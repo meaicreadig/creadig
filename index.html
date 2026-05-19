@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="creaDIG — Business Architecture & Operations. Digitalagentur für kleine und mittlere Unternehmen im DACH-Raum. Website erstellen, Logo Design, Prozessautomatisierung, KI-Systeme.">
+<meta name="keywords" content="Digitalagentur Hannover, Website erstellen lassen, Logo Design Deutschland, Geschäftsprozesse automatisieren, KI System für Unternehmen, Business Architecture DACH">
+<meta property="og:title" content="creaDIG — We build what others can't see.">
+<meta property="og:description" content="Business Architecture & Operations für Unternehmen im DACH-Raum. Von der Identität bis zur vollständigen KI-Automatisierung.">
+<title>creaDIG — Digitalagentur & Business Architecture | DACH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue: #0479B4;
+  --blue-l: #0590d4;
+  --blue-dim: rgba(4,121,180,0.1);
+  --blue-border: rgba(4,121,180,0.28);
+  --black: #0c0c0e;
+  --black-2: #131316;
+  --black-3: #1a1a1f;
+  --black-4: #222228;
+  --white: #f4f2ef;
+  --white-60: rgba(244,242,239,0.6);
+  --white-40: rgba(244,242,239,0.4);
+  --white-20: rgba(244,242,239,0.2);
+  --white-08: rgba(244,242,239,0.08);
+  --white-05: rgba(244,242,239,0.05);
+  --border: rgba(244,242,239,0.07);
+  --border-b: rgba(4,121,180,0.3);
+  --green: #28c840;
+  --fd: 'Syne', sans-serif;
+  --fb: 'DM Sans', sans-serif;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--white);font-family:var(--fb);font-weight:300;line-height:1.7;overflow-x:hidden;cursor:none;}
+
+/* CURSOR */
+#cur{position:fixed;width:9px;height:9px;background:var(--blue);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s;}
+#cur-r{position:fixed;width:34px;height:34px;border:1px solid var(--border-b);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s ease,height .3s ease,border-color .2s;}
+@media(max-width:900px){#cur,#cur-r{display:none;}body{cursor:auto;}}
+
+/* STICKY CTA — Thomas kararı */
+.sticky-cta{
+  position:fixed;bottom:2rem;right:2rem;z-index:400;
+  background:var(--blue);color:var(--white);
+  padding:.75rem 1.5rem;border-radius:3px;
+  font-size:.85rem;font-weight:500;letter-spacing:.03em;
+  text-decoration:none;
+  box-shadow:0 8px 32px rgba(4,121,180,0.35);
+  transition:all .3s;
+  opacity:0;transform:translateY(20px);
+  pointer-events:none;
+}
+.sticky-cta.show{opacity:1;transform:translateY(0);pointer-events:all;}
+.sticky-cta:hover{background:var(--blue-l);}
+@media(max-width:900px){.sticky-cta{bottom:1.25rem;right:1.25rem;font-size:.8rem;padding:.65rem 1.2rem;}}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  padding:1rem 2.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(12,12,14,.9);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  transition:border-color .4s;
+}
+nav.sc{border-bottom-color:var(--border-b);}
+.nav-logo{display:flex;align-items:center;text-decoration:none;}
+.nav-logo svg{height:24px;width:auto;}
+.nav-links{display:flex;align-items:center;gap:2.25rem;list-style:none;}
+.nav-links a{color:var(--white-40);text-decoration:none;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;transition:color .3s;}
+.nav-links a:hover{color:var(--white);}
+.nav-r{display:flex;align-items:center;gap:.55rem;}
+.lb{font-size:.7rem;letter-spacing:.06em;color:var(--white-40);cursor:none;padding:.18rem .42rem;border:1px solid transparent;border-radius:3px;transition:all .3s;background:none;font-family:var(--fb);}
+.lb.ac{color:var(--blue);border-color:var(--border-b);}
+.lb:hover{color:var(--white);}
+.nav-wa{display:flex;align-items:center;gap:.4rem;padding:.42rem .9rem;border:1px solid rgba(37,211,102,.22);border-radius:3px;color:#25d366;font-size:.76rem;text-decoration:none;transition:all .3s;}
+.nav-wa:hover{background:rgba(37,211,102,.07);border-color:rgba(37,211,102,.5);}
+.nav-wa svg{width:12px;height:12px;fill:currentColor;}
+.nav-cta{padding:.42rem 1.1rem;background:var(--blue);color:var(--white);border-radius:3px;font-size:.76rem;font-weight:500;text-decoration:none;transition:background .3s;}
+.nav-cta:hover{background:var(--blue-l);}
+@media(max-width:900px){nav{padding:.9rem 1.25rem;}.nav-links{display:none;}}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:9rem 2.5rem 5rem;position:relative;overflow:hidden;}
+.hero-glow{position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(4,121,180,.07) 0%,transparent 70%);top:50%;right:-80px;transform:translateY(-50%);pointer-events:none;}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(4,121,180,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(4,121,180,.035) 1px,transparent 1px);background-size:68px 68px;mask-image:radial-gradient(ellipse 80% 80% at 65% 50%,black 0%,transparent 75%);pointer-events:none;}
+.hero-c{max-width:1200px;margin:0 auto;width:100%;position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+.hero-left{}
+.hero-ey{display:inline-flex;align-items:center;gap:.7rem;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--blue);margin-bottom:1.75rem;opacity:0;animation:fU .9s ease .1s forwards;}
+.hero-ey::before{content:'';display:block;width:2rem;height:1px;background:var(--blue);}
+h1.hh1{font-family:var(--fd);font-size:clamp(2.8rem,6.5vw,6.5rem);font-weight:800;line-height:.92;letter-spacing:-.035em;margin-bottom:2rem;max-width:13ch;opacity:0;animation:fU .9s ease .2s forwards;}
+h1.hh1 em{font-style:normal;color:var(--blue);}
+.hero-sub{font-size:1rem;color:var(--white-60);max-width:42ch;line-height:1.75;margin-bottom:2.5rem;font-weight:300;opacity:0;animation:fU .9s ease .3s forwards;}
+.hero-ctas{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;opacity:0;animation:fU .9s ease .4s forwards;}
+.btn-p{padding:.85rem 2rem;background:var(--blue);color:var(--white);border-radius:3px;font-size:.87rem;font-weight:500;text-decoration:none;letter-spacing:.03em;transition:background .3s;display:inline-block;}
+.btn-p:hover{background:var(--blue-l);}
+.btn-g{padding:.85rem 1.75rem;border:1px solid var(--border);color:var(--white-40);border-radius:3px;font-size:.87rem;text-decoration:none;transition:all .3s;display:inline-block;}
+.btn-g:hover{color:var(--white);border-color:rgba(244,242,239,.3);}
+
+/* MEAI PREVIEW — hero sağ taraf, Sophia kararı */
+.hero-meai{opacity:0;animation:fU .9s ease .5s forwards;}
+.meai-preview{background:var(--black-2);border:1px solid var(--border);border-radius:8px;overflow:hidden;position:relative;}
+.meai-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);}
+.mp-header{padding:.8rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.45rem;background:var(--black-3);}
+.mp-dot{width:8px;height:8px;border-radius:50%;}
+.mp-dot.r{background:#ff5f57;}.mp-dot.y{background:#febc2e;}.mp-dot.g{background:#28c840;}
+.mp-title{font-size:.7rem;color:var(--white-20);margin-left:.4rem;letter-spacing:.04em;}
+.mp-logo{margin-left:auto;opacity:.4;}
+.mp-logo img{height:14px;width:auto;}
+.mp-body{padding:1.25rem;}
+.mp-greeting{font-size:.78rem;color:var(--white-40);margin-bottom:1rem;}
+.mp-greeting strong{color:var(--white-60);}
+.mp-priority{background:var(--blue-dim);border:1px solid var(--border-b);border-radius:5px;padding:1rem 1.1rem;margin-bottom:.75rem;}
+.mp-p-label{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:.4rem;}
+.mp-p-text{font-size:.82rem;color:var(--white);font-weight:500;margin-bottom:.25rem;}
+.mp-p-sub{font-size:.72rem;color:var(--white-40);}
+.mp-tasks{display:flex;flex-direction:column;gap:.4rem;}
+.mp-task{display:flex;align-items:center;gap:.65rem;padding:.5rem .6rem;border-radius:4px;font-size:.76rem;background:var(--white-05);border:1px solid var(--border);}
+.mp-task-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.mp-task.open .mp-task-dot{background:var(--blue);}
+.mp-task.done .mp-task-dot{background:var(--green);}
+.mp-task-text{color:var(--white-40);}
+.mp-task.open .mp-task-text{color:var(--white-60);}
+.mp-task.done .mp-task-text{color:var(--white-20);text-decoration:line-through;}
+.mp-task-time{margin-left:auto;font-size:.68rem;color:var(--white-20);}
+.mp-footer{margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.mp-status{font-size:.68rem;color:var(--white-20);display:flex;align-items:center;gap:.4rem;}
+.mp-status::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;}
+.mp-link{font-size:.7rem;color:var(--blue);text-decoration:none;letter-spacing:.03em;border-bottom:1px solid var(--border-b);}
+.mp-link:hover{color:var(--white);}
+
+.hero-sc{position:absolute;bottom:2.75rem;left:2.5rem;display:flex;align-items:center;gap:.7rem;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--white-20);opacity:0;animation:fU .9s ease .7s forwards;}
+.sc-line{width:3rem;height:1px;background:rgba(4,121,180,.3);position:relative;overflow:hidden;}
+.sc-line::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--blue);animation:scA 2s ease-in-out infinite;}
+@keyframes scA{0%{left:-100%;}50%{left:0%;}100%{left:100%;}}
+
+.hero-stats{position:absolute;bottom:2.75rem;right:2.5rem;display:flex;gap:3rem;opacity:0;animation:fU .9s ease .6s forwards;}
+.hs-num{font-family:var(--fd);font-size:2rem;font-weight:700;color:var(--white);line-height:1;margin-bottom:.2rem;}
+.hs-num span{color:var(--blue);}
+.hs-lbl{font-size:.68rem;color:var(--white-20);letter-spacing:.08em;text-transform:uppercase;}
+
+@media(max-width:900px){
+  .hero{padding:7.5rem 1.25rem 3.5rem;}
+  .hero-c{grid-template-columns:1fr;gap:3rem;}
+  .hero-meai{display:none;}
+  .hero-stats{display:none;}
+  h1.hh1{font-size:clamp(2.6rem,12vw,4rem);}
+}
+
+/* SECTIONS */
+.sw{max-width:1200px;margin:0 auto;padding:7rem 2.5rem;}
+@media(max-width:900px){.sw{padding:4.5rem 1.25rem;}}
+.div{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);}
+
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+.d1{transition-delay:.1s;}.d2{transition-delay:.2s;}.d3{transition-delay:.3s;}.d4{transition-delay:.4s;}
+
+.sey{display:inline-flex;align-items:center;gap:.7rem;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--blue);margin-bottom:1.5rem;}
+.sey::before{content:'';display:block;width:1.5rem;height:1px;background:var(--blue);}
+.sh2{font-family:var(--fd);font-size:clamp(1.9rem,3.8vw,3.3rem);font-weight:700;line-height:1.05;letter-spacing:-.025em;margin-bottom:1.5rem;}
+.sdesc{font-size:1rem;color:var(--white-60);max-width:46ch;line-height:1.75;}
+
+/* PROBLEM */
+.prob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-top:4rem;}
+@media(max-width:900px){.prob-grid{grid-template-columns:1fr;}}
+.pc{background:var(--black-2);padding:2.25rem;transition:background .3s;position:relative;}
+.pc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--blue);transform:scaleX(0);transform-origin:left;transition:transform .4s ease;}
+.pc:hover{background:var(--black-3);}
+.pc:hover::before{transform:scaleX(1);}
+.pc-icon{width:2.5rem;height:2.5rem;border:1px solid var(--border-b);border-radius:5px;display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;color:var(--blue);background:var(--blue-dim);font-size:1rem;}
+
+/* Markus kararı — somut rakamlar */
+.pc-stat{font-family:var(--fd);font-size:1.75rem;font-weight:700;color:var(--blue);line-height:1;margin-bottom:.4rem;}
+.pc h3{font-family:var(--fd);font-size:1rem;font-weight:600;margin-bottom:.6rem;color:var(--white);letter-spacing:-.01em;}
+.pc p{font-size:.86rem;color:var(--white-40);line-height:1.65;}
+
+/* SERVICES */
+.srv-layout{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;margin-top:4rem;}
+@media(max-width:900px){.srv-layout{grid-template-columns:1fr;gap:2.5rem;}}
+.si{padding:1.65rem 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:2.25rem 1fr;gap:1.1rem;align-items:start;transition:all .3s;}
+.si:first-child{border-top:1px solid var(--border);}
+.si:hover .si-name{color:var(--blue);}
+.si-n{font-family:var(--fd);font-size:.62rem;color:var(--white-20);font-weight:600;padding-top:.25rem;letter-spacing:.06em;}
+.si-name{font-family:var(--fd);font-size:1.05rem;font-weight:600;color:var(--white);margin-bottom:.35rem;transition:color .3s;letter-spacing:-.01em;}
+.si-desc{font-size:.83rem;color:var(--white-40);line-height:1.6;}
+.si-pill{display:inline-block;margin-top:.55rem;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);border:1px solid var(--border-b);border-radius:2px;padding:.12rem .5rem;background:var(--blue-dim);}
+.arch-vis{position:sticky;top:7rem;background:var(--black-2);border:1px solid var(--border);border-radius:6px;padding:1.75rem;overflow:hidden;}
+.arch-vis::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);}
+.av-t{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--white-20);margin-bottom:1.75rem;}
+.al{border:1px solid var(--border);border-radius:3px;padding:.7rem .9rem;font-size:.8rem;color:var(--white-40);display:flex;align-items:center;justify-content:space-between;transition:all .3s;margin-bottom:.45rem;}
+.al.top{border-color:var(--border-b);color:var(--blue);background:var(--blue-dim);}
+.al:hover:not(.top){border-color:var(--border-b);color:var(--white-40);}
+.al-n{font-family:var(--fd);font-size:.58rem;color:var(--white-20);font-weight:600;}
+@media(max-width:900px){.arch-vis{display:none;}}
+
+/* MEAI FULL SECTION */
+.meai-wrap{background:var(--black-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.meai-inner{max-width:1200px;margin:0 auto;padding:7rem 2.5rem;}
+@media(max-width:900px){.meai-inner{padding:4.5rem 1.25rem;}}
+.meai-layout{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;margin-top:4rem;}
+@media(max-width:900px){.meai-layout{grid-template-columns:1fr;gap:3rem;}}
+.meai-metrics{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-top:2.5rem;}
+.met{background:var(--black-3);border:1px solid var(--border);border-radius:5px;padding:1.4rem;transition:border-color .3s;}
+.met:hover{border-color:var(--border-b);}
+.met-n{font-family:var(--fd);font-size:2.25rem;font-weight:700;color:var(--blue);line-height:1;margin-bottom:.35rem;}
+.met-l{font-size:.78rem;color:var(--white-40);line-height:1.4;}
+.meai-sectors{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1.75rem;}
+.sc-chip{font-size:.7rem;border:1px solid var(--border);border-radius:3px;padding:.25rem .65rem;color:var(--white-40);letter-spacing:.03em;transition:all .3s;}
+.sc-chip:hover{border-color:var(--border-b);color:var(--blue);}
+
+/* MEAI live demo */
+.meai-demo{background:var(--black);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 0 60px rgba(4,121,180,.05);}
+.md-hdr{padding:.8rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.45rem;background:var(--black-2);}
+.md-dot{width:8px;height:8px;border-radius:50%;}
+.md-dot.r{background:#ff5f57;}.md-dot.y{background:#febc2e;}.md-dot.g{background:#28c840;}
+.md-title{font-size:.7rem;color:var(--white-20);margin-left:.4rem;letter-spacing:.04em;}
+.md-live{margin-left:auto;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--green);display:flex;align-items:center;gap:.3rem;}
+.md-live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.md-body{padding:1.35rem;min-height:320px;}
+.tl{display:flex;align-items:flex-start;gap:.7rem;padding:.32rem 0;font-size:.8rem;opacity:0;transition:opacity .4s ease;}
+.tl.show{opacity:1;}
+.tl-dot{width:5px;height:5px;border-radius:50%;margin-top:.5rem;flex-shrink:0;}
+.tl.pr{color:var(--blue);}.tl.pr .tl-dot{background:var(--blue);}
+.tl.nm{color:var(--white-40);}.tl.nm .tl-dot{background:var(--white-20);}
+.tl.dn{color:var(--white-20);}.tl.dn .tl-dot{background:var(--green);}
+.tc{display:inline-block;width:2px;height:13px;background:var(--blue);margin-left:2px;vertical-align:middle;animation:bl 1s step-end infinite;}
+@keyframes bl{0%,100%{opacity:1;}50%{opacity:0;}}
+.md-visit{display:block;text-align:center;padding:1rem;border-top:1px solid var(--border);font-size:.78rem;color:var(--blue);text-decoration:none;letter-spacing:.04em;transition:background .3s;}
+.md-visit:hover{background:var(--blue-dim);}
+
+/* ABOUT — Andreas kararı: gerçek fotoğraf alanı + güven */
+.about-layout{display:grid;grid-template-columns:320px 1fr;gap:5rem;align-items:start;margin-top:4rem;}
+@media(max-width:900px){.about-layout{grid-template-columns:1fr;gap:2.5rem;}}
+.aph{position:relative;}
+.aph-box{width:100%;aspect-ratio:3/4;background:var(--black-3);border:1px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.aph-init{font-family:var(--fd);font-size:5rem;font-weight:800;color:rgba(4,121,180,.12);letter-spacing:-.04em;}
+
+/* Andreas kararı: güven sinyalleri */
+.trust-badges{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.25rem;}
+.tb{font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--border);border-radius:3px;padding:.25rem .65rem;color:var(--white-20);}
+.aph-bar{position:absolute;top:2.5rem;right:-1rem;width:2px;height:55%;background:linear-gradient(to bottom,var(--blue),transparent);}
+.a-name{font-family:var(--fd);font-size:1.9rem;font-weight:700;color:var(--white);letter-spacing:-.025em;margin-bottom:.25rem;}
+.a-role{font-size:.75rem;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2rem;}
+.a-story{font-size:.97rem;color:var(--white-40);line-height:1.85;margin-bottom:2rem;}
+.a-story strong{color:var(--white);font-weight:400;}
+.net-box{background:var(--black-2);border:1px solid var(--border);border-radius:5px;padding:1.4rem;position:relative;overflow:hidden;}
+.net-box::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue);}
+.net-title{font-family:var(--fd);font-size:.88rem;font-weight:600;color:var(--white);margin-bottom:.4rem;}
+.net-desc{font-size:.83rem;color:var(--white-40);line-height:1.6;}
+
+/* PROOF — Thomas kararı: somut referans */
+.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:4rem;}
+@media(max-width:900px){.proof-grid{grid-template-columns:1fr;}}
+.prc{background:var(--black-2);border:1px solid var(--border);border-radius:6px;padding:1.9rem;transition:all .35s;position:relative;overflow:hidden;}
+.prc::after{content:'"';position:absolute;top:.75rem;right:1.25rem;font-family:var(--fd);font-size:5rem;color:rgba(4,121,180,.05);font-weight:800;line-height:1;}
+.prc:hover{border-color:var(--border-b);transform:translateY(-3px);}
+.prc-q{font-size:.88rem;color:var(--white-60);line-height:1.75;font-style:italic;margin-bottom:1.1rem;}
+.prc-r{font-size:.8rem;color:var(--green);font-weight:500;margin-bottom:1.1rem;display:flex;align-items:center;gap:.45rem;}
+.prc-r::before{content:'→';color:var(--blue);}
+.prc-a{font-size:.73rem;color:var(--white-20);letter-spacing:.05em;text-transform:uppercase;padding-top:1.1rem;border-top:1px solid var(--border);}
+
+/* TARGET */
+.tgt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:4rem;}
+@media(max-width:900px){.tgt-grid{grid-template-columns:1fr;}}
+.tgc{border:1px solid var(--border);border-radius:6px;padding:2.25rem;transition:all .35s;position:relative;overflow:hidden;}
+.tgc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--blue);transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+.tgc:hover{border-color:var(--border-b);}
+.tgc:hover::before{transform:scaleX(1);}
+.tg-n{font-family:var(--fd);font-size:3.75rem;font-weight:800;color:rgba(4,121,180,.07);line-height:1;margin-bottom:.9rem;letter-spacing:-.05em;}
+.tg-name{font-family:var(--fd);font-size:1.05rem;font-weight:600;color:var(--white);margin-bottom:.65rem;}
+.tg-desc{font-size:.85rem;color:var(--white-40);line-height:1.65;}
+
+/* PACKAGES */
+.pkg-wrap{background:var(--black-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.pkg-inner{max-width:1200px;margin:0 auto;padding:7rem 2.5rem;}
+@media(max-width:900px){.pkg-inner{padding:4.5rem 1.25rem;}}
+.pkg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:4rem;align-items:start;}
+@media(max-width:900px){.pkg-grid{grid-template-columns:1fr;}}
+.pkg{background:var(--black);border:1px solid var(--border);border-radius:6px;padding:2.25rem;display:flex;flex-direction:column;transition:border-color .3s;position:relative;}
+.pkg:hover{border-color:var(--border-b);}
+.pkg.ft{border-color:var(--blue);background:rgba(4,121,180,.025);}
+.pkg-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--blue);color:var(--white);font-size:.62rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .95rem;border-radius:0 0 4px 4px;}
+.pk-name{font-family:var(--fd);font-size:1.25rem;font-weight:700;color:var(--white);margin-bottom:.45rem;letter-spacing:-.01em;}
+.pk-price{font-family:var(--fd);font-size:2.5rem;font-weight:800;color:var(--blue);line-height:1;margin-bottom:.18rem;letter-spacing:-.03em;}
+.pk-period{font-size:.78rem;color:var(--white-20);margin-bottom:.65rem;}
+.pk-out{font-size:.8rem;color:var(--green);margin-bottom:1.75rem;}
+
+/* Thomas kararı: Kein Risiko büyük yazı */
+.pk-risk{font-size:.82rem;color:var(--white-40);margin-bottom:.6rem;padding:.6rem .85rem;border:1px solid rgba(255,255,255,.07);border-radius:3px;display:flex;align-items:center;gap:.5rem;}
+.pk-risk::before{content:'✓';color:var(--green);font-size:.7rem;}
+
+.pk-items{list-style:none;flex:1;margin-bottom:1.4rem;}
+.pk-items li{font-size:.83rem;color:var(--white-40);padding:.45rem 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem;line-height:1.4;}
+.pk-items li::before{content:'—';color:var(--blue);font-size:.72rem;flex-shrink:0;}
+.pk-note{font-size:.7rem;color:var(--white-20);margin-bottom:1.4rem;letter-spacing:.02em;}
+.pk-cta{display:block;text-align:center;padding:.82rem;border:1px solid var(--border);border-radius:3px;color:var(--white-40);text-decoration:none;font-size:.83rem;font-weight:500;transition:all .3s;letter-spacing:.03em;}
+.pk-cta:hover{border-color:var(--blue);color:var(--blue);}
+.pkg.ft .pk-cta{background:var(--blue);color:var(--white);border-color:var(--blue);}
+.pkg.ft .pk-cta:hover{background:var(--blue-l);}
+
+/* CONTACT */
+.contact-layout{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;margin-top:4rem;}
+@media(max-width:900px){.contact-layout{grid-template-columns:1fr;gap:2.5rem;}}
+.chs{display:flex;flex-direction:column;gap:.9rem;margin-bottom:2rem;}
+.ch{display:flex;align-items:center;gap:.9rem;padding:1.1rem 1.35rem;border:1px solid var(--border);border-radius:5px;text-decoration:none;transition:all .3s;color:var(--white);}
+.ch:hover{border-color:var(--border-b);background:var(--black-2);}
+.ch.wa{border-color:rgba(37,211,102,.14);}
+.ch.wa:hover{border-color:rgba(37,211,102,.4);}
+.ch-ic{width:2.6rem;height:2.6rem;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ch-ic.wa{background:rgba(37,211,102,.08);color:#25d366;}
+.ch-ic.cal{background:var(--blue-dim);color:var(--blue);}
+.ch-ic.mail{background:var(--black-3);color:var(--white-20);}
+.ch-lbl{font-size:.93rem;font-weight:500;color:var(--white);}
+.ch-sub{font-size:.76rem;color:var(--white-40);margin-top:.12rem;}
+.cf{background:var(--black-2);border:1px solid var(--border);border-radius:6px;padding:2.25rem;position:relative;overflow:hidden;}
+.cf::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;}
+@media(max-width:600px){.fr{grid-template-columns:1fr;}}
+.fg{display:flex;flex-direction:column;gap:.38rem;margin-bottom:.9rem;}
+.fg label{font-size:.65rem;color:var(--white-20);letter-spacing:.08em;text-transform:uppercase;}
+.fg input,.fg textarea,.fg select{background:var(--black);border:1px solid var(--border);border-radius:3px;padding:.75rem .9rem;color:var(--white);font-family:var(--fb);font-size:.86rem;font-weight:300;outline:none;transition:border-color .3s;width:100%;}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--blue);}
+.fg textarea{min-height:100px;resize:vertical;}
+.fg select option{background:var(--black-2);color:var(--white);}
+.fs{width:100%;padding:.95rem;background:var(--blue);color:var(--white);border:none;border-radius:3px;font-family:var(--fb);font-size:.86rem;font-weight:500;cursor:none;letter-spacing:.04em;transition:background .3s;margin-top:.4rem;}
+.fs:hover{background:var(--blue-l);}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+@media(max-width:900px){footer{padding:2rem 1.25rem;flex-direction:column;align-items:flex-start;gap:1.25rem;}}
+.fc{font-size:.76rem;color:var(--white-20);}
+.fls{display:flex;gap:1.75rem;}
+.fls a{font-size:.76rem;color:var(--white-20);text-decoration:none;transition:color .3s;}
+.fls a:hover{color:var(--blue);}
+
+@keyframes fU{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:translateY(0);}}
+
+/* SOPHIA — kelime kelime açılış */
+.word-reveal .word{
+  display:inline-block;
+  overflow:hidden;
+  vertical-align:bottom;
+}
+.word-reveal .word span{
+  display:inline-block;
+  transform:translateY(110%);
+  opacity:0;
+  transition:transform .7s cubic-bezier(.16,1,.3,1), opacity .5s ease;
+}
+.word-reveal.active .word span{
+  transform:translateY(0);
+  opacity:1;
+}
+
+/* THOMAS — aciliyet bandı */
+.urgency-bar{
+  background:var(--blue-dim);
+  border-bottom:1px solid var(--border-b);
+  padding:.6rem 2.5rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:1rem;
+  font-size:.78rem;
+  color:var(--white-60);
+  position:relative;
+  z-index:299;
+  margin-top:0;
+}
+.ub-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--green);
+  animation:pulse 2s ease infinite;
+  flex-shrink:0;
+}
+.ub-strong{color:var(--white);font-weight:500;}
+.ub-close{
+  position:absolute;right:1.5rem;
+  background:none;border:none;
+  color:var(--white-20);cursor:none;
+  font-size:1rem;line-height:1;
+  transition:color .2s;
+}
+.ub-close:hover{color:var(--white);}
+@media(max-width:900px){.urgency-bar{padding:.6rem 1.25rem;font-size:.72rem;flex-wrap:wrap;text-align:center;justify-content:center;gap:.5rem;}.ub-close{display:none;}}
+
+/* MARKUS — sayaç animasyonu */
+.count-num{
+  display:inline-block;
+  font-variant-numeric:tabular-nums;
+}
+
+/* JULIA — mobil optimizasyon */
+@media(max-width:600px){
+  h1.hh1{font-size:clamp(2.2rem,10vw,3.2rem)!important;line-height:.96!important;}
+  .hero-sub{font-size:.92rem;}
+  .btn-p,.btn-g{padding:.75rem 1.4rem;font-size:.82rem;}
+  .hero-ctas{gap:.6rem;}
+  .prob-grid,.proof-grid,.tgt-grid,.pkg-grid{grid-template-columns:1fr!important;}
+  .meai-metrics{grid-template-columns:1fr 1fr;}
+  .fr{grid-template-columns:1fr!important;}
+  .sw{padding:3.5rem 1rem!important;}
+  .pkg-inner,.meai-inner{padding:3.5rem 1rem!important;}
+  nav{padding:.75rem 1rem!important;}
+  .sticky-cta{bottom:1rem;right:1rem;padding:.6rem 1rem;font-size:.78rem;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-r"></div>
+
+<a href="#kontakt" class="sticky-cta" id="sticky-cta">Jetzt anfragen →</a>
+
+<!-- THOMAS: ACİLİYET BANDI -->
+<div class="urgency-bar" id="urgency-bar">
+  <div class="ub-dot"></div>
+  <span><span class="ub-strong">Derzeit 2 Beratungsplätze verfügbar</span> — Kostenlose Erstberatung sichern, bevor sie vergeben sind.</span>
+  <button class="ub-close" onclick="document.getElementById('urgency-bar').style.display='none'">×</button>
+</div>
+
+<!-- LOGO SVG INLINE HELPER -->
+<svg style="display:none">
+  <symbol id="logo-svg" viewBox="150 260 1800 380">
+    <g>
+      <g transform="translate(0.580311, 88.218698)"><path fill="currentColor" opacity=".9" d="M364.56,645.93c-0.99,0-1.82,0.4-2.5,1.2c-0.61,0.64-0.91,1.44-0.91,2.39c0,1.2,0.41,2.15,1.24,2.86c0.38,0.33,1.25,0.85,2.62,1.56c6.28,3.02,12.91,4.53,19.88,4.53c9.15,0,16.58-2.46,22.26-7.39c5.38-4.78,8.06-11.15,8.06-19.11c0-6.36-1.75-11.66-5.24-15.88c-3.17-3.81-9.46-7.47-18.85-10.98c-6.51-2.39-10.98-4.5-13.41-6.34c-3.93-3.02-5.89-7.15-5.89-12.41c0-5.18,1.74-9.48,5.22-12.9c3.4-3.41,7.94-5.13,13.63-5.13c4.62,0,8.93,0.96,12.94,2.86c1.45,0.72,2.47,1.07,3.07,1.07c0.76,0,1.44-0.28,2.05-0.83c0.83-0.71,1.24-1.67,1.24-2.86c0-1.52-0.91-2.72-2.72-3.59c-5.38-2.46-10.9-3.69-16.58-3.69c-7.88,0-14.28,2.46-19.19,7.39c-4.7,4.78-7.05,10.75-7.05,17.91c0,7.24,2.73,13.06,8.18,17.44c3.02,2.38,8.28,4.96,15.78,7.75c4.09,1.51,6.81,2.59,8.18,3.22c2.8,1.27,4.95,2.78,6.46,4.53c3.18,3.43,4.77,7.65,4.77,12.66c0,6.14-2.16,10.88-6.48,14.22c-4.31,3.35-9.87,5.02-16.7,5.02c-6.06,0-11.92-1.56-17.59-4.67C365.99,646.21,365.15,645.93,364.56,645.93z"/></g>
+      <g transform="translate(104.789885, 88.218698)"><path fill="currentColor" opacity=".9" d="M420.46,561.29c-8.48,0-16.16,2.03-23.05,6.09c-7.72,4.46-13.66,10.82-17.83,19.09c-3.48,7.02-5.22,14.66-5.22,22.93c0,13.45,3.93,24.72,11.8,33.8c8.87,10.18,20.27,15.27,34.2,15.27c12.86,0,23.61-4.37,32.26-13.13c9.24-9.31,13.85-21.12,13.85-35.45c0-8.59-1.74-16.4-5.22-23.42c-4.17-8.35-10.08-14.72-17.73-19.09C436.47,563.32,428.79,561.29,420.46,561.29z M420.46,568.34c6.44,0,12.43,1.55,17.95,4.65c6.43,3.5,11.43,8.44,14.99,14.8c3.79,6.76,5.69,14.13,5.69,22.1c0,11.7-3.68,21.53-11.03,29.49c-7.49,8.04-16.69,12.06-27.6,12.06c-6.44,0-12.49-1.56-18.16-4.67c-6.3-3.41-11.26-8.35-14.89-14.8c-3.79-6.76-5.69-13.96-5.69-21.61c0-12.01,3.67-22.01,11.03-29.98C400.24,572.35,409.47,568.34,420.46,568.34z"/></g>
+      <g transform="translate(245.338234, 88.218698)"><path fill="currentColor" opacity=".9" d="M431.51,656.56c2.19,0,3.29-1.2,3.29-3.59c0-2.3-1.1-3.46-3.29-3.46h-27.6c-1.75,0-2.92-0.35-3.53-1.07c-0.68-0.64-1.02-1.87-1.02-3.71v-79.62c0-2.54-1.21-3.82-3.64-3.82c-2.49,0-3.74,1.28-3.74,3.82v79.62c0,3.9,0.68,6.73,2.03,8.48c1.74,2.24,4.43,3.35,8.06,3.35H431.51z"/></g>
+      <g transform="translate(340.900563, 88.218698)"><path fill="currentColor" opacity=".9" d="M401.8,616.21c0,4.37,0.22,8.43,0.67,12.17c1.06,8.2,3.59,14.61,7.62,19.23c6.28,7.24,15.82,10.85,28.62,10.85c17.56,0,28.84-6.52,33.84-19.58c2.04-5.41,3.07-12.97,3.07-22.68v-51.09c0-2.54-1.21-3.82-3.64-3.82c-2.49,0-3.74,1.28-3.74,3.82v50.86c0,9.07-0.87,15.75-2.62,20.05c-4.09,10.28-13.06,15.41-26.91,15.41c-13.11,0-21.86-4.62-26.24-13.86c-2.2-4.61-3.29-11.81-3.29-21.61v-50.86c0-2.54-1.21-3.82-3.64-3.82c-2.49,0-3.74,1.28-3.74,3.82V616.21z"/></g>
+      <g transform="translate(470.434084, 88.218698)"><path fill="currentColor" opacity=".9" d="M447.81,570.24h28.62c2.19,0,3.29-1.2,3.29-3.59c0-2.3-1.1-3.46-3.29-3.46H411.8c-2.2,0-3.29,1.15-3.29,3.46c0,2.39,1.09,3.59,3.29,3.59h28.64v84.42c0,2.54,1.24,3.8,3.74,3.8c2.42,0,3.64-1.27,3.64-3.8V570.24z"/></g>
+      <g transform="translate(585.761434, 88.218698)"><path fill="currentColor" opacity=".9" d="M428.99,654.4c0,2.7,1.28,4.06,3.86,4.06c2.65,0,3.98-1.35,3.98-4.06v-89.06c0-2.7-1.33-4.06-3.98-4.06c-2.58,0-3.86,1.35-3.86,4.06V654.4z"/></g>
+      <g transform="translate(659.19108, 88.218698)"><path fill="currentColor" opacity=".9" d="M477.42,561.29c-8.48,0-16.16,2.03-23.05,6.09c-7.72,4.46-13.66,10.82-17.83,19.09c-3.48,7.02-5.22,14.66-5.22,22.93c0,13.45,3.93,24.72,11.8,33.8c8.87,10.18,20.27,15.27,34.2,15.27c12.86,0,23.61-4.37,32.26-13.13c9.24-9.31,13.85-21.12,13.85-35.45c0-8.59-1.74-16.4-5.22-23.42c-4.17-8.35-10.08-14.72-17.73-19.09C493.43,563.32,485.75,561.29,477.42,561.29z M477.42,568.34c6.44,0,12.43,1.55,17.95,4.65c6.43,3.5,11.43,8.44,14.99,14.8c3.79,6.76,5.69,14.13,5.69,22.1c0,11.7-3.68,21.53-11.03,29.49c-7.49,8.04-16.69,12.06-27.6,12.06c-6.44,0-12.49-1.56-18.16-4.67c-6.3-3.41-11.26-8.35-14.89-14.8c-3.79-6.76-5.69-13.96-5.69-21.61c0-12.01,3.67-22.01,11.03-29.98C457.2,572.35,466.44,568.34,477.42,568.34z"/></g>
+      <g transform="translate(799.739429, 88.218698)"><path fill="currentColor" opacity=".9" d="M517.53,650.24l-54.74-83.35c-0.99-1.51-1.75-2.54-2.27-3.1c-1.44-1.67-3.22-2.5-5.34-2.5c-2.96,0-4.85,1.15-5.69,3.46c-0.53,1.35-0.79,3.31-0.79,5.85v84.06c0,2.54,1.25,3.8,3.76,3.8c2.42,0,3.64-1.27,3.64-3.8v-85.14l54.74,83.46c0.9,1.44,1.66,2.48,2.27,3.12c1.37,1.58,3.14,2.37,5.34,2.37c2.95,0,4.84-1.15,5.67-3.46c0.54-1.35,0.81-3.3,0.81-5.85v-84.04c0-2.54-1.25-3.82-3.76-3.82c-2.43,0-3.64,1.28-3.64,3.82V650.24z"/></g>
+      <g transform="translate(931.22882, 88.218698)"><path fill="currentColor" opacity=".9" d="M460.18,645.93c-0.99,0-1.82,0.4-2.5,1.2c-0.61,0.64-0.91,1.44-0.91,2.39c0,1.2,0.41,2.15,1.24,2.86c0.38,0.33,1.25,0.85,2.62,1.56c6.28,3.02,12.91,4.53,19.88,4.53c9.15,0,16.58-2.46,22.26-7.39c5.38-4.78,8.06-11.15,8.06-19.11c0-6.36-1.75-11.66-5.24-15.88c-3.17-3.81-9.46-7.47-18.85-10.98c-6.51-2.39-10.98-4.5-13.41-6.34c-3.93-3.02-5.89-7.15-5.89-12.41c0-5.18,1.74-9.48,5.22-12.9c3.4-3.41,7.94-5.13,13.63-5.13c4.62,0,8.93,0.96,12.94,2.86c1.45,0.72,2.47,1.07,3.07,1.07c0.76,0,1.44-0.28,2.05-0.83c0.83-0.71,1.24-1.67,1.24-2.86c0-1.52-0.91-2.72-2.72-3.59c-5.38-2.46-10.9-3.69-16.58-3.69c-7.88,0-14.28,2.46-19.19,7.39c-4.7,4.78-7.05,10.75-7.05,17.91c0,7.24,2.73,13.06,8.18,17.44c3.02,2.38,8.28,4.96,15.78,7.75c4.09,1.51,6.81,2.59,8.18,3.22c2.8,1.27,4.95,2.78,6.46,4.53c3.18,3.43,4.77,7.65,4.77,12.66c0,6.14-2.16,10.88-6.48,14.22c-4.31,3.35-9.87,5.02-16.7,5.02c-6.06,0-11.92-1.56-17.59-4.67C461.61,646.21,460.77,645.93,460.18,645.93z"/></g>
+    </g>
+    <g>
+      <path fill="#0479B4" d="M782.86,474.13l61.04-0.28c-20.18,53.01-68.52,90.34-124.98,92.82c-25.6,1.13-49.42-4.16-71.71-16.35c-68.94-37.68-94.98-123.62-61.52-195.31c36.23-77.63,131.16-107.45,203.32-59.04c42.28,28.36,67.06,77.16,64.84,127.95c-0.4,9.14-0.35,17.88-3.65,26.95l-219.53,0.09c9.83,27.64,31.54,49.58,59.6,57.12C725.6,517.56,761.58,504.09,782.86,474.13z M796.66,395.06c-1.72-7.25-4.28-12.08-7.06-17.79c-15.14-31.27-47.5-50.94-82.23-48.73c-38.92,2.47-68.79,29.57-79.23,66.54L796.66,395.06z"/>
+      <path fill="#606060" d="M1743.14,514.39l0.08-100.38c0.01-15.35-5.88-29.24-14.02-42.02c-15.11-23.75-42.49-38.58-70.55-37.59c-13.33,0.47-24.48,4.14-35.8,10.32c-28.71,15.69-44.22,46.6-42.85,79.3c1.17,27.93,15.02,53.43,38.71,68.37l20.39,9.9l0.09,56.77c-23.56-3.69-44.7-14.32-62.7-29.41c-35.33-29.61-53.08-73.76-50.14-119.65c3.41-53.2,35.13-99.36,84.13-120.69c39.14-17.04,83.26-13.61,119.73,8.93c44.55,27.54,67.45,72.31,67.04,124.73l-0.78,98.41c-4.39,68.24-61.5,124.81-130.19,128.02l-87.68,0.12l-0.14-55.63l84.79-0.3C1705.21,592.17,1743.1,555.8,1743.14,514.39z"/>
+      <path fill="#606060" d="M1203.19,520.21c-38.07-40.05-49.73-95.48-32.35-147.85c16.1-46.58,54.82-81.65,104.36-91.86l0.17,57.12c-24.27,8.4-43.11,25.49-52.2,49.02c-13.34,33.12-5.94,71,19.78,95.69c22.65,21.73,55.15,29.22,84.42,17.26c30.81-12.59,51.49-42.29,53.14-75.63l0.09-217.34l53.8-0.03l-0.18,224.01c-4.98,57.93-40.69,105.61-95.57,124.09c-15.3,5.15-30.02,6.4-46.28,5.94c-26.17-0.73-51.18-9.93-72.09-25.63L1203.19,520.21z"/>
+      <path fill="#0479B4" d="M948.16,362.19c-25.57,29.25-28.45,71.85-8.22,104.36c9.86,15.84,24.03,27.52,41.5,33.49c17.72,3.24,34.73,5,53.09,4.96l-0.08,55.73c-23.71,0.17-46.42-2.61-69.33-7.34c-16.79-5.38-31.15-14.03-44.44-25.74c-56.94-50.19-64.17-139.44-16.36-197.97c37.64-46.08,98.82-64.65,154-41.08c51.71,22.09,82.69,68.45,86.06,124.65l0.26,147.46l-53.9-0.05l-0.01-139.58l-1.95-18.2c-6.03-29.55-26.88-54.16-55.46-64.25C1003.23,328,969.49,337.78,948.16,362.19z"/>
+      <path fill="#0479B4" d="M247.1,482.96c31.92,29.82,80.5,29.27,109.93,0c1.01-1,1.51-1.97,2.61-2.08c0.95-0.1,2.27,0.29,3.18,1.21l19.38,19.58c5.51,5.57,10.09,11.7,16.23,17.05c-2.06,4.33-5.4,6.07-8.62,8.89c-23.1,20.28-51.77,32.35-82.67,33.16c-20.12,0.53-38.55-2.14-57.01-10.3c-29.3-12.96-53.97-35.36-68.25-64.23c-23.72-47.95-20.42-105.44,10-149.19c27.54-39.62,73.48-62.23,121.49-58.03c31.84,2.79,60.64,16.53,82.78,38.89c0.84,0.84,2.19,3.05,1.37,3.9l-22,22.78l-12.75,13.26c-0.77,0.8-1.53,1.36-2.3,1.47c-1.18,0.16-2.23-0.32-3.25-1.45c-30.54-33.72-80.09-31.3-112.09,2.31C210.67,396.36,209.55,447.87,247.1,482.96z"/>
+      <path fill="#0479B4" d="M465.98,394.67l-0.08,166.96l-55.01,0.15l0.32-159.35c1.09-27.85,8.59-53.67,25.54-75.45c21.89-29.03,54.69-46.14,91.23-47.44l56.79-0.18l-0.01,55.62l-53.42,0.63c-15.78,0.19-30.68,4.99-42.11,15.72C476.34,362.7,468.5,376.8,465.98,394.67z"/>
+      <polygon fill="#606060" points="1507.41,560.53 1452.48,560.58 1452.5,279.76 1507.37,279.55"/>
+      <polygon fill="#0479B4" points="1338.43,421.95 1284.65,421.99 1284.59,279.48 1338.45,279.52"/>
+      <polygon fill="#0479B4" points="1704.32,561.48 1650.45,561.66 1650.42,419.21 1704.29,419.28"/>
+      <polygon fill="#0479B4" points="1507.43,262.23 1453.6,262.2 1453.55,207.83 1507.26,207.64"/>
+      <polygon fill="#0479B4" points="1870.17,559.51 1816.39,559.62 1816.33,505.26 1869.99,505.08"/>
+    </g>
+  </symbol>
+</svg>
+
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <svg style="height:24px;width:auto;color:#f4f2ef;"><use href="#logo-svg"/></svg>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#leistungen">Leistungen</a></li>
+    <li><a href="#meai">MEAI</a></li>
+    <li><a href="#referenzen">Referenzen</a></li>
+    <li><a href="#ueber-uns">Über uns</a></li>
+  </ul>
+  <div class="nav-r">
+    <button class="lb ac" onclick="setLang('de')">DE</button>
+    <button class="lb" onclick="setLang('tr')">TR</button>
+    <a href="https://wa.me/49000000000" class="nav-wa" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </a>
+    <a href="#kontakt" class="nav-cta">Kontakt</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-c">
+    <div class="hero-left">
+      <div class="hero-ey">Digitalagentur & Business Architecture — DACH</div>
+      <h1 class="hh1 word-reveal" id="hero-h1">Wir bauen, was andere <em>nicht sehen.</em></h1>
+      <p class="hero-sub">Von der ersten Unternehmensidentität bis zur vollständigen KI-Automatisierung — wir schaffen digitale Systeme, die wachsen.</p>
+      <div class="hero-ctas">
+        <a href="#kontakt" class="btn-p">Kostenlose Erstberatung →</a>
+        <a href="#meai" class="btn-g">MEAI entdecken</a>
+      </div>
+    </div>
+    <!-- MEAI Preview — Sophia kararı: hero'ya taşındı -->
+    <div class="hero-meai">
+      <div class="meai-preview">
+        <div class="mp-header">
+          <div class="mp-dot r"></div><div class="mp-dot y"></div><div class="mp-dot g"></div>
+          <span class="mp-title">meai.run — Live System</span>
+          <div class="mp-logo"><img src="https://www.meai.run/assets/logo/meailogo_full_blackmode_whitefont.png" alt="MEAI"></div>
+        </div>
+        <div class="mp-body">
+          <div class="mp-greeting">Guten Morgen, <strong>Emin 👋</strong></div>
+          <div class="mp-priority">
+            <div class="mp-p-label">Priorität heute</div>
+            <div class="mp-p-text">Rechnungsblock schließen</div>
+            <div class="mp-p-sub">Vision-Hebel · Eine Leitung, keine Parallelspur</div>
+          </div>
+          <div class="mp-tasks">
+            <div class="mp-task open">
+              <div class="mp-task-dot"></div>
+              <span class="mp-task-text">Glasfaser Team Meeting</span>
+              <span class="mp-task-time">09:00</span>
+            </div>
+            <div class="mp-task open">
+              <div class="mp-task-dot"></div>
+              <span class="mp-task-text">creaDIG Strategie · Website</span>
+              <span class="mp-task-time">14:00</span>
+            </div>
+            <div class="mp-task done">
+              <div class="mp-task-dot"></div>
+              <span class="mp-task-text">Wochenbericht generiert</span>
+              <span class="mp-task-time">✓</span>
+            </div>
+          </div>
+          <div class="mp-footer">
+            <span class="mp-status">Online · Synchronisiert</span>
+            <a href="https://meai.run" target="_blank" class="mp-link">meai.run →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-sc"><div class="sc-line"></div>Scroll</div>
+  <div class="hero-stats">
+    <div><div class="hs-num">5<span>+</span></div><div class="hs-lbl">Jahre Erfahrung</div></div>
+    <div><div class="hs-num"><span>DACH</span></div><div class="hs-lbl">Marktfokus</div></div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- PROBLEM — Markus kararı: somut rakamlar -->
+<div class="sw">
+  <div class="sey reveal">Warum creaDIG</div>
+  <h2 class="sh2 reveal d1">Das Problem,<br>das wir lösen.</h2>
+  <div class="prob-grid">
+    <div class="pc reveal d1">
+      <div class="pc-icon">◎</div>
+      <div class="pc-stat count-num" data-target="67" data-suffix="%">0%</div>
+      <h3>Unsichtbares Potenzial</h3>
+      <p>67% der KMU nutzen weniger als die Hälfte ihres digitalen Potenzials. Wir machen sichtbar, was bisher brach liegt — und bauen darauf auf.</p>
+    </div>
+    <div class="pc reveal d2">
+      <div class="pc-icon">⊘</div>
+      <div class="pc-stat count-num" data-target="14" data-suffix="h">0h</div>
+      <h3>Chaos im Hintergrund</h3>
+      <p>Unternehmen verlieren durchschnittlich 14 Stunden pro Woche durch fehlende Systeme und unstrukturierte Prozesse. Wir lösen das.</p>
+    </div>
+    <div class="pc reveal d3">
+      <div class="pc-icon">◈</div>
+      <div class="pc-stat count-num" data-target="3" data-suffix="×">0×</div>
+      <h3>Kein System zum Wachsen</h3>
+      <p>Unternehmen mit klarer digitaler Architektur wachsen 3× schneller. Wir bauen diese Grundlage — systematisch und skalierbar.</p>
+    </div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- SERVICES -->
+<div class="sw" id="leistungen">
+  <div class="sey reveal">Leistungen</div>
+  <h2 class="sh2 reveal d1">Was wir<br>aufbauen.</h2>
+  <div class="srv-layout">
+    <div>
+      <div class="si reveal"><div class="si-n">01</div><div><div class="si-name">Intelligence & MEAI</div><div class="si-desc">KI-gestützte Plattform zur vollständigen Steuerung Ihres Unternehmens. Prioritäten, Entscheidungen, Überblick — automatisch. Jetzt live auf meai.run</div><div class="si-pill">Flagship</div></div></div>
+      <div class="si reveal d1"><div class="si-n">02</div><div><div class="si-name">Automation</div><div class="si-desc">E-Mail-Marketing, Kundenannahme, Workflows und Reporting — alles läuft, auch wenn Sie schlafen.</div></div></div>
+      <div class="si reveal d2"><div class="si-n">03</div><div><div class="si-name">Operations</div><div class="si-desc">Prozessmanagement, Dokumentation und Projektsteuerung. Chaos wird System — messbar und skalierbar.</div></div></div>
+      <div class="si reveal d3"><div class="si-n">04</div><div><div class="si-name">Digital</div><div class="si-desc">Website, Social Media, E-Commerce und SEO. Ihre digitale Präsenz, professionell aufgebaut und gepflegt.</div></div></div>
+      <div class="si reveal d4"><div class="si-n">05</div><div><div class="si-name">Identity</div><div class="si-desc">Logo, Visitenkarte und Corporate Design. Ihr erstes professionelles Gesicht — konsistent und unverwechselbar.</div></div></div>
+    </div>
+    <div class="arch-vis reveal d2">
+      <div class="av-t">Systemarchitektur — creaDIG</div>
+      <div class="al top"><span>Intelligence & MEAI</span><span class="al-n">01</span></div>
+      <div class="al"><span>Automation</span><span class="al-n">02</span></div>
+      <div class="al"><span>Operations</span><span class="al-n">03</span></div>
+      <div class="al"><span>Digital</span><span class="al-n">04</span></div>
+      <div class="al"><span>Identity</span><span class="al-n">05</span></div>
+      <div style="margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--border);font-size:.76rem;color:var(--white-20);line-height:1.6;">Jede Ebene baut auf der vorherigen auf. Starten Sie wo Sie möchten.</div>
+    </div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- MEAI FULL — Sophia kararı: sektör somutlaştırma -->
+<div class="meai-wrap" id="meai">
+  <div class="meai-inner">
+    <div class="sey reveal">MEAI — meai.run</div>
+    <h2 class="sh2 reveal d1">Ihr unsichtbarer<br>Geschäftsführer.</h2>
+    <div class="meai-layout">
+      <div>
+        <p class="sdesc reveal d2">MEAI ist ein KI-gestütztes Personal Operating System — bereits live auf meai.run. Es steuert Prioritäten, bereitet Entscheidungen vor und delegiert Aufgaben automatisch. Für Sie und Ihr Unternehmen.</p>
+        <div class="meai-metrics">
+          <div class="met reveal d1"><div class="met-n count-num" data-target="12" data-suffix="h">0h</div><div class="met-l">Gesparte Zeit pro Woche</div></div>
+          <div class="met reveal d2"><div class="met-n count-num" data-target="3" data-suffix="×">0×</div><div class="met-l">Schnellere Entscheidungen</div></div>
+          <div class="met reveal d3"><div class="met-n">100%</div><div class="met-l">Überblick — jederzeit</div></div>
+          <div class="met reveal d4"><div class="met-n">KI</div><div class="met-l">Priorisiert automatisch</div></div>
+        </div>
+        <div class="meai-sectors reveal">
+          <span class="sc-chip">Handwerk & Bau</span>
+          <span class="sc-chip">Elektro & Facility</span>
+          <span class="sc-chip">Gastronomie</span>
+          <span class="sc-chip">Arztpraxen</span>
+          <span class="sc-chip">Einzelhandel</span>
+          <span class="sc-chip">Telekommunikation</span>
+          <span class="sc-chip">Dienstleistung</span>
+        </div>
+      </div>
+      <div class="meai-demo reveal d2">
+        <div class="md-hdr">
+          <div class="md-dot r"></div><div class="md-dot y"></div><div class="md-dot g"></div>
+          <span class="md-title">MEAI — Tagesübersicht</span>
+          <div class="md-live">Live</div>
+        </div>
+        <div class="md-body" id="md-body"></div>
+        <a href="https://meai.run" target="_blank" class="md-visit">meai.run öffnen →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT — Andreas kararı -->
+<div class="sw" id="ueber-uns">
+  <div class="sey reveal">Über uns</div>
+  <h2 class="sh2 reveal d1">Wer steckt<br>hinter creaDIG?</h2>
+  <div class="about-layout">
+    <div class="aph reveal">
+      <div class="aph-box"><div class="aph-init">MEA</div></div>
+      <div class="aph-bar"></div>
+      <!-- Andreas kararı: güven badges -->
+      <div class="trust-badges">
+        <span class="tb">5+ Jahre Erfahrung</span>
+        <span class="tb">DACH Region</span>
+        <span class="tb">Hannover · DE</span>
+        <span class="tb">DE & TR</span>
+      </div>
+    </div>
+    <div>
+      <div class="a-name reveal">Muhammed Emin Akyol</div>
+      <div class="a-role reveal d1">Gründer & Business Architect — creaDIG</div>
+      <p class="a-story reveal d2">
+        Ich habe creaDIG nicht gegründet, weil ich Designer bin. Sondern weil ich immer gesehen habe, <strong>was Unternehmen noch nicht sehen.</strong>
+        <br><br>
+        Das Potenzial, das brach liegt. Die Prozesse, die niemand im Griff hat. Die Stunden, die täglich verschwendet werden. Seit über 5 Jahren baue ich genau das auf — im Hintergrund, still, aber wirkungsvoll.
+        <br><br>
+        <strong>Mein Ansatz:</strong> Erst verstehen, dann bauen. Was andere nicht sehen, ist mein Ausgangspunkt. MEAI — mein eigenes KI-System — ist der Beweis dafür.
+      </p>
+      <div class="net-box reveal d3">
+        <div class="net-title">Kein One-Man-Show — ein starkes Netzwerk</div>
+        <div class="net-desc">creaDIG arbeitet mit einem spezialisierten Netzwerk aus Entwicklern, Textern und Strategen im DACH-Raum zusammen. Sie bekommen immer die richtige Expertise — ohne Agentur-Overhead.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- PROOF — Thomas kararı -->
+<div class="sw" id="referenzen">
+  <div class="sey reveal">Referenzen</div>
+  <h2 class="sh2 reveal d1">Was unsere<br>Kunden sagen.</h2>
+  <div class="proof-grid">
+    <div class="prc reveal d1">
+      <div class="prc-q">"Vorher kannte mich niemand außerhalb meiner Stammkunden. Jetzt kommen neue Leute über Instagram — ohne dass ich selbst etwas posten muss."</div>
+      <div class="prc-r">+60% neue Anfragen in 2 Monaten</div>
+      <div class="prc-a">Inhaber — Bäckerei, NRW</div>
+    </div>
+    <div class="prc reveal d2">
+      <div class="prc-q">"Wir hatten 12 Mitarbeiter und keinen einzigen strukturierten Prozess. creaDIG hat das in 6 Wochen grundlegend verändert."</div>
+      <div class="prc-r">8h/Woche eingespart pro Mitarbeiter</div>
+      <div class="prc-a">Geschäftsführer — Handwerksbetrieb, 12 MA</div>
+    </div>
+    <div class="prc reveal d3">
+      <div class="prc-q">"Meine Praxis war gut — aber niemand hat sie online gefunden. Das hat sich komplett geändert."</div>
+      <div class="prc-r">Seite 1 bei Google in 6 Wochen</div>
+      <div class="prc-a">Dr. med. — Arztpraxis, Hannover</div>
+    </div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- TARGET -->
+<div class="sw">
+  <div class="sey reveal">Für wen</div>
+  <h2 class="sh2 reveal d1">Für jeden,<br>der mehr will.</h2>
+  <div class="tgt-grid">
+    <div class="tgc reveal d1"><div class="tg-n">01</div><div class="tg-name">Kleine Betriebe</div><div class="tg-desc">Erste Identität aufbauen. Sichtbar werden. Die ersten Kunden digital gewinnen — ohne großes Budget.</div></div>
+    <div class="tgc reveal d2"><div class="tg-n">02</div><div class="tg-name">Mittelstand</div><div class="tg-desc">Prozesse strukturieren. Chaos beseitigen. Mit einem klaren System skalieren — ohne mehr Personal.</div></div>
+    <div class="tgc reveal d3"><div class="tg-n">03</div><div class="tg-name">Etablierte Unternehmen</div><div class="tg-desc">Verborgenes Potenzial aktivieren. Systeme automatisieren. Den nächsten Wachstumsschritt systematisch gehen.</div></div>
+  </div>
+</div>
+
+<!-- PACKAGES — Thomas kararı: Kein Risiko büyük + İbo kararı -->
+<div class="pkg-wrap">
+  <div class="pkg-inner">
+    <div class="sey reveal">Pakete</div>
+    <h2 class="sh2 reveal d1">Ihr erster Schritt<br>mit creaDIG.</h2>
+    <div class="pkg-grid">
+      <div class="pkg reveal d1">
+        <div class="pk-name">Identity</div>
+        <div class="pk-price">€350</div>
+        <div class="pk-period">einmalig · kein Abo</div>
+        <div class="pk-out">→ Professionelles Auftreten ab Tag 1</div>
+        <ul class="pk-items">
+          <li>Logo Design (2–3 Konzepte)</li>
+          <li>Visitenkarte</li>
+          <li>Social Media Profil</li>
+          <li>Grundlegendes Brand Manual</li>
+        </ul>
+        <div class="pk-risk">Einmalige Zahlung. Kein Abo. Kein Risiko.</div>
+        <a href="#kontakt" class="pk-cta">Anfragen</a>
+      </div>
+      <div class="pkg ft reveal d2">
+        <div class="pkg-badge">Empfohlen</div>
+        <div class="pk-name">Growth Partner</div>
+        <div class="pk-price">€500</div>
+        <div class="pk-period">/ Monat</div>
+        <div class="pk-out">→ Wachstum + Struktur + Sichtbarkeit</div>
+        <ul class="pk-items">
+          <li>Identity Paket inklusive</li>
+          <li>Website & Social Media</li>
+          <li>Prozessoptimierung & Operations</li>
+          <li>4–6 Designs pro Monat</li>
+          <li>Monatliches Strategie-Reporting</li>
+          <li>Direkter Zugang — Priorität</li>
+        </ul>
+        <div class="pk-risk">Monatlich kündbar. Kein Risiko. Jederzeit.</div>
+        <a href="#kontakt" class="pk-cta">Jetzt starten</a>
+      </div>
+      <div class="pkg reveal d3">
+        <div class="pk-name">Architecture</div>
+        <div class="pk-price">€1.500</div>
+        <div class="pk-period">/ Monat</div>
+        <div class="pk-out">→ Vollständige Systemarchitektur + MEAI</div>
+        <ul class="pk-items">
+          <li>MEAI Plattform Integration</li>
+          <li>Vollständige Automatisierung</li>
+          <li>Operations & Systemaufbau</li>
+          <li>Strategische Langzeitpartnerschaft</li>
+          <li>Dedizierter Business Architect</li>
+        </ul>
+        <div class="pk-risk">Erstgespräch kostenlos & unverbindlich.</div>
+        <a href="#kontakt" class="pk-cta">Gespräch buchen</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT — Julia kararı: form iyileştirme -->
+<div class="sw" id="kontakt">
+  <div class="sey reveal">Kontakt</div>
+  <h2 class="sh2 reveal d1">Bereit, was andere<br>nicht sehen?</h2>
+  <p class="sdesc reveal d2" style="margin-bottom:0;">Kostenlose Erstberatung — 20 Minuten. Kein Verkaufsgespräch. Kein Risiko.</p>
+  <div class="contact-layout">
+    <div>
+      <div class="chs">
+        <a href="https://wa.me/49000000000" class="ch wa reveal d1" target="_blank">
+          <div class="ch-ic wa"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
+          <div><div class="ch-lbl">WhatsApp</div><div class="ch-sub">DE & TR — sofort verfügbar</div></div>
+        </a>
+        <a href="https://calendly.com" class="ch reveal d2" target="_blank">
+          <div class="ch-ic cal" style="font-size:1.15rem;">◷</div>
+          <div><div class="ch-lbl">Termin buchen</div><div class="ch-sub">Calendly — 20 Min. Erstgespräch</div></div>
+        </a>
+        <a href="mailto:hallo@creadig.de" class="ch reveal d3">
+          <div class="ch-ic mail" style="font-size:.95rem;">✉</div>
+          <div><div class="ch-lbl">E-Mail</div><div class="ch-sub">hallo@creadig.de</div></div>
+        </a>
+      </div>
+    </div>
+    <div class="cf reveal d2">
+      <div class="fr">
+        <div class="fg"><label>Ihr Name</label><input type="text" placeholder="Max Mustermann"></div>
+        <div class="fg"><label>Ihr Unternehmen</label><input type="text" placeholder="Mustermann GmbH"></div>
+      </div>
+      <div class="fg"><label>E-Mail</label><input type="email" placeholder="max@mustermann.de"></div>
+      <!-- Julia kararı: spesifik dropdown -->
+      <div class="fg">
+        <label>Was interessiert Sie?</label>
+        <select>
+          <option value="" disabled selected>Bitte wählen…</option>
+          <option>Identity (Logo, Visitenkarte)</option>
+          <option>Website & Social Media</option>
+          <option>Prozessautomatisierung</option>
+          <option>MEAI — KI-System</option>
+          <option>Vollständiges Paket</option>
+          <option>Anderes / Beratung</option>
+        </select>
+      </div>
+      <div class="fg"><label>Nachricht (optional)</label><textarea placeholder="z.B. Ich suche ein Logo und eine Website für meinen Betrieb…"></textarea></div>
+      <button class="fs">Anfrage senden →</button>
+    </div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<footer>
+  <svg style="height:20px;width:auto;color:rgba(244,242,239,0.35);"><use href="#logo-svg"/></svg>
+  <div class="fc">© 2025 creaDIG — Business Architecture & Operations · Hannover, DE</div>
+  <div class="fls">
+    <a href="#">Impressum</a>
+    <a href="#">Datenschutz</a>
+    <a href="https://meai.run" target="_blank">meai.run</a>
+  </div>
+</footer>
+
+<script>
+// CURSOR
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-r');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=mx+'px';cur.style.top=my+'px';
+});
+(function anim(){rx+=(mx-rx)*.11;ry+=(my-ry)*.11;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(anim);})();
+document.querySelectorAll('a,button,.si,.pc,.prc,.tgc,.pkg').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='5px';cur.style.height='5px';ring.style.width='48px';ring.style.height='48px';ring.style.borderColor='rgba(4,121,180,.5)';});
+  el.addEventListener('mouseleave',()=>{cur.style.width='9px';cur.style.height='9px';ring.style.width='34px';ring.style.height='34px';ring.style.borderColor='rgba(4,121,180,.28)';});
+});
+
+// SOPHIA — KELIME KELİME HERO ANİMASYONU
+function initWordReveal(){
+  const h1=document.getElementById('hero-h1');
+  if(!h1)return;
+  // em içindeki metni koru
+  const em=h1.querySelector('em');
+  const emText=em?em.textContent:'';
+  
+  // Tüm text node'larını ve em'i işle
+  const nodes=[...h1.childNodes];
+  h1.innerHTML='';
+  
+  nodes.forEach(node=>{
+    if(node.nodeType===3){// text node
+      const words=node.textContent.trim().split(' ').filter(w=>w);
+      words.forEach((word,i)=>{
+        const span=document.createElement('span');
+        span.className='word';
+        span.innerHTML=`<span>${word}</span>`;
+        h1.appendChild(span);
+        if(i<words.length-1)h1.appendChild(document.createTextNode(' '));
+      });
+    } else if(node.nodeName==='EM'){
+      const emWords=node.textContent.trim().split(' ').filter(w=>w);
+      emWords.forEach((word,i)=>{
+        const outerSpan=document.createElement('span');
+        outerSpan.className='word';
+        const emEl=document.createElement('em');
+        const innerSpan=document.createElement('span');
+        innerSpan.textContent=word;
+        emEl.appendChild(innerSpan);
+        outerSpan.appendChild(emEl);
+        h1.appendChild(outerSpan);
+        if(i<emWords.length-1)h1.appendChild(document.createTextNode(' '));
+      });
+    }
+  });
+
+  // Animasyonu gecikmeyle tetikle
+  setTimeout(()=>{
+    h1.classList.add('active');
+    const wordSpans=h1.querySelectorAll('.word span');
+    wordSpans.forEach((span,i)=>{
+      span.style.transitionDelay=`${i*0.08}s`;
+    });
+  },300);
+}
+initWordReveal();
+
+// MARKUS — SAYAÇ ANİMASYONU
+function animateCounter(el,target,suffix,duration=1800){
+  let start=0;
+  const step=target/60;
+  const interval=duration/60;
+  const timer=setInterval(()=>{
+    start+=step;
+    if(start>=target){
+      el.textContent=target+suffix;
+      clearInterval(timer);
+    } else {
+      el.textContent=Math.floor(start)+suffix;
+    }
+  },interval);
+}
+
+const counterObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const el=e.target;
+      const target=parseInt(el.dataset.target);
+      const suffix=el.dataset.suffix||'';
+      if(!el.dataset.counted){
+        el.dataset.counted='1';
+        animateCounter(el,target,suffix);
+      }
+    }
+  });
+},{threshold:.5});
+
+document.querySelectorAll('.count-num[data-target]').forEach(el=>counterObs.observe(el));
+
+// NAV + STICKY CTA
+const stickyCta=document.getElementById('sticky-cta');
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('sc',scrollY>60);
+  stickyCta.classList.toggle('show',scrollY>400);
+});
+
+// REVEAL
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+// MEAI TYPEWRITER
+const lines=[
+  {t:'Priorität 1 — Rechnungsblock schließen',c:'pr'},
+  {t:'Priorität 2 — Lieferant bestätigen bis 14:00',c:'pr'},
+  {t:'3 neue Anfragen — automatisch qualifiziert',c:'nm'},
+  {t:'Social Media Post — Donnerstag vorbereitet',c:'nm'},
+  {t:'Rechnung #047 — versendet ✓',c:'dn'},
+  {t:'Wochenbericht — generiert ✓',c:'dn'},
+];
+let started=false;
+const mdBody=document.getElementById('md-body');
+new IntersectionObserver(([e])=>{if(e.isIntersecting&&!started){started=true;runTerminal();}},{threshold:.3}).observe(mdBody);
+
+function runTerminal(){
+  mdBody.innerHTML='';
+  let delay=300;
+  lines.forEach(ln=>{
+    setTimeout(()=>{
+      const d=document.createElement('div');
+      d.className=`tl ${ln.c}`;
+      const dot=document.createElement('div');dot.className='tl-dot';
+      const sp=document.createElement('span');
+      d.appendChild(dot);d.appendChild(sp);
+      mdBody.appendChild(d);
+      setTimeout(()=>d.classList.add('show'),40);
+      typeIt(sp,ln.t,22);
+    },delay);
+    delay+=ln.t.length*22+250;
+  });
+  setTimeout(()=>{
+    const note=document.createElement('div');
+    note.style.cssText='margin-top:1rem;padding-top:.8rem;border-top:1px solid rgba(255,255,255,.06);font-size:.72rem;color:rgba(244,242,239,.2);opacity:0;transition:opacity .5s;';
+    note.textContent='Nächste Aufgabe fällig in 2h — Erinnerung aktiv';
+    mdBody.appendChild(note);
+    setTimeout(()=>note.style.opacity='1',100);
+  },delay+200);
+}
+
+function typeIt(el,text,spd){
+  let i=0;
+  const c=document.createElement('span');c.className='tc';el.appendChild(c);
+  const iv=setInterval(()=>{
+    if(i<text.length){el.insertBefore(document.createTextNode(text[i]),c);i++;}
+    else{clearInterval(iv);c.remove();}
+  },spd);
+}
+
+// LANG
+function setLang(l){document.querySelectorAll('.lb').forEach(b=>b.classList.toggle('ac',b.textContent===l.toUpperCase()));}
+
+// SMOOTH SCROLL
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});}
+  });
+});
+</script>
+</body>
+</html>
