@@ -1,7 +1,20 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="light">
+<html lang="de-DE" dir="ltr" data-theme="light" data-lang="de">
 <head>
 <meta charset="UTF-8">
+<script>
+(function(){
+  var V=['de','en','tr','ar','ru'],lang='de';
+  if(localStorage.getItem('creadig_lang_chosen')==='1'){
+    var s=localStorage.getItem('creadig_lang');
+    if(V.indexOf(s)!==-1)lang=s;
+  }
+  var m={de:['de-DE','ltr'],en:['en','ltr'],tr:['tr','ltr'],ar:['ar','rtl'],ru:['ru','ltr']};
+  document.documentElement.lang=m[lang][0];
+  document.documentElement.dir=m[lang][1];
+  document.documentElement.setAttribute('data-lang',lang);
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="creaDIG — Business Architecture & Operations. Digitalagentur für kleine und mittlere Unternehmen im DACH-Raum. Website erstellen, Logo Design, Prozessautomatisierung, KI-Systeme.">
 <meta name="keywords" content="Digitalagentur Hannover, Website erstellen lassen, Logo Design Deutschland, Geschäftsprozesse automatisieren, KI System für Unternehmen, Business Architecture DACH">
@@ -124,10 +137,41 @@ nav.sc{border-bottom-color:var(--border-b);}
 .nav-links a{color:var(--text-3);text-decoration:none;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;transition:color .3s;}
 .nav-links a:hover{color:var(--text-1);}
 .nav-r{display:flex;align-items:center;gap:.55rem;}
-.lb{font-size:.7rem;letter-spacing:.06em;color:var(--text-3);cursor:none;padding:.18rem .42rem;border:1px solid transparent;border-radius:3px;transition:all .3s;background:none;font-family:var(--fb);}
-.lb.ac{color:var(--blue);border-color:var(--border-b);}
-.lb:hover{color:var(--text-1);}
+.lang-wrap{position:relative;}
+.lang-btn{
+  font-size:.7rem;letter-spacing:.06em;color:var(--text-3);
+  cursor:none;padding:.35rem .55rem;border:1px solid var(--border);border-radius:3px;
+  transition:all .3s;background:var(--bg-2);font-family:var(--fb);
+  display:flex;align-items:center;gap:.35rem;min-width:3.2rem;justify-content:center;
+}
+.lang-btn:hover{color:var(--text-1);border-color:var(--border-b);}
+.lang-menu{
+  position:absolute;top:calc(100% + .4rem);right:0;min-width:5.5rem;
+  background:var(--bg-2);border:1px solid var(--border);border-radius:4px;
+  box-shadow:0 12px 40px rgba(0,0,0,.12);padding:.35rem;
+  display:none;flex-direction:column;gap:.2rem;z-index:350;
+}
+.lang-menu.open{display:flex;}
+.lang-menu button{
+  font-size:.72rem;letter-spacing:.06em;color:var(--text-3);
+  cursor:none;padding:.45rem .65rem;border:1px solid transparent;border-radius:3px;
+  transition:all .2s;background:none;font-family:var(--fb);text-align:left;width:100%;
+}
+.lang-menu button:hover,.lang-menu button.ac{color:var(--blue);border-color:var(--border-b);background:var(--blue-dim);}
+.mob-lang{display:none;gap:.35rem;}
+.mob-lb{font-size:.65rem;letter-spacing:.06em;color:var(--text-3);cursor:none;padding:.2rem .38rem;border:1px solid var(--border);border-radius:3px;background:none;font-family:var(--fb);}
+.mob-lb.ac{color:var(--blue);border-color:var(--border-b);}
+html[dir="rtl"] nav{direction:rtl;}
+html[dir="rtl"] .nav-links{flex-direction:row-reverse;}
+html[dir="rtl"] .lang-menu{left:0;right:auto;}
+html[dir="rtl"] .hero-ey{flex-direction:row-reverse;}
+html[dir="rtl"] .sey{flex-direction:row-reverse;}
+@media(max-width:900px){
+  .lang-wrap .lang-menu{display:none!important;}
+  .mob-lang{display:flex;}
+}
 .nav-wa{display:flex;align-items:center;gap:.4rem;padding:.42rem .9rem;border:1px solid rgba(37,211,102,.22);border-radius:3px;color:#25d366;font-size:.76rem;text-decoration:none;transition:all .3s;}
+.nav-wa span{white-space:nowrap;}
 .nav-wa:hover{background:rgba(37,211,102,.07);border-color:rgba(37,211,102,.5);}
 .nav-wa svg{width:12px;height:12px;fill:currentColor;}
 .nav-cta{padding:.42rem 1.1rem;background:var(--blue);color:var(--btn-on-primary);border-radius:3px;font-size:.76rem;font-weight:500;text-decoration:none;transition:background .3s;}
@@ -479,13 +523,23 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
 <div id="cur"></div>
 <div id="cur-r"></div>
 
-<a href="#kontakt" class="sticky-cta" id="sticky-cta">Jetzt anfragen →</a>
+<a href="#kontakt" class="sticky-cta" id="sticky-cta" data-de="Jetzt anfragen →" data-en="Inquire now →" data-tr="Şimdi başvur →" data-ar="اطلب الآن ←" data-ru="Связаться →">Jetzt anfragen →</a>
 
-<!-- THOMAS: ACİLİYET BANDI -->
 <div class="urgency-bar" id="urgency-bar">
   <div class="ub-dot"></div>
-  <span><span class="ub-strong">Derzeit 2 Beratungsplätze verfügbar</span> — Kostenlose Erstberatung sichern, bevor sie vergeben sind.</span>
-  <button class="ub-close" onclick="document.getElementById('urgency-bar').style.display='none'">×</button>
+  <span
+    data-de="Derzeit 2 Beratungsplätze verfügbar — Kostenlose Erstberatung sichern, bevor sie vergeben sind."
+    data-en="2 consultation slots available — Book your free initial consultation before they're gone."
+    data-tr="Şu anda 2 danışmanlık kontenjanı — Ücretsiz ön görüşmenizi kaçırmayın."
+    data-ar="مكانان للاستشارة متاحان — احجز استشارتك الأولى المجانية قبل نفاد المواعيد."
+    data-ru="Сейчас доступно 2 консультации — Забронируйте бесплатную первичную консультацию."
+    data-html-de="<span class=&quot;ub-strong&quot;>Derzeit 2 Beratungsplätze verfügbar</span> — Kostenlose Erstberatung sichern, bevor sie vergeben sind."
+    data-html-en="<span class=&quot;ub-strong&quot;>2 consultation slots available</span> — Book your free initial consultation before they're gone."
+    data-html-tr="<span class=&quot;ub-strong&quot;>Şu anda 2 danışmanlık kontenjanı</span> — Ücretsiz ön görüşmenizi kaçırmayın."
+    data-html-ar="<span class=&quot;ub-strong&quot;>مكانان للاستشارة متاحان</span> — احجز استشارتك الأولى المجانية قبل نفاد المواعيد."
+    data-html-ru="<span class=&quot;ub-strong&quot;>Сейчас 2 консультации</span> — Забронируйте бесплатную первичную консультацию."
+  ><span class="ub-strong">Derzeit 2 Beratungsplätze verfügbar</span> — Kostenlose Erstberatung sichern, bevor sie vergeben sind.</span>
+  <button class="ub-close" onclick="document.getElementById('urgency-bar').style.display='none'" aria-label="Schließen">×</button>
 </div>
 
 <!-- LOGO SVG INLINE HELPER -->
@@ -523,20 +577,35 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
     <svg class="nav-logo-svg" style="height:24px;width:auto;color:var(--text-1);"><use href="#logo-svg"/></svg>
   </a>
   <ul class="nav-links">
-    <li><a href="#leistungen">Leistungen</a></li>
-    <li><a href="#meai">MEAI</a></li>
-    <li><a href="#referenzen">Referenzen</a></li>
-    <li><a href="#ueber-uns">Über uns</a></li>
+    <li><a href="#leistungen" data-de="Leistungen" data-en="Services" data-tr="Hizmetler" data-ar="الخدمات" data-ru="Услуги">Leistungen</a></li>
+    <li><a href="#meai" data-de="MEAI" data-en="MEAI" data-tr="MEAI" data-ar="MEAI" data-ru="MEAI">MEAI</a></li>
+    <li><a href="#referenzen" data-de="Referenzen" data-en="References" data-tr="Referanslar" data-ar="المراجع" data-ru="Отзывы">Referenzen</a></li>
+    <li><a href="#ueber-uns" data-de="Über uns" data-en="About us" data-tr="Hakkımızda" data-ar="من نحن" data-ru="О нас">Über uns</a></li>
   </ul>
   <div class="nav-r">
+    <div class="mob-lang" aria-label="Sprache">
+      <button type="button" class="mob-lb ac" data-lang="de" onclick="selectLang('de',true)">DE</button>
+      <button type="button" class="mob-lb" data-lang="en" onclick="selectLang('en',true)">EN</button>
+      <button type="button" class="mob-lb" data-lang="tr" onclick="selectLang('tr',true)">TR</button>
+      <button type="button" class="mob-lb" data-lang="ar" onclick="selectLang('ar',true)">AR</button>
+      <button type="button" class="mob-lb" data-lang="ru" onclick="selectLang('ru',true)">RU</button>
+    </div>
+    <div class="lang-wrap" id="langWrap">
+      <button type="button" class="lang-btn" onclick="toggleLangMenu()" aria-haspopup="listbox" aria-expanded="false"><span id="langLabel">DE</span> ▾</button>
+      <div class="lang-menu" id="langMenu" role="listbox">
+        <button type="button" id="lm-de" class="ac" onclick="selectLang('de',true)">DE — Deutsch</button>
+        <button type="button" id="lm-en" onclick="selectLang('en',true)">EN — English</button>
+        <button type="button" id="lm-tr" onclick="selectLang('tr',true)">TR — Türkçe</button>
+        <button type="button" id="lm-ar" onclick="selectLang('ar',true)">AR — العربية</button>
+        <button type="button" id="lm-ru" onclick="selectLang('ru',true)">RU — Русский</button>
+      </div>
+    </div>
     <button type="button" class="theme-btn" id="theme-btn" aria-label="Dark Mode aktivieren" title="Dark Mode (Strg+D)">🌙</button>
-    <button class="lb ac" onclick="setLang('de')">DE</button>
-    <button class="lb" onclick="setLang('tr')">TR</button>
-    <a href="https://wa.me/49000000000" class="nav-wa" target="_blank">
+    <a href="https://wa.me/49000000000" class="nav-wa" target="_blank" rel="noopener" data-de="WhatsApp" data-en="WhatsApp" data-tr="WhatsApp" data-ar="واتساب" data-ru="WhatsApp">
       <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      WhatsApp
+      <span data-de="WhatsApp" data-en="WhatsApp" data-tr="WhatsApp" data-ar="واتساب" data-ru="WhatsApp">WhatsApp</span>
     </a>
-    <a href="#kontakt" class="nav-cta">Kontakt</a>
+    <a href="#kontakt" class="nav-cta" data-de="Kontakt" data-en="Contact" data-tr="İletişim" data-ar="اتصل" data-ru="Контакт">Kontakt</a>
   </div>
 </nav>
 
@@ -546,12 +615,18 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
   <div class="hero-grid"></div>
   <div class="hero-c">
     <div class="hero-left">
-      <div class="hero-ey">Digitalagentur & Business Architecture — DACH</div>
-      <h1 class="hh1 word-reveal" id="hero-h1">Wir bauen, was andere <em>nicht sehen.</em></h1>
-      <p class="hero-sub">Von der ersten Unternehmensidentität bis zur vollständigen KI-Automatisierung — wir schaffen digitale Systeme, die wachsen.</p>
+      <div class="hero-ey" data-de="Digitalagentur & Business Architecture — DACH" data-en="Digital agency & business architecture — DACH" data-tr="Dijital ajans & iş mimarisi — DACH" data-ar="وكالة رقمية وهندسة أعمال — DACH" data-ru="Digital-агентство и бизнес-архитектура — DACH">Digitalagentur & Business Architecture — DACH</div>
+      <h1 class="hh1 word-reveal" id="hero-h1"
+        data-html-de="Wir bauen, was andere <em>nicht sehen.</em>"
+        data-html-en="We build what others <em>can't see.</em>"
+        data-html-tr="Başkalarının <em>görmediğini</em> inşa ediyoruz."
+        data-html-ar="نبني ما <em>لا يراه</em> الآخرون."
+        data-html-ru="Мы создаём то, что <em>другие не видят.</em>"
+      >Wir bauen, was andere <em>nicht sehen.</em></h1>
+      <p class="hero-sub" data-de="Von der ersten Unternehmensidentität bis zur vollständigen KI-Automatisierung — wir schaffen digitale Systeme, die wachsen." data-en="From your first brand identity to full AI automation — we build digital systems that grow." data-tr="İlk kurumsal kimlikten tam KI otomasyonuna — büyüyen dijital sistemler kuruyoruz." data-ar="من الهوية الأولى إلى أتمتة الذكاء الاصطناعي الكاملة — نبني أنظمة رقمية تنمو." data-ru="От первой идентичности до полной ИИ-автоматизации — мы создаём цифровые системы, которые растут.">Von der ersten Unternehmensidentität bis zur vollständigen KI-Automatisierung — wir schaffen digitale Systeme, die wachsen.</p>
       <div class="hero-ctas">
-        <a href="#kontakt" class="btn-p">Kostenlose Erstberatung →</a>
-        <a href="#meai" class="btn-g">MEAI entdecken</a>
+        <a href="#kontakt" class="btn-p" data-de="Kostenlose Erstberatung →" data-en="Free consultation →" data-tr="Ücretsiz ön görüşme →" data-ar="استشارة مجانية ←" data-ru="Бесплатная консультация →">Kostenlose Erstberatung →</a>
+        <a href="#meai" class="btn-g" data-de="MEAI entdecken" data-en="Discover MEAI" data-tr="MEAI'yi keşfet" data-ar="اكتشف MEAI" data-ru="Открыть MEAI">MEAI entdecken</a>
       </div>
     </div>
     <!-- MEAI Preview — Sophia kararı: hero'ya taşındı -->
@@ -559,72 +634,71 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
       <div class="meai-preview">
         <div class="mp-header">
           <div class="mp-dot r"></div><div class="mp-dot y"></div><div class="mp-dot g"></div>
-          <span class="mp-title">meai.run — Live System</span>
+          <span class="mp-title" data-de="meai.run — Live System" data-en="meai.run — Live system" data-tr="meai.run — Canlı sistem" data-ar="meai.run — نظام مباشر" data-ru="meai.run — Живая система">meai.run — Live System</span>
           <div class="mp-logo"><img src="https://www.meai.run/assets/logo/meailogo_full_blackmode_whitefont.png" alt="MEAI"></div>
         </div>
         <div class="mp-body">
-          <div class="mp-greeting">Guten Morgen, <strong>Emin 👋</strong></div>
+          <div class="mp-greeting" data-html-de="Guten Morgen, <strong>Emin 👋</strong>" data-html-en="Good morning, <strong>Emin 👋</strong>" data-html-tr="Günaydın, <strong>Emin 👋</strong>" data-html-ar="صباح الخير، <strong>إيمين 👋</strong>" data-html-ru="Доброе утро, <strong>Emin 👋</strong>">Guten Morgen, <strong>Emin 👋</strong></div>
           <div class="mp-priority">
-            <div class="mp-p-label">Priorität heute</div>
-            <div class="mp-p-text">Rechnungsblock schließen</div>
-            <div class="mp-p-sub">Vision-Hebel · Eine Leitung, keine Parallelspur</div>
+            <div class="mp-p-label" data-de="Priorität heute" data-en="Today's priority" data-tr="Bugünün önceliği" data-ar="أولوية اليوم" data-ru="Приоритет сегодня">Priorität heute</div>
+            <div class="mp-p-text" data-de="Rechnungsblock schließen" data-en="Close billing block" data-tr="Fatura bloğunu kapat" data-ar="إغلاق كتلة الفواتير" data-ru="Закрыть блок счетов">Rechnungsblock schließen</div>
+            <div class="mp-p-sub" data-de="Vision-Hebel · Eine Leitung, keine Parallelspur" data-en="Vision lever · One line, no parallel path" data-tr="Vizyon kolu · Tek hat, paralel yol yok" data-ar="رافعة الرؤية · خط واحد، لا مسار موازٍ" data-ru="Рычаг видения · Одна линия, без параллели">Vision-Hebel · Eine Leitung, keine Parallelspur</div>
           </div>
           <div class="mp-tasks">
             <div class="mp-task open">
               <div class="mp-task-dot"></div>
-              <span class="mp-task-text">Glasfaser Team Meeting</span>
+              <span class="mp-task-text" data-de="Glasfaser Team Meeting" data-en="Fiber team meeting" data-tr="Glasfaser ekip toplantısı" data-ar="اجتماع فريق الألياف" data-ru="Встреча команды Glasfaser">Glasfaser Team Meeting</span>
               <span class="mp-task-time">09:00</span>
             </div>
             <div class="mp-task open">
               <div class="mp-task-dot"></div>
-              <span class="mp-task-text">creaDIG Strategie · Website</span>
+              <span class="mp-task-text" data-de="creaDIG Strategie · Website" data-en="creaDIG strategy · Website" data-tr="creaDIG strateji · Website" data-ar="استراتيجية creaDIG · الموقع" data-ru="creaDIG стратегия · Сайт">creaDIG Strategie · Website</span>
               <span class="mp-task-time">14:00</span>
             </div>
             <div class="mp-task done">
               <div class="mp-task-dot"></div>
-              <span class="mp-task-text">Wochenbericht generiert</span>
+              <span class="mp-task-text" data-de="Wochenbericht generiert" data-en="Weekly report generated" data-tr="Haftalık rapor oluşturuldu" data-ar="تم إنشاء التقرير الأسبوعي" data-ru="Недельный отчёт сформирован">Wochenbericht generiert</span>
               <span class="mp-task-time">✓</span>
             </div>
           </div>
           <div class="mp-footer">
-            <span class="mp-status">Online · Synchronisiert</span>
-            <a href="https://meai.run" target="_blank" class="mp-link">meai.run →</a>
+            <span class="mp-status" data-de="Online · Synchronisiert" data-en="Online · Synced" data-tr="Çevrimiçi · Senkronize" data-ar="متصل · متزامن" data-ru="Онлайн · Синхронизировано">Online · Synchronisiert</span>
+            <a href="https://meai.run" target="_blank" rel="noopener" class="mp-link" data-de="meai.run →" data-en="meai.run →" data-tr="meai.run →" data-ar="meai.run ←" data-ru="meai.run →">meai.run →</a>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="hero-sc"><div class="sc-line"></div>Scroll</div>
+  <div class="hero-sc"><div class="sc-line"></div><span data-de="Scroll" data-en="Scroll" data-tr="Kaydır" data-ar="تمرير" data-ru="Листать">Scroll</span></div>
   <div class="hero-stats">
-    <div><div class="hs-num">5<span>+</span></div><div class="hs-lbl">Jahre Erfahrung</div></div>
-    <div><div class="hs-num"><span>DACH</span></div><div class="hs-lbl">Marktfokus</div></div>
+    <div><div class="hs-num">5<span>+</span></div><div class="hs-lbl" data-de="Jahre Erfahrung" data-en="Years experience" data-tr="Yıl deneyim" data-ar="سنوات خبرة" data-ru="Лет опыта">Jahre Erfahrung</div></div>
+    <div><div class="hs-num"><span>DACH</span></div><div class="hs-lbl" data-de="Marktfokus" data-en="Market focus" data-tr="Pazar odağı" data-ar="تركيز السوق" data-ru="Фокус рынка">Marktfokus</div></div>
   </div>
 </section>
 
 <div class="div"></div>
 
-<!-- PROBLEM — Markus kararı: somut rakamlar -->
 <div class="sw">
-  <div class="sey reveal">Warum creaDIG</div>
-  <h2 class="sh2 reveal d1">Das Problem,<br>das wir lösen.</h2>
+  <div class="sey reveal" data-de="Warum creaDIG" data-en="Why creaDIG" data-tr="Neden creaDIG" data-ar="لماذا creaDIG" data-ru="Почему creaDIG">Warum creaDIG</div>
+  <h2 class="sh2 reveal d1" data-html-de="Das Problem,<br>das wir lösen." data-html-en="The problem<br>we solve." data-html-tr="Çözdüğümüz<br>sorun." data-html-ar="المشكلة<br>التي نحلها." data-html-ru="Проблема,<br>которую мы решаем.">Das Problem,<br>das wir lösen.</h2>
   <div class="prob-grid">
     <div class="pc reveal d1">
       <div class="pc-icon">◎</div>
       <div class="pc-stat count-num" data-target="67" data-suffix="%">0%</div>
-      <h3>Unsichtbares Potenzial</h3>
-      <p>67% der KMU nutzen weniger als die Hälfte ihres digitalen Potenzials. Wir machen sichtbar, was bisher brach liegt — und bauen darauf auf.</p>
+      <h3 data-de="Unsichtbares Potenzial" data-en="Invisible potential" data-tr="Görünmeyen potansiyel" data-ar="إمكانات مخفية" data-ru="Скрытый потенциал">Unsichtbares Potenzial</h3>
+      <p data-de="67% der KMU nutzen weniger als die Hälfte ihres digitalen Potenzials. Wir machen sichtbar, was bisher brach liegt — und bauen darauf auf." data-en="67% of SMEs use less than half their digital potential. We reveal what's dormant — and build on it." data-tr="KOBİ'lerin %67'si dijital potansiyelinin yarısından azını kullanıyor. Biz görünmeyeni görünür kılıyoruz." data-ar="67% من الشركات الصغيرة تستخدم أقل من نصف إمكاناتها الرقمية. نكشف ما كان خامداً ونبني عليه." data-ru="67% МСП используют меньше половины цифрового потенциала. Мы делаем видимым скрытое — и строим на этом.">67% der KMU nutzen weniger als die Hälfte ihres digitalen Potenzials. Wir machen sichtbar, was bisher brach liegt — und bauen darauf auf.</p>
     </div>
     <div class="pc reveal d2">
       <div class="pc-icon">⊘</div>
       <div class="pc-stat count-num" data-target="14" data-suffix="h">0h</div>
-      <h3>Chaos im Hintergrund</h3>
-      <p>Unternehmen verlieren durchschnittlich 14 Stunden pro Woche durch fehlende Systeme und unstrukturierte Prozesse. Wir lösen das.</p>
+      <h3 data-de="Chaos im Hintergrund" data-en="Back-office chaos" data-tr="Arka planda kaos" data-ar="فوضى في الخلفية" data-ru="Хаос в процессах">Chaos im Hintergrund</h3>
+      <p data-de="Unternehmen verlieren durchschnittlich 14 Stunden pro Woche durch fehlende Systeme und unstrukturierte Prozesse. Wir lösen das." data-en="Companies lose an average of 14 hours per week to missing systems and unstructured processes. We fix that." data-tr="İşletmeler eksik sistemler yüzünden haftada ortalama 14 saat kaybediyor. Biz bunu çözüyoruz." data-ar="الشركات تخسر 14 ساعة أسبوعياً بسبب أنظمة ناقصة. نحل ذلك." data-ru="Компании теряют в среднем 14 часов в неделю из-за отсутствия систем. Мы это решаем.">Unternehmen verlieren durchschnittlich 14 Stunden pro Woche durch fehlende Systeme und unstrukturierte Prozesse. Wir lösen das.</p>
     </div>
     <div class="pc reveal d3">
       <div class="pc-icon">◈</div>
       <div class="pc-stat count-num" data-target="3" data-suffix="×">0×</div>
-      <h3>Kein System zum Wachsen</h3>
-      <p>Unternehmen mit klarer digitaler Architektur wachsen 3× schneller. Wir bauen diese Grundlage — systematisch und skalierbar.</p>
+      <h3 data-de="Kein System zum Wachsen" data-en="No system to scale" data-tr="Büyümek için sistem yok" data-ar="لا نظام للنمو" data-ru="Нет системы роста">Kein System zum Wachsen</h3>
+      <p data-de="Unternehmen mit klarer digitaler Architektur wachsen 3× schneller. Wir bauen diese Grundlage — systematisch und skalierbar." data-en="Companies with clear digital architecture grow 3× faster. We build that foundation — systematically and at scale." data-tr="Net dijital mimariye sahip işletmeler 3 kat daha hızlı büyür. Biz bu temeli kuruyoruz." data-ar="الشركات ذات البنية الرقمية الواضحة تنمو 3 أضعاف. نبني هذا الأساس." data-ru="Компании с чёткой цифровой архитектурой растут в 3 раза быстрее. Мы строим эту основу.">Unternehmen mit klarer digitaler Architektur wachsen 3× schneller. Wir bauen diese Grundlage — systematisch und skalierbar.</p>
     </div>
   </div>
 </div>
@@ -633,24 +707,24 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
 
 <!-- SERVICES -->
 <div class="sw" id="leistungen">
-  <div class="sey reveal">Leistungen</div>
-  <h2 class="sh2 reveal d1">Was wir<br>aufbauen.</h2>
+  <div class="sey reveal" data-de="Leistungen" data-en="Services" data-tr="Hizmetler" data-ar="الخدمات" data-ru="Услуги">Leistungen</div>
+  <h2 class="sh2 reveal d1" data-html-de="Was wir<br>aufbauen." data-html-en="What we<br>build." data-html-tr="Ne inşa<br>ediyoruz." data-html-ar="ما<br>نبنيه." data-html-ru="Что мы<br>создаём.">Was wir<br>aufbauen.</h2>
   <div class="srv-layout">
     <div>
-      <div class="si reveal"><div class="si-n">01</div><div><div class="si-name">Intelligence & MEAI</div><div class="si-desc">KI-gestützte Plattform zur vollständigen Steuerung Ihres Unternehmens. Prioritäten, Entscheidungen, Überblick — automatisch. Jetzt live auf meai.run</div><div class="si-pill">Flagship</div></div></div>
-      <div class="si reveal d1"><div class="si-n">02</div><div><div class="si-name">Automation</div><div class="si-desc">E-Mail-Marketing, Kundenannahme, Workflows und Reporting — alles läuft, auch wenn Sie schlafen.</div></div></div>
-      <div class="si reveal d2"><div class="si-n">03</div><div><div class="si-name">Operations</div><div class="si-desc">Prozessmanagement, Dokumentation und Projektsteuerung. Chaos wird System — messbar und skalierbar.</div></div></div>
-      <div class="si reveal d3"><div class="si-n">04</div><div><div class="si-name">Digital</div><div class="si-desc">Website, Social Media, E-Commerce und SEO. Ihre digitale Präsenz, professionell aufgebaut und gepflegt.</div></div></div>
-      <div class="si reveal d4"><div class="si-n">05</div><div><div class="si-name">Identity</div><div class="si-desc">Logo, Visitenkarte und Corporate Design. Ihr erstes professionelles Gesicht — konsistent und unverwechselbar.</div></div></div>
+      <div class="si reveal"><div class="si-n">01</div><div><div class="si-name" data-de="Intelligence & MEAI" data-en="Intelligence & MEAI" data-tr="Intelligence & MEAI" data-ar="Intelligence & MEAI" data-ru="Intelligence & MEAI">Intelligence & MEAI</div><div class="si-desc" data-de="KI-gestützte Plattform zur vollständigen Steuerung Ihres Unternehmens. Prioritäten, Entscheidungen, Überblick — automatisch. Jetzt live auf meai.run" data-en="AI-powered platform to run your business. Priorities, decisions, overview — automatic. Live at meai.run" data-tr="İşletmenizi yönetmek için KI destekli platform. Öncelikler, kararlar, genel bakış — otomatik. meai.run'da canlı" data-ar="منصة مدعومة بالذكاء الاصطناعي لإدارة عملك. أولويات وقرارات ونظرة شاملة — تلقائياً. مباشر على meai.run" data-ru="KI-платформа для управления бизнесом. Приоритеты, решения, обзор — автоматически. На meai.run">KI-gestützte Plattform zur vollständigen Steuerung Ihres Unternehmens. Prioritäten, Entscheidungen, Überblick — automatisch. Jetzt live auf meai.run</div><div class="si-pill" data-de="Flagship" data-en="Flagship" data-tr="Amiral gemi" data-ar="الرائدة" data-ru="Флагман">Flagship</div></div></div>
+      <div class="si reveal d1"><div class="si-n">02</div><div><div class="si-name" data-de="Automation" data-en="Automation" data-tr="Otomasyon" data-ar="الأتمتة" data-ru="Автоматизация">Automation</div><div class="si-desc" data-de="E-Mail-Marketing, Kundenannahme, Workflows und Reporting — alles läuft, auch wenn Sie schlafen." data-en="Email marketing, intake, workflows and reporting — everything runs while you sleep." data-tr="E-posta pazarlama, müşteri kabulü, iş akışları ve raporlama — siz uyurken de çalışır." data-ar="التسويق بالبريد، استقبال العملاء، سير العمل والتقارير — يعمل وأنت نائم." data-ru="Email-маркетинг, приём клиентов, процессы и отчёты — всё работает, пока вы спите.">E-Mail-Marketing, Kundenannahme, Workflows und Reporting — alles läuft, auch wenn Sie schlafen.</div></div></div>
+      <div class="si reveal d2"><div class="si-n">03</div><div><div class="si-name" data-de="Operations" data-en="Operations" data-tr="Operasyon" data-ar="العمليات" data-ru="Операции">Operations</div><div class="si-desc" data-de="Prozessmanagement, Dokumentation und Projektsteuerung. Chaos wird System — messbar und skalierbar." data-en="Process management, documentation and project control. Chaos becomes system — measurable and scalable." data-tr="Süreç yönetimi, dokümantasyon ve proje kontrolü. Kaos sisteme dönüşür." data-ar="إدارة العمليات والتوثيق والمشاريع. الفوضى تصبح نظاماً." data-ru="Управление процессами, документация и проекты. Хаос становится системой.">Prozessmanagement, Dokumentation und Projektsteuerung. Chaos wird System — messbar und skalierbar.</div></div></div>
+      <div class="si reveal d3"><div class="si-n">04</div><div><div class="si-name" data-de="Digital" data-en="Digital" data-tr="Dijital" data-ar="رقمي" data-ru="Digital">Digital</div><div class="si-desc" data-de="Website, Social Media, E-Commerce und SEO. Ihre digitale Präsenz, professionell aufgebaut und gepflegt." data-en="Website, social media, e-commerce and SEO. Your digital presence, built and maintained professionally." data-tr="Website, sosyal medya, e-ticaret ve SEO. Dijital varlığınız profesyonelce." data-ar="الموقع، وسائل التواصل، التجارة الإلكترونية وSEO. حضورك الرقمي باحتراف." data-ru="Сайт, соцсети, e-commerce и SEO. Ваше цифровое присутствие профессионально.">Website, Social Media, E-Commerce und SEO. Ihre digitale Präsenz, professionell aufgebaut und gepflegt.</div></div></div>
+      <div class="si reveal d4"><div class="si-n">05</div><div><div class="si-name" data-de="Identity" data-en="Identity" data-tr="Kimlik" data-ar="الهوية" data-ru="Идентичность">Identity</div><div class="si-desc" data-de="Logo, Visitenkarte und Corporate Design. Ihr erstes professionelles Gesicht — konsistent und unverwechselbar." data-en="Logo, business cards and corporate design. Your first professional face — consistent and distinctive." data-tr="Logo, kartvizit ve kurumsal tasarım. İlk profesyonel yüzünüz." data-ar="الشعار وبطاقات العمل والهوية البصرية. وجهك المهني الأول." data-ru="Логотип, визитки и фирменный стиль. Ваше первое профессиональное лицо.">Logo, Visitenkarte und Corporate Design. Ihr erstes professionelles Gesicht — konsistent und unverwechselbar.</div></div></div>
     </div>
     <div class="arch-vis reveal d2">
-      <div class="av-t">Systemarchitektur — creaDIG</div>
+      <div class="av-t" data-de="Systemarchitektur — creaDIG" data-en="System architecture — creaDIG" data-tr="Sistem mimarisi — creaDIG" data-ar="هندسة النظام — creaDIG" data-ru="Архитектура системы — creaDIG">Systemarchitektur — creaDIG</div>
       <div class="al top"><span>Intelligence & MEAI</span><span class="al-n">01</span></div>
       <div class="al"><span>Automation</span><span class="al-n">02</span></div>
       <div class="al"><span>Operations</span><span class="al-n">03</span></div>
       <div class="al"><span>Digital</span><span class="al-n">04</span></div>
       <div class="al"><span>Identity</span><span class="al-n">05</span></div>
-      <div style="margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--border);font-size:.76rem;color:var(--text-4);line-height:1.6;">Jede Ebene baut auf der vorherigen auf. Starten Sie wo Sie möchten.</div>
+      <div style="margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--border);font-size:.76rem;color:var(--text-4);line-height:1.6;" data-de="Jede Ebene baut auf der vorherigen auf. Starten Sie wo Sie möchten." data-en="Each layer builds on the previous. Start wherever you want." data-tr="Her katman bir öncekinin üzerine kurulur. İstediğiniz yerden başlayın." data-ar="كل طبقة تبني على السابقة. ابدأ حيث تريد." data-ru="Каждый уровень строится на предыдущем. Начните с любого.">Jede Ebene baut auf der vorherigen auf. Starten Sie wo Sie möchten.</div>
     </div>
   </div>
 </div>
@@ -660,35 +734,35 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
 <!-- MEAI FULL — Sophia kararı: sektör somutlaştırma -->
 <div class="meai-wrap" id="meai">
   <div class="meai-inner">
-    <div class="sey reveal">MEAI — meai.run</div>
-    <h2 class="sh2 reveal d1">Ihr unsichtbarer<br>Geschäftsführer.</h2>
+    <div class="sey reveal" data-de="MEAI — meai.run" data-en="MEAI — meai.run" data-tr="MEAI — meai.run" data-ar="MEAI — meai.run" data-ru="MEAI — meai.run">MEAI — meai.run</div>
+    <h2 class="sh2 reveal d1" data-html-de="Ihr unsichtbarer<br>Geschäftsführer." data-html-en="Your invisible<br>COO." data-html-tr="Görünmez<br>iş ortağınız." data-html-ar="مديرك التنفيذي<br>الخفي." data-html-ru="Ваш невидимый<br>операционный директор.">Ihr unsichtbarer<br>Geschäftsführer.</h2>
     <div class="meai-layout">
       <div>
-        <p class="sdesc reveal d2">MEAI ist ein KI-gestütztes Personal Operating System — bereits live auf meai.run. Es steuert Prioritäten, bereitet Entscheidungen vor und delegiert Aufgaben automatisch. Für Sie und Ihr Unternehmen.</p>
+        <p class="sdesc reveal d2" data-de="MEAI ist ein KI-gestütztes Personal Operating System — bereits live auf meai.run. Es steuert Prioritäten, bereitet Entscheidungen vor und delegiert Aufgaben automatisch. Für Sie und Ihr Unternehmen." data-en="MEAI is an AI-powered personal operating system — live at meai.run. It manages priorities, prepares decisions and delegates tasks automatically." data-tr="MEAI, meai.run'da canlı bir KI destekli kişisel işletim sistemidir. Öncelikleri yönetir, kararları hazırlar." data-ar="MEAI نظام تشغيل شخصي بالذكاء الاصطناعي — مباشر على meai.run. يدير الأولويات ويحضّر القرارات." data-ru="MEAI — персональная ОС с ИИ на meai.run. Управляет приоритетами, готовит решения и делегирует задачи.">MEAI ist ein KI-gestütztes Personal Operating System — bereits live auf meai.run. Es steuert Prioritäten, bereitet Entscheidungen vor und delegiert Aufgaben automatisch. Für Sie und Ihr Unternehmen.</p>
         <div class="meai-metrics">
-          <div class="met reveal d1"><div class="met-n count-num" data-target="12" data-suffix="h">0h</div><div class="met-l">Gesparte Zeit pro Woche</div></div>
-          <div class="met reveal d2"><div class="met-n count-num" data-target="3" data-suffix="×">0×</div><div class="met-l">Schnellere Entscheidungen</div></div>
-          <div class="met reveal d3"><div class="met-n">100%</div><div class="met-l">Überblick — jederzeit</div></div>
-          <div class="met reveal d4"><div class="met-n">KI</div><div class="met-l">Priorisiert automatisch</div></div>
+          <div class="met reveal d1"><div class="met-n count-num" data-target="12" data-suffix="h">0h</div><div class="met-l" data-de="Gesparte Zeit pro Woche" data-en="Time saved per week" data-tr="Haftalık kazanılan zaman" data-ar="وقت موفر أسبوعياً" data-ru="Экономия времени в неделю">Gesparte Zeit pro Woche</div></div>
+          <div class="met reveal d2"><div class="met-n count-num" data-target="3" data-suffix="×">0×</div><div class="met-l" data-de="Schnellere Entscheidungen" data-en="Faster decisions" data-tr="Daha hızlı kararlar" data-ar="قرارات أسرع" data-ru="Быстрее решения">Schnellere Entscheidungen</div></div>
+          <div class="met reveal d3"><div class="met-n">100%</div><div class="met-l" data-de="Überblick — jederzeit" data-en="Overview — anytime" data-tr="Genel bakış — her zaman" data-ar="نظرة شاملة — دائماً" data-ru="Обзор — в любое время">Überblick — jederzeit</div></div>
+          <div class="met reveal d4"><div class="met-n">KI</div><div class="met-l" data-de="Priorisiert automatisch" data-en="Auto-prioritizes" data-tr="Otomatik önceliklendirir" data-ar="أولويات تلقائية" data-ru="Авто-приоритизация">Priorisiert automatisch</div></div>
         </div>
         <div class="meai-sectors reveal">
-          <span class="sc-chip">Handwerk & Bau</span>
-          <span class="sc-chip">Elektro & Facility</span>
-          <span class="sc-chip">Gastronomie</span>
-          <span class="sc-chip">Arztpraxen</span>
-          <span class="sc-chip">Einzelhandel</span>
-          <span class="sc-chip">Telekommunikation</span>
-          <span class="sc-chip">Dienstleistung</span>
+          <span class="sc-chip" data-de="Handwerk & Bau" data-en="Trades & construction" data-tr="El sanatları & inşaat" data-ar="الحرف والبناء" data-ru="Ремесло и строительство">Handwerk & Bau</span>
+          <span class="sc-chip" data-de="Elektro & Facility" data-en="Electrical & facility" data-tr="Elektrik & tesis" data-ar="كهرباء ومرافق" data-ru="Электро и facility">Elektro & Facility</span>
+          <span class="sc-chip" data-de="Gastronomie" data-en="Hospitality" data-tr="Gastronomi" data-ar="المطاعم" data-ru="HoReCa">Gastronomie</span>
+          <span class="sc-chip" data-de="Arztpraxen" data-en="Medical practices" data-tr="Doktor muayenehaneleri" data-ar="عيادات طبية" data-ru="Медицинские практики">Arztpraxen</span>
+          <span class="sc-chip" data-de="Einzelhandel" data-en="Retail" data-tr="Perakende" data-ar="التجزئة" data-ru="Розница">Einzelhandel</span>
+          <span class="sc-chip" data-de="Telekommunikation" data-en="Telecom" data-tr="Telekomünikasyon" data-ar="الاتصالات" data-ru="Телеком">Telekommunikation</span>
+          <span class="sc-chip" data-de="Dienstleistung" data-en="Services" data-tr="Hizmet" data-ar="خدمات" data-ru="Услуги">Dienstleistung</span>
         </div>
       </div>
       <div class="meai-demo reveal d2">
         <div class="md-hdr">
           <div class="md-dot r"></div><div class="md-dot y"></div><div class="md-dot g"></div>
-          <span class="md-title">MEAI — Tagesübersicht</span>
-          <div class="md-live">Live</div>
+          <span class="md-title" data-de="MEAI — Tagesübersicht" data-en="MEAI — Daily overview" data-tr="MEAI — Günlük özet" data-ar="MEAI — نظرة يومية" data-ru="MEAI — Обзор дня">MEAI — Tagesübersicht</span>
+          <div class="md-live" data-de="Live" data-en="Live" data-tr="Canlı" data-ar="مباشر" data-ru="Live">Live</div>
         </div>
         <div class="md-body" id="md-body"></div>
-        <a href="https://meai.run" target="_blank" class="md-visit">meai.run öffnen →</a>
+        <a href="https://meai.run" target="_blank" rel="noopener" class="md-visit" data-de="meai.run öffnen →" data-en="Open meai.run →" data-tr="meai.run aç →" data-ar="افتح meai.run ←" data-ru="Открыть meai.run →">meai.run öffnen →</a>
       </div>
     </div>
   </div>
@@ -696,33 +770,38 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
 
 <!-- ABOUT — Andreas kararı -->
 <div class="sw" id="ueber-uns">
-  <div class="sey reveal">Über uns</div>
-  <h2 class="sh2 reveal d1">Wer steckt<br>hinter creaDIG?</h2>
+  <div class="sey reveal" data-de="Über uns" data-en="About us" data-tr="Hakkımızda" data-ar="من نحن" data-ru="О нас">Über uns</div>
+  <h2 class="sh2 reveal d1" data-html-de="Wer steckt<br>hinter creaDIG?" data-html-en="Who is<br>behind creaDIG?" data-html-tr="creaDIG'in<br>arkasında kim var?" data-html-ar="من وراء<br>creaDIG؟" data-html-ru="Кто стоит за<br>creaDIG?">Wer steckt<br>hinter creaDIG?</h2>
   <div class="about-layout">
     <div class="aph reveal">
       <div class="aph-box"><div class="aph-init">MEA</div></div>
       <div class="aph-bar"></div>
       <!-- Andreas kararı: güven badges -->
       <div class="trust-badges">
-        <span class="tb">5+ Jahre Erfahrung</span>
-        <span class="tb">DACH Region</span>
-        <span class="tb">Hannover · DE</span>
-        <span class="tb">DE & TR</span>
+        <span class="tb" data-de="5+ Jahre Erfahrung" data-en="5+ years experience" data-tr="5+ yıl deneyim" data-ar="5+ سنوات خبرة" data-ru="5+ лет опыта">5+ Jahre Erfahrung</span>
+        <span class="tb" data-de="DACH Region" data-en="DACH region" data-tr="DACH bölgesi" data-ar="منطقة DACH" data-ru="Регион DACH">DACH Region</span>
+        <span class="tb" data-de="Hannover · DE" data-en="Hannover · DE" data-tr="Hannover · DE" data-ar="هانوفر · DE" data-ru="Ганновер · DE">Hannover · DE</span>
+        <span class="tb" data-de="DE & TR" data-en="DE & TR" data-tr="DE & TR" data-ar="DE & TR" data-ru="DE & TR">DE & TR</span>
       </div>
     </div>
     <div>
       <div class="a-name reveal">Muhammed Emin Akyol</div>
-      <div class="a-role reveal d1">Gründer & Business Architect — creaDIG</div>
-      <p class="a-story reveal d2">
-        Ich habe creaDIG nicht gegründet, weil ich Designer bin. Sondern weil ich immer gesehen habe, <strong>was Unternehmen noch nicht sehen.</strong>
+      <div class="a-role reveal d1" data-de="Gründer & Business Architect — creaDIG" data-en="Founder & business architect — creaDIG" data-tr="Kurucu & iş mimarı — creaDIG" data-ar="المؤسس ومهندس الأعمال — creaDIG" data-ru="Основатель и бизнес-архитектор — creaDIG">Gründer & Business Architect — creaDIG</div>
+      <p class="a-story reveal d2"
+        data-html-de="Ich habe creaDIG nicht gegründet, weil ich Designer bin. Sondern weil ich immer gesehen habe, <strong>was Unternehmen noch nicht sehen.</strong><br><br>Das Potenzial, das brach liegt. Die Prozesse, die niemand im Griff hat. Die Stunden, die täglich verschwendet werden. Seit über 5 Jahren baue ich genau das auf — im Hintergrund, still, aber wirkungsvoll.<br><br><strong>Mein Ansatz:</strong> Erst verstehen, dann bauen. Was andere nicht sehen, ist mein Ausgangspunkt. MEAI — mein eigenes KI-System — ist der Beweis dafür."
+        data-html-en="I didn't found creaDIG because I'm a designer. I always saw <strong>what companies don't see yet.</strong><br><br>Dormant potential. Processes nobody controls. Hours wasted every day. For 5+ years I've been building exactly that — quietly, but with impact.<br><br><strong>My approach:</strong> Understand first, then build. MEAI — my own AI system — is the proof."
+        data-html-tr="creaDIG'i tasarımcı olduğum için kurmadım. Her zaman <strong>şirketlerin henüz görmediğini</strong> gördüm.<br><br>Uyuyan potansiyel. Kontrol edilmeyen süreçler. Her gün boşa giden saatler. 5+ yıldır tam bunu inşa ediyorum.<br><br><strong>Yaklaşımım:</strong> Önce anla, sonra kur. MEAI — kendi KI sistemim — bunun kanıtı."
+        data-html-ar="لم أؤسس creaDIG لأنني مصمم. بل لأنني رأيت دائماً <strong>ما لا تراه الشركات بعد.</strong><br><br>إمكانات خامدة. عمليات بلا تحكم. ساعات تُهدر يومياً. منذ 5+ سنوات أبني ذلك.<br><br><strong>منهجي:</strong> أفهم أولاً، ثم أبني. MEAI — نظام الذكاء الاصطناعي الخاص بي — هو الدليل."
+        data-html-ru="Я основал creaDIG не потому, что я дизайнер. Я всегда видел <strong>то, что компании ещё не видят.</strong><br><br>Спящий потенциал. Процессы без контроля. Часы, потерянные каждый день. 5+ лет я строю именно это.<br><br><strong>Мой подход:</strong> Сначала понять, потом строить. MEAI — моя система ИИ — тому доказательство."
+      >Ich habe creaDIG nicht gegründet, weil ich Designer bin. Sondern weil ich immer gesehen habe, <strong>was Unternehmen noch nicht sehen.</strong>
         <br><br>
         Das Potenzial, das brach liegt. Die Prozesse, die niemand im Griff hat. Die Stunden, die täglich verschwendet werden. Seit über 5 Jahren baue ich genau das auf — im Hintergrund, still, aber wirkungsvoll.
         <br><br>
         <strong>Mein Ansatz:</strong> Erst verstehen, dann bauen. Was andere nicht sehen, ist mein Ausgangspunkt. MEAI — mein eigenes KI-System — ist der Beweis dafür.
       </p>
       <div class="net-box reveal d3">
-        <div class="net-title">Kein One-Man-Show — ein starkes Netzwerk</div>
-        <div class="net-desc">creaDIG arbeitet mit einem spezialisierten Netzwerk aus Entwicklern, Textern und Strategen im DACH-Raum zusammen. Sie bekommen immer die richtige Expertise — ohne Agentur-Overhead.</div>
+        <div class="net-title" data-de="Kein One-Man-Show — ein starkes Netzwerk" data-en="Not a one-man show — a strong network" data-tr="Tek kişilik değil — güçlü bir ağ" data-ar="ليس عملاً فردياً — شبكة قوية" data-ru="Не одиночка — сильная сеть">Kein One-Man-Show — ein starkes Netzwerk</div>
+        <div class="net-desc" data-de="creaDIG arbeitet mit einem spezialisierten Netzwerk aus Entwicklern, Textern und Strategen im DACH-Raum zusammen. Sie bekommen immer die richtige Expertise — ohne Agentur-Overhead." data-en="creaDIG works with a specialized network of developers, writers and strategists in the DACH region. You always get the right expertise — without agency overhead." data-tr="creaDIG, DACH bölgesinde geliştiriciler, yazarlar ve stratejistlerden oluşan uzman bir ağla çalışır. Ajans yükü olmadan doğru uzmanlık." data-ar="creaDIG تعمل مع شبكة متخصصة من المطورين والكتّاب والاستراتيجيين في منطقة DACH. الخبرة المناسبة دون تكاليف وكالة." data-ru="creaDIG работает с сетью разработчиков, авторов и стратегов в DACH. Нужная экспертиза без overhead агентства.">creaDIG arbeitet mit einem spezialisierten Netzwerk aus Entwicklern, Textern und Strategen im DACH-Raum zusammen. Sie bekommen immer die richtige Expertise — ohne Agentur-Overhead.</div>
       </div>
     </div>
   </div>
@@ -732,23 +811,23 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
 
 <!-- PROOF — Thomas kararı -->
 <div class="sw" id="referenzen">
-  <div class="sey reveal">Referenzen</div>
-  <h2 class="sh2 reveal d1">Was unsere<br>Kunden sagen.</h2>
+  <div class="sey reveal" data-de="Referenzen" data-en="References" data-tr="Referanslar" data-ar="المراجع" data-ru="Отзывы">Referenzen</div>
+  <h2 class="sh2 reveal d1" data-html-de="Was unsere<br>Kunden sagen." data-html-en="What our<br>clients say." data-html-tr="Müşterilerimiz<br>ne diyor." data-html-ar="ماذا يقول<br>عملاؤنا." data-html-ru="Что говорят<br>клиенты.">Was unsere<br>Kunden sagen.</h2>
   <div class="proof-grid">
     <div class="prc reveal d1">
-      <div class="prc-q">"Vorher kannte mich niemand außerhalb meiner Stammkunden. Jetzt kommen neue Leute über Instagram — ohne dass ich selbst etwas posten muss."</div>
-      <div class="prc-r">+60% neue Anfragen in 2 Monaten</div>
-      <div class="prc-a">Inhaber — Bäckerei, NRW</div>
+      <div class="prc-q" data-de="&quot;Vorher kannte mich niemand außerhalb meiner Stammkunden. Jetzt kommen neue Leute über Instagram — ohne dass ich selbst etwas posten muss.&quot;" data-en="&quot;Before, nobody knew me outside my regulars. Now new people find me on Instagram — without me posting.&quot;" data-tr="&quot;Önceden sadık müşterilerim dışında kimse tanımıyordu. Şimdi Instagram'dan yeni müşteriler geliyor.&quot;" data-ar="&quot;قبل ذلك لم يعرفني أحد خارج زبائني. الآن يأتي عملاء جدد عبر إنستغرام دون أن أنشر.&quot;" data-ru="&quot;Раньше меня знали только постоянные клиенты. Теперь новые приходят из Instagram — без моих постов.&quot;">"Vorher kannte mich niemand außerhalb meiner Stammkunden. Jetzt kommen neue Leute über Instagram — ohne dass ich selbst etwas posten muss."</div>
+      <div class="prc-r" data-de="+60% neue Anfragen in 2 Monaten" data-en="+60% new inquiries in 2 months" data-tr="2 ayda +%60 yeni talep" data-ar="+60% طلبات جديدة في شهرين" data-ru="+60% новых запросов за 2 месяца">+60% neue Anfragen in 2 Monaten</div>
+      <div class="prc-a" data-de="Inhaber — Bäckerei, NRW" data-en="Owner — bakery, NRW" data-tr="İşletme sahibi — fırın, NRW" data-ar="مالك — مخبز، NRW" data-ru="Владелец — пекарня, NRW">Inhaber — Bäckerei, NRW</div>
     </div>
     <div class="prc reveal d2">
-      <div class="prc-q">"Wir hatten 12 Mitarbeiter und keinen einzigen strukturierten Prozess. creaDIG hat das in 6 Wochen grundlegend verändert."</div>
-      <div class="prc-r">8h/Woche eingespart pro Mitarbeiter</div>
-      <div class="prc-a">Geschäftsführer — Handwerksbetrieb, 12 MA</div>
+      <div class="prc-q" data-de="&quot;Wir hatten 12 Mitarbeiter und keinen einzigen strukturierten Prozess. creaDIG hat das in 6 Wochen grundlegend verändert.&quot;" data-en="&quot;We had 12 staff and zero structured processes. creaDIG changed that fundamentally in 6 weeks.&quot;" data-tr="&quot;12 çalışanımız vardı, yapılandırılmış süreç yoktu. creaDIG 6 haftada bunu değiştirdi.&quot;" data-ar="&quot;كان لدينا 12 موظفاً بلا عمليات منظمة. creaDIG غيّر ذلك في 6 أسابيع.&quot;" data-ru="&quot;12 сотрудников и ни одного процесса. creaDIG изменил это за 6 недель.&quot;">"Wir hatten 12 Mitarbeiter und keinen einzigen strukturierten Prozess. creaDIG hat das in 6 Wochen grundlegend verändert."</div>
+      <div class="prc-r" data-de="8h/Woche eingespart pro Mitarbeiter" data-en="8h/week saved per employee" data-tr="Çalışan başına haftada 8 saat tasarruf" data-ar="8 ساعات/أسبوع موفرة لكل موظف" data-ru="8 ч/нед экономии на сотрудника">8h/Woche eingespart pro Mitarbeiter</div>
+      <div class="prc-a" data-de="Geschäftsführer — Handwerksbetrieb, 12 MA" data-en="CEO — trade business, 12 staff" data-tr="Genel müdür — esnaf, 12 çalışan" data-ar="المدير — حرفي، 12 موظفاً" data-ru="Руководитель — ремесленное предприятие, 12 чел.">Geschäftsführer — Handwerksbetrieb, 12 MA</div>
     </div>
     <div class="prc reveal d3">
-      <div class="prc-q">"Meine Praxis war gut — aber niemand hat sie online gefunden. Das hat sich komplett geändert."</div>
-      <div class="prc-r">Seite 1 bei Google in 6 Wochen</div>
-      <div class="prc-a">Dr. med. — Arztpraxis, Hannover</div>
+      <div class="prc-q" data-de="&quot;Meine Praxis war gut — aber niemand hat sie online gefunden. Das hat sich komplett geändert.&quot;" data-en="&quot;My practice was good — but nobody found it online. That changed completely.&quot;" data-tr="&quot;Muayenehanem iyiydi — ama online kimse bulamıyordu. Bu tamamen değişti.&quot;" data-ar="&quot;عيادتي كانت جيدة — لكن أحداً لم يجدها online. تغيّر كل شيء.&quot;" data-ru="&quot;Практика была хорошей — но в сети её не находили. Всё изменилось.&quot;">"Meine Praxis war gut — aber niemand hat sie online gefunden. Das hat sich komplett geändert."</div>
+      <div class="prc-r" data-de="Seite 1 bei Google in 6 Wochen" data-en="Page 1 on Google in 6 weeks" data-tr="6 haftada Google'da 1. sayfa" data-ar="الصفحة 1 في Google خلال 6 أسابيع" data-ru="Страница 1 в Google за 6 недель">Seite 1 bei Google in 6 Wochen</div>
+      <div class="prc-a" data-de="Dr. med. — Arztpraxis, Hannover" data-en="MD — medical practice, Hannover" data-tr="Dr. — muayenehane, Hannover" data-ar="طبيب — عيادة، هانوفر" data-ru="Врач — практика, Ганновер">Dr. med. — Arztpraxis, Hannover</div>
     </div>
   </div>
 </div>
@@ -757,66 +836,66 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
 
 <!-- TARGET -->
 <div class="sw">
-  <div class="sey reveal">Für wen</div>
-  <h2 class="sh2 reveal d1">Für jeden,<br>der mehr will.</h2>
+  <div class="sey reveal" data-de="Für wen" data-en="Who it's for" data-tr="Kimler için" data-ar="لمن" data-ru="Для кого">Für wen</div>
+  <h2 class="sh2 reveal d1" data-html-de="Für jeden,<br>der mehr will." data-html-en="For everyone<br>who wants more." data-html-tr="Daha fazlasını<br>isteyen herkes için." data-html-ar="لمن يريد<br>المزيد." data-html-ru="Для тех,<br>кто хочет большего.">Für jeden,<br>der mehr will.</h2>
   <div class="tgt-grid">
-    <div class="tgc reveal d1"><div class="tg-n">01</div><div class="tg-name">Kleine Betriebe</div><div class="tg-desc">Erste Identität aufbauen. Sichtbar werden. Die ersten Kunden digital gewinnen — ohne großes Budget.</div></div>
-    <div class="tgc reveal d2"><div class="tg-n">02</div><div class="tg-name">Mittelstand</div><div class="tg-desc">Prozesse strukturieren. Chaos beseitigen. Mit einem klaren System skalieren — ohne mehr Personal.</div></div>
-    <div class="tgc reveal d3"><div class="tg-n">03</div><div class="tg-name">Etablierte Unternehmen</div><div class="tg-desc">Verborgenes Potenzial aktivieren. Systeme automatisieren. Den nächsten Wachstumsschritt systematisch gehen.</div></div>
+    <div class="tgc reveal d1"><div class="tg-n">01</div><div class="tg-name" data-de="Kleine Betriebe" data-en="Small businesses" data-tr="Küçük işletmeler" data-ar="شركات صغيرة" data-ru="Малый бизнес">Kleine Betriebe</div><div class="tg-desc" data-de="Erste Identität aufbauen. Sichtbar werden. Die ersten Kunden digital gewinnen — ohne großes Budget." data-en="Build your first identity. Get visible. Win first customers online — without a big budget." data-tr="İlk kimliğinizi kurun. Görünür olun. İlk müşterileri dijital kazanın." data-ar="ابنوا هويتكم الأولى. كونوا مرئيين. اكتسبوا أول عملاء رقمياً." data-ru="Создайте первую идентичность. Станьте видимыми. Получите первых клиентов онлайн.">Erste Identität aufbauen. Sichtbar werden. Die ersten Kunden digital gewinnen — ohne großes Budget.</div></div>
+    <div class="tgc reveal d2"><div class="tg-n">02</div><div class="tg-name" data-de="Mittelstand" data-en="Mid-market" data-tr="Orta ölçek" data-ar="الشركات المتوسطة" data-ru="Средний бизнес">Mittelstand</div><div class="tg-desc" data-de="Prozesse strukturieren. Chaos beseitigen. Mit einem klaren System skalieren — ohne mehr Personal." data-en="Structure processes. End chaos. Scale with a clear system — without hiring more." data-tr="Süreçleri yapılandırın. Kaosu bitirin. Net sistemle ölçeklenin." data-ar="نظّموا العمليات. أنهوا الفوضى. انمُوا بنظام واضح." data-ru="Структурируйте процессы. Уберите хаос. Масштабируйтесь с системой.">Prozesse strukturieren. Chaos beseitigen. Mit einem klaren System skalieren — ohne mehr Personal.</div></div>
+    <div class="tgc reveal d3"><div class="tg-n">03</div><div class="tg-name" data-de="Etablierte Unternehmen" data-en="Established companies" data-tr="Kurulu şirketler" data-ar="شركات راسخة" data-ru="Зрелые компании">Etablierte Unternehmen</div><div class="tg-desc" data-de="Verborgenes Potenzial aktivieren. Systeme automatisieren. Den nächsten Wachstumsschritt systematisch gehen." data-en="Unlock hidden potential. Automate systems. Take the next growth step systematically." data-tr="Gizli potansiyeli açın. Sistemleri otomatikleştirin. Büyümeyi sistematik yapın." data-ar="فعّلوا الإمكانات المخفية. أوتمتوا الأنظمة. انمُوا بشكل منهجي." data-ru="Раскройте скрытый потенциал. Автоматизируйте. Растите системно.">Verborgenes Potenzial aktivieren. Systeme automatisieren. Den nächsten Wachstumsschritt systematisch gehen.</div></div>
   </div>
 </div>
 
 <!-- PACKAGES — Thomas kararı: Kein Risiko büyük + İbo kararı -->
 <div class="pkg-wrap">
   <div class="pkg-inner">
-    <div class="sey reveal">Pakete</div>
-    <h2 class="sh2 reveal d1">Ihr erster Schritt<br>mit creaDIG.</h2>
+    <div class="sey reveal" data-de="Pakete" data-en="Packages" data-tr="Paketler" data-ar="الباقات" data-ru="Пакеты">Pakete</div>
+    <h2 class="sh2 reveal d1" data-html-de="Ihr erster Schritt<br>mit creaDIG." data-html-en="Your first step<br>with creaDIG." data-html-tr="creaDIG ile<br>ilk adımınız." data-html-ar="خطوتك الأولى<br>مع creaDIG." data-html-ru="Ваш первый шаг<br>с creaDIG.">Ihr erster Schritt<br>mit creaDIG.</h2>
     <div class="pkg-grid">
       <div class="pkg reveal d1">
         <div class="pk-name">Identity</div>
         <div class="pk-price">€350</div>
-        <div class="pk-period">einmalig · kein Abo</div>
-        <div class="pk-out">→ Professionelles Auftreten ab Tag 1</div>
+        <div class="pk-period" data-de="einmalig · kein Abo" data-en="one-time · no subscription" data-tr="tek seferlik · abonelik yok" data-ar="مرة واحدة · بدون اشتراك" data-ru="разово · без подписки">einmalig · kein Abo</div>
+        <div class="pk-out" data-de="→ Professionelles Auftreten ab Tag 1" data-en="→ Professional presence from day 1" data-tr="→ 1. günden profesyonel görünüm" data-ar="→ حضور احترافي من اليوم الأول" data-ru="→ Профессиональный образ с 1-го дня">→ Professionelles Auftreten ab Tag 1</div>
         <ul class="pk-items">
-          <li>Logo Design (2–3 Konzepte)</li>
-          <li>Visitenkarte</li>
-          <li>Social Media Profil</li>
-          <li>Grundlegendes Brand Manual</li>
+          <li data-de="Logo Design (2–3 Konzepte)" data-en="Logo design (2–3 concepts)" data-tr="Logo tasarımı (2–3 konsept)" data-ar="تصميم شعار (2–3 مفاهيم)" data-ru="Логотип (2–3 концепта)">Logo Design (2–3 Konzepte)</li>
+          <li data-de="Visitenkarte" data-en="Business card" data-tr="Kartvizit" data-ar="بطاقة عمل" data-ru="Визитка">Visitenkarte</li>
+          <li data-de="Social Media Profil" data-en="Social media profile" data-tr="Sosyal medya profili" data-ar="ملف وسائل التواصل" data-ru="Профиль в соцсетях">Social Media Profil</li>
+          <li data-de="Grundlegendes Brand Manual" data-en="Basic brand manual" data-tr="Temel marka kılavuzu" data-ar="دليل علامة أساسي" data-ru="Базовый brand manual">Grundlegendes Brand Manual</li>
         </ul>
-        <div class="pk-risk">Einmalige Zahlung. Kein Abo. Kein Risiko.</div>
-        <a href="#kontakt" class="pk-cta">Anfragen</a>
+        <div class="pk-risk" data-de="Einmalige Zahlung. Kein Abo. Kein Risiko." data-en="One-time payment. No subscription. No risk." data-tr="Tek ödeme. Abonelik yok. Risiko yok." data-ar="دفعة واحدة. بدون اشتراك. بدون مخاطر." data-ru="Разовая оплата. Без подписки. Без риска.">Einmalige Zahlung. Kein Abo. Kein Risiko.</div>
+        <a href="#kontakt" class="pk-cta" data-de="Anfragen" data-en="Inquire" data-tr="Başvur" data-ar="اطلب" data-ru="Запросить">Anfragen</a>
       </div>
       <div class="pkg ft reveal d2">
-        <div class="pkg-badge">Empfohlen</div>
+        <div class="pkg-badge" data-de="Empfohlen" data-en="Recommended" data-tr="Önerilen" data-ar="موصى به" data-ru="Рекомендуем">Empfohlen</div>
         <div class="pk-name">Growth Partner</div>
         <div class="pk-price">€500</div>
-        <div class="pk-period">/ Monat</div>
-        <div class="pk-out">→ Wachstum + Struktur + Sichtbarkeit</div>
+        <div class="pk-period" data-de="/ Monat" data-en="/ month" data-tr="/ ay" data-ar="/ شهر" data-ru="/ месяц">/ Monat</div>
+        <div class="pk-out" data-de="→ Wachstum + Struktur + Sichtbarkeit" data-en="→ Growth + structure + visibility" data-tr="→ Büyüme + yapı + görünürlük" data-ar="→ نمو + هيكل + ظهور" data-ru="→ Рост + структура + видимость">→ Wachstum + Struktur + Sichtbarkeit</div>
         <ul class="pk-items">
-          <li>Identity Paket inklusive</li>
-          <li>Website & Social Media</li>
-          <li>Prozessoptimierung & Operations</li>
-          <li>4–6 Designs pro Monat</li>
-          <li>Monatliches Strategie-Reporting</li>
-          <li>Direkter Zugang — Priorität</li>
+          <li data-de="Identity Paket inklusive" data-en="Identity package included" data-tr="Identity paketi dahil" data-ar="باقة الهوية مشمولة" data-ru="Пакет Identity включён">Identity Paket inklusive</li>
+          <li data-de="Website & Social Media" data-en="Website & social media" data-tr="Website & sosyal medya" data-ar="موقع ووسائل تواصل" data-ru="Сайт и соцсети">Website & Social Media</li>
+          <li data-de="Prozessoptimierung & Operations" data-en="Process optimization & operations" data-tr="Süreç optimizasyonu & operasyon" data-ar="تحسين العمليات" data-ru="Оптимизация процессов">Prozessoptimierung & Operations</li>
+          <li data-de="4–6 Designs pro Monat" data-en="4–6 designs per month" data-tr="Ayda 4–6 tasarım" data-ar="4–6 تصاميم شهرياً" data-ru="4–6 дизайнов в месяц">4–6 Designs pro Monat</li>
+          <li data-de="Monatliches Strategie-Reporting" data-en="Monthly strategy reporting" data-tr="Aylık strateji raporu" data-ar="تقرير استراتيجي شهري" data-ru="Ежемесячный отчёт">Monatliches Strategie-Reporting</li>
+          <li data-de="Direkter Zugang — Priorität" data-en="Direct access — priority" data-tr="Doğrudan erişim — öncelik" data-ar="وصول مباشر — أولوية" data-ru="Прямой доступ — приоритет">Direkter Zugang — Priorität</li>
         </ul>
-        <div class="pk-risk">Monatlich kündbar. Kein Risiko. Jederzeit.</div>
-        <a href="#kontakt" class="pk-cta">Jetzt starten</a>
+        <div class="pk-risk" data-de="Monatlich kündbar. Kein Risiko. Jederzeit." data-en="Cancel monthly. No risk. Anytime." data-tr="Aylık iptal. Risiko yok. Her zaman." data-ar="إلغاء شهري. بدون مخاطر." data-ru="Отмена ежемесячно. Без риска.">Monatlich kündbar. Kein Risiko. Jederzeit.</div>
+        <a href="#kontakt" class="pk-cta" data-de="Jetzt starten" data-en="Start now" data-tr="Şimdi başla" data-ar="ابدأ الآن" data-ru="Начать">Jetzt starten</a>
       </div>
       <div class="pkg reveal d3">
         <div class="pk-name">Architecture</div>
         <div class="pk-price">€1.500</div>
-        <div class="pk-period">/ Monat</div>
-        <div class="pk-out">→ Vollständige Systemarchitektur + MEAI</div>
+        <div class="pk-period" data-de="/ Monat" data-en="/ month" data-tr="/ ay" data-ar="/ شهر" data-ru="/ месяц">/ Monat</div>
+        <div class="pk-out" data-de="→ Vollständige Systemarchitektur + MEAI" data-en="→ Full system architecture + MEAI" data-tr="→ Tam sistem mimarisi + MEAI" data-ar="→ هندسة نظام كاملة + MEAI" data-ru="→ Полная архитектура + MEAI">→ Vollständige Systemarchitektur + MEAI</div>
         <ul class="pk-items">
-          <li>MEAI Plattform Integration</li>
-          <li>Vollständige Automatisierung</li>
-          <li>Operations & Systemaufbau</li>
-          <li>Strategische Langzeitpartnerschaft</li>
-          <li>Dedizierter Business Architect</li>
+          <li data-de="MEAI Plattform Integration" data-en="MEAI platform integration" data-tr="MEAI platform entegrasyonu" data-ar="تكامل منصة MEAI" data-ru="Интеграция MEAI">MEAI Plattform Integration</li>
+          <li data-de="Vollständige Automatisierung" data-en="Full automation" data-tr="Tam otomasyon" data-ar="أتمتة كاملة" data-ru="Полная автоматизация">Vollständige Automatisierung</li>
+          <li data-de="Operations & Systemaufbau" data-en="Operations & system build" data-tr="Operasyon & sistem kurulumu" data-ar="عمليات وبناء نظام" data-ru="Операции и система">Operations & Systemaufbau</li>
+          <li data-de="Strategische Langzeitpartnerschaft" data-en="Long-term strategic partnership" data-tr="Uzun vadeli stratejik ortaklık" data-ar="شراكة استراتيجية طويلة" data-ru="Долгосрочное партнёрство">Strategische Langzeitpartnerschaft</li>
+          <li data-de="Dedizierter Business Architect" data-en="Dedicated business architect" data-tr="Özel iş mimarı" data-ar="مهندس أعمال مخصص" data-ru="Выделенный бизнес-архитектор">Dedizierter Business Architect</li>
         </ul>
-        <div class="pk-risk">Erstgespräch kostenlos & unverbindlich.</div>
-        <a href="#kontakt" class="pk-cta">Gespräch buchen</a>
+        <div class="pk-risk" data-de="Erstgespräch kostenlos & unverbindlich." data-en="Free, no-obligation intro call." data-tr="İlk görüşme ücretsiz ve bağlayıcı değil." data-ar="استشارة أولى مجانية." data-ru="Первичная консультация бесплатно.">Erstgespräch kostenlos & unverbindlich.</div>
+        <a href="#kontakt" class="pk-cta" data-de="Gespräch buchen" data-en="Book a call" data-tr="Görüşme ayarla" data-ar="احجز مكالمة" data-ru="Записаться">Gespräch buchen</a>
       </div>
     </div>
   </div>
@@ -824,47 +903,46 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
 
 <!-- CONTACT — Julia kararı: form iyileştirme -->
 <div class="sw" id="kontakt">
-  <div class="sey reveal">Kontakt</div>
-  <h2 class="sh2 reveal d1">Bereit, was andere<br>nicht sehen?</h2>
-  <p class="sdesc reveal d2" style="margin-bottom:0;">Kostenlose Erstberatung — 20 Minuten. Kein Verkaufsgespräch. Kein Risiko.</p>
+  <div class="sey reveal" data-de="Kontakt" data-en="Contact" data-tr="İletişim" data-ar="اتصل" data-ru="Контакт">Kontakt</div>
+  <h2 class="sh2 reveal d1" data-html-de="Bereit, was andere<br>nicht sehen?" data-html-en="Ready for what others<br>don't see?" data-html-tr="Başkalarının<br>görmediğine hazır mısınız?" data-html-ar="مستعد لما<br>لا يراه الآخرون؟" data-html-ru="Готовы к тому, что<br>другие не видят?">Bereit, was andere<br>nicht sehen?</h2>
+  <p class="sdesc reveal d2" style="margin-bottom:0;" data-de="Kostenlose Erstberatung — 20 Minuten. Kein Verkaufsgespräch. Kein Risiko." data-en="Free consultation — 20 minutes. No sales pitch. No risk." data-tr="Ücretsiz ön görüşme — 20 dakika. Satış yok. Risiko yok." data-ar="استشارة مجانية — 20 دقيقة. بدون ضغط مبيعات." data-ru="Бесплатная консультация — 20 минут. Без продаж. Без риска.">Kostenlose Erstberatung — 20 Minuten. Kein Verkaufsgespräch. Kein Risiko.</p>
   <div class="contact-layout">
     <div>
       <div class="chs">
         <a href="https://wa.me/49000000000" class="ch wa reveal d1" target="_blank">
           <div class="ch-ic wa"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
-          <div><div class="ch-lbl">WhatsApp</div><div class="ch-sub">DE & TR — sofort verfügbar</div></div>
+          <div><div class="ch-lbl" data-de="WhatsApp" data-en="WhatsApp" data-tr="WhatsApp" data-ar="واتساب" data-ru="WhatsApp">WhatsApp</div><div class="ch-sub" data-de="DE & TR — sofort verfügbar" data-en="DE & TR — available now" data-tr="DE & TR — hemen ulaşılabilir" data-ar="DE & TR — متاح فوراً" data-ru="DE & TR — сейчас доступен">DE & TR — sofort verfügbar</div></div>
         </a>
-        <a href="https://calendly.com" class="ch reveal d2" target="_blank">
+        <a href="https://calendly.com" class="ch reveal d2" target="_blank" rel="noopener">
           <div class="ch-ic cal" style="font-size:1.15rem;">◷</div>
-          <div><div class="ch-lbl">Termin buchen</div><div class="ch-sub">Calendly — 20 Min. Erstgespräch</div></div>
+          <div><div class="ch-lbl" data-de="Termin buchen" data-en="Book appointment" data-tr="Randevu al" data-ar="احجز موعداً" data-ru="Записаться">Termin buchen</div><div class="ch-sub" data-de="Calendly — 20 Min. Erstgespräch" data-en="Calendly — 20 min intro call" data-tr="Calendly — 20 dk ön görüşme" data-ar="Calendly — 20 دقيقة استشارة" data-ru="Calendly — 20 мин консультация">Calendly — 20 Min. Erstgespräch</div></div>
         </a>
         <a href="mailto:hallo@creadig.de" class="ch reveal d3">
           <div class="ch-ic mail" style="font-size:.95rem;">✉</div>
-          <div><div class="ch-lbl">E-Mail</div><div class="ch-sub">hallo@creadig.de</div></div>
+          <div><div class="ch-lbl" data-de="E-Mail" data-en="Email" data-tr="E-posta" data-ar="بريد" data-ru="E-mail">E-Mail</div><div class="ch-sub">hallo@creadig.de</div></div>
         </a>
       </div>
     </div>
     <div class="cf reveal d2">
       <div class="fr">
-        <div class="fg"><label>Ihr Name</label><input type="text" placeholder="Max Mustermann"></div>
-        <div class="fg"><label>Ihr Unternehmen</label><input type="text" placeholder="Mustermann GmbH"></div>
+        <div class="fg"><label data-de="Ihr Name" data-en="Your name" data-tr="Adınız" data-ar="اسمك" data-ru="Ваше имя">Ihr Name</label><input type="text" data-de="Max Mustermann" data-en="John Smith" data-tr="Ahmet Yılmaz" data-ar="أحمد محمد" data-ru="Иван Иванов" placeholder="Max Mustermann"></div>
+        <div class="fg"><label data-de="Ihr Unternehmen" data-en="Your company" data-tr="Şirketiniz" data-ar="شركتك" data-ru="Ваша компания">Ihr Unternehmen</label><input type="text" data-de="Mustermann GmbH" data-en="Smith Ltd" data-tr="Yılmaz Ltd" data-ar="شركة مثال" data-ru="ООО Пример" placeholder="Mustermann GmbH"></div>
       </div>
-      <div class="fg"><label>E-Mail</label><input type="email" placeholder="max@mustermann.de"></div>
-      <!-- Julia kararı: spesifik dropdown -->
+      <div class="fg"><label data-de="E-Mail" data-en="Email" data-tr="E-posta" data-ar="البريد" data-ru="E-mail">E-Mail</label><input type="email" data-de="max@mustermann.de" data-en="john@company.com" data-tr="ahmet@sirket.com" data-ar="info@company.com" data-ru="info@company.ru" placeholder="max@mustermann.de"></div>
       <div class="fg">
-        <label>Was interessiert Sie?</label>
-        <select>
-          <option value="" disabled selected>Bitte wählen…</option>
-          <option>Identity (Logo, Visitenkarte)</option>
-          <option>Website & Social Media</option>
-          <option>Prozessautomatisierung</option>
-          <option>MEAI — KI-System</option>
-          <option>Vollständiges Paket</option>
-          <option>Anderes / Beratung</option>
+        <label data-de="Was interessiert Sie?" data-en="What interests you?" data-tr="Ne ilgileniyorsunuz?" data-ar="ما الذي يهمك؟" data-ru="Что вас интересует?">Was interessiert Sie?</label>
+        <select id="interest-select">
+          <option value="" disabled selected data-de="Bitte wählen…" data-en="Please select…" data-tr="Lütfen seçin…" data-ar="يرجى الاختيار…" data-ru="Выберите…">Bitte wählen…</option>
+          <option data-de="Identity (Logo, Visitenkarte)" data-en="Identity (logo, business card)" data-tr="Identity (logo, kartvizit)" data-ar="الهوية (شعار، بطاقة)" data-ru="Identity (логотип, визитка)">Identity (Logo, Visitenkarte)</option>
+          <option data-de="Website & Social Media" data-en="Website & social media" data-tr="Website & sosyal medya" data-ar="موقع ووسائل تواصل" data-ru="Сайт и соцсети">Website & Social Media</option>
+          <option data-de="Prozessautomatisierung" data-en="Process automation" data-tr="Süreç otomasyonu" data-ar="أتمتة العمليات" data-ru="Автоматизация процессов">Prozessautomatisierung</option>
+          <option data-de="MEAI — KI-System" data-en="MEAI — AI system" data-tr="MEAI — KI sistemi" data-ar="MEAI — نظام ذكاء اصطناعي" data-ru="MEAI — система ИИ">MEAI — KI-System</option>
+          <option data-de="Vollständiges Paket" data-en="Full package" data-tr="Tam paket" data-ar="باقة كاملة" data-ru="Полный пакет">Vollständiges Paket</option>
+          <option data-de="Anderes / Beratung" data-en="Other / consultation" data-tr="Diğer / danışmanlık" data-ar="أخرى / استشارة" data-ru="Другое / консультация">Anderes / Beratung</option>
         </select>
       </div>
-      <div class="fg"><label>Nachricht (optional)</label><textarea placeholder="z.B. Ich suche ein Logo und eine Website für meinen Betrieb…"></textarea></div>
-      <button class="fs">Anfrage senden →</button>
+      <div class="fg"><label data-de="Nachricht (optional)" data-en="Message (optional)" data-tr="Mesaj (isteğe bağlı)" data-ar="رسالة (اختياري)" data-ru="Сообщение (необязательно)">Nachricht (optional)</label><textarea data-de="z.B. Ich suche ein Logo und eine Website für meinen Betrieb…" data-en="e.g. I need a logo and website for my business…" data-tr="ör. İşletmem için logo ve website arıyorum…" data-ar="مثلاً أبحث عن شعار وموقع لعملي…" data-ru="напр. нужен логотип и сайт для бизнеса…" placeholder="z.B. Ich suche ein Logo und eine Website für meinen Betrieb…"></textarea></div>
+      <button class="fs" data-de="Anfrage senden →" data-en="Send inquiry →" data-tr="Başvuru gönder →" data-ar="إرسال الطلب ←" data-ru="Отправить →">Anfrage senden →</button>
     </div>
   </div>
 </div>
@@ -873,14 +951,16 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
 
 <footer>
   <svg class="nav-logo-svg" style="height:20px;width:auto;color:var(--text-4);"><use href="#logo-svg"/></svg>
-  <div class="fc">© 2025 creaDIG — Business Architecture & Operations · Hannover, DE</div>
+  <div class="fc" data-de="© 2025 creaDIG — Business Architecture & Operations · Hannover, DE" data-en="© 2025 creaDIG — Business Architecture & Operations · Hannover, DE" data-tr="© 2025 creaDIG — İş Mimarisi & Operasyon · Hannover, DE" data-ar="© 2025 creaDIG — هندسة أعمال وعمليات · هانوفر، DE" data-ru="© 2025 creaDIG — Бизнес-архитектура · Ганновер, DE">© 2025 creaDIG — Business Architecture & Operations · Hannover, DE</div>
   <div class="fls">
-    <a href="#">Impressum</a>
-    <a href="#">Datenschutz</a>
+    <a href="#" data-de="Impressum" data-en="Legal notice" data-tr="Künye" data-ar="إشعار قانوني" data-ru="Импрессум">Impressum</a>
+    <a href="#" data-de="Datenschutz" data-en="Privacy" data-tr="Gizlilik" data-ar="الخصوصية" data-ru="Конфиденциальность">Datenschutz</a>
     <a href="https://meai.run" target="_blank">meai.run</a>
   </div>
 </footer>
 
+<script src="app-lang.js" defer></script>
+<script src="creadig-dynamic.js" defer></script>
 <script>
 // THEME — Light default, Dark optional
 const THEME_KEY='creadig_theme';
@@ -930,26 +1010,20 @@ document.addEventListener('mousemove',e=>{
   cur.style.left=mx+'px';cur.style.top=my+'px';
 });
 (function anim(){rx+=(mx-rx)*.11;ry+=(my-ry)*.11;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(anim);})();
-document.querySelectorAll('a,button,.si,.pc,.prc,.tgc,.pkg,.theme-btn').forEach(el=>{
+document.querySelectorAll('a,button,.si,.pc,.prc,.tgc,.pkg,.theme-btn,.lang-btn,.lang-menu button,.mob-lb').forEach(el=>{
   el.addEventListener('mouseenter',()=>{cur.style.width='5px';cur.style.height='5px';ring.style.width='48px';ring.style.height='48px';ring.style.borderColor='rgba(4,121,180,.5)';});
   el.addEventListener('mouseleave',()=>{cur.style.width='9px';cur.style.height='9px';ring.style.width='34px';ring.style.height='34px';ring.style.borderColor='rgba(4,121,180,.28)';});
 });
 
-// SOPHIA — KELIME KELİME HERO ANİMASYONU
+// Hero headline — word reveal (after i18n apply)
 function initWordReveal(){
   const h1=document.getElementById('hero-h1');
   if(!h1)return;
-  // em içindeki metni koru
-  const em=h1.querySelector('em');
-  const emText=em?em.textContent:'';
-  
-  // Tüm text node'larını ve em'i işle
   const nodes=[...h1.childNodes];
   h1.innerHTML='';
-  
   nodes.forEach(node=>{
-    if(node.nodeType===3){// text node
-      const words=node.textContent.trim().split(' ').filter(w=>w);
+    if(node.nodeType===3){
+      const words=node.textContent.trim().split(/\s+/).filter(w=>w);
       words.forEach((word,i)=>{
         const span=document.createElement('span');
         span.className='word';
@@ -958,7 +1032,7 @@ function initWordReveal(){
         if(i<words.length-1)h1.appendChild(document.createTextNode(' '));
       });
     } else if(node.nodeName==='EM'){
-      const emWords=node.textContent.trim().split(' ').filter(w=>w);
+      const emWords=node.textContent.trim().split(/\s+/).filter(w=>w);
       emWords.forEach((word,i)=>{
         const outerSpan=document.createElement('span');
         outerSpan.className='word';
@@ -970,19 +1044,30 @@ function initWordReveal(){
         h1.appendChild(outerSpan);
         if(i<emWords.length-1)h1.appendChild(document.createTextNode(' '));
       });
+    } else if(node.nodeType===1){
+      h1.appendChild(node.cloneNode(true));
     }
   });
-
-  // Animasyonu gecikmeyle tetikle
   setTimeout(()=>{
     h1.classList.add('active');
-    const wordSpans=h1.querySelectorAll('.word span');
-    wordSpans.forEach((span,i)=>{
+    h1.querySelectorAll('.word span').forEach((span,i)=>{
       span.style.transitionDelay=`${i*0.08}s`;
     });
   },300);
 }
-initWordReveal();
+
+window.refreshHeroHeadline=function(){
+  const h1=document.getElementById('hero-h1');
+  if(!h1)return;
+  h1.classList.remove('active');
+  const lang=document.documentElement.getAttribute('data-lang')||'de';
+  const html=h1.getAttribute('data-html-'+lang)||h1.getAttribute('data-html-de');
+  if(html)h1.innerHTML=html;
+  initWordReveal();
+};
+
+document.addEventListener('DOMContentLoaded',()=>{initWordReveal();});
+window.addEventListener('langChanged',()=>{window.refreshHeroHeadline();});
 
 // MARKUS — SAYAÇ ANİMASYONU
 function animateCounter(el,target,suffix,duration=1800){
@@ -1026,58 +1111,6 @@ window.addEventListener('scroll',()=>{
 // REVEAL
 const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');}),{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
-
-// MEAI TYPEWRITER
-const lines=[
-  {t:'Priorität 1 — Rechnungsblock schließen',c:'pr'},
-  {t:'Priorität 2 — Lieferant bestätigen bis 14:00',c:'pr'},
-  {t:'3 neue Anfragen — automatisch qualifiziert',c:'nm'},
-  {t:'Social Media Post — Donnerstag vorbereitet',c:'nm'},
-  {t:'Rechnung #047 — versendet ✓',c:'dn'},
-  {t:'Wochenbericht — generiert ✓',c:'dn'},
-];
-let started=false;
-const mdBody=document.getElementById('md-body');
-new IntersectionObserver(([e])=>{if(e.isIntersecting&&!started){started=true;runTerminal();}},{threshold:.3}).observe(mdBody);
-
-function runTerminal(){
-  mdBody.innerHTML='';
-  let delay=300;
-  lines.forEach(ln=>{
-    setTimeout(()=>{
-      const d=document.createElement('div');
-      d.className=`tl ${ln.c}`;
-      const dot=document.createElement('div');dot.className='tl-dot';
-      const sp=document.createElement('span');
-      d.appendChild(dot);d.appendChild(sp);
-      mdBody.appendChild(d);
-      setTimeout(()=>d.classList.add('show'),40);
-      typeIt(sp,ln.t,22);
-    },delay);
-    delay+=ln.t.length*22+250;
-  });
-  setTimeout(()=>{
-    const note=document.createElement('div');
-    note.className='md-note';
-    note.style.opacity='0';
-    note.style.transition='opacity .5s';
-    note.textContent='Nächste Aufgabe fällig in 2h — Erinnerung aktiv';
-    mdBody.appendChild(note);
-    setTimeout(()=>note.style.opacity='1',100);
-  },delay+200);
-}
-
-function typeIt(el,text,spd){
-  let i=0;
-  const c=document.createElement('span');c.className='tc';el.appendChild(c);
-  const iv=setInterval(()=>{
-    if(i<text.length){el.insertBefore(document.createTextNode(text[i]),c);i++;}
-    else{clearInterval(iv);c.remove();}
-  },spd);
-}
-
-// LANG
-function setLang(l){document.querySelectorAll('.lb').forEach(b=>b.classList.toggle('ac',b.textContent===l.toUpperCase()));}
 
 // SMOOTH SCROLL
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
