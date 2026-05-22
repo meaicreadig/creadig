@@ -1,0 +1,29 @@
+---
+description: creaDIG landing page — stack, i18n, UI skill, and content preservation
+globs: index.html,*.js,.cursor/skills/**/*
+alwaysApply: false
+---
+
+# creaDIG site conventions
+
+## Stack
+- **Vanilla HTML/CSS/JS** only (`index.html`, `app-lang.js`, `creadig-dynamic.js`, `creadig-motion.js`). No React/Framer Motion unless the user explicitly requests a migration.
+- For UI/UX Pro Max searches, use stack **`html-tailwind`** as reference; implement with existing CSS variables and patterns in `index.html`.
+
+## UI/UX Pro Max (Faz 2)
+- Skill: `.cursor/skills/ui-ux-pro-max/` — run design-system search before major visual work:
+  `python3 .cursor/skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system -p creaDIG`
+- Persisted design tokens: `design-system/creadig/MASTER.md` (check `design-system/creadig/pages/[page].md` for overrides).
+
+## Content & i18n (do not break)
+- **Never delete or rewrite** existing marketing copy. Add effects, layout, or styling on top only.
+- Five languages: DE (default on first visit), EN, TR, AR (RTL), RU — `data-de` … `data-ru` on elements; engine in `app-lang.js`.
+- Theme: light default, `creadig_theme` in localStorage; keys `creadig_lang` / `creadig_lang_chosen`.
+
+## Quality bar (from UI Pro Max checklist)
+- SVG icons (Heroicons/Lucide), not emoji icons
+- `cursor-pointer` on clickable elements; visible focus states; `prefers-reduced-motion` respected
+- Test breakpoints: 375, 768, 1024, 1440px
+
+## Deploy
+- Static site → Vercel (`creadig.vercel.app`). Do not commit `.vercel` or `.video-analysis/`.
