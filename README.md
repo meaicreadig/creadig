@@ -10,6 +10,7 @@ Landing page for [creaDIG](https://creadig.vercel.app) — Business Architecture
 | `app-lang.js` | 5-language i18n (DE default) |
 | `creadig-dynamic.js` | MEAI terminal copy |
 | `creadig-motion.js` | Scroll / hover motion (Faz 1) |
+| `creadig-faz3.css` / `creadig-faz3.js` | Premium UI layer — 21st.dev style (Faz 3) |
 
 ## Cursor — UI/UX Pro Max (Faz 2)
 

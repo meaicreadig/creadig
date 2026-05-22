@@ -1,13 +1,14 @@
 ---
 description: creaDIG landing page — stack, i18n, UI skill, and content preservation
-globs: index.html,*.js,.cursor/skills/**/*
+globs: index.html,*.js,creadig-faz3.*,.cursor/skills/**/*
 alwaysApply: false
 ---
 
 # creaDIG site conventions
 
 ## Stack
-- **Vanilla HTML/CSS/JS** only (`index.html`, `app-lang.js`, `creadig-dynamic.js`, `creadig-motion.js`). No React/Framer Motion unless the user explicitly requests a migration.
+- **Vanilla HTML/CSS/JS** only (`index.html`, `app-lang.js`, `creadig-dynamic.js`, `creadig-motion.js`, `creadig-faz3.css`, `creadig-faz3.js`). No React/Framer Motion unless the user explicitly requests a migration.
+- **Faz 3** (`creadig-faz3.*`): 21st.dev-inspired visual layer — glass nav, gradient pricing ring, bento cards, hero spotlight. Do not remove i18n attributes or marketing copy.
 - For UI/UX Pro Max searches, use stack **`html-tailwind`** as reference; implement with existing CSS variables and patterns in `index.html`.
 
 ## UI/UX Pro Max (Faz 2)
