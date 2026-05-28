@@ -28,7 +28,7 @@
 <meta property="og:description" content="Business Architecture & Operations für Unternehmen im DACH-Raum. Von der Identität bis zur vollständigen KI-Automatisierung.">
 <title>creaDIG — Digitalagentur & Business Architecture | DACH</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Poppins:wght@400;500;600;700;800&family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="creadig-faz3.css">
 <style>
 :root {
@@ -256,6 +256,64 @@ html[dir="rtl"] .nav-links{flex-direction:row-reverse;}
 html[dir="rtl"] .lang-menu{left:0;right:auto;}
 html[dir="rtl"] .hero-ey{flex-direction:row-reverse;}
 html[dir="rtl"] .sey{flex-direction:row-reverse;}
+
+/* Arabic / RTL — fließende Typografie */
+html[dir="rtl"]{
+  --fd:'Tajawal',sans-serif;
+  --fb:'IBM Plex Sans Arabic','Tajawal',sans-serif;
+}
+html[dir="rtl"] body{
+  font-family:var(--fb);
+  line-height:1.85;
+  font-feature-settings:"liga" 1,"calt" 1;
+}
+html[dir="rtl"] h1.hh1,
+html[dir="rtl"] .sh2,
+html[dir="rtl"] .hs-num,
+html[dir="rtl"] .nav-wordmark{
+  font-family:var(--fd);
+  letter-spacing:0;
+}
+html[dir="rtl"] h1.hh1{
+  line-height:1.28;
+  max-width:none;
+  text-wrap:pretty;
+}
+html[dir="rtl"] h1.hh1 em.hero-accent{
+  white-space:normal;
+}
+html[dir="rtl"] .hero-sub{
+  line-height:2;
+  max-width:38em;
+  text-wrap:pretty;
+}
+html[dir="rtl"] .hero-ey,
+html[dir="rtl"] .sey,
+html[dir="rtl"] .hs-lbl{
+  letter-spacing:.04em;
+}
+html[dir="rtl"] .btn-p,
+html[dir="rtl"] .btn-g,
+html[dir="rtl"] .nav-links a{
+  letter-spacing:0;
+  font-family:var(--fd);
+}
+html[dir="rtl"] .meai-preview,
+html[dir="rtl"] .mp-body{
+  font-family:var(--fb);
+  line-height:1.75;
+}
+html[dir="rtl"] .mp-p-text{
+  font-family:var(--fd);
+  font-weight:600;
+}
+html[dir="rtl"] h1.word-reveal.active{
+  opacity:1;
+}
+html[dir="rtl"] h1.word-reveal.active .word span{
+  transform:none;
+  opacity:1;
+}
 @media(max-width:900px){
   .lang-wrap .lang-menu{display:none!important;}
   .mob-lang{display:flex;}
@@ -1173,18 +1231,18 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
   <div class="hero-grid" aria-hidden="true"></div>
   <div class="hero-c">
     <div class="hero-left">
-      <div class="hero-ey" data-de="Business Architecture & Operations — DACH" data-en="Business Architecture & Operations — DACH" data-tr="İş Mimarisi & Operasyon — DACH" data-ar="هندسة أعمال وعمليات — DACH" data-ru="Бизнес-архитектура и операции — DACH">Business Architecture & Operations — DACH</div>
+      <div class="hero-ey" data-de="Business Architecture & Operations — DACH" data-en="Business Architecture & Operations — DACH" data-tr="İş Mimarisi & Operasyon — DACH" data-ar="هندسة الأعمال والعمليات — DACH" data-ru="Бизнес-архитектура и операции — DACH">Business Architecture & Operations — DACH</div>
       <h1 class="hh1 word-reveal" id="hero-h1"
         data-html-de="Wir bauen, was andere <em class=&quot;hero-accent&quot;>nicht sehen.</em>"
         data-html-en="We build what others <em class=&quot;hero-accent&quot;>can't see.</em>"
         data-html-tr="Başkalarının <em class=&quot;hero-accent&quot;>görmediğini</em> inşa ediyoruz."
-        data-html-ar="نبني ما <em class=&quot;hero-accent&quot;>لا يراه</em> الآخرون."
+        data-html-ar="نبني ما <em class=&quot;hero-accent&quot;>لا يراه</em> الآخرون"
         data-html-ru="Мы создаём то, что <em class=&quot;hero-accent&quot;>другие не видят.</em>"
       >Wir bauen, was andere <em class="hero-accent">nicht sehen.</em></h1>
-      <p class="hero-sub" data-de="Termine, Papierkram, Prozesse — das unsichtbare Chaos, das Ihren Betrieb ausbremst. Wir bringen Struktur hinein. KI-gestützt, zweisprachig, DACH-weit." data-en="Appointments, paperwork, processes — the invisible chaos slowing your business down. We bring structure in. AI-powered, bilingual, across the DACH region." data-tr="Randevular, evrak işleri, süreçler — işletmenizi yavaşlatan görünmez karmaşa. Yapı getiriyoruz. KI destekli, iki dilli, DACH genelinde." data-ar="المواعيد والأوراق والعمليات — الفوضى الخفية التي تبطئ عملك. نضع البنية. مدعوم بالذكاء الاصطناعي، ثنائي اللغة، في منطقة DACH." data-ru="Встречи, бумаги, процессы — невидимый хаос, который тормозит ваш бизнес. Мы наводим структуру. С ИИ, на двух языках, по всему DACH.">Termine, Papierkram, Prozesse — das unsichtbare Chaos, das Ihren Betrieb ausbremst. Wir bringen Struktur hinein. KI-gestützt, zweisprachig, DACH-weit.</p>
+      <p class="hero-sub" data-de="Termine, Papierkram, Prozesse — das unsichtbare Chaos, das Ihren Betrieb ausbremst. Wir bringen Struktur hinein. KI-gestützt, zweisprachig, DACH-weit." data-en="Appointments, paperwork, processes — the invisible chaos slowing your business down. We bring structure in. AI-powered, bilingual, across the DACH region." data-tr="Randevular, evrak işleri, süreçler — işletmenizi yavaşlatan görünmez karmaşa. Yapı getiriyoruz. KI destekli, iki dilli, DACH genelinde." data-ar="المواعيد والأوراق والإجراءات — فوضى خفية تُبطئ نموّ عملك. نحوّلها إلى نظامٍ واضح. بقوة الذكاء الاصطناعي، بخدمة ثنائية اللغة، في أسواق DACH." data-ru="Встречи, бумаги, процессы — невидимый хаос, который тормозит ваш бизнес. Мы наводим структуру. С ИИ, на двух языках, по всему DACH.">Termine, Papierkram, Prozesse — das unsichtbare Chaos, das Ihren Betrieb ausbremst. Wir bringen Struktur hinein. KI-gestützt, zweisprachig, DACH-weit.</p>
       <div class="hero-ctas">
-        <a href="#kontakt" class="btn-p" data-de="Kostenlose Erstberatung →" data-en="Free consultation →" data-tr="Ücretsiz ön görüşme →" data-ar="استشارة مجانية ←" data-ru="Бесплатная консультация →">Kostenlose Erstberatung →</a>
-        <a href="#meai" class="btn-g" data-de="MEAI entdecken" data-en="Discover MEAI" data-tr="MEAI'yi keşfet" data-ar="اكتشف MEAI" data-ru="Открыть MEAI">MEAI entdecken</a>
+        <a href="#kontakt" class="btn-p" data-de="Kostenlose Erstberatung →" data-en="Free consultation →" data-tr="Ücretsiz ön görüşme →" data-ar="احجز استشارتك المجانية ←" data-ru="Бесплатная консультация →">Kostenlose Erstberatung →</a>
+        <a href="#meai" class="btn-g" data-de="MEAI entdecken" data-en="Discover MEAI" data-tr="MEAI'yi keşfet" data-ar="اكتشف منصة MEAI" data-ru="Открыть MEAI">MEAI entdecken</a>
       </div>
     </div>
     <div class="hero-meai">
@@ -1192,36 +1250,36 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
       <div class="meai-preview">
         <div class="mp-header">
           <div class="mp-dot r"></div><div class="mp-dot y"></div><div class="mp-dot g"></div>
-          <span class="mp-title" data-de="meai.run — Live System" data-en="meai.run — Live system" data-tr="meai.run — Canlı sistem" data-ar="meai.run — نظام مباشر" data-ru="meai.run — Живая система">meai.run — Live System</span>
+          <span class="mp-title" data-de="meai.run — Live System" data-en="meai.run — Live system" data-tr="meai.run — Canlı sistem" data-ar="meai.run — نظام حي" data-ru="meai.run — Живая система">meai.run — Live System</span>
           <div class="mp-logo"><img src="https://www.meai.run/assets/logo/meailogo_full_blackmode_whitefont.png" alt="MEAI"></div>
         </div>
         <div class="mp-body">
-          <div class="mp-greeting" data-html-de="Guten Morgen, <strong>Emin 👋</strong>" data-html-en="Good morning, <strong>Emin 👋</strong>" data-html-tr="Günaydın, <strong>Emin 👋</strong>" data-html-ar="صباح الخير، <strong>إيمين 👋</strong>" data-html-ru="Доброе утро, <strong>Emin 👋</strong>">Guten Morgen, <strong>Emin 👋</strong></div>
+          <div class="mp-greeting" data-html-de="Guten Morgen, <strong>Emin 👋</strong>" data-html-en="Good morning, <strong>Emin 👋</strong>" data-html-tr="Günaydın, <strong>Emin 👋</strong>" data-html-ar="صباح الخير، <strong>إيمن</strong> 👋" data-html-ru="Доброе утро, <strong>Emin 👋</strong>">Guten Morgen, <strong>Emin 👋</strong></div>
           <div class="mp-priority">
             <div class="mp-p-label" data-de="Priorität heute" data-en="Today's priority" data-tr="Bugünün önceliği" data-ar="أولوية اليوم" data-ru="Приоритет сегодня">Priorität heute</div>
-            <div class="mp-p-text" data-de="Rechnungsblock schließen" data-en="Close billing block" data-tr="Fatura bloğunu kapat" data-ar="إغلاق كتلة الفواتير" data-ru="Закрыть блок счетов">Rechnungsblock schließen</div>
-            <div class="mp-p-sub" data-de="Vision-Hebel · Eine Leitung, keine Parallelspur" data-en="Vision lever · One line, no parallel path" data-tr="Vizyon kolu · Tek hat, paralel yol yok" data-ar="رافعة الرؤية · خط واحد، لا مسار موازٍ" data-ru="Рычаг видения · Одна линия, без параллели">Vision-Hebel · Eine Leitung, keine Parallelspur</div>
+            <div class="mp-p-text" data-de="Rechnungsblock schließen" data-en="Close billing block" data-tr="Fatura bloğunu kapat" data-ar="إنهاء دورة الفواتير المتأخرة" data-ru="Закрыть блок счетов">Rechnungsblock schließen</div>
+            <div class="mp-p-sub" data-de="Vision-Hebel · Eine Leitung, keine Parallelspur" data-en="Vision lever · One line, no parallel path" data-tr="Vizyon kolu · Tek hat, paralel yol yok" data-ar="رافعة رؤية · مسار واحد بلا تشتيت" data-ru="Рычаг видения · Одна линия, без параллели">Vision-Hebel · Eine Leitung, keine Parallelspur</div>
           </div>
           <div class="mp-tasks" id="hero-mp-tasks">
             <div class="mp-task open mp-task-live" data-task-idx="0">
               <div class="mp-task-dot"></div>
-              <span class="mp-task-text" data-de="Glasfaser Team Meeting" data-en="Fiber team meeting" data-tr="Glasfaser ekip toplantısı" data-ar="اجتماع فريق الألياف" data-ru="Встреча команды Glasfaser">Glasfaser Team Meeting</span>
+              <span class="mp-task-text" data-de="Glasfaser Team Meeting" data-en="Fiber team meeting" data-tr="Glasfaser ekip toplantısı" data-ar="اجتماع فريق الألياف البصرية" data-ru="Встреча команды Glasfaser">Glasfaser Team Meeting</span>
               <span class="mp-task-time">09:00</span>
             </div>
             <div class="mp-task open mp-task-live" data-task-idx="1">
               <div class="mp-task-dot"></div>
-              <span class="mp-task-text" data-de="creaDIG Strategie · Website" data-en="creaDIG strategy · Website" data-tr="creaDIG strateji · Website" data-ar="استراتيجية creaDIG · الموقع" data-ru="creaDIG стратегия · Сайт">creaDIG Strategie · Website</span>
+              <span class="mp-task-text" data-de="creaDIG Strategie · Website" data-en="creaDIG strategy · Website" data-tr="creaDIG strateji · Website" data-ar="استراتيجية creaDIG · الموقع الإلكتروني" data-ru="creaDIG стратегия · Сайт">creaDIG Strategie · Website</span>
               <span class="mp-task-time">14:00</span>
             </div>
             <div class="mp-task done">
               <div class="mp-task-dot"></div>
-              <span class="mp-task-text" data-de="Wochenbericht generiert" data-en="Weekly report generated" data-tr="Haftalık rapor oluşturuldu" data-ar="تم إنشاء التقرير الأسبوعي" data-ru="Недельный отчёт сформирован">Wochenbericht generiert</span>
+              <span class="mp-task-text" data-de="Wochenbericht generiert" data-en="Weekly report generated" data-tr="Haftalık rapor oluşturuldu" data-ar="تم إعداد التقرير الأسبوعي" data-ru="Недельный отчёт сформирован">Wochenbericht generiert</span>
               <span class="mp-task-time">✓</span>
             </div>
           </div>
           <div class="mp-footer">
-            <span class="mp-status" data-de="Online · Synchronisiert" data-en="Online · Synced" data-tr="Çevrimiçi · Senkronize" data-ar="متصل · متزامن" data-ru="Онлайн · Синхронизировано">Online · Synchronisiert</span>
-            <a href="https://meai.run" target="_blank" rel="noopener" class="mp-link" data-de="meai.run →" data-en="meai.run →" data-tr="meai.run →" data-ar="meai.run ←" data-ru="meai.run →">meai.run →</a>
+            <span class="mp-status" data-de="Online · Synchronisiert" data-en="Online · Synced" data-tr="Çevrimiçi · Senkronize" data-ar="متصل · متزامَن" data-ru="Онлайн · Синхронизировано">Online · Synchronisiert</span>
+            <a href="https://meai.run" target="_blank" rel="noopener" class="mp-link" data-de="meai.run →" data-en="meai.run →" data-tr="meai.run →" data-ar="انتقل إلى meai.run ←" data-ru="meai.run →">meai.run →</a>
           </div>
         </div>
       </div>
@@ -1233,7 +1291,7 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
     <div><div class="hs-num">5<span>+</span></div><div class="hs-lbl" data-de="Jahre Erfahrung" data-en="Years experience" data-tr="Yıl deneyim" data-ar="سنوات خبرة" data-ru="Лет опыта">Jahre Erfahrung</div></div>
     <div><div class="hs-num"><span>DACH</span></div><div class="hs-lbl" data-de="Marktfokus" data-en="Market focus" data-tr="Pazar odağı" data-ar="تركيز السوق" data-ru="Фокус рынка">Marktfokus</div></div>
     <!-- TODO: echte Referenz/Logo, sobald vorhanden -->
-    <div><div class="hs-num"><span>DE</span>/<span>TR</span></div><div class="hs-lbl" data-de="Zweisprachig" data-en="Bilingual" data-tr="İki dilli" data-ar="ثنائي اللغة" data-ru="Два языка">Zweisprachig</div></div>
+    <div><div class="hs-num"><span>ع</span>/<span>DE</span></div><div class="hs-lbl" data-de="Zweisprachig" data-en="Bilingual" data-tr="İki dilli" data-ar="عربي وألماني" data-ru="Два языка">Zweisprachig</div></div>
   </div>
 </section>
 
@@ -1569,6 +1627,11 @@ document.addEventListener('keydown',e=>{
 function initWordReveal(){
   const h1=document.getElementById('hero-h1');
   if(!h1)return;
+  const lang=document.documentElement.getAttribute('data-lang')||'de';
+  if(lang==='ar'){
+    h1.classList.add('active');
+    return;
+  }
   const nodes=[...h1.childNodes];
   h1.innerHTML='';
   nodes.forEach(node=>{

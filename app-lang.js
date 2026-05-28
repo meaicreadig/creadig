@@ -25,7 +25,7 @@
     de: 'creaDIG — Digitalagentur & Business Architecture | DACH',
     en: 'creaDIG — Digital Agency & Business Architecture | DACH',
     tr: 'creaDIG — Dijital Ajans & İş Mimarisi | DACH',
-    ar: 'creaDIG — وكالة رقمية وهندسة أعمال | DACH',
+    ar: 'creaDIG — هندسة أعمال وعمليات | DACH',
     ru: 'creaDIG — Digital-агентство и бизнес-архитектура | DACH',
   };
 
