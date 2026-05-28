@@ -52,28 +52,39 @@
   background: radial-gradient(circle, rgba(4, 121, 180, 0.14) 0%, transparent 62%);
 }
 
-/* Nav — floating glass bar */
+/* Nav — floating glass bar (layout in index.html) */
 nav {
-  margin: 0.65rem 1.25rem 0;
+  margin: 0.65rem clamp(0.75rem, 2vw, 1.25rem) 0;
   left: 0;
   right: 0;
   width: auto;
   border-radius: var(--radius-lg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-card);
-  padding: 0.65rem 1.35rem;
 }
 
 nav.sc {
   box-shadow: var(--shadow-card-hover);
+  margin-top: 0.35rem;
 }
 
-[data-theme="light"] nav {
+[data-theme="light"] nav:not(.sc) {
   background: var(--glass);
 }
 
-[data-theme="dark"] nav {
+[data-theme="dark"] nav:not(.sc) {
   background: var(--glass);
+}
+
+.nav-logo,
+.nav-links a,
+.nav-wa,
+.nav-cta,
+.theme-btn,
+.nav-burger,
+.lang-btn,
+.nav-drawer-links a {
+  cursor: pointer;
 }
 
 @media (max-width: 900px) {
@@ -83,6 +94,20 @@ nav.sc {
     width: 100%;
     left: 0;
     right: 0;
+  }
+
+  nav.sc {
+    margin-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  nav,
+  .nav-drawer-panel,
+  .nav-drawer-backdrop,
+  .theme-btn svg,
+  .nav-burger span {
+    transition-duration: 0.01ms !important;
   }
 }
 
@@ -102,8 +127,8 @@ nav.sc {
   box-shadow: 0 0 10px var(--blue);
 }
 
-h1.hh1 em {
-  background: linear-gradient(120deg, var(--blue) 0%, #0369a1 50%, var(--blue-l) 100%);
+h1.hh1 em.hero-accent {
+  background: linear-gradient(115deg, var(--blue) 0%, #0ea5e9 48%, var(--blue-l) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -346,11 +371,21 @@ h1.hh1 em {
 
 /* Stats in hero */
 .hero-stats > div {
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 1.15rem;
   background: var(--glass);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   backdrop-filter: blur(12px);
+}
+
+@media (max-width: 900px) {
+  .hero-stats > div {
+    padding: 0.65rem 0.9rem;
+  }
+
+  .hero-stats .hs-num {
+    font-size: 1.35rem;
+  }
 }
 
 /* Sticky CTA */
