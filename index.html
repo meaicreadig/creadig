@@ -698,9 +698,26 @@ h1.hh1 em.hero-accent::after{
 .pc-icon{width:2.5rem;height:2.5rem;border:1px solid var(--border-b);border-radius:5px;display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;color:var(--blue);background:var(--blue-dim);font-size:1rem;}
 
 /* Markus kararı — somut rakamlar */
-.pc-stat{font-family:var(--fd);font-size:1.75rem;font-weight:700;color:var(--blue);line-height:1;margin-bottom:.4rem;}
-.pc h3{font-family:var(--fd);font-size:1rem;font-weight:600;margin-bottom:.6rem;color:var(--text-1);letter-spacing:-.01em;}
-.pc p{font-size:.86rem;color:var(--text-3);line-height:1.65;}
+.prob-grid{align-items:stretch;}
+.pc{display:flex;flex-direction:column;background:linear-gradient(180deg,var(--bg-2) 0%,var(--bg-3) 140%);border-color:var(--border-b);}
+.pc:hover{border-color:rgba(4,121,180,.5);box-shadow:0 0 0 1px rgba(4,121,180,.16),var(--shadow-card-hover);}
+.pc-stat{font-family:var(--fd);font-size:clamp(2.4rem,4vw,3.1rem);font-weight:700;color:var(--blue);line-height:1;margin-bottom:.7rem;letter-spacing:-.02em;}
+.pc h3{font-family:var(--fd);font-size:1.05rem;font-weight:600;margin-bottom:.55rem;color:var(--text-1);letter-spacing:-.01em;}
+.pc p{font-size:.88rem;color:var(--text-2);line-height:1.7;flex:1 1 auto;}
+.pc-solve{
+  margin-top:1.5rem;padding-top:1.1rem;
+  border-top:1px solid var(--border-b);
+  display:flex;align-items:flex-start;gap:.55rem;
+  font-family:var(--fd);font-size:.92rem;font-weight:600;
+  line-height:1.45;letter-spacing:-.01em;color:var(--blue);
+}
+.pc-solve::before{content:'→';flex-shrink:0;font-weight:700;}
+html[dir="rtl"] .pc-solve::before{content:'←';}
+
+/* Branchen-Tags */
+.prob-tags{margin-top:2.75rem;display:flex;flex-wrap:wrap;gap:.65rem 1.6rem;}
+.prob-tag{display:inline-flex;align-items:center;gap:.5rem;font-size:.8rem;letter-spacing:.03em;color:var(--text-2);}
+.prob-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--blue);opacity:.65;flex-shrink:0;}
 
 /* SERVICES */
 .srv-layout{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;margin-top:4rem;}
@@ -1302,23 +1319,35 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
   <h2 class="sh2 reveal d1" data-html-de="Das Problem,<br>das wir lösen." data-html-en="The problem<br>we solve." data-html-tr="Çözdüğümüz<br>sorun." data-html-ar="المشكلة<br>التي نحلها." data-html-ru="Проблема,<br>которую мы решаем.">Das Problem,<br>das wir lösen.</h2>
   <div class="prob-grid">
     <div class="pc reveal d1">
-      <div class="pc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
+      <div class="pc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div>
+      <!-- TODO: Zahl und Quelle verifizieren vor Go-Live -->
       <div class="pc-stat count-num" data-target="67" data-suffix="%">0%</div>
       <h3 data-de="Unsichtbares Potenzial" data-en="Invisible potential" data-tr="Görünmeyen potansiyel" data-ar="إمكانات مخفية" data-ru="Скрытый потенциал">Unsichtbares Potenzial</h3>
-      <p data-de="67% der KMU nutzen weniger als die Hälfte ihres digitalen Potenzials. Wir machen sichtbar, was bisher brach liegt — und bauen darauf auf." data-en="67% of SMEs use less than half their digital potential. We reveal what's dormant — and build on it." data-tr="KOBİ'lerin %67'si dijital potansiyelinin yarısından azını kullanıyor. Biz görünmeyeni görünür kılıyoruz." data-ar="67% من الشركات الصغيرة تستخدم أقل من نصف إمكاناتها الرقمية. نكشف ما كان خامداً ونبني عليه." data-ru="67% МСП используют меньше половины цифрового потенциала. Мы делаем видимым скрытое — и строим на этом.">67% der KMU nutzen weniger als die Hälfte ihres digitalen Potenzials. Wir machen sichtbar, was bisher brach liegt — und bauen darauf auf.</p>
+      <p data-de="Ihr Betrieb hat mehr Kapazität als er zeigt — aber niemand hat Zeit, das sichtbar zu machen." data-en="Your business has more capacity than it shows — but no one has time to make it visible." data-tr="İşletmenizin görünenden fazla kapasitesi var — ama kimsenin bunu görünür kılacak vakti yok." data-ar="في عملك طاقة أكبر مما يظهر — لكن لا أحد يملك الوقت لإبرازها." data-ru="У вашего бизнеса больше возможностей, чем видно — но ни у кого нет времени их раскрыть.">Ihr Betrieb hat mehr Kapazität als er zeigt — aber niemand hat Zeit, das sichtbar zu machen.</p>
+      <div class="pc-solve" data-de="creaDIG macht sichtbar, was brachliegt." data-en="creaDIG reveals what lies dormant." data-tr="creaDIG, atıl olanı görünür kılar." data-ar="creaDIG تُظهر ما هو خامل." data-ru="creaDIG раскрывает то, что простаивает.">creaDIG macht sichtbar, was brachliegt.</div>
     </div>
     <div class="pc reveal d2">
       <div class="pc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+      <!-- TODO: Zahl und Quelle verifizieren vor Go-Live -->
       <div class="pc-stat count-num" data-target="14" data-suffix="h">0h</div>
       <h3 data-de="Chaos im Hintergrund" data-en="Back-office chaos" data-tr="Arka planda kaos" data-ar="فوضى في الخلفية" data-ru="Хаос в процессах">Chaos im Hintergrund</h3>
-      <p data-de="Unternehmen verlieren durchschnittlich 14 Stunden pro Woche durch fehlende Systeme und unstrukturierte Prozesse. Wir lösen das." data-en="Companies lose an average of 14 hours per week to missing systems and unstructured processes. We fix that." data-tr="İşletmeler eksik sistemler yüzünden haftada ortalama 14 saat kaybediyor. Biz bunu çözüyoruz." data-ar="الشركات تخسر 14 ساعة أسبوعياً بسبب أنظمة ناقصة. نحل ذلك." data-ru="Компании теряют в среднем 14 часов в неделю из-за отсутствия систем. Мы это решаем.">Unternehmen verlieren durchschnittlich 14 Stunden pro Woche durch fehlende Systeme und unstrukturierte Prozesse. Wir lösen das.</p>
+      <p data-de="Zettel, Anrufe, unstrukturierte Prozesse. Diese Stunden fehlen am Ende der Woche — überall." data-en="Notes, calls, unstructured processes. These hours are missing at the end of the week — everywhere." data-tr="Notlar, telefonlar, yapısız süreçler. Bu saatler hafta sonunda her yerde eksik kalır." data-ar="أوراق، مكالمات، إجراءات غير منظمة. هذه الساعات تضيع في نهاية الأسبوع — في كل مكان." data-ru="Записки, звонки, неструктурированные процессы. Этих часов не хватает к концу недели — везде.">Zettel, Anrufe, unstrukturierte Prozesse. Diese Stunden fehlen am Ende der Woche — überall.</p>
+      <div class="pc-solve" data-de="MEAI übernimmt die Last. Automatisch." data-en="MEAI takes the load. Automatically." data-tr="MEAI yükü üstlenir. Otomatik." data-ar="MEAI تتحمّل العبء. تلقائياً." data-ru="MEAI берёт нагрузку на себя. Автоматически.">MEAI übernimmt die Last. Automatisch.</div>
     </div>
     <div class="pc reveal d3">
-      <div class="pc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18l4-8 4 4 4-10 4 14"/></svg></div>
+      <div class="pc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 8h4v4"/></svg></div>
+      <!-- TODO: Zahl und Quelle verifizieren vor Go-Live -->
       <div class="pc-stat count-num" data-target="3" data-suffix="×">0×</div>
       <h3 data-de="Kein System zum Wachsen" data-en="No system to scale" data-tr="Büyümek için sistem yok" data-ar="لا نظام للنمو" data-ru="Нет системы роста">Kein System zum Wachsen</h3>
-      <p data-de="Unternehmen mit klarer digitaler Architektur wachsen 3× schneller. Wir bauen diese Grundlage — systematisch und skalierbar." data-en="Companies with clear digital architecture grow 3× faster. We build that foundation — systematically and at scale." data-tr="Net dijital mimariye sahip işletmeler 3 kat daha hızlı büyür. Biz bu temeli kuruyoruz." data-ar="الشركات ذات البنية الرقمية الواضحة تنمو 3 أضعاف. نبني هذا الأساس." data-ru="Компании с чёткой цифровой архитектурой растут в 3 раза быстрее. Мы строим эту основу.">Unternehmen mit klarer digitaler Architektur wachsen 3× schneller. Wir bauen diese Grundlage — systematisch und skalierbar.</p>
+      <p data-de="Gute Arbeit reicht nicht. Wer kein System hat, läuft auf der Stelle — egal wie gut das Handwerk ist." data-en="Good work isn't enough. Without a system you run in place — no matter how good the craft." data-tr="İyi iş yetmez. Sistemi olmayan, ne kadar usta olursa olsun yerinde sayar." data-ar="العمل الجيد لا يكفي. من لا نظام له يراوح مكانه — مهما أتقن حرفته." data-ru="Хорошей работы мало. Без системы вы топчетесь на месте — каким бы мастером ни были.">Gute Arbeit reicht nicht. Wer kein System hat, läuft auf der Stelle — egal wie gut das Handwerk ist.</p>
+      <div class="pc-solve" data-de="Wir bauen das System. Sie machen das Handwerk." data-en="We build the system. You do the craft." data-tr="Sistemi biz kurarız. Zanaatı siz yaparsınız." data-ar="نحن نبني النظام. وأنت تتقن حرفتك." data-ru="Мы строим систему. Вы делаете своё дело.">Wir bauen das System. Sie machen das Handwerk.</div>
     </div>
+  </div>
+  <div class="prob-tags reveal d3" role="list" aria-label="Branchen">
+    <span class="prob-tag" role="listitem" data-de="Handwerk & Bau" data-en="Trades & Construction" data-tr="Zanaat & İnşaat" data-ar="الحِرَف والبناء" data-ru="Ремесло и стройка">Handwerk & Bau</span>
+    <span class="prob-tag" role="listitem" data-de="Arztpraxen" data-en="Medical Practices" data-tr="Muayenehaneler" data-ar="العيادات الطبية" data-ru="Медпрактики">Arztpraxen</span>
+    <span class="prob-tag" role="listitem" data-de="Gastronomie" data-en="Hospitality" data-tr="Gastronomi" data-ar="الضيافة" data-ru="Гастрономия">Gastronomie</span>
+    <span class="prob-tag" role="listitem" data-de="Zweisprachige KMU" data-en="Bilingual SMEs" data-tr="İki Dilli KOBİ'ler" data-ar="الشركات الثنائية اللغة" data-ru="Двуязычные МСП">Zweisprachige KMU</span>
   </div>
 </div>
 
@@ -1696,6 +1725,7 @@ function animateCounter(el,target,suffix,duration=1800){
   },interval);
 }
 
+const counterReducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const counterObs=new IntersectionObserver((entries)=>{
   entries.forEach(e=>{
     if(e.isIntersecting){
@@ -1704,7 +1734,8 @@ const counterObs=new IntersectionObserver((entries)=>{
       const suffix=el.dataset.suffix||'';
       if(!el.dataset.counted){
         el.dataset.counted='1';
-        animateCounter(el,target,suffix);
+        if(counterReducedMotion)el.textContent=target+suffix;
+        else animateCounter(el,target,suffix);
       }
     }
   });
