@@ -31,7 +31,7 @@
         x +
         "px " +
         y +
-        "px, rgba(4,121,180,0.06), transparent 45%), var(--bg-2)";
+        "px, rgba(var(--accent-rgb),0.06), transparent 45%), var(--bg-2)";
     });
     featured.addEventListener("mouseleave", function () {
       featured.style.background = "";

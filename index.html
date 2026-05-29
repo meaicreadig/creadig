@@ -32,10 +32,20 @@
 <link rel="stylesheet" href="creadig-faz3.css">
 <style>
 :root {
-  --blue: #0479B4;
-  --blue-l: #0590d4;
+  /* ── Globaler Akzent-Gradient (Gold → Champagne) ── */
+  --accent-from: #be904e;            /* Gold */
+  --accent-to: #e4c378;              /* Hellgold / Champagne */
+  --accent-color: #be904e;           /* Fallback (solide) */
+  --accent-rgb: 190, 144, 78;        /* RGB-Tripel von --accent-from */
+  --accent-on: #0D1B2A;              /* Dunkler Text auf Gold (Kontrast) */
+  --accent-gradient: linear-gradient(90deg, var(--accent-from), var(--accent-to));
+  --accent-gradient-v: linear-gradient(180deg, var(--accent-from), var(--accent-to));
+
+  /* Bestehende Akzent-Tokens auf Gold umgeleitet (Layout/Logik unverändert) */
+  --blue: var(--accent-color);
+  --blue-l: var(--accent-to);
   --green: #28c840;
-  --btn-on-primary: #f4f2ef;
+  --btn-on-primary: var(--accent-on);
   --fd: 'Poppins', sans-serif;
   --fb: 'Open Sans', sans-serif;
 }
@@ -54,16 +64,16 @@
   --surface-2: rgba(12,12,14,0.04);
   --border: rgba(12,12,14,0.1);
   --border-strong: rgba(12,12,14,0.22);
-  --border-b: rgba(4,121,180,0.35);
-  --blue-dim: rgba(4,121,180,0.08);
+  --border-b: rgba(var(--accent-rgb),0.35);
+  --blue-dim: rgba(var(--accent-rgb),0.08);
   --nav-bg: rgba(246,245,242,0.92);
-  --hero-glow: rgba(4,121,180,0.1);
-  --hero-grid: rgba(4,121,180,0.07);
-  --quote-mark: rgba(4,121,180,0.06);
-  --tg-num: rgba(4,121,180,0.08);
-  --aph-init: rgba(4,121,180,0.1);
+  --hero-glow: rgba(var(--accent-rgb),0.1);
+  --hero-grid: rgba(var(--accent-rgb),0.07);
+  --quote-mark: rgba(var(--accent-rgb),0.06);
+  --tg-num: rgba(var(--accent-rgb),0.08);
+  --aph-init: rgba(var(--accent-rgb),0.1);
   --page-bg: linear-gradient(180deg, #f8fafc 0%, #f6f5f2 45%, #f6f5f2 100%);
-  --meai-shadow: rgba(4,121,180,0.08);
+  --meai-shadow: rgba(var(--accent-rgb),0.08);
 }
 
 [data-theme="dark"] {
@@ -80,16 +90,16 @@
   --surface-2: rgba(244,242,239,0.05);
   --border: rgba(244,242,239,0.07);
   --border-strong: rgba(244,242,239,0.3);
-  --border-b: rgba(4,121,180,0.3);
-  --blue-dim: rgba(4,121,180,0.1);
+  --border-b: rgba(var(--accent-rgb),0.3);
+  --blue-dim: rgba(var(--accent-rgb),0.1);
   --nav-bg: rgba(12,12,14,0.9);
-  --hero-glow: rgba(4,121,180,0.07);
-  --hero-grid: rgba(4,121,180,0.035);
-  --quote-mark: rgba(4,121,180,0.05);
-  --tg-num: rgba(4,121,180,0.07);
-  --aph-init: rgba(4,121,180,0.12);
+  --hero-glow: rgba(var(--accent-rgb),0.07);
+  --hero-grid: rgba(var(--accent-rgb),0.035);
+  --quote-mark: rgba(var(--accent-rgb),0.05);
+  --tg-num: rgba(var(--accent-rgb),0.07);
+  --aph-init: rgba(var(--accent-rgb),0.12);
   --page-bg: none;
-  --meai-shadow: rgba(4,121,180,0.05);
+  --meai-shadow: rgba(var(--accent-rgb),0.05);
 }
 
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
@@ -117,7 +127,7 @@ a,button,input,select,textarea,label[for],.lang-btn,.theme-btn,.nav-burger,.fs,.
   padding:.75rem 1.5rem;border-radius:3px;
   font-size:.85rem;font-weight:500;letter-spacing:.03em;
   text-decoration:none;
-  box-shadow:0 8px 32px rgba(4,121,180,0.35);
+  box-shadow:0 8px 32px rgba(var(--accent-rgb),0.35);
   transition:all .3s;
   opacity:0;transform:translateY(20px);
   pointer-events:none;
@@ -498,11 +508,11 @@ html[dir="rtl"] .nav-drawer-panel{
 }
 .hero-glow-mockup{
   position:absolute;width:min(520px,70vw);height:min(520px,70vw);
-  background:radial-gradient(circle,rgba(4,121,180,.14) 0%,transparent 70%);
+  background:radial-gradient(circle,rgba(var(--accent-rgb),.14) 0%,transparent 70%);
   top:48%;right:8%;transform:translateY(-50%);
   pointer-events:none;z-index:0;
 }
-[data-theme="dark"] .hero-glow-mockup{background:radial-gradient(circle,rgba(4,121,180,.1) 0%,transparent 72%);}
+[data-theme="dark"] .hero-glow-mockup{background:radial-gradient(circle,rgba(var(--accent-rgb),.1) 0%,transparent 72%);}
 .hero-grid{
   position:absolute;inset:0;
   background-image:linear-gradient(var(--hero-grid) 1px,transparent 1px),linear-gradient(90deg,var(--hero-grid) 1px,transparent 1px);
@@ -544,14 +554,14 @@ h1.hh1 em.hero-accent{
 }
 h1.hh1 em.hero-accent > span,
 h1.hh1 em.hero-accent{
-  background:linear-gradient(115deg,var(--blue) 0%,#0ea5e9 48%,var(--blue-l) 100%);
+  background:var(--accent-gradient);
   -webkit-background-clip:text;background-clip:text;
   -webkit-text-fill-color:transparent;color:transparent;
 }
 h1.hh1 em.hero-accent::after{
   content:'';
   position:absolute;left:0;right:0;bottom:.06em;height:2px;
-  background:linear-gradient(90deg,transparent,var(--blue),#0ea5e9,var(--blue-l),transparent);
+  background:linear-gradient(90deg,transparent,var(--accent-from),var(--accent-to),transparent);
   opacity:.75;border-radius:2px;
 }
 .hero-sub{
@@ -617,8 +627,8 @@ h1.hh1 em.hero-accent::after{
 .mp-status{font-size:.68rem;color:var(--text-4);display:flex;align-items:center;gap:.4rem;}
 .mp-status::before{
   content:'';width:6px;height:6px;border-radius:50%;
-  background:var(--green);display:inline-block;
-  box-shadow:0 0 0 0 rgba(40,200,64,.45);
+  background:var(--accent-from);display:inline-block;
+  box-shadow:0 0 0 0 rgba(var(--accent-rgb),.45);
   animation:mpOnlinePulse 2.4s ease-in-out infinite;
 }
 .mp-link{font-size:.7rem;color:var(--blue);text-decoration:none;letter-spacing:.03em;border-bottom:1px solid var(--border-b);}
@@ -626,7 +636,7 @@ h1.hh1 em.hero-accent::after{
 .mp-tasks .mp-task.open.mp-task-live{
   border-color:var(--border-b);
   background:var(--blue-dim);
-  box-shadow:0 0 0 1px rgba(4,121,180,.08);
+  box-shadow:0 0 0 1px rgba(var(--accent-rgb),.08);
 }
 
 .hero-sc{
@@ -635,13 +645,13 @@ h1.hh1 em.hero-accent::after{
   font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-4);
   opacity:0;animation:heroIn .85s cubic-bezier(.16,1,.3,1) .92s forwards;
 }
-.sc-line{width:3rem;height:1px;background:rgba(4,121,180,.3);position:relative;overflow:hidden;}
+.sc-line{width:3rem;height:1px;background:rgba(var(--accent-rgb),.3);position:relative;overflow:hidden;}
 .sc-line::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--blue);animation:scA 2s ease-in-out infinite;}
 @keyframes scA{0%{left:-100%;}50%{left:0%;}100%{left:100%;}}
 @keyframes heroIn{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
 @keyframes mpOnlinePulse{
-  0%,100%{box-shadow:0 0 0 0 rgba(40,200,64,.4);}
-  50%{box-shadow:0 0 0 5px rgba(40,200,64,0);}
+  0%,100%{box-shadow:0 0 0 0 rgba(var(--accent-rgb),.4);}
+  50%{box-shadow:0 0 0 5px rgba(var(--accent-rgb),0);}
 }
 
 .hero-stats{
@@ -700,7 +710,7 @@ h1.hh1 em.hero-accent::after{
 /* Markus kararı — somut rakamlar */
 .prob-grid{align-items:stretch;}
 .pc{display:flex;flex-direction:column;background:linear-gradient(180deg,var(--bg-2) 0%,var(--bg-3) 140%);border-color:var(--border-b);}
-.pc:hover{border-color:rgba(4,121,180,.5);box-shadow:0 0 0 1px rgba(4,121,180,.16),var(--shadow-card-hover);}
+.pc:hover{border-color:rgba(var(--accent-rgb),.5);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.16),var(--shadow-card-hover);}
 .pc-stat{font-family:var(--fd);font-size:clamp(2.4rem,4vw,3.1rem);font-weight:700;color:var(--blue);line-height:1;margin-bottom:.7rem;letter-spacing:-.02em;}
 .pc h3{font-family:var(--fd);font-size:1.05rem;font-weight:600;margin-bottom:.55rem;color:var(--text-1);letter-spacing:-.01em;}
 .pc p{font-size:.88rem;color:var(--text-2);line-height:1.7;flex:1 1 auto;}
@@ -825,7 +835,7 @@ html[dir="rtl"] .pc-solve::before{content:'←';}
 @media(max-width:900px){.pkg-grid{grid-template-columns:1fr;}}
 .pkg{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2.25rem;display:flex;flex-direction:column;transition:border-color .3s;position:relative;}
 .pkg:hover{border-color:var(--border-b);}
-.pkg.ft{border-color:var(--blue);background:rgba(4,121,180,.025);}
+.pkg.ft{border-color:var(--blue);background:rgba(var(--accent-rgb),.025);}
 .pkg-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--blue);color:var(--btn-on-primary);font-size:.62rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .95rem;border-radius:0 0 4px 4px;}
 .pk-name{font-family:var(--fd);font-size:1.25rem;font-weight:700;color:var(--text-1);margin-bottom:.45rem;letter-spacing:-.01em;}
 .pk-price{font-family:var(--fd);font-size:2.5rem;font-weight:800;color:var(--blue);line-height:1;margin-bottom:.18rem;letter-spacing:-.03em;}
@@ -982,7 +992,7 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
   }
   .hero-meai:hover .hero-meai-stage .meai-preview{
     animation-play-state:paused;
-    box-shadow:0 32px 64px rgba(4,121,180,0.16),0 12px 32px rgba(0,0,0,.14);
+    box-shadow:0 32px 64px rgba(var(--accent-rgb),0.16),0 12px 32px rgba(0,0,0,.14);
   }
 
   .meai-demo{
@@ -1018,7 +1028,7 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
   }
   .pkg:hover{
     transform:translateY(-6px);
-    box-shadow:0 18px 40px rgba(4,121,180,0.08);
+    box-shadow:0 18px 40px rgba(var(--accent-rgb),0.08);
   }
   .pkg.ft{
     animation:featuredPulse 5s ease-in-out infinite;
@@ -1040,7 +1050,7 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
   }
   .btn-p:hover,.nav-cta:hover,.pk-cta:hover,.fs:hover{
     transform:translateY(-2px) scale(1.02);
-    box-shadow:0 10px 28px rgba(4,121,180,0.28);
+    box-shadow:0 10px 28px rgba(var(--accent-rgb),0.28);
   }
   .btn-g:hover,.pkg .pk-cta:hover{
     transform:translateY(-2px);
@@ -1085,16 +1095,16 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
   50%{transform:translateY(-10px);}
 }
 @keyframes priorityGlow{
-  0%,100%{box-shadow:0 0 0 0 rgba(4,121,180,0);}
-  50%{box-shadow:0 0 0 1px rgba(4,121,180,0.12);}
+  0%,100%{box-shadow:0 0 0 0 rgba(var(--accent-rgb),0);}
+  50%{box-shadow:0 0 0 1px rgba(var(--accent-rgb),0.12);}
 }
 @keyframes featuredPulse{
-  0%,100%{box-shadow:0 0 0 0 rgba(4,121,180,0.08);}
-  50%{box-shadow:0 0 24px 2px rgba(4,121,180,0.12);}
+  0%,100%{box-shadow:0 0 0 0 rgba(var(--accent-rgb),0.08);}
+  50%{box-shadow:0 0 24px 2px rgba(var(--accent-rgb),0.12);}
 }
 @keyframes mpTaskFocus{
   0%,18%,100%{background:var(--surface-2);border-color:var(--border);box-shadow:none;}
-  6%,12%{background:var(--blue-dim);border-color:var(--border-b);box-shadow:0 0 0 1px rgba(4,121,180,.1);}
+  6%,12%{background:var(--blue-dim);border-color:var(--border-b);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.1);}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -1106,6 +1116,65 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
   .meai-preview:hover,.meai-demo:hover,.pc:hover,.prc:hover,.tgc:hover,.pkg:hover,.btn-p:hover{transform:none!important;}
   .reveal{opacity:1!important;transform:none!important;}
   .word-reveal .word span{transform:none!important;opacity:1!important;}
+}
+
+/* ═══ Globaler Akzent-Gradient — gebündelte Anwendung (überschreibt Solid-Akzent) ═══ */
+
+/* Primär-CTAs (Buttons, Sticky, Formular, Featured-Paket, Badge) → Gold-Gradient + dunkler Text */
+.btn-p,.nav-cta,.sticky-cta,.fs,.pkg.ft .pk-cta,.pkg-badge{
+  background:var(--accent-gradient);
+  color:var(--accent-on);
+}
+.btn-p:hover,.nav-cta:hover,.sticky-cta:hover,.fs:hover,.pkg.ft .pk-cta:hover{
+  background:var(--accent-gradient);
+  filter:brightness(1.08);
+}
+
+/* Outline-/Sekundär-Buttons → Gradient-Fill im Hover, dunkler Text */
+.btn-g{border-color:var(--accent-from);}
+.btn-g:hover{
+  background:var(--accent-gradient);
+  border-color:transparent;
+  color:var(--accent-on);
+}
+
+/* Nav — aktiver/Hover-Unterstrich als Gradient (links → rechts) */
+.nav-links a::after{background:var(--accent-gradient);}
+
+/* Header — feine Gradient-Grenzlinie wenn kompakt */
+nav.sc{border-bottom-color:transparent;}
+nav.sc::after{
+  content:'';position:absolute;left:0;right:0;bottom:-1px;height:1.5px;
+  background:var(--accent-gradient);opacity:.9;pointer-events:none;
+}
+
+/* Text-Akzente als Gradient (Zahlen, Preise, Auflösungssätze inkl. → Pfeil, meai.run-Link) */
+.pc-stat,.pc-solve,.met-n,.pk-price,.mp-link,.hs-num span{
+  background:var(--accent-gradient);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+
+/* Karten — vertikaler Akzent-Strich als Gradient (oben → unten) */
+.net-box::before{background:var(--accent-gradient-v);}
+
+/* Karten — Hover-Border-Glow in Akzentfarbe */
+.pc:hover{box-shadow:0 0 0 1.5px var(--accent-from),0 4px 24px rgba(var(--accent-rgb),0.15),var(--shadow-card-hover);}
+
+/* Branchen-Tags / Chips — Text in Akzentfarbe */
+.prob-tag{color:var(--accent-from);}
+
+/* Footer — Gradient-Trennlinie oben */
+footer{position:relative;border-top-color:transparent;}
+footer::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+  background:var(--accent-gradient);opacity:.6;
+}
+
+/* Formular — Focus-State mit Gold-Ring */
+.fg input:focus,.fg textarea:focus,.fg select:focus{
+  border-color:var(--accent-from);
+  box-shadow:0 0 0 3px rgba(var(--accent-rgb),0.2);
 }
 </style>
 </head>
@@ -1148,17 +1217,17 @@ footer{border-top:1px solid var(--border);padding:2.25rem 2.5rem;max-width:1200p
       <g transform="translate(931.22882, 88.218698)"><path fill="currentColor" opacity=".9" d="M460.18,645.93c-0.99,0-1.82,0.4-2.5,1.2c-0.61,0.64-0.91,1.44-0.91,2.39c0,1.2,0.41,2.15,1.24,2.86c0.38,0.33,1.25,0.85,2.62,1.56c6.28,3.02,12.91,4.53,19.88,4.53c9.15,0,16.58-2.46,22.26-7.39c5.38-4.78,8.06-11.15,8.06-19.11c0-6.36-1.75-11.66-5.24-15.88c-3.17-3.81-9.46-7.47-18.85-10.98c-6.51-2.39-10.98-4.5-13.41-6.34c-3.93-3.02-5.89-7.15-5.89-12.41c0-5.18,1.74-9.48,5.22-12.9c3.4-3.41,7.94-5.13,13.63-5.13c4.62,0,8.93,0.96,12.94,2.86c1.45,0.72,2.47,1.07,3.07,1.07c0.76,0,1.44-0.28,2.05-0.83c0.83-0.71,1.24-1.67,1.24-2.86c0-1.52-0.91-2.72-2.72-3.59c-5.38-2.46-10.9-3.69-16.58-3.69c-7.88,0-14.28,2.46-19.19,7.39c-4.7,4.78-7.05,10.75-7.05,17.91c0,7.24,2.73,13.06,8.18,17.44c3.02,2.38,8.28,4.96,15.78,7.75c4.09,1.51,6.81,2.59,8.18,3.22c2.8,1.27,4.95,2.78,6.46,4.53c3.18,3.43,4.77,7.65,4.77,12.66c0,6.14-2.16,10.88-6.48,14.22c-4.31,3.35-9.87,5.02-16.7,5.02c-6.06,0-11.92-1.56-17.59-4.67C461.61,646.21,460.77,645.93,460.18,645.93z"/></g>
     </g>
     <g>
-      <path fill="#0479B4" d="M782.86,474.13l61.04-0.28c-20.18,53.01-68.52,90.34-124.98,92.82c-25.6,1.13-49.42-4.16-71.71-16.35c-68.94-37.68-94.98-123.62-61.52-195.31c36.23-77.63,131.16-107.45,203.32-59.04c42.28,28.36,67.06,77.16,64.84,127.95c-0.4,9.14-0.35,17.88-3.65,26.95l-219.53,0.09c9.83,27.64,31.54,49.58,59.6,57.12C725.6,517.56,761.58,504.09,782.86,474.13z M796.66,395.06c-1.72-7.25-4.28-12.08-7.06-17.79c-15.14-31.27-47.5-50.94-82.23-48.73c-38.92,2.47-68.79,29.57-79.23,66.54L796.66,395.06z"/>
+      <path fill="currentColor" d="M782.86,474.13l61.04-0.28c-20.18,53.01-68.52,90.34-124.98,92.82c-25.6,1.13-49.42-4.16-71.71-16.35c-68.94-37.68-94.98-123.62-61.52-195.31c36.23-77.63,131.16-107.45,203.32-59.04c42.28,28.36,67.06,77.16,64.84,127.95c-0.4,9.14-0.35,17.88-3.65,26.95l-219.53,0.09c9.83,27.64,31.54,49.58,59.6,57.12C725.6,517.56,761.58,504.09,782.86,474.13z M796.66,395.06c-1.72-7.25-4.28-12.08-7.06-17.79c-15.14-31.27-47.5-50.94-82.23-48.73c-38.92,2.47-68.79,29.57-79.23,66.54L796.66,395.06z"/>
       <path fill="#606060" d="M1743.14,514.39l0.08-100.38c0.01-15.35-5.88-29.24-14.02-42.02c-15.11-23.75-42.49-38.58-70.55-37.59c-13.33,0.47-24.48,4.14-35.8,10.32c-28.71,15.69-44.22,46.6-42.85,79.3c1.17,27.93,15.02,53.43,38.71,68.37l20.39,9.9l0.09,56.77c-23.56-3.69-44.7-14.32-62.7-29.41c-35.33-29.61-53.08-73.76-50.14-119.65c3.41-53.2,35.13-99.36,84.13-120.69c39.14-17.04,83.26-13.61,119.73,8.93c44.55,27.54,67.45,72.31,67.04,124.73l-0.78,98.41c-4.39,68.24-61.5,124.81-130.19,128.02l-87.68,0.12l-0.14-55.63l84.79-0.3C1705.21,592.17,1743.1,555.8,1743.14,514.39z"/>
       <path fill="#606060" d="M1203.19,520.21c-38.07-40.05-49.73-95.48-32.35-147.85c16.1-46.58,54.82-81.65,104.36-91.86l0.17,57.12c-24.27,8.4-43.11,25.49-52.2,49.02c-13.34,33.12-5.94,71,19.78,95.69c22.65,21.73,55.15,29.22,84.42,17.26c30.81-12.59,51.49-42.29,53.14-75.63l0.09-217.34l53.8-0.03l-0.18,224.01c-4.98,57.93-40.69,105.61-95.57,124.09c-15.3,5.15-30.02,6.4-46.28,5.94c-26.17-0.73-51.18-9.93-72.09-25.63L1203.19,520.21z"/>
-      <path fill="#0479B4" d="M948.16,362.19c-25.57,29.25-28.45,71.85-8.22,104.36c9.86,15.84,24.03,27.52,41.5,33.49c17.72,3.24,34.73,5,53.09,4.96l-0.08,55.73c-23.71,0.17-46.42-2.61-69.33-7.34c-16.79-5.38-31.15-14.03-44.44-25.74c-56.94-50.19-64.17-139.44-16.36-197.97c37.64-46.08,98.82-64.65,154-41.08c51.71,22.09,82.69,68.45,86.06,124.65l0.26,147.46l-53.9-0.05l-0.01-139.58l-1.95-18.2c-6.03-29.55-26.88-54.16-55.46-64.25C1003.23,328,969.49,337.78,948.16,362.19z"/>
-      <path fill="#0479B4" d="M247.1,482.96c31.92,29.82,80.5,29.27,109.93,0c1.01-1,1.51-1.97,2.61-2.08c0.95-0.1,2.27,0.29,3.18,1.21l19.38,19.58c5.51,5.57,10.09,11.7,16.23,17.05c-2.06,4.33-5.4,6.07-8.62,8.89c-23.1,20.28-51.77,32.35-82.67,33.16c-20.12,0.53-38.55-2.14-57.01-10.3c-29.3-12.96-53.97-35.36-68.25-64.23c-23.72-47.95-20.42-105.44,10-149.19c27.54-39.62,73.48-62.23,121.49-58.03c31.84,2.79,60.64,16.53,82.78,38.89c0.84,0.84,2.19,3.05,1.37,3.9l-22,22.78l-12.75,13.26c-0.77,0.8-1.53,1.36-2.3,1.47c-1.18,0.16-2.23-0.32-3.25-1.45c-30.54-33.72-80.09-31.3-112.09,2.31C210.67,396.36,209.55,447.87,247.1,482.96z"/>
-      <path fill="#0479B4" d="M465.98,394.67l-0.08,166.96l-55.01,0.15l0.32-159.35c1.09-27.85,8.59-53.67,25.54-75.45c21.89-29.03,54.69-46.14,91.23-47.44l56.79-0.18l-0.01,55.62l-53.42,0.63c-15.78,0.19-30.68,4.99-42.11,15.72C476.34,362.7,468.5,376.8,465.98,394.67z"/>
+      <path fill="currentColor" d="M948.16,362.19c-25.57,29.25-28.45,71.85-8.22,104.36c9.86,15.84,24.03,27.52,41.5,33.49c17.72,3.24,34.73,5,53.09,4.96l-0.08,55.73c-23.71,0.17-46.42-2.61-69.33-7.34c-16.79-5.38-31.15-14.03-44.44-25.74c-56.94-50.19-64.17-139.44-16.36-197.97c37.64-46.08,98.82-64.65,154-41.08c51.71,22.09,82.69,68.45,86.06,124.65l0.26,147.46l-53.9-0.05l-0.01-139.58l-1.95-18.2c-6.03-29.55-26.88-54.16-55.46-64.25C1003.23,328,969.49,337.78,948.16,362.19z"/>
+      <path fill="currentColor" d="M247.1,482.96c31.92,29.82,80.5,29.27,109.93,0c1.01-1,1.51-1.97,2.61-2.08c0.95-0.1,2.27,0.29,3.18,1.21l19.38,19.58c5.51,5.57,10.09,11.7,16.23,17.05c-2.06,4.33-5.4,6.07-8.62,8.89c-23.1,20.28-51.77,32.35-82.67,33.16c-20.12,0.53-38.55-2.14-57.01-10.3c-29.3-12.96-53.97-35.36-68.25-64.23c-23.72-47.95-20.42-105.44,10-149.19c27.54-39.62,73.48-62.23,121.49-58.03c31.84,2.79,60.64,16.53,82.78,38.89c0.84,0.84,2.19,3.05,1.37,3.9l-22,22.78l-12.75,13.26c-0.77,0.8-1.53,1.36-2.3,1.47c-1.18,0.16-2.23-0.32-3.25-1.45c-30.54-33.72-80.09-31.3-112.09,2.31C210.67,396.36,209.55,447.87,247.1,482.96z"/>
+      <path fill="currentColor" d="M465.98,394.67l-0.08,166.96l-55.01,0.15l0.32-159.35c1.09-27.85,8.59-53.67,25.54-75.45c21.89-29.03,54.69-46.14,91.23-47.44l56.79-0.18l-0.01,55.62l-53.42,0.63c-15.78,0.19-30.68,4.99-42.11,15.72C476.34,362.7,468.5,376.8,465.98,394.67z"/>
       <polygon fill="#606060" points="1507.41,560.53 1452.48,560.58 1452.5,279.76 1507.37,279.55"/>
-      <polygon fill="#0479B4" points="1338.43,421.95 1284.65,421.99 1284.59,279.48 1338.45,279.52"/>
-      <polygon fill="#0479B4" points="1704.32,561.48 1650.45,561.66 1650.42,419.21 1704.29,419.28"/>
-      <polygon fill="#0479B4" points="1507.43,262.23 1453.6,262.2 1453.55,207.83 1507.26,207.64"/>
-      <polygon fill="#0479B4" points="1870.17,559.51 1816.39,559.62 1816.33,505.26 1869.99,505.08"/>
+      <polygon fill="currentColor" points="1338.43,421.95 1284.65,421.99 1284.59,279.48 1338.45,279.52"/>
+      <polygon fill="currentColor" points="1704.32,561.48 1650.45,561.66 1650.42,419.21 1704.29,419.28"/>
+      <polygon fill="currentColor" points="1507.43,262.23 1453.6,262.2 1453.55,207.83 1507.26,207.64"/>
+      <polygon fill="currentColor" points="1870.17,559.51 1816.39,559.62 1816.33,505.26 1869.99,505.08"/>
     </g>
   </symbol>
 </svg>
