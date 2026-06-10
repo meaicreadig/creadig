@@ -809,6 +809,9 @@ html[dir="rtl"] .pc-solve::before{content:'←';}
 .team-photo img{display:block;width:100%;height:auto;}
 .team-photo::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 44%,rgba(12,12,14,.55) 78%,rgba(12,12,14,.94) 100%);}
 [data-theme="light"] .team-photo::after{background:linear-gradient(180deg,transparent 52%,rgba(246,245,242,.6) 80%,rgba(246,245,242,.96) 100%);}
+.team-ai-badge{position:absolute;top:1rem;right:1rem;z-index:2;display:inline-flex;align-items:center;gap:.4rem;padding:.42rem .8rem;font-family:var(--fb);font-size:.72rem;font-weight:600;letter-spacing:.02em;color:#fff;background:rgba(12,12,14,.68);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.22);border-radius:100px;}
+.team-ai-badge::before{content:'';width:13px;height:13px;flex-shrink:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e4c378'%3E%3Cpath d='M12 2l2 7 7 2-7 2-2 7-2-7-7-2 7-2z'/%3E%3C/svg%3E") center/contain no-repeat;}
+[dir="rtl"] .team-ai-badge{right:auto;left:1rem;}
 .team-cap{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:1.9rem 2rem;display:flex;flex-direction:column;gap:.3rem;}
 .team-cap-tag{align-self:flex-start;font-family:var(--fd);font-size:1.02rem;font-weight:700;letter-spacing:-.01em;background:var(--accent-gradient);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
 .team-cap-sub{font-size:.82rem;color:var(--text-2);letter-spacing:.01em;}
@@ -1500,10 +1503,11 @@ footer::before{
   <div class="sey reveal" data-de="Über uns" data-en="About us" data-tr="Hakkımızda" data-ar="من نحن" data-ru="О нас">Über uns</div>
   <h2 class="sh2 reveal d1" data-html-de="Wer steckt<br>hinter creaDIG?" data-html-en="Who is<br>behind creaDIG?" data-html-tr="creaDIG'in<br>arkasında kim var?" data-html-ar="من وراء<br>creaDIG؟" data-html-ru="Кто стоит за<br>creaDIG?">Wer steckt<br>hinter creaDIG?</h2>
   <figure class="team-photo reveal d1">
-    <img src="assets/img/team.jpg" width="1536" height="1024" loading="lazy" decoding="async" alt="Das creaDIG-Team rund um Gründer Muhammed Emin Akyol">
+    <img src="assets/img/team.jpg" width="1536" height="1024" loading="lazy" decoding="async" alt="creaDIG — Gründer Muhammed Emin Akyol (real) mit KI-generiertem Team">
+    <span class="team-ai-badge" data-de="KI-generiert" data-en="AI-generated" data-tr="Yapay zekâ" data-ar="مُولّد بالذكاء الاصطناعي" data-ru="Сгенерировано ИИ">KI-generiert</span>
     <figcaption class="team-cap">
-      <span class="team-cap-tag" data-de="Das creaDIG-Kollektiv" data-en="The creaDIG collective" data-tr="creaDIG kolektifi" data-ar="جماعة creaDIG" data-ru="Коллектив creaDIG">Das creaDIG-Kollektiv</span>
-      <span class="team-cap-sub">Muhammed Emin · Fatma · Julia · Maxi · Georgina</span>
+      <span class="team-cap-tag" data-de="Ein Mensch. Ein KI-Team." data-en="One human. One AI team." data-tr="Bir insan. Bir yapay zekâ ekibi." data-ar="إنسان واحد. فريق ذكاء اصطناعي." data-ru="Один человек. Команда ИИ.">Ein Mensch. Ein KI-Team.</span>
+      <span class="team-cap-sub" data-de="Muhammed Emin (real) · KI-Team: Fatma, Julia, Maxi &amp; Georgina" data-en="Muhammed Emin (real) · AI team: Fatma, Julia, Maxi &amp; Georgina" data-tr="Muhammed Emin (gerçek) · YZ ekibi: Fatma, Julia, Maxi &amp; Georgina" data-ar="محمد أمين (حقيقي) · فريق ذكاء اصطناعي: فاطمة، يوليا، ماكسي، جورجينا" data-ru="Мухаммед Эмин (реальный) · ИИ-команда: Fatma, Julia, Maxi &amp; Georgina">Muhammed Emin (real) · KI-Team: Fatma, Julia, Maxi &amp; Georgina</span>
     </figcaption>
   </figure>
   <div class="about-layout">
