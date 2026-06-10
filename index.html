@@ -804,6 +804,16 @@ html[dir="rtl"] .pc-solve::before{content:'←';}
 .net-box::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue);}
 .net-title{font-family:var(--fd);font-size:.88rem;font-weight:600;color:var(--text-1);margin-bottom:.4rem;}
 .net-desc{font-size:.83rem;color:var(--text-3);line-height:1.6;}
+/* Team-Foto Banner — Über uns */
+.team-photo{position:relative;margin:3rem 0 3.5rem;border-radius:var(--radius-lg,16px);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-card);background:var(--bg-3);}
+.team-photo img{display:block;width:100%;height:auto;}
+.team-photo::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 44%,rgba(12,12,14,.55) 78%,rgba(12,12,14,.94) 100%);}
+[data-theme="light"] .team-photo::after{background:linear-gradient(180deg,transparent 52%,rgba(246,245,242,.6) 80%,rgba(246,245,242,.96) 100%);}
+.team-cap{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:1.9rem 2rem;display:flex;flex-direction:column;gap:.3rem;}
+.team-cap-tag{align-self:flex-start;font-family:var(--fd);font-size:1.02rem;font-weight:700;letter-spacing:-.01em;background:var(--accent-gradient);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
+.team-cap-sub{font-size:.82rem;color:var(--text-2);letter-spacing:.01em;}
+[dir="rtl"] .team-cap-tag,[dir="rtl"] .team-cap-sub{align-self:flex-end;}
+@media(max-width:900px){.team-photo{margin:2rem 0 2.5rem;}.team-cap{padding:1.1rem 1.25rem;}.team-cap-sub{font-size:.72rem;}}
 
 /* PROOF — Thomas kararı: somut referans */
 .proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:4rem;}
@@ -1489,10 +1499,15 @@ footer::before{
 <div class="sw" id="ueber-uns">
   <div class="sey reveal" data-de="Über uns" data-en="About us" data-tr="Hakkımızda" data-ar="من نحن" data-ru="О нас">Über uns</div>
   <h2 class="sh2 reveal d1" data-html-de="Wer steckt<br>hinter creaDIG?" data-html-en="Who is<br>behind creaDIG?" data-html-tr="creaDIG'in<br>arkasında kim var?" data-html-ar="من وراء<br>creaDIG؟" data-html-ru="Кто стоит за<br>creaDIG?">Wer steckt<br>hinter creaDIG?</h2>
+  <figure class="team-photo reveal d1">
+    <img src="assets/img/team.jpg" width="1536" height="1024" loading="lazy" decoding="async" alt="Das creaDIG-Team rund um Gründer Muhammed Emin Akyol">
+    <figcaption class="team-cap">
+      <span class="team-cap-tag" data-de="Das creaDIG-Kollektiv" data-en="The creaDIG collective" data-tr="creaDIG kolektifi" data-ar="جماعة creaDIG" data-ru="Коллектив creaDIG">Das creaDIG-Kollektiv</span>
+      <span class="team-cap-sub">Muhammed Emin · Fatma · Julia · Maxi · Georgina</span>
+    </figcaption>
+  </figure>
   <div class="about-layout">
     <div class="aph reveal">
-      <div class="aph-box"><div class="aph-init">MEA</div></div>
-      <div class="aph-bar"></div>
       <!-- Andreas kararı: güven badges -->
       <div class="trust-badges">
         <span class="tb" data-de="5+ Jahre Erfahrung" data-en="5+ years experience" data-tr="5+ yıl deneyim" data-ar="5+ سنوات خبرة" data-ru="5+ лет опыта">5+ Jahre Erfahrung</span>
