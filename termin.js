@@ -6,7 +6,7 @@
   'use strict';
 
   /* ▼▼ HIER ANPASSEN ▼▼ ─────────────────────────────────────── */
-  var WA_NUMBER = '4915140448885';        // TODO bestätigen: creaDIG WhatsApp-Nummer (aktuell = Selsebil-Nummer)
+  var WA_NUMBER = '41765045879';          // creaDIG WhatsApp · +41 76 504 58 79
   var AVAIL_DAYS = [1, 2, 3];             // empfohlene Wochentage (Mo=0,Di=1,Mi=2,Do=3,Fr=4) → Di/Mi/Do
   var TIME_SLOTS_VG = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
   var TIME_SLOTS_AR = ['10:00', '11:00', '14:00', '15:00', '16:00'];
