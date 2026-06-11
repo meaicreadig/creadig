@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="de-DE" dir="ltr" data-theme="dark" data-lang="de">
+<head>
+<meta charset="UTF-8">
+<script>
+(function(){var t=localStorage.getItem('creadig_theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');})();
+</script>
+<script>
+(function(){var V=['de','en','tr','ar','ru'],lang='de';if(localStorage.getItem('creadig_lang_chosen')==='1'){var s=localStorage.getItem('creadig_lang');if(V.indexOf(s)!==-1)lang=s;}var m={de:['de-DE','ltr'],en:['en','ltr'],tr:['tr','ltr'],ar:['ar','rtl'],ru:['ru','ltr']};document.documentElement.lang=m[lang][0];document.documentElement.dir=m[lang][1];document.documentElement.setAttribute('data-lang',lang);})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="creaDIG — Termin vereinbaren. Kostenlose Erstberatung oder Architecture-Gespräch. Wunschtermin angeben, wir bestätigen innerhalb von 24 Stunden.">
+<meta name="robots" content="index,follow">
+<title>creaDIG — Termin vereinbaren</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="termin.css">
+</head>
+<body>
+
+<div class="tm-bg" aria-hidden="true">
+  <div class="tm-orb o1"></div>
+  <div class="tm-orb o2"></div>
+  <div class="tm-grid"></div>
+</div>
+
+<!-- NAV -->
+<nav class="tm-nav">
+  <a href="/" class="tm-logo" aria-label="creaDIG — Startseite">
+    <svg class="tm-logo-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <rect x="4" y="18" width="14" height="3" rx=".5" fill="currentColor" opacity=".35"/>
+      <rect x="7" y="12" width="14" height="3" rx=".5" fill="currentColor" opacity=".6"/>
+      <rect x="10" y="6" width="14" height="3" rx=".5" fill="currentColor"/>
+      <path d="M26 8v16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+    </svg>
+    <span><span class="crea">crea</span><span class="dig">DIG</span></span>
+  </a>
+  <div class="tm-nav-sp"></div>
+  <a href="/" class="tm-nav-link" aria-label="Zur Startseite">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    <span class="lbl" data-de="Zur Startseite" data-tr="Ana sayfa" data-en="Back to site">Zur Startseite</span>
+  </a>
+  <div class="tm-lang" id="langWrap">
+    <button type="button" class="tm-lang-btn" id="langToggle" onclick="toggleLangMenu()" aria-haspopup="listbox" aria-expanded="false">🌐 <span id="langLabel">DE</span> ▾</button>
+    <div class="tm-lang-menu" id="langMenu" role="listbox">
+      <button type="button" id="lm-de" class="ac" onclick="selectLang('de',true)">🇩🇪 Deutsch</button>
+      <button type="button" id="lm-tr" onclick="selectLang('tr',true)">🇹🇷 Türkçe</button>
+      <button type="button" id="lm-en" onclick="selectLang('en',true)">🇬🇧 English</button>
+    </div>
+  </div>
+  <button type="button" class="tm-theme" id="theme-btn" aria-label="Theme wechseln" title="Hell/Dunkel">
+    <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 1 0 11.5 11.5z"/></svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+  </button>
+</nav>
+
+<main class="tm-main">
+
+  <!-- HERO -->
+  <div class="tm-hero">
+    <div class="tm-eye" data-de="Termin vereinbaren" data-tr="Randevu al" data-en="Book an appointment">Termin vereinbaren</div>
+    <h1 class="tm-h1" data-html-de="Ihr Termin mit <span class='grad'>creaDIG.</span>" data-html-tr="creaDIG ile <span class='grad'>randevunuz.</span>" data-html-en="Your appointment with <span class='grad'>creaDIG.</span>">Ihr Termin mit <span class="grad">creaDIG.</span></h1>
+    <p class="tm-sub" data-de="Terminart und Wunschtermin wählen — wir bestätigen innerhalb von 24 Stunden. Kein Risiko, kein Verkaufsdruck." data-tr="Termin türünü ve tarihinizi seçin — 24 saat içinde onaylıyoruz. Risk yok, satış baskısı yok." data-en="Pick a type and your preferred date — we confirm within 24 hours. No risk, no sales pressure.">Terminart und Wunschtermin wählen — wir bestätigen innerhalb von 24 Stunden. Kein Risiko, kein Verkaufsdruck.</p>
+  </div>
+
+  <!-- STEP DOTS -->
+  <div class="tm-steps">
+    <div class="tm-step-item"><div class="tm-dot active" id="sdot1">1</div><div class="tm-line" id="sline1"></div></div>
+    <div class="tm-step-item"><div class="tm-dot" id="sdot2">2</div><div class="tm-line" id="sline2"></div></div>
+    <div class="tm-step-item"><div class="tm-dot" id="sdot3">3</div><div class="tm-line" id="sline3"></div></div>
+    <div class="tm-step-item"><div class="tm-dot" id="sdot4">4</div></div>
+  </div>
+  <div class="tm-progress"><div class="tm-progress-fill" id="progFill" style="width:25%"></div></div>
+
+  <!-- ══ SCREEN 1: TYP ══ -->
+  <section class="tm-screen active" id="s1">
+    <div class="tm-sec-title" data-de="Terminart wählen" data-tr="Termin türünü seçin" data-en="Choose appointment type">Terminart wählen</div>
+    <div class="tm-sec-sub" data-de="Wählen Sie, was zu Ihrem Anliegen passt." data-tr="Talebinize uygun olanı seçin." data-en="Pick what fits your need.">Wählen Sie, was zu Ihrem Anliegen passt.</div>
+
+    <div class="tm-type-grid">
+      <!-- Erstberatung -->
+      <div class="tm-type-card" id="card-vg" onclick="selectType('vg')" role="button" tabindex="0">
+        <div class="tm-tc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="tm-tc-badge free" data-de="✓ Kostenlos" data-tr="✓ Ücretsiz" data-en="✓ Free">✓ Kostenlos</div>
+        <div class="tm-tc-title">Erstberatung<small data-de="20 Minuten" data-tr="20 dakika" data-en="20 minutes">20 Minuten</small></div>
+        <div class="tm-tc-desc" data-de="Ihr Betrieb, Ihre Fragen — kein Verkaufsgespräch, kein Risiko." data-tr="İşletmeniz, sorularınız — satış konuşması yok, risk yok." data-en="Your business, your questions — no sales pitch, no risk.">Ihr Betrieb, Ihre Fragen — kein Verkaufsgespräch, kein Risiko.</div>
+        <div class="tm-tc-meta">
+          <div class="tm-tc-meta-row"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-de="20 Minuten" data-tr="20 dakika" data-en="20 minutes">20 Minuten</span></div>
+          <div class="tm-tc-meta-row"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Muhammed Emin</span></div>
+          <div class="tm-tc-meta-row"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span data-de="Wunschtermin angeben" data-tr="Tarih tercihinizi belirtin" data-en="Suggest your date">Wunschtermin angeben</span></div>
+        </div>
+        <div class="tm-tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+
+      <!-- Architecture-Gespräch -->
+      <div class="tm-type-card" id="card-ar" onclick="selectType('ar')" role="button" tabindex="0">
+        <div class="tm-tc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></div>
+        <div class="tm-tc-badge book" data-de="Strategie" data-tr="Strateji" data-en="Strategy">Strategie</div>
+        <div class="tm-tc-title">Architecture-Gespräch<small data-de="45 Minuten" data-tr="45 dakika" data-en="45 minutes">45 Minuten</small></div>
+        <div class="tm-tc-desc" data-de="Systemarchitektur, Prozesse, MEAI — wir skizzieren den nächsten Schritt." data-tr="Sistem mimarisi, süreçler, MEAI — bir sonraki adımı çizelim." data-en="System architecture, processes, MEAI — we map the next step.">Systemarchitektur, Prozesse, MEAI — wir skizzieren den nächsten Schritt.</div>
+        <div class="tm-tc-meta">
+          <div class="tm-tc-meta-row"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-de="45 Minuten" data-tr="45 dakika" data-en="45 minutes">45 Minuten</span></div>
+          <div class="tm-tc-meta-row"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><span data-de="Business Architect" data-tr="Business Architect" data-en="Business Architect">Business Architect</span></div>
+          <div class="tm-tc-meta-row"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span data-de="Angebot folgt nach dem Gespräch" data-tr="Teklif görüşmeden sonra" data-en="Offer follows the call">Angebot folgt nach dem Gespräch</span></div>
+        </div>
+        <div class="tm-tc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+    </div>
+
+    <div class="tm-btn-row" style="justify-content:flex-end">
+      <button type="button" class="tm-btn tm-btn-fill" id="btn1" onclick="goStep(2)" disabled>
+        <span data-de="Weiter" data-tr="Devam" data-en="Continue">Weiter</span>
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN 2: DATUM & ZEIT ══ -->
+  <section class="tm-screen" id="s2">
+    <div class="tm-sec-title" data-de="Datum & Uhrzeit" data-tr="Tarih ve saat" data-en="Date & time">Datum & Uhrzeit</div>
+    <div class="tm-sec-sub" data-de="Wählen Sie Ihren Wunschtermin. Wir prüfen die Verfügbarkeit und bestätigen." data-tr="Tarihinizi seçin. Uygunluğu kontrol edip onaylıyoruz." data-en="Pick your preferred date. We check availability and confirm.">Wählen Sie Ihren Wunschtermin. Wir prüfen die Verfügbarkeit und bestätigen.</div>
+
+    <div class="tm-notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span data-de="Goldene Tage sind unsere empfohlenen Termine. Andere Tage können Sie ebenfalls anfragen — wir melden uns innerhalb von 24 Stunden." data-tr="Altın günler önerilen tarihlerimizdir. Diğer günler için de talep iletebilirsiniz — 24 saat içinde dönüş yaparız." data-en="Golden days are our recommended slots. You can request other days too — we reply within 24 hours.">Goldene Tage sind unsere empfohlenen Termine. Andere Tage können Sie ebenfalls anfragen — wir melden uns innerhalb von 24 Stunden.</span></div>
+
+    <div class="tm-legend">
+      <span class="av"><i></i><span data-de="Empfohlene Tage" data-tr="Önerilen günler" data-en="Recommended days">Empfohlene Tage</span></span>
+      <span class="pa"><i></i><span data-de="Wunschtermin frei wählbar" data-tr="Tarih serbest seçilir" data-en="Any day selectable">Wunschtermin frei wählbar</span></span>
+    </div>
+
+    <div class="tm-cal">
+      <div class="tm-cal-head">
+        <div class="tm-cal-month" id="calMonth">—</div>
+        <div class="tm-cal-nav">
+          <button type="button" onclick="calPrev()" aria-label="Vorheriger Monat"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button type="button" onclick="calNext()" aria-label="Nächster Monat"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
+      </div>
+      <div class="tm-cal-grid" id="calGrid"></div>
+      <div class="tm-time" id="timeSection" style="display:none">
+        <div class="tm-time-title" data-de="Bevorzugte Uhrzeit" data-tr="Tercih ettiğiniz saat" data-en="Preferred time">Bevorzugte Uhrzeit</div>
+        <div class="tm-time-grid" id="timeGrid"></div>
+      </div>
+    </div>
+
+    <div class="tm-btn-row">
+      <button type="button" class="tm-btn tm-btn-out" onclick="goStep(1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg><span data-de="Zurück" data-tr="Geri" data-en="Back">Zurück</span></button>
+      <button type="button" class="tm-btn tm-btn-fill" id="btn2" onclick="goStep(3)" disabled><span data-de="Weiter" data-tr="Devam" data-en="Continue">Weiter</span><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN 3: ANGABEN ══ -->
+  <section class="tm-screen" id="s3">
+    <div class="tm-sec-title" data-de="Ihre Angaben" data-tr="Bilgileriniz" data-en="Your details">Ihre Angaben</div>
+    <div class="tm-sec-sub" data-de="Damit wir gut vorbereitet ins Gespräch gehen." data-tr="Görüşmeye hazırlıklı girebilmemiz için." data-en="So we come prepared to the call.">Damit wir gut vorbereitet ins Gespräch gehen.</div>
+
+    <div class="tm-form-grid">
+      <div class="tm-fg"><label class="tm-label" data-de="Name" data-tr="Ad Soyad" data-en="Name">Name <span class="req">*</span></label><input class="tm-input" type="text" id="termin_fName" placeholder="Max Mustermann" data-de="Max Mustermann" data-tr="Ahmet Yılmaz" data-en="John Smith"></div>
+      <div class="tm-fg"><label class="tm-label" data-de="Telefon / WhatsApp" data-tr="Telefon / WhatsApp" data-en="Phone / WhatsApp">Telefon / WhatsApp <span class="req">*</span></label><input class="tm-input" type="tel" id="termin_fPhone" placeholder="+49 152 1234 5678"></div>
+      <div class="tm-fg"><label class="tm-label">E-Mail <span class="req">*</span></label><input class="tm-input" type="email" id="termin_fEmail" placeholder="max@unternehmen.de"></div>
+      <div class="tm-fg"><label class="tm-label" data-de="Unternehmen" data-tr="Şirket" data-en="Company">Unternehmen <span class="req">*</span></label><input class="tm-input" type="text" id="termin_fOrg" placeholder="Mustermann GmbH"></div>
+      <div class="tm-fg"><label class="tm-label" data-de="Stadt / Region" data-tr="Şehir" data-en="City / Region">Stadt / Region</label><input class="tm-input" type="text" id="termin_fCity" placeholder="Hannover, DE"></div>
+      <div class="tm-fg"><label class="tm-label" data-de="Unternehmensgröße" data-tr="Şirket büyüklüğü" data-en="Company size">Unternehmensgröße</label>
+        <select class="tm-select" id="termin_fSize">
+          <option value="" data-de="Bitte wählen…" data-tr="Seçin…" data-en="Select…">Bitte wählen…</option>
+          <option value="1-5">1–5</option><option value="6-20">6–20</option><option value="21-50">21–50</option><option value="50+">50+</option>
+        </select>
+      </div>
+      <div class="tm-fg full"><label class="tm-label" data-de="Was interessiert Sie?" data-tr="Neyle ilgileniyorsunuz?" data-en="What interests you?">Was interessiert Sie?</label>
+        <select class="tm-select" id="termin_fInterest">
+          <option value="" data-de="Bitte wählen…" data-tr="Seçin…" data-en="Select…">Bitte wählen…</option>
+          <option data-de="Identity (Logo, Branding)" data-tr="Identity (Logo, Marka)" data-en="Identity (logo, branding)">Identity (Logo, Branding)</option>
+          <option data-de="Website & Social Media" data-tr="Website & Sosyal Medya" data-en="Website & social media">Website & Social Media</option>
+          <option data-de="Prozessautomatisierung" data-tr="Süreç otomasyonu" data-en="Process automation">Prozessautomatisierung</option>
+          <option data-de="MEAI — KI-System" data-tr="MEAI — KI sistemi" data-en="MEAI — AI system">MEAI — KI-System</option>
+          <option data-de="Vollständiges Paket" data-tr="Tam paket" data-en="Full package">Vollständiges Paket</option>
+          <option data-de="Beratung / noch offen" data-tr="Danışmanlık / belirsiz" data-en="Consulting / undecided">Beratung / noch offen</option>
+        </select>
+      </div>
+      <div class="tm-fg full"><label class="tm-label" data-de="Bevorzugte Gesprächssprache" data-tr="Tercih ettiğiniz görüşme dili" data-en="Preferred meeting language">Bevorzugte Gesprächssprache</label>
+        <div class="tm-radio-group" id="terminMeetingLang">
+          <div class="tm-radio-item selected" onclick="selectMeetingRadio(this)" data-val="de"><div class="tm-radio-dot"></div><div>🇩🇪 Deutsch</div></div>
+          <div class="tm-radio-item" onclick="selectMeetingRadio(this)" data-val="tr"><div class="tm-radio-dot"></div><div>🇹🇷 Türkçe</div></div>
+          <div class="tm-radio-item" onclick="selectMeetingRadio(this)" data-val="de-tr"><div class="tm-radio-dot"></div><div>🇩🇪🇹🇷 Beides</div></div>
+        </div>
+      </div>
+      <div class="tm-fg full"><label class="tm-label" data-de="Nachricht (optional)" data-tr="Mesaj (isteğe bağlı)" data-en="Message (optional)">Nachricht (optional)</label><textarea class="tm-textarea" id="termin_fNote" placeholder="Kurz zu Ihrem Anliegen…" data-de="Kurz zu Ihrem Anliegen…" data-tr="Kısaca talebiniz…" data-en="Briefly about your need…"></textarea></div>
+    </div>
+
+    <div class="tm-btn-row">
+      <button type="button" class="tm-btn tm-btn-out" onclick="goStep(2)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg><span data-de="Zurück" data-tr="Geri" data-en="Back">Zurück</span></button>
+      <button type="button" class="tm-btn tm-btn-fill" onclick="goStep(4)"><span data-de="Zur Zusammenfassung" data-tr="Özete geç" data-en="To summary">Zur Zusammenfassung</span><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN 4: ZUSAMMENFASSUNG ══ -->
+  <section class="tm-screen" id="s4">
+    <div class="tm-sec-title" data-de="Zusammenfassung & Absenden" data-tr="Özet & Gönder" data-en="Summary & send">Zusammenfassung & Absenden</div>
+    <div class="tm-sec-sub" data-de="Prüfen Sie Ihre Angaben. Per WhatsApp gesendet, erreicht uns die Anfrage sofort." data-tr="Bilgilerinizi kontrol edin. WhatsApp ile gönderince hemen bize ulaşır." data-en="Check your details. Sent via WhatsApp, it reaches us instantly.">Prüfen Sie Ihre Angaben. Per WhatsApp gesendet, erreicht uns die Anfrage sofort.</div>
+
+    <div class="tm-summary" id="summaryCard"></div>
+
+    <div class="tm-notice" style="margin-top:1.2rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 13 19.79 19.79 0 0 1 1.07 4.4 2 2 0 0 1 3.05 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/></svg><span data-de="Ihre Anfrage wird per WhatsApp übermittelt. Wir melden uns innerhalb von 24 Stunden." data-tr="Talebiniz WhatsApp ile iletilir. 24 saat içinde dönüş yaparız." data-en="Your request is sent via WhatsApp. We reply within 24 hours.">Ihre Anfrage wird per WhatsApp übermittelt. Wir melden uns innerhalb von 24 Stunden.</span></div>
+
+    <div class="tm-btn-row">
+      <button type="button" class="tm-btn tm-btn-out" onclick="goStep(3)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg><span data-de="Zurück" data-tr="Geri" data-en="Back">Zurück</span></button>
+      <a class="tm-btn-wa" id="waBtn" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        <span data-de="Per WhatsApp senden" data-tr="WhatsApp ile gönder" data-en="Send via WhatsApp">Per WhatsApp senden</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN 5: SUCCESS ══ -->
+  <section class="tm-screen" id="s5">
+    <div class="tm-success">
+      <div class="tm-success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="tm-success-title" data-de="Anfrage gesendet!" data-tr="Talebiniz iletildi!" data-en="Request sent!">Anfrage gesendet!</div>
+      <div class="tm-success-sub" data-de="Wir melden uns innerhalb von 24 Stunden per WhatsApp oder E-Mail. Wir freuen uns auf Sie!" data-tr="24 saat içinde WhatsApp veya e-posta ile dönüş yaparız. Sizi bekliyoruz!" data-en="We'll reply within 24 hours via WhatsApp or email. We look forward to it!">Wir melden uns innerhalb von 24 Stunden per WhatsApp oder E-Mail. Wir freuen uns auf Sie!</div>
+      <div class="tm-success-detail" id="successDetail"></div>
+      <div><a class="tm-btn tm-btn-fill" href="/" style="display:inline-flex"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg><span data-de="Zur Startseite" data-tr="Ana sayfaya dön" data-en="Back to site">Zur Startseite</span></a></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="tm-footer">
+  <div class="ft-links">
+    <a href="/#kontakt" data-de="Kontakt" data-tr="İletişim" data-en="Contact">Kontakt</a>
+    <a href="#" data-de="Impressum" data-tr="Künye" data-en="Legal notice">Impressum</a>
+    <a href="#" data-de="Datenschutz" data-tr="Gizlilik" data-en="Privacy">Datenschutz</a>
+    <a href="https://meai.run" target="_blank" rel="noopener">meai.run</a>
+  </div>
+  <div class="ft-copy" data-de="© 2026 creaDIG — Business Architecture & Operations · Hannover, DE" data-tr="© 2026 creaDIG — İş Mimarisi & Operasyon · Hannover, DE" data-en="© 2026 creaDIG — Business Architecture & Operations · Hannover, DE">© 2026 creaDIG — Business Architecture & Operations · Hannover, DE</div>
+</footer>
+
+<script src="app-lang.js" defer></script>
+<script src="termin.js" defer></script>
+<script>
+// Seitentitel pro Sprache (app-lang.js würde sonst den Hauptseiten-Titel setzen)
+(function(){
+  var TT={de:'creaDIG — Termin vereinbaren',tr:'creaDIG — Randevu al',en:'creaDIG — Book an appointment'};
+  function setTitle(){var l=document.documentElement.getAttribute('data-lang');document.title=TT[l]||TT.de;}
+  window.addEventListener('langChanged',function(){setTimeout(setTitle,0);});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(setTitle,0);});else setTimeout(setTitle,0);
+})();
+// THEME toggle (wie Hauptseite)
+(function(){
+  var KEY='creadig_theme';
+  function upd(){var d=document.documentElement.getAttribute('data-theme')==='dark';var b=document.getElementById('theme-btn');if(b)b.setAttribute('aria-label',d?'Hellmodus aktivieren':'Dark Mode aktivieren');}
+  function toggle(){var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{localStorage.setItem(KEY,n);}catch(e){}upd();}
+  var btn=document.getElementById('theme-btn');if(btn)btn.addEventListener('click',toggle);upd();
+})();
+</script>
+</body>
+</html>
