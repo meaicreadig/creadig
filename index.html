@@ -530,18 +530,18 @@ html[dir="rtl"] .nav-drawer-panel{
   pointer-events:none;z-index:0;
 }
 [data-theme="dark"] .hero-glow-mockup{background:radial-gradient(circle,rgba(var(--accent-rgb),.1) 0%,transparent 72%);}
-.hero-grid{display:none;} /* ersetzt durch animiertes Partikelfeld (creadig-hero.js) */
-.hero-particles{
-  position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;
-  -webkit-mask-image:radial-gradient(ellipse 118% 108% at 60% 45%,#000 60%,rgba(0,0,0,.55) 88%,transparent 100%);
-          mask-image:radial-gradient(ellipse 118% 108% at 60% 45%,#000 60%,rgba(0,0,0,.55) 88%,transparent 100%);
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(var(--hero-grid) 1px,transparent 1px),linear-gradient(90deg,var(--hero-grid) 1px,transparent 1px);
+  background-size:68px 68px;
+  -webkit-mask-image:radial-gradient(ellipse 85% 75% at 58% 42%,black 0%,transparent 78%);
+          mask-image:radial-gradient(ellipse 85% 75% at 58% 42%,black 0%,transparent 78%);
+  pointer-events:none;opacity:.9;
 }
-@media(max-width:900px){
-  .hero-particles{
-    -webkit-mask-image:radial-gradient(ellipse 118% 62% at 50% 30%,#000 24%,transparent 92%);
-            mask-image:radial-gradient(ellipse 118% 62% at 50% 30%,#000 24%,transparent 92%);
-  }
+@media(prefers-reduced-motion:no-preference){
+  .hero-glow{animation:heroBreathe 9s ease-in-out infinite;}
 }
+@keyframes heroBreathe{0%,100%{transform:translateY(-50%) scale(1);}50%{transform:translateY(-50%) scale(1.07);}}
 .hero-c{
   max-width:1200px;margin:0 auto;width:100%;
   position:relative;z-index:1;
@@ -1350,7 +1350,6 @@ footer::before{
   <div class="hero-glow" aria-hidden="true"></div>
   <div class="hero-glow-mockup" aria-hidden="true"></div>
   <div class="hero-grid" aria-hidden="true"></div>
-  <canvas id="hero-particles" class="hero-particles" aria-hidden="true"></canvas>
   <div class="hero-c">
     <div class="hero-left">
       <div class="hero-ey" data-de="Business Architecture & Operations — DACH" data-en="Business Architecture & Operations — DACH" data-tr="İş Mimarisi & Operasyon — DACH" data-ar="هندسة الأعمال والعمليات — DACH" data-ru="Бизнес-архитектура и операции — DACH">Business Architecture & Operations — DACH</div>
@@ -1722,7 +1721,6 @@ footer::before{
 <script src="creadig-dynamic.js" defer></script>
 <script src="creadig-motion.js" defer></script>
 <script src="creadig-faz3.js" defer></script>
-<script src="creadig-hero.js" defer></script>
 <script>
 // THEME — Dark default, Light optional
 const THEME_KEY='creadig_theme';
