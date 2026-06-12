@@ -1683,10 +1683,10 @@ footer::before{
     </div>
     <div class="cf reveal d2">
       <div class="fr">
-        <div class="fg"><label data-de="Ihr Name" data-en="Your name" data-tr="Adınız" data-ar="اسمك" data-ru="Ваше имя">Ihr Name</label><input type="text" data-de="Max Mustermann" data-en="John Smith" data-tr="Ahmet Yılmaz" data-ar="أحمد محمد" data-ru="Иван Иванов" placeholder="Max Mustermann"></div>
-        <div class="fg"><label data-de="Ihr Unternehmen" data-en="Your company" data-tr="Şirketiniz" data-ar="شركتك" data-ru="Ваша компания">Ihr Unternehmen</label><input type="text" data-de="Mustermann GmbH" data-en="Smith Ltd" data-tr="Yılmaz Ltd" data-ar="شركة مثال" data-ru="ООО Пример" placeholder="Mustermann GmbH"></div>
+        <div class="fg"><label data-de="Ihr Name" data-en="Your name" data-tr="Adınız" data-ar="اسمك" data-ru="Ваше имя">Ihr Name</label><input id="ct_name" type="text" data-de="Max Mustermann" data-en="John Smith" data-tr="Ahmet Yılmaz" data-ar="أحمد محمد" data-ru="Иван Иванов" placeholder="Max Mustermann"></div>
+        <div class="fg"><label data-de="Ihr Unternehmen" data-en="Your company" data-tr="Şirketiniz" data-ar="شركتك" data-ru="Ваша компания">Ihr Unternehmen</label><input id="ct_company" type="text" data-de="Mustermann GmbH" data-en="Smith Ltd" data-tr="Yılmaz Ltd" data-ar="شركة مثال" data-ru="ООО Пример" placeholder="Mustermann GmbH"></div>
       </div>
-      <div class="fg"><label data-de="E-Mail" data-en="Email" data-tr="E-posta" data-ar="البريد" data-ru="E-mail">E-Mail</label><input type="email" data-de="max@mustermann.de" data-en="john@company.com" data-tr="ahmet@sirket.com" data-ar="info@company.com" data-ru="info@company.ru" placeholder="max@mustermann.de"></div>
+      <div class="fg"><label data-de="E-Mail" data-en="Email" data-tr="E-posta" data-ar="البريد" data-ru="E-mail">E-Mail</label><input id="ct_email" type="email" data-de="max@mustermann.de" data-en="john@company.com" data-tr="ahmet@sirket.com" data-ar="info@company.com" data-ru="info@company.ru" placeholder="max@mustermann.de"></div>
       <div class="fg">
         <label data-de="Was interessiert Sie?" data-en="What interests you?" data-tr="Ne ilgileniyorsunuz?" data-ar="ما الذي يهمك؟" data-ru="Что вас интересует?">Was interessiert Sie?</label>
         <select id="interest-select">
@@ -1699,8 +1699,8 @@ footer::before{
           <option data-de="Anderes / Beratung" data-en="Other / consultation" data-tr="Diğer / danışmanlık" data-ar="أخرى / استشارة" data-ru="Другое / консультация">Anderes / Beratung</option>
         </select>
       </div>
-      <div class="fg"><label data-de="Nachricht (optional)" data-en="Message (optional)" data-tr="Mesaj (isteğe bağlı)" data-ar="رسالة (اختياري)" data-ru="Сообщение (необязательно)">Nachricht (optional)</label><textarea data-de="z.B. Ich suche ein Logo und eine Website für meinen Betrieb…" data-en="e.g. I need a logo and website for my business…" data-tr="ör. İşletmem için logo ve website arıyorum…" data-ar="مثلاً أبحث عن شعار وموقع لعملي…" data-ru="напр. нужен логотип и сайт для бизнеса…" placeholder="z.B. Ich suche ein Logo und eine Website für meinen Betrieb…"></textarea></div>
-      <button class="fs" data-de="Anfrage senden →" data-en="Send inquiry →" data-tr="Başvuru gönder →" data-ar="إرسال الطلب ←" data-ru="Отправить →">Anfrage senden →</button>
+      <div class="fg"><label data-de="Nachricht (optional)" data-en="Message (optional)" data-tr="Mesaj (isteğe bağlı)" data-ar="رسالة (اختياري)" data-ru="Сообщение (необязательно)">Nachricht (optional)</label><textarea id="ct_msg" data-de="z.B. Ich suche ein Logo und eine Website für meinen Betrieb…" data-en="e.g. I need a logo and website for my business…" data-tr="ör. İşletmem için logo ve website arıyorum…" data-ar="مثلاً أبحث عن شعار وموقع لعملي…" data-ru="напр. нужен логотип и сайт для бизнеса…" placeholder="z.B. Ich suche ein Logo und eine Website für meinen Betrieb…"></textarea></div>
+      <button class="fs" id="ct_send" data-de="Anfrage senden →" data-en="Send inquiry →" data-tr="Başvuru gönder →" data-ar="إرسال الطلب ←" data-ru="Отправить →">Anfrage senden →</button>
     </div>
   </div>
 </div>
@@ -1947,6 +1947,34 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     }
   });
 });
+</script>
+<script>
+// Kontaktformular → WhatsApp (kein Backend, nutzerinitiiert)
+(function(){
+  var btn=document.getElementById('ct_send'); if(!btn) return;
+  var WA='41765045879';
+  function v(id){var e=document.getElementById(id); if(!e) return ''; if(e.tagName==='SELECT'){var o=e.options[e.selectedIndex]; return (o&&o.value)?o.text:'';} return (e.value||'').trim();}
+  function lang(){var l=document.documentElement.getAttribute('data-lang'); return (l==='de'||l==='en'||l==='tr'||l==='ar'||l==='ru')?l:'de';}
+  function t(o){return o[lang()]||o.de;}
+  btn.addEventListener('click',function(e){
+    e.preventDefault();
+    var name=v('ct_name'), email=v('ct_email'), bad=[];
+    if(!name) bad.push('ct_name');
+    if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) bad.push('ct_email');
+    ['ct_name','ct_email'].forEach(function(id){var el=document.getElementById(id); if(el) el.style.borderColor=bad.indexOf(id)>=0?'#e5484d':'';});
+    if(bad.length){var el=document.getElementById(bad[0]); if(el) el.focus(); return;}
+    var msg='*creaDIG — '+t({de:'Anfrage',en:'Inquiry',tr:'Talep',ar:'طلب',ru:'Запрос'})+'*\n\n'+
+      '👤 '+name+'\n'+
+      (v('ct_company')?'🏢 '+v('ct_company')+'\n':'')+
+      '📧 '+email+'\n'+
+      (v('interest-select')?'💡 '+v('interest-select')+'\n':'')+
+      (v('ct_msg')?'\n💬 '+v('ct_msg'):'');
+    window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(msg),'_blank','noopener');
+    var orig=btn.getAttribute('data-'+lang())||btn.textContent;
+    btn.textContent=t({de:'In WhatsApp geöffnet ✓',en:'Opened in WhatsApp ✓',tr:'WhatsApp açıldı ✓',ar:'فُتح في واتساب ✓',ru:'Открыто в WhatsApp ✓'});
+    setTimeout(function(){btn.textContent=orig;},3000);
+  });
+})();
 </script>
 </body>
 </html>
