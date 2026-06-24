@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="tr" data-lang="tr">
+<head>
+<meta charset="UTF-8">
+<script>
+(function(){
+  var VALID={tr:1,de:1,en:1,ar:1,bs:1};var lang='tr';
+  try{if(localStorage.getItem('selsebil_lang_chosen')==='1'){var s=localStorage.getItem('selsebil_lang');if(VALID[s])lang=s;}}catch(e){}
+  var htmlLang={tr:'tr',de:'de-DE',en:'en',ar:'ar',bs:'bs'};
+  document.documentElement.lang=htmlLang[lang]||'tr';
+  document.documentElement.setAttribute('data-lang',lang);
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Termin — Selsebil.TV</title>
+<link rel="canonical" href="https://www.selsebil.tv/termin.html">
+<meta name="description" content="Selsebil.TV ile canlı bağış yayını planlayın. Ön görüşme veya yayın rezervasyonu için online termin alın.">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;0,900&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/termin.css">
+</head>
+<body class="termin-page">
+<div id="spb"></div>
+<div class="termin-page-bg">
+  <div class="termin-orb o1"></div>
+  <div class="termin-orb o2"></div>
+  <div class="termin-orb o3"></div>
+</div>
+
+<nav>
+  <svg class="nav-logo" xmlns="http://www.w3.org/2000/svg" viewBox="260 840 1520 320">
+    <defs><style>.n0{fill:#deedf8}.n4{fill:#0073af}</style></defs>
+    <path class="n0" d="M1230.15,999.62c18.5,13.45,19.17,32.51,11.85,53.92-7,16.63-22.32,30.7-41.85,30.8l-110.84.54,25.32-166.08,96.38-.17c6.57-.01,12.85,1.36,18.83,2.99,15.29,5.78,24.13,19.86,22.75,36.22-.15,16.88-7.1,31.33-22.45,41.79ZM1222.17,957.84c-1.39-6.61-7.86-8.87-13.42-9.72l-68.22.06-5.93,39.81,62.71-.02c15.46,0,28.12-14.53,24.85-30.13ZM1216.56,1033.55c.45-9.59-5.93-14.99-14.61-16.34l-71.88-.27-5.58,39.08h68.11c12.65,0,23.35-9.53,23.96-22.47Z"/>
+    <path class="n0" d="M391.47,1084.42l-118.69.32,6.66-28.37,107.88-.17c12.07-.02,21.92-9.04,24.14-19.86,1.88-9.14-3.78-18.49-13.84-18.58l-68.35-.6c-11.47-.1-22.46-4.48-30.29-12.39-7.95-8.03-9.96-18.56-8.85-29.81,3.02-30.62,27.72-55.84,59.28-55.9l109.82-.19c-1.48,10.04-3.41,18.9-5.82,29.15l-104.04.27c-12.82.03-23.52,9.68-26.46,21.05-1.16,4.5-.65,9.7,1.87,13.11,1.99,2.7,6.82,6.06,11.28,6.07l62.92.22c23.97.08,43.15,14.28,43.34,39.76.22,28.28-20.47,55.83-50.85,55.91Z"/>
+    <path class="n0" d="M899.52,1068.6c-9.79,9.88-23.45,16.09-37.32,16.11l-112.66.12,5.04-28.51,105.24-.33c12.32-.04,22.51-8.8,24.84-20.14,1.94-9.44-4.47-18.28-14.43-18.33l-67.37-.37c-9.33-.05-18.81-3.4-26.13-8.28-11.8-7.88-14.97-20.36-14.07-33.73,2.17-32.1,26.52-56.45,59.26-56.43l105.64.09-5.15,29.27-102.87.38c-14.41.05-25.43,13.1-24.88,26.65.29,7.18,6.91,13.24,14.18,13.27l63.81.23c8.18.03,16.54,1.98,23.59,5.68,26.81,14.08,23.68,53.76,3.28,74.34Z"/>
+    <path class="n0" d="M494.52,1017.37c-2.31,8.7-4.27,17.9-4.72,26.88-.36,7.18,7.63,11.76,14.27,11.78l95.96.28-5,28.59h-96.67c-7.53,0-14.91-1-21.61-3.86-14.06-5.98-21.78-20.07-19.06-35.65l13.92-79.6c2.98-17.03,11.69-31.55,26.58-40.46,8.32-4.97,17.94-6.56,27.88-6.55l98.88.09-5.43,29.26-95.84.1c-10.42.01-18.82,9.53-20.56,18.85l-3.99,21.41h103.31s-4.92,28.88-4.92,28.88h-103.01Z"/>
+    <path class="n0" d="M967.4,1017.33l-3.96,25.07c-1.01,6.42,6.4,13.43,13.46,13.45l95.56.3-4.23,28.7-97.41-.07c-10.27,0-20.15-4.03-27.85-10.18-9.28-7.4-13.18-19.44-11.23-31.27l13.86-84.37c3.71-22.61,24.34-39.96,47.28-39.96l101.35-.02-4.92,29.11-91.92.1c-9.93.01-19.51,6.39-21.2,16.04l-4.24,24.14,101.79.1-4.43,28.88-101.89-.02Z"/>
+    <path class="n0" d="M740.75,1056.35l-4.79,28.51-78.12-.24c-11.78-.04-23.08-6.01-29.43-15.26-5.03-7.33-5.49-16.07-3.98-24.73l21.92-125.59,31.1-.03-21.3,124.15c-1.27,7.38,5.17,12.82,12.01,12.85l72.59.35Z"/>
+    <path class="n0" d="M1422.5,1055.77l-4.12,29.1h-61.81c-23.84-.01-44.59-17.98-41.11-42.63l17.44-123.29,29.77.25-15.79,119.15c-1.86,8.12,3.63,17.1,12.52,17.14l63.1.28Z"/>
+    <polygon class="n0" points="1287.42 1084.52 1256.19 1084.67 1279.42 918.95 1309.67 918.75 1287.42 1084.52"/>
+    <polygon id="nGray"  class="n0" opacity="1" points="1310.08,906.46 1280.13,906.33 1283.88,876.60 1313.87,876.44"/>
+    <polygon id="nMorph" fill="#0072b1" opacity="0"  points="1283.88,876.60 1313.87,876.44 1310.08,906.46 1280.13,906.33"/>
+    <line id="nfrA" x1="1280" y1="883" x2="1280" y2="883" stroke="#0072b1" stroke-width="11" stroke-linecap="round" opacity="0"/>
+    <path id="nfrB" fill="none" stroke="#0072b1" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"
+      d="M1694.54,883 C1718.08,883 1733.59,907.52 1724.67,928.79 L1642.35,1102.5 C1635.89,1113.69 1624.61,1120.83 1612.22,1120.83 L1438.68,1120.83" opacity="0"/>
+    <path id="nfrGlow" fill="none" stroke="#0099ff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" style="filter:blur(5px)"
+      d="M1343,883 L1694.54,883 C1718.08,883 1733.59,907.52 1724.67,928.79 L1642.35,1102.5 C1635.89,1113.69 1624.61,1120.83 1612.22,1120.83 L1438.68,1120.83" opacity="0"/>
+    <path id="nfrLight" fill="none" stroke="#a8e0ff" stroke-width="8" stroke-linecap="round"
+      d="M1343,883 L1694.54,883 C1718.08,883 1733.59,907.52 1724.67,928.79 L1642.35,1102.5 C1635.89,1113.69 1624.61,1120.83 1612.22,1120.83 L1438.68,1120.83" opacity="0"/>
+    <g id="ntvOut" opacity="0">
+      <polygon fill="none" stroke="#0073af" stroke-width="9" stroke-linejoin="round" points="1559.6 919.96 1555.85 949.42 1495.12 949.42 1477.25 1085.63 1446.25 1085.82 1464.76 949.42 1402.9 949.42 1407.14 919.96 1559.6 919.96"/>
+      <path fill="none" stroke="#0073af" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M1645.09,922.32l30.14.07-77.67,158.12c-1.74,3.19-6.25,5.48-9.83,5.49l-25.12.05c-5.41,0-8.56-3.27-9.78-8.42l-29.65-105.83,30.89-.31,21.57,80.48c.54,2.34,3.74,2.64,4.72.45"/>
+    </g>
+    <g id="ntvFill" opacity="0">
+      <polygon class="n4" points="1559.6 919.96 1555.85 949.42 1495.12 949.42 1477.25 1085.63 1446.25 1085.82 1464.76 949.42 1402.9 949.42 1407.14 919.96 1559.6 919.96"/>
+      <path class="n4" d="M1645.09,922.32l30.14.07-77.67,158.12c-1.74,3.19-6.25,5.48-9.83,5.49l-25.12.05c-5.41,0-8.56-3.27-9.78-8.42l-29.65-105.83,30.89-.31,21.57,80.48c.54,2.34,3.74,2.64,4.72.45"/>
+    </g>
+  </svg>
+  <button type="button" class="nav-hamburger" id="navHamburger" aria-label="Menü aç/kapat">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <div class="nav-links">
+    <a href="/#story" class="nav-link" data-tr="Hikayemiz" data-de="Unsere Geschichte" data-en="Our Story" data-ar="قصتنا" data-bs="Naša priča">Hikayemiz</a>
+    <a href="/yayinlar.html" class="nav-link" data-tr="Yayınlar" data-de="Sendungen" data-en="Broadcasts" data-ar="البث" data-bs="Emisije">Yayınlar</a>
+    <a href="/#what" class="nav-link" data-tr="Ne Yapıyoruz" data-de="Was wir tun" data-en="What We Do" data-ar="ما نفعله" data-bs="Što radimo">Ne Yapıyoruz</a>
+    <a href="/#team" class="nav-link" data-tr="Ekip" data-de="Team" data-en="Team" data-ar="الفريق" data-bs="Tim">Ekip</a>
+    <a href="/#donate" class="nav-link" data-tr="Destek Ol" data-de="Unterstützen" data-en="Support" data-ar="تبرع" data-bs="Podrži">Destek Ol</a>
+    <a href="/fuer-vereine.html" class="nav-link accent" style="border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:4px 12px"
+      data-tr="Dernekler İçin"
+      data-de="Für Vereine"
+      data-en="For Associations"
+      data-ar="للجمعيات" data-bs="Za udruženja">Dernekler İçin</a>
+    <a href="https://www.youtube.com/shorts/JvSAOsmKgqs" target="_blank" rel="noopener noreferrer" class="nav-link accent" data-tr="BAYOS" data-de="BAYOS" data-en="BAYOS" data-ar="BAYOS" data-bs="BAYOS">BAYOS</a>
+  </div>
+  <div class="nav-right-group">
+    <div class="lang-dropdown" id="langDropdown">
+      <button type="button" class="lang-toggle" onclick="toggleLangMenu()" id="langToggle">
+        🌐 <span id="langLabel">TR</span> ▾
+      </button>
+      <div class="lang-menu" id="langMenu">
+        <button type="button" onclick="selectLang('tr', true)" id="lm-tr">🇹🇷 Türkçe</button>
+        <button type="button" onclick="selectLang('de', true)" id="lm-de">🇩🇪 Deutsch</button>
+        <button type="button" onclick="selectLang('en', true)" id="lm-en">🇬🇧 English</button>
+        <button type="button" onclick="selectLang('ar', true)" id="lm-ar">🇸🇦 العربية</button>
+        <button type="button" onclick="selectLang('bs', true)" id="lm-bs">🇧🇦 Bosanski</button>
+      </div>
+    </div>
+    <div id="nav-right"><div class="ndot" id="ndot"></div><span id="ncd">Yükleniyor…</span></div>
+  </div>
+  <div class="mobile-nav-overlay" id="mobileNavOverlay">
+    <a href="/#story" class="mob-link" data-tr="Hikayemiz" data-de="Unsere Geschichte" data-en="Our Story" data-ar="قصتنا" data-bs="Naša priča" onclick="closeMobileNav()">Hikayemiz</a>
+    <a href="/yayinlar.html" class="mob-link" data-tr="Yayınlar" data-de="Sendungen" data-en="Broadcasts" data-ar="البث" data-bs="Emisije" onclick="closeMobileNav()">Yayınlar</a>
+    <a href="/#what" class="mob-link" data-tr="Ne Yapıyoruz" data-de="Was wir tun" data-en="What We Do" data-ar="ما نفعله" data-bs="Što radimo" onclick="closeMobileNav()">Ne Yapıyoruz</a>
+    <a href="/#team" class="mob-link" data-tr="Ekip" data-de="Team" data-en="Team" data-ar="الفريق" data-bs="Tim" onclick="closeMobileNav()">Ekip</a>
+    <a href="/#donate" class="mob-link" data-tr="Destek Ol" data-de="Unterstützen" data-en="Support" data-ar="تبرع" data-bs="Podrži" onclick="closeMobileNav()">Destek Ol</a>
+    <a href="/fuer-vereine.html" class="mob-link accent-link" data-tr="Dernekler İçin" data-de="Für Vereine" data-en="For Associations" data-ar="للجمعيات" data-bs="Za udruženja" onclick="closeMobileNav()">Dernekler İçin</a>
+    <a href="https://www.youtube.com/shorts/JvSAOsmKgqs" target="_blank" rel="noopener noreferrer" class="mob-link mob-bayos-link" data-tr="BAYOS" data-de="BAYOS" data-en="BAYOS" data-ar="BAYOS" data-bs="BAYOS" onclick="closeMobileNav()">BAYOS</a>
+    <div class="mob-lang">
+      <button type="button" onclick="selectLang('tr', true);updateMobLang()" id="mob-lb-tr">TR</button>
+      <button type="button" onclick="selectLang('de', true);updateMobLang()" id="mob-lb-de">DE</button>
+      <button type="button" onclick="selectLang('en', true);updateMobLang()" id="mob-lb-en">EN</button>
+      <button type="button" onclick="selectLang('ar', true);updateMobLang()" id="mob-lb-ar">AR</button>
+      <button type="button" onclick="selectLang('bs', true);updateMobLang()" id="mob-lb-bs">BS</button>
+    </div>
+  </div>
+</nav>
+
+<main class="termin-main">
+<!-- HERO -->
+<div class="termin-hero">
+  <div class="s-eye" id="heroEyebrow" data-tr="Canlı Bağış Yayını Planlama" data-de="Live-Spendenabend planen" data-en="Plan your live donation broadcast" data-ar="تخطيط بث التبرع المباشر" data-bs="Planirajte direktni prijenos donacija">Canlı Bağış Yayını Planlama</div>
+  <h1 class="s-title"><span id="terminHeroL1">Derneğiniz için</span><br><span class="grad" id="terminHeroL2">termin alın</span></h1>
+  <p class="s-body" id="terminHeroSub">
+    İki adımda ön görüşme veya yayın rezervasyonu yapın.<br>
+    Ekibimiz 24 saat içinde onay verir.
+  </p>
+</div>
+
+<!-- STEP DOTS -->
+<div class="termin-steps" id="stepsBar">
+  <div class="termin-step-item">
+    <div class="termin-step-dot active" id="sdot1">1</div>
+    <div class="termin-step-line" id="sline1"></div>
+  </div>
+  <div class="termin-step-item">
+    <div class="termin-step-dot" id="sdot2">2</div>
+    <div class="termin-step-line" id="sline2"></div>
+  </div>
+  <div class="termin-step-item">
+    <div class="termin-step-dot" id="sdot3">3</div>
+    <div class="termin-step-line" id="sline3"></div>
+  </div>
+  <div class="termin-step-item">
+    <div class="termin-step-dot" id="sdot4">4</div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="termin-progress-bar"><div class="termin-progress-fill" id="progFill" style="width:25%"></div></div>
+
+<!-- FLOW -->
+<div class="termin-flow">
+
+  <!-- ══ SCREEN 1: TİP ══ -->
+  <div class="termin-screen active" id="s1">
+    <div class="termin-sec-title" id="termS1Title">Termin türünü seçin</div>
+    <div class="termin-sec-sub" id="termS1Sub">İhtiyacınıza göre ön görüşme veya doğrudan yayın rezervasyonu yapabilirsiniz.</div>
+
+    <div class="termin-type-grid">
+      <!-- Ön Görüşme -->
+      <div class="termin-type-card" id="card-vg" onclick="selectType('vg')">
+        <div class="termin-tc-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div class="termin-tc-badge free" id="termVgBadge">&#10003; Ücretsiz</div>
+        <div class="termin-tc-title" id="termVgTitle">Ön Görüşme<br><small id="termVgTitleSub" style="font-weight:400;font-size:14px;color:var(--text2)">Vorgespräch</small></div>
+        <div class="termin-tc-desc" id="termVgDesc">Projenizi tanıyalım, sorularınızı yanıtlayalım. Hiçbir taahhüt olmadan.</div>
+        <div class="termin-tc-meta">
+          <div class="termin-tc-meta-row" id="termVgMeta1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            20 dakika
+          </div>
+          <div class="termin-tc-meta-row" id="termVgMeta2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Hüseyin, Uğur veya Emin
+          </div>
+          <div class="termin-tc-meta-row" id="termVgMeta3">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Tarih tercihinizi belirtin
+          </div>
+        </div>
+        <div class="termin-tc-select-btn" id="sel-vg">
+          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><polyline points="20,6 9,17 4,12"/></svg>
+        </div>
+      </div>
+
+      <!-- Yayın Rezervasyonu -->
+      <div class="termin-type-card" id="card-br" onclick="selectType('br')">
+        <div class="termin-tc-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <polygon points="23,7 16,12 23,17"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+          </svg>
+        </div>
+        <div class="termin-tc-badge booking" id="termBrBadge">Yayın Planlaması</div>
+        <div class="termin-tc-title" id="termBrTitle">Yayın Rezervasyonu<br><small id="termBrTitleSub" style="font-weight:400;font-size:14px;color:var(--text2)">Buchungstermin</small></div>
+        <div class="termin-tc-desc" id="termBrDesc">Canlı yayın tarihini, lokasyonu ve teknik detayları birlikte planlayalım.</div>
+        <div class="termin-tc-meta">
+          <div class="termin-tc-meta-row" id="termBrMeta1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            45–60 dakika
+          </div>
+          <div class="termin-tc-meta-row" id="termBrMeta2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Hüseyin + Uğur + Emin
+          </div>
+          <div class="termin-tc-meta-row" id="termBrMeta3">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Teklif bu görüşmeden sonra
+          </div>
+        </div>
+        <div class="termin-tc-select-btn" id="sel-br">
+          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><polyline points="20,6 9,17 4,12"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="termin-btn-row" style="justify-content:flex-end;margin-top:32px">
+      <button type="button" class="btn-fill termin-btn-next" id="btn1" onclick="goStep(2)" disabled>
+        Devam Et
+        <svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 2: TARİH & SAAT ══ -->
+  <div class="termin-screen" id="s2">
+    <div class="termin-sec-title" id="termS2Title">Tarih ve saat seçin</div>
+    <div class="termin-sec-sub" id="termS2Sub">Tercih ettiğiniz tarihi seçin. Ekibimiz uygunluk kontrolü yaparak onay gönderir.</div>
+
+    <div class="termin-notice" id="termS2Notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> <span id="termS2NoticeText">Yeşil noktalı günler ekibimizin genel olarak müsait olduğu günlerdir. Diğer günler için de talep iletebilirsiniz — 24 saat içinde geri dönülür.</span>
+    </div>
+
+    <div class="termin-cal-legend" id="termCalLegend" aria-hidden="false">
+      <span class="termin-legend-item termin-legend-avail"><i></i><span id="termLegendAvail">Önerilen günler</span></span>
+      <span class="termin-legend-item termin-legend-planning"><i></i><span id="termLegendPlanning">Yoğun plan</span></span>
+    </div>
+
+    <div class="termin-calendar-wrap">
+      <div class="termin-cal-header">
+        <div class="termin-cal-month" id="calMonth">Mayıs 2026</div>
+        <div class="termin-cal-nav">
+          <button class="termin-cal-nav-btn" onclick="calPrev()">
+            <svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+          </button>
+          <button class="termin-cal-nav-btn" onclick="calNext()">
+            <svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="termin-cal-grid" id="calGrid"></div>
+
+      <div class="termin-time-section" id="timeSection" style="display:none">
+        <div class="termin-time-section-title">Tercih ettiğiniz saat aralığı</div>
+        <div class="termin-time-grid" id="timeGrid"></div>
+      </div>
+    </div>
+
+    <div class="termin-btn-row">
+      <button type="button" class="btn-out termin-btn-back" onclick="goStep(1)">
+        <svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+        Geri
+      </button>
+      <button type="button" class="btn-fill termin-btn-next" id="btn2" onclick="goStep(3)" disabled>
+        Devam Et
+        <svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 3: BİLGİLER ══ -->
+  <div class="termin-screen" id="s3">
+    <div class="termin-sec-title" id="termS3Title">Dernek bilgileri</div>
+    <div class="termin-sec-sub" id="termS3Sub">Sizi daha iyi tanıyabilmek için birkaç bilgi paylaşın.</div>
+
+    <div class="termin-form-grid" id="formGrid">
+
+      <div class="termin-form-group">
+        <label class="termin-form-label" id="termLblName">Adınız Soyadınız <span class="req">*</span></label>
+        <input class="termin-form-input" type="text" id="termin_fName" placeholder="Ahmet Yılmaz">
+      </div>
+
+      <div class="termin-form-group">
+        <label class="termin-form-label" id="termLblPhone">Telefon / WhatsApp <span class="req">*</span></label>
+        <input class="termin-form-input" type="tel" id="termin_fPhone" placeholder="+49 152 1234 5678">
+      </div>
+
+      <div class="termin-form-group">
+        <label class="termin-form-label" id="termLblEmail">E-posta <span class="req">*</span></label>
+        <input class="termin-form-input" type="email" id="termin_fEmail" placeholder="info@dernek.de">
+      </div>
+
+      <div class="termin-form-group">
+        <label class="termin-form-label" id="termLblOrg">Dernek / Kurum Adı <span class="req">*</span></label>
+        <input class="termin-form-input" type="text" id="termin_fOrg" placeholder="IGMG Kuzey Ruhr">
+      </div>
+
+      <div class="termin-form-group">
+        <label class="termin-form-label" id="termLblCity">Şehir</label>
+        <input class="termin-form-input" type="text" id="termin_fCity" placeholder="Duisburg, Deutschland">
+      </div>
+
+      <div class="termin-form-group">
+        <label class="termin-form-label" id="termLblSize">Tahmini Katılımcı Sayısı</label>
+        <select class="termin-form-select" id="termin_fSize">
+          <option value="">Seçin...</option>
+          <option value="50-">50'den az</option>
+          <option value="50-150">50 – 150</option>
+          <option value="150-300">150 – 300</option>
+          <option value="300+">300+</option>
+        </select>
+      </div>
+
+      <div class="form-group full" id="targetGroup">
+        <label class="termin-form-label" id="termLblTarget">Hedef Vaad Miktarı</label>
+        <select class="termin-form-select" id="termin_fTarget">
+          <option value="">Seçin...</option>
+          <option value="50k-">50.000 € altı</option>
+          <option value="50k-150k">50.000 – 150.000 €</option>
+          <option value="150k-300k">150.000 – 300.000 €</option>
+          <option value="300k+">300.000 € üzeri</option>
+        </select>
+      </div>
+
+      <div class="form-group full">
+        <label class="termin-form-label" id="termLblMeetLang">Tercih ettiğiniz görüşme dili</label>
+        <div class="termin-radio-group" id="terminMeetingLang">
+          <div class="termin-radio-item selected" onclick="selectMeetingRadio(this)" data-val="tr">
+            <div class="termin-radio-dot"></div>
+            <div class="termin-radio-label">🇹🇷 Türkçe</div>
+          </div>
+          <div class="termin-radio-item" onclick="selectMeetingRadio(this)" data-val="de">
+            <div class="termin-radio-dot"></div>
+            <div class="termin-radio-label">🇩🇪 Deutsch</div>
+          </div>
+          <div class="termin-radio-item" onclick="selectMeetingRadio(this)" data-val="tr-de">
+            <div class="termin-radio-dot"></div>
+            <div class="termin-radio-label">🇹🇷🇩🇪 Türkçe + Almanca</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group full">
+        <label class="termin-form-label" id="termLblNote">Ek bilgi veya soru</label>
+        <textarea class="termin-form-textarea" id="termin_fNote" placeholder="Projeniz hakkında kısa bilgi verebilirsiniz..."></textarea>
+      </div>
+
+    </div>
+
+    <div class="termin-btn-row">
+      <button type="button" class="btn-out termin-btn-back" onclick="goStep(2)">
+        <svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+        Geri
+      </button>
+      <button type="button" class="btn-fill termin-btn-next" id="termBtnSummary" onclick="goStep(4)">
+        Özete Geç
+        <svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 4: ÖZET ══ -->
+  <div class="termin-screen" id="s4">
+    <div class="termin-sec-title" id="termS4Title">Özet & Gönder</div>
+    <div class="termin-sec-sub" id="termS4Sub">Bilgilerinizi kontrol edin. WhatsApp üzerinden gönderdiğinizde ekibimize iletilir.</div>
+
+    <div class="termin-summary-card" id="summaryCard"></div>
+
+    <div class="termin-notice" style="margin-top:20px" id="termS4Notice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 13 19.79 19.79 0 0 1 1.07 4.4 2 2 0 0 1 3.05 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 16.92z"/></svg> <span id="termS4NoticeText">Talebiniz WhatsApp üzerinden iletilecektir. Ekibimiz 24 saat içinde size geri dönecektir.</span>
+    </motionmotiondiv>
+
+    <div class="termin-btn-row">
+      <button type="button" class="btn-out termin-btn-back" onclick="goStep(3)">
+        <svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+        Geri Dön
+      </button>
+      <a class="termin-btn-whatsapp" id="waBtn" href="#" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.12.554 4.112 1.523 5.838L.057 23.27a.75.75 0 0 0 .917.978l5.737-1.505A11.952 11.952 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.952 9.952 0 0 1-5.148-1.44l-.369-.22-3.84 1.007 1.022-3.737-.24-.38A9.952 9.952 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        WhatsApp ile Gönder
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 5: BAŞARILI ══ -->
+  <div class="termin-screen" id="s5">
+    <div class="termin-success-wrap">
+      <div class="termin-success-icon">
+        <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+      </div>
+      <div class="termin-success-title" id="termS5Title">Talebiniz İletildi!</div>
+      <div class="termin-success-sub" id="termS5Sub">Ekibimiz en geç 24 saat içinde WhatsApp veya e-posta ile size geri dönecektir. Sabırsızlıkla bekliyoruz!</div>
+      <div class="termin-success-detail" id="successDetail"></div>
+      <a class="btn-fill termin-btn-next" id="termBtnHome" href="/" style="margin:0 auto">
+        <svg viewBox="0 0 24 24"><polyline points="3,12 9,12"/><polyline points="9,6 3,12 9,18"/></svg>
+        Anasayfaya Dön
+      </a>
+    </div>
+  </div>
+
+
+</div><!-- /flow -->
+</main>
+
+<!-- FOOTER (index.html ile aynı) -->
+<footer>
+  <div class="ft-brand"><iframe class="ft-logo-embed" src="assets/logo/animated-logo.html" title="Selsebil TV animasyonlu footer logo" loading="lazy"></iframe></div>
+  <div class="social-links">
+    <a href="https://www.youtube.com/@selsebiltv" target="_blank" class="social-link" title="YouTube"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.5 15.5v-7l6.3 3.5-6.3 3.5z"/></svg></a>
+    <a href="https://www.instagram.com/selsebiltv" target="_blank" class="social-link" title="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.2 4.8 1.7 5 5 .1 1.3.1 1.6.1 4.9s0 3.6-.1 4.9c-.2 3.3-1.7 4.8-5 5-1.3.1-1.6.1-4.9.1s-3.6 0-4.9-.1c-3.3-.2-4.8-1.7-5-5C2 16.6 2 16.3 2 13s0-3.6.1-4.9c.2-3.3 1.7-4.8 5-5C8.4 2.2 8.8 2.2 12 2.2zm0-2.2C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12s0 3.7.1 4.9C.3 21.3 2.7 23.7 7.1 23.9 8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9C23.7 2.7 21.3.3 16.9.1 15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4A6.2 6.2 0 0012 5.8zM12 16a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"/></svg></a>
+    <a href="https://www.tiktok.com/@selsebil.tv" target="_blank" class="social-link" title="TikTok"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.6 3.3A4.5 4.5 0 0115.1 0h-3.5v15.6a2.1 2.1 0 11-2.1-2.1c.2 0 .4 0 .6.1V9.9a5.6 5.6 0 100 11.2 5.6 5.6 0 005.6-5.6V7.9A8 8 0 0020 9V5.5a4.5 4.5 0 010-2.2z"/></svg></a>
+    <a href="https://www.facebook.com/share/1CtjV6isGJ" target="_blank" class="social-link" title="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+    <a href="https://wa.me/4915140448885" target="_blank" class="social-link" title="WhatsApp"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+    <a href="https://www.youtube.com/shorts/JvSAOsmKgqs" target="_blank" class="social-link" title="BAYOS"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><polygon points="10,9 16,12 10,15" fill="currentColor" stroke="none"/></svg></a>
+  </div>
+  <div class="ft-bottom">
+    <div class="ft-legal">
+      <a href="/yasal.html"
+        data-tr="Yasal bilgiler" data-de="Rechtliches" data-en="Legal" data-ar="معلومات قانونية" data-bs="Pravne informacije">Yasal bilgiler</a>
+      <a href="/yasal.html#gizlilik"
+        data-tr="Gizlilik" data-de="Datenschutz" data-en="Privacy" data-ar="الخصوصية" data-bs="Privatnost">Gizlilik</a>
+      <a href="/yasal.html#bagislar"
+        data-tr="Bağışlar &amp; BAYOS" data-de="Spenden &amp; BAYOS" data-en="Donations &amp; BAYOS" data-ar="التبرعات وBAYOS" data-bs="Donacije &amp; BAYOS">Bağışlar &amp; BAYOS</a>
+      <a href="/termin.html"
+        data-tr="Termin Al"
+        data-de="Termin buchen"
+        data-en="Book Appointment"
+        data-ar="احجز موعداً"
+        data-bs="Zakažite termin">Termin Al</a>
+    </div>
+    <div class="ft-copy"
+      data-tr="© 2026 Selsebil.TV · Tüm hakları saklıdır"
+      data-de="© 2026 Selsebil.TV · Alle Rechte vorbehalten"
+      data-en="© 2026 Selsebil.TV · All rights reserved"
+      data-ar="© 2026 سلسبيل تي في · جميع الحقوق محفوظة" data-bs="© 2026 Selsebil.TV · Sva prava pridržana">© 2026 Selsebil.TV · Tüm hakları saklıdır</div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js" defer></script>
+<script src="assets/js/selsebil-lang.js" defer></script>
+<script src="assets/js/termin-i18n.js" defer></script>
+<script src="assets/js/termin-availability-client.js" defer></script>
+<script src="assets/js/termin-wizard.js" defer></script>
+
+<script>
+// ── Mobile Nav ──
+(function(){
+  var btn     = document.getElementById('navHamburger');
+  var overlay = document.getElementById('mobileNavOverlay');
+  if (!btn || !overlay) return;
+
+  btn.addEventListener('click', function() {
+    var isOpen = overlay.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    updateMobLang();
+  });
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeMobileNav();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeMobileNav();
+  });
+
+  window.addEventListener('langChanged', function() { updateMobLang(); });
+  document.addEventListener('DOMContentLoaded', function() { updateMobLang(); });
+})();
+
+function closeMobileNav() {
+  var overlay = document.getElementById('mobileNavOverlay');
+  var btn     = document.getElementById('navHamburger');
+  if (overlay) overlay.classList.remove('open');
+  if (btn)     btn.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function updateMobLang() {
+  var saved = 'tr';
+  try {
+    if (localStorage.getItem('selsebil_lang_chosen') === '1') {
+      var s = localStorage.getItem('selsebil_lang');
+      if (s) saved = s;
+    }
+  } catch (e) {}
+  ['tr','de','en','ar','bs'].forEach(function(l) {
+    var b = document.getElementById('mob-lb-' + l);
+    if (b) b.classList.toggle('active-lang', l === saved);
+  });
+}
+</script>
+</body>
+</html>

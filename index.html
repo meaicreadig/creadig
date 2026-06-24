@@ -853,9 +853,9 @@ html[dir="rtl"] .pc-solve::before{content:'←';}
 .proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-top:4rem;}
 @media(max-width:900px){.proof-grid{grid-template-columns:1fr;}}
 .prc{background:var(--bg-2);border:1px solid var(--border);border-radius:6px;padding:1.9rem;transition:all .35s;position:relative;overflow:hidden;}
-.prc::after{content:'"';position:absolute;top:.75rem;right:1.25rem;font-family:var(--fd);font-size:5rem;color:var(--quote-mark);font-weight:800;line-height:1;}
+.prc::after{content:none;}
 .prc:hover{border-color:var(--border-b);transform:translateY(-3px);}
-.prc-q{font-size:.88rem;color:var(--text-2);line-height:1.75;font-style:italic;margin-bottom:1.1rem;}
+.prc-q{font-size:.88rem;color:var(--text-2);line-height:1.75;font-style:normal;margin-bottom:1.1rem;}
 .prc-r{font-size:.8rem;color:var(--green);font-weight:500;margin-bottom:1.1rem;display:flex;align-items:center;gap:.45rem;}
 .prc-r::before{content:'→';color:var(--blue);}
 .prc-a{font-size:.73rem;color:var(--text-4);letter-spacing:.05em;text-transform:uppercase;padding-top:1.1rem;border-top:1px solid var(--border);}
@@ -1291,8 +1291,8 @@ footer::before{
   </a>
   <ul class="nav-links" role="list">
     <li><a href="#leistungen" data-nav="leistungen" data-de="Leistungen" data-en="Services" data-tr="Hizmetler" data-ar="الخدمات" data-ru="Услуги">Leistungen</a></li>
+    <li><a href="#pakete" data-nav="pakete" data-de="Pakete" data-en="Packages" data-tr="Paketler" data-ar="الباقات" data-ru="Пакеты">Pakete</a></li>
     <li><a href="#meai" data-nav="meai" data-de="MEAI" data-en="MEAI" data-tr="MEAI" data-ar="MEAI" data-ru="MEAI">MEAI</a></li>
-    <li><a href="#referenzen" data-nav="referenzen" data-de="Referenzen" data-en="References" data-tr="Referanslar" data-ar="المراجع" data-ru="Отзывы">Referenzen</a></li>
     <li><a href="#ueber-uns" data-nav="ueber-uns" data-de="Über uns" data-en="About us" data-tr="Hakkımızda" data-ar="من نحن" data-ru="О нас">Über uns</a></li>
   </ul>
   <div class="nav-r">
@@ -1333,8 +1333,8 @@ footer::before{
   <div class="nav-drawer-panel" role="dialog" aria-modal="true" aria-label="Navigation">
     <ul class="nav-drawer-links" role="list">
       <li><a href="#leistungen" data-nav="leistungen" data-de="Leistungen" data-en="Services" data-tr="Hizmetler" data-ar="الخدمات" data-ru="Услуги">Leistungen</a></li>
+      <li><a href="#pakete" data-nav="pakete" data-de="Pakete" data-en="Packages" data-tr="Paketler" data-ar="الباقات" data-ru="Пакеты">Pakete</a></li>
       <li><a href="#meai" data-nav="meai" data-de="MEAI" data-en="MEAI" data-tr="MEAI" data-ar="MEAI" data-ru="MEAI">MEAI</a></li>
-      <li><a href="#referenzen" data-nav="referenzen" data-de="Referenzen" data-en="References" data-tr="Referanslar" data-ar="المراجع" data-ru="Отзывы">Referenzen</a></li>
       <li><a href="#ueber-uns" data-nav="ueber-uns" data-de="Über uns" data-en="About us" data-tr="Hakkımızda" data-ar="من نحن" data-ru="О нас">Über uns</a></li>
     </ul>
     <div class="nav-drawer-ctas">
@@ -1434,24 +1434,18 @@ footer::before{
   <div class="prob-grid">
     <div class="pc reveal d1">
       <div class="pc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div>
-      <!-- TODO: Zahl und Quelle verifizieren vor Go-Live -->
-      <div class="pc-stat count-num" data-target="67" data-suffix="%">0%</div>
       <h3 data-de="Unsichtbares Potenzial" data-en="Invisible potential" data-tr="Görünmeyen potansiyel" data-ar="إمكانات مخفية" data-ru="Скрытый потенциал">Unsichtbares Potenzial</h3>
       <p data-de="Ihr Betrieb hat mehr Kapazität als er zeigt — aber niemand hat Zeit, das sichtbar zu machen." data-en="Your business has more capacity than it shows — but no one has time to make it visible." data-tr="İşletmenizin görünenden fazla kapasitesi var — ama kimsenin bunu görünür kılacak vakti yok." data-ar="في عملك طاقة أكبر مما يظهر — لكن لا أحد يملك الوقت لإبرازها." data-ru="У вашего бизнеса больше возможностей, чем видно — но ни у кого нет времени их раскрыть.">Ihr Betrieb hat mehr Kapazität als er zeigt — aber niemand hat Zeit, das sichtbar zu machen.</p>
       <div class="pc-solve" data-de="creaDIG macht sichtbar, was brachliegt." data-en="creaDIG reveals what lies dormant." data-tr="creaDIG, atıl olanı görünür kılar." data-ar="creaDIG تُظهر ما هو خامل." data-ru="creaDIG раскрывает то, что простаивает.">creaDIG macht sichtbar, was brachliegt.</div>
     </div>
     <div class="pc reveal d2">
       <div class="pc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-      <!-- TODO: Zahl und Quelle verifizieren vor Go-Live -->
-      <div class="pc-stat count-num" data-target="14" data-suffix="h">0h</div>
       <h3 data-de="Chaos im Hintergrund" data-en="Back-office chaos" data-tr="Arka planda kaos" data-ar="فوضى في الخلفية" data-ru="Хаос в процессах">Chaos im Hintergrund</h3>
       <p data-de="Zettel, Anrufe, unstrukturierte Prozesse. Diese Stunden fehlen am Ende der Woche — überall." data-en="Notes, calls, unstructured processes. These hours are missing at the end of the week — everywhere." data-tr="Notlar, telefonlar, yapısız süreçler. Bu saatler hafta sonunda her yerde eksik kalır." data-ar="أوراق، مكالمات، إجراءات غير منظمة. هذه الساعات تضيع في نهاية الأسبوع — في كل مكان." data-ru="Записки, звонки, неструктурированные процессы. Этих часов не хватает к концу недели — везде.">Zettel, Anrufe, unstrukturierte Prozesse. Diese Stunden fehlen am Ende der Woche — überall.</p>
       <div class="pc-solve" data-de="MEAI übernimmt die Last. Automatisch." data-en="MEAI takes the load. Automatically." data-tr="MEAI yükü üstlenir. Otomatik." data-ar="MEAI تتحمّل العبء. تلقائياً." data-ru="MEAI берёт нагрузку на себя. Автоматически.">MEAI übernimmt die Last. Automatisch.</div>
     </div>
     <div class="pc reveal d3">
       <div class="pc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 8h4v4"/></svg></div>
-      <!-- TODO: Zahl und Quelle verifizieren vor Go-Live -->
-      <div class="pc-stat count-num" data-target="3" data-suffix="×">0×</div>
       <h3 data-de="Kein System zum Wachsen" data-en="No system to scale" data-tr="Büyümek için sistem yok" data-ar="لا نظام للنمو" data-ru="Нет системы роста">Kein System zum Wachsen</h3>
       <p data-de="Gute Arbeit reicht nicht. Wer kein System hat, läuft auf der Stelle — egal wie gut das Handwerk ist." data-en="Good work isn't enough. Without a system you run in place — no matter how good the craft." data-tr="İyi iş yetmez. Sistemi olmayan, ne kadar usta olursa olsun yerinde sayar." data-ar="العمل الجيد لا يكفي. من لا نظام له يراوح مكانه — مهما أتقن حرفته." data-ru="Хорошей работы мало. Без системы вы топчетесь на месте — каким бы мастером ни были.">Gute Arbeit reicht nicht. Wer kein System hat, läuft auf der Stelle — egal wie gut das Handwerk ist.</p>
       <div class="pc-solve" data-de="Wir bauen das System. Sie machen das Handwerk." data-en="We build the system. You do the craft." data-tr="Sistemi biz kurarız. Zanaatı siz yaparsınız." data-ar="نحن نبني النظام. وأنت تتقن حرفتك." data-ru="Мы строим систему. Вы делаете своё дело.">Wir bauen das System. Sie machen das Handwerk.</div>
@@ -1581,23 +1575,23 @@ footer::before{
 
 <!-- PROOF — Thomas kararı -->
 <div class="sw" id="referenzen">
-  <div class="sey reveal" data-de="Referenzen" data-en="References" data-tr="Referanslar" data-ar="المراجع" data-ru="Отзывы">Referenzen</div>
-  <h2 class="sh2 reveal d1" data-html-de="Was unsere<br>Kunden sagen." data-html-en="What our<br>clients say." data-html-tr="Müşterilerimiz<br>ne diyor." data-html-ar="ماذا يقول<br>عملاؤنا." data-html-ru="Что говорят<br>клиенты.">Was unsere<br>Kunden sagen.</h2>
+  <div class="sey reveal" data-de="Was möglich wird" data-en="What becomes possible" data-tr="Neler mümkün" data-ar="ما الذي يصبح ممكناً" data-ru="Что становится возможным">Was möglich wird</div>
+  <h2 class="sh2 reveal d1" data-html-de="Was wir<br>möglich machen." data-html-en="What we<br>make possible." data-html-tr="Neyi mümkün<br>kılıyoruz." data-html-ar="ما الذي<br>نجعله ممكناً." data-html-ru="Что мы<br>делаем возможным.">Was wir<br>möglich machen.</h2>
   <div class="proof-grid">
     <div class="prc reveal d1">
-      <div class="prc-q" data-de="&quot;Vorher kannte mich niemand außerhalb meiner Stammkunden. Jetzt kommen neue Leute über Instagram — ohne dass ich selbst etwas posten muss.&quot;" data-en="&quot;Before, nobody knew me outside my regulars. Now new people find me on Instagram — without me posting.&quot;" data-tr="&quot;Önceden sadık müşterilerim dışında kimse tanımıyordu. Şimdi Instagram'dan yeni müşteriler geliyor.&quot;" data-ar="&quot;قبل ذلك لم يعرفني أحد خارج زبائني. الآن يأتي عملاء جدد عبر إنستغرام دون أن أنشر.&quot;" data-ru="&quot;Раньше меня знали только постоянные клиенты. Теперь новые приходят из Instagram — без моих постов.&quot;">"Vorher kannte mich niemand außerhalb meiner Stammkunden. Jetzt kommen neue Leute über Instagram — ohne dass ich selbst etwas posten muss."</div>
-      <div class="prc-r" data-de="+60% neue Anfragen in 2 Monaten" data-en="+60% new inquiries in 2 months" data-tr="2 ayda +%60 yeni talep" data-ar="+60% طلبات جديدة في شهرين" data-ru="+60% новых запросов за 2 месяца">+60% neue Anfragen in 2 Monaten</div>
-      <div class="prc-a" data-de="Inhaber — Bäckerei, NRW" data-en="Owner — bakery, NRW" data-tr="İşletme sahibi — fırın, NRW" data-ar="مالك — مخبز، NRW" data-ru="Владелец — пекарня, NRW">Inhaber — Bäckerei, NRW</div>
+      <div class="prc-q" data-de="Bei Stammkunden beliebt — außerhalb davon kennt den Betrieb kaum jemand. Genau hier entsteht Sichtbarkeit." data-en="Loved by regulars — but barely known beyond them. This is exactly where visibility begins." data-tr="Sadık müşteriler severek gelir — ama dışarıda işletmeyi neredeyse kimse tanımaz. Görünürlük tam burada başlar." data-ar="محبوب لدى الزبائن الدائمين — لكن خارجهم لا يكاد يعرفه أحد. هنا تبدأ القدرة على الظهور." data-ru="Любят постоянные клиенты — но за их пределами бизнес почти не знают. Именно здесь начинается видимость.">Bei Stammkunden beliebt — außerhalb davon kennt den Betrieb kaum jemand. Genau hier entsteht Sichtbarkeit.</div>
+      <div class="prc-r" data-de="Sichtbar werden — ohne selbst täglich posten zu müssen." data-en="Get found — without posting every day yourself." data-tr="Görünür olmak — her gün kendiniz paylaşmadan." data-ar="الظهور — دون الحاجة إلى النشر يومياً بنفسك." data-ru="Стать заметным — не публикуя каждый день самому.">Sichtbar werden — ohne selbst täglich posten zu müssen.</div>
+      <div class="prc-a" data-de="Beispielszenario · Bäckerei" data-en="Example scenario · bakery" data-tr="Örnek senaryo · fırın" data-ar="سيناريو مثال · مخبز" data-ru="Пример · пекарня">Beispielszenario · Bäckerei</div>
     </div>
     <div class="prc reveal d2">
-      <div class="prc-q" data-de="&quot;Wir hatten 12 Mitarbeiter und keinen einzigen strukturierten Prozess. creaDIG hat das in 6 Wochen grundlegend verändert.&quot;" data-en="&quot;We had 12 staff and zero structured processes. creaDIG changed that fundamentally in 6 weeks.&quot;" data-tr="&quot;12 çalışanımız vardı, yapılandırılmış süreç yoktu. creaDIG 6 haftada bunu değiştirdi.&quot;" data-ar="&quot;كان لدينا 12 موظفاً بلا عمليات منظمة. creaDIG غيّر ذلك في 6 أسابيع.&quot;" data-ru="&quot;12 сотрудников и ни одного процесса. creaDIG изменил это за 6 недель.&quot;">"Wir hatten 12 Mitarbeiter und keinen einzigen strukturierten Prozess. creaDIG hat das in 6 Wochen grundlegend verändert."</div>
-      <div class="prc-r" data-de="8h/Woche eingespart pro Mitarbeiter" data-en="8h/week saved per employee" data-tr="Çalışan başına haftada 8 saat tasarruf" data-ar="8 ساعات/أسبوع موفرة لكل موظف" data-ru="8 ч/нед экономии на сотрудника">8h/Woche eingespart pro Mitarbeiter</div>
-      <div class="prc-a" data-de="Geschäftsführer — Handwerksbetrieb, 12 MA" data-en="CEO — trade business, 12 staff" data-tr="Genel müdür — esnaf, 12 çalışan" data-ar="المدير — حرفي، 12 موظفاً" data-ru="Руководитель — ремесленное предприятие, 12 чел.">Geschäftsführer — Handwerksbetrieb, 12 MA</div>
+      <div class="prc-q" data-de="Ein wachsender Betrieb ohne strukturierte Abläufe verliert Zeit im Hintergrund — Tag für Tag." data-en="A growing business without structured processes loses time behind the scenes — day after day." data-tr="Yapılandırılmış süreçleri olmayan, büyüyen bir işletme arka planda zaman kaybeder — her gün." data-ar="عمل ينمو دون عمليات منظمة يخسر الوقت خلف الكواليس — يوماً بعد يوم." data-ru="Растущий бизнес без выстроенных процессов теряет время на заднем плане — день за днём.">Ein wachsender Betrieb ohne strukturierte Abläufe verliert Zeit im Hintergrund — Tag für Tag.</div>
+      <div class="prc-r" data-de="Klare Abläufe statt Zettelwirtschaft — Zeit fürs Wesentliche." data-en="Clear processes instead of paper chaos — time for what matters." data-tr="Kâğıt karmaşası yerine net süreçler — asıl işe zaman." data-ar="عمليات واضحة بدل فوضى الأوراق — وقت لما يهم." data-ru="Чёткие процессы вместо бумажного хаоса — время на главное.">Klare Abläufe statt Zettelwirtschaft — Zeit fürs Wesentliche.</div>
+      <div class="prc-a" data-de="Beispielszenario · Handwerk" data-en="Example scenario · trades" data-tr="Örnek senaryo · esnaf" data-ar="سيناريو مثال · حِرَفة" data-ru="Пример · ремесло">Beispielszenario · Handwerk</div>
     </div>
     <div class="prc reveal d3">
-      <div class="prc-q" data-de="&quot;Meine Praxis war gut — aber niemand hat sie online gefunden. Das hat sich komplett geändert.&quot;" data-en="&quot;My practice was good — but nobody found it online. That changed completely.&quot;" data-tr="&quot;Muayenehanem iyiydi — ama online kimse bulamıyordu. Bu tamamen değişti.&quot;" data-ar="&quot;عيادتي كانت جيدة — لكن أحداً لم يجدها online. تغيّر كل شيء.&quot;" data-ru="&quot;Практика была хорошей — но в сети её не находили. Всё изменилось.&quot;">"Meine Praxis war gut — aber niemand hat sie online gefunden. Das hat sich komplett geändert."</div>
-      <div class="prc-r" data-de="Seite 1 bei Google in 6 Wochen" data-en="Page 1 on Google in 6 weeks" data-tr="6 haftada Google'da 1. sayfa" data-ar="الصفحة 1 في Google خلال 6 أسابيع" data-ru="Страница 1 в Google за 6 недель">Seite 1 bei Google in 6 Wochen</div>
-      <div class="prc-a" data-de="Dr. med. — Arztpraxis, Hannover" data-en="MD — medical practice, Hannover" data-tr="Dr. — muayenehane, Hannover" data-ar="طبيب — عيادة، هانوفر" data-ru="Врач — практика, Ганновер">Dr. med. — Arztpraxis, Hannover</div>
+      <div class="prc-q" data-de="Ein guter Betrieb, den online niemand findet, verschenkt jeden Tag Anfragen." data-en="A good business nobody finds online gives away inquiries every day." data-tr="Online bulunamayan iyi bir işletme her gün talep kaçırır." data-ar="عمل جيد لا يجده أحد على الإنترنت يضيّع طلبات كل يوم." data-ru="Хороший бизнес, который не находят онлайн, ежедневно теряет заявки.">Ein guter Betrieb, den online niemand findet, verschenkt jeden Tag Anfragen.</div>
+      <div class="prc-r" data-de="Gefunden werden, wenn Kunden suchen." data-en="Get found when customers are searching." data-tr="Müşteriler ararken bulunmak." data-ar="أن تكون في المقدمة عندما يبحث العملاء." data-ru="Быть найденным, когда клиенты ищут.">Gefunden werden, wenn Kunden suchen.</div>
+      <div class="prc-a" data-de="Beispielszenario · Arztpraxis" data-en="Example scenario · medical practice" data-tr="Örnek senaryo · muayenehane" data-ar="سيناريو مثال · عيادة" data-ru="Пример · практика">Beispielszenario · Arztpraxis</div>
     </div>
   </div>
 </div>
@@ -1616,7 +1610,7 @@ footer::before{
 </div>
 
 <!-- PACKAGES — Thomas kararı: Kein Risiko büyük + İbo kararı -->
-<div class="pkg-wrap">
+<div class="pkg-wrap" id="pakete">
   <div class="pkg-inner">
     <div class="sey reveal" data-de="Pakete" data-en="Packages" data-tr="Paketler" data-ar="الباقات" data-ru="Пакеты">Pakete</div>
     <h2 class="sh2 reveal d1" data-html-de="Ihr erster Schritt<br>mit creaDIG." data-html-en="Your first step<br>with creaDIG." data-html-tr="creaDIG ile<br>ilk adımınız." data-html-ar="خطوتك الأولى<br>مع creaDIG." data-html-ru="Ваш первый шаг<br>с creaDIG.">Ihr erster Schritt<br>mit creaDIG.</h2>
