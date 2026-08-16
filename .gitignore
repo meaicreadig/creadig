@@ -22,3 +22,7 @@ node_modules
 # Große lokale Archive
 Archiv_creadig.zip
 *.zip
+
+# Build- und Tooling-Artefakte
+tsconfig.tsbuildinfo
+next-env.d.ts
