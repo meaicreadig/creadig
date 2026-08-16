@@ -1,5 +1,6 @@
 "use client"
 
+import { SignatureMotif } from "@/components/brand/signature-motif"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { impactSignals } from "@/lib/site-data"
@@ -10,7 +11,11 @@ export function ImpactBand() {
 
   return (
     <section id="fundament" className="section-dark relative overflow-hidden">
-      <div aria-hidden="true" className="hairline-grid absolute inset-0 opacity-30" />
+      <SignatureMotif
+        direction="up"
+        density={0.5}
+        className="pointer-events-none absolute inset-0 h-full w-full opacity-70"
+      />
       <div
         aria-hidden="true"
         className="via-gold/60 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent"

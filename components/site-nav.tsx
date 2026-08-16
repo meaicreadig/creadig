@@ -17,6 +17,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { Logo } from "@/components/brand/logo"
 import { navLinks } from "@/lib/site-data"
 import { WHATSAPP_LINK } from "@/lib/dictionary"
 import { cn } from "@/lib/utils"
@@ -56,12 +57,8 @@ export function SiteNav() {
       )}
     >
       <div className="mx-auto flex h-[4.5rem] max-w-[88rem] items-center justify-between gap-6 px-6 lg:px-10">
-        <a
-          href="#top"
-          className="text-display text-2xl tracking-tight text-foreground"
-          aria-label="creaDIG — zur Startseite"
-        >
-          crea<span className="text-gold">DIG</span>
+        <a href="#top" className="shrink-0" aria-label="creaDIG — zur Startseite">
+          <Logo variant="auto" className="h-7 md:h-8" priority />
         </a>
 
         <nav aria-label="Hauptnavigation" className="hidden items-center gap-8 lg:flex">
@@ -129,13 +126,13 @@ export function SiteNav() {
 
           <a
             href="#kontakt"
-            className="group relative ml-1.5 hidden items-center overflow-hidden bg-foreground px-6 py-3 text-[0.75rem] tracking-[0.1em] text-background uppercase sm:inline-flex"
+            className="group relative ml-1.5 hidden items-center overflow-hidden bg-gradient-to-br from-gold-soft to-gold px-6 py-3 text-[0.75rem] tracking-[0.1em] text-[#201e1b] uppercase sm:inline-flex"
           >
             <span
               aria-hidden="true"
-              className="absolute inset-0 -translate-y-full bg-gradient-to-br from-gold-soft to-gold transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
+              className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
             />
-            <span className="relative z-10 transition-colors duration-500 group-hover:text-[#0a0a0b]">
+            <span className="relative z-10 transition-colors duration-500 group-hover:text-gold-soft">
               {t.nav.cta}
             </span>
           </a>
@@ -157,8 +154,9 @@ export function SiteNav() {
               className="h-dvh border-0 bg-background p-0 [&>button]:top-7 [&>button]:right-6"
             >
               <SheetHeader className="h-[4.5rem] justify-center px-6 py-0">
-                <SheetTitle className="text-display text-left text-2xl font-normal">
-                  crea<span className="text-gold">DIG</span>
+                <SheetTitle className="text-left">
+                  <Logo variant="auto" className="h-7" />
+                  <span className="sr-only">creaDIG</span>
                 </SheetTitle>
               </SheetHeader>
 
@@ -182,7 +180,7 @@ export function SiteNav() {
                 <SheetClose asChild>
                   <a
                     href="#kontakt"
-                    className="flex items-center justify-center bg-foreground px-6 py-4 text-sm tracking-wide text-background"
+                    className="flex items-center justify-center bg-gradient-to-br from-gold-soft to-gold px-6 py-4 text-sm tracking-wide text-[#201e1b]"
                   >
                     {t.nav.cta}
                   </a>

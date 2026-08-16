@@ -1,6 +1,7 @@
 "use client"
 
 import { useLocale } from "@/components/locale-provider"
+import { Logo } from "@/components/brand/logo"
 import { contact, navLinks, ownProducts } from "@/lib/site-data"
 
 export function SiteFooter() {
@@ -8,13 +9,13 @@ export function SiteFooter() {
 
   return (
     <footer className="section-dark relative overflow-hidden">
-      <div aria-hidden="true" className="hairline-grid absolute inset-0 opacity-20" />
+      <div aria-hidden="true" className="triangle-mesh absolute inset-0 opacity-40" />
 
       <div className="relative mx-auto w-full max-w-[100rem] px-6 pt-24 pb-10 md:px-10 md:pt-32 lg:px-16">
         {/* Riesige Wortmarke */}
         <div className="border-line border-b pb-14">
-          <a href="#top" className="text-display-tight inline-block text-[clamp(3rem,13vw,11rem)]">
-            crea<span className="text-gold">DIG</span>
+          <a href="#top" className="inline-block" aria-label="creaDIG — nach oben">
+            <Logo variant="light" className="h-[clamp(2.5rem,9vw,7rem)]" />
           </a>
           <p className="text-muted-foreground mt-6 max-w-xl text-base text-pretty md:text-lg">
             {t.footer.tagline}

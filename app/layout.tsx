@@ -1,17 +1,21 @@
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Poppins, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 
-const geist = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist",
+// CEO-Entscheidung: Poppins — rund-geometrisch, passt zum Logo. Nicht Geist.
+const poppins = Poppins({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-poppins",
   display: "swap",
 })
 
-const geistMono = Geist_Mono({
+// Monospace nur für Eyebrows und Kennziffern.
+const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-geist-mono",
+  weight: ["400", "500"],
+  variable: "--font-jetbrains",
   display: "swap",
 })
 
@@ -47,8 +51,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fcfcfb" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0b" },
+    { media: "(prefers-color-scheme: light)", color: "#fbfbf9" },
+    { media: "(prefers-color-scheme: dark)", color: "#201e1b" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -79,7 +83,7 @@ export default function RootLayout({
   return (
     <html
       lang="de"
-      className={`${geist.variable} ${geistMono.variable}`}
+      className={`${poppins.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>

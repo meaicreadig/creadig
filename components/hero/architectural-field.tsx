@@ -2,10 +2,11 @@
 
 import { useRef } from "react"
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion"
+import { SignatureMotif } from "@/components/brand/signature-motif"
 
 /**
- * Großflächiges architektonisches Raster mit exponentieller Aufwärtskurve.
- * Gold nur als scharfe Hairline — keine warmen Flächen.
+ * Hero-Hintergrund: creaDIG-Signatur-Motiv (Dreiecks-Mesh) plus perspektivischer
+ * Boden und exponentielle Aufwärtskurve. Gold nur als scharfe Hairline.
  */
 export function ArchitecturalField() {
   const ref = useRef<HTMLDivElement>(null)
@@ -29,8 +30,8 @@ export function ArchitecturalField() {
 
   return (
     <div ref={ref} aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* Statisches Basisraster */}
-      <div className="hairline-grid absolute inset-0 opacity-[0.55]" />
+      {/* Signatur-Motiv der Marke: Dreiecks-/Pfeil-Mesh, nach unten verdichtend */}
+      <SignatureMotif className="absolute inset-0 h-full w-full" />
 
       <motion.div style={reduce ? undefined : { y: gridY, opacity: fade }} className="absolute inset-0">
         <svg

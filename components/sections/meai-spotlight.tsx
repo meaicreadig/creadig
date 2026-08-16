@@ -12,7 +12,7 @@ export function MeaiSpotlight() {
 
   return (
     <section id="meai" aria-labelledby="meai-title" className="section-dark relative overflow-hidden">
-      <div aria-hidden="true" className="hairline-grid absolute inset-0 opacity-25" />
+      <div aria-hidden="true" className="triangle-mesh absolute inset-0 opacity-50" />
       <div
         aria-hidden="true"
         className="via-gold/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent"

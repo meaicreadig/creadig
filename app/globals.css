@@ -15,6 +15,8 @@
   --color-gold: var(--gold);
   --color-gold-soft: var(--gold-soft);
   --color-gold-deep: var(--gold-deep);
+  --color-mesh: var(--mesh);
+  --color-mesh-fill: var(--mesh-fill);
   /* „ink" folgt immer dem Vordergrund, damit dunkle Sektionen korrekt invertieren. */
   --color-ink: var(--foreground);
 
@@ -35,8 +37,9 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
   --radius-xs: 0.0625rem;
   --radius-sm: 0.125rem;
@@ -44,65 +47,71 @@
   --radius-lg: 0.375rem;
 }
 
-/* Hell = Default. Kühles, sauberes Weiß — kein warmes Creme. */
+/* Hell = Default. Warmes Papierweiss, warm-anthrazit Text — kein reines Schwarz. */
 :root {
-  --background: #fcfcfb;
-  --foreground: #0a0a0b;
+  --background: #fbfbf9;
+  --foreground: #2a2723;
   --surface: #f5f5f4;
   --surface-raised: #ffffff;
-  --muted: #f0f0ee;
-  --muted-foreground: #6e6e6b;
-  --line: #e5e5e3;
-  --line-strong: #c9c9c6;
+  --muted: #f0efec;
+  --muted-foreground: #6f6a62;
+  --line: #e6e4df;
+  --line-strong: #cbc7c0;
   --gold: #be904e;
   --gold-soft: #e4c378;
   --gold-deep: #8f6a33;
+  /* Signatur-Motiv (Dreiecks-Mesh) */
+  --mesh: #ded9d0;
+  --mesh-fill: #be904e;
 
   --card: #ffffff;
-  --card-foreground: #0a0a0b;
+  --card-foreground: #2a2723;
   --popover: #ffffff;
-  --popover-foreground: #0a0a0b;
-  --primary: #0a0a0b;
-  --primary-foreground: #fcfcfb;
-  --secondary: #f0f0ee;
-  --secondary-foreground: #0a0a0b;
+  --popover-foreground: #2a2723;
+  /* Gold ist die Primärfarbe — nicht Schwarz. */
+  --primary: #be904e;
+  --primary-foreground: #201e1b;
+  --secondary: #f0efec;
+  --secondary-foreground: #2a2723;
   --accent: #be904e;
-  --accent-foreground: #fcfcfb;
+  --accent-foreground: #201e1b;
   --destructive: #a63527;
-  --destructive-foreground: #fcfcfb;
-  --border: #e5e5e3;
-  --input: #c9c9c6;
+  --destructive-foreground: #fbfbf9;
+  --border: #e6e4df;
+  --input: #cbc7c0;
   --ring: #be904e;
   --radius: 0.125rem;
 }
 
 .dark {
-  --background: #0a0a0b;
-  --foreground: #fcfcfb;
-  --surface: #131315;
-  --surface-raised: #1a1a1d;
-  --muted: #1a1a1d;
-  --muted-foreground: #9c9c9a;
-  --line: #232326;
-  --line-strong: #34343a;
+  --background: #201e1b;
+  --foreground: #fbfbf9;
+  --surface: #2a2723;
+  --surface-raised: #322e29;
+  --muted: #2a2723;
+  --muted-foreground: #a7a099;
+  --line: #35312c;
+  --line-strong: #4a453e;
   --gold: #d3a763;
   --gold-soft: #e4c378;
   --gold-deep: #be904e;
+  --mesh: #3a352f;
+  --mesh-fill: #d3a763;
 
-  --card: #131315;
-  --card-foreground: #fcfcfb;
-  --popover: #131315;
-  --popover-foreground: #fcfcfb;
-  --primary: #fcfcfb;
-  --primary-foreground: #0a0a0b;
-  --secondary: #1a1a1d;
-  --secondary-foreground: #fcfcfb;
+  --card: #2a2723;
+  --card-foreground: #fbfbf9;
+  --popover: #2a2723;
+  --popover-foreground: #fbfbf9;
+  --primary: #d3a763;
+  --primary-foreground: #201e1b;
+  --secondary: #2a2723;
+  --secondary-foreground: #fbfbf9;
   --accent: #d3a763;
-  --accent-foreground: #0a0a0b;
+  --accent-foreground: #201e1b;
   --destructive: #c4574a;
-  --destructive-foreground: #0a0a0b;
-  --border: #232326;
-  --input: #34343a;
+  --destructive-foreground: #201e1b;
+  --border: #35312c;
+  --input: #4a453e;
   --ring: #d3a763;
 }
 
@@ -111,25 +120,27 @@
  * Setzt die Tokens lokal um, damit auch shadcn-Komponenten korrekt erben.
  */
 .section-dark {
-  --background: #0a0a0b;
-  --foreground: #fcfcfb;
-  --surface: #131315;
-  --surface-raised: #1a1a1d;
-  --muted: #1a1a1d;
-  --muted-foreground: #9c9c9a;
-  --line: #232326;
-  --line-strong: #3d3d44;
+  --background: #201e1b;
+  --foreground: #fbfbf9;
+  --surface: #2a2723;
+  --surface-raised: #322e29;
+  --muted: #2a2723;
+  --muted-foreground: #a7a099;
+  --line: #38332d;
+  --line-strong: #4f4941;
   --gold: #d3a763;
   --gold-soft: #e4c378;
   --gold-deep: #be904e;
-  --card: #131315;
-  --card-foreground: #fcfcfb;
-  --primary: #fcfcfb;
-  --primary-foreground: #0a0a0b;
-  --secondary: #1a1a1d;
-  --secondary-foreground: #fcfcfb;
-  --border: #232326;
-  --input: #3d3d44;
+  --mesh: #3a352f;
+  --mesh-fill: #d3a763;
+  --card: #2a2723;
+  --card-foreground: #fbfbf9;
+  --primary: #d3a763;
+  --primary-foreground: #201e1b;
+  --secondary: #2a2723;
+  --secondary-foreground: #fbfbf9;
+  --border: #38332d;
+  --input: #4f4941;
   --ring: #d3a763;
   background-color: var(--background);
   color: var(--foreground);
@@ -169,16 +180,16 @@
 
 /* Headlines sind Bauwerke: riesig, eng, selbstbewusst. */
 @utility text-display {
-  font-family: var(--font-sans);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
   letter-spacing: -0.04em;
   /* 0.9 ließ Unterlängen (g, j, ß) bei sehr großen Graden in die Folgezeile laufen. */
   line-height: 1.02;
 }
 
 @utility text-display-tight {
-  font-family: var(--font-sans);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
   letter-spacing: -0.045em;
   line-height: 0.95;
 }
@@ -191,11 +202,29 @@
   font-weight: 500;
 }
 
-@utility hairline-grid {
+/*
+ * Signatur-Motiv der Marke: feines Dreiecks-/Pfeil-Raster (Isometrie mit
+ * vertikalen Basen) — nachgebaut aus `corporate_creadig.ai`.
+ * Ersetzt bewusst das generische Quadrat-Grid.
+ */
+@utility triangle-mesh {
+  --mesh-cell: 4.5rem;
   background-image:
-    linear-gradient(to right, var(--line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
-  background-size: 5rem 5rem;
+    repeating-linear-gradient(
+      90deg,
+      var(--mesh) 0 1px,
+      transparent 1px var(--mesh-cell)
+    ),
+    repeating-linear-gradient(
+      30deg,
+      var(--mesh) 0 1px,
+      transparent 1px var(--mesh-cell)
+    ),
+    repeating-linear-gradient(
+      150deg,
+      var(--mesh) 0 1px,
+      transparent 1px var(--mesh-cell)
+    );
 }
 
 @keyframes marquee-left {
