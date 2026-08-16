@@ -29,10 +29,10 @@ export function StickyWhatsApp() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 16 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="group border-line-strong bg-background/90 hover:border-gold fixed bottom-5 left-5 z-40 flex items-center gap-0 overflow-hidden border px-4 py-3 backdrop-blur-xl transition-colors duration-500 md:bottom-8 md:left-8"
+          className="group fixed bottom-5 left-5 z-40 flex items-center overflow-hidden rounded-full bg-[#25D366] p-4 text-white shadow-[0_12px_30px_-8px_rgba(0,0,0,0.4)] transition-all duration-500 hover:pr-5 md:bottom-8 md:left-8"
         >
-          <WhatsAppIcon className="size-5 shrink-0 text-gold" />
-          <span className="max-w-0 overflow-hidden text-[0.75rem] tracking-[0.1em] whitespace-nowrap text-foreground uppercase transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:ml-2.5 group-hover:max-w-[9rem]">
+          <WhatsAppIcon className="size-6 shrink-0" />
+          <span className="max-w-0 overflow-hidden text-[0.8rem] font-medium whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:ml-2.5 group-hover:max-w-[9rem]">
             WhatsApp
           </span>
         </motion.a>

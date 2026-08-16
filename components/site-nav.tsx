@@ -58,7 +58,7 @@ export function SiteNav() {
     >
       <div className="mx-auto flex h-[4.5rem] max-w-[88rem] items-center justify-between gap-6 px-6 lg:px-10">
         <a href="/#top" className="shrink-0" aria-label="creaDIG — zur Startseite">
-          <Logo variant="auto" className="h-6 md:h-[1.65rem]" priority />
+          <Logo variant="auto" className="h-[1.3rem] md:h-[1.55rem]" priority />
         </a>
 
         <nav aria-label="Hauptnavigation" className="hidden items-center gap-8 lg:flex">
@@ -120,7 +120,7 @@ export function SiteNav() {
               rel="noopener noreferrer"
               aria-label="WhatsApp — creaDIG schreiben"
             >
-              <WhatsAppIcon className="size-4" />
+              <WhatsAppIcon className="size-5" />
             </a>
           </Button>
 
@@ -155,7 +155,7 @@ export function SiteNav() {
             >
               <SheetHeader className="h-[4.5rem] justify-center px-6 py-0">
                 <SheetTitle className="text-left">
-                  <Logo variant="auto" className="h-6" />
+                  <Logo variant="auto" className="h-[1.3rem]" />
                   <span className="sr-only">creaDIG</span>
                 </SheetTitle>
               </SheetHeader>
@@ -203,7 +203,7 @@ export function SiteNav() {
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 border border-line-strong px-6 py-4 text-sm tracking-wide text-foreground"
                 >
-                  <WhatsAppIcon className="size-4" /> WhatsApp
+                  <WhatsAppIcon className="size-5" /> WhatsApp
                 </a>
                 <Separator className="mt-4" />
                 <ToggleGroup

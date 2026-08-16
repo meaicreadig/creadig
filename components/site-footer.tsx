@@ -17,7 +17,7 @@ export function SiteFooter() {
         {/* Riesige Wortmarke */}
         <div className="border-line border-b pb-14">
           <a href="/#top" className="inline-block" aria-label="creaDIG — nach oben">
-            <Logo variant="auto" className="h-[clamp(1.9rem,4vw,3.1rem)]" />
+            <Logo variant="auto" className="h-[clamp(1.4rem,3vw,2.5rem)]" />
           </a>
           <p className="text-muted-foreground mt-6 max-w-xl text-base text-pretty md:text-lg">
             {t.footer.tagline}
