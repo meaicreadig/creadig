@@ -116,32 +116,32 @@
 }
 
 /*
- * Dramatische dunkle Vollbild-Sektionen innerhalb der hellen Seite.
- * Setzt die Tokens lokal um, damit auch shadcn-Komponenten korrekt erben.
+ * Ruhig abgesetzte Sektionen — hell & warm, KEIN Schwarz mehr.
+ * Text bleibt anthrazit und lesbar; Motiv nur als feine Struktur.
  */
 .section-dark {
-  --background: #201e1b;
-  --foreground: #fbfbf9;
-  --surface: #2a2723;
-  --surface-raised: #322e29;
-  --muted: #2a2723;
-  --muted-foreground: #a7a099;
-  --line: #38332d;
-  --line-strong: #4f4941;
-  --gold: #d3a763;
+  --background: #f3f1ec;
+  --foreground: #2a2723;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --muted: #ece9e2;
+  --muted-foreground: #6d6a63;
+  --line: #e0dcd3;
+  --line-strong: #cec9c0;
+  --gold: #be904e;
   --gold-soft: #e4c378;
-  --gold-deep: #be904e;
-  --mesh: #3a352f;
-  --mesh-fill: #d3a763;
-  --card: #2a2723;
-  --card-foreground: #fbfbf9;
-  --primary: #d3a763;
-  --primary-foreground: #201e1b;
-  --secondary: #2a2723;
-  --secondary-foreground: #fbfbf9;
-  --border: #38332d;
-  --input: #4f4941;
-  --ring: #d3a763;
+  --gold-deep: #8f6a33;
+  --mesh: #ddd8cf;
+  --mesh-fill: #be904e;
+  --card: #ffffff;
+  --card-foreground: #2a2723;
+  --primary: #be904e;
+  --primary-foreground: #241c11;
+  --secondary: #ece9e2;
+  --secondary-foreground: #2a2723;
+  --border: #e0dcd3;
+  --input: #cec9c0;
+  --ring: #be904e;
   background-color: var(--background);
   color: var(--foreground);
 }

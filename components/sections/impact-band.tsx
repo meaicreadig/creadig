@@ -14,7 +14,7 @@ export function ImpactBand() {
       <SignatureMotif
         direction="up"
         density={0.5}
-        className="pointer-events-none absolute inset-0 h-full w-full opacity-70"
+        className="pointer-events-none absolute inset-0 h-full w-full opacity-20"
       />
       <div
         aria-hidden="true"

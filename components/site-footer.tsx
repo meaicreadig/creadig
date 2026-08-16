@@ -10,13 +10,13 @@ export function SiteFooter() {
 
   return (
     <footer className="section-dark relative overflow-hidden">
-      <div aria-hidden="true" className="triangle-mesh absolute inset-0 opacity-40" />
+      <div aria-hidden="true" className="triangle-mesh absolute inset-0 opacity-[0.12]" />
 
       <div className="relative mx-auto w-full max-w-[100rem] px-6 pt-24 pb-10 md:px-10 md:pt-32 lg:px-16">
         {/* Riesige Wortmarke */}
         <div className="border-line border-b pb-14">
           <a href="/#top" className="inline-block" aria-label="creaDIG — nach oben">
-            <Logo variant="light" className="h-[clamp(2.5rem,9vw,7rem)]" />
+            <Logo variant="auto" className="h-[clamp(1.9rem,4vw,3.1rem)]" />
           </a>
           <p className="text-muted-foreground mt-6 max-w-xl text-base text-pretty md:text-lg">
             {t.footer.tagline}

@@ -2,15 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "creadig-static",
-      "runtimeExecutable": "node",
-      "runtimeArgs": [".claude/static-server.mjs"],
-      "port": 8910
-    },
-    {
-      "name": "creadig-v0",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["-C", "/private/tmp/claude-501/-Users-muhammedeminakyol-Documents-creaDIG-Solutions/bd8937a3-c449-4c4f-b53d-fe42a70d565a/scratchpad/crea-dig-3", "dev"],
+      "name": "creadig-site",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
       "port": 3000,
       "autoPort": true
     }

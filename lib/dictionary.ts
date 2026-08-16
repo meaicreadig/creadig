@@ -42,7 +42,7 @@ export const dictionary = {
       signals: {
         since: { label: "Seit", detail: "Aus der Agentur zum System-Haus gewachsen." },
         products: { label: "Eigene Produkte", detail: "meAI, fibero, CASSAMEA, meahv — selbst gebaut." },
-        regions: { label: "Märkte", detail: "Deutschland und Schweiz, zweisprachig." },
+        regions: { label: "Märkte", detail: "Deutschland & Schweiz — auf Deutsch & Türkisch." },
         scope: { label: "Von Marke bis KI", detail: "Fünf Ebenen, ein Haus." },
       },
       note: "Systeme im Tagesbetrieb — nicht in der Präsentation.",
@@ -422,7 +422,7 @@ export const dictionary = {
       signals: {
         since: { label: "Beri", detail: "Ajanstan sistem evine büyüdük." },
         products: { label: "Kendi ürünlerimiz", detail: "meAI, fibero, CASSAMEA, meahv — kendimiz kurduk." },
-        regions: { label: "Pazarlar", detail: "Almanya ve İsviçre, iki dilde." },
+        regions: { label: "Pazarlar", detail: "Almanya ve İsviçre — Almanca & Türkçe." },
         scope: { label: "Markadan yapay zekâya", detail: "Beş katman, tek çatı." },
       },
       note: "Sistemler günlük kullanımda — sunumda değil.",

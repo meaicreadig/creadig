@@ -58,7 +58,7 @@ export function SiteNav() {
     >
       <div className="mx-auto flex h-[4.5rem] max-w-[88rem] items-center justify-between gap-6 px-6 lg:px-10">
         <a href="/#top" className="shrink-0" aria-label="creaDIG — zur Startseite">
-          <Logo variant="auto" className="h-7 md:h-8" priority />
+          <Logo variant="auto" className="h-6 md:h-[1.65rem]" priority />
         </a>
 
         <nav aria-label="Hauptnavigation" className="hidden items-center gap-8 lg:flex">
@@ -155,7 +155,7 @@ export function SiteNav() {
             >
               <SheetHeader className="h-[4.5rem] justify-center px-6 py-0">
                 <SheetTitle className="text-left">
-                  <Logo variant="auto" className="h-7" />
+                  <Logo variant="auto" className="h-6" />
                   <span className="sr-only">creaDIG</span>
                 </SheetTitle>
               </SheetHeader>
