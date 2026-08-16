@@ -19,7 +19,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light")
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("credig-theme")
+    const stored = window.localStorage.getItem("creadig-theme")
     if (stored === "dark" || stored === "light") setTheme(stored)
   }, [])
 
@@ -31,7 +31,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {
       const next = prev === "light" ? "dark" : "light"
-      window.localStorage.setItem("credig-theme", next)
+      window.localStorage.setItem("creadig-theme", next)
       return next
     })
   }, [])
