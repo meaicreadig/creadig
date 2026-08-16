@@ -65,11 +65,11 @@ export function Hero() {
             {t.hero.subline}
           </p>
           <div className="flex flex-wrap items-start gap-3 lg:col-span-5 lg:justify-end">
-            <MagneticButton href="#kontakt">
+            <MagneticButton href="/#kontakt">
               {t.hero.ctaPrimary}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
             </MagneticButton>
-            <MagneticButton href="#arbeiten" variant="ghost">
+            <MagneticButton href="/#arbeiten" variant="ghost">
               {t.hero.ctaSecondary}
             </MagneticButton>
           </div>
@@ -84,7 +84,7 @@ export function Hero() {
       >
         <span className="eyebrow text-muted-foreground">{t.hero.location}</span>
         <a
-          href="#fundament"
+          href="/#fundament"
           className="text-muted-foreground hover:text-foreground flex items-center gap-2.5 text-[0.6875rem] tracking-[0.18em] uppercase transition-colors"
         >
           {t.hero.scroll}

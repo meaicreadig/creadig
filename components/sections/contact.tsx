@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { ArrowUpRight, CalendarDays, MessageSquare, Send } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
@@ -20,6 +21,8 @@ export function Contact() {
   const [name, setName] = useState("")
   const [business, setBusiness] = useState("")
   const [message, setMessage] = useState("")
+  const [invalid, setInvalid] = useState<{ name?: boolean; message?: boolean }>({})
+  const [error, setError] = useState<string | null>(null)
 
   const composed = [
     name && `${t.contact.nameLabel}: ${name}`,
@@ -65,8 +68,18 @@ export function Contact() {
             <Reveal delay={0.12}>
               <form
                 className="mt-12 flex flex-col gap-8"
+                noValidate
                 onSubmit={(e) => {
                   e.preventDefault()
+                  // Gleiche Regel wie in der alten `ct_*`-Logik: ohne Name und
+                  // ohne Anliegen wird nichts verschickt.
+                  const bad = { name: !name.trim(), message: !message.trim() }
+                  setInvalid(bad)
+                  if (bad.name || bad.message) {
+                    setError(t.contact.errRequired)
+                    return
+                  }
+                  setError(null)
                   window.open(whatsappHref, "_blank", "noopener,noreferrer")
                 }}
               >
@@ -79,9 +92,13 @@ export function Contact() {
                       <Input
                         id="contact-name"
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e) => {
+                          setName(e.target.value)
+                          setInvalid((v) => ({ ...v, name: false }))
+                        }}
+                        aria-invalid={invalid.name || undefined}
                         placeholder={t.contact.namePlaceholder}
-                        className={fieldClass}
+                        className={`${fieldClass} ${invalid.name ? "border-destructive" : ""}`}
                       />
                     </Field>
                     <Field>
@@ -108,13 +125,23 @@ export function Contact() {
                     <Textarea
                       id="contact-message"
                       value={message}
-                      onChange={(e) => setMessage(e.target.value)}
+                      onChange={(e) => {
+                        setMessage(e.target.value)
+                        setInvalid((v) => ({ ...v, message: false }))
+                      }}
+                      aria-invalid={invalid.message || undefined}
                       rows={3}
                       placeholder={t.contact.messagePlaceholder}
-                      className={`${fieldClass} resize-none`}
+                      className={`${fieldClass} resize-none ${invalid.message ? "border-destructive" : ""}`}
                     />
                   </Field>
                 </FieldGroup>
+
+                {error && (
+                  <p role="alert" className="border-destructive/40 text-destructive border-l-2 py-1 pl-4 text-sm">
+                    {error}
+                  </p>
+                )}
 
                 <div className="flex flex-wrap items-center gap-3">
                   <button
@@ -173,12 +200,8 @@ export function Contact() {
             </Reveal>
 
             <Reveal delay={0.12}>
-              <a
-                href={`${contact.whatsappHref}?text=${encodeURIComponent(
-                  "Guten Tag creaDIG, ich möchte einen Termin vereinbaren.",
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/termin"
                 className="group border-line hover:bg-foreground/[0.03] relative flex items-start gap-5 border-t p-7 transition-colors duration-500"
               >
                 <span
@@ -197,7 +220,7 @@ export function Contact() {
                   className="text-line-strong group-hover:text-gold mt-1 size-4 transition-colors duration-500"
                   strokeWidth={1.5}
                 />
-              </a>
+              </Link>
             </Reveal>
 
             <Reveal delay={0.18}>

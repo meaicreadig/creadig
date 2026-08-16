@@ -2,6 +2,11 @@ import type { Metadata, Viewport } from "next"
 import { Poppins, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { LocaleProvider } from "@/components/locale-provider"
+import { SiteNav } from "@/components/site-nav"
+import { SiteFooter } from "@/components/site-footer"
+import { StickyWhatsApp } from "@/components/sticky-whatsapp"
+import { AiAssistant } from "@/components/ai-assistant"
 
 // CEO-Entscheidung: Poppins — rund-geometrisch, passt zum Logo. Nicht Geist.
 const poppins = Poppins({
@@ -92,7 +97,15 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <LocaleProvider>
+            <SiteNav />
+            {children}
+            <SiteFooter />
+            <StickyWhatsApp />
+            <AiAssistant />
+          </LocaleProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

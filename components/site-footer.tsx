@@ -1,6 +1,7 @@
 "use client"
 
 import { useLocale } from "@/components/locale-provider"
+import Link from "next/link"
 import { Logo } from "@/components/brand/logo"
 import { contact, navLinks, ownProducts } from "@/lib/site-data"
 
@@ -14,7 +15,7 @@ export function SiteFooter() {
       <div className="relative mx-auto w-full max-w-[100rem] px-6 pt-24 pb-10 md:px-10 md:pt-32 lg:px-16">
         {/* Riesige Wortmarke */}
         <div className="border-line border-b pb-14">
-          <a href="#top" className="inline-block" aria-label="creaDIG — nach oben">
+          <a href="/#top" className="inline-block" aria-label="creaDIG — nach oben">
             <Logo variant="light" className="h-[clamp(2.5rem,9vw,7rem)]" />
           </a>
           <p className="text-muted-foreground mt-6 max-w-xl text-base text-pretty md:text-lg">
@@ -29,7 +30,7 @@ export function SiteFooter() {
               {navLinks.map((link) => (
                 <li key={link.id}>
                   <a
-                    href={`#${link.id}`}
+                    href={`/#${link.id}`}
                     className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
                   >
                     {t.nav[link.labelKey]}
@@ -64,22 +65,29 @@ export function SiteFooter() {
           <div>
             <p className="eyebrow text-gold">{t.footer.legalLabel}</p>
             <ul className="mt-6 flex flex-col gap-3.5">
-              {/* TODO: Echte Rechtstexte hinterlegen. */}
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/impressum"
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
                 >
                   {t.footer.imprint}
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/datenschutz"
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
                 >
                   {t.footer.privacy}
-                </a>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/termin"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                >
+                  {t.contact.appointmentTitle}
+                </Link>
               </li>
             </ul>
             <p className="text-line-strong mt-5 font-mono text-[0.6875rem]">{t.footer.legalNote}</p>

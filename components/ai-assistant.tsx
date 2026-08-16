@@ -11,7 +11,11 @@ type Turn = { role: "assistant" | "user"; text: string }
 
 /**
  * Regelbasierter Demo-Assistent. Bewusst ohne Modell-Anbindung:
- * die Antworten sind kuratiert und als Demo gekennzeichnet.
+ * die Antworten sind kuratiert und in der UI als Demo gekennzeichnet.
+ *
+ * TODO: API — hier später einen Server-Route-Handler (`app/api/chat`) gegen
+ * die Claude-API anbinden. Bis dahin blockiert der Assistent nichts: Er
+ * antwortet sofort und verweist im Zweifel auf WhatsApp.
  */
 function pickAnswer(input: string, t: ReturnType<typeof useLocale>["t"]) {
   const q = input.toLowerCase()

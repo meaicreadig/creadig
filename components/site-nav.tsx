@@ -57,7 +57,7 @@ export function SiteNav() {
       )}
     >
       <div className="mx-auto flex h-[4.5rem] max-w-[88rem] items-center justify-between gap-6 px-6 lg:px-10">
-        <a href="#top" className="shrink-0" aria-label="creaDIG — zur Startseite">
+        <a href="/#top" className="shrink-0" aria-label="creaDIG — zur Startseite">
           <Logo variant="auto" className="h-7 md:h-8" priority />
         </a>
 
@@ -65,7 +65,7 @@ export function SiteNav() {
           {navLinks.map((link) => (
             <a
               key={link.id}
-              href={`#${link.id}`}
+              href={`/#${link.id}`}
               className="group relative py-1 text-[0.8125rem] tracking-wide text-muted-foreground transition-colors duration-300 hover:text-foreground"
             >
               {t.nav[link.labelKey]}
@@ -125,7 +125,7 @@ export function SiteNav() {
           </Button>
 
           <a
-            href="#kontakt"
+            href="/#kontakt"
             className="group relative ml-1.5 hidden items-center overflow-hidden bg-gradient-to-br from-gold-soft to-gold px-6 py-3 text-[0.75rem] tracking-[0.1em] text-[#201e1b] uppercase sm:inline-flex"
           >
             <span
@@ -164,7 +164,7 @@ export function SiteNav() {
                 {navLinks.map((link, index) => (
                   <SheetClose asChild key={link.id}>
                     <motion.a
-                      href={`#${link.id}`}
+                      href={`/#${link.id}`}
                       initial={{ opacity: 0, y: 14 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.06 * index + 0.1, duration: 0.5 }}
@@ -179,7 +179,7 @@ export function SiteNav() {
               <div className="flex flex-col gap-3 px-6 pt-10">
                 <SheetClose asChild>
                   <a
-                    href="#kontakt"
+                    href="/#kontakt"
                     className="flex items-center justify-center bg-gradient-to-br from-gold-soft to-gold px-6 py-4 text-sm tracking-wide text-[#201e1b]"
                   >
                     {t.nav.cta}
