@@ -165,6 +165,13 @@ export const dictionary = {
       honesty:
         "Wir nennen keine erfundenen Mitarbeiter- oder Umsatzzahlen. Unser Beweis ist gebaute Arbeit.",
     },
+    location: {
+      eyebrow: "Unser Sitz",
+      note: "Sie finden uns im InnovationsCentrum Osnabrück. Termine nach Vereinbarung — persönlich, per Video oder über WhatsApp.",
+      mapLink: "Auf der Karte ansehen",
+      photoAlt:
+        "Das ICO InnovationsCentrum Osnabrück an der Albert-Einstein-Straße 1 — Sitz von creaDIG",
+    },
     packages: {
       eyebrow: "Pakete",
       title: "Ihr erster Schritt mit creaDIG.",
@@ -613,6 +620,13 @@ export const dictionary = {
       locationsLabel: "Merkez",
       marketsLabel: "Pazarlar",
       honesty: "Uydurma çalışan veya ciro sayıları vermiyoruz. Kanıtımız yaptığımız işlerdir.",
+    },
+    location: {
+      eyebrow: "Merkezimiz",
+      note: "Bizi Osnabrück InnovationsCentrum'da bulabilirsiniz. Randevular önceden anlaşmayla — yüz yüze, görüntülü ya da WhatsApp üzerinden.",
+      mapLink: "Haritada görüntüle",
+      photoAlt:
+        "Albert-Einstein-Straße 1'deki ICO InnovationsCentrum Osnabrück — creaDIG'in merkezi",
     },
     packages: {
       eyebrow: "Paketler",

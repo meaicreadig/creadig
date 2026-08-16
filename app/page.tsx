@@ -7,6 +7,7 @@ import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
 import { Process } from "@/components/sections/process"
 import { Certifications } from "@/components/sections/certifications"
 import { About } from "@/components/sections/about"
+import { Location } from "@/components/sections/location"
 import { Packages } from "@/components/sections/packages"
 import { Contact } from "@/components/sections/contact"
 
@@ -22,6 +23,7 @@ export default function Page() {
       <Process />
       <Certifications />
       <About />
+      <Location />
       <Packages />
       <Contact />
     </main>
