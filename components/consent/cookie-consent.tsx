@@ -1,0 +1,251 @@
+"use client"
+
+import { useCallback, useEffect, useState } from "react"
+import Link from "next/link"
+import { Check, ShieldCheck, SlidersHorizontal, X } from "lucide-react"
+import { useLocale } from "@/components/locale-provider"
+import {
+  ACCEPT_ALL,
+  CONSENT_OPEN_EVENT,
+  ESSENTIAL_ONLY,
+  optionalCategories,
+  readConsent,
+  writeConsent,
+  type ConsentChoice,
+  type OptionalCategory,
+} from "@/lib/consent"
+
+/** Kleiner Schalter im Hairline-Stil der Seite — Gold, wenn aktiv. */
+function Switch({
+  checked,
+  disabled,
+  label,
+  onChange,
+}: {
+  checked: boolean
+  disabled?: boolean
+  label: string
+  onChange?: (next: boolean) => void
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      disabled={disabled}
+      onClick={() => onChange?.(!checked)}
+      className={`relative h-6 w-11 shrink-0 border transition-colors duration-400 ${
+        checked ? "border-gold bg-gold/25" : "border-line-strong bg-transparent"
+      } ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+    >
+      <span
+        aria-hidden="true"
+        className={`absolute top-1/2 size-4 -translate-y-1/2 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          checked ? "bg-gold left-[1.5rem]" : "bg-line-strong left-[0.15rem]"
+        }`}
+      />
+    </button>
+  )
+}
+
+/**
+ * Cookie-Consent nach DSGVO / § 25 TDDDG.
+ *
+ * Drei Wege beim Erstbesuch: alles akzeptieren, nur essenzielle, oder
+ * individuelle Präferenzen. Essenziell ist immer aktiv und nicht abwählbar.
+ * Nicht-essenzielle Speicherung passiert erst NACH der Einwilligung —
+ * Sprache und Erscheinungsbild werden ohne Einwilligung nur in der laufenden
+ * Sitzung gehalten (siehe locale-provider / theme-provider).
+ *
+ * Bewusst KEIN USA-Transfer-Hinweis: Diese Seite lädt keinen Dienst aus einem
+ * Drittland (Schriften self-hosted via next/font, kein Analytics, keine Maps).
+ * Begründung siehe lib/consent.ts.
+ */
+export function CookieConsent() {
+  const { t } = useLocale()
+  const [open, setOpen] = useState(false)
+  const [details, setDetails] = useState(false)
+  const [choice, setChoice] = useState<ConsentChoice>(ESSENTIAL_ONLY)
+  /** Erst nach der Hydration entscheiden, sonst Markup-Mismatch. */
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    const stored = readConsent()
+    if (stored) {
+      setChoice({ functional: stored.functional, statistics: stored.statistics })
+    } else {
+      setOpen(true)
+    }
+    setReady(true)
+  }, [])
+
+  // Footer-Link „Cookie-Einstellungen" öffnet das Banner erneut — mit Details.
+  useEffect(() => {
+    const reopen = () => {
+      const stored = readConsent()
+      if (stored) setChoice({ functional: stored.functional, statistics: stored.statistics })
+      setDetails(true)
+      setOpen(true)
+    }
+    window.addEventListener(CONSENT_OPEN_EVENT, reopen)
+    return () => window.removeEventListener(CONSENT_OPEN_EVENT, reopen)
+  }, [])
+
+  const decide = useCallback((next: ConsentChoice) => {
+    writeConsent(next)
+    setChoice(next)
+    setOpen(false)
+    setDetails(false)
+  }, [])
+
+  if (!ready || !open) return null
+
+  const decided = readConsent() !== null
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="consent-title"
+      className="fixed inset-x-0 bottom-0 z-[60] px-4 pb-4 md:px-6 md:pb-6"
+    >
+      <div className="border-line-strong bg-background/97 relative mx-auto w-full max-w-4xl border shadow-[0_28px_80px_-28px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+        <span aria-hidden="true" className="bg-gold absolute inset-x-0 top-0 h-px" />
+
+        {/* Erneut geöffnet? Dann darf man ohne neue Entscheidung wieder zumachen. */}
+        {decided && (
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false)
+              setDetails(false)
+            }}
+            aria-label={t.consent.close}
+            className="text-muted-foreground hover:text-gold absolute top-4 right-4 transition-colors duration-400"
+          >
+            <X className="size-4" strokeWidth={1.5} />
+          </button>
+        )}
+
+        <div className="max-h-[75dvh] overflow-y-auto px-6 py-7 md:px-9 md:py-8">
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="text-gold size-4 shrink-0" strokeWidth={1.5} />
+            <p id="consent-title" className="eyebrow text-muted-foreground">
+              {details ? t.consent.settingsTitle : t.consent.title}
+            </p>
+          </div>
+
+          <p className="text-foreground/90 mt-5 max-w-2xl text-[0.9375rem] leading-relaxed text-pretty">
+            {t.consent.intro}
+          </p>
+          <p className="text-muted-foreground mt-3 max-w-2xl text-[0.8125rem] leading-relaxed text-pretty">
+            {t.consent.minors}
+          </p>
+          <p className="text-muted-foreground mt-3 max-w-2xl text-[0.8125rem] leading-relaxed text-pretty">
+            {t.consent.privacyPrefix}{" "}
+            <Link
+              href="/datenschutz"
+              className="text-gold underline underline-offset-4 hover:opacity-80"
+            >
+              {t.consent.privacyLink}
+            </Link>
+            . {t.consent.revoke}
+          </p>
+
+          {details && (
+            <div className="border-line mt-8 flex flex-col gap-px border-t">
+              {/* Essenziell — immer aktiv, nicht abwählbar. */}
+              <div className="border-line flex items-start gap-5 border-b py-5">
+                <Switch checked disabled label={t.consent.categories.essential.name} />
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <p className="text-foreground text-[0.9375rem] font-semibold">
+                      {t.consent.categories.essential.name}
+                    </p>
+                    <span className="border-gold/50 text-gold border px-2 py-0.5 font-mono text-[0.5625rem] tracking-[0.14em] uppercase">
+                      {t.consent.alwaysActive}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground mt-2.5 text-[0.8125rem] leading-relaxed text-pretty">
+                    {t.consent.categories.essential.body}
+                  </p>
+                </div>
+              </div>
+
+              {optionalCategories.map((category: OptionalCategory) => (
+                <div key={category} className="border-line flex items-start gap-5 border-b py-5">
+                  <Switch
+                    checked={choice[category]}
+                    label={t.consent.categories[category].name}
+                    onChange={(next) => setChoice((prev) => ({ ...prev, [category]: next }))}
+                  />
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <p className="text-foreground text-[0.9375rem] font-semibold">
+                        {t.consent.categories[category].name}
+                      </p>
+                      {category === "statistics" && (
+                        <span className="border-line-strong text-muted-foreground border px-2 py-0.5 font-mono text-[0.5625rem] tracking-[0.14em] uppercase">
+                          {t.consent.notInUse}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-muted-foreground mt-2.5 text-[0.8125rem] leading-relaxed text-pretty">
+                      {t.consent.categories[category].body}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <button
+              type="button"
+              onClick={() => decide(ACCEPT_ALL)}
+              className="group/cta from-gold-soft to-gold relative inline-flex items-center justify-center gap-2.5 overflow-hidden bg-gradient-to-br px-7 py-3.5 text-sm tracking-wide text-[#201e1b]"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/cta:translate-y-0"
+              />
+              <span className="group-hover/cta:text-gold-soft relative z-10 flex items-center gap-2.5 transition-colors duration-500">
+                <Check className="size-4" strokeWidth={1.5} />
+                {t.consent.acceptAll}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => decide(ESSENTIAL_ONLY)}
+              className="border-line-strong hover:border-gold hover:text-gold inline-flex items-center justify-center border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
+            >
+              {t.consent.essentialOnly}
+            </button>
+
+            {details ? (
+              <button
+                type="button"
+                onClick={() => decide(choice)}
+                className="border-line-strong hover:border-gold hover:text-gold inline-flex items-center justify-center gap-2.5 border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
+              >
+                <Check className="size-4" strokeWidth={1.5} />
+                {t.consent.save}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setDetails(true)}
+                className="text-muted-foreground hover:text-gold inline-flex items-center justify-center gap-2 py-3.5 text-sm tracking-wide transition-colors duration-500 sm:px-2"
+              >
+                <SlidersHorizontal className="size-4" strokeWidth={1.5} />
+                {t.consent.customize}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

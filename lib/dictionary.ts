@@ -365,7 +365,11 @@ export const dictionary = {
         },
         {
           title: "Schriften",
-          body: "Poppins und JetBrains Mono werden lokal ausgeliefert. Es besteht keine Verbindung zu Google Fonts.",
+          body: "Poppins und JetBrains Mono werden lokal ausgeliefert. Es besteht keine Verbindung zu Google Fonts. Aus demselben Grund findet keine Datenübermittlung in Drittländer statt — wir binden keine Analyse-, Karten- oder Werbedienste ein.",
+        },
+        {
+          title: "Einwilligung und lokale Speicherung",
+          body: "Ihre Entscheidung aus dem Einwilligungs-Banner speichern wir im lokalen Speicher Ihres Browsers (Schlüssel „creadig_consent“). Nur mit Ihrer Einwilligung merken wir uns zusätzlich die Sprachwahl und das Erscheinungsbild; ohne Einwilligung gelten diese Einstellungen nur für die laufende Sitzung. Es werden dabei keine Daten an Dritte übermittelt. Ihre Wahl können Sie jederzeit unter „Cookie-Einstellungen“ anpassen oder widerrufen — beim Widerruf entfernen wir die betroffenen Einträge sofort.",
         },
         {
           title: "Ihre Rechte",
@@ -373,6 +377,40 @@ export const dictionary = {
         },
       ],
       privacyNote: "Diese Fassung wird mit den vollständigen Firmendaten juristisch final geprüft.",
+    },
+    consent: {
+      title: "Ihre Einwilligung",
+      intro:
+        "Diese Seite speichert nur, was sie zum Funktionieren braucht — und was Sie erlauben. Für alles, was nicht technisch notwendig ist, brauchen wir Ihre Einwilligung.",
+      minors:
+        "Sind Sie unter 16 Jahre alt, holen Sie bitte die Zustimmung Ihrer Erziehungsberechtigten ein, bevor Sie nicht notwendige Funktionen erlauben.",
+      privacyPrefix: "Einzelheiten stehen in unserer",
+      privacyLink: "Datenschutzerklärung",
+      revoke:
+        "Ihre Wahl können Sie jederzeit über „Cookie-Einstellungen“ im Footer anpassen oder widerrufen.",
+      acceptAll: "Alle akzeptieren",
+      essentialOnly: "Nur essenzielle akzeptieren",
+      customize: "Individuelle Datenschutz-Präferenzen",
+      save: "Auswahl speichern",
+      alwaysActive: "Immer aktiv",
+      notInUse: "Derzeit nicht im Einsatz",
+      settingsLabel: "Cookie-Einstellungen",
+      settingsTitle: "Datenschutz-Präferenzen",
+      close: "Schließen",
+      categories: {
+        essential: {
+          name: "Essenziell",
+          body: "Speichert allein Ihre Entscheidung aus diesem Banner, damit wir nicht bei jedem Aufruf erneut fragen müssen. Ohne diese Speicherung funktioniert die Einwilligung selbst nicht.",
+        },
+        functional: {
+          name: "Komfort",
+          body: "Merkt sich Ihre Sprachwahl (Deutsch/Türkisch) und das Erscheinungsbild (hell/dunkel). Ohne Einwilligung gilt Ihre Wahl nur für die laufende Sitzung.",
+        },
+        statistics: {
+          name: "Reichweitenmessung",
+          body: "Wir setzen derzeit keinen Analyse- oder Tracking-Dienst ein. Ihre Entscheidung wird gespeichert und gilt, falls sich das künftig ändert.",
+        },
+      },
     },
     footer: {
       tagline: "System-Haus für Marke, Web, Operations, Automation und KI.",
@@ -769,7 +807,11 @@ export const dictionary = {
         },
         {
           title: "Yazı tipleri",
-          body: "Poppins ve JetBrains Mono yerel olarak sunulur. Google Fonts ile bağlantı kurulmaz.",
+          body: "Poppins ve JetBrains Mono yerel olarak sunulur. Google Fonts ile bağlantı kurulmaz. Aynı nedenle üçüncü ülkelere veri aktarımı da olmaz — analiz, harita veya reklam hizmeti kullanmıyoruz.",
+        },
+        {
+          title: "Onay ve yerel kayıt",
+          body: "Onay penceresindeki kararınızı tarayıcınızın yerel deposunda saklıyoruz („creadig_consent“ anahtarı). Yalnızca onayınızla ek olarak dil seçiminizi ve görünümü hatırlıyoruz; onay yoksa bu ayarlar sadece açık oturum için geçerlidir. Bu sırada üçüncü taraflara hiçbir veri aktarılmaz. Seçiminizi istediğiniz zaman „Çerez ayarları“ üzerinden değiştirebilir veya geri alabilirsiniz — geri aldığınızda ilgili kayıtları anında sileriz.",
         },
         {
           title: "Haklarınız",
@@ -777,6 +819,40 @@ export const dictionary = {
         },
       ],
       privacyNote: "Bu metin, şirket bilgileri tamamlandığında hukuken son kez kontrol edilecektir.",
+    },
+    consent: {
+      title: "Onayınız",
+      intro:
+        "Bu site yalnızca çalışmak için gerekeni ve sizin izin verdiğinizi saklar. Teknik olarak zorunlu olmayan her şey için onayınıza ihtiyacımız var.",
+      minors:
+        "16 yaşından küçükseniz, zorunlu olmayan işlevlere izin vermeden önce lütfen veli veya vasinizin onayını alın.",
+      privacyPrefix: "Ayrıntılar",
+      privacyLink: "gizlilik metnimizde",
+      revoke:
+        "Seçiminizi istediğiniz zaman alt bilgideki „Çerez ayarları“ üzerinden değiştirebilir veya geri alabilirsiniz.",
+      acceptAll: "Tümünü kabul et",
+      essentialOnly: "Yalnızca zorunlu olanlar",
+      customize: "Kişisel gizlilik tercihleri",
+      save: "Seçimi kaydet",
+      alwaysActive: "Her zaman etkin",
+      notInUse: "Şu anda kullanılmıyor",
+      settingsLabel: "Çerez ayarları",
+      settingsTitle: "Gizlilik tercihleri",
+      close: "Kapat",
+      categories: {
+        essential: {
+          name: "Zorunlu",
+          body: "Yalnızca bu penceredeki kararınızı saklar, böylece her ziyarette yeniden sormak zorunda kalmayız. Bu kayıt olmadan onay mekanizması çalışmaz.",
+        },
+        functional: {
+          name: "Konfor",
+          body: "Dil seçiminizi (Almanca/Türkçe) ve görünümü (açık/koyu) hatırlar. Onay olmadan seçiminiz yalnızca bu oturum için geçerlidir.",
+        },
+        statistics: {
+          name: "Erişim ölçümü",
+          body: "Şu anda hiçbir analiz veya izleme hizmeti kullanmıyoruz. Kararınız yine de kaydedilir ve ileride bu değişirse geçerli olur.",
+        },
+      },
     },
     footer: {
       tagline: "Marka, web, operations, automation ve yapay zekâ için sistem evi.",

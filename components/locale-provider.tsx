@@ -1,7 +1,8 @@
 "use client"
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { dictionary, type Dictionary, type Locale } from "@/lib/dictionary"
+import { CONSENT_CHANGE_EVENT, hasConsent } from "@/lib/consent"
 
 type LocaleContextValue = {
   locale: Locale
@@ -23,8 +24,13 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
   // DE ist primär und zugleich der Server-Render — die gespeicherte Wahl wird
   // erst nach der Hydration angewandt, damit kein Markup-Mismatch entsteht.
   const [locale, setLocaleState] = useState<Locale>("de")
+  const localeRef = useRef<Locale>("de")
+  localeRef.current = locale
 
   useEffect(() => {
+    // Ohne Komfort-Einwilligung wird nichts gelesen — die Wahl gilt dann nur
+    // für die laufende Sitzung (siehe lib/consent.ts).
+    if (!hasConsent("functional")) return
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY)
       if (stored === "tr" || stored === "de") setLocaleState(stored)
@@ -39,11 +45,27 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next)
+    if (!hasConsent("functional")) return
     try {
       window.localStorage.setItem(STORAGE_KEY, next)
     } catch {
       // Nicht kritisch: die Wahl gilt dann nur für diese Sitzung.
     }
+  }, [])
+
+  // Wird die Komfort-Kategorie nachträglich erlaubt, sichern wir die aktuelle
+  // Wahl. Beim Widerruf räumt lib/consent.ts den Schlüssel selbst weg.
+  useEffect(() => {
+    const onConsentChange = () => {
+      if (!hasConsent("functional")) return
+      try {
+        window.localStorage.setItem(STORAGE_KEY, localeRef.current)
+      } catch {
+        // Ohne Storage bleibt es bei der Sitzungs-Wahl.
+      }
+    }
+    window.addEventListener(CONSENT_CHANGE_EVENT, onConsentChange)
+    return () => window.removeEventListener(CONSENT_CHANGE_EVENT, onConsentChange)
   }, [])
 
   const toggleLocale = useCallback(() => {

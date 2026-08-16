@@ -1,9 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, SlidersHorizontal } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { contact } from "@/lib/site-data"
+import { openConsentSettings } from "@/lib/consent"
 
 /**
  * Gemeinsames Gerüst für /impressum und /datenschutz.
@@ -84,6 +85,19 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
                 </p>
               </section>
             ))}
+
+            {/* Widerruf muss so leicht sein wie die Einwilligung. */}
+            <section className="border-line border-t pt-8">
+              <p className="eyebrow text-gold">{t.consent.settingsTitle}</p>
+              <button
+                type="button"
+                onClick={openConsentSettings}
+                className="border-line-strong hover:border-gold hover:text-gold mt-5 inline-flex items-center gap-2.5 border px-6 py-3 text-sm tracking-wide transition-colors duration-500"
+              >
+                <SlidersHorizontal className="size-4" strokeWidth={1.5} />
+                {t.consent.settingsLabel}
+              </button>
+            </section>
 
             <section className="border-line border-t pt-8">
               <p className="eyebrow text-gold">{t.legal.contactLabel}</p>

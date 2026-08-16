@@ -7,6 +7,7 @@ import { SiteNav } from "@/components/site-nav"
 import { SiteFooter } from "@/components/site-footer"
 import { StickyWhatsApp } from "@/components/sticky-whatsapp"
 import { AiAssistant } from "@/components/ai-assistant"
+import { CookieConsent } from "@/components/consent/cookie-consent"
 
 // CEO-Entscheidung: Poppins — rund-geometrisch, passt zum Logo. Nicht Geist.
 const poppins = Poppins({
@@ -115,6 +116,7 @@ export default function RootLayout({
             <SiteFooter />
             <StickyWhatsApp />
             <AiAssistant />
+            <CookieConsent />
           </LocaleProvider>
         </ThemeProvider>
       </body>

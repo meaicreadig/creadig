@@ -4,6 +4,7 @@ import { useLocale } from "@/components/locale-provider"
 import Link from "next/link"
 import { Logo } from "@/components/brand/logo"
 import { contact, navLinks, ownProducts } from "@/lib/site-data"
+import { openConsentSettings } from "@/lib/consent"
 
 export function SiteFooter() {
   const { t } = useLocale()
@@ -98,8 +99,17 @@ export function SiteFooter() {
                   {t.contact.appointmentTitle}
                 </Link>
               </li>
+              {/* Widerruf/Anpassung der Einwilligung — jederzeit erreichbar. */}
+              <li>
+                <button
+                  type="button"
+                  onClick={openConsentSettings}
+                  className="text-muted-foreground hover:text-foreground text-left text-sm transition-colors duration-400"
+                >
+                  {t.consent.settingsLabel}
+                </button>
+              </li>
             </ul>
-            <p className="text-line-strong mt-5 font-mono text-[0.6875rem]">{t.footer.legalNote}</p>
           </div>
 
           <div>
