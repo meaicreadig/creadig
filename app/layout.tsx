@@ -24,7 +24,16 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 })
 
+/**
+ * Domain-ready: Die Seite läuft heute auf creadig.vercel.app, soll aber ohne
+ * Rebuild auf creadig.de umziehen können. Nur diese eine Variable steuert
+ * Canonicals und OG-URLs — die DNS-Umstellung macht der Owner im Registrar.
+ */
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://creadig.de"
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
   title: {
     default: "creaDIG — System-Haus für Marke, Web und KI",
     template: "%s · creaDIG",
@@ -51,6 +60,7 @@ export const metadata: Metadata = {
     locale: "de_DE",
     type: "website",
     siteName: "creaDIG",
+    url: "/",
   },
   robots: { index: true, follow: true },
 }
@@ -79,6 +89,7 @@ const organizationSchema = {
   },
   founder: { "@type": "Person", name: "Muhammed Emin Akyol" },
   telephone: "+41765045879",
+  url: SITE_URL,
 }
 
 export default function RootLayout({

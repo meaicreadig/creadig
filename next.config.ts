@@ -12,6 +12,14 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }]
   },
+  async redirects() {
+    return [
+      // Alte statische Seite: Einstiegspunkte sauber weiterleiten,
+      // damit bestehende Links und QR-Codes nicht ins Leere laufen.
+      { source: "/termin.html", destination: "/termin", permanent: true },
+      { source: "/index.html", destination: "/", permanent: true },
+    ]
+  },
 }
 
 export default nextConfig
