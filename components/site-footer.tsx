@@ -37,6 +37,15 @@ export function SiteFooter() {
                   </a>
                 </li>
               ))}
+              {/* Nicht in der Hauptnavigation, aber im Footer erreichbar. */}
+              <li>
+                <a
+                  href="/#zertifizierungen"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                >
+                  {t.nav.zertifikate}
+                </a>
+              </li>
             </ul>
           </div>
 

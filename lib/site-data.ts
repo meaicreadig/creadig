@@ -222,6 +222,65 @@ export const packages = [
 
 export const meaiCapabilityKeys = ["overview", "tasks", "documents", "decisions"] as const
 
+/**
+ * Zertifizierungen & Mitgliedschaften — ausschließlich echte, nachweisbare Einträge.
+ * Nichts wird erfunden, nichts geschönt.
+ *
+ * `logoPath` bleibt `null`, solange das offizielle Badge-Logo nicht vorliegt.
+ * Die Kachel rendert dann eine saubere getypte Variante — nie ein kaputtes <img>.
+ * TODO (Owner): offizielle Badges nach `public/badges/<slug>.svg` legen und
+ * hier `logoPath` setzen. Nutzungsbedingungen der jeweiligen Stelle beachten.
+ */
+export type Certification = {
+  slug: "go-digital" | "bafa" | "iuk" | "avpq" | "agd"
+  /** Offizielles Badge-Logo unter public/badges/ — null, solange keins vorliegt. */
+  logoPath: string | null
+  /** Kürzel für die getypte Kachel. */
+  mark: string
+  /** Eigenname — bewusst nicht übersetzt. */
+  name: string
+  /** Offizielle Quelle zum Nachprüfen. */
+  href: string
+}
+
+export const certifications: Certification[] = [
+  {
+    slug: "go-digital",
+    logoPath: null,
+    mark: "gd",
+    name: "go-digital",
+    href: "https://www.bmwk.de/Redaktion/DE/Artikel/Digitale-Welt/foerderprogramm-go-digital.html",
+  },
+  {
+    slug: "bafa",
+    logoPath: null,
+    mark: "BAFA",
+    name: "Bundesamt für Wirtschaft und Ausfuhrkontrolle",
+    href: "https://www.bafa.de",
+  },
+  {
+    slug: "iuk",
+    logoPath: null,
+    mark: "iuk",
+    name: "iuk unternehmensnetzwerk osnabrück e.v.",
+    href: "https://www.iuk-os.de",
+  },
+  {
+    slug: "avpq",
+    logoPath: null,
+    mark: "AVPQ",
+    name: "Amtliche Verzeichnis Präqualifizierter Unternehmen (AVPQ)",
+    href: "https://www.amtliches-verzeichnis.ihk.de",
+  },
+  {
+    slug: "agd",
+    logoPath: null,
+    mark: "AGD",
+    name: "Allianz deutscher Designer (AGD)",
+    href: "https://agd.de",
+  },
+]
+
 export const contact = {
   whatsapp: "+41 76 504 58 79",
   whatsappHref: "https://wa.me/41765045879",

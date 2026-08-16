@@ -5,6 +5,7 @@ import { Portfolio } from "@/components/sections/portfolio"
 import { Services } from "@/components/sections/services"
 import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
 import { Process } from "@/components/sections/process"
+import { Certifications } from "@/components/sections/certifications"
 import { About } from "@/components/sections/about"
 import { Packages } from "@/components/sections/packages"
 import { Contact } from "@/components/sections/contact"
@@ -19,6 +20,7 @@ export default function Page() {
       <Services />
       <MeaiSpotlight />
       <Process />
+      <Certifications />
       <About />
       <Packages />
       <Contact />

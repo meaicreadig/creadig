@@ -17,6 +17,7 @@ export const dictionary = {
       ueber: "Über uns",
       pakete: "Pakete",
       kontakt: "Kontakt",
+      zertifikate: "Zertifizierungen",
       cta: "Projekt starten",
       menu: "Menü öffnen",
       close: "Menü schließen",
@@ -216,6 +217,30 @@ export const dictionary = {
         },
       },
     },
+    certs: {
+      eyebrow: "Zertifizierungen & Mitgliedschaften",
+      title: "Geprüft. Zugelassen. Eingetragen.",
+      lead: "Fünf Nachweise, die man nachschlagen kann. Keine selbst vergebenen Siegel, keine gekauften Auszeichnungen.",
+      verify: "Zur offiziellen Stelle",
+      note: "Alle Einträge sind bei den genannten Stellen überprüfbar.",
+      items: {
+        "go-digital": { label: "autorisiert für das Förderprogramm", note: "BMWK-Förderprogramm" },
+        bafa: { label: "zugelassener Unternehmensberater des", note: "Berater-ID: #190949" },
+        iuk: { label: "Mitglied beim", note: "" },
+        avpq: { label: "eingetragen in das", note: "" },
+        agd: { label: "Mitglied bei der", note: "" },
+      },
+      funding: {
+        eyebrow: "Förderung",
+        title: "Bis zu 50 % Förderung über go-digital.",
+        body: "Viele Projekte realisieren wir über das go-digital-Förderprogramm des BMWK — bis zu 50 % Förderung. Wir übernehmen Antrag und Abwicklung.",
+        detail:
+          "Als autorisiertes Beratungsunternehmen prüfen wir zuerst, ob Ihr Betrieb die Voraussetzungen erfüllt. Ergibt die Prüfung, dass keine Förderung möglich ist, sagen wir das offen.",
+        cta: "Förderfähigkeit prüfen lassen",
+        waText:
+          "Guten Tag creaDIG, bitte prüfen Sie, ob mein Vorhaben über go-digital förderfähig ist.",
+      },
+    },
     contact: {
       eyebrow: "Kontakt",
       title: "In 20 Minuten unverbindlich.",
@@ -397,6 +422,7 @@ export const dictionary = {
       ueber: "Hakkımızda",
       pakete: "Paketler",
       kontakt: "İletişim",
+      zertifikate: "Sertifikalar",
       cta: "Projeye başla",
       menu: "Menüyü aç",
       close: "Menüyü kapat",
@@ -593,6 +619,30 @@ export const dictionary = {
           note: "İlk görüşme ücretsiz ve bağlayıcı değil.",
           cta: "Görüşme ayarla",
         },
+      },
+    },
+    certs: {
+      eyebrow: "Sertifikalar & üyelikler",
+      title: "Denetlenmiş. Yetkili. Kayıtlı.",
+      lead: "Doğrulanabilir beş belge. Kendi verdiğimiz rozetler yok, satın alınmış ödüller yok.",
+      verify: "Resmî kuruma git",
+      note: "Tüm kayıtlar adı geçen kurumlardan doğrulanabilir.",
+      items: {
+        "go-digital": { label: "Yetkili olduğumuz destek programı", note: "BMWK destek programı" },
+        bafa: { label: "Onaylı danışmanı olduğumuz kurum", note: "Danışman kimliği: #190949" },
+        iuk: { label: "Üyesi olduğumuz ağ", note: "" },
+        avpq: { label: "Kayıtlı olduğumuz resmî sicil", note: "" },
+        agd: { label: "Üyesi olduğumuz birlik", note: "" },
+      },
+      funding: {
+        eyebrow: "Devlet desteği",
+        title: "go-digital ile %50'ye varan destek.",
+        body: "Birçok projeyi BMWK'nın go-digital destek programı üzerinden hayata geçiriyoruz — %50'ye varan destek. Başvuruyu ve süreci biz yürütüyoruz.",
+        detail:
+          "Yetkili danışmanlık şirketi olarak önce işletmenizin koşulları karşılayıp karşılamadığını inceliyoruz. Destek mümkün değilse bunu açıkça söylüyoruz.",
+        cta: "Destek uygunluğunu inceletin",
+        waText:
+          "Merhaba creaDIG, projemin go-digital kapsamında desteklenip desteklenemeyeceğini inceler misiniz?",
       },
     },
     contact: {
