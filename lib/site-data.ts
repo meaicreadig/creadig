@@ -1,12 +1,17 @@
 // Alle Inhalte sind echt. Keine erfundenen Zahlen, Zitate oder Auszeichnungen.
+//
+// CEO-Entscheidung (gesperrt):
+//   Eigene Produkte = meAI · fibero · CASSAMEA · meahv  — mehr nicht.
+//   NÛR · Bir Damla Hayır · Rumi's Maison = Kundenwerk / Dienstleistung.
+//   PLANEX gehört nicht zu creaDIG und kommt nirgends vor.
 
 export type Region = "DE" | "CH" | "DE & CH"
 
 export type ProductLogo = {
   name: string
-  /** TODO: Echtes Logo hier ablegen → assets/logos/produkte/ */
-  logoPath: string
-  /** Monogramm-Platzhalter, solange kein echtes Logo vorliegt. */
+  /** Echtes Logo unter public/brand/products/ — null, solange keins vorliegt. */
+  logoPath: string | null
+  /** Monogramm-Platzhalter, solange kein echtes Logo vorliegt (kein kaputtes <img>). */
   mark: string
   region: Region
   /** Markenfarbe für den Graustufe-→-Farbe-Hover. */
@@ -15,82 +20,51 @@ export type ProductLogo = {
 
 export type BrandLogo = {
   name: string
-  /** TODO: Echtes Logo hier ablegen → assets/logos/kunden/ */
-  logoPath: string
+  logoPath: string | null
   mark: string
   region: Region
-  /** Markenfarbe für den Graustufe-→-Farbe-Hover. */
   color: string
   /** Freigabe für die Bezeichnung „Kunde/Partner" liegt noch nicht vor. */
   approved: boolean
 }
 
+/** Die vier eigenen Produkte des Hauses. */
 export const ownProducts: ProductLogo[] = [
-  { name: "meAI", logoPath: "assets/logos/produkte/meai.svg", mark: "me", color: "#4f46e5", region: "DE & CH" },
-  { name: "FIBERO", logoPath: "assets/logos/produkte/fibero.svg", mark: "FB", color: "#0f8a5f", region: "DE" },
-  { name: "CASSAMEA", logoPath: "assets/logos/produkte/cassamea.svg", mark: "CA", color: "#b3122c", region: "CH" },
-  { name: "PLANEX", logoPath: "assets/logos/produkte/planex.svg", mark: "PX", color: "#1d4ed8", region: "DE" },
-  { name: "NÛR", logoPath: "assets/logos/produkte/nur.svg", mark: "NÛ", color: "#0f766e", region: "DE & CH" },
+  // TODO: Echtes meAI-Logo ergänzen → public/brand/products/meai.svg
+  { name: "meAI", logoPath: null, mark: "me", color: "#be904e", region: "DE & CH" },
+  { name: "fibero", logoPath: "/brand/products/fibero.svg", mark: "fb", color: "#dab149", region: "DE" },
   {
-    name: "Bir Damla Hayır",
-    logoPath: "assets/logos/produkte/bir-damla-hayir.svg",
-    mark: "BD",
-    color: "#c2410c",
-    region: "DE",
+    name: "CASSAMEA",
+    logoPath: "/brand/products/cassamea.svg",
+    mark: "CA",
+    color: "#f0743c",
+    region: "CH",
   },
+  // TODO: Echtes meahv-Logo ergänzen → public/brand/products/meahv.svg
+  { name: "meahv", logoPath: null, mark: "hv", color: "#8f6a33", region: "DE" },
 ]
 
+/**
+ * Marken, mit denen wir im Tagesgeschäft zu tun hatten.
+ * `approved: false` = keine Freigabe für „unser Kunde" → neutrale Beschriftung,
+ * keine Behauptung einer Geschäfts- oder Partnerbeziehung.
+ */
 export const brands: BrandLogo[] = [
-  {
-    name: "Deutsche Telekom",
-    logoPath: "assets/logos/kunden/telekom.svg",
-    mark: "T",
-    color: "#e20074",
-    region: "DE",
-    approved: false,
-  },
+  { name: "Deutsche Telekom", logoPath: null, mark: "T", color: "#e20074", region: "DE", approved: false },
   {
     name: "Glasfaser NordWest",
-    logoPath: "assets/logos/kunden/glasfaser-nordwest.svg",
+    logoPath: null,
     mark: "GN",
     color: "#0a5ca8",
     region: "DE",
     approved: false,
   },
-  { name: "1&1", logoPath: "assets/logos/kunden/1und1.svg", mark: "1&1", color: "#1a4fa0", region: "DE", approved: false },
-  {
-    name: "Drillisch",
-    logoPath: "assets/logos/kunden/drillisch.svg",
-    mark: "DR",
-    color: "#e2001a",
-    region: "DE",
-    approved: false,
-  },
-  {
-    name: "MAS MöbelAufbauService",
-    logoPath: "assets/logos/kunden/mas.svg",
-    mark: "MAS",
-    color: "#b45309",
-    region: "DE",
-    approved: false,
-  },
-  {
-    name: "Wartungsprofis",
-    logoPath: "assets/logos/kunden/wartungsprofis.svg",
-    mark: "WP",
-    color: "#166534",
-    region: "DE",
-    approved: false,
-  },
-  { name: "BÜEM", logoPath: "assets/logos/kunden/blueem.svg", mark: "BÜ", color: "#1e3a5f", region: "DE", approved: false },
-  {
-    name: "MEDILUXURY",
-    logoPath: "assets/logos/kunden/mediluxury.svg",
-    mark: "ML",
-    color: "#7c2d5e",
-    region: "DE & CH",
-    approved: false,
-  },
+  { name: "1&1", logoPath: null, mark: "1&1", color: "#1a4fa0", region: "DE", approved: false },
+  { name: "Drillisch", logoPath: null, mark: "DR", color: "#e2001a", region: "DE", approved: false },
+  { name: "MAS MöbelAufbauService", logoPath: null, mark: "MAS", color: "#b45309", region: "DE", approved: false },
+  { name: "Wartungsprofis", logoPath: null, mark: "WP", color: "#166534", region: "DE", approved: false },
+  { name: "BÜEM", logoPath: null, mark: "BÜ", color: "#1e3a5f", region: "DE", approved: false },
+  { name: "MEDILUXURY", logoPath: null, mark: "ML", color: "#7c2d5e", region: "DE & CH", approved: false },
 ]
 
 export type Work = {
@@ -101,49 +75,89 @@ export type Work = {
   outcome: string
   kind: "Produkt" | "Kundenwerk"
   region: Region
-  /** TODO: Durch echtes Produkt-Mockup ersetzen → assets/works/ */
-  image: string
+  /** Illustratives Mockup — kein Screenshot. null = Monogramm-Panel statt Bild. */
+  image: string | null
+  /** Monogramm für Karten ohne Bild. */
+  mark: string
   href?: string
   live?: boolean
-  featured: boolean
 }
 
-export const works: Work[] = [
+/** Eigene Produkte — die großen Cases. */
+export const productWorks: Work[] = [
   {
     slug: "meai",
     name: "meAI",
     what: "KI-Business-Betriebssystem für kleine und mittlere Betriebe.",
     built: "Produktarchitektur, KI-Logik, Dashboard, Betrieb — von Grund auf.",
-    outcome: "Live im Einsatz",
+    outcome: "Im Aufbau · live unter meai.run",
     kind: "Produkt",
     region: "DE & CH",
     image: "/works/meai.png",
+    mark: "me",
     href: "https://meai.run",
     live: true,
-    featured: true,
   },
   {
     slug: "fibero",
-    name: "FIBERO",
-    what: "Glasfaser- und Telekom-Dienstleistung mit eigenem Finanz- und Rechnungssystem.",
-    built: "Operatives Geschäft, Abrechnungssystem, Prozesse und Betrieb.",
+    name: "fibero",
+    what: "Ordnung und Klarheit im Glasfaser-Alltag: Auftrags-, Abrechnungs- und Finanzlogik.",
+    built: "Operative Prozesse, Abrechnungssystem, Auswertung.",
     outcome: "Im Tagesbetrieb",
     kind: "Produkt",
     region: "DE",
     image: "/works/fibero.png",
+    mark: "fb",
     live: true,
-    featured: true,
   },
   {
     slug: "cassamea",
     name: "CASSAMEA",
-    what: "Das Kassensystem, das mitdenkt — für die Gastronomie, für die Schweiz.",
+    what: "Die Kasse, die mitdenkt — für die Gastronomie, gebaut für Schweizer Anforderungen.",
     built: "Kassen-Software, Backoffice, Schweizer Anforderungen.",
-    outcome: "Gastronomie DE & CH",
+    outcome: "Im Aufbau",
     kind: "Produkt",
     region: "CH",
     image: "/works/cassamea.png",
-    featured: true,
+    mark: "CA",
+  },
+  {
+    slug: "meahv",
+    name: "meahv",
+    what: "Hausverwaltungs-System: Objekte, Mieter, Belege und Abrechnung an einem Ort.",
+    built: "Datenmodell, Verwaltungslogik, Abrechnung.",
+    outcome: "Im Aufbau",
+    kind: "Produkt",
+    region: "DE",
+    // Noch kein Mockup — die Karte rendert ein Monogramm-Panel statt eines leeren Bildes.
+    image: null,
+    mark: "hv",
+  },
+]
+
+/** Kundenwerk / Dienstleistung — ausdrücklich KEIN eigenes Produkt. */
+export const clientWorks: Work[] = [
+  {
+    slug: "nur",
+    name: "NÛR",
+    what: "Qur'an-Plattform — Marke, Oberfläche und Inhalte.",
+    built: "Marke, Web, Inhaltsstruktur.",
+    outcome: "Kundenwerk",
+    kind: "Kundenwerk",
+    region: "DE & CH",
+    image: null,
+    mark: "NÛ",
+  },
+  {
+    slug: "bir-damla-hayir",
+    name: "Bir Damla Hayır",
+    what: "Spendenplattform mit transparenter Mittelverwendung.",
+    built: "Plattform, Spendenfluss, Verwaltung.",
+    outcome: "Kundenwerk",
+    kind: "Kundenwerk",
+    region: "DE",
+    image: "/works/bir-damla-hayir.png",
+    mark: "BD",
   },
   {
     slug: "rumis-maison",
@@ -154,36 +168,17 @@ export const works: Work[] = [
     kind: "Kundenwerk",
     region: "DE",
     image: "/works/rumis-maison.png",
-    featured: true,
-  },
-  {
-    slug: "planex",
-    name: "PLANEX",
-    what: "Einsatzplanung für Teams im Außendienst und Handwerk.",
-    built: "Planungslogik, Oberfläche, Rollen und Rechte.",
-    outcome: "Eigenes Produkt",
-    kind: "Produkt",
-    region: "DE",
-    image: "/works/planex.png",
-    featured: true,
-  },
-  {
-    slug: "bir-damla-hayir",
-    name: "Bir Damla Hayır",
-    what: "Spendenplattform mit transparenter Mittelverwendung.",
-    built: "Plattform, Spendenfluss, Verwaltung.",
-    outcome: "Eigenes Produkt",
-    kind: "Produkt",
-    region: "DE",
-    image: "/works/bir-damla-hayir.png",
-    featured: true,
+    mark: "RM",
   },
 ]
 
+/**
+ * Was sonst noch unter dem Dach läuft. `creaDIG fiber` ist das operative
+ * Glasfaser-Geschäft (der Motor) — nicht zu verwechseln mit dem Produkt fibero.
+ */
 export const furtherProjects = [
-  { name: "NÛR", what: "Qur'an-Plattform", kind: "Produkt" as const },
-  { name: "ENIGMA", what: "Markenprojekt", kind: "Kundenwerk" as const },
-  { name: "Hausverwaltung", what: "Verwaltungssystem", kind: "Kundenwerk" as const },
+  { name: "creaDIG fiber", what: "Glasfaser-Geschäft mit Subunternehmern", kind: "Betrieb" as const },
+  { name: "Ops-Retainer", what: "Operations-System für Handwerksbetriebe", kind: "Dienstleistung" as const },
 ]
 
 export const navLinks = [
@@ -197,8 +192,9 @@ export const navLinks = [
 
 /** Echte Signale statt erfundener Kennzahlen. */
 export const impactSignals = [
+  // TODO: Gründungsjahr vom Owner bestätigen lassen (KIZILELMA §4b markiert es als offen).
   { value: "2018", key: "since" as const },
-  { value: "6+", key: "products" as const },
+  { value: "4", key: "products" as const },
   { value: "DE / CH", key: "regions" as const },
   { value: "A–Z", key: "scope" as const },
 ]
@@ -229,7 +225,7 @@ export const meaiCapabilityKeys = ["overview", "tasks", "documents", "decisions"
 export const contact = {
   whatsapp: "+41 76 504 58 79",
   whatsappHref: "https://wa.me/41765045879",
-  // TODO: Echte Geschäfts-E-Mail und Impressum-Adresse ergänzen.
-  email: "kontakt@creadig.de",
+  // Adresse der bisherigen Live-Seite — bewusst beibehalten, damit nichts bricht.
+  email: "hallo@creadig.de",
   locations: "Diepholz (DE) · Schweiz",
 }

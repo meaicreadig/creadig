@@ -5,20 +5,21 @@ import { useLocale } from "@/components/locale-provider"
 import { brands, ownProducts, type Region } from "@/lib/site-data"
 
 /**
- * Logo-Slot: standardmäßig monochrom, bei Hover volle Markenfarbe + Lift.
- * TODO: Sobald echte Logos vorliegen, <img src={logoPath} /> statt Monogramm rendern
- *       (public/logos/… , grayscale → grayscale-0 bei Hover).
+ * Logo-Slot: echtes Logo, wo eins vorliegt (grayscale → Farbe bei Hover),
+ * sonst sauberes Monogramm — nie ein kaputtes <img>.
  */
 function LogoSlot({
   name,
   mark,
   region,
   color,
+  logoPath,
 }: {
   name: string
   mark: string
   region: Region
   color: string
+  logoPath: string | null
 }) {
   return (
     <div
@@ -30,15 +31,25 @@ function LogoSlot({
         className="absolute inset-x-0 bottom-0 h-px w-0 transition-all duration-600 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
         style={{ backgroundColor: "var(--brand)" }}
       />
-      <span
-        aria-hidden="true"
-        className="border-line-strong text-muted-foreground flex size-9 items-center justify-center border text-[0.8125rem] font-semibold tracking-tight transition-all duration-500 group-hover:border-[var(--brand)] group-hover:text-[var(--brand)]"
-      >
-        {mark}
-      </span>
-      <span className="text-muted-foreground group-hover:text-foreground text-center text-[0.8125rem] tracking-wide transition-colors duration-500">
-        {name}
-      </span>
+      {logoPath ? (
+        <img
+          src={logoPath}
+          alt={name}
+          className="h-8 w-auto max-w-[9rem] opacity-70 grayscale transition-all duration-500 group-hover:opacity-100 group-hover:grayscale-0"
+        />
+      ) : (
+        <>
+          <span
+            aria-hidden="true"
+            className="border-line-strong text-muted-foreground flex size-9 items-center justify-center border text-[0.8125rem] font-semibold tracking-tight transition-all duration-500 group-hover:border-[var(--brand)] group-hover:text-[var(--brand)]"
+          >
+            {mark}
+          </span>
+          <span className="text-muted-foreground group-hover:text-foreground text-center text-[0.8125rem] tracking-wide transition-colors duration-500">
+            {name}
+          </span>
+        </>
+      )}
       <span className="text-line-strong absolute top-3 right-3 text-[0.5625rem] tracking-[0.16em] uppercase transition-colors duration-500 group-hover:text-[var(--brand)]">
         {region}
       </span>
@@ -46,7 +57,7 @@ function LogoSlot({
   )
 }
 
-type Row = { name: string; mark: string; region: Region; color: string }
+type Row = { name: string; mark: string; region: Region; color: string; logoPath: string | null }
 
 function MarqueeRow({ items, direction }: { items: Row[]; direction: "left" | "right" }) {
   return (
@@ -77,13 +88,21 @@ function MarqueeRow({ items, direction }: { items: Row[]; direction: "left" | "r
 export function LogoWall() {
   const { t } = useLocale()
 
-  const productRow: Row[] = ownProducts.map(({ name, mark, region, color }) => ({
+  const productRow: Row[] = ownProducts.map(({ name, mark, region, color, logoPath }) => ({
     name,
     mark,
     region,
     color,
+    logoPath,
   }))
-  const brandRow: Row[] = brands.map(({ name, mark, region, color }) => ({ name, mark, region, color }))
+  // Fremdmarken bewusst nur als neutrales Monogramm — ohne Freigabe kein fremdes Logo.
+  const brandRow: Row[] = brands.map(({ name, mark, region, color }) => ({
+    name,
+    mark,
+    region,
+    color,
+    logoPath: null,
+  }))
 
   return (
     <section id="produkte" aria-labelledby="produkte-title" className="border-line border-b">

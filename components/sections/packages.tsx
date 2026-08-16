@@ -64,12 +64,17 @@ export function Packages() {
                   </span>
                 </div>
 
+                {/* „Für wen" — Zeile aus der bisherigen Live-Seite übernommen. */}
                 <div className="border-line mt-8 border-t pt-6">
                   <p className="eyebrow text-line-strong group-hover:text-gold transition-colors duration-500">
                     {t.packages.forWhom}
                   </p>
                   <p className="text-foreground/85 mt-3 text-[0.9375rem] leading-relaxed text-pretty">
                     {copy.who}
+                  </p>
+                  <p className="text-gold mt-4 flex gap-2 text-[0.9375rem] leading-relaxed text-pretty">
+                    <span aria-hidden="true">→</span>
+                    <span>{copy.outcome}</span>
                   </p>
                 </div>
 
@@ -88,12 +93,25 @@ export function Packages() {
                   {copy.note}
                 </p>
 
+                {/* Führt wie auf der alten Seite in den Termin-Wizard. */}
                 <a
-                  href="#kontakt"
-                  className="border-line-strong hover:border-gold hover:text-gold mt-7 inline-flex items-center justify-between gap-2 border px-5 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                  href={`/termin?paket=${pkg.key}`}
+                  className={
+                    pkg.recommended
+                      ? "from-gold-soft to-gold group/cta relative mt-7 inline-flex items-center justify-between gap-2 overflow-hidden bg-gradient-to-br px-5 py-3.5 text-sm tracking-wide text-[#201e1b]"
+                      : "border-line-strong hover:border-gold hover:text-gold mt-7 inline-flex items-center justify-between gap-2 border px-5 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                  }
                 >
-                  {t.packages.cta}
-                  <ArrowUpRight className="size-4" strokeWidth={1.5} />
+                  {pkg.recommended && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/cta:translate-y-0"
+                    />
+                  )}
+                  <span className="group-hover/cta:text-gold-soft relative z-10 flex w-full items-center justify-between gap-2 transition-colors duration-500">
+                    {copy.cta}
+                    <ArrowUpRight className="size-4" strokeWidth={1.5} />
+                  </span>
                 </a>
               </Reveal>
             )

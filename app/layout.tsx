@@ -25,13 +25,14 @@ export const metadata: Metadata = {
     template: "%s · creaDIG",
   },
   description:
-    "creaDIG ist das Dach über eigenen Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie. System-Haus seit 2018, Deutschland & Schweiz.",
+    "creaDIG ist das Dach über eigenen Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie. System-Haus, Deutschland & Schweiz.",
   keywords: [
     "creaDIG",
     "System-Haus",
     "meAI",
+    "fibero",
     "CASSAMEA",
-    "FIBERO",
+    "meahv",
     "Digitalagentur",
     "KI-Systeme",
     "Diepholz",
@@ -63,7 +64,7 @@ const organizationSchema = {
   "@type": "Organization",
   name: "creaDIG",
   description:
-    "System-Haus für Marke, Web, Operations, Automation und KI. Eigene Produkte: meAI, CASSAMEA, PLANEX, NÛR.",
+    "System-Haus für Marke, Web, Operations, Automation und KI. Eigene Produkte: meAI, fibero, CASSAMEA, meahv.",
   foundingDate: "2018",
   areaServed: ["DE", "CH"],
   address: {
