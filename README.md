@@ -27,14 +27,18 @@ npm run build   # Produktions-Build (muss grün sein, bevor gepusht wird)
 
 | Pfad | Inhalt |
 |---|---|
-| `app/page.tsx` | Startseite: Hero → Impact → Logo-Wand → Portfolio → Leistungen → meAI → Prozess → Über uns → Pakete → Kontakt |
+| `app/page.tsx` | Startseite: Hero → Impact → Logo-Wand → Portfolio → Leistungen → meAI → Prozess → **Zertifizierungen** → Über uns → Pakete → Kontakt |
 | `app/termin/` | 4-Schritt-Terminanfrage → WhatsApp |
 | `app/impressum/`, `app/datenschutz/` | Rechtsseiten |
-| `app/layout.tsx` | Schriften, Metadaten, Nav/Footer/WhatsApp/Chat für alle Routen |
+| `app/layout.tsx` | Schriften, Metadaten, Nav/Footer/WhatsApp/Chat/Consent für alle Routen |
+| `app/sitemap.ts`, `app/robots.ts` | `sitemap.xml` und `robots.txt`, an `NEXT_PUBLIC_SITE_URL` gekoppelt |
+| `lib/consent.ts` | Einwilligungs-Logik (localStorage `creadig_consent`) |
+| `components/consent/` | Cookie-Consent-Banner mit Detail-Auswahl |
 | `lib/site-data.ts` | Produkte, Kundenwerk, Marken, Pakete, Kontaktdaten |
 | `lib/dictionary.ts` | Sämtliche Texte, DE + TR (294 Schlüssel, paritätisch) |
 | `components/brand/` | Logo-Komponente und Signatur-Motiv |
 | `public/brand/` | Echte CI-Assets (Logo, Produktlogos) |
+| `public/badges/` | Badge-Logos der Zertifizierungen (siehe README dort) |
 | `_legacy/` | Die alte Vanilla-Seite, vollständig archiviert |
 
 ### Marke
@@ -58,6 +62,27 @@ npm run build   # Produktions-Build (muss grün sein, bevor gepusht wird)
 - Keine erfundenen Zahlen, Zitate oder Verknappung.
 - Bilder unter `public/works/` sind illustrative Mockups, keine Screenshots.
   Der Hinweis dazu steht sichtbar in der Werkschau.
+- **Zertifizierungen** sind ausschließlich echt und nachprüfbar: go-digital
+  (BMWK), BAFA (Berater-ID #190949), iuk unternehmensnetzwerk osnabrück e.v.,
+  AVPQ, AGD. Nichts dazuerfinden. Fehlt ein Badge-Logo, rendert eine getypte
+  Kachel — nie ein kaputtes Bild.
+- **Sitz ist Osnabrück** (ICO InnovationsCentrum, Albert-Einstein-Straße 1).
+  Die private Anschrift steht nirgends öffentlich. Die Schweiz ist **Markt**,
+  nicht Standort. Einzige Quelle: `address` in `lib/site-data.ts`.
+
+### Einwilligung (DSGVO)
+
+- `lib/consent.ts` speichert die Entscheidung versioniert unter
+  `creadig_consent`. Essenziell ist immer aktiv und nicht abwählbar.
+- Die Komfort-Kategorie steuert **echt**, ob Sprachwahl (`creadig_lang`) und
+  Erscheinungsbild (`creadig-theme`) persistiert werden. Ohne Einwilligung
+  gilt die Wahl nur für die Sitzung; bei Widerruf werden die Schlüssel gelöscht.
+- **Kein USA-Transfer-Hinweis**, weil kein Dienst aus einem Drittland geladen
+  wird: Schriften kommen self-hosted über `next/font`, es gibt kein Analytics,
+  keine Maps, keine Werbe-Tags. Kommt so ein Dienst dazu, gehört der Hinweis
+  nach Art. 49 Abs. 1 lit. a DSGVO ins Banner **und** in die Datenschutzseite.
+- Jedes künftige nicht-essenzielle Skript muss `hasConsent(...)` abfragen,
+  bevor es lädt.
 
 ---
 
@@ -100,8 +125,12 @@ nach der Domain-Umstellung wieder.
 
 ## Offen
 
-- Impressum: Pflichtangaben nach § 5 DDG ergänzen (Rechtsform, Anschrift,
-  Registereintrag, USt-IdNr.). Die Seite existiert und benennt die Lücke.
+- **Impressum (Owner bestätigen):** Rechtsform, USt-IdNr. nach § 27 a UStG
+  bzw. Hinweis auf § 19 UStG, und die förmliche Benennung des Verantwortlichen
+  nach § 18 Abs. 2 MStV. Anschrift und Kontaktwege stehen bereits verbindlich.
+- **Badge-Logos (Owner liefern):** offizielle Dateien nach `public/badges/`
+  legen und `logoPath` in `lib/site-data.ts` setzen — Details in
+  `public/badges/README.md`. Bis dahin: getypte Kacheln, kein 404.
 - Datenschutz: Fassung juristisch final prüfen lassen.
 - Echte Logos für **meAI** und **meahv** → `public/brand/products/`.
   Bis dahin rendert ein Monogramm, kein kaputtes Bild.

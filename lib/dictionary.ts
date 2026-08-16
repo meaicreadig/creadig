@@ -171,6 +171,9 @@ export const dictionary = {
       lead: "Feste Beträge, klar benannt. Sie sehen vorher, was Sie zahlen — kein Riba, keine versteckten Posten.",
       forWhom: "Für wen",
       recommended: "Empfohlen",
+      funding:
+        "Viele Leistungen sind über das go-digital-Programm des BMWK förderfähig — bis zu 50 %. Wir prüfen die Voraussetzungen vorab und übernehmen Antrag und Abwicklung.",
+      fundingLink: "Zu unseren Zertifizierungen",
       once: "einmalig · kein Abo",
       monthly: "/ Monat",
       items: {
@@ -424,7 +427,6 @@ export const dictionary = {
       legalLabel: "Rechtliches",
       imprint: "Impressum",
       privacy: "Datenschutz",
-      legalNote: "Rechtstexte in Vorbereitung.",
       socialLabel: "Social",
       rights: "Alle Rechte vorbehalten.",
     },
@@ -618,6 +620,9 @@ export const dictionary = {
       lead: "Sabit tutarlar, açıkça belirtilmiş. Ne ödeyeceğinizi önceden görürsünüz — riba yok, gizli kalem yok.",
       forWhom: "Kimler için",
       recommended: "Önerilen",
+      funding:
+        "Birçok hizmet, BMWK'nın go-digital programı üzerinden %50'ye varan oranda desteklenebilir. Koşulları önceden inceliyor, başvuruyu ve süreci biz yürütüyoruz.",
+      fundingLink: "Sertifikalarımıza git",
       once: "tek seferlik · abonelik yok",
       monthly: "/ ay",
       items: {
@@ -871,7 +876,6 @@ export const dictionary = {
       legalLabel: "Yasal",
       imprint: "Künye",
       privacy: "Gizlilik",
-      legalNote: "Yasal metinler hazırlanıyor.",
       socialLabel: "Sosyal",
       rights: "Tüm hakları saklıdır.",
     },

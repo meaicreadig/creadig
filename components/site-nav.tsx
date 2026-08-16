@@ -174,6 +174,18 @@ export function SiteNav() {
                     </motion.a>
                   </SheetClose>
                 ))}
+                {/* Vertrauens-Baustein: in der Desktop-Leiste kein Platz, hier schon. */}
+                <SheetClose asChild>
+                  <motion.a
+                    href="/#zertifizierungen"
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.06 * navLinks.length + 0.1, duration: 0.5 }}
+                    className="text-display border-b border-line py-5 text-3xl text-foreground"
+                  >
+                    {t.nav.zertifikate}
+                  </motion.a>
+                </SheetClose>
               </nav>
 
               <div className="flex flex-col gap-3 px-6 pt-10">
