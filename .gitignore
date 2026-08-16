@@ -4,3 +4,21 @@
 .video-analysis/
 assets/img/image1.png
 assets/img/image_fuercreadig.png
+# v0 sandbox internal files
+__v0_runtime_loader.js
+__v0_devtools.tsx
+__v0_jsx-dev-runtime.ts
+.snowflake/
+.v0-trash/
+.vercel/
+
+# Environment variables
+.env*.local
+
+# Common ignores
+node_modules
+.next/
+.DS_Store
+# Große lokale Archive
+Archiv_creadig.zip
+*.zip
