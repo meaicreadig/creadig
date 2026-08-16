@@ -35,9 +35,23 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
         {kind === "imprint" ? (
           <div className="mt-12 flex flex-col gap-10">
             <section className="border-line border-t pt-8">
+              <p className="eyebrow text-gold">{t.legal.providerLabel}</p>
+              <p className="text-foreground mt-4 text-lg">
+                {contact.address.company} — {contact.address.owner}
+              </p>
+              <address className="text-muted-foreground mt-3 text-[0.9375rem] leading-relaxed not-italic">
+                {contact.addressLines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </address>
+            </section>
+
+            <section className="border-line border-t pt-8">
               <p className="eyebrow text-gold">{t.legal.responsible}</p>
-              <p className="text-foreground mt-4 text-lg">Muhammed Emin Akyol</p>
-              <p className="text-muted-foreground mt-2 text-[0.9375rem]">{contact.locations}</p>
+              <p className="text-foreground mt-4 text-lg">{contact.address.owner}</p>
+              <p className="text-muted-foreground mt-2 text-[0.9375rem]">{t.legal.sameAddress}</p>
             </section>
 
             <section className="border-line border-t pt-8">
@@ -97,6 +111,20 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
                 <SlidersHorizontal className="size-4" strokeWidth={1.5} />
                 {t.consent.settingsLabel}
               </button>
+            </section>
+
+            <section className="border-line border-t pt-8">
+              <p className="eyebrow text-gold">{t.legal.responsible}</p>
+              <p className="text-foreground mt-4 text-[0.9375rem]">
+                {contact.address.company} — {contact.address.owner}
+              </p>
+              <address className="text-muted-foreground mt-3 text-[0.9375rem] leading-relaxed not-italic">
+                {contact.addressLines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </address>
             </section>
 
             <section className="border-line border-t pt-8">

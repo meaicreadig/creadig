@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { StickyWhatsApp } from "@/components/sticky-whatsapp"
 import { AiAssistant } from "@/components/ai-assistant"
 import { CookieConsent } from "@/components/consent/cookie-consent"
+import { address } from "@/lib/site-data"
 
 // CEO-Entscheidung: Poppins — rund-geometrisch, passt zum Logo. Nicht Geist.
 const poppins = Poppins({
@@ -50,7 +51,8 @@ export const metadata: Metadata = {
     "meahv",
     "Digitalagentur",
     "KI-Systeme",
-    "Diepholz",
+    "Osnabrück",
+    "go-digital",
     "Schweiz",
   ],
   authors: [{ name: "creaDIG" }],
@@ -83,12 +85,15 @@ const organizationSchema = {
     "System-Haus für Marke, Web, Operations, Automation und KI. Eigene Produkte: meAI, fibero, CASSAMEA, meahv.",
   foundingDate: "2018",
   areaServed: ["DE", "CH"],
+  // Sitz: ICO InnovationsCentrum Osnabrück. Die Schweiz ist Markt, nicht Sitz.
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Diepholz",
-    addressCountry: "DE",
+    streetAddress: `${address.venue}, ${address.street}`,
+    postalCode: address.postalCode,
+    addressLocality: address.city,
+    addressCountry: address.countryCode,
   },
-  founder: { "@type": "Person", name: "Muhammed Emin Akyol" },
+  founder: { "@type": "Person", name: address.owner },
   telephone: "+41765045879",
   url: SITE_URL,
 }

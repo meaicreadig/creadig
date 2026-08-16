@@ -66,7 +66,15 @@ export function About() {
 
             <Reveal delay={0.18} className="border-line mt-10 border-t pt-7">
               <p className="eyebrow text-gold">{t.about.locationsLabel}</p>
-              <p className="text-foreground/85 mt-4 text-[0.9375rem]">{contact.locations}</p>
+              <address className="text-foreground/85 mt-4 text-[0.9375rem] leading-relaxed not-italic">
+                {contact.addressLines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </address>
+              <p className="eyebrow text-gold mt-7">{t.about.marketsLabel}</p>
+              <p className="text-foreground/85 mt-3 text-[0.9375rem]">{contact.markets}</p>
             </Reveal>
           </div>
         </div>

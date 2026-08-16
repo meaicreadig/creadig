@@ -281,10 +281,37 @@ export const certifications: Certification[] = [
   },
 ]
 
+/**
+ * Geschäftsadresse (gesperrt): ICO InnovationsCentrum Osnabrück.
+ * Die private Anschrift taucht öffentlich nirgends auf.
+ */
+export const address = {
+  company: "creaDIG",
+  owner: "Muhammed Emin Akyol",
+  venue: "ICO InnovationsCentrum Osnabrück",
+  street: "Albert-Einstein-Straße 1",
+  postalCode: "49076",
+  city: "Osnabrück",
+  country: "Deutschland",
+  countryCode: "DE",
+} as const
+
+/** Anschrift als Zeilen — für Footer, Kontakt und Impressum identisch. */
+export const addressLines: string[] = [
+  address.venue,
+  address.street,
+  `${address.postalCode} ${address.city}`,
+  address.country,
+]
+
 export const contact = {
   whatsapp: "+41 76 504 58 79",
   whatsappHref: "https://wa.me/41765045879",
-  // Adresse der bisherigen Live-Seite — bewusst beibehalten, damit nichts bricht.
   email: "hallo@creadig.de",
-  locations: "Diepholz (DE) · Schweiz",
+  address,
+  addressLines,
+  /** Sitz — kurz. */
+  locations: "Osnabrück (DE)",
+  /** Die Schweiz ist Markt, nicht Sitz. */
+  markets: "Deutschland & Schweiz",
 }

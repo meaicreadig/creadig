@@ -246,9 +246,18 @@ export function Contact() {
               </button>
             </Reveal>
 
+            {/* Sitz = Osnabrück (ICO). Die Schweiz ist Markt, nicht Standort. */}
             <Reveal delay={0.24} className="border-line mt-10 border-t pt-7">
               <p className="eyebrow text-gold">{t.contact.locationsLabel}</p>
-              <p className="text-foreground/85 mt-4 text-[0.9375rem]">{contact.locations}</p>
+              <address className="text-foreground/85 mt-4 text-[0.9375rem] leading-relaxed not-italic">
+                {contact.addressLines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </address>
+              <p className="eyebrow text-gold mt-7">{t.contact.marketsLabel}</p>
+              <p className="text-foreground/85 mt-3 text-[0.9375rem]">{contact.markets}</p>
             </Reveal>
           </div>
         </div>

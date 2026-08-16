@@ -133,7 +133,15 @@ export function SiteFooter() {
                   {contact.email}
                 </a>
               </li>
-              <li className="text-muted-foreground text-sm">{contact.locations}</li>
+              <li>
+                <address className="text-muted-foreground text-sm leading-relaxed not-italic">
+                  {contact.addressLines.map((line) => (
+                    <span key={line} className="block">
+                      {line}
+                    </span>
+                  ))}
+                </address>
+              </li>
             </ul>
 
             <p className="eyebrow text-gold mt-8">{t.footer.socialLabel}</p>
@@ -156,7 +164,7 @@ export function SiteFooter() {
             © 2026 creaDIG. {t.footer.rights}
           </p>
           <p className="text-line-strong font-mono text-[0.6875rem] tracking-wide">
-            {contact.locations}
+            {contact.locations} · {contact.markets}
           </p>
         </div>
       </div>

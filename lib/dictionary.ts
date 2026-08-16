@@ -34,7 +34,7 @@ export const dictionary = {
         "creaDIG ist das Dach über unseren Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie.",
       ctaPrimary: "Projekt starten",
       ctaSecondary: "Unsere Arbeit ansehen",
-      location: "Diepholz · Zürich",
+      location: "Osnabrück · DE & CH",
       scroll: "Scrollen",
     },
     impact: {
@@ -161,6 +161,7 @@ export const dictionary = {
         "Gastronomie in Deutschland und der Schweiz",
       ],
       locationsLabel: "Sitz",
+      marketsLabel: "Märkte",
       honesty:
         "Wir nennen keine erfundenen Mitarbeiter- oder Umsatzzahlen. Unser Beweis ist gebaute Arbeit.",
     },
@@ -262,7 +263,8 @@ export const dictionary = {
       chatTitle: "KI-Assistent",
       chatNote: "Fragen Sie direkt auf der Seite.",
       chatCta: "Assistent öffnen",
-      locationsLabel: "Standorte",
+      locationsLabel: "Sitz",
+      marketsLabel: "Märkte",
     },
     termin: {
       back: "Zurück zur Seite",
@@ -349,8 +351,11 @@ export const dictionary = {
       imprintTitle: "Impressum",
       privacyTitle: "Datenschutz",
       back: "Zurück zur Seite",
-      pending: "Firmendaten folgen",
-      pendingNote: "Die vollständigen Pflichtangaben nach § 5 DDG werden derzeit finalisiert und hier ergänzt. Bis dahin erreichen Sie uns verbindlich über die unten genannten Wege.",
+      providerLabel: "Anbieter (§ 5 DDG)",
+      addressLabel: "Anschrift",
+      sameAddress: "Anschrift wie oben",
+      pending: "Noch zu bestätigen",
+      pendingNote: "Diese förmlichen Angaben ergänzen wir, sobald der Inhaber sie freigegeben hat: Rechtsform, Umsatzsteuer-Identifikationsnummer nach § 27 a UStG bzw. Hinweis auf die Kleinunternehmerregelung nach § 19 UStG sowie die förmliche Benennung des Verantwortlichen nach § 18 Abs. 2 MStV. Anschrift und Kontaktwege oben gelten bereits verbindlich.",
       responsible: "Verantwortlich für den Inhalt",
       contactLabel: "Kontakt",
       privacyIntro: "Diese Seite ist bewusst schlank gebaut: Wir setzen kein Tracking, keine Werbe-Cookies und keine Analyse-Dienste ein.",
@@ -444,7 +449,7 @@ export const dictionary = {
       answerMeai:
         "meAI ist unser KI-Business-Betriebssystem — es bündelt Zahlen, Aufgaben und Dokumente und bereitet Entscheidungen vor. Live unter meai.run.",
       answerSwiss:
-        "Ja. Wir sind in Diepholz und in der Schweiz vertreten; CASSAMEA ist speziell für die schweizerische Gastronomie gebaut.",
+        "Ja. Unser Sitz ist das ICO InnovationsCentrum Osnabrück; die Schweiz betreuen wir als Markt. CASSAMEA ist speziell für die schweizerische Gastronomie gebaut.",
       answerProcess:
         "In drei Schritten: verstehen, bauen, betreiben. Wir sehen uns den Betrieb an, bauen das System und betreiben es anschließend weiter.",
       answerFallback:
@@ -477,7 +482,7 @@ export const dictionary = {
         "creaDIG, kendi sistemlerimizin çatısıdır — markadan yapay zekâya. Onları biz kurarız. Ve biz işletiriz.",
       ctaPrimary: "Projeye başla",
       ctaSecondary: "İşlerimizi gör",
-      location: "Diepholz · Zürih",
+      location: "Osnabrück · DE & CH",
       scroll: "Kaydır",
     },
     impact: {
@@ -604,6 +609,7 @@ export const dictionary = {
         "Almanya ve İsviçre'de gastronomi",
       ],
       locationsLabel: "Merkez",
+      marketsLabel: "Pazarlar",
       honesty: "Uydurma çalışan veya ciro sayıları vermiyoruz. Kanıtımız yaptığımız işlerdir.",
     },
     packages: {
@@ -704,7 +710,8 @@ export const dictionary = {
       chatTitle: "Yapay zekâ asistanı",
       chatNote: "Doğrudan sayfada sorun.",
       chatCta: "Asistanı aç",
-      locationsLabel: "Konumlar",
+      locationsLabel: "Merkez",
+      marketsLabel: "Pazarlar",
     },
     termin: {
       back: "Sayfaya dön",
@@ -791,8 +798,11 @@ export const dictionary = {
       imprintTitle: "Künye",
       privacyTitle: "Gizlilik",
       back: "Sayfaya dön",
-      pending: "Şirket bilgileri eklenecek",
-      pendingNote: "Alman DDG § 5 uyarınca zorunlu bilgiler halen tamamlanıyor ve burada eklenecektir. O zamana kadar bize aşağıdaki yollardan bağlayıcı şekilde ulaşabilirsiniz.",
+      providerLabel: "Sağlayıcı (§ 5 DDG)",
+      addressLabel: "Adres",
+      sameAddress: "Adres yukarıdaki gibidir",
+      pending: "Onay bekleyen bilgiler",
+      pendingNote: "Şu resmî bilgileri, şirket sahibi onayladığı anda ekleyeceğiz: şirket türü, § 27 a UStG uyarınca vergi kimlik numarası ya da § 19 UStG küçük işletme düzenlemesine ilişkin not ve § 18/2 MStV uyarınca sorumlunun resmî olarak belirtilmesi. Yukarıdaki adres ve iletişim yolları şimdiden bağlayıcıdır.",
       responsible: "İçerikten sorumlu",
       contactLabel: "İletişim",
       privacyIntro: "Bu sayfa bilinçli olarak sade kuruldu: izleme, reklam çerezi veya analiz hizmeti kullanmıyoruz.",
@@ -886,7 +896,7 @@ export const dictionary = {
       answerMeai:
         "meAI, yapay zekâ tabanlı iş işletim sistemimizdir — sayıları, görevleri ve belgeleri toplar, kararları hazırlar. meai.run adresinde canlı.",
       answerSwiss:
-        "Evet. Diepholz'da ve İsviçre'de bulunuyoruz; CASSAMEA özellikle İsviçre gastronomisi için kuruldu.",
+        "Evet. Merkezimiz Osnabrück'teki ICO InnovationsCentrum; İsviçre'ye pazar olarak hizmet veriyoruz. CASSAMEA özellikle İsviçre gastronomisi için kuruldu.",
       answerProcess:
         "Üç adımda: anlamak, kurmak, işletmek. İşletmeye bakar, sistemi kurar ve ardından işletmeye devam ederiz.",
       answerFallback:
