@@ -130,8 +130,16 @@
 }
 
 /*
- * Ruhig abgesetzte Sektionen — hell & warm, KEIN Schwarz mehr.
- * Text bleibt anthrazit und lesbar; Motiv nur als feine Struktur.
+ * Ruhig abgesetzte Sektionen (Impact-Band, meAI-Spotlight, Footer).
+ *
+ * Der Name ist historisch — gemeint ist „abgesetzt", nicht „schwarz". Die
+ * Klasse definiert einen eigenen Token-Satz und faerbt damit ein ganzes Band
+ * um, statt einzelne Elemente zu uebermalen.
+ *
+ * WICHTIG (E-D2): Der Satz muss ZWEIMAL existieren. Vorher gab es nur die
+ * helle Variante — die dann auch im Dunkelmodus griff. Ergebnis: Nav und Hero
+ * dunkel, das Band darunter creme. Der Dunkelmodus brach mitten in der Seite,
+ * und die aufgehellte Wortmarke im Footer stand unsichtbar auf Creme.
  */
 .section-dark {
   --background: #f3f1ec;
@@ -159,6 +167,37 @@
   --ring: #be904e;
   background-color: var(--background);
   color: var(--foreground);
+}
+
+/*
+ * Dasselbe Band im Dunkelmodus: eine Spur heller und waermer als der
+ * Seitengrund (#201e1b), damit es weiterhin als eigene Flaeche liest —
+ * aber eben dunkel. Spezifitaet 0,2,0 schlaegt `.section-dark` (0,1,0).
+ */
+.dark .section-dark {
+  --background: #272420;
+  --foreground: #fbfbf9;
+  --surface: #312d28;
+  --surface-raised: #393530;
+  --muted: #312d28;
+  --muted-foreground: #aaa39b;
+  --line: #3e3932;
+  --line-strong: #534d45;
+  --gold: #d3a763;
+  --gold-soft: #e4c378;
+  --gold-deep: #be904e;
+  --gold-text: #d3a763;
+  --mesh: #423c34;
+  --mesh-fill: #d3a763;
+  --card: #312d28;
+  --card-foreground: #fbfbf9;
+  --primary: #d3a763;
+  --primary-foreground: #201e1b;
+  --secondary: #312d28;
+  --secondary-foreground: #fbfbf9;
+  --border: #3e3932;
+  --input: #534d45;
+  --ring: #d3a763;
 }
 
 @layer base {
