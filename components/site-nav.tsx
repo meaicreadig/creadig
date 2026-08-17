@@ -56,7 +56,13 @@ export function SiteNav() {
           : "border-b border-transparent bg-transparent",
       )}
     >
-      <div className="mx-auto flex h-[4.5rem] max-w-[88rem] items-center justify-between gap-6 px-6 lg:px-10">
+      {/*
+        Raster identisch zu jeder Sektion (max-w-[100rem] · px-6 / md:px-10 /
+        lg:px-16). Vorher lag die Leiste auf 88rem/px-10 und lief damit ueber
+        einem anderen Raster als der Seiteninhalt — das Logo sass sichtbar
+        weiter innen als die Headline darunter.
+      */}
+      <div className="mx-auto flex h-[4.5rem] max-w-[100rem] items-center justify-between gap-6 px-6 md:px-10 lg:px-16">
         <a href="/#top" className="shrink-0" aria-label="creaDIG — zur Startseite">
           <Logo variant="auto" className="h-[1.3rem] md:h-[1.55rem]" priority />
         </a>
