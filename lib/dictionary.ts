@@ -324,8 +324,10 @@ export const dictionary = {
       submitEmail: "Per E-Mail senden",
       whatsappTitle: "WhatsApp",
       whatsappNote: "Schnellste Antwort, DE & TR.",
-      appointmentTitle: "Termin",
-      appointmentNote: "20 Minuten, unverbindlich, per Video.",
+      appointmentTitle: "Kostenlose Erstberatung",
+      appointmentNote: "20 Minuten, per Video. Kostenlos und unverbindlich.",
+      appointmentValue:
+        "Wir sehen uns Ihren Betrieb an und sagen Ihnen, was wir bauen würden — und was nicht. Auch dann, wenn die Antwort „noch nicht“ lautet.",
       appointmentCta: "Termin anfragen",
       chatTitle: "KI-Assistent",
       chatNote: "Fragen Sie direkt auf der Seite.",
@@ -343,7 +345,7 @@ export const dictionary = {
     },
     termin: {
       back: "Zurück zur Seite",
-      eyebrow: "Terminanfrage",
+      eyebrow: "Kostenlose Erstberatung",
       title: "In vier Schritten zum Gespräch.",
       lead: "Wunschtermin wählen, Angaben ergänzen — die Anfrage geht als fertige Nachricht an unser WhatsApp. Kein Konto, keine Wartezeit.",
       stepOf: "Schritt",
@@ -855,8 +857,10 @@ export const dictionary = {
       submitEmail: "E-posta ile gönder",
       whatsappTitle: "WhatsApp",
       whatsappNote: "En hızlı yanıt, DE & TR.",
-      appointmentTitle: "Randevu",
-      appointmentNote: "20 dakika, bağlayıcı değil, görüntülü.",
+      appointmentTitle: "Ücretsiz ilk görüşme",
+      appointmentNote: "20 dakika, görüntülü. Ücretsiz ve bağlayıcı değil.",
+      appointmentValue:
+        "İşletmenize bakar ve ne inşa edeceğimizi söyleriz — neyi inşa etmeyeceğimizi de. Cevap „henüz değil“ olsa bile.",
       appointmentCta: "Randevu talep et",
       chatTitle: "Yapay zekâ asistanı",
       chatNote: "Doğrudan sayfada sorun.",
@@ -873,7 +877,7 @@ export const dictionary = {
     },
     termin: {
       back: "Sayfaya dön",
-      eyebrow: "Randevu talebi",
+      eyebrow: "Ücretsiz ilk görüşme",
       title: "Dört adımda görüşmeye.",
       lead: "Tarihi seçin, bilgileri tamamlayın — talep hazır bir mesaj olarak WhatsApp'ımıza gider. Hesap yok, bekleme yok.",
       stepOf: "Adım",

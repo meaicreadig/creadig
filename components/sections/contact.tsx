@@ -291,6 +291,15 @@ export function Contact() {
                   <span className="text-muted-foreground mt-2 block text-sm">
                     {t.contact.appointmentNote}
                   </span>
+                  {/*
+                    E-K8: Was der Termin dem Gegenueber bringt, bevor er etwas
+                    kostet. Kein neues Versprechen - beschrieben ist, was
+                    ohnehin passiert (siehe Prozess-Schritt „Verstehen" und der
+                    Foerder-Hinweis „sagen wir das offen").
+                  */}
+                  <span className="type-small text-foreground/85 mt-3 block text-pretty">
+                    {t.contact.appointmentValue}
+                  </span>
                   <span className="text-gold-text mt-3 block text-sm">{t.contact.appointmentCta}</span>
                 </span>
                 <ArrowUpRight
