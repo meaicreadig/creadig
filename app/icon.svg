@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="creaDIG">
+  <!--
+    Favicon = das creaDIG-Emblem (die beiden ineinandergreifenden Boegen aus
+    public/brand/creadig-logo.svg), ohne Wortmarke. Bei 16 px ist "creaDIG"
+    ohnehin nicht lesbar; das Emblem bleibt es.
+
+    Der Verlauf ist derselbe wie im Logo (gold-soft -> gold -> gold-deep).
+    Hintergrund bewusst das warme Papierweiss statt transparent: auf dunklen
+    Browser-Tableisten faellt ein transparentes Gold sonst zusammen.
+  -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e4c378"/>
+      <stop offset="0.55" stop-color="#be904e"/>
+      <stop offset="1" stop-color="#8f6a33"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="24" fill="#201e1b"/>
+  <!-- Emblem-Koordinaten aus dem Original (x 118-436, y 187-365), zentriert skaliert. -->
+  <g transform="translate(256 256) scale(1.45) translate(-277 -276)" fill="url(#g)">
+    <path d="M143.98,276.36L143.98,276.36 c0-38.06,30.85-68.91,68.91-68.91h58.33v-19.92h-57.65c-49.06,0-88.83,39.77-88.83,88.83l0,0c0,49.06,39.77,88.83,88.83,88.83 h57.65v-19.92h-58.33C174.83,345.27,143.98,314.41,143.98,276.36z"/>
+    <path d="M347.41,187.53h-57.65v19.92h58.33 c38.06,0,68.91,30.85,68.91,68.91l0,0c0,38.06-30.85,68.91-68.91,68.91h-58.33v19.92h57.65c49.06,0,88.83-39.77,88.83-88.83l0,0 C436.24,227.3,396.47,187.53,347.41,187.53z"/>
+  </g>
+</svg>

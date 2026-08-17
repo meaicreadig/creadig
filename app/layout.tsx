@@ -68,6 +68,18 @@ export const metadata: Metadata = {
     siteName: "creaDIG",
     url: "/",
   },
+  /*
+   * Bild und Alt-Text liefert app/opengraph-image.tsx — Next haengt sie
+   * automatisch an OpenGraph UND an die Twitter-Card. Hier steht nur, welche
+   * Karte X/Twitter rendern soll: `summary_large_image` statt der kleinen
+   * quadratischen Vorschau.
+   */
+  twitter: {
+    card: "summary_large_image",
+    title: "creaDIG — Wir bauen, was andere nicht sehen.",
+    description:
+      "System-Haus seit 2017. Eigene Produkte, echte Kunden, KI-Systeme, die wir bauen und betreiben.",
+  },
   robots: { index: true, follow: true },
 }
 
