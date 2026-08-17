@@ -11,11 +11,35 @@ import { Certifications } from "@/components/sections/certifications"
 import { About } from "@/components/sections/about"
 import { Location } from "@/components/sections/location"
 import { Packages } from "@/components/sections/packages"
+import { Faq } from "@/components/sections/faq"
 import { Contact } from "@/components/sections/contact"
+import { dictionary } from "@/lib/dictionary"
+
+/**
+ * FAQPage für Suchmaschinen (E-K5).
+ *
+ * Bewusst hier und nicht in der FAQ-Komponente: Die Sektion ist eine
+ * Client-Komponente, deren Sprache erst nach der Hydration feststeht. Ein
+ * Crawler sieht das Server-HTML, und das ist deutsch — also stehen hier die
+ * deutschen Fragen. Dieselben Texte, dieselbe Quelle.
+ */
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: dictionary.de.faq.items.map((item) => ({
+    "@type": "Question",
+    name: item.q,
+    acceptedAnswer: { "@type": "Answer", text: item.a },
+  })),
+}
 
 export default function Page() {
   return (
     <main id="top">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <Hero />
       <ImpactBand />
       <LogoWall />
@@ -31,6 +55,8 @@ export default function Page() {
       <About />
       <Location />
       <Packages />
+      {/* Direkt vor dem Formular: nimmt die Fragen weg, die sonst bremsen. */}
+      <Faq />
       <Contact />
     </main>
   )

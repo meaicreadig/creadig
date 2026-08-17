@@ -87,6 +87,39 @@ export const dictionary = {
       countOne: "Bewertung",
       countMany: "Bewertungen",
     },
+    faq: {
+      eyebrow: "Häufige Fragen",
+      title: "Was Interessenten zuerst fragen.",
+      lead: "Sechs Fragen, die im Erstgespräch fast immer kommen — hier vorab beantwortet. Alle Antworten entsprechen dem, was auch am Telefon gesagt wird.",
+      more: "Ihre Frage steht nicht dabei?",
+      moreCta: "Direkt fragen",
+      items: [
+        {
+          q: "Was kostet ein Auftritt bei creaDIG?",
+          a: "Wir arbeiten mit drei festen Paketen: Identity €350 einmalig, Growth Partner €500 pro Monat und Architecture €1.500 pro Monat. Transparent, ohne versteckte Kosten.",
+        },
+        {
+          q: "Gibt es Förderung für die Zusammenarbeit?",
+          a: "Viele Leistungen sind über das go-digital-Programm des BMWK förderfähig — bis zu 50 %. Wir sind dafür autorisiertes Beratungsunternehmen, prüfen die Voraussetzungen vorab und übernehmen Antrag und Abwicklung.",
+        },
+        {
+          q: "Wie läuft ein Projekt ab?",
+          a: "In drei Schritten: verstehen, bauen, betreiben. Wir sehen uns den Betrieb an, bauen das System und betreiben es anschließend weiter.",
+        },
+        {
+          q: "Was ist meAI?",
+          a: "meAI ist unser KI-Business-Betriebssystem — es bündelt Zahlen, Aufgaben und Dokumente und bereitet Entscheidungen vor. Live unter meai.run.",
+        },
+        {
+          q: "Arbeiten Sie auch in der Schweiz?",
+          a: "Ja. Unser Sitz ist das ICO InnovationsCentrum Osnabrück; die Schweiz betreuen wir als Markt. CASSAMEA ist speziell für die schweizerische Gastronomie gebaut.",
+        },
+        {
+          q: "Sprechen Sie Türkisch?",
+          a: "Ja. Beratung, Unterlagen und laufende Betreuung gibt es auf Deutsch und auf Türkisch — auf Wunsch komplett über WhatsApp.",
+        },
+      ],
+    },
     services: {
       eyebrow: "Leistungen",
       title: "Fünf Ebenen. Ein System.",
@@ -585,6 +618,39 @@ export const dictionary = {
       ofFive: "/ 5",
       countOne: "değerlendirme",
       countMany: "değerlendirme",
+    },
+    faq: {
+      eyebrow: "Sık sorulan sorular",
+      title: "İlgilenenlerin ilk sorduğu şeyler.",
+      lead: "İlk görüşmede neredeyse her zaman gelen altı soru — burada önceden yanıtlandı. Tüm yanıtlar telefonda söylenenle aynıdır.",
+      more: "Sorunuz burada yok mu?",
+      moreCta: "Doğrudan sorun",
+      items: [
+        {
+          q: "creaDIG ile bir kimlik ne kadar?",
+          a: "Üç sabit paketle çalışıyoruz: Identity tek seferlik €350, Growth Partner aylık €500 ve Architecture aylık €1.500. Şeffaf, gizli maliyet yok.",
+        },
+        {
+          q: "İş birliği için destek imkânı var mı?",
+          a: "Birçok hizmet, BMWK'nın go-digital programı üzerinden %50'ye varan oranda desteklenebilir. Bunun için yetkili danışmanlık firmasıyız; koşulları önceden inceliyor, başvuruyu ve süreci biz yürütüyoruz.",
+        },
+        {
+          q: "Proje nasıl ilerler?",
+          a: "Üç adımda: anlamak, kurmak, işletmek. İşletmeye bakar, sistemi kurar ve ardından işletmeye devam ederiz.",
+        },
+        {
+          q: "meAI nedir?",
+          a: "meAI, yapay zekâ tabanlı iş işletim sistemimizdir — sayıları, görevleri ve belgeleri toplar, kararları hazırlar. meai.run adresinde canlı.",
+        },
+        {
+          q: "İsviçre'de de çalışıyor musunuz?",
+          a: "Evet. Merkezimiz Osnabrück'teki ICO InnovationsCentrum; İsviçre'ye pazar olarak hizmet veriyoruz. CASSAMEA özellikle İsviçre gastronomisi için kuruldu.",
+        },
+        {
+          q: "Türkçe konuşuyor musunuz?",
+          a: "Evet. Danışmanlık, belgeler ve sürekli destek Almanca ve Türkçe verilir — istenirse tamamen WhatsApp üzerinden.",
+        },
+      ],
     },
     services: {
       eyebrow: "Hizmetler",
