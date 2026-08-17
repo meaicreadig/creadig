@@ -62,7 +62,7 @@ export function Services() {
                   />
                   <div className="grid items-baseline gap-x-8 gap-y-4 px-2 py-9 md:grid-cols-12 md:px-6">
                     <div className="flex items-baseline gap-4 md:col-span-4">
-                      <span className="eyebrow text-gold">
+                      <span className="eyebrow text-gold-text">
                         {layer.level}
                       </span>
                       <h3 className="type-h3">{copy.name}</h3>
@@ -71,7 +71,7 @@ export function Services() {
                       {copy.what}
                     </p>
                     <div className="md:col-span-3">
-                      <p className="eyebrow text-line-strong group-hover:text-gold transition-colors duration-500">
+                      <p className="eyebrow text-muted-foreground group-hover:text-gold-text transition-colors duration-500">
                         {t.services.forWhom}
                       </p>
                       <p className="type-small text-muted-foreground mt-2.5 text-pretty">

@@ -24,7 +24,7 @@ export function MeaiSpotlight() {
           <div className="lg:col-span-6">
             <Reveal className="flex items-center gap-4">
               <span aria-hidden="true" className="bg-gold h-px w-10" />
-              <p className="eyebrow text-gold">{t.meai.eyebrow}</p>
+              <p className="eyebrow text-gold-text">{t.meai.eyebrow}</p>
             </Reveal>
 
             <Reveal delay={0.05}>
@@ -85,7 +85,7 @@ export function MeaiSpotlight() {
                         aria-hidden="true"
                         className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
                       />
-                      <span className="text-line-strong group-hover:text-gold text-meta transition-colors duration-500">
+                      <span className="text-muted-foreground group-hover:text-gold-text text-meta transition-colors duration-500">
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <h3 className="text-subhead mt-4 text-xl">{copy.name}</h3>

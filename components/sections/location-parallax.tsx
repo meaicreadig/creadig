@@ -102,7 +102,7 @@ export function LocationParallax({ photoSrc }: { photoSrc: string | null }) {
           <div className="mx-auto w-full max-w-[100rem] px-6 pb-10 md:px-10 md:pb-14 lg:px-16">
             <Reveal className="border-line bg-background/90 max-w-xl border p-7 backdrop-blur-sm md:p-9">
               <span aria-hidden="true" className="bg-gold block h-px w-10" />
-              <p className="eyebrow text-gold mt-5">{t.location.eyebrow}</p>
+              <p className="eyebrow text-gold-text mt-5">{t.location.eyebrow}</p>
 
               <h2
                 id="standort-title"
@@ -127,7 +127,7 @@ export function LocationParallax({ photoSrc }: { photoSrc: string | null }) {
                 href={MAP_HREF}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gold hover:text-gold-deep group mt-6 inline-flex items-center gap-2 text-sm font-medium transition-colors"
+                className="text-gold-text hover:text-foreground group mt-6 inline-flex items-center gap-2 text-sm font-medium transition-colors"
               >
                 {t.location.mapLink}
                 <ArrowUpRight

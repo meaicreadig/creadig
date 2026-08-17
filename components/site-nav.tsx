@@ -112,7 +112,7 @@ export function SiteNav() {
             asChild
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:bg-transparent hover:text-gold"
+            className="text-muted-foreground hover:bg-transparent hover:text-gold-text"
           >
             <a
               href={WHATSAPP_LINK}

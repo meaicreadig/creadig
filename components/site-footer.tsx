@@ -26,7 +26,7 @@ export function SiteFooter() {
 
         <div className="grid gap-12 py-14 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="eyebrow text-gold">{t.footer.navLabel}</p>
+            <p className="eyebrow text-gold-text">{t.footer.navLabel}</p>
             <ul className="mt-6 flex flex-col gap-3.5">
               {navLinks.map((link) => (
                 <li key={link.id}>
@@ -51,7 +51,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="eyebrow text-gold">{t.footer.productsLabel}</p>
+            <p className="eyebrow text-gold-text">{t.footer.productsLabel}</p>
             <ul className="mt-6 flex flex-col gap-3.5">
               {ownProducts.map((product) => (
                 <li key={product.name} className="text-muted-foreground text-sm">
@@ -73,7 +73,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="eyebrow text-gold">{t.footer.legalLabel}</p>
+            <p className="eyebrow text-gold-text">{t.footer.legalLabel}</p>
             <ul className="mt-6 flex flex-col gap-3.5">
               <li>
                 <Link
@@ -113,7 +113,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="eyebrow text-gold">{t.nav.kontakt}</p>
+            <p className="eyebrow text-gold-text">{t.nav.kontakt}</p>
             <ul className="mt-6 flex flex-col gap-3.5">
               <li>
                 <a
@@ -144,13 +144,13 @@ export function SiteFooter() {
               </li>
             </ul>
 
-            <p className="eyebrow text-gold mt-8">{t.footer.socialLabel}</p>
+            <p className="eyebrow text-gold-text mt-8">{t.footer.socialLabel}</p>
             {/* TODO: Echte Social-Profile verlinken. */}
             <div className="mt-4 flex gap-2">
               {["IG", "LI", "YT"].map((slot) => (
                 <span
                   key={slot}
-                  className="border-line text-line-strong hover:border-gold hover:text-gold flex size-9 items-center justify-center border text-meta transition-colors duration-400"
+                  className="border-line text-muted-foreground hover:border-gold hover:text-gold-text flex size-9 items-center justify-center border text-meta transition-colors duration-400"
                 >
                   {slot}
                 </span>
@@ -163,7 +163,7 @@ export function SiteFooter() {
           <p className="text-muted-foreground text-meta">
             © 2026 creaDIG. {t.footer.rights}
           </p>
-          <p className="text-line-strong text-meta">
+          <p className="text-muted-foreground text-meta">
             {contact.locations} · {contact.markets}
           </p>
         </div>

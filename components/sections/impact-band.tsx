@@ -46,7 +46,7 @@ export function ImpactBand() {
                   aria-hidden="true"
                   className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
                 />
-                <p className="eyebrow text-gold">{copy.label}</p>
+                <p className="eyebrow text-gold-text">{copy.label}</p>
                 <p className="type-stat mt-5">{signal.value}</p>
                 <p className="type-small text-muted-foreground mt-5 max-w-xs text-pretty">
                   {copy.detail}

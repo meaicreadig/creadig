@@ -50,7 +50,7 @@ function LogoSlot({
           </span>
         </>
       )}
-      <span className="text-line-strong eyebrow absolute top-3 right-3 transition-colors duration-500 group-hover:text-[var(--brand)]">
+      <span className="text-muted-foreground eyebrow absolute top-3 right-3 transition-colors duration-500 group-hover:text-[var(--brand)]">
         {region}
       </span>
     </div>

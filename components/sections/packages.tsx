@@ -36,7 +36,7 @@ export function Packages() {
             </p>
             <a
               href="#zertifizierungen"
-              className="text-gold hover:text-gold-deep inline-flex shrink-0 items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="text-gold-text hover:text-foreground inline-flex shrink-0 items-center gap-2 text-sm tracking-wide transition-colors duration-500"
             >
               {t.packages.fundingLink}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
@@ -67,7 +67,7 @@ export function Packages() {
                 <div className="flex items-start justify-between gap-4">
                   <h3 className="type-h3">{copy.name}</h3>
                   {pkg.recommended && (
-                    <span className="border-gold text-gold eyebrow shrink-0 border px-2.5 py-1">
+                    <span className="border-gold text-gold-text eyebrow shrink-0 border px-2.5 py-1">
                       {t.packages.recommended}
                     </span>
                   )}
@@ -82,13 +82,13 @@ export function Packages() {
 
                 {/* „Für wen" — Zeile aus der bisherigen Live-Seite übernommen. */}
                 <div className="border-line mt-8 border-t pt-6">
-                  <p className="eyebrow text-line-strong group-hover:text-gold transition-colors duration-500">
+                  <p className="eyebrow text-muted-foreground group-hover:text-gold-text transition-colors duration-500">
                     {t.packages.forWhom}
                   </p>
                   <p className="type-body text-foreground/85 mt-3 text-pretty">
                     {copy.who}
                   </p>
-                  <p className="type-body text-gold mt-4 flex gap-2 text-pretty">
+                  <p className="type-body text-gold-text mt-4 flex gap-2 text-pretty">
                     <span aria-hidden="true">→</span>
                     <span>{copy.outcome}</span>
                   </p>
@@ -115,7 +115,7 @@ export function Packages() {
                   className={
                     pkg.recommended
                       ? "from-gold-soft to-gold group/cta relative mt-7 inline-flex items-center justify-between gap-2 overflow-hidden bg-gradient-to-br px-5 py-3.5 text-sm tracking-wide text-[#201e1b]"
-                      : "border-line-strong hover:border-gold hover:text-gold mt-7 inline-flex items-center justify-between gap-2 border px-5 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                      : "border-line-strong hover:border-gold hover:text-gold-text mt-7 inline-flex items-center justify-between gap-2 border px-5 py-3.5 text-sm tracking-wide transition-colors duration-500"
                   }
                 >
                   {pkg.recommended && (

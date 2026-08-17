@@ -254,7 +254,7 @@ export function TerminWizard() {
       <div className="relative mx-auto w-full max-w-4xl px-6 pt-32 pb-24 md:px-10 md:pt-40">
         <Link
           href="/"
-          className="text-muted-foreground hover:text-gold type-small inline-flex items-center gap-2 transition-colors duration-300"
+          className="text-muted-foreground hover:text-gold-text type-small inline-flex items-center gap-2 transition-colors duration-300"
         >
           <ArrowLeft className="size-4" strokeWidth={1.5} />
           {t.termin.back}
@@ -347,7 +347,7 @@ export function TerminWizard() {
                   <span className="type-body text-muted-foreground mt-4 text-pretty">
                     {option.desc}
                   </span>
-                  <span className="text-gold eyebrow mt-5 inline-flex items-center gap-2">
+                  <span className="text-gold-text eyebrow mt-5 inline-flex items-center gap-2">
                     <Clock className="size-3.5" strokeWidth={1.5} />
                     {option.meta}
                   </span>
@@ -376,7 +376,7 @@ export function TerminWizard() {
                   onClick={() => shiftMonth(-1)}
                   disabled={!canGoBack}
                   aria-label="Vorheriger Monat"
-                  className="text-muted-foreground hover:text-gold disabled:pointer-events-none disabled:opacity-30"
+                  className="text-muted-foreground hover:text-gold-text disabled:pointer-events-none disabled:opacity-30"
                 >
                   <ChevronLeft className="size-5" strokeWidth={1.5} />
                 </button>
@@ -387,7 +387,7 @@ export function TerminWizard() {
                   type="button"
                   onClick={() => shiftMonth(1)}
                   aria-label="Nächster Monat"
-                  className="text-muted-foreground hover:text-gold"
+                  className="text-muted-foreground hover:text-gold-text"
                 >
                   <ChevronRight className="size-5" strokeWidth={1.5} />
                 </button>
@@ -456,7 +456,7 @@ export function TerminWizard() {
                         "border px-5 py-3 font-mono text-sm tracking-wide transition-colors duration-300",
                         time === slot
                           ? "border-gold bg-gold text-[#201e1b]"
-                          : "border-line-strong hover:border-gold hover:text-gold",
+                          : "border-line-strong hover:border-gold hover:text-gold-text",
                       )}
                     >
                       {slot}
@@ -570,7 +570,7 @@ export function TerminWizard() {
                         "border px-5 py-2.5 text-sm transition-colors duration-300",
                         meetingLang === option.id
                           ? "border-gold bg-gold text-[#201e1b]"
-                          : "border-line-strong hover:border-gold hover:text-gold",
+                          : "border-line-strong hover:border-gold hover:text-gold-text",
                       )}
                     >
                       {option.label}
@@ -617,7 +617,7 @@ export function TerminWizard() {
                   <dd
                     className={cn(
                       "type-small break-words",
-                      row.accent ? "text-gold" : "text-foreground",
+                      row.accent ? "text-gold-text" : "text-foreground",
                     )}
                   >
                     {row.v}
@@ -667,7 +667,7 @@ export function TerminWizard() {
                 {dateLabel} · {time}
               </p>
               <p className="text-muted-foreground">{t.termin.done.reply}</p>
-              <a href={contact.whatsappHref} className="text-gold" target="_blank" rel="noopener noreferrer">
+              <a href={contact.whatsappHref} className="text-gold-text" target="_blank" rel="noopener noreferrer">
                 {contact.whatsapp}
               </a>
             </div>
@@ -675,7 +675,7 @@ export function TerminWizard() {
             <div className="mt-10 flex flex-wrap gap-3">
               <Link
                 href="/"
-                className="border-line-strong hover:border-gold hover:text-gold inline-flex items-center gap-2 border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
               >
                 {t.termin.done.home}
               </Link>
@@ -690,7 +690,7 @@ export function TerminWizard() {
                   setForm(EMPTY_FORM)
                   setInvalid({})
                 }}
-                className="border-line-strong hover:border-gold hover:text-gold inline-flex items-center gap-2 border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
               >
                 {t.termin.done.again}
               </button>
@@ -735,7 +735,7 @@ function BackButton({ label, onClick }: { label: string; onClick: () => void }) 
     <button
       type="button"
       onClick={onClick}
-      className="text-muted-foreground hover:text-gold inline-flex items-center gap-2 text-sm transition-colors duration-300"
+      className="text-muted-foreground hover:text-gold-text inline-flex items-center gap-2 text-sm transition-colors duration-300"
     >
       <ArrowLeft className="size-4" strokeWidth={1.5} />
       {label}

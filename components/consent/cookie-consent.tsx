@@ -122,7 +122,7 @@ export function CookieConsent() {
               setDetails(false)
             }}
             aria-label={t.consent.close}
-            className="text-muted-foreground hover:text-gold absolute top-4 right-4 transition-colors duration-400"
+            className="text-muted-foreground hover:text-gold-text absolute top-4 right-4 transition-colors duration-400"
           >
             <X className="size-4" strokeWidth={1.5} />
           </button>
@@ -146,7 +146,7 @@ export function CookieConsent() {
             {t.consent.privacyPrefix}{" "}
             <Link
               href="/datenschutz"
-              className="text-gold underline underline-offset-4 hover:opacity-80"
+              className="text-gold-text underline underline-offset-4 hover:opacity-80"
             >
               {t.consent.privacyLink}
             </Link>
@@ -163,7 +163,7 @@ export function CookieConsent() {
                     <p className="text-foreground text-base font-semibold">
                       {t.consent.categories.essential.name}
                     </p>
-                    <span className="border-gold/50 text-gold eyebrow border px-2 py-0.5">
+                    <span className="border-gold/50 text-gold-text eyebrow border px-2 py-0.5">
                       {t.consent.alwaysActive}
                     </span>
                   </div>
@@ -219,7 +219,7 @@ export function CookieConsent() {
             <button
               type="button"
               onClick={() => decide(ESSENTIAL_ONLY)}
-              className="border-line-strong hover:border-gold hover:text-gold inline-flex items-center justify-center border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
+              className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center justify-center border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
             >
               {t.consent.essentialOnly}
             </button>
@@ -228,7 +228,7 @@ export function CookieConsent() {
               <button
                 type="button"
                 onClick={() => decide(choice)}
-                className="border-line-strong hover:border-gold hover:text-gold inline-flex items-center justify-center gap-2.5 border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center justify-center gap-2.5 border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
               >
                 <Check className="size-4" strokeWidth={1.5} />
                 {t.consent.save}
@@ -237,7 +237,7 @@ export function CookieConsent() {
               <button
                 type="button"
                 onClick={() => setDetails(true)}
-                className="text-muted-foreground hover:text-gold inline-flex items-center justify-center gap-2 py-3.5 text-sm tracking-wide transition-colors duration-500 sm:px-2"
+                className="text-muted-foreground hover:text-gold-text inline-flex items-center justify-center gap-2 py-3.5 text-sm tracking-wide transition-colors duration-500 sm:px-2"
               >
                 <SlidersHorizontal className="size-4" strokeWidth={1.5} />
                 {t.consent.customize}

@@ -72,7 +72,7 @@ export function Certifications() {
                 ) : (
                   <span
                     aria-hidden="true"
-                    className="border-line-strong text-muted-foreground group-hover:border-gold group-hover:text-gold flex h-11 min-w-11 items-center justify-center self-start text-meta border px-2.5 transition-colors duration-500"
+                    className="border-line-strong text-muted-foreground group-hover:border-gold group-hover:text-gold-text flex h-11 min-w-11 items-center justify-center self-start text-meta border px-2.5 transition-colors duration-500"
                   >
                     {cert.mark}
                   </span>
@@ -86,7 +86,7 @@ export function Certifications() {
                 </p>
 
                 {copy.note && (
-                  <p className="text-line-strong group-hover:text-gold text-meta mt-4 transition-colors duration-500">
+                  <p className="text-muted-foreground group-hover:text-gold-text text-meta mt-4 transition-colors duration-500">
                     {copy.note}
                   </p>
                 )}
@@ -95,7 +95,7 @@ export function Certifications() {
                   href={cert.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-gold mt-auto inline-flex items-center gap-1.5 pt-8 text-[0.75rem] transition-colors duration-500"
+                  className="text-muted-foreground hover:text-gold-text mt-auto inline-flex items-center gap-1.5 pt-8 text-[0.75rem] transition-colors duration-500"
                 >
                   {t.certs.verify}
                   <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
@@ -115,7 +115,7 @@ export function Certifications() {
         <Reveal delay={0.06}>
           <div className="border-gold/45 bg-gold/[0.045] mt-16 grid gap-10 border-l-2 px-7 py-9 md:px-10 md:py-11 lg:grid-cols-12 lg:gap-14">
             <div className="lg:col-span-7">
-              <p className="eyebrow text-gold">{t.certs.funding.eyebrow}</p>
+              <p className="eyebrow text-gold-text">{t.certs.funding.eyebrow}</p>
               <h3 className="type-h3 mt-5 text-balance">
                 {t.certs.funding.title}
               </h3>

@@ -44,14 +44,14 @@ export function About() {
           {/* Faktenspalte: Gründer, Schwerpunkte, Sitz */}
           <div className="flex flex-col gap-px lg:col-span-5">
             <Reveal delay={0.06} className="border-line border-t pt-7">
-              <p className="eyebrow text-gold">{t.about.founderLabel}</p>
+              <p className="eyebrow text-gold-text">{t.about.founderLabel}</p>
               <p className="type-statement mt-4">
                 {t.about.founder}
               </p>
             </Reveal>
 
             <Reveal delay={0.12} className="border-line mt-10 border-t pt-7">
-              <p className="eyebrow text-gold">{t.about.nicheLabel}</p>
+              <p className="eyebrow text-gold-text">{t.about.nicheLabel}</p>
               <ul className="mt-5 flex flex-col gap-4">
                 {t.about.niches.map((niche) => (
                   <li key={niche} className="flex gap-3.5">
@@ -65,7 +65,7 @@ export function About() {
             </Reveal>
 
             <Reveal delay={0.18} className="border-line mt-10 border-t pt-7">
-              <p className="eyebrow text-gold">{t.about.locationsLabel}</p>
+              <p className="eyebrow text-gold-text">{t.about.locationsLabel}</p>
               <address className="type-small text-foreground/85 mt-4 not-italic">
                 {contact.addressLines.map((line) => (
                   <span key={line} className="block">
@@ -73,7 +73,7 @@ export function About() {
                   </span>
                 ))}
               </address>
-              <p className="eyebrow text-gold mt-7">{t.about.marketsLabel}</p>
+              <p className="eyebrow text-gold-text mt-7">{t.about.marketsLabel}</p>
               <p className="type-small text-foreground/85 mt-3">{contact.markets}</p>
             </Reveal>
           </div>

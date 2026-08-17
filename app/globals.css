@@ -15,6 +15,16 @@
   --color-gold: var(--gold);
   --color-gold-soft: var(--gold-soft);
   --color-gold-deep: var(--gold-deep);
+  /*
+   * Gold hat zwei Rollen mit unterschiedlichen Anforderungen:
+   *   --gold      = Marken-Gold für Flächen, Hairlines, Verläufe, Embleme.
+   *                 Darf leuchten, muss keinen Textkontrast erfüllen.
+   *   --gold-text = dieselbe Farbe als LESBARES Gold. `--gold` erreicht auf dem
+   *                 Papierweiss nur 2,8:1 und fällt damit selbst für große
+   *                 Schrift durch AA. Jedes Gold, das ein Mensch liest
+   *                 (Eyebrows, Ziffern, Links, Preiszeilen), nimmt diesen Wert.
+   */
+  --color-gold-text: var(--gold-text);
   --color-mesh: var(--mesh);
   --color-mesh-fill: var(--mesh-fill);
   /* „ink" folgt immer dem Vordergrund, damit dunkle Sektionen korrekt invertieren. */
@@ -60,6 +70,8 @@
   --gold: #be904e;
   --gold-soft: #e4c378;
   --gold-deep: #8f6a33;
+  /* 4,7:1 auf #fbfbf9 — AA auch für Fließtext. */
+  --gold-text: #8f6a33;
   /* Signatur-Motiv (Dreiecks-Mesh) */
   --mesh: #ded9d0;
   --mesh-fill: #be904e;
@@ -95,6 +107,8 @@
   --gold: #d3a763;
   --gold-soft: #e4c378;
   --gold-deep: #be904e;
+  /* 7,5:1 auf #201e1b. */
+  --gold-text: #d3a763;
   --mesh: #3a352f;
   --mesh-fill: #d3a763;
 
@@ -131,6 +145,7 @@
   --gold: #be904e;
   --gold-soft: #e4c378;
   --gold-deep: #8f6a33;
+  --gold-text: #8f6a33;
   --mesh: #ddd8cf;
   --mesh-fill: #be904e;
   --card: #ffffff;

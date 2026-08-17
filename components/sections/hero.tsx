@@ -44,7 +44,7 @@ export function Hero() {
                 >
                   {isLast && words.length > 1 ? (
                     <>
-                      {words.slice(0, -1).join(" ")} <span className="text-gold">{words.at(-1)}</span>
+                      {words.slice(0, -1).join(" ")} <span className="text-gold-text">{words.at(-1)}</span>
                     </>
                   ) : (
                     line

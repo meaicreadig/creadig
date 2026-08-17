@@ -193,7 +193,7 @@ export function Contact() {
                   </span>
                 </span>
                 <ArrowUpRight
-                  className="text-line-strong group-hover:text-gold mt-1 size-4 transition-colors duration-500"
+                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 transition-colors duration-500"
                   strokeWidth={1.5}
                 />
               </a>
@@ -214,10 +214,10 @@ export function Contact() {
                   <span className="text-muted-foreground mt-2 block text-sm">
                     {t.contact.appointmentNote}
                   </span>
-                  <span className="text-gold mt-3 block text-sm">{t.contact.appointmentCta}</span>
+                  <span className="text-gold-text mt-3 block text-sm">{t.contact.appointmentCta}</span>
                 </span>
                 <ArrowUpRight
-                  className="text-line-strong group-hover:text-gold mt-1 size-4 transition-colors duration-500"
+                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 transition-colors duration-500"
                   strokeWidth={1.5}
                 />
               </Link>
@@ -237,10 +237,10 @@ export function Contact() {
                 <span className="flex-1">
                   <span className="text-display block text-xl">{t.contact.chatTitle}</span>
                   <span className="text-muted-foreground mt-2 block text-sm">{t.contact.chatNote}</span>
-                  <span className="text-gold mt-3 block text-sm">{t.contact.chatCta}</span>
+                  <span className="text-gold-text mt-3 block text-sm">{t.contact.chatCta}</span>
                 </span>
                 <ArrowUpRight
-                  className="text-line-strong group-hover:text-gold mt-1 size-4 transition-colors duration-500"
+                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 transition-colors duration-500"
                   strokeWidth={1.5}
                 />
               </button>
@@ -248,7 +248,7 @@ export function Contact() {
 
             {/* Sitz = Osnabrück (ICO). Die Schweiz ist Markt, nicht Standort. */}
             <Reveal delay={0.24} className="border-line mt-10 border-t pt-7">
-              <p className="eyebrow text-gold">{t.contact.locationsLabel}</p>
+              <p className="eyebrow text-gold-text">{t.contact.locationsLabel}</p>
               <address className="type-small text-foreground/85 mt-4 not-italic">
                 {contact.addressLines.map((line) => (
                   <span key={line} className="block">
@@ -256,7 +256,7 @@ export function Contact() {
                   </span>
                 ))}
               </address>
-              <p className="eyebrow text-gold mt-7">{t.contact.marketsLabel}</p>
+              <p className="eyebrow text-gold-text mt-7">{t.contact.marketsLabel}</p>
               <p className="type-small text-foreground/85 mt-3">{contact.markets}</p>
             </Reveal>
           </div>

@@ -84,7 +84,7 @@ function WorkCard({
 
         {/* Hover-Reveal: was wir gebaut haben */}
         <div className="bg-background/95 absolute inset-x-0 bottom-0 translate-y-full p-5 backdrop-blur-md transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0">
-          <p className="eyebrow text-gold">{builtLabel}</p>
+          <p className="eyebrow text-gold-text">{builtLabel}</p>
           <p className="type-small text-foreground mt-2 text-pretty">
             {work.built}
           </p>
@@ -196,7 +196,7 @@ export function Portfolio() {
               className="group bg-surface hover:bg-surface-raised flex items-baseline justify-between gap-4 px-6 py-7 transition-colors duration-500"
             >
               <span className="text-subhead text-foreground text-xl">{project.name}</span>
-              <span className="text-muted-foreground group-hover:text-gold text-right text-[0.75rem] transition-colors duration-500">
+              <span className="text-muted-foreground group-hover:text-gold-text text-right text-[0.75rem] transition-colors duration-500">
                 {project.what}
               </span>
             </li>
