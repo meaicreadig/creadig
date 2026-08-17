@@ -192,8 +192,8 @@ export const navLinks = [
 
 /** Echte Signale statt erfundener Kennzahlen. */
 export const impactSignals = [
-  // TODO: Gründungsjahr vom Owner bestätigen lassen (KIZILELMA §4b markiert es als offen).
-  { value: "2018", key: "since" as const },
+  // Gründungsjahr 2017 — vom Inhaber bestätigt (2026-08-17).
+  { value: "2017", key: "since" as const },
   { value: "4", key: "products" as const },
   { value: "DE / CH", key: "regions" as const },
   { value: "A–Z", key: "scope" as const },

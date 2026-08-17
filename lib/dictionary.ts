@@ -26,7 +26,7 @@ export const dictionary = {
       language: "Sprache wechseln",
     },
     hero: {
-      eyebrow: "System-Haus · seit 2018 · Deutschland & Schweiz",
+      eyebrow: "System-Haus · seit 2017 · Deutschland & Schweiz",
       headlineLine1: "Wir bauen,",
       headlineLine2: "was andere",
       headlineLine3: "nicht sehen.",
@@ -151,7 +151,7 @@ export const dictionary = {
       founderLabel: "Gründer",
       founder: "Muhammed Emin Akyol",
       body1:
-        "creaDIG startete 2018 als Agentur. Aus Aufträgen wurden Produkte, aus Produkten ein System-Haus — heute laufen unter dem Dach eigene Systeme und ein operatives Telekom-Geschäft.",
+        "creaDIG startete 2017 als Agentur. Aus Aufträgen wurden Produkte, aus Produkten ein System-Haus — heute laufen unter dem Dach eigene Systeme und ein operatives Telekom-Geschäft.",
       body2:
         "Wir arbeiten mit einem spezialisierten Netzwerk aus Entwicklern, Textern und Strategen im DACH-Raum. Das Team wächst; die nächsten Stellen sind in Vorbereitung.",
       nicheLabel: "Schwerpunkte",
@@ -483,7 +483,7 @@ export const dictionary = {
       language: "Dili değiştir",
     },
     hero: {
-      eyebrow: "Sistem evi · 2018'den beri · Almanya & İsviçre",
+      eyebrow: "Sistem evi · 2017'den beri · Almanya & İsviçre",
       headlineLine1: "Başkalarının",
       headlineLine2: "görmediğini",
       headlineLine3: "inşa ediyoruz.",
@@ -608,7 +608,7 @@ export const dictionary = {
       founderLabel: "Kurucu",
       founder: "Muhammed Emin Akyol",
       body1:
-        "creaDIG 2018'de ajans olarak başladı. İşlerden ürünler, ürünlerden bir sistem evi doğdu — bugün bu çatı altında kendi sistemlerimiz ve operasyonel bir telekom işi yürüyor.",
+        "creaDIG 2017'de ajans olarak başladı. İşlerden ürünler, ürünlerden bir sistem evi doğdu — bugün bu çatı altında kendi sistemlerimiz ve operasyonel bir telekom işi yürüyor.",
       body2:
         "DACH bölgesinde geliştirici, metin yazarı ve stratejistlerden oluşan uzman bir ağ ile çalışıyoruz. Ekip büyüyor; yeni pozisyonlar hazırlanıyor.",
       nicheLabel: "Odak alanları",

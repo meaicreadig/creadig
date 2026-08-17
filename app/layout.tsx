@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "creaDIG — Wir bauen, was andere nicht sehen.",
     description:
-      "System-Haus seit 2018. Eigene Produkte, echte Kunden, KI-Systeme, die wir bauen und betreiben.",
+      "System-Haus seit 2017. Eigene Produkte, echte Kunden, KI-Systeme, die wir bauen und betreiben.",
     locale: "de_DE",
     type: "website",
     siteName: "creaDIG",
@@ -83,7 +83,7 @@ const organizationSchema = {
   name: "creaDIG",
   description:
     "System-Haus für Marke, Web, Operations, Automation und KI. Eigene Produkte: meAI, fibero, CASSAMEA, meahv.",
-  foundingDate: "2018",
+  foundingDate: "2017",
   areaServed: ["DE", "CH"],
   // Sitz: ICO InnovationsCentrum Osnabrück. Die Schweiz ist Markt, nicht Sitz.
   address: {
