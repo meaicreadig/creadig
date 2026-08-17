@@ -18,7 +18,7 @@ export function About() {
         <div className="mt-7 grid gap-x-12 gap-y-16 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <Reveal>
-              <h2 id="ueber-title" className="text-display text-[clamp(2.25rem,6vw,5rem)] text-balance">
+              <h2 id="ueber-title" className="type-h2 text-balance">
                 {t.about.title}
               </h2>
             </Reveal>
@@ -45,7 +45,7 @@ export function About() {
           <div className="flex flex-col gap-px lg:col-span-5">
             <Reveal delay={0.06} className="border-line border-t pt-7">
               <p className="eyebrow text-gold">{t.about.founderLabel}</p>
-              <p className="text-display mt-4 text-[clamp(1.5rem,2.6vw,2.25rem)]">
+              <p className="type-statement mt-4">
                 {t.about.founder}
               </p>
             </Reveal>

@@ -106,7 +106,7 @@ export function LocationParallax({ photoSrc }: { photoSrc: string | null }) {
 
               <h2
                 id="standort-title"
-                className="text-display mt-4 text-[clamp(1.5rem,2.8vw,2.5rem)] text-balance"
+                className="type-h3 mt-4 text-balance"
               >
                 {address.venue}
               </h2>

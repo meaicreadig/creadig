@@ -22,7 +22,7 @@ export function Services() {
             </div>
             <h2
               id="leistungen-title"
-              className="text-display mt-7 text-[clamp(2.25rem,6vw,5rem)] text-balance"
+              className="type-h2 mt-7 text-balance"
             >
               {t.services.title}
             </h2>
@@ -65,9 +65,9 @@ export function Services() {
                       <span className="text-gold font-mono text-xs tracking-[0.16em]">
                         {layer.level}
                       </span>
-                      <h3 className="text-display text-[clamp(1.5rem,2.8vw,2.5rem)]">{copy.name}</h3>
+                      <h3 className="type-h3">{copy.name}</h3>
                     </div>
-                    <p className="text-foreground/85 text-base leading-relaxed text-pretty md:col-span-5 md:text-[1.0625rem]">
+                    <p className="type-lead text-foreground/85 text-pretty md:col-span-5">
                       {copy.what}
                     </p>
                     <div className="md:col-span-3">

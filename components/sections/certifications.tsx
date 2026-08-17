@@ -36,7 +36,7 @@ export function Certifications() {
             </div>
             <h2
               id="zertifizierungen-title"
-              className="text-display mt-7 text-[clamp(2.25rem,6vw,5rem)] text-balance"
+              className="type-h2 mt-7 text-balance"
             >
               {t.certs.title}
             </h2>
@@ -116,7 +116,7 @@ export function Certifications() {
           <div className="border-gold/45 bg-gold/[0.045] mt-16 grid gap-10 border-l-2 px-7 py-9 md:px-10 md:py-11 lg:grid-cols-12 lg:gap-14">
             <div className="lg:col-span-7">
               <p className="eyebrow text-gold">{t.certs.funding.eyebrow}</p>
-              <h3 className="text-display mt-5 text-[clamp(1.5rem,3vw,2.5rem)] text-balance">
+              <h3 className="type-h3 mt-5 text-balance">
                 {t.certs.funding.title}
               </h3>
               <p className="text-foreground/85 mt-6 max-w-2xl text-base leading-relaxed text-pretty">

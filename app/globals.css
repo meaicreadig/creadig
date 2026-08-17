@@ -178,7 +178,12 @@
   }
 }
 
-/* Headlines sind Bauwerke: riesig, eng, selbstbewusst. */
+/*
+ * Headlines sind Bauwerke: riesig, eng, selbstbewusst.
+ * `text-display` ist reine SCHNITT-Angabe (Familie, Gewicht, Laufweite) — die
+ * Größe kommt separat. Für alle wiederkehrenden Ebenen gibt es stattdessen die
+ * `type-*`-Skala unten, die Schnitt UND Größe in einer Klasse bündelt.
+ */
 @utility text-display {
   font-family: var(--font-display);
   font-weight: 700;
@@ -187,11 +192,101 @@
   line-height: 1.02;
 }
 
-@utility text-display-tight {
+/* ==========================================================================
+ * TYPOGRAFIE-SKALA — eine Quelle je Ebene.
+ *
+ * Vorher lagen ~30 Größen als `text-[clamp(…)]` direkt im Markup, die H2 war
+ * 8× wortgleich dupliziert, die H3 6× leicht abweichend. Wer die H2 ändern
+ * wollte, musste 8 Dateien anfassen — und hat es nie überall getroffen.
+ *
+ * Regeln:
+ * - Genau EIN `clamp()` pro Ebene. Neue Größen kommen hier rein, nicht ins Markup.
+ * - Jede Klasse ist selbsttragend (Familie + Gewicht + Laufweite + Zeilenhöhe
+ *   + Größe) und wird NICHT mit `text-display` kombiniert.
+ * - Gewicht 700 tragen nur die großen Bauwerke; ab H3 trägt 600 (siehe E-T2),
+ *   damit überhaupt eine Hierarchie-Stufe zwischen Headline und Fließtext liegt.
+ * ========================================================================== */
+
+/* Hero — einmal pro Seite, das größte Bauwerk. */
+@utility type-display {
   font-family: var(--font-display);
   font-weight: 700;
+  font-size: clamp(3rem, 11vw, 9.5rem);
   letter-spacing: -0.045em;
-  line-height: 0.95;
+  /* 0.95 kappte Unterlängen der 3-zeiligen DE-Headline. */
+  line-height: 1;
+}
+
+/* Seiten-Titel der Unterseiten (/impressum, /datenschutz, /termin). */
+@utility type-h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.25rem, 6vw, 4rem);
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+}
+
+/* Sektions-Headline auf der Startseite. */
+@utility type-h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.25rem, 6vw, 5rem);
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+
+/* Karten- und Unterüberschrift. */
+@utility type-h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 2.8vw, 2.5rem);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+
+/* Kompakte Kartenüberschrift (dichte Raster). */
+@utility type-h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.25rem, 1.8vw, 1.625rem);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Kennziffern und Preise — Ziffern sollen tragen, nicht flüstern. */
+@utility type-stat {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 4.5vw, 4rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+/* Haltungssatz: großer Fließtext im Headline-Schnitt. */
+@utility type-statement {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.25rem, 2.6vw, 2.25rem);
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+/* Einleitungstext direkt unter einer Headline. */
+@utility type-lead {
+  font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
+  line-height: 1.65;
+}
+
+/* Fließtext-Boden: nie kleiner als 16px. */
+@utility type-body {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* Bewusstes „small" — Meta, Fußnoten, Nebeninformation. */
+@utility type-small {
+  font-size: 0.9375rem;
+  line-height: 1.6;
 }
 
 @utility eyebrow {

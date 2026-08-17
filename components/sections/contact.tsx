@@ -55,7 +55,7 @@ export function Contact() {
           {/* Formular */}
           <div className="lg:col-span-7">
             <Reveal>
-              <h2 id="kontakt-title" className="text-display text-[clamp(2.25rem,6vw,5rem)] text-balance">
+              <h2 id="kontakt-title" className="type-h2 text-balance">
                 {t.contact.title}
               </h2>
             </Reveal>

@@ -18,7 +18,7 @@ export function Process() {
         <Reveal delay={0.05}>
           <h2
             id="prozess-title"
-            className="text-display mt-7 max-w-3xl text-[clamp(2.25rem,6vw,5rem)] text-balance"
+            className="type-h2 mt-7 max-w-3xl text-balance"
           >
             {t.process.title}
           </h2>
@@ -38,7 +38,7 @@ export function Process() {
                   className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
                 />
                 <span className="text-gold font-mono text-xs tracking-[0.16em]">{step.step}</span>
-                <h3 className="text-display mt-6 text-[clamp(1.75rem,3.5vw,2.75rem)]">{copy.name}</h3>
+                <h3 className="type-h3 mt-6">{copy.name}</h3>
                 <p className="text-muted-foreground mt-5 max-w-sm text-[0.9375rem] leading-relaxed text-pretty">
                   {copy.what}
                 </p>
@@ -48,7 +48,7 @@ export function Process() {
         </div>
 
         <Reveal delay={0.2}>
-          <p className="text-display border-line mt-20 max-w-4xl border-t pt-12 text-[clamp(1.25rem,2.6vw,2.25rem)] text-balance">
+          <p className="type-statement border-line mt-20 max-w-4xl border-t pt-12 text-balance">
             {t.process.bridge}
           </p>
         </Reveal>

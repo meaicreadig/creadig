@@ -96,8 +96,8 @@ function WorkCard({
           <div className="flex items-start justify-between gap-4">
             <h3
               className={cn(
-                "text-display text-foreground",
-                compact ? "text-[clamp(1.25rem,1.8vw,1.625rem)]" : "text-[clamp(1.5rem,2.4vw,2.25rem)]",
+                "text-foreground",
+                compact ? "type-h4" : "type-h3",
               )}
             >
               {work.name}
@@ -149,7 +149,7 @@ export function Portfolio() {
             </div>
             <h2
               id="arbeiten-title"
-              className="text-display text-foreground mt-6 text-[clamp(2.5rem,7vw,5.5rem)]"
+              className="type-h2 text-foreground mt-6 text-balance"
             >
               {t.portfolio.title}
             </h2>

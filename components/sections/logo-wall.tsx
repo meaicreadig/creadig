@@ -115,7 +115,7 @@ export function LogoWall() {
             </div>
             <h2
               id="produkte-title"
-              className="text-display mt-7 max-w-2xl text-[clamp(2.25rem,5.5vw,4.5rem)] text-balance"
+              className="type-h2 mt-7 max-w-2xl text-balance"
             >
               {t.logos.title}
             </h2>

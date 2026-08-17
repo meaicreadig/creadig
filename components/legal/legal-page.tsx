@@ -50,7 +50,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
           <span aria-hidden="true" className="bg-gold h-px w-10" />
           <p className="eyebrow text-muted-foreground">creaDIG</p>
         </div>
-        <h1 className="text-display mt-6 text-[clamp(2.25rem,6vw,4rem)]">{title}</h1>
+        <h1 className="type-h1 mt-6">{title}</h1>
 
         {kind === "imprint" ? (
           <div className="mt-12 flex flex-col gap-10">

@@ -30,7 +30,7 @@ export function Hero() {
         </motion.div>
 
         {/* Headline als Bauwerk: bildschirmfüllend, kinetisch enthüllt */}
-        <h1 className="text-display-tight mt-10 text-[clamp(3rem,11vw,9.5rem)]">
+        <h1 className="type-display mt-10">
           {lines.map((line, i) => {
             const words = line.split(" ")
             const isLast = i === lines.length - 1

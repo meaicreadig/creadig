@@ -30,7 +30,7 @@ export function MeaiSpotlight() {
             <Reveal delay={0.05}>
               <h2
                 id="meai-title"
-                className="text-display mt-8 text-[clamp(2.25rem,6vw,5rem)] text-balance"
+                className="type-h2 mt-8 text-balance"
               >
                 {t.meai.title}
               </h2>

@@ -17,7 +17,7 @@ export function Packages() {
               <span aria-hidden="true" className="bg-gold h-px w-10" />
               <p className="eyebrow text-muted-foreground">{t.packages.eyebrow}</p>
             </div>
-            <h2 id="pakete-title" className="text-display mt-7 text-[clamp(2.25rem,6vw,5rem)] text-balance">
+            <h2 id="pakete-title" className="type-h2 mt-7 text-balance">
               {t.packages.title}
             </h2>
           </Reveal>
@@ -65,7 +65,7 @@ export function Packages() {
                 />
 
                 <div className="flex items-start justify-between gap-4">
-                  <h3 className="text-display text-[clamp(1.5rem,2.4vw,2rem)]">{copy.name}</h3>
+                  <h3 className="type-h3">{copy.name}</h3>
                   {pkg.recommended && (
                     <span className="border-gold text-gold shrink-0 border px-2.5 py-1 font-mono text-[0.5625rem] tracking-[0.14em] uppercase">
                       {t.packages.recommended}
@@ -74,7 +74,7 @@ export function Packages() {
                 </div>
 
                 <div className="mt-8 flex items-baseline gap-2.5">
-                  <span className="text-display text-[clamp(2.5rem,4.5vw,3.5rem)]">{pkg.price}</span>
+                  <span className="type-stat">{pkg.price}</span>
                   <span className="text-muted-foreground text-xs tracking-[0.1em] uppercase">
                     {isMonthly ? t.packages.monthly : t.packages.once}
                   </span>

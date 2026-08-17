@@ -264,7 +264,7 @@ export function TerminWizard() {
           <span aria-hidden="true" className="bg-gold h-px w-10" />
           <p className="eyebrow text-muted-foreground">{t.termin.eyebrow}</p>
         </div>
-        <h1 className="text-display mt-6 text-[clamp(2.25rem,6vw,4rem)] text-balance">
+        <h1 className="type-h1 mt-6 text-balance">
           {t.termin.title}
         </h1>
         <p className="text-muted-foreground mt-6 max-w-xl text-base leading-relaxed text-pretty md:text-lg">
@@ -657,7 +657,7 @@ export function TerminWizard() {
             >
               <Check className="size-6" strokeWidth={1.5} />
             </span>
-            <h2 className="text-display mt-8 text-[clamp(1.75rem,4vw,2.75rem)]">{t.termin.done.title}</h2>
+            <h2 className="type-h3 mt-8">{t.termin.done.title}</h2>
             <p className="text-muted-foreground mt-5 max-w-xl text-base leading-relaxed text-pretty">
               {t.termin.done.lead}
             </p>

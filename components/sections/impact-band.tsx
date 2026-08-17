@@ -28,7 +28,7 @@ export function ImpactBand() {
         </Reveal>
 
         <Reveal delay={0.05}>
-          <h2 className="text-display mt-8 max-w-4xl text-[clamp(2.25rem,6vw,5rem)] text-balance">
+          <h2 className="type-h2 mt-8 max-w-4xl text-balance">
             {t.impact.title}
           </h2>
         </Reveal>
@@ -47,7 +47,7 @@ export function ImpactBand() {
                   className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
                 />
                 <p className="eyebrow text-gold">{copy.label}</p>
-                <p className="text-display mt-5 text-[clamp(2.5rem,4.5vw,4rem)]">{signal.value}</p>
+                <p className="type-stat mt-5">{signal.value}</p>
                 <p className="text-muted-foreground mt-5 max-w-xs text-sm leading-relaxed text-pretty">
                   {copy.detail}
                 </p>
