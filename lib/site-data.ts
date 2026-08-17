@@ -172,6 +172,69 @@ export const clientWorks: Work[] = [
   },
 ]
 
+/* ==========================================================================
+ * CASE-STUDIES — Problem → Lösung → Ergebnis (E-K1)
+ *
+ * Das Format, mit dem Wettbewerber gewinnen: nicht „wir haben eine Website
+ * gebaut", sondern „der Betrieb hatte X, wir haben Y gebaut, seither Z".
+ *
+ * Die Struktur steht. Der Inhalt NICHT — und er wird hier auch nicht
+ * erfunden. Jeder Eintrag braucht `approved: true`, und das heißt: eine
+ * schriftliche Freigabe des Kunden für genau diesen Text liegt vor. Ohne
+ * Freigabe rendert die Sektion gar nicht, statt mit Platzhaltern zu füllen.
+ *
+ * Zweisprachig als Feld-Paar, damit ein halb übersetzter Fall gar nicht erst
+ * ins Repo kommt — der Compiler verlangt beide Sprachen.
+ * ========================================================================== */
+
+/** Ein Text in beiden Sprachen. Fehlt eine, meckert der Compiler. */
+export type Localized = { de: string; tr: string }
+
+export type CaseStudy = {
+  slug: string
+  /** Kundenname exakt so, wie er freigegeben wurde. */
+  client: string
+  /** Branche/Ort — Einordnung, keine Bewertung. */
+  context: Localized
+  /** Ausgangslage beim Kunden, in dessen Worten oder von ihm bestätigt. */
+  problem: Localized
+  /** Was wir gebaut oder geändert haben. */
+  solution: Localized
+  /**
+   * Ergebnis — ausschließlich Nachweisbares. Keine Prozentzahl ohne Quelle,
+   * keine „Umsatz verdreifacht"-Behauptung ohne Beleg des Kunden.
+   */
+  result: Localized
+  image: string | null
+  /** Monogramm, solange kein Bild vorliegt. */
+  mark: string
+  /** Schriftliche Freigabe des Kunden liegt vor. */
+  approved: boolean
+}
+
+/**
+ * LEER, und das ist der ehrliche Zustand.
+ *
+ * TODO (Owner): 2–3 Kunden um eine kurze Freigabe bitten, dann hier
+ * eintragen. Vorlage:
+ *
+ *   {
+ *     slug: "beispiel-betrieb",
+ *     client: "Beispiel GmbH",
+ *     context: { de: "Handwerk · Osnabrück", tr: "Zanaat · Osnabrück" },
+ *     problem: { de: "…", tr: "…" },
+ *     solution: { de: "…", tr: "…" },
+ *     result: { de: "…", tr: "…" },
+ *     image: null,
+ *     mark: "BG",
+ *     approved: true,
+ *   }
+ */
+export const caseStudies: CaseStudy[] = []
+
+/** Nur Freigegebenes verlässt die Datei. */
+export const approvedCaseStudies = caseStudies.filter((c) => c.approved)
+
 /**
  * Was sonst noch unter dem Dach läuft. `creaDIG fiber` ist das operative
  * Glasfaser-Geschäft (der Motor) — nicht zu verwechseln mit dem Produkt fibero.

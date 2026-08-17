@@ -68,6 +68,14 @@ export const dictionary = {
       viewLive: "Live ansehen",
       mockupNote: "Abbildungen sind illustrative Mockups, keine Screenshots.",
     },
+    cases: {
+      eyebrow: "Kundenfälle",
+      title: "Was sich danach geändert hat.",
+      lead: "Jeder Fall in derselben Reihenfolge: Ausgangslage, was wir gebaut haben, was daraus geworden ist. Nur mit schriftlicher Freigabe des Kunden — ohne Freigabe steht hier nichts.",
+      problem: "Ausgangslage",
+      solution: "Was wir gebaut haben",
+      result: "Was daraus wurde",
+    },
     services: {
       eyebrow: "Leistungen",
       title: "Fünf Ebenen. Ein System.",
@@ -542,6 +550,14 @@ export const dictionary = {
       more: "Çatı altında ayrıca",
       viewLive: "Canlı gör",
       mockupNote: "Görseller açıklayıcı maketlerdir, ekran görüntüsü değildir.",
+    },
+    cases: {
+      eyebrow: "Müşteri örnekleri",
+      title: "Sonrasında ne değişti.",
+      lead: "Her örnek aynı sırayla: başlangıç durumu, ne inşa ettiğimiz, ortaya ne çıktığı. Yalnızca müşterinin yazılı onayıyla — onay yoksa burada bir şey yazmaz.",
+      problem: "Başlangıç durumu",
+      solution: "Ne inşa ettik",
+      result: "Ortaya ne çıktı",
     },
     services: {
       eyebrow: "Hizmetler",
