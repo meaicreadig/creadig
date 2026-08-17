@@ -3,6 +3,7 @@
 import { useLocale } from "@/components/locale-provider"
 import Link from "next/link"
 import { Logo } from "@/components/brand/logo"
+import { SignatureMotif } from "@/components/brand/signature-motif"
 import { contact, navLinks, ownProducts } from "@/lib/site-data"
 import { openConsentSettings } from "@/lib/consent"
 
@@ -11,7 +12,11 @@ export function SiteFooter() {
 
   return (
     <footer className="section-dark relative overflow-hidden">
-      <div aria-hidden="true" className="triangle-mesh absolute inset-0 opacity-[0.12]" />
+      <SignatureMotif
+        direction="down"
+        density={0.45}
+        className="motif-band pointer-events-none absolute inset-0 h-full w-full"
+      />
 
       <div className="relative mx-auto w-full max-w-[100rem] px-6 pt-24 pb-10 md:px-10 md:pt-32 lg:px-16">
         {/* Riesige Wortmarke */}

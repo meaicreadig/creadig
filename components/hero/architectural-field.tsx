@@ -31,7 +31,7 @@ export function ArchitecturalField() {
   return (
     <div ref={ref} aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Signatur-Motiv der Marke: Dreiecks-/Pfeil-Mesh, nach unten verdichtend */}
-      <SignatureMotif className="absolute inset-0 h-full w-full" />
+      <SignatureMotif className="motif-feature absolute inset-0 h-full w-full" />
 
       <motion.div style={reduce ? undefined : { y: gridY, opacity: fade }} className="absolute inset-0">
         <svg

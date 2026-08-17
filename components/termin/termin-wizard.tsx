@@ -247,7 +247,7 @@ export function TerminWizard() {
   return (
     <main className="relative min-h-dvh">
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[38rem] overflow-hidden">
-        <SignatureMotif className="h-full w-full opacity-60" density={0.42} />
+        <SignatureMotif className="motif-feature h-full w-full" density={0.42} />
         <div className="from-background absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t to-transparent" />
       </div>
 

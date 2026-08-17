@@ -1,6 +1,7 @@
 "use client"
 
 import { ArrowUpRight } from "lucide-react"
+import { SignatureMotif } from "@/components/brand/signature-motif"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { MagneticButton } from "@/components/ui/magnetic-button"
@@ -12,7 +13,11 @@ export function MeaiSpotlight() {
 
   return (
     <section id="meai" aria-labelledby="meai-title" className="section-dark relative overflow-hidden">
-      <div aria-hidden="true" className="triangle-mesh absolute inset-0 opacity-[0.14]" />
+      <SignatureMotif
+        direction="center"
+        density={0.45}
+        className="motif-band pointer-events-none absolute inset-0 h-full w-full"
+      />
       <div
         aria-hidden="true"
         className="via-gold/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent"

@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import { ArrowUpRight } from "lucide-react"
+import { SignatureMotif } from "@/components/brand/signature-motif"
 import { Reveal } from "@/components/ui/reveal"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -12,7 +13,11 @@ import { cn } from "@/lib/utils"
 /** Ersatzfläche für Cases ohne Mockup — statt eines leeren oder kaputten <img>. */
 function MonogramPanel({ mark }: { mark: string }) {
   return (
-    <div className="bg-surface triangle-mesh absolute inset-0 flex items-center justify-center">
+    <div className="bg-surface absolute inset-0 flex items-center justify-center">
+      <SignatureMotif
+        direction="center"
+        className="motif-placeholder pointer-events-none absolute inset-0 h-full w-full"
+      />
       <span
         aria-hidden="true"
         className="border-gold/40 text-gold text-display flex size-20 items-center justify-center border text-2xl"

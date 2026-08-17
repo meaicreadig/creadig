@@ -381,29 +381,32 @@
   font-weight: 400;
 }
 
-/*
- * Signatur-Motiv der Marke: feines Dreiecks-/Pfeil-Raster (Isometrie mit
- * vertikalen Basen) — nachgebaut aus `corporate_creadig.ai`.
- * Ersetzt bewusst das generische Quadrat-Grid.
- */
-@utility triangle-mesh {
-  --mesh-cell: 4.5rem;
-  background-image:
-    repeating-linear-gradient(
-      90deg,
-      var(--mesh) 0 1px,
-      transparent 1px var(--mesh-cell)
-    ),
-    repeating-linear-gradient(
-      30deg,
-      var(--mesh) 0 1px,
-      transparent 1px var(--mesh-cell)
-    ),
-    repeating-linear-gradient(
-      150deg,
-      var(--mesh) 0 1px,
-      transparent 1px var(--mesh-cell)
-    );
+/* ==========================================================================
+ * SIGNATUR-MOTIV — drei Lautstaerken, sonst nichts.
+ *
+ * Die Marke hatte zwei konkurrierende Motive: `SignatureMotif` (SVG mit
+ * gefuellten Dreiecken, aus dem echten Corporate-Design) und ein flaches
+ * CSS-Liniengitter `.triangle-mesh`. Zwei Motive sind kein Motiv. Das
+ * Liniengitter ist raus; `SignatureMotif` traegt jetzt ueberall.
+ *
+ * Die Lautstaerke lag vorher ad hoc im Markup (0,12 / 0,14 / 0,20 / 1,0).
+ * Jetzt gibt es genau drei Rollen — und wer eine vierte braucht, aendert
+ * hier, nicht im Markup.
+ * ========================================================================== */
+
+/* Hauptdarsteller: nur der Hero. Das Motiv traegt die Flaeche mit. */
+@utility motif-feature {
+  opacity: 0.5;
+}
+
+/* Abgesetzte Baender (Impact, meAI, Footer): Struktur, keine Konkurrenz. */
+@utility motif-band {
+  opacity: 0.18;
+}
+
+/* Ersatzflaeche, wo ein Bild fehlt — darf traegt, weil sonst nichts da ist. */
+@utility motif-placeholder {
+  opacity: 0.32;
 }
 
 @keyframes marquee-left {

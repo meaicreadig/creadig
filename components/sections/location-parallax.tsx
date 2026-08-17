@@ -5,6 +5,7 @@ import Image from "next/image"
 import { ArrowUpRight, MapPin } from "lucide-react"
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion"
 import { useLocale } from "@/components/locale-provider"
+import { SignatureMotif } from "@/components/brand/signature-motif"
 import { Reveal } from "@/components/ui/reveal"
 import { address, addressLines } from "@/lib/site-data"
 
@@ -27,8 +28,12 @@ const SHIFT = ["-7%", "7%"]
 /** Ersatzfläche, solange das Foto fehlt — Signatur-Mesh statt kaputtem <img>. */
 function PhotoPlaceholder() {
   return (
-    <div aria-hidden="true" className="bg-surface triangle-mesh absolute inset-0">
-      <div className="flex h-full items-center justify-center">
+    <div aria-hidden="true" className="bg-surface absolute inset-0">
+      <SignatureMotif
+        direction="center"
+        className="motif-placeholder pointer-events-none absolute inset-0 h-full w-full"
+      />
+      <div className="relative flex h-full items-center justify-center">
         <span className="border-gold/40 text-gold flex size-24 items-center justify-center border">
           <MapPin className="size-9" strokeWidth={1.25} />
         </span>
