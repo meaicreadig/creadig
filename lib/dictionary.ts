@@ -378,7 +378,11 @@ export const dictionary = {
       privacyPoints: [
         {
           title: "Server-Logs",
-          body: "Beim Aufruf der Seite verarbeitet unser Hoster (Vercel Inc.) technisch notwendige Daten wie IP-Adresse, Zeitpunkt und aufgerufene Ressource. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.",
+          body: "Beim Aufruf der Seite verarbeitet unser Hoster Vercel Inc. (USA) technisch notwendige Daten wie IP-Adresse, Zeitpunkt und aufgerufene Ressource. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO — ohne diese Verarbeitung lässt sich die Seite weder ausliefern noch gegen Missbrauch absichern. Mit Vercel besteht ein Vertrag über die Auftragsverarbeitung nach Art. 28 DSGVO.",
+        },
+        {
+          title: "Hosting und Übermittlung in Drittländer",
+          body: "Diese Seite ist vollständig statisch und wird über das weltweite Content-Delivery-Netz von Vercel ausgeliefert — jeweils vom nächstgelegenen Standort. Eine Verarbeitung von Zugriffsdaten außerhalb der EU, insbesondere in den USA, ist deshalb nicht ausgeschlossen. Abgesichert ist sie über den Auftragsverarbeitungsvertrag mit Vercel Inc. einschließlich der EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Weitere Übermittlungen finden nicht statt: Wir binden keine Analyse-, Karten- oder Werbedienste ein und liefern alle Schriften lokal aus. Nutzen Sie den Kontaktweg über WhatsApp, gelten dafür zusätzlich die Bedingungen von Meta Platforms Ireland Ltd.",
         },
         {
           title: "Kontaktformular und Termin",
@@ -386,7 +390,7 @@ export const dictionary = {
         },
         {
           title: "Schriften",
-          body: "Poppins und JetBrains Mono werden lokal ausgeliefert. Es besteht keine Verbindung zu Google Fonts. Aus demselben Grund findet keine Datenübermittlung in Drittländer statt — wir binden keine Analyse-, Karten- oder Werbedienste ein.",
+          body: "Poppins und JetBrains Mono werden zusammen mit der Seite lokal ausgeliefert. Es besteht keine Verbindung zu Google Fonts; Ihre IP-Adresse wird dafür an keinen Dritten übermittelt.",
         },
         {
           title: "Einwilligung und lokale Speicherung",
@@ -394,7 +398,7 @@ export const dictionary = {
         },
         {
           title: "Ihre Rechte",
-          body: "Sie haben jederzeit das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit und Widerspruch. Eine Nachricht an die unten genannte Adresse genügt.",
+          body: "Sie haben jederzeit das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch (Art. 21). Eine Nachricht an die unten genannte Adresse genügt. Unabhängig davon steht Ihnen das Recht zu, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren (Art. 77 DSGVO) — für unseren Sitz ist die Landesbeauftragte für den Datenschutz Niedersachsen zuständig.",
         },
       ],
       privacyNote: "Diese Fassung wird mit den vollständigen Firmendaten juristisch final geprüft.",
@@ -840,7 +844,11 @@ export const dictionary = {
       privacyPoints: [
         {
           title: "Sunucu kayıtları",
-          body: "Sayfa çağrıldığında sağlayıcımız (Vercel Inc.) IP adresi, zaman ve çağrılan kaynak gibi teknik olarak gerekli verileri işler. Hukuki dayanak GDPR Md. 6/1-f'dir.",
+          body: "Sayfa çağrıldığında sağlayıcımız Vercel Inc. (ABD) IP adresi, zaman ve çağrılan kaynak gibi teknik olarak gerekli verileri işler. Hukuki dayanak GDPR Md. 6/1-f'dir — bu işleme olmadan sayfa ne sunulabilir ne de kötüye kullanıma karşı korunabilir. Vercel ile GDPR Md. 28 uyarınca bir veri işleyen sözleşmesi mevcuttur.",
+        },
+        {
+          title: "Barındırma ve üçüncü ülkelere aktarım",
+          body: "Bu sayfa tamamen statiktir ve Vercel'in dünya çapındaki içerik dağıtım ağı üzerinden, her seferinde en yakın konumdan sunulur. Bu nedenle erişim verilerinin AB dışında, özellikle ABD'de işlenmesi ihtimali bulunur. Bu durum, Vercel Inc. ile yapılan veri işleyen sözleşmesi ve GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altına alınmıştır. Bunun dışında aktarım yapılmaz: analiz, harita veya reklam hizmeti kullanmıyoruz ve tüm yazı tiplerini yerel olarak sunuyoruz. İletişim için WhatsApp'ı kullanırsanız, ek olarak Meta Platforms Ireland Ltd. koşulları geçerlidir.",
         },
         {
           title: "İletişim formu ve randevu",
@@ -848,7 +856,7 @@ export const dictionary = {
         },
         {
           title: "Yazı tipleri",
-          body: "Poppins ve JetBrains Mono yerel olarak sunulur. Google Fonts ile bağlantı kurulmaz. Aynı nedenle üçüncü ülkelere veri aktarımı da olmaz — analiz, harita veya reklam hizmeti kullanmıyoruz.",
+          body: "Poppins ve JetBrains Mono sayfayla birlikte yerel olarak sunulur. Google Fonts ile bağlantı kurulmaz; bu nedenle IP adresiniz üçüncü bir tarafa iletilmez.",
         },
         {
           title: "Onay ve yerel kayıt",
@@ -856,7 +864,7 @@ export const dictionary = {
         },
         {
           title: "Haklarınız",
-          body: "Her zaman bilgi alma, düzeltme, silme, kısıtlama, veri taşınabilirliği ve itiraz hakkına sahipsiniz. Aşağıdaki adrese bir mesaj yeterlidir.",
+          body: "Her zaman bilgi alma (GDPR Md. 15), düzeltme (Md. 16), silme (Md. 17), işlemenin kısıtlanması (Md. 18), veri taşınabilirliği (Md. 20) ve itiraz (Md. 21) hakkına sahipsiniz. Aşağıdaki adrese bir mesaj yeterlidir. Bundan bağımsız olarak, bir veri koruma denetim otoritesine şikâyette bulunma hakkınız da vardır (GDPR Md. 77) — merkezimiz için yetkili otorite Aşağı Saksonya Veri Koruma Görevlisi'dir (Landesbeauftragte für den Datenschutz Niedersachsen).",
         },
       ],
       privacyNote: "Bu metin, şirket bilgileri tamamlandığında hukuken son kez kontrol edilecektir.",
