@@ -254,7 +254,7 @@ export function TerminWizard() {
       <div className="relative mx-auto w-full max-w-4xl px-6 pt-32 pb-24 md:px-10 md:pt-40">
         <Link
           href="/"
-          className="text-muted-foreground hover:text-gold inline-flex items-center gap-2 text-[0.8125rem] transition-colors duration-300"
+          className="text-muted-foreground hover:text-gold type-small inline-flex items-center gap-2 transition-colors duration-300"
         >
           <ArrowLeft className="size-4" strokeWidth={1.5} />
           {t.termin.back}
@@ -267,7 +267,7 @@ export function TerminWizard() {
         <h1 className="type-h1 mt-6 text-balance">
           {t.termin.title}
         </h1>
-        <p className="text-muted-foreground mt-6 max-w-xl text-base leading-relaxed text-pretty md:text-lg">
+        <p className="type-lead text-muted-foreground mt-6 max-w-xl text-pretty">
           {t.termin.lead}
         </p>
 
@@ -300,7 +300,7 @@ export function TerminWizard() {
         {step === 1 && (
           <section className="mt-14">
             <h2 className="text-display text-2xl">{t.termin.step1.title}</h2>
-            <p className="text-muted-foreground mt-3 text-[0.9375rem]">{t.termin.step1.lead}</p>
+            <p className="type-body text-muted-foreground mt-3">{t.termin.step1.lead}</p>
 
             <div className="mt-8 grid gap-px sm:grid-cols-2">
               {(
@@ -344,7 +344,7 @@ export function TerminWizard() {
                       {type === option.id && <Check className="size-3 text-[#201e1b]" strokeWidth={3} />}
                     </span>
                   </span>
-                  <span className="text-muted-foreground mt-4 text-[0.9375rem] leading-relaxed text-pretty">
+                  <span className="type-body text-muted-foreground mt-4 text-pretty">
                     {option.desc}
                   </span>
                   <span className="text-gold mt-5 inline-flex items-center gap-2 font-mono text-[0.6875rem] tracking-[0.12em] uppercase">
@@ -365,7 +365,7 @@ export function TerminWizard() {
         {step === 2 && (
           <section className="mt-14">
             <h2 className="text-display text-2xl">{t.termin.step2.title}</h2>
-            <p className="text-muted-foreground mt-3 max-w-xl text-[0.9375rem] text-pretty">
+            <p className="type-body text-muted-foreground mt-3 max-w-xl text-pretty">
               {t.termin.step2.lead}
             </p>
 
@@ -397,7 +397,7 @@ export function TerminWizard() {
                 {t.termin.days.map((d) => (
                   <div
                     key={d}
-                    className="text-muted-foreground py-2 text-center font-mono text-[0.625rem] tracking-[0.12em] uppercase"
+                    className="text-muted-foreground py-2 text-center font-mono text-[0.6875rem] tracking-[0.12em] uppercase"
                   >
                     {d}
                   </div>
@@ -432,7 +432,7 @@ export function TerminWizard() {
                 )}
               </div>
 
-              <p className="border-line text-muted-foreground flex items-center gap-2 border-t px-5 py-3 font-mono text-[0.625rem] tracking-wide">
+              <p className="border-line text-muted-foreground flex items-center gap-2 border-t px-5 py-3 font-mono text-[0.6875rem] tracking-wide">
                 <span aria-hidden="true" className="bg-gold size-1 rounded-full" />
                 {t.termin.step2.preferred}
               </p>
@@ -441,7 +441,7 @@ export function TerminWizard() {
             {dateKey && (
               <div className="mt-10">
                 <h3 className="text-display text-xl">{t.termin.step2.timeTitle}</h3>
-                <p className="text-muted-foreground mt-2 text-[0.8125rem]">{t.termin.step2.timeLead}</p>
+                <p className="type-small text-muted-foreground mt-2">{t.termin.step2.timeLead}</p>
                 <div className="mt-5 flex flex-wrap gap-2">
                   {slots.map((slot) => (
                     <button
@@ -477,7 +477,7 @@ export function TerminWizard() {
         {step === 3 && (
           <section className="mt-14">
             <h2 className="text-display text-2xl">{t.termin.step3.title}</h2>
-            <p className="text-muted-foreground mt-3 text-[0.9375rem]">{t.termin.step3.lead}</p>
+            <p className="type-body text-muted-foreground mt-3">{t.termin.step3.lead}</p>
 
             <form
               className="mt-10 grid gap-8 sm:grid-cols-2"
@@ -601,7 +601,7 @@ export function TerminWizard() {
         {step === 4 && (
           <section className="mt-14">
             <h2 className="text-display text-2xl">{t.termin.step4.title}</h2>
-            <p className="text-muted-foreground mt-3 max-w-xl text-[0.9375rem] text-pretty">
+            <p className="type-body text-muted-foreground mt-3 max-w-xl text-pretty">
               {t.termin.step4.lead}
             </p>
 
@@ -616,7 +616,7 @@ export function TerminWizard() {
                   </dt>
                   <dd
                     className={cn(
-                      "text-[0.9375rem] break-words",
+                      "type-small break-words",
                       row.accent ? "text-gold" : "text-foreground",
                     )}
                   >
@@ -633,7 +633,7 @@ export function TerminWizard() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => window.setTimeout(() => setStep(5), 800)}
-                className="group from-gold-soft to-gold relative inline-flex items-center gap-3 overflow-hidden bg-gradient-to-br px-8 py-4 text-[0.9375rem] tracking-wide text-[#201e1b]"
+                className="group from-gold-soft to-gold relative inline-flex items-center gap-3 overflow-hidden bg-gradient-to-br px-8 py-4 text-base tracking-wide text-[#201e1b]"
               >
                 <span
                   aria-hidden="true"
@@ -662,7 +662,7 @@ export function TerminWizard() {
               {t.termin.done.lead}
             </p>
 
-            <div className="border-line mt-10 flex flex-col gap-3 border-t pt-8 font-mono text-[0.8125rem]">
+            <div className="border-line mt-10 flex flex-col gap-3 type-small border-t pt-8 font-mono">
               <p className="text-foreground">
                 {dateLabel} · {time}
               </p>

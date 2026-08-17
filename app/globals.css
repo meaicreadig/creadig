@@ -192,6 +192,19 @@
   line-height: 1.02;
 }
 
+/*
+ * Sub-Head: das fehlende Zwischengewicht. Vorher gab es nur 700 (Headline)
+ * und 400 (Fließtext) — dazwischen klaffte eine Lücke, und genau die ließ die
+ * Seite „flach" wirken. Karten- und Schritt-Titel tragen jetzt 600 und stehen
+ * damit sichtbar zwischen Bauwerk und Text. Größe kommt separat.
+ */
+@utility text-subhead {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
 /* ==========================================================================
  * TYPOGRAFIE-SKALA — eine Quelle je Ebene.
  *

@@ -25,7 +25,7 @@ export function About() {
 
             <Reveal delay={0.08}>
               <div className="mt-10 flex flex-col gap-6">
-                <p className="text-foreground/85 max-w-2xl text-base leading-relaxed text-pretty md:text-lg">
+                <p className="type-lead text-foreground/85 max-w-2xl text-pretty">
                   {t.about.body1}
                 </p>
                 <p className="text-muted-foreground max-w-2xl text-base leading-relaxed text-pretty">
@@ -35,7 +35,7 @@ export function About() {
             </Reveal>
 
             <Reveal delay={0.14}>
-              <p className="border-line text-muted-foreground mt-12 border-t pt-6 text-sm leading-relaxed text-pretty">
+              <p className="type-small border-line text-muted-foreground mt-12 border-t pt-6 text-pretty">
                 {t.about.honesty}
               </p>
             </Reveal>
@@ -56,7 +56,7 @@ export function About() {
                 {t.about.niches.map((niche) => (
                   <li key={niche} className="flex gap-3.5">
                     <span aria-hidden="true" className="bg-gold mt-2.5 h-px w-5 shrink-0" />
-                    <span className="text-foreground/85 text-[0.9375rem] leading-relaxed text-pretty">
+                    <span className="type-body text-foreground/85 text-pretty">
                       {niche}
                     </span>
                   </li>
@@ -66,7 +66,7 @@ export function About() {
 
             <Reveal delay={0.18} className="border-line mt-10 border-t pt-7">
               <p className="eyebrow text-gold">{t.about.locationsLabel}</p>
-              <address className="text-foreground/85 mt-4 text-[0.9375rem] leading-relaxed not-italic">
+              <address className="type-small text-foreground/85 mt-4 not-italic">
                 {contact.addressLines.map((line) => (
                   <span key={line} className="block">
                     {line}
@@ -74,7 +74,7 @@ export function About() {
                 ))}
               </address>
               <p className="eyebrow text-gold mt-7">{t.about.marketsLabel}</p>
-              <p className="text-foreground/85 mt-3 text-[0.9375rem]">{contact.markets}</p>
+              <p className="type-small text-foreground/85 mt-3">{contact.markets}</p>
             </Reveal>
           </div>
         </div>

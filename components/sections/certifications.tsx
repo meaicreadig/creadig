@@ -42,7 +42,7 @@ export function Certifications() {
             </h2>
           </Reveal>
           <Reveal delay={0.1} className="flex items-end lg:col-span-5">
-            <p className="text-muted-foreground max-w-md text-base leading-relaxed text-pretty md:text-lg">
+            <p className="type-lead text-muted-foreground max-w-md text-pretty">
               {t.certs.lead}
             </p>
           </Reveal>
@@ -106,7 +106,7 @@ export function Certifications() {
         </div>
 
         <Reveal delay={0.12}>
-          <p className="border-line text-muted-foreground mt-14 border-t pt-6 text-sm">
+          <p className="type-small border-line text-muted-foreground mt-14 border-t pt-6">
             {t.certs.note}
           </p>
         </Reveal>
@@ -125,7 +125,7 @@ export function Certifications() {
             </div>
 
             <div className="flex flex-col justify-end lg:col-span-5">
-              <p className="text-muted-foreground max-w-md text-[0.9375rem] leading-relaxed text-pretty">
+              <p className="type-body text-muted-foreground max-w-md text-pretty">
                 {t.certs.funding.detail}
               </p>
               <a

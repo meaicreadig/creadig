@@ -28,7 +28,7 @@ export function Services() {
             </h2>
           </Reveal>
           <Reveal delay={0.1} className="flex items-end lg:col-span-5">
-            <p className="text-muted-foreground max-w-md text-base leading-relaxed text-pretty md:text-lg">
+            <p className="type-lead text-muted-foreground max-w-md text-pretty">
               {t.services.lead}
             </p>
           </Reveal>
@@ -74,7 +74,7 @@ export function Services() {
                       <p className="eyebrow text-line-strong group-hover:text-gold transition-colors duration-500">
                         {t.services.forWhom}
                       </p>
-                      <p className="text-muted-foreground mt-2.5 text-sm leading-relaxed text-pretty">
+                      <p className="type-small text-muted-foreground mt-2.5 text-pretty">
                         {copy.who}
                       </p>
                     </div>

@@ -19,7 +19,7 @@ export function SiteFooter() {
           <a href="/#top" className="inline-block" aria-label="creaDIG — nach oben">
             <Logo variant="auto" className="h-[clamp(1.4rem,3vw,2.5rem)]" />
           </a>
-          <p className="text-muted-foreground mt-6 max-w-xl text-base text-pretty md:text-lg">
+          <p className="type-lead text-muted-foreground mt-6 max-w-xl text-pretty">
             {t.footer.tagline}
           </p>
         </div>
@@ -134,7 +134,7 @@ export function SiteFooter() {
                 </a>
               </li>
               <li>
-                <address className="text-muted-foreground text-sm leading-relaxed not-italic">
+                <address className="type-small text-muted-foreground not-italic">
                   {contact.addressLines.map((line) => (
                     <span key={line} className="block">
                       {line}
@@ -150,7 +150,7 @@ export function SiteFooter() {
               {["IG", "LI", "YT"].map((slot) => (
                 <span
                   key={slot}
-                  className="border-line text-line-strong hover:border-gold hover:text-gold flex size-9 items-center justify-center border font-mono text-[0.625rem] transition-colors duration-400"
+                  className="border-line text-line-strong hover:border-gold hover:text-gold flex size-9 items-center justify-center border font-mono text-[0.6875rem] transition-colors duration-400"
                 >
                   {slot}
                 </span>

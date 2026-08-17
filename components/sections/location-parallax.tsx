@@ -111,7 +111,7 @@ export function LocationParallax({ photoSrc }: { photoSrc: string | null }) {
                 {address.venue}
               </h2>
 
-              <address className="text-foreground/85 mt-4 text-[0.9375rem] leading-relaxed not-italic">
+              <address className="type-small text-foreground/85 mt-4 not-italic">
                 {addressLines.slice(1).map((line) => (
                   <span key={line} className="block">
                     {line}
@@ -119,7 +119,7 @@ export function LocationParallax({ photoSrc }: { photoSrc: string | null }) {
                 ))}
               </address>
 
-              <p className="text-muted-foreground mt-5 text-[0.9375rem] leading-relaxed text-pretty">
+              <p className="type-body text-muted-foreground mt-5 text-pretty">
                 {t.location.note}
               </p>
 

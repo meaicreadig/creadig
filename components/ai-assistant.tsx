@@ -105,20 +105,20 @@ export function AiAssistant() {
       >
         <div className="border-line flex items-start justify-between gap-4 border-b px-5 py-4">
           <div>
-            <p className="text-display text-base">{t.chat.title}</p>
+            <p className="text-subhead text-base">{t.chat.title}</p>
             <p className="text-muted-foreground mt-1 text-xs">{t.chat.subtitle}</p>
           </div>
           <span aria-hidden="true" className="bg-gold mt-1.5 size-1.5 rounded-full" />
         </div>
 
         <div ref={scrollRef} className="flex max-h-[22rem] flex-col gap-4 overflow-y-auto px-5 py-5">
-          <p className="text-foreground/85 text-[0.9375rem] leading-relaxed">{t.chat.greeting}</p>
+          <p className="type-body text-foreground/85">{t.chat.greeting}</p>
 
           {turns.map((turn, i) => (
             <div
               key={i}
               className={cn(
-                "max-w-[88%] px-4 py-3 text-[0.9375rem] leading-relaxed",
+                "type-body max-w-[88%] px-4 py-3",
                 turn.role === "user"
                   ? "bg-foreground text-background self-end"
                   : "border-line-strong self-start border",
@@ -157,7 +157,7 @@ export function AiAssistant() {
             onChange={(e) => setDraft(e.target.value)}
             placeholder={t.chat.placeholder}
             aria-label={t.chat.placeholder}
-            className="h-auto rounded-none border-0 bg-transparent px-2 py-2.5 text-[0.9375rem] shadow-none focus-visible:ring-0 dark:bg-transparent"
+            className="h-auto rounded-none border-0 bg-transparent px-2 py-2.5 text-base shadow-none focus-visible:ring-0 dark:bg-transparent"
           />
           <Button
             type="submit"

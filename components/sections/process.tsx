@@ -39,7 +39,7 @@ export function Process() {
                 />
                 <span className="text-gold font-mono text-xs tracking-[0.16em]">{step.step}</span>
                 <h3 className="type-h3 mt-6">{copy.name}</h3>
-                <p className="text-muted-foreground mt-5 max-w-sm text-[0.9375rem] leading-relaxed text-pretty">
+                <p className="type-body text-muted-foreground mt-5 max-w-sm text-pretty">
                   {copy.what}
                 </p>
               </Reveal>

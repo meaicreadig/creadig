@@ -136,13 +136,13 @@ export function CookieConsent() {
             </p>
           </div>
 
-          <p className="text-foreground/90 mt-5 max-w-2xl text-[0.9375rem] leading-relaxed text-pretty">
+          <p className="type-body text-foreground/90 mt-5 max-w-2xl text-pretty">
             {t.consent.intro}
           </p>
-          <p className="text-muted-foreground mt-3 max-w-2xl text-[0.8125rem] leading-relaxed text-pretty">
+          <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
             {t.consent.minors}
           </p>
-          <p className="text-muted-foreground mt-3 max-w-2xl text-[0.8125rem] leading-relaxed text-pretty">
+          <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
             {t.consent.privacyPrefix}{" "}
             <Link
               href="/datenschutz"
@@ -160,14 +160,14 @@ export function CookieConsent() {
                 <Switch checked disabled label={t.consent.categories.essential.name} />
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-3">
-                    <p className="text-foreground text-[0.9375rem] font-semibold">
+                    <p className="text-foreground text-base font-semibold">
                       {t.consent.categories.essential.name}
                     </p>
-                    <span className="border-gold/50 text-gold border px-2 py-0.5 font-mono text-[0.5625rem] tracking-[0.14em] uppercase">
+                    <span className="border-gold/50 text-gold border px-2 py-0.5 font-mono text-[0.6875rem] tracking-[0.14em] uppercase">
                       {t.consent.alwaysActive}
                     </span>
                   </div>
-                  <p className="text-muted-foreground mt-2.5 text-[0.8125rem] leading-relaxed text-pretty">
+                  <p className="type-small text-muted-foreground mt-2.5 text-pretty">
                     {t.consent.categories.essential.body}
                   </p>
                 </div>
@@ -182,16 +182,16 @@ export function CookieConsent() {
                   />
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3">
-                      <p className="text-foreground text-[0.9375rem] font-semibold">
+                      <p className="text-foreground text-base font-semibold">
                         {t.consent.categories[category].name}
                       </p>
                       {category === "statistics" && (
-                        <span className="border-line-strong text-muted-foreground border px-2 py-0.5 font-mono text-[0.5625rem] tracking-[0.14em] uppercase">
+                        <span className="border-line-strong text-muted-foreground border px-2 py-0.5 font-mono text-[0.6875rem] tracking-[0.14em] uppercase">
                           {t.consent.notInUse}
                         </span>
                       )}
                     </div>
-                    <p className="text-muted-foreground mt-2.5 text-[0.8125rem] leading-relaxed text-pretty">
+                    <p className="type-small text-muted-foreground mt-2.5 text-pretty">
                       {t.consent.categories[category].body}
                     </p>
                   </div>

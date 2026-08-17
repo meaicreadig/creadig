@@ -22,7 +22,7 @@ export function Packages() {
             </h2>
           </Reveal>
           <Reveal delay={0.1} className="flex items-end lg:col-span-5">
-            <p className="text-muted-foreground max-w-md text-base leading-relaxed text-pretty md:text-lg">
+            <p className="type-lead text-muted-foreground max-w-md text-pretty">
               {t.packages.lead}
             </p>
           </Reveal>
@@ -31,7 +31,7 @@ export function Packages() {
         {/* Preise sind der Moment, in dem Förderung zählt — deshalb hier der Hinweis. */}
         <Reveal delay={0.14}>
           <div className="border-gold/45 bg-gold/[0.045] mt-14 flex flex-col gap-4 border-l-2 py-5 pl-6 md:flex-row md:items-center md:justify-between md:gap-8 md:pr-7">
-            <p className="text-foreground/85 max-w-3xl text-[0.9375rem] leading-relaxed text-pretty">
+            <p className="type-body text-foreground/85 max-w-3xl text-pretty">
               {t.packages.funding}
             </p>
             <a
@@ -67,7 +67,7 @@ export function Packages() {
                 <div className="flex items-start justify-between gap-4">
                   <h3 className="type-h3">{copy.name}</h3>
                   {pkg.recommended && (
-                    <span className="border-gold text-gold shrink-0 border px-2.5 py-1 font-mono text-[0.5625rem] tracking-[0.14em] uppercase">
+                    <span className="border-gold text-gold shrink-0 border px-2.5 py-1 font-mono text-[0.6875rem] tracking-[0.14em] uppercase">
                       {t.packages.recommended}
                     </span>
                   )}
@@ -85,10 +85,10 @@ export function Packages() {
                   <p className="eyebrow text-line-strong group-hover:text-gold transition-colors duration-500">
                     {t.packages.forWhom}
                   </p>
-                  <p className="text-foreground/85 mt-3 text-[0.9375rem] leading-relaxed text-pretty">
+                  <p className="type-body text-foreground/85 mt-3 text-pretty">
                     {copy.who}
                   </p>
-                  <p className="text-gold mt-4 flex gap-2 text-[0.9375rem] leading-relaxed text-pretty">
+                  <p className="type-body text-gold mt-4 flex gap-2 text-pretty">
                     <span aria-hidden="true">→</span>
                     <span>{copy.outcome}</span>
                   </p>
@@ -98,7 +98,7 @@ export function Packages() {
                   {copy.includes.map((item) => (
                     <li key={item} className="flex gap-3">
                       <Check className="text-gold mt-0.5 size-4 shrink-0" strokeWidth={1.5} />
-                      <span className="text-muted-foreground text-sm leading-relaxed text-pretty">
+                      <span className="type-small text-muted-foreground text-pretty">
                         {item}
                       </span>
                     </li>

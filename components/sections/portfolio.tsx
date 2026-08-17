@@ -60,13 +60,13 @@ function WorkCard({
         <div className="absolute top-4 left-4 flex items-center gap-2">
           <Badge
             variant="outline"
-            className="border-background/40 bg-background/80 rounded-none px-2.5 py-1 text-[0.5625rem] tracking-[0.16em] uppercase backdrop-blur-sm"
+            className="border-background/40 bg-background/80 rounded-none px-2.5 py-1 text-[0.6875rem] tracking-[0.16em] uppercase backdrop-blur-sm"
           >
             {work.kind}
           </Badge>
           <Badge
             variant="outline"
-            className="border-background/40 bg-background/80 text-muted-foreground rounded-none px-2.5 py-1 text-[0.5625rem] tracking-[0.16em] uppercase backdrop-blur-sm"
+            className="border-background/40 bg-background/80 text-muted-foreground rounded-none px-2.5 py-1 text-[0.6875rem] tracking-[0.16em] uppercase backdrop-blur-sm"
           >
             {work.region}
           </Badge>
@@ -75,7 +75,7 @@ function WorkCard({
         {work.live && (
           <Badge
             variant="outline"
-            className="border-background/40 bg-background/80 absolute top-4 right-4 gap-1.5 rounded-none px-2.5 py-1 text-[0.5625rem] tracking-[0.16em] uppercase backdrop-blur-sm"
+            className="border-background/40 bg-background/80 absolute top-4 right-4 gap-1.5 rounded-none px-2.5 py-1 text-[0.6875rem] tracking-[0.16em] uppercase backdrop-blur-sm"
           >
             <span className="bg-gold size-1.5 rounded-full" aria-hidden="true" />
             live
@@ -85,7 +85,7 @@ function WorkCard({
         {/* Hover-Reveal: was wir gebaut haben */}
         <div className="bg-background/95 absolute inset-x-0 bottom-0 translate-y-full p-5 backdrop-blur-md transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0">
           <p className="eyebrow text-gold">{builtLabel}</p>
-          <p className="text-foreground mt-2 text-[0.8125rem] leading-relaxed text-pretty">
+          <p className="type-small text-foreground mt-2 text-pretty">
             {work.built}
           </p>
         </div>
@@ -106,7 +106,7 @@ function WorkCard({
               <ArrowUpRight className="text-gold mt-1 size-4 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             )}
           </div>
-          <p className="text-muted-foreground mt-3 max-w-md text-[0.9375rem] leading-relaxed text-pretty">
+          <p className="type-body text-muted-foreground mt-3 max-w-md text-pretty">
             {work.what}
           </p>
         </div>
@@ -126,7 +126,7 @@ function GroupHeading({ label, note }: { label: string; note: string }) {
         <p className="eyebrow text-foreground">{label}</p>
         <span aria-hidden="true" className="bg-gold h-px w-10" />
       </div>
-      <p className="text-muted-foreground text-[0.8125rem]">{note}</p>
+      <p className="type-small text-muted-foreground">{note}</p>
     </div>
   )
 }
@@ -154,7 +154,7 @@ export function Portfolio() {
               {t.portfolio.title}
             </h2>
           </div>
-          <p className="text-muted-foreground max-w-md text-[0.9375rem] leading-relaxed text-pretty lg:col-span-5 lg:pb-4">
+          <p className="type-lead text-muted-foreground max-w-md text-pretty lg:col-span-5 lg:pb-4">
             {t.portfolio.lead}
           </p>
         </div>
@@ -195,7 +195,7 @@ export function Portfolio() {
               key={project.name}
               className="group bg-surface hover:bg-surface-raised flex items-baseline justify-between gap-4 px-6 py-7 transition-colors duration-500"
             >
-              <span className="text-display text-foreground text-xl">{project.name}</span>
+              <span className="text-subhead text-foreground text-xl">{project.name}</span>
               <span className="text-muted-foreground group-hover:text-gold text-right text-[0.75rem] transition-colors duration-500">
                 {project.what}
               </span>

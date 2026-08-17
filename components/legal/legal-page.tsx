@@ -40,7 +40,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
       <div className="mx-auto w-full max-w-3xl px-6 pt-32 pb-24 md:px-10 md:pt-40">
         <Link
           href="/"
-          className="text-muted-foreground hover:text-gold inline-flex items-center gap-2 text-[0.8125rem] transition-colors duration-300"
+          className="text-muted-foreground hover:text-gold type-small inline-flex items-center gap-2 transition-colors duration-300"
         >
           <ArrowLeft className="size-4" strokeWidth={1.5} />
           {t.legal.back}
@@ -59,7 +59,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
               <p className="text-foreground mt-4 text-lg">
                 {contact.address.company} — {contact.address.owner}
               </p>
-              <address className="text-muted-foreground mt-3 text-[0.9375rem] leading-relaxed not-italic">
+              <address className="type-small text-muted-foreground mt-3 not-italic">
                 {contact.addressLines.map((line) => (
                   <span key={line} className="block">
                     {line}
@@ -71,12 +71,12 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
             <section className="border-line border-t pt-8">
               <p className="eyebrow text-gold">{t.legal.responsible}</p>
               <p className="text-foreground mt-4 text-lg">{contact.address.owner}</p>
-              <p className="text-muted-foreground mt-2 text-[0.9375rem]">{t.legal.sameAddress}</p>
+              <p className="type-small text-muted-foreground mt-2">{t.legal.sameAddress}</p>
             </section>
 
             <section className="border-line border-t pt-8">
               <p className="eyebrow text-gold">{t.legal.contactLabel}</p>
-              <ul className="mt-4 flex flex-col gap-2 text-[0.9375rem]">
+              <ul className="type-small mt-4 flex flex-col gap-2">
                 <li>
                   <a
                     href={contact.whatsappHref}
@@ -112,7 +112,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
             {formalRows.length > 0 ? (
               <section className="border-line border-t pt-8">
                 <p className="eyebrow text-gold">{t.legal.formalLabel}</p>
-                <dl className="mt-4 flex flex-col gap-4 text-[0.9375rem]">
+                <dl className="type-small mt-4 flex flex-col gap-4">
                   {formalRows.map((row) => (
                     <div key={row.label} className="flex flex-col gap-1">
                       <dt className="text-muted-foreground">{row.label}</dt>
@@ -127,7 +127,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
             {!imprintComplete ? (
               <section className="border-gold/40 bg-gold/[0.05] border-l-2 py-5 pl-6">
                 <p className="eyebrow text-gold">{t.legal.pending}</p>
-                <p className="text-muted-foreground mt-3 text-[0.9375rem] leading-relaxed text-pretty">
+                <p className="type-body text-muted-foreground mt-3 text-pretty">
                   {t.legal.pendingNote}
                 </p>
               </section>
@@ -135,14 +135,14 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
           </div>
         ) : (
           <div className="mt-12 flex flex-col gap-10">
-            <p className="text-foreground text-base leading-relaxed text-pretty md:text-lg">
+            <p className="type-lead text-foreground text-pretty">
               {t.legal.privacyIntro}
             </p>
 
             {t.legal.privacyPoints.map((point) => (
               <section key={point.title} className="border-line border-t pt-8">
                 <p className="eyebrow text-gold">{point.title}</p>
-                <p className="text-muted-foreground mt-4 text-[0.9375rem] leading-relaxed text-pretty">
+                <p className="type-body text-muted-foreground mt-4 text-pretty">
                   {point.body}
                 </p>
               </section>
@@ -163,10 +163,10 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
 
             <section className="border-line border-t pt-8">
               <p className="eyebrow text-gold">{t.legal.responsible}</p>
-              <p className="text-foreground mt-4 text-[0.9375rem]">
+              <p className="type-small text-foreground mt-4">
                 {contact.address.company} — {contact.address.owner}
               </p>
-              <address className="text-muted-foreground mt-3 text-[0.9375rem] leading-relaxed not-italic">
+              <address className="type-small text-muted-foreground mt-3 not-italic">
                 {contact.addressLines.map((line) => (
                   <span key={line} className="block">
                     {line}
@@ -177,7 +177,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
 
             <section className="border-line border-t pt-8">
               <p className="eyebrow text-gold">{t.legal.contactLabel}</p>
-              <p className="text-muted-foreground mt-4 text-[0.9375rem]">
+              <p className="type-small text-muted-foreground mt-4">
                 <a href={`mailto:${contact.email}`} className="hover:text-gold transition-colors">
                   {contact.email}
                 </a>

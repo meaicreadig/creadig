@@ -48,7 +48,7 @@ export function ImpactBand() {
                 />
                 <p className="eyebrow text-gold">{copy.label}</p>
                 <p className="type-stat mt-5">{signal.value}</p>
-                <p className="text-muted-foreground mt-5 max-w-xs text-sm leading-relaxed text-pretty">
+                <p className="type-small text-muted-foreground mt-5 max-w-xs text-pretty">
                   {copy.detail}
                 </p>
               </Reveal>
@@ -57,7 +57,7 @@ export function ImpactBand() {
         </div>
 
         <Reveal delay={0.2}>
-          <p className="border-line text-muted-foreground mt-20 border-t pt-8 text-base md:text-lg">
+          <p className="type-lead border-line text-muted-foreground mt-20 border-t pt-8">
             {t.impact.note}
           </p>
         </Reveal>

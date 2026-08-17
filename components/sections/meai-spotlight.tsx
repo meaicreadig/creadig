@@ -37,14 +37,14 @@ export function MeaiSpotlight() {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <p className="text-foreground/80 mt-8 max-w-xl text-base leading-relaxed text-pretty md:text-lg">
+              <p className="type-lead text-foreground/80 mt-8 max-w-xl text-pretty">
                 {t.meai.lead}
               </p>
             </Reveal>
 
             <Reveal delay={0.15}>
               <div className="border-gold/40 mt-10 border-l pl-6">
-                <p className="text-muted-foreground max-w-xl text-sm leading-relaxed text-pretty md:text-base">
+                <p className="type-body text-muted-foreground max-w-xl text-pretty">
                   {t.meai.dna}
                 </p>
               </div>
@@ -85,11 +85,11 @@ export function MeaiSpotlight() {
                         aria-hidden="true"
                         className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
                       />
-                      <span className="text-line-strong group-hover:text-gold font-mono text-[0.625rem] tracking-[0.16em] transition-colors duration-500">
+                      <span className="text-line-strong group-hover:text-gold font-mono text-[0.6875rem] tracking-[0.16em] transition-colors duration-500">
                         {String(i + 1).padStart(2, "0")}
                       </span>
-                      <h3 className="text-display mt-4 text-xl">{copy.name}</h3>
-                      <p className="text-muted-foreground mt-3 text-sm leading-relaxed text-pretty">
+                      <h3 className="text-subhead mt-4 text-xl">{copy.name}</h3>
+                      <p className="type-small text-muted-foreground mt-3 text-pretty">
                         {copy.what}
                       </p>
                     </div>

@@ -41,16 +41,16 @@ function LogoSlot({
         <>
           <span
             aria-hidden="true"
-            className="border-line-strong text-muted-foreground flex size-9 items-center justify-center border text-[0.8125rem] font-semibold tracking-tight transition-all duration-500 group-hover:border-[var(--brand)] group-hover:text-[var(--brand)]"
+            className="border-line-strong text-muted-foreground flex size-9 items-center justify-center type-small border font-semibold tracking-tight transition-all duration-500 group-hover:border-[var(--brand)] group-hover:text-[var(--brand)]"
           >
             {mark}
           </span>
-          <span className="text-muted-foreground group-hover:text-foreground text-center text-[0.8125rem] tracking-wide transition-colors duration-500">
+          <span className="text-muted-foreground group-hover:text-foreground type-small text-center tracking-wide transition-colors duration-500">
             {name}
           </span>
         </>
       )}
-      <span className="text-line-strong absolute top-3 right-3 text-[0.5625rem] tracking-[0.16em] uppercase transition-colors duration-500 group-hover:text-[var(--brand)]">
+      <span className="text-line-strong absolute top-3 right-3 text-[0.6875rem] tracking-[0.16em] uppercase transition-colors duration-500 group-hover:text-[var(--brand)]">
         {region}
       </span>
     </div>
@@ -120,7 +120,7 @@ export function LogoWall() {
               {t.logos.title}
             </h2>
           </div>
-          <p className="text-muted-foreground max-w-sm text-[0.8125rem] leading-relaxed text-pretty">
+          <p className="type-lead text-muted-foreground max-w-sm text-pretty">
             {t.logos.note}
           </p>
         </Reveal>

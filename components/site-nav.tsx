@@ -66,7 +66,7 @@ export function SiteNav() {
             <a
               key={link.id}
               href={`/#${link.id}`}
-              className="group relative py-1 text-[0.8125rem] tracking-wide text-muted-foreground transition-colors duration-300 hover:text-foreground"
+              className="group relative py-1 text-sm tracking-wide text-muted-foreground transition-colors duration-300 hover:text-foreground"
             >
               {t.nav[link.labelKey]}
               <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-gold transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full" />

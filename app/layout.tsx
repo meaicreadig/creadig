@@ -13,7 +13,7 @@ import { address } from "@/lib/site-data"
 // CEO-Entscheidung: Poppins — rund-geometrisch, passt zum Logo. Nicht Geist.
 const poppins = Poppins({
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
   display: "swap",
 })

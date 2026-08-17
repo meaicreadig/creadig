@@ -38,7 +38,7 @@ export function MagneticButton({
   const base = cn(
     "group relative inline-flex items-center justify-center gap-2.5 overflow-hidden",
     // Großzügige Fläche, damit die CTAs neben der riesigen Display-Typo bestehen.
-    "px-9 py-5 text-[0.9375rem] tracking-wide transition-colors duration-500",
+    "px-9 py-5 text-base tracking-wide transition-colors duration-500",
     variant === "primary"
       ? "bg-gradient-to-br from-gold-soft to-gold text-[#201e1b]"
       : "border border-line-strong bg-transparent text-foreground hover:border-gold",
