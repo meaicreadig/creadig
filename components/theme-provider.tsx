@@ -20,24 +20,27 @@ const ThemeContext = createContext<ThemeContextValue>({
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Light is the intended default and primary look for creaDIG.
   const [theme, setTheme] = useState<Theme>("light")
+  // Bis das Boot-Skript ausgelesen ist, darf nichts an die Klasse geschrieben
+  // werden — sonst nimmt der Sync-Effekt den State ("light") fuer bare Muenze
+  // und entfernt `.dark` wieder, das das Skript gerade gesetzt hat. Genau das
+  // waere das Flackern zurueck, das E-F1 beseitigen soll.
+  const [adopted, setAdopted] = useState(false)
   const themeRef = useRef<Theme>("light")
   themeRef.current = theme
 
   useEffect(() => {
-    // Ohne Komfort-Einwilligung lesen wir nichts — Light bleibt der Default.
-    if (!hasConsent("functional")) return
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY)
-      if (stored === "dark" || stored === "light") setTheme(stored)
-    } catch {
-      // Storage kann blockiert sein — Light bleibt der Fallback.
-    }
+    // Die Wahrheit steht im DOM: Das Boot-Skript in app/layout.tsx hat
+    // `.dark` bereits vor dem ersten Paint gesetzt — einwilligungsgeprueft.
+    // Hier wird sie nur uebernommen, nicht neu ermittelt.
+    if (document.documentElement.classList.contains("dark")) setTheme("dark")
+    setAdopted(true)
   }, [])
 
   useEffect(() => {
+    if (!adopted) return
     document.documentElement.classList.toggle("dark", theme === "dark")
     document.documentElement.style.colorScheme = theme
-  }, [theme])
+  }, [theme, adopted])
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {

@@ -28,6 +28,16 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
   localeRef.current = locale
 
   useEffect(() => {
+    // `?lang=tr` gewinnt: Wer einen tuerkischen Link weitergibt, will, dass er
+    // auf Tuerkisch aufgeht — unabhaengig davon, was im Browser des Empfaengers
+    // gespeichert ist. Der Parameter wird nicht gespeichert; er ist ein
+    // Einstiegspunkt, keine Praeferenz. Dasselbe liest das Boot-Skript in
+    // app/layout.tsx, damit `<html lang>` schon vor dem ersten Paint stimmt.
+    const fromUrl = new URLSearchParams(window.location.search).get("lang")
+    if (fromUrl === "tr" || fromUrl === "de") {
+      setLocaleState(fromUrl)
+      return
+    }
     // Ohne Komfort-Einwilligung wird nichts gelesen — die Wahl gilt dann nur
     // für die laufende Sitzung (siehe lib/consent.ts).
     if (!hasConsent("functional")) return

@@ -80,6 +80,36 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
+/**
+ * Blockierendes Inline-Skript, das VOR dem ersten Paint laeuft.
+ *
+ * Zwei Fehler, eine Ursache — beides wurde bisher erst nach der Hydration
+ * gesetzt, also nachdem der Browser schon gemalt hatte:
+ *
+ * E-F1  Dunkelmodus-Rueckkehrer sahen die Seite hell aufblitzen, bevor
+ *       React `.dark` setzte.
+ * E-F2  `<html lang>` stand fest auf "de". Bei tuerkischer Oberflaeche machte
+ *       `text-transform: uppercase` daraus das deutsche i -> I statt des
+ *       tuerkischen i -> İ. „İletişim" wurde zu „ILETISIM" — ein anderes Wort.
+ *
+ * Einwilligungs-konform: Gelesen wird nur, wenn `creadig_consent` die
+ * Komfort-Kategorie erlaubt (siehe lib/consent.ts). Ohne Einwilligung bleibt
+ * es bei Hell + Deutsch, genau wie im ThemeProvider und LocaleProvider.
+ * Die Sprache aus `?lang=` gilt dagegen immer — sie steht in der URL, die der
+ * Besucher selbst aufgerufen hat, und wird nirgends gespeichert.
+ */
+const BOOT_SCRIPT = `(function(){try{
+var d=document.documentElement;
+var q=new URLSearchParams(location.search).get('lang');
+var lang=(q==='tr'||q==='de')?q:null;
+var c=JSON.parse(localStorage.getItem('creadig_consent')||'null');
+if(c&&c.functional){
+  if(localStorage.getItem('creadig-theme')==='dark'){d.classList.add('dark');d.style.colorScheme='dark';}
+  if(!lang){var s=localStorage.getItem('creadig_lang');if(s==='tr'||s==='de')lang=s;}
+}
+if(lang)d.lang=lang;
+}catch(e){}})();`
+
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -113,6 +143,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>
+        {/* Muss als Erstes stehen: laeuft synchron, bevor der Body gemalt wird. */}
+        <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
