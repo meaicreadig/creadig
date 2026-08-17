@@ -315,3 +315,41 @@ export const contact = {
   /** Die Schweiz ist Markt, nicht Sitz. */
   markets: "Deutschland & Schweiz",
 }
+
+/**
+ * Förmliche Anbieterangaben für das Impressum.
+ *
+ * Diese Werte liefert ausschließlich der Inhaber — sie werden NICHT geraten
+ * und NICHT aus anderen Quellen abgeleitet. Solange ein Feld `null` ist,
+ * rendert das Impressum die Zeile nicht und der Pending-Hinweis bleibt stehen
+ * (siehe components/legal/legal-page.tsx). Sobald alle Pflichtfelder gefüllt
+ * sind, verschwindet der Pending-Block automatisch.
+ */
+export const imprintDetails = {
+  /** Rechtsform, z. B. "Einzelunternehmen" oder "creaDIG GmbH". */
+  legalForm: null as string | null,
+  /** Umsatzsteuer-Identifikationsnummer nach § 27 a UStG. */
+  vatId: null as string | null,
+  /**
+   * `true`, wenn die Kleinunternehmerregelung nach § 19 UStG greift.
+   * Dann tritt der entsprechende Hinweis an die Stelle der USt-IdNr.
+   * Entweder `vatId` ODER `smallBusiness` muss gesetzt sein — nicht beides.
+   */
+  smallBusiness: null as boolean | null,
+  /**
+   * Verantwortlicher nach § 18 Abs. 2 MStV (Name; Anschrift nur, wenn sie
+   * von der Geschäftsanschrift abweicht).
+   */
+  mstvResponsible: null as string | null,
+  /** Optionale deutsche Rufnummer fürs Impressum, z. B. "+49 …". */
+  phone: null as string | null,
+} as const
+
+/**
+ * Vollständig im Sinne der Pflichtangaben: Rechtsform, Umsatzsteuer-Status
+ * (USt-IdNr. oder § 19-Hinweis) und § 18 Abs. 2 MStV liegen vor.
+ */
+export const imprintComplete =
+  Boolean(imprintDetails.legalForm) &&
+  (Boolean(imprintDetails.vatId) || imprintDetails.smallBusiness === true) &&
+  Boolean(imprintDetails.mstvResponsible)

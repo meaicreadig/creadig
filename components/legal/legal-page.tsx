@@ -3,17 +3,37 @@
 import Link from "next/link"
 import { ArrowLeft, SlidersHorizontal } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
-import { contact } from "@/lib/site-data"
+import { contact, imprintComplete, imprintDetails } from "@/lib/site-data"
 import { openConsentSettings } from "@/lib/consent"
 
 /**
  * Gemeinsames Gerüst für /impressum und /datenschutz.
- * Die Pflichtangaben stehen noch aus — die Seiten existieren aber echt
- * (kein `#`, kein 404) und benennen den offenen Punkt ehrlich.
+ * Die förmlichen Pflichtangaben stehen noch aus — die Struktur dafür existiert
+ * aber (siehe `imprintDetails`): jedes Feld erscheint, sobald der Inhaber den
+ * Wert geliefert hat, und der Pending-Hinweis verschwindet erst, wenn alle
+ * Pflichtfelder vollständig sind. Bis dahin benennen die Seiten den offenen
+ * Punkt ehrlich, statt etwas zu behaupten.
  */
 export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
   const { t } = useLocale()
   const title = kind === "imprint" ? t.legal.imprintTitle : t.legal.privacyTitle
+
+  // Umsatzsteuer: entweder USt-IdNr. (§ 27 a UStG) oder § 19-Hinweis — nie beides.
+  const vatValue = imprintDetails.vatId
+    ? imprintDetails.vatId
+    : imprintDetails.smallBusiness
+      ? t.legal.smallBusinessNote
+      : null
+
+  const formalRows: { label: string; value: string }[] = [
+    ...(imprintDetails.legalForm
+      ? [{ label: t.legal.legalFormLabel, value: imprintDetails.legalForm }]
+      : []),
+    ...(vatValue ? [{ label: t.legal.vatLabel, value: vatValue }] : []),
+    ...(imprintDetails.mstvResponsible
+      ? [{ label: t.legal.mstvLabel, value: imprintDetails.mstvResponsible }]
+      : []),
+  ]
 
   return (
     <main className="min-h-dvh">
@@ -67,6 +87,16 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
                     {contact.whatsapp}
                   </a>
                 </li>
+                {imprintDetails.phone ? (
+                  <li>
+                    <a
+                      href={`tel:${imprintDetails.phone.replace(/[^+\d]/g, "")}`}
+                      className="hover:text-gold font-mono transition-colors duration-300"
+                    >
+                      {imprintDetails.phone}
+                    </a>
+                  </li>
+                ) : null}
                 <li>
                   <a
                     href={`mailto:${contact.email}`}
@@ -78,12 +108,30 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
               </ul>
             </section>
 
-            <section className="border-gold/40 bg-gold/[0.05] border-l-2 py-5 pl-6">
-              <p className="eyebrow text-gold">{t.legal.pending}</p>
-              <p className="text-muted-foreground mt-3 text-[0.9375rem] leading-relaxed text-pretty">
-                {t.legal.pendingNote}
-              </p>
-            </section>
+            {/* Erscheint Feld für Feld, sobald der Inhaber die Werte liefert. */}
+            {formalRows.length > 0 ? (
+              <section className="border-line border-t pt-8">
+                <p className="eyebrow text-gold">{t.legal.formalLabel}</p>
+                <dl className="mt-4 flex flex-col gap-4 text-[0.9375rem]">
+                  {formalRows.map((row) => (
+                    <div key={row.label} className="flex flex-col gap-1">
+                      <dt className="text-muted-foreground">{row.label}</dt>
+                      <dd className="text-foreground leading-relaxed text-pretty">{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            ) : null}
+
+            {/* Fällt automatisch weg, sobald alle Pflichtfelder vollständig sind. */}
+            {!imprintComplete ? (
+              <section className="border-gold/40 bg-gold/[0.05] border-l-2 py-5 pl-6">
+                <p className="eyebrow text-gold">{t.legal.pending}</p>
+                <p className="text-muted-foreground mt-3 text-[0.9375rem] leading-relaxed text-pretty">
+                  {t.legal.pendingNote}
+                </p>
+              </section>
+            ) : null}
           </div>
         ) : (
           <div className="mt-12 flex flex-col gap-10">
