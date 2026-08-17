@@ -125,7 +125,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
 
             {/* Fällt automatisch weg, sobald alle Pflichtfelder vollständig sind. */}
             {!imprintComplete ? (
-              <section className="border-gold/40 bg-gold/[0.05] border-l-2 py-5 pl-6">
+              <section className="border-gold/40 bg-muted border-l-2 py-5 pl-6">
                 <p className="eyebrow text-gold-text">{t.legal.pending}</p>
                 <p className="type-body text-muted-foreground mt-3 text-pretty">
                   {t.legal.pendingNote}

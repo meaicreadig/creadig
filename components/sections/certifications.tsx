@@ -113,7 +113,7 @@ export function Certifications() {
 
         {/* Förder-Angle: go-digital ist der konkreteste Grund, jetzt zu sprechen. */}
         <Reveal delay={0.06}>
-          <div className="border-gold/45 bg-gold/[0.045] mt-16 grid gap-10 border-l-2 px-7 py-9 md:px-10 md:py-11 lg:grid-cols-12 lg:gap-14">
+          <div className="border-gold/45 bg-muted mt-16 grid gap-10 border-l-2 px-7 py-9 md:px-10 md:py-11 lg:grid-cols-12 lg:gap-14">
             <div className="lg:col-span-7">
               <p className="eyebrow text-gold-text">{t.certs.funding.eyebrow}</p>
               <h3 className="type-h3 mt-5 text-balance">
