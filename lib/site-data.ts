@@ -181,10 +181,18 @@ export const furtherProjects = [
   { name: "Ops-Retainer", what: "Operations-System für Handwerksbetriebe", kind: "Dienstleistung" as const },
 ]
 
+/**
+ * Reihenfolge = Reihenfolge auf der Seite (app/page.tsx).
+ *
+ * Vorher stand „Leistungen" an erster Stelle, lag auf der Seite aber HINTER
+ * Produkten und Arbeiten. Wer oben links klickte, sprang nach unten und
+ * scrollte dann zurueck — die Leiste log ueber den Seitenaufbau.
+ * Wer die Sektionsreihenfolge in page.tsx aendert, aendert sie hier mit.
+ */
 export const navLinks = [
-  { id: "leistungen", labelKey: "leistungen" as const },
   { id: "produkte", labelKey: "produkte" as const },
   { id: "arbeiten", labelKey: "arbeiten" as const },
+  { id: "leistungen", labelKey: "leistungen" as const },
   { id: "ueber-uns", labelKey: "ueber" as const },
   { id: "pakete", labelKey: "pakete" as const },
   { id: "kontakt", labelKey: "kontakt" as const },

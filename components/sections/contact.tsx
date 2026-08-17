@@ -21,7 +21,13 @@ export function Contact() {
   const [name, setName] = useState("")
   const [business, setBusiness] = useState("")
   const [message, setMessage] = useState("")
-  const [invalid, setInvalid] = useState<{ name?: boolean; message?: boolean }>({})
+  // Ohne Einwilligung wird nichts uebergeben — weder an WhatsApp noch per Mail.
+  const [privacyOk, setPrivacyOk] = useState(false)
+  const [invalid, setInvalid] = useState<{
+    name?: boolean
+    message?: boolean
+    privacy?: boolean
+  }>({})
   const [error, setError] = useState<string | null>(null)
 
   const composed = [
@@ -72,11 +78,20 @@ export function Contact() {
                 onSubmit={(e) => {
                   e.preventDefault()
                   // Gleiche Regel wie in der alten `ct_*`-Logik: ohne Name und
-                  // ohne Anliegen wird nichts verschickt.
-                  const bad = { name: !name.trim(), message: !message.trim() }
+                  // ohne Anliegen wird nichts verschickt. Neu: ohne Einwilligung
+                  // ebenfalls nicht.
+                  const bad = {
+                    name: !name.trim(),
+                    message: !message.trim(),
+                    privacy: !privacyOk,
+                  }
                   setInvalid(bad)
                   if (bad.name || bad.message) {
                     setError(t.contact.errRequired)
+                    return
+                  }
+                  if (bad.privacy) {
+                    setError(t.contact.errPrivacy)
                     return
                   }
                   setError(null)
@@ -137,6 +152,45 @@ export function Contact() {
                   </Field>
                 </FieldGroup>
 
+                {/*
+                  Pflicht-Einwilligung. Bewusst NICHT vorangekreuzt und
+                  bewusst vor dem Absende-Knopf: erst lesen, dann uebergeben.
+                */}
+                <div className="border-line border-t pt-7">
+                  <label
+                    htmlFor="contact-privacy"
+                    className="flex cursor-pointer items-start gap-3.5"
+                  >
+                    <input
+                      id="contact-privacy"
+                      type="checkbox"
+                      checked={privacyOk}
+                      onChange={(e) => {
+                        setPrivacyOk(e.target.checked)
+                        setInvalid((v) => ({ ...v, privacy: false }))
+                      }}
+                      aria-invalid={invalid.privacy || undefined}
+                      aria-describedby="contact-handoff"
+                      className={`accent-gold mt-1 size-4 shrink-0 rounded-none ${
+                        invalid.privacy ? "outline-destructive outline-2 outline-offset-2" : ""
+                      }`}
+                    />
+                    <span className="type-small text-muted-foreground text-pretty">
+                      {t.contact.privacyConsentPrefix}{" "}
+                      <Link
+                        href="/datenschutz"
+                        className="text-gold-text underline underline-offset-4 hover:opacity-80"
+                      >
+                        {t.contact.privacyConsentLink}
+                      </Link>{" "}
+                      {t.contact.privacyConsentSuffix}
+                    </span>
+                  </label>
+                  <p id="contact-handoff" className="text-muted-foreground text-meta mt-4">
+                    {t.contact.handoffNote}
+                  </p>
+                </div>
+
                 {error && (
                   <p role="alert" className="border-destructive/40 text-destructive border-l-2 py-1 pl-4 text-sm">
                     {error}
@@ -157,13 +211,36 @@ export function Contact() {
                       {t.contact.submitWhatsapp}
                     </span>
                   </button>
-                  <a
-                    href={mailHref}
+                  {/*
+                    Kein <a href="mailto:…">: der Link haette die Pflichtfelder
+                    und die Einwilligung umgangen. Beide Wege laufen jetzt durch
+                    dieselbe Pruefung.
+                  */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const bad = {
+                        name: !name.trim(),
+                        message: !message.trim(),
+                        privacy: !privacyOk,
+                      }
+                      setInvalid(bad)
+                      if (bad.name || bad.message) {
+                        setError(t.contact.errRequired)
+                        return
+                      }
+                      if (bad.privacy) {
+                        setError(t.contact.errPrivacy)
+                        return
+                      }
+                      setError(null)
+                      window.location.href = mailHref
+                    }}
                     className="border-line-strong hover:border-gold inline-flex items-center gap-2.5 border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
                   >
                     <Send className="size-4" strokeWidth={1.5} />
                     {t.contact.submitEmail}
-                  </a>
+                  </button>
                 </div>
               </form>
             </Reveal>

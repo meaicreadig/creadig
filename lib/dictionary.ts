@@ -275,6 +275,14 @@ export const dictionary = {
       chatCta: "Assistent öffnen",
       locationsLabel: "Sitz",
       marketsLabel: "Märkte",
+      // Einwilligung vor der Uebergabe an WhatsApp/E-Mail (Art. 6 Abs. 1 lit. a DSGVO).
+      privacyConsentPrefix: "Ich habe die",
+      privacyConsentLink: "Datenschutzerklärung",
+      privacyConsentSuffix:
+        "gelesen und bin damit einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage verarbeitet werden.",
+      errPrivacy: "Bitte bestätigen Sie die Datenschutzerklärung.",
+      handoffNote:
+        "Beim Absenden öffnet sich WhatsApp beziehungsweise Ihr E-Mail-Programm mit der fertigen Nachricht — versendet wird erst, wenn Sie es dort bestätigen.",
     },
     termin: {
       back: "Zurück zur Seite",
@@ -741,6 +749,13 @@ export const dictionary = {
       chatCta: "Asistanı aç",
       locationsLabel: "Merkez",
       marketsLabel: "Pazarlar",
+      privacyConsentPrefix: "",
+      privacyConsentLink: "Gizlilik politikasını",
+      privacyConsentSuffix:
+        "okudum ve bilgilerimin talebimin işlenmesi amacıyla kullanılmasını kabul ediyorum.",
+      errPrivacy: "Lütfen gizlilik politikasını onaylayın.",
+      handoffNote:
+        "Gönderdiğinizde WhatsApp veya e-posta programınız hazır mesajla açılır — gönderim ancak orada onayladığınızda gerçekleşir.",
     },
     termin: {
       back: "Sayfaya dön",
