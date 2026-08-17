@@ -53,8 +53,12 @@ export function Packages() {
               <Reveal
                 key={pkg.key}
                 delay={0.08 * i}
-                className={`group border-line relative flex flex-col border-t p-8 transition-colors duration-500 md:p-9 ${
-                  pkg.recommended ? "bg-foreground/[0.035]" : "hover:bg-foreground/[0.02]"
+                className={`group border-line relative flex flex-col border-t p-8 transition-[background-color,box-shadow] duration-500 md:p-9 ${
+                  // Das empfohlene Paket liegt eine Stufe hoeher — die einzige
+                  // Karte der Seite, die den Grund verlaesst.
+                  pkg.recommended
+                    ? "bg-surface-raised elevation-2 relative z-10"
+                    : "hover:bg-foreground/[0.02]"
                 }`}
               >
                 <span

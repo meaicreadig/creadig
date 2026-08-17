@@ -93,6 +93,20 @@
   --input: #cbc7c0;
   --ring: #be904e;
   --radius: 0.125rem;
+
+  /*
+   * Elevation — drei Stufen, warmer Schatten.
+   * Reines Schwarz auf warmem Papierweiss sieht schmutzig aus; der Schatten
+   * nimmt darum den Textton (#2a2723) auf. Jede Stufe ist zweilagig: eine
+   * enge Kontaktkante, damit die Karte den Grund beruehrt, und ein weiter
+   * Wurf, der die Hoehe traegt.
+   */
+  --elevation-1:
+    0 1px 2px rgba(42, 39, 35, 0.05), 0 10px 26px -18px rgba(42, 39, 35, 0.22);
+  --elevation-2:
+    0 2px 5px rgba(42, 39, 35, 0.06), 0 20px 46px -24px rgba(42, 39, 35, 0.3);
+  --elevation-3:
+    0 4px 10px rgba(42, 39, 35, 0.08), 0 34px 80px -28px rgba(42, 39, 35, 0.42);
 }
 
 .dark {
@@ -127,6 +141,14 @@
   --border: #35312c;
   --input: #4a453e;
   --ring: #d3a763;
+
+  /* Im Dunkeln traegt ein warmer Schatten nicht — hier zaehlt Tiefe, nicht Ton. */
+  --elevation-1:
+    0 1px 2px rgba(12, 10, 9, 0.4), 0 10px 26px -18px rgba(12, 10, 9, 0.7);
+  --elevation-2:
+    0 2px 5px rgba(12, 10, 9, 0.45), 0 20px 46px -24px rgba(12, 10, 9, 0.8);
+  --elevation-3:
+    0 4px 10px rgba(12, 10, 9, 0.5), 0 34px 80px -28px rgba(12, 10, 9, 0.9);
 }
 
 /*
@@ -404,9 +426,34 @@
   opacity: 0.18;
 }
 
-/* Ersatzflaeche, wo ein Bild fehlt — darf traegt, weil sonst nichts da ist. */
+/* Ersatzflaeche, wo ein Bild fehlt — darf tragen, weil sonst nichts da ist. */
 @utility motif-placeholder {
   opacity: 0.32;
+}
+
+/* ==========================================================================
+ * ELEVATION — drei Stufen, sonst nichts.
+ *
+ * Die Seite war flach: alles lag auf einer Ebene, zusammengehalten von
+ * Haarlinien. Wo doch ein Schatten stand, war er handgeschrieben und in
+ * reinem Schwarz (5× `shadow-[0_..._rgba(0,0,0,…)]`), was auf dem warmen
+ * Papierweiss grau-schmutzig wirkt.
+ *
+ *   elevation-1  Flaggschiff-Karten in Ruhe — liegt auf, schwebt nicht
+ *   elevation-2  dieselbe Karte bei Hover · empfohlenes Paket
+ *   elevation-3  alles, was ueber der Seite schwebt (FAB, Panel, Banner)
+ * ========================================================================== */
+
+@utility elevation-1 {
+  box-shadow: var(--elevation-1);
+}
+
+@utility elevation-2 {
+  box-shadow: var(--elevation-2);
+}
+
+@utility elevation-3 {
+  box-shadow: var(--elevation-3);
 }
 
 @keyframes marquee-left {

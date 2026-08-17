@@ -43,7 +43,7 @@ function WorkCard({
   return (
     <Tag
       {...(isLink ? { href: work.href, target: "_blank", rel: "noopener noreferrer" } : {})}
-      className="group border-line bg-surface relative flex w-full flex-col overflow-hidden border"
+      className="group border-line bg-surface elevation-1 hover:elevation-2 relative flex w-full flex-col overflow-hidden border transition-shadow duration-500"
     >
       <div className={cn("bg-muted relative overflow-hidden", compact ? "aspect-[16/9]" : "aspect-[16/10]")}>
         {work.image ? (

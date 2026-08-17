@@ -110,7 +110,7 @@ export function CookieConsent() {
       aria-labelledby="consent-title"
       className="fixed inset-x-0 bottom-0 z-[60] px-4 pb-4 md:px-6 md:pb-6"
     >
-      <div className="border-line-strong bg-background/97 relative mx-auto w-full max-w-4xl border shadow-[0_28px_80px_-28px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+      <div className="border-line-strong bg-background/97 relative mx-auto w-full max-w-4xl border elevation-3 backdrop-blur-xl">
         <span aria-hidden="true" className="bg-gold absolute inset-x-0 top-0 h-px" />
 
         {/* Erneut geöffnet? Dann darf man ohne neue Entscheidung wieder zumachen. */}

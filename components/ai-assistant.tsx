@@ -80,7 +80,7 @@ export function AiAssistant() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="creadig-assistant"
-        className="fixed right-5 bottom-5 z-50 h-auto gap-2.5 rounded-none border border-foreground/15 bg-foreground px-5 py-3.5 text-background shadow-[0_16px_48px_-12px_rgba(0,0,0,0.45)] hover:bg-foreground/90 md:right-8 md:bottom-8"
+        className="fixed right-5 bottom-5 z-50 h-auto gap-2.5 rounded-none border border-foreground/15 bg-foreground px-5 py-3.5 text-background elevation-3 hover:bg-foreground/90 md:right-8 md:bottom-8"
       >
         {open ? (
           <X className="size-4" strokeWidth={1.5} data-icon="inline-start" />
@@ -100,7 +100,7 @@ export function AiAssistant() {
         aria-label={t.chat.title}
         hidden={!open}
         className={cn(
-          "border-line-strong bg-background fixed right-5 bottom-24 z-50 flex w-[calc(100vw-2.5rem)] max-w-[24.5rem] flex-col border shadow-[0_28px_80px_-24px_rgba(0,0,0,0.5)] md:right-8 md:bottom-28",
+          "border-line-strong bg-background fixed right-5 bottom-24 z-50 flex w-[calc(100vw-2.5rem)] max-w-[24.5rem] flex-col border elevation-3 md:right-8 md:bottom-28",
         )}
       >
         <div className="border-line flex items-start justify-between gap-4 border-b px-5 py-4">

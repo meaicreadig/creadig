@@ -23,7 +23,7 @@ function LogoSlot({
 }) {
   return (
     <div
-      className="group border-line bg-surface-raised relative flex h-28 w-60 shrink-0 flex-col items-center justify-center gap-3 border transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_18px_44px_-24px_rgba(0,0,0,0.35)]"
+      className="group border-line bg-surface-raised relative flex h-28 w-60 shrink-0 flex-col items-center justify-center gap-3 border transition-all duration-500 hover:-translate-y-1.5 hover:elevation-2"
       style={{ ["--brand" as string]: color }}
     >
       <span
