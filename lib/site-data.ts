@@ -371,11 +371,55 @@ export const processSteps = [
   { step: "03", key: "operate" as const },
 ]
 
+/**
+ * Die drei Stufen (E-K3).
+ *
+ * `tier` macht die Reihenfolge zur Aussage: 01 ist der Einstieg, 03 das
+ * Vollbild. `recommended` setzt genau EINEN Anker — und der ist als
+ * „Unsere Empfehlung" beschriftet, nicht als „beliebteste Wahl". Ohne
+ * Verkaufszahlen wäre Letzteres eine Behauptung; unsere Empfehlung ist
+ * nachprüfbar unsere.
+ *
+ * `amount` ist der Preis als Zahl für schema.org — dieselbe Quelle wie die
+ * angezeigte Zeichenkette, damit beides nicht auseinanderlaufen kann.
+ */
 export const packages = [
-  { key: "identity" as const, price: "€350", recommended: false },
-  { key: "growth" as const, price: "€500", recommended: true },
-  { key: "architecture" as const, price: "€1.500", recommended: false },
+  { key: "identity" as const, tier: "01", price: "€350", amount: 350, period: null, recommended: false },
+  { key: "growth" as const, tier: "02", price: "€500", amount: 500, period: "MON" as const, recommended: true },
+  {
+    key: "architecture" as const,
+    tier: "03",
+    price: "€1.500",
+    amount: 1500,
+    period: "MON" as const,
+    recommended: false,
+  },
 ]
+
+/* ==========================================================================
+ * RETAINER (E-K6)
+ *
+ * Die laufende Betreuung ist heute in einer Fußzeile versteckt
+ * („Ops-Retainer" unter `furtherProjects`) — dabei ist sie das, was
+ * wiederkehrenden Umsatz trägt und was creaDIG von einer Agentur
+ * unterscheidet, die übergibt und verschwindet.
+ *
+ * Sichtbar wird sie erst, wenn der Owner Preis UND Leistungsumfang
+ * bestätigt hat. Beides steht hier, nicht im Markup — und solange `price`
+ * `null` ist, rendert der Block nicht. Einen Retainer zu bewerben, dessen
+ * Umfang niemand festgelegt hat, wäre ein Versprechen ohne Substanz.
+ */
+export const retainer = {
+  /** z. B. "€450". `null` = der Block erscheint nicht. */
+  price: null as string | null,
+  amount: null as number | null,
+  /** Was tatsächlich geliefert wird — vom Owner bestätigt, nicht abgeleitet. */
+  description: null as Localized | null,
+  /** Einzelne Leistungen, in beiden Sprachen. */
+  includes: null as { de: string[]; tr: string[] } | null,
+}
+
+export const retainerPublished = Boolean(retainer.price && retainer.description)
 
 export const meaiCapabilityKeys = ["overview", "tasks", "documents", "decisions"] as const
 

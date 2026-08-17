@@ -8,7 +8,14 @@ import { SiteFooter } from "@/components/site-footer"
 import { StickyWhatsApp } from "@/components/sticky-whatsapp"
 import { AiAssistant } from "@/components/ai-assistant"
 import { CookieConsent } from "@/components/consent/cookie-consent"
-import { address, aggregateRating, approvedReviews, socialProfiles } from "@/lib/site-data"
+import {
+  address,
+  aggregateRating,
+  approvedReviews,
+  packages,
+  socialProfiles,
+} from "@/lib/site-data"
+import { dictionary } from "@/lib/dictionary"
 
 // CEO-Entscheidung: Poppins — rund-geometrisch, passt zum Logo. Nicht Geist.
 const poppins = Poppins({
@@ -150,6 +157,34 @@ const organizationSchema = {
   telephone: "+41765045879",
   url: SITE_URL,
   ...(socialProfiles.length > 0 ? { sameAs: socialProfiles.map((p) => p.url) } : {}),
+  /*
+   * Die drei Pakete als Angebotskatalog (E-K3). Preise und Namen kommen aus
+   * derselben Quelle wie die Anzeige — sie koennen nicht auseinanderlaufen.
+   * `MON` ist die UN/CEFACT-Einheit fuer Monat.
+   */
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "creaDIG Pakete",
+    itemListElement: packages.map((pkg) => ({
+      "@type": "Offer",
+      name: dictionary.de.packages.items[pkg.key].name,
+      description: dictionary.de.packages.items[pkg.key].who,
+      priceCurrency: "EUR",
+      price: pkg.amount,
+      ...(pkg.period
+        ? {
+            priceSpecification: {
+              "@type": "UnitPriceSpecification",
+              price: pkg.amount,
+              priceCurrency: "EUR",
+              billingDuration: 1,
+              unitCode: pkg.period,
+            },
+          }
+        : {}),
+      availability: "https://schema.org/InStock",
+    })),
+  },
   ...(aggregateRating
     ? {
         aggregateRating: {

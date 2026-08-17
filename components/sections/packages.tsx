@@ -3,10 +3,10 @@
 import { ArrowUpRight, Check } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { packages } from "@/lib/site-data"
+import { packages, retainer, retainerPublished } from "@/lib/site-data"
 
 export function Packages() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
 
   return (
     <section id="pakete" aria-labelledby="pakete-title" className="border-line border-b">
@@ -69,7 +69,9 @@ export function Packages() {
                 />
 
                 <div className="flex items-start justify-between gap-4">
-                  <h3 className="type-h3">{copy.name}</h3>
+                  <p className="eyebrow text-muted-foreground">
+                    {t.packages.tierLabel} {pkg.tier}
+                  </p>
                   {pkg.recommended && (
                     <span className="border-gold text-gold-text eyebrow shrink-0 border px-2.5 py-1">
                       {t.packages.recommended}
@@ -77,7 +79,15 @@ export function Packages() {
                   )}
                 </div>
 
-                <div className="mt-8 flex items-baseline gap-2.5">
+                {/*
+                  Feste Hoehe fuer den Namen: „Growth Partner" bricht auf zwei
+                  Zeilen um, „Identity" nicht — ohne Reserve sassen die drei
+                  Preise auf drei verschiedenen Hoehen und liessen sich nicht
+                  mehr vergleichen. Genau das soll eine Preistabelle koennen.
+                */}
+                <h3 className="type-h3 mt-5 lg:min-h-[2.24em]">{copy.name}</h3>
+
+                <div className="mt-6 flex items-baseline gap-2.5">
                   <span className="type-stat">{pkg.price}</span>
                   <span className="eyebrow text-muted-foreground">
                     {isMonthly ? t.packages.monthly : t.packages.once}
@@ -89,7 +99,8 @@ export function Packages() {
                   <p className="eyebrow text-muted-foreground group-hover:text-gold-text transition-colors duration-500">
                     {t.packages.forWhom}
                   </p>
-                  <p className="type-body text-foreground/85 mt-3 text-pretty">
+                  {/* Zweizeilige Reserve, gleiche Begruendung wie beim Namen. */}
+                  <p className="type-body text-foreground/85 mt-3 text-pretty lg:min-h-[3.4em]">
                     {copy.who}
                   </p>
                   <p className="type-body text-gold-text mt-4 flex gap-2 text-pretty">
@@ -137,6 +148,56 @@ export function Packages() {
             )
           })}
         </div>
+
+        {/*
+          Laufende Betreuung (E-K6). Sie stand bisher als „Ops-Retainer" in
+          einer Fusszeile der Werkschau — dabei ist sie das, was creaDIG von
+          einer Agentur unterscheidet, die uebergibt und verschwindet.
+
+          Erscheint erst, wenn Preis UND Leistungsumfang bestaetigt sind
+          (lib/site-data.ts -> retainer). Einen Retainer zu bewerben, dessen
+          Umfang niemand festgelegt hat, waere ein Versprechen ohne Substanz.
+        */}
+        {retainerPublished && retainer.description && (
+          <Reveal delay={0.1}>
+            <div className="border-gold/45 bg-muted mt-20 grid gap-10 border-l-2 px-7 py-9 md:px-10 md:py-11 lg:grid-cols-12 lg:gap-14">
+              <div className="lg:col-span-7">
+                <p className="eyebrow text-gold-text">{t.packages.retainerEyebrow}</p>
+                <h3 className="type-h3 mt-5 text-balance">{t.packages.retainerTitle}</h3>
+                <p className="type-body text-foreground/85 mt-6 max-w-2xl text-pretty">
+                  {retainer.description[locale]}
+                </p>
+                {retainer.includes && (
+                  <ul className="mt-7 grid gap-3 sm:grid-cols-2">
+                    {retainer.includes[locale].map((item) => (
+                      <li key={item} className="flex gap-3">
+                        <Check className="text-gold mt-0.5 size-4 shrink-0" strokeWidth={1.5} />
+                        <span className="type-small text-muted-foreground text-pretty">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="flex flex-col justify-end lg:col-span-5">
+                <div className="flex items-baseline gap-2.5">
+                  <span className="eyebrow text-muted-foreground">
+                    {t.packages.retainerFrom}
+                  </span>
+                  <span className="type-stat">{retainer.price}</span>
+                  <span className="eyebrow text-muted-foreground">{t.packages.monthly}</span>
+                </div>
+                <a
+                  href="/termin?paket=retainer"
+                  className="border-line-strong hover:border-gold hover:text-gold-text mt-7 inline-flex items-center justify-between gap-2 self-start border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                >
+                  {t.packages.retainerCta}
+                  <ArrowUpRight className="size-4" strokeWidth={1.5} />
+                </a>
+              </div>
+            </div>
+          </Reveal>
+        )}
       </div>
     </section>
   )
