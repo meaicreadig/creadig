@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Menu, Moon, Sun } from "lucide-react"
+import { Menu, Sun } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { useLocale } from "@/components/locale-provider"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
+import { MoonIcon } from "@/components/ui/moon-icon"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
@@ -111,14 +112,16 @@ export function SiteNav() {
             aria-label={t.nav.theme}
             className="text-muted-foreground hover:bg-transparent hover:text-foreground"
           >
-            {theme === "light" ? <Moon /> : <Sun />}
+            {theme === "light" ? <MoonIcon className="size-[1.15rem]" /> : <Sun />}
           </Button>
 
           <Button
             asChild
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:bg-transparent hover:text-gold-text"
+            // In der Leiste traegt WhatsApp Marken-Gold statt Grau — es ist der
+            // schnellste Weg zu uns und darf sich vom Rest der Leiste abheben.
+            className="text-gold-text hover:bg-transparent hover:text-foreground"
           >
             <a
               href={WHATSAPP_LINK}

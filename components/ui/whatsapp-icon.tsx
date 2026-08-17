@@ -1,14 +1,23 @@
 import { cn } from "@/lib/utils"
 
 /**
- * Kanonisches WhatsApp-Glyph (Simple Icons) — ein einziger, gefüllter Pfad,
- * der auch bei 16–24 px klar als WhatsApp lesbar ist.
+ * Kanonisches WhatsApp-Glyph (Simple Icons).
+ *
+ * Der Pfad enthält drei Teilpfade: den Hörer, den inneren Rand der Sprechblase
+ * und deren äußeren Rand. Ohne `fill-rule="evenodd"` gewinnt die
+ * Nonzero-Regel — dann füllt sich die Blase massiv und der Hörer verschwindet
+ * darin. Genau das sah man bei 16 px: ein Klecks mit angedeutetem Schwanz.
+ *
+ * Mit `evenodd` wird der Hörer als Loch ausgestanzt, statt als zweiter Pfad
+ * darüberzuliegen — das Glyph bleibt bis 16 px eindeutig WhatsApp.
  */
 export function WhatsAppIcon({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="currentColor"
+      fillRule="evenodd"
+      clipRule="evenodd"
       aria-hidden="true"
       focusable="false"
       // Grundmaß, damit das Icon in Flex-Containern nicht kollabiert.
