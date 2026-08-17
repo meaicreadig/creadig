@@ -72,7 +72,7 @@ export function Certifications() {
                 ) : (
                   <span
                     aria-hidden="true"
-                    className="border-line-strong text-muted-foreground group-hover:border-gold group-hover:text-gold flex h-11 min-w-11 items-center justify-center self-start border px-2.5 font-mono text-[0.6875rem] tracking-[0.08em] transition-colors duration-500"
+                    className="border-line-strong text-muted-foreground group-hover:border-gold group-hover:text-gold flex h-11 min-w-11 items-center justify-center self-start text-meta border px-2.5 transition-colors duration-500"
                   >
                     {cert.mark}
                   </span>
@@ -86,7 +86,7 @@ export function Certifications() {
                 </p>
 
                 {copy.note && (
-                  <p className="text-line-strong group-hover:text-gold mt-4 font-mono text-[0.6875rem] tracking-wide transition-colors duration-500">
+                  <p className="text-line-strong group-hover:text-gold text-meta mt-4 transition-colors duration-500">
                     {copy.note}
                   </p>
                 )}

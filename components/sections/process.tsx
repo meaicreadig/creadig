@@ -37,7 +37,7 @@ export function Process() {
                   aria-hidden="true"
                   className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
                 />
-                <span className="text-gold font-mono text-xs tracking-[0.16em]">{step.step}</span>
+                <span className="eyebrow text-gold">{step.step}</span>
                 <h3 className="type-h3 mt-6">{copy.name}</h3>
                 <p className="type-body text-muted-foreground mt-5 max-w-sm text-pretty">
                   {copy.what}

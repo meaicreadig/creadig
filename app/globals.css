@@ -302,12 +302,29 @@
   line-height: 1.6;
 }
 
+/*
+ * Label-Ebene, zwei Rollen — und je Rolle GENAU EINE Laufweite.
+ * Vorher lagen sieben Werte im Markup (0.08 / 0.1 / 0.12 / 0.14 / 0.16 /
+ * 0.18em plus tracking-wide/wider), oft neben handgeschriebenem
+ * `font-mono text-[0.6875rem] uppercase` — dieselbe Rezeptur 30× kopiert.
+ *
+ * eyebrow   = Versal-Label über einer Headline oder auf einem Badge
+ * text-meta = Mono-Nebeninformation in gemischter Schreibung (Fußnoten,
+ *             Kennziffern, Zeilen im Footer) — nie versal, sonst schreit sie
+ */
 @utility eyebrow {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   font-weight: 500;
+}
+
+@utility text-meta {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  font-weight: 400;
 }
 
 /*

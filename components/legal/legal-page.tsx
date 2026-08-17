@@ -193,7 +193,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
               </p>
             </section>
 
-            <p className="text-muted-foreground/70 font-mono text-[0.6875rem] tracking-wide">
+            <p className="text-muted-foreground/70 text-meta">
               {t.legal.privacyNote}
             </p>
           </div>

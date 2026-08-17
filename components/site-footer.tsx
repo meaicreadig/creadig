@@ -150,7 +150,7 @@ export function SiteFooter() {
               {["IG", "LI", "YT"].map((slot) => (
                 <span
                   key={slot}
-                  className="border-line text-line-strong hover:border-gold hover:text-gold flex size-9 items-center justify-center border font-mono text-[0.6875rem] transition-colors duration-400"
+                  className="border-line text-line-strong hover:border-gold hover:text-gold flex size-9 items-center justify-center border text-meta transition-colors duration-400"
                 >
                   {slot}
                 </span>
@@ -160,10 +160,10 @@ export function SiteFooter() {
         </div>
 
         <div className="border-line flex flex-col gap-3 border-t pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-muted-foreground font-mono text-[0.6875rem] tracking-wide">
+          <p className="text-muted-foreground text-meta">
             © 2026 creaDIG. {t.footer.rights}
           </p>
-          <p className="text-line-strong font-mono text-[0.6875rem] tracking-wide">
+          <p className="text-line-strong text-meta">
             {contact.locations} · {contact.markets}
           </p>
         </div>

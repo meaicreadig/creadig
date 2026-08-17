@@ -60,13 +60,13 @@ function WorkCard({
         <div className="absolute top-4 left-4 flex items-center gap-2">
           <Badge
             variant="outline"
-            className="border-background/40 bg-background/80 rounded-none px-2.5 py-1 text-[0.6875rem] tracking-[0.16em] uppercase backdrop-blur-sm"
+            className="border-background/40 bg-background/80 eyebrow rounded-none px-2.5 py-1 backdrop-blur-sm"
           >
             {work.kind}
           </Badge>
           <Badge
             variant="outline"
-            className="border-background/40 bg-background/80 text-muted-foreground rounded-none px-2.5 py-1 text-[0.6875rem] tracking-[0.16em] uppercase backdrop-blur-sm"
+            className="border-background/40 bg-background/80 text-muted-foreground eyebrow rounded-none px-2.5 py-1 backdrop-blur-sm"
           >
             {work.region}
           </Badge>
@@ -75,7 +75,7 @@ function WorkCard({
         {work.live && (
           <Badge
             variant="outline"
-            className="border-background/40 bg-background/80 absolute top-4 right-4 gap-1.5 rounded-none px-2.5 py-1 text-[0.6875rem] tracking-[0.16em] uppercase backdrop-blur-sm"
+            className="border-background/40 bg-background/80 eyebrow absolute top-4 right-4 gap-1.5 rounded-none px-2.5 py-1 backdrop-blur-sm"
           >
             <span className="bg-gold size-1.5 rounded-full" aria-hidden="true" />
             live
@@ -110,7 +110,7 @@ function WorkCard({
             {work.what}
           </p>
         </div>
-        <p className="text-muted-foreground/80 text-[0.6875rem] tracking-[0.16em] uppercase">
+        <p className="eyebrow text-muted-foreground/80">
           {work.outcome}
         </p>
       </div>
@@ -202,7 +202,7 @@ export function Portfolio() {
             </li>
           ))}
         </ul>
-        <p className="text-muted-foreground/80 mt-6 font-mono text-[0.6875rem] tracking-wide">
+        <p className="text-muted-foreground/80 text-meta mt-6">
           {t.portfolio.mockupNote}
         </p>
       </Reveal>

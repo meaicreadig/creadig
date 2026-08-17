@@ -163,7 +163,7 @@ export function CookieConsent() {
                     <p className="text-foreground text-base font-semibold">
                       {t.consent.categories.essential.name}
                     </p>
-                    <span className="border-gold/50 text-gold border px-2 py-0.5 font-mono text-[0.6875rem] tracking-[0.14em] uppercase">
+                    <span className="border-gold/50 text-gold eyebrow border px-2 py-0.5">
                       {t.consent.alwaysActive}
                     </span>
                   </div>
@@ -186,7 +186,7 @@ export function CookieConsent() {
                         {t.consent.categories[category].name}
                       </p>
                       {category === "statistics" && (
-                        <span className="border-line-strong text-muted-foreground border px-2 py-0.5 font-mono text-[0.6875rem] tracking-[0.14em] uppercase">
+                        <span className="border-line-strong text-muted-foreground eyebrow border px-2 py-0.5">
                           {t.consent.notInUse}
                         </span>
                       )}

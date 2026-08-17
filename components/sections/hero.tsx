@@ -85,7 +85,7 @@ export function Hero() {
         <span className="eyebrow text-muted-foreground">{t.hero.location}</span>
         <a
           href="/#fundament"
-          className="text-muted-foreground hover:text-foreground flex items-center gap-2.5 text-[0.6875rem] tracking-[0.18em] uppercase transition-colors"
+          className="text-muted-foreground hover:text-foreground eyebrow flex items-center gap-2.5 transition-colors"
         >
           {t.hero.scroll}
           <motion.span

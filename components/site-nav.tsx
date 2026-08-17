@@ -85,14 +85,14 @@ export function SiteNav() {
             <ToggleGroupItem
               value="de"
               aria-label="Deutsch"
-              className="h-9 rounded-none border-0 bg-transparent px-2 text-[0.6875rem] tracking-[0.14em] text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
+              className="h-9 rounded-none border-0 bg-transparent eyebrow px-2 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
             >
               DE
             </ToggleGroupItem>
             <ToggleGroupItem
               value="tr"
               aria-label="Türkçe"
-              className="h-9 rounded-none border-0 bg-transparent px-2 text-[0.6875rem] tracking-[0.14em] text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
+              className="h-9 rounded-none border-0 bg-transparent eyebrow px-2 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
             >
               TR
             </ToggleGroupItem>
@@ -126,7 +126,7 @@ export function SiteNav() {
 
           <a
             href="/#kontakt"
-            className="group relative ml-1.5 hidden items-center overflow-hidden bg-gradient-to-br from-gold-soft to-gold px-6 py-3 text-[0.75rem] tracking-[0.1em] text-[#201e1b] uppercase sm:inline-flex"
+            className="group relative ml-1.5 hidden items-center overflow-hidden bg-gradient-to-br from-gold-soft to-gold eyebrow px-6 py-3 text-[#201e1b] sm:inline-flex"
           >
             <span
               aria-hidden="true"
@@ -215,13 +215,13 @@ export function SiteNav() {
                 >
                   <ToggleGroupItem
                     value="de"
-                    className="rounded-none border-0 bg-transparent px-3 text-[0.6875rem] tracking-[0.16em] text-muted-foreground uppercase hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
+                    className="rounded-none border-0 bg-transparent eyebrow px-3 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
                   >
                     Deutsch
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="tr"
-                    className="rounded-none border-0 bg-transparent px-3 text-[0.6875rem] tracking-[0.16em] text-muted-foreground uppercase hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
+                    className="rounded-none border-0 bg-transparent eyebrow px-3 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
                   >
                     Türkçe
                   </ToggleGroupItem>

@@ -68,7 +68,7 @@ export function MeaiSpotlight() {
                 <span aria-hidden="true" className="bg-gold size-1.5 rounded-full" />
                 <span aria-hidden="true" className="bg-line-strong size-1.5 rounded-full" />
                 <span aria-hidden="true" className="bg-line-strong size-1.5 rounded-full" />
-                <span className="text-muted-foreground ml-3 font-mono text-[0.6875rem] tracking-wider">
+                <span className="text-muted-foreground text-meta ml-3">
                   meai.run
                 </span>
               </div>
@@ -85,7 +85,7 @@ export function MeaiSpotlight() {
                         aria-hidden="true"
                         className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
                       />
-                      <span className="text-line-strong group-hover:text-gold font-mono text-[0.6875rem] tracking-[0.16em] transition-colors duration-500">
+                      <span className="text-line-strong group-hover:text-gold text-meta transition-colors duration-500">
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <h3 className="text-subhead mt-4 text-xl">{copy.name}</h3>

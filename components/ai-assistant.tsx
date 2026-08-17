@@ -87,7 +87,7 @@ export function AiAssistant() {
         ) : (
           <MessageSquare className="size-4" strokeWidth={1.5} data-icon="inline-start" />
         )}
-        <span className="text-[0.6875rem] tracking-[0.16em] uppercase">
+        <span className="eyebrow">
           {open ? t.chat.close : t.chat.open}
         </span>
       </Button>
@@ -170,7 +170,7 @@ export function AiAssistant() {
           </Button>
         </form>
 
-        <p className="text-muted-foreground border-line border-t px-5 py-2.5 text-[0.6875rem]">
+        <p className="text-muted-foreground border-line text-meta border-t px-5 py-2.5">
           {t.chat.demoNote}
         </p>
       </div>

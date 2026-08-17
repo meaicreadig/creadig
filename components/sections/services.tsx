@@ -62,7 +62,7 @@ export function Services() {
                   />
                   <div className="grid items-baseline gap-x-8 gap-y-4 px-2 py-9 md:grid-cols-12 md:px-6">
                     <div className="flex items-baseline gap-4 md:col-span-4">
-                      <span className="text-gold font-mono text-xs tracking-[0.16em]">
+                      <span className="eyebrow text-gold">
                         {layer.level}
                       </span>
                       <h3 className="type-h3">{copy.name}</h3>

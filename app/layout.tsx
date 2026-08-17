@@ -19,8 +19,11 @@ const poppins = Poppins({
 })
 
 // Monospace nur für Eyebrows und Kennziffern.
+// `latin-ext` ist Pflicht, nicht Komfort: Ohne diesen Subset fehlen ş, ğ, ı,
+// İ und ç — und genau die stehen in den türkischen Labels. Der Browser fiele
+// dort auf eine System-Monospace zurück, mitten im Wort.
 const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
   weight: ["400", "500"],
   variable: "--font-jetbrains",
   display: "swap",

@@ -50,7 +50,7 @@ function LogoSlot({
           </span>
         </>
       )}
-      <span className="text-line-strong absolute top-3 right-3 text-[0.6875rem] tracking-[0.16em] uppercase transition-colors duration-500 group-hover:text-[var(--brand)]">
+      <span className="text-line-strong eyebrow absolute top-3 right-3 transition-colors duration-500 group-hover:text-[var(--brand)]">
         {region}
       </span>
     </div>

@@ -273,7 +273,7 @@ export function TerminWizard() {
 
         {/* Fortschritt */}
         <div className="mt-14">
-          <div className="text-muted-foreground flex items-baseline justify-between font-mono text-[0.6875rem] tracking-[0.14em] uppercase">
+          <div className="text-muted-foreground eyebrow flex items-baseline justify-between">
             <span>
               {t.termin.stepOf} {Math.min(step, 4)} / 4
             </span>
@@ -347,7 +347,7 @@ export function TerminWizard() {
                   <span className="type-body text-muted-foreground mt-4 text-pretty">
                     {option.desc}
                   </span>
-                  <span className="text-gold mt-5 inline-flex items-center gap-2 font-mono text-[0.6875rem] tracking-[0.12em] uppercase">
+                  <span className="text-gold eyebrow mt-5 inline-flex items-center gap-2">
                     <Clock className="size-3.5" strokeWidth={1.5} />
                     {option.meta}
                   </span>
@@ -397,7 +397,7 @@ export function TerminWizard() {
                 {t.termin.days.map((d) => (
                   <div
                     key={d}
-                    className="text-muted-foreground py-2 text-center font-mono text-[0.6875rem] tracking-[0.12em] uppercase"
+                    className="text-muted-foreground eyebrow py-2 text-center"
                   >
                     {d}
                   </div>
@@ -432,7 +432,7 @@ export function TerminWizard() {
                 )}
               </div>
 
-              <p className="border-line text-muted-foreground flex items-center gap-2 border-t px-5 py-3 font-mono text-[0.6875rem] tracking-wide">
+              <p className="border-line text-muted-foreground flex items-center gap-2 text-meta border-t px-5 py-3">
                 <span aria-hidden="true" className="bg-gold size-1 rounded-full" />
                 {t.termin.step2.preferred}
               </p>
@@ -611,7 +611,7 @@ export function TerminWizard() {
                   key={row.k}
                   className="border-line grid grid-cols-1 gap-1 border-b px-5 py-4 last:border-b-0 sm:grid-cols-[12rem_1fr] sm:gap-4"
                 >
-                  <dt className="text-muted-foreground font-mono text-[0.6875rem] tracking-[0.12em] uppercase">
+                  <dt className="text-muted-foreground eyebrow">
                     {row.k}
                   </dt>
                   <dd

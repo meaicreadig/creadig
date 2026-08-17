@@ -67,7 +67,7 @@ export function Packages() {
                 <div className="flex items-start justify-between gap-4">
                   <h3 className="type-h3">{copy.name}</h3>
                   {pkg.recommended && (
-                    <span className="border-gold text-gold shrink-0 border px-2.5 py-1 font-mono text-[0.6875rem] tracking-[0.14em] uppercase">
+                    <span className="border-gold text-gold eyebrow shrink-0 border px-2.5 py-1">
                       {t.packages.recommended}
                     </span>
                   )}
@@ -75,7 +75,7 @@ export function Packages() {
 
                 <div className="mt-8 flex items-baseline gap-2.5">
                   <span className="type-stat">{pkg.price}</span>
-                  <span className="text-muted-foreground text-xs tracking-[0.1em] uppercase">
+                  <span className="eyebrow text-muted-foreground">
                     {isMonthly ? t.packages.monthly : t.packages.once}
                   </span>
                 </div>
@@ -105,7 +105,7 @@ export function Packages() {
                   ))}
                 </ul>
 
-                <p className="text-muted-foreground mt-8 font-mono text-[0.6875rem] tracking-wide">
+                <p className="text-muted-foreground text-meta mt-8">
                   {copy.note}
                 </p>
 
