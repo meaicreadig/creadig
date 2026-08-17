@@ -3,6 +3,7 @@ import { ImpactBand } from "@/components/sections/impact-band"
 import { LogoWall } from "@/components/sections/logo-wall"
 import { Portfolio } from "@/components/sections/portfolio"
 import { CaseStudies } from "@/components/sections/case-studies"
+import { Reviews } from "@/components/sections/reviews"
 import { Services } from "@/components/sections/services"
 import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
 import { Process } from "@/components/sections/process"
@@ -25,6 +26,8 @@ export default function Page() {
       <MeaiSpotlight />
       <Process />
       <Certifications />
+      {/* Rendert erst, wenn echte Bewertungen vorliegen (E-K2). */}
+      <Reviews />
       <About />
       <Location />
       <Packages />

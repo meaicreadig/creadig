@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { StickyWhatsApp } from "@/components/sticky-whatsapp"
 import { AiAssistant } from "@/components/ai-assistant"
 import { CookieConsent } from "@/components/consent/cookie-consent"
-import { address } from "@/lib/site-data"
+import { address, aggregateRating, approvedReviews, socialProfiles } from "@/lib/site-data"
 
 // CEO-Entscheidung: Poppins — rund-geometrisch, passt zum Logo. Nicht Geist.
 const poppins = Poppins({
@@ -122,6 +122,14 @@ if(c&&c.functional){
 if(lang)d.lang=lang;
 }catch(e){}})();`
 
+/**
+ * Organisations-Daten für Suchmaschinen.
+ *
+ * Bewertungen und Social-Profile hängen sich NUR an, wenn es sie wirklich
+ * gibt (E-K2 / E-K7). Ein `aggregateRating` ohne echte Bewertungen wäre
+ * nicht bloß unehrlich — Google wertet erfundene Sterne-Auszeichnungen als
+ * Richtlinienverstoß und straft die Domain dafür ab.
+ */
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
@@ -141,6 +149,37 @@ const organizationSchema = {
   founder: { "@type": "Person", name: address.owner },
   telephone: "+41765045879",
   url: SITE_URL,
+  ...(socialProfiles.length > 0 ? { sameAs: socialProfiles.map((p) => p.url) } : {}),
+  ...(aggregateRating
+    ? {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: aggregateRating.value,
+          reviewCount: aggregateRating.count,
+          bestRating: 5,
+        },
+      }
+    : {}),
+  ...(approvedReviews.length > 0
+    ? {
+        review: approvedReviews.map((r) => ({
+          "@type": "Review",
+          author: { "@type": "Person", name: r.name },
+          datePublished: r.date,
+          reviewBody: r.text,
+          inLanguage: r.lang,
+          ...(r.rating !== null
+            ? {
+                reviewRating: {
+                  "@type": "Rating",
+                  ratingValue: r.rating,
+                  bestRating: 5,
+                },
+              }
+            : {}),
+        })),
+      }
+    : {}),
 }
 
 export default function RootLayout({

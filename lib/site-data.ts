@@ -235,6 +235,92 @@ export const caseStudies: CaseStudy[] = []
 /** Nur Freigegebenes verlässt die Datei. */
 export const approvedCaseStudies = caseStudies.filter((c) => c.approved)
 
+/* ==========================================================================
+ * BEWERTUNGEN (E-K2)
+ *
+ * Der größte fehlende Vertrauens-Hebel. Und der, bei dem am meisten
+ * geschummelt wird — deshalb hier die schärfsten Regeln des Repos:
+ *
+ *  1. Nur echte, nachprüfbare Bewertungen. Kein „sinngemäß", kein „so hat
+ *     ein Kunde es mal gesagt", keine zusammengefassten Stimmen.
+ *  2. Der Wortlaut wird NICHT übersetzt. Eine übersetzte Bewertung ist ein
+ *     Text, den der Mensch so nie geschrieben hat. Sie erscheint in ihrer
+ *     Originalsprache, in beiden Sprachfassungen der Seite.
+ *  3. `AggregateRating` erscheint erst, wenn es echte Sterne gibt — eine
+ *     erfundene Sterne-Auszeichnung in der Google-Suche wäre nicht nur
+ *     unehrlich, sondern ein Verstoß gegen Googles Richtlinien.
+ * ========================================================================== */
+
+export type Review = {
+  id: string
+  /** Name so, wie er öffentlich steht (z. B. bei Google). */
+  name: string
+  /** Datum der Bewertung, ISO (YYYY-MM-DD). */
+  date: string
+  /** Originalwortlaut. Wird nicht übersetzt, nicht gekürzt, nicht geglättet. */
+  text: string
+  /** Sprache des Originals — für `<blockquote lang>`. */
+  lang: "de" | "tr"
+  /** Wo sie steht. `google` erlaubt die Verlinkung zum Nachprüfen. */
+  source: "google" | "kunde"
+  /** Direktlink zur Quelle, wo vorhanden. */
+  sourceUrl?: string
+  /** 1–5. `null`, wenn die Quelle keine Sterne vergibt. */
+  rating: number | null
+  /** Veröffentlichung ist abgesprochen. */
+  approved: boolean
+}
+
+/**
+ * LEER. Kein einziger Platzhalter.
+ *
+ * TODO (Owner): zufriedene Altkunden um eine Google-Bewertung bitten und die
+ * echten Einträge hier eintragen — Name, Datum, Wortlaut, Link.
+ */
+export const reviews: Review[] = []
+
+export const approvedReviews = reviews.filter((r) => r.approved)
+
+/** Bewertungen mit Sternen — nur die zählen für den Durchschnitt. */
+const ratedReviews = approvedReviews.filter((r) => typeof r.rating === "number")
+
+/**
+ * Durchschnitt und Anzahl — oder `null`, wenn es nichts zu mitteln gibt.
+ * Bewusst kein Default wie „5,0 (0 Bewertungen)".
+ */
+export const aggregateRating =
+  ratedReviews.length > 0
+    ? {
+        value:
+          Math.round(
+            (ratedReviews.reduce((sum, r) => sum + (r.rating ?? 0), 0) / ratedReviews.length) * 10,
+          ) / 10,
+        count: ratedReviews.length,
+      }
+    : null
+
+/* ==========================================================================
+ * SOCIAL-PROFILE (E-K7)
+ *
+ * Vorher standen im Footer drei tote Kästchen mit „IG / LI / YT" — sie sahen
+ * aus wie Links, führten aber nirgendwohin. Ein toter Link ist schlechter als
+ * kein Link: er verspricht eine Präsenz, die es nicht gibt.
+ *
+ * Leer = der Block verschwindet. Gefüllt = echte Links, die zugleich als
+ * `sameAs` in die Organisations-Daten für Suchmaschinen gehen.
+ *
+ * TODO (Owner): echte Profil-URLs eintragen oder es bei leer belassen.
+ */
+export type SocialProfile = {
+  /** Kürzel für die Kachel. */
+  label: string
+  /** Voller Name für Screenreader und aria-label. */
+  name: string
+  url: string
+}
+
+export const socialProfiles: SocialProfile[] = []
+
 /**
  * Was sonst noch unter dem Dach läuft. `creaDIG fiber` ist das operative
  * Glasfaser-Geschäft (der Motor) — nicht zu verwechseln mit dem Produkt fibero.

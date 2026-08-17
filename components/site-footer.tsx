@@ -4,7 +4,7 @@ import { useLocale } from "@/components/locale-provider"
 import Link from "next/link"
 import { Logo } from "@/components/brand/logo"
 import { SignatureMotif } from "@/components/brand/signature-motif"
-import { contact, navLinks, ownProducts } from "@/lib/site-data"
+import { contact, navLinks, ownProducts, socialProfiles } from "@/lib/site-data"
 import { openConsentSettings } from "@/lib/consent"
 
 export function SiteFooter() {
@@ -149,18 +149,34 @@ export function SiteFooter() {
               </li>
             </ul>
 
-            <p className="eyebrow text-gold-text mt-8">{t.footer.socialLabel}</p>
-            {/* TODO: Echte Social-Profile verlinken. */}
-            <div className="mt-4 flex gap-2">
-              {["IG", "LI", "YT"].map((slot) => (
-                <span
-                  key={slot}
-                  className="border-line text-muted-foreground hover:border-gold hover:text-gold-text flex size-9 items-center justify-center border text-meta transition-colors duration-400"
-                >
-                  {slot}
-                </span>
-              ))}
-            </div>
+            {/*
+              Vorher standen hier drei Kaestchen mit „IG / LI / YT" — sie sahen
+              aus wie Links, fuehrten aber nirgendwohin. Ein toter Link ist
+              schlechter als kein Link: er verspricht eine Praesenz, die es
+              nicht gibt. Der Block erscheint erst mit echten URLs
+              (lib/site-data.ts -> socialProfiles) und speist dann zugleich
+              `sameAs` in die Organisations-Daten.
+            */}
+            {socialProfiles.length > 0 && (
+              <>
+                <p className="eyebrow text-gold-text mt-8">{t.footer.socialLabel}</p>
+                <ul className="mt-4 flex gap-2">
+                  {socialProfiles.map((profile) => (
+                    <li key={profile.url}>
+                      <a
+                        href={profile.url}
+                        target="_blank"
+                        rel="noopener noreferrer me"
+                        aria-label={profile.name}
+                        className="border-line text-muted-foreground hover:border-gold hover:text-gold-text flex size-9 items-center justify-center border text-meta transition-colors duration-400"
+                      >
+                        {profile.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </div>
         </div>
 
