@@ -92,7 +92,7 @@ export function ArchitecturalField() {
             vectorEffect="non-scaling-stroke"
             initial={reduce ? { pathLength: 1, opacity: 0.6 } : { pathLength: 0, opacity: 0 }}
             animate={{ pathLength: 1, opacity: 0.65 }}
-            transition={{ duration: 2.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 1.3, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           />
           {[
             [34, 95],
@@ -107,7 +107,7 @@ export function ArchitecturalField() {
               fill="var(--gold)"
               initial={reduce ? { opacity: 0.7 } : { opacity: 0, scale: 0 }}
               animate={{ opacity: 0.8, scale: 1 }}
-              transition={{ duration: 0.6, delay: 1.2 + i * 0.35 }}
+              transition={{ duration: 0.45, delay: 0.7 + i * 0.2 }}
             />
           ))}
         </svg>
