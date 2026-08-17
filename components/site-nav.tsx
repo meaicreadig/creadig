@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Menu, MoonStar, Sun } from "lucide-react"
+import { Menu, Moon, Sun } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { useLocale } from "@/components/locale-provider"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
@@ -105,7 +105,7 @@ export function SiteNav() {
             aria-label={t.nav.theme}
             className="text-muted-foreground hover:bg-transparent hover:text-foreground"
           >
-            {theme === "light" ? <MoonStar /> : <Sun />}
+            {theme === "light" ? <Moon /> : <Sun />}
           </Button>
 
           <Button
