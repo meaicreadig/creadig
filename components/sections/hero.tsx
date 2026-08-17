@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowDown, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
@@ -83,7 +84,7 @@ export function Hero() {
         className="border-line relative z-10 mx-auto flex w-full max-w-[100rem] items-center justify-between border-t px-6 py-5 md:px-10 lg:px-16"
       >
         <span className="eyebrow text-muted-foreground">{t.hero.location}</span>
-        <a
+        <Link
           href="/#fundament"
           className="text-muted-foreground hover:text-foreground eyebrow flex items-center gap-2.5 transition-colors"
         >
@@ -96,7 +97,7 @@ export function Hero() {
           >
             <ArrowDown className="text-gold size-3.5" strokeWidth={1.5} />
           </motion.span>
-        </a>
+        </Link>
       </motion.div>
     </section>
   )

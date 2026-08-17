@@ -1,8 +1,12 @@
 "use client"
 
 import { useRef, useState } from "react"
+import Link from "next/link"
 import { motion, useReducedMotion } from "framer-motion"
 import { cn } from "@/lib/utils"
+
+/** Ausserhalb der Komponente: sonst entsteht der Typ bei jedem Render neu. */
+const MotionLink = motion.create(Link)
 
 type MagneticButtonProps = {
   children: React.ReactNode
@@ -72,8 +76,13 @@ export function MagneticButton({
   }
 
   if (href) {
+    // Interne Ziele ueber next/link: „/#kontakt" als hartes <a> haette von
+    // /impressum oder /termin aus die ganze Seite neu geladen, statt zu
+    // navigieren. Externe Ziele (mailto:, https://, wa.me) bleiben <a>.
+    const internal = href.startsWith("/") && target !== "_blank"
+    const Tag = internal ? MotionLink : motion.a
     return (
-      <motion.a
+      <Tag
         ref={ref as React.Ref<HTMLAnchorElement>}
         href={href}
         target={target}
@@ -83,7 +92,7 @@ export function MagneticButton({
         {...motionProps}
       >
         {inner}
-      </motion.a>
+      </Tag>
     )
   }
 

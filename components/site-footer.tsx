@@ -21,9 +21,9 @@ export function SiteFooter() {
       <div className="relative mx-auto w-full max-w-[100rem] px-6 pt-24 pb-10 md:px-10 md:pt-32 lg:px-16">
         {/* Riesige Wortmarke */}
         <div className="border-line border-b pb-14">
-          <a href="/#top" className="inline-block" aria-label="creaDIG — nach oben">
+          <Link href="/#top" className="inline-block" aria-label="creaDIG — nach oben">
             <Logo variant="auto" className="h-[clamp(1.4rem,3vw,2.5rem)]" />
-          </a>
+          </Link>
           <p className="type-lead text-muted-foreground mt-6 max-w-xl text-pretty">
             {t.footer.tagline}
           </p>
@@ -35,22 +35,22 @@ export function SiteFooter() {
             <ul className="mt-6 flex flex-col gap-3.5">
               {navLinks.map((link) => (
                 <li key={link.id}>
-                  <a
+                  <Link
                     href={`/#${link.id}`}
                     className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
                   >
                     {t.nav[link.labelKey]}
-                  </a>
+                  </Link>
                 </li>
               ))}
               {/* Nicht in der Hauptnavigation, aber im Footer erreichbar. */}
               <li>
-                <a
+                <Link
                   href="/#zertifizierungen"
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
                 >
                   {t.nav.zertifikate}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

@@ -66,7 +66,6 @@ export default function OpengraphImage() {
         />
 
         <div style={{ display: "flex", flexDirection: "column", gap: 34 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={`data:image/svg+xml;base64,${LOGO}`}
             width={560}

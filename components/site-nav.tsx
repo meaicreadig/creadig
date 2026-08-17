@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { Menu, Sun } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
@@ -22,6 +23,14 @@ import { Logo } from "@/components/brand/logo"
 import { navLinks } from "@/lib/site-data"
 import { WHATSAPP_LINK } from "@/lib/dictionary"
 import { cn } from "@/lib/utils"
+
+/**
+ * Framer-Motion auf next/link: `motion.a` haette die Seitenlinks als harte
+ * <a> gerendert und damit bei jedem Menue-Klick die ganze Seite neu geladen.
+ * Ausserhalb der Komponente definiert, damit der Typ nicht bei jedem Render
+ * neu entsteht (sonst remountet das Menue).
+ */
+const MotionLink = motion.create(Link)
 
 export function SiteNav() {
   const { theme, toggleTheme } = useTheme()
@@ -64,20 +73,20 @@ export function SiteNav() {
         weiter innen als die Headline darunter.
       */}
       <div className="mx-auto flex h-[4.5rem] max-w-[100rem] items-center justify-between gap-6 px-6 md:px-10 lg:px-16">
-        <a href="/#top" className="shrink-0" aria-label="creaDIG — zur Startseite">
+        <Link href="/#top" className="shrink-0" aria-label="creaDIG — zur Startseite">
           <Logo variant="auto" className="h-[1.3rem] md:h-[1.55rem]" priority />
-        </a>
+        </Link>
 
         <nav aria-label="Hauptnavigation" className="hidden items-center gap-8 lg:flex">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.id}
               href={`/#${link.id}`}
               className="group relative py-1 text-sm tracking-wide text-muted-foreground transition-colors duration-300 hover:text-foreground"
             >
               {t.nav[link.labelKey]}
               <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-gold transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full" />
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -133,7 +142,7 @@ export function SiteNav() {
             </a>
           </Button>
 
-          <a
+          <Link
             href="/#kontakt"
             className="group relative ml-1.5 hidden items-center overflow-hidden bg-gradient-to-br from-gold-soft to-gold eyebrow px-6 py-3 text-[#201e1b] sm:inline-flex"
           >
@@ -144,7 +153,7 @@ export function SiteNav() {
             <span className="relative z-10 transition-colors duration-500 group-hover:text-gold-soft">
               {t.nav.cta}
             </span>
-          </a>
+          </Link>
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
@@ -172,7 +181,7 @@ export function SiteNav() {
               <nav aria-label="Mobile Navigation" className="flex flex-col px-6 pt-6">
                 {navLinks.map((link, index) => (
                   <SheetClose asChild key={link.id}>
-                    <motion.a
+                    <MotionLink
                       href={`/#${link.id}`}
                       initial={{ opacity: 0, y: 14 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -180,12 +189,12 @@ export function SiteNav() {
                       className="text-display border-b border-line py-5 text-3xl text-foreground"
                     >
                       {t.nav[link.labelKey]}
-                    </motion.a>
+                    </MotionLink>
                   </SheetClose>
                 ))}
                 {/* Vertrauens-Baustein: in der Desktop-Leiste kein Platz, hier schon. */}
                 <SheetClose asChild>
-                  <motion.a
+                  <MotionLink
                     href="/#zertifizierungen"
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -193,18 +202,18 @@ export function SiteNav() {
                     className="text-display border-b border-line py-5 text-3xl text-foreground"
                   >
                     {t.nav.zertifikate}
-                  </motion.a>
+                  </MotionLink>
                 </SheetClose>
               </nav>
 
               <div className="flex flex-col gap-3 px-6 pt-10">
                 <SheetClose asChild>
-                  <a
+                  <Link
                     href="/#kontakt"
                     className="flex items-center justify-center bg-gradient-to-br from-gold-soft to-gold px-6 py-4 text-sm tracking-wide text-[#201e1b]"
                   >
                     {t.nav.cta}
-                  </a>
+                  </Link>
                 </SheetClose>
                 <a
                   href={WHATSAPP_LINK}
