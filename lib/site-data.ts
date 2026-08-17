@@ -307,7 +307,7 @@ export const addressLines: string[] = [
 export const contact = {
   whatsapp: "+41 76 504 58 79",
   whatsappHref: "https://wa.me/41765045879",
-  email: "hallo@creadig.de",
+  email: "info@creadig.de",
   address,
   addressLines,
   /** Sitz — kurz. */
