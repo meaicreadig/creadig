@@ -361,6 +361,19 @@ export const dictionary = {
       handoffNote:
         "Beim Absenden öffnet sich WhatsApp beziehungsweise Ihr E-Mail-Programm mit der fertigen Nachricht — versendet wird erst, wenn Sie es dort bestätigen.",
     },
+    /*
+     * Abschluss-Band (B1) — der letzte Block vor dem Footer.
+     * Die Seite endete bisher mitten im Kontaktformular; wer nicht ausfuellen
+     * wollte, fiel in den Footer. Ein schmales Band fasst zusammen und laesst
+     * genau zwei Wege offen: sprechen oder erst weiterschauen.
+     */
+    closing: {
+      eyebrow: "Nächster Schritt",
+      title: "Sie führen den Betrieb. Wir bauen das System dahinter.",
+      lead: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sehen uns den Betrieb an und sagen ehrlich, ob wir helfen können.",
+      ctaPrimary: "Projekt starten",
+      ctaSecondary: "Arbeiten ansehen",
+    },
     termin: {
       back: "Zurück zur Seite",
       eyebrow: "Kostenlose Erstberatung",
@@ -910,6 +923,13 @@ export const dictionary = {
       errPrivacy: "Lütfen gizlilik politikasını onaylayın.",
       handoffNote:
         "Gönderdiğinizde WhatsApp veya e-posta programınız hazır mesajla açılır — gönderim ancak orada onayladığınızda gerçekleşir.",
+    },
+    closing: {
+      eyebrow: "Sonraki adım",
+      title: "İşletmeyi siz yönetirsiniz. Arkasındaki sistemi biz kurarız.",
+      lead: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmeye bakar ve yardımcı olabilir miyiz, dürüstçe söyleriz.",
+      ctaPrimary: "Projeye başla",
+      ctaSecondary: "İşleri gör",
     },
     termin: {
       back: "Sayfaya dön",

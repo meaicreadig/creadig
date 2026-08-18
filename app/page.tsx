@@ -13,6 +13,7 @@ import { Location } from "@/components/sections/location"
 import { Packages } from "@/components/sections/packages"
 import { Faq } from "@/components/sections/faq"
 import { Contact } from "@/components/sections/contact"
+import { ClosingCta } from "@/components/sections/closing-cta"
 import { dictionary } from "@/lib/dictionary"
 
 /**
@@ -58,6 +59,8 @@ export default function Page() {
       {/* Direkt vor dem Formular: nimmt die Fragen weg, die sonst bremsen. */}
       <Faq />
       <Contact />
+      {/* Schlussstrich statt abruptem Ende (B1). */}
+      <ClosingCta />
     </main>
   )
 }
