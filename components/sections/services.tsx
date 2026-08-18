@@ -1,15 +1,18 @@
 "use client"
 
+import Link from "next/link"
+import { ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { serviceLayers } from "@/lib/site-data"
+import { publishedServicePages } from "@/lib/service-pages"
 
 /**
  * Fünf Ebenen als aufsteigende, bauliche Architektur.
  * Jede Ebene wird breiter und dunkler — Tiefe von unten nach oben.
  */
 export function Services() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
 
   return (
     <section id="leistungen" aria-labelledby="leistungen-title" className="border-line border-b">
@@ -84,6 +87,33 @@ export function Services() {
             )
           })}
         </div>
+
+        {/*
+          Einstieg in die granularen Leistungsseiten (E-K4).
+
+          Ohne diese Verlinkung waeren die Seiten zwar in der Sitemap, aber von
+          der Startseite aus nicht erreichbar — und interne Links sind das, was
+          eine Unterseite tatsaechlich traegt. Die Beschriftung ist bewusst die
+          Suchvokabel („Webdesign") und nicht die Hausvokabel („Digital").
+        */}
+        <Reveal delay={0.16}>
+          <div className="border-line mt-20 border-t pt-8">
+            <p className="eyebrow text-gold-text">{t.servicePage.allServices}</p>
+            <ul className="mt-6 flex flex-wrap gap-2.5">
+              {publishedServicePages.map((page) => (
+                <li key={page.slug}>
+                  <Link
+                    href={`/leistungen/${page.slug}`}
+                    className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-4 py-2.5 text-sm tracking-wide transition-colors duration-500"
+                  >
+                    {page.metaTitle[locale]}
+                    <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
       </div>
     </section>
   )
