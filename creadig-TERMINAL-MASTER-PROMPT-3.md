@@ -33,6 +33,7 @@ Wettbewerber (coresection.ch) = **Struktur-/Info-Architektur-Referenz**. creaDIG
 **Owner-Entscheidung:** Der FAB bleibt (Demo-Assistent nutzbar), aber **nicht mehr charcoal.**
 - `components/ai-assistant.tsx:83`: `bg-foreground text-background` → **creaDIG-CTA-Stil**: Gold-Gradient (`from-gold-soft to-gold`), Text `#201e1b`, Hover dunkelt wie die anderen CTAs. `rounded-none` bleibt (Haus-Radius).
 - Demo-Kennzeichnung bleibt. **Kein schwarzer Fill mehr** irgendwo unten (Sticky-WhatsApp bleibt grün, das ist Marken-Kanal).
+- *Hide-Option bleibt offen:* falls der Demo-Assistent ohne echte KI-API zu dünn wirkt (berechtigter Einwand), ist Ausblenden hinter einem Feature-Flag ein 1-Zeilen-Schritt — jederzeit nachrüstbar.
 - Test: FAB in hell + dunkel, offen + geschlossen.
 
 ## 4. P-B · Block-Adaption (Kern-Blöcke + Feinschliff)
@@ -58,8 +59,14 @@ Der letzte Dunkelmodus-Durchgang fehlt (Sandbox brach ab). Prüfe in **beiden** 
 
 ---
 
-## 7. Reihenfolge & Start
-**P-AI** (schnell) → **P-B** (B1→B4, dann Feinschliff) → **P-I** (EN) → **P-M** (Märkte) → **P-V** (Verifikation). Ein Commit pro Epic/Block. `build` + `tsc` + `lint` grün halten, Parität jetzt **3×**. Nach jedem Block Screenshots hell/dunkel. **Nicht** nach `main` pushen.
+## 7. Reihenfolge & Start — ZWEI Läufe (bewusst getrennt)
+Die EN-Übersetzung (415 Keys × neu) ist zu groß, um sie mit den visuellen Blöcken in **einen** Auto-Lauf zu packen — sonst leiden die letzten Epics. Deshalb zwei getrennte Terminal-Läufe:
+
+**RUN A — visuell (zuerst):** `P-AI` → `P-B` (B1→B4, dann Feinschliff) → `P-V`. Ein Commit pro Block; nach jedem Block `npm run build` + Screenshot **hell + dunkel** (Hero, FAB unten, neuer Block). Am Ende `git push origin feat/system-haus-site` + kurze Liste „was sichtbar neu ist". **`P-I`/`P-M` NICHT in diesem Lauf.**
+
+**RUN B — i18n (separater Lauf):** `P-I` (EN, allein) → `P-M` (Märkte). `build` + `tsc` + `lint` grün, **Parität 3× (DE = TR = EN)** prüfen. Am Ende push.
+
+`build`/`tsc`/`lint` grün halten. Nach jedem Lauf push zum **Preview**; **`main`-Merge nur auf dein „live"**. Nicht nach `main` pushen.
 
 ## 8. Nicht tun
 - ❌ Wettbewerber-**Stil** kopieren (nur Struktur) · Serif · 5 Sprachen
