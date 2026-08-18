@@ -74,23 +74,35 @@ export function AiAssistant() {
 
   return (
     <>
-      {/* Auslöser */}
-      <Button
+      {/*
+        Auslöser — Haus-CTA, nicht Fremdkoerper (P-AI).
+
+        Vorher trug der FAB `bg-foreground`: ein schwarzer Block unten rechts,
+        der auf dem warmen Papierweiss schwerer wog als jede echte CTA der
+        Seite. Jetzt traegt er dieselbe Rezeptur wie Nav-CTA und
+        MagneticButton — Gold-Verlauf in Ruhe, dunkler Vorhang beim Hover.
+        `rounded-none` bleibt: Haus-Radius.
+      */}
+      <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="creadig-assistant"
-        className="fixed right-5 bottom-5 z-50 h-auto gap-2.5 rounded-none border border-foreground/15 bg-foreground px-5 py-3.5 text-background elevation-3 hover:bg-foreground/90 md:right-8 md:bottom-8"
+        className="group border-gold-deep/25 from-gold-soft to-gold elevation-3 fixed right-5 bottom-5 z-50 inline-flex items-center gap-2.5 overflow-hidden border bg-gradient-to-br px-5 py-3.5 text-[#201e1b] md:right-8 md:bottom-8"
       >
-        {open ? (
-          <X className="size-4" strokeWidth={1.5} data-icon="inline-start" />
-        ) : (
-          <MessageSquare className="size-4" strokeWidth={1.5} data-icon="inline-start" />
-        )}
-        <span className="eyebrow">
-          {open ? t.chat.close : t.chat.open}
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
+        />
+        <span className="group-hover:text-gold-soft relative z-10 flex items-center gap-2.5 transition-colors duration-500">
+          {open ? (
+            <X className="size-4" strokeWidth={1.5} />
+          ) : (
+            <MessageSquare className="size-4" strokeWidth={1.5} />
+          )}
+          <span className="eyebrow">{open ? t.chat.close : t.chat.open}</span>
         </span>
-      </Button>
+      </button>
 
       {/* Panel */}
       <div
@@ -159,12 +171,13 @@ export function AiAssistant() {
             aria-label={t.chat.placeholder}
             className="h-auto rounded-none border-0 bg-transparent px-2 py-2.5 text-base shadow-none focus-visible:ring-0 dark:bg-transparent"
           />
+          {/* Auch der Senden-Knopf traegt Gold — unten rechts steht kein schwarzer Fill mehr. */}
           <Button
             type="submit"
             size="icon"
             disabled={!draft.trim()}
             aria-label={t.chat.send}
-            className="bg-foreground text-background hover:bg-foreground/90 size-9 shrink-0 rounded-none"
+            className="from-gold-soft to-gold hover:to-gold-deep size-9 shrink-0 rounded-none bg-gradient-to-br text-[#201e1b] transition-colors duration-500"
           >
             <ArrowUp className="size-4" strokeWidth={1.5} />
           </Button>
