@@ -67,6 +67,14 @@ export const dictionary = {
       more: "Außerdem unter dem Dach",
       viewLive: "Live ansehen",
       mockupNote: "Abbildungen sind illustrative Mockups, keine Screenshots.",
+      // Register-Ansicht (B2)
+      viewLabel: "Ansicht",
+      viewCards: "Karten",
+      viewRegistry: "Register",
+      colProject: "Projekt",
+      colSector: "Branche",
+      colRegion: "Region",
+      registryNote: "Dieselben Projekte, dicht gelistet. Jahreszahlen ergänzen wir, sobald sie belegt sind — geschätzte Jahre stehen hier nicht.",
     },
     cases: {
       eyebrow: "Kundenfälle",
@@ -632,6 +640,13 @@ export const dictionary = {
       more: "Çatı altında ayrıca",
       viewLive: "Canlı gör",
       mockupNote: "Görseller açıklayıcı maketlerdir, ekran görüntüsü değildir.",
+      viewLabel: "Görünüm",
+      viewCards: "Kartlar",
+      viewRegistry: "Sicil",
+      colProject: "Proje",
+      colSector: "Sektör",
+      colRegion: "Bölge",
+      registryNote: "Aynı projeler, sıkı bir liste hâlinde. Yıl bilgilerini belgelendiğinde ekleriz — tahmini yıllar burada yer almaz.",
     },
     cases: {
       eyebrow: "Müşteri örnekleri",

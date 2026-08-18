@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
 import { ArrowUpRight } from "lucide-react"
 import { SignatureMotif } from "@/components/brand/signature-motif"
@@ -7,6 +8,7 @@ import { Reveal } from "@/components/ui/reveal"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useLocale } from "@/components/locale-provider"
+import { WorkRegistry } from "@/components/sections/work-registry"
 import { clientWorks, furtherProjects, productWorks, type Work } from "@/lib/site-data"
 import { cn } from "@/lib/utils"
 
@@ -138,6 +140,12 @@ function GroupHeading({ label, note }: { label: string; note: string }) {
 
 export function Portfolio() {
   const { t } = useLocale()
+  /*
+   * Zwei Ansichten auf dieselbe Liste (B2). Karten sind der Default: Sie
+   * zeigen, wie etwas aussieht. Das Register zeigt, wie viel es ist — und
+   * beantwortet damit die Frage, die das Grid offen laesst.
+   */
+  const [view, setView] = useState<"cards" | "registry">("cards")
 
   return (
     <section
@@ -165,29 +173,65 @@ export function Portfolio() {
         </div>
       </Reveal>
 
-      {/* Eigene Produkte — die großen Cases */}
-      <Reveal className="mt-20">
-        <GroupHeading label={t.portfolio.products} note={t.portfolio.productsNote} />
+      {/* Ansichtswechsel — Hairline-Pills in der Sprache des Hauses. */}
+      <Reveal delay={0.08} className="border-line mt-12 flex flex-wrap items-center gap-4 border-t pt-6">
+        <p className="eyebrow text-muted-foreground">{t.portfolio.viewLabel}</p>
+        <div role="group" aria-label={t.portfolio.viewLabel} className="flex gap-px">
+          {(
+            [
+              ["cards", t.portfolio.viewCards],
+              ["registry", t.portfolio.viewRegistry],
+            ] as const
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setView(key)}
+              aria-pressed={view === key}
+              className={cn(
+                "eyebrow border px-4 py-2.5 transition-colors duration-500",
+                view === key
+                  ? "border-gold bg-gold/10 text-gold-text"
+                  : "border-line-strong text-muted-foreground hover:border-gold hover:text-gold-text",
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </Reveal>
-      <div className="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-8">
-        {productWorks.map((work, index) => (
-          <Reveal key={work.slug} delay={(index % 2) * 0.08} className="flex">
-            <WorkCard work={work} builtLabel={t.portfolio.built} />
-          </Reveal>
-        ))}
-      </div>
 
-      {/* Kundenwerk — ausdrücklich getrennt, kein eigenes Produkt */}
-      <Reveal className="mt-24">
-        <GroupHeading label={t.portfolio.clientWork} note={t.portfolio.clientWorkNote} />
-      </Reveal>
-      <div className="mt-8 grid gap-6 md:grid-cols-3 lg:gap-8">
-        {clientWorks.map((work, index) => (
-          <Reveal key={work.slug} delay={index * 0.08} className="flex">
-            <WorkCard work={work} builtLabel={t.portfolio.built} compact />
+      {view === "registry" ? (
+        <div className="mt-14">
+          <WorkRegistry />
+        </div>
+      ) : (
+        <>
+          {/* Eigene Produkte — die großen Cases */}
+          <Reveal className="mt-20">
+            <GroupHeading label={t.portfolio.products} note={t.portfolio.productsNote} />
           </Reveal>
-        ))}
-      </div>
+          <div className="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-8">
+            {productWorks.map((work, index) => (
+              <Reveal key={work.slug} delay={(index % 2) * 0.08} className="flex">
+                <WorkCard work={work} builtLabel={t.portfolio.built} />
+              </Reveal>
+            ))}
+          </div>
+
+          {/* Kundenwerk — ausdrücklich getrennt, kein eigenes Produkt */}
+          <Reveal className="mt-24">
+            <GroupHeading label={t.portfolio.clientWork} note={t.portfolio.clientWorkNote} />
+          </Reveal>
+          <div className="mt-8 grid gap-6 md:grid-cols-3 lg:gap-8">
+            {clientWorks.map((work, index) => (
+              <Reveal key={work.slug} delay={index * 0.08} className="flex">
+                <WorkCard work={work} builtLabel={t.portfolio.built} compact />
+              </Reveal>
+            ))}
+          </div>
+        </>
+      )}
 
       <Reveal className="mt-24">
         <div className="flex items-center gap-4">
@@ -207,9 +251,12 @@ export function Portfolio() {
             </li>
           ))}
         </ul>
-        <p className="text-muted-foreground/80 text-meta mt-6">
-          {t.portfolio.mockupNote}
-        </p>
+        {/* Gilt nur fuer die Karten — das Register zeigt keine Abbildungen. */}
+        {view === "cards" && (
+          <p className="text-muted-foreground/80 text-meta mt-6">
+            {t.portfolio.mockupNote}
+          </p>
+        )}
       </Reveal>
     </section>
   )

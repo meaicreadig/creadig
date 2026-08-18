@@ -75,6 +75,20 @@ export type Work = {
   outcome: string
   kind: "Produkt" | "Kundenwerk"
   region: Region
+  /**
+   * Branche in zwei bis drei Worten — die dichte Register-Ansicht (B2) hat
+   * keinen Platz fuer den ganzen `what`-Satz. Abgeleitet aus dem, was das
+   * Projekt tatsaechlich ist; nichts dazuerfunden.
+   */
+  sector: string
+  /**
+   * Jahr der Umsetzung. `null`, solange es nicht belegt ist — und dann steht
+   * im Register schlicht nichts. Ein geschaetztes Jahr waere eine erfundene
+   * Angabe, und die Regel dagegen ist gesperrt.
+   *
+   * TODO (Owner): echte Jahreszahlen nachtragen.
+   */
+  year: string | null
   /** Illustratives Mockup — kein Screenshot. null = Monogramm-Panel statt Bild. */
   image: string | null
   /** Monogramm für Karten ohne Bild. */
@@ -87,6 +101,8 @@ export type Work = {
 export const productWorks: Work[] = [
   {
     slug: "meai",
+    sector: "KI · Business-Software",
+    year: null,
     name: "meAI",
     what: "KI-Business-Betriebssystem für kleine und mittlere Betriebe.",
     built: "Produktarchitektur, KI-Logik, Dashboard, Betrieb — von Grund auf.",
@@ -100,6 +116,8 @@ export const productWorks: Work[] = [
   },
   {
     slug: "fibero",
+    sector: "Glasfaser · Operations",
+    year: null,
     name: "fibero",
     what: "Ordnung und Klarheit im Glasfaser-Alltag: Auftrags-, Abrechnungs- und Finanzlogik.",
     built: "Operative Prozesse, Abrechnungssystem, Auswertung.",
@@ -112,6 +130,8 @@ export const productWorks: Work[] = [
   },
   {
     slug: "cassamea",
+    sector: "Gastronomie · Kasse",
+    year: null,
     name: "CASSAMEA",
     what: "Die Kasse, die mitdenkt — für die Gastronomie, gebaut für Schweizer Anforderungen.",
     built: "Kassen-Software, Backoffice, Schweizer Anforderungen.",
@@ -123,6 +143,8 @@ export const productWorks: Work[] = [
   },
   {
     slug: "meahv",
+    sector: "Immobilien · Verwaltung",
+    year: null,
     name: "meahv",
     what: "Hausverwaltungs-System: Objekte, Mieter, Belege und Abrechnung an einem Ort.",
     built: "Datenmodell, Verwaltungslogik, Abrechnung.",
@@ -139,6 +161,8 @@ export const productWorks: Work[] = [
 export const clientWorks: Work[] = [
   {
     slug: "nur",
+    sector: "Bildung · Plattform",
+    year: null,
     name: "NÛR",
     what: "Qur'an-Plattform — Marke, Oberfläche und Inhalte.",
     built: "Marke, Web, Inhaltsstruktur.",
@@ -150,6 +174,8 @@ export const clientWorks: Work[] = [
   },
   {
     slug: "bir-damla-hayir",
+    sector: "Gemeinnützig · Spenden",
+    year: null,
     name: "Bir Damla Hayır",
     what: "Spendenplattform mit transparenter Mittelverwendung.",
     built: "Plattform, Spendenfluss, Verwaltung.",
@@ -161,6 +187,8 @@ export const clientWorks: Work[] = [
   },
   {
     slug: "rumis-maison",
+    sector: "Lifestyle · Marke",
+    year: null,
     name: "Rumi's Maison",
     what: "Markenauftritt und Website für eine Lifestyle-Marke.",
     built: "Marke, Web, Inhalte, laufende Betreuung.",
@@ -171,6 +199,16 @@ export const clientWorks: Work[] = [
     mark: "RM",
   },
 ]
+
+/**
+ * Referenzregister (B2) — dieselben Projekte, dichte Listenansicht.
+ *
+ * Bewusst KEINE zweite Quelle: Wer hier eine eigene Liste pflegen wuerde,
+ * haette in vier Wochen zwei Wahrheiten. Das Register ist eine andere
+ * Darstellung derselben Werke — eigene Produkte zuerst, dann Kundenwerk,
+ * durchnummeriert 01…n.
+ */
+export const registryWorks: Work[] = [...productWorks, ...clientWorks]
 
 /* ==========================================================================
  * CASE-STUDIES — Problem → Lösung → Ergebnis (E-K1)
