@@ -233,6 +233,31 @@ export const dictionary = {
           what: "Wir übergeben nicht und verschwinden. Wir betreiben, überwachen und entwickeln weiter.",
         },
       },
+      /*
+       * Die vier operativen Schritte (B4). Die drei Schritte darueber sind
+       * Haltung; das hier ist der Ablauf, den jemand erlebt, der heute
+       * schreibt. Alle Angaben decken sich mit dem, was auch am Telefon
+       * gesagt wird — inklusive der 24 Stunden.
+       */
+      opsEyebrow: "Vom ersten Kontakt an",
+      opsSteps: {
+        request: {
+          name: "Anfrage",
+          what: "Sie schreiben uns — per WhatsApp, über das Formular oder direkt mit einem Terminwunsch. Wir melden uns in der Regel innerhalb von 24 Stunden.",
+        },
+        analysis: {
+          name: "Analyse",
+          what: "Zwanzig Minuten Erstgespräch, kostenlos. Wir sehen uns den Betrieb an und sagen, was wir bauen würden — und was nicht.",
+        },
+        offer: {
+          name: "Angebot",
+          what: "Ein festes Angebot mit Umfang, Preis und Zeitrahmen. Keine Stundenzettel, keine Nachforderungen.",
+        },
+        operate: {
+          name: "Betrieb",
+          what: "Nach dem Start bleiben wir dran: betreiben, überwachen, weiterentwickeln — solange Sie wollen.",
+        },
+      },
     },
     about: {
       eyebrow: "Über uns",
@@ -810,6 +835,25 @@ export const dictionary = {
         operate: {
           name: "İşletmek",
           what: "Teslim edip kaybolmuyoruz. İşletiyor, izliyor ve geliştirmeye devam ediyoruz.",
+        },
+      },
+      opsEyebrow: "İlk temastan itibaren",
+      opsSteps: {
+        request: {
+          name: "Talep",
+          what: "Bize yazarsınız — WhatsApp'tan, form üzerinden ya da doğrudan bir randevu talebiyle. Genellikle 24 saat içinde döneriz.",
+        },
+        analysis: {
+          name: "Analiz",
+          what: "Yirmi dakikalık ilk görüşme, ücretsiz. İşletmeye bakar; neyi kurardık, neyi kurmazdık açıkça söyleriz.",
+        },
+        offer: {
+          name: "Teklif",
+          what: "Kapsamı, fiyatı ve süresi belli sabit bir teklif. Saat çizelgesi yok, sonradan ek talep yok.",
+        },
+        operate: {
+          name: "İşletme",
+          what: "Başlangıçtan sonra da yanınızdayız: işletir, izler, geliştiririz — siz istediğiniz sürece.",
         },
       },
     },

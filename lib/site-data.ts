@@ -410,6 +410,21 @@ export const processSteps = [
 ]
 
 /**
+ * Die vier operativen Schritte (B4).
+ *
+ * `processSteps` beantwortet „wie arbeitet ihr" — eine Haltung. Das ist
+ * richtig, aber es beantwortet nicht die Frage, die ein Interessent vor dem
+ * Absenden tatsaechlich hat: „Was passiert, wenn ich jetzt schreibe?"
+ * Genau das steht hier — vier Schritte, vom ersten Kontakt bis zum Betrieb.
+ */
+export const opsSteps = [
+  { step: "01", key: "request" as const },
+  { step: "02", key: "analysis" as const },
+  { step: "03", key: "offer" as const },
+  { step: "04", key: "operate" as const },
+]
+
+/**
  * Die drei Stufen (E-K3).
  *
  * `tier` macht die Reihenfolge zur Aussage: 01 ist der Einstieg, 03 das

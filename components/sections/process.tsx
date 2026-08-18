@@ -2,7 +2,7 @@
 
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { processSteps } from "@/lib/site-data"
+import { opsSteps, processSteps } from "@/lib/site-data"
 
 export function Process() {
   const { t } = useLocale()
@@ -52,6 +52,43 @@ export function Process() {
             {t.process.bridge}
           </p>
         </Reveal>
+
+        {/*
+          Vier operative Schritte (B4).
+
+          Die drei Schritte oben sind Haltung — richtig, aber sie beantworten
+          nicht die Frage, die jemand vor dem Absenden tatsaechlich hat:
+          „Was passiert, wenn ich jetzt schreibe?" Das steht hier. Bewusst
+          dieselbe Hairline-Sprache wie oben, nur vierspaltig und ohne zweite
+          Headline: Es ist die Fortsetzung derselben Sektion, kein neuer Block.
+        */}
+        <Reveal delay={0.24} className="mt-24 flex items-center gap-4">
+          <span aria-hidden="true" className="bg-gold h-px w-10" />
+          <p className="eyebrow text-muted-foreground">{t.process.opsEyebrow}</p>
+        </Reveal>
+
+        <div className="mt-10 grid gap-px sm:grid-cols-2 lg:grid-cols-4">
+          {opsSteps.map((step, i) => {
+            const copy = t.process.opsSteps[step.key]
+            return (
+              <Reveal
+                key={step.key}
+                delay={0.06 * i}
+                className="group border-line relative border-t pt-7 lg:pr-8"
+              >
+                <span
+                  aria-hidden="true"
+                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                />
+                <span className="eyebrow text-gold-text">{step.step}</span>
+                <h3 className="type-h4 mt-5">{copy.name}</h3>
+                <p className="type-small text-muted-foreground mt-4 max-w-xs text-pretty">
+                  {copy.what}
+                </p>
+              </Reveal>
+            )
+          })}
+        </div>
       </div>
     </section>
   )
