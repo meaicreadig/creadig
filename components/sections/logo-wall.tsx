@@ -3,6 +3,7 @@
 import { Reveal } from "@/components/ui/reveal"
 import { useLocale } from "@/components/locale-provider"
 import { brands, ownProducts, type Region } from "@/lib/site-data"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /**
  * Logo-Slot: echtes Logo, wo eins vorliegt (grayscale → Farbe bei Hover),
@@ -106,13 +107,10 @@ export function LogoWall() {
 
   return (
     <section id="produkte" aria-labelledby="produkte-title" className="border-line border-b">
-      <div className="mx-auto w-full max-w-[100rem] px-6 pt-24 md:px-10 md:pt-32 lg:px-16">
+      <div className="section-gutter pt-24 md:pt-32">
         <Reveal className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="flex items-center gap-4">
-              <span aria-hidden="true" className="bg-gold h-px w-10" />
-              <p className="eyebrow text-muted-foreground">{t.logos.eyebrow}</p>
-            </div>
+            <SectionEyebrow label={t.logos.eyebrow} />
             <h2
               id="produkte-title"
               className="type-h2 mt-7 max-w-2xl text-balance"
@@ -127,7 +125,7 @@ export function LogoWall() {
       </div>
 
       <div className="mt-16 pb-24 md:pb-32">
-        <div className="mx-auto mb-6 flex w-full max-w-[100rem] items-center gap-4 px-6 md:px-10 lg:px-16">
+        <div className="section-gutter mb-6 flex items-center gap-4">
           <p className="eyebrow text-foreground">{t.logos.ownProducts}</p>
           <span aria-hidden="true" className="bg-line h-px flex-1" />
         </div>
@@ -136,7 +134,7 @@ export function LogoWall() {
           {t.logos.ownProducts}: {productRow.map((i) => i.name).join(", ")}
         </span>
 
-        <div className="mx-auto mt-14 mb-6 flex w-full max-w-[100rem] items-center gap-4 px-6 md:px-10 lg:px-16">
+        <div className="section-gutter mt-14 mb-6 flex items-center gap-4">
           <p className="eyebrow text-foreground">{t.logos.brands}</p>
           <span aria-hidden="true" className="bg-line h-px flex-1" />
         </div>

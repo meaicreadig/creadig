@@ -6,6 +6,7 @@ import { ArrowDown, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { ArchitecturalField } from "@/components/hero/architectural-field"
 import { MagneticButton } from "@/components/ui/magnetic-button"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
@@ -19,15 +20,13 @@ export function Hero() {
     <section id="top" className="relative isolate flex min-h-[100svh] flex-col overflow-hidden">
       <ArchitecturalField />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[100rem] flex-1 flex-col justify-center px-6 pt-32 pb-14 md:px-10 lg:px-16">
+      <div className="section-gutter relative z-10 flex flex-1 flex-col justify-center pt-32 pb-14">
         <motion.div
           initial={reduce ? undefined : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: EASE }}
-          className="flex items-center gap-4"
         >
-          <span aria-hidden="true" className="bg-gold h-px w-10" />
-          <p className="eyebrow text-muted-foreground">{t.hero.eyebrow}</p>
+          <SectionEyebrow label={t.hero.eyebrow} />
         </motion.div>
 
         {/* Headline als Bauwerk: bildschirmfüllend, kinetisch enthüllt */}
@@ -81,7 +80,7 @@ export function Hero() {
         initial={reduce ? undefined : { opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.6 }}
-        className="border-line relative z-10 mx-auto flex w-full max-w-[100rem] items-center justify-between border-t px-6 py-5 md:px-10 lg:px-16"
+        className="section-gutter border-line relative z-10 flex items-center justify-between border-t py-5"
       >
         <span className="eyebrow text-muted-foreground">{t.hero.location}</span>
         <Link

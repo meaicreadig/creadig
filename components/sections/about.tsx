@@ -3,16 +3,16 @@
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { contact } from "@/lib/site-data"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 export function About() {
   const { t } = useLocale()
 
   return (
     <section id="ueber-uns" aria-labelledby="ueber-title" className="border-line border-b">
-      <div className="mx-auto w-full max-w-[100rem] px-6 py-24 md:px-10 md:py-32 lg:px-16">
-        <Reveal className="flex items-center gap-4">
-          <span aria-hidden="true" className="bg-gold h-px w-10" />
-          <p className="eyebrow text-muted-foreground">{t.about.eyebrow}</p>
+      <div className="section-shell">
+        <Reveal>
+          <SectionEyebrow label={t.about.eyebrow} />
         </Reveal>
 
         <div className="mt-7 grid gap-x-12 gap-y-16 lg:grid-cols-12">

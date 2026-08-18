@@ -6,6 +6,7 @@ import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { MagneticButton } from "@/components/ui/magnetic-button"
 import { meaiCapabilityKeys } from "@/lib/site-data"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /** Dunkle Vollbild-Sektion. Flagship-Drama für meAI. */
 export function MeaiSpotlight() {
@@ -23,14 +24,13 @@ export function MeaiSpotlight() {
         className="via-gold/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent"
       />
 
-      <div className="relative mx-auto w-full max-w-[100rem] px-6 py-28 md:px-10 md:py-36 lg:px-16">
+      <div className="section-shell-band relative">
         <div className="grid gap-16 lg:grid-cols-12 lg:gap-12">
           {/* Text */}
           <div className="lg:col-span-6">
-            <Reveal className="flex items-center gap-4">
-              <span aria-hidden="true" className="bg-gold h-px w-10" />
-              <p className="eyebrow text-gold-text">{t.meai.eyebrow}</p>
-            </Reveal>
+            <Reveal>
+          <SectionEyebrow label={t.meai.eyebrow} tone="gold" />
+        </Reveal>
 
             <Reveal delay={0.05}>
               <h2

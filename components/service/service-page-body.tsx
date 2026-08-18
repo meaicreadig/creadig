@@ -9,6 +9,7 @@ import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { clientWorks, packages, productWorks } from "@/lib/site-data"
 import { WHATSAPP_LINK } from "@/lib/dictionary"
 import type { ServicePage } from "@/lib/service-pages"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /**
  * Körper einer Leistungsseite.
@@ -37,7 +38,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
         className="motif-band pointer-events-none absolute inset-x-0 top-0 h-[34rem] w-full"
       />
 
-      <div className="relative mx-auto w-full max-w-[100rem] px-6 pt-32 pb-24 md:px-10 md:pt-40 md:pb-32 lg:px-16">
+      <div className="section-gutter relative pt-32 pb-24 md:pt-40 md:pb-32">
         {/* Brotkrumen: der Weg zurück ins System, nicht nur ein Zurück-Pfeil. */}
         <nav aria-label="Brotkrumen">
           <ol className="text-muted-foreground flex flex-wrap items-center gap-2 text-meta">
@@ -63,12 +64,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
         </nav>
 
         <Reveal className="mt-12">
-          <div className="flex items-center gap-4">
-            <span aria-hidden="true" className="bg-gold h-px w-10" />
-            <p className="eyebrow text-muted-foreground">
-              {copy.layerLabel} · {layer.name}
-            </p>
-          </div>
+          <SectionEyebrow label={`${copy.layerLabel} · ${layer.name}`} />
           <h1 className="type-h1 mt-7 max-w-4xl text-balance">{page.h1[locale]}</h1>
           <p className="type-lead text-muted-foreground mt-8 max-w-2xl text-pretty">
             {page.lead[locale]}

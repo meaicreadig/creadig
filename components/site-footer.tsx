@@ -18,7 +18,7 @@ export function SiteFooter() {
         className="motif-band pointer-events-none absolute inset-0 h-full w-full"
       />
 
-      <div className="relative mx-auto w-full max-w-[100rem] px-6 pt-24 pb-10 md:px-10 md:pt-32 lg:px-16">
+      <div className="section-gutter relative pt-24 pb-10 md:pt-32">
         {/* Riesige Wortmarke */}
         <div className="border-line border-b pb-14">
           <Link href="/#top" className="inline-block" aria-label="creaDIG — nach oben">

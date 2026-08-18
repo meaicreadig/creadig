@@ -144,13 +144,15 @@ export const dictionary = {
       ctaBody: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sehen uns den Betrieb an und sagen ehrlich, ob wir helfen können.",
       ctaPrimary: "Kostenlose Erstberatung",
       ctaSecondary: "Per WhatsApp fragen",
-      allServices: "Alle Leistungen",
     },
     services: {
       eyebrow: "Leistungen",
       title: "Fünf Ebenen. Ein System.",
       lead: "Wir arbeiten von A bis Z — vom ersten Logo bis zum eigenen KI-System. Jede Ebene baut auf der darunter auf.",
       forWhom: "Für wen",
+      // Einstiegs-Chips ueber der Pyramide: die Vokabel, nach der gesucht wird.
+      entryLabel: "Einstieg",
+      entryFunding: "go-digital-Förderung",
       layers: {
         identity: {
           name: "Identity",
@@ -752,13 +754,14 @@ export const dictionary = {
       ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmeye bakar ve yardımcı olabilir miyiz, dürüstçe söyleriz.",
       ctaPrimary: "Ücretsiz ilk görüşme",
       ctaSecondary: "WhatsApp'tan sorun",
-      allServices: "Tüm hizmetler",
     },
     services: {
       eyebrow: "Hizmetler",
       title: "Beş katman. Tek sistem.",
       lead: "A'dan Z'ye çalışıyoruz — ilk logodan kendi yapay zekâ sistemine kadar. Her katman altındakinin üzerine kurulur.",
       forWhom: "Kimler için",
+      entryLabel: "Başlangıç",
+      entryFunding: "go-digital desteği",
       layers: {
         identity: {
           name: "Identity",

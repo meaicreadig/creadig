@@ -11,6 +11,7 @@ import { useLocale } from "@/components/locale-provider"
 import { WorkRegistry } from "@/components/sections/work-registry"
 import { clientWorks, furtherProjects, productWorks, type Work } from "@/lib/site-data"
 import { cn } from "@/lib/utils"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /** Ersatzfläche für Cases ohne Mockup — statt eines leeren oder kaputten <img>. */
 function MonogramPanel({ mark }: { mark: string }) {
@@ -151,15 +152,12 @@ export function Portfolio() {
     <section
       id="arbeiten"
       aria-labelledby="arbeiten-title"
-      className="border-line mx-auto max-w-[100rem] border-b px-6 py-24 md:px-10 md:py-32 lg:px-16"
+      className="border-line section-shell border-b"
     >
       <Reveal>
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-7">
-            <div className="flex items-center gap-3">
-              <span className="bg-gold h-px w-10" aria-hidden="true" />
-              <p className="eyebrow text-muted-foreground">{t.portfolio.eyebrow}</p>
-            </div>
+            <SectionEyebrow label={t.portfolio.eyebrow} />
             <h2
               id="arbeiten-title"
               className="type-h2 text-foreground mt-6 text-balance"

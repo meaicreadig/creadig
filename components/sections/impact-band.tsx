@@ -4,6 +4,7 @@ import { SignatureMotif } from "@/components/brand/signature-motif"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { impactSignals } from "@/lib/site-data"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /** Dunkle Vollbild-Sektion. Größe ohne erfundene Zahlen. */
 export function ImpactBand() {
@@ -21,14 +22,13 @@ export function ImpactBand() {
         className="via-gold/60 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent"
       />
 
-      <div className="relative mx-auto w-full max-w-[100rem] px-6 py-28 md:px-10 md:py-36 lg:px-16">
-        <Reveal className="flex items-center gap-4">
-          <span aria-hidden="true" className="bg-gold h-px w-10" />
-          <p className="eyebrow text-muted-foreground">{t.impact.eyebrow}</p>
+      <div className="section-shell-band relative">
+        <Reveal>
+          <SectionEyebrow label={t.impact.eyebrow} />
         </Reveal>
 
         <Reveal delay={0.05}>
-          <h2 className="type-h2 mt-8 max-w-4xl text-balance">
+          <h2 className="type-h2 mt-7 max-w-4xl text-balance">
             {t.impact.title}
           </h2>
         </Reveal>

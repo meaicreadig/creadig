@@ -9,6 +9,7 @@ import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { SignatureMotif } from "@/components/brand/signature-motif"
 import { contact } from "@/lib/site-data"
 import { cn } from "@/lib/utils"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /*
  * Portierung des alten `termin.html` / `termin.js` (Vanilla) nach Next.
@@ -260,10 +261,7 @@ export function TerminWizard() {
           {t.termin.back}
         </Link>
 
-        <div className="mt-10 flex items-center gap-4">
-          <span aria-hidden="true" className="bg-gold h-px w-10" />
-          <p className="eyebrow text-muted-foreground">{t.termin.eyebrow}</p>
-        </div>
+        <SectionEyebrow label={t.termin.eyebrow} className="mt-10" />
         <h1 className="type-h1 mt-6 text-balance">
           {t.termin.title}
         </h1>

@@ -4,19 +4,17 @@ import { ArrowUpRight, Check } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { packages, retainer, retainerPublished } from "@/lib/site-data"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 export function Packages() {
   const { t, locale } = useLocale()
 
   return (
     <section id="pakete" aria-labelledby="pakete-title" className="border-line border-b">
-      <div className="mx-auto w-full max-w-[100rem] px-6 py-24 md:px-10 md:py-32 lg:px-16">
+      <div className="section-shell">
         <div className="grid gap-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-7">
-            <div className="flex items-center gap-4">
-              <span aria-hidden="true" className="bg-gold h-px w-10" />
-              <p className="eyebrow text-muted-foreground">{t.packages.eyebrow}</p>
-            </div>
+            <SectionEyebrow label={t.packages.eyebrow} />
             <h2 id="pakete-title" className="type-h2 mt-7 text-balance">
               {t.packages.title}
             </h2>
@@ -30,7 +28,7 @@ export function Packages() {
 
         {/* Preise sind der Moment, in dem Förderung zählt — deshalb hier der Hinweis. */}
         <Reveal delay={0.14}>
-          <div className="border-gold/45 bg-muted mt-14 flex flex-col gap-4 border-l-2 py-5 pl-6 md:flex-row md:items-center md:justify-between md:gap-8 md:pr-7">
+          <div className="border-gold/45 bg-muted mt-20 flex flex-col gap-4 border-l-2 py-5 pl-6 md:flex-row md:items-center md:justify-between md:gap-8 md:pr-7">
             <p className="type-body text-foreground/85 max-w-3xl text-pretty">
               {t.packages.funding}
             </p>

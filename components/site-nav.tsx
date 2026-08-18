@@ -72,7 +72,7 @@ export function SiteNav() {
         einem anderen Raster als der Seiteninhalt — das Logo sass sichtbar
         weiter innen als die Headline darunter.
       */}
-      <div className="mx-auto flex h-[4.5rem] max-w-[100rem] items-center justify-between gap-6 px-6 md:px-10 lg:px-16">
+      <div className="section-gutter flex h-[4.5rem] items-center justify-between gap-6">
         <Link href="/#top" className="shrink-0" aria-label="creaDIG — zur Startseite">
           <Logo variant="auto" className="h-[1.3rem] md:h-[1.55rem]" priority />
         </Link>

@@ -4,6 +4,7 @@ import { useLocale } from "@/components/locale-provider"
 import { SignatureMotif } from "@/components/brand/signature-motif"
 import { MagneticButton } from "@/components/ui/magnetic-button"
 import { Reveal } from "@/components/ui/reveal"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /**
  * Abschluss-Band (B1) — der letzte Block vor dem Footer.
@@ -44,13 +45,10 @@ export function ClosingCta() {
         className="via-gold/60 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent"
       />
 
-      <div className="relative mx-auto w-full max-w-[100rem] px-6 py-20 md:px-10 md:py-24 lg:px-16">
+      <div className="section-shell-tight relative">
         <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
           <Reveal className="lg:col-span-7">
-            <div className="flex items-center gap-4">
-              <span aria-hidden="true" className="bg-gold h-px w-10" />
-              <p className="eyebrow text-muted-foreground">{t.closing.eyebrow}</p>
-            </div>
+            <SectionEyebrow label={t.closing.eyebrow} />
             <h2 id="abschluss-title" className="type-h3 mt-6 max-w-2xl text-balance">
               {t.closing.title}
             </h2>

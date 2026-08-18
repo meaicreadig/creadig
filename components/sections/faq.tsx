@@ -3,6 +3,7 @@
 import { ArrowUpRight, Plus } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /**
  * Häufige Fragen — direkt vor dem Kontaktformular.
@@ -21,13 +22,10 @@ export function Faq() {
 
   return (
     <section id="faq" aria-labelledby="faq-title" className="border-line border-b">
-      <div className="mx-auto w-full max-w-[100rem] px-6 py-24 md:px-10 md:py-32 lg:px-16">
+      <div className="section-shell">
         <div className="grid gap-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-7">
-            <div className="flex items-center gap-4">
-              <span aria-hidden="true" className="bg-gold h-px w-10" />
-              <p className="eyebrow text-muted-foreground">{t.faq.eyebrow}</p>
-            </div>
+            <SectionEyebrow label={t.faq.eyebrow} />
             <h2 id="faq-title" className="type-h2 mt-7 max-w-3xl text-balance">
               {t.faq.title}
             </h2>
@@ -37,7 +35,7 @@ export function Faq() {
           </Reveal>
         </div>
 
-        <div className="mt-16 flex flex-col">
+        <div className="mt-20 flex flex-col">
           {t.faq.items.map((item, i) => (
             <Reveal key={item.q} delay={0.04 * i}>
               <details className="group border-line border-t">
@@ -59,7 +57,7 @@ export function Faq() {
         </div>
 
         <Reveal delay={0.2}>
-          <div className="mt-12 flex flex-wrap items-center gap-x-5 gap-y-3">
+          <div className="mt-20 flex flex-wrap items-center gap-x-5 gap-y-3">
             <p className="type-body text-muted-foreground">{t.faq.more}</p>
             <a
               href="#kontakt"

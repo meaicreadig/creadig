@@ -5,6 +5,7 @@ import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { certifications, contact } from "@/lib/site-data"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /**
  * Zertifizierungen & Mitgliedschaften — nur echte, nachprüfbare Nachweise.
@@ -27,13 +28,10 @@ export function Certifications() {
       aria-labelledby="zertifizierungen-title"
       className="border-line border-b"
     >
-      <div className="mx-auto w-full max-w-[100rem] px-6 py-24 md:px-10 md:py-32 lg:px-16">
+      <div className="section-shell">
         <div className="grid gap-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-7">
-            <div className="flex items-center gap-4">
-              <span aria-hidden="true" className="bg-gold h-px w-10" />
-              <p className="eyebrow text-muted-foreground">{t.certs.eyebrow}</p>
-            </div>
+            <SectionEyebrow label={t.certs.eyebrow} />
             <h2
               id="zertifizierungen-title"
               className="type-h2 mt-7 text-balance"

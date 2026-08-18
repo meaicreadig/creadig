@@ -53,6 +53,13 @@ export type ServicePage = {
   lead: Localized
   /** <title> — bewusst kürzer und suchnäher als die H1. */
   metaTitle: Localized
+  /**
+   * Kurzform fuer die Einstiegs-Chips auf der Startseite. Der `metaTitle`
+   * ist ein Suchmaschinen-Satz („Webdesign für kleine und mittlere
+   * Betriebe") — als Pille gelesen ist er zu lang. Hier steht die Vokabel,
+   * nach der jemand tatsaechlich sucht.
+   */
+  chip: Localized
   metaDescription: Localized
   /** Was dazugehört. Jede Zeile ist eine Leistung, die heute erbracht wird. */
   includes: { de: string[]; tr: string[] }
@@ -69,6 +76,7 @@ export type ServicePage = {
 export const servicePages: ServicePage[] = [
   {
     slug: "webdesign",
+    chip: { de: "Webdesign", tr: "Web tasarımı" },
     layer: "digital",
     h1: {
       de: "Webdesign, das im Betrieb funktioniert.",
@@ -107,6 +115,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "corporate-design",
+    chip: { de: "Corporate Design", tr: "Kurumsal tasarım" },
     layer: "identity",
     h1: {
       de: "Corporate Design vom ersten Strich an.",
@@ -145,6 +154,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "website-handwerk",
+    chip: { de: "Website fürs Handwerk", tr: "Zanaat için web sitesi" },
     layer: "digital",
     h1: {
       de: "Website für Handwerksbetriebe.",
@@ -189,6 +199,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "zweisprachig-de-tr",
+    chip: { de: "Zweisprachig DE + TR", tr: "İki dilli DE + TR" },
     layer: "digital",
     h1: {
       de: "Zweisprachig: Deutsch und Türkisch.",
@@ -236,6 +247,7 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "ki-automatisierung",
+    chip: { de: "KI & Automatisierung", tr: "Yapay zekâ & otomasyon" },
     layer: "automation",
     h1: {
       de: "Automatisierung und KI im Betrieb.",

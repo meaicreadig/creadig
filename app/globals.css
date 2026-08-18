@@ -404,6 +404,73 @@
 }
 
 /* ==========================================================================
+ * SEKTIONS-RASTER — eine Quelle fuer Breite, Rand und Hoehe.
+ *
+ * Vorher stand die Rezeptur 14x wortgleich im Markup:
+ *   mx-auto w-full max-w-[100rem] px-6 py-24 md:px-10 md:py-32 lg:px-16
+ * Wer den Aussenrand aendern wollte, musste 14 Dateien anfassen — und hat es
+ * nie ueberall getroffen.
+ *
+ *   section-gutter       nur Breite + Seitenrand. Fuer alles, was seine
+ *                        senkrechten Abstaende selbst setzen muss (Hero,
+ *                        Footer, Logo-Wand, Leistungsseiten).
+ *   section-shell        normale Sektionen
+ *   section-shell-band   abgesetzte Baender (Impact, meAI) — eine Stufe
+ *                        grosszuegiger, weil sie die Seite anhalten sollen
+ *   section-shell-tight  das Abschluss-Band: schmal, weil es zusammenfasst
+ *                        statt zu erzaehlen
+ *
+ * Der senkrechte Rhythmus INNERHALB einer Sektion folgt drei Schritten:
+ *   eyebrow -> Headline    mt-7
+ *   Kopf    -> Inhalt      mt-20
+ *   Inhalt  -> Schlusssatz mt-20
+ * Der Hero hat bewusst eine eigene Skala: er traegt `type-display` und
+ * richtet sich an der Bildschirmhoehe aus, nicht am Sektions-Raster.
+ * ========================================================================== */
+
+@utility section-gutter {
+  width: 100%;
+  max-width: 100rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 2.5rem;
+  }
+
+  @media (width >= 64rem) {
+    padding-inline: 4rem;
+  }
+}
+
+@utility section-shell {
+  @apply section-gutter;
+  padding-block: 6rem;
+
+  @media (width >= 48rem) {
+    padding-block: 8rem;
+  }
+}
+
+@utility section-shell-band {
+  @apply section-gutter;
+  padding-block: 7rem;
+
+  @media (width >= 48rem) {
+    padding-block: 9rem;
+  }
+}
+
+@utility section-shell-tight {
+  @apply section-gutter;
+  padding-block: 5rem;
+
+  @media (width >= 48rem) {
+    padding-block: 6rem;
+  }
+}
+
+/* ==========================================================================
  * SIGNATUR-MOTIV — drei Lautstaerken, sonst nichts.
  *
  * Die Marke hatte zwei konkurrierende Motive: `SignatureMotif` (SVG mit

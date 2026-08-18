@@ -6,6 +6,7 @@ import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { serviceLayers } from "@/lib/site-data"
 import { publishedServicePages } from "@/lib/service-pages"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /**
  * Fünf Ebenen als aufsteigende, bauliche Architektur.
@@ -16,13 +17,10 @@ export function Services() {
 
   return (
     <section id="leistungen" aria-labelledby="leistungen-title" className="border-line border-b">
-      <div className="mx-auto w-full max-w-[100rem] px-6 py-24 md:px-10 md:py-32 lg:px-16">
+      <div className="section-shell">
         <div className="grid gap-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-7">
-            <div className="flex items-center gap-4">
-              <span aria-hidden="true" className="bg-gold h-px w-10" />
-              <p className="eyebrow text-muted-foreground">{t.services.eyebrow}</p>
-            </div>
+            <SectionEyebrow label={t.services.eyebrow} />
             <h2
               id="leistungen-title"
               className="type-h2 mt-7 text-balance"
@@ -36,6 +34,45 @@ export function Services() {
             </p>
           </Reveal>
         </div>
+
+        {/*
+          Einstiegs-Chips (Feinschliff).
+
+          Die Ebenen darunter sind die Hausvokabel („Digital", „Operations").
+          Gesucht wird aber nach „Webdesign". Die Chips stehen deshalb VOR der
+          Pyramide: Wer mit einem konkreten Wort kommt, findet es sofort und
+          landet auf der granularen Leistungsseite. Zugleich sind sie die
+          internen Links, die diese Unterseiten ueberhaupt tragen — vorher
+          standen sie als lange Meta-Titel ganz unten, wo sie kaum jemand sah.
+        */}
+        <Reveal delay={0.16}>
+          <div className="border-line mt-20 flex flex-wrap items-center gap-x-6 gap-y-4 border-t pt-8">
+            <p className="eyebrow text-gold-text">{t.services.entryLabel}</p>
+            <ul className="flex flex-wrap gap-2.5">
+              {publishedServicePages.map((page) => (
+                <li key={page.slug}>
+                  <Link
+                    href={`/leistungen/${page.slug}`}
+                    className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-4 py-2.5 text-sm tracking-wide transition-colors duration-500"
+                  >
+                    {page.chip[locale]}
+                    <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
+                  </Link>
+                </li>
+              ))}
+              {/* Kein Leistungs-, sondern ein Geld-Einstieg — und fuer viele der erste. */}
+              <li>
+                <Link
+                  href="/#zertifizierungen"
+                  className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-4 py-2.5 text-sm tracking-wide transition-colors duration-500"
+                >
+                  {t.services.entryFunding}
+                  <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </Reveal>
 
         {/* Aufsteigende Ebenen — von 05 oben nach 01 unten gelesen als Bauwerk */}
         <div className="mt-20 flex flex-col-reverse gap-px">
@@ -87,33 +124,6 @@ export function Services() {
             )
           })}
         </div>
-
-        {/*
-          Einstieg in die granularen Leistungsseiten (E-K4).
-
-          Ohne diese Verlinkung waeren die Seiten zwar in der Sitemap, aber von
-          der Startseite aus nicht erreichbar — und interne Links sind das, was
-          eine Unterseite tatsaechlich traegt. Die Beschriftung ist bewusst die
-          Suchvokabel („Webdesign") und nicht die Hausvokabel („Digital").
-        */}
-        <Reveal delay={0.16}>
-          <div className="border-line mt-20 border-t pt-8">
-            <p className="eyebrow text-gold-text">{t.servicePage.allServices}</p>
-            <ul className="mt-6 flex flex-wrap gap-2.5">
-              {publishedServicePages.map((page) => (
-                <li key={page.slug}>
-                  <Link
-                    href={`/leistungen/${page.slug}`}
-                    className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-4 py-2.5 text-sm tracking-wide transition-colors duration-500"
-                  >
-                    {page.metaTitle[locale]}
-                    <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Reveal>
       </div>
     </section>
   )

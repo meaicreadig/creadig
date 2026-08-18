@@ -5,6 +5,7 @@ import { ArrowLeft, SlidersHorizontal } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { contact, imprintComplete, imprintDetails } from "@/lib/site-data"
 import { openConsentSettings } from "@/lib/consent"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /**
  * Gemeinsames Gerüst für /impressum und /datenschutz.
@@ -46,10 +47,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
           {t.legal.back}
         </Link>
 
-        <div className="mt-10 flex items-center gap-4">
-          <span aria-hidden="true" className="bg-gold h-px w-10" />
-          <p className="eyebrow text-muted-foreground">creaDIG</p>
-        </div>
+        <SectionEyebrow label="creaDIG" className="mt-10" />
         <h1 className="type-h1 mt-6">{title}</h1>
 
         {kind === "imprint" ? (

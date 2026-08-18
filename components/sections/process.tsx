@@ -3,16 +3,16 @@
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { opsSteps, processSteps } from "@/lib/site-data"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 export function Process() {
   const { t } = useLocale()
 
   return (
     <section id="prozess" aria-labelledby="prozess-title" className="border-line border-b">
-      <div className="mx-auto w-full max-w-[100rem] px-6 py-24 md:px-10 md:py-32 lg:px-16">
-        <Reveal className="flex items-center gap-4">
-          <span aria-hidden="true" className="bg-gold h-px w-10" />
-          <p className="eyebrow text-muted-foreground">{t.process.eyebrow}</p>
+      <div className="section-shell">
+        <Reveal>
+          <SectionEyebrow label={t.process.eyebrow} />
         </Reveal>
 
         <Reveal delay={0.05}>
@@ -62,9 +62,8 @@ export function Process() {
           dieselbe Hairline-Sprache wie oben, nur vierspaltig und ohne zweite
           Headline: Es ist die Fortsetzung derselben Sektion, kein neuer Block.
         */}
-        <Reveal delay={0.24} className="mt-24 flex items-center gap-4">
-          <span aria-hidden="true" className="bg-gold h-px w-10" />
-          <p className="eyebrow text-muted-foreground">{t.process.opsEyebrow}</p>
+        <Reveal delay={0.24} className="mt-24">
+          <SectionEyebrow label={t.process.opsEyebrow} />
         </Reveal>
 
         <div className="mt-10 grid gap-px sm:grid-cols-2 lg:grid-cols-4">

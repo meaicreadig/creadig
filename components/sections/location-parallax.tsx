@@ -104,7 +104,7 @@ export function LocationParallax({ photoSrc }: { photoSrc: string | null }) {
         />
 
         <div className="absolute inset-0 flex items-end">
-          <div className="mx-auto w-full max-w-[100rem] px-6 pb-10 md:px-10 md:pb-14 lg:px-16">
+          <div className="section-gutter pb-10 md:pb-14">
             <Reveal className="border-line bg-background/90 max-w-xl border p-7 backdrop-blur-sm md:p-9">
               <span aria-hidden="true" className="bg-gold block h-px w-10" />
               <p className="eyebrow text-gold-text mt-5">{t.location.eyebrow}</p>
