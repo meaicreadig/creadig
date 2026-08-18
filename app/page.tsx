@@ -5,6 +5,7 @@ import { Portfolio } from "@/components/sections/portfolio"
 import { CaseStudies } from "@/components/sections/case-studies"
 import { Reviews } from "@/components/sections/reviews"
 import { Services } from "@/components/sections/services"
+import { HouseProducts } from "@/components/sections/house-products"
 import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
 import { Process } from "@/components/sections/process"
 import { Certifications } from "@/components/sections/certifications"
@@ -48,6 +49,8 @@ export default function Page() {
       {/* Rendert erst, wenn eine freigegebene Case-Study vorliegt (E-K1). */}
       <CaseStudies />
       <Services />
+      {/* Die vier eigenen Produkte gleichwertig — davor, nicht anstelle des Flaggschiffs (B3). */}
+      <HouseProducts />
       <MeaiSpotlight />
       <Process />
       <Certifications />

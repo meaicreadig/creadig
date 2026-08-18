@@ -179,6 +179,17 @@ export const dictionary = {
         },
       },
     },
+    /*
+     * Produkt-Uebersicht (B3) — die vier eigenen Produkte gleichwertig,
+     * bevor meAI als Flaggschiff seinen eigenen Deep-Dive bekommt.
+     */
+    houseProducts: {
+      eyebrow: "Unter dem Dach",
+      title: "Vier eigene Produkte.",
+      lead: "Selbst erfunden, selbst gebaut, selbst betrieben. Hier stehen sie gleichwertig nebeneinander — der Deep-Dive zum Flaggschiff meAI folgt direkt darunter.",
+      statusLabel: "Stand",
+      openLabel: "Öffnen",
+    },
     meai: {
       eyebrow: "Flagship · meai.run",
       title: "Ihr unsichtbarer Geschäftsführer.",
@@ -750,6 +761,13 @@ export const dictionary = {
           who: "Daha hızlı karar almak isteyen yerleşik işletmeler.",
         },
       },
+    },
+    houseProducts: {
+      eyebrow: "Çatının altında",
+      title: "Dört kendi ürünümüz.",
+      lead: "Kendimiz icat ettik, kendimiz kurduk, kendimiz işletiyoruz. Burada eşit ağırlıkta yan yana duruyorlar — amiral gemisi meAI'ın ayrıntılı bölümü hemen aşağıda.",
+      statusLabel: "Durum",
+      openLabel: "Aç",
     },
     meai: {
       eyebrow: "Amiral gemisi · meai.run",
