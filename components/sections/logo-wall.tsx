@@ -36,7 +36,13 @@ function LogoSlot({
         <img
           src={logoPath}
           alt={name}
-          className="h-8 w-auto max-w-[9rem] opacity-70 grayscale transition-all duration-500 group-hover:opacity-100 group-hover:grayscale-0"
+          /*
+            Dunkelmodus (P-V): fibero und CASSAMEA tragen dunkle Artwork und
+            standen auf der dunklen Kachel praktisch unsichtbar. In Ruhe darum
+            eine weisse Silhouette, beim Hover die echte Markenfarbe — dieselbe
+            Dramaturgie wie in Hell, nur mit umgekehrtem Ausgangspunkt.
+          */
+          className="h-8 w-auto max-w-[9rem] opacity-70 grayscale transition-all duration-500 group-hover:opacity-100 group-hover:grayscale-0 dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
         />
       ) : (
         <>
