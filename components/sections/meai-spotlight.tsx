@@ -65,26 +65,27 @@ export function MeaiSpotlight() {
             </Reveal>
           </div>
 
-          {/* Produkt-Andeutung: Dashboard-Rahmen */}
-          <Reveal delay={0.12} className="lg:col-span-6">
-            <div className="border-line bg-surface relative border">
-              {/* Fensterleiste */}
-              <div className="border-line flex items-center gap-2 border-b px-5 py-3.5">
-                <span aria-hidden="true" className="bg-gold size-1.5 rounded-full" />
-                <span aria-hidden="true" className="bg-line-strong size-1.5 rounded-full" />
-                <span aria-hidden="true" className="bg-line-strong size-1.5 rounded-full" />
-                <span className="text-muted-foreground text-meta ml-3">
-                  meai.run
-                </span>
-              </div>
+          {/*
+            Was das System kann — als Liste, nicht als Fenster.
 
+            Hier stand bis PHASE B ein Browser-Rahmen: drei Punkte, daneben
+            „meai.run", darin diese vier Texte. Das las sich wie ein
+            Screenshot der Anwendung und war keiner. Genau diese Sorte
+            Andeutung schliesst die Ehrlichkeits-Regel des Projekts aus — und
+            eine Produktseite, deren Interface-Sektion hart gated ist, darf
+            zwei Bildschirmhoehen weiter unten keinen Fensterrahmen um
+            Fliesstext legen. Die Faehigkeiten stehen jetzt als das da, was
+            sie sind: vier belegte Saetze.
+          */}
+          <Reveal delay={0.12} className="lg:col-span-6">
+            <div className="border-line bg-surface relative border-t">
               <div className="grid gap-px sm:grid-cols-2">
                 {meaiCapabilityKeys.map((key, i) => {
                   const copy = t.meai.capabilities[key]
                   return (
                     <div
                       key={key}
-                      className="group border-line hover:bg-surface-raised relative border-t border-r p-7 transition-colors duration-500 sm:last:border-r-0 sm:[&:nth-child(2)]:border-r-0"
+                      className="group border-line hover:bg-surface-raised relative border-b p-7 transition-colors duration-500 sm:border-r sm:last:border-r-0 sm:[&:nth-child(2)]:border-r-0"
                     >
                       <span
                         aria-hidden="true"

@@ -159,6 +159,105 @@ export const productWorks: Work[] = [
   },
 ]
 
+/* ==========================================================================
+ * PRODUKT-WELTEN (PHASE B)
+ *
+ * `productWorks` beantwortet „was ist das" in einem Satz. Eine Welt braucht
+ * mehr — aber sie darf sich das Mehr nicht ausdenken. Deshalb steht hier
+ * ausschliesslich, was schon belegt ist, nur anders sortiert:
+ *
+ *   blocks   ist `built`, zerlegt. Dieselben Angaben, einzeln lesbar statt
+ *            als Komma-Kette. Kein neues Wort, nur eine andere Form — und
+ *            zweisprachig, weil diese Felder hier neu geschrieben werden.
+ *   layer    ordnet das Produkt in die fuenf Ebenen des Hauses ein. Das ist
+ *            eine Einordnung unserer eigenen Arbeit, keine Behauptung ueber
+ *            Dritte.
+ *   story    ist der EINZIGE Ort fuer neuen Owner-Text — und er ist leer.
+ *            Solange `null`, versteckt sich die Sektion. Hier gehoert hin,
+ *            warum ein Produkt gebaut wurde; das weiss nur der Owner, und
+ *            geraten wird es nicht.
+ *   flagship traegt heute nur meAI: das dunkle Band mit den vier
+ *            Faehigkeiten, die im Woerterbuch belegt sind.
+ *
+ * Was hier NICHT steht: Nutzerzahlen, Releases, Roadmaps, Preise, Feature-
+ * Listen, Kundennamen. Nichts davon ist belegt.
+ * ========================================================================== */
+
+export type ProductWorld = {
+  /** `built`, in einzelne Bausteine zerlegt — zweisprachig. */
+  blocks: Localized[]
+  /** Ebene im Haus. Mirror von `serviceLayers` (dieselben Schluessel). */
+  layer: (typeof serviceLayers)[number]["key"]
+  /**
+   * Owner-Text: warum es gebaut wurde, was es im Betrieb gelehrt hat.
+   * `null` = die Sektion rendert nicht. TODO (Owner).
+   */
+  story: Localized | null
+  /** Traegt das dunkle Faehigkeiten-Band (heute nur meAI). */
+  flagship: boolean
+}
+
+export const productWorlds: Record<string, ProductWorld> = {
+  meai: {
+    blocks: [
+      { de: "Produktarchitektur", tr: "Ürün mimarisi" },
+      { de: "KI-Logik", tr: "Yapay zekâ mantığı" },
+      { de: "Dashboard", tr: "Gösterge paneli" },
+      { de: "Betrieb — von Grund auf", tr: "İşletme — sıfırdan" },
+    ],
+    layer: "intelligence",
+    story: null,
+    flagship: true,
+  },
+  fibero: {
+    blocks: [
+      { de: "Operative Prozesse", tr: "Operasyonel süreçler" },
+      { de: "Abrechnungssystem", tr: "Hakediş sistemi" },
+      { de: "Auswertung", tr: "Değerlendirme" },
+    ],
+    layer: "operations",
+    story: null,
+    flagship: false,
+  },
+  cassamea: {
+    blocks: [
+      { de: "Kassen-Software", tr: "Kasa yazılımı" },
+      { de: "Backoffice", tr: "Backoffice" },
+      { de: "Schweizer Anforderungen", tr: "İsviçre gereklilikleri" },
+    ],
+    layer: "operations",
+    story: null,
+    flagship: false,
+  },
+  meahv: {
+    blocks: [
+      { de: "Datenmodell", tr: "Veri modeli" },
+      { de: "Verwaltungslogik", tr: "Yönetim mantığı" },
+      { de: "Abrechnung", tr: "Faturalandırma" },
+    ],
+    layer: "operations",
+    story: null,
+    flagship: false,
+  },
+}
+
+/**
+ * Nachbarn eines Produkts — fuer die Weiter-Navigation am Seitenende.
+ *
+ * Ein Ring, kein Band: Das letzte Produkt fuehrt zurueck aufs erste. Wer am
+ * Ende einer Welt ankommt, soll in die naechste koennen und nicht in eine
+ * Sackgasse laufen. Reihenfolge ist die von `productWorks`.
+ */
+export function productNeighbours(slug: string): { prev: Work; next: Work } | null {
+  const index = productWorks.findIndex((product) => product.slug === slug)
+  if (index === -1) return null
+  const count = productWorks.length
+  return {
+    prev: productWorks[(index - 1 + count) % count],
+    next: productWorks[(index + 1) % count],
+  }
+}
+
 /** Kundenwerk / Dienstleistung — ausdrücklich KEIN eigenes Produkt. */
 export const clientWorks: Work[] = [
   {

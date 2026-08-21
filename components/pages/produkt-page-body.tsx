@@ -2,26 +2,50 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, ArrowUpRight } from "lucide-react"
+import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { Reveal } from "@/components/ui/reveal"
 import { MagneticButton } from "@/components/ui/magnetic-button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { ownProducts, type Work } from "@/lib/site-data"
+import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
+import { publishedServicePages } from "@/lib/service-pages"
+import {
+  ownProducts,
+  productNeighbours,
+  productWorlds,
+  serviceLayers,
+  type Work,
+} from "@/lib/site-data"
 
 /**
- * Eine Produkt-Welt (PHASE A — Gerüst; die Tiefe folgt in PHASE B).
+ * Eine Produkt-Welt (PHASE B).
  *
- * Der Aufbau folgt der Reihenfolge, in der jemand ein fremdes Produkt liest:
- * Was ist das? (Name, Sektor, Einzeiler) → Läuft es? (Status, Markt, Live-Link)
- * → Was habt ihr daran gebaut? (`built`) → Zeig es mir (Interface).
+ * ---------------------------------------------------------------------------
+ * DIE REIHENFOLGE IST DAS ARGUMENT
+ * Was ist das? (Name, Sektor, Einzeiler, Status) → Zeig es mir (Interface) →
+ * Was habt ihr daran gebaut? (Bausteine) → Warum? (Story, gated) → Wo steht
+ * es im Haus? (Ebene + passende Leistungen) → Weiter (nächstes Produkt).
  *
- * Der letzte Schritt ist gated und zwar hart: `screens` kommt aus dem
- * Dateisystem (lib/product-media.ts). Liegt nichts vor, steht hier ein Satz,
- * der sagt WARUM kein Bild da ist — kein Deko-Laptop, kein erfundenes
- * Interface, keine Mockup-Attrappe. Das ist die gesperrte Regel des Projekts,
- * und eine Produktseite ist genau die Stelle, an der sie sonst zuerst bricht.
+ * Das Interface steht bewusst GANZ OBEN, direkt unter dem Kopf. Es ist der
+ * Beweis, und ein Beweis, den man erst nach drei Absätzen sieht, hat schon
+ * verloren. Wo es keinen gibt, steht an derselben Stelle der Satz, der sagt
+ * warum — nicht weiter unten versteckt.
+ *
+ * ---------------------------------------------------------------------------
+ * DIE GATED-STELLEN
+ * Zwei Sektionen hängen an Material, das der Owner liefert:
+ *
+ *   Interface  `screens` kommt aus dem Dateisystem (lib/product-media.ts).
+ *              Nicht das Markup entscheidet, ob hier ein Interface erscheint,
+ *              sondern ob eine echte Aufnahme im Repo liegt. Es gibt keinen
+ *              dritten Zustand: kein Deko-Laptop, keine Mockup-Attrappe, kein
+ *              Fenster-Rahmen um Text, der so tut, als sei er ein Screenshot.
+ *   Story      `productWorlds[slug].story` ist überall `null` und rendert
+ *              deshalb nicht. Warum ein Produkt gebaut wurde, weiß nur der
+ *              Owner — und geraten wird es nicht.
+ *
+ * Alles andere auf dieser Seite stammt aus `site-data` und ist belegt.
  */
 export function ProduktPageBody({
   product,
@@ -31,9 +55,18 @@ export function ProduktPageBody({
   /** Echte Aufnahmen aus `public/works/products/<slug>/` — leer = keine da. */
   screens: string[]
 }) {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
   const copy = t.produktPage
+  const world = productWorlds[product.slug]
   const logo = ownProducts.find((p) => p.name === product.name)
+  const neighbours = productNeighbours(product.slug)
+
+  const layer = serviceLayers.find((entry) => entry.key === world?.layer)
+  const layerCopy = world ? t.services.layers[world.layer] : null
+  // Leistungsseiten, die dieses Produkt ausdrücklich als Arbeit führen.
+  const relatedServices = publishedServicePages.filter((page) =>
+    page.workSlugs.includes(product.slug),
+  )
 
   return (
     <main>
@@ -60,60 +93,31 @@ export function ProduktPageBody({
           </div>
         </div>
 
-        {product.href && (
-          <a
-            href={product.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="border-line-strong hover:border-gold hover:text-gold-text mt-10 inline-flex items-center gap-2.5 border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
-          >
-            {copy.liveLabel}
-            <ArrowUpRight className="size-4" strokeWidth={1.5} />
-          </a>
-        )}
+        <div className="mt-10 flex flex-wrap items-center gap-6">
+          {product.href && (
+            <a
+              href={product.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2.5 border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
+            >
+              {copy.liveLabel}
+              <ArrowUpRight className="size-4" strokeWidth={1.5} />
+            </a>
+          )}
+          {/* Marken-Zeichen, wo eins vorliegt — nie ein kaputtes <img>. */}
+          {logo?.logoPath && (
+            <img
+              src={logo.logoPath}
+              alt={`${product.name} — Logo`}
+              className="h-7 w-auto max-w-[10rem] opacity-70 dark:brightness-0 dark:invert"
+            />
+          )}
+        </div>
       </PageHeader>
 
-      <section aria-labelledby="gebaut-title" className="border-line border-b">
-        <div className="section-shell">
-          <div className="grid gap-x-12 gap-y-14 lg:grid-cols-12">
-            <Reveal className="lg:col-span-7">
-              <SectionEyebrow label={copy.builtLabel} />
-              <h2 id="gebaut-title" className="type-h3 mt-7 max-w-2xl text-balance">
-                {product.built}
-              </h2>
-            </Reveal>
-
-            <Reveal delay={0.08} className="lg:col-span-5">
-              {/*
-                Hier stand bis zur Sichtpruefung noch einmal `product.what` —
-                derselbe Satz, der zwei Bildschirmhoehen weiter oben schon als
-                Lead unter der H1 steht. Wiederholung ist kein Inhalt.
-                Marken-Zeichen, wo eins vorliegt — sonst das Monogramm. Nie ein
-                kaputtes <img>.
-              */}
-              <div className="border-line flex h-16 items-center border-t pt-7">
-                {logo?.logoPath ? (
-                  <img
-                    src={logo.logoPath}
-                    alt={`${product.name} — Logo`}
-                    className="h-7 w-auto max-w-[9rem] opacity-80 dark:brightness-0 dark:invert"
-                  />
-                ) : (
-                  <span
-                    aria-hidden="true"
-                    className="border-line-strong text-muted-foreground flex size-10 items-center justify-center border text-sm font-semibold tracking-tight"
-                  >
-                    {product.mark}
-                  </span>
-                )}
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
       {/* ------------------------------------------------------------------
-          Interface — gated. Bilder nur, wenn echte Aufnahmen im Repo liegen.
+          1 — Das Interface. Der Beweis steht oben, nicht unten.
           ------------------------------------------------------------------ */}
       {screens.length > 0 ? (
         <section aria-labelledby="interface-title" className="border-line border-b">
@@ -124,18 +128,27 @@ export function ProduktPageBody({
                 {copy.screensLabel}
               </h2>
             </Reveal>
-            <div className="mt-14 flex flex-col gap-8">
+
+            {/* Volle Breite, ein Bild pro Zeile: Ein Interface, das man
+                zusammenkneifen muss, beweist nichts. */}
+            <div className="mt-14 flex flex-col gap-10">
               {screens.map((src, i) => (
                 <Reveal key={src} delay={0.06 * i}>
-                  <div className="border-line bg-surface relative aspect-[16/10] w-full overflow-hidden border">
-                    <Image
-                      src={src}
-                      alt={`${product.name} — Oberfläche aus dem laufenden System`}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 90vw"
-                      className="object-cover"
-                    />
-                  </div>
+                  <figure>
+                    <div className="border-line bg-surface elevation-1 relative aspect-[16/10] w-full overflow-hidden border">
+                      <Image
+                        src={src}
+                        alt={`${product.name} — Oberfläche aus dem laufenden System`}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 92vw"
+                        className="object-cover object-top"
+                        priority={i === 0}
+                      />
+                    </div>
+                    <figcaption className="text-meta text-muted-foreground mt-4">
+                      {product.name} · {String(i + 1).padStart(2, "0")}
+                    </figcaption>
+                  </figure>
                 </Reveal>
               ))}
             </div>
@@ -145,7 +158,7 @@ export function ProduktPageBody({
         <section aria-label={copy.screensLabel} className="border-line border-b">
           <div className="section-shell-tight">
             <Reveal>
-              <p className="type-body text-muted-foreground max-w-2xl text-pretty">
+              <p className="type-statement text-foreground/85 max-w-3xl text-balance">
                 {copy.screensPending}
               </p>
             </Reveal>
@@ -153,6 +166,192 @@ export function ProduktPageBody({
         </section>
       )}
 
+      {/* ------------------------------------------------------------------
+          2 — Was gebaut ist, in Bausteinen statt als Komma-Kette.
+          ------------------------------------------------------------------ */}
+      {world && (
+        <section aria-labelledby="gebaut-title" className="border-line border-b">
+          <div className="section-shell">
+            {/*
+              Hier stand bis zur Sichtpruefung `product.built` als H2 — also
+              exakt die Komma-Kette, die zwei Zeilen darunter als Bausteine
+              aufgeloest wird. Derselbe Inhalt zweimal, einmal gross und
+              einmal klein, ist keine Hierarchie; es sieht nur nach mehr aus.
+              Die Ueberschrift traegt jetzt die Aussage, die Bausteine tragen
+              den Inhalt. Die volle `built`-Zeile steht weiterhin auf der
+              Produkt-Uebersicht.
+            */}
+            <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
+              <Reveal className="lg:col-span-7">
+                <SectionEyebrow label={copy.builtLabel} />
+                <h2 id="gebaut-title" className="type-h2 mt-7 max-w-2xl text-balance">
+                  {copy.blocksTitle}
+                </h2>
+              </Reveal>
+              <Reveal delay={0.1} className="lg:col-span-5 lg:pb-3">
+                <p className="eyebrow text-muted-foreground">{copy.blocksLabel}</p>
+              </Reveal>
+            </div>
+
+            <div className="mt-16 grid gap-px sm:grid-cols-2 lg:grid-cols-4">
+              {world.blocks.map((blockCopy, i) => (
+                <Reveal
+                  key={blockCopy.de}
+                  delay={0.06 * i}
+                  className="group border-line relative border-t pt-8 lg:pr-8"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                  />
+                  <span className="eyebrow text-gold-text">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="type-h4 mt-5 text-pretty">{blockCopy[locale]}</h3>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ------------------------------------------------------------------
+          3 — Flaggschiff-Band: heute nur meAI, und nur mit belegten Texten.
+          ------------------------------------------------------------------ */}
+      {world?.flagship && <MeaiSpotlight />}
+
+      {/* ------------------------------------------------------------------
+          4 — Warum. Gated: `story` ist überall null, die Sektion rendert nicht.
+          ------------------------------------------------------------------ */}
+      {world?.story && (
+        <section aria-labelledby="story-title" className="border-line border-b">
+          <div className="section-shell">
+            <div className="grid gap-x-14 gap-y-10 lg:grid-cols-12">
+              <Reveal className="lg:col-span-4">
+                <SectionEyebrow label={copy.storyLabel} />
+              </Reveal>
+              <Reveal delay={0.08} className="lg:col-span-8">
+                <h2 id="story-title" className="sr-only">
+                  {copy.storyLabel}
+                </h2>
+                <p className="type-lead text-foreground/85 max-w-2xl text-pretty">
+                  {world.story[locale]}
+                </p>
+              </Reveal>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ------------------------------------------------------------------
+          5 — Einordnung: Die Brücke vom eigenen Produkt zur Leistung.
+          ------------------------------------------------------------------ */}
+      {layer && layerCopy && (
+        <section aria-labelledby="einordnung-title" className="border-line border-b">
+          <div className="section-shell">
+            <div className="grid gap-x-14 gap-y-12 lg:grid-cols-12">
+              <Reveal className="lg:col-span-5">
+                <SectionEyebrow label={copy.systemLabel} />
+                <h2 id="einordnung-title" className="type-h3 mt-7 max-w-md text-balance">
+                  {layerCopy.name}
+                </h2>
+                <p className="type-body text-muted-foreground mt-6 max-w-md text-pretty">
+                  {copy.systemBody}
+                </p>
+                <Link
+                  href={`/leistungen#ebene-${world.layer}`}
+                  className="text-gold-text hover:text-foreground mt-8 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+                >
+                  {copy.layerCta}
+                  <ArrowUpRight className="size-4" strokeWidth={1.5} />
+                </Link>
+              </Reveal>
+
+              <div className="lg:col-span-7">
+                <Reveal className="border-line border-t pt-7">
+                  <p className="eyebrow text-gold-text">
+                    {copy.layerLabel} {layer.level}
+                  </p>
+                  <p className="type-body text-foreground/85 mt-4 max-w-xl text-pretty">
+                    {layerCopy.what}
+                  </p>
+                </Reveal>
+
+                {/* Nur Leistungsseiten, die dieses Produkt wirklich als Arbeit
+                    führen — keine erfundene Verwandtschaft. */}
+                {relatedServices.length > 0 && (
+                  <Reveal delay={0.08} className="border-line mt-10 border-t pt-7">
+                    <p className="eyebrow text-gold-text">{copy.servicesLabel}</p>
+                    <ul className="mt-5 flex flex-wrap gap-2.5">
+                      {relatedServices.map((page) => (
+                        <li key={page.slug}>
+                          <Link
+                            href={`/leistungen/${page.slug}`}
+                            className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-4 py-2.5 text-sm tracking-wide transition-colors duration-500"
+                          >
+                            {page.chip[locale]}
+                            <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </Reveal>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ------------------------------------------------------------------
+          6 — Weiter. Ein Ring, keine Sackgasse.
+          ------------------------------------------------------------------ */}
+      {neighbours && (
+        <section aria-label={copy.nextLabel} className="border-line border-b">
+          <div className="section-gutter grid gap-px sm:grid-cols-2">
+            {(
+              [
+                [copy.prevLabel, neighbours.prev, "prev"],
+                [copy.nextLabel, neighbours.next, "next"],
+              ] as const
+            ).map(([label, neighbour, direction]) => (
+              <Link
+                key={direction}
+                href={`/produkte/${neighbour.slug}`}
+                className={`group hover:bg-surface relative flex flex-col gap-3 py-10 transition-colors duration-500 ${
+                  direction === "next" ? "sm:items-end sm:text-right" : ""
+                }`}
+              >
+                <span className="eyebrow text-muted-foreground flex items-center gap-2">
+                  {direction === "prev" && (
+                    <ArrowLeft
+                      className="size-3.5 transition-transform duration-500 group-hover:-translate-x-1"
+                      strokeWidth={1.5}
+                    />
+                  )}
+                  {label}
+                  {direction === "next" && (
+                    <ArrowRight
+                      className="size-3.5 transition-transform duration-500 group-hover:translate-x-1"
+                      strokeWidth={1.5}
+                    />
+                  )}
+                </span>
+                <span className="type-h3 group-hover:text-gold-text transition-colors duration-500">
+                  {neighbour.name}
+                </span>
+                <span className="type-small text-muted-foreground max-w-sm text-pretty">
+                  {neighbour.what}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ------------------------------------------------------------------
+          7 — Abschluss.
+          ------------------------------------------------------------------ */}
       <section aria-labelledby="produkt-cta-title" className="border-line border-b">
         <div className="section-shell-tight">
           <Reveal>

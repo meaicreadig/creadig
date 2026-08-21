@@ -5,7 +5,6 @@ import { ArrowRight, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { Reveal } from "@/components/ui/reveal"
-import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
 import { ClosingCta } from "@/components/sections/closing-cta"
 import { clientWorks, ownProducts, productWorks } from "@/lib/site-data"
 
@@ -112,9 +111,14 @@ export function ProduktePageBody() {
         </div>
       </section>
 
-      {/* Das Flaggschiff bekommt sein Gewicht durch das dunkle Band — nicht
-          durch eine größere Kachel in der Liste darüber. */}
-      <MeaiSpotlight />
+      {/*
+        Das meAI-Band stand hier bis PHASE B. Es ist in die meAI-Welt gezogen
+        (/produkte/meai): Ein Flaggschiff-Deep-Dive auf der Uebersichtsseite
+        laesst die drei anderen Produkte wie Beiwerk aussehen — und derselbe
+        Text auf zwei Seiten ist eine Dublette, keine Tiefe. In der Liste
+        oben stehen alle vier gleichwertig; das Gewicht bekommt meAI auf
+        seiner eigenen Seite.
+      */}
 
       {/* Kundenwerk steht auf der Produktseite bewusst getrennt und klein:
           Es gehört nicht zu den eigenen Produkten und darf sie nicht verwässern. */}

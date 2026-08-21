@@ -197,12 +197,24 @@ export const dictionary = {
     produktPage: {
       breadcrumb: "Produkte",
       builtLabel: "Was wir gebaut haben",
-      whatLabel: "Wofür es gebaut ist",
+      blocksLabel: "Bausteine",
+      blocksTitle: "Selbst gebaut, Baustein für Baustein.",
       sectorLabel: "Sektor",
       statusLabel: "Stand",
       regionLabel: "Markt",
       liveLabel: "Live öffnen",
       backLabel: "Alle Produkte",
+      /* Einordnung: wo das Produkt im Haus steht und was dazu passt. */
+      systemLabel: "Einordnung im System",
+      systemBody:
+        "Jedes eigene Produkt sitzt auf einer der fünf Ebenen — und dieselbe Ebene bieten wir als Leistung an. Was wir hier gebaut haben, bauen wir auch für Ihren Betrieb.",
+      layerLabel: "Ebene",
+      servicesLabel: "Passende Leistungen",
+      layerCta: "Ebene ansehen",
+      /* Owner-Text, heute leer — die Sektion rendert dann gar nicht. */
+      storyLabel: "Warum wir es gebaut haben",
+      nextLabel: "Nächstes Produkt",
+      prevLabel: "Vorheriges Produkt",
       /*
        * Steht NUR, solange keine echten Screenshots im Repo liegen. Es ist
        * kein Platzhalter fuer ein Bild — es ist die ehrliche Auskunft,
@@ -992,12 +1004,22 @@ export const dictionary = {
     produktPage: {
       breadcrumb: "Ürünler",
       builtLabel: "Ne inşa ettik",
-      whatLabel: "Ne için kurulmuş",
+      blocksLabel: "Yapı taşları",
+      blocksTitle: "Taş taş, kendimiz kurduk.",
       sectorLabel: "Sektör",
       statusLabel: "Durum",
       regionLabel: "Pazar",
       liveLabel: "Canlı aç",
       backLabel: "Tüm ürünler",
+      systemLabel: "Sistemdeki yeri",
+      systemBody:
+        "Kendi ürünlerimizin her biri beş katmandan birinde durur — ve aynı katmanı hizmet olarak da sunarız. Burada kurduğumuzu sizin işletmeniz için de kurarız.",
+      layerLabel: "Katman",
+      servicesLabel: "İlgili hizmetler",
+      layerCta: "Katmanı gör",
+      storyLabel: "Neden kurduk",
+      nextLabel: "Sonraki ürün",
+      prevLabel: "Önceki ürün",
       screensPending:
         "Arayüzleri ancak çalışan sistemden gerçek görüntüler gösterebildiğimizde paylaşırız. O zamana kadar burada ne kurulduğu yazar — başka bir şey iddia eden bir görsel değil.",
       screensLabel: "Çalışan sistemden",

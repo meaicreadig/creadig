@@ -88,6 +88,16 @@ export default async function ProduktRoute({
       publisher: { "@type": "Organization", name: "creaDIG", url: SITE_URL },
       inLanguage: ["de", "tr"],
       url: product.href ?? `${SITE_URL}/produkte/${product.slug}`,
+      /*
+       * `screenshot` haengt sich nur an, wenn es echte Aufnahmen gibt —
+       * dieselbe Bedingung wie fuer die Sektion auf der Seite. Ein
+       * Screenshot-Feld, das auf ein Mockup zeigt, waere gegenueber
+       * Suchmaschinen dieselbe Behauptung wie ein Deko-Laptop gegenueber
+       * Besuchern.
+       */
+      ...(screens.length > 0
+        ? { screenshot: screens.map((src) => `${SITE_URL}${src}`) }
+        : {}),
     },
   ]
 
