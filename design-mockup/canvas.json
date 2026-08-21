@@ -1,0 +1,17 @@
+{
+  "pages": [
+    { "id": "richtung-1", "name": "Richtung 1 · Editorial ruhig" },
+    { "id": "richtung-2", "name": "Richtung 2 · Warm & präsent" }
+  ],
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 4600, "title": "R1 · Startseite", "page": "richtung-1" },
+    { "file": "Produkte.dc.html", "x": 1600, "y": 0, "w": 1440, "h": 2560, "title": "R1 · Produkte", "page": "richtung-1" },
+    { "file": "Leistungen.dc.html", "x": 3200, "y": 0, "w": 1440, "h": 2620, "title": "R1 · Leistungen", "page": "richtung-1" },
+    { "file": "Home2.dc.html", "x": 0, "y": 0, "w": 1440, "h": 3520, "title": "R2 · Startseite", "page": "richtung-2" }
+  ],
+  "annotations": [
+    { "id": "note-r1", "x": 0, "y": -180, "w": 660, "text": "RICHTUNG 1 — Editorial & ruhig\n\nKühl, viel Weißraum, Gold nur als dünne Linie, dunkles ICO-Band. Zurückhaltung im Vordergrund. Startseite + 2 echte Unterseiten (rechts)." },
+    { "id": "note-r2", "x": 0, "y": -180, "w": 660, "text": "RICHTUNG 2 — Warm & präsent\n\nWärmere Creme-Bänder, mehr Struktur & Presence, Gold auch als Fläche (Hero-Panel, volles Gold-CTA-Band), ICO hell & gerahmt. Selbe echten Daten, mehr Selbstbewusstsein." }
+  ],
+  "launch": { "view": "canvas", "page": "richtung-2" }
+}

@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Poppins", system-ui, sans-serif; background: #fbfbf9; color: #2a2723; -webkit-font-smoothing: antialiased; }
+    a { color: #8f6a33; text-decoration: none; } a:hover { color: #6f5227; }
+    .ey { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 500; color: #a39c90; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; background: #fbfbf9;">
+
+  <!-- NAV -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 26px 96px; border-bottom: 1px solid #eceae4;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <svg viewBox="120 185 330 185" width="34" height="19" aria-hidden="true">
+        <rect x="271.22" y="224.29" width="18.54" height="104.13" fill="#be904e"/>
+        <path fill="#be904e" d="M143.98,276.36c0-38.06,30.85-68.91,68.91-68.91h58.33v-19.92h-57.65c-49.06,0-88.83,39.77-88.83,88.83s39.77,88.83,88.83,88.83h57.65v-19.92h-58.33C174.83,345.27,143.98,314.41,143.98,276.36z"/>
+        <path fill="#be904e" d="M347.41,187.53h-57.65v19.92h58.33c38.06,0,68.91,30.85,68.91,68.91s-30.85,68.91-68.91,68.91h-58.33v19.92h57.65c49.06,0,88.83-39.77,88.83-88.83S396.47,187.53,347.41,187.53z"/>
+      </svg>
+      <span style="font-weight: 600; font-size: 17px; letter-spacing: 0.04em; color: #2a2723;">crea<span style="color:#be904e;">DIG</span></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 40px;">
+      <a style="font-size: 13.5px; font-weight: 500; color: #4a463f;">Unternehmen</a>
+      <a style="font-size: 13.5px; font-weight: 600; color: #2a2723; border-bottom: 2px solid #be904e; padding-bottom: 4px;">Leistungen</a>
+      <a style="font-size: 13.5px; font-weight: 500; color: #4a463f;">Produkte</a>
+      <a style="font-size: 13.5px; font-weight: 500; color: #4a463f;">Referenzen</a>
+      <a style="font-size: 13.5px; font-weight: 500; color: #4a463f;">Kontakt</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-size: 11px; letter-spacing: 0.12em; color: #b3ab9f;">DE · TR · EN</span>
+      <a style="font-size: 12.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #2a2723; border: 1px solid #d6d1c8; padding: 10px 20px;">Anfragen</a>
+    </div>
+  </div>
+
+  <!-- PAGE HEADER -->
+  <div style="padding: 100px 96px 70px; border-bottom: 1px solid #eceae4;">
+    <div class="ey">Leistungen</div>
+    <h1 style="margin: 26px 0 0; font-weight: 400; font-size: 54px; line-height: 1.1; letter-spacing: -0.02em; color: #2a2723; max-width: 16ch;">Fünf Ebenen, aufeinander gebaut.</h1>
+    <p style="margin: 28px 0 0; font-size: 18px; line-height: 1.65; color: #6f6a62; font-weight: 300; max-width: 58ch;">Marke, Auftritt, Betrieb, Automatisierung, Intelligenz. Jede Ebene trägt die nächste — nicht nebeneinander, sondern als System.</p>
+  </div>
+
+  <!-- 5 EBENEN mit Beschreibung -->
+  <div>
+    <div style="display:grid; grid-template-columns: 120px 4fr 6fr; gap:0 60px; align-items:baseline; padding: 60px 96px; border-bottom:1px solid #eceae4;">
+      <span style="font-size: 40px; font-weight: 300; color: #d8cdb6;">01</span>
+      <span style="font-size: 27px; font-weight: 500; color: #2a2723;">Marke &amp; Identität</span>
+      <p style="margin:0; font-size:16px; line-height:1.7; color:#6f6a62;">Corporate Design, Logo, Bildsprache, Auftritt. Das Fundament, auf dem alles Weitere ruht — konsistent über jeden Kanal.</p>
+    </div>
+    <div style="display:grid; grid-template-columns: 120px 4fr 6fr; gap:0 60px; align-items:baseline; padding: 60px 96px; border-bottom:1px solid #eceae4;">
+      <span style="font-size: 40px; font-weight: 300; color: #d8cdb6;">02</span>
+      <span style="font-size: 27px; font-weight: 500; color: #2a2723;">Digitaler Auftritt</span>
+      <p style="margin:0; font-size:16px; line-height:1.7; color:#6f6a62;">Websites, Online-Shops und Plattformen — modern gebaut, mehrsprachig (DE · TR · EN), auf den Betrieb ausgelegt.</p>
+    </div>
+    <div style="display:grid; grid-template-columns: 120px 4fr 6fr; gap:0 60px; align-items:baseline; padding: 60px 96px; border-bottom:1px solid #eceae4;">
+      <span style="font-size: 40px; font-weight: 300; color: #d8cdb6;">03</span>
+      <span style="font-size: 27px; font-weight: 500; color: #2a2723;">Operations</span>
+      <p style="margin:0; font-size:16px; line-height:1.7; color:#6f6a62;">Prozesse, Auftrags- und Abrechnungslogik, laufender Betrieb. Was wir für unsere eigenen Produkte gebaut haben, bringen wir in Ihren Alltag.</p>
+    </div>
+    <div style="display:grid; grid-template-columns: 120px 4fr 6fr; gap:0 60px; align-items:baseline; padding: 60px 96px; border-bottom:1px solid #eceae4;">
+      <span style="font-size: 40px; font-weight: 300; color: #d8cdb6;">04</span>
+      <span style="font-size: 27px; font-weight: 500; color: #2a2723;">Automatisierung</span>
+      <p style="margin:0; font-size:16px; line-height:1.7; color:#6f6a62;">Schnittstellen und Workflows, die wiederkehrende Arbeit übernehmen — damit Ihr Team an dem arbeitet, was zählt.</p>
+    </div>
+    <div style="display:grid; grid-template-columns: 120px 4fr 6fr; gap:0 60px; align-items:baseline; padding: 60px 96px; border-bottom:1px solid #eceae4;">
+      <span style="font-size: 40px; font-weight: 300; color: #d8cdb6;">05</span>
+      <span style="font-size: 27px; font-weight: 500; color: #2a2723;">Intelligenz &amp; KI</span>
+      <p style="margin:0; font-size:16px; line-height:1.7; color:#6f6a62;">KI-Anwendungen und meAI — unser eigenes KI-Business-Betriebssystem. Die Ebene, auf die alles hinarbeitet.</p>
+    </div>
+  </div>
+
+  <!-- GO-DIGITAL FÖRDERUNG -->
+  <div style="margin: 0 96px; padding: 64px; background: #201e1b; display:grid; grid-template-columns: 7fr 5fr; gap:60px; align-items:center;">
+    <div>
+      <div class="ey" style="color:#c9a24f;">Förderung</div>
+      <h2 style="margin:22px 0 0; font-weight:400; font-size:34px; line-height:1.2; color:#f6f3ee;">Bis zu 50&nbsp;% Förderung über go-digital.</h2>
+      <p style="margin:20px 0 0; font-size:16px; line-height:1.7; color:#b8b1a5; max-width:52ch;">creaDIG ist ein vom BMWK autorisiertes go-digital-Beratungsunternehmen. Viele Projekte realisieren wir über das Förderprogramm — Antrag und Abwicklung übernehmen wir für Sie.</p>
+    </div>
+    <div style="border-left:1px solid #3a352d; padding-left:48px;">
+      <div style="font-size:64px; font-weight:300; color:#e4c378; line-height:1;">50<span style="font-size:32px;">%</span></div>
+      <p style="margin:16px 0 0; font-size:13.5px; color:#8f887c; line-height:1.6;">der förderfähigen Beratungs- und Umsetzungskosten — für kleine und mittlere Unternehmen.</p>
+    </div>
+  </div>
+
+  <!-- ABLAUF -->
+  <div style="padding: 110px 96px 40px;">
+    <div style="max-width:620px;">
+      <div class="ey">Ablauf</div>
+      <h2 style="margin:20px 0 0; font-weight:400; font-size:34px; letter-spacing:-0.015em; color:#2a2723;">Was passiert, wenn Sie schreiben.</h2>
+    </div>
+    <div style="margin-top:56px; display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:1px; background:#e7e4de; border:1px solid #e7e4de;">
+      <div style="background:#fbfbf9; padding:36px 30px;"><span style="font-size:12px; font-weight:600; letter-spacing:0.12em; color:#be904e;">01</span><div style="margin-top:16px; font-size:18px; font-weight:500; color:#2a2723;">Anfrage</div><p style="margin:10px 0 0; font-size:14px; line-height:1.6; color:#837d73;">Kurz per WhatsApp oder Formular.</p></div>
+      <div style="background:#fbfbf9; padding:36px 30px;"><span style="font-size:12px; font-weight:600; letter-spacing:0.12em; color:#be904e;">02</span><div style="margin-top:16px; font-size:18px; font-weight:500; color:#2a2723;">Analyse</div><p style="margin:10px 0 0; font-size:14px; line-height:1.6; color:#837d73;">Wir verstehen Ihren Bedarf, kostenlos.</p></div>
+      <div style="background:#fbfbf9; padding:36px 30px;"><span style="font-size:12px; font-weight:600; letter-spacing:0.12em; color:#be904e;">03</span><div style="margin-top:16px; font-size:18px; font-weight:500; color:#2a2723;">Angebot</div><p style="margin:10px 0 0; font-size:14px; line-height:1.6; color:#837d73;">Fest, transparent — inkl. Förder-Prüfung.</p></div>
+      <div style="background:#fbfbf9; padding:36px 30px;"><span style="font-size:12px; font-weight:600; letter-spacing:0.12em; color:#be904e;">04</span><div style="margin-top:16px; font-size:18px; font-weight:500; color:#2a2723;">Betrieb</div><p style="margin:10px 0 0; font-size:14px; line-height:1.6; color:#837d73;">Wir bauen — und bleiben im Betrieb dabei.</p></div>
+    </div>
+  </div>
+
+  <!-- FOOTER (kompakt) -->
+  <div style="background:#201e1b; padding: 60px 96px; margin-top:80px; color:#c8c2b7;">
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div style="display:flex; align-items:center; gap:11px;">
+        <svg viewBox="120 185 330 185" width="30" height="17" aria-hidden="true"><rect x="271.22" y="224.29" width="18.54" height="104.13" fill="#e4c378"/><path fill="#e4c378" d="M143.98,276.36c0-38.06,30.85-68.91,68.91-68.91h58.33v-19.92h-57.65c-49.06,0-88.83,39.77-88.83,88.83s39.77,88.83,88.83,88.83h57.65v-19.92h-58.33C174.83,345.27,143.98,314.41,143.98,276.36z"/><path fill="#e4c378" d="M347.41,187.53h-57.65v19.92h58.33c38.06,0,68.91,30.85,68.91,68.91s-30.85,68.91-68.91,68.91h-58.33v19.92h57.65c49.06,0,88.83-39.77,88.83-88.83S396.47,187.53,347.41,187.53z"/></svg>
+        <span style="font-weight:600; font-size:15px; color:#f6f3ee;">crea<span style="color:#e4c378;">DIG</span></span>
+      </div>
+      <span style="font-size:12px; color:#6f6a5e;">© 2026 creaDIG · info@creadig.de · Osnabrück</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic { renderVals() { return {}; } }
+</script>
+</body>
+</html>

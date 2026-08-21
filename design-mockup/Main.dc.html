@@ -1,0 +1,278 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Poppins", system-ui, sans-serif; background: #fbfbf9; color: #2a2723; -webkit-font-smoothing: antialiased; }
+    a { color: #8f6a33; text-decoration: none; }
+    a:hover { color: #6f5227; }
+    .ey { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 500; color: #a39c90; }
+    .rule { height: 1px; background: #e7e4de; border: 0; margin: 0; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; background: #fbfbf9;">
+
+  <!-- ============ NAV ============ -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 26px 96px; border-bottom: 1px solid #eceae4;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <svg viewBox="120 185 330 185" width="34" height="19" aria-hidden="true">
+        <rect x="271.22" y="224.29" width="18.54" height="104.13" fill="#be904e"/>
+        <path fill="#be904e" d="M143.98,276.36c0-38.06,30.85-68.91,68.91-68.91h58.33v-19.92h-57.65c-49.06,0-88.83,39.77-88.83,88.83s39.77,88.83,88.83,88.83h57.65v-19.92h-58.33C174.83,345.27,143.98,314.41,143.98,276.36z"/>
+        <path fill="#be904e" d="M347.41,187.53h-57.65v19.92h58.33c38.06,0,68.91,30.85,68.91,68.91s-30.85,68.91-68.91,68.91h-58.33v19.92h57.65c49.06,0,88.83-39.77,88.83-88.83S396.47,187.53,347.41,187.53z"/>
+      </svg>
+      <span style="font-weight: 600; font-size: 17px; letter-spacing: 0.04em; color: #2a2723;">crea<span style="color:#be904e;">DIG</span></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 40px;">
+      <a style="font-size: 13.5px; font-weight: 500; color: #4a463f; letter-spacing: 0.01em;">Unternehmen</a>
+      <a style="font-size: 13.5px; font-weight: 500; color: #4a463f;">Leistungen</a>
+      <a style="font-size: 13.5px; font-weight: 500; color: #4a463f;">Produkte</a>
+      <a style="font-size: 13.5px; font-weight: 500; color: #4a463f;">Referenzen</a>
+      <a style="font-size: 13.5px; font-weight: 500; color: #4a463f;">Kontakt</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-size: 11px; letter-spacing: 0.12em; color: #b3ab9f;">DE · TR · EN</span>
+      <a style="font-size: 12.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #2a2723; border: 1px solid #d6d1c8; padding: 10px 20px;">Anfragen</a>
+    </div>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <div style="position: relative; overflow: hidden; padding: 150px 96px 130px;">
+    <!-- sehr dezentes Signaturmotiv, nur oben rechts -->
+    <svg viewBox="0 0 600 600" width="640" height="640" style="position: absolute; top: -120px; right: -120px; opacity: 0.05;" aria-hidden="true">
+      <g fill="none" stroke="#be904e" stroke-width="1">
+        <path d="M300 60 L540 480 L60 480 Z"/><path d="M300 180 L440 420 L160 420 Z"/><path d="M300 300 L360 400 L240 400 Z"/>
+      </g>
+    </svg>
+    <div style="position: relative; max-width: 1000px;">
+      <div class="ey">System-Haus · Osnabrück · seit 2017</div>
+      <h1 style="margin: 30px 0 0; font-weight: 400; font-size: 66px; line-height: 1.08; letter-spacing: -0.02em; color: #2a2723; max-width: 15ch;">
+        Ein System-Haus.<br>Von der Marke bis zur <span style="color:#8f6a33; font-weight: 500;">KI</span>.
+      </h1>
+      <p style="margin: 34px 0 0; font-size: 19px; line-height: 1.65; color: #6f6a62; font-weight: 300; max-width: 56ch;">
+        creaDIG entwickelt eigene digitale Produkte und betreibt sie im Tagesgeschäft — für Unternehmen, die Substanz über Show stellen.
+      </p>
+      <div style="display: flex; align-items: center; gap: 18px; margin-top: 46px;">
+        <a style="display: inline-flex; align-items: center; gap: 10px; background: #be904e; color: #241d10; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px 30px;">
+          Projekt anfragen
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#241d10" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a style="font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #4a463f; padding: 16px 6px; border-bottom: 1px solid #cfc9bf;">Unsere Arbeiten</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PROOF LINE ============ -->
+  <div style="border-top: 1px solid #eceae4; border-bottom: 1px solid #eceae4; padding: 26px 96px;">
+    <div style="display: flex; align-items: center; gap: 46px; flex-wrap: wrap;">
+      <span style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #b3ab9f;">Nachweisbar</span>
+      <span style="font-size: 13.5px; color: #6f6a62; font-weight: 400;">go-digital autorisiert · BMWK</span>
+      <span style="width:4px;height:4px;border-radius:50%;background:#d8d2c7;"></span>
+      <span style="font-size: 13.5px; color: #6f6a62;">BAFA-gelistet</span>
+      <span style="width:4px;height:4px;border-radius:50%;background:#d8d2c7;"></span>
+      <span style="font-size: 13.5px; color: #6f6a62;">Mitglied AGD</span>
+      <span style="width:4px;height:4px;border-radius:50%;background:#d8d2c7;"></span>
+      <span style="font-size: 13.5px; color: #6f6a62;">iuk Netzwerk Osnabrück</span>
+      <span style="width:4px;height:4px;border-radius:50%;background:#d8d2c7;"></span>
+      <span style="font-size: 13.5px; color: #6f6a62;">AVPQ präqualifiziert</span>
+    </div>
+  </div>
+
+  <!-- ============ POSITIONIERUNG (editorial 2-spaltig) ============ -->
+  <div style="display: grid; grid-template-columns: 4fr 6fr; gap: 90px; padding: 130px 96px; align-items: start;">
+    <div>
+      <div class="ey">Haltung</div>
+      <h2 style="margin: 22px 0 0; font-weight: 400; font-size: 34px; line-height: 1.25; letter-spacing: -0.01em; color: #2a2723;">Erfinden, bauen, betreiben.</h2>
+    </div>
+    <div>
+      <p style="margin: 0; font-size: 19px; line-height: 1.7; color: #57534b; font-weight: 300;">
+        creaDIG ist keine Agentur, die ein Projekt abliefert und verschwindet. Wir sind ein Haus, das eigene Produkte erfindet, sie selbst baut und im Betrieb hält — von der Marke über die Software bis zur künstlichen Intelligenz.
+      </p>
+      <p style="margin: 26px 0 0; font-size: 16px; line-height: 1.75; color: #837d73; font-weight: 400;">
+        Was wir für Kunden entwickeln, betreiben wir für uns selbst. Diese Substanz unterscheidet ein System-Haus von einer Präsentation.
+      </p>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ UNTER DEM DACH — PRODUKTE ============ -->
+  <div style="padding: 120px 96px;">
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 64px;">
+      <div>
+        <div class="ey">Unter dem Dach</div>
+        <h2 style="margin: 20px 0 0; font-weight: 400; font-size: 40px; letter-spacing: -0.015em; color: #2a2723;">Vier eigene Produkte.</h2>
+      </div>
+      <a style="font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #8f6a33; padding-bottom: 6px; border-bottom: 1px solid #cbb78e;">Alle Produkte</a>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1px; background: #e7e4de; border: 1px solid #e7e4de;">
+      <!-- meAI -->
+      <div style="background: #fbfbf9; padding: 44px 44px 40px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+          <span style="font-size: 25px; font-weight: 600; color: #2a2723;">meAI</span>
+          <span style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #9a948b;">KI · Business-Software</span>
+        </div>
+        <p style="margin: 20px 0 0; font-size: 16px; line-height: 1.6; color: #6f6a62;">KI-Business-Betriebssystem für kleine und mittlere Betriebe.</p>
+        <div style="margin-top: 26px; display:flex; align-items:center; gap:8px;"><span style="width:6px;height:6px;border-radius:50%;background:#5c9a5c;"></span><span style="font-size: 12.5px; color: #837d73;">Im Aufbau · live unter meai.run</span></div>
+      </div>
+      <!-- fibero -->
+      <div style="background: #fbfbf9; padding: 44px 44px 40px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+          <span style="font-size: 25px; font-weight: 600; color: #2a2723;">fibero</span>
+          <span style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #9a948b;">Glasfaser · Operations</span>
+        </div>
+        <p style="margin: 20px 0 0; font-size: 16px; line-height: 1.6; color: #6f6a62;">Ordnung im Glasfaser-Alltag: Auftrags-, Abrechnungs- und Finanzlogik.</p>
+        <div style="margin-top: 26px; display:flex; align-items:center; gap:8px;"><span style="width:6px;height:6px;border-radius:50%;background:#5c9a5c;"></span><span style="font-size: 12.5px; color: #837d73;">Im Tagesbetrieb</span></div>
+      </div>
+      <!-- CASSAMEA -->
+      <div style="background: #fbfbf9; padding: 44px 44px 40px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+          <span style="font-size: 25px; font-weight: 600; color: #2a2723;">CASSAMEA</span>
+          <span style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #9a948b;">Gastronomie · Kasse · CH</span>
+        </div>
+        <p style="margin: 20px 0 0; font-size: 16px; line-height: 1.6; color: #6f6a62;">Die Kasse, die mitdenkt — gebaut für Schweizer Anforderungen.</p>
+        <div style="margin-top: 26px; display:flex; align-items:center; gap:8px;"><span style="width:6px;height:6px;border-radius:50%;background:#c9a24f;"></span><span style="font-size: 12.5px; color: #837d73;">Im Aufbau</span></div>
+      </div>
+      <!-- meahv -->
+      <div style="background: #fbfbf9; padding: 44px 44px 40px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+          <span style="font-size: 25px; font-weight: 600; color: #2a2723;">meahv</span>
+          <span style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #9a948b;">Immobilien · Verwaltung</span>
+        </div>
+        <p style="margin: 20px 0 0; font-size: 16px; line-height: 1.6; color: #6f6a62;">Hausverwaltung: Objekte, Mieter, Belege und Abrechnung an einem Ort.</p>
+        <div style="margin-top: 26px; display:flex; align-items:center; gap:8px;"><span style="width:6px;height:6px;border-radius:50%;background:#c9a24f;"></span><span style="font-size: 12.5px; color: #837d73;">Im Aufbau</span></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ LEISTUNGEN — 5 EBENEN ============ -->
+  <div style="padding: 120px 96px;">
+    <div style="max-width: 620px;">
+      <div class="ey">Leistungen</div>
+      <h2 style="margin: 20px 0 0; font-weight: 400; font-size: 40px; letter-spacing: -0.015em; color: #2a2723;">Fünf Ebenen, ein Haus.</h2>
+      <p style="margin: 22px 0 0; font-size: 17px; line-height: 1.65; color: #6f6a62; font-weight: 300;">Von der Marke bis zur Automatisierung — aufeinander aufbauend, nicht nebeneinander.</p>
+    </div>
+    <div style="margin-top: 60px;">
+      <div style="display: grid; grid-template-columns: 90px 1fr auto; gap: 0 40px; align-items: center; padding: 30px 0; border-top: 1px solid #e7e4de;">
+        <span style="font-size: 13px; font-weight: 500; letter-spacing: 0.1em; color: #be904e;">01</span>
+        <span style="font-size: 24px; font-weight: 500; color: #2a2723;">Marke &amp; Identität</span>
+        <span style="font-size: 14px; color: #9a948b;">Corporate Design, Logo, Auftritt</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 90px 1fr auto; gap: 0 40px; align-items: center; padding: 30px 0; border-top: 1px solid #e7e4de;">
+        <span style="font-size: 13px; font-weight: 500; letter-spacing: 0.1em; color: #be904e;">02</span>
+        <span style="font-size: 24px; font-weight: 500; color: #2a2723;">Digitaler Auftritt</span>
+        <span style="font-size: 14px; color: #9a948b;">Websites, Shops, Plattformen</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 90px 1fr auto; gap: 0 40px; align-items: center; padding: 30px 0; border-top: 1px solid #e7e4de;">
+        <span style="font-size: 13px; font-weight: 500; letter-spacing: 0.1em; color: #be904e;">03</span>
+        <span style="font-size: 24px; font-weight: 500; color: #2a2723;">Operations</span>
+        <span style="font-size: 14px; color: #9a948b;">Prozesse, Abrechnung, Betrieb</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 90px 1fr auto; gap: 0 40px; align-items: center; padding: 30px 0; border-top: 1px solid #e7e4de;">
+        <span style="font-size: 13px; font-weight: 500; letter-spacing: 0.1em; color: #be904e;">04</span>
+        <span style="font-size: 24px; font-weight: 500; color: #2a2723;">Automatisierung</span>
+        <span style="font-size: 14px; color: #9a948b;">Schnittstellen, Workflows</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 90px 1fr auto; gap: 0 40px; align-items: center; padding: 30px 0; border-top: 1px solid #e7e4de; border-bottom: 1px solid #e7e4de;">
+        <span style="font-size: 13px; font-weight: 500; letter-spacing: 0.1em; color: #be904e;">05</span>
+        <span style="font-size: 24px; font-weight: 500; color: #2a2723;">Intelligenz &amp; KI</span>
+        <span style="font-size: 14px; color: #9a948b;">meAI, KI-Anwendungen</span>
+      </div>
+    </div>
+    <div style="margin-top: 34px; display:flex; align-items:center; gap:12px;">
+      <span style="font-size: 13.5px; color: #837d73;">Viele Projekte über <strong style="font-weight:600; color:#6f5227;">go-digital</strong> — bis zu 50&nbsp;% Förderung. Antrag &amp; Abwicklung übernehmen wir.</span>
+    </div>
+  </div>
+
+  <!-- ============ STANDORT / ICO — PARALLAX-BAND ============ -->
+  <div style="position: relative; height: 560px; background: #201e1b; overflow: hidden;">
+    <!-- Platzhalter für das echte ICO-Foto (public/images/ico-osnabrueck.jpg) mit Parallax -->
+    <div style="position:absolute; inset:0; background: linear-gradient(115deg, #1c1a17 0%, #2b2620 55%, #201e1b 100%);"></div>
+    <svg viewBox="0 0 1440 560" preserveAspectRatio="none" style="position:absolute; inset:0; width:100%; height:100%; opacity:0.5;" aria-hidden="true">
+      <g stroke="#3a352d" stroke-width="1" fill="none">
+        <path d="M120 560 V180 H360 V560"/><path d="M120 220 H360 M120 300 H360 M120 380 H360 M120 460 H360"/>
+        <path d="M240 180 V560"/>
+        <path d="M980 560 V120 H1320 V560"/><path d="M980 200 H1320 M980 290 H1320 M980 380 H1320 M980 470 H1320"/><path d="M1150 120 V560"/>
+      </g>
+    </svg>
+    <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; padding: 0 96px;">
+      <div class="ey" style="color:#c9a24f;">Unser Sitz</div>
+      <h2 style="margin: 22px 0 0; font-weight: 300; font-size: 44px; line-height: 1.15; color: #f6f3ee; letter-spacing:-0.01em; max-width: 20ch;">Zu Hause im InnovationsCentrum Osnabrück.</h2>
+      <p style="margin: 24px 0 0; font-size: 16px; line-height: 1.7; color: #b8b1a5; max-width: 46ch;">Albert-Einstein-Straße 1 · 49076 Osnabrück<br>Ein Ort für Erfinder — genau richtig für ein Haus, das eigene Produkte baut.</p>
+      <div style="margin-top: 30px; display:inline-flex; align-items:center; gap:10px; align-self:flex-start; border:1px solid #4a443a; padding: 11px 20px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a24f" stroke-width="1.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0116 0z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        <span style="font-size:12.5px; letter-spacing:0.08em; text-transform:uppercase; color:#d8d2c6;">Auf der Karte</span>
+      </div>
+    </div>
+    <div style="position:absolute; right:40px; bottom:26px; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:#5c554a;">[ ICO-Foto + Parallax ]</div>
+  </div>
+
+  <!-- ============ ABSCHLUSS-CTA ============ -->
+  <div style="padding: 130px 96px; text-align: center;">
+    <div class="ey" style="text-align:center;">Nächster Schritt</div>
+    <h2 style="margin: 26px auto 0; font-weight: 300; font-size: 46px; line-height: 1.2; letter-spacing: -0.015em; color: #2a2723; max-width: 20ch;">Sie führen den Betrieb.<br>Wir bauen das System dahinter.</h2>
+    <div style="margin-top: 44px; display:flex; align-items:center; justify-content:center; gap:18px;">
+      <a style="background:#be904e; color:#241d10; font-size:13px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; padding:16px 34px;">Kostenlose Erstberatung</a>
+      <a style="font-size:13px; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; color:#4a463f; padding:16px 6px; border-bottom:1px solid #cfc9bf;">WhatsApp schreiben</a>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <div style="background:#201e1b; padding: 80px 96px 40px; color:#c8c2b7;">
+    <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1.4fr; gap: 48px; padding-bottom: 56px; border-bottom:1px solid #34302a;">
+      <div>
+        <div style="display:flex; align-items:center; gap:11px;">
+          <svg viewBox="120 185 330 185" width="32" height="18" aria-hidden="true">
+            <rect x="271.22" y="224.29" width="18.54" height="104.13" fill="#e4c378"/>
+            <path fill="#e4c378" d="M143.98,276.36c0-38.06,30.85-68.91,68.91-68.91h58.33v-19.92h-57.65c-49.06,0-88.83,39.77-88.83,88.83s39.77,88.83,88.83,88.83h57.65v-19.92h-58.33C174.83,345.27,143.98,314.41,143.98,276.36z"/>
+            <path fill="#e4c378" d="M347.41,187.53h-57.65v19.92h58.33c38.06,0,68.91,30.85,68.91,68.91s-30.85,68.91-68.91,68.91h-58.33v19.92h57.65c49.06,0,88.83-39.77,88.83-88.83S396.47,187.53,347.41,187.53z"/>
+          </svg>
+          <span style="font-weight:600; font-size:16px; letter-spacing:0.04em; color:#f6f3ee;">crea<span style="color:#e4c378;">DIG</span></span>
+        </div>
+        <p style="margin:22px 0 0; font-size:14px; line-height:1.7; color:#8f887c; max-width:34ch;">System-Haus für Marke, Software und KI. Erdacht, gebaut und betrieben aus Osnabrück.</p>
+      </div>
+      <div>
+        <div style="font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#6f6a5e;">Navigation</div>
+        <div style="margin-top:20px; display:flex; flex-direction:column; gap:12px;">
+          <a style="font-size:14px; color:#c8c2b7;">Unternehmen</a><a style="font-size:14px; color:#c8c2b7;">Leistungen</a><a style="font-size:14px; color:#c8c2b7;">Produkte</a><a style="font-size:14px; color:#c8c2b7;">Referenzen</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#6f6a5e;">Rechtliches</div>
+        <div style="margin-top:20px; display:flex; flex-direction:column; gap:12px;">
+          <a style="font-size:14px; color:#c8c2b7;">Impressum</a><a style="font-size:14px; color:#c8c2b7;">Datenschutz</a><a style="font-size:14px; color:#c8c2b7;">Termin</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#6f6a5e;">Kontakt</div>
+        <div style="margin-top:20px; display:flex; flex-direction:column; gap:12px;">
+          <span style="font-size:14px; color:#c8c2b7;">+41 76 504 58 79</span>
+          <span style="font-size:14px; color:#c8c2b7;">info@creadig.de</span>
+          <span style="font-size:14px; color:#8f887c; line-height:1.6;">ICO InnovationsCentrum<br>Albert-Einstein-Str. 1 · Osnabrück</span>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; justify-content:space-between; padding-top:28px;">
+      <span style="font-size:12px; color:#6f6a5e;">© 2026 creaDIG · Osnabrück (DE) · Märkte DE · CH · Europa</span>
+      <span style="font-size:12px; color:#6f6a5e;">Beratung auf Deutsch · Türkisch · Englisch</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
