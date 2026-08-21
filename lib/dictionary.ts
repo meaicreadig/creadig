@@ -10,10 +10,31 @@ export const WHATSAPP_LINK =
 
 export const dictionary = {
   de: {
+    /*
+     * Uebersichtsseite /leistungen (PHASE A).
+     *
+     * Sie erfindet nichts: Die fuenf Ebenen, der Ablauf, die Pakete und der
+     * Foerderhinweis stehen alle schon im Woerterbuch. Neu ist nur, dass sie
+     * eine eigene Adresse haben — die Startseite reisst an, hier steht es.
+     */
+    leistungenPage: {
+      eyebrow: "Leistungen",
+      title: "Fünf Ebenen, aufeinander gebaut.",
+      lead: "Marke, Auftritt, Betrieb, Automatisierung, Intelligenz. Jede Ebene trägt die nächste — nicht nebeneinander, sondern als System. Was wir für unsere eigenen Produkte gebaut haben, bringen wir in Ihren Alltag.",
+      metaTitle: "Leistungen — von der Marke bis zur KI",
+      metaDescription:
+        "Die fünf Ebenen von creaDIG: Marke, digitaler Auftritt, Operations, Automatisierung und KI. Für kleine und mittlere Betriebe in Deutschland und der Schweiz — auf Deutsch und Türkisch.",
+      pricingLabel: "Preise",
+      pricingNote:
+        "Standard-Produkte sind transparent bepreist. Systementwicklung rechnen wir individuell ab — nach Umfang, nicht nach Stunden.",
+    },
     nav: {
+      home: "Startseite",
       leistungen: "Leistungen",
       produkte: "Produkte",
       arbeiten: "Arbeiten",
+      unternehmen: "Unternehmen",
+      insights: "Insights",
       ueber: "Über uns",
       pakete: "Pakete",
       kontakt: "Kontakt",
@@ -621,10 +642,24 @@ export const dictionary = {
   },
 
   tr: {
+    leistungenPage: {
+      eyebrow: "Hizmetler",
+      title: "Beş katman, üst üste kuruldu.",
+      lead: "Marka, dijital görünüm, operasyon, otomasyon, zekâ. Her katman bir sonrakini taşır — yan yana değil, bir sistem olarak. Kendi ürünlerimiz için kurduğumuzu sizin günlük işinize taşırız.",
+      metaTitle: "Hizmetler — markadan yapay zekâya",
+      metaDescription:
+        "creaDIG'in beş katmanı: marka, dijital görünüm, operasyon, otomasyon ve yapay zekâ. Almanya ve İsviçre'deki küçük ve orta ölçekli işletmeler için — Almanca ve Türkçe.",
+      pricingLabel: "Fiyatlar",
+      pricingNote:
+        "Standart ürünlerin fiyatı şeffaftır. Sistem geliştirmeyi kapsama göre ayrıca hesaplarız — saate göre değil.",
+    },
     nav: {
+      home: "Ana sayfa",
       leistungen: "Hizmetler",
       produkte: "Ürünler",
       arbeiten: "İşler",
+      unternehmen: "Şirket",
+      insights: "Insights",
       ueber: "Hakkımızda",
       pakete: "Paketler",
       kontakt: "İletişim",

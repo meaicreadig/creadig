@@ -11,29 +11,42 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 /**
  * Fünf Ebenen als aufsteigende, bauliche Architektur.
  * Jede Ebene wird breiter und dunkler — Tiefe von unten nach oben.
+ *
+ * Zwei Einsatzorte, ein Bauteil (PHASE A):
+ *   Startseite    — nicht mehr. Dort steht seit dem Umbau die kompakte
+ *                   Verteiler-Kachel-Variante (`CapabilityTiles`).
+ *   /leistungen   — hier, als Hauptinhalt der Uebersichtsseite. Die H1 traegt
+ *                   dann der Seitenkopf, darum laesst `heading={false}` die
+ *                   zweite Ueberschrift weg, statt sie zu doppeln.
+ *
+ * Jede Ebene traegt zusaetzlich einen Anker (`#ebene-<key>`), damit die
+ * Kacheln der Startseite nicht nur „irgendwohin nach /leistungen" fuehren,
+ * sondern genau auf die Ebene, auf die geklickt wurde.
  */
-export function Services() {
+export function Services({ heading = true }: { heading?: boolean }) {
   const { t, locale } = useLocale()
 
   return (
     <section id="leistungen" aria-labelledby="leistungen-title" className="border-line border-b">
       <div className="section-shell">
-        <div className="grid gap-10 lg:grid-cols-12">
-          <Reveal className="lg:col-span-7">
-            <SectionEyebrow label={t.services.eyebrow} />
-            <h2
-              id="leistungen-title"
-              className="type-h2 mt-7 text-balance"
-            >
-              {t.services.title}
-            </h2>
-          </Reveal>
-          <Reveal delay={0.1} className="flex items-end lg:col-span-5">
-            <p className="type-lead text-muted-foreground max-w-md text-pretty">
-              {t.services.lead}
-            </p>
-          </Reveal>
-        </div>
+        {heading && (
+          <div className="grid gap-10 lg:grid-cols-12">
+            <Reveal className="lg:col-span-7">
+              <SectionEyebrow label={t.services.eyebrow} />
+              <h2
+                id="leistungen-title"
+                className="type-h2 mt-7 text-balance"
+              >
+                {t.services.title}
+              </h2>
+            </Reveal>
+            <Reveal delay={0.1} className="flex items-end lg:col-span-5">
+              <p className="type-lead text-muted-foreground max-w-md text-pretty">
+                {t.services.lead}
+              </p>
+            </Reveal>
+          </div>
+        )}
 
         {/*
           Einstiegs-Chips (Feinschliff).
@@ -46,7 +59,11 @@ export function Services() {
           standen sie als lange Meta-Titel ganz unten, wo sie kaum jemand sah.
         */}
         <Reveal delay={0.16}>
-          <div className="border-line mt-20 flex flex-wrap items-center gap-x-6 gap-y-4 border-t pt-8">
+          <div
+            className={`border-line flex flex-wrap items-center gap-x-6 gap-y-4 border-t pt-8 ${
+              heading ? "mt-20" : ""
+            }`}
+          >
             <p className="eyebrow text-gold-text">{t.services.entryLabel}</p>
             <ul className="flex flex-wrap gap-2.5">
               {publishedServicePages.map((page) => (
@@ -63,7 +80,7 @@ export function Services() {
               {/* Kein Leistungs-, sondern ein Geld-Einstieg — und fuer viele der erste. */}
               <li>
                 <Link
-                  href="/#zertifizierungen"
+                  href="/unternehmen#zertifizierungen"
                   className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-4 py-2.5 text-sm tracking-wide transition-colors duration-500"
                 >
                   {t.services.entryFunding}
@@ -91,8 +108,10 @@ export function Services() {
                 as="div"
               >
                 <div
+                  id={`ebene-${layer.key}`}
                   style={{ marginLeft: `${inset}%`, marginRight: `${inset}%` }}
-                  className={`border-line relative border-t transition-colors duration-500 ${
+                  /* scroll-mt: die feste Leiste (4,5rem) darf den Anker nicht verdecken. */
+                  className={`border-line relative scroll-mt-28 border-t transition-colors duration-500 ${
                     isTop ? "bg-foreground/[0.03]" : ""
                   } hover:bg-foreground/[0.04]`}
                 >

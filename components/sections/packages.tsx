@@ -33,7 +33,7 @@ export function Packages() {
               {t.packages.funding}
             </p>
             <a
-              href="#zertifizierungen"
+              href="/unternehmen#zertifizierungen"
               className="text-gold-text hover:text-foreground inline-flex shrink-0 items-center gap-2 text-sm tracking-wide transition-colors duration-500"
             >
               {t.packages.fundingLink}

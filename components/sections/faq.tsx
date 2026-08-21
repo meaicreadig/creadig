@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { ArrowUpRight, Plus } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
@@ -59,13 +60,13 @@ export function Faq() {
         <Reveal delay={0.2}>
           <div className="mt-20 flex flex-wrap items-center gap-x-5 gap-y-3">
             <p className="type-body text-muted-foreground">{t.faq.more}</p>
-            <a
-              href="#kontakt"
+            <Link
+              href="/kontakt"
               className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
             >
               {t.faq.moreCta}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
-            </a>
+            </Link>
           </div>
         </Reveal>
       </div>

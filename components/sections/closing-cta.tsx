@@ -59,8 +59,8 @@ export function ClosingCta() {
 
           <Reveal delay={0.1} className="lg:col-span-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:justify-end">
-              <MagneticButton href="/#kontakt">{t.closing.ctaPrimary}</MagneticButton>
-              <MagneticButton href="/#arbeiten" variant="ghost">
+              <MagneticButton href="/kontakt">{t.closing.ctaPrimary}</MagneticButton>
+              <MagneticButton href="/arbeiten" variant="ghost">
                 {t.closing.ctaSecondary}
               </MagneticButton>
             </div>
