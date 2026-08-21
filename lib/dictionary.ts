@@ -11,6 +11,23 @@ export const WHATSAPP_LINK =
 export const dictionary = {
   de: {
     /*
+     * Unternehmensseite (PHASE A).
+     *
+     * Sie buendelt, was bisher als „Ueber uns", Logo-Wand, Standort und
+     * Zertifizierungen ueber die Startseite verteilt lag. Keine neue
+     * Behauptung — dieselben Angaben, endlich an einem Ort mit eigener
+     * Adresse. Die Ueberschrift ist die Haltung aus dem Entwurf R1.
+     */
+    unternehmenPage: {
+      eyebrow: "Unternehmen",
+      title: "Erfinden, bauen, betreiben.",
+      lead: "creaDIG ist keine Agentur, die ein Projekt abliefert und verschwindet. Wir sind ein Haus, das eigene Produkte erfindet, sie selbst baut und im Betrieb hält — von der Marke über die Software bis zur künstlichen Intelligenz.",
+      statement: "Was wir für Kunden entwickeln, betreiben wir für uns selbst. Diese Substanz unterscheidet ein System-Haus von einer Präsentation.",
+      metaTitle: "Unternehmen — System-Haus aus Osnabrück, seit 2017",
+      metaDescription:
+        "creaDIG: System-Haus im ICO InnovationsCentrum Osnabrück, gegründet 2017. Gründer, Netzwerk, Schwerpunkte, Standort und nachprüfbare Zertifizierungen.",
+    },
+    /*
      * Arbeiten-Ebene (PHASE A): Werkschau als eigene Route + Detailseiten.
      *
      * Die Detailseiten tragen nur, was in `site-data` belegt ist. Eine tiefe
@@ -725,6 +742,15 @@ export const dictionary = {
   },
 
   tr: {
+    unternehmenPage: {
+      eyebrow: "Şirket",
+      title: "İcat etmek, kurmak, işletmek.",
+      lead: "creaDIG, bir projeyi teslim edip kaybolan bir ajans değildir. Kendi ürünlerini icat eden, onları kendi kuran ve işler hâlde tutan bir evdir — markadan yazılıma, yazılımdan yapay zekâya.",
+      statement: "Müşteriler için geliştirdiğimizi kendimiz için de işletiriz. Bir sistem evini bir sunumdan ayıran şey bu sağlamlıktır.",
+      metaTitle: "Şirket — Osnabrück'ten sistem evi, 2017'den beri",
+      metaDescription:
+        "creaDIG: Osnabrück ICO InnovationsCentrum'da sistem evi, 2017'de kuruldu. Kurucu, ağ, odak alanları, merkez ve doğrulanabilir sertifikalar.",
+    },
     arbeitenPage: {
       eyebrow: "İşler",
       title: "Kuruldu. Ve işletiliyor.",

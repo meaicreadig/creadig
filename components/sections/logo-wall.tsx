@@ -112,13 +112,20 @@ export function LogoWall() {
   }))
 
   return (
-    <section id="produkte" aria-labelledby="produkte-title" className="border-line border-b">
+    /*
+      id war „produkte" — solange die Produkte ein Anker auf der Startseite
+      waren, stimmte das. Seit PHASE A ist /produkte eine echte Route, und
+      ein Anker mit demselben Namen wuerde auf etwas anderes zeigen als der
+      Menuepunkt. Die Wand ist ohnehin nicht die Produktliste, sondern das
+      Oekosystem: eigene Marken UND das Arbeitsumfeld.
+    */
+    <section id="oekosystem" aria-labelledby="oekosystem-title" className="border-line border-b">
       <div className="section-gutter pt-24 md:pt-32">
         <Reveal className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div>
             <SectionEyebrow label={t.logos.eyebrow} />
             <h2
-              id="produkte-title"
+              id="oekosystem-title"
               className="type-h2 mt-7 max-w-2xl text-balance"
             >
               {t.logos.title}
