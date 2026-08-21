@@ -5,6 +5,8 @@
 //   NÛR · Bir Damla Hayır · Rumi's Maison = Kundenwerk / Dienstleistung.
 //   PLANEX gehört nicht zu creaDIG und kommt nirgends vor.
 
+import { publishedInsights } from "@/lib/insights"
+
 export type Region = "DE" | "CH" | "DE & CH"
 
 export type ProductLogo = {
@@ -420,6 +422,24 @@ export const navLinks = [
   { href: "/unternehmen", labelKey: "unternehmen" as const },
   { href: "/insights", labelKey: "insights" as const },
 ]
+
+/**
+ * Was in der Kopfleiste steht (PHASE B).
+ *
+ * Insights bleibt als Route und im Footer, verschwindet aber aus der
+ * Hauptnavigation, solange dort nichts veroeffentlicht ist. Der Grund ist
+ * nicht Aesthetik: Ein Menuepunkt ist ein Versprechen. Fuehrt er auf eine
+ * Seite, die „Noch nichts veroeffentlicht" sagt, kostet er beim ersten Klick
+ * mehr Vertrauen, als er vorher an Groesse suggeriert hat — und zwar bei
+ * genau den Besuchern, die neugierig genug waren, ihn anzuklicken.
+ *
+ * Der Footer behaelt den Link: Er ist das vollstaendige Verzeichnis der
+ * Seite, die Leiste ist eine Auswahl. Mit dem ersten Beitrag erscheint der
+ * Punkt oben von selbst — hier ist nichts auszukommentieren.
+ */
+export const mainNavLinks = navLinks.filter(
+  (link) => link.href !== "/insights" || publishedInsights.length > 0,
+)
 
 /** Echte Signale statt erfundener Kennzahlen. */
 export const impactSignals = [

@@ -21,7 +21,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Logo } from "@/components/brand/logo"
-import { navLinks } from "@/lib/site-data"
+import { mainNavLinks } from "@/lib/site-data"
 import { WHATSAPP_LINK } from "@/lib/dictionary"
 import { cn } from "@/lib/utils"
 
@@ -91,7 +91,7 @@ export function SiteNav() {
         </Link>
 
         <nav aria-label="Hauptnavigation" className="hidden items-center gap-8 lg:flex">
-          {navLinks.map((link) => {
+          {mainNavLinks.map((link) => {
             const active = isActive(pathname, link.href)
             return (
               <Link
@@ -206,7 +206,7 @@ export function SiteNav() {
               </SheetHeader>
 
               <nav aria-label="Mobile Navigation" className="flex flex-col px-6 pt-6">
-                {navLinks.map((link, index) => (
+                {mainNavLinks.map((link, index) => (
                   <SheetClose asChild key={link.href}>
                     <MotionLink
                       href={link.href}
@@ -226,7 +226,7 @@ export function SiteNav() {
                     href="/unternehmen#zertifizierungen"
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.06 * navLinks.length + 0.1, duration: 0.5 }}
+                    transition={{ delay: 0.06 * mainNavLinks.length + 0.1, duration: 0.5 }}
                     className="text-display border-b border-line py-5 text-3xl text-foreground"
                   >
                     {t.nav.zertifikate}
