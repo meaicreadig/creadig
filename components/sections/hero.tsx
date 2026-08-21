@@ -4,6 +4,7 @@ import Link from "next/link"
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowDown, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
+import { heroChips } from "@/lib/site-data"
 import { ArchitecturalField } from "@/components/hero/architectural-field"
 import { MagneticButton } from "@/components/ui/magnetic-button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
@@ -61,15 +62,36 @@ export function Hero() {
           transition={{ duration: 0.7, delay: 0.38, ease: EASE }}
           className="border-line mt-14 grid gap-8 border-t pt-10 lg:grid-cols-12 lg:gap-12"
         >
-          <p className="text-muted-foreground max-w-2xl text-lg leading-relaxed text-pretty lg:col-span-7 lg:text-xl">
-            {t.hero.subline}
-          </p>
+          <div className="lg:col-span-7">
+            <p className="text-muted-foreground max-w-2xl text-lg leading-relaxed text-pretty lg:text-xl">
+              {t.hero.subline}
+            </p>
+
+            {/*
+              Einstiegs-Chips: vier Worte, die sagen, worum es geht — und
+              zugleich vier Absprungpunkte in die neue Architektur. Ein Chip,
+              der nur ein Wort waere, waere Dekoration.
+            */}
+            <ul className="mt-8 flex flex-wrap gap-2.5">
+              {heroChips.map((chip) => (
+                <li key={chip.href}>
+                  <Link
+                    href={chip.href}
+                    className="border-line-strong hover:border-gold hover:text-gold-text text-muted-foreground inline-flex items-center border px-4 py-2 text-sm tracking-wide transition-colors duration-500"
+                  >
+                    {chip.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           <div className="flex flex-wrap items-start gap-3 lg:col-span-5 lg:justify-end">
-            <MagneticButton href="/#kontakt">
+            <MagneticButton href="/kontakt">
               {t.hero.ctaPrimary}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
             </MagneticButton>
-            <MagneticButton href="/#arbeiten" variant="ghost">
+            <MagneticButton href="/arbeiten" variant="ghost">
               {t.hero.ctaSecondary}
             </MagneticButton>
           </div>
@@ -84,7 +106,7 @@ export function Hero() {
       >
         <span className="eyebrow text-muted-foreground">{t.hero.location}</span>
         <Link
-          href="/#fundament"
+          href="#haltung"
           className="text-muted-foreground hover:text-foreground eyebrow flex items-center gap-2.5 transition-colors"
         >
           {t.hero.scroll}

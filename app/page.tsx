@@ -1,68 +1,93 @@
 import { Hero } from "@/components/sections/hero"
-import { ImpactBand } from "@/components/sections/impact-band"
-import { LogoWall } from "@/components/sections/logo-wall"
-import { Portfolio } from "@/components/sections/portfolio"
-import { CaseStudies } from "@/components/sections/case-studies"
-import { Reviews } from "@/components/sections/reviews"
-import { Services } from "@/components/sections/services"
+import { HouseStatement } from "@/components/sections/house-statement"
+import { SelectedWork } from "@/components/sections/selected-work"
+import { CapabilityTiles } from "@/components/sections/capability-tiles"
 import { HouseProducts } from "@/components/sections/house-products"
-import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
-import { Process } from "@/components/sections/process"
-import { Certifications } from "@/components/sections/certifications"
-import { About } from "@/components/sections/about"
+import { CaseStudies } from "@/components/sections/case-studies"
+import { ImpactBand } from "@/components/sections/impact-band"
+import { ProofLine } from "@/components/sections/proof-line"
 import { Location } from "@/components/sections/location"
-import { Packages } from "@/components/sections/packages"
-import { Faq } from "@/components/sections/faq"
-import { Contact } from "@/components/sections/contact"
+import { CompanyTeaser } from "@/components/sections/company-teaser"
+import { InsightsTeaser } from "@/components/sections/insights-teaser"
 import { ClosingCta } from "@/components/sections/closing-cta"
-import { dictionary } from "@/lib/dictionary"
 
 /**
- * FAQPage für Suchmaschinen (E-K5).
+ * DIE STARTSEITE IST EIN VERTEILER (PHASE A, Master-Prompt 4 §4).
  *
- * Bewusst hier und nicht in der FAQ-Komponente: Die Sektion ist eine
- * Client-Komponente, deren Sprache erst nach der Hydration feststeht. Ein
- * Crawler sieht das Server-HTML, und das ist deutsch — also stehen hier die
- * deutschen Fragen. Dieselben Texte, dieselbe Quelle.
+ * ---------------------------------------------------------------------------
+ * WAS SICH GEÄNDERT HAT UND WARUM
+ * Vorher standen hier 17 Sektionen: Hero, Impact, Logo-Wand, Werkschau,
+ * Kundenfälle, Leistungen, Produkte, meAI, Prozess, Zertifizierungen,
+ * Bewertungen, Über uns, Standort, Pakete, FAQ, Kontakt, Abschluss. Das ist
+ * Landingpage-Architektur: eine lineare Verkaufsgeschichte auf einer
+ * Scroll-Schiene, die alles selbst erklärt.
+ *
+ * creaDIG ist aber ein System-Haus mit eigenem Ökosystem — und das muss die
+ * Seite STRUKTURELL zeigen, nicht behaupten. Eine große Website ist nicht
+ * dasselbe wie eine lange Homepage. Jede Sektion hier reißt an und führt
+ * tiefer; die Ausführung steht auf der Unterseite, auf die verlinkt wird.
+ *
+ * ---------------------------------------------------------------------------
+ * WOHIN DIE ALTEN SEKTIONEN GEZOGEN SIND — gestrichen wurde nichts
+ *   Logo-Wand, Über uns, Zertifizierungen  → /unternehmen
+ *   Werkschau, Register, Bewertungen       → /arbeiten
+ *   Ebenen-Pyramide, Prozess, Pakete, FAQ  → /leistungen
+ *   meAI-Deep-Dive                         → /produkte
+ *   Kontaktformular                        → /kontakt
+ *
+ * ---------------------------------------------------------------------------
+ * DIE REIHENFOLGE IST EIN ARGUMENT
+ * Arbeit kommt VOR der Erklärung (Sektion 3, groß). Vorher musste sich jemand
+ * durch drei Sektionen Behauptung lesen, bevor er sah, ob wir etwas können.
+ * Produkte stehen direkt danach — sie sind der Punkt, an dem klar wird, dass
+ * das hier keine Agentur ist. Preise stehen gar nicht mehr hier: Eine
+ * Preistabelle auf der Startseite macht ein System-Haus zur produktisierten
+ * Agentur.
+ *
+ * ---------------------------------------------------------------------------
+ * ZWEI SEKTIONEN RENDERN HEUTE NICHTS
+ * `CaseStudies` und `InsightsTeaser` sind gated und verschwinden spurlos,
+ * solange keine Freigabe bzw. keine Notiz vorliegt. Sie stehen hier trotzdem:
+ * Sobald der Owner liefert, sind sie an der richtigen Stelle — ohne dass
+ * jemand die Reihenfolge neu erfinden muss.
+ *
+ * Das FAQ-Schema ist mit der FAQ nach /leistungen gezogen; hier stünde es
+ * über Inhalten, die auf dieser Seite nicht mehr sichtbar sind — und
+ * strukturierte Daten müssen beschreiben, was auf der Seite steht.
  */
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: dictionary.de.faq.items.map((item) => ({
-    "@type": "Question",
-    name: item.q,
-    acceptedAnswer: { "@type": "Answer", text: item.a },
-  })),
-}
-
 export default function Page() {
   return (
     <main id="top">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
+      {/* 1 — Wer wir sind, in einer Headline und vier Absprungpunkten. */}
       <Hero />
-      <ImpactBand />
-      <LogoWall />
-      <Portfolio />
-      {/* Rendert erst, wenn eine freigegebene Case-Study vorliegt (E-K1). */}
-      <CaseStudies />
-      <Services />
-      {/* Die vier eigenen Produkte gleichwertig — davor, nicht anstelle des Flaggschiffs (B3). */}
+
+      {/* 2 — creaDIG in einem Satz. Ruhige Fläche, keine Karten. */}
+      <HouseStatement />
+
+      {/* 3 — Arbeit vor Erklärung: drei Werke, groß. → /arbeiten */}
+      <SelectedWork />
+
+      {/* 4 — Die fünf Ebenen als Verteiler-Kacheln. → /leistungen */}
+      <CapabilityTiles />
+
+      {/* 5 — „We build our own." Der Aha-Moment. → /produkte */}
       <HouseProducts />
-      <MeaiSpotlight />
-      <Process />
-      <Certifications />
-      {/* Rendert erst, wenn echte Bewertungen vorliegen (E-K2). */}
-      <Reviews />
-      <About />
+
+      {/* 6 — Ein tiefer Kundenfall (gated auf schriftliche Freigabe). */}
+      <CaseStudies />
+
+      {/* 7 — Zahlen und Nachweise: nur echte Signale, dann die Nachweis-Zeile. */}
+      <ImpactBand />
+      <ProofLine />
+
+      {/* 8 — Wo wir sitzen und wer dahintersteht. → /unternehmen */}
       <Location />
-      <Packages />
-      {/* Direkt vor dem Formular: nimmt die Fragen weg, die sonst bremsen. */}
-      <Faq />
-      <Contact />
-      {/* Schlussstrich statt abruptem Ende (B1). */}
+      <CompanyTeaser />
+
+      {/* 9 — Notizen aus dem Bau (gated, bis die erste steht). → /insights */}
+      <InsightsTeaser />
+
+      {/* 10 — Schlussstrich, souverän: sprechen oder erst weiterschauen. */}
       <ClosingCta />
     </main>
   )

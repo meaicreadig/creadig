@@ -11,6 +11,51 @@ export const WHATSAPP_LINK =
 export const dictionary = {
   de: {
     /*
+     * Verteiler-Startseite (PHASE A, Master-Prompt 4 §4).
+     *
+     * Die Startseite erklaert nicht mehr alles selbst. Jede Sektion reisst an
+     * und fuehrt tiefer — grosse Website heisst nicht lange Homepage. Die
+     * Texte hier sind Anreisser; die Ausfuehrung steht auf der Unterseite,
+     * auf die verlinkt wird.
+     */
+    home: {
+      statement: {
+        eyebrow: "creaDIG in einem Satz",
+        title: "Wir erfinden Systeme, bauen sie selbst und halten sie im Betrieb.",
+        body: "Von der Marke über den digitalen Auftritt und den laufenden Betrieb bis zur Automatisierung und zur künstlichen Intelligenz. Fünf Ebenen, die aufeinander aufbauen — und vier eigene Produkte, an denen wir sie selbst erprobt haben.",
+        cta: "Über das Unternehmen",
+      },
+      work: {
+        eyebrow: "Ausgewählte Arbeiten",
+        title: "Erst zeigen. Dann reden.",
+        cta: "Alle Arbeiten",
+      },
+      capabilities: {
+        eyebrow: "Leistungen",
+        title: "Fünf Ebenen, ein Haus.",
+        lead: "Jede Ebene trägt die nächste. Sie können auf jeder einsteigen — und auf jeder aufhören.",
+        cta: "Alle Leistungen",
+      },
+      products: {
+        cta: "Alle Produkte",
+      },
+      proof: {
+        label: "Nachweisbar",
+        cta: "Nachweise prüfen",
+      },
+      company: {
+        eyebrow: "Das Unternehmen",
+        title: "Osnabrück. Seit 2017.",
+        body: "Sitz im ICO InnovationsCentrum, gegründet 2017, geführt von Muhammed Emin Akyol — mit einem spezialisierten Netzwerk im DACH-Raum.",
+        cta: "Mehr über uns",
+      },
+      insights: {
+        eyebrow: "Insights",
+        title: "Notizen aus dem Bau.",
+        cta: "Alle Notizen",
+      },
+    },
+    /*
      * System-Notes (PHASE A — Geruest).
      *
      * `empty` ist der wichtigste Schluessel hier: Solange nichts
@@ -213,10 +258,16 @@ export const dictionary = {
       headlineLine1: "Wir bauen,",
       headlineLine2: "was andere",
       headlineLine3: "nicht sehen.",
+      /*
+       * Glasklare Subline (§4.1): Vorher stand hier ein Markenbild („das Dach
+       * ueber unseren Systemen"). Schoen — aber wer creaDIG nicht kennt, weiss
+       * danach immer noch nicht, was gemacht wird. Der Satz nennt jetzt die
+       * vier Dinge beim Namen; die Haltung traegt die Headline darueber.
+       */
       subline:
-        "creaDIG ist das Dach über unseren Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie.",
+        "creaDIG entwickelt Marken, digitale Systeme, Automatisierung und eigene Softwareprodukte.",
       ctaPrimary: "Projekt starten",
-      ctaSecondary: "Unsere Arbeit ansehen",
+      ctaSecondary: "Unsere Arbeit",
       location: "Osnabrück · DE & CH",
       scroll: "Scrollen",
     },
@@ -804,6 +855,43 @@ export const dictionary = {
   },
 
   tr: {
+    home: {
+      statement: {
+        eyebrow: "Tek cümlede creaDIG",
+        title: "Sistemleri biz icat eder, kendimiz kurar ve işler hâlde tutarız.",
+        body: "Markadan dijital görünüme, günlük işletmeden otomasyona ve yapay zekâya kadar. Üst üste kurulan beş katman — ve bunları kendimiz üzerinde denediğimiz dört kendi ürün.",
+        cta: "Şirket hakkında",
+      },
+      work: {
+        eyebrow: "Seçilmiş işler",
+        title: "Önce göster. Sonra konuş.",
+        cta: "Tüm işler",
+      },
+      capabilities: {
+        eyebrow: "Hizmetler",
+        title: "Beş katman, tek çatı.",
+        lead: "Her katman bir sonrakini taşır. İstediğiniz katmanda başlayabilir, istediğiniz katmanda durabilirsiniz.",
+        cta: "Tüm hizmetler",
+      },
+      products: {
+        cta: "Tüm ürünler",
+      },
+      proof: {
+        label: "Doğrulanabilir",
+        cta: "Belgeleri gör",
+      },
+      company: {
+        eyebrow: "Şirket",
+        title: "Osnabrück. 2017'den beri.",
+        body: "Merkez ICO InnovationsCentrum, 2017'de kuruldu, Muhammed Emin Akyol yönetiminde — DACH bölgesinde uzman bir ağla birlikte.",
+        cta: "Hakkımızda daha fazlası",
+      },
+      insights: {
+        eyebrow: "Insights",
+        title: "Kurma sürecinden notlar.",
+        cta: "Tüm notlar",
+      },
+    },
     insightsPage: {
       eyebrow: "Insights",
       title: "Kurma sürecinden notlar.",
@@ -953,9 +1041,9 @@ export const dictionary = {
       headlineLine2: "görmediğini",
       headlineLine3: "inşa ediyoruz.",
       subline:
-        "creaDIG, kendi sistemlerimizin çatısıdır — markadan yapay zekâya. Onları biz kurarız. Ve biz işletiriz.",
+        "creaDIG; marka, dijital sistemler, otomasyon ve kendi yazılım ürünlerini geliştirir.",
       ctaPrimary: "Projeye başla",
-      ctaSecondary: "İşlerimizi gör",
+      ctaSecondary: "İşlerimiz",
       location: "Osnabrück · DE & CH",
       scroll: "Kaydır",
     },

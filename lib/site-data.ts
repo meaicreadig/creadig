@@ -225,6 +225,24 @@ export function workHref(work: Work): string {
   return work.kind === "Produkt" ? `/produkte/${work.slug}` : `/arbeiten/${work.slug}`
 }
 
+/**
+ * Die drei Arbeiten, die auf der Verteiler-Startseite gross stehen (PHASE A).
+ *
+ * Bewusst eine kuratierte Auswahl und nicht „die ersten drei": Die Startseite
+ * soll in einem Blick zeigen, was das Haus ist — ein KI-Produkt, ein System
+ * im Tagesbetrieb, eine Arbeit fuer einen Auftraggeber. Drei Zeilen, drei
+ * Beweisarten.
+ *
+ * Slugs, keine Kopien: Der Inhalt bleibt in `productWorks`/`clientWorks`, hier
+ * steht nur die Reihenfolge. Wer einen Slug aendert, faellt beim Build auf.
+ */
+export const featuredWorkSlugs = ["meai", "fibero", "rumis-maison"] as const
+
+/** Aufgeloest in der Reihenfolge oben; unbekannte Slugs fallen still weg. */
+export const featuredWorks: Work[] = featuredWorkSlugs
+  .map((slug) => registryWorks.find((work) => work.slug === slug))
+  .filter((work): work is Work => Boolean(work))
+
 /* ==========================================================================
  * CASE-STUDIES — Problem → Lösung → Ergebnis (E-K1)
  *
@@ -412,6 +430,22 @@ export const impactSignals = [
   { value: "A–Z", key: "scope" as const },
 ]
 
+/**
+ * Einstiegs-Chips unter der Hero-Subline (PHASE A, §4.1).
+ *
+ * Vier Worte, die sagen, worum es geht — und zugleich vier Absprungpunkte.
+ * Ein Chip, der nur ein Wort ist, waere Dekoration; jeder hier hat ein Ziel
+ * in der neuen Architektur. „Produkte" fuehrt bewusst nicht auf eine Ebene,
+ * sondern auf die Produkt-Uebersicht: Es ist keine Leistung, es ist der
+ * Beweis.
+ */
+export const heroChips = [
+  { label: "Brand", href: "/leistungen#ebene-identity" },
+  { label: "Digital", href: "/leistungen#ebene-digital" },
+  { label: "KI", href: "/leistungen#ebene-intelligence" },
+  { label: "Produkte", href: "/produkte" },
+]
+
 /** Die fünf Ebenen — aufsteigende Architektur. */
 export const serviceLayers = [
   { level: "01", key: "identity" as const },
@@ -511,6 +545,14 @@ export type Certification = {
   mark: string
   /** Eigenname — bewusst nicht übersetzt. */
   name: string
+  /**
+   * Kurzform für die Nachweis-Leiste auf der Startseite.
+   *
+   * `mark` ist ein Monogramm für eine Kachel („gd") und in einer Textzeile
+   * unlesbar; `name` ist der vollständige Behördenname und dort zu lang.
+   * Diese dritte Form ist das, was ein Mensch sagen würde.
+   */
+  short: string
   /** Offizielle Quelle zum Nachprüfen. */
   href: string
 }
@@ -518,6 +560,7 @@ export type Certification = {
 export const certifications: Certification[] = [
   {
     slug: "go-digital",
+    short: "go-digital · BMWK",
     logoPath: null,
     mark: "gd",
     name: "go-digital",
@@ -525,6 +568,7 @@ export const certifications: Certification[] = [
   },
   {
     slug: "bafa",
+    short: "BAFA-gelistet",
     logoPath: null,
     mark: "BAFA",
     name: "Bundesamt für Wirtschaft und Ausfuhrkontrolle",
@@ -532,6 +576,7 @@ export const certifications: Certification[] = [
   },
   {
     slug: "iuk",
+    short: "iuk Osnabrück",
     logoPath: null,
     mark: "iuk",
     name: "iuk unternehmensnetzwerk osnabrück e.v.",
@@ -539,6 +584,7 @@ export const certifications: Certification[] = [
   },
   {
     slug: "avpq",
+    short: "AVPQ präqualifiziert",
     logoPath: null,
     mark: "AVPQ",
     name: "Amtliche Verzeichnis Präqualifizierter Unternehmen (AVPQ)",
@@ -546,6 +592,7 @@ export const certifications: Certification[] = [
   },
   {
     slug: "agd",
+    short: "Mitglied AGD",
     logoPath: null,
     mark: "AGD",
     name: "Allianz deutscher Designer (AGD)",

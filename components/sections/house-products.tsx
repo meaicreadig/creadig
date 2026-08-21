@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
@@ -40,10 +41,17 @@ export function HouseProducts() {
               {t.houseProducts.title}
             </h2>
           </Reveal>
-          <Reveal delay={0.1} className="flex items-end lg:col-span-5">
+          <Reveal delay={0.1} className="flex flex-col justify-end lg:col-span-5">
             <p className="type-lead text-muted-foreground max-w-md text-pretty">
               {t.houseProducts.lead}
             </p>
+            <Link
+              href="/produkte"
+              className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 self-start text-sm tracking-wide transition-colors duration-500"
+            >
+              {t.home.products.cta}
+              <ArrowUpRight className="size-4" strokeWidth={1.5} />
+            </Link>
           </Reveal>
         </div>
 
@@ -52,15 +60,14 @@ export function HouseProducts() {
         <div className="bg-line border-line mt-20 grid gap-px border sm:grid-cols-2 lg:grid-cols-4">
           {productWorks.map((product, i) => {
             const logo = ownProducts.find((p) => p.name === product.name)
-            const isLink = Boolean(product.href)
-            const Tag = isLink ? "a" : "div"
 
             return (
               <Reveal key={product.slug} delay={0.06 * i} className="flex">
-                <Tag
-                  {...(isLink
-                    ? { href: product.href, target: "_blank", rel: "noopener noreferrer" }
-                    : {})}
+                {/* Seit PHASE A fuehrt jede Karte in die Produkt-Welt statt nach
+                    draussen. Der Live-Link zu meai.run steht dort, wo er
+                    hingehoert: auf der Produktseite selbst. */}
+                <Link
+                  href={`/produkte/${product.slug}`}
                   className="group bg-background hover:bg-surface relative flex w-full flex-col justify-between gap-8 p-7 transition-colors duration-500 lg:p-8"
                 >
                   <span
@@ -92,12 +99,10 @@ export function HouseProducts() {
                           {product.mark}
                         </span>
                       )}
-                      {isLink && (
-                        <ArrowUpRight
-                          className="text-gold size-4 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                          strokeWidth={1.5}
-                        />
-                      )}
+                      <ArrowUpRight
+                        className="text-gold size-4 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                        strokeWidth={1.5}
+                      />
                     </div>
 
                     <h3 className="type-h4 mt-6">{product.name}</h3>
@@ -115,7 +120,7 @@ export function HouseProducts() {
                     </p>
                     <p className="text-meta text-muted-foreground mt-3">{product.region}</p>
                   </div>
-                </Tag>
+                </Link>
               </Reveal>
             )
           })}

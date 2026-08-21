@@ -58,6 +58,24 @@ const jsonLd = [
       url: `${SITE_URL}/leistungen/${page.slug}`,
     })),
   },
+  /*
+   * FAQPage — mit der FAQ von der Startseite hierher gezogen. Strukturierte
+   * Daten muessen beschreiben, was auf DIESER Seite steht; auf der Startseite
+   * stuenden sie jetzt ueber Inhalten, die dort nicht mehr sichtbar sind.
+   *
+   * Bewusst hier und nicht in der FAQ-Komponente: Die Sektion ist eine
+   * Client-Komponente, deren Sprache erst nach der Hydration feststeht. Ein
+   * Crawler sieht das Server-HTML, und das ist deutsch.
+   */
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: dictionary.de.faq.items.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    })),
+  },
   {
     "@context": "https://schema.org",
     "@type": "Service",
