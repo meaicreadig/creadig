@@ -11,6 +11,47 @@ export const WHATSAPP_LINK =
 export const dictionary = {
   de: {
     /*
+     * Kontaktseite (PHASE A, Master-Prompt 4 §7).
+     *
+     * Der Kontakt war bisher ein Formular plus „Termin in 20 Minuten". Das
+     * bedient genau eine Absicht — die von jemandem, der schon entschieden
+     * hat. Die drei anderen Absichten (erst schauen, erst pruefen, erst
+     * fragen) hatten keinen Weg. Hier stehen alle vier.
+     */
+    kontaktPage: {
+      eyebrow: "Kontakt",
+      title: "Wählen Sie den Weg, der passt.",
+      lead: "Nicht jede Anfrage beginnt mit einem Termin. Manche beginnen mit einem Blick auf das, was wir gebaut haben — auch das ist ein Weg zu uns. Beratung auf Deutsch und Türkisch.",
+      metaTitle: "Kontakt — creaDIG Osnabrück",
+      metaDescription:
+        "creaDIG erreichen: per WhatsApp, E-Mail, kostenloser Erstberatung oder direkt über unsere Arbeiten. ICO InnovationsCentrum Osnabrück, Beratung auf Deutsch und Türkisch.",
+      intentsLabel: "Womit möchten Sie anfangen?",
+      intents: {
+        talk: {
+          name: "Projekt besprechen",
+          what: "Schreiben Sie in eigenen Worten, worum es geht — per WhatsApp oder über das Formular unten.",
+          cta: "Zum Formular",
+        },
+        appointment: {
+          name: "Termin vereinbaren",
+          what: "Zwanzig Minuten Erstgespräch, kostenlos und unverbindlich. Vier Schritte, dann steht die Anfrage.",
+          cta: "Termin anfragen",
+        },
+        products: {
+          name: "Produkte ansehen",
+          what: "Vier eigene Systeme, die wir gebaut haben und selbst betreiben. Der schnellste Weg zu einem Urteil über uns.",
+          cta: "Zu den Produkten",
+        },
+        works: {
+          name: "Arbeiten ansehen",
+          what: "Eigene Produkte und Kundenwerk, getrennt ausgewiesen. Ausführliche Fallbeschreibungen folgen mit den Freigaben.",
+          cta: "Zur Werkschau",
+        },
+      },
+      mailLabel: "E-Mail",
+      mailNote: "Für Unterlagen, Angebote und alles Schriftliche.",
+    },
+    /*
      * Unternehmensseite (PHASE A).
      *
      * Sie buendelt, was bisher als „Ueber uns", Logo-Wand, Standort und
@@ -742,6 +783,39 @@ export const dictionary = {
   },
 
   tr: {
+    kontaktPage: {
+      eyebrow: "İletişim",
+      title: "Size uyan yolu seçin.",
+      lead: "Her başvuru bir randevuyla başlamaz. Bazıları neyi kurduğumuza bakmakla başlar — o da bize giden bir yoldur. Danışmanlık Almanca ve Türkçe.",
+      metaTitle: "İletişim — creaDIG Osnabrück",
+      metaDescription:
+        "creaDIG'e ulaşın: WhatsApp, e-posta, ücretsiz ilk görüşme veya doğrudan işlerimiz üzerinden. ICO InnovationsCentrum Osnabrück, Almanca ve Türkçe danışmanlık.",
+      intentsLabel: "Neyle başlamak istersiniz?",
+      intents: {
+        talk: {
+          name: "Projeyi konuşmak",
+          what: "Konuyu kendi cümlelerinizle yazın — WhatsApp'tan veya aşağıdaki formdan.",
+          cta: "Forma git",
+        },
+        appointment: {
+          name: "Randevu almak",
+          what: "Yirmi dakikalık ilk görüşme, ücretsiz ve bağlayıcı değil. Dört adım, sonra talep hazır.",
+          cta: "Randevu iste",
+        },
+        products: {
+          name: "Ürünlere bakmak",
+          what: "Kurduğumuz ve kendimiz işlettiğimiz dört sistem. Hakkımızda karar vermenin en hızlı yolu.",
+          cta: "Ürünlere git",
+        },
+        works: {
+          name: "İşlere bakmak",
+          what: "Kendi ürünlerimiz ve müşteri işleri, ayrı gösterilir. Ayrıntılı vaka anlatımları onaylarla birlikte gelir.",
+          cta: "Seçkiye git",
+        },
+      },
+      mailLabel: "E-posta",
+      mailNote: "Belgeler, teklifler ve yazılı her şey için.",
+    },
     unternehmenPage: {
       eyebrow: "Şirket",
       title: "İcat etmek, kurmak, işletmek.",
