@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { SignatureMotif } from "@/components/brand/signature-motif"
 import { Reveal } from "@/components/ui/reveal"
@@ -9,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useLocale } from "@/components/locale-provider"
 import { WorkRegistry } from "@/components/sections/work-registry"
-import { clientWorks, furtherProjects, productWorks, type Work } from "@/lib/site-data"
+import { clientWorks, furtherProjects, productWorks, workHref, type Work } from "@/lib/site-data"
 import { cn } from "@/lib/utils"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -31,6 +32,14 @@ function MonogramPanel({ mark }: { mark: string }) {
   )
 }
 
+/*
+ * Seit PHASE A fuehrt jede Karte nach INNEN — eigene Produkte auf ihre Welt
+ * unter /produkte, Kundenwerk auf seine Seite unter /arbeiten. Vorher fuehrte
+ * sie entweder nach draussen (meai.run) oder nirgendwohin; damit war die
+ * Werkschau eine Sackgasse und der externe Link die einzige Tiefe.
+ * Der Live-Hinweis bleibt als Marke sichtbar — verschachtelte Links waeren
+ * ungueltiges Markup, den Live-Link traegt die Produktseite selbst.
+ */
 function WorkCard({
   work,
   builtLabel,
@@ -40,12 +49,9 @@ function WorkCard({
   builtLabel: string
   compact?: boolean
 }) {
-  const isLink = Boolean(work.href)
-  const Tag = isLink ? "a" : "article"
-
   return (
-    <Tag
-      {...(isLink ? { href: work.href, target: "_blank", rel: "noopener noreferrer" } : {})}
+    <Link
+      href={workHref(work)}
       className="group border-line bg-surface elevation-1 hover:elevation-2 relative flex w-full flex-col overflow-hidden border transition-shadow duration-500"
     >
       <div className={cn("bg-muted relative overflow-hidden", compact ? "aspect-[16/9]" : "aspect-[16/10]")}>
@@ -110,9 +116,7 @@ function WorkCard({
             >
               {work.name}
             </h3>
-            {isLink && (
-              <ArrowUpRight className="text-gold mt-1 size-4 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            )}
+            <ArrowUpRight className="text-gold mt-1 size-4 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </div>
           <p className="type-body text-muted-foreground mt-3 max-w-md text-pretty">
             {work.what}
@@ -122,7 +126,7 @@ function WorkCard({
           {work.outcome}
         </p>
       </div>
-    </Tag>
+    </Link>
   )
 }
 
@@ -139,7 +143,7 @@ function GroupHeading({ label, note }: { label: string; note: string }) {
   )
 }
 
-export function Portfolio() {
+export function Portfolio({ heading = true }: { heading?: boolean }) {
   const { t } = useLocale()
   /*
    * Zwei Ansichten auf dieselbe Liste (B2). Karten sind der Default: Sie
@@ -154,25 +158,33 @@ export function Portfolio() {
       aria-labelledby="arbeiten-title"
       className="border-line section-shell border-b"
     >
-      <Reveal>
-        <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
-          <div className="lg:col-span-7">
-            <SectionEyebrow label={t.portfolio.eyebrow} />
-            <h2
-              id="arbeiten-title"
-              className="type-h2 text-foreground mt-6 text-balance"
-            >
-              {t.portfolio.title}
-            </h2>
+      {heading && (
+        <Reveal>
+          <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
+            <div className="lg:col-span-7">
+              <SectionEyebrow label={t.portfolio.eyebrow} />
+              <h2
+                id="arbeiten-title"
+                className="type-h2 text-foreground mt-6 text-balance"
+              >
+                {t.portfolio.title}
+              </h2>
+            </div>
+            <p className="type-lead text-muted-foreground max-w-md text-pretty lg:col-span-5 lg:pb-4">
+              {t.portfolio.lead}
+            </p>
           </div>
-          <p className="type-lead text-muted-foreground max-w-md text-pretty lg:col-span-5 lg:pb-4">
-            {t.portfolio.lead}
-          </p>
-        </div>
-      </Reveal>
+        </Reveal>
+      )}
 
       {/* Ansichtswechsel — Hairline-Pills in der Sprache des Hauses. */}
-      <Reveal delay={0.08} className="border-line mt-12 flex flex-wrap items-center gap-4 border-t pt-6">
+      <Reveal
+        delay={0.08}
+        className={cn(
+          "border-line flex flex-wrap items-center gap-4 border-t pt-6",
+          heading && "mt-12",
+        )}
+      >
         <p className="eyebrow text-muted-foreground">{t.portfolio.viewLabel}</p>
         <div role="group" aria-label={t.portfolio.viewLabel} className="flex gap-px">
           {(

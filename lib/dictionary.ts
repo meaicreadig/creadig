@@ -11,6 +11,42 @@ export const WHATSAPP_LINK =
 export const dictionary = {
   de: {
     /*
+     * Arbeiten-Ebene (PHASE A): Werkschau als eigene Route + Detailseiten.
+     *
+     * Die Detailseiten tragen nur, was in `site-data` belegt ist. Eine tiefe
+     * Case-Study (Ausgangslage -> Loesung -> Ergebnis) erscheint zusaetzlich,
+     * sobald der Kunde sie freigegeben hat — vorher nicht.
+     */
+    arbeitenPage: {
+      eyebrow: "Arbeiten",
+      title: "Gebaut. Und betrieben.",
+      lead: "Vier eigene Produkte, die wir selbst erfunden und gebaut haben — dazu Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen, damit klar ist, was uns gehört.",
+      metaTitle: "Arbeiten — eigene Produkte und Kundenwerk",
+      metaDescription:
+        "Die Werkschau von creaDIG: vier eigene Produkte und Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen — eigene Systeme und Auftragsarbeit sind nicht dasselbe.",
+    },
+    arbeitPage: {
+      breadcrumb: "Arbeiten",
+      kindLabel: "Art",
+      sectorLabel: "Branche",
+      regionLabel: "Region",
+      statusLabel: "Stand",
+      builtLabel: "Was wir gebaut haben",
+      whatLabel: "Worum es geht",
+      backLabel: "Alle Arbeiten",
+      /*
+       * Steht auf jeder Kundenwerk-Seite, solange keine schriftliche Freigabe
+       * fuer eine ausfuehrliche Fallbeschreibung vorliegt. Bewusst als Grund
+       * formuliert, nicht als „demnaechst" — es ist eine Haltung, kein Rueckstand.
+       */
+      caseGatedNote:
+        "Eine ausführliche Fallbeschreibung mit Ausgangslage, Lösung und Ergebnis veröffentlichen wir nur mit schriftlicher Freigabe des Kunden. Liegt sie vor, steht sie hier.",
+      ctaTitle: "Ähnliche Ausgangslage in Ihrem Betrieb?",
+      ctaBody: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sehen uns den Betrieb an und sagen ehrlich, ob wir helfen können.",
+      ctaPrimary: "Projekt starten",
+      ctaSecondary: "Alle Arbeiten",
+    },
+    /*
      * Produkt-Ebene (PHASE A): Uebersicht + eine Seite je Produkt.
      *
      * Der staerkste Beweis des Hauses — keine Agentur baut eigene Software.
@@ -689,6 +725,30 @@ export const dictionary = {
   },
 
   tr: {
+    arbeitenPage: {
+      eyebrow: "İşler",
+      title: "Kuruldu. Ve işletiliyor.",
+      lead: "Kendi icat edip kurduğumuz dört ürün — ayrıca Almanya ve İsviçre'den müşteri işleri. Neyin bize ait olduğu açık olsun diye ayrı gösteriliyor.",
+      metaTitle: "İşler — kendi ürünlerimiz ve müşteri işleri",
+      metaDescription:
+        "creaDIG seçkisi: dört kendi ürün ve Almanya ile İsviçre'den müşteri işleri. Ayrı gösterilir — kendi sistemlerimiz ile sipariş işleri aynı şey değildir.",
+    },
+    arbeitPage: {
+      breadcrumb: "İşler",
+      kindLabel: "Tür",
+      sectorLabel: "Sektör",
+      regionLabel: "Bölge",
+      statusLabel: "Durum",
+      builtLabel: "Ne inşa ettik",
+      whatLabel: "Konu ne",
+      backLabel: "Tüm işler",
+      caseGatedNote:
+        "Başlangıç durumu, çözüm ve sonucu içeren ayrıntılı bir vaka anlatımını yalnızca müşterinin yazılı onayıyla yayımlarız. Onay geldiğinde burada yer alır.",
+      ctaTitle: "İşletmenizde de benzer bir durum mu var?",
+      ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmenize bakar ve yardımcı olup olamayacağımızı dürüstçe söyleriz.",
+      ctaPrimary: "Projeye başla",
+      ctaSecondary: "Tüm işler",
+    },
     produktePage: {
       eyebrow: "Ürünler",
       title: "Kendi işlettiğimiz dört ürün.",

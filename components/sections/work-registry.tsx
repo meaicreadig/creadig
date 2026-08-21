@@ -1,9 +1,10 @@
 "use client"
 
+import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { registryWorks } from "@/lib/site-data"
+import { registryWorks, workHref } from "@/lib/site-data"
 
 /**
  * Referenzregister (B2) — die dichte Zweitansicht der Werkschau.
@@ -35,15 +36,13 @@ export function WorkRegistry() {
       <ul>
         {registryWorks.map((work, i) => {
           const number = String(i + 1).padStart(2, "0")
-          const isLink = Boolean(work.href)
-          const Tag = isLink ? "a" : "div"
 
           return (
             <Reveal key={work.slug} as="li" delay={0.04 * i} y={12}>
-              <Tag
-                {...(isLink
-                  ? { href: work.href, target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
+              {/* Seit PHASE A fuehrt jede Zeile auf die eigene Seite des Werks
+                  — dieselbe Adresse wie die Karte daneben (site-data.workHref). */}
+              <Link
+                href={workHref(work)}
                 className="group border-line hover:bg-foreground/[0.03] relative block border-t transition-colors duration-500"
               >
                 <span
@@ -55,12 +54,10 @@ export function WorkRegistry() {
 
                   <span className="text-subhead flex items-center gap-2 text-xl md:col-span-5">
                     {work.name}
-                    {isLink && (
-                      <ArrowUpRight
-                        className="text-gold size-4 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                        strokeWidth={1.5}
-                      />
-                    )}
+                    <ArrowUpRight
+                      className="text-gold size-4 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                      strokeWidth={1.5}
+                    />
                   </span>
 
                   <span className="type-small text-muted-foreground md:col-span-3">
@@ -73,7 +70,7 @@ export function WorkRegistry() {
                     {work.region}
                   </span>
                 </div>
-              </Tag>
+              </Link>
             </Reveal>
           )
         })}

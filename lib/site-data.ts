@@ -210,6 +210,21 @@ export const clientWorks: Work[] = [
  */
 export const registryWorks: Work[] = [...productWorks, ...clientWorks]
 
+/**
+ * Die interne Adresse eines Werks (PHASE A).
+ *
+ * Vorher fuehrte jede Werk-Karte entweder nach draussen (meai.run) oder
+ * nirgendwohin. Mit der neuen Architektur hat jedes Werk eine Seite im Haus:
+ * eigene Produkte leben unter /produkte, Kundenwerk unter /arbeiten. Ein
+ * externer Live-Link bleibt daneben bestehen — er ersetzt die eigene Seite
+ * nicht, er ergaenzt sie.
+ *
+ * Eine Quelle, damit Karten, Register und Verweise nicht auseinanderlaufen.
+ */
+export function workHref(work: Work): string {
+  return work.kind === "Produkt" ? `/produkte/${work.slug}` : `/arbeiten/${work.slug}`
+}
+
 /* ==========================================================================
  * CASE-STUDIES — Problem → Lösung → Ergebnis (E-K1)
  *
