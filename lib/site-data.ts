@@ -384,20 +384,23 @@ export const furtherProjects = [
 ]
 
 /**
- * Reihenfolge = Reihenfolge auf der Seite (app/page.tsx).
+ * Hauptnavigation (PHASE A) — die Firmen-IA, nicht die Sektionsreihenfolge.
  *
- * Vorher stand „Leistungen" an erster Stelle, lag auf der Seite aber HINTER
- * Produkten und Arbeiten. Wer oben links klickte, sprang nach unten und
- * scrollte dann zurueck — die Leiste log ueber den Seitenaufbau.
- * Wer die Sektionsreihenfolge in page.tsx aendert, aendert sie hier mit.
+ * Vorher standen hier Anker auf Sektionen derselben Seite. Damit war die
+ * Leiste ein Inhaltsverzeichnis der Startseite, und sie musste bei jeder
+ * Umsortierung mitgepflegt werden (der Kommentar an dieser Stelle bat genau
+ * darum). Jetzt bildet sie die Firma ab: fuenf Ebenen, die es als Adresse
+ * gibt. Die Nav muss beweisen, dass hinter der Startseite eine Welt liegt.
+ *
+ * „Kontakt" steht bewusst NICHT in der Reihe, sondern rechts als Gold-CTA —
+ * es ist kein Kapitel des Hauses, es ist die Handlung.
  */
 export const navLinks = [
-  { id: "produkte", labelKey: "produkte" as const },
-  { id: "arbeiten", labelKey: "arbeiten" as const },
-  { id: "leistungen", labelKey: "leistungen" as const },
-  { id: "ueber-uns", labelKey: "ueber" as const },
-  { id: "pakete", labelKey: "pakete" as const },
-  { id: "kontakt", labelKey: "kontakt" as const },
+  { href: "/leistungen", labelKey: "leistungen" as const },
+  { href: "/produkte", labelKey: "produkte" as const },
+  { href: "/arbeiten", labelKey: "arbeiten" as const },
+  { href: "/unternehmen", labelKey: "unternehmen" as const },
+  { href: "/insights", labelKey: "insights" as const },
 ]
 
 /** Echte Signale statt erfundener Kennzahlen. */

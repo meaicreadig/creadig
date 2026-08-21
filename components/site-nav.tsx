@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import { Menu, Sun } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
@@ -32,9 +33,21 @@ import { cn } from "@/lib/utils"
  */
 const MotionLink = motion.create(Link)
 
+/**
+ * Ist dieser Menuepunkt der aktuelle Bereich?
+ *
+ * Nicht nur exakte Gleichheit: /produkte/meai liegt in „Produkte", und die
+ * Leiste muss das zeigen — sonst steht der Besucher auf einer Unterseite und
+ * die Navigation behauptet, er sei nirgends.
+ */
+function isActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`)
+}
+
 export function SiteNav() {
   const { theme, toggleTheme } = useTheme()
   const { locale, t, setLocale } = useLocale()
+  const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
 
@@ -73,21 +86,35 @@ export function SiteNav() {
         weiter innen als die Headline darunter.
       */}
       <div className="section-gutter flex h-[4.5rem] items-center justify-between gap-6">
-        <Link href="/#top" className="shrink-0" aria-label="creaDIG — zur Startseite">
+        <Link href="/" className="shrink-0" aria-label="creaDIG — zur Startseite">
           <Logo variant="auto" className="h-[1.3rem] md:h-[1.55rem]" priority />
         </Link>
 
         <nav aria-label="Hauptnavigation" className="hidden items-center gap-8 lg:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.id}
-              href={`/#${link.id}`}
-              className="group relative py-1 text-sm tracking-wide text-muted-foreground transition-colors duration-300 hover:text-foreground"
-            >
-              {t.nav[link.labelKey]}
-              <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-gold transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full" />
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const active = isActive(pathname, link.href)
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "group relative py-1 text-sm tracking-wide transition-colors duration-300 hover:text-foreground",
+                  active ? "text-foreground" : "text-muted-foreground",
+                )}
+              >
+                {t.nav[link.labelKey]}
+                {/* Die Gold-Linie zeigt im Ruhezustand, wo man ist — und beim
+                    Hover, wo man hinkaeme. Dieselbe Bewegung, zwei Rollen. */}
+                <span
+                  className={cn(
+                    "absolute -bottom-0.5 left-0 h-px bg-gold transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full",
+                    active ? "w-full" : "w-0",
+                  )}
+                />
+              </Link>
+            )
+          })}
         </nav>
 
         <div className="flex items-center gap-1.5">
@@ -143,7 +170,7 @@ export function SiteNav() {
           </Button>
 
           <Link
-            href="/#kontakt"
+            href="/kontakt"
             className="group relative ml-1.5 hidden items-center overflow-hidden bg-gradient-to-br from-gold-soft to-gold eyebrow px-6 py-3 text-[#201e1b] sm:inline-flex"
           >
             <span
@@ -180,9 +207,10 @@ export function SiteNav() {
 
               <nav aria-label="Mobile Navigation" className="flex flex-col px-6 pt-6">
                 {navLinks.map((link, index) => (
-                  <SheetClose asChild key={link.id}>
+                  <SheetClose asChild key={link.href}>
                     <MotionLink
-                      href={`/#${link.id}`}
+                      href={link.href}
+                      aria-current={isActive(pathname, link.href) ? "page" : undefined}
                       initial={{ opacity: 0, y: 14 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.06 * index + 0.1, duration: 0.5 }}
@@ -195,7 +223,7 @@ export function SiteNav() {
                 {/* Vertrauens-Baustein: in der Desktop-Leiste kein Platz, hier schon. */}
                 <SheetClose asChild>
                   <MotionLink
-                    href="/#zertifizierungen"
+                    href="/unternehmen#zertifizierungen"
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.06 * navLinks.length + 0.1, duration: 0.5 }}
@@ -209,7 +237,7 @@ export function SiteNav() {
               <div className="flex flex-col gap-3 px-6 pt-10">
                 <SheetClose asChild>
                   <Link
-                    href="/#kontakt"
+                    href="/kontakt"
                     className="flex items-center justify-center bg-gradient-to-br from-gold-soft to-gold px-6 py-4 text-sm tracking-wide text-[#201e1b]"
                   >
                     {t.nav.cta}

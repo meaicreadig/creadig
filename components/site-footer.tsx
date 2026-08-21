@@ -4,7 +4,7 @@ import { useLocale } from "@/components/locale-provider"
 import Link from "next/link"
 import { Logo } from "@/components/brand/logo"
 import { SignatureMotif } from "@/components/brand/signature-motif"
-import { contact, navLinks, ownProducts, socialProfiles } from "@/lib/site-data"
+import { contact, navLinks, productWorks, socialProfiles } from "@/lib/site-data"
 import { openConsentSettings } from "@/lib/consent"
 
 export function SiteFooter() {
@@ -21,7 +21,7 @@ export function SiteFooter() {
       <div className="section-gutter relative pt-24 pb-10 md:pt-32">
         {/* Riesige Wortmarke */}
         <div className="border-line border-b pb-14">
-          <Link href="/#top" className="inline-block" aria-label="creaDIG — nach oben">
+          <Link href="/" className="inline-block" aria-label="creaDIG — nach oben">
             <Logo variant="auto" className="h-[clamp(1.4rem,3vw,2.5rem)]" />
           </Link>
           <p className="type-lead text-muted-foreground mt-6 max-w-xl text-pretty">
@@ -34,19 +34,33 @@ export function SiteFooter() {
             <p className="eyebrow text-gold-text">{t.footer.navLabel}</p>
             <ul className="mt-6 flex flex-col gap-3.5">
               {navLinks.map((link) => (
-                <li key={link.id}>
+                <li key={link.href}>
                   <Link
-                    href={`/#${link.id}`}
+                    href={link.href}
                     className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
                   >
                     {t.nav[link.labelKey]}
                   </Link>
                 </li>
               ))}
-              {/* Nicht in der Hauptnavigation, aber im Footer erreichbar. */}
+              {/*
+                Zwei Ziele, die in der Hauptnavigation bewusst fehlen: Kontakt
+                traegt dort der Gold-CTA, die Zertifizierungen liegen als
+                Abschnitt auf /unternehmen. Im Footer sind beide direkt
+                erreichbar — ein Footer darf vollstaendig sein, eine Leiste
+                nicht.
+              */}
               <li>
                 <Link
-                  href="/#zertifizierungen"
+                  href="/kontakt"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                >
+                  {t.nav.kontakt}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/unternehmen#zertifizierungen"
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
                 >
                   {t.nav.zertifikate}
@@ -58,20 +72,20 @@ export function SiteFooter() {
           <div>
             <p className="eyebrow text-gold-text">{t.footer.productsLabel}</p>
             <ul className="mt-6 flex flex-col gap-3.5">
-              {ownProducts.map((product) => (
-                <li key={product.name} className="text-muted-foreground text-sm">
-                  {product.name === "meAI" ? (
-                    <a
-                      href="https://meai.run"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-foreground transition-colors duration-400"
-                    >
-                      meAI — meai.run
-                    </a>
-                  ) : (
-                    product.name
-                  )}
+              {/*
+                Vorher standen hier vier Namen, von denen genau einer ein Link
+                war (nach draussen zu meai.run). Seit PHASE A hat jedes Produkt
+                eine eigene Welt — der Footer fuehrt dorthin, nicht mehr an
+                der Seite vorbei.
+              */}
+              {productWorks.map((product) => (
+                <li key={product.slug} className="text-muted-foreground text-sm">
+                  <Link
+                    href={`/produkte/${product.slug}`}
+                    className="hover:text-foreground transition-colors duration-400"
+                  >
+                    {product.name}
+                  </Link>
                 </li>
               ))}
             </ul>

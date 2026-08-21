@@ -50,7 +50,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
             <ChevronRight aria-hidden="true" className="size-3.5" strokeWidth={1.5} />
             <li>
               <Link
-                href="/#leistungen"
+                href="/leistungen"
                 className="hover:text-foreground transition-colors duration-300"
               >
                 {copy.breadcrumbServices}
@@ -120,7 +120,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                   ))}
                 </ul>
                 <Link
-                  href="/#arbeiten"
+                  href="/arbeiten"
                   className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
                 >
                   {copy.worksCta}
@@ -168,7 +168,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                   ))}
               </ul>
               <Link
-                href="/#pakete"
+                href="/leistungen#pakete"
                 className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
               >
                 {copy.packagesCta}
@@ -183,7 +183,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                   {t.certs.funding.body}
                 </p>
                 <Link
-                  href="/#zertifizierungen"
+                  href="/unternehmen#zertifizierungen"
                   className="text-gold-text hover:text-foreground mt-5 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
                 >
                   {t.packages.fundingLink}

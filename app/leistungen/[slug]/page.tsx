@@ -67,7 +67,7 @@ export default async function ServiceRoute({
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Startseite", item: SITE_URL },
-        { "@type": "ListItem", position: 2, name: "Leistungen", item: `${SITE_URL}/#leistungen` },
+        { "@type": "ListItem", position: 2, name: "Leistungen", item: `${SITE_URL}/leistungen` },
         {
           "@type": "ListItem",
           position: 3,
