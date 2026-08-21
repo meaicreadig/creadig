@@ -11,6 +11,27 @@ export const WHATSAPP_LINK =
 export const dictionary = {
   de: {
     /*
+     * System-Notes (PHASE A — Geruest).
+     *
+     * `empty` ist der wichtigste Schluessel hier: Solange nichts
+     * veroeffentlicht ist, sagt die Seite das in einem Satz — statt drei
+     * erfundene Beispielartikel zu zeigen, die jeder als Fassade erkennt.
+     */
+    insightsPage: {
+      eyebrow: "Insights",
+      title: "Notizen aus dem Bau.",
+      lead: "Kein Blog. Notizen aus dem Betrieb: warum eine Entscheidung so und nicht anders gefallen ist, was ein System im Alltag gelehrt hat, welche Annahme sich als falsch herausgestellt hat.",
+      metaTitle: "Insights — System-Notes von creaDIG",
+      metaDescription:
+        "Notizen aus dem Bau eigener Systeme: Entscheidungen, Erfahrungen aus dem Betrieb und was sich als falsch herausgestellt hat.",
+      emptyTitle: "Noch nichts veröffentlicht.",
+      emptyBody:
+        "Die erste Notiz steht noch aus. Wir schreiben hier erst, wenn ein System lange genug gelaufen ist, dass sich etwas daraus lernen lässt — bis dahin bleibt die Seite leer, statt sich mit Beispieltexten zu füllen.",
+      emptyCtaProducts: "Was wir gebaut haben",
+      emptyCtaWorks: "Zur Werkschau",
+      readLabel: "Lesen",
+    },
+    /*
      * Kontaktseite (PHASE A, Master-Prompt 4 §7).
      *
      * Der Kontakt war bisher ein Formular plus „Termin in 20 Minuten". Das
@@ -783,6 +804,20 @@ export const dictionary = {
   },
 
   tr: {
+    insightsPage: {
+      eyebrow: "Insights",
+      title: "Kurma sürecinden notlar.",
+      lead: "Blog değil. İşletmeden notlar: bir kararın neden böyle alındığı, bir sistemin günlük kullanımda ne öğrettiği, hangi varsayımın yanlış çıktığı.",
+      metaTitle: "Insights — creaDIG sistem notları",
+      metaDescription:
+        "Kendi sistemlerimizi kurarken tutulan notlar: kararlar, işletme deneyimleri ve yanlış çıkan varsayımlar.",
+      emptyTitle: "Henüz bir yazı yok.",
+      emptyBody:
+        "İlk not henüz yazılmadı. Buraya ancak bir sistem, kendisinden bir şey öğrenilecek kadar uzun süre çalıştığında yazarız — o zamana kadar sayfa örnek metinlerle dolmak yerine boş kalır.",
+      emptyCtaProducts: "Ne inşa ettik",
+      emptyCtaWorks: "Seçkiye git",
+      readLabel: "Oku",
+    },
     kontaktPage: {
       eyebrow: "İletişim",
       title: "Size uyan yolu seçin.",
