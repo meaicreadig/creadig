@@ -31,6 +31,7 @@ export function LeistungenPageBody() {
       <PageHeader
         eyebrow={t.leistungenPage.eyebrow}
         title={t.leistungenPage.title}
+        crumbLabel={t.nav.leistungen}
         lead={t.leistungenPage.lead}
       >
         {/* Kategorie-Korrektur (§7): der Preis-Rahmen als Satz, nicht als Tabelle. */}

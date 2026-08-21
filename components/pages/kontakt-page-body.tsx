@@ -43,7 +43,8 @@ export function KontaktPageBody() {
 
   return (
     <main>
-      <PageHeader eyebrow={copy.eyebrow} title={copy.title} lead={copy.lead}>
+      <PageHeader eyebrow={copy.eyebrow} title={copy.title}
+        crumbLabel={t.nav.kontakt} lead={copy.lead}>
         {/* E-Mail steht bewusst schon hier: Sie ist der einzige Weg, der ohne
             Formular und ohne Messenger auskommt — und für alles Schriftliche
             (Angebote, Unterlagen, Förderanträge) der richtige. */}

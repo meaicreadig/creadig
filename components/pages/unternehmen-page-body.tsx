@@ -26,7 +26,8 @@ export function UnternehmenPageBody({ location }: { location: React.ReactNode })
 
   return (
     <main>
-      <PageHeader eyebrow={copy.eyebrow} title={copy.title} lead={copy.lead}>
+      <PageHeader eyebrow={copy.eyebrow} title={copy.title}
+        crumbLabel={t.nav.unternehmen} lead={copy.lead}>
         <div className="border-line mt-12 border-t pt-8">
           <p className="type-statement max-w-4xl text-balance">{copy.statement}</p>
         </div>

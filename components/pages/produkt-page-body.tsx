@@ -84,14 +84,14 @@ export function ProduktPageBody({
             </Reveal>
 
             <Reveal delay={0.08} className="lg:col-span-5">
-              <div className="border-line border-t pt-7">
-                <p className="eyebrow text-gold-text">{copy.whatLabel}</p>
-                <p className="type-body text-foreground/85 mt-4 text-pretty">{product.what}</p>
-              </div>
-
-              {/* Marken-Zeichen, wo eins vorliegt — sonst das Monogramm. Nie ein
-                  kaputtes <img>. */}
-              <div className="border-line mt-10 flex h-16 items-center border-t pt-7">
+              {/*
+                Hier stand bis zur Sichtpruefung noch einmal `product.what` —
+                derselbe Satz, der zwei Bildschirmhoehen weiter oben schon als
+                Lead unter der H1 steht. Wiederholung ist kein Inhalt.
+                Marken-Zeichen, wo eins vorliegt — sonst das Monogramm. Nie ein
+                kaputtes <img>.
+              */}
+              <div className="border-line flex h-16 items-center border-t pt-7">
                 {logo?.logoPath ? (
                   <img
                     src={logo.logoPath}

@@ -27,6 +27,7 @@ export function ArbeitenPageBody() {
       <PageHeader
         eyebrow={t.arbeitenPage.eyebrow}
         title={t.arbeitenPage.title}
+        crumbLabel={t.nav.arbeiten}
         lead={t.arbeitenPage.lead}
       />
       {/* Die H1 steht im Kopf — die Werkschau kommt ohne zweite Überschrift. */}

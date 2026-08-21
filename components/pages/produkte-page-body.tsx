@@ -26,7 +26,8 @@ export function ProduktePageBody() {
 
   return (
     <main>
-      <PageHeader eyebrow={copy.eyebrow} title={copy.title} lead={copy.lead} />
+      <PageHeader eyebrow={copy.eyebrow} title={copy.title}
+        crumbLabel={t.nav.produkte} lead={copy.lead} />
 
       <section aria-label={copy.eyebrow} className="border-line border-b">
         <div className="section-shell">
@@ -47,24 +48,33 @@ export function ProduktePageBody() {
 
                     <div className="grid gap-x-10 gap-y-6 md:grid-cols-12 md:items-baseline">
                       <div className="md:col-span-4">
-                        <div className="flex items-center gap-4">
-                          {logo?.logoPath ? (
+                        {/*
+                          Die echten Produktlogos (fibero, CASSAMEA) SIND
+                          Wortmarken. Logo und Name nebeneinander lasen sich
+                          darum als „Fibero fibero" — wie ein Tippfehler. Wo
+                          ein Logo vorliegt, traegt es den Namen; der Text
+                          bleibt fuer Screenreader und Suche im alt-Attribut.
+                          Wo keins vorliegt, traegt das Monogramm plus Name.
+                        */}
+                        {logo?.logoPath ? (
+                          <h2>
                             <img
                               src={logo.logoPath}
-                              alt=""
-                              aria-hidden="true"
-                              className="h-7 w-auto max-w-[7rem] opacity-70 grayscale transition-all duration-500 group-hover:opacity-100 group-hover:grayscale-0 dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
+                              alt={product.name}
+                              className="h-8 w-auto max-w-[9rem] opacity-80 grayscale transition-all duration-500 group-hover:opacity-100 group-hover:grayscale-0 dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
                             />
-                          ) : (
+                          </h2>
+                        ) : (
+                          <div className="flex items-center gap-4">
                             <span
                               aria-hidden="true"
                               className="border-line-strong text-muted-foreground group-hover:border-gold group-hover:text-gold-text flex size-9 items-center justify-center border text-sm font-semibold tracking-tight transition-colors duration-500"
                             >
                               {product.mark}
                             </span>
-                          )}
-                          <h2 className="type-h3">{product.name}</h2>
-                        </div>
+                            <h2 className="type-h3">{product.name}</h2>
+                          </div>
+                        )}
                         <p className="eyebrow text-muted-foreground mt-5">{product.sector}</p>
                       </div>
 

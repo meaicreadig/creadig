@@ -27,12 +27,21 @@ export type Crumb = { label: string; href: string }
 export function PageHeader({
   eyebrow,
   title,
+  crumbLabel,
   lead,
   crumbs = [],
   children,
 }: {
   eyebrow: string
   title: string
+  /**
+   * Name der Seite in den Brotkrumen. Ohne Angabe steht dort die H1 — und die
+   * ist auf einer Uebersichtsseite ein ganzer Satz („Vier Produkte, die wir
+   * selbst betreiben."). In einer Brotkrumen-Zeile liest sich das wie ein
+   * Fehler. Uebersichtsseiten geben darum den Bereichsnamen an; Detailseiten
+   * (Produkt, Arbeit) tragen ohnehin nur ihren Eigennamen als H1.
+   */
+  crumbLabel?: string
   lead?: string
   /** Zwischenglieder OHNE Startseite und OHNE die aktuelle Seite. */
   crumbs?: Crumb[]
@@ -71,7 +80,7 @@ export function PageHeader({
             <li className="flex items-center gap-2">
               <ChevronRight aria-hidden="true" className="size-3.5" strokeWidth={1.5} />
               <span aria-current="page" className="text-foreground">
-                {title}
+                {crumbLabel ?? title}
               </span>
             </li>
           </ol>

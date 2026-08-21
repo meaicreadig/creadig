@@ -30,7 +30,8 @@ export function InsightsPageBody() {
 
   return (
     <main>
-      <PageHeader eyebrow={copy.eyebrow} title={copy.title} lead={copy.lead} />
+      <PageHeader eyebrow={copy.eyebrow} title={copy.title}
+        crumbLabel={t.nav.insights} lead={copy.lead} />
 
       <section aria-labelledby="insights-title" className="border-line border-b">
         <div className="section-shell">
