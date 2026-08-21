@@ -11,6 +11,53 @@ export const WHATSAPP_LINK =
 export const dictionary = {
   de: {
     /*
+     * Produkt-Ebene (PHASE A): Uebersicht + eine Seite je Produkt.
+     *
+     * Der staerkste Beweis des Hauses — keine Agentur baut eigene Software.
+     * Alle Angaben kommen aus `site-data.productWorks`; hier stehen nur die
+     * Beschriftungen drumherum.
+     */
+    produktePage: {
+      eyebrow: "Produkte",
+      title: "Vier Produkte, die wir selbst betreiben.",
+      lead: "Keine Ankündigungen, keine Konzeptfolien. Jedes dieser Produkte hat creaDIG von Grund auf gebaut — und setzt es im eigenen Tagesgeschäft ein.",
+      metaTitle: "Eigene Produkte — meAI, fibero, CASSAMEA, meahv",
+      metaDescription:
+        "Die vier eigenen Produkte von creaDIG: meAI (KI-Business-Betriebssystem), fibero (Glasfaser-Operations), CASSAMEA (Gastro-Kasse, Schweiz) und meahv (Hausverwaltung).",
+      builtLabel: "Was wir gebaut haben",
+      sectorLabel: "Sektor",
+      statusLabel: "Stand",
+      regionLabel: "Markt",
+      openLabel: "Produkt ansehen",
+      liveLabel: "Live öffnen",
+      clientWorkTitle: "Was wir für andere gebaut haben.",
+      clientWorkNote: "Ausdrücklich kein eigenes Produkt — Arbeiten für Auftraggeber.",
+      clientWorkCta: "Zur Werkschau",
+    },
+    produktPage: {
+      breadcrumb: "Produkte",
+      builtLabel: "Was wir gebaut haben",
+      whatLabel: "Wofür es gebaut ist",
+      sectorLabel: "Sektor",
+      statusLabel: "Stand",
+      regionLabel: "Markt",
+      liveLabel: "Live öffnen",
+      backLabel: "Alle Produkte",
+      /*
+       * Steht NUR, solange keine echten Screenshots im Repo liegen. Es ist
+       * kein Platzhalter fuer ein Bild — es ist die ehrliche Auskunft,
+       * warum hier keins steht. Ein Deko-Laptop waere die Alternative, und
+       * die ist gesperrt.
+       */
+      screensPending:
+        "Oberflächen zeigen wir erst, wenn wir echte Aufnahmen aus dem laufenden System zeigen können. Bis dahin steht hier, was gebaut ist — und nicht ein Bild, das etwas anderes behauptet.",
+      screensLabel: "Aus dem laufenden System",
+      ctaTitle: "Passt das zu Ihrem Betrieb?",
+      ctaBody: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sehen uns den Betrieb an und sagen ehrlich, ob wir helfen können.",
+      ctaPrimary: "Projekt starten",
+      ctaSecondary: "Alle Produkte",
+    },
+    /*
      * Uebersichtsseite /leistungen (PHASE A).
      *
      * Sie erfindet nichts: Die fuenf Ebenen, der Ablauf, die Pakete und der
@@ -642,6 +689,40 @@ export const dictionary = {
   },
 
   tr: {
+    produktePage: {
+      eyebrow: "Ürünler",
+      title: "Kendi işlettiğimiz dört ürün.",
+      lead: "Duyuru yok, konsept slaytı yok. Bu ürünlerin her birini creaDIG sıfırdan kurdu — ve kendi günlük işinde kullanıyor.",
+      metaTitle: "Kendi ürünlerimiz — meAI, fibero, CASSAMEA, meahv",
+      metaDescription:
+        "creaDIG'in dört kendi ürünü: meAI (yapay zekâ tabanlı iş işletim sistemi), fibero (fiber operasyonu), CASSAMEA (İsviçre için gastronomi kasası) ve meahv (bina yönetimi).",
+      builtLabel: "Ne inşa ettik",
+      sectorLabel: "Sektör",
+      statusLabel: "Durum",
+      regionLabel: "Pazar",
+      openLabel: "Ürünü gör",
+      liveLabel: "Canlı aç",
+      clientWorkTitle: "Başkaları için ne inşa ettik.",
+      clientWorkNote: "Açıkça kendi ürünümüz değil — iş verenler için yapılan işler.",
+      clientWorkCta: "Seçkiye git",
+    },
+    produktPage: {
+      breadcrumb: "Ürünler",
+      builtLabel: "Ne inşa ettik",
+      whatLabel: "Ne için kurulmuş",
+      sectorLabel: "Sektör",
+      statusLabel: "Durum",
+      regionLabel: "Pazar",
+      liveLabel: "Canlı aç",
+      backLabel: "Tüm ürünler",
+      screensPending:
+        "Arayüzleri ancak çalışan sistemden gerçek görüntüler gösterebildiğimizde paylaşırız. O zamana kadar burada ne kurulduğu yazar — başka bir şey iddia eden bir görsel değil.",
+      screensLabel: "Çalışan sistemden",
+      ctaTitle: "Bu sizin işletmenize uyar mı?",
+      ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmenize bakar ve yardımcı olup olamayacağımızı dürüstçe söyleriz.",
+      ctaPrimary: "Projeye başla",
+      ctaSecondary: "Tüm ürünler",
+    },
     leistungenPage: {
       eyebrow: "Hizmetler",
       title: "Beş katman, üst üste kuruldu.",
