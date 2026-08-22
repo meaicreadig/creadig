@@ -6,7 +6,6 @@ import { LocaleProvider } from "@/components/locale-provider"
 import { SiteNav } from "@/components/site-nav"
 import { SiteFooter } from "@/components/site-footer"
 import { StickyWhatsApp } from "@/components/sticky-whatsapp"
-import { AiAssistant } from "@/components/ai-assistant"
 import { CookieConsent } from "@/components/consent/cookie-consent"
 import {
   address,
@@ -260,7 +259,6 @@ export default function RootLayout({
             {children}
             <SiteFooter />
             <StickyWhatsApp />
-            <AiAssistant />
             <CookieConsent />
           </LocaleProvider>
         </ThemeProvider>

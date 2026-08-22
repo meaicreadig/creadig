@@ -632,9 +632,6 @@ export const dictionary = {
       appointmentValue:
         "Wir sehen uns Ihren Betrieb an und sagen Ihnen, was wir bauen würden — und was nicht. Auch dann, wenn die Antwort „noch nicht“ lautet.",
       appointmentCta: "Termin anfragen",
-      chatTitle: "KI-Assistent",
-      chatNote: "Fragen Sie direkt auf der Seite.",
-      chatCta: "Assistent öffnen",
       locationsLabel: "Sitz",
       marketsLabel: "Märkte",
       // Einwilligung vor der Uebergabe an WhatsApp/E-Mail (Art. 6 Abs. 1 lit. a DSGVO).
@@ -829,33 +826,6 @@ export const dictionary = {
       privacy: "Datenschutz",
       socialLabel: "Social",
       rights: "Alle Rechte vorbehalten.",
-    },
-    chat: {
-      title: "creaDIG Assistent",
-      subtitle: "Antwortet in DE & TR",
-      open: "Assistent öffnen",
-      close: "Assistent schließen",
-      placeholder: "Frage stellen …",
-      send: "Senden",
-      greeting:
-        "Guten Tag. Ich beantworte Fragen zu creaDIG, unseren Systemen und Paketen. Womit können wir helfen?",
-      demoNote: "Demo-Antworten. Die Anbindung an die KI folgt.",
-      suggestions: [
-        "Was kostet ein Auftritt?",
-        "Was ist meAI?",
-        "Arbeiten Sie in der Schweiz?",
-        "Wie läuft ein Projekt ab?",
-      ],
-      answerPrice:
-        "Wir arbeiten mit drei festen Paketen: Identity €350 einmalig, Growth Partner €500 pro Monat und Architecture €1.500 pro Monat. Transparent, ohne versteckte Kosten.",
-      answerMeai:
-        "meAI ist unser KI-Business-Betriebssystem — es bündelt Zahlen, Aufgaben und Dokumente und bereitet Entscheidungen vor. Live unter meai.run.",
-      answerSwiss:
-        "Ja. Unser Sitz ist das ICO InnovationsCentrum Osnabrück; die Schweiz betreuen wir als Markt. CASSAMEA ist speziell für die schweizerische Gastronomie gebaut.",
-      answerProcess:
-        "In drei Schritten: verstehen, bauen, betreiben. Wir sehen uns den Betrieb an, bauen das System und betreiben es anschließend weiter.",
-      answerFallback:
-        "Das klären wir am besten direkt. Schreiben Sie uns per WhatsApp an +41 76 504 58 79 — oder nutzen Sie das Kontaktformular.",
     },
   },
 
@@ -1379,9 +1349,6 @@ export const dictionary = {
       appointmentValue:
         "İşletmenize bakar ve ne inşa edeceğimizi söyleriz — neyi inşa etmeyeceğimizi de. Cevap „henüz değil“ olsa bile.",
       appointmentCta: "Randevu talep et",
-      chatTitle: "Yapay zekâ asistanı",
-      chatNote: "Doğrudan sayfada sorun.",
-      chatCta: "Asistanı aç",
       locationsLabel: "Merkez",
       marketsLabel: "Pazarlar",
       privacyConsentPrefix: "",
@@ -1569,33 +1536,6 @@ export const dictionary = {
       privacy: "Gizlilik",
       socialLabel: "Sosyal",
       rights: "Tüm hakları saklıdır.",
-    },
-    chat: {
-      title: "creaDIG Asistanı",
-      subtitle: "DE & TR yanıt verir",
-      open: "Asistanı aç",
-      close: "Asistanı kapat",
-      placeholder: "Soru sorun …",
-      send: "Gönder",
-      greeting:
-        "Merhaba. creaDIG, sistemlerimiz ve paketlerimiz hakkındaki soruları yanıtlıyorum. Nasıl yardımcı olabiliriz?",
-      demoNote: "Demo yanıtlar. Yapay zekâ bağlantısı sonra eklenecek.",
-      suggestions: [
-        "Bir kimlik ne kadar?",
-        "meAI nedir?",
-        "İsviçre'de çalışıyor musunuz?",
-        "Proje nasıl ilerler?",
-      ],
-      answerPrice:
-        "Üç sabit paketle çalışıyoruz: Identity tek seferlik €350, Growth Partner aylık €500 ve Architecture aylık €1.500. Şeffaf, gizli maliyet yok.",
-      answerMeai:
-        "meAI, yapay zekâ tabanlı iş işletim sistemimizdir — sayıları, görevleri ve belgeleri toplar, kararları hazırlar. meai.run adresinde canlı.",
-      answerSwiss:
-        "Evet. Merkezimiz Osnabrück'teki ICO InnovationsCentrum; İsviçre'ye pazar olarak hizmet veriyoruz. CASSAMEA özellikle İsviçre gastronomisi için kuruldu.",
-      answerProcess:
-        "Üç adımda: anlamak, kurmak, işletmek. İşletmeye bakar, sistemi kurar ve ardından işletmeye devam ederiz.",
-      answerFallback:
-        "Bunu en iyi doğrudan netleştiririz. WhatsApp'tan +41 76 504 58 79 numarasına yazın — veya iletişim formunu kullanın.",
     },
   },
 } as const

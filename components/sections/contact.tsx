@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ArrowUpRight, CalendarDays, MessageSquare, Send } from "lucide-react"
+import { ArrowUpRight, CalendarDays, Send } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
@@ -11,11 +11,6 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { contact } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-
-/** Öffnet den Chat-Assistenten (siehe components/ai-assistant.tsx). */
-function openAssistant() {
-  window.dispatchEvent(new CustomEvent("creadig:open-assistant"))
-}
 
 export function Contact() {
   const { t } = useLocale()
@@ -307,29 +302,6 @@ export function Contact() {
                   strokeWidth={1.5}
                 />
               </Link>
-            </Reveal>
-
-            <Reveal delay={0.18}>
-              <button
-                type="button"
-                onClick={openAssistant}
-                className="group border-line hover:bg-foreground/[0.03] relative flex w-full items-start gap-5 border-t p-7 text-left transition-colors duration-500"
-              >
-                <span
-                  aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
-                />
-                <MessageSquare className="text-gold mt-1 size-5 shrink-0" strokeWidth={1.5} />
-                <span className="flex-1">
-                  <span className="text-display block text-xl">{t.contact.chatTitle}</span>
-                  <span className="text-muted-foreground mt-2 block text-sm">{t.contact.chatNote}</span>
-                  <span className="text-gold-text mt-3 block text-sm">{t.contact.chatCta}</span>
-                </span>
-                <ArrowUpRight
-                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 transition-colors duration-500"
-                  strokeWidth={1.5}
-                />
-              </button>
             </Reveal>
 
             {/* Sitz = Osnabrück (ICO). Die Schweiz ist Markt, nicht Standort. */}

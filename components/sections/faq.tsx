@@ -12,7 +12,7 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
  * Die sechs Fragen sind die, die im Erstgespräch ohnehin kommen; sie hier
  * vorwegzunehmen nimmt dem Formular die Hürde. Jede Antwort ist wörtlich
  * die, die auch am Telefon gegeben wird — die Texte stammen aus den bereits
- * freigegebenen Assistenten- und Förder-Antworten, nichts ist dazuerfunden.
+ * belegten Angaben aus dem Woerterbuch, nichts ist dazuerfunden.
  *
  * Bewusst `<details>` statt eines React-Accordions: Tastatur, Screenreader
  * und die Seitensuche des Browsers (Strg+F findet auch zugeklappten Text)
