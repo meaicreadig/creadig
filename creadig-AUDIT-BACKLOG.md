@@ -7,11 +7,11 @@ Score = (Wirkung × Dringlichkeit) ÷ Personentage. Reihenfolge folgt Wirkung/Au
 ---
 
 ## WELLE 1 — sofort (≈1 Tag): Deploy grün + sichtbar lebendig
-- [ ] **TECH-1** Deploy-Function schluckt Repo-Root (Score 100 · 0,25 PT) → in `next.config.ts` top-level `outputFileTracingExcludes: {"*":[".git/**",".next/cache/**","_legacy/**","design-mockup/**",".cursor/**",".claude/**",".video-analysis/**","**/*.pdf","**/*.zip"]}`. **Ohne das ist NICHTS auslieferbar.**
-- [ ] **VIS-1** „Dunkle" Bänder sind nicht dunkel (Score 25 · 1 PT) → `.section-dark` im Hellmodus echten dunklen Tokensatz geben (`--background:#201e1b; --foreground:#fbfbf9`). Wirkt auf Impact/meAI/Closing/Footer = echter Rhythmus. **Kernfix gegen „still/boutique".**
-- [ ] **VIS-3** Typo zu groß/fett (Score 32 · 0,5 PT) → `type-h2` clamp(1.875rem,4vw,3.25rem)/weight 600; `type-display` max 7rem; `type-h1` max 3rem.
-- [ ] **VIS-4** Gold zu schwach, klebt am Label (Score 24 · 0,5 PT) → Eyebrow-Linie 2px + `gold-text`; Abstände öffnen; zwei Inline-Varianten auf eine Komponente.
-- [ ] **SEC-6** Clickjacking/HSTS (Score 40 · 0,1 PT) → `X-Frame-Options: DENY` + HSTS `includeSubDomains; preload`.
+- [x] **TECH-1** Deploy-Function schluckt Repo-Root (Score 100 · 0,25 PT) → in `next.config.ts` top-level `outputFileTracingExcludes: {"*":[".git/**",".next/cache/**","_legacy/**","design-mockup/**",".cursor/**",".claude/**",".video-analysis/**","**/*.pdf","**/*.zip"]}`. **Ohne das ist NICHTS auslieferbar.**
+- [x] **VIS-1** „Dunkle" Bänder sind nicht dunkel (Score 25 · 1 PT) → `.section-dark` im Hellmodus echten dunklen Tokensatz geben (`--background:#201e1b; --foreground:#fbfbf9`). Wirkt auf Impact/meAI/Closing/Footer = echter Rhythmus. **Kernfix gegen „still/boutique".**
+- [x] **VIS-3** Typo zu groß/fett (Score 32 · 0,5 PT) → `type-h2` clamp(1.875rem,4vw,3.25rem)/weight 600; `type-display` max 7rem; `type-h1` max 3rem.
+- [x] **VIS-4** Gold zu schwach, klebt am Label (Score 24 · 0,5 PT) → Eyebrow-Linie 2px + `gold-text`; Abstände öffnen; zwei Inline-Varianten auf eine Komponente.
+- [x] **SEC-6** Clickjacking/HSTS (Score 40 · 0,1 PT) → `X-Frame-Options: DENY` + HSTS `includeSubDomains; preload`.
 - [ ] **TECH-3** Fremddateien aus Deploy-Root (Score 36 · 0,25 PT) → `Archiv_creadig.zip`, PDFs, `_legacy/`, `design-mockup/` aus dem Root ziehen (Repo-Hygiene).
 
 ## WELLE 2 — diese Woche
