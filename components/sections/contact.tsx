@@ -25,6 +25,34 @@ export function Contact() {
     privacy?: boolean
   }>({})
   const [error, setError] = useState<string | null>(null)
+  /*
+   * UX-2: Nach dem Klick stand bisher nichts da. Ein blockiertes Popup und
+   * eine geglueckte Uebergabe sahen exakt gleich aus — beide unsichtbar.
+   * `handoff` ist bewusst KEINE Erfolgsmeldung: Die Nachricht ist erst raus,
+   * wenn der Absender sie in WhatsApp bzw. seinem Mailprogramm bestaetigt,
+   * und genau das steht dann dort.
+   */
+  const [handoff, setHandoff] = useState<"whatsapp" | "mail" | null>(null)
+
+  /** Beide Wege laufen durch dieselbe Pruefung. `true` = darf uebergeben werden. */
+  function validate() {
+    const bad = {
+      name: !name.trim(),
+      message: !message.trim(),
+      privacy: !privacyOk,
+    }
+    setInvalid(bad)
+    if (bad.name || bad.message) {
+      setError(t.contact.errRequired)
+      return false
+    }
+    if (bad.privacy) {
+      setError(t.contact.errPrivacy)
+      return false
+    }
+    setError(null)
+    return true
+  }
 
   const composed = [
     name && `${t.contact.nameLabel}: ${name}`,
@@ -75,22 +103,23 @@ export function Contact() {
                   // Gleiche Regel wie in der alten `ct_*`-Logik: ohne Name und
                   // ohne Anliegen wird nichts verschickt. Neu: ohne Einwilligung
                   // ebenfalls nicht.
-                  const bad = {
-                    name: !name.trim(),
-                    message: !message.trim(),
-                    privacy: !privacyOk,
-                  }
-                  setInvalid(bad)
-                  if (bad.name || bad.message) {
-                    setError(t.contact.errRequired)
+                  if (!validate()) {
+                    setHandoff(null)
                     return
                   }
-                  if (bad.privacy) {
-                    setError(t.contact.errPrivacy)
+                  /*
+                    Der Rueckgabewert von `window.open` ist die einzige Stelle,
+                    an der ein blockiertes Popup ueberhaupt bemerkbar ist. Ohne
+                    diese Pruefung sah "Browser hat es geblockt" genauso aus wie
+                    "hat geklappt": naemlich nach gar nichts.
+                  */
+                  const opened = window.open(whatsappHref, "_blank", "noopener,noreferrer")
+                  if (!opened) {
+                    setHandoff(null)
+                    setError(`${t.contact.errBlocked} ${contact.email}.`)
                     return
                   }
-                  setError(null)
-                  window.open(whatsappHref, "_blank", "noopener,noreferrer")
+                  setHandoff("whatsapp")
                 }}
               >
                 <FieldGroup className="gap-8">
@@ -192,6 +221,32 @@ export function Contact() {
                   </p>
                 )}
 
+                {/*
+                  Kein Erfolgs-Haken: Die Anfrage ist an dieser Stelle noch
+                  NICHT bei uns. `role="status"` statt `role="alert"`, weil es
+                  eine Zustandsmeldung ist und keine Fehlermeldung.
+                */}
+                {handoff && !error && (
+                  <div
+                    role="status"
+                    className="border-gold/45 bg-muted border-l-2 py-4 pl-5"
+                  >
+                    <p className="type-small text-foreground">{t.contact.handoffTitle}</p>
+                    <p className="type-small text-muted-foreground mt-2 text-pretty">
+                      {handoff === "whatsapp" ? t.contact.handoffWhatsapp : t.contact.handoffMail}
+                    </p>
+                    <a
+                      href={handoff === "whatsapp" ? whatsappHref : mailHref}
+                      {...(handoff === "whatsapp"
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
+                      className="text-gold-text hover:text-foreground text-meta mt-3 inline-block transition-colors duration-500"
+                    >
+                      {t.contact.handoffRetry}
+                    </a>
+                  </div>
+                )}
+
                 <div className="flex flex-wrap items-center gap-3">
                   <button
                     type="submit"
@@ -214,21 +269,11 @@ export function Contact() {
                   <button
                     type="button"
                     onClick={() => {
-                      const bad = {
-                        name: !name.trim(),
-                        message: !message.trim(),
-                        privacy: !privacyOk,
-                      }
-                      setInvalid(bad)
-                      if (bad.name || bad.message) {
-                        setError(t.contact.errRequired)
+                      if (!validate()) {
+                        setHandoff(null)
                         return
                       }
-                      if (bad.privacy) {
-                        setError(t.contact.errPrivacy)
-                        return
-                      }
-                      setError(null)
+                      setHandoff("mail")
                       window.location.href = mailHref
                     }}
                     className="border-line-strong hover:border-gold inline-flex items-center gap-2.5 border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"

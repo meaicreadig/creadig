@@ -642,6 +642,22 @@ export const dictionary = {
       errPrivacy: "Bitte bestätigen Sie die Datenschutzerklärung.",
       handoffNote:
         "Beim Absenden öffnet sich WhatsApp beziehungsweise Ihr E-Mail-Programm mit der fertigen Nachricht — versendet wird erst, wenn Sie es dort bestätigen.",
+      /*
+       * UX-2: Nach dem Klick stand bisher NICHTS. Wer einen Popup-Blocker
+       * hatte, sah keinen Unterschied zwischen "hat funktioniert" und "ist
+       * gar nichts passiert" — und wer WhatsApp geoeffnet bekam, konnte
+       * glauben, die Anfrage sei damit raus. Beide Zustaende stehen jetzt
+       * da, und der Erfolgstext sagt ausdruecklich, dass noch ein Schritt
+       * fehlt. "Anfrage steht." waere hier eine Luege.
+       */
+      handoffTitle: "Fast geschafft — ein Schritt fehlt noch.",
+      handoffWhatsapp:
+        "WhatsApp ist mit Ihrer fertigen Nachricht geöffnet. Bei uns ist sie erst, wenn Sie dort auf Senden tippen.",
+      handoffMail:
+        "Ihr E-Mail-Programm ist mit der fertigen Nachricht geöffnet. Bei uns ist sie erst, wenn Sie dort auf Senden klicken.",
+      handoffRetry: "Nichts passiert? Hier noch einmal öffnen.",
+      errBlocked:
+        "Ihr Browser hat das Fenster blockiert. Öffnen Sie WhatsApp bitte über den Link darunter — oder schreiben Sie direkt an",
     },
     /*
      * Abschluss-Band (B1) — der letzte Block vor dem Footer.
@@ -1358,6 +1374,14 @@ export const dictionary = {
       errPrivacy: "Lütfen gizlilik politikasını onaylayın.",
       handoffNote:
         "Gönderdiğinizde WhatsApp veya e-posta programınız hazır mesajla açılır — gönderim ancak orada onayladığınızda gerçekleşir.",
+      handoffTitle: "Neredeyse tamam — bir adım kaldı.",
+      handoffWhatsapp:
+        "WhatsApp hazır mesajınızla açıldı. Mesaj bize ancak orada Gönder'e dokunduğunuzda ulaşır.",
+      handoffMail:
+        "E-posta programınız hazır mesajla açıldı. Mesaj bize ancak orada Gönder'e tıkladığınızda ulaşır.",
+      handoffRetry: "Bir şey olmadı mı? Buradan tekrar açın.",
+      errBlocked:
+        "Tarayıcınız pencereyi engelledi. WhatsApp'ı lütfen aşağıdaki bağlantıdan açın — ya da doğrudan şu adrese yazın:",
     },
     closing: {
       eyebrow: "Sonraki adım",
