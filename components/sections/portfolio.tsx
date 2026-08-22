@@ -134,10 +134,7 @@ function WorkCard({
 function GroupHeading({ label, note }: { label: string; note: string }) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-      <div className="flex items-center gap-4">
-        <p className="eyebrow text-foreground">{label}</p>
-        <span aria-hidden="true" className="bg-gold h-px w-10" />
-      </div>
+      <SectionEyebrow label={label} />
       <p className="type-small text-muted-foreground">{note}</p>
     </div>
   )

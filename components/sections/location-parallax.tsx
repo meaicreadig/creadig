@@ -7,6 +7,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
 import { useLocale } from "@/components/locale-provider"
 import { SignatureMotif } from "@/components/brand/signature-motif"
 import { Reveal } from "@/components/ui/reveal"
+import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { address, addressLines } from "@/lib/site-data"
 
 /**
@@ -106,12 +107,11 @@ export function LocationParallax({ photoSrc }: { photoSrc: string | null }) {
         <div className="absolute inset-0 flex items-end">
           <div className="section-gutter pb-10 md:pb-14">
             <Reveal className="border-line bg-background/90 max-w-xl border p-7 backdrop-blur-sm md:p-9">
-              <span aria-hidden="true" className="bg-gold block h-px w-10" />
-              <p className="eyebrow text-gold-text mt-5">{t.location.eyebrow}</p>
+              <SectionEyebrow label={t.location.eyebrow} />
 
               <h2
                 id="standort-title"
-                className="type-h3 mt-4 text-balance"
+                className="type-h3 mt-7 text-balance"
               >
                 {address.venue}
               </h2>

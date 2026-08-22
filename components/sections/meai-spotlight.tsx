@@ -29,7 +29,7 @@ export function MeaiSpotlight() {
           {/* Text */}
           <div className="lg:col-span-6">
             <Reveal>
-          <SectionEyebrow label={t.meai.eyebrow} tone="gold" />
+          <SectionEyebrow label={t.meai.eyebrow} />
         </Reveal>
 
             <Reveal delay={0.05}>
