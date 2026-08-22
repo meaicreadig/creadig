@@ -2,9 +2,12 @@
 //
 // CEO-Entscheidung (gesperrt):
 //   Eigene Produkte = meAI · fibero · CASSAMEA · meahv  — mehr nicht.
-//   NÛR · Bir Damla Hayır · Rumi's Maison = Kundenwerk / Dienstleistung.
+//   Echte Kunden (Owner-Freigabe 22.08.2026) = NV SWISS · maqam.
+//   NÛR ist ein EIGENES Produkt, kein Kundenwerk. Bir Damla Hayır und
+//   Rumi's Maison sind nicht bestaetigt und erscheinen nirgends.
 //   PLANEX gehört nicht zu creaDIG und kommt nirgends vor.
 
+import { CLIENT_LOGOS } from "@/lib/client-logos.generated"
 import { publishedInsights } from "@/lib/insights"
 
 export type Region = "DE" | "CH" | "DE & CH"
@@ -24,9 +27,10 @@ export type BrandLogo = {
   name: string
   logoPath: string | null
   mark: string
-  region: Region
+  /** `null`, solange der Owner die Region nicht bestaetigt hat. */
+  region: Region | null
   color: string
-  /** Freigabe für die Bezeichnung „Kunde/Partner" liegt noch nicht vor. */
+  /** Schriftliche Freigabe für die Bezeichnung „Kunde/Partner" liegt vor. */
   approved: boolean
 }
 
@@ -66,10 +70,15 @@ export type Work = {
   slug: string
   name: string
   what: string
-  built: string
+  /**
+   * Was wir gebaut haben. `null`, solange der Owner den Umfang nicht
+   * bestaetigt hat — dann steht dort nichts statt einer Vermutung.
+   */
+  built: string | null
   outcome: string
   kind: "Produkt" | "Kundenwerk"
-  region: Region
+  /** `null`, solange der Owner die Region nicht bestaetigt hat. */
+  region: Region | null
   /**
    * Branche in zwei bis drei Worten — die dichte Register-Ansicht (B2) hat
    * keinen Platz fuer den ganzen `what`-Satz. Abgeleitet aus dem, was das
@@ -267,48 +276,106 @@ export function productNeighbours(slug: string): { prev: Work; next: Work } | nu
   }
 }
 
-/** Kundenwerk / Dienstleistung — ausdrücklich KEIN eigenes Produkt. */
+/**
+ * Echtes Kundenwerk — ausdrücklich KEIN eigenes Produkt.
+ *
+ * ---------------------------------------------------------------------------
+ * WER HIER STAND UND WARUM ER GEHEN MUSSTE (Owner-Freigabe 22.08.2026)
+ *   NÛR              — ein EIGENES Produkt des Hauses, nie ein Kunde.
+ *   Bir Damla Hayır  — nicht als zahlender Kunde bestaetigt. Kommt erst
+ *                      zurueck, wenn der Owner das ausdruecklich sagt.
+ *   Rumi's Maison    — [OWNER-BESTAETIGUNG AUSSTEHEND] echter zahlender
+ *                      Kunde? Bis zur Antwort: kein Eintrag, keine Seite,
+ *                      keine Nennung. Der Datensatz steht als Kommentar am
+ *                      Ende dieser Liste, damit nichts neu getippt werden
+ *                      muss, falls die Bestaetigung kommt.
+ *
+ * Ein eigenes Projekt als Kundenwerk auszugeben ist der eine Fehler, den
+ * diese Seite sich nicht leisten kann — sie hat sonst nichts als ihre
+ * Glaubwuerdigkeit.
+ *
+ * ---------------------------------------------------------------------------
+ * WAS FEHLT, STEHT AUF `null`
+ * Screenshots, Regionen, Links und Umfang liefert der Owner. Solange etwas
+ * fehlt, rendert das Feld nicht — geraten wird nichts.
+ */
 export const clientWorks: Work[] = [
   {
-    slug: "nur",
-    sector: "Bildung · Plattform",
+    slug: "nv-swiss",
+    sector: "Versicherung & Finanzen",
     year: null,
-    name: "NÛR",
-    what: "Qur'an-Plattform — Marke, Oberfläche und Inhalte.",
-    built: "Marke, Web, Inhaltsstruktur.",
-    outcome: "Kundenwerk",
+    name: "NV SWISS",
+    what: "Versicherungs- & Finanzmakler (Schweiz) — Marke, Website und Digitalisierung aus einer Hand.",
+    built: "Marke, Website, Digitalisierung.",
+    outcome: "Kundenwerk · live",
     kind: "Kundenwerk",
-    region: "DE & CH",
+    region: "CH",
+    // Noch kein freigegebener Screenshot — die Karte rendert ein Monogramm-Panel.
     image: null,
-    mark: "NÛ",
+    mark: "NV",
+    href: "https://nvswiss.ch",
+    live: true,
   },
   {
-    slug: "bir-damla-hayir",
-    sector: "Gemeinnützig · Spenden",
+    slug: "maqam",
+    sector: "Online-Business · E-Commerce",
     year: null,
-    name: "Bir Damla Hayır",
-    what: "Spendenplattform mit transparenter Mittelverwendung.",
-    built: "Plattform, Spendenfluss, Verwaltung.",
+    name: "maqam",
+    what: "Online-Business / E-Commerce.",
+    // Umfang, Region, Link und Screenshots liegen noch nicht vor.
+    // TODO (Owner): nachtragen — bis dahin rendern diese Felder nicht.
+    built: null,
     outcome: "Kundenwerk",
     kind: "Kundenwerk",
-    region: "DE",
-    image: "/works/bir-damla-hayir.png",
-    mark: "BD",
+    region: null,
+    image: null,
+    mark: "mq",
   },
-  {
-    slug: "rumis-maison",
-    sector: "Lifestyle · Marke",
-    year: null,
-    name: "Rumi's Maison",
-    what: "Markenauftritt und Website für eine Lifestyle-Marke.",
-    built: "Marke, Web, Inhalte, laufende Betreuung.",
-    outcome: "Kundenwerk",
-    kind: "Kundenwerk",
-    region: "DE",
-    image: "/works/rumis-maison.png",
-    mark: "RM",
-  },
+  /*
+   * [OWNER-BESTAETIGUNG AUSSTEHEND] — Rumi's Maison
+   *
+   * Frage an den Owner: echter zahlender Kunde, ja oder nein? Bis zur
+   * schriftlichen Antwort erscheint der Eintrag nirgends. Wird er bestaetigt,
+   * kommt dieser Block zurueck in die Liste — unveraendert:
+   *
+   *   {
+   *     slug: "rumis-maison",
+   *     sector: "Lifestyle · Marke",
+   *     year: null,
+   *     name: "Rumi's Maison",
+   *     what: "Markenauftritt und Website für eine Lifestyle-Marke.",
+   *     built: "Marke, Web, Inhalte, laufende Betreuung.",
+   *     outcome: "Kundenwerk",
+   *     kind: "Kundenwerk",
+   *     region: "DE",
+   *     image: "/works/rumis-maison.png",
+   *     mark: "RM",
+   *   },
+   */
 ]
+
+/**
+ * Die Kunden-Logowand — dieselbe Quelle wie `clientWorks`, andere Form.
+ *
+ * Ein echtes Logo erscheint, sobald es unter `public/brand/clients/<slug>.svg`
+ * (oder `.png`) liegt; bis dahin traegt die Kachel ein sauberes Monogramm.
+ * Der `prebuild`-Hook liest das Verzeichnis einmal zur Bauzeit
+ * (`scripts/generate-client-logos.mjs`) — kein `fs` zur Laufzeit, siehe die
+ * Begruendung in `lib/product-media.ts`.
+ *
+ * `approved: true` gilt hier fuer alle: In dieser Liste steht nur, wen der
+ * Owner ausdruecklich als Kunden freigegeben hat.
+ */
+export const clientLogos: BrandLogo[] = clientWorks.map((work) => ({
+  name: work.name,
+  logoPath: CLIENT_LOGOS[work.slug] ?? null,
+  mark: work.mark,
+  region: work.region,
+  // Kein Markenfarben-Raten: bis ein Logo vorliegt, traegt die Kachel die
+  // Hausfarbe. Eine erfundene Markenfarbe waere eine erfundene Angabe.
+  color: "#be904e",
+  approved: true,
+}))
 
 /**
  * Referenzregister (B2) — dieselben Projekte, dichte Listenansicht.
@@ -346,7 +413,7 @@ export function workHref(work: Work): string {
  * Slugs, keine Kopien: Der Inhalt bleibt in `productWorks`/`clientWorks`, hier
  * steht nur die Reihenfolge. Wer einen Slug aendert, faellt beim Build auf.
  */
-export const featuredWorkSlugs = ["meai", "fibero", "rumis-maison"] as const
+export const featuredWorkSlugs = ["meai", "fibero", "nv-swiss"] as const
 
 /** Aufgeloest in der Reihenfolge oben; unbekannte Slugs fallen still weg. */
 export const featuredWorks: Work[] = featuredWorkSlugs

@@ -1,18 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { ArrowUpRight } from "lucide-react"
-import { SignatureMotif } from "@/components/brand/signature-motif"
-import { Reveal } from "@/components/ui/reveal"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { useLocale } from "@/components/locale-provider"
-import { WorkRegistry } from "@/components/sections/work-registry"
-import { clientWorks, furtherProjects, productWorks, workHref, type Work } from "@/lib/site-data"
-import { cn } from "@/lib/utils"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+import { SignatureMotif } from "@/components/brand/signature-motif";
+import { Reveal } from "@/components/ui/reveal";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { useLocale } from "@/components/locale-provider";
+import { WorkRegistry } from "@/components/sections/work-registry";
+import {
+  clientWorks,
+  furtherProjects,
+  productWorks,
+  workHref,
+  type Work,
+} from "@/lib/site-data";
+import { cn } from "@/lib/utils";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 
 /** Ersatzfläche für Cases ohne Mockup — statt eines leeren oder kaputten <img>. */
 function MonogramPanel({ mark }: { mark: string }) {
@@ -29,7 +35,7 @@ function MonogramPanel({ mark }: { mark: string }) {
         {mark}
       </span>
     </div>
-  )
+  );
 }
 
 /*
@@ -45,22 +51,31 @@ function WorkCard({
   builtLabel,
   compact = false,
 }: {
-  work: Work
-  builtLabel: string
-  compact?: boolean
+  work: Work;
+  builtLabel: string;
+  compact?: boolean;
 }) {
   return (
     <Link
       href={workHref(work)}
       className="group border-line bg-surface elevation-1 hover:elevation-2 relative flex w-full flex-col overflow-hidden border transition-shadow duration-500"
     >
-      <div className={cn("bg-muted relative overflow-hidden", compact ? "aspect-[16/9]" : "aspect-[16/10]")}>
+      <div
+        className={cn(
+          "bg-muted relative overflow-hidden",
+          compact ? "aspect-[16/9]" : "aspect-[16/10]",
+        )}
+      >
         {work.image ? (
           <Image
             src={work.image}
             alt={`${work.name} — ${work.what}`}
             fill
-            sizes={compact ? "(max-width: 1024px) 100vw, 33vw" : "(max-width: 1024px) 100vw, 50vw"}
+            sizes={
+              compact
+                ? "(max-width: 1024px) 100vw, 33vw"
+                : "(max-width: 1024px) 100vw, 50vw"
+            }
             className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
           />
         ) : (
@@ -78,12 +93,15 @@ function WorkCard({
           >
             {work.kind}
           </Badge>
-          <Badge
-            variant="outline"
-            className="border-background/40 bg-background/80 text-muted-foreground eyebrow rounded-none px-2.5 py-1 backdrop-blur-sm"
-          >
-            {work.region}
-          </Badge>
+          {/* Ohne bestaetigte Region kein leeres Badge. */}
+          {work.region && (
+            <Badge
+              variant="outline"
+              className="border-background/40 bg-background/80 text-muted-foreground eyebrow rounded-none px-2.5 py-1 backdrop-blur-sm"
+            >
+              {work.region}
+            </Badge>
+          )}
         </div>
 
         {work.live && (
@@ -91,28 +109,30 @@ function WorkCard({
             variant="outline"
             className="border-background/40 bg-background/80 eyebrow absolute top-4 right-4 gap-1.5 rounded-none px-2.5 py-1 backdrop-blur-sm"
           >
-            <span className="bg-gold size-1.5 rounded-full" aria-hidden="true" />
+            <span
+              className="bg-gold size-1.5 rounded-full"
+              aria-hidden="true"
+            />
             live
           </Badge>
         )}
 
-        {/* Hover-Reveal: was wir gebaut haben */}
-        <div className="bg-background/95 absolute inset-x-0 bottom-0 translate-y-full p-5 backdrop-blur-md transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0">
-          <p className="eyebrow text-gold-text">{builtLabel}</p>
-          <p className="type-small text-foreground mt-2 text-pretty">
-            {work.built}
-          </p>
-        </div>
+        {/* Hover-Reveal: was wir gebaut haben — nur, wo der Umfang belegt ist. */}
+        {work.built && (
+          <div className="bg-background/95 absolute inset-x-0 bottom-0 translate-y-full p-5 backdrop-blur-md transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0">
+            <p className="eyebrow text-gold-text">{builtLabel}</p>
+            <p className="type-small text-foreground mt-2 text-pretty">
+              {work.built}
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col justify-between gap-6 p-6 lg:p-8">
         <div>
           <div className="flex items-start justify-between gap-4">
             <h3
-              className={cn(
-                "text-foreground",
-                compact ? "type-h4" : "type-h3",
-              )}
+              className={cn("text-foreground", compact ? "type-h4" : "type-h3")}
             >
               {work.name}
             </h3>
@@ -122,12 +142,10 @@ function WorkCard({
             {work.what}
           </p>
         </div>
-        <p className="eyebrow text-muted-foreground/80">
-          {work.outcome}
-        </p>
+        <p className="eyebrow text-muted-foreground/80">{work.outcome}</p>
       </div>
     </Link>
-  )
+  );
 }
 
 /** Abschnitts-Überschrift innerhalb der Werkschau. */
@@ -137,17 +155,17 @@ function GroupHeading({ label, note }: { label: string; note: string }) {
       <SectionEyebrow label={label} />
       <p className="type-small text-muted-foreground">{note}</p>
     </div>
-  )
+  );
 }
 
 export function Portfolio({ heading = true }: { heading?: boolean }) {
-  const { t } = useLocale()
+  const { t } = useLocale();
   /*
    * Zwei Ansichten auf dieselbe Liste (B2). Karten sind der Default: Sie
    * zeigen, wie etwas aussieht. Das Register zeigt, wie viel es ist — und
    * beantwortet damit die Frage, die das Grid offen laesst.
    */
-  const [view, setView] = useState<"cards" | "registry">("cards")
+  const [view, setView] = useState<"cards" | "registry">("cards");
 
   return (
     <section
@@ -183,7 +201,11 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
         )}
       >
         <p className="eyebrow text-muted-foreground">{t.portfolio.viewLabel}</p>
-        <div role="group" aria-label={t.portfolio.viewLabel} className="flex gap-px">
+        <div
+          role="group"
+          aria-label={t.portfolio.viewLabel}
+          className="flex gap-px"
+        >
           {(
             [
               ["cards", t.portfolio.viewCards],
@@ -216,27 +238,50 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
         <>
           {/* Eigene Produkte — die großen Cases */}
           <Reveal className="mt-20">
-            <GroupHeading label={t.portfolio.products} note={t.portfolio.productsNote} />
+            <GroupHeading
+              label={t.portfolio.products}
+              note={t.portfolio.productsNote}
+            />
           </Reveal>
           <div className="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-8">
             {productWorks.map((work, index) => (
-              <Reveal key={work.slug} delay={(index % 2) * 0.08} className="flex">
+              <Reveal
+                key={work.slug}
+                delay={(index % 2) * 0.08}
+                className="flex"
+              >
                 <WorkCard work={work} builtLabel={t.portfolio.built} />
               </Reveal>
             ))}
           </div>
 
-          {/* Kundenwerk — ausdrücklich getrennt, kein eigenes Produkt */}
-          <Reveal className="mt-24">
-            <GroupHeading label={t.portfolio.clientWork} note={t.portfolio.clientWorkNote} />
-          </Reveal>
-          <div className="mt-8 grid gap-6 md:grid-cols-3 lg:gap-8">
-            {clientWorks.map((work, index) => (
-              <Reveal key={work.slug} delay={index * 0.08} className="flex">
-                <WorkCard work={work} builtLabel={t.portfolio.built} compact />
+          {/*
+            Kundenwerk — ausdrücklich getrennt, kein eigenes Produkt.
+            Liegt keine freigegebene Referenz vor, faellt die Gruppe samt
+            Ueberschrift weg. Eine Ueberschrift ueber einem leeren Raster
+            waere die Ankuendigung von etwas, das es nicht gibt.
+          */}
+          {clientWorks.length > 0 && (
+            <>
+              <Reveal className="mt-24">
+                <GroupHeading
+                  label={t.portfolio.clientWork}
+                  note={t.portfolio.clientWorkNote}
+                />
               </Reveal>
-            ))}
-          </div>
+              <div className="mt-8 grid gap-6 md:grid-cols-3 lg:gap-8">
+                {clientWorks.map((work, index) => (
+                  <Reveal key={work.slug} delay={index * 0.08} className="flex">
+                    <WorkCard
+                      work={work}
+                      builtLabel={t.portfolio.built}
+                      compact
+                    />
+                  </Reveal>
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
 
@@ -251,7 +296,9 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
               key={project.name}
               className="group bg-surface hover:bg-surface-raised flex items-baseline justify-between gap-4 px-6 py-7 transition-colors duration-500"
             >
-              <span className="text-subhead text-foreground text-xl">{project.name}</span>
+              <span className="text-subhead text-foreground text-xl">
+                {project.name}
+              </span>
               <span className="text-muted-foreground group-hover:text-gold-text text-right text-[0.75rem] transition-colors duration-500">
                 {project.what}
               </span>
@@ -266,5 +313,5 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
         )}
       </Reveal>
     </section>
-  )
+  );
 }

@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
-import { useLocale } from "@/components/locale-provider"
-import { PageHeader } from "@/components/ui/page-header"
-import { Reveal } from "@/components/ui/reveal"
-import { MagneticButton } from "@/components/ui/magnetic-button"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import type { CaseStudy, Work } from "@/lib/site-data"
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { useLocale } from "@/components/locale-provider";
+import { PageHeader } from "@/components/ui/page-header";
+import { Reveal } from "@/components/ui/reveal";
+import { MagneticButton } from "@/components/ui/magnetic-button";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
+import type { CaseStudy, Work } from "@/lib/site-data";
 
 /**
  * Eine Kundenwerk-Seite (PHASE A — Gerüst; das tiefe Case-Format folgt in
@@ -27,12 +27,12 @@ export function ArbeitPageBody({
   work,
   study,
 }: {
-  work: Work
+  work: Work;
   /** Freigegebene Fallbeschreibung zu diesem Werk — sonst null. */
-  study: CaseStudy | null
+  study: CaseStudy | null;
 }) {
-  const { t, locale } = useLocale()
-  const copy = t.arbeitPage
+  const { t, locale } = useLocale();
+  const copy = t.arbeitPage;
 
   return (
     <main>
@@ -51,31 +51,61 @@ export function ArbeitPageBody({
             <p className="eyebrow text-gold-text">{copy.sectorLabel}</p>
             <p className="type-body text-foreground/85 mt-3">{work.sector}</p>
           </div>
-          <div className="border-line pt-7 sm:border-l sm:pl-8">
-            <p className="eyebrow text-gold-text">{copy.regionLabel}</p>
-            <p className="type-body text-foreground/85 mt-3">{work.region}</p>
-          </div>
+          {/* Ohne bestaetigte Region faellt die ganze Zelle weg — kein Label ins Leere. */}
+          {work.region && (
+            <div className="border-line pt-7 sm:border-l sm:pl-8">
+              <p className="eyebrow text-gold-text">{copy.regionLabel}</p>
+              <p className="type-body text-foreground/85 mt-3">{work.region}</p>
+            </div>
+          )}
         </div>
       </PageHeader>
 
-      <section aria-labelledby="arbeit-gebaut-title" className="border-line border-b">
+      {/*
+        Die Sektion traegt ihren Namen ueber die H2 — faellt die weg (kein
+        belegter Umfang), muss der Name direkt an die Sektion, sonst zeigt
+        `aria-labelledby` ins Leere.
+      */}
+      <section
+        {...(work.built
+          ? { "aria-labelledby": "arbeit-gebaut-title" }
+          : { "aria-label": copy.builtLabel })}
+        className="border-line border-b"
+      >
         <div className="section-shell">
           <div className="grid gap-x-12 gap-y-14 lg:grid-cols-12">
-            <Reveal className="lg:col-span-7">
-              <SectionEyebrow label={copy.builtLabel} />
-              <h2 id="arbeit-gebaut-title" className="type-h3 mt-7 max-w-2xl text-balance">
-                {work.built}
-              </h2>
-            </Reveal>
+            {/*
+              Der Umfang traegt hier die Ueberschrift. Liegt er nicht vor,
+              faellt die Spalte weg und die belegten Angaben ruecken auf die
+              volle Breite — statt einer leeren H2 ueber einer halben Seite.
+            */}
+            {work.built && (
+              <Reveal className="lg:col-span-7">
+                <SectionEyebrow label={copy.builtLabel} />
+                <h2
+                  id="arbeit-gebaut-title"
+                  className="type-h3 mt-7 max-w-2xl text-balance"
+                >
+                  {work.built}
+                </h2>
+              </Reveal>
+            )}
 
-            <Reveal delay={0.08} className="lg:col-span-5">
+            <Reveal
+              delay={0.08}
+              className={work.built ? "lg:col-span-5" : "lg:col-span-8"}
+            >
               <div className="border-line border-t pt-7">
                 <p className="eyebrow text-gold-text">{copy.whatLabel}</p>
-                <p className="type-body text-foreground/85 mt-4 text-pretty">{work.what}</p>
+                <p className="type-body text-foreground/85 mt-4 text-pretty">
+                  {work.what}
+                </p>
               </div>
               <div className="border-line mt-10 border-t pt-7">
                 <p className="eyebrow text-gold-text">{copy.statusLabel}</p>
-                <p className="type-body text-foreground/85 mt-4 text-pretty">{work.outcome}</p>
+                <p className="type-body text-foreground/85 mt-4 text-pretty">
+                  {work.outcome}
+                </p>
               </div>
             </Reveal>
           </div>
@@ -85,13 +115,19 @@ export function ArbeitPageBody({
       {/* ------------------------------------------------------------------
           Fallbeschreibung — gated auf die schriftliche Freigabe des Kunden.
           ------------------------------------------------------------------ */}
-      <section aria-labelledby="arbeit-fall-title" className="border-line border-b">
+      <section
+        aria-labelledby="arbeit-fall-title"
+        className="border-line border-b"
+      >
         <div className={study ? "section-shell" : "section-shell-tight"}>
           {study ? (
             <>
               <Reveal>
                 <SectionEyebrow label={t.cases.eyebrow} />
-                <h2 id="arbeit-fall-title" className="type-h3 mt-7 max-w-2xl text-balance">
+                <h2
+                  id="arbeit-fall-title"
+                  className="type-h3 mt-7 max-w-2xl text-balance"
+                >
                   {t.cases.title}
                 </h2>
               </Reveal>
@@ -110,7 +146,9 @@ export function ArbeitPageBody({
                     className="border-line border-t pt-8 md:pr-10"
                   >
                     <p className="eyebrow text-gold-text">{label}</p>
-                    <p className="type-body text-foreground/85 mt-5 max-w-sm text-pretty">{body}</p>
+                    <p className="type-body text-foreground/85 mt-5 max-w-sm text-pretty">
+                      {body}
+                    </p>
                   </Reveal>
                 ))}
               </div>
@@ -128,12 +166,18 @@ export function ArbeitPageBody({
         </div>
       </section>
 
-      <section aria-labelledby="arbeit-cta-title" className="border-line border-b">
+      <section
+        aria-labelledby="arbeit-cta-title"
+        className="border-line border-b"
+      >
         <div className="section-shell-tight">
           <Reveal>
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <h2 id="arbeit-cta-title" className="type-h3 max-w-2xl text-balance">
+                <h2
+                  id="arbeit-cta-title"
+                  className="type-h3 max-w-2xl text-balance"
+                >
                   {copy.ctaTitle}
                 </h2>
                 <p className="type-body text-muted-foreground mt-5 max-w-xl text-pretty">
@@ -141,7 +185,9 @@ export function ArbeitPageBody({
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <MagneticButton href="/kontakt">{copy.ctaPrimary}</MagneticButton>
+                <MagneticButton href="/kontakt">
+                  {copy.ctaPrimary}
+                </MagneticButton>
                 <MagneticButton href="/arbeiten" variant="ghost">
                   {copy.ctaSecondary}
                 </MagneticButton>
@@ -161,5 +207,5 @@ export function ArbeitPageBody({
         </div>
       </section>
     </main>
-  )
+  );
 }

@@ -104,10 +104,13 @@ export function SelectedWork() {
                   <p className="type-lead text-muted-foreground mt-6 max-w-md text-pretty">
                     {work.what}
                   </p>
-                  <p className="type-small text-foreground/85 border-line mt-8 max-w-md border-t pt-6 text-pretty">
-                    <span className="text-gold-text">{t.portfolio.built}: </span>
-                    {work.built}
-                  </p>
+                  {/* Ohne belegten Umfang keine leere Zeile mit Label. */}
+                  {work.built && (
+                    <p className="type-small text-foreground/85 border-line mt-8 max-w-md border-t pt-6 text-pretty">
+                      <span className="text-gold-text">{t.portfolio.built}: </span>
+                      {work.built}
+                    </p>
+                  )}
                   <span className="text-gold-text mt-8 inline-flex items-center gap-2 text-sm tracking-wide">
                     {work.name}
                     <ArrowRight

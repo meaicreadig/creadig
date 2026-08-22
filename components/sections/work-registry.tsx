@@ -65,9 +65,12 @@ export function WorkRegistry() {
                   </span>
 
                   <span className="text-meta text-muted-foreground md:col-span-3 md:text-right">
-                    {/* Jahr nur, wo es belegt ist — sonst traegt die Zeile allein die Region. */}
-                    {work.year ? `${work.year} · ` : ""}
-                    {work.region}
+                    {/*
+                      Jahr und Region stehen beide nur, wo sie belegt sind.
+                      Fehlt beides, bleibt die Spalte leer — das ist richtig:
+                      Sie traegt kein Label, das ins Leere zeigen koennte.
+                    */}
+                    {[work.year, work.region].filter(Boolean).join(" · ")}
                   </span>
                 </div>
               </Link>

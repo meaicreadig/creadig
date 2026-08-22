@@ -2,7 +2,7 @@
 
 import { Reveal } from "@/components/ui/reveal"
 import { useLocale } from "@/components/locale-provider"
-import { brands, ownProducts, type Region } from "@/lib/site-data"
+import { brands, clientLogos, ownProducts, type Region } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /**
@@ -18,7 +18,7 @@ function LogoSlot({
 }: {
   name: string
   mark: string
-  region: Region
+  region: Region | null
   color: string
   logoPath: string | null
 }) {
@@ -57,14 +57,17 @@ function LogoSlot({
           </span>
         </>
       )}
-      <span className="text-muted-foreground eyebrow absolute top-3 right-3 transition-colors duration-500 group-hover:text-[var(--brand)]">
-        {region}
-      </span>
+      {/* Ohne bestaetigte Region steht dort nichts — keine Vermutung. */}
+      {region && (
+        <span className="text-muted-foreground eyebrow absolute top-3 right-3 transition-colors duration-500 group-hover:text-[var(--brand)]">
+          {region}
+        </span>
+      )}
     </div>
   )
 }
 
-type Row = { name: string; mark: string; region: Region; color: string; logoPath: string | null }
+type Row = { name: string; mark: string; region: Region | null; color: string; logoPath: string | null }
 
 function MarqueeRow({ items, direction }: { items: Row[]; direction: "left" | "right" }) {
   return (
@@ -96,6 +99,14 @@ export function LogoWall() {
   const { t } = useLocale()
 
   const productRow: Row[] = ownProducts.map(({ name, mark, region, color, logoPath }) => ({
+    name,
+    mark,
+    region,
+    color,
+    logoPath,
+  }))
+  // Echte Kunden — mit Freigabe, mit Logo sobald eins vorliegt (sonst Monogramm).
+  const clientRow: Row[] = clientLogos.map(({ name, mark, region, color, logoPath }) => ({
     name,
     mark,
     region,
@@ -148,6 +159,19 @@ export function LogoWall() {
         <span className="sr-only">
           {t.logos.ownProducts}: {productRow.map((i) => i.name).join(", ")}
         </span>
+
+        {clientRow.length > 0 && (
+          <>
+            <div className="section-gutter mt-14 mb-6 flex items-center gap-4">
+              <p className="eyebrow text-foreground">{t.logos.clients}</p>
+              <span aria-hidden="true" className="bg-line h-px flex-1" />
+            </div>
+            <MarqueeRow items={clientRow} direction="right" />
+            <span className="sr-only">
+              {t.logos.clients}: {clientRow.map((i) => i.name).join(", ")}
+            </span>
+          </>
+        )}
 
         {brandRow.length > 0 && (
           <>

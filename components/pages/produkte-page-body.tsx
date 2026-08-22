@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ArrowRight, ArrowUpRight } from "lucide-react"
-import { useLocale } from "@/components/locale-provider"
-import { PageHeader } from "@/components/ui/page-header"
-import { Reveal } from "@/components/ui/reveal"
-import { StatusDot } from "@/components/ui/status-dot"
-import { ClosingCta } from "@/components/sections/closing-cta"
-import { clientWorks, ownProducts, productWorks } from "@/lib/site-data"
+import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { useLocale } from "@/components/locale-provider";
+import { PageHeader } from "@/components/ui/page-header";
+import { Reveal } from "@/components/ui/reveal";
+import { StatusDot } from "@/components/ui/status-dot";
+import { ClosingCta } from "@/components/sections/closing-cta";
+import { clientWorks, ownProducts, productWorks } from "@/lib/site-data";
 
 /**
  * Übersicht der vier eigenen Produkte (PHASE A).
@@ -21,22 +21,31 @@ import { clientWorks, ownProducts, productWorks } from "@/lib/site-data"
  * steht hier nicht.
  */
 export function ProduktePageBody() {
-  const { t } = useLocale()
-  const copy = t.produktePage
+  const { t } = useLocale();
+  const copy = t.produktePage;
 
   return (
     <main>
-      <PageHeader eyebrow={copy.eyebrow} title={copy.title}
-        crumbLabel={t.nav.produkte} lead={copy.lead} />
+      <PageHeader
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        crumbLabel={t.nav.produkte}
+        lead={copy.lead}
+      />
 
       <section aria-label={copy.eyebrow} className="border-line border-b">
         <div className="section-shell">
           <ul className="flex flex-col">
             {productWorks.map((product, i) => {
-              const logo = ownProducts.find((p) => p.name === product.name)
+              const logo = ownProducts.find((p) => p.name === product.name);
 
               return (
-                <Reveal key={product.slug} delay={0.05 * i} as="li" className="group">
+                <Reveal
+                  key={product.slug}
+                  delay={0.05 * i}
+                  as="li"
+                  className="group"
+                >
                   <Link
                     href={`/produkte/${product.slug}`}
                     className="border-line hover:bg-surface relative block border-t py-10 transition-colors duration-500 md:py-12"
@@ -75,7 +84,9 @@ export function ProduktePageBody() {
                             <h2 className="type-h3">{product.name}</h2>
                           </div>
                         )}
-                        <p className="eyebrow text-muted-foreground mt-5">{product.sector}</p>
+                        <p className="eyebrow text-muted-foreground mt-5">
+                          {product.sector}
+                        </p>
                       </div>
 
                       <div className="md:col-span-5">
@@ -83,18 +94,27 @@ export function ProduktePageBody() {
                           {product.what}
                         </p>
                         <p className="type-small text-muted-foreground mt-5 max-w-lg text-pretty">
-                          <span className="text-gold-text">{copy.builtLabel}: </span>
+                          <span className="text-gold-text">
+                            {copy.builtLabel}:{" "}
+                          </span>
                           {product.built}
                         </p>
                       </div>
 
                       <div className="md:col-span-3 md:text-right">
-                        <p className="eyebrow text-muted-foreground">{copy.statusLabel}</p>
+                        <p className="eyebrow text-muted-foreground">
+                          {copy.statusLabel}
+                        </p>
                         <p className="type-small text-foreground/85 mt-2.5 flex items-baseline gap-2 text-pretty md:justify-end">
-                          <StatusDot live={product.live} className="translate-y-[-0.15em]" />
+                          <StatusDot
+                            live={product.live}
+                            className="translate-y-[-0.15em]"
+                          />
                           {product.outcome}
                         </p>
-                        <p className="text-meta text-muted-foreground mt-3">{product.region}</p>
+                        <p className="text-meta text-muted-foreground mt-3">
+                          {product.region}
+                        </p>
                         <span className="text-gold-text mt-6 inline-flex items-center gap-2 text-sm tracking-wide md:justify-end">
                           {copy.openLabel}
                           <ArrowRight
@@ -106,7 +126,7 @@ export function ProduktePageBody() {
                     </div>
                   </Link>
                 </Reveal>
-              )
+              );
             })}
           </ul>
           <div className="border-line border-t" />
@@ -123,51 +143,64 @@ export function ProduktePageBody() {
       */}
 
       {/* Kundenwerk steht auf der Produktseite bewusst getrennt und klein:
-          Es gehört nicht zu den eigenen Produkten und darf sie nicht verwässern. */}
-      <section aria-labelledby="kundenwerk-title" className="border-line border-b">
-        <div className="section-shell">
-          <Reveal>
-            <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
-              <div className="lg:col-span-7">
-                <h2 id="kundenwerk-title" className="type-h3 text-balance">
-                  {copy.clientWorkTitle}
-                </h2>
-                <p className="type-body text-muted-foreground mt-5 max-w-xl text-pretty">
-                  {copy.clientWorkNote}
-                </p>
+          Es gehört nicht zu den eigenen Produkten und darf sie nicht verwässern.
+          Ohne freigegebene Referenz faellt die Sektion ganz weg. */}
+      {clientWorks.length > 0 && (
+        <section
+          aria-labelledby="kundenwerk-title"
+          className="border-line border-b"
+        >
+          <div className="section-shell">
+            <Reveal>
+              <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
+                <div className="lg:col-span-7">
+                  <h2 id="kundenwerk-title" className="type-h3 text-balance">
+                    {copy.clientWorkTitle}
+                  </h2>
+                  <p className="type-body text-muted-foreground mt-5 max-w-xl text-pretty">
+                    {copy.clientWorkNote}
+                  </p>
+                </div>
+                <div className="lg:col-span-5 lg:text-right">
+                  <Link
+                    href="/arbeiten"
+                    className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+                  >
+                    {copy.clientWorkCta}
+                    <ArrowUpRight className="size-4" strokeWidth={1.5} />
+                  </Link>
+                </div>
               </div>
-              <div className="lg:col-span-5 lg:text-right">
-                <Link
-                  href="/arbeiten"
-                  className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
-                >
-                  {copy.clientWorkCta}
-                  <ArrowUpRight className="size-4" strokeWidth={1.5} />
-                </Link>
-              </div>
-            </div>
-          </Reveal>
+            </Reveal>
 
-          <ul className="border-line bg-line mt-12 grid gap-px border md:grid-cols-3">
-            {clientWorks.map((work, i) => (
-              <Reveal key={work.slug} delay={0.06 * i} as="li" className="flex">
-                <Link
-                  href={`/arbeiten/${work.slug}`}
-                  className="group bg-background hover:bg-surface flex w-full flex-col gap-3 px-6 py-7 transition-colors duration-500"
+            <ul className="border-line bg-line mt-12 grid gap-px border md:grid-cols-3">
+              {clientWorks.map((work, i) => (
+                <Reveal
+                  key={work.slug}
+                  delay={0.06 * i}
+                  as="li"
+                  className="flex"
                 >
-                  <span className="text-subhead text-lg">{work.name}</span>
-                  <span className="type-small text-muted-foreground text-pretty">{work.what}</span>
-                  <span className="eyebrow text-muted-foreground group-hover:text-gold-text mt-auto pt-4 transition-colors duration-500">
-                    {work.sector}
-                  </span>
-                </Link>
-              </Reveal>
-            ))}
-          </ul>
-        </div>
-      </section>
+                  <Link
+                    href={`/arbeiten/${work.slug}`}
+                    className="group bg-background hover:bg-surface flex w-full flex-col gap-3 px-6 py-7 transition-colors duration-500"
+                  >
+                    <span className="text-subhead text-lg">{work.name}</span>
+                    <span className="type-small text-muted-foreground text-pretty">
+                      {work.what}
+                    </span>
+                    <span className="eyebrow text-muted-foreground group-hover:text-gold-text mt-auto pt-4 transition-colors duration-500">
+                      {work.sector}
+                    </span>
+                  </Link>
+                </Reveal>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       <ClosingCta />
     </main>
-  )
+  );
 }
