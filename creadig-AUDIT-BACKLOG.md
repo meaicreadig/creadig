@@ -16,10 +16,10 @@ Score = (Wirkung × Dringlichkeit) ÷ Personentage. Reihenfolge folgt Wirkung/Au
 
 ## WELLE 2 — diese Woche
 - [ ] **SEC-1** Impressum-Pflichtangaben (Score 100 · OWNER) → Rechtsform · USt-IdNr **oder** §19 · §18-MStV-Verantwortlicher. **Einziger echter Go-Live-Rechtsblocker.**
-- [ ] **TECH-2** fs-Root-Cause dauerhaft (Score 50 · 0,5 PT) → `product-media.ts` Screens per `prebuild`-Skript in statische Map schreiben statt `readdirSync(process.cwd()…)`.
-- [ ] **TECH-4** Deploy-Gate (Score 32 · 0,5 PT) → `postbuild`-Skript: Function-Trace >200 MB → Exit 1.
+- [x] **TECH-2** fs-Root-Cause dauerhaft (Score 50 · 0,5 PT) → `product-media.ts` Screens per `prebuild`-Skript in statische Map schreiben statt `readdirSync(process.cwd()…)`.
+- [x] **TECH-4** Deploy-Gate (Score 32 · 0,5 PT) → `postbuild`-Skript: Function-Trace >200 MB → Exit 1.
 - [ ] **TECH-5** KI-Attrappe (Score 24 · 0,25 PT) → bis zur echten API ausblenden (kein totes „KI"-Widget auf einer KI-Marke).
-- [ ] **VIS-5** Riesen-Stats ohne Zahlen (Score 18 · 0,5 PT) → „A–Z"/„DE·CH" nicht als Stat; Doppelung Impact/CompanyTeaser auflösen.
+- [x] **VIS-5** Riesen-Stats ohne Zahlen (Score 18 · 0,5 PT) → „A–Z"/„DE·CH" nicht als Stat; Doppelung Impact/CompanyTeaser auflösen.
 - [ ] **UX-2** Kontaktformular ohne Erfolgs-Zustand (Score 18 · 0,5 PT) → `window.open`-Rückgabe prüfen + Inline-Bestätigung.
 - [ ] **GROW-3** Preise positionieren als Agentur (Score 9 · 1 PT) → Pakete als „Einstieg", Architecture auf „ab"-Logik, Retainer sichtbar machen.
 - [ ] **UX-1** Startseite verankert keinen Beleg (Score 8 · 2 PT) → 1 echten Fall/echte Zahl auf die Startseite; leere gated Slots raus, bis Inhalt da.
