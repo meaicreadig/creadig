@@ -67,7 +67,7 @@ export type ServicePage = {
   /** Für wen — aus den Schwerpunkten und der „Für wen"-Zeile der Ebene. */
   forWhom: { de: string[]; tr: string[] }
   /** Pakete, in denen die Leistung enthalten ist. */
-  packageKeys: ("identity" | "growth" | "architecture")[]
+  packageKeys: "website"[]
   /** Arbeiten, die zu dieser Leistung gehören (slugs aus site-data). */
   workSlugs: string[]
   /** Auf `false` verschwindet die Seite aus Routing UND Sitemap. */
@@ -110,7 +110,7 @@ export const servicePages: ServicePage[] = [
       de: ["Bäckerei, Praxis, Restaurant, Handwerksbetrieb", "Betriebe ohne eigene IT-Abteilung"],
       tr: ["Fırın, muayenehane, restoran, zanaat işletmesi", "Kendi BT birimi olmayan işletmeler"],
     },
-    packageKeys: ["growth", "architecture"],
+    packageKeys: ["website"],
     // Echtes Kundenwerk auf der Webdesign-Seite: NV SWISS ist Marke, Website
     // und Digitalisierung aus einer Hand — genau das, was diese Seite anbietet.
     workSlugs: ["nv-swiss", "maqam"],
@@ -130,8 +130,8 @@ export const servicePages: ServicePage[] = [
     },
     metaTitle: { de: "Corporate Design und Markenaufbau", tr: "Kurumsal tasarım ve marka kurulumu" },
     metaDescription: {
-      de: "Logo, Marke und Auftritt für Gründer und neue Betriebe — als Fundament, nicht als Dekoration. Identity-Paket ab €350 einmalig, ohne Abo.",
-      tr: "Girişimciler ve yeni işletmeler için logo, marka ve görünüm — dekorasyon değil, temel. Identity paketi tek seferlik €350'den, aboneliksiz.",
+      de: "Logo, Marke und Auftritt für Gründer und neue Betriebe — als Fundament, nicht als Dekoration. Festpreis, kein Abo.",
+      tr: "Girişimciler ve yeni işletmeler için logo, marka ve görünüm — dekorasyon değil, temel. Sabit fiyat, aboneliksiz.",
     },
     includes: {
       de: [
@@ -151,7 +151,7 @@ export const servicePages: ServicePage[] = [
       de: ["Gründer und neue Betriebe", "Handwerk vor dem ersten Auftritt"],
       tr: ["Girişimciler ve yeni işletmeler", "İlk görünümünden önceki zanaat işletmeleri"],
     },
-    packageKeys: ["identity", "growth"],
+    packageKeys: ["website"],
     // Marke und Auftritt aus einer Hand — dieselbe Arbeit, andere Ebene.
     workSlugs: ["nv-swiss"],
     published: true,
@@ -197,7 +197,7 @@ export const servicePages: ServicePage[] = [
         "Evrak yükü büyüyen işletmeler",
       ],
     },
-    packageKeys: ["growth", "architecture"],
+    packageKeys: ["website"],
     workSlugs: [],
     published: true,
   },
@@ -245,7 +245,7 @@ export const servicePages: ServicePage[] = [
         "Çalışanlarına Türkçe ulaşmak isteyen işletmeler",
       ],
     },
-    packageKeys: ["identity", "growth"],
+    packageKeys: ["website"],
     // Die frueheren Slugs ("nur", "bir-damla-hayir") gibt es nicht mehr —
     // sie waren kein Kundenwerk. Bis eine zweisprachige Referenz freigegeben
     // ist, bleibt die Liste leer und der Werke-Block rendert nicht.
@@ -293,7 +293,7 @@ export const servicePages: ServicePage[] = [
         "Kararları daha hızlı almak isteyen yerleşik işletmeler",
       ],
     },
-    packageKeys: ["architecture"],
+    packageKeys: ["website"],
     workSlugs: ["meai", "fibero", "meahv"],
     published: true,
   },

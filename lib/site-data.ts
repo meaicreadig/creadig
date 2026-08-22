@@ -698,15 +698,34 @@ export const opsSteps = [
  * `amount` ist der Preis als Zahl für schema.org — dieselbe Quelle wie die
  * angezeigte Zeichenkette, damit beides nicht auseinanderlaufen kann.
  */
+/*
+ * EIN Angebot, EIN Preis, EINE Leiter.
+ *
+ * Hier standen drei Pakete — 350 EUR einmalig, 500 EUR/Monat, 1.500 EUR/Monat.
+ * Zwei Probleme auf einmal: Die Zahlen entsprachen nicht mehr dem, was das
+ * Haus verkauft, und sie gingen ueber `hasOfferCatalog` als strukturierte
+ * Daten an Google. Solange 350 EUR dasteht, verhandelt man gegen sich selbst.
+ *
+ * Die Leiter (KIZILELMA §9.3, gesperrt — nicht ueberspringen, nicht
+ * unterbieten):
+ *   Betrieb 1 + 2   2.400 EUR netto   Referenzpreis, offen als solcher benannt
+ *   ab Betrieb 3    3.900 EUR netto   Regelpreis
+ *   danach            149 EUR/Monat   laufende Betreuung (siehe `retainer`)
+ *
+ * `regularPrice` steht bewusst DANEBEN und nicht statt des Einstiegs: Wer
+ * den Referenzpreis bekommt, soll sehen, was er kostet — sonst ist es kein
+ * Entgegenkommen, sondern eine spaetere Ueberraschung.
+ */
 export const packages = [
-  { key: "identity" as const, tier: "01", price: "€350", amount: 350, period: null, recommended: false },
-  { key: "growth" as const, tier: "02", price: "€500", amount: 500, period: "MON" as const, recommended: true },
   {
-    key: "architecture" as const,
-    tier: "03",
-    price: "€1.500",
-    amount: 1500,
-    period: "MON" as const,
+    key: "website" as const,
+    tier: "01",
+    price: "€2.400",
+    amount: 2400,
+    period: null,
+    /** Regelpreis ab dem dritten Betrieb — steht offen daneben. */
+    regularPrice: "€3.900",
+    regularAmount: 3900,
     recommended: false,
   },
 ]
@@ -725,13 +744,29 @@ export const packages = [
  * Umfang niemand festgelegt hat, wäre ein Versprechen ohne Substanz.
  */
 export const retainer = {
-  /** z. B. "€450". `null` = der Block erscheint nicht. */
-  price: null as string | null,
-  amount: null as number | null,
+  /** Preis pro Monat, netto. `null` = der Block erscheint nicht. */
+  price: "€149" as string | null,
+  amount: 149 as number | null,
   /** Was tatsächlich geliefert wird — vom Owner bestätigt, nicht abgeleitet. */
-  description: null as Localized | null,
+  description: {
+    de: "Nach dem Livegang bleibt die Seite in Betrieb — und wir bleiben ansprechbar. Kein Paket, das etwas verwaltet, sondern der Mensch, der sie gebaut hat.",
+    tr: "Yayına aldıktan sonra site işlemeye devam eder — ve biz ulaşılabilir kalırız. Bir şeyi yöneten bir paket değil, siteyi kuran kişinin kendisi.",
+  } as Localized | null,
   /** Einzelne Leistungen, in beiden Sprachen. */
-  includes: null as { de: string[]; tr: string[] } | null,
+  includes: {
+    de: [
+      "Hosting und Sicherheitsupdates",
+      "Bis zu 2 Inhaltsänderungen im Monat",
+      "Google-Unternehmensprofil aktuell halten",
+      "Rückruf am nächsten Werktag",
+    ],
+    tr: [
+      "Hosting ve güvenlik güncellemeleri",
+      "Ayda 2 içerik değişikliğine kadar",
+      "Google işletme profilini güncel tutmak",
+      "Bir sonraki iş günü geri arama",
+    ],
+  } as { de: string[]; tr: string[] } | null,
 }
 
 export const retainerPublished = Boolean(retainer.price && retainer.description)

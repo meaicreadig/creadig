@@ -26,10 +26,23 @@ export function Packages() {
           </Reveal>
         </div>
 
-        <div className="mt-20 grid gap-px lg:grid-cols-3">
+        {/*
+          Spaltenzahl folgt der Kartenzahl. Vorher stand hier fest
+          `lg:grid-cols-3` — mit einem einzigen Angebot haette die Karte auf
+          einem Drittel der Breite geklebt und der Rest waere leer geblieben.
+          Kein Design-Eingriff, nur die Vermeidung eines Bruchs.
+        */}
+        <div
+          className={`mt-20 grid gap-px ${
+            packages.length >= 3
+              ? "lg:grid-cols-3"
+              : packages.length === 2
+                ? "lg:grid-cols-2"
+                : "lg:grid-cols-1"
+          }`}
+        >
           {packages.map((pkg, i) => {
             const copy = t.packages.items[pkg.key]
-            const isMonthly = pkg.key !== "identity"
 
             return (
               <Reveal
@@ -72,9 +85,25 @@ export function Packages() {
                 <div className="mt-6 flex items-baseline gap-2.5">
                   <span className="type-stat">{pkg.price}</span>
                   <span className="eyebrow text-muted-foreground">
-                    {isMonthly ? t.packages.monthly : t.packages.once}
+                    {pkg.period ? t.packages.monthly : t.packages.once}
                   </span>
                 </div>
+
+                {/*
+                  Der Referenzpreis wird offen als solcher benannt, mit dem
+                  Regelpreis daneben. Ein Nachlass, den der Kunde erst bei der
+                  zweiten Rechnung bemerkt, ist kein Entgegenkommen.
+                */}
+                {pkg.regularPrice && (
+                  <div className="mt-5 flex flex-col gap-2">
+                    <p className="type-small text-muted-foreground text-pretty">
+                      {t.packages.referenceNote}
+                    </p>
+                    <p className="text-meta text-muted-foreground">
+                      {t.packages.regularLabel}: {pkg.regularPrice}
+                    </p>
+                  </div>
+                )}
 
                 {/* „Für wen" — Zeile aus der bisherigen Live-Seite übernommen. */}
                 <div className="border-line mt-8 border-t pt-6">
@@ -130,6 +159,11 @@ export function Packages() {
             )
           })}
         </div>
+
+        {/* Netto ist eine Pflichtangabe, keine Fussnote (M12-4). */}
+        <p className="type-small text-muted-foreground border-line mt-8 border-t pt-6">
+          {t.packages.netNote}
+        </p>
 
         {/*
           Laufende Betreuung (E-K6). Sie stand bisher als „Ops-Retainer" in

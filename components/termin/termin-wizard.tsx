@@ -81,19 +81,16 @@ export function TerminWizard() {
     setCursor({ year: now.getFullYear(), month: now.getMonth() })
   }, [])
 
-  // Paket-Vorauswahl aus der Pakete-Sektion (`/termin?paket=growth`).
+  // Vorauswahl aus der Angebots-Sektion (`/termin?paket=website`).
   useEffect(() => {
     const paket = params.get("paket")
     if (!paket) return
-    if (paket === "architecture") {
-      setType("ar")
-      setForm((f) => ({ ...f, interest: t.termin.step3.interests[2] }))
-    } else if (paket === "growth") {
-      setType("vg")
-      setForm((f) => ({ ...f, interest: t.termin.step3.interests[1] }))
-    } else if (paket === "identity") {
+    if (paket === "website") {
       setType("vg")
       setForm((f) => ({ ...f, interest: t.termin.step3.interests[0] }))
+    } else if (paket === "retainer") {
+      setType("vg")
+      setForm((f) => ({ ...f, interest: t.termin.step3.interests[1] }))
     }
     // Nur beim ersten Lauf — eine spätere Sprachumschaltung soll die
     // Auswahl des Nutzers nicht überschreiben.

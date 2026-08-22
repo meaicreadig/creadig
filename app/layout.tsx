@@ -13,6 +13,8 @@ import {
   aggregateRating,
   approvedReviews,
   packages,
+  retainer,
+  retainerPublished,
   socialProfiles,
 } from "@/lib/site-data"
 import { dictionary } from "@/lib/dictionary"
@@ -184,6 +186,24 @@ const organizationSchema = {
       availability: "https://schema.org/InStock",
     })),
   },
+  ...(retainerPublished && retainer.amount
+    ? {
+        makesOffer: {
+          "@type": "Offer",
+          name: dictionary.de.packages.retainerEyebrow,
+          description: retainer.description?.de,
+          priceCurrency: "EUR",
+          priceSpecification: {
+            "@type": "UnitPriceSpecification",
+            price: retainer.amount,
+            priceCurrency: "EUR",
+            billingDuration: 1,
+            unitCode: "MON",
+          },
+          availability: "https://schema.org/InStock",
+        },
+      }
+    : {}),
   ...(aggregateRating
     ? {
         aggregateRating: {
