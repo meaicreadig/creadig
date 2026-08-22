@@ -207,7 +207,18 @@ export function ProduktPageBody({
               </Reveal>
             </div>
 
-            <div className="mt-16 grid gap-px sm:grid-cols-2 lg:grid-cols-4">
+            {/*
+              Spaltenzahl folgt der Anzahl der Bausteine. Fest auf vier
+              gestellt blieb bei drei Bausteinen (fibero, CASSAMEA, meahv)
+              eine Spalte leer — und weil jeder Baustein seine eigene
+              Oberkante traegt, brach die Trennlinie sichtbar vor dem rechten
+              Rand ab. Das sah nach fehlendem Inhalt aus, nicht nach drei.
+            */}
+            <div
+              className={`mt-16 grid gap-px sm:grid-cols-2 ${
+                world.blocks.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"
+              }`}
+            >
               {world.blocks.map((blockCopy, i) => (
                 <Reveal
                   key={blockCopy.de}
