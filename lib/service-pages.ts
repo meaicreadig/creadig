@@ -30,7 +30,8 @@ import type { Localized } from "@/lib/site-data"
  *
  * ---------------------------------------------------------------------------
  * KEIN WILDWUCHS
- * Fünf Seiten, alle in der Nische (Handwerk, TR-DE-Mittelstand, Gastronomie).
+ * Fünf Seiten, alle in der Nische (Handwerk, KMU, Gastronomie) —
+ * Schwerpunkt Deutschland, offen für Unternehmen jeder Branche.
  * Nicht dreißig generische Landingpages — die verwässern die Domain, statt sie
  * zu stärken.
  */
@@ -110,7 +111,9 @@ export const servicePages: ServicePage[] = [
       tr: ["Fırın, muayenehane, restoran, zanaat işletmesi", "Kendi BT birimi olmayan işletmeler"],
     },
     packageKeys: ["growth", "architecture"],
-    workSlugs: ["rumis-maison", "bir-damla-hayir", "nur"],
+    // Echtes Kundenwerk auf der Webdesign-Seite: NV SWISS ist Marke, Website
+    // und Digitalisierung aus einer Hand — genau das, was diese Seite anbietet.
+    workSlugs: ["nv-swiss", "maqam"],
     published: true,
   },
   {
@@ -149,7 +152,8 @@ export const servicePages: ServicePage[] = [
       tr: ["Girişimciler ve yeni işletmeler", "İlk görünümünden önceki zanaat işletmeleri"],
     },
     packageKeys: ["identity", "growth"],
-    workSlugs: ["nur", "rumis-maison"],
+    // Marke und Auftritt aus einer Hand — dieselbe Arbeit, andere Ebene.
+    workSlugs: ["nv-swiss"],
     published: true,
   },
   {
@@ -214,8 +218,8 @@ export const servicePages: ServicePage[] = [
       tr: "İki dilli web sitesi ve destek (DE/TR)",
     },
     metaDescription: {
-      de: "Website, Marke und laufende Betreuung auf Deutsch und Türkisch. Für den türkisch-deutschen Mittelstand in Deutschland und der Schweiz — Kommunikation über WhatsApp.",
-      tr: "Almanca ve Türkçe web sitesi, marka ve sürekli destek. Almanya ve İsviçre'deki Türk-Alman KOBİ'ler için — iletişim WhatsApp üzerinden.",
+      de: "Website, Marke und laufende Betreuung auf Deutsch und Türkisch. Für Betriebe mit Kundschaft oder Mitarbeitern in beiden Sprachen — Kommunikation auf Wunsch über WhatsApp.",
+      tr: "Almanca ve Türkçe web sitesi, marka ve sürekli destek. Her iki dilde müşterisi ya da çalışanı olan işletmeler için — istenirse WhatsApp üzerinden iletişim.",
     },
     includes: {
       de: [
@@ -233,16 +237,19 @@ export const servicePages: ServicePage[] = [
     },
     forWhom: {
       de: [
-        "Türkisch-deutscher Mittelstand — WhatsApp-Kultur",
         "Betriebe mit Kundschaft in beiden Sprachen",
+        "Betriebe, die Mitarbeiter auf Türkisch erreichen wollen",
       ],
       tr: [
-        "Türk-Alman KOBİ'ler — WhatsApp kültürü",
         "Her iki dilde müşterisi olan işletmeler",
+        "Çalışanlarına Türkçe ulaşmak isteyen işletmeler",
       ],
     },
     packageKeys: ["identity", "growth"],
-    workSlugs: ["nur", "bir-damla-hayir"],
+    // Die frueheren Slugs ("nur", "bir-damla-hayir") gibt es nicht mehr —
+    // sie waren kein Kundenwerk. Bis eine zweisprachige Referenz freigegeben
+    // ist, bleibt die Liste leer und der Werke-Block rendert nicht.
+    workSlugs: [],
     published: true,
   },
   {

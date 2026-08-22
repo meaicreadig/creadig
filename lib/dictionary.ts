@@ -250,7 +250,7 @@ export const dictionary = {
       lead: "Marke, Auftritt, Betrieb, Automatisierung, Intelligenz. Jede Ebene trägt die nächste — nicht nebeneinander, sondern als System. Was wir für unsere eigenen Produkte gebaut haben, bringen wir in Ihren Alltag.",
       metaTitle: "Leistungen — von der Marke bis zur KI",
       metaDescription:
-        "Die fünf Ebenen von creaDIG: Marke, digitaler Auftritt, Operations, Automatisierung und KI. Für kleine und mittlere Betriebe in Deutschland und der Schweiz — auf Deutsch und Türkisch.",
+        "Die fünf Ebenen von creaDIG: Marke, digitaler Auftritt, Operations, Automatisierung und KI. Für Handwerk und Mittelstand, Schwerpunkt Deutschland — auf Deutsch und Türkisch.",
       pricingLabel: "Preise",
       pricingNote:
         "Standard-Produkte sind transparent bepreist. Systementwicklung rechnen wir individuell ab — nach Umfang, nicht nach Stunden.",
@@ -285,7 +285,7 @@ export const dictionary = {
        * vier Dinge beim Namen; die Haltung traegt die Headline darueber.
        */
       subline:
-        "creaDIG entwickelt Marken, digitale Systeme, Automatisierung und eigene Softwareprodukte.",
+        "creaDIG entwickelt Marken, digitale Systeme, Automatisierung und eigene Softwareprodukte — für Handwerk und Mittelstand in Deutschland.",
       ctaPrimary: "Projekt starten",
       ctaSecondary: "Unsere Arbeit",
       location: "Osnabrück · DE & CH",
@@ -542,10 +542,17 @@ export const dictionary = {
         "Wir arbeiten mit einem spezialisierten Netzwerk aus Entwicklern, Textern und Strategen im DACH-Raum. Das Team wächst; die nächsten Stellen sind in Vorbereitung.",
       nicheLabel: "Schwerpunkte",
       niches: [
-        "Handwerk mit 6–20 Mitarbeitern (NRW & Niedersachsen)",
-        "Türkisch-deutscher Mittelstand — WhatsApp-Kultur, DE + TR",
+        "Handwerk mit 6–20 Mitarbeitern — Schwerpunkt Deutschland",
+        "Kleine und mittlere Betriebe ohne eigene IT-Abteilung",
         "Gastronomie in Deutschland und der Schweiz",
       ],
+      /*
+       * „Schwerpunkte" heisst Schwerpunkte, nicht Zulassungsbedingung. Ohne
+       * diesen Satz liest eine Liste aus drei Branchen sich fuer jeden
+       * vierten Betrieb wie eine Absage — und genau das ist sie nicht.
+       */
+      nicheOpen:
+        "Das sind Schwerpunkte, keine Bedingungen. Wir arbeiten mit Unternehmen jeder Branche und Größe — auf Deutsch und auf Türkisch.",
       locationsLabel: "Sitz",
       marketsLabel: "Märkte",
       honesty:
@@ -1090,7 +1097,7 @@ export const dictionary = {
       headlineLine2: "görmediğini",
       headlineLine3: "inşa ediyoruz.",
       subline:
-        "creaDIG; marka, dijital sistemler, otomasyon ve kendi yazılım ürünlerini geliştirir.",
+        "creaDIG; Almanya'daki zanaat işletmeleri ve KOBİ'ler için marka, dijital sistemler, otomasyon ve kendi yazılım ürünlerini geliştirir.",
       ctaPrimary: "Projeye başla",
       ctaSecondary: "İşlerimiz",
       location: "Osnabrück · DE & CH",
@@ -1330,10 +1337,12 @@ export const dictionary = {
         "DACH bölgesinde geliştirici, metin yazarı ve stratejistlerden oluşan uzman bir ağ ile çalışıyoruz. Ekip büyüyor; yeni pozisyonlar hazırlanıyor.",
       nicheLabel: "Odak alanları",
       niches: [
-        "6–20 çalışanlı esnaf işletmeleri (NRW & Aşağı Saksonya)",
-        "Türk-Alman KOBİ'ler — WhatsApp kültürü, DE + TR",
+        "6–20 çalışanlı zanaat işletmeleri — ağırlıkla Almanya",
+        "Kendi BT birimi olmayan küçük ve orta ölçekli işletmeler",
         "Almanya ve İsviçre'de gastronomi",
       ],
+      nicheOpen:
+        "Bunlar ağırlık noktalarımız, koşul değil. Her sektörden ve her büyüklükten işletmeyle çalışıyoruz — Almanca ve Türkçe.",
       locationsLabel: "Merkez",
       marketsLabel: "Pazarlar",
       honesty: "Uydurma çalışan veya ciro sayıları vermiyoruz. Kanıtımız yaptığımız işlerdir.",

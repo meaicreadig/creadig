@@ -62,6 +62,13 @@ export function About() {
                   </li>
                 ))}
               </ul>
+              {/*
+                Schwerpunkte sind keine Zulassungsbedingung — ohne diesen Satz
+                liest die Liste sich fuer jeden vierten Betrieb wie eine Absage.
+              */}
+              <p className="type-small text-muted-foreground mt-6 text-pretty">
+                {t.about.nicheOpen}
+              </p>
             </Reveal>
 
             <Reveal delay={0.18} className="border-line mt-10 border-t pt-7">
