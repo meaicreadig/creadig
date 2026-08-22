@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/ui/page-header"
 import { Reveal } from "@/components/ui/reveal"
 import { MagneticButton } from "@/components/ui/magnetic-button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { StatusDot } from "@/components/ui/status-dot"
 import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
 import { publishedServicePages } from "@/lib/service-pages"
 import {
@@ -89,7 +90,13 @@ export function ProduktPageBody({
         <div className="border-line mt-12 grid gap-px border-t sm:grid-cols-3">
           <div className="pt-7 sm:pr-8">
             <p className="eyebrow text-gold-text">{copy.statusLabel}</p>
-            <p className="type-body text-foreground/85 mt-3 text-pretty">{product.outcome}</p>
+            {/* Gefuellt = laeuft, offen = im Aufbau. Der Unterschied ist die
+                ehrlichste Angabe auf der Seite und darf nicht im Fliesstext
+                verschwinden. */}
+            <p className="type-body text-foreground/85 mt-3 flex items-baseline gap-2.5 text-pretty">
+              <StatusDot live={product.live} className="translate-y-[-0.15em]" />
+              {product.outcome}
+            </p>
           </div>
           <div className="border-line pt-7 sm:border-l sm:pl-8">
             <p className="eyebrow text-gold-text">{copy.regionLabel}</p>

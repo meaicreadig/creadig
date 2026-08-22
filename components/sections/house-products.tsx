@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
+import { StatusDot } from "@/components/ui/status-dot"
 import { ownProducts, productWorks } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -115,7 +116,8 @@ export function HouseProducts() {
                     <p className="eyebrow text-muted-foreground">
                       {t.houseProducts.statusLabel}
                     </p>
-                    <p className="type-small text-foreground/85 mt-2 text-pretty">
+                    <p className="type-small text-foreground/85 mt-2 flex items-baseline gap-2 text-pretty">
+                      <StatusDot live={product.live} className="translate-y-[-0.15em]" />
                       {product.outcome}
                     </p>
                     <p className="text-meta text-muted-foreground mt-3">{product.region}</p>
