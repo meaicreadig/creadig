@@ -1,5 +1,4 @@
-import { existsSync, readdirSync } from "node:fs"
-import path from "node:path"
+import { PRODUCT_SCREENS } from "./product-media.generated"
 
 /**
  * Echte Produkt-Aufnahmen — die Gated-Maschine für die Produkt-Welten.
@@ -21,33 +20,31 @@ import path from "node:path"
  * Screenshots aus dem laufenden System nach
  *   public/works/products/meai/…       (meai, fibero, cassamea, meahv)
  * legen — Dateiname beliebig, alphabetisch sortiert ist die Reihenfolge.
- * Kein Code-Eingriff nötig; der nächste Build nimmt sie auf.
+ * Kein Code-Eingriff nötig; der nächste `npm run build` nimmt sie auf.
  *
- * Die Prüfung läuft ausschließlich zur Bauzeit (Server-Komponente) — im
- * Browser wird nie ein Bild-Request für eine Datei gestellt, die es nicht
- * gibt, und damit steht auch kein 404 in der Konsole.
+ * ---------------------------------------------------------------------------
+ * WARUM HIER KEIN `fs` MEHR STEHT (TECH-2)
+ * Bis hierher lief `readdirSync(process.cwd(), …)` zur Render-Zeit. Das war
+ * gleich zweimal falsch:
+ *
+ *   - Der Datei-Tracer von Next sieht einen `fs`-Zugriff auf `process.cwd()`,
+ *     kann nicht wissen, was davon gebraucht wird, und packt vorsichtshalber
+ *     den halben Repo-Root in die Function. Das war die Wurzel der zu großen
+ *     Serverless-Function — die Exclude-Liste in `next.config.ts` behandelt
+ *     nur das Symptom.
+ *   - `process.cwd()` zeigt im Serverless-Bundle nicht auf das Repo. Was
+ *     lokal funktionierte, hätte in der Cloud nie etwas gefunden.
+ *
+ * Das Verzeichnis wird jetzt genau einmal gelesen — von
+ * `scripts/generate-product-media.mjs` im `prebuild`-Hook, der daraus
+ * `product-media.generated.ts` schreibt. Die Regel bleibt dieselbe, nur der
+ * Zeitpunkt ist ein anderer: Bauzeit statt Betrieb.
  */
-const MEDIA_ROOT = ["public", "works", "products"]
-
-/** Was ein Browser sicher darstellt — alles andere wird ignoriert. */
-const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".avif"])
 
 /**
  * Öffentliche Pfade der echten Aufnahmen eines Produkts, alphabetisch.
  * Leeres Array = es liegt nichts vor, die Sektion versteckt sich.
  */
 export function productScreens(slug: string): string[] {
-  const dir = path.join(process.cwd(), ...MEDIA_ROOT, slug)
-  if (!existsSync(dir)) return []
-
-  try {
-    return readdirSync(dir)
-      .filter((file) => IMAGE_EXTENSIONS.has(path.extname(file).toLowerCase()))
-      .sort()
-      .map((file) => `/${MEDIA_ROOT.slice(1).join("/")}/${slug}/${file}`)
-  } catch {
-    // Unlesbares Verzeichnis behandeln wir wie ein leeres: lieber nichts
-    // zeigen als einen Build an einem Bild scheitern lassen.
-    return []
-  }
+  return [...(PRODUCT_SCREENS[slug] ?? [])]
 }
