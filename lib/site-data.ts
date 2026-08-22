@@ -47,27 +47,20 @@ export const ownProducts: ProductLogo[] = [
 ]
 
 /**
- * Marken, mit denen wir im Tagesgeschäft zu tun hatten.
- * `approved: false` = keine Freigabe für „unser Kunde" → neutrale Beschriftung,
- * keine Behauptung einer Geschäfts- oder Partnerbeziehung.
+ * Fremdmarken-Wand — heute bewusst LEER.
+ *
+ * Hier standen Auftraggeber und Marken aus dem operativen Glasfaser-Alltag
+ * (Telekom, Glasfaser NordWest, 1&1, Drillisch u. a.). Keine davon hatte eine
+ * Freigabe fuer die Bezeichnung „Kunde/Partner", und die Glasfaser-Taetigkeit
+ * ist der private Motor des Hauses, kein Schaufenster der oeffentlichen Seite
+ * (Owner-Entscheidung 22.08.2026).
+ *
+ * Der Typ bleibt: Sobald eine Marke mit schriftlicher Freigabe dazukommt,
+ * traegt sie `approved: true` und erscheint ohne Code-Umbau. Solange die
+ * Liste leer ist, rendert die Reihe gar nicht — statt eine Wand aus
+ * Monogrammen zu zeigen, die nichts belegen.
  */
-export const brands: BrandLogo[] = [
-  { name: "Deutsche Telekom", logoPath: null, mark: "T", color: "#e20074", region: "DE", approved: false },
-  {
-    name: "Glasfaser NordWest",
-    logoPath: null,
-    mark: "GN",
-    color: "#0a5ca8",
-    region: "DE",
-    approved: false,
-  },
-  { name: "1&1", logoPath: null, mark: "1&1", color: "#1a4fa0", region: "DE", approved: false },
-  { name: "Drillisch", logoPath: null, mark: "DR", color: "#e2001a", region: "DE", approved: false },
-  { name: "MAS MöbelAufbauService", logoPath: null, mark: "MAS", color: "#b45309", region: "DE", approved: false },
-  { name: "Wartungsprofis", logoPath: null, mark: "WP", color: "#166534", region: "DE", approved: false },
-  { name: "BÜEM", logoPath: null, mark: "BÜ", color: "#1e3a5f", region: "DE", approved: false },
-  { name: "MEDILUXURY", logoPath: null, mark: "ML", color: "#7c2d5e", region: "DE & CH", approved: false },
-]
+export const brands: BrandLogo[] = []
 
 export type Work = {
   slug: string
@@ -196,12 +189,11 @@ export type ProductWorld = {
   /**
    * Name eines Eintrags aus `furtherProjects`, der im selben Feld arbeitet.
    *
-   * Heute traegt das nur fibero: Unter demselben Dach laeuft `creaDIG fiber`,
-   * das operative Glasfaser-Geschaeft. Das ist keine Herleitung („daraus ist
-   * fibero entstanden") — das waere eine Behauptung, die niemand belegt hat.
-   * Es ist die schlichte Angabe, dass beide hier laufen, und genau das ist
-   * bei einem Operations-Produkt die relevanteste Information ueberhaupt:
-   * Wir kennen die Seite, fuer die wir bauen, aus dem eigenen Tagesgeschaeft.
+   * Heute traegt das KEIN Produkt: Der operative Betrieb, der frueher hier
+   * neben fibero stand, ist von der oeffentlichen Seite genommen
+   * (Owner-Entscheidung 22.08.2026) — er ist der Motor des Hauses, nicht sein
+   * Schaufenster. Das Feld bleibt, weil die Verknuepfung als Struktur richtig
+   * ist, sobald ein zeigbarer Betrieb dazukommt.
    *
    * `null` = der Block rendert nicht. Ein unbekannter Name ebenfalls.
    */
@@ -231,7 +223,7 @@ export const productWorlds: Record<string, ProductWorld> = {
     ],
     layer: "operations",
     story: null,
-    houseContext: "creaDIG fiber",
+    houseContext: null,
     flagship: false,
   },
   cassamea: {
@@ -511,11 +503,14 @@ export type SocialProfile = {
 export const socialProfiles: SocialProfile[] = []
 
 /**
- * Was sonst noch unter dem Dach läuft. `creaDIG fiber` ist das operative
- * Glasfaser-Geschäft (der Motor) — nicht zu verwechseln mit dem Produkt fibero.
+ * Was sonst noch unter dem Dach läuft.
+ *
+ * Der operative Betrieb, aus dem creaDIG seinen Alltag kennt, steht hier
+ * bewusst NICHT mehr: Er ist der Motor des Hauses, nicht sein Schaufenster
+ * (Owner-Entscheidung 22.08.2026). Das Produkt fibero ist davon unberührt —
+ * es ist ein eigenes Produkt und steht in `productWorks`.
  */
 export const furtherProjects = [
-  { name: "creaDIG fiber", what: "Glasfaser-Geschäft mit Subunternehmern", kind: "Betrieb" as const },
   { name: "Ops-Retainer", what: "Operations-System für Handwerksbetriebe", kind: "Dienstleistung" as const },
 ]
 

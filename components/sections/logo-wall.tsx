@@ -103,6 +103,8 @@ export function LogoWall() {
     logoPath,
   }))
   // Fremdmarken bewusst nur als neutrales Monogramm — ohne Freigabe kein fremdes Logo.
+  // Heute leer: Ohne freigegebene Marke rendert die Reihe gar nicht, statt eine
+  // Wand aus Monogrammen zu zeigen, die nichts belegt.
   const brandRow: Row[] = brands.map(({ name, mark, region, color }) => ({
     name,
     mark,
@@ -147,14 +149,18 @@ export function LogoWall() {
           {t.logos.ownProducts}: {productRow.map((i) => i.name).join(", ")}
         </span>
 
-        <div className="section-gutter mt-14 mb-6 flex items-center gap-4">
-          <p className="eyebrow text-foreground">{t.logos.brands}</p>
-          <span aria-hidden="true" className="bg-line h-px flex-1" />
-        </div>
-        <MarqueeRow items={brandRow} direction="right" />
-        <span className="sr-only">
-          {t.logos.brands}: {brandRow.map((i) => i.name).join(", ")}
-        </span>
+        {brandRow.length > 0 && (
+          <>
+            <div className="section-gutter mt-14 mb-6 flex items-center gap-4">
+              <p className="eyebrow text-foreground">{t.logos.brands}</p>
+              <span aria-hidden="true" className="bg-line h-px flex-1" />
+            </div>
+            <MarqueeRow items={brandRow} direction="right" />
+            <span className="sr-only">
+              {t.logos.brands}: {brandRow.map((i) => i.name).join(", ")}
+            </span>
+          </>
+        )}
       </div>
     </section>
   )

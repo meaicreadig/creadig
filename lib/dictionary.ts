@@ -465,7 +465,7 @@ export const dictionary = {
       eyebrow: "Flagship · meai.run",
       title: "Ihr unsichtbarer Geschäftsführer.",
       lead: "meAI ist unser KI-Business-Betriebssystem. Es liest den Betrieb, bereitet Entscheidungen vor und hält zusammen, was sonst in Köpfen und Zetteln verteilt liegt.",
-      dna: "Die seltene Doppel-DNA: Wir bauen ein eigenes KI-System — und betreiben mit creaDIG fiber ein echtes operatives Glasfaser-Geschäft. Wir kennen beide Seiten.",
+      dna: "Die seltene Doppel-DNA: Wir bauen das KI-System nicht nur — wir führen unseren eigenen Betrieb damit. Was meAI kann, ist an unserem eigenen Alltag erprobt, bevor es zu einem Kunden kommt.",
       cta: "meai.run öffnen",
       capabilities: {
         overview: {
@@ -536,7 +536,7 @@ export const dictionary = {
       founderLabel: "Gründer",
       founder: "Muhammed Emin Akyol",
       body1:
-        "creaDIG startete 2017 als Agentur. Aus Aufträgen wurden Produkte, aus Produkten ein System-Haus — heute laufen unter dem Dach eigene Systeme und ein operatives Telekom-Geschäft.",
+        "creaDIG startete 2017 als Agentur. Aus Aufträgen wurden Produkte, aus Produkten ein System-Haus — heute laufen unter dem Dach vier eigene Systeme und die Betreuung der Betriebe, für die wir sie gebaut haben.",
       body2:
         "Wir arbeiten mit einem spezialisierten Netzwerk aus Entwicklern, Textern und Strategen im DACH-Raum. Das Team wächst; die nächsten Stellen sind in Vorbereitung.",
       nicheLabel: "Schwerpunkte",
@@ -1258,7 +1258,7 @@ export const dictionary = {
       eyebrow: "Amiral gemisi · meai.run",
       title: "Görünmeyen genel müdürünüz.",
       lead: "meAI, yapay zekâ tabanlı iş işletim sistemimizdir. İşletmeyi okur, kararları hazırlar ve kafalarda ile kâğıtlarda dağılan her şeyi bir arada tutar.",
-      dna: "Ender bir çifte DNA: Kendi yapay zekâ sistemimizi kuruyoruz — ve creaDIG fiber ile gerçek bir operasyonel fiber işi yürütüyoruz. İki tarafı da biliyoruz.",
+      dna: "Ender bir çifte DNA: Yapay zekâ sistemini yalnızca kurmuyoruz — kendi işletmemizi onunla yönetiyoruz. meAI'ın yaptığı her şey, bir müşteriye gitmeden önce kendi günlük işimizde sınanıyor.",
       cta: "meai.run'ı aç",
       capabilities: {
         overview: {
@@ -1323,7 +1323,7 @@ export const dictionary = {
       founderLabel: "Kurucu",
       founder: "Muhammed Emin Akyol",
       body1:
-        "creaDIG 2017'de ajans olarak başladı. İşlerden ürünler, ürünlerden bir sistem evi doğdu — bugün bu çatı altında kendi sistemlerimiz ve operasyonel bir telekom işi yürüyor.",
+        "creaDIG 2017'de ajans olarak başladı. İşlerden ürünler, ürünlerden bir sistem evi doğdu — bugün bu çatı altında dört kendi sistemimiz ve onları kurduğumuz işletmelerin bakımı yürüyor.",
       body2:
         "DACH bölgesinde geliştirici, metin yazarı ve stratejistlerden oluşan uzman bir ağ ile çalışıyoruz. Ekip büyüyor; yeni pozisyonlar hazırlanıyor.",
       nicheLabel: "Odak alanları",
