@@ -11,7 +11,7 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
 import { publishedServicePages } from "@/lib/service-pages"
 import {
-  ownProducts,
+  furtherProjects,
   productNeighbours,
   productWorlds,
   serviceLayers,
@@ -58,7 +58,6 @@ export function ProduktPageBody({
   const { t, locale } = useLocale()
   const copy = t.produktPage
   const world = productWorlds[product.slug]
-  const logo = ownProducts.find((p) => p.name === product.name)
   const neighbours = productNeighbours(product.slug)
 
   const layer = serviceLayers.find((entry) => entry.key === world?.layer)
@@ -67,6 +66,15 @@ export function ProduktPageBody({
   const relatedServices = publishedServicePages.filter((page) =>
     page.workSlugs.includes(product.slug),
   )
+  /*
+   * Was im selben Feld unter demselben Dach läuft. Der Name wird gegen
+   * `furtherProjects` aufgelöst statt hier wiederholt: Ein Tippfehler oder
+   * eine Umbenennung lässt den Block still verschwinden, statt eine Angabe
+   * anzuzeigen, die es nicht mehr gibt.
+   */
+  const houseContext = world?.houseContext
+    ? (furtherProjects.find((entry) => entry.name === world.houseContext) ?? null)
+    : null
 
   return (
     <main>
@@ -93,8 +101,15 @@ export function ProduktPageBody({
           </div>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center gap-6">
-          {product.href && (
+        {/*
+          Hier stand bis zur Sichtpruefung zusaetzlich das Produktlogo. Die
+          echten Logos (fibero, CASSAMEA) SIND Wortmarken — unter einer H1,
+          die denselben Namen traegt, stand der Schriftzug damit zweimal auf
+          demselben Bildschirm. Auf der Uebersicht traegt das Logo den Namen,
+          hier traegt ihn die H1; beides zugleich ist eine Dublette.
+        */}
+        {product.href && (
+          <div className="mt-10">
             <a
               href={product.href}
               target="_blank"
@@ -104,16 +119,8 @@ export function ProduktPageBody({
               {copy.liveLabel}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
             </a>
-          )}
-          {/* Marken-Zeichen, wo eins vorliegt — nie ein kaputtes <img>. */}
-          {logo?.logoPath && (
-            <img
-              src={logo.logoPath}
-              alt={`${product.name} — Logo`}
-              className="h-7 w-auto max-w-[10rem] opacity-70 dark:brightness-0 dark:invert"
-            />
-          )}
-        </div>
+          </div>
+        )}
       </PageHeader>
 
       {/* ------------------------------------------------------------------
@@ -295,6 +302,25 @@ export function ProduktPageBody({
                         </li>
                       ))}
                     </ul>
+                  </Reveal>
+                )}
+
+                {/*
+                  Nur wo etwas im selben Feld läuft — heute allein bei fibero.
+                  Bei einem Operations-Produkt ist das die relevanteste Angabe
+                  überhaupt: Wir kennen die Seite, für die wir bauen, aus dem
+                  eigenen Tagesgeschäft.
+                */}
+                {houseContext && (
+                  <Reveal delay={0.12} className="border-gold/45 bg-muted mt-10 border-l-2 py-6 pl-6">
+                    <p className="eyebrow text-gold-text">{copy.houseContextLabel}</p>
+                    <p className="text-subhead mt-4 text-xl">{houseContext.name}</p>
+                    <p className="type-small text-muted-foreground mt-2">
+                      {houseContext.what} · {houseContext.kind}
+                    </p>
+                    <p className="type-body text-foreground/85 mt-5 max-w-lg text-pretty">
+                      {copy.houseContextNote}
+                    </p>
                   </Reveal>
                 )}
               </div>

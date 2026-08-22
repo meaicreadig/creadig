@@ -211,6 +211,14 @@ export const dictionary = {
       layerLabel: "Ebene",
       servicesLabel: "Passende Leistungen",
       layerCta: "Ebene ansehen",
+      /*
+       * Der Kontext-Block nennt, was im selben Feld unter demselben Dach
+       * laeuft. Bewusst als Angabe formuliert, nicht als Herleitung: „daraus
+       * ist das Produkt entstanden" hat niemand belegt.
+       */
+      houseContextLabel: "Im selben Haus",
+      houseContextNote:
+        "Wir bauen nicht nur für dieses Feld — wir arbeiten selbst darin. Das ist der Grund, warum wir die Fragen kennen, bevor sie gestellt werden.",
       /* Owner-Text, heute leer — die Sektion rendert dann gar nicht. */
       storyLabel: "Warum wir es gebaut haben",
       nextLabel: "Nächstes Produkt",
@@ -1017,6 +1025,9 @@ export const dictionary = {
       layerLabel: "Katman",
       servicesLabel: "İlgili hizmetler",
       layerCta: "Katmanı gör",
+      houseContextLabel: "Aynı çatı altında",
+      houseContextNote:
+        "Bu alan için yalnızca kurmuyoruz — kendimiz de içinde çalışıyoruz. Soruları sorulmadan bilmemizin sebebi bu.",
       storyLabel: "Neden kurduk",
       nextLabel: "Sonraki ürün",
       prevLabel: "Önceki ürün",

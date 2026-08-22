@@ -193,6 +193,19 @@ export type ProductWorld = {
    * `null` = die Sektion rendert nicht. TODO (Owner).
    */
   story: Localized | null
+  /**
+   * Name eines Eintrags aus `furtherProjects`, der im selben Feld arbeitet.
+   *
+   * Heute traegt das nur fibero: Unter demselben Dach laeuft `creaDIG fiber`,
+   * das operative Glasfaser-Geschaeft. Das ist keine Herleitung („daraus ist
+   * fibero entstanden") — das waere eine Behauptung, die niemand belegt hat.
+   * Es ist die schlichte Angabe, dass beide hier laufen, und genau das ist
+   * bei einem Operations-Produkt die relevanteste Information ueberhaupt:
+   * Wir kennen die Seite, fuer die wir bauen, aus dem eigenen Tagesgeschaeft.
+   *
+   * `null` = der Block rendert nicht. Ein unbekannter Name ebenfalls.
+   */
+  houseContext: string | null
   /** Traegt das dunkle Faehigkeiten-Band (heute nur meAI). */
   flagship: boolean
 }
@@ -207,6 +220,7 @@ export const productWorlds: Record<string, ProductWorld> = {
     ],
     layer: "intelligence",
     story: null,
+    houseContext: null,
     flagship: true,
   },
   fibero: {
@@ -217,6 +231,7 @@ export const productWorlds: Record<string, ProductWorld> = {
     ],
     layer: "operations",
     story: null,
+    houseContext: "creaDIG fiber",
     flagship: false,
   },
   cassamea: {
@@ -227,6 +242,7 @@ export const productWorlds: Record<string, ProductWorld> = {
     ],
     layer: "operations",
     story: null,
+    houseContext: null,
     flagship: false,
   },
   meahv: {
@@ -237,6 +253,7 @@ export const productWorlds: Record<string, ProductWorld> = {
     ],
     layer: "operations",
     story: null,
+    houseContext: null,
     flagship: false,
   },
 }
