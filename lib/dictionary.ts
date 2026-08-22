@@ -655,8 +655,8 @@ export const dictionary = {
       messageLabel: "Worum geht es?",
       messagePlaceholder: "Kurz in eigenen Worten — ein bis zwei Sätze genügen.",
       errRequired: "Bitte Name und ein paar Worte zum Anliegen ergänzen.",
-      submitWhatsapp: "Per WhatsApp senden",
-      submitEmail: "Per E-Mail senden",
+      submit: "Anfrage senden",
+      submitWhatsapp: "Lieber per WhatsApp",
       whatsappTitle: "WhatsApp",
       whatsappNote: "Schnellste Antwort, DE & TR.",
       appointmentTitle: "Kostenlose Erstberatung",
@@ -671,7 +671,23 @@ export const dictionary = {
       privacyConsentLink: "Datenschutzerklärung",
       privacyConsentSuffix:
         "gelesen und bin damit einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage verarbeitet werden.",
+      emailLabel: "E-Mail",
+      emailPlaceholder: "damit wir antworten können",
+      phoneLabel: "Telefon",
+      phonePlaceholder: "für den Rückruf",
+      errEmail: "Bitte prüfen Sie die E-Mail-Adresse.",
+      errPhone: "Bitte geben Sie eine Telefonnummer an — wir rufen lieber an, als zu schreiben.",
       errPrivacy: "Bitte bestätigen Sie die Datenschutzerklärung.",
+      /* Der Sende-Zustand. Kein Text ohne Deckung: „gesendet" steht erst da,
+         wenn der Server die Zustellung bestätigt hat. */
+      sending: "Wird gesendet …",
+      sentTitle: "Ihre Anfrage ist angekommen.",
+      sentBody:
+        "Wir melden uns am nächsten Werktag. Eine Bestätigung liegt in Ihrem Postfach — schauen Sie zur Sicherheit auch in den Spam-Ordner.",
+      errSendFailed:
+        "Die Anfrage konnte gerade nicht zugestellt werden. Bitte versuchen Sie es noch einmal — oder nehmen Sie einen der Wege rechts.",
+      errNotConfigured:
+        "Der Versandweg ist noch nicht eingerichtet. Bitte nutzen Sie so lange WhatsApp oder schreiben Sie an",
       handoffNote:
         "Beim Absenden öffnet sich WhatsApp beziehungsweise Ihr E-Mail-Programm mit der fertigen Nachricht — versendet wird erst, wenn Sie es dort bestätigen.",
       /*
@@ -1413,8 +1429,8 @@ export const dictionary = {
       messageLabel: "Konu nedir?",
       messagePlaceholder: "Kendi cümlelerinizle kısaca — bir iki cümle yeterli.",
       errRequired: "Lütfen adınızı ve konuyla ilgili birkaç kelime ekleyin.",
-      submitWhatsapp: "WhatsApp ile gönder",
-      submitEmail: "E-posta ile gönder",
+      submit: "Talebi gönder",
+      submitWhatsapp: "WhatsApp ile göndereyim",
       whatsappTitle: "WhatsApp",
       whatsappNote: "En hızlı yanıt, DE & TR.",
       appointmentTitle: "Ücretsiz ilk görüşme",
@@ -1428,7 +1444,21 @@ export const dictionary = {
       privacyConsentLink: "Gizlilik politikasını",
       privacyConsentSuffix:
         "okudum ve bilgilerimin talebimin işlenmesi amacıyla kullanılmasını kabul ediyorum.",
+      emailLabel: "E-posta",
+      emailPlaceholder: "size dönebilmemiz için",
+      phoneLabel: "Telefon",
+      phonePlaceholder: "geri arama için",
+      errEmail: "Lütfen e-posta adresini kontrol edin.",
+      errPhone: "Lütfen bir telefon numarası girin — yazmaktansa aramayı tercih ederiz.",
       errPrivacy: "Lütfen gizlilik politikasını onaylayın.",
+      sending: "Gönderiliyor …",
+      sentTitle: "Talebiniz bize ulaştı.",
+      sentBody:
+        "Bir sonraki iş günü size döneceğiz. Onay e-postası posta kutunuzda — güvenlik için spam klasörüne de bakın.",
+      errSendFailed:
+        "Talep şu anda iletilemedi. Lütfen tekrar deneyin — ya da sağdaki yollardan birini kullanın.",
+      errNotConfigured:
+        "Gönderim yolu henüz kurulmadı. O zamana kadar WhatsApp'ı kullanın ya da şu adrese yazın:",
       handoffNote:
         "Gönderdiğinizde WhatsApp veya e-posta programınız hazır mesajla açılır — gönderim ancak orada onayladığınızda gerçekleşir.",
       handoffTitle: "Neredeyse tamam — bir adım kaldı.",

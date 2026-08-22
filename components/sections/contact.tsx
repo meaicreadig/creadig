@@ -13,37 +13,57 @@ import { contact } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 export function Contact() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
   const [name, setName] = useState("")
   const [business, setBusiness] = useState("")
+  // E-Mail und Telefon fehlten komplett. Ein Formular, das nur einen Namen und
+  // einen Text einsammelt, liefert keine Anfrage — es liefert eine Notiz.
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  // Honeypot: muss leer bleiben. Fuer Menschen unsichtbar, fuer Bots verlockend.
+  const [website, setWebsite] = useState("")
   const [message, setMessage] = useState("")
   // Ohne Einwilligung wird nichts uebergeben — weder an WhatsApp noch per Mail.
   const [privacyOk, setPrivacyOk] = useState(false)
   const [invalid, setInvalid] = useState<{
     name?: boolean
+    email?: boolean
+    phone?: boolean
     message?: boolean
     privacy?: boolean
   }>({})
   const [error, setError] = useState<string | null>(null)
   /*
-   * UX-2: Nach dem Klick stand bisher nichts da. Ein blockiertes Popup und
-   * eine geglueckte Uebergabe sahen exakt gleich aus — beide unsichtbar.
-   * `handoff` ist bewusst KEINE Erfolgsmeldung: Die Nachricht ist erst raus,
-   * wenn der Absender sie in WhatsApp bzw. seinem Mailprogramm bestaetigt,
-   * und genau das steht dann dort.
+   * UX-2 / P3: Nach dem Klick stand hier lange gar nichts. Jetzt gibt es drei
+   * ehrliche Zustaende und keinen vierten:
+   *   "sending"  laeuft
+   *   "sent"     der Server hat die Zustellung BESTAETIGT
+   *   handoff    WhatsApp/Mail wurde geoeffnet — die Nachricht ist damit noch
+   *              NICHT bei uns, und genau das steht dann da.
    */
+  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle")
   const [handoff, setHandoff] = useState<"whatsapp" | "mail" | null>(null)
 
-  /** Beide Wege laufen durch dieselbe Pruefung. `true` = darf uebergeben werden. */
+  /** Beide Wege laufen durch dieselbe Pruefung. `true` = darf raus. */
   function validate() {
     const bad = {
       name: !name.trim(),
+      email: !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim()),
+      phone: !phone.trim(),
       message: !message.trim(),
       privacy: !privacyOk,
     }
     setInvalid(bad)
     if (bad.name || bad.message) {
       setError(t.contact.errRequired)
+      return false
+    }
+    if (bad.email) {
+      setError(t.contact.errEmail)
+      return false
+    }
+    if (bad.phone) {
+      setError(t.contact.errPhone)
       return false
     }
     if (bad.privacy) {
@@ -57,6 +77,8 @@ export function Contact() {
   const composed = [
     name && `${t.contact.nameLabel}: ${name}`,
     business && `${t.contact.businessLabel}: ${business}`,
+    email && `${t.contact.emailLabel}: ${email}`,
+    phone && `${t.contact.phoneLabel}: ${phone}`,
     message,
   ]
     .filter(Boolean)
@@ -96,30 +118,65 @@ export function Contact() {
 
             <Reveal delay={0.12}>
               <form
-                className="mt-12 flex flex-col gap-8"
+                className="relative mt-12 flex flex-col gap-8"
                 noValidate
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault()
-                  // Gleiche Regel wie in der alten `ct_*`-Logik: ohne Name und
-                  // ohne Anliegen wird nichts verschickt. Neu: ohne Einwilligung
-                  // ebenfalls nicht.
                   if (!validate()) {
                     setHandoff(null)
                     return
                   }
+
                   /*
-                    Der Rueckgabewert von `window.open` ist die einzige Stelle,
-                    an der ein blockiertes Popup ueberhaupt bemerkbar ist. Ohne
-                    diese Pruefung sah "Browser hat es geblockt" genauso aus wie
-                    "hat geklappt": naemlich nach gar nichts.
+                    Der eigentliche Weg: an den eigenen Endpunkt. WhatsApp
+                    bleibt daneben stehen, ist aber nicht mehr der einzige —
+                    und vor allem nicht mehr der, den die Seite als Erfolg
+                    ausgibt, obwohl der Absender dort noch tippen muss.
                   */
-                  const opened = window.open(whatsappHref, "_blank", "noopener,noreferrer")
-                  if (!opened) {
-                    setHandoff(null)
-                    setError(`${t.contact.errBlocked} ${contact.email}.`)
-                    return
+                  setStatus("sending")
+                  setError(null)
+                  setHandoff(null)
+                  try {
+                    const response = await fetch("/api/lead", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        name,
+                        business,
+                        email,
+                        phone,
+                        message,
+                        privacyOk,
+                        locale,
+                        website,
+                        source: "kontakt",
+                      }),
+                    })
+                    const data = (await response.json().catch(() => null)) as
+                      | { ok?: boolean; error?: string }
+                      | null
+
+                    if (response.ok && data?.ok) {
+                      setStatus("sent")
+                      return
+                    }
+
+                    setStatus("idle")
+                    /*
+                      Der Unterschied zaehlt: "noch nicht eingerichtet" ist ein
+                      Zustand unserer Seite, "hat gerade nicht geklappt" einer
+                      der Leitung. Wer das Erste liest, versucht es nicht
+                      dreimal vergeblich, sondern nimmt WhatsApp.
+                    */
+                    setError(
+                      data?.error === "not_configured"
+                        ? `${t.contact.errNotConfigured} ${contact.email}.`
+                        : t.contact.errSendFailed,
+                    )
+                  } catch {
+                    setStatus("idle")
+                    setError(t.contact.errSendFailed)
                   }
-                  setHandoff("whatsapp")
                 }}
               >
                 <FieldGroup className="gap-8">
@@ -157,6 +214,54 @@ export function Contact() {
                     </Field>
                   </div>
 
+                  {/*
+                    E-Mail und Telefon fehlten. Ein Formular, das nur Name und
+                    Text einsammelt, liefert keine Anfrage, sondern eine Notiz:
+                    Man weiss, dass jemand geschrieben hat, aber nicht, wie man
+                    ihn erreicht. Beide sind Pflicht — Telefon, weil bei dieser
+                    Zielgruppe der Rueckruf besser wirkt als jede Mail.
+                  */}
+                  <div className="grid gap-8 sm:grid-cols-2">
+                    <Field>
+                      <FieldLabel htmlFor="contact-email" className="eyebrow text-muted-foreground">
+                        {t.contact.emailLabel}
+                      </FieldLabel>
+                      <Input
+                        id="contact-email"
+                        type="email"
+                        inputMode="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value)
+                          setInvalid((v) => ({ ...v, email: false }))
+                        }}
+                        aria-invalid={invalid.email || undefined}
+                        placeholder={t.contact.emailPlaceholder}
+                        className={`${fieldClass} ${invalid.email ? "border-destructive" : ""}`}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel htmlFor="contact-phone" className="eyebrow text-muted-foreground">
+                        {t.contact.phoneLabel}
+                      </FieldLabel>
+                      <Input
+                        id="contact-phone"
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        value={phone}
+                        onChange={(e) => {
+                          setPhone(e.target.value)
+                          setInvalid((v) => ({ ...v, phone: false }))
+                        }}
+                        aria-invalid={invalid.phone || undefined}
+                        placeholder={t.contact.phonePlaceholder}
+                        className={`${fieldClass} ${invalid.phone ? "border-destructive" : ""}`}
+                      />
+                    </Field>
+                  </div>
+
                   <Field>
                     <FieldLabel htmlFor="contact-message" className="eyebrow text-muted-foreground">
                       {t.contact.messageLabel}
@@ -174,6 +279,25 @@ export function Contact() {
                       className={`${fieldClass} resize-none ${invalid.message ? "border-destructive" : ""}`}
                     />
                   </Field>
+
+                  {/*
+                    Honeypot. Kein `display:none` — manche Bots erkennen das und
+                    lassen das Feld dann aus. Es steht ausserhalb des sichtbaren
+                    Bereichs, ist fuer Screenreader ausgeblendet und aus der
+                    Tab-Reihenfolge genommen.
+                  */}
+                  <div aria-hidden="true" className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                    <label htmlFor="contact-website">Website</label>
+                    <input
+                      id="contact-website"
+                      name="website"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
+                  </div>
                 </FieldGroup>
 
                 {/*
@@ -222,6 +346,21 @@ export function Contact() {
                 )}
 
                 {/*
+                  DER Erfolgszustand — und der einzige Ort auf der Seite, an
+                  dem "angekommen" steht. Er erscheint erst, wenn der Server
+                  die Zustellung bestaetigt hat (`ok: true`), nie nach einem
+                  Klick allein.
+                */}
+                {status === "sent" && (
+                  <div role="status" className="border-gold bg-muted border-l-2 py-4 pl-5">
+                    <p className="type-small text-foreground">{t.contact.sentTitle}</p>
+                    <p className="type-small text-muted-foreground mt-2 text-pretty">
+                      {t.contact.sentBody}
+                    </p>
+                  </div>
+                )}
+
+                {/*
                   Kein Erfolgs-Haken: Die Anfrage ist an dieser Stelle noch
                   NICHT bei uns. `role="status"` statt `role="alert"`, weil es
                   eine Zustandsmeldung ist und keine Fehlermeldung.
@@ -248,23 +387,35 @@ export function Contact() {
                 )}
 
                 <div className="flex flex-wrap items-center gap-3">
+                  {/*
+                    Der Hauptknopf schickt jetzt an den eigenen Endpunkt. Er
+                    trug vorher das WhatsApp-Zeichen — das war die ehrliche
+                    Beschriftung fuer das, was passierte, aber es war der
+                    falsche Weg: Eine Anfrage, die erst im Postfach eines
+                    Fremdanbieters landet und dort noch einmal abgeschickt
+                    werden muss, geht unterwegs verloren.
+                  */}
                   <button
                     type="submit"
-                    className="group from-gold-soft to-gold relative inline-flex items-center gap-2.5 overflow-hidden bg-gradient-to-br px-7 py-3.5 text-sm tracking-wide text-[#201e1b]"
+                    disabled={status === "sending"}
+                    className="group from-gold-soft to-gold relative inline-flex items-center gap-2.5 overflow-hidden bg-gradient-to-br px-7 py-3.5 text-sm tracking-wide text-[#201e1b] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <span
                       aria-hidden="true"
                       className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
                     />
                     <span className="group-hover:text-gold-soft relative z-10 flex items-center gap-2.5 transition-colors duration-500">
-                      <WhatsAppIcon className="size-4" />
-                      {t.contact.submitWhatsapp}
+                      <Send className="size-4" strokeWidth={1.5} />
+                      {status === "sending" ? t.contact.sending : t.contact.submit}
                     </span>
                   </button>
                   {/*
-                    Kein <a href="mailto:…">: der Link haette die Pflichtfelder
-                    und die Einwilligung umgangen. Beide Wege laufen jetzt durch
-                    dieselbe Pruefung.
+                    WhatsApp bleibt — entthront, nicht entfernt. Fuer einen
+                    Teil dieser Zielgruppe ist es der bequemste Weg, und es
+                    laeuft weiterhin durch dieselbe Pflichtfeld- und
+                    Einwilligungspruefung wie der Hauptknopf. Der Zustand
+                    darunter sagt dann ausdruecklich, dass dort noch ein
+                    Schritt fehlt.
                   */}
                   <button
                     type="button"
@@ -273,13 +424,19 @@ export function Contact() {
                         setHandoff(null)
                         return
                       }
-                      setHandoff("mail")
-                      window.location.href = mailHref
+                      const opened = window.open(whatsappHref, "_blank", "noopener,noreferrer")
+                      if (!opened) {
+                        setHandoff(null)
+                        setError(`${t.contact.errBlocked} ${contact.email}.`)
+                        return
+                      }
+                      setStatus("idle")
+                      setHandoff("whatsapp")
                     }}
                     className="border-line-strong hover:border-gold inline-flex items-center gap-2.5 border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
                   >
-                    <Send className="size-4" strokeWidth={1.5} />
-                    {t.contact.submitEmail}
+                    <WhatsAppIcon className="size-4" />
+                    {t.contact.submitWhatsapp}
                   </button>
                 </div>
               </form>
