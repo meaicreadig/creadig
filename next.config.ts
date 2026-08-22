@@ -3,7 +3,22 @@ import type { NextConfig } from "next"
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "Strict-Transport-Security", value: "max-age=63072000" },
+  /*
+   * SEC-6 — Clickjacking: ohne diesen Header laesst sich die Seite in einen
+   * fremden Frame haengen und ueber eine unsichtbare Schicht bedienen. Wir
+   * betten uns nirgends selbst ein, also DENY statt SAMEORIGIN.
+   */
+  { key: "X-Frame-Options", value: "DENY" },
+  /*
+   * HSTS galt bisher nur fuer die nackte Domain und ohne Preload-Zusage.
+   * includeSubDomains zieht alle Subdomains mit, preload macht die Regel
+   * schon vor dem ersten Besuch gueltig (Browser-Liste) — damit greift sie
+   * auch beim allerersten Aufruf, wo der Downgrade-Angriff sitzt.
+   */
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
 ]
 
