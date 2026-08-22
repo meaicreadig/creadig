@@ -62,7 +62,6 @@ export const metadata: Metadata = {
     "Digitalagentur",
     "KI-Systeme",
     "Osnabrück",
-    "go-digital",
     "Schweiz",
   ],
   authors: [{ name: "creaDIG" }],

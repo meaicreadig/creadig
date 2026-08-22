@@ -377,10 +377,6 @@ export const dictionary = {
           a: "Wir arbeiten mit drei festen Paketen: Identity €350 einmalig, Growth Partner €500 pro Monat und Architecture €1.500 pro Monat. Transparent, ohne versteckte Kosten.",
         },
         {
-          q: "Gibt es Förderung für die Zusammenarbeit?",
-          a: "Viele Leistungen sind über das go-digital-Programm des BMWK förderfähig — bis zu 50 %. Wir sind dafür autorisiertes Beratungsunternehmen, prüfen die Voraussetzungen vorab und übernehmen Antrag und Abwicklung.",
-        },
-        {
           q: "Wie läuft ein Projekt ab?",
           a: "In drei Schritten: verstehen, bauen, betreiben. Wir sehen uns den Betrieb an, bauen das System und betreiben es anschließend weiter.",
         },
@@ -409,7 +405,6 @@ export const dictionary = {
       packagesCta: "Pakete und Preise ansehen",
       worksLabel: "Arbeiten dazu",
       worksCta: "Ganze Werkschau ansehen",
-      fundingLabel: "Förderung",
       ctaTitle: "Passt das zu Ihrem Betrieb?",
       ctaBody: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sehen uns den Betrieb an und sagen ehrlich, ob wir helfen können.",
       ctaPrimary: "Kostenlose Erstberatung",
@@ -422,7 +417,6 @@ export const dictionary = {
       forWhom: "Für wen",
       // Einstiegs-Chips ueber der Pyramide: die Vokabel, nach der gesucht wird.
       entryLabel: "Einstieg",
-      entryFunding: "go-digital-Förderung",
       layers: {
         identity: {
           name: "Identity",
@@ -576,9 +570,6 @@ export const dictionary = {
       retainerTitle: "Betrieb statt Uebergabe.",
       retainerFrom: "ab",
       retainerCta: "Retainer anfragen",
-      funding:
-        "Viele Leistungen sind über das go-digital-Programm des BMWK förderfähig — bis zu 50 %. Wir prüfen die Voraussetzungen vorab und übernehmen Antrag und Abwicklung.",
-      fundingLink: "Zu unseren Zertifizierungen",
       once: "einmalig · kein Abo",
       monthly: "/ Monat",
       items: {
@@ -629,25 +620,14 @@ export const dictionary = {
     certs: {
       eyebrow: "Zertifizierungen & Mitgliedschaften",
       title: "Geprüft. Zugelassen. Eingetragen.",
-      lead: "Fünf Nachweise, die man nachschlagen kann. Keine selbst vergebenen Siegel, keine gekauften Auszeichnungen.",
+      lead: "Vier Nachweise, die man nachschlagen kann. Keine selbst vergebenen Siegel, keine gekauften Auszeichnungen.",
       verify: "Zur offiziellen Stelle",
       note: "Alle Einträge sind bei den genannten Stellen überprüfbar.",
       items: {
-        "go-digital": { label: "autorisiert für das Förderprogramm", note: "BMWK-Förderprogramm" },
         bafa: { label: "zugelassener Unternehmensberater des", note: "Berater-ID: #190949" },
         iuk: { label: "Mitglied beim", note: "" },
         avpq: { label: "eingetragen in das", note: "" },
         agd: { label: "Mitglied bei der", note: "" },
-      },
-      funding: {
-        eyebrow: "Förderung",
-        title: "Bis zu 50 % Förderung über go-digital.",
-        body: "Viele Projekte realisieren wir über das go-digital-Förderprogramm des BMWK — bis zu 50 % Förderung. Wir übernehmen Antrag und Abwicklung.",
-        detail:
-          "Als autorisiertes Beratungsunternehmen prüfen wir zuerst, ob Ihr Betrieb die Voraussetzungen erfüllt. Ergibt die Prüfung, dass keine Förderung möglich ist, sagen wir das offen.",
-        cta: "Förderfähigkeit prüfen lassen",
-        waText:
-          "Guten Tag creaDIG, bitte prüfen Sie, ob mein Vorhaben über go-digital förderfähig ist.",
       },
     },
     contact: {
@@ -1183,10 +1163,6 @@ export const dictionary = {
           a: "Üç sabit paketle çalışıyoruz: Identity tek seferlik €350, Growth Partner aylık €500 ve Architecture aylık €1.500. Şeffaf, gizli maliyet yok.",
         },
         {
-          q: "İş birliği için destek imkânı var mı?",
-          a: "Birçok hizmet, BMWK'nın go-digital programı üzerinden %50'ye varan oranda desteklenebilir. Bunun için yetkili danışmanlık firmasıyız; koşulları önceden inceliyor, başvuruyu ve süreci biz yürütüyoruz.",
-        },
-        {
           q: "Proje nasıl ilerler?",
           a: "Üç adımda: anlamak, kurmak, işletmek. İşletmeye bakar, sistemi kurar ve ardından işletmeye devam ederiz.",
         },
@@ -1215,7 +1191,6 @@ export const dictionary = {
       packagesCta: "Paketleri ve fiyatları gör",
       worksLabel: "İlgili işler",
       worksCta: "Tüm seçkiyi gör",
-      fundingLabel: "Destek",
       ctaTitle: "İşletmenize uygun mu?",
       ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmeye bakar ve yardımcı olabilir miyiz, dürüstçe söyleriz.",
       ctaPrimary: "Ücretsiz ilk görüşme",
@@ -1227,7 +1202,6 @@ export const dictionary = {
       lead: "A'dan Z'ye çalışıyoruz — ilk logodan kendi yapay zekâ sistemine kadar. Her katman altındakinin üzerine kurulur.",
       forWhom: "Kimler için",
       entryLabel: "Başlangıç",
-      entryFunding: "go-digital desteği",
       layers: {
         identity: {
           name: "Identity",
@@ -1365,9 +1339,6 @@ export const dictionary = {
       retainerTitle: "Teslim değil, işletme.",
       retainerFrom: "başlangıç",
       retainerCta: "Retainer talep et",
-      funding:
-        "Birçok hizmet, BMWK'nın go-digital programı üzerinden %50'ye varan oranda desteklenebilir. Koşulları önceden inceliyor, başvuruyu ve süreci biz yürütüyoruz.",
-      fundingLink: "Sertifikalarımıza git",
       once: "tek seferlik · abonelik yok",
       monthly: "/ ay",
       items: {
@@ -1418,25 +1389,14 @@ export const dictionary = {
     certs: {
       eyebrow: "Sertifikalar & üyelikler",
       title: "Denetlenmiş. Yetkili. Kayıtlı.",
-      lead: "Doğrulanabilir beş belge. Kendi verdiğimiz rozetler yok, satın alınmış ödüller yok.",
+      lead: "Doğrulanabilir dört belge. Kendi verdiğimiz rozetler yok, satın alınmış ödüller yok.",
       verify: "Resmî kuruma git",
       note: "Tüm kayıtlar adı geçen kurumlardan doğrulanabilir.",
       items: {
-        "go-digital": { label: "Yetkili olduğumuz destek programı", note: "BMWK destek programı" },
         bafa: { label: "Onaylı danışmanı olduğumuz kurum", note: "Danışman kimliği: #190949" },
         iuk: { label: "Üyesi olduğumuz ağ", note: "" },
         avpq: { label: "Kayıtlı olduğumuz resmî sicil", note: "" },
         agd: { label: "Üyesi olduğumuz birlik", note: "" },
-      },
-      funding: {
-        eyebrow: "Devlet desteği",
-        title: "go-digital ile %50'ye varan destek.",
-        body: "Birçok projeyi BMWK'nın go-digital destek programı üzerinden hayata geçiriyoruz — %50'ye varan destek. Başvuruyu ve süreci biz yürütüyoruz.",
-        detail:
-          "Yetkili danışmanlık şirketi olarak önce işletmenizin koşulları karşılayıp karşılamadığını inceliyoruz. Destek mümkün değilse bunu açıkça söylüyoruz.",
-        cta: "Destek uygunluğunu inceletin",
-        waText:
-          "Merhaba creaDIG, projemin go-digital kapsamında desteklenip desteklenemeyeceğini inceler misiniz?",
       },
     },
     contact: {

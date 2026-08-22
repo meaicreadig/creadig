@@ -748,7 +748,7 @@ export const meaiCapabilityKeys = ["overview", "tasks", "documents", "decisions"
  * hier `logoPath` setzen. Nutzungsbedingungen der jeweiligen Stelle beachten.
  */
 export type Certification = {
-  slug: "go-digital" | "bafa" | "iuk" | "avpq" | "agd"
+  slug: "bafa" | "iuk" | "avpq" | "agd"
   /** Offizielles Badge-Logo unter public/badges/ — null, solange keins vorliegt. */
   logoPath: string | null
   /** Kürzel für die getypte Kachel. */
@@ -767,15 +767,18 @@ export type Certification = {
   href: string
 }
 
+/*
+ * go-digital stand hier als fuenfter Eintrag — mit dem Label „autorisiert
+ * fuer das Foerderprogramm". Diese Behauptung ist ohne aktuellen Nachweis
+ * nicht haltbar (das Programm ist ausgelaufen, der Status des Hauses
+ * ungeklaert). Ein Nachweis, den man nicht nachschlagen kann, ist in einer
+ * Liste mit der Ueberschrift „Geprueft. Zugelassen. Eingetragen." genau
+ * das Gegenteil dessen, wofuer die Liste da ist.
+ *
+ * Zurueck kommt der Eintrag nur mit Nachweis. Bis dahin steht die Frage auf
+ * der Live-Checkliste (Phase 5): "go-digital-Status klaeren".
+ */
 export const certifications: Certification[] = [
-  {
-    slug: "go-digital",
-    short: "go-digital · BMWK",
-    logoPath: null,
-    mark: "gd",
-    name: "go-digital",
-    href: "https://www.bmwk.de/Redaktion/DE/Artikel/Digitale-Welt/foerderprogramm-go-digital.html",
-  },
   {
     slug: "bafa",
     short: "BAFA-gelistet",

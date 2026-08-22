@@ -18,7 +18,7 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
  * strukturierten Daten liefert die Server-Seite darüber.
  *
  * Alles hier zeigt bereits belegte Inhalte: die Ebenen-Beschreibung aus dem
- * Wörterbuch, die drei Prozessschritte, die Paketinhalte, den Förder-Hinweis
+ * Wörterbuch, die drei Prozessschritte, die Paketinhalte
  * und echte Arbeiten. Die Seite bündelt sie für einen Suchbegriff, sie
  * erfindet nichts dazu.
  */
@@ -130,7 +130,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
             )}
           </div>
 
-          {/* Rechte Spalte: Für wen, Pakete, Förderung */}
+          {/* Rechte Spalte: Für wen, Pakete */}
           <div className="lg:col-span-5">
             <Reveal className="border-line border-t pt-8">
               <p className="eyebrow text-gold-text">{copy.forWhomLabel}</p>
@@ -176,21 +176,6 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
               </Link>
             </Reveal>
 
-            <Reveal delay={0.12}>
-              <div className="border-gold/45 bg-muted mt-14 border-l-2 py-6 pl-6">
-                <p className="eyebrow text-gold-text">{copy.fundingLabel}</p>
-                <p className="type-body text-foreground/85 mt-4 text-pretty">
-                  {t.certs.funding.body}
-                </p>
-                <Link
-                  href="/unternehmen#zertifizierungen"
-                  className="text-gold-text hover:text-foreground mt-5 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
-                >
-                  {t.packages.fundingLink}
-                  <ArrowUpRight className="size-4" strokeWidth={1.5} />
-                </Link>
-              </div>
-            </Reveal>
           </div>
         </div>
 

@@ -3,12 +3,16 @@
 import { ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
-import { certifications, contact } from "@/lib/site-data"
+import { certifications } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /**
  * Zertifizierungen & Mitgliedschaften — nur echte, nachprüfbare Nachweise.
+ *
+ * Der Foerder-Block, der hier stand, ist entfernt: Er warb mit „autorisiertes
+ * Beratungsunternehmen" fuer ein Programm, dessen Status ungeklaert ist. In
+ * einer Sektion mit der Ueberschrift „Geprueft. Zugelassen. Eingetragen."
+ * war das der einzige Eintrag, den man nicht nachschlagen konnte.
  *
  * Solange die offiziellen Badge-Logos nicht vorliegen (`logoPath === null`),
  * rendert die Kachel eine getypte Variante: kleines Kürzel-Quadrat, Über-Label,
@@ -17,10 +21,6 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
  */
 export function Certifications() {
   const { t } = useLocale()
-
-  const fundingHref = `${contact.whatsappHref}?text=${encodeURIComponent(
-    t.certs.funding.waText,
-  )}`
 
   return (
     <section
@@ -109,41 +109,6 @@ export function Certifications() {
           </p>
         </Reveal>
 
-        {/* Förder-Angle: go-digital ist der konkreteste Grund, jetzt zu sprechen. */}
-        <Reveal delay={0.06}>
-          <div className="border-gold/45 bg-muted mt-16 grid gap-10 border-l-2 px-7 py-9 md:px-10 md:py-11 lg:grid-cols-12 lg:gap-14">
-            <div className="lg:col-span-7">
-              <p className="eyebrow text-gold-text">{t.certs.funding.eyebrow}</p>
-              <h3 className="type-h3 mt-5 text-balance">
-                {t.certs.funding.title}
-              </h3>
-              <p className="text-foreground/85 mt-6 max-w-2xl text-base leading-relaxed text-pretty">
-                {t.certs.funding.body}
-              </p>
-            </div>
-
-            <div className="flex flex-col justify-end lg:col-span-5">
-              <p className="type-body text-muted-foreground max-w-md text-pretty">
-                {t.certs.funding.detail}
-              </p>
-              <a
-                href={fundingHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group/cta from-gold-soft to-gold relative mt-8 inline-flex items-center justify-between gap-3 self-start overflow-hidden bg-gradient-to-br px-7 py-3.5 text-sm tracking-wide text-[#201e1b]"
-              >
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/cta:translate-y-0"
-                />
-                <span className="group-hover/cta:text-gold-soft relative z-10 flex items-center gap-2.5 transition-colors duration-500">
-                  <WhatsAppIcon className="size-4" />
-                  {t.certs.funding.cta}
-                </span>
-              </a>
-            </div>
-          </div>
-        </Reveal>
       </div>
     </section>
   )

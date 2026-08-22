@@ -16,7 +16,7 @@ import type { Localized } from "@/lib/site-data"
  * WOHER DER INHALT KOMMT — und woher NICHT
  * Kein Satz auf diesen Seiten behauptet etwas, das die Seite nicht schon sagt.
  * Jede Aussage ist entweder aus `dictionary.ts` übernommen (Ebenen-Beschreibung,
- * Prozess, Pakete, Förderung, Schwerpunkte) oder eine Umformulierung davon in
+ * Prozess, Pakete, Schwerpunkte) oder eine Umformulierung davon in
  * der Vokabel, nach der gesucht wird. Was hier NICHT steht: Zahlen, Fristen,
  * Ergebnisversprechen, Referenzen ohne Freigabe.
  *
@@ -89,8 +89,8 @@ export const servicePages: ServicePage[] = [
     },
     metaTitle: { de: "Webdesign für kleine und mittlere Betriebe", tr: "KOBİ'ler için web tasarımı" },
     metaDescription: {
-      de: "Website, Shop und Landingpages für kleine und mittlere Betriebe in Deutschland und der Schweiz. Auf Deutsch und Türkisch. Bis zu 50 % Förderung über go-digital möglich.",
-      tr: "Almanya ve İsviçre'deki küçük ve orta ölçekli işletmeler için web sitesi, mağaza ve açılış sayfaları. Almanca ve Türkçe. go-digital üzerinden %50'ye varan destek mümkün.",
+      de: "Website, Shop und Landingpages für kleine und mittlere Betriebe in Deutschland und der Schweiz. Auf Deutsch und Türkisch.",
+      tr: "Almanya ve İsviçre'deki küçük ve orta ölçekli işletmeler için web sitesi, mağaza ve açılış sayfaları. Almanca ve Türkçe.",
     },
     includes: {
       de: [
@@ -170,8 +170,8 @@ export const servicePages: ServicePage[] = [
     },
     metaTitle: { de: "Website für Handwerksbetriebe", tr: "Zanaat işletmeleri için web sitesi" },
     metaDescription: {
-      de: "Websites für Handwerksbetriebe mit 6–20 Mitarbeitern in NRW und Niedersachsen. Erst den Betrieb verstehen, dann bauen, dann betreiben. Förderung über go-digital möglich.",
-      tr: "NRW ve Aşağı Saksonya'da 6–20 çalışanlı zanaat işletmeleri için web siteleri. Önce işletmeyi anlamak, sonra kurmak, sonra işletmek. go-digital desteği mümkün.",
+      de: "Websites für Handwerksbetriebe mit 6–20 Mitarbeitern in NRW und Niedersachsen. Erst den Betrieb verstehen, dann bauen, dann betreiben.",
+      tr: "NRW ve Aşağı Saksonya'da 6–20 çalışanlı zanaat işletmeleri için web siteleri. Önce işletmeyi anlamak, sonra kurmak, sonra işletmek.",
     },
     includes: {
       de: [

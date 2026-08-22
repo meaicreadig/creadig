@@ -77,16 +77,6 @@ export function Services({ heading = true }: { heading?: boolean }) {
                   </Link>
                 </li>
               ))}
-              {/* Kein Leistungs-, sondern ein Geld-Einstieg — und fuer viele der erste. */}
-              <li>
-                <Link
-                  href="/unternehmen#zertifizierungen"
-                  className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-4 py-2.5 text-sm tracking-wide transition-colors duration-500"
-                >
-                  {t.services.entryFunding}
-                  <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
-                </Link>
-              </li>
             </ul>
           </div>
         </Reveal>
