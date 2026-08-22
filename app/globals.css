@@ -305,36 +305,53 @@
  * - Genau EIN `clamp()` pro Ebene. Neue Größen kommen hier rein, nicht ins Markup.
  * - Jede Klasse ist selbsttragend (Familie + Gewicht + Laufweite + Zeilenhöhe
  *   + Größe) und wird NICHT mit `text-display` kombiniert.
- * - Gewicht 700 tragen nur die großen Bauwerke; ab H3 trägt 600 (siehe E-T2),
- *   damit überhaupt eine Hierarchie-Stufe zwischen Headline und Fließtext liegt.
+ * - Gewicht 700 tragen nur die großen Bauwerke (display, h1, stat); ab H2
+ *   trägt 600 (E-T2, VIS-3), damit überhaupt eine Hierarchie-Stufe zwischen
+ *   Headline und Fließtext liegt.
  * ========================================================================== */
 
-/* Hero — einmal pro Seite, das größte Bauwerk. */
+/*
+ * Hero — einmal pro Seite, das größte Bauwerk.
+ * VIS-3: 9,5rem (152px) fuellten auf dem Laptop den halben Bildschirm mit
+ * drei Woertern. 7rem ist immer noch eine Ansage, laesst aber Hero-Text,
+ * Buttons und den Rand darunter im selben Bild stehen.
+ */
 @utility type-display {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(3rem, 11vw, 9.5rem);
+  font-size: clamp(3rem, 11vw, 7rem);
   letter-spacing: -0.045em;
   /* 0.95 kappte Unterlängen der 3-zeiligen DE-Headline. */
   line-height: 1;
 }
 
-/* Seiten-Titel der Unterseiten (/impressum, /datenschutz, /termin). */
+/*
+ * Seiten-Titel der Unterseiten (/impressum, /datenschutz, /termin).
+ * VIS-3: gedeckelt auf 3rem — ein Unterseiten-Titel darf nicht so laut
+ * werden wie der Hero der Startseite.
+ */
 @utility type-h1 {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(2.25rem, 6vw, 4rem);
+  font-size: clamp(2.25rem, 6vw, 3rem);
   letter-spacing: -0.04em;
   line-height: 1.04;
 }
 
-/* Sektions-Headline auf der Startseite. */
+/*
+ * Sektions-Headline auf der Startseite.
+ *
+ * VIS-3: 5rem bei Gewicht 700 war eine zweite Hero-Zeile — auf jeder
+ * Sektion. Zwoelf gleich laute Ueberschriften ergeben keine Hierarchie,
+ * sondern Geschrei. 3,25rem bei 600 laesst dem Hero seinen Auftritt und
+ * bringt oben wieder Luft in die Sektionen.
+ */
 @utility type-h2 {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(2.25rem, 6vw, 5rem);
-  letter-spacing: -0.04em;
-  line-height: 1.02;
+  font-weight: 600;
+  font-size: clamp(1.875rem, 4vw, 3.25rem);
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 /* Karten- und Unterüberschrift. */
