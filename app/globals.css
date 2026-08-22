@@ -152,41 +152,54 @@
 }
 
 /*
- * Ruhig abgesetzte Sektionen (Impact-Band, meAI-Spotlight, Footer).
+ * Abgesetzte Sektionen (Impact-Band, meAI-Spotlight, Abschluss-Band, Footer).
  *
- * Der Name ist historisch — gemeint ist „abgesetzt", nicht „schwarz". Die
- * Klasse definiert einen eigenen Token-Satz und faerbt damit ein ganzes Band
- * um, statt einzelne Elemente zu uebermalen.
+ * Die Klasse definiert einen eigenen Token-Satz und faerbt damit ein ganzes
+ * Band um, statt einzelne Elemente zu uebermalen.
  *
- * WICHTIG (E-D2): Der Satz muss ZWEIMAL existieren. Vorher gab es nur die
- * helle Variante — die dann auch im Dunkelmodus griff. Ergebnis: Nav und Hero
- * dunkel, das Band darunter creme. Der Dunkelmodus brach mitten in der Seite,
- * und die aufgehellte Wortmarke im Footer stand unsichtbar auf Creme.
+ * VIS-1: Der Name sagt „dark" — die Klasse lieferte im Hellmodus aber nur
+ * Creme auf Papierweiss (#f3f1ec auf #fbfbf9). Vier Baender, die die Seite
+ * anhalten sollten, waren vom Grund praktisch nicht zu unterscheiden; die
+ * Seite las sich als eine einzige helle Flaeche. Jetzt traegt das Band auch
+ * im Hellmodus den dunklen Satz: Papier -> Anthrazit -> Papier ist der
+ * Rhythmus, an dem man beim Scrollen merkt, dass ein Kapitel wechselt.
+ *
+ * WICHTIG (E-D2): Der Satz muss ZWEIMAL existieren. Ohne die zweite Variante
+ * greift dieser hier auch im Dunkelmodus — und das Band verschwindet dann
+ * umgekehrt im Seitengrund, statt sich abzuheben.
  */
 .section-dark {
-  --background: #f3f1ec;
-  --foreground: #2a2723;
-  --surface: #ffffff;
-  --surface-raised: #ffffff;
-  --muted: #ece9e2;
-  --muted-foreground: #6d6a63;
-  --line: #e0dcd3;
-  --line-strong: #cec9c0;
-  --gold: #be904e;
+  --background: #201e1b;
+  --foreground: #fbfbf9;
+  --surface: #2a2723;
+  --surface-raised: #322e29;
+  --muted: #2a2723;
+  --muted-foreground: #a7a099;
+  --line: #35312c;
+  --line-strong: #4a453e;
+  --gold: #d3a763;
   --gold-soft: #e4c378;
-  --gold-deep: #8f6a33;
-  --gold-text: #8f6a33;
-  --mesh: #ddd8cf;
-  --mesh-fill: #be904e;
-  --card: #ffffff;
-  --card-foreground: #2a2723;
-  --primary: #be904e;
-  --primary-foreground: #241c11;
-  --secondary: #ece9e2;
-  --secondary-foreground: #2a2723;
-  --border: #e0dcd3;
-  --input: #cec9c0;
-  --ring: #be904e;
+  --gold-deep: #be904e;
+  /* 7,5:1 auf #201e1b — Gold traegt hier auch Fliesstext. */
+  --gold-text: #d3a763;
+  --mesh: #3a352f;
+  --mesh-fill: #d3a763;
+  --card: #2a2723;
+  --card-foreground: #fbfbf9;
+  --primary: #d3a763;
+  --primary-foreground: #201e1b;
+  --secondary: #2a2723;
+  --secondary-foreground: #fbfbf9;
+  --border: #35312c;
+  --input: #4a453e;
+  --ring: #d3a763;
+  /* Warmer Schatten traegt auf dunklem Grund nicht — hier zaehlt Tiefe. */
+  --elevation-1:
+    0 1px 2px rgba(12, 10, 9, 0.4), 0 10px 26px -18px rgba(12, 10, 9, 0.7);
+  --elevation-2:
+    0 2px 5px rgba(12, 10, 9, 0.45), 0 20px 46px -24px rgba(12, 10, 9, 0.8);
+  --elevation-3:
+    0 4px 10px rgba(12, 10, 9, 0.5), 0 34px 80px -28px rgba(12, 10, 9, 0.9);
   background-color: var(--background);
   color: var(--foreground);
 }
