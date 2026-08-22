@@ -9,6 +9,28 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  /*
+   * TECH-1 — die Serverless-Function schluckte das halbe Repo.
+   *
+   * Der Datei-Tracer folgt von den Routen aus allem, was er fuer eine
+   * Abhaengigkeit haelt, und nimmt im Zweifel den Repo-Root mit: `.git`,
+   * das Alt-Projekt unter `_legacy/`, die Mockups, das Archiv-ZIP, die PDFs.
+   * Damit lief die Function ueber das Limit — nichts war auslieferbar.
+   * `"*"` gilt fuer jede Route, nicht nur eine.
+   */
+  outputFileTracingExcludes: {
+    "*": [
+      ".git/**",
+      ".next/cache/**",
+      "_legacy/**",
+      "design-mockup/**",
+      ".cursor/**",
+      ".claude/**",
+      ".video-analysis/**",
+      "**/*.pdf",
+      "**/*.zip",
+    ],
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }]
   },
