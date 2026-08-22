@@ -5,22 +5,34 @@ import Link from "next/link"
 import { ArrowRight, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
+import { ImageUnveil } from "@/components/ui/image-unveil"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { SignatureMotif } from "@/components/brand/signature-motif"
 import { featuredWorks, workHref } from "@/lib/site-data"
 
 /**
- * Ausgewählte Arbeiten — früh und groß (PHASE A, Master-Prompt 4 §4.3).
+ * ARCHETYP C — das randlose Band. Ausgewählte Arbeiten (Master-Prompt 4 §4.3).
  *
- * Die wichtigste Umstellung der neuen Startseite: Arbeit kommt VOR der
- * Erklärung. Vorher stand die Werkschau hinter Impact-Band, Logo-Wand und
- * Leistungen — wer wissen wollte, ob wir etwas können, musste sich durch drei
- * Sektionen Behauptung lesen. Jetzt steht sie an dritter Stelle, groß, und
- * führt weiter auf /arbeiten.
+ * ---------------------------------------------------------------------------
+ * WAS SICH GEGENÜBER VORHER ÄNDERT UND WARUM (VIS-2)
+ * Der Inhalt stimmte schon: Arbeit vor Erklärung, ein Werk pro Zeile, Bild und
+ * Text abwechselnd. Die FORM war aber dieselbe wie überall — Kopf aus
+ * `SectionEyebrow` + `type-h2` im 12-Spalten-Raster, Inhalt brav innerhalb des
+ * Sektionsrands. Die wichtigste Sektion der Seite sah aus wie die
+ * Ebenen-Kacheln darunter.
  *
- * Groß heißt hier wörtlich: volle Breite, ein Werk pro Zeile, Bild und Text
- * abwechselnd. Kleine Karten hätten dieselben drei Arbeiten gezeigt und
- * nichts bewiesen.
+ * Jetzt ist sie der dritte Archetyp:
+ *
+ *   randlos   Die Abbildungen laufen bis an den Rand der Seitenfläche — auf
+ *             der Seite, auf der sie stehen. Nur der Text bleibt im Raster.
+ *             Das ist der eine Ort, an dem die Seite ihren Rahmen verlässt,
+ *             und dadurch bekommt der Beweis Gewicht, das eine Karte im
+ *             Raster nicht erzeugen kann.
+ *   Haarlinie Zeilen sind durch Linien getrennt statt durch Abstand. Das Band
+ *             liest sich als zusammenhängende Fläche, nicht als drei Blöcke.
+ *   Bewegung  Beim Eintritt fährt eine Maske vom Bild weg (`ImageUnveil`) —
+ *             die dritte Mikro-Interaktion der Seite neben Haarlinie und
+ *             magnetischem Knopf, und die einzige, die beim Scrollen wirkt.
  *
  * Gated: Die Sektion rendert nur, was in `featuredWorks` wirklich aufgelöst
  * werden konnte — und die Abbildungen tragen weiterhin den Hinweis, dass sie
@@ -33,8 +45,13 @@ export function SelectedWork() {
   if (featuredWorks.length === 0) return null
 
   return (
-    <section id="arbeiten" aria-labelledby="arbeiten-title" className="border-line border-b">
-      <div className="section-shell">
+    <section
+      id="arbeiten"
+      aria-labelledby="arbeiten-title"
+      className="border-line bg-surface overflow-hidden border-b"
+    >
+      {/* Kopf bleibt im Raster — nur die Bilder brechen aus. */}
+      <div className="section-gutter pt-24 md:pt-32">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
           <Reveal className="lg:col-span-8">
             <SectionEyebrow label={copy.eyebrow} />
@@ -45,58 +62,77 @@ export function SelectedWork() {
           <Reveal delay={0.1} className="lg:col-span-4 lg:pb-3 lg:text-right">
             <Link
               href="/arbeiten"
-              className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="group text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
             >
               {copy.cta}
-              <ArrowUpRight className="size-4" strokeWidth={1.5} />
+              <ArrowUpRight
+                className="size-4 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                strokeWidth={1.5}
+              />
             </Link>
           </Reveal>
         </div>
+      </div>
 
-        <ul className="mt-20 flex flex-col gap-16 md:gap-24">
-          {featuredWorks.map((work, i) => (
-            <Reveal key={work.slug} as="li" delay={0.04 * i}>
+      <ul className="mt-16 md:mt-24">
+        {featuredWorks.map((work, i) => {
+          // Gerade Zeilen: Bild links. Ungerade: Bild rechts. Der Wechsel ist
+          // der Takt dieser Sektion — drei gleich ausgerichtete Zeilen wären
+          // wieder ein Raster.
+          const imageRight = i % 2 === 1
+
+          return (
+            <li key={work.slug} className="border-line border-t first:border-t-0">
               <Link
                 href={workHref(work)}
-                className="group grid gap-x-12 gap-y-8 md:grid-cols-12 md:items-center"
+                className="group grid items-center md:grid-cols-12"
               >
-                {/* Abwechselnde Seite: gerade Zeilen Bild links, ungerade rechts.
-                    Der Wechsel ist der Rhythmus dieser Sektion — vier gleich
-                    ausgerichtete Zeilen wären wieder ein Raster. */}
                 <div
-                  className={`relative aspect-[16/10] overflow-hidden md:col-span-7 ${
-                    i % 2 === 1 ? "md:order-2" : ""
+                  className={`relative aspect-[16/10] md:col-span-7 ${
+                    imageRight ? "md:order-2" : ""
                   }`}
                 >
-                  {work.image ? (
-                    <Image
-                      src={work.image}
-                      alt={`${work.name} — ${work.what}`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 58vw"
-                      className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <div className="bg-surface absolute inset-0 flex items-center justify-center">
-                      <SignatureMotif
-                        direction="center"
-                        className="motif-placeholder pointer-events-none absolute inset-0 h-full w-full"
+                  <ImageUnveil className="absolute inset-0">
+                    {work.image ? (
+                      <Image
+                        src={work.image}
+                        alt={`${work.name} — ${work.what}`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 58vw"
+                        className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
                       />
-                      <span
-                        aria-hidden="true"
-                        className="border-gold/40 text-gold text-display flex size-20 items-center justify-center border text-2xl"
-                      >
-                        {work.mark}
-                      </span>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="bg-muted absolute inset-0 flex items-center justify-center">
+                        <SignatureMotif
+                          direction="center"
+                          className="motif-placeholder pointer-events-none absolute inset-0 h-full w-full"
+                        />
+                        <span
+                          aria-hidden="true"
+                          className="border-gold/40 text-gold text-display flex size-20 items-center justify-center border text-2xl"
+                        >
+                          {work.mark}
+                        </span>
+                      </div>
+                    )}
+                  </ImageUnveil>
+                  {/*
+                    Die Trennkante zum Text — nur auf der Innenseite. Aussen
+                    soll das Bild ohne Rahmen an den Seitenrand laufen.
+                  */}
                   <span
                     aria-hidden="true"
-                    className="border-line pointer-events-none absolute inset-0 border"
+                    className={`bg-line absolute inset-y-0 hidden w-px md:block ${
+                      imageRight ? "left-0" : "right-0"
+                    }`}
                   />
                 </div>
 
-                <div className={`md:col-span-5 ${i % 2 === 1 ? "md:order-1" : ""}`}>
+                <div
+                  className={`px-6 py-12 md:col-span-5 md:px-10 md:py-16 lg:px-16 ${
+                    imageRight ? "md:order-1" : ""
+                  }`}
+                >
                   <p className="eyebrow text-muted-foreground">
                     {work.kind} · {work.sector}
                   </p>
@@ -120,14 +156,16 @@ export function SelectedWork() {
                   </span>
                 </div>
               </Link>
-            </Reveal>
-          ))}
-        </ul>
+            </li>
+          )
+        })}
+      </ul>
 
-        {/* Der Hinweis reist mit den Bildern mit — wo eine Abbildung steht,
-            steht auch, was sie ist. */}
+      {/* Der Hinweis reist mit den Bildern mit — wo eine Abbildung steht,
+          steht auch, was sie ist. */}
+      <div className="section-gutter pb-20 md:pb-24">
         <Reveal delay={0.1}>
-          <p className="text-muted-foreground/80 text-meta border-line mt-20 border-t pt-6">
+          <p className="text-muted-foreground/80 text-meta border-line mt-16 border-t pt-6">
             {t.portfolio.mockupNote}
           </p>
         </Reveal>

@@ -36,13 +36,23 @@ import { ClosingCta } from "@/components/sections/closing-cta"
  *   Kontaktformular                        → /kontakt
  *
  * ---------------------------------------------------------------------------
- * DIE REIHENFOLGE IST EIN ARGUMENT
+ * DIE REIHENFOLGE IST EIN ARGUMENT — UND EIN TAKT (VIS-2)
  * Arbeit kommt VOR der Erklärung (Sektion 3, groß). Vorher musste sich jemand
  * durch drei Sektionen Behauptung lesen, bevor er sah, ob wir etwas können.
- * Produkte stehen direkt danach — sie sind der Punkt, an dem klar wird, dass
- * das hier keine Agentur ist. Preise stehen gar nicht mehr hier: Eine
- * Preistabelle auf der Startseite macht ein System-Haus zur produktisierten
- * Agentur.
+ * Produkte stehen kurz danach — sie sind der Punkt, an dem klar wird, dass
+ * das hier keine Agentur ist.
+ *
+ * Neu ist, dass die Reihenfolge auch den RHYTHMUS trägt. Jede Sektion gehört
+ * zu einem von drei Archetypen:
+ *
+ *   A · Editorial   ruhige Fläche, ein Satz, kein Raster
+ *   B · Raster      das Hairline-Gitter, dicht und zählbar
+ *   C · Band        randlos, dunkel oder Bild, mit Bewegung
+ *
+ * Gelesen von oben: C A C B C B — C A — C. Keine zwei gleichen Archetypen
+ * liegen nebeneinander. Vorher standen `CapabilityTiles` und `HouseProducts`
+ * direkt hintereinander (zweimal B) und das dunkle Fundament-Band kam erst
+ * danach; jetzt schiebt es sich dazwischen und bricht den Takt.
  *
  * ---------------------------------------------------------------------------
  * ZWEI SEKTIONEN RENDERN HEUTE NICHTS
@@ -58,36 +68,45 @@ import { ClosingCta } from "@/components/sections/closing-cta"
 export default function Page() {
   return (
     <main id="top">
-      {/* 1 — Wer wir sind, in einer Headline und vier Absprungpunkten. */}
+      {/* 1 · C — Wer wir sind, in einer Headline und vier Absprungpunkten. */}
       <Hero />
 
-      {/* 2 — creaDIG in einem Satz. Ruhige Fläche, keine Karten. */}
+      {/* 2 · A — creaDIG in einem Satz. Die erste Pause. */}
       <HouseStatement />
 
-      {/* 3 — Arbeit vor Erklärung: drei Werke, groß. → /arbeiten */}
+      {/* 3 · C — Arbeit vor Erklärung: randloses Band, drei Werke. → /arbeiten */}
       <SelectedWork />
 
-      {/* 4 — Die fünf Ebenen als Verteiler-Kacheln. → /leistungen */}
+      {/* 4 · B — Die fünf Ebenen als Verteiler-Kacheln. → /leistungen */}
       <CapabilityTiles />
 
-      {/* 5 — „We build our own." Der Aha-Moment. → /produkte */}
+      {/*
+        5 · C — Das dunkle Fundament-Band.
+        Es stand vorher HINTER den Produkt-Kacheln, also lagen zwei
+        Raster-Sektionen unmittelbar hintereinander. Zwischen ihnen bricht
+        das Band den Takt: Papier → Anthrazit → Papier.
+      */}
+      <ImpactBand />
+
+      {/* 6 · B — „We build our own." Der Aha-Moment. → /produkte */}
       <HouseProducts />
 
-      {/* 6 — Ein tiefer Kundenfall (gated auf schriftliche Freigabe). */}
+      {/* 7 — Ein tiefer Kundenfall (gated auf schriftliche Freigabe). */}
       <CaseStudies />
 
-      {/* 7 — Zahlen und Nachweise: nur echte Signale, dann die Nachweis-Zeile. */}
-      <ImpactBand />
-      <ProofLine />
-
-      {/* 8 — Wo wir sitzen und wer dahintersteht. → /unternehmen */}
+      {/* 8 · C — Wo wir sitzen: Foto mit Parallaxe. */}
       <Location />
+
+      {/* 9 · A — Wer dahintersteht. Die zweite Pause. → /unternehmen */}
       <CompanyTeaser />
 
-      {/* 9 — Notizen aus dem Bau (gated, bis die erste steht). → /insights */}
+      {/* 10 — Die Nachweis-Zeile, schmal, direkt vor dem Abschluss. */}
+      <ProofLine />
+
+      {/* 11 — Notizen aus dem Bau (gated, bis die erste steht). → /insights */}
       <InsightsTeaser />
 
-      {/* 10 — Schlussstrich, souverän: sprechen oder erst weiterschauen. */}
+      {/* 12 · C — Schlussstrich, souverän: sprechen oder erst weiterschauen. */}
       <ClosingCta />
     </main>
   )
