@@ -294,11 +294,26 @@ export const dictionary = {
     impact: {
       eyebrow: "Das Fundament",
       title: "Kein Konzept. Ein laufender Betrieb.",
-      signals: {
+      /*
+       * VIS-5: getrennt nach zaehlbar und nicht zaehlbar. „Märkte" und
+       * „Spannweite" haben deshalb ein eigenes `value` — einen Satzanfang,
+       * keine Pseudo-Kennzahl wie vorher „DE / CH" und „A–Z".
+       */
+      figures: {
         since: { label: "Seit", detail: "Aus der Agentur zum System-Haus gewachsen." },
         products: { label: "Eigene Produkte", detail: "meAI, fibero, CASSAMEA, meahv — selbst gebaut." },
-        regions: { label: "Märkte", detail: "Deutschland & Schweiz — auf Deutsch & Türkisch." },
-        scope: { label: "Von Marke bis KI", detail: "Fünf Ebenen, ein Haus." },
+      },
+      facts: {
+        regions: {
+          label: "Märkte",
+          value: "Deutschland & Schweiz",
+          detail: "Beraten und gebaut auf Deutsch und Türkisch.",
+        },
+        scope: {
+          label: "Spannweite",
+          value: "Von der Marke bis zur KI",
+          detail: "Fünf Ebenen, ein Haus.",
+        },
       },
       note: "Systeme im Tagesbetrieb — nicht in der Präsentation.",
     },
@@ -1083,11 +1098,21 @@ export const dictionary = {
     impact: {
       eyebrow: "Temel",
       title: "Konsept değil. İşleyen bir yapı.",
-      signals: {
+      figures: {
         since: { label: "Beri", detail: "Ajanstan sistem evine büyüdük." },
         products: { label: "Kendi ürünlerimiz", detail: "meAI, fibero, CASSAMEA, meahv — kendimiz kurduk." },
-        regions: { label: "Pazarlar", detail: "Almanya ve İsviçre — Almanca & Türkçe." },
-        scope: { label: "Markadan yapay zekâya", detail: "Beş katman, tek çatı." },
+      },
+      facts: {
+        regions: {
+          label: "Pazarlar",
+          value: "Almanya ve İsviçre",
+          detail: "Almanca ve Türkçe danışıyor ve kuruyoruz.",
+        },
+        scope: {
+          label: "Kapsam",
+          value: "Markadan yapay zekâya",
+          detail: "Beş katman, tek çatı.",
+        },
       },
       note: "Sistemler günlük kullanımda — sunumda değil.",
     },

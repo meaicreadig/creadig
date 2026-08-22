@@ -372,13 +372,21 @@
   line-height: 1.2;
 }
 
-/* Kennziffern und Preise — Ziffern sollen tragen, nicht flüstern. */
+/*
+ * Kennziffern und Preise — Ziffern sollen tragen, nicht flüstern.
+ *
+ * VIS-5: 4rem bei Gewicht 700 war lauter als jede Sektions-Headline (h2
+ * liegt bei 3,25rem/600). Damit stand im Impact-Band die Zahl ueber der
+ * Aussage, zu der sie gehoert — und eine Preiskachel schrie ihren Betrag
+ * ueber den Paketnamen. Eine Kennziffer ist ein Beleg, keine Ueberschrift:
+ * 2,5rem bei 600 bleibt deutlich lesbar und ordnet sich der Headline unter.
+ */
 @utility type-stat {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(2.5rem, 4.5vw, 4rem);
-  letter-spacing: -0.04em;
-  line-height: 1;
+  font-weight: 600;
+  font-size: clamp(1.875rem, 3vw, 2.5rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
 }
 
 /* Haltungssatz: großer Fließtext im Headline-Schnitt. */

@@ -557,14 +557,26 @@ export const mainNavLinks = navLinks.filter(
   (link) => link.href !== "/insights" || publishedInsights.length > 0,
 )
 
-/** Echte Signale statt erfundener Kennzahlen. */
-export const impactSignals = [
+/*
+ * Das Fundament — echte Signale statt erfundener Kennzahlen.
+ *
+ * VIS-5: Vorher standen alle vier in EINER Stat-Reihe, in Ziffern-Groesse
+ * nebeneinander: „2017", „4", „DE / CH", „A–Z". Zwei davon sind aber keine
+ * Kennziffern, sondern Reichweiten-Aussagen. Als Riesen-Zahl gesetzt
+ * behaupten sie eine Messbarkeit, die es nicht gibt — und „A–Z" laesst sich
+ * ohnehin nicht zaehlen. Die Trennung steht deshalb in den Daten, nicht im
+ * Markup: Was zaehlbar ist, ist eine Figure; was eine Aussage ist, ein Fact.
+ */
+
+/** Zaehlbares. Wird als Kennziffer gesetzt. */
+export const impactFigures = [
   // Gründungsjahr 2017 — vom Inhaber bestätigt (2026-08-17).
   { value: "2017", key: "since" as const },
   { value: "4", key: "products" as const },
-  { value: "DE / CH", key: "regions" as const },
-  { value: "A–Z", key: "scope" as const },
 ]
+
+/** Aussagen ueber Reichweite. Werden als Text gesetzt, nicht als Zahl. */
+export const impactFacts = ["regions", "scope"] as const
 
 /**
  * Einstiegs-Chips unter der Hero-Subline (PHASE A, §4.1).

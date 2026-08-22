@@ -3,10 +3,22 @@
 import { SignatureMotif } from "@/components/brand/signature-motif"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { impactSignals } from "@/lib/site-data"
+import { impactFacts, impactFigures } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
-/** Dunkle Vollbild-Sektion. Größe ohne erfundene Zahlen. */
+/**
+ * Dunkle Vollbild-Sektion. Größe ohne erfundene Zahlen.
+ *
+ * VIS-5 — hier standen vier gleich große Kennziffern nebeneinander: „2017",
+ * „4", „DE / CH" und „A–Z". Die letzten beiden sind keine Zahlen. In
+ * Ziffern-Größe gesetzt behaupteten sie eine Messbarkeit, die es nicht gibt,
+ * und machten die zwei echten Zahlen wertlos — wenn alles eine Kennzahl ist,
+ * ist keine mehr eine.
+ *
+ * Jetzt tragen die Zahlen die obere Reihe und die Aussagen die untere. Zwei
+ * Ebenen, sichtbar unterschieden, aus derselben Quelle
+ * (`site-data.impactFigures` / `impactFacts`).
+ */
 export function ImpactBand() {
   const { t } = useLocale()
 
@@ -33,21 +45,51 @@ export function ImpactBand() {
           </h2>
         </Reveal>
 
-        <div className="border-line mt-20 grid grid-cols-1 gap-px sm:grid-cols-2 lg:grid-cols-4">
-          {impactSignals.map((signal, i) => {
-            const copy = t.impact.signals[signal.key]
+        {/*
+          Ein Raster, zwei Ebenen. Die Zahlen stehen links und tragen die
+          Kennziffern-Schrift; die Aussagen stehen rechts und lesen sich als
+          Satz. Die Trennung entsteht durch den Schriftgrad, nicht durch zwei
+          getrennte Bloecke — die Reihe soll eine Reihe bleiben.
+        */}
+        <div className="border-line mt-20 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-y-0">
+          {impactFigures.map((figure, i) => {
+            const copy = t.impact.figures[figure.key]
             return (
               <Reveal
-                key={signal.key}
+                key={figure.key}
                 delay={0.08 * i}
-                className="border-line group relative border-t pt-8 sm:pr-8 lg:border-r lg:last:border-r-0"
+                className="border-line group relative border-t pt-8 lg:border-r lg:pr-8"
               >
                 <span
                   aria-hidden="true"
                   className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
                 />
                 <p className="eyebrow text-gold-text">{copy.label}</p>
-                <p className="type-stat mt-5">{signal.value}</p>
+                {/* Gemeinsame Mindesthoehe mit den Aussagen, damit alle vier Detailzeilen auf einer Linie beginnen. */}
+                <p className="type-stat mt-5 lg:min-h-[3rem]">{figure.value}</p>
+                <p className="type-small text-muted-foreground mt-5 max-w-xs text-pretty">
+                  {copy.detail}
+                </p>
+              </Reveal>
+            )
+          })}
+
+          {impactFacts.map((key, i) => {
+            const copy = t.impact.facts[key]
+            return (
+              <Reveal
+                key={key}
+                delay={0.08 * (i + impactFigures.length)}
+                className="border-line group relative border-t pt-8 lg:border-r lg:pr-8 lg:last:border-r-0"
+              >
+                <span
+                  aria-hidden="true"
+                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
+                />
+                <p className="eyebrow text-muted-foreground">{copy.label}</p>
+                <p className="text-subhead mt-5 max-w-[14ch] text-xl text-pretty lg:min-h-[3rem]">
+                  {copy.value}
+                </p>
                 <p className="type-small text-muted-foreground mt-5 max-w-xs text-pretty">
                   {copy.detail}
                 </p>
