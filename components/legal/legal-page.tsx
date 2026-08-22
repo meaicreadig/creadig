@@ -26,11 +26,22 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
       ? t.legal.smallBusinessNote
       : null
 
-  const formalRows: { label: string; value: string }[] = [
+  /*
+    `pending` heisst: Die Zeile steht da, damit das Impressum vollstaendig
+    aussieht — aber sie traegt sichtbar die Kennzeichnung "Platzhalter". Ein
+    unmarkierter Platzhalter waere eine falsche Angabe; eine fehlende Zeile
+    waere ein halbes Impressum. Beides ist schlechter als das hier, und der
+    Pending-Hinweis unten bleibt ohnehin stehen, bis die echten Werte da sind.
+  */
+  const formalRows: { label: string; value: string; pending?: boolean }[] = [
     ...(imprintDetails.legalForm
       ? [{ label: t.legal.legalFormLabel, value: imprintDetails.legalForm }]
       : []),
-    ...(vatValue ? [{ label: t.legal.vatLabel, value: vatValue }] : []),
+    ...(vatValue
+      ? [{ label: t.legal.vatLabel, value: vatValue }]
+      : imprintDetails.taxStatusPending
+        ? [{ label: t.legal.vatLabel, value: t.legal.taxStatusPending, pending: true }]
+        : []),
     ...(imprintDetails.mstvResponsible
       ? [{ label: t.legal.mstvLabel, value: imprintDetails.mstvResponsible }]
       : []),
@@ -94,6 +105,18 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
                       {imprintDetails.phone}
                     </a>
                   </li>
+                ) : imprintDetails.phonePending ? (
+                  /*
+                    Bewusst KEIN `tel:`-Link: Ein Anruf-Knopf, der ins Leere
+                    fuehrt, ist schlimmer als kein Knopf. Die Zeile sagt, dass
+                    die Nummer folgt, und ist als Platzhalter gekennzeichnet.
+                  */
+                  <li className="flex flex-wrap items-center gap-2">
+                    <span>{t.legal.phonePending}</span>
+                    <span className="border-gold/50 text-gold-text eyebrow border px-2 py-0.5">
+                      {t.legal.placeholderMark}
+                    </span>
+                  </li>
                 ) : null}
                 <li>
                   <a
@@ -114,7 +137,14 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
                   {formalRows.map((row) => (
                     <div key={row.label} className="flex flex-col gap-1">
                       <dt className="text-muted-foreground">{row.label}</dt>
-                      <dd className="text-foreground leading-relaxed text-pretty">{row.value}</dd>
+                      <dd className="text-foreground flex flex-wrap items-center gap-2 leading-relaxed text-pretty">
+                        <span>{row.value}</span>
+                        {row.pending && (
+                          <span className="border-gold/50 text-gold-text eyebrow border px-2 py-0.5">
+                            {t.legal.placeholderMark}
+                          </span>
+                        )}
+                      </dd>
                     </div>
                   ))}
                 </dl>

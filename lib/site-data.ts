@@ -893,8 +893,8 @@ export const contact = {
  * sind, verschwindet der Pending-Block automatisch.
  */
 export const imprintDetails = {
-  /** Rechtsform, z. B. "Einzelunternehmen" oder "creaDIG GmbH". */
-  legalForm: null as string | null,
+  /** Rechtsform — vom Inhaber bestätigt (22.08.2026). */
+  legalForm: "Einzelunternehmen" as string | null,
   /** Umsatzsteuer-Identifikationsnummer nach § 27 a UStG. */
   vatId: null as string | null,
   /**
@@ -904,12 +904,26 @@ export const imprintDetails = {
    */
   smallBusiness: null as boolean | null,
   /**
-   * Verantwortlicher nach § 18 Abs. 2 MStV (Name; Anschrift nur, wenn sie
-   * von der Geschäftsanschrift abweicht).
+   * Klar markierter Platzhalter, solange der Steuerstatus nicht freigegeben
+   * ist. Er ist NICHT als Angabe gemeint und wird auf der Seite auch nicht so
+   * gesetzt: Die Zeile traegt sichtbar die Kennzeichnung „Platzhalter" und der
+   * Pending-Hinweis bleibt stehen. Ohne den echten Wert kein Livegang
+   * (Live-Checkliste, Phase 5).
    */
-  mstvResponsible: null as string | null,
-  /** Optionale deutsche Rufnummer fürs Impressum, z. B. "+49 …". */
+  taxStatusPending: true,
+  /**
+   * Verantwortlicher nach § 18 Abs. 2 MStV (Name; Anschrift nur, wenn sie
+   * von der Geschäftsanschrift abweicht). Vom Inhaber bestätigt (22.08.2026).
+   */
+  mstvResponsible: "Muhammed Emin Akyol" as string | null,
+  /** Deutsche Rufnummer fürs Impressum, z. B. "+49 …". */
   phone: null as string | null,
+  /**
+   * Wie `taxStatusPending`: markierter Platzhalter statt einer erfundenen
+   * Nummer. Es wird KEIN `tel:`-Link daraus — ein Anruf-Link, der ins Leere
+   * fuehrt, waere schlimmer als keiner.
+   */
+  phonePending: true,
 } as const
 
 /**
