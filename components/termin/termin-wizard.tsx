@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Clock } from "lucide-react"
+import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Clock, Send } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { SignatureMotif } from "@/components/brand/signature-motif"
@@ -56,7 +56,7 @@ function toDateKey(year: number, month: number, day: number) {
 }
 
 export function TerminWizard() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
   const params = useSearchParams()
 
   const [step, setStep] = useState(1)
@@ -68,6 +68,15 @@ export function TerminWizard() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [invalid, setInvalid] = useState<Record<string, boolean>>({})
   const [error, setError] = useState<string | null>(null)
+  /*
+   * Pflicht-Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Die Woerterbuch-
+   * Eintraege dafuer lagen seit Langem in DE und TR bereit, wurden hier aber
+   * nie benutzt: Der Assistent sammelte Name, Telefon, E-Mail, Betrieb, Ort
+   * und Betriebsgroesse ein — mehr personenbezogene Daten als das
+   * Kontaktformular — und fragte als Einziger nicht.
+   */
+  const [privacyOk, setPrivacyOk] = useState(false)
+  const [sending, setSending] = useState(false)
 
   // „Heute" erst nach dem Mount bestimmen — sonst weichen Server- und
   // Client-Render voneinander ab.
@@ -176,14 +185,17 @@ export function TerminWizard() {
       phone: !form.phone.trim(),
       org: !form.org.trim(),
       email: !form.email.trim() || !EMAIL_RE.test(form.email.trim()),
+      privacy: !privacyOk,
     }
     setInvalid(bad)
     const hasError = Object.values(bad).some(Boolean)
     if (hasError) {
       setError(
-        form.email.trim() && !EMAIL_RE.test(form.email.trim())
-          ? t.termin.step3.errEmail
-          : t.termin.step3.errRequired,
+        bad.name || bad.phone || bad.org
+          ? t.termin.step3.errRequired
+          : bad.email
+            ? t.termin.step3.errEmail
+            : t.contact.errPrivacy,
       )
     }
     return !hasError
@@ -584,6 +596,42 @@ export function TerminWizard() {
                 />
               </label>
 
+              {/*
+                Derselbe Datenschutz-Baustein wie im Kontaktformular. Die
+                Woerterbuch-Eintraege lagen in DE und TR bereit und wurden hier
+                nie benutzt — dabei sammelt dieser Assistent MEHR
+                personenbezogene Daten ein als das Formular.
+              */}
+              <div className="border-line border-t pt-7 sm:col-span-2">
+                <label htmlFor="termin-privacy" className="flex cursor-pointer items-start gap-3.5">
+                  <input
+                    id="termin-privacy"
+                    type="checkbox"
+                    checked={privacyOk}
+                    onChange={(e) => {
+                      setPrivacyOk(e.target.checked)
+                      setInvalid((v) => ({ ...v, privacy: false }))
+                    }}
+                    aria-invalid={invalid.privacy || undefined}
+                    aria-describedby="termin-handoff"
+                    className={cn(
+                      "accent-gold mt-1 size-4 shrink-0 rounded-none",
+                      invalid.privacy && "outline-destructive outline-2 outline-offset-2",
+                    )}
+                  />
+                  <span className="type-small text-muted-foreground text-pretty">
+                    {t.contact.privacyConsentPrefix}{" "}
+                    <Link href="/datenschutz" className="text-gold-text underline underline-offset-4">
+                      {t.contact.privacyConsentLink}
+                    </Link>{" "}
+                    {t.contact.privacyConsentSuffix}
+                  </span>
+                </label>
+                <p id="termin-handoff" className="text-muted-foreground text-meta mt-4">
+                  {t.termin.step4.privacyNote}
+                </p>
+              </div>
+
               <div className="flex items-center justify-between gap-4 sm:col-span-2">
                 <BackButton onClick={() => setStep(2)} label={t.termin.prev} />
                 <StepButton onClick={() => goTo(4)} label={t.termin.next} />
@@ -621,24 +669,100 @@ export function TerminWizard() {
               ))}
             </dl>
 
+            {error && (
+              <p
+                role="alert"
+                className="border-destructive/40 text-destructive mt-8 border-l-2 py-1 pl-4 text-sm"
+              >
+                {error}
+              </p>
+            )}
+
+            {/*
+              HIER LAG DER SCHLIMMSTE FEHLER DER SEITE.
+
+              Vorher: `onClick={() => window.setTimeout(() => setStep(5), 800)}`
+              auf einem Link nach WhatsApp. Der Erfolgsschritt kam nach 800
+              Millisekunden — unabhaengig davon, ob WhatsApp ueberhaupt
+              geoeffnet wurde, und garantiert bevor der Interessent dort auf
+              Senden tippen konnte. Ohne Netz, mit Popup-Blocker, ohne
+              WhatsApp auf dem Geraet: immer "Anfrage steht." Der Mensch
+              wartete auf einen Rueckruf, der nie kommen konnte, weil nie
+              jemand von ihm erfahren hat.
+
+              Jetzt entscheidet der Server. Schritt 5 erscheint nur nach
+              `ok: true` von `/api/lead`.
+            */}
             <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
               <BackButton onClick={() => setStep(3)} label={t.termin.prev} />
-              <a
-                href={waHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => window.setTimeout(() => setStep(5), 800)}
-                className="group from-gold-soft to-gold relative inline-flex items-center gap-3 overflow-hidden bg-gradient-to-br px-8 py-4 text-base tracking-wide text-[#201e1b]"
-              >
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
-                />
-                <span className="group-hover:text-gold-soft relative z-10 flex items-center gap-3 transition-colors duration-500">
+              <div className="flex flex-wrap items-center gap-3">
+                <a
+                  href={waHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2.5 border px-6 py-4 text-sm tracking-wide transition-colors duration-500"
+                >
                   <WhatsAppIcon className="size-4" />
-                  {t.termin.step4.send}
-                </span>
-              </a>
+                  {t.termin.step4.sendWhatsapp}
+                </a>
+                <button
+                  type="button"
+                  disabled={sending}
+                  onClick={async () => {
+                    setSending(true)
+                    setError(null)
+                    try {
+                      const response = await fetch("/api/lead", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          name: form.name,
+                          business: form.org,
+                          email: form.email,
+                          phone: form.phone,
+                          privacyOk,
+                          locale,
+                          source: "termin",
+                          // Der Assistent sammelt mehr als das Formular — alles,
+                          // was er weiss, gehoert in die Mail, sonst muss der
+                          // Rueckruf noch einmal von vorn fragen.
+                          message: summaryRows
+                            .map((row) => `${row.k}: ${row.v}`)
+                            .join("\n"),
+                        }),
+                      })
+                      const data = (await response.json().catch(() => null)) as
+                        | { ok?: boolean; error?: string }
+                        | null
+
+                      if (response.ok && data?.ok) {
+                        setStep(5)
+                        window.scrollTo({ top: 0, behavior: "smooth" })
+                        return
+                      }
+                      setError(
+                        data?.error === "not_configured"
+                          ? `${t.contact.errNotConfigured} ${contact.email}.`
+                          : t.contact.errSendFailed,
+                      )
+                    } catch {
+                      setError(t.contact.errSendFailed)
+                    } finally {
+                      setSending(false)
+                    }
+                  }}
+                  className="group from-gold-soft to-gold relative inline-flex items-center gap-3 overflow-hidden bg-gradient-to-br px-8 py-4 text-base tracking-wide text-[#201e1b] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
+                  />
+                  <span className="group-hover:text-gold-soft relative z-10 flex items-center gap-3 transition-colors duration-500">
+                    <Send className="size-4" strokeWidth={1.5} />
+                    {sending ? t.contact.sending : t.termin.step4.send}
+                  </span>
+                </button>
+              </div>
             </div>
           </section>
         )}
