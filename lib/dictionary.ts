@@ -133,6 +133,38 @@ export const dictionary = {
       metaTitle: "Unternehmen — System-Haus aus Osnabrück, seit 2017",
       metaDescription:
         "creaDIG: System-Haus im ICO InnovationsCentrum Osnabrück, gegründet 2017. Gründer, Netzwerk, Schwerpunkte, Standort und nachprüfbare Zertifizierungen.",
+      /*
+       * Die drei Etappen des Hauses (KIZILELMA §7: „Das Dach zuerst — gross,
+       * als Ursprung; die Produkte als sein Werk").
+       *
+       * NUR ZWEI ZEITANGABEN, und beide sind belegt: 2017 als Gruendungsjahr
+       * (vom Inhaber bestaetigt) und „heute". Die mittlere Etappe traegt
+       * bewusst KEINE Jahreszahl — wann aus Auftraegen Produkte wurden, ist
+       * nirgends belegt, und `Work.year` steht aus genau demselben Grund
+       * ueberall auf `null`. Eine geschaetzte Jahreszahl waere eine erfundene
+       * Angabe.
+       */
+      chapters: {
+        label: "Der Weg",
+        title: "Ein Haus entsteht nicht als Ankündigung.",
+        items: [
+          {
+            year: "2017",
+            title: "Der Anfang",
+            body: "Gegründet in Osnabrück — als Agentur. Marke, Auftritt, einzelne Aufträge. Alles, was danach kam, ist daraus entstanden und nicht daneben.",
+          },
+          {
+            year: null,
+            title: "Aus Aufträgen wurden Produkte",
+            body: "Was in Projekten immer wiederkehrte, haben wir gebaut statt jedes Mal neu zu lösen. Vier eigene Systeme: meAI, fibero, CASSAMEA, meahv — erfunden, gebaut und selbst betrieben.",
+          },
+          {
+            year: "heute",
+            title: "Das Haus",
+            body: "Sitz im ICO InnovationsCentrum Osnabrück. Eigene Produkte im Betrieb, Kundenarbeit in Deutschland und der Schweiz — und dieselbe Hand, die baut, geht danach ans Telefon.",
+          },
+        ],
+      },
     },
     /*
      * Arbeiten-Ebene (PHASE A): Werkschau als eigene Route + Detailseiten.
@@ -942,6 +974,27 @@ export const dictionary = {
       metaTitle: "Şirket — Osnabrück'ten sistem evi, 2017'den beri",
       metaDescription:
         "creaDIG: Osnabrück ICO InnovationsCentrum'da sistem evi, 2017'de kuruldu. Kurucu, ağ, odak alanları, merkez ve doğrulanabilir sertifikalar.",
+      chapters: {
+        label: "Yol",
+        title: "Bir ev, duyuruyla kurulmaz.",
+        items: [
+          {
+            year: "2017",
+            title: "Başlangıç",
+            body: "Osnabrück'te kuruldu — ajans olarak. Marka, görünüm, tek tek işler. Sonrasında gelen her şey bunun içinden çıktı, yanında değil.",
+          },
+          {
+            year: null,
+            title: "İşlerden ürünler doğdu",
+            body: "Projelerde sürekli tekrar edeni her seferinde yeniden çözmek yerine kurduk. Dört kendi sistemimiz: meAI, fibero, CASSAMEA, meahv — icat ettik, kurduk ve kendimiz işletiyoruz.",
+          },
+          {
+            year: "bugün",
+            title: "Ev",
+            body: "Merkez: Osnabrück ICO InnovationsCentrum. Kendi ürünlerimiz işler hâlde, müşteri işleri Almanya ve İsviçre'de — ve kuran el, sonrasında telefona da kendisi bakıyor.",
+          },
+        ],
+      },
     },
     arbeitenPage: {
       eyebrow: "İşler",

@@ -2,6 +2,7 @@
 
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
+import { CompanyChapters } from "@/components/sections/company-chapters"
 import { About } from "@/components/sections/about"
 import { LogoWall } from "@/components/sections/logo-wall"
 import { Certifications } from "@/components/sections/certifications"
@@ -33,6 +34,12 @@ export function UnternehmenPageBody({ location }: { location: React.ReactNode })
         </div>
       </PageHeader>
 
+      {/*
+        Der Weg zuerst (KIZILELMA §7: das Dach als Ursprung), dann wer
+        dahintersteht, dann fuer wen gearbeitet wird. Vorher begann die Seite
+        mit "Ueber uns" und hatte damit keine Herkunft — nur einen Zustand.
+      */}
+      <CompanyChapters />
       <About />
       <LogoWall />
       {/* Standort + Parallax — die Server-Komponente entscheidet über das Foto.
