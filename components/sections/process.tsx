@@ -5,12 +5,35 @@ import { Reveal } from "@/components/ui/reveal"
 import { opsSteps, processSteps } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
+/**
+ * ARCHETYP C auf der Leistungsseite — der Prozess als dunkles Band (VIS-2).
+ *
+ * /leistungen lief vorher in vier identischen Takten durch: Ebenen, Prozess,
+ * Angebot, FAQ — viermal `section-shell`, viermal derselbe Kopf aus
+ * Gold-Eyebrow und `type-h2`, viermal ein Hairline-Raster. Vier gleich laute
+ * Kapitel hintereinander liest niemand als vier Kapitel; er liest sie als
+ * eine lange Flaeche und hoert nach dem zweiten auf.
+ *
+ * Der Prozess ist die richtige Stelle zum Anhalten: Er ist der einzige Block
+ * der Seite, der keine Liste ist, sondern eine Haltung — verstehen, bauen,
+ * betreiben. Auf dunklem Grund wird daraus die Zaesur zwischen "was wir
+ * koennen" und "was es kostet".
+ *
+ * `.section-dark` bringt den vollstaendigen dunklen Tokensatz mit (auch im
+ * Hellmodus, siehe VIS-1 in globals.css) — es ist keine Farbe im Markup,
+ * sondern derselbe benannte Zustand, den Fundament- und Abschlussband
+ * benutzen.
+ */
 export function Process() {
   const { t } = useLocale()
 
   return (
-    <section id="prozess" aria-labelledby="prozess-title" className="border-line border-b">
-      <div className="section-shell">
+    <section
+      id="prozess"
+      aria-labelledby="prozess-title"
+      className="section-dark border-line relative overflow-hidden border-b"
+    >
+      <div className="section-shell-band relative">
         <Reveal>
           <SectionEyebrow label={t.process.eyebrow} />
         </Reveal>
