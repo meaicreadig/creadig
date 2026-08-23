@@ -99,6 +99,18 @@ export type Work = {
   mark: string
   href?: string
   live?: boolean
+  /*
+   * C-2 / BF-5 — die schriftliche Freigabe des Kunden fuer die Nennung, und
+   * der eine Satz zu Aufgabe und Ergebnis, den er freigegeben hat.
+   *
+   * Beides liefert ausschliesslich der Owner. Die Felder stehen hier, damit
+   * die Statusseite (`/status`) BENENNEN kann, was fehlt — eine Luecke, die
+   * nirgends auftaucht, wird nie geschlossen. Nichts davon wird geraten, und
+   * solange `approvalOnFile` nicht ausdruecklich `true` ist, gilt die
+   * Freigabe als offen.
+   */
+  approvalOnFile?: boolean
+  approvedSentence?: Localized | null
 }
 
 /** Eigene Produkte — die großen Cases. */
@@ -315,6 +327,9 @@ export const clientWorks: Work[] = [
     mark: "NV",
     href: "https://nvswiss.ch",
     live: true,
+    // C-2: TODO (Owner) — schriftliche Freigabe und ein Satz Aufgabe/Ergebnis.
+    approvalOnFile: false,
+    approvedSentence: null,
   },
   {
     slug: "maqam",
@@ -330,6 +345,9 @@ export const clientWorks: Work[] = [
     region: null,
     image: null,
     mark: "mq",
+    // C-2: TODO (Owner) — schriftliche Freigabe und ein Satz Aufgabe/Ergebnis.
+    approvalOnFile: false,
+    approvedSentence: null,
   },
   /*
    * [OWNER-BESTAETIGUNG AUSSTEHEND] — Rumi's Maison
