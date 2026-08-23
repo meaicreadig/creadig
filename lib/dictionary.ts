@@ -725,6 +725,12 @@ export const dictionary = {
         "Die Anfrage konnte gerade nicht zugestellt werden. Bitte versuchen Sie es noch einmal — oder nehmen Sie einen der Wege rechts.",
       errNotConfigured:
         "Der Versandweg ist noch nicht eingerichtet. Bitte nutzen Sie so lange WhatsApp oder schreiben Sie an",
+      /* BF-2 — die beiden Zustaende des Missbrauchsschutzes. Sie sagen, was
+         der Mensch tun kann, statt "Fehler" zu melden. */
+      errRateLimited:
+        "Von diesem Anschluss kamen gerade mehrere Anfragen. Bitte versuchen Sie es in ein paar Minuten noch einmal — oder nehmen Sie WhatsApp.",
+      errFormExpired:
+        "Das Formular war zu lange offen. Bitte laden Sie die Seite neu und senden Sie noch einmal.",
       handoffNote:
         "Beim Absenden öffnet sich WhatsApp beziehungsweise Ihr E-Mail-Programm mit der fertigen Nachricht — versendet wird erst, wenn Sie es dort bestätigen.",
       /*
@@ -1582,6 +1588,10 @@ export const dictionary = {
         "Talep şu anda iletilemedi. Lütfen tekrar deneyin — ya da sağdaki yollardan birini kullanın.",
       errNotConfigured:
         "Gönderim yolu henüz kurulmadı. O zamana kadar WhatsApp'ı kullanın ya da şu adrese yazın:",
+      errRateLimited:
+        "Bu bağlantıdan az önce birkaç talep geldi. Lütfen birkaç dakika sonra tekrar deneyin — ya da WhatsApp'ı kullanın.",
+      errFormExpired:
+        "Form çok uzun süre açık kaldı. Lütfen sayfayı yenileyip yeniden gönderin.",
       handoffNote:
         "Gönderdiğinizde WhatsApp veya e-posta programınız hazır mesajla açılır — gönderim ancak orada onayladığınızda gerçekleşir.",
       handoffTitle: "Neredeyse tamam — bir adım kaldı.",

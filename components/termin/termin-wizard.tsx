@@ -9,6 +9,7 @@ import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { SignatureMotif } from "@/components/brand/signature-motif"
 import { contact } from "@/lib/site-data"
 import { trackLead } from "@/lib/track"
+import { useLeadSubmit } from "@/lib/use-lead"
 import { cn } from "@/lib/utils"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -75,6 +76,8 @@ function toDateKey(year: number, month: number, day: number) {
 export function TerminWizard() {
   const { t, locale } = useLocale()
   const params = useSearchParams()
+  /* BF-2: dasselbe signierte Zeit-Token wie im Kontaktformular. */
+  const submitLead = useLeadSubmit()
 
   const [step, setStep] = useState(1)
   const [type, setType] = useState<MeetingType | null>(null)
@@ -277,6 +280,14 @@ export function TerminWizard() {
   ].join("\n")
 
   const waHref = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(waMessage)}`
+
+  /* Dieselben vier Zustaende wie im Kontaktformular — eine Route, eine Sprache. */
+  function errorText(code: string | undefined) {
+    if (code === "not_configured") return `${t.contact.errNotConfigured} ${contact.email}.`
+    if (code === "rate_limited") return t.contact.errRateLimited
+    if (code === "token_expired" || code === "token_invalid") return t.contact.errFormExpired
+    return t.contact.errSendFailed
+  }
 
   const inputClass =
     "w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-3 text-base text-foreground outline-none transition-colors duration-300 placeholder:text-muted-foreground/60 focus:border-gold"
@@ -765,40 +776,29 @@ export function TerminWizard() {
                     setSending(true)
                     setError(null)
                     try {
-                      const response = await fetch("/api/lead", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          name: form.name,
-                          business: form.org,
-                          email: form.email,
-                          phone: form.phone,
-                          privacyOk,
-                          locale,
-                          source: "termin",
-                          // Der Assistent sammelt mehr als das Formular — alles,
-                          // was er weiss, gehoert in die Mail, sonst muss der
-                          // Rueckruf noch einmal von vorn fragen.
-                          message: summaryRows
-                            .map((row) => `${row.k}: ${row.v}`)
-                            .join("\n"),
-                        }),
+                      const data = await submitLead({
+                        name: form.name,
+                        business: form.org,
+                        email: form.email,
+                        phone: form.phone,
+                        privacyOk,
+                        locale,
+                        source: "termin",
+                        // Der Assistent sammelt mehr als das Formular — alles,
+                        // was er weiss, gehoert in die Mail, sonst muss der
+                        // Rueckruf noch einmal von vorn fragen.
+                        message: summaryRows
+                          .map((row) => `${row.k}: ${row.v}`)
+                          .join("\n"),
                       })
-                      const data = (await response.json().catch(() => null)) as
-                        | { ok?: boolean; error?: string }
-                        | null
 
-                      if (response.ok && data?.ok) {
+                      if (data.ok) {
                         trackLead("termin")
                         setStep(5)
                         window.scrollTo({ top: 0, behavior: "smooth" })
                         return
                       }
-                      setError(
-                        data?.error === "not_configured"
-                          ? `${t.contact.errNotConfigured} ${contact.email}.`
-                          : t.contact.errSendFailed,
-                      )
+                      setError(errorText(data.error))
                     } catch {
                       setError(t.contact.errSendFailed)
                     } finally {

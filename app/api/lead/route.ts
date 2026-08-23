@@ -1,4 +1,12 @@
 import { NextResponse } from "next/server"
+import {
+  bucketKey,
+  callerAddress,
+  issueFormToken,
+  LIMITS_INFO,
+  verifyFormToken,
+  withinLimit,
+} from "@/lib/lead-guard"
 
 /**
  * DER LEAD-WEG — der Boden des Trichters.
@@ -35,12 +43,60 @@ import { NextResponse } from "next/server"
  *   LEAD_TO          Empfänger. Standard: info@creadig.de
  *
  * ---------------------------------------------------------------------------
- * SPAM
- * Ein verstecktes Feld (`website`), sonst nichts. Kein Captcha — das ist
- * gesperrt, und es kostet an dieser Stelle mehr echte Anfragen als es
- * Bots abhält. Ist das Feld gefüllt, antwortet die Route mit `ok`, verschickt
- * aber nichts: Ein Bot, der eine Fehlermeldung bekommt, probiert es erneut.
+ * SPAM UND MISSBRAUCH (BF-2 / R-2)
+ * Drei Hürden, keine davon ein Captcha:
+ *
+ *   1. Ein verstecktes Feld (`website`). Ist es gefüllt, antwortet die Route
+ *      mit `ok`, verschickt aber nichts: Ein Bot, der eine Fehlermeldung
+ *      bekommt, probiert es erneut.
+ *   2. Ein signiertes Zeit-Token, das das Formular beim Aufbau über `GET`
+ *      dieser Route holt. Fehlt es, ist es gefälscht, abgelaufen — oder war
+ *      das Formular schneller ausgefüllt als ein Mensch tippen kann, geht
+ *      nichts raus.
+ *   3. Ein Fenster je Absender-Adresse im Arbeitsspeicher.
+ *
+ * Alles davon läuft VOR dem Versand. Die Bestätigungsmail an die eingegebene
+ * Adresse ist der empfindlichste Teil: Sie geht an einen Fremden, in unserem
+ * Namen. Ein ungebremster Endpunkt macht daraus Backscatter und beschädigt die
+ * Zustellbarkeit genau der Domain, über die alle Angebote rausgehen.
+ *
+ * Grenzen ehrlich benannt: Das IP-Fenster gilt pro Serverless-Instanz und ist
+ * nach einem Kaltstart leer (siehe `lib/lead-guard.ts`). Ein belastbares Limit
+ * über alle Instanzen braucht einen geteilten Zähler — Owner-Punkt.
  */
+
+/*
+ * Die Route liest Kopfzeilen des Aufrufers und stellt Token aus; beides
+ * verträgt kein Vorrendern und keinen Zwischenspeicher.
+ */
+export const dynamic = "force-dynamic"
+
+/**
+ * Das Token für ein frisch aufgebautes Formular. Bewusst ohne jede Angabe zum
+ * Aufrufer: Es sagt nur, wann es ausgestellt wurde, und beweist mit seiner
+ * Signatur, dass es von uns stammt.
+ */
+export async function GET(request: Request) {
+  const now = Date.now()
+  const key = await bucketKey("token", callerAddress(request))
+
+  if (!withinLimit(key, LIMITS_INFO.MAX_TOKENS, now)) {
+    return NextResponse.json(
+      { ok: false, error: "rate_limited" },
+      { status: 429, headers: { "Cache-Control": "no-store" } },
+    )
+  }
+
+  const token = await issueFormToken(now)
+  if (!token) {
+    return NextResponse.json(
+      { ok: false, error: "not_configured" },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
+    )
+  }
+
+  return NextResponse.json({ ok: true, token }, { headers: { "Cache-Control": "no-store" } })
+}
 
 /** Nur diese Sprachen haben Bestätigungstexte. Alles andere fällt auf DE. */
 type Locale = "de" | "tr"
@@ -57,6 +113,8 @@ type LeadPayload = {
   website?: unknown
   /** Woher die Anfrage kam: "kontakt" oder "termin". */
   source?: unknown
+  /** Signiertes Zeit-Token aus `GET` dieser Route. */
+  token?: unknown
 }
 
 const LIMITS = {
@@ -66,6 +124,8 @@ const LIMITS = {
   phone: 60,
   message: 4000,
   source: 40,
+  /** BF-2: abgeschickte Anfragen je Adresse und Zeitfenster. */
+  submitsPerWindow: LIMITS_INFO.MAX_SUBMITS,
 } as const
 
 function asText(value: unknown, max: number): string {
@@ -221,6 +281,52 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true })
   }
 
+  const apiKey = process.env.RESEND_API_KEY
+  const from = process.env.LEAD_FROM
+  const to = process.env.LEAD_TO || "info@creadig.de"
+
+  /*
+    Nicht konfiguriert heißt: nicht zugestellt. Die Route sagt das offen und
+    das Formular zeigt daraufhin die anderen Wege. Ein „Danke, wir melden
+    uns" ohne Postfach dahinter ist genau der Fehler, den diese Datei
+    beseitigen soll.
+
+    Diese Prüfung steht VOR dem Token: Ohne Geheimnis lässt sich gar kein
+    Token ausstellen, und dann wäre „ungültiges Token" eine irreführende
+    Antwort auf ein Problem, das auf unserer Seite liegt.
+  */
+  if (!apiKey || !from) {
+    console.error("[lead] RESEND_API_KEY oder LEAD_FROM fehlt — Anfrage NICHT zugestellt")
+    return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 })
+  }
+
+  /*
+    BF-2 — die zweite Hürde. `too_fast` und `expired` bekommen eigene Codes,
+    damit das Formular sinnvoll reagieren kann: neu holen und noch einmal
+    schicken statt eine Fehlermeldung zu zeigen, die niemand versteht.
+  */
+  const now = Date.now()
+  const verdict = await verifyFormToken(payload.token, now)
+  if (verdict !== "ok") {
+    if (verdict === "too_fast") {
+      console.warn("[lead] Absenden schneller als moeglich — nichts verschickt")
+    }
+    return NextResponse.json(
+      { ok: false, error: verdict === "expired" ? "token_expired" : "token_invalid" },
+      { status: verdict === "expired" ? 409 : 400 },
+    )
+  }
+
+  /*
+    BF-2 — die dritte Hürde. Sie zählt erst hier mit, nach dem Token: Ein
+    Skript ohne gültiges Token soll das Fenster eines echten Besuchers hinter
+    derselben Firmen-IP nicht auffüllen können.
+  */
+  if (!withinLimit(await bucketKey("lead", callerAddress(request)), LIMITS.submitsPerWindow, now)) {
+    console.warn("[lead] Fenster ausgeschoepft — nichts verschickt")
+    return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 })
+  }
+
   const name = asText(payload.name, LIMITS.name)
   const business = asText(payload.business, LIMITS.business)
   const email = asText(payload.email, LIMITS.email)
@@ -246,21 +352,6 @@ export async function POST(request: Request) {
   if (!phone) missing.push("phone")
   if (missing.length > 0) {
     return NextResponse.json({ ok: false, error: "invalid", fields: missing }, { status: 400 })
-  }
-
-  const apiKey = process.env.RESEND_API_KEY
-  const from = process.env.LEAD_FROM
-  const to = process.env.LEAD_TO || "info@creadig.de"
-
-  /*
-    Nicht konfiguriert heißt: nicht zugestellt. Die Route sagt das offen und
-    das Formular zeigt daraufhin die anderen Wege. Ein „Danke, wir melden
-    uns" ohne Postfach dahinter ist genau der Fehler, den diese Datei
-    beseitigen soll.
-  */
-  if (!apiKey || !from) {
-    console.error("[lead] RESEND_API_KEY oder LEAD_FROM fehlt — Anfrage NICHT zugestellt")
-    return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 })
   }
 
   const lines = [

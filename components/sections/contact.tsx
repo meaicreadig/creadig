@@ -11,10 +11,14 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { contact } from "@/lib/site-data"
 import { trackLead } from "@/lib/track"
+import { useLeadSubmit } from "@/lib/use-lead"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 export function Contact() {
   const { t, locale } = useLocale()
+  /* BF-2: holt beim Aufbau des Formulars das signierte Zeit-Token und legt es
+     beim Absenden bei. Ohne das geht nichts raus. */
+  const submitLead = useLeadSubmit()
   const [name, setName] = useState("")
   const [business, setBusiness] = useState("")
   // E-Mail und Telefon fehlten komplett. Ein Formular, das nur einen Namen und
@@ -96,6 +100,19 @@ export function Contact() {
   const fieldClass =
     "rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-3.5 h-auto text-base shadow-none focus-visible:border-gold focus-visible:ring-0 dark:bg-transparent"
 
+  /*
+    Der Unterschied zaehlt: "noch nicht eingerichtet" ist ein Zustand unserer
+    Seite, "zu viele Anfragen" einer des Anschlusses, "Formular zu lange offen"
+    einer des Browsers — und "hat gerade nicht geklappt" einer der Leitung. Wer
+    das Richtige liest, versucht es nicht dreimal vergeblich.
+  */
+  function errorText(code: string | undefined) {
+    if (code === "not_configured") return `${t.contact.errNotConfigured} ${contact.email}.`
+    if (code === "rate_limited") return t.contact.errRateLimited
+    if (code === "token_expired" || code === "token_invalid") return t.contact.errFormExpired
+    return t.contact.errSendFailed
+  }
+
   return (
     <section id="kontakt" aria-labelledby="kontakt-title" className="border-line border-b">
       <div className="section-shell">
@@ -138,26 +155,19 @@ export function Contact() {
                   setError(null)
                   setHandoff(null)
                   try {
-                    const response = await fetch("/api/lead", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        name,
-                        business,
-                        email,
-                        phone,
-                        message,
-                        privacyOk,
-                        locale,
-                        website,
-                        source: "kontakt",
-                      }),
+                    const data = await submitLead({
+                      name,
+                      business,
+                      email,
+                      phone,
+                      message,
+                      privacyOk,
+                      locale,
+                      website,
+                      source: "kontakt",
                     })
-                    const data = (await response.json().catch(() => null)) as
-                      | { ok?: boolean; error?: string }
-                      | null
 
-                    if (response.ok && data?.ok) {
+                    if (data.ok) {
                       setStatus("sent")
                       // GROW-2: die einzige Zahl, an der sich die Seite messen
                       // lassen muss. Nur der Herkunftsname, nie ein Feldinhalt.
@@ -172,11 +182,7 @@ export function Contact() {
                       der Leitung. Wer das Erste liest, versucht es nicht
                       dreimal vergeblich, sondern nimmt WhatsApp.
                     */
-                    setError(
-                      data?.error === "not_configured"
-                        ? `${t.contact.errNotConfigured} ${contact.email}.`
-                        : t.contact.errSendFailed,
-                    )
+                    setError(errorText(data.error))
                   } catch {
                     setStatus("idle")
                     setError(t.contact.errSendFailed)
