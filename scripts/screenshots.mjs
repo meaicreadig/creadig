@@ -102,6 +102,9 @@ const VIEWPORTS = [
 
 const THEMES = ["hell", "dunkel"]
 
+/** Chromium nimmt keine Textur ueber 16.384 Pixel Kante auf. Etwas Reserve. */
+const MAX_TEXTURE = 16_000
+
 /**
  * Läuft VOR jedem Skript der Seite — also auch vor dem Boot-Skript im <head>,
  * das den Dunkelmodus setzt. Später gesetzt hätte die Seite bereits hell
@@ -226,8 +229,40 @@ async function main() {
             blank.push(`${viewport.name}/${theme} ${entry.name}: ${invisible.join(", ")}`)
           }
 
+          /*
+            NACHGEMESSEN: Chromium kann keine Textur ueber 16.384 Pixel Kante
+            aufnehmen. Bei doppelter Aufloesung reisst diese Grenze schon bei
+            8.192 Pixeln Seitenhoehe — die Startseite ist 8.780 hoch. Das Bild
+            war dann nicht etwa abgeschnitten, sondern zeigte unter der halben
+            Fusszeile ein zweites Mal Leiste und Buehne. Ein Bild, das etwas
+            zeigt, das es nicht gibt, ist schlimmer als eines, das fehlt: Ich
+            habe zuerst nach einem Fehler in der Seite gesucht, den es nicht
+            gab (/leistungen mit 7.619 Pixeln war sauber).
+
+            Zu hohe Seiten werden deshalb in einfacher Aufloesung aufgenommen.
+            Lieber weniger scharf als falsch.
+          */
           const file = path.join(dir, `${entry.name}.png`)
-          await page.screenshot({ path: file, fullPage: true })
+          const pageHeight = await page.evaluate(() => document.body.scrollHeight)
+
+          if (pageHeight * viewport.deviceScaleFactor > MAX_TEXTURE) {
+            const plain = await browser.newContext({
+              viewport: { width: viewport.width, height: viewport.height },
+              deviceScaleFactor: 1,
+              reducedMotion: "reduce",
+              colorScheme: theme === "dunkel" ? "dark" : "light",
+              locale: "de-DE",
+            })
+            await plain.addInitScript(seedScript(theme))
+            const plainPage = await plain.newPage()
+            await plainPage.goto(`${BASE}${entry.path}`, { waitUntil: "networkidle" })
+            if (entry.act) await entry.act(plainPage)
+            await settle(plainPage)
+            await plainPage.screenshot({ path: file, fullPage: true })
+            await plain.close()
+          } else {
+            await page.screenshot({ path: file, fullPage: true })
+          }
           written++
           console.log(
             `  ${viewport.name}/${theme}  ${entry.name}${invisible.length > 0 ? "  ← UNSICHTBARER TEXT" : ""}`,
