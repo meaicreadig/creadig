@@ -3,7 +3,8 @@
 import { useRef } from "react"
 import Image from "next/image"
 import { ArrowUpRight, MapPin } from "lucide-react"
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion"
+import { motion, useScroll, useTransform } from "framer-motion"
+import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { useLocale } from "@/components/locale-provider"
 import { SignatureMotif } from "@/components/brand/signature-motif"
 import { Reveal } from "@/components/ui/reveal"
@@ -46,7 +47,7 @@ function PhotoPlaceholder() {
 export function LocationParallax({ photoSrc }: { photoSrc: string | null }) {
   const { t } = useLocale()
   const frameRef = useRef<HTMLDivElement>(null)
-  const reduce = useReducedMotion()
+  const reduce = usePrefersReducedMotion()
 
   // Fortschritt, während der Rahmen durchs Fenster läuft: 0 = tritt unten ein,
   // 1 = verlässt oben. Scroll-gekoppelt und nur auf `transform` gelegt.

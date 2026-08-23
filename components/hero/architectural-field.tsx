@@ -1,7 +1,8 @@
 "use client"
 
 import { useRef } from "react"
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion"
+import { motion, useScroll, useTransform } from "framer-motion"
+import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { SignatureMotif } from "@/components/brand/signature-motif"
 
 /**
@@ -10,7 +11,7 @@ import { SignatureMotif } from "@/components/brand/signature-motif"
  */
 export function ArchitecturalField() {
   const ref = useRef<HTMLDivElement>(null)
-  const reduce = useReducedMotion()
+  const reduce = usePrefersReducedMotion()
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],

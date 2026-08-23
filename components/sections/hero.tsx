@@ -1,7 +1,8 @@
 "use client"
 
 import { LocaleLink as Link } from "@/components/ui/locale-link"
-import { motion, useReducedMotion } from "framer-motion"
+import { motion } from "framer-motion"
+import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { ArrowDown, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { heroChips } from "@/lib/site-data"
@@ -13,7 +14,7 @@ const EASE = [0.22, 1, 0.36, 1] as const
 
 export function Hero() {
   const { t } = useLocale()
-  const reduce = useReducedMotion()
+  const reduce = usePrefersReducedMotion()
 
   const lines = [t.hero.headlineLine1, t.hero.headlineLine2, t.hero.headlineLine3]
 

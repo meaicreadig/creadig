@@ -1,6 +1,7 @@
 "use client"
 
-import { motion, useReducedMotion } from "framer-motion"
+import { motion } from "framer-motion"
+import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 
 /**
  * ARCHETYP C, Bewegung — die Maskenfahrt (VIS-2).
@@ -24,7 +25,7 @@ import { motion, useReducedMotion } from "framer-motion"
  * REGELN
  *   - Läuft EINMAL (`once: true`) — eine Fahrt, die sich beim Zurückscrollen
  *     wiederholt, wird beim zweiten Mal zur Nervensäge.
- *   - `useReducedMotion` schaltet sie vollständig ab; dann steht das Bild
+ *   - `usePrefersReducedMotion` schaltet sie vollständig ab; dann steht das Bild
  *     einfach da. Kein halber Zustand, keine unsichtbare Maske.
  *   - Kein Blur, kein Schatten, kein Farbverlauf: Die Marke arbeitet mit
  *     Kante und Fläche, nicht mit Effekt.
@@ -38,7 +39,7 @@ export function ImageUnveil({
   delay?: number
   className?: string
 }) {
-  const reduce = useReducedMotion()
+  const reduce = usePrefersReducedMotion()
 
   if (reduce) return <div className={className}>{children}</div>
 

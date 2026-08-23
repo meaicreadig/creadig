@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
-import { motion, useReducedMotion } from "framer-motion"
+import { motion } from "framer-motion"
+import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { cn } from "@/lib/utils"
 
 /** Ausserhalb der Komponente: sonst entsteht der Typ bei jedem Render neu. */
@@ -28,7 +29,7 @@ export function MagneticButton({
   target,
 }: MagneticButtonProps) {
   const ref = useRef<HTMLElement | null>(null)
-  const reduce = useReducedMotion()
+  const reduce = usePrefersReducedMotion()
   const [offset, setOffset] = useState({ x: 0, y: 0 })
 
   function handleMove(event: React.MouseEvent<HTMLElement>) {

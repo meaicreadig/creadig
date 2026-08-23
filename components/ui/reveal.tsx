@@ -1,6 +1,7 @@
 "use client"
 
-import { motion, useReducedMotion } from "framer-motion"
+import { motion } from "framer-motion"
+import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { cn } from "@/lib/utils"
 
 type RevealProps = {
@@ -12,7 +13,7 @@ type RevealProps = {
 }
 
 export function Reveal({ children, className, delay = 0, y = 24, as = "div" }: RevealProps) {
-  const reduce = useReducedMotion()
+  const reduce = usePrefersReducedMotion()
   const MotionTag = motion[as]
 
   if (reduce) {

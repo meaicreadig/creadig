@@ -89,8 +89,10 @@ const PAGES = [
       await page.waitForTimeout(400)
     },
   },
-  { name: "10-404", path: "/diese-adresse-gibt-es-nicht" },
-  { name: "11-404-tr", path: "/tr/bu-adres-yok" },
+  /* BF-9 sitzt hier: Auf dieser Seite stehen Referenzen und Paketpreis. */
+  { name: "10-leistung-detail", path: "/leistungen/webdesign" },
+  { name: "11-404", path: "/diese-adresse-gibt-es-nicht" },
+  { name: "12-404-tr", path: "/tr/bu-adres-yok" },
 ]
 
 const VIEWPORTS = [
@@ -126,6 +128,33 @@ async function waitForServer(timeoutMs = 60_000) {
     await new Promise((resolve) => setTimeout(resolve, 400))
   }
   throw new Error(`Server kam auf ${BASE} nicht hoch.`)
+}
+
+/**
+ * Ein Bild von einer leeren Seite sieht aus wie eine leere Seite — und genau
+ * das ist einmal passiert: Die Leistungs-Detailseite kam als Kopfzeile,
+ * weisse Flaeche, Fusszeile aus dem Satz. Ursache war ein echter Fehler
+ * (siehe lib/use-prefers-reduced-motion.ts), aber gemerkt habe ich es nur,
+ * weil ich zufaellig hingesehen habe.
+ *
+ * Diese Pruefung sieht immer hin: Sie sucht Bloecke mit nennenswertem Text,
+ * die trotz allem unsichtbar geblieben sind. Findet sie welche, schlaegt der
+ * ganze Durchlauf fehl — ein Bildersatz, der Leere zeigt, ist schlimmer als
+ * keiner, weil er beruhigt.
+ */
+async function findInvisibleText(page) {
+  return page.evaluate(() => {
+    const hidden = []
+    for (const element of document.querySelectorAll("main *, header *, footer *")) {
+      const text = (element.textContent ?? "").trim()
+      if (text.length < 80) continue
+      const style = getComputedStyle(element)
+      if (Number(style.opacity) < 0.5 || style.visibility === "hidden") {
+        hidden.push(`${element.tagName}.${String(element.className).slice(0, 40)}`)
+      }
+    }
+    return [...new Set(hidden)].slice(0, 5)
+  })
 }
 
 /** Bis ans Ende scrollen und zurück — laedt die verzoegerten Bilder. */
@@ -171,6 +200,7 @@ async function main() {
     browser = await chromium.launch({ channel: "chrome" })
 
     let written = 0
+    const blank = []
     for (const viewport of VIEWPORTS) {
       for (const theme of THEMES) {
         const dir = path.join(OUT, `${viewport.name}-${theme}`)
@@ -190,16 +220,30 @@ async function main() {
           await page.goto(`${BASE}${entry.path}`, { waitUntil: "networkidle" })
           if (entry.act) await entry.act(page)
           await settle(page)
+
+          const invisible = await findInvisibleText(page)
+          if (invisible.length > 0) {
+            blank.push(`${viewport.name}/${theme} ${entry.name}: ${invisible.join(", ")}`)
+          }
+
           const file = path.join(dir, `${entry.name}.png`)
           await page.screenshot({ path: file, fullPage: true })
           written++
-          console.log(`  ${viewport.name}/${theme}  ${entry.name}`)
+          console.log(
+            `  ${viewport.name}/${theme}  ${entry.name}${invisible.length > 0 ? "  ← UNSICHTBARER TEXT" : ""}`,
+          )
         }
         await context.close()
       }
     }
 
     console.log(`\n${written} Aufnahmen in ${path.relative(ROOT, OUT)}/`)
+
+    if (blank.length > 0) {
+      console.error("\nText, der im Bild unsichtbar geblieben ist:")
+      for (const entry of blank) console.error(`  ${entry}`)
+      process.exitCode = 1
+    }
   } finally {
     if (browser) await browser.close()
     server.kill("SIGTERM")
