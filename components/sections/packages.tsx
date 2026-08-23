@@ -1,6 +1,7 @@
 "use client"
 
 import { ArrowUpRight, Check } from "lucide-react"
+import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { packages, retainer, retainerPublished } from "@/lib/site-data"
@@ -135,8 +136,11 @@ export function Packages() {
                   {copy.note}
                 </p>
 
-                {/* Führt wie auf der alten Seite in den Termin-Wizard. */}
-                <a
+                {/* Führt wie auf der alten Seite in den Termin-Wizard.
+                    Auch hier ein LocaleLink: Das nackte <a> sprang auf
+                    /tr/... in die deutsche Fassung — der Regel-Pruefer sieht
+                    das bei einem Template-Literal nicht. */}
+                <Link
                   href={`/termin?paket=${pkg.key}`}
                   className={
                     pkg.recommended
@@ -154,7 +158,7 @@ export function Packages() {
                     {copy.cta}
                     <ArrowUpRight className="size-4" strokeWidth={1.5} />
                   </span>
-                </a>
+                </Link>
               </Reveal>
             )
           })}
@@ -203,13 +207,19 @@ export function Packages() {
                   <span className="type-stat">{retainer.price}</span>
                   <span className="eyebrow text-muted-foreground">{t.packages.monthly}</span>
                 </div>
-                <a
+                {/*
+                  War ein nacktes <a>. Zwei Folgen: ein voller Ladevorgang
+                  statt Client-Navigation — und auf /tr/... ein Sprung in die
+                  deutsche Fassung, weil das Sprachpraefix fehlte. Der
+                  LocaleLink setzt es (siehe components/ui/locale-link.tsx).
+                */}
+                <Link
                   href="/termin?paket=retainer"
                   className="border-line-strong hover:border-gold hover:text-gold-text mt-7 inline-flex items-center justify-between gap-2 self-start border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
                 >
                   {t.packages.retainerCta}
                   <ArrowUpRight className="size-4" strokeWidth={1.5} />
-                </a>
+                </Link>
               </div>
             </div>
           </Reveal>
