@@ -875,6 +875,46 @@ export const dictionary = {
       months: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
       days: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
     },
+    /*
+     * BF-3 — die Seiten, die nur im Fehlerfall erscheinen.
+     *
+     * Bis hierher gab es sie nicht: Eine falsche Adresse zeigte die englische
+     * Standardseite von Next ("This page could not be found"), ohne
+     * Navigation, ohne Sprache, ohne einen Weg zurück. Wer über einen alten
+     * Link oder einen QR-Code kam, landete auf einer Seite, die nicht nach
+     * uns aussah — und war weg.
+     *
+     * Die Wege stehen bewusst hier und nicht als generische Links: Die
+     * Kontaktseite ist einer davon, aber WhatsApp und E-Mail stehen daneben,
+     * weil die Lead-Route bei fehlender Konfiguration 503 antwortet. Ein
+     * Ausweg, der selbst kaputt sein kann, ist kein Ausweg.
+     */
+    errorPages: {
+      notFound: {
+        metaTitle: "Seite nicht gefunden",
+        metaDescription:
+          "Diese Adresse gibt es nicht. Hier sind die Wege zurück zu creaDIG — und die direkten Kontaktwege.",
+        eyebrow: "Fehler 404",
+        title: "Diese Seite gibt es nicht.",
+        lead: "Entweder hat sich die Adresse geändert, oder es hat sich ein Tippfehler eingeschlichen. Beides ist schnell behoben.",
+      },
+      serverError: {
+        eyebrow: "Fehler 500",
+        title: "Hier ist etwas schiefgegangen.",
+        lead: "Der Fehler liegt bei uns, nicht bei Ihnen. Versuchen Sie es noch einmal — und wenn es dabei bleibt, erreichen Sie uns direkt.",
+        retry: "Noch einmal versuchen",
+      },
+      waysLabel: "Drei Wege zurück",
+      ways: {
+        home: { label: "Startseite", note: "Der Überblick über das ganze Haus." },
+        services: { label: "Leistungen", note: "Fünf Ebenen — von der Marke bis zur künstlichen Intelligenz." },
+        contact: { label: "Kontakt", note: "Formular, WhatsApp und der Weg zum Gespräch." },
+      },
+      directLabel: "Oder direkt",
+      directNote: "Diese beiden Wege gehen immer — auch dann, wenn das Formular gerade nicht will.",
+      whatsapp: "Per WhatsApp schreiben",
+      mail: "E-Mail schreiben",
+    },
     legal: {
       imprintTitle: "Impressum",
       privacyTitle: "Datenschutz",
@@ -1704,6 +1744,32 @@ export const dictionary = {
       waNote: "Mesaj",
       months: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"],
       days: ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"],
+    },
+    errorPages: {
+      notFound: {
+        metaTitle: "Sayfa bulunamadı",
+        metaDescription:
+          "Bu adres mevcut değil. creaDIG'e dönüş yolları ve doğrudan iletişim kanalları burada.",
+        eyebrow: "Hata 404",
+        title: "Bu sayfa mevcut değil.",
+        lead: "Ya adres değişti ya da yazımda küçük bir hata var. İkisi de hızlıca çözülür.",
+      },
+      serverError: {
+        eyebrow: "Hata 500",
+        title: "Bir şeyler ters gitti.",
+        lead: "Hata sizde değil, bizde. Lütfen tekrar deneyin — sorun sürerse bize doğrudan ulaşabilirsiniz.",
+        retry: "Tekrar dene",
+      },
+      waysLabel: "Üç dönüş yolu",
+      ways: {
+        home: { label: "Ana sayfa", note: "Tüm evin genel görünümü." },
+        services: { label: "Hizmetler", note: "Beş katman — markadan yapay zekâya." },
+        contact: { label: "İletişim", note: "Form, WhatsApp ve görüşmeye giden yol." },
+      },
+      directLabel: "Ya da doğrudan",
+      directNote: "Bu iki yol her zaman açıktır — form çalışmadığında bile.",
+      whatsapp: "WhatsApp'tan yazın",
+      mail: "E-posta gönderin",
     },
     legal: {
       imprintTitle: "Künye",
