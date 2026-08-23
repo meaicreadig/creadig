@@ -26,6 +26,17 @@ node_modules
 Archiv_creadig.zip
 *.zip
 
+# TECH-3 — Fremdbestand im Repo-Root.
+#
+# `_legacy/` ist die alte statische Seite (6,6 MB, 29 Dateien, davon fuenf
+# VAG-Rounded-Schnitte), `design-mockup/` sind Canvas-Entwuerfe. Beides wird
+# von keiner Quelldatei importiert, ESLint schliesst es ohnehin aus und
+# `outputFileTracingExcludes` haelt es aus der Serverless-Function heraus.
+# Es gehoert damit in kein Deployment und in keinen Klon — aber es bleibt
+# LOKAL erhalten. `git rm --cached` nimmt es nur aus der Versionierung.
+_legacy/
+design-mockup/
+
 # Build- und Tooling-Artefakte
 tsconfig.tsbuildinfo
 next-env.d.ts
