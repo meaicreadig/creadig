@@ -91,8 +91,10 @@ const PAGES = [
   },
   /* BF-9 sitzt hier: Auf dieser Seite stehen Referenzen und Paketpreis. */
   { name: "10-leistung-detail", path: "/leistungen/webdesign" },
-  { name: "11-404", path: "/diese-adresse-gibt-es-nicht" },
-  { name: "12-404-tr", path: "/tr/bu-adres-yok" },
+  { name: "11-barrierefreiheit", path: "/barrierefreiheit" },
+  { name: "11b-barrierefreiheit-tr", path: "/tr/erisilebilirlik" },
+  { name: "12-404", path: "/diese-adresse-gibt-es-nicht" },
+  { name: "13-404-tr", path: "/tr/bu-adres-yok" },
 ]
 
 /*
