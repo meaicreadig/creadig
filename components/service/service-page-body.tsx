@@ -174,6 +174,19 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                     </li>
                   ))}
               </ul>
+              {/*
+                BF-A11 — der Satz, der die zweite Preiswelt verhindert.
+
+                Barrierefreiheit ist Einstieg, nicht Konkurrenzprodukt: im
+                Paket eingebaut, wenn neu gebaut wird — eigene Leistung, wenn
+                die Seite schon steht. Ohne diesen Satz stehen beide Angebote
+                nebeneinander und der Leser muss raten, welches fuer ihn gilt.
+              */}
+              {page.packageNote && (
+                <p className="type-small text-muted-foreground mt-5 text-pretty">
+                  {page.packageNote[locale]}
+                </p>
+              )}
               <Link
                 href="/leistungen#pakete"
                 className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"

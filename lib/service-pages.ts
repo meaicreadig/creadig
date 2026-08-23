@@ -30,8 +30,10 @@ import type { Localized } from "@/lib/site-data"
  *
  * ---------------------------------------------------------------------------
  * KEIN WILDWUCHS
- * Fünf Seiten, alle in der Nische (Handwerk, KMU, Gastronomie) —
- * Schwerpunkt Deutschland, offen für Unternehmen jeder Branche.
+ * Sechs Seiten, alle in der Nische (Handwerk, KMU, Gastronomie) —
+ * Schwerpunkt Deutschland, offen für Unternehmen jeder Branche. Die sechste
+ * (Barrierefreiheit) ist seit Master-Prompt 7 die Einstiegsleistung: der
+ * Türöffner, hinter dem Relaunch und Betreuung stehen.
  * Nicht dreißig generische Landingpages — die verwässern die Domain, statt sie
  * zu stärken.
  */
@@ -68,6 +70,16 @@ export type ServicePage = {
   forWhom: { de: string[]; tr: string[] }
   /** Pakete, in denen die Leistung enthalten ist. */
   packageKeys: "website"[]
+  /**
+   * BF-A5 — Seiten, deren Leistung NICHT im Paket steckt, sondern davor.
+   *
+   * Der Regelfall ist `packageKeys`: Die Leistung ist Bestandteil des
+   * Website-Pakets, die Seite verweist dorthin. Barrierefreiheit ist der
+   * erste Fall, der beides ist — im Paket eingebaut, wenn neu gebaut wird,
+   * und eine eigene Leistung, wenn die Seite schon steht. Dieser Satz sagt
+   * das an der Paketliste, statt es dem Leser zu ueberlassen.
+   */
+  packageNote?: Localized
   /** Arbeiten, die zu dieser Leistung gehören (slugs aus site-data). */
   workSlugs: string[]
   /** Auf `false` verschwindet die Seite aus Routing UND Sitemap. */
@@ -295,6 +307,91 @@ export const servicePages: ServicePage[] = [
     },
     packageKeys: ["website"],
     workSlugs: ["meai", "fibero", "meahv"],
+    published: true,
+  },
+  {
+    /*
+     * BF-A5 — Barrierefreiheit als eigene Leistung.
+     *
+     * -----------------------------------------------------------------------
+     * WARUM DIESE SEITE ANDERS GEBAUT IST ALS DIE VIER DARUEBER
+     * Die anderen vier Seiten buendeln, was das Haus ohnehin tut, fuer je
+     * einen Suchbegriff. Diese hier verkauft eine Pruefung — und eine
+     * Pruefung, die man nicht belegen kann, ist eine Behauptung. Deshalb
+     * traegt sie drei Bloecke, die es sonst nicht gibt: die Grenze der
+     * eigenen Leistung (`boundary`), den Beleg am eigenen Objekt
+     * (`ownProof`) und die Preisleiter (`priceLadder`).
+     *
+     * -----------------------------------------------------------------------
+     * WAS HIER NICHT STEHT — UND WARUM
+     * Keine Bussgeldhoehe, keine Abmahnung, keine Behoerde, keine Frist als
+     * Druckmittel, kein "rechtssicher" und kein "garantiert konform".
+     * Argumentiert wird ueber den Kunden, der abbricht, nie ueber die
+     * Strafe. Das ist keine Zurueckhaltung aus Vorsicht: Wer mit Angst
+     * verkauft, bekommt einen Kunden, der die Rechnung bezahlt und nie
+     * wiederkommt — und wer eine Rechtsfolge verspricht, verkauft etwas,
+     * das er gar nicht liefern darf.
+     */
+    slug: "barrierefreiheit-website",
+    chip: { de: "Barrierefreiheit", tr: "Erişilebilirlik" },
+    layer: "digital",
+    h1: {
+      de: "Barrierefreiheit: geprüft, behoben, nachweisbar.",
+      tr: "Erişilebilirlik: denetlenir, giderilir, belgelenir.",
+    },
+    lead: {
+      de: "Ein Kunde bricht die Bestellung ab, weil sein Screenreader das Pflichtfeld nicht vorliest. Er schreibt Ihnen nicht, warum — er ist einfach weg. Wir prüfen Ihre Website nach WCAG 2.1 AA von Hand, schreiben jeden Fund mit Beleg auf und beheben ihn im Code. Kein Overlay, kein Widget.",
+      tr: "Bir müşteri siparişi yarıda bırakır, çünkü ekran okuyucusu zorunlu alanı okumaz. Size nedenini yazmaz — sadece gider. Web sitenizi WCAG 2.1 AA ölçütlerine göre elle denetler, bulduğumuz her şeyi kanıtıyla yazar ve kodun içinde gideririz. Overlay yok, eklenti yok.",
+    },
+    metaTitle: {
+      de: "Barrierefreiheit Website & BFSG Onlineshop",
+      tr: "Web sitesi erişilebilirliği & BFSG (Almanya)",
+    },
+    metaDescription: {
+      de: "Barrierefreiheit für Website und Onlineshop: manuelle Prüfung nach WCAG 2.1 AA, Befundbericht mit Belegen, Behebung im Code — ohne Overlay. Aus Osnabrück, auf Deutsch und Türkisch.",
+      tr: "Web sitesi ve online mağaza için erişilebilirlik: WCAG 2.1 AA ölçütlerine göre elle denetim, kanıtlı bulgu raporu, kod içinde giderme — overlay olmadan. Osnabrück'ten, Almanca ve Türkçe.",
+    },
+    includes: {
+      de: [
+        "Manuelle Prüfung nach unserem 12-Punkte-Raster — demselben, mit dem wir unsere eigene Seite geprüft haben",
+        "Durchlauf mit Tastatur und Screenreader, nicht nur ein automatischer Scan",
+        "Befundbericht: jeder Fund mit Seite, Element, WCAG-Kriterium und Messwert",
+        "Behebung im Code Ihrer Seite — kein Overlay, kein Widget, kein Plugin",
+        "Erklärung zur Barrierefreiheit und Feedback-Weg als technische Vorlage",
+        "Nachprüfung nach der Behebung, mit Zahlen vorher und nachher",
+      ],
+      tr: [
+        "Kendi 12 maddelik denetim şablonumuzla elle denetim — kendi sitemizi denetlediğimiz şablonun aynısı",
+        "Klavye ve ekran okuyucuyla baştan sona geçiş, yalnızca otomatik tarama değil",
+        "Bulgu raporu: her bulgu sayfası, öğesi, WCAG ölçütü ve ölçülen değeriyle",
+        "Sitenizin kodunda giderme — overlay yok, widget yok, eklenti yok",
+        "Erişilebilirlik beyanı ve geri bildirim yolu, teknik taslak olarak",
+        "Giderme sonrası yeniden denetim, öncesi ve sonrası sayılarla",
+      ],
+    },
+    forWhom: {
+      de: [
+        "Betriebe mit Onlineshop oder Buchungsstrecke",
+        "Handwerk, KMU und Gastronomie — Schwerpunkt Deutschland",
+        "Wer eine bestehende Seite hat und zuerst wissen will, wo sie steht",
+      ],
+      tr: [
+        "Online mağazası veya randevu/rezervasyon akışı olan işletmeler",
+        "Zanaat, KOBİ ve gastronomi — ağırlık Almanya",
+        "Mevcut bir sitesi olan ve önce durumunu öğrenmek isteyenler",
+      ],
+    },
+    packageKeys: ["website"],
+    packageNote: {
+      de: "Wer neu bei uns baut, bekommt Barrierefreiheit eingebaut — sie steht als Zeile im Website-Paket. Was hier beschrieben ist, gilt für eine Seite, die schon steht.",
+      tr: "Siteyi bizimle yeni kuranlarda erişilebilirlik baştan içeride — web sitesi paketinde bir satır olarak durur. Burada anlatılan, hâlihazırda ayakta olan bir site içindir.",
+    },
+    /*
+     * Leer, und das bleibt so, bis ein Kunde eine Freigabe unterschreibt.
+     * Der Beleg dieser Seite ist nicht fremdes Werk, sondern das eigene:
+     * `ownProof` zeigt auf die eigene Erklaerung und den eigenen Befund.
+     */
+    workSlugs: [],
     published: true,
   },
 ]
