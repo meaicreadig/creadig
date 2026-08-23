@@ -110,6 +110,20 @@ export function SiteFooter() {
                   {t.footer.privacy}
                 </Link>
               </li>
+              {/*
+                BF-A4 — die Erklaerung zur Barrierefreiheit gehoert dorthin,
+                wo Menschen sie suchen: in die Fusszeile, neben Impressum und
+                Datenschutz. Anders als die beiden ist sie aber `index,follow`
+                — sie ist kein Pflichttext, sondern ein Beleg.
+              */}
+              <li>
+                <Link
+                  href="/barrierefreiheit"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                >
+                  {t.accessibility.eyebrow}
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/termin"

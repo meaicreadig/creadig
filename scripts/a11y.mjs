@@ -73,6 +73,8 @@ const ROUTES = [
       await page.waitForTimeout(400)
     },
   },
+  { name: "barrierefreiheit", path: "/barrierefreiheit" },
+  { name: "barrierefreiheit-tr", path: "/tr/erisilebilirlik" },
   { name: "datenschutz", path: "/datenschutz" },
   { name: "impressum", path: "/impressum" },
   { name: "fehlerseite-404", path: "/diese-adresse-gibt-es-nicht" },

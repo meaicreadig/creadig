@@ -72,6 +72,17 @@ const entries: Entry[] = [
 
   { path: "/kontakt", changeFrequency: "monthly", priority: 0.9 },
   { path: "/termin", changeFrequency: "monthly", priority: 0.8 },
+
+  /*
+   * BF-A4 — die Erklaerung zur Barrierefreiheit steht drin, Impressum und
+   * Datenschutz nicht. Kein Widerspruch: Die beiden sind `noindex`, diese
+   * Seite nicht. Sie ist ein Beleg, kein Pflichttext — wer nach
+   * Barrierefreiheit und einer Agentur sucht, soll sie finden.
+   *
+   * Der tuerkische Pfad heisst `/tr/erisilebilirlik`; `localeUrl` setzt das
+   * aus der Tabelle in `lib/routes.ts`, hier steht wie ueberall der deutsche.
+   */
+  { path: "/barrierefreiheit", changeFrequency: "yearly", priority: 0.5 },
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

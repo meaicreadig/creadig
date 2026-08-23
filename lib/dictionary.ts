@@ -995,6 +995,92 @@ export const dictionary = {
       whatsapp: "Per WhatsApp schreiben",
       mail: "E-Mail schreiben",
     },
+    /*
+     * BF-A4 — die eigene Erklaerung zur Barrierefreiheit.
+     *
+     * Sie ist FREIWILLIG. Ob creadig.de unter das BFSG faellt, ist nicht
+     * geprueft und wird hier auch nicht behauptet — das waere eine rechtliche
+     * Aussage, und die trifft ein Anwalt, nicht wir. Was hier steht, ist der
+     * technische Stand: was geprueft wurde, was gefunden wurde, was behoben
+     * ist und was offen bleibt.
+     *
+     * Jede Zahl in diesem Text hat einen Beleg in
+     * `docs/barrierefreiheit-befund-eigen.md`. Steht dort nichts dazu, steht
+     * es hier nicht.
+     */
+    accessibility: {
+      metaTitle: "Erklärung zur Barrierefreiheit",
+      metaDescription:
+        "Stand der Barrierefreiheit von creadig.de: was wir geprüft haben, was wir gefunden und behoben haben, was offen bleibt — und wie Sie uns eine Barriere melden.",
+      eyebrow: "Erklärung zur Barrierefreiheit",
+      title: "Was diese Seite kann — und was nicht.",
+      lead: "Wir verkaufen Barrierefreiheit. Also fangen wir bei uns an: Diese Seite ist nach WCAG 2.1 Stufe AA geprüft, die gefundenen Mängel sind behoben, und was offen bleibt, steht unten. Die Erklärung ist freiwillig.",
+
+      voluntaryTitle: "Freiwillig, nicht Pflichterfüllung",
+      voluntaryBody:
+        "Ob diese Website unter das Barrierefreiheitsstärkungsgesetz fällt, haben wir nicht rechtlich prüfen lassen — und behaupten es deshalb auch nicht. Wir veröffentlichen diesen Stand, weil eine Agentur, die Barrierefreiheit anbietet, ihre eigene Seite offenlegen sollte. Eine rechtliche Bewertung ist das hier nicht.",
+
+      statusTitle: "Stand der Umsetzung",
+      statusBody:
+        "Nach dem Prüflauf vom 23. August 2026 sind alle acht gefundenen Mängel behoben. Der automatisierte Lauf über 68 Durchläufe (17 Seiten, zwei Fenstergrößen, helle und dunkle Fassung) meldet keine maschinell feststellbare Verletzung von WCAG 2.1 AA mehr. Die Handprüfung — Tastaturdurchlauf, zugängliche Namen, Fokus, Struktur — ist ebenfalls ohne offenen Punkt.",
+      statusNote:
+        "„Keine maschinell feststellbare Verletzung“ heißt nicht „barrierefrei“. Automatische Werkzeuge finden nur einen Teil der Barrieren; deshalb steht unten, was wir nicht geprüft haben.",
+
+      checkedTitle: "Was geprüft wurde",
+      checkedIntro:
+        "Zwölf Punkte nach WCAG 2.1 AA, in beiden Sprachfassungen, hell und dunkel, auf 1440 × 900 und 390 × 844 Pixeln:",
+      checked: [
+        "Kontrast von Text und von Bedienelementen, in beiden Erscheinungsbildern",
+        "Alternativtexte für informative Bilder; dekorative Grafiken stummgeschaltet",
+        "Beschriftung aller Formularfelder, einschließlich Auswahlfeldern und Einwilligungs-Kästchen",
+        "Fehler- und Statusmeldungen: zugeordnet, angesagt, nicht nur farblich",
+        "vollständige Bedienbarkeit ohne Maus, ohne Tastaturfalle",
+        "sichtbarer Fokus auf jedem Bedienelement",
+        "Sprungmarke, Überschriftenstruktur, Landmarks",
+        "Sprachauszeichnung je Sprachfassung",
+        "Verhalten bei „Bewegung reduzieren“, bei 200 % Zoom und 320 Pixel Breite",
+      ],
+      pagesLabel: "Geprüfte Seiten",
+      pagesBody:
+        "Startseite, Leistungen und eine Leistungs-Detailseite, Produkte und eine Produkt-Detailseite, Arbeiten, Unternehmen, Kontakt, der Termin-Assistent (Schritt 1 und Schritt 3), Datenschutz, Impressum und die Fehlerseite — jeweils in Deutsch und Türkisch.",
+
+      fixedTitle: "Was gefunden und behoben wurde",
+      fixedIntro:
+        "Acht Mängel, keiner davon blockierend, sieben als „erheblich“ eingestuft. Alle im Code behoben — ohne Overlay, ohne Zusatz-Werkzeug:",
+      fixed: [
+        "Textfarben mit zu geringem Kontrast (bis herunter auf 2,4 : 1 bei Platzhaltern)",
+        "kein sichtbarer Fokus auf drei Bedienelementen der Kopfleiste",
+        "keine Sprungmarke zum Inhalt",
+        "Kalendertage im Termin-Assistenten ohne aussagekräftigen Namen",
+        "zwei deutsche Beschriftungen in der türkischen Fassung",
+        "der Schrittwechsel im Termin-Assistenten wurde nicht angesagt",
+      ],
+      fixedEarlier:
+        "Vorher, in einem eigenen Durchgang: Mit der Systemeinstellung „Bewegung reduzieren“ blieben eingeblendete Abschnitte unsichtbar — auf einer Seite 33 Blöcke. Der schwerste Fehler dieser Seite, und er traf genau die Menschen, für die die Einstellung gemacht ist.",
+
+      openTitle: "Bekannte Einschränkungen",
+      openIntro: "Was wir nicht geprüft haben, und was das bedeutet:",
+      open: [
+        "Kein Durchlauf mit einem blinden Nutzer. Wir haben die technischen Voraussetzungen geprüft (Name, Rolle, Zustand, Ansagen) — nicht, wie verständlich das Ergebnis im Alltag ist.",
+        "Keine Prüfung mit Vergrößerungssoftware und keine Prüfung der Bedienung per Sprache.",
+        "Die Erklärung stützt sich auf einen Prüflauf zu einem Stichtag. Jede Änderung an der Seite kann etwas brechen; der automatisierte Teil läuft deshalb bei jeder Änderung mit.",
+        "Externe Wege — WhatsApp und das E-Mail-Programm — liegen außerhalb unserer Seite. Für ihre Barrierefreiheit können wir nicht einstehen. Deshalb gibt es zu jedem dieser Wege auch einen auf unserer Seite.",
+      ],
+
+      feedbackTitle: "Eine Barriere melden",
+      feedbackBody:
+        "Wenn Ihnen etwas auf dieser Seite den Weg versperrt, schreiben Sie uns — auch formlos, auch nur mit einem Satz. Wir antworten innerhalb von zwei Werktagen und sagen, ob und wann wir es beheben.",
+      feedbackMail: "E-Mail schreiben",
+      feedbackForm: "Über das Formular melden",
+      feedbackNote:
+        "Hilfreich, aber nicht nötig: welche Seite, welches Element, welches Hilfsmittel Sie benutzen.",
+
+      methodTitle: "Wie geprüft wurde",
+      methodBody:
+        "Nach einem festen Raster mit zwölf Punkten, damit zwei Personen unabhängig zum selben Ergebnis kommen. Automatisiert mit axe-core, von Hand mit Tastatur und Prüfung der zugänglichen Namen. Raster und vollständiger Befund liegen offen im Quelltext dieser Seite.",
+      updatedLabel: "Stand",
+      updated: "23. August 2026",
+    },
     legal: {
       imprintTitle: "Impressum",
       privacyTitle: "Datenschutz",
@@ -1874,6 +1960,79 @@ export const dictionary = {
       directNote: "Bu iki yol her zaman açıktır — form çalışmadığında bile.",
       whatsapp: "WhatsApp'tan yazın",
       mail: "E-posta gönderin",
+    },
+    accessibility: {
+      metaTitle: "Erişilebilirlik beyanı",
+      metaDescription:
+        "creadig.de'nin erişilebilirlik durumu: neyi denetledik, ne bulduk ve giderdik, ne açık kaldı — ve bir engeli bize nasıl bildirirsiniz.",
+      eyebrow: "Erişilebilirlik beyanı",
+      title: "Bu sayfa neyi yapabiliyor — neyi yapamıyor.",
+      lead: "Erişilebilirlik satıyoruz. O yüzden kendimizden başlıyoruz: Bu sayfa WCAG 2.1 AA seviyesine göre denetlendi, bulunan eksikler giderildi ve açık kalanlar aşağıda yazıyor. Bu beyan gönüllüdür.",
+
+      voluntaryTitle: "Gönüllü, yasal bir zorunluluk beyanı değil",
+      voluntaryBody:
+        "Bu web sitesinin Alman Erişilebilirliği Güçlendirme Yasası (BFSG) kapsamına girip girmediğini hukuken incelettirmedik — bu yüzden öyle olduğunu da iddia etmiyoruz. Bu durumu, erişilebilirlik sunan bir ajansın kendi sayfasını açıkça ortaya koyması gerektiği için yayımlıyoruz. Burada yazanlar hukuki bir değerlendirme değildir.",
+
+      statusTitle: "Uygulama durumu",
+      statusBody:
+        "23 Ağustos 2026 tarihli denetimden sonra bulunan sekiz eksiğin tamamı giderildi. 68 turluk otomatik denetim (17 sayfa, iki pencere boyutu, açık ve koyu görünüm) artık makineyle saptanabilir hiçbir WCAG 2.1 AA ihlali bildirmiyor. Elle yapılan denetim — klavyeyle gezinme, erişilebilir adlar, odak, yapı — de açık nokta bırakmıyor.",
+      statusNote:
+        "„Makineyle saptanabilir ihlal yok“ ifadesi „erişilebilir“ demek değildir. Otomatik araçlar engellerin yalnızca bir kısmını bulur; bu yüzden neyi denetlemediğimiz aşağıda yazıyor.",
+
+      checkedTitle: "Neyi denetledik",
+      checkedIntro:
+        "WCAG 2.1 AA'ya göre on iki madde, her iki dil sürümünde, açık ve koyu görünümde, 1440 × 900 ve 390 × 844 piksel boyutlarında:",
+      checked: [
+        "Metin ve kontrol öğelerinin kontrastı, her iki görünümde",
+        "Bilgi taşıyan görseller için alternatif metin; süsleyici grafikler sessize alındı",
+        "Tüm form alanlarının etiketlenmesi — seçim listeleri ve onay kutuları dahil",
+        "Hata ve durum mesajları: ilişkilendirilmiş, sesli okunuyor, yalnızca renkle verilmiyor",
+        "Faresiz tam kullanılabilirlik, klavye tuzağı olmadan",
+        "Her kontrol öğesinde görünür odak",
+        "İçeriğe atlama bağlantısı, başlık yapısı, landmark'lar",
+        "Her dil sürümü için dil işaretlemesi",
+        "„Hareketi azalt“ ayarında, %200 yakınlaştırmada ve 320 piksel genişlikte davranış",
+      ],
+      pagesLabel: "Denetlenen sayfalar",
+      pagesBody:
+        "Ana sayfa, Hizmetler ve bir hizmet ayrıntı sayfası, Ürünler ve bir ürün ayrıntı sayfası, İşler, Şirket, İletişim, randevu asistanı (1. ve 3. adım), Gizlilik, Künye ve hata sayfası — her biri Almanca ve Türkçe.",
+
+      fixedTitle: "Ne bulundu ve giderildi",
+      fixedIntro:
+        "Sekiz eksik; hiçbiri engelleyici değil, yedisi „ciddi“ olarak sınıflandırıldı. Hepsi kodda giderildi — overlay yok, ek araç yok:",
+      fixed: [
+        "Kontrastı yetersiz metin renkleri (yer tutucularda 2,4 : 1'e kadar düşen)",
+        "üst çubuktaki üç kontrol öğesinde görünür odak yokluğu",
+        "içeriğe atlama bağlantısının bulunmaması",
+        "randevu asistanındaki takvim günlerinin anlamlı bir ada sahip olmaması",
+        "Türkçe sürümde kalan iki Almanca etiket",
+        "randevu asistanında adım değişiminin sesli bildirilmemesi",
+      ],
+      fixedEarlier:
+        "Daha önce, ayrı bir turda: „Hareketi azalt“ sistem ayarı açıkken, kaydırmayla beliren bölümler görünmez kalıyordu — bir sayfada 33 blok. Bu sayfanın en ağır hatasıydı ve tam olarak bu ayarın kendisi için yapıldığı insanları etkiliyordu.",
+
+      openTitle: "Bilinen sınırlamalar",
+      openIntro: "Neyi denetlemediğimiz ve bunun anlamı:",
+      open: [
+        "Görme engelli bir kullanıcıyla deneme yapılmadı. Teknik ön koşulları denetledik (ad, rol, durum, sesli bildirimler) — sonucun günlük kullanımda ne kadar anlaşılır olduğunu değil.",
+        "Büyüteç yazılımıyla ve sesle kullanım denetlenmedi.",
+        "Beyan, belirli bir tarihteki denetime dayanır. Sayfadaki her değişiklik bir şeyi bozabilir; bu yüzden otomatik bölüm her değişiklikte birlikte çalışır.",
+        "Dış yollar — WhatsApp ve e-posta programınız — sayfamızın dışındadır. Onların erişilebilirliğinden sorumlu olamayız. Bu yüzden her biri için sayfamızda da bir yol vardır.",
+      ],
+
+      feedbackTitle: "Bir engeli bildirin",
+      feedbackBody:
+        "Bu sayfada bir şey önünüzü kesiyorsa bize yazın — serbest biçimde, tek bir cümleyle bile olur. İki iş günü içinde yanıtlar, sorunu giderip gideremeyeceğimizi ve ne zaman gidereceğimizi söyleriz.",
+      feedbackMail: "E-posta gönderin",
+      feedbackForm: "Form üzerinden bildirin",
+      feedbackNote:
+        "Yardımcı olur ama şart değil: hangi sayfa, hangi öğe, hangi yardımcı teknolojiyi kullandığınız.",
+
+      methodTitle: "Nasıl denetlendi",
+      methodBody:
+        "İki kişinin bağımsız olarak aynı sonuca ulaşması için on iki maddelik sabit bir şablona göre. Otomatik olarak axe-core ile, elle klavye ve erişilebilir ad denetimiyle. Şablon ve tam denetim raporu bu sayfanın kaynak kodunda açıkça yer alır.",
+      updatedLabel: "Durum",
+      updated: "23 Ağustos 2026",
     },
     legal: {
       imprintTitle: "Künye",

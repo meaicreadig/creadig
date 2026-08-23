@@ -51,11 +51,41 @@ export const locales = ["de", "tr"] as const
  * `https://` und reine Anker (`#pakete`) sind keine Seitenpfade und dürfen
  * kein Sprachpräfix bekommen.
  */
+/*
+ * BF-A4 — die eine Adresse, deren Wort sich uebersetzt.
+ *
+ * Regel im Projekt: Slugs bleiben in beiden Sprachen gleich (siehe
+ * app/_routes/leistung-detail.tsx). Uebersetzte Slugs sind huebscher, machen
+ * aber aus jedem Sprachwechsel eine Uebersetzungstabelle, die jemand pflegen
+ * muss — und aus jedem vergessenen Eintrag einen 404.
+ *
+ * Genau eine Ausnahme: die Erklaerung zur Barrierefreiheit. Sie ist der
+ * einzige Ort, an dem ein tuerkischsprachiger Besucher nach dem WORT sucht,
+ * nicht nach dem Weg — „erisilebilirlik" ist der Begriff, unter dem er sie
+ * erwartet. Die Tabelle steht deshalb hier, in der einzigen Datei, die vom
+ * Sprachpraefix weiss, und nicht verstreut in den Routen.
+ */
+const TR_PATHS: Record<string, string> = {
+  "/barrierefreiheit": "/erisilebilirlik",
+}
+
+/** Umgekehrte Tabelle — fuer `splitLocale`. */
+const DE_PATHS: Record<string, string> = Object.fromEntries(
+  Object.entries(TR_PATHS).map(([de, tr]) => [tr, de]),
+)
+
+/** Trennt Anker und Suchparameter ab; die gehoeren nicht in die Tabelle. */
+function splitSuffix(path: string): [string, string] {
+  const cut = path.search(/[?#]/)
+  return cut === -1 ? [path, ""] : [path.slice(0, cut), path.slice(cut)]
+}
+
 export function localePath(path: string, locale: Locale): string {
   if (locale === "de") return path
   if (!path.startsWith("/")) return path
   if (path === "/") return TR_PREFIX
-  return `${TR_PREFIX}${path}`
+  const [bare, suffix] = splitSuffix(path)
+  return `${TR_PREFIX}${TR_PATHS[bare] ?? bare}${suffix}`
 }
 
 /** Wie `localePath`, nur absolut — für Canonicals, Sitemap und JSON-LD. */
@@ -75,7 +105,8 @@ export function localeUrl(path: string, locale: Locale): string {
 export function splitLocale(pathname: string): { locale: Locale; path: string } {
   if (pathname === TR_PREFIX) return { locale: "tr", path: "/" }
   if (pathname.startsWith(`${TR_PREFIX}/`)) {
-    return { locale: "tr", path: pathname.slice(TR_PREFIX.length) }
+    const [bare, suffix] = splitSuffix(pathname.slice(TR_PREFIX.length))
+    return { locale: "tr", path: `${DE_PATHS[bare] ?? bare}${suffix}` }
   }
   return { locale: "de", path: pathname }
 }
