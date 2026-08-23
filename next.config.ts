@@ -1,5 +1,65 @@
 import type { NextConfig } from "next"
 
+/*
+ * SEC-3 — Content-Security-Policy in zwei Stufen.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM NICHT EINE EINZIGE, SCHARFE POLICY
+ * Eine scharfe CSP verlangt hier `unsafe-inline` fuer Skripte (das
+ * Theme-Boot-Skript im <head> laeuft, bevor irgendetwas gerendert ist) und
+ * fuer Stile (Tailwind und framer-motion setzen Inline-Attribute). Eine CSP,
+ * die `unsafe-inline` erlaubt, verhindert genau den Angriff nicht, gegen den
+ * sie gedacht ist — sie sieht nur so aus. Der ehrliche Weg ist der aus dem
+ * Audit: erst beobachten, dann verschaerfen.
+ *
+ * ---------------------------------------------------------------------------
+ * STUFE 1 — was SOFORT scharf gilt (kann nichts kaputt machen)
+ * Kein `default-src`, also keine Ressourcen-Beschraenkung — nur die vier
+ * Direktiven, die kein Rendering beeinflussen und trotzdem echte Angriffe
+ * ausschliessen:
+ *   object-src 'none'      keine Flash-/Plugin-Einbettung
+ *   base-uri 'self'        kein untergeschobenes <base>, das alle relativen
+ *                          Links auf eine fremde Domain umbiegt
+ *   form-action 'self'     kein Formular, das woanders hin absendet — das
+ *                          schuetzt genau die neuen Anfrage-Formulare
+ *   frame-ancestors 'none' Clickjacking, jetzt auch fuer Browser, die
+ *                          X-Frame-Options ignorieren
+ *
+ * ---------------------------------------------------------------------------
+ * STUFE 2 — die vollstaendige Policy, vorerst NUR als Bericht
+ * Sie blockiert nichts, meldet aber jeden Verstoss in der Browser-Konsole.
+ * Damit laesst sich vor dem Livegang sehen, was wirklich geladen wird —
+ * statt es zu raten und im Zweifel die Seite zu zerlegen. Umschalten auf
+ * `Content-Security-Policy` gehoert auf die Live-Checkliste, nachdem die
+ * Berichte einmal sauber waren.
+ */
+const CSP_ENFORCED = [
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join("; ")
+
+const CSP_REPORT_ONLY = [
+  "default-src 'self'",
+  // 'unsafe-inline': Theme-Boot-Skript im <head> + Next.js-Hydration.
+  // va.vercel-scripts.com ist die Reichweitenmessung — sie laedt ohnehin
+  // erst nach Einwilligung, aber die Policy muss sie kennen.
+  "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
+  // Tailwind und framer-motion schreiben Inline-Stile.
+  "style-src 'self' 'unsafe-inline'",
+  // data: fuer die inline eingebetteten SVG-Muster, blob: fuer next/image.
+  "img-src 'self' data: blob:",
+  "font-src 'self'",
+  "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+  "frame-src 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "upgrade-insecure-requests",
+].join("; ")
+
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -20,6 +80,8 @@ const securityHeaders = [
     value: "max-age=63072000; includeSubDomains; preload",
   },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  { key: "Content-Security-Policy", value: CSP_ENFORCED },
+  { key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY },
 ]
 
 const nextConfig: NextConfig = {
