@@ -535,6 +535,24 @@ const ratedReviews = approvedReviews.filter((r) => typeof r.rating === "number")
 /**
  * Durchschnitt und Anzahl — oder `null`, wenn es nichts zu mitteln gibt.
  * Bewusst kein Default wie „5,0 (0 Bewertungen)".
+ *
+ * ---------------------------------------------------------------------------
+ * BF-6 — DIESE BEDINGUNG IST FESTGESCHRIEBEN
+ * `null` heisst: Der Block haengt sich nicht an die Organisations-Daten
+ * (components/site-shell.tsx). Wer hier einen Vorgabewert einsetzt — auch nur
+ * zum Ausprobieren —, behauptet in den strukturierten Daten eine Auszeichnung,
+ * die es nicht gibt. Google wertet das als Richtlinienverstoss und straft die
+ * ganze Domain ab; sichtbar ist der Fehler nirgends, weil JSON-LD unsichtbar
+ * ist.
+ *
+ * Deshalb steht die Regel nicht nur hier, sondern als Gate im Build:
+ * `scripts/check-reviews.mjs` liest das GEBAUTE HTML und bricht ab, sobald ein
+ * `AggregateRating` ohne ein einziges `Review` im selben Dokument steht oder
+ * `reviewCount` unter 1 liegt. Gegengeprueft: mit einem eingesetzten
+ * Vorgabewert (5,0 / 12) bricht der Build in 43 Dokumenten ab.
+ *
+ * Das Gate verbietet keine Sterne — es verlangt Deckung. Sobald echte,
+ * freigegebene Bewertungen in `reviews` stehen, laeuft es unveraendert weiter.
  */
 export const aggregateRating =
   ratedReviews.length > 0
