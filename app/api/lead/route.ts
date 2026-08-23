@@ -24,7 +24,11 @@ import {
  * ---------------------------------------------------------------------------
  * WAS SIE TUT
  * Nimmt eine Anfrage entgegen, schickt sie an `info@creadig.de` und dem
- * Absender eine Bestätigung. Zwei Mails, kein Speicher: Wir legen hier
+ * Absender eine Bestätigung. Drei Herkünfte, ein Weg: `kontakt`, `termin`
+ * und seit BF-A8 `kurzcheck` — Letzterer mit der Adresse der zu prüfenden
+ * Seite als zusätzlichem Pflichtfeld und ohne Pflicht zur freien Nachricht.
+ * Ein zweiter Endpunkt für dasselbe Anliegen wäre eine zweite Tür mit einem
+ * zweiten Schloss, und das schwächere von beiden entscheidet. Zwei Mails, kein Speicher: Wir legen hier
  * bewusst keine Datenbank an — die Anfrage liegt im Postfach, und die
  * Speicherfrist dort (6 Monate nach dem letzten Kontakt, bei Vertrag die
  * handels- und steuerrechtlichen Fristen) steht in der Datenschutzerklärung.
@@ -113,8 +117,14 @@ type LeadPayload = {
   locale?: unknown
   /** Honeypot — muss leer bleiben. */
   website?: unknown
-  /** Woher die Anfrage kam: "kontakt" oder "termin". */
+  /** Woher die Anfrage kam: "kontakt", "termin" oder "kurzcheck". */
   source?: unknown
+  /**
+   * BF-A8 — die Adresse der Seite, um die es geht. Pflicht beim Kurz-Check,
+   * sonst leer. Bewusst NICHT `website`: So heisst der Honeypot, und ein
+   * echtes Feld mit demselben Namen wuerde jede Anfrage still verschlucken.
+   */
+  siteUrl?: unknown
   /** Signiertes Zeit-Token aus `GET` dieser Route. */
   token?: unknown
 }
@@ -126,6 +136,7 @@ const LIMITS = {
   phone: 60,
   message: 4000,
   source: 40,
+  siteUrl: 300,
   /** BF-2: abgeschickte Anfragen je Adresse und Zeitfenster. */
   submitsPerWindow: LIMITS_INFO.MAX_SUBMITS,
 } as const
@@ -144,6 +155,31 @@ function looksLikeEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)
 }
 
+/**
+ * BF-A8 — die Adresse der Seite, die geprüft werden soll.
+ *
+ * Absichtlich nachsichtig, aus demselben Grund wie bei der E-Mail: Wer
+ * „meinbetrieb.de" eintippt, hat die Frage richtig beantwortet — er soll nicht
+ * an einer fehlenden Protokollangabe scheitern. Ergänzt wird sie hier, nicht
+ * im Browser; eine Prüfung, die nur im Formular stattfindet, ist keine.
+ *
+ * `null` heißt: daraus wird keine Web-Adresse. Dann fehlt das Pflichtfeld.
+ */
+function normaliseSiteUrl(value: string): string | null {
+  if (!value) return null
+  const withScheme = /^https?:\/\//i.test(value) ? value : `https://${value}`
+  let parsed: URL
+  try {
+    parsed = new URL(withScheme)
+  } catch {
+    return null
+  }
+  // Ein Punkt im Namen und keine Leerzeichen — mehr prüfen wir nicht, und
+  // erreichbar ist die Seite damit noch lange nicht. Das sehen wir beim Ansehen.
+  if (!/^[^\s.]+(\.[^\s.]+)+$/.test(parsed.hostname)) return null
+  return parsed.toString()
+}
+
 /** Verhindert, dass eingeschleuste Zeilenumbrüche eigene Kopfzeilen bauen. */
 function headerSafe(value: string): string {
   return value.replace(/[\r\n]+/g, " ").trim()
@@ -158,7 +194,7 @@ function headerSafe(value: string): string {
  * zwei Fassungen. Die Termin-Fassung sagt in ihrer Betreffzeile und im ersten
  * Absatz, dass die verbindliche Bestätigung noch aussteht und von uns kommt.
  */
-type ConfirmationKind = "kontakt" | "termin"
+type ConfirmationKind = "kontakt" | "termin" | "kurzcheck"
 
 /*
  * BF-8 — die Reaktionszusage, an einer Stelle.
@@ -252,6 +288,54 @@ const PROOF_DE = [
   PROOF_URL,
 ]
 
+/*
+ * BF-A8 — der Kurz-Check hat einen eigenen Ablauf, also einen eigenen Text.
+ *
+ * Die allgemeine Fassung verspricht ein Zwanzig-Minuten-Erstgespraech. Wer
+ * einen Kurz-Check angefragt hat, erwartet etwas anderes: dass jemand auf
+ * SEINE Seite sieht. Bekaeme er den Standardtext, waere die erste Zusage
+ * schon daneben — und die Bestaetigungsmail ist der Moment, in dem er uns
+ * garantiert liest.
+ *
+ * Die Grenze steht in derselben Mail: drei Punkte, keine vollstaendige
+ * Pruefung, keine rechtliche Bewertung. Wer sie erst im Angebot erfaehrt,
+ * fuehlt sich verkauft.
+ */
+const QUICKCHECK_DE = [
+  "WIE ES WEITERGEHT",
+  "1. Wir sehen uns Ihre Seite an — von Hand, mit Tastatur und Screenreader,",
+  "   nicht nur mit einem automatischen Scanner.",
+  `2. ${RESPONSE_TIME.de.charAt(0).toUpperCase()}${RESPONSE_TIME.de.slice(1)} melden wir uns mit drei konkreten Punkten:`,
+  "   was uns aufgefallen ist, wo es steht und was es für Ihre Besucher bedeutet.",
+  "3. Was daraus wird, entscheiden Sie danach. Der Kurz-Check kostet nichts",
+  "   und verpflichtet zu nichts.",
+]
+
+const QUICKCHECK_LIMIT_DE = [
+  "WAS DER KURZ-CHECK NICHT IST",
+  "Er zeigt drei Punkte, nicht alle. Er ist keine vollständige Prüfung nach",
+  "WCAG 2.1 AA — die ist Arbeit von Hand und dauert länger als ein Blick.",
+  "Und er ist keine rechtliche Bewertung; die trifft Ihre Rechtsberatung,",
+  "nicht wir.",
+]
+
+const QUICKCHECK_TR = [
+  "BUNDAN SONRA NE OLACAK",
+  "1. Sitenize bakarız — elle, klavye ve ekran okuyucuyla,",
+  "   yalnızca otomatik bir tarayıcıyla değil.",
+  `2. ${RESPONSE_TIME.trSentenceStart} üç somut maddeyle size döneriz:`,
+  "   ne dikkatimizi çekti, nerede duruyor ve ziyaretçileriniz için ne anlama geliyor.",
+  "3. Sonrasında ne olacağına siz karar verirsiniz. Kısa kontrol ücretsizdir",
+  "   ve hiçbir yükümlülük doğurmaz.",
+]
+
+const QUICKCHECK_LIMIT_TR = [
+  "KISA KONTROL NE DEĞİLDİR",
+  "Üç madde gösterir, hepsini değil. WCAG 2.1 AA'ya göre eksiksiz bir denetim",
+  "değildir — o, elle yapılan bir iştir ve bir bakıştan uzun sürer.",
+  "Hukuki bir değerlendirme de değildir; onu hukuk danışmanınız yapar, biz değil.",
+]
+
 const CLOSING_DE = [
   "Diese Nachricht ist eine automatische Bestätigung; Sie müssen darauf nicht antworten.",
   "Wenn es eilt, erreichen Sie uns direkt unter info@creadig.de.",
@@ -329,6 +413,23 @@ const CONFIRMATION: Record<
           SIGNATURE_DE.slice(1),
         ]),
     },
+    kurzcheck: {
+      subject: "Ihr Kurz-Check bei creaDIG",
+      body: (name) =>
+        paragraphs([
+          [name ? `Guten Tag ${name},` : "Guten Tag,"],
+          [
+            "vielen Dank — Ihre Anfrage für den Kurz-Check ist bei uns angekommen.",
+            "Wir sehen uns Ihre Seite an und melden uns mit drei konkreten Punkten;",
+            "kostenlos und unverbindlich.",
+          ],
+          QUICKCHECK_DE,
+          QUICKCHECK_LIMIT_DE,
+          PROOF_DE,
+          CLOSING_DE,
+          SIGNATURE_DE.slice(1),
+        ]),
+    },
   },
   tr: {
     kontakt: {
@@ -356,6 +457,23 @@ const CONFIRMATION: Record<
           ],
           NEXT_STEPS_TR,
           BRING_TR,
+          PROOF_TR,
+          CLOSING_TR,
+          SIGNATURE_TR.slice(1),
+        ]),
+    },
+    kurzcheck: {
+      subject: "creaDIG kısa kontrolünüz",
+      body: (name) =>
+        paragraphs([
+          [name ? `Merhaba ${name},` : "Merhaba,"],
+          [
+            "teşekkür ederiz — kısa kontrol talebiniz bize ulaştı.",
+            "Sitenize bakar ve üç somut maddeyle size döneriz;",
+            "ücretsiz ve bağlayıcı değil.",
+          ],
+          QUICKCHECK_TR,
+          QUICKCHECK_LIMIT_TR,
           PROOF_TR,
           CLOSING_TR,
           SIGNATURE_TR.slice(1),
@@ -463,6 +581,15 @@ export async function POST(request: Request) {
   const message = asText(payload.message, LIMITS.message)
   const source = asText(payload.source, LIMITS.source) || "kontakt"
   const locale: Locale = payload.locale === "tr" ? "tr" : "de"
+  /*
+   * BF-A8 — der Kurz-Check ist derselbe Weg mit einem Feld mehr und einem
+   * Feld weniger: Die Adresse ist Pflicht, die freie Nachricht nicht. Wer
+   * seine Seite prüfen lassen will, hat die Frage mit der Adresse bereits
+   * beantwortet; ein Pflichtfeld „Worum geht es?" wäre an dieser Stelle eine
+   * Hürde ohne Ertrag.
+   */
+  const isQuickCheck = source === "kurzcheck"
+  const siteUrl = isQuickCheck ? normaliseSiteUrl(asText(payload.siteUrl, LIMITS.siteUrl)) : null
 
   /*
     Die Einwilligung wird hier NOCH EINMAL geprüft, obwohl das Formular sie
@@ -476,9 +603,10 @@ export async function POST(request: Request) {
 
   const missing: string[] = []
   if (!name) missing.push("name")
-  if (!message) missing.push("message")
+  if (!message && !isQuickCheck) missing.push("message")
   if (!email || !looksLikeEmail(email)) missing.push("email")
   if (!phone) missing.push("phone")
+  if (isQuickCheck && !siteUrl) missing.push("siteUrl")
   if (missing.length > 0) {
     return NextResponse.json({ ok: false, error: "invalid", fields: missing }, { status: 400 })
   }
@@ -488,11 +616,14 @@ export async function POST(request: Request) {
     business ? `Betrieb:   ${business}` : null,
     `E-Mail:    ${email}`,
     `Telefon:   ${phone}`,
+    // BF-A8: Ohne die Adresse ist ein Kurz-Check nicht bearbeitbar — sie
+    // steht deshalb oben bei den Kontaktdaten, nicht unten im Fliesstext.
+    siteUrl ? `Website:   ${siteUrl}` : null,
     `Sprache:   ${locale.toUpperCase()}`,
     `Herkunft:  ${source}`,
     "",
     "Nachricht:",
-    message,
+    message || "(keine — Kurz-Check ohne freie Nachricht)",
   ]
     .filter((line) => line !== null)
     .join("\n")
@@ -501,8 +632,9 @@ export async function POST(request: Request) {
     await sendMail(apiKey, {
       from,
       to,
-      subject:
-        source === "termin"
+      subject: isQuickCheck
+        ? `Kurz-Check angefragt — ${headerSafe(name)} · ${headerSafe(new URL(siteUrl!).hostname)}`
+        : source === "termin"
           ? `Terminwunsch über creadig.de — ${headerSafe(name)}`
           : `Anfrage über creadig.de — ${headerSafe(name)}`,
       text: lines,
@@ -525,7 +657,11 @@ export async function POST(request: Request) {
     Bestätigung fehl, hat der Interessent trotzdem angefragt — ihm eine
     Fehlermeldung zu zeigen, würde ihn ein zweites Mal schicken.
   */
-  const kind: ConfirmationKind = source === "termin" ? "termin" : "kontakt"
+  const kind: ConfirmationKind = isQuickCheck
+    ? "kurzcheck"
+    : source === "termin"
+      ? "termin"
+      : "kontakt"
 
   try {
     await sendMail(apiKey, {

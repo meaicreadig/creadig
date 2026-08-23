@@ -10,6 +10,7 @@ import { clientWorks, packages, productWorks } from "@/lib/site-data"
 import { WHATSAPP_LINK } from "@/lib/dictionary"
 import type { ServicePage } from "@/lib/service-pages"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { QuickCheck } from "@/components/service/quick-check"
 
 /**
  * Körper einer Leistungsseite.
@@ -248,6 +249,21 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
 
           </div>
         </div>
+
+        {/*
+          BF-A8 — der Beweis am Objekt des Kunden.
+
+          Er steht NACH der Leistungsbeschreibung und VOR dem allgemeinen
+          Abschluss: Wer bis hierher gelesen hat, will nicht noch ein
+          Erstgespraech ueber Grundsaetzliches, sondern wissen, wie seine
+          eigene Seite dasteht. Der allgemeine CTA bleibt darunter fuer alle
+          anderen.
+        */}
+        {page.quickCheck && (
+          <div className="mt-24">
+            <QuickCheck />
+          </div>
+        )}
 
         {/* Abschluss-CTA — dieselbe Zusage wie überall: kostenlos, unverbindlich. */}
         <Reveal delay={0.1}>

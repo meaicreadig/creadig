@@ -527,6 +527,44 @@ export const dictionary = {
       ctaPrimary: "Kostenlose Erstberatung",
       ctaSecondary: "Per WhatsApp fragen",
     },
+    /*
+     * BF-A8 — der Kurz-Check.
+     *
+     * ---------------------------------------------------------------------
+     * WARUM HIER KEIN SCANNER STEHT
+     * Ein Knopf, der eine fremde Seite automatisch prueft und eine Ampel
+     * ausgibt, waere in zwei Tagen gebaut und der beste Koeder der Seite.
+     * Er ist trotzdem nicht da: Ein Automat erzeugt Ergebnisse, fuer die
+     * niemand geradesteht — dieselbe Zusage, die ein Overlay macht, und die
+     * Abgrenzung zum Overlay ist das Angebot. Wer eine Ampel verkauft, kann
+     * nicht erklaeren, warum die Ampel des Nachbarn nichts taugt.
+     *
+     * Stattdessen: ein Feld, eine Adresse, ein Mensch, der hinsieht. Das
+     * dauert zwei Werktage statt zwei Sekunden, und genau das steht auch da.
+     *
+     * Die uebrigen Feldbeschriftungen kommen aus `contact` — dasselbe
+     * Formular, ein Feld mehr. Zwei Woerterbuecher fuer dieselbe Zeile waeren
+     * zwei Stellen, an denen sie auseinanderlaufen kann.
+     */
+    quickCheck: {
+      eyebrow: "Kurz-Check",
+      title: "Drei Punkte zu Ihrer Seite. Kostenlos.",
+      lead: "Sie geben uns die Adresse, wir sehen uns die Seite an — von Hand, mit Tastatur und Screenreader. Sie bekommen drei konkrete Punkte: was uns aufgefallen ist, wo es steht, was es für Ihre Besucher bedeutet.",
+      siteLabel: "Website-Adresse",
+      sitePlaceholder: "meinbetrieb.de",
+      errSite: "Bitte geben Sie die Adresse Ihrer Website an — ohne sie können wir nichts ansehen.",
+      messageLabel: "Etwas, das wir wissen sollten?",
+      messagePlaceholder: "Optional. Zum Beispiel: der Shop, die Terminbuchung, eine Rückmeldung eines Kunden.",
+      submit: "Kurz-Check anfragen",
+      sentTitle: "Angekommen.",
+      sentBody:
+        "Wir sehen uns Ihre Seite an und melden uns mit drei konkreten Punkten — kostenlos und unverbindlich.",
+      limitTitle: "Was der Kurz-Check nicht ist",
+      limitBody:
+        "Er zeigt drei Punkte, nicht alle. Er ist keine vollständige Prüfung nach WCAG 2.1 AA — die ist Handarbeit und dauert länger als ein Blick. Und er ist keine rechtliche Bewertung.",
+      humanNote:
+        "Kein automatischer Scanner: Ein Mensch sieht sich die Seite an. Deshalb dauert es zwei Werktage und nicht zwei Sekunden.",
+    },
     services: {
       eyebrow: "Leistungen",
       title: "Fünf Ebenen. Ein System.",
@@ -1598,6 +1636,25 @@ export const dictionary = {
       ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmeye bakar ve yardımcı olabilir miyiz, dürüstçe söyleriz.",
       ctaPrimary: "Ücretsiz ilk görüşme",
       ctaSecondary: "WhatsApp'tan sorun",
+    },
+    quickCheck: {
+      eyebrow: "Kısa kontrol",
+      title: "Sitenize dair üç madde. Ücretsiz.",
+      lead: "Siz adresi verirsiniz, biz siteye bakarız — elle, klavye ve ekran okuyucuyla. Üç somut madde alırsınız: ne dikkatimizi çekti, nerede duruyor, ziyaretçileriniz için ne anlama geliyor.",
+      siteLabel: "Web sitesi adresi",
+      sitePlaceholder: "isletmem.com",
+      errSite: "Lütfen web sitenizin adresini yazın — adres olmadan bakabileceğimiz bir şey yok.",
+      messageLabel: "Bilmemiz gereken bir şey var mı?",
+      messagePlaceholder: "İsteğe bağlı. Örneğin: mağaza, randevu akışı ya da bir müşterinizin geri bildirimi.",
+      submit: "Kısa kontrol iste",
+      sentTitle: "Ulaştı.",
+      sentBody:
+        "Sitenize bakar ve üç somut maddeyle size döneriz — ücretsiz ve bağlayıcı değil.",
+      limitTitle: "Kısa kontrol ne değildir",
+      limitBody:
+        "Üç madde gösterir, hepsini değil. WCAG 2.1 AA'ya göre eksiksiz bir denetim değildir — o el işidir ve bir bakıştan uzun sürer. Hukuki bir değerlendirme de değildir.",
+      humanNote:
+        "Otomatik tarayıcı yok: Siteye bir insan bakar. Bu yüzden iki saniye değil, iki iş günü sürer.",
     },
     services: {
       eyebrow: "Hizmetler",

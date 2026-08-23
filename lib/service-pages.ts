@@ -100,6 +100,15 @@ export type ServicePage = {
   packageNote?: Localized
   /** Arbeiten, die zu dieser Leistung gehören (slugs aus site-data). */
   workSlugs: string[]
+  /**
+   * BF-A8 — „Kurz-Check anfragen" unter der Seite.
+   *
+   * Nur dort, wo ein Blick auf das Objekt des Kunden das Angebot ueberhaupt
+   * erst greifbar macht. Auf einer Webdesign-Seite waere es eine zweite
+   * Kontaktstrecke ohne Anlass; bei Barrierefreiheit ist es das Angebot:
+   * Wir behaupten nicht, dass etwas im Argen liegt, wir sehen nach.
+   */
+  quickCheck?: boolean
   /** Auf `false` verschwindet die Seite aus Routing UND Sitemap. */
   published: boolean
 }
@@ -444,6 +453,7 @@ export const servicePages: ServicePage[] = [
      * `ownProof` zeigt auf die eigene Erklaerung und den eigenen Befund.
      */
     workSlugs: [],
+    quickCheck: true,
     published: true,
   },
 ]

@@ -72,9 +72,11 @@ async function run() {
     "/kontakt",
     "/leistungen",
     "/leistungen/webdesign",
+    "/leistungen/barrierefreiheit-website",
     "/produkte/meai",
     "/tr/kontakt",
     "/tr/leistungen/webdesign",
+    "/tr/leistungen/barrierefreiheit-website",
   ]) {
     await expectStatus(pathname, 200)
   }
@@ -126,6 +128,60 @@ async function run() {
     "gefuellter Honeypot: keine Mail, keine Fehlermeldung",
     honeypot.status === 200 && honeypot.data?.ok === true,
     `${honeypot.status} ${JSON.stringify(honeypot.data)}`,
+  )
+
+  /*
+    BF-A8 — das zusaetzliche Pflichtfeld des Kurz-Checks.
+
+    Geprueft wird die Ablehnung, nicht der Erfolgsfall: Ein vollstaendiger
+    Kurz-Check liefe bis zum Versand durch und scheiterte dort am absichtlich
+    ungueltigen Schluessel. Die Ablehnung beweist genau das, worauf es
+    ankommt — ohne Adresse gibt es keinen Kurz-Check, und die Pruefung
+    findet auf dem Server statt, nicht nur im Formular.
+  */
+  const quickToken = (await (await fetch(`${BASE}/api/lead`)).json()).token
+  await new Promise((resolve) => setTimeout(resolve, 2_500))
+  const ohneAdresse = await postLead({
+    ...LEAD,
+    token: quickToken,
+    source: "kurzcheck",
+    message: "",
+  })
+  record(
+    "Kurz-Check ohne Website-Adresse wird abgelehnt",
+    ohneAdresse.status === 400 && ohneAdresse.data?.fields?.includes("siteUrl") === true,
+    `${ohneAdresse.status} ${JSON.stringify(ohneAdresse.data)}`,
+  )
+
+  const kaputteAdresse = await postLead({
+    ...LEAD,
+    token: quickToken,
+    source: "kurzcheck",
+    message: "",
+    siteUrl: "kein punkt hier",
+  })
+  record(
+    "Kurz-Check mit unbrauchbarer Adresse wird abgelehnt",
+    kaputteAdresse.status === 400 && kaputteAdresse.data?.fields?.includes("siteUrl") === true,
+    `${kaputteAdresse.status} ${JSON.stringify(kaputteAdresse.data)}`,
+  )
+
+  /*
+    Gegenprobe: MIT Adresse laeuft derselbe Aufruf bis zum Versand durch und
+    scheitert erst dort (502). Ohne diese Zeile bewiese der Test oben nur,
+    dass die Route irgendetwas ablehnt.
+  */
+  const mitAdresse = await postLead({
+    ...LEAD,
+    token: quickToken,
+    source: "kurzcheck",
+    message: "",
+    siteUrl: "beispielbetrieb.de",
+  })
+  record(
+    "Kurz-Check mit Adresse kommt bis zum Versand",
+    mitAdresse.status === 502,
+    `${mitAdresse.status} ${JSON.stringify(mitAdresse.data)}`,
   )
 }
 
