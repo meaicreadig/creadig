@@ -37,6 +37,42 @@ import type { NextConfig } from "next"
  * drin, weil die Browser sich nicht einig sind: `report-uri` ist veraltet,
  * aber das Einzige, was Safari versteht; `report-to` ist der Nachfolger und
  * braucht zusaetzlich den `Reporting-Endpoints`-Header.
+ *
+ * ---------------------------------------------------------------------------
+ * BF-7 — WARUM HIER KEIN NONCE STEHT (nachgemessen, nicht vermutet)
+ * Die Aufgabe lautete: Theme-Boot-Skript bekommt einen Nonce, `unsafe-inline`
+ * fuer Skripte raus. Der Weg dorthin ist in diesem Projekt teuer, und zwar
+ * aus einem Grund, den man erst sieht, wenn man ins gebaute HTML schaut:
+ *
+ *   Inline-<script>-Bloecke auf /leistungen:  43
+ *     1  unser Theme-Boot-Skript          (konstant, hashbar)
+ *     2  JSON-LD                          (Datenblock, von CSP nicht geprueft)
+ *    40  `self.__next_f.push([...])`      (der Streaming-Payload von Next,
+ *                                          je Seite anders, nicht hashbar)
+ *
+ * Diese vierzig gehoeren dem Framework. Sie liessen sich nur ueber einen
+ * Nonce erlauben — und ein Nonce muss je Anfrage neu sein, also im HTML
+ * stehen, also darf die Seite nicht mehr vorgerendert sein. Nonce heisst in
+ * Next damit: JEDE Seite wird bei jedem Aufruf dynamisch gerendert, kein
+ * CDN-Zwischenspeicher mehr, 53 statische Seiten werden zu 53 Funktionen.
+ *
+ * Dafuer bekaeme man Schutz gegen eingeschleustes Inline-JavaScript. Nur
+ * gibt es hier keine Stelle, an der fremde Eingaben ins HTML gelangen: keine
+ * Kommentare, keine Suche, keine Benutzerinhalte, kein
+ * `dangerouslySetInnerHTML` mit fremden Daten. Der Preis ist die Kern-Staerke
+ * der Seite (Auslieferung vom CDN), der Gegenwert nahe null.
+ *
+ * ENTSCHEIDUNG: kein Nonce, solange die Seite statisch ist und keine fremden
+ * Eingaben rendert. Kommt eines von beidem dazu, ist die Rechnung eine andere
+ * — dann gehoert dieser Absatz neu gelesen.
+ *
+ * WAS STATTDESSEN GEHT — und was BF-7 wirklich weiterbringt: Die
+ * vollstaendige Policy war bisher NUR ein Bericht und hat nie etwas
+ * verhindert. Mit `CSP_ENFORCE=1` wird sie scharf. Sie erlaubt dann zwar
+ * weiterhin Inline-Skripte, verbietet aber alles Uebrige: fremde
+ * Skript-Hosts, fremde Verbindungsziele, Frames, Schriften und Bilder von
+ * ueberall her. Das ist der Unterschied zwischen "keine Policy" und "eine
+ * Policy mit einer benannten Ausnahme" — und es kostet keine Millisekunde.
  */
 const CSP_REPORT_ENDPOINT = "/api/csp-report"
 
@@ -69,6 +105,20 @@ const CSP_REPORT_ONLY = [
   "report-to csp",
 ].join("; ")
 
+/*
+ * BF-7 — der Schalter. Ohne ihn bleibt es beim Bericht (Stufe 2), mit ihm
+ * gilt die vollstaendige Policy. Gemeldet wird in beiden Faellen, damit ein
+ * Verstoss auch nach dem Scharfstellen sichtbar bleibt.
+ */
+const CSP_ENFORCE_FULL = process.env.CSP_ENFORCE === "1"
+
+const cspHeaders = CSP_ENFORCE_FULL
+  ? [{ key: "Content-Security-Policy", value: CSP_REPORT_ONLY }]
+  : [
+      { key: "Content-Security-Policy", value: CSP_ENFORCED },
+      { key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY },
+    ]
+
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -89,8 +139,7 @@ const securityHeaders = [
     value: "max-age=63072000; includeSubDomains; preload",
   },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-  { key: "Content-Security-Policy", value: CSP_ENFORCED },
-  { key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY },
+  ...cspHeaders,
   // Ohne diesen Header ist `report-to csp` oben ein Name ohne Adresse.
   { key: "Reporting-Endpoints", value: `csp="${CSP_REPORT_ENDPOINT}"` },
 ]
