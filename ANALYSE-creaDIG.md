@@ -901,9 +901,12 @@ Nichts davon geht raus, bevor es gefüllt ist:
 
 1. `[BEWEIS EINSETZEN]` **Rumis Maison** — echter zahlender Kunde? Wenn ja: Ergebnissatz + Jahr + Freigabe
 2. `[BEWEIS EINSETZEN]` **FIBERO-Auftraggeber** — welche darf er öffentlich nennen? (Telekom, Glasfaser NordWest, 1&1, Drillisch — Nennung freigegeben?)
-3. `[BEWEIS EINSETZEN]` **BAFA #190949** — Status bestätigt am TT.MM.2026
+3. ~~`[BEWEIS EINSETZEN]` BAFA #190949~~ — **GEKLÄRT: besteht nicht.** Registrierung wäre erwerbbar und hätte echten Verkaufswert (geförderte Beratung für Kunden) — aber erst behaupten, wenn eingetragen
 4. `[BEWEIS EINSETZEN]` **go-digital** — aktiv ja/nein, mit Datum. **Bis dahin in keiner Copy**
-5. `[BEWEIS EINSETZEN]` **iuk-Netzwerk, AVPQ, AGD** — Mitgliedschaft aktiv, Logos beschafft
+5. ~~`[BEWEIS EINSETZEN]` iuk-Netzwerk, AVPQ, AGD~~ — **GEKLÄRT 22.08.2026: keine davon besteht.**
+   Owner ist bei **keinem** der vier gelistet oder Mitglied (auch BAFA nicht). Alle vier fliegen
+   in **V1-e** aus dem Code — inklusive schema.org `hasCredential`. Neue offene Frage: welche
+   erwirbt er wirklich, in welcher Reihenfolge (siehe `KIZILELMA-creaDIG.md` §9.9)
 6. `[BEWEIS EINSETZEN]` **Reale Vermittlungskosten** einer Handwerks-Neueinstellung, aus einem Kundengespräch
 7. `[BEWEIS EINSETZEN]` **Zahl aus den ersten 50 Anrufen** — wie viele Betriebe haben eine falsche Google-Nummer
 8. `[BEWEIS EINSETZEN]` **Erste zwei Referenzprojekte** — Zitat, Nennung, 2 Fotos

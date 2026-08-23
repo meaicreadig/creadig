@@ -179,8 +179,14 @@ Was sich ändert: Die Seite muss sich nicht mehr für eine leere Referenzfläche
    er erscheint nicht mehr auf der öffentlichen Seite (Owner-Entscheidung 22.08.2026).
 2. **Eigene Produkte** — meAI · fibero · CASSAMEA · meahv: selbst erfunden, selbst gebaut,
    selbst betrieben. Kompetenzbeweis für Software-Kunden.
-3. **Verbände (real, prüfbar):** BAFA-zugelassener Unternehmensberater #190949 ·
-   iuk-Netzwerk Osnabrück · AVPQ · AGD.
+3. **Verbände — KORREKTUR 22.08.2026: KEINE davon besteht.** Der Owner hat bestätigt:
+   er ist bei **keinem** der vier Mitglied bzw. gelistet — nicht BAFA, nicht iuk, nicht AVPQ,
+   nicht AGD. Alle vier stehen trotzdem in `lib/site-data.ts` `certifications`, werden an
+   **drei** Stellen gerendert (Startseiten-Nachweisleiste, `/unternehmen`, und als schema.org
+   `hasCredential` an Google) — unter der Überschrift „Geprüft. Zugelassen. Eingetragen."
+   **Das ist die schwerste Verletzung des Ehrlichkeits-Locks im gesamten Projekt und muss in
+   V1 raus**, nach demselben Muster, mit dem go-digital bereits entfernt wurde.
+   Zurück kommt jeder Eintrag einzeln — mit Datum der Bestätigung.
 4. **go-digital — [UNBEKANNT], Programm ausgelaufen.** Die Behauptung „autorisiertes
    Beratungsunternehmen" ist ohne aktuellen Nachweis nicht haltbar und ist deshalb
    **vollständig aus der Copy entfernt** (22.08.2026). Rückkehr nur mit Nachweis.
@@ -271,4 +277,11 @@ wie Ihre Seite aussehen könnte. Kein Auftrag, keine Rechnung."*
 - [ ] **Kleinunternehmer oder Umsatzsteuer-ID?** (blockiert Impressum → blockiert Livegang → blockiert Ads)
 - [ ] **Deutsche Rufnummer** — welche Nummer kommt rein?
 - [ ] **go-digital** — aktiv, beantragt, oder gar nicht?
-- [ ] **Verbands-Logos** (BAFA, iuk, AVPQ, AGD) — beschaffbar?
+- [x] **Verbands-Logos** — erledigt durch Owner-Aussage 22.08.2026: **keine Mitgliedschaft besteht.**
+      Alle vier Einträge fliegen in V1-e raus. Neue Frage: welche will er **wirklich** erwerben?
+      Rangfolge nach Verkaufswert: **1. iuk** (250 €/Jahr, 1–4 Vollzeitbeschäftigte, gleiches Gebäude
+      Albert-Einstein-Str. 1 — behebt direkt die Schwäche „Netzwerk unter 10") ·
+      **2. BAFA-Beraterlistung** (echter Verkaufshebel: geförderte Beratung für seine Kunden) ·
+      **3. AGD** (nützlich für ihn selbst wegen Vergütungstarifvertrag, für Handwerks-Verkauf wertlos) ·
+      **4. AVPQ** (nur für öffentliche Vergabe relevant — für Handwerk und TR-KMU ohne Nutzen).
+      Kosten AGD und AVPQ: [UNBEKANNT].

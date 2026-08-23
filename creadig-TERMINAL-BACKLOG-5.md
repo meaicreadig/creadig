@@ -54,6 +54,31 @@ die es nicht mehr gibt. Dieser Backlog macht sie verkaufsfähig. Nichts anderes.
   aber nicht das Erste, was ein Handwerker sieht.
 - **Acceptance:** Kein „Im Aufbau" mehr im gerenderten HTML. `/produkte` weiter erreichbar, aber nicht im Menü.
 
+### V1-e · Unbelegte Zertifizierungen entfernen (HÖCHSTE PRIORITÄT in V1)
+
+**Owner-Aussage vom 22.08.2026: Es besteht KEINE der vier Mitgliedschaften/Listungen.**
+Nicht BAFA, nicht iuk, nicht AVPQ, nicht AGD.
+
+- `lib/site-data.ts` `certifications`: **alle vier Einträge entfernen**, Array auf `[]` setzen.
+  Folge demselben Muster und derselben Kommentar-Haltung, mit der go-digital bereits entfernt
+  wurde (der Kommentarblock direkt über `export const certifications` ist die Vorlage).
+  Neuer Kommentar sinngemäß: *Die vier Einträge standen hier ohne Nachweis. Ein Nachweis, den
+  man nicht nachschlagen kann, ist in einer Liste mit der Überschrift „Geprüft. Zugelassen.
+  Eingetragen." das Gegenteil dessen, wofür die Liste da ist. Zurück kommt jeder Eintrag
+  einzeln — mit Datum der Bestätigung.*
+- **Drei Rendering-Stellen prüfen**, alle müssen bei leerem Array sauber verschwinden statt zu brechen:
+  1. `components/sections/proof-line.tsx:33` — Nachweis-Leiste auf der Startseite
+  2. `components/sections/certifications.tsx:50` — Block auf `/unternehmen`
+  3. `app/_routes/unternehmen.tsx:61` — **schema.org `hasCredential`**. Bei leerem Array darf
+     kein leeres `hasCredential: []` an Google gehen — Feld ganz weglassen.
+- `app/(de)/status/page.tsx:198` prüft `certifications.length > 0`. Diese Prüfung muss ihren
+  Sinn behalten: nicht auf „grün" zwingen, sondern als offener Punkt stehen bleiben.
+- **Nebenbefund, gleich mitnehmen:** Der iuk-Link ist ohnehin falsch —
+  `https://www.iuk-os.de` statt korrekt `https://www.iukos.de`.
+- **Acceptance:** `grep -rn "BAFA\|AVPQ\|AGD" lib/ components/ app/` findet keinen Werbe-Claim
+  mehr. Startseite und `/unternehmen` rendern ohne Lücke oder Layout-Bruch. Kein `hasCredential`
+  im ausgelieferten JSON-LD. `build` grün.
+
 ### V1 — Nicht tun
 - ❌ Keine Farb-, Typo-, Abstands- oder Button-Änderungen. Design ist in V1–V5 gesperrt.
 - ❌ Keine erfundenen Referenzen, Zitate oder Zahlen als Platzhalter.
