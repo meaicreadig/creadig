@@ -25,6 +25,20 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   /*
+   * TECH-6 — die Werk-Aufnahmen sind gross: fuenf PNGs zwischen 1 und 1,7 MB,
+   * und die Werkschau zeigt drei davon gleich auf der Startseite. Ueber
+   * `next/image` werden sie in der Groesse ausgeliefert, die das Layout
+   * wirklich braucht — hier steht nur, in welchem Format.
+   *
+   * AVIF vor WebP: bei diesen Aufnahmen (grosse Flaechen, weiche Verlaeufe)
+   * liegt AVIF deutlich unter WebP, und jeder Browser, der es nicht kann,
+   * bekommt ueber `Accept` automatisch WebP. Der Aufwand liegt einmalig beim
+   * Build, nicht bei jedem Besucher.
+   */
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
+  /*
    * TECH-1 — die Serverless-Function schluckte das halbe Repo.
    *
    * Der Datei-Tracer folgt von den Routen aus allem, was er fuer eine

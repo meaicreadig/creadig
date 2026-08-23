@@ -1,5 +1,7 @@
 "use client"
 
+import Image from "next/image"
+
 import { useLocale } from "@/components/locale-provider"
 import { SignatureMotif } from "@/components/brand/signature-motif"
 import { Reveal } from "@/components/ui/reveal"
@@ -57,10 +59,21 @@ export function CaseStudies() {
 
                   <div className="border-line bg-surface relative mt-8 aspect-[16/10] overflow-hidden border">
                     {study.image ? (
-                      <img
+                      /*
+                        TECH-6 / A10-1: Hier stand ein rohes <img> — das
+                        einzige im Projekt, das eine grosse Aufnahme aus
+                        `public/works/` ausgeliefert hat, in voller Groesse
+                        und in jedem Viewport dieselbe Datei. Ueber
+                        `next/image` kommt sie jetzt in AVIF bzw. WebP, in der
+                        Groesse, die das Layout wirklich braucht, und erst
+                        wenn sie in Sichtweite ist.
+                      */
+                      <Image
                         src={study.image}
                         alt={study.client}
-                        className="absolute inset-0 h-full w-full object-cover"
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 30vw"
+                        className="object-cover"
                       />
                     ) : (
                       <>

@@ -33,6 +33,15 @@ function LogoSlot({
         style={{ backgroundColor: "var(--brand)" }}
       />
       {logoPath ? (
+        /*
+          Bewusst ein rohes <img> und kein `next/image` (TECH-6):
+          Wortmarken kommen als SVG, und die optimiert `next/image` nicht —
+          es wuerde sie nur durchreichen und dafuer `dangerouslyAllowSVG`
+          verlangen. Dazu haengt die Breite hier am Inhalt (`w-auto` bei
+          fester Hoehe), was `next/image` ohne bekannte Masse nicht kann.
+          Fuer eine Handvoll Kilobyte Vektorgrafik waere das Aufwand ohne
+          Ertrag. Die grossen Rasterbilder laufen ueber `next/image`.
+        */
         <img
           src={logoPath}
           alt={name}

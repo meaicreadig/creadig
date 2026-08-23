@@ -12,7 +12,7 @@ Score = (Wirkung × Dringlichkeit) ÷ Personentage. Reihenfolge folgt Wirkung/Au
 - [x] **VIS-3** Typo zu groß/fett (Score 32 · 0,5 PT) → `type-h2` clamp(1.875rem,4vw,3.25rem)/weight 600; `type-display` max 7rem; `type-h1` max 3rem.
 - [x] **VIS-4** Gold zu schwach, klebt am Label (Score 24 · 0,5 PT) → Eyebrow-Linie 2px + `gold-text`; Abstände öffnen; zwei Inline-Varianten auf eine Komponente.
 - [x] **SEC-6** Clickjacking/HSTS (Score 40 · 0,1 PT) → `X-Frame-Options: DENY` + HSTS `includeSubDomains; preload`.
-- [ ] **TECH-3** Fremddateien aus Deploy-Root (Score 36 · 0,25 PT) → `Archiv_creadig.zip`, PDFs, `_legacy/`, `design-mockup/` aus dem Root ziehen (Repo-Hygiene).
+- [x] **TECH-3** Fremddateien aus Deploy-Root (Score 36 · 0,25 PT) → `Archiv_creadig.zip`, PDFs, `_legacy/`, `design-mockup/` aus dem Root ziehen (Repo-Hygiene).
 
 ## WELLE 2 — diese Woche
 - [ ] **SEC-1** Impressum-Pflichtangaben (Score 100 · OWNER) → Rechtsform · USt-IdNr **oder** §19 · §18-MStV-Verantwortlicher. **Einziger echter Go-Live-Rechtsblocker.**
@@ -26,7 +26,7 @@ Score = (Wirkung × Dringlichkeit) ÷ Personentage. Reihenfolge folgt Wirkung/Au
 
 ## WELLE 3 — dieser Monat
 - [x] **GROW-2** Keine Messung/Lead-Backup (Score 12,5 · 2 PT) → cookiefreies Analytics + Klick-Event + `app/api/lead`-Backup. *(greift mit Traffic)*
-- [ ] **TECH-6** Bilder ohne next/image (Score 12 · 0,5 PT) → Work-/Case-PNGs auf next/image bzw. WebP/AVIF.
+- [x] **TECH-6** Bilder ohne next/image (Score 12 · 0,5 PT) → Work-/Case-PNGs auf next/image bzw. WebP/AVIF.
 - [ ] **TECH-7** Observability/CSP (Score 8 · 0,5 PT) → Vercel Analytics/Speed-Insights + CSP (report-only → enforce).
 - [x] **VIS-2** Eine visuelle Frequenz (Score 6,7 · 3 PT) → 3 Sektions-Archetypen + Rhythmus + mehr als eine Mikro-Interaktion. *(eigentliche „Lebendigkeit"-Wurzel, teuer)*
 - [x] **FEAT-1** Produkte ohne Nachfragepfad (Score 5,3 · 3 PT) → pro Produkt Warteliste/Demo + E-Mail-Erfassung. *(greift mit Traffic)*
