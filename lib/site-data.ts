@@ -994,6 +994,17 @@ export type Processor = {
   dpaUrl: string
   /** Vom Owner im Dashboard bestaetigt und abgelegt? */
   dpaConfirmed: boolean
+  /*
+   * R-1 — die einzelnen Dienste dieses Anbieters, mit Namen.
+   *
+   * Warum das noetig war: In der Liste stand "Vercel Inc." und dahinter ein
+   * Zwecktext. Vercel Speed Insights lief da laengst mit — es misst die
+   * Ladezeiten ECHTER Aufrufe und traegt dabei IP und Seitenpfad. Wer nur
+   * "Hosting und Reichweitenmessung" liest, kann nicht erkennen, dass zwei
+   * getrennte Messungen laufen. Ein Verarbeiter, dessen Dienste man nicht
+   * benennt, ist nicht wirklich benannt.
+   */
+  services: string[]
 }
 
 export const processors: Processor[] = [
@@ -1004,6 +1015,7 @@ export const processors: Processor[] = [
     safeguard: "scc",
     dpaUrl: "https://vercel.com/legal/dpa",
     dpaConfirmed: false,
+    services: ["Hosting & CDN", "Vercel Web Analytics", "Vercel Speed Insights"],
   },
   {
     key: "resend",
@@ -1012,6 +1024,7 @@ export const processors: Processor[] = [
     safeguard: "scc",
     dpaUrl: "https://resend.com/legal/dpa",
     dpaConfirmed: false,
+    services: ["Resend (E-Mail-Versand)"],
   },
 ]
 

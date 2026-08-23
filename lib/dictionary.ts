@@ -946,6 +946,9 @@ export const dictionary = {
       processorsIntro:
         "Diese Dienstleister verarbeiten personenbezogene Daten für uns — weisungsgebunden, nach einem Vertrag über die Auftragsverarbeitung (Art. 28 DSGVO) und, weil sie in den USA sitzen, abgesichert über die EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Weiter geben wir nichts.",
       processorPurposeLabel: "Wofür",
+      /* R-1: die einzelnen Dienste je Anbieter, mit Namen — sonst laeuft
+         Speed Insights unbenannt unter "Reichweitenmessung" mit. */
+      processorServicesLabel: "Dienste",
       processorCountryLabel: "Sitz",
       processorSafeguardLabel: "Grundlage",
       processorSafeguardScc: "Auftragsverarbeitung nach Art. 28 DSGVO + EU-Standardvertragsklauseln",
@@ -955,7 +958,7 @@ export const dictionary = {
         "Die markierten Verträge hat der Inhaber noch nicht im jeweiligen Dashboard bestätigt und abgelegt. Wir schreiben deshalb nicht, dass sie bestehen — das holen wir vor dem Livegang nach.",
       processorPurposes: {
         vercel:
-          "Hosting, Auslieferung der Seite über das Content-Delivery-Netz, Server-Logs und — nach Ihrer Einwilligung — die cookiefreie Reichweiten- und Ladezeit-Messung.",
+          "Hosting, Auslieferung der Seite über das Content-Delivery-Netz und Server-Logs. Nach Ihrer Einwilligung zusätzlich zwei getrennte Messungen: Vercel Web Analytics (wie oft welche Seite geöffnet wird) und Vercel Speed Insights (wie schnell die Seite bei echten Aufrufen lädt). Beide sind cookiefrei, verarbeiten aber IP-Adresse und Seitenpfad — ohne Einwilligung wird kein Skript geladen.",
         resend:
           "Zustellung der E-Mails aus unseren Formularen an unser Postfach und der Eingangsbestätigung an Sie.",
       },
@@ -1800,6 +1803,7 @@ export const dictionary = {
       processorsIntro:
         "Bu hizmet sağlayıcılar kişisel verileri bizim için işler — talimatımıza bağlı olarak, veri işleyen sözleşmesi (GDPR Md. 28) kapsamında ve ABD'de bulundukları için GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altında. Bunun ötesinde hiçbir aktarım yapmıyoruz.",
       processorPurposeLabel: "Ne için",
+      processorServicesLabel: "Hizmetler",
       processorCountryLabel: "Merkez",
       processorSafeguardLabel: "Dayanak",
       processorSafeguardScc: "GDPR Md. 28 uyarınca veri işleme + AB standart sözleşme maddeleri",
@@ -1809,7 +1813,7 @@ export const dictionary = {
         "İşaretli sözleşmeleri işletme sahibi henüz ilgili panelde onaylayıp saklamadı. Bu yüzden var olduklarını yazmıyoruz — yayına almadan önce tamamlanacak.",
       processorPurposes: {
         vercel:
-          "Barındırma, sayfanın içerik dağıtım ağı üzerinden sunulması, sunucu kayıtları ve — onayınızdan sonra — çerezsiz erişim ve yüklenme süresi ölçümü.",
+          "Barındırma, sayfanın içerik dağıtım ağı üzerinden sunulması ve sunucu kayıtları. Onayınızdan sonra ayrıca iki ayrı ölçüm: Vercel Web Analytics (hangi sayfanın ne sıklıkla açıldığı) ve Vercel Speed Insights (gerçek çağrılarda sayfanın ne kadar hızlı yüklendiği). Her ikisi de çerezsizdir, ancak IP adresi ve sayfa yolunu işler — onay yoksa hiçbir betik yüklenmez.",
         resend:
           "Formlarımızdan çıkan e-postaların posta kutumuza ve alındı onayının size iletilmesi.",
       },

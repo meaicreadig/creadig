@@ -213,7 +213,22 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
                         </span>
                       )}
                     </div>
-                    <p className="type-small text-muted-foreground mt-2.5 text-pretty">
+                    {/* R-1: die Dienste mit Namen. "Vercel Inc." allein sagt
+                        nicht, dass dort zwei getrennte Messungen laufen. */}
+                    <p className="eyebrow text-muted-foreground mt-4">
+                      {t.legal.processorServicesLabel}
+                    </p>
+                    <ul className="mt-2.5 flex flex-wrap gap-2">
+                      {processor.services.map((service) => (
+                        <li
+                          key={service}
+                          className="border-line-strong text-muted-foreground type-small border px-2.5 py-1"
+                        >
+                          {service}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="type-small text-muted-foreground mt-3 text-pretty">
                       {t.legal.processorPurposes[processor.key]}
                     </p>
                     <p className="type-small text-muted-foreground/80 mt-2.5">
