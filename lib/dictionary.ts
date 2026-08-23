@@ -686,7 +686,7 @@ export const dictionary = {
       privacyConsentPrefix: "Ich habe die",
       privacyConsentLink: "Datenschutzerklärung",
       privacyConsentSuffix:
-        "gelesen und bin damit einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage verarbeitet werden.",
+        "gelesen und bin damit einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage verarbeitet und dafür über unseren Versanddienstleister Resend Inc. (USA) zugestellt werden — abgesichert über EU-Standardvertragsklauseln und, ergänzend, mit meiner ausdrücklichen Einwilligung in die Übermittlung in die USA (Art. 49 Abs. 1 lit. a DSGVO). Widerrufen kann ich das jederzeit für die Zukunft.",
       emailLabel: "E-Mail",
       emailPlaceholder: "damit wir antworten können",
       phoneLabel: "Telefon",
@@ -889,7 +889,11 @@ export const dictionary = {
       customize: "Individuelle Datenschutz-Präferenzen",
       save: "Auswahl speichern",
       alwaysActive: "Immer aktiv",
-      notInUse: "Derzeit nicht im Einsatz",
+      /* SEC-4 · Art. 49 Abs. 1 lit. a DSGVO. Steht im Banner ueber den
+         Schaltern — wer „Alle akzeptieren" drueckt, muss vorher gelesen
+         haben, worin er einwilligt. */
+      thirdCountry:
+        "Die Reichweitenmessung läuft über Vercel Inc. in den USA. Erlauben Sie sie, willigen Sie zugleich ausdrücklich in die Übermittlung Ihrer Zugriffsdaten dorthin ein (Art. 49 Abs. 1 lit. a DSGVO) — zusätzlich zu den EU-Standardvertragsklauseln, die wir mit Vercel geschlossen haben. In den USA gilt kein dem europäischen gleichwertiges Datenschutzniveau: Behörden können Zugriff verlangen, und wirksame Rechtsbehelfe dagegen bestehen möglicherweise nicht. Ohne Ihre Einwilligung findet keine Übermittlung statt.",
       settingsLabel: "Cookie-Einstellungen",
       settingsTitle: "Datenschutz-Präferenzen",
       close: "Schließen",
@@ -1480,7 +1484,7 @@ export const dictionary = {
       privacyConsentPrefix: "",
       privacyConsentLink: "Gizlilik politikasını",
       privacyConsentSuffix:
-        "okudum ve bilgilerimin talebimin işlenmesi amacıyla kullanılmasını kabul ediyorum.",
+        "okudum; bilgilerimin talebimin işlenmesi amacıyla kullanılmasını ve bunun için gönderim hizmet sağlayıcımız Resend Inc. (ABD) üzerinden iletilmesini kabul ediyorum — AB standart sözleşme maddeleriyle güvence altında ve buna ek olarak ABD'ye aktarıma açık onayımla (GDPR Md. 49/1-a). Onayımı geleceğe yönelik olarak istediğim zaman geri alabilirim.",
       emailLabel: "E-posta",
       emailPlaceholder: "size dönebilmemiz için",
       phoneLabel: "Telefon",
@@ -1667,7 +1671,8 @@ export const dictionary = {
       customize: "Kişisel gizlilik tercihleri",
       save: "Seçimi kaydet",
       alwaysActive: "Her zaman etkin",
-      notInUse: "Şu anda kullanılmıyor",
+      thirdCountry:
+        "Erişim ölçümü, ABD'deki Vercel Inc. üzerinden yürür. Buna izin verirseniz, erişim verilerinizin oraya aktarılmasına da açıkça onay vermiş olursunuz (GDPR Md. 49/1-a) — Vercel ile imzaladığımız AB standart sözleşme maddelerine ek olarak. ABD'de Avrupa'dakine denk bir veri koruma düzeyi yoktur: kamu kurumları erişim talep edebilir ve buna karşı etkili hukuki yollar bulunmayabilir. Onayınız olmadan hiçbir aktarım yapılmaz.",
       settingsLabel: "Çerez ayarları",
       settingsTitle: "Gizlilik tercihleri",
       close: "Kapat",

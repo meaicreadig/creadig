@@ -58,9 +58,12 @@ function Switch({
  * Sprache und Erscheinungsbild werden ohne Einwilligung nur in der laufenden
  * Sitzung gehalten (siehe locale-provider / theme-provider).
  *
- * Bewusst KEIN USA-Transfer-Hinweis: Diese Seite lädt keinen Dienst aus einem
- * Drittland (Schriften self-hosted via next/font, kein Analytics, keine Maps).
- * Begründung siehe lib/consent.ts.
+ * SEC-4 — der Drittland-Hinweis steht jetzt drin, und zwar OBEN, nicht im
+ * aufklappbaren Detail. „Alle akzeptieren" schaltet die Reichweitenmessung
+ * mit ein, und die läuft über Vercel Inc. in den USA; eine Einwilligung nach
+ * Art. 49 Abs. 1 lit. a DSGVO ist nur wirksam, wenn der Betroffene das
+ * Drittland und dessen Risiken vorher kennt. Wer den Knopf sieht, muss den
+ * Satz gelesen haben können. Begründung siehe lib/consent.ts.
  */
 export function CookieConsent() {
   const { t } = useLocale()
@@ -153,6 +156,12 @@ export function CookieConsent() {
             . {t.consent.revoke}
           </p>
 
+          {/* Art. 49 Abs. 1 lit. a DSGVO — abgesetzt, damit er nicht als
+              Kleingedrucktes durchgeht. */}
+          <p className="border-gold/40 text-foreground/80 type-small mt-6 max-w-2xl border-l-2 pl-4 text-pretty">
+            {t.consent.thirdCountry}
+          </p>
+
           {details && (
             <div className="border-line mt-8 flex flex-col gap-px border-t">
               {/* Essenziell — immer aktiv, nicht abwählbar. */}
@@ -185,11 +194,6 @@ export function CookieConsent() {
                       <p className="text-foreground text-base font-semibold">
                         {t.consent.categories[category].name}
                       </p>
-                      {category === "statistics" && (
-                        <span className="border-line-strong text-muted-foreground eyebrow border px-2 py-0.5">
-                          {t.consent.notInUse}
-                        </span>
-                      )}
                     </div>
                     <p className="type-small text-muted-foreground mt-2.5 text-pretty">
                       {t.consent.categories[category].body}

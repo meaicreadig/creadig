@@ -1,13 +1,20 @@
 /**
  * Einwilligungs-Verwaltung (DSGVO / § 25 TDDDG).
  *
- * Ehrlichkeits-Hinweis zum Stand der Seite:
- * Wir laden **keine** Dienste aus Drittländern. Poppins und JetBrains Mono
- * werden über `next/font` beim Build heruntergeladen und vom eigenen Server
- * ausgeliefert; es gibt kein Analytics, keine Maps, keine Werbe-Tags. Deshalb
- * steht im Banner bewusst **kein** USA-Transfer-Hinweis nach Art. 49 Abs. 1
- * lit. a DSGVO — er wäre schlicht unwahr. Kommt später ein Dienst mit
- * Drittlandbezug dazu, gehört der Hinweis hierher und in `dictionary.ts`.
+ * Stand der Seite — SEC-4:
+ * Der Satz „Kommt später ein Dienst mit Drittlandbezug dazu, gehört der
+ * Hinweis hierher" stand hier seit dem ersten Tag. Mit GROW-2 ist genau das
+ * eingetreten: Vercel Web Analytics ist ein Dienst von Vercel Inc. in den
+ * USA. Die Standardvertragsklauseln aus dem Auftragsverarbeitungsvertrag
+ * decken die Übermittlung ab, aber sie ersetzen nicht die Aufklärung — wer
+ * hier zustimmt, muss vorher wissen, wohin seine Zugriffsdaten gehen.
+ * Deshalb steht der Hinweis nach Art. 49 Abs. 1 lit. a DSGVO jetzt im Banner
+ * (`consent.thirdCountry` in `dictionary.ts`), sichtbar ÜBER den Schaltern
+ * und nicht in einem aufklappbaren Detail.
+ *
+ * Die Schriften bleiben unberührt: Poppins und JetBrains Mono lädt
+ * `next/font` beim Build herunter, ausgeliefert werden sie vom eigenen
+ * Server. Maps und Werbe-Tags gibt es weiterhin nicht.
  *
  * Was tatsächlich gespeichert wird:
  *   essential  — immer aktiv, nicht abwählbar: diese Einwilligung selbst
@@ -33,8 +40,13 @@ export const CONSENT_STORAGE_KEY = "creadig_consent"
  * wahr und ist es jetzt nicht mehr. Eine Einwilligung, die sich auf eine
  * andere Beschreibung bezog, gilt nicht weiter — also wird jeder noch einmal
  * gefragt.
+ *
+ * 2 → 3 (SEC-4): Version 2 nannte den Dienst, verschwieg aber, dass er in
+ * den USA läuft. Eine Einwilligung nach Art. 49 Abs. 1 lit. a DSGVO ist nur
+ * wirksam, wenn der Betroffene über das Drittland und dessen Risiken
+ * unterrichtet wurde — das war sie nicht. Also wird erneut gefragt.
  */
-export const CONSENT_VERSION = 2
+export const CONSENT_VERSION = 3
 
 /** Fired auf `window`, sobald sich die Einwilligung ändert. */
 export const CONSENT_CHANGE_EVENT = "creadig:consent-change"
