@@ -235,9 +235,13 @@ export const dictionary = {
      * Beschriftungen drumherum.
      */
     produktePage: {
-      eyebrow: "Produkte",
+      /*
+       * S-2 — „Produkte" liest sich wie ein Katalog. Der Vorspann sagt jetzt
+       * im ersten Satz, was die Seite wirklich ist: ein Beleg, kein Regal.
+       */
+      eyebrow: "Beweis, kein Katalog",
       title: "Vier Produkte, die wir selbst betreiben.",
-      lead: "Keine Ankündigungen, keine Konzeptfolien. Jedes dieser Produkte hat creaDIG von Grund auf gebaut — und setzt es im eigenen Tagesgeschäft ein.",
+      lead: "Diese Seite verkauft nichts davon. Sie steht hier, weil sie belegt, was wir über uns sagen: Jedes dieser Systeme hat creaDIG von Grund auf gebaut — und setzt es im eigenen Tagesgeschäft ein. Was wir für Sie bauen, steht unter Leistungen.",
       metaTitle: "Eigene Produkte — meAI, fibero, CASSAMEA, meahv",
       metaDescription:
         "Die vier eigenen Produkte von creaDIG: meAI (KI-Business-Betriebssystem), fibero (Glasfaser-Operations), CASSAMEA (Gastro-Kasse, Schweiz) und meahv (Hausverwaltung).",
@@ -335,6 +339,26 @@ export const dictionary = {
       arbeiten: "Arbeiten",
       unternehmen: "Unternehmen",
       insights: "Insights",
+      /*
+       * S-2 — die Menuewoerter sagen nicht, was dahinterliegt.
+       *
+       * „Produkte" liest sich wie ein Katalog: vier Dinge, die man kaufen
+       * kann. Das ist falsch und kostet doppelt — wer einkaufen will, findet
+       * keinen Preis, und wer einen Beleg fuer unsere Arbeit sucht, klickt
+       * gar nicht erst hin. Dabei sind die vier Systeme genau das: der
+       * Beweis, dass wir bauen und betreiben, was wir verkaufen.
+       *
+       * Diese Halbsaetze stehen im Menue unter dem Wort. Sie beschreiben,
+       * nicht bewerben.
+       */
+      hints: {
+        leistungen: "Was wir für Sie bauen",
+        produkte: "Was wir selbst gebaut haben und betreiben — der Beweis, kein Katalog",
+        arbeiten: "Ausgeführte Projekte, mit Namen",
+        unternehmen: "Wer dahintersteht und wie wir arbeiten",
+        insights: "Fachtexte aus dem laufenden Betrieb",
+        kontakt: "Vier Wege zum Gespräch",
+      },
       ueber: "Über uns",
       pakete: "Pakete",
       kontakt: "Kontakt",
@@ -525,7 +549,7 @@ export const dictionary = {
     houseProducts: {
       eyebrow: "Unter dem Dach",
       title: "Vier eigene Produkte.",
-      lead: "Selbst erfunden, selbst gebaut, selbst betrieben. Hier stehen sie gleichwertig nebeneinander — der Deep-Dive zum Flaggschiff meAI folgt direkt darunter.",
+      lead: "Selbst erfunden, selbst gebaut, selbst betrieben — und deshalb der beste Beleg dafür, was wir für andere bauen können. Kein Katalog: Verkauft wird hier keins davon. Der Deep-Dive zum Flaggschiff meAI folgt direkt darunter.",
       statusLabel: "Stand",
       openLabel: "Öffnen",
     },
@@ -1227,9 +1251,9 @@ export const dictionary = {
       ctaSecondary: "Tüm işler",
     },
     produktePage: {
-      eyebrow: "Ürünler",
+      eyebrow: "Katalog değil, kanıt",
       title: "Kendi işlettiğimiz dört ürün.",
-      lead: "Duyuru yok, konsept slaytı yok. Bu ürünlerin her birini creaDIG sıfırdan kurdu — ve kendi günlük işinde kullanıyor.",
+      lead: "Bu sayfa bunların hiçbirini satmıyor. Burada olmalarının nedeni, kendimiz hakkında söylediğimizi kanıtlamaları: Bu sistemlerin her birini creaDIG sıfırdan kurdu — ve kendi günlük işinde kullanıyor. Sizin için ne kurduğumuz Hizmetler altında.",
       metaTitle: "Kendi ürünlerimiz — meAI, fibero, CASSAMEA, meahv",
       metaDescription:
         "creaDIG'in dört kendi ürünü: meAI (yapay zekâ tabanlı iş işletim sistemi), fibero (fiber operasyonu), CASSAMEA (İsviçre için gastronomi kasası) ve meahv (bina yönetimi).",
@@ -1305,6 +1329,14 @@ export const dictionary = {
       arbeiten: "İşler",
       unternehmen: "Şirket",
       insights: "Insights",
+      hints: {
+        leistungen: "Sizin için ne kurarız",
+        produkte: "Kendi kurduğumuz ve işlettiğimiz sistemler — katalog değil, kanıt",
+        arbeiten: "Adıyla anılan tamamlanmış projeler",
+        unternehmen: "Arkasında kim var ve nasıl çalışıyoruz",
+        insights: "İşin içinden gelen uzman metinler",
+        kontakt: "Görüşmeye giden dört yol",
+      },
       ueber: "Hakkımızda",
       pakete: "Paketler",
       kontakt: "İletişim",
@@ -1478,7 +1510,7 @@ export const dictionary = {
     houseProducts: {
       eyebrow: "Çatının altında",
       title: "Dört kendi ürünümüz.",
-      lead: "Kendimiz icat ettik, kendimiz kurduk, kendimiz işletiyoruz. Burada eşit ağırlıkta yan yana duruyorlar — amiral gemisi meAI'ın ayrıntılı bölümü hemen aşağıda.",
+      lead: "Kendimiz icat ettik, kendimiz kurduk, kendimiz işletiyoruz — ve tam da bu yüzden başkaları için ne kurabileceğimizin en iyi kanıtı. Katalog değil: Burada hiçbiri satılmıyor. Amiral gemisi meAI'ın ayrıntılı bölümü hemen aşağıda.",
       statusLabel: "Durum",
       openLabel: "Aç",
     },

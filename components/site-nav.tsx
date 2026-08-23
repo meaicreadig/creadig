@@ -126,6 +126,7 @@ export function SiteNav() {
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}
+                title={t.nav.hints[link.labelKey as keyof typeof t.nav.hints]}
                 className={cn(
                   "group relative py-1 text-sm tracking-wide transition-colors duration-300 hover:text-foreground",
                   active ? "text-foreground" : "text-muted-foreground",
@@ -245,6 +246,18 @@ export function SiteNav() {
                       className="text-display border-b border-line py-5 text-3xl text-foreground"
                     >
                       {t.nav[link.labelKey]}
+                      {/*
+                        S-2 — das Menuewort allein sagt nicht, was dahinterliegt.
+                        „Produkte" liest sich wie ein Katalog; tatsaechlich ist
+                        es der Beweis. Auf dem Telefon ist Platz fuer den
+                        Halbsatz, in der Desktop-Leiste nicht — dort traegt ihn
+                        das `title`-Attribut.
+                      */}
+                      {t.nav.hints[link.labelKey as keyof typeof t.nav.hints] && (
+                        <span className="text-muted-foreground type-small mt-1.5 block text-pretty">
+                          {t.nav.hints[link.labelKey as keyof typeof t.nav.hints]}
+                        </span>
+                      )}
                     </MotionLink>
                   </SheetClose>
                 ))}
