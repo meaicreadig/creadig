@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { SITE_URL } from "@/lib/routes"
 import {
   bucketKey,
   callerAddress,
@@ -198,6 +199,100 @@ const SIGNATURE_TR = [
   "creaDIG · ICO InnovationsCentrum Osnabrück",
 ]
 
+/**
+ * V-1 — die Bestätigungsmail arbeitet jetzt.
+ *
+ * ---------------------------------------------------------------------------
+ * WAS SIE VORHER WAR
+ * Vier Zeilen: „Ihre Anfrage ist angekommen, wir melden uns." Ein Beleg, sonst
+ * nichts. Dabei ist das der einzige Moment, in dem ein Interessent uns
+ * garantiert liest — er hat gerade selbst geschrieben und wartet. Diese
+ * Aufmerksamkeit verfiel ungenutzt, und in der Zwischenzeit bis zum Rückruf
+ * konnte er drei andere Angebote anfragen.
+ *
+ * ---------------------------------------------------------------------------
+ * WAS SIE JETZT TUT — DREI DINGE, KEINE WERBUNG
+ *   1. Sie sagt, WAS ALS NÄCHSTES PASSIERT. Wer den Ablauf kennt, wartet
+ *      ruhiger und fragt nicht anderswo nach.
+ *   2. Sie sagt, WAS WIR IM GESPRÄCH BRAUCHEN — Zugänge, Bestand, was heute
+ *      hakt. Wer das vorher zusammensucht, verkürzt das Erstgespräch um die
+ *      halbe Zeit; und wer es nicht tut, hat trotzdem schon einmal darüber
+ *      nachgedacht.
+ *   3. Sie zeigt EINEN Beleg statt einer Selbstbeschreibung: meAI, das
+ *      stärkste eigene System — gebaut, betrieben und täglich benutzt.
+ *
+ * Kein Nachfass-Angebot, kein Rabatt, keine zweite Bitte. Die Mail schuldet
+ * dem Empfänger etwas, nicht umgekehrt.
+ */
+const PROOF_URL = `${SITE_URL}/produkte/meai`
+const PROOF_URL_TR = `${SITE_URL}/tr/produkte/meai`
+
+const NEXT_STEPS_DE = [
+  "WIE ES WEITERGEHT",
+  `1. Wir lesen Ihre Anfrage und melden uns ${RESPONSE_TIME.de} bei Ihnen.`,
+  "2. Zwanzig Minuten Erstgespräch — kostenlos, unverbindlich, per Telefon oder Video.",
+  "3. Danach sagen wir ehrlich, ob wir helfen können, was wir bauen würden und was es kostet.",
+]
+
+const BRING_DE = [
+  "WAS DAS GESPRÄCH KÜRZER MACHT",
+  "Falls Sie es zur Hand haben:",
+  "· Ihre bestehende Website und wer die Zugänge dazu hat",
+  "· Ihr Google-Unternehmensprofil, falls es eines gibt",
+  "· wo die Domain liegt und wer sie verwaltet",
+  "· ein, zwei Sätze dazu, was im Alltag gerade hakt",
+  "Fehlt etwas davon: kein Problem. Wir finden es gemeinsam.",
+]
+
+const PROOF_DE = [
+  "WORAN SIE UNSERE ARBEIT SEHEN",
+  "meAI ist unser eigenes System — von uns gebaut, von uns betrieben, täglich",
+  "im eigenen Haus benutzt:",
+  PROOF_URL,
+]
+
+const CLOSING_DE = [
+  "Diese Nachricht ist eine automatische Bestätigung; Sie müssen darauf nicht antworten.",
+  "Wenn es eilt, erreichen Sie uns direkt unter info@creadig.de.",
+]
+
+const NEXT_STEPS_TR = [
+  "BUNDAN SONRA NE OLACAK",
+  `1. Talebinizi okur ve ${RESPONSE_TIME.tr} size döneriz.`,
+  "2. Yirmi dakikalık ilk görüşme — ücretsiz, bağlayıcı değil, telefonla ya da görüntülü.",
+  "3. Ardından yardımcı olup olamayacağımızı, ne kuracağımızı ve maliyetini dürüstçe söyleriz.",
+]
+
+const BRING_TR = [
+  "GÖRÜŞMEYİ KISALTAN ŞEYLER",
+  "Elinizin altındaysa:",
+  "· Mevcut web siteniz ve erişim bilgilerinin kimde olduğu",
+  "· Varsa Google işletme profiliniz",
+  "· Alan adının nerede olduğu ve kimin yönettiği",
+  "· Günlük işleyişte şu an neyin aksadığına dair bir iki cümle",
+  "Bunlardan biri eksikse sorun değil — birlikte buluruz.",
+]
+
+const PROOF_TR = [
+  "İŞİMİZİ NEREDE GÖREBİLİRSİNİZ",
+  "meAI bizim kendi sistemimiz — biz kurduk, biz işletiyoruz ve her gün",
+  "kendi işimizde kullanıyoruz:",
+  PROOF_URL_TR,
+]
+
+const CLOSING_TR = [
+  "Bu mesaj otomatik bir onaydır; yanıtlamanız gerekmez.",
+  "Acele bir durum varsa doğrudan info@creadig.de adresinden bize ulaşabilirsiniz.",
+]
+
+/** Absätze mit genau einer Leerzeile dazwischen — Plaintext, aber lesbar. */
+function paragraphs(blocks: string[][]): string {
+  return blocks
+    .map((block) => block.join("\n"))
+    .filter(Boolean)
+    .join("\n\n")
+}
+
 const CONFIRMATION: Record<
   Locale,
   Record<ConfirmationKind, { subject: string; body: (name: string) => string }>
@@ -206,65 +301,64 @@ const CONFIRMATION: Record<
     kontakt: {
       subject: "Ihre Anfrage bei creaDIG",
       body: (name) =>
-        [
-          name ? `Guten Tag ${name},` : "Guten Tag,",
-          "",
-          "vielen Dank für Ihre Anfrage — sie ist bei uns angekommen.",
-          `Wir melden uns ${RESPONSE_TIME.de} bei Ihnen.`,
-          "",
-          "Diese Nachricht ist eine automatische Bestätigung; Sie müssen darauf nicht antworten.",
-          "Wenn es eilt, erreichen Sie uns direkt unter info@creadig.de.",
-          ...SIGNATURE_DE,
-        ].join("\n"),
+        paragraphs([
+          [name ? `Guten Tag ${name},` : "Guten Tag,"],
+          ["vielen Dank für Ihre Anfrage — sie ist bei uns angekommen."],
+          NEXT_STEPS_DE,
+          BRING_DE,
+          PROOF_DE,
+          CLOSING_DE,
+          SIGNATURE_DE.slice(1),
+        ]),
     },
     termin: {
       subject: "Terminwunsch erhalten — wir bestätigen Ihnen den Termin",
       body: (name) =>
-        [
-          name ? `Guten Tag ${name},` : "Guten Tag,",
-          "",
-          "vielen Dank für Ihren Terminwunsch — er ist bei uns angekommen.",
-          "",
-          "Der Termin ist damit noch nicht gebucht: Wir gleichen Ihre Wunschzeiten ab",
-          `und bestätigen Ihnen verbindlich einen Termin. Wir melden uns ${RESPONSE_TIME.de}`,
-          "bei Ihnen.",
-          "",
-          "Diese Nachricht ist eine automatische Eingangsbestätigung; Sie müssen darauf",
-          "nicht antworten. Wenn es eilt, erreichen Sie uns direkt unter info@creadig.de.",
-          ...SIGNATURE_DE,
-        ].join("\n"),
+        paragraphs([
+          [name ? `Guten Tag ${name},` : "Guten Tag,"],
+          ["vielen Dank für Ihren Terminwunsch — er ist bei uns angekommen."],
+          [
+            "Der Termin ist damit noch nicht gebucht: Wir gleichen Ihre Wunschzeiten ab",
+            "und bestätigen Ihnen verbindlich einen Termin.",
+          ],
+          NEXT_STEPS_DE,
+          BRING_DE,
+          PROOF_DE,
+          CLOSING_DE,
+          SIGNATURE_DE.slice(1),
+        ]),
     },
   },
   tr: {
     kontakt: {
       subject: "creaDIG talebiniz",
       body: (name) =>
-        [
-          name ? `Merhaba ${name},` : "Merhaba,",
-          "",
-          "talebiniz için teşekkür ederiz — bize ulaştı.",
-          `${RESPONSE_TIME.trSentenceStart} size döneceğiz.`,
-          "",
-          "Bu mesaj otomatik bir onaydır; yanıtlamanız gerekmez.",
-          "Acele bir durum varsa doğrudan info@creadig.de adresinden bize ulaşabilirsiniz.",
-          ...SIGNATURE_TR,
-        ].join("\n"),
+        paragraphs([
+          [name ? `Merhaba ${name},` : "Merhaba,"],
+          ["talebiniz için teşekkür ederiz — bize ulaştı."],
+          NEXT_STEPS_TR,
+          BRING_TR,
+          PROOF_TR,
+          CLOSING_TR,
+          SIGNATURE_TR.slice(1),
+        ]),
     },
     termin: {
       subject: "Randevu talebiniz alındı — randevuyu size onaylayacağız",
       body: (name) =>
-        [
-          name ? `Merhaba ${name},` : "Merhaba,",
-          "",
-          "randevu talebiniz için teşekkür ederiz — bize ulaştı.",
-          "",
-          "Randevu henüz kesinleşmedi: Belirttiğiniz zamanları değerlendirip size",
-          `bağlayıcı bir randevu onayı göndereceğiz. ${RESPONSE_TIME.trSentenceStart} size döneceğiz.`,
-          "",
-          "Bu mesaj otomatik bir alındı onayıdır; yanıtlamanız gerekmez.",
-          "Acele bir durum varsa doğrudan info@creadig.de adresinden bize ulaşabilirsiniz.",
-          ...SIGNATURE_TR,
-        ].join("\n"),
+        paragraphs([
+          [name ? `Merhaba ${name},` : "Merhaba,"],
+          ["randevu talebiniz için teşekkür ederiz — bize ulaştı."],
+          [
+            "Randevu henüz kesinleşmedi: Belirttiğiniz zamanları değerlendirip size",
+            "bağlayıcı bir randevu onayı göndereceğiz.",
+          ],
+          NEXT_STEPS_TR,
+          BRING_TR,
+          PROOF_TR,
+          CLOSING_TR,
+          SIGNATURE_TR.slice(1),
+        ]),
     },
   },
 }
