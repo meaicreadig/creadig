@@ -164,6 +164,34 @@ export function Packages() {
           })}
         </div>
 
+        {/*
+          BF-9 — die obere Oeffnung der Leiter.
+
+          Sie endete bei 3.900 EUR. Wer mehr braucht, las das als Obergrenze
+          und sortierte sich selbst aus — oder wir verhandelten uns an der
+          eigenen Zahl nach unten. Hier steht deshalb bewusst KEINE zweite
+          Zahl, sondern „auf Anfrage" und ein Gespraech: ein beworbenes
+          Angebot, eine Leiter, ein offenes oberes Ende.
+        */}
+        <Reveal className="border-line mt-px flex flex-col gap-6 border-t p-8 md:flex-row md:items-start md:justify-between md:p-9">
+          <div className="max-w-2xl">
+            <div className="flex flex-wrap items-baseline gap-3">
+              <p className="eyebrow text-muted-foreground">{t.packages.openEyebrow}</p>
+              <p className="text-display text-gold-text text-2xl">{t.packages.openPrice}</p>
+            </div>
+            <p className="type-body text-muted-foreground mt-4 text-pretty">
+              {t.packages.openNote}
+            </p>
+          </div>
+          <Link
+            href="/termin"
+            className="border-line-strong hover:border-gold hover:text-gold-text inline-flex shrink-0 items-center gap-2.5 border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
+          >
+            {t.packages.openCta}
+            <ArrowUpRight className="size-4" strokeWidth={1.5} />
+          </Link>
+        </Reveal>
+
         {/* Netto ist eine Pflichtangabe, keine Fussnote (M12-4). */}
         <p className="type-small text-muted-foreground border-line mt-8 border-t pt-6">
           {t.packages.netNote}

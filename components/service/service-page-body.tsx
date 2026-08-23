@@ -145,24 +145,31 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
               <p className="type-small text-muted-foreground mt-6 text-pretty">{layer.who}</p>
             </Reveal>
 
+            {/*
+              BF-9 — HIER STAND DER PREIS, UND DAS WAR DIE FALSCHE STELLE.
+
+              Diese Spalte liegt auf demselben Bildschirm wie „Arbeiten dazu"
+              in der Spalte daneben. Rechts €2.400, links NV SWISS und maqam —
+              gemessen keine 300 Pixel auseinander. Wer beides zugleich sieht,
+              liest die Zahl als den Preis dieser Arbeiten. Das entwertet die
+              Referenzen und verankert uns auf einer Zahl, die fuer den Fall
+              gar nicht gilt.
+
+              Der Preis steht jetzt an genau EINER Stelle: im Angebot auf
+              `/leistungen`. Diese Seite nennt das Paket beim Namen und
+              verlinkt dorthin — und `/leistungen` traegt keine Referenzen.
+              Damit koennen Referenz und Preis gar nicht mehr zusammentreffen,
+              nicht nur zufaellig gerade nicht.
+            */}
             <Reveal delay={0.08} className="border-line mt-14 border-t pt-8">
               <p className="eyebrow text-gold-text">{copy.packagesLabel}</p>
               <ul className="mt-6 flex flex-col gap-px">
                 {packages
                   .filter((pkg) => page.packageKeys.includes(pkg.key))
                   .map((pkg) => (
-                    <li
-                      key={pkg.key}
-                      className="border-line flex items-baseline justify-between gap-4 border-t py-5"
-                    >
+                    <li key={pkg.key} className="border-line border-t py-5">
                       <span className="text-subhead text-lg">
                         {t.packages.items[pkg.key].name}
-                      </span>
-                      <span className="type-body text-muted-foreground">
-                        {pkg.price}
-                        <span className="text-meta ml-1.5">
-                          {pkg.period ? t.packages.monthly : t.packages.once}
-                        </span>
                       </span>
                     </li>
                   ))}

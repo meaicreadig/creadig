@@ -658,6 +658,23 @@ export const dictionary = {
         "Referenzpreis für die ersten zwei Betriebe — als Gegenleistung für ein Zitat, die Nennung als Referenz und zwei Fotos. Ab dem dritten Betrieb gilt der Regelpreis.",
       regularLabel: "Regelpreis",
       netNote: "Alle Preise netto, zzgl. 19 % USt.",
+      /*
+       * BF-9 — die obere Oeffnung.
+       *
+       * Die Leiter endete bei 3.900 EUR. Wer mehr braucht — mehrere
+       * Standorte, einen Shop, eine Schnittstelle in die Warenwirtschaft —
+       * las diese Zahl als Obergrenze und sortierte sich selbst aus, oder wir
+       * verhandelten uns an der eigenen Zahl nach unten. Beides kostet.
+       *
+       * Bewusst OHNE zweite Zahl: Black Lock 5 (ein beworbenes Angebot, eine
+       * Leiter) bleibt unangetastet. Es steht kein zweiter Preis da, sondern
+       * ein offener Satz und ein Gespraech.
+       */
+      openEyebrow: "Größerer Umfang",
+      openPrice: "auf Anfrage",
+      openNote:
+        "Mehrere Standorte, ein Shop, Schnittstellen in die Warenwirtschaft oder ein System, das über die Website hinausgeht: Das rechnen wir nach Aufwand — nach einem Gespräch, nicht nach Liste. Wir sagen Ihnen vorher, was es kostet, und danach ändert sich die Zahl nicht.",
+      openCta: "Umfang besprechen",
       retainerEyebrow: "Laufende Betreuung",
       retainerTitle: "Betrieb statt Uebergabe.",
       retainerFrom: "ab",
@@ -1567,6 +1584,11 @@ export const dictionary = {
         "İlk iki işletme için referans fiyatı — karşılığında bir görüş cümlesi, referans olarak anılma ve iki fotoğraf. Üçüncü işletmeden itibaren normal fiyat geçerlidir.",
       regularLabel: "Normal fiyat",
       netNote: "Tüm fiyatlar nettir, %19 KDV hariç.",
+      openEyebrow: "Daha büyük kapsam",
+      openPrice: "talep üzerine",
+      openNote:
+        "Birden fazla şube, bir mağaza, stok sistemine bağlantılar ya da web sitesinin ötesine geçen bir sistem: Bunu listeye göre değil, görüşmeden sonra işe göre hesaplarız. Maliyeti önceden söyleriz ve sonrasında rakam değişmez.",
+      openCta: "Kapsamı konuşalım",
       retainerEyebrow: "Sürekli destek",
       retainerTitle: "Teslim değil, işletme.",
       retainerFrom: "aylık",
