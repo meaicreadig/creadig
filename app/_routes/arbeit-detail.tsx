@@ -3,8 +3,8 @@ import { notFound } from "next/navigation"
 import { ArbeitPageBody } from "@/components/pages/arbeit-page-body"
 import { approvedCaseStudies, clientWorks } from "@/lib/site-data"
 import { dictionary, type Locale } from "@/lib/dictionary"
+import { pageMetadata } from "@/lib/page-metadata"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
-import { localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
 
 /**
  * Detailseiten des Kundenwerks (PHASE A · GROW-1).
@@ -39,18 +39,13 @@ export async function arbeitMetadata(
   if (!work) return {}
 
   const title = `${work.name} — ${work.sector}`
-  return {
+  return pageMetadata({
+    locale,
+    path: `/arbeiten/${work.slug}`,
     title,
     description: work.what,
-    alternates: localeAlternates(`/arbeiten/${work.slug}`, locale),
-    openGraph: {
-      title: `${title} · creaDIG`,
-      description: work.what,
-      url: localeUrl(`/arbeiten/${work.slug}`, locale),
-      locale: openGraphLocale[locale],
-      type: "article",
-    },
-  }
+    type: "article",
+  })
 }
 
 export async function ArbeitRoute({

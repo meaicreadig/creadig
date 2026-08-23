@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import type { Metadata } from "next"
 import { TerminWizard } from "@/components/termin/termin-wizard"
 import { dictionary, type Locale } from "@/lib/dictionary"
-import { localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
+import { pageMetadata } from "@/lib/page-metadata"
 
 /**
  * Der Termin-Assistent (GROW-1).
@@ -14,18 +14,12 @@ import { localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
  */
 export function terminMetadata(locale: Locale): Metadata {
   const copy = dictionary[locale].termin
-  return {
+  return pageMetadata({
+    locale,
+    path: "/termin",
     title: copy.metaTitle,
     description: copy.metaDescription,
-    alternates: localeAlternates("/termin", locale),
-    openGraph: {
-      title: `${copy.metaTitle} · creaDIG`,
-      description: copy.metaDescription,
-      url: localeUrl("/termin", locale),
-      locale: openGraphLocale[locale],
-      type: "website",
-    },
-  }
+  })
 }
 
 export function TerminRoute() {

@@ -2,9 +2,10 @@ import type { Metadata } from "next"
 import { UnternehmenPageBody } from "@/components/pages/unternehmen-page-body"
 import { Location } from "@/components/sections/location"
 import { dictionary, type Locale } from "@/lib/dictionary"
+import { pageMetadata } from "@/lib/page-metadata"
 import { address, certifications } from "@/lib/site-data"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
-import { SITE_URL, localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
+import { SITE_URL, localeUrl } from "@/lib/routes"
 
 /**
  * Unternehmensseite (PHASE A · zweisprachig seit GROW-1).
@@ -19,18 +20,12 @@ import { SITE_URL, localeAlternates, localeUrl, openGraphLocale } from "@/lib/ro
  */
 export function unternehmenMetadata(locale: Locale): Metadata {
   const copy = dictionary[locale].unternehmenPage
-  return {
+  return pageMetadata({
+    locale,
+    path: "/unternehmen",
     title: copy.metaTitle,
     description: copy.metaDescription,
-    alternates: localeAlternates("/unternehmen", locale),
-    openGraph: {
-      title: `${copy.metaTitle} · creaDIG`,
-      description: copy.metaDescription,
-      url: localeUrl("/unternehmen", locale),
-      locale: openGraphLocale[locale],
-      type: "website",
-    },
-  }
+  })
 }
 
 /*

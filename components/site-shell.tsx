@@ -20,6 +20,7 @@ import {
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { jsonLdScript } from "@/lib/json-ld"
 import { SITE_URL, localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
+import { ogImage } from "@/lib/page-metadata"
 
 /**
  * GROW-1 — das gemeinsame Gerüst beider Sprachbäume.
@@ -103,17 +104,21 @@ export function shellMetadata(locale: Locale): Metadata {
       type: "website",
       siteName: "creaDIG",
       url: localeUrl("/", locale),
+      /*
+       * T-1 — das Bild kommt jetzt aus derselben Quelle wie auf jeder
+       * Unterseite (`lib/page-metadata.ts`) und nicht mehr aus der
+       * Dateikonvention. Die lieferte eine Adresse mit zwei Streuwerten, an
+       * die ein gemeinsamer Kopfdaten-Helfer nicht herankommt — und sobald
+       * eine Unterseite ein eigenes `openGraph` setzte, fiel das Bild ganz
+       * weg. Eine Mechanik statt zwei.
+       */
+      images: ogImage(locale),
     },
-    /*
-     * Bild und Alt-Text liefert app/opengraph-image.tsx — Next haengt sie
-     * automatisch an OpenGraph UND an die Twitter-Card. Hier steht nur, welche
-     * Karte X/Twitter rendern soll: `summary_large_image` statt der kleinen
-     * quadratischen Vorschau.
-     */
     twitter: {
       card: "summary_large_image",
       title: t.meta.ogTitle,
       description: t.meta.ogDescription,
+      images: ogImage(locale),
     },
     robots: { index: true, follow: true },
   }

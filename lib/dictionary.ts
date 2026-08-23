@@ -30,6 +30,10 @@ export const dictionary = {
         "System-Haus für Marke, Web, Operations, Automation und KI. Eigene Produkte: meAI, fibero, CASSAMEA, meahv.",
       /** Erster Eintrag jeder Brotkrume in den strukturierten Daten. */
       breadcrumbHome: "Startseite",
+      /* T-1 — Alt-Text des Vorschaubildes. Er stand nur in
+         app/_routes/og-image.tsx; von dort kann ihn der Kopfdaten-Helfer
+         nicht holen, ohne `fs` und `next/og` in jede Seite zu ziehen. */
+      ogImageAlt: "creaDIG — System-Haus für Marke, Web und KI",
     },
     /*
      * Verteiler-Startseite (PHASE A, Master-Prompt 4 §4).
@@ -1065,6 +1069,7 @@ export const dictionary = {
       organizationDescription:
         "Marka, web, operations, automation ve yapay zekâ için sistem evi. Kendi ürünlerimiz: meAI, fibero, CASSAMEA, meahv.",
       breadcrumbHome: "Ana sayfa",
+      ogImageAlt: "creaDIG — marka, web ve yapay zekâ için sistem evi",
     },
     home: {
       statement: {

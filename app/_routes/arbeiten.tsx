@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
 import { ArbeitenPageBody } from "@/components/pages/arbeiten-page-body"
 import { dictionary, type Locale } from "@/lib/dictionary"
+import { pageMetadata } from "@/lib/page-metadata"
 import { registryWorks, workHref } from "@/lib/site-data"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
-import { localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
+import { localeUrl } from "@/lib/routes"
 
 /**
  * Werkschau (PHASE A · zweisprachig seit GROW-1).
@@ -14,18 +15,12 @@ import { localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
  */
 export function arbeitenMetadata(locale: Locale): Metadata {
   const copy = dictionary[locale].arbeitenPage
-  return {
+  return pageMetadata({
+    locale,
+    path: "/arbeiten",
     title: copy.metaTitle,
     description: copy.metaDescription,
-    alternates: localeAlternates("/arbeiten", locale),
-    openGraph: {
-      title: `${copy.metaTitle} · creaDIG`,
-      description: copy.metaDescription,
-      url: localeUrl("/arbeiten", locale),
-      locale: openGraphLocale[locale],
-      type: "website",
-    },
-  }
+  })
 }
 
 function jsonLd(locale: Locale) {

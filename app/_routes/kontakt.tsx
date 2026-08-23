@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
 import { KontaktPageBody } from "@/components/pages/kontakt-page-body"
 import { dictionary, type Locale } from "@/lib/dictionary"
+import { pageMetadata } from "@/lib/page-metadata"
 import { address, contact } from "@/lib/site-data"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
-import { SITE_URL, localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
+import { SITE_URL, localeUrl } from "@/lib/routes"
 
 /**
  * Kontaktseite (PHASE A · zweisprachig seit GROW-1).
@@ -14,18 +15,12 @@ import { SITE_URL, localeAlternates, localeUrl, openGraphLocale } from "@/lib/ro
  */
 export function kontaktMetadata(locale: Locale): Metadata {
   const copy = dictionary[locale].kontaktPage
-  return {
+  return pageMetadata({
+    locale,
+    path: "/kontakt",
     title: copy.metaTitle,
     description: copy.metaDescription,
-    alternates: localeAlternates("/kontakt", locale),
-    openGraph: {
-      title: `${copy.metaTitle} · creaDIG`,
-      description: copy.metaDescription,
-      url: localeUrl("/kontakt", locale),
-      locale: openGraphLocale[locale],
-      type: "website",
-    },
-  }
+  })
 }
 
 /*

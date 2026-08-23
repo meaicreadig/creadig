@@ -3,9 +3,10 @@ import { notFound } from "next/navigation"
 import { ServicePageBody } from "@/components/service/service-page-body"
 import { findServicePage, publishedServicePages } from "@/lib/service-pages"
 import { dictionary, type Locale } from "@/lib/dictionary"
+import { pageMetadata } from "@/lib/page-metadata"
 import { address } from "@/lib/site-data"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
-import { SITE_URL, localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
+import { SITE_URL, localeUrl } from "@/lib/routes"
 
 /**
  * Template-Route für die granularen Leistungsseiten (E-K4 · GROW-1).
@@ -33,18 +34,13 @@ export async function serviceMetadata(
   const page = findServicePage(slug)
   if (!page) return {}
 
-  return {
+  return pageMetadata({
+    locale,
+    path: `/leistungen/${page.slug}`,
     title: page.metaTitle[locale],
     description: page.metaDescription[locale],
-    alternates: localeAlternates(`/leistungen/${page.slug}`, locale),
-    openGraph: {
-      title: `${page.metaTitle[locale]} · creaDIG`,
-      description: page.metaDescription[locale],
-      url: localeUrl(`/leistungen/${page.slug}`, locale),
-      locale: openGraphLocale[locale],
-      type: "article",
-    },
-  }
+    type: "article",
+  })
 }
 
 export async function ServiceRoute({

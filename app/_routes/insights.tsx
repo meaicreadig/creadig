@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import { InsightsPageBody } from "@/components/pages/insights-page-body"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { publishedInsights } from "@/lib/insights"
+import { pageMetadata } from "@/lib/page-metadata"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
-import { localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
 
 /**
  * System-Notes (PHASE A — Gerüst, Inhalte folgen vom Owner · GROW-1).
@@ -17,22 +17,13 @@ import { localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
  */
 export function insightsMetadata(locale: Locale): Metadata {
   const copy = dictionary[locale].insightsPage
-  return {
+  return pageMetadata({
+    locale,
+    path: "/insights",
     title: copy.metaTitle,
     description: copy.metaDescription,
-    alternates: localeAlternates("/insights", locale),
-    robots:
-      publishedInsights.length > 0
-        ? { index: true, follow: true }
-        : { index: false, follow: true },
-    openGraph: {
-      title: `${copy.metaTitle} · creaDIG`,
-      description: copy.metaDescription,
-      url: localeUrl("/insights", locale),
-      locale: openGraphLocale[locale],
-      type: "website",
-    },
-  }
+    noIndex: publishedInsights.length === 0,
+  })
 }
 
 function jsonLd(locale: Locale) {

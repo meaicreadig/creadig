@@ -1,10 +1,11 @@
 import type { Metadata } from "next"
 import { LeistungenPageBody } from "@/components/pages/leistungen-page-body"
 import { dictionary, type Locale } from "@/lib/dictionary"
+import { pageMetadata } from "@/lib/page-metadata"
 import { publishedServicePages } from "@/lib/service-pages"
 import { address } from "@/lib/site-data"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
-import { SITE_URL, localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
+import { SITE_URL, localeUrl } from "@/lib/routes"
 
 /**
  * Übersichtsseite der Leistungen (PHASE A · zweisprachig seit GROW-1).
@@ -23,18 +24,12 @@ import { SITE_URL, localeAlternates, localeUrl, openGraphLocale } from "@/lib/ro
  */
 export function leistungenMetadata(locale: Locale): Metadata {
   const copy = dictionary[locale].leistungenPage
-  return {
+  return pageMetadata({
+    locale,
+    path: "/leistungen",
     title: copy.metaTitle,
     description: copy.metaDescription,
-    alternates: localeAlternates("/leistungen", locale),
-    openGraph: {
-      title: `${copy.metaTitle} · creaDIG`,
-      description: copy.metaDescription,
-      url: localeUrl("/leistungen", locale),
-      locale: openGraphLocale[locale],
-      type: "website",
-    },
-  }
+  })
 }
 
 /*

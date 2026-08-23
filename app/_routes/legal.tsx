@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { LegalPage } from "@/components/legal/legal-page"
 import { dictionary, type Locale } from "@/lib/dictionary"
-import { localeAlternates } from "@/lib/routes"
+import { pageMetadata } from "@/lib/page-metadata"
 
 /**
  * Impressum und Datenschutz (GROW-1).
@@ -18,13 +18,14 @@ import { localeAlternates } from "@/lib/routes"
 export function legalMetadata(kind: "imprint" | "privacy", locale: Locale): Metadata {
   const t = dictionary[locale].legal
   const path = kind === "imprint" ? "/impressum" : "/datenschutz"
-  return {
+  return pageMetadata({
+    locale,
+    path,
     title: kind === "imprint" ? t.imprintTitle : t.privacyTitle,
     description:
       kind === "imprint" ? t.imprintMetaDescription : t.privacyMetaDescription,
-    alternates: localeAlternates(path, locale),
-    robots: { index: false, follow: true },
-  }
+    noIndex: true,
+  })
 }
 
 export function LegalRoute({ kind }: { kind: "imprint" | "privacy" }) {

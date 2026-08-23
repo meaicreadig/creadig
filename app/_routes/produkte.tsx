@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
 import { ProduktePageBody } from "@/components/pages/produkte-page-body"
 import { dictionary, type Locale } from "@/lib/dictionary"
+import { pageMetadata } from "@/lib/page-metadata"
 import { productWorks } from "@/lib/site-data"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
-import { localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
+import { localeUrl } from "@/lib/routes"
 
 /**
  * Übersicht der eigenen Produkte (PHASE A · zweisprachig seit GROW-1).
@@ -16,18 +17,12 @@ import { localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
  */
 export function produkteMetadata(locale: Locale): Metadata {
   const copy = dictionary[locale].produktePage
-  return {
+  return pageMetadata({
+    locale,
+    path: "/produkte",
     title: copy.metaTitle,
     description: copy.metaDescription,
-    alternates: localeAlternates("/produkte", locale),
-    openGraph: {
-      title: `${copy.metaTitle} · creaDIG`,
-      description: copy.metaDescription,
-      url: localeUrl("/produkte", locale),
-      locale: openGraphLocale[locale],
-      type: "website",
-    },
-  }
+  })
 }
 
 function jsonLd(locale: Locale) {

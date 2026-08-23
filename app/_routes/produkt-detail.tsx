@@ -4,8 +4,9 @@ import { ProduktPageBody } from "@/components/pages/produkt-page-body"
 import { productScreens } from "@/lib/product-media"
 import { productWorks } from "@/lib/site-data"
 import { dictionary, type Locale } from "@/lib/dictionary"
+import { pageMetadata } from "@/lib/page-metadata"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
-import { SITE_URL, localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
+import { SITE_URL, localeUrl } from "@/lib/routes"
 
 /**
  * Template-Route der Produkt-Welten (PHASE A · GROW-1).
@@ -42,18 +43,13 @@ export async function produktMetadata(
   if (!product) return {}
 
   const title = `${product.name} — ${product.sector}`
-  return {
+  return pageMetadata({
+    locale,
+    path: `/produkte/${product.slug}`,
     title,
     description: product.what,
-    alternates: localeAlternates(`/produkte/${product.slug}`, locale),
-    openGraph: {
-      title: `${title} · creaDIG`,
-      description: product.what,
-      url: localeUrl(`/produkte/${product.slug}`, locale),
-      locale: openGraphLocale[locale],
-      type: "website",
-    },
-  }
+    type: "article",
+  })
 }
 
 export async function ProduktRoute({
