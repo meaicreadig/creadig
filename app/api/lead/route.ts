@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { SITE_URL } from "@/lib/routes"
+import { raiseAlert } from "@/lib/alert"
 import {
   bucketKey,
   callerAddress,
@@ -416,7 +417,15 @@ export async function POST(request: Request) {
     Antwort auf ein Problem, das auf unserer Seite liegt.
   */
   if (!apiKey || !from) {
-    console.error("[lead] RESEND_API_KEY oder LEAD_FROM fehlt — Anfrage NICHT zugestellt")
+    /*
+      T-2 — das ist kein Log-Eintrag, das ist ein Notfall: JEDE Anfrage geht
+      in diesem Zustand verloren, und der Absender bekommt eine Fehlermeldung
+      in unserem Namen.
+    */
+    await raiseAlert(
+      "lead-not-configured",
+      "RESEND_API_KEY oder LEAD_FROM fehlt — jede Anfrage geht verloren.",
+    )
     return NextResponse.json({ ok: false, error: "not_configured" }, { status: 503 })
   }
 
@@ -501,7 +510,12 @@ export async function POST(request: Request) {
       replyTo: email,
     })
   } catch (error) {
-    console.error("[lead] Zustellung an das eigene Postfach fehlgeschlagen:", error)
+    // T-2 — die Anfrage ist an dieser Stelle verloren. Nichts hier faengt sie
+    // auf; wer davon nicht erfaehrt, erfaehrt gar nichts.
+    await raiseAlert(
+      "lead-send-failed",
+      `Zustellung an das eigene Postfach fehlgeschlagen: ${String(error).slice(0, 300)}`,
+    )
     return NextResponse.json({ ok: false, error: "send_failed" }, { status: 502 })
   }
 
@@ -521,7 +535,16 @@ export async function POST(request: Request) {
       text: CONFIRMATION[locale][kind].body(name),
     })
   } catch (error) {
-    console.error("[lead] Bestaetigung an den Absender fehlgeschlagen:", error)
+    /*
+      Niedrigere Stufe, aber gemeldet: Die Anfrage liegt bereits im Postfach,
+      es fehlt "nur" die Eingangsbestaetigung. Haeuft sich das, stimmt etwas
+      mit der Absender-Domain nicht — und das faellt sonst erst auf, wenn die
+      Zustellbarkeit insgesamt kippt.
+    */
+    await raiseAlert(
+      "lead-confirmation-failed",
+      `Eingangsbestaetigung an den Absender fehlgeschlagen: ${String(error).slice(0, 300)}`,
+    )
   }
 
   return NextResponse.json({ ok: true })

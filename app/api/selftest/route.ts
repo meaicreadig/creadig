@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { issueFormToken, verifyFormToken } from "@/lib/lead-guard"
+import { raiseAlert } from "@/lib/alert"
 
 /**
  * BF-8 — der Zustell-Selbsttest.
@@ -149,28 +150,17 @@ async function sendTestMail(apiKey: string, from: string, to: string): Promise<C
   }
 }
 
+/*
+ * T-2 — der Selbsttest benutzt denselben Alarmweg wie die Lead- und die
+ * CSP-Route. Vorher stand hier eine zweite, fast gleiche Fassung; zwei
+ * Alarmwege heissen im Ernstfall, dass einer davon nicht gepflegt ist.
+ */
 async function alert(checks: Check[]) {
   const failed = checks.filter((check) => !check.ok)
-  console.error(
-    "[selftest] Lead-Weg gestoert:",
-    failed.map((check) => `${check.name}: ${check.detail}`).join(" | "),
+  await raiseAlert(
+    "selftest",
+    `Lead-Weg gestoert — ${failed.map((check) => `${check.name}: ${check.detail}`).join(" | ")}`,
   )
-
-  const hook = process.env.ALERT_WEBHOOK_URL
-  if (!hook) return
-  try {
-    await fetch(hook, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text: `creaDIG Selbsttest fehlgeschlagen — ${failed
-          .map((check) => `${check.name}: ${check.detail}`)
-          .join(" | ")}`,
-      }),
-    })
-  } catch (error) {
-    console.error("[selftest] Alarm konnte nicht zugestellt werden:", error)
-  }
 }
 
 export async function GET(request: Request) {
