@@ -10,6 +10,7 @@ import { MagneticButton } from "@/components/ui/magnetic-button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { StatusDot } from "@/components/ui/status-dot"
 import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
+import { ProductInterest } from "@/components/product/product-interest"
 import { publishedServicePages } from "@/lib/service-pages"
 import {
   furtherProjects,
@@ -394,7 +395,17 @@ export function ProduktPageBody({
       )}
 
       {/* ------------------------------------------------------------------
-          7 — Abschluss.
+          7 — Nachfragepfad (FEAT-1).
+
+          Vor dem Abschluss, nicht danach: Wer bis hierher gelesen hat, ist an
+          seinem Interesse-Maximum. Der allgemeine Abschluss-Block darunter
+          fuehrt WEG vom Produkt ("Kontakt", "Alle Produkte") — die Frage zum
+          Produkt selbst muss davor stehen.
+          ------------------------------------------------------------------ */}
+      <ProductInterest slug={product.slug} productName={product.name} />
+
+      {/* ------------------------------------------------------------------
+          8 — Abschluss.
           ------------------------------------------------------------------ */}
       <section aria-labelledby="produkt-cta-title" className="border-line border-b">
         <div className="section-shell-tight">

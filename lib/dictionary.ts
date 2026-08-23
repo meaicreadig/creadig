@@ -227,6 +227,22 @@ export const dictionary = {
       clientWorkCta: "Zur Werkschau",
     },
     produktPage: {
+      interest: {
+        eyebrow: "Nachfrage",
+        title: "Sagen wir Ihnen Bescheid?",
+        body: "Wenn {product} für Ihren Betrieb interessant ist: Adresse hinterlassen, und wir melden uns, sobald es so weit ist. Kein Newsletter, keine Werbung — eine Nachricht zu diesem Produkt.",
+        emailLabel: "E-Mail",
+        emailPlaceholder: "damit wir Sie erreichen",
+        nameLabel: "Name (optional)",
+        namePlaceholder: "wie dürfen wir Sie ansprechen?",
+        submit: "Bescheid geben lassen",
+        sentTitle: "Notiert.",
+        sentBody: "Wir melden uns, sobald es zu diesem Produkt etwas zu sagen gibt. Eine Bestätigung liegt in Ihrem Postfach.",
+        /* Der Endpunkt verlangt ein Telefonfeld — hier gibt es keins, und das
+           steht dann auch so in der Mail statt einer erfundenen Nummer. */
+        phoneOmitted: "nicht angegeben (Produkt-Nachfrage)",
+        messageTemplate: "Nachfrage zum Produkt {product} — bitte Bescheid geben, sobald es verfügbar ist.",
+      },
       breadcrumb: "Produkte",
       builtLabel: "Was wir gebaut haben",
       blocksLabel: "Bausteine",
@@ -1057,6 +1073,20 @@ export const dictionary = {
       clientWorkCta: "Seçkiye git",
     },
     produktPage: {
+      interest: {
+        eyebrow: "İlgi",
+        title: "Haber verelim mi?",
+        body: "{product} işletmeniz için ilginç geliyorsa: adresinizi bırakın, zamanı geldiğinde size haber verelim. Bülten yok, reklam yok — yalnızca bu ürüne dair tek bir mesaj.",
+        emailLabel: "E-posta",
+        emailPlaceholder: "size ulaşabilmemiz için",
+        nameLabel: "İsim (isteğe bağlı)",
+        namePlaceholder: "size nasıl hitap edelim?",
+        submit: "Haber verin",
+        sentTitle: "Not aldık.",
+        sentBody: "Bu ürünle ilgili söylenecek bir şey olduğunda size haber vereceğiz. Onay e-postası posta kutunuzda.",
+        phoneOmitted: "belirtilmedi (ürün ilgisi)",
+        messageTemplate: "{product} ürünü hakkında bilgi talebi — hazır olduğunda haber verilmesi rica olunur.",
+      },
       breadcrumb: "Ürünler",
       builtLabel: "Ne inşa ettik",
       blocksLabel: "Yapı taşları",
