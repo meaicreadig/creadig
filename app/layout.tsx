@@ -7,6 +7,7 @@ import { SiteNav } from "@/components/site-nav"
 import { SiteFooter } from "@/components/site-footer"
 import { StickyWhatsApp } from "@/components/sticky-whatsapp"
 import { CookieConsent } from "@/components/consent/cookie-consent"
+import { GatedAnalytics } from "@/components/consent/gated-analytics"
 import {
   address,
   aggregateRating,
@@ -260,6 +261,8 @@ export default function RootLayout({
             <SiteFooter />
             <StickyWhatsApp />
             <CookieConsent />
+            {/* Laedt erst nach Einwilligung in die Kategorie `statistics`. */}
+            <GatedAnalytics />
           </LocaleProvider>
         </ThemeProvider>
       </body>

@@ -7,6 +7,7 @@ import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { cn } from "@/lib/utils"
+import { trackLead } from "@/lib/track"
 
 /**
  * FEAT-1 — der Nachfragepfad je Produkt.
@@ -139,6 +140,7 @@ export function ProductInterest({
 
                   if (response.ok && data?.ok) {
                     setStatus("sent")
+                    trackLead(`produkt-${slug}`)
                     return
                   }
                   setStatus("idle")

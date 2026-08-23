@@ -8,6 +8,7 @@ import { useLocale } from "@/components/locale-provider"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { SignatureMotif } from "@/components/brand/signature-motif"
 import { contact } from "@/lib/site-data"
+import { trackLead } from "@/lib/track"
 import { cn } from "@/lib/utils"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -736,6 +737,7 @@ export function TerminWizard() {
                         | null
 
                       if (response.ok && data?.ok) {
+                        trackLead("termin")
                         setStep(5)
                         window.scrollTo({ top: 0, behavior: "smooth" })
                         return

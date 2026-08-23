@@ -10,6 +10,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { contact } from "@/lib/site-data"
+import { trackLead } from "@/lib/track"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 export function Contact() {
@@ -158,6 +159,9 @@ export function Contact() {
 
                     if (response.ok && data?.ok) {
                       setStatus("sent")
+                      // GROW-2: die einzige Zahl, an der sich die Seite messen
+                      // lassen muss. Nur der Herkunftsname, nie ein Feldinhalt.
+                      trackLead("kontakt")
                       return
                     }
 

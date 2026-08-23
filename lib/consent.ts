@@ -15,15 +15,26 @@
  *   functional — Komfort: Sprachwahl (`creadig_lang`) und Erscheinungsbild
  *                (`creadig-theme`). Ohne Einwilligung gilt die Wahl nur für
  *                die laufende Sitzung.
- *   statistics — Reichweitenmessung. Derzeit im Einsatz: keine. Die
- *                Entscheidung wird trotzdem gespeichert und muss von jedem
- *                künftigen Skript abgefragt werden.
+ *   statistics — Reichweitenmessung: Vercel Web Analytics. Setzt KEINE
+ *                Cookies und legt keine geräteübergreifende Kennung an, wird
+ *                aber trotzdem erst nach ausdrücklicher Einwilligung geladen
+ *                (`components/consent/gated-analytics.tsx`). Cookiefrei heißt
+ *                nicht einwilligungsfrei — gemessen wird trotzdem.
  */
 
 export const CONSENT_STORAGE_KEY = "creadig_consent"
 
-/** Bei inhaltlichen Änderungen an den Kategorien hochzählen — dann wird neu gefragt. */
-export const CONSENT_VERSION = 1
+/**
+ * Bei inhaltlichen Änderungen an den Kategorien hochzählen — dann wird neu
+ * gefragt.
+ *
+ * 1 → 2 (GROW-2): Unter Version 1 stand bei `statistics` der Satz „Wir setzen
+ * derzeit keinen Analyse-Dienst ein." Das war zum Zeitpunkt der Zustimmung
+ * wahr und ist es jetzt nicht mehr. Eine Einwilligung, die sich auf eine
+ * andere Beschreibung bezog, gilt nicht weiter — also wird jeder noch einmal
+ * gefragt.
+ */
+export const CONSENT_VERSION = 2
 
 /** Fired auf `window`, sobald sich die Einwilligung ändert. */
 export const CONSENT_CHANGE_EVENT = "creadig:consent-change"

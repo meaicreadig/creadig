@@ -900,7 +900,7 @@ export const dictionary = {
         },
         statistics: {
           name: "Reichweitenmessung",
-          body: "Wir setzen derzeit keinen Analyse- oder Tracking-Dienst ein. Ihre Entscheidung wird gespeichert und gilt, falls sich das künftig ändert.",
+          body: "Vercel Web Analytics — misst anonym, wie oft welche Seite geöffnet wird und ob eine Anfrage zustande kam. Es werden keine Cookies gesetzt und keine geräteübergreifende Kennung angelegt. Ohne Ihre Einwilligung wird das Skript gar nicht erst geladen.",
         },
       },
     },
@@ -1674,7 +1674,7 @@ export const dictionary = {
         },
         statistics: {
           name: "Erişim ölçümü",
-          body: "Şu anda hiçbir analiz veya izleme hizmeti kullanmıyoruz. Kararınız yine de kaydedilir ve ileride bu değişirse geçerli olur.",
+          body: "Vercel Web Analytics — hangi sayfanın ne sıklıkla açıldığını ve bir talebin oluşup oluşmadığını anonim olarak ölçer. Çerez kullanılmaz, cihazlar arası kimlik oluşturulmaz. Onayınız olmadan betik hiç yüklenmez.",
         },
       },
     },
