@@ -3,6 +3,7 @@ import { UnternehmenPageBody } from "@/components/pages/unternehmen-page-body"
 import { Location } from "@/components/sections/location"
 import { dictionary } from "@/lib/dictionary"
 import { address, certifications } from "@/lib/site-data"
+import { jsonLdScript } from "@/lib/json-ld"
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://creadig.de"
 const copy = dictionary.de.unternehmenPage
@@ -77,7 +78,7 @@ export default function UnternehmenRoute() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <UnternehmenPageBody location={<Location />} />
     </>

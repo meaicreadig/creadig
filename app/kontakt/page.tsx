@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { KontaktPageBody } from "@/components/pages/kontakt-page-body"
 import { dictionary } from "@/lib/dictionary"
 import { address, contact } from "@/lib/site-data"
+import { jsonLdScript } from "@/lib/json-ld"
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://creadig.de"
 const copy = dictionary.de.kontaktPage
@@ -77,7 +78,7 @@ export default function KontaktRoute() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <KontaktPageBody />
     </>

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { ServicePageBody } from "@/components/service/service-page-body"
 import { findServicePage, publishedServicePages } from "@/lib/service-pages"
 import { address } from "@/lib/site-data"
+import { jsonLdScript } from "@/lib/json-ld"
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://creadig.de"
 
@@ -104,7 +105,7 @@ export default async function ServiceRoute({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <ServicePageBody page={page} />
     </>

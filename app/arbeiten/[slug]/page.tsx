@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { ArbeitPageBody } from "@/components/pages/arbeit-page-body"
 import { approvedCaseStudies, clientWorks } from "@/lib/site-data"
+import { jsonLdScript } from "@/lib/json-ld"
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://creadig.de"
 
@@ -79,7 +80,7 @@ export default async function ArbeitRoute({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <ArbeitPageBody work={work} study={study} />
     </>

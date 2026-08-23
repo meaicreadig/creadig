@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { InsightsPageBody } from "@/components/pages/insights-page-body"
 import { dictionary } from "@/lib/dictionary"
 import { publishedInsights } from "@/lib/insights"
+import { jsonLdScript } from "@/lib/json-ld"
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://creadig.de"
 const copy = dictionary.de.insightsPage
@@ -59,7 +60,7 @@ export default function InsightsRoute() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <InsightsPageBody />
     </>

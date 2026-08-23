@@ -18,6 +18,7 @@ import {
   socialProfiles,
 } from "@/lib/site-data"
 import { dictionary } from "@/lib/dictionary"
+import { jsonLdScript } from "@/lib/json-ld"
 
 // CEO-Entscheidung: Poppins — rund-geometrisch, passt zum Logo. Nicht Geist.
 const poppins = Poppins({
@@ -252,7 +253,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(organizationSchema) }}
         />
         <ThemeProvider>
           <LocaleProvider>

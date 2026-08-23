@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { ProduktPageBody } from "@/components/pages/produkt-page-body"
 import { productScreens } from "@/lib/product-media"
 import { productWorks } from "@/lib/site-data"
+import { jsonLdScript } from "@/lib/json-ld"
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://creadig.de"
 
@@ -105,7 +106,7 @@ export default async function ProduktRoute({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <ProduktPageBody product={product} screens={screens} />
     </>

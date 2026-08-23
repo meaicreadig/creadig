@@ -3,6 +3,7 @@ import { LeistungenPageBody } from "@/components/pages/leistungen-page-body"
 import { dictionary } from "@/lib/dictionary"
 import { publishedServicePages } from "@/lib/service-pages"
 import { address } from "@/lib/site-data"
+import { jsonLdScript } from "@/lib/json-ld"
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://creadig.de"
 const copy = dictionary.de.leistungenPage
@@ -104,7 +105,7 @@ export default function LeistungenRoute() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <LeistungenPageBody />
     </>

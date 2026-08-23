@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { ProduktePageBody } from "@/components/pages/produkte-page-body"
 import { dictionary } from "@/lib/dictionary"
 import { productWorks } from "@/lib/site-data"
+import { jsonLdScript } from "@/lib/json-ld"
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://creadig.de"
 const copy = dictionary.de.produktePage
@@ -53,7 +54,7 @@ export default function ProdukteRoute() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       <ProduktePageBody />
     </>
