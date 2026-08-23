@@ -548,16 +548,46 @@ export const aggregateRating =
     : null
 
 /* ==========================================================================
- * SOCIAL-PROFILE (E-K7)
+ * SOCIAL-PROFILE (E-K7 · GROW-4)
  *
  * Vorher standen im Footer drei tote Kästchen mit „IG / LI / YT" — sie sahen
  * aus wie Links, führten aber nirgendwohin. Ein toter Link ist schlechter als
  * kein Link: er verspricht eine Präsenz, die es nicht gibt.
  *
  * Leer = der Block verschwindet. Gefüllt = echte Links, die zugleich als
- * `sameAs` in die Organisations-Daten für Suchmaschinen gehen.
+ * `sameAs` in die Organisations-Daten für Suchmaschinen gehen. Beides hängt
+ * an dieser einen Liste; es gibt keine zweite Stelle, an der ein Profil
+ * stehen könnte.
  *
- * TODO (Owner): echte Profil-URLs eintragen oder es bei leer belassen.
+ * --------------------------------------------------------------------------
+ * WANN EIN PROFIL HIER REIN DARF (GROW-4)
+ * Drei Bedingungen, alle drei:
+ *   1. Es existiert und ist öffentlich erreichbar.
+ *   2. Es gehört creaDIG — nicht privat, nicht einem Produkt.
+ *   3. Es wird gepflegt. Ein Profil mit dem letzten Beitrag von 2021 ist als
+ *      Beleg schlechter als keines: Es beantwortet die Frage „läuft der
+ *      Laden noch?" mit nein.
+ * `sameAs` ist eine Identitätsangabe gegenüber Google. Ein Profil, das nicht
+ * uns gehört oder nicht gepflegt wird, ist dort keine Lücke, sondern eine
+ * falsche Angabe.
+ *
+ * Stand 23.08.2026: keine Profile freigegeben, die Liste bleibt leer, der
+ * Footer-Block erscheint nicht. Das ist der abgeschlossene Zustand von
+ * GROW-4 — nicht ein offener Punkt.
+ *
+ * --------------------------------------------------------------------------
+ * DIE ZWEITE HÄLFTE VON GROW-4 IST BEWUSST NICHT GEBAUT
+ * Das Audit nannte neben den Profilen einen „Lead-Magnet/Newsletter mit
+ * Double-Opt-in". Der ist hier nicht entstanden, und zwar aus einem Grund,
+ * der zur Sache gehört: Ein Newsletter-Feld verspricht Post. `/insights` hat
+ * bis heute keinen einzigen veröffentlichten Eintrag — wir hätten ein
+ * Anmeldefeld für eine Sendung gebaut, die es nicht gibt. Dazu käme ein
+ * weiterer Auftragsverarbeiter für eine Empfängerliste.
+ *
+ * Die Reihenfolge ist damit umgekehrt: erst der erste Insight, dann die
+ * Anmeldung. Die E-Mail-Erfassung, die heute schon trägt, steht ohnehin
+ * woanders — `product-interest.tsx` (FEAT-1) sammelt Interesse pro Produkt,
+ * und dort ist der Anlass echt.
  */
 export type SocialProfile = {
   /** Kürzel für die Kachel. */
