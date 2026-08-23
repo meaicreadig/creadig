@@ -40,3 +40,10 @@ design-mockup/
 # Build- und Tooling-Artefakte
 tsconfig.tsbuildinfo
 next-env.d.ts
+
+# D-1 — der Bildersatz aus `npm run shots`. Er wird bei jeder Aenderung neu
+# erzeugt und ist damit ein Artefakt, kein Quelltext: 44 PNGs in doppelter
+# Aufloesung sind zweistellige Megabyte, die in jedem Klon und in jedem
+# Deployment mitreisen wuerden. Erzeugt wird er lokal, angesehen wird er
+# lokal.
+screenshots/

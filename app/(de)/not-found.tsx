@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import { SiteShell } from "@/components/site-shell"
 import { StatusPageBody } from "@/components/pages/status-page-body"
 import { dictionary } from "@/lib/dictionary"
 
@@ -23,21 +22,22 @@ export const metadata: Metadata = {
 }
 
 /*
- * WARUM HIER `SiteShell` STEHT UND NICHT DAS LAYOUT GREIFT
- * Next rendert eine `not-found`-Seite in einem Projekt mit MEHREREN
- * Wurzel-Layouts ohne jedes Layout — geprueft gegen `next start`: kein
- * <html lang>, kein <nav>, kein <footer>, nur der nackte Inhalt. Genau das
- * ist der englische Standard-Bildschirm, den BF-3 abschaffen soll.
+ * EIN UMWEG, DER SICH ERST IM BILD ZEIGTE
+ * Zwischendurch stand hier ein eigenes `SiteShell`, weil das Server-HTML
+ * dieser Seite weder <html lang> noch <nav> noch <footer> enthaelt: Next
+ * liefert bei `notFound()` in einem Projekt mit ZWEI Wurzel-Layouts nur eine
+ * Huelle aus und reicht den Inhalt als Stream nach. Aus dem gelieferten HTML
+ * allein sah es also so aus, als fehle das Layout.
  *
- * Deshalb rendert diese Seite das Geruest selbst. Sie bekommt damit dieselbe
- * Navigation, dieselbe Fusszeile, dieselben Schriften und dasselbe
- * <html lang> wie jede andere Seite — und behaelt den Status 404, den
- * `notFound()` gesetzt hat.
+ * Der erste Bildersatz aus `npm run shots` (D-1) hat es widerlegt: Auf dem
+ * Bild stand die Fusszeile ZWEIMAL. Das Layout greift also sehr wohl — nur
+ * eben erst im Browser. Das eigene Geruest war ein zweites obendrauf.
+ *
+ * Genau dafuer gibt es den Bildersatz: Diesen Fehler haette kein `curl` und
+ * kein Typpruefer gefunden.
  */
 export default function NotFound() {
   return (
-    <SiteShell locale="de">
-      <StatusPageBody locale="de" eyebrow={copy.eyebrow} title={copy.title} lead={copy.lead} />
-    </SiteShell>
+    <StatusPageBody locale="de" eyebrow={copy.eyebrow} title={copy.title} lead={copy.lead} />
   )
 }
