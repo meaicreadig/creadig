@@ -824,12 +824,17 @@ export const retainer = {
       "Hosting und Sicherheitsupdates",
       "Bis zu 2 Inhaltsänderungen im Monat",
       "Google-Unternehmensprofil aktuell halten",
+      /* BF-A11 — die Zusage aus der Preisleiter der Barrierefreiheits-Seite
+         steht hier im Leistungsumfang, nicht nur dort im Fliesstext. Eine
+         Zusage, die nur auf der Verkaufsseite steht, ist keine. */
+      "Barrierefreiheits-Lauf bei jeder Änderung, einmal im Jahr von Hand",
       "Rückruf am nächsten Werktag",
     ],
     tr: [
       "Hosting ve güvenlik güncellemeleri",
       "Ayda 2 içerik değişikliğine kadar",
       "Google işletme profilini güncel tutmak",
+      "Her değişiklikte erişilebilirlik geçişi, yılda bir kez elle",
       "Bir sonraki iş günü geri arama",
     ],
   } as { de: string[]; tr: string[] } | null,

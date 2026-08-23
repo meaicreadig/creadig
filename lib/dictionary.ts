@@ -792,6 +792,13 @@ export const dictionary = {
             "Karriere-Unterseite für Bewerber",
             "Google-Unternehmensprofil eingerichtet",
             "Anfrageformular, das wirklich zustellt",
+            /* BF-A11 — Barrierefreiheit ist Bestandteil des Pakets, nicht
+               Aufpreis. Wer neu baut, bekommt sie eingebaut; wer eine
+               bestehende Seite hat, bekommt Pruefung und Behebung als eigene
+               Leistung (/leistungen/barrierefreiheit-website). Eine zweite
+               Preiswelt entsteht dadurch nicht: Das beworbene Angebot bleibt
+               dieses Paket. */
+            "Barrierefreiheit nach WCAG 2.1 AA eingebaut statt nachgerüstet",
             "Texte — geschrieben, nicht als Hausaufgabe zurückgegeben",
             "Fotoauswahl und Bildaufbereitung",
           ],
@@ -1849,6 +1856,7 @@ export const dictionary = {
             "Başvuru sahipleri için kariyer alt sayfası",
             "Google işletme profili kurulumu",
             "Gerçekten ulaşan talep formu",
+            "WCAG 2.1 AA'ya göre erişilebilirlik baştan içeride, sonradan eklenmiş değil",
             "Metinler — size ödev olarak geri verilmez, biz yazarız",
             "Fotoğraf seçimi ve görsel hazırlığı",
           ],
