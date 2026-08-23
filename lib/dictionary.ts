@@ -571,14 +571,24 @@ export const dictionary = {
       /*
        * Die vier operativen Schritte (B4). Die drei Schritte darueber sind
        * Haltung; das hier ist der Ablauf, den jemand erlebt, der heute
-       * schreibt. Alle Angaben decken sich mit dem, was auch am Telefon
-       * gesagt wird — inklusive der 24 Stunden.
+       * schreibt.
+       *
+       * BF-8 — hier standen "24 Stunden". Eine Zusage, die ein Ein-Mann-Haus
+       * an einem Freitagabend, im Urlaub oder mitten in einer Auslieferung
+       * nicht halten kann, ist keine Zusage, sondern eine spaetere
+       * Enttaeuschung: Wer sie liest und am naechsten Tag nichts hoert, haelt
+       * uns fuer unzuverlaessig, bevor das erste Gespraech stattgefunden hat.
+       * Zwei Werktage sind haltbar — und werden fast immer unterboten.
+       *
+       * Dieselbe Frist steht in `contact.sentBody`, in `termin.done.reply`
+       * und in den Bestaetigungsmails (app/api/lead/route.ts). Wer sie hier
+       * aendert, aendert sie dort mit.
        */
       opsEyebrow: "Vom ersten Kontakt an",
       opsSteps: {
         request: {
           name: "Anfrage",
-          what: "Sie schreiben uns — per WhatsApp, über das Formular oder direkt mit einem Terminwunsch. Wir melden uns in der Regel innerhalb von 24 Stunden.",
+          what: "Sie schreiben uns — per WhatsApp, über das Formular oder direkt mit einem Terminwunsch. Wir melden uns innerhalb von zwei Werktagen.",
         },
         analysis: {
           name: "Analyse",
@@ -720,7 +730,7 @@ export const dictionary = {
       sending: "Wird gesendet …",
       sentTitle: "Ihre Anfrage ist angekommen.",
       sentBody:
-        "Wir melden uns am nächsten Werktag. Eine Bestätigung liegt in Ihrem Postfach — schauen Sie zur Sicherheit auch in den Spam-Ordner.",
+        "Wir melden uns innerhalb von zwei Werktagen. Eine Bestätigung liegt in Ihrem Postfach — schauen Sie zur Sicherheit auch in den Spam-Ordner.",
       errSendFailed:
         "Die Anfrage konnte gerade nicht zugestellt werden. Bitte versuchen Sie es noch einmal — oder nehmen Sie einen der Wege rechts.",
       errNotConfigured:
@@ -856,7 +866,7 @@ export const dictionary = {
       done: {
         title: "Terminwunsch erhalten.",
         lead: "Ihr Terminwunsch liegt bei uns im Postfach, eine Eingangsbestätigung ist per E-Mail unterwegs. Der Termin ist damit noch nicht gebucht — wir gleichen Ihre Wunschzeiten ab und bestätigen Ihnen verbindlich einen Termin.",
-        reply: "Wir melden uns am nächsten Werktag",
+        reply: "Wir melden uns innerhalb von zwei Werktagen",
         home: "Zurück zur Startseite",
         again: "Weiteren Terminwunsch senden",
       },
@@ -1497,7 +1507,7 @@ export const dictionary = {
       opsSteps: {
         request: {
           name: "Talep",
-          what: "Bize yazarsınız — WhatsApp'tan, form üzerinden ya da doğrudan bir randevu talebiyle. Genellikle 24 saat içinde döneriz.",
+          what: "Bize yazarsınız — WhatsApp'tan, form üzerinden ya da doğrudan bir randevu talebiyle. İki iş günü içinde size döneriz.",
         },
         analysis: {
           name: "Analiz",
@@ -1626,7 +1636,7 @@ export const dictionary = {
       sending: "Gönderiliyor …",
       sentTitle: "Talebiniz bize ulaştı.",
       sentBody:
-        "Bir sonraki iş günü size döneceğiz. Onay e-postası posta kutunuzda — güvenlik için spam klasörüne de bakın.",
+        "İki iş günü içinde size döneceğiz. Onay e-postası posta kutunuzda — güvenlik için spam klasörüne de bakın.",
       errSendFailed:
         "Talep şu anda iletilemedi. Lütfen tekrar deneyin — ya da sağdaki yollardan birini kullanın.",
       errNotConfigured:
@@ -1729,7 +1739,7 @@ export const dictionary = {
       done: {
         title: "Randevu talebiniz alındı.",
         lead: "Talebiniz posta kutumuzda, alındı onayı e-posta ile yolda. Randevu henüz kesinleşmedi — belirttiğiniz zamanları değerlendirip size bağlayıcı bir randevu onayı göndereceğiz.",
-        reply: "Bir sonraki iş günü size döneceğiz",
+        reply: "İki iş günü içinde size döneceğiz",
         home: "Ana sayfaya dön",
         again: "Yeni randevu talebi gönder",
       },

@@ -158,6 +158,32 @@ function headerSafe(value: string): string {
  */
 type ConfirmationKind = "kontakt" | "termin"
 
+/*
+ * BF-8 — die Reaktionszusage, an einer Stelle.
+ *
+ * Hier stand "am naechsten Werktag", an anderer Stelle "innerhalb von 24
+ * Stunden". Beides war zu eng: Ein Ein-Mann-Haus kann das an einem
+ * Freitagabend, im Urlaub oder mitten in einer Auslieferung nicht halten —
+ * und wer eine Frist liest, die verstreicht, haelt uns fuer unzuverlaessig,
+ * bevor das erste Gespraech stattgefunden hat. Zwei Werktage sind haltbar
+ * und werden fast immer unterboten.
+ *
+ * Dieselbe Frist steht auf der Seite in `dictionary.ts`
+ * (`process.opsSteps.request`, `contact.sentBody`, `termin.done.reply`).
+ * Wer sie hier aendert, aendert sie dort mit.
+ */
+const RESPONSE_TIME = {
+  de: "innerhalb von zwei Werktagen",
+  tr: "iki iş günü içinde",
+  /*
+   * Satzanfang getrennt gefuehrt statt per `toUpperCase()`: Im Tuerkischen
+   * wird aus kleinem i ein grosses İ, JavaScript macht daraus nach
+   * Standardregel ein I — ein anderer Buchstabe. Genau der Fehler, gegen den
+   * `<html lang="tr">` im Layout gesetzt wurde.
+   */
+  trSentenceStart: "İki iş günü içinde",
+} as const
+
 const SIGNATURE_DE = [
   "",
   "Herzliche Grüße",
@@ -184,7 +210,7 @@ const CONFIRMATION: Record<
           name ? `Guten Tag ${name},` : "Guten Tag,",
           "",
           "vielen Dank für Ihre Anfrage — sie ist bei uns angekommen.",
-          "Wir melden uns am nächsten Werktag bei Ihnen.",
+          `Wir melden uns ${RESPONSE_TIME.de} bei Ihnen.`,
           "",
           "Diese Nachricht ist eine automatische Bestätigung; Sie müssen darauf nicht antworten.",
           "Wenn es eilt, erreichen Sie uns direkt unter info@creadig.de.",
@@ -200,8 +226,8 @@ const CONFIRMATION: Record<
           "vielen Dank für Ihren Terminwunsch — er ist bei uns angekommen.",
           "",
           "Der Termin ist damit noch nicht gebucht: Wir gleichen Ihre Wunschzeiten ab",
-          "und bestätigen Ihnen verbindlich einen Termin. Wir melden uns am nächsten",
-          "Werktag bei Ihnen.",
+          `und bestätigen Ihnen verbindlich einen Termin. Wir melden uns ${RESPONSE_TIME.de}`,
+          "bei Ihnen.",
           "",
           "Diese Nachricht ist eine automatische Eingangsbestätigung; Sie müssen darauf",
           "nicht antworten. Wenn es eilt, erreichen Sie uns direkt unter info@creadig.de.",
@@ -217,7 +243,7 @@ const CONFIRMATION: Record<
           name ? `Merhaba ${name},` : "Merhaba,",
           "",
           "talebiniz için teşekkür ederiz — bize ulaştı.",
-          "Bir sonraki iş günü size döneceğiz.",
+          `${RESPONSE_TIME.trSentenceStart} size döneceğiz.`,
           "",
           "Bu mesaj otomatik bir onaydır; yanıtlamanız gerekmez.",
           "Acele bir durum varsa doğrudan info@creadig.de adresinden bize ulaşabilirsiniz.",
@@ -233,7 +259,7 @@ const CONFIRMATION: Record<
           "randevu talebiniz için teşekkür ederiz — bize ulaştı.",
           "",
           "Randevu henüz kesinleşmedi: Belirttiğiniz zamanları değerlendirip size",
-          "bağlayıcı bir randevu onayı göndereceğiz. Bir sonraki iş günü size döneceğiz.",
+          `bağlayıcı bir randevu onayı göndereceğiz. ${RESPONSE_TIME.trSentenceStart} size döneceğiz.`,
           "",
           "Bu mesaj otomatik bir alındı onayıdır; yanıtlamanız gerekmez.",
           "Acele bir durum varsa doğrudan info@creadig.de adresinden bize ulaşabilirsiniz.",
