@@ -849,11 +849,15 @@ export const dictionary = {
         },
         {
           title: "Hosting und Übermittlung in Drittländer",
-          body: "Diese Seite ist vollständig statisch und wird über das weltweite Content-Delivery-Netz von Vercel ausgeliefert — jeweils vom nächstgelegenen Standort. Eine Verarbeitung von Zugriffsdaten außerhalb der EU, insbesondere in den USA, ist deshalb nicht ausgeschlossen. Abgesichert ist sie über den Auftragsverarbeitungsvertrag mit Vercel Inc. einschließlich der EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Weitere Übermittlungen finden nicht statt: Wir binden keine Analyse-, Karten- oder Werbedienste ein und liefern alle Schriften lokal aus. Nutzen Sie den Kontaktweg über WhatsApp, gelten dafür zusätzlich die Bedingungen von Meta Platforms Ireland Ltd.",
+          body: "Diese Seite ist vollständig statisch und wird über das weltweite Content-Delivery-Netz von Vercel ausgeliefert — jeweils vom nächstgelegenen Standort. Eine Verarbeitung von Zugriffsdaten außerhalb der EU, insbesondere in den USA, ist deshalb nicht ausgeschlossen. Abgesichert ist sie über den Auftragsverarbeitungsvertrag mit Vercel Inc. einschließlich der EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Karten- und Werbedienste binden wir nicht ein und liefern alle Schriften lokal aus. Zur Reichweitenmessung setzen wir Vercel Web Analytics ein — cookiefrei, ohne geräteübergreifende Kennung und erst nach Ihrer ausdrücklichen Einwilligung; ohne sie wird das Skript nicht geladen. Nutzen Sie den Kontaktweg über WhatsApp, gelten dafür zusätzlich die Bedingungen von Meta Platforms Ireland Ltd.",
         },
         {
-          title: "Kontaktformular und Termin",
-          body: "Ihre Angaben werden nicht auf unserem Server gespeichert. Sie werden ausschließlich im Browser zu einer WhatsApp-Nachricht zusammengesetzt, die Sie selbst absenden. Damit gelten für den Versand die Bedingungen von WhatsApp (Meta Platforms Ireland Ltd.).",
+          title: "Kontaktformular, Termin und Produkt-Nachfrage",
+          body: "Wenn Sie eines unserer Formulare absenden, übermitteln wir Ihre Angaben — Name, Betrieb, E-Mail, Telefon und Ihre Nachricht — an unser Postfach info@creadig.de und schicken Ihnen eine Bestätigung. Für den Versand nutzen wir Resend (Resend Inc., USA) als Auftragsverarbeiter nach Art. 28 DSGVO, abgesichert über die EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Rechtsgrundlage ist Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO, die Sie vor dem Absenden ausdrücklich erteilen und jederzeit für die Zukunft widerrufen können. Eine Datenbank führen wir nicht: Ihre Anfrage liegt ausschließlich in unserem E-Mail-Postfach. Wählen Sie stattdessen den Weg über WhatsApp, gelten dafür die Bedingungen von Meta Platforms Ireland Ltd.",
+        },
+        {
+          title: "Wie lange wir etwas aufbewahren",
+          body: "Server-Logs löschen wir nach 30 Tagen. Anfragen über unsere Formulare bewahren wir bis zu 6 Monate nach dem letzten Kontakt auf und löschen sie danach; kommt ein Vertrag zustande, gelten die handels- und steuerrechtlichen Aufbewahrungsfristen von 6 bzw. 10 Jahren (§ 257 HGB, § 147 AO). Ihre Einwilligungs-Entscheidung bleibt im lokalen Speicher Ihres Browsers, bis Sie sie ändern oder die Browserdaten löschen.",
         },
         {
           title: "Schriften",
@@ -1623,11 +1627,15 @@ export const dictionary = {
         },
         {
           title: "Barındırma ve üçüncü ülkelere aktarım",
-          body: "Bu sayfa tamamen statiktir ve Vercel'in dünya çapındaki içerik dağıtım ağı üzerinden, her seferinde en yakın konumdan sunulur. Bu nedenle erişim verilerinin AB dışında, özellikle ABD'de işlenmesi ihtimali bulunur. Bu durum, Vercel Inc. ile yapılan veri işleyen sözleşmesi ve GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altına alınmıştır. Bunun dışında aktarım yapılmaz: analiz, harita veya reklam hizmeti kullanmıyoruz ve tüm yazı tiplerini yerel olarak sunuyoruz. İletişim için WhatsApp'ı kullanırsanız, ek olarak Meta Platforms Ireland Ltd. koşulları geçerlidir.",
+          body: "Bu sayfa tamamen statiktir ve Vercel'in dünya çapındaki içerik dağıtım ağı üzerinden, her seferinde en yakın konumdan sunulur. Bu nedenle erişim verilerinin AB dışında, özellikle ABD'de işlenmesi ihtimali bulunur. Bu durum, Vercel Inc. ile yapılan veri işleyen sözleşmesi ve GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altına alınmıştır. Harita ve reklam hizmeti kullanmıyoruz ve tüm yazı tiplerini yerel olarak sunuyoruz. Erişim ölçümü için Vercel Web Analytics kullanıyoruz — çerezsiz, cihazlar arası kimlik olmadan ve yalnızca açık onayınızdan sonra; onay yoksa betik hiç yüklenmez. İletişim için WhatsApp'ı kullanırsanız, ek olarak Meta Platforms Ireland Ltd. koşulları geçerlidir.",
         },
         {
-          title: "İletişim formu ve randevu",
-          body: "Bilgileriniz sunucumuzda saklanmaz. Yalnızca tarayıcınızda, sizin gönderdiğiniz bir WhatsApp mesajına dönüştürülür. Gönderim için WhatsApp (Meta Platforms Ireland Ltd.) koşulları geçerlidir.",
+          title: "İletişim formu, randevu ve ürün talebi",
+          body: "Formlarımızdan birini gönderdiğinizde bilgilerinizi — ad, işletme, e-posta, telefon ve mesajınız — info@creadig.de posta kutumuza iletiriz ve size bir onay göndeririz. Gönderim için GDPR Md. 28 uyarınca veri işleyenimiz olan Resend'i (Resend Inc., ABD) kullanırız; aktarım GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altındadır. Hukuki dayanak, göndermeden önce açıkça verdiğiniz ve geleceğe yönelik olarak istediğiniz zaman geri alabileceğiniz GDPR Md. 6/1-a onayınızdır. Veritabanı tutmuyoruz: talebiniz yalnızca e-posta kutumuzda bulunur. Bunun yerine WhatsApp yolunu seçerseniz Meta Platforms Ireland Ltd. koşulları geçerlidir.",
+        },
+        {
+          title: "Ne kadar süre saklıyoruz",
+          body: "Sunucu kayıtlarını 30 gün sonra sileriz. Formlar üzerinden gelen talepleri son temastan itibaren en fazla 6 ay saklar, ardından sileriz; bir sözleşme kurulursa ticaret ve vergi hukukundaki 6 ve 10 yıllık saklama süreleri geçerlidir (§ 257 HGB, § 147 AO). Onay kararınız, siz değiştirene ya da tarayıcı verilerini silene kadar tarayıcınızın yerel deposunda kalır.",
         },
         {
           title: "Yazı tipleri",
