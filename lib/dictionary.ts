@@ -530,6 +530,17 @@ export const dictionary = {
       boundaryWeLabel: "Das sagen wir zu",
       boundaryNotWeLabel: "Das sagen wir nicht zu",
       ownProofLabel: "Am eigenen Objekt geprüft",
+      /*
+       * BF-A10 — die Etiketten der Preisleiter.
+       *
+       * „Angebot nach der Pruefung" ist der wichtigste der drei: Ohne ihn
+       * liest jeder die Spanne als Preis, und wer 2.000 gelesen hat, hoert
+       * 3.400 als Aufschlag — auch wenn 3.400 der ehrliche Aufwand ist.
+       */
+      priceLadderLabel: "Was es kostet",
+      priceFixed: "Festpreis",
+      priceOffer: "Angebot nach der Prüfung",
+      priceMonthly: "je Monat",
       ctaTitle: "Passt das zu Ihrem Betrieb?",
       ctaBody: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sehen uns den Betrieb an und sagen ehrlich, ob wir helfen können.",
       ctaPrimary: "Kostenlose Erstberatung",
@@ -1646,6 +1657,10 @@ export const dictionary = {
       boundaryWeLabel: "Söz verdiklerimiz",
       boundaryNotWeLabel: "Söz vermediklerimiz",
       ownProofLabel: "Kendi sitemizde denetlendi",
+      priceLadderLabel: "Maliyeti",
+      priceFixed: "Sabit fiyat",
+      priceOffer: "Denetimden sonra teklif",
+      priceMonthly: "aylık",
       ctaTitle: "İşletmenize uygun mu?",
       ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmeye bakar ve yardımcı olabilir miyiz, dürüstçe söyleriz.",
       ctaPrimary: "Ücretsiz ilk görüşme",

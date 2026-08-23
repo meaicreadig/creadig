@@ -100,6 +100,31 @@ export type ServicePage = {
     body: Localized
     links: { label: Localized; href: string }[]
   }
+  /**
+   * BF-A10 — die Preisleiter dieser Leistung.
+   *
+   * Nur dort, wo die Leistung VOR dem Paket steht und einen eigenen Einstieg
+   * hat. Sie macht keine zweite Preiswelt auf: Das beworbene Angebot bleibt
+   * das Website-Paket (`packageKeys`, Preis ausschliesslich auf
+   * `/leistungen#pakete`). Was hier steht, ist der Einstieg davor — eine
+   * Prüfung zum Festpreis, eine Behebung, die erst nach der Prüfung beziffert
+   * wird, und die laufende Betreuung, die es ohnehin schon gibt.
+   *
+   * `kind` entscheidet, welches Etikett am Preis steht. Genau ein `fixed` je
+   * Seite: Ein zweiter Festpreis daneben ist keine Leiter mehr, sondern eine
+   * Auswahl — und die verschiebt das Gespräch von „was brauchen Sie" zu
+   * „was ist billiger".
+   */
+  priceLadder?: {
+    steps: {
+      key: string
+      price: Localized
+      kind: "fixed" | "offer" | "monthly"
+      title: Localized
+      body: Localized
+    }[]
+    note: Localized
+  }
   /** Pakete, in denen die Leistung enthalten ist. */
   packageKeys: "website"[]
   /**
@@ -474,6 +499,44 @@ export const servicePages: ServicePage[] = [
           href: "/barrierefreiheit",
         },
       ],
+    },
+    priceLadder: {
+      steps: [
+        {
+          key: "pruefung",
+          price: { de: "1.500 €", tr: "1.500 €" },
+          kind: "fixed",
+          title: { de: "Prüfung", tr: "Denetim" },
+          body: {
+            de: "Die vollständige Prüfung nach dem 12-Punkte-Raster: automatisiert über alle Hauptseiten, von Hand mit Tastatur und Screenreader, dazu der Befundbericht mit Seite, Element, Kriterium und Messwert je Fund. Der Bericht gehört Ihnen — auch wenn Sie danach jemand anderen beauftragen oder gar nichts tun.",
+            tr: "12 maddelik şablona göre eksiksiz denetim: tüm ana sayfalarda otomatik, elle klavye ve ekran okuyucuyla, ayrıca her bulgu için sayfa, öğe, ölçüt ve ölçülen değeri içeren bulgu raporu. Rapor sizindir — sonrasında başkasına verseniz de, hiçbir şey yapmasanız da.",
+          },
+        },
+        {
+          key: "behebung",
+          price: { de: "2.000–4.000 €", tr: "2.000–4.000 €" },
+          kind: "offer",
+          title: { de: "Behebung", tr: "Giderme" },
+          body: {
+            de: "Für Code, den wir noch nicht gesehen haben, nennen wir keinen Festpreis. Nach der Prüfung wissen wir, wie viel Arbeit darin steckt — dann bekommen Sie eine Zahl, und die steigt danach nicht mehr. Die Spanne ist Erfahrung aus dem eigenen Durchgang, kein Angebot.",
+            tr: "Henüz görmediğimiz bir kod için sabit fiyat vermeyiz. Denetimden sonra içinde ne kadar iş olduğunu biliriz — o zaman bir rakam alırsınız ve o rakam sonradan yükselmez. Aralık, kendi denetimimizden gelen deneyimdir; teklif değildir.",
+          },
+        },
+        {
+          key: "betreuung",
+          price: { de: "149 €", tr: "149 €" },
+          kind: "monthly",
+          title: { de: "Betreuung", tr: "Sürekli destek" },
+          body: {
+            de: "Kein neuer Posten, sondern die laufende Betreuung, die es ohnehin gibt: Darin läuft der automatisierte Barrierefreiheits-Lauf bei jeder Änderung mit — denn jede Änderung an einer Seite kann eine Barriere zurückbringen. Einmal im Jahr sehen wir zusätzlich von Hand nach.",
+            tr: "Yeni bir kalem değil, hâlihazırda var olan sürekli destek: İçinde otomatik erişilebilirlik geçişi her değişiklikte birlikte çalışır — çünkü sitedeki her değişiklik bir engeli geri getirebilir. Yılda bir kez ayrıca elle bakarız.",
+          },
+        },
+      ],
+      note: {
+        de: "Alle Preise netto, zzgl. 19 % USt. Die Prüfung ist der Einstieg und steht für sich: Sie verpflichtet zu keiner Behebung, und der Bericht bleibt bei Ihnen.",
+        tr: "Tüm fiyatlar nettir, %19 KDV hariç. Denetim giriş adımıdır ve tek başına durur: Hiçbir gidermeye mecbur bırakmaz, rapor sizde kalır.",
+      },
     },
     packageKeys: ["website"],
     packageNote: {

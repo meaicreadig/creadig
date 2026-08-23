@@ -280,6 +280,51 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
         </div>
 
         {/*
+          BF-A10 — die Preisleiter.
+
+          Volle Breite und nach den beiden Spalten, aus demselben Grund, aus
+          dem der Paketpreis aus der rechten Spalte verschwunden ist (BF-9):
+          Ein Preis, der neben „Arbeiten dazu" oder neben der Grenze der
+          Leistung steht, wird auf den Nachbarn bezogen. Hier steht er allein
+          und meint genau das, was danebensteht.
+
+          Genau EIN Festpreis: die Pruefung. Die Behebung traegt ein anderes
+          Etikett, und das ist keine Formulierung, sondern die Sache selbst —
+          fuer ungesehenen Code kann niemand einen Festpreis nennen, ohne
+          entweder zu raten oder Luft einzupreisen.
+        */}
+        {page.priceLadder && (
+          <Reveal delay={0.06}>
+            <div className="border-line mt-24 border-t pt-10">
+              <p className="eyebrow text-gold-text">{copy.priceLadderLabel}</p>
+              <div className="border-line bg-line mt-8 grid gap-px border md:grid-cols-3">
+                {page.priceLadder.steps.map((step) => (
+                  <div key={step.key} className="bg-surface flex flex-col gap-4 px-7 py-8">
+                    <h2 className="text-subhead text-lg">{step.title[locale]}</h2>
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                      <span className="type-stat">{step.price[locale]}</span>
+                      <span className="eyebrow text-muted-foreground">
+                        {step.kind === "fixed"
+                          ? copy.priceFixed
+                          : step.kind === "offer"
+                            ? copy.priceOffer
+                            : copy.priceMonthly}
+                      </span>
+                    </div>
+                    <p className="type-small text-muted-foreground text-pretty">
+                      {step.body[locale]}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <p className="type-small text-muted-foreground mt-7 text-pretty">
+                {page.priceLadder.note[locale]}
+              </p>
+            </div>
+          </Reveal>
+        )}
+
+        {/*
           BF-A8 — der Beweis am Objekt des Kunden.
 
           Er steht NACH der Leistungsbeschreibung und VOR dem allgemeinen
