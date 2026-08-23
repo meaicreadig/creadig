@@ -511,6 +511,17 @@ export const dictionary = {
       packagesCta: "Pakete und Preise ansehen",
       worksLabel: "Arbeiten dazu",
       worksCta: "Ganze Werkschau ansehen",
+      /*
+       * BF-A6 — die Grenze der eigenen Leistung, als eigener Abschnitt.
+       *
+       * Sie erscheint nur auf Seiten, die `boundary` fuehren (heute:
+       * Barrierefreiheit). Wer eine Pruefung verkauft, muss sagen, wo sie
+       * aufhoert — sonst kauft der Kunde eine Rechtsfolge, die niemand
+       * zugesagt hat, und misst uns spaeter daran.
+       */
+      boundaryLabel: "Was wir tun — und was nicht",
+      boundaryWeLabel: "Das sagen wir zu",
+      boundaryNotWeLabel: "Das sagen wir nicht zu",
       ctaTitle: "Passt das zu Ihrem Betrieb?",
       ctaBody: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sehen uns den Betrieb an und sagen ehrlich, ob wir helfen können.",
       ctaPrimary: "Kostenlose Erstberatung",
@@ -1580,6 +1591,9 @@ export const dictionary = {
       packagesCta: "Paketleri ve fiyatları gör",
       worksLabel: "İlgili işler",
       worksCta: "Tüm seçkiyi gör",
+      boundaryLabel: "Ne yaparız — ve ne yapmayız",
+      boundaryWeLabel: "Söz verdiklerimiz",
+      boundaryNotWeLabel: "Söz vermediklerimiz",
       ctaTitle: "İşletmenize uygun mu?",
       ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmeye bakar ve yardımcı olabilir miyiz, dürüstçe söyleriz.",
       ctaPrimary: "Ücretsiz ilk görüşme",

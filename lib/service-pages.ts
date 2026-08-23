@@ -68,6 +68,24 @@ export type ServicePage = {
   includes: { de: string[]; tr: string[] }
   /** Für wen — aus den Schwerpunkten und der „Für wen"-Zeile der Ebene. */
   forWhom: { de: string[]; tr: string[] }
+  /**
+   * BF-A6 — „Was wir tun, und was nicht."
+   *
+   * Optional, und bewusst nicht auf jeder Seite: Er gehört dorthin, wo die
+   * Grenze der eigenen Leistung Teil des Angebots ist. Bei Barrierefreiheit
+   * ist genau das der Fall — die technische Prüfung ist unsere Arbeit, die
+   * rechtliche Bewertung ist es nicht, und wer das nicht ausspricht, wird
+   * genau daran gemessen. Ein Kunde, der glaubt, er habe Rechtssicherheit
+   * gekauft, ist ein Rechtsstreit mit Ansage.
+   */
+  boundary?: {
+    /** Was wir zusagen. */
+    we: { de: string[]; tr: string[] }
+    /** Was wir ausdrücklich nicht zusagen — und wer es stattdessen tut. */
+    notWe: { de: string[]; tr: string[] }
+    /** Der eine Satz darunter: sachlich, ohne Drohung. */
+    note: Localized
+  }
   /** Pakete, in denen die Leistung enthalten ist. */
   packageKeys: "website"[]
   /**
@@ -380,6 +398,40 @@ export const servicePages: ServicePage[] = [
         "Zanaat, KOBİ ve gastronomi — ağırlık Almanya",
         "Mevcut bir sitesi olan ve önce durumunu öğrenmek isteyenler",
       ],
+    },
+    boundary: {
+      we: {
+        de: [
+          "Wir prüfen Ihre Seite nach WCAG 2.1 AA — von Hand, mit Tastatur und Screenreader, nicht nur mit einem Scanner.",
+          "Wir schreiben jeden Fund mit Seite, Element, Kriterium und Messwert auf, auch die unangenehmen.",
+          "Wir beheben die Funde im Code und prüfen danach erneut, mit Zahlen vorher und nachher.",
+          "Wir liefern Ihnen Erklärung und Feedback-Weg als technische Vorlage — Text und Struktur, fertig zum Einsetzen.",
+        ],
+        tr: [
+          "Sitenizi WCAG 2.1 AA ölçütlerine göre denetleriz — elle, klavye ve ekran okuyucuyla, yalnızca tarayıcı programla değil.",
+          "Her bulguyu sayfası, öğesi, ölçütü ve ölçülen değeriyle yazarız; rahatsız edici olanları da.",
+          "Bulguları kodda gideririz ve sonrasında öncesi–sonrası sayılarla yeniden denetleriz.",
+          "Erişilebilirlik beyanını ve geri bildirim yolunu teknik taslak olarak veririz — metin ve yapı, yerine konmaya hazır.",
+        ],
+      },
+      notWe: {
+        de: [
+          "Wir bewerten nicht, ob und wie das Gesetz für Ihren Betrieb gilt. Das ist eine Rechtsfrage, und die beantwortet Ihr Anwalt — nicht wir.",
+          "Wir geben die Erklärung zur Barrierefreiheit nicht frei. Wir liefern die Vorlage; veröffentlicht wird sie, nachdem Ihre Rechtsberatung sie gesehen hat.",
+          "Wir setzen kein Overlay ein und empfehlen keins. Ein Overlay legt eine Schicht über die Seite, statt die Barriere zu entfernen — darunter bleibt alles, wie es war.",
+          "Wir versprechen kein rechtliches Ergebnis. Zugesagt ist Prüfung und Umsetzung nach WCAG 2.1 AA, und nichts darüber hinaus.",
+        ],
+        tr: [
+          "Yasanın işletmeniz için geçerli olup olmadığını ve nasıl geçerli olduğunu biz değerlendirmeyiz. Bu bir hukuk sorusudur, yanıtını avukatınız verir.",
+          "Erişilebilirlik beyanını biz onaylamayız. Taslağı veririz; yayımlanması, hukuk danışmanınız gördükten sonra olur.",
+          "Overlay kullanmayız ve önermeyiz. Overlay, engeli kaldırmak yerine sitenin üzerine bir katman koyar — altındaki her şey olduğu gibi kalır.",
+          "Hukuki bir sonuç vaat etmeyiz. Verdiğimiz söz, WCAG 2.1 AA'ya göre denetim ve uygulamadır; fazlası değil.",
+        ],
+      },
+      note: {
+        de: "Das Barrierefreiheitsstärkungsgesetz gilt seit dem 28. Juni 2025. Wir nennen das Datum, weil es zur Sache gehört — nicht, um Druck zu machen. Der bessere Grund steht oben: der Kunde, der abbricht und nicht sagt, warum.",
+        tr: "Almanya'daki erişilebilirlik yasası (BFSG) 28 Haziran 2025'ten beri yürürlükte. Tarihi, konuya ait olduğu için yazıyoruz — baskı kurmak için değil. Daha iyi gerekçe yukarıda: yarıda bırakıp nedenini söylemeyen müşteri.",
+      },
     },
     packageKeys: ["website"],
     packageNote: {

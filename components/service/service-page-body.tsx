@@ -1,7 +1,7 @@
 "use client"
 
 import { LocaleLink as Link } from "@/components/ui/locale-link"
-import { ArrowUpRight, Check, ChevronRight } from "lucide-react"
+import { ArrowUpRight, Check, ChevronRight, Minus } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { SignatureMotif } from "@/components/brand/signature-motif"
@@ -84,6 +84,56 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                 ))}
               </ul>
             </Reveal>
+
+            {/*
+              BF-A6 — „Was wir tun, und was nicht."
+
+              Zwei Spalten, gleich gross, gleich ausfuehrlich. Die rechte ist
+              die wichtigere: Sie steht zwischen einem zufriedenen Kunden und
+              einem, der glaubt, er habe Rechtssicherheit gekauft. Kein Satz
+              hier verspricht ein rechtliches Ergebnis, und keiner droht mit
+              einem.
+            */}
+            {page.boundary && (
+              <Reveal delay={0.06} className="border-line mt-14 border-t pt-8">
+                <p className="eyebrow text-gold-text">{copy.boundaryLabel}</p>
+                <div className="mt-6 grid gap-x-10 gap-y-8 sm:grid-cols-2">
+                  <div>
+                    <h2 className="text-subhead text-lg">{copy.boundaryWeLabel}</h2>
+                    <ul className="mt-5 flex flex-col gap-4">
+                      {page.boundary.we[locale].map((item) => (
+                        <li key={item} className="flex gap-3.5">
+                          <Check className="text-gold mt-1 size-4 shrink-0" strokeWidth={1.5} />
+                          <span className="type-small text-foreground/85 text-pretty">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h2 className="text-subhead text-lg">{copy.boundaryNotWeLabel}</h2>
+                    <ul className="mt-5 flex flex-col gap-4">
+                      {page.boundary.notWe[locale].map((item) => (
+                        <li key={item} className="flex gap-3.5">
+                          {/* Kein Warn-Rot: Das hier ist keine Fehlermeldung,
+                              sondern eine Zusage darueber, was nicht dazugehoert. */}
+                          <Minus
+                            aria-hidden="true"
+                            className="text-muted-foreground mt-1 size-4 shrink-0"
+                            strokeWidth={1.5}
+                          />
+                          <span className="type-small text-muted-foreground text-pretty">
+                            {item}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <p className="type-small text-muted-foreground border-line mt-8 border-t pt-6 text-pretty">
+                  {page.boundary.note[locale]}
+                </p>
+              </Reveal>
+            )}
 
             {/* Der Prozess ist derselbe wie auf der Startseite — bewusst. */}
             <Reveal delay={0.08} className="border-line mt-14 border-t pt-8">
