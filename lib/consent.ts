@@ -22,11 +22,13 @@
  *   functional — Komfort: Sprachwahl (`creadig_lang`) und Erscheinungsbild
  *                (`creadig-theme`). Ohne Einwilligung gilt die Wahl nur für
  *                die laufende Sitzung.
- *   statistics — Reichweitenmessung: Vercel Web Analytics. Setzt KEINE
- *                Cookies und legt keine geräteübergreifende Kennung an, wird
- *                aber trotzdem erst nach ausdrücklicher Einwilligung geladen
- *                (`components/consent/gated-analytics.tsx`). Cookiefrei heißt
- *                nicht einwilligungsfrei — gemessen wird trotzdem.
+ *   statistics — Reichweitenmessung: Vercel Web Analytics und Vercel Speed
+ *                Insights (Ladezeiten echter Aufrufe). Beide setzen KEINE
+ *                Cookies und legen keine geräteübergreifende Kennung an,
+ *                werden aber trotzdem erst nach ausdrücklicher Einwilligung
+ *                geladen (`components/consent/gated-analytics.tsx`).
+ *                Cookiefrei heißt nicht einwilligungsfrei — gemessen wird
+ *                trotzdem.
  */
 
 export const CONSENT_STORAGE_KEY = "creadig_consent"
@@ -45,8 +47,13 @@ export const CONSENT_STORAGE_KEY = "creadig_consent"
  * den USA läuft. Eine Einwilligung nach Art. 49 Abs. 1 lit. a DSGVO ist nur
  * wirksam, wenn der Betroffene über das Drittland und dessen Risiken
  * unterrichtet wurde — das war sie nicht. Also wird erneut gefragt.
+ *
+ * 3 → 4 (TECH-7): Zur Reichweitenmessung kommt Vercel Speed Insights, das
+ * die Ladezeiten echter Aufrufe misst. Gleicher Anbieter, gleiche Kategorie,
+ * aber eine zweite Messung — wer der einen zugestimmt hat, hat der anderen
+ * nicht zugestimmt.
  */
-export const CONSENT_VERSION = 3
+export const CONSENT_VERSION = 4
 
 /** Fired auf `window`, sobald sich die Einwilligung ändert. */
 export const CONSENT_CHANGE_EVENT = "creadig:consent-change"

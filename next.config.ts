@@ -27,12 +27,19 @@ import type { NextConfig } from "next"
  *
  * ---------------------------------------------------------------------------
  * STUFE 2 — die vollstaendige Policy, vorerst NUR als Bericht
- * Sie blockiert nichts, meldet aber jeden Verstoss in der Browser-Konsole.
- * Damit laesst sich vor dem Livegang sehen, was wirklich geladen wird —
- * statt es zu raten und im Zweifel die Seite zu zerlegen. Umschalten auf
- * `Content-Security-Policy` gehoert auf die Live-Checkliste, nachdem die
- * Berichte einmal sauber waren.
+ * Sie blockiert nichts, meldet aber jeden Verstoss. Damit laesst sich vor dem
+ * Livegang sehen, was wirklich geladen wird — statt es zu raten und im
+ * Zweifel die Seite zu zerlegen. Umschalten auf `Content-Security-Policy`
+ * gehoert auf die Live-Checkliste, nachdem die Berichte einmal sauber waren.
+ *
+ * TECH-7: Gemeldet wird jetzt an `app/api/csp-report`, nicht mehr nur in die
+ * Konsole des Besuchers — die sieht hier niemand. Beide Meldewege stehen
+ * drin, weil die Browser sich nicht einig sind: `report-uri` ist veraltet,
+ * aber das Einzige, was Safari versteht; `report-to` ist der Nachfolger und
+ * braucht zusaetzlich den `Reporting-Endpoints`-Header.
  */
+const CSP_REPORT_ENDPOINT = "/api/csp-report"
+
 const CSP_ENFORCED = [
   "object-src 'none'",
   "base-uri 'self'",
@@ -58,6 +65,8 @@ const CSP_REPORT_ONLY = [
   "form-action 'self'",
   "frame-ancestors 'none'",
   "upgrade-insecure-requests",
+  `report-uri ${CSP_REPORT_ENDPOINT}`,
+  "report-to csp",
 ].join("; ")
 
 const securityHeaders = [
@@ -82,6 +91,8 @@ const securityHeaders = [
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
   { key: "Content-Security-Policy", value: CSP_ENFORCED },
   { key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY },
+  // Ohne diesen Header ist `report-to csp` oben ein Name ohne Adresse.
+  { key: "Reporting-Endpoints", value: `csp="${CSP_REPORT_ENDPOINT}"` },
 ]
 
 const nextConfig: NextConfig = {

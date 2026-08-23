@@ -857,7 +857,7 @@ export const dictionary = {
         "Die markierten Verträge hat der Inhaber noch nicht im jeweiligen Dashboard bestätigt und abgelegt. Wir schreiben deshalb nicht, dass sie bestehen — das holen wir vor dem Livegang nach.",
       processorPurposes: {
         vercel:
-          "Hosting, Auslieferung der Seite über das Content-Delivery-Netz, Server-Logs und — nach Ihrer Einwilligung — die cookiefreie Reichweitenmessung.",
+          "Hosting, Auslieferung der Seite über das Content-Delivery-Netz, Server-Logs und — nach Ihrer Einwilligung — die cookiefreie Reichweiten- und Ladezeit-Messung.",
         resend:
           "Zustellung der E-Mails aus unseren Formularen an unser Postfach und der Eingangsbestätigung an Sie.",
       },
@@ -868,7 +868,7 @@ export const dictionary = {
         },
         {
           title: "Hosting und Übermittlung in Drittländer",
-          body: "Diese Seite ist vollständig statisch und wird über das weltweite Content-Delivery-Netz von Vercel ausgeliefert — jeweils vom nächstgelegenen Standort. Eine Verarbeitung von Zugriffsdaten außerhalb der EU, insbesondere in den USA, ist deshalb nicht ausgeschlossen. Abgesichert ist sie über den Auftragsverarbeitungsvertrag mit Vercel Inc. einschließlich der EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Karten- und Werbedienste binden wir nicht ein und liefern alle Schriften lokal aus. Zur Reichweitenmessung setzen wir Vercel Web Analytics ein — cookiefrei, ohne geräteübergreifende Kennung und erst nach Ihrer ausdrücklichen Einwilligung; ohne sie wird das Skript nicht geladen. Nutzen Sie den Kontaktweg über WhatsApp, gelten dafür zusätzlich die Bedingungen von Meta Platforms Ireland Ltd.",
+          body: "Diese Seite ist vollständig statisch und wird über das weltweite Content-Delivery-Netz von Vercel ausgeliefert — jeweils vom nächstgelegenen Standort. Eine Verarbeitung von Zugriffsdaten außerhalb der EU, insbesondere in den USA, ist deshalb nicht ausgeschlossen. Abgesichert ist sie über den Auftragsverarbeitungsvertrag mit Vercel Inc. einschließlich der EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Karten- und Werbedienste binden wir nicht ein und liefern alle Schriften lokal aus. Zur Reichweitenmessung setzen wir Vercel Web Analytics und Vercel Speed Insights ein — cookiefrei, ohne geräteübergreifende Kennung und erst nach Ihrer ausdrücklichen Einwilligung; ohne sie wird kein Skript geladen. Nutzen Sie den Kontaktweg über WhatsApp, gelten dafür zusätzlich die Bedingungen von Meta Platforms Ireland Ltd.",
         },
         {
           title: "Kontaktformular, Termin und Produkt-Nachfrage",
@@ -927,7 +927,7 @@ export const dictionary = {
         },
         statistics: {
           name: "Reichweitenmessung",
-          body: "Vercel Web Analytics — misst anonym, wie oft welche Seite geöffnet wird und ob eine Anfrage zustande kam. Es werden keine Cookies gesetzt und keine geräteübergreifende Kennung angelegt. Ohne Ihre Einwilligung wird das Skript gar nicht erst geladen.",
+          body: "Vercel Web Analytics und Vercel Speed Insights — misst anonym, wie oft welche Seite geöffnet wird, ob eine Anfrage zustande kam und wie schnell die Seite bei Ihnen geladen hat. Es werden keine Cookies gesetzt und keine geräteübergreifende Kennung angelegt. Ohne Ihre Einwilligung wird kein Skript geladen.",
         },
       },
     },
@@ -1656,7 +1656,7 @@ export const dictionary = {
         "İşaretli sözleşmeleri işletme sahibi henüz ilgili panelde onaylayıp saklamadı. Bu yüzden var olduklarını yazmıyoruz — yayına almadan önce tamamlanacak.",
       processorPurposes: {
         vercel:
-          "Barındırma, sayfanın içerik dağıtım ağı üzerinden sunulması, sunucu kayıtları ve — onayınızdan sonra — çerezsiz erişim ölçümü.",
+          "Barındırma, sayfanın içerik dağıtım ağı üzerinden sunulması, sunucu kayıtları ve — onayınızdan sonra — çerezsiz erişim ve yüklenme süresi ölçümü.",
         resend:
           "Formlarımızdan çıkan e-postaların posta kutumuza ve alındı onayının size iletilmesi.",
       },
@@ -1667,7 +1667,7 @@ export const dictionary = {
         },
         {
           title: "Barındırma ve üçüncü ülkelere aktarım",
-          body: "Bu sayfa tamamen statiktir ve Vercel'in dünya çapındaki içerik dağıtım ağı üzerinden, her seferinde en yakın konumdan sunulur. Bu nedenle erişim verilerinin AB dışında, özellikle ABD'de işlenmesi ihtimali bulunur. Bu durum, Vercel Inc. ile yapılan veri işleyen sözleşmesi ve GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altına alınmıştır. Harita ve reklam hizmeti kullanmıyoruz ve tüm yazı tiplerini yerel olarak sunuyoruz. Erişim ölçümü için Vercel Web Analytics kullanıyoruz — çerezsiz, cihazlar arası kimlik olmadan ve yalnızca açık onayınızdan sonra; onay yoksa betik hiç yüklenmez. İletişim için WhatsApp'ı kullanırsanız, ek olarak Meta Platforms Ireland Ltd. koşulları geçerlidir.",
+          body: "Bu sayfa tamamen statiktir ve Vercel'in dünya çapındaki içerik dağıtım ağı üzerinden, her seferinde en yakın konumdan sunulur. Bu nedenle erişim verilerinin AB dışında, özellikle ABD'de işlenmesi ihtimali bulunur. Bu durum, Vercel Inc. ile yapılan veri işleyen sözleşmesi ve GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altına alınmıştır. Harita ve reklam hizmeti kullanmıyoruz ve tüm yazı tiplerini yerel olarak sunuyoruz. Erişim ölçümü için Vercel Web Analytics ve Vercel Speed Insights kullanıyoruz — çerezsiz, cihazlar arası kimlik olmadan ve yalnızca açık onayınızdan sonra; onay yoksa hiçbir betik yüklenmez. İletişim için WhatsApp'ı kullanırsanız, ek olarak Meta Platforms Ireland Ltd. koşulları geçerlidir.",
         },
         {
           title: "İletişim formu, randevu ve ürün talebi",
@@ -1723,7 +1723,7 @@ export const dictionary = {
         },
         statistics: {
           name: "Erişim ölçümü",
-          body: "Vercel Web Analytics — hangi sayfanın ne sıklıkla açıldığını ve bir talebin oluşup oluşmadığını anonim olarak ölçer. Çerez kullanılmaz, cihazlar arası kimlik oluşturulmaz. Onayınız olmadan betik hiç yüklenmez.",
+          body: "Vercel Web Analytics ve Vercel Speed Insights — hangi sayfanın ne sıklıkla açıldığını, bir talebin oluşup oluşmadığını ve sayfanın sizde ne kadar hızlı yüklendiğini anonim olarak ölçer. Çerez kullanılmaz, cihazlar arası kimlik oluşturulmaz. Onayınız olmadan hiçbir betik yüklenmez.",
         },
       },
     },

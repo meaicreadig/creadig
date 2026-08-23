@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import {
   CONSENT_CHANGE_EVENT,
   hasConsent,
@@ -9,7 +10,7 @@ import {
 } from "@/lib/consent"
 
 /**
- * GROW-2 — Reichweitenmessung, an die Einwilligung gehängt.
+ * GROW-2 / TECH-7 — Messung, an die Einwilligung gehängt.
  *
  * ---------------------------------------------------------------------------
  * WARUM ÜBERHAUPT MESSEN
@@ -40,6 +41,20 @@ import {
  * jeder noch einmal gefragt wird, der unter der alten Beschreibung
  * zugestimmt hat — die war zum Zeitpunkt der Zustimmung wahr und ist es
  * jetzt nicht mehr.
+ *
+ * ---------------------------------------------------------------------------
+ * TECH-7 — WARUM SPEED INSIGHTS DANEBEN STEHT
+ * Web Analytics sagt, WIE VIELE eine Seite geöffnet haben. Es sagt nicht, ob
+ * die Seite dabei schnell war. Genau das ist hier die offene Flanke: Diese
+ * Seite trägt große Bilder, Parallaxe und framer-motion — Dinge, die im
+ * Labor-Test (Lighthouse auf einem Entwicklerrechner) gut aussehen und auf
+ * einem Mobilgerät im Netz eines Handwerkers nicht. Speed Insights misst
+ * die Web Vitals ECHTER Aufrufe statt eines Laborlaufs, und erst damit ist
+ * eine Aussage über die Geschwindigkeit der Seite mehr als eine Vermutung.
+ *
+ * Es hängt an derselben Kategorie und derselben Einwilligung: Auch
+ * Vitals-Messwerte tragen IP und Seitenpfad, also gilt hier nichts anderes
+ * als für die Reichweitenmessung. Ohne Zustimmung wird kein Skript geladen.
  */
 export function GatedAnalytics() {
   const [allowed, setAllowed] = useState(false)
@@ -58,5 +73,10 @@ export function GatedAnalytics() {
 
   if (!allowed) return null
 
-  return <Analytics />
+  return (
+    <>
+      <Analytics />
+      <SpeedInsights />
+    </>
+  )
 }
