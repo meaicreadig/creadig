@@ -10,7 +10,8 @@
     "postbuild": "node scripts/check-function-size.mjs",
     "start": "next start",
     "lint": "eslint .",
-    "shots": "node scripts/screenshots.mjs"
+    "shots": "node scripts/screenshots.mjs",
+    "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.3",

@@ -1,0 +1,68 @@
+# BF-4 — das kleinste CI, das etwas beweist.
+#
+# ---------------------------------------------------------------------------
+# WARUM ES DAS BRAUCHT
+# Bis hierher lief jede Pruefung auf genau einem Rechner: dem des Bauenden.
+# Wer den Typpruefer vergisst, die Function-Groesse nicht misst oder eine
+# Route kaputt macht, merkt es im Zweifel erst im Deploy — oder gar nicht,
+# weil `next build` gruen ist und trotzdem eine halbe Seite 500 liefert.
+#
+# Vier Stufen, in dieser Reihenfolge, weil jede die naechste voraussetzt:
+#   1. Typen      tsc --noEmit
+#   2. Regeln     eslint
+#   3. Bauen      next build — und im postbuild das Function-Groessen-Gate,
+#                 das schon einmal ein nicht auslieferbares Deployment
+#                 verursacht hat (TECH-4)
+#   4. Antworten  scripts/smoke.mjs startet den gebauten Server und fragt
+#                 nach: Seiten, Fehlerseiten, Vorschaubild — und die drei
+#                 Huerden der Lead-Route
+#
+# Die letzte Pruefung ist die eigentliche Versicherung: Sie schlaegt fehl,
+# wenn jemand den Honeypot entfernt (gegengeprueft — ohne ihn antwortet die
+# Route mit 502 statt mit ok, weil sie bis zum Versand durchlaeuft).
+#
+# KEINE GEHEIMNISSE noetig: Der Rauchtest setzt sich einen absichtlich
+# ungueltigen Resend-Schluessel selbst. Nichts hier kann eine echte Mail
+# verschicken.
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      # Der Bildersatz (D-1) laeuft hier nicht — ohne diese Zeile luede
+      # `npm ci` trotzdem rund 400 MB Browser herunter.
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+      # Damit Canonicals und Vorschaubilder im Test dieselbe Adresse tragen
+      # wie spaeter live.
+      NEXT_PUBLIC_SITE_URL: "https://creadig.de"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typen
+        run: npx tsc --noEmit
+
+      - name: Regeln
+        run: npm run lint
+
+      # `npm run build` ruft im postbuild das Function-Groessen-Gate auf.
+      - name: Bauen und Function-Gate
+        run: npm run build
+
+      - name: Rauchtest
+        run: npm run smoke
