@@ -930,6 +930,64 @@ export const imprintDetails = {
  * Vollständig im Sinne der Pflichtangaben: Rechtsform, Umsatzsteuer-Status
  * (USt-IdNr. oder § 19-Hinweis) und § 18 Abs. 2 MStV liegen vor.
  */
+/**
+ * SEC-2 — wer im Auftrag von creaDIG Daten verarbeitet.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM DAS EINE LISTE IST UND KEIN SATZ
+ * Bisher standen die Dienstleister verstreut in der Datenschutzerklaerung:
+ * Vercel unter „Server-Logs", Vercel noch einmal unter „Hosting", Resend im
+ * Formular-Absatz. Wer wissen will, wohin seine Daten gehen, muss dann drei
+ * Absaetze zusammensetzen — und wer die Seite pflegt, vergisst beim naechsten
+ * Dienst einen davon. Art. 30 DSGVO verlangt ohnehin ein Verzeichnis; das
+ * hier ist seine oeffentliche Seite, aus einer Quelle gespeist.
+ *
+ * ---------------------------------------------------------------------------
+ * `dpaConfirmed` IST EIN OWNER-FELD, KEIN CODE-FELD
+ * Ein Auftragsverarbeitungsvertrag ist nichts, was ein Entwickler behaupten
+ * kann. Solange der Owner ihn nicht im jeweiligen Dashboard bestaetigt und
+ * abgelegt hat, steht `false` — und die Seite schreibt dann nicht „es besteht
+ * ein Vertrag", sondern kennzeichnet die Zeile sichtbar als offen. Die
+ * Alternative waere, eine Rechtslage zu behaupten, die vielleicht nicht
+ * besteht; das ist genau die Sorte Satz, die im Ernstfall teuer wird.
+ *
+ * Beide Vertraege stehen auf der Live-Checkliste (Phase 5).
+ */
+export type Processor = {
+  /** Schluessel fuer die Zwecktexte in `dictionary.legal.processorPurposes`. */
+  key: "vercel" | "resend"
+  company: string
+  country: string
+  /** Rechtsgrundlage der Uebermittlung ins Drittland. */
+  safeguard: "scc"
+  /** Wo der Vertrag liegt — oeffentlich einsehbar. */
+  dpaUrl: string
+  /** Vom Owner im Dashboard bestaetigt und abgelegt? */
+  dpaConfirmed: boolean
+}
+
+export const processors: Processor[] = [
+  {
+    key: "vercel",
+    company: "Vercel Inc.",
+    country: "USA",
+    safeguard: "scc",
+    dpaUrl: "https://vercel.com/legal/dpa",
+    dpaConfirmed: false,
+  },
+  {
+    key: "resend",
+    company: "Resend Inc.",
+    country: "USA",
+    safeguard: "scc",
+    dpaUrl: "https://resend.com/legal/dpa",
+    dpaConfirmed: false,
+  },
+]
+
+/** Solange das `false` ist, bleibt der offene Hinweis auf der Seite stehen. */
+export const processorsConfirmed = processors.every((p) => p.dpaConfirmed)
+
 export const imprintComplete =
   Boolean(imprintDetails.legalForm) &&
   (Boolean(imprintDetails.vatId) || imprintDetails.smallBusiness === true) &&

@@ -841,7 +841,26 @@ export const dictionary = {
       pendingNote: "Zwei Angaben stehen noch aus und sind oben als Platzhalter gekennzeichnet: der Umsatzsteuer-Status (Identifikationsnummer nach § 27 a UStG oder Hinweis auf die Kleinunternehmerregelung nach § 19 UStG) und die deutsche Rufnummer. Beide ergänzen wir, sobald der Inhaber sie freigegeben hat. Anbieter, Anschrift, Rechtsform, Verantwortlicher nach § 18 Abs. 2 MStV und die Kontaktwege oben gelten bereits verbindlich.",
       responsible: "Verantwortlich für den Inhalt",
       contactLabel: "Kontakt",
-      privacyIntro: "Diese Seite ist bewusst schlank gebaut: Wir setzen kein Tracking, keine Werbe-Cookies und keine Analyse-Dienste ein.",
+      privacyIntro: "Diese Seite ist bewusst schlank gebaut: kein Tracking über Websites hinweg, keine Werbe-Cookies, keine Profilbildung. Was wir einsetzen, steht unten mit Namen — und die Reichweitenmessung lädt erst, wenn Sie sie erlaubt haben.",
+      /* SEC-2 — eine Liste statt drei verstreuter Absaetze. Quelle:
+         lib/site-data.ts `processors`. */
+      processorsLabel: "Wer in unserem Auftrag verarbeitet",
+      processorsIntro:
+        "Diese Dienstleister verarbeiten personenbezogene Daten für uns — weisungsgebunden, nach einem Vertrag über die Auftragsverarbeitung (Art. 28 DSGVO) und, weil sie in den USA sitzen, abgesichert über die EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Weiter geben wir nichts.",
+      processorPurposeLabel: "Wofür",
+      processorCountryLabel: "Sitz",
+      processorSafeguardLabel: "Grundlage",
+      processorSafeguardScc: "Auftragsverarbeitung nach Art. 28 DSGVO + EU-Standardvertragsklauseln",
+      processorDpaLink: "Vertrag ansehen",
+      processorPendingMark: "Bestätigung durch den Inhaber offen",
+      processorPendingNote:
+        "Die markierten Verträge hat der Inhaber noch nicht im jeweiligen Dashboard bestätigt und abgelegt. Wir schreiben deshalb nicht, dass sie bestehen — das holen wir vor dem Livegang nach.",
+      processorPurposes: {
+        vercel:
+          "Hosting, Auslieferung der Seite über das Content-Delivery-Netz, Server-Logs und — nach Ihrer Einwilligung — die cookiefreie Reichweitenmessung.",
+        resend:
+          "Zustellung der E-Mails aus unseren Formularen an unser Postfach und der Eingangsbestätigung an Sie.",
+      },
       privacyPoints: [
         {
           title: "Server-Logs",
@@ -1623,7 +1642,24 @@ export const dictionary = {
       pendingNote: "İki bilgi henüz eksik ve yukarıda yer tutucu olarak işaretlendi: KDV durumu (§ 27 a UStG uyarınca vergi kimlik numarası ya da § 19 UStG küçük işletme düzenlemesine ilişkin not) ve Almanya telefon numarası. İkisini de şirket sahibi onayladığı anda ekleyeceğiz. Yukarıdaki sağlayıcı, adres, şirket türü, § 18/2 MStV uyarınca sorumlu ve iletişim yolları şimdiden bağlayıcıdır.",
       responsible: "İçerikten sorumlu",
       contactLabel: "İletişim",
-      privacyIntro: "Bu sayfa bilinçli olarak sade kuruldu: izleme, reklam çerezi veya analiz hizmeti kullanmıyoruz.",
+      privacyIntro: "Bu sayfa bilinçli olarak sade kuruldu: siteler arası izleme yok, reklam çerezi yok, profil oluşturma yok. Kullandıklarımız aşağıda adıyla yazılı — ve erişim ölçümü ancak siz izin verdikten sonra yüklenir.",
+      processorsLabel: "Bizim adımıza kim işliyor",
+      processorsIntro:
+        "Bu hizmet sağlayıcılar kişisel verileri bizim için işler — talimatımıza bağlı olarak, veri işleyen sözleşmesi (GDPR Md. 28) kapsamında ve ABD'de bulundukları için GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altında. Bunun ötesinde hiçbir aktarım yapmıyoruz.",
+      processorPurposeLabel: "Ne için",
+      processorCountryLabel: "Merkez",
+      processorSafeguardLabel: "Dayanak",
+      processorSafeguardScc: "GDPR Md. 28 uyarınca veri işleme + AB standart sözleşme maddeleri",
+      processorDpaLink: "Sözleşmeyi görüntüle",
+      processorPendingMark: "İşletme sahibinin onayı bekleniyor",
+      processorPendingNote:
+        "İşaretli sözleşmeleri işletme sahibi henüz ilgili panelde onaylayıp saklamadı. Bu yüzden var olduklarını yazmıyoruz — yayına almadan önce tamamlanacak.",
+      processorPurposes: {
+        vercel:
+          "Barındırma, sayfanın içerik dağıtım ağı üzerinden sunulması, sunucu kayıtları ve — onayınızdan sonra — çerezsiz erişim ölçümü.",
+        resend:
+          "Formlarımızdan çıkan e-postaların posta kutumuza ve alındı onayının size iletilmesi.",
+      },
       privacyPoints: [
         {
           title: "Sunucu kayıtları",

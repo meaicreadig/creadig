@@ -3,7 +3,13 @@
 import Link from "next/link"
 import { ArrowLeft, SlidersHorizontal } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
-import { contact, imprintComplete, imprintDetails } from "@/lib/site-data"
+import {
+  contact,
+  imprintComplete,
+  imprintDetails,
+  processors,
+  processorsConfirmed,
+} from "@/lib/site-data"
 import { openConsentSettings } from "@/lib/consent"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -175,6 +181,64 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
                 </p>
               </section>
             ))}
+
+            {/*
+              SEC-2 — die Dienstleister an EINER Stelle, aus lib/site-data.ts.
+              Vorher standen sie verstreut in drei Absaetzen; wer wissen
+              wollte, wohin seine Daten gehen, musste sie zusammensuchen, und
+              wer die Seite pflegt, haette beim naechsten Dienst einen davon
+              vergessen.
+            */}
+            <section className="border-line border-t pt-8">
+              <p className="eyebrow text-gold-text">{t.legal.processorsLabel}</p>
+              <p className="type-body text-muted-foreground mt-4 text-pretty">
+                {t.legal.processorsIntro}
+              </p>
+
+              <ul className="mt-8 flex flex-col gap-px">
+                {processors.map((processor) => (
+                  <li key={processor.key} className="border-line border-t pt-5 pb-5">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <p className="text-foreground text-base font-semibold">
+                        {processor.company}
+                      </p>
+                      <span className="text-muted-foreground type-small font-mono">
+                        {processor.country}
+                      </span>
+                      {/* Kein behaupteter Vertrag: solange der Owner ihn nicht
+                          bestaetigt hat, steht das sichtbar dran. */}
+                      {!processor.dpaConfirmed && (
+                        <span className="border-gold/50 text-gold-text eyebrow border px-2 py-0.5">
+                          {t.legal.processorPendingMark}
+                        </span>
+                      )}
+                    </div>
+                    <p className="type-small text-muted-foreground mt-2.5 text-pretty">
+                      {t.legal.processorPurposes[processor.key]}
+                    </p>
+                    <p className="type-small text-muted-foreground/80 mt-2.5">
+                      {t.legal.processorSafeguardLabel}: {t.legal.processorSafeguardScc}
+                      {" · "}
+                      <a
+                        href={processor.dpaUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gold-text underline underline-offset-4 hover:opacity-80"
+                      >
+                        {t.legal.processorDpaLink}
+                      </a>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Faellt automatisch weg, sobald alle Vertraege bestaetigt sind. */}
+              {!processorsConfirmed && (
+                <p className="border-gold/40 bg-muted type-small text-muted-foreground mt-6 border-l-2 py-4 pl-5 text-pretty">
+                  {t.legal.processorPendingNote}
+                </p>
+              )}
+            </section>
 
             {/* Widerruf muss so leicht sein wie die Einwilligung. */}
             <section className="border-line border-t pt-8">
