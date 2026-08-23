@@ -91,6 +91,13 @@ const PAGES = [
   },
   /* BF-9 sitzt hier: Auf dieser Seite stehen Referenzen und Paketpreis. */
   { name: "10-leistung-detail", path: "/leistungen/webdesign" },
+  /* BF-A5 bis BF-A10 — die neue Einstiegsleistung, beide Sprachfassungen.
+     Sie traegt Grenze, Beleg, Preisleiter und Kurz-Check; ein Bildersatz
+     ohne sie zeigt eine Seite, die es so nicht mehr gibt. */
+  { name: "10b-barrierefreiheit-leistung", path: "/leistungen/barrierefreiheit-website" },
+  { name: "10c-barrierefreiheit-leistung-tr", path: "/tr/leistungen/barrierefreiheit-website" },
+  { name: "10d-insight-eigene-seite", path: "/insights/eigene-seite-geprueft" },
+  { name: "10e-insight-eigene-seite-tr", path: "/tr/insights/eigene-seite-geprueft" },
   { name: "11-barrierefreiheit", path: "/barrierefreiheit" },
   { name: "11b-barrierefreiheit-tr", path: "/tr/erisilebilirlik" },
   { name: "12-404", path: "/diese-adresse-gibt-es-nicht" },

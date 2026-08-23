@@ -125,11 +125,60 @@ gekennzeichnet — die Zeile steht unter der Werkschau.
 
 ---
 
+## MASTER-PROMPT 7 — Barrierefreiheit als Einstiegsleistung (23.08.2026)
+
+Stufe 1 war vorher erledigt (Raster, Eigenbefund, Behebung, eigene Erklärung).
+Stufen 2–4 in einem Durchgang, ein Commit je Teilschritt:
+
+- [x] **BF-A5** Leistungsseite `barrierefreiheit-website` im Datenmodell — DE + TR,
+      Sitemap, Einstiegs-Chip, eigener Canonical. Neu: `packageNote` (im Paket
+      eingebaut / eigene Leistung für bestehende Seiten).
+- [x] **BF-A6** „Was wir tun — und was nicht" als eigener Abschnitt. Die
+      rechtliche Bewertung und die Freigabe der Erklärung liegen ausdrücklich
+      beim Anwalt des Kunden; die Abgrenzung zum Overlay steht als Zusage da,
+      nicht als Beiwerk. Im gebauten HTML beider Sprachen gegengeprüft.
+- [x] **BF-A7** DE/TR-Parität als **Gate** (`scripts/check-parity.mjs`, läuft im
+      `postbuild`): gleiche Abschnitte, gleiche Punkte, Textmenge 0,80–1,25.
+      Gemessen 0,88–0,95. Gegenprobe gefahren.
+- [x] **BF-A8** Kurz-Check mit einem zusätzlichen Pflichtfeld (Website-Adresse),
+      derselbe Lead-Weg mit denselben drei Hürden. **Kein Scanner** — begründet
+      im Code. Eigene Bestätigungsmail DE + TR. Rauchtest um vier Prüfungen
+      erweitert.
+- [x] **BF-A9** Erster Insight-Artikel überhaupt: „Wir haben unsere eigene Seite
+      geprüft. Acht Mängel." Dazu das fehlende Gerüst — Detailseiten für
+      Insights (DE + TR), vier Textbausteine, BlogPosting-Daten, Sitemap.
+      `/insights` ist damit nicht mehr `noindex`.
+- [x] **BF-A10** Preisleiter: genau ein Festpreis (Prüfung 1.500 €), Behebung
+      2.000–4.000 € ausdrücklich als „Angebot nach der Prüfung", Betreuung
+      149 €/Monat als laufende Position.
+- [x] **BF-A11** Barrierefreiheit als benannte Zeile im Website-Paket und im
+      Betreuungsumfang. Keine zweite Preiswelt.
+- [x] **BF-A12** axe als CI-Schritt über 24 Routen (96 Durchläufe) — **plus eine
+      eigene Regel**: Ein Formularfeld, dessen einziger Name der Platzhalter ist,
+      gilt als Mangel. Gegengeprüft, dass axe genau diesen Fall NICHT meldet.
+
+**Bewusst nicht getan** (steht so im Prompt): kein automatischer öffentlicher
+Scanner, kein Overlay, keine Aussage über Bußgelder, Fristen oder Rechtsfolgen,
+nichts zur Handelsvertretung auf dieser Website.
+
+**Offen an `app/api/selftest/route.ts`:** unverändert. Der Selbsttest läuft in
+einer Serverless-Route ohne Browser — eine axe-Prüfung ist dort technisch nicht
+möglich. Sie gehört in die CI, und dort steht sie.
+
+---
+
 ## OWNER LIEFERT (kein Code — macht die Seite „wahr")
 - [ ] **SEC-1**: USt-IdNr **oder** § 19 · deutsche Rufnummer *(Rechtsform und § 18 MStV liegen vor)*
+- [ ] **Copy-Freigabe Master-Prompt 7**: Leistungsseite, Kurz-Check, Bestätigungsmail
+      und Insight-Artikel sind entworfen und gebaut, aber noch nicht gelesen
+      (Liste in `creadig-LIVE-CHECKLISTE.md`, Abschnitt A6)
+- [ ] **Kurz-Check-Kapazität**: Die Seite sagt „drei konkrete Punkte innerhalb von
+      zwei Werktagen" zu. Das ist Handarbeit — die Zusage hält nur, solange die
+      Menge dazu passt
 - [ ] **C-1 · Produkt-Screens**: echte meAI-Oberflächen → `public/works/products/meai/`
 - [ ] **C-2 · Referenzen**: NV SWISS und maqam — schriftliche Freigabe **und** je ein Satz Aufgabe/Ergebnis → `clientWorks[].approvalOnFile` / `.approvedSentence`
-- [ ] **S-1 · Insights**: zwei Fachartikel als Vertriebsmaterial → `lib/insights.ts`. **V-2 hängt daran.**
+- [x] **S-1 · Insights**: erster Artikel steht (BF-A9, DE + TR). Ein zweiter fehlt,
+      damit die Liste keine Ein-Zeilen-Liste ist — **V-2 ist nicht mehr blockiert**
 - [ ] **Bewertungen**: 3–5 echte Google-Bewertungen → `reviews`
 - [ ] **Vercel-AVV UND Resend-AVV** bestätigen/ablegen → `processors[].dpaConfirmed: true`
 - [ ] **Türkische Projekttexte**: `work.what` und `work.sector` gibt es nur auf Deutsch
@@ -139,5 +188,5 @@ gekennzeichnet — die Zeile steht unter der Werkschau.
 - [ ] **Produkt-Stände** prüfen (siehe D-2, Punkt 3)
 
 ---
-*Quelle: Vollaudit (4 Lanes + Roter Agent), 2026-08-22 · v0-Review und Master-Prompt 6, 2026-08-23.*
+*Quelle: Vollaudit (4 Lanes + Roter Agent), 2026-08-22 · v0-Review und Master-Prompt 6, 2026-08-23 · Master-Prompt 7 (Barrierefreiheit), 2026-08-23.*
 

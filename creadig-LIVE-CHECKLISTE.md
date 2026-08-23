@@ -1,6 +1,6 @@
 # creaDIG — vor dem Live-Flip nötig
 
-*Stand 23.08.2026 · nach Master-Prompt 6 (v0-Review, Stufen 1–4) · Branch `feat/system-haus-site`*
+*Stand 23.08.2026 · nach Master-Prompt 7 (Barrierefreiheit als Einstiegsleistung, Stufen 1–4) · Branch `feat/system-haus-site`*
 
 Die Seite ist gebaut und geprüft. Was hier steht, kann **kein Entwickler erledigen** —
 es sind Entscheidungen, Zugangsdaten und Inhalte des Inhabers. Abschnitt A blockiert
@@ -71,6 +71,23 @@ einen Erfolg zu melden, den es nicht gab — aber der Lead ist trotzdem weg.
 - Reaktionszusage **„innerhalb von zwei Werktagen" / „iki iş günü içinde"** —
   vom Inhaber freigegeben, überall gesetzt (BF-8).
 - Termin-Assistent fragt Wunschzeiten und bucht nichts (BF-1) — Copy freigegeben.
+- **Barrierefreiheit (Master-Prompt 7):** Prüfung **1.500 € Festpreis**, Behebung
+  **2.000–4.000 € als Angebot nach der Prüfung**, Betreuung **149 €/Monat** —
+  vom Inhaber am 23.08.2026 entschieden und gebaut (BF-A10). Keine zweite
+  Preiswelt: Das beworbene Angebot bleibt das Website-Paket.
+
+### A6 Neue Copy zur Freigabe (Master-Prompt 7)
+Alles Folgende ist entworfen und gebaut, aber **vom Inhaber noch nicht gelesen**.
+Es steht auf dem Branch, nicht live — nichts davon ist unumkehrbar.
+
+| Was | Wo | Wozu der Blick |
+|---|---|---|
+| Leistungsseite Barrierefreiheit, DE + TR | `lib/service-pages.ts` → `barrierefreiheit-website` | H1, Einleitung, „Was wir tun — und was nicht", Preisleiter |
+| Kurz-Check-Formular, DE + TR | `lib/dictionary.ts` → `quickCheck` | Zusage „drei konkrete Punkte", Grenze davor |
+| Bestätigungsmail Kurz-Check, DE + TR | `app/api/lead/route.ts` → `CONFIRMATION[*].kurzcheck` | Der Text, den jeder Anfragende garantiert liest |
+| Insight „Wir haben unsere eigene Seite geprüft" | `lib/insights.ts` | Der erste veröffentlichte Artikel überhaupt |
+| Neue Zeile im Website-Paket | `lib/dictionary.ts` → `packages.items.website.includes` | „Barrierefreiheit nach WCAG 2.1 AA eingebaut statt nachgerüstet" |
+| Neue Zeile im Betreuungsumfang | `lib/site-data.ts` → `retainer.includes` | „Barrierefreiheits-Lauf bei jeder Änderung, einmal im Jahr von Hand" — eine Zusage, die im Betrieb eingelöst werden muss |
 
 ---
 
@@ -118,10 +135,26 @@ türkisch. Geht erst nach A4, weil die Bildadresse aus `NEXT_PUBLIC_SITE_URL` ge
    müssen wechselseitig aufeinander zeigen.
 
 ### B6 CI beobachten
-`.github/workflows/ci.yml` läuft bei jedem Push: Typen, Regeln, Build,
-Function-Gate, Sterne-Gate und 17 Rauchtests gegen den gebauten Server. Ein roter
-Lauf ist kein Formfehler — er bedeutet, dass eine Seite nicht antwortet oder ein
-Schutz gefallen ist.
+`.github/workflows/ci.yml` läuft bei jedem Push: Typen, Regeln, Build
+(Function-Gate, Sterne-Gate, **Paritäts-Gate DE/TR**), **25 Rauchtests** gegen
+den gebauten Server und seit BF-A12 **96 axe-Durchläufe** über 24 Routen. Ein
+roter Lauf ist kein Formfehler — er bedeutet, dass eine Seite nicht antwortet,
+ein Schutz gefallen ist, eine Sprachfassung auseinanderläuft oder eine Barriere
+zurückgekommen ist.
+
+**Neu und wichtig:** Seit wir Barrierefreiheit verkaufen, ist ein axe-Verstoß auf
+der eigenen Seite kein Schönheitsfehler, sondern ein Widerspruch zum Angebot.
+Der Schritt darf nicht „vorübergehend" abgeschaltet werden.
+
+### B7 Erster echter Kurz-Check (BF-A8)
+Nach A3/A4 einmal über das Formular auf `/leistungen/barrierefreiheit-website`
+eine Anfrage mit der eigenen Adresse schicken und prüfen:
+1. Die Anfrage kommt an, Betreff enthält den Hostnamen der eingegebenen Seite.
+2. Die Bestätigungsmail trägt die **Kurz-Check-Fassung** (nicht die allgemeine)
+   und nennt die Grenze: drei Punkte, keine vollständige Prüfung, keine
+   rechtliche Bewertung.
+3. Die Antwort binnen zwei Werktagen ist ab dann eine Zusage, die gehalten
+   werden muss — der Kurz-Check ist Handarbeit, nicht Automatik.
 
 ---
 
@@ -136,7 +169,7 @@ dessen, was solange nicht rendert.
 | Echte meAI-Oberflächen (C-1) | `public/works/products/meai/` | Ohne sie zeigt die Produktseite keine Screenshots. Kein Mockup als Beweis. |
 | NV SWISS & maqam: schriftliche Freigabe + je ein Satz Aufgabe/Ergebnis (C-2) | `clientWorks[].approvalOnFile` / `.approvedSentence` | Die einzigen zwei Kundenwerke. Ohne Freigabe bleibt die Nennung dünn — und ohne den einen Satz sagt die Karte nicht, was wir dort gelöst haben. |
 | 3–5 echte Google-Bewertungen | `reviews` in `lib/site-data.ts` | Ohne sie kein `aggregateRating` — und das Sterne-Gate im Build lässt keinen Ersatz zu. |
-| Zwei Fachartikel (S-1) | `lib/insights.ts` | `/insights` nimmt sich selbst aus dem Index, solange nichts veröffentlicht ist. **V-2 (Lead-Magnet) hängt daran** und wartet. |
+| Weitere Fachartikel (S-1) | `lib/insights.ts` | Der erste steht seit BF-A9 („Wir haben unsere eigene Seite geprüft", DE + TR) — `/insights` ist damit indexierbar. **V-2 (Lead-Magnet) ist nicht mehr blockiert**, braucht aber einen zweiten Artikel, damit die Liste keine Ein-Zeilen-Liste ist. |
 | maqam: Umfang, Jahr, Region, Link | `clientWorks` | Steht heute ohne Link und ohne Bild in der Werkschau. |
 | Jahreszahlen der Arbeiten | `work.year` | Im Register steht sonst nichts. Ein geschätztes Jahr wäre erfunden. |
 | Weitere Kunden-Logos | `public/brand/clients/` | Sonst Monogramm statt Logo. |
@@ -183,5 +216,32 @@ dessen, was solange nicht rendert.
   mit aktiviertem „Bewegung reduzieren" über weite Strecken **leer** war.
   Beides behoben, beides nachgemessen.
 
+---
+
+## Nachtrag: was nach Master-Prompt 7 geprüft wurde (23.08.2026)
+
+**Automatisch**
+- `npm run build` grün, Function-Gate 23,5 MB von 200 MB, Sterne-Gate 0 von 47.
+- **Paritäts-Gate (neu, BF-A7):** sechs Leistungsseiten, DE gegen TR — gleiche
+  Abschnitte, gleiche Aufzählungspunkte, Textmenge im Verhältnis 0,88–0,95.
+  Gegenprobe: eine entfernte Zeile auf der türkischen Seite bricht den Build.
+- `npm run smoke`: **25 von 25**. Neu darin: beide Sprachfassungen der
+  Leistungsseite, `/insights` und der Artikel in beiden Sprachen, dazu drei
+  Prüfungen am Kurz-Check (ohne Adresse abgelehnt, unbrauchbare Adresse
+  abgelehnt, mit Adresse bis zum Versand durchgelaufen).
+- `npm run a11y`: **96 Durchläufe** über 24 Routen, keine Verletzung. Zwei
+  Gegenproben ausgelöst und zurückgenommen — Kontrast auf 2,39 : 1 (axe meldet),
+  Feldbeschriftung entfernt (die eigene Regel meldet; **axe meldet das nicht**,
+  weil der Platzhalter als Name gilt).
+- `tsc --noEmit` und `eslint` ohne Befund.
+
+**Von Hand**
+- Gebautes HTML beider Sprachfassungen der neuen Seite gegen die Verbotsliste
+  gefiltert: kein „rechtssicher", kein „garantiert", keine Bußgeldzahl, keine
+  Abmahnung, keine Behörde, keine Frist als Druckmittel. Genau **ein** Etikett
+  „Festpreis" am Preis.
+- `npm run shots`: **84 Aufnahmen**, darunter die neue Leistungsseite und der
+  Artikel in beiden Sprachen, je hell/dunkel und mobil/Desktop.
+
 **Was weiterhin offen ist:** die Punkte in A und C. Alles Technische aus dem
-v0-Review ist abgearbeitet.
+v0-Review und aus Master-Prompt 7 ist abgearbeitet.
