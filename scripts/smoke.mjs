@@ -77,6 +77,9 @@ async function run() {
     "/tr/kontakt",
     "/tr/leistungen/webdesign",
     "/tr/leistungen/barrierefreiheit-website",
+    "/insights",
+    "/insights/eigene-seite-geprueft",
+    "/tr/insights/eigene-seite-geprueft",
   ]) {
     await expectStatus(pathname, 200)
   }

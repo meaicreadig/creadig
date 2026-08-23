@@ -68,24 +68,40 @@ export function InsightsPageBody() {
               <ul className="flex flex-col">
                 {entries.map((entry, i) => (
                   <Reveal key={entry.slug} as="li" delay={0.05 * i} className="group">
-                    <article className="border-line relative border-t py-10 md:py-12">
-                      <span
-                        aria-hidden="true"
-                        className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
-                      />
-                      <div className="grid gap-x-10 gap-y-5 md:grid-cols-12 md:items-baseline">
-                        <div className="md:col-span-3">
-                          <p className="eyebrow text-gold-text">{entry.topic[locale]}</p>
-                          <p className="text-meta text-muted-foreground mt-3">{entry.date}</p>
+                    {/*
+                      Der ganze Eintrag ist der Link, nicht nur ein „Lesen"
+                      am Ende: Wer mit der Maus dorthin zielt, wo er hinsieht
+                      — auf die Ueberschrift —, soll ankommen. Der sichtbare
+                      Hinweis bleibt trotzdem stehen, damit erkennbar ist,
+                      dass es ueberhaupt weitergeht.
+                    */}
+                    <Link
+                      href={`/insights/${entry.slug}`}
+                      className="block focus-visible:outline-offset-4"
+                    >
+                      <article className="border-line relative border-t py-10 md:py-12">
+                        <span
+                          aria-hidden="true"
+                          className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                        />
+                        <div className="grid gap-x-10 gap-y-5 md:grid-cols-12 md:items-baseline">
+                          <div className="md:col-span-3">
+                            <p className="eyebrow text-gold-text">{entry.topic[locale]}</p>
+                            <p className="text-meta text-muted-foreground mt-3">{entry.date}</p>
+                          </div>
+                          <div className="md:col-span-9">
+                            <h3 className="type-h4">{entry.title[locale]}</h3>
+                            <p className="type-body text-muted-foreground mt-4 max-w-2xl text-pretty">
+                              {entry.teaser[locale]}
+                            </p>
+                            <span className="text-gold-text group-hover:text-foreground mt-5 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500">
+                              {copy.readLabel}
+                              <ArrowUpRight className="size-4" strokeWidth={1.5} />
+                            </span>
+                          </div>
                         </div>
-                        <div className="md:col-span-9">
-                          <h3 className="type-h4">{entry.title[locale]}</h3>
-                          <p className="type-body text-muted-foreground mt-4 max-w-2xl text-pretty">
-                            {entry.teaser[locale]}
-                          </p>
-                        </div>
-                      </div>
-                    </article>
+                      </article>
+                    </Link>
                   </Reveal>
                 ))}
               </ul>

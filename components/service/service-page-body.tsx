@@ -136,6 +136,35 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
               </Reveal>
             )}
 
+            {/*
+              BF-A9 — der Beleg statt des Versprechens.
+
+              Er steht direkt unter der Grenze der eigenen Leistung, und das
+              ist die richtige Reihenfolge: erst sagen, was wir nicht tun,
+              dann zeigen, dass wir das, was wir tun, an uns selbst gemacht
+              haben. Umgekehrt liest es sich wie Werbung mit Nachsatz.
+            */}
+            {page.ownProof && (
+              <Reveal delay={0.1} className="border-line mt-14 border-t pt-8">
+                <p className="eyebrow text-gold-text">{copy.ownProofLabel}</p>
+                <p className="type-body text-foreground/85 mt-6 text-pretty">
+                  {page.ownProof.body[locale]}
+                </p>
+                <div className="mt-7 flex flex-col gap-4">
+                  {page.ownProof.links.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+                    >
+                      {link.label[locale]}
+                      <ArrowUpRight className="size-4" strokeWidth={1.5} />
+                    </Link>
+                  ))}
+                </div>
+              </Reveal>
+            )}
+
             {/* Der Prozess ist derselbe wie auf der Startseite — bewusst. */}
             <Reveal delay={0.08} className="border-line mt-14 border-t pt-8">
               <p className="eyebrow text-gold-text">{copy.processLabel}</p>

@@ -86,6 +86,20 @@ export type ServicePage = {
     /** Der eine Satz darunter: sachlich, ohne Drohung. */
     note: Localized
   }
+  /**
+   * BF-A9 — der Beleg am eigenen Objekt.
+   *
+   * Eine Kundenreferenz gibt es hier nicht, und es wird auch keine erfunden:
+   * ohne schriftliche Freigabe kein Name. Was es gibt, ist die eigene Seite —
+   * geprüft, mit acht gefundenen Mängeln, offengelegt. Das ist der einzige
+   * Beleg, den wir ohne fremde Unterschrift zeigen dürfen, und für dieses
+   * Angebot der stärkere: Wer seine eigenen Mängel veröffentlicht, hat die
+   * Prüfung wirklich gemacht.
+   */
+  ownProof?: {
+    body: Localized
+    links: { label: Localized; href: string }[]
+  }
   /** Pakete, in denen die Leistung enthalten ist. */
   packageKeys: "website"[]
   /**
@@ -441,6 +455,25 @@ export const servicePages: ServicePage[] = [
         de: "Das Barrierefreiheitsstärkungsgesetz gilt seit dem 28. Juni 2025. Wir nennen das Datum, weil es zur Sache gehört — nicht, um Druck zu machen. Der bessere Grund steht oben: der Kunde, der abbricht und nicht sagt, warum.",
         tr: "Almanya'daki erişilebilirlik yasası (BFSG) 28 Haziran 2025'ten beri yürürlükte. Tarihi, konuya ait olduğu için yazıyoruz — baskı kurmak için değil. Daha iyi gerekçe yukarıda: yarıda bırakıp nedenini söylemeyen müşteri.",
       },
+    },
+    ownProof: {
+      body: {
+        de: "Wir haben unsere eigene Seite nach demselben Raster geprüft, bevor wir die Leistung angeboten haben. Acht Mängel, sieben davon erheblich — Fokus unsichtbar, keine Sprungmarke, ein Assistent, der beim Schrittwechsel schwieg. Alle behoben, im Code. Der Befund steht offen, mit Zahlen vorher und nachher.",
+        tr: "Bu hizmeti sunmadan önce kendi sitemizi aynı şablonla denetledik. Sekiz eksik, yedisi ciddi — görünmeyen odak, atlama bağlantısının olmaması, adım değiştirirken susan bir asistan. Hepsi kodun içinde giderildi. Bulgu, öncesi ve sonrası sayılarıyla açıkta duruyor.",
+      },
+      links: [
+        {
+          label: { de: "Der Befund: acht eigene Mängel", tr: "Bulgu: kendi sekiz eksiğimiz" },
+          href: "/insights/eigene-seite-geprueft",
+        },
+        {
+          label: {
+            de: "Unsere Erklärung zur Barrierefreiheit",
+            tr: "Erişilebilirlik beyanımız",
+          },
+          href: "/barrierefreiheit",
+        },
+      ],
     },
     packageKeys: ["website"],
     packageNote: {

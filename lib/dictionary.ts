@@ -100,6 +100,13 @@ export const dictionary = {
       emptyCtaProducts: "Was wir gebaut haben",
       emptyCtaWorks: "Zur Werkschau",
       readLabel: "Lesen",
+      /* BF-A9 — die Detailseite. Sie kam erst mit dem ersten Text, der
+         laenger ist als ein Anreisser. */
+      publishedLabel: "Veröffentlicht",
+      sourcesLabel: "Zum Nachschlagen",
+      sourceStatement: "Erklärung zur Barrierefreiheit dieser Seite",
+      sourceService: "Barrierefreiheit als Leistung",
+      backCta: "Alle Notizen",
     },
     /*
      * Kontaktseite (PHASE A, Master-Prompt 4 §7).
@@ -522,6 +529,7 @@ export const dictionary = {
       boundaryLabel: "Was wir tun — und was nicht",
       boundaryWeLabel: "Das sagen wir zu",
       boundaryNotWeLabel: "Das sagen wir nicht zu",
+      ownProofLabel: "Am eigenen Objekt geprüft",
       ctaTitle: "Passt das zu Ihrem Betrieb?",
       ctaBody: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sehen uns den Betrieb an und sagen ehrlich, ob wir helfen können.",
       ctaPrimary: "Kostenlose Erstberatung",
@@ -1322,6 +1330,11 @@ export const dictionary = {
       emptyCtaProducts: "Ne inşa ettik",
       emptyCtaWorks: "Seçkiye git",
       readLabel: "Oku",
+      publishedLabel: "Yayımlandı",
+      sourcesLabel: "Kaynaklar",
+      sourceStatement: "Bu sitenin erişilebilirlik beyanı",
+      sourceService: "Hizmet olarak erişilebilirlik",
+      backCta: "Tüm notlar",
     },
     kontaktPage: {
       eyebrow: "İletişim",
@@ -1632,6 +1645,7 @@ export const dictionary = {
       boundaryLabel: "Ne yaparız — ve ne yapmayız",
       boundaryWeLabel: "Söz verdiklerimiz",
       boundaryNotWeLabel: "Söz vermediklerimiz",
+      ownProofLabel: "Kendi sitemizde denetlendi",
       ctaTitle: "İşletmenize uygun mu?",
       ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmeye bakar ve yardımcı olabilir miyiz, dürüstçe söyleriz.",
       ctaPrimary: "Ücretsiz ilk görüşme",

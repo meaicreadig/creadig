@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next"
-import { publishedInsights } from "@/lib/insights"
+import { publishedInsights, readableInsights } from "@/lib/insights"
 import { publishedServicePages } from "@/lib/service-pages"
 import { clientWorks, productWorks } from "@/lib/site-data"
 import { localeUrl, locales } from "@/lib/routes"
@@ -69,6 +69,17 @@ const entries: Entry[] = [
   ...(publishedInsights.length > 0
     ? [{ path: "/insights", changeFrequency: "weekly" as const, priority: 0.6 }]
     : []),
+  /*
+   * BF-A9 — jede Notiz mit Fliesstext hat eine eigene Adresse und steht
+   * deshalb einzeln drin. Eintraege ohne Text (nur Anreisser in der Liste)
+   * haben keine Seite und duerfen hier auch nicht auftauchen — eine Sitemap,
+   * die auf 404 zeigt, ist schlimmer als eine unvollstaendige.
+   */
+  ...readableInsights.map((entry) => ({
+    path: `/insights/${entry.slug}`,
+    changeFrequency: "yearly" as const,
+    priority: 0.6,
+  })),
 
   { path: "/kontakt", changeFrequency: "monthly", priority: 0.9 },
   { path: "/termin", changeFrequency: "monthly", priority: 0.8 },
