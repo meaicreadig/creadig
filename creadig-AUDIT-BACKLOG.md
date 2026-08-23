@@ -22,17 +22,17 @@ Score = (Wirkung × Dringlichkeit) ÷ Personentage. Reihenfolge folgt Wirkung/Au
 - [x] **VIS-5** Riesen-Stats ohne Zahlen (Score 18 · 0,5 PT) → „A–Z"/„DE·CH" nicht als Stat; Doppelung Impact/CompanyTeaser auflösen.
 - [x] **UX-2** Kontaktformular ohne Erfolgs-Zustand (Score 18 · 0,5 PT) → `window.open`-Rückgabe prüfen + Inline-Bestätigung.
 - [x] **GROW-3** Preise positionieren als Agentur (Score 9 · 1 PT) → Pakete als „Einstieg", Architecture auf „ab"-Logik, Retainer sichtbar machen.
-- [ ] **UX-1** Startseite verankert keinen Beleg (Score 8 · 2 PT) → 1 echten Fall/echte Zahl auf die Startseite; leere gated Slots raus, bis Inhalt da.
+- [x] **UX-1** Startseite verankert keinen Beleg (Score 8 · 2 PT) → 1 echten Fall/echte Zahl auf die Startseite; leere gated Slots raus, bis Inhalt da.
 
 ## WELLE 3 — dieser Monat
-- [ ] **GROW-2** Keine Messung/Lead-Backup (Score 12,5 · 2 PT) → cookiefreies Analytics + Klick-Event + `app/api/lead`-Backup. *(greift mit Traffic)*
+- [x] **GROW-2** Keine Messung/Lead-Backup (Score 12,5 · 2 PT) → cookiefreies Analytics + Klick-Event + `app/api/lead`-Backup. *(greift mit Traffic)*
 - [ ] **TECH-6** Bilder ohne next/image (Score 12 · 0,5 PT) → Work-/Case-PNGs auf next/image bzw. WebP/AVIF.
 - [ ] **TECH-7** Observability/CSP (Score 8 · 0,5 PT) → Vercel Analytics/Speed-Insights + CSP (report-only → enforce).
 - [x] **VIS-2** Eine visuelle Frequenz (Score 6,7 · 3 PT) → 3 Sektions-Archetypen + Rhythmus + mehr als eine Mikro-Interaktion. *(eigentliche „Lebendigkeit"-Wurzel, teuer)*
-- [ ] **FEAT-1** Produkte ohne Nachfragepfad (Score 5,3 · 3 PT) → pro Produkt Warteliste/Demo + E-Mail-Erfassung. *(greift mit Traffic)*
+- [x] **FEAT-1** Produkte ohne Nachfragepfad (Score 5,3 · 3 PT) → pro Produkt Warteliste/Demo + E-Mail-Erfassung. *(greift mit Traffic)*
 - [ ] **GROW-1** TR-Inhalte SEO-unsichtbar (Score 4 · 5 PT) → `/tr/`-Routing + hreflang + TR-Sitemap. *(strategisch KRITISCH, wirkt erst nach Go-Live)*
 - [ ] **GROW-4** Keine E-Mail/Retention (Score 3 · 2 PT) → Lead-Magnet/Newsletter (Double-Opt-in) + echte Social-Profile.
-- [ ] **FEAT-3** KI-Assistent echt (Score 2 · 3 PT) → Claude-API-Anbindung oder auf WhatsApp-Widget reduzieren.
+- [x] **FEAT-3** KI-Assistent: Attrappe entfernt (TECH-5/P1-f). Eine echte Anbindung ist damit eine freie Entscheidung, kein Reparaturzwang mehr.
 - [ ] **SEC-2/3/4/5/7** DSGVO/Härtung (klein) → Vercel-AVV bestätigen · CSP · Art.49-Consent-Suffix · Speicherfristen · JSON-LD-Escaping.
 
 ## OWNER LIEFERT (kein Code — macht die Seite „wahr")

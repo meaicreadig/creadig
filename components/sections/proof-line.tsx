@@ -11,8 +11,9 @@ import { certifications } from "@/lib/site-data"
  *
  * Die ausführliche Zertifizierungs-Sektion mit Kacheln und Quellenlinks lebt
  * jetzt auf /unternehmen. Auf der Verteiler-Startseite steht davon nur noch
- * die eine Zeile: fünf Namen, durch Punkte getrennt, ein Link zum
- * Nachschlagen.
+ * die eine Zeile: die Namen, durch Punkte getrennt, ein Link zum
+ * Nachschlagen. Wie viele es sind, entscheidet `certifications` — seit
+ * go-digital dort raus ist, sind es vier.
  *
  * Warum überhaupt noch etwas: Es sind die einzigen Aussagen auf der ganzen
  * Seite, die jemand bei einer dritten Stelle überprüfen kann. Das ist zu viel
