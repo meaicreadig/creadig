@@ -95,6 +95,55 @@ const PAGES = [
   { name: "12-404-tr", path: "/tr/bu-adres-yok" },
 ]
 
+/*
+ * BF-A3 — der Tastaturpfad als Bild.
+ *
+ * Ein Fokus-Umriss laesst sich behaupten. Diese vier Aufnahmen zeigen ihn:
+ * die Sprungmarke als erste Station, den zuvor unsichtbaren Fokus auf dem
+ * Sprachumschalter, einen fokussierten Kalendertag und den Schritt, auf den
+ * der Fokus nach „Weiter" wandert. Ausschnitt statt ganzer Seite — ein
+ * Fokusrahmen ist auf 8.780 Pixel Hoehe nicht zu erkennen.
+ */
+const KEYBOARD_SHOTS = [
+  {
+    name: "k1-sprungmarke",
+    path: "/",
+    async act(page) {
+      await page.keyboard.press("Tab")
+    },
+  },
+  {
+    name: "k2-fokus-kopfleiste",
+    path: "/",
+    async act(page) {
+      for (let i = 0; i < 6; i++) await page.keyboard.press("Tab")
+    },
+  },
+  {
+    name: "k3-kalendertag-fokussiert",
+    path: "/termin",
+    async act(page) {
+      await page.getByRole("button", { name: "Kostenlose Erstberatung" }).first().click()
+      await page.getByRole("button", { name: "Weiter" }).click()
+      await page.waitForTimeout(400)
+      await page
+        .locator("button:not([disabled])")
+        .filter({ hasText: /^\d{1,2}$/ })
+        .last()
+        .focus()
+    },
+  },
+  {
+    name: "k4-fokus-nach-weiter",
+    path: "/termin",
+    async act(page) {
+      await page.getByRole("button", { name: "Kostenlose Erstberatung" }).first().click()
+      await page.getByRole("button", { name: "Weiter" }).click()
+      await page.waitForTimeout(600)
+    },
+  },
+]
+
 const VIEWPORTS = [
   { name: "desktop", width: 1440, height: 900, deviceScaleFactor: 2 },
   { name: "mobil", width: 390, height: 844, deviceScaleFactor: 2 },
@@ -270,6 +319,31 @@ async function main() {
         }
         await context.close()
       }
+    }
+
+    /* Tastaturpfad — eigener kleiner Satz, nur hell/Desktop, im Ausschnitt. */
+    if (!only) {
+      const dir = path.join(OUT, "tastaturpfad")
+      await mkdir(dir, { recursive: true })
+      const context = await browser.newContext({
+        viewport: { width: 1440, height: 900 },
+        deviceScaleFactor: 2,
+        reducedMotion: "reduce",
+        colorScheme: "light",
+        locale: "de-DE",
+      })
+      await context.addInitScript(seedScript("hell"))
+      const page = await context.newPage()
+      for (const entry of KEYBOARD_SHOTS) {
+        await page.goto(`${BASE}${entry.path}`, { waitUntil: "networkidle" })
+        await page.waitForTimeout(300)
+        await entry.act(page)
+        await page.waitForTimeout(300)
+        await page.screenshot({ path: path.join(dir, `${entry.name}.png`) })
+        written++
+        console.log(`  tastaturpfad  ${entry.name}`)
+      }
+      await context.close()
     }
 
     console.log(`\n${written} Aufnahmen in ${path.relative(ROOT, OUT)}/`)

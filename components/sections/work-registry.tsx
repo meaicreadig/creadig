@@ -79,7 +79,7 @@ export function WorkRegistry() {
         })}
       </ul>
 
-      <p className="text-muted-foreground/80 text-meta border-line mt-6 border-t pt-6">
+      <p className="text-muted-foreground text-meta border-line mt-6 border-t pt-6">
         {t.portfolio.registryNote}
       </p>
     </div>

@@ -231,7 +231,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
                     <p className="type-small text-muted-foreground mt-3 text-pretty">
                       {t.legal.processorPurposes[processor.key]}
                     </p>
-                    <p className="type-small text-muted-foreground/80 mt-2.5">
+                    <p className="type-small text-muted-foreground mt-2.5">
                       {t.legal.processorSafeguardLabel}: {t.legal.processorSafeguardScc}
                       {" · "}
                       <a
@@ -300,7 +300,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
               </p>
             </section>
 
-            <p className="text-muted-foreground/70 text-meta">
+            <p className="text-muted-foreground text-meta">
               {t.legal.privacyNote}
             </p>
           </div>

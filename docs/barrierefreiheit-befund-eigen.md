@@ -1,7 +1,7 @@
 # Befund: creadig.de gegen das eigene Prüfraster
 
 *Geprüft am 23.08.2026 · Raster: `docs/barrierefreiheit-pruefraster.md` (WCAG 2.1 AA)
-· Branch `feat/system-haus-site`, Stand vor BF-A3*
+· Branch `feat/system-haus-site` · Erstbefund vor BF-A3, Nachprüfung am Ende des Dokuments*
 
 ---
 
@@ -177,7 +177,44 @@ weniger wert ist. Nachgemessen nach der Behebung: alle Blöcke sofort sichtbar.
 
 ---
 
-## Nächster Schritt
+## Nachprüfung nach der Behebung (23.08.2026, BF-A3)
 
-Behebung nach BF-A3 — **im Code, nicht per Overlay**. Danach derselbe Lauf
-erneut, Ergebnis in diesem Dokument unter „Nachprüfung" ergänzen.
+Behoben **im Code**, kein Overlay, kein Plugin, kein Widget.
+
+| Fund | Behebung | Nachgemessen |
+|---|---|---|
+| F1 | `--gold-text` von `#8f6a33` auf `#87632f` | ≥ 4,74 : 1 auf allen fünf hellen Flächen |
+| F2 | Deckkraft 70/80 % auf Text entfernt (7 Stellen) | hell 5,18 : 1, dunkel 6,44 : 1 |
+| F3 | Platzhalter ohne Deckkraft | dieselben Werte wie F2 |
+| F4 | `:focus-visible` steht jetzt **außerhalb jeder Kaskadenschicht** | Sprachumschalter `2px solid`, Erscheinungsbild `3px solid`, WhatsApp `3px solid` — alle drei sichtbar |
+| F5 | Sprungmarke in `SiteShell`, Ziel `#inhalt` mit `tabIndex={-1}` | Erste Tab-Station, sichtbar, `Enter` setzt den Fokus auf `#inhalt` |
+| F6 | `aria-label` je Kalendertag aus Wochentag, Datum, Zustand | „Montag, 31. August 2026" |
+| F7 | Monats-Schaltflächen aus dem Wörterbuch | DE „Vorheriger Monat / Nächster Monat", TR „Önceki ay / Sonraki ay", Tag „Pazartesi, 31. Ağustos 2026" |
+| F8 | Fokus wandert auf die Überschrift des neuen Schritts, dazu eine höflich vorlesende Region | Fokus `H2 · Wann passt es Ihnen?`, Ansage „Schritt 2 von 4: Wann passt es Ihnen?" |
+
+**Automatisierter Lauf danach:** 68 Durchläufe, **keine** maschinell
+feststellbare Verletzung von WCAG 2.1 AA (vorher 11 Stellen).
+
+### Eine Korrektur an der Messung selbst
+
+Nach der Behebung meldete axe noch zwei Kontrastwerte — beide auf Seiten, deren
+deutsche Zwillingsseite bei identischem Markup bestand. Ursache war nicht die
+Seite, sondern die Messung: axe traf die eingeblendeten Abschnitte **mitten in
+der 0,9-Sekunden-Animation** und maß eine halb durchsichtige Fläche. Der Lauf
+misst jetzt mit „Bewegung reduzieren" — also den Endzustand, den ein Mensch
+sieht. Das ist im Skript begründet.
+
+Es wäre bequem gewesen, die zwei Werte als „Ausreißer" abzuhaken. Ein Befund,
+der Messfehler als Ergebnis ausgibt, ist genauso falsch wie einer, der Funde
+verschweigt.
+
+### Was weiterhin offen ist
+
+Unverändert die Punkte aus „Nicht geprüft" oben: kein Durchlauf mit einem
+blinden Nutzer, keine Vergrößerungssoftware, keine Sprachsteuerung. Der Befund
+sagt: **technisch konform nach WCAG 2.1 AA, soweit prüfbar** — er sagt nicht
+„barrierefrei", und er ersetzt keine rechtliche Bewertung.
+
+**Bildnachweis Tastaturpfad:** `screenshots/tastaturpfad/` (`npm run shots`) —
+Sprungmarke, Fokus in der Kopfleiste, fokussierter Kalendertag, Fokus nach
+„Weiter".

@@ -250,7 +250,7 @@ export default async function StatusPage({
                 </div>
                 <p className="type-small text-muted-foreground mt-2 text-pretty">{item.detail}</p>
                 {item.owner !== "—" && (
-                  <p className="text-meta text-muted-foreground/80 mt-2">{item.owner}</p>
+                  <p className="text-meta text-muted-foreground mt-2">{item.owner}</p>
                 )}
               </li>
             ))}

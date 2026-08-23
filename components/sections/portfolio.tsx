@@ -142,7 +142,7 @@ function WorkCard({
             {work.what}
           </p>
         </div>
-        <p className="eyebrow text-muted-foreground/80">{work.outcome}</p>
+        <p className="eyebrow text-muted-foreground">{work.outcome}</p>
       </div>
     </Link>
   );
@@ -307,7 +307,7 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
         </ul>
         {/* Gilt nur fuer die Karten — das Register zeigt keine Abbildungen. */}
         {view === "cards" && (
-          <p className="text-muted-foreground/80 text-meta mt-6">
+          <p className="text-muted-foreground text-meta mt-6">
             {t.portfolio.mockupNote}
           </p>
         )}

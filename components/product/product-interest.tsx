@@ -62,7 +62,7 @@ export function ProductInterest({
   const [error, setError] = useState<string | null>(null)
 
   const fieldClass =
-    "w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-3 text-base text-foreground outline-none transition-colors duration-300 placeholder:text-muted-foreground/60 focus:border-gold"
+    "w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-3 text-base text-foreground outline-none transition-colors duration-300 placeholder:text-muted-foreground focus:border-gold"
 
   if (status === "sent") {
     return (

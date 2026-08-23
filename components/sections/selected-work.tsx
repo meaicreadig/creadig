@@ -165,7 +165,7 @@ export function SelectedWork() {
           steht auch, was sie ist. */}
       <div className="section-gutter pb-20 md:pb-24">
         <Reveal delay={0.1}>
-          <p className="text-muted-foreground/80 text-meta border-line mt-16 border-t pt-6">
+          <p className="text-muted-foreground text-meta border-line mt-16 border-t pt-6">
             {t.portfolio.mockupNote}
           </p>
         </Reveal>

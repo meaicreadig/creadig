@@ -71,7 +71,14 @@
   --gold-soft: #e4c378;
   --gold-deep: #8f6a33;
   /* 4,7:1 auf #fbfbf9 — AA auch für Fließtext. */
-  --gold-text: #8f6a33;
+  /*
+   * BF-A3 / F1 — war #8f6a33. Auf der Standardflaeche reichte das knapp
+   * (4,74 : 1), auf jeder getoenten Flaeche nicht mehr: 4,26 im Impressum,
+   * 4,33 in der Werkschau, 4,34 auf der Kontaktseite. Kleiner Text braucht
+   * 4,5 : 1. Der neue Wert haelt auf ALLEN fuenf hellen Flaechen der Seite
+   * mindestens 4,74 : 1 und bleibt dieselbe Goldfamilie.
+   */
+  --gold-text: #87632f;
   /* Signatur-Motiv (Dreiecks-Mesh) */
   --mesh: #ded9d0;
   --mesh-fill: #be904e;
@@ -261,10 +268,34 @@
     color: var(--foreground);
   }
 
-  :focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 3px;
-  }
+}
+
+/*
+ * BF-A3 / F4 — DER SICHTBARE FOKUS, BEWUSST AUSSERHALB JEDER SCHICHT.
+ *
+ * Diese Regel stand in `@layer base`. Kaskadenschichten schlagen
+ * Spezifitaet: Jede Utility-Klasse gewinnt gegen jede Basis-Regel, egal wie
+ * spezifisch die ist. Und `components/ui/button.tsx` und `toggle.tsx`
+ * bringen aus ihrer Herkunftsbibliothek ein `outline-none` mit, das den
+ * Umriss durch einen Ring ersetzt — der in dieser Palette nicht gezeichnet
+ * wird.
+ *
+ * Gemessen im Tastaturdurchlauf: Sprachumschalter, Erscheinungsbild-Schalter
+ * und WhatsApp-Link hatten `outline-style: none` und einen durchsichtigen
+ * Schatten. Drei Bedienelemente ohne sichtbaren Fokus — auf JEDER Seite.
+ *
+ * Ungeschichtetes CSS steht ueber allen Schichten. Deshalb steht die Regel
+ * hier und nicht dort. Ein Fokus, den eine Gestaltungsentscheidung abschalten
+ * kann, ist kein Fokus.
+ *
+ * Warum `--gold-text` und nicht `--gold`: Der Umriss liegt durch den Versatz
+ * AUSSERHALB des Elements, also auf der Seitenflaeche. `--gold` erreicht dort
+ * nur 2,6 : 1 — unter den 3 : 1, die WCAG 1.4.11 fuer Bedienelemente
+ * verlangt. `--gold-text` erreicht 5,26 : 1 hell und 7,50 : 1 dunkel.
+ */
+:focus-visible {
+  outline: 2px solid var(--gold-text);
+  outline-offset: 3px;
 }
 
 /*

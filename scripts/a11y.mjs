@@ -144,9 +144,23 @@ try {
 
   for (const viewport of VIEWPORTS) {
     for (const theme of THEMES) {
+      /*
+       * `reducedMotion: "reduce"` ist hier eine MESSENTSCHEIDUNG, keine
+       * Bequemlichkeit: Die Seite blendet Abschnitte beim Scrollen ein
+       * (0,9 s). Ohne den Schalter misst axe mitten in der Animation und
+       * meldet Kontrastwerte einer halb durchsichtigen Flaeche — Werte, die
+       * es im fertigen Zustand nie gibt. Genau das ist passiert: Dieselbe
+       * Ueberschrift fiel auf /tr durch und auf / nicht, bei identischem
+       * Markup.
+       *
+       * Mit reduzierter Bewegung rendert `Reveal` den Endzustand sofort
+       * (siehe lib/use-prefers-reduced-motion.ts) — gemessen wird also, was
+       * ein Mensch sieht.
+       */
       const context = await browser.newContext({
         viewport: { width: viewport.width, height: viewport.height },
         colorScheme: theme === "dunkel" ? "dark" : "light",
+        reducedMotion: "reduce",
         locale: "de-DE",
       })
       await context.addInitScript(seedScript(theme))

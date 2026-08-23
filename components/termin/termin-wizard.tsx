@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useSearchParams } from "next/navigation"
 import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Clock, Send } from "lucide-react"
@@ -100,6 +100,25 @@ export function TerminWizard() {
   const [privacyOk, setPrivacyOk] = useState(false)
   const [sending, setSending] = useState(false)
 
+  /*
+   * BF-A3 / F8 — der Schrittwechsel war fuer Tastatur und Screenreader ein
+   * Loch.
+   *
+   * Gemessen: Nach „Weiter" tauschte der Assistent den Inhalt aus, scrollte
+   * nach oben — und liess den Fokus auf <body> fallen. Wer nur mit der
+   * Tastatur arbeitet, faengt danach wieder ganz vorn an. Und angesagt wurde
+   * gar nichts: Auf der Seite gab es keine einzige Live-Region. Man drueckte
+   * „Weiter" und hoerte Stille.
+   *
+   * Jetzt zwei Dinge zugleich: Der Fokus wandert auf die Ueberschrift des
+   * neuen Schritts (`tabIndex={-1}`, damit sie ihn ueberhaupt annehmen kann),
+   * und eine hoeflich vorlesende Region sagt Nummer und Titel an. Beides ist
+   * noetig — der Fokus fuer die Tastatur, die Ansage fuer den Screenreader.
+   */
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const [announcement, setAnnouncement] = useState("")
+  const firstRender = useRef(true)
+
   // „Heute" erst nach dem Mount bestimmen — sonst weichen Server- und
   // Client-Render voneinander ab.
   const [today, setToday] = useState<Date | null>(null)
@@ -146,7 +165,15 @@ export function TerminWizard() {
     const leading = firstDow === 0 ? 6 : firstDow - 1 // Woche beginnt montags
     const daysInMonth = new Date(year, month + 1, 0).getDate()
 
-    const cells: ({ day: number; key: string; past: boolean; preferred: boolean; today: boolean } | null)[] =
+    const cells: ({
+      day: number
+      key: string
+      past: boolean
+      preferred: boolean
+      today: boolean
+      /** Sprechender Name fuer Screenreader (BF-A3 / F6). */
+      label: string
+    } | null)[] =
       Array.from({ length: leading }, () => null)
 
     for (let day = 1; day <= daysInMonth; day++) {
@@ -160,9 +187,20 @@ export function TerminWizard() {
         past,
         preferred: PREFERRED_WEEKDAYS.includes(dowMon) && !past,
         today: date.getTime() === today.getTime(),
+        /*
+         * BF-A3 / F6 — die Schaltflaeche hiess fuer einen Screenreader nur
+         * „31". Ohne Monat, ohne Wochentag, ohne den Hinweis, dass dies einer
+         * unserer bevorzugten Gespraechstage ist. Der Name traegt das jetzt.
+         */
+        label: `${t.termin.step2.daysLong[dowMon]}, ${day}. ${t.termin.months[month]} ${year}`,
       })
     }
     return cells
+    // `t` haengt an der Sprache, und die Sprache wechselt nur ueber einen
+    // vollen Seitenwechsel (zwei Wurzel-Layouts, siehe site-shell.tsx). Die
+    // Monats- und Wochentagsnamen koennen sich waehrend der Lebensdauer
+    // dieser Komponente also nicht aendern.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cursor, today])
 
   /** Zurückblättern nur, solange der Monat nicht komplett in der Vergangenheit liegt. */
@@ -179,6 +217,31 @@ export function TerminWizard() {
       return { year: next.getFullYear(), month: next.getMonth() }
     })
   }
+
+  const stepTitle =
+    step === 1
+      ? t.termin.step1.title
+      : step === 2
+        ? t.termin.step2.title
+        : step === 3
+          ? t.termin.step3.title
+          : step === 4
+            ? t.termin.step4.title
+            : t.termin.done.title
+
+  useEffect(() => {
+    // Beim ersten Rendern nichts ansagen und nichts fokussieren — der Mensch
+    // hat den Assistenten gerade erst geoeffnet.
+    if (firstRender.current) {
+      firstRender.current = false
+      return
+    }
+    headingRef.current?.focus({ preventScroll: true })
+    setAnnouncement(
+      step === 5 ? t.termin.done.title : t.termin.stepAnnounce(step, stepTitle),
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step])
 
   const isChosen = (key: string) => dates.some((d) => d.key === key)
 
@@ -290,7 +353,7 @@ export function TerminWizard() {
   }
 
   const inputClass =
-    "w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-3 text-base text-foreground outline-none transition-colors duration-300 placeholder:text-muted-foreground/60 focus:border-gold"
+    "w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-3 text-base text-foreground outline-none transition-colors duration-300 placeholder:text-muted-foreground focus:border-gold"
   const invalidClass = "border-destructive focus:border-destructive"
 
   function field(key: keyof FormState) {
@@ -345,6 +408,15 @@ export function TerminWizard() {
           </div>
         </div>
 
+        {/*
+          Hoeflich vorlesende Region: Sie unterbricht nicht, sondern meldet
+          sich, wenn der Screenreader gerade Pause hat. Fuer den Schrittwechsel
+          ist das richtig — fuer Fehler ist es `role="alert"` weiter unten.
+        */}
+        <p aria-live="polite" role="status" className="sr-only">
+          {announcement}
+        </p>
+
         {error && (
           <p
             role="alert"
@@ -357,7 +429,9 @@ export function TerminWizard() {
         {/* ── Schritt 1: Art des Gesprächs ── */}
         {step === 1 && (
           <section className="mt-14">
-            <h2 className="text-display text-2xl">{t.termin.step1.title}</h2>
+            <h2 ref={headingRef} tabIndex={-1} className="text-display text-2xl outline-none">
+              {t.termin.step1.title}
+            </h2>
             <p className="type-body text-muted-foreground mt-3">{t.termin.step1.lead}</p>
 
             <div className="mt-8 grid gap-px sm:grid-cols-2">
@@ -419,7 +493,9 @@ export function TerminWizard() {
         {/* ── Schritt 2: Wunschtermin ── */}
         {step === 2 && (
           <section className="mt-14">
-            <h2 className="text-display text-2xl">{t.termin.step2.title}</h2>
+            <h2 ref={headingRef} tabIndex={-1} className="text-display text-2xl outline-none">
+              {t.termin.step2.title}
+            </h2>
             <p className="type-body text-muted-foreground mt-3 max-w-xl text-pretty">
               {t.termin.step2.lead}
             </p>
@@ -430,7 +506,7 @@ export function TerminWizard() {
                   type="button"
                   onClick={() => shiftMonth(-1)}
                   disabled={!canGoBack}
-                  aria-label="Vorheriger Monat"
+                  aria-label={t.termin.step2.prevMonth}
                   className="text-muted-foreground hover:text-gold-text disabled:pointer-events-none disabled:opacity-30"
                 >
                   <ChevronLeft className="size-5" strokeWidth={1.5} />
@@ -441,7 +517,7 @@ export function TerminWizard() {
                 <button
                   type="button"
                   onClick={() => shiftMonth(1)}
-                  aria-label="Nächster Monat"
+                  aria-label={t.termin.step2.nextMonth}
                   className="text-muted-foreground hover:text-gold-text"
                 >
                   <ChevronRight className="size-5" strokeWidth={1.5} />
@@ -467,6 +543,13 @@ export function TerminWizard() {
                       disabled={cell.past || (dates.length >= MAX_DATES && !isChosen(cell.key))}
                       onClick={() => toggleDate(cell)}
                       aria-pressed={isChosen(cell.key)}
+                      aria-label={[
+                        cell.label,
+                        cell.preferred ? t.termin.step2.dayPreferred : null,
+                        isChosen(cell.key) ? t.termin.step2.daySelected : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" — ")}
                       className={cn(
                         "relative flex aspect-square items-center justify-center text-sm transition-colors duration-300",
                         cell.past && "text-muted-foreground/35 pointer-events-none",
@@ -547,7 +630,9 @@ export function TerminWizard() {
         {/* ── Schritt 3: Angaben ── */}
         {step === 3 && (
           <section className="mt-14">
-            <h2 className="text-display text-2xl">{t.termin.step3.title}</h2>
+            <h2 ref={headingRef} tabIndex={-1} className="text-display text-2xl outline-none">
+              {t.termin.step3.title}
+            </h2>
             <p className="type-body text-muted-foreground mt-3">{t.termin.step3.lead}</p>
 
             <form
@@ -707,7 +792,9 @@ export function TerminWizard() {
         {/* ── Schritt 4: Zusammenfassung + WhatsApp ── */}
         {step === 4 && (
           <section className="mt-14">
-            <h2 className="text-display text-2xl">{t.termin.step4.title}</h2>
+            <h2 ref={headingRef} tabIndex={-1} className="text-display text-2xl outline-none">
+              {t.termin.step4.title}
+            </h2>
             <p className="type-body text-muted-foreground mt-3 max-w-xl text-pretty">
               {t.termin.step4.lead}
             </p>
@@ -830,7 +917,9 @@ export function TerminWizard() {
             >
               <Check className="size-6" strokeWidth={1.5} />
             </span>
-            <h2 className="type-h3 mt-8">{t.termin.done.title}</h2>
+            <h2 ref={headingRef} tabIndex={-1} className="type-h3 mt-8 outline-none">
+              {t.termin.done.title}
+            </h2>
             <p className="text-muted-foreground mt-5 max-w-xl text-base leading-relaxed text-pretty">
               {t.termin.done.lead}
             </p>

@@ -369,6 +369,15 @@ export const dictionary = {
       menuTitle: "Navigation",
       theme: "Erscheinungsbild wechseln",
       language: "Sprache wechseln",
+      /*
+       * BF-A3 / F5 — die Sprungmarke.
+       *
+       * Wer nur mit der Tastatur arbeitet, durchquerte bisher acht Stationen
+       * (Logo, vier Menuepunkte, Sprache, Erscheinungsbild, WhatsApp), bevor
+       * er im Inhalt ankam — auf JEDER Seite erneut. WCAG 2.4.1 verlangt
+       * genau dafuer einen Weg vorbei.
+       */
+      skipToContent: "Zum Inhalt springen",
     },
     hero: {
       eyebrow: "System-Haus · seit 2017 · Deutschland & Schweiz",
@@ -832,6 +841,8 @@ export const dictionary = {
       stepOf: "Schritt",
       next: "Weiter",
       prev: "Zurück",
+      /* BF-A3 / F8 — wird beim Schrittwechsel in einer Live-Region angesagt. */
+      stepAnnounce: (step: number, title: string) => `Schritt ${step} von 4: ${title}`,
       step1: {
         title: "Worum geht es?",
         lead: "Wählen Sie die Art des Gesprächs.",
@@ -869,6 +880,20 @@ export const dictionary = {
         preferred: "bevorzugt",
         today: "heute",
         maxDates: "Bis zu drei Tage auswählbar.",
+        /*
+         * BF-A3 / F6 + F7 — Beschriftungen fuer Screenreader.
+         *
+         * Die Tages-Schaltflaechen trugen nur die Zahl: „31, Schaltflaeche" —
+         * ohne Monat, ohne Wochentag, ohne den Zustand „gewaehlt". Und die
+         * beiden Monatspfeile standen mit deutschem `aria-label` HART im
+         * Markup; auf der tuerkischen Seite las ein Screenreader sie mit
+         * tuerkischer Aussprache vor.
+         */
+        prevMonth: "Vorheriger Monat",
+        nextMonth: "Nächster Monat",
+        daySelected: "ausgewählt",
+        dayPreferred: "bevorzugter Gesprächstag",
+        daysLong: ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"],
         notBooked:
           "Das ist noch keine Buchung. Wir prüfen Ihren Wunsch und bestätigen den Termin verbindlich per Rückmeldung.",
         errDate: "Bitte wählen Sie mindestens einen Tag.",
@@ -1347,6 +1372,7 @@ export const dictionary = {
       menuTitle: "Gezinme",
       theme: "Görünümü değiştir",
       language: "Dili değiştir",
+      skipToContent: "İçeriğe geç",
     },
     hero: {
       eyebrow: "Sistem evi · 2017'den beri · Almanya & İsviçre",
@@ -1733,6 +1759,7 @@ export const dictionary = {
       stepOf: "Adım",
       next: "Devam",
       prev: "Geri",
+      stepAnnounce: (step: number, title: string) => `4 adımdan ${step}. adım: ${title}`,
       step1: {
         title: "Konu nedir?",
         lead: "Görüşme türünü seçin.",
@@ -1756,6 +1783,11 @@ export const dictionary = {
         preferred: "tercihli",
         today: "bugün",
         maxDates: "En fazla üç gün seçilebilir.",
+        prevMonth: "Önceki ay",
+        nextMonth: "Sonraki ay",
+        daySelected: "seçildi",
+        dayPreferred: "tercih edilen görüşme günü",
+        daysLong: ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"],
         notBooked:
           "Bu henüz bir rezervasyon değildir. Talebinizi inceler ve randevuyu dönüşümüzde bağlayıcı olarak onaylarız.",
         errDate: "Lütfen en az bir gün seçin.",

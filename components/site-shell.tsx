@@ -291,8 +291,32 @@ export function SiteShell({
         />
         <ThemeProvider>
           <LocaleProvider locale={locale}>
+            {/*
+              BF-A3 / F5 — die Sprungmarke. Sie muss die ERSTE Station der
+              Tastatur sein, steht also vor der Navigation, und sie muss
+              sichtbar werden, sobald sie den Fokus hat: eine Sprungmarke, die
+              man nicht sieht, ist fuer Sehende mit Tastatur wertlos.
+
+              `sr-only` blendet sie aus, `focus:not-sr-only` holt sie zurueck.
+              Ziel ist `#inhalt`, das jede Seite ueber ihr <main> traegt.
+            */}
+            <a
+              href="#inhalt"
+              className="sr-only focus:not-sr-only focus:bg-background focus:text-foreground focus:border-gold focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:border focus:px-5 focus:py-3 focus:text-sm focus:tracking-wide"
+            >
+              {dictionary[locale].nav.skipToContent}
+            </a>
             <SiteNav />
-            {children}
+            {/*
+              `tabIndex={-1}` ist hier kein Zierrat: Ohne ihn springt der
+              Browser bei manchen Zielen nur die Bildlaufposition an und
+              laesst den Fokus stehen — der naechste Tastendruck faengt dann
+              wieder in der Navigation an, und die Sprungmarke haette nichts
+              bewirkt.
+            */}
+            <div id="inhalt" tabIndex={-1}>
+              {children}
+            </div>
             <SiteFooter />
             <StickyWhatsApp />
             <CookieConsent />
