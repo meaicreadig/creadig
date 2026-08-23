@@ -43,12 +43,66 @@ const BASE = `http://127.0.0.1:${PORT}`
 /** WCAG 2.1 AA — genau der Umfang, den das Prüfraster festlegt. */
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]
 
+/**
+ * BF-A12 — die Beschriftungsprüfung, die axe nicht leisten kann.
+ *
+ * ---------------------------------------------------------------------------
+ * GEGENGEPRÜFT, NICHT ANGENOMMEN
+ * Die Abnahme verlangt, dass der Lauf fehlschlägt, wenn jemand ein `label`
+ * entfernt. Also haben wir genau das getan: die Beschriftung des Adressfelds
+ * im Kurz-Check gelöscht und den Lauf gestartet. Ergebnis: **kein Befund** —
+ * weder über die WCAG-Marken noch mit dem vollen Regelsatz einschließlich
+ * „best practice". Der Platzhalter gilt als zugänglicher Name, und damit ist
+ * die Sache für ein automatisches Werkzeug erledigt.
+ *
+ * Für einen Menschen ist sie es nicht: Ein Name, der nur im Platzhalter
+ * steht, verschwindet in dem Moment, in dem jemand zu tippen anfängt. Wer
+ * beim vierten Feld nachsehen will, was oben verlangt war, findet nichts
+ * mehr. Punkt 5 des Prüfrasters verlangt deshalb eine echte Verknüpfung von
+ * `label` und `input` — und was das Raster verlangt, muss das Gate messen.
+ *
+ * Diese Prüfung läuft im Browser über jedes sichtbare Feld der Seite und
+ * fragt genau eine Sache: Hat es einen Namen, der nicht der Platzhalter ist?
+ * Sie läuft einmal je Route — ob ein Feld beschriftet ist, hängt weder vom
+ * Fenster noch vom Erscheinungsbild ab.
+ */
+async function unlabelledFields(page) {
+  return page.evaluate(() => {
+    const found = []
+    const fields = document.querySelectorAll(
+      "input:not([type=hidden]):not([type=submit]):not([type=button]), select, textarea",
+    )
+    for (const field of fields) {
+      const labelled =
+        (field.labels && field.labels.length > 0) ||
+        field.hasAttribute("aria-label") ||
+        field.hasAttribute("aria-labelledby")
+      if (labelled) continue
+      found.push(
+        field.id
+          ? `#${field.id}`
+          : `${field.tagName.toLowerCase()}[name="${field.getAttribute("name") ?? "?"}"]`,
+      )
+    }
+    return found
+  })
+}
+
 const ROUTES = [
   { name: "startseite", path: "/" },
   { name: "startseite-tr", path: "/tr" },
   { name: "leistungen", path: "/leistungen" },
   { name: "leistungen-tr", path: "/tr/leistungen" },
   { name: "leistung-detail", path: "/leistungen/webdesign" },
+  /* BF-A12 — die neue Einstiegsleistung steht im Lauf, und zwar in beiden
+     Sprachen: Sie traegt das einzige zusaetzliche Formular der Seite
+     (Kurz-Check) und damit genau die Mangelklasse, die am haeufigsten
+     auftritt — Feldbeschriftungen. */
+  { name: "barrierefreiheit-leistung", path: "/leistungen/barrierefreiheit-website" },
+  { name: "barrierefreiheit-leistung-tr", path: "/tr/leistungen/barrierefreiheit-website" },
+  { name: "insights", path: "/insights" },
+  { name: "insight-detail", path: "/insights/eigene-seite-geprueft" },
+  { name: "insight-detail-tr", path: "/tr/insights/eigene-seite-geprueft" },
   { name: "produkte", path: "/produkte" },
   { name: "produkt-detail", path: "/produkte/meai" },
   { name: "arbeiten", path: "/arbeiten" },
@@ -112,6 +166,23 @@ async function waitForServer(timeoutMs = 90_000) {
 }
 
 const asJson = process.argv.includes("--json")
+
+/**
+ * BF-A12 — ein einzelner Name aus der Liste oben, fuer die Gegenprobe.
+ *
+ *   A11Y_ONLY=kontakt npm run a11y
+ *
+ * Gebaut fuer den Fall, in dem man WISSEN will, ob das Gate ueberhaupt
+ * anschlaegt: ein `label` entfernen, den einen Lauf starten, Ergebnis lesen,
+ * zuruecknehmen. Ohne das dauert jede Gegenprobe alle Routen lang — und eine
+ * Gegenprobe, die zu lange dauert, macht niemand.
+ */
+const only = process.env.A11Y_ONLY?.trim()
+const routes = only ? ROUTES.filter((route) => route.name === only) : ROUTES
+if (only && routes.length === 0) {
+  console.error(`Keine Route mit dem Namen "${only}".`)
+  process.exit(2)
+}
 const findings = new Map()
 
 function record(violation, where) {
@@ -142,7 +213,21 @@ let checked = 0
 
 try {
   await waitForServer()
-  browser = await chromium.launch({ channel: "chrome" })
+  /*
+   * BF-A12 — dasselbe Skript laeuft auf dem Rechner des Bauenden und im CI.
+   *
+   * Lokal ist der installierte Chrome der richtige Browser: Er rendert, was
+   * ein Besucher sieht. Auf einem CI-Laeufer gibt es ihn nicht — dort steht
+   * das mitgelieferte Chromium bereit. Der Rueckfall wird angesagt und nicht
+   * verschwiegen: Es ist ein anderer Browser, auch wenn axe darin dieselben
+   * Regeln prueft.
+   */
+  try {
+    browser = await chromium.launch({ channel: "chrome" })
+  } catch {
+    if (!asJson) console.log("  (kein Chrome gefunden — Lauf mit dem mitgelieferten Chromium)")
+    browser = await chromium.launch()
+  }
 
   for (const viewport of VIEWPORTS) {
     for (const theme of THEMES) {
@@ -168,7 +253,7 @@ try {
       await context.addInitScript(seedScript(theme))
       const page = await context.newPage()
 
-      for (const route of ROUTES) {
+      for (const route of routes) {
         await page.goto(`${BASE}${route.path}`, { waitUntil: "networkidle" })
         if (route.act) await route.act(page)
         // Einblendungen aufloesen, sonst prueft axe unsichtbare Bloecke nicht.
@@ -184,11 +269,38 @@ try {
 
         const result = await new AxeBuilder({ page }).withTags(TAGS).analyze()
         checked++
-        for (const violation of result.violations) {
+        const violations = [...result.violations]
+
+        /*
+         * Die eigene Beschriftungsregel nur einmal je Route: Ob ein Feld
+         * beschriftet ist, haengt weder vom Fenster noch vom Erscheinungsbild
+         * ab. Sie viermal zu fahren kostet Laufzeit und beweist dreimal
+         * dasselbe.
+         */
+        if (viewport.name === "desktop" && theme === "hell") {
+          for (const selector of await unlabelledFields(page)) {
+            violations.push({
+              id: "eigene-regel-feldbeschriftung",
+              impact: "serious",
+              help: "Formularfeld ohne Beschriftung — ein Platzhalter ist kein Name",
+              tags: ["wcag2a", "wcag412", "raster-punkt-5"],
+              nodes: [
+                {
+                  target: [selector],
+                  failureSummary:
+                    "Das Feld hat weder ein verknuepftes label noch aria-label oder " +
+                    "aria-labelledby. Ein Platzhalter verschwindet beim Tippen.",
+                },
+              ],
+            })
+          }
+        }
+
+        for (const violation of violations) {
           record(violation, `${route.name} · ${viewport.name}/${theme}`)
         }
         if (!asJson) {
-          const count = result.violations.length
+          const count = violations.length
           console.log(
             `  ${count === 0 ? "ok  " : "FEHL"}  ${viewport.name}/${theme}  ${route.name}` +
               (count ? `  — ${count} Regel(n)` : ""),
@@ -214,9 +326,10 @@ if (asJson) {
     ),
   )
 } else {
-  console.log(`\n${checked} Durchläufe (${ROUTES.length} Routen × 2 Fenster × 2 Erscheinungsbilder)`)
+  console.log(`\n${checked} Durchläufe (${routes.length} Routen × 2 Fenster × 2 Erscheinungsbilder)`)
   if (list.length === 0) {
-    console.log("Keine maschinell feststellbare Verletzung von WCAG 2.1 AA.")
+    console.log("Keine maschinell feststellbare Verletzung von WCAG 2.1 AA,")
+    console.log("und jedes Formularfeld traegt eine echte Beschriftung.")
     console.log("Das heisst NICHT barrierefrei — die Handpruefung nach dem Raster bleibt.")
   } else {
     console.log(`\n${list.length} verschiedene Befunde:\n`)

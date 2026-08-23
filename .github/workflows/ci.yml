@@ -7,15 +7,20 @@
 # Route kaputt macht, merkt es im Zweifel erst im Deploy — oder gar nicht,
 # weil `next build` gruen ist und trotzdem eine halbe Seite 500 liefert.
 #
-# Vier Stufen, in dieser Reihenfolge, weil jede die naechste voraussetzt:
+# Fuenf Stufen, in dieser Reihenfolge, weil jede die naechste voraussetzt:
 #   1. Typen      tsc --noEmit
 #   2. Regeln     eslint
 #   3. Bauen      next build — und im postbuild das Function-Groessen-Gate,
 #                 das schon einmal ein nicht auslieferbares Deployment
-#                 verursacht hat (TECH-4)
+#                 verursacht hat (TECH-4), das Sterne-Gate und seit BF-A7
+#                 das Paritaets-Gate DE/TR
 #   4. Antworten  scripts/smoke.mjs startet den gebauten Server und fragt
-#                 nach: Seiten, Fehlerseiten, Vorschaubild — und die drei
-#                 Huerden der Lead-Route
+#                 nach: Seiten, Fehlerseiten, Vorschaubild — und die Huerden
+#                 der Lead-Route samt Pflichtfeld des Kurz-Checks
+#   5. Zugang     scripts/a11y.mjs faehrt axe ueber alle Hauptrouten (BF-A12).
+#                 Seit wir Barrierefreiheit verkaufen, ist ein Verstoss auf
+#                 der eigenen Seite kein Schoenheitsfehler mehr, sondern ein
+#                 Widerspruch zum Angebot.
 #
 # Die letzte Pruefung ist die eigentliche Versicherung: Sie schlaegt fehl,
 # wenn jemand den Honeypot entfernt (gegengeprueft — ohne ihn antwortet die
@@ -66,3 +71,24 @@ jobs:
 
       - name: Rauchtest
         run: npm run smoke
+
+      # BF-A12 — der Browser fuer die Barrierefreiheits-Pruefung. Die
+      # Umgebungsvariable oben verhindert nur den automatischen Download bei
+      # `npm ci`; hier holen wir genau einen Browser, absichtlich.
+      - name: Browser fuer die Barrierefreiheits-Pruefung
+        run: npx playwright install --with-deps chromium
+
+      # BF-A12 — axe ueber alle Hauptrouten, beide Sprachen, beide
+      # Erscheinungsbilder, zwei Fenstergroessen; dazu die eigene Regel, dass
+      # jedes Formularfeld eine echte Beschriftung traegt.
+      #
+      # Dass dieser Schritt den Build zum Scheitern bringt, ist der Zweck und
+      # kein Unfall: Wer eine Beschriftung entfernt oder einen Kontrast
+      # unterschreitet, soll es hier erfahren und nicht von einem Kunden,
+      # dem wir Barrierefreiheit verkauft haben.
+      #
+      # Gegengeprueft (beides einzeln ausgeloest und wieder zurueckgenommen):
+      #   Kontrast auf 2,39 : 1 gesetzt  -> color-contrast, 4 Durchlaeufe FEHL
+      #   Beschriftung entfernt          -> eigene-regel-feldbeschriftung, FEHL
+      - name: Barrierefreiheit (axe)
+        run: npm run a11y
