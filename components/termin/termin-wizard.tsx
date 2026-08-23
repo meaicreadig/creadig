@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import Link from "next/link"
+import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useSearchParams } from "next/navigation"
 import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Clock, Send } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"

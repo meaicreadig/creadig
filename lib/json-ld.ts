@@ -1,3 +1,6 @@
+import { dictionary, type Locale } from "@/lib/dictionary"
+import { localeUrl } from "@/lib/routes"
+
 /**
  * SEC-7 — strukturierte Daten sicher in ein <script>-Element schreiben.
  *
@@ -31,4 +34,39 @@ export function jsonLdScript(data: unknown): string {
     .replace(/</g, "\\u003c")
     .replace(/\u2028/g, "\\u2028")
     .replace(/\u2029/g, "\\u2029")
+}
+
+/**
+ * GROW-1 — die Brotkrume, zweisprachig und aus einer Quelle.
+ *
+ * Sie stand vorher in jeder Route noch einmal, jedes Mal mit dem hart
+ * geschriebenen Wort „Startseite". Auf `/tr/…` waere daraus eine deutsche
+ * Brotkrume ueber tuerkischem Inhalt geworden — und mit zehn Kopien haette
+ * man das an zehn Stellen uebersehen koennen.
+ *
+ * `trail` enthaelt die Stufen UNTER der Startseite, jeweils mit deutschem
+ * Basispfad; das Sprachpraefix setzt `localeUrl`.
+ */
+export function breadcrumbList(
+  locale: Locale,
+  trail: { name: string; path: string }[],
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: dictionary[locale].meta.breadcrumbHome,
+        item: localeUrl("/", locale),
+      },
+      ...trail.map((step, i) => ({
+        "@type": "ListItem",
+        position: i + 2,
+        name: step.name,
+        item: localeUrl(step.path, locale),
+      })),
+    ],
+  }
 }

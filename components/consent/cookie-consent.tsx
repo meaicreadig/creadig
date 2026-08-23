@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import Link from "next/link"
+import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { Check, ShieldCheck, SlidersHorizontal, X } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import {

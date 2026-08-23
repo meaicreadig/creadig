@@ -19,9 +19,12 @@
  * Was tatsächlich gespeichert wird:
  *   essential  — immer aktiv, nicht abwählbar: diese Einwilligung selbst
  *                (`creadig_consent`).
- *   functional — Komfort: Sprachwahl (`creadig_lang`) und Erscheinungsbild
- *                (`creadig-theme`). Ohne Einwilligung gilt die Wahl nur für
- *                die laufende Sitzung.
+ *   functional — Komfort: das Erscheinungsbild (`creadig-theme`). Ohne
+ *                Einwilligung gilt die Wahl nur für die laufende Sitzung.
+ *                Die Sprachwahl stand hier bis GROW-1 daneben; sie steht
+ *                jetzt in der URL (`/` gegen `/tr/…`) und wird gar nicht
+ *                mehr gespeichert — ein Eintrag weniger, für den überhaupt
+ *                eine Einwilligung nötig ist.
  *   statistics — Reichweitenmessung: Vercel Web Analytics und Vercel Speed
  *                Insights (Ladezeiten echter Aufrufe). Beide setzen KEINE
  *                Cookies und legen keine geräteübergreifende Kennung an,
@@ -52,8 +55,13 @@ export const CONSENT_STORAGE_KEY = "creadig_consent"
  * die Ladezeiten echter Aufrufe misst. Gleicher Anbieter, gleiche Kategorie,
  * aber eine zweite Messung — wer der einen zugestimmt hat, hat der anderen
  * nicht zugestimmt.
+ *
+ * 4 → 5 (GROW-1): Die Komfort-Kategorie speichert die Sprachwahl nicht mehr —
+ * sie steht in der URL. Die Beschreibung nennt jetzt weniger, als sie vorher
+ * nannte; auch das ist eine inhaltliche Änderung, und niemand soll unter
+ * einem Text zugestimmt haben, der nicht mehr gilt.
  */
-export const CONSENT_VERSION = 4
+export const CONSENT_VERSION = 5
 
 /** Fired auf `window`, sobald sich die Einwilligung ändert. */
 export const CONSENT_CHANGE_EVENT = "creadig:consent-change"
@@ -77,7 +85,7 @@ export const ACCEPT_ALL: ConsentChoice = { functional: true, statistics: true }
 export const ESSENTIAL_ONLY: ConsentChoice = { functional: false, statistics: false }
 
 /** Schlüssel, die von der Komfort-Kategorie abhängen — bei Widerruf entfernt. */
-const FUNCTIONAL_KEYS = ["creadig_lang", "creadig-theme"]
+const FUNCTIONAL_KEYS = ["creadig-theme"]
 
 function safeLocalStorage(): Storage | null {
   if (typeof window === "undefined") return null

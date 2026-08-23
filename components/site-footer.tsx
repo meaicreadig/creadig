@@ -1,7 +1,7 @@
 "use client"
 
 import { useLocale } from "@/components/locale-provider"
-import Link from "next/link"
+import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { Logo } from "@/components/brand/logo"
 import { SignatureMotif } from "@/components/brand/signature-motif"
 import { contact, navLinks, productWorks, socialProfiles } from "@/lib/site-data"

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/components/ui/locale-link";
 import { ArrowUpRight } from "lucide-react";
 import { SignatureMotif } from "@/components/brand/signature-motif";
 import { Reveal } from "@/components/ui/reveal";

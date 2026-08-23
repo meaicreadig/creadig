@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowDown, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"

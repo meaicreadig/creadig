@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import Link from "next/link"
+import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { motion, useReducedMotion } from "framer-motion"
 import { cn } from "@/lib/utils"
 

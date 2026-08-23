@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import Link from "next/link"
+import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"

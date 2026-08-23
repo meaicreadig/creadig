@@ -11,6 +11,27 @@ export const WHATSAPP_LINK =
 export const dictionary = {
   de: {
     /*
+     * GROW-1 — die Kopfdaten der Seite, jetzt zweisprachig.
+     *
+     * Sie standen bis hierher fest verdrahtet im Layout, auf Deutsch. Solange
+     * es nur eine Adresse gab, war das kein Widerspruch; seit `/tr/…` eine
+     * eigene Seite ist, waere ein deutscher <title> ueber tuerkischem Inhalt
+     * genau das Signal, das Google dazu bringt, die tuerkische Fassung als
+     * Dublette auszusortieren.
+     */
+    meta: {
+      siteTitle: "creaDIG — System-Haus für Marke, Web und KI",
+      siteDescription:
+        "creaDIG ist das Dach über eigenen Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie. System-Haus, Deutschland & Schweiz.",
+      ogTitle: "creaDIG — Wir bauen, was andere nicht sehen.",
+      ogDescription:
+        "System-Haus seit 2017. Eigene Produkte, echte Kunden, KI-Systeme, die wir bauen und betreiben.",
+      organizationDescription:
+        "System-Haus für Marke, Web, Operations, Automation und KI. Eigene Produkte: meAI, fibero, CASSAMEA, meahv.",
+      /** Erster Eintrag jeder Brotkrume in den strukturierten Daten. */
+      breadcrumbHome: "Startseite",
+    },
+    /*
      * Verteiler-Startseite (PHASE A, Master-Prompt 4 §4).
      *
      * Die Startseite erklaert nicht mehr alles selbst. Jede Sektion reisst an
@@ -737,6 +758,12 @@ export const dictionary = {
       ctaSecondary: "Arbeiten ansehen",
     },
     termin: {
+      /* GROW-1: Diese drei standen hart in app/termin/page.tsx, auf Deutsch —
+         und die alte Fassung versprach noch, die Anfrage gehe "an unser
+         WhatsApp". Seit P3-a laeuft sie ueber app/api/lead. */
+      metaTitle: "Termin anfragen",
+      metaDescription:
+        "In vier Schritten zum Gespräch: Terminart wählen, Wunschtermin setzen, Angaben ergänzen. Die Anfrage geht direkt an uns — oder auf Wunsch über WhatsApp.",
       back: "Zurück zur Seite",
       eyebrow: "Kostenlose Erstberatung",
       title: "In vier Schritten zum Gespräch.",
@@ -823,6 +850,9 @@ export const dictionary = {
     legal: {
       imprintTitle: "Impressum",
       privacyTitle: "Datenschutz",
+      imprintMetaDescription: "Anbieterkennzeichnung und Kontakt von creaDIG.",
+      privacyMetaDescription:
+        "Kein Tracking über Websites hinweg, keine Werbe-Cookies, keine Profilbildung. Was creaDIG verarbeitet, wer es im Auftrag tut und wie lange es bleibt.",
       back: "Zurück zur Seite",
       providerLabel: "Anbieter (§ 5 DDG)",
       addressLabel: "Anschrift",
@@ -884,7 +914,7 @@ export const dictionary = {
         },
         {
           title: "Einwilligung und lokale Speicherung",
-          body: "Ihre Entscheidung aus dem Einwilligungs-Banner speichern wir im lokalen Speicher Ihres Browsers (Schlüssel „creadig_consent“). Nur mit Ihrer Einwilligung merken wir uns zusätzlich die Sprachwahl und das Erscheinungsbild; ohne Einwilligung gelten diese Einstellungen nur für die laufende Sitzung. Es werden dabei keine Daten an Dritte übermittelt. Ihre Wahl können Sie jederzeit unter „Cookie-Einstellungen“ anpassen oder widerrufen — beim Widerruf entfernen wir die betroffenen Einträge sofort.",
+          body: "Ihre Entscheidung aus dem Einwilligungs-Banner speichern wir im lokalen Speicher Ihres Browsers (Schlüssel „creadig_consent“). Nur mit Ihrer Einwilligung merken wir uns zusätzlich das Erscheinungsbild (hell/dunkel); ohne Einwilligung gilt diese Einstellung nur für die laufende Sitzung. Die Sprache speichern wir gar nicht — sie steht in der Adresse der Seite. Es werden dabei keine Daten an Dritte übermittelt. Ihre Wahl können Sie jederzeit unter „Cookie-Einstellungen“ anpassen oder widerrufen — beim Widerruf entfernen wir die betroffenen Einträge sofort.",
         },
         {
           title: "Ihre Rechte",
@@ -923,7 +953,7 @@ export const dictionary = {
         },
         functional: {
           name: "Komfort",
-          body: "Merkt sich Ihre Sprachwahl (Deutsch/Türkisch) und das Erscheinungsbild (hell/dunkel). Ohne Einwilligung gilt Ihre Wahl nur für die laufende Sitzung.",
+          body: "Merkt sich das Erscheinungsbild (hell/dunkel). Ohne Einwilligung gilt Ihre Wahl nur für die laufende Sitzung. Die Sprache wird nicht gespeichert — sie steht in der Adresse (creadig.de für Deutsch, creadig.de/tr für Türkisch).",
         },
         statistics: {
           name: "Reichweitenmessung",
@@ -944,6 +974,17 @@ export const dictionary = {
   },
 
   tr: {
+    meta: {
+      siteTitle: "creaDIG — marka, web ve yapay zekâ için sistem evi",
+      siteDescription:
+        "creaDIG, kendi sistemlerinin çatısıdır — markadan yapay zekâya. Onları biz kurarız ve biz işletiriz. Almanya ve İsviçre için sistem evi.",
+      ogTitle: "creaDIG — Başkalarının göremediğini inşa ediyoruz.",
+      ogDescription:
+        "2017'den beri sistem evi. Kendi ürünlerimiz, gerçek müşteriler ve kurup işlettiğimiz yapay zekâ sistemleri.",
+      organizationDescription:
+        "Marka, web, operations, automation ve yapay zekâ için sistem evi. Kendi ürünlerimiz: meAI, fibero, CASSAMEA, meahv.",
+      breadcrumbHome: "Ana sayfa",
+    },
     home: {
       statement: {
         eyebrow: "Tek cümlede creaDIG",
@@ -1538,6 +1579,9 @@ export const dictionary = {
       ctaSecondary: "İşleri gör",
     },
     termin: {
+      metaTitle: "Randevu talep et",
+      metaDescription:
+        "Dört adımda görüşmeye: randevu türünü seçin, tarihi belirleyin, bilgileri tamamlayın. Talep doğrudan bize ulaşır — dilerseniz WhatsApp üzerinden.",
       back: "Sayfaya dön",
       eyebrow: "Ücretsiz ilk görüşme",
       title: "Dört adımda görüşmeye.",
@@ -1624,6 +1668,9 @@ export const dictionary = {
     legal: {
       imprintTitle: "Künye",
       privacyTitle: "Gizlilik",
+      imprintMetaDescription: "creaDIG'in sağlayıcı bilgileri ve iletişim.",
+      privacyMetaDescription:
+        "Siteler arası izleme yok, reklam çerezi yok, profil oluşturma yok. creaDIG neyi işliyor, bunu kim adımıza yapıyor ve ne kadar süre saklanıyor.",
       back: "Sayfaya dön",
       providerLabel: "Sağlayıcı (§ 5 DDG)",
       addressLabel: "Adres",
@@ -1683,7 +1730,7 @@ export const dictionary = {
         },
         {
           title: "Onay ve yerel kayıt",
-          body: "Onay penceresindeki kararınızı tarayıcınızın yerel deposunda saklıyoruz („creadig_consent“ anahtarı). Yalnızca onayınızla ek olarak dil seçiminizi ve görünümü hatırlıyoruz; onay yoksa bu ayarlar sadece açık oturum için geçerlidir. Bu sırada üçüncü taraflara hiçbir veri aktarılmaz. Seçiminizi istediğiniz zaman „Çerez ayarları“ üzerinden değiştirebilir veya geri alabilirsiniz — geri aldığınızda ilgili kayıtları anında sileriz.",
+          body: "Onay penceresindeki kararınızı tarayıcınızın yerel deposunda saklıyoruz („creadig_consent“ anahtarı). Yalnızca onayınızla ek olarak görünümü (açık/koyu) hatırlıyoruz; onay yoksa bu ayar sadece açık oturum için geçerlidir. Dili hiç saklamıyoruz — o, sayfanın adresinde durur. Bu sırada üçüncü taraflara hiçbir veri aktarılmaz. Seçiminizi istediğiniz zaman „Çerez ayarları“ üzerinden değiştirebilir veya geri alabilirsiniz — geri aldığınızda ilgili kayıtları anında sileriz.",
         },
         {
           title: "Haklarınız",
@@ -1719,7 +1766,7 @@ export const dictionary = {
         },
         functional: {
           name: "Konfor",
-          body: "Dil seçiminizi (Almanca/Türkçe) ve görünümü (açık/koyu) hatırlar. Onay olmadan seçiminiz yalnızca bu oturum için geçerlidir.",
+          body: "Görünümü (açık/koyu) hatırlar. Onay olmadan seçiminiz yalnızca bu oturum için geçerlidir. Dil saklanmaz — adreste durur (Almanca için creadig.de, Türkçe için creadig.de/tr).",
         },
         statistics: {
           name: "Erişim ölçümü",

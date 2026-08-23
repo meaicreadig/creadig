@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { LocaleLink as Link } from "@/components/ui/locale-link"
+import { useRouter, usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import { Menu, Sun } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/sheet"
 import { Logo } from "@/components/brand/logo"
 import { mainNavLinks } from "@/lib/site-data"
+import { localePath, splitLocale } from "@/lib/routes"
 import { WHATSAPP_LINK } from "@/lib/dictionary"
 import { cn } from "@/lib/utils"
 
@@ -44,10 +45,37 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`)
 }
 
+/**
+ * GROW-1 — der Sprachschalter navigiert jetzt, statt einen Zustand zu kippen.
+ *
+ * Vorher tauschte er nur das Wörterbuch im Browser; die Adresse blieb
+ * dieselbe. Ein türkischer Link war damit nicht weiterzugeben. Jetzt führt er
+ * auf dieselbe Seite in der anderen Sprache — `/leistungen` <-> `/tr/leistungen` —
+ * und die Sprache steht damit dort, wo man sie kopieren kann.
+ *
+ * Anker und Suchparameter bleiben erhalten: Wer aus `/leistungen#pakete`
+ * heraus umschaltet, landet auf `/tr/leistungen#pakete` und nicht oben.
+ */
+function useLanguageSwitch() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const { path } = splitLocale(pathname)
+
+  return (next: "de" | "tr") => {
+    const target = localePath(path, next)
+    const hash = typeof window !== "undefined" ? window.location.hash : ""
+    const query = typeof window !== "undefined" ? window.location.search : ""
+    router.push(`${target}${query}${hash}`)
+  }
+}
+
 export function SiteNav() {
   const { theme, toggleTheme } = useTheme()
-  const { locale, t, setLocale } = useLocale()
-  const pathname = usePathname()
+  const { locale, t } = useLocale()
+  const switchLanguage = useLanguageSwitch()
+  // Der Menuepunkt-Vergleich laeuft auf dem deutschen Basispfad, sonst waere
+  // auf /tr/... nie etwas aktiv.
+  const { path: pathname } = splitLocale(usePathname())
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
 
@@ -121,7 +149,7 @@ export function SiteNav() {
           <ToggleGroup
             type="single"
             value={locale}
-            onValueChange={(value) => value && setLocale(value as "de" | "tr")}
+            onValueChange={(value) => value && switchLanguage(value as "de" | "tr")}
             aria-label={t.nav.language}
             className="hidden divide-x divide-line-strong border-0 sm:flex"
           >
@@ -255,7 +283,7 @@ export function SiteNav() {
                 <ToggleGroup
                   type="single"
                   value={locale}
-                  onValueChange={(value) => value && setLocale(value as "de" | "tr")}
+                  onValueChange={(value) => value && switchLanguage(value as "de" | "tr")}
                   aria-label={t.nav.language}
                   className="mt-1 justify-start border-0"
                 >
