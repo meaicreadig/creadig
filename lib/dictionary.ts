@@ -761,13 +761,13 @@ export const dictionary = {
       /* GROW-1: Diese drei standen hart in app/termin/page.tsx, auf Deutsch —
          und die alte Fassung versprach noch, die Anfrage gehe "an unser
          WhatsApp". Seit P3-a laeuft sie ueber app/api/lead. */
-      metaTitle: "Termin anfragen",
+      metaTitle: "Terminwunsch senden",
       metaDescription:
-        "In vier Schritten zum Gespräch: Terminart wählen, Wunschtermin setzen, Angaben ergänzen. Die Anfrage geht direkt an uns — oder auf Wunsch über WhatsApp.",
+        "In vier Schritten zum Gespräch: Gesprächsart wählen, Wunschzeiten angeben, Angaben ergänzen. Der Wunsch geht direkt an uns — verbindlich wird der Termin mit unserer Rückmeldung.",
       back: "Zurück zur Seite",
       eyebrow: "Kostenlose Erstberatung",
       title: "In vier Schritten zum Gespräch.",
-      lead: "Wunschtermin wählen, Angaben ergänzen — die Anfrage geht als fertige Nachricht an unser WhatsApp. Kein Konto, keine Wartezeit.",
+      lead: "Sagen Sie uns, wann es Ihnen passt. Wir prüfen den Wunsch und bestätigen den Termin verbindlich per Rückmeldung — dieser Assistent bucht nichts automatisch.",
       stepOf: "Schritt",
       next: "Weiter",
       prev: "Zurück",
@@ -781,15 +781,37 @@ export const dictionary = {
         arDesc: "Tiefer Blick auf Operations, Automation und meAI — für Betriebe mit konkretem Vorhaben.",
         arMeta: "ausführlich · 45 Min.",
       },
+      /*
+       * BF-1 — hier stand bis zuletzt ein Buchungskalender ohne Kalender.
+       *
+       * Der Assistent zeigte feste Uhrzeiten ("09:00, 10:00, 11:00 …") aus
+       * zwei hartkodierten Listen. Kein Abgleich mit einem echten Kalender,
+       * keine Sperre für belegte Zeiten — die Seite behauptete eine
+       * Verfügbarkeit, die niemand kannte. Wer 10:00 wählte, las "Anfrage
+       * angekommen" und hielt den Termin für gesetzt.
+       *
+       * Jetzt fragt der Assistent, statt zuzusagen: mehrere Wunschtage,
+       * grobe Zeitfenster, und an jeder Stelle der Satz, dass die Bestätigung
+       * von uns kommt. Ein echter Kalenderabgleich ist ein eigenes Projekt
+       * und bewusst NICHT Teil dieser Stufe.
+       */
       step2: {
-        title: "Wunschtermin",
-        lead: "Hervorgehobene Tage sind unsere bevorzugten Gesprächstage. Andere Tage sind auf Anfrage möglich.",
-        timeTitle: "Uhrzeit",
-        timeLead: "Alle Zeiten in MEZ.",
+        title: "Wann passt es Ihnen?",
+        lead: "Wählen Sie einen oder mehrere Tage. Hervorgehobene Tage sind unsere bevorzugten Gesprächstage — andere Tage sind auf Anfrage möglich.",
+        timeTitle: "Zeitfenster",
+        timeLead: "Mehrfachauswahl möglich. Alle Zeiten in MEZ.",
+        windows: [
+          { id: "vormittag", label: "Vormittag", time: "09–12 Uhr" },
+          { id: "nachmittag", label: "Nachmittag", time: "13–17 Uhr" },
+          { id: "abend", label: "Früher Abend", time: "17–19 Uhr" },
+        ],
         preferred: "bevorzugt",
         today: "heute",
-        errDate: "Bitte wählen Sie ein Datum.",
-        errTime: "Bitte wählen Sie eine Uhrzeit.",
+        maxDates: "Bis zu drei Tage auswählbar.",
+        notBooked:
+          "Das ist noch keine Buchung. Wir prüfen Ihren Wunsch und bestätigen den Termin verbindlich per Rückmeldung.",
+        errDate: "Bitte wählen Sie mindestens einen Tag.",
+        errTime: "Bitte wählen Sie mindestens ein Zeitfenster.",
       },
       step3: {
         title: "Ihre Angaben",
@@ -816,26 +838,26 @@ export const dictionary = {
       step4: {
         sendWhatsapp: "Lieber per WhatsApp",
         privacyNote:
-          "Ihre Angaben gehen an creaDIG und dienen ausschließlich der Bearbeitung dieser Terminanfrage.",
+          "Ihre Angaben gehen an creaDIG und dienen ausschließlich der Bearbeitung dieses Terminwunsches.",
         title: "Prüfen und senden",
-        lead: "Ein Klick, und die Anfrage liegt bei uns im Postfach. Sie bekommen sofort eine Bestätigung per E-Mail. Wenn Ihnen WhatsApp lieber ist, geht es auch darüber.",
-        send: "Anfrage senden",
-        typeLabel: "Terminart",
-        dateLabel: "Wunschtermin",
-        timeLabel: "Uhrzeit",
+        lead: "Ein Klick, und Ihr Terminwunsch liegt bei uns im Postfach. Sie bekommen sofort eine Eingangsbestätigung per E-Mail; den Termin selbst bestätigen wir Ihnen verbindlich in unserer Rückmeldung. Wenn Ihnen WhatsApp lieber ist, geht es auch darüber.",
+        send: "Terminwunsch senden",
+        typeLabel: "Gesprächsart",
+        dateLabel: "Wunschtage",
+        timeLabel: "Zeitfenster",
         langLabel: "Sprache",
       },
       done: {
-        title: "Anfrage angekommen.",
-        lead: "Ihre Terminanfrage liegt bei uns im Postfach, eine Bestätigung ist per E-Mail unterwegs. Wir melden uns am nächsten Werktag.",
-        reply: "Antwort meist innerhalb von 24 Stunden",
+        title: "Terminwunsch erhalten.",
+        lead: "Ihr Terminwunsch liegt bei uns im Postfach, eine Eingangsbestätigung ist per E-Mail unterwegs. Der Termin ist damit noch nicht gebucht — wir gleichen Ihre Wunschzeiten ab und bestätigen Ihnen verbindlich einen Termin.",
+        reply: "Wir melden uns am nächsten Werktag",
         home: "Zurück zur Startseite",
-        again: "Weiteren Termin anfragen",
+        again: "Weiteren Terminwunsch senden",
       },
-      waTitle: "creaDIG — Terminanfrage",
+      waTitle: "creaDIG — Terminwunsch",
       waType: "Art",
-      waDate: "Wunschtermin",
-      waTime: "Uhrzeit",
+      waDate: "Wunschtage",
+      waTime: "Zeitfenster",
       waName: "Name",
       waOrg: "Unternehmen",
       waCity: "Stadt",
@@ -1579,13 +1601,13 @@ export const dictionary = {
       ctaSecondary: "İşleri gör",
     },
     termin: {
-      metaTitle: "Randevu talep et",
+      metaTitle: "Randevu talebi gönder",
       metaDescription:
-        "Dört adımda görüşmeye: randevu türünü seçin, tarihi belirleyin, bilgileri tamamlayın. Talep doğrudan bize ulaşır — dilerseniz WhatsApp üzerinden.",
+        "Dört adımda görüşmeye: görüşme türünü seçin, size uygun zamanları belirtin, bilgileri tamamlayın. Talep doğrudan bize ulaşır — randevu, dönüşümüzle kesinleşir.",
       back: "Sayfaya dön",
       eyebrow: "Ücretsiz ilk görüşme",
       title: "Dört adımda görüşmeye.",
-      lead: "Tarihi seçin, bilgileri tamamlayın — talep hazır bir mesaj olarak WhatsApp'ımıza gider. Hesap yok, bekleme yok.",
+      lead: "Size ne zaman uyduğunu söyleyin. Talebinizi inceler ve randevuyu dönüşümüzde bağlayıcı olarak onaylarız — bu asistan otomatik randevu oluşturmaz.",
       stepOf: "Adım",
       next: "Devam",
       prev: "Geri",
@@ -1600,14 +1622,22 @@ export const dictionary = {
         arMeta: "ayrıntılı · 45 dk.",
       },
       step2: {
-        title: "Tercih ettiğiniz tarih",
-        lead: "Vurgulanan günler tercih ettiğimiz görüşme günleridir. Diğer günler talep üzerine mümkündür.",
-        timeTitle: "Saat",
-        timeLead: "Tüm saatler Orta Avrupa saatidir.",
+        title: "Size ne zaman uyar?",
+        lead: "Bir veya birkaç gün seçin. Vurgulanan günler tercih ettiğimiz görüşme günleridir — diğer günler talep üzerine mümkündür.",
+        timeTitle: "Zaman aralığı",
+        timeLead: "Birden fazla seçebilirsiniz. Tüm saatler Orta Avrupa saatidir.",
+        windows: [
+          { id: "vormittag", label: "Sabah", time: "09.00–12.00" },
+          { id: "nachmittag", label: "Öğleden sonra", time: "13.00–17.00" },
+          { id: "abend", label: "Akşamüstü", time: "17.00–19.00" },
+        ],
         preferred: "tercihli",
         today: "bugün",
-        errDate: "Lütfen bir tarih seçin.",
-        errTime: "Lütfen bir saat seçin.",
+        maxDates: "En fazla üç gün seçilebilir.",
+        notBooked:
+          "Bu henüz bir rezervasyon değildir. Talebinizi inceler ve randevuyu dönüşümüzde bağlayıcı olarak onaylarız.",
+        errDate: "Lütfen en az bir gün seçin.",
+        errTime: "Lütfen en az bir zaman aralığı seçin.",
       },
       step3: {
         title: "Bilgileriniz",
@@ -1636,24 +1666,24 @@ export const dictionary = {
         privacyNote:
           "Bilgileriniz creaDIG'e iletilir ve yalnızca bu randevu talebinin işlenmesi için kullanılır.",
         title: "Kontrol edin ve gönderin",
-        lead: "Tek tıkla talep posta kutumuza düşer. Anında e-posta ile onay alırsınız. WhatsApp'ı tercih ediyorsanız o yol da açık.",
-        send: "Talebi gönder",
-        typeLabel: "Randevu türü",
-        dateLabel: "Tarih",
-        timeLabel: "Saat",
+        lead: "Tek tıkla randevu talebiniz posta kutumuza düşer. Anında e-posta ile alındı onayı alırsınız; randevunun kendisini dönüşümüzde bağlayıcı olarak onaylarız. WhatsApp'ı tercih ediyorsanız o yol da açık.",
+        send: "Randevu talebini gönder",
+        typeLabel: "Görüşme türü",
+        dateLabel: "Tercih edilen günler",
+        timeLabel: "Zaman aralığı",
         langLabel: "Dil",
       },
       done: {
-        title: "Talep bize ulaştı.",
-        lead: "Randevu talebiniz posta kutumuzda, onay e-postası yolda. Bir sonraki iş günü size döneceğiz.",
-        reply: "Yanıt genellikle 24 saat içinde",
+        title: "Randevu talebiniz alındı.",
+        lead: "Talebiniz posta kutumuzda, alındı onayı e-posta ile yolda. Randevu henüz kesinleşmedi — belirttiğiniz zamanları değerlendirip size bağlayıcı bir randevu onayı göndereceğiz.",
+        reply: "Bir sonraki iş günü size döneceğiz",
         home: "Ana sayfaya dön",
-        again: "Yeni randevu talep et",
+        again: "Yeni randevu talebi gönder",
       },
       waTitle: "creaDIG — Randevu talebi",
       waType: "Tür",
-      waDate: "Tarih",
-      waTime: "Saat",
+      waDate: "Tercih edilen günler",
+      waTime: "Zaman aralığı",
       waName: "Ad Soyad",
       waOrg: "Şirket",
       waCity: "Şehir",

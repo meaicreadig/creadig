@@ -13,17 +13,33 @@ import { cn } from "@/lib/utils"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /*
- * Portierung des alten `termin.html` / `termin.js` (Vanilla) nach Next.
- * Gleiche 4-Schritt-UX, gleiche Verfügbarkeitsregeln, gleicher WhatsApp-Versand.
- * Bewusst ohne Backend: Die Nachricht wird im Browser gebaut, abgeschickt wird
- * sie vom Nutzer selbst in WhatsApp.
+ * Vier Schritte zum Gespräch — als WUNSCH, nicht als Buchung (BF-1).
+ *
+ * ---------------------------------------------------------------------------
+ * WAS HIER FALSCH WAR
+ * An dieser Stelle standen zwei Listen fester Uhrzeiten (`SLOTS_INITIAL`,
+ * `SLOTS_ARCHITECTURE`). Sie waren mit nichts verbunden: kein Kalender, keine
+ * Belegung, keine Sperre. Der Assistent zeigte "09:00 · 10:00 · 11:00 …" und
+ * meldete danach "Anfrage angekommen" — der Interessent hielt 10:00 für
+ * vereinbart, während bei uns niemand davon wusste. Das ist dieselbe Klasse
+ * von Unwahrheit wie der frühere Fake-Erfolg nach 800 Millisekunden: eine
+ * Zusage, hinter der nichts steht.
+ *
+ * ---------------------------------------------------------------------------
+ * WIE ES JETZT LÄUFT
+ * Der Assistent FRAGT: bis zu drei Wunschtage, ein oder mehrere grobe
+ * Zeitfenster. Nirgends steht "gebucht" oder "bestätigt"; an Schritt 2, an
+ * Schritt 4 und im Erfolgsschritt steht, dass die verbindliche Bestätigung von
+ * uns kommt. Ein echter Kalenderabgleich ist ein eigenes Projekt und bewusst
+ * nicht Teil dieser Stufe — bis dahin verspricht die Seite nur, was ein Mensch
+ * dahinter auch halten kann.
  */
 
 const WA_NUMBER = "41765045879"
 /** Bevorzugte Gesprächstage: Di / Mi / Do (Montag = 0). */
 const PREFERRED_WEEKDAYS = [1, 2, 3]
-const SLOTS_INITIAL = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"]
-const SLOTS_ARCHITECTURE = ["10:00", "11:00", "14:00", "15:00", "16:00"]
+/** Mehr Wunschtage helfen niemandem — sie machen die Rückmeldung nur länger. */
+const MAX_DATES = 3
 
 type MeetingType = "vg" | "ar"
 type MeetingLang = "de" | "tr" | "de-tr"
@@ -62,9 +78,11 @@ export function TerminWizard() {
 
   const [step, setStep] = useState(1)
   const [type, setType] = useState<MeetingType | null>(null)
-  const [dateKey, setDateKey] = useState<string | null>(null)
-  const [dateLabel, setDateLabel] = useState<string | null>(null)
-  const [time, setTime] = useState<string | null>(null)
+  /* Wunschtage (bis zu MAX_DATES) statt eines "gebuchten" Datums. */
+  const [dates, setDates] = useState<{ key: string; label: string }[]>([])
+  /* Zeitfenster statt Uhrzeiten — wir fragen nach der Tageszeit, nicht nach
+     einem Slot, den niemand freigehalten hat. */
+  const [windows, setWindows] = useState<string[]>([])
   const [meetingLang, setMeetingLang] = useState<MeetingLang>("de")
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [invalid, setInvalid] = useState<Record<string, boolean>>({})
@@ -106,8 +124,6 @@ export function TerminWizard() {
     // Auswahl des Nutzers nicht überschreiben.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const slots = type === "ar" ? SLOTS_ARCHITECTURE : SLOTS_INITIAL
 
   const typeLabel =
     type === "ar" ? t.termin.step1.arName : type === "vg" ? t.termin.step1.vgName : ""
@@ -161,18 +177,41 @@ export function TerminWizard() {
     })
   }
 
-  function selectDate(cell: { day: number; key: string; past: boolean }) {
+  const isChosen = (key: string) => dates.some((d) => d.key === key)
+
+  /** Anklicken wählt aus, nochmal anklicken wieder ab — bis zu MAX_DATES. */
+  function toggleDate(cell: { day: number; key: string; past: boolean }) {
     if (cell.past || !cursor) return
-    setDateKey(cell.key)
-    setDateLabel(`${cell.day}. ${t.termin.months[cursor.month]} ${cursor.year}`)
-    setTime(null)
     setError(null)
+    setDates((current) => {
+      if (current.some((d) => d.key === cell.key)) {
+        return current.filter((d) => d.key !== cell.key)
+      }
+      if (current.length >= MAX_DATES) return current
+      const label = `${cell.day}. ${t.termin.months[cursor.month]} ${cursor.year}`
+      return [...current, { key: cell.key, label }].sort((a, b) => a.key.localeCompare(b.key))
+    })
   }
+
+  function toggleWindow(id: string) {
+    setError(null)
+    setWindows((current) =>
+      current.includes(id) ? current.filter((w) => w !== id) : [...current, id],
+    )
+  }
+
+  /** Zeitfenster in der Reihenfolge des Wörterbuchs, nicht der Anklick-Folge. */
+  const chosenWindows = t.termin.step2.windows.filter((w) => windows.includes(w.id))
+  const dateSummary = dates.length > 0 ? dates.map((d) => d.label).join(" · ") : "–"
+  const windowSummary =
+    chosenWindows.length > 0
+      ? chosenWindows.map((w) => `${w.label} (${w.time})`).join(" · ")
+      : "–"
 
   function goTo(next: number) {
     if (next === 3) {
-      if (!dateKey) return setError(t.termin.step2.errDate)
-      if (!time) return setError(t.termin.step2.errTime)
+      if (dates.length === 0) return setError(t.termin.step2.errDate)
+      if (windows.length === 0) return setError(t.termin.step2.errTime)
     }
     if (next === 4 && !validateForm()) return
     setError(null)
@@ -204,8 +243,8 @@ export function TerminWizard() {
 
   const summaryRows = [
     { k: t.termin.step4.typeLabel, v: typeLabel, accent: true },
-    { k: t.termin.step4.dateLabel, v: dateLabel ?? "–" },
-    { k: t.termin.step4.timeLabel, v: time ?? "–" },
+    { k: t.termin.step4.dateLabel, v: dateSummary },
+    { k: t.termin.step4.timeLabel, v: windowSummary },
     { k: t.termin.step3.name, v: form.name },
     { k: t.termin.step3.phone, v: form.phone },
     { k: t.termin.step3.email, v: form.email },
@@ -221,8 +260,8 @@ export function TerminWizard() {
     `*${t.termin.waTitle}*`,
     "",
     `📋 *${t.termin.waType}:* ${typeLabel}`,
-    `📅 *${t.termin.waDate}:* ${dateLabel ?? "–"}`,
-    `🕐 *${t.termin.waTime}:* ${time ?? "–"}`,
+    `📅 *${t.termin.waDate}:* ${dateSummary}`,
+    `🕐 *${t.termin.waTime}:* ${windowSummary}`,
     "",
     `👤 *${t.termin.waName}:* ${form.name}`,
     `🏢 *${t.termin.waOrg}:* ${form.org}`,
@@ -330,10 +369,7 @@ export function TerminWizard() {
                 <button
                   key={option.id}
                   type="button"
-                  onClick={() => {
-                    setType(option.id)
-                    setTime(null)
-                  }}
+                  onClick={() => setType(option.id)}
                   aria-pressed={type === option.id}
                   className={cn(
                     "border-line group relative flex flex-col border p-7 text-left transition-colors duration-500",
@@ -417,19 +453,23 @@ export function TerminWizard() {
                     <button
                       key={cell.key}
                       type="button"
-                      disabled={cell.past}
-                      onClick={() => selectDate(cell)}
-                      aria-pressed={dateKey === cell.key}
+                      disabled={cell.past || (dates.length >= MAX_DATES && !isChosen(cell.key))}
+                      onClick={() => toggleDate(cell)}
+                      aria-pressed={isChosen(cell.key)}
                       className={cn(
                         "relative flex aspect-square items-center justify-center text-sm transition-colors duration-300",
                         cell.past && "text-muted-foreground/35 pointer-events-none",
                         !cell.past && "hover:bg-gold/10",
                         cell.today && "font-semibold",
-                        dateKey === cell.key && "bg-gold text-[#201e1b]",
+                        isChosen(cell.key) && "bg-gold text-[#201e1b]",
+                        !cell.past &&
+                          !isChosen(cell.key) &&
+                          dates.length >= MAX_DATES &&
+                          "text-muted-foreground/35 pointer-events-none",
                       )}
                     >
                       {cell.day}
-                      {cell.preferred && dateKey !== cell.key && (
+                      {cell.preferred && !isChosen(cell.key) && (
                         <span
                           aria-hidden="true"
                           className="bg-gold absolute bottom-1.5 size-1 rounded-full"
@@ -440,43 +480,55 @@ export function TerminWizard() {
                 )}
               </div>
 
-              <p className="border-line text-muted-foreground flex items-center gap-2 text-meta border-t px-5 py-3">
-                <span aria-hidden="true" className="bg-gold size-1 rounded-full" />
-                {t.termin.step2.preferred}
+              <p className="border-line text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-meta border-t px-5 py-3">
+                <span className="flex items-center gap-2">
+                  <span aria-hidden="true" className="bg-gold size-1 rounded-full" />
+                  {t.termin.step2.preferred}
+                </span>
+                <span>{t.termin.step2.maxDates}</span>
               </p>
             </div>
 
-            {dateKey && (
-              <div className="mt-10">
-                <h3 className="text-display text-xl">{t.termin.step2.timeTitle}</h3>
-                <p className="type-small text-muted-foreground mt-2">{t.termin.step2.timeLead}</p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {slots.map((slot) => (
-                    <button
-                      key={slot}
-                      type="button"
-                      onClick={() => {
-                        setTime(slot)
-                        setError(null)
-                      }}
-                      aria-pressed={time === slot}
-                      className={cn(
-                        "border px-5 py-3 font-mono text-sm tracking-wide transition-colors duration-300",
-                        time === slot
-                          ? "border-gold bg-gold text-[#201e1b]"
-                          : "border-line-strong hover:border-gold hover:text-gold-text",
-                      )}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                </div>
+            {/* Zeitfenster statt Uhrzeiten — und sichtbar, bevor ein Tag gewählt ist. */}
+            <div className="mt-10">
+              <h3 className="text-display text-xl">{t.termin.step2.timeTitle}</h3>
+              <p className="type-small text-muted-foreground mt-2">{t.termin.step2.timeLead}</p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {t.termin.step2.windows.map((window) => (
+                  <button
+                    key={window.id}
+                    type="button"
+                    onClick={() => toggleWindow(window.id)}
+                    aria-pressed={windows.includes(window.id)}
+                    className={cn(
+                      "flex flex-col items-start gap-1 border px-5 py-3 text-left transition-colors duration-300",
+                      windows.includes(window.id)
+                        ? "border-gold bg-gold text-[#201e1b]"
+                        : "border-line-strong hover:border-gold hover:text-gold-text",
+                    )}
+                  >
+                    <span className="text-sm tracking-wide">{window.label}</span>
+                    <span className="font-mono text-xs opacity-75">{window.time}</span>
+                  </button>
+                ))}
               </div>
-            )}
+            </div>
+
+            {/*
+              Der Satz, der die ganze Stufe trägt: Hier wird nichts gebucht.
+              Er steht bewusst VOR dem Weiter-Knopf und nicht im Kleingedruckten.
+            */}
+            <p className="border-gold/45 text-muted-foreground type-small mt-10 border-l-2 py-2 pl-4 text-pretty">
+              {t.termin.step2.notBooked}
+            </p>
 
             <div className="mt-12 flex items-center justify-between gap-4">
               <BackButton onClick={() => setStep(1)} label={t.termin.prev} />
-              <StepButton disabled={!dateKey || !time} onClick={() => goTo(3)} label={t.termin.next} />
+              <StepButton
+                disabled={dates.length === 0 || windows.length === 0}
+                onClick={() => goTo(3)}
+                label={t.termin.next}
+              />
             </div>
           </section>
         )}
@@ -784,9 +836,8 @@ export function TerminWizard() {
             </p>
 
             <div className="border-line mt-10 flex flex-col gap-3 type-small border-t pt-8 font-mono">
-              <p className="text-foreground">
-                {dateLabel} · {time}
-              </p>
+              <p className="text-foreground">{dateSummary}</p>
+              <p className="text-foreground">{windowSummary}</p>
               <p className="text-muted-foreground">{t.termin.done.reply}</p>
               <a href={contact.whatsappHref} className="text-gold-text" target="_blank" rel="noopener noreferrer">
                 {contact.whatsapp}
@@ -805,9 +856,8 @@ export function TerminWizard() {
                 onClick={() => {
                   setStep(1)
                   setType(null)
-                  setDateKey(null)
-                  setDateLabel(null)
-                  setTime(null)
+                  setDates([])
+                  setWindows([])
                   setForm(EMPTY_FORM)
                   setInvalid({})
                 }}

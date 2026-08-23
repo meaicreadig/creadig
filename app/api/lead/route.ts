@@ -87,40 +87,99 @@ function headerSafe(value: string): string {
   return value.replace(/[\r\n]+/g, " ").trim()
 }
 
-const CONFIRMATION: Record<Locale, { subject: string; body: (name: string) => string }> = {
+/**
+ * BF-1 — die Bestätigung sagt nicht mehr, was sie nicht weiß.
+ *
+ * Der Termin-Assistent sammelte Wunschzeiten ein, und diese Mail antwortete
+ * darauf mit einem allgemeinen "Ihre Anfrage ist angekommen" — der Absender
+ * durfte daraus lesen, was er wollte, und las meistens: gebucht. Jetzt gibt es
+ * zwei Fassungen. Die Termin-Fassung sagt in ihrer Betreffzeile und im ersten
+ * Absatz, dass die verbindliche Bestätigung noch aussteht und von uns kommt.
+ */
+type ConfirmationKind = "kontakt" | "termin"
+
+const SIGNATURE_DE = [
+  "",
+  "Herzliche Grüße",
+  "Muhammed Emin Akyol",
+  "creaDIG · ICO InnovationsCentrum Osnabrück",
+]
+
+const SIGNATURE_TR = [
+  "",
+  "Selamlar",
+  "Muhammed Emin Akyol",
+  "creaDIG · ICO InnovationsCentrum Osnabrück",
+]
+
+const CONFIRMATION: Record<
+  Locale,
+  Record<ConfirmationKind, { subject: string; body: (name: string) => string }>
+> = {
   de: {
-    subject: "Ihre Anfrage bei creaDIG",
-    body: (name) =>
-      [
-        name ? `Guten Tag ${name},` : "Guten Tag,",
-        "",
-        "vielen Dank für Ihre Anfrage — sie ist bei uns angekommen.",
-        "Wir melden uns am nächsten Werktag bei Ihnen.",
-        "",
-        "Diese Nachricht ist eine automatische Bestätigung; Sie müssen darauf nicht antworten.",
-        "Wenn es eilt, erreichen Sie uns direkt unter info@creadig.de.",
-        "",
-        "Herzliche Grüße",
-        "Muhammed Emin Akyol",
-        "creaDIG · ICO InnovationsCentrum Osnabrück",
-      ].join("\n"),
+    kontakt: {
+      subject: "Ihre Anfrage bei creaDIG",
+      body: (name) =>
+        [
+          name ? `Guten Tag ${name},` : "Guten Tag,",
+          "",
+          "vielen Dank für Ihre Anfrage — sie ist bei uns angekommen.",
+          "Wir melden uns am nächsten Werktag bei Ihnen.",
+          "",
+          "Diese Nachricht ist eine automatische Bestätigung; Sie müssen darauf nicht antworten.",
+          "Wenn es eilt, erreichen Sie uns direkt unter info@creadig.de.",
+          ...SIGNATURE_DE,
+        ].join("\n"),
+    },
+    termin: {
+      subject: "Terminwunsch erhalten — wir bestätigen Ihnen den Termin",
+      body: (name) =>
+        [
+          name ? `Guten Tag ${name},` : "Guten Tag,",
+          "",
+          "vielen Dank für Ihren Terminwunsch — er ist bei uns angekommen.",
+          "",
+          "Der Termin ist damit noch nicht gebucht: Wir gleichen Ihre Wunschzeiten ab",
+          "und bestätigen Ihnen verbindlich einen Termin. Wir melden uns am nächsten",
+          "Werktag bei Ihnen.",
+          "",
+          "Diese Nachricht ist eine automatische Eingangsbestätigung; Sie müssen darauf",
+          "nicht antworten. Wenn es eilt, erreichen Sie uns direkt unter info@creadig.de.",
+          ...SIGNATURE_DE,
+        ].join("\n"),
+    },
   },
   tr: {
-    subject: "creaDIG talebiniz",
-    body: (name) =>
-      [
-        name ? `Merhaba ${name},` : "Merhaba,",
-        "",
-        "talebiniz için teşekkür ederiz — bize ulaştı.",
-        "Bir sonraki iş günü size döneceğiz.",
-        "",
-        "Bu mesaj otomatik bir onaydır; yanıtlamanız gerekmez.",
-        "Acele bir durum varsa doğrudan info@creadig.de adresinden bize ulaşabilirsiniz.",
-        "",
-        "Selamlar",
-        "Muhammed Emin Akyol",
-        "creaDIG · ICO InnovationsCentrum Osnabrück",
-      ].join("\n"),
+    kontakt: {
+      subject: "creaDIG talebiniz",
+      body: (name) =>
+        [
+          name ? `Merhaba ${name},` : "Merhaba,",
+          "",
+          "talebiniz için teşekkür ederiz — bize ulaştı.",
+          "Bir sonraki iş günü size döneceğiz.",
+          "",
+          "Bu mesaj otomatik bir onaydır; yanıtlamanız gerekmez.",
+          "Acele bir durum varsa doğrudan info@creadig.de adresinden bize ulaşabilirsiniz.",
+          ...SIGNATURE_TR,
+        ].join("\n"),
+    },
+    termin: {
+      subject: "Randevu talebiniz alındı — randevuyu size onaylayacağız",
+      body: (name) =>
+        [
+          name ? `Merhaba ${name},` : "Merhaba,",
+          "",
+          "randevu talebiniz için teşekkür ederiz — bize ulaştı.",
+          "",
+          "Randevu henüz kesinleşmedi: Belirttiğiniz zamanları değerlendirip size",
+          "bağlayıcı bir randevu onayı göndereceğiz. Bir sonraki iş günü size döneceğiz.",
+          "",
+          "Bu mesaj otomatik bir alındı onayıdır; yanıtlamanız gerekmez.",
+          "Acele bir durum varsa doğrudan info@creadig.de adresinden bize ulaşabilirsiniz.",
+          ...SIGNATURE_TR,
+        ].join("\n"),
+    },
   },
 }
 
@@ -222,7 +281,10 @@ export async function POST(request: Request) {
     await sendMail(apiKey, {
       from,
       to,
-      subject: `Anfrage über creadig.de — ${headerSafe(name)}`,
+      subject:
+        source === "termin"
+          ? `Terminwunsch über creadig.de — ${headerSafe(name)}`
+          : `Anfrage über creadig.de — ${headerSafe(name)}`,
       text: lines,
       // Direkt aus dem Postfach antworten können, ohne die Adresse zu suchen.
       replyTo: email,
@@ -238,12 +300,14 @@ export async function POST(request: Request) {
     Bestätigung fehl, hat der Interessent trotzdem angefragt — ihm eine
     Fehlermeldung zu zeigen, würde ihn ein zweites Mal schicken.
   */
+  const kind: ConfirmationKind = source === "termin" ? "termin" : "kontakt"
+
   try {
     await sendMail(apiKey, {
       from,
       to: email,
-      subject: CONFIRMATION[locale].subject,
-      text: CONFIRMATION[locale].body(name),
+      subject: CONFIRMATION[locale][kind].subject,
+      text: CONFIRMATION[locale][kind].body(name),
     })
   } catch (error) {
     console.error("[lead] Bestaetigung an den Absender fehlgeschlagen:", error)
