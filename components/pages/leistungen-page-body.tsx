@@ -34,8 +34,18 @@ export function LeistungenPageBody() {
         crumbLabel={t.nav.leistungen}
         lead={t.leistungenPage.lead}
       >
-        {/* Kategorie-Korrektur (§7): der Preis-Rahmen als Satz, nicht als Tabelle. */}
+        {/*
+          Die Kategorie (KIZILELMA §10.1) steht VOR dem Preis-Rahmen und nicht
+          darunter: Wer nicht weiss, was fuer ein Haus das ist, liest jede
+          Preisangabe als die einer Agentur.
+        */}
         <div className="border-line mt-12 border-t pt-6">
+          <p className="eyebrow text-gold-text">{t.brand.categoryLabel}</p>
+          <p className="type-statement mt-4 max-w-3xl text-balance">{t.brand.category}</p>
+        </div>
+
+        {/* Kategorie-Korrektur (§7): der Preis-Rahmen als Satz, nicht als Tabelle. */}
+        <div className="border-line mt-10 border-t pt-6">
           <p className="eyebrow text-gold-text">{t.leistungenPage.pricingLabel}</p>
           <p className="type-body text-foreground/85 mt-4 max-w-2xl text-pretty">
             {t.leistungenPage.pricingNote}

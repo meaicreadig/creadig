@@ -30,7 +30,17 @@ export function UnternehmenPageBody({ location }: { location: React.ReactNode })
       <PageHeader eyebrow={copy.eyebrow} title={copy.title}
         crumbLabel={t.nav.unternehmen} lead={copy.lead}>
         <div className="border-line mt-12 border-t pt-8">
-          <p className="type-statement max-w-4xl text-balance">{copy.statement}</p>
+          {/*
+            Erst die Kategorie, dann die Haltung. Umgekehrt gelesen ist der
+            Haltungssatz eine Behauptung ohne Bezugsrahmen — „System-Haus"
+            heisst fuer die meisten Leser zunaechst „IT-Systemhaus", und
+            genau das raeumt der Kategorie-Satz ab (KIZILELMA §10.1).
+          */}
+          <p className="eyebrow text-gold-text">{t.brand.categoryLabel}</p>
+          <p className="type-statement mt-4 max-w-4xl text-balance">{t.brand.category}</p>
+          <p className="type-body text-foreground/85 mt-8 max-w-3xl text-pretty">
+            {copy.statement}
+          </p>
         </div>
       </PageHeader>
 

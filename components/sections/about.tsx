@@ -71,7 +71,25 @@ export function About() {
               </p>
             </Reveal>
 
-            <Reveal delay={0.18} className="border-line mt-10 border-t pt-7">
+            {/*
+              KIZILELMA §10.10 — die Nische professionell besitzen.
+
+              Hier stand bisher gar nichts: Zweisprachigkeit war eine
+              Nebenbemerkung in `nicheOpen` („auf Deutsch und auf Tuerkisch")
+              und damit eine Fussnote. Sie ist aber das eine Merkmal, das
+              sonst niemand im Markt hat, der auch deutschen Standard liefert.
+              Bewusst OHNE Herkunftsbild: kein „tuerkisch-deutscher
+              Mittelstand", keine Community-Ansprache. Der Satz redet ueber
+              Standard und Sprache, nicht ueber Menschen.
+            */}
+            <Reveal delay={0.16} className="border-line mt-10 border-t pt-7">
+              <p className="eyebrow text-gold-text">{t.about.standardLabel}</p>
+              <p className="type-body text-foreground/85 mt-4 text-pretty">
+                {t.about.standardBody}
+              </p>
+            </Reveal>
+
+            <Reveal delay={0.22} className="border-line mt-10 border-t pt-7">
               <p className="eyebrow text-gold-text">{t.about.locationsLabel}</p>
               <address className="type-small text-foreground/85 mt-4 not-italic">
                 {contact.addressLines.map((line) => (

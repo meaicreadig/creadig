@@ -36,6 +36,28 @@ export const dictionary = {
       ogImageAlt: "creaDIG — System-Haus für Marke, Web und KI",
     },
     /*
+     * DIE KATEGORIE IN EINEM SATZ (KIZILELMA §10.1).
+     *
+     * Die Tiefen-Analyse hat die eine Frage benannt, die die Seite bisher
+     * nicht beantwortet hat: Was IST das hier? Digitalagentur, IT-Systemhaus,
+     * KI-Bude? Wer die Kategorie nicht selbst setzt, wird in die naechstbeste
+     * einsortiert — und das ist bei uns immer die kleinere.
+     *
+     * Der Satz sagt zuerst, was wir NICHT sind, und erst dann, was wir sind.
+     * Diese Reihenfolge ist Absicht: „System-Haus" allein liest jeder als
+     * „IT-Systemhaus" und erwartet dann Serverwartung, Lizenzen und einen
+     * Helpdesk. Die Verneinung raeumt genau diese Erwartung ab, bevor sie
+     * entsteht.
+     *
+     * Er steht an zwei Stellen und nur dort: im Kopf von /leistungen (was
+     * wir tun) und im Kopf von /unternehmen (wer das tut). Ein Satz, den man
+     * ueberall liest, ist ein Slogan; drei Marken-Saetze hat das Haus schon.
+     */
+    brand: {
+      categoryLabel: "Kategorie",
+      category: "Kein klassisches IT-Systemhaus. Ein System-Haus für digitale Betriebe.",
+    },
+    /*
      * Verteiler-Startseite (PHASE A, Master-Prompt 4 §4).
      *
      * Die Startseite erklaert nicht mehr alles selbst. Jede Sektion reisst an
@@ -57,7 +79,7 @@ export const dictionary = {
       },
       capabilities: {
         eyebrow: "Leistungen",
-        title: "Fünf Ebenen, ein Haus.",
+        title: "Fünf Ebenen. Ein System.",
         lead: "Jede Ebene trägt die nächste. Sie können auf jeder einsteigen — und auf jeder aufhören.",
         cta: "Alle Leistungen",
       },
@@ -159,7 +181,7 @@ export const dictionary = {
      */
     unternehmenPage: {
       eyebrow: "Unternehmen",
-      title: "Erfinden, bauen, betreiben.",
+      title: "Das Haus hinter den Systemen.",
       lead: "creaDIG ist keine Agentur, die ein Projekt abliefert und verschwindet. Wir sind ein Haus, das eigene Produkte erfindet, sie selbst baut und im Betrieb hält — von der Marke über die Software bis zur künstlichen Intelligenz.",
       statement: "Was wir für Kunden entwickeln, betreiben wir für uns selbst. Diese Substanz unterscheidet ein System-Haus von einer Präsentation.",
       metaTitle: "Unternehmen — System-Haus aus Osnabrück, seit 2017",
@@ -330,7 +352,7 @@ export const dictionary = {
      */
     leistungenPage: {
       eyebrow: "Leistungen",
-      title: "Fünf Ebenen, aufeinander gebaut.",
+      title: "Fünf Ebenen. Ein System.",
       lead: "Marke, Auftritt, Betrieb, Automatisierung, Intelligenz. Jede Ebene trägt die nächste — nicht nebeneinander, sondern als System. Was wir für unsere eigenen Produkte gebaut haben, bringen wir in Ihren Alltag.",
       metaTitle: "Leistungen — von der Marke bis zur KI",
       metaDescription:
@@ -425,7 +447,7 @@ export const dictionary = {
         scope: {
           label: "Spannweite",
           value: "Von der Marke bis zur KI",
-          detail: "Fünf Ebenen, ein Haus.",
+          detail: "Fünf Ebenen. Ein System.",
         },
       },
       note: "Systeme im Tagesbetrieb — nicht in der Präsentation.",
@@ -731,6 +753,9 @@ export const dictionary = {
        */
       nicheOpen:
         "Das sind Schwerpunkte, keine Bedingungen. Wir arbeiten mit Unternehmen jeder Branche und Größe — auf Deutsch und auf Türkisch.",
+      standardLabel: "Zwei Sprachen, ein Standard",
+      standardBody:
+        "Beratung, Unterlagen, Verträge und die laufende Betreuung gibt es auf Deutsch und auf Türkisch. Derselbe Standard, dieselbe Dokumentation, dieselbe Rechnung — nur in der Sprache, in der im Betrieb entschieden wird. Kein Dolmetscher dazwischen und keine zweite, dünnere Fassung.",
       locationsLabel: "Sitz",
       marketsLabel: "Märkte",
       honesty:
@@ -1298,6 +1323,10 @@ export const dictionary = {
       breadcrumbHome: "Ana sayfa",
       ogImageAlt: "creaDIG — marka, web ve yapay zekâ için sistem evi",
     },
+    brand: {
+      categoryLabel: "Kategori",
+      category: "Klasik bir BT sistem evi değil. Dijital işletmeler için bir sistem evi.",
+    },
     home: {
       statement: {
         eyebrow: "Tek cümlede creaDIG",
@@ -1312,7 +1341,7 @@ export const dictionary = {
       },
       capabilities: {
         eyebrow: "Hizmetler",
-        title: "Beş katman, tek çatı.",
+        title: "Beş katman. Tek sistem.",
         lead: "Her katman bir sonrakini taşır. İstediğiniz katmanda başlayabilir, istediğiniz katmanda durabilirsiniz.",
         cta: "Tüm hizmetler",
       },
@@ -1389,7 +1418,7 @@ export const dictionary = {
     },
     unternehmenPage: {
       eyebrow: "Şirket",
-      title: "İcat etmek, kurmak, işletmek.",
+      title: "Sistemlerin arkasındaki ev.",
       lead: "creaDIG, bir projeyi teslim edip kaybolan bir ajans değildir. Kendi ürünlerini icat eden, onları kendi kuran ve işler hâlde tutan bir evdir — markadan yazılıma, yazılımdan yapay zekâya.",
       statement: "Müşteriler için geliştirdiğimizi kendimiz için de işletiriz. Bir sistem evini bir sunumdan ayıran şey bu sağlamlıktır.",
       metaTitle: "Şirket — Osnabrück'ten sistem evi, 2017'den beri",
@@ -1504,7 +1533,7 @@ export const dictionary = {
     },
     leistungenPage: {
       eyebrow: "Hizmetler",
-      title: "Beş katman, üst üste kuruldu.",
+      title: "Beş katman. Tek sistem.",
       lead: "Marka, dijital görünüm, operasyon, otomasyon, zekâ. Her katman bir sonrakini taşır — yan yana değil, bir sistem olarak. Kendi ürünlerimiz için kurduğumuzu sizin günlük işinize taşırız.",
       metaTitle: "Hizmetler — markadan yapay zekâya",
       metaDescription:
@@ -1568,7 +1597,7 @@ export const dictionary = {
         scope: {
           label: "Kapsam",
           value: "Markadan yapay zekâya",
-          detail: "Beş katman, tek çatı.",
+          detail: "Beş katman. Tek sistem.",
         },
       },
       note: "Sistemler günlük kullanımda — sunumda değil.",
@@ -1813,6 +1842,9 @@ export const dictionary = {
       ],
       nicheOpen:
         "Bunlar ağırlık noktalarımız, koşul değil. Her sektörden ve her büyüklükten işletmeyle çalışıyoruz — Almanca ve Türkçe.",
+      standardLabel: "İki dil, tek standart",
+      standardBody:
+        "Danışmanlık, belgeler, sözleşmeler ve sürekli destek Almanca ve Türkçe. Aynı standart, aynı belgelendirme, aynı fatura — yalnızca işletmede kararın verildiği dilde. Arada tercüman yok, ikinci ve daha ince bir sürüm yok.",
       locationsLabel: "Merkez",
       marketsLabel: "Pazarlar",
       honesty: "Uydurma çalışan veya ciro sayıları vermiyoruz. Kanıtımız yaptığımız işlerdir.",
