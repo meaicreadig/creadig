@@ -285,3 +285,36 @@ wie Ihre Seite aussehen könnte. Kein Auftrag, keine Rechnung."*
       **3. AGD** (nützlich für ihn selbst wegen Vergütungstarifvertrag, für Handwerks-Verkauf wertlos) ·
       **4. AVPQ** (nur für öffentliche Vergabe relevant — für Handwerk und TR-KMU ohne Nutzen).
       Kosten AGD und AVPQ: [UNBEKANNT].
+
+---
+
+## 10 · V2 — Von der Behauptung zum Beweis (Tiefen-Analyse 23.08.2026)
+
+> Quelle: externe Tiefen-Analyse (Kundensicht + Designer + Kritiker; Vergleich mit INNOQ, valantic, digitalhoch5, udsys). Gesamturteil **8,0/10**: „Sehr gute Marken-Hülle — jetzt mit Unternehmens-Beweis füllen."
+
+**10.0 · Die eine Diagnose:** Die **Behauptung ist größer als der Beweis.** Vision stark (9/10), Beweis schwach (Vertrauen 6 · Referenzstärke 5,5 · Team 4,5 · Case-Tiefe 5). Das Gerüst steht (Marketing/Technik ~85 %); es fehlt **Tiefe + Beweis** (Proof ~45 %, Content-Authority ~40 %). **V2 heißt: nicht größer aussehen, sondern wahrer/bewiesener werden — Tiefe & Beweis, keine Deko.**
+
+**10.1 · Kategorie (schärfen):** Weder Digitalagentur noch klassisches IT-Systemhaus noch AI-Agentur. Eigene Kategorie: **„Kein klassisches IT-Systemhaus. Ein System-Haus für digitale Betriebe."** Das **5-Ebenen-Modell** (Identity → Digital → Operations → Automation → Intelligence) ist das eigentliche **IP** — wichtiger als Logo/Farben. **Betrieb** ist keine 6. vertikale Ebene, sondern die **horizontale Lebenszyklus-Ebene** unter Verstehen→Bauen→**Betreiben** (Hosting · Monitoring · Wartung · Support · Backups · Security · Weiterentwicklung). Diagnose-Methodik als IP: **SEE → ANALYZE → BUILD → OPERATE**. **Drei Marken-Sätze, mehr nicht:** „Wir bauen, was andere nicht sehen." · „Verstehen. Bauen. Betreiben." · „Fünf Ebenen. Ein System." Verb-Welt: bauen/verbinden/betreiben/strukturieren/automatisieren — **nie „wir machen".**
+
+**10.2 · Die fünf fehlenden Beweisarten:** Zahlen · Kundenstimmen (mit Name/Firma/Projekt) · echte Screens · technische Tiefe · Menschen.
+
+**10.3 · Leistungen tiefer (Owner-Kritik „nur oberflächlich"):** Die Ebenen sind heute **Kategorie-Sprache**. Jede Ebene braucht **Problem → Lösung → Ergebnis** + **„Typische Projekte"** mit konkreten Capabilities in **Kunden-/Suchsprache** (CRM, Auftragsmanagement, Prozessautomatisierung, individuelle Software, Webentwicklung, Portale, E-Commerce, APIs/Integrationen, Dashboards, Analyse/KI …). **Markensprache oben (Nav), Capability-/Suchsprache darunter** — löst zugleich SEO. **Nicht** tun: 20-Dienste-Katalog wie klassische IT-Häuser; **keine Leistung erfinden** (kein IT-Support/Serverüberwachung/Agile Transformation/Projektmanagement als Headline).
+
+**10.4 · Höchster Einzelhebel — /arbeiten = echtes Case-Study-System:** Schablone je Fall: Ausgangslage → Problem → Ziel → unsere Rolle → System → Umsetzung → Ergebnis → Kennzahlen → Kundenstimme → Heute. **NV SWISS + maqam** zu vollen Cases ausbauen (NV SWISS = wertvollster Beweis: fremder zahlender Kunde). Prinzip **„fewer, deeper"** — 6–10 starke Cases > 20 Logos.
+
+**10.5 · Produkte = Beweis der Baukapazität:** Je Produkt eine echte Detailseite: Problem → Product-Thesis → 4–8 echte Screens → Funktionen → System/Architektur → Betrieb → Status-Badge (LIVE/PRIVATE BETA/IM AUFBAU/INTERN) → Learnings → CTA. Produkte = **F&E-Labor** des Hauses, kein Katalog.
+
+**10.6 · Unternehmen — Arbeitsmodell ehrlich zeigen:** Größte Lücke „wer macht das?". **Keine Schein-Größe** — echtes Modell benennen (founder-led + kleines Kernteam + Spezialisten/Partner nach Bedarf). Founder-led ist im Premium ein **Vorteil**, wenn als bewusstes Modell gezeigt. Echte Fotos (Büro/ICO/Screens/Whiteboard) statt Stock. Founder als „Gründer & System Lead". **Haus-Architektur als ein Bild:** creaDIG → 5 Ebenen → 4 Produkte.
+
+**10.7 · Angebot/Preis-Positionierung:** **Website-Paket Handwerk (2.400 €)** vom System-Haus-Kern **trennen** → Rubrik „Einstiegsangebote", nicht als Beispiel der Hauptarchitektur (sonst „doch nur Website-Agentur"). **Betrieb (149 €)** zu **„Managed Betrieb" produktisieren** — der wiederkehrende Umsatz macht aus einer Agentur ein Unternehmen. BFSG-Audit (beschlossen, [[creadig-bfsg-offer]]) bleibt Einstiegsleistung.
+
+**10.8 · Insights = echte Thought-Leadership** aus dem eigenen Betrieb (z. B. „Warum Automatisierung vor KI kommt", „Warum kleine Betriebe kein weiteres Dashboard brauchen", „Was wir aus dem Betrieb eigener Produkte lernen").
+
+**10.9 · Was NICHT zu tun:** keine Neon-AI-Gradients, Fake-Stats, Fake-Logos, Stock-Fotos, 25 Tech-Logos, Chatbot, 3D-Globe, Dauer-Animation. Die zurückhaltende Premium-Sprache ist wertvoller. Ehrlichkeit bleibt der härteste Lock.
+
+**10.10 · Offene strategische Owner-Fragen (VOR dem großen V2-Master-Prompt entscheiden):**
+- **Markt:** „nur in Deutschland" ist zu eng und widerspricht der eigenen CH-Arbeit (NV SWISS, CASSAMEA) → **„Deutschland & Schweiz"** (oder ohne Geo-Grenze). *(Owner-Frage 1)*
+- **Zielgruppe:** „Handwerk und Mittelstand" (eng) vs. „alle Unternehmen" — entscheiden.
+- **TR-Nische:** Analyse empfiehlt, die Nische *„für türkischsprachige Unternehmen in DE, in deutschem Standard"* aktiv zu besitzen. **Widerspricht** der früheren Owner-Aussage „türkisch-deutscher Mittelstand raus" → **bewusst entscheiden.** Davon unabhängig: TR-Projekttexte (`work.what`/`work.sector`) sind auf `/tr` noch deutsch → übersetzen.
+
+> **Reconciliation:** Einige §9.8-Locks sind seit dem KOMPLETT-Lauf überholt — Design-Feinschliff ist **entsperrt** (V2 baut Tiefe), „ein Angebot" ist auf **zwei** gelockert (Website + BFSG). **§10 gilt vor §9.8, wo sie sich widersprechen.**
