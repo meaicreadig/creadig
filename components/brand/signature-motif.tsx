@@ -34,7 +34,7 @@ function makeRandom(seed: number) {
 
 export function SignatureMotif({
   cell = 74,
-  density = 0.62,
+  density = 0.3,
   direction = "down",
   className,
 }: SignatureMotifProps) {
@@ -70,11 +70,11 @@ export function SignatureMotif({
         // Drei Tonwerte wie im CI: Gold, helles Gold, neutrales Grau.
         const roll = random()
         if (roll < 0.5) {
-          filled.push({ d, fill: "var(--mesh-fill)", opacity: 0.16 + random() * 0.16 })
+          filled.push({ d, fill: "var(--mesh-fill)", opacity: 0.08 + random() * 0.08 })
         } else if (roll < 0.78) {
-          filled.push({ d, fill: "var(--mesh-fill)", opacity: 0.07 + random() * 0.07 })
+          filled.push({ d, fill: "var(--mesh-fill)", opacity: 0.04 + random() * 0.04 })
         } else {
-          filled.push({ d, fill: "var(--line-strong)", opacity: 0.14 + random() * 0.12 })
+          filled.push({ d, fill: "var(--line-strong)", opacity: 0.07 + random() * 0.06 })
         }
       }
     }
