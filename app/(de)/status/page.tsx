@@ -21,6 +21,7 @@ import { CLIENT_LOGOS } from "@/lib/client-logos.generated"
 import { COMPANY_PHOTOS, COMPANY_PHOTO_SLOTS } from "@/lib/company-media.generated"
 import { productScreens } from "@/lib/product-media"
 import { publishedInsights } from "@/lib/insights"
+import { publishedServicePages } from "@/lib/service-pages"
 
 /**
  * BF-5 — was fehlt, an einer Stelle sichtbar.
@@ -170,6 +171,27 @@ function collect(): { open: Item[]; done: Item[] } {
         .filter(Boolean)
         .join(", ") || "vollständig",
       owner: "Owner: Angaben bestätigen — nichts wird geschätzt",
+    })
+  }
+
+  /* ── Leistungs-Tiefe: die vier Kauf-Fragen (MP10-1) ─────────────────── */
+  for (const page of publishedServicePages) {
+    const fehlend = [
+      page.duration ? null : "Projektdauer",
+      page.fromTo ? null : "vorher→nachher",
+      page.clientEffort ? null : "Kundenaufwand",
+    ].filter(Boolean)
+    items.push({
+      label: `Kauf-Fragen /leistungen/${page.slug} (MP10-1)`,
+      ok: fehlend.length === 0,
+      detail:
+        fehlend.length === 0
+          ? "alle vier Fragen beantwortet"
+          : `Ablauf steht (aus dem Bestand abgeleitet). Es fehlt: ${fehlend.join(", ")} — ` +
+            "diese Abschnitte rendern nicht.",
+      owner:
+        "Owner: reale Projektdauer, ein belegtes vorher→nachher und der Kundenaufwand " +
+        "(Zeit, Zugänge, Material). Nichts davon wird geschätzt.",
     })
   }
 

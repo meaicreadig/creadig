@@ -68,6 +68,41 @@ export type ServicePage = {
   includes: { de: string[]; tr: string[] }
   /** Für wen — aus den Schwerpunkten und der „Für wen"-Zeile der Ebene. */
   forWhom: { de: string[]; tr: string[] }
+  /*
+   * ==========================================================================
+   * MP10-1 — DIE VIER KAUF-FRAGEN
+   * ==========================================================================
+   *
+   * Die Seiten beantworteten bisher „was ist enthalten" und „für wen". Wer
+   * kaufen will, fragt vier andere Dinge, und zwar in dieser Reihenfolge:
+   * wie läuft das ab, wie lange dauert es, was ändert sich bei mir, was muss
+   * ich selbst beisteuern. Drei davon stehen unten als leeres Feld.
+   *
+   * --------------------------------------------------------------------------
+   * WARUM DREI VON VIER LEER SIND
+   * `process` darf hier stehen: Jeder Schritt ist eine Umformulierung dessen,
+   * was die Seite ohnehin sagt (`includes`, `lead`, die drei Prozessschritte
+   * aus dem Wörterbuch, ergänzt um „Umsetzung" aus `opsSteps`). Da wird
+   * nichts behauptet, was nicht schon dasteht.
+   *
+   * `duration`, `fromTo` und `clientEffort` dürfen es NICHT. Eine Projektdauer
+   * ist eine Zusage, ein Vorher→Nachher ist ein Ergebnisversprechen und ein
+   * Kundenaufwand ist eine Rechnung, die der Kunde in Stunden bezahlt. Alle
+   * drei sind aus dem Bestand nicht ableitbar — sie sind Erfahrungswerte, die
+   * nur der Owner hat. Erfunden wären sie genau die Sorte Zahl, an der uns
+   * später jemand misst.
+   *
+   * Sie stehen deshalb als Feld, nicht als Wert: `undefined` heißt, der
+   * Abschnitt rendert nicht — und die Lücke steht auf `/status`.
+   */
+  /** „Wie lange dauert das?" — Owner-gegatet, siehe Block oben. */
+  duration?: Localized
+  /** Die Schritte dieser Leistung, in Reihenfolge. Aus dem Bestand ableitbar. */
+  process?: { key: string; title: Localized; body: Localized }[]
+  /** „Was ändert sich im Betrieb?" — Owner-gegatet. */
+  fromTo?: { before: Localized; after: Localized }
+  /** „Was muss ich beitragen?" (Zeit, Zugänge, Material) — Owner-gegatet. */
+  clientEffort?: { de: string[]; tr: string[] }
   /**
    * BF-A6 — „Was wir tun, und was nicht."
    *
@@ -194,6 +229,40 @@ export const servicePages: ServicePage[] = [
       de: ["Bäckerei, Praxis, Restaurant, Handwerksbetrieb", "Betriebe ohne eigene IT-Abteilung"],
       tr: ["Fırın, muayenehane, restoran, zanaat işletmesi", "Kendi BT birimi olmayan işletmeler"],
     },
+    process: [
+      {
+        key: "verstehen",
+        title: { de: "Verstehen", tr: "Anlamak" },
+        body: {
+          de: "Wir sehen uns den Betrieb an, bevor wir eine Zeile bauen: was der Auftritt leisten muss und was danach im Alltag mit einer Anfrage passiert.",
+          tr: "Bir satır kurmadan önce işletmeye bakarız: görünümün ne yapması gerektiğine ve bir talebin ardından günlük işleyişte ne olduğuna.",
+        },
+      },
+      {
+        key: "aufbau",
+        title: { de: "Aufbau", tr: "Kurgu" },
+        body: {
+          de: "Struktur, Inhalte und Seitenaufbau stehen fest, bevor gestaltet wird — sonst gestaltet man eine Reihenfolge, die später nicht trägt.",
+          tr: "Tasarımdan önce yapı, içerik ve sayfa kurgusu belirlenir — yoksa sonradan taşımayan bir sıralama tasarlanmış olur.",
+        },
+      },
+      {
+        key: "umsetzung",
+        title: { de: "Umsetzung", tr: "Uygulama" },
+        body: {
+          de: "Wir bauen Website, Shop oder Landingpage in Abschnitten, die Sie unterwegs zu sehen bekommen. Zwischenstände statt einer Überraschung am Ende.",
+          tr: "Web sitesini, mağazayı ya da açılış sayfasını, yol boyunca göreceğiniz bölümler hâlinde kurarız. Sonunda sürpriz yerine ara durumlar.",
+        },
+      },
+      {
+        key: "betrieb",
+        title: { de: "Betrieb", tr: "İşletme" },
+        body: {
+          de: "Nach dem Start bleibt der Auftritt in Betrieb: keine Übergabe, sondern laufende Betreuung durch dieselben Leute, die ihn gebaut haben.",
+          tr: "Yayına aldıktan sonra görünüm işlemeye devam eder: teslim değil, onu kuran kişilerin sürekli desteği.",
+        },
+      },
+    ],
     packageKeys: ["website"],
     // Echtes Kundenwerk auf der Webdesign-Seite: NV SWISS ist Marke, Website
     // und Digitalisierung aus einer Hand — genau das, was diese Seite anbietet.
@@ -235,6 +304,40 @@ export const servicePages: ServicePage[] = [
       de: ["Gründer und neue Betriebe", "Handwerk vor dem ersten Auftritt"],
       tr: ["Girişimciler ve yeni işletmeler", "İlk görünümünden önceki zanaat işletmeleri"],
     },
+    process: [
+      {
+        key: "verstehen",
+        title: { de: "Verstehen", tr: "Anlamak" },
+        body: {
+          de: "Wofür soll die Marke stehen, und wo taucht sie auf? Am Fahrzeug, auf der Rechnung, im Schaufenster — das entscheidet, wie das Zeichen gebaut sein muss.",
+          tr: "Marka neyi temsil etmeli ve nerede görünüyor? Araçta, faturada, vitrinde — işareti nasıl kurmak gerektiğine bu karar verir.",
+        },
+      },
+      {
+        key: "entwuerfe",
+        title: { de: "Entwürfe", tr: "Taslaklar" },
+        body: {
+          de: "Zwei bis drei Logo-Konzepte, nicht dreißig Varianten einer Idee. Jedes ist ein eigener Vorschlag, keine Farbvariante des Nachbarn.",
+          tr: "Bir fikrin otuz varyantı değil, iki–üç logo konsepti. Her biri kendi başına bir öneridir, komşusunun renk varyantı değil.",
+        },
+      },
+      {
+        key: "umsetzung",
+        title: { de: "Umsetzung", tr: "Uygulama" },
+        body: {
+          de: "Aus dem gewählten Konzept entstehen Visitenkarte, Social-Media-Profil und ein grundlegendes Brand Manual — die Regeln, nach denen das Zeichen später verwendet wird.",
+          tr: "Seçilen konsepttan kartvizit, sosyal medya profili ve temel bir marka kılavuzu çıkar — işaretin sonradan hangi kurallara göre kullanılacağı.",
+        },
+      },
+      {
+        key: "fundament",
+        title: { de: "Fundament", tr: "Temel" },
+        body: {
+          de: "Was hier entsteht, trägt den digitalen Auftritt darüber. Deshalb steht diese Ebene am Anfang: Wer damit anfängt, muss später nichts geraderücken.",
+          tr: "Burada ortaya çıkan, üstündeki dijital görünümü taşır. Bu katman bu yüzden başta durur: Buradan başlayan, sonradan hiçbir şeyi düzeltmek zorunda kalmaz.",
+        },
+      },
+    ],
     packageKeys: ["website"],
     // Marke und Auftritt aus einer Hand — dieselbe Arbeit, andere Ebene.
     workSlugs: ["nv-swiss"],
@@ -281,6 +384,40 @@ export const servicePages: ServicePage[] = [
         "Evrak yükü büyüyen işletmeler",
       ],
     },
+    process: [
+      {
+        key: "verstehen",
+        title: { de: "Verstehen", tr: "Anlamak" },
+        body: {
+          de: "Wir sehen uns den Betrieb an, bevor wir eine Zeile bauen: welche Aufträge Sie wollen, welche nicht, und wo im Alltag Zeit verloren geht.",
+          tr: "Bir satır kurmadan önce işletmeye bakarız: hangi işleri istediğinizi, hangilerini istemediğinizi ve günlük işleyişte zamanın nerede kaybolduğunu.",
+        },
+      },
+      {
+        key: "aufbau",
+        title: { de: "Aufbau", tr: "Kurgu" },
+        body: {
+          de: "Leistungen, Referenzen und Kontaktweg werden so angeordnet, dass eine Anfrage in zwei Schritten möglich ist — auf Wunsch direkt per WhatsApp.",
+          tr: "Hizmetler, referanslar ve iletişim yolu, bir talebin iki adımda mümkün olacağı biçimde düzenlenir — istenirse doğrudan WhatsApp üzerinden.",
+        },
+      },
+      {
+        key: "umsetzung",
+        title: { de: "Umsetzung", tr: "Uygulama" },
+        body: {
+          de: "Wir bauen in Abschnitten und zeigen Zwischenstände. Wo ein Ablauf im Betrieb ohnehin schon hakt, richten wir ihn mit ein — Prozessoptimierung gehört dazu.",
+          tr: "Bölümler hâlinde kurar, ara durumları gösteririz. İşletmede zaten aksayan bir akış varsa onu da düzenleriz — süreç iyileştirme buna dâhildir.",
+        },
+      },
+      {
+        key: "betrieb",
+        title: { de: "Betrieb", tr: "İşletme" },
+        body: {
+          de: "Nach dem Start bleiben wir dran: betreiben, überwachen, weiterentwickeln. Laufende Betreuung statt Übergabe an jemanden, der den Betrieb nicht kennt.",
+          tr: "Yayına aldıktan sonra bırakmayız: işletir, izler, geliştiririz. İşletmeyi tanımayan birine teslim etmek yerine sürekli destek.",
+        },
+      },
+    ],
     packageKeys: ["website"],
     workSlugs: [],
     published: true,
@@ -329,6 +466,40 @@ export const servicePages: ServicePage[] = [
         "Çalışanlarına Türkçe ulaşmak isteyen işletmeler",
       ],
     },
+    process: [
+      {
+        key: "verstehen",
+        title: { de: "Verstehen", tr: "Anlamak" },
+        body: {
+          de: "Das Erstgespräch führen wir in der Sprache, die Ihnen liegt — auf Deutsch oder auf Türkisch, ohne Dolmetscher dazwischen.",
+          tr: "İlk görüşmeyi size uyan dilde yaparız — Almanca ya da Türkçe, araya tercüman girmeden.",
+        },
+      },
+      {
+        key: "aufbau",
+        title: { de: "Aufbau", tr: "Kurgu" },
+        body: {
+          de: "Beide Sprachfassungen werden zusammen geplant, nicht eine zuerst und die andere später. Was in einer Sprache steht, hat in der anderen einen Platz.",
+          tr: "Her iki dil sürümü birlikte planlanır; biri önce, öbürü sonra değil. Bir dilde duran şeyin öbüründe de yeri vardır.",
+        },
+      },
+      {
+        key: "umsetzung",
+        title: { de: "Umsetzung", tr: "Uygulama" },
+        body: {
+          de: "Gebaut werden beide Fassungen gleichwertig — keine halb übersetzte Website, bei der die zweite Sprache nach drei Klicks aufhört.",
+          tr: "İki sürüm de eşdeğer kurulur — ikinci dilin üç tıklamada bittiği yarım çevrilmiş bir site değil.",
+        },
+      },
+      {
+        key: "betreuung",
+        title: { de: "Betreuung", tr: "Destek" },
+        body: {
+          de: "Beratung, Unterlagen und laufende Betreuung bleiben dauerhaft in beiden Sprachen — auf Wunsch komplett über WhatsApp.",
+          tr: "Danışmanlık, belgeler ve sürekli destek kalıcı olarak iki dilde kalır — istenirse tamamen WhatsApp üzerinden.",
+        },
+      },
+    ],
     packageKeys: ["website"],
     // Die frueheren Slugs ("nur", "bir-damla-hayir") gibt es nicht mehr —
     // sie waren kein Kundenwerk. Bis eine zweisprachige Referenz freigegeben
@@ -377,6 +548,40 @@ export const servicePages: ServicePage[] = [
         "Kararları daha hızlı almak isteyen yerleşik işletmeler",
       ],
     },
+    process: [
+      {
+        key: "verstehen",
+        title: { de: "Verstehen", tr: "Anlamak" },
+        body: {
+          de: "Zuerst sehen wir uns an, was sich wiederholt: welche Arbeit jede Woche gleich abläuft, wo Zahlen von Hand übertragen werden, was liegen bleibt.",
+          tr: "Önce neyin tekrarlandığına bakarız: her hafta aynı işleyen iş hangisi, sayılar nerede elle aktarılıyor, ne birikip kalıyor.",
+        },
+      },
+      {
+        key: "systemaufbau",
+        title: { de: "Systemaufbau", tr: "Sistem kurulumu" },
+        body: {
+          de: "Wir legen fest, was das System übernimmt und was beim Menschen bleibt. Nicht alles, was sich automatisieren lässt, sollte automatisiert werden.",
+          tr: "Sistemin neyi üstleneceğini, neyin insanda kalacağını belirleriz. Otomatikleştirilebilen her şey otomatikleştirilmeli değildir.",
+        },
+      },
+      {
+        key: "umsetzung",
+        title: { de: "Umsetzung", tr: "Uygulama" },
+        body: {
+          de: "Die Abläufe werden gebaut und angebunden — auf Wunsch mit meAI darüber, das Zahlen, Aufgaben und Dokumente zusammenhält.",
+          tr: "Akışlar kurulur ve bağlanır — istenirse üzerinde, sayıları, görevleri ve belgeleri bir arada tutan meAI ile.",
+        },
+      },
+      {
+        key: "betrieb",
+        title: { de: "Betrieb", tr: "İşletme" },
+        body: {
+          de: "Betrieb und Weiterentwicklung bleiben bei uns. Ein automatisierter Ablauf, den niemand beobachtet, fällt irgendwann aus, ohne dass es jemand merkt.",
+          tr: "İşletme ve geliştirme bizde kalır. Kimsenin izlemediği otomatik bir akış, bir gün kimse fark etmeden durur.",
+        },
+      },
+    ],
     packageKeys: ["website"],
     workSlugs: ["meai", "fibero", "meahv"],
     published: true,
@@ -453,6 +658,46 @@ export const servicePages: ServicePage[] = [
         "Mevcut bir sitesi olan ve önce durumunu öğrenmek isteyenler",
       ],
     },
+    /*
+     * Vier Schritte, und keiner davon ist neu: Sie stehen als Zeilen in
+     * `includes` und als Stufen in `priceLadder`. Was hier dazukommt, ist
+     * die Reihenfolge — und die ist bei einer Pruefung das Angebot. Wer
+     * zuerst behebt und danach prueft, hat nichts belegt.
+     */
+    process: [
+      {
+        key: "pruefung",
+        title: { de: "Prüfung", tr: "Denetim" },
+        body: {
+          de: "Automatisiert über alle Hauptseiten, danach von Hand mit Tastatur und Screenreader. Der automatische Lauf findet ungefähr ein Drittel — den Rest findet ein Mensch.",
+          tr: "Önce tüm ana sayfalarda otomatik, sonra elle klavye ve ekran okuyucuyla. Otomatik geçiş yaklaşık üçte birini bulur — gerisini bir insan bulur.",
+        },
+      },
+      {
+        key: "befund",
+        title: { de: "Befundbericht", tr: "Bulgu raporu" },
+        body: {
+          de: "Jeder Fund mit Seite, Element, WCAG-Kriterium und Messwert. Der Bericht gehört Ihnen — auch wenn Sie danach jemand anderen beauftragen.",
+          tr: "Her bulgu sayfası, öğesi, WCAG ölçütü ve ölçülen değeriyle. Rapor sizindir — sonrasında başkasına verseniz de.",
+        },
+      },
+      {
+        key: "behebung",
+        title: { de: "Behebung", tr: "Giderme" },
+        body: {
+          de: "Die Funde werden im Code Ihrer Seite behoben. Kein Overlay, kein Widget, kein Plugin — eine Schicht darüber entfernt keine Barriere.",
+          tr: "Bulgular sitenizin kodunda giderilir. Overlay yok, widget yok, eklenti yok — üste konan bir katman hiçbir engeli kaldırmaz.",
+        },
+      },
+      {
+        key: "nachpruefung",
+        title: { de: "Nachprüfung", tr: "Yeniden denetim" },
+        body: {
+          de: "Nach der Behebung läuft dieselbe Prüfung erneut, mit Zahlen vorher und nachher. Ohne den zweiten Durchgang ist die Behebung eine Behauptung.",
+          tr: "Gidermeden sonra aynı denetim yeniden yapılır, öncesi ve sonrası sayılarla. İkinci geçiş olmadan giderme bir iddiadan ibarettir.",
+        },
+      },
+    ],
     boundary: {
       we: {
         de: [

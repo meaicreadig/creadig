@@ -615,6 +615,20 @@ export const dictionary = {
       forWhomLabel: "Für wen",
       layerLabel: "Ebene im System",
       processLabel: "So läuft es",
+      /*
+       * MP10-1 — die vier Kauf-Fragen.
+       *
+       * Drei der vier Beschriftungen stehen heute ueber leeren Feldern und
+       * rendern deshalb nicht. Sie sind trotzdem hier: Sobald der Owner eine
+       * Projektdauer, ein Vorher→Nachher oder einen Kundenaufwand bestaetigt,
+       * ist die Zeile fertig uebersetzt und muss nicht in zwei Woerterbuechern
+       * nachgezogen werden.
+       */
+      durationLabel: "Wie lange es dauert",
+      fromToLabel: "Was sich im Betrieb ändert",
+      fromToBefore: "Vorher",
+      fromToAfter: "Nachher",
+      clientEffortLabel: "Was Sie beitragen",
       packagesLabel: "In diesen Paketen enthalten",
       packagesCta: "Pakete und Preise ansehen",
       worksLabel: "Arbeiten dazu",
@@ -2100,6 +2114,11 @@ export const dictionary = {
       forWhomLabel: "Kimler için",
       layerLabel: "Sistemdeki kademe",
       processLabel: "Nasıl ilerler",
+      durationLabel: "Ne kadar sürer",
+      fromToLabel: "İşletmede ne değişir",
+      fromToBefore: "Öncesi",
+      fromToAfter: "Sonrası",
+      clientEffortLabel: "Sizden gerekenler",
       packagesLabel: "Şu paketlere dahil",
       packagesCta: "Paketleri ve fiyatları gör",
       worksLabel: "İlgili işler",

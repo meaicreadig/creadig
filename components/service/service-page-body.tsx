@@ -209,23 +209,83 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
               </div>
             </Reveal>
 
-            {/* Der Prozess ist derselbe wie auf der Startseite — bewusst. */}
+            {/*
+              MP10-1 — der Ablauf DIESER Leistung, nicht der des Hauses.
+
+              Hier standen die drei Schritte „Verstehen · Bauen · Betreiben"
+              aus dem Woerterbuch — auf allen sechs Seiten dieselben. Sie
+              beschreiben eine Haltung, und die stimmt; nur beantworten sie
+              nicht die Frage, mit der jemand auf einer Leistungsseite steht:
+              „Wenn ich hier zusage, was passiert dann konkret?"
+
+              `page.process` sagt genau das, in vier Schritten, je Leistung
+              verschieden. Kein Schritt behauptet etwas Neues — jeder ist eine
+              Umformulierung dessen, was unter „Was dazugehoert" ohnehin
+              schon steht. Fehlt die Liste, bleiben die drei Haus-Schritte:
+              lieber die allgemeine Antwort als gar keine.
+            */}
             <Reveal delay={0.08} className="border-line mt-14 border-t pt-8">
               <p className="eyebrow text-gold-text">{copy.processLabel}</p>
-              <div className="mt-6 grid gap-8 sm:grid-cols-3">
-                {(["understand", "build", "operate"] as const).map((key, i) => (
-                  <div key={key}>
-                    <span className="eyebrow text-muted-foreground">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <h2 className="text-subhead mt-3 text-lg">{t.process.steps[key].name}</h2>
-                    <p className="type-small text-muted-foreground mt-3 text-pretty">
-                      {t.process.steps[key].what}
+              {page.process ? (
+                <ol className="mt-6 grid gap-8 sm:grid-cols-2">
+                  {page.process.map((step, i) => (
+                    <li key={step.key}>
+                      <span className="eyebrow text-muted-foreground">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <h2 className="text-subhead mt-3 text-lg">{step.title[locale]}</h2>
+                      <p className="type-small text-muted-foreground mt-3 text-pretty">
+                        {step.body[locale]}
+                      </p>
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <div className="mt-6 grid gap-8 sm:grid-cols-3">
+                  {(["understand", "build", "operate"] as const).map((key, i) => (
+                    <div key={key}>
+                      <span className="eyebrow text-muted-foreground">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <h2 className="text-subhead mt-3 text-lg">{t.process.steps[key].name}</h2>
+                      <p className="type-small text-muted-foreground mt-3 text-pretty">
+                        {t.process.steps[key].what}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Reveal>
+
+            {/*
+              MP10-1 — „was aendert sich bei mir?"
+
+              Owner-gegatet und heute auf allen sechs Seiten leer. Das ist
+              kein Versehen: Ein Vorher→Nachher ist ein Ergebnisversprechen,
+              und ein Ergebnisversprechen ohne einen Betrieb, an dem es
+              gemessen wurde, ist eine Erfindung. Der Abschnitt erscheint mit
+              dem ersten bestaetigten Fall — bis dahin steht die Luecke auf
+              `/status`.
+            */}
+            {page.fromTo && (
+              <Reveal delay={0.09} className="border-line mt-14 border-t pt-8">
+                <p className="eyebrow text-gold-text">{copy.fromToLabel}</p>
+                <div className="border-line bg-line mt-6 grid gap-px border sm:grid-cols-2">
+                  <div className="bg-surface px-6 py-6">
+                    <p className="eyebrow text-muted-foreground">{copy.fromToBefore}</p>
+                    <p className="type-body text-muted-foreground mt-4 text-pretty">
+                      {page.fromTo.before[locale]}
                     </p>
                   </div>
-                ))}
-              </div>
-            </Reveal>
+                  <div className="bg-surface px-6 py-6">
+                    <p className="eyebrow text-gold-text">{copy.fromToAfter}</p>
+                    <p className="type-body text-foreground/85 mt-4 text-pretty">
+                      {page.fromTo.after[locale]}
+                    </p>
+                  </div>
+                </div>
+              </Reveal>
+            )}
 
             {works.length > 0 && (
               <Reveal delay={0.12} className="border-line mt-14 border-t pt-8">
@@ -268,6 +328,47 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
               </ul>
               <p className="type-small text-muted-foreground mt-6 text-pretty">{layer.who}</p>
             </Reveal>
+
+            {/*
+              MP10-1 — „wie lange dauert das?"
+
+              Die zweite der vier Kauf-Fragen, und die einzige, auf die man
+              ohne Zahl gar nicht antworten kann. Genau deshalb steht hier
+              heute nichts: Eine geschaetzte Projektdauer ist eine Zusage,
+              die im ersten Projekt gebrochen wird. Owner-gegatet, Luecke auf
+              `/status`.
+            */}
+            {page.duration && (
+              <Reveal delay={0.05} className="border-line mt-14 border-t pt-8">
+                <p className="eyebrow text-gold-text">{copy.durationLabel}</p>
+                <p className="type-body text-foreground/85 mt-6 text-pretty">
+                  {page.duration[locale]}
+                </p>
+              </Reveal>
+            )}
+
+            {/*
+              MP10-1 — „was muss ich beitragen?"
+
+              Die Frage, die niemand stellt und jeder mitrechnet: Zeit,
+              Zugaenge, Material. Sie ehrlich zu beantworten kostet vielleicht
+              eine Anfrage und spart mit Sicherheit ein Projekt, das an
+              fehlenden Zulieferungen haengen bleibt. Owner-gegatet, weil nur
+              er weiss, was ein Betrieb tatsaechlich liefern musste.
+            */}
+            {page.clientEffort && (
+              <Reveal delay={0.06} className="border-line mt-14 border-t pt-8">
+                <p className="eyebrow text-gold-text">{copy.clientEffortLabel}</p>
+                <ul className="mt-6 flex flex-col gap-4">
+                  {page.clientEffort[locale].map((item) => (
+                    <li key={item} className="flex gap-3.5">
+                      <span aria-hidden="true" className="bg-gold mt-2.5 h-px w-5 shrink-0" />
+                      <span className="type-body text-foreground/85 text-pretty">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
+            )}
 
             {/*
               BF-9 — HIER STAND DER PREIS, UND DAS WAR DIE FALSCHE STELLE.
