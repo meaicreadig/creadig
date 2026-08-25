@@ -3,6 +3,7 @@
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { Services } from "@/components/sections/services"
+import { ManagedOperations } from "@/components/sections/managed-operations"
 import { Process } from "@/components/sections/process"
 import { Packages } from "@/components/sections/packages"
 import { Faq } from "@/components/sections/faq"
@@ -55,6 +56,13 @@ export function LeistungenPageBody() {
 
       {/* Die H1 steht im Kopf — die Ebenen kommen ohne zweite Überschrift. */}
       <Services heading={false} />
+      {/*
+        Der Betrieb steht direkt unter der Pyramide — er ist die Schicht, die
+        quer unter allen fuenf Ebenen liegt, nicht die sechste Stufe darin
+        (KIZILELMA §10.1). Danach erst der Ablauf: Was gebaut wird, dann was
+        laufend gilt, dann wie es zustande kommt.
+      */}
+      <ManagedOperations />
       <Process />
       <Packages />
       <Faq />

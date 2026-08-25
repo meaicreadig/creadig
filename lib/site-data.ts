@@ -833,7 +833,30 @@ export const opsSteps = [
  * angezeigte Zeichenkette, damit beides nicht auseinanderlaufen kann.
  */
 /*
- * EIN Angebot, EIN Preis, EINE Leiter.
+ * EINSTIEGSANGEBOTE — zwei Tueren, nicht das Haus (KIZILELMA §10.7).
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM DAS EINE EIGENE RUBRIK IST
+ * Das Website-Paket stand hier als „das Angebot" — die einzige bepreiste
+ * Sache der Seite, direkt unter den fuenf Ebenen. Wer so liest, kommt zu dem
+ * Schluss, der in der Tiefen-Analyse steht: „doch nur eine Website-Agentur."
+ * Ein Festpreis-Paket fuer 2.400 EUR ist kein Beispiel der System-Haus-
+ * Architektur, es ist der Einstieg davor. Beides in einer Reihe zu zeigen
+ * macht das Groessere klein, nicht das Kleinere gross.
+ *
+ * Deshalb: Diese Liste heisst „Einstiegsangebote" und traegt jetzt ZWEI
+ * Eintraege — das Website-Paket und die Barrierefreiheits-Pruefung. Beide
+ * sind Festpreise, beide sind Tueren ins Haus, keiner von beiden ist die
+ * Hauptarchitektur. Die steht darueber in den fuenf Ebenen und rechnet nach
+ * Umfang ab.
+ *
+ * Der frueher hier stehende Lock „EIN beworbenes Angebot" ist damit
+ * abgeloest (KIZILELMA §10 vor §9.8). Was NICHT gelockert ist: Es gibt
+ * weiterhin genau EINE Preisleiter je Angebot, und kein Preis erscheint an
+ * zwei Stellen mit zwei Zahlen.
+ *
+ * ---------------------------------------------------------------------------
+ * Die Website-Leiter (KIZILELMA §9.3, gesperrt):
  *
  * Hier standen drei Pakete — 350 EUR einmalig, 500 EUR/Monat, 1.500 EUR/Monat.
  * Zwei Probleme auf einmal: Die Zahlen entsprachen nicht mehr dem, was das
@@ -850,17 +873,58 @@ export const opsSteps = [
  * den Referenzpreis bekommt, soll sehen, was er kostet — sonst ist es kein
  * Entgegenkommen, sondern eine spaetere Ueberraschung.
  */
-export const packages = [
+export type Package = {
+  key: "website" | "audit"
+  tier: string
+  price: string
+  amount: number
+  period: string | null
+  /** Regelpreis ab dem dritten Betrieb — steht offen daneben. */
+  regularPrice?: string
+  regularAmount?: number
+  recommended: boolean
+  /**
+   * Wohin die Schaltfläche fuehrt. Ohne Angabe in den Termin-Assistenten
+   * (`/termin?paket=<key>`); mit Angabe auf die Leistungsseite, die das
+   * Angebot ausfuehrlich beschreibt.
+   *
+   * Fuer die Pruefung ist das die richtige Reihenfolge: Sie hat eine eigene
+   * Seite mit Grenze, Preisleiter und Kurz-Check. Wer aus einer Kachel
+   * heraus direkt in ein Terminformular faellt, hat vorher nicht gelesen,
+   * was er bucht.
+   */
+  ctaHref?: string
+}
+
+export const packages: Package[] = [
   {
-    key: "website" as const,
+    key: "website",
     tier: "01",
     price: "€2.400",
     amount: 2400,
     period: null,
-    /** Regelpreis ab dem dritten Betrieb — steht offen daneben. */
     regularPrice: "€3.900",
     regularAmount: 3900,
     recommended: false,
+  },
+  {
+    /*
+     * Die Barrierefreiheits-Pruefung (Owner-Beschluss, zweites Angebot).
+     *
+     * Der Preis steht hier NICHT zusaetzlich, sondern derselbe wie in der
+     * Preisleiter auf `/leistungen/barrierefreiheit-website` — dort als
+     * erste Stufe, hier als Kachel. Eine Zahl, zwei Ansichten. Die Behebung
+     * (2.000–4.000 EUR) taucht hier bewusst nicht auf: Sie ist kein
+     * Festpreis, und eine Spanne in einer Preiskachel liest jeder als
+     * Angebot.
+     */
+    key: "audit",
+    tier: "02",
+    price: "€1.500",
+    amount: 1500,
+    period: null,
+    recommended: false,
+    ctaHref: "/leistungen/barrierefreiheit-website",
   },
 ]
 
@@ -877,6 +941,37 @@ export const packages = [
  * `null` ist, rendert der Block nicht. Einen Retainer zu bewerben, dessen
  * Umfang niemand festgelegt hat, wäre ein Versprechen ohne Substanz.
  */
+/* ==========================================================================
+ * MANAGED BETRIEB (V2-3 · KIZILELMA §10.1 / §10.7)
+ *
+ * Die sieben Bestandteile des laufenden Betriebs, benannt.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM SIE HIER STEHEN UND NICHT IM WOERTERBUCH
+ * Sie stehen im Woerterbuch — die Texte. Hier steht nur die REIHENFOLGE und
+ * die Schluessel, aus demselben Grund wie bei `serviceLayers`: Die Reihe ist
+ * eine Aussage (Hosting zuerst, Weiterentwicklung zuletzt) und sie darf sich
+ * nicht danach richten, in welcher Reihenfolge jemand zwei Woerterbuecher
+ * gepflegt hat.
+ *
+ * ---------------------------------------------------------------------------
+ * WAS HIER BEWUSST FEHLT
+ * Keine Verfuegbarkeitszusage in Prozent, keine Reaktionszeit in Stunden,
+ * kein „24/7". Zugesagt ist, was im Retainer-Umfang steht — Rueckruf am
+ * naechsten Werktag. Eine SLA-Zahl, die ein Haus dieser Groesse an einem
+ * Sonntag nicht halten kann, ist keine Zusage, sondern eine spaetere
+ * Enttaeuschung (dieselbe Begruendung wie bei BF-8).
+ * ========================================================================== */
+export const managedOperations = [
+  "hosting",
+  "monitoring",
+  "updates",
+  "security",
+  "backups",
+  "support",
+  "evolution",
+] as const
+
 export const retainer = {
   /** Preis pro Monat, netto. `null` = der Block erscheint nicht. */
   price: "€149" as string | null,

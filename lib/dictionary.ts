@@ -874,12 +874,24 @@ export const dictionary = {
         "Das ICO InnovationsCentrum Osnabrück an der Albert-Einstein-Straße 1 — Sitz von creaDIG",
     },
     packages: {
-      eyebrow: "Angebot",
-      title: "Ihr erster Schritt mit creaDIG.",
-      lead: "Ein Festpreis, offen benannt. Sie sehen vorher, was Sie zahlen — kein Riba, keine versteckten Posten.",
+      /*
+       * V2-3 — DIE RUBRIK HEISST JETZT „EINSTIEGSANGEBOTE".
+       *
+       * Sie hiess „Angebot" und stand als einzige bepreiste Sache direkt
+       * unter den fuenf Ebenen. Wer so liest, kommt zu dem Schluss aus der
+       * Tiefen-Analyse: „doch nur eine Website-Agentur." Ein Festpreis-Paket
+       * ist kein Beispiel der System-Haus-Architektur, es ist die Tuer davor
+       * — und `entryNote` sagt das jetzt in einem Satz, statt es dem Leser
+       * zu ueberlassen.
+       */
+      eyebrow: "Einstiegsangebote",
+      title: "Zwei Wege hinein — beide zum Festpreis.",
+      lead: "Nicht jeder Betrieb fängt oben an. Diese beiden Angebote sind der Einstieg: klar umrissen, vorher bepreist, ohne dass Sie das ganze Haus mitbestellen.",
+      entryNote:
+        "Das ist der Einstieg, nicht die Hauptarchitektur. Was creaDIG als System-Haus baut, steht oben in den fünf Ebenen und wird nach Umfang gerechnet — nicht nach Paket.",
       forWhom: "Für wen",
       recommended: "Unsere Empfehlung",
-      tierLabel: "Angebot",
+      tierLabel: "Einstieg",
       /*
        * Der Referenzpreis wird offen als solcher benannt — samt Regelpreis
        * daneben. Ein Nachlass, den der Kunde erst bei der zweiten Rechnung
@@ -935,7 +947,94 @@ export const dictionary = {
           note: "Festpreis für den vereinbarten Umfang. Fester Livetermin: vier Wochen ab Materialeingang. 50 % bei Start, 50 % bei Ihrer Freigabe. Seite und Zugänge gehören Ihnen ab Tag eins.",
           cta: "Projekt anfragen",
         },
+        /*
+         * Der zweite Einstieg. Der Preis ist DERSELBE wie in der Preisleiter
+         * auf /leistungen/barrierefreiheit-website — eine Zahl, zwei
+         * Ansichten. Die Behebung (2.000–4.000 EUR) steht hier bewusst
+         * nicht: Sie ist kein Festpreis, und eine Spanne in einer
+         * Preiskachel liest jeder als Angebot.
+         */
+        audit: {
+          name: "Barrierefreiheits-Prüfung",
+          who: "Für Betriebe, deren Seite schon steht",
+          outcome: "Ein Befundbericht, der Ihnen gehört — auch wenn Sie danach nichts tun",
+          includes: [
+            "Manuelle Prüfung nach WCAG 2.1 AA über alle Hauptseiten",
+            "Durchlauf mit Tastatur und Screenreader, nicht nur ein Scan",
+            "Jeder Fund mit Seite, Element, Kriterium und Messwert",
+            "Erklärung zur Barrierefreiheit als technische Vorlage",
+            "Nachprüfung nach einer Behebung, mit Zahlen vorher und nachher",
+          ],
+          note: "Festpreis. Die Prüfung steht für sich und verpflichtet zu keiner Behebung. Was eine Behebung kostet, sagen wir erst, wenn wir den Code gesehen haben — für Ungesehenes nennt niemand seriös einen Festpreis.",
+          cta: "Leistung ansehen",
+        },
       },
+    },
+    /*
+     * V2-3 — MANAGED BETRIEB, ALS LEISTUNG BENANNT.
+     *
+     * -----------------------------------------------------------------------
+     * WARUM DAS EINE EIGENE SEKTION IST
+     * „Betreiben" war bisher an drei Stellen verteilt: als dritter
+     * Prozessschritt (eine Haltung), als „Ops-Retainer" in einer Fusszeile
+     * der Werkschau und als Preiskaestchen unter den Paketen. Genau das ist
+     * der Teil, der ein Haus von einer Agentur unterscheidet, die uebergibt
+     * und verschwindet — und der einzige, der wiederkehrenden Umsatz traegt.
+     * Als Fussnote gelesen ist er nichts davon.
+     *
+     * -----------------------------------------------------------------------
+     * ER IST KEINE SECHSTE EBENE
+     * Die fuenf Ebenen stehen senkrecht aufeinander. Der Betrieb liegt quer
+     * darunter und beruehrt jede von ihnen (KIZILELMA §10.1: die horizontale
+     * Lebenszyklus-Ebene). Deshalb steht die Sektion UNTER der Pyramide und
+     * nicht als sechste Zeile darin — eine sechste Zeile haette behauptet,
+     * man koenne Betrieb weglassen wie Automation.
+     *
+     * -----------------------------------------------------------------------
+     * WAS HIER NICHT STEHT
+     * Keine Verfuegbarkeit in Prozent, keine Reaktionszeit in Stunden, kein
+     * „24/7". Zugesagt ist der Rueckruf am naechsten Werktag, weil das ein
+     * Haus dieser Groesse halten kann. Eine SLA-Zahl, die an einem Sonntag
+     * bricht, ist keine Zusage, sondern eine spaetere Enttaeuschung —
+     * dieselbe Begruendung wie bei den zwei Werktagen in BF-8.
+     */
+    managed: {
+      eyebrow: "Betreiben",
+      title: "Managed Betrieb.",
+      lead: "Die fünf Ebenen stehen senkrecht aufeinander. Das hier liegt quer darunter und berührt jede von ihnen: Was gebaut ist, muss laufen — jeden Tag, auch an den Tagen, an denen niemand daran denkt.",
+      statement: "Wir übergeben nicht und verschwinden. Was wir gebaut haben, betreiben wir weiter — fällt nachts etwas aus, ist das unser Problem und nicht Ihres.",
+      itemsLabel: "Was dazugehört",
+      items: {
+        hosting: {
+          name: "Hosting",
+          what: "Server, Domains und Zertifikate — eingerichtet, bezahlt und in unserer Hand.",
+        },
+        monitoring: {
+          name: "Monitoring",
+          what: "Die Seite meldet sich, wenn sie nicht erreichbar ist. Nicht Ihr Kunde.",
+        },
+        updates: {
+          name: "Updates",
+          what: "Abhängigkeiten und Systemstände bleiben aktuell — bevor aus einer Lücke ein Vorfall wird.",
+        },
+        security: {
+          name: "Security",
+          what: "Zugänge, Rechte, Header und Transportverschlüsselung auf dem Stand, der beim Bau gesetzt wurde.",
+        },
+        backups: {
+          name: "Backups",
+          what: "Gesichert und zurückspielbar. Ein Backup, das nie zurückgespielt wurde, ist keins.",
+        },
+        support: {
+          name: "Support",
+          what: "Ein Ansprechpartner, der das System selbst gebaut hat. Rückruf am nächsten Werktag.",
+        },
+        evolution: {
+          name: "Weiterentwicklung",
+          what: "Was sich im Betrieb als falsch herausstellt, wird geändert — nicht dokumentiert und stehen gelassen.",
+        },
+      },
+      note: "Keine Verfügbarkeit in Prozent, keine Reaktionszeit in Stunden, kein „24/7“. Zugesagt ist, was hier steht — und das halten wir auch im Urlaub.",
     },
     certs: {
       eyebrow: "Zertifizierungen & Mitgliedschaften",
@@ -2035,12 +2134,14 @@ export const dictionary = {
         "Albert-Einstein-Straße 1'deki ICO InnovationsCentrum Osnabrück — creaDIG'in merkezi",
     },
     packages: {
-      eyebrow: "Teklif",
-      title: "creaDIG ile ilk adımınız.",
-      lead: "Açıkça belirtilmiş tek bir sabit fiyat. Ne ödeyeceğinizi önceden görürsünüz — riba yok, gizli kalem yok.",
+      eyebrow: "Giriş teklifleri",
+      title: "İçeri iki yol — ikisi de sabit fiyatlı.",
+      lead: "Her işletme en üstten başlamaz. Bu iki teklif giriş adımıdır: sınırları belli, fiyatı önceden yazılı, tüm evi birden sipariş etmeden.",
+      entryNote:
+        "Bu giriş adımıdır, ana mimari değil. creaDIG'in sistem evi olarak kurduğu şey yukarıda beş katmanda durur ve pakete göre değil, kapsama göre hesaplanır.",
       forWhom: "Kimler için",
       recommended: "Önerimiz",
-      tierLabel: "Teklif",
+      tierLabel: "Giriş",
       referenceNote:
         "İlk iki işletme için referans fiyatı — karşılığında bir görüş cümlesi, referans olarak anılma ve iki fotoğraf. Üçüncü işletmeden itibaren normal fiyat geçerlidir.",
       regularLabel: "Normal fiyat",
@@ -2073,7 +2174,59 @@ export const dictionary = {
           note: "Kararlaştırılan kapsam için sabit fiyat. Sabit yayın tarihi: malzeme ulaştıktan sonra dört hafta. Başlangıçta %50, onayınızda %50. Site ve tüm erişimler ilk günden itibaren sizindir.",
           cta: "Proje talebi gönder",
         },
+        audit: {
+          name: "Erişilebilirlik denetimi",
+          who: "Sitesi hâlihazırda ayakta olan işletmeler için",
+          outcome: "Size ait olan bir bulgu raporu — sonrasında hiçbir şey yapmasanız da",
+          includes: [
+            "Tüm ana sayfalarda WCAG 2.1 AA'ya göre elle denetim",
+            "Klavye ve ekran okuyucuyla baştan sona geçiş, yalnızca tarama değil",
+            "Her bulgu sayfası, öğesi, ölçütü ve ölçülen değeriyle",
+            "Teknik taslak olarak erişilebilirlik beyanı",
+            "Giderme sonrası yeniden denetim, öncesi ve sonrası sayılarla",
+          ],
+          note: "Sabit fiyat. Denetim tek başına durur ve hiçbir gidermeye mecbur bırakmaz. Gidermenin ne tutacağını ancak kodu gördükten sonra söyleriz — görülmemiş bir iş için kimse ciddi biçimde sabit fiyat vermez.",
+          cta: "Hizmeti gör",
+        },
       },
+    },
+    managed: {
+      eyebrow: "İşletme",
+      title: "Managed işletme.",
+      lead: "Beş katman dikey olarak üst üste durur. Bu ise onların altında yatay uzanır ve hepsine dokunur: Kurulan şeyin işlemesi gerekir — her gün, kimsenin aklına gelmediği günlerde de.",
+      statement: "Teslim edip kaybolmayız. Kurduğumuz şeyi işletmeye devam ederiz — gece bir şey düşerse bu bizim sorunumuzdur, sizin değil.",
+      itemsLabel: "Neler dahil",
+      items: {
+        hosting: {
+          name: "Hosting",
+          what: "Sunucu, alan adları ve sertifikalar — kurulmuş, ödenmiş ve bizim elimizde.",
+        },
+        monitoring: {
+          name: "Monitoring",
+          what: "Site erişilemez olduğunda kendisi haber verir. Müşteriniz değil.",
+        },
+        updates: {
+          name: "Güncellemeler",
+          what: "Bağımlılıklar ve sistem sürümleri güncel kalır — bir açık olaya dönüşmeden önce.",
+        },
+        security: {
+          name: "Güvenlik",
+          what: "Erişimler, yetkiler, başlıklar ve aktarım şifrelemesi, kurulumda belirlenen düzeyde tutulur.",
+        },
+        backups: {
+          name: "Yedekler",
+          what: "Yedeklenir ve geri yüklenebilir. Hiç geri yüklenmemiş bir yedek, yedek değildir.",
+        },
+        support: {
+          name: "Destek",
+          what: "Sistemi bizzat kurmuş tek bir muhatap. Bir sonraki iş günü geri arama.",
+        },
+        evolution: {
+          name: "Geliştirme",
+          what: "İşletmede yanlış olduğu ortaya çıkan şey değiştirilir — belgelenip öylece bırakılmaz.",
+        },
+      },
+      note: "Yüzdeyle verilmiş erişilebilirlik oranı yok, saatle verilmiş yanıt süresi yok, „7/24“ yok. Verdiğimiz söz burada yazandır — tatilde de tutarız.",
     },
     certs: {
       eyebrow: "Sertifikalar & üyelikler",

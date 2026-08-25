@@ -1,4 +1,4 @@
-import type { Localized } from "@/lib/site-data"
+import type { Localized, Package } from "@/lib/site-data"
 
 /**
  * Granulare Leistungsseiten (E-K4).
@@ -125,8 +125,14 @@ export type ServicePage = {
     }[]
     note: Localized
   }
-  /** Pakete, in denen die Leistung enthalten ist. */
-  packageKeys: "website"[]
+  /**
+   * Einstiegsangebote, in denen die Leistung enthalten ist.
+   *
+   * Seit V2-3 gibt es zwei (`website`, `audit`), und die Barrierefreiheits-
+   * Seite fuehrt bewusst weiterhin nur `website`: Das Audit IST diese Seite.
+   * Eine Kachel, die auf sich selbst zeigt, ist keine Einordnung.
+   */
+  packageKeys: Package["key"][]
   /**
    * BF-A5 — Seiten, deren Leistung NICHT im Paket steckt, sondern davor.
    *

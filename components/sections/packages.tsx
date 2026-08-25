@@ -4,11 +4,11 @@ import { ArrowUpRight, Check } from "lucide-react"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { packages, retainer, retainerPublished } from "@/lib/site-data"
+import { packages } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 export function Packages() {
-  const { t, locale } = useLocale()
+  const { t } = useLocale()
 
   return (
     <section id="pakete" aria-labelledby="pakete-title" className="border-line border-b">
@@ -141,7 +141,13 @@ export function Packages() {
                     /tr/... in die deutsche Fassung — der Regel-Pruefer sieht
                     das bei einem Template-Literal nicht. */}
                 <Link
-                  href={`/termin?paket=${pkg.key}`}
+                  /*
+                    Ohne eigenes Ziel in den Termin-Assistenten. Die Pruefung
+                    hat eins: eine Seite mit Grenze, Preisleiter und
+                    Kurz-Check. Wer aus einer Kachel heraus direkt in ein
+                    Terminformular faellt, hat nicht gelesen, was er bucht.
+                  */
+                  href={pkg.ctaHref ?? `/termin?paket=${pkg.key}`}
                   className={
                     pkg.recommended
                       ? "from-gold-soft to-gold group/cta relative mt-7 inline-flex items-center justify-between gap-2 overflow-hidden bg-gradient-to-br px-5 py-3.5 text-sm tracking-wide text-[#201e1b]"
@@ -198,60 +204,18 @@ export function Packages() {
         </p>
 
         {/*
-          Laufende Betreuung (E-K6). Sie stand bisher als „Ops-Retainer" in
-          einer Fusszeile der Werkschau — dabei ist sie das, was creaDIG von
-          einer Agentur unterscheidet, die uebergibt und verschwindet.
+          V2-3 — der Satz, der die Rubrik einordnet.
 
-          Erscheint erst, wenn Preis UND Leistungsumfang bestaetigt sind
-          (lib/site-data.ts -> retainer). Einen Retainer zu bewerben, dessen
-          Umfang niemand festgelegt hat, waere ein Versprechen ohne Substanz.
+          Ohne ihn steht eine Preistabelle unter fuenf Ebenen und macht das
+          Groessere klein: Wer 2.400 EUR liest, hat die Antwort auf „was ist
+          das hier" gefunden, bevor er die Ebenen zu Ende gelesen hat. Der
+          Satz sagt ausdruecklich, dass dies der Einstieg ist und nicht die
+          Hauptarchitektur (KIZILELMA §10.7).
         */}
-        {retainerPublished && retainer.description && (
-          <Reveal delay={0.1}>
-            <div className="border-gold/45 bg-muted mt-20 grid gap-10 border-l-2 px-7 py-9 md:px-10 md:py-11 lg:grid-cols-12 lg:gap-14">
-              <div className="lg:col-span-7">
-                <p className="eyebrow text-gold-text">{t.packages.retainerEyebrow}</p>
-                <h3 className="type-h3 mt-5 text-balance">{t.packages.retainerTitle}</h3>
-                <p className="type-body text-foreground/85 mt-6 max-w-2xl text-pretty">
-                  {retainer.description[locale]}
-                </p>
-                {retainer.includes && (
-                  <ul className="mt-7 grid gap-3 sm:grid-cols-2">
-                    {retainer.includes[locale].map((item) => (
-                      <li key={item} className="flex gap-3">
-                        <Check className="text-gold mt-0.5 size-4 shrink-0" strokeWidth={1.5} />
-                        <span className="type-small text-muted-foreground text-pretty">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+        <p className="type-body text-foreground/85 border-line mt-6 max-w-3xl border-t pt-6 text-pretty">
+          {t.packages.entryNote}
+        </p>
 
-              <div className="flex flex-col justify-end lg:col-span-5">
-                <div className="flex items-baseline gap-2.5">
-                  <span className="eyebrow text-muted-foreground">
-                    {t.packages.retainerFrom}
-                  </span>
-                  <span className="type-stat">{retainer.price}</span>
-                  <span className="eyebrow text-muted-foreground">{t.packages.monthly}</span>
-                </div>
-                {/*
-                  War ein nacktes <a>. Zwei Folgen: ein voller Ladevorgang
-                  statt Client-Navigation — und auf /tr/... ein Sprung in die
-                  deutsche Fassung, weil das Sprachpraefix fehlte. Der
-                  LocaleLink setzt es (siehe components/ui/locale-link.tsx).
-                */}
-                <Link
-                  href="/termin?paket=retainer"
-                  className="border-line-strong hover:border-gold hover:text-gold-text mt-7 inline-flex items-center justify-between gap-2 self-start border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
-                >
-                  {t.packages.retainerCta}
-                  <ArrowUpRight className="size-4" strokeWidth={1.5} />
-                </Link>
-              </div>
-            </div>
-          </Reveal>
-        )}
       </div>
     </section>
   )
