@@ -3,7 +3,7 @@ import { UnternehmenPageBody } from "@/components/pages/unternehmen-page-body"
 import { Location } from "@/components/sections/location"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { pageMetadata } from "@/lib/page-metadata"
-import { address, certifications } from "@/lib/site-data"
+import { address } from "@/lib/site-data"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
 import { SITE_URL, localeUrl } from "@/lib/routes"
 
@@ -29,9 +29,14 @@ export function unternehmenMetadata(locale: Locale): Metadata {
 }
 
 /*
- * `AboutPage` verweist auf die Organisation aus dem Layout und trägt die
- * Nachweise als `hasCredential`. Alle fünf sind bei den genannten Stellen
- * überprüfbar — nichts Selbstvergebenes, nichts Gekauftes.
+ * `AboutPage` verweist auf die Organisation aus dem Layout.
+ *
+ * V2-5 — HIER STAND `hasCredential` MIT VIER EINTRAEGEN. BAFA, iuk, AVPQ und
+ * AGD sind nicht belegt (KIZILELMA §9.9), und in strukturierten Daten war es
+ * dieselbe Behauptung wie auf der Seite, nur unsichtbar und gegenueber
+ * Google. Unsichtbar macht sie nicht harmloser: Ein Nachweis, den Google
+ * fuehrt und niemand bestaetigen kann, ist genau die Sorte Angabe, die eine
+ * Domain teuer zu stehen kommt.
  */
 function jsonLd(locale: Locale) {
   const t = dictionary[locale]
@@ -58,11 +63,6 @@ function jsonLd(locale: Locale) {
           addressLocality: address.city,
           addressCountry: address.countryCode,
         },
-        hasCredential: certifications.map((cert) => ({
-          "@type": "EducationalOccupationalCredential",
-          name: cert.name,
-          url: cert.href,
-        })),
       },
     },
   ]

@@ -5,7 +5,6 @@ import {
   approvedReviews,
   caseChapterKeys,
   caseStudies,
-  certifications,
   clientWorks,
   impactFigures,
   filledChapters,
@@ -257,10 +256,13 @@ function collect(): { open: Item[]; done: Item[] } {
   })
 
   items.push({
-    label: "Zertifizierungen",
-    ok: certifications.length > 0,
-    detail: `${certifications.length} nachprüfbare Einträge`,
-    owner: "—",
+    label: "Zertifizierungen & Mitgliedschaften (§9.9)",
+    ok: false,
+    detail:
+      "keine. BAFA, iuk, AVPQ und AGD sind aus Daten, Seite und strukturierten " +
+      "Daten entfernt — keiner der vier Einträge war belegt. Die Seite behauptet " +
+      "keinen Nachweis mehr, den ein Dritter nicht bestätigen kann.",
+    owner: "Owner: entscheiden, welche real erworben wird — dann mit Nachweis zurück",
   })
 
   return { open: items.filter((item) => !item.ok), done: items.filter((item) => item.ok) }

@@ -86,10 +86,6 @@ export const dictionary = {
       products: {
         cta: "Alle Produkte",
       },
-      proof: {
-        label: "Nachweisbar",
-        cta: "Nachweise prüfen",
-      },
       company: {
         eyebrow: "Das Unternehmen",
         title: "Osnabrück. Seit 2017.",
@@ -186,7 +182,7 @@ export const dictionary = {
       statement: "Was wir für Kunden entwickeln, betreiben wir für uns selbst. Diese Substanz unterscheidet ein System-Haus von einer Präsentation.",
       metaTitle: "Unternehmen — System-Haus aus Osnabrück, seit 2017",
       metaDescription:
-        "creaDIG: System-Haus im ICO InnovationsCentrum Osnabrück, gegründet 2017. Gründer, Netzwerk, Schwerpunkte, Standort und nachprüfbare Zertifizierungen.",
+        "creaDIG: System-Haus im ICO InnovationsCentrum Osnabrück, gegründet 2017. Gründer, Arbeitsmodell, Schwerpunkte und Standort — ein Dach, fünf Ebenen, vier eigene Produkte.",
       /*
        * Die drei Etappen des Hauses (KIZILELMA §7: „Das Dach zuerst — gross,
        * als Ursprung; die Produkte als sein Werk").
@@ -418,7 +414,6 @@ export const dictionary = {
       ueber: "Über uns",
       pakete: "Pakete",
       kontakt: "Kontakt",
-      zertifikate: "Zertifizierungen",
       cta: "Projekt starten",
       menu: "Menü öffnen",
       close: "Menü schließen",
@@ -1140,19 +1135,6 @@ export const dictionary = {
       },
       note: "Keine Verfügbarkeit in Prozent, keine Reaktionszeit in Stunden, kein „24/7“. Zugesagt ist, was hier steht — und das halten wir auch im Urlaub.",
     },
-    certs: {
-      eyebrow: "Zertifizierungen & Mitgliedschaften",
-      title: "Geprüft. Zugelassen. Eingetragen.",
-      lead: "Vier Nachweise, die man nachschlagen kann. Keine selbst vergebenen Siegel, keine gekauften Auszeichnungen.",
-      verify: "Zur offiziellen Stelle",
-      note: "Alle Einträge sind bei den genannten Stellen überprüfbar.",
-      items: {
-        bafa: { label: "zugelassener Unternehmensberater des", note: "Berater-ID: #190949" },
-        iuk: { label: "Mitglied beim", note: "" },
-        avpq: { label: "eingetragen in das", note: "" },
-        agd: { label: "Mitglied bei der", note: "" },
-      },
-    },
     contact: {
       eyebrow: "Kontakt",
       title: "In 20 Minuten unverbindlich.",
@@ -1656,10 +1638,6 @@ export const dictionary = {
       products: {
         cta: "Tüm ürünler",
       },
-      proof: {
-        label: "Doğrulanabilir",
-        cta: "Belgeleri gör",
-      },
       company: {
         eyebrow: "Şirket",
         title: "Osnabrück. 2017'den beri.",
@@ -1731,7 +1709,7 @@ export const dictionary = {
       statement: "Müşteriler için geliştirdiğimizi kendimiz için de işletiriz. Bir sistem evini bir sunumdan ayıran şey bu sağlamlıktır.",
       metaTitle: "Şirket — Osnabrück'ten sistem evi, 2017'den beri",
       metaDescription:
-        "creaDIG: Osnabrück ICO InnovationsCentrum'da sistem evi, 2017'de kuruldu. Kurucu, ağ, odak alanları, merkez ve doğrulanabilir sertifikalar.",
+        "creaDIG: Osnabrück ICO InnovationsCentrum'da sistem evi, 2017'de kuruldu. Kurucu, çalışma modeli, odak alanları ve merkez — tek çatı, beş katman, kendi dört ürünümüz.",
       chapters: {
         label: "Yol",
         title: "Bir ev, duyuruyla kurulmaz.",
@@ -1880,7 +1858,6 @@ export const dictionary = {
       ueber: "Hakkımızda",
       pakete: "Paketler",
       kontakt: "İletişim",
-      zertifikate: "Sertifikalar",
       cta: "Projeye başla",
       menu: "Menüyü aç",
       close: "Menüyü kapat",
@@ -2380,19 +2357,6 @@ export const dictionary = {
         },
       },
       note: "Yüzdeyle verilmiş erişilebilirlik oranı yok, saatle verilmiş yanıt süresi yok, „7/24“ yok. Verdiğimiz söz burada yazandır — tatilde de tutarız.",
-    },
-    certs: {
-      eyebrow: "Sertifikalar & üyelikler",
-      title: "Denetlenmiş. Yetkili. Kayıtlı.",
-      lead: "Doğrulanabilir dört belge. Kendi verdiğimiz rozetler yok, satın alınmış ödüller yok.",
-      verify: "Resmî kuruma git",
-      note: "Tüm kayıtlar adı geçen kurumlardan doğrulanabilir.",
-      items: {
-        bafa: { label: "Onaylı danışmanı olduğumuz kurum", note: "Danışman kimliği: #190949" },
-        iuk: { label: "Üyesi olduğumuz ağ", note: "" },
-        avpq: { label: "Kayıtlı olduğumuz resmî sicil", note: "" },
-        agd: { label: "Üyesi olduğumuz birlik", note: "" },
-      },
     },
 
     contact: {

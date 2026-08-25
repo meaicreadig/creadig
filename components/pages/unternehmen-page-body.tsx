@@ -6,7 +6,6 @@ import { CompanyChapters } from "@/components/sections/company-chapters"
 import { HouseArchitecture } from "@/components/sections/house-architecture"
 import { About } from "@/components/sections/about"
 import { LogoWall } from "@/components/sections/logo-wall"
-import { Certifications } from "@/components/sections/certifications"
 import { ClosingCta } from "@/components/sections/closing-cta"
 
 /**
@@ -64,7 +63,11 @@ export function UnternehmenPageBody({ location }: { location: React.ReactNode })
           Scroll-Kopplung mit, ein zweiter Opacity-Uebergang darueber wuerde
           nur gegen sie arbeiten. */}
       {location}
-      <Certifications />
+      {/*
+        Hier stand die Zertifizierungs-Sektion mit vier Kacheln. Alle vier
+        Eintraege sind unbelegt und deshalb entfernt (V2-5 · §9.9) — die
+        offene Frage steht im Audit-Backlog, nicht auf der Seite.
+      */}
       <ClosingCta />
     </main>
   )

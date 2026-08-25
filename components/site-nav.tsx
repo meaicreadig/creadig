@@ -261,18 +261,13 @@ export function SiteNav() {
                     </MotionLink>
                   </SheetClose>
                 ))}
-                {/* Vertrauens-Baustein: in der Desktop-Leiste kein Platz, hier schon. */}
-                <SheetClose asChild>
-                  <MotionLink
-                    href="/unternehmen#zertifizierungen"
-                    initial={{ opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.06 * mainNavLinks.length + 0.1, duration: 0.5 }}
-                    className="text-display border-b border-line py-5 text-3xl text-foreground"
-                  >
-                    {t.nav.zertifikate}
-                  </MotionLink>
-                </SheetClose>
+                {/*
+                  Hier stand „Zertifizierungen" als Vertrauens-Baustein. Der
+                  Anker, auf den er zeigte, gibt es nicht mehr: Alle vier
+                  Eintraege waren unbelegt und sind entfernt (V2-5 · §9.9).
+                  Ein Menuepunkt auf einen leeren Anker ist ein Versprechen,
+                  das beim ersten Klick bricht.
+                */}
               </nav>
 
               <div className="flex flex-col gap-3 px-6 pt-10">

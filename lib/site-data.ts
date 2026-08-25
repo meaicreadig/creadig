@@ -1260,80 +1260,42 @@ export const retainerPublished = Boolean(retainer.price && retainer.description)
 
 export const meaiCapabilityKeys = ["overview", "tasks", "documents", "decisions"] as const
 
-/**
- * Zertifizierungen & Mitgliedschaften — ausschließlich echte, nachweisbare Einträge.
- * Nichts wird erfunden, nichts geschönt.
- *
- * `logoPath` bleibt `null`, solange das offizielle Badge-Logo nicht vorliegt.
- * Die Kachel rendert dann eine saubere getypte Variante — nie ein kaputtes <img>.
- * TODO (Owner): offizielle Badges nach `public/badges/<slug>.svg` legen und
- * hier `logoPath` setzen. Nutzungsbedingungen der jeweiligen Stelle beachten.
- */
-export type Certification = {
-  slug: "bafa" | "iuk" | "avpq" | "agd"
-  /** Offizielles Badge-Logo unter public/badges/ — null, solange keins vorliegt. */
-  logoPath: string | null
-  /** Kürzel für die getypte Kachel. */
-  mark: string
-  /** Eigenname — bewusst nicht übersetzt. */
-  name: string
-  /**
-   * Kurzform für die Nachweis-Leiste auf der Startseite.
-   *
-   * `mark` ist ein Monogramm für eine Kachel („gd") und in einer Textzeile
-   * unlesbar; `name` ist der vollständige Behördenname und dort zu lang.
-   * Diese dritte Form ist das, was ein Mensch sagen würde.
-   */
-  short: string
-  /** Offizielle Quelle zum Nachprüfen. */
-  href: string
-}
-
 /*
- * go-digital stand hier als fuenfter Eintrag — mit dem Label „autorisiert
- * fuer das Foerderprogramm". Diese Behauptung ist ohne aktuellen Nachweis
- * nicht haltbar (das Programm ist ausgelaufen, der Status des Hauses
- * ungeklaert). Ein Nachweis, den man nicht nachschlagen kann, ist in einer
- * Liste mit der Ueberschrift „Geprueft. Zugelassen. Eingetragen." genau
- * das Gegenteil dessen, wofuer die Liste da ist.
+ * ==========================================================================
+ * ZERTIFIZIERUNGEN & MITGLIEDSCHAFTEN — ENTFERNT (V2-5 · KIZILELMA §9.9)
+ * ==========================================================================
  *
- * Zurueck kommt der Eintrag nur mit Nachweis. Bis dahin steht die Frage auf
- * der Live-Checkliste (Phase 5): "go-digital-Status klaeren".
+ * Hier standen vier Eintraege: BAFA, iuk Osnabrueck, AVPQ, AGD. Sie trugen
+ * die Ueberschrift „Geprueft. Zugelassen. Eingetragen." und den Satz „Vier
+ * Nachweise, die man nachschlagen kann" — und keiner von ihnen war belegt.
+ * Die AGD-Mitgliedschaft besteht nicht, die iuk-Mitgliedschaft besteht
+ * nicht, der AVPQ-Eintrag ist nicht nachgewiesen, und die BAFA-Berater-ID
+ * stammt aus einem ausgelaufenen Programm.
+ *
+ * Das war der schwerste Fehler auf der ganzen Seite. Nicht weil vier
+ * Kacheln fehlten, sondern wegen der Reihenfolge: Ein unbelegter Nachweis
+ * ist schlimmer als kein Nachweis. Wer eines der vier nachschlaegt und
+ * nichts findet, glaubt danach auch die Saetze nicht mehr, die stimmen —
+ * und auf dieser Seite stimmt sonst jeder.
+ *
+ * Sie standen zusaetzlich als `hasCredential` in den strukturierten Daten
+ * von /unternehmen. Dort war es dieselbe Behauptung, nur unsichtbar und
+ * gegenueber Google.
+ *
+ * ---------------------------------------------------------------------------
+ * WAS ZURUECKKOMMT, UND WANN
+ * Jede einzelne — sobald sie real erworben ist und sich bei der nennenden
+ * Stelle nachschlagen laesst. Dann mit Nachweis, Datum und Quelle. Bis
+ * dahin steht die Frage auf `creadig-AUDIT-BACKLOG.md` und nicht auf der
+ * Seite.
+ *
+ * Mit den Eintraegen sind gegangen: `Certification`, die Sektion
+ * `components/sections/certifications.tsx`, die Nachweis-Zeile der
+ * Startseite (`proof-line.tsx`), das Woerterbuch unter `certs` und
+ * `home.proof`, die Menuepunkte „Zertifizierungen" in Kopf- und Fusszeile
+ * und der `hasCredential`-Block. Ein Rest, der nur noch auf sich selbst
+ * zeigt, ist kein Geruest, sondern Bauschutt.
  */
-export const certifications: Certification[] = [
-  {
-    slug: "bafa",
-    short: "BAFA-gelistet",
-    logoPath: null,
-    mark: "BAFA",
-    name: "Bundesamt für Wirtschaft und Ausfuhrkontrolle",
-    href: "https://www.bafa.de",
-  },
-  {
-    slug: "iuk",
-    short: "iuk Osnabrück",
-    logoPath: null,
-    mark: "iuk",
-    name: "iuk unternehmensnetzwerk osnabrück e.v.",
-    href: "https://www.iuk-os.de",
-  },
-  {
-    slug: "avpq",
-    short: "AVPQ präqualifiziert",
-    logoPath: null,
-    mark: "AVPQ",
-    name: "Amtliche Verzeichnis Präqualifizierter Unternehmen (AVPQ)",
-    href: "https://www.amtliches-verzeichnis.ihk.de",
-  },
-  {
-    slug: "agd",
-    short: "Mitglied AGD",
-    logoPath: null,
-    mark: "AGD",
-    name: "Allianz deutscher Designer (AGD)",
-    href: "https://agd.de",
-  },
-]
 
 /**
  * Geschäftsadresse (gesperrt): ICO InnovationsCentrum Osnabrück.

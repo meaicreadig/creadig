@@ -5,7 +5,6 @@ import { CapabilityTiles } from "@/components/sections/capability-tiles"
 import { HouseProducts } from "@/components/sections/house-products"
 import { CaseStudies } from "@/components/sections/case-studies"
 import { ImpactBand } from "@/components/sections/impact-band"
-import { ProofLine } from "@/components/sections/proof-line"
 import { Location } from "@/components/sections/location"
 import { CompanyTeaser } from "@/components/sections/company-teaser"
 import { InsightsTeaser } from "@/components/sections/insights-teaser"
@@ -111,8 +110,18 @@ export function HomeRoute() {
       {/* 9 · A — Wer dahintersteht. Die zweite Pause. → /unternehmen */}
       <CompanyTeaser />
 
-      {/* 10 — Die Nachweis-Zeile, schmal, direkt vor dem Abschluss. */}
-      <ProofLine />
+      {/*
+        10 — HIER STAND DIE NACHWEIS-ZEILE, UND SIE IST GEGANGEN (V2-5).
+
+        Sie zaehlte BAFA, iuk, AVPQ und AGD auf — vier Nachweise, von denen
+        keiner belegt ist (KIZILELMA §9.9). Eine Zeile mit der Ueberschrift
+        „Nachweisbar" ueber vier unbelegten Namen ist die teuerste Zeile, die
+        eine Seite haben kann: Wer einen davon nachschlaegt und nichts
+        findet, glaubt danach auch die Saetze nicht mehr, die stimmen.
+
+        Sie kommt zurueck, wenn es etwas gibt, das ein Dritter bestaetigt.
+        Nicht vorher, und nicht mit einem Ersatz, der aehnlich aussieht.
+      */}
 
       {/* 11 — Notizen aus dem Bau (gated, bis die erste steht). → /insights */}
       <InsightsTeaser />

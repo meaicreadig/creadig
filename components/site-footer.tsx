@@ -58,14 +58,6 @@ export function SiteFooter() {
                   {t.nav.kontakt}
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/unternehmen#zertifizierungen"
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
-                >
-                  {t.nav.zertifikate}
-                </Link>
-              </li>
             </ul>
           </div>
 
