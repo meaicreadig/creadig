@@ -766,10 +766,34 @@ export const approvedCaseStudies = caseStudies.filter((c) => c.approved)
  *     unehrlich, sondern ein Verstoß gegen Googles Richtlinien.
  * ========================================================================== */
 
+/*
+ * V2-4c — EINE KUNDENSTIMME IST MEHR ALS EIN NAME.
+ *
+ * Die Tiefen-Analyse verlangt „Kundenstimmen mit Name, Firma, Rolle,
+ * Projekt". Bisher trug ein Eintrag Name, Datum, Wortlaut und Quelle. Der
+ * Unterschied ist nicht kosmetisch: „M. K." unter einem Zitat ist eine
+ * Behauptung, „Geschäftsführer, Firma X, zum Projekt Y" ist eine Angabe, die
+ * jemand nachschlagen kann — und die derjenige, der sie freigibt, auch
+ * bewusst freigibt.
+ *
+ * Die drei neuen Felder sind optional und nicht Pflicht: Eine echte
+ * Google-Bewertung traegt oft nur einen Namen, und sie deshalb nicht zu
+ * zeigen waere die falsche Strenge. Sie sind da, damit eine direkt
+ * eingeholte Stimme ihre volle Form haben kann.
+ *
+ * Was NICHT gelockert ist: `approved`, der Originalwortlaut ohne
+ * Uebersetzung, und das Sterne-Gate im Build.
+ */
 export type Review = {
   id: string
   /** Name so, wie er öffentlich steht (z. B. bei Google). */
   name: string
+  /** Firma — nur mit Freigabe, sonst `null`. */
+  company?: string | null
+  /** Funktion im Betrieb. Beschreibung, kein Zitat — darf übersetzt werden. */
+  role?: Localized | null
+  /** Auf welches Projekt sich die Stimme bezieht. */
+  project?: string | null
   /** Datum der Bewertung, ISO (YYYY-MM-DD). */
   date: string
   /** Originalwortlaut. Wird nicht übersetzt, nicht gekürzt, nicht geglättet. */
@@ -956,12 +980,38 @@ export const mainNavLinks = navLinks.filter(
  * Markup: Was zaehlbar ist, ist eine Figure; was eine Aussage ist, ein Fact.
  */
 
-/** Zaehlbares. Wird als Kennziffer gesetzt. */
-export const impactFigures = [
+/**
+ * Zaehlbares. Wird als Kennziffer gesetzt.
+ *
+ * ---------------------------------------------------------------------------
+ * V2-4c — DREI GEFAESSE STEHEN BEREIT UND SIND LEER
+ * Die Tiefen-Analyse nennt „Zahlen" als erste der fuenf fehlenden
+ * Beweisarten. Das Band zeigt heute zwei: das Gruendungsjahr und die Anzahl
+ * eigener Produkte. Beide sind belegt — mehr ist es nicht.
+ *
+ * Was ueberzeugen wuerde, steht darunter mit `value: null`: produktive
+ * Systeme, automatisierte Vorgaenge, Jahre im Betrieb. Es sind genau die
+ * Zahlen, die ein Haus wie dieses hat und die niemand nachzaehlen kann —
+ * und deshalb genau die, die man sich am leichtesten ausdenkt. Sie stehen
+ * hier als Feld, nicht als Wert: `null` heisst, die Kachel erscheint nicht.
+ *
+ * Wer eine davon fuellt, muss sie belegen koennen. „Ungefaehr 40" ist keine
+ * Zahl, sondern ein Gefuehl mit Ziffern.
+ */
+export const impactFigures: { value: string | null; key: string }[] = [
   // Gründungsjahr 2017 — vom Inhaber bestätigt (2026-08-17).
-  { value: "2017", key: "since" as const },
-  { value: "4", key: "products" as const },
+  { value: "2017", key: "since" },
+  { value: "4", key: "products" },
+  // TODO (Owner): echte Zahlen — bis dahin rendert keine dieser drei Kacheln.
+  { value: null, key: "systems" },
+  { value: null, key: "automated" },
+  { value: null, key: "operatingYears" },
 ]
+
+/** Nur Kennziffern mit belegtem Wert verlassen die Datei. */
+export const publishedImpactFigures = impactFigures.filter(
+  (figure): figure is { value: string; key: string } => figure.value !== null,
+)
 
 /** Aussagen ueber Reichweite. Werden als Text gesetzt, nicht als Zahl. */
 export const impactFacts = ["regions", "scope"] as const

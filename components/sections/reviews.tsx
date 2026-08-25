@@ -102,6 +102,23 @@ export function Reviews() {
 
               <div className="border-line mt-auto flex flex-col gap-1 border-t pt-6">
                 <p className="text-subhead text-base">{review.name}</p>
+                {/*
+                  V2-4c — Rolle und Firma, wo sie freigegeben sind.
+
+                  „M. K." unter einem Zitat ist eine Behauptung; „Geschäfts-
+                  führer, Firma X" ist eine Angabe, die jemand nachschlagen
+                  kann. Beide Felder sind optional: Eine echte Google-
+                  Bewertung traegt oft nur einen Namen, und sie deshalb nicht
+                  zu zeigen waere die falsche Strenge.
+                */}
+                {(review.role || review.company) && (
+                  <p className="type-small text-muted-foreground">
+                    {[review.role?.[locale], review.company].filter(Boolean).join(" · ")}
+                  </p>
+                )}
+                {review.project && (
+                  <p className="text-meta text-gold-text">{t.reviews.projectLabel}: {review.project}</p>
+                )}
                 <p className="text-muted-foreground text-meta">
                   {dateFormat.format(new Date(review.date))} ·{" "}
                   {review.source === "google" ? t.reviews.sourceGoogle : t.reviews.sourceClient}

@@ -7,6 +7,7 @@ import {
   caseStudies,
   certifications,
   clientWorks,
+  impactFigures,
   filledChapters,
   imprintComplete,
   imprintDetails,
@@ -72,6 +73,19 @@ function collect(): { open: Item[]; done: Item[] } {
         ? `${approvedReviews.length} freigegeben, Durchschnitt ${aggregateRating?.value ?? "—"}`
         : "keine. Der Bewertungsblock und aggregateRating bleiben aus.",
     owner: "Owner: zufriedene Altkunden um eine Google-Bewertung bitten",
+  })
+
+  items.push({
+    label: "Echte Zahlen fürs Fundament-Band (§10.2)",
+    ok: impactFigures.every((figure) => figure.value !== null),
+    detail:
+      impactFigures
+        .filter((figure) => figure.value === null)
+        .map((figure) => figure.key)
+        .join(", ") || "alle Kennziffern belegt",
+    owner:
+      "Owner: produktive Systeme, automatisierte Vorgänge, Jahre im Betrieb — " +
+      "belegbar, nicht geschätzt. Bis dahin rendern die Kacheln nicht.",
   })
 
   items.push({

@@ -464,6 +464,28 @@ export const dictionary = {
       figures: {
         since: { label: "Seit", detail: "Aus der Agentur zum System-Haus gewachsen." },
         products: { label: "Eigene Produkte", detail: "meAI, fibero, CASSAMEA, meahv — selbst gebaut." },
+        /*
+         * V2-4c — drei Gefaesse, heute leer.
+         *
+         * Der Wert steht in `site-data.impactFigures` auf `null`, deshalb
+         * erscheint keine dieser Kacheln. Die Beschriftungen liegen hier,
+         * damit der Owner nur eine Zahl nachtragen muss und nicht auch noch
+         * ueberlegen, wie sie heisst. Wer eine fuellt, muss sie belegen
+         * koennen — „ungefaehr 40" ist keine Zahl, sondern ein Gefuehl mit
+         * Ziffern.
+         */
+        systems: {
+          label: "Produktive Systeme",
+          detail: "Systeme, die heute im Tagesbetrieb eines Betriebs laufen.",
+        },
+        automated: {
+          label: "Automatisierte Vorgänge",
+          detail: "Schritte, die vorher jemand von Hand gemacht hat.",
+        },
+        operatingYears: {
+          label: "Jahre im Betrieb",
+          detail: "Gerechnet ab dem ersten System, das wir übergeben und behalten haben.",
+        },
       },
       facts: {
         regions: {
@@ -555,6 +577,7 @@ export const dictionary = {
       title: "Was Kunden geschrieben haben.",
       lead: "Im Originalwortlaut, mit Name und Datum. Wir übersetzen keine Bewertungen — ein übersetzter Satz ist ein Satz, den der Mensch so nie geschrieben hat.",
       verify: "Bei Google nachlesen",
+      projectLabel: "Projekt",
       sourceGoogle: "Google-Bewertung",
       sourceClient: "Direkt an uns",
       ofFive: "von 5",
@@ -1854,6 +1877,18 @@ export const dictionary = {
       figures: {
         since: { label: "Beri", detail: "Ajanstan sistem evine büyüdük." },
         products: { label: "Kendi ürünlerimiz", detail: "meAI, fibero, CASSAMEA, meahv — kendimiz kurduk." },
+        systems: {
+          label: "Üretimdeki sistemler",
+          detail: "Bugün bir işletmenin günlük işinde çalışan sistemler.",
+        },
+        automated: {
+          label: "Otomatikleşen işlemler",
+          detail: "Daha önce birinin elle yaptığı adımlar.",
+        },
+        operatingYears: {
+          label: "İşletmede geçen yıl",
+          detail: "Teslim edip elimizde tuttuğumuz ilk sistemden itibaren.",
+        },
       },
       facts: {
         regions: {
@@ -1922,6 +1957,7 @@ export const dictionary = {
       title: "Müşteriler ne yazdı.",
       lead: "Özgün haliyle, isim ve tarihle. Değerlendirmeleri çevirmiyoruz — çevrilmiş bir cümle, o kişinin hiç yazmadığı bir cümledir.",
       verify: "Google'da oku",
+      projectLabel: "Proje",
       sourceGoogle: "Google değerlendirmesi",
       sourceClient: "Doğrudan bize",
       ofFive: "/ 5",

@@ -3,7 +3,7 @@
 import { SignatureMotif } from "@/components/brand/signature-motif"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { impactFacts, impactFigures } from "@/lib/site-data"
+import { impactFacts, publishedImpactFigures } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /**
@@ -52,8 +52,14 @@ export function ImpactBand() {
           getrennte Bloecke — die Reihe soll eine Reihe bleiben.
         */}
         <div className="border-line mt-20 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-y-0">
-          {impactFigures.map((figure, i) => {
-            const copy = t.impact.figures[figure.key]
+          {/*
+            V2-4c — nur Kennziffern mit belegtem Wert. Drei weitere Gefaesse
+            stehen in `site-data` bereit (produktive Systeme, automatisierte
+            Vorgaenge, Jahre im Betrieb) und sind `null`; sie erscheinen,
+            sobald der Owner echte Zahlen liefert, und bis dahin nicht.
+          */}
+          {publishedImpactFigures.map((figure, i) => {
+            const copy = t.impact.figures[figure.key as keyof typeof t.impact.figures]
             return (
               <Reveal
                 key={figure.key}
@@ -79,7 +85,7 @@ export function ImpactBand() {
             return (
               <Reveal
                 key={key}
-                delay={0.08 * (i + impactFigures.length)}
+                delay={0.08 * (i + publishedImpactFigures.length)}
                 className="border-line group relative border-t pt-8 lg:border-r lg:pr-8 lg:last:border-r-0"
               >
                 <span
