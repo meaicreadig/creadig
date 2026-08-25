@@ -318,3 +318,35 @@ wie Ihre Seite aussehen könnte. Kein Auftrag, keine Rechnung."*
 - **Sprache/Nische:** **Deutsch ist Hauptsprache.** TR bleibt fest — und die Nische *„türkischsprachige Unternehmen in DACH, in deutschem Standard"* wird **professionell besessen** (Targeting, TR-Seiten, WhatsApp), **ohne klischeehafte „türkisch-deutscher Mittelstand"-Copy**. TR-Projekttexte (`work.what`/`work.sector`) noch deutsch auf `/tr` → übersetzen.
 
 > **Reconciliation:** Einige §9.8-Locks sind seit dem KOMPLETT-Lauf überholt — Design-Feinschliff ist **entsperrt** (V2 baut Tiefe), „ein Angebot" ist auf **zwei** gelockert (Website + BFSG). **§10 gilt vor §9.8, wo sie sich widersprechen.**
+
+---
+
+## 11 · V3-Diagnose (v0 Runde 2, 25.08.2026): Anspruch verengen + Platzierung nach Käuferfragen
+
+**Kern-Reframe:** Nicht „mehr Beweise" (mit 2 Kunden nicht herstellbar), sondern **den Anspruch verengen.** Zwei Skalen trennen:
+- **Skala A — allein kontrollierbar** (Code, a11y, SEO, Recht, i18n, CI, Ehrlichkeit): **~93 %, abschließbar.**
+- **Skala B — braucht Kundenmaterial** (Stimmen, Cases, Reviews, Team): **~45 %, mit 2 Kunden strukturell bei ~60 % gedeckelt** — NICHT durch Arbeit an der Seite erreichbar, nur durch Aufträge.
+- **„Fertig" = „alles, was mit heutigem Material möglich ist, ist gemacht."** Werkzeug dafür ist die **`/status`-Seite** (leitet aus den Daten ab, was fehlt) → sie beendet die Analyse-Spirale. Das ist die Definition von „fertig".
+
+**Leistungen tiefer — vier Felder, KEIN Fremdmaterial nötig** (Wissen aus dem eigenen Betrieb der 4 Produkte): `duration` (wie lange?), `process` (Reihenfolge der Schritte), `fromTo` (vorher → nachher im Betrieb), `clientEffort` (was muss der Kunde beitragen?). Heute steht „was enthalten ist", nie „was sich ändert" — Letzteres ist der Kaufgrund.
+
+**Platzierungs-Diagnose:** Die Startseite erzählt in der Reihenfolge **„wer wir sind"**; der Käufer liest in der Reihenfolge **„was brauche ich, um zu kaufen"**. **Preis und Dauer** (die zwei Kaufentscheider) kommen zu spät oder gar nicht. Top-Moves (Wirkung/Aufwand, ohne Fremdmaterial):
+1. **Preiszeile auf die Startseite** (nach CapabilityTiles, Pos. 4) — ein Satz mit Zahl + Verweis, kein Paketblock.
+2. **FAQ VOR Pakete** auf `/leistungen`; die zwei Kernfragen (Preis, Ablauf) auf der Startseite spiegeln.
+3. **Projektdauer** neben jeden Preis.
+4. **„Alle Arbeiten"-Verweis** am Ende von SelectedWork.
+5. **Location nach CompanyTeaser**; Sitz-Erwähnungen 6× → 2 (Hero-Eyebrow + Footer).
+6. **/kontakt vs /termin:** eine Hierarchie — `/termin` Haupt-Abschluss, `/kontakt` nur direkte Wege (kein zweites volles Formular).
+7. **Vier/Fünf-Ebenen-Widerspruch** vereinheitlichen (Hero nennt 4, Modell 5, Footer 4 mit „KI") → überall 5; „Fünf Ebenen. Ein System." gehört in den Hero.
+8. **FAQ-Punkt „Wem gehört das System? / Kündigung 149 €?"** — die Abhängigkeits-Sorge beim Dauerbetrieb.
+9. **Logo-Wand:** mit Disclaimer schwächer als keine → entfernen bis echte Freigaben (oder auf die Startseite).
+10. **`/status` dezent in die Fußzeile** — bestes Ehrlichkeits-Signal, heute unsichtbar.
+Dazu: ClosingCta **ortsabhängig** statt identisch; Impact-Band um **„Jahre im Betrieb"** (berechenbar) ergänzen.
+
+**Strategische Blind Spots (entscheiden, nicht offen lassen):**
+- **Wollt ihr den 50k-Kunden jetzt überhaupt?** Bei 2 Referenzen + founder-led = Liefer-/Klumpenrisiko; die Seite muss evtl. NICHT dafür optimieren.
+- **TR ist Übersetzung, keine Positionierung.** Für türkischsprachige Betriebe in DACH ist die erste Frage „verstehen die mich?" → Sprachfähigkeit als Einstieg, nicht als FAQ-Punkt 5. Nische bewusst besitzen — oder bewusst lassen. Siehe [[creadig-markets]].
+- **Preisleiter oben öffnen:** „größerer Umfang: auf Anfrage" (ohne Zahl; Black Lock 5 bleibt).
+- **Wiederkehrer:** die Seite ist nur für den Erstbesuch gebaut; der Termin-Wizard könnte einen Stand behalten.
+
+> **Umsetzungs-Reihenfolge (v0-Empfehlung):** 1) Leistungs-Tiefenfelder, 2) Platzierung Top 1–4, 3) `/status` als Fertig-Definition. Alles ohne Fremdmaterial. Design-Identität „Der Schnitt" ([[creadig-ci-motif-rethink]]) läuft als SEPARATER Design-Durchlauf. Später: eine Gesamt-Master-Prompt aus all dem.
