@@ -24,8 +24,8 @@ const MAP_HREF =
  * verschoben — so bleibt beim Parallax nie ein Rand sichtbar.
  * Überstand oben/unten je 10 %, Bewegung ±7 % der Ebene (= ±8,4 % des Rahmens).
  */
-const LAYER_OVERHANG = "-top-[10%] h-[120%]"
-const SHIFT = ["-7%", "7%"]
+const LAYER_OVERHANG = "-top-[18%] h-[136%]"
+const SHIFT = ["-12%", "12%"]
 
 /** Ersatzfläche, solange das Foto fehlt — Signatur-Mesh statt kaputtem <img>. */
 function PhotoPlaceholder() {
@@ -102,7 +102,7 @@ export function LocationParallax({ photoSrc }: { photoSrc: string | null }) {
         {/* Heller Schleier — hält die Schrift lesbar, ohne die Seite abzudunkeln. */}
         <div
           aria-hidden="true"
-          className="from-background via-background/45 absolute inset-0 bg-gradient-to-t to-transparent"
+          className="from-background/75 absolute inset-0 bg-gradient-to-t via-transparent to-transparent"
         />
 
         <div className="absolute inset-0 flex items-end">
