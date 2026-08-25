@@ -456,11 +456,36 @@ export function TerminWizard() {
                   type="button"
                   onClick={() => setType(option.id)}
                   aria-pressed={type === option.id}
+                  /*
+                    V2-6 — DER AUSWAHL-ZUSTAND WAR ZU LEISE.
+
+                    Er bestand aus 7 % Gold-Tonung und einem 1 px goldenen
+                    Rahmen. Auf einem Laptop bei Tageslicht ist der
+                    Unterschied zur zweiten Karte kaum zu sehen — und diese
+                    Auswahl ist die erste Entscheidung, die jemand auf dieser
+                    Seite trifft. Wer nicht sieht, was er gewaehlt hat,
+                    klickt zurueck oder bricht ab.
+
+                    Jetzt drei Signale statt eines: kraeftigere Tonung, eine
+                    durchgehende Gold-Kante oben (dieselbe Linie, die
+                    anderswo beim Hover laeuft, hier dauerhaft) und ein
+                    breiterer Rahmen. Das Haekchen rechts bleibt — es ist
+                    das einzige Signal, das auch ohne Farbe funktioniert.
+                  */
                   className={cn(
                     "border-line group relative flex flex-col border p-7 text-left transition-colors duration-500",
-                    type === option.id ? "bg-gold/[0.07] border-gold" : "hover:bg-foreground/[0.02]",
+                    type === option.id
+                      ? "bg-gold/[0.14] border-gold ring-gold/35 ring-1"
+                      : "hover:bg-foreground/[0.02]",
                   )}
                 >
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "bg-gold absolute top-0 left-0 h-0.5 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                      type === option.id ? "w-full" : "w-0",
+                    )}
+                  />
                   <span className="flex items-start justify-between gap-4">
                     <span className="text-display text-xl">{option.name}</span>
                     <span
@@ -602,7 +627,21 @@ export function TerminWizard() {
                     )}
                   >
                     <span className="text-sm tracking-wide">{window.label}</span>
-                    <span className="font-mono text-xs opacity-75">{window.time}</span>
+                    {/*
+                      V2-6 — hier stand `opacity-75`. Auf der gewaehlten,
+                      goldenen Flaeche ergab das im Hellmodus 3,81 : 1 —
+                      unter den 4,5 : 1, die WCAG 1.4.3 fuer Text dieser
+                      Groesse verlangt. Nachgerechnet mit den echten Tokens:
+                      #201e1b auf #be904e (hell) und auf #d3a763 (dunkel).
+                      90 % ergibt 4,98 : 1 hell und 6,24 : 1 dunkel.
+
+                      axe hat das nicht gemeldet: Es kann eine Deckkraft auf
+                      Text ueber einer Token-Flaeche nicht zuverlaessig
+                      aufloesen. Ein gruenes Gate heisst nicht, dass nichts
+                      da ist — es heisst, dass die Maschine nichts gefunden
+                      hat.
+                    */}
+                    <span className="font-mono text-xs opacity-90">{window.time}</span>
                   </button>
                 ))}
               </div>
