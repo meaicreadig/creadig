@@ -79,6 +79,37 @@ const PAGES = [
       await page.waitForTimeout(400)
     },
   },
+  /*
+   * V2-6 — der AUSGEWAEHLTE Zustand, und zwar sichtbar.
+   *
+   * „08-termin" zeigt Schritt 1 ohne Auswahl, „08b" zeigt Schritt 2. Was
+   * dazwischen liegt — wie eine gewaehlte Karte aussieht — hat kein Bild
+   * gezeigt, und genau dort war der Zustand zu leise (7 % Gold-Tonung).
+   * Ein Zustand, den kein Bildersatz aufnimmt, faellt bei der Sichtpruefung
+   * nicht auf; deshalb steht er jetzt drin, hell und dunkel.
+   */
+  {
+    name: "08c-termin-schritt1-gewaehlt",
+    path: "/termin",
+    async act(page) {
+      await page.getByRole("button", { name: "Kostenlose Erstberatung" }).first().click()
+      await page.waitForTimeout(400)
+    },
+  },
+  {
+    /* Dasselbe fuer das Zeitfenster: gewaehlt heisst goldene Flaeche, und
+       darauf steht die Uhrzeit — die Zeile, die bei 75 % Deckkraft unter dem
+       Kontrastwert lag. */
+    name: "08d-termin-zeitfenster-gewaehlt",
+    path: "/termin",
+    async act(page) {
+      await page.getByRole("button", { name: "Kostenlose Erstberatung" }).first().click()
+      await page.getByRole("button", { name: "Weiter" }).click()
+      await page.waitForTimeout(300)
+      await page.getByRole("button", { name: /^Vormittag/ }).click()
+      await page.waitForTimeout(400)
+    },
+  },
   { name: "09-termin-tr", path: "/tr/termin" },
   {
     name: "09b-termin-tr-adim2",

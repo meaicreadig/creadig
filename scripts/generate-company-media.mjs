@@ -56,6 +56,9 @@ function scan() {
   for (const file of readdirSync(base).sort()) {
     const ext = path.extname(file).toLowerCase()
     const slot = path.basename(file, ext).toLowerCase()
+    // Die Anleitung im Verzeichnis und Systemdateien sind kein Fehlversuch —
+    // sie jeden Build als „ignoriert" zu melden, macht die Meldung wertlos.
+    if (ext === ".md" || file.startsWith(".")) continue
     if (!IMAGE_EXTENSIONS.has(ext) || !SLOTS.includes(slot)) {
       ignored.push(file)
       continue

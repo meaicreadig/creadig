@@ -1,6 +1,6 @@
 # creaDIG — vor dem Live-Flip nötig
 
-*Stand 23.08.2026 · nach Master-Prompt 7 (Barrierefreiheit als Einstiegsleistung, Stufen 1–4) · Branch `feat/system-haus-site`*
+*Stand 25.08.2026 · nach Master-Prompt 8 · V2 (KIZILELMA §10 — von der Behauptung zum Beweis, Stufen 1–6) · Branch `feat/system-haus-site`*
 
 Die Seite ist gebaut und geprüft. Was hier steht, kann **kein Entwickler erledigen** —
 es sind Entscheidungen, Zugangsdaten und Inhalte des Inhabers. Abschnitt A blockiert
@@ -89,6 +89,41 @@ Es steht auf dem Branch, nicht live — nichts davon ist unumkehrbar.
 | Neue Zeile im Website-Paket | `lib/dictionary.ts` → `packages.items.website.includes` | „Barrierefreiheit nach WCAG 2.1 AA eingebaut statt nachgerüstet" |
 | Neue Zeile im Betreuungsumfang | `lib/site-data.ts` → `retainer.includes` | „Barrierefreiheits-Lauf bei jeder Änderung, einmal im Jahr von Hand" — eine Zusage, die im Betrieb eingelöst werden muss |
 
+### A7 Neue Copy zur Freigabe (Master-Prompt 8 · V2, 25.08.2026)
+
+Auch das ist entworfen und gebaut, aber **vom Inhaber noch nicht gelesen**.
+Es steht auf dem Branch, nicht live. Kein Satz behauptet etwas, das die Seite
+nicht schon vorher gesagt hat — neu ist die Ordnung, nicht der Anspruch.
+
+| Was | Wo | Wozu der Blick |
+|---|---|---|
+| **Kategorie-Satz** „Kein klassisches IT-Systemhaus. Ein System-Haus für digitale Betriebe." | `lib/dictionary.ts` → `brand.category` | Er steht im Kopf von /leistungen und /unternehmen. Das ist die Positionierung in einem Satz — wenn er nicht sitzt, sitzt nichts darunter. |
+| **Fünf Ebenen in der Tiefe**, DE + TR | `lib/dictionary.ts` → `services.layers.<key>.problem/solution/result/projects` | Fünfzehn neue Absätze und fünf Vokabellisten. Die Antwort auf die Owner-Kritik „nur oberflächlich" — bitte auf Aussagen prüfen, die zu viel versprechen. |
+| **Managed Betrieb**, sieben Bestandteile | `lib/dictionary.ts` → `managed` | Was zugesagt wird, muss im Betrieb gehalten werden. Besonders: „Die Seite meldet sich, wenn sie nicht erreichbar ist" setzt B3 (Selbsttest + Cron) voraus. |
+| **Einstiegsangebote**, Rubrik und Einordnungssatz | `lib/dictionary.ts` → `packages.eyebrow/title/lead/entryNote` | Aus „Angebot" wurde „Einstiegsangebote" mit zwei Einträgen. Der Satz sagt ausdrücklich, dass das nicht die Hauptarchitektur ist. |
+| **Kachel Barrierefreiheits-Prüfung** (1.500 €) | `lib/dictionary.ts` → `packages.items.audit` | Zweiter Eintrag der Rubrik. Der Preis ist derselbe wie in der Preisleiter auf der Leistungsseite — eine Zahl, zwei Ansichten. |
+| **„So arbeiten wir"** | `lib/dictionary.ts` → `workModel` | Der wichtigste Text dieser Runde. Er beschreibt, wie das Haus arbeitet: founder-led, kleines Kernteam, Spezialisten nach Bedarf. **Wenn ein Wort davon nicht stimmt, muss es hier geändert werden — nicht im Markup.** |
+| **Haus-Diagramm**, Texte drumherum | `lib/dictionary.ts` → `architecture` | Die Struktur selbst kommt aus den Daten; hier stehen nur Überschrift, Vorspann und die Bildunterschrift. |
+| **Foto-Beschriftungen und Alt-Texte** | `lib/dictionary.ts` → `photos.slots` | Stehen schon da, damit später nur noch ein Bild abgelegt werden muss. Sichtbar wird nichts, solange kein Foto da ist. |
+| **Zahlen-Beschriftungen** (leer) | `lib/dictionary.ts` → `impact.figures.systems/automated/operatingYears` | Drei Kacheln warten auf echte Zahlen. Die Beschriftung sollte stimmen, bevor eine Zahl daneben steht. |
+| **Türkische Projekttexte** | `lib/site-data.ts` → `productWorks` / `clientWorks` | meAI, fibero, CASSAMEA, meahv, NV SWISS, maqam — jeweils Sektor, Einzeiler, Umfang und Stand auf Türkisch. Bisher standen sie dort deutsch. |
+
+### A8 Entfernt — bitte zur Kenntnis nehmen (25.08.2026)
+
+**Die vier Zertifizierungen sind von der Seite verschwunden.** BAFA (mit
+Berater-ID 190949), iuk Osnabrück, AVPQ und AGD standen unter der Überschrift
+„Geprüft. Zugelassen. Eingetragen." und dem Satz „Vier Nachweise, die man
+nachschlagen kann". Keiner davon ist belegt (KIZILELMA §9.9).
+
+Sie sind nicht nur ausgeblendet, sondern aus Daten, Sektion, Nachweis-Zeile
+der Startseite, Kopf- und Fußzeile, Meta-Beschreibung **und aus den
+strukturierten Daten (`hasCredential`)** entfernt. Der letzte Punkt ist der
+wichtigere: Dort war die Behauptung unsichtbar und richtete sich an Google.
+
+Das ist kein Verlust, der ausgeglichen werden muss. Es kommt auch kein
+Ersatz, der ähnlich aussieht. Jede einzelne kommt zurück, sobald sie real
+erworben ist und sich nachschlagen lässt — mit Nachweis, Datum und Quelle.
+
 ---
 
 ## B · AM FLIP-TAG UND KURZ DANACH
@@ -173,7 +208,11 @@ dessen, was solange nicht rendert.
 | maqam: Umfang, Jahr, Region, Link | `clientWorks` | Steht heute ohne Link und ohne Bild in der Werkschau. |
 | Jahreszahlen der Arbeiten | `work.year` | Im Register steht sonst nichts. Ein geschätztes Jahr wäre erfunden. |
 | Weitere Kunden-Logos | `public/brand/clients/` | Sonst Monogramm statt Logo. |
-| Türkische Projekttexte | `work.what`, `work.sector` | Auf `/tr/arbeiten/…` steht der Projektsatz heute deutsch unter türkischer Oberfläche. |
+| Fallbeschreibungen NV SWISS + maqam | `caseStudies[].chapters` in `lib/site-data.ts` | Das Gerüst steht mit acht Kapiteln, Kennzahlen und Kundenstimme — und ist leer. `approved: false` heißt: erscheint nirgends. **Der höchste Einzelhebel der ganzen Seite** (§10.4). |
+| Produkt-Tiefe je Produkt | `productWorlds[].problem/thesis/functions/architecture/operations/learnings` | Sechs Felder je Produkt, alle leer. Ohne sie zeigt eine Produktseite den Status und die Bausteine — mehr nicht. |
+| Echte Zahlen fürs Fundament-Band | `impactFigures` → `systems`, `automated`, `operatingYears` | Drei Kacheln stehen bereit und rendern nicht. **Belegbar, nicht geschätzt** — „ungefähr 40" ist keine Zahl. |
+| Echte Fotos aus dem Haus | `public/images/unternehmen/` → `buero.jpg`, `ico.jpg`, `arbeitsplatz.jpg`, `whiteboard.jpg` | Ohne Foto keine Sektion. Anleitung liegt als README im Verzeichnis. Achtung: keine lesbaren Kundendaten auf Bildschirmen. |
+| Wortlaut „So arbeiten wir" bestätigen | `lib/dictionary.ts` → `workModel` | Der Text ist Entwurf und behauptet nichts Neues. Trotzdem: Er beschreibt, wie das Haus arbeitet — das gehört bestätigt. |
 | Social-Profile | `socialProfiles` | Nur, wenn sie existieren, uns gehören und gepflegt werden. |
 
 ---
@@ -245,3 +284,61 @@ dessen, was solange nicht rendert.
 
 **Was weiterhin offen ist:** die Punkte in A und C. Alles Technische aus dem
 v0-Review und aus Master-Prompt 7 ist abgearbeitet.
+
+---
+
+## Nachtrag: was nach Master-Prompt 8 · V2 geprüft wurde (25.08.2026)
+
+**Vor jedem der elf Commits**
+`npm run build` grün · Function-Gate · Sterne-Gate · Paritäts-Gate ·
+`npm run a11y`. Kein Commit ohne diese fünf.
+
+**Endabnahme, in einem Durchgang**
+- `tsc --noEmit` und `eslint` ohne Befund.
+- `npm run build` grün. Function-Gate: **23,5 MB** von 200 MB.
+- Sterne-Gate: **49 Dokumente, 0** mit `AggregateRating`.
+- Paritäts-Gate: **6 von 6** Leistungsseiten. Die Seiten sind durch die neue
+  Ebenen-Tiefe von 4 auf **7 Abschnitte** gewachsen (Barrierefreiheit von 10
+  auf 13), die Punkte von 10–21 auf 16–27 — DE und TR im Gleichschritt,
+  Textmenge TR/DE **0,92–0,96**.
+- `npm run smoke`: **25 von 25**.
+- `npm run a11y`: **96 Durchläufe** über 24 Routen, keine Verletzung.
+- `npm run shots`: **92 Aufnahmen** (vorher 84) — zwei neue Bildersätze für
+  den ausgewählten Zustand im Terminassistenten, hell und dunkel, mobil und
+  Desktop.
+
+**Von Hand gegen das gebaute HTML gefiltert**
+- Kein Dokument enthält noch „BAFA", „AVPQ", „hasCredential",
+  „Zertifizierungen" oder „Sertifikalar". Gegenprobe über alle statischen
+  HTML-Dateien gefahren.
+- `/tr/produkte` und `/tr/arbeiten` enthalten kein „Kundenwerk", kein „Im
+  Aufbau", kein „Glasfaser" mehr — stattdessen „Müşteri işi", „Kuruluyor",
+  „Fiber optik".
+- Status-Badges je Produkt gegen die Daten geprüft: meAI → *Live*, fibero →
+  *Im eigenen Betrieb*, CASSAMEA → *Im Aufbau*, meahv → *Im Aufbau*.
+- Die Fußzeile trägt „Osnabrück (DE) · Deutschland, Österreich & Schweiz".
+
+**Visuell — und dabei zwei Dinge gefunden, die kein Gate meldet**
+1. Der **Auswahl-Zustand** im Terminassistenten war zu leise: 7 % Gold-Tönung
+   plus 1 px Rahmen. Auf einem hellen Bildschirm kaum vom Nachbarn zu
+   unterscheiden — und das ist die erste Entscheidung auf dieser Seite.
+2. Die **Uhrzeit auf dem gewählten Zeitfenster** stand bei `opacity-75` und
+   damit auf **3,81 : 1** — unter den 4,5 : 1, die WCAG 1.4.3 verlangt.
+   Nachgerechnet mit den echten Tokens (#201e1b auf #be904e hell, auf
+   #d3a763 dunkel). Bei 90 % sind es 4,98 : 1 hell und 6,24 : 1 dunkel.
+
+   **axe hat das in 96 Durchläufen nicht gemeldet** — es kann eine Deckkraft
+   auf Text über einer Token-Fläche nicht zuverlässig auflösen. Ein grünes
+   Gate heißt nicht, dass nichts da ist.
+
+Beide Zustände haben jetzt einen eigenen Bildersatz (`08c-…-gewaehlt`,
+`08d-…-zeitfenster-gewaehlt`). Ein Zustand, den kein Screenshot aufnimmt,
+fällt bei keiner Sichtprüfung auf.
+
+**Was diese Runde NICHT getan hat:** kein Redesign, keine erfundene Zahl,
+keine erfundene Referenz, kein erfundenes Zertifikat, nichts auf `main`,
+nichts live.
+
+**Was weiterhin offen ist:** Abschnitt A (Impressum, AVV, Umgebungsvariablen,
+Domain, Copy-Freigaben A6 und A7) und Abschnitt C. Die Struktur für alle
+Beweise aus §10 steht — es fehlt der Inhalt, und den liefert nur der Owner.

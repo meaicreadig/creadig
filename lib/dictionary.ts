@@ -1111,7 +1111,7 @@ export const dictionary = {
         "Mehrere Standorte, ein Shop, Schnittstellen in die Warenwirtschaft oder ein System, das über die Website hinausgeht: Das rechnen wir nach Aufwand — nach einem Gespräch, nicht nach Liste. Wir sagen Ihnen vorher, was es kostet, und danach ändert sich die Zahl nicht.",
       openCta: "Umfang besprechen",
       retainerEyebrow: "Laufende Betreuung",
-      retainerTitle: "Betrieb statt Uebergabe.",
+      retainerTitle: "Betrieb statt Übergabe.",
       retainerFrom: "ab",
       retainerCta: "Betreuung anfragen",
       once: "einmalig · Festpreis",

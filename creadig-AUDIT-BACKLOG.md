@@ -48,7 +48,7 @@ Score = (Wirkung × Dringlichkeit) ÷ Personentage. Reihenfolge folgt Wirkung/Au
 - [ ] **Produkt-Screens**: echte meAI-Oberflächen → `public/works/products/meai/`
 - [x] **maqam** geklärt: echter Kunde (Owner 22.08.2026). Offen bleiben Screenshots, Region und Link.
 - [ ] **Vercel-AVV UND Resend-AVV** im jeweiligen Dashboard bestätigen/ablegen, dann `processors[].dpaConfirmed: true` (lib/site-data.ts)
-- [ ] **Türkische Projekttexte**: `work.what` und `work.sector` gibt es nur auf Deutsch — auf `/tr/arbeiten/…` steht der Projektsatz deutsch unter türkischer Oberfläche
+- [x] **Türkische Projekttexte** — erledigt (V2-1c, 25.08.2026). `what`, `sector`, `built` und `outcome` sind `Localized`; der Typ erzwingt beide Sprachen.
 
 ---
 
@@ -181,12 +181,127 @@ möglich. Sie gehört in die CI, und dort steht sie.
       damit die Liste keine Ein-Zeilen-Liste ist — **V-2 ist nicht mehr blockiert**
 - [ ] **Bewertungen**: 3–5 echte Google-Bewertungen → `reviews`
 - [ ] **Vercel-AVV UND Resend-AVV** bestätigen/ablegen → `processors[].dpaConfirmed: true`
-- [ ] **Türkische Projekttexte**: `work.what` und `work.sector` gibt es nur auf Deutsch
+- [x] **Türkische Projekttexte** — erledigt (V2-1c, 25.08.2026)
 - [ ] **maqam**: Umfang, Jahr, Region, Link
 - [ ] **Betrieb**: `SELFTEST_SECRET` setzen und einen Cron auf `/api/selftest` zeigen lassen (BF-8); optional `ALERT_WEBHOOK_URL` (T-2)
 - [ ] **BF-2 offene Flanke**: geteiltes Rate-Limit über alle Instanzen (Upstash o. ä.), falls der Endpunkt wirklich unter Beschuss gerät. Heute deckt das Zeit-Token den Regelfall.
 - [ ] **Produkt-Stände** prüfen (siehe D-2, Punkt 3)
 
 ---
-*Quelle: Vollaudit (4 Lanes + Roter Agent), 2026-08-22 · v0-Review und Master-Prompt 6, 2026-08-23 · Master-Prompt 7 (Barrierefreiheit), 2026-08-23.*
+
+## MASTER-PROMPT 8 · V2 — Von der Behauptung zum Beweis (25.08.2026)
+
+Grundlage: KIZILELMA §10 (externe Tiefen-Analyse, Gesamturteil 8,0/10 —
+„Sehr gute Marken-Hülle, jetzt mit Unternehmens-Beweis füllen") plus die
+Owner-Entscheidungen vom 23.08.2026. Stufen 1–6 in EINEM Durchgang, ein
+Commit je Teilschritt, vor jedem Commit `npm run build` grün + Function-Gate
++ Sterne-Gate + Paritäts-Gate + a11y. Nichts auf `main`, nichts live.
+
+**Die Leitfrage war nicht „was fehlt", sondern „was behaupten wir, ohne es zu
+belegen".** Deshalb ist der größte Einzel-Commit dieser Runde eine Löschung.
+
+### Stufe 1 — Positionierung & Sprache
+- [x] **V2-1a** DACH statt „nur Deutschland". Sieben sichtbare Stellen trugen
+      „Deutschland & Schweiz", zwei „für Handwerk und Mittelstand in
+      Deutschland" — das erste seit der Owner-Entscheidung falsch, das zweite
+      eine Grenze, wo eine Betonung gemeint war. DE + TR gleichzeitig.
+      `areaServed` lag als `["DE","CH"]` an vier Stellen einzeln und ist jetzt
+      eine Konstante neben `contact.markets`. **Nicht** geändert: Aussagen über
+      bestehende Arbeit — in Österreich hat niemand unterschrieben, und
+      nirgends steht, dass jemand es hätte.
+- [x] **V2-1b** Kategorie-Satz „Kein klassisches IT-Systemhaus. Ein System-Haus
+      für digitale Betriebe." im Kopf von /leistungen und /unternehmen — an
+      genau zwei Stellen, sonst wäre er ein vierter Slogan. Nische sachlich
+      benannt („Zwei Sprachen, ein Standard") ohne Herkunftsbild. Drei
+      Marken-Sätze durchgesetzt: „Fünf Ebenen. Ein System." existierte in vier
+      Fassungen nebeneinander, „Erfinden, bauen, betreiben." war eine fünfte
+      Variante von „Verstehen. Bauen. Betreiben."
+- [x] **V2-1c** Projekttexte zweisprachig. `Work.what`, `.sector`, `.built`,
+      `.outcome` sind `Localized` — der Compiler verlangt beide Sprachen.
+      Damit ist der letzte Punkt aus „OWNER LIEFERT" erledigt, der gar keine
+      Owner-Sache war. Gegengeprüft im gebauten HTML: /tr/produkte und
+      /tr/arbeiten enthalten kein deutsches Wort mehr.
+
+### Stufe 2 — Leistungen tiefer
+- [x] **V2-2** Je Ebene Ausgangslage → was wir bauen → was danach anders ist,
+      dazu „Typische Projekte" in Such-/Kundensprache (CRM,
+      Auftragsmanagement, Workflows, APIs, Dashboards, Individualsoftware …).
+      Markensprache oben, Capability-Sprache darunter — nicht umgekehrt.
+      Gerendert aus EINER Quelle auf /leistungen und auf allen sechs
+      Leistungsseiten. Prozess um **„Umsetzung"** ergänzt: Der Ablauf sprang
+      von „Angebot" direkt zu „Betrieb" und verschwieg damit seine längste
+      Etappe.
+
+### Stufe 3 — Betrieb produktisieren, Angebote ordnen
+- [x] **V2-3a** **Managed Betrieb** als eigene, benannte Sektion mit sieben
+      Bestandteilen (Hosting · Monitoring · Updates · Security · Backups ·
+      Support · Weiterentwicklung). Er lag über drei Stellen verteilt und war
+      als Fußnote unsichtbar — dabei trägt er den wiederkehrenden Umsatz. Der
+      Retainer-Preis ist mitgezogen. Keine SLA-Zahl, kein „24/7": zugesagt ist
+      der Rückruf am nächsten Werktag.
+- [x] **V2-3b** Rubrik **„Einstiegsangebote"** mit zwei Einträgen
+      (Website-Paket 2.400 € · Barrierefreiheits-Prüfung 1.500 €) und dem Satz,
+      der sie einordnet: der Einstieg, nicht die Hauptarchitektur. Damit ist
+      der Lock „EIN beworbenes Angebot" abgelöst (§10 vor §9.8) — **nicht**
+      gelockert ist: eine Preisleiter je Angebot, kein Preis an zwei Stellen
+      mit zwei Zahlen.
+
+### Stufe 4 — Proof-Gefäße (Struktur jetzt, Inhalt Owner-gegatet)
+- [x] **V2-4a** Case-Study-System mit **acht Kapiteln** statt drei Feldern:
+      Ausgangslage → Problem → Ziel → unsere Rolle → System → Umsetzung →
+      Ergebnis → Heute. Dazu Kennzahlen mit **Pflicht-Quelle** und eine
+      Kundenstimme (Wortlaut wird nicht übersetzt). Gerüst für **NV SWISS** und
+      **maqam** angelegt, `approved: false` — erscheint nirgends.
+- [x] **V2-4b** Produkt-Detailseiten: problem · thesis · functions ·
+      architecture · operations · learnings, alle Owner-gegatet und leer.
+      **Status-Badge abgeleitet** aus `live` + öffentlicher Adresse, nicht
+      gepflegt — ein drittes Feld neben `live` und `outcome` wäre die zweite
+      Wahrheit.
+- [x] **V2-4c** Zahlen-Band: drei Gefäße vorbereitet und leer (produktive
+      Systeme, automatisierte Vorgänge, Jahre im Betrieb). Kundenstimmen um
+      Firma, Rolle und Projekt erweitert — optional, weil eine echte
+      Google-Bewertung oft nur einen Namen trägt.
+- [x] **V2-4d** **Haus-Architektur-Diagramm** auf /unternehmen: Dach → fünf
+      Ebenen → quer darunter der Betrieb → vier Produkte, jedes mit seiner
+      Ebene. Keine Grafikdatei: Es liest `serviceLayers`, `productWorks` und
+      `productWorlds` und kann deshalb von den Daten nicht abweichen. **Der
+      einzige Beweis-Baustein dieser Runde, der heute schon vollständig ist.**
+
+### Stufe 5 — Unternehmen & Trust-Wahrheit
+- [x] **V2-5a** **Unbelegte Zertifikate und Mitgliedschaften entfernt** —
+      BAFA (mit Berater-ID), iuk Osnabrück, AVPQ, AGD. Keiner der vier ist
+      belegt (§9.9). Entfernt aus Daten, Sektion, Nachweis-Zeile der
+      Startseite, Kopf- und Fußzeile, Wörterbuch, Meta-Beschreibung **und aus
+      `hasCredential` in den strukturierten Daten**. Gegengeprüft: kein
+      gebautes HTML-Dokument enthält noch einen der Begriffe.
+      *Ein unbelegter Nachweis ist schlimmer als kein Nachweis.*
+- [x] **V2-5b** Arbeitsmodell **„So arbeiten wir"**: geführt vom Gründer · ein
+      kleines Kernteam · Spezialisten nach Bedarf. Founder als „Gründer &
+      System Lead"; die Verantwortungsfelder lesen `serviceLayers` statt einer
+      eigenen Fähigkeiten-Liste. Am Ende steht, was wir NICHT nennen und
+      warum. **Foto-Slots** unter `public/images/unternehmen/` (buero · ico ·
+      arbeitsplatz · whiteboard) mit eigenem Bauzeit-Skript, Beschriftungen
+      und Alt-Texten in beiden Sprachen sowie einem README im Verzeichnis.
+
+### Stufe 6 — Feinschliff & Abnahme
+- [x] **V2-6a** Auswahl-Zustand im Terminassistenten: 7 % Gold-Tönung waren bei
+      Tageslicht kaum sichtbar — jetzt Tönung, durchgehende Gold-Kante und
+      Ring. Dazu ein Kontrast-Fehler, den axe in 96 Durchläufen **nicht**
+      gemeldet hat: die Uhrzeit auf der gewählten goldenen Fläche lag bei
+      `opacity-75` auf 3,81 : 1 (nachgerechnet mit den echten Tokens), jetzt
+      4,98 : 1 hell und 6,24 : 1 dunkel. Zwei neue Bildersätze halten beide
+      Zustände fest — ein Zustand, den kein Screenshot aufnimmt, fällt bei
+      keiner Sichtprüfung auf.
+- [x] **V2-6b** Endabnahme, Checkliste und dieses Backlog aktualisiert.
+
+**Bewusst nicht getan** (steht so im Prompt): kein Redesign, keine erfundenen
+Zahlen, keine erfundenen Referenzen oder Zertifikate, keine Deko-Trends, kein
+Push nach `main`, kein Livegang.
+
+**Nicht in dieser Runde gebaut, obwohl §10 es nennt:** §10.8 (Insights als
+Thought-Leadership) — der erste Artikel steht seit BF-A9, weitere sind
+Owner-Inhalt und keine Struktur. Die Gefäße dafür existieren.
+
+---
+*Quelle: Vollaudit (4 Lanes + Roter Agent), 2026-08-22 · v0-Review und Master-Prompt 6, 2026-08-23 · Master-Prompt 7 (Barrierefreiheit), 2026-08-23 · KIZILELMA §10 / Master-Prompt 8 V2, 2026-08-25.*
 
