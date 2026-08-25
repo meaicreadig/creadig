@@ -39,7 +39,7 @@ import { featuredWorks, workHref } from "@/lib/site-data"
  * illustrative Mockups sind und keine Screenshots.
  */
 export function SelectedWork() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
   const copy = t.home.work
 
   if (featuredWorks.length === 0) return null
@@ -96,7 +96,7 @@ export function SelectedWork() {
                     {work.image ? (
                       <Image
                         src={work.image}
-                        alt={`${work.name} — ${work.what}`}
+                        alt={`${work.name} — ${work.what[locale]}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 58vw"
                         className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
@@ -134,17 +134,18 @@ export function SelectedWork() {
                   }`}
                 >
                   <p className="eyebrow text-muted-foreground">
-                    {work.kind} · {work.sector}
+                    {work.kind === "Produkt" ? t.portfolio.kindProduct : t.portfolio.kindClientWork} ·{" "}
+                    {work.sector[locale]}
                   </p>
                   <h3 className="type-h3 mt-5">{work.name}</h3>
                   <p className="type-lead text-muted-foreground mt-6 max-w-md text-pretty">
-                    {work.what}
+                    {work.what[locale]}
                   </p>
                   {/* Ohne belegten Umfang keine leere Zeile mit Label. */}
                   {work.built && (
                     <p className="type-small text-foreground/85 border-line mt-8 max-w-md border-t pt-6 text-pretty">
                       <span className="text-gold-text">{t.portfolio.built}: </span>
-                      {work.built}
+                      {work.built[locale]}
                     </p>
                   )}
                   <span className="text-gold-text mt-8 inline-flex items-center gap-2 text-sm tracking-wide">

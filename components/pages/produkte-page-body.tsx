@@ -21,7 +21,7 @@ import { clientWorks, ownProducts, productWorks } from "@/lib/site-data";
  * steht hier nicht.
  */
 export function ProduktePageBody() {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const copy = t.produktePage;
 
   return (
@@ -85,20 +85,22 @@ export function ProduktePageBody() {
                           </div>
                         )}
                         <p className="eyebrow text-muted-foreground mt-5">
-                          {product.sector}
+                          {product.sector[locale]}
                         </p>
                       </div>
 
                       <div className="md:col-span-5">
                         <p className="type-lead text-foreground/85 max-w-lg text-pretty">
-                          {product.what}
+                          {product.what[locale]}
                         </p>
-                        <p className="type-small text-muted-foreground mt-5 max-w-lg text-pretty">
-                          <span className="text-gold-text">
-                            {copy.builtLabel}:{" "}
-                          </span>
-                          {product.built}
-                        </p>
+                        {product.built && (
+                          <p className="type-small text-muted-foreground mt-5 max-w-lg text-pretty">
+                            <span className="text-gold-text">
+                              {copy.builtLabel}:{" "}
+                            </span>
+                            {product.built[locale]}
+                          </p>
+                        )}
                       </div>
 
                       <div className="md:col-span-3 md:text-right">
@@ -110,7 +112,7 @@ export function ProduktePageBody() {
                             live={product.live}
                             className="translate-y-[-0.15em]"
                           />
-                          {product.outcome}
+                          {product.outcome[locale]}
                         </p>
                         <p className="text-meta text-muted-foreground mt-3">
                           {product.region}
@@ -187,10 +189,10 @@ export function ProduktePageBody() {
                   >
                     <span className="text-subhead text-lg">{work.name}</span>
                     <span className="type-small text-muted-foreground text-pretty">
-                      {work.what}
+                      {work.what[locale]}
                     </span>
                     <span className="eyebrow text-muted-foreground group-hover:text-gold-text mt-auto pt-4 transition-colors duration-500">
-                      {work.sector}
+                      {work.sector[locale]}
                     </span>
                   </Link>
                 </Reveal>

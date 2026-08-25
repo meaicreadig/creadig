@@ -66,16 +66,35 @@ export const ownProducts: ProductLogo[] = [
  */
 export const brands: BrandLogo[] = []
 
+/*
+ * V2-1c — DIE PROJEKTTEXTE SIND ZWEISPRACHIG.
+ *
+ * Bis hierher waren `what`, `sector`, `built` und `outcome` einfache
+ * Zeichenketten, und in den Routen stand der Grund dafuer als Kommentar:
+ * „Auf /tr ist die Oberflaeche tuerkisch, der Projektsatz deutsch — der
+ * ehrliche Zustand." Ehrlich war das, aber es war auch die groesste
+ * sichtbare Luecke der tuerkischen Fassung: Auf /tr/produkte/meai stand die
+ * halbe Seite auf Deutsch, ausgerechnet an der Stelle, an der es um die
+ * Sache geht.
+ *
+ * `Localized` statt `string` heisst: Der Compiler verlangt beide Sprachen.
+ * Ein Werk, das nur auf Deutsch beschrieben ist, kommt gar nicht mehr ins
+ * Repo — dieselbe Mechanik wie bei den Case-Studies.
+ *
+ * Was NICHT uebersetzt wird: Eigennamen (`name`), Regionskuerzel (`region`)
+ * und Monogramme. Und `outcome` ist eine Zustandsangabe („Im Aufbau"), keine
+ * Bewertung — die tuerkische Fassung sagt dasselbe, nicht mehr.
+ */
 export type Work = {
   slug: string
   name: string
-  what: string
+  what: Localized
   /**
    * Was wir gebaut haben. `null`, solange der Owner den Umfang nicht
    * bestaetigt hat — dann steht dort nichts statt einer Vermutung.
    */
-  built: string | null
-  outcome: string
+  built: Localized | null
+  outcome: Localized
   kind: "Produkt" | "Kundenwerk"
   /** `null`, solange der Owner die Region nicht bestaetigt hat. */
   region: Region | null
@@ -84,7 +103,7 @@ export type Work = {
    * keinen Platz fuer den ganzen `what`-Satz. Abgeleitet aus dem, was das
    * Projekt tatsaechlich ist; nichts dazuerfunden.
    */
-  sector: string
+  sector: Localized
   /**
    * Jahr der Umsetzung. `null`, solange es nicht belegt ist — und dann steht
    * im Register schlicht nichts. Ein geschaetztes Jahr waere eine erfundene
@@ -117,12 +136,18 @@ export type Work = {
 export const productWorks: Work[] = [
   {
     slug: "meai",
-    sector: "KI · Business-Software",
+    sector: { de: "KI · Business-Software", tr: "Yapay zekâ · İş yazılımı" },
     year: null,
     name: "meAI",
-    what: "KI-Business-Betriebssystem für kleine und mittlere Betriebe.",
-    built: "Produktarchitektur, KI-Logik, Dashboard, Betrieb — von Grund auf.",
-    outcome: "Im Aufbau · live unter meai.run",
+    what: {
+      de: "KI-Business-Betriebssystem für kleine und mittlere Betriebe.",
+      tr: "Küçük ve orta ölçekli işletmeler için yapay zekâ tabanlı iş işletim sistemi.",
+    },
+    built: {
+      de: "Produktarchitektur, KI-Logik, Dashboard, Betrieb — von Grund auf.",
+      tr: "Ürün mimarisi, yapay zekâ mantığı, gösterge paneli, işletme — sıfırdan.",
+    },
+    outcome: { de: "Im Aufbau · live unter meai.run", tr: "Kuruluyor · meai.run adresinde canlı" },
     kind: "Produkt",
     region: "DE & CH",
     image: "/works/meai.png",
@@ -132,12 +157,18 @@ export const productWorks: Work[] = [
   },
   {
     slug: "fibero",
-    sector: "Glasfaser · Operations",
+    sector: { de: "Glasfaser · Operations", tr: "Fiber optik · Operasyon" },
     year: null,
     name: "fibero",
-    what: "Ordnung und Klarheit im Glasfaser-Alltag: Auftrags-, Abrechnungs- und Finanzlogik.",
-    built: "Operative Prozesse, Abrechnungssystem, Auswertung.",
-    outcome: "Im Tagesbetrieb",
+    what: {
+      de: "Ordnung und Klarheit im Glasfaser-Alltag: Auftrags-, Abrechnungs- und Finanzlogik.",
+      tr: "Fiber optik günlük işinde düzen ve netlik: iş emri, hakediş ve finans mantığı.",
+    },
+    built: {
+      de: "Operative Prozesse, Abrechnungssystem, Auswertung.",
+      tr: "Operasyonel süreçler, hakediş sistemi, değerlendirme.",
+    },
+    outcome: { de: "Im Tagesbetrieb", tr: "Günlük kullanımda" },
     kind: "Produkt",
     region: "DE",
     image: "/works/fibero.png",
@@ -146,12 +177,18 @@ export const productWorks: Work[] = [
   },
   {
     slug: "cassamea",
-    sector: "Gastronomie · Kasse",
+    sector: { de: "Gastronomie · Kasse", tr: "Gastronomi · Kasa" },
     year: null,
     name: "CASSAMEA",
-    what: "Die Kasse, die mitdenkt — für die Gastronomie, gebaut für Schweizer Anforderungen.",
-    built: "Kassen-Software, Backoffice, Schweizer Anforderungen.",
-    outcome: "Im Aufbau",
+    what: {
+      de: "Die Kasse, die mitdenkt — für die Gastronomie, gebaut für Schweizer Anforderungen.",
+      tr: "Birlikte düşünen kasa — gastronomi için, İsviçre gerekliliklerine göre kuruldu.",
+    },
+    built: {
+      de: "Kassen-Software, Backoffice, Schweizer Anforderungen.",
+      tr: "Kasa yazılımı, backoffice, İsviçre gereklilikleri.",
+    },
+    outcome: { de: "Im Aufbau", tr: "Kuruluyor" },
     kind: "Produkt",
     region: "CH",
     image: "/works/cassamea.png",
@@ -159,12 +196,18 @@ export const productWorks: Work[] = [
   },
   {
     slug: "meahv",
-    sector: "Immobilien · Verwaltung",
+    sector: { de: "Immobilien · Verwaltung", tr: "Gayrimenkul · Yönetim" },
     year: null,
     name: "meahv",
-    what: "Hausverwaltungs-System: Objekte, Mieter, Belege und Abrechnung an einem Ort.",
-    built: "Datenmodell, Verwaltungslogik, Abrechnung.",
-    outcome: "Im Aufbau",
+    what: {
+      de: "Hausverwaltungs-System: Objekte, Mieter, Belege und Abrechnung an einem Ort.",
+      tr: "Bina yönetim sistemi: taşınmazlar, kiracılar, belgeler ve faturalandırma tek yerde.",
+    },
+    built: {
+      de: "Datenmodell, Verwaltungslogik, Abrechnung.",
+      tr: "Veri modeli, yönetim mantığı, faturalandırma.",
+    },
+    outcome: { de: "Im Aufbau", tr: "Kuruluyor" },
     kind: "Produkt",
     region: "DE",
     // Noch kein Mockup — die Karte rendert ein Monogramm-Panel statt eines leeren Bildes.
@@ -314,12 +357,15 @@ export function productNeighbours(slug: string): { prev: Work; next: Work } | nu
 export const clientWorks: Work[] = [
   {
     slug: "nv-swiss",
-    sector: "Versicherung & Finanzen",
+    sector: { de: "Versicherung & Finanzen", tr: "Sigorta & finans" },
     year: null,
     name: "NV SWISS",
-    what: "Versicherungs- & Finanzmakler (Schweiz) — Marke, Website und Digitalisierung aus einer Hand.",
-    built: "Marke, Website, Digitalisierung.",
-    outcome: "Kundenwerk · live",
+    what: {
+      de: "Versicherungs- & Finanzmakler (Schweiz) — Marke, Website und Digitalisierung aus einer Hand.",
+      tr: "Sigorta & finans brokeri (İsviçre) — marka, web sitesi ve dijitalleşme tek elden.",
+    },
+    built: { de: "Marke, Website, Digitalisierung.", tr: "Marka, web sitesi, dijitalleşme." },
+    outcome: { de: "Kundenwerk · live", tr: "Müşteri işi · canlı" },
     kind: "Kundenwerk",
     region: "CH",
     // Noch kein freigegebener Screenshot — die Karte rendert ein Monogramm-Panel.
@@ -333,14 +379,14 @@ export const clientWorks: Work[] = [
   },
   {
     slug: "maqam",
-    sector: "Online-Business · E-Commerce",
+    sector: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret" },
     year: null,
     name: "maqam",
-    what: "Online-Business / E-Commerce.",
+    what: { de: "Online-Business / E-Commerce.", tr: "Online iş / e-ticaret." },
     // Umfang, Region, Link und Screenshots liegen noch nicht vor.
     // TODO (Owner): nachtragen — bis dahin rendern diese Felder nicht.
     built: null,
-    outcome: "Kundenwerk",
+    outcome: { de: "Kundenwerk", tr: "Müşteri işi" },
     kind: "Kundenwerk",
     region: null,
     image: null,
@@ -643,8 +689,19 @@ export const socialProfiles: SocialProfile[] = []
  * (Owner-Entscheidung 22.08.2026). Das Produkt fibero ist davon unberührt —
  * es ist ein eigenes Produkt und steht in `productWorks`.
  */
-export const furtherProjects = [
-  { name: "Ops-Retainer", what: "Operations-System für Handwerksbetriebe", kind: "Dienstleistung" as const },
+export const furtherProjects: {
+  name: string
+  what: Localized
+  kind: Localized
+}[] = [
+  {
+    name: "Ops-Retainer",
+    what: {
+      de: "Operations-System für Handwerksbetriebe",
+      tr: "Zanaat işletmeleri için operasyon sistemi",
+    },
+    kind: { de: "Dienstleistung", tr: "Hizmet" },
+  },
 ]
 
 /**

@@ -81,9 +81,9 @@ export function ProduktPageBody({
   return (
     <main>
       <PageHeader
-        eyebrow={product.sector}
+        eyebrow={product.sector[locale]}
         title={product.name}
-        lead={product.what}
+        lead={product.what[locale]}
         crumbs={[{ label: copy.breadcrumb, href: "/produkte" }]}
       >
         {/* Signal-Zeile: nur belegte Felder. `year` ist überall null und
@@ -96,7 +96,7 @@ export function ProduktPageBody({
                 verschwinden. */}
             <p className="type-body text-foreground/85 mt-3 flex items-baseline gap-2.5 text-pretty">
               <StatusDot live={product.live} className="translate-y-[-0.15em]" />
-              {product.outcome}
+              {product.outcome[locale]}
             </p>
           </div>
           <div className="border-line pt-7 sm:border-l sm:pl-8">
@@ -105,7 +105,7 @@ export function ProduktPageBody({
           </div>
           <div className="border-line pt-7 sm:border-l sm:pl-8">
             <p className="eyebrow text-gold-text">{copy.sectorLabel}</p>
-            <p className="type-body text-foreground/85 mt-3">{product.sector}</p>
+            <p className="type-body text-foreground/85 mt-3">{product.sector[locale]}</p>
           </div>
         </div>
 
@@ -335,7 +335,7 @@ export function ProduktPageBody({
                     <p className="eyebrow text-gold-text">{copy.houseContextLabel}</p>
                     <p className="text-subhead mt-4 text-xl">{houseContext.name}</p>
                     <p className="type-small text-muted-foreground mt-2">
-                      {houseContext.what} · {houseContext.kind}
+                      {houseContext.what[locale]} · {houseContext.kind[locale]}
                     </p>
                     <p className="type-body text-foreground/85 mt-5 max-w-lg text-pretty">
                       {copy.houseContextNote}
@@ -386,7 +386,7 @@ export function ProduktPageBody({
                   {neighbour.name}
                 </span>
                 <span className="type-small text-muted-foreground max-w-sm text-pretty">
-                  {neighbour.what}
+                  {neighbour.what[locale]}
                 </span>
               </Link>
             ))}

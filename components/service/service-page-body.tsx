@@ -194,7 +194,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                     >
                       <span className="text-subhead text-lg">{work.name}</span>
                       <span className="type-small text-muted-foreground text-pretty">
-                        {work.what}
+                        {work.what[locale]}
                       </span>
                     </li>
                   ))}

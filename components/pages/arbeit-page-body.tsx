@@ -37,19 +37,21 @@ export function ArbeitPageBody({
   return (
     <main>
       <PageHeader
-        eyebrow={work.sector}
+        eyebrow={work.sector[locale]}
         title={work.name}
-        lead={work.what}
+        lead={work.what[locale]}
         crumbs={[{ label: copy.breadcrumb, href: "/arbeiten" }]}
       >
         <div className="border-line mt-12 grid gap-px border-t sm:grid-cols-3">
           <div className="pt-7 sm:pr-8">
             <p className="eyebrow text-gold-text">{copy.kindLabel}</p>
-            <p className="type-body text-foreground/85 mt-3">{work.kind}</p>
+            <p className="type-body text-foreground/85 mt-3">
+              {work.kind === "Produkt" ? t.portfolio.kindProduct : t.portfolio.kindClientWork}
+            </p>
           </div>
           <div className="border-line pt-7 sm:border-l sm:pl-8">
             <p className="eyebrow text-gold-text">{copy.sectorLabel}</p>
-            <p className="type-body text-foreground/85 mt-3">{work.sector}</p>
+            <p className="type-body text-foreground/85 mt-3">{work.sector[locale]}</p>
           </div>
           {/* Ohne bestaetigte Region faellt die ganze Zelle weg — kein Label ins Leere. */}
           {work.region && (
@@ -86,7 +88,7 @@ export function ArbeitPageBody({
                   id="arbeit-gebaut-title"
                   className="type-h3 mt-7 max-w-2xl text-balance"
                 >
-                  {work.built}
+                  {work.built[locale]}
                 </h2>
               </Reveal>
             )}
@@ -98,13 +100,13 @@ export function ArbeitPageBody({
               <div className="border-line border-t pt-7">
                 <p className="eyebrow text-gold-text">{copy.whatLabel}</p>
                 <p className="type-body text-foreground/85 mt-4 text-pretty">
-                  {work.what}
+                  {work.what[locale]}
                 </p>
               </div>
               <div className="border-line mt-10 border-t pt-7">
                 <p className="eyebrow text-gold-text">{copy.statusLabel}</p>
                 <p className="type-body text-foreground/85 mt-4 text-pretty">
-                  {work.outcome}
+                  {work.outcome[locale]}
                 </p>
               </div>
             </Reveal>

@@ -19,7 +19,7 @@ import { registryWorks, workHref } from "@/lib/site-data"
  * zwei Darstellungen, eine Wahrheit. Das Jahr steht nur da, wo es belegt ist.
  */
 export function WorkRegistry() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
 
   return (
     <div>
@@ -61,7 +61,7 @@ export function WorkRegistry() {
                   </span>
 
                   <span className="type-small text-muted-foreground md:col-span-3">
-                    {work.sector}
+                    {work.sector[locale]}
                   </span>
 
                   <span className="text-meta text-muted-foreground md:col-span-3 md:text-right">

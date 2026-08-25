@@ -26,7 +26,7 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
  * Monogramm, nie ein kaputtes <img>.
  */
 export function HouseProducts() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
 
   return (
     <section
@@ -108,7 +108,7 @@ export function HouseProducts() {
 
                     <h3 className="type-h4 mt-6">{product.name}</h3>
                     <p className="type-small text-muted-foreground mt-4 text-pretty">
-                      {product.what}
+                      {product.what[locale]}
                     </p>
                   </div>
 
@@ -118,7 +118,7 @@ export function HouseProducts() {
                     </p>
                     <p className="type-small text-foreground/85 mt-2 flex items-baseline gap-2 text-pretty">
                       <StatusDot live={product.live} className="translate-y-[-0.15em]" />
-                      {product.outcome}
+                      {product.outcome[locale]}
                     </p>
                     <p className="text-meta text-muted-foreground mt-3">{product.region}</p>
                   </div>

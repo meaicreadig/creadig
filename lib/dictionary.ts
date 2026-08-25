@@ -469,6 +469,16 @@ export const dictionary = {
       productsNote: "Selbst erfunden, selbst gebaut, selbst betrieben.",
       clientWork: "Kundenwerk",
       clientWorkNote: "Dienstleistung für Auftraggeber — kein eigenes Produkt.",
+      /*
+       * V2-1c — die Art eines Werks als Etikett, in der Sprache der Seite.
+       *
+       * `Work.kind` bleibt in den Daten ein deutscher Schluessel („Produkt" /
+       * „Kundenwerk"), weil daran Logik haengt (Adresse, Gruppierung,
+       * Register). Was der Besucher liest, kommt jetzt von hier — sonst stand
+       * auf /tr im Badge „Kundenwerk" ueber einer sonst tuerkischen Karte.
+       */
+      kindProduct: "Produkt",
+      kindClientWork: "Kundenwerk",
       more: "Außerdem unter dem Dach",
       viewLive: "Live ansehen",
       mockupNote: "Abbildungen sind illustrative Mockups, keine Screenshots.",
@@ -1619,6 +1629,8 @@ export const dictionary = {
       productsNote: "Kendimiz icat ettik, kendimiz kurduk, kendimiz işletiyoruz.",
       clientWork: "Müşteri işleri",
       clientWorkNote: "İş verenler için hizmet — kendi ürünümüz değil.",
+      kindProduct: "Ürün",
+      kindClientWork: "Müşteri işi",
       more: "Çatı altında ayrıca",
       viewLive: "Canlı gör",
       mockupNote: "Görseller açıklayıcı maketlerdir, ekran görüntüsü değildir.",

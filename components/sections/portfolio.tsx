@@ -9,6 +9,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useLocale } from "@/components/locale-provider";
+import type { Locale } from "@/lib/dictionary";
 import { WorkRegistry } from "@/components/sections/work-registry";
 import {
   clientWorks,
@@ -49,11 +50,16 @@ function MonogramPanel({ mark }: { mark: string }) {
 function WorkCard({
   work,
   builtLabel,
+  locale,
+  kindLabel,
   compact = false,
 }: {
   work: Work;
   builtLabel: string;
   compact?: boolean;
+  /** Sprache der Seite — die Projekttexte sind seit V2-1c zweisprachig. */
+  locale: Locale;
+  kindLabel: string;
 }) {
   return (
     <Link
@@ -69,7 +75,7 @@ function WorkCard({
         {work.image ? (
           <Image
             src={work.image}
-            alt={`${work.name} — ${work.what}`}
+            alt={`${work.name} — ${work.what[locale]}`}
             fill
             sizes={
               compact
@@ -91,7 +97,7 @@ function WorkCard({
             variant="outline"
             className="border-background/40 bg-background/80 eyebrow rounded-none px-2.5 py-1 backdrop-blur-sm"
           >
-            {work.kind}
+            {kindLabel}
           </Badge>
           {/* Ohne bestaetigte Region kein leeres Badge. */}
           {work.region && (
@@ -122,7 +128,7 @@ function WorkCard({
           <div className="bg-background/95 absolute inset-x-0 bottom-0 translate-y-full p-5 backdrop-blur-md transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0">
             <p className="eyebrow text-gold-text">{builtLabel}</p>
             <p className="type-small text-foreground mt-2 text-pretty">
-              {work.built}
+              {work.built[locale]}
             </p>
           </div>
         )}
@@ -139,10 +145,10 @@ function WorkCard({
             <ArrowUpRight className="text-gold mt-1 size-4 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </div>
           <p className="type-body text-muted-foreground mt-3 max-w-md text-pretty">
-            {work.what}
+            {work.what[locale]}
           </p>
         </div>
-        <p className="eyebrow text-muted-foreground">{work.outcome}</p>
+        <p className="eyebrow text-muted-foreground">{work.outcome[locale]}</p>
       </div>
     </Link>
   );
@@ -159,7 +165,7 @@ function GroupHeading({ label, note }: { label: string; note: string }) {
 }
 
 export function Portfolio({ heading = true }: { heading?: boolean }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   /*
    * Zwei Ansichten auf dieselbe Liste (B2). Karten sind der Default: Sie
    * zeigen, wie etwas aussieht. Das Register zeigt, wie viel es ist — und
@@ -250,7 +256,12 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
                 delay={(index % 2) * 0.08}
                 className="flex"
               >
-                <WorkCard work={work} builtLabel={t.portfolio.built} />
+                <WorkCard
+                  work={work}
+                  builtLabel={t.portfolio.built}
+                  locale={locale}
+                  kindLabel={t.portfolio.kindProduct}
+                />
               </Reveal>
             ))}
           </div>
@@ -275,6 +286,8 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
                     <WorkCard
                       work={work}
                       builtLabel={t.portfolio.built}
+                      locale={locale}
+                      kindLabel={t.portfolio.kindClientWork}
                       compact
                     />
                   </Reveal>
@@ -300,7 +313,7 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
                 {project.name}
               </span>
               <span className="text-muted-foreground group-hover:text-gold-text text-right text-[0.75rem] transition-colors duration-500">
-                {project.what}
+                {project.what[locale]}
               </span>
             </li>
           ))}

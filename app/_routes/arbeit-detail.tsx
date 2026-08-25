@@ -38,12 +38,12 @@ export async function arbeitMetadata(
   const work = findWork(slug)
   if (!work) return {}
 
-  const title = `${work.name} — ${work.sector}`
+  const title = `${work.name} — ${work.sector[locale]}`
   return pageMetadata({
     locale,
     path: `/arbeiten/${work.slug}`,
     title,
-    description: work.what,
+    description: work.what[locale],
     type: "article",
   })
 }

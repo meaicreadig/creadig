@@ -42,12 +42,12 @@ export async function produktMetadata(
   const product = findProduct(slug)
   if (!product) return {}
 
-  const title = `${product.name} — ${product.sector}`
+  const title = `${product.name} — ${product.sector[locale]}`
   return pageMetadata({
     locale,
     path: `/produkte/${product.slug}`,
     title,
-    description: product.what,
+    description: product.what[locale],
     type: "article",
   })
 }
@@ -75,7 +75,7 @@ export async function ProduktRoute({
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       name: product.name,
-      description: product.what,
+      description: product.what[locale],
       applicationCategory: "BusinessApplication",
       author: { "@type": "Organization", name: "creaDIG", url: SITE_URL },
       publisher: { "@type": "Organization", name: "creaDIG", url: SITE_URL },
