@@ -15,6 +15,7 @@ import { publishedServicePages } from "@/lib/service-pages"
 import {
   furtherProjects,
   productNeighbours,
+  productStatus,
   productWorlds,
   serviceLayers,
   type Work,
@@ -62,6 +63,13 @@ export function ProduktPageBody({
   const world = productWorlds[product.slug]
   const neighbours = productNeighbours(product.slug)
 
+  /*
+   * V2-4b — der Zustands-Badge. Abgeleitet aus `live` und der oeffentlichen
+   * Adresse, nicht gepflegt: ein drittes Feld neben `live` und `outcome`
+   * waere die zweite Wahrheit (siehe `productStatus` in site-data).
+   */
+  const status = productStatus(product)
+
   const layer = serviceLayers.find((entry) => entry.key === world?.layer)
   const layerCopy = world ? t.services.layers[world.layer] : null
   // Leistungsseiten, die dieses Produkt ausdrücklich als Arbeit führen.
@@ -93,9 +101,15 @@ export function ProduktPageBody({
             <p className="eyebrow text-gold-text">{copy.statusLabel}</p>
             {/* Gefuellt = laeuft, offen = im Aufbau. Der Unterschied ist die
                 ehrlichste Angabe auf der Seite und darf nicht im Fliesstext
-                verschwinden. */}
-            <p className="type-body text-foreground/85 mt-3 flex items-baseline gap-2.5 text-pretty">
-              <StatusDot live={product.live} className="translate-y-[-0.15em]" />
+                verschwinden. Der Badge daneben sagt dasselbe in einem Wort —
+                fuer alle, die die Zeile nicht lesen. */}
+            <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span className="border-line-strong text-muted-foreground eyebrow inline-flex items-center gap-2 border px-2.5 py-1">
+                <StatusDot live={product.live} />
+                {copy.statusBadge[status]}
+              </span>
+            </p>
+            <p className="type-body text-foreground/85 mt-3 text-pretty">
               {product.outcome[locale]}
             </p>
           </div>
@@ -132,7 +146,42 @@ export function ProduktPageBody({
       </PageHeader>
 
       {/* ------------------------------------------------------------------
-          1 — Das Interface. Der Beweis steht oben, nicht unten.
+          1 — Wofür es gebaut wurde, und worauf es wettet (V2-4b · §10.5).
+
+          Beide Felder sind Owner-Sache und heute `null`; die Sektion rendert
+          dann gar nicht. Sie steht bewusst VOR dem Interface: Ein Screenshot
+          ohne Problem davor ist ein Bild, kein Beweis.
+          ------------------------------------------------------------------ */}
+      {(world?.problem || world?.thesis) && (
+        <section aria-labelledby="produkt-warum-title" className="border-line border-b">
+          <div className="section-shell">
+            <h2 id="produkt-warum-title" className="sr-only">
+              {copy.problemLabel}
+            </h2>
+            <div className="grid gap-x-14 gap-y-12 lg:grid-cols-12">
+              {world.problem && (
+                <Reveal className="lg:col-span-6">
+                  <SectionEyebrow label={copy.problemLabel} />
+                  <p className="type-lead text-foreground/85 mt-7 max-w-xl text-pretty">
+                    {world.problem[locale]}
+                  </p>
+                </Reveal>
+              )}
+              {world.thesis && (
+                <Reveal delay={0.08} className="lg:col-span-6">
+                  <SectionEyebrow label={copy.thesisLabel} />
+                  <p className="type-lead text-foreground/85 mt-7 max-w-xl text-pretty">
+                    {world.thesis[locale]}
+                  </p>
+                </Reveal>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ------------------------------------------------------------------
+          2 — Das Interface. Der Beweis steht oben, nicht unten.
           ------------------------------------------------------------------ */}
       {screens.length > 0 ? (
         <section aria-labelledby="interface-title" className="border-line border-b">
@@ -242,7 +291,79 @@ export function ProduktPageBody({
       )}
 
       {/* ------------------------------------------------------------------
-          3 — Flaggschiff-Band: heute nur meAI, und nur mit belegten Texten.
+          4 — Was es kann, wie es innen aussieht, wie es betrieben wird und
+              was der Betrieb gelehrt hat (V2-4b · §10.5).
+
+          Vier Owner-Felder, heute alle leer — die Sektion rendert nicht. Sie
+          steht als Ganzes und nicht als vier einzelne Sektionen, damit eine
+          halb gefuellte Produktseite nicht in vier angerissene Kapitel
+          zerfaellt.
+          ------------------------------------------------------------------ */}
+      {world &&
+        (world.functions.length > 0 ||
+          world.architecture ||
+          world.operations ||
+          world.learnings.length > 0) && (
+          <section aria-labelledby="produkt-tiefe-title" className="border-line border-b">
+            <div className="section-shell">
+              <h2 id="produkt-tiefe-title" className="sr-only">
+                {copy.functionsLabel}
+              </h2>
+              <div className="grid gap-x-14 gap-y-14 lg:grid-cols-12">
+                {world.functions.length > 0 && (
+                  <Reveal className="lg:col-span-7">
+                    <SectionEyebrow label={copy.functionsLabel} />
+                    <ul className="mt-7 flex flex-col gap-4">
+                      {world.functions.map((fn) => (
+                        <li key={fn.de} className="flex gap-3.5">
+                          <span aria-hidden="true" className="bg-gold mt-2.5 h-px w-5 shrink-0" />
+                          <span className="type-body text-foreground/85 text-pretty">
+                            {fn[locale]}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </Reveal>
+                )}
+
+                <div className="flex flex-col gap-12 lg:col-span-5">
+                  {world.architecture && (
+                    <Reveal delay={0.06} className="border-line border-t pt-7">
+                      <p className="eyebrow text-gold-text">{copy.architectureLabel}</p>
+                      <p className="type-body text-foreground/85 mt-4 text-pretty">
+                        {world.architecture[locale]}
+                      </p>
+                    </Reveal>
+                  )}
+                  {world.operations && (
+                    <Reveal delay={0.1} className="border-line border-t pt-7">
+                      <p className="eyebrow text-gold-text">{copy.operationsLabel}</p>
+                      <p className="type-body text-foreground/85 mt-4 text-pretty">
+                        {world.operations[locale]}
+                      </p>
+                    </Reveal>
+                  )}
+                </div>
+
+                {world.learnings.length > 0 && (
+                  <Reveal delay={0.14} className="border-line border-t pt-8 lg:col-span-12">
+                    <p className="eyebrow text-gold-text">{copy.learningsLabel}</p>
+                    <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                      {world.learnings.map((entry) => (
+                        <li key={entry.de} className="type-body text-foreground/85 text-pretty">
+                          {entry[locale]}
+                        </li>
+                      ))}
+                    </ul>
+                  </Reveal>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+
+      {/* ------------------------------------------------------------------
+          5 — Flaggschiff-Band: heute nur meAI, und nur mit belegten Texten.
           ------------------------------------------------------------------ */}
       {world?.flagship && <MeaiSpotlight />}
 

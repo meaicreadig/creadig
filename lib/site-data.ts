@@ -240,6 +240,49 @@ export const productWorks: Work[] = [
  * Listen, Kundennamen. Nichts davon ist belegt.
  * ========================================================================== */
 
+/**
+ * Der Zustands-Badge eines Produkts (V2-4b · KIZILELMA §10.5).
+ *
+ * ---------------------------------------------------------------------------
+ * ER WIRD ABGELEITET, NICHT GEPFLEGT
+ * Es waere naheliegend gewesen, je Produkt ein Feld `status` einzutragen.
+ * Genau das waere die zweite Wahrheit: `live` und `outcome` stehen schon in
+ * den Daten, und ein drittes Feld daneben laeuft ihnen frueher oder spaeter
+ * davon — „Im Aufbau" im Text, „LIVE" im Badge, und niemand merkt es, weil
+ * beides nie nebeneinander gelesen wird.
+ *
+ * Die Ableitung ist absichtlich streng und behauptet nichts Neues:
+ *   live + oeffentliche Adresse  →  LIVE           (jeder kann es aufrufen)
+ *   live ohne Adresse            →  IM EIGENEN BETRIEB (wir nutzen es taeglich)
+ *   nicht live                   →  IM AUFBAU
+ *
+ * `beta` steht im Typ und traegt heute kein Produkt. Der Zustand existiert
+ * (eine geschlossene Testphase mit echten Nutzern), nur hat ihn niemand
+ * bestaetigt — und einen Badge zu vergeben, den keiner belegt hat, waere
+ * genau die Sorte Etikett, die diese Seite nicht vergibt.
+ */
+export type ProductStatus = "live" | "beta" | "aufbau" | "intern"
+
+export function productStatus(work: Work): ProductStatus {
+  if (!work.live) return "aufbau"
+  return work.href ? "live" : "intern"
+}
+
+/* --------------------------------------------------------------------------
+ * V2-4b — DIE PRODUKTSEITE HAT JETZT PLATZ FUER DIE GANZE GESCHICHTE.
+ *
+ * §10.5 verlangt je Produkt: Problem → Product-Thesis → Screens → Funktionen
+ * → System/Architektur → Betrieb → Status → Learnings → CTA. Bisher trug
+ * `ProductWorld` davon zwei Punkte (Bausteine und eine gesperrte Story).
+ *
+ * Die sechs neuen Felder sind alle `null` beziehungsweise leer, und das
+ * bleiben sie, bis der Owner liefert. Das ist kein Rueckstand, sondern die
+ * Regel dieses Repos: Warum ein Produkt gebaut wurde, wie es innen aussieht
+ * und was es im Betrieb gelehrt hat, weiss genau eine Person — und geraten
+ * wird es nicht. Was fehlt, steht auf `/status` mit Namen.
+ *
+ * Sichtbar wird heute nur der Status-Badge, und der ist abgeleitet.
+ * -------------------------------------------------------------------------- */
 export type ProductWorld = {
   /** `built`, in einzelne Bausteine zerlegt — zweisprachig. */
   blocks: Localized[]
@@ -264,6 +307,35 @@ export type ProductWorld = {
   houseContext: string | null
   /** Traegt das dunkle Faehigkeiten-Band (heute nur meAI). */
   flagship: boolean
+  /**
+   * Wofuer es gebaut wurde — das Problem im Markt, nicht das eigene.
+   * TODO (Owner). `null` = die Sektion rendert nicht.
+   */
+  problem: Localized | null
+  /**
+   * Die Produkt-These: die eine Annahme, auf der das Produkt steht und an
+   * der es scheitern wuerde, wenn sie falsch ist. TODO (Owner).
+   */
+  thesis: Localized | null
+  /**
+   * Funktionen in Kundensprache. Leer = kein Block.
+   *
+   * NICHT zu verwechseln mit `blocks`: Die sagen, was WIR gebaut haben
+   * („Produktarchitektur"), die hier sagen, was das Produkt KANN. meAI
+   * fuehrt seine vier bereits im Flaggschiff-Band; deshalb steht auch dort
+   * heute nichts, statt dieselben Worte ein zweites Mal zu zeigen.
+   */
+  functions: Localized[]
+  /** System und Architektur, so weit sie oeffentlich sein duerfen. TODO (Owner). */
+  architecture: Localized | null
+  /** Wie es betrieben wird — Hosting, Ueberwachung, Stand. TODO (Owner). */
+  operations: Localized | null
+  /**
+   * Was der Betrieb gelehrt hat, auch das Unangenehme. Leer = kein Block.
+   * Das ist der Teil, den kein Wettbewerber kopieren kann — und der
+   * einzige, den man sich am wenigsten ausdenken darf.
+   */
+  learnings: Localized[]
 }
 
 export const productWorlds: Record<string, ProductWorld> = {
@@ -278,6 +350,12 @@ export const productWorlds: Record<string, ProductWorld> = {
     story: null,
     houseContext: null,
     flagship: true,
+    problem: null,
+    thesis: null,
+    functions: [],
+    architecture: null,
+    operations: null,
+    learnings: [],
   },
   fibero: {
     blocks: [
@@ -289,6 +367,12 @@ export const productWorlds: Record<string, ProductWorld> = {
     story: null,
     houseContext: null,
     flagship: false,
+    problem: null,
+    thesis: null,
+    functions: [],
+    architecture: null,
+    operations: null,
+    learnings: [],
   },
   cassamea: {
     blocks: [
@@ -300,6 +384,12 @@ export const productWorlds: Record<string, ProductWorld> = {
     story: null,
     houseContext: null,
     flagship: false,
+    problem: null,
+    thesis: null,
+    functions: [],
+    architecture: null,
+    operations: null,
+    learnings: [],
   },
   meahv: {
     blocks: [
@@ -311,6 +401,12 @@ export const productWorlds: Record<string, ProductWorld> = {
     story: null,
     houseContext: null,
     flagship: false,
+    problem: null,
+    thesis: null,
+    functions: [],
+    architecture: null,
+    operations: null,
+    learnings: [],
   },
 }
 

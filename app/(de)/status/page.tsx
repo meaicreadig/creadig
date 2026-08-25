@@ -11,7 +11,9 @@ import {
   imprintComplete,
   imprintDetails,
   processors,
+  productStatus,
   productWorks,
+  productWorlds,
   retainerPublished,
   socialProfiles,
 } from "@/lib/site-data"
@@ -103,6 +105,30 @@ function collect(): { open: Item[]; done: Item[] } {
           ? `${screens.length} Aufnahme(n)`
           : `keine unter public/works/products/${product.slug}/ — die Interface-Sektion rendert nicht.`,
       owner: "Owner: echte Screenshots aus dem laufenden System",
+    })
+  }
+
+  /* ── Produkt-Tiefe (V2-4b · §10.5) ──────────────────────────────────── */
+  for (const product of productWorks) {
+    const world = productWorlds[product.slug]
+    const fehlend = [
+      world?.problem ? null : "Problem",
+      world?.thesis ? null : "These",
+      world?.functions.length ? null : "Funktionen",
+      world?.architecture ? null : "System/Architektur",
+      world?.operations ? null : "Betrieb",
+      world?.learnings.length ? null : "Learnings",
+      world?.story ? null : "Warum gebaut",
+    ].filter(Boolean)
+    items.push({
+      label: `Produkt-Tiefe ${product.name} (§10.5)`,
+      ok: fehlend.length === 0,
+      detail:
+        fehlend.length === 0
+          ? "vollständig"
+          : `fehlt: ${fehlend.join(", ")} — diese Abschnitte rendern nicht. ` +
+            `Status-Badge steht (abgeleitet: ${productStatus(product)}).`,
+      owner: "Owner: Problem, These, Funktionen, Architektur, Betrieb, Learnings",
     })
   }
 

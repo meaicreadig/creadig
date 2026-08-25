@@ -302,6 +302,33 @@ export const dictionary = {
         messageTemplate: "Nachfrage zum Produkt {product} — bitte Bescheid geben, sobald es verfügbar ist.",
       },
       breadcrumb: "Produkte",
+      /*
+       * V2-4b — die Beschriftungen der Produkt-Tiefe (KIZILELMA §10.5).
+       *
+       * Die Inhalte dazu liegen in `productWorlds` und sind alle `null`: Was
+       * ein Produkt loesen soll, worauf es wettet, wie es innen aussieht und
+       * was der Betrieb gelehrt hat, weiss genau eine Person. Die Labels
+       * stehen hier trotzdem — damit der Owner Text in eine Struktur
+       * schreiben kann und nicht die Struktur mitliefern muss.
+       */
+      problemLabel: "Wofür es gebaut wurde",
+      thesisLabel: "Die These",
+      functionsLabel: "Was es kann",
+      architectureLabel: "System & Architektur",
+      operationsLabel: "Wie es betrieben wird",
+      learningsLabel: "Was der Betrieb gelehrt hat",
+      /*
+       * Der Zustands-Badge. Er wird aus `live` und der oeffentlichen
+       * Adresse abgeleitet und nicht gepflegt — ein drittes Feld neben
+       * `live` und `outcome` waere die zweite Wahrheit (siehe
+       * `productStatus` in site-data).
+       */
+      statusBadge: {
+        live: "Live",
+        beta: "Private Beta",
+        aufbau: "Im Aufbau",
+        intern: "Im eigenen Betrieb",
+      },
       builtLabel: "Was wir gebaut haben",
       blocksLabel: "Bausteine",
       blocksTitle: "Selbst gebaut, Baustein für Baustein.",
@@ -1731,6 +1758,18 @@ export const dictionary = {
         messageTemplate: "{product} ürünü hakkında bilgi talebi — hazır olduğunda haber verilmesi rica olunur.",
       },
       breadcrumb: "Ürünler",
+      problemLabel: "Ne için kuruldu",
+      thesisLabel: "Tez",
+      functionsLabel: "Neler yapabiliyor",
+      architectureLabel: "Sistem & mimari",
+      operationsLabel: "Nasıl işletiliyor",
+      learningsLabel: "İşletme ne öğretti",
+      statusBadge: {
+        live: "Canlı",
+        beta: "Özel beta",
+        aufbau: "Kuruluyor",
+        intern: "Kendi işletmemizde",
+      },
       builtLabel: "Ne inşa ettik",
       blocksLabel: "Yapı taşları",
       blocksTitle: "Taş taş, kendimiz kurduk.",
