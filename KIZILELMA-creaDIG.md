@@ -312,9 +312,9 @@ wie Ihre Seite aussehen könnte. Kein Auftrag, keine Rechnung."*
 
 **10.9 · Was NICHT zu tun:** keine Neon-AI-Gradients, Fake-Stats, Fake-Logos, Stock-Fotos, 25 Tech-Logos, Chatbot, 3D-Globe, Dauer-Animation. Die zurückhaltende Premium-Sprache ist wertvoller. Ehrlichkeit bleibt der härteste Lock.
 
-**10.10 · Offene strategische Owner-Fragen (VOR dem großen V2-Master-Prompt entscheiden):**
-- **Markt:** „nur in Deutschland" ist zu eng und widerspricht der eigenen CH-Arbeit (NV SWISS, CASSAMEA) → **„Deutschland & Schweiz"** (oder ohne Geo-Grenze). *(Owner-Frage 1)*
-- **Zielgruppe:** „Handwerk und Mittelstand" (eng) vs. „alle Unternehmen" — entscheiden.
-- **TR-Nische:** Analyse empfiehlt, die Nische *„für türkischsprachige Unternehmen in DE, in deutschem Standard"* aktiv zu besitzen. **Widerspricht** der früheren Owner-Aussage „türkisch-deutscher Mittelstand raus" → **bewusst entscheiden.** Davon unabhängig: TR-Projekttexte (`work.what`/`work.sector`) sind auf `/tr` noch deutsch → übersetzen.
+**10.10 · Strategische Owner-Entscheidungen — ENTSCHIEDEN (23.08.2026):**
+- **Markt:** **DACH — Deutschland, Österreich & Schweiz.** „nur Deutschland" raus. (Als Zielmarkt formuliert, keine Behauptung bestehender AT-Kunden.)
+- **Zielgruppe:** **alle Unternehmen** (Handwerk/KMU als Beispiel/Einstieg, nicht als Grenze).
+- **Sprache/Nische:** **Deutsch ist Hauptsprache.** TR bleibt fest — und die Nische *„türkischsprachige Unternehmen in DACH, in deutschem Standard"* wird **professionell besessen** (Targeting, TR-Seiten, WhatsApp), **ohne klischeehafte „türkisch-deutscher Mittelstand"-Copy**. TR-Projekttexte (`work.what`/`work.sector`) noch deutsch auf `/tr` → übersetzen.
 
 > **Reconciliation:** Einige §9.8-Locks sind seit dem KOMPLETT-Lauf überholt — Design-Feinschliff ist **entsperrt** (V2 baut Tiefe), „ein Angebot" ist auf **zwei** gelockert (Website + BFSG). **§10 gilt vor §9.8, wo sie sich widersprechen.**
