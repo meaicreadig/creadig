@@ -690,6 +690,36 @@ export const dictionary = {
       humanNote:
         "Kein automatischer Scanner: Ein Mensch sieht sich die Seite an. Deshalb dauert es zwei Werktage und nicht zwei Sekunden.",
     },
+    /*
+     * V2-4d — DAS HAUS ALS EIN BILD (KIZILELMA §10.6).
+     *
+     * Die Seite erklaert die Struktur des Hauses an vier Orten: fuenf Ebenen
+     * auf /leistungen, vier Produkte auf /produkte, der Betrieb als eigene
+     * Sektion, das Dach in Saetzen auf /unternehmen. Wer alle vier gelesen
+     * hat, versteht es. Wer eine Seite ansieht, nicht.
+     *
+     * Dieses Diagramm ist die eine Ansicht, die alles zugleich zeigt: Dach →
+     * fuenf Ebenen → quer darunter der Betrieb → vier Produkte, jedes an der
+     * Ebene, auf der es sitzt.
+     *
+     * Es braucht kein Material vom Owner — es zeigt nur, was ohnehin in den
+     * Daten steht (`serviceLayers`, `productWorks`, `productWorlds`). Genau
+     * deshalb kann es hier stehen, waehrend Fotos und Screens noch fehlen.
+     */
+    architecture: {
+      eyebrow: "Das Haus",
+      title: "Ein Dach, fünf Ebenen, vier Produkte.",
+      lead: "Das ganze Unternehmen in einer Ansicht: oben das Dach, darunter die fünf Ebenen, quer darunter der Betrieb — und unten die vier eigenen Produkte, jedes an der Ebene, auf der es sitzt.",
+      roofLabel: "Das Dach",
+      roofNote: "System-Haus, Osnabrück, seit 2017",
+      layersLabel: "Fünf Ebenen",
+      operateLabel: "Quer darunter",
+      operateNote: "Hosting · Monitoring · Updates · Security · Backups · Support · Weiterentwicklung",
+      productsLabel: "Vier eigene Produkte",
+      onLayer: "auf Ebene",
+      caption:
+        "Kein Organigramm und keine Marktübersicht — die Ordnung des eigenen Hauses. Jede Ebene bieten wir als Leistung an; jedes Produkt ist der Beleg, dass wir sie selbst gebaut haben.",
+    },
     services: {
       eyebrow: "Leistungen",
       title: "Fünf Ebenen. Ein System.",
@@ -2035,6 +2065,20 @@ export const dictionary = {
         "Üç madde gösterir, hepsini değil. WCAG 2.1 AA'ya göre eksiksiz bir denetim değildir — o el işidir ve bir bakıştan uzun sürer. Hukuki bir değerlendirme de değildir.",
       humanNote:
         "Otomatik tarayıcı yok: Siteye bir insan bakar. Bu yüzden iki saniye değil, iki iş günü sürer.",
+    },
+    architecture: {
+      eyebrow: "Ev",
+      title: "Tek çatı, beş katman, dört ürün.",
+      lead: "Tüm şirket tek bir görünümde: en üstte çatı, altında beş katman, onların altında yatay olarak işletme — ve en altta kendi dört ürünümüz, her biri oturduğu katmanda.",
+      roofLabel: "Çatı",
+      roofNote: "Sistem evi, Osnabrück, 2017'den beri",
+      layersLabel: "Beş katman",
+      operateLabel: "Altında yatay",
+      operateNote: "Hosting · Monitoring · Güncellemeler · Güvenlik · Yedekler · Destek · Geliştirme",
+      productsLabel: "Kendi dört ürünümüz",
+      onLayer: "katman",
+      caption:
+        "Bir organizasyon şeması ya da pazar görünümü değil — kendi evimizin düzeni. Her katmanı hizmet olarak sunuyoruz; her ürün ise o katmanı kendimiz kurduğumuzun kanıtı.",
     },
     services: {
       eyebrow: "Hizmetler",

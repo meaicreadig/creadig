@@ -3,6 +3,7 @@
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { CompanyChapters } from "@/components/sections/company-chapters"
+import { HouseArchitecture } from "@/components/sections/house-architecture"
 import { About } from "@/components/sections/about"
 import { LogoWall } from "@/components/sections/logo-wall"
 import { Certifications } from "@/components/sections/certifications"
@@ -50,6 +51,12 @@ export function UnternehmenPageBody({ location }: { location: React.ReactNode })
         mit "Ueber uns" und hatte damit keine Herkunft — nur einen Zustand.
       */}
       <CompanyChapters />
+      {/*
+        Das Haus in einer Ansicht (V2-4d). Es steht direkt hinter dem Weg:
+        erst wie es entstanden ist, dann wie es heute geordnet ist — und
+        erst danach, wer darin arbeitet.
+      */}
+      <HouseArchitecture />
       <About />
       <LogoWall />
       {/* Standort + Parallax — die Server-Komponente entscheidet über das Foto.
