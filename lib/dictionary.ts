@@ -623,31 +623,122 @@ export const dictionary = {
       forWhom: "Für wen",
       // Einstiegs-Chips ueber der Pyramide: die Vokabel, nach der gesucht wird.
       entryLabel: "Einstieg",
+      /*
+       * V2-2 — DIE EBENEN WAREN KATEGORIE-SPRACHE, KEINE LEISTUNG.
+       *
+       * Owner-Kritik, wörtlich: „nur oberflächlich". Sie war berechtigt. Eine
+       * Ebene bestand aus drei Zeilen — Name, ein Satz, „für wen". Das
+       * beantwortet, in welche Schublade etwas gehört, aber nicht die zwei
+       * Fragen, mit denen jemand hier ankommt: Ist das mein Problem? Und was
+       * habe ich hinterher?
+       *
+       * Deshalb je Ebene drei Abschnitte in immer derselben Reihenfolge —
+       * Ausgangslage, was wir bauen, was danach anders ist — und darunter die
+       * Vokabeln, nach denen tatsächlich gesucht wird. „Operations" sucht
+       * niemand; „CRM" und „Auftragsmanagement" schon.
+       *
+       * MARKENSPRACHE OBEN, CAPABILITY-SPRACHE DARUNTER. Nicht umgekehrt: Ein
+       * Haus, das mit „CRM · Dashboards · APIs" aufmacht, ist ein Dienstleister
+       * mit Liste. Die Liste steht darunter, wo sie hingehört — und löst
+       * zugleich das SEO-Problem, das die Ebenen-Namen erzeugt haben.
+       *
+       * WAS HIER NICHT STEHT: keine Zahl, keine Frist, kein Ergebnisversprechen
+       * mit Prozentzeichen, und keine Leistung, die das Haus nicht erbringt.
+       * Kein IT-Support, keine Serverüberwachung, keine „Agile Transformation"
+       * (KIZILELMA §10.3).
+       */
+      problemLabel: "Ausgangslage",
+      solutionLabel: "Was wir bauen",
+      resultLabel: "Was danach anders ist",
+      projectsLabel: "Typische Projekte",
+      depthLabel: "In der Tiefe",
       layers: {
         identity: {
           name: "Identity",
           what: "Marke, Name, Logo, Auftritt — das Fundament, auf dem alles steht.",
           who: "Gründer, neue Betriebe, Handwerk vor dem ersten Auftritt.",
+          problem:
+            "Der Betrieb hat einen Namen, aber kein Bild. Angebot, Fahrzeug, Rechnung und Schild sehen jedes Mal anders aus — der Kunde muss bei jedem Kontakt neu erkennen, mit wem er es zu tun hat.",
+          solution:
+            "Wir bauen ein Markensystem statt eines Logos: Zeichen, Schrift, Farben und ihre Anwendung, festgehalten und übergeben — damit auch die Druckerei und der nächste Dienstleister damit arbeiten können, ohne zu raten.",
+          result: "Alles, was den Betrieb verlässt, kommt sichtbar von ihm. Ohne Rückfrage, ohne Nachbau, ohne dass jemand die Farbe aus einem alten PDF pipettiert.",
+          projects: [
+            "Corporate Design",
+            "Markensystem",
+            "Logo & Wortmarke",
+            "Geschäftsausstattung",
+            "UI-Grundlagen",
+          ],
         },
         digital: {
           name: "Digital",
           what: "Website, Shop, Landingpages — sichtbar, schnell, auffindbar.",
           who: "Bäckerei, Praxis, Restaurant, Handwerksbetrieb.",
+          problem:
+            "Die Website ist eine Broschüre. Sie steht online, aber sie nimmt nichts entgegen — keine Anfrage, keine Bewerbung, keinen Termin. Und niemand weiß, wie viele daran vorbeigegangen sind.",
+          solution:
+            "Wir bauen den Auftritt als Teil des Betriebs: Website, Portal, Web-App oder Shop, verbunden mit dem, was danach passiert. Barrierefreiheit nach WCAG 2.1 AA ist dabei eingebaut und nicht nachgerüstet.",
+          result: "Anfragen kommen an, sind zuordenbar und landen dort, wo sie bearbeitet werden — statt in einem Postfach, in das freitags niemand sieht.",
+          projects: [
+            "Websites",
+            "Web-Apps",
+            "Portale",
+            "E-Commerce",
+            "Mobile",
+            "Barrierefreiheit",
+          ],
         },
         operations: {
           name: "Operations",
           what: "Kasse, Planung, Abrechnung, Verwaltung — der Betrieb im System.",
           who: "Gastronomie, Außendienst, Verwaltung, Dienstleister.",
+          problem:
+            "Der Betrieb läuft über Zettel, Tabellen und drei Programme, die nichts voneinander wissen. Wer eine Frage beantworten will, sucht an vier Stellen — und die Antwort ist schon wieder alt, bevor sie fertig ist.",
+          solution:
+            "Wir strukturieren den Betrieb in einem System: Auftrag, Kunde, Beleg und Zahl an einem Ort, mit Schnittstellen zu dem, was bleiben soll. Was individuell sein muss, bauen wir; was es fertig gibt, kaufen wir nicht doppelt.",
+          result: "Eine Auskunft statt vier. Und wer neu dazukommt, findet sich im System zurecht statt im Kopf eines Kollegen.",
+          projects: [
+            "CRM",
+            "Auftragsmanagement",
+            "Backoffice",
+            "Daten & Schnittstellen",
+            "Dashboards",
+            "Individualsoftware",
+          ],
         },
         automation: {
           name: "Automation",
           what: "Wiederkehrende Arbeit übernimmt das System, nicht der Mensch.",
           who: "Betriebe mit 6–20 Mitarbeitern und wachsendem Papierberg.",
+          problem:
+            "Dieselbe Arbeit, jeden Tag, von Hand: Belege abtippen, Mails weiterleiten, Angebote nachfassen, Listen abgleichen. Es fällt nicht auf, weil es nie viel auf einmal ist — es fällt am Monatsende auf.",
+          solution:
+            "Wir automatisieren die Wege, nicht die Menschen: Abläufe, Schnittstellen, Dokumente und eingehende E-Mails übernimmt das System. Dazu immer eine Stelle, an der ein Mensch sieht, was nicht durchgelaufen ist.",
+          result: "Wiederkehrende Arbeit passiert, ohne dass jemand daran denken muss. Und wenn etwas hängt, meldet es sich, statt still liegen zu bleiben.",
+          projects: [
+            "Workflows",
+            "APIs & Integrationen",
+            "Dokumentenverarbeitung",
+            "E-Mail-Verarbeitung",
+            "Prozessautomatisierung",
+          ],
         },
         intelligence: {
           name: "Intelligence · meAI",
           what: "Ein KI-System, das mitdenkt, vorbereitet und den Überblick behält.",
           who: "Etablierte Betriebe, die Entscheidungen schneller treffen wollen.",
+          problem:
+            "Die Zahlen sind da, die Entscheidung nicht. Wer sie treffen will, öffnet fünf Auswertungen und weiß danach mehr — aber nicht besser.",
+          solution:
+            "Wir bauen darauf ein System, das liest statt zeigt: Es ordnet ein, priorisiert und bereitet Optionen vor. meAI ist unser eigenes davon — von uns gebaut, von uns betrieben und im eigenen Alltag erprobt, bevor es zu einem Betrieb kommt.",
+          result: "Die Frage „was ist heute zuerst dran“ hat eine Antwort — und daneben steht, warum.",
+          projects: [
+            "Analyse",
+            "Priorisierung",
+            "Knowledge",
+            "KI & Agents",
+            "meAI",
+          ],
         },
       },
     },
@@ -734,6 +825,10 @@ export const dictionary = {
         offer: {
           name: "Angebot",
           what: "Ein festes Angebot mit Umfang, Preis und Zeitrahmen. Keine Stundenzettel, keine Nachforderungen.",
+        },
+        implementation: {
+          name: "Umsetzung",
+          what: "Wir bauen, was im Angebot steht — in Abschnitten, die Sie unterwegs zu sehen bekommen. Zwischenstände statt einer Überraschung am Ende.",
         },
         operate: {
           name: "Betrieb",
@@ -1739,31 +1834,98 @@ export const dictionary = {
       lead: "A'dan Z'ye çalışıyoruz — ilk logodan kendi yapay zekâ sistemine kadar. Her katman altındakinin üzerine kurulur.",
       forWhom: "Kimler için",
       entryLabel: "Başlangıç",
+      problemLabel: "Başlangıç durumu",
+      solutionLabel: "Ne kuruyoruz",
+      resultLabel: "Sonrasında ne değişir",
+      projectsLabel: "Tipik projeler",
+      depthLabel: "Derinlemesine",
       layers: {
         identity: {
           name: "Identity",
           what: "Marka, isim, logo, görünüm — her şeyin durduğu temel.",
           who: "Girişimciler, yeni işletmeler, ilk kimliğini arayan esnaf.",
+          problem:
+            "İşletmenin adı var ama görüntüsü yok. Teklif, araç, fatura ve tabela her seferinde başka görünüyor — müşteri her temasta kiminle iş yaptığını yeniden anlamak zorunda kalıyor.",
+          solution:
+            "Logo değil, bir marka sistemi kuruyoruz: işaret, yazı karakteri, renkler ve bunların kullanımı; yazılı hâle getirilip teslim edilir — matbaa ve bir sonraki hizmet sağlayıcı tahmin etmeden çalışabilsin diye.",
+          result: "İşletmeden çıkan her şey görünür biçimde ona ait olur. Soru sormaya, yeniden çizmeye, eski bir PDF'ten renk damlatmaya gerek kalmaz.",
+          projects: [
+            "Kurumsal tasarım",
+            "Marka sistemi",
+            "Logo & kelime markası",
+            "Kurumsal basılı setler",
+            "Arayüz temelleri",
+          ],
         },
         digital: {
           name: "Digital",
           what: "Web sitesi, mağaza, açılış sayfaları — görünür, hızlı, bulunabilir.",
           who: "Fırın, klinik, restoran, esnaf işletmesi.",
+          problem:
+            "Web sitesi bir broşür. İnternette duruyor ama hiçbir şeyi karşılamıyor — talep yok, başvuru yok, randevu yok. Kaç kişinin yanından geçip gittiğini de kimse bilmiyor.",
+          solution:
+            "Görünümü işletmenin bir parçası olarak kuruyoruz: web sitesi, portal, web uygulaması ya da mağaza; sonrasında olan her şeye bağlı. WCAG 2.1 AA'ya göre erişilebilirlik sonradan eklenmiyor, baştan içeride oluyor.",
+          result: "Talepler yerine ulaşır, kimden geldiği bellidir ve işlendiği yere düşer — cuma günleri kimsenin bakmadığı bir posta kutusuna değil.",
+          projects: [
+            "Web siteleri",
+            "Web uygulamaları",
+            "Portallar",
+            "E-ticaret",
+            "Mobil",
+            "Erişilebilirlik",
+          ],
         },
         operations: {
           name: "Operations",
           what: "Kasa, planlama, faturalama, yönetim — işleyiş sistem içinde.",
           who: "Gastronomi, saha ekipleri, yönetim, hizmet sağlayıcılar.",
+          problem:
+            "İşletme kâğıtlar, tablolar ve birbirinden habersiz üç program üzerinden yürüyor. Bir soruya cevap vermek isteyen dört yere bakıyor — cevap daha tamamlanmadan eskimiş oluyor.",
+          solution:
+            "İşletmeyi tek bir sistemde yapılandırıyoruz: iş emri, müşteri, belge ve rakam tek yerde; kalması gerekenlere bağlantılarla. Özel olması gerekeni kuruyoruz, hazırı olanı ikinci kez satın almıyoruz.",
+          result: "Dört bilgi yerine tek bilgi. Yeni gelen biri de bir meslektaşın kafasında değil, sistemin içinde yolunu buluyor.",
+          projects: [
+            "CRM",
+            "İş emri yönetimi",
+            "Backoffice",
+            "Veri & entegrasyonlar",
+            "Gösterge panelleri",
+            "Özel yazılım",
+          ],
         },
         automation: {
           name: "Automation",
           what: "Tekrar eden işi insan değil, sistem üstlenir.",
           who: "6–20 çalışanı ve büyüyen evrak yükü olan işletmeler.",
+          problem:
+            "Aynı iş, her gün, elle: belge girmek, e-postaları yönlendirmek, teklifleri takip etmek, listeleri karşılaştırmak. Fark edilmiyor, çünkü hiçbiri tek seferde çok değil — ay sonunda fark ediliyor.",
+          solution:
+            "İnsanları değil, yolları otomatikleştiriyoruz: akışları, entegrasyonları, belgeleri ve gelen e-postaları sistem üstleniyor. Yanında her zaman, geçmeyen bir şeyi bir insanın gördüğü bir yer duruyor.",
+          result: "Tekrar eden iş, kimse aklında tutmadan oluyor. Bir şey takıldığında ise sessizce beklemek yerine haber veriyor.",
+          projects: [
+            "İş akışları",
+            "API & entegrasyonlar",
+            "Belge işleme",
+            "E-posta işleme",
+            "Süreç otomasyonu",
+          ],
         },
         intelligence: {
           name: "Intelligence · meAI",
           what: "Düşünen, hazırlayan ve genel görünümü koruyan bir yapay zekâ sistemi.",
           who: "Daha hızlı karar almak isteyen yerleşik işletmeler.",
+          problem:
+            "Sayılar var, karar yok. Karar vermek isteyen beş rapor açıyor ve sonrasında daha çok şey biliyor — ama daha iyi bilmiyor.",
+          solution:
+            "Bunun üzerine gösteren değil okuyan bir sistem kuruyoruz: sıraya koyar, önceliklendirir ve seçenekleri hazırlar. meAI bizim kendi sistemimiz — biz kurduk, biz işletiyoruz ve bir işletmeye gitmeden önce kendi günlük işimizde denendi.",
+          result: "„Bugün önce ne var“ sorusunun bir cevabı olur — ve yanında nedeni yazar.",
+          projects: [
+            "Analiz",
+            "Önceliklendirme",
+            "Bilgi yönetimi",
+            "Yapay zekâ & ajanlar",
+            "meAI",
+          ],
         },
       },
     },
@@ -1830,6 +1992,10 @@ export const dictionary = {
         offer: {
           name: "Teklif",
           what: "Kapsamı, fiyatı ve süresi belli sabit bir teklif. Saat çizelgesi yok, sonradan ek talep yok.",
+        },
+        implementation: {
+          name: "Uygulama",
+          what: "Teklifte yazan neyi söylüyorsa onu kurarız — yol boyunca görebileceğiniz aşamalar hâlinde. Sonunda sürpriz değil, ara durumlar alırsınız.",
         },
         operate: {
           name: "İşletme",

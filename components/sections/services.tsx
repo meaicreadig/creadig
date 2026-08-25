@@ -109,7 +109,7 @@ export function Services({ heading = true }: { heading?: boolean }) {
                     aria-hidden="true"
                     className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
                   />
-                  <div className="grid items-baseline gap-x-8 gap-y-4 px-2 py-9 md:grid-cols-12 md:px-6">
+                  <div className="grid items-baseline gap-x-8 gap-y-4 px-2 pt-9 pb-7 md:grid-cols-12 md:px-6">
                     <div className="flex items-baseline gap-4 md:col-span-4">
                       <span className="eyebrow text-gold-text">
                         {layer.level}
@@ -126,6 +126,59 @@ export function Services({ heading = true }: { heading?: boolean }) {
                       <p className="type-small text-muted-foreground mt-2.5 text-pretty">
                         {copy.who}
                       </p>
+                    </div>
+                  </div>
+
+                  {/*
+                    V2-2 — die Tiefe unter dem Kopf.
+
+                    Die drei Zeilen darueber sind Kategorie-Sprache: Sie sagen,
+                    in welche Schublade etwas gehoert. Was hier steht, sind die
+                    zwei Fragen, mit denen jemand ankommt — ist das mein
+                    Problem, und was habe ich hinterher. Immer dieselbe
+                    Reihenfolge, damit die fuenf Ebenen vergleichbar bleiben.
+
+                    Bewusst keine Ueberschriften, sondern Eyebrows: Der Kopf
+                    oben traegt die H3 der Ebene: eine zweite Ueberschriftsebene
+                    je Block wuerde die Gliederung der Seite zerlegen, ohne dass
+                    ein Screenreader dadurch mehr faende.
+                  */}
+                  <div className="border-line grid gap-x-8 gap-y-8 border-t px-2 py-8 md:grid-cols-12 md:px-6">
+                    {(
+                      [
+                        [t.services.problemLabel, copy.problem],
+                        [t.services.solutionLabel, copy.solution],
+                        [t.services.resultLabel, copy.result],
+                      ] as const
+                    ).map(([label, body]) => (
+                      <div key={label} className="md:col-span-4">
+                        <p className="eyebrow text-muted-foreground">{label}</p>
+                        <p className="type-small text-foreground/85 mt-3 text-pretty">
+                          {body}
+                        </p>
+                      </div>
+                    ))}
+
+                    {/*
+                      Capability-Sprache. „Operations" sucht niemand — „CRM"
+                      und „Auftragsmanagement" schon. Sie steht UNTER der
+                      Markensprache und nicht statt ihr: Ein Haus, das mit
+                      einer Vokabelliste aufmacht, ist ein Dienstleister mit
+                      Katalog (KIZILELMA §10.3).
+                    */}
+                    <div className="border-line border-t pt-6 md:col-span-12">
+                      <p className="eyebrow text-gold-text">{t.services.projectsLabel}</p>
+                      <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+                        {copy.projects.map((project) => (
+                          <li
+                            key={project}
+                            className="type-small text-muted-foreground flex items-center gap-2.5"
+                          >
+                            <span aria-hidden="true" className="bg-gold h-px w-3.5 shrink-0" />
+                            {project}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 </div>

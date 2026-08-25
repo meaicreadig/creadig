@@ -165,6 +165,50 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
               </Reveal>
             )}
 
+            {/*
+              V2-2 — die Ebene in der Tiefe, nicht nur als Etikett.
+
+              Ueber der H1 steht „Ebene im System · Digital". Das ordnet ein,
+              erklaert aber nichts: Wer hier ankommt, sucht „Webdesign" und
+              will wissen, ob sein Problem hier gemeint ist. Genau dieselben
+              drei Abschnitte wie auf /leistungen — nicht neu geschrieben,
+              sondern dieselbe Quelle. Zwei Fassungen derselben Aussage waeren
+              in vier Wochen zwei Aussagen.
+            */}
+            <Reveal delay={0.05} className="border-line mt-14 border-t pt-8">
+              <p className="eyebrow text-gold-text">
+                {copy.layerLabel} · {layer.name}
+              </p>
+              <div className="mt-6 flex flex-col gap-8">
+                {(
+                  [
+                    [t.services.problemLabel, layer.problem],
+                    [t.services.solutionLabel, layer.solution],
+                    [t.services.resultLabel, layer.result],
+                  ] as const
+                ).map(([label, body]) => (
+                  <div key={label}>
+                    <h2 className="text-subhead text-lg">{label}</h2>
+                    <p className="type-body text-foreground/85 mt-3 text-pretty">{body}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="border-line mt-8 border-t pt-6">
+                <p className="eyebrow text-gold-text">{t.services.projectsLabel}</p>
+                <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+                  {layer.projects.map((project) => (
+                    <li
+                      key={project}
+                      className="type-small text-muted-foreground flex items-center gap-2.5"
+                    >
+                      <span aria-hidden="true" className="bg-gold h-px w-3.5 shrink-0" />
+                      {project}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
+
             {/* Der Prozess ist derselbe wie auf der Startseite — bewusst. */}
             <Reveal delay={0.08} className="border-line mt-14 border-t pt-8">
               <p className="eyebrow text-gold-text">{copy.processLabel}</p>

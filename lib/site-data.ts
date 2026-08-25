@@ -806,7 +806,18 @@ export const opsSteps = [
   { step: "01", key: "request" as const },
   { step: "02", key: "analysis" as const },
   { step: "03", key: "offer" as const },
-  { step: "04", key: "operate" as const },
+  /*
+   * V2-2 — „Umsetzung" hat gefehlt, und zwar der laengste Schritt von allen.
+   *
+   * Der Ablauf sprang von „Angebot" direkt zu „Betrieb". Dazwischen liegen
+   * die Wochen, in denen tatsaechlich gebaut wird — und aus Sicht eines
+   * Kunden ist genau das die Zeit, in der er nichts hoert und nicht weiss,
+   * ob etwas passiert. Eine Ablaufliste, die ihre laengste Etappe
+   * verschweigt, beantwortet die Frage „was passiert, wenn ich schreibe"
+   * nur bis zur Unterschrift.
+   */
+  { step: "04", key: "implementation" as const },
+  { step: "05", key: "operate" as const },
 ]
 
 /**

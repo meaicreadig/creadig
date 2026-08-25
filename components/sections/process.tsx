@@ -89,7 +89,9 @@ export function Process() {
           <SectionEyebrow label={t.process.opsEyebrow} />
         </Reveal>
 
-        <div className="mt-10 grid gap-px sm:grid-cols-2 lg:grid-cols-4">
+        {/* Fuenf Schritte seit V2-2 — die Spaltenzahl folgt der Liste, damit
+            die letzte Spalte nicht leer bleibt (siehe Produkt-Bausteine). */}
+        <div className="mt-10 grid gap-px sm:grid-cols-2 lg:grid-cols-5">
           {opsSteps.map((step, i) => {
             const copy = t.process.opsSteps[step.key]
             return (
