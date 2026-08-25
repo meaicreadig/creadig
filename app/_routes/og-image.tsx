@@ -32,7 +32,7 @@ const copy = {
     lead:
       "Das Dach über unseren Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie.",
     disciplines: "SYSTEM-HAUS · MARKE · WEB · KI",
-    origin: "SEIT 2017 · OSNABRÜCK · DE & CH",
+    origin: "SEIT 2017 · OSNABRÜCK · DACH",
   },
   tr: {
     alt: "creaDIG — marka, web ve yapay zekâ için sistem evi",
@@ -40,7 +40,7 @@ const copy = {
     lead:
       "Sistemlerimizin çatısı — markadan yapay zekâya. Onları biz kurarız. Ve biz işletiriz.",
     disciplines: "SISTEM EVI · MARKA · WEB · YAPAY ZEKÂ",
-    origin: "2017'DEN BERI · OSNABRÜCK · DE & CH",
+    origin: "2017'DEN BERI · OSNABRÜCK · DACH",
   },
 } as const
 

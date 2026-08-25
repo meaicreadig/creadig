@@ -4,7 +4,7 @@ import { ServicePageBody } from "@/components/service/service-page-body"
 import { findServicePage, publishedServicePages } from "@/lib/service-pages"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { pageMetadata } from "@/lib/page-metadata"
-import { address } from "@/lib/site-data"
+import { address, areaServed } from "@/lib/site-data"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
 import { SITE_URL, localeUrl } from "@/lib/routes"
 
@@ -83,7 +83,7 @@ export async function ServiceRoute({
           addressCountry: address.countryCode,
         },
       },
-      areaServed: ["DE", "CH"],
+      areaServed: [...areaServed],
       availableLanguage: ["de", "tr"],
       url: localeUrl(`/leistungen/${page.slug}`, locale),
     },

@@ -11,6 +11,7 @@ import { GatedAnalytics } from "@/components/consent/gated-analytics"
 import {
   address,
   aggregateRating,
+  areaServed,
   approvedReviews,
   packages,
   retainer,
@@ -176,7 +177,7 @@ function organizationSchema(locale: Locale) {
     name: "creaDIG",
     description: t.meta.organizationDescription,
     foundingDate: "2017",
-    areaServed: ["DE", "CH"],
+    areaServed: [...areaServed],
     inLanguage: locale,
     // Sitz: ICO InnovationsCentrum Osnabrück. Die Schweiz ist Markt, nicht Sitz.
     address: {

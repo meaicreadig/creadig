@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { KontaktPageBody } from "@/components/pages/kontakt-page-body"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { pageMetadata } from "@/lib/page-metadata"
-import { address, contact } from "@/lib/site-data"
+import { address, areaServed, contact } from "@/lib/site-data"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
 import { SITE_URL, localeUrl } from "@/lib/routes"
 
@@ -60,7 +60,7 @@ function jsonLd(locale: Locale) {
             email: contact.email,
             telephone: "+41765045879",
             availableLanguage: ["de", "tr"],
-            areaServed: ["DE", "CH"],
+            areaServed: [...areaServed],
           },
         ],
       },

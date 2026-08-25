@@ -3,7 +3,7 @@ import { LeistungenPageBody } from "@/components/pages/leistungen-page-body"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { pageMetadata } from "@/lib/page-metadata"
 import { publishedServicePages } from "@/lib/service-pages"
-import { address } from "@/lib/site-data"
+import { address, areaServed } from "@/lib/site-data"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
 import { SITE_URL, localeUrl } from "@/lib/routes"
 
@@ -86,7 +86,7 @@ function jsonLd(locale: Locale) {
           addressCountry: address.countryCode,
         },
       },
-      areaServed: ["DE", "CH"],
+      areaServed: [...areaServed],
       availableLanguage: ["de", "tr"],
       url: localeUrl("/leistungen", locale),
     },

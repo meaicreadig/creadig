@@ -942,6 +942,18 @@ export const addressLines: string[] = [
   address.country,
 ]
 
+/**
+ * Bediente Laender fuer schema.org `areaServed` — ISO-3166-1 alpha-2.
+ *
+ * Stand bis zur Owner-Entscheidung vom 23.08.2026 an vier Stellen einzeln
+ * (`site-shell`, `/leistungen`, `/leistungen/[slug]`, `/kontakt`). Vier
+ * Kopien derselben Angabe heisst: Beim naechsten Markt aendert jemand drei
+ * davon. Deshalb hier, an derselben Stelle wie `contact.markets` — die
+ * sichtbare Zeile und das Maschinen-Feld sagen jetzt dasselbe, weil sie
+ * nebeneinander stehen.
+ */
+export const areaServed = ["DE", "AT", "CH"] as const
+
 export const contact = {
   whatsapp: "+41 76 504 58 79",
   whatsappHref: "https://wa.me/41765045879",
@@ -950,8 +962,16 @@ export const contact = {
   addressLines,
   /** Sitz — kurz. */
   locations: "Osnabrück (DE)",
-  /** Die Schweiz ist Markt, nicht Sitz. */
-  markets: "Deutschland & Schweiz",
+  /*
+   * Zielmarkt (KIZILELMA §10.10, Owner-Entscheidung 23.08.2026): DACH.
+   *
+   * Das ist bewusst als MARKT formuliert und nicht als Kundenliste. Sitz ist
+   * und bleibt Osnabrück; in der Schweiz gibt es Kundenwerk (NV SWISS),
+   * in Österreich heute nicht. „Deutschland, Österreich & Schweiz" sagt,
+   * wohin gearbeitet wird — nicht, wo überall schon jemand unterschrieben
+   * hat. Eine Behauptung bestehender AT-Kunden steht nirgends.
+   */
+  markets: "Deutschland, Österreich & Schweiz",
 }
 
 /**

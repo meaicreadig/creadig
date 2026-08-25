@@ -167,8 +167,8 @@ export const servicePages: ServicePage[] = [
     },
     metaTitle: { de: "Webdesign für kleine und mittlere Betriebe", tr: "KOBİ'ler için web tasarımı" },
     metaDescription: {
-      de: "Website, Shop und Landingpages für kleine und mittlere Betriebe in Deutschland und der Schweiz. Auf Deutsch und Türkisch.",
-      tr: "Almanya ve İsviçre'deki küçük ve orta ölçekli işletmeler için web sitesi, mağaza ve açılış sayfaları. Almanca ve Türkçe.",
+      de: "Website, Shop und Landingpages für Unternehmen in Deutschland, Österreich und der Schweiz. Auf Deutsch und Türkisch.",
+      tr: "Almanya, Avusturya ve İsviçre'deki işletmeler için web sitesi, mağaza ve açılış sayfaları. Almanca ve Türkçe.",
     },
     includes: {
       de: [

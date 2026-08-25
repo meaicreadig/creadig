@@ -22,10 +22,10 @@ export const dictionary = {
     meta: {
       siteTitle: "creaDIG — System-Haus für Marke, Web und KI",
       siteDescription:
-        "creaDIG ist das Dach über eigenen Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie. System-Haus, Deutschland & Schweiz.",
+        "creaDIG ist das Dach über eigenen Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie. System-Haus für Deutschland, Österreich und die Schweiz.",
       ogTitle: "creaDIG — Wir bauen, was andere nicht sehen.",
       ogDescription:
-        "System-Haus seit 2017. Eigene Produkte, echte Kunden, KI-Systeme, die wir bauen und betreiben.",
+        "System-Haus seit 2017. Eigene Produkte, echte Kunden, KI-Systeme, die wir bauen und betreiben. Deutschland, Österreich, Schweiz.",
       organizationDescription:
         "System-Haus für Marke, Web, Operations, Automation und KI. Eigene Produkte: meAI, fibero, CASSAMEA, meahv.",
       /** Erster Eintrag jeder Brotkrume in den strukturierten Daten. */
@@ -334,7 +334,7 @@ export const dictionary = {
       lead: "Marke, Auftritt, Betrieb, Automatisierung, Intelligenz. Jede Ebene trägt die nächste — nicht nebeneinander, sondern als System. Was wir für unsere eigenen Produkte gebaut haben, bringen wir in Ihren Alltag.",
       metaTitle: "Leistungen — von der Marke bis zur KI",
       metaDescription:
-        "Die fünf Ebenen von creaDIG: Marke, digitaler Auftritt, Operations, Automatisierung und KI. Für Handwerk und Mittelstand, Schwerpunkt Deutschland — auf Deutsch und Türkisch.",
+        "Die fünf Ebenen von creaDIG: Marke, digitaler Auftritt, Operations, Automatisierung und KI. Für Unternehmen in Deutschland, Österreich und der Schweiz — auf Deutsch und Türkisch.",
       pricingLabel: "Preise",
       pricingNote:
         "Standard-Produkte sind transparent bepreist. Systementwicklung rechnen wir individuell ab — nach Umfang, nicht nach Stunden.",
@@ -387,7 +387,7 @@ export const dictionary = {
       skipToContent: "Zum Inhalt springen",
     },
     hero: {
-      eyebrow: "System-Haus · seit 2017 · Deutschland & Schweiz",
+      eyebrow: "System-Haus · seit 2017 · Deutschland · Österreich · Schweiz",
       headlineLine1: "Wir bauen,",
       headlineLine2: "was andere",
       headlineLine3: "nicht sehen.",
@@ -398,10 +398,10 @@ export const dictionary = {
        * vier Dinge beim Namen; die Haltung traegt die Headline darueber.
        */
       subline:
-        "creaDIG entwickelt Marken, digitale Systeme, Automatisierung und eigene Softwareprodukte — für Handwerk und Mittelstand in Deutschland.",
+        "creaDIG entwickelt Marken, digitale Systeme, Automatisierung und eigene Softwareprodukte — für Unternehmen in Deutschland, Österreich und der Schweiz.",
       ctaPrimary: "Projekt starten",
       ctaSecondary: "Unsere Arbeit",
-      location: "Osnabrück · DE & CH",
+      location: "Osnabrück · DACH",
       scroll: "Scrollen",
     },
     impact: {
@@ -419,7 +419,7 @@ export const dictionary = {
       facts: {
         regions: {
           label: "Märkte",
-          value: "Deutschland & Schweiz",
+          value: "Deutschland, Österreich & Schweiz",
           detail: "Beraten und gebaut auf Deutsch und Türkisch.",
         },
         scope: {
@@ -1289,10 +1289,10 @@ export const dictionary = {
     meta: {
       siteTitle: "creaDIG — marka, web ve yapay zekâ için sistem evi",
       siteDescription:
-        "creaDIG, kendi sistemlerinin çatısıdır — markadan yapay zekâya. Onları biz kurarız ve biz işletiriz. Almanya ve İsviçre için sistem evi.",
+        "creaDIG, kendi sistemlerinin çatısıdır — markadan yapay zekâya. Onları biz kurarız ve biz işletiriz. Almanya, Avusturya ve İsviçre için sistem evi.",
       ogTitle: "creaDIG — Başkalarının göremediğini inşa ediyoruz.",
       ogDescription:
-        "2017'den beri sistem evi. Kendi ürünlerimiz, gerçek müşteriler ve kurup işlettiğimiz yapay zekâ sistemleri.",
+        "2017'den beri sistem evi. Kendi ürünlerimiz, gerçek müşteriler ve kurup işlettiğimiz yapay zekâ sistemleri. Almanya, Avusturya, İsviçre.",
       organizationDescription:
         "Marka, web, operations, automation ve yapay zekâ için sistem evi. Kendi ürünlerimiz: meAI, fibero, CASSAMEA, meahv.",
       breadcrumbHome: "Ana sayfa",
@@ -1508,7 +1508,7 @@ export const dictionary = {
       lead: "Marka, dijital görünüm, operasyon, otomasyon, zekâ. Her katman bir sonrakini taşır — yan yana değil, bir sistem olarak. Kendi ürünlerimiz için kurduğumuzu sizin günlük işinize taşırız.",
       metaTitle: "Hizmetler — markadan yapay zekâya",
       metaDescription:
-        "creaDIG'in beş katmanı: marka, dijital görünüm, operasyon, otomasyon ve yapay zekâ. Almanya ve İsviçre'deki küçük ve orta ölçekli işletmeler için — Almanca ve Türkçe.",
+        "creaDIG'in beş katmanı: marka, dijital görünüm, operasyon, otomasyon ve yapay zekâ. Almanya, Avusturya ve İsviçre'deki işletmeler için — Almanca ve Türkçe.",
       pricingLabel: "Fiyatlar",
       pricingNote:
         "Standart ürünlerin fiyatı şeffaftır. Sistem geliştirmeyi kapsama göre ayrıca hesaplarız — saate göre değil.",
@@ -1541,15 +1541,15 @@ export const dictionary = {
       skipToContent: "İçeriğe geç",
     },
     hero: {
-      eyebrow: "Sistem evi · 2017'den beri · Almanya & İsviçre",
+      eyebrow: "Sistem evi · 2017'den beri · Almanya · Avusturya · İsviçre",
       headlineLine1: "Başkalarının",
       headlineLine2: "görmediğini",
       headlineLine3: "inşa ediyoruz.",
       subline:
-        "creaDIG; Almanya'daki zanaat işletmeleri ve KOBİ'ler için marka, dijital sistemler, otomasyon ve kendi yazılım ürünlerini geliştirir.",
+        "creaDIG; Almanya, Avusturya ve İsviçre'deki işletmeler için marka, dijital sistemler, otomasyon ve kendi yazılım ürünlerini geliştirir.",
       ctaPrimary: "Projeye başla",
       ctaSecondary: "İşlerimiz",
-      location: "Osnabrück · DE & CH",
+      location: "Osnabrück · DACH",
       scroll: "Kaydır",
     },
     impact: {
@@ -1562,7 +1562,7 @@ export const dictionary = {
       facts: {
         regions: {
           label: "Pazarlar",
-          value: "Almanya ve İsviçre",
+          value: "Almanya, Avusturya ve İsviçre",
           detail: "Almanca ve Türkçe danışıyor ve kuruyoruz.",
         },
         scope: {
