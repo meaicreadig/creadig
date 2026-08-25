@@ -252,6 +252,21 @@ function collect(): { open: Item[]; done: Item[] } {
   })
 
   items.push({
+    label: "Materialstand in der Fußzeile (MP10-2.10)",
+    ok: process.env.NEXT_PUBLIC_STATUS_PUBLIC === "1",
+    detail:
+      process.env.NEXT_PUBLIC_STATUS_PUBLIC === "1"
+        ? "NEXT_PUBLIC_STATUS_PUBLIC=1 — der Link steht im Betrieb in der Fußzeile. " +
+          "Dann muss diese Seite dort auch ohne Schlüssel antworten, sonst zeigt er auf eine 404."
+        : "Der Link erscheint nur in der Entwicklung. Diese Seite ist eine Innenansicht " +
+          "(offene Verträge, fehlende Freigaben, unfertiges Impressum) — ob sie öffentlich " +
+          "wird, ist keine Code-Frage.",
+    owner:
+      "Owner: entscheiden, ob der Materialstand öffentlich sichtbar sein soll. " +
+      "Ja → NEXT_PUBLIC_STATUS_PUBLIC=1 setzen und die Schlüsselsperre unten aufheben.",
+  })
+
+  items.push({
     label: "Lead-Weg konfiguriert",
     ok: Boolean(process.env.RESEND_API_KEY && process.env.LEAD_FROM),
     detail:

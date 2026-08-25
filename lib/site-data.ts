@@ -1016,22 +1016,6 @@ export const publishedImpactFigures = impactFigures.filter(
 /** Aussagen ueber Reichweite. Werden als Text gesetzt, nicht als Zahl. */
 export const impactFacts = ["regions", "scope"] as const
 
-/**
- * Einstiegs-Chips unter der Hero-Subline (PHASE A, §4.1).
- *
- * Vier Worte, die sagen, worum es geht — und zugleich vier Absprungpunkte.
- * Ein Chip, der nur ein Wort ist, waere Dekoration; jeder hier hat ein Ziel
- * in der neuen Architektur. „Produkte" fuehrt bewusst nicht auf eine Ebene,
- * sondern auf die Produkt-Uebersicht: Es ist keine Leistung, es ist der
- * Beweis.
- */
-export const heroChips = [
-  { label: "Brand", href: "/leistungen#ebene-identity" },
-  { label: "Digital", href: "/leistungen#ebene-digital" },
-  { label: "KI", href: "/leistungen#ebene-intelligence" },
-  { label: "Produkte", href: "/produkte" },
-]
-
 /** Die fünf Ebenen — aufsteigende Architektur. */
 export const serviceLayers = [
   { level: "01", key: "identity" as const },
@@ -1040,6 +1024,33 @@ export const serviceLayers = [
   { level: "04", key: "automation" as const },
   { level: "05", key: "intelligence" as const },
 ]
+
+/** Nur die Schluessel, in derselben Reihenfolge — fuer Chips und Sprungmarken. */
+export const serviceLayerKeys = serviceLayers.map((layer) => layer.key)
+
+/**
+ * Einstiegs-Chips unter der Hero-Subline (PHASE A, §4.1).
+ *
+ * ---------------------------------------------------------------------------
+ * MP10-2.7 — HIER STANDEN VIER, UND ZWEI DAVON GAB ES NICHT
+ * Die Chips hiessen „Brand · Digital · KI · Produkte". Drei Fehler auf
+ * engstem Raum: Es sind FUENF Ebenen, nicht vier — wer hier vier zaehlt und
+ * eine Sektion tiefer fuenf liest, hat den ersten Widerspruch der Seite
+ * gefunden. „Brand" und „KI" sind Uebersetzungen der Ebenennamen, also zwei
+ * Vokabeln fuer dieselbe Sache: In der Kachel darunter steht „Identity", im
+ * Menue „Intelligence". Und „Produkte" ist gar keine Ebene, sondern der
+ * Beleg — an dieser Stelle macht es die Reihe zu einer Aufzaehlung ohne
+ * Ordnung.
+ *
+ * Jetzt sind es genau die fuenf Ebenen, in der Reihenfolge des Hauses, mit
+ * denselben Namen wie in `CapabilityTiles`, auf `/leistungen` und in der
+ * Fusszeile. Der Beschriftungstext kommt aus `t.services.layers` — eine
+ * Quelle, damit die Reihe nicht wieder auseinanderlaeuft.
+ */
+export const heroChips = serviceLayerKeys.map((key) => ({
+  key,
+  href: `/leistungen#ebene-${key}`,
+}))
 
 export const processSteps = [
   { step: "01", key: "understand" as const },

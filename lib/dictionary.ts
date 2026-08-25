@@ -77,9 +77,18 @@ export const dictionary = {
         title: "Erst zeigen. Dann reden.",
         cta: "Alle Arbeiten",
       },
+      /*
+       * MP10-2.7 — die Ueberschrift ist in den Hero gezogen.
+       *
+       * Hier stand „Fünf Ebenen. Ein System." — derselbe Satz, den der Hero
+       * jetzt traegt. Zweimal auf einer Seite gelesen ist er keine Betonung,
+       * sondern eine Wiederholung, und die zweite Fassung macht die erste
+       * kleiner. Oben bindet er die fuenf Chips zusammen; hier steht, was die
+       * Reihe darunter zeigt.
+       */
       capabilities: {
         eyebrow: "Leistungen",
-        title: "Fünf Ebenen. Ein System.",
+        title: "Von der Marke bis zur Intelligenz.",
         lead: "Jede Ebene trägt die nächste. Sie können auf jeder einsteigen — und auf jeder aufhören.",
         cta: "Alle Leistungen",
       },
@@ -438,11 +447,27 @@ export const dictionary = {
       /*
        * Glasklare Subline (§4.1): Vorher stand hier ein Markenbild („das Dach
        * ueber unseren Systemen"). Schoen — aber wer creaDIG nicht kennt, weiss
-       * danach immer noch nicht, was gemacht wird. Der Satz nennt jetzt die
-       * vier Dinge beim Namen; die Haltung traegt die Headline darueber.
+       * danach immer noch nicht, was gemacht wird. Der Satz nennt die Sache
+       * beim Namen; die Haltung traegt die Headline darueber.
+       *
+       * MP10-2.7 — er nannte VIER Dinge („Marken, digitale Systeme,
+       * Automatisierung und eigene Softwareprodukte"), waehrend die Sektion
+       * darunter, das Menue und `/leistungen` fuenf Ebenen zeigen. Zwei
+       * verschiedene Antworten auf „was macht ihr eigentlich", 800 Pixel
+       * auseinander. Jetzt nennt er dieselben fuenf, in derselben Reihenfolge.
        */
       subline:
-        "creaDIG entwickelt Marken, digitale Systeme, Automatisierung und eigene Softwareprodukte — für Unternehmen in Deutschland, Österreich und der Schweiz.",
+        "creaDIG baut Marke, digitalen Auftritt, Betrieb, Automatisierung und künstliche Intelligenz als ein System — für Unternehmen in Deutschland, Österreich und der Schweiz.",
+      /*
+       * MP10-2.7 — der Satz, der die fuenf Ebenen zusammenbindet.
+       *
+       * Er stand bisher als Ueberschrift der Kachelreihe weiter unten. Dort
+       * kommt er zu spaet: Wer die Reihe erreicht, hat die Chips daruber
+       * schon als lose Aufzaehlung gelesen. Im Hero macht er aus fuenf Worten
+       * eine Ordnung — und genau das ist der Unterschied zwischen einem
+       * Leistungskatalog und einem System-Haus.
+       */
+      systemLine: "Fünf Ebenen. Ein System.",
       ctaPrimary: "Projekt starten",
       ctaSecondary: "Unsere Arbeit",
       location: "Osnabrück · DACH",
@@ -605,6 +630,29 @@ export const dictionary = {
         {
           q: "Sprechen Sie Türkisch?",
           a: "Ja. Beratung, Unterlagen und laufende Betreuung gibt es auf Deutsch und auf Türkisch — auf Wunsch komplett über WhatsApp.",
+        },
+        /*
+         * MP10-2.8 — DIE FRAGE, DIE NIEMAND STELLT UND JEDER DENKT.
+         *
+         * Wir verkaufen nicht nur ein Projekt, sondern einen Dauerbetrieb zu
+         * 149 EUR im Monat. Wer das liest, rechnet still mit: „Und wenn ich
+         * irgendwann nicht mehr will — habe ich dann noch etwas?" Solange
+         * darauf keine Antwort steht, ist die Antwort im Kopf des Lesers die
+         * schlechteste: Abhaengigkeit.
+         *
+         * Sie auszusprechen ist staerker als jede Referenz, weil sie gegen
+         * unser eigenes Interesse zu sprechen scheint — und weil sie nichts
+         * kostet: System und Daten gehoeren ohnehin dem Kunden, und monatlich
+         * kuendbar war die Betreuung immer schon. Neu ist nur, dass es
+         * dasteht.
+         *
+         * Die Zahl 149 EUR und die Kuendbarkeit stehen auch in `retainer`
+         * (site-data) und in der Preisleiter der Barrierefreiheits-Seite. Wer
+         * eine davon aendert, aendert die anderen mit.
+         */
+        {
+          q: "Wem gehört das System — und was passiert, wenn ich die Betreuung kündige?",
+          a: "Das System und alle Daten darin gehören Ihnen, vom ersten Tag an. Die laufende Betreuung für 149 € netto im Monat ist monatlich kündbar, ohne Mindestlaufzeit. Danach bleibt alles bei Ihnen: Code, Inhalte, Zugänge und Domain — wir händigen aus, was wir haben, und Sie können mit jedem anderen weiterarbeiten. Was aufhört, ist die Betreuung, nicht Ihr Zugriff.",
         },
       ],
     },
@@ -1696,13 +1744,39 @@ export const dictionary = {
       },
     },
     footer: {
-      tagline: "System-Haus für Marke, Web, Operations, Automation und KI.",
+      /*
+       * MP10-2.7 — die Tagline zaehlte fuenf Dinge auf, aber in einer
+       * anderen Sprache als der Rest des Hauses („Web", „Operations",
+       * „Automation", „KI"). Jetzt stehen dieselben fuenf Ebenennamen wie im
+       * Hero, in den Kacheln und in den Sprungmarken darunter.
+       */
+      tagline: "System-Haus für Identity, Digital, Operations, Automation und Intelligence.",
       productsLabel: "Produkte",
       navLabel: "Seite",
+      /*
+       * MP10-2.7 — die fuenf Ebenen als Sprungmarken.
+       *
+       * Der Footer ist das vollstaendige Verzeichnis der Seite. Bis hierher
+       * fuehrte er auf `/leistungen` als Ganzes; wer eine bestimmte Ebene
+       * suchte, musste dort erst wieder scrollen. Die fuenf Anker sind
+       * derselbe Satz Namen wie im Hero und in den Kacheln — dritte
+       * Nennung, dieselben Woerter, dieselbe Reihenfolge.
+       */
+      layersLabel: "Fünf Ebenen",
       legalLabel: "Rechtliches",
       imprint: "Impressum",
       privacy: "Datenschutz",
       socialLabel: "Social",
+      /*
+       * MP10-2.10 — der Materialstand, dezent.
+       *
+       * `/status` ist das ehrlichste, was diese Seite hat: eine Liste dessen,
+       * was fehlt, abgeleitet aus denselben Daten, aus denen die Seite gebaut
+       * wird. Sie war bisher nur erreichbar, wenn man die Adresse kannte.
+       * Im Betrieb antwortet sie ohne Schluessel weiterhin mit 404 — der
+       * Link ist damit kein Leck, sondern ein Signal.
+       */
+      statusLabel: "Materialstand",
       rights: "Alle Rechte vorbehalten.",
     },
   },
@@ -1738,7 +1812,7 @@ export const dictionary = {
       },
       capabilities: {
         eyebrow: "Hizmetler",
-        title: "Beş katman. Tek sistem.",
+        title: "Markadan yapay zekâya.",
         lead: "Her katman bir sonrakini taşır. İstediğiniz katmanda başlayabilir, istediğiniz katmanda durabilirsiniz.",
         cta: "Tüm hizmetler",
       },
@@ -1979,7 +2053,8 @@ export const dictionary = {
       headlineLine2: "görmediğini",
       headlineLine3: "inşa ediyoruz.",
       subline:
-        "creaDIG; Almanya, Avusturya ve İsviçre'deki işletmeler için marka, dijital sistemler, otomasyon ve kendi yazılım ürünlerini geliştirir.",
+        "creaDIG; Almanya, Avusturya ve İsviçre'deki işletmeler için markayı, dijital görünümü, işletmeyi, otomasyonu ve yapay zekâyı tek bir sistem olarak kurar.",
+      systemLine: "Beş katman. Tek sistem.",
       ctaPrimary: "Projeye başla",
       ctaSecondary: "İşlerimiz",
       location: "Osnabrück · DACH",
@@ -2104,6 +2179,10 @@ export const dictionary = {
         {
           q: "Türkçe konuşuyor musunuz?",
           a: "Evet. Danışmanlık, belgeler ve sürekli destek Almanca ve Türkçe verilir — istenirse tamamen WhatsApp üzerinden.",
+        },
+        {
+          q: "Sistem kime ait — ve desteği iptal edersem ne olur?",
+          a: "Sistem ve içindeki tüm veriler ilk günden itibaren size aittir. Aylık 149 € net sürekli destek, asgari süre olmadan aylık iptal edilebilir. Sonrasında her şey sizde kalır: kod, içerik, erişimler ve alan adı — elimizdekini teslim ederiz, dilediğiniz başka biriyle devam edebilirsiniz. Biten şey destektir, erişiminiz değil.",
         },
       ],
     },
@@ -2891,13 +2970,15 @@ export const dictionary = {
       },
     },
     footer: {
-      tagline: "Marka, web, operations, automation ve yapay zekâ için sistem evi.",
+      tagline: "Identity, Digital, Operations, Automation ve Intelligence için sistem evi.",
       productsLabel: "Ürünler",
       navLabel: "Sayfa",
+      layersLabel: "Beş katman",
       legalLabel: "Yasal",
       imprint: "Künye",
       privacy: "Gizlilik",
       socialLabel: "Sosyal",
+      statusLabel: "Malzeme durumu",
       rights: "Tüm hakları saklıdır.",
     },
   },

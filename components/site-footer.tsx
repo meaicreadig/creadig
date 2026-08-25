@@ -4,8 +4,18 @@ import { useLocale } from "@/components/locale-provider"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { Logo } from "@/components/brand/logo"
 import { SignatureMotif } from "@/components/brand/signature-motif"
-import { contact, navLinks, productWorks, socialProfiles } from "@/lib/site-data"
+import { contact, navLinks, productWorks, serviceLayerKeys, socialProfiles } from "@/lib/site-data"
 import { openConsentSettings } from "@/lib/consent"
+
+/**
+ * Sichtbarkeit des `/status`-Links (MP10-2.10). Ausfuehrliche Begruendung
+ * unten an der Stelle, an der er gerendert wird.
+ *
+ * Beide Werte werden von Next zur Bauzeit eingesetzt — hier steht deshalb
+ * eine Konstante und keine Laufzeitabfrage.
+ */
+const STATUS_LINK_VISIBLE =
+  process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_STATUS_PUBLIC === "1"
 
 export function SiteFooter() {
   const { t } = useLocale()
@@ -58,6 +68,29 @@ export function SiteFooter() {
                   {t.nav.kontakt}
                 </Link>
               </li>
+            </ul>
+
+            {/*
+              MP10-2.7 — die fuenf Ebenen als Sprungmarken.
+
+              Dritte Nennung derselben Reihe: Hero-Chips, Kacheln, hier.
+              Dieselben Namen, dieselbe Reihenfolge, dieselbe Quelle
+              (`serviceLayerKeys` + `t.services.layers`) — eine Liste, die
+              man an drei Stellen von Hand pflegt, ist in vier Wochen drei
+              Listen.
+            */}
+            <p className="eyebrow text-gold-text mt-8">{t.footer.layersLabel}</p>
+            <ul className="mt-6 flex flex-col gap-3.5">
+              {serviceLayerKeys.map((key) => (
+                <li key={key}>
+                  <Link
+                    href={`/leistungen#ebene-${key}`}
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                  >
+                    {t.services.layers[key].name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -134,6 +167,37 @@ export function SiteFooter() {
                   {t.consent.settingsLabel}
                 </button>
               </li>
+              {/*
+                MP10-2.10 — der Materialstand in der Fusszeile.
+
+                --------------------------------------------------------------
+                WARUM ER NICHT EINFACH DASTEHT
+                Der Wunsch ist richtig: `/status` ist das ehrlichste, was diese
+                Seite hat, und heute sieht es niemand. Nur ist die Seite eine
+                Innenansicht — offene Vertraege, fehlende Freigaben, ein
+                unfertiges Impressum. Sie oeffentlich zu verlinken heisst
+                nicht „ehrlich sein", sondern „einem Wettbewerber die
+                Baustellenliste geben"; und ohne Schluessel antwortet sie im
+                Betrieb ohnehin mit 404, der Link waere also kaputt.
+
+                Deshalb ein Schalter statt einer Entscheidung an unserer
+                Stelle: In der Entwicklung ist der Link immer da. Im Betrieb
+                erscheint er, sobald `NEXT_PUBLIC_STATUS_PUBLIC=1` gesetzt ist
+                — und dann muss auch `SELFTEST_SECRET` weg oder die Seite
+                oeffentlich gemacht werden, sonst zeigt der Link auf eine 404.
+                Beides ist Owner-Sache und steht als offener Punkt auf
+                `/status` selbst.
+              */}
+              {STATUS_LINK_VISIBLE && (
+                <li>
+                  <Link
+                    href="/status"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                  >
+                    {t.footer.statusLabel}
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 

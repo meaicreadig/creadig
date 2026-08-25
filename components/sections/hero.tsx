@@ -69,18 +69,25 @@ export function Hero() {
             </p>
 
             {/*
-              Einstiegs-Chips: vier Worte, die sagen, worum es geht — und
-              zugleich vier Absprungpunkte in die neue Architektur. Ein Chip,
-              der nur ein Wort waere, waere Dekoration.
+              MP10-2.7 — die fuenf Ebenen als Einstieg, mit dem Satz darueber,
+              der sie zusammenbindet.
+
+              Hier standen vier Chips („Brand · Digital · KI · Produkte") und
+              kein Satz. Vier Chips ueber einer Reihe von fuenf Kacheln ist
+              der erste Widerspruch, den ein Leser findet — und ohne
+              „Fünf Ebenen. Ein System." liest sich die Reihe als Liste von
+              Dienstleistungen, nicht als Architektur. Beides ist jetzt hier;
+              die Beschriftungen kommen aus derselben Quelle wie die Kacheln.
             */}
-            <ul className="mt-8 flex flex-wrap gap-2.5">
+            <p className="type-body text-foreground/85 mt-8">{t.hero.systemLine}</p>
+            <ul className="mt-4 flex flex-wrap gap-2.5">
               {heroChips.map((chip) => (
                 <li key={chip.href}>
                   <Link
                     href={chip.href}
                     className="border-line-strong hover:border-gold hover:text-gold-text text-muted-foreground inline-flex items-center border px-4 py-2 text-sm tracking-wide transition-colors duration-500"
                   >
-                    {chip.label}
+                    {t.services.layers[chip.key].name}
                   </Link>
                 </li>
               ))}

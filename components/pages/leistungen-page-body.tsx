@@ -64,8 +64,22 @@ export function LeistungenPageBody() {
       */}
       <ManagedOperations />
       <Process />
-      <Packages />
+      {/*
+        MP10-2.2 — DIE FRAGEN STEHEN JETZT VOR DEN PREISEN.
+
+        Bis hierher stand die Preistabelle direkt hinter dem Ablauf und die
+        FAQ dahinter. Das ist die Reihenfolge eines Katalogs: erst die Zahl,
+        dann die Erklaerung. Ein Leser, der bei 2.400 EUR haengen bleibt,
+        liest die Erklaerung nicht mehr — er hat schon entschieden.
+
+        Umgekehrt beantwortet die FAQ genau die zwei Fragen, die vor dem Preis
+        stehen muessen: was das kostet und wie es ablaeuft. Wer beide gelesen
+        hat, liest die Tabelle als Bestaetigung statt als Ueberraschung. Die
+        Sektionen selbst sind unveraendert — nur ihre Reihenfolge ist ein
+        anderes Argument.
+      */}
       <Faq />
+      <Packages />
       <ClosingCta />
     </main>
   )
