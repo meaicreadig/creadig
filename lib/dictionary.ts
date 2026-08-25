@@ -92,6 +92,38 @@ export const dictionary = {
         lead: "Jede Ebene trägt die nächste. Sie können auf jeder einsteigen — und auf jeder aufhören.",
         cta: "Alle Leistungen",
       },
+      /*
+       * MP10-2.1 / 2.2 — DER EINSTIEG AUF DER STARTSEITE.
+       *
+       * -----------------------------------------------------------------------
+       * WARUM HIER EINE ZAHL STEHT — UND NUR EINE
+       * Die Startseite nannte keinen einzigen Preis. Das war als Haltung
+       * gedacht (ein System-Haus ist keine Preisliste), wirkte aber als
+       * Auskunftsverweigerung: Wer wissen will, ob er sich das leisten kann,
+       * und keine Zahl findet, geht — und zwar zu jemandem, der eine nennt.
+       *
+       * Was hier NICHT steht, ist ein Paketblock. Ein Satz mit einer Zahl und
+       * einem Verweis; die Leiter, der Regelpreis und die Betreuung stehen
+       * weiter an genau einer Stelle, auf `/leistungen#pakete`. Die Zahl
+       * selbst kommt aus `site-data.packages` — sie wird hier nicht noch
+       * einmal getippt, sonst gibt es zwei Wahrheiten.
+       *
+       * -----------------------------------------------------------------------
+       * WARUM ZWEI FRAGEN DANEBEN
+       * Es sind dieselben zwei, die im Erstgespraech immer zuerst kommen:
+       * was kostet das, wie laeuft das ab. Sie stehen wortgleich in der FAQ
+       * auf `/leistungen` — gespiegelt, nicht neu geschrieben: Die Sektion
+       * liest `t.faq.items`, damit die Antwort hier nicht in vier Wochen
+       * anders lautet als dort.
+       */
+      entry: {
+        eyebrow: "Einstieg",
+        priceLead: "Website-Paket ab",
+        priceNote: "netto. Festpreis für den vereinbarten Umfang.",
+        priceCta: "Pakete und Preise",
+        questionsLabel: "Zwei Fragen vorab",
+        questionsCta: "Alle Fragen",
+      },
       products: {
         cta: "Alle Produkte",
       },
@@ -1154,6 +1186,14 @@ export const dictionary = {
       referenceNote:
         "Referenzpreis für die ersten zwei Betriebe — als Gegenleistung für ein Zitat, die Nennung als Referenz und zwei Fotos. Ab dem dritten Betrieb gilt der Regelpreis.",
       regularLabel: "Regelpreis",
+      /*
+       * MP10-2.3 — das Etikett der Projektdauer.
+       *
+       * Steht heute ueber einem leeren Feld (`Package.duration === null`) und
+       * rendert deshalb nicht. Es liegt trotzdem hier, damit der Owner nur
+       * eine Dauer nachtragen muss und nicht auch noch die Uebersetzung.
+       */
+      durationLabel: "Projektdauer",
       netNote: "Alle Preise netto, zzgl. 19 % USt.",
       /*
        * BF-9 — die obere Oeffnung.
@@ -1815,6 +1855,14 @@ export const dictionary = {
         title: "Markadan yapay zekâya.",
         lead: "Her katman bir sonrakini taşır. İstediğiniz katmanda başlayabilir, istediğiniz katmanda durabilirsiniz.",
         cta: "Tüm hizmetler",
+      },
+      entry: {
+        eyebrow: "Başlangıç",
+        priceLead: "Web sitesi paketi",
+        priceNote: "net'ten itibaren. Anlaşılan kapsam için sabit fiyat.",
+        priceCta: "Paketler ve fiyatlar",
+        questionsLabel: "Önce iki soru",
+        questionsCta: "Tüm sorular",
       },
       products: {
         cta: "Tüm ürünler",
@@ -2512,6 +2560,7 @@ export const dictionary = {
       referenceNote:
         "İlk iki işletme için referans fiyatı — karşılığında bir görüş cümlesi, referans olarak anılma ve iki fotoğraf. Üçüncü işletmeden itibaren normal fiyat geçerlidir.",
       regularLabel: "Normal fiyat",
+      durationLabel: "Proje süresi",
       netNote: "Tüm fiyatlar nettir, %19 KDV hariç.",
       openEyebrow: "Daha büyük kapsam",
       openPrice: "talep üzerine",

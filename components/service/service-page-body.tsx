@@ -456,6 +456,13 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                             : copy.priceMonthly}
                       </span>
                     </div>
+                    {/* MP10-2.3 — Dauer neben dem Preis, Owner-gegatet. */}
+                    {step.duration && (
+                      <p className="type-small text-muted-foreground">
+                        <span className="eyebrow text-gold-text">{copy.durationLabel}: </span>
+                        {step.duration[locale]}
+                      </p>
+                    )}
                     <p className="type-small text-muted-foreground text-pretty">
                       {step.body[locale]}
                     </p>

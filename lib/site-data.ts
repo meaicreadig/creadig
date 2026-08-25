@@ -1143,6 +1143,20 @@ export type Package = {
   price: string
   amount: number
   period: string | null
+  /*
+   * MP10-2.3 — DIE PROJEKTDAUER NEBEN DEM PREIS.
+   *
+   * „Was kostet das" und „wie lange dauert das" sind eine Frage, nicht zwei:
+   * Ein Festpreis ohne Zeitrahmen laesst genau die Unsicherheit stehen, die
+   * er beseitigen soll. Steht die Dauer daneben, ist das Angebot vollstaendig.
+   *
+   * Sie ist trotzdem `null` — und das bleibt sie, bis der Owner sie nennt.
+   * Eine geschaetzte Projektdauer ist eine Zusage, die im ersten Projekt
+   * gebrochen wird; „vier bis sechs Wochen" hingeschrieben, weil es plausibel
+   * klingt, ist erfunden. Solange `null`, rendert die Zeile nicht und die
+   * Luecke steht auf `/status`.
+   */
+  duration: Localized | null
   /** Regelpreis ab dem dritten Betrieb — steht offen daneben. */
   regularPrice?: string
   regularAmount?: number
@@ -1170,6 +1184,8 @@ export const packages: Package[] = [
     regularPrice: "€3.900",
     regularAmount: 3900,
     recommended: false,
+    // TODO (Owner): reale Projektdauer. Bis dahin rendert die Zeile nicht.
+    duration: null,
   },
   {
     /*
@@ -1189,6 +1205,8 @@ export const packages: Package[] = [
     period: null,
     recommended: false,
     ctaHref: "/leistungen/barrierefreiheit-website",
+    // TODO (Owner): wie lange die Pruefung von der Zusage bis zum Bericht dauert.
+    duration: null,
   },
 ]
 

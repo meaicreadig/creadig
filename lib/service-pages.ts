@@ -157,6 +157,14 @@ export type ServicePage = {
       kind: "fixed" | "offer" | "monthly"
       title: Localized
       body: Localized
+      /*
+       * MP10-2.3 — die Dauer neben dem Preis, je Stufe.
+       *
+       * Owner-gegatet und heute nirgends gesetzt: Wie lange eine Pruefung von
+       * der Zusage bis zum Bericht braucht, weiss nur, wer sie gemacht hat.
+       * Ohne Wert rendert die Zeile nicht.
+       */
+      duration?: Localized
     }[]
     note: Localized
   }

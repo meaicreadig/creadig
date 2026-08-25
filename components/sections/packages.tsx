@@ -8,7 +8,7 @@ import { packages } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 export function Packages() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
 
   return (
     <section id="pakete" aria-labelledby="pakete-title" className="border-line border-b">
@@ -89,6 +89,25 @@ export function Packages() {
                     {pkg.period ? t.packages.monthly : t.packages.once}
                   </span>
                 </div>
+
+                {/*
+                  MP10-2.3 — die Projektdauer, direkt unter dem Preis.
+
+                  „Was kostet das" und „wie lange dauert das" sind eine Frage,
+                  nicht zwei: Ein Festpreis ohne Zeitrahmen laesst genau die
+                  Unsicherheit stehen, die er beseitigen soll.
+
+                  Heute ist `duration` bei beiden Angeboten `null` und die
+                  Zeile rendert nicht. Das ist Absicht — eine geschaetzte
+                  Dauer ist eine Zusage, die im ersten Projekt bricht. Die
+                  Luecke steht auf `/status`.
+                */}
+                {pkg.duration && (
+                  <p className="type-small text-muted-foreground mt-4">
+                    <span className="eyebrow text-gold-text">{t.packages.durationLabel}: </span>
+                    {pkg.duration[locale]}
+                  </p>
+                )}
 
                 {/*
                   Der Referenzpreis wird offen als solcher benannt, mit dem

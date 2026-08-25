@@ -2,6 +2,7 @@ import { Hero } from "@/components/sections/hero"
 import { HouseStatement } from "@/components/sections/house-statement"
 import { SelectedWork } from "@/components/sections/selected-work"
 import { CapabilityTiles } from "@/components/sections/capability-tiles"
+import { EntryLine } from "@/components/sections/entry-line"
 import { HouseProducts } from "@/components/sections/house-products"
 import { CaseStudies } from "@/components/sections/case-studies"
 import { ImpactBand } from "@/components/sections/impact-band"
@@ -91,27 +92,41 @@ export function HomeRoute() {
       <CapabilityTiles />
 
       {/*
-        5 · C — Das dunkle Fundament-Band.
+        5 · A — MP10-2.1/2.2: der Einstieg. EINE Zahl, zwei Fragen.
+
+        Er steht direkt hinter den Ebenen und nicht weiter unten, weil genau
+        hier die Frage entsteht: Wer gerade gelesen hat, was das Haus alles
+        macht, fragt als Naechstes, ob er sich das leisten kann. Keine Antwort
+        an dieser Stelle heisst nicht „exklusiv", sondern „vermutlich zu
+        teuer" — und der Leser beantwortet die Frage dann selbst, gegen uns.
+
+        Es ist kein Paketblock: ein Satz mit einer Zahl, zwei gespiegelte
+        Fragen, zwei Verweise. Die Preisleiter bleibt auf `/leistungen#pakete`.
+      */}
+      <EntryLine />
+
+      {/*
+        6 · C — Das dunkle Fundament-Band.
         Es stand vorher HINTER den Produkt-Kacheln, also lagen zwei
         Raster-Sektionen unmittelbar hintereinander. Zwischen ihnen bricht
         das Band den Takt: Papier → Anthrazit → Papier.
       */}
       <ImpactBand />
 
-      {/* 6 · B — „We build our own." Der Aha-Moment. → /produkte */}
+      {/* 7 · B — „We build our own." Der Aha-Moment. → /produkte */}
       <HouseProducts />
 
-      {/* 7 — Ein tiefer Kundenfall (gated auf schriftliche Freigabe). */}
+      {/* 8 — Ein tiefer Kundenfall (gated auf schriftliche Freigabe). */}
       <CaseStudies />
 
-      {/* 8 · C — Wo wir sitzen: Foto mit Parallaxe. */}
+      {/* 9 · C — Wo wir sitzen: Foto mit Parallaxe. */}
       <Location />
 
-      {/* 9 · A — Wer dahintersteht. Die zweite Pause. → /unternehmen */}
+      {/* 10 · A — Wer dahintersteht. Die zweite Pause. → /unternehmen */}
       <CompanyTeaser />
 
       {/*
-        10 — HIER STAND DIE NACHWEIS-ZEILE, UND SIE IST GEGANGEN (V2-5).
+        11 — HIER STAND DIE NACHWEIS-ZEILE, UND SIE IST GEGANGEN (V2-5).
 
         Sie zaehlte BAFA, iuk, AVPQ und AGD auf — vier Nachweise, von denen
         keiner belegt ist (KIZILELMA §9.9). Eine Zeile mit der Ueberschrift
@@ -123,10 +138,10 @@ export function HomeRoute() {
         Nicht vorher, und nicht mit einem Ersatz, der aehnlich aussieht.
       */}
 
-      {/* 11 — Notizen aus dem Bau (gated, bis die erste steht). → /insights */}
+      {/* 12 — Notizen aus dem Bau (gated, bis die erste steht). → /insights */}
       <InsightsTeaser />
 
-      {/* 12 · C — Schlussstrich, souverän: sprechen oder erst weiterschauen. */}
+      {/* 13 · C — Schlussstrich, souverän: sprechen oder erst weiterschauen. */}
       <ClosingCta />
     </main>
   )

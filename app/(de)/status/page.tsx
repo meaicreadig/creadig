@@ -10,6 +10,7 @@ import {
   filledChapters,
   imprintComplete,
   imprintDetails,
+  packages,
   processors,
   productStatus,
   productWorks,
@@ -194,6 +195,21 @@ function collect(): { open: Item[]; done: Item[] } {
         "(Zeit, Zugänge, Material). Nichts davon wird geschätzt.",
     })
   }
+
+  items.push({
+    label: "Projektdauer neben den Preisen (MP10-2.3)",
+    ok: packages.every((pkg) => pkg.duration !== null),
+    detail:
+      packages
+        .filter((pkg) => pkg.duration === null)
+        .map((pkg) => pkg.key)
+        .join(", ") ||
+      "alle Angebote nennen eine Dauer",
+    owner:
+      "Owner: wie lange das Website-Paket von der Zusage bis zum Livegang braucht " +
+      "und wie lange die Prüfung bis zum Bericht. Ein Festpreis ohne Zeitrahmen " +
+      "lässt die Unsicherheit stehen, die er beseitigen soll.",
+  })
 
   /* ── Fallbeschreibungen (V2-4) ──────────────────────────────────────── */
   for (const study of caseStudies) {
