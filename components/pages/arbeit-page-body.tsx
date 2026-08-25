@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Reveal } from "@/components/ui/reveal";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
+import { CaseStudyBody } from "@/components/sections/case-study-body";
 import type { CaseStudy, Work } from "@/lib/site-data";
 
 /**
@@ -134,26 +135,14 @@ export function ArbeitPageBody({
                 </h2>
               </Reveal>
 
-              <div className="mt-16 grid gap-px md:grid-cols-3">
-                {(
-                  [
-                    [t.cases.problem, study.problem[locale]],
-                    [t.cases.solution, study.solution[locale]],
-                    [t.cases.result, study.result[locale]],
-                  ] as const
-                ).map(([label, body], i) => (
-                  <Reveal
-                    key={label}
-                    delay={0.08 * i}
-                    className="border-line border-t pt-8 md:pr-10"
-                  >
-                    <p className="eyebrow text-gold-text">{label}</p>
-                    <p className="type-body text-foreground/85 mt-5 max-w-sm text-pretty">
-                      {body}
-                    </p>
-                  </Reveal>
-                ))}
-              </div>
+              {/*
+                Dieselben acht Kapitel wie auf /arbeiten, aus derselben
+                Komponente. Zwei Fassungen desselben Falls waeren in vier
+                Wochen zwei Faelle (V2-4).
+              */}
+              <Reveal delay={0.08} className="mt-16">
+                <CaseStudyBody study={study} />
+              </Reveal>
             </>
           ) : (
             <Reveal>

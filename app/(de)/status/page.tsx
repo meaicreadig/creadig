@@ -3,8 +3,11 @@ import type { Metadata } from "next"
 import {
   aggregateRating,
   approvedReviews,
+  caseChapterKeys,
+  caseStudies,
   certifications,
   clientWorks,
+  filledChapters,
   imprintComplete,
   imprintDetails,
   processors,
@@ -127,6 +130,26 @@ function collect(): { open: Item[]; done: Item[] } {
         .filter(Boolean)
         .join(", ") || "vollständig",
       owner: "Owner: Angaben bestätigen — nichts wird geschätzt",
+    })
+  }
+
+  /* ── Fallbeschreibungen (V2-4) ──────────────────────────────────────── */
+  for (const study of caseStudies) {
+    const filled = filledChapters(study)
+    const fehlend = caseChapterKeys.filter((key) => !study.chapters[key])
+    items.push({
+      label: `Fall ${study.client} (§10.4)`,
+      ok: study.approved && filled.length === caseChapterKeys.length,
+      detail: study.approved
+        ? fehlend.length === 0
+          ? "alle acht Kapitel stehen"
+          : `freigegeben, aber ohne: ${fehlend.join(", ")}`
+        : `nicht freigegeben — ${filled.length} von ${caseChapterKeys.length} Kapiteln, ` +
+          `${study.metrics.length} Kennzahl(en), Stimme ${study.voice ? "liegt vor" : "fehlt"}. ` +
+          "Der Fall erscheint nirgends.",
+      owner:
+        "Owner: Ausgangslage, Problem, Ziel, unsere Rolle, System, Umsetzung, Ergebnis, Heute — " +
+        "dazu Kennzahlen mit Quelle und ein freigegebenes Zitat",
     })
   }
 

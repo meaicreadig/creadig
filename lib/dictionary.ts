@@ -491,13 +491,37 @@ export const dictionary = {
       colRegion: "Region",
       registryNote: "Dieselben Projekte, dicht gelistet. Jahreszahlen ergänzen wir, sobald sie belegt sind — geschätzte Jahre stehen hier nicht.",
     },
+    /*
+     * V2-4 — DER FALL HAT ACHT KAPITEL STATT DREI.
+     *
+     * „Problem, Loesung, Ergebnis" ist die Kurzform, mit der Agenturen ihre
+     * Referenzen fuellen. Sie beantwortet die entscheidende Frage nicht:
+     * Was war unser Anteil daran? Und was ist heute, ein Jahr spaeter?
+     *
+     * Die Reihenfolge ist die Aussage. Erst der Betrieb, wie er war, dann
+     * sein Problem, dann sein Ziel — und erst DANACH kommen wir vor. Wer mit
+     * „unsere Rolle" anfaengt, schreibt eine Selbstdarstellung mit
+     * Kundennamen.
+     */
     cases: {
       eyebrow: "Kundenfälle",
       title: "Was sich danach geändert hat.",
-      lead: "Jeder Fall in derselben Reihenfolge: Ausgangslage, was wir gebaut haben, was daraus geworden ist. Nur mit schriftlicher Freigabe des Kunden — ohne Freigabe steht hier nichts.",
-      problem: "Ausgangslage",
-      solution: "Was wir gebaut haben",
-      result: "Was daraus wurde",
+      lead: "Jeder Fall in derselben Reihenfolge: wie der Betrieb dastand, was ihn aufgehalten hat, was er erreichen wollte — und erst dann, was wir daran hatten. Nur mit schriftlicher Freigabe des Kunden; ohne Freigabe steht hier nichts.",
+      chapters: {
+        start: "Ausgangslage",
+        problem: "Das Problem",
+        goal: "Das Ziel",
+        role: "Unsere Rolle",
+        system: "Das System",
+        delivery: "Umsetzung",
+        result: "Ergebnis",
+        today: "Heute",
+      },
+      metricsLabel: "Kennzahlen",
+      /* Ohne Quelle keine Zahl. Ziffern glaubt man schneller als Saetze —
+         deshalb werden sie hier strenger behandelt und nicht lockerer. */
+      sourceLabel: "Quelle",
+      voiceLabel: "Kundenstimme",
     },
     reviews: {
       eyebrow: "Bewertungen",
@@ -1839,10 +1863,20 @@ export const dictionary = {
     cases: {
       eyebrow: "Müşteri örnekleri",
       title: "Sonrasında ne değişti.",
-      lead: "Her örnek aynı sırayla: başlangıç durumu, ne inşa ettiğimiz, ortaya ne çıktığı. Yalnızca müşterinin yazılı onayıyla — onay yoksa burada bir şey yazmaz.",
-      problem: "Başlangıç durumu",
-      solution: "Ne inşa ettik",
-      result: "Ortaya ne çıktı",
+      lead: "Her örnek aynı sırayla: işletme nasıl duruyordu, onu ne engelliyordu, neye ulaşmak istiyordu — ve ancak ondan sonra bizim payımız. Yalnızca müşterinin yazılı onayıyla; onay yoksa burada bir şey yazmaz.",
+      chapters: {
+        start: "Başlangıç durumu",
+        problem: "Sorun",
+        goal: "Hedef",
+        role: "Bizim rolümüz",
+        system: "Sistem",
+        delivery: "Uygulama",
+        result: "Sonuç",
+        today: "Bugün",
+      },
+      metricsLabel: "Ölçütler",
+      sourceLabel: "Kaynak",
+      voiceLabel: "Müşteri görüşü",
     },
     reviews: {
       eyebrow: "Değerlendirmeler",

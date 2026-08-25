@@ -502,47 +502,154 @@ export const featuredWorks: Work[] = featuredWorkSlugs
 /** Ein Text in beiden Sprachen. Fehlt eine, meckert der Compiler. */
 export type Localized = { de: string; tr: string }
 
+/**
+ * Die acht Kapitel eines Falls, in Leserichtung (KIZILELMA §10.4).
+ *
+ * Die Reihenfolge ist die Aussage: Erst der Betrieb, wie er war, dann sein
+ * Problem, dann sein Ziel — und erst DANACH kommen wir vor. Wer mit „unsere
+ * Rolle" anfaengt, schreibt eine Selbstdarstellung mit Kundennamen.
+ */
+export const caseChapterKeys = [
+  "start",
+  "problem",
+  "goal",
+  "role",
+  "system",
+  "delivery",
+  "result",
+  "today",
+] as const
+
+export type CaseChapterKey = (typeof caseChapterKeys)[number]
+
+/**
+ * Eine Kennzahl — und der Beleg dafuer.
+ *
+ * `value` ist bewusst eine Zeichenkette und keine Zahl: „von drei Tagen auf
+ * einen" ist die ehrlichste Form vieler Ergebnisse und laesst sich nicht
+ * runden. `source` ist Pflicht. Eine Kennzahl ohne Quelle ist eine
+ * Behauptung mit Ziffern — und Ziffern glaubt man schneller als Saetze,
+ * weshalb sie hier strenger behandelt werden und nicht lockerer.
+ */
+export type CaseMetric = {
+  label: Localized
+  value: string
+  source: Localized
+}
+
+/**
+ * Die Kundenstimme in einem Fall.
+ *
+ * Dieselbe Regel wie bei `reviews`: Der Wortlaut wird NICHT uebersetzt. Ein
+ * uebersetztes Zitat ist ein Satz, den der Mensch so nie gesagt hat. `role`
+ * ist die Funktion und darf uebersetzt werden — sie ist eine Beschreibung,
+ * kein Zitat.
+ */
+export type CaseVoice = {
+  quote: string
+  lang: "de" | "tr"
+  name: string
+  company: string
+  role: Localized
+}
+
+/* ==========================================================================
+ * DAS CASE-STUDY-SYSTEM (V2-4 · KIZILELMA §10.4)
+ *
+ * Vorher trug ein Fall drei Felder: Problem, Loesung, Ergebnis. Das ist die
+ * Kurzform, mit der Agenturen ihre Referenzen fuellen, und sie beantwortet
+ * die entscheidende Frage nicht: Was war unser Anteil daran? Ein Fall ohne
+ * „unsere Rolle" und ohne „Heute" liest sich wie eine Projektbeschreibung,
+ * die auch der Kunde selbst haette schreiben koennen.
+ *
+ * Acht Kapitel, dazu Kennzahlen und eine Stimme. Jedes Kapitel ist einzeln
+ * `null`-faehig: Ein Fall, von dem der Owner heute nur die Ausgangslage
+ * bestaetigen kann, rendert die Ausgangslage — und nicht acht
+ * Zwischenueberschriften ueber Leerraum.
+ *
+ * ---------------------------------------------------------------------------
+ * `approved` IST DIE HAUPTSICHERUNG, NICHT DER INHALT
+ * Solange sie `false` ist, erscheint der Fall nirgends: nicht auf /arbeiten,
+ * nicht auf der Werk-Seite, nicht in den strukturierten Daten. Die Geruest-
+ * Eintraege unten sind deshalb sichtbar leer und trotzdem gefahrlos — sie
+ * existieren, damit der Owner Text in eine Struktur schreiben kann, statt
+ * eine Struktur mitzuliefern.
+ * ========================================================================== */
 export type CaseStudy = {
   slug: string
   /** Kundenname exakt so, wie er freigegeben wurde. */
   client: string
   /** Branche/Ort — Einordnung, keine Bewertung. */
   context: Localized
-  /** Ausgangslage beim Kunden, in dessen Worten oder von ihm bestätigt. */
-  problem: Localized
-  /** Was wir gebaut oder geändert haben. */
-  solution: Localized
-  /**
-   * Ergebnis — ausschließlich Nachweisbares. Keine Prozentzahl ohne Quelle,
-   * keine „Umsatz verdreifacht"-Behauptung ohne Beleg des Kunden.
-   */
-  result: Localized
+  /** Die acht Kapitel. `null` = liegt nicht vor und rendert nicht. */
+  chapters: Record<CaseChapterKey, Localized | null>
+  /** Nur belegte Zahlen, jede mit Quelle. Leer = kein Kennzahlen-Block. */
+  metrics: CaseMetric[]
+  /** Freigegebenes Zitat des Kunden. `null` = kein Stimmen-Block. */
+  voice: CaseVoice | null
   image: string | null
   /** Monogramm, solange kein Bild vorliegt. */
   mark: string
-  /** Schriftliche Freigabe des Kunden liegt vor. */
+  /** Schriftliche Freigabe des Kunden für genau diesen Text liegt vor. */
   approved: boolean
 }
 
+/** Alle acht Kapitel leer — die Form, in die der Owner schreibt. */
+const emptyChapters: Record<CaseChapterKey, Localized | null> = {
+  start: null,
+  problem: null,
+  goal: null,
+  role: null,
+  system: null,
+  delivery: null,
+  result: null,
+  today: null,
+}
+
 /**
- * LEER, und das ist der ehrliche Zustand.
+ * Zwei Geruestee, kein Inhalt — und das ist der ehrliche Zustand.
  *
- * TODO (Owner): 2–3 Kunden um eine kurze Freigabe bitten, dann hier
- * eintragen. Vorlage:
+ * NV SWISS ist der wertvollste Beweis, den das Haus hat: ein fremder,
+ * zahlender Kunde, dessen Marke, Website und Digitalisierung aus einer Hand
+ * kommen. maqam ist der zweite. Beide stehen hier mit Namen, Einordnung und
+ * leeren Kapiteln — `approved: false`, also unsichtbar.
  *
- *   {
- *     slug: "beispiel-betrieb",
- *     client: "Beispiel GmbH",
- *     context: { de: "Handwerk · Osnabrück", tr: "Zanaat · Osnabrück" },
- *     problem: { de: "…", tr: "…" },
- *     solution: { de: "…", tr: "…" },
- *     result: { de: "…", tr: "…" },
- *     image: null,
- *     mark: "BG",
- *     approved: true,
- *   }
+ * Was der Owner liefern muss, steht auf `/status` mit Namen; erfunden wird
+ * nichts davon. Sobald ein Kapitel Text traegt und die schriftliche Freigabe
+ * vorliegt, wird `approved` auf `true` gesetzt und der Fall erscheint —
+ * ohne dass jemand Markup anfassen muss.
  */
-export const caseStudies: CaseStudy[] = []
+export const caseStudies: CaseStudy[] = [
+  {
+    slug: "nv-swiss",
+    client: "NV SWISS",
+    context: { de: "Versicherung & Finanzen · Schweiz", tr: "Sigorta & finans · İsviçre" },
+    chapters: { ...emptyChapters },
+    metrics: [],
+    voice: null,
+    image: null,
+    mark: "NV",
+    approved: false,
+  },
+  {
+    slug: "maqam",
+    client: "maqam",
+    context: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret" },
+    chapters: { ...emptyChapters },
+    metrics: [],
+    voice: null,
+    image: null,
+    mark: "mq",
+    approved: false,
+  },
+]
+
+/** Kapitel, die tatsächlich Text tragen — in der festen Leserichtung. */
+export function filledChapters(study: CaseStudy) {
+  return caseChapterKeys
+    .map((key) => ({ key, body: study.chapters[key] }))
+    .filter((entry): entry is { key: CaseChapterKey; body: Localized } => Boolean(entry.body))
+}
 
 /** Nur Freigegebenes verlässt die Datei. */
 export const approvedCaseStudies = caseStudies.filter((c) => c.approved)
