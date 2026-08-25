@@ -5,6 +5,8 @@ import { PageHeader } from "@/components/ui/page-header"
 import { CompanyChapters } from "@/components/sections/company-chapters"
 import { HouseArchitecture } from "@/components/sections/house-architecture"
 import { About } from "@/components/sections/about"
+import { WorkModel } from "@/components/sections/work-model"
+import { CompanyPhotos } from "@/components/sections/company-photos"
 import { LogoWall } from "@/components/sections/logo-wall"
 import { ClosingCta } from "@/components/sections/closing-cta"
 
@@ -57,6 +59,18 @@ export function UnternehmenPageBody({ location }: { location: React.ReactNode })
       */}
       <HouseArchitecture />
       <About />
+      {/*
+        „Wer macht das?" war die groesste Luecke der Seite (§10.6). Sie steht
+        direkt hinter „Ueber uns", weil sie dessen Fortsetzung ist: erst was
+        das Haus ist, dann wer darin arbeitet — und erst danach, fuer wen.
+      */}
+      <WorkModel />
+      {/*
+        Echte Fotos aus dem Haus (§10.6). Rendert nur, wenn unter
+        public/images/unternehmen/ wirklich eins liegt — heute keins, also
+        keine Sektion. Kein Stock, kein Platzhalter, kein dritter Zustand.
+      */}
+      <CompanyPhotos />
       <LogoWall />
       {/* Standort + Parallax — die Server-Komponente entscheidet über das Foto.
           Bewusst ohne Reveal-Huelle: Die Sektion bringt ihre eigene

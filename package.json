@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "predev": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs",
-    "prebuild": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs",
+    "predev": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs && node scripts/generate-company-media.mjs",
+    "prebuild": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs && node scripts/generate-company-media.mjs",
     "build": "next build",
     "postbuild": "node scripts/check-function-size.mjs && node scripts/check-reviews.mjs && node scripts/check-parity.mjs",
     "start": "next start",

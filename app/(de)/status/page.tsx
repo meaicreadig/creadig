@@ -18,6 +18,7 @@ import {
   socialProfiles,
 } from "@/lib/site-data"
 import { CLIENT_LOGOS } from "@/lib/client-logos.generated"
+import { COMPANY_PHOTOS, COMPANY_PHOTO_SLOTS } from "@/lib/company-media.generated"
 import { productScreens } from "@/lib/product-media"
 import { publishedInsights } from "@/lib/insights"
 
@@ -236,6 +237,27 @@ function collect(): { open: Item[]; done: Item[] } {
         ? "RESEND_API_KEY und LEAD_FROM gesetzt"
         : "ohne diese Werte antwortet /api/lead mit 503 — keine Anfrage kommt an",
     owner: "Owner: Werte in Vercel hinterlegen",
+  })
+
+  items.push({
+    label: "Echte Fotos aus dem Haus (§10.6)",
+    ok: COMPANY_PHOTO_SLOTS.every((slot) => COMPANY_PHOTOS[slot]),
+    detail:
+      COMPANY_PHOTO_SLOTS.filter((slot) => !COMPANY_PHOTOS[slot]).join(", ") ||
+      "alle vier Slots belegt",
+    owner:
+      "Owner: Fotos nach public/images/unternehmen/<slot>.jpg — " +
+      "buero, ico, arbeitsplatz, whiteboard. Kein Stock. Ohne Foto keine Sektion.",
+  })
+
+  items.push({
+    label: "Arbeitsmodell — Wortlaut bestätigt (§10.6)",
+    ok: false,
+    detail:
+      "Der Abschnitt \u201eSo arbeiten wir\u201c steht und behauptet nichts Neues " +
+      "(founder-led, kleines Kernteam, Netzwerk im DACH-Raum \u2014 alles stand " +
+      "vorher schon in \u201eÜber uns\u201c). Der genaue Wortlaut ist Entwurf.",
+    owner: "Owner: Wortlaut durchlesen und bestätigen oder ändern",
   })
 
   items.push({

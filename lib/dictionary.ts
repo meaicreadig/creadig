@@ -938,12 +938,12 @@ export const dictionary = {
     about: {
       eyebrow: "Über uns",
       title: "Ein Haus, das wächst.",
-      founderLabel: "Gründer",
+      founderLabel: "Gründer & System Lead",
       founder: "Muhammed Emin Akyol",
       body1:
         "creaDIG startete 2017 als Agentur. Aus Aufträgen wurden Produkte, aus Produkten ein System-Haus — heute laufen unter dem Dach vier eigene Systeme und die Betreuung der Betriebe, für die wir sie gebaut haben.",
       body2:
-        "Wir arbeiten mit einem spezialisierten Netzwerk aus Entwicklern, Textern und Strategen im DACH-Raum. Das Team wächst; die nächsten Stellen sind in Vorbereitung.",
+        "Das Team wächst; die nächsten Stellen sind in Vorbereitung. Wie wir heute arbeiten — wer führt, wer im Kernteam sitzt, wer dazukommt — steht darunter, ohne Schönfärberei.",
       nicheLabel: "Schwerpunkte",
       niches: [
         "Handwerk mit 6–20 Mitarbeitern — Schwerpunkt Deutschland",
@@ -964,6 +964,99 @@ export const dictionary = {
       marketsLabel: "Märkte",
       honesty:
         "Wir nennen keine erfundenen Mitarbeiter- oder Umsatzzahlen. Unser Beweis ist gebaute Arbeit.",
+    },
+    /*
+     * V2-5 — DAS ARBEITSMODELL (KIZILELMA §10.6).
+     *
+     * -----------------------------------------------------------------------
+     * DIE GROESSTE LUECKE DER SEITE WAR „WER MACHT DAS?"
+     * Es stand ein Satz dazu da, mitten in „Ueber uns": „Wir arbeiten mit
+     * einem spezialisierten Netzwerk … Das Team waechst." Das ist wahr und
+     * beantwortet die Frage trotzdem nicht — es sagt, dass es jemanden gibt,
+     * aber nicht, wer Ihr Projekt fuehrt und wer daran sitzt.
+     *
+     * -----------------------------------------------------------------------
+     * KEINE SCHEIN-GROESSE
+     * Ein Haus dieser Groesse kann sich groesser aussehen lassen; es ist nur
+     * eine Frage der Wortwahl („unser Team", „unsere Standorte"). Der Preis
+     * faellt spaeter an, beim ersten Termin, in dem der Kunde merkt, dass
+     * „das Team" eine Person ist. Founder-led ist im Premium kein Nachteil —
+     * vorausgesetzt, es steht als bewusstes Modell da und nicht als Luecke.
+     *
+     * -----------------------------------------------------------------------
+     * WORTLAUT: ENTWURF, OWNER BESTAETIGT
+     * Kein Satz hier behauptet etwas Neues: Der Gruender fuehrt (belegt),
+     * es gibt ein Netzwerk aus Entwicklern, Textern und Strategen im
+     * DACH-Raum (stand schon in `about.body2`), das Team waechst (ebenda).
+     * Neu ist nur die Ordnung. Der genaue Wortlaut ist trotzdem Owner-Sache
+     * und steht als offener Punkt auf `/status` — geaendert wird er hier,
+     * nicht im Markup.
+     *
+     * Was NICHT dasteht und auch nicht dazukommt: eine Mitarbeiterzahl, eine
+     * Umsatzzahl, ein Standort, den es nicht gibt.
+     */
+    workModel: {
+      eyebrow: "So arbeiten wir",
+      title: "Founder-led — und dazu genau die Leute, die ein Projekt braucht.",
+      lead: "Wir sagen nicht, wie groß wir sind, sondern wie wir arbeiten. Das ist die ehrlichere Angabe und für Sie die nützlichere: Sie wissen danach, wer Ihr Projekt führt und wer daran sitzt.",
+      items: {
+        founder: {
+          name: "Geführt vom Gründer",
+          what: "Jedes Projekt hat einen Verantwortlichen, und es ist immer derselbe. Er führt das erste Gespräch, er entwirft das System, und er geht ans Telefon, wenn etwas ist. Kein Wechsel vom Verkauf zur Umsetzung, keine Übergabe an jemanden, der nicht dabei war.",
+        },
+        core: {
+          name: "Ein kleines Kernteam",
+          what: "Klein genug, dass jeder weiß, woran die anderen arbeiten. Groß genug, dass ein Urlaub kein Projekt anhält.",
+        },
+        network: {
+          name: "Spezialisten nach Bedarf",
+          what: "Für das, was ein Projekt zusätzlich braucht — Entwicklung, Text, Strategie — arbeiten wir mit einem festen Netzwerk im DACH-Raum. Nicht anonym eingekauft: Es sind Leute, mit denen wir schon gebaut haben.",
+        },
+      },
+      fieldsLabel: "Verantwortungsfelder",
+      fieldsNote: "Fünf Ebenen, eine Verantwortung. Das ist die Struktur des Hauses — keine Aufzählung von Fähigkeiten.",
+      honesty:
+        "Wir nennen keine Mitarbeiterzahl und keine Umsatzzahl. Beides ließe sich behaupten, und beides sagt über Ihr Projekt nichts. Was zählt, ist, wer daran sitzt.",
+    },
+    /*
+     * V2-5 — DIE FOTO-SLOTS (KIZILELMA §10.6).
+     *
+     * „Menschen" ist die fuenfte der fehlenden Beweisarten, und sie ist die
+     * einzige, die sich nicht durch Struktur ersetzen laesst: Ein Haus ohne
+     * ein einziges Bild vom eigenen Arbeitsplatz wirkt wie eine Adresse, an
+     * der niemand sitzt.
+     *
+     * Stock ist gesperrt und ein Platzhalter-Bild auch. Deshalb entscheidet
+     * das Dateisystem: Liegt unter `public/images/unternehmen/<slot>.jpg`
+     * ein Foto, erscheint es mit der Beschriftung von hier. Liegt keins da,
+     * erscheint die Sektion nicht — heute ist das der Fall.
+     *
+     * Die Beschriftungen stehen trotzdem schon hier, in beiden Sprachen:
+     * Der Owner soll ein Bild ablegen muessen und nicht auch noch
+     * ueberlegen, was darunter steht.
+     */
+    photos: {
+      eyebrow: "Aus dem Haus",
+      title: "Wo das entsteht.",
+      lead: "Keine Stockfotos und keine Bürostudio-Aufnahmen. Was hier steht, ist der Ort, an dem gearbeitet wird — oder es steht nichts.",
+      slots: {
+        buero: {
+          caption: "Der Arbeitsraum im ICO InnovationsCentrum Osnabrück.",
+          alt: "Der Arbeitsraum von creaDIG im ICO InnovationsCentrum Osnabrück",
+        },
+        ico: {
+          caption: "Das ICO InnovationsCentrum Osnabrück, Albert-Einstein-Straße 1.",
+          alt: "Das ICO InnovationsCentrum Osnabrück an der Albert-Einstein-Straße 1",
+        },
+        arbeitsplatz: {
+          caption: "Bildschirme mit echter Arbeit darauf.",
+          alt: "Arbeitsplatz bei creaDIG mit laufenden Systemen auf den Bildschirmen",
+        },
+        whiteboard: {
+          caption: "Eine Skizze, die wirklich so entstanden ist.",
+          alt: "Whiteboard mit einer Systemskizze aus einem Projekt",
+        },
+      },
     },
     location: {
       eyebrow: "Unser Sitz",
@@ -2235,12 +2328,12 @@ export const dictionary = {
     about: {
       eyebrow: "Hakkımızda",
       title: "Büyüyen bir çatı.",
-      founderLabel: "Kurucu",
+      founderLabel: "Kurucu & sistem lideri",
       founder: "Muhammed Emin Akyol",
       body1:
         "creaDIG 2017'de ajans olarak başladı. İşlerden ürünler, ürünlerden bir sistem evi doğdu — bugün bu çatı altında dört kendi sistemimiz ve onları kurduğumuz işletmelerin bakımı yürüyor.",
       body2:
-        "DACH bölgesinde geliştirici, metin yazarı ve stratejistlerden oluşan uzman bir ağ ile çalışıyoruz. Ekip büyüyor; yeni pozisyonlar hazırlanıyor.",
+        "Ekip büyüyor; yeni pozisyonlar hazırlanıyor. Bugün nasıl çalıştığımız — kim yürütüyor, çekirdek ekipte kim var, kim ekleniyor — aşağıda yazıyor, süslemeden.",
       nicheLabel: "Odak alanları",
       niches: [
         "6–20 çalışanlı zanaat işletmeleri — ağırlıkla Almanya",
@@ -2255,6 +2348,52 @@ export const dictionary = {
       locationsLabel: "Merkez",
       marketsLabel: "Pazarlar",
       honesty: "Uydurma çalışan veya ciro sayıları vermiyoruz. Kanıtımız yaptığımız işlerdir.",
+    },
+    workModel: {
+      eyebrow: "Nasıl çalışıyoruz",
+      title: "Kurucu yönetiminde — ve bir projenin ihtiyaç duyduğu kişilerle.",
+      lead: "Ne kadar büyük olduğumuzu değil, nasıl çalıştığımızı söylüyoruz. Bu hem daha dürüst hem de sizin için daha yararlı bir bilgi: Projenizi kimin yürüttüğünü ve başında kimin oturduğunu bilirsiniz.",
+      items: {
+        founder: {
+          name: "Kurucu yürütür",
+          what: "Her projenin bir sorumlusu vardır ve bu hep aynı kişidir. İlk görüşmeyi o yapar, sistemi o tasarlar ve bir şey olduğunda telefona o çıkar. Satıştan uygulamaya geçişte kişi değişmez, orada bulunmamış birine devir olmaz.",
+        },
+        core: {
+          name: "Küçük bir çekirdek ekip",
+          what: "Herkesin diğerlerinin ne üzerinde çalıştığını bileceği kadar küçük. Bir tatilin projeyi durdurmayacağı kadar büyük.",
+        },
+        network: {
+          name: "İhtiyaca göre uzmanlar",
+          what: "Bir projenin ek olarak ihtiyaç duyduğu şey için — geliştirme, metin, strateji — DACH bölgesinde sabit bir ağla çalışıyoruz. Adı sanı belirsiz bir alım değil: daha önce birlikte iş kurduğumuz kişiler.",
+        },
+      },
+      fieldsLabel: "Sorumluluk alanları",
+      fieldsNote: "Beş katman, tek sorumluluk. Bu evin yapısıdır — bir yetenek listesi değil.",
+      honesty:
+        "Çalışan sayısı ya da ciro rakamı vermiyoruz. İkisi de iddia edilebilir ve ikisi de projeniz hakkında bir şey söylemez. Önemli olan, başında kimin oturduğudur.",
+    },
+    photos: {
+      eyebrow: "Evden",
+      title: "Burada ortaya çıkıyor.",
+      lead: "Stok fotoğraf yok, ofis stüdyosu çekimi yok. Burada duran şey, işin yapıldığı yerdir — ya da hiçbir şey durmaz.",
+      slots: {
+        buero: {
+          caption: "Osnabrück ICO InnovationsCentrum'daki çalışma alanı.",
+          alt: "creaDIG'in Osnabrück ICO InnovationsCentrum'daki çalışma alanı",
+        },
+        ico: {
+          caption: "ICO InnovationsCentrum Osnabrück, Albert-Einstein-Straße 1.",
+          alt: "Albert-Einstein-Straße 1'deki ICO InnovationsCentrum Osnabrück",
+        },
+        arbeitsplatz: {
+          caption: "Üzerinde gerçek iş olan ekranlar.",
+          alt: "creaDIG'de çalışan sistemlerin göründüğü çalışma masası",
+        },
+        whiteboard: {
+          caption: "Gerçekten böyle ortaya çıkmış bir eskiz.",
+          alt: "Bir projeden çıkmış sistem eskizinin bulunduğu beyaz tahta",
+        },
+      },
     },
     location: {
       eyebrow: "Merkezimiz",
