@@ -541,7 +541,8 @@ export function ProduktPageBody({
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <MagneticButton href="/kontakt">{copy.ctaPrimary}</MagneticButton>
+                {/* MP10-2.6 — Abschluss nach /termin. */}
+                <MagneticButton href="/termin">{copy.ctaPrimary}</MagneticButton>
                 <MagneticButton href="/produkte" variant="ghost">
                   {copy.ctaSecondary}
                 </MagneticButton>

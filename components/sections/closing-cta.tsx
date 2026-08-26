@@ -76,7 +76,8 @@ export function ClosingCta({ variant = "default" }: { variant?: ClosingVariant }
 
           <Reveal delay={0.1} className="lg:col-span-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:justify-end">
-              <MagneticButton href="/kontakt">{copy.ctaPrimary}</MagneticButton>
+              {/* MP10-2.6 — der Abschluss zeigt auf den Abschluss. */}
+              <MagneticButton href="/termin">{copy.ctaPrimary}</MagneticButton>
               <MagneticButton href={secondaryHref} variant="ghost">
                 {copy.ctaSecondary}
               </MagneticButton>

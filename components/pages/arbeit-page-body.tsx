@@ -176,7 +176,8 @@ export function ArbeitPageBody({
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <MagneticButton href="/kontakt">
+                {/* MP10-2.6 — Abschluss nach /termin. */}
+                <MagneticButton href="/termin">
                   {copy.ctaPrimary}
                 </MagneticButton>
                 <MagneticButton href="/arbeiten" variant="ghost">

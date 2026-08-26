@@ -5,7 +5,7 @@ import { ArrowRight, ArrowUpRight, CalendarDays, Layers, MessageSquare, Package 
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { Reveal } from "@/components/ui/reveal"
-import { Contact } from "@/components/sections/contact"
+import { ContactDirect } from "@/components/sections/contact-direct"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { contact } from "@/lib/site-data"
 
@@ -17,10 +17,13 @@ import { contact } from "@/lib/site-data"
  * entschieden hat. Drei andere Absichten kamen im Alltag mindestens so oft
  * vor und hatten keinen Weg: erst schauen, erst prüfen, erst fragen.
  *
- * Darum steht über dem Formular eine Absichtszeile mit vier gleichwertigen
- * Wegen. Zwei führen ins Gespräch, zwei führen tiefer in die Seite — und das
- * ist kein Umweg, sondern für ein System-Haus der ehrlichere Einstieg: Wer
- * vier eigene Produkte gesehen hat, braucht weniger Überzeugungsarbeit.
+ * Darum steht oben eine Absichtszeile mit vier gleichwertigen Wegen. Zwei
+ * führen ins Gespräch, zwei führen tiefer in die Seite — und das ist kein
+ * Umweg, sondern für ein System-Haus der ehrlichere Einstieg: Wer vier eigene
+ * Produkte gesehen hat, braucht weniger Überzeugungsarbeit.
+ *
+ * MP10-2.6: Das Formular unter dieser Zeile ist gegangen. Es war das zweite
+ * für denselben Vorgang — /termin fragt dasselbe, nur geführt.
  */
 const INTENT_ICONS = {
   talk: MessageSquare,
@@ -30,6 +33,11 @@ const INTENT_ICONS = {
 } as const
 
 /** Reihenfolge = Reihenfolge auf der Seite. */
+/*
+ * MP10-2.6 — „Projekt besprechen" fuehrte zum Formular unten auf dieser
+ * Seite. Das Formular gibt es nicht mehr; der Anker fuehrt jetzt auf die
+ * direkten Wege, und die Beschriftung sagt das auch.
+ */
 const INTENTS = [
   { key: "talk" as const, href: "#kontakt", external: false },
   { key: "appointment" as const, href: "/termin", external: false },
@@ -113,9 +121,10 @@ export function KontaktPageBody() {
         </div>
       </section>
 
-      {/* Formular, direkte Wege und Sitz — unverändert aus der Startseite
-          übernommen, hier aber am richtigen Ort. */}
-      <Contact />
+      {/* MP10-2.6 — direkte Wege und Sitz. Das Formular, das hier stand,
+          ist gegangen: /termin ist der Abschluss, /kontakt der direkte Weg.
+          Die Begründung steht in `contact-direct.tsx`. */}
+      <ContactDirect />
     </main>
   )
 }

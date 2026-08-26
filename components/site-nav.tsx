@@ -198,8 +198,13 @@ export function SiteNav() {
             </a>
           </Button>
 
+          {/*
+            MP10-2.6 — der Kopfzeilen-Knopf fuehrt zum Abschluss, nicht zur
+            Kontaktliste. „Projekt starten" hiess bisher: Seite mit vier
+            Absichten, darunter ein Formular. Jetzt heisst es, was es sagt.
+          */}
           <Link
-            href="/kontakt"
+            href="/termin"
             className="group relative ml-1.5 hidden items-center overflow-hidden bg-gradient-to-br from-gold-soft to-gold eyebrow px-6 py-3 text-[#201e1b] sm:inline-flex"
           >
             <span
@@ -273,7 +278,7 @@ export function SiteNav() {
               <div className="flex flex-col gap-3 px-6 pt-10">
                 <SheetClose asChild>
                   <Link
-                    href="/kontakt"
+                    href="/termin"
                     className="flex items-center justify-center bg-gradient-to-br from-gold-soft to-gold px-6 py-4 text-sm tracking-wide text-[#201e1b]"
                   >
                     {t.nav.cta}

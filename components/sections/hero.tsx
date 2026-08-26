@@ -95,7 +95,9 @@ export function Hero() {
           </div>
 
           <div className="flex flex-wrap items-start gap-3 lg:col-span-5 lg:justify-end">
-            <MagneticButton href="/kontakt">
+            {/* MP10-2.6 — der erste Knopf der Seite fuehrt an ihr Ende:
+                /termin ist der Abschluss, /kontakt der direkte Weg. */}
+            <MagneticButton href="/termin">
               {t.hero.ctaPrimary}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
             </MagneticButton>

@@ -209,8 +209,8 @@ export const dictionary = {
       intents: {
         talk: {
           name: "Projekt besprechen",
-          what: "Schreiben Sie in eigenen Worten, worum es geht — per WhatsApp oder über das Formular unten.",
-          cta: "Zum Formular",
+          what: "Schreiben Sie in eigenen Worten, worum es geht — per WhatsApp oder E-Mail, ohne Formular.",
+          cta: "Zu den direkten Wegen",
         },
         appointment: {
           name: "Termin vereinbaren",
@@ -604,7 +604,22 @@ export const dictionary = {
       ownProducts: "Eigene Produkte",
       clients: "Kunden",
       brands: "Marken in unserem Arbeitsumfeld",
-      note: "Namensnennung dient allein der Einordnung unserer Arbeit. Freigaben stehen aus; eine Kunden-, Geschäfts- oder Partnerbeziehung wird damit nicht behauptet.",
+      /*
+       * MP10-2.9 — DER DISCLAIMER WAR STAERKER ALS DIE WAND.
+       *
+       * Er lautete: „Freigaben stehen aus; eine Kunden-, Geschäfts- oder
+       * Partnerbeziehung wird damit nicht behauptet." Das gehoerte zur Reihe
+       * fremder Marken aus dem Glasfaser-Alltag — und die ist seit dem
+       * 22.08.2026 leer (`site-data.brands`). Uebrig blieb ein Satz, der
+       * genau ueber den beiden Reihen stand, die es noch gibt: eigene
+       * Produkte und Kunden MIT Zustimmung. Er widerrief also, was darunter
+       * zu Recht steht.
+       *
+       * Ein Hinweis, der die eigene Aussage schwaecht, ist keine Ehrlichkeit,
+       * sondern ein Rest. Jetzt sagt der Satz, wonach eine Logo-Wand zuerst
+       * gefragt wird: Was davon ist eures, und wer hat zugestimmt.
+       */
+      note: "Eigene Produkte haben wir gebaut und betreiben sie selbst. Kunden stehen hier nur mit ihrer Zustimmung. Fremde Marken stehen gar nicht hier — ohne Freigabe kein Name.",
     },
     portfolio: {
       eyebrow: "Werkschau",
@@ -1377,8 +1392,18 @@ export const dictionary = {
     },
     contact: {
       eyebrow: "Kontakt",
+      /*
+       * MP10-2.6 — `title`/`lead` gehoerten zum Formular, das hier stand, und
+       * bleiben fuer den Fall, dass ein anderer Ort sie braucht. Die Seite
+       * selbst traegt jetzt `directTitle`/`directLead`: Sie kuendigt kein
+       * Eingabefeld mehr an, sondern drei Wege.
+       */
       title: "In 20 Minuten unverbindlich.",
       lead: "Deutsch und Türkisch. Wählen Sie den Weg, der Ihnen am schnellsten passt.",
+      directTitle: "Drei Wege. Jeder endet bei einem Menschen.",
+      directLead: "Ein Erstgespräch läuft über die Terminanfrage — dort steht in vier Schritten, worum es geht. Wer nur eine Frage hat, schreibt direkt: per WhatsApp oder E-Mail, auf Deutsch oder Türkisch.",
+      mailTitle: "E-Mail",
+      mailNote: "Für Unterlagen, Angebote und alles Schriftliche.",
       nameLabel: "Name",
       namePlaceholder: "Ihr Name",
       businessLabel: "Betrieb",
@@ -1987,8 +2012,8 @@ export const dictionary = {
       intents: {
         talk: {
           name: "Projeyi konuşmak",
-          what: "Konuyu kendi cümlelerinizle yazın — WhatsApp'tan veya aşağıdaki formdan.",
-          cta: "Forma git",
+          what: "Konuyu kendi cümlelerinizle yazın — WhatsApp'tan ya da e-postayla, formsuz.",
+          cta: "Doğrudan yollara git",
         },
         appointment: {
           name: "Randevu almak",
@@ -2225,7 +2250,7 @@ export const dictionary = {
       ownProducts: "Kendi ürünlerimiz",
       clients: "Müşteriler",
       brands: "Çalışma çevremizdeki markalar",
-      note: "İsimler yalnızca çalışmamızı konumlandırmak için anılmıştır. Onaylar beklemededir; bu bir müşteri, iş veya ortaklık ilişkisi iddiası değildir.",
+      note: "Kendi ürünlerimizi biz kurduk ve kendimiz işletiyoruz. Müşteriler burada yalnızca onayıyla yer alır. Yabancı markalar ise hiç yer almaz — onay yoksa isim de yok.",
     },
     portfolio: {
       eyebrow: "Seçki",
@@ -2727,6 +2752,10 @@ export const dictionary = {
       eyebrow: "İletişim",
       title: "20 dakikada, bağlayıcı olmadan.",
       lead: "Almanca ve Türkçe. Size en hızlı gelen yolu seçin.",
+      directTitle: "Üç yol. Hepsi bir insana çıkar.",
+      directLead: "İlk görüşme randevu talebinden geçer — orada dört adımda konuyu anlatırsınız. Sadece bir sorusu olan doğrudan yazar: WhatsApp'tan ya da e-postayla, Almanca veya Türkçe.",
+      mailTitle: "E-posta",
+      mailNote: "Belgeler, teklifler ve yazılı her şey için.",
       nameLabel: "İsim",
       namePlaceholder: "Adınız",
       businessLabel: "İşletme",
