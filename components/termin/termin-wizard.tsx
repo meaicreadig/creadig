@@ -527,12 +527,31 @@ export function TerminWizard() {
 
             <div className="border-line mt-8 border">
               <div className="border-line flex items-center justify-between border-b px-5 py-4">
+                {/*
+                  MP10-5 — `-m-3 p-3` ist kein Zierrat, sondern die Bedienflaeche.
+
+                  Beide Pfeile waren genau so gross wie ihr Symbol: 20 × 20 px.
+                  Am Bildschirm faellt das nicht auf, mit dem Daumen schon —
+                  und WCAG 2.2 verlangt seit 2.5.8 mindestens 24 × 24 px, wenn
+                  ringsum kein Platz ist. Hier ist keiner: Der Monatsname sitzt
+                  daneben, die Kalenderzellen darunter.
+
+                  Gefunden hat das `npm run mobile`, nicht das Auge und nicht
+                  das axe-Gate — das faehrt WCAG 2.1 und kennt das Kriterium
+                  noch nicht. Fuer ein Haus, das Barrierefreiheits-Pruefungen
+                  verkauft, ist die eigene Terminseite der falsche Ort dafuer.
+
+                  Das Innenmass waechst auf 44 px, das Aussenmass bleibt bei
+                  20: Die negative Aussenmarge nimmt genau zurueck, was der
+                  Innenabstand hinzufuegt. Die Zeile ist danach keinen Pixel
+                  hoeher — nur treffbar.
+                */}
                 <button
                   type="button"
                   onClick={() => shiftMonth(-1)}
                   disabled={!canGoBack}
                   aria-label={t.termin.step2.prevMonth}
-                  className="text-muted-foreground hover:text-gold-text disabled:pointer-events-none disabled:opacity-30"
+                  className="text-muted-foreground hover:text-gold-text -m-3 p-3 disabled:pointer-events-none disabled:opacity-30"
                 >
                   <ChevronLeft className="size-5" strokeWidth={1.5} />
                 </button>
@@ -543,7 +562,7 @@ export function TerminWizard() {
                   type="button"
                   onClick={() => shiftMonth(1)}
                   aria-label={t.termin.step2.nextMonth}
-                  className="text-muted-foreground hover:text-gold-text"
+                  className="text-muted-foreground hover:text-gold-text -m-3 p-3"
                 >
                   <ChevronRight className="size-5" strokeWidth={1.5} />
                 </button>
