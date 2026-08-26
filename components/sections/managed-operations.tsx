@@ -137,10 +137,28 @@ export function ManagedOperations() {
           Prozentzahl, keine Stundenfrist. Wer sie hier liest, misst uns
           spaeter an dem, was wir wirklich gesagt haben.
         */}
+        {/*
+          MP10-4 — die Sektion fasst zusammen, die Seite fuehrt aus.
+
+          Der Verweis steht neben der Grenze der Zusage und nicht darueber:
+          Wer bis hierher gelesen hat, hat die sieben Bestandteile gesehen
+          und stellt jetzt die beiden Fragen, die hier keinen Platz haben —
+          warum ueberhaupt Betrieb, und wem das System dann gehoert.
+        */}
         <Reveal delay={0.16}>
-          <p className="type-small text-muted-foreground border-line mt-16 border-t pt-6 text-pretty">
-            {copy.note}
-          </p>
+          <div className="border-line mt-16 flex flex-col gap-6 border-t pt-6 sm:flex-row sm:items-baseline sm:justify-between">
+            <p className="type-small text-muted-foreground max-w-2xl text-pretty">{copy.note}</p>
+            <Link
+              href="/betrieb"
+              className="group text-gold-text hover:text-foreground inline-flex shrink-0 items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+            >
+              {t.nav.betrieb}
+              <ArrowUpRight
+                className="size-4 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                strokeWidth={1.5}
+              />
+            </Link>
+          </div>
         </Reveal>
       </div>
     </section>

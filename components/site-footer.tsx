@@ -60,6 +60,16 @@ export function SiteFooter() {
                 erreichbar — ein Footer darf vollstaendig sein, eine Leiste
                 nicht.
               */}
+              {/* MP10-4 — der Betrieb hat seit dieser Runde eine eigene
+                  Adresse; im Footer ist sie erreichbar, in der Leiste nicht. */}
+              <li>
+                <Link
+                  href="/betrieb"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                >
+                  {t.nav.betrieb}
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/kontakt"

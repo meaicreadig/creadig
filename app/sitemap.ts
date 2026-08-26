@@ -81,6 +81,10 @@ const entries: Entry[] = [
     priority: 0.6,
   })),
 
+  /* MP10-4 — der Betrieb ist das einzige wiederkehrende Angebot und hat
+     seit dieser Runde eine eigene Adresse. */
+  { path: "/betrieb", changeFrequency: "monthly", priority: 0.7 },
+
   { path: "/kontakt", changeFrequency: "monthly", priority: 0.9 },
   { path: "/termin", changeFrequency: "monthly", priority: 0.8 },
 

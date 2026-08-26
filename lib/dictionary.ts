@@ -455,6 +455,9 @@ export const dictionary = {
       arbeiten: "Arbeiten",
       unternehmen: "Unternehmen",
       insights: "Insights",
+      /* MP10-4 — steht im Footer, nicht in der Leiste: Der Betrieb ist ein
+         Kapitel unter „Leistungen", keine sechste Hauptrubrik. */
+      betrieb: "Managed Betrieb",
       /*
        * S-2 — die Menuewoerter sagen nicht, was dahinterliegt.
        *
@@ -1390,6 +1393,65 @@ export const dictionary = {
       },
       note: "Keine Verfügbarkeit in Prozent, keine Reaktionszeit in Stunden, kein „24/7“. Zugesagt ist, was hier steht — und das halten wir auch im Urlaub.",
     },
+    /*
+     * MP10-4 — DER BETRIEB HAT EINE EIGENE ADRESSE BEKOMMEN.
+     *
+     * -------------------------------------------------------------------------
+     * WARUM EINE SEKTION NICHT REICHTE
+     * „Managed Betrieb" stand als eine Sektion mitten auf /leistungen, zwischen
+     * den fuenf Ebenen und den Paketen. Genau der Teil, der dieses Haus von
+     * einer Agentur unterscheidet, die uebergibt und verschwindet, war damit
+     * ein Absatz auf einer Seite, die von etwas anderem handelt — nicht
+     * verlinkbar, nicht auffindbar, nicht suchbar.
+     *
+     * Der Betrieb ist ausserdem das Einzige im Angebot, das wiederkehrend ist.
+     * Ein wiederkehrendes Angebot ohne eigene Seite ist ein Angebot, das nur
+     * verkauft wird, wenn jemand zufaellig weit genug scrollt.
+     *
+     * Die Sektion bleibt, wo sie ist — sie fasst zusammen und verweist hierher.
+     * Diese Seite sagt, was dort keinen Platz hatte: WARUM Betrieb statt
+     * Uebergabe, und was das fuer die Abhaengigkeit des Kunden bedeutet.
+     *
+     * KEINE ZWEITE WAHRHEIT: Die sieben Bestandteile kommen aus `managed.items`
+     * (dieselben Texte wie in der Sektion), der Preis aus `site-data.retainer`,
+     * die Grenze der Zusage aus `managed.note`. Neu geschrieben ist hier nur,
+     * was es vorher nirgends gab.
+     */
+    betriebPage: {
+      eyebrow: "Betreiben",
+      title: "Übergeben ist einfach. Betreiben ist die Arbeit.",
+      lead: "Die meisten Projekte enden mit dem Livegang. Danach beginnt der Teil, den niemand verkauft: Updates, Ausfälle, Sicherheitslücken und die kleinen Änderungen, die plötzlich niemand mehr machen kann. Wir bleiben.",
+      metaTitle: "Managed Betrieb — Hosting, Monitoring, Updates, Backups",
+      metaDescription:
+        "creaDIG betreibt, was creaDIG gebaut hat: Hosting, Monitoring, Updates, Security, Backups, Support und Weiterentwicklung. Monatlich kündbar — System und Daten gehören Ihnen.",
+      whyLabel: "Warum Betrieb statt Übergabe",
+      why: [
+        {
+          name: "Wer gebaut hat, kennt die Stellen",
+          body: "Ein fremder Betreuer liest bei jedem Fehler zuerst fremden Code. Wir lesen unseren eigenen — deshalb ist die Antwort auf „geht das schnell?“ hier meistens ja.",
+        },
+        {
+          name: "Ein System altert, auch wenn niemand es anfasst",
+          body: "Abhängigkeiten bekommen Sicherheitslücken, Zertifikate laufen ab, Browser ändern ihre Regeln. Nichts davon kündigt sich an, und nichts davon wartet auf das nächste Projektbudget.",
+        },
+        {
+          name: "Der Ausfall kommt nicht zur Bürozeit",
+          body: "Er kommt nachts, am Wochenende, im Urlaub. Die Frage ist nicht, ob ihn jemand bemerkt, sondern wer zuerst: das Monitoring oder Ihr Kunde.",
+        },
+        {
+          name: "Was sich im Betrieb als falsch herausstellt, wird geändert",
+          body: "Kein Bau übersteht den ersten echten Monat unverändert. In einem Projekt mit Abnahmedatum wird so etwas dokumentiert und stehen gelassen. Im Betrieb wird es geändert.",
+        },
+      ],
+      /*
+       * Die Abhaengigkeits-Frage, an derselben Stelle beantwortet, an der sie
+       * entsteht. Dieselbe Auskunft steht als FAQ-Punkt auf /leistungen —
+       * die Zahl dazu kommt aus `site-data.retainer`, nicht aus diesem Text.
+       */
+      ownershipLabel: "Abhängigkeit",
+      ownershipTitle: "Betrieb heißt nicht Abhängigkeit.",
+      ownershipBody: "Das System und alle Daten darin gehören Ihnen, vom ersten Tag an. Die Betreuung ist monatlich kündbar, ohne Mindestlaufzeit. Danach bleibt alles bei Ihnen — Code, Inhalte, Zugänge und Domain. Was aufhört, ist die Betreuung, nicht Ihr Zugriff.",
+    },
     contact: {
       eyebrow: "Kontakt",
       /*
@@ -2179,6 +2241,7 @@ export const dictionary = {
       arbeiten: "İşler",
       unternehmen: "Şirket",
       insights: "Insights",
+      betrieb: "Managed işletme",
       hints: {
         leistungen: "Sizin için ne kurarız",
         produkte: "Kendi kurduğumuz ve işlettiğimiz sistemler — katalog değil, kanıt",
@@ -2748,6 +2811,36 @@ export const dictionary = {
       note: "Yüzdeyle verilmiş erişilebilirlik oranı yok, saatle verilmiş yanıt süresi yok, „7/24“ yok. Verdiğimiz söz burada yazandır — tatilde de tutarız.",
     },
 
+    betriebPage: {
+      eyebrow: "İşletme",
+      title: "Teslim etmek kolaydır. Asıl iş işletmektir.",
+      lead: "Çoğu proje yayına alınmayla biter. Asıl kimsenin satmadığı kısım ondan sonra başlar: güncellemeler, kesintiler, güvenlik açıkları ve bir anda kimsenin yapamadığı küçük değişiklikler. Biz kalırız.",
+      metaTitle: "Managed işletme — hosting, monitoring, güncelleme, yedekleme",
+      metaDescription:
+        "creaDIG kurduğu şeyi işletir: hosting, monitoring, güncellemeler, güvenlik, yedekler, destek ve geliştirme. Aylık iptal edilebilir — sistem ve veriler size aittir.",
+      whyLabel: "Neden teslim değil de işletme",
+      why: [
+        {
+          name: "Kuran, yerini bilir",
+          body: "Yabancı bir bakım ekibi her hatada önce yabancı kod okur. Biz kendi kodumuzu okuruz — bu yüzden „çabuk olur mu?“ sorusunun cevabı burada çoğu zaman evettir.",
+        },
+        {
+          name: "Sisteme kimse dokunmasa da yaşlanır",
+          body: "Bağımlılıklarda güvenlik açıkları çıkar, sertifikalar dolar, tarayıcılar kurallarını değiştirir. Hiçbiri önceden haber vermez ve hiçbiri bir sonraki proje bütçesini beklemez.",
+        },
+        {
+          name: "Kesinti mesai saatinde gelmez",
+          body: "Gece gelir, hafta sonu gelir, tatilde gelir. Soru birinin fark edip etmeyeceği değil, önce kimin fark edeceğidir: monitoring mi, müşteriniz mi.",
+        },
+        {
+          name: "İşletmede yanlış çıkan şey değiştirilir",
+          body: "Hiçbir yapı ilk gerçek ayı değişmeden atlatmaz. Teslim tarihli bir projede böyle bir şey belgelenir ve öylece bırakılır. İşletmede ise değiştirilir.",
+        },
+      ],
+      ownershipLabel: "Bağımlılık",
+      ownershipTitle: "İşletme, bağımlılık demek değildir.",
+      ownershipBody: "Sistem ve içindeki tüm veriler ilk günden itibaren size aittir. Bakım aylık olarak, asgari süre olmadan iptal edilebilir. Sonrasında her şey sizde kalır — kod, içerikler, erişimler ve alan adı. Biten şey bakımdır, erişiminiz değil.",
+    },
     contact: {
       eyebrow: "İletişim",
       title: "20 dakikada, bağlayıcı olmadan.",
