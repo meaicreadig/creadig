@@ -245,6 +245,13 @@ export const dictionary = {
         },
       },
       mailLabel: "E-Mail",
+      /*
+       * MP10-2.6 — steht nicht mehr auf der Seite. Der Halbsatz stand zweimal
+       * woertlich auf /kontakt: einmal neben der Adresse im Kopf, einmal in
+       * der E-Mail-Kachel weiter unten. Die Kachel behaelt ihn, weil sie ohne
+       * ihn nur eine Adresse ist; der Kopf ist der schnelle Griff. Der
+       * Schluessel bleibt fuer den Fall, dass ein anderer Ort ihn braucht.
+       */
       mailNote: "Für Unterlagen, Angebote und alles Schriftliche.",
     },
     /*
@@ -2243,6 +2250,13 @@ export const dictionary = {
         },
       },
       mailLabel: "E-posta",
+      /*
+       * MP10-2.6 — steht nicht mehr auf der Seite. Der Halbsatz stand zweimal
+       * woertlich auf /kontakt: einmal neben der Adresse im Kopf, einmal in
+       * der E-Mail-Kachel weiter unten. Die Kachel behaelt ihn, weil sie ohne
+       * ihn nur eine Adresse ist; der Kopf ist der schnelle Griff. Der
+       * Schluessel bleibt fuer den Fall, dass ein anderer Ort ihn braucht.
+       */
       mailNote: "Belgeler, teklifler ve yazılı her şey için.",
     },
     unternehmenPage: {

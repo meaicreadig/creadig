@@ -63,6 +63,9 @@ const PAGES = [
   { name: "05-arbeiten", path: "/arbeiten" },
   { name: "06-kontakt", path: "/kontakt" },
   { name: "07-unternehmen", path: "/unternehmen" },
+  /* MP10-4 — die beiden neuen Seiten. */
+  { name: "07b-betrieb", path: "/betrieb" },
+  { name: "07c-systeme", path: "/systeme" },
   { name: "08-termin", path: "/termin" },
   /*
    * BF-1 sitzt in Schritt 2, und den sieht man nicht, indem man die Adresse

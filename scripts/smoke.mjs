@@ -80,6 +80,11 @@ async function run() {
     "/insights",
     "/insights/eigene-seite-geprueft",
     "/tr/insights/eigene-seite-geprueft",
+    /* MP10-4 — die beiden Seiten dieser Runde, in beiden Sprachen. */
+    "/betrieb",
+    "/tr/betrieb",
+    "/systeme",
+    "/tr/systeme",
   ]) {
     await expectStatus(pathname, 200)
   }

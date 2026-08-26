@@ -107,6 +107,11 @@ const ROUTES = [
   { name: "produkt-detail", path: "/produkte/meai" },
   { name: "arbeiten", path: "/arbeiten" },
   { name: "unternehmen", path: "/unternehmen" },
+  /* MP10-4 — beide neuen Seiten, DE und TR. */
+  { name: "betrieb", path: "/betrieb" },
+  { name: "betrieb-tr", path: "/tr/betrieb" },
+  { name: "systeme", path: "/systeme" },
+  { name: "systeme-tr", path: "/tr/systeme" },
   { name: "kontakt", path: "/kontakt" },
   { name: "kontakt-tr", path: "/tr/kontakt" },
   { name: "termin-schritt1", path: "/termin" },

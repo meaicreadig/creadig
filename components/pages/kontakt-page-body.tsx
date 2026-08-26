@@ -53,9 +53,17 @@ export function KontaktPageBody() {
     <main>
       <PageHeader eyebrow={copy.eyebrow} title={copy.title}
         crumbLabel={t.nav.kontakt} lead={copy.lead}>
-        {/* E-Mail steht bewusst schon hier: Sie ist der einzige Weg, der ohne
-            Formular und ohne Messenger auskommt — und für alles Schriftliche
-            (Angebote, Unterlagen, Förderanträge) der richtige. */}
+        {/*
+          E-Mail steht bewusst schon hier: Sie ist der einzige Weg, der ohne
+          Messenger und ohne Assistent auskommt — und für alles Schriftliche
+          (Angebote, Unterlagen, Förderanträge) der richtige.
+
+          MP10-2.6: Der erklärende Halbsatz daneben ist gegangen. Seit die
+          direkten Wege unten eine eigene E-Mail-Kachel tragen, stand er
+          zweimal wörtlich auf derselben Seite — einmal hier und einmal
+          dort. Die Kachel behält ihn, weil sie ihn braucht; diese Zeile ist
+          der schnelle Griff, nicht die Erklärung.
+        */}
         <div className="border-line mt-12 flex flex-wrap items-baseline gap-x-6 gap-y-2 border-t pt-6">
           <p className="eyebrow text-gold-text">{copy.mailLabel}</p>
           <a
@@ -64,7 +72,6 @@ export function KontaktPageBody() {
           >
             {contact.email}
           </a>
-          <p className="type-small text-muted-foreground">{copy.mailNote}</p>
         </div>
       </PageHeader>
 
