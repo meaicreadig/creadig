@@ -1,6 +1,6 @@
 # creaDIG — vor dem Live-Flip nötig
 
-*Stand 25.08.2026 · nach Master-Prompt 8 · V2 (KIZILELMA §10 — von der Behauptung zum Beweis, Stufen 1–6) · Branch `feat/system-haus-site`*
+*Stand 26.08.2026 · nach Master-Prompt 10 · V3 (KIZILELMA §11 — Inhalt, Platzierung, Tiefe, Abschluss) · Branch `feat/system-haus-site`*
 
 Die Seite ist gebaut und geprüft. Was hier steht, kann **kein Entwickler erledigen** —
 es sind Entscheidungen, Zugangsdaten und Inhalte des Inhabers. Abschnitt A blockiert
@@ -123,6 +123,23 @@ wichtigere: Dort war die Behauptung unsichtbar und richtete sich an Google.
 Das ist kein Verlust, der ausgeglichen werden muss. Es kommt auch kein
 Ersatz, der ähnlich aussieht. Jede einzelne kommt zurück, sobald sie real
 erworben ist und sich nachschlagen lässt — mit Nachweis, Datum und Quelle.
+
+### A9 Neue Copy zur Freigabe (Master-Prompt 10 · V3, 26.08.2026)
+
+Zwei neue Seiten, zwei neue Ordnungen und ein Preis auf der Startseite —
+gebaut, geprüft, **nicht gelesen**. Wie bei A6 und A7 gilt: Es steht auf dem
+Branch, nicht live.
+
+| Was | Wo | Wozu der Blick |
+|---|---|---|
+| **`/betrieb`** — Managed Betrieb als eigene Seite, DE + TR | `lib/dictionary.ts` → `betriebPage` | Die Sektion war ein Block auf `/leistungen`, jetzt ist sie eine Seite. Der Kern ist der Satz „Wir übergeben nicht und verschwinden" — er ist ein Versprechen über Jahre, nicht über ein Projekt. Wenn ein Bestandteil nicht dauerhaft gehalten werden kann, gehört er hier gestrichen, nicht später erklärt. |
+| **`/systeme`** — „Integration first", DE + TR | `lib/dictionary.ts` → `systemePage`, `lib/systems.ts` | Die Seite beschreibt, WIE angebunden wird (API, Datenhaltung, Betrieb) — nicht, WAS. Die Liste der wirklich angebundenen Systeme ist leer und rendert nicht. Das ist Absicht: Es ist die einzige Angabe auf dieser Seite, die ein Kunde im Gespräch nachprüfen kann. |
+| **Vier Kauf-Fragen je Leistungsseite** | `lib/service-pages.ts` → `duration`, `fromTo`, `clientEffort`, `process` | Was kostet es, wie lange dauert es, was muss ich selbst tun, was bekomme ich. Wo eine Angabe fehlt, erscheint die Zeile nicht — geschätzte Projektdauern wären erfunden. **Die echten Dauern liefert nur der Owner.** |
+| **Preiszeile auf der Startseite** | `lib/dictionary.ts` → `home.entry` | Ein Satz mit einer Zahl („Website-Paket ab 2.400 € netto, Festpreis"), direkt nach den Fähigkeiten. Kein Paketblock. Die Zahl ist dieselbe wie in der Preisleiter — eine Zahl, drei Ansichten. |
+| **FAQ „Wem gehört das System?"** | `lib/dictionary.ts` → `faq.items` | Die Abhängigkeits-Sorge beim Dauerbetrieb, ausdrücklich beantwortet: System und Daten gehören dem Kunden, monatlich kündbar. **Das ist eine vertragliche Zusage** — sie muss im Vertrag genauso stehen. |
+| **`/kontakt` neu geordnet** | `lib/dictionary.ts` → `kontaktPage`, `contact` | Kein zweites volles Formular mehr. `/termin` ist der Abschluss, `/kontakt` sind die direkten Wege: Mail, WhatsApp, Sitz. Der Nav-CTA und der Startseiten-CTA zeigen auf `/termin`. |
+| **Insights-Fächer** | `lib/insights.ts` | Sechs Kategorien (Systems, Automation, AI, Products, Betrieb, Praxis). Fünf sind leer und erscheinen **nicht** — kein „Demnächst". |
+| **SEO-Landing-Struktur** | `lib/seo-landings.ts` | Steht und ist leer. **Der Owner nennt Städte und Leistungen**, dann bekommt jede Landing einen eigenen Text. Ein ausgetauschter Stadtname in derselben Vorlage ist Keyword-Müll und wird nicht gebaut. |
 
 ---
 
@@ -342,3 +359,69 @@ nichts live.
 **Was weiterhin offen ist:** Abschnitt A (Impressum, AVV, Umgebungsvariablen,
 Domain, Copy-Freigaben A6 und A7) und Abschnitt C. Die Struktur für alle
 Beweise aus §10 steht — es fehlt der Inhalt, und den liefert nur der Owner.
+
+---
+
+## Nachtrag: was nach Master-Prompt 10 · V3 geprüft wurde (26.08.2026)
+
+**Automatisch, bei jedem Build und in der CI** — unverändert: Function-Gate,
+Sterne-Gate, Paritäts-Gate. Dazu drei Läufe, die von Hand angestoßen werden:
+
+| Lauf | Was er entscheidet | Stand |
+|---|---|---|
+| `npm run smoke` | 29 Prüfungen: Statuscodes, OG-Bild, Lead-Route, Honeypot, Kurz-Check | 29/29 |
+| `npm run a11y` | 112 Durchläufe (28 Routen × 2 Fenster × 2 Erscheinungsbilder), axe gegen WCAG 2.1 AA | ohne Befund |
+| `npm run mobile` | **neu** — 6 Breiten × 16 Seiten: läuft die Seite seitwärts über, ist jede Bedienfläche ≥ 24 × 24 px (WCAG 2.2, 2.5.8) | ohne Befund |
+| `npm run vitals` | **neu** — Labormessung LCP / CLS / TTFB / Dokumentgröße, 7 Routen × 2 Fenster | alle unter den Schwellen |
+
+**Die Messung, und warum sie nicht „grün" sagt**
+
+`vitals` misst das Labor: dieselbe Maschine, kein Wettbewerb um Bandbreite.
+LCP 44–120 ms, CLS 0,000 durchgehend, TTFB 3–8 ms, Dokument 126–289 kB.
+Ein Laborwert unter der Schwelle heißt: **Es liegt nicht am Code.** Über echte
+Besuche sagt er nichts — die entstehen nach dem Livegang und stehen dann in
+der Search Console (B5). INP wird gar nicht gemessen: Der Wert entsteht aus
+echten Eingaben, und ein Skript, das sie simuliert, misst seine eigene
+Klickgeschwindigkeit.
+
+**Zwei Messgeräte haben zuerst gelogen — beide in dieselbe Richtung**
+
+1. `vitals` meldete im ersten Lauf 14 Striche und darunter „alle unter den
+   Schwellen". Drei Fehler: LCP und Layout-Verschiebungen wurden mit
+   `getEntriesByType` abgefragt (Chrome liefert beide nur an einen
+   `PerformanceObserver`), die Dokumentgröße kam aus einem `content-length`,
+   das bei stückweiser Auslieferung leer ist, und die Voreinwilligung schrieb
+   `creadig-consent` statt `creadig_consent` — sie griff also nie, das Banner
+   stand auf jeder Seite, und **gemessen wurde der Banner-Text**.
+2. `mobile` meldete im ersten Lauf 919 zu kleine Bedienflächen und 607
+   Überläufe. Fast alles falsch: die unsichtbare Sprungmarke, Textlinks mit
+   40 px Luft ringsum, und hunderte SVG-Gruppen, die ihr eigenes Element
+   längst abschneidet.
+
+Beide sind repariert und tragen jetzt eine Wache: `vitals` bricht ab, wenn das
+Einwilligungs-Banner doch noch steht, und wertet „kein Wert" als Fehlschlag
+statt als Erfolg. `mobile` fragt nicht mehr „ragt irgendwo etwas hinaus",
+sondern „lässt sich die Seite seitwärts schieben" — die Frage, die den
+Besucher betrifft.
+
+**Der eine echte Befund**
+
+Die Monatspfeile im Terminassistenten waren genau so groß wie ihr Symbol:
+**20 × 20 px**, ohne Innenabstand. Das axe-Gate meldet das nicht — es fährt
+WCAG 2.1, und die 24-px-Regel steht in 2.2 (Kriterium 2.5.8). Für ein Haus,
+das ab dem 23.08.2026 Barrierefreiheits-Prüfungen anbietet, ist die eigene
+Terminseite der falsche Ort dafür.
+
+Behoben mit `-m-3 p-3`: Die Fläche wächst auf 44 px, die negative Außenmarge
+nimmt dem Layout zurück, was der Innenabstand hinzufügt. Die Zeile ist keinen
+Pixel höher — nur treffbar.
+
+**Was diese Runde NICHT getan hat:** kein Redesign (die Design-Identität „Der
+Schnitt" läuft als separater Durchlauf), keine erfundene Zahl, keine erfundene
+Referenz, kein erfundenes Zertifikat, nichts auf `main`, nichts live.
+
+**Was weiterhin offen ist:** Abschnitt A (Impressum, AVV, Umgebungsvariablen,
+Domain, Copy-Freigaben A6, A7 und **A9**) und Abschnitt C. Dazu zwei
+Entscheidungen aus §11, die jetzt auch auf `/status` stehen: ob die Seite auf
+den 50k-Kunden zielen soll, und ob die türkische Nische bewusst besessen wird.
+Unentschieden ist bei beiden die einzige Antwort, die nichts bringt.

@@ -303,5 +303,109 @@ Thought-Leadership) — der erste Artikel steht seit BF-A9, weitere sind
 Owner-Inhalt und keine Struktur. Die Gefäße dafür existieren.
 
 ---
-*Quelle: Vollaudit (4 Lanes + Roter Agent), 2026-08-22 · v0-Review und Master-Prompt 6, 2026-08-23 · Master-Prompt 7 (Barrierefreiheit), 2026-08-23 · KIZILELMA §10 / Master-Prompt 8 V2, 2026-08-25.*
 
+## MASTER-PROMPT 10 · V3 — Inhalt, Platzierung, Tiefe & Abschluss (26.08.2026)
+
+Grundprinzip dieser Runde: **nicht mehr behaupten, sondern platzieren und
+messen.** Nichts Neues erfunden — das Vorhandene dorthin gebracht, wo die
+Kauf-Fragen gestellt werden, und nachgeprüft, ob es hält.
+
+### Stufe 1 — Leistungen-Tiefe
+- [x] **MP10-1** Die vier Kauf-Fragen je Leistungsseite: Was kostet es, wie
+      lange dauert es, was muss ich beitragen, was bekomme ich. Alle vier als
+      **optionale Felder** (`duration`, `fromTo`, `clientEffort`, `process`) —
+      fehlt eine Angabe, rendert der Abschnitt nicht und die Lücke steht auf
+      `/status`. Eine geschätzte Projektdauer wäre erfunden.
+
+### Stufe 2 — Platzierung nach Käufer-Fragen
+- [x] **MP10-2.1** Eine Zahl auf die Startseite (`home.entry`), ein Satz, kein
+      Paketblock.
+- [x] **MP10-2.2/2.7/2.8/2.10** Eine Aufzählung statt vier gegen fünf Ebenen ·
+      Fragen vor Preisen auf `/leistungen` · FAQ „Wem gehört das System?" ·
+      `/status` dezent in die Fußzeile.
+- [x] **MP10-2.3** Projektdauer neben jeden Preis — leer heißt gegatet.
+- [x] **MP10-2.4/2.5** Verweis am Ende der Werkschau · Sitz-Erwähnungen von
+      sechs auf zwei · ortsabhängiger Abschluss.
+- [x] **MP10-2.6** `/termin` ist der Abschluss, `/kontakt` der direkte Weg.
+      Kein zweites volles Formular. Dabei fiel auf: Der erklärende Halbsatz
+      stand danach **zweimal wörtlich** auf `/kontakt` — einmal im Kopf, einmal
+      in der E-Mail-Kachel. Der Kopf ist der schnelle Griff, die Kachel behält
+      die Erklärung.
+- [x] **MP10-2.9** Logo-Wand: Der Auftrag lautete „entfernen, solange nur
+      unfreigegebene Fremdmarken". Sie ist nicht ausgebaut, sondern **an die
+      Daten gehängt** — `CLIENT_LOGOS` ist leer, also rendert die Sektion
+      nicht. Das Ergebnis ist dasselbe, der Unterschied zählt trotzdem: Kommt
+      eine echte Freigabe, genügt eine Datei im Verzeichnis. Ausgebaut müsste
+      man sie neu schreiben.
+
+### Stufe 3 — Betriebsreife
+- [x] **Nachgeprüft:** `aggregateRating` gelangt bei 0 Bewertungen nicht ins
+      JSON-LD — das Sterne-Gate bestätigt es bei jedem Build (53 Dokumente,
+      keins mit Sternen).
+- [x] **Nachgeprüft:** BF-9 „größerer Umfang: auf Anfrage" steht sichtbar über
+      der Preisleiter, ohne Zahl.
+- [x] **BF-7** bleibt bei der gemessenen Entscheidung: **kein Nonce.** Im
+      gebauten HTML stehen 43 Inline-Skripte, 40 davon gehören dem Framework
+      (`self.__next_f.push`) und sind je Seite anders, also nicht hashbar. Ein
+      Nonce müsste je Anfrage neu sein — damit würden 53 statische Seiten zu 53
+      Funktionen, ohne CDN-Zwischenspeicher. Der Gegenwert wäre Schutz gegen
+      eingeschleustes Inline-JavaScript; eine Stelle, an der fremde Eingaben
+      ins HTML gelangen, gibt es hier nicht.
+- [x] **BF-8** Reaktionszusage an **einer** Stelle: „innerhalb von zwei
+      Werktagen". Vorher standen „nächster Werktag" und „24 Stunden"
+      nebeneinander — beides für ein founder-led Haus an einem Freitagabend
+      nicht haltbar. Die Bestätigung ist Owner-Sache und steht auf `/status`.
+
+### Stufe 4 — Fehlende Seiten
+- [x] **MP10-4** `/betrieb` — Managed Betrieb als eigene Seite statt als Block.
+- [x] **MP10-4** `/systeme` — „Integration first". Beschreibt das WIE; die
+      Liste der wirklich angebundenen Systeme ist leer und rendert nicht.
+- [x] **MP10-4** Insights-Kategorien (sechs Fächer). Leere Fächer erscheinen
+      **nicht** — kein „Demnächst".
+
+### Stufe 5 — SEO, Mobile, Performance
+- [x] **MP10-5** SEO-Landing-Architektur vorbereitet, Inhalt Owner-gegatet.
+      Ohne die Owner-Liste (Städte/Leistungen) existiert keine einzige Adresse
+      — ein ausgetauschter Stadtname in derselben Vorlage wäre Keyword-Müll.
+- [x] **MP10-5** `npm run vitals` — Labormessung LCP/CLS/TTFB/Dokumentgröße.
+      **Der erste Lauf war wertlos und meldete trotzdem Erfolg:** LCP und
+      Layout-Verschiebungen mit `getEntriesByType` abgefragt (Chrome liefert
+      beide nur an einen `PerformanceObserver`), Dokumentgröße aus einem leeren
+      `content-length`, und die Voreinwilligung schrieb `creadig-consent` statt
+      `creadig_consent` — gemessen wurde das Einwilligungs-Banner. Repariert,
+      und „kein Wert" zählt jetzt als Fehlschlag statt als Erfolg.
+- [x] **MP10-5** `npm run mobile` — 6 Breiten × 16 Seiten. **Auch hier zwei
+      Anläufe:** 919 gemeldete Bedienflächen und 607 Überläufe waren fast alle
+      falsch (unsichtbare Sprungmarke, Textlinks mit Luft ringsum, gekappte
+      SVG-Gruppen). Die Abstands-Ausnahme aus WCAG 2.5.8 fehlte, und die Frage
+      war falsch gestellt — nicht „ragt etwas hinaus", sondern „lässt sich die
+      Seite schieben".
+- [x] **MP10-5** Der eine echte Befund: Monatspfeile im Terminassistenten
+      **20 × 20 px**. Das axe-Gate meldet das nicht — es fährt WCAG 2.1, die
+      24-px-Regel steht in 2.2. Behoben mit `-m-3 p-3`: Fläche 44 px, Layout
+      unverändert.
+- [x] **Nachgeprüft:** Bilder laufen über `next/image` mit AVIF vor WebP, jedes
+      `<Image>` trägt `sizes`, verzögertes Laden ist Vorgabe. Schriften kommen
+      über `next/font` mit `latin` + `latin-ext` — die türkischen Zeichen
+      hängen an `latin-ext`.
+
+### Stufe 6 — Abschluss
+- [x] **MP10-6** `/status` trägt jetzt auch Domain, Reaktionszusage und die
+      beiden offenen Entscheidungen aus §11. Eine offene Entscheidung blockiert
+      Arbeit genauso zuverlässig wie ein fehlendes Bild — nur fällt sie
+      niemandem auf, weil sie nirgends als Lücke sichtbar wird.
+- [x] **MP10-6** Live-Checkliste (A9 + Nachtrag) und dieses Backlog
+      aktualisiert; der Abschluss-Prompt von Master-Prompt 9 ist gelöscht.
+
+**Bewusst nicht getan:** Design-Identität „Der Schnitt" (separater Durchlauf),
+keine erfundenen Zahlen, Referenzen oder Zertifikate, kein Push nach `main`,
+kein Livegang.
+
+**Offen und nur vom Owner zu schließen:** 40 Posten auf `/status` — darunter
+Impressum, AVV, Umgebungsvariablen, Domain, die SEO-Ziele, die echten
+Projektdauern, die Fallinhalte für NV SWISS und maqam, und die beiden
+Entscheidungen (50k-Kunde, TR-Nische).
+
+---
+
+*Quelle: Vollaudit (4 Lanes + Roter Agent), 2026-08-22 · v0-Review und Master-Prompt 6, 2026-08-23 · Master-Prompt 7 (Barrierefreiheit), 2026-08-23 · KIZILELMA §10 / Master-Prompt 8 V2, 2026-08-25 · KIZILELMA §11 / Master-Prompt 10 V3, 2026-08-26.*
