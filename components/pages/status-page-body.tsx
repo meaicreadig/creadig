@@ -28,10 +28,14 @@ import { localePath } from "@/lib/routes"
  *
  * ---------------------------------------------------------------------------
  * WARUM WHATSAPP UND E-MAIL DANEBEN STEHEN
- * Die Kontaktseite ist einer der drei Wege zurück. Sie führt aber auf ein
- * Formular, und das Formular hängt an `app/api/lead` — die antwortet ohne
- * Konfiguration mit 503. Ein Ausweg, der selbst ausfallen kann, ist kein
- * Ausweg; die beiden direkten Wege hängen an nichts.
+ * Die Kontaktseite ist einer der drei Wege zurück, und sie ist selbst eine
+ * Seite, die geladen werden muss. Auf einer Fehlerseite ist das ein Weg zu
+ * viel: WhatsApp und E-Mail hängen an nichts, was in diesem Moment gerade
+ * kaputt sein könnte — kein Routing, keine API, keine Konfiguration.
+ *
+ * MP10-2.6: Hier stand, das Formular auf /kontakt hänge an `app/api/lead`.
+ * Das Formular gibt es dort nicht mehr; der Grund für die beiden direkten
+ * Wege bleibt derselbe.
  */
 export function StatusPageBody({
   locale,

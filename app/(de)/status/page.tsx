@@ -21,7 +21,7 @@ import {
 import { CLIENT_LOGOS } from "@/lib/client-logos.generated"
 import { COMPANY_PHOTOS, COMPANY_PHOTO_SLOTS } from "@/lib/company-media.generated"
 import { productScreens } from "@/lib/product-media"
-import { publishedInsights } from "@/lib/insights"
+import { emptyInsightCategories, publishedInsights } from "@/lib/insights"
 import { publishedServicePages } from "@/lib/service-pages"
 import { connectedSystems } from "@/lib/systems"
 
@@ -112,6 +112,18 @@ function collect(): { open: Item[]; done: Item[] } {
     owner:
       "Owner: Systeme, die wir wirklich angebunden haben — Name + ein Satz je Eintrag. " +
       "Es ist die einzige Angabe auf /systeme, die ein Kunde im Gespräch nachprüfen kann.",
+  })
+
+  items.push({
+    label: "Insight-Fächer (MP10-4)",
+    ok: emptyInsightCategories.length === 0,
+    detail:
+      emptyInsightCategories.length === 0
+        ? "alle sechs Fächer gefüllt"
+        : `leer: ${emptyInsightCategories.join(", ")} — diese Fächer erscheinen nicht auf /insights.`,
+    owner:
+      "Owner: je Fach mindestens ein Beitrag aus dem eigenen Betrieb. " +
+      "Leere Fächer werden NICHT als „Demnächst“ angezeigt.",
   })
 
   items.push({

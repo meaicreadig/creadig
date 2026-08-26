@@ -182,6 +182,22 @@ export const dictionary = {
       emptyCtaProducts: "Was wir gebaut haben",
       emptyCtaWorks: "Zur Werkschau",
       readLabel: "Lesen",
+      /*
+       * MP10-4 — die sechs Faecher.
+       *
+       * Sichtbar sind nur die gefuellten (siehe `lib/insights.ts`). Die Namen
+       * stehen hier und nicht in den Daten, weil sie uebersetzt werden — der
+       * Schluessel ist die Wahrheit, das Wort ist die Sprache.
+       */
+      categoriesLabel: "Worüber wir schreiben",
+      categories: {
+        systems: "Systeme",
+        automation: "Automatisierung",
+        ai: "Künstliche Intelligenz",
+        products: "Produkte",
+        betrieb: "Betrieb",
+        praxis: "Praxis",
+      },
       /* BF-A9 — die Detailseite. Sie kam erst mit dem ersten Text, der
          laenger ist als ein Anreisser. */
       publishedLabel: "Veröffentlicht",
@@ -2181,6 +2197,15 @@ export const dictionary = {
       emptyCtaProducts: "Ne inşa ettik",
       emptyCtaWorks: "Seçkiye git",
       readLabel: "Oku",
+      categoriesLabel: "Ne hakkında yazıyoruz",
+      categories: {
+        systems: "Sistemler",
+        automation: "Otomasyon",
+        ai: "Yapay zekâ",
+        products: "Ürünler",
+        betrieb: "İşletme",
+        praxis: "Pratik",
+      },
       publishedLabel: "Yayımlandı",
       sourcesLabel: "Kaynaklar",
       sourceStatement: "Bu sitenin erişilebilirlik beyanı",

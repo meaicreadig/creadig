@@ -6,7 +6,7 @@ import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { Reveal } from "@/components/ui/reveal"
 import { ClosingCta } from "@/components/sections/closing-cta"
-import { publishedInsights } from "@/lib/insights"
+import { filledInsightCategories, insightsInCategory, publishedInsights } from "@/lib/insights"
 
 /**
  * System-Notes (PHASE A — Gerüst).
@@ -22,6 +22,17 @@ import { publishedInsights } from "@/lib/insights"
  * Der leere Zustand ist der wahrscheinlichere und darum der sorgfältiger
  * gebaute: Er darf nicht wie ein Fehler aussehen, sondern wie eine
  * Entscheidung.
+ *
+ * ---------------------------------------------------------------------------
+ * MP10-4 — DIE LISTE IST NACH FAECHERN SORTIERT, NICHT NUR NACH DATUM
+ * Sechs Faecher stehen in `lib/insights.ts` fest. Gezeigt werden nur die,
+ * in denen etwas steht — ein leeres Fach waere eine „Demnaechst"-Kachel mit
+ * anderem Namen, und genau die lehnt dieser Bereich seit PHASE A ab. Welche
+ * Faecher leer sind, sagt `/status` dem Owner, nicht dem Besucher.
+ *
+ * Mit einem Beitrag sieht man davon eine Ueberschrift. Das ist der Punkt:
+ * Die Struktur ist da, bevor der zweite Text existiert, und sie muss beim
+ * dritten nicht nachgebaut werden.
  */
 export function InsightsPageBody() {
   const { t, locale } = useLocale()
@@ -63,10 +74,24 @@ export function InsightsPageBody() {
           ) : (
             <>
               <h2 id="insights-title" className="sr-only">
-                {copy.eyebrow}
+                {copy.categoriesLabel}
               </h2>
-              <ul className="flex flex-col">
-                {entries.map((entry, i) => (
+              {filledInsightCategories.map((categoryKey, groupIndex) => (
+                <section
+                  key={categoryKey}
+                  aria-labelledby={`insights-${categoryKey}`}
+                  className={groupIndex === 0 ? "" : "mt-20"}
+                >
+                  <Reveal>
+                    <h3
+                      id={`insights-${categoryKey}`}
+                      className="eyebrow text-gold-text"
+                    >
+                      {copy.categories[categoryKey]}
+                    </h3>
+                  </Reveal>
+                  <ul className="mt-8 flex flex-col">
+                    {insightsInCategory(categoryKey).map((entry, i) => (
                   <Reveal key={entry.slug} as="li" delay={0.05 * i} className="group">
                     {/*
                       Der ganze Eintrag ist der Link, nicht nur ein „Lesen"
@@ -104,8 +129,10 @@ export function InsightsPageBody() {
                     </Link>
                   </Reveal>
                 ))}
-              </ul>
-              <div className="border-line border-t" />
+                  </ul>
+                  <div className="border-line border-t" />
+                </section>
+              ))}
             </>
           )}
         </div>

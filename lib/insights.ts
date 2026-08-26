@@ -48,8 +48,50 @@ export type InsightBlock =
   /** Abgesetzt, für den Satz, der die Grenze zieht. */
   | { kind: "note"; text: Localized }
 
+/**
+ * MP10-4 — DIE KATEGORIEN.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM SIE VOR DEN ARTIKELN KOMMEN
+ * Ein Bereich mit einem Beitrag ist ein Zufall; ein Bereich mit sechs Faechern
+ * und einem gefuellten Fach ist ein Anfang. Der Unterschied liegt nicht im
+ * Inhalt, sondern darin, ob erkennbar ist, WORUEBER hier geschrieben wird —
+ * und das laesst sich festlegen, bevor der zweite Text existiert.
+ *
+ * Die sechs Faecher sind nicht frei erfunden: Es sind die fuenf Ebenen des
+ * Hauses, zusammengefasst auf das, worueber sich aus dem eigenen Betrieb
+ * ueberhaupt etwas sagen laesst, plus „Praxis" fuer den Befund am eigenen
+ * Objekt (dort liegt der erste Beitrag).
+ *
+ * ---------------------------------------------------------------------------
+ * WAS DIE KATEGORIEN NICHT TUN
+ * Sie erscheinen NICHT als leere Regalbretter auf der Seite. Ein Fach ohne
+ * Beitrag ist eine „Demnaechst"-Kachel mit anderem Namen, und die hat dieser
+ * Bereich schon einmal ausdruecklich abgelehnt (siehe den leeren Zustand in
+ * `components/pages/insights-page-body.tsx`). Sichtbar sind nur Faecher, in
+ * denen etwas steht; welche leer sind, sagt `/status` dem Owner.
+ */
+export const insightCategoryKeys = [
+  "systems",
+  "automation",
+  "ai",
+  "products",
+  "betrieb",
+  "praxis",
+] as const
+
+export type InsightCategoryKey = (typeof insightCategoryKeys)[number]
+
 export type Insight = {
   slug: string
+  /**
+   * Das Fach, in dem der Beitrag steht. Pflicht — ein Beitrag ohne Fach
+   * waere der Anfang einer Liste, die keine Struktur mehr hat.
+   *
+   * Nicht dasselbe wie `topic`: Das Fach ist das Regal (sechs Stueck, fest),
+   * `topic` ist das Etikett auf dem Ruecken (zwei bis drei Worte, frei).
+   */
+  category: InsightCategoryKey
   /** Veröffentlichungsdatum, ISO (YYYY-MM-DD). Bestimmt die Reihenfolge. */
   date: string
   /** Einordnung in zwei bis drei Worten. */
@@ -86,6 +128,8 @@ export const insights: Insight[] = [
      * beinahe als Ergebnis durchgegangen waere.
      */
     slug: "eigene-seite-geprueft",
+    /* Praxis: ein Befund am eigenen Objekt, keine Ebenen-Lehre. */
+    category: "praxis",
     date: "2026-08-23",
     topic: { de: "Barrierefreiheit", tr: "Erişilebilirlik" },
     title: {
@@ -242,3 +286,21 @@ export const readableInsights = publishedInsights.filter((entry) => entry.body.l
 export function findInsight(slug: string) {
   return readableInsights.find((entry) => entry.slug === slug)
 }
+
+/** Beitraege eines Fachs, neueste zuerst. */
+export function insightsInCategory(key: InsightCategoryKey) {
+  return publishedInsights.filter((entry) => entry.category === key)
+}
+
+/**
+ * Nur Faecher, in denen etwas steht — in der festen Reihenfolge oben, damit
+ * die Leiste nicht bei jedem neuen Beitrag umspringt.
+ */
+export const filledInsightCategories = insightCategoryKeys.filter(
+  (key) => insightsInCategory(key).length > 0,
+)
+
+/** Was der Owner noch fuellen muss. Wird auf `/status` gelesen. */
+export const emptyInsightCategories = insightCategoryKeys.filter(
+  (key) => insightsInCategory(key).length === 0,
+)
