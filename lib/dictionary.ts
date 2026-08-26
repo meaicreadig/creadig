@@ -458,6 +458,7 @@ export const dictionary = {
       /* MP10-4 — steht im Footer, nicht in der Leiste: Der Betrieb ist ein
          Kapitel unter „Leistungen", keine sechste Hauptrubrik. */
       betrieb: "Managed Betrieb",
+      systeme: "Systeme",
       /*
        * S-2 — die Menuewoerter sagen nicht, was dahinterliegt.
        *
@@ -1417,6 +1418,129 @@ export const dictionary = {
      * die Grenze der Zusage aus `managed.note`. Neu geschrieben ist hier nur,
      * was es vorher nirgends gab.
      */
+    /*
+     * MP10-4 — DIE SYSTEM-SEITE.
+     *
+     * Warum sie keine Logo-Wand ist, steht in `lib/systems.ts`. Was hier steht,
+     * ist die Arbeitsweise: welche Fragen vor dem Bau geklaert werden, wie
+     * betrieben wird, und was an dieser Seite selbst nachpruefbar ist.
+     *
+     * Der letzte Abschnitt ist der eigentliche Grund fuer die Seite. Alles
+     * andere darauf ist eine Beschreibung; die sieben Punkte unter
+     * „nachpruefbar" sind ein Beleg — jeder einzelne im Antwort-Header, im
+     * ausgelieferten HTML oder im Repo kontrollierbar, ohne uns zu fragen.
+     */
+    systemePage: {
+      eyebrow: "Systeme",
+      title: "Integration first.",
+      lead: "Ein neues System ersetzt selten alles. Meistens muss es neben dem laufen, was schon da ist — und mit ihm reden. Was dabei zu klären ist, steht hier.",
+      metaTitle: "Systeme & Integration — Schnittstellen, Daten, Betrieb",
+      metaDescription:
+        "Wie creaDIG Systeme anbindet und betreibt: Schnittstellen, Daten, Hosting, Abrechnung, Belege, Zugänge, KI-Dienste. Dazu sieben Punkte, die an dieser Seite selbst nachprüfbar sind.",
+      statement: "Ein System, das nur für sich funktioniert, ist ein zweiter Ort, an dem dieselben Daten gepflegt werden. Genau das wollte niemand.",
+      /* Kurzes Wort oben, ganzer Satz als Ueberschrift — sonst stuenden
+         Eyebrow und H2 zweimal mit demselben Text uebereinander. */
+      categoriesEyebrow: "Integration",
+      categoriesLabel: "Womit ein System sprechen muss.",
+      categoriesNote: "Kein Anbieter-Katalog. Hier steht, was wir vor dem Bau klären — nicht, welche fremden Marken wir angeblich beherrschen. Was wir tatsächlich angebunden haben, sagen wir im Gespräch mit Namen.",
+      categoryQuestionLabel: "Was zuerst geklärt wird",
+      categories: {
+        interfaces: {
+          name: "Schnittstellen",
+          body: "Fast jedes System muss Daten irgendwo holen oder abgeben. Ob dafür eine Schnittstelle existiert, entscheidet über den halben Aufwand — und es entscheidet sich vor dem ersten Entwurf, nicht mitten im Bau.",
+          question: "Gibt es eine dokumentierte Schnittstelle, einen Export oder gar nichts?",
+        },
+        data: {
+          name: "Daten und Datenbanken",
+          body: "Wo die Daten leben, wem sie gehören und wie sie aussehen, wenn sie einmal falsch sind. Ein Datenmodell, das den Betrieb nicht abbildet, wird im Betrieb umgangen — dann pflegt jemand wieder eine Tabelle nebenher.",
+          question: "Welcher Bestand ist die Wahrheit, wenn zwei Stellen sich widersprechen?",
+        },
+        hosting: {
+          name: "Hosting und Auslieferung",
+          body: "Wo es läuft, wie es dorthin kommt und was passiert, wenn eine Auslieferung schiefgeht. Kein Nebenthema: Es entscheidet über Tempo, Erreichbarkeit und darüber, ob eine Änderung Minuten oder Tage braucht.",
+          question: "Wer hat heute Zugriff auf Server, Domain und Zertifikate?",
+        },
+        billing: {
+          name: "Abrechnung und Zahlungen",
+          body: "Der Teil, an dem sich Fehler in Geld ausdrücken. Beträge, Steuersätze, Belege, Fristen — und die Regeln des Landes, in dem abgerechnet wird. Hier wird nichts geschätzt und nichts gerundet.",
+          question: "Nach welchen Regeln wird gerechnet, und wer prüft das Ergebnis?",
+        },
+        documents: {
+          name: "Dokumente und Belege",
+          body: "Verträge, Rechnungen, Nachweise, Fotos vom Einsatz. Sie entstehen unterwegs und müssen wiederfindbar sein — sonst wird das System zur Ablage, in die niemand mehr hineinsieht.",
+          question: "Was muss wie lange auffindbar bleiben — und für wen?",
+        },
+        accounts: {
+          name: "Zugänge und Rechte",
+          body: "Wer darf was sehen, wer darf was ändern, und was passiert, wenn jemand geht. Die unauffälligste Frage im Projekt und die, die im Betrieb am häufigsten weh tut.",
+          question: "Welche Rollen gibt es wirklich — nicht im Organigramm, sondern im Alltag?",
+        },
+        ai: {
+          name: "KI-Dienste",
+          body: "Sinnvoll dort, wo etwas gelesen, sortiert oder vorbereitet werden muss, das heute jemand von Hand macht. Nicht sinnvoll als Etikett auf einem System, das ohnehin funktioniert hätte.",
+          question: "Welcher Schritt kostet heute Zeit — und darf eine Maschine ihn vorbereiten?",
+        },
+      },
+      connectedLabel: "Angebunden",
+      operationsEyebrow: "Praxis",
+      operationsLabel: "Wie wir betreiben.",
+      operationsNote: "Was davon als Leistung buchbar ist, steht auf der Seite zum Managed Betrieb.",
+      operations: {
+        monitoring: {
+          name: "Monitoring",
+          body: "Die Systeme melden sich selbst, wenn sie nicht erreichbar sind. Bei der Anfragestrecke geht das weiter: Ein Selbsttest prüft, ob eine Anfrage überhaupt noch zugestellt werden kann — ein stiller Ausfall dort sieht von außen aus wie schlechte Marktlage.",
+        },
+        logging: {
+          name: "Logging",
+          body: "Genug, um einen Fehler zu finden. Nicht mehr, als sich verantworten lässt: Was jemand in ein Formular geschrieben hat, steht in keinem Protokoll.",
+        },
+        backups: {
+          name: "Backups",
+          body: "Gesichert und zurückgespielt. Ein Backup, das nie zurückgespielt wurde, ist keins — es ist eine Datei, von der man hofft.",
+        },
+        security: {
+          name: "Security",
+          body: "Zugänge, Rechte, Transportverschlüsselung und Antwort-Header auf dem Stand, der beim Bau gesetzt wurde — und danach nachgemessen, nicht angenommen.",
+        },
+        deployment: {
+          name: "Deployment",
+          body: "Jede Änderung nimmt denselben Weg: bauen, prüfen, ausliefern. Bricht eine der Prüfungen, wird nicht ausgeliefert — auch dann nicht, wenn es eilig ist.",
+        },
+      },
+      proofEyebrow: "Beleg",
+      proofLabel: "An dieser Seite nachprüfbar.",
+      proofNote: "Zeigen ist besser als behaupten. Jeder Punkt lässt sich von außen im Antwort-Header, im ausgelieferten Quelltext oder im Repo kontrollieren — ohne uns zu fragen.",
+      proofs: {
+        headers: {
+          name: "Sicherheits-Header",
+          body: "HSTS mit Subdomains und Preload, X-Content-Type-Options, Referrer-Policy, X-Frame-Options auf DENY, Permissions-Policy und eine Content-Security-Policy, die object-src, base-uri, form-action und frame-ancestors bereits scharf setzt.",
+        },
+        static: {
+          name: "Statisch ausgeliefert",
+          body: "Die Seiten werden zur Bauzeit erzeugt und vom CDN ausgeliefert, nicht bei jedem Aufruf gerendert. Das ist der Grund, warum sie schnell ist — und warum ein Ausfall der Anwendung sie nicht sofort mitnimmt.",
+        },
+        bilingual: {
+          name: "Zwei Sprachen, zwei Adressen",
+          body: "Deutsch und Türkisch haben eigene URLs, eigene Titel, eigene strukturierte Daten und sind über hreflang verbunden — nicht ein Schalter, der im Browser Text austauscht.",
+        },
+        images: {
+          name: "Bilder in AVIF und WebP",
+          body: "Die Aufnahmen werden zur Bauzeit umgerechnet und in der Größe ausgeliefert, die das Layout wirklich braucht. Wer AVIF nicht kann, bekommt WebP — automatisch, nicht per Weiche im Code.",
+        },
+        gates: {
+          name: "Drei Prüfungen im Build",
+          body: "Der Build bricht ab, wenn eine Funktion zu groß wird, wenn strukturierte Daten Sterne behaupten würden, die es nicht gibt, oder wenn eine Leistungsseite auf Türkisch weniger sagt als auf Deutsch. Keine Absichtserklärung — ein Abbruch.",
+        },
+        selftest: {
+          name: "Selbsttest der Anfragestrecke",
+          body: "Eine eigene Route prüft, ob Schlüssel, Absender-Domain und Missbrauchsschutz der Anfragestrecke noch funktionieren, ohne dabei eine Mail zu verschicken. Fällt eine Prüfung, antwortet sie mit einem Fehler, den ein Wächter versteht.",
+        },
+        accessibility: {
+          name: "Eigene Barrierefreiheits-Prüfung, offengelegt",
+          body: "Wir haben diese Seite selbst geprüft und die gefundenen Mängel veröffentlicht, statt eine Erklärung ohne Befund abzugeben. Nachzulesen unter Barrierefreiheit.",
+        },
+      },
+    },
     betriebPage: {
       eyebrow: "Betreiben",
       title: "Übergeben ist einfach. Betreiben ist die Arbeit.",
@@ -2242,6 +2366,7 @@ export const dictionary = {
       unternehmen: "Şirket",
       insights: "Insights",
       betrieb: "Managed işletme",
+      systeme: "Sistemler",
       hints: {
         leistungen: "Sizin için ne kurarız",
         produkte: "Kendi kurduğumuz ve işlettiğimiz sistemler — katalog değil, kanıt",
@@ -2811,6 +2936,115 @@ export const dictionary = {
       note: "Yüzdeyle verilmiş erişilebilirlik oranı yok, saatle verilmiş yanıt süresi yok, „7/24“ yok. Verdiğimiz söz burada yazandır — tatilde de tutarız.",
     },
 
+    systemePage: {
+      eyebrow: "Sistemler",
+      title: "Önce entegrasyon.",
+      lead: "Yeni bir sistem nadiren her şeyin yerine geçer. Çoğu zaman hâlihazırda çalışanın yanında çalışması ve onunla konuşması gerekir. Bunun için nelerin netleşmesi gerektiği burada yazıyor.",
+      metaTitle: "Sistemler & entegrasyon — arayüzler, veri, işletme",
+      metaDescription:
+        "creaDIG sistemleri nasıl bağlar ve işletir: arayüzler, veri, hosting, hakediş, belgeler, erişimler, yapay zekâ servisleri. Ayrıca bu sitenin kendisinde doğrulanabilir yedi nokta.",
+      statement: "Yalnızca kendi başına çalışan bir sistem, aynı verinin bakıldığı ikinci bir yerdir. Kimse bunu istememişti.",
+      categoriesEyebrow: "Entegrasyon",
+      categoriesLabel: "Bir sistemin neyle konuşması gerekir.",
+      categoriesNote: "Sağlayıcı kataloğu değil. Burada, inşadan önce neyi netleştirdiğimiz yazıyor — hangi yabancı markalara sözde hâkim olduğumuz değil. Gerçekte neyi bağladığımızı görüşmede adıyla söyleriz.",
+      categoryQuestionLabel: "Önce netleşen soru",
+      categories: {
+        interfaces: {
+          name: "Arayüzler",
+          body: "Neredeyse her sistemin bir yerden veri alması ya da bir yere vermesi gerekir. Bunun için bir arayüz olup olmaması işin yarısını belirler — ve bu, ilk taslaktan önce belli olur, inşanın ortasında değil.",
+          question: "Belgelenmiş bir arayüz mü var, bir dışa aktarım mı, yoksa hiçbir şey mi?",
+        },
+        data: {
+          name: "Veri ve veritabanları",
+          body: "Verinin nerede yaşadığı, kime ait olduğu ve yanlış olduğunda neye benzediği. İşletmeyi yansıtmayan bir veri modeli işletmede es geçilir — o zaman biri yeniden yan tarafta tablo tutar.",
+          question: "İki yer birbiriyle çelişince hangi kayıt doğrudur?",
+        },
+        hosting: {
+          name: "Hosting ve yayına alma",
+          body: "Nerede çalıştığı, oraya nasıl gittiği ve bir yayınlama ters gidince ne olduğu. Yan konu değil: hız, erişilebilirlik ve bir değişikliğin dakika mı gün mü sürdüğü buna bağlı.",
+          question: "Sunucuya, alan adına ve sertifikalara bugün kimin erişimi var?",
+        },
+        billing: {
+          name: "Hakediş ve ödemeler",
+          body: "Hataların paraya dönüştüğü kısım. Tutarlar, vergi oranları, belgeler, süreler — ve hesabın yapıldığı ülkenin kuralları. Burada hiçbir şey tahmin edilmez, hiçbir şey yuvarlanmaz.",
+          question: "Hangi kurallara göre hesaplanıyor ve sonucu kim kontrol ediyor?",
+        },
+        documents: {
+          name: "Belgeler ve evraklar",
+          body: "Sözleşmeler, faturalar, kanıtlar, sahadan fotoğraflar. Yol boyunca oluşurlar ve yeniden bulunabilmeleri gerekir — yoksa sistem, kimsenin bir daha bakmadığı bir arşive dönüşür.",
+          question: "Ne, ne kadar süre ve kimin için bulunabilir kalmalı?",
+        },
+        accounts: {
+          name: "Erişimler ve yetkiler",
+          body: "Kim neyi görebilir, kim neyi değiştirebilir ve biri ayrıldığında ne olur. Projenin en dikkat çekmeyen sorusu ve işletmede en sık canını yakanı.",
+          question: "Gerçekte hangi roller var — şemada değil, günlük işte?",
+        },
+        ai: {
+          name: "Yapay zekâ servisleri",
+          body: "Bugün birinin elle yaptığı bir okuma, ayıklama ya da hazırlama varsa anlamlıdır. Zaten çalışacak bir sisteme yapıştırılan bir etiket olarak anlamsızdır.",
+          question: "Bugün hangi adım zaman yiyor — ve onu bir makine hazırlayabilir mi?",
+        },
+      },
+      connectedLabel: "Bağlı sistemler",
+      operationsEyebrow: "Pratik",
+      operationsLabel: "Nasıl işletiriz.",
+      operationsNote: "Bunun hangi kısmının hizmet olarak alınabileceği Managed işletme sayfasında yazıyor.",
+      operations: {
+        monitoring: {
+          name: "Monitoring",
+          body: "Sistemler erişilemez olduklarında kendileri haber verir. Talep hattında bu daha ileri gider: Bir öz test, bir talebin hâlâ iletilip iletilemediğini kontrol eder — oradaki sessiz bir arıza dışarıdan kötü piyasa gibi görünür.",
+        },
+        logging: {
+          name: "Logging",
+          body: "Bir hatayı bulmaya yetecek kadar. Sorumluluğu taşınabilecek olandan fazlası değil: Birinin forma yazdığı şey hiçbir kayıtta yer almaz.",
+        },
+        backups: {
+          name: "Yedekler",
+          body: "Yedeklenmiş ve geri yüklenmiş. Hiç geri yüklenmemiş bir yedek, yedek değildir — umut edilen bir dosyadır.",
+        },
+        security: {
+          name: "Güvenlik",
+          body: "Erişimler, yetkiler, taşıma şifrelemesi ve yanıt başlıkları kurulumda ayarlanan seviyede — ve sonrasında varsayılmaz, ölçülür.",
+        },
+        deployment: {
+          name: "Yayınlama",
+          body: "Her değişiklik aynı yoldan geçer: kur, kontrol et, yayına al. Kontrollerden biri kırılırsa yayına alınmaz — acele olsa bile.",
+        },
+      },
+      proofEyebrow: "Kanıt",
+      proofLabel: "Bu sitede doğrulanabilir.",
+      proofNote: "Göstermek, iddia etmekten iyidir. Her nokta dışarıdan yanıt başlığında, gönderilen kaynak kodda ya da depoda kontrol edilebilir — bize sormaya gerek yok.",
+      proofs: {
+        headers: {
+          name: "Güvenlik başlıkları",
+          body: "Alt alan adları ve preload ile HSTS, X-Content-Type-Options, Referrer-Policy, DENY olarak X-Frame-Options, Permissions-Policy ve object-src, base-uri, form-action ile frame-ancestors'ı hâlihazırda zorlayan bir Content-Security-Policy.",
+        },
+        static: {
+          name: "Statik olarak sunulur",
+          body: "Sayfalar derleme anında üretilir ve CDN'den sunulur, her çağrıda yeniden oluşturulmaz. Sitenin hızlı olmasının nedeni budur — ve uygulamadaki bir arızanın onu hemen götürmemesinin de.",
+        },
+        bilingual: {
+          name: "İki dil, iki adres",
+          body: "Almanca ve Türkçe'nin kendi URL'leri, kendi başlıkları, kendi yapılandırılmış verileri vardır ve hreflang ile bağlıdır — tarayıcıda metin değiştiren bir düğme değil.",
+        },
+        images: {
+          name: "AVIF ve WebP görseller",
+          body: "Görseller derleme anında dönüştürülür ve düzenin gerçekten ihtiyaç duyduğu boyutta sunulur. AVIF desteklemeyen WebP alır — otomatik olarak, kodda bir dallanmayla değil.",
+        },
+        gates: {
+          name: "Derlemede üç kontrol",
+          body: "Bir fonksiyon fazla büyürse, yapılandırılmış veri olmayan yıldızları iddia edecek olursa ya da bir hizmet sayfası Türkçe'de Almanca'dan az şey söylerse derleme durur. Niyet beyanı değil — durdurma.",
+        },
+        selftest: {
+          name: "Talep hattının öz testi",
+          body: "Ayrı bir yol, talep hattının anahtarını, gönderici alan adını ve kötüye kullanım korumasını e-posta göndermeden kontrol eder. Bir kontrol düşerse, bir gözcünün anlayacağı bir hata döner.",
+        },
+        accessibility: {
+          name: "Açıkça yayımlanmış kendi erişilebilirlik denetimimiz",
+          body: "Bu siteyi kendimiz denetledik ve bulduğumuz eksikleri, bulgusuz bir beyan vermek yerine yayımladık. Erişilebilirlik sayfasında okunabilir.",
+        },
+      },
+    },
     betriebPage: {
       eyebrow: "İşletme",
       title: "Teslim etmek kolaydır. Asıl iş işletmektir.",

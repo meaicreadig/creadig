@@ -64,6 +64,14 @@ export function SiteFooter() {
                   Adresse; im Footer ist sie erreichbar, in der Leiste nicht. */}
               <li>
                 <Link
+                  href="/systeme"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                >
+                  {t.nav.systeme}
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/betrieb"
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
                 >

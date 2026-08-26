@@ -23,6 +23,7 @@ import { COMPANY_PHOTOS, COMPANY_PHOTO_SLOTS } from "@/lib/company-media.generat
 import { productScreens } from "@/lib/product-media"
 import { publishedInsights } from "@/lib/insights"
 import { publishedServicePages } from "@/lib/service-pages"
+import { connectedSystems } from "@/lib/systems"
 
 /**
  * BF-5 — was fehlt, an einer Stelle sichtbar.
@@ -98,6 +99,19 @@ function collect(): { open: Item[]; done: Item[] } {
         ? `${publishedInsights.length} veröffentlicht`
         : "keiner. /insights steht auf noindex und fehlt in der Sitemap.",
     owner: "Owner: zwei Fachartikel als Vertriebsmaterial",
+  })
+
+  /* ── Angebundene Systeme (MP10-4) ──────────────────────────────────── */
+  items.push({
+    label: "Angebundene Systeme (MP10-4)",
+    ok: connectedSystems.length > 0,
+    detail:
+      connectedSystems.length > 0
+        ? `${connectedSystems.length} System(e) bestätigt`
+        : "keine. Der Abschnitt „Angebunden“ auf /systeme rendert nicht.",
+    owner:
+      "Owner: Systeme, die wir wirklich angebunden haben — Name + ein Satz je Eintrag. " +
+      "Es ist die einzige Angabe auf /systeme, die ein Kunde im Gespräch nachprüfen kann.",
   })
 
   items.push({

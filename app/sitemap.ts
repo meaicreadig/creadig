@@ -85,6 +85,9 @@ const entries: Entry[] = [
      seit dieser Runde eine eigene Adresse. */
   { path: "/betrieb", changeFrequency: "monthly", priority: 0.7 },
 
+  /* MP10-4 — „Integration first": die Frage, die vor jedem Angebot steht. */
+  { path: "/systeme", changeFrequency: "monthly", priority: 0.7 },
+
   { path: "/kontakt", changeFrequency: "monthly", priority: 0.9 },
   { path: "/termin", changeFrequency: "monthly", priority: 0.8 },
 
