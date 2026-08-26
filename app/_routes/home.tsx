@@ -119,11 +119,23 @@ export function HomeRoute() {
       {/* 8 — Ein tiefer Kundenfall (gated auf schriftliche Freigabe). */}
       <CaseStudies />
 
-      {/* 9 · C — Wo wir sitzen: Foto mit Parallaxe. */}
-      <Location />
+      {/*
+        9 · A — MP10-2.5: WER, DANN WO. Die beiden Sektionen sind getauscht.
 
-      {/* 10 · A — Wer dahintersteht. Die zweite Pause. → /unternehmen */}
+        Vorher stand das Standortbild vor der Firma: Ein Besucher sah eine
+        Adresse, bevor er wusste, wessen Adresse das ist. Ein Ort belegt
+        nichts, solange niemand dazu gehoert — umgekehrt macht er den Satz
+        darueber ueberpruefbar.
+
+        Damit ist der Sitz auch nur noch einmal Text und einmal Bild: Die
+        Firmen-Zeile nennt ihn nicht mehr (sie steht direkt darueber), das
+        Standortband darunter zeigt ihn. Genannt wird er sonst nur im
+        Hero-Eyebrow und in der Fusszeile.
+      */}
       <CompanyTeaser />
+
+      {/* 10 · C — Wo das stattfindet: Foto mit Parallaxe. */}
+      <Location />
 
       {/*
         11 — HIER STAND DIE NACHWEIS-ZEILE, UND SIE IST GEGANGEN (V2-5).

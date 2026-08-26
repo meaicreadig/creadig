@@ -34,7 +34,9 @@ export function ArbeitenPageBody() {
       <Portfolio heading={false} />
       <CaseStudies />
       <Reviews />
-      <ClosingCta />
+      {/* MP10-2 (Zusatz) — nach der Werkschau knuepft der Abschluss an das
+          Gesehene an, statt allgemein zum Start aufzurufen. */}
+      <ClosingCta variant="work" />
     </main>
   )
 }

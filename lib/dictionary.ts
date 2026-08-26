@@ -76,6 +76,15 @@ export const dictionary = {
         eyebrow: "Ausgewählte Arbeiten",
         title: "Erst zeigen. Dann reden.",
         cta: "Alle Arbeiten",
+        /*
+         * MP10-2.4 — der Verweis AM ENDE der Werkschau.
+         *
+         * Oben gibt es ihn schon, und dort ist er fuer die falsche Person:
+         * Wer die Sektion noch nicht gelesen hat, klickt nicht auf „alle".
+         * Wer drei Arbeiten durchgescrollt hat, will genau das — und fand
+         * am Ende nur eine Fussnote ueber Mockups und die naechste Sektion.
+         */
+        ctaEnd: "Alle Arbeiten ansehen",
       },
       /*
        * MP10-2.7 — die Ueberschrift ist in den Hero gezogen.
@@ -127,10 +136,24 @@ export const dictionary = {
       products: {
         cta: "Alle Produkte",
       },
+      /*
+       * MP10-2.5 — HIER STAND DER SITZ ZUM DRITTEN MAL.
+       *
+       * Ueberschrift „Osnabrück. Seit 2017.", darunter „Sitz im ICO
+       * InnovationsCentrum" — und unmittelbar danach das Standortband mit
+       * Haus, Anschrift und Kartenlink. Zweimal derselbe Ort auf zwei
+       * Bildschirmhoehen; auf der ganzen Startseite kam er sechsmal vor.
+       *
+       * Ein Sitz, der oft genug wiederholt wird, wird nicht glaubwuerdiger,
+       * sondern zum eigentlichen Thema. Er steht jetzt an genau zwei Stellen
+       * als Text — Hero-Eyebrow und Fusszeile — und einmal als Bild im
+       * Standortband direkt darunter. Diese Zeile sagt dafuer, was nur sie
+       * sagen kann: wer dahintersteht.
+       */
       company: {
         eyebrow: "Das Unternehmen",
-        title: "Osnabrück. Seit 2017.",
-        body: "Sitz im ICO InnovationsCentrum, gegründet 2017, geführt von Muhammed Emin Akyol — mit einem spezialisierten Netzwerk im DACH-Raum.",
+        title: "Ein Haus, das wächst.",
+        body: "Gegründet 2017, geführt von Muhammed Emin Akyol — mit einem kleinen Kernteam und einem spezialisierten Netzwerk im DACH-Raum.",
         cta: "Mehr über uns",
       },
       insights: {
@@ -472,7 +495,15 @@ export const dictionary = {
       skipToContent: "Zum Inhalt springen",
     },
     hero: {
-      eyebrow: "System-Haus · seit 2017 · Deutschland · Österreich · Schweiz",
+      /*
+       * MP10-2.5 — die erste der beiden verbliebenen Sitz-Nennungen.
+       *
+       * Der Eyebrow zaehlte die drei Maerkte auf, die zwei Zeilen tiefer in
+       * der Subline noch einmal stehen — und nannte den Sitz nicht. Jetzt
+       * steht hier, was nur hier steht: Was fuer ein Haus, von wo, seit wann.
+       * Die Maerkte traegt die Subline.
+       */
+      eyebrow: "System-Haus · Osnabrück · seit 2017",
       headlineLine1: "Wir bauen,",
       headlineLine2: "was andere",
       headlineLine3: "nicht sehen.",
@@ -502,7 +533,12 @@ export const dictionary = {
       systemLine: "Fünf Ebenen. Ein System.",
       ctaPrimary: "Projekt starten",
       ctaSecondary: "Unsere Arbeit",
-      location: "Osnabrück · DACH",
+      /*
+       * MP10-2.5 — die Fusszeile des Hero nannte den Sitz ein zweites Mal,
+       * 200 Pixel unter dem Eyebrow. Sie traegt jetzt den Markt, den der
+       * Eyebrow abgegeben hat.
+       */
+      location: "Deutschland · Österreich · Schweiz",
       scroll: "Scrollen",
     },
     impact: {
@@ -534,9 +570,18 @@ export const dictionary = {
           label: "Automatisierte Vorgänge",
           detail: "Schritte, die vorher jemand von Hand gemacht hat.",
         },
+        /*
+         * MP10-2 (Zusatz) — die Beschriftung musste mit dem Wert mitziehen.
+         *
+         * Sie lautete „Gerechnet ab dem ersten System, das wir übergeben und
+         * behalten haben" — eine Angabe, die nur der Owner hat. Der Wert
+         * kommt jetzt aus dem Gruendungsjahr (`site-data.FOUNDING_YEAR`), und
+         * genau das steht hier auch. Eine Zahl, die anders gerechnet ist als
+         * ihre Beschriftung, ist eine falsche Zahl mit richtiger Ziffer.
+         */
         operatingYears: {
-          label: "Jahre im Betrieb",
-          detail: "Gerechnet ab dem ersten System, das wir übergeben und behalten haben.",
+          label: "Jahre im Geschäft",
+          detail: "Ununterbrochen, gerechnet ab der Gründung 2017.",
         },
       },
       facts: {
@@ -1405,12 +1450,44 @@ export const dictionary = {
      * wollte, fiel in den Footer. Ein schmales Band fasst zusammen und laesst
      * genau zwei Wege offen: sprechen oder erst weiterschauen.
      */
+    /*
+     * MP10-2 (Zusatz) — DAS ABSCHLUSS-BAND SAGT JETZT, WO ES STEHT.
+     *
+     * -------------------------------------------------------------------------
+     * DAS PROBLEM
+     * Es steht am Ende von sieben verschiedenen Seiten und sagte auf allen
+     * dasselbe: „Projekt starten". Nach der Preistabelle liest sich das wie
+     * eine Wiederholung der Kachel-Schaltflaeche daneben; nach der Werkschau
+     * wie ein Aufruf, der mit dem gerade Gesehenen nichts zu tun hat. Ein
+     * Schlussstrich, der den Absatz darueber nicht kennt, ist ein Banner.
+     *
+     * `variants` liefert den Ort mit: Nach Preisen wird der naechste Schritt
+     * konkret („Festpreis-Angebot anfragen"), nach der Werkschau knuepft er an
+     * das Gesehene an („Ähnliches Vorhaben?"). Der Grundfall bleibt unveraendert
+     * fuer alle Seiten, die keinen besonderen Anlauf haben.
+     */
     closing: {
       eyebrow: "Nächster Schritt",
       title: "Sie führen den Betrieb. Wir bauen das System dahinter.",
       lead: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sehen uns den Betrieb an und sagen ehrlich, ob wir helfen können.",
       ctaPrimary: "Projekt starten",
       ctaSecondary: "Arbeiten ansehen",
+      variants: {
+        prices: {
+          eyebrow: "Nächster Schritt",
+          title: "Ein Festpreis für Ihren Umfang — nach zwanzig Minuten.",
+          lead: "Was oben steht, ist der Einstieg. Was Ihr Betrieb braucht, sehen wir uns an, bevor irgendjemand eine Zahl nennt — kostenlos und unverbindlich.",
+          ctaPrimary: "Festpreis-Angebot anfragen",
+          ctaSecondary: "Arbeiten ansehen",
+        },
+        work: {
+          eyebrow: "Nächster Schritt",
+          title: "Ähnliches Vorhaben? Sprechen wir.",
+          lead: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sagen Ihnen ehrlich, ob Ihr Vorhaben zu dem passt, was Sie hier gesehen haben.",
+          ctaPrimary: "Vorhaben besprechen",
+          ctaSecondary: "Leistungen ansehen",
+        },
+      },
     },
     termin: {
       /* GROW-1: Diese drei standen hart in app/termin/page.tsx, auf Deutsch —
@@ -1849,6 +1926,7 @@ export const dictionary = {
         eyebrow: "Seçilmiş işler",
         title: "Önce göster. Sonra konuş.",
         cta: "Tüm işler",
+        ctaEnd: "Tüm işleri gör",
       },
       capabilities: {
         eyebrow: "Hizmetler",
@@ -1869,8 +1947,8 @@ export const dictionary = {
       },
       company: {
         eyebrow: "Şirket",
-        title: "Osnabrück. 2017'den beri.",
-        body: "Merkez ICO InnovationsCentrum, 2017'de kuruldu, Muhammed Emin Akyol yönetiminde — DACH bölgesinde uzman bir ağla birlikte.",
+        title: "Büyüyen bir ev.",
+        body: "2017'de kuruldu, Muhammed Emin Akyol yönetiminde — küçük bir çekirdek ekip ve DACH bölgesinde uzman bir ağla birlikte.",
         cta: "Hakkımızda daha fazlası",
       },
       insights: {
@@ -2096,7 +2174,7 @@ export const dictionary = {
       skipToContent: "İçeriğe geç",
     },
     hero: {
-      eyebrow: "Sistem evi · 2017'den beri · Almanya · Avusturya · İsviçre",
+      eyebrow: "Sistem evi · Osnabrück · 2017'den beri",
       headlineLine1: "Başkalarının",
       headlineLine2: "görmediğini",
       headlineLine3: "inşa ediyoruz.",
@@ -2105,7 +2183,7 @@ export const dictionary = {
       systemLine: "Beş katman. Tek sistem.",
       ctaPrimary: "Projeye başla",
       ctaSecondary: "İşlerimiz",
-      location: "Osnabrück · DACH",
+      location: "Almanya · Avusturya · İsviçre",
       scroll: "Kaydır",
     },
     impact: {
@@ -2123,8 +2201,8 @@ export const dictionary = {
           detail: "Daha önce birinin elle yaptığı adımlar.",
         },
         operatingYears: {
-          label: "İşletmede geçen yıl",
-          detail: "Teslim edip elimizde tuttuğumuz ilk sistemden itibaren.",
+          label: "İşteki yıl",
+          detail: "Kesintisiz, 2017'deki kuruluştan itibaren.",
         },
       },
       facts: {
@@ -2707,6 +2785,22 @@ export const dictionary = {
       lead: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmeye bakar ve yardımcı olabilir miyiz, dürüstçe söyleriz.",
       ctaPrimary: "Projeye başla",
       ctaSecondary: "İşleri gör",
+      variants: {
+        prices: {
+          eyebrow: "Sonraki adım",
+          title: "Kapsamınıza sabit bir fiyat — yirmi dakika sonra.",
+          lead: "Yukarıdaki, giriş adımıdır. İşletmenizin neye ihtiyacı olduğuna, kimse bir rakam söylemeden önce bakarız — ücretsiz ve bağlayıcı değil.",
+          ctaPrimary: "Sabit fiyat teklifi isteyin",
+          ctaSecondary: "İşleri gör",
+        },
+        work: {
+          eyebrow: "Sonraki adım",
+          title: "Benzer bir işiniz mi var? Konuşalım.",
+          lead: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşinizin burada gördüklerinize uyup uymadığını dürüstçe söyleriz.",
+          ctaPrimary: "İşinizi konuşalım",
+          ctaSecondary: "Hizmetleri gör",
+        },
+      },
     },
     termin: {
       metaTitle: "Randevu talebi gönder",

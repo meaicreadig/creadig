@@ -166,9 +166,30 @@ export function SelectedWork() {
           steht auch, was sie ist. */}
       <div className="section-gutter pb-20 md:pb-24">
         <Reveal delay={0.1}>
-          <p className="text-muted-foreground text-meta border-line mt-16 border-t pt-6">
-            {t.portfolio.mockupNote}
-          </p>
+          {/*
+            MP10-2.4 — der Verweis am Ende, nicht nur am Anfang.
+
+            Oben steht er auch, und dort ist er fuer die falsche Person: Wer
+            die Sektion noch nicht gelesen hat, klickt nicht auf „alle". Wer
+            drei Arbeiten durchgescrollt hat, will genau das — und fand hier
+            bisher nur die Fussnote ueber die Mockups und danach die naechste
+            Sektion.
+          */}
+          <div className="border-line mt-16 flex flex-col gap-6 border-t pt-6 sm:flex-row sm:items-baseline sm:justify-between">
+            <p className="text-muted-foreground text-meta max-w-2xl text-pretty">
+              {t.portfolio.mockupNote}
+            </p>
+            <Link
+              href="/arbeiten"
+              className="group text-gold-text hover:text-foreground inline-flex shrink-0 items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+            >
+              {copy.ctaEnd}
+              <ArrowUpRight
+                className="size-4 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                strokeWidth={1.5}
+              />
+            </Link>
+          </div>
         </Reveal>
       </div>
     </section>

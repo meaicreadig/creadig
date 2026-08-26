@@ -24,8 +24,25 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
  * `motif-band` und wird ueber die *Dichte* leiser, nicht ueber einen neuen
  * Opacity-Wert.
  */
-export function ClosingCta() {
+/**
+ * MP10-2 (Zusatz) — welcher Abschluss zu welchem Ort gehoert.
+ *
+ * `prices` steht unter einer Preistabelle, `work` unter einer Werkschau,
+ * `default` ueberall sonst. Der Text kommt aus dem Woerterbuch
+ * (`t.closing.variants`), nicht aus dem Markup — sonst gaebe es drei
+ * Fassungen desselben Satzes in drei Sprachen an drei Orten.
+ */
+export type ClosingVariant = "default" | "prices" | "work"
+
+export function ClosingCta({ variant = "default" }: { variant?: ClosingVariant } = {}) {
   const { t } = useLocale()
+  const copy = variant === "default" ? t.closing : t.closing.variants[variant]
+  /*
+    Der zweite Weg fuehrt dorthin, wo der Leser noch NICHT war: Unter einer
+    Werkschau ist „noch mehr Arbeiten" kein Angebot mehr, unter einer
+    Preistabelle schon.
+  */
+  const secondaryHref = variant === "work" ? "/leistungen" : "/arbeiten"
 
   return (
     <section
@@ -48,20 +65,20 @@ export function ClosingCta() {
       <div className="section-shell-tight relative">
         <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
           <Reveal className="lg:col-span-7">
-            <SectionEyebrow label={t.closing.eyebrow} />
+            <SectionEyebrow label={copy.eyebrow} />
             <h2 id="abschluss-title" className="type-h3 mt-6 max-w-2xl text-balance">
-              {t.closing.title}
+              {copy.title}
             </h2>
             <p className="type-body text-muted-foreground mt-5 max-w-xl text-pretty">
-              {t.closing.lead}
+              {copy.lead}
             </p>
           </Reveal>
 
           <Reveal delay={0.1} className="lg:col-span-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:justify-end">
-              <MagneticButton href="/kontakt">{t.closing.ctaPrimary}</MagneticButton>
-              <MagneticButton href="/arbeiten" variant="ghost">
-                {t.closing.ctaSecondary}
+              <MagneticButton href="/kontakt">{copy.ctaPrimary}</MagneticButton>
+              <MagneticButton href={secondaryHref} variant="ghost">
+                {copy.ctaSecondary}
               </MagneticButton>
             </div>
           </Reveal>

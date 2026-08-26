@@ -21,6 +21,7 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
  */
 export function ImpactBand() {
   const { t } = useLocale()
+  const tileCount = publishedImpactFigures.length + impactFacts.length
 
   return (
     <section id="fundament" className="section-dark relative overflow-hidden">
@@ -51,12 +52,30 @@ export function ImpactBand() {
           Satz. Die Trennung entsteht durch den Schriftgrad, nicht durch zwei
           getrennte Bloecke — die Reihe soll eine Reihe bleiben.
         */}
-        <div className="border-line mt-20 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-y-0">
+        {/*
+          MP10-2 (Zusatz) — die Spaltenzahl folgt der Kachelzahl.
+
+          Sie stand fest auf vier. Solange drei Kacheln leer waren, passte
+          das zufaellig; mit „Jahre im Geschäft" sind es fuenf, und vier
+          Spalten haetten eine einzelne Kachel in eine zweite Reihe geschoben —
+          direkt unter eine Reihe, die `lg:gap-y-0` fuehrt, also ohne Abstand.
+          Dieselbe Rechnung wie bei den Paketkacheln, aus demselben Grund:
+          kein Design-Eingriff, nur die Vermeidung eines Bruchs.
+        */}
+        <div
+          className={`border-line mt-20 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:gap-y-0 ${
+            tileCount >= 5 ? "lg:grid-cols-5" : tileCount === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"
+          }`}
+        >
           {/*
-            V2-4c — nur Kennziffern mit belegtem Wert. Drei weitere Gefaesse
-            stehen in `site-data` bereit (produktive Systeme, automatisierte
-            Vorgaenge, Jahre im Betrieb) und sind `null`; sie erscheinen,
-            sobald der Owner echte Zahlen liefert, und bis dahin nicht.
+            V2-4c — nur Kennziffern mit belegtem Wert. Zwei Gefaesse stehen in
+            `site-data` bereit (produktive Systeme, automatisierte Vorgaenge)
+            und sind `null`; sie erscheinen, sobald der Owner echte Zahlen
+            liefert, und bis dahin nicht.
+
+            MP10-2 (Zusatz) — „Jahre im Geschäft" war das dritte und ist es
+            nicht mehr: Die Zahl ergibt sich aus dem Gruendungsjahr und wird
+            zur Bauzeit gerechnet, nicht geschaetzt.
           */}
           {publishedImpactFigures.map((figure, i) => {
             const copy = t.impact.figures[figure.key as keyof typeof t.impact.figures]

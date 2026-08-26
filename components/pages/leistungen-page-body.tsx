@@ -80,7 +80,11 @@ export function LeistungenPageBody() {
       */}
       <Faq />
       <Packages />
-      <ClosingCta />
+      {/* MP10-2 (Zusatz) — hier steht der Abschluss unmittelbar unter der
+          Preistabelle. „Projekt starten" waere die dritte Schaltflaeche mit
+          derselben Aufschrift; „Festpreis-Angebot anfragen" ist der Schritt,
+          der auf das Gelesene folgt. */}
+      <ClosingCta variant="prices" />
     </main>
   )
 }

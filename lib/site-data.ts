@@ -998,14 +998,43 @@ export const mainNavLinks = navLinks.filter(
  * Wer eine davon fuellt, muss sie belegen koennen. „Ungefaehr 40" ist keine
  * Zahl, sondern ein Gefuehl mit Ziffern.
  */
+/**
+ * Gruendungsjahr — vom Inhaber bestaetigt (2026-08-17).
+ *
+ * Steht hier und nicht als Zeichenkette in drei Kacheln: Aus derselben Zahl
+ * kommen das „Seit 2017" im Band, `foundingDate` in den strukturierten Daten
+ * und die gerechneten Jahre darunter.
+ */
+export const FOUNDING_YEAR = 2017
+
+/**
+ * MP10-2 (Zusatz) — „Jahre im Betrieb" ist RECHENBAR, nicht zu schaetzen.
+ *
+ * Die Kachel stand auf `null` und wartete auf den Owner. Sie muss es nicht:
+ * Wie lange dieses Haus im Geschaeft ist, ergibt sich aus dem
+ * Gruendungsjahr — dieselbe Zahl, die eine Kachel weiter links schon steht,
+ * nur anders gelesen. Das ist keine erfundene Kennzahl, sondern eine
+ * Subtraktion.
+ *
+ * WAS SIE NICHT BEHAUPTET: nicht, wie lange EIN uebergebenes System schon
+ * laeuft. Das waere eine andere, groessere Aussage und liesse sich ohne
+ * Owner-Angabe nicht belegen — die Beschriftung im Woerterbuch sagt deshalb
+ * ausdruecklich „seit der Gruendung".
+ *
+ * Der Wert wird zur Bauzeit gerechnet. Er aendert sich also erst mit dem
+ * naechsten Deploy nach dem Jahreswechsel — und das ist richtig so: Eine Zahl,
+ * die sich im Browser des Besuchers selbst weiterzaehlt, waere zur Bauzeit
+ * nicht mehr nachpruefbar.
+ */
+const OPERATING_YEARS = new Date().getFullYear() - FOUNDING_YEAR
+
 export const impactFigures: { value: string | null; key: string }[] = [
-  // Gründungsjahr 2017 — vom Inhaber bestätigt (2026-08-17).
-  { value: "2017", key: "since" },
+  { value: String(FOUNDING_YEAR), key: "since" },
   { value: "4", key: "products" },
-  // TODO (Owner): echte Zahlen — bis dahin rendert keine dieser drei Kacheln.
+  // TODO (Owner): echte Zahlen — bis dahin rendert keine dieser zwei Kacheln.
   { value: null, key: "systems" },
   { value: null, key: "automated" },
-  { value: null, key: "operatingYears" },
+  { value: OPERATING_YEARS > 0 ? String(OPERATING_YEARS) : null, key: "operatingYears" },
 ]
 
 /** Nur Kennziffern mit belegtem Wert verlassen die Datei. */
