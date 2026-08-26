@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next"
 import { publishedInsights, readableInsights } from "@/lib/insights"
+import { publishedSeoLandings } from "@/lib/seo-landings"
 import { publishedServicePages } from "@/lib/service-pages"
 import { clientWorks, productWorks } from "@/lib/site-data"
 import { localeUrl, locales } from "@/lib/routes"
@@ -101,6 +102,17 @@ const entries: Entry[] = [
    * aus der Tabelle in `lib/routes.ts`, hier steht wie ueberall der deutsche.
    */
   { path: "/barrierefreiheit", changeFrequency: "yearly", priority: 0.5 },
+
+  /*
+   * MP10-5 — SEO-Landings. Heute keine: Die Liste ist Owner-gegatet, und
+   * eine Sitemap mit Adressen, die es nicht gibt, ist schlimmer als eine
+   * kurze Sitemap.
+   */
+  ...publishedSeoLandings.map((landing) => ({
+    path: `/${landing.slug}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  })),
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

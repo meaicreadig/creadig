@@ -22,6 +22,7 @@ import { CLIENT_LOGOS } from "@/lib/client-logos.generated"
 import { COMPANY_PHOTOS, COMPANY_PHOTO_SLOTS } from "@/lib/company-media.generated"
 import { productScreens } from "@/lib/product-media"
 import { emptyInsightCategories, publishedInsights } from "@/lib/insights"
+import { publishedSeoLandings, seoLandings } from "@/lib/seo-landings"
 import { publishedServicePages } from "@/lib/service-pages"
 import { connectedSystems } from "@/lib/systems"
 
@@ -112,6 +113,18 @@ function collect(): { open: Item[]; done: Item[] } {
     owner:
       "Owner: Systeme, die wir wirklich angebunden haben — Name + ein Satz je Eintrag. " +
       "Es ist die einzige Angabe auf /systeme, die ein Kunde im Gespräch nachprüfen kann.",
+  })
+
+  items.push({
+    label: "SEO-Landings (MP10-5)",
+    ok: publishedSeoLandings.length > 0,
+    detail:
+      publishedSeoLandings.length > 0
+        ? `${publishedSeoLandings.length} von ${seoLandings.length} veröffentlicht`
+        : "keine. Struktur steht (lib/seo-landings.ts), es existiert keine einzige Adresse.",
+    owner:
+      "Owner: welche Städte und welche Leistungen beworben werden sollen — " +
+      "je Landing ein eigener Text, kein ausgetauschter Stadtname.",
   })
 
   items.push({
