@@ -332,6 +332,73 @@ function collect(): { open: Item[]; done: Item[] } {
   })
 
   items.push({
+    label: "Domain gesetzt",
+    ok: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
+    detail: process.env.NEXT_PUBLIC_SITE_URL
+      ? `NEXT_PUBLIC_SITE_URL = ${process.env.NEXT_PUBLIC_SITE_URL}`
+      : "nicht gesetzt. Der Code fällt auf https://creadig.de zurück — " +
+        "daran hängen die kanonischen Adressen, die Sitemap und jedes OG-Bild. " +
+        "Stimmt die Adresse nicht, zeigen alle drei ins Leere, ohne dass etwas bricht.",
+    owner: "Owner: Domain in Vercel verbinden und den Wert setzen",
+  })
+
+  items.push({
+    label: "Reaktionszusage bestätigt (BF-8)",
+    ok: false,
+    detail:
+      "Gewählt ist „innerhalb von zwei Werktagen“ — an einer Stelle " +
+      "gepflegt (app/api/lead/route.ts), von dort in Bestätigungsmail und Seite. " +
+      "Vorher stand hier „nächster Werktag“ und dort „24 Stunden“; beides " +
+      "ist für ein founder-led Haus an einem Freitagabend nicht haltbar. " +
+      "Eine Frist, die verstreicht, kostet mehr als eine, die länger klingt.",
+    owner: "Owner: bestätigen, dass zwei Werktage jederzeit haltbar sind — oder ändern",
+  })
+
+  /* ── Entscheidungen (§11, strategische Blind Spots) ──────────── */
+  /*
+   * Diese drei sind KEIN fehlendes Material — kein Foto, keine Zahl, keine
+   * Freigabe. Sie sind Entscheidungen, und sie stehen trotzdem hier, weil
+   * diese Seite die eine Wahrheit darüber sein soll, was noch aussteht. Eine
+   * offene Entscheidung blockiert Arbeit genauso zuverlässig wie ein
+   * fehlendes Bild — nur fällt sie niemandem auf, weil sie nirgends als
+   * Lücke sichtbar wird.
+   *
+   * Was der Code ohne sie tut, steht jeweils dabei. Keine davon hält den
+   * Livegang auf.
+   */
+  items.push({
+    label: "Entscheidung: 50k-Kunde jetzt? (§11)",
+    ok: false,
+    detail:
+      "Bei zwei Referenzen und founder-led ist ein Auftrag dieser Größe ein " +
+      "Liefer- und Klumpenrisiko. Die Seite ist heute NICHT darauf optimiert: " +
+      "Die Preisleiter endet bei „größerer Umfang: auf Anfrage“, ohne Zahl. " +
+      "Das bleibt so, solange nichts anderes entschieden ist.",
+    owner: "Owner: entscheiden, ob die Seite auf diesen Kunden zielen soll",
+  })
+
+  items.push({
+    label: "Entscheidung: TR-Nische besitzen? (§11)",
+    ok: false,
+    detail:
+      "Türkisch ist heute eine Übersetzung, keine Positionierung: dieselbe " +
+      "Seite, andere Sprache. Für einen türkischsprachigen Betrieb im " +
+      "DACH-Raum ist die erste Frage aber „verstehen die mich?“ — das wäre " +
+      "ein Einstieg, kein FAQ-Punkt. Bewusst besitzen oder bewusst lassen; " +
+      "unentschieden ist die einzige Antwort, die nichts bringt.",
+    owner: "Owner: entscheiden — danach folgt Aufbau oder Rückbau, nicht beides",
+  })
+
+  items.push({
+    label: "Preisleiter oben geöffnet (BF-9)",
+    ok: true,
+    detail:
+      "„größerer Umfang: auf Anfrage“ steht sichtbar über der Leiter, " +
+      "ohne Zahl — die gesperrten Stufen 2.400 / 2.400 / 3.900 bleiben unberührt.",
+    owner: "—",
+  })
+
+  items.push({
     label: "Echte Fotos aus dem Haus (§10.6)",
     ok: COMPANY_PHOTO_SLOTS.every((slot) => COMPANY_PHOTOS[slot]),
     detail:
