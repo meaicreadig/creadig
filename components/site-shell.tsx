@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Poppins, JetBrains_Mono } from "next/font/google"
+import { Poppins, JetBrains_Mono, M_PLUS_Rounded_1c } from "next/font/google"
 import "@/app/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LocaleProvider } from "@/components/locale-provider"
@@ -48,11 +48,56 @@ import { ogImage } from "@/lib/page-metadata"
  */
 
 // CEO-Entscheidung: Poppins — rund-geometrisch, passt zum Logo. Nicht Geist.
+// Traegt seit dem Form-Entscheid (27.08.2026) nur noch die UEBERSCHRIFTEN
+// (`--font-display`); der Fliesstext liegt darunter auf M PLUS Rounded 1c.
 const poppins = Poppins({
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
   display: "swap",
+})
+
+/*
+ * Fliesstext-Schrift — Owner-Entscheidung 27.08.2026 (Master-Prompt 11).
+ *
+ * Die Analyse hat den Kernwiderspruch benannt: Die Seite zeichnet Kanten
+ * (2 px Radius, 251 Haarlinien), die Marke verspricht Verbindung und Naehe.
+ * M PLUS Rounded 1c hat runde Strichenden — der Text sagt damit dasselbe wie
+ * die kommende runde Geometrie, statt dagegen zu stehen.
+ *
+ * NUR der Fliesstext. Die Ueberschriften bleiben ausdruecklich Poppins
+ * (`--font-display` in `globals.css`), damit dieser Schritt allein die
+ * Schriftart tauscht und nichts an der Hierarchie verschiebt.
+ *
+ * `latin-ext` ist hier dieselbe Pflicht wie bei der Monospace: ohne den
+ * Subset fehlen ş, ğ, ı, İ, ç — und Umlaute traegt er ohnehin. Der
+ * japanische Subset der Familie wird NICHT geladen; next/font holt genau
+ * die zwei angegebenen.
+ *
+ * ---------------------------------------------------------------------------
+ * `preload: false` IST HIER PFLICHT, KEIN GESCHMACK.
+ *
+ * M PLUS Rounded 1c ist urspruenglich eine japanische Familie. Google
+ * zerlegt sie in ~126 Unicode-Bereiche je Schnitt — bei drei Schnitten also
+ * 378 `@font-face`-Regeln. Mit Vorladen haengte Next an die Startseite
+ * **252 `<link rel="preload">` und 3,79 MB** Schriftdateien, gemessen am
+ * gebauten Server. Zum Vergleich: die ganze Seite lag vorher darunter.
+ *
+ * Ohne Vorladen bleibt der Mechanismus intakt, der fuer solche Familien
+ * gebaut wurde: `unicode-range`. Der Browser holt genau die Bereiche, in
+ * denen die Zeichen der Seite liegen — Latein und Latein-Erweitert, zwei
+ * bis drei Dateien. Die japanischen Bereiche liegen im Build und werden nie
+ * angefragt.
+ *
+ * Der Preis ist ein kurzer Wechsel von der Ersatzschrift auf die echte
+ * (`display: swap`). Den zahlen wir; 3,7 MB Vorladen zahlen wir nicht.
+ */
+const mplusRounded = M_PLUS_Rounded_1c({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "700"],
+  variable: "--font-mplus",
+  display: "swap",
+  preload: false,
 })
 
 // Monospace nur für Eyebrows und Kennziffern.
@@ -280,7 +325,7 @@ export function SiteShell({
   return (
     <html
       lang={locale}
-      className={`${poppins.variable} ${jetbrains.variable}`}
+      className={`${poppins.variable} ${mplusRounded.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>

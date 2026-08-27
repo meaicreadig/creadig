@@ -47,7 +47,21 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  /*
+   * ZWEI ROLLEN, ZWEI SCHRIFTEN — Owner-Entscheidung 27.08.2026 (MP11).
+   *
+   *   --font-sans     Fliesstext. M PLUS Rounded 1c: runde Strichenden,
+   *                   passt zur kommenden runden Geometrie und zur Marke
+   *                   („verbinden", nicht „trennen").
+   *   --font-display  Ueberschriften. Bleibt Poppins — dieser Schritt
+   *                   tauscht ausdruecklich NUR die Textschrift und ruehrt
+   *                   die Hierarchie nicht an.
+   *
+   * Wer das drehen will, aendert diese zwei Zeilen. Die `type-*`-Skala
+   * unten greift bewusst auf `--font-display` zu, `type-lead` / `type-body` /
+   * `type-small` erben still den Fliesstext.
+   */
+  --font-sans: var(--font-mplus), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
