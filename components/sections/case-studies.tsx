@@ -21,7 +21,7 @@ export function CaseStudies() {
   if (approvedCaseStudies.length === 0) return null
 
   return (
-    <section id="kundenfaelle" aria-labelledby="kundenfaelle-title" className="border-line border-b">
+    <section id="kundenfaelle" aria-labelledby="kundenfaelle-title" className="section-seam">
       <div className="section-shell">
         <div className="grid gap-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-7">

@@ -48,7 +48,7 @@ export function MeaiSpotlight() {
             </Reveal>
 
             <Reveal delay={0.15}>
-              <div className="border-gold/40 mt-10 border-l pl-6">
+              <div className="border-gold/45 mt-10 border-l pl-6">
                 <p className="type-body text-muted-foreground max-w-xl text-pretty">
                   {t.meai.dna}
                 </p>

@@ -27,7 +27,7 @@ export function InsightsTeaser() {
   if (entries.length === 0) return null
 
   return (
-    <section id="insights" aria-labelledby="insights-teaser-title" className="border-line border-b">
+    <section id="insights" aria-labelledby="insights-teaser-title" className="section-seam">
       <div className="section-shell">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
           <Reveal className="lg:col-span-8">

@@ -33,7 +33,7 @@ export function ProduktePageBody() {
         lead={copy.lead}
       />
 
-      <section aria-label={copy.eyebrow} className="border-line border-b">
+      <section aria-label={copy.eyebrow} className="section-seam">
         <div className="section-shell">
           <ul className="flex flex-col">
             {productWorks.map((product, i) => {
@@ -150,7 +150,7 @@ export function ProduktePageBody() {
       {clientWorks.length > 0 && (
         <section
           aria-labelledby="kundenwerk-title"
-          className="border-line border-b"
+          className="section-seam"
         >
           <div className="section-shell">
             <Reveal>

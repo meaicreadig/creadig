@@ -22,7 +22,7 @@ export function Faq() {
   const { t } = useLocale()
 
   return (
-    <section id="faq" aria-labelledby="faq-title" className="border-line border-b">
+    <section id="faq" aria-labelledby="faq-title" className="section-seam">
       <div className="section-shell">
         <div className="grid gap-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-7">

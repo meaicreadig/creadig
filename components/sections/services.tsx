@@ -27,7 +27,7 @@ export function Services({ heading = true }: { heading?: boolean }) {
   const { t, locale } = useLocale()
 
   return (
-    <section id="leistungen" aria-labelledby="leistungen-title" className="border-line border-b">
+    <section id="leistungen" aria-labelledby="leistungen-title" className="section-seam">
       <div className="section-shell">
         {heading && (
           <div className="grid gap-10 lg:grid-cols-12">

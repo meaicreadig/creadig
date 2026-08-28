@@ -39,7 +39,7 @@ export function CompanyChapters() {
   const copy = t.unternehmenPage.chapters
 
   return (
-    <section aria-labelledby="weg-title" className="border-line border-b">
+    <section aria-labelledby="weg-title" className="section-seam">
       <div className="section-shell">
         <Reveal>
           <SectionEyebrow label={copy.label} />

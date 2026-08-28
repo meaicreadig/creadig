@@ -65,7 +65,34 @@
   --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
-  --radius-xs: 0.0625rem;
+  /*
+   * BEWEGUNG — DIE ERSTE ZEILE EINER SPRACHE, DIE ES NOCH NICHT GAB.
+   *
+   * Bis hierher hatte diese Datei Token fuer Farbe, Typografie, Raster,
+   * Elevation und Motiv-Lautstaerke — und KEINEN einzigen fuer Bewegung.
+   * Die Markenkurve stand stattdessen 54× als Zeichenkette im Markup.
+   * Wer die Bewegung des Hauses aendern wollte, musste 54 Stellen anfassen;
+   * eine Motion-Sprache war damit nicht einfuehrbar, nur nachkopierbar.
+   *
+   * Drei Geschwindigkeiten, mehr braucht es nicht:
+   *   --dur-1  Zustand direkt am Zeiger — Farbe, Kante, Deckkraft
+   *   --dur-2  der Normalfall
+   *   --dur-3  alles, was einen WEG zuruecklegt: Flaechen, Linien, Wege
+   *   --stagger  Abstand zwischen Geschwistern derselben Reihe
+   */
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-1: 300ms;
+  --dur-2: 500ms;
+  --dur-3: 700ms;
+  --stagger: 60ms;
+
+  /*
+   * RADIUS — `--radius-xs` (1 px) ist gegangen. Ein Pixel Rundung ist
+   * keine Entscheidung, sondern ein Messfehler: Man sieht ihn nicht, und
+   * er beantwortet die Frage „scharf oder rund" nicht. Die eigentliche
+   * Radius-Entscheidung (rund, Owner 27.08.) kommt als eigener Durchgang —
+   * sie zieht die 34 fugenlosen Raster mit und ist kein Token-Tausch.
+   */
   --radius-sm: 0.125rem;
   --radius-md: 0.25rem;
   --radius-lg: 0.375rem;
@@ -271,6 +298,8 @@
   }
 
   body {
+    /* Der Kapitelzaehler der tragenden Fuge — siehe `section-seam`. */
+    counter-reset: seam;
     min-height: 100vh;
     background-color: var(--background);
     color: var(--foreground);
@@ -432,6 +461,18 @@
   font-size: clamp(1.875rem, 3vw, 2.5rem);
   letter-spacing: -0.03em;
   line-height: 1.05;
+  /*
+   * ZIFFERN, DIE NICHT SPRINGEN.
+   *
+   * Auf der ganzen Seite stand bisher kein einziges `tabular-nums`. In
+   * Proportionalziffern ist die 1 schmaler als die 8 — untereinander
+   * stehende Betraege, Jahre und Kennziffern rutschen dadurch gegeneinander,
+   * und zwar genau dort, wo sie verglichen werden sollen (Impact-Band,
+   * Preisleiter, Betriebszahlen). Ein Haus, das misst, darf seine Zahlen
+   * nicht wackeln lassen. Hier gesetzt und nicht als eigene Klasse, damit
+   * es fuer alle 18 Fundstellen auf einmal gilt.
+   */
+  font-variant-numeric: tabular-nums;
 }
 
 /* Haltungssatz: großer Fließtext im Headline-Schnitt. */
@@ -552,6 +593,147 @@
     padding-block: 6rem;
   }
 }
+
+/* ==========================================================================
+ * DIE TRAGENDE FUGE — SIGNATUR 01.
+ *
+ * ---------------------------------------------------------------------------
+ * DAS PROBLEM
+ * 25 Sektionen, 49 Abschluesse — und jeder einzelne war dieselbe Zeile:
+ * `border-line border-b`. Wer scrollt, bekommt 49× denselben Schnitt.
+ * Genau das erzeugt den Eindruck „Kisten mit Linien dazwischen": Die Naht
+ * TRENNT, sie sagt nichts. Bei einem Haus, dessen Satz „wir bauen, was
+ * andere nicht sehen" lautet, ist das die falsche Aussage an der einzigen
+ * Stelle, die auf jeder Seite 49× vorkommt.
+ *
+ * ---------------------------------------------------------------------------
+ * DAS PRINZIP
+ * Die Naht wird zur SCHIENE. Sie bleibt eine Haarlinie — nichts wird
+ * lauter, nichts wird bunt —, aber sie bekommt einen Anfang: ein kurzes
+ * Goldstueck am Aussenrand, buendig mit dem Sektions-Raster. Wo ein
+ * Kapitel wirklich eines ist, traegt sie zusaetzlich eine KOORDINATE
+ * (`data-seam`), gesetzt in der Monospace des Hauses.
+ *
+ * Das ist der ganze Effekt. Kein Verlauf, kein Schatten, keine Bewegung.
+ * Der Unterschied entsteht dadurch, dass er 49× wiederkehrt und dabei
+ * IMMER am selben Raster haengt — dieselbe Praezision, die die Marke
+ * behauptet, nur sichtbar gemacht.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM PSEUDO-ELEMENT UND NICHT MARKUP
+ * Die Koordinate wiederholt, was die Ueberschrift daneben schon sagt. Im
+ * DOM waere sie eine zweite, stumme Stimme fuer Screenreader; als
+ * Pseudo-Element ist sie das, was sie ist — eine Markierung am Rand, wie
+ * eine Seitenzahl. Und: 49 Aufrufstellen bleiben eine Klasse statt einer
+ * neuen Komponente mit 49 Props.
+ *
+ * Ohne `data-seam` rendert `attr()` eine leere Zeichenkette — die Schiene
+ * traegt dann nur ihr Goldstueck. Das ist der Normalfall.
+ *
+ * Der linke Abstand folgt exakt `section-gutter` (1,5 / 2,5 / 4 rem),
+ * damit die Marke auf derselben Flucht sitzt wie Logo, Eyebrow und
+ * Headline. Faellt das auseinander, faellt die ganze Idee.
+ * ========================================================================== */
+
+@utility section-seam {
+  position: relative;
+  border-bottom: 1px solid var(--line);
+  /*
+   * Die Kapitelnummer zaehlt CSS, nicht das Markup — und genau das ist der
+   * Grund, warum sie stimmt: `CaseStudies` und `InsightsTeaser` rendern
+   * nichts, solange kein Material vorliegt (`return null`). Ein von Hand
+   * vergebenes „08" haette dann eine Luecke hinterlassen. Der Zaehler sieht
+   * nur, was wirklich auf der Seite steht, und zaehlt darum immer richtig.
+   *
+   * Damit ist die Nummer keine Dekoration: Sie sagt, das WIEVIELTE Kapitel
+   * hier endet — auf jeder Seite, in beiden Sprachen, ohne ein einziges
+   * neues Wort im Woerterbuch.
+   */
+  counter-increment: seam;
+
+  /* Der Anfang der Schiene. */
+  &::before {
+    content: "";
+    position: absolute;
+    left: 1.5rem;
+    bottom: -1px;
+    height: 1px;
+    width: 2.25rem;
+    background-color: var(--gold);
+  }
+
+  /* Die Koordinate — nur, wenn `data-seam` gesetzt ist. */
+  &::after {
+    content: counter(seam, decimal-leading-zero) attr(data-seam);
+    position: absolute;
+    left: 1.5rem;
+    bottom: 0.875rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    /*
+     * 0,12em statt der 0,16em der Eyebrow-Klasse: Die weite Versal-Laufweite
+     * ist fuer WORTE gemacht. Bei zwei Ziffern zieht sie die Zahl
+     * auseinander, und aus einer Kapitelnummer wird optisch eine Aufzaehlung.
+     */
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  @media (width >= 48rem) {
+    &::before,
+    &::after {
+      left: 2.5rem;
+    }
+  }
+
+  @media (width >= 64rem) {
+    &::before,
+    &::after {
+      left: 4rem;
+    }
+  }
+}
+
+/* ==========================================================================
+ * ZWEI EBENEN, SEMANTISCH — SIGNATUR 03 (Grundlage).
+ *
+ * Die Seite lag auf EINER Ebene: drei Elevation-Stufen sind definiert und
+ * wurden siebenmal in 145 Dateien benutzt. Damit war Tiefe kein Mittel,
+ * sondern ein ungenutztes Token.
+ *
+ * Die Regel ist ab jetzt nicht optisch, sondern INHALTLICH:
+ *
+ *   Basis (Papier)   Behauptung, Erzaehlung, Text — alles, was wir sagen.
+ *   Gehoben          alles, was das SYSTEM erzeugt hat: Messung, Status,
+ *                    Produktoberflaeche, Kennzahl, Beleg.
+ *
+ * Wer eine Flaeche hebt, behauptet damit: hier hat eine Maschine gearbeitet.
+ * Deshalb gibt es genau zwei Register und keine dritte Zwischenstufe —
+ * eine dritte waere wieder Dekoration.
+ * ========================================================================== */
+
+@utility surface-raised {
+  background-color: var(--surface-raised);
+  border: 1px solid var(--line);
+  box-shadow: var(--elevation-1);
+}
+
+/* ==========================================================================
+ * KANTEN-GRAMMATIK — vier Rollen, sonst nichts.
+ *
+ *   border-line          Struktur. Die Haarlinie, aus der die Seite besteht.
+ *   border-line-strong   staerkere Trennung, Formularkanten, Umrisse.
+ *   border-gold          AKTIVER Zustand — Hover, Auswahl, „hier bist du".
+ *   border-gold/45       Akzent-Schiene an einem hervorgehobenen Block.
+ *
+ * Vorher lag dieselbe Akzent-Schiene in DREI Deckkraften vor (40 / 45 / 50),
+ * ohne dass ein Unterschied gemeint war. Drei Werte fuer eine Rolle sind
+ * kein System, sondern Zufall — jetzt ist es einer.
+ * ========================================================================== */
 
 /* ==========================================================================
  * SIGNATUR-MOTIV — drei Lautstaerken, sonst nichts.

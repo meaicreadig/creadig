@@ -47,7 +47,7 @@ export function ManagedOperations() {
     <section
       id="managed-betrieb"
       aria-labelledby="managed-title"
-      className="bg-surface border-line border-b"
+      className="bg-surface section-seam"
     >
       <div className="section-shell">
         <div className="grid gap-10 lg:grid-cols-12">

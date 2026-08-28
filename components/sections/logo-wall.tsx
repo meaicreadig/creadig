@@ -141,7 +141,7 @@ export function LogoWall() {
       Menuepunkt. Die Wand ist ohnehin nicht die Produktliste, sondern das
       Oekosystem: eigene Marken UND das Arbeitsumfeld.
     */
-    <section id="oekosystem" aria-labelledby="oekosystem-title" className="border-line border-b">
+    <section id="oekosystem" aria-labelledby="oekosystem-title" className="section-seam">
       <div className="section-gutter pt-24 md:pt-32">
         <Reveal className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div>

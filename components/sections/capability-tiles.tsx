@@ -29,7 +29,7 @@ export function CapabilityTiles() {
   const copy = t.home.capabilities
 
   return (
-    <section id="leistungen" aria-labelledby="capabilities-title" className="border-line border-b">
+    <section id="leistungen" aria-labelledby="capabilities-title" className="section-seam">
       <div className="section-shell">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
           <Reveal className="lg:col-span-7">

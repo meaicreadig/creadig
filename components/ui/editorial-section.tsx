@@ -58,7 +58,7 @@ export function EditorialSection({
   const titleId = `${id}-title`
 
   return (
-    <section id={id} aria-labelledby={titleId} className="border-line border-b">
+    <section id={id} aria-labelledby={titleId} className="section-seam">
       <div className="section-shell-band">
         <Reveal>
           <p className="eyebrow text-muted-foreground">{eyebrow}</p>

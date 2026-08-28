@@ -158,7 +158,7 @@ export function CookieConsent() {
 
           {/* Art. 49 Abs. 1 lit. a DSGVO — abgesetzt, damit er nicht als
               Kleingedrucktes durchgeht. */}
-          <p className="border-gold/40 text-foreground/80 type-small mt-6 max-w-2xl border-l-2 pl-4 text-pretty">
+          <p className="border-gold/45 text-foreground/80 type-small mt-6 max-w-2xl border-l-2 pl-4 text-pretty">
             {t.consent.thirdCountry}
           </p>
 
@@ -172,7 +172,7 @@ export function CookieConsent() {
                     <p className="text-foreground text-base font-semibold">
                       {t.consent.categories.essential.name}
                     </p>
-                    <span className="border-gold/50 text-gold-text eyebrow border px-2 py-0.5">
+                    <span className="border-gold/45 text-gold-text eyebrow border px-2 py-0.5">
                       {t.consent.alwaysActive}
                     </span>
                   </div>

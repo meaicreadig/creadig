@@ -48,7 +48,7 @@ export function BetriebPageBody() {
       />
 
       {/* Der Satz, der die Haltung traegt — derselbe wie in der Sektion. */}
-      <section aria-labelledby="betrieb-statement" className="border-line border-b">
+      <section aria-labelledby="betrieb-statement" className="section-seam">
         <div className="section-shell-tight">
           <Reveal>
             <h2 id="betrieb-statement" className="type-statement max-w-4xl text-balance">
@@ -59,7 +59,7 @@ export function BetriebPageBody() {
       </section>
 
       {/* WARUM — vor der Liste, nicht dahinter. */}
-      <section aria-labelledby="betrieb-warum" className="bg-surface border-line border-b">
+      <section aria-labelledby="betrieb-warum" className="bg-surface section-seam">
         <div className="section-shell">
           <Reveal>
             <SectionEyebrow label={copy.whyLabel} />
@@ -95,7 +95,7 @@ export function BetriebPageBody() {
       </section>
 
       {/* WAS — dieselben sieben wie in der Sektion. */}
-      <section aria-labelledby="betrieb-umfang" className="border-line border-b">
+      <section aria-labelledby="betrieb-umfang" className="section-seam">
         <div className="section-shell">
           <Reveal>
             <SectionEyebrow label={managed.itemsLabel} />
@@ -135,7 +135,7 @@ export function BetriebPageBody() {
       </section>
 
       {/* WEM ES GEHOERT — die Sorge, die bei jedem Dauervertrag mitliest. */}
-      <section aria-labelledby="betrieb-eigentum" className="bg-surface border-line border-b">
+      <section aria-labelledby="betrieb-eigentum" className="bg-surface section-seam">
         <div className="section-shell-tight">
           <div className="grid gap-10 lg:grid-cols-12">
             <Reveal className="lg:col-span-5">
@@ -159,7 +159,7 @@ export function BetriebPageBody() {
         Reihenfolge.
       */}
       {retainerPublished && retainer.description && (
-        <section aria-labelledby="betrieb-preis" className="border-line border-b">
+        <section aria-labelledby="betrieb-preis" className="section-seam">
           <div className="section-shell-tight">
             <Reveal>
               <div className="border-gold/45 bg-background grid gap-10 border-l-2 px-7 py-9 md:px-10 md:py-11 lg:grid-cols-12 lg:gap-14">

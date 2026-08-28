@@ -38,7 +38,7 @@ export function SeoLandingPageBody({ landing }: { landing: SeoLanding }) {
         crumbs={[{ label: t.nav.leistungen, href: "/leistungen" }]}
       />
 
-      <section aria-labelledby="landing-text" className="border-line border-b">
+      <section aria-labelledby="landing-text" className="section-seam">
         <div className="section-shell">
           <h2 id="landing-text" className="sr-only">
             {landing.h1[locale]}
@@ -55,7 +55,7 @@ export function SeoLandingPageBody({ landing }: { landing: SeoLanding }) {
 
       {/* Was dazugehoert — dieselbe Liste wie auf der Leistungsseite. */}
       {service && (
-        <section aria-labelledby="landing-umfang" className="bg-surface border-line border-b">
+        <section aria-labelledby="landing-umfang" className="bg-surface section-seam">
           <div className="section-shell">
             <Reveal>
               <SectionEyebrow label={copy.includesLabel} />

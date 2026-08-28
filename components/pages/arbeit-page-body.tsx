@@ -73,7 +73,7 @@ export function ArbeitPageBody({
         {...(work.built
           ? { "aria-labelledby": "arbeit-gebaut-title" }
           : { "aria-label": copy.builtLabel })}
-        className="border-line border-b"
+        className="section-seam"
       >
         <div className="section-shell">
           <div className="grid gap-x-12 gap-y-14 lg:grid-cols-12">
@@ -120,7 +120,7 @@ export function ArbeitPageBody({
           ------------------------------------------------------------------ */}
       <section
         aria-labelledby="arbeit-fall-title"
-        className="border-line border-b"
+        className="section-seam"
       >
         <div className={study ? "section-shell" : "section-shell-tight"}>
           {study ? (
@@ -159,7 +159,7 @@ export function ArbeitPageBody({
 
       <section
         aria-labelledby="arbeit-cta-title"
-        className="border-line border-b"
+        className="section-seam"
       >
         <div className="section-shell-tight">
           <Reveal>

@@ -75,7 +75,7 @@ export function KontaktPageBody() {
         </div>
       </PageHeader>
 
-      <section aria-labelledby="wege-title" className="border-line border-b">
+      <section aria-labelledby="wege-title" className="section-seam">
         <div className="section-shell">
           <Reveal>
             <SectionEyebrow label={copy.intentsLabel} />

@@ -48,7 +48,7 @@ export function SystemePageBody() {
         lead={copy.lead}
       />
 
-      <section aria-labelledby="systeme-statement" className="border-line border-b">
+      <section aria-labelledby="systeme-statement" className="section-seam">
         <div className="section-shell-tight">
           <Reveal>
             <h2 id="systeme-statement" className="type-statement max-w-4xl text-balance">
@@ -59,7 +59,7 @@ export function SystemePageBody() {
       </section>
 
       {/* 1 — die sieben Kategorien, je mit der Frage davor. */}
-      <section aria-labelledby="systeme-kategorien" className="bg-surface border-line border-b">
+      <section aria-labelledby="systeme-kategorien" className="bg-surface section-seam">
         <div className="section-shell">
           <div className="grid gap-10 lg:grid-cols-12">
             <Reveal className="lg:col-span-7">
@@ -120,7 +120,7 @@ export function SystemePageBody() {
         auf /status.
       */}
       {connectedSystems.length > 0 && (
-        <section aria-labelledby="systeme-angebunden" className="border-line border-b">
+        <section aria-labelledby="systeme-angebunden" className="section-seam">
           <div className="section-shell">
             <Reveal>
               <SectionEyebrow label={copy.connectedLabel} />
@@ -146,7 +146,7 @@ export function SystemePageBody() {
       )}
 
       {/* 3 — wie betrieben wird. Die Leistung dazu steht auf /betrieb. */}
-      <section aria-labelledby="systeme-betrieb" className="border-line border-b">
+      <section aria-labelledby="systeme-betrieb" className="section-seam">
         <div className="section-shell">
           <Reveal>
             <SectionEyebrow label={copy.operationsEyebrow} />

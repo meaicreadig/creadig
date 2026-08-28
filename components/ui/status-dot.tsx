@@ -34,9 +34,10 @@ export function StatusDot({ live, className }: { live?: boolean; className?: str
         "inline-block size-2 shrink-0 rounded-full",
         // Der offene Ring lag zuerst auf der Linienfarbe und war damit fast
         // unsichtbar — „im Aufbau" las sich wie ein Rendering-Fehler statt wie
-        // ein Zustand. Gold mit halber Deckung bleibt in der Palette und ist
-        // eindeutig als Ring erkennbar.
-        live ? "bg-gold" : "border-gold/60 border bg-transparent",
+        // ein Zustand. Volles Gold: Der Ring IST der Zustand, und die
+        // Kanten-Grammatik in `globals.css` reserviert volles Gold genau
+        // dafuer — Akzent-Flaechen tragen `/45`.
+        live ? "bg-gold" : "border-gold border bg-transparent",
         className,
       )}
     />

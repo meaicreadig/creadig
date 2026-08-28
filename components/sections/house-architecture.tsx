@@ -45,7 +45,7 @@ export function HouseArchitecture() {
   const layersTopDown = [...serviceLayers].reverse()
 
   return (
-    <section id="haus" aria-labelledby="haus-title" className="border-line border-b">
+    <section id="haus" aria-labelledby="haus-title" className="section-seam">
       <div className="section-shell">
         <div className="grid gap-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-7">
@@ -62,7 +62,7 @@ export function HouseArchitecture() {
         <figure className="mt-20">
           {/* ---- Das Dach ------------------------------------------------ */}
           <Reveal>
-            <div className="border-gold/60 bg-surface border px-7 py-8 text-center">
+            <div className="border-gold/45 bg-surface border px-7 py-8 text-center">
               <p className="eyebrow text-gold-text">{copy.roofLabel}</p>
               <p className="text-display mt-4 text-3xl tracking-tight md:text-4xl">creaDIG</p>
               <p className="type-small text-muted-foreground mt-3">{copy.roofNote}</p>

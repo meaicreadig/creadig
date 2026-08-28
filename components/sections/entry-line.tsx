@@ -48,7 +48,7 @@ export function EntryLine() {
   const questions = t.faq.items.slice(0, 2)
 
   return (
-    <section id="einstieg" aria-labelledby="einstieg-title" className="border-line border-b">
+    <section id="einstieg" aria-labelledby="einstieg-title" className="section-seam">
       <div className="section-shell-tight">
         <div className="grid gap-x-12 gap-y-12 lg:grid-cols-12">
           <Reveal className="lg:col-span-6">

@@ -49,7 +49,7 @@ export function AccessibilityPageBody() {
       />
 
       {/* Freiwillig — der erste Abschnitt, nicht der letzte. */}
-      <section aria-labelledby="freiwillig" className="border-line border-b">
+      <section aria-labelledby="freiwillig" className="section-seam">
         <div className="section-shell">
           <Reveal>
             <h2 id="freiwillig" className="type-h3 max-w-2xl text-balance">
@@ -62,7 +62,7 @@ export function AccessibilityPageBody() {
         </div>
       </section>
 
-      <section aria-labelledby="stand" className="border-line border-b">
+      <section aria-labelledby="stand" className="section-seam">
         <div className="section-shell">
           <div className="grid gap-x-14 gap-y-10 lg:grid-cols-12">
             <Reveal className="lg:col-span-5">
@@ -85,7 +85,7 @@ export function AccessibilityPageBody() {
         </div>
       </section>
 
-      <section aria-labelledby="geprueft" className="border-line border-b">
+      <section aria-labelledby="geprueft" className="section-seam">
         <div className="section-shell">
           <Reveal>
             <h2 id="geprueft" className="type-h3 text-balance">
@@ -114,7 +114,7 @@ export function AccessibilityPageBody() {
         </div>
       </section>
 
-      <section aria-labelledby="behoben" className="border-line border-b">
+      <section aria-labelledby="behoben" className="section-seam">
         <div className="section-shell">
           <Reveal>
             <h2 id="behoben" className="type-h3 text-balance">
@@ -141,7 +141,7 @@ export function AccessibilityPageBody() {
         </div>
       </section>
 
-      <section aria-labelledby="offen" className="border-line border-b">
+      <section aria-labelledby="offen" className="section-seam">
         <div className="section-shell">
           <Reveal>
             <h2 id="offen" className="type-h3 text-balance">
@@ -164,7 +164,7 @@ export function AccessibilityPageBody() {
         </div>
       </section>
 
-      <section aria-labelledby="melden" className="border-line border-b">
+      <section aria-labelledby="melden" className="section-seam">
         <div className="section-shell">
           <Reveal>
             <h2 id="melden" className="type-h3 text-balance">
@@ -198,7 +198,7 @@ export function AccessibilityPageBody() {
         </div>
       </section>
 
-      <section aria-labelledby="methode" className="border-line border-b">
+      <section aria-labelledby="methode" className="section-seam">
         <div className="section-shell">
           <Reveal>
             <h2 id="methode" className="type-h3 text-balance">

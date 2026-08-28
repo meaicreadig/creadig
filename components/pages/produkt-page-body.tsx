@@ -153,7 +153,7 @@ export function ProduktPageBody({
           ohne Problem davor ist ein Bild, kein Beweis.
           ------------------------------------------------------------------ */}
       {(world?.problem || world?.thesis) && (
-        <section aria-labelledby="produkt-warum-title" className="border-line border-b">
+        <section aria-labelledby="produkt-warum-title" className="section-seam">
           <div className="section-shell">
             <h2 id="produkt-warum-title" className="sr-only">
               {copy.problemLabel}
@@ -184,7 +184,7 @@ export function ProduktPageBody({
           2 — Das Interface. Der Beweis steht oben, nicht unten.
           ------------------------------------------------------------------ */}
       {screens.length > 0 ? (
-        <section aria-labelledby="interface-title" className="border-line border-b">
+        <section aria-labelledby="interface-title" className="section-seam">
           <div className="section-shell">
             <Reveal>
               <SectionEyebrow label={copy.screensLabel} />
@@ -219,7 +219,7 @@ export function ProduktPageBody({
           </div>
         </section>
       ) : (
-        <section aria-label={copy.screensLabel} className="border-line border-b">
+        <section aria-label={copy.screensLabel} className="section-seam">
           <div className="section-shell-tight">
             <Reveal>
               <p className="type-statement text-foreground/85 max-w-3xl text-balance">
@@ -234,7 +234,7 @@ export function ProduktPageBody({
           2 — Was gebaut ist, in Bausteinen statt als Komma-Kette.
           ------------------------------------------------------------------ */}
       {world && (
-        <section aria-labelledby="gebaut-title" className="border-line border-b">
+        <section aria-labelledby="gebaut-title" className="section-seam">
           <div className="section-shell">
             {/*
               Hier stand bis zur Sichtpruefung `product.built` als H2 — also
@@ -304,7 +304,7 @@ export function ProduktPageBody({
           world.architecture ||
           world.operations ||
           world.learnings.length > 0) && (
-          <section aria-labelledby="produkt-tiefe-title" className="border-line border-b">
+          <section aria-labelledby="produkt-tiefe-title" className="section-seam">
             <div className="section-shell">
               <h2 id="produkt-tiefe-title" className="sr-only">
                 {copy.functionsLabel}
@@ -371,7 +371,7 @@ export function ProduktPageBody({
           4 — Warum. Gated: `story` ist überall null, die Sektion rendert nicht.
           ------------------------------------------------------------------ */}
       {world?.story && (
-        <section aria-labelledby="story-title" className="border-line border-b">
+        <section aria-labelledby="story-title" className="section-seam">
           <div className="section-shell">
             <div className="grid gap-x-14 gap-y-10 lg:grid-cols-12">
               <Reveal className="lg:col-span-4">
@@ -394,7 +394,7 @@ export function ProduktPageBody({
           5 — Einordnung: Die Brücke vom eigenen Produkt zur Leistung.
           ------------------------------------------------------------------ */}
       {layer && layerCopy && (
-        <section aria-labelledby="einordnung-title" className="border-line border-b">
+        <section aria-labelledby="einordnung-title" className="section-seam">
           <div className="section-shell">
             <div className="grid gap-x-14 gap-y-12 lg:grid-cols-12">
               <Reveal className="lg:col-span-5">
@@ -473,7 +473,7 @@ export function ProduktPageBody({
           6 — Weiter. Ein Ring, keine Sackgasse.
           ------------------------------------------------------------------ */}
       {neighbours && (
-        <section aria-label={copy.nextLabel} className="border-line border-b">
+        <section aria-label={copy.nextLabel} className="section-seam">
           <div className="section-gutter grid gap-px sm:grid-cols-2">
             {(
               [
@@ -528,7 +528,7 @@ export function ProduktPageBody({
       {/* ------------------------------------------------------------------
           8 — Abschluss.
           ------------------------------------------------------------------ */}
-      <section aria-labelledby="produkt-cta-title" className="border-line border-b">
+      <section aria-labelledby="produkt-cta-title" className="section-seam">
         <div className="section-shell-tight">
           <Reveal>
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">

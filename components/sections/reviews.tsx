@@ -42,7 +42,7 @@ export function Reviews() {
   })
 
   return (
-    <section id="bewertungen" aria-labelledby="bewertungen-title" className="border-line border-b">
+    <section id="bewertungen" aria-labelledby="bewertungen-title" className="section-seam">
       <div className="section-shell">
         <div className="grid gap-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-7">

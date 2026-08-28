@@ -9,7 +9,7 @@ export function About() {
   const { t } = useLocale()
 
   return (
-    <section id="ueber-uns" aria-labelledby="ueber-title" className="border-line border-b">
+    <section id="ueber-uns" aria-labelledby="ueber-title" className="section-seam">
       <div className="section-shell">
         <Reveal>
           <SectionEyebrow label={t.about.eyebrow} />

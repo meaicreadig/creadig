@@ -43,7 +43,7 @@ export function ContactDirect() {
       ist teurer als es zu behalten — es zeigt jetzt auf die Wege statt auf
       ein Eingabefeld.
     */
-    <section id="kontakt" aria-labelledby="kontakt-title" className="border-line border-b">
+    <section id="kontakt" aria-labelledby="kontakt-title" className="section-seam">
       <div className="section-shell">
         <div className="grid gap-x-14 gap-y-16 lg:grid-cols-12">
           {/* Links: was diese Seite ist — und der Sitz. */}

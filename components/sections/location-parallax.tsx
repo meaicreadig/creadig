@@ -58,7 +58,7 @@ export function LocationParallax({ photoSrc }: { photoSrc: string | null }) {
   const y = useTransform(scrollYProgress, [0, 1], SHIFT)
 
   return (
-    <section id="standort" aria-labelledby="standort-title" className="border-line border-b">
+    <section id="standort" aria-labelledby="standort-title" className="section-seam">
       <div
         ref={frameRef}
         className="relative h-[clamp(22rem,58vh,30rem)] w-full overflow-hidden md:h-[clamp(28rem,72vh,44rem)]"

@@ -11,7 +11,7 @@ export function Packages() {
   const { t, locale } = useLocale()
 
   return (
-    <section id="pakete" aria-labelledby="pakete-title" className="border-line border-b">
+    <section id="pakete" aria-labelledby="pakete-title" className="section-seam">
       <div className="section-shell">
         <div className="grid gap-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-7">

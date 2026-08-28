@@ -77,7 +77,7 @@ export function ProductInterest({
 
   if (status === "sent") {
     return (
-      <section aria-labelledby={`interesse-${slug}-title`} className="border-line border-b">
+      <section aria-labelledby={`interesse-${slug}-title`} className="section-seam">
         <div className="section-shell-tight">
           <Reveal>
             <div
@@ -98,7 +98,7 @@ export function ProductInterest({
   }
 
   return (
-    <section aria-labelledby={`interesse-${slug}-title`} className="border-line border-b">
+    <section aria-labelledby={`interesse-${slug}-title`} className="section-seam">
       <div className="section-shell-tight">
         <div className="grid gap-x-14 gap-y-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-5">

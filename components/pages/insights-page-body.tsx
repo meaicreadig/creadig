@@ -44,7 +44,7 @@ export function InsightsPageBody() {
       <PageHeader eyebrow={copy.eyebrow} title={copy.title}
         crumbLabel={t.nav.insights} lead={copy.lead} />
 
-      <section aria-labelledby="insights-title" className="border-line border-b">
+      <section aria-labelledby="insights-title" className="section-seam">
         <div className="section-shell">
           {entries.length === 0 ? (
             <Reveal>
