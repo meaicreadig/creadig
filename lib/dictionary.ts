@@ -3523,3 +3523,22 @@ export const dictionary = {
 } as const
 
 export type Dictionary = (typeof dictionary)["de"]
+
+type IsPlainObject<T> = T extends object ? (T extends readonly unknown[] ? false : true) : false
+
+/** Keys and nesting must match; leaf strings may differ (DE vs TR copy). */
+type SameShape<A, B> = IsPlainObject<A> extends true
+  ? IsPlainObject<B> extends true
+    ? keyof A extends keyof B
+      ? keyof B extends keyof A
+        ? { [K in keyof A & keyof B]: SameShape<A[K], B[K]> }[keyof A & keyof B] extends true
+          ? true
+          : false
+        : false
+      : false
+    : false
+  : true
+
+type AssertLocaleParity = SameShape<Dictionary, (typeof dictionary)["tr"]>
+const _localeParity: AssertLocaleParity = true
+void _localeParity

@@ -7,7 +7,9 @@ import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { cn } from "@/lib/utils"
+import { contact } from "@/lib/site-data"
 import { trackLead } from "@/lib/track"
+import { useLeadSubmit } from "@/lib/use-lead"
 
 /**
  * FEAT-1 — der Nachfragepfad je Produkt.
@@ -51,6 +53,7 @@ export function ProductInterest({
   productName: string
 }) {
   const { t, locale } = useLocale()
+  const submitLead = useLeadSubmit()
   const copy = t.produktPage.interest
 
   const [email, setEmail] = useState("")
@@ -64,12 +67,23 @@ export function ProductInterest({
   const fieldClass =
     "w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-3 text-base text-foreground outline-none transition-colors duration-300 placeholder:text-muted-foreground focus:border-gold"
 
+  /** Dieselben Codes wie Kontakt, Kurz-Check und Termin — ein Endpunkt, eine Sprache. */
+  function errorText(code: string | undefined) {
+    if (code === "not_configured") return `${t.contact.errNotConfigured} ${contact.email}.`
+    if (code === "rate_limited") return t.contact.errRateLimited
+    if (code === "token_expired" || code === "token_invalid") return t.contact.errFormExpired
+    return t.contact.errSendFailed
+  }
+
   if (status === "sent") {
     return (
       <section aria-labelledby={`interesse-${slug}-title`} className="border-line border-b">
         <div className="section-shell-tight">
           <Reveal>
-            <div className="border-gold bg-muted border-l-2 py-6 pl-6">
+            <div
+              role="status"
+              className="border-gold bg-muted border-l-2 py-6 pl-6"
+            >
               <h2 id={`interesse-${slug}-title`} className="type-h4">
                 {copy.sentTitle}
               </h2>
@@ -120,31 +134,24 @@ export function ProductInterest({
                 setStatus("sending")
 
                 try {
-                  const response = await fetch("/api/lead", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      name: name.trim() || productName,
-                      email,
-                      phone: copy.phoneOmitted,
-                      privacyOk,
-                      locale,
-                      website,
-                      source: `produkt-${slug}`,
-                      message: copy.messageTemplate.replace("{product}", productName),
-                    }),
+                  const data = await submitLead({
+                    name: name.trim() || productName,
+                    email,
+                    phone: copy.phoneOmitted,
+                    privacyOk,
+                    locale,
+                    website,
+                    source: `produkt-${slug}`,
+                    message: copy.messageTemplate.replace("{product}", productName),
                   })
-                  const data = (await response.json().catch(() => null)) as
-                    | { ok?: boolean; error?: string }
-                    | null
 
-                  if (response.ok && data?.ok) {
+                  if (data.status >= 200 && data.status < 300 && data.ok) {
                     setStatus("sent")
                     trackLead(`produkt-${slug}`)
                     return
                   }
                   setStatus("idle")
-                  setError(t.contact.errSendFailed)
+                  setError(errorText(data.error))
                 } catch {
                   setStatus("idle")
                   setError(t.contact.errSendFailed)
@@ -231,16 +238,10 @@ export function ProductInterest({
               <button
                 type="submit"
                 disabled={status === "sending"}
-                className="group from-gold-soft to-gold relative inline-flex items-center gap-2.5 self-start overflow-hidden bg-gradient-to-br px-7 py-3.5 text-sm tracking-wide text-[#201e1b] disabled:cursor-not-allowed disabled:opacity-60"
+                className="border-gold-text/55 text-foreground hover:border-gold-text hover:text-gold-text inline-flex items-center gap-2.5 self-start border bg-transparent px-7 py-3.5 text-sm tracking-wide transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
-                />
-                <span className="group-hover:text-gold-soft relative z-10 flex items-center gap-2.5 transition-colors duration-500">
-                  <Send className="size-4" strokeWidth={1.5} />
-                  {status === "sending" ? t.contact.sending : copy.submit}
-                </span>
+                <Send className="size-4" strokeWidth={1.5} />
+                {status === "sending" ? t.contact.sending : copy.submit}
               </button>
             </form>
           </Reveal>

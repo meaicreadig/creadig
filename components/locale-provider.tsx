@@ -5,7 +5,7 @@ import { dictionary, type Dictionary, type Locale } from "@/lib/dictionary"
 
 type LocaleContextValue = {
   locale: Locale
-  t: Dictionary
+  t: (typeof dictionary)[Locale]
 }
 
 const LocaleContext = createContext<LocaleContextValue>({
@@ -47,10 +47,7 @@ export function LocaleProvider({
   locale: Locale
   children: React.ReactNode
 }) {
-  const value = useMemo(
-    () => ({ locale, t: dictionary[locale] as Dictionary }),
-    [locale],
-  )
+  const value = useMemo(() => ({ locale, t: dictionary[locale] }), [locale])
 
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
 }

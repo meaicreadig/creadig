@@ -24,6 +24,7 @@ import { Logo } from "@/components/brand/logo"
 import { mainNavLinks } from "@/lib/site-data"
 import { localePath, splitLocale } from "@/lib/routes"
 import { WHATSAPP_LINK } from "@/lib/dictionary"
+import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { cn } from "@/lib/utils"
 
 /**
@@ -76,6 +77,7 @@ export function SiteNav() {
   // Der Menuepunkt-Vergleich laeuft auf dem deutschen Basispfad, sonst waere
   // auf /tr/... nie etwas aktiv.
   const { path: pathname } = splitLocale(usePathname())
+  const reduceMotion = usePrefersReducedMotion()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
 
@@ -240,32 +242,46 @@ export function SiteNav() {
               </SheetHeader>
 
               <nav aria-label="Mobile Navigation" className="flex flex-col px-6 pt-6">
-                {mainNavLinks.map((link, index) => (
-                  <SheetClose asChild key={link.href}>
-                    <MotionLink
-                      href={link.href}
-                      aria-current={isActive(pathname, link.href) ? "page" : undefined}
-                      initial={{ opacity: 0, y: 14 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.06 * index + 0.1, duration: 0.5 }}
-                      className="text-display border-b border-line py-5 text-3xl text-foreground"
-                    >
+                {mainNavLinks.map((link, index) => {
+                  const hint = t.nav.hints[link.labelKey as keyof typeof t.nav.hints]
+                  const linkClassName =
+                    "text-display border-b border-line py-5 text-3xl text-foreground"
+                  const linkBody = (
+                    <>
                       {t.nav[link.labelKey]}
-                      {/*
-                        S-2 — das Menuewort allein sagt nicht, was dahinterliegt.
-                        „Produkte" liest sich wie ein Katalog; tatsaechlich ist
-                        es der Beweis. Auf dem Telefon ist Platz fuer den
-                        Halbsatz, in der Desktop-Leiste nicht — dort traegt ihn
-                        das `title`-Attribut.
-                      */}
-                      {t.nav.hints[link.labelKey as keyof typeof t.nav.hints] && (
+                      {hint && (
                         <span className="text-muted-foreground type-small mt-1.5 block text-pretty">
-                          {t.nav.hints[link.labelKey as keyof typeof t.nav.hints]}
+                          {hint}
                         </span>
                       )}
-                    </MotionLink>
-                  </SheetClose>
-                ))}
+                    </>
+                  )
+
+                  return (
+                    <SheetClose asChild key={link.href}>
+                      {reduceMotion ? (
+                        <Link
+                          href={link.href}
+                          aria-current={isActive(pathname, link.href) ? "page" : undefined}
+                          className={linkClassName}
+                        >
+                          {linkBody}
+                        </Link>
+                      ) : (
+                        <MotionLink
+                          href={link.href}
+                          aria-current={isActive(pathname, link.href) ? "page" : undefined}
+                          initial={{ opacity: 0, y: 14 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.06 * index + 0.1, duration: 0.5 }}
+                          className={linkClassName}
+                        >
+                          {linkBody}
+                        </MotionLink>
+                      )}
+                    </SheetClose>
+                  )
+                })}
                 {/*
                   Hier stand „Zertifizierungen" als Vertrauens-Baustein. Der
                   Anker, auf den er zeigte, gibt es nicht mehr: Alle vier

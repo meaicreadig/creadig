@@ -30,17 +30,47 @@
  */
 
 const WINDOW_MS = 15 * 60 * 1000
+/** Verhindert unbegrenztes Wachstum, wenn `kind` von aussen kommt. */
+const MAX_KINDS = 64
 
 type Entry = { lastSent: number; suppressed: number }
 
 const seen = new Map<string, Entry>()
 
+function normaliseKind(kind: string): string {
+  const safe = kind.replace(/[^a-z0-9_-]/gi, "").slice(0, 48)
+  return safe || "unknown"
+}
+
+function pruneSeen(now: number) {
+  if (seen.size <= MAX_KINDS) return
+
+  for (const [key, entry] of seen) {
+    if (now - entry.lastSent >= WINDOW_MS) seen.delete(key)
+  }
+
+  while (seen.size > MAX_KINDS) {
+    let oldestKey: string | null = null
+    let oldestTime = Infinity
+    for (const [key, entry] of seen) {
+      if (entry.lastSent < oldestTime) {
+        oldestTime = entry.lastSent
+        oldestKey = key
+      }
+    }
+    if (!oldestKey) break
+    seen.delete(oldestKey)
+  }
+}
+
 /** `null` = jetzt melden (mit Zahl der unterdrückten), sonst stillhalten. */
 function shouldSend(kind: string, now: number): number | null {
-  const entry = seen.get(kind)
+  const key = normaliseKind(kind)
+  const entry = seen.get(key)
   if (!entry || now - entry.lastSent >= WINDOW_MS) {
     const suppressed = entry?.suppressed ?? 0
-    seen.set(kind, { lastSent: now, suppressed: 0 })
+    seen.set(key, { lastSent: now, suppressed: 0 })
+    pruneSeen(now)
     return suppressed
   }
   entry.suppressed++
@@ -55,13 +85,14 @@ function shouldSend(kind: string, now: number): number | null {
  * sonst drosselt nichts.
  */
 export async function raiseAlert(kind: string, message: string): Promise<void> {
-  const suppressed = shouldSend(kind, Date.now())
+  const safeKind = normaliseKind(kind)
+  const suppressed = shouldSend(safeKind, Date.now())
   if (suppressed === null) return
 
   const text =
     suppressed > 0
-      ? `creaDIG [${kind}] ${message} (${suppressed} weitere im letzten Fenster unterdrückt)`
-      : `creaDIG [${kind}] ${message}`
+      ? `creaDIG [${safeKind}] ${message} (${suppressed} weitere im letzten Fenster unterdrückt)`
+      : `creaDIG [${safeKind}] ${message}`
 
   console.error(`[alarm] ${text}`)
 

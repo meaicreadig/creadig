@@ -111,7 +111,9 @@ export async function POST(request: Request) {
     console.warn(`[csp] ${line}`)
 
     if (violation.disposition === "enforce" && !fromExtension(violation.blockedUri)) {
-      await raiseAlert(`csp-${violation.violatedDirective ?? "unbekannt"}`, line)
+      // Ein fester `kind`-Schluessel — sonst wird `violatedDirective` aus dem
+      // Request zum Drossel-Schlüssel und erzeugt unbegrenzt viele Alarme.
+      await raiseAlert("csp-enforce", line)
     }
   }
 
