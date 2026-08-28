@@ -40,33 +40,48 @@ export function MagneticButton({
     setOffset({ x: relX * 0.16, y: relY * 0.22 })
   }
 
+  /*
+   * OHNE FUELLUNG — Owner-Entscheidung 28.08.2026.
+   *
+   * ---------------------------------------------------------------------------
+   * WAS HIER STAND UND WARUM ES GEHT
+   * Der Hauptknopf war eine gefuellte Gold-Flaeche mit Verlauf, dazu ein
+   * anthrazitfarbener Vorhang, der bei Hover von oben ueber die ganze Flaeche
+   * fuhr. Auf einer Seite, deren gesamte Sprache aus Haarlinien besteht, war
+   * das die einzige grosse gefuellte Flaeche ueberhaupt — und damit das
+   * lauteste Element der Marke. Ein Haus, das „zeigen statt behaupten" als
+   * Regel hat, sollte nicht ausgerechnet den Knopf am lautesten stellen.
+   *
+   * Jetzt traegt die KANTE die Farbe, nicht die Flaeche. Der Knopf ist ein
+   * Rahmen, der sich beim Hover verfaerbt — dieselbe Geste, die die Seite
+   * ohnehin ueberall benutzt (Karten, Kacheln, Eyebrow-Linie), nur an der
+   * Stelle, an der etwas passiert.
+   *
+   * ---------------------------------------------------------------------------
+   * WARUM `--gold-text` UND NICHT `--gold`
+   * Weil der Rahmen jetzt die Hauptsache ist. `--gold` erreicht auf dem
+   * Papierweiss nur 2,6 : 1 — unter den 3 : 1, die WCAG 1.4.11 fuer die
+   * Umrisse von Bedienelementen verlangt (dieselbe Rechnung steht in
+   * `globals.css` beim Fokus-Ring). `--gold-text` haelt 5,26 : 1 hell und
+   * 7,50 : 1 dunkel. Solange die Fuellung da war, war das egal; jetzt nicht
+   * mehr.
+   *
+   * Die Hierarchie liegt damit in der Rahmenfarbe: Gold fuehrt, neutral
+   * folgt. Zwei Umrisse, ein Unterschied — mehr braucht es nicht.
+   */
   const base = cn(
-    "group relative inline-flex items-center justify-center gap-2.5 overflow-hidden",
+    "group relative inline-flex items-center justify-center gap-2.5",
     // Großzügige Fläche, damit die CTAs neben der riesigen Display-Typo bestehen.
-    "px-9 py-5 text-base tracking-wide transition-colors duration-500",
+    "border bg-transparent px-9 py-5 text-base tracking-wide",
+    "transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
     variant === "primary"
-      ? "bg-gradient-to-br from-gold-soft to-gold text-[#201e1b]"
-      : "border border-line-strong bg-transparent text-foreground hover:border-gold",
+      ? "border-gold-text/55 text-foreground hover:border-gold-text hover:text-gold-text"
+      : "border-line-strong text-muted-foreground hover:border-foreground hover:text-foreground",
     className,
   )
 
   const inner = (
-    <>
-      {variant === "primary" && (
-        <span
-          aria-hidden="true"
-          className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
-        />
-      )}
-      <span
-        className={cn(
-          "relative z-10 flex items-center gap-2.5",
-          variant === "primary" && "transition-colors duration-500 group-hover:text-gold-soft",
-        )}
-      >
-        {children}
-      </span>
-    </>
+    <span className="flex items-center gap-2.5">{children}</span>
   )
 
   const motionProps = {

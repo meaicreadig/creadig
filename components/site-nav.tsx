@@ -203,17 +203,17 @@ export function SiteNav() {
             Kontaktliste. „Projekt starten" hiess bisher: Seite mit vier
             Absichten, darunter ein Formular. Jetzt heisst es, was es sagt.
           */}
+          {/*
+            Ohne Fuellung — wie `MagneticButton` (28.08.2026). Der Knopf in
+            der Kopfzeile MUSS dieselbe Sprache sprechen wie der im Hero;
+            ein gefuellter Knopf oben und ein Umriss 200 Pixel darunter
+            waeren zwei Marken auf einem Bildschirm.
+          */}
           <Link
             href="/termin"
-            className="group relative ml-1.5 hidden items-center overflow-hidden bg-gradient-to-br from-gold-soft to-gold eyebrow px-6 py-3 text-[#201e1b] sm:inline-flex"
+            className="eyebrow border-gold-text/55 text-foreground hover:border-gold-text hover:text-gold-text ml-1.5 hidden items-center border bg-transparent px-6 py-3 transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:inline-flex"
           >
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
-            />
-            <span className="relative z-10 transition-colors duration-500 group-hover:text-gold-soft">
-              {t.nav.cta}
-            </span>
+            {t.nav.cta}
           </Link>
 
           <Sheet open={open} onOpenChange={setOpen}>
@@ -279,7 +279,7 @@ export function SiteNav() {
                 <SheetClose asChild>
                   <Link
                     href="/termin"
-                    className="flex items-center justify-center bg-gradient-to-br from-gold-soft to-gold px-6 py-4 text-sm tracking-wide text-[#201e1b]"
+                    className="border-gold-text/55 text-foreground hover:border-gold-text hover:text-gold-text flex items-center justify-center border bg-transparent px-6 py-4 text-sm tracking-wide transition-colors duration-500"
                   >
                     {t.nav.cta}
                   </Link>
