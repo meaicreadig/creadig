@@ -31,7 +31,7 @@ function MonogramPanel({ mark }: { mark: string }) {
       />
       <span
         aria-hidden="true"
-        className="border-gold/40 text-gold text-display flex size-20 items-center justify-center border text-2xl"
+        className="border-gold-text/55 text-gold-text text-display flex size-20 items-center justify-center border text-2xl"
       >
         {mark}
       </span>

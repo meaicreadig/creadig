@@ -18,7 +18,7 @@ const STATUS_LINK_VISIBLE =
   process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_STATUS_PUBLIC === "1"
 
 export function SiteFooter() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
 
   return (
     <footer className="section-dark relative overflow-hidden">
@@ -206,7 +206,10 @@ export function SiteFooter() {
                 Beides ist Owner-Sache und steht als offener Punkt auf
                 `/status` selbst.
               */}
-              {STATUS_LINK_VISIBLE && (
+              {/* Es gibt keine Route `app/(tr)/tr/status/` — auf Tuerkisch
+                  zeigte der Link auf eine 404. Bis die Seite zweisprachig
+                  ist, erscheint er nur im deutschen Baum. */}
+              {STATUS_LINK_VISIBLE && locale === "de" && (
                 <li>
                   <Link
                     href="/status"

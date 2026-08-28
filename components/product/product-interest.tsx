@@ -238,7 +238,7 @@ export function ProductInterest({
               <button
                 type="submit"
                 disabled={status === "sending"}
-                className="border-gold-text/55 text-foreground hover:border-gold-text hover:text-gold-text inline-flex items-center gap-2.5 self-start border bg-transparent px-7 py-3.5 text-sm tracking-wide transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] disabled:cursor-not-allowed disabled:opacity-60"
+                className="cta-outline inline-flex items-center gap-2.5 self-start px-7 py-3.5 text-sm tracking-wide disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Send className="size-4" strokeWidth={1.5} />
                 {status === "sending" ? t.contact.sending : copy.submit}

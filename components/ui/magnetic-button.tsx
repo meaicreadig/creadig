@@ -72,11 +72,12 @@ export function MagneticButton({
   const base = cn(
     "group relative inline-flex items-center justify-center gap-2.5",
     // Großzügige Fläche, damit die CTAs neben der riesigen Display-Typo bestehen.
-    "border bg-transparent px-9 py-5 text-base tracking-wide",
-    "transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+    "px-9 py-5 text-base tracking-wide",
     variant === "primary"
-      ? "border-gold-text/55 text-foreground hover:border-gold-text hover:text-gold-text"
-      : "border-line-strong text-muted-foreground hover:border-foreground hover:text-foreground",
+      // Die Marke steht in `globals.css` (`cta-outline`) — nicht hier. Sonst
+      // liegt dieselbe Rezeptur wieder an mehreren Stellen und laeuft auseinander.
+      ? "cta-outline"
+      : "border-line-strong text-muted-foreground hover:border-foreground border bg-transparent transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-foreground",
     className,
   )
 

@@ -36,7 +36,7 @@ function PhotoPlaceholder() {
         className="motif-placeholder pointer-events-none absolute inset-0 h-full w-full"
       />
       <div className="relative flex h-full items-center justify-center">
-        <span className="border-gold/40 text-gold flex size-24 items-center justify-center border">
+        <span className="border-gold-text/55 text-gold-text flex size-24 items-center justify-center border">
           <MapPin className="size-9" strokeWidth={1.25} />
         </span>
       </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useMemo } from "react"
-import { dictionary, type Dictionary, type Locale } from "@/lib/dictionary"
+import { dictionary, type Locale } from "@/lib/dictionary"
 
 type LocaleContextValue = {
   locale: Locale

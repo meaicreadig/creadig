@@ -208,12 +208,8 @@ export function CookieConsent() {
             <button
               type="button"
               onClick={() => decide(ACCEPT_ALL)}
-              className="group/cta from-gold-soft to-gold relative inline-flex items-center justify-center gap-2.5 overflow-hidden bg-gradient-to-br px-7 py-3.5 text-sm tracking-wide text-[#201e1b]"
+              className="cta-outline inline-flex items-center justify-center gap-2.5 px-7 py-3.5 text-sm tracking-wide"
             >
-              <span
-                aria-hidden="true"
-                className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/cta:translate-y-0"
-              />
               <span className="group-hover/cta:text-gold-soft relative z-10 flex items-center gap-2.5 transition-colors duration-500">
                 <Check className="size-4" strokeWidth={1.5} />
                 {t.consent.acceptAll}

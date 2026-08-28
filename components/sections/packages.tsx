@@ -167,19 +167,19 @@ export function Packages() {
                     Terminformular faellt, hat nicht gelesen, was er bucht.
                   */
                   href={pkg.ctaHref ?? `/termin?paket=${pkg.key}`}
+                  /*
+                    Beide Knoepfe sind jetzt Umrisse — die Empfehlung steckt
+                    in der KANTENFARBE, nicht mehr in einer Goldflaeche.
+                    Gold fuehrt, neutral folgt; das ist derselbe Unterschied
+                    wie zwischen `primary` und `ghost` beim Hero-Knopf.
+                  */
                   className={
                     pkg.recommended
-                      ? "from-gold-soft to-gold group/cta relative mt-7 inline-flex items-center justify-between gap-2 overflow-hidden bg-gradient-to-br px-5 py-3.5 text-sm tracking-wide text-[#201e1b]"
+                      ? "cta-outline mt-7 inline-flex items-center justify-between gap-2 px-5 py-3.5 text-sm tracking-wide"
                       : "border-line-strong hover:border-gold hover:text-gold-text mt-7 inline-flex items-center justify-between gap-2 border px-5 py-3.5 text-sm tracking-wide transition-colors duration-500"
                   }
                 >
-                  {pkg.recommended && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/cta:translate-y-0"
-                    />
-                  )}
-                  <span className="group-hover/cta:text-gold-soft relative z-10 flex w-full items-center justify-between gap-2 transition-colors duration-500">
+                  <span className="flex w-full items-center justify-between gap-2">
                     {copy.cta}
                     <ArrowUpRight className="size-4" strokeWidth={1.5} />
                   </span>

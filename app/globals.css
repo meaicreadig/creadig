@@ -582,6 +582,51 @@
 }
 
 /* ==========================================================================
+ * HAUPT-KNOPF — EINE QUELLE, KEINE FUELLUNG.
+ *
+ * Owner-Entscheidung 28.08.2026: Der Hauptknopf verliert seine Flaeche, die
+ * KANTE traegt die Farbe. Auf einer Seite, deren ganze Sprache aus Haarlinien
+ * besteht, war die gefuellte Gold-Flaeche das lauteste Element der Marke —
+ * ausgerechnet an der Stelle, an der „zeigen statt behaupten" gilt.
+ *
+ * WARUM ALS UTILITY UND NICHT ACHTMAL IM MARKUP
+ * Die Rezeptur stand handgeschrieben an acht Stellen (Audit-Befund A3-3:
+ * „dreizehn handgebaute Gold-Buttons in sechs Groessen"). Jede Aenderung an
+ * der Marke hiess: acht Dateien anfassen und eine davon vergessen. Jetzt
+ * gilt hier dieselbe Regel wie fuer `section-shell`, `motif-band` und
+ * `elevation-*` — eine Quelle je Rolle. Groesse und Abstand bleiben am
+ * Aufrufort, weil sie sich je Kontext unterscheiden; die MARKE steht hier.
+ *
+ * WARUM `--gold-text` UND NICHT `--gold`
+ * Ohne Fuellung ist die Kante der Umriss des Bedienelements. `--gold`
+ * erreicht auf dem Papierweiss 2,6 : 1 und faellt damit unter die 3 : 1, die
+ * WCAG 1.4.11 dafuer verlangt (dieselbe Rechnung wie beim Fokus-Ring weiter
+ * oben). `--gold-text` haelt 5,26 : 1 hell und 7,50 : 1 dunkel.
+ * ========================================================================== */
+
+@utility cta-outline {
+  /*
+   * 78 % ist kein Geschmackswert, sondern der gemessene Boden: Bei 55 %
+   * hielt die Kante im Dunkeln 3,21 : 1, im Hellmodus aber nur 2,25 : 1 —
+   * und Hell ist der Default. Gerechnet gegen alle fuenf Flaechen der
+   * Seite (Papier, Karte, muted, Dunkel, Band) ist 78 % der kleinste
+   * Wert, der ueberall die 3 : 1 aus WCAG 1.4.11 haelt: 3,40 / 3,28 /
+   * 3,15 / 5,11 / 4,81.
+   */
+  border: 1px solid color-mix(in oklab, var(--gold-text) 78%, transparent);
+  background-color: transparent;
+  color: var(--foreground);
+  transition:
+    color 500ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 500ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  &:hover {
+    border-color: var(--gold-text);
+    color: var(--gold-text);
+  }
+}
+
+/* ==========================================================================
  * ELEVATION — drei Stufen, sonst nichts.
  *
  * Die Seite war flach: alles lag auf einer Ebene, zusammengehalten von

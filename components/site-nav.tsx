@@ -213,7 +213,7 @@ export function SiteNav() {
           */}
           <Link
             href="/termin"
-            className="eyebrow border-gold-text/55 text-foreground hover:border-gold-text hover:text-gold-text ml-1.5 hidden items-center border bg-transparent px-6 py-3 transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:inline-flex"
+            className="cta-outline eyebrow ml-1.5 hidden items-center px-6 py-3 sm:inline-flex"
           >
             {t.nav.cta}
           </Link>
@@ -295,7 +295,7 @@ export function SiteNav() {
                 <SheetClose asChild>
                   <Link
                     href="/termin"
-                    className="border-gold-text/55 text-foreground hover:border-gold-text hover:text-gold-text flex items-center justify-center border bg-transparent px-6 py-4 text-sm tracking-wide transition-colors duration-500"
+                    className="cta-outline flex items-center justify-center px-6 py-4 text-sm tracking-wide"
                   >
                     {t.nav.cta}
                   </Link>

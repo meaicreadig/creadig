@@ -116,6 +116,8 @@ export function TerminWizard() {
    * noetig — der Fokus fuer die Tastatur, die Ansage fuer den Screenreader.
    */
   const headingRef = useRef<HTMLHeadingElement>(null)
+  /** Griff auf das Formular in Schritt 3 — siehe `focusFirstInvalid()`. */
+  const formRef = useRef<HTMLFormElement>(null)
   const [announcement, setAnnouncement] = useState("")
   const firstRender = useRef(true)
 
@@ -285,6 +287,53 @@ export function TerminWizard() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  /*
+   * DIE FEHLERMELDUNG STAND AUSSERHALB DES SICHTFELDS.
+   *
+   * ---------------------------------------------------------------------------
+   * WAS PASSIERT IST
+   * Der globale Fehlerblock sitzt oben im Assistenten, direkt unter der
+   * Fortschrittsanzeige. Das Formular in Schritt 3 ist zweispaltig und lang;
+   * der „Weiter"-Knopf steht an seinem Ende. Wer unvollstaendig ausfuellt und
+   * unten klickt, bekommt die Meldung rund tausend Pixel weiter OBEN — und
+   * sieht unten nichts als roetliche Feldraender. Gemessen an derselben
+   * Stelle, an der `product-interest` gerade jeden Lead verloren hat: Es ist
+   * derselbe Fehlertyp — das System weiss Bescheid, der Mensch nicht.
+   *
+   * ---------------------------------------------------------------------------
+   * WARUM FOKUS UND NICHT EINE ZWEITE MELDUNG
+   * Eine zweite Meldung neben dem Knopf wuerde die Meldung sichtbar machen,
+   * aber nicht sagen, WELCHES Feld fehlt — bei fuenf Pflichtfeldern ist das
+   * die eigentliche Frage. Der Fokus beantwortet beides: Der Browser scrollt
+   * das Feld selbst ins Bild, der Screenreader liest seine Beschriftung vor
+   * (WCAG 3.3.1), und die Tastatur steht sofort an der richtigen Stelle.
+   *
+   * Die Reihenfolge ist die des Formulars, nicht die des Objekts — sonst
+   * springt der Fokus auf ein Feld weiter unten, obwohl darueber schon eines
+   * leer ist.
+   */
+  const FIELD_ORDER = ["name", "org", "phone", "email"] as const
+
+  function focusFirstInvalid(bad: Record<string, boolean>) {
+    const form = formRef.current
+    if (!form) return
+
+    for (const key of FIELD_ORDER) {
+      if (!bad[key]) continue
+      const el = form.elements.namedItem(key)
+      if (el instanceof HTMLElement) {
+        el.focus()
+        return
+      }
+    }
+
+    // Bleibt nur die Einwilligung — sie steht unter den Feldern und traegt
+    // als einziges Bedienelement hier eine feste Kennung.
+    if (bad.privacy) {
+      document.getElementById("termin-privacy")?.focus()
+    }
+  }
+
   function validateForm() {
     const bad: Record<string, boolean> = {
       name: !form.name.trim(),
@@ -303,6 +352,7 @@ export function TerminWizard() {
             ? t.termin.step3.errEmail
             : t.contact.errPrivacy,
       )
+      focusFirstInvalid(bad)
     }
     return !hasError
   }
@@ -358,6 +408,12 @@ export function TerminWizard() {
 
   function field(key: keyof FormState) {
     return {
+      /*
+        `name` ist nicht Deko: Es ist der Griff, an dem `focusFirstInvalid()`
+        das Feld wiederfindet (`form.elements.namedItem(key)`) — und nebenbei
+        das, woran Browser-Autofill Felder zuordnet.
+      */
+      name: key,
       value: form[key],
       onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setForm((f) => ({ ...f, [key]: e.target.value }))
@@ -694,6 +750,7 @@ export function TerminWizard() {
             <p className="type-body text-muted-foreground mt-3">{t.termin.step3.lead}</p>
 
             <form
+              ref={formRef}
               className="mt-10 grid gap-8 sm:grid-cols-2"
               onSubmit={(e) => {
                 e.preventDefault()
@@ -950,12 +1007,8 @@ export function TerminWizard() {
                       setSending(false)
                     }
                   }}
-                  className="group from-gold-soft to-gold relative inline-flex items-center gap-3 overflow-hidden bg-gradient-to-br px-8 py-4 text-base tracking-wide text-[#201e1b] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="cta-outline inline-flex items-center gap-3 px-8 py-4 text-base tracking-wide disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
-                  />
                   <span className="group-hover:text-gold-soft relative z-10 flex items-center gap-3 transition-colors duration-500">
                     <Send className="size-4" strokeWidth={1.5} />
                     {sending ? t.contact.sending : t.termin.step4.send}
@@ -1034,13 +1087,9 @@ function StepButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="group from-gold-soft to-gold relative inline-flex items-center gap-2.5 overflow-hidden bg-gradient-to-br px-7 py-3.5 text-sm tracking-wide text-[#201e1b] transition-opacity duration-300 disabled:pointer-events-none disabled:opacity-35"
+      className="cta-outline inline-flex items-center gap-2.5 px-7 py-3.5 text-sm tracking-wide transition-opacity duration-300 disabled:pointer-events-none disabled:opacity-35"
     >
-      <span
-        aria-hidden="true"
-        className="absolute inset-0 -translate-y-full bg-[#201e1b] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0"
-      />
-      <span className="group-hover:text-gold-soft relative z-10 flex items-center gap-2.5 transition-colors duration-500">
+      <span className="flex items-center gap-2.5">
         {label}
         <ArrowRight className="size-4" strokeWidth={1.5} />
       </span>

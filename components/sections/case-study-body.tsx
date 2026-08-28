@@ -75,7 +75,7 @@ export function CaseStudyBody({
                 />
                 <span
                   aria-hidden="true"
-                  className="border-gold/40 text-gold text-display absolute inset-0 m-auto flex size-20 items-center justify-center border text-2xl"
+                  className="border-gold-text/55 text-gold-text text-display absolute inset-0 m-auto flex size-20 items-center justify-center border text-2xl"
                 >
                   {study.mark}
                 </span>
