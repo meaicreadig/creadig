@@ -89,6 +89,9 @@ const entries: Entry[] = [
   /* MP10-4 — „Integration first": die Frage, die vor jedem Angebot steht. */
   { path: "/systeme", changeFrequency: "monthly", priority: 0.7 },
 
+  /* MP-D — das erste Werkzeug der Seite, nicht nur eine Darstellung. */
+  { path: "/betriebscheck", changeFrequency: "monthly", priority: 0.8 },
+
   { path: "/kontakt", changeFrequency: "monthly", priority: 0.9 },
   { path: "/termin", changeFrequency: "monthly", priority: 0.8 },
 

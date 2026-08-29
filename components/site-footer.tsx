@@ -5,6 +5,7 @@ import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { Logo } from "@/components/brand/logo"
 import { contact, navLinks, productWorks, serviceLayerKeys, socialProfiles } from "@/lib/site-data"
 import { openConsentSettings } from "@/lib/consent"
+import { checkCopy } from "@/lib/betriebscheck"
 
 /**
  * Sichtbarkeit des `/status`-Links (MP10-2.10). Ausfuehrliche Begruendung
@@ -55,6 +56,16 @@ export function SiteFooter() {
               */}
               {/* MP10-4 — der Betrieb hat seit dieser Runde eine eigene
                   Adresse; im Footer ist sie erreichbar, in der Leiste nicht. */}
+              {/* MP-D — der Betriebscheck. Erreichbar, aber nicht in der
+                  Leiste: Er ist ein Werkzeug, kein Kapitel der Seite. */}
+              <li>
+                <Link
+                  href="/betriebscheck"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
+                >
+                  {checkCopy.eyebrow[locale]}
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/systeme"

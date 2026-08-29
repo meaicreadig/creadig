@@ -39,12 +39,13 @@ MP-A BRAND ──► MP-B COMPANY OS ──► MP-D SALES
 
 | Code | Stufe | Dauer | Haupt-Artefakt | Parallel-Regel |
 |------|--------|-------|----------------|----------------|
-| **MP-A** | LOCK THE BRAND | 1–2 | Canon + Design-System + Principles + Copy-Pass | — |
-| **MP-B** | COMPANY OS Kern | 2–4 | Current-State-Map → Lead-Ref + 3 State-Machines + Events | — |
-| **MP-C** | PROOF | Owner-Material | Screens/Cases/Empty-States | **Darf OPEN bleiben**, während MP-D läuft — **kein unverifizierter Proof live** |
-| **MP-D** | SALES ENGINE | 2–3 | Betriebscheck + Playbook + Offers-Spec | Nach MP-B; wartet nicht auf volles MP-C |
-| **MP-E** | MARKETING | nach Tracking | Branchen-LP + UTM + Events | Nur wenn Analytics (B) + Check (D) oder Owner „trotz Lücke“ |
-| **MP-F** | SCALE | Plan first | Blueprint; Builds nur mit Owner-Freigabe | **Portal-Gate** unten |
+| **MP-A** | LOCK THE BRAND | ✅ | Canon + Design-System + Principles | — |
+| **MP-B** | COMPANY OS Kern | ✅ | Lead-Ref + UTM-fähig + cta_click/booking_step | — |
+| **MP-C** | PROOF | **OPEN / MATERIAL-BLOCKED** | Screens/Cases/Empty-States | Darf OPEN bleiben; **kein unverifizierter Proof live**. MP-D execution permitted. |
+| **MP-D** | SALES ENGINE | ✅ | Betriebscheck + Sales-Specs | Nach MP-B; wartete nicht auf volles MP-C |
+| **MP-D.5** | CONVERSION ACCEPTANCE | **nächste Stufe** | Manuelle Kette prüfen — Code nur bei echtem Defekt | Kein Feature. Kein MP-E. |
+| **MP-E** | MARKETING | nach D.5 | Branchen-LP + UTM-Client (nach Datenschutz) | Erst nach Acceptance |
+| **MP-F** | SCALE | Plan first | Blueprint; Builds nur mit Owner-Freigabe | **Portal-Gate** |
 
 **Parallel erlaubt (klein):** Site-Polish aus `EFSANE` während A/B — kein neues Produkt-Feature außerhalb der Stufe.
 
@@ -142,29 +143,43 @@ BERICHT: Owner-Blocker · technisch bereit · Backend vs Frontend.
 ---
 
 # MP-D · SALES ENGINE
-## Copy-Paste-Prompt
+## Status: ✅ erledigt 29.08.2026
+
+Artefakte: `/betriebscheck` DE+TR · `lib/betriebscheck.ts` · `docs/sales/*` · Lead `source: betriebscheck`.
+
+---
+
+# MP-D.5 · CONVERSION ACCEPTANCE (Gate — kein Feature)
+## Copy-Paste-Prompt (kompletter Chat)
 
 ```
-Du bist CTO/Product für creaDIG. Stufe MP-D — Sales Engine.
-Positionierung: System-Haus. Verkaufssprache = Fragen, nicht Tech-Buzzwords.
-Darf starten während MP-C noch OPEN ist (kein Fake-Proof auf der Check-Seite).
+Du bist QA/CTO für creaDIG. Stufe MP-D.5 — Conversion Acceptance.
+KEIN neues Feature. KEIN MP-E. KEIN Portal. KEIN Fake-Proof.
+Black Lock. Code NUR wenn du einen echten Defekt beweist.
 
-1) Betriebscheck MVP — Diagnostic IP, nicht „Quiz“:
-   Jede Frage gehört einer Five-Level-Ebene (Identity/Digital/Operations/Automation/Intelligence).
-   Ergebnis: Gesamt-Score /100 + Balken je Ebene + Engpass-Satz
-   („größte Lücke: Operations → Automation“) + „X Stellen mit Zeitverlust“.
-   Lead-Capture Ende → Lead reference (MP-B). DE zuerst; TR wenn Dictionary klar.
+Lies creadig-MASTER-PROMPT-COMPANY-OS.md (Status: MP-C OPEN/MATERIAL-BLOCKED).
 
-2) docs/sales/offers.md — Preise nur [PREIS OWNER] bis bestätigt:
-   Betriebsanalyse · Website Handwerk Festpreis · A11y · Managed Tiers
+AUFGABE: Die Kette manuell prüfen und dokumentieren:
+docs/ops/conversion-acceptance.md — Checkliste mit PASS/FAIL + Beleg.
 
-3) docs/sales/discovery-questions.md (10 Discovery-Fragen)
+Pflichtpfade:
+1. Desktop DE → /betriebscheck → 15 Fragen → Ergebnis → Form → Lead
+2. Mobile DE → dieselbe Kette
+3. Desktop TR → dieselbe Kette
+4. Mobile TR → dieselbe Kette
+5. Hero/Closing Project→/termin → booking steps → lead
+6. WhatsApp / Contact-Direktwege → richtige Ziele
+7. Error states (leere Pflichtfelder, privacy, token)
+8. Double-submit
+9. Refresh/Back während Check — was passiert mit Antworten?
+10. 100/100 → „kein Engpass“-Satz (nicht Identity→Digital)
+11. 0/100 bzw. viele Nein → Engpass + „X Punkte selbst offen“
+12. Mail: Referenz CD-…, source, locale korrekt (wenn Env erlaubt; sonst Spec-Hinweis)
 
-4) docs/sales/proposal-outline.md (Inhaltsschema — Portal = MP-F)
+Browser-Tools nutzen. Am Ende: nur FAIL-Fixes committen (Owner-Befehl).
+Kein UTM-Client. Keine Managed-Tiers. Keine TR-Umschreibung außer klarer Bug.
 
-5) tsc wenn Code. Kein Ads. Commit auf Befehl.
-
-BERICHT: Was klickbar · was Spec · Conversion-Pfad.
+BERICHT: PASS/FAIL-Tabelle · Fixes · was Owner noch prüfen muss (TR-Ton).
 ```
 
 ---
@@ -173,8 +188,10 @@ BERICHT: Was klickbar · was Spec · Conversion-Pfad.
 ## Copy-Paste-Prompt
 
 ```
-Du bist CTO/Growth für creaDIG. Stufe MP-E — NUR wenn MP-B Analytics + MP-D Check
-existieren ODER Owner explizit „Marketing trotz Lücke“ sagt.
+Du bist CTO/Growth für creaDIG. Stufe MP-E — NUR nach MP-D.5 PASS
+ODER Owner explizit „Marketing trotz Lücke“ sagt.
+UTM-Client erst nach Owner-Datenschutz-Satz.
+Attribution-Spec (first/last touch) in docs — Code nur mit Consent-Klarheit.
 
 1) Branchen-LP Handwerk — KEIN klassisches SEO-Landing („Vorteile der Digitalisierung“).
    creaDIG-Sprache:
@@ -249,11 +266,12 @@ BERICHT: Blueprint · freigegebene Builds · zurückgestellt.
 | Owner der | Agent yapar |
 |-----------|-------------|
 | `MP-A` / `Markayı kilitle` | Brand Lock (✅) |
-| `MP-B` / `Company OS` | Current-State → Lead-Ref → 3 Machines → Events |
-| `MP-C` / `Kanıt` | Proof (OPEN kalabilir) |
-| `MP-D` / `Satış motoru` | Betriebscheck + Playbook (C OPEN iken OK) |
-| `MP-E` / `Marketing` | Branchen workflow-LP + Tracking |
+| `MP-B` / `Company OS` | Lead-OS (✅) |
+| `MP-C` / `Kanıt` | Proof — **OPEN / MATERIAL-BLOCKED** |
+| `MP-D` / `Satış motoru` | Betriebscheck (✅) |
+| `MP-D.5` / `Acceptance` | Conversion-Kette prüfen — kein Feature |
+| `MP-E` / `Marketing` | Branchen + UTM-Client (nach Datenschutz) |
 | `MP-F` / `Ölçek planı` | Blueprint; Portal gate |
 | `merdiven` / `leiter` | Özet + sıradaki açık basamak |
 
-**Sıra:** A → B → (C ∥ D) → E → F. C asset beklerken D durmaz.
+**Sıra:** A → B → (C OPEN ∥ D) → **D.5** → E → F. C asset beklerken D durdu; E D.5’ten sonra.

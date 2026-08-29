@@ -5,6 +5,18 @@
 >
 > **Drei Systeme:** Website · Company OS · Knowledge OS (diese Map).
 
+### Stage-Status (29.08.2026)
+
+| Stage | Status |
+|-------|--------|
+| MP-A Brand | ✅ |
+| MP-B Company OS / Lead | ✅ |
+| MP-C Proof | **OPEN / MATERIAL-BLOCKED** — kein unverifizierter Proof; MP-D war erlaubt |
+| MP-D Sales / Betriebscheck | ✅ |
+| MP-D.5 Conversion Acceptance | **nächste** |
+| MP-E Marketing | ⬜ nach D.5 |
+| MP-F Scale | ⬜ |
+
 ---
 
 ## Authority-Stufen
@@ -61,6 +73,8 @@
 
 | Datei | Authority | Rolle |
 |-------|-----------|--------|
+| `lib/betriebscheck.ts` | **Canon (Code)** | Fragen, Rechnung und Texte des Betriebschecks |
+| `components/sales/betriebscheck.tsx` | **Canon (Code)** | Oberfläche · `/betriebscheck` (DE+TR) |
 | `docs/sales/offers.md` | Spec | Productized Offers |
 | `docs/sales/discovery-questions.md` | Spec | Discovery |
 | `docs/sales/proposal-outline.md` | Spec | Proposal-Schema |
