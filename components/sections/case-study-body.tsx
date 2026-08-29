@@ -3,7 +3,6 @@
 import Image from "next/image"
 
 import { useLocale } from "@/components/locale-provider"
-import { SignatureMotif } from "@/components/brand/signature-motif"
 import { filledChapters, type CaseStudy } from "@/lib/site-data"
 
 /**
@@ -68,15 +67,12 @@ export function CaseStudyBody({
                 className="object-cover"
               />
             ) : (
-              <>
-                <SignatureMotif role="placeholder" />
-                <span
-                  aria-hidden="true"
-                  className="border-gold-text/55 text-gold-text text-display absolute inset-0 m-auto flex size-20 items-center justify-center border text-2xl"
-                >
-                  {study.mark}
-                </span>
-              </>
+              <span
+                aria-hidden="true"
+                className="border-gold-text/55 text-gold-text text-display absolute inset-0 m-auto flex size-20 items-center justify-center border text-2xl"
+              >
+                {study.mark}
+              </span>
             )}
           </div>
         </div>

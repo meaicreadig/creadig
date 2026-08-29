@@ -4,7 +4,6 @@ import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { ChevronRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { SignatureMotif } from "@/components/brand/signature-motif"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /**
@@ -52,8 +51,6 @@ export function PageHeader({
 
   return (
     <header className="border-line relative overflow-hidden border-b">
-      <SignatureMotif />
-
       {/* pt-32/40 haelt den Kopf frei von der festen Leiste (h-[4.5rem]). */}
       <div className="section-gutter relative pt-32 pb-20 md:pt-40 md:pb-24">
         <nav aria-label="Brotkrumen">

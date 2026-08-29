@@ -4,7 +4,6 @@ import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { ArrowUpRight, ChevronRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { SignatureMotif } from "@/components/brand/signature-motif"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ClosingCta } from "@/components/sections/closing-cta"
 import type { Insight } from "@/lib/insights"
@@ -27,8 +26,6 @@ export function InsightPageBody({ entry }: { entry: Insight }) {
 
   return (
     <main className="relative">
-      <SignatureMotif />
-
       <article className="section-gutter relative pt-32 pb-24 md:pt-40 md:pb-32">
         <nav aria-label="Brotkrumen">
           <ol className="text-muted-foreground text-meta flex flex-wrap items-center gap-2">

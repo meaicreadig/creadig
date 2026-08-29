@@ -4,7 +4,6 @@ import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { ArrowUpRight, Check, ChevronRight, Minus } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { SignatureMotif } from "@/components/brand/signature-motif"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { clientWorks, packages, productWorks } from "@/lib/site-data"
 import { WHATSAPP_LINK } from "@/lib/dictionary"
@@ -34,8 +33,6 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
 
   return (
     <main className="relative">
-      <SignatureMotif active={page.layer} />
-
       <div className="section-gutter relative pt-32 pb-24 md:pt-40 md:pb-32">
         {/* Brotkrumen: der Weg zurück ins System, nicht nur ein Zurück-Pfeil. */}
         <nav aria-label="Brotkrumen">

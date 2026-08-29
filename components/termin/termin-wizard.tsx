@@ -6,7 +6,6 @@ import { useSearchParams } from "next/navigation"
 import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Clock, Send } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
-import { SignatureMotif } from "@/components/brand/signature-motif"
 import { contact } from "@/lib/site-data"
 import { trackLead } from "@/lib/track"
 import { useLeadSubmit } from "@/lib/use-lead"
@@ -426,11 +425,6 @@ export function TerminWizard() {
 
   return (
     <main className="relative min-h-dvh">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[38rem] overflow-hidden">
-        <SignatureMotif />
-        <div className="from-background absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t to-transparent" />
-      </div>
-
       <div className="relative mx-auto w-full max-w-4xl px-6 pt-32 pb-24 md:px-10 md:pt-40">
         <Link
           href="/"

@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
-import { SignatureMotif } from "@/components/brand/signature-motif"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { contact } from "@/lib/site-data"
@@ -60,11 +59,6 @@ export function StatusPageBody({
 
   return (
     <main className="relative min-h-dvh">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] overflow-hidden">
-        <SignatureMotif />
-        <div className="from-background absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t to-transparent" />
-      </div>
-
       <div className="section-gutter relative pt-32 pb-24 md:pt-40 md:pb-32">
         <SectionEyebrow label={eyebrow} />
         <h1 className="type-h1 mt-7 max-w-3xl text-balance">{title}</h1>

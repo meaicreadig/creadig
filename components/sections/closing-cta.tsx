@@ -1,7 +1,6 @@
 "use client"
 
 import { useLocale } from "@/components/locale-provider"
-import { SignatureMotif } from "@/components/brand/signature-motif"
 import { MagneticButton } from "@/components/ui/magnetic-button"
 import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
@@ -52,7 +51,6 @@ export function ClosingCta({ variant = "default" }: { variant?: ClosingVariant }
       // waeren sonst eine einzige Flaeche — der Schlussstrich braucht eine Kante.
       className="section-dark border-line relative overflow-hidden border-b"
     >
-      <SignatureMotif />
       <div
         aria-hidden="true"
         className="via-gold/60 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent"

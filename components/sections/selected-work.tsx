@@ -7,7 +7,6 @@ import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { ImageUnveil } from "@/components/ui/image-unveil"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { SignatureMotif } from "@/components/brand/signature-motif"
 import { featuredWorks, workHref } from "@/lib/site-data"
 
 /**
@@ -103,7 +102,6 @@ export function SelectedWork() {
                       />
                     ) : (
                       <div className="bg-muted absolute inset-0 flex items-center justify-center">
-                        <SignatureMotif role="placeholder" />
                         <span
                           aria-hidden="true"
                           className="border-gold-text/55 text-gold-text text-display flex size-20 items-center justify-center border text-2xl"

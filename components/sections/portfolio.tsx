@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { LocaleLink as Link } from "@/components/ui/locale-link";
 import { ArrowUpRight } from "lucide-react";
-import { SignatureMotif } from "@/components/brand/signature-motif";
 import { Reveal } from "@/components/ui/reveal";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -25,7 +24,6 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 function MonogramPanel({ mark }: { mark: string }) {
   return (
     <div className="bg-surface absolute inset-0 flex items-center justify-center">
-      <SignatureMotif role="placeholder" />
       <span
         aria-hidden="true"
         className="border-gold-text/55 text-gold-text text-display flex size-20 items-center justify-center border text-2xl"

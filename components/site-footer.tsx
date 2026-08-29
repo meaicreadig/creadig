@@ -3,7 +3,6 @@
 import { useLocale } from "@/components/locale-provider"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { Logo } from "@/components/brand/logo"
-import { SignatureMotif } from "@/components/brand/signature-motif"
 import { contact, navLinks, productWorks, serviceLayerKeys, socialProfiles } from "@/lib/site-data"
 import { openConsentSettings } from "@/lib/consent"
 
@@ -22,8 +21,6 @@ export function SiteFooter() {
 
   return (
     <footer className="section-dark relative overflow-hidden">
-      <SignatureMotif />
-
       <div className="section-gutter relative pt-24 pb-10 md:pt-32">
         {/* Riesige Wortmarke */}
         <div className="border-line border-b pb-14">
