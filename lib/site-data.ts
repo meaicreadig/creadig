@@ -488,12 +488,12 @@ export const clientWorks: Work[] = [
     outcome: { de: "Kundenwerk · live", tr: "Müşteri işi · canlı" },
     kind: "Kundenwerk",
     region: "CH",
-    // Noch kein freigegebener Screenshot — die Karte rendert ein Monogramm-Panel.
-    image: null,
+    // Owner 29.08.2026: Kundenbild (Laptop-Szene, Display = echte nvswiss.ch-Oberfläche).
+    image: "/works/nv-swiss.jpg",
     mark: "NV",
     href: "https://nvswiss.ch",
     live: true,
-    // C-2: TODO (Owner) — schriftliche Freigabe und ein Satz Aufgabe/Ergebnis.
+    // Logo unter public/brand/clients/nv-swiss.png (Owner geliefert).
     approvalOnFile: false,
     approvedSentence: null,
   },

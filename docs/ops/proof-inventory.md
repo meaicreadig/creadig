@@ -15,8 +15,8 @@
 |---|---|---|---|---|
 | **Echte Produkt-Oberflächen** | 4 (meAI, fibero, CASSAMEA, meahv) | **0** | `PRODUCT_SCREENS = {}` · Quelle `public/works/products/` enthält nur `README.md` | 🔴 leer |
 | Produkt-Kartenbild | 4 | **3** | `productWorks[].image` — meAI, fibero, CASSAMEA gesetzt; **meahv `null`** | 🟡 teils |
-| **Kundenlogos** | ≥ 2 (NV SWISS, maqam) | **0** | `CLIENT_LOGOS = {}` · Quelle `public/brand/clients/` enthält nur `README.md` | 🔴 leer |
-| Bild zur Kundenarbeit | 2 | **0** | `clientWorks[].image` — beide `null` | 🔴 leer |
+| Kundenlogos | ≥ 2 (NV SWISS, maqam) | **1** — `nv-swiss.png` (Owner 29.08.) · maqam fehlt | `CLIENT_LOGOS` · `public/brand/clients/` | 🟡 teils |
+| Bild zur Kundenarbeit | 2 | **1** — `nv-swiss.jpg` (Laptop-Szene, Display = echte Oberfläche) · maqam fehlt | `clientWorks[].image` | 🟡 teils |
 | **Fallstudien freigegeben** | ≥ 2 | **0 von 2** | `caseStudies`: `nv-swiss` und `maqam`, beide `approved: false` | 🔴 gesperrt |
 | **Bewertungen / Zitate** | ≥ 1 | **0** | `reviews: []` — Sterne-Gate im Build hält `AggregateRating` fern | 🔴 leer |
 | Unternehmensfotos | 4 Slots (`buero`, `ico`, `arbeitsplatz`, `whiteboard`) | **0** | `COMPANY_PHOTOS = {}` · Quelle `public/images/unternehmen/` nur `README.md` | 🔴 leer |
@@ -79,7 +79,7 @@ Alle Slots sind vorbereitet. Datei ablegen, `npm run build` — die
 
 | Was | Wohin | Erscheint dann |
 |---|---|---|
-| Produkt-Screens | `public/works/products/<slug>/*.png` (`meai`, `fibero`, `cassamea`, `meahv`) | Produktseite, echte Abbildungen statt Mockup |
+| Produkt-Screens | `public/works/products/<slug>/*.png` (`meai`, `fibero`, `cassamea`, `meahv`) | Interface-Sektion mit Label „Echte Oberfläche, Demodaten.“ — Kette in MP-C.2 mit Wegwerf-Dateien geprobt und wieder abgeräumt |
 | Kundenlogo | `public/brand/clients/<slug>.svg\|png\|webp` (`nv-swiss`, `maqam`) | Logowand |
 | Unternehmensfotos | `public/images/unternehmen/<slot>.jpg` — `buero`, `ico`, `arbeitsplatz`, `whiteboard` | `/unternehmen` |
 | Kundenarbeit-Bild | `public/works/<slug>.png` + `clientWorks[].image` setzen | Werkschau-Karte |

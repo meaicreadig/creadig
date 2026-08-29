@@ -221,15 +221,31 @@ export function ProduktPageBody({
                     <div className="border-line bg-surface elevation-1 relative aspect-[16/10] w-full overflow-hidden rounded-lg border">
                       <Image
                         src={src}
-                        alt={`${product.name} — Oberfläche aus dem laufenden System`}
+                        alt={`${product.name} — ${copy.screensAlt}`}
                         fill
                         sizes="(max-width: 1024px) 100vw, 92vw"
                         className="object-cover object-top"
                         priority={i === 0}
                       />
                     </div>
-                    <figcaption className="text-meta text-muted-foreground mt-4">
-                      {product.name} · {String(i + 1).padStart(2, "0")}
+                    {/*
+                      MP-C.2 · Das Demodaten-Label ist Pflicht, nicht Kosmetik
+                      (`docs/ops/demo-data-standard.md`). Es steht als Text
+                      unter dem Bild und NICHT als Wasserzeichen darauf: Ein
+                      Wasserzeichen macht die Oberflaeche unlesbar und
+                      entwertet damit genau den Teil, der echt ist.
+
+                      Der Satz ist eine Zusage, die das Verzeichnis einloest:
+                      `public/works/products/README.md` laesst nur Aufnahmen
+                      aus einer Demo-Instanz zu. Wer dort ein Produktionsbild
+                      ablegt, macht diese Zeile zur Luege — deshalb steht die
+                      Regel dort und hier.
+                    */}
+                    <figcaption className="text-meta text-muted-foreground mt-4 flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <span>
+                        {product.name} · {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="text-gold-text">{copy.screensCaption}</span>
                     </figcaption>
                   </figure>
                 </Reveal>

@@ -480,9 +480,27 @@ export const dictionary = {
        * warum hier keins steht. Ein Deko-Laptop waere die Alternative, und
        * die ist gesperrt.
        */
+      /*
+       * MP-C.2 — hier stand „aus dem laufenden System".
+       *
+       * Das war ein Produktionsversprechen, und es widersprach dem Canon, der
+       * seit MP-C.1 gilt: Aufnahmen entstehen in einer DEMO-INSTANZ, nie im
+       * Produktivsystem — auf einem echten Screen stehen Kundennamen, Betraege
+       * und Adressen. Die Ueberschrift haette also genau das behauptet, was
+       * das Bild nicht sein darf.
+       *
+       * Die wahre Aussage ist zweiteilig, und beide Haelften zaehlen: Die
+       * OBERFLAECHE ist die echte Anwendung — das ist der Beleg. Die DATEN
+       * darin sind erfunden — das ist die Ehrlichkeit. Wer nur „Demo" sagt,
+       * laesst offen, ob auch die Oberflaeche eine Attrappe ist, und
+       * verschenkt den Beleg.
+       */
       screensPending:
-        "Oberflächen zeigen wir erst, wenn wir echte Aufnahmen aus dem laufenden System zeigen können. Bis dahin steht hier, was gebaut ist — und nicht ein Bild, das etwas anderes behauptet.",
-      screensLabel: "Aus dem laufenden System",
+        "Oberflächen zeigen wir erst, wenn wir die echte Anwendung mit Demodaten aufnehmen können. Bis dahin steht hier, was gebaut ist — und nicht ein Bild, das etwas anderes behauptet.",
+      screensLabel: "Die echte Oberfläche",
+      /** Canon-Wortlaut aus `docs/ops/demo-data-standard.md`. */
+      screensCaption: "Echte Oberfläche, Demodaten.",
+      screensAlt: "echte Oberfläche mit Demodaten",
       ctaTitle: "Passt das zu Ihrem Betrieb?",
       ctaBody: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sehen uns den Betrieb an und sagen ehrlich, ob wir helfen können.",
       ctaPrimary: "Projekt starten",
@@ -2426,8 +2444,10 @@ export const dictionary = {
       nextLabel: "Sonraki ürün",
       prevLabel: "Önceki ürün",
       screensPending:
-        "Arayüzleri ancak çalışan sistemden gerçek görüntüler gösterebildiğimizde paylaşırız. O zamana kadar burada ne kurulduğu yazar — başka bir şey iddia eden bir görsel değil.",
-      screensLabel: "Çalışan sistemden",
+        "Arayüzleri ancak gerçek uygulamayı örnek verilerle kaydedebildiğimizde paylaşırız. O zamana kadar burada ne kurulduğu yazar — başka bir şey iddia eden bir görsel değil.",
+      screensLabel: "Gerçek arayüz",
+      screensCaption: "Gerçek arayüz, örnek veriler.",
+      screensAlt: "örnek verilerle gerçek arayüz",
       ctaTitle: "Bu sizin işletmenize uyar mı?",
       ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmenize bakar ve yardımcı olup olamayacağımızı dürüstçe söyleriz.",
       ctaPrimary: "Projeye başla",
