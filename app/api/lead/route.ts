@@ -128,6 +128,24 @@ type LeadPayload = {
   siteUrl?: unknown
   /** Signiertes Zeit-Token aus `GET` dieser Route. */
   token?: unknown
+  /*
+   * MP-B · KAMPAGNEN-HERKUNFT — OPTIONAL, UND ZWAR WIRKLICH.
+   *
+   * Diese fuenf Felder nimmt die Route entgegen, WENN der Client sie
+   * mitschickt. Heute schickt sie keiner: Es gibt bewusst noch keine
+   * Client-Seite dazu. Der Grund ist nicht Faulheit, sondern Reihenfolge —
+   * sobald der Browser Kampagnen-Parameter mitspeichert und versendet,
+   * entsteht eine neue Datenkategorie im Anfrage-Vorgang, und die gehoert
+   * vorher in die Datenschutzerklaerung. Das ist Owner-Inhalt, kein Code.
+   *
+   * Bis dahin gilt: Die Route KANN es, die Seite TUT es nicht. Ein Feld, das
+   * leer bleibt, taucht in der Mail nicht auf.
+   */
+  utmSource?: unknown
+  utmMedium?: unknown
+  utmCampaign?: unknown
+  utmTerm?: unknown
+  utmContent?: unknown
 }
 
 const LIMITS = {
@@ -138,6 +156,7 @@ const LIMITS = {
   message: 4000,
   source: 40,
   siteUrl: 300,
+  utm: 120,
   /** BF-2: abgeschickte Anfragen je Adresse und Zeitfenster. */
   submitsPerWindow: LIMITS_INFO.MAX_SUBMITS,
 } as const
@@ -145,6 +164,24 @@ const LIMITS = {
 function asText(value: unknown, max: number): string {
   if (typeof value !== "string") return ""
   return value.trim().slice(0, max)
+}
+
+/*
+ * Wie `asText`, aber ohne Zeilenumbrueche und Steuerzeichen.
+ *
+ * Kampagnen-Werte kommen aus der Adresszeile und landen unveraendert im
+ * Klartext der internen Mail. Ein Wert mit einem Zeilenumbruch darin koennte
+ * dort eine zusaetzliche Zeile vortaeuschen, die aussieht wie ein Feld der
+ * Route — „Referenz: CD-..." zum Beispiel. Das ist keine Header-Injektion,
+ * aber es ist eine Faelschung im Postfach, und die verhindert man an der
+ * Stelle, an der der Wert hereinkommt.
+ */
+function asToken(value: unknown, max: number): string {
+  if (typeof value !== "string") return ""
+  return value
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .trim()
+    .slice(0, max)
 }
 
 /**
@@ -598,6 +635,19 @@ export async function POST(request: Request) {
    * beantwortet; ein Pflichtfeld „Worum geht es?" wäre an dieser Stelle eine
    * Hürde ohne Ertrag.
    */
+  /*
+   * MP-B — Kampagnen-Herkunft. Alles leer, wenn der Client nichts schickt;
+   * dann steht in der Mail auch keine Zeile dazu.
+   */
+  const utm = {
+    source: asToken(payload.utmSource, LIMITS.utm),
+    medium: asToken(payload.utmMedium, LIMITS.utm),
+    campaign: asToken(payload.utmCampaign, LIMITS.utm),
+    term: asToken(payload.utmTerm, LIMITS.utm),
+    content: asToken(payload.utmContent, LIMITS.utm),
+  }
+  const hasUtm = Object.values(utm).some((value) => value !== "")
+
   const isQuickCheck = source === "kurzcheck"
   const siteUrl = isQuickCheck ? normaliseSiteUrl(asText(payload.siteUrl, LIMITS.siteUrl)) : null
 
@@ -635,6 +685,13 @@ export async function POST(request: Request) {
     siteUrl ? `Website:   ${siteUrl}` : null,
     `Sprache:   ${locale.toUpperCase()}`,
     `Herkunft:  ${source}`,
+    hasUtm ? "" : null,
+    hasUtm ? "Kampagne:" : null,
+    utm.source ? `  utm_source:   ${utm.source}` : null,
+    utm.medium ? `  utm_medium:   ${utm.medium}` : null,
+    utm.campaign ? `  utm_campaign: ${utm.campaign}` : null,
+    utm.term ? `  utm_term:     ${utm.term}` : null,
+    utm.content ? `  utm_content:  ${utm.content}` : null,
     "",
     "Nachricht:",
     message || "(keine — Kurz-Check ohne freie Nachricht)",
@@ -650,7 +707,9 @@ export async function POST(request: Request) {
         ? `Kurz-Check ${reference} — ${headerSafe(name)} · ${headerSafe(new URL(siteUrl!).hostname)}`
         : source === "termin"
           ? `Terminwunsch ${reference} — ${headerSafe(name)}`
-          : `Anfrage ${reference} — ${headerSafe(name)}`,
+          : source === "betriebscheck"
+            ? `Betriebscheck ${reference} — ${headerSafe(name)}`
+            : `Anfrage ${reference} — ${headerSafe(name)}`,
       text: lines,
       // Direkt aus dem Postfach antworten können, ohne die Adresse zu suchen.
       replyTo: email,

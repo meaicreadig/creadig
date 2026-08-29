@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Clock, Send } 
 import { useLocale } from "@/components/locale-provider"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { contact } from "@/lib/site-data"
-import { trackLead } from "@/lib/track"
+import { trackEvent, trackLead } from "@/lib/track"
 import { useLeadSubmit } from "@/lib/use-lead"
 import { cn } from "@/lib/utils"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
@@ -229,6 +229,26 @@ export function TerminWizard() {
           : step === 4
             ? t.termin.step4.title
             : t.termin.done.title
+
+  /*
+   * MP-B · `booking_step` — der einzige Ort, an dem sich messen laesst, WO
+   * jemand abbricht.
+   *
+   * Der Assistent ist der laengste Weg der Seite. Bisher war nur sein Ende
+   * sichtbar (`lead_submitted`): Man sah, wer ankam, nie, wer auf Schritt 2
+   * stehen blieb. Ohne diese Zahl ist jede spaetere Verbesserung am
+   * Assistenten geraten.
+   *
+   * Schritt 1 feuert bewusst beim Oeffnen — das ist das „begonnen". Schritt 5
+   * ist der Erfolg und wird von `lead_submitted` getragen; ihn hier zu
+   * wiederholen hiesse, denselben Vorgang zweimal zu zaehlen.
+   *
+   * Uebertragen wird eine Zahl und eine Sprache. Nichts, was jemand eingegeben
+   * hat, verlaesst diesen Assistenten ueber die Messung.
+   */
+  useEffect(() => {
+    if (step >= 1 && step <= 4) trackEvent("booking_step", { step, locale })
+  }, [step, locale])
 
   useEffect(() => {
     // Beim ersten Rendern nichts ansagen und nichts fokussieren — der Mensch

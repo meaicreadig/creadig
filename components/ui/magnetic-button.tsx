@@ -1,9 +1,11 @@
 "use client"
 
 import { useRef, useState } from "react"
+import { usePathname } from "next/navigation"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { motion } from "framer-motion"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
+import { trackEvent } from "@/lib/track"
 import { cn } from "@/lib/utils"
 
 /** Ausserhalb der Komponente: sonst entsteht der Typ bei jedem Render neu. */
@@ -17,6 +19,11 @@ type MagneticButtonProps = {
   className?: string
   ariaLabel?: string
   target?: string
+  /**
+   * MP-B · Wo dieser Knopf steht — „hero", „closing", „paket". Optional: Ohne
+   * ihn wird trotzdem gemessen, nur ohne die Ortsangabe.
+   */
+  trackLocation?: string
 }
 
 export function MagneticButton({
@@ -27,10 +34,39 @@ export function MagneticButton({
   className,
   ariaLabel,
   target,
+  trackLocation,
 }: MagneticButtonProps) {
   const ref = useRef<HTMLElement | null>(null)
   const reduce = usePrefersReducedMotion()
+  const pathname = usePathname()
   const [offset, setOffset] = useState({ x: 0, y: 0 })
+
+  /*
+   * MP-B Regel D — EIN Ereignis, Eigenschaften statt Namen.
+   *
+   * Diese Komponente ist der Hauptknopf der Seite; sie steht an dreizehn
+   * Stellen. Genau deshalb sitzt die Messung hier und nicht dort: Dreizehn
+   * handgesetzte `onClick`-Tracker waeren dreizehn Gelegenheiten, einen zu
+   * vergessen oder anders zu benennen — und am Ende haette man dreizehn
+   * Ereignisnamen statt eines mit dreizehn Auspraegungen.
+   *
+   * Der `cta`-Wert kommt aus dem Ziel, nicht aus dem Beschriftungstext: Der
+   * Text ist zweisprachig und aendert sich, das Ziel nicht. Damit ist der
+   * Wert sprachunabhaengig und enthaelt nie, was jemand geschrieben hat.
+   */
+  function handleTracked() {
+    const cta = href
+      ? href.startsWith("/")
+        ? href.replace(/[?#].*$/, "").replace(/^\//, "") || "start"
+        : href.startsWith("mailto:")
+          ? "email"
+          : href.includes("wa.me")
+            ? "whatsapp"
+            : "extern"
+      : "aktion"
+    trackEvent("cta_click", { cta, location: trackLocation, page: pathname })
+    onClick?.()
+  }
 
   function handleMove(event: React.MouseEvent<HTMLElement>) {
     if (reduce || !ref.current) return
@@ -86,6 +122,7 @@ export function MagneticButton({
   )
 
   const motionProps = {
+    onClick: handleTracked,
     onMouseMove: handleMove,
     onMouseLeave: () => setOffset({ x: 0, y: 0 }),
     animate: { x: offset.x, y: offset.y },
@@ -117,7 +154,6 @@ export function MagneticButton({
     <motion.button
       ref={ref as React.Ref<HTMLButtonElement>}
       type="button"
-      onClick={onClick}
       aria-label={ariaLabel}
       className={base}
       {...motionProps}
