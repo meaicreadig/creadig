@@ -2,9 +2,9 @@
 //
 // CEO-Entscheidung (gesperrt):
 //   Eigene Produkte = meAI · fibero · CASSAMEA · meahv  — mehr nicht.
-//   Echte Kunden (Owner-Freigabe 22.08.2026) = NV SWISS · maqam.
-//   NÛR ist ein EIGENES Produkt, kein Kundenwerk. Bir Damla Hayır und
-//   Rumi's Maison sind nicht bestaetigt und erscheinen nirgends.
+//   Echte Kunden = NV SWISS · maqam · Bir Damla Hayır (Owner 29.08.2026).
+//   NÛR ist ein EIGENES Produkt, kein Kundenwerk.
+//   Rumi's Maison ist nicht bestaetigt und erscheint nirgends.
 //   PLANEX gehört nicht zu creaDIG und kommt nirgends vor.
 
 import { CLIENT_LOGOS } from "@/lib/client-logos.generated"
@@ -455,10 +455,10 @@ export function productNeighbours(slug: string): { prev: Work; next: Work } | nu
  * Echtes Kundenwerk — ausdrücklich KEIN eigenes Produkt.
  *
  * ---------------------------------------------------------------------------
- * WER HIER STAND UND WARUM ER GEHEN MUSSTE (Owner-Freigabe 22.08.2026)
+ * WER HIER STAND / WER ZURUECKKAM
  *   NÛR              — ein EIGENES Produkt des Hauses, nie ein Kunde.
- *   Bir Damla Hayır  — nicht als zahlender Kunde bestaetigt. Kommt erst
- *                      zurueck, wenn der Owner das ausdruecklich sagt.
+ *   Bir Damla Hayır  — Owner 29.08.2026: Logo + Kundenbild geliefert → wieder
+ *                      in der Liste (siehe Eintrag unten).
  *   Rumi's Maison    — [OWNER-BESTAETIGUNG AUSSTEHEND] echter zahlender
  *                      Kunde? Bis zur Antwort: kein Eintrag, keine Seite,
  *                      keine Nennung. Der Datensatz steht als Kommentar am
@@ -512,6 +512,26 @@ export const clientWorks: Work[] = [
     image: "/works/maqam.jpg",
     mark: "mq",
     // Logo: public/brand/clients/maqam.png (schwarz entfernt → transparent)
+    approvalOnFile: false,
+    approvedSentence: null,
+  },
+  {
+    slug: "bir-damla-hayir",
+    sector: { de: "Nonprofit · Hilfe", tr: "Sivil toplum · yardım" },
+    year: null,
+    name: "Bir Damla Hayır",
+    what: {
+      de: "Hilfsorganisation — Marke und Website.",
+      tr: "Yardım kuruluşu — marka ve web sitesi.",
+    },
+    built: null,
+    outcome: { de: "Kundenwerk", tr: "Müşteri işi" },
+    kind: "Kundenwerk",
+    region: "DE",
+    // Owner 29.08.2026: Kundenbild (Laptop-Szene mit echter Oberfläche).
+    image: "/works/bir-damla-hayir.jpg",
+    mark: "bd",
+    // Logo: public/brand/clients/bir-damla-hayir.png
     approvalOnFile: false,
     approvedSentence: null,
   },
@@ -729,9 +749,7 @@ const emptyChapters: Record<CaseChapterKey, Localized | null> = {
 /**
  * Zwei Geruestee, kein Inhalt — und das ist der ehrliche Zustand.
  *
- * NV SWISS ist der wertvollste Beweis, den das Haus hat: ein fremder,
- * zahlender Kunde, dessen Marke, Website und Digitalisierung aus einer Hand
- * kommen. maqam ist der zweite. Beide stehen hier mit Namen, Einordnung und
+ * NV SWISS, maqam und Bir Damla Hayır stehen hier mit Namen, Einordnung und
  * leeren Kapiteln — `approved: false`, also unsichtbar.
  *
  * Was der Owner liefern muss, steht auf `/status` mit Namen; erfunden wird
@@ -760,6 +778,17 @@ export const caseStudies: CaseStudy[] = [
     voice: null,
     image: null,
     mark: "mq",
+    approved: false,
+  },
+  {
+    slug: "bir-damla-hayir",
+    client: "Bir Damla Hayır",
+    context: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya" },
+    chapters: { ...emptyChapters },
+    metrics: [],
+    voice: null,
+    image: null,
+    mark: "bd",
     approved: false,
   },
 ]

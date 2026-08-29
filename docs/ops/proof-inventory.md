@@ -112,8 +112,8 @@ Füll-Platzhalter, nur weil er leer aussieht.
 
 | Datei | Status |
 |-------|--------|
-| `public/works/bir-damla-hayir.png` | **DO NOT PUBLISH / UNVERIFIED** — nicht in `clientWorks`, öffentlich erreichbar |
-| `public/works/rumis-maison.png` | **DO NOT PUBLISH / UNVERIFIED** — ditto |
+| `public/works/bir-damla-hayir.jpg` | Owner 29.08.2026 — in `clientWorks` · Logo `public/brand/clients/bir-damla-hayir.png` |
+| `public/works/rumis-maison.png` | **DO NOT PUBLISH / UNVERIFIED** — nicht in `clientWorks`, öffentlich erreichbar |
 
 Owner: löschen, nach `internal/archive` verschieben, oder bewusst freigeben.
 Agent: **nicht** verdrahten, nicht als Case/Logo nutzen.

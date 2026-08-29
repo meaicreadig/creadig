@@ -10,6 +10,7 @@ Datei nach diesem Muster benennen und in diesen Ordner legen:
 |---|---|
 | NV SWISS | `nvswiss.svg` (oder `nv-swiss.svg`) |
 | maqam | `maqam.svg` |
+| Bir Damla Hayır | `bir-damla-hayir.png` |
 
 Erlaubte Formate: `.svg` (bevorzugt), `.png`, `.webp`, `.avif`, `.jpg`.
 
