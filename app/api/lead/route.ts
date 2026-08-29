@@ -10,6 +10,7 @@ import {
   withinLimit,
 } from "@/lib/lead-guard"
 import { createLeadIdentity } from "@/lib/lead-id"
+import { storeLead } from "@/lib/lead-store"
 
 /**
  * DER LEAD-WEG — der Boden des Trichters.
@@ -755,6 +756,40 @@ export async function POST(request: Request) {
       `Eingangsbestaetigung an den Absender fehlgeschlagen: ${String(error).slice(0, 300)}`,
     )
   }
+
+  /*
+   * MP-G · Erst zugestellt, dann gespeichert.
+   *
+   * Die Reihenfolge ist die ganze Entscheidung: Die Mail ist seit Jahren der
+   * Weg, auf dem eine Anfrage ankommt, und sie braucht keine Infrastruktur.
+   * Der Speicher tritt daneben. Faellt er aus, ist die Anfrage trotzdem da —
+   * und der Absender merkt nichts, weil er nichts falsch gemacht hat.
+   *
+   * Andersherum waere es bequemer zu programmieren und falsch: Ein Ausfall
+   * der Datenbank wuerde dann jede Anfrage verschlucken, die heute ankommt.
+   *
+   * Ohne `LEAD_STORE` passiert hier nichts — die Route verhaelt sich dann
+   * exakt wie vor MP-G.
+   */
+  await storeLead({
+    id: leadId,
+    reference,
+    source,
+    locale,
+    name,
+    email,
+    phone,
+    business: business || null,
+    message: message || null,
+    siteUrl,
+    utmSource: utm.source || null,
+    utmMedium: utm.medium || null,
+    utmCampaign: utm.campaign || null,
+    utmTerm: utm.term || null,
+    utmContent: utm.content || null,
+    salesStatus: "new",
+    createdAt: new Date().toISOString(),
+  })
 
   return NextResponse.json({ ok: true, reference, id: leadId })
 }
