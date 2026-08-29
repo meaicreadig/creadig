@@ -503,15 +503,15 @@ export const clientWorks: Work[] = [
     year: null,
     name: "maqam",
     what: { de: "Online-Business / E-Commerce.", tr: "Online iş / e-ticaret." },
-    // Umfang, Region, Link und Screenshots liegen noch nicht vor.
-    // TODO (Owner): nachtragen — bis dahin rendern diese Felder nicht.
+    // Umfang, Region, Link — Owner 29.08.2026: Logo + Kundenbild geliefert.
     built: null,
     outcome: { de: "Kundenwerk", tr: "Müşteri işi" },
     kind: "Kundenwerk",
     region: null,
-    image: null,
+    // Hero der echten Oberfläche (scharf, aus Owner-Screenshot). Lifestyle: /works/maqam-scene.jpg
+    image: "/works/maqam.jpg",
     mark: "mq",
-    // C-2: TODO (Owner) — schriftliche Freigabe und ein Satz Aufgabe/Ergebnis.
+    // Logo: public/brand/clients/maqam.png (schwarz entfernt → transparent)
     approvalOnFile: false,
     approvedSentence: null,
   },

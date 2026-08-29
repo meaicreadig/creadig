@@ -11,5 +11,6 @@
 
 /** Oeffentlicher Pfad des echten Logos je Kunden-Slug. */
 export const CLIENT_LOGOS: Readonly<Record<string, string>> = {
+  "maqam": "/brand/clients/maqam.png",
   "nv-swiss": "/brand/clients/nv-swiss.png",
 }
