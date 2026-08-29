@@ -36,8 +36,8 @@ export type BrandLogo = {
 
 /** Die vier eigenen Produkte des Hauses. */
 export const ownProducts: ProductLogo[] = [
-  // TODO: Echtes meAI-Logo ergänzen → public/brand/products/meai.svg
-  { name: "meAI", logoPath: null, mark: "me", color: "#be904e", region: "DE & CH" },
+  // Owner 29.08.2026: Gold-Icon unter public/brand/products/meai.png
+  { name: "meAI", logoPath: "/brand/products/meai.png", mark: "me", color: "#be904e", region: "DE & CH" },
   { name: "fibero", logoPath: "/brand/products/fibero.svg", mark: "fb", color: "#dab149", region: "DE" },
   {
     name: "CASSAMEA",
