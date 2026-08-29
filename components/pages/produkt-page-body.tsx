@@ -70,6 +70,25 @@ export function ProduktPageBody({
    */
   const status = productStatus(product)
 
+  /*
+   * MP-C.1 · PRODUCT TRUTH — gesagt schlaegt gerechnet.
+   *
+   * `productStatus()` leitet den Zustand aus `live` und `href` ab. Das ist
+   * eine gute Schaetzung und war lange die einzige Angabe. Sobald der Owner
+   * einen Reifegrad SAGT, ist die Schaetzung daneben ueberfluessig — und zwei
+   * Badges mit zwei Woertern zur selben Frage waeren schlechter als eins.
+   *
+   * Der Punkt links folgt demselben Wert: Ein gefuellter Punkt neben
+   * „In Entwicklung" waere ein Widerspruch, den niemand aufloest.
+   *
+   * Ohne Owner-Wert (heute: alle vier `null`) aendert sich nichts.
+   */
+  const maturity = world?.maturity ?? null
+  const badgeLabel = maturity
+    ? copy.maturityBadge[maturity]
+    : copy.statusBadge[status]
+  const badgeLive = maturity ? maturity === "live" : product.live
+
   const layer = serviceLayers.find((entry) => entry.key === world?.layer)
   const layerCopy = world ? t.services.layers[world.layer] : null
   // Leistungsseiten, die dieses Produkt ausdrücklich als Arbeit führen.
@@ -104,9 +123,9 @@ export function ProduktPageBody({
                 verschwinden. Der Badge daneben sagt dasselbe in einem Wort —
                 fuer alle, die die Zeile nicht lesen. */}
             <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-              <span className="border-line-strong text-muted-foreground eyebrow inline-flex items-center gap-2 border px-2.5 py-1">
-                <StatusDot live={product.live} />
-                {copy.statusBadge[status]}
+              <span className="border-line-strong text-muted-foreground eyebrow inline-flex items-center gap-2 rounded-sm border px-2.5 py-1">
+                <StatusDot live={badgeLive} />
+                {badgeLabel}
               </span>
             </p>
             <p className="type-body text-foreground/85 mt-3 text-pretty">

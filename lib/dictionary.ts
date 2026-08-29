@@ -429,6 +429,24 @@ export const dictionary = {
         aufbau: "Im Aufbau",
         intern: "Im eigenen Betrieb",
       },
+      /*
+       * MP-C.1 — der Reifegrad, den der OWNER sagt.
+       *
+       * `statusBadge` darueber wird aus `live` und `href` gerechnet und kann
+       * genau drei Zustaende erreichen: laeuft, im Aufbau, im eigenen Betrieb.
+       * Die Stufe dazwischen — echte Nutzer in einer geschlossenen Phase —
+       * kann keine Rechnung wissen, die weiss nur eine Person.
+       *
+       * Ist `productWorlds[slug].maturity` gesetzt, gewinnt dieser Wert. Zwei
+       * Badges nebeneinander waeren zwei Wahrheiten zur selben Frage; solange
+       * nichts gesetzt ist, bleibt es bei der Ableitung.
+       */
+      maturityBadge: {
+        live: "Live",
+        pilot: "Pilotbetrieb",
+        "private-beta": "Private Beta",
+        "in-development": "In Entwicklung",
+      },
       builtLabel: "Was wir gebaut haben",
       blocksLabel: "Bausteine",
       blocksTitle: "Selbst gebaut, Baustein für Baustein.",
@@ -2380,6 +2398,12 @@ export const dictionary = {
         beta: "Özel beta",
         aufbau: "Kuruluyor",
         intern: "Kendi işletmemizde",
+      },
+      maturityBadge: {
+        live: "Canlı",
+        pilot: "Pilot işletme",
+        "private-beta": "Özel beta",
+        "in-development": "Geliştirme aşamasında",
       },
       builtLabel: "Ne inşa ettik",
       blocksLabel: "Yapı taşları",

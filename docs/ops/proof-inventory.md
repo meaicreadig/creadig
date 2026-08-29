@@ -21,7 +21,7 @@
 | **Bewertungen / Zitate** | ≥ 1 | **0** | `reviews: []` — Sterne-Gate im Build hält `AggregateRating` fern | 🔴 leer |
 | Unternehmensfotos | 4 Slots (`buero`, `ico`, `arbeitsplatz`, `whiteboard`) | **0** | `COMPANY_PHOTOS = {}` · Quelle `public/images/unternehmen/` nur `README.md` | 🔴 leer |
 | Ort-Foto | 1 | **1** | `public/images/ico-osnabrueck.jpg` | 🟢 vorhanden |
-| Produkt-Reifegrad | 4 | **0 gesetzt** | `productWorlds[].maturity` — alle `null` (MP-A vorbereitet) | 🔴 offen |
+| Produkt-Reifegrad | 4 | **0 gesetzt** | `productWorlds[].maturity` — alle `null`; Badge rendert den Wert, sobald er da ist (MP-C.1) | 🔴 wartet auf Owner |
 | Insights veröffentlicht | — | **1** | `lib/insights.ts`, ein Eintrag `published: true` | 🟢 vorhanden |
 | **Handwerk-Referenz** | 1 | **0** | existiert nirgends | 🔴 **größte Lücke** |
 
@@ -121,6 +121,9 @@ Agent: **nicht** verdrahten, nicht als Case/Logo nutzen.
 ---
 
 ## Proof-Arten (nicht vermischen)
+
+> Vollstaendig mit Freigabe-Matrix: `docs/ops/proof-kinds.md`.
+> Wie eine Aufnahme entstehen muss: `docs/ops/demo-data-standard.md`.
 
 | Art | Was | Freigabe |
 |-----|-----|----------|

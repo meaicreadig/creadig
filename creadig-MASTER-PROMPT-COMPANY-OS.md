@@ -42,8 +42,8 @@ MP-A BRAND ──► MP-B COMPANY OS ──► MP-D SALES
 | **MP-A** | LOCK THE BRAND | ✅ | Canon + Design-System + Principles | — |
 | **MP-B** | COMPANY OS Kern | ✅ | Lead-Ref + UTM-fähig + cta_click/booking_step | — |
 | **MP-C** | PROOF | Inventar ✅ · **MATERIAL-BLOCKED** | `docs/ops/proof-inventory.md` | Weiter nur als C.1→C.3 — nichts erfinden |
-| **MP-C.1** | PRODUCT TRUTH | **nächste** | Owner: maturity 4× setzen · Proof-Arten trennen · Demo-Data-Standard · orphan assets markieren | Kein Screenshot-Fake |
-| **MP-C.2** | FIBERO VISUAL | nach C.1 | 3–5 echte UI + Demodaten · Kategorie „Eigenes Produkt“ | Kein Kunden-KPI erfinden |
+| **MP-C.1** | PRODUCT TRUTH | ✅ | Demo-Data-Standard · Proof-Arten · maturity schlägt Ableitung (alle null) · Orphans unberührt | Kein Fake-Screen |
+| **MP-C.2** | FIBERO VISUAL | **nächste** (Owner-Screens) | 3–5 echte UI + Demodaten · Eigenes Produkt · optional Device-Foto um echte Pixel | **Kein** AI-generiertes Dashboard |
 | **MP-C.3** | CLIENT PROOF | nach Freigaben | NV SWISS / maqam / Logos / ggf. Handwerk-Kunde | Nur mit Owner-OK |
 | **MP-D** | SALES ENGINE | ✅ | Betriebscheck + Sales-Specs | — |
 | **MP-D.5** | CONVERSION ACCEPTANCE | ✅ 12/12 | WhatsApp-i18n-Fix | Live-Mail-SELFTEST Owner-Gate |
@@ -170,12 +170,37 @@ Bericht Türkisch: was Owner noch liefern muss für C.2 (fibero Screens).
 
 ---
 
-# MP-C.2 · FIBERO VISUAL PROOF (nach C.1 + Owner-Screens)
-## Kurzbefehl
+# MP-C.2 · FIBERO VISUAL PROOF
+## Copy-Paste-Prompt (kompletter Chat)
 
 ```
-MP-C.2 — nur echte fibero-UI mit Demodaten (3–5). Kategorie Eigenes Produkt.
-Kein Kunden-KPI. Drop-in public/works/products/fibero/. Mockup-Note entfernen wo echte Screens.
+Du bist CTO/UX für creaDIG. Stufe MP-C.2 — fibero Visual Proof.
+Voraussetzung: MP-C.1 Canon (demo-data-standard.md · proof-kinds.md).
+Black Lock. Unknown ≠ invented.
+
+GOLDENE REGEL (verbindlich):
+- Produkt im Display = pixelgetreu echte fibero-Oberfläche (Demo-Instanz).
+- Umgebung (Laptop/Büro/Licht) darf fotografisch/generiert sein.
+- VERBOTEN: AI-generiertes Dashboard / erfundene UI als „Proof“.
+- VERBOTEN: Produktionsdaten, echte Kundennamen/Beträge/Adressen.
+- Label unter dem Bild: „Echte Oberfläche, Demodaten.“ / TR-Äquivalent.
+- Kategorie: Eigenes Produkt — NIEMALS als Kundenprojekt/Kundenergebnis verkaufen.
+
+Wenn Owner noch KEINE Screens geliefert hat:
+→ nur Drop-in-Slots prüfen, Empty States ehrlich lassen, Bericht „wartet auf Material“.
+→ KEINE Platzhalter-UI erfinden.
+
+Wenn Owner 3–5 PNGs liefert (Auftragsliste · Auftrag-Detail/Doku · Abrechnung):
+1) nach public/works/products/fibero/ ablegen
+2) npm run build → PRODUCT_SCREENS regenerieren
+3) Mockup-Note entfernen wo echte Screens stehen
+4) Demodaten-Label in UI anbinden (Canon-Text aus dictionary wenn nötig)
+5) maturity NUR setzen wenn Owner fibero=… sagt
+
+Orphans / NV-SWISS: nicht verdrahten. NV-SWISS später: echter Site-Screenshot
+in Device-Szene — keine erfundene NV-Oberfläche.
+
+tsc + a11y. Commit auf Befehl. Bericht Türkisch.
 ```
 
 ---
@@ -186,6 +211,7 @@ Kein Kunden-KPI. Drop-in public/works/products/fibero/. Mockup-Note entfernen wo
 ```
 MP-C.3 — Logos/Cases/Quotes nur mit Owner-Freigabe. approved:true nie raten.
 Handwerk-Kundenfall oder warten. Orphans nicht verdrahten.
+Echter Kunden-Screenshot in Device-Mockup OK; generierte Kunden-UI VERBOTEN.
 ```
 
 ---
