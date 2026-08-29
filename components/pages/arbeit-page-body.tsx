@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { LocaleLink as Link } from "@/components/ui/locale-link";
 import { ArrowLeft } from "lucide-react";
 import { useLocale } from "@/components/locale-provider";
@@ -11,18 +12,11 @@ import { CaseStudyBody } from "@/components/sections/case-study-body";
 import type { CaseStudy, Work } from "@/lib/site-data";
 
 /**
- * Eine Kundenwerk-Seite (PHASE A — Gerüst; das tiefe Case-Format folgt in
- * PHASE D).
+ * Eine Kundenwerk-Seite (PHASE A · MP-C.3).
  *
- * Zwei Ebenen, klar getrennt:
- *
- *  1. Was belegt ist — Name, Branche, Region, `what`, `built`, `outcome` aus
- *     `site-data`. Das steht immer.
- *  2. Die ausführliche Fallbeschreibung (Ausgangslage → Lösung → Ergebnis).
- *     Sie erscheint NUR, wenn zu diesem Werk eine Case-Study mit
- *     `approved: true` vorliegt. Ohne Freigabe steht dort der Grund, warum
- *     nichts dasteht — nicht „demnächst", sondern die Haltung: Kundentexte
- *     ohne schriftliche Freigabe veröffentlichen wir nicht.
+ *  1. Belegtes: Name, Branche, Region, what, built, outcome, Kundenbild.
+ *  2. Fallstudie nur bei `approved: true` — Kurzformat Projekt · Kategorie ·
+ *     Leistungen, optional acht Tiefkapitel.
  */
 export function ArbeitPageBody({
   work,
@@ -54,7 +48,6 @@ export function ArbeitPageBody({
             <p className="eyebrow text-gold-text">{copy.sectorLabel}</p>
             <p className="type-body text-foreground/85 mt-3">{work.sector[locale]}</p>
           </div>
-          {/* Ohne bestaetigte Region faellt die ganze Zelle weg — kein Label ins Leere. */}
           {work.region && (
             <div className="border-line pt-7 sm:border-l sm:pl-8">
               <p className="eyebrow text-gold-text">{copy.regionLabel}</p>
@@ -64,11 +57,30 @@ export function ArbeitPageBody({
         </div>
       </PageHeader>
 
-      {/*
-        Die Sektion traegt ihren Namen ueber die H2 — faellt die weg (kein
-        belegter Umfang), muss der Name direkt an die Sektion, sonst zeigt
-        `aria-labelledby` ins Leere.
-      */}
+      {work.image && (
+        <section aria-label={work.name} className="section-seam">
+          <div className="section-shell">
+            <Reveal>
+              <div className="border-line bg-muted relative aspect-[16/10] overflow-hidden rounded-lg border">
+                <Image
+                  src={work.image}
+                  alt={`${work.name} — ${work.what[locale]}`}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 80vw"
+                  className="object-cover"
+                  priority
+                />
+              </div>
+              {work.imageProof === "customer-photo" && (
+                <p className="text-muted-foreground text-meta mt-4 max-w-2xl text-pretty">
+                  {t.portfolio.customerPhotoNote}
+                </p>
+              )}
+            </Reveal>
+          </div>
+        </section>
+      )}
+
       <section
         {...(work.built
           ? { "aria-labelledby": "arbeit-gebaut-title" }
@@ -77,11 +89,6 @@ export function ArbeitPageBody({
       >
         <div className="section-shell">
           <div className="grid gap-x-12 gap-y-14 lg:grid-cols-12">
-            {/*
-              Der Umfang traegt hier die Ueberschrift. Liegt er nicht vor,
-              faellt die Spalte weg und die belegten Angaben ruecken auf die
-              volle Breite — statt einer leeren H2 ueber einer halben Seite.
-            */}
             {work.built && (
               <Reveal className="lg:col-span-7">
                 <SectionEyebrow label={copy.builtLabel} />
@@ -115,9 +122,6 @@ export function ArbeitPageBody({
         </div>
       </section>
 
-      {/* ------------------------------------------------------------------
-          Fallbeschreibung — gated auf die schriftliche Freigabe des Kunden.
-          ------------------------------------------------------------------ */}
       <section
         aria-labelledby="arbeit-fall-title"
         className="section-seam"
@@ -135,11 +139,6 @@ export function ArbeitPageBody({
                 </h2>
               </Reveal>
 
-              {/*
-                Dieselben acht Kapitel wie auf /arbeiten, aus derselben
-                Komponente. Zwei Fassungen desselben Falls waeren in vier
-                Wochen zwei Faelle (V2-4).
-              */}
               <Reveal delay={0.08} className="mt-16">
                 <CaseStudyBody study={study} />
               </Reveal>
@@ -176,7 +175,6 @@ export function ArbeitPageBody({
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                {/* MP10-2.6 — Abschluss nach /termin. */}
                 <MagneticButton href="/termin">
                   {copy.ctaPrimary}
                 </MagneticButton>

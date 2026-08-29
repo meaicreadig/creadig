@@ -20,7 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 
-/** Ersatzfläche für Cases ohne Mockup — statt eines leeren oder kaputten <img>. */
+/** Ersatzfläche ohne Bild — statt eines leeren oder kaputten <img>. */
 function MonogramPanel({ mark }: { mark: string }) {
   return (
     <div className="bg-surface absolute inset-0 flex items-center justify-center">
@@ -260,6 +260,24 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
               </Reveal>
             ))}
           </div>
+          {view === "cards" && (() => {
+            const proofs = new Set(
+              productWorks
+                .map((w) => w.imageProof)
+                .filter((p): p is NonNullable<typeof p> => Boolean(p)),
+            )
+            const note =
+              proofs.has("mockup") && proofs.has("product-photo")
+                ? t.portfolio.imageNoteMixed
+                : proofs.has("product-photo")
+                  ? t.portfolio.productPhotoNote
+                  : proofs.has("mockup")
+                    ? t.portfolio.mockupNote
+                    : null
+            return note ? (
+              <p className="text-muted-foreground text-meta mt-6">{note}</p>
+            ) : null
+          })()}
 
           {/*
             Kundenwerk — ausdrücklich getrennt, kein eigenes Produkt.
@@ -288,6 +306,11 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
                   </Reveal>
                 ))}
               </div>
+              {view === "cards" && (
+                <p className="text-muted-foreground text-meta mt-6">
+                  {t.portfolio.customerPhotoNote}
+                </p>
+              )}
             </>
           )}
         </>
@@ -313,12 +336,6 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
             </li>
           ))}
         </ul>
-        {/* Gilt nur fuer die Karten — das Register zeigt keine Abbildungen. */}
-        {view === "cards" && (
-          <p className="text-muted-foreground text-meta mt-6">
-            {t.portfolio.mockupNote}
-          </p>
-        )}
       </Reveal>
     </section>
   );

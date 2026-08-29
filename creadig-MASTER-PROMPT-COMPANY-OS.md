@@ -44,7 +44,7 @@ MP-A BRAND ──► MP-B COMPANY OS ──► MP-D SALES
 | **MP-C** | PROOF | Inventar ✅ · **MATERIAL-BLOCKED** | `docs/ops/proof-inventory.md` | Weiter nur als C.1→C.3 — nichts erfinden |
 | **MP-C.1** | PRODUCT TRUTH | ✅ | Demo-Data-Standard · Proof-Arten · maturity schlägt Ableitung (alle null) · Orphans unberührt | Kein Fake-Screen |
 | **MP-C.2** | FIBERO VISUAL | ✅ Pipeline · **MATERIAL-BLOCKED** | Caption/Canon angebunden · Drop-in getestet · keine Fake-PNGs | Wartet auf Owner-Screens (echte UI + synthetische Daten) |
-| **MP-C.3** | CLIENT PROOF | nach Freigaben | NV SWISS / maqam / Logos / ggf. Handwerk-Kunde | Nur mit Owner-OK |
+| **MP-C.3** | CLIENT PROOF | 🟡 Gerüst ✅ · Freigaben offen | CaseCard · imageProof · 3 Clients · `docs/ops/case-format.md` | `approved:true` nur Owner |
 | **MP-D** | SALES ENGINE | ✅ | Betriebscheck + Sales-Specs | — |
 | **MP-D.5** | CONVERSION ACCEPTANCE | ✅ 12/12 | WhatsApp-i18n-Fix | Live-Mail-SELFTEST Owner-Gate |
 | **MP-E** | MARKETING | ✅ | Handwerk-LP · UTM Spec · Build Notes | Keine weitere Branche |
@@ -183,15 +183,21 @@ Goldene Regel: echte UI + synthetische Daten. Staging/lokal OK — Produktiv-Kun
 ---
 
 # MP-C.3 · CLIENT PROOF
+## Status: 🟡 Gerüst 29.08.2026 · Freigaben Owner
+
+Erledigt: Logos+Bilder NV/maqam/BDH · `imageProof` · CaseCard · Inventar · case-format.md.  
+Offen: `approved:true` nur mit Freigabe+Satz · Leistungen maqam/BDH · rumis orphan.
+
 ## Copy-Paste-Prompt
 
 ```
 Du bist CTO/UX für creaDIG. Stufe MP-C.3 — Client Proof.
 Black Lock. Keine erfundenen KPI. Keine AI-Kunden-UI.
-Orphans bir-damla / rumis-maison: nicht verdrahten.
+Orphan rumis-maison: nicht verdrahten.
+Bir Damla Hayır: Owner 29.08. freigegeben (Logo+Bild) — mit NV/maqam führen.
 
-IST: Logo+Bild für NV SWISS und maqam liegen bereits.
-Case Studies: approved noch false.
+IST: Logo+Bild für NV SWISS, maqam, Bir Damla Hayır liegen.
+Case Studies: approved noch false. CaseCard-Gerüst steht.
 
 1) Case-Format: Projekt · Kategorie · Leistungen (ohne Tech-Stack-Liste).
    Optional tiefer: Ausgangslage → Problem → System → Ergebnis → Betrieb.
@@ -200,7 +206,7 @@ Case Studies: approved noch false.
 2) NV SWISS: /works/nv-swiss.jpg (echte Site) — kein Lifestyle-Mockup.
    approved:true NUR mit expliziter Owner-Freigabe + Freigabesatz.
 
-3) maqam analog.
+3) maqam + Bir Damla Hayır analog.
 
 4) Portfolio: echte Kundenbilder nicht als „Mockup“ etikettieren.
 

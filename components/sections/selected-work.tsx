@@ -34,14 +34,34 @@ import { featuredWorks, workHref } from "@/lib/site-data"
  *             magnetischem Knopf, und die einzige, die beim Scrollen wirkt.
  *
  * Gated: Die Sektion rendert nur, was in `featuredWorks` wirklich aufgelöst
- * werden konnte — und die Abbildungen tragen weiterhin den Hinweis, dass sie
- * illustrative Mockups sind und keine Screenshots.
+ * werden konnte. Die Fussnote folgt `imageProof` (MP-C.3) — Kundenfotos
+ * werden nie als Mockup etikettiert.
  */
 export function SelectedWork() {
   const { t, locale } = useLocale()
   const copy = t.home.work
 
   if (featuredWorks.length === 0) return null
+
+  const proofs = new Set(
+    featuredWorks.map((w) => w.imageProof).filter((p): p is NonNullable<typeof p> => Boolean(p)),
+  )
+  const hasMockup = proofs.has("mockup")
+  const hasProduct = proofs.has("product-photo")
+  const hasCustomer = proofs.has("customer-photo")
+  const hasReal = hasProduct || hasCustomer
+  const imageNote =
+    hasMockup && hasReal
+      ? t.portfolio.imageNoteMixed
+      : hasMockup
+        ? t.portfolio.mockupNote
+        : hasProduct && hasCustomer
+          ? t.portfolio.imageNoteMixed
+          : hasProduct
+            ? t.portfolio.productPhotoNote
+            : hasCustomer
+              ? t.portfolio.customerPhotoNote
+              : null
 
   return (
     <section
@@ -171,9 +191,11 @@ export function SelectedWork() {
             Sektion.
           */}
           <div className="border-line mt-16 flex flex-col gap-6 border-t pt-6 sm:flex-row sm:items-baseline sm:justify-between">
-            <p className="text-muted-foreground text-meta max-w-2xl text-pretty">
-              {t.portfolio.mockupNote}
-            </p>
+            {imageNote && (
+              <p className="text-muted-foreground text-meta max-w-2xl text-pretty">
+                {imageNote}
+              </p>
+            )}
             <Link
               href="/arbeiten"
               className="group text-gold-text hover:text-foreground inline-flex shrink-0 items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"

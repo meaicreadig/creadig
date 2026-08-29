@@ -722,7 +722,14 @@ export const dictionary = {
       kindClientWork: "Kundenwerk",
       more: "Außerdem unter dem Dach",
       viewLive: "Live ansehen",
-      mockupNote: "Abbildungen sind illustrative Mockups, keine Screenshots.",
+      // Nur Produktkarten ohne echtes Foto — Kunden-/Produktfotos tragen eigene Notes.
+      mockupNote: "Produktkarten: illustrative Mockups, keine Screenshots.",
+      productPhotoNote:
+        "Produktbilder zeigen die echte Oberfläche (Demodaten) — keine Mockups.",
+      customerPhotoNote: "Kundenbilder zeigen die echte Oberfläche — keine Mockups.",
+      // Selected Work / gemischte Werkschau.
+      imageNoteMixed:
+        "Echte Oberflächen (Produkt & Kunden) und illustrative Mockups — getrennt ausgewiesen, nicht vermischt etikettiert.",
       // Register-Ansicht (B2)
       viewLabel: "Ansicht",
       viewCards: "Karten",
@@ -742,12 +749,17 @@ export const dictionary = {
      * Die Reihenfolge ist die Aussage. Erst der Betrieb, wie er war, dann
      * sein Problem, dann sein Ziel — und erst DANACH kommen wir vor. Wer mit
      * „unsere Rolle" anfaengt, schreibt eine Selbstdarstellung mit
-     * Kundennamen.
+     * Kundennamen. MP-C.3 ergaenzt davor das Kurzformat Projekt · Kategorie · Leistungen.
      */
     cases: {
       eyebrow: "Kundenfälle",
       title: "Was sich danach geändert hat.",
       lead: "Jeder Fall in derselben Reihenfolge: wie der Betrieb dastand, was ihn aufgehalten hat, was er erreichen wollte — und erst dann, was wir daran hatten. Nur mit schriftlicher Freigabe des Kunden; ohne Freigabe steht hier nichts.",
+      card: {
+        project: "Projekt",
+        category: "Kategorie",
+        services: "Leistungen",
+      },
       chapters: {
         start: "Ausgangslage",
         problem: "Das Problem",
@@ -2559,7 +2571,12 @@ export const dictionary = {
       kindClientWork: "Müşteri işi",
       more: "Çatı altında ayrıca",
       viewLive: "Canlı gör",
-      mockupNote: "Görseller açıklayıcı maketlerdir, ekran görüntüsü değildir.",
+      mockupNote: "Ürün kartları: açıklayıcı maketler, ekran görüntüsü değil.",
+      productPhotoNote:
+        "Ürün görselleri gerçek arayüzü gösterir (demodaten) — maket değil.",
+      customerPhotoNote: "Müşteri görselleri gerçek arayüzü gösterir — maket değil.",
+      imageNoteMixed:
+        "Gerçek arayüzler (ürün ve müşteri) ile açıklayıcı maketler — ayrı etiketlenir, karıştırılmaz.",
       viewLabel: "Görünüm",
       viewCards: "Kartlar",
       viewRegistry: "Sicil",
@@ -2572,6 +2589,11 @@ export const dictionary = {
       eyebrow: "Müşteri örnekleri",
       title: "Sonrasında ne değişti.",
       lead: "Her örnek aynı sırayla: işletme nasıl duruyordu, onu ne engelliyordu, neye ulaşmak istiyordu — ve ancak ondan sonra bizim payımız. Yalnızca müşterinin yazılı onayıyla; onay yoksa burada bir şey yazmaz.",
+      card: {
+        project: "Proje",
+        category: "Kategori",
+        services: "Hizmetler",
+      },
       chapters: {
         start: "Başlangıç durumu",
         problem: "Sorun",

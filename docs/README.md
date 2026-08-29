@@ -11,7 +11,7 @@
 |-------|--------|
 | MP-A Brand | ✅ |
 | MP-B Company OS / Lead | ✅ |
-| MP-C Proof | Inventar ✅ · C.1 ✅ · C.2 Pipeline ✅ (**Screens fehlen**) · C.3 Client teilweise (Logo+Bild NV/maqam) · Case-Texte noch freigabe |
+| MP-C Proof | Inventar ✅ · C.1 ✅ · C.2 Pipeline ✅ (**Screens fehlen**) · **C.3 Gerüst ✅** (Logo+Bild NV/maqam/BDH · `imageProof` · CaseCard · `approved` weiter false) |
 | MP-D Sales / Betriebscheck | ✅ |
 | MP-D.5 Conversion Acceptance | ✅ |
 | Live-Mail SELFTEST | ⬜ Owner-Gate |
@@ -70,6 +70,7 @@
 | `docs/ops/conversion-acceptance.md` | Working Note | MP-D.5 Prüfprotokoll: 12/12 PASS, Befunde, was Env-blockiert ist |
 | `docs/ops/marketing-acceptance.md` | Working Note | MP-E.5 Prüfprotokoll: 10/10 PASS + Conversion-Definition |
 | `docs/ops/proof-inventory.md` | Working Note | MP-C Lückentabelle — was fehlt, wo es hingehört |
+| `docs/ops/case-format.md` | Working Note | MP-C.3 Owner-Fill: Projekt · Kategorie · Leistungen |
 | `docs/ops/proof-kinds.md` | **Canon** | Eigenes Produkt / Kundenprojekt / Kundenergebnis — Freigabe-Matrix |
 | `docs/ops/demo-data-standard.md` | **Canon** | Echte UI, synthetische Daten, Label-Regel, Prüfliste vor jeder Aufnahme |
 | `docs/ops/utm-playbook.md` | Spec | Attribution-Modell + Tracking-Ready-Checkliste; Client blockiert bis Datenschutzsatz |

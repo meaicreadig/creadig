@@ -6,36 +6,10 @@ import { useLocale } from "@/components/locale-provider"
 import { filledChapters, type CaseStudy } from "@/lib/site-data"
 
 /**
- * Ein Fall, ausgeschrieben (V2-4 · KIZILELMA §10.4).
+ * Ein Fall, ausgeschrieben (V2-4 · KIZILELMA §10.4 · MP-C.3).
  *
- * ---------------------------------------------------------------------------
- * WARUM ES DIESE KOMPONENTE GIBT
- * Ein Fall erscheint an zwei Orten: gebuendelt auf `/arbeiten` und einzeln
- * auf der Seite des Werks. Beide rendern jetzt dieselben acht Kapitel, und
- * dieselbe Struktur zweimal im Markup zu halten heisst, sie in vier Wochen
- * zweimal unterschiedlich zu haben — genau der Fehler, den `PageHeader` und
- * die `section-*`-Utilities schon einmal geheilt haben.
- *
- * ---------------------------------------------------------------------------
- * LEERE KAPITEL RENDERN NICHT
- * `filledChapters` gibt nur zurueck, was Text traegt, in der festen
- * Leserichtung. Ein Fall, von dem der Owner heute nur die Ausgangslage
- * bestaetigen kann, zeigt die Ausgangslage — und nicht acht
- * Zwischenueberschriften ueber Leerraum. Die Kapitel bekommen ihre Nummer
- * aus der ANZEIGE, nicht aus dem Schema: „01, 02, 03" ueber drei sichtbaren
- * Kapiteln liest sich richtig, „01, 04, 08" liest sich wie ein Fehler.
- *
- * ---------------------------------------------------------------------------
- * DIE KENNZAHLEN TRAGEN IHRE QUELLE
- * Nicht als Fussnote, sondern in derselben Zelle. Eine Kennzahl ohne Quelle
- * ist eine Behauptung mit Ziffern, und Ziffern glaubt man schneller als
- * Saetze — deshalb steht der Beleg daneben und nicht darunter.
- *
- * ---------------------------------------------------------------------------
- * DAS ZITAT WIRD NICHT UEBERSETZT
- * Dieselbe Regel wie bei den Bewertungen: `lang` steht am `<blockquote>`,
- * der Wortlaut bleibt der des Menschen. Uebersetzt wird nur die Funktion
- * darunter — die ist eine Beschreibung, kein Zitat.
+ * Kurz zuerst: Projekt · Kategorie · Leistungen (`study.card`).
+ * Dann nur gefüllte Tiefkapitel. Kennzahlen nur mit Quelle. Zitat unverändert.
  */
 export function CaseStudyBody({
   study,
@@ -48,10 +22,10 @@ export function CaseStudyBody({
   const { t, locale } = useLocale()
   const copy = t.cases
   const chapters = filledChapters(study)
+  const { card } = study
 
   return (
     <div id={headingId}>
-      {/* Kunde, Einordnung, Bild bzw. Monogramm. */}
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
         <div className="lg:col-span-4">
           <h3 className="type-h3">{study.client}</h3>
@@ -78,8 +52,28 @@ export function CaseStudyBody({
         </div>
 
         <div className="lg:col-span-8">
+          {/* MP-C.3 Kurzformat — Projekt · Kategorie · Leistungen */}
+          <dl className="border-line grid gap-6 border-t pt-6 sm:grid-cols-3">
+            <div>
+              <dt className="eyebrow text-gold-text">{copy.card.project}</dt>
+              <dd className="type-body text-foreground/85 mt-3">{card.project}</dd>
+            </div>
+            <div>
+              <dt className="eyebrow text-gold-text">{copy.card.category}</dt>
+              <dd className="type-body text-foreground/85 mt-3">{card.category[locale]}</dd>
+            </div>
+            {card.services && (
+              <div>
+                <dt className="eyebrow text-gold-text">{copy.card.services}</dt>
+                <dd className="type-body text-foreground/85 mt-3 text-pretty">
+                  {card.services[locale]}
+                </dd>
+              </div>
+            )}
+          </dl>
+
           {chapters.length > 0 && (
-            <div className="grid gap-10 sm:grid-cols-2">
+            <div className="mt-12 grid gap-10 sm:grid-cols-2">
               {chapters.map((chapter, i) => (
                 <div key={chapter.key} className="border-line border-t pt-6">
                   <div className="flex items-baseline gap-3">
@@ -118,7 +112,10 @@ export function CaseStudyBody({
           {study.voice && (
             <figure className="border-gold/45 bg-muted mt-12 border-l-2 py-6 pl-6">
               <p className="eyebrow text-gold-text">{copy.voiceLabel}</p>
-              <blockquote lang={study.voice.lang} className="type-lead text-foreground/90 mt-5 text-pretty">
+              <blockquote
+                lang={study.voice.lang}
+                className="type-lead text-foreground/90 mt-5 text-pretty"
+              >
                 {study.voice.quote}
               </blockquote>
               <figcaption className="type-small text-muted-foreground mt-5">

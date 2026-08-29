@@ -112,8 +112,19 @@ export type Work = {
    * TODO (Owner): echte Jahreszahlen nachtragen.
    */
   year: string | null
-  /** Illustratives Mockup — kein Screenshot. null = Monogramm-Panel statt Bild. */
+  /**
+   * Bild zur Arbeit. `null` = Monogramm-Panel statt leerem `<img>`.
+   * Was das Bild *ist*, steht in `imageProof` — Kundenfotos nie als Mockup.
+   */
   image: string | null
+  /**
+   * MP-C.3 — steuert Fussnoten in Werkschau / Selected Work.
+   * `mockup` = illustrative Produkt-Abbildung
+   * `product-photo` = echte eigene Oberfläche in situ (Demodaten ok)
+   * `customer-photo` = echte Kundenoberfläche in situ
+   * `null` = kein Bild
+   */
+  imageProof: "mockup" | "product-photo" | "customer-photo" | null
   /** Monogramm für Karten ohne Bild. */
   mark: string
   href?: string
@@ -150,7 +161,9 @@ export const productWorks: Work[] = [
     outcome: { de: "Im Aufbau · live unter meai.run", tr: "Kuruluyor · meai.run adresinde canlı" },
     kind: "Produkt",
     region: "DE & CH",
-    image: "/works/meai.png",
+    // Owner 29.08.2026: Laptop-Szene mit echter meAI-Oberfläche (Demodaten).
+    image: "/works/meai.jpg",
+    imageProof: "product-photo",
     mark: "me",
     href: "https://meai.run",
     live: true,
@@ -171,7 +184,9 @@ export const productWorks: Work[] = [
     outcome: { de: "Im Tagesbetrieb", tr: "Günlük kullanımda" },
     kind: "Produkt",
     region: "DE",
-    image: "/works/fibero.png",
+    // Owner 29.08.2026: Feld-Szene mit echter fibero Map-Center-Oberfläche.
+    image: "/works/fibero.jpg",
+    imageProof: "product-photo",
     mark: "fb",
     live: true,
   },
@@ -191,7 +206,9 @@ export const productWorks: Work[] = [
     outcome: { de: "Im Aufbau", tr: "Kuruluyor" },
     kind: "Produkt",
     region: "CH",
-    image: "/works/cassamea.png",
+    // Owner 29.08.2026: POS-Szene mit echter CASSAMEA-Oberfläche (Demodaten).
+    image: "/works/cassamea.jpg",
+    imageProof: "product-photo",
     mark: "CA",
   },
   {
@@ -210,8 +227,9 @@ export const productWorks: Work[] = [
     outcome: { de: "Im Aufbau", tr: "Kuruluyor" },
     kind: "Produkt",
     region: "DE",
-    // Noch kein Mockup — die Karte rendert ein Monogramm-Panel statt eines leeren Bildes.
+    // Noch kein Kartenbild — Monogramm-Panel statt leerem Bild.
     image: null,
+    imageProof: null,
     mark: "hv",
   },
 ]
@@ -490,6 +508,7 @@ export const clientWorks: Work[] = [
     region: "CH",
     // Owner 29.08.2026: Kundenbild (Laptop-Szene mit echter nvswiss.ch-Oberfläche).
     image: "/works/nv-swiss.jpg",
+    imageProof: "customer-photo",
     mark: "NV",
     href: "https://nvswiss.ch",
     live: true,
@@ -504,12 +523,14 @@ export const clientWorks: Work[] = [
     name: "maqam",
     what: { de: "Online-Business / E-Commerce.", tr: "Online iş / e-ticaret." },
     // Umfang, Region, Link — Owner 29.08.2026: Logo + Kundenbild geliefert.
+    // Leistungen (Case-Card) fehlen noch — nichts erfinden.
     built: null,
     outcome: { de: "Kundenwerk", tr: "Müşteri işi" },
     kind: "Kundenwerk",
     region: null,
     // Owner 29.08.2026: Kundenbild (Boutique-Laptop, echte maqam-Oberfläche).
     image: "/works/maqam.jpg",
+    imageProof: "customer-photo",
     mark: "mq",
     // Logo: public/brand/clients/maqam.png (schwarz entfernt → transparent)
     approvalOnFile: false,
@@ -524,12 +545,14 @@ export const clientWorks: Work[] = [
       de: "Hilfsorganisation — Marke und Website.",
       tr: "Yardım kuruluşu — marka ve web sitesi.",
     },
+    // Leistungen (Case-Card) fehlen noch — nichts erfinden.
     built: null,
     outcome: { de: "Kundenwerk", tr: "Müşteri işi" },
     kind: "Kundenwerk",
     region: "DE",
     // Owner 29.08.2026: Kundenbild (Laptop-Szene mit echter Oberfläche).
     image: "/works/bir-damla-hayir.jpg",
+    imageProof: "customer-photo",
     mark: "bd",
     // Logo: public/brand/clients/bir-damla-hayir.png
     approvalOnFile: false,
@@ -678,6 +701,19 @@ export type CaseMetric = {
 }
 
 /**
+ * Kurzformat eines Falls (MP-C.3) — bevor die acht Tiefkapitel kommen.
+ *
+ * Projekt · Kategorie · Leistungen. Keine Tech-Stack-Liste, keine KPI.
+ * `services` bleibt `null`, solange der Owner den Leistungsumfang nicht
+ * bestaetigt hat — geraten wird nichts.
+ */
+export type CaseCard = {
+  project: string
+  category: Localized
+  services: Localized | null
+}
+
+/**
  * Die Kundenstimme in einem Fall.
  *
  * Dieselbe Regel wie bei `reviews`: Der Wortlaut wird NICHT uebersetzt. Ein
@@ -694,33 +730,22 @@ export type CaseVoice = {
 }
 
 /* ==========================================================================
- * DAS CASE-STUDY-SYSTEM (V2-4 · KIZILELMA §10.4)
+ * DAS CASE-STUDY-SYSTEM (V2-4 · KIZILELMA §10.4 · MP-C.3)
  *
- * Vorher trug ein Fall drei Felder: Problem, Loesung, Ergebnis. Das ist die
- * Kurzform, mit der Agenturen ihre Referenzen fuellen, und sie beantwortet
- * die entscheidende Frage nicht: Was war unser Anteil daran? Ein Fall ohne
- * „unsere Rolle" und ohne „Heute" liest sich wie eine Projektbeschreibung,
- * die auch der Kunde selbst haette schreiben koennen.
+ * Kurz: Projekt · Kategorie · Leistungen (`card`).
+ * Tief (optional): acht Kapitel Ausgangslage → … → Heute.
  *
- * Acht Kapitel, dazu Kennzahlen und eine Stimme. Jedes Kapitel ist einzeln
- * `null`-faehig: Ein Fall, von dem der Owner heute nur die Ausgangslage
- * bestaetigen kann, rendert die Ausgangslage — und nicht acht
- * Zwischenueberschriften ueber Leerraum.
- *
- * ---------------------------------------------------------------------------
  * `approved` IST DIE HAUPTSICHERUNG, NICHT DER INHALT
- * Solange sie `false` ist, erscheint der Fall nirgends: nicht auf /arbeiten,
- * nicht auf der Werk-Seite, nicht in den strukturierten Daten. Die Geruest-
- * Eintraege unten sind deshalb sichtbar leer und trotzdem gefahrlos — sie
- * existieren, damit der Owner Text in eine Struktur schreiben kann, statt
- * eine Struktur mitzuliefern.
+ * Solange sie `false` ist, erscheint der Fall nirgends.
  * ========================================================================== */
 export type CaseStudy = {
   slug: string
   /** Kundenname exakt so, wie er freigegeben wurde. */
   client: string
-  /** Branche/Ort — Einordnung, keine Bewertung. */
+  /** Branche/Ort — Einordnung, keine Bewertung (= card.category). */
   context: Localized
+  /** Kurzformat — immer gesetzt; services darf null sein. */
+  card: CaseCard
   /** Die acht Kapitel. `null` = liegt nicht vor und rendert nicht. */
   chapters: Record<CaseChapterKey, Localized | null>
   /** Nur belegte Zahlen, jede mit Quelle. Leer = kein Kennzahlen-Block. */
@@ -747,25 +772,29 @@ const emptyChapters: Record<CaseChapterKey, Localized | null> = {
 }
 
 /**
- * Zwei Geruestee, kein Inhalt — und das ist der ehrliche Zustand.
+ * Drei Gerüste, kein freigegebener Fall — und das ist der ehrliche Zustand.
  *
- * NV SWISS, maqam und Bir Damla Hayır stehen hier mit Namen, Einordnung und
- * leeren Kapiteln — `approved: false`, also unsichtbar.
- *
- * Was der Owner liefern muss, steht auf `/status` mit Namen; erfunden wird
- * nichts davon. Sobald ein Kapitel Text traegt und die schriftliche Freigabe
- * vorliegt, wird `approved` auf `true` gesetzt und der Fall erscheint —
- * ohne dass jemand Markup anfassen muss.
+ * NV SWISS · maqam · Bir Damla Hayır: Namen, Kategorie, Bildpfad und (wo
+ * belegt) Leistungen. `approved: false` — unsichtbar, bis Owner Freigabe +
+ * Freigabesatz liefert. Keine KPI, keine erfundenen Kapitel.
  */
 export const caseStudies: CaseStudy[] = [
   {
     slug: "nv-swiss",
     client: "NV SWISS",
     context: { de: "Versicherung & Finanzen · Schweiz", tr: "Sigorta & finans · İsviçre" },
+    card: {
+      project: "NV SWISS",
+      category: { de: "Versicherung & Finanzen · Schweiz", tr: "Sigorta & finans · İsviçre" },
+      services: {
+        de: "Marke, Website, Digitalisierung.",
+        tr: "Marka, web sitesi, dijitalleşme.",
+      },
+    },
     chapters: { ...emptyChapters },
     metrics: [],
     voice: null,
-    image: null,
+    image: "/works/nv-swiss.jpg",
     mark: "NV",
     approved: false,
   },
@@ -773,10 +802,15 @@ export const caseStudies: CaseStudy[] = [
     slug: "maqam",
     client: "maqam",
     context: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret" },
+    card: {
+      project: "maqam",
+      category: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret" },
+      services: null,
+    },
     chapters: { ...emptyChapters },
     metrics: [],
     voice: null,
-    image: null,
+    image: "/works/maqam.jpg",
     mark: "mq",
     approved: false,
   },
@@ -784,10 +818,15 @@ export const caseStudies: CaseStudy[] = [
     slug: "bir-damla-hayir",
     client: "Bir Damla Hayır",
     context: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya" },
+    card: {
+      project: "Bir Damla Hayır",
+      category: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya" },
+      services: null,
+    },
     chapters: { ...emptyChapters },
     metrics: [],
     voice: null,
-    image: null,
+    image: "/works/bir-damla-hayir.jpg",
     mark: "bd",
     approved: false,
   },
