@@ -16,7 +16,7 @@
 | **Echte Produkt-Oberflächen** | 4 (meAI, fibero, CASSAMEA, meahv) | **0** | `PRODUCT_SCREENS = {}` · Quelle `public/works/products/` enthält nur `README.md` | 🔴 leer |
 | Produkt-Kartenbild | 4 | **3** | `productWorks[].image` — meAI, fibero, CASSAMEA gesetzt; **meahv `null`** | 🟡 teils |
 | Kundenlogos | ≥ 2 (NV SWISS, maqam) | **2** — `nv-swiss.png` · `maqam.png` (Owner 29.08.) | `CLIENT_LOGOS` · `public/brand/clients/` | 🟢 |
-| Bild zur Kundenarbeit | 2 | **2** — `nv-swiss.jpg` · `maqam.jpg` (Hero der echten Oberfläche; Lifestyle als `-scene`) | `clientWorks[].image` | 🟢 |
+| Bild zur Kundenarbeit | 2 | **2** — `nv-swiss.jpg` (echte Site, scharf) · `maqam.jpg` (+ optional `maqam-scene`) | `clientWorks[].image` | 🟢 |
 | **Fallstudien freigegeben** | ≥ 2 | **0 von 2** | `caseStudies`: `nv-swiss` und `maqam`, beide `approved: false` | 🔴 gesperrt |
 | **Bewertungen / Zitate** | ≥ 1 | **0** | `reviews: []` — Sterne-Gate im Build hält `AggregateRating` fern | 🔴 leer |
 | Unternehmensfotos | 4 Slots (`buero`, `ico`, `arbeitsplatz`, `whiteboard`) | **0** | `COMPANY_PHOTOS = {}` · Quelle `public/images/unternehmen/` nur `README.md` | 🔴 leer |
