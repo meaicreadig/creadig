@@ -50,6 +50,8 @@
  * Besucherliste in der Hand.
  */
 
+import { equal, sign } from "@/lib/hmac"
+
 /** Ohne eigenes Geheimnis leiten wir es vom Resend-Schlüssel ab. */
 function secret(): string | null {
   return process.env.LEAD_TOKEN_SECRET || process.env.RESEND_API_KEY || null
@@ -60,41 +62,12 @@ const MIN_AGE_MS = 2_000
 /** Nach zwei Stunden ist das Formular kalt — dann holt der Browser ein neues. */
 const MAX_AGE_MS = 2 * 60 * 60 * 1000
 
-const encoder = new TextEncoder()
-const keyCache = new Map<string, Promise<CryptoKey>>()
-
-function hmacKey(value: string): Promise<CryptoKey> {
-  let cached = keyCache.get(value)
-  if (!cached) {
-    cached = crypto.subtle.importKey(
-      "raw",
-      encoder.encode(value),
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["sign"],
-    )
-    keyCache.set(value, cached)
-  }
-  return cached
-}
-
-function toBase64Url(bytes: ArrayBuffer): string {
-  const binary = String.fromCharCode(...new Uint8Array(bytes))
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
-}
-
-async function sign(message: string, value: string): Promise<string> {
-  const signature = await crypto.subtle.sign("HMAC", await hmacKey(value), encoder.encode(message))
-  return toBase64Url(signature)
-}
-
-/** Vergleich ohne Laufzeit-Unterschied — sonst verrät die Antwortzeit die Signatur. */
-function equal(a: string, b: string): boolean {
-  if (a.length !== b.length) return false
-  let diff = 0
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
-  return diff === 0
-}
+/*
+ * MP-G — die HMAC-Grundlage liegt seit der Admin-Sitzung in `lib/hmac.ts`.
+ * Sie stand hier, solange es einen Nutzer gab; jetzt gibt es zwei, und zwei
+ * Krypto-Implementierungen desselben Verfahrens laufen auseinander.
+ * Verhalten unverändert — es war ein Umzug, keine Neufassung.
+ */
 
 /**
  * Ein Token für ein frisch gerendertes Formular. `null`, wenn kein Geheimnis

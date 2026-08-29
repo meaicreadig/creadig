@@ -73,6 +73,11 @@
 | `docs/ops/case-format.md` | Working Note | MP-C.3 Owner-Fill: Projekt · Kategorie · Leistungen |
 | `docs/ops/proof-kinds.md` | **Canon** | Eigenes Produkt / Kundenprojekt / Kundenergebnis — Freigabe-Matrix |
 | `docs/ops/demo-data-standard.md` | **Canon** | Echte UI, synthetische Daten, Label-Regel, Prüfliste vor jeder Aufnahme |
+| `docs/ops/case-format.md` | Spec | Case-Kurzformat + Freigabe-Vorlage zum Ausfüllen |
+| `docs/roadmap/creadig-1-0-scale.md` | Spec | **MP-F Blueprint** — Portal-IA, Trust Center, Pulse, Tiers, meAI, Hiring, Revenue-Rahmen, 1.0-Definition |
+| `docs/control-center/current-state.md` | Working Note | **MP-G G.0** — Bestandsaufnahme: es gibt keinen Admin, keine Persistence, keine Auth. Modul-Bereitschaft, Konflikte, V1-Empfehlung |
+| `docs/control-center/architecture.md` | Spec | **MP-G G.1** — Routen, Zugang (signierte Sitzung), Rollen, geteilte Bausteine |
+| `docs/control-center/acceptance.md` | Acceptance | **MP-G G.1** — 11/11 PASS: Zugang, Regression, Oberfläche |
 | `docs/ops/utm-playbook.md` | Spec | Attribution-Modell + Tracking-Ready-Checkliste; Client blockiert bis Datenschutzsatz |
 | `app/api/lead/route.ts` | **Canon (Code)** | Source of Truth Versand |
 | `lib/use-lead.ts` | **Canon (Code)** | Client-Submit |

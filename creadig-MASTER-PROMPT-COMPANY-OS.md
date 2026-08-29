@@ -44,12 +44,12 @@ MP-A BRAND ──► MP-B COMPANY OS ──► MP-D SALES
 | **MP-C** | PROOF | Inventar ✅ · **MATERIAL-BLOCKED** | `docs/ops/proof-inventory.md` | Weiter nur als C.1→C.3 — nichts erfinden |
 | **MP-C.1** | PRODUCT TRUTH | ✅ | Demo-Data-Standard · Proof-Arten · maturity schlägt Ableitung (alle null) · Orphans unberührt | Kein Fake-Screen |
 | **MP-C.2** | FIBERO VISUAL | ✅ Pipeline · **MATERIAL-BLOCKED** | Caption/Canon angebunden · Drop-in getestet · keine Fake-PNGs | Wartet auf Owner-Screens (echte UI + synthetische Daten) |
-| **MP-C.3** | CLIENT PROOF | 🟡 Gerüst ✅ · Freigaben offen | CaseCard · imageProof · 3 Clients · `docs/ops/case-format.md` | `approved:true` nur Owner |
+| **MP-C.3** | CLIENT PROOF | 🔴 MATERIAL-BLOCKED · Gerüst ✅ | 3 Clients mit Logo + `customer-photo`; alle `approved:false`, `approvalOnFile:false`. Freigabe-Vorlage steht in `docs/ops/case-format.md` | `approved:true` nur Owner — nie geraten |
 | **MP-D** | SALES ENGINE | ✅ | Betriebscheck + Sales-Specs | — |
 | **MP-D.5** | CONVERSION ACCEPTANCE | ✅ 12/12 | WhatsApp-i18n-Fix | Live-Mail-SELFTEST Owner-Gate |
 | **MP-E** | MARKETING | ✅ | Handwerk-LP · UTM Spec · Build Notes | Keine weitere Branche |
 | **MP-E.5** | MARKETING ACCEPTANCE | ✅ 10/10 | LP↔Leistung Rückweg · Events · hreflang | — |
-| **MP-F** | SCALE BLUEPRINT | nach C-Fortschritt | Spec only · Portal-Gate | Kein Build ohne Owner |
+| **MP-F** | SCALE BLUEPRINT | ✅ Blueprint geschrieben · 0 Build-Kandidaten | `docs/roadmap/creadig-1-0-scale.md` — Portal-IA, Trust Center, Pulse/Health, Tiers, meAI, Hiring, Revenue-Rahmen, 1.0-Definition (2/10 grün) | Kein Build ohne Owner · Portal-Gate zu |
 
 **Parallel erlaubt (klein):** Site-Polish aus `EFSANE` während A/B — kein neues Produkt-Feature außerhalb der Stufe.
 
@@ -372,6 +372,138 @@ BERICHT: Blueprint · freigegebene Builds · zurückgestellt.
 | `MP-F` | Blueprint — sonra |
 | `merdiven` | Özet |
 
-**Kalan efsane basamak (çekirdek):** **2** — C.3 → F (+ C.2 drop-in when PNGs).  
+**Kalan efsane basamak (çekirdek):** **2** — C.3 Freigabe → F Blueprint (+ C.2 drop-in when PNGs).  
 **C.2 durumu:** kod READY, materyal yok — uydurma yok.  
-**Owner-kapılar:** fibero PNGs · maturity · Case-Freigabe · Live-Mail · Datenschutz.
+**Owner-kapılar:** Case-Freigabe+Satz · fibero UI-PNGs · maturity · Live-Mail · Datenschutz.
+
+---
+
+# MP-C.3 → MP-F · KAPANIŞ + SCALE (tek Chat)
+## Copy-Paste-Prompt — kalan çekirdek merdiven
+
+```
+Du bist CTO/UX/Architekt für creaDIG (Einzelunternehmer-Owner).
+Omurga: KIZILELMA §12 · Leiter: creadig-MASTER-PROMPT-COMPANY-OS.md.
+Knowledge Map: docs/README.md.
+
+ZIEL DIESES CHATS: Die letzten zwei Kernstufen — MP-C.3 schließen (soweit
+Owner-Material reicht) und MP-F als Blueprint liefern. Kein Fake-Proof.
+Black Lock. Unknown ≠ invented. Kein Impressum-/AVV-Nagging.
+Kein Portal-Build ohne Owner-OK. Commit nur auf Befehl. Bericht Türkisch
+(Backend/Frontend getrennt). UI-Copy DE (TR-Parität wo Dictionary).
+
+════════════════════════════════════════
+IST (29.08.2026 — nicht zurückbauen)
+════════════════════════════════════════
+✅ MP-A … MP-E.5 (außer Proof-Material & Owner-Gates)
+✅ C.1 Demo-Data-Standard / Proof-Arten / maturity-Felder (alle null)
+✅ C.2 Pipeline READY — PRODUCT_SCREENS leer; Caption/Demodaten-Label angebunden
+✅ C.3 Gerüst: CaseCard · imageProof · case-format.md · inventar
+✅ Kunden: NV SWISS · maqam · Bir Damla Hayır — Logo + Kundenbild
+✅ Produkte Kartenfotos: meAI · fibero · CASSAMEA = product-photo JPG
+   (alte Mockup-PNGs entfernt). meahv Bild fehlt.
+⬜ caseStudies[].approved = false (alle)
+⬜ approvalOnFile / approvedSentence fehlen
+⬜ maqam + Bir Damla Hayır: card.services / built oft null
+⬜ rumis-maison.png = ORPHAN — NICHT verdrahten
+⬜ C.2 fibero Interface-PNGs unter public/works/products/fibero/ fehlen
+⬜ Live-Mail SELFTEST · UTM-Client-Datenschutzsatz = Owner-Gates (nicht naggen)
+
+Canon Proof-Bild:
+  Echte Anwendung + synthetische Daten + null Kunden-PII.
+  Staging / local demo / Demo-Tenant egal — nie Produktivdaten.
+  Caption Pflicht: „Echte Oberfläche, Demodaten." (DE) / TR-Äquivalent.
+  Kein „aus dem laufenden System"/Produktionsversprechen.
+
+════════════════════════════════════════
+TEIL A — MP-C.3 CLIENT PROOF (zuerst)
+════════════════════════════════════════
+Lies zuerst:
+  docs/ops/case-format.md
+  docs/ops/proof-inventory.md
+  docs/ops/proof-kinds.md
+  lib/site-data.ts (clientWorks, caseStudies)
+
+A0) Status-Snapshot in 5 Zeilen (was fehlt für approved:true).
+
+A1) Case-Format strikt:
+  Kurz: Projekt · Kategorie · Leistungen (KEINE Tech-Stack-Liste).
+  Optional tief: start→problem→goal→role→system→delivery→result→today.
+  metrics[] NUR mit source. KPI erfinden = VERBOTEN.
+  AI-erfundene Kunden-UI = VERBOTEN.
+
+A2) Freigabe-Regel (HARTE TÜR):
+  approved:true NUR wenn Owner in DIESEM Chat (oder klar zitiert) liefert:
+    (1) schriftliche Freigabe der Nennung UND
+    (2) Freigabesatz (Aufgabe/Ergebnis)
+  Dann setzen:
+    clientWorks[].approvalOnFile = true
+    clientWorks[].approvedSentence = { de, tr }
+    caseStudies[].approved = true
+    card.services / built nur mit Owner-Text (sonst null lassen)
+  Ohne (1)+(2): Gerüst verbessern, aber approved bleibt false.
+  Kein „fast freigegeben".
+
+A3) NV SWISS · maqam · Bir Damla Hayır parallel führen.
+  Bilder: imageProof customer-photo — nie als Mockup etikettieren.
+  Produktfotos meAI/fibero/CASSAMEA: product-photo — Demodaten-Note.
+
+A4) Orphan rumis-maison: nicht verdrahten, nicht löschen ohne Owner-Befehl.
+
+A5) proof-inventory.md + docs/ops/case-format.md aktualisieren.
+  /status-Lücken ehrlich lassen.
+
+A6) Parallel-Hinweis (kein Blocker): Wenn Owner fibero-PNGs liefert →
+  Drop-in public/works/products/fibero/ + npm run build — kein neuer Code.
+  maturity nur setzen wenn Owner den Wert nennt.
+
+════════════════════════════════════════
+TEIL B — MP-F SCALE BLUEPRINT (nach A, auch wenn A material-blocked)
+════════════════════════════════════════
+Voraussetzung: PLAN FIRST. Customer Portal Build Gate gilt:
+
+  my.creadig NICHT bauen solange:
+  - kein echter operativer Bedarf („Ticket/Rechnung/Status wo?“), UND
+  - kein explizites Owner-OK.
+  Default = Spec. Build = Ausnahme.
+
+B1) Erzeuge/aktualisiere docs/roadmap/creadig-1-0-scale.md mit:
+
+  1) Customer Portal my.creadig — IA only (Sitemap, Rollen, Leerzustände)
+  2) Trust Center + Status Page Spez
+  3) creaDIG Pulse + System Health Score (Definition, keine Fake-Zahlen)
+  4) Managed Tiers detailliert (was enthalten / nicht — Preise nur wenn Owner)
+  5) meAI Intelligence-Layer (Use Cases nur wo Datenpfad realistisch)
+  6) Hiring-Reihenfolge (Ops → Dev → Design → Sales → Support)
+  7) Revenue-Mix-Rahmen (Owner setzt Targets — Platzhalter ok, keine erfundenen €)
+  8) 12-Monats-Definition creaDIG 1.0 (KIZILELMA §12)
+
+B2) Knowledge Map (docs/README.md): MP-F Status + Link zum Blueprint.
+B3) COMPANY-OS Leiter-Tabelle: C.3/F Statuszeilen ehrlich setzen.
+B4) Owner nennt 1–2 Builds → NUR die spezifizieren als „Build-Kandidat".
+   Alles andere bleibt Spec. Kein Portal-UI-Code ohne OK.
+
+════════════════════════════════════════
+REIHENFOLGE IM CHAT
+════════════════════════════════════════
+1) Teil A Snapshot + was Owner noch senden muss (Freigabe+Satz / Leistungen)
+2) Wenn Owner-Material kommt → verdrahten; sonst A material-blocked belassen
+3) Teil B Blueprint vollständig schreiben
+4) Kurzbericht Türkisch:
+   - C.3: was live / was gesperrt
+   - F: Blueprint-Pfad · Build-Kandidaten · zurückgestellt
+   - Backend vs Frontend
+5) tsc (+ a11y wenn UI). Commit/Push NUR auf Befehl.
+
+════════════════════════════════════════
+NICHT TUN
+════════════════════════════════════════
+- approved:true raten
+- KPI / Reviews / AggregateRating erfinden
+- rumis verdrahten
+- Produktivdaten-Screens
+- Portal/my.creadig implementieren
+- Impressum/USt/AVV anfragen
+- screenshots 2/ oder .tmp-review/ committen ohne Owner-Klarheit
+```
+
