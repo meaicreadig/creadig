@@ -11,7 +11,7 @@
 |-------|--------|
 | MP-A Brand | ✅ |
 | MP-B Company OS / Lead | ✅ |
-| MP-C Proof | Inventar ✅ · C.1 ✅ · **nächste: C.2 fibero** (Owner-Screens) · C.3 Freigaben · MATERIAL-BLOCKED Client |
+| MP-C Proof | Inventar ✅ · C.1 ✅ · C.2 Pipeline ✅ (**Screens fehlen**) · C.3 Client teilweise (Logo+Bild NV/maqam) · Case-Texte noch freigabe |
 | MP-D Sales / Betriebscheck | ✅ |
 | MP-D.5 Conversion Acceptance | ✅ |
 | Live-Mail SELFTEST | ⬜ Owner-Gate |

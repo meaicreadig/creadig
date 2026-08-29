@@ -43,7 +43,7 @@ MP-A BRAND ──► MP-B COMPANY OS ──► MP-D SALES
 | **MP-B** | COMPANY OS Kern | ✅ | Lead-Ref + UTM-fähig + cta_click/booking_step | — |
 | **MP-C** | PROOF | Inventar ✅ · **MATERIAL-BLOCKED** | `docs/ops/proof-inventory.md` | Weiter nur als C.1→C.3 — nichts erfinden |
 | **MP-C.1** | PRODUCT TRUTH | ✅ | Demo-Data-Standard · Proof-Arten · maturity schlägt Ableitung (alle null) · Orphans unberührt | Kein Fake-Screen |
-| **MP-C.2** | FIBERO VISUAL | **nächste** (Owner-Screens) | 3–5 echte UI + Demodaten · Eigenes Produkt · optional Device-Foto um echte Pixel | **Kein** AI-generiertes Dashboard |
+| **MP-C.2** | FIBERO VISUAL | ✅ Pipeline · **MATERIAL-BLOCKED** | Caption/Canon angebunden · Drop-in getestet · keine Fake-PNGs | Wartet auf Owner-Screens (echte UI + synthetische Daten) |
 | **MP-C.3** | CLIENT PROOF | nach Freigaben | NV SWISS / maqam / Logos / ggf. Handwerk-Kunde | Nur mit Owner-OK |
 | **MP-D** | SALES ENGINE | ✅ | Betriebscheck + Sales-Specs | — |
 | **MP-D.5** | CONVERSION ACCEPTANCE | ✅ 12/12 | WhatsApp-i18n-Fix | Live-Mail-SELFTEST Owner-Gate |
@@ -366,11 +366,11 @@ BERICHT: Blueprint · freigegebene Builds · zurückgestellt.
 |-----------|-------------|
 | `MP-A`…`MP-E.5` | ✅ (E.5: LP↔Leistung) |
 | `MP-C.1` | Product Truth (✅) |
-| `MP-C.2` | fibero Visual (**şimdi** — echte Screens + Demodaten) |
-| `MP-C.3` | Client Proof (Freigaben) |
-| `MP-F` | Blueprint — Proof sonrası |
+| `MP-C.2` | Pipeline ✅ — Screens **Owner** (MATERIAL-BLOCKED) |
+| `MP-C.3` | Client Proof / Case-Freigabe (**şimdi** paralel) |
+| `MP-F` | Blueprint — sonra |
 | `merdiven` | Özet |
 
-**Kalan efsane basamak (çekirdek):** **3** — C.2 → C.3 → F (Spec).  
-**Altın kural:** Display = gerçek UI; sahne fotoğrafik olabilir; AI-dashboard ≠ Proof.  
-**Owner-kapılar:** fibero Demo-Screens · maturity · Freigaben · Live-Mail · Datenschutz.
+**Kalan efsane basamak (çekirdek):** **2** — C.3 → F (+ C.2 drop-in when PNGs).  
+**C.2 durumu:** kod READY, materyal yok — uydurma yok.  
+**Owner-kapılar:** fibero PNGs · maturity · Case-Freigabe · Live-Mail · Datenschutz.

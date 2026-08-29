@@ -6,6 +6,11 @@
 > Präsentation.
 > **Ein Satz:** Die **Oberfläche** ist echt, die **Daten** darin sind es nie.
 
+**Umgebung:** „Demodaten“ ≠ zwingend eine eigene Demo-App-Architektur.
+Erlaubt ist jede sichere Kopie/Staging/lokale Instanz derselben echten
+Anwendung — solange **ausschließlich synthetische Daten** darin stehen.
+Verboten bleibt: Produktiv-Kundendaten, auch verpixelt.
+
 ---
 
 ## Die Regel

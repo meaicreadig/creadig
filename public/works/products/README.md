@@ -1,8 +1,12 @@
 # Echte Produkt-Aufnahmen (gated)
 
-Hier liegen **ausschließlich Aufnahmen der echten Anwendung aus einer
-DEMO-INSTANZ** — keine Mockups, keine Renderings, keine KI-erzeugten
-Dashboards, und **nichts aus dem Produktivsystem**.
+Hier liegen **ausschließlich Aufnahmen der echten Anwendung mit
+ausschließlich synthetischen Daten** — keine Mockups, keine Renderings,
+keine KI-erzeugten Dashboards, und **nichts aus dem Produktivsystem mit
+Kundendaten**.
+
+Die Umgebung darf Demo-Instanz, Staging oder lokale Kopie sein — entscheidend
+sind **echte UI + Demodaten**, nicht der Host-Name der Instanz.
 
 ```
 public/works/products/<slug>/<beliebiger-name>.png
