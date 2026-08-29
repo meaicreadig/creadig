@@ -46,8 +46,8 @@ export const ownProducts: ProductLogo[] = [
     color: "#f0743c",
     region: "CH",
   },
-  // TODO: Echtes meahv-Logo ergänzen → public/brand/products/meahv.svg
-  { name: "meahv", logoPath: null, mark: "hv", color: "#8f6a33", region: "DE" },
+  // Owner 29.08.2026: Teal MEA-Mark unter public/brand/products/meahv.png
+  { name: "meahv", logoPath: "/brand/products/meahv.png", mark: "hv", color: "#09696e", region: "DE" },
 ]
 
 /**
