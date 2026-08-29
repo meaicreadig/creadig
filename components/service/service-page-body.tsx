@@ -6,7 +6,7 @@ import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { clientWorks, packages, productWorks } from "@/lib/site-data"
-import { WHATSAPP_LINK } from "@/lib/dictionary"
+import { whatsappLink } from "@/lib/dictionary"
 import type { ServicePage } from "@/lib/service-pages"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { QuickCheck } from "@/components/service/quick-check"
@@ -505,7 +505,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                 </span>
               </Link>
               <a
-                href={WHATSAPP_LINK}
+                href={whatsappLink(locale)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="cta-quiet inline-flex items-center gap-2.5 px-7 py-3.5 text-sm tracking-wide"

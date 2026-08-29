@@ -23,7 +23,7 @@ import {
 import { Logo } from "@/components/brand/logo"
 import { mainNavLinks } from "@/lib/site-data"
 import { localePath, splitLocale } from "@/lib/routes"
-import { WHATSAPP_LINK } from "@/lib/dictionary"
+import { whatsappLink } from "@/lib/dictionary"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { cn } from "@/lib/utils"
 
@@ -191,10 +191,10 @@ export function SiteNav() {
             className="text-gold-text hover:bg-transparent hover:text-foreground"
           >
             <a
-              href={WHATSAPP_LINK}
+              href={whatsappLink(locale)}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="WhatsApp — creaDIG schreiben"
+              aria-label={`WhatsApp — ${t.contact.whatsappAction}`}
             >
               <WhatsAppIcon className="size-5" />
             </a>
@@ -301,7 +301,7 @@ export function SiteNav() {
                   </Link>
                 </SheetClose>
                 <a
-                  href={WHATSAPP_LINK}
+                  href={whatsappLink(locale)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 border border-line-strong px-6 py-4 text-sm tracking-wide text-foreground"

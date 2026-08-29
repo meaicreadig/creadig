@@ -3,14 +3,19 @@
 import { useEffect, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
-import { WHATSAPP_LINK, WHATSAPP_NUMBER } from "@/lib/dictionary"
+import { useLocale } from "@/components/locale-provider"
+import { whatsappLink, WHATSAPP_NUMBER } from "@/lib/dictionary"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 
 const buttonClassName =
   "group fixed bottom-5 left-5 z-40 flex items-center overflow-hidden rounded-full bg-[#25D366] p-4 text-white elevation-3 transition-all duration-[var(--dur-2)] hover:pr-5 md:bottom-8 md:left-8"
 
 export function StickyWhatsApp() {
+  const { t, locale } = useLocale()
   const reduceMotion = usePrefersReducedMotion()
+  const href = whatsappLink(locale)
+  /* Auch die Vorlesehilfe war deutsch — auf jeder tuerkischen Seite. */
+  const label = `${t.contact.whatsappAction} — ${WHATSAPP_NUMBER}`
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -27,10 +32,10 @@ export function StickyWhatsApp() {
   if (reduceMotion) {
     return (
       <a
-        href={WHATSAPP_LINK}
+        href={href}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`Per WhatsApp schreiben — ${WHATSAPP_NUMBER}`}
+        aria-label={label}
         className={buttonClassName}
       >
         <WhatsAppIcon className="size-6 shrink-0" />
@@ -44,10 +49,10 @@ export function StickyWhatsApp() {
   return (
     <AnimatePresence>
       <motion.a
-        href={WHATSAPP_LINK}
+        href={href}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`Per WhatsApp schreiben — ${WHATSAPP_NUMBER}`}
+        aria-label={label}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 16 }}

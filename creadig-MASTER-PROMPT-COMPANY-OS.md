@@ -43,8 +43,8 @@ MP-A BRAND ──► MP-B COMPANY OS ──► MP-D SALES
 | **MP-B** | COMPANY OS Kern | ✅ | Lead-Ref + UTM-fähig + cta_click/booking_step | — |
 | **MP-C** | PROOF | **OPEN / MATERIAL-BLOCKED** | Screens/Cases/Empty-States | Darf OPEN bleiben; **kein unverifizierter Proof live**. MP-D execution permitted. |
 | **MP-D** | SALES ENGINE | ✅ | Betriebscheck + Sales-Specs | Nach MP-B; wartete nicht auf volles MP-C |
-| **MP-D.5** | CONVERSION ACCEPTANCE | **nächste Stufe** | Manuelle Kette prüfen — Code nur bei echtem Defekt | Kein Feature. Kein MP-E. |
-| **MP-E** | MARKETING | nach D.5 | Branchen-LP + UTM-Client (nach Datenschutz) | Erst nach Acceptance |
+| **MP-D.5** | CONVERSION ACCEPTANCE | ✅ 12/12 PASS | `docs/ops/conversion-acceptance.md` · WhatsApp-i18n-Fix | Live-Mail-SELFTEST noch Owner-Gate |
+| **MP-E** | MARKETING | **nächste** (kontrolliert) | Handwerk-LP + UTM/Attribution Spec → Client nur nach Datenschutz | Kein Ads-Spend. Kein Portal. MP-C bleibt OPEN. |
 | **MP-F** | SCALE | Plan first | Blueprint; Builds nur mit Owner-Freigabe | **Portal-Gate** |
 
 **Parallel erlaubt (klein):** Site-Polish aus `EFSANE` während A/B — kein neues Produkt-Feature außerhalb der Stufe.
@@ -150,65 +150,57 @@ Artefakte: `/betriebscheck` DE+TR · `lib/betriebscheck.ts` · `docs/sales/*` ·
 ---
 
 # MP-D.5 · CONVERSION ACCEPTANCE (Gate — kein Feature)
-## Copy-Paste-Prompt (kompletter Chat)
+## Status: ✅ 12/12 PASS · 29.08.2026
 
-```
-Du bist QA/CTO für creaDIG. Stufe MP-D.5 — Conversion Acceptance.
-KEIN neues Feature. KEIN MP-E. KEIN Portal. KEIN Fake-Proof.
-Black Lock. Code NUR wenn du einen echten Defekt beweist.
-
-Lies creadig-MASTER-PROMPT-COMPANY-OS.md (Status: MP-C OPEN/MATERIAL-BLOCKED).
-
-AUFGABE: Die Kette manuell prüfen und dokumentieren:
-docs/ops/conversion-acceptance.md — Checkliste mit PASS/FAIL + Beleg.
-
-Pflichtpfade:
-1. Desktop DE → /betriebscheck → 15 Fragen → Ergebnis → Form → Lead
-2. Mobile DE → dieselbe Kette
-3. Desktop TR → dieselbe Kette
-4. Mobile TR → dieselbe Kette
-5. Hero/Closing Project→/termin → booking steps → lead
-6. WhatsApp / Contact-Direktwege → richtige Ziele
-7. Error states (leere Pflichtfelder, privacy, token)
-8. Double-submit
-9. Refresh/Back während Check — was passiert mit Antworten?
-10. 100/100 → „kein Engpass“-Satz (nicht Identity→Digital)
-11. 0/100 bzw. viele Nein → Engpass + „X Punkte selbst offen“
-12. Mail: Referenz CD-…, source, locale korrekt (wenn Env erlaubt; sonst Spec-Hinweis)
-
-Browser-Tools nutzen. Am Ende: nur FAIL-Fixes committen (Owner-Befehl).
-Kein UTM-Client. Keine Managed-Tiers. Keine TR-Umschreibung außer klarer Bug.
-
-BERICHT: PASS/FAIL-Tabelle · Fixes · was Owner noch prüfen muss (TR-Ton).
-```
+Befund 1 (Ilke 06): WhatsApp-Vortext/ARIA folgten nicht der Locale → `whatsappLink(locale)`.  
+Offen (Owner): Live-Mail mit gültigem Resend + `SELFTEST_SECRET`; sessionStorage-Persistenz nur nach Datenschutz; `tel:` nur wenn Nummer veröffentlicht.
 
 ---
 
-# MP-E · MARKETING ENGINE
-## Copy-Paste-Prompt
+# MP-E · MARKETING ENGINE (kontrolliert — kein Ads-Sturm)
+## Copy-Paste-Prompt (kompletter Chat)
 
 ```
-Du bist CTO/Growth für creaDIG. Stufe MP-E — NUR nach MP-D.5 PASS
-ODER Owner explizit „Marketing trotz Lücke“ sagt.
-UTM-Client erst nach Owner-Datenschutz-Satz.
-Attribution-Spec (first/last touch) in docs — Code nur mit Consent-Klarheit.
+Du bist CTO/Growth-Architekt für creaDIG. Stufe MP-E — kontrolliert.
+Voraussetzung: MP-D.5 PASS (docs/ops/conversion-acceptance.md).
+MP-C bleibt OPEN / MATERIAL-BLOCKED — kein Fake-Proof, keine erfundenen Screens/Zahlen.
+Black Lock. Kein Portal. Keine Managed-Tiers. Kein Ads-Budget-Setup.
+Unknown ≠ invented default.
 
-1) Branchen-LP Handwerk — KEIN klassisches SEO-Landing („Vorteile der Digitalisierung“).
+ZIEL: Die bestehende Conversion-Kette (Site → Betriebscheck → Lead) messbar und
+vertikal ansprechbar machen — nicht „15 Landing Pages“.
+
+═══ REIHENFOLGE ═══
+
+0) Owner-Gates prüfen (kurz in Bericht, nicht naggen):
+   - Live-Mail-SELFTEST erledigt? (docs/ops/conversion-acceptance.md)
+   - Datenschutz-Satz für UTM/Client-Persistenz vorhanden? Wenn NEIN: UTM-Client
+     NICHT bauen — nur Spec + Server-Fähigkeit bleibt.
+
+1) docs/ops/utm-playbook.md
+   first touch + last touch + landing page + referrer + lead source
+   (siehe analytics-events Attribution-Abschnitt). Keine PII.
+
+2) /branchen/handwerk (+ TR-Äquivalent falls Locale-Pfad klar)
+   KEIN SEO-Spam („Vorteile der Digitalisierung“).
    creaDIG-Sprache:
    „Ihr Betrieb läuft. Aber wie viel davon noch per Hand?“
-   Workflow-Bruch zeigen: ANFRAGE → ANGEBOT → TERMIN → AUFTRAG → DOKUMENTATION → RECHNUNG
+   Workflow-Bruch: ANFRAGE → ANGEBOT → TERMIN → AUFTRAG → DOKUMENTATION → RECHNUNG
    (Ist: Telefon/WhatsApp/Word/Papier — Soll: ein Betrieb).
-   CTA → Betriebscheck / Kontakt. Keine Fake-Stats.
+   CTA primär → /betriebscheck · sekundär → /kontakt oder /termin.
+   Keine Fake-Stats. Text nur Owner-Ton / Canon — sonst [VORSCHLAG].
 
-2) Insights = Build Notes (docs + 1 Beispiel-Struktur) — kein SEO-Spam.
+3) Insights = Build Notes Spec (1 Beispiel-Struktur) — kein Blog-Spam.
 
-3) Marketing-CTAs → generic events + properties (MP-B Regel D).
+4) Tracking: bestehende Events nutzen (cta_click, audit_*, lead_submitted).
+   UTM-Client NUR wenn Owner Datenschutz freigibt.
+   Optional: MagneticButton trackLocation auf Branchen-LP.
 
-4) docs/ops/utm-playbook.md
+5) Tracking-Ready-Checkliste in utm-playbook — Ads erst danach.
 
-5) Tracking-Ready-Checkliste — kein Ads-Budget erzwingen.
+tsc + eslint + build + a11y. Commit nur auf Owner-Befehl.
 
-BERICHT: Landing live? · Tracking ready? · Owner-Lieferliste Ads.
+BERICHT Türkisch: Frontend vs Backend · was Spec · was Owner liefern muss.
 ```
 
 ---
@@ -269,8 +261,8 @@ BERICHT: Blueprint · freigegebene Builds · zurückgestellt.
 | `MP-B` / `Company OS` | Lead-OS (✅) |
 | `MP-C` / `Kanıt` | Proof — **OPEN / MATERIAL-BLOCKED** |
 | `MP-D` / `Satış motoru` | Betriebscheck (✅) |
-| `MP-D.5` / `Acceptance` | Conversion-Kette prüfen — kein Feature |
-| `MP-E` / `Marketing` | Branchen + UTM-Client (nach Datenschutz) |
+| `MP-D.5` / `Acceptance` | Conversion (✅ 12/12) |
+| `MP-E` / `Marketing` | Handwerk-LP + UTM Spec (kontrolliert) |
 | `MP-F` / `Ölçek planı` | Blueprint; Portal gate |
 | `merdiven` / `leiter` | Özet + sıradaki açık basamak |
 

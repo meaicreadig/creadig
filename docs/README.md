@@ -13,8 +13,9 @@
 | MP-B Company OS / Lead | ✅ |
 | MP-C Proof | **OPEN / MATERIAL-BLOCKED** — kein unverifizierter Proof; MP-D war erlaubt |
 | MP-D Sales / Betriebscheck | ✅ |
-| MP-D.5 Conversion Acceptance | **nächste** |
-| MP-E Marketing | ⬜ nach D.5 |
+| MP-D.5 Conversion Acceptance | ✅ 12/12 PASS (WhatsApp-i18n-Fix) |
+| Live-Mail SELFTEST | ⬜ Owner-Gate vor Production-Vertrauen |
+| MP-E Marketing | **nächste** — kontrolliert, kein Ads-Sturm |
 | MP-F Scale | ⬜ |
 
 ---
@@ -65,6 +66,7 @@
 | `docs/ops/crm-schema.md` | Spec | Lead + 3 State Machines |
 | `docs/ops/analytics-events.md` | Spec | Events + Properties |
 | `docs/ops/sop-lead-handling.md` | Spec | Interne Antwort-SLA |
+| `docs/ops/conversion-acceptance.md` | Working Note | MP-D.5 Prüfprotokoll: 12/12 PASS, Befunde, was Env-blockiert ist |
 | `docs/ops/utm-playbook.md` | Spec | (MP-E) |
 | `app/api/lead/route.ts` | **Canon (Code)** | Source of Truth Versand |
 | `lib/use-lead.ts` | **Canon (Code)** | Client-Submit |

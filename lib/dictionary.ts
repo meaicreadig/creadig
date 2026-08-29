@@ -4,9 +4,26 @@
 export type Locale = "de" | "tr"
 
 export const WHATSAPP_NUMBER = "+41 76 504 58 79"
-export const WHATSAPP_LINK =
-  "https://wa.me/41765045879?text=" +
-  encodeURIComponent("Guten Tag creaDIG, ich interessiere mich für ein Projekt.")
+
+/**
+ * MP-D.5 · Befund — hier stand eine Konstante mit DEUTSCHEM Vortext.
+ *
+ * `WHATSAPP_LINK` war ein Modulwert, kein Aufruf: Der vorausgefuellte Satz
+ * „Guten Tag creaDIG, ich interessiere mich fuer ein Projekt." ging an drei
+ * Stellen ins Markup — schwebender Knopf, Kopfleiste, Leistungsseite — und
+ * damit auf JEDER Seite, auch auf `/tr/...`. Ein tuerkischer Besucher hat
+ * WhatsApp geoeffnet und einen deutschen Satz im Eingabefeld gefunden.
+ *
+ * Der Termin-Assistent hat das nie falsch gemacht: Er baut seine Nachricht aus
+ * `t.termin.*`. Nur diese Konstante konnte es nicht, weil sie ausserhalb
+ * jeder Sprache steht. Deshalb ist sie jetzt eine Funktion.
+ */
+export function whatsappLink(locale: Locale): string {
+  return (
+    "https://wa.me/41765045879?text=" +
+    encodeURIComponent(dictionary[locale].contact.whatsappIntro)
+  )
+}
 
 export const dictionary = {
   de: {
@@ -1626,6 +1643,10 @@ export const dictionary = {
       submitWhatsapp: "Lieber per WhatsApp",
       whatsappTitle: "WhatsApp",
       whatsappNote: "Schnellste Antwort, DE & TR.",
+      /* Der Satz, der beim Oeffnen im Eingabefeld steht. */
+      whatsappIntro: "Guten Tag creaDIG, ich interessiere mich für ein Projekt.",
+      /* Die Vorlesehilfe des schwebenden Knopfes und der Kopfleiste. */
+      whatsappAction: "Per WhatsApp schreiben",
       appointmentTitle: "Kostenlose Erstberatung",
       appointmentNote: "20 Minuten, per Video. Kostenlos und unverbindlich.",
       appointmentValue:
@@ -3136,6 +3157,8 @@ export const dictionary = {
       submitWhatsapp: "WhatsApp ile göndereyim",
       whatsappTitle: "WhatsApp",
       whatsappNote: "En hızlı yanıt, DE & TR.",
+      whatsappIntro: "Merhaba creaDIG, bir proje hakkında bilgi almak istiyorum.",
+      whatsappAction: "WhatsApp'tan yazın",
       appointmentTitle: "Ücretsiz ilk görüşme",
       appointmentNote: "20 dakika, görüntülü. Ücretsiz ve bağlayıcı değil.",
       appointmentValue:
