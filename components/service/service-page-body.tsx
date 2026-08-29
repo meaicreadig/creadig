@@ -7,6 +7,7 @@ import { Reveal } from "@/components/ui/reveal"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { clientWorks, packages, productWorks } from "@/lib/site-data"
 import { whatsappLink } from "@/lib/dictionary"
+import { BRANCH_ENTRY_FOR_SERVICE } from "@/lib/branchen"
 import type { ServicePage } from "@/lib/service-pages"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { QuickCheck } from "@/components/service/quick-check"
@@ -26,6 +27,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
   const { t, locale } = useLocale()
   const layer = t.services.layers[page.layer]
   const copy = t.servicePage
+  const branchEntry = BRANCH_ENTRY_FOR_SERVICE[page.slug]
   const allWorks = [...productWorks, ...clientWorks]
   const works = page.workSlugs
     .map((slug) => allWorks.find((w) => w.slug === slug))
@@ -64,6 +66,25 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
           <p className="type-lead text-muted-foreground mt-8 max-w-2xl text-pretty">
             {page.lead[locale]}
           </p>
+
+          {/*
+            MP-E.5 — der Rueckweg zum Branchen-Einstieg. Er steht hier oben und
+            nicht unten bei den Knoepfen: Wer noch nicht weiss, ob er diese
+            Leistung braucht, soll das lesen, bevor er die Leistung liest.
+            Ohne Eintrag in der Tabelle rendert nichts.
+          */}
+          {branchEntry && (
+            <p className="type-small text-muted-foreground mt-8 flex flex-wrap items-center gap-x-3 gap-y-1">
+              {branchEntry.lead[locale]}
+              <Link
+                href={branchEntry.path}
+                className="text-gold-text hover:text-foreground inline-flex items-center gap-2 underline underline-offset-4 transition-colors duration-[var(--dur-2)]"
+              >
+                {branchEntry.cta[locale]}
+                <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
+              </Link>
+            </p>
+          )}
         </Reveal>
 
         <div className="mt-20 grid gap-x-12 gap-y-16 lg:grid-cols-12">

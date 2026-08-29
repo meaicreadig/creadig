@@ -11,13 +11,13 @@
 |-------|--------|
 | MP-A Brand | ✅ |
 | MP-B Company OS / Lead | ✅ |
-| MP-C Proof | **OPEN / MATERIAL-BLOCKED** — kein unverifizierter Proof; MP-D war erlaubt |
+| MP-C Proof | Inventar ✅ · **MATERIAL-BLOCKED** · nächste: **C.1 Product Truth** |
 | MP-D Sales / Betriebscheck | ✅ |
-| MP-D.5 Conversion Acceptance | ✅ 12/12 PASS (WhatsApp-i18n-Fix) |
-| Live-Mail SELFTEST | ⬜ Owner-Gate vor Production-Vertrauen |
-| MP-E Marketing | ✅ Handwerk-LP · UTM Spec · Build Notes (kein Client, kein Ads) |
-| MP-E.5 Marketing Acceptance | **nächste** |
-| MP-F Scale | ⬜ Spec later |
+| MP-D.5 Conversion Acceptance | ✅ |
+| Live-Mail SELFTEST | ⬜ Owner-Gate |
+| MP-E Marketing | ✅ |
+| MP-E.5 Marketing Acceptance | ✅ 10/10 |
+| MP-F Scale | ⬜ nach Proof-Fortschritt |
 
 ---
 
@@ -68,6 +68,8 @@
 | `docs/ops/analytics-events.md` | Spec | Events + Properties |
 | `docs/ops/sop-lead-handling.md` | Spec | Interne Antwort-SLA |
 | `docs/ops/conversion-acceptance.md` | Working Note | MP-D.5 Prüfprotokoll: 12/12 PASS, Befunde, was Env-blockiert ist |
+| `docs/ops/marketing-acceptance.md` | Working Note | MP-E.5 Prüfprotokoll: 10/10 PASS + Conversion-Definition |
+| `docs/ops/proof-inventory.md` | Working Note | MP-C Lückentabelle — was fehlt, wo es hingehört |
 | `docs/ops/utm-playbook.md` | Spec | Attribution-Modell + Tracking-Ready-Checkliste; Client blockiert bis Datenschutzsatz |
 | `app/api/lead/route.ts` | **Canon (Code)** | Source of Truth Versand |
 | `lib/use-lead.ts` | **Canon (Code)** | Client-Submit |

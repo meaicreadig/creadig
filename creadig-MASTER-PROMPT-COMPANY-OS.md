@@ -41,12 +41,15 @@ MP-A BRAND ──► MP-B COMPANY OS ──► MP-D SALES
 |------|--------|-------|----------------|----------------|
 | **MP-A** | LOCK THE BRAND | ✅ | Canon + Design-System + Principles | — |
 | **MP-B** | COMPANY OS Kern | ✅ | Lead-Ref + UTM-fähig + cta_click/booking_step | — |
-| **MP-C** | PROOF | **OPEN / MATERIAL-BLOCKED** | Inventar + Empty States nach E.5 — **kein** erfundener Proof | Größte Lücke: Handwerk-Case + Product Screens |
-| **MP-D** | SALES ENGINE | ✅ | Betriebscheck + Sales-Specs | Nach MP-B; wartete nicht auf volles MP-C |
-| **MP-D.5** | CONVERSION ACCEPTANCE | ✅ 12/12 PASS | `docs/ops/conversion-acceptance.md` · WhatsApp-i18n-Fix | Live-Mail-SELFTEST noch Owner-Gate |
-| **MP-E** | MARKETING | ✅ | `/branchen/handwerk` DE+TR · UTM-Playbook · Build-Notes · **kein** UTM-Client · **kein** Ads | Keine 2.–n. Branchen-LP |
-| **MP-E.5** | MARKETING ACCEPTANCE | **nächste** | Handwerk→Check + Events + Locale + hreflang — Code nur bei Defekt | Kein Feature |
-| **MP-F** | SCALE | danach Spec | Blueprint only; Portal-Gate | Kein Build ohne Owner |
+| **MP-C** | PROOF | Inventar ✅ · **MATERIAL-BLOCKED** | `docs/ops/proof-inventory.md` | Weiter nur als C.1→C.3 — nichts erfinden |
+| **MP-C.1** | PRODUCT TRUTH | **nächste** | Owner: maturity 4× setzen · Proof-Arten trennen · Demo-Data-Standard · orphan assets markieren | Kein Screenshot-Fake |
+| **MP-C.2** | FIBERO VISUAL | nach C.1 | 3–5 echte UI + Demodaten · Kategorie „Eigenes Produkt“ | Kein Kunden-KPI erfinden |
+| **MP-C.3** | CLIENT PROOF | nach Freigaben | NV SWISS / maqam / Logos / ggf. Handwerk-Kunde | Nur mit Owner-OK |
+| **MP-D** | SALES ENGINE | ✅ | Betriebscheck + Sales-Specs | — |
+| **MP-D.5** | CONVERSION ACCEPTANCE | ✅ 12/12 | WhatsApp-i18n-Fix | Live-Mail-SELFTEST Owner-Gate |
+| **MP-E** | MARKETING | ✅ | Handwerk-LP · UTM Spec · Build Notes | Keine weitere Branche |
+| **MP-E.5** | MARKETING ACCEPTANCE | ✅ 10/10 | LP↔Leistung Rückweg · Events · hreflang | — |
+| **MP-F** | SCALE BLUEPRINT | nach C-Fortschritt | Spec only · Portal-Gate | Kein Build ohne Owner |
 
 **Parallel erlaubt (klein):** Site-Polish aus `EFSANE` während A/B — kein neues Produkt-Feature außerhalb der Stufe.
 
@@ -120,25 +123,69 @@ BERICHT: Current-State · was live im Code · was nur Spec · nächster Hebel MP
 
 ---
 
-# MP-C · PROOF
+# MP-C · PROOF (Mikro-Stufen)
+## Status: Inventar ✅ · MATERIAL-BLOCKED für Client-Proof
+
+Inventar: `docs/ops/proof-inventory.md`. Orphans: DO NOT PUBLISH.
+
+### Proof-Arten (Canon)
+Eigenes Produkt · Kundenprojekt · Kundenergebnis — nicht vermischen.
+
+---
+
+# MP-C.1 · PRODUCT TRUTH
 ## Copy-Paste-Prompt
 
 ```
-Du bist CTO/UX für creaDIG. Stufe MP-C — PROOF DENSITY.
-Black Lock: KEINE erfundenen Screenshots, Logos, Zahlen, Testimonials.
-Wenn Asset fehlt: ehrlicher Empty State („folgt“) — nie Fake-Dashboard.
-Unknown ≠ invented default. ProductMaturity bleibt null bis Owner bestätigt.
+Du bist CTO für creaDIG. Stufe MP-C.1 — Product Truth.
+Black Lock. Kein Fake-Screenshot. Kein Client-Case freischalten.
+Kein Portal. Keine neue Branche. Unknown ≠ invented.
 
-PARALLEL: Diese Stufe darf OPEN bleiben, während MP-D startet —
-solange kein unverifizierter Proof veröffentlicht wird.
+ZIEL: Wahrheitsschicht vor Visual Proof — Spec + nur Owner-bestätigte Werte.
 
-1) Inventar: PRODUCT_SCREENS, CLIENT_LOGOS, Cases, Quotes — Lückentabelle.
-2) Code: Empty States + drop-in Pfade/Docs.
-3) Case-Template: Ausgangslage → Problem → System → Architektur → Ergebnis → Betrieb → Zahlen
-4) Product Maturity nur mit Owner-Werten setzen.
-5) Image Bible verlinken; keine Stock-Bilder ohne Owner.
+1) docs/ops/demo-data-standard.md
+   - echte UI erlaubt
+   - Daten nur synthetisch / erkennbar Demo („Musterbetrieb Nord GmbH“)
+   - optional sichtbares „Demodaten“-Label-Regel
+   - echte Kundendaten in Screens = Verbot
 
-BERICHT: Owner-Blocker · technisch bereit · Backend vs Frontend.
+2) docs/ops/proof-kinds.md (kurz)
+   Eigenes Produkt | Kundenprojekt | Kundenergebnis — Freigabe-Matrix
+
+3) Product maturity: NUR setzen wenn Owner in diesem Chat explizit
+   live|pilot|private-beta|in-development je Produkt nennt.
+   Sonst null lassen + Tabelle „wartet auf Owner“ in Bericht.
+
+4) Orphan assets: bir-damla-hayir.png, rumis-maison.png
+   - nicht verdrahten
+   - wenn Owner „archivieren“ sagt: aus public/works entfernen/verschieben
+   - sonst nur DO NOT PUBLISH belassen (Inventar)
+
+5) Optional Code: maturity Badge rendern NUR wenn Wert gesetzt
+   (kein „offen“-Badge der wie Status wirkt, außer Canon fordert es)
+
+tsc + a11y wenn Code. Commit auf Befehl.
+Bericht Türkisch: was Owner noch liefern muss für C.2 (fibero Screens).
+```
+
+---
+
+# MP-C.2 · FIBERO VISUAL PROOF (nach C.1 + Owner-Screens)
+## Kurzbefehl
+
+```
+MP-C.2 — nur echte fibero-UI mit Demodaten (3–5). Kategorie Eigenes Produkt.
+Kein Kunden-KPI. Drop-in public/works/products/fibero/. Mockup-Note entfernen wo echte Screens.
+```
+
+---
+
+# MP-C.3 · CLIENT PROOF (nur mit Freigaben)
+## Kurzbefehl
+
+```
+MP-C.3 — Logos/Cases/Quotes nur mit Owner-Freigabe. approved:true nie raten.
+Handwerk-Kundenfall oder warten. Orphans nicht verdrahten.
 ```
 
 ---
@@ -291,12 +338,13 @@ BERICHT: Blueprint · freigegebene Builds · zurückgestellt.
 
 | Owner der | Agent yapar |
 |-----------|-------------|
-| `MP-A` … `MP-B` | ✅ |
-| `MP-D` / `MP-D.5` | Betriebscheck + Conversion ✅ |
-| `MP-E` | Handwerk ✅ |
-| `MP-E.5` | LP→Check Acceptance (**şimdi**) |
-| `MP-C` | Proof inventar — OPEN / material-blocked |
-| `MP-F` | Blueprint only — sonra |
+| `MP-A`…`MP-E.5` | ✅ (E.5: LP↔Leistung) |
+| `MP-C.1` | Product Truth (**şimdi**) |
+| `MP-C.2` | fibero Visual (Screens + Demodaten) |
+| `MP-C.3` | Client Proof (Freigaben) |
+| `MP-F` | Blueprint only — Proof sonrası |
 | `merdiven` | Özet |
 
-**Sıra:** A→B→D→D.5→E → **E.5** → C (materyal) → F Spec. **Yayılma yok** (8 Branche yok).
+**Kalan efsane basamak (çekirdek):** C.1 → C.2 → C.3 → F (Spec).  
+**Owner-kapılar (kod değil):** Live-Mail SELFTEST · Datenschutz/UTM · maturity değerleri · Screens · Freigaben.  
+**Yasak şimdi:** 8 Branche · Portal · Ads · fake proof.

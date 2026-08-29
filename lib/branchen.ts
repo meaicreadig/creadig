@@ -186,4 +186,38 @@ export const handwerkCopy = {
   buildWebsite: { de: "Website fürs Handwerk", tr: "Zanaat için web sitesi" },
   buildLayers: { de: "Die fünf Ebenen", tr: "Beş katman" },
   buildWorks: { de: "Was wir gebaut haben", tr: "Neler kurduk" },
+  /* MP-E.5 · Der Rückweg von der Leistungsseite auf den Einstieg. */
+  backlinkLead: {
+    de: "Noch nicht sicher, wo es im Betrieb klemmt?",
+    tr: "İşletmede tam olarak nerede takıldığından emin değil misiniz?",
+  },
+  backlinkCta: {
+    de: "Der Einstieg für Handwerksbetriebe",
+    tr: "Zanaat işletmeleri için giriş",
+  },
 } as const
+
+/**
+ * MP-E.5 · WELCHE LEISTUNGSSEITE AUF WELCHEN EINSTIEG ZURUECKVERWEIST.
+ *
+ * Die Abnahme hat gezeigt: Der Weg lief nur in eine Richtung. Der Einstieg
+ * verlinkte die Leistungsseite, die Leistungsseite kannte den Einstieg nicht.
+ * Fuer einen Besucher heisst das: Wer ueber die Suche direkt auf "Website fuer
+ * Handwerksbetriebe" landet und noch gar nicht weiss, ob er eine Website
+ * braucht, hat keinen Weg zur Diagnose. Fuer eine Suchmaschine heisst es:
+ * zwei Seiten zum selben Wort ohne erkennbare Beziehung.
+ *
+ * Die Zuordnung steht HIER und nicht als Feld an ServicePage: Sie ist Wissen
+ * der Branche ueber die Leistung, nicht umgekehrt. Kommt eine zweite Branche,
+ * waechst diese Tabelle — der Leistungs-Datensatz bleibt unangetastet.
+ */
+export const BRANCH_ENTRY_FOR_SERVICE: Record<
+  string,
+  { path: string; lead: Localized; cta: Localized }
+> = {
+  "website-handwerk": {
+    path: "/branchen/handwerk",
+    lead: handwerkCopy.backlinkLead,
+    cta: handwerkCopy.backlinkCta,
+  },
+}
