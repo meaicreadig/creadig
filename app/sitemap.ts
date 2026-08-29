@@ -92,6 +92,14 @@ const entries: Entry[] = [
   /* MP-D — das erste Werkzeug der Seite, nicht nur eine Darstellung. */
   { path: "/betriebscheck", changeFrequency: "monthly", priority: 0.8 },
 
+  /*
+   * MP-E — der erste vertikale Einstieg. GENAU EINER: Die Stadt-und-Gewerk-
+   * Streuung liegt in `lib/seo-landings.ts` und ist leer, weil keine Stadt
+   * bestaetigt ist. Eine Sitemap mit Adressen, die es nicht gibt, ist
+   * schlimmer als eine kurze Sitemap.
+   */
+  { path: "/branchen/handwerk", changeFrequency: "monthly", priority: 0.7 },
+
   { path: "/kontakt", changeFrequency: "monthly", priority: 0.9 },
   { path: "/termin", changeFrequency: "monthly", priority: 0.8 },
 

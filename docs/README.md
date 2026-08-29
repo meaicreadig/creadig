@@ -15,8 +15,9 @@
 | MP-D Sales / Betriebscheck | ✅ |
 | MP-D.5 Conversion Acceptance | ✅ 12/12 PASS (WhatsApp-i18n-Fix) |
 | Live-Mail SELFTEST | ⬜ Owner-Gate vor Production-Vertrauen |
-| MP-E Marketing | **nächste** — kontrolliert, kein Ads-Sturm |
-| MP-F Scale | ⬜ |
+| MP-E Marketing | ✅ Handwerk-LP · UTM Spec · Build Notes (kein Client, kein Ads) |
+| MP-E.5 Marketing Acceptance | **nächste** |
+| MP-F Scale | ⬜ Spec later |
 
 ---
 
@@ -67,7 +68,7 @@
 | `docs/ops/analytics-events.md` | Spec | Events + Properties |
 | `docs/ops/sop-lead-handling.md` | Spec | Interne Antwort-SLA |
 | `docs/ops/conversion-acceptance.md` | Working Note | MP-D.5 Prüfprotokoll: 12/12 PASS, Befunde, was Env-blockiert ist |
-| `docs/ops/utm-playbook.md` | Spec | (MP-E) |
+| `docs/ops/utm-playbook.md` | Spec | Attribution-Modell + Tracking-Ready-Checkliste; Client blockiert bis Datenschutzsatz |
 | `app/api/lead/route.ts` | **Canon (Code)** | Source of Truth Versand |
 | `lib/use-lead.ts` | **Canon (Code)** | Client-Submit |
 
@@ -85,8 +86,9 @@
 
 | Datei | Authority | Rolle |
 |-------|-----------|--------|
-| Branchen-LPs unter `app/` | Canon wenn live | Handwerk zuerst (MP-E) |
-| Insights / Build Notes | Spec | kein SEO-Spam |
+| `lib/branchen.ts` · `components/pages/handwerk-page-body.tsx` | **Canon (Code)** | `/branchen/handwerk` (DE+TR) — genau EIN vertikaler Einstieg |
+| `docs/marketing/build-notes.md` | Spec | Insights-Format: Bau-Notizen, kein Blog |
+| `lib/seo-landings.ts` | Spec | Stadt/Keyword-Landings — LEER, kein Ort bestätigt |
 
 ## 06 — ENGINEERING
 

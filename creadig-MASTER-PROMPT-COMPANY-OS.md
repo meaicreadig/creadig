@@ -41,11 +41,12 @@ MP-A BRAND ──► MP-B COMPANY OS ──► MP-D SALES
 |------|--------|-------|----------------|----------------|
 | **MP-A** | LOCK THE BRAND | ✅ | Canon + Design-System + Principles | — |
 | **MP-B** | COMPANY OS Kern | ✅ | Lead-Ref + UTM-fähig + cta_click/booking_step | — |
-| **MP-C** | PROOF | **OPEN / MATERIAL-BLOCKED** | Screens/Cases/Empty-States | Darf OPEN bleiben; **kein unverifizierter Proof live**. MP-D execution permitted. |
+| **MP-C** | PROOF | **OPEN / MATERIAL-BLOCKED** | Inventar + Empty States nach E.5 — **kein** erfundener Proof | Größte Lücke: Handwerk-Case + Product Screens |
 | **MP-D** | SALES ENGINE | ✅ | Betriebscheck + Sales-Specs | Nach MP-B; wartete nicht auf volles MP-C |
 | **MP-D.5** | CONVERSION ACCEPTANCE | ✅ 12/12 PASS | `docs/ops/conversion-acceptance.md` · WhatsApp-i18n-Fix | Live-Mail-SELFTEST noch Owner-Gate |
-| **MP-E** | MARKETING | **nächste** (kontrolliert) | Handwerk-LP + UTM/Attribution Spec → Client nur nach Datenschutz | Kein Ads-Spend. Kein Portal. MP-C bleibt OPEN. |
-| **MP-F** | SCALE | Plan first | Blueprint; Builds nur mit Owner-Freigabe | **Portal-Gate** |
+| **MP-E** | MARKETING | ✅ | `/branchen/handwerk` DE+TR · UTM-Playbook · Build-Notes · **kein** UTM-Client · **kein** Ads | Keine 2.–n. Branchen-LP |
+| **MP-E.5** | MARKETING ACCEPTANCE | **nächste** | Handwerk→Check + Events + Locale + hreflang — Code nur bei Defekt | Kein Feature |
+| **MP-F** | SCALE | danach Spec | Blueprint only; Portal-Gate | Kein Build ohne Owner |
 
 **Parallel erlaubt (klein):** Site-Polish aus `EFSANE` während A/B — kein neues Produkt-Feature außerhalb der Stufe.
 
@@ -205,6 +206,39 @@ BERICHT Türkisch: Frontend vs Backend · was Spec · was Owner liefern muss.
 
 ---
 
+# MP-E.5 · MARKETING ACCEPTANCE (Gate — kein Feature)
+## Copy-Paste-Prompt
+
+```
+Du bist QA/CTO für creaDIG. Stufe MP-E.5 — Marketing Acceptance.
+KEIN Feature. KEINE zweite Branche. KEIN Ads. KEIN Fake-Proof. KEIN UTM-Client.
+Code NUR bei bewiesenem Defekt. Black Lock.
+
+Dokumentiere docs/ops/marketing-acceptance.md (PASS/FAIL):
+
+1. Desktop+Mobile DE: /branchen/handwerk → CTA → /betriebscheck → (optional) Ergebnis
+2. Desktop+Mobile TR: /tr/branchen/handwerk → /tr/betriebscheck
+3. CTA targets: primary Check, secondary Termin — Locale korrekt
+4. Events: cta_click mit location handwerk-hero / handwerk-bridge (Consent an)
+5. Sitemap enthält beide URLs; hreflang/canonical wenn im Projekt üblich
+6. Dark/Light + a11y Spot-Check der LP
+7. Keine Fake-Zahlen/Referenzen auf der LP
+8. Link zu /leistungen/website-handwerk und zurück — keine Dublette der Absicht
+
+Conversion-Definition in docs (nur spezifizieren, nicht erfinden):
+- Primary: lead_submitted source=betriebscheck
+- Diagnostic: audit_completed
+- Later: Qualified / Proposal / Won (Sales pipeline — nicht messen bis CRM Store)
+
+Danach OPTIONAL im selben Chat nur wenn Owner „MP-C Inventar“ sagt:
+docs/ops/proof-inventory.md — Lückentabelle PRODUCT_SCREENS / Logos / Cases / Quotes.
+Empty-State-Slots vorbereiten. NICHTS erfinden. Handwerk-Case = größte Lücke.
+
+BERICHT Türkisch. Commit auf Befehl.
+```
+
+---
+
 # MP-F · SCALE BLUEPRINT (+ selektiver Build)
 ## Copy-Paste-Prompt
 
@@ -259,11 +293,10 @@ BERICHT: Blueprint · freigegebene Builds · zurückgestellt.
 |-----------|-------------|
 | `MP-A` / `Markayı kilitle` | Brand Lock (✅) |
 | `MP-B` / `Company OS` | Lead-OS (✅) |
-| `MP-C` / `Kanıt` | Proof — **OPEN / MATERIAL-BLOCKED** |
-| `MP-D` / `Satış motoru` | Betriebscheck (✅) |
-| `MP-D.5` / `Acceptance` | Conversion (✅ 12/12) |
-| `MP-E` / `Marketing` | Handwerk-LP + UTM Spec (kontrolliert) |
-| `MP-F` / `Ölçek planı` | Blueprint; Portal gate |
+| `MP-E` / `Marketing` | Handwerk (✅) |
+| `MP-E.5` / `Acceptance` | LP→Check doğrulama |
+| `MP-C` / `Kanıt` | Proof inventar — **OPEN** |
+| `MP-F` / `Ölçek planı` | Blueprint only |
 | `merdiven` / `leiter` | Özet + sıradaki açık basamak |
 
 **Sıra:** A → B → (C OPEN ∥ D) → **D.5** → E → F. C asset beklerken D durdu; E D.5’ten sonra.

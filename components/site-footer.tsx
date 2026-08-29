@@ -6,6 +6,7 @@ import { Logo } from "@/components/brand/logo"
 import { contact, navLinks, productWorks, serviceLayerKeys, socialProfiles } from "@/lib/site-data"
 import { openConsentSettings } from "@/lib/consent"
 import { checkCopy } from "@/lib/betriebscheck"
+import { handwerkCopy } from "@/lib/branchen"
 
 /**
  * Sichtbarkeit des `/status`-Links (MP10-2.10). Ausfuehrliche Begruendung
@@ -56,6 +57,17 @@ export function SiteFooter() {
               */}
               {/* MP10-4 — der Betrieb hat seit dieser Runde eine eigene
                   Adresse; im Footer ist sie erreichbar, in der Leiste nicht. */}
+              {/* MP-E — der Branchen-Einstieg. Er ist ein Ziel fuer
+                  Kampagnen und Suche; ohne einen internen Link waere er eine
+                  Waise, und eine Waise findet auch Google schlechter. */}
+              <li>
+                <Link
+                  href="/branchen/handwerk"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
+                >
+                  {handwerkCopy.eyebrow[locale]}
+                </Link>
+              </li>
               {/* MP-D — der Betriebscheck. Erreichbar, aber nicht in der
                   Leiste: Er ist ein Werkzeug, kein Kapitel der Seite. */}
               <li>
