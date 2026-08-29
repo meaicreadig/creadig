@@ -53,6 +53,39 @@ erscheint jeweils genau einmal.
 
 ---
 
+## Nachtrag G.1.1 — Gruppierung
+
+Die erste Fassung zeigte **43 gleichrangige Zeilen**. Das beantwortet die
+Frage nicht, für die die Ansicht gebaut ist („Was braucht heute
+Aufmerksamkeit?") — es beantwortet nur „es ist viel".
+
+Die Ordnung war schon da: `collect()` erhebt in zehn kommentargetrennten
+Abschnitten. Sie wurde zu Daten gemacht (`ITEM_GROUPS`, `Item.group`) —
+**erfunden ist daran nichts**, Reihenfolge und Zuschnitte sind dieselben.
+
+| Prüfpunkt | Ergebnis |
+|---|---|
+| Gruppen erscheinen | ✅ 10 · Belege 2 · Systeme 3 · Produkt-Aufnahmen 4 · Produkt-Tiefe 4 · Referenzen 6 · Leistungs-Tiefe 7 · Fälle 3 · Rechtliches 3 · Betrieb 5 · Entscheidungen 6 |
+| **Kein Punkt geht verloren** | ✅ Summe der Gruppen = **43** = Zähler in der Kopfzeile |
+| Leere Gruppe erscheint nicht | ✅ (keine Überschrift über nichts) |
+| a11y nach der Änderung | ✅ Desktop hell + Mobil dunkel, je 0 Verletzungen |
+
+### Zwei Anweisungstexte korrigiert
+
+An zwei Stellen stand noch **„Screenshots aus dem laufenden System"** — genau
+die Anweisung, die der Canon seit MP-C.1 verbietet (auf einem Produktivbild
+stehen Kundennamen und Beträge). Beide Stellen sind das, was der Owner liest,
+wenn er nachsieht, was er liefern soll:
+
+| Datei | Jetzt |
+|---|---|
+| `lib/material-status.ts` | „echte Oberfläche mit Demodaten — Demo-Instanz, Staging oder lokale Kopie, nie Produktivdaten" |
+| `lib/product-media.ts` | dieselbe Formulierung im Owner-Abschnitt |
+
+Damit sagen Website, Control Center, README und Canon dasselbe.
+
+---
+
 ## Gates
 
 ```

@@ -1,5 +1,5 @@
 import { AdminShell } from "@/components/admin/admin-shell"
-import { collect } from "@/lib/material-status"
+import { ITEM_GROUPS, collect } from "@/lib/material-status"
 
 /**
  * MP-G · G.1 — die erste und heute einzige Seite des Control Centers.
@@ -68,19 +68,48 @@ export default function ControlCenterHome() {
             Nichts offen. Jedes Material, das die Website zeigen könnte, ist da.
           </p>
         ) : (
-          <ul className="mt-5 flex flex-col gap-2.5">
-            {open.map((item) => (
-              <li key={item.label} className="tile bg-background p-5">
-                <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-                  <h3 className="text-subhead text-base">{item.label}</h3>
-                  <span className="text-meta text-muted-foreground shrink-0">offen</span>
-                </div>
-                <p className="type-small text-muted-foreground mt-2 text-pretty">{item.detail}</p>
-                {/* Wer liefern muss — der Grund, warum diese Liste nützt. */}
-                <p className="type-small text-gold-text mt-3 text-pretty">{item.owner}</p>
-              </li>
-            ))}
-          </ul>
+          /*
+            Gruppiert statt am Stück. Siebenundvierzig gleichrangige Zeilen
+            sagen nur „es ist viel"; zehn benannte Blöcke mit Zahl sagen, WO
+            es viel ist — und das ist die Frage, für die diese Ansicht da ist.
+
+            Die Reihenfolge ist die der Erhebung und damit die des Hauses:
+            Belege zuerst, Entscheidungen zuletzt. Leere Gruppen erscheinen
+            nicht: Eine Überschrift über nichts ist eine Zeile, die man jedes
+            Mal überliest.
+          */
+          <div className="mt-5 flex flex-col gap-10">
+            {ITEM_GROUPS.map((group) => {
+              const inGroup = open.filter((item) => item.group === group.key)
+              if (inGroup.length === 0) return null
+
+              return (
+                <section key={group.key} aria-labelledby={`gruppe-${group.key}`}>
+                  <div className="border-line flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b pb-2">
+                    <h3 id={`gruppe-${group.key}`} className="text-subhead text-base">
+                      {group.label}
+                    </h3>
+                    <span className="text-meta text-muted-foreground shrink-0">
+                      {inGroup.length} offen
+                    </span>
+                  </div>
+
+                  <ul className="mt-3 flex flex-col gap-2.5">
+                    {inGroup.map((item) => (
+                      <li key={item.label} className="tile bg-background p-5">
+                        <h4 className="text-subhead text-sm">{item.label}</h4>
+                        <p className="type-small text-muted-foreground mt-2 text-pretty">
+                          {item.detail}
+                        </p>
+                        {/* Wer liefern muss — der Grund, warum diese Liste nützt. */}
+                        <p className="type-small text-gold-text mt-3 text-pretty">{item.owner}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )
+            })}
+          </div>
         )}
       </section>
 

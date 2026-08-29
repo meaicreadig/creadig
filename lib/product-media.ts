@@ -17,7 +17,9 @@ import { PRODUCT_SCREENS } from "./product-media.generated"
  *
  * ---------------------------------------------------------------------------
  * WIE DER OWNER SIE FÜLLT
- * Screenshots aus dem laufenden System nach
+ * Aufnahmen der ECHTEN Anwendung mit DEMODATEN (Demo-Instanz, Staging oder
+ * lokale Kopie — nie Produktivdaten, siehe `docs/ops/demo-data-standard.md`)
+ * nach
  *   public/works/products/meai/…       (meai, fibero, cassamea, meahv)
  * legen — Dateiname beliebig, alphabetisch sortiert ist die Reihenfolge.
  * Kein Code-Eingriff nötig; der nächste `npm run build` nimmt sie auf.

@@ -45,19 +45,59 @@ import { publishedSeoLandings, seoLandings } from "@/lib/seo-landings"
 import { publishedServicePages } from "@/lib/service-pages"
 import { connectedSystems } from "@/lib/systems"
 
+/**
+ * MP-G · Die Gruppen sind nicht neu — sie standen schon als Kommentare in
+ * `collect()`. Bis hierher waren sie nur fuer den lesbar, der den Quelltext
+ * offen hat; die Ansicht bekam siebenundvierzig gleichrangige Zeilen.
+ *
+ * Eine Liste aus siebenundvierzig gleich lauten Punkten beantwortet die
+ * Frage nicht, fuer die diese Ansicht gebaut ist: Was braucht heute
+ * Aufmerksamkeit? Sie beantwortet nur: Es ist viel.
+ *
+ * Deshalb wird die vorhandene Ordnung zu Daten. Erfunden ist daran nichts —
+ * die Reihenfolge und die Zuschnitte sind dieselben wie vorher.
+ */
+export const ITEM_GROUPS = [
+  { key: "belege", label: "Belege" },
+  { key: "systeme", label: "Angebundene Systeme" },
+  { key: "produkt-aufnahmen", label: "Produkt-Aufnahmen" },
+  { key: "produkt-tiefe", label: "Produkt-Tiefe" },
+  { key: "referenzen", label: "Referenzen" },
+  { key: "leistungs-tiefe", label: "Leistungs-Tiefe" },
+  { key: "faelle", label: "Fallbeschreibungen" },
+  { key: "recht", label: "Rechtliches" },
+  { key: "betrieb", label: "Betrieb" },
+  { key: "entscheidungen", label: "Entscheidungen" },
+] as const
+
+export type ItemGroup = (typeof ITEM_GROUPS)[number]["key"]
+
 export type Item = {
   label: string
   ok: boolean
   detail: string
   /** Wer es liefern muss. Fast alles hier ist Owner-Sache. */
   owner: string
+  /** Der Abschnitt, in dem der Punkt erhoben wurde. */
+  group: ItemGroup
 }
 
 export function collect(): { open: Item[]; done: Item[] } {
   const items: Item[] = []
 
+  /*
+   * Die Gruppe wird beim Betreten eines Abschnitts gesetzt und von `push`
+   * an jeden Punkt gehaengt. So bleibt die Zuordnung an genau EINER Stelle
+   * je Abschnitt — statt siebenundvierzigmal von Hand, wo sie beim naechsten
+   * eingefuegten Punkt vergessen wuerde.
+   */
+  let group: ItemGroup = "belege"
+  function push(item: Omit<Item, "group">): void {
+    items.push({ ...item, group })
+  }
+
   /* ── Belege ─────────────────────────────────────────────────────────── */
-  items.push({
+  push({
     label: "Bewertungen (E-K2)",
     ok: approvedReviews.length > 0,
     detail:
@@ -67,7 +107,7 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "Owner: zufriedene Altkunden um eine Google-Bewertung bitten",
   })
 
-  items.push({
+  push({
     label: "Echte Zahlen fürs Fundament-Band (§10.2)",
     ok: impactFigures.every((figure) => figure.value !== null),
     detail:
@@ -80,7 +120,7 @@ export function collect(): { open: Item[]; done: Item[] } {
       "belegbar, nicht geschätzt. Bis dahin rendern die Kacheln nicht.",
   })
 
-  items.push({
+  push({
     label: "Fachartikel / Insights (S-1)",
     ok: publishedInsights.length > 0,
     detail:
@@ -91,7 +131,8 @@ export function collect(): { open: Item[]; done: Item[] } {
   })
 
   /* ── Angebundene Systeme (MP10-4) ──────────────────────────────────── */
-  items.push({
+  group = "systeme"
+  push({
     label: "Angebundene Systeme (MP10-4)",
     ok: connectedSystems.length > 0,
     detail:
@@ -103,7 +144,7 @@ export function collect(): { open: Item[]; done: Item[] } {
       "Es ist die einzige Angabe auf /systeme, die ein Kunde im Gespräch nachprüfen kann.",
   })
 
-  items.push({
+  push({
     label: "SEO-Landings (MP10-5)",
     ok: publishedSeoLandings.length > 0,
     detail:
@@ -115,7 +156,7 @@ export function collect(): { open: Item[]; done: Item[] } {
       "je Landing ein eigener Text, kein ausgetauschter Stadtname.",
   })
 
-  items.push({
+  push({
     label: "Insight-Fächer (MP10-4)",
     ok: emptyInsightCategories.length === 0,
     detail:
@@ -127,7 +168,7 @@ export function collect(): { open: Item[]; done: Item[] } {
       "Leere Fächer werden NICHT als „Demnächst“ angezeigt.",
   })
 
-  items.push({
+  push({
     label: "Kundenlogos",
     ok: Object.keys(CLIENT_LOGOS).length > 0,
     detail:
@@ -138,20 +179,29 @@ export function collect(): { open: Item[]; done: Item[] } {
   })
 
   /* ── Produkt-Aufnahmen (C-1) ────────────────────────────────────────── */
+  group = "produkt-aufnahmen"
   for (const product of productWorks) {
     const screens = productScreens(product.slug)
-    items.push({
+    push({
       label: `Aufnahmen ${product.name} (C-1)`,
       ok: screens.length > 0,
       detail:
         screens.length > 0
           ? `${screens.length} Aufnahme(n)`
           : `keine unter public/works/products/${product.slug}/ — die Interface-Sektion rendert nicht.`,
-      owner: "Owner: echte Screenshots aus dem laufenden System",
+      /*
+       * MP-C.2 — hier stand „echte Screenshots aus dem laufenden System".
+       * Das ist genau die Anweisung, die der Canon seit MP-C.1 verbietet: Auf
+       * einem Produktivbild stehen Kundennamen und Betraege. Der Satz stand
+       * ausgerechnet dort, wo der Owner nachliest, was er liefern soll.
+       */
+      owner:
+        "Owner: echte Oberfläche mit Demodaten — Demo-Instanz, Staging oder lokale Kopie, nie Produktivdaten (docs/ops/demo-data-standard.md)",
     })
   }
 
   /* ── Produkt-Tiefe (V2-4b · §10.5) ──────────────────────────────────── */
+  group = "produkt-tiefe"
   for (const product of productWorks) {
     const world = productWorlds[product.slug]
     const fehlend = [
@@ -163,7 +213,7 @@ export function collect(): { open: Item[]; done: Item[] } {
       world?.learnings.length ? null : "Learnings",
       world?.story ? null : "Warum gebaut",
     ].filter(Boolean)
-    items.push({
+    push({
       label: `Produkt-Tiefe ${product.name} (§10.5)`,
       ok: fehlend.length === 0,
       detail:
@@ -176,8 +226,9 @@ export function collect(): { open: Item[]; done: Item[] } {
   }
 
   /* ── Referenzen (C-2) ───────────────────────────────────────────────── */
+  group = "referenzen"
   for (const work of clientWorks) {
-    items.push({
+    push({
       label: `Freigabe ${work.name} (C-2)`,
       ok: work.approvalOnFile === true && Boolean(work.approvedSentence),
       detail:
@@ -188,7 +239,7 @@ export function collect(): { open: Item[]; done: Item[] } {
           : "keine schriftliche Freigabe hinterlegt",
       owner: "Owner: schriftliche Freigabe + ein Satz Aufgabe/Ergebnis",
     })
-    items.push({
+    push({
       label: `Umfang & Jahr ${work.name}`,
       ok: Boolean(work.built) && Boolean(work.year),
       detail: [
@@ -203,13 +254,14 @@ export function collect(): { open: Item[]; done: Item[] } {
   }
 
   /* ── Leistungs-Tiefe: die vier Kauf-Fragen (MP10-1) ─────────────────── */
+  group = "leistungs-tiefe"
   for (const page of publishedServicePages) {
     const fehlend = [
       page.duration ? null : "Projektdauer",
       page.fromTo ? null : "vorher→nachher",
       page.clientEffort ? null : "Kundenaufwand",
     ].filter(Boolean)
-    items.push({
+    push({
       label: `Kauf-Fragen /leistungen/${page.slug} (MP10-1)`,
       ok: fehlend.length === 0,
       detail:
@@ -223,7 +275,7 @@ export function collect(): { open: Item[]; done: Item[] } {
     })
   }
 
-  items.push({
+  push({
     label: "Projektdauer neben den Preisen (MP10-2.3)",
     ok: packages.every((pkg) => pkg.duration !== null),
     detail:
@@ -239,10 +291,11 @@ export function collect(): { open: Item[]; done: Item[] } {
   })
 
   /* ── Fallbeschreibungen (V2-4) ──────────────────────────────────────── */
+  group = "faelle"
   for (const study of caseStudies) {
     const filled = filledChapters(study)
     const fehlend = caseChapterKeys.filter((key) => !study.chapters[key])
-    items.push({
+    push({
       label: `Fall ${study.client} (§10.4)`,
       ok: study.approved && filled.length === caseChapterKeys.length,
       detail: study.approved
@@ -259,7 +312,8 @@ export function collect(): { open: Item[]; done: Item[] } {
   }
 
   /* ── Rechtliches ────────────────────────────────────────────────────── */
-  items.push({
+  group = "recht"
+  push({
     label: "Impressum vollständig",
     ok: imprintComplete,
     detail: [
@@ -274,7 +328,7 @@ export function collect(): { open: Item[]; done: Item[] } {
   })
 
   for (const processor of processors) {
-    items.push({
+    push({
       label: `Auftragsverarbeitung ${processor.company}`,
       ok: processor.dpaConfirmed,
       detail: processor.dpaConfirmed
@@ -285,7 +339,8 @@ export function collect(): { open: Item[]; done: Item[] } {
   }
 
   /* ── Betrieb ────────────────────────────────────────────────────────── */
-  items.push({
+  group = "betrieb"
+  push({
     label: "Zustell-Selbsttest aktiviert (BF-8)",
     ok: Boolean(process.env.SELFTEST_SECRET),
     detail: process.env.SELFTEST_SECRET
@@ -294,7 +349,7 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "Owner: Geheimnis setzen und einen Cron darauf zeigen lassen",
   })
 
-  items.push({
+  push({
     label: "Materialstand in der Fußzeile (MP10-2.10)",
     ok: process.env.NEXT_PUBLIC_STATUS_PUBLIC === "1",
     detail:
@@ -309,7 +364,7 @@ export function collect(): { open: Item[]; done: Item[] } {
       "Ja → NEXT_PUBLIC_STATUS_PUBLIC=1 setzen und die Schlüsselsperre unten aufheben.",
   })
 
-  items.push({
+  push({
     label: "Lead-Weg konfiguriert",
     ok: Boolean(process.env.RESEND_API_KEY && process.env.LEAD_FROM),
     detail:
@@ -319,7 +374,7 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "Owner: Werte in Vercel hinterlegen",
   })
 
-  items.push({
+  push({
     label: "Domain gesetzt",
     ok: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
     detail: process.env.NEXT_PUBLIC_SITE_URL
@@ -330,7 +385,7 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "Owner: Domain in Vercel verbinden und den Wert setzen",
   })
 
-  items.push({
+  push({
     label: "Reaktionszusage bestätigt (BF-8)",
     ok: false,
     detail:
@@ -343,6 +398,7 @@ export function collect(): { open: Item[]; done: Item[] } {
   })
 
   /* ── Entscheidungen (§11, strategische Blind Spots) ──────────── */
+  group = "entscheidungen"
   /*
    * Diese drei sind KEIN fehlendes Material — kein Foto, keine Zahl, keine
    * Freigabe. Sie sind Entscheidungen, und sie stehen trotzdem hier, weil
@@ -354,7 +410,7 @@ export function collect(): { open: Item[]; done: Item[] } {
    * Was der Code ohne sie tut, steht jeweils dabei. Keine davon hält den
    * Livegang auf.
    */
-  items.push({
+  push({
     label: "Entscheidung: 50k-Kunde jetzt? (§11)",
     ok: false,
     detail:
@@ -365,7 +421,7 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "Owner: entscheiden, ob die Seite auf diesen Kunden zielen soll",
   })
 
-  items.push({
+  push({
     label: "Entscheidung: TR-Nische besitzen? (§11)",
     ok: false,
     detail:
@@ -377,7 +433,7 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "Owner: entscheiden — danach folgt Aufbau oder Rückbau, nicht beides",
   })
 
-  items.push({
+  push({
     label: "Preisleiter oben geöffnet (BF-9)",
     ok: true,
     detail:
@@ -386,7 +442,7 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "—",
   })
 
-  items.push({
+  push({
     label: "Echte Fotos aus dem Haus (§10.6)",
     ok: COMPANY_PHOTO_SLOTS.every((slot) => COMPANY_PHOTOS[slot]),
     detail:
@@ -397,7 +453,7 @@ export function collect(): { open: Item[]; done: Item[] } {
       "buero, ico, arbeitsplatz, whiteboard. Kein Stock. Ohne Foto keine Sektion.",
   })
 
-  items.push({
+  push({
     label: "Arbeitsmodell — Wortlaut bestätigt (§10.6)",
     ok: false,
     detail:
@@ -407,7 +463,7 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "Owner: Wortlaut durchlesen und bestätigen oder ändern",
   })
 
-  items.push({
+  push({
     label: "Social-Profile (E-K7)",
     ok: socialProfiles.length > 0,
     detail:
@@ -417,14 +473,14 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "Owner: entscheiden, ob ein Profil gepflegt wird",
   })
 
-  items.push({
+  push({
     label: "Laufende Betreuung veröffentlicht",
     ok: retainerPublished,
     detail: retainerPublished ? "Preis und Umfang stehen" : "Block rendert nicht",
     owner: "—",
   })
 
-  items.push({
+  push({
     label: "Zertifizierungen & Mitgliedschaften (§9.9)",
     ok: false,
     detail:
