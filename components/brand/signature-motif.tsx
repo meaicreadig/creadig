@@ -1,160 +1,108 @@
 /**
- * SIGNATUR 02 — DIE FUENF KNOTEN
+ * SIGNATUR 02 — DIE FUENF EBENEN
+ *
+ * Fuenf Schienen uebereinander, jede laenger als die darunter. Unten
+ * Identity, oben Intelligence. Jede beginnt links mit einem Goldstueck und
+ * laeuft als Haarlinie aus.
  *
  * ---------------------------------------------------------------------------
- * WAS HIER VORHER STAND, UND WARUM ES GEHEN MUSSTE
- * An dieser Stelle lag ein isometrisches Dreiecksraster: sauber gebaut,
- * deterministisch, aus dem alten Corporate-Design abgeleitet — und ohne
- * Aussage. Es war auf vierzehn Flaechen dasselbe Muster, dessen Dichte ein
- * PRNG mit dem Startwert 20180929 bestimmte. Ein Zeichen, das ueberall
- * dasselbe sagt und dieses Etwas aus einer Zufallszahl bezieht, ist kein
- * Zeichen, sondern eine Tapete.
+ * WARUM NICHT MEHR ALS KNOTEN
+ * Der erste Anlauf zeichnete dieselben fuenf Ebenen als Knoten auf einer
+ * steigenden Kette. Die Herleitung stimmte, die Wirkung nicht: Ein frei
+ * schwebendes Punktnetz ist der Hintergrund jedes KI-Startups — also genau
+ * das „Standard", das hier vermieden werden soll. Es sah nach Molekuel aus,
+ * nicht nach creaDIG. Ein Zeichen, dessen Bedeutung nur im Kommentar steht
+ * und nirgends auf der Seite, ist kein Zeichen fuer Besucher.
  *
- * Der Owner hat das Muster am 26.08. global abgeschaltet. Damit war die
- * Seite ruhig — und ehrlich leer. Das war kein Rueckschritt: Erst ohne
- * Tapete sieht man, was fehlt.
+ * Diese Fassung erfindet darum keine Form, sondern benutzt die zwei, die auf
+ * der Seite schon stehen:
  *
- * ---------------------------------------------------------------------------
- * DIE REGEL: EIN BAU, DREI ZUSTAENDE, NULL ERFINDUNG
- * Das Zeichen sind die fuenf Ebenen des Hauses — Identity, Digital,
- * Operations, Automation, Intelligence — als fuenf Knoten auf einer
- * steigenden Kette. Nichts daran ist frei gewaehlt:
+ *   Leistungspyramide (`/leistungen`)   fuenf Ebenen, nach oben breiter
+ *   tragende Fuge (SIG-01)              Schiene mit Goldanfang links
  *
- *   Die Knoten        sind `serviceLayers` aus `site-data`. Fuenf, weil das
- *                     Haus fuenf Ebenen hat — nicht, weil fuenf gut aussieht.
- *   Die Kette         ist das Modell selbst: Jede Ebene steht auf der
- *                     darunter. Darum steigt sie, und darum schliesst sie
- *                     sich nicht zum Kreis.
- *   Die Trabanten     sind die eigenen Produkte, jedes an SEINER Ebene
- *                     (`productWorlds[slug].layer`). Heute haengen drei an
- *                     Operations und eines an Intelligence — die drei
- *                     unteren Knoten stehen leer.
- *   Gefuellt / offen  `live` aus `site-data`: gefuellt heisst laeuft, offen
- *                     heisst im Aufbau. Dieselbe Unterscheidung wie beim
- *                     `StatusDot`, nur ohne Worte.
- *
- * Das Zeichen behauptet damit nichts, was die Seite nicht auch schreibt. Es
- * ist eine Zeichnung des Datenbestands. Kommt ein Produkt dazu oder wechselt
- * eine Ebene, aendert sich das Markenzeichen mit — ohne dass jemand diese
- * Datei anfasst. Und solange an den unteren Knoten nichts haengt, sieht man
- * auch das. Das ist der Punkt, nicht der Schoenheitsfehler.
+ * Damit ist die Aufloesung schon gelesen, bevor jemand das Zeichen deutet:
+ * „Fuenf Ebenen. Ein System." steht als Satz im Hero, die fuenf Namen stehen
+ * als Chips daneben, und auf `/leistungen` liegt dieselbe Treppe in gross.
  *
  * ---------------------------------------------------------------------------
- * WARUM LINIE UND PUNKT UND KEINE FLAECHE
- * Der Befund aus `creadig-DESIGN-IDENTITAET.md` war: Auf dem dunklen Grund
- * verschwand das Motiv, weil es aus Flaechen bestand. Eine Haarlinie und ein
- * Punkt haben dieses Problem nicht — sie holen ihre Helligkeit aus
- * `--line-strong` und `--gold` und tragen in beiden Fassungen.
+ * WAS AUS DEN DATEN KOMMT
+ * Die Zahl der Schienen ist `serviceLayers.length`. Fuenf, weil das Haus
+ * fuenf Ebenen hat — kaeme eine dazu, zeichnete sich das Zeichen mit.
+ *
+ * Die Trabanten (ein Punkt je eigenem Produkt an seiner Ebene) sind bewusst
+ * RAUS. Sie waren der Teil, der die Zeichnung zum Molekuel machte, und die
+ * Aussage „welches Produkt liegt auf welcher Ebene" traegt die Seite besser
+ * in Worten als der Hintergrund in Punkten.
  *
  * ---------------------------------------------------------------------------
  * DREI ZUSTAENDE
- *   quiet   Baender, Kopfzonen, Ersatzflaechen. Der Bau, sonst nichts.
- *   field   Nur der Hero: die Knoten atmen, EIN Signal laeuft die Kette von
- *           01 nach 05. Das ist die eine Bewegung dieser Sektion, und sie
- *           erklaert etwas — die Richtung, in der dieses Haus baut.
- *   active  Leistungsseite Ebene n: derselbe Bau, Knoten n leuchtet.
+ *   quiet   Baender, Kopfzonen, Ersatzflaechen. Die Treppe, sonst nichts.
+ *   field   Nur der Hero: Gold laeuft der Reihe nach durch die Ebenen, von
+ *           unten nach oben, einmal in dreizehn Sekunden. Dieselbe Linie,
+ *           die bei SIG-01 an der Naht entlanglaeuft, und dieselbe Aussage
+ *           wie die Headline: die Reihenfolge, in der hier gebaut wird.
+ *           Eine Bewegung, ein Satz.
+ *   active  Leistungsseite Ebene n: deren Schiene ist ganz aus Gold.
  *
- * Die Bewegung ist reines CSS/SMIL — kein Client-JS, kein Hydrations-Risiko.
- * Wer „Bewegung reduzieren" gesetzt hat, sieht denselben Bau in Ruhe.
+ * Reines CSS/SVG, kein Client-JS. Wer „Bewegung reduzieren" gesetzt hat,
+ * sieht die Treppe in Ruhe — nicht eine leere Flaeche.
  */
 
 import type { CSSProperties } from "react"
-import { productWorks, productWorlds, serviceLayers } from "@/lib/site-data"
+import { serviceLayers } from "@/lib/site-data"
 
 type LayerKey = (typeof serviceLayers)[number]["key"]
 
+type Role = "field" | "band" | "placeholder"
+
 type SignatureMotifProps = {
-  /**
-   * Wo das Zeichen steht — und damit, wie gross und wie laut es ist.
-   * Siehe `ROLE` unten.
-   */
+  /** Wo das Zeichen steht — und damit, wie gross und wie laut es ist. */
   role?: Role
-  /** Wenn gesetzt, leuchtet genau dieser Knoten — die Ebene dieser Seite. */
+  /** Wenn gesetzt, ist die Schiene dieser Ebene ganz aus Gold. */
   active?: LayerKey
   /** Nur fuer Ausnahmen der Platzierung. Die Rolle bringt ihre eigene mit. */
   className?: string
 }
 
-type Role = "field" | "band" | "placeholder"
-
 /*
- * DAS ZEICHEN HAT EINE GROESSE, KEINE FLAECHE.
- *
- * Der erste Anlauf liess das SVG die Flaeche fuellen (`inset-0 h-full
- * w-full`). Das war die Denkweise der alten Tapete und hier falsch: Ein
- * Zeichen aus Punkten und Haarlinien skaliert nicht mit. Die Linien blieben
- * per `non-scaling-stroke` bei 1 px, die Knoten wuchsen mit der Flaeche —
- * im Kennzahlen-Band standen fingerdicke Punkte an haarduennen Faeden, und
- * die Kette lief quer durch die Ueberschrift.
- *
- * Ein Signet hat darum hier dieselbe Eigenschaft wie ein Logo: eine feste
- * Groesse und einen festen Platz. Was sich je Rolle aendert, ist beides —
- * nicht die Zeichnung.
- *
- *   field        Der Hero. Rechts neben der Typografie, gross genug, um
- *                die Flaeche mitzutragen. Der einzige Ort mit Bewegung.
- *   band         Baender und Kopfzonen. Oben rechts, klein, leise: Es
- *                begleitet die Schrift und tritt nie vor sie.
- *   placeholder  Wo ein Bild fehlt. Mittig — es soll auffallen, dass hier
- *                etwas hingehoert, das noch nicht da ist.
+ * Das Zeichen hat eine Groesse, keine Flaeche: Haarlinien skalieren nicht mit
+ * (`non-scaling-stroke`), Abstaende schon. Wer das SVG die Flaeche fuellen
+ * laesst, bekommt je nach Sektion ein anderes Zeichen — und damit keins. Also
+ * traegt die ROLLE Platz und Groesse, wie bei einem Logo.
  */
 const ROLE: Record<Role, string> = {
   field:
-    "motif-feature pointer-events-none absolute top-[42%] right-[4%] w-[40rem] max-w-[72%] -translate-y-1/2",
-  band: "motif-band pointer-events-none absolute top-10 right-6 w-[26rem] max-w-[46%] md:right-10",
+    "motif-feature pointer-events-none absolute top-[46%] right-[5%] w-[36rem] max-w-[66%] -translate-y-1/2",
+  /* top-24 statt top-12: Die feste Kopfleiste ist 4,5 rem hoch — darueber
+     lag das Zeichen halb hinter der Navigation. */
+  band: "motif-band pointer-events-none absolute top-24 right-6 w-[21rem] max-w-[42%] md:right-10",
   placeholder:
-    "motif-placeholder pointer-events-none absolute inset-0 m-auto h-fit w-[24rem] max-w-[76%]",
+    "motif-placeholder pointer-events-none absolute inset-0 m-auto h-fit w-[19rem] max-w-[70%]",
 }
 
-/* 16:9 auf allen vierzehn Flaechen, damit der Bau ueberall derselbe ist —
-   und `meet` statt `slice`, damit er nirgends verzerrt oder angeschnitten
-   wird. Ein Zeichen, das je nach Flaeche anders aussieht, ist keins. */
-const VB_W = 160
-const VB_H = 90
+const VB_W = 140
+const VB_H = 72
 
-/*
- * Der Aufstieg. Die Kette steigt nicht gleichmaessig, sondern erst flach und
- * dann steil (Exponent 1,6): Identity und Digital liegen dicht beieinander,
- * zwischen Automation und Intelligence liegt der groesste Sprung. Das ist
- * keine Kurvenkosmetik, sondern die Aussage der Leistungspyramide, in der
- * Ebene 05 die groesste Wirkung traegt.
- */
-const X_START = 22
-const X_END = 138
-const Y_BASE = 76
-const Y_TOP = 14
-const RISE = 1.6
+/* Unten schmal, oben breit — dieselbe Verjuengung wie in der Pyramide, in der
+   Ebene 05 die groesste Wirkung traegt. */
+const X_START = 6
+const LEN_BASE = 40
+const LEN_STEP = 22
+const Y_BOTTOM = 64
+const Y_STEP = 14
 
-/* Trabantenkranz: unterhalb des Knotens, damit die Kette frei bleibt. */
-const SAT_RADIUS = 8.5
-const SAT_FROM = 28
-const SAT_TO = 118
+/* Der Goldanfang. Bei SIG-01 sind es 2,25 rem an einer Sektionsnaht; hier
+   dasselbe Verhaeltnis, nur in viewBox-Einheiten. */
+const GOLD_HEAD = 14
 
-const NODES = serviceLayers.map((layer, i) => {
-  const t = i / (serviceLayers.length - 1)
-  const x = X_START + (X_END - X_START) * t
-  const y = Y_BASE - (Y_BASE - Y_TOP) * Math.pow(t, RISE)
+const RAILS = serviceLayers.map((layer, i) => ({
+  ...layer,
+  y: Y_BOTTOM - i * Y_STEP,
+  length: LEN_BASE + i * LEN_STEP,
+}))
 
-  const products = productWorks.filter(
-    (product) => productWorlds[product.slug]?.layer === layer.key,
-  )
-
-  const satellites = products.map((product, k) => {
-    const share = products.length === 1 ? 0.5 : k / (products.length - 1)
-    const rad = ((SAT_FROM + (SAT_TO - SAT_FROM) * share) * Math.PI) / 180
-    return {
-      slug: product.slug,
-      live: product.live,
-      x: x + Math.cos(rad) * SAT_RADIUS,
-      y: y + Math.sin(rad) * SAT_RADIUS,
-    }
-  })
-
-  return { ...layer, x, y, satellites }
-})
-
-/* Der Weg des Signals: einmal die ganze Kette hinauf. */
-const CHAIN_PATH = NODES.map((n, i) => `${i === 0 ? "M" : "L"} ${n.x} ${n.y}`).join(" ")
+/* Ein Durchlauf, fuenf Ebenen: jede bekommt ihr Fuenftel. */
+const CYCLE = 13
 
 export function SignatureMotif({ role = "band", active, className }: SignatureMotifProps) {
   const alive = role === "field"
@@ -169,122 +117,102 @@ export function SignatureMotif({ role = "band", active, className }: SignatureMo
     >
       {alive && (
         <style>{`
-          .cdsig-node {
-            transform-box: fill-box;
-            transform-origin: center;
-            animation: cdsig-breathe var(--d) ease-in-out infinite;
+          .cdsig-run {
+            animation: cdsig-run ${CYCLE}s linear infinite;
             animation-delay: var(--t);
           }
-          @keyframes cdsig-breathe {
-            0%, 100% { opacity: .55; transform: scale(1); }
-            50%      { opacity: 1;   transform: scale(1.45); }
+          @keyframes cdsig-run {
+            0%   { stroke-dashoffset: var(--l); }
+            12%  { stroke-dashoffset: 0; }
+            20%  { stroke-dashoffset: 0; }
+            32%  { stroke-dashoffset: calc(var(--l) * -1); }
+            100% { stroke-dashoffset: calc(var(--l) * -1); }
           }
           @media (prefers-reduced-motion: reduce) {
-            .cdsig-node { animation: none; opacity: .85; }
-            .cdsig-signal { display: none; }
+            .cdsig-run { display: none; }
           }
         `}</style>
       )}
 
-      {/* Die Kette — das Modell. Gold, weil Gold hier Verbindung heisst. */}
-      <path
-        d={CHAIN_PATH}
-        stroke="var(--gold-text)"
-        strokeOpacity="0.5"
+      {/*
+        Die Fluchtlinie, an der alle fuenf Ebenen haengen.
+
+        Ohne sie sind fuenf waagerechte Linien abnehmender Laenge nichts
+        Architektonisches, sondern ein Textblock — der Platzhalter, den jeder
+        Ladebildschirm zeigt. Mit ihr ist es ein Bau: eine Kante, an der die
+        Ebenen sitzen. Dieselbe senkrechte Haarlinie steht in der
+        Haus-Architektur zwischen den Ebenen.
+      */}
+      <line
+        x1={X_START}
+        y1={RAILS[RAILS.length - 1].y}
+        x2={X_START}
+        y2={RAILS[0].y}
+        stroke="var(--line-strong)"
+        strokeOpacity="0.85"
         strokeWidth="1"
-        strokeLinecap="round"
-        strokeLinejoin="round"
         vectorEffect="non-scaling-stroke"
       />
 
-      {/* Die Verbindung zu den eigenen Produkten. */}
-      <g stroke="var(--gold-text)" strokeOpacity="0.32" strokeWidth="1" vectorEffect="non-scaling-stroke">
-        {NODES.flatMap((node) =>
-          node.satellites.map((sat) => (
-            <line key={`v-${sat.slug}`} x1={node.x} y1={node.y} x2={sat.x} y2={sat.y} />
-          )),
-        )}
-      </g>
+      {RAILS.map((rail, i) => {
+        const isActive = active === rail.key
+        const end = X_START + rail.length
 
-      {/* Die Produkte. Gefuellt = laeuft, offen = im Aufbau. */}
-      {NODES.flatMap((node) =>
-        node.satellites.map((sat) =>
-          sat.live ? (
-            <circle
-              key={`p-${sat.slug}`}
-              cx={sat.x}
-              cy={sat.y}
-              r="0.7"
-              fill="var(--gold-text)"
-              fillOpacity="0.8"
-            />
-          ) : (
-            <circle
-              key={`p-${sat.slug}`}
-              cx={sat.x}
-              cy={sat.y}
-              r="0.7"
-              stroke="var(--gold-text)"
-              strokeOpacity="0.8"
-              strokeWidth="1"
+        return (
+          <g key={rail.key}>
+            {/* Die Schiene. Struktur, keine Farbe. */}
+            <line
+              x1={X_START}
+              y1={rail.y}
+              x2={end}
+              y2={rail.y}
+              stroke={isActive ? "var(--gold-text)" : "var(--line-strong)"}
+              strokeOpacity={isActive ? 0.9 : 0.85}
+              strokeWidth={isActive ? 2 : 1}
               vectorEffect="non-scaling-stroke"
             />
-          ),
-        ),
-      )}
 
-      {/* Die fuenf Ebenen. */}
-      <g fill="var(--gold-text)">
-        {NODES.map((node, i) => {
-          const isActive = active === node.key
-          return (
-            <g key={node.key}>
-              {isActive && (
-                <circle
-                  cx={node.x}
-                  cy={node.y}
-                  r="3.6"
-                  fill="none"
-                  stroke="var(--gold-text)"
-                  strokeOpacity="0.6"
-                  strokeWidth="1"
-                  vectorEffect="non-scaling-stroke"
-                />
-              )}
-              <circle
-                cx={node.x}
-                cy={node.y}
-                r={isActive ? 1.8 : 1}
-                fillOpacity={isActive ? 1 : 0.8}
-                className={alive ? "cdsig-node" : undefined}
+            {/* Der Goldanfang — dieselbe Marke wie an jeder Sektionsnaht. */}
+            {!isActive && (
+              <line
+                x1={X_START}
+                y1={rail.y}
+                x2={X_START + GOLD_HEAD}
+                y2={rail.y}
+                stroke="var(--gold-text)"
+                strokeOpacity="0.85"
+                strokeWidth="1"
+                vectorEffect="non-scaling-stroke"
+              />
+            )}
+
+            {/*
+              Die eine Bewegung: Gold laeuft die Ebene ab und verlaesst sie
+              wieder — Ebene 01 zuerst, Ebene 05 zuletzt. Das ist die
+              Reihenfolge, in der dieses Haus baut.
+            */}
+            {alive && (
+              <line
+                x1={X_START}
+                y1={rail.y}
+                x2={end}
+                y2={rail.y}
+                stroke="var(--gold-text)"
+                strokeWidth="1"
+                vectorEffect="non-scaling-stroke"
+                className="cdsig-run"
+                strokeDasharray={`${rail.length} ${rail.length}`}
                 style={
-                  alive
-                    ? ({ "--d": `${9 + (i % 3) * 1.5}s`, "--t": `${i * 0.8}s` } as CSSProperties)
-                    : undefined
+                  {
+                    "--l": rail.length,
+                    "--t": `${(i * CYCLE) / RAILS.length}s`,
+                  } as CSSProperties
                 }
               />
-            </g>
-          )
-        })}
-      </g>
-
-      {/*
-        Das eine Signal. Es laeuft von Identity nach Intelligence, weil das
-        die Richtung ist, in der dieses Haus baut — nicht, weil Bewegung
-        huebsch ist. Genau eines, nach der Regel „eine Bewegung je Sektion".
-      */}
-      {alive && (
-        <circle r="0.95" fill="var(--gold-text)" opacity="0" className="cdsig-signal">
-          <animateMotion dur="13s" repeatCount="indefinite" path={CHAIN_PATH} rotate="0" />
-          <animate
-            attributeName="opacity"
-            dur="13s"
-            repeatCount="indefinite"
-            values="0; 0.85; 0.85; 0"
-            keyTimes="0; 0.12; 0.88; 1"
-          />
-        </circle>
-      )}
+            )}
+          </g>
+        )
+      })}
     </svg>
   )
 }
