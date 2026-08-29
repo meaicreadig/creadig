@@ -171,47 +171,42 @@ Bericht Türkisch: was Owner noch liefern muss für C.2 (fibero Screens).
 ---
 
 # MP-C.2 · FIBERO VISUAL PROOF
-## Copy-Paste-Prompt (kompletter Chat)
+## Status: ✅ Pipeline READY · MATERIAL-BLOCKED (29.08.2026)
 
-```
-Du bist CTO/UX für creaDIG. Stufe MP-C.2 — fibero Visual Proof.
-Voraussetzung: MP-C.1 Canon (demo-data-standard.md · proof-kinds.md).
-Black Lock. Unknown ≠ invented.
+Canon-Konflikt („laufendes System“ vs Demodaten) behoben · Caption angebunden · Drop-in-Probe OK · keine Fake-PNGs.
 
-GOLDENE REGEL (verbindlich):
-- Produkt im Display = pixelgetreu echte fibero-Oberfläche (Demo-Instanz).
-- Umgebung (Laptop/Büro/Licht) darf fotografisch/generiert sein.
-- VERBOTEN: AI-generiertes Dashboard / erfundene UI als „Proof“.
-- VERBOTEN: Produktionsdaten, echte Kundennamen/Beträge/Adressen.
-- Label unter dem Bild: „Echte Oberfläche, Demodaten.“ / TR-Äquivalent.
-- Kategorie: Eigenes Produkt — NIEMALS als Kundenprojekt/Kundenergebnis verkaufen.
+**Owner liefert:** 3–5 PNGs → `public/works/products/fibero/` → `npm run build`.  
+Optional: `fibero` maturity. Danach Device-Fotos nur um **dieselben** echten Pixel.
 
-Wenn Owner noch KEINE Screens geliefert hat:
-→ nur Drop-in-Slots prüfen, Empty States ehrlich lassen, Bericht „wartet auf Material“.
-→ KEINE Platzhalter-UI erfinden.
-
-Wenn Owner 3–5 PNGs liefert (Auftragsliste · Auftrag-Detail/Doku · Abrechnung):
-1) nach public/works/products/fibero/ ablegen
-2) npm run build → PRODUCT_SCREENS regenerieren
-3) Mockup-Note entfernen wo echte Screens stehen
-4) Demodaten-Label in UI anbinden (Canon-Text aus dictionary wenn nötig)
-5) maturity NUR setzen wenn Owner fibero=… sagt
-
-Orphans / NV-SWISS: nicht verdrahten. NV-SWISS später: echter Site-Screenshot
-in Device-Szene — keine erfundene NV-Oberfläche.
-
-tsc + a11y. Commit auf Befehl. Bericht Türkisch.
-```
+Goldene Regel: echte UI + synthetische Daten. Staging/lokal OK — Produktiv-Kundendaten nie.
 
 ---
 
-# MP-C.3 · CLIENT PROOF (nur mit Freigaben)
-## Kurzbefehl
+# MP-C.3 · CLIENT PROOF
+## Copy-Paste-Prompt
 
 ```
-MP-C.3 — Logos/Cases/Quotes nur mit Owner-Freigabe. approved:true nie raten.
-Handwerk-Kundenfall oder warten. Orphans nicht verdrahten.
-Echter Kunden-Screenshot in Device-Mockup OK; generierte Kunden-UI VERBOTEN.
+Du bist CTO/UX für creaDIG. Stufe MP-C.3 — Client Proof.
+Black Lock. Keine erfundenen KPI. Keine AI-Kunden-UI.
+Orphans bir-damla / rumis-maison: nicht verdrahten.
+
+IST: Logo+Bild für NV SWISS und maqam liegen bereits.
+Case Studies: approved noch false.
+
+1) Case-Format: Projekt · Kategorie · Leistungen (ohne Tech-Stack-Liste).
+   Optional tiefer: Ausgangslage → Problem → System → Ergebnis → Betrieb.
+   Zahlen nur mit Owner-Quelle.
+
+2) NV SWISS: /works/nv-swiss.jpg (echte Site) — kein Lifestyle-Mockup.
+   approved:true NUR mit expliziter Owner-Freigabe + Freigabesatz.
+
+3) maqam analog.
+
+4) Portfolio: echte Kundenbilder nicht als „Mockup“ etikettieren.
+
+5) proof-inventory.md aktualisieren.
+
+tsc + a11y. Commit auf Befehl. Bericht Türkisch.
 ```
 
 ---
