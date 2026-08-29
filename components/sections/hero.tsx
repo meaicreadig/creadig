@@ -6,7 +6,7 @@ import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { ArrowDown, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { heroChips } from "@/lib/site-data"
-import { ArchitecturalField } from "@/components/hero/architectural-field"
+import { SystemField } from "@/components/hero/system-field"
 import { MagneticButton } from "@/components/ui/magnetic-button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -20,7 +20,7 @@ export function Hero() {
 
   return (
     <section id="top" className="relative isolate flex min-h-[100svh] flex-col overflow-hidden">
-      <ArchitecturalField />
+      <SystemField />
 
       <div className="section-gutter relative z-10 flex flex-1 flex-col justify-center pt-32 pb-14">
         <motion.div

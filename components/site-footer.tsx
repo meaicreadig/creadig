@@ -22,11 +22,7 @@ export function SiteFooter() {
 
   return (
     <footer className="section-dark relative overflow-hidden">
-      <SignatureMotif
-        direction="down"
-        density={0.45}
-        className="motif-band pointer-events-none absolute inset-0 h-full w-full"
-      />
+      <SignatureMotif />
 
       <div className="section-gutter relative pt-24 pb-10 md:pt-32">
         {/* Riesige Wortmarke */}

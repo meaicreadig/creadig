@@ -69,10 +69,7 @@ export function CaseStudyBody({
               />
             ) : (
               <>
-                <SignatureMotif
-                  direction="center"
-                  className="motif-placeholder pointer-events-none absolute inset-0 h-full w-full"
-                />
+                <SignatureMotif role="placeholder" />
                 <span
                   aria-hidden="true"
                   className="border-gold-text/55 text-gold-text text-display absolute inset-0 m-auto flex size-20 items-center justify-center border text-2xl"

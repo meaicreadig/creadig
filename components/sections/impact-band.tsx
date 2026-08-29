@@ -25,11 +25,7 @@ export function ImpactBand() {
 
   return (
     <section id="fundament" className="section-dark relative overflow-hidden">
-      <SignatureMotif
-        direction="up"
-        density={0.5}
-        className="motif-band pointer-events-none absolute inset-0 h-full w-full"
-      />
+      <SignatureMotif />
       <div
         aria-hidden="true"
         className="via-gold/60 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent"

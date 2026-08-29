@@ -34,10 +34,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
 
   return (
     <main className="relative">
-      <SignatureMotif
-        direction="down"
-        className="motif-band pointer-events-none absolute inset-x-0 top-0 h-[34rem] w-full"
-      />
+      <SignatureMotif active={page.layer} />
 
       <div className="section-gutter relative pt-32 pb-24 md:pt-40 md:pb-32">
         {/* Brotkrumen: der Weg zurück ins System, nicht nur ein Zurück-Pfeil. */}

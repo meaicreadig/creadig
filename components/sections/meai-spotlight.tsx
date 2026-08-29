@@ -14,11 +14,7 @@ export function MeaiSpotlight() {
 
   return (
     <section id="meai" aria-labelledby="meai-title" className="section-dark relative overflow-hidden">
-      <SignatureMotif
-        direction="center"
-        density={0.45}
-        className="motif-band pointer-events-none absolute inset-0 h-full w-full"
-      />
+      <SignatureMotif />
       <div
         aria-hidden="true"
         className="via-gold/50 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent"

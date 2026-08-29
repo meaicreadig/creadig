@@ -797,21 +797,31 @@
  * Die Lautstaerke lag vorher ad hoc im Markup (0,12 / 0,14 / 0,20 / 1,0).
  * Jetzt gibt es genau drei Rollen — und wer eine vierte braucht, aendert
  * hier, nicht im Markup.
+ *
+ * NEU KALIBRIERT MIT SIGNATUR 02 (29.08.2026)
+ * Die alten Werte waren fuer eine FLAECHE gerechnet: Ein Feld aus tausend
+ * gefuellten Dreiecken traegt bei 18 % noch sichtbar. Das neue Zeichen ist
+ * eine Haarlinie und fuenf Punkte — dieselben 18 % loeschen es. Ein Zeichen,
+ * das man suchen muss, ist keins.
+ *
+ * Die Lautstaerke wandert deshalb IN das Zeichen: Kette 40 %, Knoten 80 %,
+ * Trabanten 70 % stehen jetzt im SVG. Diese drei Werte hier sind nur noch
+ * der Regler darueber — nicht mehr die Dosis selbst.
  * ========================================================================== */
 
-/* Hauptdarsteller: nur der Hero. Das Motiv traegt die Flaeche mit. */
+/* Hauptdarsteller: nur der Hero. Das Zeichen traegt die Flaeche mit. */
 @utility motif-feature {
-  opacity: 0.5;
+  opacity: 1;
 }
 
-/* Abgesetzte Baender (Impact, meAI, Footer): Struktur, keine Konkurrenz. */
+/* Abgesetzte Baender und Kopfzonen: Struktur, keine Konkurrenz zur Schrift. */
 @utility motif-band {
-  opacity: 0.18;
+  opacity: 0.5;
 }
 
 /* Ersatzflaeche, wo ein Bild fehlt — darf tragen, weil sonst nichts da ist. */
 @utility motif-placeholder {
-  opacity: 0.32;
+  opacity: 0.75;
 }
 
 /* ==========================================================================

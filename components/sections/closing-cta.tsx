@@ -52,11 +52,7 @@ export function ClosingCta({ variant = "default" }: { variant?: ClosingVariant }
       // waeren sonst eine einzige Flaeche — der Schlussstrich braucht eine Kante.
       className="section-dark border-line relative overflow-hidden border-b"
     >
-      <SignatureMotif
-        direction="center"
-        density={0.26}
-        className="motif-band pointer-events-none absolute inset-0 h-full w-full"
-      />
+      <SignatureMotif />
       <div
         aria-hidden="true"
         className="via-gold/60 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent"

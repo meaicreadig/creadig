@@ -61,7 +61,7 @@ export function StatusPageBody({
   return (
     <main className="relative min-h-dvh">
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] overflow-hidden">
-        <SignatureMotif direction="down" className="motif-band h-full w-full" />
+        <SignatureMotif />
         <div className="from-background absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t to-transparent" />
       </div>
 

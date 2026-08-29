@@ -31,10 +31,7 @@ const SHIFT = ["-12%", "12%"]
 function PhotoPlaceholder() {
   return (
     <div aria-hidden="true" className="bg-surface absolute inset-0">
-      <SignatureMotif
-        direction="center"
-        className="motif-placeholder pointer-events-none absolute inset-0 h-full w-full"
-      />
+      <SignatureMotif role="placeholder" />
       <div className="relative flex h-full items-center justify-center">
         <span className="border-gold-text/55 text-gold-text flex size-24 items-center justify-center border">
           <MapPin className="size-9" strokeWidth={1.25} />

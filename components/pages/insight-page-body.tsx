@@ -27,10 +27,7 @@ export function InsightPageBody({ entry }: { entry: Insight }) {
 
   return (
     <main className="relative">
-      <SignatureMotif
-        direction="down"
-        className="motif-band pointer-events-none absolute inset-x-0 top-0 h-[34rem] w-full"
-      />
+      <SignatureMotif />
 
       <article className="section-gutter relative pt-32 pb-24 md:pt-40 md:pb-32">
         <nav aria-label="Brotkrumen">

@@ -25,10 +25,7 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow";
 function MonogramPanel({ mark }: { mark: string }) {
   return (
     <div className="bg-surface absolute inset-0 flex items-center justify-center">
-      <SignatureMotif
-        direction="center"
-        className="motif-placeholder pointer-events-none absolute inset-0 h-full w-full"
-      />
+      <SignatureMotif role="placeholder" />
       <span
         aria-hidden="true"
         className="border-gold-text/55 text-gold-text text-display flex size-20 items-center justify-center border text-2xl"

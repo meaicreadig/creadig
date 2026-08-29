@@ -52,10 +52,7 @@ export function PageHeader({
 
   return (
     <header className="border-line relative overflow-hidden border-b">
-      <SignatureMotif
-        direction="down"
-        className="motif-band pointer-events-none absolute inset-x-0 top-0 h-[34rem] w-full"
-      />
+      <SignatureMotif />
 
       {/* pt-32/40 haelt den Kopf frei von der festen Leiste (h-[4.5rem]). */}
       <div className="section-gutter relative pt-32 pb-20 md:pt-40 md:pb-24">
