@@ -291,12 +291,12 @@ BERICHT: Blueprint · freigegebene Builds · zurückgestellt.
 
 | Owner der | Agent yapar |
 |-----------|-------------|
-| `MP-A` / `Markayı kilitle` | Brand Lock (✅) |
-| `MP-B` / `Company OS` | Lead-OS (✅) |
-| `MP-E` / `Marketing` | Handwerk (✅) |
-| `MP-E.5` / `Acceptance` | LP→Check doğrulama |
-| `MP-C` / `Kanıt` | Proof inventar — **OPEN** |
-| `MP-F` / `Ölçek planı` | Blueprint only |
-| `merdiven` / `leiter` | Özet + sıradaki açık basamak |
+| `MP-A` … `MP-B` | ✅ |
+| `MP-D` / `MP-D.5` | Betriebscheck + Conversion ✅ |
+| `MP-E` | Handwerk ✅ |
+| `MP-E.5` | LP→Check Acceptance (**şimdi**) |
+| `MP-C` | Proof inventar — OPEN / material-blocked |
+| `MP-F` | Blueprint only — sonra |
+| `merdiven` | Özet |
 
-**Sıra:** A → B → (C OPEN ∥ D) → **D.5** → E → F. C asset beklerken D durdu; E D.5’ten sonra.
+**Sıra:** A→B→D→D.5→E → **E.5** → C (materyal) → F Spec. **Yayılma yok** (8 Branche yok).
