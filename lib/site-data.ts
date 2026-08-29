@@ -488,7 +488,7 @@ export const clientWorks: Work[] = [
     outcome: { de: "Kundenwerk · live", tr: "Müşteri işi · canlı" },
     kind: "Kundenwerk",
     region: "CH",
-    // Owner 29.08.2026: Kundenbild (Laptop-Szene, Display = echte nvswiss.ch-Oberfläche).
+    // Owner 29.08.2026: Kundenbild (Laptop-Szene mit echter nvswiss.ch-Oberfläche).
     image: "/works/nv-swiss.jpg",
     mark: "NV",
     href: "https://nvswiss.ch",
@@ -508,7 +508,7 @@ export const clientWorks: Work[] = [
     outcome: { de: "Kundenwerk", tr: "Müşteri işi" },
     kind: "Kundenwerk",
     region: null,
-    // Hero der echten Oberfläche (scharf, aus Owner-Screenshot). Lifestyle: /works/maqam-scene.jpg
+    // Owner 29.08.2026: Kundenbild (Boutique-Laptop, echte maqam-Oberfläche).
     image: "/works/maqam.jpg",
     mark: "mq",
     // Logo: public/brand/clients/maqam.png (schwarz entfernt → transparent)
