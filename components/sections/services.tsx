@@ -7,6 +7,7 @@ import { Reveal } from "@/components/ui/reveal"
 import { serviceLayers } from "@/lib/site-data"
 import { publishedServicePages } from "@/lib/service-pages"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { Disclosure } from "@/components/ui/disclosure"
 
 /**
  * Fünf Ebenen als aufsteigende, bauliche Architektur.
@@ -143,7 +144,23 @@ export function Services({ heading = true }: { heading?: boolean }) {
                     je Block wuerde die Gliederung der Seite zerlegen, ohne dass
                     ein Screenreader dadurch mehr faende.
                   */}
-                  <div className="border-line grid gap-x-8 gap-y-8 border-t px-2 py-8 md:grid-cols-12 md:px-6">
+                  {/*
+                    MP-A · Textdichte. Der Kopf oben sagt, WAS die Ebene ist —
+                    Name, Satz, fuer wen. Was hier folgt, sagt, was sie im
+                    Einzelfall bedeutet. Fuenfmal untereinander aufgeklappt war
+                    das eine Seite von elftausend Pixeln, auf der niemand die
+                    Ebene findet, die ihn betrifft.
+
+                    Der Text ist NICHT weg: `<details>` haelt ihn im Dokument,
+                    Strg+F findet ihn, Suchmaschinen lesen ihn. Er wartet nur,
+                    bis jemand ihn will.
+                  */}
+                  <Disclosure
+                    label={t.services.detailLabel}
+                    size="sm"
+                    className="px-2 md:px-6"
+                  >
+                  <div className="grid gap-x-8 gap-y-8 md:grid-cols-12">
                     {(
                       [
                         [t.services.problemLabel, copy.problem],
@@ -181,6 +198,7 @@ export function Services({ heading = true }: { heading?: boolean }) {
                       </ul>
                     </div>
                   </div>
+                  </Disclosure>
                 </div>
               </Reveal>
             )

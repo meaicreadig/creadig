@@ -9,6 +9,7 @@ import {
   verifyFormToken,
   withinLimit,
 } from "@/lib/lead-guard"
+import { createLeadIdentity } from "@/lib/lead-id"
 
 /**
  * DER LEAD-WEG — der Boden des Trichters.
@@ -380,15 +381,19 @@ function paragraphs(blocks: string[][]): string {
 
 const CONFIRMATION: Record<
   Locale,
-  Record<ConfirmationKind, { subject: string; body: (name: string) => string }>
+  Record<
+    ConfirmationKind,
+    { subject: string; body: (name: string, reference: string) => string }
+  >
 > = {
   de: {
     kontakt: {
       subject: "Ihre Anfrage bei creaDIG",
-      body: (name) =>
+      body: (name, reference) =>
         paragraphs([
           [name ? `Guten Tag ${name},` : "Guten Tag,"],
           ["vielen Dank für Ihre Anfrage — sie ist bei uns angekommen."],
+          [`Ihre Vorgangsnummer: ${reference}`],
           NEXT_STEPS_DE,
           BRING_DE,
           PROOF_DE,
@@ -398,10 +403,11 @@ const CONFIRMATION: Record<
     },
     termin: {
       subject: "Terminwunsch erhalten — wir bestätigen Ihnen den Termin",
-      body: (name) =>
+      body: (name, reference) =>
         paragraphs([
           [name ? `Guten Tag ${name},` : "Guten Tag,"],
           ["vielen Dank für Ihren Terminwunsch — er ist bei uns angekommen."],
+          [`Ihre Vorgangsnummer: ${reference}`],
           [
             "Der Termin ist damit noch nicht gebucht: Wir gleichen Ihre Wunschzeiten ab",
             "und bestätigen Ihnen verbindlich einen Termin.",
@@ -415,7 +421,7 @@ const CONFIRMATION: Record<
     },
     kurzcheck: {
       subject: "Ihr Kurz-Check bei creaDIG",
-      body: (name) =>
+      body: (name, reference) =>
         paragraphs([
           [name ? `Guten Tag ${name},` : "Guten Tag,"],
           [
@@ -423,6 +429,7 @@ const CONFIRMATION: Record<
             "Wir sehen uns Ihre Seite an und melden uns mit drei konkreten Punkten;",
             "kostenlos und unverbindlich.",
           ],
+          [`Ihre Vorgangsnummer: ${reference}`],
           QUICKCHECK_DE,
           QUICKCHECK_LIMIT_DE,
           PROOF_DE,
@@ -434,10 +441,11 @@ const CONFIRMATION: Record<
   tr: {
     kontakt: {
       subject: "creaDIG talebiniz",
-      body: (name) =>
+      body: (name, reference) =>
         paragraphs([
           [name ? `Merhaba ${name},` : "Merhaba,"],
           ["talebiniz için teşekkür ederiz — bize ulaştı."],
+          [`İşlem numaranız: ${reference}`],
           NEXT_STEPS_TR,
           BRING_TR,
           PROOF_TR,
@@ -447,10 +455,11 @@ const CONFIRMATION: Record<
     },
     termin: {
       subject: "Randevu talebiniz alındı — randevuyu size onaylayacağız",
-      body: (name) =>
+      body: (name, reference) =>
         paragraphs([
           [name ? `Merhaba ${name},` : "Merhaba,"],
           ["randevu talebiniz için teşekkür ederiz — bize ulaştı."],
+          [`İşlem numaranız: ${reference}`],
           [
             "Randevu henüz kesinleşmedi: Belirttiğiniz zamanları değerlendirip size",
             "bağlayıcı bir randevu onayı göndereceğiz.",
@@ -464,7 +473,7 @@ const CONFIRMATION: Record<
     },
     kurzcheck: {
       subject: "creaDIG kısa kontrolünüz",
-      body: (name) =>
+      body: (name, reference) =>
         paragraphs([
           [name ? `Merhaba ${name},` : "Merhaba,"],
           [
@@ -472,6 +481,7 @@ const CONFIRMATION: Record<
             "Sitenize bakar ve üç somut maddeyle size döneriz;",
             "ücretsiz ve bağlayıcı değil.",
           ],
+          [`İşlem numaranız: ${reference}`],
           QUICKCHECK_TR,
           QUICKCHECK_LIMIT_TR,
           PROOF_TR,
@@ -611,7 +621,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "invalid", fields: missing }, { status: 400 })
   }
 
+  const { id: leadId, reference } = createLeadIdentity()
+
   const lines = [
+    `Referenz:  ${reference}`,
+    `ID:        ${leadId}`,
     `Name:      ${name}`,
     business ? `Betrieb:   ${business}` : null,
     `E-Mail:    ${email}`,
@@ -633,10 +647,10 @@ export async function POST(request: Request) {
       from,
       to,
       subject: isQuickCheck
-        ? `Kurz-Check angefragt — ${headerSafe(name)} · ${headerSafe(new URL(siteUrl!).hostname)}`
+        ? `Kurz-Check ${reference} — ${headerSafe(name)} · ${headerSafe(new URL(siteUrl!).hostname)}`
         : source === "termin"
-          ? `Terminwunsch über creadig.de — ${headerSafe(name)}`
-          : `Anfrage über creadig.de — ${headerSafe(name)}`,
+          ? `Terminwunsch ${reference} — ${headerSafe(name)}`
+          : `Anfrage ${reference} — ${headerSafe(name)}`,
       text: lines,
       // Direkt aus dem Postfach antworten können, ohne die Adresse zu suchen.
       replyTo: email,
@@ -668,7 +682,7 @@ export async function POST(request: Request) {
       from,
       to: email,
       subject: CONFIRMATION[locale][kind].subject,
-      text: CONFIRMATION[locale][kind].body(name),
+      text: CONFIRMATION[locale][kind].body(name, reference),
     })
   } catch (error) {
     /*
@@ -683,5 +697,5 @@ export async function POST(request: Request) {
     )
   }
 
-  return NextResponse.json({ ok: true })
+  return NextResponse.json({ ok: true, reference, id: leadId })
 }

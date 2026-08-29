@@ -263,6 +263,21 @@ export const productWorks: Work[] = [
  */
 export type ProductStatus = "live" | "beta" | "aufbau" | "intern"
 
+/*
+ * MP-A · REIFEGRAD — was der Owner SAGT, nicht was der Code ABLEITET.
+ *
+ * `ProductStatus` oben wird aus `live` und `href` gerechnet und kann darum
+ * nur drei grobe Zustaende: laeuft, im Aufbau, intern. Fuer die Produktseiten
+ * fehlt die Stufe dazwischen — ein Produkt kann mit echten Nutzern in einer
+ * geschlossenen Phase laufen, und das ist weder „live" noch „im Aufbau".
+ *
+ * Diese Stufe kann man nicht ausrechnen. Sie weiss genau eine Person. Deshalb
+ * ist das Feld hier vorbereitet und ueberall `null`: Kein Etikett, das keiner
+ * belegt hat. Sobald der Owner einen Wert setzt, hat die Produktseite ihn —
+ * bis dahin steht dort nichts, und das ist die richtige Aussage.
+ */
+export type ProductMaturity = "live" | "pilot" | "private-beta" | "in-development"
+
 export function productStatus(work: Work): ProductStatus {
   if (!work.live) return "aufbau"
   return work.href ? "live" : "intern"
@@ -288,6 +303,11 @@ export type ProductWorld = {
   blocks: Localized[]
   /** Ebene im Haus. Mirror von `serviceLayers` (dieselben Schluessel). */
   layer: (typeof serviceLayers)[number]["key"]
+  /**
+   * Owner-gesetzter Reifegrad. `null` = offen — dann rendert nichts.
+   * Wird NICHT aus `live` abgeleitet; siehe `ProductMaturity`.
+   */
+  maturity: ProductMaturity | null
   /**
    * Owner-Text: warum es gebaut wurde, was es im Betrieb gelehrt hat.
    * `null` = die Sektion rendert nicht. TODO (Owner).
@@ -347,6 +367,7 @@ export const productWorlds: Record<string, ProductWorld> = {
       { de: "Betrieb — von Grund auf", tr: "İşletme — sıfırdan" },
     ],
     layer: "intelligence",
+    maturity: null,
     story: null,
     houseContext: null,
     flagship: true,
@@ -364,6 +385,7 @@ export const productWorlds: Record<string, ProductWorld> = {
       { de: "Auswertung", tr: "Değerlendirme" },
     ],
     layer: "operations",
+    maturity: null,
     story: null,
     houseContext: null,
     flagship: false,
@@ -381,6 +403,7 @@ export const productWorlds: Record<string, ProductWorld> = {
       { de: "Schweizer Anforderungen", tr: "İsviçre gereklilikleri" },
     ],
     layer: "operations",
+    maturity: null,
     story: null,
     houseContext: null,
     flagship: false,
@@ -398,6 +421,7 @@ export const productWorlds: Record<string, ProductWorld> = {
       { de: "Abrechnung", tr: "Faturalandırma" },
     ],
     layer: "operations",
+    maturity: null,
     story: null,
     houseContext: null,
     flagship: false,

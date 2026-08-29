@@ -83,7 +83,7 @@ Du entscheidest technisch. Der Owner entscheidet Vision, Feedback, Material (Scr
 |---|---|
 | CI-Richtung | **01 · Die Fuge trägt** — Derz-Luft, Rundheit als Folge, nicht Dekor |
 | Radius | **Rund** (Owner 27.08.) — kommt in Phase 2, nicht vorher einzeln flicken |
-| Motif | **SIG-02 live** (`2581cf0`) — 5 Layer = 5 Knoten, Trabanten = eigene Produkte an ihrer Ebene |
+| Motif | **AUS** (Owner 29.08.) — weder Knoten noch Schienen; `SignatureMotif` → `null` |
 | Motion-Regel | **Max 1 Bewegung pro Sektion** — muss etwas **erklären** |
 | Positionierung | **System-Haus** — nie „Digitalagentur" |
 | Inhalt | **Black Lock** — nichts erfinden, gated Content bleibt gated |
@@ -100,7 +100,7 @@ Die Seite ist **technisch solide (~75 %)**, aber **visuell noch flach**:
 - **129 von 145** Dateien ohne sinnvollen Radius — noch scharf/kastig
 - **34× `gap-px`** — fugenlose Raster trennen statt verbinden
 - **Elevation** fast ungenutzt (7× in 145 Dateien) — keine semantische Tiefe
-- **SignatureMotif** global aus — 14 Flächen leer; Platzhalter ehrlich, aber ohne SIG-02 keine Identität
+- **SignatureMotif** global aus (Owner) — Platzhalter ehrlich; Identität = Typo + Seam + Outline-CTA + SystemField, nicht Dekor-Motiv
 - **Kein Produkt-Screen** in `PRODUCT_SCREENS` — größter „Lebendigkeit"-Hebel, Owner-Material
 - **KIZILELMA-Seele** (Kairos, Gönül, Asymmetrie) auf der **öffentlichen Seite: 0** — „legendär" fehlt hier, nicht in der Typografie
 

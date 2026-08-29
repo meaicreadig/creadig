@@ -350,3 +350,124 @@ Dazu: ClosingCta **ortsabhängig** statt identisch; Impact-Band um **„Jahre im
 - **Wiederkehrer:** die Seite ist nur für den Erstbesuch gebaut; der Termin-Wizard könnte einen Stand behalten.
 
 > **Umsetzungs-Reihenfolge (v0-Empfehlung):** 1) Leistungs-Tiefenfelder, 2) Platzierung Top 1–4, 3) `/status` als Fertig-Definition. Alles ohne Fremdmaterial. Design-Identität „Der Schnitt" ([[creadig-ci-motif-rethink]]) läuft als SEPARATER Design-Durchlauf. Später: eine Gesamt-Master-Prompt aus all dem.
+
+---
+
+## 12 · EXTERNE UNTERNEHMENS-ARCHITEKTUR-ANALYSE (29.08.2026)
+
+> **Status:** Owner hat eine unabhängige Drittanalyse (vollständiger Screenshot-Satz + Systemblick) **als besonderen Teil der Omurga** aufgenommen.
+> **Charakter:** kein UI-Audit allein — **Marke → Kunde → Verkauf → Produkt → Dienstleistung → Betrieb → Vertrauen → Technik → Inhalt → Skalierung → Marketing.**
+> **Operative Umsetzung:** siehe `creadig-MASTER-PROMPT-COMPANY-OS.md` (Stufen-Leiter MP-A … MP-F).
+> **Owner-Regel bleibt:** Black Lock (nichts erfinden), kein Admin-Nagging, Eckdaten kommen wenn er sie hat.
+
+### 12.0 · Owner-/CTO-Anerkennung (Kurz)
+
+Diese Analyse trifft den Kern, den interne Design-Prompts oft verfehlten: **Die Vitrine (Site) ist der Firma voraus.** Das ist kein Scheitern — es ist der richtige nächste Kampfplatz: nicht „noch ein Motiv“, sondern **creaDIG 1.0 — Company Operating System**. Die Site ist die sichtbare Schicht; dahinter muss Lead → Audit → Angebot → Build → Managed denselben Standard erreichen.
+
+### 12.1 · Scores (Ist / Potenzial)
+
+| Bereich | Ist | Potenzial |
+|---|---|---|
+| Visuelle Qualität | 8.7 | 9.5+ |
+| Marken-Kohärenz | 8.8 | 10 |
+| Positioning / Firmenidee | 9.0 | 10 |
+| Informationsarchitektur | 8.1 | 9.5 |
+| UX | 8.2 | 9.5 |
+| Vertrauen / Credibility | 7.5 | 9.5 |
+| Verkaufssystem | 6.8 | 9.5 |
+| Lead-System | 6.5 | 10 |
+| Produktisierung | 8.0 | 10 |
+| Operative Firmen-Infrastruktur | unvollständig | sehr hoch |
+| Marketing-Bereitschaft | 7 | 10 |
+| **Digitale Unternehmensbasis gesamt** | **~8.3** | **sehr stark** |
+
+**Kritischer Satz:** *Die Site ist gestalterisch weiter als die kommerzielle Maschine.* Ab jetzt: Firma auf das Niveau der Site heben — nicht die Site neu erfinden.
+
+### 12.2 · Was wirklich gelungen ist (nicht „Design“)
+
+creaDIG hat eine **Welt** gebaut — nicht eine Dienstleistungsliste.
+
+Wiederkehrende DNA (über Homepage, Leistungen, Produkte, Betrieb, Accessibility hinweg):
+
+| DNA | Rolle |
+|---|---|
+| *Wir bauen, was andere nicht sehen.* | Omurga-Satz |
+| *Sie führen den Betrieb. Wir bauen das System dahinter.* | Kundenversprechen |
+| *Erst zeigen. Dann reden.* | Beweis-Haltung |
+| *Fünf Ebenen. Ein System.* | Architektur |
+| Identity → Digital → Operations → Automation → Intelligence | Methodik-Kern |
+| Managed Betrieb | Recurring / Bindung |
+| Eigene Produkte (meAI, fibero, CASSAMEA, meahv) | Baukapazität |
+| Eigene A11y-Prüfung („acht Mängel“) | *Wir prüfen zuerst uns selbst* |
+| DE/TR | Strategische Nische ohne Klischee |
+| Editorial-minimal, kein Neon-AI-Kitsch | Visuelle Haltung |
+
+**Positionierung (gesperrt):** weder Digitalagentur noch klassisches IT-Systemhaus noch AI-Agentur.
+
+> **System-Haus für digitale Betriebe.**  
+> Strategische Leitzeile: *Wir bauen das System hinter Ihrem Betrieb.*  
+> Unterzeile: *Von Marke und digitalem Auftritt über operative Systeme und Automatisierung bis zur künstlichen Intelligenz — verbunden, betrieben und weiterentwickelt.*
+
+### 12.3 · Strategische Gefahr
+
+Kapazität wirkt riesig (Brand, Web, Software, Automation, AI, Ops, Managed, A11y, Produkte, Integration). Mittelstand fragt in 15 Sekunden: *„Was für eine Firma ist das genau?“*  
+**Antwort:** Kategorien **verdichten**, nicht weitere Dienste stapeln. Emotion → Erklärung → Proof.
+
+### 12.4 · Fünf Ebenen → Unternehmens-Methodik (nicht nur Website-Sektion)
+
+Langfristig: **creaDIG Five** als Consulting-Framework.
+
+- **creaDIG System Audit / Betriebsanalyse** — Score je Ebene + Digital Maturity.  
+- **Lead-Magnet / Sales-Tool:** „Wie digital arbeitet Ihr Betrieb?“ (10–15 Fragen → Score + Zeitverluste).  
+- **System Map** pro Kunde (Website → CRM → Angebot → Termin → Auftrag → Rechnung → meAI).  
+- **Haus-Metapher** als Motion/Framework behalten — **kein** freischwebendes Dekor-Motiv (SIG-02 AUS, Owner 29.08.).
+
+### 12.5 · Site: stärken / kürzen / beweisen
+
+**Stärken:** Hero-Satz, Positioning-Sätze, Produkt-Trennung, Managed Betrieb, Integration first, A11y-Selbstprüfung, Termin-Assistent („bucht nichts automatisch“), 404, DE/TR.
+
+**Schwächen / Hebel:**
+
+1. Textvolumen ~30–40 % reduzieren — **ohne** Informationsverlust (Accordion, Diagramme, Screens, Metrics).  
+2. **Proof Density** — echte Screens, Cases, Zahlen, Testimonials (größte Lücke).  
+3. Product-Maturity klar (Live / Pilot / Private Beta / In Development) — nicht überall „im Aufbau“.  
+4. Case-Engine: Ausgangslage → Problem → System → Architektur → Ergebnis → Betrieb → Zahlen.  
+5. Managed in Tiers (Care / Operate / Business / Mission Critical).  
+6. Rhythmus: nicht nur white → heading → text; Product/Video/Dark/Metric mischen.  
+7. Image Bible (kein Stock-Laptop); echte creaDIG-UI in Fotos.  
+8. Branchen-Funnels (Handwerk, Hausverwaltung, Gastronomie) — Marketing vertikal, Site breit.  
+9. Insights = Build Notes, kein „5 Vorteile der Digitalisierung“.  
+10. Visual rhythm + gezielte Microinteractions (Five Levels scroll-build) — ruhig, nicht Apple-Kopie.
+
+### 12.6 · Company OS (die eigentliche nächste Legende)
+
+Visitor → Website → Lead → CRM → Qualify → Meeting → Discovery → **System Audit** → Proposal → Contract → Project → Delivery → Docs → **Managed Betrieb** → Monitoring → Upsell.
+
+Dazu: Lead-IDs · Pipeline-Stufen · Proposal-Portal · Customer Portal (`my.creadig`) · Trust Center · Status Page · Changelog · Pulse-Monatsbericht · Health Score · Analytics-Taxonomie · UTM→Revenue.
+
+**meAI:** nicht Chatbot-Ornament — Intelligence-Layer über dem eigenen Betrieb.
+
+**Umsatz-Säulen:** Audit · Project · SaaS · Managed · Expansion.
+
+**Risiko Nr. 1:** nicht die Site — **Founder-Bandwidth**. SOP, Design System, Starter-Boilerplate, Automation von Tag 1.
+
+### 12.7 · Was NICHT anfassen (DNA)
+
+Wir bauen, was andere nicht sehen · Sie führen den Betrieb… · Erst zeigen. Dann reden. · Fünf Ebenen · Managed Betrieb · Eigene Produkte · Eigene A11y-Prüfung · DE/TR · ruhige Premium-Sprache · Black Lock.
+
+### 12.8 · Sechs Stufen (Umsetzung = COMPANY-OS-Leiter)
+
+| Stufe | Name | Ziel |
+|---|---|---|
+| **A** | LOCK THE BRAND | Positioning, Messaging, Visual System, Five Levels, Image Bible, DE/TR, Design System |
+| **B** | BUILD THE COMPANY OS | CRM, Lead-IDs, Booking, Proposal, PM, Docs, Billing, Support, Monitoring, Analytics, SOP |
+| **C** | PROOF | Screens, Cases, Demos, Testimonials, Metrics, Office-Fotos |
+| **D** | SALES ENGINE | Betriebscheck/Analyse, Scripts, Proposal, Follow-up, Pipeline |
+| **E** | MARKETING ENGINE | Branchen-LP, Ads, SEO Insights, Referral — erst mit Tracking |
+| **F** | SCALE | Team, SaaS, Portal, meAI, Verticals, DACH |
+
+> **Projektname ab jetzt (Owner-Richtung):** *creaDIG 1.0 — Company Operating System.*  
+> Die Website ist nur die sichtbare Schicht.
+
+**Lange Form / Rohanalyse:** vom Owner geliefert (29.08.2026, Screenshot-basiert). Diese §12 ist die Omurga-Verdichtung; Details und Prompts: `creadig-MASTER-PROMPT-COMPANY-OS.md`.
+

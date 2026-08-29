@@ -1,10 +1,11 @@
 "use client"
 
 import { LocaleLink as Link } from "@/components/ui/locale-link"
-import { ArrowUpRight, Plus } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { Disclosure } from "@/components/ui/disclosure"
 
 /**
  * Häufige Fragen — direkt vor dem Kontaktformular.
@@ -14,9 +15,8 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
  * die, die auch am Telefon gegeben wird — die Texte stammen aus den bereits
  * belegten Angaben aus dem Woerterbuch, nichts ist dazuerfunden.
  *
- * Bewusst `<details>` statt eines React-Accordions: Tastatur, Screenreader
- * und die Seitensuche des Browsers (Strg+F findet auch zugeklappten Text)
- * funktionieren ohne eine Zeile JavaScript.
+ * Die Mechanik steht seit MP-A in `components/ui/disclosure.tsx` — hier lag
+ * sie handgeschrieben, in `entry-line.tsx' ein zweites Mal.
  */
 export function Faq() {
   const { t } = useLocale()
@@ -39,19 +39,9 @@ export function Faq() {
         <div className="mt-20 flex flex-col">
           {t.faq.items.map((item, i) => (
             <Reveal key={item.q} delay={0.04 * i}>
-              <details className="group border-line border-t">
-                <summary className="marker:content-none flex cursor-pointer list-none items-start justify-between gap-6 py-7">
-                  <h3 className="text-subhead text-lg text-pretty md:text-xl">{item.q}</h3>
-                  <Plus
-                    aria-hidden="true"
-                    className="text-muted-foreground group-open:text-gold-text mt-1 size-5 shrink-0 transition-transform duration-[var(--dur-2)] ease-brand group-open:rotate-45"
-                    strokeWidth={1.5}
-                  />
-                </summary>
-                <p className="type-body text-muted-foreground max-w-3xl pb-8 text-pretty">
-                  {item.a}
-                </p>
-              </details>
+              <Disclosure label={item.q} heading>
+                <p className="type-body text-muted-foreground max-w-3xl text-pretty">{item.a}</p>
+              </Disclosure>
             </Reveal>
           ))}
           <div className="border-line border-t" />

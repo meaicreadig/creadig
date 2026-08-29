@@ -931,6 +931,8 @@ export const dictionary = {
       solutionLabel: "Was wir bauen",
       resultLabel: "Was danach anders ist",
       projectsLabel: "Typische Projekte",
+      /* MP-A · Textdichte: Die Tiefe je Ebene liegt hinter diesem Wort. */
+      detailLabel: "Im Detail",
       depthLabel: "In der Tiefe",
       layers: {
         identity: {
@@ -2636,6 +2638,7 @@ export const dictionary = {
       solutionLabel: "Ne kuruyoruz",
       resultLabel: "Sonrasında ne değişir",
       projectsLabel: "Tipik projeler",
+      detailLabel: "Ayrıntıda",
       depthLabel: "Derinlemesine",
       layers: {
         identity: {
@@ -3176,7 +3179,12 @@ export const dictionary = {
     },
     closing: {
       eyebrow: "Sonraki adım",
-      title: "İşletmeyi siz yönetirsiniz. Arkasındaki sistemi biz kurarız.",
+      /*
+       * MP-A · Canon. Hier stand „İşletmeyi" — ohne Possessiv. Der Canon des
+       * Owners sagt „İşletmenizi": DEN Betrieb gegen IHREN Betrieb. Ein Wort,
+       * und es entscheidet, ob der Satz den Leser meint.
+       */
+      title: "İşletmenizi siz yönetirsiniz. Arkasındaki sistemi biz kurarız.",
       lead: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmeye bakar ve yardımcı olabilir miyiz, dürüstçe söyleriz.",
       ctaPrimary: "Projeye başla",
       ctaSecondary: "İşleri gör",

@@ -23,7 +23,14 @@ import { useCallback, useEffect, useRef } from "react"
  * tippen kann — beides gehört nicht wiederholt, sondern abgelehnt.
  */
 
-export type LeadResponse = { ok?: boolean; error?: string }
+export type LeadResponse = {
+  ok?: boolean
+  error?: string
+  /** Menschliche Vorgangsnummer CD-YYMMDD-XXXX — nie als DB-PK verwenden. */
+  reference?: string
+  /** Internes immutable UUID. */
+  id?: string
+}
 
 const TOKEN_URL = "/api/lead"
 

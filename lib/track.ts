@@ -17,12 +17,29 @@ import { hasConsent } from "@/lib/consent"
  * Es werden ausschließlich Feld-Namen übergeben, nie Feld-INHALTE: `source`
  * sagt „kontakt" oder „produkt-cassamea", niemals wer geschrieben hat.
  */
-export function trackLead(source: string): void {
+type TrackProps = Record<string, string | number | boolean | null | undefined>
+
+/**
+ * MP-B Regel D — generisches Ereignis + Properties.
+ * Keine PII. Consent hier noch einmal prüfen.
+ */
+export function trackEvent(name: string, props: TrackProps = {}): void {
   if (typeof window === "undefined") return
   if (!hasConsent("statistics")) return
+  const clean: Record<string, string | number | boolean> = {}
+  for (const [key, value] of Object.entries(props)) {
+    if (value === null || value === undefined) continue
+    clean[key] = value
+  }
   try {
-    vercelTrack("Anfrage", { source })
+    vercelTrack(name, clean)
   } catch {
     // Messung darf niemals einen echten Vorgang stören.
   }
+}
+
+export function trackLead(source: string): void {
+  // Alias behalten (bestehende Aufrufer). Zusätzlich Spec-Name lead_submitted.
+  trackEvent("Anfrage", { source })
+  trackEvent("lead_submitted", { source })
 }

@@ -1,9 +1,10 @@
 # creaDIG — MASTER PROMPT · EFSANE / LEGENDÄR
 ### Stand 29.08.2026 · Branch `feat/system-haus-site` · HEAD `c061017`
 
-> **Dies ist der einzige operative Master-Prompt ab jetzt.**
-> Ältere Discovery-/Analyse-Prompts ersetzen ihn nicht — sie erklären Geschichte.
-> Referenzen: `creadig-TIEFENANALYSE.md` · `KIZILELMA-creaDIG.md` · `creadig-MASTER-PROMPT-BETRIEB.md`
+> **Site-Evolution (sichtbare Schicht):** dieser Prompt.
+> **Firmen-Maschine dahinter:** `creadig-MASTER-PROMPT-COMPANY-OS.md` (MP-A→F) · Omurga §12 in `KIZILELMA-creaDIG.md`.
+> Ältere Discovery-/Analyse-Prompts erklären Geschichte; sie ersetzen diese beiden Leiter nicht.
+> Referenzen: `creadig-TIEFENANALYSE.md` · `creadig-MASTER-PROMPT-BETRIEB.md` · `creadig-MASTER-PROMPT-WEITERENTWICKLUNG.md`
 
 ---
 

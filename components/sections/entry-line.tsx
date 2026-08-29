@@ -1,10 +1,11 @@
 "use client"
 
 import { LocaleLink as Link } from "@/components/ui/locale-link"
-import { ArrowUpRight, Plus } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { Disclosure } from "@/components/ui/disclosure"
 import { packages } from "@/lib/site-data"
 
 /**
@@ -92,17 +93,9 @@ export function EntryLine() {
             <div className="mt-6 flex flex-col">
               {questions.map((item, i) => (
                 <Reveal key={item.q} delay={0.12 + 0.06 * i}>
-                  <details className="group border-line border-t">
-                    <summary className="marker:content-none flex cursor-pointer list-none items-start justify-between gap-6 py-5">
-                      <h3 className="text-subhead text-pretty">{item.q}</h3>
-                      <Plus
-                        aria-hidden="true"
-                        className="text-muted-foreground group-open:text-gold-text mt-1 size-4 shrink-0 transition-transform duration-[var(--dur-2)] ease-brand group-open:rotate-45"
-                        strokeWidth={1.5}
-                      />
-                    </summary>
-                    <p className="type-small text-muted-foreground pb-6 text-pretty">{item.a}</p>
-                  </details>
+                  <Disclosure label={item.q} size="sm" heading>
+                    <p className="type-small text-muted-foreground text-pretty">{item.a}</p>
+                  </Disclosure>
                 </Reveal>
               ))}
               <div className="border-line border-t" />
