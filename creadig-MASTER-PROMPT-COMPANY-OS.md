@@ -365,12 +365,12 @@ BERICHT: Blueprint · freigegebene Builds · zurückgestellt.
 | Owner der | Agent yapar |
 |-----------|-------------|
 | `MP-A`…`MP-E.5` | ✅ (E.5: LP↔Leistung) |
-| `MP-C.1` | Product Truth (**şimdi**) |
-| `MP-C.2` | fibero Visual (Screens + Demodaten) |
+| `MP-C.1` | Product Truth (✅) |
+| `MP-C.2` | fibero Visual (**şimdi** — echte Screens + Demodaten) |
 | `MP-C.3` | Client Proof (Freigaben) |
-| `MP-F` | Blueprint only — Proof sonrası |
+| `MP-F` | Blueprint — Proof sonrası |
 | `merdiven` | Özet |
 
-**Kalan efsane basamak (çekirdek):** C.1 → C.2 → C.3 → F (Spec).  
-**Owner-kapılar (kod değil):** Live-Mail SELFTEST · Datenschutz/UTM · maturity değerleri · Screens · Freigaben.  
-**Yasak şimdi:** 8 Branche · Portal · Ads · fake proof.
+**Kalan efsane basamak (çekirdek):** **3** — C.2 → C.3 → F (Spec).  
+**Altın kural:** Display = gerçek UI; sahne fotoğrafik olabilir; AI-dashboard ≠ Proof.  
+**Owner-kapılar:** fibero Demo-Screens · maturity · Freigaben · Live-Mail · Datenschutz.
