@@ -113,20 +113,16 @@ AVV = Auftragsverarbeitungsvertrag (DSGVO) — **kein Code-Task**, nicht erklär
 
 ---
 
-## 5 · MOTIF — ENTSCHIEDEN (Option C · `c061017`)
+## 5 · MOTIF — AUS (Owner 29.08.2026)
 
-Erste SIG-02-Fassung (Knoten + Trabanten) wirkte wie Molekül / KI-Startup-Standard. Owner: „Saçmalık“.
+Knoten-Netz **und** Schienen-Treppe (Option C) abgelehnt.
 
-**Jetzt gesperrt — Option C:**
+**Jetzt gesperrt — Option A:**
 
-- Fünf **Schienen** (unten Identity → oben Intelligence), jede länger als die darunter  
-- Links **Goldanfang** (SIG-01-Sprache) + **vertikale Fluchtlinie** (sonst wirkt es wie Skeleton-Placeholder)  
-- **Keine Trabanten** (B-Disziplin: Produkte sagt die Seite in Worten)  
-- `active` = Leistungsseite: betreffende Schiene ganz Gold  
-- `field` = Hero: Gold läuft 01→05 in ~13 s (eine Bewegung, eine Aussage)  
-- Fallback: Owner sagt weiter „saçmalık“ → Option A (`return null`) — eine Zeile  
-
-**Nicht zurück** zu Knoten/Kette/Satelliten ohne Owner-Befehl.
+- `SignatureMotif` → `return null` (14 Aufrufe bleiben, rendern nichts)  
+- Hero-Grund: nur Wärme/Verläufe, kein Zeichen  
+- **Kein neues Motiv** ohne ausdrücklichen Owner-Befehl  
+- Platzhalterflächen: ehrliche Empty States (nicht Motif)
 
 ---
 
@@ -134,7 +130,7 @@ Erste SIG-02-Fassung (Knoten + Trabanten) wirkte wie Molekül / KI-Startup-Stand
 
 ### JETZT · Phase 3 Rest
 
-1. ✅ **Motif-Entscheidung: Option C** umgesetzt (`c061017`) — Zeichen = Leistungspyramide + SIG-01-Schiene. Trabanten raus (Disziplin aus B). Owner prüft in der Preview.  
+1. ✅ Motif **AUS** (Owner) — weder Knoten noch Schienen; `SignatureMotif` → `null`  
 2. **Ehrliche Empty States** für fehlende `PRODUCT_SCREENS` / `CLIENT_LOGOS`  
    — Bild fehlt → **sichtbar fehlen** (benannter Ersatz), **nicht** mit Motif kaschieren  
 3. **SIG-03 `surface-raised`** nur auf System-Output (Status, Messung, echte Screens wenn da)  
@@ -248,7 +244,7 @@ Frontend (`components/`, `app/globals.css`) und Backend (`lib/`, `app/api/`) in 
 | ID | Name | Status |
 |---|---|---|
 | SIG-01 | Die tragende Fuge | ✅ live |
-| SIG-02 | Fünf Ebenen (Schienen) | ✅ live — Option C (`c061017`), Owner-Sichtprüfung offen |
+| SIG-02 | Fünf Ebenen (Zeichen) | ❌ **AUS** — Owner 29.08.; kein neues Motiv ohne Befehl |
 | SIG-03 | Zwei Ebenen (`surface-raised`) | ⏳ anwenden wenn System-Output existiert |
 
 Prüffrage vor jeder Design-Änderung:
