@@ -48,11 +48,11 @@ export function ProduktePageBody() {
                 >
                   <Link
                     href={`/produkte/${product.slug}`}
-                    className="border-line hover:bg-surface relative block border-t py-10 transition-colors duration-500 md:py-12"
+                    className="border-line hover:bg-surface relative block border-t py-10 transition-colors duration-[var(--dur-2)] md:py-12"
                   >
                     <span
                       aria-hidden="true"
-                      className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                      className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                     />
 
                     <div className="grid gap-x-10 gap-y-6 md:grid-cols-12 md:items-baseline">
@@ -70,14 +70,14 @@ export function ProduktePageBody() {
                             <img
                               src={logo.logoPath}
                               alt={product.name}
-                              className="h-8 w-auto max-w-[9rem] opacity-80 grayscale transition-all duration-500 group-hover:opacity-100 group-hover:grayscale-0 dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
+                              className="h-8 w-auto max-w-[9rem] opacity-80 grayscale transition-all duration-[var(--dur-2)] group-hover:opacity-100 group-hover:grayscale-0 dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
                             />
                           </h2>
                         ) : (
                           <div className="flex items-center gap-4">
                             <span
                               aria-hidden="true"
-                              className="border-line-strong text-muted-foreground group-hover:border-gold group-hover:text-gold-text flex size-9 items-center justify-center border text-sm font-semibold tracking-tight transition-colors duration-500"
+                              className="border-line-strong text-muted-foreground group-hover:border-gold group-hover:text-gold-text flex size-9 items-center justify-center rounded-sm border text-sm font-semibold tracking-tight transition-colors duration-[var(--dur-2)]"
                             >
                               {product.mark}
                             </span>
@@ -120,7 +120,7 @@ export function ProduktePageBody() {
                         <span className="text-gold-text mt-6 inline-flex items-center gap-2 text-sm tracking-wide md:justify-end">
                           {copy.openLabel}
                           <ArrowRight
-                            className="size-4 transition-transform duration-500 group-hover:translate-x-1"
+                            className="size-4 transition-transform duration-[var(--dur-2)] group-hover:translate-x-1"
                             strokeWidth={1.5}
                           />
                         </span>
@@ -166,7 +166,7 @@ export function ProduktePageBody() {
                 <div className="lg:col-span-5 lg:text-right">
                   <Link
                     href="/arbeiten"
-                    className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+                    className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
                   >
                     {copy.clientWorkCta}
                     <ArrowUpRight className="size-4" strokeWidth={1.5} />
@@ -175,7 +175,7 @@ export function ProduktePageBody() {
               </div>
             </Reveal>
 
-            <ul className="border-line bg-line mt-12 grid gap-px border md:grid-cols-3">
+            <ul className="mt-12 grid gap-2.5 md:grid-cols-3">
               {clientWorks.map((work, i) => (
                 <Reveal
                   key={work.slug}
@@ -185,13 +185,13 @@ export function ProduktePageBody() {
                 >
                   <Link
                     href={`/arbeiten/${work.slug}`}
-                    className="group bg-background hover:bg-surface flex w-full flex-col gap-3 px-6 py-7 transition-colors duration-500"
+                    className="group tile bg-background hover:bg-surface flex w-full flex-col gap-3 px-6 py-7 transition-colors duration-[var(--dur-2)]"
                   >
                     <span className="text-subhead text-lg">{work.name}</span>
                     <span className="type-small text-muted-foreground text-pretty">
                       {work.what[locale]}
                     </span>
-                    <span className="eyebrow text-muted-foreground group-hover:text-gold-text mt-auto pt-4 transition-colors duration-500">
+                    <span className="eyebrow text-muted-foreground group-hover:text-gold-text mt-auto pt-4 transition-colors duration-[var(--dur-2)]">
                       {work.sector[locale]}
                     </span>
                   </Link>

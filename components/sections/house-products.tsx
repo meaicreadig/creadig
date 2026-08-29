@@ -48,7 +48,7 @@ export function HouseProducts() {
             </p>
             <Link
               href="/produkte"
-              className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 self-start text-sm tracking-wide transition-colors duration-500"
+              className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 self-start text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {t.home.products.cta}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
@@ -56,9 +56,10 @@ export function HouseProducts() {
           </Reveal>
         </div>
 
-        {/* Vier gleichwertige Hairline-Karten. `gap-px` auf der Linienfarbe
-            erzeugt das durchgehende Raster ohne doppelte Raender. */}
-        <div className="bg-line border-line mt-20 grid gap-px border sm:grid-cols-2 lg:grid-cols-4">
+        {/* Vier gleichwertige Kacheln. Bis PHASE 2 war die Fuge die Linie
+            (`bg-line` + `gap-px`); jetzt traegt jede Karte ihre eigene Kante
+            und zwischen ihnen steht Luft — vier Dinge statt einem Block. */}
+        <div className="mt-20 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
           {productWorks.map((product, i) => {
             const logo = ownProducts.find((p) => p.name === product.name)
 
@@ -69,11 +70,11 @@ export function HouseProducts() {
                     hingehoert: auf der Produktseite selbst. */}
                 <Link
                   href={`/produkte/${product.slug}`}
-                  className="group bg-background hover:bg-surface relative flex w-full flex-col justify-between gap-8 p-7 transition-colors duration-500 lg:p-8"
+                  className="group tile bg-background hover:bg-surface relative flex w-full flex-col justify-between gap-8 p-7 transition-colors duration-[var(--dur-2)] lg:p-8"
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
 
                   <div>
@@ -90,18 +91,18 @@ export function HouseProducts() {
                             Markenfarbe — dieselbe Dramaturgie wie in Hell,
                             nur mit umgekehrtem Ausgangspunkt.
                           */
-                          className="h-7 w-auto max-w-[7rem] opacity-70 grayscale transition-all duration-500 group-hover:opacity-100 group-hover:grayscale-0 dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
+                          className="h-7 w-auto max-w-[7rem] opacity-70 grayscale transition-all duration-[var(--dur-2)] group-hover:opacity-100 group-hover:grayscale-0 dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
                         />
                       ) : (
                         <span
                           aria-hidden="true"
-                          className="border-line-strong text-muted-foreground group-hover:border-gold group-hover:text-gold-text flex size-9 items-center justify-center border text-sm font-semibold tracking-tight transition-colors duration-500"
+                          className="border-line-strong text-muted-foreground group-hover:border-gold group-hover:text-gold-text flex size-9 items-center justify-center rounded-sm border text-sm font-semibold tracking-tight transition-colors duration-[var(--dur-2)]"
                         >
                           {product.mark}
                         </span>
                       )}
                       <ArrowUpRight
-                        className="text-gold size-4 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                        className="text-gold size-4 shrink-0 transition-transform duration-[var(--dur-2)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                         strokeWidth={1.5}
                       />
                     </div>

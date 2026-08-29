@@ -76,15 +76,15 @@ export function ContactDirect() {
           </div>
 
           {/* Rechts: die drei Wege, in der Reihenfolge ihrer Verbindlichkeit. */}
-          <div className="flex flex-col gap-px lg:col-span-7">
+          <div className="flex flex-col gap-2.5 lg:col-span-7">
             <Reveal>
               <Link
                 href="/termin"
-                className="group border-line hover:bg-foreground/[0.03] relative flex items-start gap-5 border-t p-7 transition-colors duration-500"
+                className="group tile hover:bg-foreground/[0.03] relative flex items-start gap-5 p-7 transition-colors duration-[var(--dur-2)]"
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
+                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
                 />
                 <CalendarDays className="text-gold mt-1 size-5 shrink-0" strokeWidth={1.5} />
                 <span className="flex-1">
@@ -106,7 +106,7 @@ export function ContactDirect() {
                   </span>
                 </span>
                 <ArrowUpRight
-                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 transition-colors duration-500"
+                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 transition-colors duration-[var(--dur-2)]"
                   strokeWidth={1.5}
                 />
               </Link>
@@ -117,11 +117,11 @@ export function ContactDirect() {
                 href={contact.whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group border-line hover:bg-foreground/[0.03] relative flex items-start gap-5 border-t p-7 transition-colors duration-500"
+                className="group tile hover:bg-foreground/[0.03] relative flex items-start gap-5 p-7 transition-colors duration-[var(--dur-2)]"
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
+                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
                 />
                 <WhatsAppIcon className="text-gold mt-1 size-5 shrink-0" />
                 <span className="flex-1">
@@ -134,7 +134,7 @@ export function ContactDirect() {
                   </span>
                 </span>
                 <ArrowUpRight
-                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 transition-colors duration-500"
+                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 transition-colors duration-[var(--dur-2)]"
                   strokeWidth={1.5}
                 />
               </a>
@@ -143,11 +143,11 @@ export function ContactDirect() {
             <Reveal delay={0.12}>
               <a
                 href={`mailto:${contact.email}`}
-                className="group border-line hover:bg-foreground/[0.03] relative flex items-start gap-5 border-y p-7 transition-colors duration-500"
+                className="group tile hover:bg-foreground/[0.03] relative flex items-start gap-5 p-7 transition-colors duration-[var(--dur-2)]"
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
+                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
                 />
                 <Mail className="text-gold mt-1 size-5 shrink-0" strokeWidth={1.5} />
                 <span className="flex-1">
@@ -160,7 +160,7 @@ export function ContactDirect() {
                   </span>
                 </span>
                 <ArrowUpRight
-                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 transition-colors duration-500"
+                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 transition-colors duration-[var(--dur-2)]"
                   strokeWidth={1.5}
                 />
               </a>

@@ -65,7 +65,7 @@ export function ProductInterest({
   const [error, setError] = useState<string | null>(null)
 
   const fieldClass =
-    "w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-3 text-base text-foreground outline-none transition-colors duration-300 placeholder:text-muted-foreground focus:border-gold"
+    "w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-3 text-base text-foreground outline-none transition-colors duration-[var(--dur-1)] placeholder:text-muted-foreground focus:border-gold"
 
   /** Dieselben Codes wie Kontakt, Kurz-Check und Termin — ein Endpunkt, eine Sprache. */
   function errorText(code: string | undefined) {

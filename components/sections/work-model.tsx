@@ -54,7 +54,7 @@ export function WorkModel() {
           </Reveal>
         </div>
 
-        <div className="mt-20 grid gap-px md:grid-cols-3">
+        <div className="mt-20 grid gap-x-2.5 gap-y-12 md:grid-cols-3">
           {items.map((key, i) => (
             <Reveal
               key={key}
@@ -63,7 +63,7 @@ export function WorkModel() {
             >
               <span
                 aria-hidden="true"
-                className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
               />
               <span className="eyebrow text-gold-text">{String(i + 1).padStart(2, "0")}</span>
               <h3 className="type-h3 mt-6">{copy.items[key].name}</h3>

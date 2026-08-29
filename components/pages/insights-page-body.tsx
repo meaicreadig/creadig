@@ -57,14 +57,14 @@ export function InsightsPageBody() {
               <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3">
                 <Link
                   href="/produkte"
-                  className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+                  className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
                 >
                   {copy.emptyCtaProducts}
                   <ArrowUpRight className="size-4" strokeWidth={1.5} />
                 </Link>
                 <Link
                   href="/arbeiten"
-                  className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+                  className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
                 >
                   {copy.emptyCtaWorks}
                   <ArrowUpRight className="size-4" strokeWidth={1.5} />
@@ -107,7 +107,7 @@ export function InsightsPageBody() {
                       <article className="border-line relative border-t py-10 md:py-12">
                         <span
                           aria-hidden="true"
-                          className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                          className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                         />
                         <div className="grid gap-x-10 gap-y-5 md:grid-cols-12 md:items-baseline">
                           <div className="md:col-span-3">
@@ -119,7 +119,7 @@ export function InsightsPageBody() {
                             <p className="type-body text-muted-foreground mt-4 max-w-2xl text-pretty">
                               {entry.teaser[locale]}
                             </p>
-                            <span className="text-gold-text group-hover:text-foreground mt-5 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500">
+                            <span className="text-gold-text group-hover:text-foreground mt-5 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]">
                               {copy.readLabel}
                               <ArrowUpRight className="size-4" strokeWidth={1.5} />
                             </span>

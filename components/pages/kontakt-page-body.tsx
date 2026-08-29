@@ -68,7 +68,7 @@ export function KontaktPageBody() {
           <p className="eyebrow text-gold-text">{copy.mailLabel}</p>
           <a
             href={`mailto:${contact.email}`}
-            className="text-foreground hover:text-gold-text type-body transition-colors duration-500"
+            className="text-foreground hover:text-gold-text type-body transition-colors duration-[var(--dur-2)]"
           >
             {contact.email}
           </a>
@@ -84,7 +84,7 @@ export function KontaktPageBody() {
             </h2>
           </Reveal>
 
-          <div className="bg-line border-line mt-12 grid gap-px border sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
             {INTENTS.map((intent, i) => {
               const item = copy.intents[intent.key]
               const Icon = INTENT_ICONS[intent.key]
@@ -93,11 +93,11 @@ export function KontaktPageBody() {
                 <Reveal key={intent.key} delay={0.06 * i} className="flex">
                   <Link
                     href={intent.href}
-                    className="group bg-background hover:bg-surface relative flex w-full flex-col justify-between gap-8 p-7 transition-colors duration-500 lg:p-8"
+                    className="group tile bg-background hover:bg-surface relative flex w-full flex-col justify-between gap-8 p-7 transition-colors duration-[var(--dur-2)] lg:p-8"
                   >
                     <span
                       aria-hidden="true"
-                      className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                      className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                     />
                     <div>
                       <Icon className="text-gold size-5" strokeWidth={1.5} aria-hidden="true" />
@@ -110,12 +110,12 @@ export function KontaktPageBody() {
                       {item.cta}
                       {intent.href.startsWith("#") ? (
                         <ArrowRight
-                          className="size-4 transition-transform duration-500 group-hover:translate-x-1"
+                          className="size-4 transition-transform duration-[var(--dur-2)] group-hover:translate-x-1"
                           strokeWidth={1.5}
                         />
                       ) : (
                         <ArrowUpRight
-                          className="size-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                          className="size-4 transition-transform duration-[var(--dur-2)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                           strokeWidth={1.5}
                         />
                       )}

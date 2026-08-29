@@ -35,13 +35,13 @@ function Switch({
       aria-label={label}
       disabled={disabled}
       onClick={() => onChange?.(!checked)}
-      className={`relative h-6 w-11 shrink-0 border transition-colors duration-400 ${
+      className={`relative h-6 w-11 shrink-0 border transition-colors duration-[var(--dur-2)] ${
         checked ? "border-gold bg-gold/25" : "border-line-strong bg-transparent"
       } ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
     >
       <span
         aria-hidden="true"
-        className={`absolute top-1/2 size-4 -translate-y-1/2 transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        className={`absolute top-1/2 size-4 -translate-y-1/2 transition-all duration-[var(--dur-2)] ease-brand ${
           checked ? "bg-gold left-[1.5rem]" : "bg-line-strong left-[0.15rem]"
         }`}
       />
@@ -113,7 +113,7 @@ export function CookieConsent() {
       aria-labelledby="consent-title"
       className="fixed inset-x-0 bottom-0 z-[60] px-4 pb-4 md:px-6 md:pb-6"
     >
-      <div className="border-line-strong bg-background/97 relative mx-auto w-full max-w-4xl border elevation-3 backdrop-blur-xl">
+      <div className="border-line-strong bg-background/97 relative mx-auto w-full max-w-4xl rounded-lg border elevation-3 backdrop-blur-xl">
         <span aria-hidden="true" className="bg-gold absolute inset-x-0 top-0 h-px" />
 
         {/* Erneut geöffnet? Dann darf man ohne neue Entscheidung wieder zumachen. */}
@@ -125,7 +125,7 @@ export function CookieConsent() {
               setDetails(false)
             }}
             aria-label={t.consent.close}
-            className="text-muted-foreground hover:text-gold-text absolute top-4 right-4 transition-colors duration-400"
+            className="text-muted-foreground hover:text-gold-text absolute top-4 right-4 transition-colors duration-[var(--dur-2)]"
           >
             <X className="size-4" strokeWidth={1.5} />
           </button>
@@ -163,7 +163,7 @@ export function CookieConsent() {
           </p>
 
           {details && (
-            <div className="border-line mt-8 flex flex-col gap-px border-t">
+            <div className="border-line mt-8 flex flex-col border-t">
               {/* Essenziell — immer aktiv, nicht abwählbar. */}
               <div className="border-line flex items-start gap-5 border-b py-5">
                 <Switch checked disabled label={t.consent.categories.essential.name} />
@@ -210,7 +210,7 @@ export function CookieConsent() {
               onClick={() => decide(ACCEPT_ALL)}
               className="cta-outline inline-flex items-center justify-center gap-2.5 px-7 py-3.5 text-sm tracking-wide"
             >
-              <span className="group-hover/cta:text-gold-soft relative z-10 flex items-center gap-2.5 transition-colors duration-500">
+              <span className="group-hover/cta:text-gold-soft relative z-10 flex items-center gap-2.5 transition-colors duration-[var(--dur-2)]">
                 <Check className="size-4" strokeWidth={1.5} />
                 {t.consent.acceptAll}
               </span>
@@ -219,7 +219,7 @@ export function CookieConsent() {
             <button
               type="button"
               onClick={() => decide(ESSENTIAL_ONLY)}
-              className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center justify-center border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
+              className="cta-quiet inline-flex items-center justify-center px-7 py-3.5 text-sm tracking-wide"
             >
               {t.consent.essentialOnly}
             </button>
@@ -228,7 +228,7 @@ export function CookieConsent() {
               <button
                 type="button"
                 onClick={() => decide(choice)}
-                className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center justify-center gap-2.5 border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                className="cta-quiet inline-flex items-center justify-center gap-2.5 px-7 py-3.5 text-sm tracking-wide"
               >
                 <Check className="size-4" strokeWidth={1.5} />
                 {t.consent.save}
@@ -237,7 +237,7 @@ export function CookieConsent() {
               <button
                 type="button"
                 onClick={() => setDetails(true)}
-                className="text-muted-foreground hover:text-gold-text inline-flex items-center justify-center gap-2 py-3.5 text-sm tracking-wide transition-colors duration-500 sm:px-2"
+                className="text-muted-foreground hover:text-gold-text inline-flex items-center justify-center gap-2 py-3.5 text-sm tracking-wide transition-colors duration-[var(--dur-2)] sm:px-2"
               >
                 <SlidersHorizontal className="size-4" strokeWidth={1.5} />
                 {t.consent.customize}

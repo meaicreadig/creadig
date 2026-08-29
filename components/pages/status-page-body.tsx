@@ -76,7 +76,7 @@ export function StatusPageBody({
             onClick={action.onClick}
             className="cta-outline mt-10 inline-flex items-center gap-2.5 px-7 py-3.5 text-sm tracking-wide"
           >
-            <span className="group-hover:text-gold-soft relative z-10 transition-colors duration-500">
+            <span className="group-hover:text-gold-soft relative z-10 transition-colors duration-[var(--dur-2)]">
               {action.label}
             </span>
           </button>
@@ -89,7 +89,7 @@ export function StatusPageBody({
             <li key={way.href}>
               <Link
                 href={localePath(way.href, locale)}
-                className="group border-line hover:bg-foreground/[0.03] relative flex items-start gap-5 border-b py-6 transition-colors duration-500"
+                className="group border-line hover:bg-foreground/[0.03] relative flex items-start gap-5 border-b py-6 transition-colors duration-[var(--dur-2)]"
               >
                 <span className="flex-1">
                   <span className="text-display block text-xl">{way.label}</span>
@@ -98,7 +98,7 @@ export function StatusPageBody({
                   </span>
                 </span>
                 <ArrowUpRight
-                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 shrink-0 transition-colors duration-500"
+                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 shrink-0 transition-colors duration-[var(--dur-2)]"
                   strokeWidth={1.5}
                 />
               </Link>
@@ -115,14 +115,14 @@ export function StatusPageBody({
             href={contact.whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2.5 border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
+            className="cta-quiet inline-flex items-center gap-2.5 px-6 py-3.5 text-sm tracking-wide"
           >
             <WhatsAppIcon className="size-4" />
             {copy.whatsapp}
           </a>
           <a
             href={`mailto:${contact.email}`}
-            className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2.5 border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
+            className="cta-quiet inline-flex items-center gap-2.5 px-6 py-3.5 text-sm tracking-wide"
           >
             {copy.mail}
             <span className="text-muted-foreground font-mono text-xs">{contact.email}</span>

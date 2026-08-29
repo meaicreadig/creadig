@@ -77,7 +77,7 @@ export function MagneticButton({
       // Die Marke steht in `globals.css` (`cta-outline`) — nicht hier. Sonst
       // liegt dieselbe Rezeptur wieder an mehreren Stellen und laeuft auseinander.
       ? "cta-outline"
-      : "border-line-strong text-muted-foreground hover:border-foreground border bg-transparent transition-colors duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-foreground",
+      : "border-line-strong text-muted-foreground hover:border-foreground border bg-transparent transition-colors duration-[var(--dur-2)] ease-brand hover:text-foreground",
     className,
   )
 

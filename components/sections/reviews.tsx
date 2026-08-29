@@ -75,16 +75,16 @@ export function Reviews() {
           </Reveal>
         </div>
 
-        <div className="mt-20 grid gap-px sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-20 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {approvedReviews.map((review, i) => (
             <Reveal
               key={review.id}
               delay={0.06 * i}
-              className="group border-line hover:bg-foreground/[0.02] relative flex flex-col border-t p-7 transition-colors duration-500"
+              className="group tile hover:bg-foreground/[0.02] relative flex flex-col p-7 transition-colors duration-[var(--dur-2)]"
             >
               <span
                 aria-hidden="true"
-                className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
+                className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
               />
 
               {review.rating !== null && (
@@ -128,7 +128,7 @@ export function Reviews() {
                     href={review.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-gold-text type-small mt-2 inline-flex items-center gap-1.5 transition-colors duration-500"
+                    className="text-muted-foreground hover:text-gold-text type-small mt-2 inline-flex items-center gap-1.5 transition-colors duration-[var(--dur-2)]"
                   >
                     {t.reviews.verify}
                     <ArrowUpRight className="size-3.5" strokeWidth={1.5} />

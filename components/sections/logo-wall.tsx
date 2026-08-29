@@ -24,12 +24,12 @@ function LogoSlot({
 }) {
   return (
     <div
-      className="group border-line bg-surface-raised relative flex h-28 w-60 shrink-0 flex-col items-center justify-center gap-3 border transition-all duration-500 hover:-translate-y-1.5 hover:elevation-2"
+      className="group tile bg-surface-raised relative flex h-28 w-60 shrink-0 flex-col items-center justify-center gap-3 transition-all duration-[var(--dur-2)] hover:-translate-y-1.5 hover:elevation-2"
       style={{ ["--brand" as string]: color }}
     >
       <span
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-px w-0 transition-all duration-600 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+        className="absolute inset-x-0 bottom-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
         style={{ backgroundColor: "var(--brand)" }}
       />
       {logoPath ? (
@@ -51,24 +51,24 @@ function LogoSlot({
             eine weisse Silhouette, beim Hover die echte Markenfarbe — dieselbe
             Dramaturgie wie in Hell, nur mit umgekehrtem Ausgangspunkt.
           */
-          className="h-8 w-auto max-w-[9rem] opacity-70 grayscale transition-all duration-500 group-hover:opacity-100 group-hover:grayscale-0 dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
+          className="h-8 w-auto max-w-[9rem] opacity-70 grayscale transition-all duration-[var(--dur-2)] group-hover:opacity-100 group-hover:grayscale-0 dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
         />
       ) : (
         <>
           <span
             aria-hidden="true"
-            className="border-line-strong text-muted-foreground flex size-9 items-center justify-center type-small border font-semibold tracking-tight transition-all duration-500 group-hover:border-[var(--brand)] group-hover:text-[var(--brand)]"
+            className="border-line-strong text-muted-foreground flex size-9 items-center justify-center type-small border font-semibold tracking-tight transition-all duration-[var(--dur-2)] group-hover:border-[var(--brand)] group-hover:text-[var(--brand)]"
           >
             {mark}
           </span>
-          <span className="text-muted-foreground group-hover:text-foreground type-small text-center tracking-wide transition-colors duration-500">
+          <span className="text-muted-foreground group-hover:text-foreground type-small text-center tracking-wide transition-colors duration-[var(--dur-2)]">
             {name}
           </span>
         </>
       )}
       {/* Ohne bestaetigte Region steht dort nichts — keine Vermutung. */}
       {region && (
-        <span className="text-muted-foreground eyebrow absolute top-3 right-3 transition-colors duration-500 group-hover:text-[var(--brand)]">
+        <span className="text-muted-foreground eyebrow absolute top-3 right-3 transition-colors duration-[var(--dur-2)] group-hover:text-[var(--brand)]">
           {region}
         </span>
       )}

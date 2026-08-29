@@ -58,7 +58,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
       <div className="mx-auto w-full max-w-3xl px-6 pt-32 pb-24 md:px-10 md:pt-40">
         <Link
           href="/"
-          className="text-muted-foreground hover:text-gold-text type-small inline-flex items-center gap-2 transition-colors duration-300"
+          className="text-muted-foreground hover:text-gold-text type-small inline-flex items-center gap-2 transition-colors duration-[var(--dur-1)]"
         >
           <ArrowLeft className="size-4" strokeWidth={1.5} />
           {t.legal.back}
@@ -97,7 +97,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
                     href={contact.whatsappHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-gold-text font-mono transition-colors duration-300"
+                    className="hover:text-gold-text font-mono transition-colors duration-[var(--dur-1)]"
                   >
                     {contact.whatsapp}
                   </a>
@@ -106,7 +106,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
                   <li>
                     <a
                       href={`tel:${imprintDetails.phone.replace(/[^+\d]/g, "")}`}
-                      className="hover:text-gold-text font-mono transition-colors duration-300"
+                      className="hover:text-gold-text font-mono transition-colors duration-[var(--dur-1)]"
                     >
                       {imprintDetails.phone}
                     </a>
@@ -127,7 +127,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
                 <li>
                   <a
                     href={`mailto:${contact.email}`}
-                    className="hover:text-gold-text transition-colors duration-300"
+                    className="hover:text-gold-text transition-colors duration-[var(--dur-1)]"
                   >
                     {contact.email}
                   </a>
@@ -195,7 +195,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
                 {t.legal.processorsIntro}
               </p>
 
-              <ul className="mt-8 flex flex-col gap-px">
+              <ul className="mt-8 flex flex-col">
                 {processors.map((processor) => (
                   <li key={processor.key} className="border-line border-t pt-5 pb-5">
                     <div className="flex flex-wrap items-center gap-3">
@@ -261,7 +261,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
               <button
                 type="button"
                 onClick={openConsentSettings}
-                className="border-line-strong hover:border-gold hover:text-gold-text mt-5 inline-flex items-center gap-2.5 border px-6 py-3 text-sm tracking-wide transition-colors duration-500"
+                className="cta-quiet mt-5 inline-flex items-center gap-2.5 px-6 py-3 text-sm tracking-wide"
               >
                 <SlidersHorizontal className="size-4" strokeWidth={1.5} />
                 {t.consent.settingsLabel}

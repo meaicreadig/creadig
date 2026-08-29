@@ -37,7 +37,7 @@ export function CaseStudies() {
           </Reveal>
         </div>
 
-        <div className="mt-20 flex flex-col gap-px">
+        <div className="mt-20 flex flex-col gap-12">
           {approvedCaseStudies.map((study, i) => (
             <Reveal
               key={study.slug}
@@ -46,7 +46,7 @@ export function CaseStudies() {
             >
               <span
                 aria-hidden="true"
-                className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
               />
               <CaseStudyBody study={study} />
             </Reveal>

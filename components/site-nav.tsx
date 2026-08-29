@@ -103,7 +103,7 @@ export function SiteNav() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "fixed inset-x-0 top-0 z-50 transition-all duration-[var(--dur-2)] ease-brand",
         scrolled
           ? "border-b border-line bg-background/85 backdrop-blur-xl"
           : "border-b border-transparent bg-transparent",
@@ -130,7 +130,7 @@ export function SiteNav() {
                 aria-current={active ? "page" : undefined}
                 title={t.nav.hints[link.labelKey as keyof typeof t.nav.hints]}
                 className={cn(
-                  "group relative py-1 text-sm tracking-wide transition-colors duration-300 hover:text-foreground",
+                  "group relative py-1 text-sm tracking-wide transition-colors duration-[var(--dur-1)] hover:text-foreground",
                   active ? "text-foreground" : "text-muted-foreground",
                 )}
               >
@@ -139,7 +139,7 @@ export function SiteNav() {
                     Hover, wo man hinkaeme. Dieselbe Bewegung, zwei Rollen. */}
                 <span
                   className={cn(
-                    "absolute -bottom-0.5 left-0 h-px bg-gold transition-all duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full",
+                    "absolute -bottom-0.5 left-0 h-px bg-gold transition-all duration-[var(--dur-2)] ease-brand group-hover:w-full",
                     active ? "w-full" : "w-0",
                   )}
                 />

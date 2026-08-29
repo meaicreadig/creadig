@@ -43,11 +43,11 @@ export function WorkRegistry() {
                   — dieselbe Adresse wie die Karte daneben (site-data.workHref). */}
               <Link
                 href={workHref(work)}
-                className="group border-line hover:bg-foreground/[0.03] relative block border-t transition-colors duration-500"
+                className="group border-line hover:bg-foreground/[0.03] relative block border-t transition-colors duration-[var(--dur-2)]"
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                 />
                 <div className="grid items-baseline gap-x-8 gap-y-2 px-2 py-6 md:grid-cols-12">
                   <span className="eyebrow text-gold-text md:col-span-1">{number}</span>
@@ -55,7 +55,7 @@ export function WorkRegistry() {
                   <span className="text-subhead flex items-center gap-2 text-xl md:col-span-5">
                     {work.name}
                     <ArrowUpRight
-                      className="text-gold size-4 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                      className="text-gold size-4 shrink-0 transition-transform duration-[var(--dur-2)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                       strokeWidth={1.5}
                     />
                   </span>

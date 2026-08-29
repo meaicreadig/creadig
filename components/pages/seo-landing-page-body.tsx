@@ -75,11 +75,11 @@ export function SeoLandingPageBody({ landing }: { landing: SeoLanding }) {
             <Reveal delay={0.12}>
               <Link
                 href={`/leistungen/${service.slug}`}
-                className="group text-gold-text hover:text-foreground border-line mt-14 inline-flex items-center gap-2 border-t pt-6 text-sm tracking-wide transition-colors duration-500"
+                className="group text-gold-text hover:text-foreground border-line mt-14 inline-flex items-center gap-2 border-t pt-6 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
               >
                 {service.h1[locale]}
                 <ArrowUpRight
-                  className="size-4 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  className="size-4 transition-transform duration-[var(--dur-2)] ease-brand group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                   strokeWidth={1.5}
                 />
               </Link>

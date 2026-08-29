@@ -44,7 +44,7 @@ export function Faq() {
                   <h3 className="text-subhead text-lg text-pretty md:text-xl">{item.q}</h3>
                   <Plus
                     aria-hidden="true"
-                    className="text-muted-foreground group-open:text-gold-text mt-1 size-5 shrink-0 transition-transform duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-open:rotate-45"
+                    className="text-muted-foreground group-open:text-gold-text mt-1 size-5 shrink-0 transition-transform duration-[var(--dur-2)] ease-brand group-open:rotate-45"
                     strokeWidth={1.5}
                   />
                 </summary>
@@ -62,7 +62,7 @@ export function Faq() {
             <p className="type-body text-muted-foreground">{t.faq.more}</p>
             <Link
               href="/kontakt"
-              className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {t.faq.moreCta}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />

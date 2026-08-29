@@ -48,7 +48,7 @@ export function CompanyChapters() {
           </h2>
         </Reveal>
 
-        <ol className="relative mt-20 grid gap-14 md:grid-cols-3 md:gap-px">
+        <ol className="relative mt-20 grid gap-14 md:grid-cols-3 md:gap-x-2.5">
           {/*
             Die Schiene. Waagerecht erst ab `md` — auf dem Telefon stehen die
             Etappen untereinander, und eine liegende Linie waere dort eine

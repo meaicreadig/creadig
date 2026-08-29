@@ -44,7 +44,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
         <nav aria-label="Brotkrumen">
           <ol className="text-muted-foreground flex flex-wrap items-center gap-2 text-meta">
             <li>
-              <Link href="/" className="hover:text-foreground transition-colors duration-300">
+              <Link href="/" className="hover:text-foreground transition-colors duration-[var(--dur-1)]">
                 {copy.breadcrumbHome}
               </Link>
             </li>
@@ -52,7 +52,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
             <li>
               <Link
                 href="/leistungen"
-                className="hover:text-foreground transition-colors duration-300"
+                className="hover:text-foreground transition-colors duration-[var(--dur-1)]"
               >
                 {copy.breadcrumbServices}
               </Link>
@@ -155,7 +155,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                     <Link
                       key={link.href}
                       href={link.href}
-                      className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+                      className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
                     >
                       {link.label[locale]}
                       <ArrowUpRight className="size-4" strokeWidth={1.5} />
@@ -270,14 +270,14 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
             {page.fromTo && (
               <Reveal delay={0.09} className="border-line mt-14 border-t pt-8">
                 <p className="eyebrow text-gold-text">{copy.fromToLabel}</p>
-                <div className="border-line bg-line mt-6 grid gap-px border sm:grid-cols-2">
-                  <div className="bg-surface px-6 py-6">
+                <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
+                  <div className="tile bg-surface px-6 py-6">
                     <p className="eyebrow text-muted-foreground">{copy.fromToBefore}</p>
                     <p className="type-body text-muted-foreground mt-4 text-pretty">
                       {page.fromTo.before[locale]}
                     </p>
                   </div>
-                  <div className="bg-surface px-6 py-6">
+                  <div className="tile bg-surface px-6 py-6">
                     <p className="eyebrow text-gold-text">{copy.fromToAfter}</p>
                     <p className="type-body text-foreground/85 mt-4 text-pretty">
                       {page.fromTo.after[locale]}
@@ -290,11 +290,11 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
             {works.length > 0 && (
               <Reveal delay={0.12} className="border-line mt-14 border-t pt-8">
                 <p className="eyebrow text-gold-text">{copy.worksLabel}</p>
-                <ul className="border-line bg-line mt-6 grid gap-px border sm:grid-cols-2">
+                <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
                   {works.map((work) => (
                     <li
                       key={work.slug}
-                      className="bg-surface flex flex-col gap-2 px-6 py-6"
+                      className="tile bg-surface flex flex-col gap-2 px-6 py-6"
                     >
                       <span className="text-subhead text-lg">{work.name}</span>
                       <span className="type-small text-muted-foreground text-pretty">
@@ -305,7 +305,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                 </ul>
                 <Link
                   href="/arbeiten"
-                  className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+                  className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
                 >
                   {copy.worksCta}
                   <ArrowUpRight className="size-4" strokeWidth={1.5} />
@@ -388,7 +388,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
             */}
             <Reveal delay={0.08} className="border-line mt-14 border-t pt-8">
               <p className="eyebrow text-gold-text">{copy.packagesLabel}</p>
-              <ul className="mt-6 flex flex-col gap-px">
+              <ul className="mt-6 flex flex-col">
                 {packages
                   .filter((pkg) => page.packageKeys.includes(pkg.key))
                   .map((pkg) => (
@@ -414,7 +414,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
               )}
               <Link
                 href="/leistungen#pakete"
-                className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+                className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
               >
                 {copy.packagesCta}
                 <ArrowUpRight className="size-4" strokeWidth={1.5} />
@@ -442,9 +442,9 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
           <Reveal delay={0.06}>
             <div className="border-line mt-24 border-t pt-10">
               <p className="eyebrow text-gold-text">{copy.priceLadderLabel}</p>
-              <div className="border-line bg-line mt-8 grid gap-px border md:grid-cols-3">
+              <div className="mt-8 grid gap-2.5 md:grid-cols-3">
                 {page.priceLadder.steps.map((step) => (
-                  <div key={step.key} className="bg-surface flex flex-col gap-4 px-7 py-8">
+                  <div key={step.key} className="tile bg-surface flex flex-col gap-4 px-7 py-8">
                     <h2 className="text-subhead text-lg">{step.title[locale]}</h2>
                     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                       <span className="type-stat">{step.price[locale]}</span>
@@ -514,7 +514,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                 href={WHATSAPP_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2.5 border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                className="cta-quiet inline-flex items-center gap-2.5 px-7 py-3.5 text-sm tracking-wide"
               >
                 <WhatsAppIcon className="size-4" />
                 {copy.ctaSecondary}

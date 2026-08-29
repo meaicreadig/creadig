@@ -62,7 +62,7 @@ export function PageHeader({
         <nav aria-label="Brotkrumen">
           <ol className="text-muted-foreground flex flex-wrap items-center gap-2 text-meta">
             <li>
-              <Link href="/" className="hover:text-foreground transition-colors duration-300">
+              <Link href="/" className="hover:text-foreground transition-colors duration-[var(--dur-1)]">
                 {t.nav.home}
               </Link>
             </li>
@@ -71,7 +71,7 @@ export function PageHeader({
                 <ChevronRight aria-hidden="true" className="size-3.5" strokeWidth={1.5} />
                 <Link
                   href={crumb.href}
-                  className="hover:text-foreground transition-colors duration-300"
+                  className="hover:text-foreground transition-colors duration-[var(--dur-1)]"
                 >
                   {crumb.label}
                 </Link>

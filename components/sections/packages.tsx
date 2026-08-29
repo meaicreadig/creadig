@@ -34,7 +34,7 @@ export function Packages() {
           Kein Design-Eingriff, nur die Vermeidung eines Bruchs.
         */}
         <div
-          className={`mt-20 grid gap-px ${
+          className={`mt-20 grid gap-2.5 ${
             packages.length >= 3
               ? "lg:grid-cols-3"
               : packages.length === 2
@@ -49,7 +49,7 @@ export function Packages() {
               <Reveal
                 key={pkg.key}
                 delay={0.08 * i}
-                className={`group border-line relative flex flex-col border-t p-8 transition-[background-color,box-shadow] duration-500 md:p-9 ${
+                className={`group tile relative flex flex-col p-8 transition-[background-color,box-shadow] duration-[var(--dur-2)] md:p-9 ${
                   // Das empfohlene Paket liegt eine Stufe hoeher — die einzige
                   // Karte der Seite, die den Grund verlaesst.
                   pkg.recommended
@@ -59,7 +59,7 @@ export function Packages() {
               >
                 <span
                   aria-hidden="true"
-                  className={`bg-gold absolute top-0 left-0 h-px transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  className={`bg-gold absolute top-0 left-0 h-px transition-all duration-[var(--dur-3)] ease-brand ${
                     pkg.recommended ? "w-full" : "w-0 group-hover:w-full"
                   }`}
                 />
@@ -127,7 +127,7 @@ export function Packages() {
 
                 {/* „Für wen" — Zeile aus der bisherigen Live-Seite übernommen. */}
                 <div className="border-line mt-8 border-t pt-6">
-                  <p className="eyebrow text-muted-foreground group-hover:text-gold-text transition-colors duration-500">
+                  <p className="eyebrow text-muted-foreground group-hover:text-gold-text transition-colors duration-[var(--dur-2)]">
                     {t.packages.forWhom}
                   </p>
                   {/* Zweizeilige Reserve, gleiche Begruendung wie beim Namen. */}
@@ -176,7 +176,7 @@ export function Packages() {
                   className={
                     pkg.recommended
                       ? "cta-outline mt-7 inline-flex items-center justify-between gap-2 px-5 py-3.5 text-sm tracking-wide"
-                      : "border-line-strong hover:border-gold hover:text-gold-text mt-7 inline-flex items-center justify-between gap-2 border px-5 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                      : "cta-quiet mt-7 inline-flex items-center justify-between gap-2 px-5 py-3.5 text-sm tracking-wide"
                   }
                 >
                   <span className="flex w-full items-center justify-between gap-2">
@@ -210,7 +210,7 @@ export function Packages() {
           </div>
           <Link
             href="/termin"
-            className="border-line-strong hover:border-gold hover:text-gold-text inline-flex shrink-0 items-center gap-2.5 border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
+            className="cta-quiet inline-flex shrink-0 items-center gap-2.5 px-6 py-3.5 text-sm tracking-wide"
           >
             {t.packages.openCta}
             <ArrowUpRight className="size-4" strokeWidth={1.5} />

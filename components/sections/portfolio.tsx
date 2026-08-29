@@ -64,7 +64,7 @@ function WorkCard({
   return (
     <Link
       href={workHref(work)}
-      className="group border-line bg-surface elevation-1 hover:elevation-2 relative flex w-full flex-col overflow-hidden border transition-shadow duration-500"
+      className="group tile bg-surface elevation-1 hover:elevation-2 relative flex w-full flex-col transition-shadow duration-[var(--dur-2)]"
     >
       <div
         className={cn(
@@ -82,14 +82,14 @@ function WorkCard({
                 ? "(max-width: 1024px) 100vw, 33vw"
                 : "(max-width: 1024px) 100vw, 50vw"
             }
-            className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+            className="object-cover transition-transform duration-[1200ms] ease-brand group-hover:scale-[1.04]"
           />
         ) : (
           <MonogramPanel mark={work.mark} />
         )}
         <div
           aria-hidden="true"
-          className="from-ink/55 via-ink/5 absolute inset-0 bg-gradient-to-t to-transparent opacity-70 transition-opacity duration-700 group-hover:opacity-40"
+          className="from-ink/55 via-ink/5 absolute inset-0 bg-gradient-to-t to-transparent opacity-70 transition-opacity duration-[var(--dur-3)] group-hover:opacity-40"
         />
 
         <div className="absolute top-4 left-4 flex items-center gap-2">
@@ -125,7 +125,7 @@ function WorkCard({
 
         {/* Hover-Reveal: was wir gebaut haben — nur, wo der Umfang belegt ist. */}
         {work.built && (
-          <div className="bg-background/95 absolute inset-x-0 bottom-0 translate-y-full p-5 backdrop-blur-md transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0">
+          <div className="bg-background/95 absolute inset-x-0 bottom-0 translate-y-full p-5 backdrop-blur-md transition-transform duration-[var(--dur-3)] ease-brand group-hover:translate-y-0">
             <p className="eyebrow text-gold-text">{builtLabel}</p>
             <p className="type-small text-foreground mt-2 text-pretty">
               {work.built[locale]}
@@ -142,7 +142,7 @@ function WorkCard({
             >
               {work.name}
             </h3>
-            <ArrowUpRight className="text-gold mt-1 size-4 shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            <ArrowUpRight className="text-gold mt-1 size-4 shrink-0 transition-transform duration-[var(--dur-2)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </div>
           <p className="type-body text-muted-foreground mt-3 max-w-md text-pretty">
             {work.what[locale]}
@@ -210,7 +210,7 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
         <div
           role="group"
           aria-label={t.portfolio.viewLabel}
-          className="flex gap-px"
+          className="flex gap-2"
         >
           {(
             [
@@ -224,7 +224,7 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
               onClick={() => setView(key)}
               aria-pressed={view === key}
               className={cn(
-                "eyebrow border px-4 py-2.5 transition-colors duration-500",
+                "eyebrow rounded-sm border px-4 py-2.5 transition-colors duration-[var(--dur-2)]",
                 view === key
                   ? "border-gold bg-gold/10 text-gold-text"
                   : "border-line-strong text-muted-foreground hover:border-gold hover:text-gold-text",
@@ -303,16 +303,16 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
           <p className="eyebrow text-foreground">{t.portfolio.more}</p>
           <Separator className="flex-1" />
         </div>
-        <ul className="border-line bg-line mt-6 grid gap-px border sm:grid-cols-2">
+        <ul className="mt-6 grid gap-2.5 sm:grid-cols-2">
           {furtherProjects.map((project) => (
             <li
               key={project.name}
-              className="group bg-surface hover:bg-surface-raised flex items-baseline justify-between gap-4 px-6 py-7 transition-colors duration-500"
+              className="group tile bg-surface hover:bg-surface-raised flex items-baseline justify-between gap-4 px-6 py-7 transition-colors duration-[var(--dur-2)]"
             >
               <span className="text-subhead text-foreground text-xl">
                 {project.name}
               </span>
-              <span className="text-muted-foreground group-hover:text-gold-text text-right text-[0.75rem] transition-colors duration-500">
+              <span className="text-muted-foreground group-hover:text-gold-text text-right text-[0.75rem] transition-colors duration-[var(--dur-2)]">
                 {project.what[locale]}
               </span>
             </li>

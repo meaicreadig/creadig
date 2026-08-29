@@ -42,7 +42,7 @@ export function About() {
           </div>
 
           {/* Faktenspalte: Gründer, Schwerpunkte, Sitz */}
-          <div className="flex flex-col gap-px lg:col-span-5">
+          <div className="flex flex-col lg:col-span-5">
             <Reveal delay={0.06} className="border-line border-t pt-7">
               <p className="eyebrow text-gold-text">{t.about.founderLabel}</p>
               <p className="type-statement mt-4">

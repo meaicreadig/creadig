@@ -70,7 +70,7 @@ export function Services({ heading = true }: { heading?: boolean }) {
                 <li key={page.slug}>
                   <Link
                     href={`/leistungen/${page.slug}`}
-                    className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-4 py-2.5 text-sm tracking-wide transition-colors duration-500"
+                    className="cta-quiet inline-flex items-center gap-2 px-4 py-2.5 text-sm tracking-wide"
                   >
                     {page.chip[locale]}
                     <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
@@ -82,7 +82,7 @@ export function Services({ heading = true }: { heading?: boolean }) {
         </Reveal>
 
         {/* Aufsteigende Ebenen — von 05 oben nach 01 unten gelesen als Bauwerk */}
-        <div className="mt-20 flex flex-col-reverse gap-px">
+        <div className="mt-20 flex flex-col-reverse gap-2">
           {serviceLayers.map((layer, i) => {
             const copy = t.services.layers[layer.key]
             // Ebene 01 = schmalste Basis, Ebene 05 = breiteste Spitze der Wirkung
@@ -101,13 +101,13 @@ export function Services({ heading = true }: { heading?: boolean }) {
                   id={`ebene-${layer.key}`}
                   style={{ marginLeft: `${inset}%`, marginRight: `${inset}%` }}
                   /* scroll-mt: die feste Leiste (4,5rem) darf den Anker nicht verdecken. */
-                  className={`border-line relative scroll-mt-28 border-t transition-colors duration-500 ${
+                  className={`tile relative scroll-mt-28 transition-colors duration-[var(--dur-2)] ${
                     isTop ? "bg-foreground/[0.03]" : ""
                   } hover:bg-foreground/[0.04]`}
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
                   <div className="grid items-baseline gap-x-8 gap-y-4 px-2 pt-9 pb-7 md:grid-cols-12 md:px-6">
                     <div className="flex items-baseline gap-4 md:col-span-4">
@@ -120,7 +120,7 @@ export function Services({ heading = true }: { heading?: boolean }) {
                       {copy.what}
                     </p>
                     <div className="md:col-span-3">
-                      <p className="eyebrow text-muted-foreground group-hover:text-gold-text transition-colors duration-500">
+                      <p className="eyebrow text-muted-foreground group-hover:text-gold-text transition-colors duration-[var(--dur-2)]">
                         {t.services.forWhom}
                       </p>
                       <p className="type-small text-muted-foreground mt-2.5 text-pretty">

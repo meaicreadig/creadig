@@ -96,7 +96,7 @@ export function ProduktPageBody({
       >
         {/* Signal-Zeile: nur belegte Felder. `year` ist überall null und
             steht darum bewusst nirgends. */}
-        <div className="border-line mt-12 grid gap-px border-t sm:grid-cols-3">
+        <div className="border-line mt-12 grid border-t sm:grid-cols-3">
           <div className="pt-7 sm:pr-8">
             <p className="eyebrow text-gold-text">{copy.statusLabel}</p>
             {/* Gefuellt = laeuft, offen = im Aufbau. Der Unterschied ist die
@@ -136,7 +136,7 @@ export function ProduktPageBody({
               href={product.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2.5 border px-7 py-3.5 text-sm tracking-wide transition-colors duration-500"
+              className="cta-quiet inline-flex items-center gap-2.5 px-7 py-3.5 text-sm tracking-wide"
             >
               {copy.liveLabel}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
@@ -199,7 +199,7 @@ export function ProduktPageBody({
               {screens.map((src, i) => (
                 <Reveal key={src} delay={0.06 * i}>
                   <figure>
-                    <div className="border-line bg-surface elevation-1 relative aspect-[16/10] w-full overflow-hidden border">
+                    <div className="border-line bg-surface elevation-1 relative aspect-[16/10] w-full overflow-hidden rounded-lg border">
                       <Image
                         src={src}
                         alt={`${product.name} — Oberfläche aus dem laufenden System`}
@@ -265,7 +265,7 @@ export function ProduktPageBody({
               Rand ab. Das sah nach fehlendem Inhalt aus, nicht nach drei.
             */}
             <div
-              className={`mt-16 grid gap-px sm:grid-cols-2 ${
+              className={`mt-16 grid gap-x-2.5 gap-y-12 sm:grid-cols-2 ${
                 world.blocks.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"
               }`}
             >
@@ -277,7 +277,7 @@ export function ProduktPageBody({
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
                   <span className="eyebrow text-gold-text">
                     {String(i + 1).padStart(2, "0")}
@@ -407,7 +407,7 @@ export function ProduktPageBody({
                 </p>
                 <Link
                   href={`/leistungen#ebene-${world.layer}`}
-                  className="text-gold-text hover:text-foreground mt-8 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+                  className="text-gold-text hover:text-foreground mt-8 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
                 >
                   {copy.layerCta}
                   <ArrowUpRight className="size-4" strokeWidth={1.5} />
@@ -434,7 +434,7 @@ export function ProduktPageBody({
                         <li key={page.slug}>
                           <Link
                             href={`/leistungen/${page.slug}`}
-                            className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-4 py-2.5 text-sm tracking-wide transition-colors duration-500"
+                            className="cta-quiet inline-flex items-center gap-2 px-4 py-2.5 text-sm tracking-wide"
                           >
                             {page.chip[locale]}
                             <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
@@ -474,7 +474,7 @@ export function ProduktPageBody({
           ------------------------------------------------------------------ */}
       {neighbours && (
         <section aria-label={copy.nextLabel} className="section-seam">
-          <div className="section-gutter grid gap-px sm:grid-cols-2">
+          <div className="section-gutter grid gap-2.5 sm:grid-cols-2">
             {(
               [
                 [copy.prevLabel, neighbours.prev, "prev"],
@@ -484,26 +484,26 @@ export function ProduktPageBody({
               <Link
                 key={direction}
                 href={`/produkte/${neighbour.slug}`}
-                className={`group hover:bg-surface relative flex flex-col gap-3 py-10 transition-colors duration-500 ${
+                className={`group hover:bg-surface relative flex flex-col gap-3 py-10 transition-colors duration-[var(--dur-2)] ${
                   direction === "next" ? "sm:items-end sm:text-right" : ""
                 }`}
               >
                 <span className="eyebrow text-muted-foreground flex items-center gap-2">
                   {direction === "prev" && (
                     <ArrowLeft
-                      className="size-3.5 transition-transform duration-500 group-hover:-translate-x-1"
+                      className="size-3.5 transition-transform duration-[var(--dur-2)] group-hover:-translate-x-1"
                       strokeWidth={1.5}
                     />
                   )}
                   {label}
                   {direction === "next" && (
                     <ArrowRight
-                      className="size-3.5 transition-transform duration-500 group-hover:translate-x-1"
+                      className="size-3.5 transition-transform duration-[var(--dur-2)] group-hover:translate-x-1"
                       strokeWidth={1.5}
                     />
                   )}
                 </span>
-                <span className="type-h3 group-hover:text-gold-text transition-colors duration-500">
+                <span className="type-h3 group-hover:text-gold-text transition-colors duration-[var(--dur-2)]">
                   {neighbour.name}
                 </span>
                 <span className="type-small text-muted-foreground max-w-sm text-pretty">
@@ -553,7 +553,7 @@ export function ProduktPageBody({
           <Reveal delay={0.08}>
             <Link
               href="/produkte"
-              className="text-muted-foreground hover:text-foreground mt-14 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="text-muted-foreground hover:text-foreground mt-14 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               <ArrowLeft className="size-4" strokeWidth={1.5} />
               {copy.backLabel}

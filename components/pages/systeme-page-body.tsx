@@ -87,7 +87,7 @@ export function SystemePageBody() {
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
                   <h3 className="text-subhead text-lg">{item.name}</h3>
                   <p className="type-small text-muted-foreground mt-3 flex-1 text-pretty">
@@ -167,7 +167,7 @@ export function SystemePageBody() {
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
                   <h3 className="text-subhead text-lg">{item.name}</h3>
                   <p className="type-small text-muted-foreground mt-3 text-pretty">{item.body}</p>
@@ -183,11 +183,11 @@ export function SystemePageBody() {
               </p>
               <Link
                 href="/betrieb"
-                className="group text-gold-text hover:text-foreground inline-flex shrink-0 items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+                className="group text-gold-text hover:text-foreground inline-flex shrink-0 items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
               >
                 {t.nav.betrieb}
                 <ArrowUpRight
-                  className="size-4 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  className="size-4 transition-transform duration-[var(--dur-2)] ease-brand group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                   strokeWidth={1.5}
                 />
               </Link>
@@ -225,7 +225,7 @@ export function SystemePageBody() {
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
                   <h3 className="text-subhead text-lg">{item.name}</h3>
                   <p className="type-small text-muted-foreground mt-3 text-pretty">{item.body}</p>
@@ -238,11 +238,11 @@ export function SystemePageBody() {
           <Reveal delay={0.16}>
             <Link
               href="/barrierefreiheit"
-              className="group text-gold-text hover:text-foreground border-line mt-16 inline-flex items-center gap-2 border-t pt-6 text-sm tracking-wide transition-colors duration-500"
+              className="group text-gold-text hover:text-foreground border-line mt-16 inline-flex items-center gap-2 border-t pt-6 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {t.accessibility.eyebrow}
               <ArrowUpRight
-                className="size-4 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                className="size-4 transition-transform duration-[var(--dur-2)] ease-brand group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                 strokeWidth={1.5}
               />
             </Link>

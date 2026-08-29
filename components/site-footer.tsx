@@ -47,7 +47,7 @@ export function SiteFooter() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
                   >
                     {t.nav[link.labelKey]}
                   </Link>
@@ -65,7 +65,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   href="/systeme"
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
                 >
                   {t.nav.systeme}
                 </Link>
@@ -73,7 +73,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   href="/betrieb"
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
                 >
                   {t.nav.betrieb}
                 </Link>
@@ -81,7 +81,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   href="/kontakt"
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
                 >
                   {t.nav.kontakt}
                 </Link>
@@ -103,7 +103,7 @@ export function SiteFooter() {
                 <li key={key}>
                   <Link
                     href={`/leistungen#ebene-${key}`}
-                    className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
                   >
                     {t.services.layers[key].name}
                   </Link>
@@ -125,7 +125,7 @@ export function SiteFooter() {
                 <li key={product.slug} className="text-muted-foreground text-sm">
                   <Link
                     href={`/produkte/${product.slug}`}
-                    className="hover:text-foreground transition-colors duration-400"
+                    className="hover:text-foreground transition-colors duration-[var(--dur-2)]"
                   >
                     {product.name}
                   </Link>
@@ -140,7 +140,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   href="/impressum"
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
                 >
                   {t.footer.imprint}
                 </Link>
@@ -148,7 +148,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   href="/datenschutz"
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
                 >
                   {t.footer.privacy}
                 </Link>
@@ -162,7 +162,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   href="/barrierefreiheit"
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
                 >
                   {t.accessibility.eyebrow}
                 </Link>
@@ -170,7 +170,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   href="/termin"
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
                 >
                   {t.contact.appointmentTitle}
                 </Link>
@@ -180,7 +180,7 @@ export function SiteFooter() {
                 <button
                   type="button"
                   onClick={openConsentSettings}
-                  className="text-muted-foreground hover:text-foreground text-left text-sm transition-colors duration-400"
+                  className="text-muted-foreground hover:text-foreground text-left text-sm transition-colors duration-[var(--dur-2)]"
                 >
                   {t.consent.settingsLabel}
                 </button>
@@ -213,7 +213,7 @@ export function SiteFooter() {
                 <li>
                   <Link
                     href="/status"
-                    className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
                   >
                     {t.footer.statusLabel}
                   </Link>
@@ -230,7 +230,7 @@ export function SiteFooter() {
                   href={contact.whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground font-mono text-sm transition-colors duration-400"
+                  className="text-muted-foreground hover:text-foreground font-mono text-sm transition-colors duration-[var(--dur-2)]"
                 >
                   {contact.whatsapp}
                 </a>
@@ -238,7 +238,7 @@ export function SiteFooter() {
               <li>
                 <a
                   href={`mailto:${contact.email}`}
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-400"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors duration-[var(--dur-2)]"
                 >
                   {contact.email}
                 </a>
@@ -273,7 +273,7 @@ export function SiteFooter() {
                         target="_blank"
                         rel="noopener noreferrer me"
                         aria-label={profile.name}
-                        className="border-line text-muted-foreground hover:border-gold hover:text-gold-text flex size-9 items-center justify-center border text-meta transition-colors duration-400"
+                        className="border-line text-muted-foreground hover:border-gold hover:text-gold-text flex size-9 items-center justify-center rounded-sm border text-meta transition-colors duration-[var(--dur-2)]"
                       >
                         {profile.label}
                       </a>

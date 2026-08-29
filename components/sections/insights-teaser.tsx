@@ -39,7 +39,7 @@ export function InsightsTeaser() {
           <Reveal delay={0.1} className="lg:col-span-4 lg:pb-2 lg:text-right">
             <Link
               href="/insights"
-              className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {copy.cta}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
@@ -47,12 +47,12 @@ export function InsightsTeaser() {
           </Reveal>
         </div>
 
-        <ul className="bg-line border-line mt-16 grid gap-px border md:grid-cols-3">
+        <ul className="mt-16 grid gap-2.5 md:grid-cols-3">
           {entries.map((entry, i) => (
             <Reveal key={entry.slug} as="li" delay={0.06 * i} className="flex">
               <Link
                 href="/insights"
-                className="group bg-background hover:bg-surface flex w-full flex-col gap-4 p-7 transition-colors duration-500"
+                className="group tile bg-background hover:bg-surface flex w-full flex-col gap-4 p-7 transition-colors duration-[var(--dur-2)]"
               >
                 <p className="eyebrow text-gold-text">{entry.topic[locale]}</p>
                 <h3 className="type-h4">{entry.title[locale]}</h3>

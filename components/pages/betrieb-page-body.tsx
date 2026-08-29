@@ -78,7 +78,7 @@ export function BetriebPageBody() {
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                 />
                 {/* Die Ziffer ordnet, sie zaehlt nichts — darum aria-hidden. */}
                 <span aria-hidden="true" className="eyebrow text-muted-foreground">
@@ -116,7 +116,7 @@ export function BetriebPageBody() {
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
                   <h3 className="text-subhead text-lg">{item.name}</h3>
                   <p className="type-small text-muted-foreground mt-3 text-pretty">{item.what}</p>
@@ -195,7 +195,7 @@ export function BetriebPageBody() {
                   </div>
                   <Link
                     href="/termin?paket=retainer"
-                    className="border-line-strong hover:border-gold hover:text-gold-text mt-7 inline-flex items-center justify-between gap-2 self-start border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                    className="cta-quiet mt-7 inline-flex items-center justify-between gap-2 self-start px-6 py-3.5 text-sm tracking-wide"
                   >
                     {t.packages.retainerCta}
                     <ArrowUpRight className="size-4" strokeWidth={1.5} />

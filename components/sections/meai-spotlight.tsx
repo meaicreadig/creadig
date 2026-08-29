@@ -79,19 +79,19 @@ export function MeaiSpotlight() {
           */}
           <Reveal delay={0.12} className="lg:col-span-6">
             <div className="border-line bg-surface relative border-t">
-              <div className="grid gap-px sm:grid-cols-2">
+              <div className="grid sm:grid-cols-2">
                 {meaiCapabilityKeys.map((key, i) => {
                   const copy = t.meai.capabilities[key]
                   return (
                     <div
                       key={key}
-                      className="group border-line hover:bg-surface-raised relative border-b p-7 transition-colors duration-500 sm:border-r sm:last:border-r-0 sm:[&:nth-child(2)]:border-r-0"
+                      className="group border-line hover:bg-surface-raised relative border-b p-7 transition-colors duration-[var(--dur-2)] sm:border-r sm:last:border-r-0 sm:[&:nth-child(2)]:border-r-0"
                     >
                       <span
                         aria-hidden="true"
-                        className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 group-hover:w-full"
+                        className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
                       />
-                      <span className="text-muted-foreground group-hover:text-gold-text text-meta transition-colors duration-500">
+                      <span className="text-muted-foreground group-hover:text-gold-text text-meta transition-colors duration-[var(--dur-2)]">
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <h3 className="text-subhead mt-4 text-xl">{copy.name}</h3>

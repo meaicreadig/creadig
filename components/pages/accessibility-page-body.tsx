@@ -178,14 +178,14 @@ export function AccessibilityPageBody() {
             <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href={`mailto:${contact.email}`}
-                className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2.5 border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                className="cta-quiet inline-flex items-center gap-2.5 px-6 py-3.5 text-sm tracking-wide"
               >
                 {copy.feedbackMail}
                 <span className="text-muted-foreground font-mono text-xs">{contact.email}</span>
               </a>
               <Link
                 href="/kontakt"
-                className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2.5 border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                className="cta-quiet inline-flex items-center gap-2.5 px-6 py-3.5 text-sm tracking-wide"
               >
                 {copy.feedbackForm}
                 <ArrowUpRight className="size-4" strokeWidth={1.5} />

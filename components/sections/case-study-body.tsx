@@ -58,7 +58,7 @@ export function CaseStudyBody({
           <h3 className="type-h3">{study.client}</h3>
           <p className="eyebrow text-gold-text mt-4">{study.context[locale]}</p>
 
-          <div className="border-line bg-surface relative mt-8 aspect-[16/10] overflow-hidden border">
+          <div className="border-line bg-surface relative mt-8 aspect-[16/10] overflow-hidden rounded-lg border">
             {study.image ? (
               <Image
                 src={study.image}

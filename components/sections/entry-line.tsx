@@ -73,7 +73,7 @@ export function EntryLine() {
 
             <Link
               href="/leistungen#pakete"
-              className="text-gold-text hover:text-foreground mt-7 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="text-gold-text hover:text-foreground mt-7 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {copy.priceCta}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
@@ -97,7 +97,7 @@ export function EntryLine() {
                       <h3 className="text-subhead text-pretty">{item.q}</h3>
                       <Plus
                         aria-hidden="true"
-                        className="text-muted-foreground group-open:text-gold-text mt-1 size-4 shrink-0 transition-transform duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] group-open:rotate-45"
+                        className="text-muted-foreground group-open:text-gold-text mt-1 size-4 shrink-0 transition-transform duration-[var(--dur-2)] ease-brand group-open:rotate-45"
                         strokeWidth={1.5}
                       />
                     </summary>
@@ -111,7 +111,7 @@ export function EntryLine() {
             <Reveal delay={0.24}>
               <Link
                 href="/leistungen#faq"
-                className="text-gold-text hover:text-foreground mt-7 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+                className="text-gold-text hover:text-foreground mt-7 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
               >
                 {copy.questionsCta}
                 <ArrowUpRight className="size-4" strokeWidth={1.5} />

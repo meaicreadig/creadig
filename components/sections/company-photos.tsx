@@ -64,7 +64,7 @@ export function CompanyPhotos() {
           {photos.map((slot, i) => (
             <Reveal key={slot} delay={0.06 * i}>
               <figure>
-                <div className="border-line bg-surface relative aspect-[4/3] w-full overflow-hidden border">
+                <div className="border-line bg-surface relative aspect-[4/3] w-full overflow-hidden rounded-lg border">
                   <Image
                     src={COMPANY_PHOTOS[slot] as string}
                     alt={copy.slots[slot].alt}

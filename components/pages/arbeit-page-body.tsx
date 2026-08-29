@@ -43,7 +43,7 @@ export function ArbeitPageBody({
         lead={work.what[locale]}
         crumbs={[{ label: copy.breadcrumb, href: "/arbeiten" }]}
       >
-        <div className="border-line mt-12 grid gap-px border-t sm:grid-cols-3">
+        <div className="border-line mt-12 grid border-t sm:grid-cols-3">
           <div className="pt-7 sm:pr-8">
             <p className="eyebrow text-gold-text">{copy.kindLabel}</p>
             <p className="type-body text-foreground/85 mt-3">
@@ -190,7 +190,7 @@ export function ArbeitPageBody({
           <Reveal delay={0.08}>
             <Link
               href="/arbeiten"
-              className="text-muted-foreground hover:text-foreground mt-14 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="text-muted-foreground hover:text-foreground mt-14 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               <ArrowLeft className="size-4" strokeWidth={1.5} />
               {copy.backLabel}

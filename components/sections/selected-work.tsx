@@ -62,11 +62,11 @@ export function SelectedWork() {
           <Reveal delay={0.1} className="lg:col-span-4 lg:pb-3 lg:text-right">
             <Link
               href="/arbeiten"
-              className="group text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="group text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {copy.cta}
               <ArrowUpRight
-                className="size-4 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                className="size-4 transition-transform duration-[var(--dur-2)] ease-brand group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                 strokeWidth={1.5}
               />
             </Link>
@@ -99,7 +99,7 @@ export function SelectedWork() {
                         alt={`${work.name} — ${work.what[locale]}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 58vw"
-                        className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
+                        className="object-cover transition-transform duration-[1200ms] ease-brand group-hover:scale-[1.03]"
                       />
                     ) : (
                       <div className="bg-muted absolute inset-0 flex items-center justify-center">
@@ -151,7 +151,7 @@ export function SelectedWork() {
                   <span className="text-gold-text mt-8 inline-flex items-center gap-2 text-sm tracking-wide">
                     {work.name}
                     <ArrowRight
-                      className="size-4 transition-transform duration-500 group-hover:translate-x-1"
+                      className="size-4 transition-transform duration-[var(--dur-2)] group-hover:translate-x-1"
                       strokeWidth={1.5}
                     />
                   </span>
@@ -181,11 +181,11 @@ export function SelectedWork() {
             </p>
             <Link
               href="/arbeiten"
-              className="group text-gold-text hover:text-foreground inline-flex shrink-0 items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="group text-gold-text hover:text-foreground inline-flex shrink-0 items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {copy.ctaEnd}
               <ArrowUpRight
-                className="size-4 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                className="size-4 transition-transform duration-[var(--dur-2)] ease-brand group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                 strokeWidth={1.5}
               />
             </Link>

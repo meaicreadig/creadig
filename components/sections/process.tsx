@@ -47,7 +47,7 @@ export function Process() {
           </h2>
         </Reveal>
 
-        <div className="mt-20 grid gap-px md:grid-cols-3">
+        <div className="mt-20 grid gap-x-2.5 gap-y-12 md:grid-cols-3">
           {processSteps.map((step, i) => {
             const copy = t.process.steps[step.key]
             return (
@@ -58,7 +58,7 @@ export function Process() {
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                 />
                 <span className="eyebrow text-gold-text">{step.step}</span>
                 <h3 className="type-h3 mt-6">{copy.name}</h3>
@@ -91,7 +91,7 @@ export function Process() {
 
         {/* Fuenf Schritte seit V2-2 — die Spaltenzahl folgt der Liste, damit
             die letzte Spalte nicht leer bleibt (siehe Produkt-Bausteine). */}
-        <div className="mt-10 grid gap-px sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-10 grid gap-x-2.5 gap-y-10 sm:grid-cols-2 lg:grid-cols-5">
           {opsSteps.map((step, i) => {
             const copy = t.process.opsSteps[step.key]
             return (
@@ -102,7 +102,7 @@ export function Process() {
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                 />
                 <span className="eyebrow text-gold-text">{step.step}</span>
                 <h3 className="type-h4 mt-5">{copy.name}</h3>

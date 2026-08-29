@@ -85,7 +85,7 @@ export function Hero() {
                 <li key={chip.href}>
                   <Link
                     href={chip.href}
-                    className="border-line-strong hover:border-gold hover:text-gold-text text-muted-foreground inline-flex items-center border px-4 py-2 text-sm tracking-wide transition-colors duration-500"
+                    className="cta-quiet text-muted-foreground inline-flex items-center px-4 py-2 text-sm tracking-wide"
                   >
                     {t.services.layers[chip.key].name}
                   </Link>

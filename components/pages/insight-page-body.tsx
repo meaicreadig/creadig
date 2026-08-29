@@ -36,7 +36,7 @@ export function InsightPageBody({ entry }: { entry: Insight }) {
         <nav aria-label="Brotkrumen">
           <ol className="text-muted-foreground text-meta flex flex-wrap items-center gap-2">
             <li>
-              <Link href="/" className="hover:text-foreground transition-colors duration-300">
+              <Link href="/" className="hover:text-foreground transition-colors duration-[var(--dur-1)]">
                 {t.servicePage.breadcrumbHome}
               </Link>
             </li>
@@ -44,7 +44,7 @@ export function InsightPageBody({ entry }: { entry: Insight }) {
             <li>
               <Link
                 href="/insights"
-                className="hover:text-foreground transition-colors duration-300"
+                className="hover:text-foreground transition-colors duration-[var(--dur-1)]"
               >
                 {t.nav.insights}
               </Link>
@@ -116,21 +116,21 @@ export function InsightPageBody({ entry }: { entry: Insight }) {
           <div className="mt-6 flex flex-col gap-4">
             <Link
               href="/barrierefreiheit"
-              className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {copy.sourceStatement}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
             </Link>
             <Link
               href="/leistungen/barrierefreiheit-website"
-              className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {copy.sourceService}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
             </Link>
             <Link
               href="/insights"
-              className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {copy.backCta}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />

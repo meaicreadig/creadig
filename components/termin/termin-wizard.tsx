@@ -403,7 +403,7 @@ export function TerminWizard() {
   }
 
   const inputClass =
-    "w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-3 text-base text-foreground outline-none transition-colors duration-300 placeholder:text-muted-foreground focus:border-gold"
+    "w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-3 text-base text-foreground outline-none transition-colors duration-[var(--dur-1)] placeholder:text-muted-foreground focus:border-gold"
   const invalidClass = "border-destructive focus:border-destructive"
 
   function field(key: keyof FormState) {
@@ -434,7 +434,7 @@ export function TerminWizard() {
       <div className="relative mx-auto w-full max-w-4xl px-6 pt-32 pb-24 md:px-10 md:pt-40">
         <Link
           href="/"
-          className="text-muted-foreground hover:text-gold-text type-small inline-flex items-center gap-2 transition-colors duration-300"
+          className="text-muted-foreground hover:text-gold-text type-small inline-flex items-center gap-2 transition-colors duration-[var(--dur-1)]"
         >
           <ArrowLeft className="size-4" strokeWidth={1.5} />
           {t.termin.back}
@@ -458,7 +458,7 @@ export function TerminWizard() {
           </div>
           <div className="bg-line mt-3 h-px w-full">
             <div
-              className="from-gold-soft to-gold h-px bg-gradient-to-r transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              className="from-gold-soft to-gold h-px bg-gradient-to-r transition-all duration-[var(--dur-3)] ease-brand"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -490,7 +490,7 @@ export function TerminWizard() {
             </h2>
             <p className="type-body text-muted-foreground mt-3">{t.termin.step1.lead}</p>
 
-            <div className="mt-8 grid gap-px sm:grid-cols-2">
+            <div className="mt-8 grid gap-2.5 sm:grid-cols-2">
               {(
                 [
                   {
@@ -529,7 +529,7 @@ export function TerminWizard() {
                     das einzige Signal, das auch ohne Farbe funktioniert.
                   */
                   className={cn(
-                    "border-line group relative flex flex-col border p-7 text-left transition-colors duration-500",
+                    "border-line group relative flex flex-col rounded-md border p-7 text-left transition-colors duration-[var(--dur-2)]",
                     type === option.id
                       ? "bg-gold/[0.14] border-gold ring-gold/35 ring-1"
                       : "hover:bg-foreground/[0.02]",
@@ -538,7 +538,7 @@ export function TerminWizard() {
                   <span
                     aria-hidden="true"
                     className={cn(
-                      "bg-gold absolute top-0 left-0 h-0.5 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                      "bg-gold absolute top-0 left-0 h-0.5 transition-all duration-[var(--dur-2)] ease-brand",
                       type === option.id ? "w-full" : "w-0",
                     )}
                   />
@@ -547,7 +547,7 @@ export function TerminWizard() {
                     <span
                       aria-hidden="true"
                       className={cn(
-                        "mt-1 flex size-5 shrink-0 items-center justify-center border transition-colors duration-300",
+                        "mt-1 flex size-5 shrink-0 items-center justify-center border transition-colors duration-[var(--dur-1)]",
                         type === option.id ? "border-gold bg-gold" : "border-line-strong",
                       )}
                     >
@@ -651,7 +651,7 @@ export function TerminWizard() {
                         .filter(Boolean)
                         .join(" — ")}
                       className={cn(
-                        "relative flex aspect-square items-center justify-center text-sm transition-colors duration-300",
+                        "relative flex aspect-square items-center justify-center text-sm transition-colors duration-[var(--dur-1)]",
                         cell.past && "text-muted-foreground/35 pointer-events-none",
                         !cell.past && "hover:bg-gold/10",
                         cell.today && "font-semibold",
@@ -695,7 +695,7 @@ export function TerminWizard() {
                     onClick={() => toggleWindow(window.id)}
                     aria-pressed={windows.includes(window.id)}
                     className={cn(
-                      "flex flex-col items-start gap-1 border px-5 py-3 text-left transition-colors duration-300",
+                      "flex flex-col items-start gap-1 rounded-sm border px-5 py-3 text-left transition-colors duration-[var(--dur-1)]",
                       windows.includes(window.id)
                         ? "border-gold bg-gold text-[#201e1b]"
                         : "border-line-strong hover:border-gold hover:text-gold-text",
@@ -838,7 +838,7 @@ export function TerminWizard() {
                       onClick={() => setMeetingLang(option.id)}
                       aria-pressed={meetingLang === option.id}
                       className={cn(
-                        "border px-5 py-2.5 text-sm transition-colors duration-300",
+                        "rounded-sm border px-5 py-2.5 text-sm transition-colors duration-[var(--dur-1)]",
                         meetingLang === option.id
                           ? "border-gold bg-gold text-[#201e1b]"
                           : "border-line-strong hover:border-gold hover:text-gold-text",
@@ -966,7 +966,7 @@ export function TerminWizard() {
                   href={waHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2.5 border px-6 py-4 text-sm tracking-wide transition-colors duration-500"
+                  className="cta-quiet inline-flex items-center gap-2.5 px-6 py-4 text-sm tracking-wide"
                 >
                   <WhatsAppIcon className="size-4" />
                   {t.termin.step4.sendWhatsapp}
@@ -1009,7 +1009,7 @@ export function TerminWizard() {
                   }}
                   className="cta-outline inline-flex items-center gap-3 px-8 py-4 text-base tracking-wide disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <span className="group-hover:text-gold-soft relative z-10 flex items-center gap-3 transition-colors duration-500">
+                  <span className="group-hover:text-gold-soft relative z-10 flex items-center gap-3 transition-colors duration-[var(--dur-2)]">
                     <Send className="size-4" strokeWidth={1.5} />
                     {sending ? t.contact.sending : t.termin.step4.send}
                   </span>
@@ -1047,7 +1047,7 @@ export function TerminWizard() {
             <div className="mt-10 flex flex-wrap gap-3">
               <Link
                 href="/"
-                className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                className="cta-quiet inline-flex items-center gap-2 px-6 py-3.5 text-sm tracking-wide"
               >
                 {t.termin.done.home}
               </Link>
@@ -1061,7 +1061,7 @@ export function TerminWizard() {
                   setForm(EMPTY_FORM)
                   setInvalid({})
                 }}
-                className="border-line-strong hover:border-gold hover:text-gold-text inline-flex items-center gap-2 border px-6 py-3.5 text-sm tracking-wide transition-colors duration-500"
+                className="cta-quiet inline-flex items-center gap-2 px-6 py-3.5 text-sm tracking-wide"
               >
                 {t.termin.done.again}
               </button>
@@ -1087,7 +1087,7 @@ function StepButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="cta-outline inline-flex items-center gap-2.5 px-7 py-3.5 text-sm tracking-wide transition-opacity duration-300 disabled:pointer-events-none disabled:opacity-35"
+      className="cta-outline inline-flex items-center gap-2.5 px-7 py-3.5 text-sm tracking-wide transition-opacity duration-[var(--dur-1)] disabled:pointer-events-none disabled:opacity-35"
     >
       <span className="flex items-center gap-2.5">
         {label}
@@ -1102,7 +1102,7 @@ function BackButton({ label, onClick }: { label: string; onClick: () => void }) 
     <button
       type="button"
       onClick={onClick}
-      className="text-muted-foreground hover:text-gold-text inline-flex items-center gap-2 text-sm transition-colors duration-300"
+      className="text-muted-foreground hover:text-gold-text inline-flex items-center gap-2 text-sm transition-colors duration-[var(--dur-1)]"
     >
       <ArrowLeft className="size-4" strokeWidth={1.5} />
       {label}

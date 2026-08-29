@@ -79,7 +79,7 @@ export function HouseArchitecture() {
           <Reveal delay={0.06}>
             <p className="eyebrow text-muted-foreground text-center">{copy.layersLabel}</p>
           </Reveal>
-          <ul className="mt-5 flex flex-col gap-px">
+          <ul className="mt-5 flex flex-col gap-2">
             {layersTopDown.map((layer, i) => {
               const layerCopy = t.services.layers[layer.key]
               /* Oben breit, unten schmal: 05 traegt die groesste Wirkung,
@@ -90,7 +90,7 @@ export function HouseArchitecture() {
                 <Reveal key={layer.key} as="li" delay={0.05 * i} y={12}>
                   <div
                     style={{ marginLeft: `${inset}%`, marginRight: `${inset}%` }}
-                    className="border-line bg-background flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border px-6 py-5"
+                    className="border-line bg-background flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 rounded-md border px-6 py-5"
                   >
                     <span className="flex items-baseline gap-4">
                       <span className="eyebrow text-gold-text">{layer.level}</span>
@@ -124,14 +124,14 @@ export function HouseArchitecture() {
           <Reveal delay={0.16}>
             <p className="eyebrow text-muted-foreground text-center">{copy.productsLabel}</p>
           </Reveal>
-          <ul className="bg-line border-line mt-5 grid gap-px border sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
             {productWorks.map((product, i) => {
               const world = productWorlds[product.slug]
               const layer = serviceLayers.find((entry) => entry.key === world?.layer)
               const layerCopy = world ? t.services.layers[world.layer] : null
               return (
                 <Reveal key={product.slug} as="li" delay={0.05 * i} y={12} className="flex">
-                  <div className="bg-background flex w-full flex-col gap-3 px-6 py-7">
+                  <div className="tile bg-background flex w-full flex-col gap-3 px-6 py-7">
                     <span className="text-subhead text-lg">{product.name}</span>
                     <span className="type-small text-muted-foreground text-pretty">
                       {product.sector[locale]}

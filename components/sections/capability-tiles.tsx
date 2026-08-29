@@ -42,7 +42,7 @@ export function CapabilityTiles() {
             <p className="type-lead text-muted-foreground max-w-md text-pretty">{copy.lead}</p>
             <Link
               href="/leistungen"
-              className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-500"
+              className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {copy.cta}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
@@ -50,7 +50,7 @@ export function CapabilityTiles() {
           </Reveal>
         </div>
 
-        <div className="bg-line border-line mt-20 grid gap-px border sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-20 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
           {serviceLayers.map((layer, i) => {
             const layerCopy = t.services.layers[layer.key]
             const pages = publishedServicePages.filter((page) => page.layer === layer.key)
@@ -59,11 +59,11 @@ export function CapabilityTiles() {
               <Reveal key={layer.key} delay={0.05 * i} className="flex">
                 <Link
                   href={`/leistungen#ebene-${layer.key}`}
-                  className="group bg-background hover:bg-surface relative flex w-full flex-col gap-6 p-7 transition-colors duration-500"
+                  className="group tile bg-background hover:bg-surface relative flex w-full flex-col gap-6 p-7 transition-colors duration-[var(--dur-2)]"
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full"
+                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
                   <div>
                     <span className="eyebrow text-gold-text">{layer.level}</span>
@@ -77,7 +77,7 @@ export function CapabilityTiles() {
                     <ul className="border-line mt-auto flex flex-col gap-2 border-t pt-5">
                       {pages.map((page) => (
                         <li key={page.slug}>
-                          <span className="text-meta text-muted-foreground group-hover:text-gold-text transition-colors duration-500">
+                          <span className="text-meta text-muted-foreground group-hover:text-gold-text transition-colors duration-[var(--dur-2)]">
                             {page.chip[locale]}
                           </span>
                         </li>

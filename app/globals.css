@@ -87,15 +87,30 @@
   --stagger: 60ms;
 
   /*
-   * RADIUS — `--radius-xs` (1 px) ist gegangen. Ein Pixel Rundung ist
-   * keine Entscheidung, sondern ein Messfehler: Man sieht ihn nicht, und
-   * er beantwortet die Frage „scharf oder rund" nicht. Die eigentliche
-   * Radius-Entscheidung (rund, Owner 27.08.) kommt als eigener Durchgang —
-   * sie zieht die 34 fugenlosen Raster mit und ist kein Token-Tausch.
+   * RADIUS — die Entscheidung ist gefallen: RUND (Owner 27.08.2026).
+   *
+   * Vorher standen hier 2 / 4 / 6 Pixel. Das war keine Rundung, das war
+   * eine entschaerfte Ecke: Zwei Pixel Radius sieht kein Auge, es sieht
+   * nur, dass die Ecke „irgendwie unsauber" ist. Entweder eine Form ist
+   * scharf — dann bleibt sie es —, oder sie ist rund, dann muss man es
+   * sehen.
+   *
+   * Drei Groessen, an die ROLLE gebunden, nicht an die Optik:
+   *
+   *   --radius-sm   8 px   BEDIENELEMENT — Knopf, Feld, Chip, Umschalter.
+   *                        Was man anfasst, ist handlich, nicht weich.
+   *   --radius-md  12 px   KACHEL — Karte, Paket, Produktflaeche. Das ist
+   *                        der Radius der Marke; er faellt zuerst auf.
+   *   --radius-lg  20 px   GROSSE FLAECHE — Panel, Banner, Bildrahmen.
+   *
+   * Der Radius allein macht die Seite nicht rund: Eine gerundete Ecke ist
+   * nur sichtbar, wenn um die Form herum LUFT steht. Darum faellt diese
+   * Entscheidung im selben Durchgang wie die 34 fugenlosen `gap-px`-Raster
+   * — Radius ohne Fuge waere ein Token-Tausch ohne Wirkung.
    */
-  --radius-sm: 0.125rem;
-  --radius-md: 0.25rem;
-  --radius-lg: 0.375rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
 }
 
 /* Hell = Default. Warmes Papierweiss, warm-anthrazit Text — kein reines Schwarz. */
@@ -140,7 +155,8 @@
   --border: #e6e4df;
   --input: #cbc7c0;
   --ring: #be904e;
-  --radius: 0.125rem;
+  /* shadcn-Basis folgt dem Bedienelement, nicht der Kachel. */
+  --radius: 0.5rem;
 
   /*
    * Elevation — drei Stufen, warmer Schatten.
@@ -699,6 +715,41 @@
 }
 
 /* ==========================================================================
+ * DIE KACHEL — EINE QUELLE FUER JEDE KARTE.
+ *
+ * Bis hierher entstand jede Karte der Seite aus einem Trick: Das Raster
+ * bekam `bg-line` und `gap-px`, die Kacheln `bg-background` — die Fuge
+ * WAR die Linie. Das ist sparsam und war lange richtig, hat aber zwei
+ * Folgen, die man nicht mehr loswird:
+ *
+ *   1. Die Kacheln beruehren sich. Vier Karten sind dann optisch EIN
+ *      Block mit drei Strichen darin, nicht vier Dinge nebeneinander.
+ *   2. Ein Radius ist unmoeglich. Eine gerundete Ecke braucht Luft um
+ *      sich herum; in einer 1-px-Fuge ist keine.
+ *
+ * Deshalb traegt ab jetzt die KACHEL ihre eigene Kante, und zwischen den
+ * Kacheln steht Luft (`gap-2.5`, 10 px — dieselbe Derz-Luft wie im Rest
+ * des Hauses). Was vorher ein Raster mit Strichen war, sind jetzt Dinge
+ * auf einer Flaeche.
+ *
+ * `overflow: hidden` ist keine Vorsicht, sondern Pflicht: Die Gold-Schiene,
+ * die beim Hover an der Oberkante entlanglaeuft (`h-px w-0 → w-full`), liefe
+ * sonst an den gerundeten Ecken ins Leere und haenge rechts und links ueber.
+ *
+ * Die Flaeche steht bewusst NICHT hier. `bg-background` und der Hover
+ * (`hover:bg-surface`) bleiben am Aufrufort — sonst muesste jede Kachel
+ * gegen ihre eigene Grundregel anschreiben.
+ * ========================================================================== */
+
+@utility tile {
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* ==========================================================================
  * ZWEI EBENEN, SEMANTISCH — SIGNATUR 03 (Grundlage).
  *
  * Die Seite lag auf EINER Ebene: drei Elevation-Stufen sind definiert und
@@ -798,9 +849,46 @@
   border: 1px solid color-mix(in oklab, var(--gold-text) 78%, transparent);
   background-color: transparent;
   color: var(--foreground);
+  border-radius: var(--radius-sm);
   transition:
-    color 500ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 500ms cubic-bezier(0.22, 1, 0.36, 1);
+    color var(--dur-2) var(--ease-brand),
+    border-color var(--dur-2) var(--ease-brand);
+
+  &:hover {
+    border-color: var(--gold-text);
+    color: var(--gold-text);
+  }
+}
+
+/* ==========================================================================
+ * DER LEISE KNOPF — die zweite Haelfte derselben Quelle.
+ *
+ * `cta-outline` hat den Hauptknopf zusammengefuehrt. Der Knopf DANEBEN —
+ * „Alle Leistungen", „Details", „Ablehnen", „Zurueck" — stand weiter
+ * sechzehnmal handgeschrieben im Markup, jedes Mal dieselbe Rezeptur aus
+ * vier Klassen. Damit war die Haelfte aller Knoepfe der Seite wieder
+ * ausserhalb des Systems, und der Radius haette an sechzehn Stellen
+ * einzeln nachgetragen werden muessen.
+ *
+ * Rolle: NEBENWEG. Ruhe = neutrale Kante (`--line-strong`), damit er neben
+ * dem Hauptknopf nicht um Aufmerksamkeit kaempft. Hover = dieselbe Gold-
+ * Kante wie `cta-outline`, damit beide erkennbar aus einem Haus sind.
+ *
+ * `--gold-text` statt `--gold`, aus demselben Grund wie oben: Eine Kante,
+ * die ein Bedienelement umreisst, faellt unter WCAG 1.4.11 (3 : 1).
+ * `--gold` erreicht auf dem Papierweiss 2,6 : 1 — das war vorher an allen
+ * sechzehn Stellen zu wenig.
+ *
+ * Groesse, Innenabstand und Ausrichtung bleiben am Aufrufort: Ein
+ * Nebenknopf im Footer ist nicht so gross wie einer unter einem Paket.
+ * ========================================================================== */
+
+@utility cta-quiet {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  transition:
+    color var(--dur-2) var(--ease-brand),
+    border-color var(--dur-2) var(--ease-brand);
 
   &:hover {
     border-color: var(--gold-text);

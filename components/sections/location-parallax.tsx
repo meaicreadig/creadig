@@ -138,7 +138,7 @@ export function LocationParallax({ photoSrc }: { photoSrc: string | null }) {
                 {t.location.mapLink}
                 <ArrowUpRight
                   aria-hidden="true"
-                  className="size-4 transition-transform duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  className="size-4 transition-transform duration-[var(--dur-2)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 />
               </a>
             </Reveal>
