@@ -1,3 +1,6 @@
+import nodeFs from "node:fs"
+import nodeOs from "node:os"
+import nodePath from "node:path"
 import { raiseAlert } from "@/lib/alert"
 
 /**
@@ -242,6 +245,110 @@ function warnOnce(kind: string, message: string): void {
   void raiseAlert(kind, message)
 }
 
+/* ==========================================================================
+ * ADAPTER · Datei (nur Entwicklung und Abnahme)
+ *
+ * WARUM ES DIESEN ZWEITEN ENTWICKLUNGS-ADAPTER GIBT
+ * Der Arbeitsspeicher-Adapter oben ist fuer eine Abnahme der Oberflaeche
+ * unbrauchbar — und zwar aus einem Grund, der nicht offensichtlich ist:
+ *
+ *   Next kompiliert Route Handler und Server Components in ZWEI getrennte
+ *   Modulgraphen (Bedingung `react-server`). Ein Modul-Singleton wie
+ *   `const rows: LeadRecord[] = []` existiert damit ZWEIMAL im selben
+ *   Prozess. Der Schreibweg (/api/lead) fuellt die eine Liste, der Lesepfad
+ *   (/admin/leads) liest die andere — und sieht immer null Eintraege.
+ *
+ * Nachgemessen am 30.08.2026: `[lead] created CD-260830-268` im Log,
+ * gleichzeitig „es liegt noch keine Anfrage vor" auf der Seite.
+ *
+ * Eine Datei ist von beiden Schichten dieselbe. Damit werden Liste, Suche,
+ * Filter, Detail und die beiden Mutationen pruefbar, BEVOR ein Anbieter
+ * feststeht — und der Lesepfad laeuft nicht zum ersten Mal, wenn der erste
+ * echte Lead eintrifft.
+ *
+ * Fuer den Betrieb ist er genauso verboten wie der Arbeitsspeicher: kein
+ * Sperrverfahren, kein gleichzeitiger Zugriff, kein Netzlaufwerk.
+ * ========================================================================== */
+
+const FILE_DEFAULT = "creadig-leads.dev.json"
+
+function filePath(): string {
+  const configured = process.env.LEAD_STORE_FILE?.trim()
+  if (configured) return configured
+  return nodePath.join(nodeOs.tmpdir(), FILE_DEFAULT)
+}
+
+function readAll(): LeadRecord[] {
+  try {
+    const raw = nodeFs.readFileSync(filePath(), "utf8")
+    const parsed: unknown = JSON.parse(raw)
+    return Array.isArray(parsed) ? (parsed as LeadRecord[]) : []
+  } catch {
+    // Datei fehlt oder ist unlesbar — beides heisst hier: noch nichts da.
+    return []
+  }
+}
+
+function writeAll(all: LeadRecord[]): void {
+  nodeFs.writeFileSync(filePath(), JSON.stringify(all, null, 2), "utf8")
+}
+
+const fileStore: LeadStore = {
+  name: "file",
+
+  async save(record: LeadRecord): Promise<void> {
+    const all = readAll()
+    const index = all.findIndex((row) => row.id === record.id)
+    if (index === -1) all.push({ ...record })
+    else all[index] = { ...record }
+    writeAll(all)
+  },
+
+  async findBySubmissionKey(key: string): Promise<LeadRecord | null> {
+    if (!key) return null
+    return readAll().find((row) => row.submissionKey === key) ?? null
+  },
+
+  async getById(id: string): Promise<LeadRecord | null> {
+    return readAll().find((row) => row.id === id) ?? null
+  },
+
+  async list(query: LeadListQuery): Promise<LeadPage> {
+    const hits = readAll()
+      .filter((row) => matches(row, query))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    const offset = query.offset ?? 0
+    const limit = query.limit ?? hits.length
+    return { rows: hits.slice(offset, offset + limit), total: hits.length }
+  },
+
+  async updateSalesStatus(
+    id: string,
+    status: SalesStatus,
+    lostReason: string | null,
+  ): Promise<boolean> {
+    const all = readAll()
+    const row = all.find((entry) => entry.id === id)
+    if (!row) return false
+    row.salesStatus = status
+    row.lostReason = status === "lost" ? lostReason : null
+    row.updatedAt = new Date().toISOString()
+    writeAll(all)
+    return true
+  },
+
+  async updateNextAction(id: string, action: string | null, at: string | null): Promise<boolean> {
+    const all = readAll()
+    const row = all.find((entry) => entry.id === id)
+    if (!row) return false
+    row.nextAction = action
+    row.nextActionAt = action === null ? null : at
+    row.updatedAt = new Date().toISOString()
+    writeAll(all)
+    return true
+  },
+}
+
 /**
  * `null` heisst: kein Speicher konfiguriert — die Route verhält sich wie vor
  * MP-G. Das ist ein gültiger Zustand, kein Fehler.
@@ -250,15 +357,15 @@ export function getLeadStore(): LeadStore | null {
   const kind = process.env.LEAD_STORE?.trim()
   if (!kind) return null
 
-  if (kind === "memory") {
+  if (kind === "memory" || kind === "file") {
     if (process.env.NODE_ENV === "production") {
       warnOnce(
-        "lead-store-memory-in-production",
-        "LEAD_STORE=memory im Betrieb — der Arbeitsspeicher-Adapter ist nur fuer Entwicklung. Es wird NICHTS gespeichert.",
+        `lead-store-${kind}-in-production`,
+        `LEAD_STORE=${kind} im Betrieb — dieser Adapter ist nur fuer Entwicklung. Es wird NICHTS gespeichert.`,
       )
       return null
     }
-    return memoryStore
+    return kind === "file" ? fileStore : memoryStore
   }
 
   warnOnce(

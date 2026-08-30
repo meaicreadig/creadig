@@ -1,20 +1,27 @@
 import type { ReactNode } from "react"
-import Link from "next/link"
 import { AdminLogout } from "@/components/admin/admin-logout"
+import { AdminNav, type NavItem } from "@/components/admin/admin-nav"
+import { leadStoreConfigured } from "@/lib/lead-store"
 
 /**
  * MP-G · G.1 — die Hülle des Control Centers.
  *
  * ---------------------------------------------------------------------------
- * EIN MENÜPUNKT, KEIN THEATER
- * MP-G §5 verbietet „zehn Coming-Soon-Menüpunkte", und die Bestandsaufnahme
- * (G.0) hat gezeigt, warum das hier keine theoretische Regel ist: Es gibt
- * keinen Lead-Speicher, keine Kundentabelle, keinen Lesezugriff auf die
- * Messwerte. Ein Menü mit „Sales", „Marketing" und „Kunden" wäre heute ein
- * Menü mit drei leeren Räumen.
+ * KEIN THEATER — DIE NAVIGATION WÄCHST MIT DEN QUELLEN
+ * MP-G §5 verbietet „zehn Coming-Soon-Menüpunkte". Der v0-Prototyp führt
+ * neun weitere Punkte unter einer Überschrift „Geplant"; genau die sind
+ * gestrichen. Ein Menüpunkt entsteht hier, wenn seine Datenquelle entsteht.
  *
- * Also steht hier genau der Punkt, der echte Daten hat. Die Navigation wächst
- * mit den Quellen, nicht mit den Absichten.
+ * Heute sind das zwei feste Punkte und ein bedingter:
+ *
+ *   Heute          zusammengefasste Aufmerksamkeit — Quelle: Materialstand
+ *   Materialstand  die Punkte selbst — Quelle: collect()
+ *   Vertrieb       NUR wenn ein Lead-Speicher eingerichtet ist
+ *
+ * Der dritte prüft `leadStoreConfigured()` und nicht eine Absicht. Ohne
+ * Speicher gibt es die Seite nicht zu sehen — und „Heute" erklärt an der
+ * Stelle, warum. Sobald `LEAD_STORE` gesetzt ist, erscheint der Punkt von
+ * selbst; niemand muss daran denken.
  *
  * ---------------------------------------------------------------------------
  * DICHTER ALS DIE WEBSITE, GLEICHE SPRACHE
@@ -23,18 +30,21 @@ import { AdminLogout } from "@/components/admin/admin-logout"
  * überzeugen; diese hier muss man den ganzen Tag benutzen können.
  */
 
-type NavItem = { href: string; label: string; hint: string }
-
 /**
- * Die Navigation wächst mit den Datenquellen. Nächste Kandidaten und was
- * ihnen fehlt, stehen in `docs/control-center/current-state.md`:
- *   Sales      braucht einen Lead-Speicher (Owner-Entscheidung)
- *   Marketing  braucht Lesezugriff auf die Messwerte
- *   Kunden     braucht ein Kundenmodell
+ * Was noch fehlt und warum, steht in `docs/control-center/current-state.md`:
+ *   Marketing  braucht Lesezugriff auf die Messwerte (heute nur schreibend)
+ *   Kunden     braucht ein Kundenmodell (G.5)
  */
-const NAV: NavItem[] = [
-  { href: "/admin", label: "Materialstand", hint: "Was fehlt, und wer es liefert" },
-]
+function navItems(): NavItem[] {
+  const items: NavItem[] = [
+    { href: "/admin", label: "Heute", hint: "Was Aufmerksamkeit braucht" },
+    { href: "/admin/material", label: "Materialstand", hint: "Was fehlt, und wer es liefert" },
+  ]
+  if (leadStoreConfigured()) {
+    items.push({ href: "/admin/leads", label: "Vertrieb", hint: "Anfragen und nächste Schritte" })
+  }
+  return items
+}
 
 export function AdminShell({
   title,
@@ -68,19 +78,7 @@ export function AdminShell({
             <p className="text-subhead mt-1 text-base">Control Center</p>
           </div>
 
-          <ul className="flex flex-col gap-1">
-            {NAV.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="hover:bg-muted block rounded-sm px-3 py-2.5 transition-colors duration-[var(--dur-1)]"
-                >
-                  <span className="text-subhead block text-sm">{item.label}</span>
-                  <span className="text-muted-foreground mt-0.5 block text-xs">{item.hint}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <AdminNav items={navItems()} />
 
           <div className="border-line mt-auto hidden border-t pt-5 lg:block">
             <AdminLogout />
