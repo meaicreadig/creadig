@@ -89,7 +89,7 @@ export function InsightPageBody({ entry }: { entry: Insight }) {
             if (block.kind === "note") {
               return (
                 <Reveal key={i} delay={0.02}>
-                  <p className="border-gold/45 bg-muted type-body text-foreground/85 mt-10 border-l-2 py-5 pl-6 text-pretty">
+                  <p className="border-gold/45 bg-muted type-body text-foreground/85 mt-10 border-s-2 py-5 ps-6 text-pretty">
                     {block.text[locale]}
                   </p>
                 </Reveal>

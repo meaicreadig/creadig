@@ -68,7 +68,7 @@ function LogoSlot({
       )}
       {/* Ohne bestaetigte Region steht dort nichts — keine Vermutung. */}
       {region && (
-        <span className="text-muted-foreground eyebrow absolute top-3 right-3 transition-colors duration-[var(--dur-2)] group-hover:text-[var(--brand)]">
+        <span className="text-muted-foreground eyebrow absolute top-3 end-3 transition-colors duration-[var(--dur-2)] group-hover:text-[var(--brand)]">
           {region}
         </span>
       )}
@@ -94,11 +94,11 @@ function MarqueeRow({ items, direction }: { items: Row[]; direction: "left" | "r
       {/* Weiche Kanten links/rechts */}
       <div
         aria-hidden="true"
-        className="from-background pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r to-transparent"
+        className="from-background pointer-events-none absolute inset-y-0 start-0 w-24 bg-gradient-to-r to-transparent"
       />
       <div
         aria-hidden="true"
-        className="from-background pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l to-transparent"
+        className="from-background pointer-events-none absolute inset-y-0 end-0 w-24 bg-gradient-to-l to-transparent"
       />
     </div>
   )

@@ -30,7 +30,7 @@ export default async function AdminLoginPage({
         {expired && (
           <p
             role="status"
-            className="border-gold/45 text-foreground/80 type-small mt-6 border-l-2 pl-4 text-pretty"
+            className="border-gold/45 text-foreground/80 type-small mt-6 border-s-2 ps-4 text-pretty"
           >
             Die Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.
           </p>

@@ -196,7 +196,7 @@ export function SiteFooter() {
                 <button
                   type="button"
                   onClick={openConsentSettings}
-                  className="text-muted-foreground hover:text-foreground text-left text-sm transition-colors duration-[var(--dur-2)]"
+                  className="text-muted-foreground hover:text-foreground text-start text-sm transition-colors duration-[var(--dur-2)]"
                 >
                   {t.consent.settingsLabel}
                 </button>

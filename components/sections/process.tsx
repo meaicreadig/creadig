@@ -58,7 +58,7 @@ export function Process() {
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
+                  className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                 />
                 <span className="eyebrow text-gold-text">{step.step}</span>
                 <h3 className="type-h3 mt-6">{copy.name}</h3>
@@ -102,7 +102,7 @@ export function Process() {
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
+                  className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                 />
                 <span className="eyebrow text-gold-text">{step.step}</span>
                 <h3 className="type-h4 mt-5">{copy.name}</h3>

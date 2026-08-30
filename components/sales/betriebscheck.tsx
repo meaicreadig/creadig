@@ -136,7 +136,7 @@ export function Betriebscheck() {
             Ergebnis liest, hat die Zahl schon geglaubt.
           */}
           <Reveal delay={0.16}>
-            <p className="border-gold/45 text-foreground/80 type-small mt-12 max-w-2xl border-l-2 pl-4 text-pretty">
+            <p className="border-gold/45 text-foreground/80 type-small mt-12 max-w-2xl border-s-2 ps-4 text-pretty">
               {checkCopy.disclaimer[locale]}
             </p>
           </Reveal>
@@ -468,7 +468,7 @@ export function Betriebscheck() {
                   {error && (
                     <p
                       role="alert"
-                      className="border-destructive/40 text-destructive border-l-2 py-1 pl-4 text-sm"
+                      className="border-destructive/40 text-destructive border-s-2 py-1 ps-4 text-sm"
                     >
                       {error}
                     </p>

@@ -77,7 +77,7 @@ export function AccessibilityPageBody() {
               <p className="type-body text-foreground/85 text-pretty">{copy.statusBody}</p>
               {/* Die Einschraenkung steht direkt unter der guten Nachricht,
                   nicht drei Abschnitte spaeter. */}
-              <p className="border-gold/45 text-muted-foreground type-small mt-8 border-l-2 py-2 pl-4 text-pretty">
+              <p className="border-gold/45 text-muted-foreground type-small mt-8 border-s-2 py-2 ps-4 text-pretty">
                 {copy.statusNote}
               </p>
             </Reveal>

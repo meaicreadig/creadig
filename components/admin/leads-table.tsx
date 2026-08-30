@@ -25,7 +25,7 @@ import { SALES_LABELS_DE, TERMINAL_STATES, type LeadRecord } from "@/lib/lead-st
 export function LeadsTable({ rows }: { rows: LeadRecord[] }) {
   return (
     <div className="border-line mt-6 overflow-x-auto rounded-md border">
-      <table className="w-full min-w-[52rem] border-collapse text-left">
+      <table className="w-full min-w-[52rem] border-collapse text-start">
         <caption className="sr-only">
           Anfragen mit Nummer, Absender, Herkunft, Status, Eingang und nächstem Schritt
         </caption>

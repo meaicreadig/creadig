@@ -138,7 +138,7 @@ export function SelectedWork() {
                   <span
                     aria-hidden="true"
                     className={`bg-line absolute inset-y-0 hidden w-px md:block ${
-                      imageRight ? "left-0" : "right-0"
+                      imageRight ? "start-0" : "end-0"
                     }`}
                   />
                 </div>

@@ -200,6 +200,18 @@ export const viewport: Viewport = {
  * Komfort-Kategorie erlaubt (siehe lib/consent.ts). Ohne Einwilligung bleibt
  * es hell, genau wie im ThemeProvider.
  */
+/**
+ * Leserichtung je Sprache. Nur Arabisch laeuft rechts nach links; die
+ * Tabelle steht explizit da, weil sie sich aus dem Sprachcode nicht
+ * ableiten laesst (Tuerkisch ist LTR, Persisch waere RTL).
+ */
+const LOCALE_DIR: Record<Locale, "ltr" | "rtl"> = {
+  de: "ltr",
+  tr: "ltr",
+  en: "ltr",
+  ar: "rtl",
+}
+
 const BOOT_SCRIPT = `(function(){try{
 var d=document.documentElement;
 var c=JSON.parse(localStorage.getItem('creadig_consent')||'null');
@@ -329,8 +341,24 @@ export function SiteShell({
   children: React.ReactNode
 }) {
   return (
+    /*
+     * Gate 3 — `dir` steht hier und nirgends sonst.
+     *
+     * Die Leserichtung ist eine Eigenschaft des DOKUMENTS, nicht eines
+     * Bausteins. Steht sie am <html>, erben sie alle Kinder, und der
+     * Bidi-Algorithmus des Browsers arbeitet fuer uns: lateinische Namen
+     * (creaDIG, meAI, fibero) und E-Mail-Adressen laufen innerhalb eines
+     * arabischen Satzes weiter von links nach rechts, ohne dass wir jede
+     * Stelle einzeln auszeichnen muessen.
+     *
+     * Was NICHT hilft: text-align. Rechtsbuendiger Text in einem
+     * linkslaufenden Raster ist kein RTL — die Reihenfolge der Spalten,
+     * die Richtung der Abstaende und das Verhalten von Ueberlauf bleiben
+     * falsch. Deshalb greift zusaetzlich die logische Achse im CSS.
+     */
     <html
       lang={locale}
+      dir={LOCALE_DIR[locale]}
       className={`${poppins.variable} ${mplusRounded.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >

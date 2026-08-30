@@ -72,7 +72,7 @@ export function AdminLoginForm() {
       </label>
 
       {error && (
-        <p role="alert" className="border-destructive/40 text-destructive border-l-2 py-1 pl-4 text-sm">
+        <p role="alert" className="border-destructive/40 text-destructive border-s-2 py-1 ps-4 text-sm">
           {error}
         </p>
       )}

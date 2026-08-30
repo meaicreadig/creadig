@@ -671,7 +671,7 @@
   &::before {
     content: "";
     position: absolute;
-    left: 1.5rem;
+    inset-inline-start: 1.5rem;
     bottom: -1px;
     height: 1px;
     width: 2.25rem;
@@ -682,7 +682,7 @@
   &::after {
     content: counter(seam, decimal-leading-zero) attr(data-seam);
     position: absolute;
-    left: 1.5rem;
+    inset-inline-start: 1.5rem;
     bottom: 0.875rem;
     font-family: var(--font-mono);
     font-size: 0.625rem;
@@ -702,14 +702,14 @@
   @media (width >= 48rem) {
     &::before,
     &::after {
-      left: 2.5rem;
+      inset-inline-start: 2.5rem;
     }
   }
 
   @media (width >= 64rem) {
     &::before,
     &::after {
-      left: 4rem;
+      inset-inline-start: 4rem;
     }
   }
 }

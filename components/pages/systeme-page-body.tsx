@@ -87,7 +87,7 @@ export function SystemePageBody() {
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
+                    className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
                   <h3 className="text-subhead text-lg">{item.name}</h3>
                   <p className="type-small text-muted-foreground mt-3 flex-1 text-pretty">
@@ -167,7 +167,7 @@ export function SystemePageBody() {
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
+                    className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
                   <h3 className="text-subhead text-lg">{item.name}</h3>
                   <p className="type-small text-muted-foreground mt-3 text-pretty">{item.body}</p>
@@ -225,7 +225,7 @@ export function SystemePageBody() {
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
+                    className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
                   <h3 className="text-subhead text-lg">{item.name}</h3>
                   <p className="type-small text-muted-foreground mt-3 text-pretty">{item.body}</p>

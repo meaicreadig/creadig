@@ -47,7 +47,7 @@ export function WorkRegistry() {
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
+                  className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                 />
                 <div className="grid items-baseline gap-x-8 gap-y-2 px-2 py-6 md:grid-cols-12">
                   <span className="eyebrow text-gold-text md:col-span-1">{number}</span>

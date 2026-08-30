@@ -46,7 +46,7 @@ export function CaseStudies() {
             >
               <span
                 aria-hidden="true"
-                className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
+                className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
               />
               <CaseStudyBody study={study} />
             </Reveal>

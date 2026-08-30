@@ -69,7 +69,7 @@ export function CompanyChapters() {
               {/* Die Marke auf der Schiene — sitzt genau auf der Linie. */}
               <span
                 aria-hidden="true"
-                className="bg-gold absolute top-0 left-0 hidden h-0.5 w-10 md:block"
+                className="bg-gold absolute top-0 start-0 hidden h-0.5 w-10 md:block"
               />
               {/* Ohne belegtes Jahr steht hier nichts — keine Schaetzung. */}
               {item.year && (

@@ -78,7 +78,7 @@ export default async function StatusPage({
           {done.map((item) => (
             <li key={item.label} className="border-line border-t py-4">
               <span className="text-subhead">{item.label}</span>
-              <span className="type-small text-muted-foreground ml-3">{item.detail}</span>
+              <span className="type-small text-muted-foreground ms-3">{item.detail}</span>
             </li>
           ))}
         </ul>

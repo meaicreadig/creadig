@@ -352,7 +352,7 @@ export function QuickCheck() {
               {error && (
                 <p
                   role="alert"
-                  className="border-destructive/40 text-destructive border-l-2 py-1 pl-4 text-sm"
+                  className="border-destructive/40 text-destructive border-s-2 py-1 ps-4 text-sm"
                 >
                   {error}
                 </p>
@@ -360,7 +360,7 @@ export function QuickCheck() {
 
               {/* „Angekommen" erscheint erst, wenn der Server es bestaetigt hat. */}
               {status === "sent" && (
-                <div role="status" className="border-gold bg-muted border-l-2 py-4 pl-5">
+                <div role="status" className="border-gold bg-muted border-s-2 py-4 ps-5">
                   <p className="type-small text-foreground">{copy.sentTitle}</p>
                   <p className="type-small text-muted-foreground mt-2 text-pretty">
                     {copy.sentBody}

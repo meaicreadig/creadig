@@ -87,7 +87,7 @@ function WorkCard({
           className="from-ink/55 via-ink/5 absolute inset-0 bg-gradient-to-t to-transparent opacity-70 transition-opacity duration-[var(--dur-3)] group-hover:opacity-40"
         />
 
-        <div className="absolute top-4 left-4 flex items-center gap-2">
+        <div className="absolute top-4 start-4 flex items-center gap-2">
           <Badge
             variant="outline"
             className="border-background/40 bg-background/80 eyebrow rounded-none px-2.5 py-1 backdrop-blur-sm"
@@ -108,7 +108,7 @@ function WorkCard({
         {work.live && (
           <Badge
             variant="outline"
-            className="border-background/40 bg-background/80 eyebrow absolute top-4 right-4 gap-1.5 rounded-none px-2.5 py-1 backdrop-blur-sm"
+            className="border-background/40 bg-background/80 eyebrow absolute top-4 end-4 gap-1.5 rounded-none px-2.5 py-1 backdrop-blur-sm"
           >
             <span
               className="bg-gold size-1.5 rounded-full"
@@ -330,7 +330,7 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
               <span className="text-subhead text-foreground text-xl">
                 {project.name}
               </span>
-              <span className="text-muted-foreground group-hover:text-gold-text text-right text-[0.75rem] transition-colors duration-[var(--dur-2)]">
+              <span className="text-muted-foreground group-hover:text-gold-text text-end text-[0.75rem] transition-colors duration-[var(--dur-2)]">
                 {project.what[locale]}
               </span>
             </li>

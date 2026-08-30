@@ -490,7 +490,7 @@ export function TerminWizard() {
         {error && (
           <p
             role="alert"
-            className="border-destructive/40 text-destructive mt-8 border-l-2 py-2 pl-4 text-sm"
+            className="border-destructive/40 text-destructive mt-8 border-s-2 py-2 ps-4 text-sm"
           >
             {error}
           </p>
@@ -543,7 +543,7 @@ export function TerminWizard() {
                     das einzige Signal, das auch ohne Farbe funktioniert.
                   */
                   className={cn(
-                    "border-line group relative flex flex-col rounded-md border p-7 text-left transition-colors duration-[var(--dur-2)]",
+                    "border-line group relative flex flex-col rounded-md border p-7 text-start transition-colors duration-[var(--dur-2)]",
                     type === option.id
                       ? "bg-gold/[0.14] border-gold ring-gold/35 ring-1"
                       : "hover:bg-foreground/[0.02]",
@@ -552,7 +552,7 @@ export function TerminWizard() {
                   <span
                     aria-hidden="true"
                     className={cn(
-                      "bg-gold absolute top-0 left-0 h-0.5 transition-all duration-[var(--dur-2)] ease-brand",
+                      "bg-gold absolute top-0 start-0 h-0.5 transition-all duration-[var(--dur-2)] ease-brand",
                       type === option.id ? "w-full" : "w-0",
                     )}
                   />
@@ -709,7 +709,7 @@ export function TerminWizard() {
                     onClick={() => toggleWindow(window.id)}
                     aria-pressed={windows.includes(window.id)}
                     className={cn(
-                      "flex flex-col items-start gap-1 rounded-sm border px-5 py-3 text-left transition-colors duration-[var(--dur-1)]",
+                      "flex flex-col items-start gap-1 rounded-sm border px-5 py-3 text-start transition-colors duration-[var(--dur-1)]",
                       windows.includes(window.id)
                         ? "border-gold bg-gold text-[#201e1b]"
                         : "border-line-strong hover:border-gold hover:text-gold-text",
@@ -740,7 +740,7 @@ export function TerminWizard() {
               Der Satz, der die ganze Stufe trägt: Hier wird nichts gebucht.
               Er steht bewusst VOR dem Weiter-Knopf und nicht im Kleingedruckten.
             */}
-            <p className="border-gold/45 text-muted-foreground type-small mt-10 border-l-2 py-2 pl-4 text-pretty">
+            <p className="border-gold/45 text-muted-foreground type-small mt-10 border-s-2 py-2 ps-4 text-pretty">
               {t.termin.step2.notBooked}
             </p>
 
@@ -952,7 +952,7 @@ export function TerminWizard() {
             {error && (
               <p
                 role="alert"
-                className="border-destructive/40 text-destructive mt-8 border-l-2 py-1 pl-4 text-sm"
+                className="border-destructive/40 text-destructive mt-8 border-s-2 py-1 ps-4 text-sm"
               >
                 {error}
               </p>

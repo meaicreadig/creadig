@@ -42,7 +42,7 @@ function Switch({
       <span
         aria-hidden="true"
         className={`absolute top-1/2 size-4 -translate-y-1/2 transition-all duration-[var(--dur-2)] ease-brand ${
-          checked ? "bg-gold left-[1.5rem]" : "bg-line-strong left-[0.15rem]"
+          checked ? "bg-gold start-[1.5rem]" : "bg-line-strong start-[0.15rem]"
         }`}
       />
     </button>
@@ -125,7 +125,7 @@ export function CookieConsent() {
               setDetails(false)
             }}
             aria-label={t.consent.close}
-            className="text-muted-foreground hover:text-gold-text absolute top-4 right-4 transition-colors duration-[var(--dur-2)]"
+            className="text-muted-foreground hover:text-gold-text absolute top-4 end-4 transition-colors duration-[var(--dur-2)]"
           >
             <X className="size-4" strokeWidth={1.5} />
           </button>
@@ -158,7 +158,7 @@ export function CookieConsent() {
 
           {/* Art. 49 Abs. 1 lit. a DSGVO — abgesetzt, damit er nicht als
               Kleingedrucktes durchgeht. */}
-          <p className="border-gold/45 text-foreground/80 type-small mt-6 max-w-2xl border-l-2 pl-4 text-pretty">
+          <p className="border-gold/45 text-foreground/80 type-small mt-6 max-w-2xl border-s-2 ps-4 text-pretty">
             {t.consent.thirdCountry}
           </p>
 

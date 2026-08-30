@@ -159,7 +159,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
 
             {/* Fällt automatisch weg, sobald alle Pflichtfelder vollständig sind. */}
             {!imprintComplete ? (
-              <section className="border-gold/45 bg-muted border-l-2 py-5 pl-6">
+              <section className="border-gold/45 bg-muted border-s-2 py-5 ps-6">
                 <p className="eyebrow text-gold-text">{t.legal.pending}</p>
                 <p className="type-body text-muted-foreground mt-3 text-pretty">
                   {t.legal.pendingNote}
@@ -249,7 +249,7 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
 
               {/* Faellt automatisch weg, sobald alle Vertraege bestaetigt sind. */}
               {!processorsConfirmed && (
-                <p className="border-gold/45 bg-muted type-small text-muted-foreground mt-6 border-l-2 py-4 pl-5 text-pretty">
+                <p className="border-gold/45 bg-muted type-small text-muted-foreground mt-6 border-s-2 py-4 ps-5 text-pretty">
                   {t.legal.processorPendingNote}
                 </p>
               )}

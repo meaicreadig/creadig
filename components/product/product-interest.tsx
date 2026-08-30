@@ -82,7 +82,7 @@ export function ProductInterest({
           <Reveal>
             <div
               role="status"
-              className="border-gold bg-muted border-l-2 py-6 pl-6"
+              className="border-gold bg-muted border-s-2 py-6 ps-6"
             >
               <h2 id={`interesse-${slug}-title`} className="type-h4">
                 {copy.sentTitle}
@@ -229,7 +229,7 @@ export function ProductInterest({
               {error && (
                 <p
                   role="alert"
-                  className="border-destructive/40 text-destructive border-l-2 py-1 pl-4 text-sm"
+                  className="border-destructive/40 text-destructive border-s-2 py-1 ps-4 text-sm"
                 >
                   {error}
                 </p>

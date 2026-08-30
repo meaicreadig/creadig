@@ -34,6 +34,7 @@ const LOCALE_NAME: Record<Locale, { short: string; full: string }> = {
   de: { short: "DE", full: "Deutsch" },
   tr: { short: "TR", full: "Türkçe" },
   en: { short: "EN", full: "English" },
+  ar: { short: "AR", full: "العربية" },
 }
 import { whatsappLink, type Locale } from "@/lib/dictionary"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
@@ -151,7 +152,7 @@ export function SiteNav() {
                     Hover, wo man hinkaeme. Dieselbe Bewegung, zwei Rollen. */}
                 <span
                   className={cn(
-                    "absolute -bottom-0.5 left-0 h-px bg-gold transition-all duration-[var(--dur-2)] ease-brand group-hover:w-full",
+                    "absolute -bottom-0.5 start-0 h-px bg-gold transition-all duration-[var(--dur-2)] ease-brand group-hover:w-full",
                     active ? "w-full" : "w-0",
                   )}
                 />
@@ -221,7 +222,7 @@ export function SiteNav() {
           */}
           <Link
             href="/termin"
-            className="cta-outline eyebrow ml-1.5 hidden items-center px-6 py-3 sm:inline-flex"
+            className="cta-outline eyebrow ms-1.5 hidden items-center px-6 py-3 sm:inline-flex"
           >
             {t.nav.cta}
           </Link>
@@ -243,7 +244,7 @@ export function SiteNav() {
               className="h-dvh border-0 bg-background p-0 [&>button]:top-7 [&>button]:right-6"
             >
               <SheetHeader className="h-[4.5rem] justify-center px-6 py-0">
-                <SheetTitle className="text-left">
+                <SheetTitle className="text-start">
                   <Logo variant="auto" className="h-[1.3rem]" />
                   <span className="sr-only">creaDIG</span>
                 </SheetTitle>

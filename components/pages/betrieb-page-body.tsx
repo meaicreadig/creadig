@@ -78,7 +78,7 @@ export function BetriebPageBody() {
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
+                  className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                 />
                 {/* Die Ziffer ordnet, sie zaehlt nichts — darum aria-hidden. */}
                 <span aria-hidden="true" className="eyebrow text-muted-foreground">
@@ -116,7 +116,7 @@ export function BetriebPageBody() {
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
+                    className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
                   <h3 className="text-subhead text-lg">{item.name}</h3>
                   <p className="type-small text-muted-foreground mt-3 text-pretty">{item.what}</p>
@@ -162,7 +162,7 @@ export function BetriebPageBody() {
         <section aria-labelledby="betrieb-preis" className="section-seam">
           <div className="section-shell-tight">
             <Reveal>
-              <div className="border-gold/45 bg-background grid gap-10 border-l-2 px-7 py-9 md:px-10 md:py-11 lg:grid-cols-12 lg:gap-14">
+              <div className="border-gold/45 bg-background grid gap-10 border-s-2 px-7 py-9 md:px-10 md:py-11 lg:grid-cols-12 lg:gap-14">
                 <div className="lg:col-span-7">
                   <p className="eyebrow text-gold-text">{t.packages.retainerEyebrow}</p>
                   <h2 id="betrieb-preis" className="type-h3 mt-5 text-balance">

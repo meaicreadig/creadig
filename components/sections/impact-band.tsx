@@ -81,7 +81,7 @@ export function ImpactBand() {
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
+                  className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
                 />
                 <p className="eyebrow text-gold-text">{copy.label}</p>
                 {/* Gemeinsame Mindesthoehe mit den Aussagen, damit alle vier Detailzeilen auf einer Linie beginnen. */}
@@ -103,7 +103,7 @@ export function ImpactBand() {
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
+                  className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
                 />
                 <p className="eyebrow text-muted-foreground">{copy.label}</p>
                 <p className="text-subhead mt-5 max-w-[14ch] text-xl text-pretty lg:min-h-[3rem]">

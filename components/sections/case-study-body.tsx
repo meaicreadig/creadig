@@ -110,7 +110,7 @@ export function CaseStudyBody({
           )}
 
           {study.voice && (
-            <figure className="border-gold/45 bg-muted mt-12 border-l-2 py-6 pl-6">
+            <figure className="border-gold/45 bg-muted mt-12 border-s-2 py-6 ps-6">
               <p className="eyebrow text-gold-text">{copy.voiceLabel}</p>
               <blockquote
                 lang={study.voice.lang}

@@ -42,7 +42,7 @@ export function MeaiSpotlight() {
             </Reveal>
 
             <Reveal delay={0.15}>
-              <div className="border-gold/45 mt-10 border-l pl-6">
+              <div className="border-gold/45 mt-10 border-s ps-6">
                 <p className="type-body text-muted-foreground max-w-xl text-pretty">
                   {t.meai.dna}
                 </p>
@@ -83,7 +83,7 @@ export function MeaiSpotlight() {
                     >
                       <span
                         aria-hidden="true"
-                        className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
+                        className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
                       />
                       <span className="text-muted-foreground group-hover:text-gold-text text-meta transition-colors duration-[var(--dur-2)]">
                         {String(i + 1).padStart(2, "0")}

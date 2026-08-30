@@ -63,7 +63,7 @@ export function WorkModel() {
             >
               <span
                 aria-hidden="true"
-                className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
+                className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
               />
               <span className="eyebrow text-gold-text">{String(i + 1).padStart(2, "0")}</span>
               <h3 className="type-h3 mt-6">{copy.items[key].name}</h3>
@@ -76,7 +76,7 @@ export function WorkModel() {
 
         {/* Der Gründer mit Rolle und Verantwortungsfeldern. */}
         <Reveal delay={0.14}>
-          <div className="border-gold/45 bg-muted mt-20 grid gap-10 border-l-2 px-7 py-9 md:px-10 md:py-11 lg:grid-cols-12 lg:gap-14">
+          <div className="border-gold/45 bg-muted mt-20 grid gap-10 border-s-2 px-7 py-9 md:px-10 md:py-11 lg:grid-cols-12 lg:gap-14">
             <div className="lg:col-span-5">
               <p className="eyebrow text-gold-text">{t.about.founderLabel}</p>
               <p className="type-statement mt-4">{t.about.founder}</p>

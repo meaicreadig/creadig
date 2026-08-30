@@ -107,7 +107,7 @@ export function HouseArchitecture() {
 
           {/* ---- Quer darunter: der Betrieb ------------------------------ */}
           <Reveal delay={0.12}>
-            <div className="border-gold/45 bg-muted mt-6 border-l-2 px-6 py-5">
+            <div className="border-gold/45 bg-muted mt-6 border-s-2 px-6 py-5">
               <p className="eyebrow text-gold-text">{copy.operateLabel}</p>
               <p className="text-subhead mt-3 text-lg">{t.managed.title}</p>
               <p className="type-small text-muted-foreground mt-2 text-pretty">

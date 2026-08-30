@@ -312,7 +312,7 @@ export function ProduktPageBody({
                 >
                   <span
                     aria-hidden="true"
-                    className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
+                    className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                   />
                   <span className="eyebrow text-gold-text">
                     {String(i + 1).padStart(2, "0")}
@@ -487,7 +487,7 @@ export function ProduktPageBody({
                   eigenen Tagesgeschäft.
                 */}
                 {houseContext && (
-                  <Reveal delay={0.12} className="border-gold/45 bg-muted mt-10 border-l-2 py-6 pl-6">
+                  <Reveal delay={0.12} className="border-gold/45 bg-muted mt-10 border-s-2 py-6 ps-6">
                     <p className="eyebrow text-gold-text">{copy.houseContextLabel}</p>
                     <p className="text-subhead mt-4 text-xl">{houseContext.name}</p>
                     <p className="type-small text-muted-foreground mt-2">

@@ -84,7 +84,7 @@ export function ContactDirect() {
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
+                  className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
                 />
                 <CalendarDays className="text-gold mt-1 size-5 shrink-0" strokeWidth={1.5} />
                 <span className="flex-1">
@@ -121,7 +121,7 @@ export function ContactDirect() {
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
+                  className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
                 />
                 <WhatsAppIcon className="text-gold mt-1 size-5 shrink-0" />
                 <span className="flex-1">
@@ -147,7 +147,7 @@ export function ContactDirect() {
               >
                 <span
                   aria-hidden="true"
-                  className="bg-gold absolute top-0 left-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
+                  className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
                 />
                 <Mail className="text-gold mt-1 size-5 shrink-0" strokeWidth={1.5} />
                 <span className="flex-1">

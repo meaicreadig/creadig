@@ -8,7 +8,7 @@ import { whatsappLink, WHATSAPP_NUMBER } from "@/lib/dictionary"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 
 const buttonClassName =
-  "group fixed bottom-5 left-5 z-40 flex items-center overflow-hidden rounded-full bg-[#25D366] p-4 text-white elevation-3 transition-all duration-[var(--dur-2)] hover:pr-5 md:bottom-8 md:left-8"
+  "group fixed bottom-5 start-5 z-40 flex items-center overflow-hidden rounded-full bg-[#25D366] p-4 text-white elevation-3 transition-all duration-[var(--dur-2)] hover:pr-5 md:bottom-8 md:left-8"
 
 export function StickyWhatsApp() {
   const { t, locale } = useLocale()
