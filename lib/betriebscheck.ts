@@ -44,9 +44,9 @@ export type CheckLayer = (typeof serviceLayers)[number]["key"]
 export type CheckAnswerKey = "yes" | "partly" | "no"
 
 export const CHECK_ANSWERS: { key: CheckAnswerKey; points: number; label: Localized }[] = [
-  { key: "yes", points: 2, label: { de: "Läuft", tr: "Yürüyor", en: "Working" } },
-  { key: "partly", points: 1, label: { de: "Teilweise", tr: "Kısmen", en: "Partly" } },
-  { key: "no", points: 0, label: { de: "Nicht", tr: "Hayır", en: "Not yet" } },
+  { key: "yes", points: 2, label: { de: "Läuft", tr: "Yürüyor", en: "Working", ar: "يعمل" } },
+  { key: "partly", points: 1, label: { de: "Teilweise", tr: "Kısmen", en: "Partly", ar: "جزئيًا" } },
+  { key: "no", points: 0, label: { de: "Nicht", tr: "Hayır", en: "Not yet", ar: "لا" } },
 ]
 
 export const MAX_POINTS_PER_QUESTION = 2
@@ -71,6 +71,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Ihr Betrieb tritt überall gleich auf — Fahrzeug, Angebot, Rechnung, Website.",
       tr: "İşletmeniz her yerde aynı görünüyor — araç, teklif, fatura, web sitesi.",
       en: "Your business looks the same everywhere — van, quote, invoice, website.",
+      ar: "منشأتكم تظهر بالشكل نفسه في كل مكان — المركبة والعرض والفاتورة والموقع.",
     },
   },
   {
@@ -80,6 +81,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Wer Sie zum ersten Mal sieht, versteht in zehn Sekunden, was Sie tun.",
       tr: "Sizi ilk kez gören, on saniyede ne yaptığınızı anlıyor.",
       en: "Someone seeing you for the first time understands in ten seconds what you do.",
+      ar: "من يراكم أول مرة يفهم في عشر ثوانٍ ما الذي تفعلونه.",
     },
   },
   {
@@ -89,6 +91,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Logos, Farben und Vorlagen liegen an einer Stelle — nicht auf drei Rechnern.",
       tr: "Logolar, renkler ve şablonlar tek bir yerde — üç ayrı bilgisayarda değil.",
       en: "Logos, colours and templates are in one place — not on three computers.",
+      ar: "الشعارات والألوان والقوالب في موضع واحد — لا على ثلاثة حواسيب.",
     },
   },
 
@@ -99,6 +102,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Ihre Website ist so aktuell, dass Sie sie jemandem ungefragt schicken würden.",
       tr: "Web siteniz, birine çekinmeden gönderebileceğiniz kadar güncel.",
       en: "Your website is current enough that you would send it to someone unprompted.",
+      ar: "موقعكم محدَّث بما يكفي لترسلوه لأحدهم دون أن يطلبه.",
     },
   },
   {
@@ -108,6 +112,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Wer Ihre Leistung sucht, findet Sie — nicht nur, wer Ihren Namen schon kennt.",
       tr: "Hizmetinizi arayan sizi buluyor — sadece adınızı bilen değil.",
       en: "People searching for your service find you — not only those who already know your name.",
+      ar: "من يبحث عن خدمتكم يجدكم — لا من يعرف اسمكم فقط.",
     },
   },
   {
@@ -117,6 +122,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Eine Anfrage kommt strukturiert bei Ihnen an, nicht als Zuruf zwischen Tür und Angel.",
       tr: "Gelen talep size düzenli ulaşıyor, iki iş arasında laf olarak değil.",
       en: "An enquiry reaches you in a structured form, not as a remark in passing.",
+      ar: "الاستفسار يصلكم منظَّمًا، لا كملاحظة عابرة.",
     },
   },
 
@@ -127,6 +133,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Sie sehen den Stand eines Auftrags, ohne jemanden anzurufen.",
       tr: "Bir işin durumunu kimseyi aramadan görebiliyorsunuz.",
       en: "You can see the status of a job without calling anyone.",
+      ar: "ترون حالة الطلب دون الاتصال بأحد.",
     },
   },
   {
@@ -136,6 +143,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Angebot, Auftrag und Rechnung hängen zusammen — dieselben Daten werden nicht zweimal getippt.",
       tr: "Teklif, iş emri ve fatura birbirine bağlı — aynı veri iki kez yazılmıyor.",
       en: "Quote, job and invoice are connected — the same data is not typed twice.",
+      ar: "العرض والطلب والفاتورة مترابطة — والبيانات نفسها لا تُكتب مرتين.",
     },
   },
   {
@@ -145,6 +153,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Fällt jemand aus, findet ein anderer den Vorgang ohne Rückfrage.",
       tr: "Biri olmadığında, bir başkası işi kimseye sormadan bulabiliyor.",
       en: "If someone is away, another person finds the case without having to ask.",
+      ar: "إن غاب أحدهم وجد غيره المعاملة دون سؤال.",
     },
   },
 
@@ -155,6 +164,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Wiederkehrende Schritte laufen ohne Sie — Erinnerungen, Bestätigungen, Übergaben.",
       tr: "Tekrar eden adımlar sizsiz yürüyor — hatırlatma, onay, devir.",
       en: "Recurring steps run without you — reminders, confirmations, handovers.",
+      ar: "الخطوات المتكررة تجري دونكم — التذكيرات والتأكيدات والتسليمات.",
     },
   },
   {
@@ -164,6 +174,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Zahlen aus dem Betrieb entstehen nebenbei, nicht am Monatsende in einer Tabelle.",
       tr: "İşletme rakamları iş akarken oluşuyor, ay sonunda bir tabloda değil.",
       en: "Figures from the business arise along the way, not in a spreadsheet at month end.",
+      ar: "أرقام المنشأة تنشأ في أثناء العمل، لا في جدول نهاية الشهر.",
     },
   },
   {
@@ -173,6 +184,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "In den letzten sechs Monaten ist mindestens ein Handgriff dauerhaft weggefallen.",
       tr: "Son altı ayda en az bir el işi kalıcı olarak ortadan kalktı.",
       en: "In the last six months at least one manual step has gone away for good.",
+      ar: "في الأشهر الستة الماضية زالت خطوة يدوية واحدة على الأقل نهائيًا.",
     },
   },
 
@@ -183,6 +195,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Sie können sagen, welcher Auftragstyp bei Ihnen tatsächlich Geld bringt.",
       tr: "Hangi iş türünün gerçekten para kazandırdığını söyleyebiliyorsunuz.",
       en: "You can say which type of job actually makes you money.",
+      ar: "تستطيعون قول أي نوع من الطلبات يدرّ عليكم المال فعلًا.",
     },
   },
   {
@@ -192,6 +205,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Entscheidungen stützen sich auf Zahlen, die Sie am selben Tag sehen — nicht auf ein Gefühl.",
       tr: "Kararlar aynı gün görebildiğiniz rakamlara dayanıyor — hisse değil.",
       en: "Decisions rest on figures you see the same day — not on a feeling.",
+      ar: "القرارات تستند إلى أرقام ترونها في اليوم نفسه — لا إلى إحساس.",
     },
   },
   {
@@ -201,6 +215,7 @@ export const CHECK_QUESTIONS: CheckQuestion[] = [
       de: "Ihre Systeme melden sich, bevor Sie fragen — Auslastung, Termine, Engpässe.",
       tr: "Sistemleriniz siz sormadan haber veriyor — doluluk, randevu, darboğaz.",
       en: "Your systems report before you ask — capacity, appointments, bottlenecks.",
+      ar: "أنظمتكم تُبلغ قبل أن تسألوا — الطاقة والمواعيد والاختناقات.",
     },
   },
 ]
@@ -353,38 +368,44 @@ export const checkCopy = {
     de: "Betriebscheck — wo Ihr Betrieb noch von Hand läuft | creaDIG",
     tr: "İşletme kontrolü — işletmeniz nerede hâlâ elle yürüyor | creaDIG",
     en: "Operations check — where your business still runs by hand | creaDIG",
+    ar: "فحص المنشأة — أين تعمل منشأتكم يدويًا | creaDIG",
   },
   metaDescription: {
     de: "Fünfzehn Fragen zu Ihrem Alltag, fünf Ebenen, ein Ergebnis: wo der Engpass liegt und was er kostet. Kostenlos, ohne Anmeldung.",
     tr: "Günlük işinize dair on beş soru, beş katman, tek sonuç: darboğaz nerede ve neye mal oluyor. Ücretsiz, kayıt gerekmez.",
     en: "Fifteen questions about your working day, five levels, one result: where the bottleneck is and what it costs. Free, no sign-up.",
+    ar: "خمسة عشر سؤالًا عن يومكم العملي، وخمس طبقات، ونتيجة واحدة: أين الاختناق وكم يكلّف. مجانًا ودون تسجيل.",
   },
-  eyebrow: { de: "Betriebscheck", tr: "İşletme kontrolü", en: "Operations check" },
+  eyebrow: { de: "Betriebscheck", tr: "İşletme kontrolü", en: "Operations check", ar: "فحص المنشأة" },
   title: {
     de: "Ihr Betrieb läuft. Aber wie viel davon noch von Hand?",
     tr: "İşletmeniz yürüyor. Peki ne kadarı hâlâ elle?",
     en: "Your business runs. But how much of it still by hand?",
+    ar: "منشأتكم تعمل. لكن كم منها ما يزال يدويًا؟",
   },
   lead: {
     de: "Fünfzehn Fragen, fünf Ebenen, zwei Minuten. Am Ende sehen Sie, wo der Engpass liegt — und wie viele Stellen Sie selbst als offen benannt haben.",
     tr: "On beş soru, beş katman, iki dakika. Sonunda darboğazın nerede olduğunu ve kaç noktayı kendinizin açık olarak işaretlediğini görürsünüz.",
     en: "Fifteen questions, five levels, two minutes. At the end you see where the bottleneck is — and how many places you yourself marked as open.",
+    ar: "خمسة عشر سؤالًا، وخمس طبقات، ودقيقتان. وفي النهاية ترون أين يقع الاختناق — وكم موضعًا وسمتموه أنتم مفتوحًا.",
   },
   /* Die Ehrlichkeitszeile. Sie steht VOR dem Ergebnis, nicht im Kleingedruckten. */
   disclaimer: {
     de: "Das ist Ihre eigene Einschätzung, keine Prüfung — wir sehen Ihren Betrieb nicht. Die Seite ordnet nur, was Sie angegeben haben.",
     tr: "Bu sizin kendi değerlendirmeniz, bir denetim değil — işletmenizi görmüyoruz. Sayfa yalnızca verdiğiniz yanıtları düzenler.",
     en: "This is your own assessment, not an audit — we do not see your business. The page only orders what you entered.",
+    ar: "هذا تقديركم أنتم، لا فحصٌ — نحن لا نرى منشأتكم. والصفحة تُرتّب ما أدخلتموه فحسب.",
   },
   progress: {
     de: (done: number, total: number) => `${done} von ${total} beantwortet`,
     tr: (done: number, total: number) => `${total} sorudan ${done} tanesi yanıtlandı`,
     en: (done: number, total: number) => `${done} of ${total} answered`,
+    ar: (done: number, total: number) => `أُجيب عن ${done} من ${total}`,
   },
-  resultTitle: { de: "Ihr Ergebnis", tr: "Sonucunuz", en: "Your result" },
-  showResult: { de: "Ergebnis zeigen", tr: "Sonucu göster", en: "Show the result" },
-  scoreLabel: { de: "Gesamt", tr: "Toplam", en: "Total" },
-  bottleneckLabel: { de: "Größte Lücke", tr: "En büyük boşluk", en: "Biggest gap" },
+  resultTitle: { de: "Ihr Ergebnis", tr: "Sonucunuz", en: "Your result", ar: "نتيجتكم" },
+  showResult: { de: "Ergebnis zeigen", tr: "Sonucu göster", en: "Show the result", ar: "عرض النتيجة" },
+  scoreLabel: { de: "Gesamt", tr: "Toplam", en: "Total", ar: "الإجمالي" },
+  bottleneckLabel: { de: "Größte Lücke", tr: "En büyük boşluk", en: "Biggest gap", ar: "أكبر فجوة" },
   bottleneckBlocked: {
     de: (weak: string, blocked: string) =>
       `${weak} → ${blocked}: Solange ${weak} nicht trägt, kostet jeder Schritt in ${blocked} mehr, als er müsste.`,
@@ -392,14 +413,17 @@ export const checkCopy = {
       `${weak} → ${blocked}: ${weak} taşımadığı sürece, ${blocked} tarafındaki her adım olması gerekenden pahalıya gelir.`,
     en: (weak: string, blocked: string) =>
       `${weak} → ${blocked}: as long as ${weak} does not carry, every step in ${blocked} costs more than it should.`,
+    ar: (weak: string, blocked: string) =>
+      `${weak} ← ${blocked}: ما دامت ${weak} لا تحمل، فكل خطوة في ${blocked} تكلّف أكثر مما ينبغي.`,
   },
   /* Wenn keine Ebene abfaellt, gibt es keine Luecke — und die Seite sagt das. */
   bottleneckEven: {
     de: "Keine Ebene fällt ab. Dann ist die Frage nicht, wo es klemmt, sondern was als Nächstes dazukommt.",
     tr: "Hiçbir katman geride kalmıyor. O hâlde soru nerede takıldığı değil, sırada ne olduğu.",
     en: "No level falls behind. Then the question is not where it is stuck, but what comes next.",
+    ar: "لا طبقة متأخرة. عندها لا يكون السؤال أين يعلق الأمر، بل ما الذي يأتي تاليًا.",
   },
-  bottleneckEvenLabel: { de: "Kein Engpass", tr: "Darboğaz yok", en: "No bottleneck" },
+  bottleneckEvenLabel: { de: "Kein Engpass", tr: "Darboğaz yok", en: "No bottleneck", ar: "لا اختناق" },
   bottleneckTop: {
     de: (weak: string) =>
       `${weak} ist die schwächste Ebene — und die oberste. Darunter steht bereits etwas, auf dem sie aufbauen kann.`,
@@ -407,6 +431,8 @@ export const checkCopy = {
       `${weak} en zayıf katman — ve en üstteki. Altında, üzerine kurulabileceği bir şey zaten var.`,
     en: (weak: string) =>
       `${weak} is the weakest level — and the topmost. Below it there is already something it can build on.`,
+    ar: (weak: string) =>
+      `${weak} هي أضعف طبقة — وهي العليا أيضًا. وتحتها يوجد بالفعل ما يمكن أن تقوم عليه.`,
   },
   manualLabel: {
     de: (count: number) =>
@@ -418,38 +444,44 @@ export const checkCopy = {
       count === 1
         ? "You marked 1 place as open yourself."
         : `You marked ${count} places as open yourself.`,
+    ar: (count: number) => `وسمتم ${count} موضعًا مفتوحًا بأنفسكم.`,
   },
   manualNone: {
     de: "Sie haben keine Stelle als offen benannt. Dann geht es nicht um Aufräumen, sondern um den nächsten Schritt.",
     tr: "Hiçbir noktayı açık olarak işaretlemediniz. O hâlde mesele toparlamak değil, bir sonraki adım.",
     en: "You marked no place as open. Then this is not about tidying up, but about the next step.",
+    ar: "لم تسموا أي موضع مفتوحًا. عندها لا يكون الأمر ترتيبًا، بل الخطوة التالية.",
   },
   formTitle: {
     de: "Ergebnis besprechen",
     tr: "Sonucu konuşalım",
     en: "Discuss the result",
+    ar: "مناقشة النتيجة",
   },
   formHeadline: {
     de: "Zwanzig Minuten auf Ihre Antworten.",
     tr: "Yanıtlarınız üzerine yirmi dakika.",
     en: "Twenty minutes based on your answers.",
+    ar: "عشرون دقيقة مبنية على إجاباتكم.",
   },
   formLead: {
     de: "Wenn Sie wollen, sehen wir uns die Antworten gemeinsam an — zwanzig Minuten, kostenlos, ohne Verpflichtung. Ihre Antworten kommen mit.",
     tr: "İsterseniz yanıtlara birlikte bakalım — yirmi dakika, ücretsiz, yükümlülük yok. Yanıtlarınız da gelir.",
     en: "If you like, we can go through the answers together — twenty minutes, free, no obligation. Your answers come along.",
+    ar: "إن رغبتم نراجع الإجابات معًا — عشرون دقيقة، مجانًا، دون التزام. وإجاباتكم تأتي معها.",
   },
-  nameLabel: { de: "Name", tr: "Ad", en: "Name" },
-  businessLabel: { de: "Betrieb", tr: "İşletme", en: "Business" },
-  emailLabel: { de: "E-Mail", tr: "E-posta", en: "Email" },
-  phoneLabel: { de: "Telefon", tr: "Telefon", en: "Phone" },
-  submit: { de: "Ergebnis senden", tr: "Sonucu gönder", en: "Send the result" },
-  sending: { de: "Wird gesendet …", tr: "Gönderiliyor …", en: "Sending …" },
-  sentTitle: { de: "Angekommen.", tr: "Ulaştı.", en: "Received." },
+  nameLabel: { de: "Name", tr: "Ad", en: "Name", ar: "الاسم" },
+  businessLabel: { de: "Betrieb", tr: "İşletme", en: "Business", ar: "المنشأة" },
+  emailLabel: { de: "E-Mail", tr: "E-posta", en: "Email", ar: "البريد الإلكتروني" },
+  phoneLabel: { de: "Telefon", tr: "Telefon", en: "Phone", ar: "الهاتف" },
+  submit: { de: "Ergebnis senden", tr: "Sonucu gönder", en: "Send the result", ar: "إرسال النتيجة" },
+  sending: { de: "Wird gesendet …", tr: "Gönderiliyor …", en: "Sending …", ar: "جارٍ الإرسال …" },
+  sentTitle: { de: "Angekommen.", tr: "Ulaştı.", en: "Received.", ar: "وصل." },
   sentBody: {
     de: "Ihre Antworten liegen bei uns. Wir melden uns innerhalb von zwei Werktagen — mit Ihrer Vorgangsnummer.",
     tr: "Yanıtlarınız bize ulaştı. İki iş günü içinde dönüş yaparız — işlem numaranızla birlikte.",
     en: "Your answers have reached us. We will be in touch within two working days — with your reference number.",
+    ar: "إجاباتكم وصلتنا. سنتواصل معكم خلال يومَي عمل — مع رقم معاملتكم.",
   },
-  referenceLabel: { de: "Ihre Vorgangsnummer", tr: "İşlem numaranız", en: "Your reference number" },
+  referenceLabel: { de: "Ihre Vorgangsnummer", tr: "İşlem numaranız", en: "Your reference number", ar: "رقم معاملتكم" },
 } as const

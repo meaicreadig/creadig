@@ -132,21 +132,24 @@ export const insights: Insight[] = [
     /* Praxis: ein Befund am eigenen Objekt, keine Ebenen-Lehre. */
     category: "praxis",
     date: "2026-08-23",
-    topic: { de: "Barrierefreiheit", tr: "Erişilebilirlik", en: "Accessibility" },
+    topic: { de: "Barrierefreiheit", tr: "Erişilebilirlik", en: "Accessibility", ar: "إتاحة الوصول" },
     title: {
       de: "Wir haben unsere eigene Seite geprüft. Acht Mängel.",
       tr: "Kendi sitemizi denetledik. Sekiz eksik.",
       en: "We audited our own site. Eight defects.",
+      ar: "فحصنا موقعنا نحن. ثمانية عيوب.",
     },
     metaTitle: {
       de: "Eigene Website auf Barrierefreiheit geprüft — der Befund",
       tr: "Kendi sitemizi erişilebilirlik için denetledik — bulgular",
       en: "Auditing our own website for accessibility — the findings",
+      ar: "فحص إتاحة الوصول لموقعنا — النتائج",
     },
     teaser: {
       de: "Bevor wir Barrierefreiheit anbieten, haben wir creadig.de nach dem eigenen 12-Punkte-Raster geprüft. Acht Mängel, sieben davon erheblich. Was wir gefunden haben, wie wir es behoben haben — und der Messfehler, der uns fast als Ergebnis durchgegangen wäre.",
       tr: "Erişilebilirliği sunmadan önce creadig.de'yi kendi 12 maddelik şablonumuzla denetledik. Sekiz eksik, yedisi ciddi. Ne bulduk, nasıl giderdik — ve neredeyse sonuç diye kabul edeceğimiz ölçüm hatası.",
       en: "Before offering accessibility as a service, we audited creadig.de against our own 12-point framework. Eight defects, seven of them serious. What we found, how we fixed it — and the measurement error that almost passed as a result.",
+      ar: "قبل أن نعرض إتاحة الوصول كخدمة، فحصنا creadig.de وفق إطارنا ذي الاثنتي عشرة نقطة. ثمانية عيوب، سبعة منها خطيرة. ما وجدناه، وكيف عالجناه — وخطأ القياس الذي كاد يمرّ علينا كنتيجة.",
     },
     body: [
       {
@@ -155,15 +158,17 @@ export const insights: Insight[] = [
           de: "Wer Barrierefreiheit verkauft und sie selbst nicht liefert, verliert das Gespräch im ersten Satz. Also haben wir am 23. August 2026 unsere eigene Seite geprüft — nach demselben Raster, das wir bei Kunden anlegen, und mit demselben Ergebnisbericht. Dieser Text ist die Kurzfassung. Der vollständige Befund liegt offen im Quelltext dieser Seite.",
           tr: "Erişilebilirlik satıp kendi sitesinde sunmayan, konuşmayı ilk cümlede kaybeder. Bu yüzden 23 Ağustos 2026'da kendi sitemizi denetledik — müşterilerde uyguladığımız şablonun aynısıyla ve aynı rapor biçimiyle. Bu yazı özetidir; bulgunun tamamı bu sitenin kaynak kodunda açıkta durur.",
           en: "Anyone who sells accessibility and does not deliver it on their own site loses the conversation in the first sentence. So on 23 August 2026 we audited our own site — against the same framework we apply for clients, and with the same findings report. This text is the short version. The full findings are open in the source of this site.",
+          ar: "من يبيع إتاحة الوصول ولا يقدّمها في موقعه يخسر الحديث من الجملة الأولى. لذلك فحصنا في 23 أغسطس 2026 موقعنا — بالإطار نفسه الذي نطبّقه لدى العملاء، وبتقرير النتائج نفسه. هذا النص هو النسخة المختصرة. أما النتائج الكاملة فمكشوفة في مصدر هذه الصفحة.",
         },
       },
-      { kind: "heading", text: { de: "Was geprüft wurde", tr: "Ne denetlendi", en: "What was audited" } },
+      { kind: "heading", text: { de: "Was geprüft wurde", tr: "Ne denetlendi", en: "What was audited", ar: "ما الذي فُحص" } },
       {
         kind: "text",
         text: {
           de: "Siebzehn Routen in beiden Sprachen, in heller und dunkler Fassung, auf 1440 × 900 und 390 × 844 Pixeln: 68 automatisierte Durchläufe mit axe-core über WCAG 2.1 A und AA. Dazu von Hand, was eine Maschine nicht entscheiden kann — der ganze Weg mit der Tastatur, die zugänglichen Namen aller Bedienelemente, die Überschriften- und Landmark-Struktur, das Verhalten des Termin-Assistenten beim Schrittwechsel.",
           tr: "Her iki dilde on yedi rota, açık ve koyu görünümde, 1440 × 900 ve 390 × 844 piksel pencerede: axe-core ile WCAG 2.1 A ve AA üzerinden 68 otomatik geçiş. Buna ek olarak, bir makinenin karara bağlayamayacağı her şey elle — klavyeyle baştan sona yol, tüm öğelerin erişilebilir adları, başlık ve landmark yapısı, randevu asistanının adım değiştirirken davranışı.",
           en: "Seventeen routes in both languages, in light and dark appearance, at 1440 × 900 and 390 × 844 pixels: 68 automated passes with axe-core across WCAG 2.1 A and AA. Plus, by hand, whatever a machine cannot decide — the whole path with the keyboard, the accessible names of every control, the heading and landmark structure, the behaviour of the appointment assistant when the step changes.",
+          ar: "سبعة عشر مسارًا باللغتين، في المظهرين الفاتح والداكن، على 1440 × 900 و390 × 844 بكسل: 68 تمريرة آلية بـ axe-core عبر WCAG 2.1 المستويين A وAA. إضافةً إلى ما لا تستطيع الآلة الحكم فيه، يدويًا — الطريق كله بلوحة المفاتيح، والأسماء المتاحة لكل عناصر التحكم، وبنية العناوين والمعالم، وسلوك مساعد المواعيد عند تغيير الخطوة.",
         },
       },
       {
@@ -172,11 +177,12 @@ export const insights: Insight[] = [
           de: "Ergebnis: acht Befunde, sieben davon erheblich, keiner blockierend. Jede Funktion war erreichbar — an sieben Stellen aber deutlich erschwert. Drei davon stehen hier, weil sie das Muster zeigen.",
           tr: "Sonuç: sekiz bulgu, yedisi ciddi, hiçbiri engelleyici değil. Her işlev erişilebilirdi — ama yedi yerde belirgin biçimde zorlaştırılmıştı. Üçü burada, çünkü örüntüyü onlar gösteriyor.",
           en: "Result: eight findings, seven of them serious, none blocking. Every function was reachable — but at seven points made considerably harder. Three of them are here because they show the pattern.",
+          ar: "النتيجة: ثماني نتائج، سبعٌ منها خطيرة، ولا واحدة معطِّلة. كل وظيفة كانت قابلة للوصول — لكنها في سبعة مواضع كانت أصعب بوضوح. ثلاثة منها هنا لأنها تُظهر النمط.",
         },
       },
       {
         kind: "heading",
-        text: { de: "1 · Der Fokus war unsichtbar", tr: "1 · Odak görünmüyordu", en: "1 · The focus was invisible" },
+        text: { de: "1 · Der Fokus war unsichtbar", tr: "1 · Odak görünmüyordu", en: "1 · The focus was invisible", ar: "1 · التركيز كان غير مرئي" },
       },
       {
         kind: "text",
@@ -184,11 +190,12 @@ export const insights: Insight[] = [
           de: "Drei Bedienelemente in der Kopfleiste — Sprachumschalter, Erscheinungsbild, WhatsApp — zeigten beim Durchtabben keinen sichtbaren Umriss. Gemessen: outline-style „none“, kein Schatten, nichts. Sie stehen auf jeder Seite. Die Ursache war keine vergessene Regel, sondern eine, die verlor: Die globale Vorgabe für den Fokus stand in einer Kaskadenschicht und wurde von einer Utility-Klasse überschrieben, die den Umriss abschaltet und durch einen Ring ersetzt, den diese Farbpalette nicht zeichnet. Behoben, indem die Fokus-Regel jetzt außerhalb jeder Schicht steht. Nachgemessen: 2 beziehungsweise 3 Pixel durchgezogen, alle drei sichtbar. (WCAG 2.4.7)",
           tr: "Üst çubuktaki üç öğe — dil değiştirici, görünüm değiştirici, WhatsApp — sekmeyle gezerken görünür bir çerçeve göstermiyordu. Ölçüm: outline-style „none“, gölge yok, hiçbir şey yok. Bu öğeler her sayfada duruyor. Neden, unutulmuş bir kural değil, kaybeden bir kuraldı: Odak için genel tanım bir katman içindeydi ve çerçeveyi kapatıp yerine bu renk paletinin çizmediği bir halka koyan bir utility sınıfı tarafından eziliyordu. Odak kuralı artık hiçbir katmanın içinde değil. Yeniden ölçüldü: 2 ve 3 piksel düz çizgi, üçü de görünür. (WCAG 2.4.7)",
           en: "Three controls in the header — language switcher, appearance, WhatsApp — showed no visible outline when tabbed through. Measured: outline-style “none”, no shadow, nothing. They appear on every page. The cause was not a forgotten rule but one that lost: the global focus definition sat in a cascade layer and was overridden by a utility class that switches the outline off and replaces it with a ring this colour palette does not draw. Fixed by putting the focus rule outside any layer. Measured again: 2 and 3 pixels solid, all three visible. (WCAG 2.4.7)",
+          ar: "ثلاثة عناصر تحكم في الشريط العلوي — مبدّل اللغة، والمظهر، وواتساب — لم تُظهر إطارًا مرئيًا عند التنقل بمفتاح Tab. القياس: outline-style «none»، لا ظل، لا شيء. وهي موجودة في كل صفحة. والسبب لم يكن قاعدة منسية بل قاعدة خاسرة: التعريف العام للتركيز كان داخل طبقة تتالٍ، وكانت تدهسه فئة أدوات تُطفئ الإطار وتستبدل به حلقةً لا ترسمها هذه اللوحة اللونية. عولج بإخراج قاعدة التركيز من كل الطبقات. وأُعيد القياس: 2 و3 بكسل خطًّا متصلًا، والثلاثة مرئية. (WCAG 2.4.7)",
         },
       },
       {
         kind: "heading",
-        text: { de: "2 · Acht Stationen bis zum Inhalt", tr: "2 · İçeriğe kadar sekiz durak", en: "2 · Eight stops before the content" },
+        text: { de: "2 · Acht Stationen bis zum Inhalt", tr: "2 · İçeriğe kadar sekiz durak", en: "2 · Eight stops before the content", ar: "2 · ثماني محطات قبل المحتوى" },
       },
       {
         kind: "text",
@@ -196,6 +203,7 @@ export const insights: Insight[] = [
           de: "Es gab keine Sprungmarke. Wer nur mit der Tastatur arbeitet, landete zuerst auf dem Logo, danach auf vier Menüpunkten, dem Sprachumschalter, dem Erscheinungsbild-Schalter, WhatsApp und dem Hauptknopf — acht Stationen, auf jeder Seite erneut, bevor der Inhalt anfing. Das ist kein Schönheitsfehler; es ist der Unterschied zwischen einer Seite, die man benutzt, und einer, die man verlässt. Jetzt ist die Sprungmarke die erste Station, sie ist sichtbar, sobald sie den Fokus hat, und sie setzt ihn auf den Inhalt. (WCAG 2.4.1)",
           tr: "Atlama bağlantısı yoktu. Yalnızca klavyeyle çalışan biri önce logoya, ardından dört menü maddesine, dil değiştiriciye, görünüm değiştiriciye, WhatsApp'a ve ana düğmeye düşüyordu — içerik başlamadan önce, her sayfada yeniden sekiz durak. Bu bir güzellik kusuru değil; kullanılan bir siteyle terk edilen bir site arasındaki fark. Artık atlama bağlantısı ilk duraktır, odağı aldığı anda görünür olur ve odağı içeriğe taşır. (WCAG 2.4.1)",
           en: "There was no skip link. Anyone working with the keyboard alone landed first on the logo, then on four menu items, the language switcher, the appearance switch, WhatsApp and the main button — eight stops, on every page again, before the content began. That is not a cosmetic flaw; it is the difference between a site people use and one they leave. The skip link is now the first stop, it is visible as soon as it has focus, and it moves focus to the content. (WCAG 2.4.1)",
+          ar: "لم يكن هناك رابط تخطٍّ. من يعمل بلوحة المفاتيح وحدها كان يحطّ أولًا على الشعار، ثم على أربعة عناصر قائمة، ومبدّل اللغة، ومبدّل المظهر، وواتساب، والزر الرئيسي — ثماني محطات، في كل صفحة من جديد، قبل أن يبدأ المحتوى. هذا ليس عيبًا جماليًا؛ إنه الفرق بين موقع يُستعمل وموقع يُغادَر. الآن رابط التخطي هو المحطة الأولى، ويظهر حالما يأخذ التركيز، وينقله إلى المحتوى. (WCAG 2.4.1)",
         },
       },
       {
@@ -204,6 +212,7 @@ export const insights: Insight[] = [
           de: "3 · „Weiter“ drücken und Stille hören",
           tr: "3 · „İleri“ye basıp sessizlik duymak",
           en: "3 · Pressing “next” and hearing silence",
+          ar: "3 · الضغط على «التالي» وسماع الصمت",
         },
       },
       {
@@ -212,9 +221,10 @@ export const insights: Insight[] = [
           de: "Im Termin-Assistenten tauschte ein Klick auf „Weiter“ den Inhalt aus, scrollte nach oben — und setzte den Fokus nicht. Gemessen landete er auf dem Dokumentkörper. Für einen Tastaturnutzer heißt das: wieder ganz vorn anfangen. Für einen Screenreader-Nutzer heißt es: gar nichts. Es gab auf der ganzen Seite keine einzige Region, die eine Änderung angesagt hätte. Man drückte „Weiter“ und hörte Stille. Jetzt wandert der Fokus auf die Überschrift des neuen Schritts, und eine höflich vorlesende Region sagt an, welcher Schritt von wie vielen begonnen hat. (WCAG 4.1.3, 2.4.3)",
           tr: "Randevu asistanında „İleri“ye tıklamak içeriği değiştiriyor, sayfayı yukarı kaydırıyor — ama odağı taşımıyordu. Ölçümde odak belge gövdesine düşüyordu. Klavye kullanan biri için bu, baştan başlamak demek. Ekran okuyucu kullanan biri içinse hiçbir şey demek: Sitenin tamamında bir değişikliği duyuran tek bir bölge yoktu. „İleri“ye basılıyor ve sessizlik duyuluyordu. Artık odak yeni adımın başlığına gider ve nazikçe okuyan bir bölge, kaç adımdan hangisinin başladığını duyurur. (WCAG 4.1.3, 2.4.3)",
           en: "In the appointment assistant, clicking “next” swapped the content, scrolled to the top — and did not move the focus. Measured, it landed on the document body. For a keyboard user that means starting from the front again. For a screen reader user it means nothing at all: there was not a single region on the whole site that would have announced a change. You pressed “next” and heard silence. Now the focus moves to the heading of the new step, and a politely announcing region says which step of how many has begun. (WCAG 4.1.3, 2.4.3)",
+          ar: "في مساعد المواعيد كانت النقرة على «التالي» تستبدل المحتوى وتُمرّر إلى الأعلى — ولا تنقل التركيز. وفي القياس كان يحطّ على جسم المستند. وهذا لمستخدم لوحة المفاتيح يعني: البدء من الأول مجددًا. ولمستخدم قارئ الشاشة يعني: لا شيء إطلاقًا. لم تكن في الموقع كله منطقةٌ واحدة تُعلن تغييرًا. كان يُضغط «التالي» ويُسمع الصمت. الآن ينتقل التركيز إلى عنوان الخطوة الجديدة، وتُعلن منطقةٌ مهذّبة القراءة أي خطوة من كم بدأت. (WCAG 4.1.3, 2.4.3)",
         },
       },
-      { kind: "heading", text: { de: "Die übrigen fünf", tr: "Kalan beşi", en: "The remaining five" } },
+      { kind: "heading", text: { de: "Die übrigen fünf", tr: "Kalan beşi", en: "The remaining five", ar: "الخمسة الباقية" } },
       {
         kind: "list",
         items: {
@@ -239,11 +249,18 @@ export const insights: Insight[] = [
             "For a screen reader, the 31 calendar days in the appointment assistant were named only “31, button” — no weekday, no month, no “selected” state.",
             "On the Turkish appointment page two labels had stayed German, hard-coded in the markup instead of coming from the dictionary. A Turkish screen reader reads “Nächster Monat” with Turkish pronunciation — nobody understands the result.",
           ],
+          ar: [
+            "لون النص الذهبي نزل على الأسطح المُلوَّنة في خمسة مواضع تحت التباين المطلوب — قيم بين 4,26 و4,34 إلى 1، والمطلوب 4,5.",
+            "ألوان نصوص بعتامة 70 و80 بالمئة: وصولًا إلى 2,85 إلى 1 في المظهر الفاتح، سبعة مواضع في الشيفرة.",
+            "النصوص النائبة في حقول النماذج بعتامة 60 بالمئة: 2,40 إلى 1. لم تُبلغ عنها الآلة لأن النص النائب لا يظهر إلا في حقل فارغ — وُجد يدويًا.",
+            "أيام التقويم الواحد والثلاثون في مساعد المواعيد كانت لقارئ الشاشة تحمل اسم «31، زر» فقط — دون اسم اليوم ودون الشهر ودون حالة «مختار».",
+            "في صفحة المواعيد التركية بقيت تسميتان بالألمانية، مكتوبتين في الترميز لا آتيتين من القاموس. وقارئ شاشة تركي يقرأ «Nächster Monat» بلفظ تركي — والنتيجة لا يفهمها أحد.",
+          ],
         },
       },
       {
         kind: "heading",
-        text: { de: "Der schwerste Fehler war älter", tr: "En ağır hata daha eskiydi", en: "The most serious defect was older" },
+        text: { de: "Der schwerste Fehler war älter", tr: "En ağır hata daha eskiydi", en: "The most serious defect was older", ar: "أخطر خطأ كان أقدم" },
       },
       {
         kind: "text",
@@ -251,11 +268,12 @@ export const insights: Insight[] = [
           de: "Er stammt aus einem Durchgang davor und gehört trotzdem hierher: Wer im Betriebssystem „Bewegung reduzieren“ eingeschaltet hatte, sah Teile der Seite gar nicht. Die eingeblendeten Abschnitte blieben unsichtbar — auf der Leistungsübersicht 33 Blöcke. Die Seite war leer für genau die Gruppe, für die diese Einstellung gemacht ist. Ein Befund, der die eigene Vorgeschichte verschweigt, ist weniger wert als einer, der sie nennt.",
           tr: "Bir önceki turdan kalma, yine de buraya ait: İşletim sisteminde „hareketi azalt“ seçeneğini açmış olan biri, sayfanın bir bölümünü hiç görmüyordu. Kaydırınca beliren bölümler görünmez kalıyordu — hizmetler sayfasında 33 blok. Sayfa, tam da bu ayarın kendisi için yapıldığı grup için boştu. Kendi geçmişini gizleyen bir bulgu, onu söyleyenden daha az değerlidir.",
           en: "It comes from an earlier pass and belongs here nonetheless: anyone who had switched on “reduce motion” in their operating system did not see parts of the site at all. Sections that fade in stayed invisible — 33 blocks on the services overview. The page was empty for exactly the group the setting is made for. A findings report that hides its own history is worth less than one that names it.",
+          ar: "هذا من جولة سابقة ومع ذلك مكانه هنا: من فعّل «تقليل الحركة» في نظام التشغيل لم يكن يرى أجزاءً من الصفحة إطلاقًا. الأقسام التي تظهر تدريجيًا كانت تبقى غير مرئية — 33 كتلة في صفحة الخدمات. كانت الصفحة فارغة تحديدًا للفئة التي صُنع هذا الإعداد لأجلها. والنتيجة التي تُخفي تاريخها أقلّ قيمةً من التي تذكره.",
         },
       },
       {
         kind: "heading",
-        text: { de: "Und ein Messfehler", tr: "Ve bir ölçüm hatası", en: "And a measurement error" },
+        text: { de: "Und ein Messfehler", tr: "Ve bir ölçüm hatası", en: "And a measurement error", ar: "وخطأ في القياس" },
       },
       {
         kind: "text",
@@ -263,11 +281,12 @@ export const insights: Insight[] = [
           de: "Nach der Behebung meldete die Maschine noch zwei Kontrastwerte — beide auf Seiten, deren deutsche Zwillingsseite bei identischem Markup bestand. Die Ursache lag nicht in der Seite, sondern in der Messung: Der Prüflauf traf die eingeblendeten Abschnitte mitten in der 0,9 Sekunden langen Animation und maß eine halb durchsichtige Fläche — einen Zustand, den ein Mensch nie zu Gesicht bekommt. Der Lauf misst jetzt mit reduzierter Bewegung, also den Endzustand. Es wäre bequem gewesen, die beiden Werte als Ausreißer abzuhaken. Ein Befund, der Messfehler als Ergebnis ausgibt, ist genauso falsch wie einer, der Funde verschweigt.",
           tr: "Giderme sonrasında makine hâlâ iki kontrast değeri bildiriyordu — ikisi de, Almanca ikizi aynı kodla geçen sayfalarda. Neden sayfada değil, ölçümdeydi: Denetim geçişi, beliren bölümleri 0,9 saniyelik animasyonun ortasında yakalıyor ve yarı saydam bir yüzeyi ölçüyordu — bir insanın hiçbir zaman görmediği bir durumu. Geçiş artık hareketi azaltılmış biçimde, yani son durumu ölçüyor. İki değeri „sapma“ diye geçiştirmek kolay olurdu. Ölçüm hatasını sonuç diye sunan bir bulgu, bulguları gizleyen kadar yanlıştır.",
           en: "After remediation the machine still reported two contrast values — both on pages whose German twin passed with identical markup. The cause was not in the page but in the measurement: the audit run caught the fading sections in the middle of the 0.9-second animation and measured a semi-transparent surface — a state no person ever sees. The run now measures with reduced motion, that is, the final state. It would have been convenient to write the two values off as outliers. A findings report that presents a measurement error as a result is exactly as wrong as one that hides findings.",
+          ar: "بعد المعالجة كانت الآلة ما تزال تُبلغ عن قيمتَي تباين — كلتاهما في صفحات نجح توأمها الألماني بالترميز نفسه. والسبب لم يكن في الصفحة بل في القياس: كانت جولة الفحص تلتقط الأقسام الظاهرة في منتصف حركة مدتها 0,9 ثانية فتقيس سطحًا نصف شفاف — حالةً لا يراها إنسان قط. والجولة تقيس الآن بحركة مقلَّلة، أي الحالة النهائية. كان من المريح شطب القيمتين كشذوذ. والنتيجة التي تُقدّم خطأ قياس على أنه نتيجة خاطئةٌ تمامًا كالتي تُخفي نتائج.",
         },
       },
       {
         kind: "heading",
-        text: { de: "Was das heißt — und was nicht", tr: "Bu ne demek — ve ne demek değil", en: "What that means — and what it does not" },
+        text: { de: "Was das heißt — und was nicht", tr: "Bu ne demek — ve ne demek değil", en: "What that means — and what it does not", ar: "ماذا يعني ذلك — وماذا لا يعني" },
       },
       {
         kind: "text",
@@ -275,6 +294,7 @@ export const insights: Insight[] = [
           de: "Alle acht Mängel sind behoben, im Code, ohne Overlay und ohne Zusatzwerkzeug. Der automatisierte Lauf meldet über 68 Durchläufe keine maschinell feststellbare Verletzung von WCAG 2.1 AA mehr; vorher waren es elf Stellen. Die Handprüfung ist ohne offenen Punkt.",
           tr: "Sekiz eksiğin tamamı giderildi — kodun içinde, overlay olmadan, ek araç olmadan. Otomatik geçiş, 68 turda WCAG 2.1 AA'nın makineyle saptanabilir hiçbir ihlalini bildirmiyor; öncesinde on bir yer vardı. Elle denetimde açık madde yok.",
           en: "All eight defects are fixed, in the code, without an overlay and without an add-on tool. Across 68 passes the automated run now reports no machine-detectable violation of WCAG 2.1 AA; before, there were eleven places. The manual review has no open item.",
+          ar: "عولجت العيوب الثمانية كلها في الشيفرة، دون طبقة تغطية ودون أداة إضافية. والجولة الآلية عبر 68 تمريرة لم تعد تُبلغ عن أي مخالفة قابلة للرصد آليًا لـ WCAG 2.1 AA؛ وكانت قبلها أحد عشر موضعًا. والفحص اليدوي دون نقطة مفتوحة.",
         },
       },
       {
@@ -283,6 +303,7 @@ export const insights: Insight[] = [
           de: "„Keine maschinell feststellbare Verletzung“ heißt nicht „barrierefrei“. Automatische Werkzeuge finden nach Angabe ihrer eigenen Entwickler etwa ein Drittel der Barrieren. Wir haben keinen Durchlauf mit einem blinden Nutzer gemacht, keine Vergrößerungssoftware und keine Sprachsteuerung geprüft. Und dieser Text ist keine rechtliche Bewertung — die trifft ein Anwalt, nicht wir.",
           tr: "„Makineyle saptanabilir ihlal yok“, „erişilebilir“ demek değildir. Otomatik araçlar, kendi geliştiricilerinin beyanına göre engellerin yaklaşık üçte birini bulur. Görme engelli bir kullanıcıyla bir geçiş yapmadık, büyütme yazılımını ve sesle kullanımı denetlemedik. Ve bu yazı hukuki bir değerlendirme değildir — onu bir avukat yapar, biz değil.",
           en: "“No machine-detectable violation” does not mean “accessible”. By their own developers' account, automated tools find about a third of barriers. We did no pass with a blind user, tested no magnification software and no voice control. And this text is not a legal assessment — a lawyer makes that, not us.",
+          ar: "«لا مخالفة قابلة للرصد آليًا» لا تعني «متاح الوصول». والأدوات الآلية تجد، بحسب مطوّريها أنفسهم، نحو ثلث العوائق. لم نُجرِ جولةً مع مستخدم كفيف، ولم نفحص برمجيات التكبير ولا التحكم الصوتي. وهذا النص ليس تقييمًا قانونيًا — ذاك يقوم به محامٍ، لا نحن.",
         },
       },
       {
@@ -291,6 +312,7 @@ export const insights: Insight[] = [
           de: "Das ist der Grund, warum wir keinen automatischen Scanner auf diese Website stellen, obwohl er das beste Lockmittel wäre: Eine Ampel, die eine Maschine über eine fremde Seite hängt, verspricht dasselbe wie ein Overlay — ein Ergebnis, für das niemand geradesteht. Wer eine Ampel verkauft, kann nicht erklären, warum die Ampel des Nachbarn nichts taugt.",
           tr: "Bu yüzden, en iyi cezbedici olmasına rağmen bu siteye otomatik bir tarayıcı koymuyoruz: Bir makinenin yabancı bir sitenin üstüne astığı ışık, overlay ile aynı şeyi vaat eder — kimsenin arkasında durmadığı bir sonuç. Işık satan biri, komşunun ışığının neden işe yaramadığını açıklayamaz.",
           en: "That is why we do not put an automated scanner on this website, although it would be the best lure: a traffic light that a machine hangs over somebody else's page promises the same as an overlay — a result nobody stands behind. Anyone selling a traffic light cannot explain why the neighbour's traffic light is worthless.",
+          ar: "لهذا لا نضع ماسحًا آليًا على هذا الموقع، وإن كان أفضل طُعم: إشارةٌ تعلّقها آلةٌ فوق موقع غريب تَعِد بما يَعِد به الـ overlay — نتيجةٌ لا يقف خلفها أحد. ومن يبيع إشارة لا يستطيع تفسير لماذا لا تنفع إشارة جاره.",
         },
       },
     ],

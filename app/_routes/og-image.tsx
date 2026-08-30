@@ -50,6 +50,14 @@ const copy = {
     disciplines: "SYSTEMS HOUSE · BRAND · WEB · AI",
     origin: "SINCE 2017 · OSNABRÜCK · DACH",
   },
+  ar: {
+    alt: "creaDIG — بيت أنظمة للعلامة والويب والذكاء الاصطناعي",
+    headline: "نبني ما لا يراه الآخرون.",
+    lead:
+      "المظلة فوق أنظمتنا — من العلامة إلى الذكاء الاصطناعي. نبنيها بأنفسنا. ونشغّلها بأنفسنا.",
+    disciplines: "بيت أنظمة · علامة · ويب · ذكاء اصطناعي",
+    origin: "منذ 2017 · أوسنابروك · DACH",
+  },
 } as const
 
 export function ogAlt(locale: Locale) {

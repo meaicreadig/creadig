@@ -31,7 +31,32 @@ import { SITE_URL, localeAlternates, localeUrl, locales, openGraphLocale } from 
  * `app/og/de.png/route.tsx`.
  */
 
-const OG_IMAGE_PATH: Record<Locale, string> = { de: "/og/de.png", tr: "/og/tr.png", en: "/og/en.png" }
+/*
+ * Das Vorschaubild je Sprache.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM ARABISCH AUF DIE ENGLISCHE KARTE ZEIGT
+ * `ImageResponse` bringt nur eine generische Fallback-Schrift mit, und die
+ * hat keine arabischen Glyphen. Der Build brach beim Rendern reproduzierbar
+ * ab (`lookupType: 5 - substFormat: 3 is not yet supported` — die
+ * Formenbildung arabischer Buchstaben, die satori nicht kann).
+ *
+ * Zwei ehrliche Auswege: eine arabische Schriftdatei mitliefern (Lizenz und
+ * Gewicht sind eine Owner-Entscheidung), oder auf eine bestehende Karte
+ * zeigen. Bis die Schrift da ist, zeigt Arabisch auf die ENGLISCHE Karte —
+ * lateinisch gesetzt, markenrichtig, und keine Behauptung, die nicht stimmt.
+ *
+ * Was NICHT gemacht wurde: eine arabische Karte mit Ersatzzeichen. Ein
+ * Vorschaubild voller Kaesten ist schlechter als ein fremdsprachiges.
+ *
+ * Offen in `docs/i18n/current-state.md`.
+ */
+const OG_IMAGE_PATH: Record<Locale, string> = {
+  de: "/og/de.png",
+  tr: "/og/tr.png",
+  en: "/og/en.png",
+  ar: "/og/en.png",
+}
 
 /** 1200 × 630 — das Maß, das WhatsApp, LinkedIn und X als große Karte zeigen. */
 export function ogImage(locale: Locale) {
