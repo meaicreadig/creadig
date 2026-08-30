@@ -5,7 +5,12 @@
 >
 > **Drei Systeme:** Website · Company OS · Knowledge OS (diese Map).
 
-### Stage-Status (29.08.2026)
+### Stage-Status (30.08.2026)
+
+Operative Leiter: **`creadig-MASTER-LEITER-R4.md`** (PHASE A ausgeführt, STOP).  
+Älteres `creadig-MASTER-PROMPT-COMPANY-OS.md` bleibt Fach-Canon; **Reihenfolge** folgt R4.
+
+### Stage-Status (29.08.2026, historisch)
 
 | Stage | Status |
 |-------|--------|
@@ -37,7 +42,8 @@
 | Datei | Authority | Rolle |
 |-------|-----------|--------|
 | `KIZILELMA-creaDIG.md` | **Canon** | Omurga / DNA / §12 Drittanalyse |
-| `creadig-MASTER-PROMPT-COMPANY-OS.md` | **Canon** | Firmen-Maschine MP-A→F |
+| `creadig-MASTER-LEITER-R4.md` | **Canon (operativ)** | Company OS Reihenfolge PHASE A–L · Stand 30.08.2026 |
+| `creadig-MASTER-PROMPT-COMPANY-OS.md` | **Canon (Fach)** | Firmen-Maschine MP-A→F — weicht R4 bei Sprachen/Cutover: **R4 + Owner** |
 | `creadig-MASTER-PROMPT-EFSANE.md` | **Canon** | Site-Evolution |
 | `creadig-MASTER-PROMPT-WEITERENTWICKLUNG.md` | Working Note | Autonomer Zyklus (teilweise historisch) |
 | `creadig-MASTER-PROMPT-BETRIEB.md` | Spec | Betrieb / Deploy-Disziplin |
@@ -65,6 +71,8 @@
 |-------|-----------|--------|
 | `docs/ops/lead-current-state.md` | Spec | Ist→Soll Lead-Fluss (MP-B) |
 | `docs/ops/crm-schema.md` | Spec | Lead + 3 State Machines |
+| `docs/ops/lead-store.md` | Spec | **MP-G** — Anbieterwahl, Datenschutz-Entwurf, Aufrufort, geprüftes Ausfallverhalten |
+| `docs/ops/provider-neon.md` | Working Note | **MP-G.3** Neon/Vercel Marketplace Gate — sechs Verarbeiter-Fragen, noch keine Freigabe |
 | `docs/ops/analytics-events.md` | Spec | Events + Properties |
 | `docs/ops/sop-lead-handling.md` | Spec | Interne Antwort-SLA |
 | `docs/ops/conversion-acceptance.md` | Working Note | MP-D.5 Prüfprotokoll: 12/12 PASS, Befunde, was Env-blockiert ist |
@@ -75,9 +83,12 @@
 | `docs/ops/demo-data-standard.md` | **Canon** | Echte UI, synthetische Daten, Label-Regel, Prüfliste vor jeder Aufnahme |
 | `docs/ops/case-format.md` | Spec | Case-Kurzformat + Freigabe-Vorlage zum Ausfüllen |
 | `docs/roadmap/creadig-1-0-scale.md` | Spec | **MP-F Blueprint** — Portal-IA, Trust Center, Pulse, Tiers, meAI, Hiring, Revenue-Rahmen, 1.0-Definition |
-| `docs/control-center/current-state.md` | Working Note | **MP-G G.0** — Bestandsaufnahme: es gibt keinen Admin, keine Persistence, keine Auth. Modul-Bereitschaft, Konflikte, V1-Empfehlung |
+| `docs/control-center/current-state.md` | Current State | **PHASE A.7** — Admin existiert auf Feature-Branch; Production `/admin` = Legacy-404; Preview hinter SSO |
+| `docs/production/legacy-current-state.md` | Current State | **PHASE A.1** — `main` @ `ae76ba6`, `creadig.de` = Vanilla |
+| `docs/production/legacy-archive-plan.md` | Spec | **PHASE A.2** — archivieren, nicht löschen; Tag nur auf Befehl |
 | `docs/control-center/architecture.md` | Spec | **MP-G G.1** — Routen, Zugang (signierte Sitzung), Rollen, geteilte Bausteine |
 | `docs/control-center/acceptance.md` | Acceptance | **MP-G G.1** — 11/11 PASS: Zugang, Regression, Oberfläche |
+| `docs/control-center/sales.md` | Spec | **MP-G.3** — Sales-Maschine, Lesepfad, Doppel-Erkennung, „Persisted ≠ Delivered"; Oberfläche wartet auf den Speicher |
 | `docs/ops/utm-playbook.md` | Spec | Attribution-Modell + Tracking-Ready-Checkliste; Client blockiert bis Datenschutzsatz |
 | `app/api/lead/route.ts` | **Canon (Code)** | Source of Truth Versand |
 | `lib/use-lead.ts` | **Canon (Code)** | Client-Submit |
@@ -118,11 +129,14 @@
 
 ## Konfliktregel
 
-1. **Owner-Satz im Chat** schlägt Dokument (einmalig) — danach Dokument nachziehen.  
-2. **KIZILELMA / COMPANY-OS / messaging-canon** schlagen Working Notes.  
-3. **Code-Canon** (`/api/lead`, Tokens) schlägt Fantasie-Specs, die „zweite Systeme“ bauen.  
-4. Widerspruch → kurz Owner, nicht stillschweigend mergen.
+1. Reale verifizierte Repo-/Production-Truth.  
+2. Explizite aktuelle Owner-Entscheidung.  
+3. Fach-Canon.  
+4. Acceptance.  
+5. `creadig-MASTER-LEITER-R4.md`.  
+6. Ältere Specs / Prompts.  
+7. Widerspruch → dokumentieren, nicht still mergen.
 
 ---
 
-**Stand:** 29.08.2026 · nach Peer-Review Rev. 2 Master-Leiter
+**Stand:** 30.08.2026 · Master-Leiter R4 · PHASE A STOP

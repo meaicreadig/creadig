@@ -80,6 +80,27 @@ export async function issueFormToken(now: number): Promise<string | null> {
   return `${issuedAt}.${await sign(issuedAt, value)}`
 }
 
+/**
+ * MP-G.3 · Der Fingerabdruck eines Absendevorgangs.
+ *
+ * Das Formular holt sein Token beim Aufbau EINMAL und benutzt es fuer alle
+ * Versuche desselben Absendens — auch fuer den zweiten Klick, nachdem eine
+ * Fehlermeldung kam. Ein neues Formular (Neuladen, andere Seite) bekommt ein
+ * neues Token.
+ *
+ * Damit ist das Token genau das Signal, das ein Doppel-Absenden von zwei
+ * echten Anfragen unterscheidet — besser als die E-Mail-Adresse, unter der
+ * zwei legitime Anfragen derselben Person verschwinden wuerden.
+ *
+ * Herausgegeben wird nicht das Token, sondern sein HMAC: Der Speicher soll
+ * kein wiederverwendbares Geheimnis enthalten.
+ */
+export async function formTokenFingerprint(token: unknown): Promise<string | null> {
+  const value = secret()
+  if (!value || typeof token !== "string" || token.length === 0) return null
+  return sign(`submission:${token}`, value)
+}
+
 export type TokenVerdict = "ok" | "missing" | "invalid" | "too_fast" | "expired" | "unavailable"
 
 export async function verifyFormToken(token: unknown, now: number): Promise<TokenVerdict> {

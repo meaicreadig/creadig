@@ -4,13 +4,14 @@ import { raiseAlert } from "@/lib/alert"
 import {
   bucketKey,
   callerAddress,
+  formTokenFingerprint,
   issueFormToken,
   LIMITS_INFO,
   verifyFormToken,
   withinLimit,
 } from "@/lib/lead-guard"
 import { createLeadIdentity } from "@/lib/lead-id"
-import { storeLead } from "@/lib/lead-store"
+import { findExistingSubmission, storeLead } from "@/lib/lead-store"
 
 /**
  * DER LEAD-WEG — der Boden des Trichters.
@@ -672,7 +673,32 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "invalid", fields: missing }, { status: 400 })
   }
 
-  const { id: leadId, reference } = createLeadIdentity()
+  /*
+   * MP-G.3 · DOPPEL-ABSENDEN.
+   *
+   * Der Fall ist real und entsteht durch unseren eigenen Ablauf: Der Lead
+   * wird gespeichert, die Zustellung schlaegt fehl, der Absender sieht eine
+   * Fehlermeldung — und schickt noch einmal. Ohne Erkennung stuenden dann
+   * zwei Vorgaenge fuer dieselbe Anfrage im Speicher, mit zwei Nummern.
+   *
+   * NICHT ueber die E-Mail-Adresse: Zwei echte Anfragen derselben Person
+   * (heute Kontakt, naechste Woche Termin) wuerden verschwinden. Das waere
+   * ein stiller Datenverlust, um einen sichtbaren zu vermeiden.
+   *
+   * Sondern ueber das Absende-Token: Ein Formular holt es beim Aufbau EINMAL
+   * und benutzt es fuer alle Versuche desselben Absendens — auch fuer den
+   * zweiten Klick nach einer Fehlermeldung. Ein neues Formular bekommt ein
+   * neues Token. Gespeichert wird nur sein HMAC.
+   *
+   * Wird ein Vorgang wiedererkannt, bekommt er DIESELBE Vorgangsnummer.
+   * Sonst stuende in der zweiten Mail eine andere Nummer als im Speicher.
+   *
+   * Ohne Speicher findet hier nichts statt — dann verhaelt sich die Route
+   * wie vor MP-G.
+   */
+  const submissionKey = await formTokenFingerprint(payload.token)
+  const previous = await findExistingSubmission(submissionKey)
+  const { id: leadId, reference } = previous ?? createLeadIdentity()
 
   const lines = [
     `Referenz:  ${reference}`,
@@ -700,6 +726,51 @@ export async function POST(request: Request) {
     .filter((line) => line !== null)
     .join("\n")
 
+  /*
+   * MP-G · GESPEICHERT WIRD VOR DEM ZUSTELLVERSUCH.
+   *
+   * Die erste Fassung speicherte im Erfolgsfall, direkt vor der Antwort. Das
+   * klang richtig („erst zugestellt, dann gespeichert") und war der teuerste
+   * denkbare Fehler: Schlaegt die Zustellung fehl, kehrt die Route mit 502
+   * zurueck — und die Zeile lief nie. Der Speicher haette in jedem Fall
+   * geholfen ausser in dem einen, fuer den er da ist.
+   *
+   * Aufgefallen ist das erst im Test mit einem absichtlich ungueltigen
+   * Zustellschluessel: kein Protokolleintrag, wo einer stehen musste.
+   *
+   * Jetzt gilt: Ein Lead, der die Pruefung besteht, wird festgehalten —
+   * unabhaengig davon, ob die Mail ankommt. Die Regel dahinter bleibt
+   * unveraendert: `storeLead` schluckt jeden eigenen Fehler und kann die
+   * Anfrage nie zum Scheitern bringen (`lib/lead-store.ts`).
+   *
+   * Ohne `LEAD_STORE` passiert hier nichts — die Route verhaelt sich dann
+   * exakt wie vor MP-G.
+   */
+  await storeLead({
+    id: leadId,
+    reference,
+    submissionKey,
+    source,
+    locale,
+    name,
+    email,
+    phone,
+    business: business || null,
+    message: message || null,
+    siteUrl,
+    utmSource: utm.source || null,
+    utmMedium: utm.medium || null,
+    utmCampaign: utm.campaign || null,
+    utmTerm: utm.term || null,
+    utmContent: utm.content || null,
+    salesStatus: "new",
+    nextAction: null,
+    nextActionAt: null,
+    lostReason: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  })
+
   try {
     await sendMail(apiKey, {
       from,
@@ -716,11 +787,15 @@ export async function POST(request: Request) {
       replyTo: email,
     })
   } catch (error) {
-    // T-2 — die Anfrage ist an dieser Stelle verloren. Nichts hier faengt sie
-    // auf; wer davon nicht erfaehrt, erfaehrt gar nichts.
+    /*
+     * T-2 — ohne Speicher ist die Anfrage an dieser Stelle verloren; wer
+     * davon nicht erfaehrt, erfaehrt gar nichts. Mit Speicher ist sie
+     * festgehalten, aber niemand hat sie gesehen — gemeldet wird sie
+     * trotzdem, nur mit der Vorgangsnummer, unter der sie nachzulesen ist.
+     */
     await raiseAlert(
       "lead-send-failed",
-      `Zustellung an das eigene Postfach fehlgeschlagen: ${String(error).slice(0, 300)}`,
+      `Zustellung an das eigene Postfach fehlgeschlagen (${reference}): ${String(error).slice(0, 300)}`,
     )
     return NextResponse.json({ ok: false, error: "send_failed" }, { status: 502 })
   }
@@ -756,40 +831,6 @@ export async function POST(request: Request) {
       `Eingangsbestaetigung an den Absender fehlgeschlagen: ${String(error).slice(0, 300)}`,
     )
   }
-
-  /*
-   * MP-G · Erst zugestellt, dann gespeichert.
-   *
-   * Die Reihenfolge ist die ganze Entscheidung: Die Mail ist seit Jahren der
-   * Weg, auf dem eine Anfrage ankommt, und sie braucht keine Infrastruktur.
-   * Der Speicher tritt daneben. Faellt er aus, ist die Anfrage trotzdem da —
-   * und der Absender merkt nichts, weil er nichts falsch gemacht hat.
-   *
-   * Andersherum waere es bequemer zu programmieren und falsch: Ein Ausfall
-   * der Datenbank wuerde dann jede Anfrage verschlucken, die heute ankommt.
-   *
-   * Ohne `LEAD_STORE` passiert hier nichts — die Route verhaelt sich dann
-   * exakt wie vor MP-G.
-   */
-  await storeLead({
-    id: leadId,
-    reference,
-    source,
-    locale,
-    name,
-    email,
-    phone,
-    business: business || null,
-    message: message || null,
-    siteUrl,
-    utmSource: utm.source || null,
-    utmMedium: utm.medium || null,
-    utmCampaign: utm.campaign || null,
-    utmTerm: utm.term || null,
-    utmContent: utm.content || null,
-    salesStatus: "new",
-    createdAt: new Date().toISOString(),
-  })
 
   return NextResponse.json({ ok: true, reference, id: leadId })
 }
