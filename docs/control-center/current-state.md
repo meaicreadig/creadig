@@ -21,8 +21,8 @@ fehlende Sales-Quellen. Die Zugangsvoraussetzung „kein Admin“ gilt nicht meh
 | Navigation (nur Materialstand) | **KEEP** | keine Future-Menü-Kulisse |
 | Admin-Typografie / Tokens | **KEEP** | dichter, gleiche DNA |
 | `/status` (öffentlich, `?key=`) | **KEEP** bis Owner sagt sonst | gleiche Datenquelle, zweiter Zugang |
-| Today / Pulse | **MISSING SOURCE** | braucht persistierte Leads |
-| `/admin/leads` | **MISSING** — **nicht bauen** (Phase D) | Spec in `sales.md` |
+| Heute | **KEEP** | Aufmerksamkeit aus `collect()`; Vertriebsblock nennt die fehlende Quelle beim Namen |
+| `/admin/leads` + `[id]` | **KEEP** | echter Lesepfad; drei Zustände getrennt (nicht eingerichtet / nicht erreichbar / leer) |
 | Marketing-Funnel im Admin | **MISSING SOURCE** | Analytics nur schreibend |
 | Charts / KPI-Karten | **REMOVE** (existieren nicht — so lassen) | keine Quelle |
 | Fake Owner / Intent / Pipeline € | **REMOVE** (nicht anlegen) | Truth Lock |
@@ -35,11 +35,21 @@ fehlende Sales-Quellen. Die Zugangsvoraussetzung „kein Admin“ gilt nicht meh
 
 | Route | Art | Zugang | Inhalt |
 |-------|-----|--------|--------|
-| `/admin` | RSC, `force-dynamic` | Sitzung | Materialstand, gruppiert |
+| `/admin` | RSC, `force-dynamic` | Sitzung | **Heute** — Aufmerksamkeit aus realen Quellen |
+| `/admin/material` | RSC, `force-dynamic` | Sitzung | Materialstand, gruppiert (unverändert, neue Adresse) |
+| `/admin/leads` | RSC, `force-dynamic` | Sitzung | Anfragen: Liste, Suche, Statusfilter |
+| `/admin/leads/[id]` | RSC + Server Actions | Sitzung | Detail 2/3 + 1/3, Status- und Schritt-Mutation |
 | `/admin/login` | RSC, `force-dynamic` | offen wenn Env | Passwort |
 | `POST /api/admin/session` | Handler | Rate-Limit | setzt `cd_admin` |
 | `DELETE /api/admin/session` | Handler | — | löscht Cookie |
-| `/admin/leads` | **fehlt** | — | bewusst, Spec only |
+
+**Der Materialstand ist umgezogen**, nicht verändert: gleiche Funktion
+(`collect()`), gleiche Gruppierung, gleiche Zahlen — nur liegt unter
+`/admin` jetzt „Heute". Die Datensemantik ist unangetastet.
+
+**Navigation:** Heute · Materialstand · Vertrieb. Der dritte Punkt erscheint
+nur, wenn `leadStoreConfigured()` wahr ist — die Navigation wächst mit den
+Quellen, nicht mit den Absichten.
 
 Kein zweites Admin-Projekt. Layout: `app/(admin)/` eigene Wurzel, `lang="de"`, `noindex`.
 
@@ -49,11 +59,19 @@ Kein zweites Admin-Projekt. Layout: `app/(admin)/` eigene Wurzel, `lang="de"`, `
 
 | Datei | Rolle |
 |-------|--------|
-| `components/admin/admin-shell.tsx` | Hülle, 1 Nav-Punkt, Skip-Link |
+| `components/admin/admin-shell.tsx` | Hülle, Skip-Link, Navigation je nach Quellenlage |
+| `components/admin/admin-nav.tsx` | Client — nur wegen `aria-current` |
+| `components/admin/primitives.tsx` | Surface · SectionHeader · Pill · DataValue · **Unknown** · **UnavailableNote** |
+| `components/admin/leads-table.tsx` | dichte Tabelle, echtes `<table>`-Markup |
 | `components/admin/admin-login-form.tsx` | Client-POST, `router.refresh()` |
 | `components/admin/admin-logout.tsx` | `DELETE`, kein GET-Logout |
 
-**Charts:** keine. **Today:** keine.
+**Charts:** keine — es gibt keine Zeitreihe. **Fake-KPI:** keine.
+
+Die Bausteine stammen aus dem v0-Prototyp, aber ohne Primer und ohne
+styled-components: der Prototyp bezog seine Farben schon über eine eigene
+Semantik-Schicht (`--cd-*`), die hier auf die bestehenden Token umgehängt
+wurde. Kein zweites Design-System.
 
 ---
 
@@ -71,7 +89,8 @@ Langfrist-IA (Today, Sales, …) laut R4: nur reale Module. Heute korrekt leer.
 | `lib/material-status.ts` `collect()` | **LIVE DATA** | Lücken aus `site-data`, Insights, Screens, Env-Namen (nicht Werten) |
 | `ITEM_GROUPS` | **LIVE DATA** | 10 Gruppen: Belege … Entscheidungen |
 | Lead-Mails (Resend) | **LIVE DATA** außerhalb der App | Postfach, nicht Admin |
-| `LeadStore` | **SPEC / DEV only** | `LEAD_STORE` unset → kein Schreiben; `memory` in Production abgelehnt |
+| `LeadStore` | **SPEC / DEV only** | `LEAD_STORE` unset → kein Schreiben; `memory` und `file` in Production abgelehnt |
+| `file`-Adapter | **DEV only** (neu 30.08.) | JSON in `os.tmpdir()`; existiert, weil `memory` zwischen RSC- und Route-Handler-Schicht **nicht geteilt** wird |
 | Vercel Analytics | schreibend | **keine** Lese-API in der App |
 | Neon | **NOT RELEASED** | `docs/ops/provider-neon.md` |
 

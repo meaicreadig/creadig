@@ -111,3 +111,104 @@ Neue Routen im Build: `ƒ /admin` (575 B) · `ƒ /admin/login` (1,11 kB) ·
 
 **Keine PASS-Aussage ohne Test.** Jede Zeile oben stammt aus einem Lauf, nicht
 aus dem Quelltext.
+
+
+---
+
+# Delivery Run · 30.08.2026
+
+> **Werkzeug:** echte HTTP-Aufrufe gegen einen laufenden Server, Playwright +
+> echtes Chrome für Formulare, axe für die Barrierefreiheit.
+> **Speicher:** `LEAD_STORE=file` — ein Entwicklungs-Adapter, aber ein
+> **echter** Lese-, Schreib- und Mutationspfad. Kein Datensatz von Hand
+> eingesetzt: jeder Lead ist durch `/api/lead` gegangen.
+
+## Zugang (A.6, zuvor offen)
+
+| Prüfpunkt | Ergebnis | Beleg |
+|---|---|---|
+| `/admin` auf dem Preview | ✅ | **307 → `/admin/login`** statt leerem 404 |
+| Anmeldeseite | ✅ | 200, 11 365 B, H1 „Control Center", Passwortfeld |
+
+Damit ist der Befund vom Vormittag aufgelöst: die Env war im Preview-Scope
+unwirksam, nicht falsch. Nach dem Redeploy greift die Middleware wie gebaut.
+
+## Schreibweg und Doppel-Erkennung
+
+| # | Prüfpunkt | Ergebnis | Beleg |
+|---|---|---|---|
+| 1 | Lead wird **vor** der Mail gespeichert | ✅ | Mail scheitert (502 `send_failed`, absichtlich ungültiger Schlüssel), Lead liegt trotzdem im Speicher |
+| 2 | **Gleiches** Absende-Token → **ein** Datensatz | ✅ | `[lead] created CD-260830-efcc` danach `[lead] updated CD-260830-efcc` |
+| 3 | **Neues** Token → neuer Datensatz | ✅ | `[lead] created CD-260830-3aa0` |
+| 4 | Datei enthält **2** Sätze, nicht 3 | ✅ | zwei Absendungen + ein Wiederholversuch |
+| 5 | `memory` verweigert in Produktion | ✅ | `next start`: Alarm `lead-store-memory-in-production`, **nichts** gespeichert |
+
+Punkt 5 ist der wichtigste: die Sperre ist nicht behauptet, sie ist ausgelöst
+worden.
+
+## Lesepfad
+
+| # | Prüfpunkt | Ergebnis |
+|---|---|---|
+| 6 | Liste zeigt beide Anfragen mit Nummer, Betrieb, Herkunft, Status | ✅ |
+| 7 | Suche `?q=Yilmaz` — ein Treffer, der andere nicht | ✅ |
+| 8 | Filter `?status=won` — „Keine Anfrage passt zu dieser Suche" | ✅ |
+| 9 | Detail zeigt Betriebscheck als **Text** mit der Einordnung „Reifegrad-Diagnose" | ✅ |
+| 10 | Unbekannte ID → **404** (nicht leere Seite) | ✅ |
+| 11 | Ohne Sitzung → `/admin/login` | ✅ |
+| 12 | Vertrieb erscheint nur in der Navigation, wenn ein Speicher da ist | ✅ |
+
+## Mutationen (Playwright, echtes Chrome) — **11 / 11**
+
+| # | Prüfpunkt | Ergebnis | Beleg |
+|---|---|---|---|
+| 13 | Anmeldung **nur mit Tastatur** | ✅ | tippen, Enter |
+| 14 | Status ändern → Datei | ✅ | `qualified` |
+| 15 | Status nach **Neuladen** identisch | ✅ | Feldwert `qualified` |
+| 16 | Nächster Schritt + Datum → Datei | ✅ | „Rueckruf mit Terminvorschlag" / 2026-09-04 |
+| 17 | Schritt nach **Neuladen** identisch | ✅ | |
+| 18 | Liste zeigt Schritt und neuen Status | ✅ | |
+| 19 | `lost` mit Grund | ✅ | „Budget verschoben" |
+| 20 | Grund **fällt weg** bei Statuswechsel | ✅ | `contacted` → `lostReason: null` |
+| 21 | Leeres Feld löscht Schritt **und** Datum | ✅ | beide `null` |
+
+Punkte 20 und 21 sind die Invarianten, die man sonst erst nach Monaten
+bemerkt: ein Verlustgrund an einer gewonnenen Anfrage, ein überfälliges
+Datum ohne Aufgabe.
+
+## Barrierefreiheit
+
+| Fläche | desktop/hell | mobil/dunkel |
+|---|---|---|
+| Anmeldung · Heute · Materialstand · Vertrieb · Anfrage | 0 Verletzungen | 0 Verletzungen |
+
+**10 Durchläufe, 0 Verletzungen** (axe, WCAG 2.1 AA).
+Öffentliche Suite unverändert: **112 / 112**.
+
+## Gates
+
+```
+npx tsc --noEmit   ✅
+npx eslint .       ✅
+npm run build      ✅  Function-Gate · Sterne-Gate · Paritaets-Gate
+npm run a11y       ✅  112 / 112
+```
+
+## Sprach-Refactor ohne Verhaltensänderung
+
+`lib/routes.ts` leitet jetzt aus `locales` ab statt aus fest verdrahtetem
+`TR_PREFIX`. Geprüft gegen den **committeten** Preview-Stand, vier Adressen,
+Zeichen für Zeichen identisch:
+
+| Adresse | Ergebnis |
+|---|---|
+| `/` · `/leistungen` · `/tr/leistungen` · `/tr/erisilebilirlik` | hreflang-Block **identisch** |
+| `/tr/barrierefreiheit` | 404 (Slug-Ausnahme unverändert) |
+
+## Was NICHT geprüft wurde
+
+| Punkt | Grund |
+|---|---|
+| Produktions-Persistenz | Es gibt keinen Produktions-Adapter. Der Datei-Adapter beweist Lesepfad, Mutationen und Fehlerzustände — **nicht** Neon. |
+| Verhalten unter Last / gleichzeitige Zugriffe | Der Datei-Adapter kennt kein Sperrverfahren. Für einen Nutzer irrelevant, für Produktion verboten — deshalb dort abgelehnt. |
+| EN / AR | Existieren nicht. |

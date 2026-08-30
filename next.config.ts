@@ -187,10 +187,23 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // Alte statische Seite: Einstiegspunkte sauber weiterleiten,
-      // damit bestehende Links und QR-Codes nicht ins Leere laufen.
+      /*
+       * Legacy-Weiterleitungen. Vollstaendige Karte mit Begruendung:
+       * docs/production/redirect-map.md
+       *
+       * Die alte Seite hatte GENAU DREI ausgelieferte HTML-Adressen. Alle
+       * drei stehen hier. Was die alte Seite sonst noch hatte, waren Anker
+       * auf der Startseite (#leistungen, #pakete, #meai, #ueber-uns,
+       * #kontakt) — Anker erreichen den Server nie, also kann es fuer sie
+       * keine Weiterleitung geben. Sie landen auf "/", und das ist richtig.
+       *
+       * Sprachen sind hier bewusst NICHT abgebildet: die alte Seite hielt
+       * die Sprache in localStorage, nicht in der Adresse. Es gibt also
+       * keine alte /en/- oder /ar/-Adresse, die man umbiegen koennte.
+       */
       { source: "/termin.html", destination: "/termin", permanent: true },
       { source: "/index.html", destination: "/", permanent: true },
+      { source: "/meai_intro.html", destination: "/produkte/meai", permanent: true },
     ]
   },
 }

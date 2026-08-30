@@ -72,6 +72,10 @@ Operative Leiter: **`creadig-MASTER-LEITER-R4.md`** (PHASE A ausgeführt, STOP).
 | `docs/ops/lead-current-state.md` | Spec | Ist→Soll Lead-Fluss (MP-B) |
 | `docs/ops/crm-schema.md` | Spec | Lead + 3 State Machines |
 | `docs/ops/lead-store.md` | Spec | **MP-G** — Anbieterwahl, Datenschutz-Entwurf, Aufrufort, geprüftes Ausfallverhalten |
+| `docs/ops/privacy-persistence-gate.md` | Spec | **Tor** — die vier Owner-Entscheidungen und der fertige Datenschutz-Text; DB und Text sind EINE Freigabe |
+| `docs/production/redirect-map.md` | Spec | die drei Legacy-Adressen, und warum Anker keine bekommen |
+| `docs/ops/neon-decision-pack.md` | Spec | **eine** Owner-Entscheidung: Anbieter, Region, AVV, Aufbewahrung, Löschung |
+| `docs/i18n/current-state.md` | Current State | wo DE/TR/EN/AR stehen — und warum EN fertig, aber nicht veröffentlicht ist |
 | `docs/ops/provider-neon.md` | Working Note | **MP-G.3** Neon/Vercel Marketplace Gate — sechs Verarbeiter-Fragen, noch keine Freigabe |
 | `docs/ops/analytics-events.md` | Spec | Events + Properties |
 | `docs/ops/sop-lead-handling.md` | Spec | Interne Antwort-SLA |
