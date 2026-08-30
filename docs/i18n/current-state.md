@@ -1,8 +1,7 @@
 # Sprachen · Current State
 
 > **Authority:** Current State · Gate 3 · Stand 30.08.2026
-> **Live-fähig:** DE · TR · **EN**
-> **Nicht begonnen:** AR, RTL
+> **Live-fähig:** DE · TR · EN · **AR (RTL)**
 
 ---
 
@@ -13,7 +12,7 @@
 | **DE** | ✅ | ✅ | ✅ 21 | ✅ | 112/112 | **live** |
 | **TR** | ✅ | ✅ | ✅ 20 | ✅ | 112/112 | **live** |
 | **EN** | ✅ | ✅ | ✅ **21** | ✅ | **38/38** | **live-fähig** |
-| **AR** | ❌ | ❌ | ❌ | ❌ | — | nicht begonnen |
+| **AR** | ✅ | ✅ | ✅ 21 | ✅ | **36/36** | **live-fähig · RTL** |
 | RU | — | — | — | — | — | Legacy-Archiv |
 
 ---
@@ -71,15 +70,93 @@ SEO-Folgen, keine Nebenwirkung dieser Stufe.
 
 ---
 
-## Arabisch
+## Arabisch und RTL — was Gate 3 gebaut hat
 
-Nicht begonnen. Zwei getrennte Arbeiten, die nicht verwechselt werden dürfen:
+| | Umfang |
+|---|---|
+| Wörterbuch `dictionary.ar` | 42 Bereiche, dieselbe Struktur wie DE |
+| `Localized`-Daten | 250 Einträge in service-pages, site-data, insights, betriebscheck, branchen |
+| Routen | `app/(ar)/ar/…` — 21 Seiten + Layout |
+| **gesamt** | **~11 800 Wörter** |
 
-1. **Inhalt** — nochmals rund 8 900 Wörter, neu verfasst aus dem DE-Canon.
-2. **RTL** — `dir="rtl"`, logische CSS-Eigenschaften statt gespiegelter
-   Stylesheets, Bidi-Isolation für E-Mail, Telefon, URLs und lateinische
-   Produktnamen, dazu die Prüfung von Navigation, Formularen, Betriebscheck,
-   Termin-Assistent, Fokus und Tastatur.
+### Was lateinisch bleibt
 
-**Übersetzt ≠ RTL.** Eine arabische Fassung ohne bestandene RTL-Abnahme geht
-nicht live.
+Eigennamen (creaDIG, meAI, fibero, CASSAMEA, meahv, Resend, Vercel, WCAG)
+und **westliche Ziffern** (2017, 149 EUR). Ein transkribierter Produktname
+ist im Arabischen weder in der Suche noch auf der Rechnung wiederzufinden;
+und der Markt ist Europa — die Rechnung, die folgt, trägt dieselben Ziffern.
+
+### RTL ist kein `text-align`
+
+Drei Ebenen, alle drei nötig:
+
+| Ebene | Was passiert |
+|---|---|
+| **Dokument** | `dir="rtl"` am `<html>`, aus `LOCALE_DIR` — die einzige Stelle |
+| **Layout** | **101 physische Utilities** in 43 Dateien auf die logische Achse: `ml/mr → ms/me`, `pl/pr → ps/pe`, `left/right → start/end`, `border-l/r → border-s/e`, `text-left/right → text-start/end` |
+| **CSS** | die vier `left:`-Regeln der Sektions-Schiene → `inset-inline-start` |
+
+Danach: **0 physische Richtungs-Utilities** im Projekt. Kein zweites
+Stylesheet, kein `arabic.css` — dieselben Klassen drehen sich mit `dir`.
+
+Gemischte Richtung braucht **keine** Einzelauszeichnung: steht `dir` am
+Dokument, erledigt der Bidi-Algorithmus des Browsers lateinische Namen und
+E-Mail-Adressen innerhalb arabischer Sätze. Nachgemessen auf
+`/ar/impressum`: `info@creadig.de` rendert 113 px breit und in der
+richtigen Reihenfolge, nicht gespiegelt.
+
+### Ein Defekt, den der Compiler NICHT gefunden hat
+
+Beim Einführen von Arabisch meldete `tsc` **357 fehlende Übersetzungen** —
+und eine nicht. `retainer.includes` trug `as Record<Locale, string[]> | null`.
+Eine **Typzusicherung schaltet genau die Prüfung ab**, die dieses Feld
+braucht; der Fehler fiel erst im Build auf, als `includes.ar` `undefined`
+war und `.map()` darauf lief.
+
+Behoben, und beide `as`-Zusicherungen in `site-data.ts` durch `satisfies`
+ersetzt: `satisfies` prüft, ohne den Typ zu verbiegen.
+
+**Das ist die Lehre dieser Stufe:** Der Paritäts-Zwang trägt nur, solange
+niemand ihn per Cast umgeht.
+
+### Das Vorschaubild auf Arabisch — offene Materialfrage
+
+`ImageResponse` bringt nur eine generische Fallback-Schrift mit, und die hat
+keine arabischen Glyphen. Der Build brach reproduzierbar ab
+(`lookupType: 5 - substFormat: 3 is not yet supported` — die Formenbildung
+arabischer Buchstaben).
+
+Arabisch zeigt deshalb auf die **englische** Karte: lateinisch gesetzt,
+markenrichtig, keine falsche Aussage. Eine arabische Karte mit Ersatzzeichen
+wäre schlechter als eine fremdsprachige.
+
+**OWNER:** eine arabische Schriftdatei (Lizenz und Gewicht sind eine
+Entscheidung, kein Implementierungsdetail). Danach ist es eine Route.
+
+### Geprüft
+
+| Prüfung | Ergebnis |
+|---|---|
+| 17 AR-Routen + 404 | alle 200 / 404 korrekt |
+| `lang="ar" dir="rtl"` | 36 von 36 Durchläufen |
+| berechnete `direction` | `rtl`, 0 Abweichungen |
+| **waagerechter Überlauf** | **0** bei 1440 und 390 px |
+| axe (WCAG 2.1 AA) | **36 Durchläufe, 0 Verletzungen** |
+| gemischte Richtung | E-Mail korrekt, nicht gespiegelt |
+| hreflang | de · tr · en · ar · x-default=de, alle Ziele existieren |
+| Sprachschalter | DE · TR · EN · AR, Endonyme |
+| **LTR-Regression** | DE/TR **112/112** · EN **36/36 axe 0** · 22 Layout-Prüfungen, 0 Überlauf |
+
+---
+
+## Was RTL NICHT beweist
+
+Die Prüfung ist maschinell und visuell-metrisch. Nicht geprüft:
+
+- ein Durchlauf mit einem arabischen Muttersprachler
+- ein arabischer Screenreader (NVDA/JAWS mit arabischer Stimme)
+- die sprachliche Qualität durch einen zweiten Übersetzer
+
+„0 Verletzungen und 0 Überlauf" heißt: die Mechanik stimmt. Ob der Text
+**gut** ist, entscheidet ein Mensch — dieselbe Grenze, die für Türkisch und
+Englisch gilt.
