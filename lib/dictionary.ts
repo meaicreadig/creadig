@@ -3617,6 +3617,1428 @@ export const dictionary = {
       rights: "Tüm hakları saklıdır.",
     },
   },
+  /*
+   * GATE 3 — die englische Fassung.
+   *
+   * ---------------------------------------------------------------------------
+   * QUELLE
+   * Der aktuelle deutsche System-Haus-Canon, nicht die alte Website. Die
+   * Legacy-Seite hatte eine englische Fassung; sie beschreibt eine
+   * Digitalagentur mit anderen Paketen und anderen Preisen. Sie ist hier als
+   * Terminologie-Referenz benutzt worden und an keiner Stelle als Positionierung.
+   *
+   * ---------------------------------------------------------------------------
+   * NICHT VEROEFFENTLICHT
+   * Dieser Block steht im Objekt, aber "en" steht NICHT in `locales`. Damit
+   * ist er vollstaendig und typgeprueft, aber ohne Route — genau der Zustand,
+   * den der Canon verlangt ("keine Sprache halb veroeffentlichen").
+   *
+   * Was zum Livegang noch fehlt, steht in `docs/i18n/current-state.md`:
+   * die `Localized`-Eintraege in site-data/insights/betriebscheck/branchen,
+   * der Routenbaum unter app/(en)/ und der Eintrag in `locales`.
+   *
+   * ---------------------------------------------------------------------------
+   * EIN SATZ, DER MITWANDERN MUSS
+   * `legal.privacyPoints` enthaelt "We do not keep a database" — die
+   * Uebersetzung des heutigen, wahren deutschen Satzes. Wird die Lead-
+   * Persistenz scharfgeschaltet, wird er hier genauso falsch wie in DE und TR.
+   * Siehe `docs/ops/privacy-persistence-gate.md`.
+   */
+  en: {
+    meta: {
+      siteTitle: "creaDIG — systems house for brand, web and AI",
+      siteDescription:
+        "creaDIG is the house above its own systems — from brand to AI. We build them. And we run them. A systems house for Germany, Austria and Switzerland.",
+      ogTitle: "creaDIG — we build what others never see.",
+      ogDescription:
+        "A systems house since 2017. Our own products, real clients, AI systems we build and operate. Germany, Austria, Switzerland.",
+      organizationDescription:
+        "Systems house for brand, web, operations, automation and AI. Our own products: meAI, fibero, CASSAMEA, meahv.",
+      breadcrumbHome: "Home",
+      ogImageAlt: "creaDIG — systems house for brand, web and AI",
+    },
+    brand: {
+      categoryLabel: "Category",
+      category: "Not a classic IT systems house. A systems house for digital operations.",
+    },
+    home: {
+      statement: {
+        eyebrow: "creaDIG in one sentence",
+        title: "We design systems, build them ourselves and keep them running.",
+        body: "From the brand through the digital presence and day-to-day operations to automation and artificial intelligence. Five levels that build on each other — and four products of our own on which we have tested them.",
+        cta: "About the company",
+      },
+      work: {
+        eyebrow: "Selected work",
+        title: "Show first. Talk after.",
+        cta: "All work",
+        ctaEnd: "See all work",
+      },
+      capabilities: {
+        eyebrow: "Services",
+        title: "From the brand to intelligence.",
+        lead: "Every level carries the next. You can start at any one of them — and stop at any one of them.",
+        cta: "All services",
+      },
+      entry: {
+        eyebrow: "Getting started",
+        priceLead: "Website package from",
+        priceNote: "excl. VAT. Fixed price for the agreed scope.",
+        priceCta: "Packages and prices",
+        questionsLabel: "Two questions up front",
+        questionsCta: "All questions",
+      },
+      products: {
+        cta: "All products",
+      },
+      company: {
+        eyebrow: "The company",
+        title: "A house that grows.",
+        body: "Founded in 2017, led by Muhammed Emin Akyol — with a small core team and a specialised network across Germany, Austria and Switzerland.",
+        cta: "More about us",
+      },
+      insights: {
+        eyebrow: "Insights",
+        title: "Notes from the build.",
+        cta: "All notes",
+      },
+    },
+    insightsPage: {
+      eyebrow: "Insights",
+      title: "Notes from the build.",
+      lead: "Not a blog. Notes from running systems: why a decision went one way and not the other, what a system taught us in daily use, which assumption turned out to be wrong.",
+      metaTitle: "Insights — system notes from creaDIG",
+      metaDescription:
+        "Notes from building our own systems: decisions, experience from running them, and what turned out to be wrong.",
+      emptyTitle: "Nothing published yet.",
+      emptyBody:
+        "The first note is still to come. We only write here once a system has run long enough for there to be something to learn from it — until then the page stays empty rather than filling itself with sample texts.",
+      emptyCtaProducts: "What we have built",
+      emptyCtaWorks: "See our work",
+      readLabel: "Read",
+      categoriesLabel: "What we write about",
+      categories: {
+        systems: "Systems",
+        automation: "Automation",
+        ai: "Artificial intelligence",
+        products: "Products",
+        betrieb: "Operations",
+        praxis: "Practice",
+      },
+      publishedLabel: "Published",
+      sourcesLabel: "For reference",
+      sourceStatement: "Accessibility statement for this site",
+      sourceService: "Accessibility as a service",
+      backCta: "All notes",
+    },
+    kontaktPage: {
+      eyebrow: "Contact",
+      title: "Choose the route that fits.",
+      lead: "Not every enquiry starts with an appointment. Some start with a look at what we have built — that is a route to us as well. Advice in German, Turkish and English.",
+      metaTitle: "Contact — creaDIG Osnabrück",
+      metaDescription:
+        "Reach creaDIG: by WhatsApp, email, a free first consultation, or straight through our work. ICO InnovationsCentrum Osnabrück, advice in German, Turkish and English.",
+      intentsLabel: "Where would you like to start?",
+      intents: {
+        talk: {
+          name: "Discuss a project",
+          what: "Tell us in your own words what it is about — by WhatsApp or email, no form.",
+          cta: "See the direct routes",
+        },
+        appointment: {
+          name: "Book an appointment",
+          what: "A twenty-minute first conversation, free and without obligation. Four steps and your request is in.",
+          cta: "Request an appointment",
+        },
+        products: {
+          name: "See the products",
+          what: "Four systems of our own that we built and run ourselves. The fastest way to form a judgement about us.",
+          cta: "To the products",
+        },
+        works: {
+          name: "See the work",
+          what: "Our own products and client work, kept clearly apart. Detailed case write-ups follow as approvals come in.",
+          cta: "See our work",
+        },
+      },
+      mailLabel: "Email",
+      mailNote: "For documents, proposals and anything in writing.",
+    },
+    unternehmenPage: {
+      eyebrow: "Company",
+      title: "The house behind the systems.",
+      lead: "creaDIG is not an agency that delivers a project and disappears. We are a house that invents its own products, builds them itself and keeps them running — from the brand through the software to artificial intelligence.",
+      statement: "What we develop for clients, we operate for ourselves. That substance is what separates a systems house from a presentation.",
+      metaTitle: "Company — a systems house from Osnabrück, since 2017",
+      metaDescription:
+        "creaDIG: systems house at the ICO InnovationsCentrum Osnabrück, founded in 2017. Founder, way of working, focus areas and location — one house, five levels, four products of our own.",
+      chapters: {
+        label: "The path",
+        title: "A house is not built by announcing it.",
+        items: [
+          {
+            year: "2017",
+            title: "The beginning",
+            body: "Founded in Osnabrück — as an agency. Brand, presence, individual commissions. Everything that came after grew out of that, not beside it.",
+          },
+          {
+            year: null,
+            title: "Commissions became products",
+            body: "What kept recurring in projects, we built instead of solving it again every time. Four systems of our own: meAI, fibero, CASSAMEA, meahv — invented, built and operated by us.",
+          },
+          {
+            year: "today",
+            title: "The house",
+            body: "Based at the ICO InnovationsCentrum Osnabrück. Our own products in operation, client work in Germany and Switzerland — and the same hand that builds picks up the phone afterwards.",
+          },
+        ],
+      },
+    },
+    arbeitenPage: {
+      eyebrow: "Work",
+      title: "Built. And operated.",
+      lead: "Four products of our own that we invented and built ourselves — alongside client work from Germany and Switzerland. Listed separately, so it is clear what belongs to us.",
+      metaTitle: "Work — our own products and client work",
+      metaDescription:
+        "The creaDIG portfolio: four products of our own and client work from Germany and Switzerland. Listed separately — our own systems and commissioned work are not the same thing.",
+    },
+    arbeitPage: {
+      breadcrumb: "Work",
+      kindLabel: "Type",
+      sectorLabel: "Sector",
+      regionLabel: "Region",
+      statusLabel: "Status",
+      builtLabel: "What we built",
+      whatLabel: "What it is about",
+      backLabel: "All work",
+      caseGatedNote:
+        "We publish a detailed case write-up with starting point, solution and outcome only with the client's written approval. Once it exists, it appears here.",
+      ctaTitle: "A similar starting point in your business?",
+      ctaBody: "Twenty minutes, free and without obligation. We look at the operation and tell you honestly whether we can help.",
+      ctaPrimary: "Start a project",
+      ctaSecondary: "All work",
+    },
+    produktePage: {
+      eyebrow: "Proof, not a catalogue",
+      title: "Four products we run ourselves.",
+      lead: "This page sells none of them. It exists because it backs up what we say about ourselves: creaDIG built every one of these systems from the ground up — and uses it in its own day-to-day work. What we build for you is under Services.",
+      metaTitle: "Our own products — meAI, fibero, CASSAMEA, meahv",
+      metaDescription:
+        "The four products creaDIG built for itself: meAI (AI business operating system), fibero (fibre-optic operations), CASSAMEA (hospitality POS, Switzerland) and meahv (property management).",
+      builtLabel: "What we built",
+      sectorLabel: "Sector",
+      statusLabel: "Status",
+      regionLabel: "Market",
+      openLabel: "View product",
+      liveLabel: "Open live",
+      clientWorkTitle: "What we built for others.",
+      clientWorkNote: "Explicitly not a product of ours — work for clients.",
+      clientWorkCta: "See our work",
+    },
+    produktPage: {
+      interest: {
+        eyebrow: "Register interest",
+        title: "Shall we let you know?",
+        body: "If {product} is of interest for your business: leave an address and we will get in touch once it is ready. No newsletter, no advertising — one message about this product.",
+        emailLabel: "Email",
+        emailPlaceholder: "so we can reach you",
+        nameLabel: "Name (optional)",
+        namePlaceholder: "how should we address you?",
+        submit: "Let me know",
+        sentTitle: "Noted.",
+        sentBody: "We will be in touch as soon as there is something to say about this product. A confirmation is in your inbox.",
+        phoneOmitted: "not provided (product enquiry)",
+        messageTemplate: "Interest in the product {product} — please notify me as soon as it is available.",
+      },
+      breadcrumb: "Products",
+      problemLabel: "What it was built for",
+      thesisLabel: "The thesis",
+      functionsLabel: "What it does",
+      architectureLabel: "System & architecture",
+      operationsLabel: "How it is operated",
+      learningsLabel: "What operating it taught us",
+      statusBadge: {
+        live: "Live",
+        beta: "Private beta",
+        aufbau: "In build",
+        intern: "In our own operation",
+      },
+      maturityBadge: {
+        live: "Live",
+        pilot: "Pilot",
+        "private-beta": "Private beta",
+        "in-development": "In development",
+      },
+      builtLabel: "What we built",
+      blocksLabel: "Building blocks",
+      blocksTitle: "Built ourselves, block by block.",
+      sectorLabel: "Sector",
+      statusLabel: "Status",
+      regionLabel: "Market",
+      liveLabel: "Open live",
+      backLabel: "All products",
+      systemLabel: "Where it sits in the system",
+      systemBody:
+        "Every product of ours sits on one of the five levels — and we offer that same level as a service. What we have built here, we also build for your business.",
+      layerLabel: "Level",
+      servicesLabel: "Matching services",
+      layerCta: "View level",
+      houseContextLabel: "Under the same roof",
+      houseContextNote:
+        "We do not only build for this field — we work in it ourselves. That is why we know the questions before they are asked.",
+      storyLabel: "Why we built it",
+      nextLabel: "Next product",
+      prevLabel: "Previous product",
+      screensPending:
+        "We only show interfaces once we can capture the real application with demo data. Until then, what is built is written here — rather than an image claiming something else.",
+      screensLabel: "The real interface",
+      screensCaption: "Real interface, demo data.",
+      screensAlt: "real interface with demo data",
+      ctaTitle: "Does this fit your business?",
+      ctaBody: "Twenty minutes, free and without obligation. We look at the operation and tell you honestly whether we can help.",
+      ctaPrimary: "Start a project",
+      ctaSecondary: "All products",
+    },
+    leistungenPage: {
+      eyebrow: "Services",
+      title: "Five levels. One system.",
+      lead: "Brand, presence, operations, automation, intelligence. Each level carries the next — not side by side, but as one system. What we built for our own products, we bring into your working day.",
+      metaTitle: "Services — from the brand to AI",
+      metaDescription:
+        "The five levels of creaDIG: brand, digital presence, operations, automation and AI. For companies in Germany, Austria and Switzerland — in German, Turkish and English.",
+      pricingLabel: "Prices",
+      pricingNote:
+        "Standard products are priced transparently. Systems development is quoted individually — by scope, not by the hour.",
+    },
+    nav: {
+      home: "Home",
+      leistungen: "Services",
+      produkte: "Products",
+      arbeiten: "Work",
+      unternehmen: "Company",
+      insights: "Insights",
+      betrieb: "Managed operations",
+      systeme: "Systems",
+      hints: {
+        leistungen: "What we build for you",
+        produkte: "What we built and run ourselves — proof, not a catalogue",
+        arbeiten: "Delivered projects, named",
+        unternehmen: "Who is behind it and how we work",
+        insights: "Technical notes from live operation",
+        kontakt: "Four ways to start a conversation",
+      },
+      ueber: "About us",
+      pakete: "Packages",
+      kontakt: "Contact",
+      cta: "Start a project",
+      menu: "Open menu",
+      close: "Close menu",
+      menuTitle: "Navigation",
+      theme: "Switch appearance",
+      language: "Change language",
+      skipToContent: "Skip to content",
+    },
+    hero: {
+      eyebrow: "Systems house · Osnabrück · since 2017",
+      headlineLine1: "We build",
+      headlineLine2: "what others",
+      headlineLine3: "never see.",
+      subline:
+        "creaDIG builds brand, digital presence, operations, automation and artificial intelligence as one system — for companies in Germany, Austria and Switzerland.",
+      systemLine: "Five levels. One system.",
+      ctaPrimary: "Start a project",
+      ctaSecondary: "Our work",
+      location: "Germany · Austria · Switzerland",
+      scroll: "Scroll",
+    },
+    impact: {
+      eyebrow: "The foundation",
+      title: "Not a concept. A running operation.",
+      figures: {
+        since: { label: "Since", detail: "Grown from an agency into a systems house." },
+        products: { label: "Own products", detail: "meAI, fibero, CASSAMEA, meahv — built ourselves." },
+        systems: {
+          label: "Systems in production",
+          detail: "Systems running today in the daily work of a business.",
+        },
+        automated: {
+          label: "Automated steps",
+          detail: "Steps somebody used to do by hand.",
+        },
+        operatingYears: {
+          label: "Years in business",
+          detail: "Without interruption, counted from the founding in 2017.",
+        },
+      },
+      facts: {
+        regions: {
+          label: "Markets",
+          value: "Germany, Austria & Switzerland",
+          detail: "Advised and built in German, Turkish and English.",
+        },
+        scope: {
+          label: "Span",
+          value: "From the brand to AI",
+          detail: "Five levels. One system.",
+        },
+      },
+      note: "Systems in daily operation — not in a presentation.",
+    },
+    logos: {
+      eyebrow: "Ecosystem",
+      title: "What runs under this roof",
+      ownProducts: "Own products",
+      clients: "Clients",
+      brands: "Brands in our working environment",
+      note: "We built our own products and operate them ourselves. Clients appear here only with their consent. Third-party brands do not appear at all — no name without approval.",
+    },
+    portfolio: {
+      eyebrow: "Portfolio",
+      title: "Built. And operated.",
+      lead: "Four products of our own that we invented and built ourselves — alongside client work from Germany and Switzerland. Listed separately, so it is clear what belongs to us.",
+      built: "What we built",
+      products: "Own products",
+      productsNote: "Invented, built and operated by us.",
+      clientWork: "Client work",
+      clientWorkNote: "A service for clients — not a product of ours.",
+      kindProduct: "Product",
+      kindClientWork: "Client work",
+      more: "Also under this roof",
+      viewLive: "View live",
+      mockupNote: "Product cards: illustrative mock-ups, not screenshots.",
+      productPhotoNote:
+        "Product images show the real interface (demo data) — not mock-ups.",
+      customerPhotoNote: "Client images show the real interface — not mock-ups.",
+      imageNoteMixed:
+        "Real interfaces (product & client) and illustrative mock-ups — labelled separately, never mixed.",
+      viewLabel: "View",
+      viewCards: "Cards",
+      viewRegistry: "Register",
+      colProject: "Project",
+      colSector: "Sector",
+      colRegion: "Region",
+      registryNote: "The same projects, densely listed. We add years once they are documented — estimated years do not appear here.",
+    },
+    cases: {
+      eyebrow: "Client cases",
+      title: "What changed afterwards.",
+      lead: "Every case in the same order: where the business stood, what was holding it up, what it wanted to achieve — and only then what our part in it was. Only with the client's written approval; without approval, nothing appears here.",
+      card: {
+        project: "Project",
+        category: "Category",
+        services: "Services",
+      },
+      chapters: {
+        start: "Starting point",
+        problem: "The problem",
+        goal: "The goal",
+        role: "Our role",
+        system: "The system",
+        delivery: "Delivery",
+        result: "Outcome",
+        today: "Today",
+      },
+      metricsLabel: "Figures",
+      sourceLabel: "Source",
+      voiceLabel: "In the client's words",
+    },
+    reviews: {
+      eyebrow: "Reviews",
+      title: "What clients have written.",
+      lead: "In the original wording, with name and date. We do not translate reviews — a translated sentence is a sentence the person never wrote.",
+      verify: "Read on Google",
+      projectLabel: "Project",
+      sourceGoogle: "Google review",
+      sourceClient: "Sent directly to us",
+      ofFive: "out of 5",
+      countOne: "review",
+      countMany: "reviews",
+    },
+    faq: {
+      eyebrow: "Frequent questions",
+      title: "What prospects ask first.",
+      lead: "Six questions that come up in almost every first conversation — answered here in advance. Every answer matches what we say on the phone.",
+      more: "Your question is not here?",
+      moreCta: "Ask directly",
+      items: [
+        {
+          q: "What does a creaDIG presence cost?",
+          a: "The website package costs €2,400 excl. VAT as a reference price for the first two businesses, then €3,900 excl. VAT. Ongoing support costs €149 excl. VAT per month. All prices plus 19% VAT, fixed price for the agreed scope.",
+        },
+        {
+          q: "How does a project run?",
+          a: "In three steps: understand, build, operate. We look at the business, build the system and then keep it running.",
+        },
+        {
+          q: "What is meAI?",
+          a: "meAI is our AI business operating system — it brings together figures, tasks and documents and prepares decisions. Live at meai.run.",
+        },
+        {
+          q: "Do you work in Switzerland as well?",
+          a: "Yes. We are based at the ICO InnovationsCentrum Osnabrück; Switzerland is a market we serve. CASSAMEA was built specifically for Swiss hospitality.",
+        },
+        {
+          q: "Do you speak Turkish?",
+          a: "Yes. Advice, documents and ongoing support are available in German and Turkish — entirely over WhatsApp if you prefer.",
+        },
+        {
+          q: "Who owns the system — and what happens if I cancel the support?",
+          a: "The system and all the data in it belong to you from day one. Ongoing support at €149 excl. VAT per month can be cancelled monthly, with no minimum term. Afterwards everything stays with you: code, content, access and domain — we hand over what we hold, and you can continue with anyone else. What ends is the support, not your access.",
+        },
+      ],
+    },
+    servicePage: {
+      breadcrumbHome: "Home",
+      breadcrumbServices: "Services",
+      includesLabel: "What is included",
+      forWhomLabel: "Who it is for",
+      layerLabel: "Level in the system",
+      processLabel: "How it runs",
+      durationLabel: "How long it takes",
+      fromToLabel: "What changes in the business",
+      fromToBefore: "Before",
+      fromToAfter: "After",
+      clientEffortLabel: "What you contribute",
+      packagesLabel: "Included in these packages",
+      packagesCta: "See packages and prices",
+      worksLabel: "Related work",
+      worksCta: "See the full portfolio",
+      boundaryLabel: "What we do — and what we do not",
+      boundaryWeLabel: "We take this on",
+      boundaryNotWeLabel: "We do not take this on",
+      ownProofLabel: "Tested on our own systems",
+      priceLadderLabel: "What it costs",
+      priceFixed: "Fixed price",
+      priceOffer: "Quote after the review",
+      priceMonthly: "per month",
+      ctaTitle: "Does this fit your business?",
+      ctaBody: "Twenty minutes, free and without obligation. We look at the operation and tell you honestly whether we can help.",
+      ctaPrimary: "Free first consultation",
+      ctaSecondary: "Ask via WhatsApp",
+    },
+    quickCheck: {
+      eyebrow: "Quick check",
+      title: "Three points on your site. Free.",
+      lead: "You give us the address, we look at the site — by hand, with keyboard and screen reader. You get three concrete points: what we noticed, where it is, and what it means for your visitors.",
+      siteLabel: "Website address",
+      sitePlaceholder: "mybusiness.com",
+      errSite: "Please give us your website address — without it we have nothing to look at.",
+      messageLabel: "Anything we should know?",
+      messagePlaceholder: "Optional. For example: the shop, the booking flow, feedback from a customer.",
+      submit: "Request the quick check",
+      sentTitle: "Received.",
+      sentBody:
+        "We will look at your site and come back with three concrete points — free and without obligation.",
+      limitTitle: "What the quick check is not",
+      limitBody:
+        "It shows three points, not all of them. It is not a full audit against WCAG 2.1 AA — that is manual work and takes longer than a look. And it is not a legal assessment.",
+      humanNote:
+        "Not an automated scanner: a person looks at the site. That is why it takes two working days and not two seconds.",
+    },
+    architecture: {
+      eyebrow: "The house",
+      title: "One roof, five levels, four products.",
+      lead: "The whole company in one view: the roof on top, the five levels below it, operations running across underneath — and at the bottom the four products of our own, each on the level where it sits.",
+      roofLabel: "The roof",
+      roofNote: "Systems house, Osnabrück, since 2017",
+      layersLabel: "Five levels",
+      operateLabel: "Running across",
+      operateNote: "Hosting · monitoring · updates · security · backups · support · further development",
+      productsLabel: "Four products of our own",
+      onLayer: "on level",
+      caption:
+        "Not an org chart and not a market overview — the order of our own house. We offer every level as a service; every product is the evidence that we built it ourselves.",
+    },
+    services: {
+      eyebrow: "Services",
+      title: "Five levels. One system.",
+      lead: "We work from A to Z — from the first logo to a company's own AI system. Each level builds on the one below it.",
+      forWhom: "Who it is for",
+      entryLabel: "Entry point",
+      problemLabel: "Starting point",
+      solutionLabel: "What we build",
+      resultLabel: "What is different afterwards",
+      projectsLabel: "Typical projects",
+      detailLabel: "In detail",
+      depthLabel: "In depth",
+      layers: {
+        identity: {
+          name: "Identity",
+          what: "Brand, name, logo, presence — the foundation everything else stands on.",
+          who: "Founders, new businesses, trades before their first public presence.",
+          problem:
+            "The business has a name but no picture. Quote, van, invoice and sign look different every time — the customer has to work out who they are dealing with at every contact.",
+          solution:
+            "We build a brand system rather than a logo: mark, typeface, colours and how to apply them, documented and handed over — so the print shop and the next supplier can work with it without guessing.",
+          result: "Everything that leaves the business visibly comes from it. No queries, no rebuilding, nobody eyedropping a colour out of an old PDF.",
+          projects: [
+            "Corporate design",
+            "Brand system",
+            "Logo & wordmark",
+            "Business stationery",
+            "UI foundations",
+          ],
+        },
+        digital: {
+          name: "Digital",
+          what: "Website, shop, landing pages — visible, fast, findable.",
+          who: "Bakeries, practices, restaurants, trade businesses.",
+          problem:
+            "The website is a brochure. It is online, but it receives nothing — no enquiry, no application, no appointment. And nobody knows how many people walked past it.",
+          solution:
+            "We build the presence as part of the business: website, portal, web app or shop, connected to whatever happens next. Accessibility to WCAG 2.1 AA is built in, not retrofitted.",
+          result: "Enquiries arrive, can be traced, and land where they are handled — instead of in an inbox nobody opens on a Friday.",
+          projects: [
+            "Websites",
+            "Web apps",
+            "Portals",
+            "E-commerce",
+            "Mobile",
+            "Accessibility",
+          ],
+        },
+        operations: {
+          name: "Operations",
+          what: "Point of sale, planning, billing, administration — the business inside one system.",
+          who: "Hospitality, field service, administration, service providers.",
+          problem:
+            "The business runs on notes, spreadsheets and three programs that know nothing about each other. Answering one question means searching in four places — and the answer is already out of date before it is finished.",
+          solution:
+            "We structure the business in one system: job, customer, document and figure in one place, with interfaces to whatever should stay. What has to be bespoke, we build; what already exists off the shelf, we do not buy twice.",
+          result: "One source of an answer instead of four. And someone new finds their way around the system rather than around a colleague's memory.",
+          projects: [
+            "CRM",
+            "Job management",
+            "Back office",
+            "Data & interfaces",
+            "Dashboards",
+            "Custom software",
+          ],
+        },
+        automation: {
+          name: "Automation",
+          what: "Recurring work is done by the system, not by a person.",
+          who: "Businesses with 6–20 staff and a growing pile of paperwork.",
+          problem:
+            "The same work, every day, by hand: retyping receipts, forwarding emails, chasing quotes, reconciling lists. It goes unnoticed because it is never much at once — it is noticed at the end of the month.",
+          solution:
+            "We automate the routes, not the people: the system takes over processes, interfaces, documents and incoming email. Always with one place where a person can see what did not go through.",
+          result: "Recurring work happens without anyone having to remember it. And when something gets stuck, it says so instead of sitting there quietly.",
+          projects: [
+            "Workflows",
+            "APIs & integrations",
+            "Document processing",
+            "Email processing",
+            "Process automation",
+          ],
+        },
+        intelligence: {
+          name: "Intelligence · meAI",
+          what: "An AI system that thinks along, prepares and keeps the overview.",
+          who: "Established businesses that want to decide faster.",
+          problem:
+            "The figures are there, the decision is not. Anyone who wants to make it opens five reports and afterwards knows more — but not better.",
+          solution:
+            "On top of that we build a system that reads instead of displays: it classifies, prioritises and prepares options. meAI is our own version — built by us, run by us, and proven in our own working day before it reaches a business.",
+          result: "The question “what comes first today” has an answer — and the reason stands next to it.",
+          projects: [
+            "Analysis",
+            "Prioritisation",
+            "Knowledge",
+            "AI & agents",
+            "meAI",
+          ],
+        },
+      },
+    },
+    houseProducts: {
+      eyebrow: "Under this roof",
+      title: "Four products of our own.",
+      lead: "Invented, built and operated by us — and therefore the best evidence of what we can build for others. Not a catalogue: none of them is for sale here. The deep dive into our flagship meAI follows directly below.",
+      statusLabel: "Status",
+      openLabel: "Open",
+    },
+    meai: {
+      eyebrow: "Flagship · meai.run",
+      title: "Your invisible managing director.",
+      lead: "meAI is our AI business operating system. It reads the business, prepares decisions and holds together what would otherwise be scattered across heads and scraps of paper.",
+      dna: "The rare double DNA: we do not only build the AI system — we run our own business on it. What meAI can do has been proven in our own working day before it reaches a client.",
+      cta: "Open meai.run",
+      capabilities: {
+        overview: {
+          name: "Overview",
+          what: "Figures, tasks and appointments in one place, always current.",
+        },
+        tasks: {
+          name: "Prioritisation",
+          what: "The system says what comes first today — and why.",
+        },
+        documents: {
+          name: "Documents",
+          what: "Invoices and receipts are read, sorted and assigned.",
+        },
+        decisions: {
+          name: "Decisions",
+          what: "Prepared options instead of empty spreadsheets.",
+        },
+      },
+    },
+    process: {
+      eyebrow: "How we work",
+      title: "Understand. Build. Operate.",
+      bridge: "creaDIG builds the system — the system runs itself — you keep the overview.",
+      steps: {
+        understand: {
+          name: "Understand",
+          what: "We look at the business before we build a single line. Where does time get lost, what blocks, what is invisible?",
+        },
+        build: {
+          name: "Build",
+          what: "Brand, interface, logic, automation — as one connected system, not a collection of tools.",
+        },
+        operate: {
+          name: "Operate",
+          what: "We do not hand over and disappear. We operate, monitor and keep developing.",
+        },
+      },
+      opsEyebrow: "From the first contact",
+      opsSteps: {
+        request: {
+          name: "Enquiry",
+          what: "You write to us — by WhatsApp, through the form, or straight away with a preferred date. We reply within two working days.",
+        },
+        analysis: {
+          name: "Analysis",
+          what: "A twenty-minute first conversation, free. We look at the business and say what we would build — and what we would not.",
+        },
+        offer: {
+          name: "Quote",
+          what: "A fixed quote with scope, price and timeframe. No timesheets, no follow-up claims.",
+        },
+        implementation: {
+          name: "Delivery",
+          what: "We build what the quote says — in stages you get to see along the way. Interim states instead of a surprise at the end.",
+        },
+        operate: {
+          name: "Operation",
+          what: "After launch we stay on it: operating, monitoring, developing further — for as long as you want.",
+        },
+      },
+    },
+    about: {
+      eyebrow: "About us",
+      title: "A house that grows.",
+      founderLabel: "Founder & system lead",
+      founder: "Muhammed Emin Akyol",
+      body1:
+        "creaDIG started in 2017 as an agency. Commissions became products, products became a systems house — today four systems of our own run under this roof, alongside support for the businesses we built them for.",
+      body2:
+        "The team is growing; the next roles are being prepared. How we work today — who leads, who is in the core team, who is joining — is set out below, without varnish.",
+      nicheLabel: "Focus areas",
+      niches: [
+        "Trade businesses with 6–20 staff — focus on Germany",
+        "Small and medium businesses without their own IT department",
+        "Hospitality in Germany and Switzerland",
+      ],
+      nicheOpen:
+        "These are focus areas, not conditions. We work with companies of any sector and size — in German, Turkish and English.",
+      standardLabel: "Two languages, one standard",
+      standardBody:
+        "Advice, documents, contracts and ongoing support are available in German and Turkish. The same standard, the same documentation, the same invoice — only in the language in which decisions are made in the business. No interpreter in between and no second, thinner version.",
+      locationsLabel: "Location",
+      marketsLabel: "Markets",
+      honesty:
+        "We do not quote invented headcounts or revenue figures. Our proof is work we have built.",
+    },
+    workModel: {
+      eyebrow: "How we work",
+      title: "Founder-led — plus exactly the people a project needs.",
+      lead: "We do not tell you how big we are, but how we work. That is the more honest figure and the more useful one for you: afterwards you know who leads your project and who is working on it.",
+      items: {
+        founder: {
+          name: "Led by the founder",
+          what: "Every project has one person responsible, and it is always the same one. He runs the first conversation, he designs the system, and he answers the phone when something comes up. No handover from sales to delivery, no passing it to someone who was not there.",
+        },
+        core: {
+          name: "A small core team",
+          what: "Small enough that everyone knows what the others are working on. Large enough that one holiday does not stop a project.",
+        },
+        network: {
+          name: "Specialists as needed",
+          what: "For whatever a project needs on top — development, copy, strategy — we work with a settled network across Germany, Austria and Switzerland. Not bought in anonymously: these are people we have already built with.",
+        },
+      },
+      fieldsLabel: "Areas of responsibility",
+      fieldsNote: "Five levels, one responsibility. This is the structure of the house — not a list of skills.",
+      honesty:
+        "We do not quote a headcount and we do not quote revenue. Both could simply be asserted, and neither says anything about your project. What counts is who works on it.",
+    },
+    photos: {
+      eyebrow: "From the house",
+      title: "Where this is made.",
+      lead: "No stock photos and no studio office shots. What appears here is the place where the work happens — or nothing appears.",
+      slots: {
+        buero: {
+          caption: "The workspace at the ICO InnovationsCentrum Osnabrück.",
+          alt: "The creaDIG workspace at the ICO InnovationsCentrum Osnabrück",
+        },
+        ico: {
+          caption: "The ICO InnovationsCentrum Osnabrück, Albert-Einstein-Straße 1.",
+          alt: "The ICO InnovationsCentrum Osnabrück at Albert-Einstein-Straße 1",
+        },
+        arbeitsplatz: {
+          caption: "Screens with real work on them.",
+          alt: "A creaDIG workstation with live systems on the screens",
+        },
+        whiteboard: {
+          caption: "A sketch that really came about this way.",
+          alt: "Whiteboard with a system sketch from a project",
+        },
+      },
+    },
+    location: {
+      eyebrow: "Our location",
+      note: "You will find us at the InnovationsCentrum Osnabrück. Meetings by arrangement — in person, by video or over WhatsApp.",
+      mapLink: "View on the map",
+      photoAlt:
+        "The ICO InnovationsCentrum Osnabrück at Albert-Einstein-Straße 1 — the home of creaDIG",
+    },
+    packages: {
+      eyebrow: "Entry offers",
+      title: "Two ways in — both at a fixed price.",
+      lead: "Not every business starts at the top. These two offers are the entry point: clearly bounded, priced in advance, without you having to order the whole house.",
+      entryNote:
+        "This is the entry point, not the main architecture. What creaDIG builds as a systems house is set out above in the five levels and is quoted by scope — not by package.",
+      forWhom: "Who it is for",
+      recommended: "Our recommendation",
+      tierLabel: "Entry",
+      referenceNote:
+        "A reference price for the first two businesses — in return for a quote, a mention as a reference and two photographs. From the third business onwards the standard price applies.",
+      regularLabel: "Standard price",
+      durationLabel: "Project duration",
+      netNote: "All prices excl. VAT, plus 19% VAT.",
+      openEyebrow: "Larger scope",
+      openPrice: "on request",
+      openNote:
+        "Several locations, a shop, interfaces into inventory management, or a system that goes beyond the website: we quote that by effort — after a conversation, not from a list. We tell you what it costs beforehand, and the figure does not change afterwards.",
+      openCta: "Discuss the scope",
+      retainerEyebrow: "Ongoing support",
+      retainerTitle: "Operation instead of handover.",
+      retainerFrom: "from",
+      retainerCta: "Request support",
+      once: "one-off · fixed price",
+      monthly: "/ month",
+      items: {
+        website: {
+          name: "Website package for trades",
+          who: "For trade businesses and small companies",
+          outcome: "Online in four weeks — with enquiries and applications",
+          includes: [
+            "A website built for enquiries — not as a brochure",
+            "A careers page for applicants",
+            "Google Business Profile set up",
+            "An enquiry form that actually delivers",
+            "Accessibility to WCAG 2.1 AA built in, not retrofitted",
+            "Copy — written, not handed back to you as homework",
+            "Photo selection and image preparation",
+          ],
+          note: "Fixed price for the agreed scope. A firm launch date: four weeks from receipt of your material. 50% at the start, 50% on your approval. The site and all access belong to you from day one.",
+          cta: "Request a project",
+        },
+        audit: {
+          name: "Accessibility audit",
+          who: "For businesses whose site already exists",
+          outcome: "A findings report that belongs to you — even if you do nothing afterwards",
+          includes: [
+            "Manual review against WCAG 2.1 AA across all main pages",
+            "A pass with keyboard and screen reader, not just a scan",
+            "Every finding with page, element, criterion and measured value",
+            "An accessibility statement as a technical template",
+            "A re-check after remediation, with figures before and after",
+          ],
+          note: "Fixed price. The audit stands on its own and commits you to no remediation. What remediation costs we only say once we have seen the code — nobody names a fixed price for something unseen and means it.",
+          cta: "See the service",
+        },
+      },
+    },
+    managed: {
+      eyebrow: "Operate",
+      title: "Managed operations.",
+      lead: "The five levels stand vertically on each other. This runs across underneath them and touches every one: what has been built has to run — every day, including the days nobody thinks about it.",
+      statement: "We do not hand over and disappear. What we have built, we keep running — if something fails at night, that is our problem and not yours.",
+      itemsLabel: "What is included",
+      items: {
+        hosting: {
+          name: "Hosting",
+          what: "Servers, domains and certificates — set up, paid for and in our hands.",
+        },
+        monitoring: {
+          name: "Monitoring",
+          what: "The site reports when it is unreachable. Not your customer.",
+        },
+        updates: {
+          name: "Updates",
+          what: "Dependencies and system versions stay current — before a gap becomes an incident.",
+        },
+        security: {
+          name: "Security",
+          what: "Access, permissions, headers and transport encryption at the level set when it was built.",
+        },
+        backups: {
+          name: "Backups",
+          what: "Backed up and restorable. A backup that has never been restored is not one.",
+        },
+        support: {
+          name: "Support",
+          what: "One contact who built the system himself. A call back the next working day.",
+        },
+        evolution: {
+          name: "Further development",
+          what: "Whatever turns out to be wrong in operation gets changed — not documented and left standing.",
+        },
+      },
+      note: "No availability in per cent, no response time in hours, no “24/7”. What is promised is what is written here — and we keep it on holiday too.",
+    },
+    systemePage: {
+      eyebrow: "Systems",
+      title: "Integration first.",
+      lead: "A new system rarely replaces everything. Most of the time it has to run alongside what is already there — and talk to it. What needs settling in the process is set out here.",
+      metaTitle: "Systems & integration — interfaces, data, operation",
+      metaDescription:
+        "How creaDIG connects and operates systems: interfaces, data, hosting, billing, documents, access, AI services. Plus seven points you can verify on this page itself.",
+      statement: "A system that only works on its own is a second place where the same data is maintained. That is precisely what nobody wanted.",
+      categoriesEyebrow: "Integration",
+      categoriesLabel: "What a system has to talk to.",
+      categoriesNote: "Not a vendor catalogue. What is listed here is what we settle before building — not which third-party brands we supposedly master. What we have actually connected, we name in conversation.",
+      categoryQuestionLabel: "What gets settled first",
+      categories: {
+        interfaces: {
+          name: "Interfaces",
+          body: "Almost every system has to fetch data from somewhere or hand it over. Whether an interface exists decides half the effort — and it is decided before the first draft, not in the middle of the build.",
+          question: "Is there a documented interface, an export, or nothing at all?",
+        },
+        data: {
+          name: "Data and databases",
+          body: "Where the data lives, who owns it and what it looks like once it is wrong. A data model that does not reflect the business gets worked around in the business — and then someone maintains a spreadsheet on the side again.",
+          question: "Which record is the truth when two places contradict each other?",
+        },
+        hosting: {
+          name: "Hosting and delivery",
+          body: "Where it runs, how it gets there and what happens when a deployment goes wrong. Not a side issue: it decides speed, availability and whether a change takes minutes or days.",
+          question: "Who has access to servers, domain and certificates today?",
+        },
+        billing: {
+          name: "Billing and payments",
+          body: "The part where mistakes turn into money. Amounts, tax rates, documents, deadlines — and the rules of the country the billing happens in. Nothing here is estimated and nothing is rounded.",
+          question: "By which rules is it calculated, and who checks the result?",
+        },
+        documents: {
+          name: "Documents and records",
+          body: "Contracts, invoices, evidence, photographs from the job. They arise along the way and have to be findable again — otherwise the system becomes a filing cabinet nobody opens.",
+          question: "What has to stay findable, for how long — and for whom?",
+        },
+        accounts: {
+          name: "Access and permissions",
+          body: "Who may see what, who may change what, and what happens when somebody leaves. The least conspicuous question in a project and the one that hurts most often in operation.",
+          question: "Which roles really exist — not on the org chart, but in daily work?",
+        },
+        ai: {
+          name: "AI services",
+          body: "Worthwhile where something has to be read, sorted or prepared that a person does by hand today. Not worthwhile as a label on a system that would have worked anyway.",
+          question: "Which step costs time today — and may a machine prepare it?",
+        },
+      },
+      connectedLabel: "Connected",
+      operationsEyebrow: "In practice",
+      operationsLabel: "How we operate.",
+      operationsNote: "Which of these can be booked as a service is set out on the managed operations page.",
+      operations: {
+        monitoring: {
+          name: "Monitoring",
+          body: "The systems report themselves when they are unreachable. For the enquiry path it goes further: a self-test checks whether an enquiry can still be delivered at all — a silent failure there looks from the outside like a weak market.",
+        },
+        logging: {
+          name: "Logging",
+          body: "Enough to find a fault. No more than can be justified: what somebody typed into a form appears in no log.",
+        },
+        backups: {
+          name: "Backups",
+          body: "Backed up and restored. A backup that has never been restored is not one — it is a file you hope about.",
+        },
+        security: {
+          name: "Security",
+          body: "Access, permissions, transport encryption and response headers at the level set when it was built — and measured again afterwards, not assumed.",
+        },
+        deployment: {
+          name: "Deployment",
+          body: "Every change takes the same route: build, check, deliver. If one of the checks breaks, nothing is delivered — not even when it is urgent.",
+        },
+      },
+      proofEyebrow: "Evidence",
+      proofLabel: "Verifiable on this page.",
+      proofNote: "Showing beats claiming. Every point can be checked from outside in the response header, in the delivered source or in the repository — without asking us.",
+      proofs: {
+        headers: {
+          name: "Security headers",
+          body: "HSTS with subdomains and preload, X-Content-Type-Options, Referrer-Policy, X-Frame-Options set to DENY, Permissions-Policy and a Content-Security-Policy that already enforces object-src, base-uri, form-action and frame-ancestors.",
+        },
+        static: {
+          name: "Delivered statically",
+          body: "The pages are generated at build time and served from the CDN, not rendered on every request. That is why the site is fast — and why an application outage does not immediately take it down.",
+        },
+        bilingual: {
+          name: "Two languages, two addresses",
+          body: "German and Turkish have their own URLs, their own titles, their own structured data and are linked by hreflang — not a switch that swaps text in the browser.",
+        },
+        images: {
+          name: "Images in AVIF and WebP",
+          body: "The photographs are converted at build time and delivered at the size the layout actually needs. Anyone who cannot handle AVIF gets WebP — automatically, not by a branch in the code.",
+        },
+        gates: {
+          name: "Three checks in the build",
+          body: "The build stops if a function grows too large, if structured data would claim star ratings that do not exist, or if a service page says less in Turkish than in German. Not a statement of intent — a hard stop.",
+        },
+        selftest: {
+          name: "Self-test of the enquiry path",
+          body: "A dedicated route checks whether the keys, sender domain and abuse protection of the enquiry path still work, without sending an email. If a check fails, it answers with an error a monitor understands.",
+        },
+        accessibility: {
+          name: "Our own accessibility audit, published",
+          body: "We audited this site ourselves and published the defects we found, instead of issuing a statement without findings. Read it under Accessibility.",
+        },
+      },
+    },
+    betriebPage: {
+      eyebrow: "Operate",
+      title: "Handing over is easy. Operating is the work.",
+      lead: "Most projects end at launch. After that begins the part nobody sells: updates, outages, security gaps and the small changes that suddenly nobody can make any more. We stay.",
+      metaTitle: "Managed operations — hosting, monitoring, updates, backups",
+      metaDescription:
+        "creaDIG operates what creaDIG built: hosting, monitoring, updates, security, backups, support and further development. Cancellable monthly — the system and the data belong to you.",
+      whyLabel: "Why operation instead of handover",
+      why: [
+        {
+          name: "Whoever built it knows the places",
+          body: "An outside maintainer reads unfamiliar code at every fault. We read our own — which is why the answer to “can that be done quickly?” is usually yes here.",
+        },
+        {
+          name: "A system ages even when nobody touches it",
+          body: "Dependencies get security gaps, certificates expire, browsers change their rules. None of it announces itself, and none of it waits for the next project budget.",
+        },
+        {
+          name: "The outage does not come during office hours",
+          body: "It comes at night, at the weekend, on holiday. The question is not whether somebody notices it, but who notices first: the monitoring or your customer.",
+        },
+        {
+          name: "What turns out to be wrong in operation gets changed",
+          body: "No build survives its first real month unchanged. In a project with a sign-off date something like that gets documented and left standing. In operation it gets changed.",
+        },
+      ],
+      ownershipLabel: "Dependency",
+      ownershipTitle: "Operation does not mean dependency.",
+      ownershipBody: "The system and all the data in it belong to you from day one. Support can be cancelled monthly, with no minimum term. Afterwards everything stays with you — code, content, access and domain. What ends is the support, not your access.",
+    },
+    contact: {
+      eyebrow: "Contact",
+      title: "Twenty minutes, no obligation.",
+      lead: "German, Turkish and English. Choose whichever route suits you fastest.",
+      directTitle: "Three routes. Every one ends with a person.",
+      directLead: "A first conversation runs through the appointment request — four steps that set out what it is about. Anyone with just a question writes directly: by WhatsApp or email, in German, Turkish or English.",
+      mailTitle: "Email",
+      mailNote: "For documents, proposals and anything in writing.",
+      nameLabel: "Name",
+      namePlaceholder: "your name",
+      businessLabel: "Business",
+      businessPlaceholder: "company or sector",
+      messageLabel: "What is it about?",
+      messagePlaceholder: "Briefly, in your own words — one or two sentences are enough.",
+      errRequired: "Please add your name and a few words about your enquiry.",
+      submit: "Send enquiry",
+      submitWhatsapp: "Rather by WhatsApp",
+      whatsappTitle: "WhatsApp",
+      whatsappNote: "Fastest reply, DE, TR & EN.",
+      whatsappIntro: "Hello creaDIG, I am interested in a project.",
+      whatsappAction: "Write on WhatsApp",
+      appointmentTitle: "Free first consultation",
+      appointmentNote: "Twenty minutes, by video. Free and without obligation.",
+      appointmentValue:
+        "We look at your business and tell you what we would build — and what we would not. Including when the answer is “not yet”.",
+      appointmentCta: "Request an appointment",
+      locationsLabel: "Location",
+      marketsLabel: "Markets",
+      privacyConsentPrefix: "I have read the",
+      privacyConsentLink: "privacy policy",
+      privacyConsentSuffix:
+        "and agree that my details may be processed to handle my enquiry and delivered for that purpose via our sending provider Resend Inc. (USA) — safeguarded by EU standard contractual clauses and, in addition, with my explicit consent to the transfer to the USA (Art. 49(1)(a) GDPR). I can withdraw this at any time with effect for the future.",
+      emailLabel: "Email",
+      emailPlaceholder: "so we can reply",
+      phoneLabel: "Phone",
+      phonePlaceholder: "for the call back",
+      errEmail: "Please check the email address.",
+      errPhone: "Please give us a phone number — we would rather call than write.",
+      errPrivacy: "Please confirm the privacy policy.",
+      sending: "Sending …",
+      sentTitle: "Your enquiry has arrived.",
+      sentBody:
+        "We will be in touch within two working days. A confirmation is in your inbox — check the spam folder to be safe.",
+      errSendFailed:
+        "The enquiry could not be delivered just now. Please try again — or take one of the routes on the right.",
+      errNotConfigured:
+        "The sending path is not set up yet. Please use WhatsApp in the meantime, or write to",
+      errRateLimited:
+        "Several enquiries just came from this connection. Please try again in a few minutes — or use WhatsApp.",
+      errFormExpired:
+        "The form was open for too long. Please reload the page and send again.",
+      handoffNote:
+        "On sending, WhatsApp or your email program opens with the finished message — it is only sent once you confirm it there.",
+      handoffTitle: "Almost there — one step is missing.",
+      handoffWhatsapp:
+        "WhatsApp is open with your finished message. It only reaches us once you tap send there.",
+      handoffMail:
+        "Your email program is open with the finished message. It only reaches us once you click send there.",
+      handoffRetry: "Nothing happened? Open it again here.",
+      errBlocked:
+        "Your browser blocked the window. Please open WhatsApp through the link below — or write directly to",
+    },
+    closing: {
+      eyebrow: "Next step",
+      title: "You run the business. We build the system behind it.",
+      lead: "Twenty minutes, free and without obligation. We look at the operation and tell you honestly whether we can help.",
+      ctaPrimary: "Start a project",
+      ctaSecondary: "See our work",
+      variants: {
+        prices: {
+          eyebrow: "Next step",
+          title: "A fixed price for your scope — after twenty minutes.",
+          lead: "What is above is the entry point. What your business needs, we look at before anyone names a figure — free and without obligation.",
+          ctaPrimary: "Request a fixed-price quote",
+          ctaSecondary: "See our work",
+        },
+        work: {
+          eyebrow: "Next step",
+          title: "A similar plan? Let us talk.",
+          lead: "Twenty minutes, free and without obligation. We will tell you honestly whether your plan fits what you have seen here.",
+          ctaPrimary: "Discuss your plan",
+          ctaSecondary: "See the services",
+        },
+      },
+    },
+    termin: {
+      metaTitle: "Send an appointment request",
+      metaDescription:
+        "Four steps to a conversation: choose the type, give your preferred times, add your details. The request comes straight to us — the appointment becomes binding with our reply.",
+      back: "Back to the site",
+      eyebrow: "Free first consultation",
+      title: "Four steps to a conversation.",
+      lead: "Tell us when it suits you. We check the request and confirm the appointment bindingly in our reply — this assistant does not book anything automatically.",
+      stepOf: "Step",
+      next: "Next",
+      prev: "Back",
+      stepAnnounce: (step: number, title: string) => `Step ${step} of 4: ${title}`,
+      step1: {
+        title: "What is it about?",
+        lead: "Choose the type of conversation.",
+        vgName: "Free first consultation",
+        vgDesc: "Twenty minutes, no obligation. We listen and tell you honestly whether we can help.",
+        vgMeta: "free · 20 min",
+        arName: "Systems conversation",
+        arDesc: "A deeper look at operations, automation and meAI — for businesses with a concrete plan.",
+        arMeta: "in depth · 45 min",
+      },
+      step2: {
+        title: "When suits you?",
+        lead: "Choose one or more days. Highlighted days are our preferred days for conversations — other days are possible on request.",
+        timeTitle: "Time windows",
+        timeLead: "You can pick more than one. All times CET.",
+        windows: [
+          { id: "vormittag", label: "Morning", time: "09:00–12:00" },
+          { id: "nachmittag", label: "Afternoon", time: "13:00–17:00" },
+          { id: "abend", label: "Early evening", time: "17:00–19:00" },
+        ],
+        preferred: "preferred",
+        today: "today",
+        maxDates: "Up to three days can be selected.",
+        prevMonth: "Previous month",
+        nextMonth: "Next month",
+        daySelected: "selected",
+        dayPreferred: "preferred day for conversations",
+        daysLong: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        notBooked:
+          "This is not a booking yet. We check your request and confirm the appointment bindingly in our reply.",
+        errDate: "Please choose at least one day.",
+        errTime: "Please choose at least one time window.",
+      },
+      step3: {
+        title: "Your details",
+        lead: "Required fields are marked with *.",
+        name: "Name",
+        phone: "Phone",
+        email: "Email",
+        org: "Company",
+        city: "City / region",
+        interest: "Interest",
+        size: "Company size",
+        note: "Message",
+        notePlaceholder: "Briefly, in your own words — one or two sentences are enough.",
+        langLabel: "Language of the conversation",
+        langDe: "German",
+        langTr: "Turkish",
+        langBoth: "German + Turkish",
+        choose: "Please choose",
+        errRequired: "Please complete the required fields correctly.",
+        errEmail: "Please give a valid email address.",
+        interests: ["Website package for trades", "Ongoing support — €149 / month", "Something else — brand, software or automation", "Not sure yet"],
+        sizes: ["1–4 staff", "5–15 staff", "16–30 staff", "more than 30 staff"],
+      },
+      step4: {
+        sendWhatsapp: "Rather by WhatsApp",
+        privacyNote:
+          "Your details go to creaDIG and are used solely to handle this appointment request.",
+        title: "Check and send",
+        lead: "One click and your appointment request is in our inbox. You will receive an acknowledgement by email straight away; the appointment itself we confirm bindingly in our reply. If you prefer WhatsApp, that works too.",
+        send: "Send appointment request",
+        typeLabel: "Type of conversation",
+        dateLabel: "Preferred days",
+        timeLabel: "Time windows",
+        langLabel: "Language",
+      },
+      done: {
+        title: "Appointment request received.",
+        lead: "Your appointment request is in our inbox and an acknowledgement is on its way by email. The appointment is not booked yet — we compare your preferred times and confirm a binding date.",
+        reply: "We will be in touch within two working days",
+        home: "Back to the home page",
+        again: "Send another appointment request",
+      },
+      waTitle: "creaDIG — appointment request",
+      waType: "Type",
+      waDate: "Preferred days",
+      waTime: "Time windows",
+      waName: "Name",
+      waOrg: "Company",
+      waCity: "City",
+      waPhone: "Phone",
+      waInterest: "Interest",
+      waSize: "Size",
+      waLang: "Language",
+      waNote: "Message",
+      months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+      days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    },
+    errorPages: {
+      notFound: {
+        metaTitle: "Page not found",
+        metaDescription:
+          "This address does not exist. Here are the ways back to creaDIG — and the direct ways to reach us.",
+        eyebrow: "Error 404",
+        title: "This page does not exist.",
+        lead: "Either the address has changed or a typo slipped in. Both are quickly fixed.",
+      },
+      serverError: {
+        eyebrow: "Error 500",
+        title: "Something went wrong here.",
+        lead: "The fault is ours, not yours. Try again — and if it persists, you can reach us directly.",
+        retry: "Try again",
+      },
+      waysLabel: "Three ways back",
+      ways: {
+        home: { label: "Home", note: "The overview of the whole house." },
+        services: { label: "Services", note: "Five levels — from the brand to artificial intelligence." },
+        contact: { label: "Contact", note: "Form, WhatsApp and the way to a conversation." },
+      },
+      directLabel: "Or directly",
+      directNote: "These two routes always work — even when the form will not.",
+      whatsapp: "Write on WhatsApp",
+      mail: "Write an email",
+    },
+    accessibility: {
+      metaTitle: "Accessibility statement",
+      metaDescription:
+        "The accessibility status of creadig.de: what we audited, what we found and fixed, what remains open — and how to report a barrier to us.",
+      eyebrow: "Accessibility statement",
+      title: "What this site can do — and what it cannot.",
+      lead: "We sell accessibility. So we start with ourselves: this site is audited against WCAG 2.1 level AA, the defects we found are fixed, and what remains open is set out below. This statement is voluntary.",
+      voluntaryTitle: "Voluntary, not compliance paperwork",
+      voluntaryBody:
+        "Whether this website falls under the German Accessibility Strengthening Act has not been assessed legally — so we do not claim that it does. We publish this status because an agency that offers accessibility should open up its own site. This is not a legal assessment.",
+      statusTitle: "Implementation status",
+      statusBody:
+        "After the audit run of 23 August 2026, all eight defects found are fixed. The automated run across 68 passes (17 pages, two window sizes, light and dark appearance) reports no machine-detectable violation of WCAG 2.1 AA. The manual review — keyboard pass, accessible names, focus, structure — is likewise without an open item.",
+      statusNote:
+        "“No machine-detectable violation” does not mean “accessible”. Automated tools find only some barriers; that is why what we did not audit is set out below.",
+      checkedTitle: "What was audited",
+      checkedIntro:
+        "Twelve points against WCAG 2.1 AA, in both language versions, light and dark, at 1440 × 900 and 390 × 844 pixels:",
+      checked: [
+        "Contrast of text and of controls, in both appearances",
+        "Alternative text for informative images; decorative graphics muted",
+        "Labelling of all form fields, including select fields and consent checkboxes",
+        "Error and status messages: associated, announced, not signalled by colour alone",
+        "Full operability without a mouse, with no keyboard trap",
+        "A visible focus on every control",
+        "Skip link, heading structure, landmarks",
+        "Language marking per language version",
+        "Behaviour with “reduce motion”, at 200% zoom and 320 pixels wide",
+      ],
+      pagesLabel: "Pages audited",
+      pagesBody:
+        "Home, services and one service detail page, products and one product detail page, work, company, contact, the appointment assistant (step 1 and step 3), privacy, imprint and the error page — each in German and Turkish.",
+      fixedTitle: "What was found and fixed",
+      fixedIntro:
+        "Eight defects, none of them blocking, seven classified as serious. All fixed in the code — no overlay, no add-on tool:",
+      fixed: [
+        "Text colours with insufficient contrast (down to 2.4 : 1 on placeholders)",
+        "No visible focus on three controls in the header",
+        "No skip link to the content",
+        "Calendar days in the appointment assistant without a meaningful name",
+        "Two German labels in the Turkish version",
+        "The step change in the appointment assistant was not announced",
+      ],
+      fixedEarlier:
+        "Before that, in a separate pass: with the system setting “reduce motion”, sections that fade in stayed invisible — 33 blocks on one page. The most serious defect on this site, and it hit exactly the people the setting is made for.",
+      openTitle: "Known limitations",
+      openIntro: "What we did not audit, and what that means:",
+      open: [
+        "No pass with a blind user. We checked the technical prerequisites (name, role, state, announcements) — not how understandable the result is in daily use.",
+        "No testing with magnification software and no testing of voice control.",
+        "The statement rests on an audit run on one date. Every change to the site can break something; that is why the automated part runs with every change.",
+        "External routes — WhatsApp and the email program — lie outside our site. We cannot vouch for their accessibility. That is why there is also a route on our own site for each of them.",
+      ],
+      feedbackTitle: "Report a barrier",
+      feedbackBody:
+        "If something on this site blocks your way, write to us — informally, even just one sentence. We reply within two working days and tell you whether and when we will fix it.",
+      feedbackMail: "Write an email",
+      feedbackForm: "Report via the form",
+      feedbackNote:
+        "Helpful but not necessary: which page, which element, which assistive technology you use.",
+      methodTitle: "How it was audited",
+      methodBody:
+        "Against a fixed twelve-point framework, so that two people arrive independently at the same result. Automated with axe-core, by hand with the keyboard and a check of accessible names. The framework and the full findings are open in the source of this site.",
+      updatedLabel: "As of",
+      updated: "23 August 2026",
+    },
+    legal: {
+      imprintTitle: "Imprint",
+      privacyTitle: "Privacy",
+      imprintMetaDescription: "Provider identification and contact details for creaDIG.",
+      privacyMetaDescription:
+        "No cross-site tracking, no advertising cookies, no profiling. What creaDIG processes, who does it on our behalf and how long it stays.",
+      back: "Back to the site",
+      providerLabel: "Provider (§ 5 DDG)",
+      addressLabel: "Address",
+      sameAddress: "Address as above",
+      formalLabel: "Legal details",
+      legalFormLabel: "Legal form",
+      vatLabel: "VAT",
+      smallBusinessNote:
+        "Small business under § 19 UStG — no VAT is charged.",
+      mstvLabel: "Responsible under § 18(2) MStV",
+      placeholderMark: "Placeholder — will be replaced before launch",
+      taxStatusPending: "VAT status not yet released.",
+      phoneLabel: "Phone",
+      phonePending: "A German phone number follows.",
+      pending: "Still to be confirmed",
+      pendingNote: "Two details are still outstanding and are marked as placeholders above: the VAT status (identification number under § 27a UStG or a reference to the small business rule under § 19 UStG) and the German phone number. We will add both as soon as the owner has released them. Provider, address, legal form, the person responsible under § 18(2) MStV and the contact routes above already apply bindingly.",
+      responsible: "Responsible for the content",
+      contactLabel: "Contact",
+      privacyIntro: "This site is deliberately built lean: no cross-site tracking, no advertising cookies, no profiling. What we do use is named below — and the analytics only load once you have allowed them.",
+      processorsLabel: "Who processes on our behalf",
+      processorsIntro:
+        "These service providers process personal data for us — on our instructions, under a data processing agreement (Art. 28 GDPR) and, because they are based in the USA, safeguarded by the EU standard contractual clauses under Art. 46(2)(c) GDPR. We pass on nothing further.",
+      processorPurposeLabel: "Purpose",
+      processorServicesLabel: "Services",
+      processorCountryLabel: "Location",
+      processorSafeguardLabel: "Basis",
+      processorSafeguardScc: "Processing under Art. 28 GDPR + EU standard contractual clauses",
+      processorDpaLink: "View the agreement",
+      processorPendingMark: "Confirmation by the owner outstanding",
+      processorPendingNote:
+        "The agreements marked have not yet been confirmed and filed by the owner in the respective dashboard. We therefore do not write that they exist — we will make that good before launch.",
+      processorPurposes: {
+        vercel:
+          "Hosting, delivery of the site through the content delivery network, and server logs. After your consent, additionally two separate measurements: Vercel Web Analytics (how often which page is opened) and Vercel Speed Insights (how fast the page loads on real visits). Both are cookie-free but process IP address and page path — without consent no script is loaded.",
+        resend:
+          "Delivery of the emails from our forms to our inbox and of the acknowledgement to you.",
+      },
+      privacyPoints: [
+        {
+          title: "Server logs",
+          body: "When the site is opened, our host Vercel Inc. (USA) processes technically necessary data such as IP address, time and requested resource. The legal basis is Art. 6(1)(f) GDPR — without this processing the site can neither be delivered nor protected against abuse. A data processing agreement under Art. 28 GDPR is in place with Vercel.",
+        },
+        {
+          title: "Hosting and transfer to third countries",
+          body: "This site is fully static and is delivered through Vercel's worldwide content delivery network — from the nearest location in each case. Processing of access data outside the EU, in particular in the USA, can therefore not be ruled out. It is safeguarded by the data processing agreement with Vercel Inc. including the EU standard contractual clauses under Art. 46(2)(c) GDPR. We embed no map or advertising services and deliver all fonts locally. For analytics we use Vercel Web Analytics and Vercel Speed Insights — cookie-free, without a cross-device identifier and only after your explicit consent; without it no script is loaded. If you use the WhatsApp route, the terms of Meta Platforms Ireland Ltd. additionally apply.",
+        },
+        {
+          title: "Contact form, appointments and product enquiries",
+          body: "When you submit one of our forms, we transmit your details — name, business, email, phone and your message — to our inbox info@creadig.de and send you a confirmation. For delivery we use Resend (Resend Inc., USA) as a processor under Art. 28 GDPR, safeguarded by the EU standard contractual clauses under Art. 46(2)(c) GDPR. The legal basis is your consent under Art. 6(1)(a) GDPR, which you give explicitly before sending and can withdraw at any time with effect for the future. We do not keep a database: your enquiry sits solely in our email inbox. If you take the WhatsApp route instead, the terms of Meta Platforms Ireland Ltd. apply.",
+        },
+        {
+          title: "How long we keep things",
+          body: "We delete server logs after 30 days. Enquiries through our forms we keep for up to 6 months after the last contact and then delete them; if a contract comes about, the commercial and tax retention periods of 6 and 10 years respectively apply (§ 257 HGB, § 147 AO). Your consent decision stays in your browser's local storage until you change it or clear your browser data.",
+        },
+        {
+          title: "Fonts",
+          body: "Poppins and JetBrains Mono are delivered locally together with the site. There is no connection to Google Fonts; your IP address is not transmitted to any third party for this.",
+        },
+        {
+          title: "Consent and local storage",
+          body: "We store your decision from the consent banner in your browser's local storage (key “creadig_consent”). Only with your consent do we additionally remember the appearance (light/dark); without consent that setting applies only for the current session. We do not store the language at all — it is in the page address. No data is transmitted to third parties in the process. You can adjust or withdraw your choice at any time under “Cookie settings” — on withdrawal we remove the affected entries immediately.",
+        },
+        {
+          title: "Your rights",
+          body: "You have the right at any time to access (Art. 15 GDPR), rectification (Art. 16), erasure (Art. 17), restriction of processing (Art. 18), data portability (Art. 20) and objection (Art. 21). A message to the address below is enough. Independently of this, you have the right to lodge a complaint with a data protection supervisory authority (Art. 77 GDPR) — for our location that is the State Commissioner for Data Protection of Lower Saxony.",
+        },
+      ],
+      privacyNote: "This version will undergo a final legal review together with the complete company details.",
+    },
+    consent: {
+      title: "Your consent",
+      intro:
+        "This site stores only what it needs to function — and what you allow. For anything that is not technically necessary we need your consent.",
+      minors:
+        "If you are under 16, please obtain the agreement of your parent or guardian before allowing non-essential functions.",
+      privacyPrefix: "Details are in our",
+      privacyLink: "privacy policy",
+      revoke:
+        "You can adjust or withdraw your choice at any time via “Cookie settings” in the footer.",
+      acceptAll: "Accept all",
+      essentialOnly: "Accept essential only",
+      customize: "Individual privacy preferences",
+      save: "Save selection",
+      alwaysActive: "Always active",
+      thirdCountry:
+        "Analytics run through Vercel Inc. in the USA. If you allow them, you also explicitly consent to the transfer of your access data there (Art. 49(1)(a) GDPR) — in addition to the EU standard contractual clauses we have concluded with Vercel. The USA does not have a level of data protection equivalent to the European one: authorities can demand access, and effective legal remedies against this may not exist. Without your consent no transfer takes place.",
+      settingsLabel: "Cookie settings",
+      settingsTitle: "Privacy preferences",
+      close: "Close",
+      categories: {
+        essential: {
+          name: "Essential",
+          body: "Stores only your decision from this banner, so that we do not have to ask again on every visit. Without this storage the consent itself does not work.",
+        },
+        functional: {
+          name: "Convenience",
+          body: "Remembers the appearance (light/dark). Without consent your choice applies only for the current session. The language is not stored — it is in the address (creadig.de for German, creadig.de/tr for Turkish, creadig.de/en for English).",
+        },
+        statistics: {
+          name: "Analytics",
+          body: "Vercel Web Analytics and Vercel Speed Insights — measures anonymously how often which page is opened, whether an enquiry came about and how fast the page loaded for you. No cookies are set and no cross-device identifier is created. Without your consent no script is loaded.",
+        },
+      },
+    },
+    footer: {
+      tagline: "Systems house for identity, digital, operations, automation and intelligence.",
+      productsLabel: "Products",
+      navLabel: "Site",
+      layersLabel: "Five levels",
+      legalLabel: "Legal",
+      imprint: "Imprint",
+      privacy: "Privacy",
+      socialLabel: "Social",
+      statusLabel: "Material status",
+      rights: "All rights reserved.",
+    },
+  },
 } as const
 
 export type Dictionary = (typeof dictionary)["de"]
@@ -3639,3 +5061,12 @@ type SameShape<A, B> = IsPlainObject<A> extends true
 type AssertLocaleParity = SameShape<Dictionary, (typeof dictionary)["tr"]>
 const _localeParity: AssertLocaleParity = true
 void _localeParity
+
+/*
+ * Dasselbe Gate fuer Englisch. Es greift, obwohl "en" noch nicht in
+ * `locales` steht — und genau deshalb ist es nuetzlich: Der Block laesst
+ * sich nicht halbfertig liegen lassen, ohne dass `tsc` es meldet.
+ */
+type AssertEnParity = SameShape<Dictionary, (typeof dictionary)["en"]>
+const _enParity: AssertEnParity = true
+void _enParity

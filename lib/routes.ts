@@ -29,10 +29,44 @@ import type { Locale } from "@/lib/dictionary"
  *
  * ---------------------------------------------------------------------------
  * DIESE DATEI IST DIE EINZIGE STELLE, DIE DAS WEISS
- * Wer hier `TR_PREFIX` ändert, ändert Routing, Navigation, Sitemap, Canonicals
- * und hreflang zugleich. Keine zweite Stelle darf `"/tr"` selbst
- * zusammensetzen.
+ * Wer hier die Sprachliste ändert, ändert Routing, Navigation, Sitemap,
+ * Canonicals und hreflang zugleich. Keine zweite Stelle darf ein Präfix
+ * selbst zusammensetzen.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM HIER NICHTS MEHR "TR" HEISST  (30.08.2026)
+ * Bis hierher stand in dieser Datei fünfmal `TR_PREFIX` und einmal eine
+ * Tabelle `TR_PATHS` — die Zweisprachigkeit war in die LOGIK geschrieben,
+ * nicht in die DATEN. Eine dritte Sprache hätte deshalb nicht bedeutet, einen
+ * Eintrag zu ergänzen, sondern vier Funktionen umzubauen: `localePath`,
+ * `splitLocale`, `localeAlternates`, `openGraphLocale` — jede mit eigenen
+ * Sonderfällen, jede eine eigene Gelegenheit für einen 404.
+ *
+ * Jetzt leiten alle vier aus `locales` ab. Eine Sprache hinzuzufügen ist ein
+ * Eintrag in dieser Liste plus ihr Wörterbuch; an der Logik ändert sich
+ * nichts. Das ist bewusst VOR den Inhalten geschehen: den Umbau später
+ * gleichzeitig mit 15 000 Wörtern neuer Übersetzung zu machen, hiesse zwei
+ * Fehlerquellen zu einer zu verrühren.
+ *
+ * Was das NICHT tut: eine Sprache veröffentlichen. `locales` bleibt
+ * `["de","tr"]`, weil es genau zwei vollständige Wörterbücher gibt. Die
+ * Typen erzwingen das — `Localized<T>` verlangt einen Eintrag je Sprache,
+ * eine halbe Sprache lässt sich gar nicht erst bauen. Genau so soll es sein
+ * (Canon: „Keine Sprache halb veröffentlichen").
  */
+
+/** Deutsch trägt kein Präfix — Schwerpunktmarkt, und jede bestehende Adresse bleibt gültig. */
+export const DEFAULT_LOCALE = "de" satisfies Locale
+
+/**
+ * Das Adresspräfix einer Sprache. Die Default-Sprache hat keins.
+ * Einzige Stelle, an der ein Präfix entsteht.
+ */
+export function localePrefix(locale: Locale): string {
+  return locale === DEFAULT_LOCALE ? "" : `/${locale}`
+}
+
+/** @deprecated Nur noch für `app/global-error.tsx`. Neuer Code nimmt `localePrefix`. */
 export const TR_PREFIX = "/tr"
 
 /**
@@ -65,13 +99,16 @@ export const locales = ["de", "tr"] as const
  * erwartet. Die Tabelle steht deshalb hier, in der einzigen Datei, die vom
  * Sprachpraefix weiss, und nicht verstreut in den Routen.
  */
-const TR_PATHS: Record<string, string> = {
-  "/barrierefreiheit": "/erisilebilirlik",
+const TRANSLATED_PATHS: Partial<Record<Locale, Record<string, string>>> = {
+  tr: { "/barrierefreiheit": "/erisilebilirlik" },
 }
 
-/** Umgekehrte Tabelle — fuer `splitLocale`. */
-const DE_PATHS: Record<string, string> = Object.fromEntries(
-  Object.entries(TR_PATHS).map(([de, tr]) => [tr, de]),
+/** Umgekehrte Tabellen je Sprache — fuer `splitLocale`. */
+const SOURCE_PATHS: Partial<Record<Locale, Record<string, string>>> = Object.fromEntries(
+  Object.entries(TRANSLATED_PATHS).map(([locale, table]) => [
+    locale,
+    Object.fromEntries(Object.entries(table).map(([source, target]) => [target, source])),
+  ]),
 )
 
 /** Trennt Anker und Suchparameter ab; die gehoeren nicht in die Tabelle. */
@@ -81,11 +118,12 @@ function splitSuffix(path: string): [string, string] {
 }
 
 export function localePath(path: string, locale: Locale): string {
-  if (locale === "de") return path
+  const prefix = localePrefix(locale)
+  if (prefix === "") return path
   if (!path.startsWith("/")) return path
-  if (path === "/") return TR_PREFIX
+  if (path === "/") return prefix
   const [bare, suffix] = splitSuffix(path)
-  return `${TR_PREFIX}${TR_PATHS[bare] ?? bare}${suffix}`
+  return `${prefix}${TRANSLATED_PATHS[locale]?.[bare] ?? bare}${suffix}`
 }
 
 /** Wie `localePath`, nur absolut — für Canonicals, Sitemap und JSON-LD. */
@@ -103,12 +141,16 @@ export function localeUrl(path: string, locale: Locale): string {
  * leere String, sonst zeigt der Schalter ins Nichts.
  */
 export function splitLocale(pathname: string): { locale: Locale; path: string } {
-  if (pathname === TR_PREFIX) return { locale: "tr", path: "/" }
-  if (pathname.startsWith(`${TR_PREFIX}/`)) {
-    const [bare, suffix] = splitSuffix(pathname.slice(TR_PREFIX.length))
-    return { locale: "tr", path: `${DE_PATHS[bare] ?? bare}${suffix}` }
+  for (const locale of locales) {
+    const prefix = localePrefix(locale)
+    if (prefix === "") continue
+    if (pathname === prefix) return { locale, path: "/" }
+    if (pathname.startsWith(`${prefix}/`)) {
+      const [bare, suffix] = splitSuffix(pathname.slice(prefix.length))
+      return { locale, path: `${SOURCE_PATHS[locale]?.[bare] ?? bare}${suffix}` }
+    }
   }
-  return { locale: "de", path: pathname }
+  return { locale: DEFAULT_LOCALE, path: pathname }
 }
 
 /**
@@ -123,17 +165,23 @@ export function splitLocale(pathname: string): { locale: Locale; path: string } 
  * Funktion.
  */
 export function localeAlternates(path: string, locale: Locale) {
-  return {
-    canonical: localePath(path, locale),
-    languages: {
-      de: path,
-      tr: localePath(path, "tr"),
-      "x-default": path,
-    },
-  }
+  /*
+    Ein hreflang-Ziel darf nie ins Leere zeigen. Weil die Liste aus `locales`
+    entsteht und eine Sprache erst dort steht, wenn sie ein vollstaendiges
+    Woerterbuch hat, kann hier keine Adresse auftauchen, die es nicht gibt.
+  */
+  const languages: Record<string, string> = {}
+  for (const other of locales) languages[other] = localePath(path, other)
+  languages["x-default"] = localePath(path, DEFAULT_LOCALE)
+
+  return { canonical: localePath(path, locale), languages }
 }
 
-/** `de_DE` / `tr_TR` für OpenGraph. */
+/**
+ * OpenGraph erwartet `sprache_LAND`. Fuer die gepflegten Sprachen steht das
+ * Land hier explizit — es laesst sich nicht zuverlaessig aus dem Sprachcode
+ * ableiten (Arabisch hat kein "AR"-Land, Englisch ein Dutzend).
+ */
 export const openGraphLocale: Record<Locale, string> = {
   de: "de_DE",
   tr: "tr_TR",
