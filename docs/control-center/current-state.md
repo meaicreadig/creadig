@@ -1,286 +1,195 @@
-# creaDIG Control Center · G.0 — Current State
+# creaDIG Control Center · Current State
 
-> **Authority:** Working Note (Bestandsaufnahme) · MP-G · Stand 29.08.2026
-> **Regel dieses Dokuments:** Was nicht existiert, steht als **MISSING** da.
-> Kein Pfeil wird gezeichnet, weil er logisch wäre.
-> **Gelesen wurde der Code**, nicht die Absicht — jede Zeile hat eine Fundstelle.
+> **Authority:** Current State · PHASE A.7 · Stand 30.08.2026  
+> **Gelesen:** Code auf `feat/system-haus-site` @ `ed91936` + HTTP-Stichprobe.  
+> **Nicht:** Live-Login (Vercel Deployment Protection).  
+> **G.0 (29.08.2026)** behauptete „Es gibt keinen Admin.“ — das ist **veraltet**.
 
----
-
-## ⚠️ Der wichtigste Befund zuerst
-
-**Es gibt keinen internen Admin-Bereich.**
-
-MP-G §0 sagt: „Du entwickelst den bestehenden internen Admin-Bereich von
-creaDIG weiter." Diese Voraussetzung trifft nicht zu.
-
-Geprüft und **nicht vorhanden**:
-
-| Gesucht | Ergebnis |
-|---|---|
-| `/admin`-Routen | keine — `app/(de)/` und `app/(tr)/tr/` enthalten ausschließlich öffentliche Seiten |
-| Auth-Bibliothek | keine (`next-auth`, `@auth/*`, Clerk, Supabase: nicht in `package.json`) |
-| `middleware.ts` | existiert nicht |
-| Datenbank / ORM | keine (Prisma, Drizzle, `@vercel/postgres`, KV, Redis: nicht installiert) |
-| Rollen / Rechte | kein Konzept, kein Code |
-| Admin-Komponenten | keine |
-
-**Die vollständige Abhängigkeitsliste** (`package.json`):
-`@tailwindcss/postcss` · `@vercel/analytics` · `@vercel/speed-insights` ·
-`class-variance-authority` · `clsx` · `framer-motion` · `lucide-react` ·
-`next` · `postcss` · `radix-ui` · `react` · `react-dom` · `tailwind-merge` ·
-`tailwindcss` · `tw-animate-css`
-
-Keine dieser Abhängigkeiten kann Daten speichern oder jemanden anmelden.
-
-**Was das für MP-G bedeutet:** G.1–G.5 sind kein Ausbau, sondern ein Neubau —
-und zwar ein Neubau, dem heute die Datengrundlage fehlt. Details unter
-„V1-Empfehlung".
+G.0 bleibt als **Archive-Notiz** nützlich für Persistence, Privacy-Satz und
+fehlende Sales-Quellen. Die Zugangsvoraussetzung „kein Admin“ gilt nicht mehr.
 
 ---
 
-## A–R · Inventar
+## Klassifikation (A.7)
 
-| | Bereich | Status | Fundstelle / Befund |
-|---|---|---|---|
-| **A** | Admin-Routen | **MISSING** | keine |
-| **B** | Admin-Komponenten | **MISSING** | keine |
-| **C** | Auth | **MISSING** | keine Bibliothek, kein Middleware, keine Session |
-| **D** | Rollen / Rechte | **MISSING** | kein Konzept im Code |
-| **E** | Persistence | **MISSING** | **siehe unten — der harte Kern** |
-| **F** | Lead-Daten | **MISSING SOURCE** | `app/api/lead/route.ts` erzeugt `id` + `reference`, verschickt eine Mail und **verwirft beides**. Kein Speicher. |
-| **G** | Betriebscheck-Daten | **MISSING SOURCE** | `evaluateCheck()` rechnet im Browser; Ergebnis geht als **Klartext im `message`-Feld** mit der Mail raus. Score, Ebenen und Antworten existieren danach nur im Postfach. |
-| **H** | Booking-Daten | **MISSING SOURCE** | `termin-wizard.tsx` → derselbe Lead-Weg. Kein Kalender, kein Termin-Objekt. |
-| **I** | Analytics | **LIVE DATA (nur schreibend)** | `lib/track.ts` → `@vercel/analytics`. **Keine Lese-API** in der Anwendung; die Zahlen liegen im Vercel-Dashboard. |
-| **J** | Consent | **LIVE DATA** | `lib/consent.ts`, `components/consent/*`. Version 5, Kategorie `statistics`. Wird vor jedem Event erneut geprüft. |
-| **K** | Customer-Daten | **MISSING** | `clientWorks` in `lib/site-data.ts` ist **Marketing-Inhalt**, kein Kundenstamm: drei Einträge, öffentlich, ohne Vertrag, Kontakt oder Vertragsstand. |
-| **L** | Project-Daten | **MISSING** | existiert nirgends |
-| **M** | Finance-Daten | **MISSING** | existiert nirgends. Preise in `site-data.ts` sind Listenpreise, keine Umsätze. |
-| **N** | Monitoring-Daten | **MISSING** | kein Uptime-Check, kein Alarm ausser `raiseAlert()` (Mail bei Zustellfehler) |
-| **O** | APIs | **3 Stück** | `POST/GET /api/lead` · `GET /api/selftest` · `POST /api/csp-report` |
-| **P** | Automationen | **2 Stück** | Eingangsbestätigung an den Absender · `raiseAlert()`-Mail bei Fehlern. Beide in `route.ts`, kein Scheduler. |
-| **Q** | Empty States | **LIVE, vorbildlich** | Fallstudien/Bewertungen/Screens/Landings rendern **gar nicht**, wenn leer. Der Standard ist gesetzt und darf im Control Center nicht unterschritten werden. |
-| **R** | Technische Schulden | siehe unten | drei benannte Punkte |
-
-### E · Persistence — der harte Kern
-
-Es gibt **keinen** Datenspeicher. Die einzige Laufzeit-Zustandshaltung sind
-zwei `Map`s im Prozessspeicher:
-
-| Was | Wo | Lebensdauer |
-|---|---|---|
-| Rate-Limit-Fenster | `lib/lead-guard.ts:147` `const buckets = new Map()` | bis zum nächsten Kaltstart, **pro Instanz** |
-| Alarm-Entprellung | `lib/alert.ts:38` `const seen = new Map()` | dito |
-
-Beides ist für seinen Zweck richtig gebaut und ausdrücklich so dokumentiert.
-Beides ist **keine** Grundlage für ein Control Center.
-
-Die Datenschutzerklärung sagt denselben Satz nach aussen:
-
-> „Eine Datenbank führen wir nicht: Ihre Anfrage liegt ausschließlich in
-> unserem E-Mail-Postfach."
-
-**Das ist keine Lücke, das ist eine veröffentlichte Zusage.** Wer einen
-Lead-Speicher einführt, ändert eine Aussage in der Datenschutzerklärung —
-Owner-Gate, nicht Technik-Entscheidung.
+| Fläche | Klassifikation | Begründung |
+|--------|----------------|------------|
+| `/admin` Materialstand | **KEEP** | einzige Ansicht mit LIVE DATA aus `collect()` |
+| `/admin/login` | **KEEP** | Passwort, eine Fehlermeldung, kein Nutzername |
+| `POST/DELETE /api/admin/session` | **KEEP** | HMAC-Sitzung, Rate-Limit, Cookie-Flags |
+| `middleware.ts` | **KEEP** | 404 ohne Env; Redirect ohne Sitzung |
+| Navigation (nur Materialstand) | **KEEP** | keine Future-Menü-Kulisse |
+| Admin-Typografie / Tokens | **KEEP** | dichter, gleiche DNA |
+| `/status` (öffentlich, `?key=`) | **KEEP** bis Owner sagt sonst | gleiche Datenquelle, zweiter Zugang |
+| Today / Pulse | **MISSING SOURCE** | braucht persistierte Leads |
+| `/admin/leads` | **MISSING** — **nicht bauen** (Phase D) | Spec in `sales.md` |
+| Marketing-Funnel im Admin | **MISSING SOURCE** | Analytics nur schreibend |
+| Charts / KPI-Karten | **REMOVE** (existieren nicht — so lassen) | keine Quelle |
+| Fake Owner / Intent / Pipeline € | **REMOVE** (nicht anlegen) | Truth Lock |
+| LeadStore Abstraktion | **CONNECT** nach Privacy+Neon | Spec, kein Production-Adapter |
+| Sales-Status / Next Action im Store | **KEEP** (Modell) | UI erst Phase D |
 
 ---
 
-## Current Data Flow — was wirklich fließt
+## Routen (Code)
 
-```
-WEBSITE
-   │
-   ├── Kontaktformular ─────┐
-   ├── Termin-Assistent ────┤
-   ├── Betriebscheck ───────┤   message = Klartext-Zusammenfassung
-   ├── Produkt-Interesse ───┤
-   └── Kurz-Check ──────────┘
-                            │
-                            ▼
-                   POST /api/lead
-                   ├─ Honeypot
-                   ├─ Zeit-Token (HMAC)
-                   ├─ Rate-Limit (In-Memory)
-                   ├─ Pflichtfelder
-                   ├─ Einwilligung
-                   └─ createLeadIdentity()  →  id (UUID) + reference (CD-…)
-                            │
-                            ▼
-                   Resend  →  info@creadig.de        ← EINZIGE ABLAGE
-                            │
-                            └─→  Bestätigung an den Absender
-                            
-                   ✗ PERSISTENCE            MISSING
-                   ✗ CONTROL CENTER          MISSING
+| Route | Art | Zugang | Inhalt |
+|-------|-----|--------|--------|
+| `/admin` | RSC, `force-dynamic` | Sitzung | Materialstand, gruppiert |
+| `/admin/login` | RSC, `force-dynamic` | offen wenn Env | Passwort |
+| `POST /api/admin/session` | Handler | Rate-Limit | setzt `cd_admin` |
+| `DELETE /api/admin/session` | Handler | — | löscht Cookie |
+| `/admin/leads` | **fehlt** | — | bewusst, Spec only |
 
-
-   CTA-Klicks ──┐
-   booking_step ┤
-   audit_*      ┤ nur mit Einwilligung
-   lead_submitted┘
-                │
-                ▼
-        Vercel Web Analytics   (schreibend)
-                │
-                ▼
-        Vercel Dashboard          ← Daten liegen HIER, ausserhalb der App
-                │
-                ✗ LESE-API in der Anwendung   MISSING
-```
-
-**Zwei Pfeile fehlen, und beide sind der Grund, warum G.2–G.4 heute keine
-echten Zahlen zeigen könnten:** kein Speicher hinter der Lead-Route, kein
-Lesezugriff auf die Analytics.
+Kein zweites Admin-Projekt. Layout: `app/(admin)/` eigene Wurzel, `lang="de"`, `noindex`.
 
 ---
 
-## Was es an internem Werkzeug schon gibt
+## Komponenten
 
-**`/status` — der Materialstand.** Die einzige existierende Innenansicht.
+| Datei | Rolle |
+|-------|--------|
+| `components/admin/admin-shell.tsx` | Hülle, 1 Nav-Punkt, Skip-Link |
+| `components/admin/admin-login-form.tsx` | Client-POST, `router.refresh()` |
+| `components/admin/admin-logout.tsx` | `DELETE`, kein GET-Logout |
+
+**Charts:** keine. **Today:** keine.
+
+---
+
+## Navigation
+
+Genau ein Punkt: **Materialstand** → `/admin`.  
+Langfrist-IA (Today, Sales, …) laut R4: nur reale Module. Heute korrekt leer.
+
+---
+
+## Datenquellen
+
+| Quelle | Status | Was sie liefert |
+|-------|--------|-----------------|
+| `lib/material-status.ts` `collect()` | **LIVE DATA** | Lücken aus `site-data`, Insights, Screens, Env-Namen (nicht Werten) |
+| `ITEM_GROUPS` | **LIVE DATA** | 10 Gruppen: Belege … Entscheidungen |
+| Lead-Mails (Resend) | **LIVE DATA** außerhalb der App | Postfach, nicht Admin |
+| `LeadStore` | **SPEC / DEV only** | `LEAD_STORE` unset → kein Schreiben; `memory` in Production abgelehnt |
+| Vercel Analytics | schreibend | **keine** Lese-API in der App |
+| Neon | **NOT RELEASED** | `docs/ops/provider-neon.md` |
+
+---
+
+## Auth (Code + G.1 Acceptance 29.08.)
+
+Lokal/Build geprüft (Acceptance `docs/control-center/acceptance.md`, 11/11):
+
+- Env fehlt → 404 auf `/admin`, `/admin/login`, `POST /api/admin/session`
+- Login → HttpOnly, SameSite=Strict, Secure, 8 h
+- Logout, expired, tampered cookie, Rate-Limit
+
+**Diese Session (30.08.):** Der Preview wurde über einen Share-Link direkt
+befragt. Ergebnis: Middleware greift, Zweig `!configured` — Login/Sitzung/
+Logout ließen sich **deshalb** nicht prüfen, nicht wegen der SSO-Wand.
+Die G.1-Acceptance oben bleibt gültig (lokaler Produktionsbuild).
+
+Cookie-Name: `cd_admin`. Secrets: nur Server.
+
+---
+
+## Responsive / A11y (Acceptance, nicht dieser HTTP-Check)
+
+G.1: Desktop 1440 + Mobil 390, Keyboard-Login, axe 0. Nav oben mobil, links desktop. Logout je einmal.
+
+**Nicht erneut visuell geprüft** in PHASE A (SSO-Block).
+
+---
+
+## Platzhalter / Fake
 
 | | |
-|---|---|
-| Route | `app/(de)/status/page.tsx`, 522 Zeilen, `force-dynamic`, `noindex` |
-| Zugang | in Entwicklung offen; **in Produktion 404**, ausser `?key=` trägt `SELFTEST_SECRET` |
-| Datenquelle | dieselben Module, aus denen die Website gebaut wird — `site-data`, `insights`, `service-pages`, die `*.generated.ts` |
-| Aussage | was **fehlt**: Freigaben, Bilder, Zahlen, Verträge, Env-Variablen |
-| TR-Fassung | keine (bewusst — Innenansicht) |
-
-**Das ist bereits ein Control-Center-Baustein**, und zwar der ehrlichste: Er
-liest Wahrheit, erfindet nichts und erklärt bei jedem Punkt, wer liefern muss.
-Was ihm fehlt, ist alles Operative — er kennt keinen Lead, keinen Kunden,
-keinen Vorgang.
-
-**Die Zugangslösung (`?key=` + `SELFTEST_SECRET`) trägt eine Seite ohne
-Mutationen. Für ein Control Center mit Statusänderungen trägt sie nicht:**
-Der Schlüssel steht in der Adresszeile, im Browserverlauf und in jedem
-Referrer. Für G.1 braucht es echte Authentifizierung — das ist ein
-eigenständiger Bau, kein Nebeneffekt.
+|--|--|
+| Fake-Leads | **keine** |
+| Fake-KPIs | **keine** |
+| Coming-Soon-Menü | **keine** |
+| Materialstand-Zahlen | aus Repo, nicht erfunden |
 
 ---
 
-## Modul-Bereitschaft
+## Live vs Preview (Visibility)
 
-| Modul | Status | Warum |
-|---|---|---|
-| **Today / Pulse** | **MISSING SOURCE** | Alle vorgesehenen Karten (neue Leads, Leads ohne Aktion, offene Angebote) brauchen einen Lead-Speicher. Ohne ihn bleibt eine leere Seite. |
-| **Sales / Leads** | **MISSING SOURCE** | Es gibt keine Lead-Liste. Es gibt Mails. |
-| **Marketing** | **MISSING SOURCE** | Ereignisse werden gesendet, aber die App kann sie nicht lesen. Ohne Vercel-API-Zugang oder eigenen Ereignisspeicher: nichts anzuzeigen. |
-| **Customers** | **MISSING** | Kein Kundenmodell. `clientWorks` ist Marketing. |
-| **Products** | **SPEC ONLY** | `maturity` existiert als Feld, alle `null`. Keine Telemetrie. |
-| **Projects / Delivery** | **MISSING** | — |
-| **Finance** | **MISSING** | — |
-| **Operations / Health** | **MISSING** | kein Monitoring |
-| **Support** | **MISSING** | kein Ticketsystem |
-| **Documents** | **MISSING** | kein Ablageort |
-| **Intelligence / meAI** | **MISSING SOURCE** | siehe `docs/roadmap/creadig-1-0-scale.md` §5 — 3 von 5 Use Cases ohne Datenpfad |
-| **Materialstand** | **LIVE DATA** | `/status`, funktioniert heute |
-| **Auth / RBAC** | **OWNER DECISION** | Bau nötig, Umfang hängt an der Frage, ob je jemand ausser dem Owner hineinsieht |
-| **Geography** | **OWNER + PRIVACY GATE** | keine Quelle. Neu einzubauen hiesse neue personenbezogene Erhebung. |
-| **UTM / Attribution** | **OWNER GATE** | Server nimmt `utm*` entgegen, Client sendet nichts. Blockiert bis Datenschutzsatz — `docs/ops/utm-playbook.md`. |
+| Ort | `/admin` |
+|-----|----------|
+| `https://creadig.de/admin` | **404** `NOT_FOUND` — Production = **Legacy HTML**, Next läuft dort nicht |
+| Preview `…-lfn1kipr8-…vercel.app` (SHA `ed91936`) | **404, leerer Körper** — App läuft, Env fehlt (siehe unten) |
+| Branch-Alias `creadig-git-feat-system-haus-site-…` | 302 SSO im Browser |
+
+**Deployment Protection (verifiziert, Projekt `creadig`):**
+`ssoProtection: enabled, all_except_custom_domains` · `passwordProtection: aus`
+· `trustedIps: aus`. Das erklärt die 302 im Browser — und dass die
+Custom-Domain **nicht** geschützt ist.
+
+**A.6 teilweise erfüllt.** Bewiesen: die neue Seite läuft, die Middleware
+greift, der Zugang ist dicht. **Nicht** bewiesen: Login, Sitzung, Logout —
+dafür muss die Env erst wirksam sein. Das ist kein Agentenlimit mehr,
+sondern ein realer Konfigurationsbefund.
 
 ---
 
-## Konflikte
+## Admin Env (A.4)
 
-**1 · Der Prompt setzt einen Admin-Bereich voraus, der nicht existiert.**
-G.1 ist ein Neubau inklusive Authentifizierung.
+> **Nachtrag 30.08.2026, 11:07 UTC — die zwei UNCLEAR sind aufgelöst.**
+> Nicht über `vercel env ls` (die CLI blieb tot), sondern über das
+> **Verhalten des laufenden Deployments**. Der Vercel-Connector kann die
+> SSO-Wand mit einem Share-Link durchstoßen; damit ist die App direkt
+> befragbar — **ohne je einen Secret-Wert zu lesen**.
 
-**2 · Ein Control Center ohne Speicher ist eine leere Hülle.**
-MP-G §2 verbietet Fake-Daten, §42 verbietet Demo-Karten in produktiven
-Ansichten, §53 verbietet Karten ohne Quelle. Zusammen heisst das: Today,
-Sales und Marketing wären heute drei Seiten mit „Noch keine Daten." Das ist
-regelkonform — und nutzlos.
+`middleware.ts` unterscheidet zwei 404:
 
-**3 · Der Speicher ist kein reines Technikthema.**
-Die Datenschutzerklärung sagt öffentlich, dass keine Datenbank geführt wird.
-Ein Lead-Speicher ändert diese Aussage und ist damit ein Owner-Gate
-(MP-G §70: „neue personenbezogene Datenerhebung").
+```ts
+if (!configured) return new NextResponse(null, { status: 404 })   // LEER
+```
 
-**4 · Marketing-Daten liegen ausserhalb der Anwendung.**
-Vercel Web Analytics ist schreibend eingebunden. Ein Funnel im Control Center
-braucht entweder API-Zugang zu Vercel oder einen **eigenen**
-Ereignisspeicher — und Letzteres wäre das „parallele Analytics-System", das
-MP-G §2.4 verbietet, wenn es doppelt geführt wird.
+Eine unbekannte Route liefert dagegen die **gerenderte** 404-Seite. Die
+Körpergröße trennt die beiden Fälle sauber:
 
-**5 · Der Zugang zu `/status` skaliert nicht auf ein Control Center.**
-Schlüssel in der URL ist für eine lesende Innenansicht vertretbar, für
-Statusänderungen nicht.
-
----
-
-## Technische Schulden (dokumentiert, nicht behoben)
-
-| Fund | Bewertung |
-|---|---|
-| **Rate-Limit im Prozessspeicher** | In einer Serverless-Umgebung hat jede Instanz ihr eigenes Fenster; das Limit ist damit weicher als es aussieht. Ausdrücklich so gebaut und kommentiert. Kein Defekt — aber der erste Punkt, der mit einem Speicher besser würde. |
-| **`statusBadge.beta` ist unerreichbar** | `productStatus()` liefert nur `live`, `aufbau`, `intern`. Der vierte Wert steht im Wörterbuch und kann nicht entstehen. Seit MP-C.1 füllt `maturityBadge` diese Rolle. Aufräumen wäre eine Verhaltensänderung — hier nur notiert. |
-| **`npm run a11y` / `shots` verlieren ihren Server** | ~1 von 3 Läufen, Exit 0, kein Log (`stdio: "ignore"`). Reproduziert auch ohne aktuelle Änderungen. Bekannt, im Backlog. |
-
-**Sicherheits-, Datenintegritäts- oder Privacy-Defekte: keine gefunden.**
-Der Lead-Weg ist mehrfach abgesichert (Honeypot, signiertes Zeit-Token mit
-Mindestalter, Rate-Limit, doppelte Einwilligungsprüfung), `/status` ist in
-Produktion ohne Schlüssel nicht erreichbar, Ereignisse feuern nur mit
-Einwilligung — alles in MP-D.5 und MP-E.5 belegt getestet.
-**Deshalb wurde in G.0 keine Zeile Code geändert.**
-
----
-
-## V1-Empfehlung
-
-**Nicht G.1 zuerst.** Eine Oberfläche über nichts ist keine Oberfläche.
-
-Die Reihenfolge, die MP-G §0 selbst vorgibt — *erst Wahrheit, dann
-Oberfläche* — führt hier zu:
-
-| Schritt | Was | Owner-Gate | Ohne das … |
+| Anfrage an Preview `ed91936` | Status | Körper | Bedeutung |
 |---|---|---|---|
-| **1** | **Entscheidung: Lead-Speicher ja/nein** | ✅ ja — ändert die Datenschutzerklärung | … bleibt jedes Sales-Modul leer |
-| **2** | Speicher + Schreibpfad in `/api/lead` (zusätzlich zur Mail, nicht statt ihr) | folgt aus 1 | … kein Lead hat eine Historie |
-| **3** | Authentifizierung (echte Session, nicht `?key=`) | Umfang: Owner | … kein Modul mit Mutationen |
-| **4** | G.1 Shell + G.3 Sales (Liste, Detail, Betriebscheck-Ergebnis) | — | — |
-| **5** | G.2 Today — leitet aus 4 ab, was Aufmerksamkeit braucht | — | — |
-| **6** | G.4 Marketing | Vercel-API oder eigener Ereignisspeicher | … kein Funnel |
-| **7** | G.5 Customers | eigenes Modell, nicht `clientWorks` | — |
+| `/` | 200 | 100 284 B, enthält „System-Haus" | **die neue Seite läuft** |
+| `/gibtsnicht` | 404 | **27 123 B** | gerenderte 404-Seite |
+| `/admin` | 404 | **0 B** | **Middleware, Zweig `!configured`** |
+| `/admin/login` | 404 | **0 B** | derselbe Zweig |
 
-**Schritt 1 ist keine Programmieraufgabe.** Es ist die Frage: *Sollen Anfragen
-künftig gespeichert werden — und darf in der Datenschutzerklärung stehen, dass
-wir das tun?*
+| Name | Owner-Aussage (R4 §11) | Befund am laufenden Preview |
+|------|------------------------|------------------------------|
+| `ADMIN_PASSWORD` | gesetzt | **im Preview-Scope von `ed91936` nicht wirksam** |
+| `ADMIN_SESSION_SECRET` | gesetzt | **im Preview-Scope von `ed91936` nicht wirksam** |
 
-### Was ohne neue Datenerhebung heute gebaut werden könnte
+Werte: nicht gelesen, nicht ausgegeben, nicht angefordert.
 
-Genau ein Ding, und es ist bescheiden:
+Beide Aussagen können zugleich stimmen. Die Middleware liest die Variablen
+**des Deployments**, nicht des Dashboards — ein Deployment trägt die Env,
+die beim **Bau** galt. Zwei Erklärungen bleiben, und nur der Owner kann sie
+unterscheiden:
 
-**Der Materialstand (`/status`) als erste Control-Center-Seite** — dieselbe
-Wahrheit, in der Shell, mit richtiger Authentifizierung statt Schlüssel in der
-URL. Er liest ausschließlich Repository-Daten, erhebt nichts, speichert nichts
-und ist schon heute nützlich.
+1. Env wurde **nach** dem letzten Preview-Deploy gesetzt
+   (`ed91936`, 29.08.2026 21:27 UTC) → **Redeploy Preview** genügt.
+2. Env liegt nur im Scope **Production**, nicht **Preview** → erst Scope
+   `Preview` ergänzen, **dann** redeployen.
 
-Das wäre eine **ehrliche G.1**: eine Shell mit genau einem Modul, das echte
-Daten hat — statt fünf Modulen, die „Noch keine Daten." sagen.
+**A.5:** In beiden Fällen ist ein Preview-Redeploy nötig. Ohne ihn bleibt
+`/admin` bei 404 — korrekt, so gebaut, aber nicht das gewünschte Ergebnis.
 
-### Was ein Owner-/Privacy-Gate braucht
-
-| Thema | Gate |
-|---|---|
-| Lead-Speicher | Datenschutzerklärung + Owner |
-| UTM-Client | Datenschutzsatz (steht als Entwurf in `utm-playbook.md`) |
-| Geography | neue personenbezogene Erhebung — Owner + rechtliche Prüfung |
-| Marketing-Funnel aus Vercel | API-Zugang, Vertragslage prüfen |
-| Weitere Rollen (Steuerberater, Ops) | Owner — heute gibt es einen Nutzer |
-| Monitoring | Dienst auswählen = Auftragsverarbeiter = AVV |
+Production-Env ändert `/admin` auf `creadig.de` **nicht**, solange Production Legacy ist.
 
 ---
 
-## Was G.0 NICHT getan hat
+## Was G.0 weiterhin richtig sagt
 
-- keine Route angelegt
-- keine Komponente gebaut
-- kein Datenmodell entworfen
-- keine Abhängigkeit installiert
-- keine Zeile Produktionscode geändert
-- keine Zahl behauptet, die nicht im Code steht
+- Öffentlicher Datenschutzsatz: keine Datenbank.  
+- Persistenz Production: kein Neon.  
+- Sales-UI ohne Store: verboten.  
+- Rate-Limit = In-Memory je Instanz.
 
-**STOP.** G.1 erst auf Owner-„weiter" — und sinnvollerweise erst nach der
-Entscheidung aus Schritt 1.
+---
+
+## Bewusst nicht in PHASE A
+
+Kein `/admin/leads`. Kein Neon-Adapter. Kein EN/AR. Kein Domain-Cutover. Kein zweites CRM.
