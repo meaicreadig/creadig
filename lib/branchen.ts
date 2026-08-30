@@ -54,79 +54,91 @@ export type WorkflowStep = {
 export const HANDWERK_WORKFLOW: WorkflowStep[] = [
   {
     key: "anfrage",
-    label: { de: "Anfrage", tr: "Talep" },
+    label: { de: "Anfrage", tr: "Talep", en: "Enquiry" },
     ist: {
       de: "Telefon, WhatsApp, Zuruf auf der Baustelle. Wer gerade nicht drangeht, verliert sie — und merkt es nie.",
       tr: "Telefon, WhatsApp, şantiyede laf. O an açamayan talebi kaybeder — ve bunu hiç fark etmez.",
+      en: "Phone, WhatsApp, a shout across the site. Whoever cannot pick up loses it — and never finds out.",
     },
     soll: {
       de: "Jede Anfrage landet an einer Stelle, mit Datum und Namen. Auch die vom Samstagabend.",
       tr: "Her talep tek bir yere düşer, tarihi ve adıyla. Cumartesi akşamı geleni de.",
+      en: "Every enquiry lands in one place, with a date and a name. Including the one from Saturday night.",
     },
     layer: "digital",
   },
   {
     key: "angebot",
-    label: { de: "Angebot", tr: "Teklif" },
+    label: { de: "Angebot", tr: "Teklif", en: "Quote" },
     ist: {
       de: "Word-Vorlage vom letzten Mal, Preise aus dem Kopf, Adresse noch einmal getippt.",
       tr: "Geçen seferki Word şablonu, akıldan fiyatlar, adres bir kez daha yazılıyor.",
+      en: "Last time's Word template, prices from memory, the address typed out again.",
     },
     soll: {
       de: "Aus der Anfrage wird das Angebot — dieselben Daten, kein zweites Tippen.",
       tr: "Talepten teklif olur — aynı veri, ikinci kez yazmak yok.",
+      en: "The enquiry becomes the quote — same data, no second round of typing.",
     },
     layer: "operations",
   },
   {
     key: "termin",
-    label: { de: "Termin", tr: "Randevu" },
+    label: { de: "Termin", tr: "Randevu", en: "Appointment" },
     ist: {
       de: "Ein Kalender im Kopf, einer im Handy, einer an der Wand. Drei Kalender sind kein Kalender.",
       tr: "Biri akılda, biri telefonda, biri duvarda. Planlama tek yerde değilse, kimse güncel durumu net göremez.",
+      en: "One calendar in your head, one on the phone, one on the wall. Three calendars are no calendar.",
     },
     soll: {
       de: "Ein Termin, den auch der sieht, der ihn nicht gemacht hat.",
       tr: "Randevuyu, onu almayan da görür.",
+      en: "An appointment that the person who did not make it can see too.",
     },
     layer: "operations",
   },
   {
     key: "auftrag",
-    label: { de: "Auftrag", tr: "İş emri" },
+    label: { de: "Auftrag", tr: "İş emri", en: "Job" },
     ist: {
       de: "Der Stand steht auf einem Zettel im Fahrzeug. Wer krank wird, nimmt ihn mit.",
       tr: "Durum, araçtaki bir kâğıtta. Hasta olan onu da yanında götürür.",
+      en: "The status is on a note in the van. Whoever falls ill takes it with them.",
     },
     soll: {
       de: "Der Stand hängt am Auftrag, nicht an einer Person.",
       tr: "Durum işe bağlıdır, kişiye değil.",
+      en: "The status belongs to the job, not to a person.",
     },
     layer: "operations",
   },
   {
     key: "dokumentation",
-    label: { de: "Dokumentation", tr: "Belgeleme" },
+    label: { de: "Dokumentation", tr: "Belgeleme", en: "Documentation" },
     ist: {
       de: "Fotos auf dem privaten Handy, Notizen auf der Rückseite des Lieferscheins.",
       tr: "Fotoğraflar özel telefonda, notlar irsaliyenin arkasında.",
+      en: "Photos on a private phone, notes on the back of the delivery slip.",
     },
     soll: {
       de: "Foto und Notiz hängen sofort am Auftrag — vom Gerät aus, das ohnehin dabei ist.",
       tr: "Fotoğraf ve not anında işe eklenir — zaten yanında olan cihazdan.",
+      en: "Photo and note attach to the job immediately — from the device that is on site anyway.",
     },
     layer: "automation",
   },
   {
     key: "rechnung",
-    label: { de: "Rechnung", tr: "Fatura" },
+    label: { de: "Rechnung", tr: "Fatura", en: "Invoice" },
     ist: {
       de: "Abends am Küchentisch aus dem Gedächtnis rekonstruiert. Was fehlt, wird nicht abgerechnet.",
       tr: "Akşam mutfak masasında hafızadan toparlanır. Eksik kalan faturalanmaz.",
+      en: "Reconstructed from memory at the kitchen table in the evening. What is missing never gets invoiced.",
     },
     soll: {
       de: "Was dokumentiert ist, ist abgerechnet. Der Rest des Abends gehört Ihnen.",
       tr: "İş tamamlandığında belge ve faturalama da geride kalmamalı. Akşamın geri kalanı sizindir.",
+      en: "What is documented is invoiced. The rest of the evening is yours.",
     },
     layer: "automation",
   },
@@ -136,64 +148,75 @@ export const handwerkCopy = {
   metaTitle: {
     de: "Handwerk: Ihr Betrieb läuft — aber wie viel davon noch per Hand? | creaDIG",
     tr: "Zanaat: İşletmeniz yürüyor — peki ne kadarı hâlâ elle? | creaDIG",
+    en: "Trades: your business runs — but how much of it still by hand? | creaDIG",
   },
   metaDescription: {
     de: "Anfrage, Angebot, Termin, Auftrag, Dokumentation, Rechnung — sechs Schritte, meist sechs Werkzeuge. Der Betriebscheck zeigt in zwei Minuten, wo es klemmt.",
     tr: "Talep, teklif, randevu, iş emri, belgeleme, fatura — altı adım, çoğu zaman altı ayrı araç. İşletme kontrolü iki dakikada nerede takıldığını gösterir.",
+    en: "Enquiry, quote, appointment, job, documentation, invoice — six steps, usually six tools. The operations check shows in two minutes where it snags.",
   },
-  eyebrow: { de: "Branche · Handwerk", tr: "Sektör · Zanaat" },
+  eyebrow: { de: "Branche · Handwerk", tr: "Sektör · Zanaat", en: "Sector · trades" },
   /* Owner-Vorgabe aus dem Master-Prompt — nicht umformuliert. */
   title: {
     de: "Ihr Betrieb läuft. Aber wie viel davon noch per Hand?",
     tr: "İşletmeniz yürüyor. Peki ne kadarı hâlâ elle?",
+    en: "Your business runs. But how much of it still by hand?",
   },
   lead: {
     de: "Ein Auftrag geht durch sechs Schritte. In den meisten Betrieben geht er dabei durch sechs verschiedene Werkzeuge — und an jedem Übergang bleibt etwas liegen.",
     tr: "Bir iş altı adımdan geçer. Çoğu işletmede bu altı adım altı farklı araçtan geçer — ve her geçişte bir şey yolda kalır.",
+    en: "A job goes through six steps. In most businesses it goes through six different tools on the way — and something gets left behind at every handover.",
   },
-  workflowEyebrow: { de: "Ein Auftrag, sechs Schritte", tr: "Bir iş, altı adım" },
+  workflowEyebrow: { de: "Ein Auftrag, sechs Schritte", tr: "Bir iş, altı adım", en: "One job, six steps" },
   workflowTitle: {
     de: "Sechs Schritte. Wie viele Werkzeuge?",
     tr: "Altı adım. Kaç araç?",
+    en: "Six steps. How many tools?",
   },
-  istLabel: { de: "Wie es meistens läuft", tr: "Çoğunlukla nasıl yürür" },
-  sollLabel: { de: "Wie es laufen kann", tr: "Nasıl yürüyebilir" },
-  layerLabel: { de: "Ebene", tr: "Katman" },
+  istLabel: { de: "Wie es meistens läuft", tr: "Çoğunlukla nasıl yürür", en: "How it usually goes" },
+  sollLabel: { de: "Wie es laufen kann", tr: "Nasıl yürüyebilir", en: "How it could go" },
+  layerLabel: { de: "Ebene", tr: "Katman", en: "Level" },
   /*
    * Der Satz, der die Landing ehrlich hält: Die Zahl kennt nur der Betrieb.
    * Hier steht bewusst KEINE Prozentangabe und keine Zeitersparnis.
    */
-  bridgeEyebrow: { de: "Die Zahl kennen Sie", tr: "Sayıyı siz biliyorsunuz" },
+  bridgeEyebrow: { de: "Die Zahl kennen Sie", tr: "Sayıyı siz biliyorsunuz", en: "You know the number" },
   bridgeTitle: {
     de: "Wir wissen nicht, wie viele Stellen es bei Ihnen sind. Sie schon.",
     tr: "Sizde kaç nokta olduğunu biz bilmiyoruz. Siz biliyorsunuz.",
+    en: "We do not know how many places there are in your business. You do.",
   },
   bridgeBody: {
     de: "Fünfzehn Fragen zu Ihrem Alltag, zwei Minuten, kein Anruf davor. Am Ende sehen Sie, auf welcher Ebene der Engpass liegt und wie viele Stellen Sie selbst als offen benannt haben.",
     tr: "Günlük işinize dair on beş soru, iki dakika, öncesinde telefon yok. Sonunda darboğazın hangi katmanda olduğunu ve kaç noktayı kendinizin açık işaretlediğini görürsünüz.",
+    en: "Fifteen questions about your working day, two minutes, no call beforehand. At the end you see which level the bottleneck sits on and how many places you marked as open yourself.",
   },
-  checkCta: { de: "Betriebscheck starten", tr: "İşletme kontrolünü başlat" },
-  talkCta: { de: "Lieber direkt sprechen", tr: "Doğrudan konuşalım" },
-  buildEyebrow: { de: "Was wir dann bauen", tr: "Sonra ne kurarız" },
+  checkCta: { de: "Betriebscheck starten", tr: "İşletme kontrolünü başlat", en: "Start the operations check" },
+  talkCta: { de: "Lieber direkt sprechen", tr: "Doğrudan konuşalım", en: "Rather talk directly" },
+  buildEyebrow: { de: "Was wir dann bauen", tr: "Sonra ne kurarız", en: "What we build then" },
   buildTitle: {
     de: "Erst der Betrieb, dann die Software.",
     tr: "Önce işletme, sonra yazılım.",
+    en: "The business first, the software second.",
   },
   buildBody: {
     de: "Wir bauen kein Werkzeug für einen Schritt, sondern die Verbindung zwischen ihnen. Wo der Auftritt fehlt, fangen wir dort an; wo er steht, fangen wir hinter ihm an.",
     tr: "Tek bir adım için araç kurmayız, adımlar arasındaki bağı kurarız. Görünüm eksikse oradan başlarız; duruyorsa arkasından başlarız.",
+    en: "We do not build a tool for one step, we build the connection between them. Where the presence is missing we start there; where it stands, we start behind it.",
   },
-  buildWebsite: { de: "Website fürs Handwerk", tr: "Zanaat için web sitesi" },
-  buildLayers: { de: "Die fünf Ebenen", tr: "Beş katman" },
-  buildWorks: { de: "Was wir gebaut haben", tr: "Neler kurduk" },
+  buildWebsite: { de: "Website fürs Handwerk", tr: "Zanaat için web sitesi", en: "Website for trades" },
+  buildLayers: { de: "Die fünf Ebenen", tr: "Beş katman", en: "The five levels" },
+  buildWorks: { de: "Was wir gebaut haben", tr: "Neler kurduk", en: "What we built" },
   /* MP-E.5 · Der Rückweg von der Leistungsseite auf den Einstieg. */
   backlinkLead: {
     de: "Noch nicht sicher, wo es im Betrieb klemmt?",
     tr: "İşletmede tam olarak nerede takıldığından emin değil misiniz?",
+    en: "Not yet sure where your business is stuck?",
   },
   backlinkCta: {
     de: "Der Einstieg für Handwerksbetriebe",
     tr: "Zanaat işletmeleri için giriş",
+    en: "The entry point for trade businesses",
   },
 } as const
 

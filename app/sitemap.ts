@@ -3,7 +3,7 @@ import { publishedInsights, readableInsights } from "@/lib/insights"
 import { publishedSeoLandings } from "@/lib/seo-landings"
 import { publishedServicePages } from "@/lib/service-pages"
 import { clientWorks, productWorks } from "@/lib/site-data"
-import { localeUrl, locales } from "@/lib/routes"
+import { localeUrl, locales, DEFAULT_LOCALE } from "@/lib/routes"
 
 /**
  * Die Sitemap — jetzt zweisprachig (GROW-1).
@@ -133,15 +133,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: entry.changeFrequency,
       // Deutsch ist der Schwerpunktmarkt und führt deshalb; der Abstand ist
       // klein genug, dass die türkische Fassung nicht abgehängt wird.
-      priority: locale === "de" ? entry.priority : Math.round((entry.priority - 0.1) * 10) / 10,
+      priority: locale === DEFAULT_LOCALE ? entry.priority : Math.round((entry.priority - 0.1) * 10) / 10,
+      /*
+       * Identisch zu den Kopfdaten der Seiten. Weichen Sitemap und Seite in
+       * ihren hreflang-Angaben voneinander ab, meldet Google beides als
+       * Fehler und wertet keines.
+       *
+       * Gate 3: aus `locales` abgeleitet statt de/tr getippt. Eine Sprache,
+       * die in der Liste steht, hat einen gebauten Routenbaum — damit kann
+       * hier kein hreflang-Ziel entstehen, das es nicht gibt.
+       */
       alternates: {
         languages: {
-          de: localeUrl(entry.path, "de"),
-          tr: localeUrl(entry.path, "tr"),
-          // Identisch zu den Kopfdaten der Seiten. Weichen Sitemap und Seite
-          // in ihren hreflang-Angaben voneinander ab, meldet Google beides
-          // als Fehler und wertet keines.
-          "x-default": localeUrl(entry.path, "de"),
+          ...Object.fromEntries(locales.map((l) => [l, localeUrl(entry.path, l)])),
+          "x-default": localeUrl(entry.path, DEFAULT_LOCALE),
         },
       },
     })),

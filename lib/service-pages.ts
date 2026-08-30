@@ -1,3 +1,4 @@
+import type { Locale } from "@/lib/dictionary"
 import type { Localized, Package } from "@/lib/site-data"
 
 /**
@@ -65,9 +66,9 @@ export type ServicePage = {
   chip: Localized
   metaDescription: Localized
   /** Was dazugehört. Jede Zeile ist eine Leistung, die heute erbracht wird. */
-  includes: { de: string[]; tr: string[] }
+  includes: Record<Locale, string[]>
   /** Für wen — aus den Schwerpunkten und der „Für wen"-Zeile der Ebene. */
-  forWhom: { de: string[]; tr: string[] }
+  forWhom: Record<Locale, string[]>
   /*
    * ==========================================================================
    * MP10-1 — DIE VIER KAUF-FRAGEN
@@ -102,7 +103,7 @@ export type ServicePage = {
   /** „Was ändert sich im Betrieb?" — Owner-gegatet. */
   fromTo?: { before: Localized; after: Localized }
   /** „Was muss ich beitragen?" (Zeit, Zugänge, Material) — Owner-gegatet. */
-  clientEffort?: { de: string[]; tr: string[] }
+  clientEffort?: Record<Locale, string[]>
   /**
    * BF-A6 — „Was wir tun, und was nicht."
    *
@@ -115,9 +116,9 @@ export type ServicePage = {
    */
   boundary?: {
     /** Was wir zusagen. */
-    we: { de: string[]; tr: string[] }
+    we: Record<Locale, string[]>
     /** Was wir ausdrücklich nicht zusagen — und wer es stattdessen tut. */
-    notWe: { de: string[]; tr: string[] }
+    notWe: Record<Locale, string[]>
     /** Der eine Satz darunter: sachlich, ohne Drohung. */
     note: Localized
   }
@@ -204,20 +205,23 @@ export type ServicePage = {
 export const servicePages: ServicePage[] = [
   {
     slug: "webdesign",
-    chip: { de: "Webdesign", tr: "Web tasarımı" },
+    chip: { de: "Webdesign", tr: "Web tasarımı", en: "Web design" },
     layer: "digital",
     h1: {
       de: "Webdesign, das im Betrieb funktioniert.",
       tr: "İşletmede işe yarayan web tasarımı.",
+      en: "Web design that works in the business.",
     },
     lead: {
       de: "Website, Shop oder Landingpage — sichtbar, schnell, auffindbar. Wir bauen den Auftritt nicht als Bild, sondern als Teil Ihres Betriebs: verbunden mit dem, was danach passiert.",
       tr: "Web sitesi, mağaza veya açılış sayfası — görünür, hızlı, bulunabilir. Görünümü bir resim gibi değil, işletmenizin bir parçası olarak kurarız: sonrasında olan her şeye bağlı.",
+      en: "Website, shop or landing page — visible, fast, findable. We build the presence not as a picture but as part of your business: connected to whatever happens next.",
     },
-    metaTitle: { de: "Webdesign für kleine und mittlere Betriebe", tr: "KOBİ'ler için web tasarımı" },
+    metaTitle: { de: "Webdesign für kleine und mittlere Betriebe", tr: "KOBİ'ler için web tasarımı", en: "Web design for small and medium-sized businesses" },
     metaDescription: {
       de: "Website, Shop und Landingpages für Unternehmen in Deutschland, Österreich und der Schweiz. Auf Deutsch und Türkisch.",
       tr: "Almanya, Avusturya ve İsviçre'deki işletmeler için web sitesi, mağaza ve açılış sayfaları. Almanca ve Türkçe.",
+      en: "Websites, shops and landing pages for companies in Germany, Austria and Switzerland. In German, Turkish and English.",
     },
     includes: {
       de: [
@@ -232,42 +236,53 @@ export const servicePages: ServicePage[] = [
         "Görünür, hızlı, bulunabilir",
         "Teslim değil, sürekli işletme",
       ],
+      en: [
+        "Website, shop or landing page",
+        "Structure, content and page architecture",
+        "Visible, fast, findable",
+        "Ongoing operation instead of handover",
+      ],
     },
     forWhom: {
       de: ["Bäckerei, Praxis, Restaurant, Handwerksbetrieb", "Betriebe ohne eigene IT-Abteilung"],
       tr: ["Fırın, muayenehane, restoran, zanaat işletmesi", "Kendi BT birimi olmayan işletmeler"],
+      en: ["Bakeries, practices, restaurants, trade businesses", "Businesses without their own IT department"],
     },
     process: [
       {
         key: "verstehen",
-        title: { de: "Verstehen", tr: "Anlamak" },
+        title: { de: "Verstehen", tr: "Anlamak", en: "Understand" },
         body: {
           de: "Wir sehen uns den Betrieb an, bevor wir eine Zeile bauen: was der Auftritt leisten muss und was danach im Alltag mit einer Anfrage passiert.",
           tr: "Bir satır kurmadan önce işletmeye bakarız: görünümün ne yapması gerektiğine ve bir talebin ardından günlük işleyişte ne olduğuna.",
+          en: "We look at the business before we build a line: what the presence has to achieve, and what happens to an enquiry afterwards in daily work.",
         },
       },
       {
         key: "aufbau",
-        title: { de: "Aufbau", tr: "Kurgu" },
+        title: { de: "Aufbau", tr: "Kurgu", en: "Architecture" },
         body: {
           de: "Struktur, Inhalte und Seitenaufbau stehen fest, bevor gestaltet wird — sonst gestaltet man eine Reihenfolge, die später nicht trägt.",
           tr: "Tasarımdan önce yapı, içerik ve sayfa kurgusu belirlenir — yoksa sonradan taşımayan bir sıralama tasarlanmış olur.",
+          en: "Structure, content and page architecture are settled before anything is designed — otherwise you design an order that will not hold later.",
         },
       },
       {
         key: "umsetzung",
-        title: { de: "Umsetzung", tr: "Uygulama" },
+        title: { de: "Umsetzung", tr: "Uygulama", en: "Delivery" },
         body: {
           de: "Wir bauen Website, Shop oder Landingpage in Abschnitten, die Sie unterwegs zu sehen bekommen. Zwischenstände statt einer Überraschung am Ende.",
           tr: "Web sitesini, mağazayı ya da açılış sayfasını, yol boyunca göreceğiniz bölümler hâlinde kurarız. Sonunda sürpriz yerine ara durumlar.",
+          en: "We build the website, shop or landing page in stages you get to see along the way. Interim states instead of a surprise at the end.",
         },
       },
       {
         key: "betrieb",
-        title: { de: "Betrieb", tr: "İşletme" },
+        title: { de: "Betrieb", tr: "İşletme", en: "Operation" },
         body: {
           de: "Nach dem Start bleibt der Auftritt in Betrieb: keine Übergabe, sondern laufende Betreuung durch dieselben Leute, die ihn gebaut haben.",
           tr: "Yayına aldıktan sonra görünüm işlemeye devam eder: teslim değil, onu kuran kişilerin sürekli desteği.",
+          en: "After launch the presence stays in operation: not a handover, but ongoing support by the same people who built it.",
         },
       },
     ],
@@ -279,20 +294,23 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "corporate-design",
-    chip: { de: "Corporate Design", tr: "Kurumsal tasarım" },
+    chip: { de: "Corporate Design", tr: "Kurumsal tasarım", en: "Corporate design" },
     layer: "identity",
     h1: {
       de: "Corporate Design vom ersten Strich an.",
       tr: "İlk çizgiden itibaren kurumsal tasarım.",
+      en: "Corporate design from the first stroke.",
     },
     lead: {
       de: "Marke, Name, Logo, Auftritt — das Fundament, auf dem alles andere steht. Wer damit anfängt, muss später nichts geraderücken.",
       tr: "Marka, isim, logo, görünüm — geri kalan her şeyin üzerinde durduğu temel. Buradan başlayan, sonradan hiçbir şeyi düzeltmek zorunda kalmaz.",
+      en: "Brand, name, logo, presence — the foundation everything else stands on. Start there and you have nothing to straighten out later.",
     },
-    metaTitle: { de: "Corporate Design und Markenaufbau", tr: "Kurumsal tasarım ve marka kurulumu" },
+    metaTitle: { de: "Corporate Design und Markenaufbau", tr: "Kurumsal tasarım ve marka kurulumu", en: "Corporate design and brand building" },
     metaDescription: {
       de: "Logo, Marke und Auftritt für Gründer und neue Betriebe — als Fundament, nicht als Dekoration. Festpreis, kein Abo.",
       tr: "Girişimciler ve yeni işletmeler için logo, marka ve görünüm — dekorasyon değil, temel. Sabit fiyat, aboneliksiz.",
+      en: "Logo, brand and presence for founders and new businesses — as a foundation, not decoration. Fixed price, no subscription.",
     },
     includes: {
       de: [
@@ -307,42 +325,53 @@ export const servicePages: ServicePage[] = [
         "Sosyal medya profili",
         "Temel marka kılavuzu",
       ],
+      en: [
+        "Logo design (2–3 concepts)",
+        "Business card",
+        "Social media profile",
+        "A basic brand manual",
+      ],
     },
     forWhom: {
       de: ["Gründer und neue Betriebe", "Handwerk vor dem ersten Auftritt"],
       tr: ["Girişimciler ve yeni işletmeler", "İlk görünümünden önceki zanaat işletmeleri"],
+      en: ["Founders and new businesses", "Trades before their first public presence"],
     },
     process: [
       {
         key: "verstehen",
-        title: { de: "Verstehen", tr: "Anlamak" },
+        title: { de: "Verstehen", tr: "Anlamak", en: "Understand" },
         body: {
           de: "Wofür soll die Marke stehen, und wo taucht sie auf? Am Fahrzeug, auf der Rechnung, im Schaufenster — das entscheidet, wie das Zeichen gebaut sein muss.",
           tr: "Marka neyi temsil etmeli ve nerede görünüyor? Araçta, faturada, vitrinde — işareti nasıl kurmak gerektiğine bu karar verir.",
+          en: "What should the brand stand for, and where does it appear? On the van, on the invoice, in the shop window — that decides how the mark has to be built.",
         },
       },
       {
         key: "entwuerfe",
-        title: { de: "Entwürfe", tr: "Taslaklar" },
+        title: { de: "Entwürfe", tr: "Taslaklar", en: "Concepts" },
         body: {
           de: "Zwei bis drei Logo-Konzepte, nicht dreißig Varianten einer Idee. Jedes ist ein eigener Vorschlag, keine Farbvariante des Nachbarn.",
           tr: "Bir fikrin otuz varyantı değil, iki–üç logo konsepti. Her biri kendi başına bir öneridir, komşusunun renk varyantı değil.",
+          en: "Two to three logo concepts, not thirty variants of one idea. Each is its own proposal, not a colour variation of its neighbour.",
         },
       },
       {
         key: "umsetzung",
-        title: { de: "Umsetzung", tr: "Uygulama" },
+        title: { de: "Umsetzung", tr: "Uygulama", en: "Delivery" },
         body: {
           de: "Aus dem gewählten Konzept entstehen Visitenkarte, Social-Media-Profil und ein grundlegendes Brand Manual — die Regeln, nach denen das Zeichen später verwendet wird.",
           tr: "Seçilen konsepttan kartvizit, sosyal medya profili ve temel bir marka kılavuzu çıkar — işaretin sonradan hangi kurallara göre kullanılacağı.",
+          en: "From the chosen concept come the business card, the social media profile and a basic brand manual — the rules by which the mark is used later.",
         },
       },
       {
         key: "fundament",
-        title: { de: "Fundament", tr: "Temel" },
+        title: { de: "Fundament", tr: "Temel", en: "Foundation" },
         body: {
           de: "Was hier entsteht, trägt den digitalen Auftritt darüber. Deshalb steht diese Ebene am Anfang: Wer damit anfängt, muss später nichts geraderücken.",
           tr: "Burada ortaya çıkan, üstündeki dijital görünümü taşır. Bu katman bu yüzden başta durur: Buradan başlayan, sonradan hiçbir şeyi düzeltmek zorunda kalmaz.",
+          en: "What is made here carries the digital presence above it. That is why this level comes first: start here and you have nothing to straighten out later.",
         },
       },
     ],
@@ -353,20 +382,23 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "website-handwerk",
-    chip: { de: "Website fürs Handwerk", tr: "Zanaat için web sitesi" },
+    chip: { de: "Website fürs Handwerk", tr: "Zanaat için web sitesi", en: "Website for trades" },
     layer: "digital",
     h1: {
       de: "Website für Handwerksbetriebe.",
       tr: "Zanaat işletmeleri için web sitesi.",
+      en: "Websites for trade businesses.",
     },
     lead: {
       de: "Betriebe mit 6–20 Mitarbeitern in NRW und Niedersachsen sind unser Schwerpunkt. Wir sehen uns den Betrieb an, bevor wir eine Zeile bauen — und bauen dann das, was im Alltag trägt.",
       tr: "NRW ve Aşağı Saksonya'daki 6–20 çalışanlı işletmeler bizim odağımız. Bir satır kurmadan önce işletmeye bakarız — sonra günlük işleyişte taşıyan şeyi kurarız.",
+      en: "Businesses with 6–20 staff in North Rhine-Westphalia and Lower Saxony are our focus. We look at the business before we build a line — and then build what holds up in daily work.",
     },
-    metaTitle: { de: "Website für Handwerksbetriebe", tr: "Zanaat işletmeleri için web sitesi" },
+    metaTitle: { de: "Website für Handwerksbetriebe", tr: "Zanaat işletmeleri için web sitesi", en: "Websites for trade businesses" },
     metaDescription: {
       de: "Websites für Handwerksbetriebe mit 6–20 Mitarbeitern in NRW und Niedersachsen. Erst den Betrieb verstehen, dann bauen, dann betreiben.",
       tr: "NRW ve Aşağı Saksonya'da 6–20 çalışanlı zanaat işletmeleri için web siteleri. Önce işletmeyi anlamak, sonra kurmak, sonra işletmek.",
+      en: "Websites for trade businesses with 6–20 staff in North Rhine-Westphalia and Lower Saxony. Understand the business first, then build, then operate.",
     },
     includes: {
       de: [
@@ -381,6 +413,12 @@ export const servicePages: ServicePage[] = [
         "Süreç iyileştirme ve operasyon",
         "Teslim değil, sürekli destek",
       ],
+      en: [
+        "A website with services, references and a route to contact",
+        "Enquiries directly by WhatsApp",
+        "Process improvement and operations",
+        "Ongoing support instead of handover",
+      ],
     },
     forWhom: {
       de: [
@@ -391,38 +429,46 @@ export const servicePages: ServicePage[] = [
         "6–20 çalışanlı zanaat işletmeleri (NRW & Aşağı Saksonya)",
         "Evrak yükü büyüyen işletmeler",
       ],
+      en: [
+        "Trades with 6–20 staff (NRW & Lower Saxony)",
+        "Businesses with a growing pile of paperwork",
+      ],
     },
     process: [
       {
         key: "verstehen",
-        title: { de: "Verstehen", tr: "Anlamak" },
+        title: { de: "Verstehen", tr: "Anlamak", en: "Understand" },
         body: {
           de: "Wir sehen uns den Betrieb an, bevor wir eine Zeile bauen: welche Aufträge Sie wollen, welche nicht, und wo im Alltag Zeit verloren geht.",
           tr: "Bir satır kurmadan önce işletmeye bakarız: hangi işleri istediğinizi, hangilerini istemediğinizi ve günlük işleyişte zamanın nerede kaybolduğunu.",
+          en: "We look at the business before we build a line: which jobs you want, which you do not, and where time is lost in daily work.",
         },
       },
       {
         key: "aufbau",
-        title: { de: "Aufbau", tr: "Kurgu" },
+        title: { de: "Aufbau", tr: "Kurgu", en: "Architecture" },
         body: {
           de: "Leistungen, Referenzen und Kontaktweg werden so angeordnet, dass eine Anfrage in zwei Schritten möglich ist — auf Wunsch direkt per WhatsApp.",
           tr: "Hizmetler, referanslar ve iletişim yolu, bir talebin iki adımda mümkün olacağı biçimde düzenlenir — istenirse doğrudan WhatsApp üzerinden.",
+          en: "Services, references and the route to contact are arranged so that an enquiry takes two steps — directly by WhatsApp if you prefer.",
         },
       },
       {
         key: "umsetzung",
-        title: { de: "Umsetzung", tr: "Uygulama" },
+        title: { de: "Umsetzung", tr: "Uygulama", en: "Delivery" },
         body: {
           de: "Wir bauen in Abschnitten und zeigen Zwischenstände. Wo ein Ablauf im Betrieb ohnehin schon hakt, richten wir ihn mit ein — Prozessoptimierung gehört dazu.",
           tr: "Bölümler hâlinde kurar, ara durumları gösteririz. İşletmede zaten aksayan bir akış varsa onu da düzenleriz — süreç iyileştirme buna dâhildir.",
+          en: "We build in stages and show interim states. Where a process in the business already snags, we set it right along the way — process improvement is part of it.",
         },
       },
       {
         key: "betrieb",
-        title: { de: "Betrieb", tr: "İşletme" },
+        title: { de: "Betrieb", tr: "İşletme", en: "Operation" },
         body: {
           de: "Nach dem Start bleiben wir dran: betreiben, überwachen, weiterentwickeln. Laufende Betreuung statt Übergabe an jemanden, der den Betrieb nicht kennt.",
           tr: "Yayına aldıktan sonra bırakmayız: işletir, izler, geliştiririz. İşletmeyi tanımayan birine teslim etmek yerine sürekli destek.",
+          en: "After launch we stay on it: operating, monitoring, developing further. Ongoing support instead of a handover to someone who does not know the business.",
         },
       },
     ],
@@ -432,23 +478,27 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "zweisprachig-de-tr",
-    chip: { de: "Zweisprachig DE + TR", tr: "İki dilli DE + TR" },
+    chip: { de: "Zweisprachig DE + TR", tr: "İki dilli DE + TR", en: "Bilingual DE + TR" },
     layer: "digital",
     h1: {
       de: "Zweisprachig: Deutsch und Türkisch.",
       tr: "İki dilli: Almanca ve Türkçe.",
+      en: "Bilingual: German and Turkish.",
     },
     lead: {
       de: "Beratung, Unterlagen und laufende Betreuung auf Deutsch und auf Türkisch — auf Wunsch komplett über WhatsApp. Kein Dolmetscher dazwischen, keine halb übersetzte Website.",
       tr: "Danışmanlık, belgeler ve sürekli destek Almanca ve Türkçe — istenirse tamamen WhatsApp üzerinden. Aracı tercüman yok, yarım çevrilmiş web sitesi yok.",
+      en: "Advice, documents and ongoing support in German and Turkish — entirely over WhatsApp if you prefer. No interpreter in between, no half-translated website.",
     },
     metaTitle: {
       de: "Zweisprachige Website und Betreuung (DE/TR)",
       tr: "İki dilli web sitesi ve destek (DE/TR)",
+      en: "A bilingual website and support (DE/TR)",
     },
     metaDescription: {
       de: "Website, Marke und laufende Betreuung auf Deutsch und Türkisch. Für Betriebe mit Kundschaft oder Mitarbeitern in beiden Sprachen — Kommunikation auf Wunsch über WhatsApp.",
       tr: "Almanca ve Türkçe web sitesi, marka ve sürekli destek. Her iki dilde müşterisi ya da çalışanı olan işletmeler için — istenirse WhatsApp üzerinden iletişim.",
+      en: "Website, brand and ongoing support in German and Turkish. For businesses with customers or staff in both languages — communication over WhatsApp if you prefer.",
     },
     includes: {
       de: [
@@ -463,6 +513,12 @@ export const servicePages: ServicePage[] = [
         "WhatsApp üzerinden iletişim",
         "Kalıcı olarak her iki dilde destek",
       ],
+      en: [
+        "A website in both languages, maintained equally",
+        "Advice and documents in German and Turkish",
+        "Communication over WhatsApp",
+        "Support in both languages, permanently",
+      ],
     },
     forWhom: {
       de: [
@@ -473,38 +529,46 @@ export const servicePages: ServicePage[] = [
         "Her iki dilde müşterisi olan işletmeler",
         "Çalışanlarına Türkçe ulaşmak isteyen işletmeler",
       ],
+      en: [
+        "Businesses with customers in both languages",
+        "Businesses that want to reach staff in Turkish",
+      ],
     },
     process: [
       {
         key: "verstehen",
-        title: { de: "Verstehen", tr: "Anlamak" },
+        title: { de: "Verstehen", tr: "Anlamak", en: "Understand" },
         body: {
           de: "Das Erstgespräch führen wir in der Sprache, die Ihnen liegt — auf Deutsch oder auf Türkisch, ohne Dolmetscher dazwischen.",
           tr: "İlk görüşmeyi size uyan dilde yaparız — Almanca ya da Türkçe, araya tercüman girmeden.",
+          en: "We hold the first conversation in the language that suits you — German or Turkish, with no interpreter in between.",
         },
       },
       {
         key: "aufbau",
-        title: { de: "Aufbau", tr: "Kurgu" },
+        title: { de: "Aufbau", tr: "Kurgu", en: "Architecture" },
         body: {
           de: "Beide Sprachfassungen werden zusammen geplant, nicht eine zuerst und die andere später. Was in einer Sprache steht, hat in der anderen einen Platz.",
           tr: "Her iki dil sürümü birlikte planlanır; biri önce, öbürü sonra değil. Bir dilde duran şeyin öbüründe de yeri vardır.",
+          en: "Both language versions are planned together, not one first and the other later. What exists in one language has a place in the other.",
         },
       },
       {
         key: "umsetzung",
-        title: { de: "Umsetzung", tr: "Uygulama" },
+        title: { de: "Umsetzung", tr: "Uygulama", en: "Delivery" },
         body: {
           de: "Gebaut werden beide Fassungen gleichwertig — keine halb übersetzte Website, bei der die zweite Sprache nach drei Klicks aufhört.",
           tr: "İki sürüm de eşdeğer kurulur — ikinci dilin üç tıklamada bittiği yarım çevrilmiş bir site değil.",
+          en: "Both versions are built as equals — no half-translated website where the second language stops after three clicks.",
         },
       },
       {
         key: "betreuung",
-        title: { de: "Betreuung", tr: "Destek" },
+        title: { de: "Betreuung", tr: "Destek", en: "Support" },
         body: {
           de: "Beratung, Unterlagen und laufende Betreuung bleiben dauerhaft in beiden Sprachen — auf Wunsch komplett über WhatsApp.",
           tr: "Danışmanlık, belgeler ve sürekli destek kalıcı olarak iki dilde kalır — istenirse tamamen WhatsApp üzerinden.",
+          en: "Advice, documents and ongoing support stay permanently in both languages — entirely over WhatsApp if you prefer.",
         },
       },
     ],
@@ -517,20 +581,23 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "ki-automatisierung",
-    chip: { de: "KI & Automatisierung", tr: "Yapay zekâ & otomasyon" },
+    chip: { de: "KI & Automatisierung", tr: "Yapay zekâ & otomasyon", en: "AI & automation" },
     layer: "automation",
     h1: {
       de: "Automatisierung und KI im Betrieb.",
       tr: "İşletmede otomasyon ve yapay zekâ.",
+      en: "Automation and AI in the business.",
     },
     lead: {
       de: "Wiederkehrende Arbeit übernimmt das System, nicht der Mensch. Und darüber meAI — unser KI-Business-Betriebssystem, das Zahlen, Aufgaben und Dokumente zusammenhält und Entscheidungen vorbereitet.",
       tr: "Tekrar eden işi insan değil, sistem üstlenir. Üzerinde ise meAI — sayıları, görevleri ve belgeleri bir arada tutan ve kararları hazırlayan yapay zekâ tabanlı iş işletim sistemimiz.",
+      en: "Recurring work is done by the system, not by a person. And above it meAI — our AI business operating system, which holds figures, tasks and documents together and prepares decisions.",
     },
-    metaTitle: { de: "Automatisierung und KI-Systeme für KMU", tr: "KOBİ'ler için otomasyon ve yapay zekâ" },
+    metaTitle: { de: "Automatisierung und KI-Systeme für KMU", tr: "KOBİ'ler için otomasyon ve yapay zekâ", en: "Automation and AI systems for SMEs" },
     metaDescription: {
       de: "Automatisierung und eigene KI-Systeme für kleine und mittlere Betriebe. meAI bündelt Zahlen, Aufgaben und Dokumente. Gebaut und betrieben von creaDIG.",
       tr: "Küçük ve orta ölçekli işletmeler için otomasyon ve kendi yapay zekâ sistemlerimiz. meAI sayıları, görevleri ve belgeleri toplar. creaDIG tarafından kurulur ve işletilir.",
+      en: "Automation and bespoke AI systems for small and medium-sized businesses. meAI brings together figures, tasks and documents. Built and operated by creaDIG.",
     },
     includes: {
       de: [
@@ -545,6 +612,12 @@ export const servicePages: ServicePage[] = [
         "Operasyon ve sistem kurulumu",
         "İşletme ve geliştirme bizden",
       ],
+      en: [
+        "The system takes over recurring processes",
+        "meAI platform integration",
+        "Operations and system architecture",
+        "Operation and further development by us",
+      ],
     },
     forWhom: {
       de: [
@@ -555,38 +628,46 @@ export const servicePages: ServicePage[] = [
         "6–20 çalışanlı, evrak yükü büyüyen işletmeler",
         "Kararları daha hızlı almak isteyen yerleşik işletmeler",
       ],
+      en: [
+        "Businesses with 6–20 staff and a growing pile of paperwork",
+        "Established businesses that want to decide faster",
+      ],
     },
     process: [
       {
         key: "verstehen",
-        title: { de: "Verstehen", tr: "Anlamak" },
+        title: { de: "Verstehen", tr: "Anlamak", en: "Understand" },
         body: {
           de: "Zuerst sehen wir uns an, was sich wiederholt: welche Arbeit jede Woche gleich abläuft, wo Zahlen von Hand übertragen werden, was liegen bleibt.",
           tr: "Önce neyin tekrarlandığına bakarız: her hafta aynı işleyen iş hangisi, sayılar nerede elle aktarılıyor, ne birikip kalıyor.",
+          en: "First we look at what repeats: which work runs the same way every week, where figures are copied by hand, what gets left lying.",
         },
       },
       {
         key: "systemaufbau",
-        title: { de: "Systemaufbau", tr: "Sistem kurulumu" },
+        title: { de: "Systemaufbau", tr: "Sistem kurulumu", en: "System architecture" },
         body: {
           de: "Wir legen fest, was das System übernimmt und was beim Menschen bleibt. Nicht alles, was sich automatisieren lässt, sollte automatisiert werden.",
           tr: "Sistemin neyi üstleneceğini, neyin insanda kalacağını belirleriz. Otomatikleştirilebilen her şey otomatikleştirilmeli değildir.",
+          en: "We define what the system takes over and what stays with people. Not everything that can be automated should be.",
         },
       },
       {
         key: "umsetzung",
-        title: { de: "Umsetzung", tr: "Uygulama" },
+        title: { de: "Umsetzung", tr: "Uygulama", en: "Delivery" },
         body: {
           de: "Die Abläufe werden gebaut und angebunden — auf Wunsch mit meAI darüber, das Zahlen, Aufgaben und Dokumente zusammenhält.",
           tr: "Akışlar kurulur ve bağlanır — istenirse üzerinde, sayıları, görevleri ve belgeleri bir arada tutan meAI ile.",
+          en: "The processes are built and connected — with meAI on top if you want, holding figures, tasks and documents together.",
         },
       },
       {
         key: "betrieb",
-        title: { de: "Betrieb", tr: "İşletme" },
+        title: { de: "Betrieb", tr: "İşletme", en: "Operation" },
         body: {
           de: "Betrieb und Weiterentwicklung bleiben bei uns. Ein automatisierter Ablauf, den niemand beobachtet, fällt irgendwann aus, ohne dass es jemand merkt.",
           tr: "İşletme ve geliştirme bizde kalır. Kimsenin izlemediği otomatik bir akış, bir gün kimse fark etmeden durur.",
+          en: "Operation and further development stay with us. An automated process nobody watches eventually fails without anyone noticing.",
         },
       },
     ],
@@ -618,23 +699,27 @@ export const servicePages: ServicePage[] = [
      * das er gar nicht liefern darf.
      */
     slug: "barrierefreiheit-website",
-    chip: { de: "Barrierefreiheit", tr: "Erişilebilirlik" },
+    chip: { de: "Barrierefreiheit", tr: "Erişilebilirlik", en: "Accessibility" },
     layer: "digital",
     h1: {
       de: "Barrierefreiheit: geprüft, behoben, nachweisbar.",
       tr: "Erişilebilirlik: denetlenir, giderilir, belgelenir.",
+      en: "Accessibility: audited, fixed, evidenced.",
     },
     lead: {
       de: "Ein Kunde bricht die Bestellung ab, weil sein Screenreader das Pflichtfeld nicht vorliest. Er schreibt Ihnen nicht, warum — er ist einfach weg. Wir prüfen Ihre Website nach WCAG 2.1 AA von Hand, schreiben jeden Fund mit Beleg auf und beheben ihn im Code. Kein Overlay, kein Widget.",
       tr: "Bir müşteri siparişi yarıda bırakır, çünkü ekran okuyucusu zorunlu alanı okumaz. Size nedenini yazmaz — sadece gider. Web sitenizi WCAG 2.1 AA ölçütlerine göre elle denetler, bulduğumuz her şeyi kanıtıyla yazar ve kodun içinde gideririz. Overlay yok, eklenti yok.",
+      en: "A customer abandons the order because their screen reader does not read out the required field. They do not write to tell you why — they are simply gone. We audit your website against WCAG 2.1 AA by hand, write down every finding with evidence and fix it in the code. No overlay, no widget.",
     },
     metaTitle: {
       de: "Barrierefreiheit Website & BFSG Onlineshop",
       tr: "Web sitesi erişilebilirliği & BFSG (Almanya)",
+      en: "Website accessibility & BFSG for online shops",
     },
     metaDescription: {
       de: "Barrierefreiheit für Website und Onlineshop: manuelle Prüfung nach WCAG 2.1 AA, Befundbericht mit Belegen, Behebung im Code — ohne Overlay. Aus Osnabrück, auf Deutsch und Türkisch.",
       tr: "Web sitesi ve online mağaza için erişilebilirlik: WCAG 2.1 AA ölçütlerine göre elle denetim, kanıtlı bulgu raporu, kod içinde giderme — overlay olmadan. Osnabrück'ten, Almanca ve Türkçe.",
+      en: "Accessibility for websites and online shops: manual audit against WCAG 2.1 AA, a findings report with evidence, remediation in the code — without an overlay. From Osnabrück, in German, Turkish and English.",
     },
     includes: {
       de: [
@@ -653,6 +738,14 @@ export const servicePages: ServicePage[] = [
         "Erişilebilirlik beyanı ve geri bildirim yolu, teknik taslak olarak",
         "Giderme sonrası yeniden denetim, öncesi ve sonrası sayılarla",
       ],
+      en: [
+        "A manual audit against our 12-point framework — the same one we used on our own site",
+        "A pass with keyboard and screen reader, not just an automated scan",
+        "A findings report: every finding with page, element, WCAG criterion and measured value",
+        "Remediation in the code of your site — no overlay, no widget, no plugin",
+        "An accessibility statement and feedback route as a technical template",
+        "A re-check after remediation, with figures before and after",
+      ],
     },
     forWhom: {
       de: [
@@ -665,6 +758,11 @@ export const servicePages: ServicePage[] = [
         "Zanaat, KOBİ ve gastronomi — ağırlık Almanya",
         "Mevcut bir sitesi olan ve önce durumunu öğrenmek isteyenler",
       ],
+      en: [
+        "Businesses with an online shop or a booking flow",
+        "Trades, SMEs and hospitality — focus on Germany",
+        "Anyone with an existing site who first wants to know where it stands",
+      ],
     },
     /*
      * Vier Schritte, und keiner davon ist neu: Sie stehen als Zeilen in
@@ -675,34 +773,38 @@ export const servicePages: ServicePage[] = [
     process: [
       {
         key: "pruefung",
-        title: { de: "Prüfung", tr: "Denetim" },
+        title: { de: "Prüfung", tr: "Denetim", en: "Audit" },
         body: {
           de: "Automatisiert über alle Hauptseiten, danach von Hand mit Tastatur und Screenreader. Der automatische Lauf findet ungefähr ein Drittel — den Rest findet ein Mensch.",
           tr: "Önce tüm ana sayfalarda otomatik, sonra elle klavye ve ekran okuyucuyla. Otomatik geçiş yaklaşık üçte birini bulur — gerisini bir insan bulur.",
+          en: "Automated across all main pages, then by hand with keyboard and screen reader. The automated run finds roughly a third — a person finds the rest.",
         },
       },
       {
         key: "befund",
-        title: { de: "Befundbericht", tr: "Bulgu raporu" },
+        title: { de: "Befundbericht", tr: "Bulgu raporu", en: "Findings report" },
         body: {
           de: "Jeder Fund mit Seite, Element, WCAG-Kriterium und Messwert. Der Bericht gehört Ihnen — auch wenn Sie danach jemand anderen beauftragen.",
           tr: "Her bulgu sayfası, öğesi, WCAG ölçütü ve ölçülen değeriyle. Rapor sizindir — sonrasında başkasına verseniz de.",
+          en: "Every finding with page, element, WCAG criterion and measured value. The report belongs to you — even if you commission somebody else afterwards.",
         },
       },
       {
         key: "behebung",
-        title: { de: "Behebung", tr: "Giderme" },
+        title: { de: "Behebung", tr: "Giderme", en: "Remediation" },
         body: {
           de: "Die Funde werden im Code Ihrer Seite behoben. Kein Overlay, kein Widget, kein Plugin — eine Schicht darüber entfernt keine Barriere.",
           tr: "Bulgular sitenizin kodunda giderilir. Overlay yok, widget yok, eklenti yok — üste konan bir katman hiçbir engeli kaldırmaz.",
+          en: "The findings are fixed in the code of your site. No overlay, no widget, no plugin — a layer on top removes no barrier.",
         },
       },
       {
         key: "nachpruefung",
-        title: { de: "Nachprüfung", tr: "Yeniden denetim" },
+        title: { de: "Nachprüfung", tr: "Yeniden denetim", en: "Re-check" },
         body: {
           de: "Nach der Behebung läuft dieselbe Prüfung erneut, mit Zahlen vorher und nachher. Ohne den zweiten Durchgang ist die Behebung eine Behauptung.",
           tr: "Gidermeden sonra aynı denetim yeniden yapılır, öncesi ve sonrası sayılarla. İkinci geçiş olmadan giderme bir iddiadan ibarettir.",
+          en: "After remediation the same audit runs again, with figures before and after. Without that second pass, the remediation is a claim.",
         },
       },
     ],
@@ -720,6 +822,12 @@ export const servicePages: ServicePage[] = [
           "Bulguları kodda gideririz ve sonrasında öncesi–sonrası sayılarla yeniden denetleriz.",
           "Erişilebilirlik beyanını ve geri bildirim yolunu teknik taslak olarak veririz — metin ve yapı, yerine konmaya hazır.",
         ],
+        en: [
+          "We audit your site against WCAG 2.1 AA — by hand, with keyboard and screen reader, not just with a scanner.",
+          "We write down every finding with page, element, criterion and measured value, including the uncomfortable ones.",
+          "We fix the findings in the code and audit again afterwards, with figures before and after.",
+          "We give you the statement and feedback route as a technical template — text and structure, ready to insert.",
+        ],
       },
       notWe: {
         de: [
@@ -734,26 +842,35 @@ export const servicePages: ServicePage[] = [
           "Overlay kullanmayız ve önermeyiz. Overlay, engeli kaldırmak yerine sitenin üzerine bir katman koyar — altındaki her şey olduğu gibi kalır.",
           "Hukuki bir sonuç vaat etmeyiz. Verdiğimiz söz, WCAG 2.1 AA'ya göre denetim ve uygulamadır; fazlası değil.",
         ],
+        en: [
+          "We do not assess whether and how the law applies to your business. That is a legal question, and your lawyer answers it — not us.",
+          "We do not sign off the accessibility statement. We supply the template; it is published after your legal advisers have seen it.",
+          "We do not use an overlay and do not recommend one. An overlay puts a layer over the site instead of removing the barrier — underneath, everything stays as it was.",
+          "We promise no legal outcome. What is promised is an audit and implementation against WCAG 2.1 AA, and nothing beyond that.",
+        ],
       },
       note: {
         de: "Das Barrierefreiheitsstärkungsgesetz gilt seit dem 28. Juni 2025. Wir nennen das Datum, weil es zur Sache gehört — nicht, um Druck zu machen. Der bessere Grund steht oben: der Kunde, der abbricht und nicht sagt, warum.",
         tr: "Almanya'daki erişilebilirlik yasası (BFSG) 28 Haziran 2025'ten beri yürürlükte. Tarihi, konuya ait olduğu için yazıyoruz — baskı kurmak için değil. Daha iyi gerekçe yukarıda: yarıda bırakıp nedenini söylemeyen müşteri.",
+        en: "The German Accessibility Strengthening Act has applied since 28 June 2025. We name the date because it belongs to the matter — not to apply pressure. The better reason is above: the customer who abandons and does not say why.",
       },
     },
     ownProof: {
       body: {
         de: "Wir haben unsere eigene Seite nach demselben Raster geprüft, bevor wir die Leistung angeboten haben. Acht Mängel, sieben davon erheblich — Fokus unsichtbar, keine Sprungmarke, ein Assistent, der beim Schrittwechsel schwieg. Alle behoben, im Code. Der Befund steht offen, mit Zahlen vorher und nachher.",
         tr: "Bu hizmeti sunmadan önce kendi sitemizi aynı şablonla denetledik. Sekiz eksik, yedisi ciddi — görünmeyen odak, atlama bağlantısının olmaması, adım değiştirirken susan bir asistan. Hepsi kodun içinde giderildi. Bulgu, öncesi ve sonrası sayılarıyla açıkta duruyor.",
+        en: "We audited our own site against the same framework before offering this service. Eight defects, seven of them serious — focus invisible, no skip link, an assistant that stayed silent when the step changed. All fixed, in the code. The findings are open, with figures before and after.",
       },
       links: [
         {
-          label: { de: "Der Befund: acht eigene Mängel", tr: "Bulgu: kendi sekiz eksiğimiz" },
+          label: { de: "Der Befund: acht eigene Mängel", tr: "Bulgu: kendi sekiz eksiğimiz", en: "The findings: eight defects of our own" },
           href: "/insights/eigene-seite-geprueft",
         },
         {
           label: {
             de: "Unsere Erklärung zur Barrierefreiheit",
             tr: "Erişilebilirlik beyanımız",
+            en: "Our accessibility statement",
           },
           href: "/barrierefreiheit",
         },
@@ -763,44 +880,49 @@ export const servicePages: ServicePage[] = [
       steps: [
         {
           key: "pruefung",
-          price: { de: "1.500 €", tr: "1.500 €" },
+          price: { de: "1.500 €", tr: "1.500 €", en: "€1,500" },
           kind: "fixed",
-          title: { de: "Prüfung", tr: "Denetim" },
+          title: { de: "Prüfung", tr: "Denetim", en: "Audit" },
           body: {
             de: "Die vollständige Prüfung nach dem 12-Punkte-Raster: automatisiert über alle Hauptseiten, von Hand mit Tastatur und Screenreader, dazu der Befundbericht mit Seite, Element, Kriterium und Messwert je Fund. Der Bericht gehört Ihnen — auch wenn Sie danach jemand anderen beauftragen oder gar nichts tun.",
             tr: "12 maddelik şablona göre eksiksiz denetim: tüm ana sayfalarda otomatik, elle klavye ve ekran okuyucuyla, ayrıca her bulgu için sayfa, öğe, ölçüt ve ölçülen değeri içeren bulgu raporu. Rapor sizindir — sonrasında başkasına verseniz de, hiçbir şey yapmasanız da.",
+            en: "The full audit against the 12-point framework: automated across all main pages, by hand with keyboard and screen reader, plus the findings report with page, element, criterion and measured value for every finding. The report belongs to you — even if you commission somebody else afterwards or do nothing at all.",
           },
         },
         {
           key: "behebung",
-          price: { de: "2.000–4.000 €", tr: "2.000–4.000 €" },
+          price: { de: "2.000–4.000 €", tr: "2.000–4.000 €", en: "€2,000–4,000" },
           kind: "offer",
-          title: { de: "Behebung", tr: "Giderme" },
+          title: { de: "Behebung", tr: "Giderme", en: "Remediation" },
           body: {
             de: "Für Code, den wir noch nicht gesehen haben, nennen wir keinen Festpreis. Nach der Prüfung wissen wir, wie viel Arbeit darin steckt — dann bekommen Sie eine Zahl, und die steigt danach nicht mehr. Die Spanne ist Erfahrung aus dem eigenen Durchgang, kein Angebot.",
             tr: "Henüz görmediğimiz bir kod için sabit fiyat vermeyiz. Denetimden sonra içinde ne kadar iş olduğunu biliriz — o zaman bir rakam alırsınız ve o rakam sonradan yükselmez. Aralık, kendi denetimimizden gelen deneyimdir; teklif değildir.",
+            en: "For code we have not yet seen, we name no fixed price. After the audit we know how much work is in it — then you get a figure, and it does not rise afterwards. The range is experience from our own pass, not an offer.",
           },
         },
         {
           key: "betreuung",
-          price: { de: "149 €", tr: "149 €" },
+          price: { de: "149 €", tr: "149 €", en: "€149" },
           kind: "monthly",
-          title: { de: "Betreuung", tr: "Sürekli destek" },
+          title: { de: "Betreuung", tr: "Sürekli destek", en: "Support" },
           body: {
             de: "Kein neuer Posten, sondern die laufende Betreuung, die es ohnehin gibt: Darin läuft der automatisierte Barrierefreiheits-Lauf bei jeder Änderung mit — denn jede Änderung an einer Seite kann eine Barriere zurückbringen. Einmal im Jahr sehen wir zusätzlich von Hand nach.",
             tr: "Yeni bir kalem değil, hâlihazırda var olan sürekli destek: İçinde otomatik erişilebilirlik geçişi her değişiklikte birlikte çalışır — çünkü sitedeki her değişiklik bir engeli geri getirebilir. Yılda bir kez ayrıca elle bakarız.",
+            en: "Not a new line item, but the ongoing support that exists anyway: the automated accessibility pass runs with every change — because every change to a site can bring a barrier back. Once a year we additionally look by hand.",
           },
         },
       ],
       note: {
         de: "Alle Preise netto, zzgl. 19 % USt. Die Prüfung ist der Einstieg und steht für sich: Sie verpflichtet zu keiner Behebung, und der Bericht bleibt bei Ihnen.",
         tr: "Tüm fiyatlar nettir, %19 KDV hariç. Denetim giriş adımıdır ve tek başına durur: Hiçbir gidermeye mecbur bırakmaz, rapor sizde kalır.",
+        en: "All prices excl. VAT, plus 19% VAT. The audit is the entry point and stands on its own: it commits you to no remediation, and the report stays with you.",
       },
     },
     packageKeys: ["website"],
     packageNote: {
       de: "Wer neu bei uns baut, bekommt Barrierefreiheit eingebaut — sie steht als Zeile im Website-Paket. Was hier beschrieben ist, gilt für eine Seite, die schon steht.",
       tr: "Siteyi bizimle yeni kuranlarda erişilebilirlik baştan içeride — web sitesi paketinde bir satır olarak durur. Burada anlatılan, hâlihazırda ayakta olan bir site içindir.",
+      en: "Anyone building new with us gets accessibility built in — it is a line in the website package. What is described here applies to a site that already exists.",
     },
     /*
      * Leer, und das bleibt so, bis ein Kunde eine Freigabe unterschreibt.

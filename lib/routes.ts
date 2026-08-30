@@ -76,7 +76,7 @@ export const TR_PREFIX = "/tr"
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://creadig.de"
 
 /** Alle Sprachen, in denen die Seite ausgeliefert wird — Reihenfolge = Rang. */
-export const locales = ["de", "tr"] as const
+export const locales = ["de", "tr", "en"] as const
 
 /**
  * Deutscher Pfad → Pfad in der Zielsprache.
@@ -185,4 +185,5 @@ export function localeAlternates(path: string, locale: Locale) {
 export const openGraphLocale: Record<Locale, string> = {
   de: "de_DE",
   tr: "tr_TR",
+  en: "en_GB",
 }

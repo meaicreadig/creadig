@@ -1,104 +1,73 @@
 # Sprachen · Current State
 
 > **Authority:** Current State · Gate 3 · Stand 30.08.2026
-> **Live:** DE · TR
-> **Fertig, aber nicht veröffentlicht:** EN (Wörterbuch)
+> **Live-fähig:** DE · TR · **EN**
 > **Nicht begonnen:** AR, RTL
 
 ---
 
 ## Wo die Sprachen stehen
 
-| Sprache | Wörterbuch | `Localized`-Daten | Routen | in `locales` | öffentlich |
-|---------|-----------|-------------------|--------|--------------|------------|
-| **DE** | ✅ | ✅ | ✅ 21 | ✅ | **live** |
-| **TR** | ✅ | ✅ | ✅ 20 | ✅ | **live** |
-| **EN** | ✅ **neu** | ❌ | ❌ | ❌ | **nein — bewusst** |
-| **AR** | ❌ | ❌ | ❌ | ❌ | nein |
-| RU | — | — | — | — | Legacy-Archiv, keine Migration |
+| Sprache | Wörterbuch | `Localized`-Daten | Routen | in `locales` | a11y | Status |
+|---------|-----------|-------------------|--------|--------------|------|--------|
+| **DE** | ✅ | ✅ | ✅ 21 | ✅ | 112/112 | **live** |
+| **TR** | ✅ | ✅ | ✅ 20 | ✅ | 112/112 | **live** |
+| **EN** | ✅ | ✅ | ✅ **21** | ✅ | **38/38** | **live-fähig** |
+| **AR** | ❌ | ❌ | ❌ | ❌ | — | nicht begonnen |
+| RU | — | — | — | — | — | Legacy-Archiv |
 
 ---
 
-## Was Gate 3 an Sprache gebracht hat
+## Englisch — was Gate 3 gebaut hat
 
-### 1 · Die Architektur trägt jetzt beliebig viele Sprachen
+| | Umfang |
+|---|---|
+| Wörterbuch `dictionary.en` | 1 427 Zeilen · ~8 900 Wörter · 42 Bereiche |
+| `Localized`-Daten | **249 Einträge · ~2 900 Wörter** in service-pages, site-data, insights, betriebscheck, branchen |
+| Routen | `app/(en)/en/…` — 21 Seiten + Layout mit `lang="en"` + eigene OG-Grafik |
+| **gesamt** | **~11 800 Wörter** |
 
-`lib/routes.ts` leitete Präfixe, hreflang und Sprachtrennung bis dahin aus
-einer festen Konstante `TR_PREFIX` ab — fünf Stellen, vier Funktionen. Eine
-dritte Sprache hätte einen Logik-Umbau bedeutet.
+### Der Compiler hat die Arbeit geführt
 
-Jetzt leiten `localePath`, `splitLocale`, `localeAlternates` und die Sitemap
-aus `locales` ab. Eine Sprache hinzuzufügen ist ein Listeneintrag.
+`Localized` war `{ de: string; tr: string }` — die Zweisprachigkeit stand im
+Typ. Jetzt ist es `Record<Locale, string>`. Der entscheidende Schritt war,
+**zuerst** `Locale` um `"en"` zu erweitern: danach hat `tsc` **357 Stellen**
+genannt, an denen eine Übersetzung fehlte. Keine davon konnte übersehen
+werden, weil das Projekt nicht baut, solange eine offen ist.
 
-**Nachgemessen** gegen den committeten Stand, vier Adressen, hreflang-Block
-Zeichen für Zeichen identisch — der Umbau hat DE/TR nicht angefasst.
+Das ist der Grund, warum diese Sprache vollständig ist und nicht „fast".
 
-### 2 · Das englische Wörterbuch ist vollständig
+### Was dabei aufgefallen ist
 
-`lib/dictionary.ts` → `en`: **1 427 Zeilen, rund 8 900 Wörter**, alle 42
-Bereiche.
+`alternateLocale` stand zweimal als `locale === "de" ? "tr" : "de"` im Code.
+Bei zwei Sprachen ist „die andere" eindeutig; bei drei ist es eine falsche
+Angabe. Jetzt werden alle gepflegten ausser der eigenen genannt.
 
-Quelle war der **aktuelle deutsche System-Haus-Canon**, nicht die alte
-Website. Die Legacy-Seite hatte Englisch, beschreibt dort aber eine
-Digitalagentur mit anderen Paketen und Preisen; sie ist als
-Terminologie-Referenz benutzt worden und an keiner Stelle als Positionierung.
+Dasselbe Muster in der Sitemap (de/tr getippt), im Sprachschalter (zwei feste
+Knöpfe) und in der OG-Grafik-Tabelle. Alle vier leiten jetzt aus `locales` ab.
 
-**Es ist keine wörtliche Übersetzung.** Der deutsche Text lebt von kurzen,
-harten Sätzen; eine Wort-für-Wort-Fassung liest sich im Englischen steif und
-verliert genau die Ruhe, die die Marke ausmacht. Die englische Fassung ist
-neu formuliert und behält Bedeutung, Hierarchie und Tonfall.
+### Slugs bleiben deutsch
 
-Beibehalten: `creaDIG`, `meAI`, `fibero`, `CASSAMEA`, `meahv`, Ortsnamen,
-Paragraphenzeichen deutscher Gesetze, die realen Preise.
+`/en/leistungen`, nicht `/en/services`. Das ist die bestehende Repo-Regel
+(gleiche Slugs in allen Sprachen, genau eine Ausnahme: `/tr/erisilebilirlik`).
+Übersetzte Slugs wären hübscher und machen aus jedem Sprachwechsel eine
+Übersetzungstabelle, die jemand pflegen muss — und aus jedem vergessenen
+Eintrag einen 404. Eine Änderung daran ist eine eigene Owner-Entscheidung mit
+SEO-Folgen, keine Nebenwirkung dieser Stufe.
 
----
+### Geprüft
 
-## Warum EN noch nicht in `locales` steht
-
-Weil es sonst eine **halbe Sprache** wäre — und der Canon verbietet genau das.
-
-Ein Wörterbuch allein macht keine Sprachfassung. Es fehlen:
-
-| # | Was fehlt | Umfang |
-|---|-----------|--------|
-| 1 | `Localized`-Typ auf die Sprachliste erweitern | 1 Typ, `lib/site-data.ts:666` |
-| 2 | `en`-Strings in `site-data` · `insights` · `betriebscheck` · `branchen` | **158 Einträge, ~1 700 Wörter** — darunter ein langer Fachbeitrag |
-| 3 | Routenbaum `app/(en)/en/…` | 21 Dateien à 5 Zeilen + ein Layout mit `lang="en"` |
-| 4 | `locales` auf `["de","tr","en"]` | 1 Zeile |
-| 5 | `openGraphLocale.en` | 1 Zeile |
-| 6 | a11y-Suite um die EN-Routen erweitern | `scripts/a11y.mjs` |
-
-Punkt 2 ist die eigentliche Arbeit; der Rest ist mechanisch.
-
----
-
-## Das Gate, das den Zustand ehrlich hält
-
-```ts
-type AssertEnParity = SameShape<Dictionary, (typeof dictionary)["en"]>
-```
-
-Dieselbe Typprüfung, die DE und TR seit jeher aneinanderbindet, gilt jetzt
-auch für Englisch — **obwohl EN nicht veröffentlicht ist**. Das ist der Punkt:
-Der Block kann nicht halbfertig liegen bleiben. Fehlt ein Schlüssel, schlägt
-`tsc` fehl, und zwar sofort und nicht erst beim Livegang.
-
-`npx tsc --noEmit` läuft sauber — die englische Fassung hat **exakte
-Struktur-Parität** mit der deutschen.
-
----
-
-## Ein Satz, der mitwandern muss
-
-`legal.privacyPoints` enthält auf Englisch:
-
-> „We do not keep a database: your enquiry sits solely in our email inbox."
-
-Das ist die korrekte Übersetzung des heute **wahren** deutschen Satzes. Wird
-die Lead-Persistenz scharfgeschaltet, wird er in **allen drei** Sprachen
-gleichzeitig falsch. Der Ersatztext steht in
-`docs/ops/privacy-persistence-gate.md`; die Reihenfolge (Text vor Schalter)
-steht in `docs/ops/neon-decision-pack.md`.
+| Prüfung | Ergebnis |
+|---|---|
+| 18 EN-Routen + 404 | alle 200 / 404 korrekt |
+| `<html lang="en">` | auf allen 19 Seiten |
+| canonical je Seite | `https://creadig.de/en/…` |
+| hreflang | de · tr · en · x-default=de, alle Ziele existieren |
+| Sitemap | 81 `hreflang="en"`-Einträge |
+| Sprachschalter | DE · TR · EN, Endonyme |
+| axe (WCAG 2.1 AA) | **38 Durchläufe, 0 Verletzungen** |
+| deutsche Textreste | keine gefunden |
+| DE/TR-Regression | 112/112 unverändert |
 
 ---
 

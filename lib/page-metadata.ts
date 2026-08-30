@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { dictionary, type Locale } from "@/lib/dictionary"
-import { SITE_URL, localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
+import { SITE_URL, localeAlternates, localeUrl, locales, openGraphLocale } from "@/lib/routes"
 
 /**
  * T-1 / SEO-1 — die Kopfdaten jeder Unterseite, an einer Stelle.
@@ -31,7 +31,7 @@ import { SITE_URL, localeAlternates, localeUrl, openGraphLocale } from "@/lib/ro
  * `app/og/de.png/route.tsx`.
  */
 
-const OG_IMAGE_PATH = { de: "/og/de.png", tr: "/og/tr.png" } as const
+const OG_IMAGE_PATH: Record<Locale, string> = { de: "/og/de.png", tr: "/og/tr.png", en: "/og/en.png" }
 
 /** 1200 × 630 — das Maß, das WhatsApp, LinkedIn und X als große Karte zeigen. */
 export function ogImage(locale: Locale) {
@@ -72,7 +72,13 @@ export function pageMetadata({
       description,
       url: localeUrl(path, locale),
       locale: openGraphLocale[locale],
-      alternateLocale: openGraphLocale[locale === "de" ? "tr" : "de"],
+      /*
+       * Gate 3 — bis hierher stand hier `locale === "de" ? "tr" : "de"`: bei
+       * zwei Sprachen ist „die andere" eindeutig, bei dreien nicht mehr.
+       * OpenGraph erlaubt mehrere `alternateLocale`; hier stehen alle
+       * gepflegten ausser der eigenen.
+       */
+      alternateLocale: locales.filter((l) => l !== locale).map((l) => openGraphLocale[l]),
       siteName: "creaDIG",
       type,
       images: ogImage(locale),

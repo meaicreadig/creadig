@@ -20,7 +20,7 @@ import {
 } from "@/lib/site-data"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { jsonLdScript } from "@/lib/json-ld"
-import { SITE_URL, localeAlternates, localeUrl, openGraphLocale } from "@/lib/routes"
+import { SITE_URL, localeAlternates, localeUrl, locales, openGraphLocale } from "@/lib/routes"
 import { ogImage } from "@/lib/page-metadata"
 
 /**
@@ -146,7 +146,13 @@ export function shellMetadata(locale: Locale): Metadata {
       description: t.meta.ogDescription,
       locale: openGraphLocale[locale],
       // Die jeweils andere Sprache — OpenGraph kennt dafür `alternateLocale`.
-      alternateLocale: openGraphLocale[locale === "de" ? "tr" : "de"],
+      /*
+       * Gate 3 — bis hierher stand hier `locale === "de" ? "tr" : "de"`: bei
+       * zwei Sprachen ist „die andere" eindeutig, bei dreien nicht mehr.
+       * OpenGraph erlaubt mehrere `alternateLocale`; hier stehen alle
+       * gepflegten ausser der eigenen.
+       */
+      alternateLocale: locales.filter((l) => l !== locale).map((l) => openGraphLocale[l]),
       type: "website",
       siteName: "creaDIG",
       url: localeUrl("/", locale),

@@ -22,8 +22,20 @@ import {
 } from "@/components/ui/sheet"
 import { Logo } from "@/components/brand/logo"
 import { mainNavLinks } from "@/lib/site-data"
-import { localePath, splitLocale } from "@/lib/routes"
-import { whatsappLink } from "@/lib/dictionary"
+import { localePath, locales, splitLocale } from "@/lib/routes"
+
+/**
+ * Wie eine Sprache im Schalter heisst — im ENDONYM, also so, wie sie sich
+ * selbst nennt. Wer nur Tuerkisch liest, findet „Türkçe"; „Turkish" haette
+ * ihm nichts genutzt. Kurzform fuer die Leiste, Vollform fuer das Menue und
+ * fuer `aria-label`.
+ */
+const LOCALE_NAME: Record<Locale, { short: string; full: string }> = {
+  de: { short: "DE", full: "Deutsch" },
+  tr: { short: "TR", full: "Türkçe" },
+  en: { short: "EN", full: "English" },
+}
+import { whatsappLink, type Locale } from "@/lib/dictionary"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { cn } from "@/lib/utils"
 
@@ -62,7 +74,7 @@ function useLanguageSwitch() {
   const pathname = usePathname()
   const { path } = splitLocale(pathname)
 
-  return (next: "de" | "tr") => {
+  return (next: Locale) => {
     const target = localePath(path, next)
     const hash = typeof window !== "undefined" ? window.location.hash : ""
     const query = typeof window !== "undefined" ? window.location.search : ""
@@ -152,24 +164,20 @@ export function SiteNav() {
           <ToggleGroup
             type="single"
             value={locale}
-            onValueChange={(value) => value && switchLanguage(value as "de" | "tr")}
+            onValueChange={(value) => value && switchLanguage(value as Locale)}
             aria-label={t.nav.language}
             className="hidden divide-x divide-line-strong border-0 sm:flex"
           >
-            <ToggleGroupItem
-              value="de"
-              aria-label="Deutsch"
-              className="h-9 rounded-none border-0 bg-transparent eyebrow px-2 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
-            >
-              DE
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="tr"
-              aria-label="Türkçe"
-              className="h-9 rounded-none border-0 bg-transparent eyebrow px-2 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
-            >
-              TR
-            </ToggleGroupItem>
+            {locales.map((code) => (
+              <ToggleGroupItem
+                key={code}
+                value={code}
+                aria-label={LOCALE_NAME[code].full}
+                className="h-9 rounded-none border-0 bg-transparent eyebrow px-2 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
+              >
+                {LOCALE_NAME[code].short}
+              </ToggleGroupItem>
+            ))}
           </ToggleGroup>
 
           <Button
@@ -312,22 +320,19 @@ export function SiteNav() {
                 <ToggleGroup
                   type="single"
                   value={locale}
-                  onValueChange={(value) => value && switchLanguage(value as "de" | "tr")}
+                  onValueChange={(value) => value && switchLanguage(value as Locale)}
                   aria-label={t.nav.language}
                   className="mt-1 justify-start border-0"
                 >
-                  <ToggleGroupItem
-                    value="de"
-                    className="rounded-none border-0 bg-transparent eyebrow px-3 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
-                  >
-                    Deutsch
-                  </ToggleGroupItem>
-                  <ToggleGroupItem
-                    value="tr"
-                    className="rounded-none border-0 bg-transparent eyebrow px-3 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
-                  >
-                    Türkçe
-                  </ToggleGroupItem>
+                  {locales.map((code) => (
+                    <ToggleGroupItem
+                      key={code}
+                      value={code}
+                      className="rounded-none border-0 bg-transparent eyebrow px-3 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
+                    >
+                      {LOCALE_NAME[code].full}
+                    </ToggleGroupItem>
+                  ))}
                 </ToggleGroup>
               </div>
             </SheetContent>

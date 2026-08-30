@@ -1,7 +1,7 @@
 // i18n-ready dictionary. DE ist primär, TR ist gleichwertig.
 // Alle Inhalte sind echt. Keine erfundenen Zahlen, Zitate oder Auszeichnungen.
 
-export type Locale = "de" | "tr"
+export type Locale = "de" | "tr" | "en"
 
 export const WHATSAPP_NUMBER = "+41 76 504 58 79"
 

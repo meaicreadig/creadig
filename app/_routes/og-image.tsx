@@ -42,6 +42,14 @@ const copy = {
     disciplines: "SISTEM EVI · MARKA · WEB · YAPAY ZEKÂ",
     origin: "2017'DEN BERI · OSNABRÜCK · DACH",
   },
+  en: {
+    alt: "creaDIG — systems house for brand, web and AI",
+    headline: "We build what others never see.",
+    lead:
+      "The roof above our own systems — from brand to AI. We build them. And we run them.",
+    disciplines: "SYSTEMS HOUSE · BRAND · WEB · AI",
+    origin: "SINCE 2017 · OSNABRÜCK · DACH",
+  },
 } as const
 
 export function ogAlt(locale: Locale) {

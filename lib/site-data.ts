@@ -1,3 +1,4 @@
+import type { Locale } from "@/lib/dictionary"
 // Alle Inhalte sind echt. Keine erfundenen Zahlen, Zitate oder Auszeichnungen.
 //
 // CEO-Entscheidung (gesperrt):
@@ -147,18 +148,20 @@ export type Work = {
 export const productWorks: Work[] = [
   {
     slug: "meai",
-    sector: { de: "KI · Business-Software", tr: "Yapay zekâ · İş yazılımı" },
+    sector: { de: "KI · Business-Software", tr: "Yapay zekâ · İş yazılımı", en: "AI · business software" },
     year: null,
     name: "meAI",
     what: {
       de: "KI-Business-Betriebssystem für kleine und mittlere Betriebe.",
       tr: "Küçük ve orta ölçekli işletmeler için yapay zekâ tabanlı iş işletim sistemi.",
+      en: "An AI business operating system for small and medium-sized businesses.",
     },
     built: {
       de: "Produktarchitektur, KI-Logik, Dashboard, Betrieb — von Grund auf.",
       tr: "Ürün mimarisi, yapay zekâ mantığı, gösterge paneli, işletme — sıfırdan.",
+      en: "Product architecture, AI logic, dashboard, operation — from the ground up.",
     },
-    outcome: { de: "Im Aufbau · live unter meai.run", tr: "Kuruluyor · meai.run adresinde canlı" },
+    outcome: { de: "Im Aufbau · live unter meai.run", tr: "Kuruluyor · meai.run adresinde canlı", en: "In build · live at meai.run" },
     kind: "Produkt",
     region: "DE & CH",
     // Owner 29.08.2026: Laptop-Szene mit echter meAI-Oberfläche (Demodaten).
@@ -170,18 +173,20 @@ export const productWorks: Work[] = [
   },
   {
     slug: "fibero",
-    sector: { de: "Glasfaser · Operations", tr: "Fiber optik · Operasyon" },
+    sector: { de: "Glasfaser · Operations", tr: "Fiber optik · Operasyon", en: "Fibre optics · operations" },
     year: null,
     name: "fibero",
     what: {
       de: "Ordnung und Klarheit im Glasfaser-Alltag: Auftrags-, Abrechnungs- und Finanzlogik.",
       tr: "Fiber optik günlük işinde düzen ve netlik: iş emri, hakediş ve finans mantığı.",
+      en: "Order and clarity in day-to-day fibre-optic work: job, billing and finance logic.",
     },
     built: {
       de: "Operative Prozesse, Abrechnungssystem, Auswertung.",
       tr: "Operasyonel süreçler, hakediş sistemi, değerlendirme.",
+      en: "Operational processes, billing system, reporting.",
     },
-    outcome: { de: "Im Tagesbetrieb", tr: "Günlük kullanımda" },
+    outcome: { de: "Im Tagesbetrieb", tr: "Günlük kullanımda", en: "In daily operation" },
     kind: "Produkt",
     region: "DE",
     // Owner 29.08.2026: Feld-Szene mit echter fibero Map-Center-Oberfläche.
@@ -192,18 +197,20 @@ export const productWorks: Work[] = [
   },
   {
     slug: "cassamea",
-    sector: { de: "Gastronomie · Kasse", tr: "Gastronomi · Kasa" },
+    sector: { de: "Gastronomie · Kasse", tr: "Gastronomi · Kasa", en: "Hospitality · point of sale" },
     year: null,
     name: "CASSAMEA",
     what: {
       de: "Die Kasse, die mitdenkt — für die Gastronomie, gebaut für Schweizer Anforderungen.",
       tr: "Birlikte düşünen kasa — gastronomi için, İsviçre gerekliliklerine göre kuruldu.",
+      en: "A point of sale that thinks along — for hospitality, built for Swiss requirements.",
     },
     built: {
       de: "Kassen-Software, Backoffice, Schweizer Anforderungen.",
       tr: "Kasa yazılımı, backoffice, İsviçre gereklilikleri.",
+      en: "POS software, back office, Swiss requirements.",
     },
-    outcome: { de: "Im Aufbau", tr: "Kuruluyor" },
+    outcome: { de: "Im Aufbau", tr: "Kuruluyor", en: "In build" },
     kind: "Produkt",
     region: "CH",
     // Owner 29.08.2026: POS-Szene mit echter CASSAMEA-Oberfläche (Demodaten).
@@ -213,23 +220,25 @@ export const productWorks: Work[] = [
   },
   {
     slug: "meahv",
-    sector: { de: "Immobilien · Verwaltung", tr: "Gayrimenkul · Yönetim" },
+    sector: { de: "Immobilien · Verwaltung", tr: "Gayrimenkul · Yönetim", en: "Property · management" },
     year: null,
     name: "meahv",
     what: {
       de: "Hausverwaltungs-System: Objekte, Mieter, Belege und Abrechnung an einem Ort.",
       tr: "Bina yönetim sistemi: taşınmazlar, kiracılar, belgeler ve faturalandırma tek yerde.",
+      en: "A property management system: units, tenants, documents and billing in one place.",
     },
     built: {
       de: "Datenmodell, Verwaltungslogik, Abrechnung.",
       tr: "Veri modeli, yönetim mantığı, faturalandırma.",
+      en: "Data model, administration logic, billing.",
     },
-    outcome: { de: "Im Aufbau", tr: "Kuruluyor" },
+    outcome: { de: "Im Aufbau", tr: "Kuruluyor", en: "In build" },
     kind: "Produkt",
     region: "DE",
-    // Noch kein Kartenbild — Monogramm-Panel statt leerem Bild.
-    image: null,
-    imageProof: null,
+    // Owner 30.08.2026: Laptop-Szene mit echter meahv-Oberfläche (Objekte & Einheiten).
+    image: "/works/meahv.jpg",
+    imageProof: "product-photo",
     mark: "hv",
   },
 ]
@@ -379,10 +388,10 @@ export type ProductWorld = {
 export const productWorlds: Record<string, ProductWorld> = {
   meai: {
     blocks: [
-      { de: "Produktarchitektur", tr: "Ürün mimarisi" },
-      { de: "KI-Logik", tr: "Yapay zekâ mantığı" },
-      { de: "Dashboard", tr: "Gösterge paneli" },
-      { de: "Betrieb — von Grund auf", tr: "İşletme — sıfırdan" },
+      { de: "Produktarchitektur", tr: "Ürün mimarisi", en: "Product architecture" },
+      { de: "KI-Logik", tr: "Yapay zekâ mantığı", en: "AI logic" },
+      { de: "Dashboard", tr: "Gösterge paneli", en: "Dashboard" },
+      { de: "Betrieb — von Grund auf", tr: "İşletme — sıfırdan", en: "Operation — from the ground up" },
     ],
     layer: "intelligence",
     maturity: null,
@@ -398,9 +407,9 @@ export const productWorlds: Record<string, ProductWorld> = {
   },
   fibero: {
     blocks: [
-      { de: "Operative Prozesse", tr: "Operasyonel süreçler" },
-      { de: "Abrechnungssystem", tr: "Hakediş sistemi" },
-      { de: "Auswertung", tr: "Değerlendirme" },
+      { de: "Operative Prozesse", tr: "Operasyonel süreçler", en: "Operational processes" },
+      { de: "Abrechnungssystem", tr: "Hakediş sistemi", en: "Billing system" },
+      { de: "Auswertung", tr: "Değerlendirme", en: "Reporting" },
     ],
     layer: "operations",
     maturity: null,
@@ -416,9 +425,9 @@ export const productWorlds: Record<string, ProductWorld> = {
   },
   cassamea: {
     blocks: [
-      { de: "Kassen-Software", tr: "Kasa yazılımı" },
-      { de: "Backoffice", tr: "Backoffice" },
-      { de: "Schweizer Anforderungen", tr: "İsviçre gereklilikleri" },
+      { de: "Kassen-Software", tr: "Kasa yazılımı", en: "POS software" },
+      { de: "Backoffice", tr: "Backoffice", en: "Back office" },
+      { de: "Schweizer Anforderungen", tr: "İsviçre gereklilikleri", en: "Swiss requirements" },
     ],
     layer: "operations",
     maturity: null,
@@ -434,9 +443,9 @@ export const productWorlds: Record<string, ProductWorld> = {
   },
   meahv: {
     blocks: [
-      { de: "Datenmodell", tr: "Veri modeli" },
-      { de: "Verwaltungslogik", tr: "Yönetim mantığı" },
-      { de: "Abrechnung", tr: "Faturalandırma" },
+      { de: "Datenmodell", tr: "Veri modeli", en: "Data model" },
+      { de: "Verwaltungslogik", tr: "Yönetim mantığı", en: "Administration logic" },
+      { de: "Abrechnung", tr: "Faturalandırma", en: "Billing" },
     ],
     layer: "operations",
     maturity: null,
@@ -495,15 +504,16 @@ export function productNeighbours(slug: string): { prev: Work; next: Work } | nu
 export const clientWorks: Work[] = [
   {
     slug: "nv-swiss",
-    sector: { de: "Versicherung & Finanzen", tr: "Sigorta & finans" },
+    sector: { de: "Versicherung & Finanzen", tr: "Sigorta & finans", en: "Insurance & finance" },
     year: null,
     name: "NV SWISS",
     what: {
       de: "Versicherungs- & Finanzmakler (Schweiz) — Marke, Website und Digitalisierung aus einer Hand.",
       tr: "Sigorta & finans brokeri (İsviçre) — marka, web sitesi ve dijitalleşme tek elden.",
+      en: "Insurance & finance broker (Switzerland) — brand, website and digitalisation from one hand.",
     },
-    built: { de: "Marke, Website, Digitalisierung.", tr: "Marka, web sitesi, dijitalleşme." },
-    outcome: { de: "Kundenwerk · live", tr: "Müşteri işi · canlı" },
+    built: { de: "Marke, Website, Digitalisierung.", tr: "Marka, web sitesi, dijitalleşme.", en: "Brand, website, digitalisation." },
+    outcome: { de: "Kundenwerk · live", tr: "Müşteri işi · canlı", en: "Client work · live" },
     kind: "Kundenwerk",
     region: "CH",
     // Owner 29.08.2026: Kundenbild (Laptop-Szene mit echter nvswiss.ch-Oberfläche).
@@ -518,14 +528,14 @@ export const clientWorks: Work[] = [
   },
   {
     slug: "maqam",
-    sector: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret" },
+    sector: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret", en: "Online business · e-commerce" },
     year: null,
     name: "maqam",
-    what: { de: "Online-Business / E-Commerce.", tr: "Online iş / e-ticaret." },
+    what: { de: "Online-Business / E-Commerce.", tr: "Online iş / e-ticaret.", en: "Online business / e-commerce." },
     // Umfang, Region, Link — Owner 29.08.2026: Logo + Kundenbild geliefert.
     // Leistungen (Case-Card) fehlen noch — nichts erfinden.
     built: null,
-    outcome: { de: "Kundenwerk", tr: "Müşteri işi" },
+    outcome: { de: "Kundenwerk", tr: "Müşteri işi", en: "Client work" },
     kind: "Kundenwerk",
     region: null,
     // Owner 29.08.2026: Kundenbild (Boutique-Laptop, echte maqam-Oberfläche).
@@ -538,16 +548,17 @@ export const clientWorks: Work[] = [
   },
   {
     slug: "bir-damla-hayir",
-    sector: { de: "Nonprofit · Hilfe", tr: "Sivil toplum · yardım" },
+    sector: { de: "Nonprofit · Hilfe", tr: "Sivil toplum · yardım", en: "Non-profit · aid" },
     year: null,
     name: "Bir Damla Hayır",
     what: {
       de: "Hilfsorganisation — Marke und Website.",
       tr: "Yardım kuruluşu — marka ve web sitesi.",
+      en: "Aid organisation — brand and website.",
     },
     // Leistungen (Case-Card) fehlen noch — nichts erfinden.
     built: null,
-    outcome: { de: "Kundenwerk", tr: "Müşteri işi" },
+    outcome: { de: "Kundenwerk", tr: "Müşteri işi", en: "Client work" },
     kind: "Kundenwerk",
     region: "DE",
     // Owner 29.08.2026: Kundenbild (Laptop-Szene mit echter Oberfläche).
@@ -662,8 +673,16 @@ export const featuredWorks: Work[] = featuredWorkSlugs
  * ins Repo kommt — der Compiler verlangt beide Sprachen.
  * ========================================================================== */
 
-/** Ein Text in beiden Sprachen. Fehlt eine, meckert der Compiler. */
-export type Localized = { de: string; tr: string }
+/**
+ * Ein Text in JEDER gepflegten Sprache. Fehlt eine, meckert der Compiler.
+ *
+ * Bis Gate 3 stand hier `{ de: string; tr: string }` — die Zweisprachigkeit
+ * war in den Typ getippt. Jetzt folgt der Typ der Sprachliste: Wer `Locale`
+ * erweitert, bekommt vom Compiler jede Stelle genannt, an der noch eine
+ * Uebersetzung fehlt. Das ist die einzige Art, eine Sprache vollstaendig
+ * einzufuehren, ohne sie zu suchen.
+ */
+export type Localized = Record<Locale, string>
 
 /**
  * Die acht Kapitel eines Falls, in Leserichtung (KIZILELMA §10.4).
@@ -782,13 +801,14 @@ export const caseStudies: CaseStudy[] = [
   {
     slug: "nv-swiss",
     client: "NV SWISS",
-    context: { de: "Versicherung & Finanzen · Schweiz", tr: "Sigorta & finans · İsviçre" },
+    context: { de: "Versicherung & Finanzen · Schweiz", tr: "Sigorta & finans · İsviçre", en: "Insurance & finance · Switzerland" },
     card: {
       project: "NV SWISS",
-      category: { de: "Versicherung & Finanzen · Schweiz", tr: "Sigorta & finans · İsviçre" },
+      category: { de: "Versicherung & Finanzen · Schweiz", tr: "Sigorta & finans · İsviçre", en: "Insurance & finance · Switzerland" },
       services: {
         de: "Marke, Website, Digitalisierung.",
         tr: "Marka, web sitesi, dijitalleşme.",
+        en: "Brand, website, digitalisation.",
       },
     },
     chapters: { ...emptyChapters },
@@ -801,10 +821,10 @@ export const caseStudies: CaseStudy[] = [
   {
     slug: "maqam",
     client: "maqam",
-    context: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret" },
+    context: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret", en: "Online business · e-commerce" },
     card: {
       project: "maqam",
-      category: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret" },
+      category: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret", en: "Online business · e-commerce" },
       services: null,
     },
     chapters: { ...emptyChapters },
@@ -817,10 +837,10 @@ export const caseStudies: CaseStudy[] = [
   {
     slug: "bir-damla-hayir",
     client: "Bir Damla Hayır",
-    context: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya" },
+    context: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya", en: "Non-profit · aid · Germany" },
     card: {
       project: "Bir Damla Hayır",
-      category: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya" },
+      category: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya", en: "Non-profit · aid · Germany" },
       services: null,
     },
     chapters: { ...emptyChapters },
@@ -1018,8 +1038,9 @@ export const furtherProjects: {
     what: {
       de: "Operations-System für Handwerksbetriebe",
       tr: "Zanaat işletmeleri için operasyon sistemi",
+      en: "An operations system for trade businesses",
     },
-    kind: { de: "Dienstleistung", tr: "Hizmet" },
+    kind: { de: "Dienstleistung", tr: "Hizmet", en: "Service" },
   },
 ]
 
@@ -1383,6 +1404,7 @@ export const retainer = {
   description: {
     de: "Nach dem Livegang bleibt die Seite in Betrieb — und wir bleiben ansprechbar. Kein Paket, das etwas verwaltet, sondern der Mensch, der sie gebaut hat.",
     tr: "Yayına aldıktan sonra site işlemeye devam eder — ve biz ulaşılabilir kalırız. Bir şeyi yöneten bir paket değil, siteyi kuran kişinin kendisi.",
+    en: "After launch the site stays in operation — and we stay reachable. Not a package that administers something, but the person who built it.",
   } as Localized | null,
   /** Einzelne Leistungen, in beiden Sprachen. */
   includes: {
@@ -1403,7 +1425,14 @@ export const retainer = {
       "Her değişiklikte erişilebilirlik geçişi, yılda bir kez elle",
       "Bir sonraki iş günü geri arama",
     ],
-  } as { de: string[]; tr: string[] } | null,
+    en: [
+      "Hosting and security updates",
+      "Up to 2 content changes per month",
+      "Keeping the Google Business Profile current",
+      "An accessibility pass on every change, once a year by hand",
+      "A call back the next working day",
+    ],
+  } as Record<Locale, string[]> | null,
 }
 
 export const retainerPublished = Boolean(retainer.price && retainer.description)
