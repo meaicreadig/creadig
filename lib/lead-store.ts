@@ -2,6 +2,8 @@ import nodeFs from "node:fs"
 import nodeOs from "node:os"
 import nodePath from "node:path"
 import { raiseAlert } from "@/lib/alert"
+import { createNeonStore } from "@/lib/lead-store-neon"
+import type { Locale } from "@/lib/dictionary"
 
 /**
  * MP-G · Der Lead-Speicher — Modell, Schnittstelle, Ausfallverhalten.
@@ -93,7 +95,7 @@ export type LeadRecord = {
    */
   submissionKey: string | null
   source: string
-  locale: "de" | "tr"
+  locale: Locale
   name: string
   email: string
   phone: string
@@ -120,7 +122,7 @@ export type LeadListQuery = {
   search?: string
   status?: SalesStatus
   source?: string
-  locale?: "de" | "tr"
+  locale?: Locale
   limit?: number
   offset?: number
 }
@@ -353,9 +355,50 @@ const fileStore: LeadStore = {
  * `null` heisst: kein Speicher konfiguriert — die Route verhält sich wie vor
  * MP-G. Das ist ein gültiger Zustand, kein Fehler.
  */
+/**
+ * Der Produktions-Adapter wird EINMAL gebaut, nicht je Anfrage.
+ *
+ * `neon()` haelt eine Konfiguration, keine offene Verbindung — trotzdem
+ * waere ein Neuaufbau pro Aufruf verschwendete Arbeit in einem Pfad, der
+ * bei jedem Seitenaufruf des Control Centers laeuft.
+ */
+let neonStore: LeadStore | null = null
+
 export function getLeadStore(): LeadStore | null {
   const kind = process.env.LEAD_STORE?.trim()
   if (!kind) return null
+
+  if (kind === "neon") {
+    const url = process.env.DATABASE_URL?.trim()
+    if (!url) {
+      /*
+       * GATE 4 — LAUT SCHEITERN, NICHT LEISE ZURUECKFALLEN.
+       *
+       * `LEAD_STORE=neon` ohne `DATABASE_URL` ist eine Fehlkonfiguration,
+       * kein gueltiger Zustand. Der Adapter gibt `null` zurueck; die Route
+       * verhaelt sich dann wie vor MP-G (Mail, kein Speicher) und der Alarm
+       * geht raus.
+       *
+       * Was hier NICHT passiert: ein Rueckfall auf Arbeitsspeicher oder
+       * Datei. Ein Produktivsystem, das lautlos in einen Adapter faellt, der
+       * beim naechsten Kaltstart alles vergisst, verliert Anfragen und sagt
+       * es niemandem.
+       */
+      warnOnce(
+        "lead-store-neon-without-url",
+        "LEAD_STORE=neon, aber DATABASE_URL fehlt — der Speicher gilt als nicht erreichbar.",
+      )
+      /*
+       * NICHT `null`: Der Speicher IST eingerichtet, er hat nur keine
+       * Adresse. Ein Adapter, der bei jedem Zugriff wirft, sagt genau das —
+       * die Liste meldet "nicht erreichbar", der Schreibweg alarmiert.
+       */
+      if (!neonStore) neonStore = createNeonStore("")
+      return neonStore
+    }
+    if (!neonStore) neonStore = createNeonStore(url)
+    return neonStore
+  }
 
   if (kind === "memory" || kind === "file") {
     if (process.env.NODE_ENV === "production") {

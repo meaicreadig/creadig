@@ -3,6 +3,7 @@
 > **Authority:** Spec · Gate 3 · Stand 30.08.2026
 > **Zweck:** Die Persistenz-Frage auf **eine** Owner-Entscheidung reduzieren.
 > **Status:** nichts provisioniert, nichts aktiviert, `LEAD_STORE` leer.
+> **Gate 4:** Datenschutztext ist im Code an den Speicherzustand gebunden (§23) — die Aktivierung zieht ihn automatisch mit.
 >
 > Belege und Quellen je Einzelfrage: `docs/ops/provider-neon.md`.
 > Der Textbaustein und die Reihenfolge: `docs/ops/privacy-persistence-gate.md`.
@@ -37,8 +38,8 @@ Ich bin keine Rechtsberatung. Wo etwas unsicher ist, steht das da.
 | 8 | Was bleibt nach dem Löschen? | **WAL/History-Fenster**: Free 6 h · Launch 7 Tage · Scale 30 Tage. Bis zum Ablauf ist die Zeile über PITR rekonstruierbar. | VERIFIED · Vollständigkeit ggü. Art. 17 = **LEGAL REVIEW** |
 | 9 | Kündigung? | Export ist Kundenpflicht **vor** Deaktivierung; danach Delete/Return laut DPA. | VERIFIED |
 | 10 | Env-Variablen? | `DATABASE_URL` (von der Integration gesetzt) + `LEAD_STORE=neon`. Nur Server. | TECHNISCH |
-| 11 | Welcher Satz wird falsch? | „Eine Datenbank führen wir nicht: Ihre Anfrage liegt ausschließlich in unserem E-Mail-Postfach." (`dictionary.ts`, DE **und** TR) | VERIFIED |
-| 12 | Ersatztext | DE + TR fertig in `privacy-persistence-gate.md`. **EN/AR: es gibt diese Sprachfassungen der Seite noch nicht** — der Absatz gehört in ihren Erstübersetzungsumfang, nicht als Nachtrag. | vorbereitet |
+| 11 | Welcher Satz wird falsch? | „Eine Datenbank führen wir nicht …" — in **allen vier** Sprachen (`dictionary.ts`) | VERIFIED |
+| 12 | Ersatztext | **Im Code, in allen vier Sprachen** als `legal.privacyPoints[].bodyStored`. Die Seite waehlt ihn ueber `leadStoreConfigured()` — Text und Speicher koennen nicht auseinanderlaufen. | **UMGESETZT** |
 | 13 | Aufbewahrung? | **Empfehlung unten** | TECHNISCH → OWNER |
 | 14 | Durchsetzung? | **Empfehlung unten** | TECHNISCH → OWNER |
 | 15 | Lead wird Kunde? | **Wichtig, siehe unten** | TECHNISCH → OWNER |
@@ -66,6 +67,36 @@ Warum nicht 24, wie in den früheren Notizen vorgeschlagen:
 **12 Monate ist eine Empfehlung, keine Rechtsauskunft.** Kürzer geht immer.
 
 ---
+
+## 13b · Was „letzter Kontakt" im Modell wirklich heisst
+
+**Das Modell kennt den letzten Kontakt nicht.** Es kennt zwei Zeitstempel:
+
+| Feld | Was es wirklich bedeutet |
+|---|---|
+| `created_at` | wann die Anfrage eingegangen ist — hart, unveränderlich |
+| `updated_at` | wann jemand den Datensatz zuletzt **angefasst** hat |
+
+`updated_at` ist ein **Näherungswert**, keine Messung. Es steigt, wenn der
+Status wechselt oder ein nächster Schritt gesetzt wird — also meist nach
+einem echten Kontakt, aber nicht zwingend. Und es steigt **nicht**, wenn
+telefoniert wurde und niemand es eingetragen hat.
+
+**Erfunden wird nichts.** Es gibt kein Feld `last_contact_at`, und es wird
+auch keines eingeführt, das in Wahrheit dasselbe wäre wie `updated_at` — ein
+Feld mit einem ehrlicheren Namen und demselben Inhalt ist eine Lüge mit
+besserer Beschriftung.
+
+**Deshalb rechnet die Frist auf `updated_at`.** Die Abweichung geht
+konsequent in die sichere Richtung: Ein unbearbeiteter Lead hat
+`updated_at = created_at`, die Uhr läuft ab Eingang. Ein bearbeiteter Lead
+wird **später** gelöscht, nie früher. Das ist im Zweifel zu viel
+Aufbewahrung statt zu wenig — die falsche Richtung für Datenminimierung,
+aber die einzige, in der kein Datensatz verschwindet, den noch jemand
+braucht.
+
+Wenn die Kontakthistorie eines Tages wirklich geführt wird (G.6), rechnet die
+Frist auf sie. Bis dahin steht die Einschränkung hier und nicht im Kleingedruckten.
 
 ## 14 · Wie die Frist durchgesetzt wird
 

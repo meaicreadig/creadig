@@ -81,6 +81,7 @@ export default async function LeadsPage({
       title="Vertrieb"
       lead="Anfragen aus den Formularen der Website. Was hier steht, ist eingegangen — nicht geschätzt."
       meta={page ? <span className="block">{page.total} gesamt</span> : undefined}
+      salesAvailable={configured}
     >
       {!configured ? (
         <UnavailableNote title="Kein Lead-Speicher eingerichtet">

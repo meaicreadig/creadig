@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { SITE_URL } from "@/lib/routes"
+import { DEFAULT_LOCALE, SITE_URL, locales } from "@/lib/routes"
 import { raiseAlert } from "@/lib/alert"
 import {
   bucketKey,
@@ -629,7 +629,24 @@ export async function POST(request: Request) {
   const phone = asText(payload.phone, LIMITS.phone)
   const message = asText(payload.message, LIMITS.message)
   const source = asText(payload.source, LIMITS.source) || "kontakt"
-  const locale: Locale = payload.locale === "tr" ? "tr" : "de"
+  /*
+   * GATE 4 — die Sprache der Anfrage folgt der Sprachliste.
+   *
+   * Hier stand `payload.locale === "tr" ? "tr" : "de"`. Bei zwei Sprachen
+   * war das richtig; seit vier ist es ein stiller Datenfehler: Eine Anfrage
+   * von `/ar/kontakt` wurde als DEUTSCH gespeichert. Nachgemessen am
+   * 30.08.2026 — abgeschickt mit `locale: "ar"`, in der Ablage stand "de".
+   *
+   * Das ist nicht kosmetisch. Die Sprache entscheidet, in welcher Sprache
+   * zurueckgeschrieben wird, und im Control Center steht sie als Tatsache
+   * neben der Anfrage. Eine falsche Tatsache ist schlimmer als eine fehlende.
+   *
+   * Jetzt wird gegen `locales` geprueft; Unbekanntes faellt auf die
+   * Default-Sprache zurueck, statt geraten zu werden.
+   */
+  const locale: Locale = (locales as readonly string[]).includes(payload.locale as string)
+    ? (payload.locale as Locale)
+    : DEFAULT_LOCALE
   /*
    * BF-A8 — der Kurz-Check ist derselbe Weg mit einem Feld mehr und einem
    * Feld weniger: Die Adresse ist Pflicht, die freie Nachricht nicht. Wer

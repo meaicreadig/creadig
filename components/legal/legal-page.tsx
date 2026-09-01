@@ -21,7 +21,19 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
  * Pflichtfelder vollständig sind. Bis dahin benennen die Seiten den offenen
  * Punkt ehrlich, statt etwas zu behaupten.
  */
-export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
+export function LegalPage({
+  kind,
+  /*
+   * Ob ein Lead-Speicher scharf ist. Kommt vom SERVER — diese Komponente
+   * laeuft im Browser und darf `process.env` nicht sehen. Der Wert ist
+   * keine Einstellung, sondern eine Messung: `leadStoreConfigured()` in
+   * `app/_routes/legal.tsx`.
+   */
+  storesLeads,
+}: {
+  kind: "imprint" | "privacy"
+  storesLeads: boolean
+}) {
   const { t } = useLocale()
   const title = kind === "imprint" ? t.legal.imprintTitle : t.legal.privacyTitle
 
@@ -173,11 +185,31 @@ export function LegalPage({ kind }: { kind: "imprint" | "privacy" }) {
               {t.legal.privacyIntro}
             </p>
 
+            {/*
+              GATE 4 — der Datenschutztext folgt dem SPEICHER, nicht einer Notiz.
+
+              Ein Absatz sagte bis zur Aktivierung der Lead-Persistenz die
+              Wahrheit: „Eine Datenbank führen wir nicht." In der Sekunde, in
+              der `LEAD_STORE` auf einen echten Anbieter zeigt, wird derselbe
+              Satz zu einer falschen Rechtsauskunft — und zwar an der Stelle,
+              an der Besucher ihre Einwilligung erteilen.
+
+              Zwei Fassungen in einer Datei und ein Kalendereintrag „Text
+              nachziehen" hätten dieselbe Lücke gelassen: Es gäbe einen
+              Zustand, in dem beides auseinanderläuft. Deshalb entscheidet
+              hier NICHT ein Redakteur, sondern `leadStoreConfigured()` —
+              dieselbe Funktion, die auch der Lead-Weg fragt, bevor er
+              schreibt.
+
+              Damit gibt es den gefährlichen Zwischenzustand nicht mehr:
+              Speicher an heisst Text an, im selben Deploy, ohne dass jemand
+              daran denken muss.
+            */}
             {t.legal.privacyPoints.map((point) => (
               <section key={point.title} className="border-line border-t pt-8">
                 <p className="eyebrow text-gold-text">{point.title}</p>
                 <p className="type-body text-muted-foreground mt-4 text-pretty">
-                  {point.body}
+                  {"bodyStored" in point && storesLeads ? point.bodyStored : point.body}
                 </p>
               </section>
             ))}

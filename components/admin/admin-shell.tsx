@@ -1,7 +1,6 @@
 import type { ReactNode } from "react"
 import { AdminLogout } from "@/components/admin/admin-logout"
 import { AdminNav, type NavItem } from "@/components/admin/admin-nav"
-import { leadStoreConfigured } from "@/lib/lead-store"
 
 /**
  * MP-G · G.1 — die Hülle des Control Centers.
@@ -35,12 +34,25 @@ import { leadStoreConfigured } from "@/lib/lead-store"
  *   Marketing  braucht Lesezugriff auf die Messwerte (heute nur schreibend)
  *   Kunden     braucht ein Kundenmodell (G.5)
  */
-function navItems(): NavItem[] {
+/*
+ * GATE 4 — die Huelle fragt den Speicher NICHT mehr selbst.
+ *
+ * Bis hierher rief `navItems()` `leadStoreConfigured()` auf. Das war
+ * bequem und hat eine Falle gestellt: `lead-store` importiert `node:fs`
+ * fuer den Entwicklungs-Adapter. Solange nur Server-Seiten die Huelle
+ * benutzten, fiel das nicht auf — die erste Client-Komponente
+ * (`app/(admin)/error.tsx`) hat den Build sofort gebrochen:
+ * „Reading from node:path is not handled".
+ *
+ * Jetzt reicht der Aufrufer die Antwort herein. Die Huelle bleibt damit
+ * frei von Server-Abhaengigkeiten und in beiden Welten benutzbar.
+ */
+function navItems(salesAvailable: boolean): NavItem[] {
   const items: NavItem[] = [
     { href: "/admin", label: "Heute", hint: "Was Aufmerksamkeit braucht" },
     { href: "/admin/material", label: "Materialstand", hint: "Was fehlt, und wer es liefert" },
   ]
-  if (leadStoreConfigured()) {
+  if (salesAvailable) {
     items.push({ href: "/admin/leads", label: "Vertrieb", hint: "Anfragen und nächste Schritte" })
   }
   return items
@@ -50,12 +62,19 @@ export function AdminShell({
   title,
   lead,
   meta,
+  /**
+   * Ob es einen Lead-Speicher gibt. Der Aufrufer misst das serverseitig
+   * (`leadStoreConfigured()`); Fehler- und Ladeseiten lassen es weg und
+   * zeigen die Navigation ohne Vertrieb.
+   */
+  salesAvailable = false,
   children,
 }: {
   title: string
   lead?: string
   /** Kurze Angabe rechts im Kopf — etwa der Stand der Daten. */
   meta?: ReactNode
+  salesAvailable?: boolean
   children: ReactNode
 }) {
   return (
@@ -78,7 +97,7 @@ export function AdminShell({
             <p className="text-subhead mt-1 text-base">Control Center</p>
           </div>
 
-          <AdminNav items={navItems()} />
+          <AdminNav items={navItems(salesAvailable)} />
 
           <div className="border-line mt-auto hidden border-t pt-5 lg:block">
             <AdminLogout />

@@ -2107,6 +2107,8 @@ export const dictionary = {
         {
           title: "Kontaktformular, Termin und Produkt-Nachfrage",
           body: "Wenn Sie eines unserer Formulare absenden, übermitteln wir Ihre Angaben — Name, Betrieb, E-Mail, Telefon und Ihre Nachricht — an unser Postfach info@creadig.de und schicken Ihnen eine Bestätigung. Für den Versand nutzen wir Resend (Resend Inc., USA) als Auftragsverarbeiter nach Art. 28 DSGVO, abgesichert über die EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Rechtsgrundlage ist Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO, die Sie vor dem Absenden ausdrücklich erteilen und jederzeit für die Zukunft widerrufen können. Eine Datenbank führen wir nicht: Ihre Anfrage liegt ausschließlich in unserem E-Mail-Postfach. Wählen Sie stattdessen den Weg über WhatsApp, gelten dafür die Bedingungen von Meta Platforms Ireland Ltd.",
+          bodyStored:
+            "Wenn Sie eines unserer Formulare absenden, übermitteln wir Ihre Angaben — Name, Betrieb, E-Mail, Telefon und Ihre Nachricht — an unser Postfach info@creadig.de und schicken Ihnen eine Bestätigung. Für den Versand nutzen wir Resend (Resend Inc., USA) als Auftragsverarbeiter nach Art. 28 DSGVO, abgesichert über die EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Rechtsgrundlage ist Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO, die Sie vor dem Absenden ausdrücklich erteilen und jederzeit für die Zukunft widerrufen können. Zusätzlich speichern wir Ihre Anfrage in einer Datenbank, damit wir sie zuverlässig bearbeiten und den Bearbeitungsstand nachvollziehen können. Betreiber dieser Datenbank ist Neon, LLC als Auftragsverarbeiter nach Art. 28 DSGVO; die Daten liegen in der Region Frankfurt (aws-eu-central-1). Kommt kein Vertrag zustande, löschen wir Ihre Anfrage 12 Monate nach dem letzten Kontakt. Wählen Sie stattdessen den Weg über WhatsApp, gelten dafür die Bedingungen von Meta Platforms Ireland Ltd.",
         },
         {
           title: "Wie lange wir etwas aufbewahren",
@@ -3549,6 +3551,8 @@ export const dictionary = {
         {
           title: "İletişim formu, randevu ve ürün talebi",
           body: "Formlarımızdan birini gönderdiğinizde bilgilerinizi — ad, işletme, e-posta, telefon ve mesajınız — info@creadig.de posta kutumuza iletiriz ve size bir onay göndeririz. Gönderim için GDPR Md. 28 uyarınca veri işleyenimiz olan Resend'i (Resend Inc., ABD) kullanırız; aktarım GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altındadır. Hukuki dayanak, göndermeden önce açıkça verdiğiniz ve geleceğe yönelik olarak istediğiniz zaman geri alabileceğiniz GDPR Md. 6/1-a onayınızdır. Veritabanı tutmuyoruz: talebiniz yalnızca e-posta kutumuzda bulunur. Bunun yerine WhatsApp yolunu seçerseniz Meta Platforms Ireland Ltd. koşulları geçerlidir.",
+          bodyStored:
+            "Formlarımızdan birini gönderdiğinizde bilgilerinizi — ad, işletme, e-posta, telefon ve mesajınız — info@creadig.de posta kutumuza iletiriz ve size bir onay göndeririz. Gönderim için GDPR Md. 28 uyarınca veri işleyenimiz olan Resend'i (Resend Inc., ABD) kullanırız; aktarım GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altındadır. Hukuki dayanak, göndermeden önce açıkça verdiğiniz ve geleceğe yönelik olarak istediğiniz zaman geri alabileceğiniz GDPR Md. 6/1-a onayınızdır. Ayrıca talebinizi bir veritabanında saklarız; böylece güvenilir biçimde işleyebilir ve hangi aşamada olduğunu takip edebiliriz. Bu veritabanını GDPR Md. 28 uyarınca veri işleyen sıfatıyla Neon, LLC işletir; veriler Frankfurt bölgesinde (aws-eu-central-1) tutulur. Sözleşme kurulmazsa talebinizi son temastan 12 ay sonra sileriz. Bunun yerine WhatsApp yolunu seçerseniz Meta Platforms Ireland Ltd. koşulları geçerlidir.",
         },
         {
           title: "Ne kadar süre saklıyoruz",
@@ -4971,6 +4975,8 @@ export const dictionary = {
         {
           title: "Contact form, appointments and product enquiries",
           body: "When you submit one of our forms, we transmit your details — name, business, email, phone and your message — to our inbox info@creadig.de and send you a confirmation. For delivery we use Resend (Resend Inc., USA) as a processor under Art. 28 GDPR, safeguarded by the EU standard contractual clauses under Art. 46(2)(c) GDPR. The legal basis is your consent under Art. 6(1)(a) GDPR, which you give explicitly before sending and can withdraw at any time with effect for the future. We do not keep a database: your enquiry sits solely in our email inbox. If you take the WhatsApp route instead, the terms of Meta Platforms Ireland Ltd. apply.",
+          bodyStored:
+            "When you submit one of our forms, we transmit your details — name, business, email, phone and your message — to our inbox info@creadig.de and send you a confirmation. For delivery we use Resend (Resend Inc., USA) as a processor under Art. 28 GDPR, safeguarded by the EU standard contractual clauses under Art. 46(2)(c) GDPR. The legal basis is your consent under Art. 6(1)(a) GDPR, which you give explicitly before sending and can withdraw at any time with effect for the future. We additionally store your enquiry in a database so that we can handle it reliably and trace its progress. That database is operated by Neon, LLC as a processor under Art. 28 GDPR; the data is held in the Frankfurt region (aws-eu-central-1). If no contract comes about, we delete your enquiry 12 months after the last contact. If you take the WhatsApp route instead, the terms of Meta Platforms Ireland Ltd. apply.",
         },
         {
           title: "How long we keep things",
@@ -6391,6 +6397,8 @@ export const dictionary = {
         {
           title: "نموذج التواصل والمواعيد واستفسارات المنتجات",
           body: "حين ترسلون أحد نماذجنا ننقل بياناتكم — الاسم والمنشأة والبريد والهاتف ورسالتكم — إلى بريدنا info@creadig.de ونرسل إليكم تأكيدًا. وللإرسال نستعمل Resend (Resend Inc.، الولايات المتحدة) كمعالج بالإنابة وفق المادة 28، بضمان الشروط التعاقدية النموذجية وفق المادة 46(2)(ج). والأساس القانوني هو موافقتكم وفق المادة 6(1)(أ)، التي تمنحونها صراحةً قبل الإرسال ويمكنكم سحبها في أي وقت بأثر مستقبلي. ونحن لا نحتفظ بقاعدة بيانات: طلبكم يوجد حصرًا في بريدنا الإلكتروني. وإن سلكتم طريق واتساب بدلًا من ذلك فتسري شروط Meta Platforms Ireland Ltd.",
+          bodyStored:
+            "حين ترسلون أحد نماذجنا ننقل بياناتكم — الاسم والمنشأة والبريد والهاتف ورسالتكم — إلى بريدنا info@creadig.de ونرسل إليكم تأكيدًا. وللإرسال نستعمل Resend (Resend Inc.، الولايات المتحدة) كمعالج بالإنابة وفق المادة 28، بضمان الشروط التعاقدية النموذجية وفق المادة 46(2)(ج). والأساس القانوني هو موافقتكم وفق المادة 6(1)(أ)، التي تمنحونها صراحةً قبل الإرسال ويمكنكم سحبها في أي وقت بأثر مستقبلي. ونحفظ طلبكم إضافةً إلى ذلك في قاعدة بيانات كي نتمكن من معالجته بموثوقية وتتبّع مرحلته. وتُشغّل قاعدة البيانات هذه شركة Neon, LLC كمعالج بالإنابة وفق المادة 28؛ والبيانات محفوظة في منطقة فرانكفورت (aws-eu-central-1). وإن لم يُبرَم عقد حذفنا طلبكم بعد 12 شهرًا من آخر تواصل. وإن سلكتم طريق واتساب بدلًا من ذلك فتسري شروط Meta Platforms Ireland Ltd.",
         },
         {
           title: "كم نحتفظ بالأشياء",

@@ -85,6 +85,7 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
 
   return (
     <AdminShell
+      salesAvailable
       title={lead.business ?? lead.name}
       lead={`Eingegangen über ${lead.source}.`}
       meta={

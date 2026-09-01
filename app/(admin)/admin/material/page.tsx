@@ -1,4 +1,5 @@
 import { AdminShell } from "@/components/admin/admin-shell"
+import { leadStoreConfigured } from "@/lib/lead-store"
 import { ITEM_GROUPS, collect } from "@/lib/material-status"
 
 /**
@@ -42,6 +43,7 @@ export default function ControlCenterHome() {
 
   return (
     <AdminShell
+      salesAvailable={leadStoreConfigured()}
       title="Materialstand"
       lead="Abgeleitet aus denselben Daten, aus denen die Website gebaut wird. Diese Ansicht ändert nichts und erfindet nichts — sie sagt, was leer ist."
       meta={

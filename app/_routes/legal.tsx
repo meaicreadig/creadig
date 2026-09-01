@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { LegalPage } from "@/components/legal/legal-page"
+import { leadStoreConfigured } from "@/lib/lead-store"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { pageMetadata } from "@/lib/page-metadata"
 
@@ -29,5 +30,10 @@ export function legalMetadata(kind: "imprint" | "privacy", locale: Locale): Meta
 }
 
 export function LegalRoute({ kind }: { kind: "imprint" | "privacy" }) {
-  return <LegalPage kind={kind} />
+  /*
+   * GATE 4 — hier wird die Datenschutz-Aussage an die Wirklichkeit gebunden.
+   * Serverseitig gemessen, als Prop hinuebergereicht; der Text kann damit
+   * nicht mehr von dem abweichen, was die Anwendung tatsaechlich tut.
+   */
+  return <LegalPage kind={kind} storesLeads={leadStoreConfigured()} />
 }
