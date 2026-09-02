@@ -359,8 +359,8 @@ export function createNeonStore(connectionString: string): LeadStore {
       await ensureSchema()
       const rows = (await sql.query(
         `UPDATE leads
-            SET sales_status = $2,
-                lost_reason  = CASE WHEN $2 = 'lost' THEN $3 ELSE NULL END,
+            SET sales_status = $2::text,
+                lost_reason  = CASE WHEN $2::text = 'lost' THEN $3::text ELSE NULL END,
                 updated_at   = now()
           WHERE id = $1
         RETURNING id`,
@@ -369,7 +369,26 @@ export function createNeonStore(connectionString: string): LeadStore {
       return rows.length > 0
     },
 
-    /** Ein Datum ohne Aufgabe ist keine Aufgabe — fällt der Text weg, fällt es mit. */
+    /**
+     * Ein Datum ohne Aufgabe ist keine Aufgabe — fällt der Text weg, fällt es mit.
+     *
+     * -----------------------------------------------------------------------
+     * WARUM `$2::text` UND NICHT NUR `$2`
+     * Ohne die Umwandlung bricht Postgres die Anweisung ab:
+     *   42P08 — could not determine data type of parameter $2
+     *
+     * Der Grund ist die Stelle, an der `$2` zuerst vorkommt: `CASE WHEN $2
+     * IS NULL`. `IS NULL` verrät nichts über den Typ — es passt auf jeden.
+     * Der Planer kommt damit zu keinem Schluss und lehnt ab, bevor er die
+     * zweite Verwendung (`next_action = $2`) überhaupt ansieht.
+     *
+     * `updateSalesStatus` hat dasselbe Muster und funktioniert trotzdem:
+     * dort steht `$2 = 'lost'`, und der Vergleich mit einem Text-Literal
+     * legt den Typ fest.
+     *
+     * Gefunden erst gegen die echte Datenbank — der Datei-Adapter ist
+     * JavaScript und kennt keine Typableitung eines SQL-Planers.
+     */
     async updateNextAction(
       id: string,
       action: string | null,
@@ -378,8 +397,8 @@ export function createNeonStore(connectionString: string): LeadStore {
       await ensureSchema()
       const rows = (await sql.query(
         `UPDATE leads
-            SET next_action    = $2,
-                next_action_at = CASE WHEN $2 IS NULL THEN NULL ELSE $3::date END,
+            SET next_action    = $2::text,
+                next_action_at = CASE WHEN $2::text IS NULL THEN NULL ELSE $3::date END,
                 updated_at     = now()
           WHERE id = $1
         RETURNING id`,
