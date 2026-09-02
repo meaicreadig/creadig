@@ -2113,6 +2113,8 @@ export const dictionary = {
         {
           title: "Wie lange wir etwas aufbewahren",
           body: "Server-Logs löschen wir nach 30 Tagen. Anfragen über unsere Formulare bewahren wir bis zu 6 Monate nach dem letzten Kontakt auf und löschen sie danach; kommt ein Vertrag zustande, gelten die handels- und steuerrechtlichen Aufbewahrungsfristen von 6 bzw. 10 Jahren (§ 257 HGB, § 147 AO). Ihre Einwilligungs-Entscheidung bleibt im lokalen Speicher Ihres Browsers, bis Sie sie ändern oder die Browserdaten löschen.",
+          bodyStored:
+            "Server-Logs löschen wir nach 30 Tagen. Anfragen über unsere Formulare bewahren wir bis zu 12 Monate nach dem letzten Kontakt auf und löschen sie danach; kommt ein Vertrag zustande, gelten die handels- und steuerrechtlichen Aufbewahrungsfristen von 6 bzw. 10 Jahren (§ 257 HGB, § 147 AO). Ihre Einwilligungs-Entscheidung bleibt im lokalen Speicher Ihres Browsers, bis Sie sie ändern oder die Browserdaten löschen.",
         },
         {
           title: "Schriften",
@@ -3557,6 +3559,8 @@ export const dictionary = {
         {
           title: "Ne kadar süre saklıyoruz",
           body: "Sunucu kayıtlarını 30 gün sonra sileriz. Formlar üzerinden gelen talepleri son temastan itibaren en fazla 6 ay saklar, ardından sileriz; bir sözleşme kurulursa ticaret ve vergi hukukundaki 6 ve 10 yıllık saklama süreleri geçerlidir (§ 257 HGB, § 147 AO). Onay kararınız, siz değiştirene ya da tarayıcı verilerini silene kadar tarayıcınızın yerel deposunda kalır.",
+          bodyStored:
+            "Sunucu kayıtlarını 30 gün sonra sileriz. Formlar üzerinden gelen talepleri son temastan itibaren en fazla 12 ay saklar, ardından sileriz; bir sözleşme kurulursa ticaret ve vergi hukukundaki 6 ve 10 yıllık saklama süreleri geçerlidir (§ 257 HGB, § 147 AO). Onay kararınız, siz değiştirene ya da tarayıcı verilerini silene kadar tarayıcınızın yerel deposunda kalır.",
         },
         {
           title: "Yazı tipleri",
@@ -4981,6 +4985,8 @@ export const dictionary = {
         {
           title: "How long we keep things",
           body: "We delete server logs after 30 days. Enquiries through our forms we keep for up to 6 months after the last contact and then delete them; if a contract comes about, the commercial and tax retention periods of 6 and 10 years respectively apply (§ 257 HGB, § 147 AO). Your consent decision stays in your browser's local storage until you change it or clear your browser data.",
+          bodyStored:
+            "We delete server logs after 30 days. Enquiries through our forms we keep for up to 12 months after the last contact and then delete them; if a contract comes about, the commercial and tax retention periods of 6 and 10 years respectively apply (§ 257 HGB, § 147 AO). Your consent decision stays in your browser's local storage until you change it or clear your browser data.",
         },
         {
           title: "Fonts",
@@ -6403,6 +6409,8 @@ export const dictionary = {
         {
           title: "كم نحتفظ بالأشياء",
           body: "نحذف سجلات الخادم بعد 30 يومًا. ونحتفظ بالطلبات الواردة عبر نماذجنا حتى 6 أشهر بعد آخر تواصل ثم نحذفها؛ وإن نشأ عقد سرت مدد الحفظ التجارية والضريبية البالغة 6 و10 سنوات على التوالي (المادة 257 HGB والمادة 147 AO). وقراركم بشأن الموافقة يبقى في التخزين المحلي لمتصفحكم حتى تغيّروه أو تمسحوا بيانات المتصفح.",
+          bodyStored:
+            "نحذف سجلات الخادم بعد 30 يومًا. ونحتفظ بالطلبات الواردة عبر نماذجنا حتى 12 شهرًا بعد آخر تواصل ثم نحذفها؛ وإن نشأ عقد سرت مدد الحفظ التجارية والضريبية البالغة 6 و10 سنوات على التوالي (المادة 257 HGB والمادة 147 AO). وقراركم بشأن الموافقة يبقى في التخزين المحلي لمتصفحكم حتى تغيّروه أو تمسحوا بيانات المتصفح.",
         },
         {
           title: "الخطوط",
