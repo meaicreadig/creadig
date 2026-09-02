@@ -907,6 +907,42 @@
 }
 
 /* ==========================================================================
+ * CONTROL CENTER — native Formular-Chrom abschalten.
+ *
+ * Tailwind `appearance-none` reicht auf Safari/macOS fuer `<select>` oft
+ * nicht: der System-Doppelpfeil und der Verlauf bleiben. Harte Vendor-
+ * Prefixe + `background-image: none` sind hier die Absicherung — Marke
+ * kommt weiter aus den Klassen am Element (Kante, Radius, Typo).
+ * ========================================================================== */
+
+[data-admin-control] {
+  font: inherit;
+  color: inherit;
+}
+
+select[data-admin-control] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none;
+}
+
+input[data-admin-control][type="search"]::-webkit-search-decoration,
+input[data-admin-control][type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[data-admin-control][type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator {
+  opacity: 0.9;
+}
+
+/* ==========================================================================
  * ELEVATION — drei Stufen, sonst nichts.
  *
  * Die Seite war flach: alles lag auf einer Ebene, zusammengehalten von

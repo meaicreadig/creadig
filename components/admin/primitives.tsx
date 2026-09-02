@@ -222,16 +222,8 @@ export function AdminInput({ className, type = "text", ...props }: ComponentProp
   return (
     <input
       type={type}
-      className={cn(
-        controlClass,
-        /* WebKit-Suche: dekorative Lupe und Cancel-Knopf ausblenden. */
-        type === "search" &&
-          "[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none",
-        /* Datum: Kalender-Indikator an die Kante anbinden, nicht systemblau. */
-        type === "date" &&
-          "[&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-55 hover:[&::-webkit-calendar-picker-indicator]:opacity-90",
-        className,
-      )}
+      data-admin-control={type === "date" || type === "search" ? type : "input"}
+      className={cn(controlClass, className)}
       {...props}
     />
   )
@@ -241,12 +233,8 @@ export function AdminSelect({ className, children, ...props }: ComponentProps<"s
   return (
     <div className="relative">
       <select
-        className={cn(
-          controlClass,
-          "appearance-none pe-9",
-          /* Optionen bleiben plattformgebunden — die geschlossene Fläche nicht. */
-          className,
-        )}
+        data-admin-control="select"
+        className={cn(controlClass, "appearance-none bg-background pe-9", className)}
         {...props}
       >
         {children}
