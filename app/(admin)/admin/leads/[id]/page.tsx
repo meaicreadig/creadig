@@ -4,6 +4,9 @@ import { notFound } from "next/navigation"
 import { updateNextAction, updateStatus } from "@/app/(admin)/admin/leads/[id]/actions"
 import { AdminShell } from "@/components/admin/admin-shell"
 import {
+  AdminField,
+  AdminInput,
+  AdminSelect,
   DataValue,
   Pill,
   SectionHeader,
@@ -138,37 +141,25 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
           <section aria-labelledby="status-titel" className="mt-10">
             <SectionHeader id="status-titel" title="Status" />
             <form action={updateStatus.bind(null, lead.id)} className="mt-4 flex flex-wrap items-end gap-4">
-              <div>
-                <label htmlFor="status" className="text-meta text-muted-foreground block">
-                  Vertriebsstatus
-                </label>
-                <select
-                  id="status"
-                  name="status"
-                  defaultValue={lead.salesStatus}
-                  className="border-line bg-background mt-1.5 rounded-sm border px-3 py-2 text-sm"
-                >
+              <AdminField label="Vertriebsstatus" htmlFor="status">
+                <AdminSelect id="status" name="status" defaultValue={lead.salesStatus}>
                   {SALES_STATES.map((state) => (
                     <option key={state} value={state}>
                       {SALES_LABELS_DE[state]}
                     </option>
                   ))}
-                </select>
-              </div>
+                </AdminSelect>
+              </AdminField>
 
-              <div className="min-w-0 flex-1 basis-64">
-                <label htmlFor="lostReason" className="text-meta text-muted-foreground block">
-                  Grund — nur bei „Verloren“
-                </label>
-                <input
+              <AdminField label="Grund — nur bei „Verloren“" htmlFor="lostReason" className="flex-1 basis-64">
+                <AdminInput
                   id="lostReason"
                   name="lostReason"
                   type="text"
                   defaultValue={lead.lostReason ?? ""}
                   placeholder="frei formuliert"
-                  className="border-line bg-background mt-1.5 w-full rounded-sm border px-3 py-2 text-sm"
                 />
-              </div>
+              </AdminField>
 
               <button type="submit" className="cta-quiet px-4 py-2 text-sm">
                 Status speichern
@@ -187,32 +178,24 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
               action={updateNextAction.bind(null, lead.id)}
               className="mt-4 flex flex-wrap items-end gap-4"
             >
-              <div className="min-w-0 flex-1 basis-64">
-                <label htmlFor="nextAction" className="text-meta text-muted-foreground block">
-                  Was passiert als Nächstes
-                </label>
-                <input
+              <AdminField label="Was passiert als Nächstes" htmlFor="nextAction" className="flex-1 basis-64">
+                <AdminInput
                   id="nextAction"
                   name="nextAction"
                   type="text"
                   defaultValue={lead.nextAction ?? ""}
                   placeholder="z. B. Rückruf mit Terminvorschlag"
-                  className="border-line bg-background mt-1.5 w-full rounded-sm border px-3 py-2 text-sm"
                 />
-              </div>
+              </AdminField>
 
-              <div>
-                <label htmlFor="nextActionAt" className="text-meta text-muted-foreground block">
-                  Bis wann
-                </label>
-                <input
+              <AdminField label="Bis wann" htmlFor="nextActionAt">
+                <AdminInput
                   id="nextActionAt"
                   name="nextActionAt"
                   type="date"
                   defaultValue={lead.nextActionAt?.slice(0, 10) ?? ""}
-                  className="border-line bg-background mt-1.5 rounded-sm border px-3 py-2 text-sm"
                 />
-              </div>
+              </AdminField>
 
               <button type="submit" className="cta-quiet px-4 py-2 text-sm">
                 Schritt speichern

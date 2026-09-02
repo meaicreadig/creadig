@@ -1,4 +1,6 @@
-import type { ReactNode } from "react"
+import type { ComponentProps, ReactNode } from "react"
+
+import { cn } from "@/lib/utils"
 
 /**
  * Control Center — gemeinsame Bausteine.
@@ -30,6 +32,12 @@ import type { ReactNode } from "react"
  * trägt die Farbe. Eine gefüllte Plakette neben einem Umriss-Knopf wäre ein
  * zweiter Dialekt in derselben Oberfläche — also tragen auch hier Kante und
  * Schrift die Bedeutung.
+ *
+ * ---------------------------------------------------------------------------
+ * FORMULAR-CONTROLS
+ * Browser liefern Select, Date und Search mit eigener Chromium-/Safari-/
+ * Firefox-Optik. Hier steht EIN Dialekt: Haarlinie, Token, Fokus über das
+ * globale `:focus-visible` (kein `outline-none`), native Semantik bleibt.
  */
 
 /* ------------------------------------------------------------------------ */
@@ -166,6 +174,91 @@ export function UnavailableNote({
     <div className="border-line bg-muted/40 rounded-md border border-dashed p-5">
       <p className="text-subhead text-sm">{title}</p>
       <p className="type-small text-muted-foreground mt-2 max-w-2xl text-pretty">{children}</p>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------------ */
+/* Formular — ein Dialekt für Safari, Chrome und Firefox                     */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Gemeinsame Kante für Text, Suche, Datum und Select.
+ *
+ * Bewusst kein `outline-none`: Die globale `:focus-visible`-Regel in
+ * `globals.css` (Gold-Umriss) gilt auch hier — sonst entstünde ein zweiter
+ * Fokusstil neben dem Rest der Oberfläche.
+ */
+const controlClass =
+  "w-full min-w-0 rounded-sm border border-line bg-background px-3 py-2 text-sm text-foreground " +
+  "placeholder:text-muted-foreground " +
+  "transition-colors duration-[var(--dur-1)] " +
+  "focus-visible:border-gold " +
+  "disabled:cursor-not-allowed disabled:opacity-60 " +
+  "aria-invalid:border-destructive"
+
+export function AdminField({
+  label,
+  htmlFor,
+  children,
+  className,
+}: {
+  label: string
+  htmlFor: string
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <div className={cn("min-w-0", className)}>
+      <label htmlFor={htmlFor} className="text-meta text-muted-foreground block">
+        {label}
+      </label>
+      <div className="mt-1.5">{children}</div>
+    </div>
+  )
+}
+
+export function AdminInput({ className, type = "text", ...props }: ComponentProps<"input">) {
+  return (
+    <input
+      type={type}
+      className={cn(
+        controlClass,
+        /* WebKit-Suche: dekorative Lupe und Cancel-Knopf ausblenden. */
+        type === "search" &&
+          "[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none",
+        /* Datum: Kalender-Indikator an die Kante anbinden, nicht systemblau. */
+        type === "date" &&
+          "[&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-55 hover:[&::-webkit-calendar-picker-indicator]:opacity-90",
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+
+export function AdminSelect({ className, children, ...props }: ComponentProps<"select">) {
+  return (
+    <div className="relative">
+      <select
+        className={cn(
+          controlClass,
+          "appearance-none pe-9",
+          /* Optionen bleiben plattformgebunden — die geschlossene Fläche nicht. */
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </select>
+      <span
+        aria-hidden
+        className="text-muted-foreground pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2"
+      >
+        <svg viewBox="0 0 16 16" fill="none" className="size-4" stroke="currentColor" strokeWidth="1.5">
+          <path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
     </div>
   )
 }

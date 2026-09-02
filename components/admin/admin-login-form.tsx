@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 
+import { AdminField, AdminInput } from "@/components/admin/primitives"
+
 /**
  * Anmeldeformular.
  *
@@ -53,9 +55,9 @@ export function AdminLoginForm() {
         }
       }}
     >
-      <label className="flex flex-col gap-2">
-        <span className="eyebrow text-muted-foreground">Passwort</span>
-        <input
+      <AdminField label="Passwort" htmlFor="password">
+        <AdminInput
+          id="password"
           type="password"
           name="password"
           autoComplete="current-password"
@@ -67,9 +69,8 @@ export function AdminLoginForm() {
             setError(null)
           }}
           aria-invalid={error ? true : undefined}
-          className="border-line-strong text-foreground focus:border-gold w-full rounded-none border-0 border-b bg-transparent px-0 py-3 text-base outline-none transition-colors duration-[var(--dur-1)]"
         />
-      </label>
+      </AdminField>
 
       {error && (
         <p role="alert" className="border-destructive/40 text-destructive border-s-2 py-1 ps-4 text-sm">

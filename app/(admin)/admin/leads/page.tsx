@@ -1,6 +1,12 @@
 import { AdminShell } from "@/components/admin/admin-shell"
 import { LeadsTable } from "@/components/admin/leads-table"
-import { SectionHeader, UnavailableNote } from "@/components/admin/primitives"
+import {
+  AdminField,
+  AdminInput,
+  AdminSelect,
+  SectionHeader,
+  UnavailableNote,
+} from "@/components/admin/primitives"
 import {
   SALES_LABELS_DE,
   SALES_STATES,
@@ -101,38 +107,26 @@ export default async function LeadsPage({
       ) : (
         <>
           <form method="get" className="flex flex-wrap items-end gap-4">
-            <div className="min-w-0 flex-1 basis-64">
-              <label htmlFor="q" className="text-meta text-muted-foreground block">
-                Suche
-              </label>
-              <input
+            <AdminField label="Suche" htmlFor="q" className="flex-1 basis-64">
+              <AdminInput
                 id="q"
                 name="q"
                 type="search"
                 defaultValue={search}
                 placeholder="Nummer, Name, Betrieb, E-Mail"
-                className="border-line bg-background mt-1.5 w-full rounded-sm border px-3 py-2 text-sm"
               />
-            </div>
+            </AdminField>
 
-            <div>
-              <label htmlFor="status" className="text-meta text-muted-foreground block">
-                Status
-              </label>
-              <select
-                id="status"
-                name="status"
-                defaultValue={status ?? ""}
-                className="border-line bg-background mt-1.5 rounded-sm border px-3 py-2 text-sm"
-              >
+            <AdminField label="Status" htmlFor="status">
+              <AdminSelect id="status" name="status" defaultValue={status ?? ""}>
                 <option value="">alle</option>
                 {SALES_STATES.map((state) => (
                   <option key={state} value={state}>
                     {SALES_LABELS_DE[state]}
                   </option>
                 ))}
-              </select>
-            </div>
+              </AdminSelect>
+            </AdminField>
 
             <button type="submit" className="cta-quiet px-4 py-2 text-sm">
               Anwenden
