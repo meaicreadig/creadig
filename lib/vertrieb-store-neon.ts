@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto"
 
 import type { SalesStatus } from "@/lib/lead-store"
-import { sqlLeadOperational } from "@/lib/vertrieb-bestand"
+import { isTestEnquiry, sqlLeadOperational } from "@/lib/vertrieb-bestand"
 import { SALES_LABELS_DE, TERMINAL_STATES } from "@/lib/lead-store"
 import { neonClient, type Sql } from "@/lib/neon-client"
 import type {
@@ -267,8 +267,12 @@ const live = (alias: string, include: boolean | undefined): string =>
   include ? "" : `${alias}.excluded_reason IS NULL`
 
 export function createNeonVertrieb(connectionString: string): VertriebStore {
-  const client: { sql: Sql; ready: () => Promise<void> } = neonClient(connectionString)
-  const { sql, ready } = client
+  const client: {
+    sql: Sql
+    ready: () => Promise<void>
+    refreshExclusions: () => Promise<void>
+  } = neonClient(connectionString)
+  const { sql, ready, refreshExclusions } = client
 
   /** Chronik-Eintrag. Immer im selben Aufruf wie die Änderung. */
   async function note(
@@ -378,7 +382,7 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
      * Oberflaeche "Verkaufschance vorhanden" und nicht "gehoert zu".
      */
     async listEnquiries(query) {
-      await ready()
+      await refreshExclusions()
       const where: string[] = [sqlLeadOperational("l", query.includeExcluded)]
       const params: unknown[] = []
 
@@ -414,7 +418,13 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
         [...params, limit, offset],
       )) as EnqRowDb[]
 
-      return { rows: rows.map(toEnquiry), total: counted[0]?.total ?? 0 }
+      const mapped = rows.map(toEnquiry)
+      /* JS-Netz: dieselbe Regel wie SQL — Preview 03.09. zeigte Testzeilen trotz Filter. */
+      const visible = query.includeExcluded ? mapped : mapped.filter((row) => !isTestEnquiry(row))
+      const total = query.includeExcluded
+        ? (counted[0]?.total ?? 0)
+        : Math.max(0, (counted[0]?.total ?? 0) - (mapped.length - visible.length))
+      return { rows: visible, total }
     },
 
     async getEnquiry(id: string) {

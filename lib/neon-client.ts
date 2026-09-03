@@ -3,6 +3,7 @@ import { neon, type NeonQueryFunction } from "@neondatabase/serverless"
 import {
   AUSGESCHLOSSENE_MAIL_ENDUNG,
   AUSGESCHLOSSENE_NAMEN,
+  AUSGESCHLOSSENE_REFERENZEN,
   BESTAND_KONTAKTE,
   BESTAND_ORGANISATIONEN,
 } from "@/lib/vertrieb-bestand"
@@ -529,6 +530,14 @@ async function applyExclusions(sql: Sql): Promise<void> {
     )
   }
 
+  if (AUSGESCHLOSSENE_REFERENZEN.length > 0) {
+    await sql.query(
+      `UPDATE leads SET excluded_reason = $1::text
+        WHERE excluded_reason IS NULL AND reference = ANY($2::text[])`,
+      [EXCLUSION_TESTDATA, AUSGESCHLOSSENE_REFERENZEN],
+    )
+  }
+
   const like = `%${AUSGESCHLOSSENE_MAIL_ENDUNG}`
   const mailReason = `Abnahmedatensatz — ${AUSGESCHLOSSENE_MAIL_ENDUNG} ist für Tests reserviert`
   await sql.query(
@@ -543,25 +552,29 @@ async function applyExclusions(sql: Sql): Promise<void> {
   )
 
   /*
-   * V11-Abnahme-Fixtures: Prefix, nicht exakter Name.
-   *
-   * Die vier Preview-Läufe erzeugen denselben Betriebstitel mit laufender
-   * Nummer oder ohne. Ein exakter Listen-Eintrag trifft sie nicht alle;
-   * `%Yilmaz%` wäre zu weit. Der Prefix „V11 Abnahme" ist Owner-/Test-
-   * Konvention und trifft keinen realen Bestandskunden.
+   * Abnahme-Fixtures per Prefix (V11 / Gate4 / Runde2).
+   * Exakte Listen treffen Varianten (AR/EN/…) nicht immer; Prefix schon.
+   * Kein `%Yilmaz%` — das träfe echte Prospects.
    */
-  await sql.query(
-    `UPDATE leads SET excluded_reason = $1::text
-      WHERE excluded_reason IS NULL
-        AND (lower(btrim(coalesce(business, ''))) LIKE 'v11 abnahme%'
-          OR lower(btrim(name)) LIKE 'v11 abnahme%')`,
-    [EXCLUSION_TESTDATA],
-  )
-  await sql.query(
-    `UPDATE organisations SET excluded_reason = $1::text, updated_at = now()
-      WHERE excluded_reason IS NULL AND lower(btrim(name)) LIKE 'v11 abnahme%'`,
-    [EXCLUSION_TESTDATA],
-  )
+  for (const prefix of ["v11 abnahme%", "gate4%", "runde2%"] as const) {
+    await sql.query(
+      `UPDATE leads SET excluded_reason = $1::text
+        WHERE excluded_reason IS NULL
+          AND (lower(btrim(coalesce(business, ''))) LIKE $2::text
+            OR lower(btrim(name)) LIKE $2::text)`,
+      [EXCLUSION_TESTDATA, prefix],
+    )
+    await sql.query(
+      `UPDATE organisations SET excluded_reason = $1::text, updated_at = now()
+        WHERE excluded_reason IS NULL AND lower(btrim(name)) LIKE $2::text`,
+      [EXCLUSION_TESTDATA, prefix],
+    )
+    await sql.query(
+      `UPDATE contacts SET excluded_reason = $1::text, updated_at = now()
+        WHERE excluded_reason IS NULL AND lower(btrim(name)) LIKE $2::text`,
+      [EXCLUSION_TESTDATA, prefix],
+    )
+  }
 
   /*
    * Vorgänge erben den Ausschluss ihrer Herkunft.
@@ -590,7 +603,7 @@ async function applyExclusions(sql: Sql): Promise<void> {
   )
 }
 
-const clients = new Map<string, { sql: Sql; ready: () => Promise<void> }>()
+const clients = new Map<string, { sql: Sql; ready: () => Promise<void>; refreshExclusions: () => Promise<void> }>()
 
 /**
  * Ein Client je Verbindungszeichenfolge, ein Schema-Lauf je Prozess.
@@ -599,7 +612,11 @@ const clients = new Map<string, { sql: Sql; ready: () => Promise<void> }>()
  * schlägt auch die Abfrage fehl, die darauf wartet — und der Lesepfad meldet
  * „nicht erreichbar" statt „keine Daten".
  */
-export function neonClient(connectionString: string): { sql: Sql; ready: () => Promise<void> } {
+export function neonClient(connectionString: string): {
+  sql: Sql
+  ready: () => Promise<void>
+  refreshExclusions: () => Promise<void>
+} {
   const cached = clients.get(connectionString)
   if (cached) return cached
 
@@ -621,7 +638,12 @@ export function neonClient(connectionString: string): { sql: Sql; ready: () => P
     return promise
   }
 
-  const entry = { sql, ready }
+  const refreshExclusions = async (): Promise<void> => {
+    await ready()
+    await applyExclusions(sql)
+  }
+
+  const entry = { sql, ready, refreshExclusions }
   clients.set(connectionString, entry)
   return entry
 }

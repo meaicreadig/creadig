@@ -387,9 +387,14 @@ export const AUSGESCHLOSSENE_NAMEN: { name: string; reason: string }[] = [
   { name: "Runde2 Testbetrieb", reason: EXCLUSION_TESTDATA },
   { name: "Gate4 Runde2", reason: EXCLUSION_TESTDATA },
   { name: "Gate4 Testbetrieb", reason: EXCLUSION_TESTDATA },
+  { name: "Gate4 Abnahme", reason: EXCLUSION_TESTDATA },
   { name: "Yilmaz Dachtechnik", reason: EXCLUSION_TESTDATA },
   { name: "Deniz Yilmaz", reason: EXCLUSION_TESTDATA },
   { name: "V11 Abnahme Betrieb", reason: EXCLUSION_TESTDATA },
+  { name: "V11 Abnahme AR", reason: EXCLUSION_TESTDATA },
+  { name: "V11 Abnahme EN", reason: EXCLUSION_TESTDATA },
+  { name: "V11 Abnahme TR", reason: EXCLUSION_TESTDATA },
+  { name: "V11 Abnahme DE", reason: EXCLUSION_TESTDATA },
 
   /* Echte Menschen mit echten Anliegen — nur nicht im creaDIG-Vertrieb.
      Sie als „Testdaten" zu führen wäre bequem und unwahr. */
@@ -398,17 +403,37 @@ export const AUSGESCHLOSSENE_NAMEN: { name: string; reason: string }[] = [
   { name: "LEG / Hausverwaltung Aurich", reason: EXCLUSION_OTHER_CONTEXT },
 ]
 
+/**
+ * Gemessene Abnahme-Nummern (Preview 03.09.2026) — exakt, kein Muster.
+ * Wenn Name/Betrieb einmal abweichen, bleibt die Nummer der Anker.
+ */
+export const AUSGESCHLOSSENE_REFERENZEN: string[] = [
+  "CD-260903-3ab0",
+  "CD-260903-661b",
+  "CD-260903-1ab5",
+  "CD-260903-80d9",
+  "CD-260902-54ce",
+  "CD-260901-23df",
+  "CD-260901-0bd1",
+]
+
 /** Für Tests reservierte Endung — RFC 2606. Gehört nie einem Menschen. */
 export const AUSGESCHLOSSENE_MAIL_ENDUNG = "@beispiel.invalid"
+
+/** Prefix-Muster für Abnahme-Fixtures (kleingeschrieben). */
+const TEST_PREFIXES = ["v11 abnahme", "gate4", "runde2"] as const
+
+function norm(value: string | null | undefined): string {
+  return (value ?? "").trim().toLowerCase()
+}
 
 /**
  * Operative Lead-Liste — Gürtel und Hosenträger.
  *
- * `excluded_reason` ist die Wahrheit. Zusätzlich: bekannte Testnamen und
- * die reservierte Mail-Endung. Denn gemessen (Preview 03.09.2026) standen
- * Gate4-/V11-Zeilen in der Inbox, obwohl die Markierung im Code existierte
- * — die Markierung lief zu spät oder gar nicht nach. Die Liste darf darauf
- * nicht warten.
+ * `excluded_reason` ist die Wahrheit. Zusätzlich: bekannte Testnamen,
+ * Referenzen, Prefixes und die reservierte Mail-Endung. Gemessen Preview
+ * 03.09.2026: Gate4/V11 standen in der Inbox — die Liste darf auf die
+ * Markierung nicht warten.
  *
  * `includeExcluded === true` hebt beides auf (Audit-/Techniksicht).
  */
@@ -417,13 +442,42 @@ export function sqlLeadOperational(alias: string, includeExcluded?: boolean): st
   const names = AUSGESCHLOSSENE_NAMEN.map((entry) =>
     `'${entry.name.replace(/'/g, "''").toLowerCase()}'`,
   ).join(", ")
+  const refs = AUSGESCHLOSSENE_REFERENZEN.map((r) => `'${r.replace(/'/g, "''")}'`).join(", ")
   const mail = AUSGESCHLOSSENE_MAIL_ENDUNG.replace(/'/g, "''").toLowerCase()
+  const prefixSql = TEST_PREFIXES.map((p) => {
+    const lit = p.replace(/'/g, "''")
+    return `(lower(btrim(coalesce(${alias}.business, ''))) LIKE '${lit}%' OR lower(btrim(${alias}.name)) LIKE '${lit}%')`
+  }).join("\n    OR ")
   return `(
     ${alias}.excluded_reason IS NULL
+    AND ${alias}.reference NOT IN (${refs})
     AND lower(btrim(coalesce(${alias}.business, ''))) NOT IN (${names})
     AND lower(btrim(${alias}.name)) NOT IN (${names})
     AND lower(btrim(${alias}.email)) NOT LIKE '%${mail}'
-    AND lower(btrim(coalesce(${alias}.business, ''))) NOT LIKE 'v11 abnahme%'
-    AND lower(btrim(${alias}.name)) NOT LIKE 'v11 abnahme%'
+    AND NOT (${prefixSql})
   )`
+}
+
+/**
+ * Dieselbe Regel in JS — falls SQL-Filter aus irgendeinem Grund nicht greift,
+ * wirft die Inbox die Zeile trotzdem raus. Kein zweites Wahrheitsmodell:
+ * dieselben Listen und Prefixes.
+ */
+export function isTestEnquiry(row: {
+  reference?: string | null
+  name?: string | null
+  business?: string | null
+  email?: string | null
+  organisationName?: string | null
+  contactName?: string | null
+  excludedReason?: string | null
+}): boolean {
+  if (row.excludedReason) return true
+  if (row.reference && AUSGESCHLOSSENE_REFERENZEN.includes(row.reference)) return true
+  const mail = norm(row.email)
+  if (mail.endsWith(AUSGESCHLOSSENE_MAIL_ENDUNG)) return true
+  const fields = [row.name, row.business, row.organisationName, row.contactName].map(norm)
+  const blocked = new Set(AUSGESCHLOSSENE_NAMEN.map((e) => e.name.toLowerCase()))
+  if (fields.some((f) => f && blocked.has(f))) return true
+  return fields.some((f) => TEST_PREFIXES.some((p) => f.startsWith(p)))
 }
