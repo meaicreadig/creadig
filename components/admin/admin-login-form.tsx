@@ -26,6 +26,27 @@ export function AdminLoginForm() {
 
   return (
     <form
+      /*
+       * `method="post"` obwohl das Absenden über `fetch` läuft.
+       *
+       * Solange React nicht geladen ist, kennt der Browser den `onSubmit`
+       * nicht und sendet das Formular auf seinem eigenen Weg — und der ist
+       * ohne `method` ein GET auf die aktuelle Adresse. Dann steht das
+       * Administrationspasswort im Adressfeld: im Verlauf des Browsers, im
+       * Referrer der nächsten Anfrage und in jedem Zugriffsprotokoll auf dem
+       * Weg dorthin.
+       *
+       * Nachgemessen am 03.09.2026, als eine Prüfung vor der Hydration
+       * absendete:
+       *
+       *   GET /admin/login?password=… 200
+       *
+       * Mit `method="post"` steht dasselbe im Rumpf statt in der Adresse.
+       * Angemeldet wird man ohne JavaScript weiterhin nicht — aber ein
+       * fehlgeschlagener Anmeldeversuch hinterlässt kein Passwort in Logs,
+       * die niemand für vertraulich hält.
+       */
+      method="post"
       className="mt-8 flex flex-col gap-6"
       onSubmit={async (event) => {
         event.preventDefault()
