@@ -116,7 +116,12 @@ export async function setRelationship(id: string, form: FormData): Promise<void>
 }
 
 export async function setContactDetails(id: string, form: FormData): Promise<void> {
-  await requireStore().updateContactDetails(id, {
+  const store = requireStore()
+  const contact = await store.getContact(id)
+  if (!contact) return
+  await store.updateContactDetails(id, {
+    name: contact.name,
+    phone: contact.phone,
     linkedinUrl: text(form.get("linkedinUrl")),
     role: text(form.get("role")),
     note: text(form.get("note")),
