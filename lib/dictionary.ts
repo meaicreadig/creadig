@@ -2094,6 +2094,8 @@ export const dictionary = {
           "Hosting, Auslieferung der Seite über das Content-Delivery-Netz und Server-Logs. Nach Ihrer Einwilligung zusätzlich zwei getrennte Messungen: Vercel Web Analytics (wie oft welche Seite geöffnet wird) und Vercel Speed Insights (wie schnell die Seite bei echten Aufrufen lädt). Beide sind cookiefrei, verarbeiten aber IP-Adresse und Seitenpfad — ohne Einwilligung wird kein Skript geladen.",
         resend:
           "Zustellung der E-Mails aus unseren Formularen an unser Postfach und der Eingangsbestätigung an Sie.",
+        neon:
+          "Speicherung Ihrer Anfrage in unserer Datenbank: Name, E-Mail-Adresse, Telefonnummer, Betrieb und Ihre Nachricht — beim Betriebscheck zusätzlich Ihre Antworten. Ohne diese Speicherung müssten wir jede Anfrage im Postfach suchen; mit ihr wird sie bearbeitet, nachvollzogen und nach Ablauf gelöscht.",
       },
       privacyPoints: [
         {
@@ -3540,6 +3542,8 @@ export const dictionary = {
           "Barındırma, sayfanın içerik dağıtım ağı üzerinden sunulması ve sunucu kayıtları. Onayınızdan sonra ayrıca iki ayrı ölçüm: Vercel Web Analytics (hangi sayfanın ne sıklıkla açıldığı) ve Vercel Speed Insights (gerçek çağrılarda sayfanın ne kadar hızlı yüklendiği). Her ikisi de çerezsizdir, ancak IP adresi ve sayfa yolunu işler — onay yoksa hiçbir betik yüklenmez.",
         resend:
           "Formlarımızdan çıkan e-postaların posta kutumuza ve alındı onayının size iletilmesi.",
+        neon:
+          "Talebinizin veritabanımızda saklanması: ad, e-posta adresi, telefon numarası, işletme ve mesajınız — işletme kontrolünde ayrıca verdiğiniz yanıtlar. Bu kayıt olmasa her talebi posta kutusunda aramamız gerekirdi; kayıtla birlikte talep işlenir, izlenebilir olur ve süresi dolunca silinir.",
       },
       privacyPoints: [
         {
@@ -4966,6 +4970,8 @@ export const dictionary = {
           "Hosting, delivery of the site through the content delivery network, and server logs. After your consent, additionally two separate measurements: Vercel Web Analytics (how often which page is opened) and Vercel Speed Insights (how fast the page loads on real visits). Both are cookie-free but process IP address and page path — without consent no script is loaded.",
         resend:
           "Delivery of the emails from our forms to our inbox and of the acknowledgement to you.",
+        neon:
+          "Storage of your enquiry in our database: name, email address, phone number, business and your message — for the Betriebscheck also your answers. Without this storage every enquiry would have to be searched for in a mailbox; with it, it is processed, traceable and deleted when its retention period ends.",
       },
       privacyPoints: [
         {
@@ -6390,6 +6396,8 @@ export const dictionary = {
           "الاستضافة، وتسليم الموقع عبر شبكة توزيع المحتوى، وسجلات الخادم. وبعد موافقتكم إضافةً إلى ذلك قياسان منفصلان: Vercel Web Analytics (كم مرة تُفتح كل صفحة) وVercel Speed Insights (بأي سرعة تُحمَّل الصفحة في الزيارات الحقيقية). كلاهما دون ملفات تعريف ارتباط، لكنهما يعالجان عنوان IP ومسار الصفحة — ودون موافقة لا يُحمَّل أي سكربت.",
         resend:
           "تسليم رسائل نماذجنا إلى بريدنا، ورسالة الاستلام إليكم.",
+        neon:
+          "تخزين طلبكم في قاعدة بياناتنا: الاسم وعنوان البريد الإلكتروني ورقم الهاتف والمنشأة ورسالتكم — وفي فحص التشغيل إجاباتكم أيضًا. بدون هذا التخزين لتعيّن البحث عن كل طلب في البريد؛ ومعه يُعالَج الطلب ويبقى قابلًا للتتبع ويُحذف عند انتهاء مدة الحفظ.",
       },
       privacyPoints: [
         {

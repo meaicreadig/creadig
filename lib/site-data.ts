@@ -1635,7 +1635,7 @@ export const imprintDetails = {
  */
 export type Processor = {
   /** Schluessel fuer die Zwecktexte in `dictionary.legal.processorPurposes`. */
-  key: "vercel" | "resend"
+  key: "vercel" | "resend" | "neon"
   company: string
   country: string
   /** Rechtsgrundlage der Uebermittlung ins Drittland. */
@@ -1675,6 +1675,44 @@ export const processors: Processor[] = [
     dpaUrl: "https://resend.com/legal/dpa",
     dpaConfirmed: false,
     services: ["Resend (E-Mail-Versand)"],
+  },
+  /*
+   * GATE 1 — NEON STAND IM FLIESSTEXT, ABER NICHT IN DIESER LISTE.
+   *
+   * Genau geprueft, damit die Korrektur nicht groesser klingt als sie ist:
+   * Der Abschnitt „Kontaktformular, Termin und Produkt-Nachfrage" nennt in
+   * seiner `bodyStored`-Fassung Neon seit MP-G beim Namen, samt Region
+   * Frankfurt und Loeschfrist. Was fehlte, war der Eintrag in der
+   * VERARBEITER-TABELLE — und die traegt drei Dinge, die im Fliesstext nicht
+   * stehen: den Link auf den Vertrag, die benannte Rechtsgrundlage der
+   * Drittlandsuebermittlung und die sichtbare Kennzeichnung, ob der Inhaber
+   * ihn bestaetigt hat.
+   *
+   * Damit stand die Datenbank, in der die Anfragen tatsaechlich LIEGEN — Name,
+   * E-Mail, Telefon, Betrieb, freie Nachricht und beim Betriebscheck der
+   * komplette Fragebogen —, als einzige nicht in der Liste der Verarbeiter.
+   *
+   * Nachgesehen am 03.09.2026, nicht angenommen:
+   *   neon.com/dpa nennt „Databricks, Inc., the parent company of Neon, LLC".
+   *   Die Datenverarbeitungsvereinbarung liegt bei Databricks und traegt im
+   *   Kopf „DATA PROCESSING ADDENDUM, including its Annexes and the Standard
+   *   Contractual Clauses"; Ziffer 1.11 definiert die SCC nach dem
+   *   Durchfuehrungsbeschluss 2021/914. Deshalb `safeguard: "scc"` — nicht
+   *   geraten, sondern im Dokument gelesen.
+   *
+   * `dpaConfirmed: false` wie bei den anderen beiden: Dass es einen Vertrag
+   * GIBT, ist belegt; dass der Inhaber ihn abgeschlossen und abgelegt hat,
+   * ist es nicht. Solange das so steht, bleibt der offene Hinweis auf der
+   * Datenschutzseite und der Punkt im Materialstand.
+   */
+  {
+    key: "neon",
+    company: "Neon, LLC (Databricks, Inc.)",
+    country: "USA",
+    safeguard: "scc",
+    dpaUrl: "https://www.databricks.com/legal/dpa",
+    dpaConfirmed: false,
+    services: ["Neon (Datenbank für Anfragen)"],
   },
 ]
 

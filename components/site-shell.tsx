@@ -128,14 +128,29 @@ export function shellMetadata(locale: Locale): Metadata {
       template: "%s · creaDIG",
     },
     description: t.meta.siteDescription,
+    /*
+     * Gate 1 — hier stand „Digitalagentur".
+     *
+     * Die ganze Seite sagt in jedem Abschnitt, dass creaDIG KEINE
+     * Digitalagentur ist: „Kein klassisches IT-Systemhaus. Ein System-Haus
+     * für digitale Betriebe." Dieses eine Wort in den Kopfdaten sagte das
+     * Gegenteil — an der einzigen Stelle, die eine Maschine liest und
+     * niemand gegenliest. Suchmaschinen werten `keywords` seit Jahren nicht
+     * mehr aus; als Aussage darüber, was dieses Haus ist, stand es trotzdem
+     * da, und es war falsch.
+     *
+     * Was jetzt hier steht, ist entweder ein Name (creaDIG, die vier
+     * Produkte) oder die Positionierung selbst. Kein Begriff, der eine
+     * andere Kategorie behauptet.
+     */
     keywords: [
       "creaDIG",
       "System-Haus",
+      "System-Haus für digitale Betriebe",
       "meAI",
       "fibero",
       "CASSAMEA",
       "meahv",
-      "Digitalagentur",
       "KI-Systeme",
       "Osnabrück",
       "Schweiz",
