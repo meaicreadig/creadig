@@ -36,7 +36,9 @@ fehlende Sales-Quellen. Die Zugangsvoraussetzung „kein Admin“ gilt nicht meh
 | Route | Art | Zugang | Inhalt |
 |-------|-----|--------|--------|
 | `/admin` | RSC async, `force-dynamic` | Sitzung | **Heute** — Aufmerksamkeitsliste aus realen Quellen; Material als Vorrat in der Nebenspalte |
-| `/admin/material` | RSC, `force-dynamic` | Sitzung | Materialstand, gruppiert (unverändert, neue Adresse) |
+| `/admin/material` | RSC, `force-dynamic` | Sitzung | Materialstand, gruppiert (unverändert, in der Navigation „System") |
+| `/admin/kunden` | RSC, `force-dynamic` | Sitzung | **Kunden** — Bestand mit Historie, Standorten, Beziehung, letzter Aktivität, nächstem Schritt |
+| `/admin/kunden/[id]` | RSC + Server Actions | Sitzung | Kundenakte: Stammdaten, Standorte, Kontakte, Chancen, Anfragen, Chronik |
 | `/admin/leads` | RSC, `force-dynamic` | Sitzung | Anfragen: Liste, Suche, Statusfilter |
 | `/admin/leads/[id]` | RSC + Server Actions | Sitzung | Detail 2/3 + 1/3, Status- und Schritt-Mutation |
 | `/admin/login` | RSC, `force-dynamic` | offen wenn Env | Passwort |
@@ -47,9 +49,12 @@ fehlende Sales-Quellen. Die Zugangsvoraussetzung „kein Admin“ gilt nicht meh
 (`collect()`), gleiche Gruppierung, gleiche Zahlen — nur liegt unter
 `/admin` jetzt „Heute". Die Datensemantik ist unangetastet.
 
-**Navigation:** Heute · Materialstand · Vertrieb. Der dritte Punkt erscheint
-nur, wenn `leadStoreConfigured()` wahr ist — die Navigation wächst mit den
-Quellen, nicht mit den Absichten.
+**Navigation (Stand 03.09.2026):** Heute · Vertrieb · Kunden · System.
+Vertrieb und Kunden erscheinen nur, wenn `leadStoreConfigured()` wahr ist —
+die Navigation wächst mit den Quellen, nicht mit den Absichten. „System" ist
+der Materialstand unter dem Namen, der sagt, was drinsteht: Material,
+Betrieb, Entscheidungen. Marketing, Produkte und Projekte haben bewusst
+keinen Punkt; Begründung in `1.0-closure.md`.
 
 Kein zweites Admin-Projekt. Layout: `app/(admin)/` eigene Wurzel, `lang="de"`, `noindex`.
 

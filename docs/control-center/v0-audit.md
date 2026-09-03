@@ -82,11 +82,15 @@ Einstellungen. Übernommen werden **drei**, und die Reihenfolge folgt der
 Quellenlage, nicht dem Prototyp:
 
 ```
-Heute          — was heute Aufmerksamkeit braucht      ✅ gebaut 03.09.2026
-Vertrieb       — Anfragen · Pipeline · Beziehungen ·   ✅ steht seit Vertrieb 1.0
-                 Organisationen
-Materialstand  — was fehlt, und wer es liefert         ✅ steht
+Heute      — was jetzt Aufmerksamkeit braucht    ✅ gebaut 03.09.2026
+Vertrieb   — Anfragen · Pipeline · Beziehungen   ✅ steht seit Vertrieb 1.0
+Kunden     — Bestand · Standorte · Historie      ✅ eigener Bereich 03.09.2026
+System     — Material · Betrieb · Entscheidungen ✅ steht
 ```
+
+*(Nachtrag 03.09.2026: Das Kundenregister lag als Register im Vertrieb. Im
+Closure Pass ist es ein eigener Bereich geworden — verschoben, nicht neu
+gebaut. Begründung in `1.0-closure.md`.)*
 
 **Marketing** und **Kunden** erscheinen nicht als leere Menüpunkte. Die
 Navigation wächst mit den Quellen, nicht mit den Absichten — das ist bereits
