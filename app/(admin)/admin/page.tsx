@@ -115,7 +115,7 @@ export default function Today() {
             {hasStore ? (
               <p className="type-small text-muted-foreground text-pretty">
                 Ein Lead-Speicher ist eingerichtet. Die Anfragen stehen unter{" "}
-                <Link href="/admin/leads" className="text-gold-text underline underline-offset-4">
+                <Link href="/admin/vertrieb" className="text-gold-text underline underline-offset-4">
                   Vertrieb
                 </Link>
                 .

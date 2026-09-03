@@ -204,6 +204,18 @@ const nextConfig: NextConfig = {
       { source: "/termin.html", destination: "/termin", permanent: true },
       { source: "/index.html", destination: "/", permanent: true },
       { source: "/meai_intro.html", destination: "/produkte/meai", permanent: true },
+
+      /*
+       * Vertrieb 1.0 — die Anfragenliste ist in den Vertriebsbereich gezogen.
+       *
+       * Kein 404 fuer gemerkte Adressen: Wer sich /admin/leads/<id> als
+       * Lesezeichen gelegt hat, landet weiterhin auf derselben Anfrage. 307
+       * und nicht 308, weil die alte Adresse innerhalb des Control Centers
+       * liegt — eine dauerhafte Weiterleitung wuerde sie im Browser-Cache
+       * festschreiben, und interne Wege sollen aenderbar bleiben.
+       */
+      { source: "/admin/leads", destination: "/admin/vertrieb/anfragen", permanent: false },
+      { source: "/admin/leads/:id", destination: "/admin/vertrieb/anfragen/:id", permanent: false },
     ]
   },
 }

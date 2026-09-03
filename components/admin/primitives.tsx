@@ -229,6 +229,25 @@ export function AdminInput({ className, type = "text", ...props }: ComponentProp
   )
 }
 
+/**
+ * Mehrzeiliger Text — Notizen.
+ *
+ * `field-sizing: content` waere schoener, wird aber noch nicht ueberall
+ * unterstuetzt; `rows` plus `resize-y` funktioniert in Safari, Chrome und
+ * Firefox gleich. Horizontal NICHT skalierbar: Eine Notiz, die aus ihrer
+ * Spalte herauswaechst, bricht das Raster.
+ */
+export function AdminTextarea({ className, rows = 4, ...props }: ComponentProps<"textarea">) {
+  return (
+    <textarea
+      rows={rows}
+      data-admin-control="textarea"
+      className={cn(controlClass, "resize-y leading-relaxed", className)}
+      {...props}
+    />
+  )
+}
+
 export function AdminSelect({ className, children, ...props }: ComponentProps<"select">) {
   return (
     <div className="relative">

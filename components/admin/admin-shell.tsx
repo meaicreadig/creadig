@@ -53,7 +53,7 @@ function navItems(salesAvailable: boolean): NavItem[] {
     { href: "/admin/material", label: "Materialstand", hint: "Was fehlt, und wer es liefert" },
   ]
   if (salesAvailable) {
-    items.push({ href: "/admin/leads", label: "Vertrieb", hint: "Anfragen und nächste Schritte" })
+    items.push({ href: "/admin/vertrieb", label: "Vertrieb", hint: "Anfragen, Pipeline, Beziehungen" })
   }
   return items
 }
