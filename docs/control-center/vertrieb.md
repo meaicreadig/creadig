@@ -1,8 +1,9 @@
-# Control Center · Vertrieb 1.0
+# Control Center · Vertrieb 1.1
 
-> **Authority:** Spec · Stand 02.09.2026
-> **Status:** gebaut, lokal geprüft. Die Abnahme gegen die echte Datenbank
-> steht aus — sie braucht ein Preview-Deployment.
+> **Authority:** Spec · Stand 03.09.2026
+> **Status:** gebaut, lokal vollständig geprüft. Die Abnahme gegen die echte
+> Datenbank steht aus — sie braucht ein Preview-Deployment, weil hier kein
+> nutzbarer Zugang existiert (`.env.local` trägt den Wert maskiert).
 
 ---
 
@@ -16,6 +17,7 @@ unterschiedlich verhalten. Sie sind jetzt getrennt:
 | **Anfrage** | ein Formulareingang, ein Beleg | nie |
 | **Kontakt** | ein Mensch | selten |
 | **Organisation** | ein Betrieb | selten |
+| **Standort** | eine Adresse eines Betriebs | selten |
 | **Verkaufschance** | ein laufender Vorgang | ständig |
 
 ### Die Trennung, die den Unterschied macht
@@ -34,6 +36,42 @@ mit Nicht-Geschäften — oder gar nicht führen, dann verliert man sie.
 **Bearbeitung ≠ Status.** Eine Anfrage kann „bearbeitet" sein, ohne dass je
 eine Chance entsteht. „Angesehen, passt nicht, beantwortet" ist ein
 vollständiger Vorgang, kein Rückstand.
+
+### Die dritte Achse: Kundenhistorie
+
+Seit 1.1 gibt es sie getrennt, weil „Kunde" und „warm" verwandt klingen und
+unabhängig sind:
+
+| | Beziehung | Kundenhistorie | offene Chance |
+|---|---|---|---|
+| Vegitat | was belegt ist | **Kunde** | nur wenn real |
+| Ole Bettray | **warm** | **nie Kunde** | nein |
+| kalte Anfrage von gestern | unbekannt | nie Kunde | ja |
+
+Wer Beziehung und Historie zusammenlegt, kann die wertvollste Frage eines
+Betriebs nicht mehr stellen: *wen haben wir schon einmal überzeugt?*
+
+Vier Stufen, nicht drei. „Kunde — belegt" sagt genau so viel, wie belegt ist:
+Es gab eine Geschäftsbeziehung. Ob sie heute läuft, weiss niemand, und es gibt
+kein Feld, das es behauptet. Der Zustand, in dem sich fast der gesamte Bestand
+befindet, ist weder „bestehend" noch „ehemalig" — und ihn zu einem von beiden
+zu erklären hiesse raten.
+
+**Prospect ist keine Verkaufschance.** `prospect` heisst „war noch nie Kunde",
+sonst nichts. Wer daraus einen Vorgang ableitet, hat eine Pipeline voll
+Betriebe, die von nichts wissen.
+
+### Ein Betrieb, mehrere Adressen
+
+Vegitat hat vier bekannte Standorte. Vier Organisationen daraus zu machen
+würde jede Zählung ab dem ersten Tag vervierfachen, und die Frage „mit wem
+haben wir gearbeitet" hätte vier Antworten, wo es eine gibt.
+
+Umgekehrt gilt dasselbe: **gleiche Marke ist kein Beleg für gleichen
+Betreiber.** Die drei freenet-Datensätze (Osnabrück, Bünde, Lübbecke) bleiben
+getrennt, solange keine gemeinsame Betreiberorganisation belegt ist. Die
+Zusammenführung liesse sich später nachholen; die Trennung nach einer falschen
+Verschmelzung nicht.
 
 ---
 
@@ -117,12 +155,71 @@ das wäre eine Aussage über das Geschäft statt über die Technik.
 
 ---
 
+---
+
+## Der reale Bestand
+
+`lib/vertrieb-bestand.ts` trägt die Bestandsliste des Eigentümers — **keine
+Zeile stammt aus einer Suchmaschine.** Wo eine Anschrift steht, wurde sie
+mitgeteilt; wo keine steht, ist die Organisation nicht eindeutig
+identifizierbar, und das Feld bleibt leer.
+
+Eine Adresse, die zu 80 % stimmt, ist schlimmer als ein leeres Feld: Das leere
+Feld sagt „nachschlagen", die falsche sagt „erledigt".
+
+Bei ARAG, freenet und dem Integrationsrat kommt hinzu, dass die naheliegende
+Zuordnung nicht nur ungenau, sondern **unwahr** wäre — eine Agentur ist nicht
+ihr Konzern, ein Shop nicht seine Kette, ein kommunales Gremium keine GmbH.
+Diese Fälle tragen ihre offene Frage im Feld `note`, sichtbar beim Öffnen des
+Datensatzes.
+
+**Der Import legt keine einzige Verkaufschance an.** Aus „war einmal Kunde"
+folgt kein laufendes Geschäft.
+
+### Wiederholbar, ohne Nachpflege zu zerstören
+
+Drei Mechanismen zusammen:
+
+| | |
+|---|---|
+| `import_key` | Identität hängt am Schlüssel, nicht am Namen |
+| `import_log` | jeder Schritt läuft genau einmal — auch über Deploys hinweg |
+| `coalesce(vorhanden, neu)` | ein zweiter Lauf ergänzt, überschreibt nie |
+
+Ohne `import_log` wäre das eine Saatdatei, die bei jedem Deploy zuschlägt: ein
+gelöschter Datensatz wäre wieder da, ein aufgehobener Ausschluss wieder
+gesetzt.
+
+## Ausschluss statt Löschung
+
+Abnahmedatensätze verschwinden aus Listen und Zählungen — aber nicht aus der
+Datenbank. Sie tragen einen `excluded_reason`, und der ist in beide Richtungen
+umkehrbar.
+
+`DELETE` gegen unscharfe Namen ist die unsichere Operation: Trifft es einmal
+daneben, merkt es niemand, weil die Zeile weg ist. Verglichen wird deshalb der
+**ganze Name**, kleingeschrieben und getrimmt — nie mit Platzhaltern.
+
+> Der Fall, der das entscheidet: „Yilmaz Dachtechnik" ist ein
+> Abnahmedatensatz, „Dr. Hüseyin Yilmaz" ein echter Prospect. Ein
+> `ILIKE '%Yilmaz%'` hätte beide getroffen.
+
+`scripts/check-bestand.mjs` bricht den Build, wenn ein Name auf beiden Listen
+steht, ein Schlüssel doppelt ist, ein Kontakt auf eine unbekannte Organisation
+zeigt oder jemand einen Betrag einträgt.
+
+Zwei Gründe, die nicht dasselbe sind: ein Abnahmedatensatz ist Ausschuss; ein
+Arbeitskontakt aus einem anderen Vorhaben ist ein echter Mensch mit einem
+echten Anliegen — er gehört nur nicht in den creaDIG-Vertrieb.
+
+---
+
 ## Offen
 
-- **Abnahme gegen die echte Datenbank** — Verknüpfung, Deduplizierung,
-  Anfrage→Chance, Chronik, Filter. Braucht ein Preview-Deployment.
-- **Organisation bearbeiten** — Website, Ort, Notiz sind im Schema und in der
-  Detailansicht sichtbar, aber noch nicht änderbar. Sie entstehen heute nur
-  aus dem Betriebsnamen der Anfrage.
+- **Abnahme gegen die echte Datenbank** — die 24 Punkte aus §19. Braucht ein
+  Preview-Deployment; ein lokaler Zugang existiert nicht (`.env.local` trägt
+  den Wert maskiert).
 - **Geschätzter Wert** — Spalte da, Eingabe noch nicht. Bewusst zuletzt: eine
   Zahl, die niemand pflegt, ist schlimmer als keine.
+- **Kontakt anlegen ohne Anfrage** — Kontakte entstehen heute aus Anfragen
+  oder aus dem Bestand. Ein Formular „neuer Kontakt" fehlt.
