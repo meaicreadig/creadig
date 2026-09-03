@@ -338,6 +338,41 @@ export function collect(): { open: Item[]; done: Item[] } {
     })
   }
 
+  /*
+   * DIE LOESCHFRIST — SICHTBAR, WEIL SIE SONST NIEMAND EINHAELT.
+   *
+   * Die Datenschutzerklaerung sagt zu, Anfragen ohne Vertrag 12 Monate nach
+   * dem letzten Kontakt zu loeschen. Diese Zusage ist gedeckt: In
+   * `docs/ops/neon-decision-pack.md` §14 steht ausdruecklich, dass die Frist
+   * ZUNAECHST VON HAND durchgesetzt wird — vierteljaehrlich, mit einer festen
+   * Abfrage, und bewusst ohne Automatik, weil ein Job, der Personendaten
+   * loescht, der gefaehrlichste Job im System ist.
+   *
+   * Was fehlte, war nicht das Verfahren, sondern die ERINNERUNG daran. Ein
+   * Verfahren, das nur in einem Dokument steht und an keiner Stelle
+   * auftaucht, an der jemand taeglich vorbeikommt, wird beim ersten vollen
+   * Quartal vergessen — und dann steht auf der oeffentlichen Seite eine
+   * Zusage, die niemand mehr einloest.
+   *
+   * `ok: false` ist hier kein Mangel im Code, sondern eine offene Handlung:
+   * Es gibt keinen Nachweis, dass der Lauf stattgefunden hat. Genau wie bei
+   * „Reaktionszusage bestaetigt" schliesst der Punkt, wenn der Inhaber ihn
+   * erledigt und das hier vermerkt — nicht, wenn eine Umgebungsvariable
+   * gesetzt wird.
+   */
+  push({
+    label: "Löschlauf Anfragen — vierteljährlich (Datenschutz)",
+    ok: false,
+    detail:
+      "Die Datenschutzerklärung sagt Löschung 12 Monate nach dem letzten Kontakt zu. " +
+      "Durchgesetzt wird die Frist von Hand — so ist es in docs/ops/neon-decision-pack.md §14 " +
+      "entschieden, samt fertiger Abfrage und der Bedingung sales_status <> 'won', die nie " +
+      "fehlen darf. Ein Nachweis über einen durchgeführten Lauf liegt nicht vor.",
+    owner:
+      "Owner: einmal im Quartal die Abfrage aus dem Decision-Pack laufen lassen, " +
+      "Kandidaten durchsehen, löschen und den Lauf mit Datum vermerken",
+  })
+
   /* ── Betrieb ────────────────────────────────────────────────────────── */
   group = "betrieb"
   push({
