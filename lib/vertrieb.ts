@@ -169,6 +169,40 @@ export type OrganisationRow = Organisation & {
   contactCount: number
   locationCount: number
   openOpportunities: number
+  /**
+   * Der staerkste belegte Beziehungsgrad unter den Ansprechpartnern.
+   *
+   * -------------------------------------------------------------------------
+   * WARUM „DER STAERKSTE" UND NICHT „DER DER ORGANISATION"
+   * Ein Beziehungsgrad gehoert zu einem MENSCHEN, nicht zu einem Betrieb.
+   * Eine Organisation hat keinen — sie hat Ansprechpartner, die je einen
+   * haben. Was diese Spalte sagt, ist deshalb genau eines: wie weit die
+   * belegt engste Verbindung in dieses Haus reicht. Ein Durchschnitt waere
+   * eine erfundene Groesse, und „der des ersten Kontakts" waere Zufall.
+   *
+   * `null` heisst: kein Kontakt, oder keiner ueber `unbekannt` hinaus.
+   */
+  strongestRelationship: RelationshipLevel | null
+  /**
+   * Wann zuletzt etwas passiert ist — ueber alle Aktivitaeten dieser
+   * Organisation, ihrer Kontakte und ihrer Vorgaenge hinweg.
+   *
+   * `null` heisst „nichts aufgezeichnet", nicht „nichts passiert". Der
+   * Unterschied ist der ganze Punkt: Ein Telefonat, das niemand eingetragen
+   * hat, ist hier unsichtbar — und die Spalte behauptet nicht das Gegenteil.
+   */
+  lastActivityAt: string | null
+  /**
+   * Der naechste faellige Schritt aus einem OFFENEN Vorgang dieser
+   * Organisation — der frueheste, wenn es mehrere gibt.
+   *
+   * Kommt aus `opportunities.next_action`, nicht aus einer eigenen Aufgabe:
+   * Es gibt kein Aufgabenverwaltungssystem in diesem Haus (§18), und es
+   * entsteht hier auch keines.
+   */
+  nextStep: string | null
+  /** ISO-Datum zu `nextStep`. */
+  nextStepAt: string | null
 }
 
 /**

@@ -216,6 +216,14 @@ const nextConfig: NextConfig = {
        */
       { source: "/admin/leads", destination: "/admin/vertrieb/anfragen", permanent: false },
       { source: "/admin/leads/:id", destination: "/admin/vertrieb/anfragen/:id", permanent: false },
+
+      /*
+       * Control Center 1.0 — das Kundenregister ist ein eigener Bereich
+       * geworden. Dieselbe Begruendung und dieselbe Wahl wie eine Zeile
+       * hoeher: 307, weil interne Wege aenderbar bleiben sollen.
+       */
+      { source: "/admin/vertrieb/organisationen", destination: "/admin/kunden", permanent: false },
+      { source: "/admin/vertrieb/organisationen/:id", destination: "/admin/kunden/:id", permanent: false },
     ]
   },
 }

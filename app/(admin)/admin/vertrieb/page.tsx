@@ -69,7 +69,7 @@ export default async function VertriebUebersicht() {
               grössere Liste als die Zahl daneben. Eine Kachel, deren Ziel
               nicht ihrer Zahl entspricht, ist schlimmer als keine. */}
           <Count label="Warm ohne Chance" value={data.warmWithoutOpportunity} href="/admin/vertrieb/beziehungen?bucket=warm-ohne-chance" />
-          <Count label="Kunden ohne offene Chance" value={data.customersWithoutOpportunity} href="/admin/vertrieb/organisationen?bucket=kunde-ohne-chance" />
+          <Count label="Kunden ohne offene Chance" value={data.customersWithoutOpportunity} href="/admin/kunden?bucket=kunde-ohne-chance" />
         </ul>
       </section>
 

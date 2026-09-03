@@ -126,6 +126,10 @@ type OrgRowDb = {
   import_key: string | null; excluded_reason: string | null
   created_at: Ts; updated_at: Ts
   contact_count?: number; location_count?: number; open_opportunities?: number
+  strongest_relationship?: string | null
+  last_activity_at?: Ts | null
+  next_step?: string | null
+  next_step_at?: Date | string | null
 }
 
 function toOrganisation(r: OrgRowDb): OrganisationRow {
@@ -150,6 +154,19 @@ function toOrganisation(r: OrgRowDb): OrganisationRow {
     contactCount: Number(r.contact_count ?? 0),
     locationCount: Number(r.location_count ?? 0),
     openOpportunities: Number(r.open_opportunities ?? 0),
+    /*
+     * `unbekannt` faellt hier auf `null` zurueck: Der Wert ist die
+     * Vorbelegung jedes neuen Kontakts und sagt nichts aus. Ihn als
+     * Beziehungsgrad anzuzeigen hiesse, eine nicht getroffene Einschaetzung
+     * als Einschaetzung auszugeben.
+     */
+    strongestRelationship:
+      r.strongest_relationship && r.strongest_relationship !== "unbekannt"
+        ? (r.strongest_relationship as RelationshipLevel)
+        : null,
+    lastActivityAt: isoOrNull(r.last_activity_at ?? null),
+    nextStep: r.next_step ?? null,
+    nextStepAt: day(r.next_step_at ?? null),
   }
 }
 
@@ -245,7 +262,51 @@ const ORG_COLUMNS = `
   (SELECT count(*) FROM locations lo WHERE lo.organisation_id = org.id)::int AS location_count,
   (SELECT count(*) FROM opportunities o
     WHERE o.organisation_id = org.id AND o.status NOT IN ('won','lost')
-      AND o.excluded_reason IS NULL)::int AS open_opportunities
+      AND o.excluded_reason IS NULL)::int AS open_opportunities,
+
+  /*
+   * Der staerkste belegte Beziehungsgrad unter den Ansprechpartnern.
+   *
+   * Die Rangfolge steht als CASE hier und nicht als Sortierung auf dem Text:
+   * Alphabetisch waere „warm" > „unbekannt" > „eng" > „bekannt", also genau
+   * die falsche Reihenfolge. Ausgeschlossene Kontakte zaehlen nicht mit —
+   * ein Abnahmedatensatz darf keine Beziehung behaupten.
+   */
+  (SELECT c3.relationship FROM contacts c3
+     WHERE c3.organisation_id = org.id AND c3.excluded_reason IS NULL
+     ORDER BY CASE c3.relationship
+                WHEN 'eng' THEN 3 WHEN 'warm' THEN 2 WHEN 'bekannt' THEN 1 ELSE 0
+              END DESC
+     LIMIT 1) AS strongest_relationship,
+
+  /*
+   * Wann zuletzt etwas aufgezeichnet wurde — ueber die Organisation selbst,
+   * ihre Kontakte und ihre Vorgaenge. Anfragen bleiben aussen vor: Sie
+   * erzeugen beim Eingang ohnehin eine Aktivitaet, und ein zweiter Weg
+   * dorthin wuerde dieselbe Sache doppelt zaehlen.
+   */
+  (SELECT max(a.created_at) FROM activities a
+     WHERE (a.subject_type = 'organisation' AND a.subject_id = org.id)
+        OR (a.subject_type = 'contact' AND a.subject_id IN (
+              SELECT c4.id FROM contacts c4 WHERE c4.organisation_id = org.id))
+        OR (a.subject_type = 'opportunity' AND a.subject_id IN (
+              SELECT o4.id FROM opportunities o4 WHERE o4.organisation_id = org.id))
+  ) AS last_activity_at,
+
+  /*
+   * Der naechste faellige Schritt aus einem offenen Vorgang. next_action_at
+   * kann fehlen, waehrend next_action steht — dann hat der Schritt kein
+   * Datum, und NULLS LAST schiebt ihn hinter die datierten. Ein Schritt
+   * ohne Termin ist nicht dringender als einer mit.
+   */
+  (SELECT o5.next_action FROM opportunities o5
+     WHERE o5.organisation_id = org.id AND o5.status NOT IN ('won','lost')
+       AND o5.excluded_reason IS NULL AND o5.next_action IS NOT NULL
+     ORDER BY o5.next_action_at ASC NULLS LAST LIMIT 1) AS next_step,
+  (SELECT o6.next_action_at FROM opportunities o6
+     WHERE o6.organisation_id = org.id AND o6.status NOT IN ('won','lost')
+       AND o6.excluded_reason IS NULL AND o6.next_action IS NOT NULL
+     ORDER BY o6.next_action_at ASC NULLS LAST LIMIT 1) AS next_step_at
 `
 
 const OPP_FROM = `

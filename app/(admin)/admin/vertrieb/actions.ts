@@ -181,7 +181,7 @@ export async function setOrganisationDetails(id: string, form: FormData): Promis
     linkedinUrl: text(form.get("linkedinUrl")),
     note: text(form.get("note")),
   })
-  refresh(`/admin/vertrieb/organisationen/${id}`, "/admin/vertrieb/organisationen")
+  refresh(`/admin/kunden/${id}`, "/admin/kunden")
 }
 
 /**
@@ -196,7 +196,7 @@ export async function setOrganisationLifecycle(id: string, form: FormData): Prom
   const stage = form.get("lifecycle")
   if (typeof stage !== "string" || !(LIFECYCLE_STAGES as readonly string[]).includes(stage)) return
   await requireStore().updateOrganisationLifecycle(id, stage as LifecycleStage)
-  refresh(`/admin/vertrieb/organisationen/${id}`, "/admin/vertrieb/organisationen")
+  refresh(`/admin/kunden/${id}`, "/admin/kunden")
 }
 
 /* ── Standorte ────────────────────────────────────────────────────────────── */
@@ -221,7 +221,7 @@ export async function addLocation(organisationId: string, form: FormData): Promi
   const input = locationInput(form)
   if (!input) return
   await requireStore().createLocation(organisationId, input)
-  refresh(`/admin/vertrieb/organisationen/${organisationId}`)
+  refresh(`/admin/kunden/${organisationId}`)
 }
 
 export async function saveLocation(
@@ -232,7 +232,7 @@ export async function saveLocation(
   const input = locationInput(form)
   if (!input) return
   await requireStore().updateLocation(locationId, input)
-  refresh(`/admin/vertrieb/organisationen/${organisationId}`)
+  refresh(`/admin/kunden/${organisationId}`)
 }
 
 /**
@@ -245,5 +245,5 @@ export async function saveLocation(
  */
 export async function removeLocation(organisationId: string, locationId: string): Promise<void> {
   await requireStore().deleteLocation(locationId)
-  refresh(`/admin/vertrieb/organisationen/${organisationId}`)
+  refresh(`/admin/kunden/${organisationId}`)
 }

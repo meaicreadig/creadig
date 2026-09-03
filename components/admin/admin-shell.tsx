@@ -47,14 +47,42 @@ import { AdminNav, type NavItem } from "@/components/admin/admin-nav"
  * Jetzt reicht der Aufrufer die Antwort herein. Die Huelle bleibt damit
  * frei von Server-Abhaengigkeiten und in beiden Welten benutzbar.
  */
+/**
+ * Die vier Bereiche — und warum es genau diese vier sind.
+ *
+ * Jeder steht fuer eine Frage, die der Eigentueber im Betrieb wirklich hat:
+ *
+ *   Heute     — Was braucht jetzt Aufmerksamkeit?
+ *   Vertrieb  — Was ist gerade in Arbeit?
+ *   Kunden    — Mit wem haben wir gearbeitet?
+ *   System    — Was fehlt dem Haus, und was ist gestoert?
+ *
+ * Die Reihenfolge folgt der Haeufigkeit, nicht der Wichtigkeit: Heute wird
+ * taeglich geoeffnet, System selten.
+ *
+ * WAS HIER BEWUSST NICHT STEHT
+ * Marketing, Produkte und Projekte. Fuer alle drei gibt es heute keine
+ * operative Quelle in diesem Haus — Analytics schreibt nur, Produktstand ist
+ * Material, ein Projektmodell existiert nicht. Ein Menuepunkt, hinter dem
+ * nichts Gemessenes liegt, ist eine Behauptung ueber die Firma. Die
+ * Navigation waechst mit den Quellen, nicht mit den Absichten; genau deshalb
+ * haengen auch Vertrieb und Kunden an `salesAvailable`.
+ */
 function navItems(salesAvailable: boolean): NavItem[] {
   const items: NavItem[] = [
     { href: "/admin", label: "Heute", hint: "Was Aufmerksamkeit braucht" },
-    { href: "/admin/material", label: "Materialstand", hint: "Was fehlt, und wer es liefert" },
   ]
   if (salesAvailable) {
-    items.push({ href: "/admin/vertrieb", label: "Vertrieb", hint: "Anfragen, Pipeline, Beziehungen" })
+    items.push(
+      { href: "/admin/vertrieb", label: "Vertrieb", hint: "Anfragen, Pipeline, Beziehungen" },
+      { href: "/admin/kunden", label: "Kunden", hint: "Bestand, Standorte, Historie" },
+    )
   }
+  items.push({
+    href: "/admin/material",
+    label: "System",
+    hint: "Material, Betrieb, Entscheidungen",
+  })
   return items
 }
 

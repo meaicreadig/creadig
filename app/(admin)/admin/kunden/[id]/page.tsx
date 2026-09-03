@@ -19,7 +19,7 @@ import {
   SectionHeader,
   Surface,
 } from "@/components/admin/primitives"
-import { VertriebShell } from "@/components/admin/vertrieb-shell"
+import { KundenShell } from "@/components/admin/kunden-shell"
 import { SALES_LABELS_DE, getVertriebStore } from "@/lib/lead-store"
 import { LIFECYCLE_LABELS, LIFECYCLE_NOTES, LIFECYCLE_STAGES, RELATIONSHIP_LABELS } from "@/lib/vertrieb"
 import type { Location } from "@/lib/vertrieb"
@@ -49,7 +49,7 @@ export const metadata = { title: "Organisation" }
 export default async function OrganisationDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const store = getVertriebStore()
-  if (!store) return <VertriebShell title="Organisation" available={false}>{null}</VertriebShell>
+  if (!store) return <KundenShell title="Organisation" available={false}>{null}</KundenShell>
 
   let organisation, locations, contacts, opportunities, enquiries, activities
   try {
@@ -63,20 +63,20 @@ export default async function OrganisationDetail({ params }: { params: Promise<{
       store.activities("organisation", id),
     ])
   } catch {
-    return <VertriebShell title="Organisation" available={false}>{null}</VertriebShell>
+    return <KundenShell title="Organisation" available={false}>{null}</KundenShell>
   }
 
   const kunde = organisation.lifecycle === "kunde"
 
   return (
-    <VertriebShell
+    <KundenShell
       title={organisation.name}
       lead={[organisation.industry, organisation.city].filter(Boolean).join(" · ") || undefined}
       meta={<Pill severity={kunde ? "attention" : "neutral"}>{LIFECYCLE_LABELS[organisation.lifecycle]}</Pill>}
       available
     >
-      <Link href="/admin/vertrieb/organisationen" className="text-gold-text text-sm underline underline-offset-4">
-        ← Alle Organisationen
+      <Link href="/admin/kunden" className="text-gold-text text-sm underline underline-offset-4">
+        ← Alle Kunden
       </Link>
 
       {/*
@@ -235,9 +235,27 @@ export default async function OrganisationDetail({ params }: { params: Promise<{
               <ul className="mt-4 flex flex-col">
                 {opportunities.map((o) => (
                   <li key={o.id} className="border-line flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b py-3 last:border-b-0">
-                    <Link href={`/admin/vertrieb/pipeline/${o.id}`} className="text-subhead min-w-0 flex-1 text-sm underline-offset-4 hover:underline">
-                      {o.title}
-                    </Link>
+                    <span className="min-w-0 flex-1">
+                      <Link href={`/admin/vertrieb/pipeline/${o.id}`} className="text-subhead block text-sm underline-offset-4 hover:underline">
+                        {o.title}
+                      </Link>
+                      {/*
+                        Der nächste Schritt steht beim Vorgang, weil er dort
+                        gepflegt wird. Hier wird er nur gezeigt — es entsteht
+                        keine zweite Stelle, an der man ihn ändern könnte, und
+                        damit auch keine doppelte Datenpflege.
+                      */}
+                      {o.nextAction ? (
+                        <span className="text-muted-foreground mt-0.5 block text-xs">
+                          Nächster Schritt: {o.nextAction}
+                          {o.nextActionAt ? ` · ${formatDate(o.nextActionAt)}` : ""}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground mt-0.5 block text-xs">
+                          Kein nächster Schritt hinterlegt.
+                        </span>
+                      )}
+                    </span>
                     <Pill severity={o.status === "lost" ? "critical" : "neutral"}>{SALES_LABELS_DE[o.status]}</Pill>
                   </li>
                 ))}
@@ -352,7 +370,7 @@ export default async function OrganisationDetail({ params }: { params: Promise<{
           </div>
         </aside>
       </div>
-    </VertriebShell>
+    </KundenShell>
   )
 }
 

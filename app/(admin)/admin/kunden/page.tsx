@@ -1,9 +1,9 @@
 import Link from "next/link"
 
-import { AdminField, AdminInput, AdminSelect, Pill, SectionHeader } from "@/components/admin/primitives"
-import { VertriebShell } from "@/components/admin/vertrieb-shell"
+import { AdminField, AdminInput, AdminSelect, Pill, SectionHeader, Unknown } from "@/components/admin/primitives"
+import { KundenShell } from "@/components/admin/kunden-shell"
 import { getVertriebStore } from "@/lib/lead-store"
-import { LIFECYCLE_LABELS, LIFECYCLE_STAGES } from "@/lib/vertrieb"
+import { LIFECYCLE_LABELS, LIFECYCLE_STAGES, RELATIONSHIP_LABELS } from "@/lib/vertrieb"
 import type { LifecycleStage, OrganisationQuery, OrganisationRow } from "@/lib/vertrieb"
 
 /**
@@ -25,7 +25,7 @@ import type { LifecycleStage, OrganisationQuery, OrganisationRow } from "@/lib/v
  */
 export const dynamic = "force-dynamic"
 
-export const metadata = { title: "Organisationen" }
+export const metadata = { title: "Kunden" }
 
 const BUCKETS = [
   { value: "", label: "alle" },
@@ -40,7 +40,7 @@ export default async function OrganisationenPage({
   searchParams: Promise<{ q?: string; historie?: string; bucket?: string }>
 }) {
   const store = getVertriebStore()
-  if (!store) return <VertriebShell title="Organisationen" available={false}>{null}</VertriebShell>
+  if (!store) return <KundenShell title="Organisationen" available={false}>{null}</KundenShell>
 
   const params = await searchParams
   const search = typeof params.q === "string" ? params.q.trim() : ""
@@ -55,13 +55,13 @@ export default async function OrganisationenPage({
   try {
     page = await store.listOrganisations({ search: search || undefined, lifecycle, bucket, limit: 200 })
   } catch {
-    return <VertriebShell title="Organisationen" available={false}>{null}</VertriebShell>
+    return <KundenShell title="Organisationen" available={false}>{null}</KundenShell>
   }
 
   return (
-    <VertriebShell
-      title="Organisationen"
-      lead="Betriebe, Einrichtungen und Vereine — mit ihrer belegten Geschäftshistorie."
+    <KundenShell
+      title="Kunden"
+      lead="Betriebe, Einrichtungen und Vereine — mit ihrer belegten Geschäftshistorie. Kundenhistorie heisst NICHT laufender Auftrag."
       meta={<span className="block">{page.total} gesamt</span>}
       available
     >
@@ -97,21 +97,24 @@ export default async function OrganisationenPage({
           <OrganisationTable rows={page.rows} />
         )}
       </div>
-    </VertriebShell>
+    </KundenShell>
   )
 }
 
 function OrganisationTable({ rows }: { rows: OrganisationRow[] }) {
   return (
     <div className="border-line mt-6 overflow-x-auto rounded-md border">
-      <table className="w-full min-w-[52rem] border-collapse text-start">
+      <table className="w-full min-w-[72rem] border-collapse text-start">
         <caption className="sr-only">
-          Organisationen mit Name, Ort, Kundenhistorie, Standorten, Kontakten und offenen Verkaufschancen
+          Kunden mit Name, Ort, Kundenhistorie, Standorten, Ansprechpartnern,
+          engster belegter Beziehung, offener Verkaufschance, letzter
+          aufgezeichneter Aktivität und nächstem fälligen Schritt
         </caption>
         <thead>
           <tr className="border-line bg-muted/50 border-b">
             <Th>Name</Th><Th>Ort</Th><Th>Kundenhistorie</Th>
-            <Th>Standorte</Th><Th>Kontakte</Th><Th>Chance</Th>
+            <Th>Standorte</Th><Th>Kontakte</Th><Th>Beziehung</Th>
+            <Th>Chance</Th><Th>Zuletzt</Th><Th>Nächster Schritt</Th>
           </tr>
         </thead>
         <tbody>
@@ -119,7 +122,7 @@ function OrganisationTable({ rows }: { rows: OrganisationRow[] }) {
             <tr key={o.id} className="border-line hover:bg-muted/40 border-b last:border-b-0">
               <Td>
                 <Link
-                  href={`/admin/vertrieb/organisationen/${o.id}`}
+                  href={`/admin/kunden/${o.id}`}
                   className="text-gold-text text-sm underline underline-offset-4"
                 >
                   {o.name}
@@ -147,10 +150,51 @@ function OrganisationTable({ rows }: { rows: OrganisationRow[] }) {
                   {o.contactCount > 0 ? o.contactCount : "—"}
                 </span>
               </Td>
+              {/*
+                Der Beziehungsgrad gehört zum Menschen, nicht zum Betrieb —
+                hier steht deshalb der stärkste belegte unter seinen
+                Ansprechpartnern, und „unbekannt" gilt als kein Wert.
+              */}
+              <Td>
+                {o.strongestRelationship ? (
+                  <span className="text-xs">{RELATIONSHIP_LABELS[o.strongestRelationship]}</span>
+                ) : (
+                  <Unknown />
+                )}
+              </Td>
               <Td>
                 <span className="text-xs tabular-nums">
                   {o.openOpportunities > 0 ? `${o.openOpportunities} offen` : "—"}
                 </span>
+              </Td>
+              {/*
+                „Zuletzt" ist die letzte AUFGEZEICHNETE Aktivität. Ein
+                Telefonat, das niemand eingetragen hat, steht hier nicht — und
+                der Gedankenstrich sagt „nichts aufgezeichnet", nicht
+                „nichts passiert".
+              */}
+              <Td>
+                {o.lastActivityAt ? (
+                  <time dateTime={o.lastActivityAt} className="text-xs tabular-nums">
+                    {formatDate(o.lastActivityAt)}
+                  </time>
+                ) : (
+                  <Unknown />
+                )}
+              </Td>
+              <Td>
+                {o.nextStep ? (
+                  <>
+                    <span className="block text-xs">{o.nextStep}</span>
+                    {o.nextStepAt && (
+                      <time dateTime={o.nextStepAt} className="text-muted-foreground block text-xs tabular-nums">
+                        {formatDate(o.nextStepAt)}
+                      </time>
+                    )}
+                  </>
+                ) : (
+                  <Unknown />
+                )}
               </Td>
             </tr>
           ))}
@@ -165,4 +209,12 @@ function Th({ children }: { children: React.ReactNode }) {
 }
 function Td({ children }: { children: React.ReactNode }) {
   return <td className="px-4 py-3 align-top">{children}</td>
+}
+
+/* Wortgleich mit `pipeline/page.tsx` — ein Datum sieht im ganzen Control
+   Center gleich aus, und ein unlesbarer Wert wird durchgereicht statt als
+   „Invalid Date" angezeigt. */
+function formatDate(iso: string): string {
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })
 }

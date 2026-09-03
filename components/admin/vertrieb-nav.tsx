@@ -7,6 +7,14 @@ import { usePathname } from "next/navigation"
  * Die Unternavigation des Vertriebsbereichs.
  *
  * ---------------------------------------------------------------------------
+ * WARUM „ORGANISATIONEN" HIER NICHT MEHR STEHT
+ * Das Kundenregister ist seit dem Abschluss von 1.0 ein eigener Bereich
+ * (`/admin/kunden`). Es hier als fuenftes Register stehen zu lassen haette
+ * denselben Bestand an zwei Stellen in die Navigation gehaengt — und die
+ * haeufigste Frage („mit wem haben wir gearbeitet?") waere weiterhin hinter
+ * der selteneren gelegen.
+ *
+ * ---------------------------------------------------------------------------
  * WARUM NICHT VIER PUNKTE IN DER HAUPTNAVIGATION
  * Übersicht, Anfragen, Pipeline und Beziehungen sind vier Blicke auf
  * denselben Gegenstand — nicht vier Bereiche. Stünden sie links neben
@@ -26,7 +34,6 @@ const TABS = [
   { href: "/admin/vertrieb", label: "Übersicht" },
   { href: "/admin/vertrieb/anfragen", label: "Anfragen" },
   { href: "/admin/vertrieb/pipeline", label: "Pipeline" },
-  { href: "/admin/vertrieb/organisationen", label: "Organisationen" },
   { href: "/admin/vertrieb/beziehungen", label: "Beziehungen" },
 ]
 

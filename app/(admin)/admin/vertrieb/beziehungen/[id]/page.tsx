@@ -242,7 +242,7 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
               <SectionHeader title="Organisation" as="h3" />
               <dl className="mt-4 flex flex-col gap-4">
                 <DataValue label="Name">
-                  <Link href={`/admin/vertrieb/organisationen/${organisation.id}`} className="text-gold-text underline underline-offset-4">
+                  <Link href={`/admin/kunden/${organisation.id}`} className="text-gold-text underline underline-offset-4">
                     {organisation.name}
                   </Link>
                 </DataValue>
