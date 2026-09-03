@@ -25,7 +25,7 @@ type Row = {
 function LogoChip({ name, mark, color, logoPath }: Row) {
   return (
     <div
-      className="group tile bg-surface-raised relative flex h-20 w-44 shrink-0 items-center justify-center px-5 transition-all duration-[var(--dur-2)] hover:-translate-y-1 hover:elevation-2 sm:h-24 sm:w-52"
+      className="group tile bg-surface-raised relative flex h-24 w-52 shrink-0 items-center justify-center px-4 transition-all duration-[var(--dur-2)] hover:-translate-y-1 hover:elevation-2 sm:h-28 sm:w-60 sm:px-5"
       style={{ ["--brand" as string]: color }}
     >
       <span
@@ -37,13 +37,13 @@ function LogoChip({ name, mark, color, logoPath }: Row) {
         <img
           src={logoPath}
           alt={name}
-          className="h-7 w-auto max-w-[8rem] opacity-70 grayscale transition-all duration-[var(--dur-2)] group-hover:opacity-100 group-hover:grayscale-0 sm:h-8 sm:max-w-[9rem] dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
+          className="h-10 w-auto max-w-[11rem] opacity-70 grayscale transition-all duration-[var(--dur-2)] group-hover:opacity-100 group-hover:grayscale-0 sm:h-12 sm:max-w-[12rem] dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
         />
       ) : (
         <span className="text-muted-foreground group-hover:text-foreground type-small tracking-wide transition-colors duration-[var(--dur-2)]">
           <span
             aria-hidden="true"
-            className="border-line-strong me-2 inline-flex size-7 items-center justify-center border text-xs font-semibold group-hover:border-[var(--brand)] group-hover:text-[var(--brand)]"
+            className="border-line-strong me-2 inline-flex size-8 items-center justify-center border text-xs font-semibold group-hover:border-[var(--brand)] group-hover:text-[var(--brand)]"
           >
             {mark}
           </span>
