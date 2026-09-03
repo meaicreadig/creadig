@@ -400,3 +400,30 @@ export const AUSGESCHLOSSENE_NAMEN: { name: string; reason: string }[] = [
 
 /** Für Tests reservierte Endung — RFC 2606. Gehört nie einem Menschen. */
 export const AUSGESCHLOSSENE_MAIL_ENDUNG = "@beispiel.invalid"
+
+/**
+ * Operative Lead-Liste — Gürtel und Hosenträger.
+ *
+ * `excluded_reason` ist die Wahrheit. Zusätzlich: bekannte Testnamen und
+ * die reservierte Mail-Endung. Denn gemessen (Preview 03.09.2026) standen
+ * Gate4-/V11-Zeilen in der Inbox, obwohl die Markierung im Code existierte
+ * — die Markierung lief zu spät oder gar nicht nach. Die Liste darf darauf
+ * nicht warten.
+ *
+ * `includeExcluded === true` hebt beides auf (Audit-/Techniksicht).
+ */
+export function sqlLeadOperational(alias: string, includeExcluded?: boolean): string {
+  if (includeExcluded) return "TRUE"
+  const names = AUSGESCHLOSSENE_NAMEN.map((entry) =>
+    `'${entry.name.replace(/'/g, "''").toLowerCase()}'`,
+  ).join(", ")
+  const mail = AUSGESCHLOSSENE_MAIL_ENDUNG.replace(/'/g, "''").toLowerCase()
+  return `(
+    ${alias}.excluded_reason IS NULL
+    AND lower(btrim(coalesce(${alias}.business, ''))) NOT IN (${names})
+    AND lower(btrim(${alias}.name)) NOT IN (${names})
+    AND lower(btrim(${alias}.email)) NOT LIKE '%${mail}'
+    AND lower(btrim(coalesce(${alias}.business, ''))) NOT LIKE 'v11 abnahme%'
+    AND lower(btrim(${alias}.name)) NOT LIKE 'v11 abnahme%'
+  )`
+}

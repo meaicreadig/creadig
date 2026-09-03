@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto"
 
 import type { SalesStatus } from "@/lib/lead-store"
+import { sqlLeadOperational } from "@/lib/vertrieb-bestand"
 import { SALES_LABELS_DE, TERMINAL_STATES } from "@/lib/lead-store"
 import { neonClient, type Sql } from "@/lib/neon-client"
 import type {
@@ -297,7 +298,7 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
       const [counts] = (await sql.query(
         `SELECT
            (SELECT count(*) FROM leads
-             WHERE handling_status = 'neu' AND excluded_reason IS NULL)::int AS new_enquiries,
+             WHERE handling_status = 'neu' AND ${sqlLeadOperational("leads")})::int AS new_enquiries,
            (SELECT count(*) FROM opportunities o WHERE ${OPEN_CLAUSE}
               AND o.next_action_at = current_date)::int AS due_today,
            (SELECT count(*) FROM opportunities o WHERE ${OPEN_CLAUSE}
@@ -378,7 +379,7 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
      */
     async listEnquiries(query) {
       await ready()
-      const where: string[] = [live("l", query.includeExcluded)].filter(Boolean)
+      const where: string[] = [sqlLeadOperational("l", query.includeExcluded)]
       const params: unknown[] = []
 
       /*
@@ -428,7 +429,7 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
     async enquirySources(): Promise<string[]> {
       await ready()
       const rows = (await sql.query(
-        `SELECT DISTINCT source FROM leads WHERE excluded_reason IS NULL ORDER BY source`,
+        `SELECT DISTINCT source FROM leads WHERE ${sqlLeadOperational("leads")} ORDER BY source`,
       )) as { source: string }[]
       return rows.map((r) => r.source)
     },
