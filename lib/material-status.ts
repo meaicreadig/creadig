@@ -284,10 +284,19 @@ export function collect(): { open: Item[]; done: Item[] } {
         .map((pkg) => pkg.key)
         .join(", ") ||
       "alle Angebote nennen eine Dauer",
+    /*
+     * Der Owner-Satz nennt nur noch, was wirklich fehlt.
+     *
+     * Er fragte nach beiden Dauern. Die des Website-Pakets ist seit Gate 3
+     * gesetzt — sie stand ohnehin als Zusage in der Angebotsnotiz, jetzt auch
+     * neben dem Preis. Nach etwas zu fragen, das schon dasteht, macht die
+     * ganze Liste unglaubwuerdig; wer einmal einen erledigten Punkt findet,
+     * liest den naechsten nicht mehr nach.
+     */
     owner:
-      "Owner: wie lange das Website-Paket von der Zusage bis zum Livegang braucht " +
-      "und wie lange die Prüfung bis zum Bericht. Ein Festpreis ohne Zeitrahmen " +
-      "lässt die Unsicherheit stehen, die er beseitigen soll.",
+      "Owner: wie lange die Barrierefreiheits-Prüfung von der Zusage bis zum " +
+      "Bericht braucht. Ein Festpreis ohne Zeitrahmen lässt die Unsicherheit " +
+      "stehen, die er beseitigen soll.",
   })
 
   /* ── Fallbeschreibungen (V2-4) ──────────────────────────────────────── */
