@@ -15,9 +15,11 @@ import {
   DataValue,
   Pill,
   SectionHeader,
+  Surface,
 } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { SALES_LABELS_DE, SALES_STATES, TERMINAL_STATES, getVertriebStore } from "@/lib/lead-store"
+import { LOST_REASONS, NEXT_ACTIONS, OFFERED_STAGES, STAGE_RULES } from "@/lib/sales-playbook"
 
 /**
  * Eine Verkaufschance.
@@ -79,16 +81,61 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
           {/* ── Status ── */}
           <section aria-labelledby="status-titel">
             <SectionHeader id="status-titel" title="Status" />
-            <form action={setOpportunityStatus.bind(null, opp.id)} className="mt-4 flex flex-wrap items-end gap-4">
+            {/*
+              GATE 4 — DIE REGEL STEHT DA, WO ENTSCHIEDEN WIRD.
+
+              Vorher war das eine Auswahlliste mit neun Wörtern. Was
+              „Qualifiziert“ verlangt und wann ein Vorgang wirklich in
+              „Verhandlung“ gehört, stand nirgends — es stand im Kopf dessen,
+              der die Liste angelegt hat. Beim zweiten Menschen, oder beim
+              ersten vollen Monat, bedeutet dieselbe Liste etwas anderes.
+
+              Jetzt steht die Bedeutung der aktuellen Stufe darüber und die
+              Eintrittsbedingung darunter. Erzwungen wird nichts: Der Satz
+              erinnert, er sperrt nicht.
+            */}
+            <Surface padding="sm" className="mt-4">
+              <p className="type-small text-foreground/90 text-pretty">
+                <span className="text-subhead">{SALES_LABELS_DE[opp.status]}: </span>
+                {STAGE_RULES[opp.status].meaning}
+              </p>
+              <p className="type-small text-muted-foreground mt-2 text-pretty">
+                Hierher gehört ein Vorgang, wenn: {STAGE_RULES[opp.status].entry}
+              </p>
+            </Surface>
+
+            <form action={setOpportunityStatus.bind(null, opp.id)} className="mt-5 flex flex-wrap items-end gap-4">
               <AdminField label="Pipeline-Status" htmlFor="status">
+                {/*
+                  `audit` wird nicht mehr angeboten — Gate 3 hat entschieden,
+                  dass zwischen Gespräch und Angebot EIN Schritt liegt, und der
+                  heisst Systemgespräch. Der Wert bleibt in der Datenbank
+                  gültig; wer ihn trägt, behält ihn. Umgeschrieben wird nichts,
+                  denn ohne Blick auf die echten Zeilen wäre das Raten.
+                */}
                 <AdminSelect id="status" name="status" defaultValue={opp.status}>
-                  {SALES_STATES.map((s) => (
+                  {(opp.status === "audit" ? SALES_STATES : OFFERED_STAGES).map((s) => (
                     <option key={s} value={s}>{SALES_LABELS_DE[s]}</option>
                   ))}
                 </AdminSelect>
               </AdminField>
               <AdminField label="Grund — nur bei „Verloren“" htmlFor="lostReason" className="flex-1 basis-64">
-                <AdminInput id="lostReason" name="lostReason" defaultValue={opp.lostReason ?? ""} placeholder="frei formuliert" />
+                {/*
+                  Sechs Gründe und ein Freitextfeld. Fünfzig verschieden
+                  formulierte Absagen ergeben keine Erkenntnis; sechs Gründe
+                  ergeben eine. Der Satz daneben bleibt, weil die Kategorie
+                  sagt, WO es gescheitert ist, und der Satz, WAS los war.
+                */}
+                <AdminInput
+                  id="lostReason"
+                  name="lostReason"
+                  list="verlustgruende"
+                  defaultValue={opp.lostReason ?? ""}
+                  placeholder="Grund wählen oder frei formulieren"
+                />
+                <datalist id="verlustgruende">
+                  {LOST_REASONS.map((r) => <option key={r} value={r} />)}
+                </datalist>
               </AdminField>
               <button type="submit" className="cta-quiet px-4 py-2 text-sm">Status speichern</button>
             </form>
@@ -100,10 +147,33 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
             <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
               Ein Satz genügt. Das Feld leer zu lassen löscht den Schritt und
               sein Datum — es gibt hier absichtlich kein Aufgabenverwaltungssystem.
+              {STAGE_RULES[opp.status].suggests && (
+                <> Auf dieser Stufe steht meist an:{" "}
+                  <span className="text-foreground">{STAGE_RULES[opp.status].suggests}</span>.
+                </>
+              )}
             </p>
+            {STAGE_RULES[opp.status].active && !opp.nextAction && (
+              <p className="text-destructive type-small mt-3">
+                Kein nächster Schritt. Ein laufender Vorgang ohne Schritt fällt
+                aus jeder Ansicht heraus, bis ihn jemand zufällig wiederfindet.
+              </p>
+            )}
             <form action={setOpportunityNextAction.bind(null, opp.id)} className="mt-4 flex flex-wrap items-end gap-4">
               <AdminField label="Was passiert als Nächstes" htmlFor="nextAction" className="flex-1 basis-64">
-                <AdminInput id="nextAction" name="nextAction" defaultValue={opp.nextAction ?? ""} placeholder="z. B. Rückruf mit Terminvorschlag" />
+                <AdminInput
+                  id="nextAction"
+                  name="nextAction"
+                  list="naechste-schritte"
+                  defaultValue={opp.nextAction ?? ""}
+                  placeholder="z. B. Rückruf mit Terminvorschlag"
+                />
+                {/* Vorschläge, keine Liste zum Auswählen: Der zwölfte Fall
+                    kommt garantiert, und dann soll dort die Wahrheit stehen
+                    und nicht der nächstbeste Eintrag. */}
+                <datalist id="naechste-schritte">
+                  {NEXT_ACTIONS.map((a) => <option key={a} value={a} />)}
+                </datalist>
               </AdminField>
               <AdminField label="Bis wann" htmlFor="nextActionAt">
                 <AdminInput id="nextActionAt" name="nextActionAt" type="date" defaultValue={opp.nextActionAt ?? ""} />

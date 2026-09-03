@@ -16,7 +16,8 @@ import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { getVertriebStore } from "@/lib/lead-store"
 import { CHECK_QUESTIONS } from "@/lib/betriebscheck"
 import { dictionary } from "@/lib/dictionary"
-import { HANDLING_LABELS, HANDLING_STATES } from "@/lib/vertrieb"
+import { HANDLING_LABELS, HANDLING_STATES, LIFECYCLE_LABELS } from "@/lib/vertrieb"
+import { ENTRY_INTENT, firstActionFor } from "@/lib/sales-playbook"
 
 /**
  * Eine Anfrage.
@@ -59,11 +60,14 @@ export default async function AnfrageDetail({ params }: { params: Promise<{ id: 
   const store = getVertriebStore()
   if (!store) return <VertriebShell title="Anfrage" available={false}>{null}</VertriebShell>
 
-  let enquiry, activities
+  let enquiry, activities, organisation
   try {
     enquiry = await store.getEnquiry(id)
     if (!enquiry) notFound()
     activities = await store.activities("lead", id)
+    /* Nur wenn die Anfrage schon einer Organisation zugeordnet ist. Ohne
+       Zuordnung wird hier nichts gesucht und nichts geraten. */
+    organisation = enquiry.organisationId ? await store.getOrganisation(enquiry.organisationId) : null
   } catch {
     return <VertriebShell title="Anfrage" available={false}>{null}</VertriebShell>
   }
@@ -190,6 +194,44 @@ export default async function AnfrageDetail({ params }: { params: Promise<{ id: 
             </form>
           </section>
 
+          {/* ── Was das Haus über diese Anfrage schon weiss ── */}
+          <section aria-labelledby="triage-titel" className="mt-10">
+            <SectionHeader id="triage-titel" title="Einordnung" />
+            <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
+              Nur Tatsachen aus dem Bestand — keine Bewertung, keine
+              Empfehlung, keine Wahrscheinlichkeit. Was daraus folgt,
+              entscheiden Sie.
+            </p>
+            <Surface padding="sm" className="mt-4">
+              <ul className="flex flex-col gap-2">
+                {/*
+                  Vier Sätze, jeder mit einer Quelle dahinter. Sie ersparen
+                  genau das, was ein Mensch sonst vor jedem Rückruf von Hand
+                  zusammensucht: Kennen wir den Betrieb? War er schon Kunde?
+                  Liegt ein Befund vor? Was hat er überhaupt angefragt?
+                */}
+                <li className="type-small text-foreground/90">
+                  {organisation
+                    ? `Bekannter Betrieb: ${organisation.name} — Kundenhistorie „${LIFECYCLE_LABELS[organisation.lifecycle]}“.`
+                    : "Keiner bekannten Organisation zugeordnet."}
+                </li>
+                <li className="type-small text-foreground/90">
+                  {enquiry.contactName
+                    ? `Bekannter Ansprechpartner: ${enquiry.contactName}.`
+                    : "Kein hinterlegter Ansprechpartner — der Absender steht nur auf dieser Anfrage."}
+                </li>
+                <li className="type-small text-foreground/90">
+                  {befund
+                    ? `Betriebscheck liegt vor: ${befund.score}/100${befund.engpass ? `, Engpass ${befund.engpass}` : ", kein Engpass"}.`
+                    : "Kein Betriebscheck-Befund zu dieser Anfrage."}
+                </li>
+                <li className="type-small text-foreground/90">
+                  {ENTRY_INTENT[enquiry.source]?.label ?? `Eingang über „${enquiry.source}“.`}
+                </li>
+              </ul>
+            </Surface>
+          </section>
+
           {/* ── Verkaufschance ── */}
           <section aria-labelledby="chance-titel" className="mt-10">
             <SectionHeader id="chance-titel" title="Verkaufschance" />
@@ -213,6 +255,27 @@ export default async function AnfrageDetail({ params }: { params: Promise<{ id: 
                       name="title"
                       defaultValue={enquiry.organisationName ?? enquiry.business ?? enquiry.name}
                       placeholder="worum es geht"
+                    />
+                  </AdminField>
+                  {/*
+                    GATE 4 — EIN VORGANG ENTSTEHT NIE OHNE ERSTEN SCHRITT.
+
+                    Vorher entstand er mit leerem `nextAction` und fiel damit
+                    ab der ersten Sekunde in die Rubrik „ohne nächsten
+                    Schritt“ — sichtbar in „Heute“, aber eben als Mangel,
+                    den derselbe Mensch gerade selbst erzeugt hat.
+
+                    Der Vorschlag kommt aus der Eingangsabsicht (Gate 3) und
+                    ist überschreibbar. Nichts wird automatisch entschieden:
+                    Der Vorgang entsteht weiterhin nur, wenn jemand ihn
+                    anlegt.
+                  */}
+                  <AdminField label="Erster Schritt" htmlFor="firstAction" className="flex-1 basis-56">
+                    <AdminInput
+                      id="firstAction"
+                      name="firstAction"
+                      defaultValue={firstActionFor(enquiry.source)}
+                      placeholder="was zuerst passiert"
                     />
                   </AdminField>
                   <button type="submit" className="cta-quiet px-4 py-2 text-sm">Verkaufschance anlegen</button>

@@ -96,13 +96,30 @@ export async function createOpportunityFromEnquiry(id: string, form: FormData): 
   if (!enquiry) return
 
   const title = text(form.get("title")) ?? enquiry.business ?? enquiry.name
-  await store.createOpportunity({
+  const opportunity = await store.createOpportunity({
     title,
     organisationId: enquiry.organisationId,
     contactId: enquiry.contactId,
     source: enquiry.source,
     fromLeadId: enquiry.id,
   })
+
+  /*
+   * Der erste Schritt gehoert zur Anlage, nicht zu einem spaeteren Besuch.
+   *
+   * Ohne ihn entstand der Vorgang mit leerem `nextAction` und stand ab der
+   * ersten Sekunde unter „Ohne naechsten Schritt“ — ein Mangel, den derselbe
+   * Mensch soeben selbst erzeugt hatte. Zwei Schreibvorgaenge und keine
+   * Transaktion: Scheitert der zweite, existiert der Vorgang trotzdem, und
+   * er faellt genau dort auf, wo fehlende Schritte ohnehin auffallen.
+   *
+   * Ohne Datum. Wann etwas faellig ist, weiss dieser Moment noch nicht, und
+   * ein geraten gesetztes Datum waere sofort eine falsche Ueberfaelligkeit.
+   */
+  const firstAction = text(form.get("firstAction"))
+  if (firstAction) {
+    await store.updateOpportunityNextAction(opportunity.id, firstAction, null)
+  }
   refresh(`/admin/vertrieb/anfragen/${id}`, "/admin/vertrieb/anfragen", "/admin/vertrieb/pipeline")
 }
 
