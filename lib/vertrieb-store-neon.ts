@@ -405,13 +405,31 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
 
       /*
        * „Braucht Aufmerksamkeit" ist eine Sortierung, keine Bewertung:
-       * überfällig vor heute fällig vor ohne Schritt. Kein Punktesystem —
-       * es gäbe keine Daten, aus denen eine Punktzahl entstehen könnte.
+       * überfällig vor heute fällig vor ohne Termin vor ohne Schritt. Kein
+       * Punktesystem — es gäbe keine Daten, aus denen eine Punktzahl
+       * entstehen könnte.
+       *
+       * -----------------------------------------------------------------
+       * DIE BEDINGUNG HING BIS 03.09.2026 AM SCHRITT STATT AM DATUM
+       * Sie lautete `next_action_at <= current_date OR next_action IS NULL`.
+       * Ein Vorgang mit Schritt ABER OHNE TERMIN erfüllte beides nicht: Der
+       * Vergleich mit NULL ist nicht wahr, und der Schritt war ja gesetzt.
+       * Solche Vorgänge fielen aus JEDER Aufmerksamkeitsansicht heraus —
+       * nicht auffällig, weil sie nirgends als fehlend erschienen.
+       *
+       * Nachgemessen am 03.09.2026 gegen ein lokales Postgres 17 mit vier
+       * Vorgängen: „Ohne Termin" (Schritt gesetzt, Datum leer) kam in
+       * keiner Zeile zurück; die Abfrage lieferte null Zeilen, obwohl ein
+       * offener Vorgang einen ungeplanten Schritt trug.
+       *
+       * Jetzt hängt sie am Datum. Das deckt beide Fälle ab: kein Schritt
+       * heisst auch kein Termin, und ein Schritt ohne Termin ist genau der
+       * Fall, der vorher verschwand. Eingeordnet wird in `lib/attention.ts`.
        */
       const attention = (await sql.query(
         `SELECT ${OPP_COLUMNS} ${OPP_FROM}
           WHERE ${OPEN_CLAUSE}
-            AND (o.next_action_at <= current_date OR o.next_action IS NULL)
+            AND (o.next_action_at IS NULL OR o.next_action_at <= current_date)
           ORDER BY (o.next_action_at IS NULL), o.next_action_at ASC NULLS LAST, o.updated_at DESC
           LIMIT 12`,
       )) as OppRowDb[]

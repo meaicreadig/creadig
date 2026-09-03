@@ -35,6 +35,9 @@ import type { VertriebStore } from "@/lib/vertrieb"
 /**
  * Acht Ränge, begründet — nicht acht Zahlen, die gut aussehen.
  *
+ * (Bis 03.09.2026 waren es sieben; der achte, „Schritt ohne Termin", kam
+ * dazu, weil genau diese Vorgänge vorher aus jeder Ansicht fielen.)
+ *
  * Die Reihenfolge folgt dem Schaden, den Nichtstun anrichtet:
  *
  *   Ein Betriebsblocker kostet ALLE künftigen Anfragen — der Weg selbst ist
@@ -57,6 +60,7 @@ export const ATTENTION_RANKS = [
   "ueberfaellig",
   "heute-faellig",
   "neue-anfrage",
+  "schritt-ohne-termin",
   "ohne-schritt",
   "beziehung-faellig",
   "entscheidung",
@@ -69,6 +73,7 @@ export const ATTENTION_LABELS: Record<AttentionRank, string> = {
   ueberfaellig: "Überfällig",
   "heute-faellig": "Heute fällig",
   "neue-anfrage": "Neue Anfrage",
+  "schritt-ohne-termin": "Schritt ohne Termin",
   "ohne-schritt": "Ohne nächsten Schritt",
   "beziehung-faellig": "Kontaktpflege fällig",
   entscheidung: "Ihre Entscheidung",
@@ -98,6 +103,33 @@ export type AttentionBoard = {
   materialRest: number
   materialOpen: number
   materialDone: number
+}
+
+/**
+ * Aus dem Owner-Satz eines Materialpunkts die HANDLUNG machen.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM NICHT `detail`
+ * `detail` beschreibt den ZUSTAND, und es tut das gruendlich — beim Punkt
+ * „Domain gesetzt" stehen dort drei Zeilen ueber kanonische Adressen, Sitemap
+ * und OG-Bilder. Das ist im Materialstand richtig und auf einer Liste, die man
+ * ueberfliegt, falsch: Wer morgens „Heute" oeffnet, will wissen, was zu tun
+ * ist, nicht was der Code sonst noch damit macht.
+ *
+ * `owner` sagt genau das, und zwar bereits gepflegt: „Domain in Vercel
+ * verbinden und den Wert setzen". Die Beschreibung bleibt einen Klick
+ * entfernt im Materialstand stehen — sie geht nicht verloren, sie steht nur
+ * nicht mehr im Weg.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM DAS PRAEFIX WEG MUSS
+ * Jeder Owner-Satz beginnt mit „Owner: ". Im Materialstand trennt das den
+ * Zustand von der Zustaendigkeit. Hier ist ohnehin alles Owner-Sache — das
+ * Wort waere auf jeder zweiten Zeile dasselbe und traegt nichts.
+ */
+function ownerAction(owner: string): string | null {
+  const text = owner.replace(/^\s*Owner:\s*/, "").trim()
+  return text.length > 0 ? text : null
 }
 
 /* ========================================================================== *
@@ -134,7 +166,7 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
       id: `betrieb:${item.label}`,
       rank: "betriebsblocker",
       title: item.label,
-      detail: item.detail,
+      detail: ownerAction(item.owner),
       href: "/admin/material",
       due: null,
     })
@@ -162,12 +194,22 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
            nichts — er gehört auf keine Aufmerksamkeitsliste. */
         if (o.nextAction !== null && o.nextActionAt !== null && o.nextActionAt > today) continue
 
+        /*
+         * Vier Zustaende, nicht drei — und der vierte ist der, der lange
+         * fehlte: Ein Vorgang KANN einen Schritt haben, ohne einen Termin
+         * dafuer zu haben. Ihn zu „Ohne naechsten Schritt" zu zaehlen waere
+         * falsch (er hat einen), ihn wegzulassen war schlimmer (er
+         * verschwand). Er steht deshalb unter eigenem Namen, direkt vor den
+         * Vorgaengen, die gar keinen Schritt haben.
+         */
         const rank: AttentionRank =
-          o.nextAction === null || o.nextActionAt === null
+          o.nextAction === null
             ? "ohne-schritt"
-            : o.nextActionAt < today
-              ? "ueberfaellig"
-              : "heute-faellig"
+            : o.nextActionAt === null
+              ? "schritt-ohne-termin"
+              : o.nextActionAt < today
+                ? "ueberfaellig"
+                : "heute-faellig"
 
         const kontext = [o.organisationName, o.contactName].filter(Boolean).join(" · ")
 
@@ -222,7 +264,7 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
       id: `entscheidung:${item.label}`,
       rank: "entscheidung",
       title: item.label,
-      detail: item.detail,
+      detail: ownerAction(item.owner),
       href: "/admin/material",
       due: null,
     })

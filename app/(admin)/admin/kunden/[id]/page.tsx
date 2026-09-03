@@ -49,7 +49,7 @@ export const metadata = { title: "Organisation" }
 export default async function OrganisationDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const store = getVertriebStore()
-  if (!store) return <KundenShell title="Organisation" available={false}>{null}</KundenShell>
+  if (!store) return <KundenShell title="Kunde" available={false}>{null}</KundenShell>
 
   let organisation, locations, contacts, opportunities, enquiries, activities
   try {
@@ -63,7 +63,7 @@ export default async function OrganisationDetail({ params }: { params: Promise<{
       store.activities("organisation", id),
     ])
   } catch {
-    return <KundenShell title="Organisation" available={false}>{null}</KundenShell>
+    return <KundenShell title="Kunde" available={false}>{null}</KundenShell>
   }
 
   const kunde = organisation.lifecycle === "kunde"

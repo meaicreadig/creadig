@@ -349,20 +349,6 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "Owner: Geheimnis setzen und einen Cron darauf zeigen lassen",
   })
 
-  push({
-    label: "Materialstand in der Fußzeile (MP10-2.10)",
-    ok: process.env.NEXT_PUBLIC_STATUS_PUBLIC === "1",
-    detail:
-      process.env.NEXT_PUBLIC_STATUS_PUBLIC === "1"
-        ? "NEXT_PUBLIC_STATUS_PUBLIC=1 — der Link steht im Betrieb in der Fußzeile. " +
-          "Dann muss diese Seite dort auch ohne Schlüssel antworten, sonst zeigt er auf eine 404."
-        : "Der Link erscheint nur in der Entwicklung. Diese Seite ist eine Innenansicht " +
-          "(offene Verträge, fehlende Freigaben, unfertiges Impressum) — ob sie öffentlich " +
-          "wird, ist keine Code-Frage.",
-    owner:
-      "Owner: entscheiden, ob der Materialstand öffentlich sichtbar sein soll. " +
-      "Ja → NEXT_PUBLIC_STATUS_PUBLIC=1 setzen und die Schlüsselsperre unten aufheben.",
-  })
 
   push({
     label: "Lead-Weg konfiguriert",
@@ -385,6 +371,48 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "Owner: Domain in Vercel verbinden und den Wert setzen",
   })
 
+
+  /* ── Entscheidungen (§11, strategische Blind Spots) ──────────── */
+  group = "entscheidungen"
+
+  /*
+   * DIESE ZWEI PUNKTE STANDEN BIS 03.09.2026 UNTER „BETRIEB".
+   *
+   * Das war eine falsche Aussage, und sie war teuer: „Heute" stuft die
+   * Betriebs-Gruppe als hoechsten Rang ein — ueber gebrochene Zusagen und
+   * wartende Anfragen —, weil ein gestoerter Betrieb ALLE kuenftigen
+   * Anfragen kostet. Bei diesen beiden ist aber nichts gestoert:
+   *
+   *   Der Materialstand-Link erscheint nur in der Entwicklung. Der eigene
+   *   Text des Punktes sagt es: „ob sie oeffentlich wird, ist keine
+   *   Code-Frage."
+   *
+   *   Die Reaktionszusage IST gepflegt und wird ausgeliefert. Offen ist
+   *   allein, ob der Eigentuemer zwei Werktage jederzeit halten kann.
+   *
+   * Beides sind Entscheidungen, keine Stoerungen. Als „Betrieb gestoert"
+   * ganz oben zu stehen hiess, zwei Ueberlegungen ueber eine ueberfaellige
+   * Zusage zu stellen — und wenn oben immer etwas rot ist, ist bald nichts
+   * mehr rot.
+   *
+   * Kein Punkt ist entfallen: gleicher Text, gleiche Owner-Aufgabe, gleiche
+   * Messung. Nur die Gruppe stimmt jetzt.
+   */
+  push({
+    label: "Materialstand in der Fußzeile (MP10-2.10)",
+    ok: process.env.NEXT_PUBLIC_STATUS_PUBLIC === "1",
+    detail:
+      process.env.NEXT_PUBLIC_STATUS_PUBLIC === "1"
+        ? "NEXT_PUBLIC_STATUS_PUBLIC=1 — der Link steht im Betrieb in der Fußzeile. " +
+          "Dann muss diese Seite dort auch ohne Schlüssel antworten, sonst zeigt er auf eine 404."
+        : "Der Link erscheint nur in der Entwicklung. Diese Seite ist eine Innenansicht " +
+          "(offene Verträge, fehlende Freigaben, unfertiges Impressum) — ob sie öffentlich " +
+          "wird, ist keine Code-Frage.",
+    owner:
+      "Owner: entscheiden, ob der Materialstand öffentlich sichtbar sein soll. " +
+      "Ja → NEXT_PUBLIC_STATUS_PUBLIC=1 setzen und die Schlüsselsperre unten aufheben.",
+  })
+
   push({
     label: "Reaktionszusage bestätigt (BF-8)",
     ok: false,
@@ -397,8 +425,6 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "Owner: bestätigen, dass zwei Werktage jederzeit haltbar sind — oder ändern",
   })
 
-  /* ── Entscheidungen (§11, strategische Blind Spots) ──────────── */
-  group = "entscheidungen"
   /*
    * Diese drei sind KEIN fehlendes Material — kein Foto, keine Zahl, keine
    * Freigabe. Sie sind Entscheidungen, und sie stehen trotzdem hier, weil

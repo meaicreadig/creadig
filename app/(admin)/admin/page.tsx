@@ -58,6 +58,7 @@ const RANK_SEVERITY: Record<AttentionRank, "neutral" | "attention" | "critical">
   ueberfaellig: "critical",
   "heute-faellig": "attention",
   "neue-anfrage": "attention",
+  "schritt-ohne-termin": "neutral",
   "ohne-schritt": "neutral",
   "beziehung-faellig": "neutral",
   entscheidung: "neutral",

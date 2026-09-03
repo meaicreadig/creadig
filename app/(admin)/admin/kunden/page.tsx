@@ -40,7 +40,7 @@ export default async function OrganisationenPage({
   searchParams: Promise<{ q?: string; historie?: string; bucket?: string }>
 }) {
   const store = getVertriebStore()
-  if (!store) return <KundenShell title="Organisationen" available={false}>{null}</KundenShell>
+  if (!store) return <KundenShell title="Kunden" available={false}>{null}</KundenShell>
 
   const params = await searchParams
   const search = typeof params.q === "string" ? params.q.trim() : ""
@@ -55,7 +55,7 @@ export default async function OrganisationenPage({
   try {
     page = await store.listOrganisations({ search: search || undefined, lifecycle, bucket, limit: 200 })
   } catch {
-    return <KundenShell title="Organisationen" available={false}>{null}</KundenShell>
+    return <KundenShell title="Kunden" available={false}>{null}</KundenShell>
   }
 
   return (
