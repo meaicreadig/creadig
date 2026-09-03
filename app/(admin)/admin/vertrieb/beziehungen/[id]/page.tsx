@@ -1,7 +1,12 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
-import { setContactDetails, setNextTouch, setRelationship } from "@/app/(admin)/admin/vertrieb/actions"
+import {
+  setContactDetails,
+  setContactOrganisation,
+  setNextTouch,
+  setRelationship,
+} from "@/app/(admin)/admin/vertrieb/actions"
 import { ActivityLog } from "@/components/admin/activity-log"
 import {
   AdminField,
@@ -14,7 +19,7 @@ import {
 } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { SALES_LABELS_DE, getVertriebStore } from "@/lib/lead-store"
-import { RELATIONSHIP_LABELS, RELATIONSHIP_LEVELS } from "@/lib/vertrieb"
+import { LIFECYCLE_LABELS, RELATIONSHIP_LABELS, RELATIONSHIP_LEVELS } from "@/lib/vertrieb"
 
 /**
  * Ein Kontakt.
@@ -43,14 +48,15 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
   const store = getVertriebStore()
   if (!store) return <VertriebShell title="Kontakt" available={false}>{null}</VertriebShell>
 
-  let contact, enquiries, opportunities, activities, organisation
+  let contact, enquiries, opportunities, activities, organisation, organisationChoices
   try {
     contact = await store.getContact(id)
     if (!contact) notFound()
-    ;[enquiries, opportunities, activities] = await Promise.all([
+    ;[enquiries, opportunities, activities, organisationChoices] = await Promise.all([
       store.leadsForContact(id),
       store.opportunitiesForContact(id),
       store.activities("contact", id),
+      store.organisationChoices(),
     ])
     organisation = contact.organisationId ? await store.getOrganisation(contact.organisationId) : null
   } catch {
@@ -113,6 +119,14 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
             <SectionHeader id="angaben-titel" title="Angaben" />
             <form action={setContactDetails.bind(null, contact.id)} className="mt-4 flex flex-col gap-4">
               <div className="flex flex-wrap gap-4">
+                <AdminField label="Name" htmlFor="name" className="flex-1 basis-56">
+                  <AdminInput id="name" name="name" defaultValue={contact.name} required />
+                </AdminField>
+                <AdminField label="Telefon" htmlFor="phone" className="flex-1 basis-44">
+                  <AdminInput id="phone" name="phone" type="tel" defaultValue={contact.phone ?? ""} />
+                </AdminField>
+              </div>
+              <div className="flex flex-wrap gap-4">
                 <AdminField label="Rolle im Betrieb" htmlFor="role" className="flex-1 basis-56">
                   <AdminInput id="role" name="role" defaultValue={contact.role ?? ""} placeholder="soweit bekannt" />
                 </AdminField>
@@ -126,6 +140,26 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
               <div>
                 <button type="submit" className="cta-quiet px-4 py-2 text-sm">Angaben speichern</button>
               </div>
+            </form>
+          </section>
+
+          {/* ── Zugehörigkeit ── */}
+          <section aria-labelledby="zugehoerig-titel" className="mt-10">
+            <SectionHeader id="zugehoerig-titel" title="Gehört zu" />
+            <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
+              Nicht jeder Mensch gehört zu einem Betrieb. „Keine Zuordnung“ ist
+              eine gültige Antwort und keine offene Aufgabe.
+            </p>
+            <form action={setContactOrganisation.bind(null, contact.id)} className="mt-4 flex flex-wrap items-end gap-4">
+              <AdminField label="Organisation" htmlFor="organisationId" className="flex-1 basis-64">
+                <AdminSelect id="organisationId" name="organisationId" defaultValue={contact.organisationId ?? ""}>
+                  <option value="">keine Zuordnung</option>
+                  {organisationChoices.map((o) => (
+                    <option key={o.id} value={o.id}>{o.name}</option>
+                  ))}
+                </AdminSelect>
+              </AdminField>
+              <button type="submit" className="cta-quiet px-4 py-2 text-sm">Speichern</button>
             </form>
           </section>
 
@@ -182,7 +216,11 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
           </p>
           <dl className="mt-4 flex flex-col gap-4">
             <DataValue label="E-Mail">
-              <a href={`mailto:${contact.email}`} className="underline underline-offset-4">{contact.email}</a>
+              {/* Ein Kontakt aus der Bestandsliste hat oft keine. Ein
+                  „mailto:"-Link ins Leere wäre schlimmer als ein Strich. */}
+              {contact.email ? (
+                <a href={`mailto:${contact.email}`} className="underline underline-offset-4">{contact.email}</a>
+              ) : null}
             </DataValue>
             <DataValue label="Telefon">
               {contact.phone ? (
@@ -203,7 +241,15 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
             <div className="mt-10">
               <SectionHeader title="Organisation" as="h3" />
               <dl className="mt-4 flex flex-col gap-4">
-                <DataValue label="Name">{organisation.name}</DataValue>
+                <DataValue label="Name">
+                  <Link href={`/admin/vertrieb/organisationen/${organisation.id}`} className="text-gold-text underline underline-offset-4">
+                    {organisation.name}
+                  </Link>
+                </DataValue>
+                {/* Die dritte Achse — hier nur zu lesen. Geändert wird sie
+                    bei der Organisation, weil sie ihr gehört, nicht dem
+                    Menschen. */}
+                <DataValue label="Kundenhistorie">{LIFECYCLE_LABELS[organisation.lifecycle]}</DataValue>
                 <DataValue label="Ort">{organisation.city}</DataValue>
                 <DataValue label="Website">
                   {organisation.website ? (

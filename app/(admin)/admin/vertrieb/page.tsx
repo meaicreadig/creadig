@@ -16,7 +16,13 @@ import type { OpportunityRow, VertriebSummary } from "@/lib/vertrieb"
  *
  * ---------------------------------------------------------------------------
  * SIEBEN ZAHLEN, KEINE ACHTE
- * Jede ist eine Zählung über echte Zeilen. Was hier NICHT steht:
+ * Jede ist eine Zählung über echte Zeilen, jede führt auf genau die Liste,
+ * die sie zählt. „Kunden ohne offene Chance" ist die jüngste und steht hier
+ * nur, weil daraus eine Handlung folgt: Liste öffnen, durchgehen,
+ * entscheiden. Eine Zahl ohne Anschlusshandlung gehört in einen Bericht,
+ * nicht auf eine Arbeitsfläche.
+ *
+ * Was hier NICHT steht:
  * Abschlussquoten, Pipeline-Wert, Prognosen, Trends. Für alle vier fehlt die
  * Grundlage — es gibt keine historischen Statuswechsel vor dieser Version,
  * keine gepflegten Werte und keine abgeschlossenen Vorgänge in nennenswerter
@@ -58,7 +64,12 @@ export default async function VertriebUebersicht() {
           <Count label="Überfällig" value={data.overdue} href="/admin/vertrieb/pipeline?bucket=ueberfaellig" critical={data.overdue > 0} />
           <Count label="Offene Verkaufschancen" value={data.openOpportunities} href="/admin/vertrieb/pipeline?bucket=offen" />
           <Count label="Ohne nächsten Schritt" value={data.withoutNextAction} href="/admin/vertrieb/pipeline?bucket=ohne-schritt" accent={data.withoutNextAction > 0} />
-          <Count label="Warm ohne Chance" value={data.warmWithoutOpportunity} href="/admin/vertrieb/beziehungen?bucket=ohne-chance" />
+          {/* Beide Kacheln führen auf GENAU die Menge, die sie zählen.
+              „Warm ohne Chance" zeigte vorher auf „ohne-chance" — eine viel
+              grössere Liste als die Zahl daneben. Eine Kachel, deren Ziel
+              nicht ihrer Zahl entspricht, ist schlimmer als keine. */}
+          <Count label="Warm ohne Chance" value={data.warmWithoutOpportunity} href="/admin/vertrieb/beziehungen?bucket=warm-ohne-chance" />
+          <Count label="Kunden ohne offene Chance" value={data.customersWithoutOpportunity} href="/admin/vertrieb/organisationen?bucket=kunde-ohne-chance" />
         </ul>
       </section>
 

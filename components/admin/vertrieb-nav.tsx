@@ -26,6 +26,7 @@ const TABS = [
   { href: "/admin/vertrieb", label: "Übersicht" },
   { href: "/admin/vertrieb/anfragen", label: "Anfragen" },
   { href: "/admin/vertrieb/pipeline", label: "Pipeline" },
+  { href: "/admin/vertrieb/organisationen", label: "Organisationen" },
   { href: "/admin/vertrieb/beziehungen", label: "Beziehungen" },
 ]
 
