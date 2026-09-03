@@ -281,6 +281,20 @@ export function Betriebscheck() {
                   ? checkCopy.manualNone[locale]
                   : checkCopy.manualLabel[locale](result.manualSpots)}
               </p>
+
+              {/* Aus dem Befund folgt eine Adresse — siehe `layerLinkLabel`. */}
+              <Link
+                href={
+                  result.evenlyBalanced
+                    ? "/leistungen"
+                    : `/leistungen#ebene-${result.bottleneck.key}`
+                }
+                className="text-gold-text mt-8 inline-block text-sm underline underline-offset-4"
+              >
+                {result.evenlyBalanced
+                  ? checkCopy.layerLinkAll[locale]
+                  : checkCopy.layerLinkLabel[locale](layerName(result.bottleneck.key))}
+              </Link>
             </div>
           </div>
         </section>

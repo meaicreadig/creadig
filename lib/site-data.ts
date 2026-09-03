@@ -1338,8 +1338,32 @@ export const packages: Package[] = [
     regularPrice: "€3.900",
     regularAmount: 3900,
     recommended: false,
-    // TODO (Owner): reale Projektdauer. Bis dahin rendert die Zeile nicht.
-    duration: null,
+    /*
+     * GATE 3 — HIER STAND `null` MIT EINEM TODO, WAEHREND DIE ZUSAGE LAENGST
+     * OEFFENTLICH WAR.
+     *
+     * Der Kommentar sagte: keine geschaetzte Dauer, bis der Owner sie nennt.
+     * Richtig gedacht — aber der Owner hatte sie laengst genannt, und zwar
+     * verbindlicher als dieses Feld es je gewesen waere: In
+     * `packages.items.website.note` steht in DE, TR und EN „Fester
+     * Livetermin: vier Wochen ab Materialeingang", und `outcome` sagt „In
+     * vier Wochen online".
+     *
+     * Damit behauptete der Materialstand eine Luecke, die es nicht gab,
+     * waehrend die Preiskachel die Dauer verschwieg, die zwei Absaetze
+     * weiter unten als Zusage stand. Nichts erfunden: Dieselbe Tatsache,
+     * jetzt an der Stelle, an der die Frage gestellt wird — neben dem Preis.
+     *
+     * Die Pruefung (`audit`) bleibt `null`. Fuer sie ist keine Dauer
+     * zugesagt, und eine plausible Zahl waere genau die Erfindung, gegen
+     * die dieses Feld gebaut wurde.
+     */
+    duration: {
+      de: "vier Wochen ab Materialeingang",
+      tr: "malzeme ulaştıktan sonra dört hafta",
+      en: "four weeks from receipt of your material",
+      ar: "أربعة أسابيع من استلام موادكم",
+    },
   },
   {
     /*

@@ -493,6 +493,33 @@ export const checkCopy = {
     en: "You marked no place as open. Then this is not about tidying up, but about the next step.",
     ar: "لم تسموا أي موضع مفتوحًا. عندها لا يكون الأمر ترتيبًا، بل الخطوة التالية.",
   },
+  /*
+   * GATE 3 — WAS DAS ERGEBNIS AENDERT.
+   *
+   * Bis hierher endete der Befund als Aussage: Reifegrad, Engpass, Zahl der
+   * offenen Stellen — und darunter ein Formular. Wer wissen wollte, was
+   * „Operations" ueberhaupt heisst, musste die Seite verlassen und suchen.
+   * Ein Befund, aus dem nichts folgt, ist ein Poster mit Prozentzeichen.
+   *
+   * Der Weg hier ist bewusst KEINE Empfehlung und keine Bewertung: Er fuehrt
+   * auf genau die Ebene, die der Besucher selbst am schwaechsten
+   * eingeschaetzt hat. Aus seinen Antworten folgt eine Adresse, keine
+   * Kaufempfehlung — und schon gar kein Preis. Bei fuenf gleich starken
+   * Ebenen gibt es keinen Engpass; dann fuehrt der Weg auf die Uebersicht
+   * aller fuenf, weil eine herausgegriffene Ebene dort eine Erfindung waere.
+   */
+  layerLinkLabel: {
+    de: (layer: string) => `Was „${layer}" bei uns bedeutet`,
+    tr: (layer: string) => `Bizde „${layer}" ne demek`,
+    en: (layer: string) => `What “${layer}” means here`,
+    ar: (layer: string) => `ماذا تعني «${layer}» لدينا`,
+  },
+  layerLinkAll: {
+    de: "Die fünf Ebenen im Überblick",
+    tr: "Beş katmana genel bakış",
+    en: "The five levels at a glance",
+    ar: "المستويات الخمسة في نظرة",
+  },
   formTitle: {
     de: "Ergebnis besprechen",
     tr: "Sonucu konuşalım",

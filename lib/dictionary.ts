@@ -1364,8 +1364,8 @@ export const dictionary = {
       openEyebrow: "Größerer Umfang",
       openPrice: "auf Anfrage",
       openNote:
-        "Mehrere Standorte, ein Shop, Schnittstellen in die Warenwirtschaft oder ein System, das über die Website hinausgeht: Das rechnen wir nach Aufwand — nach einem Gespräch, nicht nach Liste. Wir sagen Ihnen vorher, was es kostet, und danach ändert sich die Zahl nicht.",
-      openCta: "Umfang besprechen",
+        "Mehrere Standorte, ein Shop, Schnittstellen in die Warenwirtschaft oder ein System, das über die Website hinausgeht: Dafür gibt es keinen Listenpreis, aber einen festen Weg. Im Systemgespräch — 45 Minuten, kostenlos — sehen wir uns den Betrieb an und schneiden den Umfang zu. Daraus wird ein Festpreis für genau diesen Umfang, und danach ändert sich die Zahl nicht.",
+      openCta: "Systemgespräch vereinbaren",
       retainerEyebrow: "Laufende Betreuung",
       retainerTitle: "Betrieb statt Übergabe.",
       retainerFrom: "ab",
@@ -2991,8 +2991,8 @@ export const dictionary = {
       openEyebrow: "Daha büyük kapsam",
       openPrice: "talep üzerine",
       openNote:
-        "Birden fazla şube, bir mağaza, stok sistemine bağlantılar ya da web sitesinin ötesine geçen bir sistem: Bunu listeye göre değil, görüşmeden sonra işe göre hesaplarız. Maliyeti önceden söyleriz ve sonrasında rakam değişmez.",
-      openCta: "Kapsamı konuşalım",
+        "Birden fazla şube, bir mağaza, stok sistemine bağlantılar ya da web sitesinin ötesine geçen bir sistem: Bunun liste fiyatı yok, ama net bir yolu var. Sistem görüşmesinde — 45 dakika, ücretsiz — işletmeye bakar ve kapsamı birlikte belirleriz. Ardından tam olarak o kapsam için sabit bir fiyat çıkar ve sonrasında rakam değişmez.",
+      openCta: "Sistem görüşmesi ayarla",
       retainerEyebrow: "Sürekli destek",
       retainerTitle: "Teslim değil, işletme.",
       retainerFrom: "aylık",
@@ -4432,8 +4432,8 @@ export const dictionary = {
       openEyebrow: "Larger scope",
       openPrice: "on request",
       openNote:
-        "Several locations, a shop, interfaces into inventory management, or a system that goes beyond the website: we quote that by effort — after a conversation, not from a list. We tell you what it costs beforehand, and the figure does not change afterwards.",
-      openCta: "Discuss the scope",
+        "Several locations, a shop, interfaces into inventory management, or a system that goes beyond the website: there is no list price for that, but there is a fixed path. In the system conversation — 45 minutes, free of charge — we look at the business and cut the scope to size. Out of that comes a fixed price for exactly that scope, and afterwards the number does not change.",
+      openCta: "System conversation",
       retainerEyebrow: "Ongoing support",
       retainerTitle: "Operation instead of handover.",
       retainerFrom: "from",
@@ -5858,8 +5858,8 @@ export const dictionary = {
       openEyebrow: "نطاق أكبر",
       openPrice: "عند الطلب",
       openNote:
-        "مواقع متعددة، أو متجر، أو واجهات إلى نظام المخزون، أو نظام يتجاوز الموقع: هذا نحسبه بالجهد — بعد حديث، لا من قائمة. نقول لكم التكلفة مسبقًا، ولا يتغيّر الرقم بعدها.",
-      openCta: "مناقشة النطاق",
+        "مواقع متعددة، أو متجر، أو واجهات إلى نظام المخزون، أو نظام يتجاوز الموقع: لا توجد لذلك قائمة أسعار، لكن يوجد طريق واضح. في حديث النظام — خمس وأربعون دقيقة، مجانًا — ننظر في المنشأة ونحدّد النطاق معًا. ومن ذلك يخرج سعر ثابت لهذا النطاق بالضبط، ولا يتغيّر الرقم بعده.",
+      openCta: "حديث النظام",
       retainerEyebrow: "المتابعة الجارية",
       retainerTitle: "تشغيل بدل تسليم.",
       retainerFrom: "من",

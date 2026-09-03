@@ -132,8 +132,20 @@ export function TerminWizard() {
     setCursor({ year: now.getFullYear(), month: now.getMonth() })
   }, [])
 
-  // Vorauswahl aus der Angebots-Sektion (`/termin?paket=website`).
+  /*
+   * Vorauswahl aus der Angebots-Sektion.
+   *
+   * `?paket=…` kommt von den beiden Festpreis-Kacheln und waehlt die
+   * kostenlose Erstberatung samt passendem Interesse.
+   *
+   * `?art=systemgespraech` kommt vom offenen Umfang. Dort steht im Text
+   * ausdruecklich „Systemgespraech — 45 Minuten"; wer darauf klickt, hat die
+   * Frage „Worum geht es?" bereits beantwortet und soll sie nicht noch
+   * einmal gestellt bekommen. Ein Wert, den der Assistent nicht kennt,
+   * aendert nichts — der Besucher waehlt dann wie vorher selbst.
+   */
   useEffect(() => {
+    if (params.get("art") === "systemgespraech") setType("ar")
     const paket = params.get("paket")
     if (!paket) return
     if (paket === "website") {

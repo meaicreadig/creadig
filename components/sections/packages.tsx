@@ -208,8 +208,17 @@ export function Packages() {
               {t.packages.openNote}
             </p>
           </div>
+          {/*
+            GATE 3 — der Verweis fuehrt jetzt in GENAU das Gespraech, das der
+            Text verspricht, nicht auf die Auswahlseite davor.
+
+            Vorher: `/termin`. Wer „Umfang besprechen" las und klickte, stand
+            vor der Frage „Worum geht es?" und musste selbst herausfinden,
+            dass das Systemgespraech gemeint war — ein Schritt, den der Text
+            gerade beantwortet hatte.
+          */}
           <Link
-            href="/termin"
+            href="/termin?art=systemgespraech"
             className="cta-quiet inline-flex shrink-0 items-center gap-2.5 px-6 py-3.5 text-sm tracking-wide"
           >
             {t.packages.openCta}
