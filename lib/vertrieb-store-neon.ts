@@ -14,12 +14,15 @@ import type {
   Opportunity,
   OpportunityQuery,
   OpportunityRow,
-  Organisation,
+  LifecycleStage,
+  Location,
+  OrganisationQuery,
+  OrganisationRow,
   RelationshipLevel,
   VertriebStore,
   VertriebSummary,
 } from "@/lib/vertrieb"
-import { RELATIONSHIP_LABELS } from "@/lib/vertrieb"
+import { LIFECYCLE_LABELS, RELATIONSHIP_LABELS } from "@/lib/vertrieb"
 
 /**
  * Vertrieb 1.0 — die Datenbankseite.
@@ -54,6 +57,7 @@ type OppRowDb = {
   title: string; status: string; source: string | null
   next_action: string | null; next_action_at: Ts | null; last_contact_at: Ts | null
   note: string | null; estimated_value: number | null; lost_reason: string | null
+  from_lead_id: string | null
   created_at: Ts; updated_at: Ts
   organisation_name?: string | null; contact_name?: string | null
 }
@@ -72,6 +76,7 @@ function toOpportunity(r: OppRowDb): OpportunityRow {
     note: r.note,
     estimatedValue: r.estimated_value,
     lostReason: r.lost_reason,
+    fromLeadId: r.from_lead_id,
     createdAt: iso(r.created_at),
     updatedAt: iso(r.updated_at),
     organisationName: r.organisation_name ?? null,
@@ -80,10 +85,11 @@ function toOpportunity(r: OppRowDb): OpportunityRow {
 }
 
 type ContactRowDb = {
-  id: string; organisation_id: string | null; name: string; email: string
+  id: string; organisation_id: string | null; name: string; email: string | null
   phone: string | null; linkedin_url: string | null; role: string | null
   relationship: string; last_interaction_at: Ts | null
   next_touch: string | null; next_touch_at: Ts | null; note: string | null
+  excluded_reason: string | null; import_key: string | null
   created_at: Ts; updated_at: Ts
   organisation_name?: string | null; open_opportunities?: number
 }
@@ -102,10 +108,73 @@ function toContact(r: ContactRowDb): ContactRow {
     nextTouch: r.next_touch,
     nextTouchAt: day(r.next_touch_at),
     note: r.note,
+    excludedReason: r.excluded_reason,
+    importKey: r.import_key,
     createdAt: iso(r.created_at),
     updatedAt: iso(r.updated_at),
     organisationName: r.organisation_name ?? null,
     openOpportunities: Number(r.open_opportunities ?? 0),
+  }
+}
+
+type OrgRowDb = {
+  id: string; name: string; website: string | null; email: string | null
+  phone: string | null; street: string | null; postal_code: string | null
+  city: string | null; country: string | null; industry: string | null
+  lifecycle: string; linkedin_url: string | null; note: string | null
+  import_key: string | null; excluded_reason: string | null
+  created_at: Ts; updated_at: Ts
+  contact_count?: number; location_count?: number; open_opportunities?: number
+}
+
+function toOrganisation(r: OrgRowDb): OrganisationRow {
+  return {
+    id: r.id,
+    name: r.name,
+    website: r.website,
+    email: r.email,
+    phone: r.phone,
+    street: r.street,
+    postalCode: r.postal_code,
+    city: r.city,
+    country: r.country,
+    industry: r.industry,
+    lifecycle: r.lifecycle as LifecycleStage,
+    linkedinUrl: r.linkedin_url,
+    note: r.note,
+    importKey: r.import_key,
+    excludedReason: r.excluded_reason,
+    createdAt: iso(r.created_at),
+    updatedAt: iso(r.updated_at),
+    contactCount: Number(r.contact_count ?? 0),
+    locationCount: Number(r.location_count ?? 0),
+    openOpportunities: Number(r.open_opportunities ?? 0),
+  }
+}
+
+type LocRowDb = {
+  id: string; organisation_id: string; label: string
+  street: string | null; postal_code: string | null; city: string | null
+  country: string | null; phone: string | null; email: string | null
+  note: string | null; import_key: string | null
+  created_at: Ts; updated_at: Ts
+}
+
+function toLocation(r: LocRowDb): Location {
+  return {
+    id: r.id,
+    organisationId: r.organisation_id,
+    label: r.label,
+    street: r.street,
+    postalCode: r.postal_code,
+    city: r.city,
+    country: r.country,
+    phone: r.phone,
+    email: r.email,
+    note: r.note,
+    importKey: r.import_key,
+    createdAt: iso(r.created_at),
+    updatedAt: iso(r.updated_at),
   }
 }
 
@@ -118,6 +187,7 @@ type EnqRowDb = {
   contact_id: string | null; contact_name: string | null
   organisation_id: string | null; organisation_name: string | null
   opportunity_id: string | null
+  excluded_reason: string | null
   created_at: Ts; updated_at: Ts
 }
 
@@ -131,6 +201,7 @@ function toEnquiry(r: EnqRowDb): EnquiryRow {
     contactId: r.contact_id, contactName: r.contact_name,
     organisationId: r.organisation_id, organisationName: r.organisation_name,
     opportunityId: r.opportunity_id,
+    excludedReason: r.excluded_reason,
     createdAt: iso(r.created_at), updatedAt: iso(r.updated_at),
   }
 }
@@ -139,13 +210,11 @@ const ENQ_COLUMNS = `
   l.id, l.reference, l.source, l.locale, l.name, l.email, l.phone,
   l.business, l.message, l.site_url,
   l.utm_source, l.utm_medium, l.utm_campaign,
-  l.handling_status, l.contact_id, l.organisation_id,
+  l.handling_status, l.contact_id, l.organisation_id, l.excluded_reason,
   c.name AS contact_name, org.name AS organisation_name,
   (SELECT o2.id FROM opportunities o2
-    WHERE o2.id = 'opp-' || l.id
-       OR (o2.contact_id = l.contact_id AND o2.created_at >= l.created_at)
-    ORDER BY (o2.id = 'opp-' || l.id) DESC, o2.created_at ASC
-    LIMIT 1) AS opportunity_id
+    WHERE o2.from_lead_id = l.id
+    ORDER BY o2.created_at ASC LIMIT 1) AS opportunity_id
 `
 const ENQ_FROM = `
   FROM leads l
@@ -156,16 +225,45 @@ const ENQ_FROM = `
 const OPP_COLUMNS = `
   o.id, o.organisation_id, o.contact_id, o.title, o.status, o.source,
   o.next_action, o.next_action_at, o.last_contact_at, o.note,
-  o.estimated_value, o.lost_reason, o.created_at, o.updated_at,
+  o.estimated_value, o.lost_reason, o.from_lead_id, o.created_at, o.updated_at,
   org.name AS organisation_name, c.name AS contact_name
 `
+const ORG_COLUMNS = `
+  org.id, org.name, org.website, org.email, org.phone, org.street, org.postal_code,
+  org.city, org.country, org.industry, org.lifecycle, org.linkedin_url, org.note,
+  org.import_key, org.excluded_reason, org.created_at, org.updated_at,
+  (SELECT count(*) FROM contacts c2
+    WHERE c2.organisation_id = org.id AND c2.excluded_reason IS NULL)::int AS contact_count,
+  (SELECT count(*) FROM locations lo WHERE lo.organisation_id = org.id)::int AS location_count,
+  (SELECT count(*) FROM opportunities o
+    WHERE o.organisation_id = org.id AND o.status NOT IN ('won','lost')
+      AND o.excluded_reason IS NULL)::int AS open_opportunities
+`
+
 const OPP_FROM = `
   FROM opportunities o
   LEFT JOIN organisations org ON org.id = o.organisation_id
   LEFT JOIN contacts c ON c.id = o.contact_id
 `
 
-const OPEN_CLAUSE = `o.status NOT IN ('won','lost')`
+/*
+ * „Offen" heisst hier zweierlei, und das ist Absicht: nicht abgeschlossen UND
+ * nicht ausgeschlossen. Die Klausel steht in jeder Zählung der Übersicht und
+ * in jedem Filter — sie an einer Stelle zu definieren ist der einzige Weg,
+ * bei dem ein Abnahmedatensatz nicht doch in einer der Zahlen auftaucht.
+ */
+const OPEN_CLAUSE = `o.status NOT IN ('won','lost') AND o.excluded_reason IS NULL`
+
+/**
+ * Was zur operativen Arbeitsfläche gehört.
+ *
+ * Listen und Zählungen filtern danach, Detailseiten NICHT: Wer einem Verweis
+ * auf einen ausgeschlossenen Datensatz folgt, soll ihn sehen — samt der
+ * Begründung. Unsichtbar machen und unauffindbar machen sind zwei
+ * verschiedene Dinge, und nur das erste ist hier gewollt.
+ */
+const live = (alias: string, include: boolean | undefined): string =>
+  include ? "" : `${alias}.excluded_reason IS NULL`
 
 export function createNeonVertrieb(connectionString: string): VertriebStore {
   const client: { sql: Sql; ready: () => Promise<void> } = neonClient(connectionString)
@@ -198,7 +296,8 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
       await ready()
       const [counts] = (await sql.query(
         `SELECT
-           (SELECT count(*) FROM leads WHERE handling_status = 'neu')::int AS new_enquiries,
+           (SELECT count(*) FROM leads
+             WHERE handling_status = 'neu' AND excluded_reason IS NULL)::int AS new_enquiries,
            (SELECT count(*) FROM opportunities o WHERE ${OPEN_CLAUSE}
               AND o.next_action_at = current_date)::int AS due_today,
            (SELECT count(*) FROM opportunities o WHERE ${OPEN_CLAUSE}
@@ -206,14 +305,29 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
            (SELECT count(*) FROM opportunities o WHERE ${OPEN_CLAUSE})::int AS open_opportunities,
            (SELECT count(*) FROM opportunities o WHERE ${OPEN_CLAUSE}
               AND o.next_action IS NULL)::int AS without_next_action,
-           (SELECT count(*) FROM contacts c WHERE c.relationship IN ('warm','eng')
-              AND NOT EXISTS (SELECT 1 FROM opportunities o
-                               WHERE o.contact_id = c.id AND ${OPEN_CLAUSE}))::int
-             AS warm_without_opportunity`,
+           (SELECT count(*) FROM contacts c
+             WHERE c.relationship IN ('warm','eng') AND c.excluded_reason IS NULL
+               AND NOT EXISTS (SELECT 1 FROM opportunities o
+                                WHERE o.contact_id = c.id AND ${OPEN_CLAUSE}))::int
+             AS warm_without_opportunity,
+           /*
+            * Die Reaktivierungsmenge.
+            *
+            * Sie steht hier, weil daraus eine Handlung folgt: Liste öffnen,
+            * durchgehen, entscheiden. Was hier NICHT steht, ist eine
+            * Abschlussquote oder ein Pipeline-Wert — beides bräuchte
+            * historische Statuswechsel und gepflegte Beträge, und beides
+            * gibt es nicht.
+            */
+           (SELECT count(*) FROM organisations og
+             WHERE og.lifecycle IN ('kunde','ehemaliger-kunde') AND og.excluded_reason IS NULL
+               AND NOT EXISTS (SELECT 1 FROM opportunities o
+                                WHERE o.organisation_id = og.id AND ${OPEN_CLAUSE}))::int
+             AS customers_without_opportunity`,
       )) as {
         new_enquiries: number; due_today: number; overdue: number
         open_opportunities: number; without_next_action: number
-        warm_without_opportunity: number
+        warm_without_opportunity: number; customers_without_opportunity: number
       }[]
 
       /*
@@ -231,13 +345,14 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
 
       const recentlyClosed = (await sql.query(
         `SELECT ${OPP_COLUMNS} ${OPP_FROM}
-          WHERE o.status IN ('won','lost')
+          WHERE o.status IN ('won','lost') AND o.excluded_reason IS NULL
           ORDER BY o.updated_at DESC LIMIT 5`,
       )) as OppRowDb[]
 
       const c = counts ?? {
         new_enquiries: 0, due_today: 0, overdue: 0,
         open_opportunities: 0, without_next_action: 0, warm_without_opportunity: 0,
+        customers_without_opportunity: 0,
       }
       return {
         newEnquiries: c.new_enquiries,
@@ -246,6 +361,7 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
         openOpportunities: c.open_opportunities,
         withoutNextAction: c.without_next_action,
         warmWithoutOpportunity: c.warm_without_opportunity,
+        customersWithoutOpportunity: c.customers_without_opportunity,
         attention: attention.map(toOpportunity),
         recentlyClosed: recentlyClosed.map(toOpportunity),
       }
@@ -262,15 +378,25 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
      */
     async listEnquiries(query) {
       await ready()
-      const where: string[] = []
+      const where: string[] = [live("l", query.includeExcluded)].filter(Boolean)
       const params: unknown[] = []
 
-      if (query.handling) { params.push(query.handling); where.push(`l.handling_status = ${params.length}`) }
-      if (query.source) { params.push(query.source); where.push(`l.source = ${params.length}`) }
+      /*
+       * Jede Bedingung schreibt `$` vor ihre Nummer.
+       *
+       * Ohne das Zeichen ist `$1` die Zahl 1 — Postgres vergleicht dann Text
+       * mit einer Ganzzahl und lehnt ab, und `LIMIT 1 OFFSET 2` wird zu einer
+       * stillen Falschantwort statt zu einem Fehler. Genau dieser Tippfehler
+       * stand hier und liess die gesamte Anfrageliste gegen die echte
+       * Datenbank in den Fehlerzustand laufen; lokal fiel er nicht auf, weil
+       * es lokal keine Datenbank gibt.
+       */
+      if (query.handling) { params.push(query.handling); where.push(`l.handling_status = $${params.length}`) }
+      if (query.source) { params.push(query.source); where.push(`l.source = $${params.length}`) }
       if (query.search?.trim()) {
         params.push(`%${query.search.trim()}%`)
         const n = params.length
-        where.push(`(l.reference ILIKE ${n} OR l.business ILIKE ${n} OR l.name ILIKE ${n} OR l.email ILIKE ${n})`)
+        where.push(`(l.reference ILIKE $${n} OR l.business ILIKE $${n} OR l.name ILIKE $${n} OR l.email ILIKE $${n})`)
       }
       const clause = where.length ? `WHERE ${where.join(" AND ")}` : ""
 
@@ -283,7 +409,7 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
       const rows = (await sql.query(
         `SELECT ${ENQ_COLUMNS} ${ENQ_FROM} ${clause}
           ORDER BY l.created_at DESC
-          LIMIT ${params.length + 1} OFFSET ${params.length + 2}`,
+          LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
         [...params, limit, offset],
       )) as EnqRowDb[]
 
@@ -302,14 +428,14 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
     async enquirySources(): Promise<string[]> {
       await ready()
       const rows = (await sql.query(
-        `SELECT DISTINCT source FROM leads ORDER BY source`,
+        `SELECT DISTINCT source FROM leads WHERE excluded_reason IS NULL ORDER BY source`,
       )) as { source: string }[]
       return rows.map((r) => r.source)
     },
 
     async listOpportunities(query: OpportunityQuery) {
       await ready()
-      const where: string[] = []
+      const where: string[] = [live("o", false)].filter(Boolean)
       const params: unknown[] = []
 
       if (query.status) { params.push(query.status); where.push(`o.status = $${params.length}`) }
@@ -319,6 +445,7 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
         case "ueberfaellig": where.push(`${OPEN_CLAUSE} AND o.next_action_at < current_date`); break
         case "ohne-schritt": where.push(`${OPEN_CLAUSE} AND o.next_action IS NULL`); break
         case "abgeschlossen": where.push(`o.status IN ('won','lost')`); break
+        default: break
       }
       if (query.search?.trim()) {
         params.push(`%${query.search.trim()}%`)
@@ -360,15 +487,38 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
      */
     async createOpportunity(input): Promise<Opportunity> {
       await ready()
+
+      /*
+       * Zweimal auf denselben Knopf ergibt einen Vorgang, nicht zwei.
+       *
+       * Die Sperre steht auf `from_lead_id`, einem echten Fremdschlüssel.
+       * Vorher hing sie an einer Näherung („gleicher Kontakt, danach
+       * angelegt"), die den falschen Vorgang finden und deshalb auch den
+       * richtigen übersehen konnte — eine Dublettensperre auf einer Vermutung
+       * ist keine.
+       *
+       * Ohne Anfrage gibt es nichts zu sperren: Wer von Hand zwei Vorgänge
+       * für dieselbe Organisation anlegt, meint in aller Regel zwei
+       * Geschäfte. Das zu verhindern hiesse, eine Regel zu erfinden.
+       */
+      if (input.fromLeadId) {
+        const existing = (await sql.query(
+          `SELECT ${OPP_COLUMNS} ${OPP_FROM} WHERE o.from_lead_id = $1 ORDER BY o.created_at ASC LIMIT 1`,
+          [input.fromLeadId],
+        )) as OppRowDb[]
+        if (existing.length) return toOpportunity(existing[0])
+      }
+
       const id = randomUUID()
       const rows = (await sql.query(
         `INSERT INTO opportunities
-           (id, organisation_id, contact_id, title, status, source, created_at, updated_at)
-         VALUES ($1,$2,$3,$4,'new',$5, now(), now())
+           (id, organisation_id, contact_id, title, status, source, from_lead_id,
+            created_at, updated_at)
+         VALUES ($1,$2,$3,$4,'new',$5,$6, now(), now())
          RETURNING id, organisation_id, contact_id, title, status, source,
                    next_action, next_action_at, last_contact_at, note,
-                   estimated_value, lost_reason, created_at, updated_at`,
-        [id, input.organisationId, input.contactId, input.title, input.source],
+                   estimated_value, lost_reason, from_lead_id, created_at, updated_at`,
+        [id, input.organisationId, input.contactId, input.title, input.source, input.fromLeadId ?? null],
       )) as OppRowDb[]
 
       await note("opportunity", id, "opportunity.created", `Verkaufschance angelegt: ${input.title}`)
@@ -441,7 +591,7 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
 
     async listContacts(query: ContactQuery) {
       await ready()
-      const where: string[] = []
+      const where: string[] = [live("c", query.includeExcluded)].filter(Boolean)
       const params: unknown[] = []
 
       if (query.relationship) {
@@ -453,6 +603,14 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
           where.push(`EXISTS (SELECT 1 FROM opportunities o WHERE o.contact_id = c.id AND ${OPEN_CLAUSE})`)
           break
         case "ohne-chance":
+          where.push(`NOT EXISTS (SELECT 1 FROM opportunities o WHERE o.contact_id = c.id AND ${OPEN_CLAUSE})`)
+          break
+        /* Deckungsgleich mit der Zahl „Warm ohne Chance" auf der Übersicht.
+           Vorher führte die Kachel auf „ohne-chance" — eine deutlich grössere
+           Menge als die, die sie zählte. Eine Zahl, die auf eine andere Liste
+           zeigt, ist schlimmer als keine Verknüpfung. */
+        case "warm-ohne-chance":
+          where.push(`c.relationship IN ('warm','eng')`)
           where.push(`NOT EXISTS (SELECT 1 FROM opportunities o WHERE o.contact_id = c.id AND ${OPEN_CLAUSE})`)
           break
         case "pflege-faellig":
@@ -470,6 +628,7 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
         `SELECT count(*)::int AS total FROM contacts c
          LEFT JOIN organisations org ON org.id = c.organisation_id ${clause}`, params,
       )) as { total: number }[]
+
 
       const limit = query.limit ?? 50
       const offset = query.offset ?? 0
@@ -517,9 +676,14 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
       await ready()
       const rows = (await sql.query(
         `UPDATE contacts
-            SET linkedin_url = $2::text, role = $3::text, note = $4::text, updated_at = now()
+            SET name         = $2::text,
+                phone        = $3::text,
+                linkedin_url = $4::text,
+                role         = $5::text,
+                note         = $6::text,
+                updated_at   = now()
           WHERE id = $1 RETURNING id`,
-        [id, input.linkedinUrl, input.role, input.note],
+        [id, input.name, input.phone, input.linkedinUrl, input.role, input.note],
       )) as { id: string }[]
       if (!rows.length) return false
       await note("contact", id, "contact.details", "Angaben geändert")
@@ -544,19 +708,220 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
       return true
     },
 
-    async getOrganisation(id: string): Promise<Organisation | null> {
+    async listOrganisations(query: OrganisationQuery) {
       await ready()
-      const rows = (await sql.query(`SELECT * FROM organisations WHERE id = $1 LIMIT 1`, [id])) as {
-        id: string; name: string; website: string | null; city: string | null
-        linkedin_url: string | null; note: string | null; created_at: Ts; updated_at: Ts
-      }[]
-      if (!rows.length) return null
-      const r = rows[0]
-      return {
-        id: r.id, name: r.name, website: r.website, city: r.city,
-        linkedinUrl: r.linkedin_url, note: r.note,
-        createdAt: iso(r.created_at), updatedAt: iso(r.updated_at),
+      const where: string[] = [live("org", query.includeExcluded)].filter(Boolean)
+      const params: unknown[] = []
+
+      if (query.lifecycle) {
+        params.push(query.lifecycle)
+        where.push(`org.lifecycle = $${params.length}`)
       }
+      switch (query.bucket) {
+        case "mit-chance":
+          where.push(`EXISTS (SELECT 1 FROM opportunities o WHERE o.organisation_id = org.id AND ${OPEN_CLAUSE})`)
+          break
+        case "ohne-chance":
+          where.push(`NOT EXISTS (SELECT 1 FROM opportunities o WHERE o.organisation_id = org.id AND ${OPEN_CLAUSE})`)
+          break
+        /* Deckungsgleich mit der Kachel „Kunden ohne offene Chance". */
+        case "kunde-ohne-chance":
+          where.push(`org.lifecycle IN ('kunde','ehemaliger-kunde')`)
+          where.push(`NOT EXISTS (SELECT 1 FROM opportunities o WHERE o.organisation_id = org.id AND ${OPEN_CLAUSE})`)
+          break
+        default: break
+      }
+      if (query.search?.trim()) {
+        params.push(`%${query.search.trim()}%`)
+        const n = params.length
+        where.push(`(org.name ILIKE $${n} OR org.city ILIKE $${n} OR org.industry ILIKE $${n})`)
+      }
+      const clause = where.length ? `WHERE ${where.join(" AND ")}` : ""
+
+      const counted = (await sql.query(
+        `SELECT count(*)::int AS total FROM organisations org ${clause}`, params,
+      )) as { total: number }[]
+
+      const limit = query.limit ?? 100
+      const offset = query.offset ?? 0
+      const rows = (await sql.query(
+        `SELECT ${ORG_COLUMNS} FROM organisations org ${clause}
+          ORDER BY org.name ASC
+          LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+        [...params, limit, offset],
+      )) as OrgRowDb[]
+
+      return { rows: rows.map(toOrganisation), total: counted[0]?.total ?? 0 }
+    },
+
+    async getOrganisation(id: string): Promise<OrganisationRow | null> {
+      await ready()
+      const rows = (await sql.query(
+        `SELECT ${ORG_COLUMNS} FROM organisations org WHERE org.id = $1 LIMIT 1`, [id],
+      )) as OrgRowDb[]
+      return rows.length ? toOrganisation(rows[0]) : null
+    },
+
+    async updateOrganisationDetails(id, input) {
+      await ready()
+      const rows = (await sql.query(
+        `UPDATE organisations
+            SET name        = $2::text,
+                website     = $3::text,
+                email       = $4::text,
+                phone       = $5::text,
+                street      = $6::text,
+                postal_code = $7::text,
+                city        = $8::text,
+                country     = $9::text,
+                industry    = $10::text,
+                linkedin_url = $11::text,
+                note        = $12::text,
+                updated_at  = now()
+          WHERE id = $1 RETURNING id`,
+        [
+          id, input.name, input.website, input.email, input.phone, input.street,
+          input.postalCode, input.city, input.country, input.industry,
+          input.linkedinUrl, input.note,
+        ],
+      )) as { id: string }[]
+      if (!rows.length) return false
+      await note("organisation", id, "organisation.details", "Stammdaten geändert")
+      return true
+    },
+
+    async updateOrganisationLifecycle(id, stage) {
+      await ready()
+      const rows = (await sql.query(
+        `UPDATE organisations SET lifecycle = $2::text, updated_at = now()
+          WHERE id = $1 RETURNING id`,
+        [id, stage],
+      )) as { id: string }[]
+      if (!rows.length) return false
+      await note("organisation", id, "organisation.lifecycle", `Kundenhistorie: ${LIFECYCLE_LABELS[stage]}`)
+      return true
+    },
+
+    async listLocations(organisationId: string) {
+      await ready()
+      const rows = (await sql.query(
+        `SELECT * FROM locations WHERE organisation_id = $1 ORDER BY label ASC`,
+        [organisationId],
+      )) as LocRowDb[]
+      return rows.map(toLocation)
+    },
+
+    async createLocation(organisationId, input): Promise<Location> {
+      await ready()
+      const id = randomUUID()
+      const rows = (await sql.query(
+        `INSERT INTO locations
+           (id, organisation_id, label, street, postal_code, city, country,
+            phone, email, note, created_at, updated_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10, now(), now())
+         RETURNING *`,
+        [
+          id, organisationId, input.label, input.street, input.postalCode,
+          input.city, input.country, input.phone, input.email, input.note,
+        ],
+      )) as LocRowDb[]
+      await note("organisation", organisationId, "organisation.location", `Standort angelegt: ${input.label}`)
+      return toLocation(rows[0])
+    },
+
+    async updateLocation(id, input) {
+      await ready()
+      const rows = (await sql.query(
+        `UPDATE locations
+            SET label = $2::text, street = $3::text, postal_code = $4::text,
+                city = $5::text, country = $6::text, phone = $7::text,
+                email = $8::text, note = $9::text, updated_at = now()
+          WHERE id = $1
+        RETURNING organisation_id`,
+        [
+          id, input.label, input.street, input.postalCode, input.city,
+          input.country, input.phone, input.email, input.note,
+        ],
+      )) as { organisation_id: string }[]
+      if (!rows.length) return false
+      await note("organisation", rows[0].organisation_id, "organisation.location", `Standort geändert: ${input.label}`)
+      return true
+    },
+
+    /**
+     * Der einzige echte Löschvorgang im Vertrieb.
+     *
+     * Er ist vertretbar, weil ein Standort nichts trägt: keine Anfrage, keine
+     * Chance, keine Chronik hängt an ihm. Bei Organisation, Kontakt und
+     * Anfrage wäre dasselbe unverantwortlich — dort wird ausgeschlossen, nicht
+     * gelöscht, und die Chronik hält fest, dass es passiert ist.
+     */
+    async deleteLocation(id: string) {
+      await ready()
+      const rows = (await sql.query(
+        `DELETE FROM locations WHERE id = $1 RETURNING organisation_id, label`,
+        [id],
+      )) as { organisation_id: string; label: string }[]
+      if (!rows.length) return false
+      await note("organisation", rows[0].organisation_id, "organisation.location", `Standort entfernt: ${rows[0].label}`)
+      return true
+    },
+
+    async contactsForOrganisation(organisationId: string) {
+      await ready()
+      const rows = (await sql.query(
+        `SELECT c.*, org.name AS organisation_name,
+                (SELECT count(*) FROM opportunities o
+                  WHERE o.contact_id = c.id AND ${OPEN_CLAUSE})::int AS open_opportunities
+           FROM contacts c
+           LEFT JOIN organisations org ON org.id = c.organisation_id
+          WHERE c.organisation_id = $1
+          ORDER BY c.name ASC`,
+        [organisationId],
+      )) as ContactRowDb[]
+      return rows.map(toContact)
+    },
+
+    async opportunitiesForOrganisation(organisationId: string) {
+      await ready()
+      const rows = (await sql.query(
+        `SELECT ${OPP_COLUMNS} ${OPP_FROM} WHERE o.organisation_id = $1 ORDER BY o.updated_at DESC`,
+        [organisationId],
+      )) as OppRowDb[]
+      return rows.map(toOpportunity)
+    },
+
+    async leadsForOrganisation(organisationId: string) {
+      await ready()
+      const rows = (await sql.query(
+        `SELECT id, reference, source, created_at FROM leads
+          WHERE organisation_id = $1 ORDER BY created_at DESC LIMIT 50`,
+        [organisationId],
+      )) as { id: string; reference: string; source: string; created_at: Ts }[]
+      return rows.map((r) => ({ ...r, createdAt: iso(r.created_at) }))
+    },
+
+    async organisationChoices() {
+      await ready()
+      const rows = (await sql.query(
+        `SELECT id, name FROM organisations WHERE excluded_reason IS NULL ORDER BY name ASC`,
+      )) as { id: string; name: string }[]
+      return rows
+    },
+
+    async updateContactOrganisation(contactId: string, organisationId: string | null) {
+      await ready()
+      const rows = (await sql.query(
+        `UPDATE contacts SET organisation_id = $2::text, updated_at = now()
+          WHERE id = $1 RETURNING id`,
+        [contactId, organisationId],
+      )) as { id: string }[]
+      if (!rows.length) return false
+      await note(
+        "contact", contactId, "contact.organisation",
+        organisationId ? "Organisation zugeordnet" : "Organisationszuordnung entfernt",
+      )
+      return true
     },
 
     async leadsForContact(contactId: string) {
@@ -587,10 +952,11 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
      */
     async leadForOpportunity(opportunityId: string) {
       await ready()
-      if (!opportunityId.startsWith("opp-")) return null
-      const leadId = opportunityId.slice(4)
       const rows = (await sql.query(
-        `SELECT id, reference FROM leads WHERE id = $1 LIMIT 1`, [leadId],
+        `SELECT l.id, l.reference FROM leads l
+           JOIN opportunities o ON o.from_lead_id = l.id
+          WHERE o.id = $1 LIMIT 1`,
+        [opportunityId],
       )) as { id: string; reference: string }[]
       return rows.length ? rows[0] : null
     },
