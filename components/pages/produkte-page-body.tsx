@@ -48,14 +48,14 @@ export function ProduktePageBody() {
                 >
                   <Link
                     href={`/produkte/${product.slug}`}
-                    className="border-line hover:bg-surface relative block border-t py-10 transition-colors duration-[var(--dur-2)] md:py-12"
+                    className="border-line hover:bg-surface relative block border-t px-4 py-10 transition-colors duration-[var(--dur-2)] sm:px-6 md:px-8 md:py-12"
                   >
                     <span
                       aria-hidden="true"
                       className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                     />
 
-                    <div className="grid gap-x-10 gap-y-6 md:grid-cols-12 md:items-baseline">
+                    <div className="grid gap-x-12 gap-y-6 md:grid-cols-12 md:items-baseline">
                       <div className="md:col-span-4">
                         {/*
                           Die echten Produktlogos (fibero, CASSAMEA) SIND
