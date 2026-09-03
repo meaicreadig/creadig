@@ -3,6 +3,7 @@ import Link from "next/link"
 import { AdminField, AdminInput, AdminSelect, Pill, SectionHeader } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { getVertriebStore } from "@/lib/lead-store"
+import { isTestEnquiry } from "@/lib/vertrieb-bestand"
 import { HANDLING_LABELS, HANDLING_STATES } from "@/lib/vertrieb"
 import type { EnquiryRow, HandlingStatus } from "@/lib/vertrieb"
 
@@ -49,11 +50,15 @@ export default async function AnfragenPage({
     return <VertriebShell title="Anfragen" available={false}>{null}</VertriebShell>
   }
 
+  /* Letzte Linie: Store-Filter greift auf altem Deploy nicht — Seite filtert selbst. */
+  const rows = page.rows.filter((row) => !isTestEnquiry(row))
+  const total = Math.max(0, page.total - (page.rows.length - rows.length))
+
   return (
     <VertriebShell
       title="Anfragen"
       lead="Was über die Formulare hereingekommen ist. Ein Eingangsbuch — der Inhalt ändert sich nie."
-      meta={<span className="block">{page.total} gesamt</span>}
+      meta={<span className="block">{total} gesamt</span>}
       available
     >
       <form method="get" className="flex flex-wrap items-end gap-4">
@@ -78,15 +83,15 @@ export default async function AnfragenPage({
       </form>
 
       <div className="mt-10">
-        <SectionHeader title="Eingänge" count={`${page.rows.length} von ${page.total}`} />
-        {page.rows.length === 0 ? (
+        <SectionHeader title="Eingänge" count={`${rows.length} von ${total}`} />
+        {rows.length === 0 ? (
           <p className="type-body text-foreground/85 mt-5 max-w-2xl text-pretty">
             {search || handling || source
               ? "Keine Anfrage passt zu dieser Auswahl."
               : "Der Speicher antwortet, und es liegt noch keine Anfrage vor."}
           </p>
         ) : (
-          <EnquiryTable rows={page.rows} />
+          <EnquiryTable rows={rows} />
         )}
       </div>
     </VertriebShell>
