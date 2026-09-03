@@ -509,12 +509,27 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
         if (existing.length) return toOpportunity(existing[0])
       }
 
+      /*
+       * Der Ausschluss wird HIER vererbt, nicht erst beim naechsten Start.
+       *
+       * `applyExclusions()` laeuft beim Hochfahren eines Prozesses. Ein
+       * Vorgang, den jemand danach aus einer ausgeschlossenen Anfrage anlegt,
+       * stuende bis zum naechsten Kaltstart in der Pipeline — ausgerechnet
+       * dort, wo eine erfundene Zeile am teuersten ist.
+       *
+       * Ein Unterausdruck statt einer zweiten Abfrage: Waere es ein eigener
+       * Schritt, gaebe es einen Moment, in dem der Vorgang existiert und noch
+       * nicht markiert ist. Kurz, aber genau der Moment, in dem jemand die
+       * Pipeline oeffnet.
+       */
       const id = randomUUID()
       const rows = (await sql.query(
         `INSERT INTO opportunities
            (id, organisation_id, contact_id, title, status, source, from_lead_id,
-            created_at, updated_at)
-         VALUES ($1,$2,$3,$4,'new',$5,$6, now(), now())
+            excluded_reason, created_at, updated_at)
+         VALUES ($1,$2,$3,$4,'new',$5,$6,
+                 (SELECT l.excluded_reason FROM leads l WHERE l.id = $6::text),
+                 now(), now())
          RETURNING id, organisation_id, contact_id, title, status, source,
                    next_action, next_action_at, last_contact_at, note,
                    estimated_value, lost_reason, from_lead_id, created_at, updated_at`,
