@@ -128,6 +128,16 @@ function EnquiryTable({ rows }: { rows: EnquiryRow[] }) {
               <Td>
                 <span className="text-xs">{e.source}</span>
                 <span className="text-muted-foreground block text-xs uppercase">{e.locale}</span>
+                {/*
+                  Der Reifegrad steht in der Quellen-Spalte und nicht in einer
+                  eigenen: Er gehoert zum Betriebscheck, und eine Spalte, die
+                  bei fast allen Zeilen leer bleibt, kostet Breite ohne Ertrag.
+                */}
+                {e.checkScore != null ? (
+                  <span className="text-gold-text block text-xs tabular-nums">
+                    {e.checkScore}/100
+                  </span>
+                ) : null}
               </Td>
               <Td>
                 <time dateTime={e.createdAt} className="text-xs tabular-nums">{formatDate(e.createdAt)}</time>

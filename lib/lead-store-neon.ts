@@ -61,6 +61,9 @@ type Row = {
   next_action: string | null
   next_action_at: Date | string | null
   lost_reason: string | null
+  check_score: number | null
+  check_bottleneck: string | null
+  check_manual_spots: number | null
   created_at: Date | string
   updated_at: Date | string
 }
@@ -98,6 +101,9 @@ function toRecord(row: Row): LeadRecord {
     nextAction: row.next_action,
     nextActionAt: day(row.next_action_at),
     lostReason: row.lost_reason,
+    checkScore: row.check_score,
+    checkBottleneck: row.check_bottleneck,
+    checkManualSpots: row.check_manual_spots,
     createdAt: iso(row.created_at),
     updatedAt: iso(row.updated_at),
   }
@@ -108,6 +114,7 @@ const COLUMNS = `
   name, email, phone, business, message, site_url,
   utm_source, utm_medium, utm_campaign, utm_term, utm_content,
   sales_status, next_action, next_action_at, lost_reason,
+  check_score, check_bottleneck, check_manual_spots,
   created_at, updated_at
 `
 
@@ -181,7 +188,7 @@ export function createNeonStore(connectionString: string): LeadStore {
       await ensureSchema()
       await sql.query(
         `INSERT INTO leads (${COLUMNS})
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25)
          ON CONFLICT (id) DO UPDATE SET
            reference      = EXCLUDED.reference,
            submission_key = EXCLUDED.submission_key,
@@ -198,12 +205,22 @@ export function createNeonStore(connectionString: string): LeadStore {
            utm_campaign   = EXCLUDED.utm_campaign,
            utm_term       = EXCLUDED.utm_term,
            utm_content    = EXCLUDED.utm_content,
+           /*
+            * Der Befund wird beim Wiederholversuch mitgezogen — dieselbe
+            * Regel wie bei message. Wer den Check erneut abschickt, hat
+            * moeglicherweise anders geantwortet; gespeichert wird, was zuletzt
+            * kam. created_at bleibt davon unberuehrt.
+            */
+           check_score        = EXCLUDED.check_score,
+           check_bottleneck   = EXCLUDED.check_bottleneck,
+           check_manual_spots = EXCLUDED.check_manual_spots,
            updated_at     = EXCLUDED.updated_at`,
         [
           record.id, record.reference, record.submissionKey, record.source, record.locale,
           record.name, record.email, record.phone, record.business, record.message, record.siteUrl,
           record.utmSource, record.utmMedium, record.utmCampaign, record.utmTerm, record.utmContent,
           record.salesStatus, record.nextAction, record.nextActionAt, record.lostReason,
+          record.checkScore, record.checkBottleneck, record.checkManualSpots,
           record.createdAt, record.updatedAt,
         ],
       )

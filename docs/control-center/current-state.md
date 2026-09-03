@@ -21,7 +21,7 @@ fehlende Sales-Quellen. Die Zugangsvoraussetzung „kein Admin“ gilt nicht meh
 | Navigation (nur Materialstand) | **KEEP** | keine Future-Menü-Kulisse |
 | Admin-Typografie / Tokens | **KEEP** | dichter, gleiche DNA |
 | `/status` (öffentlich, `?key=`) | **KEEP** bis Owner sagt sonst | gleiche Datenquelle, zweiter Zugang |
-| Heute | **KEEP** | Aufmerksamkeit aus `collect()`; Vertriebsblock nennt die fehlende Quelle beim Namen |
+| Heute | **KEEP** (03.09.2026 verbunden) | Aufmerksamkeitsliste aus Vertrieb UND Materialstand (`lib/attention.ts`), sieben Ränge, jede Zeile führt auf ihren Datensatz; nicht erreichbarer Vertrieb wird als „nicht gemessen“ benannt, nicht als Null |
 | `/admin/leads` + `[id]` | **KEEP** | echter Lesepfad; drei Zustände getrennt (nicht eingerichtet / nicht erreichbar / leer) |
 | Marketing-Funnel im Admin | **MISSING SOURCE** | Analytics nur schreibend |
 | Charts / KPI-Karten | **REMOVE** (existieren nicht — so lassen) | keine Quelle |
@@ -35,7 +35,7 @@ fehlende Sales-Quellen. Die Zugangsvoraussetzung „kein Admin“ gilt nicht meh
 
 | Route | Art | Zugang | Inhalt |
 |-------|-----|--------|--------|
-| `/admin` | RSC, `force-dynamic` | Sitzung | **Heute** — Aufmerksamkeit aus realen Quellen |
+| `/admin` | RSC async, `force-dynamic` | Sitzung | **Heute** — Aufmerksamkeitsliste aus realen Quellen; Material als Vorrat in der Nebenspalte |
 | `/admin/material` | RSC, `force-dynamic` | Sitzung | Materialstand, gruppiert (unverändert, neue Adresse) |
 | `/admin/leads` | RSC, `force-dynamic` | Sitzung | Anfragen: Liste, Suche, Statusfilter |
 | `/admin/leads/[id]` | RSC + Server Actions | Sitzung | Detail 2/3 + 1/3, Status- und Schritt-Mutation |

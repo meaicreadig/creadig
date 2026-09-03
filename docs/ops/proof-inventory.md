@@ -12,7 +12,7 @@
 | Slot | Soll | Ist | Wo im Code | Status |
 |---|---|---|---|---|
 | **Echte Produkt-Oberflächen** | 4 (meAI, fibero, CASSAMEA, meahv) | **0** | `PRODUCT_SCREENS = {}` · `public/works/products/` nur README | 🔴 leer |
-| Produkt-Kartenbild | 4 | **3** — meAI · fibero · CASSAMEA = `product-photo`; **meahv `null`** | `productWorks[].image` | 🟡 teils |
+| Produkt-Kartenbild | 4 | **4** — meAI · fibero · CASSAMEA · meahv = `product-photo` | `productWorks[].image` | 🟢 |
 | Kundenlogos | ≥ 2 | **3** — nv-swiss · maqam · bir-damla-hayir | `CLIENT_LOGOS` · `public/brand/clients/` | 🟢 |
 | Bild zur Kundenarbeit | ≥ 2 | **3** — `nv-swiss.jpg` · `maqam.jpg` · `bir-damla-hayir.jpg` · `imageProof: customer-photo` | `clientWorks[].image` | 🟢 |
 | **Fallstudien freigegeben** | ≥ 2 | **0 von 3** | `caseStudies`: alle `approved: false` · Kurzformat `card` vorbereitet | 🔴 gesperrt |
@@ -34,6 +34,7 @@
 - meAI-Kartenbild Owner 29.08.: `/works/meai.jpg` (echte Oberfläche, Demodaten)
 - CASSAMEA-Kartenbild Owner 29.08.: `/works/cassamea.jpg` (POS, echte Oberfläche)
 - fibero-Kartenbild Owner 29.08.: `/works/fibero.jpg` (Feld + Map Center)
+- meahv-Kartenbild Owner 30.08.: `/works/meahv.jpg` (Laptop, echte Oberfläche)
 - `CaseCard` (Projekt · Kategorie · Leistungen) an `CaseStudy` + Render in `CaseStudyBody`
 - Kundenbilder an Case-Gerüsten verdrahtet (sichtbar erst bei `approved: true`)
 - Guide: `docs/ops/case-format.md`

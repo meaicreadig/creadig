@@ -323,6 +323,47 @@ export function evaluateCheck(answers: CheckAnswers): CheckResult {
  * Lead-Wegs — kein zweiter Endpunkt, keine zweite Ablage. Wer die Anfrage
  * liest, sieht dieselbe Ordnung, die der Absender auf dem Bildschirm hatte.
  */
+/**
+ * Fremde Antworten annehmen — oder ablehnen.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM DIESE FUNKTION HIER STEHT UND NICHT IN DER ROUTE
+ * Sie gehoert zu den Fragen. Wer eine Frage hinzufuegt oder einen
+ * Antwortschluessel aendert, aendert diese Datei — und die Pruefung muss
+ * dieselbe Aenderung sehen. Eine Route, die dieselbe Liste ein zweites Mal
+ * kennt, faellt genau dann auseinander, wenn niemand hinsieht.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM SIE SO STRENG IST
+ * Diese Werte werden nicht angezeigt, sondern gerechnet. Ein unbekannter
+ * Fragen-Schluessel oder eine unbekannte Antwort brechen `evaluateCheck()`
+ * nicht — sie zaehlen still als „nicht beantwortet" und erzeugen einen Score,
+ * der zu nichts gehoert. Deshalb: nur bekannte Kennungen, nur bekannte
+ * Antworten, alles andere ergibt `null`.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM EIN UNVOLLSTAENDIGER BOGEN ABGELEHNT WIRD
+ * `evaluateCheck()` rechnet auch mit drei von fuenfzehn Antworten — und
+ * liefert dann einen niedrigen Score, der nach einem schwachen Betrieb
+ * aussieht statt nach einem abgebrochenen Fragebogen. Ein Befund entsteht nur
+ * aus einem vollstaendigen Bogen.
+ */
+export function parseCheckAnswers(value: unknown): CheckAnswers | null {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return null
+
+  const erlaubt = new Set<string>(CHECK_ANSWERS.map((option) => option.key))
+  const eingang = value as Record<string, unknown>
+  const answers: CheckAnswers = {}
+
+  for (const question of CHECK_QUESTIONS) {
+    const antwort = eingang[question.id]
+    if (typeof antwort !== "string" || !erlaubt.has(antwort)) return null
+    answers[question.id] = antwort as CheckAnswerKey
+  }
+
+  return answers
+}
+
 export function checkSummary(
   result: CheckResult,
   answers: CheckAnswers,

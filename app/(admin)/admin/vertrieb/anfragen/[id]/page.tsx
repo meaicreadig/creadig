@@ -14,6 +14,8 @@ import {
 } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { getVertriebStore } from "@/lib/lead-store"
+import { CHECK_QUESTIONS } from "@/lib/betriebscheck"
+import { dictionary } from "@/lib/dictionary"
 import { HANDLING_LABELS, HANDLING_STATES } from "@/lib/vertrieb"
 
 /**
@@ -32,10 +34,21 @@ import { HANDLING_LABELS, HANDLING_STATES } from "@/lib/vertrieb"
  *
  * ---------------------------------------------------------------------------
  * BETRIEBSCHECK
- * Kommt als Text in der Nachricht (`checkSummary()`); es gibt keine
- * gespeicherten Einzelantworten. Darum steht hier die Zusammenfassung, wie
- * sie eingegangen ist, und keine nachgebauten Balken. Und er bleibt eine
- * Reifegrad-Diagnose, keine Kaufwahrscheinlichkeit.
+ * Seit 03.09.2026 zweigeteilt, und die Teilung ist Absicht:
+ *
+ *   Der BEFUND (Reifegrad, Engpass, Zahl der „Nicht"-Antworten) steht als
+ *   Feld — serverseitig aus den Antworten gerechnet, nicht vom Formular
+ *   entgegengenommen. Er beantwortet die Frage, die man vor dem Anruf hat.
+ *
+ *   Die ANTWORTEN stehen weiter im Klartext der Nachricht, so wie sie
+ *   eingegangen sind. Sie sind der Beleg, und ein Beleg wird nicht
+ *   nachgebaut.
+ *
+ * Keine Balken und keine Ebenen-Grafik: Der Engpass ist EIN Wert, und ein
+ * einzelner Wert braucht kein Diagramm. Der Reifegrad steht ohne Ampelfarbe
+ * da — er bleibt eine Diagnose, keine Kaufwahrscheinlichkeit, und ein roter
+ * Punkt neben einer niedrigen Zahl würde den Absender bewerten statt seinen
+ * Betrieb zu beschreiben.
  */
 export const dynamic = "force-dynamic"
 
@@ -56,6 +69,30 @@ export default async function AnfrageDetail({ params }: { params: Promise<{ id: 
   }
 
   const isCheck = enquiry.source === "betriebscheck"
+
+  /*
+   * Der Befund hängt am Reifegrad, nicht am Engpass.
+   *
+   * `!= null` fängt beides ab: das fehlende Feld bei Anfragen von vor dieser
+   * Änderung UND `undefined` aus dem Entwicklungs-Dateispeicher, der alte
+   * JSON-Zeilen ohne diese Schlüssel zurückliest.
+   *
+   * Ein fehlender Engpass ist dagegen KEIN fehlender Befund, sondern selbst
+   * ein Ergebnis: Sind alle fünf Ebenen gleich stark, gibt es keinen — und
+   * dann steht genau das da statt einer Ebene, die zufällig zuerst in der
+   * Liste steht.
+   */
+  const layers = dictionary.de.services.layers
+  const engpassKey = enquiry.checkBottleneck as keyof typeof layers | null
+  const befund =
+    enquiry.checkScore != null
+      ? {
+          score: enquiry.checkScore,
+          engpass:
+            engpassKey != null && engpassKey in layers ? layers[engpassKey].name : null,
+          manualSpots: enquiry.checkManualSpots ?? 0,
+        }
+      : null
   const utm = [enquiry.utmSource, enquiry.utmMedium, enquiry.utmCampaign].filter(Boolean).join(" · ")
 
   return (
@@ -89,6 +126,42 @@ export default async function AnfrageDetail({ params }: { params: Promise<{ id: 
                 Kaufwahrscheinlichkeit und keine Bewertung des Absenders.
               </p>
             )}
+            {befund ? (
+              /*
+                `DataValue` erzeugt `dt`/`dd`; beide brauchen ein `dl` als
+                Elternteil. Ohne das ist die Auszeichnung ungültig und ein
+                Vorleseprogramm liest drei zusammenhanglose Textstücke statt
+                drei beschrifteter Werte. Dieselbe Hülle wie im Absender-Block.
+              */
+              <Surface className="mt-4">
+                <dl className="flex flex-wrap gap-x-12 gap-y-5">
+                  <DataValue label="Reifegrad">
+                    <span className="tabular-nums">{befund.score}</span>
+                    <span className="text-muted-foreground"> / 100</span>
+                  </DataValue>
+                  <DataValue label="Engpass">
+                    {befund.engpass ?? (
+                      <span className="text-muted-foreground">
+                        keiner — alle fünf Ebenen gleich stark
+                      </span>
+                    )}
+                  </DataValue>
+                  <DataValue label="Mit „Nicht“ beantwortet">
+                    <span className="tabular-nums">{befund.manualSpots}</span>
+                    <span className="text-muted-foreground"> von {CHECK_QUESTIONS.length}</span>
+                  </DataValue>
+                </dl>
+              </Surface>
+            ) : null}
+
+            {isCheck && !befund ? (
+              <p className="type-small text-muted-foreground mt-4 max-w-2xl text-pretty">
+                Zu dieser Anfrage ist kein Befund gespeichert. Sie ist eingegangen,
+                bevor der Betriebscheck ihn als Feld ablegte (vor dem 03.09.2026) —
+                die Antworten selbst stehen unverändert darunter.
+              </p>
+            ) : null}
+
             {enquiry.message ? (
               <Surface className="mt-4">
                 <p className="type-body text-foreground/90 whitespace-pre-line">{enquiry.message}</p>

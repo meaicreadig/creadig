@@ -189,6 +189,9 @@ type EnqRowDb = {
   organisation_id: string | null; organisation_name: string | null
   opportunity_id: string | null
   excluded_reason: string | null
+  check_score: number | null
+  check_bottleneck: string | null
+  check_manual_spots: number | null
   created_at: Ts; updated_at: Ts
 }
 
@@ -203,6 +206,9 @@ function toEnquiry(r: EnqRowDb): EnquiryRow {
     organisationId: r.organisation_id, organisationName: r.organisation_name,
     opportunityId: r.opportunity_id,
     excludedReason: r.excluded_reason,
+    checkScore: r.check_score,
+    checkBottleneck: r.check_bottleneck,
+    checkManualSpots: r.check_manual_spots,
     createdAt: iso(r.created_at), updatedAt: iso(r.updated_at),
   }
 }
@@ -212,6 +218,7 @@ const ENQ_COLUMNS = `
   l.business, l.message, l.site_url,
   l.utm_source, l.utm_medium, l.utm_campaign,
   l.handling_status, l.contact_id, l.organisation_id, l.excluded_reason,
+  l.check_score, l.check_bottleneck, l.check_manual_spots,
   c.name AS contact_name, org.name AS organisation_name,
   (SELECT o2.id FROM opportunities o2
     WHERE o2.from_lead_id = l.id

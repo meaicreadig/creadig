@@ -339,6 +339,12 @@ export function Betriebscheck() {
                       email,
                       phone,
                       message: checkSummary(result, answers, locale, layerName),
+                      /*
+                       * Die Antworten, nicht der Score. Die Route rechnet ihn
+                       * selbst — ein Wert, den das Formular mitschickt, waere
+                       * eine Behauptung des Absenders und keine Messung.
+                       */
+                      checkAnswers: answers,
                       website,
                       privacyOk,
                       locale,

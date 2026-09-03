@@ -12,6 +12,7 @@ import {
   withinLimit,
 } from "@/lib/lead-guard"
 import { createLeadIdentity } from "@/lib/lead-id"
+import { evaluateCheck, parseCheckAnswers } from "@/lib/betriebscheck"
 import { findExistingSubmission, storeLead } from "@/lib/lead-store"
 
 /**
@@ -167,6 +168,19 @@ type LeadPayload = {
   utmCampaign?: unknown
   utmTerm?: unknown
   utmContent?: unknown
+  /*
+   * Die Antworten des Betriebschecks — nur beim Betriebscheck gefuellt.
+   *
+   * -------------------------------------------------------------------------
+   * WARUM DIE ANTWORTEN UND NICHT DER SCORE
+   * Das Formular kennt den Score, es zeigt ihn dem Besucher an. Trotzdem
+   * schickt es ihn nicht mit: Ein Wert, den der Absender liefert, ist seine
+   * Behauptung. Diese Route bekommt die Antworten und rechnet mit
+   * `evaluateCheck()` selbst — derselben Funktion, die auch die Seite
+   * benutzt. Damit passt der gespeicherte Score IMMER zu den gespeicherten
+   * Antworten, auch wenn jemand die Route direkt anspricht.
+   */
+  checkAnswers?: unknown
 }
 
 const LIMITS = {
@@ -902,6 +916,40 @@ export async function POST(request: Request) {
   const siteUrl = isQuickCheck ? normaliseSiteUrl(asText(payload.siteUrl, LIMITS.siteUrl)) : null
 
   /*
+   * Der Betriebscheck-Befund — serverseitig gerechnet, nicht entgegengenommen.
+   *
+   * Die Bedingung auf `source` ist Absicht: Ein Befund gehört zum
+   * Betriebscheck. Käme er über das Kontaktformular mit, entstünde eine
+   * Anfrage mit Score, die nie einen Fragebogen gesehen hat — und die Zahl
+   * stünde in der Oberfläche, als hätte jemand geantwortet.
+   *
+   * Ein unvollständiger oder unsauberer Bogen ergibt `null`, keinen Fehler:
+   * Die Anfrage selbst ist deshalb nicht ungültig. Der Mensch, der sie
+   * abschickt, soll nicht an einer Auswertung scheitern, die für ihn
+   * unsichtbar ist — die Nachricht enthält den Befund ohnehin im Klartext.
+   */
+  const checkAnswers = source === "betriebscheck" ? parseCheckAnswers(payload.checkAnswers) : null
+  const check = checkAnswers ? evaluateCheck(checkAnswers) : null
+  const befund =
+    check?.complete === true
+      ? {
+          score: check.score,
+          /*
+           * KEIN Engpass, wenn alle fuenf Ebenen gleich stark sind.
+           *
+           * `evaluateCheck().bottleneck` ist IMMER gesetzt — eine Liste hat
+           * immer ein Minimum. Bei fuenfmal 100 Prozent zeigte das Feld
+           * deshalb „Engpass: Identity" auf einem Bogen ohne jede Luecke.
+           * Genau diese Behauptung verhindert `evenlyBalanced` schon auf der
+           * oeffentlichen Seite; sie darf im Speicher nicht wieder entstehen.
+           * Nachgemessen 03.09.2026 mit einem Bogen aus fuenfzehnmal „Ja".
+           */
+          bottleneck: check.evenlyBalanced ? null : check.bottleneck.key,
+          manualSpots: check.manualSpots,
+        }
+      : null
+
+  /*
     Die Einwilligung wird hier NOCH EINMAL geprüft, obwohl das Formular sie
     schon verlangt. Eine Prüfung, die nur im Browser stattfindet, ist keine
     Prüfung — und ohne Einwilligung fehlt die Rechtsgrundlage nach
@@ -1015,6 +1063,9 @@ export async function POST(request: Request) {
     nextAction: null,
     nextActionAt: null,
     lostReason: null,
+    checkScore: befund?.score ?? null,
+    checkBottleneck: befund?.bottleneck ?? null,
+    checkManualSpots: befund?.manualSpots ?? null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   })

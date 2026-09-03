@@ -226,6 +226,28 @@ const SCHEMA: string[] = [
      key text PRIMARY KEY,
      applied_at timestamptz NOT NULL
    )`,
+
+  /*
+   * 006 · Der Betriebscheck-Befund als Feld statt als Fliesstext.
+   *
+   * Der Befund war nie verloren — `checkSummary()` schreibt ihn seit MP-D in
+   * `leads.message`, und die Anfragen-Detailseite zeigt ihn. Was fehlte, war
+   * die Form: Score, Engpass und die Zahl der „Nicht"-Antworten steckten in
+   * einem Textblock. Wer eine Anfrage mit 28/100 von einer mit 82/100
+   * unterscheiden will, musste lesen statt sehen.
+   *
+   * Drei Spalten, keine vierte: Die Antworten selbst bleiben im Text. Sie
+   * ein zweites Mal als JSON zu halten hiesse, zwei Wahrheiten ueber
+   * dieselbe Einreichung zu fuehren — und die zweite waere die, die niemand
+   * anzeigt.
+   *
+   * Alle drei nullable: Die meisten Anfragen kommen ueber das
+   * Kontaktformular und haben keinen Befund. `NULL` heisst hier „nicht
+   * erhoben", und die Oberflaeche sagt das auch so.
+   */
+  `ALTER TABLE leads ADD COLUMN IF NOT EXISTS check_score integer`,
+  `ALTER TABLE leads ADD COLUMN IF NOT EXISTS check_bottleneck text`,
+  `ALTER TABLE leads ADD COLUMN IF NOT EXISTS check_manual_spots integer`,
 ]
 
 /**

@@ -116,6 +116,34 @@ export type LeadRecord = {
   nextActionAt: string | null
   /** Nur bei `lost`. Freitext, keine erfundene Gründeliste (§21). */
   lostReason: string | null
+  /**
+   * Der Betriebscheck-Befund — als Feld, nicht als Fliesstext.
+   *
+   * -------------------------------------------------------------------------
+   * WARUM DREI FELDER UND NICHT DIE ANTWORTEN
+   * Die Antworten stehen vollständig in `message`, weil `checkSummary()` sie
+   * dort hinschreibt. Sie ein zweites Mal strukturiert zu halten hiesse, zwei
+   * Wahrheiten über dieselbe Einreichung zu führen. Hier stehen nur die drei
+   * Werte, aus denen eine Entscheidung folgt: wie reif der Betrieb ist, wo es
+   * klemmt, und wie viele Stellen der Betrieb selbst als offen benannt hat.
+   *
+   * -------------------------------------------------------------------------
+   * WARUM DER SERVER SIE RECHNET
+   * Das Formular kennt den Score — es zeigt ihn an. Trotzdem schickt es ihn
+   * nicht: Ein Wert, den der Absender mitliefert, ist seine Behauptung, nicht
+   * unsere Messung. Die Route bekommt die Antworten und ruft `evaluateCheck()`
+   * selbst auf. Damit stimmt der gespeicherte Score IMMER mit den
+   * gespeicherten Antworten überein — auch wenn jemand die Route direkt
+   * anspricht.
+   *
+   * `null` heisst „nicht erhoben". Die meisten Anfragen kommen über das
+   * Kontaktformular und haben keinen Befund; das ist kein Score 0.
+   */
+  checkScore: number | null
+  /** Schlüssel der schwächsten Ebene (`CheckLayer`), z. B. `"digital"`. */
+  checkBottleneck: string | null
+  /** Wie viele der Fragen mit „Nicht" beantwortet wurden. */
+  checkManualSpots: number | null
   createdAt: string
   updatedAt: string
 }

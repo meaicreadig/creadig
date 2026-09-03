@@ -401,7 +401,7 @@ IST (29.08.2026 — nicht zurückbauen)
 ✅ C.3 Gerüst: CaseCard · imageProof · case-format.md · inventar
 ✅ Kunden: NV SWISS · maqam · Bir Damla Hayır — Logo + Kundenbild
 ✅ Produkte Kartenfotos: meAI · fibero · CASSAMEA = product-photo JPG
-   (alte Mockup-PNGs entfernt). meahv Bild fehlt.
+   (alte Mockup-PNGs entfernt). meahv: `/works/meahv.jpg` Owner 30.08.
 ⬜ caseStudies[].approved = false (alle)
 ⬜ approvalOnFile / approvedSentence fehlen
 ⬜ maqam + Bir Damla Hayır: card.services / built oft null

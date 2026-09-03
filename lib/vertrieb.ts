@@ -325,6 +325,18 @@ export type EnquiryRow = {
   /** Die Chance, die aus dieser Anfrage entstanden ist — falls es eine gibt. */
   opportunityId: string | null
   excludedReason: string | null
+  /**
+   * Der Betriebscheck-Befund, falls die Anfrage aus dem Fragebogen kam.
+   *
+   * `null` heisst „nicht erhoben", nicht „Score 0" — die meisten Anfragen
+   * kommen ueber das Kontaktformular und haben keinen Befund. Die vollen
+   * Antworten stehen im Klartext in `message`; hier stehen nur die drei
+   * Werte, aus denen eine Entscheidung folgt.
+   */
+  checkScore: number | null
+  /** Schluessel der schwaechsten Ebene (`CheckLayer`), z. B. `"digital"`. */
+  checkBottleneck: string | null
+  checkManualSpots: number | null
   createdAt: string
   updatedAt: string
 }
