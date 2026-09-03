@@ -1,4 +1,5 @@
 import { Hero } from "@/components/sections/hero"
+import { LogoStrip } from "@/components/sections/logo-strip"
 import { HouseStatement } from "@/components/sections/house-statement"
 import { SelectedWork } from "@/components/sections/selected-work"
 import { CapabilityTiles } from "@/components/sections/capability-tiles"
@@ -29,7 +30,8 @@ import { ClosingCta } from "@/components/sections/closing-cta"
  *
  * ---------------------------------------------------------------------------
  * WOHIN DIE ALTEN SEKTIONEN GEZOGEN SIND — gestrichen wurde nichts
- *   Logo-Wand, Über uns, Zertifizierungen  → /unternehmen
+ *   Logo-Wand (voll) · Über uns · Zertifizierungen → /unternehmen
+ *   Logo-Streifen (3 Bahnen) bleibt auf der Startseite unter dem Hero.
  *   Werkschau, Register, Bewertungen       → /arbeiten
  *   Ebenen-Pyramide, Prozess, Pakete, FAQ  → /leistungen
  *   meAI-Deep-Dive                         → /produkte
@@ -81,6 +83,12 @@ export function HomeRoute() {
     <main id="top">
       {/* 1 · C — Wer wir sind, in einer Headline und vier Absprungpunkten. */}
       <Hero />
+
+      {/*
+        1b · C — Drei Logo-Bahnen (→ ← →), Hover pausiert.
+        Nur eigene Produkte + freigegebene Kunden. Beweis direkt unter dem Hero.
+      */}
+      <LogoStrip />
 
       {/* 2 · A — creaDIG in einem Satz. Die erste Pause. */}
       <HouseStatement />
