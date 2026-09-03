@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import type { Locale } from "@/lib/dictionary"
 import { DEFAULT_LOCALE, SITE_URL, locales } from "@/lib/routes"
 import { raiseAlert } from "@/lib/alert"
 import {
@@ -107,8 +108,26 @@ export async function GET(request: Request) {
   return NextResponse.json({ ok: true, token }, { headers: { "Cache-Control": "no-store" } })
 }
 
-/** Nur diese Sprachen haben Bestätigungstexte. Alles andere fällt auf DE. */
-type Locale = "de" | "tr"
+/*
+ * Hier stand ein eigener `type Locale = "de" | "tr"`.
+ *
+ * Er hat den echten, vierstelligen Typ aus `lib/dictionary.ts` beschattet —
+ * und weil `CONFIRMATION` mit IHM getypt war, verlangte der Compiler nur zwei
+ * Sprachen. Die Prüfung in `POST` liest dagegen die echte `locales`-Liste und
+ * hat das Ergebnis mit `as Locale` in den engen Typ gezwungen: `en` und `ar`
+ * kamen durch, wurden richtig gespeichert — und liefen dann in
+ * `CONFIRMATION[locale]` gegen `undefined`.
+ *
+ * Nachgemessen am 03.09.2026 in der Preview-Abnahme:
+ *
+ *   [lead] created CD-260903-661b (neon)
+ *   [alarm] lead-confirmation-failed: TypeError:
+ *           Cannot read properties of undefined (reading 'kontakt')
+ *
+ * Die Anfrage lag im Postfach, der Absender bekam nichts. Ein eigener Typ mit
+ * demselben Namen wie ein importierter ist genau die Art Abkürzung, die man
+ * erst bemerkt, wenn sie etwas kostet.
+ */
 
 type LeadPayload = {
   name?: unknown
@@ -260,6 +279,9 @@ const RESPONSE_TIME = {
    * `<html lang="tr">` im Layout gesetzt wurde.
    */
   trSentenceStart: "İki iş günü içinde",
+  en: "within two working days",
+  enSentenceStart: "Within two working days",
+  ar: "خلال يومي عمل",
 } as const
 
 const SIGNATURE_DE = [
@@ -303,6 +325,8 @@ const SIGNATURE_TR = [
  */
 const PROOF_URL = `${SITE_URL}/produkte/meai`
 const PROOF_URL_TR = `${SITE_URL}/tr/produkte/meai`
+const PROOF_URL_EN = `${SITE_URL}/en/produkte/meai`
+const PROOF_URL_AR = `${SITE_URL}/ar/produkte/meai`
 
 const NEXT_STEPS_DE = [
   "WIE ES WEITERGEHT",
@@ -408,6 +432,117 @@ const PROOF_TR = [
 const CLOSING_TR = [
   "Bu mesaj otomatik bir onaydır; yanıtlamanız gerekmez.",
   "Acele bir durum varsa doğrudan info@creadig.de adresinden bize ulaşabilirsiniz.",
+]
+
+/* ========================================================================== *
+ * ENGLISCH UND ARABISCH
+ * ========================================================================== *
+ *
+ * Sie fehlten — und das war kein Schönheitsfehler, sondern ein Absturz. Wer
+ * auf Englisch oder Arabisch angefragt hat, bekam GAR KEINE Bestätigung, weil
+ * `CONFIRMATION[locale]` nicht existierte. Die Anfrage lag im Postfach, der
+ * Absender hörte nichts.
+ *
+ * Warum eine deutsche Bestätigung als Ersatz zu wenig ist: Wer auf Arabisch
+ * schreibt, hat sich für diese Sprachfassung entschieden — eine Antwort auf
+ * Deutsch beantwortet die Frage „habt ihr mich verstanden" mit nein. Die
+ * Verweise zeigen deshalb auch auf die jeweilige Sprachfassung, nicht auf die
+ * deutsche.
+ */
+
+const SIGNATURE_EN = ["", "Kind regards", "Muhammed Emin Akyol", "creaDIG · ICO InnovationsCentrum Osnabrück"]
+const SIGNATURE_AR = ["", "مع خالص التحية", "Muhammed Emin Akyol", "creaDIG · ICO InnovationsCentrum Osnabrück"]
+
+const NEXT_STEPS_EN = [
+  "WHAT HAPPENS NEXT",
+  `1. We read your enquiry and get back to you ${RESPONSE_TIME.en}.`,
+  "2. A twenty-minute first call — free, without obligation, by phone or video.",
+  "3. After that we tell you honestly whether we can help, what we would build and what it costs.",
+]
+
+const BRING_EN = [
+  "WHAT MAKES THE CALL SHORTER",
+  "If you have them to hand:",
+  "· your existing website and who holds the access to it",
+  "· your Google Business Profile, if there is one",
+  "· where the domain sits and who administers it",
+  "· a sentence or two on what is causing friction day to day",
+  "If something is missing: no problem. We will find it together.",
+]
+
+const PROOF_EN = [
+  "WHERE YOU CAN SEE OUR WORK",
+  "meAI is our own system — built by us, run by us, used in our own house",
+  "every day:",
+  PROOF_URL_EN,
+]
+
+const QUICKCHECK_EN = [
+  "WHAT HAPPENS NEXT",
+  "1. We look at your site — by hand, with a keyboard and a screen reader,",
+  "   not just with an automated scanner.",
+  `2. ${RESPONSE_TIME.enSentenceStart} we come back with three concrete points:`,
+  "   what we noticed, where it sits and what it means for your visitors.",
+  "3. What comes of it is your decision. The quick check costs nothing",
+  "   and commits you to nothing.",
+]
+
+const QUICKCHECK_LIMIT_EN = [
+  "WHAT THE QUICK CHECK IS NOT",
+  "It shows three points, not all of them. It is not a full audit against",
+  "WCAG 2.1 AA — that is hand work and takes longer than a look.",
+  "And it is not a legal assessment; that is for your legal advisers, not us.",
+]
+
+const CLOSING_EN = [
+  "This message is an automatic confirmation; you do not need to reply to it.",
+  "If it is urgent, you can reach us directly at info@creadig.de.",
+]
+
+const NEXT_STEPS_AR = [
+  "ما الذي سيحدث بعد ذلك",
+  `.1 نقرأ طلبك ونعود إليك ${RESPONSE_TIME.ar}.`,
+  ".2 مكالمة أولى مدتها عشرون دقيقة — مجانية، دون التزام، عبر الهاتف أو الفيديو.",
+  ".3 بعدها نقول لك بصراحة إن كنا نستطيع المساعدة، وما الذي سنبنيه، وكم يكلف.",
+]
+
+const BRING_AR = [
+  "ما الذي يختصر المكالمة",
+  ":إن كانت هذه المعلومات في متناولك",
+  "· موقعك الحالي ومن لديه بيانات الدخول إليه",
+  "· ملفك في نشاطي التجاري على جوجل، إن وُجد",
+  "· أين يُستضاف النطاق ومن يديره",
+  "· جملة أو جملتان عما يعيق سير العمل اليوم",
+  ".إن نقص شيء من ذلك فلا مشكلة — سنجده معًا",
+]
+
+const PROOF_AR = [
+  "أين ترى عملنا",
+  "meAI هو نظامنا الخاص — نحن بنيناه، ونحن نشغّله، ونستخدمه في عملنا",
+  ":كل يوم",
+  PROOF_URL_AR,
+]
+
+const QUICKCHECK_AR = [
+  "ما الذي سيحدث بعد ذلك",
+  ".1 ننظر في موقعك — يدويًا، بلوحة المفاتيح وقارئ الشاشة،",
+  "   لا بأداة فحص آلية فحسب.",
+  `.2 ${RESPONSE_TIME.ar} نعود إليك بثلاث نقاط ملموسة:`,
+  "   ما لفت انتباهنا، وأين يقف، وماذا يعني لزوارك.",
+  ".3 ما ينتج عن ذلك قرارك أنت. الفحص السريع لا يكلف شيئًا",
+  "   ولا يُلزمك بشيء.",
+]
+
+const QUICKCHECK_LIMIT_AR = [
+  "ما ليس عليه الفحص السريع",
+  "يُظهر ثلاث نقاط، لا كلها. وهو ليس تدقيقًا كاملًا وفق",
+  ".WCAG 2.1 AA — فذاك عمل يدوي يستغرق أطول من نظرة",
+  ".وليس تقييمًا قانونيًا؛ ذلك شأن مستشارك القانوني، لا شأننا",
+]
+
+const CLOSING_AR = [
+  ".هذه الرسالة تأكيد آلي؛ لا حاجة للرد عليها",
+  ".إن كان الأمر عاجلًا يمكنك مراسلتنا مباشرة على info@creadig.de",
 ]
 
 /** Absätze mit genau einer Leerzeile dazwischen — Plaintext, aber lesbar. */
@@ -526,6 +661,102 @@ const CONFIRMATION: Record<
           PROOF_TR,
           CLOSING_TR,
           SIGNATURE_TR.slice(1),
+        ]),
+    },
+  },
+  en: {
+    kontakt: {
+      subject: "Your enquiry at creaDIG",
+      body: (name, reference) =>
+        paragraphs([
+          [name ? `Hello ${name},` : "Hello,"],
+          ["thank you for your enquiry — it has reached us."],
+          [`Your reference number: ${reference}`],
+          NEXT_STEPS_EN,
+          BRING_EN,
+          PROOF_EN,
+          CLOSING_EN,
+          SIGNATURE_EN.slice(1),
+        ]),
+    },
+    termin: {
+      subject: "Appointment request received — we will confirm a time",
+      body: (name, reference) =>
+        paragraphs([
+          [name ? `Hello ${name},` : "Hello,"],
+          ["thank you for your appointment request — it has reached us."],
+          [`Your reference number: ${reference}`],
+          [
+            "The appointment is not booked yet: we will compare your preferred times",
+            "and confirm a binding date.",
+          ],
+          NEXT_STEPS_EN,
+          BRING_EN,
+          PROOF_EN,
+          CLOSING_EN,
+          SIGNATURE_EN.slice(1),
+        ]),
+    },
+    kurzcheck: {
+      subject: "Quick check requested — we will look at your site",
+      body: (name, reference) =>
+        paragraphs([
+          [name ? `Hello ${name},` : "Hello,"],
+          ["thank you for your request — it has reached us."],
+          [`Your reference number: ${reference}`],
+          QUICKCHECK_EN,
+          QUICKCHECK_LIMIT_EN,
+          PROOF_EN,
+          CLOSING_EN,
+          SIGNATURE_EN.slice(1),
+        ]),
+    },
+  },
+  ar: {
+    kontakt: {
+      subject: "طلبك لدى creaDIG",
+      body: (name, reference) =>
+        paragraphs([
+          [name ? `،مرحبًا ${name}` : "،مرحبًا"],
+          [".شكرًا لطلبك — لقد وصلنا"],
+          [`${reference} :رقم المرجع الخاص بك`],
+          NEXT_STEPS_AR,
+          BRING_AR,
+          PROOF_AR,
+          CLOSING_AR,
+          SIGNATURE_AR.slice(1),
+        ]),
+    },
+    termin: {
+      subject: "وصلنا طلب الموعد — سنؤكد لك موعدًا",
+      body: (name, reference) =>
+        paragraphs([
+          [name ? `،مرحبًا ${name}` : "،مرحبًا"],
+          [".شكرًا لطلبك تحديد موعد — لقد وصلنا"],
+          [`${reference} :رقم المرجع الخاص بك`],
+          [
+            ".الموعد لم يُحجز بعد: سنقارن الأوقات التي تفضّلها",
+            ".ثم نؤكد لك موعدًا ملزمًا",
+          ],
+          NEXT_STEPS_AR,
+          BRING_AR,
+          PROOF_AR,
+          CLOSING_AR,
+          SIGNATURE_AR.slice(1),
+        ]),
+    },
+    kurzcheck: {
+      subject: "طلب فحص سريع — سننظر في موقعك",
+      body: (name, reference) =>
+        paragraphs([
+          [name ? `،مرحبًا ${name}` : "،مرحبًا"],
+          [".شكرًا لطلبك — لقد وصلنا"],
+          [`${reference} :رقم المرجع الخاص بك`],
+          QUICKCHECK_AR,
+          QUICKCHECK_LIMIT_AR,
+          PROOF_AR,
+          CLOSING_AR,
+          SIGNATURE_AR.slice(1),
         ]),
     },
   },
