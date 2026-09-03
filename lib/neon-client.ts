@@ -6,6 +6,7 @@ import {
   BESTAND_KONTAKTE,
   BESTAND_ORGANISATIONEN,
 } from "@/lib/vertrieb-bestand"
+import { EXCLUSION_TESTDATA } from "@/lib/vertrieb"
 
 /**
  * Der Neon-Zugang und das Schema — an genau einer Stelle.
@@ -495,46 +496,72 @@ async function seedBestand(sql: Sql): Promise<void> {
  * Die einzige Ausnahme ist `@beispiel.invalid`: eine per Norm für Tests
  * reservierte Endung, die keinem Menschen gehören kann.
  *
- * `AND excluded_reason IS NULL` sorgt dafür, dass ein Ausschluss, den jemand
- * von Hand aufgehoben hat, nicht wiederkommt — zusammen mit dem
- * Einmal-Gedächtnis oben.
+ * ---------------------------------------------------------------------------
+ * WARUM KEIN `once()` MEHR
+ * Der Ausschluss lief früher hinter `import_log`. Das war falsch: Ein Lead,
+ * der NACH dem ersten Lauf entsteht (Gate-4-Abnahme, V11-Fixtures), blieb
+ * für immer unmarkiert — und die Listen filtern korrekt nach
+ * `excluded_reason IS NULL`. Ergebnis: die operative Inbox zeigte Testzeilen,
+ * obwohl die Spezifikation sie ausschliesst (gemessen Preview 03.09.2026).
+ *
+ * Jeder Start setzt denselben UPDATE erneut. `AND excluded_reason IS NULL`
+ * macht ihn idempotent und lässt einen von Hand aufgehobenen Ausschluss
+ * unangetastet — wer den Grund löscht, meint es.
  */
 async function applyExclusions(sql: Sql): Promise<void> {
   for (const { name, reason } of AUSGESCHLOSSENE_NAMEN) {
-    await once(sql, `exclude:name:${name}`, async () => {
-      await sql.query(
-        `UPDATE organisations SET excluded_reason = $2::text, updated_at = now()
-          WHERE lower(btrim(name)) = lower(btrim($1::text)) AND excluded_reason IS NULL`,
-        [name, reason],
-      )
-      await sql.query(
-        `UPDATE contacts SET excluded_reason = $2::text, updated_at = now()
-          WHERE lower(btrim(name)) = lower(btrim($1::text)) AND excluded_reason IS NULL`,
-        [name, reason],
-      )
-      await sql.query(
-        `UPDATE leads SET excluded_reason = $2::text
-          WHERE excluded_reason IS NULL
-            AND (lower(btrim(coalesce(business, ''))) = lower(btrim($1::text))
-              OR lower(btrim(name)) = lower(btrim($1::text)))`,
-        [name, reason],
-      )
-    })
-  }
-
-  await once(sql, `exclude:mail:${AUSGESCHLOSSENE_MAIL_ENDUNG}`, async () => {
-    const like = `%${AUSGESCHLOSSENE_MAIL_ENDUNG}`
     await sql.query(
-      `UPDATE leads SET excluded_reason = $2::text
-        WHERE lower(btrim(email)) LIKE $1::text AND excluded_reason IS NULL`,
-      [like, `Abnahmedatensatz — ${AUSGESCHLOSSENE_MAIL_ENDUNG} ist für Tests reserviert`],
+      `UPDATE organisations SET excluded_reason = $2::text, updated_at = now()
+        WHERE lower(btrim(name)) = lower(btrim($1::text)) AND excluded_reason IS NULL`,
+      [name, reason],
     )
     await sql.query(
       `UPDATE contacts SET excluded_reason = $2::text, updated_at = now()
-        WHERE lower(btrim(email)) LIKE $1::text AND excluded_reason IS NULL`,
-      [like, `Abnahmedatensatz — ${AUSGESCHLOSSENE_MAIL_ENDUNG} ist für Tests reserviert`],
+        WHERE lower(btrim(name)) = lower(btrim($1::text)) AND excluded_reason IS NULL`,
+      [name, reason],
     )
-  })
+    await sql.query(
+      `UPDATE leads SET excluded_reason = $2::text
+        WHERE excluded_reason IS NULL
+          AND (lower(btrim(coalesce(business, ''))) = lower(btrim($1::text))
+            OR lower(btrim(name)) = lower(btrim($1::text)))`,
+      [name, reason],
+    )
+  }
+
+  const like = `%${AUSGESCHLOSSENE_MAIL_ENDUNG}`
+  const mailReason = `Abnahmedatensatz — ${AUSGESCHLOSSENE_MAIL_ENDUNG} ist für Tests reserviert`
+  await sql.query(
+    `UPDATE leads SET excluded_reason = $2::text
+      WHERE lower(btrim(email)) LIKE $1::text AND excluded_reason IS NULL`,
+    [like, mailReason],
+  )
+  await sql.query(
+    `UPDATE contacts SET excluded_reason = $2::text, updated_at = now()
+      WHERE lower(btrim(email)) LIKE $1::text AND excluded_reason IS NULL`,
+    [like, mailReason],
+  )
+
+  /*
+   * V11-Abnahme-Fixtures: Prefix, nicht exakter Name.
+   *
+   * Die vier Preview-Läufe erzeugen denselben Betriebstitel mit laufender
+   * Nummer oder ohne. Ein exakter Listen-Eintrag trifft sie nicht alle;
+   * `%Yilmaz%` wäre zu weit. Der Prefix „V11 Abnahme" ist Owner-/Test-
+   * Konvention und trifft keinen realen Bestandskunden.
+   */
+  await sql.query(
+    `UPDATE leads SET excluded_reason = $1::text
+      WHERE excluded_reason IS NULL
+        AND (lower(btrim(coalesce(business, ''))) LIKE 'v11 abnahme%'
+          OR lower(btrim(name)) LIKE 'v11 abnahme%')`,
+    [EXCLUSION_TESTDATA],
+  )
+  await sql.query(
+    `UPDATE organisations SET excluded_reason = $1::text, updated_at = now()
+      WHERE excluded_reason IS NULL AND lower(btrim(name)) LIKE 'v11 abnahme%'`,
+    [EXCLUSION_TESTDATA],
+  )
 
   /*
    * Vorgänge erben den Ausschluss ihrer Herkunft.

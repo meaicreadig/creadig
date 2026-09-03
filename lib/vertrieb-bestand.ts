@@ -389,6 +389,7 @@ export const AUSGESCHLOSSENE_NAMEN: { name: string; reason: string }[] = [
   { name: "Gate4 Testbetrieb", reason: EXCLUSION_TESTDATA },
   { name: "Yilmaz Dachtechnik", reason: EXCLUSION_TESTDATA },
   { name: "Deniz Yilmaz", reason: EXCLUSION_TESTDATA },
+  { name: "V11 Abnahme Betrieb", reason: EXCLUSION_TESTDATA },
 
   /* Echte Menschen mit echten Anliegen — nur nicht im creaDIG-Vertrieb.
      Sie als „Testdaten" zu führen wäre bequem und unwahr. */
