@@ -3,6 +3,8 @@ import nodeOs from "node:os"
 import nodePath from "node:path"
 import { raiseAlert } from "@/lib/alert"
 import { createNeonStore } from "@/lib/lead-store-neon"
+import { createNeonVertrieb } from "@/lib/vertrieb-store-neon"
+import type { VertriebStore } from "@/lib/vertrieb"
 import type { Locale } from "@/lib/dictionary"
 
 /**
@@ -417,6 +419,57 @@ export function getLeadStore(): LeadStore | null {
   )
   return null
 }
+
+/**
+ * Der Vertriebs-Speicher — dieselbe Datenbank, zweite Facette.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM DAS NUR MIT NEON GEHT
+ * `LeadStore` beschreibt den Weg einer Website-Anfrage; den erfuellen auch
+ * die Entwicklungs-Adapter, und das bleibt so — die Abnahme des Formularwegs
+ * braucht keine Datenbank.
+ *
+ * Vertrieb braucht Verknuepfungen und Zaehlungen ueber vier Tabellen. Das in
+ * einer JSON-Datei nachzubauen hiesse, einen halben Datenbankkern zu
+ * schreiben, den niemand testet — und dessen Verhalten dann NICHT dem
+ * entspricht, was in Produktion laeuft. Genau diese Art Attrappe hat hier
+ * schon einen Fehler versteckt (`42P08`, `lead-store-neon.ts`).
+ *
+ * Fehlt die Datenbank, gibt diese Funktion `null` zurueck und die
+ * Oberflaeche sagt das. Sie erfindet nichts.
+ */
+export function getVertriebStore(): VertriebStore | null {
+  if (process.env.LEAD_STORE?.trim() !== "neon") return null
+  const url = process.env.DATABASE_URL?.trim()
+  if (!url) return null
+  if (!vertriebStore) {
+    /*
+     * `neon()` prueft die Zeichenkette sofort und wirft bei einer kaputten.
+     * Ungefangen kommt das nicht als Fehlerseite an, sondern bleibt im
+     * Ladezustand haengen — nachgemessen am 02.09.2026 mit einer
+     * absichtlich unvollstaendigen Verbindung: Die Seite zeigte dauerhaft
+     * "Wird geladen", und der Fehler stand nur im Serverprotokoll.
+     *
+     * Anders als beim LeadStore ist `null` hier die richtige Antwort. Dort
+     * muss "nicht eingerichtet" von "nicht erreichbar" unterschieden werden,
+     * weil der Schreibweg beides verschieden behandelt. Fuer eine
+     * Leseansicht laufen beide auf dieselbe Aussage hinaus — und die steht
+     * in `VertriebShell`: eingerichtet ODER erreichbar ist sie gerade nicht.
+     */
+    try {
+      vertriebStore = createNeonVertrieb(url)
+    } catch (error) {
+      warnOnce(
+        "vertrieb-store-unreachable",
+        `Vertriebs-Speicher nicht erreichbar: ${error instanceof Error ? error.message : "unbekannt"}`,
+      )
+      return null
+    }
+  }
+  return vertriebStore
+}
+
+let vertriebStore: VertriebStore | null = null
 
 export function leadStoreConfigured(): boolean {
   return getLeadStore() !== null

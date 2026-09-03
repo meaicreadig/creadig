@@ -1,4 +1,4 @@
-import { neon } from "@neondatabase/serverless"
+import { linkLeadToCrm, neonClient } from "@/lib/neon-client"
 
 import type { Locale } from "@/lib/dictionary"
 import type {
@@ -112,67 +112,6 @@ const COLUMNS = `
 `
 
 /**
- * Das Schema, wie es `scripts/migrations/001-leads.sql` beschreibt.
- *
- * ---------------------------------------------------------------------------
- * WARUM DAS HIER STEHT UND NICHT IN EINEM MIGRATIONSWERKZEUG
- * Die Zugangsdaten zur Datenbank existieren ausschliesslich in der
- * Vercel-Umgebung. Es gibt keinen Arbeitsplatz, von dem aus sich einmalig
- * ein SQL-Skript einspielen liesse, ohne das Geheimnis dorthin zu tragen —
- * und ein Geheimnis, das man herumreicht, ist keins mehr.
- *
- * Deshalb bringt der Adapter sein Schema selbst mit: einmal je Prozess, vor
- * der ersten Abfrage, ausschliesslich `IF NOT EXISTS`. Zwei gleichzeitige
- * Kaltstarts stoeren sich daran nicht; Postgres entscheidet, wer zuerst da war.
- *
- * ---------------------------------------------------------------------------
- * DIE GRENZE DIESES VERFAHRENS
- * Es traegt genau eine Tabelle ohne Datenumbau. Sobald eine Aenderung
- * bestehende Zeilen anfassen muss — eine Spalte umbenennen, Werte umrechnen —
- * ist Laufzeit-DDL das falsche Werkzeug: Es gibt keine Reihenfolge, keinen
- * Rueckweg und kein Protokoll. Dann gehoert hier ein echtes
- * Migrationswerkzeug hin, und die SQL-Datei bleibt die Quelle.
- *
- * Die Datei ist deshalb nicht dekorativ. Sie ist die lesbare Wahrheit ueber
- * die Tabelle; dieser Block haelt sie nur nach.
- */
-const SCHEMA = `
-CREATE TABLE IF NOT EXISTS leads (
-  id              text PRIMARY KEY,
-  reference       text NOT NULL,
-  submission_key  text UNIQUE,
-  source          text NOT NULL,
-  locale          text NOT NULL,
-  name            text NOT NULL,
-  email           text NOT NULL,
-  phone           text NOT NULL,
-  business        text,
-  message         text,
-  site_url        text,
-  utm_source      text,
-  utm_medium      text,
-  utm_campaign    text,
-  utm_term        text,
-  utm_content     text,
-  sales_status    text NOT NULL DEFAULT 'new'
-                  CHECK (sales_status IN (
-                    'new','contacted','qualified','discovery','audit',
-                    'proposal','negotiation','won','lost'
-                  )),
-  next_action     text,
-  next_action_at  date,
-  lost_reason     text,
-  created_at      timestamptz NOT NULL,
-  updated_at      timestamptz NOT NULL
-)`
-
-const INDEXES = [
-  `CREATE INDEX IF NOT EXISTS leads_created_at_idx ON leads (created_at DESC)`,
-  `CREATE INDEX IF NOT EXISTS leads_sales_status_idx ON leads (sales_status)`,
-  `CREATE INDEX IF NOT EXISTS leads_updated_at_idx ON leads (updated_at)`,
-]
-
-/**
  * Ein Adapter, der bei jedem Zugriff scheitert — mit Ansage.
  *
  * ---------------------------------------------------------------------------
@@ -182,13 +121,13 @@ const INDEXES = [
  * das auch so. Bei `LEAD_STORE=neon` mit kaputter Verbindung waere dieselbe
  * Meldung eine Luege — der Speicher ist eingerichtet, er antwortet nur nicht.
  *
- * Der Unterschied ist nicht kosmetisch, er entscheidet ueber die Reaktion:
+ * Der Unterschied entscheidet ueber die Reaktion:
  *   kein Speicher      → nichts tun, alles laeuft wie vor MP-G
  *   nicht erreichbar   → jemand muss nachsehen, JETZT
  *
  * Und im Schreibweg waere `null` ein stiller Rueckfall: `storeLead` gaebe
  * "skipped" zurueck und niemand erfuehre davon. So wirft es, `storeLead`
- * faengt es, und der Alarm geht raus (§17: nie leise degradieren).
+ * faengt es, und der Alarm geht raus.
  */
 function unreachableStore(reason: string): LeadStore {
   const fail = async (): Promise<never> => {
@@ -207,34 +146,21 @@ function unreachableStore(reason: string): LeadStore {
 
 export function createNeonStore(connectionString: string): LeadStore {
   /*
-   * `neon()` prueft die Zeichenkette sofort und wirft bei einer kaputten.
-   * Ungefangen wuerde das die ganze Seite mit 500 beenden — auch den
-   * Materialstand, der mit der Datenbank nichts zu tun hat.
+   * Client und Schema kommen aus `lib/neon-client.ts` — dieselbe Quelle,
+   * die auch der Vertriebs-Adapter benutzt. Zwei Stellen, die je ein Schema
+   * anlegen, waeren zwei Schemata, sobald eines nachgezogen wird.
+   *
+   * `neonClient()` prueft die Zeichenkette sofort und wirft bei einer
+   * kaputten. Ungefangen wuerde das die ganze Seite mit 500 beenden — auch
+   * den Materialstand, der mit der Datenbank nichts zu tun hat.
    */
-  let sql: ReturnType<typeof neon>
+  let sql, ensureSchema
   try {
-    sql = neon(connectionString)
+    const client = neonClient(connectionString)
+    sql = client.sql
+    ensureSchema = client.ready
   } catch (error) {
     return unreachableStore(error instanceof Error ? error.message : "unbekannt")
-  }
-
-  /*
-   * Einmal je Prozess. Das Versprechen wird gemerkt, nicht das Ergebnis:
-   * Schlaegt es fehl, schlaegt auch die Abfrage fehl, die darauf wartet —
-   * und der Lesepfad meldet "nicht erreichbar" statt "keine Anfragen".
-   */
-  let ready: Promise<void> | null = null
-  function ensureSchema(): Promise<void> {
-    if (!ready) {
-      ready = (async () => {
-        await sql.query(SCHEMA)
-        for (const stmt of INDEXES) await sql.query(stmt)
-      })().catch((error) => {
-        ready = null // beim naechsten Versuch neu probieren
-        throw error
-      })
-    }
-    return ready
   }
 
   return {
@@ -281,6 +207,28 @@ export function createNeonStore(connectionString: string): LeadStore {
           record.createdAt, record.updatedAt,
         ],
       )
+
+      /*
+       * GATE 4 · Vertrieb — die Anfrage bekommt sofort ihren Kontakt.
+       *
+       * Ein eigener Schritt und keine Transaktion: Scheitert er, ist die
+       * Anfrage trotzdem gespeichert. Das ist die richtige Reihenfolge der
+       * Verluste — eine Anfrage ohne Kontaktverknuepfung laesst sich beim
+       * naechsten Start nachziehen (der Backfill tut genau das), eine
+       * verlorene Anfrage nicht.
+       */
+      try {
+        await linkLeadToCrm(sql, {
+          id: record.id,
+          name: record.name,
+          email: record.email,
+          phone: record.phone,
+          business: record.business,
+          createdAt: record.createdAt,
+        })
+      } catch (error) {
+        console.warn(`[lead] Verknuepfung zu Kontakt/Organisation fehlgeschlagen (${record.reference}):`, error)
+      }
     },
 
     async findBySubmissionKey(key: string): Promise<LeadRecord | null> {
