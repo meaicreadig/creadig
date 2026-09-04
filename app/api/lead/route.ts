@@ -1042,7 +1042,7 @@ export async function POST(request: Request) {
    * Ohne `LEAD_STORE` passiert hier nichts — die Route verhaelt sich dann
    * exakt wie vor MP-G.
    */
-  await storeLead({
+  const stored = await storeLead({
     id: leadId,
     reference,
     submissionKey,
@@ -1070,6 +1070,41 @@ export async function POST(request: Request) {
     updatedAt: new Date().toISOString(),
   })
 
+  /*
+   * GATE 01 — WENN DER SPEICHER AUSFAELLT, MUSS ES JEMAND ERFAHREN.
+   *
+   * Gemessen am 04.09.2026 mit einer absichtlich unerreichbaren Datenbank:
+   * Die Route antwortete `ok:true` samt Vorgangsnummer, `storeLead` meldete
+   * `failed` und schrieb einen Alarm — und das Ergebnis wurde an dieser
+   * Stelle weggeworfen. Die Mail ging raus wie immer.
+   *
+   * Fuer den Absender ist das richtig: Seine Anfrage IST angekommen, denn
+   * die Mail ist der Hauptweg und der Speicher die Ergaenzung. Ihn wegen
+   * eines Datenbankausfalls abzuweisen waere die falsche Antwort — er kann
+   * nichts dafuer und muesste es noch einmal schicken.
+   *
+   * Falsch war, dass es NIEMAND ERFAEHRT. Der Alarm landet ohne
+   * `ALERT_WEBHOOK_URL` nur im Serverprotokoll, und ein Serverprotokoll
+   * liest an einem Freitagabend keiner. In der Vertriebsflaeche taucht die
+   * Anfrage nicht auf; sie existiert dann ausschliesslich in diesem einen
+   * Postfach — und niemand weiss, dass sie nur dort existiert.
+   *
+   * Deshalb steht es jetzt in der einen Nachricht, die sicher gelesen wird:
+   * ganz oben, vor allem anderen. Kein zweiter Kanal, keine neue Abhaengig-
+   * keit — nur die Wahrheit an der Stelle, an der sie ankommt.
+   */
+  const body =
+    stored === "failed"
+      ? [
+          "!! NICHT IM VERTRIEB GESPEICHERT !!",
+          "Die Datenbank war beim Eingang nicht erreichbar. Diese Anfrage steht",
+          "NUR in dieser E-Mail — sie erscheint nicht unter Anfragen und geht",
+          "verloren, wenn diese Nachricht verloren geht. Bitte von Hand sichern.",
+          "",
+          lines,
+        ].join("\n")
+      : lines
+
   try {
     await sendMail(apiKey, {
       from,
@@ -1081,7 +1116,7 @@ export async function POST(request: Request) {
           : source === "betriebscheck"
             ? `Betriebscheck ${reference} — ${headerSafe(name)}`
             : `Anfrage ${reference} — ${headerSafe(name)}`,
-      text: lines,
+      text: body,
       // Direkt aus dem Postfach antworten können, ohne die Adresse zu suchen.
       replyTo: email,
     })
