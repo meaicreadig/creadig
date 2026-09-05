@@ -3,5 +3,11 @@
   "framework": "nextjs",
   "buildCommand": "next build",
   "installCommand": "npm install",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "crons": [
+    {
+      "path": "/api/selftest",
+      "schedule": "0 7,19 * * *"
+    }
+  ]
 }

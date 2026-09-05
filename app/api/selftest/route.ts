@@ -214,10 +214,32 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url)
+
+  /*
+   * GATE 01 — ZWEI AUSWEISE, DAMIT KEIN GEHEIMNIS IN EINE DATEI MUSS.
+   *
+   * Bisher gab es genau einen Weg: `?key=` oder der Kopf `x-selftest-key`.
+   * Fuer einen Menschen richtig — fuer einen Zeitplan nicht: Vercel Cron
+   * ruft eine ADRESSE auf, und die steht in `vercel.json`. Den Schluessel
+   * dort hineinzuschreiben hiesse, ihn zu committen.
+   *
+   * Vercel schickt bei jedem Cron-Aufruf `Authorization: Bearer <CRON_SECRET>`
+   * mit — ein Geheimnis, das nur in den Umgebungsvariablen steht und nie im
+   * Repo. Damit braucht der Zeitplan keinen Schluessel in der Adresse, und
+   * `vercel.json` bleibt frei von Geheimnissen.
+   *
+   * Beide Wege werden mit demselben laufzeitgleichen Vergleich geprueft.
+   * Ist `CRON_SECRET` nicht gesetzt, existiert dieser zweite Weg schlicht
+   * nicht — ein leeres Geheimnis oeffnet nichts.
+   */
   const provided = request.headers.get("x-selftest-key") ?? url.searchParams.get("key") ?? ""
-  // Ohne Schluessel gibt es diese Route nicht — 404 statt 401, damit ein
+  const cronSecret = process.env.CRON_SECRET?.trim()
+  const bearer = (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "")
+  const alsCron = Boolean(cronSecret) && equal(bearer, cronSecret!)
+
+  // Ohne Ausweis gibt es diese Route nicht — 404 statt 401, damit ein
   // Fremder nicht einmal erfaehrt, dass hier etwas zu erraten waere.
-  if (!equal(provided, secret)) {
+  if (!alsCron && !equal(provided, secret)) {
     return NextResponse.json({ ok: false }, { status: 404, headers: { "Cache-Control": "no-store" } })
   }
 

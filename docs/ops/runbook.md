@@ -139,9 +139,22 @@ curl -s "https://<host>/api/selftest?key=$SELFTEST_SECRET" | jq
 ```
 - `raiseAlert()` → Serverprotokoll, zusätzlich Webhook wenn `ALERT_WEBHOOK_URL` gesetzt
 
+**Der Zeitplan (Gate 01):** `vercel.json` ruft `/api/selftest` zweimal täglich
+(07:00 und 19:00 UTC). Ohne Schlüssel in der Datei — Vercel schickt bei jedem
+Cron-Aufruf `Authorization: Bearer $CRON_SECRET`, und die Route akzeptiert das
+als zweiten Ausweis. Damit steht kein Geheimnis im Repo.
+
+Aktiv wird er, sobald **`SELFTEST_SECRET` und `CRON_SECRET`** in Vercel
+gesetzt sind. Vorher antwortet die Route 503 `selftest_disabled` — gemessen am
+05.09.2026 an der Live-Adresse.
+
 **Nicht vorhanden — und das ist der ehrliche Stand:**
 
-- Keine Verfügbarkeitsüberwachung. Ist die Seite nachts aus, merkt es niemand.
+- **Keine unabhängige Verfügbarkeitsüberwachung.** Der Cron läuft auf Vercel
+  und ruft die eigene Anwendung. Ist die Anwendung ganz aus, schlägt der
+  Aufruf fehl — aber es ist Vercel, das das merkt, nicht wir. Wer wissen will,
+  ob die Seite nachts erreichbar war, braucht einen Wächter AUSSERHALB dieser
+  Plattform. Das ist eine Konto-Entscheidung, kein Code.
 - Kein Auflaufen von Fehlern über die Zeit. Ein Alarm ist ein Zeitpunkt, keine Kurve.
 - **`ALERT_WEBHOOK_URL` ist nicht gesetzt.** Der Meldeweg ist gebaut und
   geprüft — Zustellung, Ablehnung (4xx/5xx wird protokolliert),

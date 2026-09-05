@@ -101,7 +101,24 @@ if (quelle) {
   const probe = "SELECT o.title||'|'||coalesce(o.from_lead_id,'-')||'|'||coalesce(org.name,'-')||'|'||coalesce(c.name,'-') FROM opportunities o LEFT JOIN organisations org ON org.id=o.organisation_id LEFT JOIN contacts c ON c.id=o.contact_id ORDER BY o.id"
   const pa = psql(quelle, probe).stdout.trim()
   const pb = psql(zielUrl, probe).stdout.trim()
-  schritt("Verknuepfungen inhaltlich gleich", pa === pb && pa.length > 0, pb.split("\n")[0] || "—")
+  /*
+   * Verglichen wird die GLEICHHEIT, nicht die Anwesenheit.
+   *
+   * Hier stand zusaetzlich `pa.length > 0` — und damit fiel die Uebung an
+   * einer Datenbank ohne Vorgaenge durch, obwohl beide Seiten identisch
+   * leer waren. Gemessen am 05.09.2026 an einem Bestand aus einer einzigen
+   * Organisation: Schritt 10 meldete einen Fehler, den es nicht gab.
+   *
+   * „Keine Vorgaenge" ist ein gueltiger Zustand. Eine Pruefung, die ihn als
+   * Mangel meldet, verliert genau dann ihre Glaubwuerdigkeit, wenn man sie
+   * das erste Mal an einem echten leeren Stand benutzt.
+   */
+  const anzahl = pa ? pa.split("\n").length : 0
+  schritt(
+    "Verknuepfungen inhaltlich gleich",
+    pa === pb,
+    anzahl === 0 ? "keine Vorgaenge — beide Seiten leer" : `${anzahl} verglichen · ${pb.split("\n")[0]}`,
+  )
 }
 
 /* Anwendungs-Abfrage: die echte ORG_COLUMNS-Abfrage aus dem Vertriebsspeicher. */
