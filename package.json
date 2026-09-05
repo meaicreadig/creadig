@@ -14,7 +14,9 @@
     "smoke": "node scripts/smoke.mjs",
     "a11y": "node scripts/a11y.mjs",
     "vitals": "node scripts/vitals.mjs",
-    "mobile": "node scripts/mobile.mjs"
+    "mobile": "node scripts/mobile.mjs",
+    "crm-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/crm-drill.mjs",
+    "crm-import": "node --import ./scripts/lib/alias-hook.mjs scripts/crm-import.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
@@ -38,11 +40,13 @@
     "@axe-core/playwright": "^4.13.0",
     "@eslint/eslintrc": "^3.3.6",
     "@types/node": "^22.0.0",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "axe-core": "^4.13.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "^15.5.23",
+    "pg": "^8.23.0",
     "playwright": "^1.62.1",
     "typescript": "^5.6.0"
   }

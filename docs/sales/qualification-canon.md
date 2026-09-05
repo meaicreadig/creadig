@@ -171,7 +171,27 @@ Gespräch, nicht zu einem Kauf.
 | Gate | Bekommt | Baut **nicht** hier |
 |---|---|---|
 | 07 | den Vertrag aus §6, Anfrage-/Kontakt-/Organisationsgrenze | CRM-Umbau |
-| 08 | „angebotsreif" heißt: Treiber bekannt, Umfang zuschneidbar | Pipeline |
+| 08 | Angebotsreife — **zwei Regeln, nicht eine** (siehe unten) | Pipeline |
+
+### Angebotsreife ist nicht überall dasselbe
+
+Der Satz „angebotsreif heißt: Treiber bekannt, Umfang zuschneidbar" stand hier
+als **eine** Regel. Er gilt aber nur für **Systemprojekte**. Auf ein
+Festpreis-Angebot angewandt wäre er schädlich: Ein Handwerksbetrieb, der eine
+Website will, wäre nie „angebotsreif", weil er nie fünf Systemtreiber liefert
+— und der Verkauf würde auf Angaben warten, die für dieses Angebot niemand
+braucht.
+
+| Angebot | Angebotsreif, sobald … | Treiber nötig? |
+|---|---|---|
+| Website-Paket (3.900 € / 2.400 €) | Betrieb, Ansprechpartner, Umfang aus dem Paket bestätigt | **nein** |
+| Barrierefreiheits-Prüfung (1.500 €) | die zu prüfende Seite benannt ist | **nein** |
+| Barrierefreiheits-Behebung | die Prüfung vorliegt | **nein** |
+| Managed Betrieb (149 €) | das System von uns stammt (Voraussetzung erfüllt) | **nein** |
+| **Systemprojekt** | genug Kontext, um den Umfang zu schneiden | **ja** |
+
+**Regel:** Ein Festpreis-Angebot braucht das, was DIESES Angebot braucht —
+nicht das, was das größte Angebot braucht.
 | 10 | Anfrage ≠ Werbeeinwilligung | Kampagnen |
 | 11 | funktionale Herkunft ≠ Attribution | Attribution |
 | 17 / 18 | deterministische Regeln, aus denen Automatisierung schöpfen kann | KI-Qualifizierung |

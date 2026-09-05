@@ -39,7 +39,7 @@ import { EXCLUSION_TESTDATA } from "@/lib/vertrieb"
 /** Die konkrete Auspraegung, die `neon()` liefert — nicht die weite Generik. */
 export type Sql = NeonQueryFunction<false, false>
 
-const SCHEMA: string[] = [
+export const SCHEMA: string[] = [
   // ── 001 · Anfragen ───────────────────────────────────────────────────────
   `CREATE TABLE IF NOT EXISTS leads (
      id text PRIMARY KEY,
@@ -257,7 +257,7 @@ const SCHEMA: string[] = [
  * das hier verteilt bestehende Daten. Erklärung Schritt für Schritt in
  * `scripts/migrations/003-vertrieb-backfill.sql`.
  */
-const BACKFILL: string[] = [
+export const BACKFILL: string[] = [
   `INSERT INTO organisations (id, name, created_at, updated_at)
    SELECT gen_random_uuid()::text, btrim(l.business), min(l.created_at), now()
      FROM leads l
@@ -434,7 +434,14 @@ async function once(sql: Sql, key: string, step: () => Promise<void>): Promise<v
  * beim ersten Öffnen 19 Vorgänge zeigt, an denen niemand arbeitet, ist ab dem
  * ersten Tag unbrauchbar.
  */
-async function seedBestand(sql: Sql): Promise<void> {
+/*
+ * GATE 07 — `export`, damit `scripts/crm-drill.mjs` GENAU DIESE Zeilen gegen
+ * eine Wegwerf-Datenbank fahren kann. Ein Pruefskript, das den Import
+ * nachbaut, prueft seinen eigenen Nachbau; nur der echte Pfad zeigt, was in
+ * Produktion passiert. Aufgerufen wird sie weiterhin ausschliesslich aus
+ * `neonClient().ready()`.
+ */
+export async function seedBestand(sql: Sql): Promise<void> {
   for (const org of BESTAND_ORGANISATIONEN) {
     await once(sql, `org:${org.importKey}`, async () => {
       await sql.query(
@@ -531,7 +538,7 @@ async function seedBestand(sql: Sql): Promise<void> {
  * macht ihn idempotent und lässt einen von Hand aufgehobenen Ausschluss
  * unangetastet — wer den Grund löscht, meint es.
  */
-async function applyExclusions(sql: Sql): Promise<void> {
+export async function applyExclusions(sql: Sql): Promise<void> {
   for (const { name, reason } of AUSGESCHLOSSENE_NAMEN) {
     await sql.query(
       `UPDATE organisations SET excluded_reason = $2::text, updated_at = now()

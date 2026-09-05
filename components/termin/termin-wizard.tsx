@@ -397,7 +397,6 @@ export function TerminWizard() {
   function validateForm() {
     const bad: Record<string, boolean> = {
       name: !form.name.trim(),
-      phone: !form.phone.trim(),
       org: !form.org.trim(),
       email: !form.email.trim() || !EMAIL_RE.test(form.email.trim()),
       privacy: !privacyOk,
@@ -854,11 +853,35 @@ export function TerminWizard() {
                   className={cn(inputClass, invalid.org && invalidClass)}
                 />
               </label>
+              {/*
+                GATE 07 — TELEFON IST NICHT MEHR PFLICHT.
+
+                Die Nummer war Pflichtfeld. Gate 07 hat nach dem BELEG gesucht,
+                der das traegt, und keinen gefunden:
+
+                  · Das Gespraech selbst ist „20 Minuten, PER VIDEO".
+                  · Die Eingangsbestaetigung geht PER E-MAIL.
+                  · Die Zusage lautet „Wir melden uns innerhalb von zwei
+                    Werktagen" — ohne Kanal.
+                  · `docs/ops/sop-lead-handling.md` kennt keinen Rueckruf als
+                    Schritt.
+
+                Der einzige zugesagte Rueckruf im ganzen Haus steht im
+                Managed-Betrieb-Umfang — fuer Kunden mit Vertrag, nicht fuer
+                eine Terminanfrage.
+
+                Damit war die Pflicht nur noch damit begruendet, dass eine
+                Nummer im Vertrieb angenehm ist. Das reicht nach dem
+                Gate-04-Grundsatz der Datensparsamkeit nicht: Pflicht ist,
+                was eine Entscheidung traegt.
+
+                Das Feld BLEIBT — wer lieber angerufen wird, traegt es ein.
+                Was faellt, ist der Zwang.
+              */}
               <label className="flex flex-col gap-2">
-                <span className="eyebrow text-muted-foreground">{t.termin.step3.phone} *</span>
+                <span className="eyebrow text-muted-foreground">{t.termin.step3.phone}</span>
                 <input
                   {...field("phone")}
-                  required
                   type="tel"
                   autoComplete="tel"
                   className={cn(inputClass, invalid.phone && invalidClass)}
