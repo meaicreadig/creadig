@@ -37,7 +37,21 @@ export const dictionary = {
      * Dublette auszusortieren.
      */
     meta: {
-      siteTitle: "creaDIG — System-Haus für Marke, Web und KI",
+      /*
+       * GATE 02 — DER TITEL NENNT DIE KATEGORIE, NICHT DIE LEISTUNGEN.
+       *
+       * Hier stand „System-Haus für Marke, Web und KI". Das ist eine
+       * Leistungsliste, und sie zog die Marke genau dorthin, wovon sie sich
+       * abgrenzen will: eine Firma, die alles macht. Der Titel ist die meist-
+       * gelesene Zeile des Hauses — er steht im Suchergebnis, im Browsertab
+       * und in jedem geteilten Link. Wenn dort eine andere Kategorie steht
+       * als im Kanon, gewinnt die meistgelesene.
+       *
+       * Die Leistungen stehen weiterhin in `siteDescription` und
+       * `organizationDescription`. Was sich aendert, ist die Reihenfolge:
+       * erst wer wir sind, dann was wir tun.
+       */
+      siteTitle: "creaDIG — System-Haus für digitale Betriebe",
       siteDescription:
         "creaDIG ist das Dach über eigenen Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie. System-Haus für Deutschland, Österreich und die Schweiz.",
       ogTitle: "creaDIG — Wir bauen, was andere nicht sehen.",
@@ -86,7 +100,7 @@ export const dictionary = {
       statement: {
         eyebrow: "creaDIG in einem Satz",
         title: "Wir erfinden Systeme, bauen sie selbst und halten sie im Betrieb.",
-        body: "Von der Marke über den digitalen Auftritt und den laufenden Betrieb bis zur Automatisierung und zur künstlichen Intelligenz. Fünf Ebenen, die aufeinander aufbauen — und vier eigene Produkte, an denen wir sie selbst erprobt haben.",
+        body: "Kein klassisches IT-Systemhaus — keine Server, keine Lizenzen, kein Helpdesk. Ein System-Haus für digitale Betriebe: für Handwerk, Praxen, Gastronomie und Dienstleister, deren Arbeit heute an Zetteln, Tabellen und drei Programmen hängt, die nichts voneinander wissen. „Digitaler Betrieb“ ist dabei das Ergebnis, nicht die Voraussetzung — Sie müssen keine Digitalfirma sein, um bei uns anzufangen. Von der Marke über den Auftritt und den laufenden Betrieb bis zur Automatisierung und zur künstlichen Intelligenz: fünf Ebenen, und Sie steigen auf der ein, wo es bei Ihnen klemmt.",
         cta: "Über das Unternehmen",
       },
       work: {
@@ -2211,7 +2225,7 @@ export const dictionary = {
 
   tr: {
     meta: {
-      siteTitle: "creaDIG — marka, web ve yapay zekâ için sistem evi",
+      siteTitle: "creaDIG — dijital işletmeler için sistem evi",
       siteDescription:
         "creaDIG, kendi sistemlerinin çatısıdır — markadan yapay zekâya. Onları biz kurarız ve biz işletiriz. Almanya, Avusturya ve İsviçre için sistem evi.",
       ogTitle: "creaDIG — Başkalarının göremediğini inşa ediyoruz.",
@@ -2230,7 +2244,7 @@ export const dictionary = {
       statement: {
         eyebrow: "Tek cümlede creaDIG",
         title: "Sistemleri biz icat eder, kendimiz kurar ve işler hâlde tutarız.",
-        body: "Markadan dijital görünüme, günlük işletmeden otomasyona ve yapay zekâya kadar. Üst üste kurulan beş katman — ve bunları kendimiz üzerinde denediğimiz dört kendi ürün.",
+        body: "Klasik bir BT sistem evi değiliz — sunucu yok, lisans yok, yardım masası yok. Dijital işletmeler için bir sistem evi: işi bugün kâğıtlara, tablolara ve birbirinden habersiz üç programa dağılmış esnafa, muayenehanelere, restoranlara ve hizmet işletmelerine. „Dijital işletme“ burada sonuçtur, önkoşul değil — bize başlamak için dijital bir firma olmanız gerekmiyor. Markadan görünüme, günlük işletmeden otomasyona ve yapay zekâya: beş katman, ve siz nerede sıkışıyorsanız oradan girersiniz.",
         cta: "Şirket hakkında",
       },
       work: {
@@ -3658,7 +3672,7 @@ export const dictionary = {
    */
   en: {
     meta: {
-      siteTitle: "creaDIG — systems house for brand, web and AI",
+      siteTitle: "creaDIG — a systems house for digitally run businesses",
       siteDescription:
         "creaDIG is the house above its own systems — from brand to AI. We build them. And we run them. A systems house for Germany, Austria and Switzerland.",
       ogTitle: "creaDIG — we build what others never see.",
@@ -3677,7 +3691,7 @@ export const dictionary = {
       statement: {
         eyebrow: "creaDIG in one sentence",
         title: "We design systems, build them ourselves and keep them running.",
-        body: "From the brand through the digital presence and day-to-day operations to automation and artificial intelligence. Five levels that build on each other — and four products of our own on which we have tested them.",
+        body: "Not a classic IT systems house — no servers, no licences, no helpdesk. A systems house for digitally run businesses: for trades, practices, restaurants and service companies whose work today hangs on notes, spreadsheets and three programs that know nothing about each other. Being a “digital operation” is the result here, not the entry requirement — you do not have to be a tech company to start with us. From the brand through the presence and day-to-day operations to automation and artificial intelligence: five levels, and you enter at the one where it hurts.",
         cta: "About the company",
       },
       work: {
@@ -5084,7 +5098,7 @@ export const dictionary = {
    */
   ar: {
     meta: {
-      siteTitle: "creaDIG — بيت أنظمة للعلامة والويب والذكاء الاصطناعي",
+      siteTitle: "creaDIG — بيت أنظمة للمنشآت التي تُدار رقميًا",
       siteDescription:
         "creaDIG هي المظلة فوق أنظمتنا الخاصة — من العلامة إلى الذكاء الاصطناعي. نبنيها بأنفسنا. ونشغّلها بأنفسنا. بيت أنظمة لألمانيا والنمسا وسويسرا.",
       ogTitle: "creaDIG — نبني ما لا يراه الآخرون.",
@@ -5103,7 +5117,7 @@ export const dictionary = {
       statement: {
         eyebrow: "creaDIG في جملة واحدة",
         title: "نبتكر الأنظمة، ونبنيها بأنفسنا، ونُبقيها في التشغيل.",
-        body: "من العلامة مرورًا بالحضور الرقمي والتشغيل اليومي وصولًا إلى الأتمتة والذكاء الاصطناعي. خمس طبقات يقوم بعضها على بعض — وأربعة منتجات خاصة بنا اختبرناها على أنفسنا.",
+        body: "لسنا بيت أنظمة معلومات تقليديًا — لا خوادم ولا تراخيص ولا مكتب مساعدة. نحن بيت أنظمة للمنشآت التي تُدار رقميًا: للحرف والعيادات والمطاعم ومقدّمي الخدمات الذين يتعلّق عملهم اليوم بأوراق وجداول وثلاثة برامج لا يعرف بعضها بعضًا. «المنشأة الرقمية» هنا هي النتيجة لا الشرط — لستم بحاجة لأن تكونوا شركة تقنية كي تبدأوا معنا. من العلامة إلى الحضور والتشغيل اليومي والأتمتة والذكاء الاصطناعي: خمس طبقات، وتدخلون من الطبقة التي تؤلمكم.",
         cta: "عن الشركة",
       },
       work: {

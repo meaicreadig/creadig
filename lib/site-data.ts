@@ -516,10 +516,20 @@ export const clientWorks: Work[] = [
     year: null,
     name: "NV SWISS",
     what: {
-      de: "Versicherungs- & Finanzmakler (Schweiz) — Marke, Website und Digitalisierung aus einer Hand.",
-      tr: "Sigorta & finans brokeri (İsviçre) — marka, web sitesi ve dijitalleşme tek elden.",
-      en: "Insurance & finance broker (Switzerland) — brand, website and digitalisation from one hand.",
-      ar: "وسيط تأمين ومال (سويسرا) — علامة وموقع وتحوّل رقمي من جهة واحدة.",
+      /*
+       * GATE 02 — „aus einer Hand" ist eine der verbotenen Phrasen des
+       * Kanons (Teil A §5): Sie behauptet nichts, was der Kunde nicht
+       * ohnehin sieht, und jeder Wettbewerber schreibt sie auch. „Digital-
+       * isierung" steht in Teil B §9 auf der Vermeidungsliste — es ist
+       * Foerderantrags-Sprache und sagt nicht, was gebaut wurde.
+       *
+       * Was jetzt dasteht, nennt die Sache: Marke, Auftritt, und der Weg
+       * dahinter. Kuerzer, und man kann es sich vorstellen.
+       */
+      de: "Versicherungs- & Finanzmakler (Schweiz) — Marke, Auftritt und der Weg von der Anfrage zum Termin.",
+      tr: "Sigorta & finans brokeri (İsviçre) — marka, görünüm ve talepten randevuya giden yol.",
+      en: "Insurance & finance broker (Switzerland) — brand, presence, and the path from enquiry to appointment.",
+      ar: "وسيط تأمين ومال (سويسرا) — علامة وحضور والطريق من الطلب إلى الموعد.",
     },
     built: { de: "Marke, Website, Digitalisierung.", tr: "Marka, web sitesi, dijitalleşme.", en: "Brand, website, digitalisation.", ar: "علامة، موقع، تحوّل رقمي." },
     outcome: { de: "Kundenwerk · live", tr: "Müşteri işi · canlı", en: "Client work · live", ar: "عمل لعميل · حيّ" },
@@ -654,14 +664,26 @@ export function workHref(work: Work): string {
  * Die drei Arbeiten, die auf der Verteiler-Startseite gross stehen (PHASE A).
  *
  * Bewusst eine kuratierte Auswahl und nicht „die ersten drei": Die Startseite
- * soll in einem Blick zeigen, was das Haus ist — ein KI-Produkt, ein System
- * im Tagesbetrieb, eine Arbeit fuer einen Auftraggeber. Drei Zeilen, drei
+ * soll in einem Blick zeigen, was das Haus ist — ein System im Tagesbetrieb,
+ * ein KI-Produkt, eine Arbeit fuer einen Auftraggeber. Drei Zeilen, drei
  * Beweisarten.
+ *
+ * GATE 02 — DIE REIHENFOLGE WAR UMGEKEHRT, UND DAS WAR EIN FEHLER.
+ *
+ * Zuerst stand meAI, dann fibero. Damit fuehrte die Werkschau mit dem
+ * lautesten Wort des Marktes statt mit dem staerksten Beleg des Hauses:
+ * meAI ist „im Aufbau", fibero laeuft im Tagesbetrieb. Wer mit KI anfaengt,
+ * wird mit jeder KI-Agentur verwechselt — und muss den Unterschied danach
+ * erklaeren, statt ihn zu zeigen.
+ *
+ * Der Kanon (Teil B §6) sagt es als Regel: Die Marke fuehrt mit Betrieb,
+ * nicht mit KI. Ein System, das seit Jahren laeuft, ist ein Beweis; ein
+ * System im Aufbau ist eine Absicht.
  *
  * Slugs, keine Kopien: Der Inhalt bleibt in `productWorks`/`clientWorks`, hier
  * steht nur die Reihenfolge. Wer einen Slug aendert, faellt beim Build auf.
  */
-export const featuredWorkSlugs = ["meai", "fibero", "nv-swiss"] as const
+export const featuredWorkSlugs = ["fibero", "meai", "nv-swiss"] as const
 
 /** Aufgeloest in der Reihenfolge oben; unbekannte Slugs fallen still weg. */
 export const featuredWorks: Work[] = featuredWorkSlugs
