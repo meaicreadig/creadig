@@ -406,10 +406,20 @@ export function checkSummary(
 
 export const checkCopy = {
   metaTitle: {
-    de: "Betriebscheck — wo Ihr Betrieb noch von Hand läuft | creaDIG",
-    tr: "İşletme kontrolü — işletmeniz nerede hâlâ elle yürüyor | creaDIG",
-    en: "Operations check — where your business still runs by hand | creaDIG",
-    ar: "فحص المنشأة — أين تعمل منشأتكم يدويًا | creaDIG",
+    /*
+     * GATE 03 — DER MARKENNAME STAND ZWEIMAL IM TITEL.
+     *
+     * Hier endete die Zeichenkette auf „ | creaDIG", und die Vorlage in
+     * `site-shell.tsx` haengt „ · creaDIG" an. Im Browsertab und im
+     * Suchergebnis stand damit „… | creaDIG · creaDIG" — dieselbe Marke
+     * zweimal, und die zweite Haelfte des Titels verdraengte im Suchergebnis
+     * die Aussage. Die Vorlage ist die eine Stelle, an der der Name gesetzt
+     * wird; hier steht nur noch, worum es auf der Seite geht.
+     */
+    de: "Betriebscheck — wo Ihr Betrieb noch von Hand läuft",
+    tr: "İşletme kontrolü — işletmeniz nerede hâlâ elle yürüyor",
+    en: "Operations check — where your business still runs by hand",
+    ar: "فحص المنشأة — أين تعمل منشأتكم يدويًا",
   },
   metaDescription: {
     de: "Fünfzehn Fragen zu Ihrem Alltag, fünf Ebenen, ein Ergebnis: wo der Engpass liegt und was er kostet. Kostenlos, ohne Anmeldung.",
@@ -418,11 +428,27 @@ export const checkCopy = {
     ar: "خمسة عشر سؤالًا عن يومكم العملي، وخمس طبقات، ونتيجة واحدة: أين الاختناق وكم يكلّف. مجانًا ودون تسجيل.",
   },
   eyebrow: { de: "Betriebscheck", tr: "İşletme kontrolü", en: "Operations check", ar: "فحص المنشأة" },
+  /*
+   * GATE 03 — ZWEI SEITEN TRUGEN DIESELBE UEBERSCHRIFT.
+   *
+   * Hier stand „Ihr Betrieb läuft. Aber wie viel davon noch von Hand?" — und
+   * auf `/branchen/handwerk` steht derselbe Satz (dort „per Hand"). In TR, EN
+   * und AR waren beide zeichengleich.
+   *
+   * Zwei Folgen, beide schlecht: Wer aus der Suche kommt, sieht zweimal
+   * denselben Titel und weiss nicht, welche Seite er gerade hat. Und die
+   * Ueberschrift beschrieb den ZUSTAND des Besuchers, nicht die AUFGABE
+   * dieser Seite.
+   *
+   * Die Handwerk-Zeile ist Owner-Vorgabe und bleibt. Diese hier sagt jetzt,
+   * was der Betriebscheck leistet — genau die Rolle, die Gate 02 ihm
+   * gegeben hat: der Einstieg fuer den, der noch nicht weiss, wo es klemmt.
+   */
   title: {
-    de: "Ihr Betrieb läuft. Aber wie viel davon noch von Hand?",
-    tr: "İşletmeniz yürüyor. Peki ne kadarı hâlâ elle?",
-    en: "Your business runs. But how much of it still by hand?",
-    ar: "منشأتكم تعمل. لكن كم منها ما يزال يدويًا؟",
+    de: "Sie wissen, dass es klemmt. Hier sehen Sie, wo.",
+    tr: "Bir yerde takıldığını biliyorsunuz. Burada nerede olduğunu görürsünüz.",
+    en: "You know something is snagging. Here you see where.",
+    ar: "تعرفون أن شيئًا يعلق. هنا ترون أين.",
   },
   lead: {
     de: "Fünfzehn Fragen, fünf Ebenen, zwei Minuten. Am Ende sehen Sie, wo der Engpass liegt — und wie viele Stellen Sie selbst als offen benannt haben.",

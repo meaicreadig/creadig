@@ -158,10 +158,10 @@ export const HANDWERK_WORKFLOW: WorkflowStep[] = [
 
 export const handwerkCopy = {
   metaTitle: {
-    de: "Handwerk: Ihr Betrieb läuft — aber wie viel davon noch per Hand? | creaDIG",
-    tr: "Zanaat: İşletmeniz yürüyor — peki ne kadarı hâlâ elle? | creaDIG",
-    en: "Trades: your business runs — but how much of it still by hand? | creaDIG",
-    ar: "الحِرف: منشأتكم تعمل — لكن كم منها ما يزال يدويًا؟ | creaDIG",
+    de: "Handwerk: Ihr Betrieb läuft — aber wie viel davon noch per Hand?",
+    tr: "Zanaat: İşletmeniz yürüyor — peki ne kadarı hâlâ elle?",
+    en: "Trades: your business runs — but how much of it still by hand?",
+    ar: "الحِرف: منشأتكم تعمل — لكن كم منها ما يزال يدويًا؟",
   },
   metaDescription: {
     de: "Anfrage, Angebot, Termin, Auftrag, Dokumentation, Rechnung — sechs Schritte, meist sechs Werkzeuge. Der Betriebscheck zeigt in zwei Minuten, wo es klemmt.",

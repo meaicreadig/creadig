@@ -597,7 +597,27 @@ export const dictionary = {
        * steht hier, was nur hier steht: Was fuer ein Haus, von wo, seit wann.
        * Die Maerkte traegt die Subline.
        */
-      eyebrow: "System-Haus · Osnabrück · seit 2017",
+      /*
+       * GATE 03 — DER ERSTE SATZ WAR EIN BRUCHSTUECK.
+       *
+       * Hier stand „System-Haus · Osnabrück · seit 2017". Gemessen am
+       * 05.09.2026 im ersten Blickfeld auf 390 und 1440 Pixel: Der Besucher
+       * sieht als Erstes das Wort „System-Haus" — allein, ohne Zusatz. In
+       * Deutschland ist das eine besetzte Kategorie (Server, Lizenzen,
+       * Helpdesk), und Gate 02 hat als Regel festgehalten, dass sie nie
+       * unerklaert an einem Erstkontakt stehen darf.
+       *
+       * Sie stand dort trotzdem — die Erklaerung begann erst eine Sektion
+       * weiter unten, also nach dem Scrollen. Wer in fuenf Sekunden
+       * entscheidet, scrollt nicht.
+       *
+       * Jetzt traegt die Zeile die vollstaendige Kategorie. Ort und Jahr
+       * bleiben; sie sind Vertrauen, nicht Identitaet, und stehen deshalb
+       * dahinter. Die Aufloesung („Ergebnis, nicht Voraussetzung") folgt
+       * unveraendert eine Sektion spaeter — jetzt als Vertiefung und nicht
+       * mehr als Nachreichung.
+       */
+      eyebrow: "System-Haus für digitale Betriebe · Osnabrück · seit 2017",
       headlineLine1: "Wir bauen,",
       headlineLine2: "was andere",
       headlineLine3: "nicht sehen.",
@@ -2525,7 +2545,7 @@ export const dictionary = {
       skipToContent: "İçeriğe geç",
     },
     hero: {
-      eyebrow: "Sistem evi · Osnabrück · 2017'den beri",
+      eyebrow: "Dijital işletmeler için sistem evi · Osnabrück · 2017'den beri",
       headlineLine1: "Başkalarının",
       headlineLine2: "görmediğini",
       headlineLine3: "inşa ediyoruz.",
@@ -3965,7 +3985,7 @@ export const dictionary = {
       skipToContent: "Skip to content",
     },
     hero: {
-      eyebrow: "Systems house · Osnabrück · since 2017",
+      eyebrow: "A systems house for digitally run businesses · Osnabrück · since 2017",
       headlineLine1: "We build",
       headlineLine2: "what others",
       headlineLine3: "never see.",
@@ -5391,7 +5411,7 @@ export const dictionary = {
       skipToContent: "الانتقال إلى المحتوى",
     },
     hero: {
-      eyebrow: "بيت أنظمة · أوسنابروك · منذ 2017",
+      eyebrow: "بيت أنظمة للمنشآت التي تُدار رقميًا · أوسنابروك · منذ 2017",
       headlineLine1: "نبني",
       headlineLine2: "ما لا يراه",
       headlineLine3: "الآخرون.",

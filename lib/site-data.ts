@@ -146,6 +146,45 @@ export type Work = {
 
 /** Eigene Produkte — die großen Cases. */
 export const productWorks: Work[] = [
+    /*
+   * GATE 03 — DIE REIHENFOLGE STAND HIER NOCH ANDERSHERUM.
+   *
+   * Gate 02 hat entschieden: Die Marke fuehrt mit Betrieb, nicht mit KI.
+   * fibero laeuft im Tagesbetrieb, meAI ist im Aufbau — ein System, das
+   * laeuft, ist ein Beweis; ein System im Aufbau ist eine Absicht.
+   *
+   * Auf der Startseite war die Reihenfolge bereits gedreht
+   * (`featuredWorkSlugs`). Diese Liste hier speist `/arbeiten`, und dort
+   * stand meAI weiterhin zuerst. Gemessen am 05.09.2026: Wer die Werkschau
+   * oeffnet, sah als Erstes das Wort KI — genau die Verwechslung, gegen die
+   * die Regel gebaut wurde.
+   */
+  {
+    slug: "fibero",
+    sector: { de: "Glasfaser · Operations", tr: "Fiber optik · Operasyon", en: "Fibre optics · operations", ar: "ألياف ضوئية · تشغيل" },
+    year: null,
+    name: "fibero",
+    what: {
+      de: "Ordnung und Klarheit im Glasfaser-Alltag: Auftrags-, Abrechnungs- und Finanzlogik.",
+      tr: "Fiber optik günlük işinde düzen ve netlik: iş emri, hakediş ve finans mantığı.",
+      en: "Order and clarity in day-to-day fibre-optic work: job, billing and finance logic.",
+      ar: "نظام ووضوح في العمل اليومي للألياف الضوئية: منطق الطلبات والفوترة والمال.",
+    },
+    built: {
+      de: "Operative Prozesse, Abrechnungssystem, Auswertung.",
+      tr: "Operasyonel süreçler, hakediş sistemi, değerlendirme.",
+      en: "Operational processes, billing system, reporting.",
+      ar: "العمليات التشغيلية، ونظام الفوترة، والتقارير.",
+    },
+    outcome: { de: "Im Tagesbetrieb", tr: "Günlük kullanımda", en: "In daily operation", ar: "في التشغيل اليومي" },
+    kind: "Produkt",
+    region: "DE",
+    // Owner 29.08.2026: Feld-Szene mit echter fibero Map-Center-Oberfläche.
+    image: "/works/fibero.jpg",
+    imageProof: "product-photo",
+    mark: "fb",
+    live: true,
+  },
   {
     slug: "meai",
     sector: { de: "KI · Business-Software", tr: "Yapay zekâ · İş yazılımı", en: "AI · business software", ar: "ذكاء اصطناعي · برمجيات أعمال" },
@@ -173,32 +212,7 @@ export const productWorks: Work[] = [
     href: "https://meai.run",
     live: true,
   },
-  {
-    slug: "fibero",
-    sector: { de: "Glasfaser · Operations", tr: "Fiber optik · Operasyon", en: "Fibre optics · operations", ar: "ألياف ضوئية · تشغيل" },
-    year: null,
-    name: "fibero",
-    what: {
-      de: "Ordnung und Klarheit im Glasfaser-Alltag: Auftrags-, Abrechnungs- und Finanzlogik.",
-      tr: "Fiber optik günlük işinde düzen ve netlik: iş emri, hakediş ve finans mantığı.",
-      en: "Order and clarity in day-to-day fibre-optic work: job, billing and finance logic.",
-      ar: "نظام ووضوح في العمل اليومي للألياف الضوئية: منطق الطلبات والفوترة والمال.",
-    },
-    built: {
-      de: "Operative Prozesse, Abrechnungssystem, Auswertung.",
-      tr: "Operasyonel süreçler, hakediş sistemi, değerlendirme.",
-      en: "Operational processes, billing system, reporting.",
-      ar: "العمليات التشغيلية، ونظام الفوترة، والتقارير.",
-    },
-    outcome: { de: "Im Tagesbetrieb", tr: "Günlük kullanımda", en: "In daily operation", ar: "في التشغيل اليومي" },
-    kind: "Produkt",
-    region: "DE",
-    // Owner 29.08.2026: Feld-Szene mit echter fibero Map-Center-Oberfläche.
-    image: "/works/fibero.jpg",
-    imageProof: "product-photo",
-    mark: "fb",
-    live: true,
-  },
+
   {
     slug: "cassamea",
     sector: { de: "Gastronomie · Kasse", tr: "Gastronomi · Kasa", en: "Hospitality · point of sale", ar: "ضيافة · نقاط بيع" },
