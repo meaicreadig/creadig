@@ -139,8 +139,9 @@ curl -s "https://<host>/api/selftest?key=$SELFTEST_SECRET" | jq
 ```
 - `raiseAlert()` → Serverprotokoll, zusätzlich Webhook wenn `ALERT_WEBHOOK_URL` gesetzt
 
-**Der Zeitplan (Gate 01):** `vercel.json` ruft `/api/selftest` zweimal täglich
-(07:00 und 19:00 UTC). Ohne Schlüssel in der Datei — Vercel schickt bei jedem
+**Der Zeitplan (Gate 01):** `vercel.json` ruft `/api/selftest` einmal täglich
+(07:00 UTC). Hobby-Plan erlaubt nur einen Lauf pro Tag — darum nicht 07:00 und
+19:00. Ohne Schlüssel in der Datei — Vercel schickt bei jedem
 Cron-Aufruf `Authorization: Bearer $CRON_SECRET`, und die Route akzeptiert das
 als zweiten Ausweis. Damit steht kein Geheimnis im Repo.
 

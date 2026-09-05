@@ -7,7 +7,7 @@
   "crons": [
     {
       "path": "/api/selftest",
-      "schedule": "0 7,19 * * *"
+      "schedule": "0 7 * * *"
     }
   ]
 }
