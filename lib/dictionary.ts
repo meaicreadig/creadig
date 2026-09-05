@@ -1384,6 +1384,26 @@ export const dictionary = {
       durationLabel: "Projektdauer",
       netNote: "Alle Preise netto, zzgl. 19 % USt.",
       /*
+       * GATE 04 — DIE PREISZEILE HAENGT AN EINER TATSACHE, DIE NOCH OFFEN IST.
+       *
+       * `netNote` behauptet 19 % Umsatzsteuer. Das Impressum sagt im selben
+       * Moment „Umsatzsteuer-Status noch nicht freigegeben"
+       * (`imprintDetails.taxStatusPending`). Beides kann nicht stimmen: Gilt
+       * die Kleinunternehmerregelung nach § 19 UStG, wird KEINE Umsatzsteuer
+       * ausgewiesen — dann waere „zzgl. 19 % USt." auf jedem Preis falsch.
+       *
+       * Bis hierher standen die zwei Aussagen in zwei Dateien ohne
+       * Verbindung. Waere der Status spaeter auf „Kleinunternehmer" gesetzt
+       * worden, haette die Seite die 19 % einfach weiterbehauptet.
+       *
+       * Jetzt waehlt `components/sections/packages.tsx` zwischen beiden
+       * Zeilen anhand von `imprintDetails.smallBusiness`. Erfunden wird
+       * nichts: Solange der Status offen ist, bleibt der bisherige Text
+       * unveraendert stehen — er ist die Annahme, die das Haus heute trifft,
+       * und sie steht als offener Punkt im Materialstand.
+       */
+      netNoteSmallBusiness: "Alle Preise netto. Kein Ausweis der Umsatzsteuer nach § 19 UStG (Kleinunternehmerregelung).",
+      /*
        * BF-9 — die obere Oeffnung.
        *
        * Die Leiter endete bei 3.900 EUR. Wer mehr braucht — mehrere
@@ -2124,8 +2144,26 @@ export const dictionary = {
       processorPendingNote:
         "Die markierten Verträge hat der Inhaber noch nicht im jeweiligen Dashboard bestätigt und abgelegt. Wir schreiben deshalb nicht, dass sie bestehen — das holen wir vor dem Livegang nach.",
       processorPurposes: {
+        /*
+         * GATE 04 — DIE MESSUNG WAR ZU ENG BESCHRIEBEN.
+         *
+         * Hier stand „wie oft welche Seite geöffnet wird". Gemessen im
+         * Quelltext am 05.09.2026 sendet die Seite aber sechs BENANNTE
+         * Ereignisse mit Eigenschaften: audit_started, audit_completed
+         * (mit Reifegrad-Korb), booking_step, cta_click (mit Seite und Ort
+         * der Schaltfläche), lead_submitted und Anfrage (je mit Quelle).
+         *
+         * Das ist mehr als Seitenaufrufe — es ist Verhalten auf der Seite.
+         * Keine dieser Angaben nennt eine Person, aber wer nur „wie oft
+         * welche Seite" liest, rechnet nicht damit. Eine Beschreibung, die
+         * weniger sagt als das System tut, ist keine Beschreibung.
+         *
+         * Was NICHT gesendet wird, steht ausdrücklich dabei: kein Name,
+         * keine Adresse, keine Antworten des Betriebschecks. Der Reifegrad
+         * geht als Zwanziger-Korb hinaus, nicht als exakter Wert.
+         */
         vercel:
-          "Hosting, Auslieferung der Seite über das Content-Delivery-Netz und Server-Logs. Nach Ihrer Einwilligung zusätzlich zwei getrennte Messungen: Vercel Web Analytics (wie oft welche Seite geöffnet wird) und Vercel Speed Insights (wie schnell die Seite bei echten Aufrufen lädt). Beide sind cookiefrei, verarbeiten aber IP-Adresse und Seitenpfad — ohne Einwilligung wird kein Skript geladen.",
+          "Hosting, Auslieferung der Seite über das Content-Delivery-Netz und Server-Logs. Nach Ihrer Einwilligung zusätzlich zwei getrennte Messungen: Vercel Web Analytics und Vercel Speed Insights (wie schnell die Seite bei echten Aufrufen lädt). Web Analytics erfasst nicht nur Seitenaufrufe, sondern auch benannte Ereignisse: Start und Abschluss des Betriebschecks (mit dem Reifegrad als Zwanziger-Korb, nicht als exakter Wert), Schritte im Termin-Assistenten, Klicks auf Schaltflächen (mit Seite und Position) sowie das Absenden einer Anfrage (mit der Herkunft). Nicht übermittelt werden Name, Adresse, Nachricht oder Ihre einzelnen Antworten im Betriebscheck. Beide Messungen sind cookiefrei, verarbeiten aber IP-Adresse und Seitenpfad — ohne Einwilligung wird kein Skript geladen.",
         resend:
           "Zustellung der E-Mails aus unseren Formularen an unser Postfach und der Eingangsbestätigung an Sie.",
         neon:
@@ -3022,6 +3060,7 @@ export const dictionary = {
       regularLabel: "Normal fiyat",
       durationLabel: "Proje süresi",
       netNote: "Tüm fiyatlar nettir, %19 KDV hariç.",
+      netNoteSmallBusiness: "Tüm fiyatlar nettir. § 19 UStG uyarınca (küçük işletme düzenlemesi) KDV gösterilmez.",
       openEyebrow: "Daha büyük kapsam",
       openPrice: "talep üzerine",
       openNote:
@@ -3573,7 +3612,7 @@ export const dictionary = {
         "İşaretli sözleşmeleri işletme sahibi henüz ilgili panelde onaylayıp saklamadı. Bu yüzden var olduklarını yazmıyoruz — yayına almadan önce tamamlanacak.",
       processorPurposes: {
         vercel:
-          "Barındırma, sayfanın içerik dağıtım ağı üzerinden sunulması ve sunucu kayıtları. Onayınızdan sonra ayrıca iki ayrı ölçüm: Vercel Web Analytics (hangi sayfanın ne sıklıkla açıldığı) ve Vercel Speed Insights (gerçek çağrılarda sayfanın ne kadar hızlı yüklendiği). Her ikisi de çerezsizdir, ancak IP adresi ve sayfa yolunu işler — onay yoksa hiçbir betik yüklenmez.",
+          "Barındırma, sayfanın içerik dağıtım ağı üzerinden sunulması ve sunucu kayıtları. Onayınızdan sonra ayrıca iki ayrı ölçüm: Vercel Web Analytics ve Vercel Speed Insights (gerçek çağrılarda sayfanın ne kadar hızlı yüklendiği). Web Analytics yalnızca sayfa görüntülemelerini değil, adlandırılmış olayları da kaydeder: işletme kontrolünün başlaması ve tamamlanması (olgunluk derecesi yirmilik aralık olarak, kesin değer olarak değil), randevu asistanındaki adımlar, düğme tıklamaları (sayfa ve konumla) ve bir talebin gönderilmesi (kaynağıyla). Ad, adres, mesaj veya işletme kontrolündeki tek tek yanıtlarınız iletilmez. Her iki ölçüm de çerezsizdir, ancak IP adresi ve sayfa yolunu işler — onay yoksa hiçbir betik yüklenmez.",
         resend:
           "Formlarımızdan çıkan e-postaların posta kutumuza ve alındı onayının size iletilmesi.",
         neon:
@@ -4463,6 +4502,7 @@ export const dictionary = {
       regularLabel: "Standard price",
       durationLabel: "Project duration",
       netNote: "All prices excl. VAT, plus 19% VAT.",
+      netNoteSmallBusiness: "All prices net. No VAT is shown under § 19 UStG (small-business rule).",
       openEyebrow: "Larger scope",
       openPrice: "on request",
       openNote:
@@ -5001,7 +5041,7 @@ export const dictionary = {
         "The agreements marked have not yet been confirmed and filed by the owner in the respective dashboard. We therefore do not write that they exist — we will make that good before launch.",
       processorPurposes: {
         vercel:
-          "Hosting, delivery of the site through the content delivery network, and server logs. After your consent, additionally two separate measurements: Vercel Web Analytics (how often which page is opened) and Vercel Speed Insights (how fast the page loads on real visits). Both are cookie-free but process IP address and page path — without consent no script is loaded.",
+          "Hosting, delivery of the site through the content delivery network, and server logs. After your consent, additionally two separate measurements: Vercel Web Analytics and Vercel Speed Insights (how fast the page loads on real visits). Web Analytics records not only page views but also named events: the start and completion of the Betriebscheck (with the maturity score as a band of twenty, not as an exact value), steps in the appointment assistant, clicks on buttons (with page and position), and the submission of an enquiry (with its source). Your name, address, message and individual Betriebscheck answers are not transmitted. Both measurements are cookie-free but process IP address and page path — without consent no script is loaded.",
         resend:
           "Delivery of the emails from our forms to our inbox and of the acknowledgement to you.",
         neon:
@@ -5889,6 +5929,7 @@ export const dictionary = {
       regularLabel: "السعر المعتاد",
       durationLabel: "مدة المشروع",
       netNote: "كل الأسعار دون ضريبة، تُضاف إليها ضريبة 19٪.",
+      netNoteSmallBusiness: "كل الأسعار صافية. لا تُحتسب ضريبة القيمة المضافة وفق المادة 19 من قانون ضريبة المبيعات الألماني (نظام المنشآت الصغيرة).",
       openEyebrow: "نطاق أكبر",
       openPrice: "عند الطلب",
       openNote:
@@ -6427,7 +6468,7 @@ export const dictionary = {
         "العقود المُعلَّمة لم يؤكّدها المالك بعد ويحفظها في لوحة كل مزوّد. لذلك لا نكتب أنها قائمة — سنستدرك ذلك قبل الإطلاق.",
       processorPurposes: {
         vercel:
-          "الاستضافة، وتسليم الموقع عبر شبكة توزيع المحتوى، وسجلات الخادم. وبعد موافقتكم إضافةً إلى ذلك قياسان منفصلان: Vercel Web Analytics (كم مرة تُفتح كل صفحة) وVercel Speed Insights (بأي سرعة تُحمَّل الصفحة في الزيارات الحقيقية). كلاهما دون ملفات تعريف ارتباط، لكنهما يعالجان عنوان IP ومسار الصفحة — ودون موافقة لا يُحمَّل أي سكربت.",
+          "الاستضافة، وتسليم الموقع عبر شبكة توزيع المحتوى، وسجلات الخادم. وبعد موافقتكم إضافةً إلى ذلك قياسان منفصلان: Vercel Web Analytics وVercel Speed Insights (بأي سرعة تُحمَّل الصفحة في الزيارات الحقيقية). لا يسجّل Web Analytics مشاهدات الصفحات فحسب، بل أحداثًا مسمّاة أيضًا: بدء فحص المنشأة وإتمامه (مع درجة النضج ضمن نطاق من عشرين، لا كقيمة دقيقة)، وخطوات مساعد المواعيد، والنقرات على الأزرار (مع الصفحة والموضع)، وإرسال الطلب (مع مصدره). ولا يُرسَل اسمكم ولا عنوانكم ولا رسالتكم ولا إجاباتكم المفردة في فحص المنشأة. كلا القياسين دون ملفات تعريف ارتباط، لكنهما يعالجان عنوان IP ومسار الصفحة — ودون موافقة لا يُحمَّل أي سكربت.",
         resend:
           "تسليم رسائل نماذجنا إلى بريدنا، ورسالة الاستلام إليكم.",
         neon:

@@ -336,6 +336,38 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner: "Owner: Steuerstatus und Rufnummer freigeben",
   })
 
+  /*
+   * GATE 04 — DIE PREISZEILE HAENGT AM STEUERSTATUS.
+   *
+   * Der Punkt „Impressum vollstaendig" nennt den fehlenden Steuerstatus als
+   * formale Luecke. Er sagt aber nicht, was daran haengt — und das ist mehr
+   * als eine Zeile im Impressum: Auf jeder Preisflaeche steht „zzgl. 19 %
+   * USt.". Gilt die Kleinunternehmerregelung nach § 19 UStG, ist dieser Satz
+   * auf JEDEM Preis falsch, und zwar nicht als Formfehler, sondern als
+   * Angabe ueber den zu zahlenden Betrag.
+   *
+   * Der Punkt steht getrennt, weil er eine andere Dringlichkeit hat: Ein
+   * unvollstaendiges Impressum ist eine Ordnungswidrigkeit; ein falscher
+   * Steuerausweis ist eine falsche Preisangabe gegenueber jedem, der anfragt.
+   *
+   * Er schliesst sich von selbst, sobald `vatId` oder `smallBusiness` gesetzt
+   * ist — dann folgt die Preiszeile dem Status (siehe
+   * `components/sections/packages.tsx`).
+   */
+  push({
+    label: "Steuerausweis auf den Preisen (§ 27 a / § 19 UStG)",
+    ok: Boolean(imprintDetails.vatId) || imprintDetails.smallBusiness === true,
+    detail:
+      imprintDetails.vatId || imprintDetails.smallBusiness === true
+        ? "Der Steuerstatus steht; die Preiszeile folgt ihm automatisch."
+        : "Die Seite schreibt „zzgl. 19 % USt.“ auf jeden Preis, während das Impressum " +
+          "den Umsatzsteuer-Status als offen führt. Trifft die Kleinunternehmerregelung " +
+          "zu, ist diese Angabe auf jedem Preis falsch.",
+    owner:
+      "Owner: mit dem Steuerberater klären, ob eine USt-IdNr. besteht oder § 19 UStG greift, " +
+      "und den Wert in imprintDetails setzen. Die Preiszeile stellt sich danach selbst um.",
+  })
+
   for (const processor of processors) {
     push({
       label: `Auftragsverarbeitung ${processor.company}`,

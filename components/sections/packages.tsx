@@ -4,7 +4,7 @@ import { ArrowUpRight, Check } from "lucide-react"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { packages } from "@/lib/site-data"
+import { imprintDetails, packages } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 export function Packages() {
@@ -228,7 +228,12 @@ export function Packages() {
 
         {/* Netto ist eine Pflichtangabe, keine Fussnote (M12-4). */}
         <p className="type-small text-muted-foreground border-line mt-8 border-t pt-6">
-          {t.packages.netNote}
+          {/*
+            GATE 04 — die Steuerzeile folgt dem Steuerstatus, nicht einer
+            zweiten, unabhaengig gepflegten Zeichenkette. Setzt der Inhaber
+            `smallBusiness: true`, verschwindet der 19-%-Satz von selbst.
+          */}
+          {imprintDetails.smallBusiness === true ? t.packages.netNoteSmallBusiness : t.packages.netNote}
         </p>
 
         {/*
