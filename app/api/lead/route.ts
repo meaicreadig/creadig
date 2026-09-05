@@ -14,6 +14,7 @@ import {
 import { createLeadIdentity } from "@/lib/lead-id"
 import { evaluateCheck, parseCheckAnswers } from "@/lib/betriebscheck"
 import { findExistingSubmission, storeLead } from "@/lib/lead-store"
+import { productWorks } from "@/lib/site-data"
 
 /**
  * DER LEAD-WEG — der Boden des Trichters.
@@ -182,6 +183,19 @@ type LeadPayload = {
    */
   checkAnswers?: unknown
 }
+
+/*
+ * Die einzigen Wege, auf denen eine Anfrage entstehen kann — je einer je
+ * Formular, plus eine Produktseite je Produkt. Siehe die Begruendung an
+ * der Auswertung weiter unten (Gate 06).
+ */
+const KNOWN_SOURCES = new Set<string>([
+  "kontakt",
+  "termin",
+  "betriebscheck",
+  "kurzcheck",
+  ...productWorks.map((product) => `produkt-${product.slug}`),
+])
 
 const LIMITS = {
   name: 120,
@@ -873,7 +887,33 @@ export async function POST(request: Request) {
   const email = asText(payload.email, LIMITS.email)
   const phone = asText(payload.phone, LIMITS.phone)
   const message = asText(payload.message, LIMITS.message)
-  const source = asText(payload.source, LIMITS.source) || "kontakt"
+  /*
+   * ==================================================================
+   * GATE 06 — DIE HERKUNFT WAR FREIER TEXT.
+   * ==================================================================
+   *
+   * Hier stand `asText(payload.source, LIMITS.source) || "kontakt"`. Damit
+   * konnte jeder, der die Schnittstelle direkt anspricht, vierzig Zeichen
+   * beliebigen Text als Herkunft setzen — und dieser Text steht danach im
+   * Postfach unter „Herkunft:" und im Vertrieb an der Anfrage.
+   *
+   * Der Verkauf liest dieses Feld als TATSACHE („kam ueber den
+   * Betriebscheck"). Ein Feld, das der Absender frei fuellt und der
+   * Empfaenger als Tatsache liest, ist keine Tatsache. Genau das prueft
+   * Frage 24 des Programms: koennen manipulierte Parameter einen falschen
+   * kaufmaennischen Zusammenhang erzeugen?
+   *
+   * Es gibt genau fuenf echte Wege hinein — vier feste und die
+   * Produktseiten. Alles andere faellt auf `kontakt` zurueck: nicht als
+   * Fehler, denn eine Anfrage ohne erkennbaren Weg IST eine Anfrage ueber
+   * den Kontaktweg. Verworfen wird nicht die Anfrage, sondern die
+   * Behauptung darueber, woher sie kam.
+   *
+   * Die Produktslugs kommen aus `productWorks`, nicht aus einer zweiten
+   * Liste — sonst faellt beim naechsten Produkt genau diese Pruefung um.
+   */
+  const rawSource = asText(payload.source, LIMITS.source)
+  const source = KNOWN_SOURCES.has(rawSource) ? rawSource : "kontakt"
   /*
    * GATE 4 — die Sprache der Anfrage folgt der Sprachliste.
    *

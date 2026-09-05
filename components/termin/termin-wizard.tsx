@@ -53,6 +53,16 @@ type FormState = {
   interest: string
   size: string
   note: string
+  /*
+   * GATE 06 — die fuenf Treiber aus Gate 05, nur auf dem Systemgespraech-Weg
+   * gefragt. Alle freiwillig; alle Tatsachen, keine Bewertung. Begruendung
+   * im Woerterbuch unter `termin.scope`.
+   */
+  scopeFlow: string
+  scopeRoles: string
+  scopeSites: string
+  scopeSystems: string
+  scopeField: string
 }
 
 const EMPTY_FORM: FormState = {
@@ -64,6 +74,11 @@ const EMPTY_FORM: FormState = {
   interest: "",
   size: "",
   note: "",
+  scopeFlow: "",
+  scopeRoles: "",
+  scopeSites: "",
+  scopeSystems: "",
+  scopeField: "",
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -98,6 +113,20 @@ export function TerminWizard() {
    */
   const [privacyOk, setPrivacyOk] = useState(false)
   const [sending, setSending] = useState(false)
+  /*
+   * GATE 06 — DIE VORGANGSNUMMER FEHLTE AUF DER ERFOLGSSEITE.
+   *
+   * Der Betriebscheck zeigt sie seit jeher („Ihre Vorgangsnummer: CD-…"),
+   * der Assistent nicht — obwohl die Schnittstelle sie in derselben Antwort
+   * zurueckgibt. Vier Formulare im selben Haus, eines gibt dem Absender
+   * einen Griff, drei nicht.
+   *
+   * Das ist kein Schoenheitsfehler: Wer nachfragt, ob seine Anfrage
+   * angekommen ist, hat sonst nur seinen Namen. Und wer eine
+   * Eingangsbestaetigung mit einer Nummer bekommt, die er auf der Seite nie
+   * gesehen hat, muss glauben, dass beide dasselbe meinen.
+   */
+  const [reference, setReference] = useState<string | null>(null)
 
   /*
    * BF-A3 / F8 — der Schrittwechsel war fuer Tastatur und Screenreader ein
@@ -399,6 +428,21 @@ export function TerminWizard() {
     { k: t.termin.step3.city, v: form.city || "–" },
     { k: t.termin.step3.interest, v: form.interest || "–" },
     { k: t.termin.step3.size, v: form.size || "–" },
+    /*
+      GATE 06 — die Treiber stehen NUR in der Zusammenfassung, wenn sie
+      gefragt wurden. Bei der Erstberatung erscheinen sie nicht als fuenf
+      Striche: Ein leeres Feld, das nie gestellt wurde, liest der Verkauf
+      sonst als „der Kunde wollte nicht antworten".
+    */
+    ...(type === "ar"
+      ? [
+          { k: t.termin.scope.flowLabel, v: form.scopeFlow || "–" },
+          { k: t.termin.scope.rolesLabel, v: form.scopeRoles || "–" },
+          { k: t.termin.scope.sitesLabel, v: form.scopeSites || "–" },
+          { k: t.termin.scope.systemsLabel, v: form.scopeSystems || "–" },
+          { k: t.termin.scope.fieldLabel, v: form.scopeField || "–" },
+        ]
+      : []),
     { k: t.termin.step4.langLabel, v: langLabel },
     { k: t.termin.step3.note, v: form.note || "–" },
   ]
@@ -466,7 +510,16 @@ export function TerminWizard() {
           {t.termin.back}
         </Link>
 
-        <SectionEyebrow label={t.termin.eyebrow} className="mt-10" />
+        {/*
+          GATE 06 — die Zeile traegt den Namen des GEWAEHLTEN Gespraechs.
+
+          Vorher stand hier fest `t.termin.eyebrow` („Kostenlose
+          Erstberatung"). Wer ueber `?art=systemgespraech` kam, sah unten
+          das Systemgespraech ausgewaehlt und oben den Namen des anderen
+          Gespraechs. `typeLabel` ist leer, solange nichts gewaehlt ist —
+          dann steht dort, was die Seite ist: eine Terminanfrage.
+        */}
+        <SectionEyebrow label={typeLabel || t.termin.eyebrowNeutral} className="mt-10" />
         <h1 className="type-h1 mt-6 text-balance">
           {t.termin.title}
         </h1>
@@ -848,6 +901,76 @@ export function TerminWizard() {
                 </select>
               </label>
 
+              {/*
+                GATE 06 — die fuenf Treiber. NUR beim Systemgespraech.
+
+                Wer die Erstberatung waehlt oder ueber `?paket=…` kommt,
+                sieht diesen Block nie: Ein Handwerksbetrieb, der eine
+                Website will, wird nicht durch fuenf System-Fragen
+                geschickt. Alle Felder sind freiwillig — wer es nicht weiss,
+                laesst es offen und kommt trotzdem durch.
+              */}
+              {type === "ar" && (
+                <div className="border-line sm:col-span-2 mt-2 border-t pt-8">
+                  <p className="eyebrow text-gold-text">{t.termin.scope.optional}</p>
+                  <h3 className="type-h4 mt-3">{t.termin.scope.title}</h3>
+                  <p className="type-small text-muted-foreground mt-3 max-w-xl text-pretty">
+                    {t.termin.scope.lead}
+                  </p>
+                  <div className="mt-7 grid gap-6 sm:grid-cols-2">
+                    {(
+                      [
+                        {
+                          key: "scopeFlow" as const,
+                          label: t.termin.scope.flowLabel,
+                          options: t.termin.scope.flowOptions,
+                          wide: true,
+                        },
+                        {
+                          key: "scopeRoles" as const,
+                          label: t.termin.scope.rolesLabel,
+                          options: t.termin.scope.rolesOptions,
+                          wide: false,
+                        },
+                        {
+                          key: "scopeSites" as const,
+                          label: t.termin.scope.sitesLabel,
+                          options: t.termin.scope.sitesOptions,
+                          wide: false,
+                        },
+                        {
+                          key: "scopeSystems" as const,
+                          label: t.termin.scope.systemsLabel,
+                          options: t.termin.scope.systemsOptions,
+                          wide: false,
+                        },
+                        {
+                          key: "scopeField" as const,
+                          label: t.termin.scope.fieldLabel,
+                          options: t.termin.scope.fieldOptions,
+                          wide: false,
+                        },
+                      ] as const
+                    ).map((question) => (
+                      <label
+                        key={question.key}
+                        className={cn("flex flex-col gap-2", question.wide && "sm:col-span-2")}
+                      >
+                        <span className="eyebrow text-muted-foreground">{question.label}</span>
+                        <select {...field(question.key)} className={inputClass}>
+                          <option value="">{t.termin.step3.choose}</option>
+                          {question.options.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <fieldset className="sm:col-span-2">
                 <legend className="eyebrow text-muted-foreground">{t.termin.step3.langLabel}</legend>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -1021,6 +1144,7 @@ export function TerminWizard() {
                       })
 
                       if (data.ok) {
+                        setReference(data.reference ?? null)
                         trackLead("termin")
                         setStep(5)
                         window.scrollTo({ top: 0, behavior: "smooth" })
@@ -1065,6 +1189,12 @@ export function TerminWizard() {
               <p className="text-foreground">{dateSummary}</p>
               <p className="text-foreground">{windowSummary}</p>
               <p className="text-muted-foreground">{t.termin.done.reply}</p>
+              {reference && (
+                <p className="text-muted-foreground">
+                  {t.termin.done.referenceLabel}:{" "}
+                  <span className="text-gold-text">{reference}</span>
+                </p>
+              )}
               <a href={contact.whatsappHref} className="text-gold-text" target="_blank" rel="noopener noreferrer">
                 {contact.whatsapp}
               </a>

@@ -261,7 +261,7 @@ export const dictionary = {
         },
         appointment: {
           name: "Termin vereinbaren",
-          what: "Zwanzig Minuten Erstgespräch, kostenlos und unverbindlich. Vier Schritte, dann steht die Anfrage.",
+          what: "Zwanzig Minuten Erstberatung, kostenlos — oder ein ausführliches Systemgespräch, wenn Ihr Vorhaben größer ist. Vier Schritte, dann steht die Anfrage.",
           cta: "Termin anfragen",
         },
         products: {
@@ -1983,6 +1983,27 @@ export const dictionary = {
       metaDescription:
         "In vier Schritten zum Gespräch: Gesprächsart wählen, Wunschzeiten angeben, Angaben ergänzen. Der Wunsch geht direkt an uns — verbindlich wird der Termin mit unserer Rückmeldung.",
       back: "Zurück zur Seite",
+      /*
+       * ==================================================================
+       * GATE 06 — DIE UEBERSCHRIFT WIDERSPRACH DER VORAUSWAHL.
+       * ==================================================================
+       *
+       * Hier stand fest „Kostenlose Erstberatung". Der Assistent kennt aber
+       * ZWEI Gespraeche: die Erstberatung (20 Min.) und das Systemgespraech
+       * (45 Min.).
+       *
+       * Wer auf der Preisflaeche „Systemgespraech vereinbaren" klickt,
+       * landet auf `/termin?art=systemgespraech`. Der Assistent waehlt
+       * darunter korrekt das Systemgespraech aus — und darueber stand der
+       * Name des ANDEREN Gespraechs. Genau der Kunde, den Gate 05 zum
+       * Zuschnitt schickt, liest als Erstes eine Ueberschrift, die ihm
+       * sagt, er sei hier falsch.
+       *
+       * Jetzt traegt die Zeile den Namen des gewaehlten Gespraechs. Solange
+       * nichts gewaehlt ist, steht dort, was die Seite tatsaechlich ist:
+       * eine Terminanfrage — nicht eine der beiden Arten.
+       */
+      eyebrowNeutral: "Terminanfrage",
       eyebrow: "Kostenlose Erstberatung",
       title: "In vier Schritten zum Gespräch.",
       lead: "Sagen Sie uns, wann es Ihnen passt. Wir prüfen den Wunsch und bestätigen den Termin verbindlich per Rückmeldung — dieser Assistent bucht nichts automatisch.",
@@ -2069,6 +2090,65 @@ export const dictionary = {
         interests: ["Website-Paket Handwerk", "Laufende Betreuung — 149 € / Monat", "Etwas anderes — Marke, Software oder Automatisierung", "Noch unklar"],
         sizes: ["1–4 Mitarbeiter", "5–15 Mitarbeiter", "16–30 Mitarbeiter", "über 30 Mitarbeiter"],
       },
+      /*
+       * ==================================================================
+       * GATE 06 — DIE FUENF TREIBER, IN DER SPRACHE DES KUNDEN.
+       * ==================================================================
+       *
+       * Gate 05 hat oeffentlich gemacht, was den Umfang eines
+       * Systemprojekts treibt: Ablaeufe, Rollen, Standorte, Anbindungen
+       * samt Altdaten, Arbeit draussen. Auf der Preisflaeche steht das
+       * seither — gefragt hat es niemand.
+       *
+       * Damit bucht ein Betrieb 45 Minuten Systemgespraech, und wir
+       * erscheinen mit Name, Stadt und einem Satz. Die Dreiviertelstunde
+       * geht dann fuer Fragen drauf, die vorher in zwei Minuten
+       * beantwortet gewesen waeren — und der Zuschnitt, fuer den das
+       * Gespraech da ist, faengt erst in der letzten Viertelstunde an.
+       *
+       * DREI REGELN, DIE HIER GELTEN:
+       *
+       * 1. NUR AUF DIESEM WEG. Wer die Erstberatung waehlt oder ueber
+       *    `?paket=…` kommt, sieht davon nichts. Ein Handwerksbetrieb, der
+       *    eine Website will, wird nicht durch fuenf System-Fragen
+       *    geschickt — das waere genau die Verhoerform, die das Programm
+       *    verbietet.
+       *
+       * 2. KEINE PFLICHT. Wer es nicht weiss, laesst es leer und kommt
+       *    trotzdem durch. Eine Pflichtangabe an dieser Stelle wuerde
+       *    Leute aussortieren, die genau deshalb anrufen: weil sie es
+       *    nicht wissen.
+       *
+       * 3. TATSACHEN, KEINE BEWERTUNG. Hier entsteht keine Punktzahl, kein
+       *    „Reifegrad", keine Einstufung. Drei Standorte sind drei
+       *    Standorte. Was das kaufmaennisch bedeutet, entscheidet ein
+       *    Mensch im Gespraech — nicht ein Formular vorher.
+       *
+       * Die Formulierungen meiden jedes Fachwort: nicht „Rollen" sondern
+       * „unterschiedliche Aufgaben", nicht „Integrationen" sondern
+       * „Programme, die mitkommen muessen".
+       */
+      scope: {
+        title: "Damit das Gespräch nicht bei null anfängt",
+        lead: "Fünf kurze Fragen. Wenn Sie etwas nicht wissen, lassen Sie es offen — genau dafür ist das Gespräch da.",
+        optional: "freiwillig",
+        flowLabel: "Was klemmt bei Ihnen am meisten?",
+        flowOptions: [
+          "Anfragen und Aufträge gehen unter",
+          "Termine und Einsätze planen",
+          "Angebote und Rechnungen schreiben",
+          "Zeiten, Material und Nachweise erfassen",
+          "Etwas anderes",
+        ],
+        rolesLabel: "Arbeiten mehrere Personen mit unterschiedlichen Aufgaben daran?",
+        rolesOptions: ["Nein, im Grunde einer", "Ja, ein paar", "Ja, mehrere Bereiche"],
+        sitesLabel: "An wie vielen Orten wird gearbeitet?",
+        sitesOptions: ["Ein Ort", "Zwei bis drei", "Mehr als drei"],
+        systemsLabel: "Gibt es Programme oder Daten, die mitkommen müssen?",
+        systemsOptions: ["Nein", "Ja", "Weiß ich nicht"],
+        fieldLabel: "Wird auch außerhalb des Büros gearbeitet — Baustelle, Montage, unterwegs?",
+        fieldOptions: ["Nein", "Ja"],
+      },
       step4: {
         sendWhatsapp: "Lieber per WhatsApp",
         privacyNote:
@@ -2085,6 +2165,7 @@ export const dictionary = {
         title: "Terminwunsch erhalten.",
         lead: "Ihr Terminwunsch liegt bei uns im Postfach, eine Eingangsbestätigung ist per E-Mail unterwegs. Der Termin ist damit noch nicht gebucht — wir gleichen Ihre Wunschzeiten ab und bestätigen Ihnen verbindlich einen Termin.",
         reply: "Wir melden uns innerhalb von zwei Werktagen",
+        referenceLabel: "Ihre Vorgangsnummer",
         home: "Zurück zur Startseite",
         again: "Weiteren Terminwunsch senden",
       },
@@ -2511,7 +2592,7 @@ export const dictionary = {
         },
         appointment: {
           name: "Randevu almak",
-          what: "Yirmi dakikalık ilk görüşme, ücretsiz ve bağlayıcı değil. Dört adım, sonra talep hazır.",
+          what: "Yirmi dakikalık ilk görüşme, ücretsiz — ya da işiniz daha büyükse ayrıntılı bir sistem görüşmesi. Dört adım, sonra talep hazır.",
           cta: "Randevu iste",
         },
         products: {
@@ -3520,6 +3601,7 @@ export const dictionary = {
       metaDescription:
         "Dört adımda görüşmeye: görüşme türünü seçin, size uygun zamanları belirtin, bilgileri tamamlayın. Talep doğrudan bize ulaşır — randevu, dönüşümüzle kesinleşir.",
       back: "Sayfaya dön",
+      eyebrowNeutral: "Randevu talebi",
       eyebrow: "Ücretsiz ilk görüşme",
       title: "Dört adımda görüşmeye.",
       lead: "Size ne zaman uyduğunu söyleyin. Talebinizi inceler ve randevuyu dönüşümüzde bağlayıcı olarak onaylarız — bu asistan otomatik randevu oluşturmaz.",
@@ -3582,6 +3664,27 @@ export const dictionary = {
         interests: ["Zanaat Web Sitesi Paketi", "Sürekli destek — aylık 149 €", "Başka bir şey — marka, yazılım veya otomasyon", "Henüz belirsiz"],
         sizes: ["1–4 çalışan", "5–15 çalışan", "16–30 çalışan", "30'dan fazla çalışan"],
       },
+      scope: {
+        title: "Görüşme sıfırdan başlamasın diye",
+        lead: "Beş kısa soru. Bilmediğiniz bir şey varsa boş bırakın — görüşme tam da bunun için.",
+        optional: "isteğe bağlı",
+        flowLabel: "Sizde en çok ne tıkanıyor?",
+        flowOptions: [
+          "Talepler ve işler kayboluyor",
+          "Randevu ve saha planlaması",
+          "Teklif ve fatura yazmak",
+          "Süre, malzeme ve belge kaydı",
+          "Başka bir şey",
+        ],
+        rolesLabel: "Farklı görevleri olan birden fazla kişi mi çalışıyor?",
+        rolesOptions: ["Hayır, esasen tek kişi", "Evet, birkaç kişi", "Evet, birden fazla alan"],
+        sitesLabel: "Kaç yerde çalışılıyor?",
+        sitesOptions: ["Tek yer", "İki ile üç", "Üçten fazla"],
+        systemsLabel: "Taşınması gereken program veya veri var mı?",
+        systemsOptions: ["Hayır", "Evet", "Bilmiyorum"],
+        fieldLabel: "Ofis dışında da çalışılıyor mu — şantiye, montaj, yolda?",
+        fieldOptions: ["Hayır", "Evet"],
+      },
       step4: {
         sendWhatsapp: "WhatsApp ile göndereyim",
         privacyNote:
@@ -3598,6 +3701,7 @@ export const dictionary = {
         title: "Randevu talebiniz alındı.",
         lead: "Talebiniz posta kutumuzda, alındı onayı e-posta ile yolda. Randevu henüz kesinleşmedi — belirttiğiniz zamanları değerlendirip size bağlayıcı bir randevu onayı göndereceğiz.",
         reply: "İki iş günü içinde size döneceğiz",
+        referenceLabel: "İşlem numaranız",
         home: "Ana sayfaya dön",
         again: "Yeni randevu talebi gönder",
       },
@@ -3974,7 +4078,7 @@ export const dictionary = {
         },
         appointment: {
           name: "Book an appointment",
-          what: "A twenty-minute first conversation, free and without obligation. Four steps and your request is in.",
+          what: "A twenty-minute first consultation, free — or a longer systems conversation if your undertaking is bigger. Four steps and your request is in.",
           cta: "Request an appointment",
         },
         products: {
@@ -4971,6 +5075,7 @@ export const dictionary = {
       metaDescription:
         "Four steps to a conversation: choose the type, give your preferred times, add your details. The request comes straight to us — the appointment becomes binding with our reply.",
       back: "Back to the site",
+      eyebrowNeutral: "Appointment request",
       eyebrow: "Free first consultation",
       title: "Four steps to a conversation.",
       lead: "Tell us when it suits you. We check the request and confirm the appointment bindingly in our reply — this assistant does not book anything automatically.",
@@ -5033,6 +5138,27 @@ export const dictionary = {
         interests: ["Website package for trades", "Ongoing support — €149 / month", "Something else — brand, software or automation", "Not sure yet"],
         sizes: ["1–4 staff", "5–15 staff", "16–30 staff", "more than 30 staff"],
       },
+      scope: {
+        title: "So the conversation does not start from zero",
+        lead: "Five short questions. If you do not know something, leave it open — that is exactly what the conversation is for.",
+        optional: "optional",
+        flowLabel: "What jams up the most for you?",
+        flowOptions: [
+          "Enquiries and jobs get lost",
+          "Planning appointments and callouts",
+          "Writing quotes and invoices",
+          "Recording hours, material and proof",
+          "Something else",
+        ],
+        rolesLabel: "Do several people with different tasks work on it?",
+        rolesOptions: ["No, essentially one person", "Yes, a few", "Yes, several areas"],
+        sitesLabel: "In how many places is the work done?",
+        sitesOptions: ["One place", "Two to three", "More than three"],
+        systemsLabel: "Are there programs or data that have to come along?",
+        systemsOptions: ["No", "Yes", "I do not know"],
+        fieldLabel: "Is work also done outside the office — on site, on installation, on the road?",
+        fieldOptions: ["No", "Yes"],
+      },
       step4: {
         sendWhatsapp: "Rather by WhatsApp",
         privacyNote:
@@ -5049,6 +5175,7 @@ export const dictionary = {
         title: "Appointment request received.",
         lead: "Your appointment request is in our inbox and an acknowledgement is on its way by email. The appointment is not booked yet — we compare your preferred times and confirm a binding date.",
         reply: "We will be in touch within two working days",
+        referenceLabel: "Your reference number",
         home: "Back to the home page",
         again: "Send another appointment request",
       },
@@ -5416,7 +5543,7 @@ export const dictionary = {
         },
         appointment: {
           name: "حجز موعد",
-          what: "عشرون دقيقة حديث أول، مجانًا ودون التزام. أربع خطوات ويصلنا طلبكم.",
+          what: "عشرون دقيقة استشارة أولى، مجانًا — أو جلسة نظام مفصّلة إن كان مشروعكم أكبر. أربع خطوات ويصلنا طلبكم.",
           cta: "طلب موعد",
         },
         products: {
@@ -6413,6 +6540,7 @@ export const dictionary = {
       metaDescription:
         "أربع خطوات إلى الحديث: اختيار نوع اللقاء، وذكر الأوقات المفضّلة، وإضافة البيانات. الطلب يصل إلينا مباشرةً — ويصبح الموعد ملزِمًا بردّنا.",
       back: "العودة إلى الموقع",
+      eyebrowNeutral: "طلب موعد",
       eyebrow: "استشارة أولى مجانية",
       title: "أربع خطوات إلى الحديث.",
       lead: "قولوا لنا متى يناسبكم. نراجع الطلب ونؤكّد الموعد بشكل ملزِم في ردّنا — هذا المساعد لا يحجز شيئًا تلقائيًا.",
@@ -6475,6 +6603,27 @@ export const dictionary = {
         interests: ["باقة الموقع للحِرف", "المتابعة الجارية — 149 يورو / شهريًا", "شيء آخر — علامة أو برمجيات أو أتمتة", "غير محدَّد بعد"],
         sizes: ["1–4 موظفين", "5–15 موظفًا", "16–30 موظفًا", "أكثر من 30 موظفًا"],
       },
+      scope: {
+        title: "كي لا يبدأ الحديث من الصفر",
+        lead: "خمسة أسئلة قصيرة. وما لا تعرفونه اتركوه مفتوحًا — فالحديث لهذا بالضبط.",
+        optional: "اختياري",
+        flowLabel: "ما الذي يتعثّر عندكم أكثر من غيره؟",
+        flowOptions: [
+          "الطلبات والأعمال تضيع",
+          "تنظيم المواعيد والمهام الميدانية",
+          "كتابة العروض والفواتير",
+          "تسجيل الساعات والمواد والإثباتات",
+          "شيء آخر",
+        ],
+        rolesLabel: "هل يعمل عليه عدة أشخاص بمهام مختلفة؟",
+        rolesOptions: ["لا، شخص واحد أساسًا", "نعم، قليلون", "نعم، عدة مجالات"],
+        sitesLabel: "في كم مكان يجري العمل؟",
+        sitesOptions: ["مكان واحد", "اثنان إلى ثلاثة", "أكثر من ثلاثة"],
+        systemsLabel: "هل توجد برامج أو بيانات يجب أن تنتقل معكم؟",
+        systemsOptions: ["لا", "نعم", "لا أعرف"],
+        fieldLabel: "هل يجري العمل خارج المكتب أيضًا — في الموقع أو التركيب أو الطريق؟",
+        fieldOptions: ["لا", "نعم"],
+      },
       step4: {
         sendWhatsapp: "أفضّل واتساب",
         privacyNote:
@@ -6491,6 +6640,7 @@ export const dictionary = {
         title: "استلمنا طلب الموعد.",
         lead: "طلب موعدكم في بريدنا، ورسالة الاستلام في طريقها إليكم. والموعد لم يُحجز بعد — نقارن أوقاتكم المفضّلة ونؤكّد لكم موعدًا ملزِمًا.",
         reply: "سنتواصل معكم خلال يومَي عمل",
+        referenceLabel: "رقم معاملتكم",
         home: "العودة إلى الصفحة الرئيسية",
         again: "إرسال طلب موعد آخر",
       },

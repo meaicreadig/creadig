@@ -62,6 +62,12 @@ export function ProductInterest({
   const [privacyOk, setPrivacyOk] = useState(false)
   const [invalid, setInvalid] = useState<{ email?: boolean; privacy?: boolean }>({})
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle")
+  /*
+   * GATE 06 — dieselbe Vorgangsnummer wie im Betriebscheck und im
+   * Terminassistenten. Vier Formulare, ein Griff fuer den Absender; die
+   * Begruendung steht im Assistenten.
+   */
+  const [reference, setReference] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const fieldClass =
@@ -89,6 +95,14 @@ export function ProductInterest({
               </h2>
               <p className="type-body text-muted-foreground mt-3 max-w-xl text-pretty">
                 {copy.sentBody}
+              </p>
+              <p className="type-small text-muted-foreground mt-3">
+                {reference && (
+                  <>
+                    {t.termin.done.referenceLabel}:{" "}
+                    <span className="text-gold-text">{reference}</span>
+                  </>
+                )}
               </p>
             </div>
           </Reveal>
@@ -146,6 +160,7 @@ export function ProductInterest({
                   })
 
                   if (data.status >= 200 && data.status < 300 && data.ok) {
+                    setReference(data.reference ?? null)
                     setStatus("sent")
                     trackLead(`produkt-${slug}`)
                     return

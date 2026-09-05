@@ -58,6 +58,12 @@ export function QuickCheck() {
   }>({})
   const [error, setError] = useState<string | null>(null)
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle")
+  /*
+   * GATE 06 — dieselbe Vorgangsnummer wie im Betriebscheck und im
+   * Terminassistenten. Vier Formulare, ein Griff fuer den Absender; die
+   * Begruendung steht im Assistenten.
+   */
+  const [reference, setReference] = useState<string | null>(null)
 
   const copy = t.quickCheck
 
@@ -175,6 +181,7 @@ export function QuickCheck() {
                   })
 
                   if (data.ok) {
+                    setReference(data.reference ?? null)
                     setStatus("sent")
                     // Nur der Herkunftsname, nie ein Feldinhalt — auch nicht
                     // die Adresse: Sie waere hier eine fremde Firma in einer
@@ -362,6 +369,12 @@ export function QuickCheck() {
               {status === "sent" && (
                 <div role="status" className="border-gold bg-muted border-s-2 py-4 ps-5">
                   <p className="type-small text-foreground">{copy.sentTitle}</p>
+                  {reference && (
+                    <p className="type-small text-muted-foreground mt-2">
+                      {t.termin.done.referenceLabel}:{" "}
+                      <span className="text-gold-text">{reference}</span>
+                    </p>
+                  )}
                   <p className="type-small text-muted-foreground mt-2 text-pretty">
                     {copy.sentBody}
                   </p>
