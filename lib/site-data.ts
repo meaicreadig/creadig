@@ -1327,10 +1327,58 @@ export const opsSteps = [
  * den Referenzpreis bekommt, soll sehen, was er kostet — sonst ist es kein
  * Entgegenkommen, sondern eine spaetere Ueberraschung.
  */
+/*
+ * ==========================================================================
+ * GATE 05 — DERSELBE PREIS STAND IN ZWEI SCHREIBWEISEN AUF EINER SEITE.
+ * ==========================================================================
+ *
+ * `packages` trug den Preis als fertige Zeichenkette: `price: "€2.400"`.
+ * Eine Zeichenkette kennt keine Sprache. Auf der englischen Seite stand
+ * damit in der Kachel „€2.400" und in der FAQ „€2,400" — dieselbe Zahl,
+ * zwei Schreibweisen, und die erste liest ein englischer Leser als ZWEI
+ * EURO VIERZIG. Ein Preisfehler um den Faktor tausend, verursacht von
+ * einem Punkt.
+ *
+ * `lib/service-pages.ts` machte es laengst richtig und hielt den Preis je
+ * Sprache: „1.500 €" / „€1,500" / „1.500 يورو". Dadurch zeigte die Seite
+ * denselben Betrag auf zwei Flaechen unterschiedlich.
+ *
+ * Jetzt gibt es EINE Quelle (`amount`) und EINEN Formatierer. Die
+ * Konventionen sind die aus `service-pages.ts` uebernommen, nicht neu
+ * erfunden — Zahl und Waehrung stehen dort, wo sie in der Sprache stehen.
+ *
+ * Arabisch bekommt ausdruecklich westliche Ziffern (`-u-nu-latn`): So
+ * steht es im Woerterbuch begruendet, und `Intl` wuerde sonst von selbst
+ * auf arabisch-indische Ziffern wechseln.
+ */
+const PRICE_FORMAT: Record<Locale, { tag: string; wrap: (n: string) => string }> = {
+  de: { tag: "de-DE", wrap: (n) => `${n} €` },
+  tr: { tag: "tr-TR", wrap: (n) => `${n} €` },
+  en: { tag: "en-GB", wrap: (n) => `€${n}` },
+  /*
+   * Arabisch gruppiert hier mit PUNKT, nicht mit Komma — und zwar
+   * absichtlich gegen das, was `Intl` fuer „ar" liefert.
+   *
+   * Die arabische Fassung des Hauses schreibt Betraege durchgaengig als
+   * „1.500 يورو" (`service-pages.ts`) und „2.400 يورو" (FAQ im
+   * Woerterbuch). Haette der Formatierer hier „2,400" erzeugt, staende auf
+   * derselben Seite beides — genau der Fehler, gegen den dieser
+   * Formatierer gebaut wurde, nur eine Sprache weiter.
+   *
+   * Deshalb die deutschen Trennzeichen mit arabischer Waehrungsangabe. Die
+   * westlichen Ziffern sind ohnehin gesetzt (siehe Woerterbuch); `de-DE`
+   * liefert sie mit.
+   */
+  ar: { tag: "de-DE", wrap: (n) => `${n} يورو` },
+}
+
+export function formatPrice(amount: number, locale: Locale): string {
+  const format = PRICE_FORMAT[locale]
+  return format.wrap(new Intl.NumberFormat(format.tag).format(amount))
+}
+
 export type Package = {
   key: "website" | "audit"
-  tier: string
-  price: string
   amount: number
   period: string | null
   /*
@@ -1348,7 +1396,6 @@ export type Package = {
    */
   duration: Localized | null
   /** Regelpreis ab dem dritten Betrieb — steht offen daneben. */
-  regularPrice?: string
   regularAmount?: number
   recommended: boolean
   /**
@@ -1367,11 +1414,8 @@ export type Package = {
 export const packages: Package[] = [
   {
     key: "website",
-    tier: "01",
-    price: "€2.400",
     amount: 2400,
     period: null,
-    regularPrice: "€3.900",
     regularAmount: 3900,
     recommended: false,
     /*
@@ -1413,8 +1457,6 @@ export const packages: Package[] = [
      * Angebot.
      */
     key: "audit",
-    tier: "02",
-    price: "€1.500",
     amount: 1500,
     period: null,
     recommended: false,
@@ -1470,7 +1512,6 @@ export const managedOperations = [
 
 export const retainer = {
   /** Preis pro Monat, netto. `null` = der Block erscheint nicht. */
-  price: "€149" as string | null,
   amount: 149 as number | null,
   /** Was tatsächlich geliefert wird — vom Owner bestätigt, nicht abgeleitet. */
   description: {
@@ -1525,9 +1566,87 @@ export const retainer = {
      * Ohne Cast prueft der Compiler das Objektliteral wieder vollstaendig.
      */
   } satisfies Record<Locale, string[]> | null,
+
+  /*
+   * ==========================================================================
+   * GATE 05 — WAS 149 EUR NICHT ENTHAELT.
+   * ==========================================================================
+   *
+   * Auf `/betrieb` standen SIEBEN Leistungen (`t.managed.items`) und daneben
+   * der Preis. Darunter „Weiterentwicklung: Was sich im Betrieb als falsch
+   * herausstellt, wird geaendert." Ohne Grenze gelesen — und so liest es
+   * jeder — heisst das: fuer 149 EUR im Monat wird geaendert, was anfaellt.
+   *
+   * Der tatsaechliche Umfang stand zwei Spalten weiter in `includes` und
+   * nennt „bis zu 2 Inhaltsaenderungen im Monat". Das sind zwei verschiedene
+   * Versprechen auf einer Seite fuer denselben Preis, und im Streitfall gilt
+   * das groessere. Genau danach hat der Owner gefragt: „Was ist das
+   * ueberhaupt?" — die Frage entsteht nicht, weil zu wenig dasteht, sondern
+   * weil zweierlei dasteht.
+   *
+   * Die sieben Punkte bleiben: Sie beschreiben, WAS Managed Betrieb ist.
+   * `includes` sagt, was der Preis traegt. `excludes` sagt, was er nicht
+   * traegt — und das fehlte vollstaendig. Ein Umfang ohne Aussengrenze ist
+   * kein Umfang; er ist eine Einladung, ihn auszudehnen, und der Erste, der
+   * das merkt, ist der, der liefern muss.
+   *
+   * Nichts hier ist verschaerft worden: Es ist derselbe Umfang wie in
+   * `includes`, nur von der anderen Seite beschrieben.
+   */
+  excludes: {
+    de: [
+      "Neue Seiten, neue Funktionen, ein neues Design — das ist ein Projekt mit eigenem Umfang und eigenem Festpreis",
+      "Mehr als zwei Inhaltsänderungen im Monat (nicht angesammelt, nicht übertragbar)",
+      "Texte schreiben, Fotos machen, Inhalte beschaffen",
+      "Betreuung von Systemen, die nicht von uns sind",
+      "Rufbereitschaft, Wochenenddienst, zugesagte Reaktionszeit in Stunden",
+    ],
+    tr: [
+      "Yeni sayfalar, yeni işlevler, yeni bir tasarım — bu, kendi kapsamı ve kendi sabit fiyatı olan bir projedir",
+      "Ayda ikiden fazla içerik değişikliği (biriktirilemez, devredilemez)",
+      "Metin yazmak, fotoğraf çekmek, içerik tedarik etmek",
+      "Bize ait olmayan sistemlerin bakımı",
+      "Nöbet, hafta sonu hizmeti, saat cinsinden taahhüt edilen yanıt süresi",
+    ],
+    en: [
+      "New pages, new features, a new design — that is a project with its own scope and its own fixed price",
+      "More than two content changes per month (not accumulated, not transferable)",
+      "Writing copy, taking photographs, sourcing content",
+      "Looking after systems that are not ours",
+      "On-call duty, weekend service, a response time promised in hours",
+    ],
+    ar: [
+      "صفحات جديدة أو وظائف جديدة أو تصميم جديد — هذا مشروع له نطاقه وسعره الثابت",
+      "أكثر من تغييرَي محتوى شهريًا (لا تُجمَّع ولا تُنقَل)",
+      "كتابة النصوص أو التقاط الصور أو تأمين المحتوى",
+      "رعاية أنظمة ليست من صنعنا",
+      "المناوبة أو خدمة نهاية الأسبوع أو زمن استجابة بالساعات",
+    ],
+  } satisfies Record<Locale, string[]>,
+
+  /*
+   * WER SIE UEBERHAUPT KAUFEN KANN.
+   *
+   * Auf der Seite stand nirgends, ob man die Betreuung ohne ein von uns
+   * gebautes System bekommt. Die Frage stellt sich jeder, der die Seite
+   * liest und schon eine Website hat — und der Verkaeufer haette sie im
+   * Gespraech erfinden muessen.
+   *
+   * Die Antwort steht bereits im Text und wurde nur nie zur Bedingung
+   * erklaert: „nicht ein Paket, das etwas verwaltet, sondern der Mensch, der
+   * sie gebaut hat." Wer ein fremdes System betreut, das er nicht kennt,
+   * verspricht Verantwortung fuer Code, den er nicht gelesen hat. Das ist
+   * dieselbe Grenze wie beim Festpreis fuer eine ungesehene Behebung.
+   */
+  precondition: {
+    de: "Die laufende Betreuung gibt es für Systeme, die wir gebaut haben — sonst würden wir für Code geradestehen, den wir nicht kennen. Steht Ihre Seite schon und soll bleiben: Wir sehen sie uns an und sagen, ob wir sie übernehmen können. Das ist eine eigene Frage, keine Absage.",
+    tr: "Sürekli destek, kurduğumuz sistemler içindir — aksi hâlde tanımadığımız bir kodun sorumluluğunu üstlenmiş oluruz. Siteniz zaten varsa ve kalacaksa: Ona bakar ve devralıp devralamayacağımızı söyleriz. Bu ayrı bir sorudur, ret değil.",
+    en: "Ongoing operation is for systems we built — otherwise we would be answering for code we do not know. If your site already exists and is staying: we will look at it and tell you whether we can take it on. That is a separate question, not a refusal.",
+    ar: "المتابعة الجارية للأنظمة التي بنيناها — وإلا لكنّا نتحمّل مسؤولية شيفرة لا نعرفها. وإن كان موقعكم قائمًا وسيبقى: ننظر فيه ونقول لكم هل يمكننا تولّيه. هذا سؤال منفصل، لا رفض.",
+  } satisfies Localized,
 }
 
-export const retainerPublished = Boolean(retainer.price && retainer.description)
+export const retainerPublished = Boolean(retainer.amount && retainer.description)
 
 export const meaiCapabilityKeys = ["overview", "tasks", "documents", "decisions"] as const
 

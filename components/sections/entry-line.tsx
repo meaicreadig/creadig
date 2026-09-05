@@ -6,7 +6,7 @@ import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { Disclosure } from "@/components/ui/disclosure"
-import { packages } from "@/lib/site-data"
+import { formatPrice, packages } from "@/lib/site-data"
 
 /**
  * MP10-2.1 / 2.2 — der Einstieg auf der Startseite.
@@ -56,7 +56,7 @@ export function EntryLine() {
             <SectionEyebrow label={copy.eyebrow} />
             <h2 id="einstieg-title" className="type-h3 mt-7 max-w-xl text-balance">
               <span className="text-muted-foreground">{copy.priceLead} </span>
-              <span className="text-gold-text">{entry.price}</span>
+              <span className="text-gold-text">{formatPrice(entry.amount, locale)}</span>
               <span className="text-muted-foreground"> {copy.priceNote}</span>
             </h2>
 

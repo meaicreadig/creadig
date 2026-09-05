@@ -1,13 +1,13 @@
 "use client"
 
-import { ArrowUpRight, Check } from "lucide-react"
+import { ArrowUpRight, Check, Minus } from "lucide-react"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { ClosingCta } from "@/components/sections/closing-cta"
-import { managedOperations, retainer, retainerPublished } from "@/lib/site-data"
+import { formatPrice, managedOperations, retainer, retainerPublished } from "@/lib/site-data"
 
 /**
  * MP10-4 — Managed Betrieb als eigene Seite.
@@ -158,7 +158,7 @@ export function BetriebPageBody() {
         Preis UND Leistungsumfang. Eine Zahl ohne Umfang waere die falsche
         Reihenfolge.
       */}
-      {retainerPublished && retainer.description && (
+      {retainerPublished && retainer.amount !== null && retainer.description && (
         <section aria-labelledby="betrieb-preis" className="section-seam">
           <div className="section-shell-tight">
             <Reveal>
@@ -171,26 +171,60 @@ export function BetriebPageBody() {
                   <p className="type-body text-foreground/85 mt-6 max-w-2xl text-pretty">
                     {retainer.description[locale]}
                   </p>
+                  {/* GATE 05 — dieselbe Gegenueberstellung wie in der Sektion:
+                      Umfang ist erst dann einer, wenn auch die Aussengrenze
+                      dasteht. Siehe `retainer.excludes` in `lib/site-data.ts`. */}
                   {retainer.includes && (
-                    <ul className="mt-7 grid gap-3 sm:grid-cols-2">
-                      {retainer.includes[locale].map((item) => (
-                        <li key={item} className="flex gap-3">
-                          <Check className="text-gold mt-0.5 size-4 shrink-0" strokeWidth={1.5} />
-                          <span className="type-small text-muted-foreground text-pretty">
-                            {item}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="mt-7 grid gap-7 sm:grid-cols-2">
+                      <div>
+                        <p className="eyebrow text-muted-foreground">
+                          {t.packages.retainerIncludesLabel}
+                        </p>
+                        <ul className="mt-3 grid gap-3">
+                          {retainer.includes[locale].map((item) => (
+                            <li key={item} className="flex gap-3">
+                              <Check
+                                className="text-gold mt-0.5 size-4 shrink-0"
+                                strokeWidth={1.5}
+                              />
+                              <span className="type-small text-muted-foreground text-pretty">
+                                {item}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="eyebrow text-muted-foreground">
+                          {t.packages.retainerExcludesLabel}
+                        </p>
+                        <ul className="mt-3 grid gap-3">
+                          {retainer.excludes[locale].map((item) => (
+                            <li key={item} className="flex gap-3">
+                              <Minus
+                                className="text-muted-foreground/60 mt-0.5 size-4 shrink-0"
+                                strokeWidth={1.5}
+                              />
+                              <span className="type-small text-muted-foreground text-pretty">
+                                {item}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
                   )}
+                  <p className="type-small text-muted-foreground mt-7 max-w-2xl text-pretty">
+                    {retainer.precondition[locale]}
+                  </p>
                 </div>
 
                 <div className="flex flex-col justify-end lg:col-span-5">
                   <div className="flex items-baseline gap-2.5">
                     <span className="eyebrow text-muted-foreground">
-                      {t.packages.retainerFrom}
+                      {t.packages.retainerFixed}
                     </span>
-                    <span className="type-stat">{retainer.price}</span>
+                    <span className="type-stat">{formatPrice(retainer.amount, locale)}</span>
                     <span className="eyebrow text-muted-foreground">{t.packages.monthly}</span>
                   </div>
                   <Link

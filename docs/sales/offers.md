@@ -1,6 +1,9 @@
 # creaDIG · Angebote (Spec)
 
 > **Authority:** Spec · MP-D · Stand 29.08.2026
+> **Architektur:** `offer-canon.md` — Angebotstypen, Grenzen, Kundenweg.
+> Dieses Dokument bleibt die Bestandsliste der bestätigten Zahlen.
+>
 > **Preisregel:** Eine Zahl steht hier nur, wenn sie **auf der Seite steht** —
 > also vom Owner freigegeben ist. Alles andere: `[PREIS OWNER]`.
 > **Unknown ≠ invented default.** Kein Platzhalterpreis, keine „ab ca."-Zahl.
@@ -11,7 +14,7 @@
 
 | Angebot | Preis | Quelle im Code |
 |---|---|---|
-| Website-Paket (Einstieg, Festpreis) | **€2.400** netto, regulär €3.900 | `packages[key="website"]` |
+| Website-Paket (Festpreis) | **€3.900** netto · Pilotpreis **€2.400** | `packages[key="website"]` |
 | Barrierefreiheits-Audit | **€1.500** netto | `packages[key="audit"]` |
 | Betrieb / Retainer | **€149** netto / Monat | `retainer.price`, Gate `retainerPublished` |
 
@@ -43,7 +46,8 @@ Betrieb, den man nicht gesehen hat, ist genau das, was Prinzip 03 verbietet.
 **Was:** Auftritt zum festen Preis für den vereinbarten Umfang. Der Umfang
 wird vor der Zahl bestimmt, nicht danach.
 
-**Preis:** **€2.400** netto (regulär €3.900) — bestätigt, steht live.
+**Preis:** **€3.900** netto Regelpreis; **€2.400** netto Pilotpreis für den
+ersten Betrieb je Gewerk (Bedingung und Begründung: `offer-canon.md` §4).
 
 **Was drin ist:** siehe `packages[key="website"].includes` in
 `lib/dictionary.ts` — das ist die verbindliche Liste, nicht dieses Dokument.
@@ -77,7 +81,7 @@ keine Preisliste.
 
 | Stufe | Inhalt (Entwurf) | Preis |
 |---|---|---|
-| **Care** | Hosting, Sicherheitsupdates, bis zu 2 Inhaltsänderungen/Monat, Google-Profil aktuell — **bestätigt** | **€149** / Monat |
+| **Care** | Hosting, Sicherheitsupdates, bis zu 2 Inhaltsänderungen/Monat, Google-Profil aktuell — **bestätigt**. Ausschlüsse und Voraussetzung: `retainer.excludes` / `retainer.precondition` | **€149** / Monat, kein „ab“ |
 | **Operate** | Care + Betrieb der Betriebssoftware, Monitoring, definierte Reaktionszeit | `[PREIS OWNER]` |
 | **Business** | Operate + Weiterentwicklung nach Plan, Auswertung, fester Ansprechpartner | `[PREIS OWNER]` |
 | **Mission Critical** | Business + erweiterte Erreichbarkeit, Bereitschaft | `[PREIS OWNER]` |
@@ -96,7 +100,16 @@ Angebot statt ins Kleingedruckte.
 - Stundensätze als Standardmodell (Festpreis für definierten Umfang)
 - Kaltakquise-Angebote (Grundregel 4)
 - Angebote für Systeme, die wir nicht betreiben können
-- Rabatte gegen Referenz-Freigabe — eine Referenz wird gegeben, nicht gekauft
+- Rabatte gegen Referenz-Freigabe — eine Referenz wird gegeben, nicht gekauft.
+  **Präzisiert in Gate 05:** Der Pilotpreis (2.400 €) ist davon nicht
+  ausgenommen, sondern erfüllt es. Er wird **nicht** für ein Zitat gezahlt —
+  ein verlangtes Lob ist als Beleg wertlos. Bedingung ist, der erste Betrieb
+  in einem Gewerk zu sein; Gegenleistung ist die Erlaubnis, das Ergebnis zu
+  zeigen und den Betrieb zu nennen. Siehe `offer-canon.md` §4.
+- Knappheit ohne Zustand („die ersten zwei Betriebe“) — wenn niemand zählt
+  und niemand abschaltet, ist es keine Knappheit
+- „ab“-Preise ohne veröffentlichte Stufe darüber
+- Spannen ohne genannte Treiber
 
 ---
 

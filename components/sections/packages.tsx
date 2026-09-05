@@ -4,7 +4,7 @@ import { ArrowUpRight, Check } from "lucide-react"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { imprintDetails, packages } from "@/lib/site-data"
+import { formatPrice, imprintDetails, packages } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 export function Packages() {
@@ -66,7 +66,7 @@ export function Packages() {
 
                 <div className="flex items-start justify-between gap-4">
                   <p className="eyebrow text-muted-foreground">
-                    {t.packages.tierLabel} {pkg.tier}
+                    {t.packages.entryKind[pkg.key]}
                   </p>
                   {pkg.recommended && (
                     <span className="border-gold text-gold-text eyebrow shrink-0 border px-2.5 py-1">
@@ -84,7 +84,7 @@ export function Packages() {
                 <h3 className="type-h3 mt-5 lg:min-h-[2.24em]">{copy.name}</h3>
 
                 <div className="mt-6 flex items-baseline gap-2.5">
-                  <span className="type-stat">{pkg.price}</span>
+                  <span className="type-stat">{formatPrice(pkg.amount, locale)}</span>
                   <span className="eyebrow text-muted-foreground">
                     {pkg.period ? t.packages.monthly : t.packages.once}
                   </span>
@@ -114,13 +114,13 @@ export function Packages() {
                   Regelpreis daneben. Ein Nachlass, den der Kunde erst bei der
                   zweiten Rechnung bemerkt, ist kein Entgegenkommen.
                 */}
-                {pkg.regularPrice && (
+                {pkg.regularAmount !== undefined && (
                   <div className="mt-5 flex flex-col gap-2">
                     <p className="type-small text-muted-foreground text-pretty">
                       {t.packages.referenceNote}
                     </p>
                     <p className="text-meta text-muted-foreground">
-                      {t.packages.regularLabel}: {pkg.regularPrice}
+                      {t.packages.regularLabel}: {formatPrice(pkg.regularAmount, locale)}
                     </p>
                   </div>
                 )}
@@ -206,6 +206,26 @@ export function Packages() {
             </div>
             <p className="type-body text-muted-foreground mt-4 text-pretty">
               {t.packages.openNote}
+            </p>
+            {/*
+              GATE 05 — die Treiber, damit sich der Kunde einordnen kann.
+
+              Zwischen „3.900 EUR" und „auf Anfrage" stand nichts. Wer eine
+              groessere Sache hat, konnte nicht erkennen, ob er ueberhaupt
+              gemeint ist. Keine Spanne — die waere erfunden —, sondern die
+              Fragen, an denen sich Umfang entscheidet.
+            */}
+            <p className="eyebrow text-muted-foreground mt-7">{t.packages.openDriversLabel}</p>
+            <ul className="mt-3 grid gap-2.5 sm:grid-cols-2">
+              {t.packages.openDrivers.map((driver) => (
+                <li key={driver} className="flex gap-3">
+                  <span aria-hidden="true" className="bg-gold/60 mt-2 size-1 shrink-0" />
+                  <span className="type-small text-muted-foreground text-pretty">{driver}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="type-small text-muted-foreground mt-5 text-pretty">
+              {t.packages.openDriversNote}
             </p>
           </div>
           {/*

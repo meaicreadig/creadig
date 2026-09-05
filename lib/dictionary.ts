@@ -831,7 +831,7 @@ export const dictionary = {
       items: [
         {
           q: "Was kostet ein Auftritt bei creaDIG?",
-          a: "Das Website-Paket kostet 2.400 € netto als Referenzpreis für die ersten zwei Betriebe, danach 3.900 € netto. Die laufende Betreuung kostet 149 € netto im Monat. Alle Preise zzgl. 19 % USt., Festpreis für den vereinbarten Umfang.",
+          a: "Das Website-Paket kostet 3.900 € netto. Für den ersten Betrieb in einem Gewerk, für das wir noch nichts gebaut haben, gilt ein Pilotpreis von 2.400 € netto. Die laufende Betreuung kostet 149 € netto im Monat. Alle Preise zzgl. 19 % USt., Festpreis für den vereinbarten Umfang.",
         },
         {
           q: "Wie läuft ein Projekt ab?",
@@ -1365,14 +1365,82 @@ export const dictionary = {
         "Das ist der Einstieg, nicht die Hauptarchitektur. Was creaDIG als System-Haus baut, steht oben in den fünf Ebenen und wird nach Umfang gerechnet — nicht nach Paket.",
       forWhom: "Für wen",
       recommended: "Unsere Empfehlung",
-      tierLabel: "Einstieg",
+      /*
+       * GATE 05 — „EINSTIEG 01" UND „EINSTIEG 02" WAREN EINE LEITER,
+       * DIE ES NICHT GIBT.
+       *
+       * Hier stand `tierLabel: "Einstieg"` und daneben `pkg.tier` mit „01"
+       * und „02". Auf der Seite las das jeder als Stufe: erst das kleine
+       * Angebot, dann das groessere. Beides ist falsch. Das Website-Paket
+       * ist fuer Betriebe OHNE Seite, die Pruefung fuer Betriebe MIT Seite.
+       * Sie sind keine Stufen, sie sind zwei Tueren nebeneinander — und wer
+       * die falsche nimmt, kauft das Falsche.
+       *
+       * Eine Nummer sagt dem Kunden nichts darueber, welche seine ist. Der
+       * Anlass sagt es in zwei Woertern. Deshalb steht ueber der Kachel
+       * jetzt der Fall, nicht der Zaehler.
+       */
+      entryKind: {
+        website: "Sie brauchen eine Website",
+        audit: "Ihre Website steht schon",
+      },
       /*
        * Der Referenzpreis wird offen als solcher benannt — samt Regelpreis
        * daneben. Ein Nachlass, den der Kunde erst bei der zweiten Rechnung
        * bemerkt, ist kein Entgegenkommen, sondern eine Ueberraschung.
        */
+      /*
+       * ==================================================================
+       * GATE 05 — DER REFERENZPREIS WAR EINE KNAPPHEIT OHNE ZUSTAND.
+       * ==================================================================
+       *
+       * Hier stand: „Referenzpreis fuer die ersten zwei Betriebe — als
+       * Gegenleistung fuer ein Zitat, die Nennung als Referenz und zwei
+       * Fotos."
+       *
+       * Drei Fehler in einem Satz.
+       *
+       * ERSTENS: Es gibt keinen Zaehler. Nirgends im Haus steht, ob null,
+       * einer oder zwei der zwei Plaetze vergeben sind — kein Feld, keine
+       * Abfrage, kein Mensch, der es abschaltet. Eine Knappheit, die
+       * niemand pruefen und niemand beenden kann, ist keine Knappheit. Sie
+       * wirkt wie eine, und das ist genau der Vorwurf, den §40 Frage 6
+       * erhebt. Der Satz haette in fuenf Jahren noch dagestanden.
+       *
+       * ZWEITENS: Er widerspricht dem eigenen Kanon. In
+       * `docs/sales/offers.md` steht unter „Was NICHT angeboten wird":
+       * „Rabatte gegen Referenz-Freigabe — eine Referenz wird gegeben,
+       * nicht gekauft." Die Seite tat woertlich das, was das Haus sich
+       * selbst verboten hat.
+       *
+       * DRITTENS: Ein verlangtes ZITAT ist gekauftes Lob. Was ein Kunde
+       * sagen muss, damit der Preis gilt, ist als Beleg wertlos — und Gate
+       * 12 soll auf diesen Belegen aufbauen.
+       *
+       * ---------------------------------------------------------------
+       * WAS STATTDESSEN GILT
+       *
+       * Der niedrigere Preis bleibt, aber er steht auf einem anderen Grund
+       * und hat eine Grenze, die sich selbst zieht:
+       *
+       * BEDINGUNG: der erste Betrieb in einem Gewerk, fuer das wir noch
+       * nichts gebaut haben. Das ist nachpruefbar — unter /arbeiten steht,
+       * was existiert — und es laeuft je Gewerk von allein aus. Niemand
+       * muss es abschalten.
+       *
+       * GRUND: Wer der Erste in seinem Fach ist, kann vorher keine
+       * vergleichbare Arbeit von uns ansehen. Er traegt ein Risiko, das
+       * der zehnte Kunde nicht mehr traegt, und der Preis traegt es mit.
+       * Fuer uns ist das Projekt mehr wert als das Geld: Es hinterlaesst
+       * eine Vorlage, Fachwissen und einen Beleg.
+       *
+       * GEGENLEISTUNG: zeigen duerfen und nennen duerfen. Kein Zitat, kein
+       * Lob, keine Bewertung. Damit bleibt der Kanon-Satz wahr — eine
+       * Referenz wird weiter nicht gekauft; gekauft wird nichts, erlaubt
+       * wird das Zeigen.
+       */
       referenceNote:
-        "Referenzpreis für die ersten zwei Betriebe — als Gegenleistung für ein Zitat, die Nennung als Referenz und zwei Fotos. Ab dem dritten Betrieb gilt der Regelpreis.",
+        "Pilotpreis für den ersten Betrieb in einem Gewerk, für das wir noch nichts gebaut haben. Sie sehen vorher keine vergleichbare Arbeit von uns — dieses Risiko tragen Sie, und der Preis trägt es mit. Dafür dürfen wir das Ergebnis zeigen und Ihren Betrieb nennen; ein Lob ist nicht verlangt. Welche Gewerke schon stehen, sehen Sie unter Arbeiten. Ab dem zweiten Betrieb im selben Gewerk gilt der Regelpreis.",
       regularLabel: "Regelpreis",
       /*
        * MP10-2.3 — das Etikett der Projektdauer.
@@ -1420,9 +1488,68 @@ export const dictionary = {
       openNote:
         "Mehrere Standorte, ein Shop, Schnittstellen in die Warenwirtschaft oder ein System, das über die Website hinausgeht: Dafür gibt es keinen Listenpreis, aber einen festen Weg. Im Systemgespräch — 45 Minuten, kostenlos — sehen wir uns den Betrieb an und schneiden den Umfang zu. Daraus wird ein Festpreis für genau diesen Umfang, und danach ändert sich die Zahl nicht.",
       openCta: "Systemgespräch vereinbaren",
+      /*
+       * ==================================================================
+       * GATE 05 — DIE LUECKE ZWISCHEN 3.900 EUR UND „AUF ANFRAGE".
+       * ==================================================================
+       *
+       * Der Owner fragt: „Was passiert kaufmaennisch zwischen 3.900 EUR und
+       * nach Umfang?" — und: „Kann ein Kunde einschaetzen, ob sein Projekt
+       * klein, mittel oder komplex ist?"
+       *
+       * Heute nicht. Ueber der Kachel stand eine Zahl, darunter „auf
+       * Anfrage", und dazwischen nichts. Wer eine groessere Sache hat,
+       * konnte sich nicht einordnen und musste raten, ob er ueberhaupt in
+       * die richtige Groessenordnung faellt.
+       *
+       * Was hier NICHT hinkommt, ist eine Spanne. „Ab 15.000 EUR" waere
+       * erfunden: Das Haus hat keine Reihe abgeschlossener Systemprojekte,
+       * aus der sich so eine Zahl ableiten liesse, und eine geratene Spanne
+       * ist im ersten Angebot entweder peinlich oder bindend. Black Lock:
+       * keine erfundenen Marktpreise.
+       *
+       * Was stattdessen kommt: die TREIBER. Ein Kunde kann sich nicht an
+       * einer Zahl einordnen, die es nicht gibt — aber an der Frage, wie
+       * viele davon auf ihn zutreffen. Keiner: das Paket oben reicht.
+       * Mehrere: es ist ein Systemprojekt, und das Gespraech ist der
+       * richtige naechste Schritt statt eines Preisschilds.
+       *
+       * Dieselbe Liste schneidet intern den Umfang
+       * (`docs/sales/offer-canon.md`) — Verkauf und Lieferung lesen damit
+       * dasselbe.
+       */
+      openDriversLabel: "Was den Umfang treibt — und damit den Preis",
+      openDrivers: [
+        "Wie viele Abläufe im Betrieb das System abbilden soll",
+        "Wie viele Rollen unterschiedlich viel sehen und dürfen",
+        "Wie viele Standorte oder Teams damit arbeiten",
+        "Welche vorhandenen Systeme angebunden werden — und ob Altdaten mitkommen",
+        "Ob draußen gearbeitet wird: mobil, offline, auf der Baustelle",
+      ],
+      openDriversNote:
+        "Trifft nichts davon zu, ist es kein Systemprojekt — dann reicht das Paket oben. Trifft mehreres zu, sagt Ihnen niemand seriös vorab eine Zahl, ohne den Betrieb gesehen zu haben.",
       retainerEyebrow: "Laufende Betreuung",
       retainerTitle: "Betrieb statt Übergabe.",
-      retainerFrom: "ab",
+      /*
+       * GATE 05 — DAS „AB" VERSPRACH EINE STAFFEL, DIE NICHT EXISTIERT.
+       *
+       * Hier stand `retainerFrom: "ab"`, gerendert als „ab 149 EUR". „Ab"
+       * heisst: darueber gibt es mehr. Oeffentlich gibt es aber genau EINE
+       * bestaetigte Stufe. Der Kunde fragt sich „ab? was kommt darueber?"
+       * und findet nirgends eine Antwort — das ist die Frage des Owners
+       * („Was ist das ueberhaupt?"), erzeugt von einem einzigen Wort.
+       *
+       * Die Staffel in `docs/sales/offers.md` (Operate, Business, Mission
+       * Critical) ist Struktur, keine Preisliste, und sie darf nach dem
+       * eigenen Kanon nicht verkauft werden, solange Reaktionszeit und
+       * Vertretung nicht beantwortet sind. Ein „ab" bewirbt sie trotzdem.
+       *
+       * 149 EUR ist ein Festpreis fuer einen festen Umfang. Genau so steht
+       * es jetzt da.
+       */
+      retainerFixed: "Festpreis",
+      retainerIncludesLabel: "Enthalten",
+      retainerExcludesLabel: "Nicht enthalten",
       retainerCta: "Betreuung anfragen",
       once: "einmalig · Festpreis",
       monthly: "/ Monat",
@@ -1533,7 +1660,7 @@ export const dictionary = {
         },
         evolution: {
           name: "Weiterentwicklung",
-          what: "Was sich im Betrieb als falsch herausstellt, wird geändert — nicht dokumentiert und stehen gelassen.",
+          what: "Was sich im Betrieb als falsch herausstellt, wird geändert — nicht dokumentiert und stehen gelassen. Im Rahmen der monatlichen Änderungen; was neu dazukommt, ist ein eigenes Projekt.",
         },
       },
       note: "Keine Verfügbarkeit in Prozent, keine Reaktionszeit in Stunden, kein „24/7“. Zugesagt ist, was hier steht — und das halten wir auch im Urlaub.",
@@ -2707,7 +2834,7 @@ export const dictionary = {
       items: [
         {
           q: "creaDIG ile bir kimlik ne kadar?",
-          a: "Web sitesi paketi, ilk iki işletme için referans fiyatı olarak 2.400 € net, sonrasında 3.900 € nettir. Sürekli destek aylık 149 € nettir. Tüm fiyatlar %19 KDV hariçtir; kararlaştırılan kapsam için sabit fiyattır.",
+          a: "Web sitesi paketi 3.900 € nettir. Henüz hiçbir şey kurmadığımız bir meslek dalındaki ilk işletme için 2.400 € net pilot fiyat geçerlidir. Sürekli destek aylık 149 € nettir. Tüm fiyatlar %19 KDV hariçtir; kararlaştırılan kapsam için sabit fiyattır.",
         },
         {
           q: "Proje nasıl ilerler?",
@@ -3054,9 +3181,12 @@ export const dictionary = {
         "Bu giriş adımıdır, ana mimari değil. creaDIG'in sistem evi olarak kurduğu şey yukarıda beş katmanda durur ve pakete göre değil, kapsama göre hesaplanır.",
       forWhom: "Kimler için",
       recommended: "Önerimiz",
-      tierLabel: "Giriş",
+      entryKind: {
+        website: "Bir web sitesine ihtiyacınız var",
+        audit: "Web siteniz zaten var",
+      },
       referenceNote:
-        "İlk iki işletme için referans fiyatı — karşılığında bir görüş cümlesi, referans olarak anılma ve iki fotoğraf. Üçüncü işletmeden itibaren normal fiyat geçerlidir.",
+        "Henüz hiçbir şey kurmadığımız bir meslek dalındaki ilk işletme için pilot fiyat. Öncesinde bizden karşılaştırılabilir bir iş göremezsiniz — bu riski siz taşırsınız, fiyat da onu birlikte taşır. Karşılığında sonucu gösterebilir ve işletmenizi anabiliriz; övgü istenmez. Hangi meslek dallarının hazır olduğunu Çalışmalar bölümünde görürsünüz. Aynı meslek dalındaki ikinci işletmeden itibaren normal fiyat geçerlidir.",
       regularLabel: "Normal fiyat",
       durationLabel: "Proje süresi",
       netNote: "Tüm fiyatlar nettir, %19 KDV hariç.",
@@ -3066,9 +3196,21 @@ export const dictionary = {
       openNote:
         "Birden fazla şube, bir mağaza, stok sistemine bağlantılar ya da web sitesinin ötesine geçen bir sistem: Bunun liste fiyatı yok, ama net bir yolu var. Sistem görüşmesinde — 45 dakika, ücretsiz — işletmeye bakar ve kapsamı birlikte belirleriz. Ardından tam olarak o kapsam için sabit bir fiyat çıkar ve sonrasında rakam değişmez.",
       openCta: "Sistem görüşmesi ayarla",
+      openDriversLabel: "Kapsamı — dolayısıyla fiyatı — belirleyenler",
+      openDrivers: [
+        "Sistemin işletmedeki kaç akışı kapsayacağı",
+        "Kaç rolün farklı şeyler görüp yapabileceği",
+        "Kaç konumun veya ekibin bununla çalışacağı",
+        "Hangi mevcut sistemlerin bağlanacağı — ve eski verilerin taşınıp taşınmayacağı",
+        "Sahada çalışılıp çalışılmadığı: mobil, çevrimdışı, şantiyede",
+      ],
+      openDriversNote:
+        "Bunların hiçbiri geçerli değilse bu bir sistem projesi değildir — yukarıdaki paket yeter. Birkaçı geçerliyse, işletmeyi görmeden kimse size ciddi bir rakam veremez.",
       retainerEyebrow: "Sürekli destek",
       retainerTitle: "Teslim değil, işletme.",
-      retainerFrom: "aylık",
+      retainerFixed: "Sabit fiyat",
+      retainerIncludesLabel: "Dahil",
+      retainerExcludesLabel: "Dahil değil",
       retainerCta: "Destek talep et",
       once: "tek seferlik · sabit fiyat",
       monthly: "/ ay",
@@ -3138,7 +3280,7 @@ export const dictionary = {
         },
         evolution: {
           name: "Geliştirme",
-          what: "İşletmede yanlış olduğu ortaya çıkan şey değiştirilir — belgelenip öylece bırakılmaz.",
+          what: "İşletmede yanlış olduğu ortaya çıkan şey değiştirilir — belgelenip öylece bırakılmaz. Aylık değişiklikler kapsamında; yeni eklenen her şey kendi başına bir projedir.",
         },
       },
       note: "Yüzdeyle verilmiş erişilebilirlik oranı yok, saatle verilmiş yanıt süresi yok, „7/24“ yok. Verdiğimiz söz burada yazandır — tatilde de tutarız.",
@@ -4148,7 +4290,7 @@ export const dictionary = {
       items: [
         {
           q: "What does a creaDIG presence cost?",
-          a: "The website package costs €2,400 excl. VAT as a reference price for the first two businesses, then €3,900 excl. VAT. Ongoing support costs €149 excl. VAT per month. All prices plus 19% VAT, fixed price for the agreed scope.",
+          a: "The website package costs €3,900 excl. VAT. For the first business in a trade we have not yet built for, a pilot price of €2,400 excl. VAT applies. Ongoing support costs €149 excl. VAT per month. All prices plus 19% VAT, fixed price for the agreed scope.",
         },
         {
           q: "How does a project run?",
@@ -4496,9 +4638,12 @@ export const dictionary = {
         "This is the entry point, not the main architecture. What creaDIG builds as a systems house is set out above in the five levels and is quoted by scope — not by package.",
       forWhom: "Who it is for",
       recommended: "Our recommendation",
-      tierLabel: "Entry",
+      entryKind: {
+        website: "You need a website",
+        audit: "Your website already exists",
+      },
       referenceNote:
-        "A reference price for the first two businesses — in return for a quote, a mention as a reference and two photographs. From the third business onwards the standard price applies.",
+        "A pilot price for the first business in a trade we have not yet built for. You cannot look at comparable work of ours beforehand — you carry that risk, and the price carries it with you. In return we may show the result and name your business; praise is not required. Which trades already exist you can see under Work. From the second business in the same trade onwards the standard price applies.",
       regularLabel: "Standard price",
       durationLabel: "Project duration",
       netNote: "All prices excl. VAT, plus 19% VAT.",
@@ -4508,9 +4653,21 @@ export const dictionary = {
       openNote:
         "Several locations, a shop, interfaces into inventory management, or a system that goes beyond the website: there is no list price for that, but there is a fixed path. In the system conversation — 45 minutes, free of charge — we look at the business and cut the scope to size. Out of that comes a fixed price for exactly that scope, and afterwards the number does not change.",
       openCta: "System conversation",
+      openDriversLabel: "What drives the scope — and with it the price",
+      openDrivers: [
+        "How many workflows in the business the system has to cover",
+        "How many roles see and may do different things",
+        "How many locations or teams work with it",
+        "Which existing systems get connected — and whether old data comes along",
+        "Whether the work happens outside: mobile, offline, on site",
+      ],
+      openDriversNote:
+        "If none of these applies it is not a system project — the package above is enough. If several apply, nobody can seriously name a figure without having seen the business.",
       retainerEyebrow: "Ongoing support",
       retainerTitle: "Operation instead of handover.",
-      retainerFrom: "from",
+      retainerFixed: "Fixed price",
+      retainerIncludesLabel: "Included",
+      retainerExcludesLabel: "Not included",
       retainerCta: "Request support",
       once: "one-off · fixed price",
       monthly: "/ month",
@@ -4580,7 +4737,7 @@ export const dictionary = {
         },
         evolution: {
           name: "Further development",
-          what: "Whatever turns out to be wrong in operation gets changed — not documented and left standing.",
+          what: "Whatever turns out to be wrong in operation gets changed — not documented and left standing. Within the monthly changes; anything newly added is a project of its own.",
         },
       },
       note: "No availability in per cent, no response time in hours, no “24/7”. What is promised is what is written here — and we keep it on holiday too.",
@@ -5575,7 +5732,7 @@ export const dictionary = {
       items: [
         {
           q: "كم يكلّف الحضور الرقمي لدى creaDIG؟",
-          a: "باقة الموقع بـ 2.400 يورو دون ضريبة كسعر مرجعي لأول منشأتين، ثم 3.900 يورو دون ضريبة. المتابعة الجارية بـ 149 يورو دون ضريبة شهريًا. كل الأسعار تُضاف إليها ضريبة 19٪، بسعر ثابت للنطاق المتفق عليه.",
+          a: "باقة الموقع بـ 3.900 يورو دون ضريبة. ولأول منشأة في حرفة لم نبنِ لها شيئًا بعد يسري سعر تجريبي قدره 2.400 يورو دون ضريبة. المتابعة الجارية بـ 149 يورو دون ضريبة شهريًا. كل الأسعار تُضاف إليها ضريبة 19٪، بسعر ثابت للنطاق المتفق عليه.",
         },
         {
           q: "كيف يسير المشروع؟",
@@ -5923,9 +6080,12 @@ export const dictionary = {
         "هذه نقطة الدخول، لا البنية الأساسية. أما ما تبنيه creaDIG كبيت أنظمة فمذكور أعلاه في الطبقات الخمس ويُحسب بحسب النطاق — لا بالباقة.",
       forWhom: "لمن",
       recommended: "توصيتنا",
-      tierLabel: "البداية",
+      entryKind: {
+        website: "تحتاجون إلى موقع",
+        audit: "موقعكم قائم بالفعل",
+      },
       referenceNote:
-        "سعر مرجعي لأول منشأتين — مقابل اقتباس، وذكرٍ كمرجع، وصورتين. ومن المنشأة الثالثة يسري السعر المعتاد.",
+        "سعر تجريبي لأول منشأة في حرفة لم نبنِ لها شيئًا بعد. لا يمكنكم الاطلاع مسبقًا على عمل مماثل لنا — أنتم تحملون هذه المخاطرة، والسعر يحملها معكم. وفي المقابل يجوز لنا عرض النتيجة وذكر منشأتكم؛ ولا يُطلب مديح. وأيّ الحرف قائمة بالفعل ترونه تحت الأعمال. ومن المنشأة الثانية في الحرفة نفسها يسري السعر المعتاد.",
       regularLabel: "السعر المعتاد",
       durationLabel: "مدة المشروع",
       netNote: "كل الأسعار دون ضريبة، تُضاف إليها ضريبة 19٪.",
@@ -5935,9 +6095,21 @@ export const dictionary = {
       openNote:
         "مواقع متعددة، أو متجر، أو واجهات إلى نظام المخزون، أو نظام يتجاوز الموقع: لا توجد لذلك قائمة أسعار، لكن يوجد طريق واضح. في حديث النظام — خمس وأربعون دقيقة، مجانًا — ننظر في المنشأة ونحدّد النطاق معًا. ومن ذلك يخرج سعر ثابت لهذا النطاق بالضبط، ولا يتغيّر الرقم بعده.",
       openCta: "حديث النظام",
+      openDriversLabel: "ما يحدّد النطاق — ومعه السعر",
+      openDrivers: [
+        "كم عدد مسارات العمل التي يغطّيها النظام في المنشأة",
+        "كم عدد الأدوار التي ترى وتفعل أشياء مختلفة",
+        "كم عدد المواقع أو الفرق التي تعمل به",
+        "أي الأنظمة القائمة سيجري ربطها — وهل تنتقل البيانات القديمة",
+        "هل يجري العمل في الخارج: متنقّلًا، دون اتصال، في الموقع",
+      ],
+      openDriversNote:
+        "إن لم ينطبق شيء من هذا فهو ليس مشروع نظام — الباقة أعلاه تكفي. وإن انطبق عدة أمور، فلا أحد يذكر لكم رقمًا جادًّا دون أن يرى المنشأة.",
       retainerEyebrow: "المتابعة الجارية",
       retainerTitle: "تشغيل بدل تسليم.",
-      retainerFrom: "من",
+      retainerFixed: "سعر ثابت",
+      retainerIncludesLabel: "مشمول",
+      retainerExcludesLabel: "غير مشمول",
       retainerCta: "طلب المتابعة",
       once: "مرة واحدة · سعر ثابت",
       monthly: "/ شهريًا",
@@ -6007,7 +6179,7 @@ export const dictionary = {
         },
         evolution: {
           name: "التطوير المستمر",
-          what: "ما يتبيّن خطؤه في التشغيل يُغيَّر — لا يُوثَّق ويُترك كما هو.",
+          what: "ما يتبيّن خطؤه في التشغيل يُغيَّر — لا يُوثَّق ويُترك كما هو. ضمن التغييرات الشهرية؛ وكل ما يُضاف جديدًا فهو مشروع قائم بذاته.",
         },
       },
       note: "لا نسبة إتاحة مئوية، ولا زمن استجابة بالساعات، ولا «24/7». المُلتزَم به هو ما هو مكتوب هنا — ونلتزم به في الإجازة أيضًا.",
