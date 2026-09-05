@@ -114,6 +114,37 @@ const ROUTES = [
   { name: "systeme-tr", path: "/tr/systeme" },
   { name: "kontakt", path: "/kontakt" },
   { name: "kontakt-tr", path: "/tr/kontakt" },
+  /*
+   * GATE 01 — DER BETRIEBSCHECK FEHLTE IN DIESER LISTE.
+   *
+   * Achtundzwanzig Routen standen hier, und ausgerechnet die Flaeche mit den
+   * meisten Bedienelementen des ganzen Hauses nicht: fuenfzehn Fragen mal
+   * drei Antworten sind fuenfundvierzig Auswahlfelder, dazu ein Formular.
+   * Sie ist zugleich der Hauptweg in den Vertrieb.
+   *
+   * Zwei Zustaende, weil es zwei Seiten sind: der Fragebogen, und das
+   * Ergebnis mit dem Formular darunter. Letzteres erscheint erst nach
+   * fuenfzehn Antworten — ein Lauf, der nur die erste Haelfte prueft, prueft
+   * das Formular nie.
+   */
+  { name: "betriebscheck", path: "/betriebscheck" },
+  { name: "betriebscheck-tr", path: "/tr/betriebscheck" },
+  {
+    name: "betriebscheck-ergebnis",
+    path: "/betriebscheck",
+    async act(page) {
+      /* Jede Frage mit der mittleren Antwort beantworten, dann das Ergebnis
+         zeigen lassen. Nativ geklickt: React haengt an den Ereignissen der
+         Eingabefelder, und `check()` wartet auf einen Zustand, den erst das
+         erneute Rendern setzt. */
+      await page.evaluate(() => {
+        const r = [...document.querySelectorAll('input[type=radio]')]
+        for (let i = 1; i < r.length; i += 3) r[i].click()
+      })
+      await page.getByRole("button", { name: /Ergebnis/i }).click()
+      await page.waitForTimeout(600)
+    },
+  },
   { name: "termin-schritt1", path: "/termin" },
   {
     name: "termin-schritt3",

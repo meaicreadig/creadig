@@ -47,3 +47,10 @@ next-env.d.ts
 # Deployment mitreisen wuerden. Erzeugt wird er lokal, angesehen wird er
 # lokal.
 screenshots/
+
+# Sicherungen gehoeren nie ins Repo — sie enthalten jede personenbezogene
+# Zeile der Datenbank. Der Regelablageort liegt ausserhalb des Arbeitsbaums
+# (~/creadig-backups); diese Zeilen fangen den Fall ab, in dem jemand
+# --out . angibt.
+*.dump
+creadig-backups/

@@ -99,13 +99,37 @@ export async function raiseAlert(kind: string, message: string): Promise<void> {
   const hook = process.env.ALERT_WEBHOOK_URL
   if (!hook) return
   try {
-    await fetch(hook, {
+    /*
+     * GATE 01 — DER ALARM DARF DEN VORGANG NICHT AUFHALTEN.
+     *
+     * Hier stand ein `fetch` ohne Frist. Gemessen am 05.09.2026: `raiseAlert`
+     * wird in `/api/lead` ABGEWARTET. Ein Alarm-Ziel, das nicht antwortet —
+     * ein haengender Webhook, ein stiller Proxy — haette damit genau die
+     * Anfrage blockiert, deren Ausfall er melden soll. Der Meldeweg waere zur
+     * zweiten Stoerung geworden.
+     *
+     * Drei Sekunden: lang genug fuer jeden erreichbaren Empfaenger, kurz
+     * genug, dass ein Mensch am Formular es nicht merkt.
+     */
+    const response = await fetch(hook, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text }),
+      signal: AbortSignal.timeout(3_000),
     })
+
+    /*
+     * Und eine abgelehnte Zustellung wurde bisher verschluckt: `fetch` wirft
+     * bei 404 oder 500 nicht. Ein Empfaenger, dessen Adresse abgelaufen ist,
+     * sah damit genau so aus wie einer, der zuhoert — der schlechteste
+     * denkbare Zustand fuer einen Meldeweg.
+     */
+    if (!response.ok) {
+      console.error(`[alarm] Empfaenger hat abgelehnt: HTTP ${response.status}`)
+    }
   } catch (error) {
     // Der Alarmweg selbst darf den Vorgang nicht scheitern lassen.
-    console.error("[alarm] Zustellung des Alarms fehlgeschlagen:", error)
+    const grund = error instanceof Error && error.name === "TimeoutError" ? "Zeitueberschreitung (3 s)" : String(error)
+    console.error("[alarm] Zustellung des Alarms fehlgeschlagen:", grund)
   }
 }

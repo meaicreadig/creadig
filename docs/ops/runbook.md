@@ -128,32 +128,101 @@ Wiederherstellung — siehe §8.
 
 - `/admin` „Heute" — offene Betriebspunkte, überfällige Schritte, neue Anfragen
 - `/admin/material` — Umgebung und Material, gegen die Wirklichkeit gemessen
-- `/api/selftest` — Zustell-Selbsttest (braucht `SELFTEST_SECRET`)
+- `/api/selftest` — prüft **env, Token-Kette, Manipulationsschutz, Resend UND
+  die Datenbank** mit einer echten Abfrage. Antwortet `state: ok | degraded |
+  failed`; `degraded` nennt beim Namen, was fehlt (heute:
+  `alert-destination`). 503 bei `failed` — die Sprache, die jeder
+  Uptime-Wächter versteht. Braucht `SELFTEST_SECRET`.
+
+```bash
+curl -s "https://<host>/api/selftest?key=$SELFTEST_SECRET" | jq
+```
 - `raiseAlert()` → Serverprotokoll, zusätzlich Webhook wenn `ALERT_WEBHOOK_URL` gesetzt
 
 **Nicht vorhanden — und das ist der ehrliche Stand:**
 
 - Keine Verfügbarkeitsüberwachung. Ist die Seite nachts aus, merkt es niemand.
 - Kein Auflaufen von Fehlern über die Zeit. Ein Alarm ist ein Zeitpunkt, keine Kurve.
-- **`ALERT_WEBHOOK_URL` ist nicht gesetzt.** Damit landet jeder Alarm nur im
-  Serverprotokoll — und ein Serverprotokoll liest an einem Freitagabend keiner.
-  Das ist die grösste Lücke dieses Abschnitts.
+- **`ALERT_WEBHOOK_URL` ist nicht gesetzt.** Der Meldeweg ist gebaut und
+  geprüft — Zustellung, Ablehnung (4xx/5xx wird protokolliert),
+  Zeitüberschreitung nach 3 Sekunden, fehlendes Ziel. Was fehlt, ist die
+  Adresse eines Empfängers. Solange sie fehlt, meldet `/api/selftest`
+  `degraded: ["alert-destination"]` — nicht still gesund.
+
+```bash
+# Meldeweg prüfen, ohne dass ein echter Empfänger etwas bekommt:
+node scripts/alert-sink.mjs --mode echo &          # zeigt die Nutzlast
+node scripts/alert-sink.mjs --mode silent &        # antwortet nie → prüft die Frist
+node scripts/alert-sink.mjs --mode 4xx &           # lehnt ab → muss protokolliert werden
+
+ALERT_WEBHOOK_URL=http://127.0.0.1:4999/hook npm run dev
+```
 
 ## 8 · Sicherung und Wiederherstellung
 
-**UNGEPRÜFT.** Neon führt nach Anbieterangabe eine zeitpunktgenaue
-Wiederherstellung. Aus dieser Ablage lässt sich das **nicht** belegen: kein
-lesbarer Zugang, keine Angabe zur Aufbewahrungsdauer, keine jemals
-durchgeführte Rückspielung.
+### Sichern
 
-Was ohne Datenbank rekonstruierbar wäre: jede Anfrage, die je eine Mail
-erzeugt hat (Postfach). Was **nicht** rekonstruierbar wäre: Vorgänge, Stufen,
-nächste Schritte, Beziehungen, Kundenhistorie, Standorte, Chronik — alles,
-was im Control Center entstanden ist.
+```bash
+CREADIG_ENV=local node scripts/db-backup.mjs --url "postgresql://…" --out ~/creadig-backups
+```
 
-**Bevor das geprüft ist, gilt das Control Center als nicht wiederherstellbar.**
+`pg_dump` im benutzerdefinierten Format. Zeitgestempelter Dateiname, kein
+stilles Überschreiben, Prüfung der Datei durch `pg_restore --list`, und ein
+Abbruch mit Fehlercode, wenn irgendetwas davon nicht stimmt. Sicherungen
+liegen **ausserhalb** des Arbeitsbaums; `.gitignore` fängt den Fall ab, in dem
+jemand `--out .` angibt.
 
----
+Fehlercodes: `2` Schutz · `3` Datei existiert · `4` pg_dump fehlt · `6` zu
+klein · `7` unlesbar.
+
+### Rückspielen und prüfen — in einem Zug
+
+```bash
+CREADIG_ENV=local node scripts/db-restore-drill.mjs \
+  --dump ~/creadig-backups/creadig-….dump \
+  --source "postgresql://…"          # optional: Zeilenvergleich gegen die Quelle
+```
+
+Zwölf Schritte: Datei da → lesbar → leere Wegwerf-Datenbank → Rückspielung →
+Schema (148 Zeilen) → alle Kerntabellen → Bestandsprüfung → Zeilenzahlen →
+Verknüpfungen inhaltlich → **echte Anwendungs-Abfrage** (`ORG_COLUMNS` aus
+`lib/vertrieb-store-neon.ts`) → aufräumen.
+
+**Ein fehlgeschlagener Schritt beendet den Lauf mit Code 10.** Es gibt kein
+„im Wesentlichen erfolgreich". Nachgemessen am 05.09.2026: mit absichtlich
+verwaisten Zeilen bricht die Übung an der Bestandsprüfung ab.
+
+Das Ziel ist **immer** eine Wegwerf-Datenbank (`--target`, Vorgabe `g1_drill`).
+Der Schutz lässt nichts anderes zu.
+
+### Was der Stand ist
+
+| | |
+|---|---|
+| **Rückspiel-Mechanismus** | **ABGENOMMEN** — 12/12, gegen PostgreSQL 17 |
+| **Sicherung durch creaDIG** | **GEBAUT** — läuft, prüft sich selbst, scheitert laut |
+| **Anbieter-Sicherung (Neon)** | **UNGEPRÜFT** — aus dieser Ablage nicht belegbar |
+| **Sicherung der echten Produktionsdaten** | **UNGEPRÜFT** — kein lesbarer Zugang |
+
+### Was wiederherstellbar ist
+
+**Kritisch:** Anfragen, Kontakte, Organisationen, Standorte, Vorgänge,
+Beziehungen, Chronik.
+
+**Ohne Datenbank rekonstruierbar:** jede Anfrage, die je eine Mail erzeugt
+hat — aus dem Postfach, von Hand.
+
+**Nicht rekonstruierbar:** Stufen, nächste Schritte, Beziehungsgrade,
+Kundenhistorie, Standorte, Chronik. Alles, was im Control Center entstanden
+ist.
+
+**Wer spielt zurück:** der Inhaber. **Womit:** den zwei Befehlen oben.
+**Was danach zu prüfen ist:** `check-integrity.sql` (elf Nullen),
+`/api/selftest` (Datenbank erreichbar), `/admin/vertrieb` lädt.
+
+**Zahlenwerte für RPO/RTO: OWNER DECISION.** Wie viel Datenverlust und wie
+viel Ausfallzeit tragbar sind, ist eine Geschäftsentscheidung — hier wird
+keine Zahl erfunden. Der technische Weg dorthin existiert und ist geprüft.
 
 ## 9 · Was gegen Production niemals getan wird
 
@@ -165,6 +234,32 @@ was im Control Center entstanden ist.
 - Keine Migration ohne vorherigen Lauf gegen eine Wegwerf-Datenbank.
 
 ## 10 · Sicher testen
+
+### Der Schutz gegen Production
+
+`scripts/lib/env-guard.mjs` sagt NEIN, bevor ein Werkzeug an ein Ziel geht,
+das echt sein könnte. Geprüft werden Umgebung (`VERCEL_ENV`, `CREADIG_ENV`,
+`NODE_ENV`, `CI`) **und** die Art der Datenbank (verwaltet / fremd / lokal /
+Wegwerf / fehlend / unlesbar).
+
+Eine Wegwerf-Datenbank erkennt er am Namen — `g1_…`, `probe…`, `test…`,
+`tmp…`, `drill…`, `cc_…`, `abnahme…` auf `localhost`. Alles andere ist im
+Zweifel echt, und im Zweifel lautet die Antwort nein.
+
+Nachgemessen über elf Fälle: Wegwerf lokal wird auch mit
+`VERCEL_ENV=production` erlaubt (dort kann nichts Echtes liegen), eine
+Neon-Adresse wird auch in lokaler Umgebung abgelehnt, leere und unlesbare
+Verbindungen ebenfalls.
+
+Die bewusste Ausnahme ist keine Einstellung, sondern ein Satz:
+
+```bash
+CREADIG_ALLOW_UNSAFE_DB=ich-weiss-was-ich-tue
+```
+
+Sie wird protokolliert.
+
+
 
 Abnahmeläufe laufen ausschliesslich so:
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { issueFormToken, verifyFormToken } from "@/lib/lead-guard"
 import { raiseAlert } from "@/lib/alert"
+import { getVertriebStore, leadStoreConfigured } from "@/lib/lead-store"
 
 /**
  * BF-8 — der Zustell-Selbsttest.
@@ -47,6 +48,46 @@ import { raiseAlert } from "@/lib/alert"
  * die jeder aufrufen kann.
  */
 export const dynamic = "force-dynamic"
+
+/**
+ * Ist der Speicher erreichbar — und antwortet er?
+ *
+ * Drei unterscheidbare Antworten, weil sie drei verschiedene Handlungen
+ * nach sich ziehen:
+ *
+ *   nicht eingerichtet  Kein `LEAD_STORE`. Gueltiger Zustand: Anfragen laufen
+ *                       als Mail. Kein Fehler, aber es gehoert gesagt.
+ *   eingerichtet, tot   Konfiguriert und antwortet nicht. Das ist der Fall,
+ *                       in dem Anfragen still an der Datenbank vorbeilaufen.
+ *   erreichbar          Eine echte Abfrage ist durchgelaufen.
+ */
+async function checkDatabase(): Promise<Check> {
+  if (!leadStoreConfigured()) {
+    return {
+      name: "datenbank",
+      ok: true,
+      detail: "kein Lead-Speicher eingerichtet — Anfragen laufen als Mail (gueltiger Zustand)",
+    }
+  }
+  const store = getVertriebStore()
+  if (!store) {
+    return { name: "datenbank", ok: false, detail: "Speicher eingerichtet, aber nicht aufbaubar (DATABASE_URL pruefen)" }
+  }
+  try {
+    const summary = await store.summary()
+    return {
+      name: "datenbank",
+      ok: true,
+      detail: `erreichbar — ${summary.openOpportunities} offene Vorgaenge gezaehlt`,
+    }
+  } catch (error) {
+    return {
+      name: "datenbank",
+      ok: false,
+      detail: `Abfrage fehlgeschlagen: ${String(error).slice(0, 160)}`,
+    }
+  }
+}
 
 type Check = { name: string; ok: boolean; detail: string }
 
@@ -216,11 +257,45 @@ export async function GET(request: Request) {
     }
   }
 
+  /*
+   * GATE 01 — DIE DATENBANK STAND HIER NICHT DRIN.
+   *
+   * Der Selbsttest prueft seit BF-8 den Zustellweg und kannte den Speicher
+   * nicht. Damit meldete er „alles gut", waehrend jede Anfrage an der
+   * Datenbank vorbeilief und nur noch im Postfach landete — genau der stille
+   * Ausfall, gegen den diese Route gebaut wurde, nur eine Ebene tiefer.
+   *
+   * Geprueft wird mit einer echten Abfrage, nicht mit dem Vorhandensein einer
+   * Umgebungsvariablen: `summary()` liest ueber vier Tabellen. Eine Variable
+   * ist gesetzt oder nicht; eine Datenbank antwortet oder nicht, und nur das
+   * Zweite ist eine Aussage.
+   */
+  checks.push(await checkDatabase())
+
+  /*
+   * Und der Alarmweg selbst. Ohne `ALERT_WEBHOOK_URL` erreicht kein Alarm
+   * jemanden — er landet im Serverprotokoll, das an einem Freitagabend
+   * niemand liest. Das ist kein Fehler des Codes, aber es ist ein
+   * GESCHWAECHTER Zustand, und ein Selbsttest, der ihn verschweigt, meldet
+   * eine Gesundheit, die es nicht gibt.
+   *
+   * `degraded` und nicht `ok:false`: Die Route soll deswegen keine 503 werfen
+   * und keinen Uptime-Waechter Alarm schlagen lassen — sie soll es sagen.
+   */
+  const alertZiel = Boolean(process.env.ALERT_WEBHOOK_URL?.trim())
+
   const ok = checks.every((check) => check.ok)
+  const degraded = !alertZiel
   if (!ok) await alert(checks)
 
   return NextResponse.json(
-    { ok, checkedAt: new Date().toISOString(), checks },
+    {
+      ok,
+      state: ok ? (degraded ? "degraded" : "ok") : "failed",
+      degraded: degraded ? ["alert-destination"] : [],
+      checkedAt: new Date().toISOString(),
+      checks,
+    },
     { status: ok ? 200 : 503, headers: { "Cache-Control": "no-store" } },
   )
 }
