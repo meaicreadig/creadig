@@ -172,6 +172,17 @@ export type ResearchCase = {
   discoveredAt: string
   researchedAt: string | null
   evidence: EvidenceRow[]
+  /*
+   * GATE 11 — die Person am Vorgang und die menschliche Entscheidung.
+   *
+   * `contactDecision` bleibt `null`, solange niemand entschieden hat. Das
+   * ist kein fehlender Wert, sondern der ganze Punkt: „bereit fuer Kontakt"
+   * ist ein Zustand des Wissens, ansprechen ist eine Entscheidung.
+   */
+  contactId: string | null
+  contactDecision: "vorbereiten" | "zurueckgestellt" | "mehr-information" | "nicht-verfolgen" | null
+  contactDecisionAt: string | null
+  contactDecisionNote: string | null
 }
 
 /* ── Ableitung ──────────────────────────────────────────────────────────── */

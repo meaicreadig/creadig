@@ -257,6 +257,39 @@ export const SCHEMA: string[] = [
      created_at timestamptz NOT NULL DEFAULT now()
    )`,
   `CREATE INDEX IF NOT EXISTS research_evidence_case_idx ON research_evidence (case_id)`,
+
+  /*
+   * GATE 11 — Kontakt & Zugang (siehe `scripts/migrations/009-kontakt-zugang.sql`).
+   *
+   * Drei Dinge, mehr braucht es nicht: woher wir die Person kennen, welche
+   * Person zum Vorgang gehoert, und was ein MENSCH entschieden hat.
+   *
+   * `contact_decision` ist der Kern des Gates. „bereit fuer Kontakt" ist ein
+   * Zustand des WISSENS; ansprechen ist eine ENTSCHEIDUNG. Zwischen beiden
+   * steht dieses Feld, und es fuellt sich nicht von selbst.
+   */
+  `ALTER TABLE contacts ADD COLUMN IF NOT EXISTS source_url text`,
+  `ALTER TABLE contacts ADD COLUMN IF NOT EXISTS source_kind text`,
+  `ALTER TABLE contacts ADD COLUMN IF NOT EXISTS source_note text`,
+  `ALTER TABLE research_cases ADD COLUMN IF NOT EXISTS contact_id text REFERENCES contacts (id) ON DELETE SET NULL`,
+  `ALTER TABLE research_cases ADD COLUMN IF NOT EXISTS contact_decision text`,
+  `ALTER TABLE research_cases ADD COLUMN IF NOT EXISTS contact_decision_at timestamptz`,
+  `ALTER TABLE research_cases ADD COLUMN IF NOT EXISTS contact_decision_note text`,
+  `DO $$
+   BEGIN
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'research_cases_decision_check') THEN
+       ALTER TABLE research_cases ADD CONSTRAINT research_cases_decision_check
+         CHECK (contact_decision IS NULL OR contact_decision IN
+           ('vorbereiten','zurueckgestellt','mehr-information','nicht-verfolgen'));
+     END IF;
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'contacts_source_kind_check') THEN
+       ALTER TABLE contacts ADD CONSTRAINT contacts_source_kind_check
+         CHECK (source_kind IS NULL OR source_kind IN
+           ('website','impressum','stellenanzeige','handelsregister','presse',
+            'ausschreibung','linkedin-unternehmensseite','empfehlung','bestand','eingehend'));
+     END IF;
+   END $$`,
+  `CREATE INDEX IF NOT EXISTS research_cases_contact_idx ON research_cases (contact_id)`,
   `DO $$
    BEGIN
      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'research_cases_status_check') THEN
@@ -753,6 +786,9 @@ const REQUIRED_COLUMNS: [table: string, column: string][] = [
   /* Gate 10 — Recherche. */
   ["research_cases", "organisation_id"],
   ["research_evidence", "source_url"],
+  /* Gate 11 — Kontakt & Zugang. */
+  ["contacts", "source_kind"],
+  ["research_cases", "contact_decision"],
 ]
 
 /**

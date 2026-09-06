@@ -124,7 +124,13 @@ export default async function RecherchePage({
                   <span className="type-small text-muted-foreground min-w-0 flex-1 text-pretty">
                     {stop.warum}
                   </span>
-                  <span className="text-meta text-muted-foreground lg:w-44 lg:shrink-0 lg:text-end">
+                  <span className="text-meta text-muted-foreground lg:w-52 lg:shrink-0 lg:text-end">
+                    {/* GATE 11 — ob eine Person am Vorgang haengt, ist die
+                        zweite Frage nach der Passung. Sie gehoert in die
+                        Uebersicht, sonst sucht man sie in jedem Detail. */}
+                    {f.contactId ? "Person" : "ohne Person"}
+                    {f.contactDecision ? ` · ${f.contactDecision}` : ""}
+                    {" · "}
                     {belegt} {belegt === 1 ? "Signal" : "Signale"}
                     {tage !== null && ` · ${tage} T`}
                     {konflikt > 0 && ` · ${konflikt} Widerspruch`}

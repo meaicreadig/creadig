@@ -7,6 +7,7 @@ import { HANDLING_STATES, LIFECYCLE_STAGES, RELATIONSHIP_LEVELS } from "@/lib/ve
 import type { HandlingStatus, LifecycleStage, LocationInput, RelationshipLevel } from "@/lib/vertrieb"
 import { OFFER_KINDS, OFFERS, type OfferKind } from "@/lib/offer-readiness"
 import { RESEARCH_STATES, SOURCES, type ResearchState, type SourceKind } from "@/lib/research"
+import { CONTACT_SOURCES, DECISIONS, type ContactSource, type Decision } from "@/lib/contact-access"
 
 const EVIDENCE_KINDS = ["fact", "signal", "anlass", "ausschluss"] as const
 type EvidenceKind = (typeof EVIDENCE_KINDS)[number]
@@ -254,6 +255,54 @@ export async function setResearchCase(id: string, form: FormData): Promise<void>
     nextAction: text(form.get("nextAction")),
   })
   refresh(`/admin/vertrieb/recherche/${id}`, "/admin/vertrieb/recherche")
+}
+
+/* ── Kontakt & Zugang (Gate 11) ───────────────────────────────────────────── */
+
+/*
+ * Die Person am Vorgang — samt Fundstelle.
+ *
+ * Ohne Quelle wird der Name zwar gespeichert (jemand hat ihn gehoert), aber
+ * er zaehlt nicht als belegt, und die Lage bleibt auf „person-unbelegt".
+ * Das ist Absicht: Ein Name ohne Fundstelle ist eine Vermutung, und eine
+ * Vermutung darf keinen Menschen erreichen.
+ */
+export async function setResearchPerson(caseId: string, form: FormData): Promise<void> {
+  const store = requireStore()
+  const contactId = text(form.get("contactId"))
+  if (!contactId) {
+    await store.linkResearchContact(caseId, null)
+    refresh(`/admin/vertrieb/recherche/${caseId}`)
+    return
+  }
+  await store.linkResearchContact(caseId, contactId)
+
+  const kind = text(form.get("sourceKind"))
+  await store.setContactSource(contactId, {
+    url: text(form.get("sourceUrl")),
+    kind: CONTACT_SOURCES.includes(kind as ContactSource) ? (kind as ContactSource) : null,
+    note: text(form.get("sourceNote")),
+  })
+  refresh(`/admin/vertrieb/recherche/${caseId}`, "/admin/vertrieb/recherche")
+}
+
+/*
+ * DAS ENTSCHEIDUNGSTOR.
+ *
+ * Das ist der einzige Weg, auf dem `contact_decision` einen Wert bekommt.
+ * Es gibt keine Ableitung, keinen Automatismus und keinen zweiten Pfad —
+ * auch dann nicht, wenn Passung, Person, Zugang und Anlass alle stehen.
+ *
+ * „Kontakt vorbereiten" heisst ausserdem NICHT „Nachricht verschickt". Die
+ * Ansprache selbst ist ein eigener Schritt und gehoert nicht in dieses
+ * Gate.
+ */
+export async function decideResearchContact(caseId: string, form: FormData): Promise<void> {
+  const store = requireStore()
+  const raw = text(form.get("decision"))
+  const decision = DECISIONS.includes(raw as Decision) ? (raw as Decision) : null
+  await store.decideContact(caseId, decision, text(form.get("note")))
+  refresh(`/admin/vertrieb/recherche/${caseId}`, "/admin/vertrieb/recherche")
 }
 
 /* ── Beziehung ────────────────────────────────────────────────────────────── */

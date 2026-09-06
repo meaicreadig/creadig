@@ -1,7 +1,12 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
-import { addResearchEvidence, setResearchCase } from "@/app/(admin)/admin/vertrieb/actions"
+import {
+  addResearchEvidence,
+  decideResearchContact,
+  setResearchCase,
+  setResearchPerson,
+} from "@/app/(admin)/admin/vertrieb/actions"
 import {
   AdminField,
   AdminInput,
@@ -24,6 +29,14 @@ import {
   widersprueche,
   type SourceKind,
 } from "@/lib/research"
+import {
+  CONTACT_SOURCES,
+  CONTACT_SOURCE_LABEL,
+  DECISIONS,
+  DECISION_LABEL,
+  ansprachedeckung,
+  kontaktLage,
+} from "@/lib/contact-access"
 
 /**
  * Vertrieb · Recherche · ein Betrieb.
@@ -59,6 +72,15 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
   const stop = abbruch(fall)
   const tage = alterInTagen(fall)
   const konflikte = widersprueche(fall)
+  /*
+    GATE 11 — Person, Zugang, Anlass und Entscheidung. Vier Achsen, die
+    einzeln beantwortet werden; keine wird zur anderen.
+  */
+  const person = await store.getResearchPerson(fall.id)
+  const kandidaten = await store.listOrganisationContacts(fall.organisationId)
+  const lage = kontaktLage(fall, person)
+  const deckung = ansprachedeckung(fall, person)
+
   const gueltig = fall.evidence.filter((x) => !x.supersededBy)
   const abgeloest = fall.evidence.filter((x) => x.supersededBy)
   const belegteSignale = new Set(gueltig.filter((x) => x.kind === "signal").map((x) => x.ref))
@@ -150,6 +172,128 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
                 </ul>
               </details>
             )}
+          </section>
+
+          {/* ── Kontakt & Zugang ──────────────────────────────────────────
+              GATE 11 — der Mensch und der Weg zu ihm.
+
+              „bereit fuer Kontakt" ist ein Zustand des WISSENS. Ansprechen
+              ist eine ENTSCHEIDUNG. Zwischen beiden steht dieser Abschnitt,
+              und er entscheidet nichts von selbst. */}
+          <section aria-labelledby="kontakt" className="mt-12">
+            <SectionHeader id="kontakt" title="Kontakt & Zugang" />
+
+            <div className="mt-5 flex flex-col gap-4">
+              {([
+                ["Passung", lage.passung],
+                ["Person", lage.person],
+                ["Zugang", lage.zugang],
+                ["Anlass", lage.anlass],
+              ] as const).map(([name, achse]) => (
+                <div key={name} className="flex flex-col gap-1 sm:flex-row sm:gap-4">
+                  <span className="eyebrow text-muted-foreground sm:w-24 sm:shrink-0">{name}</span>
+                  <span className="min-w-0">
+                    <Pill severity={achse.urteil === "ja" ? "attention" : "neutral"}>{achse.urteil}</Pill>
+                    <span className="type-small text-muted-foreground ms-3 text-pretty">{achse.grund}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <p className="type-small text-gold-text border-line mt-6 border-t pt-5 text-pretty">
+              {lage.naechstes}
+            </p>
+
+            {/* Person zuordnen */}
+            <form action={setResearchPerson.bind(null, fall.id)} className="mt-7 flex flex-col gap-5">
+              <AdminField label="Wer ist die relevante Person?" htmlFor="contactId">
+                <AdminSelect id="contactId" name="contactId" defaultValue={fall.contactId ?? ""}>
+                  <option value="">keine Person zugeordnet</option>
+                  {kandidaten.map((k) => (
+                    <option key={k.id} value={k.id}>
+                      {k.name}{k.role ? ` — ${k.role}` : ""}
+                    </option>
+                  ))}
+                </AdminSelect>
+              </AdminField>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <AdminField label="Fundstelle zur Person" htmlFor="sourceUrl">
+                  <AdminInput id="sourceUrl" name="sourceUrl" type="url" placeholder="https://…/impressum" />
+                </AdminField>
+                <AdminField label="Woher" htmlFor="sourceKind">
+                  <AdminSelect id="sourceKind" name="sourceKind" defaultValue={person?.sourceKind ?? ""}>
+                    <option value="">—</option>
+                    {CONTACT_SOURCES.map((k) => (
+                      <option key={k} value={k}>{CONTACT_SOURCE_LABEL[k]}</option>
+                    ))}
+                  </AdminSelect>
+                </AdminField>
+              </div>
+              <button type="submit" className="cta-quiet self-start px-4 py-2 text-sm">Person speichern</button>
+            </form>
+
+            {person && (
+              <dl className="border-line mt-7 flex flex-col gap-4 border-t pt-6">
+                <DataValue label="Rolle">{person.role}</DataValue>
+                <DataValue label="Nähe">{person.relationship}</DataValue>
+                <DataValue label="LinkedIn">
+                  {person.linkedinUrl ? (
+                    <a
+                      href={person.linkedinUrl}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      className="text-gold-text underline underline-offset-4"
+                    >
+                      Profil öffnen
+                    </a>
+                  ) : null}
+                </DataValue>
+                <DataValue label="Fundstelle">
+                  {person.sourceUrl ? (
+                    <a
+                      href={person.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      className="text-gold-text truncate underline underline-offset-4"
+                    >
+                      {person.sourceUrl}
+                    </a>
+                  ) : null}
+                </DataValue>
+              </dl>
+            )}
+
+            {/* Das Entscheidungstor */}
+            <div className="border-gold/45 mt-8 border-s-2 ps-6">
+              <p className="eyebrow text-gold-text">Entscheidung</p>
+              <p className="type-small text-muted-foreground mt-3 max-w-xl text-pretty">
+                {deckung.gedeckt
+                  ? `Eine Ansprache wäre gedeckt: ${deckung.grund}`
+                  : `Eine Ansprache wäre NICHT gedeckt: ${deckung.grund}`}
+              </p>
+              <form action={decideResearchContact.bind(null, fall.id)} className="mt-5 flex flex-col gap-5">
+                <AdminField label="Was entscheiden Sie?" htmlFor="decision">
+                  <AdminSelect id="decision" name="decision" defaultValue={fall.contactDecision ?? ""}>
+                    <option value="">noch nicht entschieden</option>
+                    {DECISIONS.map((d) => (
+                      <option key={d} value={d} disabled={d === "vorbereiten" && !deckung.gedeckt}>
+                        {DECISION_LABEL[d]}
+                        {d === "vorbereiten" && !deckung.gedeckt ? " — nicht gedeckt" : ""}
+                      </option>
+                    ))}
+                  </AdminSelect>
+                </AdminField>
+                <AdminField label="Warum" htmlFor="note">
+                  <AdminInput id="note" name="note" defaultValue={fall.contactDecisionNote ?? ""} placeholder="Ein Satz, der die Entscheidung trägt." />
+                </AdminField>
+                <button type="submit" className="cta-quiet self-start px-4 py-2 text-sm">Entscheidung festhalten</button>
+              </form>
+              <ul className="mt-6 flex flex-col gap-1">
+                {lage.niemalsAutomatisch.map((n) => (
+                  <li key={n} className="type-small text-muted-foreground text-pretty">· {n}</li>
+                ))}
+              </ul>
+            </div>
           </section>
 
           {/* ── Beleg hinzufügen ── */}

@@ -22,7 +22,8 @@
     "deploy:preview": "node scripts/deploy.mjs",
     "deploy:production": "node scripts/deploy.mjs --production",
     "market-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/market-drill.mjs",
-    "research-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/research-drill.mjs"
+    "research-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/research-drill.mjs",
+    "contact-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/contact-drill.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

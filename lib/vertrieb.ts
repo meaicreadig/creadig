@@ -1,3 +1,4 @@
+import type { ContactSource, Decision, PersonRef } from "@/lib/contact-access"
 import type { EvidenceKind, ResearchCase, ResearchState, SourceKind } from "@/lib/research"
 import type { OfferKind } from "@/lib/offer-readiness"
 import type { SalesStatus } from "@/lib/lead-store"
@@ -534,6 +535,17 @@ export type VertriebStore = {
     sourceKind: SourceKind
   }): Promise<boolean>
   supersedeEvidence(oldId: string, newId: string): Promise<boolean>
+  /* GATE 11 — die Person am Vorgang und die menschliche Entscheidung. */
+  getResearchPerson(caseId: string): Promise<PersonRef | null>
+  linkResearchContact(caseId: string, contactId: string | null): Promise<boolean>
+  setContactSource(contactId: string, source: {
+    url: string | null
+    kind: ContactSource | null
+    note: string | null
+  }): Promise<boolean>
+  decideContact(caseId: string, decision: Decision | null, note: string | null): Promise<boolean>
+  listOrganisationContacts(organisationId: string): Promise<PersonRef[]>
+
   updateResearchCase(id: string, patch: {
     status?: ResearchState
     access?: ResearchCase["access"]

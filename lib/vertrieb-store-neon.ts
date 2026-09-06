@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto"
 
 import { OFFERS } from "@/lib/offer-readiness"
 import { sanitizeClaim, type EvidenceRow, type ResearchCase } from "@/lib/research"
+import type { PersonRef } from "@/lib/contact-access"
 import type { SalesStatus } from "@/lib/lead-store"
 import { isTestEnquiry, sqlLeadOperational } from "@/lib/vertrieb-bestand"
 import { SALES_LABELS_DE, TERMINAL_STATES } from "@/lib/lead-store"
@@ -349,6 +350,24 @@ function toResearchCase(r: Record<string, unknown>, evidence: EvidenceRow[]): Re
     discoveredAt: iso(r.discovered_at as Ts),
     researchedAt: r.researched_at ? iso(r.researched_at as Ts) : null,
     evidence,
+    contactId: (r.contact_id as string | null) ?? null,
+    contactDecision: (r.contact_decision as ResearchCase["contactDecision"]) ?? null,
+    contactDecisionAt: r.contact_decision_at ? iso(r.contact_decision_at as Ts) : null,
+    contactDecisionNote: (r.contact_decision_note as string | null) ?? null,
+  }
+}
+
+function toPerson(r: Record<string, unknown>): PersonRef {
+  return {
+    id: String(r.id), name: String(r.name),
+    role: (r.role as string | null) ?? null,
+    email: (r.email as string | null) ?? null,
+    phone: (r.phone as string | null) ?? null,
+    linkedinUrl: (r.linkedin_url as string | null) ?? null,
+    relationship: r.relationship as PersonRef["relationship"],
+    sourceUrl: (r.source_url as string | null) ?? null,
+    sourceKind: (r.source_kind as PersonRef["sourceKind"]) ?? null,
+    sourceNote: (r.source_note as string | null) ?? null,
   }
 }
 
@@ -635,6 +654,69 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
       await ready()
       const rows = await sql.query(
         `UPDATE research_evidence SET superseded_by = $2 WHERE id = $1 RETURNING id`, [oldId, newId])
+      return rows.length > 0
+    },
+
+    /* ── Kontakt & Zugang (Gate 11) ─────────────────────────────────── */
+
+    async getResearchPerson(caseId): Promise<PersonRef | null> {
+      await ready()
+      const rows = await sql.query(
+        `SELECT c.* FROM research_cases rc JOIN contacts c ON c.id = rc.contact_id
+          WHERE rc.id = $1 AND c.excluded_reason IS NULL`, [caseId])
+      return rows.length ? toPerson(rows[0]!) : null
+    },
+
+    async listOrganisationContacts(organisationId): Promise<PersonRef[]> {
+      await ready()
+      const rows = await sql.query(
+        `SELECT * FROM contacts WHERE organisation_id = $1 AND excluded_reason IS NULL ORDER BY name`,
+        [organisationId])
+      return rows.map(toPerson)
+    },
+
+    async linkResearchContact(caseId, contactId): Promise<boolean> {
+      await ready()
+      const rows = await sql.query(
+        `UPDATE research_cases SET contact_id = $2, updated_at = now() WHERE id = $1 RETURNING id`,
+        [caseId, contactId])
+      return rows.length > 0
+    },
+
+    /*
+     * Die Fundstelle zur Person. Sie ueberschreibt nichts, was ein Mensch
+     * schon eingetragen hat — nur leere Felder werden gefuellt, dieselbe
+     * `coalesce`-Regel wie im Bestandsimport (Gate 07).
+     */
+    async setContactSource(contactId, source): Promise<boolean> {
+      await ready()
+      const rows = await sql.query(
+        `UPDATE contacts
+            SET source_url  = coalesce($2::text, source_url),
+                source_kind = coalesce($3::text, source_kind),
+                source_note = coalesce($4::text, source_note),
+                updated_at  = now()
+          WHERE id = $1 RETURNING id`,
+        [contactId, source.url, source.kind, source.note])
+      return rows.length > 0
+    },
+
+    /*
+     * Die Entscheidung. Sie kommt AUSSCHLIESSLICH von hier — kein anderer
+     * Pfad schreibt `contact_decision`, und es gibt keine Ableitung, die
+     * sie setzen koennte. Das ist die Grenze zwischen „wir wissen genug"
+     * und „wir sprechen an".
+     */
+    async decideContact(caseId, decision, note): Promise<boolean> {
+      await ready()
+      const rows = await sql.query(
+        `UPDATE research_cases
+            SET contact_decision = $2::text,
+                contact_decision_at = CASE WHEN $2::text IS NULL THEN NULL ELSE now() END,
+                contact_decision_note = $3::text,
+                updated_at = now()
+          WHERE id = $1 RETURNING id`,
+        [caseId, decision, note])
       return rows.length > 0
     },
 
