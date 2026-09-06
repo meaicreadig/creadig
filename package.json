@@ -18,7 +18,9 @@
     "crm-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/crm-drill.mjs",
     "crm-import": "node --import ./scripts/lib/alias-hook.mjs scripts/crm-import.mjs",
     "sales-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/sales-drill.mjs",
-    "db-migrate": "node --import ./scripts/lib/alias-hook.mjs scripts/db-migrate.mjs"
+    "db-migrate": "node --import ./scripts/lib/alias-hook.mjs scripts/db-migrate.mjs",
+    "deploy:preview": "node scripts/deploy.mjs",
+    "deploy:production": "node scripts/deploy.mjs --production"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
