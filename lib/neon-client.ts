@@ -653,6 +653,80 @@ export async function applyExclusions(sql: Sql): Promise<void> {
   )
 }
 
+/*
+ * ==========================================================================
+ * WAS DIE LAUFZEIT VORAUSSETZT — UND NUR PRUEFT.
+ * ==========================================================================
+ *
+ * Bewusst KEINE Ableitung aus `SCHEMA`: Eine automatisch erzeugte Liste
+ * waere immer vollstaendig und damit wertlos als Absicht. Hier steht, was
+ * die Anwendung wirklich BRAUCHT, um zu laufen — jede Zeile eine
+ * Entscheidung.
+ *
+ * Wer eine Migration schreibt, die die Laufzeit braucht, traegt sie hier
+ * ein. Wer das vergisst, merkt es beim naechsten Start gegen eine frische
+ * Datenbank — und nicht in Produktion.
+ */
+const REQUIRED_TABLES = [
+  "leads",
+  "organisations",
+  "contacts",
+  "opportunities",
+  "activities",
+  "locations",
+  "import_log",
+] as const
+
+const REQUIRED_COLUMNS: [table: string, column: string][] = [
+  ["leads", "excluded_reason"],
+  ["organisations", "lifecycle"],
+  ["organisations", "excluded_reason"],
+  ["contacts", "email_normalised"],
+  ["contacts", "relationship"],
+  ["opportunities", "from_lead_id"],
+  ["opportunities", "excluded_reason"],
+  /* Gate 08 — Angebotsreife. */
+  ["opportunities", "offer_kind"],
+  ["opportunities", "readiness_evidence"],
+  ["locations", "organisation_id"],
+]
+
+/**
+ * Prueft das Schema. Aendert nichts.
+ *
+ * Scheitert mit dem Befehl, der es beheben wuerde — die einzige Meldung,
+ * die an dieser Stelle hilft. Eine Anwendung, die eine fehlende Spalte
+ * selbst nachtraegt, verwandelt jeden Start in eine Migration.
+ */
+export async function verifySchema(sql: Sql): Promise<void> {
+  const tabellen = new Set(
+    (await sql.query(
+      `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`,
+    )).map((r) => String(r.table_name)),
+  )
+  const fehlendeTabellen = REQUIRED_TABLES.filter((t) => !tabellen.has(t))
+
+  const spalten = new Set(
+    (await sql.query(
+      `SELECT table_name || '.' || column_name AS ref
+         FROM information_schema.columns WHERE table_schema = 'public'`,
+    )).map((r) => String(r.ref)),
+  )
+  const fehlendeSpalten = REQUIRED_COLUMNS.filter(([t, c]) => !spalten.has(`${t}.${c}`))
+
+  if (fehlendeTabellen.length === 0 && fehlendeSpalten.length === 0) return
+
+  const fehlt = [
+    ...fehlendeTabellen.map((t) => `Tabelle ${t}`),
+    ...fehlendeSpalten.map(([t, c]) => `Spalte ${t}.${c}`),
+  ].join(", ")
+  throw new Error(
+    `Datenbankschema unvollstaendig: ${fehlt}. ` +
+      `Die Anwendung legt nichts selbst an — das waere eine unbeschlossene Migration. ` +
+      `Anwenden mit: npm run db-migrate`,
+  )
+}
+
 const clients = new Map<string, { sql: Sql; ready: () => Promise<void>; refreshExclusions: () => Promise<void> }>()
 
 /**
@@ -676,8 +750,47 @@ export function neonClient(connectionString: string): {
   const ready = (): Promise<void> => {
     if (!promise) {
       promise = (async () => {
-        for (const stmt of SCHEMA) await sql.query(stmt)
-        for (const stmt of BACKFILL) await sql.query(stmt)
+        /*
+         * ==============================================================
+         * HIER LIEF FRUEHER DIE MIGRATION. DAS WAR EIN KONSTRUKTIONSFEHLER.
+         * ==============================================================
+         *
+         * An dieser Stelle stand `for (const stmt of SCHEMA) await
+         * sql.query(stmt)` — jede Anwendungsbereitschaft fuehrte damit die
+         * gesamte Schema-Definition aus.
+         *
+         * Solange man das nur lokal tat, fiel es nicht auf: Alle
+         * Anweisungen sind `IF NOT EXISTS`, gegen eine fertige Datenbank
+         * sind sie folgenlos. Der Fehler zeigt sich erst, wenn jemand eine
+         * NEUE Anweisung hinzufuegt und danach die Anwendung gegen
+         * Produktion startet — dann wandert die Schema-Aenderung dorthin,
+         * ohne dass jemand sie beschlossen hat.
+         *
+         * Genau das ist am 06.09.2026 passiert: Eine Messung der
+         * Anmeldedauer mit `DATABASE_URL` auf Produktion oeffnete /admin,
+         * die Seite rief `collectAttention` -> `store.summary()` ->
+         * `ready()`, und Migration 007 lag in Produktion. Niemand hatte
+         * sie freigegeben.
+         *
+         * DREISSIG DER 33 STORE-METHODEN RUFEN `ready()`. Es gab also
+         * keinen lesenden Zugriff, der nicht potenziell DDL ausfuehren
+         * konnte. „Nur mal nachsehen" war strukturell unmoeglich.
+         *
+         * ---------------------------------------------------------------
+         * WAS JETZT GILT
+         *
+         * `ready()` PRUEFT und aendert nichts am Schema. Fehlt etwas,
+         * scheitert es mit dem Befehl, der es beheben wuerde — statt es
+         * still selbst zu tun. Angewandt wird ausschliesslich ueber
+         * `npm run db-migrate`, absichtlich und benannt.
+         *
+         * Der Bestand (`seedBestand`) und die Ausschluesse
+         * (`applyExclusions`) bleiben hier: Das sind DATEN, keine
+         * Struktur, und sie muessen bei jedem Start stimmen — ein
+         * Abnahmedatensatz, der nach einem Neustart wieder in der Inbox
+         * steht, war der Grund, warum sie ueberhaupt hierher kamen.
+         */
+        await verifySchema(sql)
         await seedBestand(sql)
         await applyExclusions(sql)
       })().catch((error) => {
