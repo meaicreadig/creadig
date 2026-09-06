@@ -194,6 +194,27 @@ export const SCHEMA: string[] = [
    * Dublettensperre, die auf einer Näherung steht, ist keine.
    */
   `ALTER TABLE opportunities ADD COLUMN IF NOT EXISTS from_lead_id text`,
+
+  /*
+   * GATE 08 — die Angebotsreife (siehe `scripts/migrations/007-angebotsreife.sql`).
+   *
+   * `offer_kind` sagt, WELCHE Belege gelten; `readiness_evidence` haelt fest,
+   * welche ein Mensch bestaetigt hat. Es gibt bewusst keine Spalte fuer das
+   * Ergebnis: Reife wird in `lib/offer-readiness.ts` abgeleitet. Eine
+   * gespeicherte Reife waere ab der ersten Regelaenderung falsch — und zwar
+   * still.
+   */
+  `ALTER TABLE opportunities ADD COLUMN IF NOT EXISTS offer_kind text`,
+  `ALTER TABLE opportunities ADD COLUMN IF NOT EXISTS readiness_evidence text[] NOT NULL DEFAULT '{}'`,
+  `DO $$
+   BEGIN
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'opportunities_offer_kind_check') THEN
+       ALTER TABLE opportunities ADD CONSTRAINT opportunities_offer_kind_check
+         CHECK (offer_kind IS NULL OR offer_kind IN
+           ('website','pruefung','behebung','systemprojekt','betrieb'));
+     END IF;
+   END $$`,
+  `CREATE INDEX IF NOT EXISTS opportunities_offer_kind_idx ON opportunities (offer_kind)`,
   `CREATE INDEX IF NOT EXISTS opportunities_from_lead_idx ON opportunities (from_lead_id)`,
 
   `CREATE TABLE IF NOT EXISTS locations (

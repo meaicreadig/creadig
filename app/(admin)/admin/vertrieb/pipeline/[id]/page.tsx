@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import {
   setOpportunityNextAction,
   setOpportunityNote,
+  setOpportunityOffer,
   setOpportunityStatus,
 } from "@/app/(admin)/admin/vertrieb/actions"
 import { ActivityLog } from "@/components/admin/activity-log"
@@ -20,6 +21,7 @@ import {
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { SALES_LABELS_DE, SALES_STATES, TERMINAL_STATES, getVertriebStore } from "@/lib/lead-store"
 import { LOST_REASONS, NEXT_ACTIONS, OFFERED_STAGES, STAGE_RULES } from "@/lib/sales-playbook"
+import { OFFER_KINDS, OFFERS, readinessFor } from "@/lib/offer-readiness"
 
 /**
  * Eine Verkaufschance.
@@ -59,6 +61,13 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
   }
 
   const closed = TERMINAL_STATES.includes(opp.status)
+  /*
+    GATE 08 — Reife wird ABGELEITET, nie gespeichert. Aendern sich die
+    Anforderungen einer Angebotsart, aendert sich die Anzeige mit; eine
+    gespeicherte Reife waere ab diesem Moment still falsch.
+  */
+  const readiness = opp.offerKind ? readinessFor(opp.offerKind, opp.readinessEvidence) : null
+
   const overdue = opp.nextActionAt !== null && opp.nextActionAt < new Date().toISOString().slice(0, 10)
 
   return (
@@ -183,6 +192,79 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
             {overdue && (
               <p className="text-destructive type-small mt-3">
                 Überfällig seit {formatDate(opp.nextActionAt!)}.
+              </p>
+            )}
+          </section>
+
+          {/* ── Angebotsreife ──────────────────────────────────────────────
+              GATE 08 — die Regel stand in zwei Markdown-Dateien und nirgends
+              im System.
+
+              Zwei Logiken, nicht eine. Ein Festpreis-Angebot fragt NICHT
+              nach Systemtreibern: Der Umfang steht im Paket, reif ist, wer
+              weiss, wem er es anbietet. Nur das Systemprojekt braucht die
+              Treiber, weil dort der Umfang erst entsteht.
+
+              Bewusst kein Zaehler und keine Ampel. Was fehlt, steht als
+              Frage da. Eine Quote laedt dazu ein, Haken zu setzen, damit sie
+              steigt; eine offene Frage laedt dazu ein, sie zu beantworten. */}
+          <section aria-labelledby="angebot-titel" className="mt-10">
+            <SectionHeader id="angebot-titel" title="Angebot" />
+            <form action={setOpportunityOffer.bind(null, opp.id)} className="mt-4">
+              <AdminField label="Was wird angeboten" htmlFor="offerKind">
+                <AdminSelect id="offerKind" name="offerKind" defaultValue={opp.offerKind ?? ""}>
+                  <option value="">Noch nicht entschieden</option>
+                  {OFFER_KINDS.map((k) => (
+                    <option key={k} value={k}>
+                      {OFFERS[k].label}
+                      {OFFERS[k].publicPrice ? ` — ${OFFERS[k].publicPrice}` : " — nach Zuschnitt"}
+                    </option>
+                  ))}
+                </AdminSelect>
+              </AdminField>
+
+              {opp.offerKind && (
+                <fieldset className="mt-6">
+                  <legend className="type-small text-muted-foreground">
+                    Was dafür belegt ist — bestätigen Sie nur, was Sie wissen.
+                  </legend>
+                  <div className="mt-4 flex flex-col gap-4">
+                    {OFFERS[opp.offerKind].evidence.map((e) => {
+                      const belegt = opp.readinessEvidence.includes(e.key)
+                      return (
+                        <label key={e.key} className="flex items-start gap-3">
+                          <input
+                            type="checkbox"
+                            name="evidence"
+                            value={e.key}
+                            defaultChecked={belegt}
+                            className="accent-gold mt-1 size-4 shrink-0"
+                          />
+                          <span>
+                            <span className="type-small text-foreground block">{e.label}</span>
+                            <span className="type-small text-muted-foreground block">{e.why}</span>
+                          </span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                </fieldset>
+              )}
+              <button type="submit" className="cta-quiet mt-5 px-4 py-2 text-sm">
+                Angebot speichern
+              </button>
+            </form>
+
+            {readiness && (
+              <p className={`type-small mt-5 ${readiness.ready ? "text-gold-text" : "text-muted-foreground"}`}>
+                {readiness.ready ? (
+                  <>Angebotsreif. Eine Zahl kann genannt werden.</>
+                ) : (
+                  <>
+                    Noch offen, bevor eine Zahl genannt wird:{" "}
+                    {readiness.open.map((e) => e.label).join(" · ")}
+                  </>
+                )}
               </p>
             )}
           </section>

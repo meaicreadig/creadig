@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto"
 
+import { OFFERS } from "@/lib/offer-readiness"
 import type { SalesStatus } from "@/lib/lead-store"
 import { isTestEnquiry, sqlLeadOperational } from "@/lib/vertrieb-bestand"
 import { SALES_LABELS_DE, TERMINAL_STATES } from "@/lib/lead-store"
@@ -59,6 +60,7 @@ type OppRowDb = {
   next_action: string | null; next_action_at: Ts | null; last_contact_at: Ts | null
   note: string | null; estimated_value: number | null; lost_reason: string | null
   from_lead_id: string | null
+  offer_kind: string | null; readiness_evidence: string[] | null
   created_at: Ts; updated_at: Ts
   organisation_name?: string | null; contact_name?: string | null
 }
@@ -78,6 +80,10 @@ function toOpportunity(r: OppRowDb): OpportunityRow {
     estimatedValue: r.estimated_value,
     lostReason: r.lost_reason,
     fromLeadId: r.from_lead_id,
+    offerKind: (r.offer_kind as OpportunityRow["offerKind"]) ?? null,
+    /* Postgres liefert `null` fuer eine nie gesetzte Spalte in alten Zeilen —
+       leer ist hier die richtige Lesart, nicht „unbekannt". */
+    readinessEvidence: r.readiness_evidence ?? [],
     createdAt: iso(r.created_at),
     updatedAt: iso(r.updated_at),
     organisationName: r.organisation_name ?? null,
@@ -250,7 +256,8 @@ const ENQ_FROM = `
 const OPP_COLUMNS = `
   o.id, o.organisation_id, o.contact_id, o.title, o.status, o.source,
   o.next_action, o.next_action_at, o.last_contact_at, o.note,
-  o.estimated_value, o.lost_reason, o.from_lead_id, o.created_at, o.updated_at,
+  o.estimated_value, o.lost_reason, o.from_lead_id, o.offer_kind, o.readiness_evidence,
+  o.created_at, o.updated_at,
   org.name AS organisation_name, c.name AS contact_name
 `
 const ORG_COLUMNS = `
@@ -699,6 +706,38 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
       if (!rows.length) return false
       await note("opportunity", id, "opportunity.note", text ? "Notiz geändert" : "Notiz entfernt")
       return true
+    },
+
+    /*
+     * GATE 08 — Angebotsart und Belege.
+     *
+     * Beides in EINEM Schreibvorgang: Wechselt die Angebotsart, gelten
+     * andere Belege, und die alten duerfen nicht stehen bleiben. Wer von
+     * „Systemprojekt" auf „Website-Paket" wechselt, hat sonst plötzlich
+     * Häkchen an Fragen, die für das Paket nie gestellt wurden — und die
+     * Reife entstünde aus Belegen für ein anderes Angebot.
+     *
+     * Die Belege werden gegen die Definition GEFILTERT, nicht bloss
+     * uebernommen: Ein Schluessel, den es fuer diese Angebotsart nicht gibt,
+     * kaeme sonst ueber ein manipuliertes Formular hinein und zaehlte nie —
+     * stuende aber in der Zeile.
+     */
+    async updateOpportunityOffer(id, offerKind, evidence): Promise<boolean> {
+      await ready()
+      const erlaubt = offerKind
+        ? new Set(OFFERS[offerKind].evidence.map((e) => e.key))
+        : new Set<string>()
+      const sauber = [...new Set(evidence.filter((k) => erlaubt.has(k)))]
+      const rows = await sql.query(
+        `UPDATE opportunities
+            SET offer_kind = $2::text,
+                readiness_evidence = $3::text[],
+                updated_at = now()
+          WHERE id = $1::text
+        RETURNING id`,
+        [id, offerKind, sauber],
+      )
+      return rows.length > 0
     },
 
     async listContacts(query: ContactQuery) {

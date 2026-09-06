@@ -16,7 +16,8 @@
     "vitals": "node scripts/vitals.mjs",
     "mobile": "node scripts/mobile.mjs",
     "crm-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/crm-drill.mjs",
-    "crm-import": "node --import ./scripts/lib/alias-hook.mjs scripts/crm-import.mjs"
+    "crm-import": "node --import ./scripts/lib/alias-hook.mjs scripts/crm-import.mjs",
+    "sales-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/sales-drill.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

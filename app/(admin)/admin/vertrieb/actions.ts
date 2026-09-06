@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache"
 import { SALES_STATES, getVertriebStore, type SalesStatus } from "@/lib/lead-store"
 import { HANDLING_STATES, LIFECYCLE_STAGES, RELATIONSHIP_LEVELS } from "@/lib/vertrieb"
 import type { HandlingStatus, LifecycleStage, LocationInput, RelationshipLevel } from "@/lib/vertrieb"
+import { OFFER_KINDS, OFFERS, type OfferKind } from "@/lib/offer-readiness"
 
 /**
  * Alle Änderungen im Vertrieb — an einer Stelle.
@@ -121,6 +122,78 @@ export async function createOpportunityFromEnquiry(id: string, form: FormData): 
     await store.updateOpportunityNextAction(opportunity.id, firstAction, null)
   }
   refresh(`/admin/vertrieb/anfragen/${id}`, "/admin/vertrieb/anfragen", "/admin/vertrieb/pipeline")
+}
+
+/*
+ * GATE 08 — WAS VERKAUFT WIRD, UND WAS DAFUER BELEGT IST.
+ *
+ * Die Angebotsart entscheidet, WELCHE Belege gelten. Deshalb kommen beide
+ * aus einem Formular und gehen in einem Schreibvorgang hinaus: Wechselt die
+ * Art, sind die Belege der alten Art gegenstandslos, und der Speicher wirft
+ * sie weg.
+ *
+ * Beide Werte werden gegen ihre Liste geprueft, nicht gecastet — ein
+ * unbekannter Wert aendert nichts, statt eine kaputte Zeile zu erzeugen.
+ */
+export async function setOpportunityOffer(id: string, form: FormData): Promise<void> {
+  const store = requireStore()
+  const raw = text(form.get("offerKind"))
+  const offerKind: OfferKind | null =
+    raw && (OFFER_KINDS as readonly string[]).includes(raw) ? (raw as OfferKind) : null
+
+  /* Nur Schluessel, die es fuer GENAU diese Angebotsart gibt. */
+  const erlaubt = offerKind ? new Set(OFFERS[offerKind].evidence.map((e) => e.key)) : new Set<string>()
+  const evidence = form.getAll("evidence").filter(
+    (v): v is string => typeof v === "string" && erlaubt.has(v),
+  )
+
+  await store.updateOpportunityOffer(id, offerKind, evidence)
+  refresh(`/admin/vertrieb/pipeline/${id}`, "/admin/vertrieb/pipeline")
+}
+
+/*
+ * GATE 08 — EIN VORGANG OHNE ANFRAGE.
+ *
+ * Bis hierher gab es genau einen Weg zu einer Verkaufschance:
+ * `createOpportunityFromEnquiry`. Wer keine Anfrage geschickt hat, konnte
+ * keine werden.
+ *
+ * Das trifft ausgerechnet die naheliegendsten Geschaefte. Ein Bestandskunde
+ * ruft an und will etwas Neues — im System nicht abbildbar. Ein warmer
+ * Kontakt sagt im Gespraech zu — nicht abbildbar. Der Owner haette den
+ * Vorgang in einer Anfrage erfinden muessen, die es nie gab, oder ihn gar
+ * nicht gefuehrt. Beides ist schlechter als eine Zeile mehr Code.
+ *
+ * `fromLeadId` bleibt hier bewusst leer. Nicht jeder Vorgang hat einen
+ * Beleg im Posteingang, und einen zu erfinden waere genau die Falschheit,
+ * gegen die dieses Feld gebaut wurde.
+ *
+ * Was NICHT passiert: Der Lebenszyklus der Organisation wird nicht
+ * angefasst. Ein Vorgang macht aus einem Prospect keinen Kunden — das tut
+ * erst ein gewonnener Abschluss, und auch dann durch einen Menschen.
+ */
+export async function createOpportunityForOrganisation(
+  organisationId: string,
+  form: FormData,
+): Promise<void> {
+  const store = requireStore()
+  const organisation = await store.getOrganisation(organisationId)
+  if (!organisation) return
+
+  const title = text(form.get("title"))
+  if (!title) return
+
+  const opportunity = await store.createOpportunity({
+    title,
+    organisationId,
+    contactId: text(form.get("contactId")),
+    source: "vertrieb-intern",
+    })
+
+  const firstAction = text(form.get("firstAction"))
+  if (firstAction) await store.updateOpportunityNextAction(opportunity.id, firstAction, null)
+
+  refresh(`/admin/kunden/${organisationId}`, "/admin/vertrieb/pipeline")
 }
 
 /* ── Beziehung ────────────────────────────────────────────────────────────── */

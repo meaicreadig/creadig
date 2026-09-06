@@ -1,3 +1,4 @@
+import type { OfferKind } from "@/lib/offer-readiness"
 import type { SalesStatus } from "@/lib/lead-store"
 
 /**
@@ -300,6 +301,17 @@ export type Opportunity = {
    * zweiten „Verkaufschance anlegen" auf eine Vermutung stützen.
    */
   fromLeadId: string | null
+  /*
+   * GATE 08 — was verkauft wird, und was dafuer belegt ist.
+   *
+   * `offerKind` null heisst „noch nicht entschieden" und ist am Anfang der
+   * Normalfall. `readinessEvidence` sind die Belege, die ein MENSCH
+   * bestaetigt hat — keine Punktzahl, keine Ableitung, keine Vermutung.
+   * Ob daraus Reife folgt, entscheidet `lib/offer-readiness.ts`, nicht eine
+   * gespeicherte Spalte.
+   */
+  offerKind: OfferKind | null
+  readinessEvidence: string[]
   createdAt: string
   updatedAt: string
 }
@@ -516,6 +528,11 @@ export type VertriebStore = {
     source: string | null
     fromLeadId?: string
   }): Promise<Opportunity>
+  updateOpportunityOffer(
+    id: string,
+    offerKind: OfferKind | null,
+    evidence: string[],
+  ): Promise<boolean>
   updateOpportunityStatus(id: string, status: SalesStatus, lostReason: string | null): Promise<boolean>
   updateOpportunityNextAction(id: string, action: string | null, at: string | null): Promise<boolean>
   updateOpportunityNote(id: string, note: string | null): Promise<boolean>
