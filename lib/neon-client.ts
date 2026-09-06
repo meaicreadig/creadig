@@ -215,6 +215,64 @@ export const SCHEMA: string[] = [
      END IF;
    END $$`,
   `CREATE INDEX IF NOT EXISTS opportunities_offer_kind_idx ON opportunities (offer_kind)`,
+
+  /*
+   * GATE 10 — Recherche (siehe `scripts/migrations/008-recherche.sql`).
+   *
+   * Zwei Tabellen, beide an `organisations` haengend. Kein zweites
+   * Firmenmodell: Ein recherchierter Betrieb IST derselbe Betrieb wie ein
+   * Kunde, nur frueher im Leben.
+   *
+   * Keine Spalte fuer die Einordnung — sie wird aus den Belegen abgeleitet
+   * (`lib/market.ts`). Gespeichert waere sie ab der ersten Regelaenderung
+   * still falsch.
+   */
+  `CREATE TABLE IF NOT EXISTS research_cases (
+     id text PRIMARY KEY,
+     organisation_id text NOT NULL REFERENCES organisations (id) ON DELETE CASCADE,
+     status text NOT NULL DEFAULT 'entdeckt',
+     discovery_why text NOT NULL,
+     discovery_kind text NOT NULL,
+     discovery_url text,
+     access text,
+     serviceable boolean,
+     next_action text,
+     discovered_at timestamptz NOT NULL DEFAULT now(),
+     researched_at timestamptz,
+     created_at timestamptz NOT NULL DEFAULT now(),
+     updated_at timestamptz NOT NULL DEFAULT now()
+   )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS research_cases_org_key ON research_cases (organisation_id)`,
+  `CREATE INDEX IF NOT EXISTS research_cases_status_idx ON research_cases (status)`,
+  `CREATE TABLE IF NOT EXISTS research_evidence (
+     id text PRIMARY KEY,
+     case_id text NOT NULL REFERENCES research_cases (id) ON DELETE CASCADE,
+     kind text NOT NULL,
+     ref text,
+     claim text NOT NULL,
+     source_url text NOT NULL,
+     source_kind text NOT NULL,
+     observed_at timestamptz NOT NULL DEFAULT now(),
+     superseded_by text REFERENCES research_evidence (id) ON DELETE SET NULL,
+     created_at timestamptz NOT NULL DEFAULT now()
+   )`,
+  `CREATE INDEX IF NOT EXISTS research_evidence_case_idx ON research_evidence (case_id)`,
+  `DO $$
+   BEGIN
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'research_cases_status_check') THEN
+       ALTER TABLE research_cases ADD CONSTRAINT research_cases_status_check
+         CHECK (status IN ('entdeckt','in-recherche','beleg-fehlt','eingeordnet',
+                           'zurueckgestellt','ausgeschlossen','bereit-fuer-kontakt'));
+     END IF;
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'research_cases_access_check') THEN
+       ALTER TABLE research_cases ADD CONSTRAINT research_cases_access_check
+         CHECK (access IS NULL OR access IN ('empfehlung','netzwerk','eingehend','bestandskunde','keiner'));
+     END IF;
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'research_evidence_kind_check') THEN
+       ALTER TABLE research_evidence ADD CONSTRAINT research_evidence_kind_check
+         CHECK (kind IN ('fact','signal','anlass','ausschluss'));
+     END IF;
+   END $$`,
   `CREATE INDEX IF NOT EXISTS opportunities_from_lead_idx ON opportunities (from_lead_id)`,
 
   `CREATE TABLE IF NOT EXISTS locations (
@@ -675,6 +733,9 @@ const REQUIRED_TABLES = [
   "activities",
   "locations",
   "import_log",
+  /* Gate 10 */
+  "research_cases",
+  "research_evidence",
 ] as const
 
 const REQUIRED_COLUMNS: [table: string, column: string][] = [
@@ -689,6 +750,9 @@ const REQUIRED_COLUMNS: [table: string, column: string][] = [
   ["opportunities", "offer_kind"],
   ["opportunities", "readiness_evidence"],
   ["locations", "organisation_id"],
+  /* Gate 10 — Recherche. */
+  ["research_cases", "organisation_id"],
+  ["research_evidence", "source_url"],
 ]
 
 /**

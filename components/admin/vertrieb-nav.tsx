@@ -33,6 +33,10 @@ import { usePathname } from "next/navigation"
 const TABS = [
   { href: "/admin/vertrieb", label: "Übersicht" },
   { href: "/admin/vertrieb/anfragen", label: "Anfragen" },
+  /* GATE 10 — Recherche steht VOR der Pipeline: Was hier entsteht, wird
+     dort erst zur Chance, und die Reihenfolge der Reiter sollte die
+     Reihenfolge der Arbeit spiegeln. */
+  { href: "/admin/vertrieb/recherche", label: "Recherche" },
   { href: "/admin/vertrieb/pipeline", label: "Pipeline" },
   { href: "/admin/vertrieb/beziehungen", label: "Beziehungen" },
 ]

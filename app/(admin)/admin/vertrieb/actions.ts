@@ -6,6 +6,11 @@ import { SALES_STATES, getVertriebStore, type SalesStatus } from "@/lib/lead-sto
 import { HANDLING_STATES, LIFECYCLE_STAGES, RELATIONSHIP_LEVELS } from "@/lib/vertrieb"
 import type { HandlingStatus, LifecycleStage, LocationInput, RelationshipLevel } from "@/lib/vertrieb"
 import { OFFER_KINDS, OFFERS, type OfferKind } from "@/lib/offer-readiness"
+import { RESEARCH_STATES, SOURCES, type ResearchState, type SourceKind } from "@/lib/research"
+
+const EVIDENCE_KINDS = ["fact", "signal", "anlass", "ausschluss"] as const
+type EvidenceKind = (typeof EVIDENCE_KINDS)[number]
+const ACCESS_VALUES = ["empfehlung", "netzwerk", "eingehend", "bestandskunde", "keiner"]
 
 /**
  * Alle Änderungen im Vertrieb — an einer Stelle.
@@ -194,6 +199,61 @@ export async function createOpportunityForOrganisation(
   if (firstAction) await store.updateOpportunityNextAction(opportunity.id, firstAction, null)
 
   refresh(`/admin/kunden/${organisationId}`, "/admin/vertrieb/pipeline")
+}
+
+/* ── Recherche (Gate 10) ──────────────────────────────────────────────────── */
+
+/*
+ * Ein Beleg besteht aus einer Beobachtung UND einer Fundstelle. Beides ist
+ * Pflicht — ohne Quelle zaehlt eine Beobachtung nicht, und das soll nicht
+ * von der Disziplin des Eintragenden abhaengen.
+ *
+ * Der Text wird im Speicher entschaerft (`sanitizeClaim`), bevor er in die
+ * Datenbank geht: Er stammt von einer fremden Seite und wird spaeter von
+ * einer KI gelesen. Er muss Daten bleiben.
+ */
+export async function addResearchEvidence(caseId: string, form: FormData): Promise<void> {
+  const store = requireStore()
+  const kind = text(form.get("kind"))
+  const claim = text(form.get("claim"))
+  const sourceUrl = text(form.get("sourceUrl"))
+  const sourceKind = text(form.get("sourceKind"))
+  if (!claim || !sourceUrl) return
+  if (!EVIDENCE_KINDS.includes(kind as EvidenceKind)) return
+  if (!(sourceKind && sourceKind in SOURCES)) return
+
+  await store.addEvidence(caseId, {
+    kind: kind as EvidenceKind,
+    ref: text(form.get("ref")),
+    claim,
+    sourceUrl,
+    sourceKind: sourceKind as SourceKind,
+  })
+  refresh(`/admin/vertrieb/recherche/${caseId}`, "/admin/vertrieb/recherche")
+}
+
+/*
+ * Zustand, Zugang und Bedienbarkeit — drei Dinge, die der Mensch entscheidet.
+ *
+ * Der Zustand wird NICHT automatisch aus `abbruch()` gesetzt. Die Funktion
+ * schlaegt vor (sie steht als Platzhalter im Feld „naechster Schritt"), aber
+ * ein Betrieb wandert nicht von selbst nach „bereit fuer Kontakt" — das ist
+ * die Grenze zwischen Recherche und Ansprache, und die ueberschreitet ein
+ * Mensch.
+ */
+export async function setResearchCase(id: string, form: FormData): Promise<void> {
+  const store = requireStore()
+  const status = text(form.get("status"))
+  const access = text(form.get("access"))
+  const serviceable = text(form.get("serviceable"))
+
+  await store.updateResearchCase(id, {
+    status: RESEARCH_STATES.includes(status as ResearchState) ? (status as ResearchState) : undefined,
+    access: ACCESS_VALUES.includes(access ?? "") ? (access as "empfehlung") : access === null ? null : undefined,
+    serviceable: serviceable === "true" ? true : serviceable === "false" ? false : null,
+    nextAction: text(form.get("nextAction")),
+  })
+  refresh(`/admin/vertrieb/recherche/${id}`, "/admin/vertrieb/recherche")
 }
 
 /* ── Beziehung ────────────────────────────────────────────────────────────── */

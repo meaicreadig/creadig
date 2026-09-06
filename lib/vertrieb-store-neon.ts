@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto"
 
 import { OFFERS } from "@/lib/offer-readiness"
+import { sanitizeClaim, type EvidenceRow, type ResearchCase } from "@/lib/research"
 import type { SalesStatus } from "@/lib/lead-store"
 import { isTestEnquiry, sqlLeadOperational } from "@/lib/vertrieb-bestand"
 import { SALES_LABELS_DE, TERMINAL_STATES } from "@/lib/lead-store"
@@ -316,6 +317,41 @@ const ORG_COLUMNS = `
      ORDER BY o6.next_action_at ASC NULLS LAST LIMIT 1) AS next_step_at
 `
 
+/*
+ * GATE 10 — Zeilen zu Recherche-Objekten. Getrennt gehalten, weil die
+ * Belege in einem eigenen Zug geladen werden (kein N+1) und dann zugeordnet.
+ */
+function toEvidence(r: Record<string, unknown>): EvidenceRow {
+  return {
+    id: String(r.id),
+    kind: r.kind as EvidenceRow["kind"],
+    ref: (r.ref as string | null) ?? null,
+    claim: String(r.claim),
+    sourceUrl: String(r.source_url),
+    sourceKind: r.source_kind as EvidenceRow["sourceKind"],
+    observedAt: iso(r.observed_at as Ts),
+    supersededBy: (r.superseded_by as string | null) ?? null,
+  }
+}
+
+function toResearchCase(r: Record<string, unknown>, evidence: EvidenceRow[]): ResearchCase {
+  return {
+    id: String(r.id),
+    organisationId: String(r.organisation_id),
+    organisationName: String(r.organisation_name),
+    status: r.status as ResearchCase["status"],
+    discoveryWhy: String(r.discovery_why),
+    discoveryKind: r.discovery_kind as ResearchCase["discoveryKind"],
+    discoveryUrl: (r.discovery_url as string | null) ?? null,
+    access: (r.access as ResearchCase["access"]) ?? null,
+    serviceable: (r.serviceable as boolean | null) ?? null,
+    nextAction: (r.next_action as string | null) ?? null,
+    discoveredAt: iso(r.discovered_at as Ts),
+    researchedAt: r.researched_at ? iso(r.researched_at as Ts) : null,
+    evidence,
+  }
+}
+
 const OPP_FROM = `
   FROM opportunities o
   LEFT JOIN organisations org ON org.id = o.organisation_id
@@ -535,6 +571,85 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
         `SELECT DISTINCT source FROM leads WHERE ${sqlLeadOperational("leads")} ORDER BY source`,
       )) as { source: string }[]
       return rows.map((r) => r.source)
+    },
+
+    /* ── Recherche (Gate 10) ────────────────────────────────────────── *
+     * Ein Vorgang je Organisation; die Belege haengen daran. Die
+     * Einordnung wird NICHT gespeichert — sie faellt in `lib/research.ts`
+     * aus den gueltigen Belegen, damit eine Regelaenderung nicht eine
+     * Datenbank voller falscher Urteile hinterlaesst.
+     * ---------------------------------------------------------------- */
+    async listResearch(query): Promise<ResearchCase[]> {
+      await ready()
+      const werte: unknown[] = []
+      const wo: string[] = ["o.excluded_reason IS NULL"]
+      if (query?.status) { werte.push(query.status); wo.push(`rc.status = $${werte.length}`) }
+      werte.push(Math.min(query?.limit ?? 100, 300))
+      /* Ein Zug fuer Vorgaenge, ein Zug fuer Belege — kein N+1. */
+      const faelle = await sql.query(
+        `SELECT rc.*, o.name AS organisation_name
+           FROM research_cases rc JOIN organisations o ON o.id = rc.organisation_id
+          WHERE ${wo.join(" AND ")}
+          ORDER BY rc.updated_at DESC LIMIT $${werte.length}`, werte)
+      if (!faelle.length) return []
+      const belege = await sql.query(
+        `SELECT * FROM research_evidence WHERE case_id = ANY($1::text[]) ORDER BY observed_at`,
+        [faelle.map((f) => String(f.id))])
+      const nachFall = new Map<string, EvidenceRow[]>()
+      for (const b of belege) {
+        const k = String(b.case_id)
+        nachFall.set(k, [...(nachFall.get(k) ?? []), toEvidence(b)])
+      }
+      return faelle.map((f) => toResearchCase(f, nachFall.get(String(f.id)) ?? []))
+    },
+
+    async getResearch(id): Promise<ResearchCase | null> {
+      await ready()
+      const rows = await sql.query(
+        `SELECT rc.*, o.name AS organisation_name
+           FROM research_cases rc JOIN organisations o ON o.id = rc.organisation_id
+          WHERE rc.id = $1`, [id])
+      if (!rows.length) return null
+      const belege = await sql.query(
+        `SELECT * FROM research_evidence WHERE case_id = $1 ORDER BY observed_at`, [id])
+      return toResearchCase(rows[0]!, belege.map(toEvidence))
+    },
+
+    async addEvidence(caseId, input): Promise<boolean> {
+      await ready()
+      /* Fremder Text wird entschaerft, BEVOR er die Datenbank sieht. */
+      const rows = await sql.query(
+        `INSERT INTO research_evidence
+           (id, case_id, kind, ref, claim, source_url, source_kind, observed_at, created_at)
+         VALUES (gen_random_uuid()::text, $1, $2, $3, $4, $5, $6, now(), now())
+         RETURNING id`,
+        [caseId, input.kind, input.ref, sanitizeClaim(input.claim), input.sourceUrl, input.sourceKind])
+      if (rows.length) {
+        await sql.query(
+          `UPDATE research_cases SET researched_at = now(), updated_at = now() WHERE id = $1`, [caseId])
+      }
+      return rows.length > 0
+    },
+
+    async supersedeEvidence(oldId, newId): Promise<boolean> {
+      await ready()
+      const rows = await sql.query(
+        `UPDATE research_evidence SET superseded_by = $2 WHERE id = $1 RETURNING id`, [oldId, newId])
+      return rows.length > 0
+    },
+
+    async updateResearchCase(id, patch): Promise<boolean> {
+      await ready()
+      const setzt: string[] = ["updated_at = now()"]
+      const werte: unknown[] = [id]
+      const feld = (spalte: string, wert: unknown) => { werte.push(wert); setzt.push(`${spalte} = $${werte.length}`) }
+      if (patch.status !== undefined) feld("status", patch.status)
+      if (patch.access !== undefined) feld("access", patch.access)
+      if (patch.serviceable !== undefined) feld("serviceable", patch.serviceable)
+      if (patch.nextAction !== undefined) feld("next_action", patch.nextAction)
+      const rows = await sql.query(
+        `UPDATE research_cases SET ${setzt.join(", ")} WHERE id = $1 RETURNING id`, werte)
+      return rows.length > 0
     },
 
     async listOpportunities(query: OpportunityQuery) {

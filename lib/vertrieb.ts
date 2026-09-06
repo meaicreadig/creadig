@@ -1,3 +1,4 @@
+import type { EvidenceKind, ResearchCase, ResearchState, SourceKind } from "@/lib/research"
 import type { OfferKind } from "@/lib/offer-readiness"
 import type { SalesStatus } from "@/lib/lead-store"
 
@@ -518,6 +519,27 @@ export type VertriebStore = {
   getEnquiry(id: string): Promise<EnquiryRow | null>
   /** Die Quellen, die wirklich vorkommen — keine gepflegte Liste. */
   enquirySources(): Promise<string[]>
+
+  /*
+   * GATE 10 — Recherche. Sie haengt an denselben Organisationen wie alles
+   * andere; es gibt kein zweites Firmenmodell.
+   */
+  listResearch(query?: { status?: ResearchState; limit?: number }): Promise<ResearchCase[]>
+  getResearch(id: string): Promise<ResearchCase | null>
+  addEvidence(caseId: string, input: {
+    kind: EvidenceKind
+    ref: string | null
+    claim: string
+    sourceUrl: string
+    sourceKind: SourceKind
+  }): Promise<boolean>
+  supersedeEvidence(oldId: string, newId: string): Promise<boolean>
+  updateResearchCase(id: string, patch: {
+    status?: ResearchState
+    access?: ResearchCase["access"]
+    serviceable?: boolean | null
+    nextAction?: string | null
+  }): Promise<boolean>
 
   listOpportunities(query: OpportunityQuery): Promise<{ rows: OpportunityRow[]; total: number }>
   getOpportunity(id: string): Promise<OpportunityRow | null>
