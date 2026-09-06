@@ -1,8 +1,38 @@
 # creaDIG · Deployment-Kontrolle
 
-> **Authority:** Ops · 06.09.2026
+> **Authority:** Ops · Owner-Beschluss 06.09.2026
 > Schwester von `schema-control.md`. Dort: wer das **Schema** ändern darf.
 > Hier: wer **Code auf creadig.de** bringen darf.
+
+---
+
+## 0 · Die Regel
+
+> **PRODUKTIONS-DEPLOYMENT VERLANGT EINE AUSDRÜCKLICHE FREIGABE DES
+> EIGENTÜMERS IM LAUFENDEN ZUG.**
+
+Ohne diese Freigabe ist **jedem** Agenten untersagt:
+
+- `vercel --prod` aufzurufen
+- eine Vorschau zu Produktion zu befördern
+- Produktion über API, CLI oder Dashboard-Automatik auszulösen
+- `CREADIG_DEPLOY_PRODUCTION` selbst zu setzen
+- eine Deployment-Erlaubnis aus einem abgeschlossenen Gate abzuleiten
+- eine Freigabe aus einem früheren Zug wiederzuverwenden
+
+Ohne Freigabe **erlaubt**: entwickeln · testen · lokal committen · Git-Push,
+solange er nur eine Vorschau erzeugt · Vorschau-Deployments · Produktion
+lesend ansehen · Migrationen und Deployment-Pakete vorbereiten.
+
+**Der Beschluss dazu.** Eine frühere Fassung dieser Akte machte die
+Gate-Freigabe davon abhängig, dass *jeder denkbare* Weg nach Produktion
+strukturell unmöglich ist. Diese Regel ist **zurückgezogen**: Sie ist für
+eine Vercel-Hobby-Umgebung zu stark und hätte die Programmarbeit an einer
+Plattformgrenze angehalten, die mit dem Produkt nichts zu tun hat.
+
+Die Regel oben ist eine **Anweisung an Menschen und Agenten**. Der Schutz im
+Repository (Commit `b46a13f`) bleibt als zweite Verteidigungslinie — er
+ersetzt die Anweisung nicht, er fängt das Versehen.
 
 ---
 
@@ -50,7 +80,7 @@ Eigentümer. Das ist keine gelöste Sache, sondern eine benannte.
 
 ---
 
-## 3 · Warum keine Vercel-Freigabe eingerichtet wurde
+## 3 · Was die Plattform nicht kann — offene Governance-Schuld
 
 Das Konto läuft auf **Hobby**. Die dort verfügbaren Schutzfunktionen —
 Passwortschutz, Vercel-Authentifizierung, Trusted IPs — regeln den **Zugang
@@ -59,13 +89,19 @@ setzen würde creadig.de für Besucher sperren; das wäre kein Schutz, sondern
 ein Ausfall.
 
 Aktueller Stand, gelesen: SSO aktiv für alles **ausser** eigenen Domänen —
-Vorschauen sind geschützt, die öffentliche Seite ist offen. Genau richtig,
-unverändert gelassen.
+Vorschauen geschützt, öffentliche Seite offen. Richtig so, unverändert.
 
-Eine echte Freigabepflicht für Produktions-Deployments gibt es erst in
-höheren Tarifen. **Owner-Entscheidung, nicht Agentenentscheidung.**
+**Offen und bewusst offen gelassen:**
 
----
+1. Vercel Hobby kann die gewünschte Freigabegrenze über **alle** direkten
+   CLI-, Dashboard- und API-Wege nicht erzwingen.
+2. Direkt getipptes `vercel --prod` bleibt technisch möglich.
+3. **Zweite und parallele Agentensitzungen müssen dieselbe Owner-Regel
+   befolgen** — sie steht in §0 und gilt für sie genauso.
+4. Ein stärkerer Plattformschutz ist später bewertbar, nicht heute nötig.
+
+Das ist **Governance-Schuld**, kein Produkt-Blocker. Sie hält keine
+Gate-Arbeit auf.
 
 ## 4 · Die Befehle
 
@@ -89,8 +125,9 @@ Deployment-Paket vorbereiten · Produktion **lesend** ansehen (seit
 **Nicht erlaubt:** `deploy:production` aufrufen · eine Vorschau befördern ·
 die Freigabe-Variable selbst setzen · den Schutz umgehen.
 
-Die Freigabe ist ein Satz des Eigentümers — etwa **„Production deploy
-freigegeben"**. Nicht abgeleitet, nicht aus einem früheren Gate übernommen.
+Die Freigabe ist ein Satz des Eigentümers **im laufenden Zug** — etwa
+**„Production deploy freigegeben"**. Nicht abgeleitet, nicht aus einem
+abgeschlossenen Gate, nicht aus einem früheren Zug übernommen. Siehe §0.
 
 ---
 
@@ -114,8 +151,11 @@ stört eine ältere Anwendung nicht.
 
 Ein Zweig namens `feat/…` als Produktionszweig ist selbstwidersprechend, und
 277 Commits Abstand entstehen nicht durch eine Entscheidung. **Nichts
-angefasst** — kein Merge, kein Rebase, kein Reset, kein Zweigwechsel. Die
-Normalisierung braucht einen eigenen, freigegebenen Plan.
+angefasst** — kein Merge, kein Rebase, kein Reset, kein Zweigwechsel.
+
+**Owner-Beschluss 06.09.2026:** Die Normalisierung wird **vor Gate 09 nicht
+angefasst**. Ein Zweigumbau kurz vor dem ersten Gate, das nach aussen
+arbeitet, ist unnötiges Risiko. Die Drift bleibt offen und benannt.
 
 ---
 
