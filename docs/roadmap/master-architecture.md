@@ -337,5 +337,7 @@ G35 nach G18 (Jurisdiktion braucht Rechnungslogik).
 | Kennzahlen nur aus echten Daten | **G34** |
 | Anmeldung gefühlt langsam (580 ms lokal gemessen) | **G34** |
 | G08 Live-Abnahme | **Owner, offen** |
+| `SOURCES.automatisch` mischt Quellenart und Abrufrecht — eine Stellenanzeige auf der EIGENEN Domain ist beides: Stellenanzeige und abrufbar (G12-Befund) | **G26** |
+| Vier der neun Betriebssignale sind über Abwesenheit definiert und aus öffentlichen Quellen nicht belegbar (G12-Befund) | G09-Kanon, benannt |
 | Deployment-Governance auf Hobby | Ops, benannt |
 | Zweigabdrift `main` 277 Commits | Ops, benannt, **nicht vor G09** |

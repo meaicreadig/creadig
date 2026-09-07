@@ -123,6 +123,43 @@ const NIEMALS = [
 ]
 
 /**
+ * Zaehlt diese Person — ist sie BELEGT?
+ *
+ * Ohne Quelle ist ein Name eine Vermutung, und eine Vermutung darf keinen
+ * Menschen erreichen. Die einzige Ausnahme ist der eigene Bestand: Wer selbst
+ * angefragt hat, seit Jahren Kunde ist oder von einem Menschen genannt wurde,
+ * ist belegt genug — dort IST creaDIG die Quelle.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM DAS EINE EIGENE FUNKTION IST — GATE-12-BEFUND
+ *
+ * Diese Pruefung stand bis zum 06.09.2026 nur in `kontaktLage()`.
+ * `ansprachedeckung()` daneben fragte lediglich, OB ein Personensatz
+ * existiert. An einem echten Fall der G12-Kohorte fiel auf, was das bedeutet:
+ * Bei einem Namen aus einer Presseerwaehnung ohne hinterlegte Fundstelle
+ * sagte dieselbe Seite gleichzeitig
+ *
+ *   „ist eingetragen, aber ohne Fundstelle"   (kontaktLage)
+ *   „eine Ansprache waere gedeckt"            (ansprachedeckung)
+ *
+ * — und die Auswahl „Kontakt vorbereiten" war freigeschaltet, weil die
+ * Oberflaeche allein an der Deckung haengt. Eine Vermutung haette einen
+ * Menschen erreichen koennen.
+ *
+ * Zwei Funktionen, die dieselbe Frage verschieden beantworten, sind kein
+ * Feinschliff. Deshalb steht die Antwort ab hier an EINER Stelle.
+ */
+export function personBelegt(person: PersonRef | null): boolean {
+  if (!person) return false
+  return (
+    Boolean(person.sourceUrl) ||
+    person.sourceKind === "bestand" ||
+    person.sourceKind === "eingehend" ||
+    person.sourceKind === "empfehlung"
+  )
+}
+
+/**
  * Die Lage eines Kontaktvorgangs.
  *
  * Deterministisch und begruendet. Die Reihenfolge der Pruefung ist selbst
@@ -139,17 +176,7 @@ export function kontaktLage(c: ResearchCase, person: PersonRef | null): KontaktL
     grund: fit.passung.gruende[0] ?? "keine Belege",
   }
 
-  /*
-   * Eine Person zaehlt nur MIT Fundstelle.
-   *
-   * Ohne Quelle ist ein Name eine Vermutung, und eine Vermutung darf keinen
-   * Menschen erreichen. Die einzige Ausnahme ist der eigene Bestand: Wer
-   * selbst angefragt hat oder seit Jahren Kunde ist, ist belegt genug —
-   * dort IST creaDIG die Quelle.
-   */
-  const belegt =
-    person !== null &&
-    (Boolean(person.sourceUrl) || person.sourceKind === "bestand" || person.sourceKind === "eingehend" || person.sourceKind === "empfehlung")
+  const belegt = personBelegt(person)
 
   const person_: Achse = !person
     ? { urteil: "offen", grund: "Keine Person bekannt." }
@@ -227,10 +254,25 @@ export function ansprachedeckung(c: ResearchCase, person: PersonRef | null): {
   const hatAnlass = gueltig.some((e) => e.kind === "anlass")
   const bestehenderWeg = c.access === "empfehlung" || c.access === "netzwerk" || c.access === "bestandskunde" || c.access === "eingehend"
 
+  const belegt = personBelegt(person)
+
   if (bestehenderWeg)
-    return { gedeckt: true, grund: `Bestehender Weg (${c.access}) — der Kontakt braucht keinen zusätzlichen Anlass.` }
-  if (hatAnlass && person)
+    return {
+      gedeckt: true,
+      grund: belegt
+        ? `Bestehender Weg (${c.access}) — der Kontakt braucht keinen zusätzlichen Anlass.`
+        : `Bestehender Weg (${c.access}) — der Kontakt braucht keinen zusätzlichen Anlass. ` +
+          `Eine belegte Person ist aber noch nicht zugeordnet: vorbereitet würde der Betrieb, nicht ein Mensch.`,
+    }
+  if (hatAnlass && belegt)
     return { gedeckt: true, grund: "Belegter Geschäftsanlass, den der Betrieb selbst öffentlich gemacht hat." }
+  if (hatAnlass && person && !belegt)
+    return {
+      gedeckt: false,
+      grund:
+        "Anlass belegt, aber die Person hat keine Fundstelle. Ein Name ohne Quelle ist eine Vermutung — " +
+        "und eine Vermutung darf keinen Menschen erreichen.",
+    }
   if (hatAnlass && !person)
     return { gedeckt: false, grund: "Anlass belegt, aber keine Person bekannt. Ein Anlass allein erreicht niemanden." }
   return {

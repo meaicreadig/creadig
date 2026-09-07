@@ -26,7 +26,7 @@ import {
   abbruch,
   alterInTagen,
   einordnung,
-  widersprueche,
+  mehrfachBelegt,
   type SourceKind,
 } from "@/lib/research"
 import {
@@ -71,7 +71,7 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
   const e = einordnung(fall)
   const stop = abbruch(fall)
   const tage = alterInTagen(fall)
-  const konflikte = widersprueche(fall)
+  const mehrfach = mehrfachBelegt(fall)
   /*
     GATE 11 — Person, Zugang, Anlass und Entscheidung. Vier Achsen, die
     einzeln beantwortet werden; keine wird zur anderen.
@@ -122,11 +122,12 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
           {/* ── Belege ── */}
           <section aria-labelledby="belege" className="mt-12">
             <SectionHeader id="belege" title="Belege" />
-            {konflikte.length > 0 && (
-              <p className="text-destructive type-small mt-4">
-                {konflikte.length} Widerspruch: zwei gültige Belege sagen Verschiedenes zu{" "}
-                {konflikte.map((k) => k.ref).join(", ")}. Der neuere ist nicht automatisch der
-                bessere — entscheiden Sie, welcher gilt.
+            {mehrfach.length > 0 && (
+              <p className="text-gold-text type-small mt-4 text-pretty">
+                Mehrfach belegt: {mehrfach.map((k) => k.ref).join(", ")}. Mehrere gültige Belege
+                können sich <em>decken</em> oder <em>widersprechen</em> — das steht in den Sätzen,
+                nicht in der Struktur, und deshalb sagt es Ihnen niemand außer Ihnen selbst. Der
+                neuere ist dabei nicht automatisch der bessere.
               </p>
             )}
             {gueltig.length === 0 ? (

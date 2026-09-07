@@ -106,6 +106,10 @@ Operative Leiter: **`creadig-MASTER-LEITER-R4.md`** (PHASE A ausgeführt, STOP).
 | `docs/sales/offers.md` | Spec | Productized Offers |
 | `docs/sales/discovery-questions.md` | Spec | Discovery |
 | `docs/sales/proposal-outline.md` | Spec | Proposal-Schema |
+| `docs/sales/market-canon.md` | **Canon** | **G09** — Zielbild nach Betriebszustand, vier Achsen, Hypothesen-Register |
+| `docs/sales/research-canon.md` | **Canon** | **G10** — Belegpflicht, Quellenpolitik, Abbruchregel |
+| `docs/sales/contact-canon.md` | **Canon** | **G11** — Person, Zugang, Anlass, das Entscheidungstor |
+| `docs/sales/evidence-canon.md` | **Canon** | **G12** — die Kette an sechs echten Betrieben; Evidenz ≠ Marketingbeleg |
 
 ## 05 — MARKETING
 

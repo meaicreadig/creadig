@@ -3,7 +3,7 @@ import Link from "next/link"
 import { Pill, SectionHeader, UnavailableNote } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { getVertriebStore } from "@/lib/lead-store"
-import { RESEARCH_STATES, STATE_MEANING, abbruch, alterInTagen, einordnung, widersprueche } from "@/lib/research"
+import { RESEARCH_STATES, STATE_MEANING, abbruch, alterInTagen, einordnung, mehrfachBelegt } from "@/lib/research"
 
 /**
  * Vertrieb · Recherche.
@@ -104,7 +104,7 @@ export default async function RecherchePage({
             const e = einordnung(f)
             const stop = abbruch(f)
             const tage = alterInTagen(f)
-            const konflikt = widersprueche(f).length
+            const mehrfach = mehrfachBelegt(f).length
             const belegt = f.evidence.filter((x) => !x.supersededBy && x.kind === "signal").length
             return (
               <li key={f.id} className="border-line border-b">
@@ -133,7 +133,7 @@ export default async function RecherchePage({
                     {" · "}
                     {belegt} {belegt === 1 ? "Signal" : "Signale"}
                     {tage !== null && ` · ${tage} T`}
-                    {konflikt > 0 && ` · ${konflikt} Widerspruch`}
+                    {mehrfach > 0 && ` · ${mehrfach} mehrfach belegt`}
                   </span>
                 </Link>
               </li>

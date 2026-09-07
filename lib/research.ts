@@ -366,13 +366,29 @@ export function alterInTagen(c: ResearchCase, jetzt = new Date()): number | null
 }
 
 /**
- * Belege zum selben Signal, die einander widersprechen — beide gueltig.
+ * Signale, zu denen MEHR ALS EIN gueltiger Beleg vorliegt.
  *
  * Sie werden GEMELDET, nicht aufgeloest. Der neuere Beleg ist nicht
  * automatisch der bessere: Eine Stellenanzeige von gestern schlaegt kein
  * Handelsregister von vorletztem Jahr.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM DIESE FUNKTION NICHT MEHR `widersprueche` HEISST — GATE-12-BEFUND
+ *
+ * Sie hiess so, und die Oberflaeche schrieb rot: „zwei gueltige Belege sagen
+ * Verschiedenes". Gemessen hat sie das nie. Sie zaehlt, wie viele gueltige
+ * Belege auf demselben Signal liegen — mehr kann ein Programm hier auch gar
+ * nicht: Ob zwei Saetze einander widersprechen oder bestaetigen, steht in der
+ * Sprache, nicht in der Struktur.
+ *
+ * An der G12-Kohorte fiel der Preis auf: Zwei Quellen, die DASSELBE belegen,
+ * wurden als Widerspruch angezeigt. Damit bestraft das Werkzeug genau das
+ * Verhalten, das ein Evidenzsystem will — einen zweiten Beleg zu suchen.
+ *
+ * Jetzt sagt sie, was sie weiss: mehrfach belegt. Ob das Deckung oder
+ * Widerspruch ist, liest ein Mensch.
  */
-export function widersprueche(c: ResearchCase): { ref: string; belege: EvidenceRow[] }[] {
+export function mehrfachBelegt(c: ResearchCase): { ref: string; belege: EvidenceRow[] }[] {
   const nachRef = new Map<string, EvidenceRow[]>()
   for (const e of c.evidence) {
     if (e.supersededBy || !e.ref) continue
