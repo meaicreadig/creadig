@@ -1,5 +1,6 @@
 import type { Locale } from "@/lib/dictionary"
 import type { Localized } from "@/lib/site-data"
+import { istOeffentlich, type Beleg, type Nachfrage, type Zustand } from "@/lib/redaktion"
 
 /**
  * System-Notes.
@@ -25,7 +26,7 @@ import type { Localized } from "@/lib/site-data"
  *
  * Solange nichts veröffentlicht ist, nimmt sich die Route aus dem Suchindex
  * (`noindex, follow`) und aus der Sitemap. Das gilt weiter, für den Fall, dass
- * alle Einträge wieder auf `published: false` gehen.
+ * alle Einträge wieder in den Entwurf zurückgehen.
  *
  * ---------------------------------------------------------------------------
  * SO KOMMT EIN EINTRAG DAZU
@@ -104,8 +105,36 @@ export type Insight = {
   metaTitle: Localized
   /** Der Text selbst. Leer heißt: Die Notiz hat keine eigene Seite. */
   body: InsightBlock[]
-  /** Auf `false` verschwindet der Eintrag aus Liste UND Sitemap. */
-  published: boolean
+  /*
+   * GATE 15 — HIER STAND `published: boolean`.
+   *
+   * Zwei Zustaende, und zwischen ihnen nichts: Ein Text war unsichtbar oder
+   * oeffentlich. Die Strecke, auf der ein Mensch ihn gegenliest, existierte
+   * nicht — und weil sie nicht existierte, hat sie auch niemand gegangen.
+   * Dieselbe Luecke, die Gate 11 zwischen „wir wissen genug" und „wir
+   * schreiben" gefunden hat.
+   *
+   * `lib/redaktion.ts` beschreibt die drei Zustaende und was jeder verlangt.
+   */
+  zustand: Zustand
+  /**
+   * WORAUF DER TEXT STEHT.
+   *
+   * Pflicht, und zwar ab `gegenlesen`. Ein Beitrag ohne Beleg ist eine
+   * Meinung mit Hausfarbe — und fuer ein Haus, dessen Regel „zeigen statt
+   * behaupten" heisst, die teuerste Sorte Text.
+   *
+   * Nennt der Text eine fremde Marke, entscheidet weiterhin Gate 13
+   * (`releases`) und nicht dieses Feld. Es wird nur nachgeschlagen.
+   */
+  belege: Beleg[]
+  /**
+   * WOHIN DER LESER GEHEN KANN. Pflicht ab `veroeffentlicht`.
+   *
+   * Die zweite Haelfte des Gate-Titels: „Inhalte UND Nachfrage". Ohne Ziel
+   * ist ein Beitrag ein Tagebuch — dieselbe Arbeit, kein Trichter.
+   */
+  nachfrage: Nachfrage | null
 }
 
 export const insights: Insight[] = [
@@ -316,14 +345,68 @@ export const insights: Insight[] = [
         },
       },
     ],
-    published: true,
+    zustand: "veroeffentlicht",
+    /*
+     * GATE 15 — WORAUF DIESER TEXT STEHT.
+     *
+     * Er nennt Zahlen: acht Maengel, 68 Durchlaeufe, 2 bzw. 3 Pixel. Bis
+     * hierher stand nirgends, woher sie kommen — der Text sagte es im
+     * Fliesstext („der vollstaendige Befund liegt offen im Quelltext"), und
+     * das war ehrlich, aber es war keine Angabe, die man nachschlagen kann.
+     * Jetzt schlaegt das Gate sie nach: Beide Fundstellen muessen als
+     * Dateien existieren, sonst faellt der Build.
+     */
+    belege: [
+      {
+        art: "eigener-befund",
+        fundstelle: "docs/barrierefreiheit-befund-eigen.md",
+        traegt: "Die acht Maengel, ihre Einstufung und die Nachmessung nach der Behebung.",
+        traegtZahlen: true,
+      },
+      {
+        art: "eigene-messung",
+        fundstelle: "scripts/a11y.mjs",
+        traegt: "Die automatisierten Durchlaeufe mit axe-core, die jeder wiederholen kann.",
+      },
+      {
+        art: "oeffentliche-quelle",
+        fundstelle: "WCAG 2.1 AA (W3C Recommendation)",
+        traegt: "Die Erfolgskriterien, gegen die geprueft wurde — 2.4.7, 1.4.11 und die uebrigen.",
+      },
+    ],
+    /*
+     * Wer diesen Text zu Ende liest, hat genau eine Frage: „Koennt ihr das
+     * auch fuer uns?" Sie fuehrt auf die Leistungsseite, nicht in einen
+     * Verteiler — das Haus hat sich gegen das Newsletter-Feld entschieden,
+     * und die Grenze im G15-Vertrag heisst „keine erfundene
+     * Werbeeinwilligung".
+     */
+    nachfrage: {
+      fuehrtZu: "/leistungen/barrierefreiheit-website",
+      weilLeserFragt: {
+        de: "Und wie sieht das auf unserer Seite aus?",
+        tr: "Peki bizim sitemizde durum ne?",
+        en: "And what does that look like on our site?",
+        ar: "وكيف يبدو ذلك في موقعنا؟",
+      },
+    },
   },
 ]
 
 /** Nur Veröffentlichtes verlässt die Datei — neueste zuerst. */
 export const publishedInsights = insights
-  .filter((entry) => entry.published)
+  .filter((entry) => istOeffentlich(entry.zustand))
   .sort((a, b) => b.date.localeCompare(a.date))
+
+/**
+ * Was auf dem Weg ist. Verlaesst die Datei NICHT in Richtung Oeffentlichkeit
+ * — nur `/status` und das Redaktions-Gate lesen es.
+ */
+export const insightsImWeg = insights
+  .filter((entry) => entry.zustand === "gegenlesen")
+  .sort((a, b) => b.date.localeCompare(a.date))
+
+export const insightEntwuerfe = insights.filter((entry) => entry.zustand === "entwurf")
 
 /** Nur Einträge mit Fließtext bekommen eine eigene Seite. */
 export const readableInsights = publishedInsights.filter((entry) => entry.body.length > 0)

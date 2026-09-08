@@ -160,9 +160,31 @@ originalgetreu, fibero nicht künstlich vergrößert, Bewegung ruhig).
 *Unabhängig, weil* eine Seite, die unfertig wirkt, jeden Beleg entwertet, den
 G13 daraufsetzt.
 
-**G15 · Inhalte & Nachfrage** — Heute: Insights dünn, kein Redaktionsweg.
-Ziel: ein Inhaltssystem, das aus Belegen Nachfrage macht.
+**G15 ⬥ Inhalte & Nachfrage** — Heute (bis 09.09.2026): Insights dünn, kein
+Redaktionsweg. Ziel: ein Inhaltssystem, das aus Belegen Nachfrage macht.
 *Grenze:* keine erfundene Werbeeinwilligung, kein Ads-Sturm.
+
+*System geschlossen 09.09.2026, Inhalt bleibt beim Owner.* Der Befund war
+zweigeteilt und nur eine Hälfte gehörte dem System:
+
+- **Dünn** — ein veröffentlichter Beitrag, fünf von sechs Fächern leer. Das
+  ist der Owner-Punkt; Texte schreibt kein Gate.
+- **Kein Weg** — ein Beitrag entstand, indem jemand `published: true` schrieb.
+  Kein Zustand dazwischen, keine Frage woher die Zahlen kommen, keine
+  Verbindung zu dem, was das Haus verkauft. Das war die Lücke.
+
+`lib/redaktion.ts` schließt sie: drei Zustände statt zwei (der mittlere ist
+das Gegenlesen — dieselbe fehlende Mitte wie in G11), Belege mit
+aufschlagbarer Fundstelle, und ein Ziel je veröffentlichtem Beitrag. Nennt
+ein Text eine fremde Marke, entscheidet weiter **G13** — dieselbe Funktion,
+keine zweite Wahrheit. `/insights` war der **neunte** Weg nach draußen, den
+G13 nicht kannte: Fließtext, in dem jeder Name stehen kann, ohne dass eine
+Liste ihn je gesehen hätte.
+
+Die Grenze aus dem Vertrag stand bis hierher als **Kommentar** in
+`lib/site-data.ts` („ein Newsletter-Feld verspricht Post"). Sie steht jetzt
+als Regel: Das Gate durchsucht das gebaute HTML nach Verteiler-Feldern und
+nach Fremdschriften, die Reichweite kaufen.
 
 **G16 · Attribution & Lernen** — Heute: UTM-Felder existieren und bleiben
 leer (G06-Beschluss). Ziel: belegte Herkunft, und die Verlust-Schleife

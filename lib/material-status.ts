@@ -42,7 +42,7 @@ import {
 import { CLIENT_LOGOS } from "@/lib/client-logos.generated"
 import { COMPANY_PHOTOS, COMPANY_PHOTO_SLOTS } from "@/lib/company-media.generated"
 import { productScreens } from "@/lib/product-media"
-import { emptyInsightCategories, publishedInsights } from "@/lib/insights"
+import { emptyInsightCategories, insightEntwuerfe, insights, insightsImWeg, publishedInsights } from "@/lib/insights"
 import { publishedSeoLandings, seoLandings } from "@/lib/seo-landings"
 import { publishedServicePages } from "@/lib/service-pages"
 import { connectedSystems } from "@/lib/systems"
@@ -130,6 +130,38 @@ export function collect(): { open: Item[]; done: Item[] } {
         ? `${publishedInsights.length} veröffentlicht`
         : "keiner. /insights steht auf noindex und fehlt in der Sitemap.",
     owner: "Owner: zwei Fachartikel als Vertriebsmaterial",
+  })
+
+  /*
+   * GATE 15 — DER WEG WAR VORHER UNSICHTBAR.
+   *
+   * Diese Fläche kannte nur „veröffentlicht" und „nicht veröffentlicht",
+   * weil der Datensatz nur das kannte. Ein Text, der fertig geschrieben war
+   * und auf einen zweiten Blick wartete, sah hier genauso aus wie einer, der
+   * nie angefangen wurde — und stand deshalb genauso lange.
+   */
+  push({
+    label: "Redaktionsweg (G15)",
+    ok: insightsImWeg.length === 0,
+    detail:
+      insightsImWeg.length > 0
+        ? `${insightsImWeg.length} Beitrag/Beiträge warten auf das Gegenlesen: ` +
+          insightsImWeg.map((e) => e.title.de).join(" · ")
+        : insightEntwuerfe.length > 0
+          ? `nichts wartet auf einen zweiten Blick — ${insightEntwuerfe.length} Entwurf/Entwürfe liegen davor.`
+          : "nichts unterwegs.",
+    owner:
+      "Owner: gegenlesen und freigeben. Belege und Ziel prüft das Gate, " +
+      "den Satz prüft ein Mensch.",
+  })
+
+  push({
+    label: "Belege je Beitrag (G15)",
+    ok: insights.every((entry) => entry.belege.length > 0),
+    detail: `${insights.reduce((n, e) => n + e.belege.length, 0)} Beleg(e) auf ${insights.length} Beitrag/Beiträge`,
+    owner:
+      "Kein Owner-Punkt: Ein Beitrag ohne Beleg kommt seit G15 nicht mehr " +
+      "durch den Build.",
   })
 
   /* ── Angebundene Systeme (MP10-4) ──────────────────────────────────── */
