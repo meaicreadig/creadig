@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "predev": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs && node scripts/generate-company-media.mjs",
-    "prebuild": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs && node scripts/generate-company-media.mjs",
+    "predev": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs && node scripts/generate-company-media.mjs && node scripts/generate-logo-masse.mjs",
+    "prebuild": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs && node scripts/generate-company-media.mjs && node scripts/generate-logo-masse.mjs",
     "build": "next build",
-    "postbuild": "node scripts/check-function-size.mjs && node scripts/check-reviews.mjs && node scripts/check-parity.mjs && node scripts/check-bestand.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-freigaben.mjs",
+    "postbuild": "node scripts/check-function-size.mjs && node scripts/check-reviews.mjs && node scripts/check-parity.mjs && node scripts/check-bestand.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-freigaben.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-auftritt.mjs",
     "start": "next start",
     "lint": "eslint .",
     "shots": "node scripts/screenshots.mjs",
@@ -26,7 +26,8 @@
     "contact-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/contact-drill.mjs",
     "evidence-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/evidence-drill.mjs",
     "research-import": "node --import ./scripts/lib/alias-hook.mjs scripts/research-import.mjs",
-    "proof-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/proof-drill.mjs"
+    "proof-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/proof-drill.mjs",
+    "auftritt-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/auftritt-drill.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

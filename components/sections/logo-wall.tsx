@@ -2,7 +2,8 @@
 
 import { Reveal } from "@/components/ui/reveal"
 import { useLocale } from "@/components/locale-provider"
-import { brands, clientLogos, ownProducts, type Region } from "@/lib/site-data"
+import { brands, clientLogos, ownProducts, type LogoDunkel, type Region } from "@/lib/site-data"
+import { MarkenZeichen } from "@/components/brand/marken-zeichen"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 /**
@@ -15,12 +16,14 @@ function LogoSlot({
   region,
   color,
   logoPath,
+  dunkel,
 }: {
   name: string
   mark: string
   region: Region | null
   color: string
   logoPath: string | null
+  dunkel?: LogoDunkel
 }) {
   return (
     <div
@@ -34,25 +37,18 @@ function LogoSlot({
       />
       {logoPath ? (
         /*
-          Bewusst ein rohes <img> und kein `next/image` (TECH-6):
-          Wortmarken kommen als SVG, und die optimiert `next/image` nicht —
-          es wuerde sie nur durchreichen und dafuer `dangerouslyAllowSVG`
-          verlangen. Dazu haengt die Breite hier am Inhalt (`w-auto` bei
-          fester Hoehe), was `next/image` ohne bekannte Masse nicht kann.
-          Fuer eine Handvoll Kilobyte Vektorgrafik waere das Aufwand ohne
-          Ertrag. Die grossen Rasterbilder laufen ueber `next/image`.
+          GATE 14 — hier stand ein eigenes <img> mit eigener Hoehe, eigener
+          Kappung und der pauschalen Dunkelbehandlung. Dieselbe Rezeptur lag
+          zwei Haeuser weiter in `logo-strip.tsx` noch einmal. Beide trugen
+          dieselben drei Fehler; die Begruendung steht jetzt einmal in
+          `components/brand/marken-zeichen.tsx`.
+
+          `--zeichen-basis` ist die Kante des gedachten Quadrats, dessen
+          FLAECHE jedes Zeichen belegt. 46 px auf der Wand: das ergibt fuer
+          die breiteste Wortmarke rund 140 px Breite — genau die Kachelluft,
+          die vorher die Kappung erzwang.
         */
-        <img
-          src={logoPath}
-          alt={name}
-          /*
-            Dunkelmodus (P-V): fibero und CASSAMEA tragen dunkle Artwork und
-            standen auf der dunklen Kachel praktisch unsichtbar. In Ruhe darum
-            eine weisse Silhouette, beim Hover die echte Markenfarbe — dieselbe
-            Dramaturgie wie in Hell, nur mit umgekehrtem Ausgangspunkt.
-          */
-          className="h-8 w-auto max-w-[9rem] opacity-70 grayscale transition-all duration-[var(--dur-2)] group-hover:opacity-100 group-hover:grayscale-0 dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
-        />
+        <MarkenZeichen name={name} logoPath={logoPath} mark={mark} dunkel={dunkel} basis="46px" />
       ) : (
         <>
           <span
@@ -76,7 +72,14 @@ function LogoSlot({
   )
 }
 
-type Row = { name: string; mark: string; region: Region | null; color: string; logoPath: string | null }
+type Row = {
+  name: string
+  mark: string
+  region: Region | null
+  color: string
+  logoPath: string | null
+  dunkel?: LogoDunkel
+}
 
 function MarqueeRow({ items, direction }: { items: Row[]; direction: "left" | "right" }) {
   return (
@@ -107,20 +110,22 @@ function MarqueeRow({ items, direction }: { items: Row[]; direction: "left" | "r
 export function LogoWall() {
   const { t } = useLocale()
 
-  const productRow: Row[] = ownProducts.map(({ name, mark, region, color, logoPath }) => ({
+  const productRow: Row[] = ownProducts.map(({ name, mark, region, color, logoPath, dunkel }) => ({
     name,
     mark,
     region,
     color,
     logoPath,
+    dunkel,
   }))
   // Echte Kunden — mit Freigabe, mit Logo sobald eins vorliegt (sonst Monogramm).
-  const clientRow: Row[] = clientLogos.map(({ name, mark, region, color, logoPath }) => ({
+  const clientRow: Row[] = clientLogos.map(({ name, mark, region, color, logoPath, dunkel }) => ({
     name,
     mark,
     region,
     color,
     logoPath,
+    dunkel,
   }))
   // Fremdmarken bewusst nur als neutrales Monogramm — ohne Freigabe kein fremdes Logo.
   // Heute leer: Ohne freigegebene Marke rendert die Reihe gar nicht, statt eine

@@ -144,8 +144,14 @@ Sätze der Owner-1.0-Definition hier liegen.
 *Kommt vor Inhalt* — die alte Reihenfolge hatte Beleg nach Attribution. Ohne
 Beleg ist jeder Inhalt Behauptung.
 
-**G14 · Auftritt V2** — Heute: die Owner-Sichtschuld hat **keinen
-Eigentümer**. Ziel: sie ist geschlossen.
+**G14 ⬥ Auftritt V2** — Heute (bis 09.09.2026): die Owner-Sichtschuld hat
+**keinen Eigentümer**. Ziel: sie ist geschlossen.
+*Geschlossen 09.09.2026:* Die Schuld steht als Register in `lib/auftritt.ts`,
+elf Zeilen gehören dem System und werden gemessen, eine dem Owner. Gefunden
+und behoben wurden dabei drei Dinge, die niemand gesehen hatte: der leise
+CTA trug **keinen Radius** neben einem runden (13 Stellen), CASSAMEA stand
+**46 % zu schmal** auf der Logowand, und in Ruhe hat auf einem Gerät ohne
+Zeiger **noch nie jemand** ein Logo dieses Hauses in seiner Farbe gesehen.
 *Enthält:* Sichtrhythmus · Fusszeile · Logo-Kontrast · Unternehmen-Erzählung ·
 Seitenrollen · Suche (wenn Volumen es trägt) · echte Medien ·
 **CTA-Radien und Kollisionsfreiheit über alle Breiten** · Logo-Treue im
@@ -321,12 +327,23 @@ G35 nach G18 (Jurisdiktion braucht Rechnungslogik).
 
 ## 8 · Owner-Sichtschuld → Eigentümer
 
-| Schuld | Gate |
-|---|---|
-| Sichtrhythmus, Fusszeile, Logo-Kontrast, Unternehmen-Erzählung | **G14** |
-| CTA-Radien, Kollisionsfreiheit, responsive Regression | **G14** |
-| Ökosystem-Logotreue (Seitenverhältnis, optische Größe, MAQAM-Q-Farbe, fibero-Größe, ruhige Bewegung) | **G14** |
-| Seitenrollen Leistungen/Produkte/Arbeiten | **G14** |
+> **G14 geschlossen am 09.09.2026.** Die vier G14-Zeilen sind in
+> `lib/auftritt.ts` (`SICHTSCHULD`) einzeln aufgeschlüsselt — jede mit
+> Eigentümer, mit dem Satz, der sie entscheidet, und mit dem Ort, an dem
+> gemessen wird. Elf gehören dem System und werden bei jedem Lauf gemessen
+> (`npm run auftritt-drill`, 112 Messstellen); eine gehört dem Owner.
+> Geschlossen heißt: zugeordnet und gemessen — nicht „die Seite ist schön".
+
+| Schuld | Gate | Eigentümer |
+|---|---|---|
+| Sichtrhythmus | **G14 ✅** | System — Taktskala, gemessen am gerechneten `padding-block` |
+| Fusszeile | **G14 ✅** | System — vier Rollen, auf jeder Breite geprüft |
+| Logo-Kontrast | **G14 ✅** | System — Deckkraft und Dunkelbehandlung je Marke |
+| Unternehmen-Erzählung | **G14 → Owner** | **Owner** — kein System kann entscheiden, ob eine Geschichte stimmt |
+| CTA-Radien | **G14 ✅** | System — gerenderter `border-radius` gegen die Rollen-Tabelle |
+| Kollisionsfreiheit, responsive Regression | **G14 ✅** | System — 7 Breiten × 2 Gründe × 8 Seiten |
+| Ökosystem-Logotreue (Seitenverhältnis, optische Größe, MAQAM-Q-Farbe, fibero-Größe, ruhige Bewegung) | **G14 ✅** | System — `LOGO_MASSE` aus den echten Dateien, `dunkel` je Marke |
+| Seitenrollen Leistungen/Produkte/Arbeiten | **G14 ✅** | System — eine h1-Rolle je Seite |
 | Suche | **G15** (wenn Volumen es trägt) |
 | Insights-Ökosystem | **G15** |
 | echte Medien | **G13/G15** |

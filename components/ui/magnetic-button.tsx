@@ -113,7 +113,25 @@ export function MagneticButton({
       // Die Marke steht in `globals.css` (`cta-outline`) — nicht hier. Sonst
       // liegt dieselbe Rezeptur wieder an mehreren Stellen und laeuft auseinander.
       ? "cta-outline"
-      : "border-line-strong text-muted-foreground hover:border-foreground border bg-transparent transition-colors duration-[var(--dur-2)] ease-brand hover:text-foreground",
+      /*
+         GATE 14 · CTA-RADIEN — hier stand die Rezeptur des leisen Knopfes
+         noch einmal von Hand, und ihr fehlte das Entscheidende: ein RADIUS.
+
+         Der Hauptknopf traegt `cta-outline` mit `--radius-sm` (8 px). Der
+         Knopf DANEBEN — „Alle Leistungen", „Details" — hatte keine
+         Rundungsangabe und stand deshalb mit scharfen Ecken direkt neben
+         einem runden. An dreizehn Stellen, an denen beide nebeneinander
+         stehen. Das ist die Zeile „CTA-Radien" aus der Sichtschuld: nicht
+         der falsche Radius, sondern ZWEI verschiedene an einer Stelle, an
+         der ein Auge sie vergleicht.
+
+         `cta-quiet` gibt es in `globals.css` seit derselben Runde wie
+         `cta-outline` — sechzehn handgeschriebene Stellen wurden damals
+         darauf zusammengefuehrt. Diese hier war die siebzehnte, und sie
+         wurde uebersehen, weil sie nicht im Markup stand, sondern in einer
+         Komponente.
+      */
+      : "cta-quiet text-muted-foreground hover:text-foreground bg-transparent",
     className,
   )
 

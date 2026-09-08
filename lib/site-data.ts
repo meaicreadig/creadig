@@ -20,6 +20,33 @@ import { publishedInsights } from "@/lib/insights"
 
 export type Region = "DE" | "CH" | "DE & CH"
 
+/*
+ * GATE 14 — WIE EIN MARKENZEICHEN AUF DUNKLEM GRUND BEHANDELT WIRD.
+ *
+ * Bis hierher stand die Antwort in einer CSS-Klasse und galt fuer ALLE:
+ * `dark:brightness-0 dark:invert` — jedes Logo wurde im Dunkelmodus zur
+ * weissen Silhouette. Die Begruendung im Code war richtig und die Regel
+ * trotzdem falsch: Sie stimmte fuer fibero und CASSAMEA (dunkle Artwork,
+ * auf der dunklen Kachel unsichtbar) und loeschte bei allen anderen die
+ * Markenfarbe mit. Genau das benennt die Sichtschuld als
+ * „MAQAM-Q-Farbe originalgetreu".
+ *
+ * Eine Behandlung, die fuer zwei Marken gilt und fuer alle wirkt, ist keine
+ * Regel — sie ist eine Verallgemeinerung. Deshalb steht sie jetzt je Marke.
+ *
+ *   `silhouette` — die Artwork ist zu dunkel fuer den dunklen Grund. Das
+ *                  Zeichen erscheint als weisse Form; die Farbe kommt beim
+ *                  Zeigen zurueck. Das ist die VORSICHTIGE Wahl: lesbar in
+ *                  jedem Fall, aber ohne Farbe.
+ *   `original`   — die Marke traegt genug Eigenhelligkeit, um auf dunklem
+ *                  Grund zu stehen. Eine Behauptung — und `auftritt-drill`
+ *                  misst sie am gerenderten Bild nach, statt ihr zu glauben.
+ *
+ * Fehlt die Angabe, gilt `silhouette`. Die Nachlaessigkeit faellt damit zur
+ * lesbaren Seite, nicht zur unsichtbaren.
+ */
+export type LogoDunkel = "original" | "silhouette"
+
 export type ProductLogo = {
   name: string
   /** Echtes Logo unter public/brand/products/ — null, solange keins vorliegt. */
@@ -29,6 +56,8 @@ export type ProductLogo = {
   region: Region
   /** Markenfarbe für den Graustufe-→-Farbe-Hover. */
   color: string
+  /** Behandlung auf dunklem Grund. Ohne Angabe: `silhouette`. */
+  dunkel?: LogoDunkel
 }
 
 export type BrandLogo = {
@@ -38,22 +67,49 @@ export type BrandLogo = {
   /** `null`, solange der Owner die Region nicht bestaetigt hat. */
   region: Region | null
   color: string
+  /** Behandlung auf dunklem Grund. Ohne Angabe: `silhouette`. */
+  dunkel?: LogoDunkel
 }
 
 /** Die vier eigenen Produkte des Hauses. */
 export const ownProducts: ProductLogo[] = [
   // Owner 29.08.2026: Gold-Icon unter public/brand/products/meai.png
-  { name: "meAI", logoPath: "/brand/products/meai.png", mark: "me", color: "#be904e", region: "DE & CH" },
-  { name: "fibero", logoPath: "/brand/products/fibero.svg", mark: "fb", color: "#dab149", region: "DE" },
+  // Gold (#be904e) steht auf dem dunklen Grund von selbst — keine Silhouette.
+  {
+    name: "meAI",
+    logoPath: "/brand/products/meai.png",
+    mark: "me",
+    color: "#be904e",
+    region: "DE & CH",
+    dunkel: "original",
+  },
+  // Dunkle Artwork: ohne Silhouette praktisch unsichtbar auf der dunklen Kachel.
+  {
+    name: "fibero",
+    logoPath: "/brand/products/fibero.svg",
+    mark: "fb",
+    color: "#dab149",
+    region: "DE",
+    dunkel: "silhouette",
+  },
   {
     name: "CASSAMEA",
     logoPath: "/brand/products/cassamea.svg",
     mark: "CA",
     color: "#f0743c",
     region: "CH",
+    dunkel: "silhouette",
   },
   // Owner 29.08.2026: Teal MEA-Mark unter public/brand/products/meahv.png
-  { name: "meahv", logoPath: "/brand/products/meahv.png", mark: "hv", color: "#09696e", region: "DE" },
+  // #09696e ist dunkles Teal — auf Anthrazit zu wenig Eigenhelligkeit.
+  {
+    name: "meahv",
+    logoPath: "/brand/products/meahv.png",
+    mark: "hv",
+    color: "#09696e",
+    region: "DE",
+    dunkel: "silhouette",
+  },
 ]
 
 /**
@@ -156,6 +212,18 @@ export type Work = {
    */
   releases?: readonly Release[]
   approvedSentence?: Localized | null
+  /**
+   * GATE 14 — Behandlung des Kundenlogos auf dunklem Grund (`LogoDunkel`).
+   *
+   * Dieselbe Frage wie beim eigenen Produkt, nur fuer eine fremde Marke: Ob
+   * das Zeichen im Dunkelmodus als weisse Silhouette erscheint oder in
+   * seiner Farbe stehen bleibt. Ohne Angabe: `silhouette`.
+   *
+   * Diese Angabe ist KEINE Freigabe. Sie sagt nur, wie das Logo aussieht,
+   * wenn es erscheinen darf — ob es erscheinen darf, entscheidet allein
+   * `releases` (Gate 13).
+   */
+  dunkel?: LogoDunkel
 }
 
 /** Eigene Produkte — die großen Cases. */
@@ -578,6 +646,10 @@ export const clientWorks: Work[] = [
     sector: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret", en: "Online business · e-commerce", ar: "أعمال إلكترونية · تجارة إلكترونية" },
     year: null,
     name: "maqam",
+    // Sichtschuld G14: „MAQAM-Q-Farbe originalgetreu". Das Q traegt die Marke;
+    // als weisse Silhouette ist es ein anderes Zeichen. Es bleibt farbig —
+    // `auftritt-drill` misst nach, dass es auf dem dunklen Grund trotzdem steht.
+    dunkel: "original",
     what: { de: "Online-Business / E-Commerce.", tr: "Online iş / e-ticaret.", en: "Online business / e-commerce.", ar: "أعمال إلكترونية / تجارة إلكترونية." },
     // Umfang, Region, Link — Owner 29.08.2026: Logo + Kundenbild geliefert.
     // Leistungen (Case-Card) fehlen noch — nichts erfinden.
@@ -721,6 +793,7 @@ export const clientLogos: BrandLogo[] = clientWorks
     // Kein Markenfarben-Raten: bis ein Logo vorliegt, traegt die Kachel die
     // Hausfarbe. Eine erfundene Markenfarbe waere eine erfundene Angabe.
     color: "#be904e",
+    dunkel: work.dunkel,
   }))
 
 /**

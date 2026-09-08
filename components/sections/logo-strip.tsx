@@ -1,7 +1,8 @@
 "use client"
 
 import { useLocale } from "@/components/locale-provider"
-import { clientLogos, ownProducts, type Region } from "@/lib/site-data"
+import { clientLogos, ownProducts, type LogoDunkel, type Region } from "@/lib/site-data"
+import { MarkenZeichen } from "@/components/brand/marken-zeichen"
 
 /**
  * Startseite · Logo-Streifen direkt unter dem Hero.
@@ -20,12 +21,13 @@ type Row = {
   region: Region | null
   color: string
   logoPath: string | null
+  dunkel?: LogoDunkel
 }
 
-function LogoChip({ name, mark, color, logoPath }: Row) {
+function LogoChip({ name, mark, color, logoPath, dunkel }: Row) {
   return (
     <div
-      className="group tile bg-surface-raised relative flex h-24 w-52 shrink-0 items-center justify-center px-4 transition-all duration-[var(--dur-2)] hover:-translate-y-1 hover:elevation-2 sm:h-28 sm:w-60 sm:px-5"
+      className="group tile bg-surface-raised relative flex h-24 w-52 shrink-0 items-center justify-center px-4 transition-all duration-[var(--dur-2)] hover:-translate-y-1 hover:elevation-2 [--zeichen-basis-streifen:52px] sm:h-28 sm:w-60 sm:px-5 sm:[--zeichen-basis-streifen:60px]"
       style={{ ["--brand" as string]: color }}
     >
       <span
@@ -34,10 +36,20 @@ function LogoChip({ name, mark, color, logoPath }: Row) {
         style={{ backgroundColor: "var(--brand)" }}
       />
       {logoPath ? (
-        <img
-          src={logoPath}
-          alt={name}
-          className="h-10 w-auto max-w-[11rem] opacity-70 grayscale transition-all duration-[var(--dur-2)] group-hover:opacity-100 group-hover:grayscale-0 sm:h-12 sm:max-w-[12rem] dark:brightness-0 dark:invert dark:group-hover:brightness-100 dark:group-hover:invert-0"
+        /*
+          GATE 14 — eine Quelle fuer alle Markenzeichen, Begruendung in
+          `components/brand/marken-zeichen.tsx`.
+
+          Der Streifen traegt eine groessere Basis als die Wand: Er steht
+          direkt unter dem Hero, wo die Kacheln groesser sind. Was sich NICHT
+          unterscheidet, ist die Regel — nur die Basis.
+        */
+        <MarkenZeichen
+          name={name}
+          logoPath={logoPath}
+          mark={mark}
+          dunkel={dunkel}
+          basis="var(--zeichen-basis-streifen)"
         />
       ) : (
         <span className="text-muted-foreground group-hover:text-foreground type-small tracking-wide transition-colors duration-[var(--dur-2)]">
@@ -107,19 +119,21 @@ export function LogoStrip() {
   const { t } = useLocale()
 
   const pool: Row[] = [
-    ...ownProducts.map(({ name, mark, region, color, logoPath }) => ({
+    ...ownProducts.map(({ name, mark, region, color, logoPath, dunkel }) => ({
       name,
       mark,
       region,
       color,
       logoPath,
+      dunkel,
     })),
-    ...clientLogos.map(({ name, mark, region, color, logoPath }) => ({
+    ...clientLogos.map(({ name, mark, region, color, logoPath, dunkel }) => ({
       name,
       mark,
       region,
       color,
       logoPath,
+      dunkel,
     })),
   ]
 

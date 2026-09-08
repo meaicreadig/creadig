@@ -64,6 +64,41 @@ steht** — deshalb gehört er untrennbar zur Raster-Regel unten.
 das Kalenderraster bleiben fugenlos — dort ist die geschlossene Reihe die
 richtige Form.
 
+**Gemessen, nicht behauptet (G14).** `auftritt-drill` liest den gerenderten
+`border-radius` jedes Bedienelements auf sieben Breiten und beiden Gründen.
+Erlaubt sind 0 / 8 / 12 / 20 px und die volle Pille — sonst nichts. Dabei
+fiel auf, was drei Runden lang niemand gesehen hatte: `MagneticButton` in
+der Variante `ghost` — der Knopf **neben** dem Hauptknopf, an 13 Stellen —
+trug überhaupt keine Rundungsangabe und stand mit scharfen Ecken neben einem
+runden. Die Rezeptur `cta-quiet` gab es längst; diese eine Stelle stand
+außerhalb, weil sie nicht im Markup lag, sondern in einer Komponente.
+
+### Sichtrhythmus — die Taktskala
+
+Die senkrechte Luft eines Abschnitts kommt aus
+**2,5 / 3,5 / 5 / 6 / 7 / 8 / 9 / 10 rem** (`TAKT_SKALA_REM`). Das ist keine
+Obergrenze für die Zahl der Werte: Drei Sektionsrollen ergeben in Paaren bis
+zu sechs Summen, ohne dass etwas aus der Ordnung fällt. Ein Takt ist nicht
+„wenige Werte", sondern: **jeder** Wert liegt auf dem Raster.
+
+Gemessen am 09.09.2026 über alle sieben Breiten: 56 / 96 / 128 / 144 / 160 px
+— fünf Rollen (Streifen, tight, shell, band, Seitenkopf), alle auf der Skala.
+
+### Markenzeichen im Ökosystem
+
+Eine Komponente, `components/brand/marken-zeichen.tsx`, und drei Regeln:
+
+| Regel | Warum |
+|---|---|
+| Das Verhältnis der Quelldatei gilt (±2 %) | `h-10 max-w-[11rem]` an einem `<img>` ist keine Kappung, sondern eine **Quetschung**: `object-fit` steht ohne Angabe auf `fill`. CASSAMEA (8,38 : 1) verlor so 46 % seiner Breite. |
+| Die Höhe kommt aus der **Fläche**, nicht aus der Zeile: `h = basis / √verhältnis` | Auf gleicher Höhe belegte meahv 960 px², CASSAMEA 4.608 px² — Faktor 4,8 auf derselben Wand. Nach der Umstellung: 1,04 : 1. |
+| Die Dunkelbehandlung ist je Marke **deklariert** (`dunkel`) | `dark:brightness-0 dark:invert` galt für alle. Zwei Marken brauchten es, vier verloren dafür ihre Farbe — genau die Zeile „MAQAM-Q-Farbe originalgetreu". |
+
+Dazu der vierte Befund, den erst das Messen zeigte: Die Farbe kam
+ausschließlich beim **Hover** zurück. Auf einem Telefon gibt es kein Hover —
+dort hatte noch nie jemand ein Logo dieses Hauses in seiner Farbe gesehen.
+`pointer-coarse` beendet das.
+
 ### Raster und Luft
 
 - **Zwischen Kacheln: `gap-2.5` (10 px).** Nicht `gap-px`.
@@ -231,9 +266,19 @@ Was jede Änderung passieren muss:
 ```
 npx tsc --noEmit
 npx eslint .
-npm run build      → Function-Gate · Sterne-Gate · Paritäts-Gate DE/TR
-npm run a11y       → 112 Durchläufe, 0 Verletzungen (WCAG 2.1 AA, maschinell)
+npm run build           → Function · Sterne · Parität DE/TR · Bestand · Freigabe · Auftritt
+npm run a11y            → 112 Durchläufe, 0 Verletzungen (WCAG 2.1 AA, maschinell)
+npm run mobile          → 6 Breiten: kein Überlauf, keine zu kleine Bedienfläche
+npm run auftritt-drill  → 112 Messstellen: Radius · Kollision · Logotreue · Takt
 ```
+
+**Warum `auftritt-drill` und nicht noch ein Postbuild-Gate (G14):** Alle vier
+Zeilen der Owner-Sichtschuld handeln von etwas, das im Quelltext nicht steht.
+Ein Knopf hat keinen Radius, weil eine Klasse so heißt — er hat einen, weil
+eine Kaskade am Ende eine Zahl ergibt. Zwei Elemente kollidieren nicht, weil
+jemand es geschrieben hat, sondern weil ein Umbruch bei 320 px anders fällt.
+Ein Gate, das das aus Klassennamen erschließt, prüft die **Absicht**. Der
+Drill prüft das **Ergebnis**.
 
 `npm run shots` erzeugt 100 Aufnahmen in `screenshots/` — hell/dunkel,
 Desktop/Mobil, DE/TR. Design wird daran beurteilt, nicht aus dem Gedächtnis.
