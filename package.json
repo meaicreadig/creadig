@@ -29,7 +29,8 @@
     "proof-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/proof-drill.mjs",
     "auftritt-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/auftritt-drill.mjs",
     "redaktion-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/redaktion-drill.mjs",
-    "verlust-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/verlust-drill.mjs"
+    "verlust-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/verlust-drill.mjs",
+    "db-drills": "node scripts/db-drills.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

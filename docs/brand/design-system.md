@@ -273,6 +273,7 @@ npm run auftritt-drill  → 112 Messstellen: Radius · Kollision · Logotreue ·
 npm run proof-drill     → 40 Prüfungen: ohne Freigabe erscheint nichts
 npm run redaktion-drill → 47 Prüfungen: kein Satz ohne Herkunft
 npm run verlust-drill   → 47 Prüfungen: die Erklärung ist der Schlüssel
+npm run db-drills       → crm · sales · research · contact · evidence, gegen frische Wegwerf-DBs
 ```
 
 **Warum `auftritt-drill` und nicht noch ein Postbuild-Gate (G14):** Alle vier
