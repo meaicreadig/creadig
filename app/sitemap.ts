@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next"
 import { publishedInsights, readableInsights } from "@/lib/insights"
 import { publishedSeoLandings } from "@/lib/seo-landings"
 import { publishedServicePages } from "@/lib/service-pages"
-import { clientWorks, productWorks } from "@/lib/site-data"
+import { genannteClientWorks, productWorks } from "@/lib/site-data"
 import { localeUrl, locales, DEFAULT_LOCALE } from "@/lib/routes"
 
 /**
@@ -60,7 +60,7 @@ const entries: Entry[] = [
   })),
 
   { path: "/arbeiten", changeFrequency: "monthly", priority: 0.8 },
-  ...clientWorks.map((work) => ({
+  ...genannteClientWorks.map((work) => ({
     path: `/arbeiten/${work.slug}`,
     changeFrequency: "monthly" as const,
     priority: 0.6,

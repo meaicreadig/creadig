@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { ArbeitPageBody } from "@/components/pages/arbeit-page-body"
-import { approvedCaseStudies, clientWorks } from "@/lib/site-data"
+import { approvedCaseStudies, genannteClientWorks } from "@/lib/site-data"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { pageMetadata } from "@/lib/page-metadata"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
@@ -23,11 +23,11 @@ import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
  * Fassungen liefert (Phase 5).
  */
 export function arbeitStaticParams() {
-  return clientWorks.map((work) => ({ slug: work.slug }))
+  return genannteClientWorks.map((work) => ({ slug: work.slug }))
 }
 
 function findWork(slug: string) {
-  return clientWorks.find((w) => w.slug === slug)
+  return genannteClientWorks.find((w) => w.slug === slug)
 }
 
 export async function arbeitMetadata(

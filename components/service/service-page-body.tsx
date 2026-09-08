@@ -5,7 +5,7 @@ import { ArrowUpRight, Check, ChevronRight, Minus } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
-import { clientWorks, packages, productWorks } from "@/lib/site-data"
+import { genannteClientWorks, packages, productWorks } from "@/lib/site-data"
 import { whatsappLink } from "@/lib/dictionary"
 import { BRANCH_ENTRY_FOR_SERVICE } from "@/lib/branchen"
 import type { ServicePage } from "@/lib/service-pages"
@@ -28,7 +28,7 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
   const layer = t.services.layers[page.layer]
   const copy = t.servicePage
   const branchEntry = BRANCH_ENTRY_FOR_SERVICE[page.slug]
-  const allWorks = [...productWorks, ...clientWorks]
+  const allWorks = [...productWorks, ...genannteClientWorks]
   const works = page.workSlugs
     .map((slug) => allWorks.find((w) => w.slug === slug))
     .filter((w): w is (typeof allWorks)[number] => Boolean(w))

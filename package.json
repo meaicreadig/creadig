@@ -7,7 +7,7 @@
     "predev": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs && node scripts/generate-company-media.mjs",
     "prebuild": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs && node scripts/generate-company-media.mjs",
     "build": "next build",
-    "postbuild": "node scripts/check-function-size.mjs && node scripts/check-reviews.mjs && node scripts/check-parity.mjs && node scripts/check-bestand.mjs",
+    "postbuild": "node scripts/check-function-size.mjs && node scripts/check-reviews.mjs && node scripts/check-parity.mjs && node scripts/check-bestand.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-freigaben.mjs",
     "start": "next start",
     "lint": "eslint .",
     "shots": "node scripts/screenshots.mjs",
@@ -25,7 +25,8 @@
     "research-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/research-drill.mjs",
     "contact-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/contact-drill.mjs",
     "evidence-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/evidence-drill.mjs",
-    "research-import": "node --import ./scripts/lib/alias-hook.mjs scripts/research-import.mjs"
+    "research-import": "node --import ./scripts/lib/alias-hook.mjs scripts/research-import.mjs",
+    "proof-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/proof-drill.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

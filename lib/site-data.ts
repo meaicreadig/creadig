@@ -9,6 +9,13 @@ import type { Locale } from "@/lib/dictionary"
 //   PLANEX gehört nicht zu creaDIG und kommt nirgends vor.
 
 import { CLIENT_LOGOS } from "@/lib/client-logos.generated"
+import {
+  benoetigtFuerFall,
+  benoetigtFuerLogo,
+  benoetigtFuerStimme,
+  deckung,
+  type Release,
+} from "@/lib/proof"
 import { publishedInsights } from "@/lib/insights"
 
 export type Region = "DE" | "CH" | "DE & CH"
@@ -31,8 +38,6 @@ export type BrandLogo = {
   /** `null`, solange der Owner die Region nicht bestaetigt hat. */
   region: Region | null
   color: string
-  /** Schriftliche Freigabe für die Bezeichnung „Kunde/Partner" liegt vor. */
-  approved: boolean
 }
 
 /** Die vier eigenen Produkte des Hauses. */
@@ -131,16 +136,25 @@ export type Work = {
   href?: string
   live?: boolean
   /*
-   * C-2 / BF-5 — die schriftliche Freigabe des Kunden fuer die Nennung, und
-   * der eine Satz zu Aufgabe und Ergebnis, den er freigegeben hat.
+   * GATE 13 — DIE SCHRIFTLICHE FREIGABE DES KUNDEN.
    *
-   * Beides liefert ausschliesslich der Owner. Die Felder stehen hier, damit
-   * die Statusseite (`/status`) BENENNEN kann, was fehlt — eine Luecke, die
-   * nirgends auftaucht, wird nie geschlossen. Nichts davon wird geraten, und
-   * solange `approvalOnFile` nicht ausdruecklich `true` ist, gilt die
-   * Freigabe als offen.
+   * Hier stand bis zum 08.09.2026 `approvalOnFile?: boolean`. Ein Ja ohne
+   * Wer, ohne Wann, ohne Worueber und ohne Fundstelle — und weil es optional
+   * war, fiel es still auf `undefined`.
+   *
+   * Jetzt steht hier die Freigabe selbst (`lib/proof.ts`): Person, Form,
+   * Datum, Umfang, Fundstelle. Ob ein Name oder ein Logo erscheinen darf,
+   * wird daraus ABGELEITET — es gibt kein Feld mehr, das man auf `true`
+   * setzen kann.
+   *
+   * DAS FELD BLEIBT OPTIONAL, UND DAS IST ABSICHT: Fehlt es, ist nichts
+   * gedeckt und nichts erscheint. Die Nachlaessigkeit faellt damit zur
+   * sicheren Seite. Beim alten Feld fiel sie zur unsicheren.
+   *
+   * `approvedSentence` ist kein Schalter, sondern Inhalt: der eine Satz zu
+   * Aufgabe und Ergebnis, den der Kunde freigegeben hat.
    */
-  approvalOnFile?: boolean
+  releases?: readonly Release[]
   approvedSentence?: Localized | null
 }
 
@@ -556,7 +570,7 @@ export const clientWorks: Work[] = [
     href: "https://nvswiss.ch",
     live: true,
     // Logo unter public/brand/clients/nv-swiss.png (Owner geliefert).
-    approvalOnFile: false,
+    releases: [],
     approvedSentence: null,
   },
   {
@@ -576,7 +590,7 @@ export const clientWorks: Work[] = [
     imageProof: "customer-photo",
     mark: "mq",
     // Logo: public/brand/clients/maqam.png (schwarz entfernt → transparent)
-    approvalOnFile: false,
+    releases: [],
     approvedSentence: null,
   },
   {
@@ -600,7 +614,7 @@ export const clientWorks: Work[] = [
     imageProof: "customer-photo",
     mark: "bd",
     // Logo: public/brand/clients/bir-damla-hayir.png
-    approvalOnFile: false,
+    releases: [],
     approvedSentence: null,
   },
   /*
@@ -627,6 +641,50 @@ export const clientWorks: Work[] = [
 ]
 
 /**
+ * Ob ein Kundenname oeffentlich erscheinen darf — und warum nicht.
+ *
+ * Eine Zeile, damit `/status`, die Werkschau und die Logowand dieselbe Antwort
+ * geben. Genau das war bis Gate 13 nicht der Fall.
+ *
+ * ZWEI UMFAENGE, WEIL ZWEI VERSCHIEDENE AUSSAGEN:
+ *
+ *   `namensFreigabe`  „Wir haben fuer X gearbeitet."  -> braucht `name`
+ *   `logoFreigabe`    dasselbe MIT fremdem Logo       -> braucht `name` + `logo`
+ *
+ * Ein Kunde, der die Nennung erlaubt, hat damit nicht die Verwendung seiner
+ * Marke erlaubt. Das ist kein Feinschliff — das Logo ist fremdes Eigentum.
+ */
+export function namensFreigabe(work: Work) {
+  return deckung(work.releases ?? [], ["name"])
+}
+
+export function logoFreigabe(work: Work) {
+  return deckung(work.releases ?? [], benoetigtFuerLogo(Boolean(CLIENT_LOGOS[work.slug])))
+}
+
+/**
+ * Die Kundenarbeiten, die oeffentlich genannt werden duerfen.
+ *
+ * ---------------------------------------------------------------------------
+ * GATE 13 — WARUM DIESE LISTE UEBERHAUPT EXISTIERT
+ *
+ * `clientWorks` erreichte die Oeffentlichkeit ueber SIEBEN Wege: Logowand,
+ * Logostreifen, Werkschau, Referenzregister, Detailseiten, Portfolio,
+ * Leistungs- und Produktseiten, dazu die Sitemap. Keiner davon hat je gefragt,
+ * ob eine Freigabe vorliegt — auch der nicht, dessen Kommentar behauptete, er
+ * tue es.
+ *
+ * Eine Regel, die an einer Stelle steht und an sieben wirken muss, wirkt an
+ * keiner. Deshalb gibt es ab hier EINE gefilterte Liste, und die Oberflaechen
+ * lesen nur noch sie.
+ *
+ * Heute ist sie leer. Das ist kein Fehler dieser Zeile, sondern der Zustand,
+ * den `/status` seit dem 29.08.2026 meldet: null freigegebene Kundenbelege.
+ * Neu ist nur, dass die Seite es jetzt auch tut.
+ */
+export const genannteClientWorks: Work[] = clientWorks.filter((w) => namensFreigabe(w).gedeckt)
+
+/**
  * Die Kunden-Logowand — dieselbe Quelle wie `clientWorks`, andere Form.
  *
  * Ein echtes Logo erscheint, sobald es unter `public/brand/clients/<slug>.svg`
@@ -635,19 +693,35 @@ export const clientWorks: Work[] = [
  * (`scripts/generate-client-logos.mjs`) — kein `fs` zur Laufzeit, siehe die
  * Begruendung in `lib/product-media.ts`.
  *
- * `approved: true` gilt hier fuer alle: In dieser Liste steht nur, wen der
- * Owner ausdruecklich als Kunden freigegeben hat.
+ * ---------------------------------------------------------------------------
+ * GATE 13 — HIER STAND `approved: true` FUER ALLE
+ *
+ * Wortlaut des alten Kommentars: „In dieser Liste steht nur, wen der Owner
+ * ausdruecklich als Kunden freigegeben hat." Der Satz stimmte nicht: Die Liste
+ * entsteht aus `clientWorks` per `.map()`, und dort stand bei allen dreien
+ * `approvalOnFile: false`. Die Wand zeigte drei Kundennamen, waehrend
+ * `/status` im selben Build meldete, die Freigabe fehle.
+ *
+ * Und das Feld wirkte nicht einmal — `logo-wall.tsx` und `logo-strip.tsx`
+ * lasen es nie. Deshalb steht hier jetzt ein FILTER statt eines Feldes: Was
+ * nicht gedeckt ist, kommt gar nicht erst in die Liste. Ein Filter kann man
+ * nicht vergessen zu lesen.
+ *
+ * Heute ist die Liste leer, und die Kundenreihe rendert nicht. Das ist keine
+ * Luecke, sondern der ehrliche Zustand — dieselbe Regel, die `brands` schon
+ * immer befolgt hat.
  */
-export const clientLogos: BrandLogo[] = clientWorks.map((work) => ({
-  name: work.name,
-  logoPath: CLIENT_LOGOS[work.slug] ?? null,
-  mark: work.mark,
-  region: work.region,
-  // Kein Markenfarben-Raten: bis ein Logo vorliegt, traegt die Kachel die
-  // Hausfarbe. Eine erfundene Markenfarbe waere eine erfundene Angabe.
-  color: "#be904e",
-  approved: true,
-}))
+export const clientLogos: BrandLogo[] = clientWorks
+  .filter((work) => logoFreigabe(work).gedeckt)
+  .map((work) => ({
+    name: work.name,
+    logoPath: CLIENT_LOGOS[work.slug] ?? null,
+    mark: work.mark,
+    region: work.region,
+    // Kein Markenfarben-Raten: bis ein Logo vorliegt, traegt die Kachel die
+    // Hausfarbe. Eine erfundene Markenfarbe waere eine erfundene Angabe.
+    color: "#be904e",
+  }))
 
 /**
  * Referenzregister (B2) — dieselben Projekte, dichte Listenansicht.
@@ -657,7 +731,7 @@ export const clientLogos: BrandLogo[] = clientWorks.map((work) => ({
  * Darstellung derselben Werke — eigene Produkte zuerst, dann Kundenwerk,
  * durchnummeriert 01…n.
  */
-export const registryWorks: Work[] = [...productWorks, ...clientWorks]
+export const registryWorks: Work[] = [...productWorks, ...genannteClientWorks]
 
 /**
  * Die interne Adresse eines Werks (PHASE A).
@@ -820,8 +894,16 @@ export type CaseStudy = {
   image: string | null
   /** Monogramm, solange kein Bild vorliegt. */
   mark: string
-  /** Schriftliche Freigabe des Kunden für genau diesen Text liegt vor. */
-  approved: boolean
+  /*
+   * GATE 13 — statt `approved: boolean` die Freigaben selbst.
+   *
+   * Der Bedarf faellt aus dem INHALT: Wer eine Kennzahl ergaenzt, verlangt
+   * damit automatisch auch die Freigabe fuer Zahlen, und wer ein Zitat
+   * ergaenzt, die fuer Zitate. Stuende der Bedarf daneben, koennte man ihn
+   * kleinschreiben — eine Fallstudie mit Zahl und Zitat, die nur `name`
+   * verlangt, waere gedeckt und trotzdem falsch.
+   */
+  releases?: readonly Release[]
 }
 
 /** Alle acht Kapitel leer — die Form, in die der Owner schreibt. */
@@ -863,7 +945,7 @@ export const caseStudies: CaseStudy[] = [
     voice: null,
     image: "/works/nv-swiss.jpg",
     mark: "NV",
-    approved: false,
+    releases: [],
   },
   {
     slug: "maqam",
@@ -879,7 +961,7 @@ export const caseStudies: CaseStudy[] = [
     voice: null,
     image: "/works/maqam.jpg",
     mark: "mq",
-    approved: false,
+    releases: [],
   },
   {
     slug: "bir-damla-hayir",
@@ -895,7 +977,7 @@ export const caseStudies: CaseStudy[] = [
     voice: null,
     image: "/works/bir-damla-hayir.jpg",
     mark: "bd",
-    approved: false,
+    releases: [],
   },
 ]
 
@@ -907,7 +989,15 @@ export function filledChapters(study: CaseStudy) {
 }
 
 /** Nur Freigegebenes verlässt die Datei. */
-export const approvedCaseStudies = caseStudies.filter((c) => c.approved)
+/** Was eine Fallstudie an Freigaben verlangt — aus ihrem eigenen Inhalt. */
+export function fallFreigabe(study: CaseStudy) {
+  return deckung(
+    study.releases ?? [],
+    benoetigtFuerFall({ metriken: study.metrics.length, hatZitat: study.voice !== null }),
+  )
+}
+
+export const approvedCaseStudies = caseStudies.filter((c) => fallFreigabe(c).gedeckt)
 
 /* ==========================================================================
  * BEWERTUNGEN (E-K2)
@@ -965,8 +1055,15 @@ export type Review = {
   sourceUrl?: string
   /** 1–5. `null`, wenn die Quelle keine Sterne vergibt. */
   rating: number | null
-  /** Veröffentlichung ist abgesprochen. */
-  approved: boolean
+  /*
+   * GATE 13 — die Freigabe fuer genau diese Veroeffentlichung.
+   *
+   * Eine oeffentlich hinterlassene Bewertung traegt sich selbst: Form
+   * `oeffentlich-veroeffentlicht`, Fundstelle ist die Adresse. Sie deckt
+   * dann aber AUSSCHLIESSLICH das Zitat — nicht das Logo und nicht eine
+   * Fallstudie. Das erzwingt `FORM_SCOPES` in `lib/proof.ts`.
+   */
+  releases?: readonly Release[]
 }
 
 /**
@@ -977,7 +1074,12 @@ export type Review = {
  */
 export const reviews: Review[] = []
 
-export const approvedReviews = reviews.filter((r) => r.approved)
+/** Was eine Stimme an Freigaben verlangt — der Firmenname ist eine eigene Aussage. */
+export function stimmeFreigabe(review: Review) {
+  return deckung(review.releases ?? [], benoetigtFuerStimme({ hatFirma: Boolean(review.company) }))
+}
+
+export const approvedReviews = reviews.filter((r) => stimmeFreigabe(r).gedeckt)
 
 /** Bewertungen mit Sternen — nur die zählen für den Durchschnitt. */
 const ratedReviews = approvedReviews.filter((r) => typeof r.rating === "number")

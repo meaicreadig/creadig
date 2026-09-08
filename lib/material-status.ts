@@ -36,6 +36,8 @@ import {
   productWorlds,
   retainerPublished,
   socialProfiles,
+  logoFreigabe,
+  fallFreigabe,
 } from "@/lib/site-data"
 import { CLIENT_LOGOS } from "@/lib/client-logos.generated"
 import { COMPANY_PHOTOS, COMPANY_PHOTO_SLOTS } from "@/lib/company-media.generated"
@@ -230,13 +232,21 @@ export function collect(): { open: Item[]; done: Item[] } {
   for (const work of clientWorks) {
     push({
       label: `Freigabe ${work.name} (C-2)`,
-      ok: work.approvalOnFile === true && Boolean(work.approvedSentence),
-      detail:
-        work.approvalOnFile === true
-          ? work.approvedSentence
-            ? "Freigabe und Satz liegen vor"
-            : "Freigabe liegt vor, der Satz zu Aufgabe/Ergebnis fehlt"
-          : "keine schriftliche Freigabe hinterlegt",
+      /*
+       * GATE 13 — dieselbe Quelle wie die Logowand.
+       *
+       * Vorher las diese Zeile `work.approvalOnFile` und die Logowand ein fest
+       * verdrahtetes `approved: true`. Beide beschrieben dieselbe Rechtsfrage
+       * und gaben verschiedene Antworten: Hier stand „keine schriftliche
+       * Freigabe hinterlegt", waehrend derselbe Name draussen auf der Wand
+       * lief. Jetzt lesen beide `logoFreigabe()`.
+       */
+      ok: logoFreigabe(work).gedeckt && Boolean(work.approvedSentence),
+      detail: logoFreigabe(work).gedeckt
+        ? work.approvedSentence
+          ? "Freigabe und Satz liegen vor — Name und Logo erscheinen"
+          : "Freigabe liegt vor, der Satz zu Aufgabe/Ergebnis fehlt"
+        : `${logoFreigabe(work).grund} Der Name erscheint deshalb nirgends.`,
       owner: "Owner: schriftliche Freigabe + ein Satz Aufgabe/Ergebnis",
     })
     push({
@@ -306,8 +316,8 @@ export function collect(): { open: Item[]; done: Item[] } {
     const fehlend = caseChapterKeys.filter((key) => !study.chapters[key])
     push({
       label: `Fall ${study.client} (§10.4)`,
-      ok: study.approved && filled.length === caseChapterKeys.length,
-      detail: study.approved
+      ok: fallFreigabe(study).gedeckt && filled.length === caseChapterKeys.length,
+      detail: fallFreigabe(study).gedeckt
         ? fehlend.length === 0
           ? "alle acht Kapitel stehen"
           : `freigegeben, aber ohne: ${fehlend.join(", ")}`

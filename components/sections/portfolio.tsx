@@ -11,7 +11,7 @@ import { useLocale } from "@/components/locale-provider";
 import type { Locale } from "@/lib/dictionary";
 import { WorkRegistry } from "@/components/sections/work-registry";
 import {
-  clientWorks,
+  genannteClientWorks,
   furtherProjects,
   productWorks,
   workHref,
@@ -285,7 +285,7 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
             Ueberschrift weg. Eine Ueberschrift ueber einem leeren Raster
             waere die Ankuendigung von etwas, das es nicht gibt.
           */}
-          {clientWorks.length > 0 && (
+          {genannteClientWorks.length > 0 && (
             <>
               <Reveal className="mt-24">
                 <GroupHeading
@@ -294,7 +294,7 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
                 />
               </Reveal>
               <div className="mt-8 grid gap-6 md:grid-cols-3 lg:gap-8">
-                {clientWorks.map((work, index) => (
+                {genannteClientWorks.map((work, index) => (
                   <Reveal key={work.slug} delay={index * 0.08} className="flex">
                     <WorkCard
                       work={work}

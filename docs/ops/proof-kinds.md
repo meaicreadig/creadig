@@ -90,13 +90,97 @@ weglassen.
 
 ---
 
+## Ausführbar seit Gate 13 — `lib/proof.ts`
+
+Bis zum 08.09.2026 stand diese Matrix nur hier. Im Code beantworteten **vier
+Stellen** dieselbe Rechtsfrage verschieden:
+
+| Stelle | Form | Problem |
+|---|---|---|
+| `Work.approvalOnFile?` | optionales `boolean` | fällt still auf `undefined` |
+| `CaseStudy.approved` | `boolean` | ein Ja ohne Wer, Wann, Worüber |
+| `Review.approved` | `boolean` | dasselbe noch einmal |
+| `clientLogos` | **fest verdrahtet `true`** | und von niemandem gelesen |
+
+Die vierte war der Schaden. `clientLogos` entsteht aus `clientWorks` per
+`.map()` und stempelte jedem Eintrag `approved: true` auf — während in
+denselben Datensätzen `approvalOnFile: false` stand. Das Feld wirkte nicht
+einmal: `logo-wall.tsx` und `logo-strip.tsx` lasen `{ name, mark, region,
+color, logoPath }`, `approved` war nie dabei.
+
+**Ergebnis im Betrieb:** Drei Kundennamen standen öffentlich auf der Logowand,
+während `/status` im selben Build meldete, die Freigabe fehle.
+
+### Was jetzt gilt
+
+**Es gibt kein `approved` mehr, das man setzen kann.** Es gibt `releases: []`
+— jede Freigabe mit Person, Form, Datum, Umfang und **Fundstelle**. Ob etwas
+erscheinen darf, wird daraus abgeleitet.
+
+```ts
+releases: [{
+  by: { name: "…", role: "Geschäftsführung", company: "NV SWISS" },
+  form: "e-mail",
+  at: "2026-09-08",
+  scopes: ["name", "logo"],
+  reference: "Postfach info@creadig.de, Betreff „Freigabe Referenznennung“",
+}]
+```
+
+Drei Regeln, die der Code erzwingt und dieses Dokument bisher nur beschrieb:
+
+1. **Der Bedarf fällt aus dem Inhalt.** Wer eine Kennzahl ergänzt, verlangt
+   damit automatisch `zahl`; wer ein Zitat ergänzt, `zitat`. Stünde der Bedarf
+   daneben, könnte man ihn kleinschreiben.
+2. **Die Form begrenzt den Umfang.** Eine selbst veröffentlichte
+   Google-Bewertung trägt das **Zitat** — nicht das Logo und nicht eine
+   Fallstudie. Sonst erzeugt die freundlichste Quelle die weitreichendste
+   Erlaubnis.
+3. **Ein Widerruf wirkt sofort**, nicht zum nächsten Redaktionsschluss. Der
+   Eintrag bleibt stehen: Man muss später erklären können, warum damals
+   veröffentlicht wurde.
+
+**Das Freigabedokument selbst gehört nicht ins Repository.** `reference` sagt,
+wo es liegt. Ein Repository wird geklont, gesichert und geteilt.
+
+### Zwei Wächter
+
+- **Quellsperre** — `genannteClientWorks` / `clientLogos` / `approvedCaseStudies`
+  sind gefilterte Listen. Ein Filter kann man nicht vergessen zu lesen.
+- **Freigabe-Gate** (`npm run build`) — liest das **gebaute HTML**. Damit ist
+  egal, über welchen Weg ein Name hineinkommt.
+
+Der zweite hat sich beim ersten Lauf sofort gelohnt: `clientWorks` erreichte
+die Öffentlichkeit über **sieben** Wege, nicht über einen. Nachdem alle sieben
+geschlossen waren, fand das Gate den achten — `workSlugs: ["nv-swiss","maqam"]`
+wanderte über den RSC-Payload von `ServicePageBody` (`"use client"`) in den
+Quelltext jeder Leistungsseite. Sichtbar war nichts; ausgeliefert war es
+trotzdem.
+
+Geprüft mit `npm run proof-drill` (38 Prüfungen).
+
+---
+
 ## Wo das heute steht
 
 | Art | Bestand |
 |---|---|
 | Eigenes Produkt | 4 Produkte, **0 echte Oberflächen** (`PRODUCT_SCREENS = {}`) |
-| Kundenprojekt | 2 Arbeiten (NV SWISS, maqam), **0 Logos**, **0 freigegebene Fallstudien** |
+| Kundenprojekt | 3 Arbeiten (NV SWISS, maqam, Bir Damla Hayır), **0 hinterlegte Freigaben** |
 | Kundenergebnis | **0** — keine bestätigte Zahl, keine Bewertung (`reviews: []`) |
+
+**Seit Gate 13 hat das eine sichtbare Folge:** Ohne hinterlegte Freigabe
+erscheint kein Kundenname — nicht auf der Logowand, nicht in der Werkschau,
+nicht im Referenzregister, nicht auf den Leistungsseiten, nicht in der
+Sitemap. Die eigenen vier Produkte bleiben unberührt; sie hängen an niemandem
+außer am Owner.
+
+Das ist keine Panne und kein Rückbau, sondern der Zustand, den
+`docs/ops/proof-inventory.md` seit dem 29.08.2026 meldet. Neu ist nur, dass
+die Seite ihn jetzt auch zeigt.
+
+**Was ihn beendet:** ein `releases`-Eintrag je Kunde, sobald die schriftliche
+Freigabe vorliegt. Kein Code-Umbau — die Namen erscheinen beim nächsten Build.
 
 Zählung und Fundstellen: `docs/ops/proof-inventory.md`.
 

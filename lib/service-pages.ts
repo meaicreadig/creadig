@@ -1,5 +1,6 @@
 import type { Locale } from "@/lib/dictionary"
 import type { Localized, Package } from "@/lib/site-data"
+import { genannteClientWorks, productWorks } from "@/lib/site-data"
 
 /**
  * Granulare Leistungsseiten (E-K4).
@@ -1056,7 +1057,36 @@ export const servicePages: ServicePage[] = [
   },
 ]
 
-export const publishedServicePages = servicePages.filter((p) => p.published)
+/*
+ * GATE 13 — WARUM DIE SLUGS HIER GEFILTERT WERDEN UND NICHT ERST BEIM RENDERN
+ *
+ * `ServicePageBody` traegt `"use client"`. Damit wandert das ganze
+ * `ServicePage`-Objekt in den an den Browser gesendeten Payload — auch
+ * `workSlugs`. Die Komponente loeste die Slugs bereits gegen die freigegebenen
+ * Arbeiten auf und zeigte deshalb nichts Unfreigegebenes an; im Quelltext der
+ * Seite stand der Kundenname trotzdem.
+ *
+ * Gefunden hat das nicht ein Mensch, sondern das Freigabe-Gate beim ersten
+ * Lauf gegen das gebaute HTML. Genau dafuer prueft es das Ergebnis und nicht
+ * die Quelle: Der siebte Weg war geschlossen, der achte fuehrte durch einen
+ * Datenblock, an den niemand gedacht haette.
+ *
+ * Ausgeliefert ist ausgeliefert. Deshalb faellt der Slug hier heraus, bevor
+ * die Seite ihn ueberhaupt bekommt.
+ */
+const freigegebeneWerkSlugs = new Set([
+  ...productWorks.map((w) => w.slug),
+  ...genannteClientWorks.map((w) => w.slug),
+])
+
+function ohneUnfreigegebeneWerke(page: ServicePage): ServicePage {
+  const erlaubt = page.workSlugs.filter((slug) => freigegebeneWerkSlugs.has(slug))
+  return erlaubt.length === page.workSlugs.length ? page : { ...page, workSlugs: erlaubt }
+}
+
+export const publishedServicePages = servicePages
+  .filter((p) => p.published)
+  .map(ohneUnfreigegebeneWerke)
 
 export function findServicePage(slug: string) {
   return publishedServicePages.find((p) => p.slug === slug)

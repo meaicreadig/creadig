@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Reveal } from "@/components/ui/reveal";
 import { StatusDot } from "@/components/ui/status-dot";
 import { ClosingCta } from "@/components/sections/closing-cta";
-import { clientWorks, ownProducts, productWorks } from "@/lib/site-data";
+import { genannteClientWorks, ownProducts, productWorks } from "@/lib/site-data";
 
 /**
  * Übersicht der vier eigenen Produkte (PHASE A).
@@ -147,7 +147,7 @@ export function ProduktePageBody() {
       {/* Kundenwerk steht auf der Produktseite bewusst getrennt und klein:
           Es gehört nicht zu den eigenen Produkten und darf sie nicht verwässern.
           Ohne freigegebene Referenz faellt die Sektion ganz weg. */}
-      {clientWorks.length > 0 && (
+      {genannteClientWorks.length > 0 && (
         <section
           aria-labelledby="kundenwerk-title"
           className="section-seam"
@@ -176,7 +176,7 @@ export function ProduktePageBody() {
             </Reveal>
 
             <ul className="mt-12 grid gap-2.5 md:grid-cols-3">
-              {clientWorks.map((work, i) => (
+              {genannteClientWorks.map((work, i) => (
                 <Reveal
                   key={work.slug}
                   delay={0.06 * i}
