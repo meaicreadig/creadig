@@ -4,6 +4,9 @@ import { notFound } from "next/navigation"
 import {
   setOpportunityNextAction,
   setOpportunityNote,
+  acceptAngebot,
+  saveAngebotEntwurf,
+  sendAngebot,
   setOpportunityOffer,
   setOpportunityStatus,
 } from "@/app/(admin)/admin/vertrieb/actions"
@@ -19,6 +22,7 @@ import {
   Surface,
 } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
+import { AngebotMappe } from "@/components/admin/angebot-mappe"
 import { SALES_LABELS_DE, SALES_STATES, TERMINAL_STATES, getVertriebStore } from "@/lib/lead-store"
 import { LOST_REASONS, NEXT_ACTIONS, OFFERED_STAGES, STAGE_RULES } from "@/lib/sales-playbook"
 import { OFFER_KINDS, OFFERS, readinessFor } from "@/lib/offer-readiness"
@@ -48,13 +52,14 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
   const store = getVertriebStore()
   if (!store) return <VertriebShell title="Verkaufschance" available={false}>{null}</VertriebShell>
 
-  let opp, activities, lead
+  let opp, activities, lead, angebote
   try {
     opp = await store.getOpportunity(id)
     if (!opp) notFound()
-    ;[activities, lead] = await Promise.all([
+    ;[activities, lead, angebote] = await Promise.all([
       store.activities("opportunity", id),
       store.leadForOpportunity(id),
+      store.listOffers(id),
     ])
   } catch {
     return <VertriebShell title="Verkaufschance" available={false}>{null}</VertriebShell>
@@ -280,6 +285,37 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                 )}
               </p>
             )}
+          </section>
+
+          {/* ── Angebotsdokument ───────────────────────────────────────────
+              GATE 17 — hier gab es bis zum 09.09.2026 nichts.
+
+              `offer_kind` und die Belege (oben) sagten, WAS verkauft wird
+              und ob eine Zahl genannt werden darf. Das Angebot selbst
+              entstand daneben, in einem Textprogramm — wo keine der neun
+              Regeln aus `docs/sales/proposal-outline.md` gilt und wo eine
+              Zahl frei getippt wird.
+
+              Dieselbe Luecke wie in Gate 12: Der Aktenschrank stand, der
+              Stift lag daneben, und der Weg, eine Akte anzulegen, fehlte. */}
+          <section aria-labelledby="angebotsmappe-titel" className="mt-10">
+            <SectionHeader id="angebotsmappe-titel" title="Angebotsdokument" />
+            <p className="type-small text-muted-foreground mt-2 max-w-2xl text-pretty">
+              Neun Abschnitte nach dem Hausschema. Gesendet wird nur, was vollständig ist und dessen
+              Angebotsreife oben steht — und angenommen nur mit Person, Form, Datum und Fundstelle.
+              Ein Ja ohne diese vier ist ein Haken.
+            </p>
+            <div className="mt-5">
+              <AngebotMappe
+                opportunityId={opp.id}
+                referenz={lead?.reference ?? ""}
+                offerKind={opp.offerKind}
+                angebote={angebote ?? []}
+                speichern={saveAngebotEntwurf}
+                senden={sendAngebot}
+                annehmen={acceptAngebot}
+              />
+            </div>
           </section>
 
           {/* ── Notiz ── */}

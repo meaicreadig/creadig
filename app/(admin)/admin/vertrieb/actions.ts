@@ -7,6 +7,7 @@ import { SALES_STATES, getVertriebStore, type SalesStatus } from "@/lib/lead-sto
 import { HANDLING_STATES, LIFECYCLE_STAGES, RELATIONSHIP_LEVELS } from "@/lib/vertrieb"
 import type { HandlingStatus, LifecycleStage, LocationInput, RelationshipLevel } from "@/lib/vertrieb"
 import { OFFER_KINDS, OFFERS, type OfferKind } from "@/lib/offer-readiness"
+import { ABSCHNITTE, JA_FORMEN, KATALOG, KATALOG_LABEL, type Annahme, type Befund, type Position } from "@/lib/angebot"
 import { RESEARCH_STATES, SOURCES, type ResearchState, type SourceKind } from "@/lib/research"
 import { CONTACT_SOURCES, DECISIONS, type ContactSource, type Decision } from "@/lib/contact-access"
 
@@ -489,4 +490,109 @@ export async function saveLocation(
 export async function removeLocation(organisationId: string, locationId: string): Promise<void> {
   await requireStore().deleteLocation(locationId)
   refresh(`/admin/kunden/${organisationId}`)
+}
+
+/* ── GATE 17 · Angebote ────────────────────────────────────────────────────
+ *
+ * Drei Aktionen, und zwei davon geben BEFUNDE zurück statt stillschweigend
+ * nichts zu tun.
+ *
+ * Das ist der Unterschied zu allem darüber: Ein Status, der nicht gesetzt
+ * wird, weil ein Wert nicht in seiner Liste steht, ist ein Tippfehler — da
+ * genügt „keine Änderung". Ein Angebot, das nicht hinausgeht, weil ein
+ * Pflichtabschnitt fehlt oder die Angebotsreife noch nicht steht, ist eine
+ * ENTSCHEIDUNG. Wer sie schweigend trifft, lässt den Verkäufer dreimal auf
+ * „Senden" drücken und dann das Formular für kaputt halten.
+ *
+ * Die Regel selbst steht in `lib/angebot.ts`. Hier wird sie nicht wiederholt
+ * — die Aktion reicht durch, was der Speicher zurückgibt, und der ruft
+ * dieselbe Funktion wie die Oberfläche und der Probelauf.
+ */
+
+export type AngebotAntwort = { ok: boolean; befunde: Befund[] }
+
+export async function saveAngebotEntwurf(
+  opportunityId: string,
+  form: FormData,
+): Promise<AngebotAntwort> {
+  const store = requireStore()
+  const kind = text(form.get("kind"))
+  if (!kind || !(OFFER_KINDS as readonly string[]).includes(kind)) {
+    return { ok: false, befunde: [{ abschnitt: "Angebotsart", satz: "Keine gültige Angebotsart gewählt." }] }
+  }
+
+  const abschnitte: Record<string, string> = {}
+  for (const a of ABSCHNITTE) {
+    const wert = text(form.get(`abschnitt_${a.key}`))
+    if (wert) abschnitte[a.key] = wert
+  }
+
+  /*
+   * Positionen kommen ausschliesslich als KATALOG-Verweis aus dem Formular.
+   * Ein Zuschnitt mit eigenem Betrag verlangt eine Owner-Freigabe mit
+   * Fundstelle — die entsteht nicht in einem Auswahlfeld, sondern in einem
+   * Postfach. Wer sie hat, trägt sie über den Speicher ein; ein Feld dafür
+   * im Formular wäre die Einladung, sie zu behaupten.
+   */
+  const positionen: Position[] = []
+  for (const quelle of form.getAll("position")) {
+    if (typeof quelle !== "string") continue
+    if (!(quelle in KATALOG)) continue
+    positionen.push({
+      art: "katalog",
+      was: KATALOG_LABEL[quelle as keyof typeof KATALOG],
+      quelle: quelle as keyof typeof KATALOG,
+      wiederkehrend: quelle === "betrieb-monatlich",
+    })
+  }
+
+  const id = await store.saveOfferDraft({
+    id: text(form.get("id")) ?? undefined,
+    opportunityId,
+    referenz: text(form.get("referenz")) ?? "",
+    kind: kind as OfferKind,
+    sprache: (text(form.get("sprache")) ?? "de") as "de" | "tr" | "en" | "ar",
+    gueltigBis: text(form.get("gueltigBis")) ?? "",
+    abschnitte,
+    positionen,
+  })
+
+  if (!id) {
+    return {
+      ok: false,
+      befunde: [
+        {
+          abschnitt: "Angebot",
+          satz: "Dieses Angebot liegt bereits beim Kunden. Was gesendet wurde, wird nicht rückwirkend umgeschrieben.",
+        },
+      ],
+    }
+  }
+  refresh(`/admin/vertrieb/pipeline/${opportunityId}`)
+  return { ok: true, befunde: [] }
+}
+
+export async function sendAngebot(opportunityId: string, form: FormData): Promise<AngebotAntwort> {
+  const id = text(form.get("id"))
+  if (!id) return { ok: false, befunde: [{ abschnitt: "Angebot", satz: "Kein Angebot angegeben." }] }
+  const befunde = await requireStore().sendOffer(id)
+  refresh(`/admin/vertrieb/pipeline/${opportunityId}`, "/admin/vertrieb/pipeline")
+  return { ok: befunde.length === 0, befunde }
+}
+
+export async function acceptAngebot(opportunityId: string, form: FormData): Promise<AngebotAntwort> {
+  const id = text(form.get("id"))
+  if (!id) return { ok: false, befunde: [{ abschnitt: "Angebot", satz: "Kein Angebot angegeben." }] }
+
+  const form_ = text(form.get("form"))
+  const annahme: Annahme = {
+    von: text(form.get("von")) ?? "",
+    rolle: text(form.get("rolle")) ?? "",
+    form: (JA_FORMEN as readonly string[]).includes(form_ ?? "") ? (form_ as Annahme["form"]) : "muendlich",
+    am: text(form.get("am")) ?? "",
+    fundstelle: text(form.get("fundstelle")) ?? "",
+  }
+  const befunde = await requireStore().acceptOffer(id, annahme)
+  refresh(`/admin/vertrieb/pipeline/${opportunityId}`, "/admin/vertrieb/pipeline")
+  return { ok: befunde.length === 0, befunde }
 }

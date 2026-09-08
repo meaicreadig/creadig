@@ -1,6 +1,12 @@
 # creaDIG · Angebot — Inhaltsschema
 
 > **Authority:** Spec · MP-D · Stand 29.08.2026
+> **Seit G17 (09.09.2026) ist dieses Schema GEBAUT.** Die neun Abschnitte
+> stehen in `lib/angebot.ts` (`ABSCHNITTE`), jede Zahl kommt aus dem Katalog
+> oder aus einer Owner-Freigabe mit Fundstelle, und `check-angebot.mjs` bricht
+> den Build ab, sobald dieses Dokument und das Modell verschieden viele
+> Abschnitte zählen. Ein Absatz, den nur noch das Dokument kennt, steht in
+> keinem Angebot — deshalb wird hier und dort gemeinsam geändert.
 > **Scope:** Nur das Schema. Ein Kundenportal, in dem Angebote liegen, ist
 > MP-F und hat dort ein eigenes Build-Gate — hier geht es darum, was drinsteht.
 

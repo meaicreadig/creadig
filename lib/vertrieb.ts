@@ -2,6 +2,7 @@ import type { ContactSource, Decision, PersonRef } from "@/lib/contact-access"
 import type { EvidenceKind, ResearchCase, ResearchState, SourceKind } from "@/lib/research"
 import type { OfferKind } from "@/lib/offer-readiness"
 import type { SalesStatus } from "@/lib/lead-store"
+import type { Angebot, Annahme, Befund, Position } from "@/lib/angebot"
 
 /**
  * Vertrieb 1.0 — das Fachmodell.
@@ -570,6 +571,30 @@ export type VertriebStore = {
   updateOpportunityStatus(id: string, status: SalesStatus, lostReason: string | null): Promise<boolean>
   updateOpportunityNextAction(id: string, action: string | null, at: string | null): Promise<boolean>
   updateOpportunityNote(id: string, note: string | null): Promise<boolean>
+
+  /* ── GATE 17 · Angebote ────────────────────────────────────────────────
+   *
+   * Vier Methoden, mehr braucht es nicht. Es gibt bewusst KEIN
+   * `updateOfferState(id, state)`: Ein Zustandswechsel ist hier keine
+   * Spalte, sondern eine Pruefung — `senden` und `annehmen` heissen so,
+   * weil sie etwas verlangen. Wer den Zustand frei setzen koennte, haette
+   * wieder den Haken, gegen den dieses Gate gebaut ist.
+   */
+  listOffers(opportunityId: string): Promise<Angebot[]>
+  getOffer(id: string): Promise<Angebot | null>
+  saveOfferDraft(input: {
+    id?: string
+    opportunityId: string
+    referenz: string
+    kind: OfferKind
+    sprache: Angebot["sprache"]
+    gueltigBis: string
+    abschnitte: Record<string, string>
+    positionen: Position[]
+  }): Promise<string | null>
+  /** Gibt die Befunde zurueck, wenn es NICHT geht — leere Liste heisst: gesendet. */
+  sendOffer(id: string): Promise<Befund[]>
+  acceptOffer(id: string, annahme: Annahme): Promise<Befund[]>
 
   listContacts(query: ContactQuery): Promise<{ rows: ContactRow[]; total: number }>
   getContact(id: string): Promise<ContactRow | null>

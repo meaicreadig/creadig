@@ -360,6 +360,79 @@ export const SCHEMA: string[] = [
   `ALTER TABLE leads ADD COLUMN IF NOT EXISTS check_score integer`,
   `ALTER TABLE leads ADD COLUMN IF NOT EXISTS check_bottleneck text`,
   `ALTER TABLE leads ADD COLUMN IF NOT EXISTS check_manual_spots integer`,
+
+  /*
+   * 010 · GATE 17 — das Angebot als Gegenstand.
+   *
+   * Bis hierher gab es `offer_kind` und die Belege (G08): WAS verkauft wird
+   * und ob eine Zahl genannt werden darf. Was fehlte, war das Angebot
+   * selbst — und damit auch das Ja. `status = 'won'` ist ein Haken ohne
+   * Wer, Wann und Worueber.
+   *
+   * WARUM DIE ABSCHNITTE ALS JSONB UND NICHT ALS NEUN SPALTEN
+   *
+   * Weil ihre Zahl eine REDAKTIONELLE Entscheidung ist, keine strukturelle.
+   * `docs/sales/proposal-outline.md` fuehrt heute neun; kommt ein zehnter
+   * dazu, waere das eine Schema-Aenderung fuer einen Absatz. Umgekehrt
+   * gilt: Was ein Angebot BINDET — Referenz, Art, Gueltigkeit, Zustand,
+   * das Ja — steht als eigene Spalte, weil danach gefiltert und geprueft
+   * wird.
+   *
+   * WARUM DIE POSITIONEN EBENFALLS JSONB
+   *
+   * Eine Position ist entweder ein VERWEIS in den Katalog oder ein
+   * freigegebener Zuschnitt — zwei Formen mit verschiedenen Feldern. Als
+   * Tabelle waere die Haelfte der Spalten immer leer, und die Regel „jede
+   * Zahl steht im Katalog oder ist freigegeben" liesse sich in SQL nicht
+   * ausdruecken. Sie steht in `lib/angebot.ts` und wird dort geprueft —
+   * einmal, von Oberflaeche, Gate und Probelauf.
+   *
+   * KEINE SPALTE `betrag`. Der Betrag einer Katalogposition wird
+   * AUFGELOEST. Ihn zusaetzlich zu speichern hiesse, den Preis an zwei
+   * Stellen zu fuehren — genau der Fehler, den Gate 05 beseitigt hat.
+   * Was ein bereits GESENDETES Angebot zugesagt hat, bleibt trotzdem
+   * nachvollziehbar: `sent_snapshot` friert die aufgeloesten Betraege im
+   * Moment des Sendens ein. Das ist keine zweite Wahrheit, sondern ein
+   * Protokoll — es wird nie wieder gerechnet, nur gelesen.
+   *
+   * Idempotent, wie alles hier: `IF NOT EXISTS`, keine bestehende Zeile
+   * wird angefasst.
+   */
+  `CREATE TABLE IF NOT EXISTS offers (
+     id text PRIMARY KEY,
+     opportunity_id text NOT NULL REFERENCES opportunities(id) ON DELETE CASCADE,
+     reference text NOT NULL,
+     kind text NOT NULL
+       CHECK (kind IN ('website','pruefung','behebung','systemprojekt','betrieb')),
+     locale text NOT NULL DEFAULT 'de'
+       CHECK (locale IN ('de','tr','en','ar')),
+     valid_until date NOT NULL,
+     sections jsonb NOT NULL DEFAULT '{}'::jsonb,
+     positions jsonb NOT NULL DEFAULT '[]'::jsonb,
+     state text NOT NULL DEFAULT 'entwurf'
+       CHECK (state IN ('entwurf','gesendet','angenommen','abgelehnt','abgelaufen')),
+     acceptance jsonb,
+     sent_snapshot jsonb,
+     sent_at timestamptz,
+     created_at timestamptz NOT NULL DEFAULT now(),
+     updated_at timestamptz NOT NULL DEFAULT now()
+   )`,
+  `CREATE INDEX IF NOT EXISTS offers_opportunity_idx ON offers (opportunity_id)`,
+  `CREATE INDEX IF NOT EXISTS offers_state_idx ON offers (state)`,
+  /*
+   * Ein angenommenes Angebot OHNE Annahme waere genau der Haken, gegen den
+   * dieses Gate gebaut ist. Die Datenbank laesst ihn nicht zu — zusaetzlich
+   * zur Regel in `lib/angebot.ts`, nicht statt ihrer: Die eine haelt die
+   * Oberflaeche ehrlich, die andere jeden anderen Weg an die Tabelle.
+   */
+  `DO $do$
+   BEGIN
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'offers_acceptance_check') THEN
+       ALTER TABLE offers ADD CONSTRAINT offers_acceptance_check
+         CHECK (state <> 'angenommen' OR acceptance IS NOT NULL);
+     END IF;
+   END
+   $do$`,
 ]
 
 /**

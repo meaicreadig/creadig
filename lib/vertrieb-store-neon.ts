@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto"
 
 import { OFFERS } from "@/lib/offer-readiness"
+import { KATALOG, fehltFuer, type Angebot, type Annahme, type Befund, type Position } from "@/lib/angebot"
 import { sanitizeClaim, type EvidenceRow, type ResearchCase } from "@/lib/research"
 import type { PersonRef } from "@/lib/contact-access"
 import type { SalesStatus } from "@/lib/lead-store"
@@ -53,6 +54,55 @@ import { LIFECYCLE_LABELS, RELATIONSHIP_LABELS } from "@/lib/vertrieb"
 
 type Ts = Date | string
 const iso = (v: Ts): string => (v instanceof Date ? v.toISOString() : String(v))
+
+/* ── GATE 17 · Angebotszeile ──────────────────────────────────────────────── */
+
+type OfferRow = {
+  id: string
+  opportunity_id: string
+  reference: string
+  kind: string
+  locale: string
+  valid_until: Ts
+  sections: unknown
+  positions: unknown
+  state: string
+  acceptance: unknown
+  sent_snapshot: unknown
+  sent_at: Ts | null
+  created_at: Ts
+  updated_at: Ts
+}
+
+/** `valid_until` ist ein DATE — als ISO-Tag, nicht als Zeitpunkt mit Zone. */
+const tag = (v: Ts): string => (v instanceof Date ? v.toISOString().slice(0, 10) : String(v).slice(0, 10))
+
+function toAngebot(r: OfferRow): Angebot {
+  return {
+    id: r.id,
+    opportunityId: r.opportunity_id,
+    referenz: r.reference,
+    kind: r.kind as Angebot["kind"],
+    sprache: r.locale as Angebot["sprache"],
+    gueltigBis: tag(r.valid_until),
+    abschnitte: (r.sections ?? {}) as Record<string, string>,
+    positionen: (r.positions ?? []) as Position[],
+    zustand: r.state as Angebot["zustand"],
+    annahme: (r.acceptance ?? null) as Annahme | null,
+    erstelltAm: iso(r.created_at),
+  }
+}
+
+/**
+ * Der Betrag einer Katalogposition fuer den Schnappschuss.
+ *
+ * Bewusst hier und nicht in `lib/angebot.ts` importiert: Dort ist es eine
+ * reine Funktion ueber dem Katalog; hier wird sie einmalig eingefroren.
+ */
+function katalogBetrag(p: Position): number | null {
+  return p.art === "katalog" ? (KATALOG[p.quelle]?.() ?? null) : p.betrag
+}
+
 const isoOrNull = (v: Ts | null): string | null => (v === null ? null : iso(v))
 const day = (v: Ts | null): string | null => (v === null ? null : iso(v).slice(0, 10))
 
@@ -935,6 +985,155 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
         [id, offerKind, sauber],
       )
       return rows.length > 0
+    },
+
+    /* ══ GATE 17 · ANGEBOTE ═════════════════════════════════════════════
+     *
+     * Es gibt hier bewusst KEIN `updateOfferState(id, state)`. Ein Zustand,
+     * den man frei setzen kann, ist wieder der Haken, gegen den dieses Gate
+     * gebaut ist — dasselbe `approved: true` (G13), dasselbe
+     * `published: true` (G15). `sendOffer` und `acceptOffer` heissen so,
+     * weil sie etwas VERLANGEN, und sie geben die Befunde zurueck, wenn es
+     * nicht geht.
+     *
+     * Die Regel dafuer steht in `lib/angebot.ts` und wird von der
+     * Oberflaeche, vom Gate und von hier mit derselben Funktion gerufen.
+     * Eine zweite Fassung im Speicher waere in vier Wochen eine andere.
+     */
+    async listOffers(opportunityId: string): Promise<Angebot[]> {
+      await ready()
+      const rows = (await sql.query(
+        `SELECT * FROM offers WHERE opportunity_id = $1::text ORDER BY created_at DESC`,
+        [opportunityId],
+      )) as OfferRow[]
+      return rows.map(toAngebot)
+    },
+
+    async getOffer(id: string): Promise<Angebot | null> {
+      await ready()
+      const rows = (await sql.query(`SELECT * FROM offers WHERE id = $1::text`, [id])) as OfferRow[]
+      return rows.length ? toAngebot(rows[0]) : null
+    },
+
+    async saveOfferDraft(input): Promise<string | null> {
+      await ready()
+      const id = input.id ?? randomUUID()
+      /*
+       * Ein Entwurf wird NICHT geprueft — das ist der Sinn eines Entwurfs.
+       * Geprueft wird beim Senden. Wer hier schon verlangt, dass alles
+       * steht, bekommt Angebote, die in einem Textprogramm entstehen und
+       * fertig hereinkopiert werden; dann prueft niemand mehr etwas.
+       *
+       * Ein GESENDETES oder angenommenes Angebot laesst sich allerdings
+       * nicht mehr als Entwurf ueberschreiben: Was beim Kunden liegt, wird
+       * nicht rueckwirkend umgeschrieben.
+       */
+      const bestand = (await sql.query(`SELECT state FROM offers WHERE id = $1::text`, [id])) as {
+        state: string
+      }[]
+      if (bestand.length && bestand[0].state !== "entwurf") return null
+
+      const rows = await sql.query(
+        `INSERT INTO offers (id, opportunity_id, reference, kind, locale, valid_until,
+                             sections, positions, state, created_at, updated_at)
+         VALUES ($1::text, $2::text, $3::text, $4::text, $5::text, $6::date,
+                 $7::jsonb, $8::jsonb, 'entwurf', now(), now())
+         ON CONFLICT (id) DO UPDATE
+            SET reference = EXCLUDED.reference,
+                kind = EXCLUDED.kind,
+                locale = EXCLUDED.locale,
+                valid_until = EXCLUDED.valid_until,
+                sections = EXCLUDED.sections,
+                positions = EXCLUDED.positions,
+                updated_at = now()
+         RETURNING id`,
+        [
+          id,
+          input.opportunityId,
+          input.referenz,
+          input.kind,
+          input.sprache,
+          input.gueltigBis,
+          JSON.stringify(input.abschnitte),
+          JSON.stringify(input.positionen),
+        ],
+      )
+      return rows.length ? id : null
+    },
+
+    async sendOffer(id: string): Promise<Befund[]> {
+      await ready()
+      const angebot = await this.getOffer(id)
+      if (!angebot) return [{ abschnitt: "Angebot", satz: "Es gibt kein Angebot mit dieser Kennung." }]
+
+      const opp = await this.getOpportunity(angebot.opportunityId)
+      if (!opp) {
+        return [{ abschnitt: "Angebot", satz: "Der Vorgang zu diesem Angebot existiert nicht mehr." }]
+      }
+
+      const fehlt = fehltFuer(angebot, "gesendet", opp.readinessEvidence)
+      if (fehlt.length > 0) return fehlt
+
+      /*
+       * `sent_snapshot` friert die AUFGELOESTEN Betraege ein. Der Katalog
+       * darf sich danach aendern — was der Kunde bekommen hat, bleibt
+       * lesbar. Das ist keine zweite Wahrheit, sondern ein Protokoll: Es
+       * wird nie wieder gerechnet.
+       */
+      const snapshot = angebot.positionen.map((p) => ({
+        was: p.was,
+        betrag: p.art === "katalog" ? katalogBetrag(p) : p.betrag,
+        wiederkehrend: p.wiederkehrend === true,
+      }))
+
+      await sql.query(
+        `UPDATE offers SET state = 'gesendet', sent_at = now(),
+                           sent_snapshot = $2::jsonb, updated_at = now()
+          WHERE id = $1::text AND state = 'entwurf'`,
+        [id, JSON.stringify(snapshot)],
+      )
+      await note("opportunity", angebot.opportunityId, "offer.sent",
+        `Angebot ${angebot.referenz} gesendet`, null)
+      return []
+    },
+
+    async acceptOffer(id: string, annahme: Annahme): Promise<Befund[]> {
+      await ready()
+      const angebot = await this.getOffer(id)
+      if (!angebot) return [{ abschnitt: "Angebot", satz: "Es gibt kein Angebot mit dieser Kennung." }]
+      if (angebot.zustand !== "gesendet") {
+        return [
+          {
+            abschnitt: "Annahme",
+            satz: "Nur ein gesendetes Angebot kann angenommen werden. Was nie beim Kunden lag, kann er nicht zusagen.",
+          },
+        ]
+      }
+
+      const opp = await this.getOpportunity(angebot.opportunityId)
+      const fehlt = fehltFuer({ ...angebot, annahme }, "angenommen", opp?.readinessEvidence ?? [])
+      if (fehlt.length > 0) return fehlt
+
+      await sql.query(
+        `UPDATE offers SET state = 'angenommen', acceptance = $2::jsonb, updated_at = now()
+          WHERE id = $1::text AND state = 'gesendet'`,
+        [id, JSON.stringify(annahme)],
+      )
+      /*
+       * Das Ja aendert den Vorgang mit — sonst stuende ein angenommenes
+       * Angebot neben einer Verkaufschance in „Verhandlung", und die
+       * Pipeline waere wieder eine zweite Wahrheit.
+       */
+      await sql.query(
+        `UPDATE opportunities SET status = 'won', lost_reason = NULL,
+                                  last_contact_at = now(), updated_at = now()
+          WHERE id = $1::text`,
+        [angebot.opportunityId],
+      )
+      await note("opportunity", angebot.opportunityId, "offer.accepted",
+        `Angebot ${angebot.referenz} angenommen`,
+        `${annahme.von} (${annahme.rolle}), ${annahme.form}, ${annahme.am}`)
+      return []
     },
 
     async listContacts(query: ContactQuery) {

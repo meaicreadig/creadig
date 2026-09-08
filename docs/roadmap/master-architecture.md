@@ -230,9 +230,44 @@ erfinden ist schlimmer, als keinen zu haben.
 
 ### Etappe V · Abschluss, Geld & Lieferung
 
-**G17 · Angebot & Abschluss** — Heute: `offer_kind` + Belege, aber kein
-Angebotsdokument, kein Vertrag. Ziel: aus Angebotsreife wird ein Angebot und
-ein Ja.
+**G17 ⬥ Angebot & Abschluss** — Heute (bis 09.09.2026): `offer_kind` +
+Belege, aber kein Angebotsdokument, kein Vertrag. Ziel: aus Angebotsreife
+wird ein Angebot und ein Ja.
+
+*Geschlossen 09.09.2026 — bis auf den Vertrag, und der bleibt draußen.*
+
+Das Angebotsschema stand seit dem 29.08. auf 112 Zeilen in
+`docs/sales/proposal-outline.md`, mit neun Abschnitten und einem Satz über
+allem: *„Jede Zahl im Angebot steht in `offers.md` oder ist vom Owner
+freigegeben."* Es band nur nichts — ein Angebot entstand daneben, in einem
+Textprogramm, wo keine dieser Regeln gilt.
+
+`lib/angebot.ts` macht daraus ein System mit zwei Sätzen:
+
+1. **Eine Zahl kann man hier nicht tippen.** Eine Position *verweist* in den
+   Katalog (`packages`, `retainer`) und der Betrag wird aufgelöst. Wer einen
+   eigenen Betrag braucht — beim Systemprojekt der Normalfall —, trägt die
+   Owner-Freigabe daneben: wer, wann, Fundstelle. Ohne sie ist es keine
+   Position. Das Formular hat kein Betragsfeld, und das Gate prüft, dass es
+   keines bekommt.
+2. **Ein Ja ist eine Aussage über einen Menschen.** `status = 'won'` war ein
+   Haken. Eine Annahme verlangt jetzt dieselben vier Angaben wie eine
+   Freigabe in G13: Person, Rolle, Form, Datum, Fundstelle. Ein mündliches Ja
+   ist ein Ja — dann steht das da, mit dem Namen dessen, der es gesagt hat.
+
+Die Regel liegt an **zwei** Orten, und das ist Absicht: in `lib/angebot.ts`,
+damit die Oberfläche ehrlich bleibt, und als CHECK in der Tabelle
+(`offers_acceptance_check`), damit jeder andere Weg an die Tabelle sie auch
+trifft — ein Import, eine Konsole, ein späteres Skript kennen die
+Anwendungsschicht nicht.
+
+*Die Fläche gehört zum Gate, nicht zum Komfort:* Ohne sie hätte G17 den
+Zustand aus **G12** wiederholt — Aktenschrank und Stift vorhanden, kein Weg,
+eine Akte anzulegen.
+
+*Draußen bleibt, was draußen bleiben muss:* kein Vertragstext, keine AGB
+(„Rechtsberatung ist nichts, was hier entsteht" — Grundregel 1), kein
+PDF-Erzeuger und kein Kundenportal (MP-F, eigenes Build-Gate).
 
 **G18 · Rechnung & Zahlungseingang** — *Dieses Gate stand im alten Plan
 hinter Lieferung und Kundenbetrieb.* Das ist falsch: Eine Rechnung wird
