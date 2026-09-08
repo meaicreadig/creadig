@@ -25,6 +25,46 @@ Adresse an die neue. Ein temporärer 307 würde beides offen lassen.
 
 ---
 
+## Ausgesetzte Adressen (Gate 13)
+
+Nicht Teil des Legacy-Cutovers, sondern eine Folge der Freigabelage.
+
+| Adresse | Ziel | Art | Warum |
+|---|---|---|---|
+| `/arbeiten/nv-swiss` | `/arbeiten` | **307** | keine hinterlegte Freigabe |
+| `/arbeiten/maqam` | `/arbeiten` | **307** | keine hinterlegte Freigabe |
+| `/arbeiten/bir-damla-hayir` | `/arbeiten` | **307** | keine hinterlegte Freigabe |
+| dieselben unter `/tr`, `/en`, `/ar` | `/<locale>/arbeiten` | **307** | dito |
+
+Diese drei Seiten waren öffentlich und indexierbar; die Überschrift **war** der
+Kundenname, ausgewiesen als „Kundenwerk". Seit Gate 13 erscheinen sie nicht
+mehr, weil keine schriftliche Freigabe hinterlegt ist
+(`docs/ops/proof-kinds.md`).
+
+**307 und nicht 308 — das ist hier der ganze Punkt.** Ein 308 sagt „diese
+Adresse kommt nicht zurück". Genau das wäre gelogen: Sobald eine Freigabe
+vorliegt, ist die Seite wieder da. Die Adresse ist **ausgesetzt, nicht
+aufgegeben** — und ein 308 stünde dann im Browser-Cache und würde sie weiter
+verstecken. Bei den drei Legacy-Adressen oben ist 308 richtig, weil die alte
+Seite tatsächlich nicht zurückkommt. Derselbe Mechanismus, zwei verschiedene
+Aussagen.
+
+Ziel ist die Werkschau, **nicht** eine erfundene Ersatzseite. Der Besucher
+sieht, was creaDIG gebaut hat — und nichts über ein fremdes Unternehmen, das
+dem nicht zugestimmt hat.
+
+**Zwei Wächter halten das zusammen**, weil die Liste in `next.config.ts` von
+Hand gepflegt wird und damit an einer zweiten Stelle steht:
+
+- Das **Freigabe-Gate** (`postbuild`) vergleicht beide Seiten und bricht den
+  Build, wenn eine freigegebene Arbeit hier noch umgeleitet wird — sonst wäre
+  die Seite da und unerreichbar.
+- Der **Smoke-Test** ruft alle drei Adressen wirklich auf. Eine
+  Weiterleitungsregel mit einem Tippfehler im Muster greift still nicht: Der
+  Build bleibt grün, die Adresse liefert 404, und niemand merkt es.
+
+---
+
 ## Was bewusst KEINE Regel bekommt
 
 **Die Anker der alten Startseite.**

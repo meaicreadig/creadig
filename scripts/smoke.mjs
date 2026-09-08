@@ -93,6 +93,30 @@ async function run() {
   await expectStatus("/diese-adresse-gibt-es-nicht", 404)
   await expectStatus("/tr/bu-adres-yok", 404)
 
+  /*
+   * GATE 13 — die ausgesetzten Kundenadressen.
+   *
+   * `/arbeiten/maqam` und die beiden anderen waren oeffentlich; die
+   * Ueberschrift war der Kundenname. Ohne hinterlegte Freigabe erscheinen sie
+   * nicht mehr, und `next.config.ts` leitet sie mit 307 auf die Werkschau.
+   *
+   * Geprueft wird das hier und nicht nur in der Konfiguration, weil eine
+   * Weiterleitungsregel mit einem Tippfehler im Muster STILL nicht greift:
+   * Der Build bleibt gruen, die Adresse liefert 404, und niemand merkt es,
+   * bis jemand den Link anklickt. 307 und nicht 308 ist Teil der Aussage —
+   * die Adresse ist ausgesetzt, nicht aufgegeben.
+   */
+  for (const slug of ["nv-swiss", "maqam", "bir-damla-hayir"]) {
+    const antwort = await expectStatus(`/arbeiten/${slug}`, 307)
+    const ziel = antwort.headers.get("location") ?? ""
+    record(
+      `/arbeiten/${slug} zeigt auf die Werkschau`,
+      ziel.endsWith("/arbeiten"),
+      ziel || "keine Zieladresse",
+    )
+  }
+  await expectStatus("/tr/arbeiten/maqam", 307)
+
   // Vorschaubild (T-1).
   const og = await expectStatus("/og/de.png", 200)
   record(

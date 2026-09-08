@@ -134,6 +134,40 @@ if (dateien.length === 0) {
   }
 }
 
+/* ── 4 · Weiterleitung und Freigabelage muessen dasselbe sagen ──────────── */
+
+/*
+ * `next.config.ts` laeuft vor der Anwendung und kann `lib/site-data.ts` nicht
+ * sinnvoll lesen. Die Liste der ausgesetzten Adressen steht deshalb dort von
+ * Hand — und damit an einer ZWEITEN Stelle.
+ *
+ * Genau diese Konstellation war der Befund, mit dem Gate 13 angefangen hat:
+ * eine Regel an zwei Stellen, von denen nur eine gepflegt wird. Der Fall, der
+ * hier sicher kommt: Eine Freigabe trifft ein, `releases` wird gefuellt, die
+ * Arbeit erscheint wieder — und die Weiterleitung schiebt jeden Besucher
+ * weiterhin auf die Werkschau. Die Seite waere da und unerreichbar.
+ *
+ * Deshalb vergleicht das Gate beide Seiten und bricht bei Abweichung.
+ */
+const config = readFileSync(path.join(ROOT, "next.config.ts"), "utf8")
+const regel = config.match(/\/arbeiten\/:slug\(([^)]*)\)/)
+const umgeleitet = new Set(regel ? regel[1].split("|").filter(Boolean) : [])
+const ohneFreigabe = new Set(ungedeckt.map((w) => w.slug))
+
+for (const slug of umgeleitet)
+  if (!ohneFreigabe.has(slug))
+    probleme.push(
+      `„${slug}" ist freigegeben, wird in next.config.ts aber weiterhin umgeleitet. ` +
+        `Die Seite existiert und ist trotzdem nicht erreichbar — Regel dort entfernen.`,
+    )
+
+for (const slug of ohneFreigabe)
+  if (!umgeleitet.has(slug))
+    hinweise.push(
+      `„${slug}" hat keine Freigabe und keine Weiterleitung — die alte Adresse laeuft ins Leere. ` +
+        `Falls sie oeffentlich war, gehoert sie in die 307-Regel in next.config.ts.`,
+    )
+
 /* ── Ausgabe ────────────────────────────────────────────────────────────── */
 
 console.log(

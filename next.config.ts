@@ -222,6 +222,45 @@ const nextConfig: NextConfig = {
        * geworden. Dieselbe Begruendung und dieselbe Wahl wie eine Zeile
        * hoeher: 307, weil interne Wege aenderbar bleiben sollen.
        */
+      /*
+       * GATE 13 — die drei Kundenarbeiten ohne hinterlegte Freigabe.
+       *
+       * `/arbeiten/maqam` und die beiden anderen waren oeffentlich und
+       * indexierbar; die Ueberschrift WAR der Kundenname, ausgewiesen als
+       * „Kundenwerk". Seit Gate 13 erscheinen sie nicht mehr, weil keine
+       * schriftliche Freigabe hinterlegt ist. Ein 404 waere technisch
+       * richtig und praktisch schlecht: Wer den Link hat, kommt aus einer
+       * Mail oder aus dem Index und soll nicht ins Leere laufen.
+       *
+       * 307 UND NICHT 308, und das ist hier der ganze Punkt: Eine dauerhafte
+       * Weiterleitung sagt „diese Adresse kommt nicht zurueck". Genau das
+       * waere gelogen. Sobald eine Freigabe vorliegt, ist die Seite wieder
+       * da — die Adresse ist ausgesetzt, nicht aufgegeben. Ein 308 stuende
+       * dann im Browser-Cache und wuerde die Seite weiter verstecken.
+       *
+       * Ziel ist die Werkschau, nicht eine erfundene Ersatzseite. Der
+       * Besucher sieht, was creaDIG gebaut hat — und nichts ueber ein
+       * fremdes Unternehmen, das dem nicht zugestimmt hat.
+       *
+       * DIESE LISTE MUSS MIT DER FREIGABELAGE UEBEREINSTIMMEN. Sie tut es
+       * nicht von selbst: `next.config.ts` laeuft vor der Anwendung und
+       * kann `lib/site-data.ts` nicht sinnvoll lesen. Deshalb prueft das
+       * Freigabe-Gate im `postbuild` beide Seiten gegeneinander und bricht
+       * den Build, wenn eine freigegebene Arbeit hier noch umgeleitet wird.
+       * Eine Regel, die an zwei Stellen steht, braucht einen Waechter —
+       * das war der Befund, mit dem Gate 13 angefangen hat.
+       */
+      {
+        source: "/arbeiten/:slug(nv-swiss|maqam|bir-damla-hayir)",
+        destination: "/arbeiten",
+        permanent: false,
+      },
+      {
+        source: "/:locale(tr|en|ar)/arbeiten/:slug(nv-swiss|maqam|bir-damla-hayir)",
+        destination: "/:locale/arbeiten",
+        permanent: false,
+      },
+
       { source: "/admin/vertrieb/organisationen", destination: "/admin/kunden", permanent: false },
       { source: "/admin/vertrieb/organisationen/:id", destination: "/admin/kunden/:id", permanent: false },
     ]
