@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { LOST_REASONS } from "@/lib/sales-playbook"
 
 import { SALES_STATES, getVertriebStore, type SalesStatus } from "@/lib/lead-store"
 import { HANDLING_STATES, LIFECYCLE_STAGES, RELATIONSHIP_LEVELS } from "@/lib/vertrieb"
@@ -62,9 +63,52 @@ export async function setOpportunityStatus(id: string, form: FormData): Promise<
   /* Der Grund gehört ausschliesslich zu `lost`. Wechselt der Status, fällt er
      weg — sonst bliebe an einem gewonnenen Vorgang der Satz stehen, warum er
      verloren ging. */
-  const lostReason = status === "lost" ? text(form.get("lostReason")) : null
+  /*
+   * GATE 16 — DER GRUND KOMMT AUS DEM VERZEICHNIS ODER GAR NICHT.
+   *
+   * Hier stand `text(form.get("lostReason"))` — und im Formular ein
+   * `<input>` mit `<datalist>`. Eine Vorschlagsliste bindet nichts: Der
+   * Platzhalter sagte selbst „Grund wählen ODER FREI FORMULIEREN". Damit
+   * standen in der Spalte wieder fünfzig Formulierungen, und genau dagegen
+   * war die Liste aus Gate 3 gebaut worden.
+   *
+   * Ein Freitext-Grund beantwortet die Frage „warum haben wir diesen einen
+   * verloren" und keine einzige darüber hinaus. Er reist nicht zurück ins
+   * Zielbild (G09) — er lässt sich nicht zählen und nicht gegen eine
+   * Annahme halten. Das ist die Verlust-Schleife aus dem G16-Vertrag.
+   *
+   * Der Satz daneben ist damit nicht verschwunden: Er gehört in die Notiz
+   * des Vorgangs, die es längst gibt (`setOpportunityNote`). Die Kategorie
+   * sagt WO es gescheitert ist, die Notiz WAS los war — genau die Trennung,
+   * die das Playbook beschreibt.
+   *
+   * Bestehende Zeilen bleiben unverändert. Sie werden weder umgedeutet noch
+   * einer Kategorie zugeordnet; `marktRueckmeldung()` zählt sie getrennt als
+   * Altbestand. Einen Grund nachträglich zu erfinden ist schlimmer, als
+   * keinen zu haben.
+   */
+  /*
+   * ALTBESTAND GEHT NICHT VERLOREN.
+   *
+   * Der erste Entwurf dieser Regel hat jeden Wert ausserhalb des
+   * Verzeichnisses auf `null` gesetzt — und damit einen alten Freitext
+   * gelöscht, sobald jemand den Status speichert, ohne das Feld anzufassen.
+   * Eine Regel gegen Freitext darf Freitext nicht VERNICHTEN; sie darf ihn
+   * nur nicht neu entstehen lassen.
+   *
+   * Deshalb wird der bestehende Wert gelesen und durchgelassen, wenn er
+   * unverändert zurückkommt. Alles andere ausserhalb des Verzeichnisses
+   * fällt weg — auch ein manipuliertes Feld, denn es müsste dem
+   * gespeicherten Wert exakt entsprechen.
+   */
+  const gewaehlt = text(form.get("lostReason"))
+  const store = requireStore()
+  const bisher = status === "lost" ? (await store.getOpportunity(id))?.lostReason ?? null : null
+  const ausVerzeichnis = gewaehlt !== null && (LOST_REASONS as readonly string[]).includes(gewaehlt)
+  const altbestand = gewaehlt !== null && bisher !== null && gewaehlt === bisher
+  const lostReason = status === "lost" && (ausVerzeichnis || altbestand) ? gewaehlt : null
 
-  await requireStore().updateOpportunityStatus(id, status as SalesStatus, lostReason)
+  await store.updateOpportunityStatus(id, status as SalesStatus, lostReason)
   refresh(`/admin/vertrieb/pipeline/${id}`, "/admin/vertrieb/pipeline")
 }
 

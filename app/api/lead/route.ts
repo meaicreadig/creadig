@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import type { Locale } from "@/lib/dictionary"
+import { dictionary, type Locale } from "@/lib/dictionary"
+import { datenschutzText, durchDieTuer, kampagneSpeicherbar } from "@/lib/herkunft"
 import { DEFAULT_LOCALE, SITE_URL, locales } from "@/lib/routes"
 import { raiseAlert } from "@/lib/alert"
 import {
@@ -940,16 +941,46 @@ export async function POST(request: Request) {
    * Hürde ohne Ertrag.
    */
   /*
-   * MP-B — Kampagnen-Herkunft. Alles leer, wenn der Client nichts schickt;
-   * dann steht in der Mail auch keine Zeile dazu.
+   * MP-B — Kampagnen-Herkunft.
+   *
+   * ═══ GATE 16: DIE ERKLAERUNG ENTSCHEIDET, NICHT DER CLIENT ═══
+   *
+   * Hier stand: „Alles leer, wenn der Client nichts schickt." Das war eine
+   * Beschreibung, keine Regel — und damit die einzige Sicherung, die diese
+   * Kategorie hatte.
+   *
+   * `docs/ops/utm-playbook.md` sagt seit dem 29.08.2026, warum sie nicht
+   * erhoben wird: Kampagnenherkunft ist eine NEUE DATENKATEGORIE, und die
+   * Datenschutzerklaerung nennt sie nicht. Sie nennt Name, Betrieb,
+   * E-Mail, Telefon und Nachricht.
+   *
+   * Nur: Diese Route nimmt die Felder trotzdem an, mailt sie und SPEICHERT
+   * sie. Es fehlte allein der Absender. Wer heute einen Aufruf mit
+   * `utmCampaign` schickt — ein Skript, ein Formular, ein kuenftiger
+   * Client, den jemand „nur mal ausprobiert" —, legt eine Kategorie an,
+   * die auf der Seite nicht steht.
+   *
+   * Jetzt fragt die Route die ERKLAERUNG. Steht die Kategorie dort nicht,
+   * fallen die Felder an der Tuer: nicht gespeichert, nicht gemailt.
+   * Schreibt der Owner den Satz, geht die Attribution an — ohne dass hier
+   * eine Zeile geaendert werden muss. Die Freigabe ist die Erklaerung.
+   *
+   * GELEERT, NICHT ABGELEHNT: Eine Anfrage darf nicht daran scheitern,
+   * dass jemand einen Kampagnenparameter angehaengt hat. Der Mensch, der
+   * schreibt, verlöre sonst seine Anfrage fuer eine Regel, die ihn
+   * schuetzen soll.
    */
-  const utm = {
-    source: asToken(payload.utmSource, LIMITS.utm),
-    medium: asToken(payload.utmMedium, LIMITS.utm),
-    campaign: asToken(payload.utmCampaign, LIMITS.utm),
-    term: asToken(payload.utmTerm, LIMITS.utm),
-    content: asToken(payload.utmContent, LIMITS.utm),
-  }
+  const herkunftErlaubt = kampagneSpeicherbar(datenschutzText(dictionary.de.legal))
+  const { felder: utm } = durchDieTuer(
+    {
+      source: asToken(payload.utmSource, LIMITS.utm),
+      medium: asToken(payload.utmMedium, LIMITS.utm),
+      campaign: asToken(payload.utmCampaign, LIMITS.utm),
+      term: asToken(payload.utmTerm, LIMITS.utm),
+      content: asToken(payload.utmContent, LIMITS.utm),
+    },
+    herkunftErlaubt,
+  )
   const hasUtm = Object.values(utm).some((value) => value !== "")
 
   const isQuickCheck = source === "kurzcheck"

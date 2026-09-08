@@ -266,12 +266,13 @@ Was jede Änderung passieren muss:
 ```
 npx tsc --noEmit
 npx eslint .
-npm run build           → Function · Sterne · Parität DE/TR · Bestand · Freigabe · Auftritt · Redaktion
+npm run build           → Function · Sterne · Parität · Bestand · Freigabe · Auftritt · Redaktion · Herkunft
 npm run a11y            → 112 Durchläufe, 0 Verletzungen (WCAG 2.1 AA, maschinell)
 npm run mobile          → 6 Breiten: kein Überlauf, keine zu kleine Bedienfläche
 npm run auftritt-drill  → 112 Messstellen: Radius · Kollision · Logotreue · Takt
 npm run proof-drill     → 40 Prüfungen: ohne Freigabe erscheint nichts
 npm run redaktion-drill → 47 Prüfungen: kein Satz ohne Herkunft
+npm run verlust-drill   → 47 Prüfungen: die Erklärung ist der Schlüssel
 ```
 
 **Warum `auftritt-drill` und nicht noch ein Postbuild-Gate (G14):** Alle vier

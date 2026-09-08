@@ -39,6 +39,9 @@ const TABS = [
   { href: "/admin/vertrieb/recherche", label: "Recherche" },
   { href: "/admin/vertrieb/pipeline", label: "Pipeline" },
   { href: "/admin/vertrieb/beziehungen", label: "Beziehungen" },
+  /* GATE 16 — die Verlust-Schleife steht am ENDE, weil sie dort beginnt:
+     Was in der Pipeline verloren geht, wird hier zu Marktwissen. */
+  { href: "/admin/vertrieb/verlust", label: "Verlust" },
 ]
 
 export function VertriebNav() {

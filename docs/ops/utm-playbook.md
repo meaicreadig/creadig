@@ -1,8 +1,14 @@
 # creaDIG · UTM & Attribution — Playbook
 
 > **Authority:** Spec · MP-E · Stand 29.08.2026
-> **Client-Status:** **NICHT gebaut.** Der Server nimmt `utm*` entgegen, die
-> Seite sendet sie nicht. Grund unten unter „Das Gate".
+> **Client-Status:** **NICHT gebaut.** Grund unten unter „Das Gate".
+> **Server-Status seit G16 (09.09.2026): die Tür hängt an der Erklärung.**
+> Der Satz „der Server nimmt `utm*` entgegen, die Seite sendet sie nicht"
+> beschrieb einen Zustand und sicherte nichts: Ein Skript oder ein zweites
+> Formular hätte die Felder gespeichert. `lib/herkunft.ts` liest jetzt die
+> Datenschutzerklärung; nennt sie die Kategorie nicht, werden die Felder
+> geleert — nicht gespeichert, nicht gemailt. Der Textbaustein am Ende dieses
+> Dokuments ist damit kein Vorschlag mehr, sondern **der Schalter**.
 > **Regel:** Keine PII in Kampagnenfeldern. Nie.
 
 ---

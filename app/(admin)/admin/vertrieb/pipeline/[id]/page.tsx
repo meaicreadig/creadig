@@ -130,21 +130,34 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
               </AdminField>
               <AdminField label="Grund — nur bei „Verloren“" htmlFor="lostReason" className="flex-1 basis-64">
                 {/*
-                  Sechs Gründe und ein Freitextfeld. Fünfzig verschieden
-                  formulierte Absagen ergeben keine Erkenntnis; sechs Gründe
-                  ergeben eine. Der Satz daneben bleibt, weil die Kategorie
-                  sagt, WO es gescheitert ist, und der Satz, WAS los war.
+                  GATE 16 — HIER STAND EIN `<input list=…>`.
+
+                  Eine `<datalist>` schlägt vor, sie bindet nicht: Der
+                  Platzhalter sagte „Grund wählen oder frei formulieren", und
+                  genau das ist passiert. Die Liste aus Gate 3 war gegen
+                  fünfzig Formulierungen gebaut und hat sie zugelassen.
+
+                  Jetzt eine Auswahl. Der Satz daneben ist deshalb nicht weg —
+                  er gehört in die Notiz des Vorgangs weiter unten: Die
+                  Kategorie sagt WO es gescheitert ist, die Notiz WAS los war.
+                  Nur trägt die Kategorie jetzt die Schleife zurück ins
+                  Zielbild, und ein Satz konnte das nie.
                 */}
-                <AdminInput
-                  id="lostReason"
-                  name="lostReason"
-                  list="verlustgruende"
-                  defaultValue={opp.lostReason ?? ""}
-                  placeholder="Grund wählen oder frei formulieren"
-                />
-                <datalist id="verlustgruende">
-                  {LOST_REASONS.map((r) => <option key={r} value={r} />)}
-                </datalist>
+                <AdminSelect id="lostReason" name="lostReason" defaultValue={opp.lostReason ?? ""}>
+                  <option value="">— kein Grund —</option>
+                  {LOST_REASONS.map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                  {/*
+                    Altbestand: Steht im Datensatz ein Freitext von früher,
+                    bleibt er wählbar und sichtbar. Er wird nicht umgedeutet
+                    und nicht stillschweigend gelöscht — wer den Status
+                    speichert, ohne ihn anzufassen, verlöre ihn sonst.
+                  */}
+                  {opp.lostReason && !(LOST_REASONS as readonly string[]).includes(opp.lostReason) && (
+                    <option value={opp.lostReason}>{opp.lostReason} (Altbestand)</option>
+                  )}
+                </AdminSelect>
               </AdminField>
               <button type="submit" className="cta-quiet px-4 py-2 text-sm">Status speichern</button>
             </form>

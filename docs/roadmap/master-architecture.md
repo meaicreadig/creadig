@@ -186,9 +186,47 @@ Die Grenze aus dem Vertrag stand bis hierher als **Kommentar** in
 als Regel: Das Gate durchsucht das gebaute HTML nach Verteiler-Feldern und
 nach Fremdschriften, die Reichweite kaufen.
 
-**G16 · Attribution & Lernen** — Heute: UTM-Felder existieren und bleiben
-leer (G06-Beschluss). Ziel: belegte Herkunft, und die Verlust-Schleife
-(warum verloren → Marktwissen zurück nach G09).
+**G16 ⬥ Attribution & Lernen** — Heute (bis 09.09.2026): UTM-Felder
+existieren und bleiben leer (G06-Beschluss). Ziel: belegte Herkunft, und die
+Verlust-Schleife (warum verloren → Marktwissen zurück nach G09).
+
+*Geschlossen 09.09.2026.* Beide Hälften waren nicht das, wonach sie aussahen:
+
+**Die UTM-Felder blieben nicht leer, weil etwas sie leer hielt.** Sie blieben
+leer, weil der Client sie nicht schickte. `app/api/lead/route.ts` nahm
+`utmSource…utmContent` entgegen, mailte sie als Block `Kampagne:` und schrieb
+sie in die Datenbank. Die Datenschutzerklärung nennt Name, Betrieb, E-Mail,
+Telefon und Nachricht — Kampagnenherkunft nicht. Ein Skript, ein zweites
+Formular oder ein Client, den jemand „nur mal ausprobiert", hätte eine
+Kategorie angelegt, die auf der Seite nicht steht. Das Playbook hatte recht
+und war trotzdem keine Sicherung: Es beschrieb einen **Zustand**, keine Regel.
+
+Jetzt entscheidet die **Erklärung selbst** (`lib/herkunft.ts`): Die Route
+liest den Text und lässt die Felder nur durch, wenn er die Kategorie nennt.
+Heute nennt er sie nicht — die Felder fallen an der Tür, geleert, nicht
+abgelehnt (eine Anfrage darf nicht daran scheitern, dass jemand einen
+Parameter angehängt hat). Schreibt der Owner den Satz, geht die Attribution
+an, **ohne dass eine Zeile Code sich ändert**. Die Freigabe ist die
+Erklärung, und das ist die richtige Reihenfolge.
+
+**Die Verlust-Schleife hatte eine Liste und keine Schleife.** Sieben Gründe
+standen seit G03 in `lib/sales-playbook.ts`, gegen genau das Problem gebaut
+(„fünfzig verschieden formulierte Absagen ergeben keine Erkenntnis"). Sie
+hatten zwei Löcher: Im Formular stand ein `<input list=…>` — eine
+**Vorschlags**liste, deren Platzhalter selbst sagte „oder frei formulieren".
+Und der Grund wurde nur dort gelesen, wo er entstand. Zurück ins Zielbild
+reiste er nie.
+
+`lib/verlust.ts` hängt an **denselben sieben Bezeichnungen** — wörtlich, weil
+in der Spalte schon Zeilen damit stehen — und ergänzt, was fehlte: was jeder
+Grund lehrt und welche Hypothese aus G09 er berührt. Ab drei gleichen Gründen
+ist es ein Muster (ein Fall ist ein Zufall), und `/admin/vertrieb/verlust`
+legt dem Menschen vor, welche offene Annahme dadurch unter Druck steht. Das
+Register ändert weiterhin ein Mensch, mit einem Satz — kein Zähler kippt eine
+Annahme.
+
+Altbestand wird **gezählt, nicht zugeordnet**: Einen Grund nachträglich zu
+erfinden ist schlimmer, als keinen zu haben.
 
 ### Etappe V · Abschluss, Geld & Lieferung
 

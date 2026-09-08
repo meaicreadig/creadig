@@ -43,6 +43,9 @@ import { CLIENT_LOGOS } from "@/lib/client-logos.generated"
 import { COMPANY_PHOTOS, COMPANY_PHOTO_SLOTS } from "@/lib/company-media.generated"
 import { productScreens } from "@/lib/product-media"
 import { emptyInsightCategories, insightEntwuerfe, insights, insightsImWeg, publishedInsights } from "@/lib/insights"
+import { datenschutzText, kampagneSpeicherbar } from "@/lib/herkunft"
+import { dictionary } from "@/lib/dictionary"
+import { VERLUST_LEHREN, lehrenVollstaendig } from "@/lib/verlust"
 import { publishedSeoLandings, seoLandings } from "@/lib/seo-landings"
 import { publishedServicePages } from "@/lib/service-pages"
 import { connectedSystems } from "@/lib/systems"
@@ -153,6 +156,38 @@ export function collect(): { open: Item[]; done: Item[] } {
     owner:
       "Owner: gegenlesen und freigeben. Belege und Ziel prüft das Gate, " +
       "den Satz prüft ein Mensch.",
+  })
+
+  /*
+   * GATE 16 — DIE ATTRIBUTION IST AUS, UND ZWAR SICHTBAR.
+   *
+   * Bis hierher war „die Seite sendet keine Kampagnenparameter" eine
+   * Aussage in einem Playbook. Auf dieser Fläche stand dazu nichts, und
+   * niemand konnte sehen, dass die Route sie trotzdem entgegengenommen und
+   * gespeichert hätte.
+   */
+  push({
+    label: "Kampagnen-Herkunft (G16)",
+    /*
+     * `ok`, weil Erklärung und Verhalten übereinstimmen — nicht, weil
+     * Attribution liefe. Ein Haken heisst hier „stimmig", nicht „gebaut".
+     */
+    ok: true,
+    detail: kampagneSpeicherbar(datenschutzText(dictionary.de.legal))
+      ? "Die Datenschutzerklärung nennt die Kampagnenherkunft — die Felder gehen durch."
+      : "Die Datenschutzerklärung nennt sie nicht — die Felder fallen an der Tür. Nichts wird gespeichert.",
+    owner:
+      "Owner: Soll Attribution laufen, gehört ein Satz zur Herkunft der Anfrage in die " +
+      "Datenschutzerklärung (lib/dictionary.ts, alle vier Sprachen). Danach geht sie an — ohne Code.",
+  })
+
+  push({
+    label: "Verlust-Schleife (G16)",
+    ok: lehrenVollstaendig(),
+    detail: `${VERLUST_LEHREN.length} Verlustgründe, jeder mit Lehre und Bezug zum Zielbild`,
+    owner:
+      "Kein Owner-Punkt: Der Grund kommt seit G16 aus dem Verzeichnis, der Satz daneben in die " +
+      "Notiz. Was daraus folgt, steht unter /admin/vertrieb/verlust.",
   })
 
   push({
