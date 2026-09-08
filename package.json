@@ -24,7 +24,8 @@
     "market-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/market-drill.mjs",
     "research-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/research-drill.mjs",
     "contact-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/contact-drill.mjs",
-    "evidence-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/evidence-drill.mjs"
+    "evidence-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/evidence-drill.mjs",
+    "research-import": "node --import ./scripts/lib/alias-hook.mjs scripts/research-import.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
