@@ -266,7 +266,7 @@ Was jede Änderung passieren muss:
 ```
 npx tsc --noEmit
 npx eslint .
-npm run build           → Function · Sterne · Parität · Bestand · Freigabe · Auftritt · Redaktion · Herkunft · Angebot · Lieferung · Produkt · Verkauf · Rollen · Betrieb · Kundenerfolg · Wirtschaft · Gedächtnis · Navigator · Ereignis · Vollmacht · Cockpit
+npm run build           → Function · Sterne · Parität · Bestand · Freigabe · Auftritt · Redaktion · Herkunft · Angebot · Lieferung · Produkt · Verkauf · Rollen · Betrieb · Kundenerfolg · Wirtschaft · Gedächtnis · Navigator · Ereignis · Vollmacht · Cockpit · Jurisdiktion
 npm run a11y            → 112 Durchläufe, 0 Verletzungen (WCAG 2.1 AA, maschinell)
 npm run mobile          → 6 Breiten: kein Überlauf, keine zu kleine Bedienfläche
 npm run auftritt-drill  → 112 Messstellen: Radius · Kollision · Logotreue · Takt
@@ -285,6 +285,7 @@ npm run gedaechtnis-drill → Belegpflicht, kein Speicher, unbekannt bleibt unbe
 npm run navigator-drill → Vorschlag mit Beleg, messen vor beheben
 npm run ereignis-drill  → Grenze, Idempotenz, Übersteuerung
 npm run vollmacht-drill → begrenzte Vollmacht, Widerruf, Prüfspur
+npm run jurisdiktion-drill → Lücke ≠ Entscheidung, kein erfundenes Recht
 npm run db-drills       → crm · sales · research · contact · evidence, gegen frische Wegwerf-DBs
 ```
 

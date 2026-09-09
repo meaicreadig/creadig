@@ -686,9 +686,36 @@ offene Owner-Frage als Systemfehler auszugeben.
 
 *Heute:* 3 steht · 5 offen · 2 nicht erhoben · 7 Schritte, davon 2 „messen".
 
-**G35 · DACH-Fähigkeit** — CASSAMEA ist CH, meAI ist DE & CH. Die
+**G35 ⬥ DACH-Fähigkeit** — CASSAMEA ist CH, meAI ist DE & CH. Die
 Internationalisierung ist kein Fernziel, sie ist halb da. Jurisdiktion,
 Währung, Recht.
+
+*System geschlossen 09.09.2026. Die Klärungen bleiben bei Steuerberater und
+Anwalt.* „Halb da" war genau richtig — und das ist das Problem: Die Seite
+nennt DACH als Markt, ein Produkt ist ausdrücklich *für Schweizer
+Anforderungen* gebaut, zwei Kunden sitzen dort. Gleichzeitig steht im
+Hypothesen-Register: *„Rechnungs- und Rechtslage für CH ist ungeklärt (G35).
+Verkaufen könnten wir heute nicht sauber."* Beides stand nebeneinander, und
+**nichts hielt sie zusammen**.
+
+`lib/jurisdiktion.ts` **erklärt kein Recht** — Umsatzsteuer, anwendbares
+Recht, Gerichtsstand sind Feststellungen von Fachleuten (Grundregel 1). Es
+hält fest, *was erklärt ist*, und sagt Nein, solange nichts erklärt ist:
+dieselbe Bauart wie G16 (die Datenschutzerklärung ist der Schlüssel) und G18
+(der Steuerstatus ist es).
+
+**Vier Punkte je Markt** — Steuer · Währung · Recht · Lieferung —, und jede
+Klärung braucht dieselben vier Angaben wie alles andere in diesem Haus: was,
+wer, wann, wo nachzulesen. Ein `gilt`-Satz ohne die anderen drei ist eine
+*Meinung über Recht*, und die ist gefährlicher als gar keine.
+
+**Die Steuerfrage wird nicht zweitgeführt.** Sie gehört G18 und wird von dort
+gelesen; das Gate bricht ab, wenn dieses Modul den Status selbst ermittelt.
+
+*Der Unterschied, um den es geht:* „Wir liefern nicht in die Schweiz" ist eine
+**Entscheidung**. „Wir haben die Schweiz nie geklärt" ist eine **Lücke**.
+Heute steht die Lücke da — und sie sagt es auch: DE offen bei Steuer und
+Recht, AT und CH bei allen vier.
 
 **G36 · Vollständiger Geschäftskreislauf** — echtes Marktsignal bis echte
 Owner-Entscheidung, an echten Fällen.
