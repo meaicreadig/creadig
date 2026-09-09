@@ -34,9 +34,23 @@ const S = await import("../lib/site-data.ts")
 for (const s of SCHEMA) await sql.query(s)
 for (const s of BACKFILL) await sql.query(s)
 
-/* Ein Probelauf muss zweimal dasselbe sagen. */
+/*
+ * Ein Probelauf muss zweimal dasselbe sagen.
+ *
+ * Beim zweiten Lauf gegen dieselbe Wegwerf-Datenbank stand das Geruest des
+ * ersten noch da — und die letzte Pruefung („eine Rechnung erzeugt keine
+ * zweite Verkaufschance") zaehlte dann zwei. Ein Werkzeug, dessen Antwort
+ * davon abhaengt, wie oft man es schon aufgerufen hat, misst nichts.
+ *
+ * Er raeumt deshalb zuerst weg, was ein FRUEHERER LAUF VON IHM SELBST
+ * hinterlassen hat — und nur das. Reihenfolge von innen nach aussen, damit
+ * kein Fremdschluessel im Weg steht.
+ */
 await c.query("DELETE FROM payments WHERE evidence LIKE 'ABNAHME%'")
 await c.query("DELETE FROM invoices WHERE id LIKE 'abnahme-%'")
+await c.query("DELETE FROM offers WHERE reference = 'ABN-1'")
+await c.query("DELETE FROM opportunities WHERE title LIKE 'ABNAHME%'")
+await c.query("DELETE FROM organisations WHERE name = 'ABNAHME Rechnungsbetrieb'")
 
 const POS = [
   { label: "Website-Paket", menge: 1, einzelpreisCent: 390000 },
