@@ -3,6 +3,7 @@
 import { useLocale } from "@/components/locale-provider"
 import { clientLogos, ownProducts, type LogoDunkel, type Region } from "@/lib/site-data"
 import { MarkenZeichen } from "@/components/brand/marken-zeichen"
+import { cn } from "@/lib/utils"
 
 /**
  * Startseite · Logo-Streifen direkt unter dem Hero.
@@ -24,10 +25,21 @@ type Row = {
   dunkel?: LogoDunkel
 }
 
-function LogoChip({ name, mark, color, logoPath, dunkel }: Row) {
+/*
+ * `fuellend` = die Kachel richtet sich nach ihrer Zelle statt nach sich selbst.
+ *
+ * Im Laufband ist die feste Breite noetig: Eine Bahn aus unterschiedlich
+ * breiten Kacheln laeuft unruhig. Im Raster ist sie ein Fehler — auf 390
+ * Pixeln ist eine Spalte rund 171 Pixel breit, `w-52` sind 208, und
+ * `shrink-0` schiebt den Rest aus dem Bild.
+ */
+function LogoChip({ name, mark, color, logoPath, dunkel, fuellend }: Row & { fuellend?: boolean }) {
   return (
     <div
-      className="group tile bg-surface-raised relative flex h-24 w-52 shrink-0 items-center justify-center px-4 transition-all duration-[var(--dur-2)] hover:-translate-y-1 hover:elevation-2 [--zeichen-basis-streifen:52px] sm:h-28 sm:w-60 sm:px-5 sm:[--zeichen-basis-streifen:60px]"
+      className={cn(
+        "group tile bg-surface-raised relative flex h-24 items-center justify-center px-4 transition-all duration-[var(--dur-2)] hover:-translate-y-1 hover:elevation-2 [--zeichen-basis-streifen:52px] sm:h-28 sm:px-5 sm:[--zeichen-basis-streifen:60px]",
+        fuellend ? "w-full" : "w-52 shrink-0 sm:w-60",
+      )}
       style={{ ["--brand" as string]: color }}
     >
       <span
@@ -174,10 +186,17 @@ export function LogoStrip() {
 
       {wenige ? (
         <div className="section-gutter">
-          <ul className="flex flex-wrap gap-3">
+          {/*
+            Raster statt Umbruch. Beim ersten Versuch stand hier
+            `flex flex-wrap`; auf 390 Pixeln stapelten sich die vier Kacheln
+            dann EINSPALTIG — die rechte Haelfte blieb leer, und die Sektion
+            wurde hoeher als das Laufband, das sie ersetzen sollte. Zwei
+            Spalten auf dem Telefon, vier ab der kleinen Breite.
+          */}
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {pool.map((item) => (
               <li key={item.name} className="min-w-0">
-                <LogoChip {...item} />
+                <LogoChip {...item} fuellend />
               </li>
             ))}
           </ul>
