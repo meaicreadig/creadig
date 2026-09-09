@@ -24,7 +24,7 @@ export function AdminLogout() {
         router.replace("/admin/login")
         router.refresh()
       }}
-      className="cta-quiet w-full px-4 py-2.5 text-sm tracking-wide disabled:opacity-60"
+      className="cta-quiet inline-flex min-h-11 w-full items-center justify-center px-4 py-2.5 text-sm tracking-wide disabled:opacity-60"
     >
       {busy ? "Wird abgemeldet …" : "Abmelden"}
     </button>

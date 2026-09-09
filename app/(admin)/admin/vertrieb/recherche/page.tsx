@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { Pill, SectionHeader, UnavailableNote } from "@/components/admin/primitives"
+import { Abschneidehinweis, Pill, SectionHeader, UnavailableNote } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { getVertriebStore } from "@/lib/lead-store"
 import { RESEARCH_STATES, STATE_MEANING, abbruch, alterInTagen, einordnung, mehrfachBelegt } from "@/lib/research"
@@ -53,7 +53,10 @@ export default async function RecherchePage({
   const gefiltert = (RESEARCH_STATES as readonly string[]).includes(status ?? "")
     ? (status as (typeof RESEARCH_STATES)[number])
     : undefined
-  const faelle = await store.listResearch({ status: gefiltert, limit: 200 })
+  /* Die Obergrenze steht als Konstante, damit der Hinweis unten dieselbe
+     Zahl nennt, die oben geholt wurde — zwei Zahlen wuerden auseinanderlaufen. */
+  const GRENZE = 200
+  const faelle = await store.listResearch({ status: gefiltert, limit: GRENZE })
   const sortiert = [...faelle].sort((a, b) => (RANG[a.status] ?? 9) - (RANG[b.status] ?? 9))
 
   return (
@@ -141,6 +144,12 @@ export default async function RecherchePage({
           })}
         </ul>
       )}
+
+      <Abschneidehinweis
+        gezeigt={sortiert.length}
+        grenze={GRENZE}
+        wie="Über die Zustände oben lässt sich die Menge eingrenzen."
+      />
 
       <p className="type-small text-muted-foreground border-line mt-10 border-t pt-6 max-w-2xl text-pretty">
         Recherche ist kein Vertrieb. Hier entsteht keine Verkaufschance, kein Kontakt und

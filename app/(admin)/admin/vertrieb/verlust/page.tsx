@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { Pill, SectionHeader, Surface } from "@/components/admin/primitives"
+import { Abschneidehinweis, Pill, SectionHeader, Surface } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { getVertriebStore } from "@/lib/lead-store"
 import { MUSTER_AB, marktRueckmeldung, unterDruck } from "@/lib/verlust"
@@ -43,7 +43,8 @@ export default async function VerlustPage() {
    * nur die juengste Seite liest, meldet die Haeufung des letzten Monats als
    * Marktwissen — und das ist genau der Fehler, gegen den sie gebaut ist.
    */
-  const { rows, total } = await store.listOpportunities({ status: "lost", limit: 500 })
+  const GRENZE = 500
+  const { rows, total } = await store.listOpportunities({ status: "lost", limit: GRENZE })
   const schleife = marktRueckmeldung(rows.map((r) => r.lostReason))
   const druck = unterDruck(schleife)
   const gezaehlt = schleife.rueckmeldungen.reduce((n, r) => n + r.anzahl, 0)
@@ -75,6 +76,18 @@ export default async function VerlustPage() {
         </Surface>
       ) : (
         <>
+          {/*
+            Hier waere eine abgeschnittene Liste teurer als anderswo: Die
+            Schleife RECHNET ueber die Zeilen und nennt das Ergebnis ein
+            Muster. Sind es 500 von 800, ist das Muster das der ersten 500 —
+            und liest sich trotzdem wie das aller.
+          */}
+          <Abschneidehinweis
+            gezeigt={rows.length}
+            grenze={GRENZE}
+            wie="Die Auswertung darunter rechnet nur über diese Zeilen, nicht über alle."
+          />
+
           <section aria-labelledby="gruende-titel">
             <SectionHeader id="gruende-titel" title="Was gesagt wurde" />
             <ul className="mt-4 flex flex-col gap-3">

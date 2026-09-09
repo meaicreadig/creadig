@@ -2,7 +2,14 @@
 
 import { useActionState } from "react"
 
-import { AdminField, AdminInput, AdminSelect, Pill, Surface } from "@/components/admin/primitives"
+import {
+  AdminField,
+  AdminInput,
+  AdminSelect,
+  Pill,
+  Speicherstand,
+  Surface,
+} from "@/components/admin/primitives"
 import { JA_FORMEN } from "@/lib/angebot"
 import {
   BELEG_FRAGE,
@@ -11,7 +18,6 @@ import {
   belegMoment,
   livetermin,
   terminMitAenderungen,
-  type Mangel,
   type Projekt,
 } from "@/lib/lieferung"
 import type { LieferAntwort } from "@/app/(admin)/admin/vertrieb/actions"
@@ -42,23 +48,25 @@ import type { LieferAntwort } from "@/app/(admin)/admin/vertrieb/actions"
  * `lib/proof.ts`, aus einem Dokument, das ein Mensch unterschrieben hat.
  */
 
+/*
+ * DER ANFANGSZUSTAND — und warum er an seiner IDENTITAET erkannt wird.
+ *
+ * `LEER` traegt `ok: true`, weil der Typ nur zwei Zustaende kennt. „Noch
+ * nichts abgeschickt" sieht darin aus wie „hat geklappt" — und die
+ * Speicheranzeige haette beim blossen Oeffnen der Seite „Gespeichert."
+ * gemeldet.
+ *
+ * `useActionState` gibt genau dieses Objekt zurueck, bis eine Aktion
+ * gelaufen ist. Der Vergleich auf Referenzgleichheit unterscheidet die
+ * beiden Faelle deshalb sicher, ohne den Antworttyp der Server-Aktion um
+ * einen dritten Zustand zu erweitern.
+ */
 const LEER: LieferAntwort = { ok: true, maengel: [] }
 
-function Maengel({ antwort }: { antwort: LieferAntwort }) {
-  if (antwort.ok || antwort.maengel.length === 0) return null
-  return (
-    <Surface padding="sm" className="mt-4">
-      <ul className="flex flex-col gap-2">
-        {antwort.maengel.map((m: Mangel, i: number) => (
-          <li key={i} className="type-small text-muted-foreground text-pretty">
-            <span className="text-foreground">{m.bereich}: </span>
-            {m.satz}
-          </li>
-        ))}
-      </ul>
-    </Surface>
-  )
-}
+/*
+ * `Maengel` ist durch `Speicherstand` ersetzt — dieselbe Luecke wie in der
+ * Angebots-Mappe: nur der Fehler wurde gemeldet, Erfolg und Wartezeit nicht.
+ */
 
 export function LieferungMappe({
   opportunityId,
@@ -77,13 +85,13 @@ export function LieferungMappe({
   abnahme: (opportunityId: string, form: FormData) => Promise<LieferAntwort>
   uebergabe: (opportunityId: string, form: FormData) => Promise<LieferAntwort>
 }) {
-  const [startA, startAction] = useActionState(
+  const [startA, startAction, startW] = useActionState(
     async (_: LieferAntwort, f: FormData) => starten(opportunityId, f), LEER)
-  const [matA, matAction] = useActionState(
+  const [matA, matAction, matW] = useActionState(
     async (_: LieferAntwort, f: FormData) => material(opportunityId, f), LEER)
-  const [abnA, abnAction] = useActionState(
+  const [abnA, abnAction, abnW] = useActionState(
     async (_: LieferAntwort, f: FormData) => abnahme(opportunityId, f), LEER)
-  const [uebA, uebAction] = useActionState(
+  const [uebA, uebAction, uebW] = useActionState(
     async (_: LieferAntwort, f: FormData) => uebergabe(opportunityId, f), LEER)
 
   const offen = angenommeneAngebote.filter((a) => !projekte.some((p) => p.offerId === a.id))
@@ -109,7 +117,12 @@ export function LieferungMappe({
           <button type="submit" className="cta-quiet px-4 py-2 text-sm">Aufsetzen</button>
         </form>
       )}
-      <Maengel antwort={startA} />
+      <Speicherstand
+        wartet={startW}
+        ok={startA === LEER ? null : startA.ok}
+        punkte={startA.maengel.map((x) => ({ wo: x.bereich, satz: x.satz }))}
+        erfolgssatz="Projekt aufgesetzt."
+      />
 
       <ul className="mt-6 flex flex-col gap-4">
         {projekte.map((p) => {
@@ -227,9 +240,24 @@ export function LieferungMappe({
           )
         })}
       </ul>
-      <Maengel antwort={matA} />
-      <Maengel antwort={abnA} />
-      <Maengel antwort={uebA} />
+      <Speicherstand
+        wartet={matW}
+        ok={matA === LEER ? null : matA.ok}
+        punkte={matA.maengel.map((x) => ({ wo: x.bereich, satz: x.satz }))}
+        erfolgssatz="Gespeichert."
+      />
+      <Speicherstand
+        wartet={abnW}
+        ok={abnA === LEER ? null : abnA.ok}
+        punkte={abnA.maengel.map((x) => ({ wo: x.bereich, satz: x.satz }))}
+        erfolgssatz="Abnahme festgehalten."
+      />
+      <Speicherstand
+        wartet={uebW}
+        ok={uebA === LEER ? null : uebA.ok}
+        punkte={uebA.maengel.map((x) => ({ wo: x.bereich, satz: x.satz }))}
+        erfolgssatz="Übergabe festgehalten."
+      />
     </div>
   )
 }

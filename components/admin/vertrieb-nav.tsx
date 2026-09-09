@@ -63,7 +63,14 @@ export function VertriebNav() {
               <Link
                 href={tab.href}
                 aria-current={active ? "page" : undefined}
-                className={`-mb-px block border-b-2 px-3 py-2.5 text-sm transition-colors duration-[var(--dur-1)] ${
+                /*
+                  `min-h-11` = 44 Pixel. `py-2.5` ergab mit `text-sm` genau
+                  42 — zwei zu wenig fuer ein Ziel, das ein Finger sicher
+                  trifft, und auf 390 Pixeln brechen diese sechs Register in
+                  zwei Reihen um, liegen also dicht beieinander. Gemessen am
+                  09.09.2026 an allen sechs.
+                */
+                className={`-mb-px inline-flex min-h-11 items-center border-b-2 px-3 py-2.5 text-sm transition-colors duration-[var(--dur-1)] ${
                   active
                     ? "border-gold text-foreground"
                     : "text-muted-foreground hover:text-foreground border-transparent"

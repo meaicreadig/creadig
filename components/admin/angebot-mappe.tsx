@@ -2,7 +2,15 @@
 
 import { useActionState } from "react"
 
-import { AdminField, AdminInput, AdminSelect, AdminTextarea, Pill, Surface } from "@/components/admin/primitives"
+import {
+  AdminField,
+  AdminInput,
+  AdminSelect,
+  AdminTextarea,
+  Pill,
+  Speicherstand,
+  Surface,
+} from "@/components/admin/primitives"
 import {
   ABSCHNITTE,
   ANGEBOT_ZUSTAENDE,
@@ -12,7 +20,6 @@ import {
   seiten,
   SEITEN_HINWEIS_AB,
   type Angebot,
-  type Befund,
 } from "@/lib/angebot"
 import { OFFER_KINDS, OFFERS } from "@/lib/offer-readiness"
 import type { AngebotAntwort } from "@/app/(admin)/admin/vertrieb/actions"
@@ -47,27 +54,27 @@ import type { AngebotAntwort } from "@/app/(admin)/admin/vertrieb/actions"
  * letzte Aktion geantwortet hat.
  */
 
+/*
+ * DER ANFANGSZUSTAND — und warum er an seiner IDENTITAET erkannt wird.
+ *
+ * `LEER` traegt `ok: true`, weil der Typ nur zwei Zustaende kennt. „Noch
+ * nichts abgeschickt" sieht darin aus wie „hat geklappt" — und die
+ * Speicheranzeige haette beim blossen Oeffnen der Seite „Gespeichert."
+ * gemeldet.
+ *
+ * `useActionState` gibt genau dieses Objekt zurueck, bis eine Aktion
+ * gelaufen ist. Der Vergleich auf Referenzgleichheit unterscheidet die
+ * beiden Faelle deshalb sicher, ohne den Antworttyp der Server-Aktion um
+ * einen dritten Zustand zu erweitern.
+ */
 const LEER: AngebotAntwort = { ok: true, befunde: [] }
 
-function Befunde({ antwort }: { antwort: AngebotAntwort }) {
-  if (antwort.ok || antwort.befunde.length === 0) return null
-  return (
-    <Surface padding="sm" className="mt-4">
-      <p className="type-small text-subhead">
-        Das geht so nicht hinaus — {antwort.befunde.length} offene{antwort.befunde.length === 1 ? "r" : ""} Punkt
-        {antwort.befunde.length === 1 ? "" : "e"}:
-      </p>
-      <ul className="mt-3 flex flex-col gap-2">
-        {antwort.befunde.map((b: Befund, i: number) => (
-          <li key={i} className="type-small text-muted-foreground text-pretty">
-            <span className="text-foreground">{b.abschnitt}: </span>
-            {b.satz}
-          </li>
-        ))}
-      </ul>
-    </Surface>
-  )
-}
+/*
+ * `Befunde` ist durch `Speicherstand` ersetzt. Sie zeigte nur den Fehler:
+ * bei Erfolg nichts, waehrend des Speicherns nichts. Wer nichts sieht,
+ * drueckt noch einmal — und bei „Angebot senden" ist der zweite Klick eine
+ * zweite Zusage.
+ */
 
 export function AngebotMappe({
   opportunityId,
@@ -87,15 +94,15 @@ export function AngebotMappe({
   senden: (opportunityId: string, form: FormData) => Promise<AngebotAntwort>
   annehmen: (opportunityId: string, form: FormData) => Promise<AngebotAntwort>
 }) {
-  const [neuAntwort, neuAction] = useActionState(
+  const [neuAntwort, neuAction, neuWartet] = useActionState(
     async (_: AngebotAntwort, form: FormData) => speichern(opportunityId, form),
     LEER,
   )
-  const [sendenAntwort, sendenAction] = useActionState(
+  const [sendenAntwort, sendenAction, sendenWartet] = useActionState(
     async (_: AngebotAntwort, form: FormData) => senden(opportunityId, form),
     LEER,
   )
-  const [jaAntwort, jaAction] = useActionState(
+  const [jaAntwort, jaAction, jaWartet] = useActionState(
     async (_: AngebotAntwort, form: FormData) => annehmen(opportunityId, form),
     LEER,
   )
@@ -165,7 +172,12 @@ export function AngebotMappe({
           ))}
         </ul>
       )}
-      <Befunde antwort={jaAntwort} />
+      <Speicherstand
+        wartet={jaWartet}
+        ok={jaAntwort === LEER ? null : jaAntwort.ok}
+        punkte={jaAntwort.befunde.map((b) => ({ wo: b.abschnitt, satz: b.satz }))}
+        erfolgssatz="Annahme festgehalten."
+      />
 
       <form action={neuAction} className="mt-2">
         {entwurf && <input type="hidden" name="id" value={entwurf.id} />}
@@ -248,7 +260,12 @@ export function AngebotMappe({
           {entwurf ? "Entwurf speichern" : "Entwurf anlegen"}
         </button>
       </form>
-      <Befunde antwort={neuAntwort} />
+      <Speicherstand
+        wartet={neuWartet}
+        ok={neuAntwort === LEER ? null : neuAntwort.ok}
+        punkte={neuAntwort.befunde.map((b) => ({ wo: b.abschnitt, satz: b.satz }))}
+        erfolgssatz="Entwurf gespeichert."
+      />
 
       {entwurf && (
         <>
@@ -262,7 +279,12 @@ export function AngebotMappe({
                 : ""}
             </span>
           </form>
-          <Befunde antwort={sendenAntwort} />
+          <Speicherstand
+        wartet={sendenWartet}
+        ok={sendenAntwort === LEER ? null : sendenAntwort.ok}
+        punkte={sendenAntwort.befunde.map((b) => ({ wo: b.abschnitt, satz: b.satz }))}
+        erfolgssatz="Angebot gesendet."
+      />
         </>
       )}
     </div>

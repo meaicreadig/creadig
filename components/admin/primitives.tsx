@@ -178,6 +178,122 @@ export function UnavailableNote({
   )
 }
 
+/**
+ * DER SPEICHERSTAND — vier Zustaende, eine Stelle.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM ES IHN GIBT
+ * Die Mappen im Vertrieb meldeten bis zum 09.09.2026 nur den FEHLER. Die
+ * Befund-Anzeige begann mit `if (antwort.ok || befunde.length === 0) return
+ * null` — bei Erfolg also nichts, und waehrend des Speicherns auch nichts.
+ *
+ * Der Owner drueckt „Speichern" und sieht: nichts. Er weiss nicht, ob der
+ * Klick angekommen ist, ob noch gerechnet wird, ob es geklappt hat. Also
+ * drueckt er noch einmal. Das ist keine Kosmetik — bei „Angebot senden" ist
+ * der zweite Klick eine zweite Zusage.
+ *
+ * `useActionState` liefert den Wartezustand als drittes Element mit. Er war
+ * da, er wurde nur nie ausgelesen.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM `role="status"` UND KEIN TOAST
+ * Ein Toast erscheint woanders als der Knopf und verschwindet von selbst —
+ * wer die Maus fuehrt, sieht ihn nicht immer, und wer vorliest, gar nicht.
+ * Diese Meldung steht, wo gehandelt wurde, und `aria-live="polite"` bringt
+ * sie ins Vorleseprogramm, ohne die Eingabe zu unterbrechen.
+ */
+export function Speicherstand({
+  wartet,
+  ok,
+  punkte,
+  erfolgssatz = "Gespeichert.",
+}: {
+  wartet: boolean
+  /**
+   * `null` heisst: noch nichts abgeschickt. Nicht dasselbe wie Erfolg —
+   * sonst stuende „Gespeichert." schon beim Oeffnen der Seite.
+   */
+  ok: boolean | null
+  /**
+   * Die offenen Punkte, auf ein Vokabular gebracht.
+   *
+   * Die Mappen nennen sie verschieden — `befunde`/`abschnitt` beim Angebot,
+   * `maengel`/`bereich` bei der Lieferung. Das Primitive kennt keines von
+   * beiden: Wer es benutzt, uebersetzt einmal beim Aufruf, und diese
+   * Anzeige bleibt von der Fachsprache der Mappe unabhaengig.
+   */
+  punkte: { wo: string; satz: string }[]
+  erfolgssatz?: string
+}) {
+  const gescheitert = ok === false && punkte.length > 0
+  const gelungen = ok === true
+  if (!wartet && !gescheitert && !gelungen) return null
+
+  return (
+    <div role="status" aria-live="polite" className="mt-4">
+      {wartet ? (
+        <p className="type-small text-muted-foreground">Wird gespeichert …</p>
+      ) : gelungen ? (
+        <p className="type-small text-gold-text">{erfolgssatz}</p>
+      ) : (
+        <Surface padding="sm">
+          <p className="type-small text-subhead">
+            Das geht so nicht hinaus — {punkte.length} offene
+            {punkte.length === 1 ? "r Punkt" : " Punkte"}:
+          </p>
+          <ul className="mt-3 flex flex-col gap-2">
+            {punkte.map((b, i) => (
+              <li key={i} className="type-small text-muted-foreground text-pretty">
+                <span className="text-foreground">{b.wo}: </span>
+                {b.satz}
+              </li>
+            ))}
+          </ul>
+        </Surface>
+      )}
+    </div>
+  )
+}
+
+/**
+ * Der Hinweis, dass eine Liste abgeschnitten sein koennte.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM ES IHN GIBT
+ * Jede Liste im Vertrieb holt hoechstens eine feste Zahl Zeilen — 100, 200,
+ * 500. Vier der sechs sagen dazu „N von Total"; wer dort 100 von 340 liest,
+ * weiss, dass er nicht alles sieht, und kann suchen oder filtern.
+ *
+ * Zwei sagten es nicht. Recherche und Verlust zeigten schlicht, was kam. Eine
+ * Liste, die bei genau ihrer Obergrenze endet, sieht aus wie eine
+ * vollstaendige — und der Owner sucht Datensatz 137 dann in einer Liste, die
+ * bei 100 aufgehoert hat, ohne es zu sagen.
+ *
+ * Der Hinweis behauptet nichts, was er nicht weiss: Er sagt „koennte", weil
+ * eine Liste, die genau die Obergrenze trifft, auch genau so lang sein kann.
+ * Das ist dieselbe Unterscheidung wie ueberall in diesem Haus — nicht
+ * gemessen ist nicht null.
+ */
+export function Abschneidehinweis({
+  gezeigt,
+  grenze,
+  wie,
+}: {
+  gezeigt: number
+  grenze: number
+  /** Was der Owner tun kann, um den Rest zu sehen. */
+  wie: string
+}) {
+  if (gezeigt < grenze) return null
+  return (
+    <p className="type-small text-muted-foreground border-line mt-4 border-s-2 py-1 ps-4 text-pretty">
+      Diese Liste zeigt {grenze} Eintraege — die Obergrenze. Ob es mehr gibt, steht hier nicht.
+      {" "}
+      {wie}
+    </p>
+  )
+}
+
 /* ------------------------------------------------------------------------ */
 /* Formular — ein Dialekt für Safari, Chrome und Firefox                     */
 /* ------------------------------------------------------------------------ */
