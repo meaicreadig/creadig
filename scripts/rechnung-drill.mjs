@@ -182,7 +182,7 @@ p(f.ueberfaellig && f.tage === 16, "und die Ueberfaelligkeit ebenso", `${f.tage}
 p(/entscheiden Sie/.test(f.satz), "und die Ansprache bleibt beim Menschen")
 p(!R.faelligkeit(gestellt([{ id: "z", betragCent: brutto, wertstellung: "2026-09-05", beleg: "ABNAHME K" }]), new Date("2026-10-01")).ueberfaellig,
   "was eingegangen ist, ist nicht ueberfaellig")
-p(R.NIEMALS_AUTOMATISCH.length === 4, "vier Dinge passieren auch dann nicht automatisch")
+p(R.NIEMALS_AUTOMATISCH.length === 5, "fuenf Dinge passieren auch dann nicht automatisch")
 
 /* ══ R17–R18 · Was es nicht gibt ══ */
 console.log("\nR17–R18 · Was es bewusst nicht gibt")

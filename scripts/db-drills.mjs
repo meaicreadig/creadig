@@ -56,6 +56,8 @@ const LAEUFE = [
   { name: "evidence", db: "drill_evidence", variable: "EVIDENCE_DRILL_URL" },
   /* GATE 18 — Rechnung und Zahlungseingang. */
   { name: "rechnung", db: "drill_rechnung", variable: "RECHNUNG_DRILL_URL" },
+  /* GATE 20 — die Kette ueber Angebot, Rechnung und Lieferung hinweg. */
+  { name: "kette", db: "drill_kette", variable: "KETTE_DRILL_URL" },
 ]
 
 function psql(sql) {

@@ -397,6 +397,91 @@ export function stornierbar(r: Rechnung): Stornierbarkeit {
   return { ok: true, grund: "Storno statt Änderung. Die alte Rechnung bleibt in der Akte." }
 }
 
+/* ── Der Zahlungsplan — das oeffentliche Versprechen, ausfuehrbar ───────── */
+
+/*
+ * GATE 20 — DIE LUECKE ZWISCHEN ZWEI GATES
+ *
+ * Auf der Paketzeile steht seit langem ein Satz:
+ *
+ *   „50 % bei Start, 50 % bei Ihrer Freigabe."
+ *
+ * G19 hat ihn in seinem eigenen Kopfkommentar benannt — „eine Zahlung, die
+ * an der Abnahme haengt" — und konnte ihn nicht bauen: G18 gab es damals
+ * nicht. G18 hat die Rechnung gebaut und wusste nichts von Projekten.
+ *
+ * Ergebnis: zwei Gates, beide fuer sich richtig, und dazwischen ein
+ * Versprechen, das nirgends wirkt. Genau die Art Luecke, die ein einzelnes
+ * Gate nicht findet, weil sie in keinem von beiden liegt.
+ *
+ * Der Plan steht hier und nicht in `lib/lieferung.ts`, weil er von Geld
+ * handelt. Er LIEST den Projektzustand, er aendert ihn nicht — die Lieferung
+ * bleibt die Wahrheit ueber den Fortschritt, die Rechnung die ueber das Geld.
+ * Keines von beiden leitet das andere ab.
+ *
+ * NUR FUER DAS WEBSITE-PAKET. Der Satz steht genau einmal auf der Seite, an
+ * genau einem Paket. Ihn auf Pruefung, Behebung, Systemprojekt oder Betrieb
+ * auszudehnen hiesse, ein Versprechen zu erfinden, das nie jemand gegeben
+ * hat — und der Kunde haette recht, wenn er widerspricht.
+ */
+export type Rate = {
+  key: "start" | "freigabe"
+  anteil: number
+  /** Der Projektzustand, ab dem sie faellig wird. */
+  ausloeser: "aufgesetzt" | "abgenommen"
+  satz: string
+}
+
+export const ZAHLUNGSPLAN: readonly Rate[] = [
+  { key: "start", anteil: 50, ausloeser: "aufgesetzt", satz: "50 % bei Start" },
+  { key: "freigabe", anteil: 50, ausloeser: "abgenommen", satz: "50 % bei Ihrer Freigabe" },
+]
+
+export type FaelligeRate = Rate & { betragCent: Cent; faellig: boolean; warum: string }
+
+/**
+ * Welche Rate der Projektzustand faellig macht — und welche noch nicht.
+ *
+ * `null`, wenn das Angebot kein Website-Paket ist: Dann gibt es keinen
+ * veroeffentlichten Plan, und ein erfundener waere schlechter als keiner.
+ *
+ * DIE RUNDUNG IST KEINE NEBENSACHE. Bei einem ungeraden Cent-Betrag ergeben
+ * zwei mal 50 % nicht die Summe. Die letzte Rate traegt deshalb den Rest —
+ * sonst fehlt am Ende ein Cent, und ein fehlender Cent ist eine offene
+ * Forderung, die niemand versteht.
+ */
+export function raten(
+  angebotsart: string,
+  bruttoCent: Cent,
+  projektZustand: "aufgesetzt" | "laeuft" | "abgenommen" | "uebergeben" | null,
+): FaelligeRate[] | null {
+  if (angebotsart !== "website") return null
+
+  const erreicht = (ausloeser: Rate["ausloeser"]) => {
+    if (projektZustand === null) return false
+    if (ausloeser === "aufgesetzt") return true
+    return projektZustand === "abgenommen" || projektZustand === "uebergeben"
+  }
+
+  let vergeben = 0
+  return ZAHLUNGSPLAN.map((r, i) => {
+    const letzte = i === ZAHLUNGSPLAN.length - 1
+    const betragCent = letzte ? bruttoCent - vergeben : Math.round((bruttoCent * r.anteil) / 100)
+    vergeben += betragCent
+    const faellig = erreicht(r.ausloeser)
+    return {
+      ...r,
+      betragCent,
+      faellig,
+      warum: faellig
+        ? `Fällig — ${r.satz}.`
+        : projektZustand === null
+          ? "Noch kein Projekt. Ohne angenommenes Angebot ist nichts fällig."
+          : `Noch nicht fällig: ${r.satz} verlangt die Abnahme, das Projekt steht auf „${projektZustand}“.`,
+    }
+  })
+}
+
 /**
  * Was auch dann nicht automatisch passiert, wenn alles steht.
  *
@@ -408,4 +493,5 @@ export const NIEMALS_AUTOMATISCH = [
   "Keine Mahnung geht raus. Überfällig wird angezeigt, nicht gemahnt.",
   "Kein Zahlungseingang wird vermutet — jeder braucht einen Beleg.",
   "Keine Rechnung wird bezahlt, weil sie alt ist.",
+  "Keine Abnahme erzeugt eine Zahlung, und keine Zahlung erzeugt eine Abnahme.",
 ]
