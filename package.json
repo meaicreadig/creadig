@@ -7,7 +7,7 @@
     "predev": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs && node scripts/generate-company-media.mjs && node scripts/generate-logo-masse.mjs",
     "prebuild": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs && node scripts/generate-company-media.mjs && node scripts/generate-logo-masse.mjs",
     "build": "next build",
-    "postbuild": "node scripts/check-function-size.mjs && node scripts/check-reviews.mjs && node scripts/check-parity.mjs && node scripts/check-bestand.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-freigaben.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-auftritt.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-redaktion.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-herkunft.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-angebot.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-lieferung.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-produkt.mjs && node scripts/check-rechnung.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-verkauf.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-rollen.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-betrieb.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-kundenerfolg.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-wirtschaft.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-gedaechtnis.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-navigator.mjs",
+    "postbuild": "node scripts/check-function-size.mjs && node scripts/check-reviews.mjs && node scripts/check-parity.mjs && node scripts/check-bestand.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-freigaben.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-auftritt.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-redaktion.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-herkunft.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-angebot.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-lieferung.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-produkt.mjs && node scripts/check-rechnung.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-verkauf.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-rollen.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-betrieb.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-kundenerfolg.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-wirtschaft.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-gedaechtnis.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-navigator.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-ereignis.mjs",
     "start": "next start",
     "lint": "eslint .",
     "shots": "node scripts/screenshots.mjs",
@@ -42,7 +42,8 @@
     "kundenerfolg-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/kundenerfolg-drill.mjs",
     "wirtschaft-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/wirtschaft-drill.mjs",
     "gedaechtnis-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/gedaechtnis-drill.mjs",
-    "navigator-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/navigator-drill.mjs"
+    "navigator-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/navigator-drill.mjs",
+    "ereignis-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/ereignis-drill.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

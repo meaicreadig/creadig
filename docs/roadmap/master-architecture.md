@@ -472,9 +472,50 @@ Franchise **eine** Beziehung sind und kein Branchenmuster.
 
 ### Etappe IX · Automation
 
-**G26 · Ereignis- & Automationsschicht** — Ereignisse, Auslöser, Idempotenz,
+**G26 ⬥ Ereignis- & Automationsschicht** — Ereignisse, Auslöser, Idempotenz,
 Fehlerbehandlung, Nachvollziehbarkeit, menschliche Übersteuerung.
 *Regel:* Wiederholung automatisieren, **nicht Verantwortung**.
+
+*Geschlossen 09.09.2026.* Die Regel aus dem Vertrag **ist** die ganze Datei.
+
+**Kein zweites Vokabular:** Die Ereignisse gibt es seit G08 — der Speicher
+schreibt `offer.sent`, `project.accepted` und sechzehn weitere in
+`activities`. Das Register nimmt genau diese und sagt, was aus ihnen folgen
+darf; das Gate hält beide Listen gegeneinander. Wäre es andersherum, hätte
+dieses Haus zwei Chroniken, und beim ersten Auseinanderlaufen gewönne die, in
+die niemand schaut.
+
+**Die Grenze steht als Daten, nicht als Vorsatz.** `NIEMALS_AUTOMATISCH`
+führt zehn Handlungen, die kein Auslöser je ausführen darf — jede mit dem
+Gate, aus dem das Verbot stammt: einen Menschen ansprechen (G11), ein Angebot
+senden oder annehmen (G17), eine Lieferung abnehmen (G19), eine Rechnung
+stellen oder ausbuchen (G18), um eine Empfehlung bitten (G22), eine Freigabe
+erzeugen (G13), einen Reifegrad setzen (G24), einen Preis nennen (G17).
+Keiner ist neu erfunden — eine Verbotsliste, die sich jemand ausdenkt, ist
+eine Meinung; eine, die vorhandene Regeln zusammenträgt, ist eine
+Zusammenfassung.
+
+**Vier Wirkungen, alle Wiederholung:** notieren · erinnern · weiterreichen ·
+prüfen. Wer eine fünfte braucht, braucht keinen Auslöser, sondern einen
+Menschen.
+
+**Der Mensch schlägt die Maschine — und zwar vor der Idempotenz.** Wer
+abschaltet, will, dass nichts geschieht; nicht, dass es einmal noch
+geschieht, weil es noch nicht dran war. Ein abgeschalteter Auslöser bekommt
+deshalb nicht einmal einen Schlüssel.
+
+**Idempotenz wird abgeleitet, nie gewürfelt** (`auslöser:ereignis:gegenstand`).
+Ein zufälliger Schlüssel ist keiner — beim zweiten Lauf desselben Ereignisses
+entstünde ein neuer, und die Wirkung träte zweimal ein. Das ist der Fehler,
+den man erst im Postfach des Kunden bemerkt.
+
+*Heute drei Auslöser, und alle drei notieren, erinnern oder prüfen.* Bewusst
+mager: Die Schicht soll beweisen, dass die **Grenze hält**, nicht dass sie
+viel kann.
+
+**G27 bleibt offen, und das ist richtig.** Ob die Owner-Last sinkt, zeigen
+Messwerte über Zeit — nicht diese Schicht. Ohne diese Trennung wäre genau das
+entstanden, wovor G27 warnt: Automationstheater.
 
 **G27 ⬥ Owner-Last gesunken** — messbar, nicht behauptet. *Ohne dieses Gate:*
 Automationstheater.
