@@ -481,7 +481,38 @@ Automationstheater.
 
 ### Etappe X · Intelligenz
 
-**G28 · Betriebsgedächtnis** — einheitlicher Kontext, Abruf, Belegpflicht.
+**G28 ⬥ Betriebsgedächtnis** — einheitlicher Kontext, Abruf, Belegpflicht.
+
+*Geschlossen 09.09.2026.* Der Zustand dieses Hauses stand an siebzehn
+Stellen, und jede war richtig. Was fehlte, war **die Frage**: Wer wissen
+wollte „wie steht es um X", musste wissen, *wo* man das nachsieht. Und
+`material-status.ts` sammelt zwar Punkte, aber **ohne Fundstelle** — es sagt,
+dass etwas offen ist, nicht, woher es das weiß.
+
+**Drei Regeln tragen das Gate:**
+
+1. **Belegpflicht.** Jede Auskunft trägt mindestens einen Beleg — das Modul,
+   aus dem sie stammt, und was dort steht, jeweils mit Gate-Nummer. Eine
+   Auskunft ohne Beleg gibt es nicht; sie wäre eine Behauptung mit
+   *Systemstimme*, und die ist gefährlicher als eine mit Menschenstimme, weil
+   ihr niemand widerspricht.
+2. **Kein zweiter Speicher.** Das Modul hält nichts fest, es *rechnet* jede
+   Auskunft im Moment der Frage aus den Registern. Ein Gedächtnis mit eigener
+   Kopie ist die zweite Wahrheit — und die gefährlichste Sorte, weil sie sich
+   richtig anfühlt: Sie war einmal richtig.
+3. **Unbekannt bleibt unbekannt.** `steht: null` ist etwas Drittes, kein Nein.
+
+*Die dritte Regel hat die Blindprobe geschärft.* Der Wächter fing zunächst nur
+die harmlose Richtung — ein `null`, das sich als ja/nein ausgibt. Die
+gefährliche ist die andere: ein **nicht Erhobenes, das als hartes Nein
+gemeldet wird**. Dann wird aus „nicht erhoben" ein „nicht in Ordnung", und
+jemand behebt etwas, das nicht kaputt ist — oder hält eine offene
+Owner-Frage für einen Systemfehler und wartet, dass sie sich löst. Das ist am
+Text nicht erkennbar; das Gate hält die Auskunft deshalb **gegen ihre
+Quelle**.
+
+*Es ist ein Gedächtnis, keine Empfehlung.* Was zu tun ist, wohnt in **G29** —
+mit eigener Belegpflicht. Ein Gedächtnis, das mitentscheidet, ist keins mehr.
 **G29 · Vorbereitung & Empfehlung** — Empfehlung **mit Beleg**, Entscheidung
 beim Menschen. Hier wohnt der **Digitale Betriebsnavigator**.
 **G30 · Handelnde Agenten unter Regeln** — begrenzte Vollmacht, Rechte,
