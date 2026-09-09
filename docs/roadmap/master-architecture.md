@@ -348,10 +348,39 @@ gegeneinander, und das Gate bricht ab, sobald ein Wert in
 Prüfung mitzubauen, wäre genau der Fehler gewesen, vor dem der alte Kommentar
 warnt.
 
-**G25 · Produkt-Kommerzialisierung** — Wann wird ein Produkt verkäuflich?
+**G25 ⬥ Produkt-Kommerzialisierung** — Wann wird ein Produkt verkäuflich?
 *Unabhängig, weil* die kaufmännische und rechtliche Grenze eine andere ist als
 beim Bauen. Enthält die Schleife: wiederkehrendes Kundenproblem → Muster →
 Produktkandidat.
+
+*Geschlossen 09.09.2026.* Die Schwelle rechnet nichts neu — sie **sammelt
+ein**, was anderswo schon entschieden ist:
+
+| # | Bedingung | Woher |
+|---|---|---|
+| 1 | Reifegrad mindestens **Pilot**, bestätigt und nicht veraltet | G24 |
+| 2 | Eigentümer — jemand antwortet dafür | G24 |
+| 3 | Rückmeldeweg — eine Störung ist meldbar | G24 |
+| 4 | Preisquelle: Katalog oder Owner-Freigabe mit Fundstelle | G17 |
+| 5 | Steuerlage **nicht offen** | G18 |
+| 6 | Betrieb danach — wer es führt, nachdem es verkauft ist | G19-Doktrin |
+
+Bedingung 1 und 5 sind der Grund, warum das Gate eigenständig ist: Ein
+Produkt kann technisch tadellos laufen und trotzdem unverkäuflich sein, weil
+niemand es abrechnen kann. Bedingung 6 steht öffentlich auf der Seite („wir
+übergeben nicht und verschwinden") — ohne sie wäre der Satz beim ersten
+Verkauf gebrochen.
+
+**Heute nimmt kein Produkt die Schwelle**, und das Gate sagt bei jedem Build
+warum: Reifegrad 4×, Preis 4×, Steuerlage 4×, Betrieb danach 4×.
+
+*Die Schleife* hat eine Richtung, und die ist der ganze Punkt. Ein Kandidat
+kommt aus **drei belegten Beobachtungen bei mindestens zwei verschiedenen
+Betrieben** — die Zahl wird aus **G16** importiert, nicht wiederholt. Die
+zweite Bedingung ist die, die man vergisst: Drei Meldungen desselben Kunden
+sind ein *Kundenproblem*, und das löst man im Projekt, nicht mit einem
+Produkt. Dieselbe Lehre wie im Hypothesen-Register, wo drei Filialen einer
+Franchise **eine** Beziehung sind und kein Branchenmuster.
 
 ### Etappe IX · Automation
 
