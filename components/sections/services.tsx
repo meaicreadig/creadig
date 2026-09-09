@@ -24,6 +24,21 @@ import { Disclosure } from "@/components/ui/disclosure"
  * Kacheln der Startseite nicht nur „irgendwohin nach /leistungen" fuehren,
  * sondern genau auf die Ebene, auf die geklickt wurde.
  */
+/*
+ * Die Einrueckung je Ebene, von der Spitze (0) zur Basis (4).
+ *
+ * Tailwind erzeugt nur Literale — ein gerechnetes `mx-[${n}%]` entstuende
+ * nie. Fuenf feste Paare sind ausserdem ehrlicher: Das Bauwerk hat genau
+ * fuenf Stufen, und wer eine sechste ergaenzt, muss hier hinsehen.
+ */
+const EINRUECKUNG = [
+  "mx-0",
+  "mx-1 md:mx-[2%]",
+  "mx-2 md:mx-[4%]",
+  "mx-3 md:mx-[6%]",
+  "mx-4 md:mx-[8%]",
+] as const
+
 export function Services({ heading = true }: { heading?: boolean }) {
   const { t, locale } = useLocale()
 
@@ -86,8 +101,22 @@ export function Services({ heading = true }: { heading?: boolean }) {
         <div className="mt-20 flex flex-col-reverse gap-2">
           {serviceLayers.map((layer, i) => {
             const copy = t.services.layers[layer.key]
-            // Ebene 01 = schmalste Basis, Ebene 05 = breiteste Spitze der Wirkung
-            const inset = (serviceLayers.length - 1 - i) * 2
+            /*
+             * Ebene 01 = schmalste Basis, Ebene 05 = breiteste Spitze.
+             *
+             * Die Einrueckung ist ab `md` prozentual — dort kostet sie nichts
+             * und traegt das Bauwerk. Auf dem Telefon war sie es, die das
+             * Bauwerk kaputtmachte: Gemessen am 09.09.2026 auf 390 Pixeln
+             * blieben der untersten Ebene 287 Pixel, 74 Prozent des
+             * Bildschirms — 55 Pixel gingen an den Rand, waehrend die Stufe
+             * zwischen zwei Ebenen nur 6 Pixel betrug. Der Preis war
+             * sichtbar, die Metapher nicht.
+             *
+             * Feste kleine Werte darunter: 0/4/8/12/16 Pixel je Seite. Der erste
+             * Versuch nahm 0/8/16/24/32 — das sind bei 390 Pixeln fast genau
+             * dieselben acht Prozent, also gar keine Aenderung. Gemessen
+             * statt geschaetzt: 287 → 278 Pixel, es wurde sogar enger.
+             */
             const isTop = i === serviceLayers.length - 1
 
             return (
@@ -100,11 +129,10 @@ export function Services({ heading = true }: { heading?: boolean }) {
               >
                 <div
                   id={`ebene-${layer.key}`}
-                  style={{ marginLeft: `${inset}%`, marginRight: `${inset}%` }}
                   /* scroll-mt: die feste Leiste (4,5rem) darf den Anker nicht verdecken. */
                   className={`tile relative scroll-mt-28 transition-colors duration-[var(--dur-2)] ${
-                    isTop ? "bg-foreground/[0.03]" : ""
-                  } hover:bg-foreground/[0.04]`}
+                    EINRUECKUNG[serviceLayers.length - 1 - i]
+                  } ${isTop ? "bg-foreground/[0.03]" : ""} hover:bg-foreground/[0.04]`}
                 >
                   <span
                     aria-hidden="true"

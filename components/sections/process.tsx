@@ -24,6 +24,21 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
  * sondern derselbe benannte Zustand, den Fundament- und Abschlussband
  * benutzen.
  */
+/*
+ * MOBILE IST EINE EIGENE KOMPOSITION, KEIN UMBRUCH.
+ *
+ * Die senkrechten Abstaende hier waren fuer die Rasterfassung bemessen: drei
+ * Spalten oben, fuenf unten. Auf dem Schreibtisch liegen die Luecken
+ * ZWISCHEN den Spalten und kosten keine Hoehe. Gestapelt werden aus
+ * denselben Werten lauter Zeilenabstaende.
+ *
+ * Gemessen am 09.09.2026 auf 390 Pixeln: 2.631 Pixel Abschnitt fuer 1.190
+ * Pixel Text — 55 Prozent Luft. Zum Vergleich die Preis-Sektion derselben
+ * Seite: 31 Prozent. Der Ablauf war der einzige Ausreisser.
+ *
+ * Geaendert sind nur die kleinen Breakpoints. Ab `md` steht jeder Wert
+ * unveraendert; kein Wort ist fort, keine Zeile zusammengezogen.
+ */
 export function Process() {
   const { t } = useLocale()
 
@@ -47,22 +62,22 @@ export function Process() {
           </h2>
         </Reveal>
 
-        <div className="mt-20 grid gap-x-2.5 gap-y-12 md:grid-cols-3">
+        <div className="mt-12 grid gap-x-2.5 gap-y-8 md:mt-20 md:gap-y-12 md:grid-cols-3">
           {processSteps.map((step, i) => {
             const copy = t.process.steps[step.key]
             return (
               <Reveal
                 key={step.key}
                 delay={0.08 * i}
-                className="group border-line relative border-t pt-8 md:pr-10"
+                className="group border-line relative border-t pt-6 md:pt-8 md:pr-10"
               >
                 <span
                   aria-hidden="true"
                   className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                 />
                 <span className="eyebrow text-gold-text">{step.step}</span>
-                <h3 className="type-h3 mt-6">{copy.name}</h3>
-                <p className="type-body text-muted-foreground mt-5 max-w-sm text-pretty">
+                <h3 className="type-h3 mt-4 md:mt-6">{copy.name}</h3>
+                <p className="type-body text-muted-foreground mt-3 max-w-sm text-pretty md:mt-5">
                   {copy.what}
                 </p>
               </Reveal>
@@ -71,7 +86,7 @@ export function Process() {
         </div>
 
         <Reveal delay={0.2}>
-          <p className="type-statement border-line mt-20 max-w-4xl border-t pt-12 text-balance">
+          <p className="type-statement border-line mt-12 max-w-4xl border-t pt-8 text-balance md:mt-20 md:pt-12">
             {t.process.bridge}
           </p>
         </Reveal>
@@ -85,28 +100,28 @@ export function Process() {
           dieselbe Hairline-Sprache wie oben, nur vierspaltig und ohne zweite
           Headline: Es ist die Fortsetzung derselben Sektion, kein neuer Block.
         */}
-        <Reveal delay={0.24} className="mt-24">
+        <Reveal delay={0.24} className="mt-14 md:mt-24">
           <SectionEyebrow label={t.process.opsEyebrow} />
         </Reveal>
 
         {/* Fuenf Schritte seit V2-2 — die Spaltenzahl folgt der Liste, damit
             die letzte Spalte nicht leer bleibt (siehe Produkt-Bausteine). */}
-        <div className="mt-10 grid gap-x-2.5 gap-y-10 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-8 grid gap-x-2.5 gap-y-7 sm:gap-y-10 sm:grid-cols-2 lg:grid-cols-5">
           {opsSteps.map((step, i) => {
             const copy = t.process.opsSteps[step.key]
             return (
               <Reveal
                 key={step.key}
                 delay={0.06 * i}
-                className="group border-line relative border-t pt-7 lg:pr-8"
+                className="group border-line relative border-t pt-5 sm:pt-7 lg:pr-8"
               >
                 <span
                   aria-hidden="true"
                   className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                 />
                 <span className="eyebrow text-gold-text">{step.step}</span>
-                <h3 className="type-h4 mt-5">{copy.name}</h3>
-                <p className="type-small text-muted-foreground mt-4 max-w-xs text-pretty">
+                <h3 className="type-h4 mt-3 sm:mt-5">{copy.name}</h3>
+                <p className="type-small text-muted-foreground mt-2.5 max-w-xs text-pretty sm:mt-4">
                   {copy.what}
                 </p>
               </Reveal>
