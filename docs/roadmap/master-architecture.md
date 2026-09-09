@@ -513,8 +513,37 @@ Quelle**.
 
 *Es ist ein Gedächtnis, keine Empfehlung.* Was zu tun ist, wohnt in **G29** —
 mit eigener Belegpflicht. Ein Gedächtnis, das mitentscheidet, ist keins mehr.
-**G29 · Vorbereitung & Empfehlung** — Empfehlung **mit Beleg**, Entscheidung
+**G29 ⬥ Vorbereitung & Empfehlung** — Empfehlung **mit Beleg**, Entscheidung
 beim Menschen. Hier wohnt der **Digitale Betriebsnavigator**.
+
+*Geschlossen 09.09.2026.* Der Navigator rechnet **nichts neu** — der Kanon
+sagt es selbst: *„Er benutzt diese Routen und diese Treiber. Er erfindet keine
+zweite Qualifizierung."* Er liest das Betriebsgedächtnis (**G28**) und macht
+aus einer **Lage** einen **Vorschlag**. Die Lage gehört G28, die Entscheidung
+gehört einem Menschen, und dazwischen liegt genau dieses Modul.
+
+**Die schärfste Regel kommt aus G28: Nicht erhoben heißt *messen*, nicht
+*reparieren*.** Wo eine Lage `null` ist, darf der Vorschlag nur lauten
+„erheben". Wer aus einem Unbekannten eine Reparatur ableitet, behebt etwas,
+das niemand gemessen hat — und hält danach das Ergebnis für bestätigt.
+
+Daraus folgt auch die Reihenfolge: **erst messen, dann beheben** — nicht weil
+Messen wichtiger wäre, sondern weil eine Reparatur an ungemessener Stelle die
+Messung für immer unmöglich macht. *Innerhalb* der beiden Gruppen wird
+**nicht** sortiert: Eine Rangfolge wäre eine Entscheidung.
+
+**Eine Handlung ist ein Verb.** „Die Freigaben stehen aus" ist keine
+Empfehlung, sondern eine Wiederholung der Lage — davon wird niemand tätig.
+Jeder Vorschlag trägt Handlung, Adressat und die Auskunft, aus der er stammt,
+mitsamt deren Fundstellen.
+
+**Und er handelt nicht.** Kein Schreibzugriff, kein Speicher, kein Versand,
+keine Statusänderung. *„Wiederholung automatisieren, nicht Verantwortung"*
+steht als Regel bei G26 — hier gilt sie schon, bevor es eine Automation gibt,
+die sie brechen könnte.
+
+*Heute sagt er sieben Sätze:* zwei „messen", fünf „beheben" — und alle sieben
+gehören dem Owner. Das ist der Zustand, nicht die Schuld des Systems.
 **G30 · Handelnde Agenten unter Regeln** — begrenzte Vollmacht, Rechte,
 Übersteuerung, Prüfspur.
 **G31 ⬥ Empfehlungen tragen** — nützlich und vertrauenswürdig, an echten
