@@ -2,6 +2,15 @@ import { randomUUID } from "node:crypto"
 
 import { OFFERS } from "@/lib/offer-readiness"
 import { KATALOG, fehltFuer, type Angebot, type Annahme, type Befund, type Position } from "@/lib/angebot"
+import {
+  UEBERGABE_STUECKE,
+  fehltFuerZustand,
+  type Aenderung,
+  type Mangel,
+  type Projekt,
+  type UebergabeEintrag,
+  type UebergabeKey,
+} from "@/lib/lieferung"
 import { sanitizeClaim, type EvidenceRow, type ResearchCase } from "@/lib/research"
 import type { PersonRef } from "@/lib/contact-access"
 import type { SalesStatus } from "@/lib/lead-store"
@@ -89,6 +98,36 @@ function toAngebot(r: OfferRow): Angebot {
     positionen: (r.positions ?? []) as Position[],
     zustand: r.state as Angebot["zustand"],
     annahme: (r.acceptance ?? null) as Annahme | null,
+    erstelltAm: iso(r.created_at),
+  }
+}
+
+
+/* ── GATE 19 · Projektzeile ───────────────────────────────────────────────── */
+
+type ProjectRow = {
+  id: string
+  opportunity_id: string
+  offer_id: string
+  material_received: Ts | null
+  changes: unknown
+  acceptance: unknown
+  handover: unknown
+  state: string
+  created_at: Ts
+  updated_at: Ts
+}
+
+function toProjekt(r: ProjectRow): Projekt {
+  return {
+    id: r.id,
+    opportunityId: r.opportunity_id,
+    offerId: r.offer_id,
+    materialEingang: r.material_received === null ? null : tag(r.material_received),
+    aenderungen: (r.changes ?? []) as Aenderung[],
+    abnahme: (r.acceptance ?? null) as Projekt["abnahme"],
+    uebergabe: (r.handover ?? {}) as Projekt["uebergabe"],
+    zustand: r.state as Projekt["zustand"],
     erstelltAm: iso(r.created_at),
   }
 }
@@ -1133,6 +1172,157 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
       await note("opportunity", angebot.opportunityId, "offer.accepted",
         `Angebot ${angebot.referenz} angenommen`,
         `${annahme.von} (${annahme.rolle}), ${annahme.form}, ${annahme.am}`)
+      return []
+    },
+
+    /* ══ GATE 19 · LIEFERUNG ════════════════════════════════════════════ */
+
+    async listProjects(opportunityId: string): Promise<Projekt[]> {
+      await ready()
+      const rows = (await sql.query(
+        `SELECT * FROM projects WHERE opportunity_id = $1::text ORDER BY created_at DESC`,
+        [opportunityId],
+      )) as ProjectRow[]
+      return rows.map(toProjekt)
+    },
+
+    async startProject(offerId: string): Promise<{ id: string | null; maengel: Mangel[] }> {
+      await ready()
+      /*
+       * Ein Projekt entsteht aus einem ANGENOMMENEN Angebot — nicht aus
+       * einem gesendeten und nicht aus einem Vorgang. Das ist die erste
+       * Regel des Gates: Der Umfang kommt aus dem Ja, nicht aus einem Feld.
+       */
+      const rows = (await sql.query(
+        `SELECT id, opportunity_id, state FROM offers WHERE id = $1::text`,
+        [offerId],
+      )) as { id: string; opportunity_id: string; state: string }[]
+      if (!rows.length) {
+        return { id: null, maengel: [{ bereich: "Grundlage", satz: "Es gibt kein Angebot mit dieser Kennung." }] }
+      }
+      if (rows[0].state !== "angenommen") {
+        return {
+          id: null,
+          maengel: [
+            {
+              bereich: "Grundlage",
+              satz:
+                "Dieses Angebot ist nicht angenommen. Ein Projekt ohne Ja ist eine Absichtserklaerung, " +
+                "und sein Umfang waere das, was zuletzt jemand gesagt hat.",
+            },
+          ],
+        }
+      }
+
+      const id = randomUUID()
+      const ergebnis = await sql.query(
+        `INSERT INTO projects (id, opportunity_id, offer_id, created_at, updated_at)
+         VALUES ($1::text, $2::text, $3::text, now(), now())
+         ON CONFLICT (offer_id) DO NOTHING
+         RETURNING id`,
+        [id, rows[0].opportunity_id, offerId],
+      )
+      if (!ergebnis.length) {
+        return {
+          id: null,
+          maengel: [{ bereich: "Grundlage", satz: "Zu diesem Angebot laeuft bereits ein Projekt." }],
+        }
+      }
+      await note("opportunity", rows[0].opportunity_id, "project.started", "Projekt aufgesetzt", null)
+      return { id, maengel: [] }
+    },
+
+    async receiveMaterial(projectId: string, am: string): Promise<Mangel[]> {
+      await ready()
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(am)) {
+        return [{ bereich: "Material", satz: "Kein gueltiges Datum (YYYY-MM-DD)." }]
+      }
+      const rows = await sql.query(
+        `UPDATE projects SET material_received = $2::date, state = 'laeuft', updated_at = now()
+          WHERE id = $1::text AND state = 'aufgesetzt'
+        RETURNING opportunity_id`,
+        [projectId, am],
+      )
+      if (!rows.length) {
+        return [{ bereich: "Material", satz: "Das Projekt ist nicht im Zustand „aufgesetzt“." }]
+      }
+      /*
+       * Die Frist beginnt hier — und deshalb steht sie in der Chronik. Wer
+       * spaeter fragt, warum der Termin so liegt, findet den Tag, an dem
+       * das Material kam, und nicht eine Erinnerung.
+       */
+      await note("opportunity", (rows[0] as { opportunity_id: string }).opportunity_id,
+        "project.material", `Materialeingang ${am} — die Frist laeuft`, null)
+      return []
+    },
+
+    async addProjectChange(projectId: string, aenderung: Aenderung): Promise<Mangel[]> {
+      await ready()
+      const rows = (await sql.query(`SELECT * FROM projects WHERE id = $1::text`, [projectId])) as ProjectRow[]
+      if (!rows.length) return [{ bereich: "Aenderung", satz: "Es gibt kein Projekt mit dieser Kennung." }]
+      const projekt = toProjekt(rows[0])
+      if (projekt.zustand === "uebergeben") {
+        return [{ bereich: "Aenderung", satz: "Ein uebergebenes Projekt aendert sich nicht mehr." }]
+      }
+      const naechste = [...projekt.aenderungen, aenderung]
+      const maengel = fehltFuerZustand({ ...projekt, aenderungen: naechste }, "laeuft")
+        .filter((m) => m.bereich === "Aenderung")
+      if (maengel.length > 0) return maengel
+
+      await sql.query(
+        `UPDATE projects SET changes = $2::jsonb, updated_at = now() WHERE id = $1::text`,
+        [projectId, JSON.stringify(naechste)],
+      )
+      await note("opportunity", projekt.opportunityId, "project.change",
+        `Aenderung: ${aenderung.was}`,
+        aenderung.zugestimmt ? `zugestimmt von ${aenderung.zugestimmt.von}` : "noch ohne Zustimmung")
+      return []
+    },
+
+    async acceptDelivery(projectId: string, abnahme: Annahme): Promise<Mangel[]> {
+      await ready()
+      const rows = (await sql.query(`SELECT * FROM projects WHERE id = $1::text`, [projectId])) as ProjectRow[]
+      if (!rows.length) return [{ bereich: "Abnahme", satz: "Es gibt kein Projekt mit dieser Kennung." }]
+      const projekt = toProjekt(rows[0])
+      const maengel = fehltFuerZustand({ ...projekt, abnahme }, "abgenommen")
+      if (maengel.length > 0) return maengel
+
+      await sql.query(
+        `UPDATE projects SET acceptance = $2::jsonb, state = 'abgenommen', updated_at = now()
+          WHERE id = $1::text`,
+        [projectId, JSON.stringify(abnahme)],
+      )
+      await note("opportunity", projekt.opportunityId, "project.accepted",
+        "Abnahme erteilt",
+        `${abnahme.von} (${abnahme.rolle}), ${abnahme.form}, ${abnahme.am}`)
+      return []
+    },
+
+    async handOver(projectId: string, stuecke): Promise<Mangel[]> {
+      await ready()
+      const rows = (await sql.query(`SELECT * FROM projects WHERE id = $1::text`, [projectId])) as ProjectRow[]
+      if (!rows.length) return [{ bereich: "Uebergabe", satz: "Es gibt kein Projekt mit dieser Kennung." }]
+      const projekt = toProjekt(rows[0])
+
+      /* Nur bekannte Stuecke — ein Schluessel aus einem manipulierten
+         Formular waere sonst eine Uebergabe, die niemand versprochen hat. */
+      const erlaubt = new Set(UEBERGABE_STUECKE.map((s) => s.key as string))
+      const zusammen: Partial<Record<UebergabeKey, UebergabeEintrag>> = { ...projekt.uebergabe }
+      for (const [k, v] of Object.entries(stuecke ?? {})) {
+        if (erlaubt.has(k) && v) zusammen[k as UebergabeKey] = v
+      }
+
+      const maengel = fehltFuerZustand({ ...projekt, uebergabe: zusammen }, "uebergeben")
+      if (maengel.length > 0) return maengel
+
+      await sql.query(
+        `UPDATE projects SET handover = $2::jsonb, state = 'uebergeben', updated_at = now()
+          WHERE id = $1::text`,
+        [projectId, JSON.stringify(zusammen)],
+      )
+      await note("opportunity", projekt.opportunityId, "project.handover",
+        "Uebergabe vollstaendig",
+        UEBERGABE_STUECKE.map((s) => s.label).join(", "))
       return []
     },
 

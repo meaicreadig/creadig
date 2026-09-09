@@ -433,6 +433,59 @@ export const SCHEMA: string[] = [
      END IF;
    END
    $do$`,
+
+  /*
+   * 011 · GATE 19 — das Projekt, und die Abnahme, ohne die eine Lieferung
+   * keine ist.
+   *
+   * KEINE SPALTE `go_live`. „Vier Wochen ab Materialeingang" ist eine
+   * oeffentliche Zusage (`dictionary.de.packages`), und der Termin wird
+   * daraus GERECHNET (`lib/lieferung.ts`). Ein eingetragenes Datum daneben
+   * waere eine zweite Wahrheit gegen die Zusage — und die eingetragene
+   * gewinnt immer die falsche.
+   *
+   * `offer_id` ist NOT NULL und zeigt auf das angenommene Angebot. Der
+   * Umfang wird nicht abgetippt: Wer ihn abtippt, hat in vier Wochen zwei
+   * Umfaenge, und der Kunde hat den anderen.
+   *
+   * `handover` als jsonb, weil die vier Stuecke aus einem oeffentlichen
+   * Satz stammen („Code, Inhalte, Zugaenge und Domain") und nicht aus dem
+   * Schema. Aendert sich der Satz, aendert sich die Liste — und
+   * `check-lieferung.mjs` haelt beide gegeneinander.
+   *
+   * Zwei CHECKs, aus demselben Grund wie bei `offers`: Die Regel in
+   * `lib/lieferung.ts` haelt die Oberflaeche ehrlich, diese hier jeden
+   * anderen Weg an die Tabelle.
+   *
+   * Idempotent. Aendert keine bestehende Zeile.
+   */
+  `CREATE TABLE IF NOT EXISTS projects (
+     id text PRIMARY KEY,
+     opportunity_id text NOT NULL REFERENCES opportunities(id) ON DELETE CASCADE,
+     offer_id text NOT NULL REFERENCES offers(id) ON DELETE RESTRICT,
+     material_received date,
+     changes jsonb NOT NULL DEFAULT '[]'::jsonb,
+     acceptance jsonb,
+     handover jsonb NOT NULL DEFAULT '{}'::jsonb,
+     state text NOT NULL DEFAULT 'aufgesetzt'
+       CHECK (state IN ('aufgesetzt','laeuft','abgenommen','uebergeben')),
+     created_at timestamptz NOT NULL DEFAULT now(),
+     updated_at timestamptz NOT NULL DEFAULT now()
+   )`,
+  `CREATE INDEX IF NOT EXISTS projects_opportunity_idx ON projects (opportunity_id)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS projects_offer_idx ON projects (offer_id)`,
+  `DO $do$
+   BEGIN
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'projects_acceptance_check') THEN
+       ALTER TABLE projects ADD CONSTRAINT projects_acceptance_check
+         CHECK (state NOT IN ('abgenommen','uebergeben') OR acceptance IS NOT NULL);
+     END IF;
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'projects_material_check') THEN
+       ALTER TABLE projects ADD CONSTRAINT projects_material_check
+         CHECK (state = 'aufgesetzt' OR material_received IS NOT NULL);
+     END IF;
+   END
+   $do$`,
 ]
 
 /**

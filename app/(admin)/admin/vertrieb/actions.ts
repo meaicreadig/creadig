@@ -8,6 +8,7 @@ import { HANDLING_STATES, LIFECYCLE_STAGES, RELATIONSHIP_LEVELS } from "@/lib/ve
 import type { HandlingStatus, LifecycleStage, LocationInput, RelationshipLevel } from "@/lib/vertrieb"
 import { OFFER_KINDS, OFFERS, type OfferKind } from "@/lib/offer-readiness"
 import { ABSCHNITTE, JA_FORMEN, KATALOG, KATALOG_LABEL, type Annahme, type Befund, type Position } from "@/lib/angebot"
+import { UEBERGABE_STUECKE, type Mangel, type UebergabeEintrag, type UebergabeKey } from "@/lib/lieferung"
 import { RESEARCH_STATES, SOURCES, type ResearchState, type SourceKind } from "@/lib/research"
 import { CONTACT_SOURCES, DECISIONS, type ContactSource, type Decision } from "@/lib/contact-access"
 
@@ -595,4 +596,67 @@ export async function acceptAngebot(opportunityId: string, form: FormData): Prom
   const befunde = await requireStore().acceptOffer(id, annahme)
   refresh(`/admin/vertrieb/pipeline/${opportunityId}`, "/admin/vertrieb/pipeline")
   return { ok: befunde.length === 0, befunde }
+}
+
+/* ── GATE 19 · Lieferung ───────────────────────────────────────────────────
+ *
+ * Wie bei den Angeboten: Jede Aktion gibt MÄNGEL zurück, wenn es nicht geht.
+ * Eine Abnahme, die stillschweigend nicht gespeichert wird, ist schlimmer
+ * als eine, die sagt, was ihr fehlt — sie sieht aus wie eine Abnahme.
+ */
+
+export type LieferAntwort = { ok: boolean; maengel: Mangel[] }
+
+export async function projektStarten(opportunityId: string, form: FormData): Promise<LieferAntwort> {
+  const offerId = text(form.get("offerId"))
+  if (!offerId) return { ok: false, maengel: [{ bereich: "Grundlage", satz: "Kein Angebot angegeben." }] }
+  const { maengel } = await requireStore().startProject(offerId)
+  refresh(`/admin/vertrieb/pipeline/${opportunityId}`)
+  return { ok: maengel.length === 0, maengel }
+}
+
+export async function materialEingetroffen(
+  opportunityId: string,
+  form: FormData,
+): Promise<LieferAntwort> {
+  const id = text(form.get("id"))
+  const am = text(form.get("am"))
+  if (!id || !am) {
+    return { ok: false, maengel: [{ bereich: "Material", satz: "Projekt oder Datum fehlt." }] }
+  }
+  const maengel = await requireStore().receiveMaterial(id, am)
+  refresh(`/admin/vertrieb/pipeline/${opportunityId}`)
+  return { ok: maengel.length === 0, maengel }
+}
+
+export async function abnahmeEintragen(opportunityId: string, form: FormData): Promise<LieferAntwort> {
+  const id = text(form.get("id"))
+  if (!id) return { ok: false, maengel: [{ bereich: "Abnahme", satz: "Kein Projekt angegeben." }] }
+  const gewaehlt = text(form.get("form"))
+  const abnahme: Annahme = {
+    von: text(form.get("von")) ?? "",
+    rolle: text(form.get("rolle")) ?? "",
+    form: (JA_FORMEN as readonly string[]).includes(gewaehlt ?? "")
+      ? (gewaehlt as Annahme["form"])
+      : "muendlich",
+    am: text(form.get("am")) ?? "",
+    fundstelle: text(form.get("fundstelle")) ?? "",
+  }
+  const maengel = await requireStore().acceptDelivery(id, abnahme)
+  refresh(`/admin/vertrieb/pipeline/${opportunityId}`, "/admin/vertrieb/pipeline")
+  return { ok: maengel.length === 0, maengel }
+}
+
+export async function uebergabeEintragen(opportunityId: string, form: FormData): Promise<LieferAntwort> {
+  const id = text(form.get("id"))
+  if (!id) return { ok: false, maengel: [{ bereich: "Uebergabe", satz: "Kein Projekt angegeben." }] }
+  const stuecke: Partial<Record<UebergabeKey, UebergabeEintrag>> = {}
+  for (const stueck of UEBERGABE_STUECKE) {
+    const am = text(form.get(`am_${stueck.key}`))
+    const wie = text(form.get(`wie_${stueck.key}`))
+    if (am && wie) stuecke[stueck.key] = { am, wie }
+  }
+  const maengel = await requireStore().handOver(id, stuecke)
+  refresh(`/admin/vertrieb/pipeline/${opportunityId}`)
+  return { ok: maengel.length === 0, maengel }
 }

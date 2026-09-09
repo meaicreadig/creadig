@@ -4,7 +4,11 @@ import { notFound } from "next/navigation"
 import {
   setOpportunityNextAction,
   setOpportunityNote,
+  abnahmeEintragen,
   acceptAngebot,
+  materialEingetroffen,
+  projektStarten,
+  uebergabeEintragen,
   saveAngebotEntwurf,
   sendAngebot,
   setOpportunityOffer,
@@ -23,6 +27,7 @@ import {
 } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { AngebotMappe } from "@/components/admin/angebot-mappe"
+import { LieferungMappe } from "@/components/admin/lieferung-mappe"
 import { SALES_LABELS_DE, SALES_STATES, TERMINAL_STATES, getVertriebStore } from "@/lib/lead-store"
 import { LOST_REASONS, NEXT_ACTIONS, OFFERED_STAGES, STAGE_RULES } from "@/lib/sales-playbook"
 import { OFFER_KINDS, OFFERS, readinessFor } from "@/lib/offer-readiness"
@@ -52,14 +57,15 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
   const store = getVertriebStore()
   if (!store) return <VertriebShell title="Verkaufschance" available={false}>{null}</VertriebShell>
 
-  let opp, activities, lead, angebote
+  let opp, activities, lead, angebote, projekte
   try {
     opp = await store.getOpportunity(id)
     if (!opp) notFound()
-    ;[activities, lead, angebote] = await Promise.all([
+    ;[activities, lead, angebote, projekte] = await Promise.all([
       store.activities("opportunity", id),
       store.leadForOpportunity(id),
       store.listOffers(id),
+      store.listProjects(id),
     ])
   } catch {
     return <VertriebShell title="Verkaufschance" available={false}>{null}</VertriebShell>
@@ -314,6 +320,40 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                 speichern={saveAngebotEntwurf}
                 senden={sendAngebot}
                 annehmen={acceptAngebot}
+              />
+            </div>
+          </section>
+
+          {/* ── Lieferung ──────────────────────────────────────────────────
+              GATE 19 — „eine Lieferung ohne Abnahme ist keine."
+
+              Die Regeln hier sind nicht erfunden: Sie stehen auf der
+              oeffentlichen Seite. Das FAQ verspricht vier Stuecke bei der
+              Uebergabe („Code, Inhalte, Zugaenge und Domain"), die
+              Paketzeile nennt die Frist („vier Wochen ab Materialeingang")
+              und knuepft die zweite Rate an die Freigabe.
+
+              Gebaut war davon nichts. Die Zusagen standen auf der Seite und
+              wirkten nirgends — dieselbe Bauart wie in G13, G15, G16 und
+              G17. */}
+          <section aria-labelledby="lieferung-titel" className="mt-10">
+            <SectionHeader id="lieferung-titel" title="Lieferung & Abnahme" />
+            <p className="type-small text-muted-foreground mt-2 max-w-2xl text-pretty">
+              Der Livetermin steht hier nicht als Feld — er wird aus dem Materialeingang gerechnet.
+              Eine Änderung wirkt erst mit Zustimmung, und übergeben ist erst, was alle vier Stücke
+              aus dem öffentlichen Versprechen enthält.
+            </p>
+            <div className="mt-5">
+              <LieferungMappe
+                opportunityId={opp.id}
+                angenommeneAngebote={(angebote ?? [])
+                  .filter((a) => a.zustand === "angenommen")
+                  .map((a) => ({ id: a.id, referenz: a.referenz }))}
+                projekte={projekte ?? []}
+                starten={projektStarten}
+                material={materialEingetroffen}
+                abnahme={abnahmeEintragen}
+                uebergabe={uebergabeEintragen}
               />
             </div>
           </section>

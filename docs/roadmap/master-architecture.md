@@ -274,9 +274,30 @@ hinter Lieferung und Kundenbetrieb.* Das ist falsch: Eine Rechnung wird
 gebraucht, sobald der erste Abschluss steht — nicht ein Quartal später.
 *Grenze:* hängt am Umsatzsteuer-Status (G04-Owner-Schuld).
 
-**G19 · Lieferung & Abnahme** — Aufsetzen, Umfang, Änderungssteuerung,
+**G19 ⬥ Lieferung & Abnahme** — Aufsetzen, Umfang, Änderungssteuerung,
 Abnahme, Übergabe, Doku. *Abnahme ist enthalten*, weil eine Lieferung ohne
 Abnahme keine ist — und weil hier die Beleg-Schleife nach G13 beginnt.
+
+*Geschlossen 09.09.2026.* Dieses Gate hat **keinen Prozess erfunden** — die
+Regeln standen längst auf der öffentlichen Seite und wirkten nirgends:
+
+| Was die Seite verspricht | Wo | Was G19 daraus macht |
+|---|---|---|
+| „Code, Inhalte, Zugänge und Domain — wir händigen aus, was wir haben" | FAQ | vier Übergabestücke, jedes mit Datum **und Weg**; ohne alle vier gibt es kein „übergeben" |
+| „Fester Livetermin: vier Wochen ab Materialeingang" | Paketzeile | der Termin wird **gerechnet**, nie eingetragen — ohne Materialeingang gibt es keinen, nicht „in vier Wochen" |
+| „50 % bei Start, 50 % bei Ihrer Freigabe" | Paketzeile | die Abnahme ist keine Formsache, sie verlangt Person, Rolle, Form, Datum, Fundstelle |
+
+Dazu die dritte Regel, die aus dem Angebot kommt: **eine Änderung ohne Ja
+ändert nichts.** Das Angebot trägt seine Abgrenzung in Abschnitt 03, damit die
+Nachforderung gar nicht entsteht — wirkt eine Änderung schon vor der
+Zustimmung, war die Abgrenzung umsonst.
+
+*Die Beleg-Schleife zurück nach G13* ist als **Frage** gebaut, nicht als
+Ableitung: Sobald die Abnahme steht, erscheint der Satz, dass jetzt der Moment
+für die schriftliche Freigabe ist. Es gibt dafür ausdrücklich keinen Knopf, und
+`check-lieferung.mjs` bricht ab, sobald `lib/lieferung.ts` aus `lib/proof`
+importiert oder eine seiner Funktionen ruft. Ein System, das aus einer Abnahme
+eine Freigabe ableitet, hat eine Zustimmung erfunden.
 
 **G20 ⬥ Ein Projekt vollständig** — von der Anfrage bis zur Abnahme, mit
 einem echten Kunden.

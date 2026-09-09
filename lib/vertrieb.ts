@@ -3,6 +3,7 @@ import type { EvidenceKind, ResearchCase, ResearchState, SourceKind } from "@/li
 import type { OfferKind } from "@/lib/offer-readiness"
 import type { SalesStatus } from "@/lib/lead-store"
 import type { Angebot, Annahme, Befund, Position } from "@/lib/angebot"
+import type { Aenderung, Mangel, Projekt, UebergabeEintrag, UebergabeKey } from "@/lib/lieferung"
 
 /**
  * Vertrieb 1.0 — das Fachmodell.
@@ -595,6 +596,21 @@ export type VertriebStore = {
   /** Gibt die Befunde zurueck, wenn es NICHT geht — leere Liste heisst: gesendet. */
   sendOffer(id: string): Promise<Befund[]>
   acceptOffer(id: string, annahme: Annahme): Promise<Befund[]>
+
+  /* ── GATE 19 · Lieferung ───────────────────────────────────────────────
+   *
+   * Wieder kein freier Zustandssetzer. `startProject` verlangt ein
+   * angenommenes Angebot, `receiveMaterial` startet die oeffentlich
+   * zugesagte Frist, `acceptDelivery` verlangt die vier Angaben, und
+   * `handOver` verlangt die vier Stuecke aus dem FAQ-Satz. Jede gibt die
+   * MAENGEL zurueck, wenn es nicht geht.
+   */
+  listProjects(opportunityId: string): Promise<Projekt[]>
+  startProject(offerId: string): Promise<{ id: string | null; maengel: Mangel[] }>
+  receiveMaterial(projectId: string, am: string): Promise<Mangel[]>
+  addProjectChange(projectId: string, aenderung: Aenderung): Promise<Mangel[]>
+  acceptDelivery(projectId: string, abnahme: Annahme): Promise<Mangel[]>
+  handOver(projectId: string, stuecke: Partial<Record<UebergabeKey, UebergabeEintrag>>): Promise<Mangel[]>
 
   listContacts(query: ContactQuery): Promise<{ rows: ContactRow[]; total: number }>
   getContact(id: string): Promise<ContactRow | null>
