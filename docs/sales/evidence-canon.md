@@ -285,9 +285,12 @@ kein Personenprofil** zu einer recherchierten Person; maschinell geprüft (A21).
   Termin. Es wurde niemand angesprochen und nichts versendet.
 - **Sechs Betriebe sind keine Marktaussage.** Sie beweisen, dass die Kette
   trennt — nicht, wie der Markt aussieht.
-- **Die Kohorte lief lokal**, gegen eine Wegwerf-Datenbank. In der Produktion
-  stehen weiterhin **0 `research_cases`**; die menschliche Kontaktentscheidung
-  ist dort **nie** ausgeübt worden.
+- **Drei der sechs stehen seit dem 09.09.2026 in der Produktion** (Osnadach,
+  Volmer, BECHER) — siehe §12. Die anderen drei liefen nur lokal. Die
+  menschliche Kontaktentscheidung ist in der Produktion weiterhin **nie**
+  ausgeübt worden, und das ist kein Rückstand: `contact_decision` steht bei
+  allen dreien auf `NULL`, weil kein Agent sie im Namen des Eigentümers
+  treffen darf.
 - **Abwesende Betriebssignale bleiben unbelegbar** (siehe §5).
 - **`kaufkraft` bleibt strukturell unbekannt** bis G23.
 
@@ -338,3 +341,53 @@ G12 ändert daran nichts und hat es auch nicht versucht.
 **Die reale Proof-Lücke.** creaDIG kann heute belegen, wie es Betriebe
 **beurteilt**. Es kann nicht belegen, was es für sie **gebaut** hat. Das ist
 G13.
+
+---
+
+## 12 · Der Betriebsnachweis — 09.09.2026
+
+Production trägt `0fec317` (`dpl_4fTX8gFgHc6H2ZvXYdsXHENhCBwr`, promotet aus
+der Vorschau `dpl_E91fRKoKPSjKVXWCCsoXACVKmyLZ`, kein `gitDirty`). Danach
+wurden über `scripts/research-import.mjs --apply` **drei** der sechs Fälle
+geschrieben. Ausgewählt nicht nach dem schönsten Ergebnis, sondern weil sie
+zusammen drei verschiedene Systemzustände tragen.
+
+| | vorher | nachher | Delta |
+|---|---|---|---|
+| `research_cases` | 0 | **3** | +3 |
+| `research_evidence` | 0 | **9** | +9 |
+| `organisations` | 29 | 32 | +3 |
+| `contacts` | 13 | 15 | +2 |
+| **`opportunities`** | 2 | **2** | **0** |
+| **`contact_decision` gesetzt** | 0 | **0** | **0** |
+| Belege ohne Fundstelle | 0 | **0** | 0 |
+| recherchierte Person mit Mail/Nummer | — | **0** | — |
+
+**Keine bestehende Organisation wurde angefasst.** Gemessen an
+`updated_at`: genau drei geänderte Organisationen in zwei Stunden, alle drei
+neu angelegt, keine mit `import_key` — der Kundenbestand blieb unberührt.
+
+| Fall | Passung | Belege / Quellen | Person | Zugang | Anlass | Stop | Deckung | Entscheidung |
+|---|---|---|---|---|---|---|---|---|
+| **Osnadach** | passend | 5 / 2 | Inhaber · Impressum | offen | — | eingeordnet | nein | **NULL** |
+| **Volmer** | unklar | 2 / 2 | keine | offen | — | beleg-fehlt | nein | **NULL** |
+| **BECHER** | unklar | 2 / 1 | Geschäftsleiter · Presse | offen | **ja** | beleg-fehlt | **ja** | **NULL** |
+
+Der wichtigste Eintrag steht in der letzten Spalte, dreimal. **BECHER ist
+gedeckt** — belegter Anlass, belegte Person — und trotzdem hat niemand
+entschieden. Es gibt keinen Codeweg, der es könnte. Das ist der Satz aus
+Gate 11 an echten Produktionsdaten: „bereit für Kontakt" ist ein Zustand des
+Wissens, ansprechen ist eine Entscheidung.
+
+**Osnadach trägt den dritten G12-Fix an echten Daten:** `mehrere-standorte`
+ist aus zwei verschiedenen Fundstellen belegt (Impressum und Startseite). Vor
+dem Fix hätte die Seite das rot als „Widerspruch: zwei gültige Belege sagen
+Verschiedenes" gemeldet — bei zwei Quellen, die sich decken. Jetzt steht dort
+„mehrfach belegt", und was es bedeutet, liest ein Mensch.
+
+Die beiden anderen Fixes (`personBelegt`, Bestandsweg ohne Person) kommen in
+diesem Datensatz nicht vor. Sie wurden **nicht künstlich erzeugt**, nur um
+sie live zu zeigen — dafür gibt es den Probelauf.
+
+**Diese drei Fälle sind ab jetzt echter Research-Bestand**, keine Testdaten.
+Sie werden nicht gelöscht.
