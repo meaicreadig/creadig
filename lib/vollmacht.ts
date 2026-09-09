@@ -47,7 +47,15 @@
  * hat, waere eine Vollmacht, die sich selbst erteilt.
  */
 
-import { NIEMALS_AUTOMATISCH, WIRKUNGEN, istEreignis, type Ereignis, type Wirkung } from "@/lib/ereignis"
+import {
+  NIEMALS_AUTOMATISCH,
+  WIRKUNGEN,
+  HANDLUNGEN,
+  handlungFuer,
+  istEreignis,
+  type Ereignis,
+  type Wirkung,
+} from "@/lib/ereignis"
 import { FLAECHEN, ROLLEN, istRolle, type Rolle } from "@/lib/rollen"
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -183,7 +191,19 @@ export type Spur = {
   imNamenVon: Rolle
   /** Was geschehen ist. */
   wirkung: Wirkung
+  /**
+   * Die Handlung — WOERTLICH aus `HANDLUNGEN` (G26), nie vom Aufrufer.
+   *
+   * Bis zum 09.09.2026 stand hier der Satz, den der Aufrufer mitgab. Damit
+   * konnte die Spur etwas anderes behaupten als geschehen war: Ein Agent
+   * reichte intern weiter und schrieb „Das Angebot per Mail rausschicken"
+   * ins Protokoll. Eine Pruefspur, deren Inhalt der Geprüfte bestimmt, ist
+   * keine — und Nachvollziehbarkeit ist die einzige Begruendung, aus der
+   * dieses Gate ueberhaupt Handlungen zulaesst.
+   */
   was: string
+  /** Der konkrete Zusatz des Aufrufers. Beschreibt den Fall, nie die Handlung. */
+  dazu: string | null
   /** Woraufhin — das Ereignis, das es ausgeloest hat (G26). */
   wegen: Ereignis
   /** Woran — der Gegenstand. */
@@ -198,10 +218,16 @@ export type Spur = {
  * Bedingung: `handeln()` gibt ohne vollstaendige Spur nichts zurueck. Was
  * niemand nachvollziehen kann, kann niemand verantworten.
  */
-export function spurTraegt(s: Spur): boolean {
+export function spurTraegt(s: Spur | null): boolean {
+  /* `handeln()` gibt bei jedem Nein `spur: null` zurueck — der haeufigste
+     Aufruf ist deshalb `spurTraegt(h.spur)`, und der darf nicht werfen.
+     Keine Spur ist keine tragende Spur; das ist dieselbe Antwort. */
+  if (!s) return false
   if (!s.agent?.trim() || !istRolle(s.imNamenVon)) return false
   if (!(WIRKUNGEN as readonly string[]).includes(s.wirkung)) return false
-  if ((s.was?.trim().length ?? 0) < 8) return false
+  /* Der Handlungssatz muss einer aus dem Katalog sein — nicht irgendeiner. */
+  const vorgesehen = HANDLUNGEN.find((h) => h.was === s.was)
+  if (!vorgesehen || vorgesehen.wirkung !== s.wirkung) return false
   if (!istEreignis(s.wegen)) return false
   if (!s.an?.trim()) return false
   return !Number.isNaN(new Date(s.wann).getTime())
@@ -219,29 +245,86 @@ export type Handlung = { erlaubt: boolean; grund: string; spur: Spur | null }
  * Die Reihenfolge der Fragen ist Absicht — jede kann allein Nein sagen, und
  * die harten kommen zuerst:
  *
- *   1 Ist die Handlung ueberhaupt automatisierbar (G26-Verbotsliste)?
- *   2 Traegt die Vollmacht (gueltig, nicht abgelaufen, nicht widerrufen)?
- *   3 Deckt sie dieses Ereignis?
- *   4 Deckt sie diese Wirkung?
- *   5 Entsteht eine vollstaendige Spur?
+ *   1 Ist die Handlung ueberhaupt eine der vorgesehenen (G26 `HANDLUNGEN`)?
+ *   2 Passt die genannte Wirkung zu dieser Handlung?
+ *   3 Beschreibt die Spur etwas, das nie automatisch geschehen darf?
+ *   4 Traegt die Vollmacht (gueltig, nicht abgelaufen, nicht widerrufen)?
+ *   5 Deckt sie dieses Ereignis?
+ *   6 Deckt sie diese Wirkung?
+ *   7 Entsteht eine vollstaendige Spur?
  *
- * Frage 1 steht vorn, weil sie unabhaengig von jeder Vollmacht gilt: Was
- * nie automatisch geschehen darf, darf auch kein beauftragter Agent tun.
+ * DIE ERSTE FRAGE IST AM 09.09.2026 DAZUGEKOMMEN, UND SIE HAT DIE RICHTUNG
+ * GEDREHT.
+ *
+ * Vorher stand hier nur die Verbotsliste, und geprueft wurde der frei
+ * gewaehlte Satz `was`. Das hielt gegen die drei kuratierten Ausloeser und
+ * gegen niemanden sonst: „ein Angebot senden" war verboten, „Das Angebot per
+ * Mail rausschicken" ging durch. Eine Grenze, die man durch Umformulieren
+ * verschiebt, ist keine.
+ *
+ * Jetzt muss der Aufrufer eine Handlung BENENNEN, die es gibt. Unbekannt
+ * heisst nein — nicht „nicht verboten".
+ *
+ * Die Verbotsliste bleibt trotzdem stehen (Frage 3). Sie prueft nicht mehr,
+ * ob gehandelt werden darf, sondern ob die Spur ehrlich beschriftet ist: Wer
+ * „chronik-notieren" nennt und „eine Rechnung stellen" dazuschreibt, bekommt
+ * ein Nein statt eines irrefuehrenden Protokolleintrags.
+ *
+ * Was nie automatisch geschehen darf, darf auch kein beauftragter Agent tun.
  * Eine Vollmacht erweitert die Grenze nicht — sie liegt innerhalb.
  */
 export function handeln(input: {
   vollmacht: Vollmacht
   ereignis: string
   wirkung: string
-  was: string
+  /** Der Schluessel einer Handlung aus `HANDLUNGEN` (G26). Unbekannt heisst nein. */
+  handlung: string
+  /**
+   * Der konkrete Zusatz zum Fall — welche Frist, welches Stueck.
+   *
+   * Er beschreibt NICHT die Handlung; die steht im Katalog. Er landet in der
+   * Spur als `dazu` und entscheidet nichts.
+   */
+  dazu?: string
   an: string
   wann?: string
   heute?: Date
 }): Handlung {
   const heute = input.heute ?? new Date()
 
+  const vorgesehen = handlungFuer(input.handlung)
+  if (!vorgesehen) {
+    return {
+      erlaubt: false,
+      grund:
+        `„${input.handlung}" ist keine vorgesehene Handlung. Erlaubt ist, was in HANDLUNGEN ` +
+        "steht (G26) — unbekannt heisst nein, nicht „nicht verboten\". Wer etwas anderes " +
+        "braucht, braucht keinen Agenten, sondern einen Menschen.",
+      spur: null,
+    }
+  }
+
+  if (vorgesehen.wirkung !== input.wirkung) {
+    return {
+      erlaubt: false,
+      grund:
+        `Die Handlung „${vorgesehen.key}" hat die Wirkung „${vorgesehen.wirkung}", genannt wurde ` +
+        `„${input.wirkung}". Eine Spur, die eine andere Wirkung behauptet als die Handlung hat, ` +
+        "ist eine falsche Spur.",
+      spur: null,
+    }
+  }
+
+  /*
+   * Der zweite Guertel, jetzt auf dem Zusatz.
+   *
+   * Die Handlung selbst kann nichts Verbotenes mehr sein — sie kommt aus dem
+   * Katalog. Was der Aufrufer noch faerben koennte, ist der Zusatz, und ein
+   * Zusatz, der eine verbotene Handlung beschreibt, ist entweder eine
+   * falsche Beschriftung oder eine Absicht. Beides ist ein Nein.
+   */
   const verboten = NIEMALS_AUTOMATISCH.find((n) =>
-    input.was.toLowerCase().includes(n.was.toLowerCase()),
+    (input.dazu ?? "").toLowerCase().includes(n.was.toLowerCase()),
   )
   if (verboten) {
     return {
@@ -266,7 +349,8 @@ export function handeln(input: {
     agent: input.vollmacht.agent,
     imNamenVon: input.vollmacht.imNamenVon,
     wirkung: input.wirkung as Wirkung,
-    was: input.was,
+    was: vorgesehen.was,
+    dazu: input.dazu?.trim() ? input.dazu.trim() : null,
     wegen: input.ereignis,
     an: input.an,
     wann: input.wann ?? heute.toISOString(),

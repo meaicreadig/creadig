@@ -687,6 +687,52 @@ Fällen.
 *Drei Gates, weil die Vollmacht sich radikal unterscheidet:* lesen ≠ vorschlagen
 ≠ handeln.
 
+*Grenzen geprüft am 09.09.2026. Nicht geschlossen — „an echten Fällen" fehlt.*
+
+**Die Grenze hält nicht, weil jemand sie einhält — sie hält, wenn die untere
+Schicht die obere nicht erreicht.** `check-empfehlung.mjs` prüft deshalb die
+Importe: G28 kennt weder Navigator noch Vollmacht, G29 kennt die Vollmacht
+nicht, und weder G28 noch G29 kennen einen Schreibweg. Ein Gedächtnis, das
+nichts kennt, was handelt, kann nicht handeln lassen — egal, was in seinen
+Kommentaren steht.
+
+**Zwei echte Lücken sind dabei aufgefallen, beide in G30.**
+
+*Erstens: Die Grenze ließ sich umformulieren.* `handeln()` prüfte den frei
+gewählten Satz gegen die Verbotsliste. „ein Angebot senden" war verboten —
+„Das Angebot per Mail rausschicken" ging durch, ebenso „Den Interessenten
+anrufen". Der Fehler war die *Richtung*: Geprüft wurde, ob etwas verboten
+ist, statt ob es erlaubt ist. Wer verbietet, muss alles aufzählen, woran ein
+Mensch je denken könnte. Seither gibt es `HANDLUNGEN` (G26) — vier Einträge,
+je einer pro Wirkung, zusammengetragen und nicht erfunden. **Unbekannt heißt
+nein, nicht „nicht verboten".**
+
+*Zweitens: Die Prüfspur war fälschbar.* `spur.was` war der Satz des
+Aufrufers; ein Agent konnte intern weiterreichen und „Das Angebot per Mail
+rausschicken" ins Protokoll schreiben. Jetzt steht dort wörtlich der Satz aus
+dem Katalog, und der Zusatz des Aufrufers steht als `dazu` daneben. Eine
+Prüfspur, deren Inhalt der Kontrollierte bestimmt, ist keine — und
+Nachvollziehbarkeit ist die einzige Begründung, aus der dieses Haus einem
+Agenten überhaupt Handlungen erlaubt.
+
+**Und eine Zweideutigkeit im Navigator.** `wer: "haus"` konnte „jemand im
+Haus" oder „das System" heißen; in der Oberfläche stand das nackte Wort neben
+einer fertigen Handlung. Wer es als Zusage der Maschine liest, baut als
+Nächstes einen Agenten, der die Liste abarbeitet — und der wäre nie durch G26
+gegangen, weil ihn niemand als Automation geplant hat. Der Typ sagt es jetzt,
+und das Cockpit schreibt „im Haus delegierbar" aus.
+
+**Ein Vorschlag ist kein Auftrag.** Geprüft wird dauerhaft, dass kein
+Vorschlag in `handeln()` passt — weder sein Schlüssel noch sein
+Handlungssatz. Wer eine Empfehlung direkt ausführen kann, hat G29 und G30
+zusammengelegt und bekommt Stellvertretung statt Automation.
+
+**Was fehlt, ist der Vertrag selbst.** „Nützlich und vertrauenswürdig, **an
+echten Fällen**": Heute stehen sieben Vorschläge aus zehn Fragen, jeder auf
+mindestens einem Beleg, keiner zu einer stehenden Lage. Dass ein Mensch einem
+davon gefolgt ist und es getragen hat, steht nicht — das hat nur der Owner,
+und es lässt sich nicht herstellen, indem man daran weiterbaut.
+
 ### Etappe XI · Organisation
 
 **G32 ✓ Rollen, Rechte & Übergaben** — heute ein Mensch, ein Passwort. Ziel:

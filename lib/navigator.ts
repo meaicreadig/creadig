@@ -65,7 +65,25 @@ export type Vorschlag = {
   art: AnlassArt
   /** Was zu tun ist — eine Handlung, kein Zustand. */
   handlung: string
-  /** Wer sie tun kann. */
+  /**
+   * Wer sie tun kann — und BEIDE Werte meinen einen Menschen.
+   *
+   * `owner`  nur der Eigentuemer: eine Entscheidung, eine Zusage, eine
+   *          Angabe, die genau eine Person hat.
+   * `haus`   delegierbare Betriebsarbeit: jemand im Haus kann sie
+   *          uebernehmen, ohne den Owner zu fragen.
+   *
+   * `haus` heisst AUSDRUECKLICH NICHT „das System macht das automatisch".
+   * Der Unterschied ist am 09.09.2026 hier hingeschrieben worden, weil er
+   * bis dahin nur gemeint war: Der Wert stand als nacktes Wort in der
+   * Oberflaeche, und „haus" liest sich neben einer fertigen Handlung wie
+   * eine Zusage der Maschine. Wer das so liest, baut als Naechstes einen
+   * Agenten, der die Liste abarbeitet — und der haette nie durch G26
+   * gemusst, weil ihn niemand als Automation geplant hat.
+   *
+   * Was ein Agent tun darf, steht in `HANDLUNGEN` (G26) und nirgends sonst.
+   * Ein Vorschlag ist kein Auftrag.
+   */
   wer: "owner" | "haus"
   /** Warum — der Satz aus der Lage, nicht eine neue Behauptung. */
   weil: string
@@ -215,6 +233,18 @@ export function reihenfolge(lagen?: readonly Auskunft[]): Vorschlag[] {
  * G26. Hier gilt sie schon — und zwar bevor es eine Automation gibt, die
  * sie brechen koennte.
  */
+/**
+ * Die Beschriftung fuer die Oberflaeche.
+ *
+ * Sie steht hier und nicht in der Seite, weil der Satz zum Wert gehoert: Ein
+ * roher Schluessel in einer Liste von Handlungen wird gelesen, als sei er
+ * eine Zusage.
+ */
+export const WER_LABELS: Record<Vorschlag["wer"], string> = {
+  owner: "nur der Owner",
+  haus: "im Haus delegierbar",
+}
+
 export const NAVIGATOR_HANDELT_NICHT =
   "Der Navigator schlaegt vor und fuehrt nicht aus. Kein Schreibzugriff, kein Versand, " +
   "keine Statusaenderung. Die Entscheidung gehoert einem Menschen — und eine Empfehlung, " +

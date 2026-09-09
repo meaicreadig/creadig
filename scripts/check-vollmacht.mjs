@@ -71,7 +71,8 @@ for (const n of NIEMALS_AUTOMATISCH) {
     vollmacht: allmacht,
     ereignis: "offer.accepted",
     wirkung: "notieren",
-    was: `Automatisch ${n.was}`,
+    handlung: "chronik-notieren",
+    dazu: `Automatisch ${n.was}`,
     an: "vorgang-1",
     heute: new Date("2026-09-15"),
   })
@@ -110,18 +111,23 @@ const ohneSpur = handeln({
   vollmacht: allmacht,
   ereignis: "offer.accepted",
   wirkung: "notieren",
-  was: "kurz",
+  handlung: "erfunden-vom-aufrufer",
+  dazu: "kurz",
   an: "x",
   heute: new Date("2026-09-15"),
 })
 if (ohneSpur.erlaubt) {
-  fehler.push("Eine Handlung ohne belastbare Spur ist erlaubt. Die Spur ist die Bedingung, kein Protokoll daneben.")
+  fehler.push(
+    "Eine frei erfundene Handlung ist erlaubt. Erlaubt ist, was in HANDLUNGEN steht (G26) — " +
+      "unbekannt heisst nein, nicht „nicht verboten\".",
+  )
 }
 if (!spurTraegt({
   agent: "a",
   imNamenVon: "owner",
   wirkung: "notieren",
-  was: "In die Chronik geschrieben",
+  was: "In die Chronik schreiben, was geschehen ist",
+  dazu: null,
   wegen: "offer.accepted",
   an: "x",
   wann: "2026-09-15T10:00:00.000Z",

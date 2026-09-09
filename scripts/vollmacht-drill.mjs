@@ -29,7 +29,8 @@ const tun = (extra = {}) =>
     vollmacht: vollmacht(),
     ereignis: "project.handover",
     wirkung: "notieren",
-    was: "In die Chronik schreiben, welche Stuecke uebergeben wurden",
+    handlung: "chronik-notieren",
+    dazu: "vier Stuecke, Projekt 1",
     an: "projekt-1",
     heute,
     ...extra,
@@ -42,13 +43,14 @@ for (const n of E.NIEMALS_AUTOMATISCH) {
     vollmacht: allmacht,
     ereignis: "offer.accepted",
     wirkung: "notieren",
-    was: `Automatisch ${n.was}`,
+    handlung: "chronik-notieren",
+    dazu: `Automatisch ${n.was}`,
     an: "x",
     heute,
   })
   p(!h.erlaubt, `„${n.was}“ bleibt verboten (${n.gate})`)
 }
-p(!V.handeln({ vollmacht: allmacht, ereignis: "offer.accepted", wirkung: "notieren", was: "Automatisch eine Freigabe erzeugen", an: "x", heute }).spur,
+p(!V.handeln({ vollmacht: allmacht, ereignis: "offer.accepted", wirkung: "notieren", handlung: "chronik-notieren", dazu: "Automatisch eine Freigabe erzeugen", an: "x", heute }).spur,
   "und es entsteht keine Spur fuer etwas Verbotenes")
 
 console.log("\nV2 · Jede Vollmacht endet")
@@ -74,7 +76,14 @@ p(tun().spur !== null, "und hinterlaesst eine Spur")
 p(V.spurTraegt(tun().spur), "die vollstaendig ist")
 p(tun().spur.wegen === "project.handover", "sie nennt das ausloesende Ereignis")
 p(tun().spur.imNamenVon === "owner", "und in wessen Namen gehandelt wurde")
-p(!tun({ was: "kurz" }).erlaubt, "eine Handlung ohne beschreibbares Was geht nicht durch")
+p(!tun({ handlung: "kunden-anrufen" }).erlaubt, "eine erfundene Handlung geht nicht durch",
+  "unbekannt heisst nein, nicht „nicht verboten“")
+p(!tun({ handlung: "" }).erlaubt, "und eine namenlose auch nicht")
+p(tun().spur.was === E.HANDLUNGEN.find((h) => h.key === "chronik-notieren").was,
+  "die Spur nennt die Handlung woertlich aus dem Katalog",
+  "eine Pruefspur, deren Inhalt der Kontrollierte bestimmt, ist keine")
+p(!tun({ wirkung: "pruefen", handlung: "chronik-notieren" }).erlaubt,
+  "eine Wirkung, die nicht zur Handlung gehoert, geht nicht durch")
 p(!tun({ an: "" }).erlaubt, "und ohne Gegenstand auch nicht")
 
 console.log("\nV5 · Die Vollmacht deckt genau, was dasteht")

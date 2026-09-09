@@ -164,6 +164,74 @@ export const NIEMALS_AUTOMATISCH = [
 export const WIRKUNGEN = ["notieren", "erinnern", "weiterreichen", "pruefen"] as const
 export type Wirkung = (typeof WIRKUNGEN)[number]
 
+/**
+ * WAS EIN AGENT KONKRET TUN DARF — die geschlossene Liste.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM SIE NACHTRAEGLICH ENTSTANDEN IST
+ *
+ * Bis zum 09.09.2026 pruefte `ausloeserErlaubt()` — und ueber sie `handeln()`
+ * in G30 — eine Handlung, indem sie den beschreibenden SATZ nach den
+ * Verbotsphrasen durchsuchte. Gegen die drei kuratierten Ausloeser war das
+ * genug: Ihre Texte stehen in dieser Datei und aendern sich nur, wenn jemand
+ * sie hier aendert.
+ *
+ * Gegen einen Agenten war es das nicht. `handeln()` nimmt den Satz vom
+ * AUFRUFER entgegen, und eine Umschreibung geht durch jede Phrasensuche:
+ *
+ *   „ein Angebot senden"                → verboten (G17)
+ *   „Das Angebot per Mail rausschicken" → dieselbe Handlung, erlaubt
+ *   „einen Menschen ansprechen"         → verboten (G11)
+ *   „Den Interessenten anrufen"         → dieselbe Handlung, erlaubt
+ *
+ * Eine Grenze, die man durch Umformulieren verschiebt, ist keine. Der Fehler
+ * war nicht die Liste, sondern die Richtung der Pruefung: Sie fragte, ob ein
+ * frei gewaehlter Satz VERBOTEN ist, statt ob er ERLAUBT ist. Wer verbietet,
+ * muss alles aufzaehlen, woran ein Mensch je denken koennte; wer erlaubt,
+ * zaehlt auf, was das Haus vorgesehen hat.
+ *
+ * ---------------------------------------------------------------------------
+ * WORAUS SIE STAMMT
+ *
+ * Nichts hier ist neu erfunden. Es sind die vier Wirkungen aus diesem Gate,
+ * je einmal in eine Handlung ausformuliert. Eine Liste, die sich jemand
+ * ausdenkt, ist eine Meinung; eine, die vorhandene Regeln zusammentraegt,
+ * ist eine Zusammenfassung.
+ *
+ * `weiterreichen` sagt ausdruecklich INTERN. Nach aussen zeigt keine der
+ * vier Wirkungen — der Weg zu einem Menschen laeuft ueber G11, und dort
+ * entscheidet einer.
+ */
+export const HANDLUNGEN = [
+  {
+    key: "chronik-notieren",
+    wirkung: "notieren",
+    was: "In die Chronik schreiben, was geschehen ist",
+  },
+  {
+    key: "frist-erinnern",
+    wirkung: "erinnern",
+    was: "An eine Frist oder einen faelligen Schritt erinnern, den ein Mensch selbst tut",
+  },
+  {
+    key: "intern-weiterreichen",
+    wirkung: "weiterreichen",
+    was: "Einen Vorgang INTERN an eine Rolle weiterreichen, damit er dort sichtbar wird",
+  },
+  {
+    key: "lage-pruefen",
+    wirkung: "pruefen",
+    was: "Eine Lage gegen ihre Regel nachrechnen und das Ergebnis hinschreiben",
+  },
+] as const satisfies readonly { key: string; wirkung: Wirkung; was: string }[]
+
+export type HandlungKey = (typeof HANDLUNGEN)[number]["key"]
+
+/** Die Handlung zu einem Schluessel — oder `null`, und `null` heisst nein. */
+export function handlungFuer(key: unknown): (typeof HANDLUNGEN)[number] | null {
+  return HANDLUNGEN.find((h) => h.key === key) ?? null
+}
+
 export type Ausloeser = {
   key: string
   auf: Ereignis
@@ -306,6 +374,21 @@ export function darfLaufen(input: {
  * Die Frage wird gegen `NIEMALS_AUTOMATISCH` beantwortet — nicht gegen ein
  * Gefuehl. Sie steht hier, damit jeder kuenftige Ausloeser sie passieren
  * muss, bevor er geschrieben wird.
+ */
+/**
+ * Beschreibt dieser Satz etwas, das nie automatisch geschehen darf?
+ *
+ * ACHTUNG — WOFUER DAS HIER TAUGT UND WOFUER NICHT.
+ *
+ * Es ist eine Phrasensuche. Gegen den KURATIERTEN Text der Ausloeser in
+ * dieser Datei ist sie richtig: Sie faellt auf, wenn jemand hier einen
+ * Ausloeser hinschreibt, der eine verbotene Handlung beschreibt.
+ *
+ * Gegen EINGABEN ist sie es nicht. Wer den Satz frei waehlt, waehlt auch die
+ * Formulierung, und „Das Angebot per Mail rausschicken" enthaelt keine der
+ * Phrasen. Deshalb entscheidet in G30 nicht diese Funktion, sondern
+ * `HANDLUNGEN`: eine geschlossene Liste dessen, was erlaubt IST. Diese hier
+ * bleibt als zweiter Guertel — sie faengt eine falsch beschriftete Spur.
  */
 export function ausloeserErlaubt(handlung: string): { ja: boolean; weil: string; gate?: string } {
   const treffer = NIEMALS_AUTOMATISCH.find((n) =>

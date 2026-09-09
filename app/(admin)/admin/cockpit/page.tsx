@@ -3,7 +3,7 @@ import Link from "next/link"
 import { AdminShell } from "@/components/admin/admin-shell"
 import { Pill, SectionHeader, Surface } from "@/components/admin/primitives"
 import { kontext, nichtErhoben, offen } from "@/lib/gedaechtnis"
-import { reihenfolge } from "@/lib/navigator"
+import { WER_LABELS, reihenfolge } from "@/lib/navigator"
 
 /**
  * G34 · OWNER-COCKPIT — die Synthese.
@@ -104,7 +104,7 @@ export default function CockpitPage() {
                 <Surface padding="sm">
                   <div className="flex flex-wrap items-baseline gap-3">
                     <Pill severity={v.art === "messen" ? "neutral" : "attention"}>{v.art}</Pill>
-                    <span className="type-small text-muted-foreground">{v.wer}</span>
+                    <span className="type-small text-muted-foreground">{WER_LABELS[v.wer]}</span>
                   </div>
                   <p className="type-small text-foreground mt-2 text-pretty">{v.handlung}</p>
                   <p className="type-small text-muted-foreground mt-2 text-pretty">{v.weil}</p>
