@@ -304,8 +304,35 @@ einem echten Kunden.
 
 ### Etappe VI · Kundenbetrieb
 
-**G21 · Betrieb & Support** — Vorfälle, Wartung, Serviceanfragen, die
+**G21 ⬥ Betrieb & Support** — Vorfälle, Wartung, Serviceanfragen, die
 149-€-Grenze in der Praxis.
+
+*Geschlossen 09.09.2026.* Wie G19 hat auch dieses Gate **keinen Prozess
+erfunden**: `retainer.includes` nennt fünf Zusagen für 149 €, und zwei davon
+sind harte, messbare Größen.
+
+| Zusage | Art | Was G21 daraus macht |
+|---|---|---|
+| „Bis zu **2** Inhaltsänderungen im Monat" | Kontingent | monatlich gezählt; die dritte liegt außerhalb — und das steht **vor** der Arbeit fest |
+| „Rückruf am **nächsten Werktag**" | Frist | gerechnet über das Wochenende, nicht eingetragen |
+| Hosting & Sicherheitsupdates · Google-Profil · Barrierefreiheits-Lauf | laufend | zählen **nicht** gegen das Kontingent |
+
+**Die Trennung, ohne die das Kontingent ungerecht wird:** Eine Störung ist
+keine Inhaltsänderung. Fielen beide in denselben Topf, hätte ein Kunde nach
+zwei Ausfällen sein Monatskontingent aufgebraucht und müsste für die Behebung
+eines Fehlers zahlen, den er nicht verursacht hat. Drei Arten, jede mit ihrer
+eigenen Uhr.
+
+**Beantwortet ist nicht erledigt.** Die Zusage lautet *Rückruf* am nächsten
+Werktag, nicht *Lösung*. Ein still erledigter Vorgang ohne Rückruf gilt
+deshalb weiter als überfällig — und ein gelöster mit rechtzeitigem Rückruf
+nicht.
+
+**Feiertage sind bewusst nicht modelliert.** Sie sind Ländersache —
+Fronleichnam ist in Bayern frei und in Niedersachsen nicht. Ein Kalender im
+Code wäre für den Sitz richtig und für den nächsten Kunden falsch. Gerechnet
+wird über das Wochenende; fällt eine Frist auf einen Feiertag, ist sie **zu
+früh** angesetzt, und der Fehler geht zu Lasten des Hauses.
 
 **G22 · Kundenerfolg & Ausbau** — Kundengesundheit, Verlängerung, Ausbau —
 und die **Empfehlungs-Schleife** zurück nach G11. Der einzige Zugangsweg, der

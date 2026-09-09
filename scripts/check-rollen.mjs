@@ -24,7 +24,7 @@ import { readFileSync, readdirSync } from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 
-import { FLAECHEN, KLASSEN, ROLLEN, ROLLEN_KEYS, darfBetreten, flaecheZu, uebergabe, vergebeneRollen } from "../lib/rollen.ts"
+import { FLAECHEN, KLASSEN, ROLLEN, ROLLEN_KEYS, flaecheZu, uebergabe, vergebeneRollen } from "../lib/rollen.ts"
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const fehler = []
