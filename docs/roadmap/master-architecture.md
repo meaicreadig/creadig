@@ -585,8 +585,37 @@ die sie brechen könnte.
 
 *Heute sagt er sieben Sätze:* zwei „messen", fünf „beheben" — und alle sieben
 gehören dem Owner. Das ist der Zustand, nicht die Schuld des Systems.
-**G30 · Handelnde Agenten unter Regeln** — begrenzte Vollmacht, Rechte,
+**G30 ⬥ Handelnde Agenten unter Regeln** — begrenzte Vollmacht, Rechte,
 Übersteuerung, Prüfspur.
+
+*Geschlossen 09.09.2026.* Die drei Stufen sind jetzt drei Module, und sie
+bleiben getrennt: **G28 liest** · **G29 schlägt vor** · **G30 handelt**. Wer
+sie zusammenlegt, bekommt ein System, das liest, daraus schließt und danach
+handelt — ohne dass irgendwo ein Mensch dazwischen war. Das ist nicht mehr
+Automation, das ist **Stellvertretung**.
+
+**Vier Eigenschaften machen eine Vollmacht erst zu einer:**
+
+1. **Sie ist kleiner als die Rolle, die sie erteilt** (G32). Wer mehr kann als
+   sein Auftraggeber, handelt für niemanden — Zurechenbarkeit gibt es nur
+   nach unten.
+2. **Sie endet** — höchstens 90 Tage. Eine Vollmacht ohne Ablauf verlängert
+   sich durch Vergessen.
+3. **Sie ist sofort widerrufbar**, wie eine Freigabe in G13: Der Widerruf
+   wirkt *jetzt*, nicht zum nächsten Lauf. Der Eintrag bleibt stehen — man
+   muss erklären können, warum damals.
+4. **Sie hinterlässt eine Spur.** Die Prüfspur ist kein Protokoll *neben* der
+   Handlung, sondern ihre **Bedingung**: Ohne vollständige Spur gibt `handeln()`
+   nichts zurück. Was niemand nachvollziehen kann, kann niemand verantworten.
+
+**Die wichtigste Regel steht ganz vorn:** Die G26-Verbotsliste gilt **auch mit
+Vollmacht**. Eine Vollmacht erweitert die Grenze nicht — sie liegt innerhalb.
+Der Probelauf fährt alle zehn verbotenen Handlungen mit einer Vollmacht, die
+*alles* darf, und jede einzelne scheitert.
+
+*Heute handelt niemand.* `AGENTEN` ist leer — derselbe ehrliche Zustand wie
+bei den Rollen: Das System kann es, beauftragt hat niemand. Eine Vollmacht,
+die sich selbst erteilt, wäre keine.
 **G31 ⬥ Empfehlungen tragen** — nützlich und vertrauenswürdig, an echten
 Fällen.
 
