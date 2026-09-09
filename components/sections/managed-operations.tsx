@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowUpRight, Check, Minus } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
@@ -72,7 +72,14 @@ export function ManagedOperations() {
         <Reveal delay={0.18} className="mt-16">
           <p className="eyebrow text-gold-text">{copy.itemsLabel}</p>
         </Reveal>
-        <div className="mt-8 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+        {/*
+          Das Raster war fuer Spalten mit einem Satz bemessen: unter `sm` eine
+          Spalte, 40 Pixel Zeilenabstand. Mit sieben Einzelbegriffen wurden
+          daraus auf 390 Pixeln rund 650 Pixel fuer sieben Woerter — die
+          Enge des Schreibtischs gegen die Leere des Telefons getauscht.
+          Zwei Spalten ab null, drei ab `sm`.
+        */}
+        <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
           {managedOperations.map((key, i) => {
             const item = copy.items[key]
             return (
@@ -86,8 +93,26 @@ export function ManagedOperations() {
                   aria-hidden="true"
                   className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
                 />
+                {/*
+                  NUR DER NAME. DIE ERKLAERUNG STEHT AUF /betrieb.
+
+                  Hier stand unter jedem Namen ein Satz. In sieben Spalten
+                  auf 1440 Pixeln ist eine Spalte rund 110 Pixel breit — die
+                  Saetze brachen auf vier bis sechs Zeilen, unterschiedlich
+                  lang, und liessen unter den kuerzeren Spalten rund 200
+                  Pixel zerfranste Flaeche stehen.
+
+                  Die Reihe soll etwas anderes sagen als der Text: Der
+                  Betrieb ist EINE SCHICHT, die quer unter allen fuenf
+                  Ebenen liegt, keine sechste Stufe. Das sagt die
+                  durchlaufende Reihe aus sieben Hairline-Spalten — und
+                  sieben lesbare Begriffe sagen es besser als sieben
+                  gequetschte Absaetze.
+
+                  Die Saetze sind nicht fort: /betrieb fuehrt sie unter „Was
+                  dazugehoert" in lesbarer Breite aus, aus derselben Quelle.
+                */}
                 <h3 className="text-subhead text-lg">{item.name}</h3>
-                <p className="type-small text-muted-foreground mt-3 text-pretty">{item.what}</p>
               </Reveal>
             )
           })}
@@ -103,51 +128,31 @@ export function ManagedOperations() {
                   {retainer.description[locale]}
                 </p>
                 {/*
-                  GATE 05 — ENTHALTEN UND NICHT ENTHALTEN STEHEN NEBENEINANDER.
+                  DER UMFANG STEHT AUF /betrieb, NICHT HIER.
 
-                  Vorher stand nur die linke Spalte. Eine Leistungsliste ohne
-                  Gegenstueck liest sich als Anfang einer Aufzaehlung, nicht
-                  als Umfang — und jeder ergaenzt still, was er braucht.
+                  Bis zum 09.09.2026 standen an dieser Stelle beide Spalten —
+                  fuenf enthaltene und fuenf nicht enthaltene Punkte. Die
+                  Begruendung dafuer war richtig und gilt weiter: Eine
+                  Leistungsliste ohne Gegenstueck liest sich als Anfang einer
+                  Aufzaehlung, und jeder ergaenzt still, was er braucht.
                   Beide Spalten zusammen sind erst die Antwort auf „was
-                  bekomme ich fuer 149 EUR".
+                  bekomme ich fuer 149 EUR" (GATE 05).
+
+                  Nur ist das nicht die Frage, die eine UEBERSICHTSSEITE
+                  beantwortet. Der Kopfkommentar dieser Datei sagt es selbst:
+                  „die Sektion fasst zusammen, die Seite fuehrt aus". Getan
+                  hat sie das Gegenteil — gemessen am 09.09.2026 waren 24
+                  Prozent des Textes von /leistungen (2.156 von 8.920
+                  Zeichen) wortgleich mit /betrieb, und der Verweis auf die
+                  ausfuehrende Seite stand ganz unten, hinter allem, was er
+                  ersetzen sollte.
+
+                  Beide Spalten stehen unveraendert auf /betrieb
+                  (`betrieb-page-body.tsx`, dieselbe Quelle aus `site-data`).
+                  Was hier bleibt, ist die Entscheidungshilfe: was es ist,
+                  was es kostet, fuer wen es NICHT gilt — und der Weg zur
+                  Tiefe.
                 */}
-                {retainer.includes && (
-                  <div className="mt-7 grid gap-7 sm:grid-cols-2">
-                    <div>
-                      <p className="eyebrow text-muted-foreground">
-                        {t.packages.retainerIncludesLabel}
-                      </p>
-                      <ul className="mt-3 grid gap-3">
-                        {retainer.includes[locale].map((item) => (
-                          <li key={item} className="flex gap-3">
-                            <Check className="text-gold mt-0.5 size-4 shrink-0" strokeWidth={1.5} />
-                            <span className="type-small text-muted-foreground text-pretty">
-                              {item}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="eyebrow text-muted-foreground">
-                        {t.packages.retainerExcludesLabel}
-                      </p>
-                      <ul className="mt-3 grid gap-3">
-                        {retainer.excludes[locale].map((item) => (
-                          <li key={item} className="flex gap-3">
-                            <Minus
-                              className="text-muted-foreground/60 mt-0.5 size-4 shrink-0"
-                              strokeWidth={1.5}
-                            />
-                            <span className="type-small text-muted-foreground text-pretty">
-                              {item}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
                 <p className="type-small text-muted-foreground mt-7 max-w-2xl text-pretty">
                   {retainer.precondition[locale]}
                 </p>
