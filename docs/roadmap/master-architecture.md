@@ -321,9 +321,32 @@ ist, keine technische.
 
 ### Etappe VIII · Produkte
 
-**G24 · Produktwahrheit & Rückmeldung** — Heute: fibero, meAI, CASSAMEA,
-meahv haben Regionen, aber **keinen geführten Reifegrad**. Ziel: Portfolio mit
-Stand, Eigentümer, Rückmeldeweg.
+**G24 ⬥ Produktwahrheit & Rückmeldung** — Heute (bis 09.09.2026): fibero,
+meAI, CASSAMEA, meahv haben Regionen, aber **keinen geführten Reifegrad**.
+Ziel: Portfolio mit Stand, Eigentümer, Rückmeldeweg.
+
+*System geschlossen 09.09.2026, der Stand bleibt beim Owner.* Alle drei
+geforderten Angaben fehlten — aber nicht auf dieselbe Weise:
+
+| | Vorher | Jetzt |
+|---|---|---|
+| **Stand** | `ProductWorld.maturity` existierte als Feld und stand bei allen vier auf `null` | ein Stand ist eine Aussage **mit Herkunft**: Stufe, wer sie bestätigt hat, wann, und **woran man sie sieht** — und er **altert** nach sechs Monaten |
+| **Eigentümer** | gab es nicht | je Produkt benannt; heute bei allen vier dieselbe Person — der Ist-Zustand des Hauses und der Ausgangspunkt für **G33** |
+| **Rückmeldeweg** | gab es nicht | je Produkt benannt **und auf der Produktseite sichtbar** — getrennt nach Störung und Wunsch |
+
+*Warum das Gate den Reifegrad nicht ausfüllt:* Im Code stand schon der
+richtige Satz — „Diese Stufe kann man nicht ausrechnen. Sie weiss genau eine
+Person." Ein Gate, das sie erzwingt, bekommt eine erfundene. Sie steht als
+Owner-Punkt bei **jedem Build** in der Ausgabe: 0 von 4 bestätigt.
+
+*Die Prüfung, ohne die das Register gefährlich wäre:* `productStatus()` leitet
+seit V2-4b einen groben Zustand aus `live` und `href` ab, und der Kommentar
+dort warnte ausdrücklich vor einem zweiten Feld daneben („‚Im Aufbau' im Text,
+‚LIVE' im Badge, und niemand merkt es"). `widerspruch()` hält beide
+gegeneinander, und das Gate bricht ab, sobald ein Wert in
+`ProductWorld.maturity` zurückkehrt. Ein Register einzuführen, ohne diese
+Prüfung mitzubauen, wäre genau der Fehler gewesen, vor dem der alte Kommentar
+warnt.
 
 **G25 · Produkt-Kommerzialisierung** — Wann wird ein Produkt verkäuflich?
 *Unabhängig, weil* die kaufmännische und rechtliche Grenze eine andere ist als
