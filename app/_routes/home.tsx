@@ -1,5 +1,4 @@
 import { Hero } from "@/components/sections/hero"
-import { LogoStrip } from "@/components/sections/logo-strip"
 import { HouseStatement } from "@/components/sections/house-statement"
 import { SelectedWork } from "@/components/sections/selected-work"
 import { CapabilityTiles } from "@/components/sections/capability-tiles"
@@ -7,7 +6,6 @@ import { EntryLine } from "@/components/sections/entry-line"
 import { HouseProducts } from "@/components/sections/house-products"
 import { CaseStudies } from "@/components/sections/case-studies"
 import { ImpactBand } from "@/components/sections/impact-band"
-import { Location } from "@/components/sections/location"
 import { CompanyTeaser } from "@/components/sections/company-teaser"
 import { InsightsTeaser } from "@/components/sections/insights-teaser"
 import { ClosingCta } from "@/components/sections/closing-cta"
@@ -85,10 +83,27 @@ export function HomeRoute() {
       <Hero />
 
       {/*
-        1b · C — Drei Logo-Bahnen (→ ← →), Hover pausiert.
-        Nur eigene Produkte + freigegebene Kunden. Beweis direkt unter dem Hero.
+        1b — HIER STAND DIE LOGO-WAND, UND SIE IST GEGANGEN.
+
+        Gedacht war sie als Beweisband direkt unter dem Hero: eigene Produkte
+        UND freigegebene Kundenlogos, drei Bahnen. Seit G13 nennt die Seite
+        keinen Kunden ohne schriftliche Freigabe, `clientLogos` ist leer —
+        uebrig blieben vier eigene Produkte.
+
+        Gemessen am 09.09.2026 auf 1440 Pixeln: 266 Pixel Hoehe, fuenf
+        Woerter, Dichte 0.15 — der mit Abstand duennste Abschnitt der Seite,
+        der zweitduennste hatte mehr als das Doppelte. Und 4.800 Pixel
+        weiter unten stehen dieselben vier Produkte noch einmal, dort aber
+        mit Namen, Stand und Beschreibung („Unter dem Dach").
+
+        Vier graue Zeichen, bevor jemand weiss, was fibero oder meahv ist,
+        sind kein Beweis — sie sind Dekoration vor dem Verstaendnis. Die
+        Angabe geht nicht verloren; sie steht an der Stelle, an der sie
+        erklaert wird.
+
+        Die Komponente bleibt. Sobald `clientLogos` traegt, ist sie wieder
+        das, wofuer sie gebaut wurde — und gehoert dann wieder hierher.
       */}
-      <LogoStrip />
 
       {/* 2 · A — creaDIG in einem Satz. Die erste Pause. */}
       <HouseStatement />
@@ -142,8 +157,18 @@ export function HomeRoute() {
       */}
       <CompanyTeaser />
 
-      {/* 10 · C — Wo das stattfindet: Foto mit Parallaxe. */}
-      <Location />
+      {/*
+        10 — DAS STANDORTBAND STEHT JETZT NUR NOCH AUF /unternehmen.
+
+        Es stand hier UND dort, Wort fuer Wort dasselbe: „ICO
+        InnovationsCentrum Osnabrueck", dreissig Woerter, 649 Pixel. Direkt
+        darueber verweist `CompanyTeaser` bereits auf /unternehmen — wer den
+        Sitz sucht, ist einen Klick entfernt und liest ihn dort einmal statt
+        zweimal.
+
+        Der Ort verschwindet damit nicht von der Startseite: Er steht im
+        Hero-Eyebrow („Osnabrueck · seit 2017") und in der Fusszeile.
+      */}
 
       {/*
         11 — HIER STAND DIE NACHWEIS-ZEILE, UND SIE IST GEGANGEN (V2-5).
