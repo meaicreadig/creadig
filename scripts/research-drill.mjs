@@ -28,6 +28,46 @@ const z = async (q, ps = []) => Number((await c.query(q, ps)).rows[0].n)
 const { SCHEMA, BACKFILL, seedBestand, applyExclusions } = await import("../lib/neon-client.ts")
 const R = await import("../lib/research.ts")
 
+/*
+ * DER PROBELAUF FAENGT LEER AN.
+ *
+ * Bis zum 09.09.2026 tat er das nicht: Er legte das Schema an und begann
+ * einzufuegen. Beim ZWEITEN Lauf gegen dieselbe Wegwerf-Datenbank brach er
+ * an einem doppelten Schluessel ab — er prueft dann nicht mehr diesen Lauf,
+ * sondern die Reste des vorigen.
+ *
+ * Das faellt lange nicht auf, weil der erste Lauf gruen ist. Genau deshalb
+ * steht es hier: Ein Probelauf, der nur einmal laeuft, ist keiner.
+ *
+ * Geleert wird in FK-Reihenfolge und nur in dieser Datenbank — der Schutz
+ * oben laesst nichts anderes zu. Danach saet `seedBestand()` neu.
+ */
+for (const tabelle of [
+  "research_evidence",
+  "research_cases",
+  "activities",
+  "payments",
+  "invoices",
+  "offers",
+  "opportunities",
+  "leads",
+  "contacts",
+  "locations",
+  "organisations",
+  /*
+   * `import_log` MUSS mit weg.
+   *
+   * `seedBestand()` merkt sich dort ueber `once()`, was es schon gesaet hat.
+   * Bliebe der Merker stehen, waeren die Zeilen fort und der Bestand gaelte
+   * als gesaet — der Lauf traefe dann auf ein Haus ohne Bestandskunden und
+   * meldete Fehler, die keine sind. Genau daran ist der erste Anlauf dieser
+   * Bereinigung gescheitert.
+   */
+  "import_log",
+]) {
+  await sql.query(`DELETE FROM ${tabelle}`).catch(() => {})
+}
+
 for (const s of SCHEMA) await sql.query(s)
 for (const s of BACKFILL) await sql.query(s)
 await seedBestand(sql)
