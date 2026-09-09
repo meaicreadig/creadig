@@ -155,6 +155,12 @@ export const FLAECHEN: readonly Flaeche[] = [
   { pfad: "/admin", klasse: "einstieg", fuer: ["owner", "vertrieb", "redaktion"] },
 
   { pfad: "/admin/material", klasse: "eigene-lage", fuer: ["owner", "redaktion"] },
+  /*
+   * GATE 34 — das Cockpit traegt die Lage des ganzen Hauses, aber keine
+   * Personendaten Dritter: Es zeigt Auskuenfte aus den Registern, keine
+   * Kundenakte. Deshalb `eigene-lage` und nicht `fremde-personen`.
+   */
+  { pfad: "/admin/cockpit", klasse: "eigene-lage", fuer: ["owner"] },
 
   { pfad: "/admin/kunden", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   { pfad: "/admin/kunden/:id", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },

@@ -664,8 +664,27 @@ ohne den Owner läuft.
 
 ### Etappe XII–XIV
 
-**G34 · Owner-Cockpit** — die Synthese. Kommt spät, **weil** es die Quellen
+**G34 ⬥ Owner-Cockpit** — die Synthese. Kommt spät, **weil** es die Quellen
 braucht. Jedes Gate davor liefert seinen Heute-Beitrag sofort mit.
+
+*Geschlossen 09.09.2026 unter `/admin/cockpit`.* Genau so gebaut, wie der
+Vertrag es beschreibt: **Diese Seite rechnet nichts.** Sie zeigt zwei Dinge,
+und beide kommen fertig aus anderen Modulen — *wie es steht* aus **G28** (mit
+Fundstellen) und *was daraus folgt* aus **G29** (mit Belegen).
+
+**Warum das die eigentliche Regel ist:** Ein Cockpit, das selbst rechnet,
+wird die zwanzigste Quelle der Wahrheit — und die mit der größten
+Schriftart. Wer eine Zahl auf einer Übersichtsseite sieht, prüft sie nicht
+nach; er handelt danach. `check-cockpit.mjs` bricht deshalb ab bei einer
+Summe, einer Rundung, einer Quote, einem Prozentwert — oder bei einem Import,
+der an G28/G29 vorbei direkt in ein Register greift.
+
+**Drei Zustände, nicht zwei:** *steht* · *offen* · **nicht erhoben**. Der
+dritte ist der, den Übersichtsseiten gewöhnlich verschlucken — und genau er
+ist der ehrlichste. Aus „nicht erhoben" ein rotes Feld zu machen hieße, eine
+offene Owner-Frage als Systemfehler auszugeben.
+
+*Heute:* 3 steht · 5 offen · 2 nicht erhoben · 7 Schritte, davon 2 „messen".
 
 **G35 · DACH-Fähigkeit** — CASSAMEA ist CH, meAI ist DE & CH. Die
 Internationalisierung ist kein Fernziel, sie ist halb da. Jurisdiktion,
