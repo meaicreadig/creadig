@@ -159,6 +159,16 @@ function GroupHeading({ label, note }: { label: string; note: string }) {
   );
 }
 
+/*
+ * MOBIL EIGENE ABSTAENDE.
+ *
+ * Gemessen am 09.09.2026 auf 390 Pixeln: der Werkschau-Abschnitt 2.491 Pixel
+ * fuer 1.161 Pixel Text — 53 Prozent Luft, derselbe Ausreisser wie der
+ * Ablauf auf /leistungen. Die Werte `mt-14`, `mt-20`, `mt-24` sind fuer die
+ * Rasterfassung bemessen; gestapelt werden sie zu Zeilenabstaenden.
+ *
+ * Ab `md` bleibt jeder Wert unveraendert.
+ */
 export function Portfolio({ heading = true }: { heading?: boolean }) {
   const { t, locale } = useLocale();
   /*
@@ -232,13 +242,13 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
       </Reveal>
 
       {view === "registry" ? (
-        <div className="mt-14">
+        <div className="mt-10 md:mt-14">
           <WorkRegistry />
         </div>
       ) : (
         <>
           {/* Eigene Produkte — die großen Cases */}
-          <Reveal className="mt-20">
+          <Reveal className="mt-12 md:mt-20">
             <GroupHeading
               label={t.portfolio.products}
               note={t.portfolio.productsNote}
@@ -287,7 +297,7 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
           */}
           {genannteClientWorks.length > 0 && (
             <>
-              <Reveal className="mt-24">
+              <Reveal className="mt-14 md:mt-24">
                 <GroupHeading
                   label={t.portfolio.clientWork}
                   note={t.portfolio.clientWorkNote}
@@ -316,7 +326,7 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
         </>
       )}
 
-      <Reveal className="mt-24">
+      <Reveal className="mt-14 md:mt-24">
         <div className="flex items-center gap-4">
           <p className="eyebrow text-foreground">{t.portfolio.more}</p>
           <Separator className="flex-1" />
