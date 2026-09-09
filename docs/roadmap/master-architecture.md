@@ -334,9 +334,42 @@ Code wäre für den Sitz richtig und für den nächsten Kunden falsch. Gerechnet
 wird über das Wochenende; fällt eine Frist auf einen Feiertag, ist sie **zu
 früh** angesetzt, und der Fehler geht zu Lasten des Hauses.
 
-**G22 · Kundenerfolg & Ausbau** — Kundengesundheit, Verlängerung, Ausbau —
+**G22 ⬥ Kundenerfolg & Ausbau** — Kundengesundheit, Verlängerung, Ausbau —
 und die **Empfehlungs-Schleife** zurück nach G11. Der einzige Zugangsweg, der
 mit „keine Kaltakquise" vollständig vereinbar ist.
+
+*Geschlossen 09.09.2026.* Von den drei genannten Dingen hat sich eines beim
+Hinsehen **aufgelöst**, und das ist der interessanteste Befund dieses Gates.
+
+**Es gibt keine Verlängerung — das ist eine Zusage, keine Lücke.** Das FAQ
+sagt öffentlich: *„monatlich kündbar, ohne Mindestlaufzeit."* Damit existiert
+kein Verlängerungstermin, den man verwalten könnte. Einen einzubauen wäre
+schlimmer als nutzlos: Ein „Vertrag läuft aus am …" widerspräche der Zusage,
+und ein Erinnerungslauf darauf wäre eine Frist, die das Haus selbst erfunden
+hat. `check-kundenerfolg.mjs` bricht ab, sobald einer auftaucht.
+
+Was es stattdessen gibt, ist eine Entscheidung, die der Kunde **jeden Monat
+still trifft**. Die Frage lautet deshalb nicht „wann läuft es aus", sondern
+**„woran würde man es vorher merken"** — und das ist die Kundengesundheit.
+
+**Gesundheit ist keine Zahl.** Vier Achsen (Betrieb · Geld · Beziehung ·
+Nutzung), jede einzeln beantwortet, jede mit Grund im Klartext — kein Score,
+keine Ampel. Dieselbe Doktrin wie bei der Angebotsreife und beim Zielbild:
+Eine Zahl lädt dazu ein, die **Zahl** zu verbessern; eine offene Frage lädt
+dazu ein, den Betrieb anzurufen.
+
+Zwei Achsen sind bewusst zweischneidig: *Nichts abgerufen* ist ein Signal
+(„wer nichts abruft, fragt sich irgendwann, wofür er zahlt") und *mehr als
+das Kontingent* ebenso („entweder wächst der Betrieb, oder er hat das falsche
+Paket"). Und **unbekannt ist nicht null**: Eine nicht erhobene Forderungslage
+ist `unklar`, nicht `gut`.
+
+**Die Empfehlung wird erbeten, nicht erzeugt.** Fragen darf man erst, wenn die
+Übergabe steht (G19), keine Achse auf Achtung ist und nichts überfällig offen
+ist — um eine Empfehlung zu bitten, während eine Rechnung überfällig ist, ist
+die Lehrbuchdefinition von Taktlosigkeit. Der genannte Name geht danach durch
+**G11**, wo die Regeln für Personendaten Dritter stehen; dieses Modul legt
+keinen Kontakt an, und das Gate prüft es.
 
 ### Etappe VII · Steuerung
 
