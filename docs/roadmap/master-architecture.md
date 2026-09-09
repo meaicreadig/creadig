@@ -876,6 +876,47 @@ Recht, AT und CH bei allen vier.
 **G36 · Vollständiger Geschäftskreislauf** — echtes Marktsignal bis echte
 Owner-Entscheidung, an echten Fällen.
 
+*System gebaut 09.09.2026. Nicht geschlossen — „an echten Fällen" fehlt, und
+der Kreislauf ist heute nicht durchgängig.*
+
+**Der naheliegendste Fehler wäre, dieses Gate durch Zählen zu beantworten:**
+fünfunddreißig gebaute Gates, also läuft der Kreislauf. Eine Kette ist aber
+nicht so stark wie die Summe ihrer Glieder, sondern so stark wie ihr
+schwächstes — und fünfunddreißig Gates mit einer offenen Umsatzsteuerfrage
+ergeben einen Kreislauf, der an der Rechnung stehenbleibt.
+
+**`lib/kreislauf.ts` zählt deshalb nichts. Es fragt.** Achtzehn Stationen vom
+Marktsignal bis zur Owner-Entscheidung, und jede Antwort holt es aus dem
+Gate, dem die Station gehört: `steuerlage()` aus G18, `darfVerkaufenIn()` aus
+G35, `ersatzlage()` aus G33, `verkaeuflicheProdukte()` aus G25. Eine zweite
+Meinung darüber, ob die Steuerfrage geklärt ist, gäbe es hier nicht — sie
+wäre falsch, sobald G18 sich ändert. Der Probelauf beweist genau das: Setzt
+man in einer Kopie den Steuerstatus auf entschieden, verschwindet die Sperre
+an der Rechnung. Sie stand nie in diesem Modul.
+
+**Die Lage heute — fünf von achtzehn Stationen tragen nicht:**
+
+| Station | Gate | Was fehlt | Wer |
+|---|---|---|---|
+| Angebot | G17/G35 | kein Markt geklärt (Steuer, Recht) | Steuerberater, Anwalt |
+| Rechnung | G18 | Umsatzsteuer-Status nicht entschieden | Steuerberater |
+| Wirtschaftlichkeit | G23 | interner Stundensatz, Kapazitätsgrenze | Owner |
+| Produktlernen | G24/G25 | kein Produkt verkäuflich (Reifegrad) | Owner |
+| Rollen | G33 | keine Rolle besetzt | Owner |
+
+**Keine dieser Sperren ist ein Codefehler.** Jede wartet auf eine Angabe, die
+ein Mensch hat — und deshalb nennt jede Sperre ihren Adressaten. Eine Sperre
+ohne Adressaten wird als Systemfehler gelesen, und dann sucht jemand im Code,
+was ein Steuerberater beibringen muss.
+
+**`durchlauf().belegt` ist `null` — und das ist das Ergebnis, kein
+Platzhalter.** Ob je ein echter Fall den Kreislauf durchlaufen hat, steht in
+den Registern, nicht im Code. Wäre hier ein `true` ableitbar, sobald alle
+Stationen tragen, hätte dieses Gate genau die Aussage erfunden, gegen die
+sein Vertrag mit *„an echten Fällen"* geschrieben ist. **GEBAUT ist nicht
+GELAUFEN**, und der Build bricht bei jedem Versuch, aus dem einen das andere
+zu machen.
+
 ---
 
 ## 5 · Zwei Regeln, die kein eigenes Gate bekommen
