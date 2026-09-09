@@ -461,6 +461,23 @@ export const dictionary = {
         "private-beta": "Private Beta",
         "in-development": "In Entwicklung",
       },
+      /*
+       * GATE 24 — DER RUECKMELDEWEG.
+       *
+       * Das Interesse-Formular weiter unten fragt „sollen wir Bescheid
+       * sagen?". Wer das Produkt schon BENUTZT und etwas findet, hat eine
+       * andere Frage — und hatte dafuer bis G24 keinen Weg ausser dem
+       * Kontaktformular, das nach einem Projekt fragt.
+       */
+      feedbackEyebrow: "Rückmeldung",
+      feedbackTitle: "Etwas gefunden?",
+      feedbackBody:
+        "Wer mit {product} arbeitet und auf eine Störung oder eine fehlende Sache stösst, meldet sie hier — nicht über das Kontaktformular, das nach einem Projekt fragt.",
+      feedbackFor: {
+        stoerung: "für Störungen",
+        wunsch: "für Wünsche",
+        beides: "für Störungen und Wünsche",
+      },
       builtLabel: "Was wir gebaut haben",
       blocksLabel: "Bausteine",
       blocksTitle: "Selbst gebaut, Baustein für Baustein.",
@@ -2721,6 +2738,15 @@ export const dictionary = {
         "private-beta": "Özel beta",
         "in-development": "Geliştirme aşamasında",
       },
+      feedbackEyebrow: "Geri bildirim",
+      feedbackTitle: "Bir şey mi buldunuz?",
+      feedbackBody:
+        "{product} ile çalışırken bir arıza ya da eksik bir şeyle karşılaşan buradan bildirir — proje soran iletişim formu üzerinden değil.",
+      feedbackFor: {
+        stoerung: "arızalar için",
+        wunsch: "istekler için",
+        beides: "arızalar ve istekler için",
+      },
       builtLabel: "Ne inşa ettik",
       blocksLabel: "Yapı taşları",
       blocksTitle: "Taş taş, kendimiz kurduk.",
@@ -4200,6 +4226,15 @@ export const dictionary = {
         "private-beta": "Private beta",
         "in-development": "In development",
       },
+      feedbackEyebrow: "Feedback",
+      feedbackTitle: "Found something?",
+      feedbackBody:
+        "Anyone working with {product} who hits a fault or a missing piece reports it here — not through the contact form, which asks about a project.",
+      feedbackFor: {
+        stoerung: "for faults",
+        wunsch: "for requests",
+        beides: "for faults and requests",
+      },
       builtLabel: "What we built",
       blocksLabel: "Building blocks",
       blocksTitle: "Built ourselves, block by block.",
@@ -5664,6 +5699,15 @@ export const dictionary = {
         pilot: "تشغيل تجريبي",
         "private-beta": "نسخة تجريبية خاصة",
         "in-development": "قيد التطوير",
+      },
+      feedbackEyebrow: "ملاحظات",
+      feedbackTitle: "وجدت شيئًا؟",
+      feedbackBody:
+        "من يعمل بـ {product} ويصادف عطلًا أو نقصًا يبلّغ عنه هنا — لا عبر نموذج التواصل الذي يسأل عن مشروع.",
+      feedbackFor: {
+        stoerung: "للأعطال",
+        wunsch: "للطلبات",
+        beides: "للأعطال والطلبات",
       },
       builtLabel: "ما الذي بنيناه",
       blocksLabel: "اللبنات",

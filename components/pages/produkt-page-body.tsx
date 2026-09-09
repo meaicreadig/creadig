@@ -11,6 +11,7 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { StatusDot } from "@/components/ui/status-dot"
 import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
 import { ProductInterest } from "@/components/product/product-interest"
+import { eintragZu, standTraegt, veraltet, wegTraegt } from "@/lib/produkt"
 import { publishedServicePages } from "@/lib/service-pages"
 import {
   furtherProjects,
@@ -81,9 +82,25 @@ export function ProduktPageBody({
    * Der Punkt links folgt demselben Wert: Ein gefuellter Punkt neben
    * „In Entwicklung" waere ein Widerspruch, den niemand aufloest.
    *
-   * Ohne Owner-Wert (heute: alle vier `null`) aendert sich nichts.
+   * ─────────────────────────────────────────────────────────────────────
+   * GATE 24 — DIE QUELLE HAT SICH GEAENDERT, DIE REGEL NICHT.
+   *
+   * Der Wert kam aus `world.maturity` — einem Feld, das man setzen konnte,
+   * ohne zu sagen wer, wann und woran. Er kommt jetzt aus dem Portfolio,
+   * und nur, wenn er TRAEGT und nicht VERALTET ist:
+   *
+   *   traegt nicht  → die Ableitung, wie vorher
+   *   veraltet      → die Ableitung, wie vorher
+   *
+   * Ein Reifegrad, den seit acht Monaten niemand bestaetigt hat, ist keine
+   * bessere Angabe als die Rechnung aus `live` — er sieht nur so aus.
+   *
+   * Ohne bestaetigten Stand (heute: alle vier) aendert sich nichts.
    */
-  const maturity = world?.maturity ?? null
+  const eintrag = eintragZu(product.slug)
+  const gepflegterStand =
+    eintrag && standTraegt(eintrag.stand) && !veraltet(eintrag.stand) ? eintrag.stand : null
+  const maturity = gepflegterStand?.stufe ?? null
   const badgeLabel = maturity
     ? copy.maturityBadge[maturity]
     : copy.statusBadge[status]
@@ -558,6 +575,36 @@ export function ProduktPageBody({
           fuehrt WEG vom Produkt ("Kontakt", "Alle Produkte") — die Frage zum
           Produkt selbst muss davor stehen.
           ------------------------------------------------------------------ */}
+      {/* ── Rueckmeldeweg ────────────────────────────────────────────────
+          GATE 24 — das Interesse-Formular darunter fragt „sollen wir
+          Bescheid sagen?". Wer das Produkt schon BENUTZT und etwas findet,
+          hat eine andere Frage.
+
+          Bis G24 gab es dafuer keinen Weg ausser dem allgemeinen
+          Kontaktformular — und das fragt nach einem Projekt. Ein Portfolio,
+          das einen Rueckmeldeweg fuehrt, den niemand sieht, waere ein
+          Register ohne Weg hinein. */}
+      {eintrag && wegTraegt(eintrag.rueckmeldung) && (
+        <section aria-labelledby="produkt-rueckmeldung-title" className="section-seam">
+          <div className="section-shell">
+            <SectionEyebrow label={copy.feedbackEyebrow} />
+            <h2 id="produkt-rueckmeldung-title" className="type-h3 mt-7 text-balance">
+              {copy.feedbackTitle}
+            </h2>
+            <p className="type-lead text-muted-foreground mt-6 max-w-2xl text-pretty">
+              {copy.feedbackBody.replace("{product}", product.name)}
+            </p>
+            <p className="type-small text-foreground mt-6">
+              {eintrag.rueckmeldung!.an}
+              <span className="text-muted-foreground">
+                {" "}
+                — {copy.feedbackFor[eintrag.rueckmeldung!.fuer]}
+              </span>
+            </p>
+          </div>
+        </section>
+      )}
+
       <ProductInterest slug={product.slug} productName={product.name} />
 
       {/* ------------------------------------------------------------------
