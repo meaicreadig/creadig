@@ -373,11 +373,39 @@ keinen Kontakt an, und das Gate prüft es.
 
 ### Etappe VII · Steuerung
 
-**G23 · Wirtschaftlichkeit & Kapazität** — Marge je Projekt, wiederkehrender
+**G23 ⬥ Wirtschaftlichkeit & Kapazität** — Marge je Projekt, wiederkehrender
 Anteil, **Kapazitätsgrenze**. Hier wird die G05-Schuld eingelöst: Trägt der
 Pilotpreis von 2.400 €? Trägt 149 €/Monat?
 *Kapazität gehört hierher*, weil „wir sind voll" eine kaufmännische Aussage
 ist, keine technische.
+
+*System geschlossen 09.09.2026 — und die Antwort ist ein begründetes
+UNBEKANNT.* Beide Fragen sind heute **nicht beantwortbar**, und das ist der
+Befund: nicht weil die Rechnung schwer wäre, sondern weil die eine Zahl fehlt,
+aus der sie entsteht. **Es wird kein Aufwand erfasst. Nirgends.**
+
+`marge()` kennt deshalb genau zwei Wege — *gerechnet* oder *unbekannt*. Es
+gibt bewusst keinen dritten („geschätzt", „ungefähr", „vorläufig"): Jeder
+davon wird nach zwei Wochen wie eine Zahl gelesen. Fehlt etwas, sagt die
+Antwort **welche drei Dinge** fehlen, und eine davon nennt die G05-Schuld beim
+Namen.
+
+**Die Knappheit, die keine war.** `offers.md` verbietet ausdrücklich
+*„Knappheit ohne Zustand — wenn niemand zählt und niemand abschaltet, ist es
+keine Knappheit"*. Zwei Absätze darüber steht die Bedingung des Pilotpreises:
+*„der erste Betrieb in einem Gewerk zu sein."* Gezählt hat sie **niemand** —
+damit galt der Pilotpreis faktisch für jeden, der fragte, und die eigene Regel
+stand gegen die eigene Praxis. `pilotpreisLage()` antwortet jetzt vor der
+Preisnennung, und ohne erfasste Gewerke antwortet sie `null`: weder ja noch
+nein, sondern der Grund.
+
+**Kapazität sperrt nicht.** Ohne hinterlegte Grenze darf weiterverkauft
+werden — ein Verkaufsstopp aus Buchhaltungsgründen wäre schlimmer als die
+Lücke. Der Vorbehalt steht dafür im Satz und verschwindet nicht.
+
+*Owner-Punkte, die diese drei Unbekannten auflösen:* interner Stundensatz ·
+Kapazitätsgrenze · Gewerk je Bestandskunde. Alle drei stehen bei jedem Build
+in der Ausgabe.
 
 ### Etappe VIII · Produkte
 

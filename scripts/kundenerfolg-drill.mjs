@@ -7,7 +7,6 @@
  * Beobachtung; und eine Empfehlungsfrage im falschen Moment.
  */
 const K = await import("../lib/kundenerfolg.ts")
-const B = await import("../lib/betrieb.ts")
 const L = await import("../lib/verlust.ts")
 const C = await import("../lib/contact-access.ts")
 
