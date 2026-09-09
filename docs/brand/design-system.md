@@ -266,7 +266,7 @@ Was jede Änderung passieren muss:
 ```
 npx tsc --noEmit
 npx eslint .
-npm run build           → Function · Sterne · Parität · Bestand · Freigabe · Auftritt · Redaktion · Herkunft · Angebot · Lieferung · Produkt · Verkauf
+npm run build           → Function · Sterne · Parität · Bestand · Freigabe · Auftritt · Redaktion · Herkunft · Angebot · Lieferung · Produkt · Verkauf · Rollen
 npm run a11y            → 112 Durchläufe, 0 Verletzungen (WCAG 2.1 AA, maschinell)
 npm run mobile          → 6 Breiten: kein Überlauf, keine zu kleine Bedienfläche
 npm run auftritt-drill  → 112 Messstellen: Radius · Kollision · Logotreue · Takt
@@ -277,6 +277,7 @@ npm run angebot-drill   → Regel + Weg durch die Datenbank (ANGEBOT_DRILL_URL)
 npm run lieferung-drill → Frist, Änderung, Abnahme, Übergabe (ANGEBOT_DRILL_URL)
 npm run produkt-drill   → Reifegrad mit Herkunft, Widerspruch, Rückmeldeweg
 npm run verkauf-drill   → Verkaufsschwelle und die Muster-Schleife
+npm run rollen-drill    → Rechte, Sitzungsfälschung, Übergabe (Sicherheits-Probelauf)
 npm run db-drills       → crm · sales · research · contact · evidence, gegen frische Wegwerf-DBs
 ```
 

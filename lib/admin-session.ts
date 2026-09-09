@@ -1,4 +1,5 @@
 import { equal, sign } from "@/lib/hmac"
+import { ROLLEN, ROLLEN_KEYS, istRolle, type Rolle } from "@/lib/rollen"
 
 /**
  * MP-G · Die Anmeldung am Control Center.
@@ -52,6 +53,37 @@ function config(): { password: string; secret: string } | null {
   return { password, secret }
 }
 
+function secret(): string | null {
+  return process.env.ADMIN_SESSION_SECRET || null
+}
+
+/*
+ * GATE 32 — WELCHE ROLLE GEHOERT ZU DIESEM PASSWORT?
+ *
+ * Bis hierher gab es eine Frage: stimmt das Passwort. Es gab nur eins, und
+ * wer es kannte, sah alles.
+ *
+ * Jetzt hat jede Rolle ihre EIGENE Umgebungsvariable. Diese Datei liest sie,
+ * vergleicht zeitkonstant und gibt die Rolle zurueck — sie legt kein Konto
+ * an, und ein Wert steht nirgends im Repository.
+ *
+ * ZEITKONSTANT UEBER ALLE: Es wird JEDE gesetzte Variable geprueft, auch
+ * wenn die erste schon passt. Ein Abbruch beim ersten Treffer verriete ueber
+ * die Antwortzeit, welche Rolle geraten wurde. Und `owner` steht zuerst in
+ * `ROLLEN_KEYS`: Waeren zwei Variablen versehentlich gleich gesetzt,
+ * bekaeme man sonst die schwaechere Rolle und wunderte sich, was fehlt.
+ */
+export function rolleFuerPasswort(input: unknown): Rolle | null {
+  if (typeof input !== "string" || input.length === 0) return null
+  let treffer: Rolle | null = null
+  for (const rolle of ROLLEN_KEYS) {
+    const wert = process.env[ROLLEN[rolle].variable]
+    if (typeof wert !== "string" || wert.length === 0) continue
+    if (equal(input, wert) && treffer === null) treffer = rolle
+  }
+  return treffer
+}
+
 export function adminConfigured(): boolean {
   return config() !== null
 }
@@ -67,41 +99,62 @@ export function passwordMatches(input: unknown): boolean {
   return equal(input, cfg.password)
 }
 
-/** `<ablaufZeitpunkt>.<signatur>` — dasselbe Format wie das Formular-Token. */
-export async function issueSession(now = Date.now()): Promise<string | null> {
-  const cfg = config()
-  if (!cfg) return null
+/**
+ * `<rolle>.<ablaufZeitpunkt>.<signatur>`
+ *
+ * GATE 32 — die Rolle steht IN der Sitzung und ist mitsigniert.
+ *
+ * Vorher lautete das Format `<ablauf>.<signatur>` und trug keine Identitaet:
+ * `verifySession()` sagte „ok", nicht WER. Damit konnte die Middleware nur
+ * eine Frage stellen — angemeldet oder nicht.
+ *
+ * Die Rolle darf nicht NEBEN der Signatur stehen, sondern muss UNTER ihr
+ * liegen: Signiert wird `<rolle>.<ablauf>`. Sonst koennte jeder das erste
+ * Feld auf `owner` aendern und behielte eine gueltige Signatur. Der
+ * Probelauf faehrt genau diesen Angriff.
+ *
+ * Alte Sitzungen (zwei Felder) werden ungueltig. Das ist beabsichtigt, und
+ * die Kosten sind eine Anmeldung: Einer Sitzung ohne Rolle koennte man nur
+ * eine raten, und geraten wird hier nichts.
+ */
+export async function issueSession(rolle: Rolle, now = Date.now()): Promise<string | null> {
+  const s = secret()
+  if (!s) return null
   const expiresAt = String(now + SESSION_MS)
-  return `${expiresAt}.${await sign(expiresAt, cfg.secret)}`
+  const nutzlast = `${rolle}.${expiresAt}`
+  return `${nutzlast}.${await sign(nutzlast, s)}`
 }
 
 export type SessionVerdict = "ok" | "missing" | "invalid" | "expired" | "unavailable"
 
+export type SessionErgebnis = { verdict: SessionVerdict; rolle: Rolle | null }
+
 export async function verifySession(
   value: unknown,
   now = Date.now(),
-): Promise<SessionVerdict> {
-  const cfg = config()
-  if (!cfg) return "unavailable"
-  if (typeof value !== "string" || value.length === 0) return "missing"
+): Promise<SessionErgebnis> {
+  const s = secret()
+  if (!s) return { verdict: "unavailable", rolle: null }
+  if (typeof value !== "string" || value.length === 0) return { verdict: "missing", rolle: null }
   /* Eine Obergrenze, damit ein langer Wert nicht erst signiert wird. */
-  if (value.length > 200) return "invalid"
+  if (value.length > 200) return { verdict: "invalid", rolle: null }
 
-  const separator = value.indexOf(".")
-  if (separator <= 0) return "invalid"
-
-  const expiresAt = value.slice(0, separator)
-  const signature = value.slice(separator + 1)
-  if (!/^\d+$/.test(expiresAt)) return "invalid"
+  const teile = value.split(".")
+  if (teile.length !== 3) return { verdict: "invalid", rolle: null }
+  const [rolle, expiresAt, signature] = teile
+  if (!istRolle(rolle)) return { verdict: "invalid", rolle: null }
+  if (!/^\d+$/.test(expiresAt)) return { verdict: "invalid", rolle: null }
 
   /*
    * Erst die Signatur, dann die Zeit. Andersherum würde ein abgelaufener,
    * aber gefälschter Wert dieselbe Antwort bekommen wie ein abgelaufener
    * echter — und damit verraten, dass die Fälschung an der Zeit scheiterte.
    */
-  if (!equal(signature, await sign(expiresAt, cfg.secret))) return "invalid"
-  if (Number(expiresAt) < now) return "expired"
-  return "ok"
+  if (!equal(signature, await sign(`${rolle}.${expiresAt}`, s))) {
+    return { verdict: "invalid", rolle: null }
+  }
+  if (Number(expiresAt) < now) return { verdict: "expired", rolle: null }
+  return { verdict: "ok", rolle }
 }
 
 /**

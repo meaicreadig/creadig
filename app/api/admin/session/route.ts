@@ -4,7 +4,7 @@ import {
   SESSION_SECONDS,
   adminConfigured,
   issueSession,
-  passwordMatches,
+  rolleFuerPasswort,
   sessionCookieOptions,
 } from "@/lib/admin-session"
 import { bucketKey, callerAddress, withinLimit } from "@/lib/lead-guard"
@@ -53,15 +53,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 })
   }
 
-  if (!passwordMatches(payload.password)) {
-    /*
-     * Eine Antwort für alles: falsches Passwort, leeres Feld, falscher Typ.
-     * Wer unterscheidet, sagt einem Angreifer, wie weit er ist.
-     */
+  /*
+   * GATE 32 — WELCHE Rolle, nicht nur OB.
+   *
+   * `rolleFuerPasswort()` prueft jede gesetzte Rollen-Variable zeitkonstant
+   * und gibt die Rolle zurueck. Ist keine gesetzt oder passt keine, ist die
+   * Antwort dieselbe wie vorher: eine einzige, fuer alles.
+   *
+   * Eine Antwort für alles: falsches Passwort, leeres Feld, falscher Typ,
+   * unbekannte Rolle. Wer unterscheidet, sagt einem Angreifer, wie weit er
+   * ist — und mit Rollen waere die Auskunft doppelt wertvoll: Sie verriete
+   * auch, WELCHES Passwort er fast getroffen hat.
+   */
+  const rolle = rolleFuerPasswort(payload.password)
+  if (!rolle) {
     return NextResponse.json({ ok: false, error: "invalid" }, { status: 401 })
   }
 
-  const session = await issueSession()
+  const session = await issueSession(rolle)
   if (!session) {
     return NextResponse.json({ ok: false, error: "unavailable" }, { status: 503 })
   }

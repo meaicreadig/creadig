@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
+import { ausweichZiel, darfBetreten } from "@/lib/rollen"
 
 /**
  * MP-G · Die Tür vor dem Control Center.
@@ -41,8 +42,32 @@ export async function middleware(request: NextRequest) {
   /* Die Anmeldeseite selbst darf nicht hinter der Anmeldung liegen. */
   if (pathname === "/admin/login") return NextResponse.next()
 
-  const verdict = await verifySession(request.cookies.get(ADMIN_COOKIE)?.value)
-  if (verdict === "ok") return NextResponse.next()
+  const { verdict, rolle } = await verifySession(request.cookies.get(ADMIN_COOKIE)?.value)
+
+  /*
+   * GATE 32 — ZWEI FRAGEN, NICHT EINE.
+   *
+   * Hier stand nur: angemeldet oder nicht. Wer hereinkam, sah fuenfzehn
+   * Flaechen — die Pipeline, die Recherche, jede Kundenakte.
+   *
+   * Jetzt entscheidet zusaetzlich `darfBetreten(rolle, pfad)`, und zwar
+   * HIER, vor der Seite. Ein ausgeblendeter Menuepunkt waere keine Sperre:
+   * die Adresse funktioniert weiter.
+   *
+   * Wer angemeldet ist, aber nicht darf, wird NICHT zur Anmeldung
+   * geschickt — er ist ja angemeldet. Er landet auf der Flaeche, die seine
+   * Rolle hat. Eine Anmeldemaske fuer jemanden, der schon angemeldet ist,
+   * liest sich wie ein Fehler und laedt dazu ein, es mit einem anderen
+   * Passwort zu versuchen.
+   */
+  if (verdict === "ok" && rolle) {
+    if (darfBetreten(rolle, pathname)) return NextResponse.next()
+    const ausweich = request.nextUrl.clone()
+    ausweich.pathname = ausweichZiel(rolle)
+    ausweich.search = ""
+    ausweich.searchParams.set("gesperrt", "1")
+    return NextResponse.redirect(ausweich)
+  }
 
   const login = request.nextUrl.clone()
   login.pathname = "/admin/login"

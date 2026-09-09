@@ -406,9 +406,39 @@ Fällen.
 
 ### Etappe XI · Organisation
 
-**G32 · Rollen, Rechte & Übergaben** — heute ein Mensch, ein Passwort. Ziel:
+**G32 ⬥ Rollen, Rechte & Übergaben** — heute ein Mensch, ein Passwort. Ziel:
 ein zweiter Mensch kann arbeiten, ohne alles zu sehen. Hier entsteht die
 **Team-Seite** mit echten Menschen.
+
+*System geschlossen 09.09.2026. Die Team-Seite bleibt beim Owner* — echte
+Menschen erfindet kein Gate.
+
+Der Befund war schärfer als der Satz: Die Sitzung trug **keine Identität**.
+`verifySession()` antwortete „ok", nicht *wer* — und `middleware.ts` konnte
+deshalb nur eine Frage stellen. Fünfzehn Flächen, zwölf davon mit
+Personendaten Dritter, und wer hereinkam, sah alle.
+
+| | Vorher | Jetzt |
+|---|---|---|
+| Sitzung | `<ablauf>.<signatur>` | `<rolle>.<ablauf>.<signatur>` — die Rolle liegt **unter** der Signatur |
+| Middleware | „angemeldet?" | zusätzlich `darfBetreten(rolle, pfad)`, **vor** der Seite |
+| Voreinstellung | — | **Verbot**: eine nicht eingetragene Fläche ist gesperrt, nicht offen |
+| Übergabe | — | fällt aus der Rolle, nicht aus dem Gedächtnis dessen, der geht |
+
+*Warum die Rolle mitsigniert wird:* Stünde sie neben der Signatur, könnte
+jeder das erste Feld auf `owner` setzen und behielte ein gültiges Cookie. Der
+Probelauf fährt genau diesen Angriff.
+
+*Kein Konto wird angelegt, kein Passwort angefasst.* Jede Rolle hat ihre
+eigene Umgebungsvariable — im Repository steht nur ihr **Name**. Ein zweiter
+Mensch ist damit **möglich**, aber nicht **eingerichtet**: Das Gate sagt bei
+jedem Build, welche Variable ihn einrichtet — ohne Code-Änderung.
+
+*Der Wächter hatte selbst eine Lücke*, und die Blindprobe fand sie: Er suchte
+das Signatur-Muster *irgendwo* in `admin-session.ts` und schwieg, als nur
+`issueSession()` kaputt war — `verifySession()` enthielt es noch. Ausstellen
+und Prüfen müssen über **dasselbe** signieren; beide werden jetzt einzeln
+geprüft.
 
 **G33 · Owner-Ersetzbarkeit** — Owner-1.0-Satz 10: für **einen** Ablauf
 ersetzbar. *Unabhängig, weil* es der einzige Beweis ist, dass das Unternehmen
