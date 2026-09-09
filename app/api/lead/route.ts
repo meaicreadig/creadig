@@ -1006,16 +1006,20 @@ export async function POST(request: Request) {
       ? {
           score: check.score,
           /*
-           * KEIN Engpass, wenn alle fuenf Ebenen gleich stark sind.
+           * KEIN Engpass nur, wenn nirgends etwas fehlt.
            *
            * `evaluateCheck().bottleneck` ist IMMER gesetzt — eine Liste hat
            * immer ein Minimum. Bei fuenfmal 100 Prozent zeigte das Feld
            * deshalb „Engpass: Identity" auf einem Bogen ohne jede Luecke.
-           * Genau diese Behauptung verhindert `evenlyBalanced` schon auf der
-           * oeffentlichen Seite; sie darf im Speicher nicht wieder entstehen.
-           * Nachgemessen 03.09.2026 mit einem Bogen aus fuenfzehnmal „Ja".
+           *
+           * Die erste Fassung haengte das an `evenlyBalanced` — und schrieb
+           * damit auch bei fuenfzehnmal „Nicht" ein `null` in den Datensatz:
+           * gleich stark ist auch, wer ueberall bei null steht. Wer die
+           * Anfrage spaeter liest, saehe einen Betrieb ohne Engpass, der
+           * gerade jede Frage verneint hat. Jetzt entscheidet `befund`.
+           * Nachgemessen 09.09.2026 mit 15x Ja, 15x Teilweise, 15x Nicht.
            */
-          bottleneck: check.evenlyBalanced ? null : check.bottleneck.key,
+          bottleneck: check.befund === "kein-engpass" ? null : check.bottleneck.key,
           manualSpots: check.manualSpots,
         }
       : null

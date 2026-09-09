@@ -254,17 +254,47 @@ export type CheckResult = {
   /** Wurden alle Fragen beantwortet? Vorher gibt es kein Ergebnis. */
   complete: boolean
   /**
+   * Wie viele Fragen mit „Teilweise" beantwortet wurden.
+   *
+   * Zaehlt getrennt von `manualSpots`, weil die beiden verschiedene Dinge
+   * sind: „Nicht" ist eine benannte Luecke, „Teilweise" eine halbe Sache.
+   * Ohne diese Zahl las sich ein Bogen aus fuenfzehnmal „Teilweise" wie
+   * einer ganz ohne offene Stellen.
+   */
+  partialSpots: number
+  /**
    * Alle fuenf Ebenen gleich stark.
    *
-   * Ohne dieses Feld behauptet die Seite auch dann einen Engpass, wenn es
-   * keinen gibt: `bottleneck` ist immer gesetzt, weil eine Liste immer ein
-   * Minimum hat. Bei fuenfmal 100 Prozent stand dort „Identity → Digital:
-   * Solange Identity nicht traegt …" — ein Satz ueber eine Luecke, die der
-   * Besucher gerade selbst als geschlossen gemeldet hat. Das ist genau die
-   * Sorte Behauptung, die diese Seite nicht macht.
+   * ACHTUNG — DAS HEISST NICHT „ALLES GUT". Genau diese Verwechslung war
+   * hier der Fehler: Das Feld wurde eingefuehrt fuer den Bogen aus
+   * fuenfzehnmal „Ja" und dort auch gemessen; benutzt wurde es aber als
+   * Schalter fuer „Kein Engpass". Fuenfmal 50 Prozent sind ebenso gleich
+   * wie fuenfmal 100 — und fuenfmal 0 auch. Wer den Befund daran haengt,
+   * meldet einem Betrieb, der gerade JEDE Frage mit „Nicht" beantwortet hat,
+   * es falle keine Ebene ab.
+   *
+   * Fuer den Befund gibt es deshalb `befund`. Dieses Feld sagt nur noch,
+   * was es misst: dass die Ebenen gleich stehen.
    */
   evenlyBalanced: boolean
+  /**
+   * DER BEFUND — die eigentliche Aussage der Seite.
+   *
+   *   `kein-engpass`           Keine Ebene hat eine Luecke. Nur dann.
+   *   `gleichmaessig-schwach`  Keine faellt ab, aber keine traegt ganz.
+   *                            Kein einzelner Engpass — und trotzdem Arbeit.
+   *   `engpass`                Eine Ebene ist die schwaechste.
+   *
+   * Die Grenze fuer `kein-engpass` ist nicht gegriffen: Sie liegt bei 100
+   * Prozent, weil jede Zahl darunter bedeutet, dass der Besucher SELBST
+   * etwas als nicht vollstaendig laufend gemeldet hat. Eine Entwarnung ueber
+   * eine Luecke, die er gerade genannt hat, waere dieselbe Sorte Behauptung,
+   * die diese Seite nicht macht — nur mit umgekehrtem Vorzeichen.
+   */
+  befund: Befund
 }
+
+export type Befund = "kein-engpass" | "gleichmaessig-schwach" | "engpass"
 
 export type CheckAnswers = Partial<Record<string, CheckAnswerKey>>
 
@@ -304,6 +334,26 @@ export function evaluateCheck(answers: CheckAnswers): CheckResult {
   const manualSpots = CHECK_QUESTIONS.filter(
     (question) => answers[question.id] === "no",
   ).length
+  const partialSpots = CHECK_QUESTIONS.filter(
+    (question) => answers[question.id] === "partly",
+  ).length
+
+  const evenlyBalanced = layers.every((layer) => layer.percent === layers[0].percent)
+  const alleVoll = layers.every((layer) => layer.percent === 100)
+
+  /*
+   * Die Reihenfolge ist die Aussage.
+   *
+   * Zuerst wird gefragt, ob ueberhaupt irgendwo etwas fehlt — nicht, ob die
+   * Ebenen gleich stehen. Umgekehrt wurde aus „alle gleich" eine Entwarnung,
+   * und ein Bogen aus fuenfzehnmal „Nicht" bekam den Satz „Keine Ebene
+   * faellt ab."
+   */
+  const befund: Befund = alleVoll
+    ? "kein-engpass"
+    : evenlyBalanced
+      ? "gleichmaessig-schwach"
+      : "engpass"
 
   return {
     score: Math.round((totalPoints / totalMax) * 100),
@@ -311,7 +361,9 @@ export function evaluateCheck(answers: CheckAnswers): CheckResult {
     bottleneck,
     blocked,
     manualSpots,
-    evenlyBalanced: layers.every((layer) => layer.percent === layers[0].percent),
+    partialSpots,
+    evenlyBalanced,
+    befund,
     complete: CHECK_QUESTIONS.every((question) => answers[question.id] !== undefined),
   }
 }
@@ -491,6 +543,36 @@ export const checkCopy = {
     ar: "لا طبقة متأخرة. عندها لا يكون السؤال أين يعلق الأمر، بل ما الذي يأتي تاليًا.",
   },
   bottleneckEvenLabel: { de: "Kein Engpass", tr: "Darboğaz yok", en: "No bottleneck", ar: "لا اختناق" },
+  /*
+   * Der Satz fuer den Bogen, auf dem keine Ebene abfaellt und keine traegt.
+   *
+   * Er ist bewusst kein Alarm: Gleichmaessig ist besser als schief, und wer
+   * ueberall „teilweise" antwortet, hat ueberall angefangen. Er ist aber
+   * auch keine Entwarnung — vorher stand hier „Keine Ebene faellt ab", und
+   * das las ein Betrieb mit 50 von 100 als „passt schon".
+   */
+  bottleneckWeakLabel: {
+    de: "Kein einzelner Engpass",
+    tr: "Tek bir darboğaz yok",
+    en: "No single bottleneck",
+    ar: "لا اختناق واحد",
+  },
+  bottleneckWeak: {
+    de: (percent: number) =>
+      `Alle fünf Ebenen stehen gleich — bei ${percent} Prozent. Das ist kein Engpass, sondern ` +
+      "eine gleichmäßige Baustelle: Es gibt keine Stelle, an der es zuerst klemmt, und keine, " +
+      "die schon trägt. Angefangen wird dann unten.",
+    tr: (percent: number) =>
+      `Beş katmanın hepsi aynı düzeyde — yüzde ${percent}. Bu bir darboğaz değil, dengeli bir ` +
+      "şantiye: önce takıldığı bir yer yok, tamamen taşıyan bir yer de yok. O hâlde en alttan başlanır.",
+    en: (percent: number) =>
+      `All five levels are equal — at ${percent} percent. That is not a bottleneck but an even ` +
+      "building site: there is no place where it gets stuck first, and none that already carries. " +
+      "Then you start at the bottom.",
+    ar: (percent: number) =>
+      `الطبقات الخمس كلها في مستوى واحد — عند ${percent} بالمئة. هذا ليس اختناقًا بل ورشة متساوية: ` +
+      "لا موضع يعلق فيه الأمر أولًا، ولا موضع يحمل بالكامل. عندها يُبدأ من الأسفل.",
+  },
   bottleneckTop: {
     de: (weak: string) =>
       `${weak} ist die schwächste Ebene — und die oberste. Darunter steht bereits etwas, auf dem sie aufbauen kann.`,
@@ -512,6 +594,23 @@ export const checkCopy = {
         ? "You marked 1 place as open yourself."
         : `You marked ${count} places as open yourself.`,
     ar: (count: number) => `وسمتم ${count} موضعًا مفتوحًا بأنفسكم.`,
+  },
+  /*
+   * „Teilweise" ist keine offene Stelle und auch keine geschlossene.
+   *
+   * Ohne diesen Satz bekam ein Bogen aus fuenfzehnmal „Teilweise" die
+   * Zeile „Sie haben keine Stelle als offen benannt" — formal richtig,
+   * inhaltlich das Gegenteil dessen, was der Besucher gemeldet hatte.
+   */
+  partialLabel: {
+    de: (count: number) =>
+      count === 1
+        ? "1 Stelle läuft nur teilweise."
+        : `${count} Stellen laufen nur teilweise.`,
+    tr: (count: number) => `${count} nokta yalnızca kısmen çalışıyor.`,
+    en: (count: number) =>
+      count === 1 ? "1 place runs only partly." : `${count} places run only partly.`,
+    ar: (count: number) => `${count} موضعًا تعمل جزئيًا فقط.`,
   },
   manualNone: {
     de: "Sie haben keine Stelle als offen benannt. Dann geht es nicht um Aufräumen, sondern um den nächsten Schritt.",

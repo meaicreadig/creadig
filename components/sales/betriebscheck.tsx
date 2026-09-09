@@ -262,38 +262,48 @@ export function Betriebscheck() {
             {/* Der Engpass-Satz. Das ist die eigentliche Aussage der Seite. */}
             <div className="border-line mt-12 border-t pt-8">
               <p className="eyebrow text-gold-text">
-                {result.evenlyBalanced
+                {result.befund === "kein-engpass"
                   ? checkCopy.bottleneckEvenLabel[locale]
-                  : checkCopy.bottleneckLabel[locale]}
+                  : result.befund === "gleichmaessig-schwach"
+                    ? checkCopy.bottleneckWeakLabel[locale]
+                    : checkCopy.bottleneckLabel[locale]}
               </p>
               <p className="type-statement mt-4 max-w-3xl text-pretty">
-                {result.evenlyBalanced
+                {result.befund === "kein-engpass"
                   ? checkCopy.bottleneckEven[locale]
-                  : result.blocked
-                    ? checkCopy.bottleneckBlocked[locale](
-                        layerName(result.bottleneck.key),
-                        layerName(result.blocked.key),
-                      )
-                    : checkCopy.bottleneckTop[locale](layerName(result.bottleneck.key))}
+                  : result.befund === "gleichmaessig-schwach"
+                    ? checkCopy.bottleneckWeak[locale](result.layers[0].percent)
+                    : result.blocked
+                      ? checkCopy.bottleneckBlocked[locale](
+                          layerName(result.bottleneck.key),
+                          layerName(result.blocked.key),
+                        )
+                      : checkCopy.bottleneckTop[locale](layerName(result.bottleneck.key))}
               </p>
+              {/*
+                Drei Zustaende, nicht zwei: benannte Luecken, halbe Sachen,
+                nichts davon. Vorher fiel „teilweise" unter „nichts davon".
+              */}
               <p className="type-body text-muted-foreground mt-6 text-pretty">
-                {result.manualSpots === 0
-                  ? checkCopy.manualNone[locale]
-                  : checkCopy.manualLabel[locale](result.manualSpots)}
+                {result.manualSpots > 0
+                  ? checkCopy.manualLabel[locale](result.manualSpots)
+                  : result.partialSpots > 0
+                    ? checkCopy.partialLabel[locale](result.partialSpots)
+                    : checkCopy.manualNone[locale]}
               </p>
 
               {/* Aus dem Befund folgt eine Adresse — siehe `layerLinkLabel`. */}
               <Link
                 href={
-                  result.evenlyBalanced
-                    ? "/leistungen"
-                    : `/leistungen#ebene-${result.bottleneck.key}`
+                  result.befund === "engpass"
+                    ? `/leistungen#ebene-${result.bottleneck.key}`
+                    : "/leistungen"
                 }
                 className="text-gold-text mt-8 inline-block text-sm underline underline-offset-4"
               >
-                {result.evenlyBalanced
-                  ? checkCopy.layerLinkAll[locale]
-                  : checkCopy.layerLinkLabel[locale](layerName(result.bottleneck.key))}
+                {result.befund === "engpass"
+                  ? checkCopy.layerLinkLabel[locale](layerName(result.bottleneck.key))
+                  : checkCopy.layerLinkAll[locale]}
               </Link>
             </div>
           </div>
