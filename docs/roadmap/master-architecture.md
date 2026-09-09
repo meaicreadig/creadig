@@ -104,6 +104,17 @@ die Zahl.
 **⬥ = Evidence Gate.** Es baut nichts. Es beweist, dass das Gebaute im echten
 Geschäft trägt.
 
+**✓ = geschlossen.** Das System steht und ist gegen Blindproben geprüft. Es
+heißt **nicht**, dass das Gate im echten Geschäft getragen hat — dafür gibt es
+die Evidence Gates. Und es heißt nicht, dass keine Owner-Punkte mehr offen
+sind: Wo eine Angabe nur ein Mensch hat, steht sie als offener Punkt in der
+Ausgabe des jeweiligen Gates.
+
+*Diese Unterscheidung ist am 09.09.2026 nachgetragen worden* — vorher wurden
+geschlossene Bau-Gates versehentlich mit **⬥** markiert, und das kehrte die
+Bedeutung des Zeichens um: Ein Evidence Gate baut nichts, und jedes so
+markierte Gate hatte etwas gebaut.
+
 ### Etappe III · Markt & Gewinnung
 
 **G09 · Markt & Zielbild** — Heute: Zielmärkte stehen als Owner-Notiz
@@ -144,7 +155,7 @@ Sätze der Owner-1.0-Definition hier liegen.
 *Kommt vor Inhalt* — die alte Reihenfolge hatte Beleg nach Attribution. Ohne
 Beleg ist jeder Inhalt Behauptung.
 
-**G14 ⬥ Auftritt V2** — Heute (bis 09.09.2026): die Owner-Sichtschuld hat
+**G14 ✓ Auftritt V2** — Heute (bis 09.09.2026): die Owner-Sichtschuld hat
 **keinen Eigentümer**. Ziel: sie ist geschlossen.
 *Geschlossen 09.09.2026:* Die Schuld steht als Register in `lib/auftritt.ts`,
 elf Zeilen gehören dem System und werden gemessen, eine dem Owner. Gefunden
@@ -160,7 +171,7 @@ originalgetreu, fibero nicht künstlich vergrößert, Bewegung ruhig).
 *Unabhängig, weil* eine Seite, die unfertig wirkt, jeden Beleg entwertet, den
 G13 daraufsetzt.
 
-**G15 ⬥ Inhalte & Nachfrage** — Heute (bis 09.09.2026): Insights dünn, kein
+**G15 ✓ Inhalte & Nachfrage** — Heute (bis 09.09.2026): Insights dünn, kein
 Redaktionsweg. Ziel: ein Inhaltssystem, das aus Belegen Nachfrage macht.
 *Grenze:* keine erfundene Werbeeinwilligung, kein Ads-Sturm.
 
@@ -186,7 +197,7 @@ Die Grenze aus dem Vertrag stand bis hierher als **Kommentar** in
 als Regel: Das Gate durchsucht das gebaute HTML nach Verteiler-Feldern und
 nach Fremdschriften, die Reichweite kaufen.
 
-**G16 ⬥ Attribution & Lernen** — Heute (bis 09.09.2026): UTM-Felder
+**G16 ✓ Attribution & Lernen** — Heute (bis 09.09.2026): UTM-Felder
 existieren und bleiben leer (G06-Beschluss). Ziel: belegte Herkunft, und die
 Verlust-Schleife (warum verloren → Marktwissen zurück nach G09).
 
@@ -230,7 +241,7 @@ erfinden ist schlimmer, als keinen zu haben.
 
 ### Etappe V · Abschluss, Geld & Lieferung
 
-**G17 ⬥ Angebot & Abschluss** — Heute (bis 09.09.2026): `offer_kind` +
+**G17 ✓ Angebot & Abschluss** — Heute (bis 09.09.2026): `offer_kind` +
 Belege, aber kein Angebotsdokument, kein Vertrag. Ziel: aus Angebotsreife
 wird ein Angebot und ein Ja.
 
@@ -274,7 +285,7 @@ hinter Lieferung und Kundenbetrieb.* Das ist falsch: Eine Rechnung wird
 gebraucht, sobald der erste Abschluss steht — nicht ein Quartal später.
 *Grenze:* hängt am Umsatzsteuer-Status (G04-Owner-Schuld).
 
-**G19 ⬥ Lieferung & Abnahme** — Aufsetzen, Umfang, Änderungssteuerung,
+**G19 ✓ Lieferung & Abnahme** — Aufsetzen, Umfang, Änderungssteuerung,
 Abnahme, Übergabe, Doku. *Abnahme ist enthalten*, weil eine Lieferung ohne
 Abnahme keine ist — und weil hier die Beleg-Schleife nach G13 beginnt.
 
@@ -304,7 +315,7 @@ einem echten Kunden.
 
 ### Etappe VI · Kundenbetrieb
 
-**G21 ⬥ Betrieb & Support** — Vorfälle, Wartung, Serviceanfragen, die
+**G21 ✓ Betrieb & Support** — Vorfälle, Wartung, Serviceanfragen, die
 149-€-Grenze in der Praxis.
 
 *Geschlossen 09.09.2026.* Wie G19 hat auch dieses Gate **keinen Prozess
@@ -334,7 +345,7 @@ Code wäre für den Sitz richtig und für den nächsten Kunden falsch. Gerechnet
 wird über das Wochenende; fällt eine Frist auf einen Feiertag, ist sie **zu
 früh** angesetzt, und der Fehler geht zu Lasten des Hauses.
 
-**G22 ⬥ Kundenerfolg & Ausbau** — Kundengesundheit, Verlängerung, Ausbau —
+**G22 ✓ Kundenerfolg & Ausbau** — Kundengesundheit, Verlängerung, Ausbau —
 und die **Empfehlungs-Schleife** zurück nach G11. Der einzige Zugangsweg, der
 mit „keine Kaltakquise" vollständig vereinbar ist.
 
@@ -373,7 +384,7 @@ keinen Kontakt an, und das Gate prüft es.
 
 ### Etappe VII · Steuerung
 
-**G23 ⬥ Wirtschaftlichkeit & Kapazität** — Marge je Projekt, wiederkehrender
+**G23 ✓ Wirtschaftlichkeit & Kapazität** — Marge je Projekt, wiederkehrender
 Anteil, **Kapazitätsgrenze**. Hier wird die G05-Schuld eingelöst: Trägt der
 Pilotpreis von 2.400 €? Trägt 149 €/Monat?
 *Kapazität gehört hierher*, weil „wir sind voll" eine kaufmännische Aussage
@@ -409,7 +420,7 @@ in der Ausgabe.
 
 ### Etappe VIII · Produkte
 
-**G24 ⬥ Produktwahrheit & Rückmeldung** — Heute (bis 09.09.2026): fibero,
+**G24 ✓ Produktwahrheit & Rückmeldung** — Heute (bis 09.09.2026): fibero,
 meAI, CASSAMEA, meahv haben Regionen, aber **keinen geführten Reifegrad**.
 Ziel: Portfolio mit Stand, Eigentümer, Rückmeldeweg.
 
@@ -436,7 +447,7 @@ gegeneinander, und das Gate bricht ab, sobald ein Wert in
 Prüfung mitzubauen, wäre genau der Fehler gewesen, vor dem der alte Kommentar
 warnt.
 
-**G25 ⬥ Produkt-Kommerzialisierung** — Wann wird ein Produkt verkäuflich?
+**G25 ✓ Produkt-Kommerzialisierung** — Wann wird ein Produkt verkäuflich?
 *Unabhängig, weil* die kaufmännische und rechtliche Grenze eine andere ist als
 beim Bauen. Enthält die Schleife: wiederkehrendes Kundenproblem → Muster →
 Produktkandidat.
@@ -472,7 +483,7 @@ Franchise **eine** Beziehung sind und kein Branchenmuster.
 
 ### Etappe IX · Automation
 
-**G26 ⬥ Ereignis- & Automationsschicht** — Ereignisse, Auslöser, Idempotenz,
+**G26 ✓ Ereignis- & Automationsschicht** — Ereignisse, Auslöser, Idempotenz,
 Fehlerbehandlung, Nachvollziehbarkeit, menschliche Übersteuerung.
 *Regel:* Wiederholung automatisieren, **nicht Verantwortung**.
 
@@ -522,7 +533,7 @@ Automationstheater.
 
 ### Etappe X · Intelligenz
 
-**G28 ⬥ Betriebsgedächtnis** — einheitlicher Kontext, Abruf, Belegpflicht.
+**G28 ✓ Betriebsgedächtnis** — einheitlicher Kontext, Abruf, Belegpflicht.
 
 *Geschlossen 09.09.2026.* Der Zustand dieses Hauses stand an siebzehn
 Stellen, und jede war richtig. Was fehlte, war **die Frage**: Wer wissen
@@ -554,7 +565,7 @@ Quelle**.
 
 *Es ist ein Gedächtnis, keine Empfehlung.* Was zu tun ist, wohnt in **G29** —
 mit eigener Belegpflicht. Ein Gedächtnis, das mitentscheidet, ist keins mehr.
-**G29 ⬥ Vorbereitung & Empfehlung** — Empfehlung **mit Beleg**, Entscheidung
+**G29 ✓ Vorbereitung & Empfehlung** — Empfehlung **mit Beleg**, Entscheidung
 beim Menschen. Hier wohnt der **Digitale Betriebsnavigator**.
 
 *Geschlossen 09.09.2026.* Der Navigator rechnet **nichts neu** — der Kanon
@@ -585,7 +596,7 @@ die sie brechen könnte.
 
 *Heute sagt er sieben Sätze:* zwei „messen", fünf „beheben" — und alle sieben
 gehören dem Owner. Das ist der Zustand, nicht die Schuld des Systems.
-**G30 ⬥ Handelnde Agenten unter Regeln** — begrenzte Vollmacht, Rechte,
+**G30 ✓ Handelnde Agenten unter Regeln** — begrenzte Vollmacht, Rechte,
 Übersteuerung, Prüfspur.
 
 *Geschlossen 09.09.2026.* Die drei Stufen sind jetzt drei Module, und sie
@@ -624,7 +635,7 @@ Fällen.
 
 ### Etappe XI · Organisation
 
-**G32 ⬥ Rollen, Rechte & Übergaben** — heute ein Mensch, ein Passwort. Ziel:
+**G32 ✓ Rollen, Rechte & Übergaben** — heute ein Mensch, ein Passwort. Ziel:
 ein zweiter Mensch kann arbeiten, ohne alles zu sehen. Hier entsteht die
 **Team-Seite** mit echten Menschen.
 
@@ -664,7 +675,7 @@ ohne den Owner läuft.
 
 ### Etappe XII–XIV
 
-**G34 ⬥ Owner-Cockpit** — die Synthese. Kommt spät, **weil** es die Quellen
+**G34 ✓ Owner-Cockpit** — die Synthese. Kommt spät, **weil** es die Quellen
 braucht. Jedes Gate davor liefert seinen Heute-Beitrag sofort mit.
 
 *Geschlossen 09.09.2026 unter `/admin/cockpit`.* Genau so gebaut, wie der
@@ -686,7 +697,7 @@ offene Owner-Frage als Systemfehler auszugeben.
 
 *Heute:* 3 steht · 5 offen · 2 nicht erhoben · 7 Schritte, davon 2 „messen".
 
-**G35 ⬥ DACH-Fähigkeit** — CASSAMEA ist CH, meAI ist DE & CH. Die
+**G35 ✓ DACH-Fähigkeit** — CASSAMEA ist CH, meAI ist DE & CH. Die
 Internationalisierung ist kein Fernziel, sie ist halb da. Jurisdiktion,
 Währung, Recht.
 
