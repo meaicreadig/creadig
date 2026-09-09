@@ -30,46 +30,85 @@ const p = (ok, n, d = "") => {
   console.log(`  ${ok ? "ok  " : "FEHL"} ${n}${d ? ` — ${d}` : ""}`)
 }
 
-const ALLE = Object.fromEntries(R.ROLLEN_KEYS.map((r) => [R.ROLLEN[r].variable, "gesetzt"]))
+const ZUGAENGE = Object.fromEntries(R.ROLLEN_KEYS.map((r) => [R.ROLLEN[r].variable, "gesetzt"]))
+const MENSCHEN = [
+  { rolle: "vertrieb", mensch: "Pruefperson", seit: "2026-09-09" },
+  { rolle: "redaktion", mensch: "Pruefperson", seit: "2026-09-09" },
+]
+/* „Voll" heisst jetzt: Zugang UND Mensch. Alles andere ist nicht besetzt. */
+const ALLE = ZUGAENGE
 
 /* ── T1 · Die Owner-Bindung ueberstimmt alles ───────────────────────────── */
 console.log("\nT1 · Ein gebundener Schritt bleibt gebunden, auch wenn alle Rollen besetzt sind")
 for (const a of T.ABLAEUFE.filter((a) => a.schritte.some((s) => s.ownerGebundenDurch))) {
-  const e = T.ersetzbarkeit(a, ALLE)
+  const e = T.ersetzbarkeit(a, ALLE, MENSCHEN)
   p(e.lage === "owner-gebunden", `${a.key} bleibt owner-gebunden`,
     "sonst waere „alle Rollen besetzt“ ein Weg, eine Entscheidung wegzudelegieren")
   p(e.ownerSchritte.length > 0 && e.ownerSchritte.every((s) => T.istOwnerGate(s.gate)),
     `  … und nennt sein Gate (${e.ownerSchritte.map((s) => s.gate).join(", ")})`)
 }
-p(T.ersatzlage(ALLE).ownerGebunden.length === 3, "drei Ablaeufe sollen nie ersetzbar sein")
+p(T.ersatzlage(ALLE, MENSCHEN).ownerGebunden.length === 3, "drei Ablaeufe sollen nie ersetzbar sein")
 
 /* ── T2 · Die Lage kommt aus der Umgebung ───────────────────────────────── */
 console.log("\nT2 · Die Antwort wird gelesen, nicht behauptet")
-const leer = T.ersatzlage({})
-const voll = T.ersatzlage(ALLE)
+const leer = T.ersatzlage({}, [])
+const voll = T.ersatzlage(ALLE, MENSCHEN)
 p(leer.ersetzbar.length === 0, "ohne besetzte Rolle ist nichts ersetzbar")
 p(!leer.erfuellt, "und der Vertrag ist nicht erfuellt")
 p(voll.ersetzbar.length >= 1, "mit besetzten Rollen mindestens einer")
 p(voll.erfuellt, "und dann ist er erfuellt", "„fuer EINEN Ablauf ersetzbar“")
 p(leer.satz !== voll.satz, "die beiden Saetze sind verschieden")
-const nurVertrieb = T.ersatzlage({ ADMIN_PASSWORD_VERTRIEB: "x" })
+const nurVertrieb = T.ersatzlage({ ADMIN_PASSWORD_VERTRIEB: "x" }, MENSCHEN)
 p(nurVertrieb.ersetzbar.includes("anfrage-aufnehmen"), "eine besetzte Rolle traegt genau ihren Ablauf")
 p(!nurVertrieb.ersetzbar.includes("inhalt-pflegen"), "und nicht den der anderen",
   "sonst wuerde eine Besetzung fuer alle gelten")
-p(T.ersatzlage({ ADMIN_PASSWORD: "x" }).ersetzbar.length === 0,
+p(T.ersatzlage({ ADMIN_PASSWORD: "x" }, MENSCHEN).ersetzbar.length === 0,
   "der Owner selbst macht keinen Ablauf ersetzbar", "er ist die Person, um die es geht")
+
+/* ── T2b · Ein Passwort antwortet niemandem ─────────────────────────────── */
+console.log("\nT2b · Zugang ist keine Besetzung")
+
+/*
+ * Der Angriff, an dem die erste Fassung gescheitert ist.
+ *
+ * Sie zaehlte eine Rolle als besetzt, sobald ihre Passwort-Variable gesetzt
+ * war — und meldete daraufhin „Fuer 1 von 5 Ablaeufen ist der Owner
+ * ersetzbar". Der Vertrag verlangt aber eine BESETZTE Rolle, und die Frage
+ * dahinter lautet „Wer antwortet, wenn du im Urlaub bist?".
+ */
+const nurPasswort = T.ersatzlage(ZUGAENGE, [])
+p(!nurPasswort.erfuellt, "gesetzte Passwoerter allein erfuellen den Vertrag NICHT",
+  "ein offenes Schloss vor einem leeren Raum")
+p(nurPasswort.ersetzbar.length === 0, "und machen keinen Ablauf ersetzbar")
+p(nurPasswort.nurZugang.length === 2, "der Zustand heisst „nur Zugang“ und hat einen eigenen Namen",
+  "faellt er mit einem der anderen zusammen, ist einer davon eine Luege")
+p(/kein(en)? Menschen|Mensch fehlt/.test(T.ersetzbarkeit(T.ABLAEUFE[0], ZUGAENGE, []).satz),
+  "und der Satz sagt, dass der Mensch fehlt")
+
+const nurMensch = T.ersatzlage({}, MENSCHEN)
+p(!nurMensch.erfuellt, "ein Mensch ohne Zugang traegt die Rolle auch nicht",
+  "wer sich nicht anmelden kann, vertritt niemanden")
+
+const beides = T.ersatzlage(ZUGAENGE, MENSCHEN)
+p(beides.erfuellt && beides.ersetzbar.length >= 1, "erst Mensch UND Zugang erfuellen den Vertrag")
+p(T.rollenstand("vertrieb", ZUGAENGE, []) === "nur-zugang", "rollenstand: nur-zugang")
+p(T.rollenstand("vertrieb", {}, MENSCHEN) === "leer", "rollenstand: leer ohne Zugang")
+p(T.rollenstand("vertrieb", ZUGAENGE, MENSCHEN) === "besetzt", "rollenstand: besetzt")
+
+p(T.BESETZUNGEN.every((b) => b.mensch === null), "heute traegt niemand eine Rolle",
+  "einen Namen erfindet dieses Gate nicht")
 
 /* ── T3 · Arbeit verschwindet nie stumm ─────────────────────────────────── */
 console.log("\nT3 · Eine leere Rolle laesst die Arbeit nicht verschwinden")
 for (const a of T.ABLAEUFE) {
-  const e = T.ersetzbarkeit(a, {})
+  const e = T.ersetzbarkeit(a, {}, [])
   if (e.lage !== "nicht-besetzt") continue
   p(!!e.eskalation, `${a.key} sagt, wohin die Arbeit faellt`)
   p(/Owner/.test(e.eskalation), "  … und zwar an den Owner")
   p(e.fehlendeRollen.length > 0 && /ADMIN_PASSWORD/.test(e.satz),
     "  … und was sie besetzen wuerde")
 }
-p(T.ABLAEUFE.every((a) => T.ersetzbarkeit(a, ALLE).lage !== "nicht-besetzt"),
+p(T.ABLAEUFE.every((a) => T.ersetzbarkeit(a, ALLE, MENSCHEN).lage !== "nicht-besetzt"),
   "mit allen Rollen ist keiner mehr unbesetzt")
 
 /* ── T4 · Kein erfundenes, kein unterschlagenes Tor ─────────────────────── */
@@ -91,8 +130,8 @@ p(T.ABLAEUFE.every((a) => a.schritte.every((s) => !s.rollen.includes("owner"))),
 
 /* ── T5 · G33 senkt die unabnehmbare Last nicht ─────────────────────────── */
 console.log("\nT5 · Ersetzbarkeit ist keine abgeschaffte Entscheidung")
-const ownerSchritteLeer = T.ABLAEUFE.flatMap((a) => T.ersetzbarkeit(a, {}).ownerSchritte).length
-const ownerSchritteVoll = T.ABLAEUFE.flatMap((a) => T.ersetzbarkeit(a, ALLE).ownerSchritte).length
+const ownerSchritteLeer = T.ABLAEUFE.flatMap((a) => T.ersetzbarkeit(a, {}, []).ownerSchritte).length
+const ownerSchritteVoll = T.ABLAEUFE.flatMap((a) => T.ersetzbarkeit(a, ALLE, MENSCHEN).ownerSchritte).length
 p(ownerSchritteLeer === ownerSchritteVoll,
   `${ownerSchritteVoll} gebundene Schritte, egal wie viele Rollen besetzt sind`,
   "eine Besetzung darf keine Entscheidung aufloesen")
@@ -183,7 +222,7 @@ bricht(
   angriff(({ lies, schreib }) => {
     const t = lies("lib/vertretung.ts")
     schreib("lib/vertretung.ts", t.replace(
-      "  const fehlendeRollen = gebraucht.filter((r) => !vergeben.includes(r))",
+      '  const fehlendeRollen = gebraucht.filter((r) => stand.get(r) === "leer")',
       "  const fehlendeRollen = []",
     ))
   }),
@@ -194,11 +233,13 @@ bricht(
 console.log("\nT7 · Was heute wirklich gilt")
 const jetzt = T.ersatzlage()
 console.log(`       ${jetzt.satz}`)
-p(R.vergebeneRollen().length <= 1, `${R.vergebeneRollen().length} Rolle(n) vergeben`,
+p(T.BESETZUNGEN.filter((b) => b.mensch !== null).length === 0,
+  `${R.vergebeneRollen().length} Zugang/Zugaenge, 0 Menschen in Rollen`,
   "echte Menschen erfindet kein Gate")
 p(!jetzt.erfuellt, "der Vertrag ist heute NICHT erfuellt",
-  "und das ist kein Codefehler — es fehlt eine Umgebungsvariable, also ein Mensch")
-console.log("       Zu tun hat das ein Mensch: ADMIN_PASSWORD_VERTRIEB oder ADMIN_PASSWORD_REDAKTION setzen.")
+  "kein Codefehler — es fehlt ein Mensch, und danach erst sein Zugang")
+console.log("       Zu tun hat das ein Mensch — und zwar zweierlei: jemanden benennen (BESETZUNGEN)")
+console.log("       und ihm den Zugang geben (ADMIN_PASSWORD_VERTRIEB / _REDAKTION). Das Passwort allein zaehlt nicht.")
 
 console.log(
   fehler === 0

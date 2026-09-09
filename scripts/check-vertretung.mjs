@@ -94,23 +94,64 @@ for (const a of T.ABLAEUFE) {
   }
 }
 
-/* ── 6 · Die Lage wird gelesen, nicht behauptet ─────────────────────────── */
-const leer = T.ersatzlage({})
-const voll = T.ersatzlage(
-  Object.fromEntries(R.ROLLEN_KEYS.map((r) => [R.ROLLEN[r].variable, "gesetzt"])),
+/* ── 6 · Zugang ist keine Besetzung ─────────────────────────────────────── */
+
+/*
+ * Der Vertrag steht woertlich in `docs/roadmap/creadig-1-0-scale.md`:
+ *
+ *   „Der Owner ist ersetzbar fuer EINEN Ablauf | pruefbar an: erste Rolle
+ *    BESETZT"
+ *
+ * Bis zum 09.09.2026 galt eine Rolle als besetzt, sobald ihre
+ * Passwort-Variable gesetzt war. EINE Umgebungsvariable machte den Vertrag
+ * damit „erfuellt". Die Frage, aus der der Satz stammt, lautet aber „Wer
+ * antwortet, wenn du im Urlaub bist?" — und ein Passwort antwortet nicht.
+ */
+const ALLE_ZUGAENGE = Object.fromEntries(
+  R.ROLLEN_KEYS.map((r) => [R.ROLLEN[r].variable, "gesetzt"]),
 )
+const MIT_MENSCH = [
+  { rolle: "vertrieb", mensch: "Pruefperson", seit: "2026-09-09" },
+  { rolle: "redaktion", mensch: "Pruefperson", seit: "2026-09-09" },
+]
+
+const leer = T.ersatzlage({}, [])
+const nurZugang = T.ersatzlage(ALLE_ZUGAENGE, [])
+const besetzt = T.ersatzlage(ALLE_ZUGAENGE, MIT_MENSCH)
+const nurMensch = T.ersatzlage({}, MIT_MENSCH)
+
 if (leer.ersetzbar.length !== 0)
   fehler.push(
-    "Ohne besetzte Rolle meldet das Modul trotzdem einen ersetzbaren Ablauf. Dann liest es die " +
-      "Umgebung nicht, sondern behauptet eine Einrichtung.",
+    "Ohne Zugang und ohne Menschen meldet das Modul trotzdem einen ersetzbaren Ablauf. Dann " +
+      "liest es nichts, sondern behauptet eine Einrichtung.",
   )
-if (voll.ersetzbar.length === 0)
+if (nurZugang.erfuellt || nurZugang.ersetzbar.length > 0)
   fehler.push(
-    "Auch mit allen besetzten Rollen ist kein Ablauf ersetzbar. Dann ist der Vertrag „fuer einen " +
-      "Ablauf ersetzbar" +
-      '" nicht einmal erreichbar — und das Gate misst nur sich selbst.',
+    "Gesetzte Passwoerter allein machen den Vertrag erfuellt. Er verlangt eine BESETZTE Rolle — " +
+      "einen Menschen. Ein Zugang ohne Menschen ist ein offenes Schloss vor einem leeren Raum.",
   )
-for (const key of voll.ersetzbar) {
+if (nurZugang.nurZugang.length === 0)
+  fehler.push(
+    "Der Zustand „Zugang da, Mensch fehlt“ wird nicht eigens gefuehrt. Dann faellt er wieder " +
+      "mit „nicht besetzt“ oder „ersetzbar“ zusammen — und einer der beiden ist eine Luege.",
+  )
+if (nurMensch.erfuellt)
+  fehler.push(
+    "Ein benannter Mensch ohne Zugang gilt als Besetzung. Wer sich nicht anmelden kann, traegt " +
+      "die Rolle nicht.",
+  )
+if (!besetzt.erfuellt || besetzt.ersetzbar.length === 0)
+  fehler.push(
+    "Auch mit Mensch UND Zugang ist kein Ablauf ersetzbar. Dann ist der Vertrag nicht einmal " +
+      "erreichbar, und das Gate misst nur sich selbst.",
+  )
+for (const b of T.BESETZUNGEN) {
+  if (b.mensch !== null && !b.seit)
+    fehler.push(`Die Besetzung „${b.rolle}“ nennt einen Menschen ohne Datum.`)
+  if (!R.istRolle(b.rolle) || b.rolle === "owner")
+    fehler.push(`„${b.rolle}“ ist keine delegierbare Rolle.`)
+}
+for (const key of besetzt.ersetzbar) {
   const ablauf = T.ABLAEUFE.find((a) => a.key === key)
   if (ablauf.schritte.some((s) => s.ownerGebundenDurch !== null))
     fehler.push(
@@ -137,8 +178,10 @@ if (T.SAGT_NICHTS_UEBER.length < 3)
 const lage = T.ersatzlage()
 console.log(
   `\nVertretungs-Gate — ${T.ABLAEUFE.length} Ablaeufe (${lage.ersetzbar.length} ersetzbar, ` +
-    `${lage.nichtBesetzt.length} nicht besetzt, ${lage.ownerGebunden.length} owner-gebunden), ` +
-    `${R.vergebeneRollen().length} von ${R.ROLLEN_KEYS.length} Rollen vergeben`,
+    `${lage.nurZugang.length} nur Zugang, ${lage.nichtBesetzt.length} nicht besetzt, ` +
+    `${lage.ownerGebunden.length} owner-gebunden), ` +
+    `${T.BESETZUNGEN.filter((b) => b.mensch !== null).length} von ${T.BESETZUNGEN.length} Rollen ` +
+    `mit einem Menschen, ${R.vergebeneRollen().length} mit Zugang`,
 )
 
 if (fehler.length > 0) {
@@ -152,11 +195,11 @@ if (fehler.length > 0) {
 }
 
 console.log(`OK — keine erfundene Chefsache, keine delegierte Entscheidung.\n${lage.satz}`)
-if (lage.nichtBesetzt.length > 0)
+if (lage.nichtBesetzt.length + lage.nurZugang.length > 0)
   console.log(
-    `\nOwner-Punkt: ${lage.nichtBesetzt.length} Ablauf/Ablaeufe waeren delegierbar, sobald eine ` +
-      "Rolle besetzt ist —\n" +
-      T.ABLAEUFE.filter((a) => lage.nichtBesetzt.includes(a.key))
+    `\nOwner-Punkt: ${lage.nichtBesetzt.length + lage.nurZugang.length} Ablauf/Ablaeufe waeren ` +
+      "delegierbar, sobald ein MENSCH die Rolle traegt — Name in BESETZUNGEN und Zugang:\n" +
+      T.ABLAEUFE.filter((a) => [...lage.nichtBesetzt, ...lage.nurZugang].includes(a.key))
         .map((a) => `  ${a.name}: ${T.ersetzbarkeit(a).satz}`)
         .join("\n"),
   )

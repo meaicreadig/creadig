@@ -787,7 +787,8 @@ voneinander:**
 | | Was es heißt | Wer es behebt |
 |---|---|---|
 | **owner-gebunden** | Ein Schritt gehört einem Menschen (G11, G13, G18) | Niemand. Das bleibt so. |
-| **nicht besetzt** | Jeder Schritt wäre delegierbar, die Rolle hat niemand | Ein Mensch, mit einer Umgebungsvariablen |
+| **nur Zugang** | Passwort gesetzt, aber niemand trägt die Rolle | Ein Mensch, benannt |
+| **nicht besetzt** | Jeder Schritt wäre delegierbar, die Rolle hat niemand | Ein Mensch **und** sein Zugang |
 
 Wer beide zusammenwirft, bekommt eine Zahl, die man auf zwei Wegen verbessern
 kann: jemanden einstellen — oder eine Sicherung entfernen. Nur der erste ist
@@ -810,13 +811,28 @@ Angriffe.
 verschwinden — sie fällt an den Owner zurück, und genau das steht in der
 Ausgabe statt stillzubleiben.
 
+**Nachtrag 09.09.2026 — ein Passwort war als Besetzung gezählt worden.**
+Die erste Fassung hielt eine Rolle für besetzt, sobald ihre
+Umgebungsvariable gesetzt war. Damit machte **eine einzige Variable** den
+Vertrag „erfüllt". Der Vertrag steht aber wörtlich in
+`creadig-1-0-scale.md`: *„Der Owner ist ersetzbar für **einen** Ablauf —
+prüfbar an: erste Rolle **besetzt**"*, und die Frage, aus der der Satz
+stammt, lautet zwei Abschnitte davor *„Wer antwortet, wenn du im Urlaub
+bist?"* — beantwortet mit *„Vertretung organisieren (Sub, Partner)"*. **Ein
+Passwort antwortet nicht.** Ein Zugang ohne Menschen ist ein offenes Schloss
+vor einem leeren Raum; er heißt jetzt `nur-zugang` und zählt nicht.
+`BESETZUNGEN` führt die Menschen — heute beide `null`, und ein Name wird
+hier nicht erfunden: Ein erfundener Mitarbeiter wäre die schlimmste Sorte
+Fake-Green, weil er die Urlaubsfrage mit einer Person beantwortet, die es im
+Urlaubsfall nicht gibt.
+
 **Die Lage heute:** fünf Abläufe, davon **drei owner-gebunden** (Ansprache,
 Freigabe, Rechnung — richtig so) und **zwei delegierbar, aber unbesetzt**
-(Anfrage führen · Materiallücke schließen). Null von drei Rollen sind
-vergeben. Der Vertrag *„für einen Ablauf ersetzbar"* ist damit **nicht
-erfüllt**, und was fehlt, ist kein Code, sondern ein Mensch:
-`ADMIN_PASSWORD_VERTRIEB` oder `ADMIN_PASSWORD_REDAKTION` setzen — dann ist
-er erfüllt. **Eingerichtet ist trotzdem nicht gelaufen.**
+(Anfrage führen · Materiallücke schließen). **Null Rollen tragen einen
+Menschen, null haben einen Zugang.** Der Vertrag ist damit **nicht erfüllt**,
+und dazu gehören zwei Dinge — das Passwort ist das kleinere: ein Name in
+`BESETZUNGEN` **und** `ADMIN_PASSWORD_VERTRIEB` bzw.
+`ADMIN_PASSWORD_REDAKTION`. **Besetzt ist trotzdem nicht gelaufen.**
 
 ### Etappe XII–XIV
 

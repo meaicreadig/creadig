@@ -209,17 +209,98 @@ export const ABLAEUFE: readonly Ablauf[] = [
   },
 ]
 
+/* ── Wer die Rolle wirklich traegt ──────────────────────────────────────── */
+
+/**
+ * DIE BESETZUNG — und warum sie NICHT aus der Umgebung kommt.
+ *
+ * ---------------------------------------------------------------------------
+ * DER FEHLER, DER HIER STAND
+ *
+ * Bis zum 09.09.2026 galt eine Rolle als besetzt, sobald ihre
+ * Passwort-Variable gesetzt war (`vergebeneRollen()` aus G32). Damit machte
+ * EINE Umgebungsvariable den Vertrag „erfuellt" — und die Ausgabe meldete
+ * „Fuer 1 von 5 Ablaeufen ist der Owner ersetzbar".
+ *
+ * Das ist falsch, und der Vertrag sagt es woertlich. `creadig-1-0-scale.md`
+ * fuehrt Satz 10 so:
+ *
+ *     „Der Owner ist ersetzbar fuer EINEN Ablauf | pruefbar an: erste Rolle
+ *      BESETZT"
+ *
+ * Und die Frage, aus der der Satz stammt, steht zwei Abschnitte darueber:
+ * „Wer antwortet, wenn du im Urlaub bist?" — beantwortet mit „Vertretung
+ * organisieren (Sub, Partner)". Das ist ein MENSCH, kein Zugang.
+ *
+ * ---------------------------------------------------------------------------
+ * DREI STUFEN, NICHT ZWEI
+ *
+ *   moeglich   Die Rolle existiert in G32. Gilt immer.
+ *   zugang     Ihre Passwort-Variable ist gesetzt. Das beweist, dass sich ein
+ *              zweiter Mensch ANMELDEN koennte — mehr nicht. Genau diesen
+ *              Unterschied haelt G32 selbst schon: „moeglich, aber nicht
+ *              eingerichtet".
+ *   besetzt    Ein benannter Mensch traegt die Rolle. Das ist ein
+ *              Owner-Fakt und steht hier als Register — leer.
+ *
+ * Ein Zugang ohne Menschen ist ein offenes Schloss vor einem leeren Raum.
+ * Wer ihn als Besetzung zaehlt, hat die Vertretungsfrage mit einem Passwort
+ * beantwortet.
+ */
+export type Besetzung = {
+  rolle: Exclude<Rolle, "owner">
+  /** Der Mensch, der die Rolle traegt. `null` heisst: niemand. */
+  mensch: string | null
+  /** Seit wann. ISO-Tag, `null` solange niemand sie traegt. */
+  seit: string | null
+}
+
+/**
+ * DER BESTAND — leer, und das ist die wahre Angabe.
+ *
+ * Kein Name wird hier erfunden. Ein erfundener Mitarbeiter waere die
+ * schlimmste Sorte Fake-Green: Er beantwortet die Urlaubsfrage mit einer
+ * Person, die im Urlaubsfall nicht existiert.
+ */
+export const BESETZUNGEN: readonly Besetzung[] = [
+  { rolle: "vertrieb", mensch: null, seit: null },
+  { rolle: "redaktion", mensch: null, seit: null },
+]
+
+export type Rollenstand = "besetzt" | "nur-zugang" | "leer"
+
+/**
+ * Wie es um eine Rolle steht — beide Fragen, getrennt.
+ *
+ * `nur-zugang` ist der Zustand, den die alte Fassung mit `besetzt`
+ * verwechselt hat. Er bekommt einen eigenen Namen, damit ihn niemand mehr
+ * fuer das eine oder das andere haelt.
+ */
+export function rollenstand(
+  rolle: Exclude<Rolle, "owner">,
+  env: Record<string, string | undefined> = process.env,
+  besetzungen: readonly Besetzung[] = BESETZUNGEN,
+): Rollenstand {
+  const zugang = vergebeneRollen(env).includes(rolle)
+  const mensch = besetzungen.find((b) => b.rolle === rolle)?.mensch ?? null
+  if (mensch && zugang) return "besetzt"
+  if (zugang) return "nur-zugang"
+  return "leer"
+}
+
 /* ── Die Lage je Ablauf ─────────────────────────────────────────────────── */
 
-export type Lage = "ersetzbar" | "nicht-besetzt" | "owner-gebunden"
+export type Lage = "ersetzbar" | "nur-zugang" | "nicht-besetzt" | "owner-gebunden"
 
 export type Ersetzbarkeit = {
   lage: Lage
   satz: string
   /** Die Schritte, die einem Menschen vorbehalten sind — mit ihrem Gate. */
   ownerSchritte: readonly { was: string; gate: string }[]
-  /** Rollen, die der Ablauf braucht und die niemand hat. */
+  /** Rollen, die der Ablauf braucht und die kein Mensch traegt. */
   fehlendeRollen: readonly Rolle[]
+  /** Rollen mit Zugang, aber ohne Menschen. Ein offenes Schloss vor einem leeren Raum. */
+  nurZugang: readonly Rolle[]
   /**
    * Wohin die Arbeit faellt, solange sie niemand traegt.
    *
@@ -233,14 +314,16 @@ export type Ersetzbarkeit = {
 export function ersetzbarkeit(
   ablauf: Ablauf,
   env: Record<string, string | undefined> = process.env,
+  besetzungen: readonly Besetzung[] = BESETZUNGEN,
 ): Ersetzbarkeit {
   const ownerSchritte = ablauf.schritte
     .filter((s) => s.ownerGebundenDurch !== null)
     .map((s) => ({ was: s.was, gate: s.ownerGebundenDurch as string }))
 
-  const vergeben = vergebeneRollen(env)
   const gebraucht = [...new Set(ablauf.schritte.flatMap((s) => s.rollen))]
-  const fehlendeRollen = gebraucht.filter((r) => !vergeben.includes(r))
+  const stand = new Map(gebraucht.map((r) => [r, rollenstand(r, env, besetzungen)]))
+  const fehlendeRollen = gebraucht.filter((r) => stand.get(r) === "leer")
+  const nurZugang = gebraucht.filter((r) => stand.get(r) === "nur-zugang")
 
   /*
    * DIE OWNER-BINDUNG WIRD ZUERST GEPRUEFT — und sie ueberstimmt alles.
@@ -258,30 +341,62 @@ export function ersetzbarkeit(
         "delegierbar.",
       ownerSchritte,
       fehlendeRollen,
+      nurZugang,
       eskalation: null,
     }
   }
+
+  const eskalation =
+    "Bis dahin macht es der Owner. Die Arbeit verschwindet nicht, weil die Rolle leer ist."
 
   if (fehlendeRollen.length > 0) {
     return {
       lage: "nicht-besetzt",
       satz:
         `Delegierbar, aber niemand traegt ihn: ${fehlendeRollen.map((r) => ROLLEN[r].label).join(", ")} ` +
-        `ist nicht besetzt. Einrichten heisst ${fehlendeRollen
+        "ist nicht besetzt. Dazu gehoeren zwei Dinge, und das Passwort ist das kleinere: ein " +
+        `Mensch in \`BESETZUNGEN\` und der Zugang (${fehlendeRollen
           .map((r) => ROLLEN[r].variable)
-          .join(" bzw. ")} setzen — ohne Codeaenderung.`,
+          .join(" bzw. ")}).`,
       ownerSchritte,
       fehlendeRollen,
-      eskalation:
-        "Bis dahin macht es der Owner. Die Arbeit verschwindet nicht, weil die Rolle leer ist.",
+      nurZugang,
+      eskalation,
+    }
+  }
+
+  /*
+   * ZUGANG IST KEINE BESETZUNG.
+   *
+   * Dieser Zweig ist der ganze Grund, warum es drei Stufen gibt. Vorher fiel
+   * er mit „ersetzbar" zusammen, und damit machte eine gesetzte
+   * Umgebungsvariable den Vertrag „erfuellt". Die Vertretungsfrage lautet
+   * aber „Wer antwortet, wenn du im Urlaub bist?" — und ein Passwort
+   * antwortet nicht.
+   */
+  if (nurZugang.length > 0) {
+    return {
+      lage: "nur-zugang",
+      satz:
+        `Der Zugang steht, der Mensch fehlt: ${nurZugang.map((r) => ROLLEN[r].label).join(", ")} ` +
+        "hat ein Passwort, aber niemanden. Ein offenes Schloss vor einem leeren Raum — im " +
+        "Urlaubsfall antwortet trotzdem niemand.",
+      ownerSchritte,
+      fehlendeRollen,
+      nurZugang,
+      eskalation,
     }
   }
 
   return {
     lage: "ersetzbar",
-    satz: `Ersetzbar: getragen von ${gebraucht.map((r) => ROLLEN[r].label).join(", ")}.`,
+    satz:
+      `Ersetzbar: getragen von ${gebraucht
+        .map((r) => `${ROLLEN[r].label} (${besetzungen.find((b) => b.rolle === r)?.mensch})`)
+        .join(", ")}.`,
     ownerSchritte,
     fehlendeRollen,
+    nurZugang,
     eskalation: null,
   }
 }
@@ -289,32 +404,51 @@ export function ersetzbarkeit(
 /* ── Der Satz, den G33 beantworten soll ─────────────────────────────────── */
 
 export type Ersatzlage = {
-  /** Der Vertrag: fuer EINEN Ablauf ersetzbar. */
+  /**
+   * Der Vertrag, woertlich: „Der Owner ist ersetzbar fuer EINEN Ablauf —
+   * pruefbar an: erste Rolle BESETZT" (`docs/roadmap/creadig-1-0-scale.md`).
+   *
+   * Besetzt heisst: ein benannter Mensch. Eine gesetzte Passwort-Variable
+   * erfuellt diesen Satz nicht.
+   */
   erfuellt: boolean
   ersetzbar: readonly string[]
+  /** Zugang da, Mensch fehlt. Zaehlt NICHT als erfuellt. */
+  nurZugang: readonly string[]
   nichtBesetzt: readonly string[]
   ownerGebunden: readonly string[]
   satz: string
 }
 
-export function ersatzlage(env: Record<string, string | undefined> = process.env): Ersatzlage {
-  const je = ABLAEUFE.map((a) => ({ a, e: ersetzbarkeit(a, env) }))
+export function ersatzlage(
+  env: Record<string, string | undefined> = process.env,
+  besetzungen: readonly Besetzung[] = BESETZUNGEN,
+): Ersatzlage {
+  const je = ABLAEUFE.map((a) => ({ a, e: ersetzbarkeit(a, env, besetzungen) }))
   const ersetzbar = je.filter((x) => x.e.lage === "ersetzbar").map((x) => x.a.key)
+  const nurZugang = je.filter((x) => x.e.lage === "nur-zugang").map((x) => x.a.key)
   const nichtBesetzt = je.filter((x) => x.e.lage === "nicht-besetzt").map((x) => x.a.key)
   const ownerGebunden = je.filter((x) => x.e.lage === "owner-gebunden").map((x) => x.a.key)
 
   const erfuellt = ersetzbar.length >= 1
+  const zugangssatz =
+    nurZugang.length > 0
+      ? ` ${nurZugang.length} haette(n) den Zugang, aber keinen Menschen — das zaehlt nicht.`
+      : ""
   return {
     erfuellt,
     ersetzbar,
+    nurZugang,
     nichtBesetzt,
     ownerGebunden,
     satz: erfuellt
       ? `Fuer ${ersetzbar.length} von ${ABLAEUFE.length} Ablaeufen ist der Owner ersetzbar. ` +
-        "Das ist eine Aussage ueber die Einrichtung, nicht ueber einen gelaufenen Fall."
+        "Das ist eine Aussage ueber die Besetzung, nicht ueber einen gelaufenen Fall." +
+        zugangssatz
       : `Fuer keinen der ${ABLAEUFE.length} Ablaeufe ist der Owner heute ersetzbar. ` +
-        `${nichtBesetzt.length} waeren es, wenn die Rolle besetzt waere; ` +
-        `${ownerGebunden.length} sollen es nie sein.`,
+        `${nichtBesetzt.length + nurZugang.length} waere(n) es mit einem Menschen in der Rolle; ` +
+        `${ownerGebunden.length} sollen es nie sein.` +
+        zugangssatz,
   }
 }
 
@@ -329,4 +463,5 @@ export const SAGT_NICHTS_UEBER = [
   "Nicht, dass der Owner entbehrlich ist. Die gebundenen Schritte bleiben gebunden.",
   "Nicht ueber Qualitaet. Wer eine Rolle besetzt, kann sie schlecht ausfuellen.",
   "Nicht ueber Urlaubsfaehigkeit. Ein Ablauf ist kein Unternehmen.",
+  "Nicht, dass ein Zugang jemanden vertritt. Ein Passwort antwortet niemandem.",
 ]
