@@ -773,6 +773,51 @@ geprüft.
 ersetzbar. *Unabhängig, weil* es der einzige Beweis ist, dass das Unternehmen
 ohne den Owner läuft.
 
+*System gebaut 09.09.2026. Der Vertrag ist heute **nicht** erfüllt — und das
+ist kein Codefehler.*
+
+**Ersetzbarkeit ist nicht die Abschaffung des Owners.** Dieses Haus hat an
+mehreren Stellen absichtlich einen Menschen hingestellt. Ein Gate, das diese
+Bindungen auflöst, um „ersetzbar" melden zu können, hat genau das getan,
+wovor G27 warnt — nur mit einem freundlicheren Wort dafür.
+
+**Zwei Arten, nicht ersetzbar zu sein, und sie sind das Gegenteil
+voneinander:**
+
+| | Was es heißt | Wer es behebt |
+|---|---|---|
+| **owner-gebunden** | Ein Schritt gehört einem Menschen (G11, G13, G18) | Niemand. Das bleibt so. |
+| **nicht besetzt** | Jeder Schritt wäre delegierbar, die Rolle hat niemand | Ein Mensch, mit einer Umgebungsvariablen |
+
+Wer beide zusammenwirft, bekommt eine Zahl, die man auf zwei Wegen verbessern
+kann: jemanden einstellen — oder eine Sicherung entfernen. Nur der erste ist
+ein Fortschritt.
+
+**Die Owner-Bindung überstimmt alles.** Auch mit allen besetzten Rollen bleibt
+ein Ablauf mit gebundenem Schritt owner-gebunden. Stünde die Rollenprüfung
+zuerst, käme er als „ersetzbar" heraus, obwohl ein Schritt darin einem
+Menschen gehört — die teuerste Falschmeldung, die dieses Modul machen kann.
+
+**Kein erfundenes Tor, keines unterschlagen.** `OWNER_GATES` wird aus G26 und
+G27 abgeleitet, nicht aufgezählt: Wer sich ein Gate ausdenken kann, macht den
+Owner unersetzbar, ohne dass es auffällt — *„nur ich kann das"* ist keine
+Regel, sondern eine Gewohnheit. Umgekehrt muss jedes Entscheidungstor aus G27
+in einem Ablauf als Owner-Schritt vorkommen; fehlt eines, ist eine
+Entscheidung stillschweigend delegiert worden. Der Probelauf fährt beide
+Angriffe.
+
+**Arbeit verschwindet nie stumm.** Eine leere Rolle lässt die Arbeit nicht
+verschwinden — sie fällt an den Owner zurück, und genau das steht in der
+Ausgabe statt stillzubleiben.
+
+**Die Lage heute:** fünf Abläufe, davon **drei owner-gebunden** (Ansprache,
+Freigabe, Rechnung — richtig so) und **zwei delegierbar, aber unbesetzt**
+(Anfrage führen · Materiallücke schließen). Null von drei Rollen sind
+vergeben. Der Vertrag *„für einen Ablauf ersetzbar"* ist damit **nicht
+erfüllt**, und was fehlt, ist kein Code, sondern ein Mensch:
+`ADMIN_PASSWORD_VERTRIEB` oder `ADMIN_PASSWORD_REDAKTION` setzen — dann ist
+er erfüllt. **Eingerichtet ist trotzdem nicht gelaufen.**
+
 ### Etappe XII–XIV
 
 **G34 ✓ Owner-Cockpit** — die Synthese. Kommt spät, **weil** es die Quellen
