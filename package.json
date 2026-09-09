@@ -7,7 +7,7 @@
     "predev": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs && node scripts/generate-company-media.mjs && node scripts/generate-logo-masse.mjs",
     "prebuild": "node scripts/generate-product-media.mjs && node scripts/generate-client-logos.mjs && node scripts/generate-company-media.mjs && node scripts/generate-logo-masse.mjs",
     "build": "next build",
-    "postbuild": "node scripts/check-function-size.mjs && node scripts/check-reviews.mjs && node scripts/check-parity.mjs && node scripts/check-bestand.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-freigaben.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-auftritt.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-redaktion.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-herkunft.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-angebot.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-lieferung.mjs",
+    "postbuild": "node scripts/check-function-size.mjs && node scripts/check-reviews.mjs && node scripts/check-parity.mjs && node scripts/check-bestand.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-freigaben.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-auftritt.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-redaktion.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-herkunft.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-angebot.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-lieferung.mjs && node --import ./scripts/lib/alias-hook.mjs scripts/check-produkt.mjs",
     "start": "next start",
     "lint": "eslint .",
     "shots": "node scripts/screenshots.mjs",
@@ -32,7 +32,8 @@
     "verlust-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/verlust-drill.mjs",
     "db-drills": "node scripts/db-drills.mjs",
     "angebot-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/angebot-drill.mjs",
-    "lieferung-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/lieferung-drill.mjs"
+    "lieferung-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/lieferung-drill.mjs",
+    "produkt-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/produkt-drill.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

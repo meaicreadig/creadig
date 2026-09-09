@@ -486,6 +486,86 @@ export const SCHEMA: string[] = [
      END IF;
    END
    $do$`,
+
+  /*
+   * 012 · GATE 18 — RECHNUNG UND ZAHLUNGSEINGANG
+   *
+   * KEINE SPALTE `bezahlt`, UND DAS IST DER KERN.
+   *
+   * Der Zahlungsstand faellt aus den erfassten Eingaengen (`lib/rechnung.ts`).
+   * Ein Haken daneben waere eine zweite Wahrheit ueber Geld — und bei Geld
+   * gewinnt die falsche so lange, bis der Steuerberater sie findet.
+   *
+   * `payments` ist deshalb eine eigene Tabelle und keine Spalte. Ein Eingang
+   * hat einen eigenen Betrag, ein eigenes Wertstellungsdatum und einen
+   * eigenen BELEG — dieselbe Fundstellenpflicht wie bei der Person in G11
+   * und der Freigabe in G13. Ein Haken ohne Kontoauszugszeile ist eine
+   * Erinnerung.
+   *
+   * `number` ERST BEIM STELLEN, DESHALB NULLABLE.
+   * Eine Rechnungsnummer ist fortlaufend und darf keine Luecke haben. Wer
+   * sie schon dem Entwurf gibt, reisst eine, sobald ein Entwurf verworfen
+   * wird. Eindeutig ist sie trotzdem — der partielle Index sorgt dafuer.
+   *
+   * `tax_snapshot` FRIERT DIE STEUERLAGE EIN.
+   * Setzt der Owner spaeter `smallBusiness`, aendert das nichts an einer
+   * Rechnung, die der Kunde bereits im Ordner hat. Dieselbe Ueberlegung wie
+   * `offers.sent_snapshot` in G17.
+   *
+   * DREI CHECKS, jeder gegen einen Satz, den ein Betrieb sich sonst erzaehlt:
+   *
+   *   invoices_issued_check    „gestellt" ohne Nummer, Datum und
+   *                            Steuer-Schnappschuss gibt es nicht.
+   *   invoices_draft_check     Ein Entwurf traegt keine Nummer.
+   *   payments_amount_check    Ein Eingang ueber 0 ist kein Eingang.
+   *
+   * Idempotent. Aendert keine bestehende Zeile.
+   */
+  `CREATE TABLE IF NOT EXISTS invoices (
+     id text PRIMARY KEY,
+     opportunity_id text NOT NULL REFERENCES opportunities(id) ON DELETE CASCADE,
+     offer_id text NOT NULL REFERENCES offers(id) ON DELETE RESTRICT,
+     number text,
+     positions jsonb NOT NULL DEFAULT '[]'::jsonb,
+     payment_term_days integer NOT NULL DEFAULT 14,
+     state text NOT NULL DEFAULT 'entwurf'
+       CHECK (state IN ('entwurf','gestellt','storniert')),
+     issued_at date,
+     tax_snapshot jsonb,
+     cancelled_at date,
+     replaced_by text REFERENCES invoices(id) ON DELETE SET NULL,
+     created_at timestamptz NOT NULL DEFAULT now(),
+     updated_at timestamptz NOT NULL DEFAULT now()
+   )`,
+  `CREATE INDEX IF NOT EXISTS invoices_opportunity_idx ON invoices (opportunity_id)`,
+  `CREATE INDEX IF NOT EXISTS invoices_state_idx ON invoices (state)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS invoices_number_idx ON invoices (number) WHERE number IS NOT NULL`,
+  `CREATE TABLE IF NOT EXISTS payments (
+     id text PRIMARY KEY,
+     invoice_id text NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+     amount_cent bigint NOT NULL,
+     value_date date NOT NULL,
+     evidence text NOT NULL,
+     note text,
+     created_at timestamptz NOT NULL DEFAULT now()
+   )`,
+  `CREATE INDEX IF NOT EXISTS payments_invoice_idx ON payments (invoice_id)`,
+  `DO $do$
+   BEGIN
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'invoices_issued_check') THEN
+       ALTER TABLE invoices ADD CONSTRAINT invoices_issued_check
+         CHECK (state <> 'gestellt' OR (number IS NOT NULL AND issued_at IS NOT NULL AND tax_snapshot IS NOT NULL));
+     END IF;
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'invoices_draft_check') THEN
+       ALTER TABLE invoices ADD CONSTRAINT invoices_draft_check
+         CHECK (state <> 'entwurf' OR number IS NULL);
+     END IF;
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'payments_amount_check') THEN
+       ALTER TABLE payments ADD CONSTRAINT payments_amount_check
+         CHECK (amount_cent > 0);
+     END IF;
+   END
+   $do$`,
 ]
 
 /**
