@@ -345,6 +345,24 @@ export const dictionary = {
       eyebrow: "Arbeiten",
       title: "Gebaut. Und betrieben.",
       lead: "Vier eigene Produkte, die wir selbst erfunden und gebaut haben — dazu Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen, damit klar ist, was uns gehört.",
+      /*
+       * ZWEI FASSUNGEN, WEIL DIE SEITE ZWEI ZUSTAENDE HAT.
+       *
+       * Der obere Satz verspricht Kundenwerk „getrennt ausgewiesen". Auf der
+       * Seite standen dann vier eigene Produkte und kein einziger Kunde —
+       * weil G13 keinen nennt, solange keine schriftliche Freigabe vorliegt
+       * (`genannteClientWorks` = 0). Eine Zusage, die die Seite selbst nicht
+       * einloest, kostet mehr Vertrauen als die fehlende Referenz.
+       *
+       * Die Fassung ohne Kundenwerk erklaert die Luecke, statt sie zu
+       * verschweigen: Sie ist der Grund, warum hier niemand steht. Welche
+       * gilt, entscheidet die Freigabelage, nicht der Text.
+       */
+      leadOhneKundenwerk:
+        "Vier eigene Produkte, die wir selbst erfunden, gebaut und betreiben. Kundenarbeiten stehen hier erst, wenn der Kunde sie schriftlich freigegeben hat — ohne Freigabe nennen wir keinen Namen.",
+      metaTitleOhneKundenwerk: "Arbeiten — vier eigene Produkte",
+      metaDescriptionOhneKundenwerk:
+        "Die Werkschau von creaDIG: vier eigene Produkte, die wir selbst erfunden, gebaut und betreiben. Kundenarbeiten erscheinen erst mit schriftlicher Freigabe.",
       metaTitle: "Arbeiten — eigene Produkte und Kundenwerk",
       metaDescription:
         "Die Werkschau von creaDIG: vier eigene Produkte und Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen — eigene Systeme und Auftragsarbeit sind nicht dasselbe.",
@@ -2667,6 +2685,11 @@ export const dictionary = {
       eyebrow: "İşler",
       title: "Kuruldu. Ve işletiliyor.",
       lead: "Kendi icat edip kurduğumuz dört ürün — ayrıca Almanya ve İsviçre'den müşteri işleri. Neyin bize ait olduğu açık olsun diye ayrı gösteriliyor.",
+      leadOhneKundenwerk:
+        "Kendi icat ettiğimiz, kurduğumuz ve işlettiğimiz dört ürün. Müşteri işleri burada ancak müşteri yazılı onay verdiğinde yer alır — onay yoksa isim vermeyiz.",
+      metaTitleOhneKundenwerk: "İşler — kendi dört ürünümüz",
+      metaDescriptionOhneKundenwerk:
+        "creaDIG seçkisi: kendi icat ettiğimiz, kurduğumuz ve işlettiğimiz dört ürün. Müşteri işleri yalnızca yazılı onayla görünür.",
       metaTitle: "İşler — kendi ürünlerimiz ve müşteri işleri",
       metaDescription:
         "creaDIG seçkisi: dört kendi ürün ve Almanya ile İsviçre'den müşteri işleri. Ayrı gösterilir — kendi sistemlerimiz ile sipariş işleri aynı şey değildir.",
@@ -4155,6 +4178,11 @@ export const dictionary = {
       eyebrow: "Work",
       title: "Built. And operated.",
       lead: "Four products of our own that we invented and built ourselves — alongside client work from Germany and Switzerland. Listed separately, so it is clear what belongs to us.",
+      leadOhneKundenwerk:
+        "Four products of our own that we invented, built and run ourselves. Client work appears here only once the client has released it in writing — without a release we name no one.",
+      metaTitleOhneKundenwerk: "Work — four products of our own",
+      metaDescriptionOhneKundenwerk:
+        "The creaDIG portfolio: four products of our own that we invented, built and run ourselves. Client work appears only with a written release.",
       metaTitle: "Work — our own products and client work",
       metaDescription:
         "The creaDIG portfolio: four products of our own and client work from Germany and Switzerland. Listed separately — our own systems and commissioned work are not the same thing.",
@@ -5629,6 +5657,11 @@ export const dictionary = {
       eyebrow: "الأعمال",
       title: "مبنيّة. ومشغَّلة.",
       lead: "أربعة منتجات خاصة بنا ابتكرناها وبنيناها بأنفسنا — إلى جانب أعمال لعملاء في ألمانيا وسويسرا. مفصولة بوضوح ليتبيّن ما هو ملكنا.",
+      leadOhneKundenwerk:
+        "أربعة منتجات خاصة بنا ابتكرناها وبنيناها ونشغّلها بأنفسنا. أعمال العملاء تظهر هنا فقط بعد موافقة خطية من العميل — وبدون موافقة لا نذكر اسمًا.",
+      metaTitleOhneKundenwerk: "الأعمال — أربعة منتجات خاصة بنا",
+      metaDescriptionOhneKundenwerk:
+        "معرض أعمال creaDIG: أربعة منتجات خاصة بنا ابتكرناها وبنيناها ونشغّلها بأنفسنا. أعمال العملاء لا تظهر إلا بموافقة خطية.",
       metaTitle: "الأعمال — منتجاتنا الخاصة وأعمال العملاء",
       metaDescription:
         "معرض أعمال creaDIG: أربعة منتجات خاصة وأعمال لعملاء في ألمانيا وسويسرا. مفصولة بوضوح — الأنظمة الخاصة والأعمال المكلَّف بها ليستا الشيء نفسه.",

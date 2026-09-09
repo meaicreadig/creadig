@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { ArbeitenPageBody } from "@/components/pages/arbeiten-page-body"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { pageMetadata } from "@/lib/page-metadata"
-import { registryWorks, workHref } from "@/lib/site-data"
+import { genannteClientWorks, registryWorks, workHref } from "@/lib/site-data"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
 import { localeUrl } from "@/lib/routes"
 
@@ -15,11 +15,17 @@ import { localeUrl } from "@/lib/routes"
  */
 export function arbeitenMetadata(locale: Locale): Metadata {
   const copy = dictionary[locale].arbeitenPage
+  /*
+   * Auch der Suchtreffer haelt sich an die Freigabelage. „Eigene Produkte
+   * UND Kundenwerk" in der Ergebnisliste ist dieselbe Zusage wie im
+   * Vorspann — und wer ihr folgt, findet vier eigene Produkte.
+   */
+  const ohneKundenwerk = genannteClientWorks.length === 0
   return pageMetadata({
     locale,
     path: "/arbeiten",
-    title: copy.metaTitle,
-    description: copy.metaDescription,
+    title: ohneKundenwerk ? copy.metaTitleOhneKundenwerk : copy.metaTitle,
+    description: ohneKundenwerk ? copy.metaDescriptionOhneKundenwerk : copy.metaDescription,
   })
 }
 

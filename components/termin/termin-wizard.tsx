@@ -729,7 +729,15 @@ export function TerminWizard() {
                         .filter(Boolean)
                         .join(" — ")}
                       className={cn(
-                        "relative flex aspect-square items-center justify-center text-sm transition-colors duration-[var(--dur-1)]",
+                        /*
+                          `min-h-11` = 44 Pixel, das kleinste Ziel, das ein
+                          Finger zuverlaessig trifft. `aspect-square` allein
+                          ergab auf 390 Pixeln 43x43 — gemessen am
+                          09.09.2026, einen Pixel zu klein, und zwar an den
+                          dreissig Feldern, die im Terminassistenten am
+                          haeufigsten getroffen werden muessen.
+                        */
+                        "relative flex aspect-square min-h-11 items-center justify-center text-sm transition-colors duration-[var(--dur-1)]",
                         cell.past && "text-muted-foreground/35 pointer-events-none",
                         !cell.past && "hover:bg-gold/10",
                         cell.today && "font-semibold",

@@ -143,6 +143,26 @@ export function LogoStrip() {
   const row2 = rotate(pool, 2).reverse()
   const row3 = rotate(pool, 4)
 
+  /*
+   * EIN LAUFBAND ZEIGT, WAS NICHT HINPASST. VIER KACHELN PASSEN HIN.
+   *
+   * Diese Wand war fuer viele Marken gebaut: eigene Produkte UND
+   * Kundenlogos, drei Bahnen in drei Tempi. Seit G13 nennt die Seite keinen
+   * Kunden ohne schriftliche Freigabe, und `clientLogos` ist leer. Uebrig
+   * blieben vier Produkte — die das Laufband dann dreimal nebeneinander
+   * wiederholte.
+   *
+   * Gemessen am 09.09.2026: 48 Logo-Kacheln fuer 4 Produkte auf 538 Pixeln
+   * Hoehe, dazu 40 Zeichen Text. Nach der vierten Kachel kam keine Angabe
+   * mehr dazu; die Wiederholung sah aus wie eine Kundenwand und war keine.
+   *
+   * Deshalb entscheidet jetzt die Menge ueber die Form. Kommt die erste
+   * Freigabe, waechst der Pool, und die drei Bahnen kehren von selbst
+   * zurueck — der Entwurf war nicht falsch, nur leer.
+   */
+  const PASST_IN_EINE_ZEILE = 6
+  const wenige = pool.length <= PASST_IN_EINE_ZEILE
+
   return (
     <section
       aria-label={t.logos.eyebrow}
@@ -152,9 +172,23 @@ export function LogoStrip() {
         <p className="eyebrow text-muted-foreground">{t.logos.eyebrow}</p>
       </div>
 
-      <MarqueeRow items={row1} direction="left" duration="52s" />
-      <MarqueeRow items={row2} direction="right" duration="60s" />
-      <MarqueeRow items={row3} direction="left" duration="56s" />
+      {wenige ? (
+        <div className="section-gutter">
+          <ul className="flex flex-wrap gap-3">
+            {pool.map((item) => (
+              <li key={item.name} className="min-w-0">
+                <LogoChip {...item} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <>
+          <MarqueeRow items={row1} direction="left" duration="52s" />
+          <MarqueeRow items={row2} direction="right" duration="60s" />
+          <MarqueeRow items={row3} direction="left" duration="56s" />
+        </>
+      )}
 
       <span className="sr-only">
         {pool.map((i) => i.name).join(", ")}
