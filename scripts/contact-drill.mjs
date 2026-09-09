@@ -11,7 +11,7 @@ import pg from "pg"
 import { randomUUID } from "node:crypto"
 import { requireSafeTarget } from "./lib/env-guard.mjs"
 
-const ZIEL = process.env.CONTACT_DRILL_URL || "postgres://localhost/g11"
+const ZIEL = process.env.CONTACT_DRILL_URL || "postgres://localhost/g11_kontakt"
 requireSafeTarget(ZIEL, "Kontakt-Probelauf")
 
 let fehler = 0

@@ -31,7 +31,7 @@
 import pg from "pg"
 import { requireSafeTarget } from "./lib/env-guard.mjs"
 
-const ZIEL = process.env.CRM_DRILL_URL || "postgres://localhost/g7"
+const ZIEL = process.env.CRM_DRILL_URL || "postgres://localhost/g7_crm"
 requireSafeTarget(ZIEL, "CRM-Probelauf")
 
 let fehler = 0

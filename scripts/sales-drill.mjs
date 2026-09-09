@@ -13,7 +13,7 @@
 import pg from "pg"
 import { requireSafeTarget } from "./lib/env-guard.mjs"
 
-const ZIEL = process.env.SALES_DRILL_URL || "postgres://localhost/g8"
+const ZIEL = process.env.SALES_DRILL_URL || "postgres://localhost/g8_vertrieb"
 requireSafeTarget(ZIEL, "Vertriebs-Probelauf")
 
 let fehler = 0
