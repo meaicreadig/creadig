@@ -531,6 +531,60 @@ entstanden, wovor G27 warnt: Automationstheater.
 **G27 ⬥ Owner-Last gesunken** — messbar, nicht behauptet. *Ohne dieses Gate:*
 Automationstheater.
 
+*Messung gebaut am 09.09.2026. Nicht geschlossen — und das ist kein Mangel
+des Baus, sondern seine Aussage.*
+
+**Die Falle, die dieses Gate stellt.** „Owner-Last" klingt nach einer Zahl,
+die sinken soll. Der billigste Weg, sie zu senken, ist nicht Automation — es
+ist, eine Entscheidung abzuschaffen. Dieses Haus hat an mehreren Stellen
+absichtlich einen Menschen hingestellt: das Kontakttor (G11), die Freigabe
+(G13), das Stellen einer Rechnung (G18), die Auslöser-Grenze (G26). Wer eine
+davon entfernt, senkt die Zahl und verschlechtert das Haus.
+
+**Deshalb zerfällt die Last in zwei Größen, die nie zu einer werden.**
+*Abnehmbar* ist Erinnern, Nachhalten, Zusammentragen — das darf sinken, dafür
+gibt es G26. *Unabnehmbar* sind die Entscheidungen, die einem Menschen
+vorbehalten sind — und wenn die sinken, ist das ein Alarm und kein Erfolg.
+`vergleich()` gibt deshalb nicht nur ein Urteil zurück, sondern das Feld
+`erfolg`: `false`, sobald ein Entscheidungstor mitgefallen sein könnte. Eine
+Warnung neben einer gefallenen Kurve wird gelesen wie ein Sternchen unter
+einem Preis; der Satz, der ankommt, ist „Owner-Last gesunken".
+
+**Der Build bricht, wenn ein Tor verschwindet.** `check-ownerlast.mjs` lädt
+die vier Module und sieht nach, ob der Export noch da ist *und noch etwas
+enthält*. Ein Textfund hätte den Namen auch in einem Kommentar akzeptiert —
+und genau so verschwindet ein Tor in der Praxis: Der Name bleibt in einer
+Notiz stehen, die Funktion ist fort. `export const NIEMALS_AUTOMATISCH = []`
+besteht jede Namenssuche und ist trotzdem ein entferntes Tor.
+
+**Das einzige Gate, das speichern muss.** Überall sonst gilt hier: nicht
+speichern, was sich ableiten lässt. Ein *Verlauf* lässt sich nicht ableiten —
+der Wert von vorletztem Monat ist fort, sobald ihn niemand aufgeschrieben
+hat. Deshalb `owner_load_samples` (Migration 013): ein Tag, eine Messung,
+keine Trendspalte. Das Urteil fällt aus zwei Messungen und den Regeln;
+gespeichert wäre es genau das Automationstheater, vor dem der Vertrag warnt.
+
+**Nicht gemessen ist nicht null.** `sales_measured` ist `NOT NULL` und hat
+keinen Default: Ohne dieses Feld wäre ein Datenbankausfall die beste
+Entlastung, die dieses Haus je hatte — null Posten, alles ruhig, die Kurve
+fällt. Eine Reihe, die niemand lesen konnte, ist `null` und nicht `[]`; eine
+Messung ohne Vertrieb wird gar nicht erst festgehalten, weil der Tag nur
+einen Platz hat und ein Ausfall um neun Uhr sonst die brauchbare Messung um
+drei Uhr blockiert.
+
+**28 Tage, und die Zahl ist nicht verhandelbar.** Zwei Messungen im Abstand
+von drei Tagen vergleichen einen Dienstag mit einem Freitag, und der
+Unterschied heißt „Woche", nicht „Entlastung". Wer den Abstand senkt, bricht
+den Build: Ungeduld ist kein Messfehler, den man wegkonfiguriert.
+
+**Was noch fehlt, ist Zeit — und ein Owner-Schritt.** Die Tabelle liegt
+absichtlich *nicht* in `REQUIRED_TABLES`; ein Messinstrument darf den Betrieb
+nicht anhalten. Sie muss deshalb einmal angelegt werden (`npm run
+db-migrate`, gegen Produktion mit ausdrücklicher Zustimmung), danach
+`npm run ownerlast-baseline` für T0. Ein Urteil gibt es frühestens 28 Tage
+später. **Gebaut ≠ bewiesen:** Dass gemessen wird, steht; dass die Owner-Last
+gesunken ist, steht nicht — und darf bis dahin niemand behaupten.
+
 ### Etappe X · Intelligenz
 
 **G28 ✓ Betriebsgedächtnis** — einheitlicher Kontext, Abruf, Belegpflicht.

@@ -8,6 +8,7 @@ import {
   BESTAND_ORGANISATIONEN,
 } from "@/lib/vertrieb-bestand"
 import { EXCLUSION_TESTDATA } from "@/lib/vertrieb"
+import type { OwnerLoadSample } from "@/lib/vertrieb"
 
 /**
  * Der Neon-Zugang und das Schema — an genau einer Stelle.
@@ -566,6 +567,44 @@ export const SCHEMA: string[] = [
      END IF;
    END
    $do$`,
+
+  /*
+   * 013 · GATE 27 — DIE MESSREIHE ZUR OWNER-LAST
+   *
+   * Das einzige Gate, das SPEICHERN muss, wo alle anderen ableiten.
+   *
+   * Ueberall sonst gilt in diesem Haus: nicht speichern, was sich ableiten
+   * laesst — eine gespeicherte Ableitung ist ab der ersten Regelaenderung
+   * still falsch. Hier ist es umgekehrt: Ein VERLAUF laesst sich nicht
+   * ableiten. Der Wert von vorletztem Monat ist fort, sobald ihn niemand
+   * aufgeschrieben hat, und mit ihm die einzige Aussage, die dieses Gate
+   * machen kann.
+   *
+   * `measured_on` IST EINDEUTIG.
+   * Zwei Messungen an einem Tag waeren zwei Wahrheiten ueber denselben Tag,
+   * und die spaetere gewaenne — obwohl der Vormittag genauso wahr war.
+   *
+   * `sales_measured` IST NOT NULL UND KEIN DEFAULT.
+   * Ob der Vertriebsteil gelesen werden konnte, ist Teil der Messung, nicht
+   * ihre Randnotiz. Ohne dieses Feld waere ein Datenbankausfall die beste
+   * Entlastung, die dieses Haus je hatte: null Posten, alles ruhig.
+   *
+   * `counts` als jsonb, weil die Raenge aus `lib/attention.ts` kommen und
+   * dort wachsen duerfen. Eine Spalte je Rang haette bei jedem neuen Rang
+   * eine Migration verlangt — und alte Messungen um eine Spalte aermer
+   * gemacht, die es damals nicht gab.
+   *
+   * Idempotent. Additiv.
+   */
+  `CREATE TABLE IF NOT EXISTS owner_load_samples (
+     id text PRIMARY KEY,
+     measured_on date NOT NULL,
+     counts jsonb NOT NULL,
+     sales_measured boolean NOT NULL,
+     note text,
+     created_at timestamptz NOT NULL DEFAULT now()
+   )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS owner_load_samples_day_idx ON owner_load_samples (measured_on)`,
 ]
 
 /**
@@ -1004,6 +1043,51 @@ const REQUIRED_COLUMNS: [table: string, column: string][] = [
  * die an dieser Stelle hilft. Eine Anwendung, die eine fehlende Spalte
  * selbst nachtraegt, verwandelt jeden Start in eine Migration.
  */
+/* ===========================================================================
+ * GATE 27 · Die Messreihe zur Owner-Last
+ *
+ * Die beiden Zugriffe stehen HIER und nicht im Store, damit der Probelauf sie
+ * gegen eine Wegwerf-Datenbank fahren kann — dieselben SQL-Zeilen wie in
+ * Produktion. Ein Probelauf, der die Abfrage nachbaut, prueft seinen Nachbau.
+ *
+ * Sie werfen, statt zu schweigen. Ob ein Fehler „nicht lesbar" bedeutet oder
+ * einen Abbruch, entscheidet der Aufrufer: Der Store meldet „nicht lesbar",
+ * der Probelauf will den Fehler sehen.
+ * =========================================================================== */
+
+/** Die Messreihe, aelteste zuerst. */
+export async function readOwnerLoadSamples(sql: Sql, limit = 400): Promise<OwnerLoadSample[]> {
+  const rows = (await sql.query(
+    `SELECT to_char(measured_on, 'YYYY-MM-DD') AS am, counts, sales_measured, note
+       FROM owner_load_samples ORDER BY measured_on ASC LIMIT $1`,
+    [limit],
+  )) as { am: string; counts: unknown; sales_measured: boolean; note: string | null }[]
+  return rows.map((r) => ({
+    am: r.am,
+    counts: (typeof r.counts === "string" ? JSON.parse(r.counts) : r.counts) as Record<string, number>,
+    vertriebGemessen: r.sales_measured,
+    note: r.note,
+  }))
+}
+
+/**
+ * Eine Messung festhalten. `false`, wenn der Tag schon eine hat.
+ *
+ * Die Kennung kommt aus dem Tag (`messungId` in `lib/ownerlast.ts`), nicht aus
+ * dem Zufall — deshalb faengt `ON CONFLICT DO NOTHING` ohne Ziel beides ab:
+ * den Primaerschluessel und den Tagesindex. Ueberschrieben wird nie; die
+ * Messung vom Vormittag war genauso wahr wie die vom Abend.
+ */
+export async function writeOwnerLoadSample(sql: Sql, input: OwnerLoadSample): Promise<boolean> {
+  const rows = (await sql.query(
+    `INSERT INTO owner_load_samples (id, measured_on, counts, sales_measured, note)
+     VALUES ($1, $2::date, $3::jsonb, $4, $5)
+     ON CONFLICT DO NOTHING RETURNING id`,
+    [`ol-${input.am}`, input.am, JSON.stringify(input.counts), input.vertriebGemessen, input.note],
+  )) as { id: string }[]
+  return rows.length > 0
+}
+
 export async function verifySchema(sql: Sql): Promise<void> {
   const tabellen = new Set(
     (await sql.query(

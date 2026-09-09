@@ -156,5 +156,6 @@ console.log(
     "die Idempotenz ist abgeleitet.",
 )
 console.log(
-  "\nG27 bleibt offen: Ob die Owner-Last sinkt, zeigen Messwerte ueber Zeit — nicht diese Schicht.",
+  "\nG27 misst inzwischen (npm run ownerlast-baseline), aber es gibt noch keine Zeitreihe: Ob die\n" +
+    "Owner-Last sinkt, zeigen zwei Messungen im Abstand von 28 Tagen — nicht diese Schicht.",
 )

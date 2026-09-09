@@ -16,7 +16,12 @@ import type { PersonRef } from "@/lib/contact-access"
 import type { SalesStatus } from "@/lib/lead-store"
 import { isTestEnquiry, sqlLeadOperational } from "@/lib/vertrieb-bestand"
 import { SALES_LABELS_DE, TERMINAL_STATES } from "@/lib/lead-store"
-import { neonClient, type Sql } from "@/lib/neon-client"
+import {
+  neonClient,
+  readOwnerLoadSamples,
+  writeOwnerLoadSample,
+  type Sql,
+} from "@/lib/neon-client"
 import type {
   Activity,
   EnquiryRow,
@@ -35,6 +40,7 @@ import type {
   RelationshipLevel,
   VertriebStore,
   VertriebSummary,
+  OwnerLoadSample,
 } from "@/lib/vertrieb"
 import { LIFECYCLE_LABELS, RELATIONSHIP_LABELS } from "@/lib/vertrieb"
 
@@ -1729,6 +1735,37 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
         detail: r.detail,
         createdAt: iso(r.created_at),
       }))
+    },
+
+    /* ── GATE 27 · Die Messreihe ──────────────────────────────────────────
+     *
+     * Beide Methoden fangen den Fehler ab und melden „nicht lesbar" bzw.
+     * „nicht moeglich" — statt zu werfen. Das ist hier kein Verschlucken:
+     * Die Messreihe steht ABSICHTLICH nicht in `REQUIRED_TABLES`. Sie ist
+     * ein Messinstrument, kein Betriebsteil; ihr Fehlen darf das Haus nicht
+     * anhalten. Es darf nur nicht als Null durchgehen — und dafuer gibt es
+     * die beiden getrennten Rueckgaben.
+     */
+
+    async ownerLoadSamples(limit = 400): Promise<OwnerLoadSample[] | null> {
+      try {
+        await ready()
+        return await readOwnerLoadSamples(sql, limit)
+      } catch {
+        /* Kein `[]`. Eine Reihe, die niemand lesen konnte, ist keine leere Reihe. */
+        return null
+      }
+    },
+
+    async recordOwnerLoadSample(
+      input: OwnerLoadSample,
+    ): Promise<"neu" | "schon-gemessen" | "nicht-moeglich"> {
+      try {
+        await ready()
+        return (await writeOwnerLoadSample(sql, input)) ? "neu" : "schon-gemessen"
+      } catch {
+        return "nicht-moeglich"
+      }
     },
   }
 }

@@ -670,4 +670,49 @@ export type VertriebStore = {
   setLeadHandling(leadId: string, status: HandlingStatus): Promise<boolean>
 
   activities(subjectType: ActivitySubject, subjectId: string, limit?: number): Promise<Activity[]>
+
+  /* ── GATE 27 · Die Messreihe zur Owner-Last ────────────────────────────
+   *
+   * Die einzige Reihe in diesem Haus, die GESPEICHERT wird. Alles andere
+   * hier wird im Moment der Frage abgeleitet — ein Verlauf laesst sich
+   * nicht ableiten. Der Wert von vorletztem Monat ist fort, sobald ihn
+   * niemand aufgeschrieben hat.
+   */
+
+  /**
+   * Die Messreihe, aelteste zuerst — oder `null`.
+   *
+   * `null` heisst „nicht lesbar" (Tabelle fehlt, Datenbank weg) und ist
+   * etwas anderes als `[]` („noch nicht gemessen"). Ohne diesen
+   * Unterschied waere ein Ausfall der Reihe die beste Entlastung, die
+   * dieses Haus je hatte.
+   */
+  ownerLoadSamples(limit?: number): Promise<OwnerLoadSample[] | null>
+
+  /**
+   * Eine Messung festhalten.
+   *
+   * `schon-gemessen`, wenn der Tag bereits eine Messung hat: Zwei
+   * Messungen an einem Tag waeren zwei Wahrheiten ueber denselben Tag, und
+   * die spaetere gewaenne — obwohl der Vormittag genauso wahr war. Der
+   * Aufruf ueberschreibt deshalb nichts.
+   */
+  recordOwnerLoadSample(input: OwnerLoadSample): Promise<"neu" | "schon-gemessen" | "nicht-moeglich">
+}
+
+/**
+ * Eine Messung, wie sie in der Datenbank steht.
+ *
+ * Absichtlich nicht der Typ aus `lib/ownerlast.ts`: Dort steht die REGEL,
+ * hier die ZEILE. Wuerde der Store den Regeltyp fuehren, muesste jede
+ * Aenderung an den Regeln durch die Datenbankschicht — und eine alte Zeile
+ * saehe ploetzlich falsch aus, obwohl sie richtig gemessen wurde.
+ */
+export type OwnerLoadSample = {
+  /** ISO-Tag. */
+  am: string
+  counts: Record<string, number>
+  /** Ob der Vertriebsteil gelesen werden konnte. Kein Default, nie `null`. */
+  vertriebGemessen: boolean
+  note: string | null
 }
