@@ -13,7 +13,7 @@ import { VertriebNav } from "@/components/admin/vertrieb-nav"
  */
 export default function VertriebLoading() {
   return (
-    <AdminShell title="Vertrieb" salesAvailable>
+    <AdminShell title="Vertrieb">
       <VertriebNav />
       <p className="type-body text-muted-foreground mt-8" aria-live="polite">
         Wird geladen …

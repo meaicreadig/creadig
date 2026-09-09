@@ -27,7 +27,7 @@ export function VertriebShell({
   children: ReactNode
 }) {
   return (
-    <AdminShell title={title} lead={lead} meta={available ? meta : undefined} salesAvailable>
+    <AdminShell title={title} lead={lead} meta={available ? meta : undefined}>
       <VertriebNav />
       <div className="mt-8">
         {available ? (

@@ -65,44 +65,55 @@ import { AdminNav, type NavItem } from "@/components/admin/admin-nav"
  * operative Quelle in diesem Haus — Analytics schreibt nur, Produktstand ist
  * Material, ein Projektmodell existiert nicht. Ein Menuepunkt, hinter dem
  * nichts Gemessenes liegt, ist eine Behauptung ueber die Firma. Die
- * Navigation waechst mit den Quellen, nicht mit den Absichten; genau deshalb
- * haengen auch Vertrieb und Kunden an `salesAvailable`.
+ * Navigation waechst mit den Quellen, nicht mit den Absichten.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM VERTRIEB UND KUNDEN TROTZDEM IMMER DASTEHEN
+ *
+ * Bis zum 09.09.2026 hingen sie an `salesAvailable`. Das klang nach
+ * derselben Regel und war eine andere — und es fiel erst im Browser auf:
+ *
+ *   /admin            Heute | System
+ *   /admin/cockpit    Heute | System
+ *   /admin/vertrieb   Heute | Vertrieb | Kunden | System
+ *   /admin/kunden     Heute | Vertrieb | Kunden | System
+ *   /admin/material   Heute | System
+ *
+ * `/admin` und `/admin/material` reichten den GEMESSENEN Wert herein,
+ * `vertrieb-shell` und `kunden-shell` ein hartes `salesAvailable`. Das Menue
+ * aenderte damit beim Blaettern seine Form — und von „Heute", der Seite, die
+ * taeglich zuerst geoeffnet wird, waren die beiden Hauptbereiche ueberhaupt
+ * nicht erreichbar. Wer sie sehen wollte, musste die Adresse kennen.
+ *
+ * Der Denkfehler steckte in der Regel selbst. Sie verwechselt zwei Dinge,
+ * die dieses Haus sonst ueberall auseinanderhaelt:
+ *
+ *   „Es gibt hier keinen Vertrieb"      — eine Aussage ueber die Firma
+ *   „Der Speicher ist nicht erreichbar" — ein Zustand von jetzt
+ *
+ * Vertrieb und Kunden sind Bereiche dieses Hauses, ob die Datenbank gerade
+ * antwortet oder nicht. Ob sie antwortet, ist ein Zustand der SEITE, und die
+ * sagt ihn bereits selbst („Vertrieb braucht die Datenbank"). Marketing und
+ * Projekte bleiben draussen — dahinter liegt keine Quelle, nicht bloss eine
+ * unerreichbare.
  */
-function navItems(salesAvailable: boolean): NavItem[] {
-  const items: NavItem[] = [
-    { href: "/admin", label: "Heute", hint: "Was Aufmerksamkeit braucht" },
-  ]
-  if (salesAvailable) {
-    items.push(
-      { href: "/admin/vertrieb", label: "Vertrieb", hint: "Anfragen, Pipeline, Beziehungen" },
-      { href: "/admin/kunden", label: "Kunden", hint: "Bestand, Standorte, Historie" },
-    )
-  }
-  items.push({
-    href: "/admin/material",
-    label: "System",
-    hint: "Material, Betrieb, Entscheidungen",
-  })
-  return items
-}
+const NAV_ITEMS: NavItem[] = [
+  { href: "/admin", label: "Heute", hint: "Was Aufmerksamkeit braucht" },
+  { href: "/admin/vertrieb", label: "Vertrieb", hint: "Anfragen, Pipeline, Beziehungen" },
+  { href: "/admin/kunden", label: "Kunden", hint: "Bestand, Standorte, Historie" },
+  { href: "/admin/material", label: "System", hint: "Material, Betrieb, Entscheidungen" },
+]
 
 export function AdminShell({
   title,
   lead,
   meta,
-  /**
-   * Ob es einen Lead-Speicher gibt. Der Aufrufer misst das serverseitig
-   * (`leadStoreConfigured()`); Fehler- und Ladeseiten lassen es weg und
-   * zeigen die Navigation ohne Vertrieb.
-   */
-  salesAvailable = false,
   children,
 }: {
   title: string
   lead?: string
   /** Kurze Angabe rechts im Kopf — etwa der Stand der Daten. */
   meta?: ReactNode
-  salesAvailable?: boolean
   children: ReactNode
 }) {
   return (
@@ -125,7 +136,7 @@ export function AdminShell({
             <p className="text-subhead mt-1 text-base">Control Center</p>
           </div>
 
-          <AdminNav items={navItems(salesAvailable)} />
+          <AdminNav items={NAV_ITEMS} />
 
           <div className="border-line mt-auto hidden border-t pt-5 lg:block">
             <AdminLogout />

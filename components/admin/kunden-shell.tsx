@@ -38,7 +38,7 @@ export function KundenShell({
   children: ReactNode
 }) {
   return (
-    <AdminShell title={title} lead={lead} meta={available ? meta : undefined} salesAvailable>
+    <AdminShell title={title} lead={lead} meta={available ? meta : undefined}>
       {available ? (
         children
       ) : (

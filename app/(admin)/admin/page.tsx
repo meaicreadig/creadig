@@ -97,7 +97,6 @@ export default async function Today() {
       title="Heute"
       lead="Was Aufmerksamkeit braucht — aus den Quellen, die es wirklich gibt."
       meta={<span className="block">Stand {stand}</span>}
-      salesAvailable={hasStore}
     >
       <div className="grid gap-10 lg:grid-cols-[2fr_1fr] lg:gap-12">
         {/* ── Arbeitsfläche: die Aufmerksamkeitsliste ── */}
