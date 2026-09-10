@@ -1039,7 +1039,7 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
  * Aenderung waere unsichtbar geblieben.
  *
  * Deshalb stehen die arabischen Familien jetzt VORN — allerdings nur im
- * arabischen Baum. Display: IBM Plex Sans Arabic, Fliesstext: Readex Pro.
+ * arabischen Baum. Display: Cairo, Fliesstext: Readex Pro.
  * Der Preis: lateinische Woerter INNERHALB arabischer Saetze kommen dort
  * ebenfalls aus der arabischen Familie. Das ist der bessere von zwei Fehlern:
  * Ein Satz aus einer Schrift liest sich ruhiger als einer aus zweien, und die
@@ -1068,22 +1068,22 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
 }
 
 /*
- * Arabisch braucht mehr Durchschuss als Latein: Die Schrift traegt
- * Punkte unter und Zeichen ueber der Grundlinie, und bei enger Zeile
- * beruehren sie die Nachbarzeile. `type-display` hatte line-height: 1 —
- * dort fehlte der Override, und die Hero-Maske schnitt die Glyphen.
+ * Arabisch braucht etwas mehr Durchschuss als Latein — aber nicht viel:
+ * 1.28 + Hero-Zeilenpadding oeffnete die Headline zu einem Luftgitter.
+ * Knapp ueber Latin-1.0, genug fuer Punkte/Madda; die Maske polstert
+ * zusaetzlich in `hero.tsx`.
  */
 [lang="ar"] :is(.type-display, .text-display) {
-  line-height: 1.28;
-  font-weight: 600;
+  line-height: 1.1;
+  font-weight: 700;
 }
 
 [lang="ar"] :is(.type-h1, .type-h2, .type-h3, .type-h4, .type-statement, .type-stat) {
-  line-height: 1.35;
+  line-height: 1.22;
 }
 
 [lang="ar"] :is(.type-h1) {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 [lang="ar"] :is(.type-lead, .type-body, .type-small, p) {

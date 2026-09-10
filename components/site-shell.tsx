@@ -4,7 +4,7 @@ import {
   JetBrains_Mono,
   M_PLUS_Rounded_1c,
   Readex_Pro,
-  IBM_Plex_Sans_Arabic,
+  Cairo,
 } from "next/font/google"
 import "@/app/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -138,13 +138,12 @@ const jetbrains = JetBrains_Mono({
  *
  * ZWEI ARABISCHE SCHNITTE — wie Latein Poppins/M PLUS:
  *
- *   Fliesstext → Readex Pro (`--font-arabic`). Runde Strichenden, ruhiger
- *   Lauf; der Owner hat den Normal-Schnitt ausdruecklich fuer gut befunden.
+ *   Fliesstext → Readex Pro (`--font-arabic`). Owner: Normal-Schnitt gut.
  *
- *   Ueberschriften → IBM Plex Sans Arabic (`--font-arabic-display`). Readex
- *   700 in Hero-Groesse wirkt schwarz und klemmt die oberen/unteren
- *   Glyphen; Plex haelt Kontrast und Metrik bei grossen Graden. Neutral-
- *   technisch passt zum System-Haus, nicht zur Agentur-Schrift.
+ *   Ueberschriften → Cairo (`--font-arabic-display`). Plex war korrekt,
+ *   aber flach („nicht wow"). Cairo traegt in Hero-Groesse mehr Charakter
+ *   ohne die mechanische Kufi-Kante. Gewicht 700, enger Durchschuss —
+ *   die Plex-Runde hatte die Zeilen zu weit geoeffnet.
  *
  * Die lateinische Schrift bleibt unangetastet (Owner-Formentscheidung vom
  * 27.08.2026). Im arabischen Baum stehen beide Familien VORN vor Poppins/
@@ -159,9 +158,9 @@ const readex = Readex_Pro({
   preload: false,
 })
 
-const plexArabic = IBM_Plex_Sans_Arabic({
+const cairo = Cairo({
   subsets: ["arabic"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["500", "600", "700"],
   variable: "--font-arabic-display",
   display: "swap",
   preload: false,
@@ -430,7 +429,7 @@ export function SiteShell({
     <html
       lang={locale}
       dir={LOCALE_DIR[locale]}
-      className={`${poppins.variable} ${mplusRounded.variable} ${jetbrains.variable} ${readex.variable} ${plexArabic.variable}`}
+      className={`${poppins.variable} ${mplusRounded.variable} ${jetbrains.variable} ${readex.variable} ${cairo.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>
