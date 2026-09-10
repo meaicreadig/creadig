@@ -4,14 +4,13 @@ import { useEffect, useState } from "react"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useRouter, usePathname } from "next/navigation"
 import { motion } from "framer-motion"
-import { Menu, Sun } from "lucide-react"
+import { Check, Menu, Sun } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { useLocale } from "@/components/locale-provider"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { MoonIcon } from "@/components/ui/moon-icon"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   Sheet,
   SheetClose,
@@ -23,19 +22,8 @@ import {
 import { Logo } from "@/components/brand/logo"
 import { mainNavLinks } from "@/lib/site-data"
 import { localePath, locales, splitLocale } from "@/lib/routes"
+import { LanguageMenu, LOCALE_NAME } from "@/components/ui/language-menu"
 
-/**
- * Wie eine Sprache im Schalter heisst — im ENDONYM, also so, wie sie sich
- * selbst nennt. Wer nur Tuerkisch liest, findet „Türkçe"; „Turkish" haette
- * ihm nichts genutzt. Kurzform fuer die Leiste, Vollform fuer das Menue und
- * fuer `aria-label`.
- */
-const LOCALE_NAME: Record<Locale, { short: string; full: string }> = {
-  de: { short: "DE", full: "Deutsch" },
-  tr: { short: "TR", full: "Türkçe" },
-  en: { short: "EN", full: "English" },
-  ar: { short: "AR", full: "العربية" },
-}
 import { whatsappLink, type Locale } from "@/lib/dictionary"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { cn } from "@/lib/utils"
@@ -117,8 +105,16 @@ export function SiteNav() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-[var(--dur-2)] ease-brand",
+        /*
+           G-VISUAL — 85 % waren zu wenig, gemessen und nicht geschaetzt.
+           Ueber einem grauen Band scrollt der Untergrund durch und mischt
+           sich in die Leiste: Die Menuewoerter standen dann mit 3,83 : 1 auf
+           #dadad8 statt auf dem hellen Grund — unter den 4,5 : 1, die
+           Fliesstext braucht. Bei 95 % bleibt die Unschaerfe als Effekt
+           sichtbar, aber die Schrift steht auf einem definierten Grund.
+        */
         scrolled
-          ? "border-b border-line bg-background/85 backdrop-blur-xl"
+          ? "border-b border-line bg-background/95 backdrop-blur-xl"
           : "border-b border-transparent bg-transparent",
       )}
     >
@@ -162,24 +158,18 @@ export function SiteNav() {
         </nav>
 
         <div className="flex items-center gap-1.5">
-          <ToggleGroup
-            type="single"
-            value={locale}
-            onValueChange={(value) => value && switchLanguage(value as Locale)}
-            aria-label={t.nav.language}
-            className="hidden divide-x divide-line-strong border-0 sm:flex"
-          >
-            {locales.map((code) => (
-              <ToggleGroupItem
-                key={code}
-                value={code}
-                aria-label={LOCALE_NAME[code].full}
-                className="h-9 rounded-none border-0 bg-transparent eyebrow px-2 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
-              >
-                {LOCALE_NAME[code].short}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+          {/*
+            Vier Kuerzel (DE TR EN AR) standen hier als vier gleichwertige
+            Ziele neben fuenf Menuepunkten. Jetzt ein Schalter, der die
+            aktuelle Sprache im Klartext nennt — Begruendung und Tastatur-
+            verhalten in `components/ui/language-menu.tsx`.
+          */}
+          <LanguageMenu
+            locale={locale}
+            label={t.nav.language}
+            onSelect={switchLanguage}
+            className="hidden sm:block"
+          />
 
           <Button
             variant="ghost"
@@ -318,23 +308,38 @@ export function SiteNav() {
                   <WhatsAppIcon className="size-5" /> WhatsApp
                 </a>
                 <Separator className="mt-4" />
-                <ToggleGroup
-                  type="single"
-                  value={locale}
-                  onValueChange={(value) => value && switchLanguage(value as Locale)}
-                  aria-label={t.nav.language}
-                  className="mt-1 justify-start border-0"
-                >
-                  {locales.map((code) => (
-                    <ToggleGroupItem
-                      key={code}
-                      value={code}
-                      className="rounded-none border-0 bg-transparent eyebrow px-3 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-foreground"
-                    >
-                      {LOCALE_NAME[code].full}
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
+                {/*
+                  Im Menue braucht es kein Aufklapp-Menue im Aufklapp-Menue:
+                  Die vier Sprachen stehen untereinander, jede Zeile 48 px
+                  hoch und ueber die volle Breite antippbar. Vier volle Namen
+                  nebeneinander (Deutsch · Türkçe · English · العربية) passen
+                  auf 390 px ohnehin nicht in eine Zeile, ohne zu brechen.
+                */}
+                <p className="eyebrow text-muted-foreground mt-1">{t.nav.language}</p>
+                <ul className="mt-1 flex flex-col">
+                  {locales.map((code) => {
+                    const gewaehlt = code === locale
+                    return (
+                      <li key={code}>
+                        <button
+                          type="button"
+                          lang={code}
+                          aria-current={gewaehlt ? "true" : undefined}
+                          onClick={() => switchLanguage(code as Locale)}
+                          className={cn(
+                            "flex h-12 w-full items-center justify-between text-start text-sm transition-colors duration-[var(--dur-2)]",
+                            gewaehlt ? "text-foreground" : "text-muted-foreground",
+                          )}
+                        >
+                          {LOCALE_NAME[code].full}
+                          {gewaehlt && (
+                            <Check className="text-gold-text size-4 shrink-0" strokeWidth={2} aria-hidden="true" />
+                          )}
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
               </div>
             </SheetContent>
           </Sheet>

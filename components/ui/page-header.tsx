@@ -80,13 +80,34 @@ export function PageHeader({
           </ol>
         </nav>
 
-        <Reveal className="mt-12">
-          <SectionEyebrow label={eyebrow} />
-          <h1 className="type-h1 mt-7 max-w-4xl text-balance">{title}</h1>
+        {/*
+          G-VISUAL — DER KOPF STAND AUF EINER HALBEN SEITE.
+
+          Eyebrow, H1 und Einleitung standen untereinander, jeweils mit
+          `max-w`. Bei 1440 px hiess das: die rechten rund 45 Prozent jedes
+          Seitenkopfs blieben leer — auf /leistungen, /produkte, /arbeiten,
+          /insights, /kontakt und jeder Detailseite, also auf jeder
+          Unterseite der Website dieselbe Leere an derselben Stelle.
+
+          Genau das ist die Grammatik, die aus „aufgeraeumt" „unfertig"
+          macht: creme, Ueberschrift, viel Nichts, naechste Ueberschrift.
+
+          Jetzt zweispaltig, wie die Abschnittskoepfe im Rest des Hauses es
+          laengst machen (`house-architecture`, `services`): Titel links,
+          Einleitung rechts auf derselben Grundlinie. Kein neues Muster —
+          das vorhandene, endlich auch hier.
+        */}
+        <div className="mt-12 grid gap-x-10 gap-y-8 lg:grid-cols-12 lg:items-end">
+          <Reveal className="lg:col-span-7">
+            <SectionEyebrow label={eyebrow} />
+            <h1 className="type-h1 mt-7 text-balance">{title}</h1>
+          </Reveal>
           {lead && (
-            <p className="type-lead text-muted-foreground mt-8 max-w-2xl text-pretty">{lead}</p>
+            <Reveal delay={0.08} className="lg:col-span-5">
+              <p className="type-lead text-muted-foreground max-w-2xl text-pretty">{lead}</p>
+            </Reveal>
           )}
-        </Reveal>
+        </div>
 
         {children && <Reveal delay={0.08}>{children}</Reveal>}
       </div>

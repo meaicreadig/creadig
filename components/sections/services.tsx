@@ -102,7 +102,21 @@ export function Services({ heading = true }: { heading?: boolean }) {
           {serviceLayers.map((layer, i) => {
             const copy = t.services.layers[layer.key]
             /*
-             * Ebene 01 = schmalste Basis, Ebene 05 = breiteste Spitze.
+             * G-VISUAL — DIE PYRAMIDE STAND AUF DER SPITZE.
+             *
+             * Hier stand: „Ebene 01 = schmalste Basis, Ebene 05 = breiteste
+             * Spitze." Genau so war es auch gebaut — und damit widersprach
+             * das Bild dem Text, der in derselben Zeile steht: Identity ist
+             * „das Fundament, auf dem alles steht". Gezeichnet war es als das
+             * SCHMALSTE Element, ganz unten, am weitesten eingerueckt: ein
+             * Bauwerk, das sich nach unten verjuengt und auf seiner Spitze
+             * balanciert.
+             *
+             * Ein Leser muss so ein Bild nicht bewusst analysieren, damit es
+             * wirkt — er sieht eine unsichere Konstruktion und liest daneben
+             * „Fundament". Jetzt traegt 01 die volle Breite und 05 die
+             * schmalste: breite Basis, schmale Spitze. Dieselben fuenf
+             * Literale, in der richtigen Richtung gelesen.
              *
              * Die Einrueckung ist ab `md` prozentual — dort kostet sie nichts
              * und traegt das Bauwerk. Auf dem Telefon war sie es, die das
@@ -117,7 +131,10 @@ export function Services({ heading = true }: { heading?: boolean }) {
              * dieselben acht Prozent, also gar keine Aenderung. Gemessen
              * statt geschaetzt: 287 → 278 Pixel, es wurde sogar enger.
              */
-            const isTop = i === serviceLayers.length - 1
+            /* Betont wird die Basis, nicht die Spitze: 01 traegt die vier
+               darueber. Vorher lag der Ton auf 05 — auf dem, was ohne die
+               anderen vier gar nicht stehen kann. */
+            const istFundament = i === 0
 
             return (
               <Reveal
@@ -131,8 +148,8 @@ export function Services({ heading = true }: { heading?: boolean }) {
                   id={`ebene-${layer.key}`}
                   /* scroll-mt: die feste Leiste (4,5rem) darf den Anker nicht verdecken. */
                   className={`tile relative scroll-mt-28 transition-colors duration-[var(--dur-2)] ${
-                    EINRUECKUNG[serviceLayers.length - 1 - i]
-                  } ${isTop ? "bg-foreground/[0.03]" : ""} hover:bg-foreground/[0.04]`}
+                    EINRUECKUNG[i]
+                  } ${istFundament ? "bg-foreground/[0.03]" : ""} hover:bg-foreground/[0.04]`}
                 >
                   <span
                     aria-hidden="true"

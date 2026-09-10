@@ -59,44 +59,92 @@ export function HouseArchitecture() {
           </Reveal>
         </div>
 
+        {/*
+          ---------------------------------------------------------------
+          DIE TRAGWERK-ANSICHT — WARUM DIE VORIGE FASSUNG FALSCH ARGUMENTIERT HAT
+
+          Bis hierher war jede Ebene ein abgerundetes Kaestchen, und die
+          Kaestchen wurden nach unten hin SCHMALER: 05 ueber die volle
+          Breite, 01 am schmalsten, jede Stufe zusaetzlich weiter
+          eingerueckt.
+
+          Gemessen an der eigenen Aussage ist das genau verkehrt. Der Text
+          derselben Zeile sagt ueber Identity: „das Fundament, auf dem alles
+          steht." Das Bild sagt: Identity ist das Kleinste und Letzte. Ein
+          Diagramm, das seiner eigenen Bildunterschrift widerspricht,
+          erklaert nichts — es macht den Leser unsicher, und zwar an genau
+          der Stelle, an der creaDIG seine Kompetenz behauptet.
+
+          Jetzt ein Schichtenmodell, wie es ein Tragwerk zeichnet:
+
+            · alle fuenf Ebenen ueber DIESELBE Breite — keine traegt weniger,
+              sie tragen Verschiedenes
+            · sie liegen ohne Fuge aufeinander, wie Lagen im Mauerwerk;
+              die Fuge ist eine Linie, kein Abstand
+            · nach unten nimmt das Gewicht ZU, nicht ab: 01 traegt die
+              staerkste Grundlinie
+            · die Ziffer ist gross und traegt die Ordnung, nicht ein Rahmen
+
+          Und das Dach ist keine Karte mehr. „creaDIG" stand als
+          1310 px breites, fast leeres Rechteck ueber dem Stapel, mit einem
+          Haarstrich verbunden — ein sechstes Kaestchen, das so tat, als
+          waere es eine sechste Ebene. creaDIG ist aber nicht das oberste
+          Element, sondern die Klammer um alle: der Rahmen, der das Tragwerk
+          zusammenhaelt. Deshalb steht der Name jetzt AM Rahmen.
+        */}
         <figure className="mt-20">
-          {/* ---- Das Dach ------------------------------------------------ */}
+          {/* ---- Der Rahmen: creaDIG haelt das Tragwerk ------------------ */}
           <Reveal>
-            <div className="border-gold/45 bg-surface border px-7 py-8 text-center">
-              <p className="eyebrow text-gold-text">{copy.roofLabel}</p>
-              <p className="text-display mt-4 text-3xl tracking-tight md:text-4xl">creaDIG</p>
-              <p className="type-small text-muted-foreground mt-3">{copy.roofNote}</p>
+            <div className="border-gold/50 border border-b-0 px-5 pt-5 pb-0 md:px-7 md:pt-6">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 pb-5">
+                <p className="eyebrow text-gold-text">{copy.roofLabel}</p>
+                <p className="type-small text-muted-foreground">{copy.roofNote}</p>
+              </div>
             </div>
           </Reveal>
 
-          {/* Der Strang, der Dach und Ebenen verbindet. Rein dekorativ — die
-              Zugehoerigkeit steht im Text, nicht in der Linie. */}
-          <div aria-hidden="true" className="flex justify-center">
-            <span className="bg-line-strong h-10 w-px" />
-          </div>
-
-          {/* ---- Fünf Ebenen -------------------------------------------- */}
-          <Reveal delay={0.06}>
-            <p className="eyebrow text-muted-foreground text-center">{copy.layersLabel}</p>
-          </Reveal>
-          <ul className="mt-5 flex flex-col gap-2">
+          {/* ---- Fünf Ebenen, von oben gelesen, 01 zuletzt --------------- */}
+          <ul className="border-gold/50 border-x">
             {layersTopDown.map((layer, i) => {
               const layerCopy = t.services.layers[layer.key]
-              /* Oben breit, unten schmal: 05 traegt die groesste Wirkung,
-                 01 die schmalste Basis — dieselbe Verjuengung wie in der
-                 Pyramide, nur von oben gelesen. */
-              const inset = i * 3
+              const fundament = i === layersTopDown.length - 1
               return (
                 <Reveal key={layer.key} as="li" delay={0.05 * i} y={12}>
                   <div
-                    style={{ marginLeft: `${inset}%`, marginRight: `${inset}%` }}
-                    className="border-line bg-background flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 rounded-md border px-6 py-5"
+                    className={`border-line grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 border-t px-5 py-6 md:grid-cols-12 md:gap-x-8 md:px-7 md:py-7 ${
+                      fundament ? "bg-surface" : ""
+                    }`}
                   >
-                    <span className="flex items-baseline gap-4">
-                      <span className="eyebrow text-gold-text">{layer.level}</span>
-                      <span className="text-subhead text-lg">{layerCopy.name}</span>
+                    {/*
+                      Die Ziffer traegt die Ordnung. Sie steht in einer eigenen
+                      Spalte, damit die drei Textspalten auf allen fuenf Zeilen
+                      an derselben Kante beginnen — vorher war die rechte
+                      Spalte auf jeder Zeile woanders, weil die Kaestchen
+                      verschieden breit waren.
+                    */}
+                    {/*
+                      `text-muted-foreground/50` stand hier und war mit
+                      2,03 : 1 gemessen unter den 3 : 1, die grosse Schrift
+                      braucht — eine Ziffer, die als Ordnungssystem gedacht
+                      war und die man kaum lesen konnte. Volle Tonwertstufe:
+                      dieselbe Zurueckhaltung, aber lesbar.
+
+                      Kein `aria-hidden`: Die Liste ist ein <ul>, also traegt
+                      NUR diese Ziffer die Ebene. Als <ol> haette sie von 1 bis
+                      5 durchgezaehlt, waehrend daneben 05 bis 01 steht — zwei
+                      Nummerierungen fuer dieselben fuenf Zeilen.
+                    */}
+                    <span
+                      className={`text-display text-2xl leading-none tabular-nums md:col-span-1 md:text-[2rem] ${
+                        fundament ? "text-gold-text" : "text-muted-foreground"
+                      }`}
+                    >
+                      {layer.level}
                     </span>
-                    <span className="type-small text-muted-foreground max-w-md text-pretty">
+                    <span className="text-subhead text-lg md:col-span-3 md:text-xl">
+                      {layerCopy.name}
+                    </span>
+                    <span className="type-small text-muted-foreground col-span-2 text-pretty md:col-span-8">
                       {layerCopy.what}
                     </span>
                   </div>
@@ -105,33 +153,52 @@ export function HouseArchitecture() {
             })}
           </ul>
 
+          {/*
+            Die Grundlinie. Sie ist die einzige starke Linie im ganzen Bild
+            und liegt unter 01 — das ist der Satz „das Fundament, auf dem
+            alles steht" als Strich statt als Behauptung.
+          */}
+          <div aria-hidden="true" className="bg-gold h-[3px] w-full" />
+
           {/* ---- Quer darunter: der Betrieb ------------------------------ */}
+          {/*
+            Er steht unter der Grundlinie und ueber die volle Breite: Der
+            Betrieb traegt nicht EINE Ebene, er laeuft unter allen fuenfen
+            durch. Deshalb hat er auch keine Ziffer — er ist keine sechste
+            Stufe (KIZILELMA §10.1).
+          */}
           <Reveal delay={0.12}>
-            <div className="border-gold/45 bg-muted mt-6 border-s-2 px-6 py-5">
-              <p className="eyebrow text-gold-text">{copy.operateLabel}</p>
-              <p className="text-subhead mt-3 text-lg">{t.managed.title}</p>
-              <p className="type-small text-muted-foreground mt-2 text-pretty">
-                {copy.operateNote}
+            <div className="bg-muted grid gap-x-8 gap-y-2 px-5 py-6 md:grid-cols-12 md:px-7">
+              <p className="eyebrow text-gold-text md:col-span-4">
+                {copy.operateLabel}
               </p>
+              <div className="md:col-span-8">
+                <p className="text-subhead text-lg">{t.managed.title}</p>
+                <p className="type-small text-muted-foreground mt-2 text-pretty">
+                  {copy.operateNote}
+                </p>
+              </div>
             </div>
           </Reveal>
 
-          <div aria-hidden="true" className="flex justify-center">
-            <span className="bg-line-strong h-10 w-px" />
-          </div>
-
           {/* ---- Vier eigene Produkte ------------------------------------ */}
           <Reveal delay={0.16}>
-            <p className="eyebrow text-muted-foreground text-center">{copy.productsLabel}</p>
+            <p className="eyebrow text-muted-foreground mt-16">{copy.productsLabel}</p>
           </Reveal>
-          <ul className="mt-5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="border-line mt-5 grid border-t sm:grid-cols-2 lg:grid-cols-4">
             {productWorks.map((product, i) => {
               const world = productWorlds[product.slug]
               const layer = serviceLayers.find((entry) => entry.key === world?.layer)
               const layerCopy = world ? t.services.layers[world.layer] : null
               return (
-                <Reveal key={product.slug} as="li" delay={0.05 * i} y={12} className="flex">
-                  <div className="tile bg-background flex w-full flex-col gap-3 px-6 py-7">
+                <Reveal key={product.slug} as="li" delay={0.05 * i} y={12} className="border-line flex sm:border-s sm:first:border-s-0">
+                  {/*
+                    Vier Kacheln mit Rahmen waren vier weitere Kaestchen in
+                    einem Bild, das schon aus Kaestchen bestand. Jetzt trennen
+                    Linien statt Rahmen — dieselbe Information, ein Element
+                    weniger.
+                  */}
+                  <div className="border-line flex w-full flex-col gap-3 border-b py-7 pe-6 sm:ps-6">
                     <span className="text-subhead text-lg">{product.name}</span>
                     <span className="type-small text-muted-foreground text-pretty">
                       {product.sector[locale]}

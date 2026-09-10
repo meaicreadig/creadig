@@ -2497,6 +2497,14 @@ export const dictionary = {
       productsLabel: "Produkte",
       navLabel: "Seite",
       /*
+       * Vierte Spalte statt Anhaengsel: Betriebscheck, Systeme, Branche und
+       * Managed Betrieb standen bis hierher unter „Seite" — zehn Eintraege in
+       * einer Spalte, waehrend die drei daneben bei vier endeten. Es sind
+       * Werkzeuge und Einstiege, keine Kapitel der Seite; als eigene Gruppe
+       * sind sie auffindbar und die Spalten enden gemeinsam.
+       */
+      toolsLabel: "Werkzeuge",
+      /*
        * MP10-2.7 — die fuenf Ebenen als Sprungmarken.
        *
        * Der Footer ist das vollstaendige Verzeichnis der Seite. Bis hierher
@@ -3988,6 +3996,7 @@ export const dictionary = {
       tagline: "Identity, Digital, Operations, Automation ve Intelligence için sistem evi.",
       productsLabel: "Ürünler",
       navLabel: "Sayfa",
+      toolsLabel: "Araçlar",
       layersLabel: "Beş katman",
       legalLabel: "Yasal",
       imprint: "Künye",
@@ -5469,6 +5478,7 @@ export const dictionary = {
       tagline: "Systems house for identity, digital, operations, automation and intelligence.",
       productsLabel: "Products",
       navLabel: "Site",
+      toolsLabel: "Tools",
       layersLabel: "Five levels",
       legalLabel: "Legal",
       imprint: "Imprint",
@@ -6948,6 +6958,7 @@ export const dictionary = {
       tagline: "بيت أنظمة للهوية والرقمي والتشغيل والأتمتة والذكاء.",
       productsLabel: "المنتجات",
       navLabel: "الموقع",
+      toolsLabel: "أدوات",
       layersLabel: "خمس طبقات",
       legalLabel: "قانوني",
       imprint: "بيانات الناشر",
