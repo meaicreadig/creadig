@@ -44,6 +44,8 @@ const PFLICHT = [
   "gate-03-content-system.md",
   /* Gate 04 */
   "gate-04-visual-system.md",
+  /* Abschluss */
+  "website-2-completion.md",
 ]
 
 const GATES = ["G00", "G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08", "G09"]

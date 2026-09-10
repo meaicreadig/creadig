@@ -49,6 +49,8 @@ nächsten Schritt versteht.
 | `gate-03-content-system.md` | Ein Gedanke, ein Primary Home: Content-Canon, Duplikationsmessung, was bewusst blieb |
 | **Gate 04** | |
 | `gate-04-visual-system.md` | Visuelle Rollen, Bewegungsregel, Flächen-Canon — und was bewusst nicht dazukam |
+| **Abschluss** | |
+| `website-2-completion.md` | Der Abschlusslauf G04-Rest → G09: was gefunden, behoben und was extern offen bleibt |
 
 ## Statuskanon
 
@@ -85,11 +87,11 @@ Lokalisierung und Conversion-Blocker werden nicht leise abgestuft.
 | **G02** | Proof, Vertrauen, Verkaufsarchitektur | **BUILT 🟢 · ACCEPTED 🟢 · OPERATIONAL 🟡 OWNER-ASSET** |
 | **G03** | Content-System und vollständige Copy | **BUILT 🟢 · ACCEPTED 🟢 · OPERATIONAL 🟢 · CLOSED 🟡 (G04-Rest)** |
 | **G04** | Visuelles System und Designqualität | **BUILT 🟢 · ACCEPTED 🟢 · OPERATIONAL 🟢 · CLOSED 🟡 (Owner-Asset)** |
-| G05 | Seiten- und Produktumsetzung | NOT_STARTED |
-| G06 | Werkzeuge, Formulare, Integrationen | NOT_STARTED |
-| G07 | Barrierefreiheit, Mobile, Internationalisierung | NOT_STARTED |
-| G08 | Technik, Performance, Sicherheit | NOT_STARTED |
-| G09 | Unabhängiger Schluss-Audit und Release | NOT_STARTED |
+| **G05** | Seiten- und Produktumsetzung | **CLOSED** |
+| **G06** | Werkzeuge, Formulare, Integrationen | **CLOSED** (Versand nur mit Produktionsschlüssel) |
+| **G07** | Barrierefreiheit, Mobile, Internationalisierung | **CLOSED** |
+| **G08** | Technik, Performance, Sicherheit | **CLOSED** |
+| **G09** | Unabhängiger Schluss-Audit | **CLOSED** — owner-unabhängig vollständig |
 
 ## Regeln für spätere Gates
 

@@ -3,14 +3,28 @@ import { StatusPageBody } from "@/components/pages/status-page-body"
 import { dictionary } from "@/lib/dictionary"
 
 /**
- * BF-3 — die türkische 404-Seite.
+ * Die englische 404-Seite.
  *
- * Sie liegt unter `tr/` und nicht in der Gruppe `(tr)`: Nur so greift sie für
- * alles unterhalb von `/tr/…`. Ohne sie fiele eine unbekannte türkische
- * Adresse auf die deutsche Fassung zurück — deutsche Überschrift über
- * türkischem `<html lang="tr">`.
+ * ---------------------------------------------------------------------------
+ * WEB-0010 — SIE HAT ANDERTHALB JAHRE LANG TUERKISCH GESPROCHEN.
+ *
+ * Diese Datei ist aus der tuerkischen Fassung kopiert worden, und mitkopiert
+ * wurde die Zeile darunter: `dictionary.tr.errorPages.notFound`. Der
+ * Kommentar hier oben sagte es sogar — „die tuerkische 404-Seite" — und stand
+ * trotzdem ueber der englische Route.
+ *
+ * Gemessen am 11.09.2026 an `/en/produkte/gibtesnicht`: Der Titel lautete
+ * „Sayfa bulunamadı · creaDIG". `StatusPageBody` bekam korrekt `locale="en"`,
+ * die Texte kamen aus dem falschen Woerterbuch — das ist der Grund, warum es
+ * keinem Typpruefer auffiel: Beide Zweige haben dieselbe Form.
+ *
+ * ---------------------------------------------------------------------------
+ * WAS DAS FUER DEN ORT DER DATEI HEISST
+ * Sie liegt unter `en/` und nicht in der Gruppe `(en)`: Nur so greift sie fuer
+ * alles unterhalb von `/en/…`. Ohne sie fiele eine unbekannte Adresse auf die
+ * deutsche Fassung zurueck — deutsche Ueberschrift ueber `<html lang="en">`.
  */
-const copy = dictionary.tr.errorPages.notFound
+const copy = dictionary.en.errorPages.notFound
 
 export const metadata: Metadata = {
   title: copy.metaTitle,

@@ -292,6 +292,46 @@ export function Betriebscheck() {
                     : checkCopy.manualNone[locale]}
               </p>
 
+              {/*
+                ABSCHLUSSLAUF · WEB-0021 — DIE ANTWORTEN SELBST.
+
+                Bis hierher endete das Ergebnis mit einer Zahl („3 Stellen
+                haben Sie selbst als offen benannt") und einem Ebenennamen.
+                Wer fuenfzehn Fragen beantwortet hat, bekam damit keine
+                einzige seiner eigenen Angaben zurueck — und genau das war
+                der Befund: Das Ergebnis priorisiert die Ebene, nicht den
+                Antworthebel.
+
+                Hier stehen jetzt bis zu drei der Fragen, die der Besucher
+                selbst mit „Nicht" (ersatzweise „Teilweise") beantwortet hat.
+                Kein Ratschlag, keine Deutung, keine erfundene Analyse —
+                seine Saetze, in der Reihenfolge des Hauses.
+
+                Das ist der Unterschied zwischen „Operations ist schwach" und
+                „Sie sehen den Stand eines Auftrags nicht, ohne jemanden
+                anzurufen."
+              */}
+              {result.offenePunkte.length > 0 && (
+                <div className="border-line mt-8 border-t pt-6">
+                  <p className="eyebrow text-muted-foreground">
+                    {checkCopy.offenLabel[locale]}
+                  </p>
+                  <ul className="mt-5 flex flex-col gap-3.5">
+                    {result.offenePunkte.map((frage) => (
+                      <li key={frage.id} className="flex gap-3.5">
+                        <span
+                          aria-hidden="true"
+                          className="bg-gold mt-2.5 h-px w-5 shrink-0"
+                        />
+                        <span className="type-small text-foreground/85 text-pretty">
+                          {frage.text[locale]}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {/* Aus dem Befund folgt eine Adresse — siehe `layerLinkLabel`. */}
               <Link
                 href={

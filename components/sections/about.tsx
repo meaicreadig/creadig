@@ -15,8 +15,22 @@ export function About() {
           <SectionEyebrow label={t.about.eyebrow} />
         </Reveal>
 
+        {/*
+          ABSCHLUSSLAUF — DAS RASTER PASSTE NICHT MEHR ZUM INHALT.
+
+          Links 7 Spalten, rechts 5. Das stimmte, solange links zwei volle
+          Absaetze standen. Gate 03 hat den zweiten auf einen Satz gekuerzt
+          („Das Team waechst; die naechsten Stellen sind in Vorbereitung.") —
+          richtig fuer den Text, falsch fuer das Raster: Gemessen am
+          11.09.2026 blieben links rund 450 Pixel leer, waehrend rechts
+          Gruender, Schwerpunkte und Sprachen weiterliefen.
+
+          Das ist keine Alt-Schuld, das ist eine Folge der eigenen Kuerzung.
+          Jetzt traegt die schmalere Spalte die Aussage und die breitere die
+          Fakten — 5/7 statt 7/5. Kein Wort dazu, kein Wort weg.
+        */}
         <div className="mt-7 grid gap-x-12 gap-y-16 lg:grid-cols-12">
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-5">
             <Reveal>
               <h2 id="ueber-title" className="type-h2 text-balance">
                 {t.about.title}
@@ -54,7 +68,7 @@ export function About() {
           </div>
 
           {/* Faktenspalte: Gründer, Schwerpunkte, Sitz */}
-          <div className="flex flex-col lg:col-span-5">
+          <div className="flex flex-col lg:col-span-7">
             <Reveal delay={0.06} className="border-line border-t pt-7">
               <p className="eyebrow text-gold-text">{t.about.founderLabel}</p>
               <p className="type-statement mt-4">

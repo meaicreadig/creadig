@@ -76,14 +76,35 @@ import type { NextConfig } from "next"
  */
 const CSP_REPORT_ENDPOINT = "/api/csp-report"
 
+/*
+ * ABSCHLUSSLAUF — `upgrade-insecure-requests` STAND IN DER FALSCHEN POLICY.
+ *
+ * Die Direktive lag in `CSP_REPORT_ONLY`. Browser ignorieren sie dort per
+ * Spezifikation und sagen das auch: „The Content Security Policy directive
+ * 'upgrade-insecure-requests' is ignored when delivered in a report-only
+ * policy." Gemessen am 11.09.2026 stand diese Warnung in der Konsole von
+ * ALLEN 124 geprueften Routen — vier Sprachen, jede Seite.
+ *
+ * Zwei Schaeden auf einmal: Die Direktive wirkte nicht, und eine Konsole, in
+ * der auf jeder Seite eine Warnung steht, ist eine Konsole, in der niemand
+ * mehr die echte Meldung sieht.
+ *
+ * Sie gehoert in die Policy, die tatsaechlich gilt. Darum steht sie jetzt
+ * einmal hier als Konstante und wird der jeweils DURCHGESETZTEN Fassung
+ * angehaengt — der kleinen im Regelbetrieb, der vollstaendigen nach
+ * `CSP_ENFORCE=1`. Aus der Berichtsfassung ist sie heraus.
+ */
+const CSP_UPGRADE = "upgrade-insecure-requests"
+
 const CSP_ENFORCED = [
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
+  CSP_UPGRADE,
 ].join("; ")
 
-const CSP_REPORT_ONLY = [
+const CSP_REPORT_ONLY_DIREKTIVEN = [
   "default-src 'self'",
   // 'unsafe-inline': Theme-Boot-Skript im <head> + Next.js-Hydration.
   // va.vercel-scripts.com ist die Reichweitenmessung — sie laedt ohnehin
@@ -100,10 +121,15 @@ const CSP_REPORT_ONLY = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  "upgrade-insecure-requests",
   `report-uri ${CSP_REPORT_ENDPOINT}`,
   "report-to csp",
-].join("; ")
+]
+
+const CSP_REPORT_ONLY = CSP_REPORT_ONLY_DIREKTIVEN.join("; ")
+
+/* Dieselbe vollstaendige Policy, aber scharf — dann traegt sie die Upgrade-
+   Direktive, weil sie dort wirkt. */
+const CSP_VOLL_SCHARF = [...CSP_REPORT_ONLY_DIREKTIVEN, CSP_UPGRADE].join("; ")
 
 /*
  * BF-7 — der Schalter. Ohne ihn bleibt es beim Bericht (Stufe 2), mit ihm
@@ -113,7 +139,7 @@ const CSP_REPORT_ONLY = [
 const CSP_ENFORCE_FULL = process.env.CSP_ENFORCE === "1"
 
 const cspHeaders = CSP_ENFORCE_FULL
-  ? [{ key: "Content-Security-Policy", value: CSP_REPORT_ONLY }]
+  ? [{ key: "Content-Security-Policy", value: CSP_VOLL_SCHARF }]
   : [
       { key: "Content-Security-Policy", value: CSP_ENFORCED },
       { key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY },

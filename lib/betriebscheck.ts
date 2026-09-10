@@ -251,6 +251,21 @@ export type CheckResult = {
    * Jede davon ist eine Stelle, die der Betrieb selbst als offen benannt hat.
    */
   manualSpots: number
+  /**
+   * ABSCHLUSSLAUF · WEB-0021 — DIE KONKRETEN OFFENEN PUNKTE.
+   *
+   * `manualSpots` sagt WIE VIELE Stellen jemand als offen benannt hat. Das
+   * Ergebnis sagte damit „3 Stellen haben Sie selbst als offen benannt" — und
+   * verschwieg, WELCHE drei. Wer fuenfzehn Fragen beantwortet hat, bekam am
+   * Ende eine Zahl und einen Ebenennamen zurueck, aber keinen einzigen
+   * seiner eigenen Saetze.
+   *
+   * Genau das war der Befund: Das Ergebnis priorisiert die Ebene, nicht den
+   * Antworthebel. Hier stehen die Fragen selbst — zuerst die mit „Nicht",
+   * sonst die mit „Teilweise". Nichts wird gedeutet, nichts ergaenzt: die
+   * eigene Angabe, zurueckgegeben.
+   */
+  offenePunkte: CheckQuestion[]
   /** Wurden alle Fragen beantwortet? Vorher gibt es kein Ergebnis. */
   complete: boolean
   /**
@@ -331,12 +346,16 @@ export function evaluateCheck(answers: CheckAnswers): CheckResult {
   const bottleneckIndex = layers.findIndex((layer) => layer.key === bottleneck.key)
   const blocked = layers[bottleneckIndex + 1] ?? null
 
-  const manualSpots = CHECK_QUESTIONS.filter(
-    (question) => answers[question.id] === "no",
-  ).length
-  const partialSpots = CHECK_QUESTIONS.filter(
-    (question) => answers[question.id] === "partly",
-  ).length
+  const nichtFragen = CHECK_QUESTIONS.filter((question) => answers[question.id] === "no")
+  const teilweiseFragen = CHECK_QUESTIONS.filter((question) => answers[question.id] === "partly")
+  const manualSpots = nichtFragen.length
+  const partialSpots = teilweiseFragen.length
+  /*
+   * Hoechstens drei. Wer elf Luecken hat, ist mit elf Zeilen nicht besser
+   * beraten als mit dreien — er braucht einen Anfang. Die Reihenfolge ist die
+   * des Hauses (Identity zuerst), weil eine untere Ebene die darueber traegt.
+   */
+  const offenePunkte = (nichtFragen.length > 0 ? nichtFragen : teilweiseFragen).slice(0, 3)
 
   const evenlyBalanced = layers.every((layer) => layer.percent === layers[0].percent)
   const alleVoll = layers.every((layer) => layer.percent === 100)
@@ -361,6 +380,7 @@ export function evaluateCheck(answers: CheckAnswers): CheckResult {
     bottleneck,
     blocked,
     manualSpots,
+    offenePunkte,
     partialSpots,
     evenlyBalanced,
     befund,
@@ -582,6 +602,17 @@ export const checkCopy = {
       `${weak} is the weakest level — and the topmost. Below it there is already something it can build on.`,
     ar: (weak: string) =>
       `${weak} هي أضعف طبقة — وهي العليا أيضًا. وتحتها يوجد بالفعل ما يمكن أن تقوم عليه.`,
+  },
+  /*
+   * ABSCHLUSSLAUF · WEB-0021 — die Ueberschrift ueber den konkreten Punkten.
+   * Sie sagt ausdruecklich „Ihre Angaben", damit niemand die Zeilen fuer
+   * eine Diagnose haelt: Es sind die eigenen Antworten, nicht unser Urteil.
+   */
+  offenLabel: {
+    de: "Was Sie selbst als offen angegeben haben",
+    tr: "Kendi açık olarak belirttikleriniz",
+    en: "What you marked as open yourself",
+    ar: "ما وسمتموه بأنفسكم على أنه مفتوح",
   },
   manualLabel: {
     de: (count: number) =>

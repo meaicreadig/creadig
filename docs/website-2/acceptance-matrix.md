@@ -27,8 +27,8 @@ Das besitzende Gate bleibt in allen sieben Fällen unverändert; für G05 heißt
 | P1 | 11 |
 | P2 | 19 |
 | P3 | 13 |
-| CONFIRMED_CURRENT | 23 |
-| FIXED_ON_BRANCH | 17 |
+| CONFIRMED_CURRENT | 17 |
+| FIXED_ON_BRANCH | 23 |
 | NOT_REPRODUCED | 2 |
 | EXTERNAL_BLOCKED | 0 |
 | UNVERIFIED | 1 |
@@ -49,9 +49,9 @@ Alle Befunde sind einem Gate zugeordnet. Kein heimatloser Befund.
 | WEB-0005 | AUDIT-5 | FIXED_ON_BRANCH | `/produkte` + `/arbeiten` | Beide Seiten zeigen dieselbe Sammlung | **Identische vier Ziel-Links** auf beiden Seiten; `/arbeiten` hat kein einziges eigenes Ziel | G01 |
 | WEB-0006 | AUDIT-6 | FIXED_ON_BRANCH | `/betrieb`, `/leistungen` | „Fällt nachts etwas aus, ist das unser Problem" neben „kein 24/7", „Reaktionszeit in Stunden", „Wochenende" | Beide Aussagen auf **beiden** Seiten im selben Dokument nachgewiesen | G03 |
 | WEB-0007 | AUDIT-7 | CONFIRMED_CURRENT | `/unternehmen` | Lieferfähigkeit: weder Personen, Rollen noch Kapazitätsmodell sichtbar | 858 Wörter, 36 Eyebrows, keine Rollenstruktur | G02 |
-| WEB-0008 | AUDIT-8 | CONFIRMED_CURRENT | `/termin` | Vier Schritte für ein 20-Minuten-Erstgespräch | Fortschritt 25 % → 50 % über mehrere Schritte gemessen | G06 |
+| WEB-0008 | AUDIT-8 | FIXED_ON_BRANCH | `/termin` | Vier Schritte für ein 20-Minuten-Erstgespräch | Fortschritt 25 % → 50 % über mehrere Schritte gemessen | G06 |
 | WEB-0009 | AUDIT-9 | FIXED_ON_BRANCH | `meai.run` (extern) | „2-Faktor & Bot-Schutz folgen" als Sicherheits-Gegensignal | `meai.run` antwortet mit 307, Text von hier **nicht verifizierbar**; liegt außerhalb von creadig.de | G02 |
-| WEB-0010 | AUDIT-10 | CONFIRMED_CURRENT | `/en/*`, `/ar/*` 404 | Lokalisierte 404-Seiten zeigen türkischen Haupttext | **Ursache gefunden:** `app/(en)/en/not-found.tsx:13` und `app/(ar)/ar/not-found.tsx:13` lesen beide `dictionary.tr.errorPages.notFound`. Live reproduziert | G07 |
+| WEB-0010 | AUDIT-10 | FIXED_ON_BRANCH | `/en/*`, `/ar/*` 404 | Lokalisierte 404-Seiten zeigen türkischen Haupttext | **Ursache gefunden:** `app/(en)/en/not-found.tsx:13` und `app/(ar)/ar/not-found.tsx:13` lesen beide `dictionary.tr.errorPages.notFound`. Live reproduziert | G07 |
 | WEB-0036 | G00 | FIXED_ON_BRANCH | `/leistungen/*` | 44 % wortgleiche Copy über vier Digital-Seiten | 8 von 18 tragenden Sätzen aus `/webdesign` stehen wortgleich auf ≥2 weiteren Seiten | G03 |
 
 ---
@@ -70,7 +70,7 @@ Alle Befunde sind einem Gate zugeordnet. Kein heimatloser Befund.
 | WEB-0018 | AUDIT-18 | FIXED_ON_BRANCH | `/insights` | Ein Artikel trägt einen Hauptnavigationspunkt | 1 veröffentlichter Beitrag, 6 definierte Fächer, Seite 2.413 px | G01 |
 | WEB-0019 | AUDIT-19 | FIXED_ON_BRANCH | `/` | Insight-Teaser führt zur Übersicht statt zum Artikel | Startseite: **4 Links auf `/insights`, 0 auf den Artikel** | G05 |
 | WEB-0020 | AUDIT-20 | CONFIRMED_CURRENT | `/insights/eigene-seite-geprueft` | Sehr lang, fast ohne Bilder | 9.361 px mobil, 1.079 Wörter, 0 Bilder | G04 |
-| WEB-0021 | AUDIT-21 | CONFIRMED_CURRENT | `/betriebscheck` | Ergebnis priorisiert Ebene, nicht konkrete Antworthebel | 330 Wörter, 1 H2 — Ergebnis ohne Antwortbezug | G06 |
+| WEB-0021 | AUDIT-21 | FIXED_ON_BRANCH | `/betriebscheck` | Ergebnis priorisiert Ebene, nicht konkrete Antworthebel | 330 Wörter, 1 H2 — Ergebnis ohne Antwortbezug | G06 |
 | WEB-0022 | AUDIT-22 | CONFIRMED_CURRENT | `/produkte/*` | Sehr langer Einwilligungstext für eine Produktnachricht | Interesse-Formular auf allen Produktdetailseiten | G06 |
 | WEB-0023 | AUDIT-23 | FIXED_ON_BRANCH | `/kontakt` | Osnabrücker Sitz plus Schweizer WhatsApp-Nummer unerklärt | `+41`-Nummer neben deutscher Anschrift, keine Einordnung | G03 |
 | WEB-0024 | AUDIT-24 | FIXED_ON_BRANCH | `/` Preise | 2.400-€-Preis ankert creaDIG als Website-Anbieter | Startseite nennt 2.400 €, 3.900 € und 149 €/Monat | G01 |
@@ -86,11 +86,11 @@ Alle Befunde sind einem Gate zugeordnet. Kein heimatloser Befund.
 
 | ID | Quelle | Wahrheitsstand | Route/Bereich | Befund | Beleg aus Gate 00 | Gate |
 |---|---|---|---|---|---|---|
-| WEB-0028 | AUDIT-28 | CONFIRMED_CURRENT | `/produkte/*` | „Alle Produkte" doppelt | **3** Links auf `/produkte` innerhalb `main` der Detailseite | G05 |
-| WEB-0029 | AUDIT-29 | CONFIRMED_CURRENT | Global mobil | Viele Eyebrows/Metadaten bei 11 px | **42 Textknoten mit 11 px** allein auf der mobilen Startseite | G07 |
+| WEB-0028 | AUDIT-28 | FIXED_ON_BRANCH | `/produkte/*` | „Alle Produkte" doppelt | **3** Links auf `/produkte` innerhalb `main` der Detailseite | G05 |
+| WEB-0029 | AUDIT-29 | FIXED_ON_BRANCH | Global mobil | Viele Eyebrows/Metadaten bei 11 px | **42 Textknoten mit 11 px** allein auf der mobilen Startseite | G07 |
 | WEB-0030 | AUDIT-30 | UNVERIFIED | `/termin` | Letzter Fortschritt zeigt 95 % | 25 % und 50 % bestätigt; letzter Schritt durch Automatik nicht erreicht (Weiter bleibt bis zur Auswahl deaktiviert) | G06 |
 | WEB-0031 | AUDIT-31 | CONFIRMED_CURRENT | `/karriere` | „Dein Platz" wechselt zum sonstigen „Sie" | Kapitelname duzt, Fließtext siezt | G03 |
-| WEB-0032 | AUDIT-32 | CONFIRMED_CURRENT | `/produkte/*` | Support- und Interessenformular auch bei nicht nutzbaren Produkten | Beide Blöcke auf allen vier Produktseiten, auch „im Aufbau" | G05 |
+| WEB-0032 | AUDIT-32 | FIXED_ON_BRANCH | `/produkte/*` | Support- und Interessenformular auch bei nicht nutzbaren Produkten | Beide Blöcke auf allen vier Produktseiten, auch „im Aufbau" | G05 |
 | WEB-0033 | AUDIT-33 | CONFIRMED_CURRENT | Footer | Sehr umfangreich, auf jeder langen Seite dominant | 28 Ziele, 968 px Desktop / 1.887 px mobil | G04 |
 | WEB-0034 | AUDIT-34 | FIXED_ON_BRANCH | Mobiles Menü | Inhalt höher als ein Viewport | **1.071 px Inhalt bei 844 px Viewport**, 12 Ziele, scrollt | G04 |
 | WEB-0035 | AUDIT-35 | FIXED_ON_BRANCH | `/unternehmen` | Viel Meta-Erklärung über nicht genannte Zahlen | 5 von 8 Abschnitten reiner Text | G03 |

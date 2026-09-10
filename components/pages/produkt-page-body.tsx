@@ -153,9 +153,24 @@ export function ProduktPageBody({
                 {badgeLabel}
               </span>
             </p>
-            <p className="type-body text-foreground/85 mt-3 text-pretty">
-              {product.outcome[locale]}
-            </p>
+            {/*
+              ABSCHLUSSLAUF · WEB-0041 — „IM AUFBAU" STAND ZWEIMAL UNTEREINANDER.
+
+              Der Badge zeigt den abgeleiteten Stand, die Zeile darunter den
+              Owner-Text `outcome`. Bei fibero und meAI sagen die beiden
+              Verschiedenes („Im eigenen Betrieb" / „Im Tagesbetrieb"; „Live" /
+              „Im Aufbau · live unter meai.run") — bei CASSAMEA und meahv
+              stand beide Male exakt dasselbe Wort.
+
+              Zwei identische Angaben uebereinander sehen nicht nach Sorgfalt
+              aus, sondern nach einem Feld, das versehentlich zweimal
+              gerendert wird. Wo `outcome` nichts hinzufuegt, entfaellt es.
+            */}
+            {product.outcome[locale] !== badgeLabel && (
+              <p className="type-body text-foreground/85 mt-3 text-pretty">
+                {product.outcome[locale]}
+              </p>
+            )}
             {/*
               GATE 02 · WEB-0009 — WAS PASSIERT, WENN ICH KLICKE.
 
@@ -702,7 +717,25 @@ export function ProduktPageBody({
           Kontaktformular — und das fragt nach einem Projekt. Ein Portfolio,
           das einen Rueckmeldeweg fuehrt, den niemand sieht, waere ein
           Register ohne Weg hinein. */}
-      {eintrag && wegTraegt(eintrag.rueckmeldung) && (
+      {/*
+        ABSCHLUSSLAUF · WEB-0032 — EIN RUECKMELDEWEG FUER PRODUKTE, DIE
+        NIEMAND BENUTZEN KANN.
+
+        Der Block fragt: „Wer mit {product} arbeitet und auf eine Stoerung
+        oder Luecke stoesst, meldet sie hier." Er stand auf ALLEN vier
+        Produktseiten — auch auf CASSAMEA und meahv, die im Aufbau sind und
+        keine oeffentliche Adresse haben. Dort kann niemand „damit arbeiten",
+        und ein Stoerungsweg fuer ein Produkt, das nach aussen gar nicht
+        laeuft, behauptet einen Betrieb, den es nicht gibt.
+
+        Die Bedingung kommt aus `lib/produkt-beleg.ts` — derselben geprueften
+        Zugangslage, die auch neben dem Stand steht. `intern` heisst: keine
+        oeffentliche Adresse. Dann auch kein oeffentlicher Rueckmeldeweg.
+
+        Das Interesse-Formular bleibt ueberall: Interesse an etwas im Aufbau
+        ist eine sinnvolle Nachricht, eine Stoerungsmeldung nicht.
+      */}
+      {eintrag && wegTraegt(eintrag.rueckmeldung) && beleg?.zugang !== "intern" && (
         <section aria-labelledby="produkt-rueckmeldung-title" className="section-seam">
           <div className="section-shell">
             <SectionEyebrow label={copy.feedbackEyebrow} />
@@ -750,15 +783,21 @@ export function ProduktPageBody({
             </div>
           </Reveal>
 
-          <Reveal delay={0.08}>
-            <Link
-              href="/produkte"
-              className="text-muted-foreground hover:text-foreground mt-14 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
-            >
-              <ArrowLeft className="size-4" strokeWidth={1.5} />
-              {copy.backLabel}
-            </Link>
-          </Reveal>
+          {/*
+            ABSCHLUSSLAUF · WEB-0028 — „ALLE PRODUKTE" STAND DREIMAL.
+
+            Gemessen am 11.09.2026: `/produkte` war auf jeder Produktseite
+            DREI Mal im `main` verlinkt — als Brotkrume oben, als zweiter
+            Knopf im Abschluss und noch einmal als Rueckweg darunter.
+
+            Die Brotkrume ist Orientierung und bleibt. Der Knopf im Abschluss
+            ist der zweite Weg neben „Projekt starten" und bleibt. Der dritte
+            war ein Rueckweg direkt unter einem Knopf, der schon dorthin
+            fuehrt — zwei Zeilen Abstand, dasselbe Ziel.
+
+            Wer zurueck will, hat oben die Brotkrume und unten den Knopf.
+            Ein drittes Mal ist keine Hilfe, sondern eine Wiederholung.
+          */}
         </div>
       </section>
     </main>

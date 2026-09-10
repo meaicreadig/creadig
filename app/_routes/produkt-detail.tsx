@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { ProduktPageBody } from "@/components/pages/produkt-page-body"
 import { productScreens } from "@/lib/product-media"
 import { productWorks } from "@/lib/site-data"
+import { belegZu } from "@/lib/produkt-beleg"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { pageMetadata } from "@/lib/page-metadata"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
@@ -94,13 +95,41 @@ export async function ProduktRoute({
     },
   ]
 
+  /* Siehe Kommentar unten: kein zurueckgehaltener Bildpfad ueber die
+     Client-Grenze. `image` wird von der Seite ohnehin nicht mehr gelesen. */
+  const beleg = belegZu(product.slug)
+  const sicheresProdukt = beleg?.situBild ? product : { ...product, image: null }
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
-      <ProduktPageBody product={product} screens={screens} />
+      {/*
+        ABSCHLUSSLAUF · ASSET-SICHERHEIT — DER ACHTE WEG.
+
+        `ProduktPageBody` ist eine Client-Komponente und bekommt das ganze
+        `Work`-Objekt als Prop. Next serialisiert es in den RSC-Payload der
+        Seite — samt `image`. Fuer CASSAMEA und meahv heisst das: Die von
+        Gate 02 ZURUECKGEHALTENEN Aufnahmen standen als Pfad im ausgelieferten
+        Quelltext ihrer eigenen Produktseiten. Sichtbar war nichts; abrufbar
+        war es trotzdem.
+
+        Genau diese Klasse achter Weg beschreibt `docs/ops/proof-kinds.md`
+        fuer `workSlugs`: „Sichtbar war nichts; ausgeliefert war es trotzdem."
+        Gate 02 hatte den Befund gemeldet und als Owner-Punkt (OA-1) gefuehrt,
+        weil die Quelle `lib/site-data.ts` G18-gesperrt ist.
+
+        Sie muss aber gar nicht angefasst werden. Die Komponente liest `image`
+        seit Gate 02 nicht mehr — sie nimmt das gepruefte Bild aus
+        `lib/produkt-beleg.ts`. Also wird das Feld hier abgeschnitten, bevor
+        es die Client-Grenze ueberquert: Wo Gate 02 kein Bild freigegeben hat,
+        geht auch kein Pfad hinaus.
+
+        Kein G18-Eingriff, keine Datei geloescht, keine Aussage geaendert.
+      */}
+      <ProduktPageBody product={sicheresProdukt} screens={screens} />
     </>
   )
 }

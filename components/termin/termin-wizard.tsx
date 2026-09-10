@@ -174,16 +174,46 @@ export function TerminWizard() {
    * aendert nichts — der Besucher waehlt dann wie vorher selbst.
    */
   useEffect(() => {
-    if (params.get("art") === "systemgespraech") setType("ar")
+    /*
+     * ABSCHLUSSLAUF · WEB-0008 — DER SATZ DARUEBER STIMMTE, DER CODE NICHT.
+     *
+     * Der Kommentar sagt seit Langem: „wer darauf klickt, hat die Frage
+     * ‚Worum geht es?' bereits beantwortet und soll sie nicht noch einmal
+     * gestellt bekommen." Ausgefuehrt wurde davon nur die halbe Zusage —
+     * `setType` fuellte die Antwort vor, aber der Assistent blieb auf
+     * Schritt 1 stehen. Der Besucher sah seine eigene Wahl noch einmal und
+     * musste sie mit „Weiter" bestaetigen.
+     *
+     * Das ist der Kern des Befundes „Vier Schritte fuer ein
+     * 20-Minuten-Erstgespraech": Fuer jeden, der ueber einen benannten
+     * Einstieg kommt (Fusszeile, Preiskacheln, Angebots-Sektion), ist der
+     * erste Schritt keine Frage, sondern eine Quittung.
+     *
+     * Wer die Art mitbringt, startet bei „Wann passt es Ihnen?" — drei
+     * Schritte statt vier. Wer ohne Vorauswahl kommt, waehlt wie bisher
+     * selbst; an der Strecke aendert sich fuer ihn nichts. Der Rueckweg auf
+     * Schritt 1 bleibt ueber „Zurueck" erreichbar, die Wahl also aenderbar.
+     */
+    let vorgewaehlt = false
+    if (params.get("art") === "systemgespraech") {
+      setType("ar")
+      vorgewaehlt = true
+    }
     const paket = params.get("paket")
-    if (!paket) return
+    if (!paket) {
+      if (vorgewaehlt) setStep(2)
+      return
+    }
     if (paket === "website") {
       setType("vg")
       setForm((f) => ({ ...f, interest: t.termin.step3.interests[0] }))
+      vorgewaehlt = true
     } else if (paket === "retainer") {
       setType("vg")
       setForm((f) => ({ ...f, interest: t.termin.step3.interests[1] }))
+      vorgewaehlt = true
     }
+    if (vorgewaehlt) setStep(2)
     // Nur beim ersten Lauf — eine spätere Sprachumschaltung soll die
     // Auswahl des Nutzers nicht überschreiben.
     // eslint-disable-next-line react-hooks/exhaustive-deps
