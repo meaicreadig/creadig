@@ -46,12 +46,28 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
  *
  * Sie ist bewusst nicht kleiner gesetzt als der Rest.
  */
+/*
+ * GATE 03 · EIGENE SCHULD AUS GATE 02.
+ *
+ * Diese Liste hatte sechs Eintraege. Zwei davon — „Wer fuehrt" und „Wer sonst
+ * daran sitzt" — beantworteten genau das, was `WorkModel` unmittelbar
+ * DARUEBER auf derselben Seite ausfuehrlich beantwortet: gefuehrt vom
+ * Gruender, kleines Kernteam, Spezialisten nach Bedarf. Beide verwiesen sogar
+ * per Anker zurueck auf die Sektion, die zwei Bildschirmhoehen hoeher steht.
+ *
+ * Das war in Gate 02 gut gemeint (die sechs Fragen als geschlossene Liste)
+ * und ist als Redaktion falsch: Der Leser liest denselben Gedanken zweimal
+ * und haelt beim zweiten Mal nicht die Antwort fuer wiederholt, sondern die
+ * Seite fuer aufgeblasen.
+ *
+ * Geblieben sind die vier Antworten, die es NUR hier gibt. Wer fuehrt und wer
+ * dazukommt, sagt der Vorspann in einem Satz und zeigt nach oben — dorthin,
+ * wo es steht.
+ */
 const ITEMS = [
-  { key: "fuehrung", href: "/unternehmen#arbeitsmodell" },
   { key: "umfang", href: "/leistungen#pakete" },
   { key: "pruefung", href: "/barrierefreiheit" },
   { key: "uebergabe", href: "/betrieb" },
-  { key: "netzwerk", href: "/unternehmen#arbeitsmodell" },
   { key: "grenze", href: "/betrieb" },
 ] as const
 

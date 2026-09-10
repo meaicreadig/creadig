@@ -40,6 +40,8 @@ const PFLICHT = [
   "information-architecture.md", "page-contracts.md", "route-transition-plan.md",
   /* Gate 02 */
   "gate-02-proof-sales.md",
+  /* Gate 03 */
+  "gate-03-content-system.md",
 ]
 
 const GATES = ["G00", "G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08", "G09"]

@@ -27,8 +27,8 @@ Das besitzende Gate bleibt in allen sieben Fällen unverändert; für G05 heißt
 | P1 | 11 |
 | P2 | 19 |
 | P3 | 13 |
-| CONFIRMED_CURRENT | 31 |
-| FIXED_ON_BRANCH | 9 |
+| CONFIRMED_CURRENT | 25 |
+| FIXED_ON_BRANCH | 15 |
 | NOT_REPRODUCED | 2 |
 | EXTERNAL_BLOCKED | 0 |
 | UNVERIFIED | 1 |
@@ -47,12 +47,12 @@ Alle Befunde sind einem Gate zugeordnet. Kein heimatloser Befund.
 | WEB-0003 | AUDIT-3 | FIXED_ON_BRANCH | `/`, `/leistungen` | Fünf Ebenen werden vor dem Nutzerproblem erklärt | Startseite: 31 Eyebrows, 9 H2 vor der ersten Kundenwirkung | G01 |
 | WEB-0004 | AUDIT-4 | FIXED_ON_BRANCH | `/leistungen` | Operations und Intelligence sind Kategorien, kein kaufbarer Einstieg | Kein Preis, keine Projektgröße, kein Beispiel für beide Ebenen | G01 |
 | WEB-0005 | AUDIT-5 | FIXED_ON_BRANCH | `/produkte` + `/arbeiten` | Beide Seiten zeigen dieselbe Sammlung | **Identische vier Ziel-Links** auf beiden Seiten; `/arbeiten` hat kein einziges eigenes Ziel | G01 |
-| WEB-0006 | AUDIT-6 | CONFIRMED_CURRENT | `/betrieb`, `/leistungen` | „Fällt nachts etwas aus, ist das unser Problem" neben „kein 24/7", „Reaktionszeit in Stunden", „Wochenende" | Beide Aussagen auf **beiden** Seiten im selben Dokument nachgewiesen | G03 |
+| WEB-0006 | AUDIT-6 | FIXED_ON_BRANCH | `/betrieb`, `/leistungen` | „Fällt nachts etwas aus, ist das unser Problem" neben „kein 24/7", „Reaktionszeit in Stunden", „Wochenende" | Beide Aussagen auf **beiden** Seiten im selben Dokument nachgewiesen | G03 |
 | WEB-0007 | AUDIT-7 | CONFIRMED_CURRENT | `/unternehmen` | Lieferfähigkeit: weder Personen, Rollen noch Kapazitätsmodell sichtbar | 858 Wörter, 36 Eyebrows, keine Rollenstruktur | G02 |
 | WEB-0008 | AUDIT-8 | CONFIRMED_CURRENT | `/termin` | Vier Schritte für ein 20-Minuten-Erstgespräch | Fortschritt 25 % → 50 % über mehrere Schritte gemessen | G06 |
 | WEB-0009 | AUDIT-9 | FIXED_ON_BRANCH | `meai.run` (extern) | „2-Faktor & Bot-Schutz folgen" als Sicherheits-Gegensignal | `meai.run` antwortet mit 307, Text von hier **nicht verifizierbar**; liegt außerhalb von creadig.de | G02 |
 | WEB-0010 | AUDIT-10 | CONFIRMED_CURRENT | `/en/*`, `/ar/*` 404 | Lokalisierte 404-Seiten zeigen türkischen Haupttext | **Ursache gefunden:** `app/(en)/en/not-found.tsx:13` und `app/(ar)/ar/not-found.tsx:13` lesen beide `dictionary.tr.errorPages.notFound`. Live reproduziert | G07 |
-| WEB-0036 | G00 | CONFIRMED_CURRENT | `/leistungen/*` | 44 % wortgleiche Copy über vier Digital-Seiten | 8 von 18 tragenden Sätzen aus `/webdesign` stehen wortgleich auf ≥2 weiteren Seiten | G03 |
+| WEB-0036 | G00 | FIXED_ON_BRANCH | `/leistungen/*` | 44 % wortgleiche Copy über vier Digital-Seiten | 8 von 18 tragenden Sätzen aus `/webdesign` stehen wortgleich auf ≥2 weiteren Seiten | G03 |
 
 ---
 
@@ -61,18 +61,18 @@ Alle Befunde sind einem Gate zugeordnet. Kein heimatloser Befund.
 | ID | Quelle | Wahrheitsstand | Route/Bereich | Befund | Beleg aus Gate 00 | Gate |
 |---|---|---|---|---|---|---|
 | WEB-0011 | AUDIT-11 | FIXED_ON_BRANCH | `/` Hero | Emotional stark, konkret schwach — kein Ergebnissatz | 642 Wörter auf der Startseite, Kaufgegenstand spät | G01 |
-| WEB-0012 | AUDIT-12 | CONFIRMED_CURRENT | `/leistungen/*` | Vier Digital-Seiten wiederholen Ausgangslage/Was wir bauen/Was danach anders ist | Dieselben drei Überschriften auf allen vier; Seiten messen 3.214–3.270 px, je 8 H2, 11 Eyebrows, 307–331 Wörter | G03 |
+| WEB-0012 | AUDIT-12 | FIXED_ON_BRANCH | `/leistungen/*` | Vier Digital-Seiten wiederholen Ausgangslage/Was wir bauen/Was danach anders ist | Dieselben drei Überschriften auf allen vier; Seiten messen 3.214–3.270 px, je 8 H2, 11 Eyebrows, 307–331 Wörter | G03 |
 | WEB-0013 | AUDIT-13 | CONFIRMED_CURRENT | `/leistungen` | Länge | **9.854 px Desktop · 15.666 px mobil · 61 Eyebrows · 1.127 Wörter** — längste Seite der Website | G03 |
 | WEB-0014 | AUDIT-14 | CONFIRMED_CURRENT | `/` | Länge, doppelte Produktdarstellung | **13.449 px mobil**, „Ausgewählte Arbeiten" und „Vier eigene Produkte" auf derselben Seite | G03 |
 | WEB-0015 | AUDIT-15 | CONFIRMED_CURRENT | `/karriere` | Länge für einen Talent Pool ohne offene Stelle | **9.826 px mobil** nach der Neuordnung (vorher 14.271 px) | G03 |
 | WEB-0016 | AUDIT-16 | CONFIRMED_CURRENT | Leistungs-/Produktdetails | Visuelle Monotonie, kaum UI oder Diagramme | **0 Bilder** auf allen sechs Leistungsdetail- und beiden Produktdetailseiten | G04 |
-| WEB-0017 | AUDIT-17 | CONFIRMED_CURRENT | `/produkte/*` | „Oberflächen zeigen wir erst …" obwohl `/arbeiten` Oberflächen zeigt | `/arbeiten` 4 Bilder, `/produkte/fibero` 0 Bilder | G03 |
+| WEB-0017 | AUDIT-17 | FIXED_ON_BRANCH | `/produkte/*` | „Oberflächen zeigen wir erst …" obwohl `/arbeiten` Oberflächen zeigt | `/arbeiten` 4 Bilder, `/produkte/fibero` 0 Bilder | G03 |
 | WEB-0018 | AUDIT-18 | FIXED_ON_BRANCH | `/insights` | Ein Artikel trägt einen Hauptnavigationspunkt | 1 veröffentlichter Beitrag, 6 definierte Fächer, Seite 2.413 px | G01 |
 | WEB-0019 | AUDIT-19 | FIXED_ON_BRANCH | `/` | Insight-Teaser führt zur Übersicht statt zum Artikel | Startseite: **4 Links auf `/insights`, 0 auf den Artikel** | G05 |
 | WEB-0020 | AUDIT-20 | CONFIRMED_CURRENT | `/insights/eigene-seite-geprueft` | Sehr lang, fast ohne Bilder | 9.361 px mobil, 1.079 Wörter, 0 Bilder | G04 |
 | WEB-0021 | AUDIT-21 | CONFIRMED_CURRENT | `/betriebscheck` | Ergebnis priorisiert Ebene, nicht konkrete Antworthebel | 330 Wörter, 1 H2 — Ergebnis ohne Antwortbezug | G06 |
 | WEB-0022 | AUDIT-22 | CONFIRMED_CURRENT | `/produkte/*` | Sehr langer Einwilligungstext für eine Produktnachricht | Interesse-Formular auf allen Produktdetailseiten | G06 |
-| WEB-0023 | AUDIT-23 | CONFIRMED_CURRENT | `/kontakt` | Osnabrücker Sitz plus Schweizer WhatsApp-Nummer unerklärt | `+41`-Nummer neben deutscher Anschrift, keine Einordnung | G03 |
+| WEB-0023 | AUDIT-23 | FIXED_ON_BRANCH | `/kontakt` | Osnabrücker Sitz plus Schweizer WhatsApp-Nummer unerklärt | `+41`-Nummer neben deutscher Anschrift, keine Einordnung | G03 |
 | WEB-0024 | AUDIT-24 | FIXED_ON_BRANCH | `/` Preise | 2.400-€-Preis ankert creaDIG als Website-Anbieter | Startseite nennt 2.400 €, 3.900 € und 149 €/Monat | G01 |
 | WEB-0025 | AUDIT-25 | CONFIRMED_CURRENT | `/leistungen/barrierefreiheit-website` | Länge | **10.890 px mobil · 24 Eyebrows · 1.026 Wörter · 14 H2** | G03 |
 | WEB-0026 | AUDIT-26 | NOT_REPRODUCED | Global | Erste Ansicht nach Navigation kurz blass/leer | Gemessen lokal **und** gegen Produktion: Above-the-fold ab 100 ms voll deckend (2/2). Mit dieser Methode nicht reproduzierbar | G08 |
@@ -93,7 +93,7 @@ Alle Befunde sind einem Gate zugeordnet. Kein heimatloser Befund.
 | WEB-0032 | AUDIT-32 | CONFIRMED_CURRENT | `/produkte/*` | Support- und Interessenformular auch bei nicht nutzbaren Produkten | Beide Blöcke auf allen vier Produktseiten, auch „im Aufbau" | G05 |
 | WEB-0033 | AUDIT-33 | CONFIRMED_CURRENT | Footer | Sehr umfangreich, auf jeder langen Seite dominant | 28 Ziele, 968 px Desktop / 1.887 px mobil | G04 |
 | WEB-0034 | AUDIT-34 | CONFIRMED_CURRENT | Mobiles Menü | Inhalt höher als ein Viewport | **1.071 px Inhalt bei 844 px Viewport**, 12 Ziele, scrollt | G04 |
-| WEB-0035 | AUDIT-35 | CONFIRMED_CURRENT | `/unternehmen` | Viel Meta-Erklärung über nicht genannte Zahlen | 5 von 8 Abschnitten reiner Text | G03 |
+| WEB-0035 | AUDIT-35 | FIXED_ON_BRANCH | `/unternehmen` | Viel Meta-Erklärung über nicht genannte Zahlen | 5 von 8 Abschnitten reiner Text | G03 |
 | WEB-0039 | G00 | CONFIRMED_CURRENT | `/arbeiten` | Seite trägt 25 Eyebrows bei nur 191 Wörtern und 1 H2 | Höchstes Verhältnis Label zu Inhalt der ganzen Website | G04 |
 | WEB-0042 | G00 | CONFIRMED_CURRENT | `/datenschutz` | Rechtstext ohne jede Gliederungsebene | 906 Wörter, **0 H2**, 18 Eyebrows, 5.432 px — die Struktur trägt keine Überschriften | G07 |
 | WEB-0043 | G00 | CONFIRMED_CURRENT | Arabischer Baum | Arabisch trägt dieselbe Länge und Wiederholung wie Deutsch | `/ar/leistungen` **61 Eyebrows, 14.898 px mobil**; `dir=rtl` und `lang=ar` korrekt, kein Überlauf | G04 |
@@ -200,3 +200,48 @@ gebaut und lokal ausgeliefert. Methode wie in Gate 00/01.
 - Gegenprüfung auf Überclaiming über 15 Routen und 7 Mustergruppen:
   **5 Treffer, alle Verneinungen** („kein 24/7", „keine Reaktionszeit in Stunden").
 - Die sechs G18-Dateien sind bit-identisch zum Stand bei Zugbeginn (SHA-256).
+
+
+---
+
+## Gate 03 — was behoben wurde und woran man es misst
+
+Gemessen am 10.09.2026 gegen den Gate-03-Zug, gebaut und lokal ausgeliefert.
+Duplikation gemessen über die gerenderten Seiten: exakte tragende Sätze (≥ 6
+Wörter) auf ≥ 2 Routen, und paarweise 5-Gramm-Jaccard der Leistungsdetailseiten.
+
+| ID | Was geändert wurde | Beleg nach der Änderung |
+|---|---|---|
+| **WEB-0036** | Jede Leistungsdetailseite druckte die vollständige Definition ihrer Ebene (Ausgangslage/Was wir bauen/Was danach anders ist + Projekte) — dieselbe Quelle wie die Pyramide auf `/leistungen`. Jetzt: ein Satz + Verweis auf `/leistungen#ebene-<key>` | Ähnlichkeit der drei Digital-Seiten **30,0/27,3/25,2 % → 10,7/7,1/6,5 %**. Tragende Sätze auf ≥ 2 Routen **68 → 50** |
+| **WEB-0012** | Dieselbe Ursache: die drei identischen Überschriften stammten aus dem Ebenen-Block, nicht aus der Seite. Zusätzlich `layer.who` und der doppelte Eyebrow entfernt | `webdesign` **307 → 214 Wörter, 8 → 5 H2, 11 → 9 Eyebrows, 3.214 → 2.803 px**; Schwesterseiten gleichauf. Unterscheidbarkeitstest ohne H1: bestanden |
+| **WEB-0006** | Der irreführende Nachtsatz war bereits in Gate 02 getrennt worden. Gate 03 hat die Konsistenz über alle Routen geprüft | `/`, `/leistungen`, `/betrieb`, `/systeme`, `/branchen/handwerk`, `/produkte` gegen 8 Begriffe geprüft: keine Route verspricht mehr als eine andere. Maschinell gesichert (Regel 5) |
+| **WEB-0017** | Für fibero und meAI in Gate 02 aufgelöst. Für CASSAMEA und meahv trifft der Satz weiterhin zu — dort existiert keine standardkonforme Aufnahme | Der Satz steht nur noch dort, wo er wahr ist. Zurückgehaltene Aufnahmen bleiben ausgeschlossen (`check-beleg`, `check-content-system` Regel 4) |
+| **WEB-0023** | Die `+41`-Nummer stand unerklärt neben einer deutschen Anschrift. Jetzt: „Schweizer Mobilnummer — creaDIG arbeitet in Deutschland, Österreich und der Schweiz." | In vier Sprachen. Ohne Gebührenaussage — der Tarif des Lesers ist nicht bekannt |
+| **WEB-0035** | Fünf Aussagen über nicht genannte Zahlen auf einer Seite → eine. Die Lieferliste 6 → 4 Einträge, weil zwei beantworteten, was `WorkModel` direkt darüber beantwortet | `/unternehmen` **1.103 → 1.012 Wörter, 43 → 41 Eyebrows, 14.545 → 13.819 px mobil**. Alle sechs Delivery-Antworten inhaltlich erhalten |
+
+### Teilweise — mit benanntem Rest
+
+| ID | Stand | Rest gehört |
+|---|---|---|
+| **WEB-0013** · `/leistungen` Länge | Content-Anteil bearbeitet; 16.280 px mobil unverändert | **27 % der Höhe liegt in `components/sections/packages.tsx` — G18-gesperrt.** Der Rest ist Primary-Home-Substanz oder Abstand → G04 + G18-Zug |
+| **WEB-0025** · Barrierefreiheits-Seite Länge | 10.890 → **10.155 px**, 1.026 → 932 Wörter, 14 → 11 H2 | Die verbleibende Länge ist Beleg (Grenze, eigene Prüfung, Preisleiter) — §28 verbietet, Beleg zum Kürzen zu opfern → G04 |
+| **WEB-0037** · Eyebrow-Inflation | Semantischer Anteil bearbeitet: −2 je Leistungsdetailseite, −2 `/unternehmen`, −1 je Produktseite, −2 Barrierefreiheit | Die Wiederholung in den fünf Ebenen-Kacheln ist **Vergleichbarkeit**, keine Inflation. Visuelle Restschuld → G04 |
+| **WEB-0014** · `/` Länge | Kein Redundanzbefund mehr; Gate 02 hatte die Dublette entfernt (13.449 → 12.245 px) | Länge → G04 |
+
+### Nicht bearbeitet — eingefroren
+
+| ID | Grund |
+|---|---|
+| **WEB-0015** · `/karriere` Länge | Careers ist durch den Master-Prompt eingefroren (§43). Eine Längenkorrektur wäre ein struktureller Eingriff in eine abgeschlossene Bahn |
+| **WEB-0031** · „Dein Platz" duzt, Fließtext siezt | Dieselbe Sperre. Der Befund ist klein und real; er gehört in den nächsten Careers-Zug, nicht in G03 |
+
+### Prüfung nach der Änderung
+
+- 34 von 34 Postbuild-Gates grün (33 bestehende plus `check-content-system.mjs`).
+- `npm run a11y`: **124 Durchläufe**, keine maschinell feststellbare Verletzung.
+- **625 interne Links** über 33 Zielseiten gecrawlt: kein toter Link, kein
+  fehlender Anker — auch die neuen `#ebene-*`-Verweise lösen auf.
+- 15 Routen × 3 Viewports (390/768/1440) inkl. TR/EN/AR: alle 200, kein
+  Seitenüberlauf.
+- Preisinvariante maschinell: **0 Beträge geändert**.
+- Die sechs G18-Dateien sind bit-identisch (SHA-256).

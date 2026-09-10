@@ -34,11 +34,23 @@ export function About() {
               </div>
             </Reveal>
 
-            <Reveal delay={0.14}>
-              <p className="type-small border-line text-muted-foreground mt-12 border-t pt-6 text-pretty">
-                {t.about.honesty}
-              </p>
-            </Reveal>
+            {/*
+              GATE 03 · WEB-0035 — HIER STAND DIE ZWEITE VON FUENF.
+
+              Der Satz lautete: „Wir nennen keine erfundenen Mitarbeiter- oder
+              Umsatzzahlen. Unser Beweis ist gebaute Arbeit."
+
+              Gemessen am 10.09.2026 stand auf `/unternehmen` FUENFMAL eine
+              Aussage darueber, welche Zahlen creaDIG nicht nennt:
+              `about.body2` (Verweis nach unten), dieser Satz,
+              `workModel.lead` („Wir sagen nicht, wie gross wir sind"),
+              `workModel.honesty` und `lieferung.limit`.
+
+              Fuenf Erklaerungen zu einer Leerstelle machen die Leerstelle zum
+              Thema der Seite. Der Primary Home dieser Aussage ist
+              `workModel.honesty` — dort steht sie neben dem Modell, das sie
+              begruendet, und sagt zusaetzlich, was stattdessen zaehlt.
+            */}
           </div>
 
           {/* Faktenspalte: Gründer, Schwerpunkte, Sitz */}

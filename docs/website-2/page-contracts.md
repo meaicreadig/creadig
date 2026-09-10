@@ -36,6 +36,20 @@ Gemessen am 10.09.2026. Höhen sind `document.scrollHeight` bei 1440 × 900 und
 gemessen, die es verändert hat, plus `/betrieb` als Ziel eines neuen
 Einstiegs.
 
+## Fortschreibung Gate 03 (10.09.2026)
+
+Der Vertrag je Route ist unverändert — Gate 03 hat keine Hauptfrage geändert,
+sondern durchgesetzt, dass jede Seite **nur ihre eigene** beantwortet.
+
+| Route | Zusatz aus Gate 03 | 1440 | 390 | Wörter |
+|---|---|---:|---:|---:|
+| `/leistungen/[slug]` | Darf die Ebene **einordnen**, nicht erklären. Primary Home ist `/leistungen#ebene-<key>` | 2.754–2.810 | 4.761–4.921 | 213–237 |
+| `/leistungen/barrierefreiheit-website` | Länge ist hier Beleg, nicht Redundanz | 5.399 | 10.155 | 932 |
+| `/produkte/[slug]` | Weiterblätterung nennt Name und Branche, nicht die ganze Beschreibung | — | 7.300–9.152 | 324–434 |
+| `/unternehmen` | **Eine** Aussage über nicht genannte Zahlen. Wer führt und wer dazukommt steht in `#arbeitsmodell`, nicht zweimal | 9.377 | 13.819 | 1.012 |
+| `/kontakt` | Die Schweizer Nummer wird eingeordnet, sobald sie genannt wird | — | — | — |
+| `/leistungen` | Bleibt Primary Home der fünf Ebenen. Länge zu 27 % in G18-gesperrtem Code | 10.384 | 16.280 | 1.212 |
+
 ---
 
 ## Die drei Verträge, die Gate 01 geändert hat

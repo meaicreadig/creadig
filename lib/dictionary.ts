@@ -1102,6 +1102,7 @@ export const dictionary = {
       includesLabel: "Was dazugehört",
       forWhomLabel: "Für wen",
       layerLabel: "Ebene im System",
+      layerCta: "Die Ebene im Ganzen",
       processLabel: "So läuft es",
       /*
        * MP10-1 — die vier Kauf-Fragen.
@@ -1480,7 +1481,7 @@ export const dictionary = {
       body1:
         "creaDIG startete 2017 als Agentur. Aus Aufträgen wurden Produkte, aus Produkten ein System-Haus — heute laufen unter dem Dach vier eigene Systeme und die Betreuung der Betriebe, für die wir sie gebaut haben.",
       body2:
-        "Das Team wächst; die nächsten Stellen sind in Vorbereitung. Wie wir heute arbeiten — wer führt, wer im Kernteam sitzt, wer dazukommt — steht darunter, ohne Schönfärberei.",
+        "Das Team wächst; die nächsten Stellen sind in Vorbereitung.",
       nicheLabel: "Schwerpunkte",
       niches: [
         "Handwerk mit 6–20 Mitarbeitern — Schwerpunkt Deutschland",
@@ -1571,7 +1572,7 @@ export const dictionary = {
     lieferung: {
       eyebrow: "Wenn Sie Verantwortung abgeben",
       title: "Was dann tatsächlich passiert.",
-      lead: "Sechs Fragen, die vor jedem größeren Projekt kommen — und die Antworten, die heute gelten. Jede steht ausführlich an der Stelle, auf die sie verweist.",
+      lead: "Wer führt und wer dazukommt, steht direkt darüber. Hier stehen die vier Fragen, die davor niemand beantwortet — und was heute für sie gilt.",
       items: {
         fuehrung: {
           name: "Wer führt",
@@ -1615,7 +1616,19 @@ export const dictionary = {
     workModel: {
       eyebrow: "So arbeiten wir",
       title: "Founder-led — und dazu genau die Leute, die ein Projekt braucht.",
-      lead: "Wir sagen nicht, wie groß wir sind, sondern wie wir arbeiten. Das ist die ehrlichere Angabe und für Sie die nützlichere: Sie wissen danach, wer Ihr Projekt führt und wer daran sitzt.",
+      /*
+       * GATE 03 · WEB-0035 — DER VORSPANN BEGANN MIT EINER VERNEINUNG.
+       *
+       * „Wir sagen nicht, wie gross wir sind, sondern wie wir arbeiten." Der
+       * Gedanke ist richtig und steht zwei Absaetze weiter unten noch einmal
+       * (`honesty`), dort praeziser. Als Einleitung kostete er den Platz, an
+       * dem die Sektion sagen koennte, was der Leser bekommt.
+       *
+       * Jetzt steht die Zusage vorn und die Abgrenzung hinten — dieselbe
+       * Reihenfolge wie ueberall sonst auf der Seite seit Gate 01: erst was
+       * gilt, dann was nicht gilt.
+       */
+      lead: "Nach dieser Sektion wissen Sie, wer Ihr Projekt führt, wer daran sitzt und wen wir dazuholen, wenn ein Vorhaben mehr braucht.",
       items: {
         founder: {
           name: "Geführt vom Gründer",
@@ -2232,7 +2245,24 @@ export const dictionary = {
       submit: "Anfrage senden",
       submitWhatsapp: "Lieber per WhatsApp",
       whatsappTitle: "WhatsApp",
-      whatsappNote: "Schnellste Antwort, DE & TR.",
+      /*
+       * GATE 03 · WEB-0023 — DIE SCHWEIZER NUMMER STAND UNERKLAERT NEBEN
+       * EINER DEUTSCHEN ANSCHRIFT.
+       *
+       * Auf `/kontakt` steht der Sitz („ICO InnovationsCentrum Osnabrueck …
+       * Deutschland") und wenige Zeilen darunter eine +41-Nummer. Ein Leser,
+       * der beides sieht, stellt genau eine Frage — und die Seite beantwortet
+       * sie nicht: Sitzt die Firma jetzt in Deutschland oder in der Schweiz?
+       *
+       * Die Antwort steht auf derselben Seite, nur an anderer Stelle
+       * („Maerkte: Deutschland, Oesterreich & Schweiz") und wird nicht mit der
+       * Nummer verbunden. Ein Satz genuegt.
+       *
+       * Was hier bewusst NICHT steht: eine Aussage ueber Gebuehren. Was ein
+       * Anruf oder eine Nachricht kostet, haengt am Tarif des Lesers, und den
+       * kennen wir nicht.
+       */
+      whatsappNote: "Schnellste Antwort, DE & TR. Schweizer Mobilnummer — creaDIG arbeitet in Deutschland, Österreich und der Schweiz.",
       /* Der Satz, der beim Oeffnen im Eingabefeld steht. */
       whatsappIntro: "Guten Tag creaDIG, ich interessiere mich für ein Projekt.",
       /* Die Vorlesehilfe des schwebenden Knopfes und der Kopfleiste. */
@@ -3372,6 +3402,7 @@ export const dictionary = {
       includesLabel: "Neler dahil",
       forWhomLabel: "Kimler için",
       layerLabel: "Sistemdeki kademe",
+      layerCta: "Katmanın tamamı",
       processLabel: "Nasıl ilerler",
       durationLabel: "Ne kadar sürer",
       fromToLabel: "İşletmede ne değişir",
@@ -3623,7 +3654,7 @@ export const dictionary = {
       body1:
         "creaDIG 2017'de ajans olarak başladı. İşlerden ürünler, ürünlerden bir sistem evi doğdu — bugün bu çatı altında dört kendi sistemimiz ve onları kurduğumuz işletmelerin bakımı yürüyor.",
       body2:
-        "Ekip büyüyor; yeni pozisyonlar hazırlanıyor. Bugün nasıl çalıştığımız — kim yürütüyor, çekirdek ekipte kim var, kim ekleniyor — aşağıda yazıyor, süslemeden.",
+        "Ekip büyüyor; yeni pozisyonlar hazırlanıyor.",
       nicheLabel: "Odak alanları",
       niches: [
         "6–20 çalışanlı zanaat işletmeleri — ağırlıkla Almanya",
@@ -3642,7 +3673,7 @@ export const dictionary = {
     lieferung: {
       eyebrow: "Sorumluluğu devrederken",
       title: "O zaman gerçekte ne olur.",
-      lead: "Her büyük projeden önce gelen altı soru — ve bugün geçerli olan cevaplar. Her biri, işaret ettiği yerde ayrıntısıyla duruyor.",
+      lead: "Kimin yürüttüğü ve kimin eklendiği hemen yukarıda. Burada, ondan önce kimsenin cevaplamadığı dört soru ve bugün onlar için geçerli olan var.",
       items: {
         fuehrung: {
           name: "Kim yürütür",
@@ -3681,7 +3712,7 @@ export const dictionary = {
     workModel: {
       eyebrow: "Nasıl çalışıyoruz",
       title: "Kurucu yönetiminde — ve bir projenin ihtiyaç duyduğu kişilerle.",
-      lead: "Ne kadar büyük olduğumuzu değil, nasıl çalıştığımızı söylüyoruz. Bu hem daha dürüst hem de sizin için daha yararlı bir bilgi: Projenizi kimin yürüttüğünü ve başında kimin oturduğunu bilirsiniz.",
+      lead: "Bu bölümden sonra projenizi kimin yürüttüğünü, başında kimin oturduğunu ve bir iş daha fazlasını gerektirdiğinde kimi dahil ettiğimizi bilirsiniz.",
       items: {
         founder: {
           name: "Kurucu yürütür",
@@ -4001,7 +4032,7 @@ export const dictionary = {
       submit: "Talebi gönder",
       submitWhatsapp: "WhatsApp ile göndereyim",
       whatsappTitle: "WhatsApp",
-      whatsappNote: "En hızlı yanıt, DE & TR.",
+      whatsappNote: "En hızlı yanıt, DE & TR. İsviçre cep numarası — creaDIG Almanya, Avusturya ve İsviçre'de çalışıyor.",
       whatsappIntro: "Merhaba creaDIG, bir proje hakkında bilgi almak istiyorum.",
       whatsappAction: "WhatsApp'tan yazın",
       appointmentTitle: "Ücretsiz ilk görüşme",
@@ -4960,6 +4991,7 @@ export const dictionary = {
       includesLabel: "What is included",
       forWhomLabel: "Who it is for",
       layerLabel: "Level in the system",
+      layerCta: "The level in full",
       processLabel: "How it runs",
       durationLabel: "How long it takes",
       fromToLabel: "What changes in the business",
@@ -5211,7 +5243,7 @@ export const dictionary = {
       body1:
         "creaDIG started in 2017 as an agency. Commissions became products, products became a systems house — today four systems of our own run under this roof, alongside support for the businesses we built them for.",
       body2:
-        "The team is growing; the next roles are being prepared. How we work today — who leads, who is in the core team, who is joining — is set out below, without varnish.",
+        "The team is growing; the next roles are being prepared.",
       nicheLabel: "Focus areas",
       niches: [
         "Trade businesses with 6–20 staff — focus on Germany",
@@ -5231,7 +5263,7 @@ export const dictionary = {
     lieferung: {
       eyebrow: "When you hand over responsibility",
       title: "What actually happens then.",
-      lead: "Six questions that come up before any larger project — and the answers that hold today. Each one is set out in full where it points.",
+      lead: "Who leads and who joins is set out directly above. These are the four questions nobody answers before that — and what holds for them today.",
       items: {
         fuehrung: {
           name: "Who leads",
@@ -5270,7 +5302,7 @@ export const dictionary = {
     workModel: {
       eyebrow: "How we work",
       title: "Founder-led — plus exactly the people a project needs.",
-      lead: "We do not tell you how big we are, but how we work. That is the more honest figure and the more useful one for you: afterwards you know who leads your project and who is working on it.",
+      lead: "After this section you know who leads your project, who works on it, and who we bring in when a project needs more.",
       items: {
         founder: {
           name: "Led by the founder",
@@ -5589,7 +5621,7 @@ export const dictionary = {
       submit: "Send enquiry",
       submitWhatsapp: "Rather by WhatsApp",
       whatsappTitle: "WhatsApp",
-      whatsappNote: "Fastest reply, DE, TR & EN.",
+      whatsappNote: "Fastest reply, DE, TR & EN. Swiss mobile number — creaDIG works in Germany, Austria and Switzerland.",
       whatsappIntro: "Hello creaDIG, I am interested in a project.",
       whatsappAction: "Write on WhatsApp",
       appointmentTitle: "Free first consultation",
@@ -6534,6 +6566,7 @@ export const dictionary = {
       includesLabel: "ما يشمله",
       forWhomLabel: "لمن",
       layerLabel: "الطبقة في النظام",
+      layerCta: "الطبقة كاملةً",
       processLabel: "كيف يسير",
       durationLabel: "كم يستغرق",
       fromToLabel: "ما الذي يتغيّر في المنشأة",
@@ -6785,7 +6818,7 @@ export const dictionary = {
       body1:
         "بدأت creaDIG في 2017 كوكالة. تحوّلت المشاريع إلى منتجات، والمنتجات إلى بيت أنظمة — واليوم تعمل تحت هذه المظلة أربعة أنظمة خاصة، إلى جانب متابعة المنشآت التي بنيناها لها.",
       body2:
-        "الفريق ينمو؛ والوظائف التالية قيد الإعداد. وكيف نعمل اليوم — من يقود، ومن في الفريق الأساسي، ومن سينضم — مذكور أدناه دون تجميل.",
+        "الفريق ينمو؛ والوظائف التالية قيد الإعداد.",
       nicheLabel: "مجالات التركيز",
       niches: [
         "الحِرف بعدد 6 إلى 20 موظفًا — التركيز على ألمانيا",
@@ -6805,7 +6838,7 @@ export const dictionary = {
     lieferung: {
       eyebrow: "حين تسلّمون المسؤولية",
       title: "ما الذي يحدث عندئذٍ فعلًا.",
-      lead: "ستة أسئلة تسبق كل مشروع أكبر — والإجابات السارية اليوم. كل إجابة مشروحة بالتفصيل في الموضع الذي تشير إليه.",
+      lead: "من يقود ومن ينضم مذكور مباشرةً أعلاه. وهنا الأسئلة الأربعة التي لا يجيب عنها أحد قبل ذلك — وما يسري عليها اليوم.",
       items: {
         fuehrung: {
           name: "من يقود",
@@ -6844,7 +6877,7 @@ export const dictionary = {
     workModel: {
       eyebrow: "هكذا نعمل",
       title: "بقيادة المؤسس — ومعه بالضبط من يحتاجه المشروع.",
-      lead: "لا نقول كم نحن كبار، بل كيف نعمل. هذه هي المعلومة الأصدق والأنفع لكم: بعدها تعرفون من يقود مشروعكم ومن يعمل عليه.",
+      lead: "بعد هذا القسم تعرفون من يقود مشروعكم، ومن يعمل عليه، ومن نضمّه حين يحتاج العمل إلى أكثر من ذلك.",
       items: {
         founder: {
           name: "بقيادة المؤسس",
@@ -7163,7 +7196,7 @@ export const dictionary = {
       submit: "إرسال الطلب",
       submitWhatsapp: "أفضّل واتساب",
       whatsappTitle: "واتساب",
-      whatsappNote: "أسرع ردّ، بالألمانية والتركية والإنجليزية.",
+      whatsappNote: "أسرع ردّ، بالألمانية والتركية والإنجليزية. رقم جوال سويسري — تعمل creaDIG في ألمانيا والنمسا وسويسرا.",
       whatsappIntro: "مرحبًا creaDIG، أنا مهتم بمشروع.",
       whatsappAction: "المراسلة عبر واتساب",
       appointmentTitle: "استشارة أولى مجانية",

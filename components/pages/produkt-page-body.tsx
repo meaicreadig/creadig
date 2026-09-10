@@ -561,14 +561,23 @@ export function ProduktPageBody({
               </Reveal>
 
               <div className="lg:col-span-7">
-                <Reveal className="border-line border-t pt-7">
-                  <p className="eyebrow text-gold-text">
-                    {copy.layerLabel} {layer.level}
-                  </p>
-                  <p className="type-body text-foreground/85 mt-4 max-w-xl text-pretty">
-                    {layerCopy.what}
-                  </p>
-                </Reveal>
+                {/*
+                  GATE 03 — HIER STAND DIE EBENE ZUM SECHSTEN MAL.
+
+                  Unter „Ebene 03" stand ihr Beschreibungssatz aus
+                  `t.services.layers`. Drei der vier Produkte sitzen auf
+                  Operations, also stand „Kasse, Planung, Abrechnung,
+                  Verwaltung — der Betrieb im System." auf drei Produktseiten
+                  — und zusaetzlich auf `/`, `/leistungen` und `/unternehmen`.
+                  Sechs Routen fuer einen Satz.
+
+                  Der erste Versuch ersetzte den Satz durch den Namen der
+                  Ebene. Das war derselbe Fehler eine Etage tiefer: Der Name
+                  steht bereits als H2 in der linken Spalte, zwei Zentimeter
+                  daneben. Jetzt steht hier nichts mehr — die linke Spalte
+                  beantwortet die Einordnung vollstaendig: welche Ebene, was
+                  das fuer den Leser heisst, und wo die ganze Fassung steht.
+                */}
 
                 {/* Nur Leistungsseiten, die dieses Produkt wirklich als Arbeit
                     führen — keine erfundene Verwandtschaft. */}
@@ -652,8 +661,23 @@ export function ProduktPageBody({
                 <span className="type-h3 group-hover:text-gold-text transition-colors duration-[var(--dur-2)]">
                   {neighbour.name}
                 </span>
-                <span className="type-small text-muted-foreground max-w-sm text-pretty">
-                  {neighbour.what[locale]}
+                {/*
+                  GATE 03 — HIER STAND DER GANZE PRODUKTSATZ.
+
+                  Unter dem Namen des Nachbarprodukts stand sein vollstaendiger
+                  `what`-Satz. Vier Produktseiten mit je zwei Nachbarn heisst:
+                  acht Abdrucke von vier Saetzen — und dieselben vier Saetze
+                  stehen ohnehin auf `/produkte` und auf der Startseite.
+                  Gemessen: „Ordnung und Klarheit im Glasfaser-Alltag …" auf
+                  sechs Routen.
+
+                  Eine Weiterblaetterung braucht den Namen und die Richtung.
+                  Wer wissen will, was das Nachbarprodukt ist, klickt — dafuer
+                  ist der Link da. Die Branche bleibt als Einordnung stehen;
+                  sie ist zwei Woerter und sagt, ob sich das Klicken lohnt.
+                */}
+                <span className="text-meta text-muted-foreground">
+                  {neighbour.sector[locale]}
                 </span>
               </Link>
             ))}

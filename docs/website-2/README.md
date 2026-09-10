@@ -45,6 +45,8 @@ nächsten Schritt versteht.
 | `route-transition-plan.md` | Welcher Übergang wartet auf welche Bedingung, und wer sie herstellt |
 | **Gate 02** | |
 | `gate-02-proof-sales.md` | Der Gate-Bericht: Beleg-Architektur, was gezeigt wird und was bewusst nicht |
+| **Gate 03** | |
+| `gate-03-content-system.md` | Ein Gedanke, ein Primary Home: Content-Canon, Duplikationsmessung, was bewusst blieb |
 
 ## Statuskanon
 
@@ -79,7 +81,7 @@ Lokalisierung und Conversion-Blocker werden nicht leise abgestuft.
 | **G00** | Bestand, Wahrheit, Kontrollsystem | **CLOSED** |
 | **G01** | Positionierung, Angebot, Informationsarchitektur | **CLOSED** |
 | **G02** | Proof, Vertrauen, Verkaufsarchitektur | **BUILT 🟢 · ACCEPTED 🟢 · OPERATIONAL 🟡 OWNER-ASSET** |
-| G03 | Content-System und vollständige Copy | NOT_STARTED |
+| **G03** | Content-System und vollständige Copy | **BUILT 🟢 · ACCEPTED 🟢 · OPERATIONAL 🟢 · CLOSED 🟡 (G04-Rest)** |
 | G04 | Visuelles System und Designqualität | NOT_STARTED |
 | G05 | Seiten- und Produktumsetzung | NOT_STARTED |
 | G06 | Werkzeuge, Formulare, Integrationen | NOT_STARTED |
@@ -110,3 +112,4 @@ Was ein Kommentar nicht hält, prüft ein Gate im Postbuild.
 | `scripts/check-einstiege.mjs` | Die Angebotsarchitektur und die Hauptnavigation (D-17, D-18, D-20) |
 | `scripts/check-beleg.mjs` | Produktbelege: Quelle, Prüfdatum, Zugangslage — und dass kein zurückgehaltenes Bild gezeigt wird (D-21, D-22, D-23) |
 | `npm run proof-drill` | Die Freigabewahrheit für Kundenbelege (älter als Gate 02, hier nur nachgeprüft) |
+| `scripts/check-content-system.mjs` | Ein Gedanke — ein Primary Home: Satz-Dubletten, Seitenähnlichkeit, Preisinvarianz, Gate-02-Belege (D-25, D-26, D-27) |

@@ -190,38 +190,67 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
               sondern dieselbe Quelle. Zwei Fassungen derselben Aussage waeren
               in vier Wochen zwei Aussagen.
             */}
+            {/*
+              GATE 03 · WEB-0036 / WEB-0012 — HIER STAND DIE GANZE EBENE.
+
+              -----------------------------------------------------------------
+              WAS HIER STAND UND WARUM ES SCHADETE
+              Drei Absaetze — Ausgangslage, Was wir bauen, Was danach anders ist
+              — plus die Liste der typischen Projekte. Alle vier aus
+              `t.services.layers[page.layer]`, also aus derselben Quelle wie die
+              Pyramide auf `/leistungen`.
+
+              Der alte Kommentar an dieser Stelle verteidigte das mit einem
+              richtigen Argument: „nicht neu geschrieben, sondern dieselbe
+              Quelle. Zwei Fassungen derselben Aussage waeren in vier Wochen
+              zwei Aussagen." Das stimmt fuer die DATENHALTUNG. Fuer den Leser
+              stimmt es nicht.
+
+              Gemessen am 10.09.2026 ueber die gerenderten Seiten: Fuenf
+              tragende Saetze der Ebene Digital standen wortgleich auf
+              `/leistungen` UND auf `/webdesign`, `/website-handwerk`,
+              `/zweisprachig-de-tr` und `/barrierefreiheit-website`. Die drei
+              Digital-Detailseiten glichen einander zu 25–30 Prozent
+              (5-Gramm-Jaccard). Wer zwei davon nacheinander liest, liest
+              denselben Text zweimal — und haelt beim zweiten Mal nicht die
+              Ebene fuer wiederholt, sondern die Seite fuer leer.
+
+              -----------------------------------------------------------------
+              WAS JETZT DASTEHT
+              Die Ebene wird EINGEORDNET, nicht erklaert: Name, der eine Satz,
+              der sie beschreibt, und der Weg zur vollstaendigen Fassung. Ihr
+              Primary Home ist `/leistungen#ebene-<key>` — dort steht sie
+              einmal, mit Ausgangslage, Loesung, Ergebnis und Projekten.
+
+              Was diese Seite dadurch NICHT verliert: ihren eigenen Inhalt.
+              `includes`, `forWhom`, `process`, `boundary`, `ownProof` und die
+              Preisleiter sind seitenspezifisch und bleiben unveraendert. Was
+              sie verliert, ist genau der Teil, der auf jeder Schwesterseite
+              identisch war.
+            */}
+            {/*
+              SELBSTPRUEFUNG G03 — DER EYEBROW STAND HIER EIN ZWEITES MAL.
+
+              Der erste Entwurf gab diesem Block die Zeile „Ebene im System ·
+              Digital". Genau die steht bereits ueber der H1, gut zwei
+              Bildschirmhoehen hoeher. Zwei identische Beschriftungen auf
+              derselben Seite ordnen nicht ein, sie lassen den Leser suchen,
+              was er uebersehen hat.
+
+              Geblieben ist, was der Block wirklich beitraegt: der eine Satz
+              zur Ebene und der Weg zur vollstaendigen Fassung.
+            */}
             <Reveal delay={0.05} className="border-line mt-14 border-t pt-8">
-              <p className="eyebrow text-gold-text">
-                {copy.layerLabel} · {layer.name}
+              <p className="type-body text-foreground/85 max-w-xl text-pretty">
+                {layer.what}
               </p>
-              <div className="mt-6 flex flex-col gap-8">
-                {(
-                  [
-                    [t.services.problemLabel, layer.problem],
-                    [t.services.solutionLabel, layer.solution],
-                    [t.services.resultLabel, layer.result],
-                  ] as const
-                ).map(([label, body]) => (
-                  <div key={label}>
-                    <h2 className="text-subhead text-lg">{label}</h2>
-                    <p className="type-body text-foreground/85 mt-3 text-pretty">{body}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="border-line mt-8 border-t pt-6">
-                <p className="eyebrow text-gold-text">{t.services.projectsLabel}</p>
-                <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
-                  {layer.projects.map((project) => (
-                    <li
-                      key={project}
-                      className="type-small text-muted-foreground flex items-center gap-2.5"
-                    >
-                      <span aria-hidden="true" className="bg-gold h-px w-3.5 shrink-0" />
-                      {project}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <Link
+                href={`/leistungen#ebene-${page.layer}`}
+                className="text-gold-text hover:text-foreground mt-5 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
+              >
+                {copy.layerCta}
+                <ArrowUpRight className="size-4" strokeWidth={1.5} />
+              </Link>
             </Reveal>
 
             {/*
@@ -349,7 +378,6 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                   </li>
                 ))}
               </ul>
-              <p className="type-small text-muted-foreground mt-6 text-pretty">{layer.who}</p>
             </Reveal>
 
             {/*
