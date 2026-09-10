@@ -4,6 +4,7 @@ import { publishedSeoLandings } from "@/lib/seo-landings"
 import { publishedServicePages } from "@/lib/service-pages"
 import { genannteClientWorks, productWorks } from "@/lib/site-data"
 import { localeUrl, locales, DEFAULT_LOCALE } from "@/lib/routes"
+import { ROLLEN } from "@/lib/karriere"
 
 /**
  * Die Sitemap — jetzt zweisprachig (GROW-1).
@@ -50,6 +51,24 @@ const entries: Entry[] = [
     path: `/leistungen/${page.slug}`,
     changeFrequency: "monthly" as const,
     priority: 0.7,
+  })),
+
+  /*
+   * Karriere. Die drei lesbaren Seiten gehoeren in die Karte — sie sind
+   * oeffentlich und sollen gefunden werden.
+   *
+   * `/karriere/bewerben` steht NICHT hier: Ein Formular ist kein Inhalt, es
+   * traegt `noIndex` und haette in einer Sitemap nur widersprochen.
+   *
+   * Die Prioritaet liegt unter der der Leistungsseiten. Das ist kein
+   * Versehen: Solange keine Stelle offen ist, soll die Karriereseite nicht
+   * vor dem stehen, womit das Haus sein Geld verdient.
+   */
+  { path: "/karriere", changeFrequency: "monthly", priority: 0.6 },
+  ...ROLLEN.map((rolle) => ({
+    path: rolle.pfad,
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
   })),
 
   { path: "/produkte", changeFrequency: "monthly", priority: 0.9 },

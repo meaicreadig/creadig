@@ -230,6 +230,25 @@ export function SiteFooter() {
                   {t.nav.betrieb}
                 </Link>
               </li>
+              {/*
+                Karriere steht hier und NICHT in der Hauptnavigation.
+
+                Die Leiste trägt fünf kommerzielle Ziele plus Sprache, Thema,
+                WhatsApp und den Gold-CTA; ein sechstes Wort hätte den Preis
+                auf der Kundenseite bezahlt, für einen Bereich, der heute
+                keine offene Stelle führt. Im Footer ist er in jeder Sprache
+                auf jeder Seite erreichbar — und die Übersicht selbst sagt im
+                ersten Absatz, dass es ein Talent Pool ist.
+
+                (Die Hauptnavigation kommt ohnehin aus `lib/site-data.ts`.
+                Die Datei gehört gerade einem anderen Arbeitszug; sie wird
+                hier nicht angefasst.)
+              */}
+              <li>
+                <Link href="/karriere" className={linkKlasse}>
+                  {t.footer.karriereLabel}
+                </Link>
+              </li>
             </ul>
           </div>
 

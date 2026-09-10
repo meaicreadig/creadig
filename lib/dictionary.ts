@@ -200,6 +200,17 @@ export const dictionary = {
      * veroeffentlicht ist, sagt die Seite das in einem Satz — statt drei
      * erfundene Beispielartikel zu zeigen, die jeder als Fassade erkennt.
      */
+    karriere: {
+      metaTitle: "Karriere — Istanbul Founding Team 2027 | creaDIG",
+      metaDescription:
+        "creaDIG baut 2027 ein Team in Istanbul auf. Zwei Spuren: DACH Business Development und Founding Talent. Heute Talent Pool, keine offene Stelle.",
+      spurenTitel: "Zwei Spuren. Dieselbe Verantwortung, anderes Handwerk.",
+      standTitel: "Was heute wirklich offen ist.",
+      bewerbenCta: "Vorstellen",
+      spurAMeta: "DACH Business Development — Istanbul Founding Team | creaDIG",
+      spurBMeta: "Founding Talent — Istanbul Founding Team | creaDIG",
+      bewerbenMeta: "Vorstellen — creaDIG Istanbul 2027",
+    },
     insightsPage: {
       eyebrow: "Insights",
       title: "Notizen aus dem Bau.",
@@ -590,6 +601,7 @@ export const dictionary = {
          Kapitel unter „Leistungen", keine sechste Hauptrubrik. */
       betrieb: "Managed Betrieb",
       systeme: "Systeme",
+      karriere: "Karriere",
       /*
        * S-2 — die Menuewoerter sagen nicht, was dahinterliegt.
        *
@@ -2510,6 +2522,7 @@ export const dictionary = {
        * sind sie auffindbar und die Spalten enden gemeinsam.
        */
       toolsLabel: "Werkzeuge",
+      karriereLabel: "Karriere",
       /*
        * MP10-2.7 — die fuenf Ebenen als Sprungmarken.
        *
@@ -2596,6 +2609,17 @@ export const dictionary = {
         title: "Kurma sürecinden notlar.",
         cta: "Tüm notlar",
       },
+    },
+    karriere: {
+      metaTitle: "Kariyer — İstanbul Founding Team 2027 | creaDIG",
+      metaDescription:
+        "creaDIG 2027'de İstanbul'da bir ekip kuruyor. İki yol: DACH İş Geliştirme ve Founding Talent. Bugün yetenek havuzu, açık pozisyon yok.",
+      spurenTitel: "İki yol. Aynı sorumluluk, farklı zanaat.",
+      standTitel: "Bugün gerçekten açık olan ne.",
+      bewerbenCta: "Tanışalım",
+      spurAMeta: "DACH İş Geliştirme — İstanbul Founding Team | creaDIG",
+      spurBMeta: "Founding Talent — İstanbul Founding Team | creaDIG",
+      bewerbenMeta: "Tanışma — creaDIG İstanbul 2027",
     },
     insightsPage: {
       eyebrow: "Insights",
@@ -2839,6 +2863,7 @@ export const dictionary = {
       insights: "Insights",
       betrieb: "Managed işletme",
       systeme: "Sistemler",
+      karriere: "Kariyer",
       hints: {
         leistungen: "Sizin için ne kurarız",
         produkte: "Kendi kurduğumuz ve işlettiğimiz sistemler — katalog değil, kanıt",
@@ -4008,6 +4033,7 @@ export const dictionary = {
       productsLabel: "Ürünler",
       navLabel: "Sayfa",
       toolsLabel: "Araçlar",
+      karriereLabel: "Kariyer",
       layersLabel: "Beş katman",
       legalLabel: "Yasal",
       imprint: "Künye",
@@ -4102,6 +4128,17 @@ export const dictionary = {
         title: "Notes from the build.",
         cta: "All notes",
       },
+    },
+    karriere: {
+      metaTitle: "Careers — Istanbul Founding Team 2027 | creaDIG",
+      metaDescription:
+        "creaDIG is building a team in Istanbul in 2027. Two tracks: DACH business development and Founding Talent. Talent pool today, no open position.",
+      spurenTitel: "Two tracks. The same responsibility, a different craft.",
+      standTitel: "What is genuinely open today.",
+      bewerbenCta: "Introduce yourself",
+      spurAMeta: "DACH Business Development — Istanbul Founding Team | creaDIG",
+      spurBMeta: "Founding Talent — Istanbul Founding Team | creaDIG",
+      bewerbenMeta: "Introduce yourself — creaDIG Istanbul 2027",
     },
     insightsPage: {
       eyebrow: "Insights",
@@ -4338,6 +4375,7 @@ export const dictionary = {
       insights: "Insights",
       betrieb: "Managed operations",
       systeme: "Systems",
+      karriere: "Careers",
       hints: {
         leistungen: "What we build for you",
         produkte: "What we built and run ourselves — proof, not a catalogue",
@@ -5495,6 +5533,7 @@ export const dictionary = {
       productsLabel: "Products",
       navLabel: "Site",
       toolsLabel: "Tools",
+      karriereLabel: "Careers",
       layersLabel: "Five levels",
       legalLabel: "Legal",
       imprint: "Imprint",
@@ -5587,6 +5626,17 @@ export const dictionary = {
         title: "ملاحظات من ورشة البناء.",
         cta: "كل الملاحظات",
       },
+    },
+    karriere: {
+      metaTitle: "الوظائف — فريق إسطنبول التأسيسي 2027 | creaDIG",
+      metaDescription:
+        "‏creaDIG تبني فريقًا في إسطنبول عام 2027. مساران: تطوير الأعمال في DACH و‏Founding Talent. اليوم مجموعة مواهب، ولا وظيفة مفتوحة.",
+      spurenTitel: "مساران. المسؤولية ذاتها، وحرفة مختلفة.",
+      standTitel: "ما هو مفتوح فعلًا اليوم.",
+      bewerbenCta: "تعرّف علينا",
+      spurAMeta: "تطوير الأعمال في DACH — فريق إسطنبول التأسيسي | creaDIG",
+      spurBMeta: "‏Founding Talent — فريق إسطنبول التأسيسي | creaDIG",
+      bewerbenMeta: "تعريف — creaDIG إسطنبول 2027",
     },
     insightsPage: {
       eyebrow: "ملاحظات",
@@ -5823,6 +5873,7 @@ export const dictionary = {
       insights: "ملاحظات",
       betrieb: "التشغيل المُدار",
       systeme: "الأنظمة",
+      karriere: "الوظائف",
       hints: {
         leistungen: "ما نبنيه لكم",
         produkte: "ما بنيناه ونشغّله بأنفسنا — دليل، لا كتالوج",
@@ -6980,6 +7031,7 @@ export const dictionary = {
       productsLabel: "المنتجات",
       navLabel: "الموقع",
       toolsLabel: "أدوات",
+      karriereLabel: "الوظائف",
       layersLabel: "خمس طبقات",
       legalLabel: "قانوني",
       imprint: "بيانات الناشر",
