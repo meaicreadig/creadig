@@ -14,8 +14,8 @@ import type { Localized } from "@/lib/site-data"
  * ---------------------------------------------------------------------------
  * DREI ZUSTAENDE — UND WARUM DER UNTERSCHIED TEUER IST
  *
- *   talent-pool  Wir lernen Menschen fuer 2027 kennen. Es gibt keine Stelle,
- *                auf die man sich bewerben koennte.
+ *   talent-pool  Wir lernen Menschen kennen, bevor wir sie brauchen. Es gibt
+ *                keine Stelle, auf die man sich bewerben koennte.
  *   planned      Die Rolle steht in der Personalplanung. Start, Budget und
  *                Freigabe stehen NICHT fest.
  *   open         Die Stelle ist freigegeben und wird besetzt.
@@ -94,10 +94,21 @@ export type RolleDefinition = {
   titel: Localized
   /** Ein Satz, der die Rolle von ihrem naechsten Nachbarn unterscheidet. */
   unterschied: Localized
-  ort: Localized
+  /*
+   * KEIN `ort`.
+   *
+   * Die erste Fassung erklaerte beide Rollen ueber einen Standort — welche
+   * Stadt, welcher Markt, welche Haelfte des Betriebs. Der Owner hat das
+   * zurueckgewiesen, und zu Recht: Er sucht Menschen, nicht einen Standort.
+   * Wo jemand spaeter sitzt, ist eine Folge der Einstellung und nicht ihr
+   * Grund; solange keine Stelle offen ist, ist es ausserdem eine Behauptung.
+   *
+   * Geblieben ist das Arbeitsmodell — es beschreibt, WIE gearbeitet wird,
+   * und das gilt unabhaengig davon, wo jemand wohnt.
+   */
   arbeitsmodell: Localized
   sprachen: Sprachanforderung[]
-  /** Nur bei Founding Talent gefuellt — die Spur buendelt mehrere Handwerke. */
+  /** Nur bei „Produkt & Systeme“ gefuellt — der Weg buendelt mehrere Handwerke. */
   disziplinen: Localized[]
   nachweise: NachweisArt[]
 }
@@ -116,7 +127,7 @@ export type RolleDefinition = {
  */
 export type Bewerbung = {
   absicht: Bewerbungsabsicht
-  /** Bei Founding Talent: welche Handwerke. Sonst leer. */
+  /** Bei „Produkt & Systeme“: welche Handwerke. Sonst leer. */
   disziplinen: string[]
   name: string
   email: string
@@ -163,37 +174,31 @@ export const ROLLEN: readonly RolleDefinition[] = [
       en: "Sees where a business is stuck — and verifies it instead of claiming it.",
       ar: "يرى أين تتعثّر المنشأة — ويتحقّق من ذلك بدل أن يدّعيه.",
     },
-    ort: {
-      de: "Istanbul · Markt: Deutschland, Österreich & Schweiz",
-      tr: "İstanbul · Pazar: Almanya, Avusturya ve İsviçre",
-      en: "Istanbul · Market: Germany, Austria & Switzerland",
-      ar: "إسطنبول · السوق: ألمانيا والنمسا وسويسرا",
-    },
     arbeitsmodell: {
-      de: "Remote-first, mit geplanten gemeinsamen Tagen vor Ort",
-      tr: "Önce uzaktan, planlı ortak ofis günleriyle",
-      en: "Remote-first, with planned days together on site",
-      ar: "العمل عن بُعد أولًا، مع أيام حضور مشتركة مخطّطة",
+      de: "Remote-first, mit geplanten gemeinsamen Tagen",
+      tr: "Önce uzaktan, planlı ortak günlerle",
+      en: "Remote-first, with planned days together",
+      ar: "العمل عن بُعد أولًا، مع أيام مشتركة مخطّطة",
     },
     sprachen: [
       {
         sprache: { de: "Deutsch", tr: "Almanca", en: "German", ar: "الألمانية" },
         niveau: "kern",
         wofuer: {
-          de: "Ein Gespräch mit einer Inhaberin in Osnabrück führen, Rückfragen stellen, einen Befund schriftlich festhalten.",
-          tr: "Osnabrück'teki bir işletme sahibiyle görüşme yürütmek, soru sormak, bulguyu yazıya dökmek.",
-          en: "Hold a conversation with an owner in Osnabrück, ask follow-up questions, write the finding down.",
-          ar: "إجراء حديث مع صاحب منشأة في أوسنابروك، وطرح أسئلة المتابعة، وتدوين النتيجة.",
+          de: "Ein Gespräch mit einer Inhaberin führen, nachfragen, einen Befund schriftlich festhalten.",
+          tr: "Bir işletme sahibiyle görüşme yürütmek, soru sormak, bulguyu yazıya dökmek.",
+          en: "Hold a conversation with an owner, ask follow-up questions, write the finding down.",
+          ar: "إجراء حديث مع صاحب منشأة، وطرح أسئلة المتابعة، وتدوين النتيجة.",
         },
       },
       {
         sprache: { de: "Türkisch", tr: "Türkçe", en: "Turkish", ar: "التركية" },
         niveau: "hilfreich",
         wofuer: {
-          de: "Die tägliche Arbeit im Istanbuler Team.",
-          tr: "İstanbul ekibindeki günlük çalışma.",
-          en: "The daily work inside the Istanbul team.",
-          ar: "العمل اليومي داخل فريق إسطنبول.",
+          de: "Die tägliche Arbeit im Team.",
+          tr: "Ekipteki günlük çalışma.",
+          en: "The daily work inside the team.",
+          ar: "العمل اليومي داخل الفريق.",
         },
       },
       {
@@ -215,11 +220,24 @@ export const ROLLEN: readonly RolleDefinition[] = [
     spur: "founding-talent",
     zustand: "talent-pool",
     pfad: "/karriere/founding-talent",
+    /*
+     * HIESS „FOUNDING TALENT“ — UND WURDE UMBENANNT.
+     *
+     * Der Name trug zwei Versprechen, die creaDIG nicht halten kann: Er
+     * klingt nach Gruenderrolle mit Anteilen, und er hing an einem
+     * Gruendungsereignis, das es so nicht gibt. Ein Bewerber musste erst
+     * einen Absatz lesen, um zu verstehen, dass beides nicht gemeint ist —
+     * ein Name, der erklaert werden muss, ist keiner.
+     *
+     * „Produkt & Systeme“ sagt in zwei Woertern, worum es geht, benutzt die
+     * Sprache, die das Haus ohnehin spricht (System-Haus), und verspricht
+     * nichts.
+     */
     titel: {
-      de: "Founding Talent",
-      tr: "Founding Talent",
-      en: "Founding Talent",
-      ar: "Founding Talent",
+      de: "Produkt & Systeme",
+      tr: "Ürün & Sistemler",
+      en: "Product & Systems",
+      ar: "المنتج والأنظمة",
     },
     unterschied: {
       de: "Baut das System — und übernimmt die Verantwortung dafür, dass es im Betrieb hält.",
@@ -227,27 +245,21 @@ export const ROLLEN: readonly RolleDefinition[] = [
       en: "Builds the system — and owns the fact that it has to hold in daily operation.",
       ar: "يبني النظام — ويتحمّل مسؤولية صموده في التشغيل اليومي.",
     },
-    ort: {
-      de: "Istanbul · Arbeit für Kunden in Deutschland, Österreich & der Schweiz",
-      tr: "İstanbul · Almanya, Avusturya ve İsviçre'deki müşteriler için çalışma",
-      en: "Istanbul · Work for clients in Germany, Austria & Switzerland",
-      ar: "إسطنبول · العمل لعملاء في ألمانيا والنمسا وسويسرا",
-    },
     arbeitsmodell: {
-      de: "Remote-first, mit geplanten gemeinsamen Tagen vor Ort",
-      tr: "Önce uzaktan, planlı ortak ofis günleriyle",
-      en: "Remote-first, with planned days together on site",
-      ar: "العمل عن بُعد أولًا، مع أيام حضور مشتركة مخطّطة",
+      de: "Remote-first, mit geplanten gemeinsamen Tagen",
+      tr: "Önce uzaktan, planlı ortak günlerle",
+      en: "Remote-first, with planned days together",
+      ar: "العمل عن بُعد أولًا، مع أيام مشتركة مخطّطة",
     },
     sprachen: [
       {
         sprache: { de: "Türkisch", tr: "Türkçe", en: "Turkish", ar: "التركية" },
         niveau: "kern",
         wofuer: {
-          de: "Die tägliche Arbeit im Istanbuler Team.",
-          tr: "İstanbul ekibindeki günlük çalışma.",
-          en: "The daily work inside the Istanbul team.",
-          ar: "العمل اليومي داخل فريق إسطنبول.",
+          de: "Die tägliche Arbeit im Team.",
+          tr: "Ekipteki günlük çalışma.",
+          en: "The daily work inside the team.",
+          ar: "العمل اليومي داخل الفريق.",
         },
       },
       {
@@ -308,16 +320,24 @@ export const ZUSTANDS_TEXTE: Record<RollenZustand, ZustandsText> = {
       ar: "مجموعة المواهب",
     },
     bedeutet: {
-      de: "Keine offene Stelle. Wir lernen jetzt Menschen kennen, mit denen wir 2027 anfangen wollen — mit Gespräch, ohne Zusage.",
-      tr: "Açık pozisyon yok. 2027'de birlikte başlamak istediğimiz kişilerle şimdiden tanışıyoruz — görüşme var, taahhüt yok.",
-      en: "No open position. We are meeting the people we want to start with in 2027 — a conversation, not a commitment.",
-      ar: "لا توجد وظيفة مفتوحة. نتعرّف الآن على من نريد أن نبدأ معهم في 2027 — حديث، لا التزام.",
+      /*
+       * KEIN JAHR MEHR.
+       *
+       * Hier stand „mit denen wir 2027 anfangen wollen“. Das klang nach
+       * einem Termin, den es nicht gibt: Wann eine Stelle entsteht, haengt
+       * am Auftragsbuch und nicht am Kalender. Eine Jahreszahl in der
+       * Handlungsaufforderung ist eine Zusage in Zahlenform.
+       */
+      de: "Keine ausgeschriebene Stelle. Wir lernen Menschen kennen, bevor wir sie brauchen — mit Gespräch, ohne Zusage.",
+      tr: "İlan edilmiş pozisyon yok. İnsanları ihtiyaç duymadan önce tanıyoruz — görüşme var, taahhüt yok.",
+      en: "No advertised position. We get to know people before we need them — a conversation, not a commitment.",
+      ar: "لا وظيفة معلنة. نتعرّف على الأشخاص قبل أن نحتاجهم — حديث، لا التزام.",
     },
     cta: {
-      de: "Für 2027 kennenlernen",
-      tr: "2027 için tanışalım",
-      en: "Introduce yourself for 2027",
-      ar: "تعرّف علينا من أجل 2027",
+      de: "Sich vorstellen",
+      tr: "Kendini tanıt",
+      en: "Introduce yourself",
+      ar: "عرِّف بنفسك",
     },
   },
   geplant: {

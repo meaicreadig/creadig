@@ -6,18 +6,23 @@ import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { BelegKette } from "@/components/karriere/beleg-kette"
 import { RollenStand } from "@/components/karriere/rollen-stand"
-import { rolleFuer } from "@/lib/karriere"
-import { auswahl, marken, spurA } from "@/lib/karriere-inhalt"
 import { Sprachtafel } from "@/components/karriere/sprachtafel"
+import { rolleFuer } from "@/lib/karriere"
+import { spurA } from "@/lib/karriere-inhalt"
 
 /**
- * /karriere/dach-business-development — das Rollendossier.
+ * /karriere/dach-business-development.
  *
- * Es ist bewusst KEINE Stellenanzeige mit „Ihr Profil / Wir bieten". Der
- * Unterschied zwischen dieser Rolle und einer Vertriebsstelle liegt nicht in
- * einer Anforderungsliste, sondern in der Arbeitsweise — deshalb trägt die
- * Seite in der Mitte ein Bild statt einer Aufzählung: die Kette vom
- * sichtbaren Signal bis zum bestätigten Bedarf.
+ * Seitenfrage: „Ist diese Art von kommerzieller Systemarbeit meine Stärke?"
+ *
+ * Gegenüber der ersten Fassung entfallen: die eigene Auswahl-Sektion (steht
+ * jetzt einmal auf der Übersicht) und die 30/60/90-Tafel. Letztere las sich
+ * wie ein Einarbeitungsplan für eine Stelle, die es nicht gibt — konkrete
+ * Zukunft ohne Zusage ist genau die Sorte Versprechen, die diese Seite
+ * sonst vermeidet.
+ *
+ * Geblieben ist das Stärkste: die Kette vom Signal bis zum bestätigten
+ * Bedarf. Sie erklärt die Rolle besser als jede Anforderungsliste.
  */
 export function KarriereSpurABody() {
   const { t, locale } = useLocale()
@@ -26,16 +31,12 @@ export function KarriereSpurABody() {
   return (
     <main>
       <PageHeader
-        eyebrow={marken.spurA[locale]}
+        eyebrow={t.nav.karriere}
         title={rolle.titel[locale]}
         crumbLabel={rolle.titel[locale]}
         crumbs={[{ label: t.nav.karriere, href: "/karriere" }]}
         lead={spurA.lead[locale]}
-      >
-        <div className="mt-12 max-w-xl">
-          <RollenStand rolle={rolle} />
-        </div>
-      </PageHeader>
+      />
 
       {/* ---- Warum es die Rolle gibt ---------------------------------- */}
       <section aria-labelledby="warum-titel" className="section-seam">
@@ -53,7 +54,7 @@ export function KarriereSpurABody() {
         </div>
       </section>
 
-      {/* ---- Was Sie tun / nicht tun ---------------------------------- */}
+      {/* ---- Was Sie tun / und was nicht ------------------------------ */}
       <section aria-labelledby="tun-titel" className="section-seam">
         <div className="section-shell">
           <Reveal>
@@ -78,11 +79,8 @@ export function KarriereSpurABody() {
             ))}
           </ol>
 
-          {/*
-            Die Grenze steht auf derselben Seite wie die Aufgabe — nicht im
-            Kleingedruckten. Wer eine Rolle annimmt, muss vorher wissen, wo
-            seine Unterschrift endet.
-          */}
+          {/* Die Grenze steht auf derselben Seite wie die Aufgabe — wer eine
+              Rolle annimmt, muss vorher wissen, wo seine Unterschrift endet. */}
           <Reveal delay={0.16}>
             <div className="bg-muted mt-12 p-7 md:p-9">
               <p className="eyebrow text-gold-text">{spurA.tutNicht.eyebrow[locale]}</p>
@@ -108,60 +106,19 @@ export function KarriereSpurABody() {
       {/* ---- Sprache -------------------------------------------------- */}
       <Sprachtafel rolle={rolle} />
 
-      {/* ---- Die ersten Monate ---------------------------------------- */}
-      <section aria-labelledby="monate-titel" className="section-seam">
-        <div className="section-shell">
-          <Reveal>
-            <SectionEyebrow label={spurA.entwicklung.eyebrow[locale]} />
-            <h2 id="monate-titel" className="sr-only">
-              {spurA.entwicklung.eyebrow[locale]}
-            </h2>
-          </Reveal>
-          <div className="mt-12 grid gap-px md:grid-cols-3">
-            {spurA.entwicklung.stufen.map((stufe, i) => (
-              <Reveal key={stufe.titel.de} delay={0.05 * i} y={12} className="flex">
-                <div className="border-line flex w-full flex-col gap-4 border p-7">
-                  <p className="eyebrow text-gold-text">{stufe.titel[locale]}</p>
-                  <p className="type-body text-foreground/85 text-pretty">{stufe.text[locale]}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-          <Reveal delay={0.14}>
-            <p className="type-small text-muted-foreground mt-8 max-w-2xl text-pretty">
-              {spurA.entwicklung.hinweis[locale]}
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---- Auswahl -------------------------------------------------- */}
-      <section aria-labelledby="a-auswahl-titel" className="section-dark">
-        <div className="section-shell">
-          <Reveal>
-            <SectionEyebrow label={auswahl.eyebrow[locale]} />
-            <h2 id="a-auswahl-titel" className="type-h2 mt-7 max-w-4xl text-balance">
-              {auswahl.titel[locale]}
-            </h2>
-          </Reveal>
-          <ol className="mt-12 grid gap-px md:grid-cols-5">
-            {auswahl.schritte.map((schritt, i) => (
-              <Reveal key={schritt.titel.de} as="li" delay={0.04 * i} y={12} className="flex">
-                <div className="border-line flex w-full flex-col gap-3 border p-6">
-                  <span className="text-meta text-gold-text">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="text-subhead text-base">{schritt.titel[locale]}</span>
-                  <span className="type-small text-muted-foreground text-pretty">
-                    {schritt.text[locale]}
-                  </span>
-                </div>
-              </Reveal>
-            ))}
-          </ol>
-          <Reveal delay={0.18}>
-            <div className="mt-12 max-w-xl">
+      {/* ---- Stand + Weg ---------------------------------------------- */}
+      <section aria-labelledby="a-stand-titel" className="section-dark">
+        <div className="section-shell-tight">
+          <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
+            <Reveal className="lg:col-span-7">
+              <h2 id="a-stand-titel" className="type-h3 text-balance">
+                {t.karriere.standTitel}
+              </h2>
+            </Reveal>
+            <Reveal delay={0.08} className="lg:col-span-5">
               <RollenStand rolle={rolle} variante="kompakt" />
-            </div>
-          </Reveal>
+            </Reveal>
+          </div>
         </div>
       </section>
     </main>

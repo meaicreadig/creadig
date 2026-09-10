@@ -63,7 +63,7 @@ function jsonLd(locale: Locale) {
       description: t.karriere.metaDescription,
       inLanguage: locale,
       /* Die Absichtserklärung als Text — nicht als Stellenanzeige. */
-      about: kopf.wahrheit[locale],
+      about: kopf.standKurz[locale],
     },
   ]
 }

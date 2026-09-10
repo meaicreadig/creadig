@@ -201,15 +201,14 @@ export const dictionary = {
      * erfundene Beispielartikel zu zeigen, die jeder als Fassade erkennt.
      */
     karriere: {
-      metaTitle: "Karriere — Istanbul Founding Team 2027 | creaDIG",
+      metaTitle: "Karriere — Menschen für das System hinter Betrieben | creaDIG",
       metaDescription:
-        "creaDIG baut 2027 ein Team in Istanbul auf. Zwei Spuren: DACH Business Development und Founding Talent. Heute Talent Pool, keine offene Stelle.",
-      spurenTitel: "Zwei Spuren. Dieselbe Verantwortung, anderes Handwerk.",
-      standTitel: "Was heute wirklich offen ist.",
+        "creaDIG baut das System hinter Betrieben. Zwei Wege: Business Development und Produkt & Systeme. Aktuell keine ausgeschriebene Stelle — wir lernen Menschen vorher kennen.",
+      standTitel: "Was heute gilt.",
       bewerbenCta: "Vorstellen",
-      spurAMeta: "DACH Business Development — Istanbul Founding Team | creaDIG",
-      spurBMeta: "Founding Talent — Istanbul Founding Team | creaDIG",
-      bewerbenMeta: "Vorstellen — creaDIG Istanbul 2027",
+      spurAMeta: "Business Development — Karriere bei creaDIG",
+      spurBMeta: "Produkt & Systeme — Karriere bei creaDIG",
+      bewerbenMeta: "Vorstellen — Karriere bei creaDIG",
     },
     insightsPage: {
       eyebrow: "Insights",
@@ -2611,15 +2610,14 @@ export const dictionary = {
       },
     },
     karriere: {
-      metaTitle: "Kariyer — İstanbul Founding Team 2027 | creaDIG",
+      metaTitle: "Kariyer — İşletmelerin arkasındaki sistem için insanlar | creaDIG",
       metaDescription:
-        "creaDIG 2027'de İstanbul'da bir ekip kuruyor. İki yol: DACH İş Geliştirme ve Founding Talent. Bugün yetenek havuzu, açık pozisyon yok.",
-      spurenTitel: "İki yol. Aynı sorumluluk, farklı zanaat.",
-      standTitel: "Bugün gerçekten açık olan ne.",
+        "creaDIG işletmelerin arkasındaki sistemi kuruyor. İki yol: İş Geliştirme ve Ürün & Sistemler. Şu anda ilan edilmiş pozisyon yok — insanları önceden tanıyoruz.",
+      standTitel: "Bugün geçerli olan.",
       bewerbenCta: "Tanışalım",
-      spurAMeta: "DACH İş Geliştirme — İstanbul Founding Team | creaDIG",
-      spurBMeta: "Founding Talent — İstanbul Founding Team | creaDIG",
-      bewerbenMeta: "Tanışma — creaDIG İstanbul 2027",
+      spurAMeta: "İş Geliştirme — creaDIG'de kariyer",
+      spurBMeta: "Ürün & Sistemler — creaDIG'de kariyer",
+      bewerbenMeta: "Tanışma — creaDIG'de kariyer",
     },
     insightsPage: {
       eyebrow: "Insights",
@@ -4130,15 +4128,14 @@ export const dictionary = {
       },
     },
     karriere: {
-      metaTitle: "Careers — Istanbul Founding Team 2027 | creaDIG",
+      metaTitle: "Careers — people for the system behind businesses | creaDIG",
       metaDescription:
-        "creaDIG is building a team in Istanbul in 2027. Two tracks: DACH business development and Founding Talent. Talent pool today, no open position.",
-      spurenTitel: "Two tracks. The same responsibility, a different craft.",
-      standTitel: "What is genuinely open today.",
+        "creaDIG builds the system behind businesses. Two paths: business development and product & systems. No advertised position right now — we get to know people beforehand.",
+      standTitel: "Where things stand today.",
       bewerbenCta: "Introduce yourself",
-      spurAMeta: "DACH Business Development — Istanbul Founding Team | creaDIG",
-      spurBMeta: "Founding Talent — Istanbul Founding Team | creaDIG",
-      bewerbenMeta: "Introduce yourself — creaDIG Istanbul 2027",
+      spurAMeta: "Business Development — Careers at creaDIG",
+      spurBMeta: "Product & Systems — Careers at creaDIG",
+      bewerbenMeta: "Introduce yourself — Careers at creaDIG",
     },
     insightsPage: {
       eyebrow: "Insights",
@@ -5628,15 +5625,14 @@ export const dictionary = {
       },
     },
     karriere: {
-      metaTitle: "الوظائف — فريق إسطنبول التأسيسي 2027 | creaDIG",
+      metaTitle: "الوظائف — أشخاص للنظام الذي يقف خلف المنشآت | creaDIG",
       metaDescription:
-        "‏creaDIG تبني فريقًا في إسطنبول عام 2027. مساران: تطوير الأعمال في DACH و‏Founding Talent. اليوم مجموعة مواهب، ولا وظيفة مفتوحة.",
-      spurenTitel: "مساران. المسؤولية ذاتها، وحرفة مختلفة.",
-      standTitel: "ما هو مفتوح فعلًا اليوم.",
+        "‏creaDIG تبني النظام الذي يقف خلف المنشآت. مساران: تطوير الأعمال، والمنتج والأنظمة. لا وظيفة معلنة حاليًا — نتعرّف على الأشخاص قبل ذلك.",
+      standTitel: "ما يسري اليوم.",
       bewerbenCta: "تعرّف علينا",
-      spurAMeta: "تطوير الأعمال في DACH — فريق إسطنبول التأسيسي | creaDIG",
-      spurBMeta: "‏Founding Talent — فريق إسطنبول التأسيسي | creaDIG",
-      bewerbenMeta: "تعريف — creaDIG إسطنبول 2027",
+      spurAMeta: "تطوير الأعمال — وظائف في creaDIG",
+      spurBMeta: "المنتج والأنظمة — وظائف في creaDIG",
+      bewerbenMeta: "تعريف — وظائف في creaDIG",
     },
     insightsPage: {
       eyebrow: "ملاحظات",

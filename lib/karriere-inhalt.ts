@@ -6,73 +6,46 @@ import type { Localized } from "@/lib/site-data"
  * ===========================================================================
  *
  * Getrennt von `lib/karriere.ts`: Dort steht, was WAHR ist (Zustand, Spur,
- * Sprache, Nachweis). Hier steht, wie es gesagt wird. Wer den Text aendert,
- * aendert keine Tatsache — und wer eine Tatsache aendert, muss die Datei
- * daneben anfassen.
+ * Sprache, Nachweis). Hier steht, wie es gesagt wird.
  *
- * Vier Sprachen, gleiche Abschnitte, gleiche Aufzaehlungen. Keine Sprache
- * bekommt eine kuerzere Karriereseite als die andere.
+ * ---------------------------------------------------------------------------
+ * WARUM DIESE DATEI EINMAL NEU GESCHRIEBEN WURDE
  *
- * WAS HIER NICHT VORKOMMT — und zwar, weil es nicht existiert:
- * Bueroadresse, Buerofotos, Teamfotos, Mitarbeiterstimmen, Gehalt,
- * Zusatzleistungen, Anteile, Zusagen zum Startdatum, Zahl der Bewerbungen,
- * Hochschulkooperationen, Auszeichnungen.
+ * Die erste Fassung war nicht falsch — sie war unlesbar. Gemessen bei
+ * 1440 px: zehn Abschnitte, achtzehn Eyebrow-Label, neun H2, 1.035 Woerter,
+ * 9.340 Pixel. Jeder Abschnitt hatte dieselbe Form: Label, Ueberschrift,
+ * Absatz, Raster. Zehnmal dieselbe Lautstaerke ergibt keine Hierarchie,
+ * sondern eine Liste — und in einer Liste verliert man sich.
+ *
+ * Dazu kam ein zweiter Fehler: Die Seite erzaehlte einen STANDORT. Wo ein
+ * Team entstehen soll, war die Hauptfigur, obwohl der Owner Menschen sucht
+ * und nicht ein Buero. Beides ist hier weg.
+ *
+ * Jetzt vier Kapitel, und jedes beantwortet genau eine Frage:
+ *
+ *   1 · DAS SYSTEM        Was baut creaDIG — und warum braucht das Menschen?
+ *   2 · DEIN PLATZ        Wo koennte ich darin wirken?
+ *   3 · KENNENLERNEN      Wie findet creaDIG heraus, ob wir zusammenpassen?
+ *   4 · DER STAND         Was kann ich heute tun?
+ *
+ * Was keine dieser vier Fragen beantwortet, steht nicht mehr hier.
+ *
+ * ---------------------------------------------------------------------------
+ * WAS ES NICHT GIBT — und zwar, weil es nicht existiert:
+ * Buero, Buerofotos, Teamfotos, Mitarbeiterstimmen, Gehalt, Zusatzleistungen,
+ * Anteile, ein zugesagtes Startdatum, Bewerberzahlen, Hochschulkooperationen.
  */
 
 export type Punkt = { titel: Localized; text: Localized }
 
-/* ── 01 · Der Anfang ─────────────────────────────────────────────────────── */
-
-export const kopf = {
-  eyebrow: {
-    de: "Karriere · Istanbul 2027",
-    tr: "Kariyer · İstanbul 2027",
-    en: "Careers · Istanbul 2027",
-    ar: "الوظائف · إسطنبول 2027",
-  } as Localized,
-  titel: {
-    de: "Wir bauen das System hinter Betrieben. Jetzt bauen wir das Team dahinter.",
-    tr: "İşletmelerin arkasındaki sistemi kuruyoruz. Şimdi o sistemin arkasındaki ekibi kuruyoruz.",
-    en: "We build the system behind businesses. Now we are building the team behind that system.",
-    ar: "نبني النظام الذي يقف خلف المنشآت. والآن نبني الفريق الذي يقف خلف ذلك النظام.",
-  } as Localized,
-  lead: {
-    de: "creaDIG ist ein System-Haus in Osnabrück. 2027 soll in Istanbul das erste feste Team dazukommen — nicht als verlängerte Werkbank, sondern als die Hälfte, die baut und betreibt. Diese Seite beschreibt, was das heißt, und was heute noch nicht feststeht.",
-    tr: "creaDIG, Osnabrück merkezli bir sistem evi. 2027'de İstanbul'da ilk kalıcı ekip kurulacak — uzatılmış tezgâh olarak değil, kuran ve işleten yarısı olarak. Bu sayfa bunun ne anlama geldiğini ve bugün neyin henüz belli olmadığını anlatıyor.",
-    en: "creaDIG is a system house in Osnabrück. In 2027 the first permanent team is meant to join in Istanbul — not as an extended workbench, but as the half that builds and operates. This page describes what that means, and what is not settled yet.",
-    ar: "‏creaDIG بيت أنظمة في أوسنابروك. في 2027 يُفترض أن ينضم أول فريق دائم في إسطنبول — لا كورشة ملحقة، بل كالنصف الذي يبني ويشغّل. تشرح هذه الصفحة ما يعنيه ذلك، وما لم يُحسم بعد.",
-  } as Localized,
-  /** Steht direkt unter dem Kopf, damit niemand erst scrollen muss. */
-  wahrheitLabel: {
-    de: "Stand heute",
-    tr: "Bugünkü durum",
-    en: "As of today",
-    ar: "الوضع اليوم",
-  } as Localized,
-  wahrheit: {
-    de: "Keine der beiden Spuren ist heute eine offene Stelle. Es gibt kein freigegebenes Budget, kein zugesagtes Startdatum und kein Büro in Istanbul. Was es gibt: die Absicht, 2027 anzufangen — und die Zeit, vorher die richtigen Leute kennenzulernen.",
-    tr: "Bugün iki yolun da açık pozisyonu yok. Onaylanmış bütçe, taahhüt edilmiş başlangıç tarihi ve İstanbul'da ofis yok. Olan şu: 2027'de başlama niyeti — ve öncesinde doğru insanlarla tanışacak zaman.",
-    en: "Neither track is an open position today. There is no approved budget, no promised start date and no office in Istanbul. What there is: the intention to start in 2027 — and the time to meet the right people first.",
-    ar: "لا يمثّل أيٌّ من المسارين وظيفة مفتوحة اليوم. لا ميزانية معتمدة، ولا تاريخ بدء مؤكّد، ولا مكتب في إسطنبول. الموجود: نيّة البدء في 2027 — ووقت للتعرّف على الأشخاص المناسبين قبل ذلك.",
-  } as Localized,
-}
-
 /** Beschriftungen, die in mehreren Bausteinen vorkommen. */
 export const marken = {
-  ort: { de: "Ort", tr: "Yer", en: "Location", ar: "المكان" } as Localized,
   arbeitsmodell: { de: "Arbeitsmodell", tr: "Çalışma modeli", en: "Work model", ar: "نموذج العمل" } as Localized,
   sprachen: { de: "Sprachen", tr: "Diller", en: "Languages", ar: "اللغات" } as Localized,
   disziplinen: { de: "Handwerke", tr: "Alanlar", en: "Crafts", ar: "الحِرَف" } as Localized,
-  spurA: { de: "Spur A", tr: "A yolu", en: "Track A", ar: "المسار A" } as Localized,
-  spurB: { de: "Spur B", tr: "B yolu", en: "Track B", ar: "المسار B" } as Localized,
-  mehr: { de: "Rolle ansehen", tr: "Rolü incele", en: "View the role", ar: "اطّلع على الدور" } as Localized,
+  mehr: { de: "Diesen Weg ansehen", tr: "Bu yolu incele", en: "See this path", ar: "اطّلع على هذا المسار" } as Localized,
   heisstEs: { de: "Das heißt es", tr: "Bu demek", en: "It means", ar: "يعني ذلك" } as Localized,
-  heisstEsNicht: {
-    de: "Das heißt es nicht",
-    tr: "Bu demek değil",
-    en: "It does not mean",
-    ar: "لا يعني ذلك",
-  } as Localized,
+  heisstEsNicht: { de: "Das heißt es nicht", tr: "Bu demek değil", en: "It does not mean", ar: "لا يعني ذلك" } as Localized,
   sprachNiveau: {
     kern: { de: "Kern", tr: "Çekirdek", en: "Core", ar: "أساسية" } as Localized,
     hilfreich: { de: "Hilfreich", tr: "Yardımcı", en: "Helpful", ar: "مفيدة" } as Localized,
@@ -80,10 +53,47 @@ export const marken = {
   },
 }
 
-/* ── 02 · Was hier gebaut wird ───────────────────────────────────────────── */
+/* ═════════════════════════════════════════════════════════════════════════
+ * KAPITEL 1 · DAS SYSTEM
+ * ═════════════════════════════════════════════════════════════════════════ */
 
-export const wasWirBauen = {
-  eyebrow: { de: "Die Arbeit", tr: "İş", en: "The work", ar: "العمل" } as Localized,
+export const kopf = {
+  eyebrow: { de: "Karriere", tr: "Kariyer", en: "Careers", ar: "الوظائف" } as Localized,
+  /*
+   * Die These sagt das ganze Modell in einem Satz: was gebaut wird, und die
+   * zwei Arten von Menschen, die es dafuer braucht. Wer nur diese Zeile
+   * liest, hat den Aufbau der Seite verstanden — Kapitel 2 ist ihre
+   * Ausfaltung.
+   */
+  titel: {
+    de: "Wir bauen das System hinter Betrieben. Dafür brauchen wir Menschen, die sehen — und Menschen, die bauen.",
+    tr: "İşletmelerin arkasındaki sistemi kuruyoruz. Bunun için gören insanlara ve kuran insanlara ihtiyacımız var.",
+    en: "We build the system behind businesses. For that we need people who see — and people who build.",
+    ar: "نبني النظام الذي يقف خلف المنشآت. ولذلك نحتاج أشخاصًا يرون — وأشخاصًا يبنون.",
+  } as Localized,
+  lead: {
+    de: "creaDIG ist ein System-Haus für digitale Betriebe. Diese Seite beschreibt, woran wir arbeiten, welche zwei Arten von Menschen dieses System braucht und wie wir sie kennenlernen.",
+    tr: "creaDIG, dijital işletmeler için bir sistem evi. Bu sayfa neyin üzerinde çalıştığımızı, bu sistemin hangi iki tür insana ihtiyaç duyduğunu ve onlarla nasıl tanıştığımızı anlatıyor.",
+    en: "creaDIG is a system house for digital operations. This page describes what we work on, which two kinds of people that system needs, and how we get to know them.",
+    ar: "‏creaDIG بيت أنظمة للمنشآت الرقمية. تشرح هذه الصفحة ما نعمل عليه، وأيّ نوعين من الناس يحتاجهما هذا النظام، وكيف نتعرّف عليهم.",
+  } as Localized,
+  /* Die Wahrheit steht oben — aber als ruhige Zeile, nicht als Absage. */
+  standKurz: {
+    de: "Aktuell ist keine Stelle ausgeschrieben. Wir lernen Menschen kennen, bevor wir sie brauchen.",
+    tr: "Şu anda açık pozisyon yok. İnsanları ihtiyaç duymadan önce tanıyoruz.",
+    en: "No position is advertised right now. We get to know people before we need them.",
+    ar: "لا توجد وظيفة معلنة حاليًا. نتعرّف على الأشخاص قبل أن نحتاجهم.",
+  } as Localized,
+  standCta: {
+    de: "Die beiden Wege ansehen",
+    tr: "İki yolu incele",
+    en: "See the two paths",
+    ar: "اطّلع على المسارين",
+  } as Localized,
+}
+
+export const system = {
+  eyebrow: { de: "Kapitel 1 · Das System", tr: "Bölüm 1 · Sistem", en: "Chapter 1 · The system", ar: "الفصل 1 · النظام" } as Localized,
   titel: {
     de: "Nicht Websites. Betriebe, die danach anders laufen.",
     tr: "Web siteleri değil. Sonrasında farklı işleyen işletmeler.",
@@ -91,267 +101,128 @@ export const wasWirBauen = {
     ar: "ليست مواقع. بل منشآت تعمل بعدها بشكل مختلف.",
   } as Localized,
   text: {
-    de: "Ein Handwerksbetrieb bekommt eine Anfrage über WhatsApp. Jemand schreibt sie in eine Tabelle. Ein Angebot entsteht in Word, die Nachfassung im Kopf, der Status in einem Gespräch auf dem Flur. Sichtbar ist davon nichts — bis etwas untergeht. Genau diese unsichtbare Hälfte ist unsere Arbeit: Wir sehen sie, ordnen sie und bauen sie so, dass sie ohne den Inhaber weiterläuft.",
-    tr: "Bir zanaat işletmesine WhatsApp'tan talep gelir. Biri bunu tabloya yazar. Teklif Word'de doğar, takip akılda kalır, durum koridordaki bir konuşmada. Bunların hiçbiri görünmez — bir şey kaybolana kadar. İşte bu görünmeyen yarı bizim işimiz: Onu görürüz, düzene sokarız ve sahibi olmadan da yürüyecek şekilde kurarız.",
-    en: "A trade business receives an enquiry via WhatsApp. Someone types it into a spreadsheet. A quote appears in Word, the follow-up lives in someone's head, the status in a hallway conversation. None of it is visible — until something gets lost. That invisible half is our work: we see it, order it, and build it so it keeps running without the owner.",
-    ar: "تصل منشأة حِرفية طلبٌ عبر واتساب. يكتبه أحدهم في جدول. يُصاغ العرض في وورد، وتبقى المتابعة في الذاكرة، والحالة في حديث عابر بالممر. لا شيء من ذلك مرئي — حتى يضيع شيء. هذا النصف غير المرئي هو عملنا: نراه، ونرتّبه، ونبنيه ليستمر دون صاحب المنشأة.",
+    de: "Ein Betrieb bekommt eine Anfrage über WhatsApp. Jemand schreibt sie in eine Tabelle. Ein Angebot entsteht in Word, die Nachfassung im Kopf, der Status in einem Gespräch auf dem Flur. Sichtbar ist davon nichts — bis etwas untergeht. Diese unsichtbare Hälfte ist unsere Arbeit.",
+    tr: "Bir işletmeye WhatsApp'tan talep gelir. Biri bunu tabloya yazar. Teklif Word'de doğar, takip akılda kalır, durum koridordaki bir konuşmada. Bunların hiçbiri görünmez — bir şey kaybolana kadar. Bu görünmeyen yarı bizim işimiz.",
+    en: "A business receives an enquiry via WhatsApp. Someone types it into a spreadsheet. A quote appears in Word, the follow-up lives in someone's head, the status in a hallway conversation. None of it is visible — until something gets lost. That invisible half is our work.",
+    ar: "تصل منشأةً طلبٌ عبر واتساب. يكتبه أحدهم في جدول. يُصاغ العرض في وورد، وتبقى المتابعة في الذاكرة، والحالة في حديث عابر. لا شيء من ذلك مرئي — حتى يضيع شيء. هذا النصف غير المرئي هو عملنا.",
   } as Localized,
-  ebenenLabel: {
-    de: "Fünf Ebenen — jede ist eine Leistung, jede ist auch eine Aufgabe im Team",
-    tr: "Beş katman — her biri bir hizmet, her biri aynı zamanda ekipte bir görev",
-    en: "Five levels — each is a service, and each is also a job inside the team",
-    ar: "خمس طبقات — كل واحدة خدمة، وكل واحدة أيضًا مهمّة داخل الفريق",
-  } as Localized,
+
+  /*
+   * DAS EINE BILD DER SEITE.
+   *
+   * Es ersetzt zwei Dinge, die vorher getrennt dastanden: die
+   * Standort-Bruecke (weg) und die siebenstufige Arbeitsweise (hier
+   * zusammengefasst). Und es tut, was keines von beiden tat — es zeigt, WO
+   * ein Mensch in diesem System steht.
+   *
+   * Drei Saeulen, weil es drei Arten von Beitrag gibt. Darunter steht, wer
+   * dort arbeitet: verstehen ist die eine Spur, bauen und betreiben die
+   * andere. Damit ist Kapitel 2 schon beantwortet, bevor es anfaengt.
+   */
+  bild: {
+    quelleLabel: { de: "Ausgangspunkt", tr: "Başlangıç", en: "Starting point", ar: "نقطة البداية" } as Localized,
+    quelle: {
+      de: "Ein Betrieb, in dem die Arbeit an Zetteln, Tabellen und drei Programmen hängt, die nichts voneinander wissen.",
+      tr: "İşin kâğıtlara, tablolara ve birbirinden habersiz üç programa bağlı olduğu bir işletme.",
+      en: "A business where the work hangs on notes, spreadsheets and three programs that know nothing about each other.",
+      ar: "منشأة يتعلّق عملها بأوراق وجداول وثلاثة برامج لا يعرف أحدها الآخر.",
+    } as Localized,
+    saeulen: [
+      {
+        titel: { de: "Verstehen", tr: "Anlamak", en: "Understand", ar: "الفهم" },
+        text: {
+          de: "Sehen, was wirklich passiert. Fragen, bis die Annahme zur Tatsache wird oder fällt.",
+          tr: "Gerçekte ne olduğunu görmek. Varsayım gerçeğe dönüşene ya da düşene kadar sormak.",
+          en: "See what actually happens. Ask until the assumption becomes a fact or falls apart.",
+          ar: "رؤية ما يحدث فعلًا. والسؤال حتى يصير الافتراض حقيقة أو يسقط.",
+        },
+        wer: { de: "Business Development", tr: "İş geliştirme", en: "Business development", ar: "تطوير الأعمال" },
+      },
+      {
+        titel: { de: "Bauen", tr: "Kurmak", en: "Build", ar: "البناء" },
+        text: {
+          de: "Marke, Auftritt, Software, Automation — was der Ablauf braucht, damit er ohne Zuruf läuft.",
+          tr: "Marka, görünüm, yazılım, otomasyon — akışın seslenmeden yürümesi için gereken ne varsa.",
+          en: "Brand, presence, software, automation — whatever the process needs to run without being nudged.",
+          ar: "العلامة والحضور والبرمجيات والأتمتة — ما يحتاجه المسار ليعمل دون تنبيه.",
+        },
+        wer: { de: "Produkt & Systeme", tr: "Ürün & Sistemler", en: "Product & systems", ar: "المنتج والأنظمة" },
+      },
+      {
+        titel: { de: "Betreiben", tr: "İşletmek", en: "Operate", ar: "التشغيل" },
+        text: {
+          de: "Wir übergeben nicht und verschwinden. Was im Betrieb auffällt, ändert die Methode.",
+          tr: "Teslim edip kaybolmuyoruz. İşleyişte fark edilen şey yöntemi değiştirir.",
+          en: "We do not hand over and disappear. What surfaces in operation changes the method.",
+          ar: "لا نُسلّم ونختفي. وما يظهر أثناء التشغيل يغيّر المنهج.",
+        },
+        wer: { de: "Produkt & Systeme", tr: "Ürün & Sistemler", en: "Product & systems", ar: "المنتج والأنظمة" },
+      },
+    ],
+    ebenenLabel: {
+      de: "Gebaut wird auf fünf Ebenen — jede ist eine Leistung und eine Aufgabe zugleich",
+      tr: "Beş katmanda kuruluyor — her biri hem bir hizmet hem bir görev",
+      en: "Built across five levels — each one is a service and a job at once",
+      ar: "يُبنى على خمس طبقات — كل واحدة خدمة ومهمّة في آنٍ واحد",
+    } as Localized,
+  },
 }
 
-/* ── 03 · Deutschland ↔ Istanbul ─────────────────────────────────────────── */
+/* ═════════════════════════════════════════════════════════════════════════
+ * KAPITEL 2 · DEIN PLATZ
+ * ═════════════════════════════════════════════════════════════════════════ */
 
-export const bruecke = {
-  eyebrow: {
-    de: "Das Betriebsmodell",
-    tr: "Çalışma modeli",
-    en: "The operating model",
-    ar: "نموذج التشغيل",
-  } as Localized,
+export const platz = {
+  eyebrow: { de: "Kapitel 2 · Dein Platz", tr: "Bölüm 2 · Senin yerin", en: "Chapter 2 · Your place", ar: "الفصل 2 · مكانك" } as Localized,
   titel: {
-    de: "Zwei Orte, eine Verantwortung.",
-    tr: "İki yer, tek sorumluluk.",
-    en: "Two places, one responsibility.",
-    ar: "مكانان، مسؤولية واحدة.",
+    de: "Zwei Wege. Derselbe Betrieb, ein anderer Blick darauf.",
+    tr: "İki yol. Aynı işletme, ona farklı bir bakış.",
+    en: "Two paths. The same business, a different way of looking at it.",
+    ar: "مساران. المنشأة نفسها، ونظرة مختلفة إليها.",
   } as Localized,
   lead: {
-    de: "Istanbul ist nicht die billige Hälfte. Die Aufteilung folgt der Nähe zum Kunden und der Nähe zum System — nicht dem Stundensatz.",
-    tr: "İstanbul ucuz olan yarı değil. Bölüşüm, müşteriye ve sisteme yakınlığa göre — saat ücretine göre değil.",
-    en: "Istanbul is not the cheap half. The split follows proximity to the client and proximity to the system — not the hourly rate.",
-    ar: "إسطنبول ليست النصف الرخيص. التقسيم يتبع القرب من العميل والقرب من النظام — لا سعر الساعة.",
-  } as Localized,
-  seiten: [
-    {
-      ort: { de: "Osnabrück", tr: "Osnabrück", en: "Osnabrück", ar: "أوسنابروك" } as Localized,
-      rolle: {
-        de: "Markt und Verantwortung",
-        tr: "Pazar ve sorumluluk",
-        en: "Market and responsibility",
-        ar: "السوق والمسؤولية",
-      } as Localized,
-      punkte: [
-        { de: "Kundenbeziehung", tr: "Müşteri ilişkisi", en: "Client relationship", ar: "علاقة العميل" },
-        { de: "Systemarchitektur", tr: "Sistem mimarisi", en: "System architecture", ar: "بنية النظام" },
-        { de: "Angebot und Preis", tr: "Teklif ve fiyat", en: "Offer and price", ar: "العرض والسعر" },
-        { de: "Abnahme gegenüber dem Kunden", tr: "Müşteriye karşı kabul", en: "Sign-off towards the client", ar: "الاعتماد أمام العميل" },
-      ] as Localized[],
-    },
-    {
-      ort: { de: "Istanbul", tr: "İstanbul", en: "Istanbul", ar: "إسطنبول" } as Localized,
-      rolle: {
-        de: "Bauen und betreiben",
-        tr: "Kurmak ve işletmek",
-        en: "Build and operate",
-        ar: "البناء والتشغيل",
-      } as Localized,
-      punkte: [
-        { de: "Recherche und Discovery-Zuarbeit", tr: "Araştırma ve keşif desteği", en: "Research and discovery support", ar: "البحث ودعم الاستكشاف" },
-        { de: "Produkt, Design, Engineering", tr: "Ürün, tasarım, engineering", en: "Product, design, engineering", ar: "المنتج والتصميم والهندسة" },
-        { de: "Automation und KI-Arbeit", tr: "Otomasyon ve yapay zekâ işi", en: "Automation and AI work", ar: "الأتمتة والعمل بالذكاء الاصطناعي" },
-        { de: "Laufender Betrieb der Systeme", tr: "Sistemlerin sürekli işletimi", en: "Ongoing operation of the systems", ar: "التشغيل المستمر للأنظمة" },
-      ] as Localized[],
-    },
-  ],
-  mitteLabel: {
-    de: "Was beide teilen",
-    tr: "İkisinin ortak zemini",
-    en: "What both share",
-    ar: "ما يشترك فيه الطرفان",
-  } as Localized,
-  mitte: [
-    { de: "Dieselbe Methode", tr: "Aynı yöntem", en: "The same method", ar: "المنهج نفسه" },
-    { de: "Dieselben Belege", tr: "Aynı kanıtlar", en: "The same evidence", ar: "الأدلّة نفسها" },
-    { de: "Dieselben Qualitätsregeln", tr: "Aynı kalite kuralları", en: "The same quality rules", ar: "قواعد الجودة نفسها" },
-  ] as Localized[],
-  fussnote: {
-    de: "Ein Büro in Istanbul gibt es heute nicht. Der Plan ist remote-first mit geplanten gemeinsamen Tagen — und ein Raum, wenn er gebraucht wird.",
-    tr: "Bugün İstanbul'da ofis yok. Plan: önce uzaktan, planlı ortak günlerle — ve gerektiğinde bir mekân.",
-    en: "There is no office in Istanbul today. The plan is remote-first with planned days together — and a room when one is needed.",
-    ar: "لا يوجد مكتب في إسطنبول اليوم. الخطة: العمل عن بُعد أولًا مع أيام حضور مخطّطة — ومكان عند الحاجة.",
+    de: "Beide arbeiten am selben System. Der Unterschied liegt darin, an welcher Stelle jemand hineingeht — vorn, wo man den Betrieb liest, oder dort, wo daraus etwas Gebautes wird.",
+    tr: "İkisi de aynı sistem üzerinde çalışıyor. Fark, kişinin sisteme nereden girdiğinde — işletmenin okunduğu önde mi, yoksa bunun kurulmuş bir şeye dönüştüğü yerde mi.",
+    en: "Both work on the same system. The difference is where you enter it — at the front, where the business is read, or where that turns into something built.",
+    ar: "كلاهما يعمل على النظام نفسه. الفرق في نقطة الدخول — من المقدّمة حيث تُقرأ المنشأة، أو حيث يتحوّل ذلك إلى شيء مبني.",
   } as Localized,
 }
 
-/* ── 04 · Die Arbeitsweise ───────────────────────────────────────────────── */
+/* ═════════════════════════════════════════════════════════════════════════
+ * KAPITEL 3 · SO LERNEN WIR DICH KENNEN
+ * ═════════════════════════════════════════════════════════════════════════ */
 
-export const arbeitsweise = {
-  eyebrow: { de: "Wie wir arbeiten", tr: "Nasıl çalışıyoruz", en: "How we work", ar: "كيف نعمل" } as Localized,
+/*
+ * Hier standen vorher DREI Abschnitte: sieben Arbeitsschritte, sechs
+ * Haltungspunkte und fuenf Auswahlschritte — 18 Elemente, die alle dieselbe
+ * Frage beantworteten. Jetzt vier Schritte und drei Regeln.
+ */
+export const kennenlernen = {
+  eyebrow: { de: "Kapitel 3 · Kennenlernen", tr: "Bölüm 3 · Tanışma", en: "Chapter 3 · Getting to know you", ar: "الفصل 3 · التعارف" } as Localized,
   titel: {
-    de: "Sehen. Verstehen. Ordnen. Bauen. Belegen. Betreiben. Lernen.",
-    tr: "Görmek. Anlamak. Düzenlemek. Kurmak. Kanıtlamak. İşletmek. Öğrenmek.",
-    en: "See. Understand. Order. Build. Prove. Operate. Learn.",
-    ar: "نرى. نفهم. نُنظّم. نبني. نُثبت. نُشغّل. نتعلّم.",
+    de: "Wir lesen, was Sie gebaut haben — nicht, wo Sie waren.",
+    tr: "Nerede bulunduğunuzu değil, ne yaptığınızı okuruz.",
+    en: "We read what you built — not where you have been.",
+    ar: "نقرأ ما بنيتَه — لا أين كنت.",
+  } as Localized,
+  lead: {
+    de: "Kein Lebenslauf, kein Anschreiben, keine Notenübersicht. Vier Schritte, und nach jedem wissen Sie, woran Sie sind.",
+    tr: "CV yok, ön yazı yok, not dökümü yok. Dört adım; her birinden sonra nerede durduğunuzu bilirsiniz.",
+    en: "No CV, no cover letter, no transcript. Four steps, and after each one you know where you stand.",
+    ar: "لا سيرة ذاتية ولا خطاب تقديم ولا كشف درجات. أربع خطوات، وبعد كلٍّ منها تعرف أين تقف.",
   } as Localized,
   schritte: [
     {
-      titel: { de: "Sehen", tr: "Görmek", en: "See", ar: "نرى" },
+      titel: { de: "Zeigen", tr: "Göstermek", en: "Show", ar: "أرِنا" },
       text: {
-        de: "Was tut der Betrieb wirklich — nicht, was auf seiner Website steht.",
-        tr: "İşletme gerçekte ne yapıyor — sitesinde ne yazdığı değil.",
-        en: "What the business actually does — not what its website says.",
-        ar: "ما تفعله المنشأة فعلًا — لا ما يقوله موقعها.",
+        de: "Ein kurzes Formular und ein Link auf etwas, das Sie gemacht haben — Repository, Portfolio, ein laufendes Produkt, eine Aufzeichnung.",
+        tr: "Kısa bir form ve yaptığınız bir şeye bağlantı — depo, portfolyo, çalışan bir ürün, bir kayıt.",
+        en: "A short form and a link to something you made — repository, portfolio, a running product, a recording.",
+        ar: "نموذج قصير ورابط لشيء صنعته — مستودع أو أعمال أو منتج يعمل أو تسجيل.",
       },
     },
     {
-      titel: { de: "Verstehen", tr: "Anlamak", en: "Understand", ar: "نفهم" },
-      text: {
-        de: "Fragen stellen, bis die Annahme zur Tatsache wird oder fällt.",
-        tr: "Varsayım gerçeğe dönüşene ya da düşene kadar soru sormak.",
-        en: "Ask until the assumption becomes a fact or falls apart.",
-        ar: "نسأل حتى يصير الافتراض حقيقة أو يسقط.",
-      },
-    },
-    {
-      titel: { de: "Ordnen", tr: "Düzenlemek", en: "Order", ar: "نُنظّم" },
-      text: {
-        de: "Aus vielen Einzelheiten wird ein Ablauf, der einen Namen hat.",
-        tr: "Dağınık ayrıntılardan adı olan bir akış çıkar.",
-        en: "Many details become one process that has a name.",
-        ar: "تتحوّل التفاصيل المبعثرة إلى مسار له اسم.",
-      },
-    },
-    {
-      titel: { de: "Bauen", tr: "Kurmak", en: "Build", ar: "نبني" },
-      text: {
-        de: "Marke, Auftritt, Software, Automation — was der Ablauf braucht.",
-        tr: "Marka, görünüm, yazılım, otomasyon — akışın neye ihtiyacı varsa.",
-        en: "Brand, presence, software, automation — whatever the process needs.",
-        ar: "العلامة والحضور والبرمجيات والأتمتة — بحسب ما يحتاجه المسار.",
-      },
-    },
-    {
-      titel: { de: "Belegen", tr: "Kanıtlamak", en: "Prove", ar: "نُثبت" },
-      text: {
-        de: "Gemessen statt behauptet. Auch wenn das Ergebnis unbequem ist.",
-        tr: "İddia değil ölçüm. Sonuç rahatsız edici olsa bile.",
-        en: "Measured, not claimed. Even when the result is inconvenient.",
-        ar: "قياس لا ادّعاء. حتى لو كانت النتيجة مزعجة.",
-      },
-    },
-    {
-      titel: { de: "Betreiben", tr: "İşletmek", en: "Operate", ar: "نُشغّل" },
-      text: {
-        de: "Wir übergeben nicht und verschwinden. Das System läuft weiter.",
-        tr: "Teslim edip kaybolmuyoruz. Sistem çalışmaya devam ediyor.",
-        en: "We do not hand over and disappear. The system keeps running.",
-        ar: "لا نُسلّم ونختفي. النظام يستمر في العمل.",
-      },
-    },
-    {
-      titel: { de: "Lernen", tr: "Öğrenmek", en: "Learn", ar: "نتعلّم" },
-      text: {
-        de: "Was im Betrieb auffällt, ändert die Methode — nicht nur das Projekt.",
-        tr: "İşleyişte fark edilen şey yöntemi değiştirir — sadece projeyi değil.",
-        en: "What surfaces in operation changes the method — not just the project.",
-        ar: "ما يظهر أثناء التشغيل يغيّر المنهج — لا المشروع وحده.",
-      },
-    },
-  ] as Punkt[],
-}
-
-/* ── 05 · Was wir suchen ─────────────────────────────────────────────────── */
-
-export const haltung = {
-  eyebrow: { de: "Haltung", tr: "Duruş", en: "How we behave", ar: "الموقف" } as Localized,
-  titel: {
-    de: "Woran man bei uns eine gute Woche erkennt.",
-    tr: "Bizde iyi bir hafta neyden anlaşılır.",
-    en: "What a good week looks like here.",
-    ar: "كيف يبدو أسبوع جيّد عندنا.",
-  } as Localized,
-  punkte: [
-    {
-      titel: { de: "Zu Ende bringen", tr: "Sonuca götürmek", en: "Finish it", ar: "أنهِ الأمر" },
-      text: {
-        de: "Eine Aufgabe ist fertig, wenn ein Ergebnis dasteht und der nächste Schritt benannt ist — nicht, wenn sie abgegeben wurde.",
-        tr: "Bir iş, ortada bir sonuç ve adı konmuş bir sonraki adım varsa biter — teslim edildiğinde değil.",
-        en: "A task is done when there is a result and a named next step — not when it has been handed over.",
-        ar: "المهمة تنتهي حين توجد نتيجة وخطوة تالية محدّدة — لا حين تُسلَّم.",
-      },
-    },
-    {
-      titel: { de: "Früh sagen", tr: "Erken söylemek", en: "Say it early", ar: "قُلها مبكرًا" },
-      text: {
-        de: "Ein Fehler am Dienstag ist eine Aufgabe. Derselbe Fehler am Freitag ist ein Problem für jemand anderen.",
-        tr: "Salı günkü bir hata bir iştir. Aynı hata cuma günü başkasının sorunudur.",
-        en: "A mistake on Tuesday is a task. The same mistake on Friday is someone else's problem.",
-        ar: "الخطأ يوم الثلاثاء مهمّة. الخطأ نفسه يوم الجمعة مشكلة لشخص آخر.",
-      },
-    },
-    {
-      titel: { de: "Nach dem Beispiel fragen", tr: "Örneği sormak", en: "Ask for the example", ar: "اطلب المثال" },
-      text: {
-        de: "Bevor jemand eine Lösung vorschlägt, will er den echten Fall gesehen haben. Ein Vorschlag ohne Beispiel ist eine Vermutung mit Selbstbewusstsein.",
-        tr: "Biri çözüm önermeden önce gerçek vakayı görmüş olmalı. Örneksiz öneri, kendine güvenen bir tahmindir.",
-        en: "Before proposing a solution, you want to have seen the real case. A proposal without an example is a guess with confidence.",
-        ar: "قبل اقتراح حلّ، عليك أن تكون رأيت الحالة الحقيقية. اقتراح بلا مثال تخمينٌ واثق.",
-      },
-    },
-    {
-      titel: { de: "Selbst prüfen", tr: "Kendin denetlemek", en: "Test your own work", ar: "افحص عملك بنفسك" },
-      text: {
-        de: "Wer etwas abgibt, hat es vorher selbst auseinandergenommen. Die Prüfung ist Teil der Arbeit, nicht der nächste Schritt.",
-        tr: "Bir şeyi teslim eden, onu önce kendisi söküp bakmıştır. Denetim işin parçasıdır, sonraki adım değil.",
-        en: "Whoever hands something over has taken it apart first. Checking is part of the work, not the step after it.",
-        ar: "من يُسلّم شيئًا يكون قد فكّكه بنفسه أولًا. الفحص جزء من العمل، لا الخطوة التالية.",
-      },
-    },
-    {
-      titel: { de: "KI benutzen und prüfen", tr: "Yapay zekâyı kullanmak ve denetlemek", en: "Use AI, then verify it", ar: "استخدم الذكاء الاصطناعي ثم تحقّق" },
-      text: {
-        de: "Wir arbeiten mit KI, wo sie schneller ist. Wer sie benutzt, kann sagen, was sie gemacht hat, was er selbst gemacht hat und woran er es geprüft hat.",
-        tr: "Hızlandırdığı yerde yapay zekâ ile çalışıyoruz. Kullanan kişi, onun ne yaptığını, kendisinin ne yaptığını ve neye göre denetlediğini söyleyebilir.",
-        en: "We work with AI where it is faster. Whoever uses it can say what it did, what they did, and how they checked it.",
-        ar: "نعمل بالذكاء الاصطناعي حيث يكون أسرع. من يستخدمه يستطيع أن يقول ما الذي فعله، وما الذي فعله هو، وكيف تحقّق.",
-      },
-    },
-    {
-      titel: { de: "Kein Theater", tr: "Tiyatro yok", en: "No theatre", ar: "بلا استعراض" },
-      text: {
-        de: "Aus Unsicherheit wird keine Gewissheit gemacht. „Weiß ich noch nicht“ ist eine vollständige Antwort, wenn danach steht, wie man es herausfindet.",
-        tr: "Belirsizlik kesinliğe çevrilmez. Arkasından nasıl öğrenileceği geliyorsa, „henüz bilmiyorum“ tam bir cevaptır.",
-        en: "Uncertainty is not converted into certainty. „I don't know yet“ is a complete answer if it is followed by how you would find out.",
-        ar: "لا نحوّل عدم اليقين إلى يقين. «لا أعرف بعد» جواب كامل إذا تبعه كيف ستكتشف.",
-      },
-    },
-  ] as Punkt[],
-}
-
-/* ── 06 · Auswahl ────────────────────────────────────────────────────────── */
-
-export const auswahl = {
-  eyebrow: { de: "Auswahl", tr: "Seçim", en: "Selection", ar: "الاختيار" } as Localized,
-  titel: {
-    de: "Fünf Schritte, und Sie wissen nach jedem, woran Sie sind.",
-    tr: "Beş adım; her birinden sonra nerede durduğunuzu bilirsiniz.",
-    en: "Five steps, and after each one you know where you stand.",
-    ar: "خمس خطوات، وبعد كلٍّ منها تعرف أين تقف.",
-  } as Localized,
-  schritte: [
-    {
-      titel: { de: "Vorstellen", tr: "Tanışma", en: "Introduce yourself", ar: "التعريف" },
-      text: {
-        de: "Ein kurzes Formular. Kein Lebenslauf nötig, kein Anschreiben.",
-        tr: "Kısa bir form. CV gerekmez, ön yazı gerekmez.",
-        en: "A short form. No CV needed, no cover letter.",
-        ar: "نموذج قصير. لا سيرة ذاتية ولا خطاب تقديم.",
-      },
-    },
-    {
-      titel: { de: "Arbeit zeigen", tr: "İşini göstermek", en: "Show your work", ar: "أرِ عملك" },
-      text: {
-        de: "Was Sie gebaut haben — Repository, Portfolio, ein laufendes Produkt, eine Aufzeichnung.",
-        tr: "Yaptığınız şey — depo, portfolyo, çalışan bir ürün, bir kayıt.",
-        en: "What you built — a repository, portfolio, a running product, a recording.",
-        ar: "ما بنيتَه — مستودع، أو أعمال، أو منتج يعمل، أو تسجيل.",
-      },
-    },
-    {
-      titel: { de: "Gespräch", tr: "Görüşme", en: "Conversation", ar: "حديث" },
+      titel: { de: "Sprechen", tr: "Konuşmak", en: "Talk", ar: "نتحدّث" },
       text: {
         de: "Wir reden über eine Sache, die Sie gemacht haben. Was war Ihr Anteil, was ist kaputtgegangen, was haben Sie danach geändert.",
         tr: "Yaptığınız bir iş üzerine konuşuruz. Payınız neydi, ne bozuldu, sonrasında neyi değiştirdiniz.",
@@ -360,109 +231,98 @@ export const auswahl = {
       },
     },
     {
-      titel: { de: "Kleine Aufgabe", tr: "Küçük görev", en: "A small task", ar: "مهمّة صغيرة" },
+      titel: { de: "Ausprobieren", tr: "Denemek", en: "Try it", ar: "نجرّب" },
       text: {
-        de: "Kurz, abgegrenzt, zur Rolle passend. Keine Kundenarbeit, kein unbezahltes Projekt.",
-        tr: "Kısa, sınırlı, role uygun. Müşteri işi değil, ücretsiz proje değil.",
-        en: "Short, bounded, matched to the role. Not client work, not an unpaid project.",
-        ar: "قصيرة، محدّدة، مناسبة للدور. ليست عمل عميل ولا مشروعًا بلا أجر.",
+        de: "Eine kleine, abgegrenzte Denkaufgabe, die zur Spur passt. Kurz, nie echte Kundenarbeit — und KI dürfen Sie benutzen.",
+        tr: "Yola uygun, küçük ve sınırlı bir düşünme görevi. Kısa, asla gerçek müşteri işi değil — ve yapay zekâyı kullanabilirsiniz.",
+        en: "A small, bounded thinking task that fits the path. Short, never real client work — and you may use AI.",
+        ar: "مهمّة تفكير صغيرة ومحدّدة تناسب المسار. قصيرة، وليست عمل عميل حقيقي أبدًا — ويمكنك استخدام الذكاء الاصطناعي.",
       },
     },
     {
-      titel: { de: "Gemeinsam entscheiden", tr: "Birlikte karar", en: "Decide together", ar: "قرار مشترك" },
+      titel: { de: "Entscheiden", tr: "Karar", en: "Decide", ar: "نقرّر" },
       text: {
-        de: "Sie bekommen eine Rückmeldung mit Begründung — auch wenn es nicht passt.",
-        tr: "Gerekçeli bir geri bildirim alırsınız — uymadığında da.",
-        en: "You get a response with reasons — including when it is not a fit.",
-        ar: "تحصل على ردٍّ مع الأسباب — حتى عند عدم التوافق.",
+        de: "Gemeinsam, mit einer Rückmeldung, die eine Begründung trägt — auch wenn es nicht passt.",
+        tr: "Birlikte; gerekçesi olan bir geri bildirimle — uymadığında da.",
+        en: "Together, with a response that carries a reason — including when it is not a fit.",
+        ar: "معًا، مع ردٍّ يحمل سببًا — حتى عند عدم التوافق.",
       },
     },
   ] as Punkt[],
-  aufgabeLabel: {
-    de: "Zur kleinen Aufgabe",
-    tr: "Küçük görev hakkında",
-    en: "About the small task",
-    ar: "عن المهمّة الصغيرة",
+  regelnLabel: {
+    de: "Drei Regeln, die dabei gelten",
+    tr: "Bu sırada geçerli üç kural",
+    en: "Three rules that apply throughout",
+    ar: "ثلاث قواعد تسري طوال ذلك",
   } as Localized,
-  aufgabeRegeln: [
+  regeln: [
     {
-      de: "Sie ist nie echte Kundenarbeit. Wir lassen uns nichts kostenlos bauen.",
-      tr: "Asla gerçek müşteri işi değildir. Kimseye bedava iş yaptırmayız.",
-      en: "It is never real client work. We do not get anything built for free.",
-      ar: "ليست أبدًا عمل عميل حقيقي. لا نحصل على شيء مجانًا.",
+      titel: { de: "Belege statt Vermutungen", tr: "Varsayım değil kanıt", en: "Evidence, not assumptions", ar: "أدلّة لا افتراضات" },
+      text: {
+        de: "„Weiß ich noch nicht“ ist eine vollständige Antwort, wenn danach steht, wie man es herausfindet. Aus Unsicherheit wird bei uns keine Gewissheit gemacht.",
+        tr: "Arkasından nasıl öğrenileceği geliyorsa, „henüz bilmiyorum“ tam bir cevaptır. Belirsizliği kesinliğe çevirmeyiz.",
+        en: "„I don't know yet“ is a complete answer if it is followed by how you would find out. We do not convert uncertainty into certainty.",
+        ar: "«لا أعرف بعد» جواب كامل إذا تبعه كيف ستكتشف. لا نحوّل عدم اليقين إلى يقين.",
+      },
     },
     {
-      de: "Sie ist kurz und hat eine Grenze. Wenn sie ein Wochenende kostet, ist sie falsch gestellt.",
-      tr: "Kısadır ve sınırı vardır. Bir hafta sonunu alıyorsa yanlış kurulmuştur.",
-      en: "It is short and bounded. If it costs a weekend, it was set badly.",
-      ar: "قصيرة ولها حدّ. إن كلّفت عطلة أسبوع فقد صيغت خطأ.",
+      titel: { de: "Keine Gratisarbeit", tr: "Bedava iş yok", en: "No free work", ar: "لا عمل مجّاني" },
+      text: {
+        de: "Die Aufgabe ist nie ein echtes Kundenprojekt. Wenn sie ein Wochenende kostet, ist sie falsch gestellt.",
+        tr: "Görev asla gerçek bir müşteri projesi değildir. Bir hafta sonunu alıyorsa yanlış kurulmuştur.",
+        en: "The task is never a real client project. If it costs a weekend, it was set badly.",
+        ar: "المهمّة ليست مشروع عميل حقيقي أبدًا. وإن كلّفت عطلة أسبوع فقد صيغت خطأ.",
+      },
     },
     {
-      de: "KI ist erlaubt. Sagen Sie dazu, wofür Sie sie benutzt haben und woran Sie das Ergebnis geprüft haben.",
-      tr: "Yapay zekâ serbest. Ne için kullandığınızı ve sonucu neye göre denetlediğinizi belirtin.",
-      en: "AI is allowed. Tell us what you used it for and how you checked the result.",
-      ar: "الذكاء الاصطناعي مسموح. أخبرنا فيمَ استخدمته وكيف تحقّقت من النتيجة.",
+      titel: { de: "KI mit Urteil", tr: "Yargıyla yapay zekâ", en: "AI with judgment", ar: "ذكاء اصطناعي مع حُكم" },
+      text: {
+        de: "Benutzen Sie KI, wo sie schneller ist. Sagen Sie dazu, was sie gemacht hat, was Sie gemacht haben und woran Sie das Ergebnis geprüft haben.",
+        tr: "Hızlandırdığı yerde yapay zekâyı kullanın. Onun ne yaptığını, sizin ne yaptığınızı ve sonucu neye göre denetlediğinizi söyleyin.",
+        en: "Use AI where it is faster. Tell us what it did, what you did, and how you checked the result.",
+        ar: "استخدم الذكاء الاصطناعي حيث يكون أسرع. وأخبرنا ماذا فعل، وماذا فعلت أنت، وكيف تحقّقت من النتيجة.",
+      },
     },
-    {
-      de: "Bewertet wird der Gedanke, nicht die Präsentation. Kamera, Licht, Raum und Akzent zählen nicht.",
-      tr: "Sunum değil düşünce değerlendirilir. Kamera, ışık, mekân ve aksan sayılmaz.",
-      en: "We assess the thinking, not the presentation. Camera, light, room and accent do not count.",
-      ar: "نقيّم التفكير لا العرض. الكاميرا والإضاءة والمكان واللهجة لا تُحتسب.",
-    },
-  ] as Localized[],
+  ] as Punkt[],
+  nichtBewertet: {
+    de: "Nicht bewertet werden Kamera, Licht, Raum, Kleidung, Akzent und Schnitt. Wir sehen auf den Gedanken, nicht auf die Vorführung.",
+    tr: "Kamera, ışık, mekân, kıyafet, aksan ve kurgu değerlendirilmez. Sunuma değil düşünceye bakarız.",
+    en: "We do not assess camera, light, room, clothing, accent or editing. We look at the thinking, not the performance.",
+    ar: "لا نقيّم الكاميرا أو الإضاءة أو المكان أو الملابس أو اللهجة أو المونتاج. ننظر إلى التفكير لا إلى العرض.",
+  } as Localized,
 }
 
-/* ── 07 · Häufige Fragen ─────────────────────────────────────────────────── */
+/* ═════════════════════════════════════════════════════════════════════════
+ * KAPITEL 4 · DER STAND
+ * ═════════════════════════════════════════════════════════════════════════ */
 
-export const fragen = {
-  eyebrow: { de: "Offene Fragen", tr: "Sorular", en: "Open questions", ar: "أسئلة" } as Localized,
+export const stand = {
+  eyebrow: { de: "Kapitel 4 · Der Stand", tr: "Bölüm 4 · Durum", en: "Chapter 4 · Where things stand", ar: "الفصل 4 · الوضع" } as Localized,
   titel: {
-    de: "Was Sie vermutlich zuerst wissen wollen.",
-    tr: "Muhtemelen önce merak ettikleriniz.",
-    en: "What you probably want to know first.",
-    ar: "ما تريد معرفته أولًا على الأرجح.",
+    de: "Was Sie heute tun können.",
+    tr: "Bugün ne yapabilirsiniz.",
+    en: "What you can do today.",
+    ar: "ما يمكنك فعله اليوم.",
   } as Localized,
-  eintraege: [
+  text: {
+    de: "Keine der beiden Spuren ist heute eine ausgeschriebene Stelle. Wir lernen jetzt Menschen kennen, mit denen wir arbeiten wollen, sobald es so weit ist — mit Gespräch, ohne Zusage. Wer sich vorstellt, bekommt eine Antwort.",
+    tr: "İki yol da bugün ilan edilmiş bir pozisyon değil. Zamanı geldiğinde birlikte çalışmak istediğimiz insanlarla şimdiden tanışıyoruz — görüşme var, taahhüt yok. Kendini tanıtan bir cevap alır.",
+    en: "Neither path is an advertised position today. We are getting to know the people we want to work with once the time comes — a conversation, not a commitment. Everyone who introduces themselves gets a reply.",
+    ar: "لا يمثّل أيٌّ من المسارين وظيفة معلنة اليوم. نتعرّف الآن على من نريد العمل معهم حين يحين الوقت — حديث، لا التزام. وكل من يعرّف بنفسه يحصل على ردّ.",
+  } as Localized,
+  fragen: [
     {
       titel: {
-        de: "Gibt es schon ein Büro in Istanbul?",
-        tr: "İstanbul'da ofis var mı?",
-        en: "Is there already an office in Istanbul?",
-        ar: "هل يوجد مكتب في إسطنبول؟",
+        de: "Ist das eine offene Stelle?",
+        tr: "Bu açık bir pozisyon mu?",
+        en: "Is this an open position?",
+        ar: "هل هذه وظيفة مفتوحة؟",
       },
       text: {
-        de: "Nein. Geplant ist remote-first mit gemeinsamen Tagen und einem Raum, wenn er gebraucht wird. Wo der liegt und ab wann, steht nicht fest.",
-        tr: "Hayır. Plan: önce uzaktan, ortak günler ve gerektiğinde bir mekân. Nerede ve ne zaman olacağı belli değil.",
-        en: "No. The plan is remote-first with shared days and a room when one is needed. Where and from when is not decided.",
-        ar: "لا. الخطة عن بُعد أولًا مع أيام مشتركة ومكان عند الحاجة. أين ومتى غير محدَّد.",
-      },
-    },
-    {
-      titel: {
-        de: "Sind das offene Stellen?",
-        tr: "Bunlar açık pozisyon mu?",
-        en: "Are these open positions?",
-        ar: "هل هذه وظائف مفتوحة؟",
-      },
-      text: {
-        de: "Nein. Beide Spuren stehen auf Talent Pool. Wir lernen jetzt Menschen kennen; eine Zusage kann daraus erst werden, wenn eine Stelle wirklich freigegeben ist.",
-        tr: "Hayır. İki yol da yetenek havuzunda. Şimdi tanışıyoruz; taahhüt ancak bir pozisyon gerçekten onaylandığında doğabilir.",
-        en: "No. Both tracks are talent pool. We are meeting people now; a commitment can only follow once a position is genuinely approved.",
-        ar: "لا. كلا المسارين ضمن مجموعة المواهب. نتعرّف الآن؛ ولا يأتي الالتزام إلا بعد اعتماد وظيفة فعليًا.",
-      },
-    },
-    {
-      titel: {
-        de: "Ist Januar 2027 zugesagt?",
-        tr: "Ocak 2027 kesin mi?",
-        en: "Is January 2027 guaranteed?",
-        ar: "هل يناير 2027 مؤكّد؟",
-      },
-      text: {
-        de: "Nein. 2027 ist die Absicht, kein Termin. Wer zuerst dazukommt, hängt daran, wo der Engpass liegt — bei der Nachfrage oder bei der Lieferung.",
-        tr: "Hayır. 2027 bir niyet, tarih değil. Kimin önce katılacağı darboğazın nerede olduğuna bağlı — talepte mi, teslimde mi.",
-        en: "No. 2027 is the intention, not a date. Who joins first depends on where the bottleneck is — demand or delivery.",
-        ar: "لا. 2027 نيّة لا موعد. ومن ينضم أولًا يعتمد على موضع الاختناق — في الطلب أم في التسليم.",
+        de: "Nein. Beide Wege stehen auf Talent Pool. Eine Zusage kann daraus erst werden, wenn eine Stelle wirklich freigegeben ist.",
+        tr: "Hayır. İki yol da yetenek havuzunda. Taahhüt ancak bir pozisyon gerçekten onaylandığında doğabilir.",
+        en: "No. Both paths are talent pool. A commitment can only follow once a position is genuinely approved.",
+        ar: "لا. كلا المسارين ضمن مجموعة المواهب. ولا يأتي الالتزام إلا بعد اعتماد وظيفة فعليًا.",
       },
     },
     {
@@ -473,10 +333,10 @@ export const fragen = {
         ar: "هل أحتاج الألمانية؟",
       },
       text: {
-        de: "Für Business Development ja — weil die Gespräche auf Deutsch stattfinden. Für Founding Talent nicht. Gemessen wird, ob Sie ein Gespräch führen können, nicht Herkunft, Pass oder Akzent.",
-        tr: "İş geliştirme için evet — görüşmeler Almanca yapılıyor. Founding Talent için gerekmiyor. Ölçtüğümüz şey görüşme yürütebilmeniz; köken, pasaport ya da aksan değil.",
-        en: "For business development yes — the conversations happen in German. For Founding Talent no. What is measured is whether you can hold a conversation, not origin, passport or accent.",
-        ar: "لتطوير الأعمال نعم — فالأحاديث تجري بالألمانية. أما Founding Talent فلا. المقياس هو قدرتك على إدارة حديث، لا الأصل أو الجواز أو اللهجة.",
+        de: "Für Business Development ja — die Gespräche mit Betrieben finden auf Deutsch statt. Für Produkt & Systeme nicht. Gemessen wird, ob Sie ein Gespräch führen können, nicht Herkunft, Pass oder Akzent.",
+        tr: "İş geliştirme için evet — işletmelerle görüşmeler Almanca yapılıyor. Ürün & Sistemler için gerekmiyor. Ölçtüğümüz şey görüşme yürütebilmeniz; köken, pasaport ya da aksan değil.",
+        en: "For business development yes — the conversations with businesses happen in German. For product & systems, no. What is measured is whether you can hold a conversation, not origin, passport or accent.",
+        ar: "لتطوير الأعمال نعم — فالأحاديث مع المنشآت تجري بالألمانية. أمّا المنتج والأنظمة فلا. المقياس قدرتك على إدارة حديث، لا الأصل أو الجواز أو اللهجة.",
       },
     },
     {
@@ -487,10 +347,10 @@ export const fragen = {
         ar: "هل أستطيع التقدّم كطالب أو في بداية مساري؟",
       },
       text: {
-        de: "Ja, über Founding Talent. Wir lesen, was Sie gebaut haben — nicht, wo Sie studiert haben. Ein Semesterprojekt, das läuft, sagt mehr als eine Note.",
-        tr: "Evet, Founding Talent üzerinden. Nerede okuduğunuza değil, ne yaptığınıza bakarız. Çalışan bir dönem projesi, bir nottan fazlasını söyler.",
-        en: "Yes, through Founding Talent. We read what you built — not where you studied. A term project that runs says more than a grade.",
-        ar: "نعم، عبر Founding Talent. نقرأ ما بنيتَه — لا أين درست. مشروع فصلي يعمل يقول أكثر من درجة.",
+        de: "Ja. Ein Semesterprojekt, das läuft, sagt mehr als eine Note. Wir lesen, was Sie gebaut haben.",
+        tr: "Evet. Çalışan bir dönem projesi, bir nottan fazlasını söyler. Ne yaptığınıza bakarız.",
+        en: "Yes. A term project that runs says more than a grade. We read what you built.",
+        ar: "نعم. مشروع فصلي يعمل يقول أكثر من درجة. نقرأ ما بنيتَه.",
       },
     },
     {
@@ -501,35 +361,17 @@ export const fragen = {
         ar: "ماذا يحدث لبياناتي؟",
       },
       text: {
-        de: "Heute nimmt die Seite noch keine Bewerbungen entgegen — es gibt keinen Speicher dafür, und in den Vertriebsbestand gehören Bewerbungen nicht. Der Weg, der heute funktioniert, steht am Ende des Formulars.",
-        tr: "Bugün site henüz başvuru almıyor — bunun için bir kayıt yeri yok ve başvurular satış kayıtlarına ait değil. Bugün işleyen yol formun sonunda yazıyor.",
-        en: "Today the site does not yet accept applications — there is no store for them, and applications do not belong in the sales records. The route that works today is stated at the end of the form.",
-        ar: "اليوم لا يستقبل الموقع الطلبات بعد — لا يوجد مخزن لها، والطلبات لا تنتمي إلى سجلّات المبيعات. الطريق الذي يعمل اليوم مذكور في نهاية النموذج.",
+        de: "Wir führen noch kein Bewerbersystem. Sie stellen Ihre Angaben am Ende des Formulars zusammen und übergeben sie selbst — in den Vertriebsbestand gehören sie nicht.",
+        tr: "Henüz bir başvuru sistemimiz yok. Bilgilerinizi formun sonunda derleyip kendiniz iletiyorsunuz — satış kayıtlarına ait değiller.",
+        en: "We do not run an applicant system yet. You assemble your answers at the end of the form and hand them over yourself — they do not belong in the sales records.",
+        ar: "لا نُشغّل نظام متقدّمين بعد. تجمع إجاباتك في نهاية النموذج وتسلّمها بنفسك — وهي لا تنتمي إلى سجلّات المبيعات.",
       },
     },
   ] as Punkt[],
 }
 
-/* ── 08 · Der Abschluss ──────────────────────────────────────────────────── */
-
-export const abschluss = {
-  eyebrow: { de: "Nächster Schritt", tr: "Sonraki adım", en: "Next step", ar: "الخطوة التالية" } as Localized,
-  titel: {
-    de: "Wenn Sie das hier gelesen haben und weitermachen wollen.",
-    tr: "Buraya kadar okuduysanız ve devam etmek istiyorsanız.",
-    en: "If you have read this far and want to continue.",
-    ar: "إن قرأت إلى هنا وأردت المتابعة.",
-  } as Localized,
-  text: {
-    de: "Ein kurzes Formular, ein Link auf etwas, das Sie gebaut haben, und drei Sätze dazu, warum creaDIG. Mehr braucht es für den ersten Schritt nicht.",
-    tr: "Kısa bir form, yaptığınız bir şeye bağlantı ve neden creaDIG olduğuna dair üç cümle. İlk adım için fazlası gerekmez.",
-    en: "A short form, a link to something you built, and three sentences on why creaDIG. Nothing more is needed for the first step.",
-    ar: "نموذج قصير، ورابط لشيء بنيتَه، وثلاث جمل عن سبب اختيارك creaDIG. لا حاجة لأكثر من ذلك في الخطوة الأولى.",
-  } as Localized,
-}
-
 /* ═════════════════════════════════════════════════════════════════════════
- * SPUR A · DACH BUSINESS DEVELOPMENT
+ * SPUR A · BUSINESS DEVELOPMENT
  * ═════════════════════════════════════════════════════════════════════════ */
 
 export const spurA = {
@@ -543,7 +385,7 @@ export const spurA = {
   warumEsGibt: {
     eyebrow: { de: "Warum es diese Rolle gibt", tr: "Bu rol neden var", en: "Why this role exists", ar: "لماذا يوجد هذا الدور" } as Localized,
     text: {
-      de: "creaDIG verkauft heute über den Inhaber. Das funktioniert, solange er selbst im Gespräch sitzt — und es hört auf zu funktionieren, sobald er gleichzeitig bauen soll. Was fehlt, ist niemand, der Angebote hinterherruft. Was fehlt, ist jemand, der Betriebe findet, versteht und so beschreibt, dass ein Systemgespräch überhaupt Sinn ergibt.",
+      de: "creaDIG verkauft heute über den Inhaber. Das funktioniert, solange er selbst im Gespräch sitzt — und es hört auf zu funktionieren, sobald er gleichzeitig bauen soll. Was fehlt, ist niemand, der Angeboten hinterherruft. Was fehlt, ist jemand, der Betriebe findet, versteht und so beschreibt, dass ein Systemgespräch überhaupt Sinn ergibt.",
       tr: "creaDIG bugün sahibi üzerinden satıyor. Bu, o görüşmede oturduğu sürece işliyor — aynı anda üretmesi gerektiğinde işlemez oluyor. Eksik olan, tekliflerin peşinden koşan biri değil. Eksik olan; işletmeleri bulan, anlayan ve sistem görüşmesini anlamlı kılacak şekilde tarif eden biri.",
       en: "Today creaDIG sells through its owner. That works as long as he is in the conversation himself — and stops working the moment he is also supposed to build. What is missing is not someone chasing quotes. What is missing is someone who finds businesses, understands them, and describes them so that a system conversation makes sense at all.",
       ar: "تبيع creaDIG اليوم عبر صاحبها. ينجح ذلك ما دام حاضرًا في الحديث — ويتوقّف حين يُطلب منه البناء في الوقت نفسه. الناقص ليس من يلاحق العروض، بل من يجد المنشآت ويفهمها ويصفها بحيث يصبح حديث النظام ذا معنى.",
@@ -556,28 +398,28 @@ export const spurA = {
       {
         titel: { de: "Betriebe lesen", tr: "İşletmeleri okumak", en: "Read businesses", ar: "قراءة المنشآت" },
         text: {
-          de: "Öffentlich sichtbare Signale sammeln: Auftritt, Kontaktwege, Bewertungen, Stellenanzeigen, Öffnungszeiten, Terminbuchung. Und daraus eine Frage bauen, keine Behauptung.",
-          tr: "Herkese açık sinyalleri toplamak: görünüm, iletişim yolları, yorumlar, ilanlar, çalışma saatleri, randevu. Ve bundan bir iddia değil, bir soru kurmak.",
-          en: "Collect publicly visible signals: presence, contact routes, reviews, job ads, opening hours, booking. And build a question from them, not a claim.",
-          ar: "جمع الإشارات العلنية: الحضور، وقنوات التواصل، والتقييمات، وإعلانات التوظيف، وساعات العمل، والحجز. ثم بناء سؤال منها، لا ادّعاء.",
+          de: "Öffentlich sichtbare Signale sammeln — und daraus eine Frage bauen, keine Behauptung.",
+          tr: "Herkese açık sinyalleri toplamak — ve bundan bir iddia değil, bir soru kurmak.",
+          en: "Collect publicly visible signals — and build a question from them, not a claim.",
+          ar: "جمع الإشارات العلنية — وبناء سؤال منها، لا ادّعاء.",
         },
       },
       {
         titel: { de: "Gespräche führen", tr: "Görüşme yürütmek", en: "Hold conversations", ar: "إدارة الأحاديث" },
         text: {
-          de: "Auf Deutsch, mit Inhaberinnen und Betriebsleitern. Zuhören, nachfragen, mitschreiben — und aushalten, wenn die Antwort die eigene Vermutung widerlegt.",
-          tr: "Almanca, işletme sahipleri ve yöneticileriyle. Dinlemek, sormak, not almak — ve cevap kendi varsayımınızı çürüttüğünde buna katlanmak.",
-          en: "In German, with owners and operations managers. Listen, ask, write it down — and accept it when the answer disproves your own assumption.",
-          ar: "بالألمانية، مع أصحاب المنشآت ومديري التشغيل. الإصغاء والسؤال والتدوين — وتقبّل أن يدحض الجواب افتراضك.",
+          de: "Auf Deutsch, mit Inhaberinnen und Betriebsleitern. Zuhören, nachfragen — und aushalten, wenn die Antwort die eigene Vermutung widerlegt.",
+          tr: "Almanca, işletme sahipleri ve yöneticileriyle. Dinlemek, sormak — ve cevap kendi varsayımınızı çürüttüğünde buna katlanmak.",
+          en: "In German, with owners and operations managers. Listen, ask — and accept it when the answer disproves your own assumption.",
+          ar: "بالألمانية، مع أصحاب المنشآت ومديري التشغيل. الإصغاء والسؤال — وتقبّل أن يدحض الجواب افتراضك.",
         },
       },
       {
         titel: { de: "Befunde festhalten", tr: "Bulguları kayda geçirmek", en: "Record findings", ar: "توثيق النتائج" },
         text: {
-          de: "Ein kurzer Vorgangs-Befund: was beobachtet, was gefragt, was bestätigt, was offen. Mit Fundstelle. Ohne Fundstelle ist es eine Erinnerung.",
-          tr: "Kısa bir vaka bulgusu: ne gözlendi, ne soruldu, ne doğrulandı, ne açık kaldı. Kaynağıyla. Kaynağı yoksa o bir hatıradır.",
-          en: "A short case finding: what was observed, asked, confirmed, still open. With a source. Without a source it is a memory.",
-          ar: "تقرير حالة قصير: ما لوحظ، وما سُئل، وما تأكّد، وما بقي مفتوحًا. مع المصدر. وبلا مصدر يصبح ذكرى.",
+          de: "Was beobachtet, was gefragt, was bestätigt, was offen — mit Fundstelle. Ohne Fundstelle ist es eine Erinnerung.",
+          tr: "Ne gözlendi, ne soruldu, ne doğrulandı, ne açık kaldı — kaynağıyla. Kaynağı yoksa o bir hatıradır.",
+          en: "What was observed, asked, confirmed, still open — with a source. Without a source it is a memory.",
+          ar: "ما لوحظ وما سُئل وما تأكّد وما بقي مفتوحًا — مع المصدر. وبلا مصدر يصبح ذكرى.",
         },
       },
       {
@@ -593,38 +435,12 @@ export const spurA = {
   },
 
   tutNicht: {
-    eyebrow: { de: "Was Sie nicht tun würden", tr: "Ne yapmazdınız", en: "What you would not do", ar: "ما لن تفعله" } as Localized,
+    eyebrow: { de: "Und was nicht", tr: "Ve ne değil", en: "And what not", ar: "وما لا" } as Localized,
     punkte: [
-      {
-        de: "Probleme erfinden, die niemand bestätigt hat.",
-        tr: "Kimsenin doğrulamadığı sorunlar uydurmak.",
-        en: "Invent problems nobody has confirmed.",
-        ar: "اختلاق مشكلات لم يؤكّدها أحد.",
-      },
-      {
-        de: "Architektur, Umfang oder Termine zusagen.",
-        tr: "Mimari, kapsam ya da tarih taahhüt etmek.",
-        en: "Promise architecture, scope or dates.",
-        ar: "الوعد ببنية أو نطاق أو مواعيد.",
-      },
-      {
-        de: "Preise verhandeln oder Nachlässe geben.",
-        tr: "Fiyat pazarlığı yapmak ya da indirim vermek.",
-        en: "Negotiate prices or grant discounts.",
-        ar: "التفاوض على الأسعار أو منح خصومات.",
-      },
-      {
-        de: "Recherchierte Betriebe in Massen anschreiben.",
-        tr: "Araştırılan işletmelere toplu mesaj atmak.",
-        en: "Mass-contact researched businesses.",
-        ar: "مراسلة المنشآت المبحوثة بالجملة.",
-      },
-      {
-        de: "Aus jedem recherchierten Betrieb einen Vorgang machen.",
-        tr: "Araştırılan her işletmeyi bir vakaya çevirmek.",
-        en: "Turn every researched business into a case.",
-        ar: "تحويل كل منشأة مبحوثة إلى حالة.",
-      },
+      { de: "Probleme erfinden, die niemand bestätigt hat.", tr: "Kimsenin doğrulamadığı sorunlar uydurmak.", en: "Invent problems nobody has confirmed.", ar: "اختلاق مشكلات لم يؤكّدها أحد." },
+      { de: "Architektur, Umfang oder Termine zusagen.", tr: "Mimari, kapsam ya da tarih taahhüt etmek.", en: "Promise architecture, scope or dates.", ar: "الوعد ببنية أو نطاق أو مواعيد." },
+      { de: "Preise verhandeln oder Nachlässe geben.", tr: "Fiyat pazarlığı yapmak ya da indirim vermek.", en: "Negotiate prices or grant discounts.", ar: "التفاوض على الأسعار أو منح خصومات." },
+      { de: "Recherchierte Betriebe in Massen anschreiben.", tr: "Araştırılan işletmelere toplu mesaj atmak.", en: "Mass-contact researched businesses.", ar: "مراسلة المنشآت المبحوثة بالجملة." },
     ] as Localized[],
     grenze: {
       de: "Angebot, Preis, Architektur und die tiefere Systemberatung bleiben beim Inhaber. Das ist keine Bevormundung, sondern die Grenze, die verhindert, dass jemand im Gespräch etwas zusagt, das danach gebaut werden muss.",
@@ -634,7 +450,7 @@ export const spurA = {
     } as Localized,
   },
 
-  /* Die Kette — das eine Diagramm dieser Seite. */
+  /* Das stärkste Element der ersten Fassung — bleibt, unverändert in der Sache. */
   kette: {
     eyebrow: { de: "Beleg statt Vermutung", tr: "Varsayım değil kanıt", en: "Evidence, not assumption", ar: "دليل لا افتراض" } as Localized,
     titel: {
@@ -646,32 +462,17 @@ export const spurA = {
     stufen: [
       {
         stufe: { de: "Signal", tr: "Sinyal", en: "Signal", ar: "إشارة" },
-        text: {
-          de: "Auf der Website steht ein WhatsApp-Knopf.",
-          tr: "Sitede bir WhatsApp düğmesi var.",
-          en: "There is a WhatsApp button on the website.",
-          ar: "يوجد زر واتساب على الموقع.",
-        },
+        text: { de: "Auf der Website steht ein WhatsApp-Knopf.", tr: "Sitede bir WhatsApp düğmesi var.", en: "There is a WhatsApp button on the website.", ar: "يوجد زر واتساب على الموقع." },
         art: "beleg" as const,
       },
       {
         stufe: { de: "Beobachtung", tr: "Gözlem", en: "Observation", ar: "ملاحظة" },
-        text: {
-          de: "Kunden können den Betrieb über WhatsApp erreichen.",
-          tr: "Müşteriler işletmeye WhatsApp'tan ulaşabiliyor.",
-          en: "Customers can reach the business via WhatsApp.",
-          ar: "يستطيع العملاء الوصول إلى المنشأة عبر واتساب.",
-        },
+        text: { de: "Kunden können den Betrieb über WhatsApp erreichen.", tr: "Müşteriler işletmeye WhatsApp'tan ulaşabiliyor.", en: "Customers can reach the business via WhatsApp.", ar: "يستطيع العملاء الوصول إلى المنشأة عبر واتساب." },
         art: "beleg" as const,
       },
       {
         stufe: { de: "Vermutung", tr: "Varsayım", en: "Hypothesis", ar: "افتراض" },
-        text: {
-          de: "Vielleicht wird jede Anfrage von Hand weiterverarbeitet.",
-          tr: "Belki her talep elle işleniyordur.",
-          en: "Perhaps every enquiry is processed by hand.",
-          ar: "ربما يُعالَج كل طلب يدويًا.",
-        },
+        text: { de: "Vielleicht wird jede Anfrage von Hand weiterverarbeitet.", tr: "Belki her talep elle işleniyordur.", en: "Perhaps every enquiry is processed by hand.", ar: "ربما يُعالَج كل طلب يدويًا." },
         art: "vermutung" as const,
       },
       {
@@ -702,125 +503,53 @@ export const spurA = {
       ar: "الاختصار هو تحويل الإشارة مباشرة إلى حاجة وإرسال عرض. ينجح أحيانًا — وفي كل مرة يخطئ يكلّف الحديث كلّه.",
     } as Localized,
   },
-
-  entwicklung: {
-    eyebrow: { de: "Die ersten Monate", tr: "İlk aylar", en: "The first months", ar: "الأشهر الأولى" } as Localized,
-    hinweis: {
-      de: "Als Erwartung an die Einarbeitung gedacht, nicht als Zielvorgabe. Es gibt keine Stückzahlen.",
-      tr: "Bir hedef değil, uyum sürecine dair beklenti olarak. Adet hedefi yoktur.",
-      en: "Meant as an expectation for onboarding, not a target. There are no quotas.",
-      ar: "بوصفها توقّعًا لفترة التهيئة لا هدفًا. لا توجد حصص.",
-    } as Localized,
-    stufen: [
-      {
-        titel: { de: "Nach 30 Tagen", tr: "30 gün sonra", en: "After 30 days", ar: "بعد 30 يومًا" },
-        text: {
-          de: "Sie kennen creaDIG, die fünf Ebenen, die Angebotslogik und den Unterschied zwischen Beobachtung und Vermutung.",
-          tr: "creaDIG'i, beş katmanı, teklif mantığını ve gözlemle varsayım arasındaki farkı biliyorsunuz.",
-          en: "You know creaDIG, the five levels, the offer logic and the difference between observation and assumption.",
-          ar: "تعرف creaDIG والطبقات الخمس ومنطق العرض والفرق بين الملاحظة والافتراض.",
-        },
-      },
-      {
-        titel: { de: "Nach 60 Tagen", tr: "60 gün sonra", en: "After 60 days", ar: "بعد 60 يومًا" },
-        text: {
-          de: "Sie führen begleitete Gespräche und schreiben Befunde, die jemand anders lesen und weiterverwenden kann.",
-          tr: "Eşlik edilen görüşmeler yürütüyor ve başkasının okuyup kullanabileceği bulgular yazıyorsunuz.",
-          en: "You run accompanied conversations and write findings someone else can read and reuse.",
-          ar: "تدير أحاديث برفقة، وتكتب نتائج يستطيع غيرك قراءتها والبناء عليها.",
-        },
-      },
-      {
-        titel: { de: "Nach 90 Tagen", tr: "90 gün sonra", en: "After 90 days", ar: "بعد 90 يومًا" },
-        text: {
-          de: "Sie führen freigegebene Vorgänge eigenständig, fassen zuverlässig nach und wissen, wann Sie abgeben müssen.",
-          tr: "Onaylanmış vakaları kendiniz yürütüyor, düzenli takip ediyor ve ne zaman devretmeniz gerektiğini biliyorsunuz.",
-          en: "You run approved cases on your own, follow up reliably and know when to hand over.",
-          ar: "تدير الحالات المعتمدة بنفسك، وتتابع بانتظام، وتعرف متى تُحيل.",
-        },
-      },
-    ] as Punkt[],
-  },
 }
 
 /* ═════════════════════════════════════════════════════════════════════════
- * SPUR B · FOUNDING TALENT
+ * SPUR B · PRODUKT & SYSTEME
  * ═════════════════════════════════════════════════════════════════════════ */
 
 export const spurB = {
   lead: {
-    de: "Founding Talent ist kein Praktikum und kein Trainee-Pool. Es ist die Spur für Leute, die ein Handwerk ernst nehmen — Produkt, Engineering, Design, Automation, KI — und die dabei sein wollen, wenn eine Arbeitsweise entsteht, statt eine fertige zu übernehmen.",
-    tr: "Founding Talent ne staj ne de trainee havuzu. Bir zanaatı ciddiye alanlar için bir yol — ürün, engineering, tasarım, otomasyon, yapay zekâ — ve hazır bir çalışma biçimini devralmak yerine biçimin kurulduğu anda orada olmak isteyenler için.",
-    en: "Founding Talent is not an internship and not a trainee pool. It is the track for people who take a craft seriously — product, engineering, design, automation, AI — and who want to be there while a way of working is formed, instead of inheriting a finished one.",
-    ar: "‏Founding Talent ليس تدريبًا ولا مجموعة متدرّبين. إنه مسار لمن يأخذ حرفته على محمل الجدّ — المنتج والهندسة والتصميم والأتمتة والذكاء الاصطناعي — ولمن يريد الحضور بينما تتشكّل طريقة العمل، بدل أن يرث واحدة جاهزة.",
+    de: "Diese Spur ist für Leute, die ein Handwerk ernst nehmen — Produkt, Engineering, Design, Automation, KI — und die etwas bauen wollen, das danach im Alltag eines Betriebs bestehen muss.",
+    tr: "Bu yol, bir zanaatı ciddiye alanlar için — ürün, engineering, tasarım, otomasyon, yapay zekâ — ve sonrasında bir işletmenin gündelik akışında ayakta kalması gereken bir şey kurmak isteyenler için.",
+    en: "This path is for people who take a craft seriously — product, engineering, design, automation, AI — and who want to build something that then has to hold up in a business's daily work.",
+    ar: "هذا المسار لمن يأخذ حرفته على محمل الجدّ — المنتج والهندسة والتصميم والأتمتة والذكاء الاصطناعي — ولمن يريد بناء شيء عليه أن يصمد في العمل اليومي لمنشأة.",
   } as Localized,
 
-  wasFounding: {
-    eyebrow: { de: "Was „Founding“ heißt", tr: "„Founding“ ne demek", en: "What „founding“ means", ar: "ما معنى «Founding»" } as Localized,
+  wasEsIst: {
+    eyebrow: { de: "Der Unterschied", tr: "Fark", en: "The difference", ar: "الفرق" } as Localized,
     ist: [
-      {
-        de: "Sie sind unter den Ersten, die in Istanbul für creaDIG bauen.",
-        tr: "İstanbul'da creaDIG için üretecek ilk kişilerden birisiniz.",
-        en: "You are among the first to build for creaDIG in Istanbul.",
-        ar: "أنت من أوائل من يبنون لـ creaDIG في إسطنبول.",
-      },
-      {
-        de: "Sie arbeiten direkt mit dem Inhaber und Systemarchitekten, nicht über drei Ebenen hinweg.",
-        tr: "Üç kademe üzerinden değil, doğrudan sahibi ve sistem mimarıyla çalışırsınız.",
-        en: "You work directly with the owner and system architect, not across three layers.",
-        ar: "تعمل مباشرة مع صاحب المنشأة ومهندس النظام، لا عبر ثلاث طبقات.",
-      },
-      {
-        de: "Was Sie an der Arbeitsweise verbessern, bleibt — es gibt noch keinen Prozess, der Sie überstimmt.",
-        tr: "Çalışma biçiminde iyileştirdiğiniz şey kalır — sizi geçersiz kılacak bir süreç henüz yok.",
-        en: "What you improve about the way of working stays — there is no process yet to overrule you.",
-        ar: "ما تحسّنه في طريقة العمل يبقى — لا توجد عملية بعدُ تُلغي رأيك.",
-      },
+      { de: "Sie bauen an einem System, das jemand danach wirklich benutzt.", tr: "Sonrasında birinin gerçekten kullanacağı bir sistemi kurarsınız.", en: "You build a system that someone actually uses afterwards.", ar: "تبني نظامًا يستخدمه أحدهم فعلًا بعد ذلك." },
+      { de: "Sie arbeiten direkt mit dem Inhaber und Systemarchitekten, nicht über drei Ebenen hinweg.", tr: "Üç kademe üzerinden değil, doğrudan sahibi ve sistem mimarıyla çalışırsınız.", en: "You work directly with the owner and system architect, not across three layers.", ar: "تعمل مباشرة مع صاحب المنشأة ومهندس النظام، لا عبر ثلاث طبقات." },
+      { de: "Was Sie an der Arbeitsweise verbessern, bleibt.", tr: "Çalışma biçiminde iyileştirdiğiniz şey kalır.", en: "What you improve about the way of working stays.", ar: "ما تحسّنه في طريقة العمل يبقى." },
     ] as Localized[],
     istNicht: [
-      {
-        de: "Keine Gründerrolle, keine Firmenanteile, kein Titel als Mitgründer.",
-        tr: "Kurucu rolü değil, hisse değil, kurucu ortak unvanı değil.",
-        en: "Not a founder role, no equity, no co-founder title.",
-        ar: "ليس دور مؤسّس، ولا حصص، ولا لقب شريك مؤسّس.",
-      },
-      {
-        de: "Kein „jeder macht alles“. Ihr Handwerk bleibt Ihr Handwerk.",
-        tr: "„Herkes her işi yapar“ değil. Zanaatınız zanaatınız olarak kalır.",
-        en: "Not „everyone does everything“. Your craft stays your craft.",
-        ar: "ليس «الجميع يفعل كل شيء». حرفتك تبقى حرفتك.",
-      },
-      {
-        de: "Keine unbezahlte Arbeit und keine Probeprojekte für Kunden.",
-        tr: "Ücretsiz çalışma yok, müşteri için deneme projesi yok.",
-        en: "No unpaid work and no trial projects for clients.",
-        ar: "لا عمل بلا أجر ولا مشاريع تجريبية لعملاء.",
-      },
+      { de: "Kein „jeder macht alles“. Ihr Handwerk bleibt Ihr Handwerk.", tr: "„Herkes her işi yapar“ değil. Zanaatınız zanaatınız olarak kalır.", en: "Not „everyone does everything“. Your craft stays your craft.", ar: "ليس «الجميع يفعل كل شيء». حرفتك تبقى حرفتك." },
+      { de: "Keine unbezahlte Arbeit und keine Probeprojekte für Kunden.", tr: "Ücretsiz çalışma yok, müşteri için deneme projesi yok.", en: "No unpaid work and no trial projects for clients.", ar: "لا عمل بلا أجر ولا مشاريع تجريبية لعملاء." },
+      { de: "Keine Firmenanteile und kein Titel als Mitgründer.", tr: "Şirket hissesi yok, kurucu ortak unvanı yok.", en: "No equity and no co-founder title.", ar: "لا حصص ولا لقب شريك مؤسّس." },
     ] as Localized[],
   },
 
-  worauf: {
-    eyebrow: { de: "Worauf wir sehen", tr: "Neye bakıyoruz", en: "What we look at", ar: "على ماذا ننظر" } as Localized,
+  gemeinsam: {
+    eyebrow: { de: "Was die Handwerke verbindet", tr: "Alanları birleştiren şey", en: "What connects the crafts", ar: "ما يجمع الحِرَف" } as Localized,
     titel: {
-      de: "Wir lesen, was Sie gebaut haben — nicht, wo Sie waren.",
-      tr: "Nerede bulunduğunuzu değil, ne yaptığınızı okuruz.",
-      en: "We read what you built — not where you have been.",
-      ar: "نقرأ ما بنيتَه — لا أين كنت.",
+      de: "Anderes Handwerk. Dieselbe Verantwortung für das Ergebnis.",
+      tr: "Farklı zanaat. Sonuç için aynı sorumluluk.",
+      en: "A different craft. The same responsibility for the result.",
+      ar: "حرفة مختلفة. المسؤولية ذاتها عن النتيجة.",
     } as Localized,
-    fragen: [
-      { de: "Was haben Sie gemacht — und was davon war Ihr Anteil?", tr: "Ne yaptınız — ve bunun ne kadarı sizin payınızdı?", en: "What did you make — and which part was yours?", ar: "ماذا صنعت — وأيّ جزء كان لك؟" },
-      { de: "Was ist dabei kaputtgegangen?", tr: "Bu sırada ne bozuldu?", en: "What broke along the way?", ar: "ما الذي انكسر أثناء ذلك؟" },
-      { de: "Was haben Sie daraus gelernt?", tr: "Bundan ne öğrendiniz?", en: "What did you learn from it?", ar: "ماذا تعلّمت منه؟" },
-      { de: "Was haben Sie nach einer Rückmeldung geändert?", tr: "Bir geri bildirimden sonra neyi değiştirdiniz?", en: "What did you change after feedback?", ar: "ما الذي غيّرته بعد ملاحظة؟" },
-      { de: "Wo hat KI geholfen — und woran haben Sie das Ergebnis geprüft?", tr: "Yapay zekâ nerede yardımcı oldu — ve sonucu neye göre denetlediniz?", en: "Where did AI help — and how did you check the result?", ar: "أين ساعد الذكاء الاصطناعي — وكيف تحقّقت من النتيجة؟" },
+    punkte: [
+      { de: "Das Problem verstehen, bevor etwas entsteht.", tr: "Bir şey doğmadan önce sorunu anlamak.", en: "Understand the problem before anything is made.", ar: "فهم المشكلة قبل أن يُصنع شيء." },
+      { de: "Etwas Echtes bauen, nicht eine Ansicht davon.", tr: "Gerçek bir şey kurmak, onun bir görüntüsünü değil.", en: "Build something real, not a view of it.", ar: "بناء شيء حقيقي، لا صورة عنه." },
+      { de: "Die eigene Arbeit selbst prüfen, bevor sie jemand anders sieht.", tr: "Kendi işinizi, başkası görmeden önce kendiniz denetlemek.", en: "Test your own work before anyone else sees it.", ar: "فحص عملك بنفسك قبل أن يراه غيرك." },
+      { de: "Nach der Übergabe wissen, was im Betrieb daraus geworden ist.", tr: "Teslimden sonra, işleyişte ne olduğunu bilmek.", en: "After handover, know what became of it in daily operation.", ar: "بعد التسليم، معرفة ما آل إليه الأمر في التشغيل." },
     ] as Localized[],
-    nachweisLabel: {
-      de: "Als Nachweis zählt alles, was man sich ansehen kann",
-      tr: "Bakılabilen her şey kanıt sayılır",
-      en: "Anything one can actually look at counts as evidence",
-      ar: "كل ما يمكن الاطّلاع عليه يُعدّ دليلًا",
-    } as Localized,
-    nachweise: [
+  },
+
+  nachweise: {
+    eyebrow: { de: "Was als Nachweis zählt", tr: "Neler kanıt sayılır", en: "What counts as evidence", ar: "ما يُعدّ دليلًا" } as Localized,
+    liste: [
       { de: "Repository", tr: "Depo", en: "Repository", ar: "مستودع" },
       { de: "Portfolio", tr: "Portfolyo", en: "Portfolio", ar: "معرض أعمال" },
       { de: "Ein laufendes Produkt", tr: "Çalışan bir ürün", en: "A running product", ar: "منتج يعمل" },
@@ -835,36 +564,15 @@ export const spurB = {
       ar: "السيرة الذاتية ليست مطلوبة. إن أردت إرسالها فسنقرأها — لكنها لا تحسم شيئًا يجيب عنه رابط عملك بشكل أفضل.",
     } as Localized,
   },
-
-  ki: {
-    eyebrow: { de: "KI im Alltag", tr: "Günlük işte yapay zekâ", en: "AI in daily work", ar: "الذكاء الاصطناعي في العمل اليومي" } as Localized,
-    titel: {
-      de: "Wir arbeiten mit KI. Die Verantwortung bleibt beim Menschen.",
-      tr: "Yapay zekâ ile çalışıyoruz. Sorumluluk insanda kalıyor.",
-      en: "We work with AI. The responsibility stays human.",
-      ar: "نعمل بالذكاء الاصطناعي. وتبقى المسؤولية بشرية.",
-    } as Localized,
-    text: {
-      de: "Wir erwarten nicht, dass jemand ohne KI arbeitet, und wir erwarten auch nicht, dass jemand ihr glaubt. Der Unterschied, auf den es ankommt: Zerlegt jemand eine Aufgabe so, dass er das Ergebnis überhaupt prüfen kann — und weiß er, was er nicht automatisieren würde und wo Kundendaten nichts zu suchen haben.",
-      tr: "Kimsenin yapay zekâsız çalışmasını beklemiyoruz; ona inanmasını da beklemiyoruz. Asıl fark şu: Kişi görevi, sonucu denetleyebilecek şekilde parçalara ayırıyor mu — ve neyi otomatikleştirmeyeceğini, müşteri verisinin nerede işi olmadığını biliyor mu.",
-      en: "We do not expect anyone to work without AI, and we do not expect anyone to believe it either. The difference that matters: does someone break a task down so the result can be checked at all — and do they know what they would not automate and where client data has no business being.",
-      ar: "لا نتوقّع أن يعمل أحد دون ذكاء اصطناعي، ولا نتوقّع أن يصدّقه. الفارق المهم: هل يفكّك المهمة بحيث يمكن التحقّق من النتيجة أصلًا — وهل يعرف ما لن يُؤتمته وأين لا مكان لبيانات العملاء.",
-    } as Localized,
-  },
 }
 
 /* ═════════════════════════════════════════════════════════════════════════
- * BEWERBEN
+ * VORSTELLEN
  * ═════════════════════════════════════════════════════════════════════════ */
 
 export const bewerben = {
   eyebrow: { de: "Vorstellen", tr: "Tanışma", en: "Introduce yourself", ar: "التعريف" } as Localized,
-  titel: {
-    de: "Vier Schritte. Kein Lebenslauf.",
-    tr: "Dört adım. CV yok.",
-    en: "Four steps. No CV.",
-    ar: "أربع خطوات. بلا سيرة ذاتية.",
-  } as Localized,
+  titel: { de: "Vier Schritte. Kein Lebenslauf.", tr: "Dört adım. CV yok.", en: "Four steps. No CV.", ar: "أربع خطوات. بلا سيرة ذاتية." } as Localized,
   lead: {
     de: "Wir fragen nur, was wir für den ersten Schritt wirklich brauchen. Kein Geburtsdatum, keine Adresse, kein Foto.",
     tr: "İlk adım için gerçekten gerekeni soruyoruz. Doğum tarihi yok, adres yok, fotoğraf yok.",
@@ -872,7 +580,7 @@ export const bewerben = {
     ar: "نسأل فقط عمّا تحتاجه الخطوة الأولى فعلًا. لا تاريخ ميلاد ولا عنوان ولا صورة.",
   } as Localized,
   schritte: [
-    { de: "Ihre Spur", tr: "Yolunuz", en: "Your track", ar: "مسارك" },
+    { de: "Ihr Weg", tr: "Yolunuz", en: "Your path", ar: "مسارك" },
     { de: "Kontakt", tr: "İletişim", en: "Contact", ar: "التواصل" },
     { de: "Ihre Arbeit", tr: "İşiniz", en: "Your work", ar: "عملك" },
     { de: "Kurz zu Ihnen", tr: "Kısaca siz", en: "A little context", ar: "لمحة عنك" },
@@ -890,77 +598,34 @@ export const bewerben = {
       ar: "واحد على الأقل. مستودع أو أعمال أو منتج يعمل أو تسجيل — ما تستطيع عرضه.",
     } as Localized,
     warum: { de: "Warum creaDIG?", tr: "Neden creaDIG?", en: "Why creaDIG?", ar: "لماذا creaDIG؟" } as Localized,
-    gebaut: {
-      de: "Woran haben Sie zuletzt gearbeitet? (optional)",
-      tr: "Son olarak ne üzerinde çalıştınız? (isteğe bağlı)",
-      en: "What did you work on most recently? (optional)",
-      ar: "على ماذا عملت مؤخرًا؟ (اختياري)",
-    } as Localized,
-    sprachen: {
-      de: "Sprachen (optional)",
-      tr: "Diller (isteğe bağlı)",
-      en: "Languages (optional)",
-      ar: "اللغات (اختياري)",
-    } as Localized,
-    verfuegbar: {
-      de: "Ab wann könnten Sie? (optional)",
-      tr: "Ne zamandan itibaren müsaitsiniz? (isteğe bağlı)",
-      en: "From when would you be available? (optional)",
-      ar: "متى يمكنك البدء؟ (اختياري)",
-    } as Localized,
+    gebaut: { de: "Woran haben Sie zuletzt gearbeitet? (optional)", tr: "Son olarak ne üzerinde çalıştınız? (isteğe bağlı)", en: "What did you work on most recently? (optional)", ar: "على ماذا عملت مؤخرًا؟ (اختياري)" } as Localized,
+    sprachen: { de: "Sprachen (optional)", tr: "Diller (isteğe bağlı)", en: "Languages (optional)", ar: "اللغات (اختياري)" } as Localized,
+    verfuegbar: { de: "Ab wann könnten Sie? (optional)", tr: "Ne zamandan itibaren müsaitsiniz? (isteğe bağlı)", en: "From when would you be available? (optional)", ar: "متى يمكنك البدء؟ (اختياري)" } as Localized,
   },
   weiter: { de: "Weiter", tr: "Devam", en: "Continue", ar: "متابعة" } as Localized,
-  abschliessen: {
-    de: "Angaben zusammenstellen",
-    tr: "Bilgileri derle",
-    en: "Assemble your answers",
-    ar: "اجمع إجاباتك",
-  } as Localized,
+  abschliessen: { de: "Angaben zusammenstellen", tr: "Bilgileri derle", en: "Assemble your answers", ar: "اجمع إجاباتك" } as Localized,
   zurueck: { de: "Zurück", tr: "Geri", en: "Back", ar: "رجوع" } as Localized,
-  pflichtFehlt: {
-    de: "Diese Angabe brauchen wir noch.",
-    tr: "Bu bilgi hâlâ gerekli.",
-    en: "We still need this.",
-    ar: "ما زلنا بحاجة إلى هذه المعلومة.",
-  } as Localized,
-  emailUngueltig: {
-    de: "Diese E-Mail-Adresse können wir nicht lesen.",
-    tr: "Bu e-posta adresini okuyamıyoruz.",
-    en: "We cannot read this email address.",
-    ar: "لا نستطيع قراءة هذا البريد الإلكتروني.",
-  } as Localized,
+  pflichtFehlt: { de: "Diese Angabe brauchen wir noch.", tr: "Bu bilgi hâlâ gerekli.", en: "We still need this.", ar: "ما زلنا بحاجة إلى هذه المعلومة." } as Localized,
+  emailUngueltig: { de: "Diese E-Mail-Adresse können wir nicht lesen.", tr: "Bu e-posta adresini okuyamıyoruz.", en: "We cannot read this email address.", ar: "لا نستطيع قراءة هذا البريد الإلكتروني." } as Localized,
 
   /*
-   * DER SCHLUSS — und der Grund, warum hier kein „Danke, gespeichert" steht.
-   *
-   * Es gibt heute keinen Speicher fuer Bewerbungen. Eine Bestaetigung waere
-   * die teuerste Luege dieser Seite: Jemand haette seine Arbeit geschickt und
-   * wuerde warten. Also sagt der letzte Schritt, was wirklich ist — und nennt
-   * den Weg, der heute funktioniert.
+   * Der Schluss sagt, was ist — aber als Übergabe, nicht als Störung.
+   * Vorher stand dort „Die Annahme ist noch nicht scharf“; das erklärte
+   * unsere Technik statt seinen nächsten Schritt.
    */
   abschlussTitel: {
-    de: "Die Annahme über dieses Formular ist noch nicht scharf.",
-    tr: "Bu form üzerinden alım henüz aktif değil.",
-    en: "Intake through this form is not live yet.",
-    ar: "الاستقبال عبر هذا النموذج ليس مفعّلًا بعد.",
+    de: "Ihre Angaben stehen. Jetzt übergeben Sie sie.",
+    tr: "Bilgileriniz hazır. Şimdi iletin.",
+    en: "Your answers are ready. Now hand them over.",
+    ar: "إجاباتك جاهزة. سلّمها الآن.",
   } as Localized,
   abschlussText: {
-    de: "Wir speichern hier noch nichts — und wir wollen Ihnen keine Bestätigung zeigen, hinter der niemand steht. Bis die Annahme steht, geht der Weg über eine E-Mail: Nehmen Sie Ihre Angaben von hier, schicken Sie sie an uns, und wir antworten.",
-    tr: "Burada henüz hiçbir şey kaydetmiyoruz — ve arkasında kimsenin olmadığı bir onay göstermek istemiyoruz. Alım devreye girene kadar yol e-posta üzerinden: Buradaki bilgileri alın, bize gönderin, cevap verelim.",
-    en: "We do not store anything here yet — and we will not show you a confirmation with nobody behind it. Until intake is live, the route is email: take your answers from here, send them to us, and we will reply.",
-    ar: "لا نخزّن شيئًا هنا بعد — ولن نعرض تأكيدًا لا أحد خلفه. وحتى يُفعَّل الاستقبال، الطريق عبر البريد: خذ إجاباتك من هنا وأرسلها إلينا، وسنردّ.",
+    de: "Wir führen noch kein Bewerbersystem — und zeigen Ihnen deshalb keine Bestätigung, hinter der niemand steht. Prüfen Sie, was unten steht, und schicken Sie es direkt an uns. Sie bekommen eine Antwort.",
+    tr: "Henüz bir başvuru sistemi işletmiyoruz — bu yüzden arkasında kimsenin olmadığı bir onay göstermiyoruz. Aşağıdakini kontrol edin ve doğrudan bize gönderin. Cevap alacaksınız.",
+    en: "We do not run an applicant system yet — so we will not show you a confirmation with nobody behind it. Check what is below and send it straight to us. You will get a reply.",
+    ar: "لا نُشغّل نظام متقدّمين بعد — لذلك لن نعرض تأكيدًا لا أحد خلفه. راجع ما في الأسفل وأرسله إلينا مباشرة. وستحصل على ردّ.",
   } as Localized,
-  abschlussCta: {
-    de: "Angaben als E-Mail öffnen",
-    tr: "Bilgileri e-posta olarak aç",
-    en: "Open your answers as an email",
-    ar: "افتح إجاباتك كبريد إلكتروني",
-  } as Localized,
-  abschlussKopieren: {
-    de: "Angaben kopieren",
-    tr: "Bilgileri kopyala",
-    en: "Copy your answers",
-    ar: "انسخ إجاباتك",
-  } as Localized,
+  abschlussCta: { de: "Als E-Mail öffnen", tr: "E-posta olarak aç", en: "Open as an email", ar: "افتح كبريد إلكتروني" } as Localized,
+  abschlussKopieren: { de: "Angaben kopieren", tr: "Bilgileri kopyala", en: "Copy your answers", ar: "انسخ إجاباتك" } as Localized,
   kopiert: { de: "Kopiert.", tr: "Kopyalandı.", en: "Copied.", ar: "تم النسخ." } as Localized,
 }

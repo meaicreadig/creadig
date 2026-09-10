@@ -129,11 +129,11 @@ export function Bewerbung() {
   const zusammenfassung = () => {
     const rolle = daten.absicht ? rolleFuer(daten.absicht) : null
     const zeilen = [
-      `${marken.spurA[locale]} / ${marken.spurB[locale]}: ${rolle ? rolle.titel[locale] : "—"}`,
+      `${bewerben.schritte[0][locale]}: ${rolle ? rolle.titel[locale] : "—"}`,
       daten.disziplinen.length ? `${marken.disziplinen[locale]}: ${daten.disziplinen.join(", ")}` : null,
       `${bewerben.felder.name[locale]}: ${daten.name}`,
       `${bewerben.felder.email[locale]}: ${daten.email}`,
-      daten.ort ? `${marken.ort[locale]}: ${daten.ort}` : null,
+      daten.ort ? `${bewerben.felder.ort[locale]}: ${daten.ort}` : null,
       "",
       `${bewerben.felder.nachweise[locale]}:`,
       ...daten.nachweise.filter((n) => n.trim()).map((n) => `  - ${n}`),
@@ -224,7 +224,7 @@ export function Bewerbung() {
             <p className="text-destructive type-small mt-4">{bewerben.pflichtFehlt[locale]}</p>
           )}
 
-          {/* Handwerke nur bei Founding Talent — sonst waere es eine Frage ohne Zweck. */}
+          {/* Handwerke nur bei „Produkt & Systeme“ — sonst waere es eine Frage ohne Zweck. */}
           {daten.absicht === "founding-talent" && (
             <div className="mt-10">
               <p className="eyebrow text-gold-text">{bewerben.felder.disziplinen[locale]}</p>
@@ -444,11 +444,12 @@ export function Bewerbung() {
   )
 }
 
+/* Der Betreff nennt weder Ort noch Jahr — beides waere eine Behauptung. */
 const kopfBetreff = {
-  de: "Vorstellung — creaDIG Istanbul 2027",
-  tr: "Tanışma — creaDIG İstanbul 2027",
-  en: "Introduction — creaDIG Istanbul 2027",
-  ar: "تعريف — creaDIG إسطنبول 2027",
+  de: "Vorstellung — creaDIG",
+  tr: "Tanışma — creaDIG",
+  en: "Introduction — creaDIG",
+  ar: "تعريف — creaDIG",
 }
 
 function Feld({

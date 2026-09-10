@@ -27,10 +27,17 @@ import { marken } from "@/lib/karriere-inhalt"
 export function RollenStand({
   rolle,
   variante = "voll",
+  neutral = false,
 }: {
   rolle: RolleDefinition
   /** `kompakt` fuer die Uebersicht, `voll` fuer die Spur-Seite. */
   variante?: "kompakt" | "voll"
+  /**
+   * Auf der Uebersicht steht der Stand fuer BEIDE Wege — beide haben
+   * denselben. Dort darf der Weg-Verweis keinen davon still vorauswaehlen,
+   * sonst schickt ein allgemeiner Satz den Leser in eine bestimmte Spur.
+   */
+  neutral?: boolean
 }) {
   const { locale } = useLocale()
   const text = ZUSTANDS_TEXTE[rolle.zustand]
@@ -61,10 +68,6 @@ export function RollenStand({
       {variante === "voll" && (
         <dl className="border-line mt-6 flex flex-col gap-4 border-t pt-6">
           <div>
-            <dt className="text-meta text-muted-foreground">{marken.ort[locale]}</dt>
-            <dd className="type-small mt-1 text-pretty">{rolle.ort[locale]}</dd>
-          </div>
-          <div>
             <dt className="text-meta text-muted-foreground">{marken.arbeitsmodell[locale]}</dt>
             <dd className="type-small mt-1 text-pretty">{rolle.arbeitsmodell[locale]}</dd>
           </div>
@@ -72,7 +75,7 @@ export function RollenStand({
       )}
 
       <Link
-        href={`/karriere/bewerben?spur=${rolle.spur}`}
+        href={neutral ? "/karriere/bewerben" : `/karriere/bewerben?spur=${rolle.spur}`}
         className="text-gold-text hover:text-foreground group mt-6 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
       >
         {text.cta[locale]}
