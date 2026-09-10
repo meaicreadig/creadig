@@ -8,9 +8,6 @@ import { useLocale } from "@/components/locale-provider"
 import { whatsappLink, WHATSAPP_NUMBER } from "@/lib/dictionary"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 
-const buttonClassName =
-  "group fixed bottom-5 start-5 z-40 flex items-center overflow-hidden rounded-full bg-[#25D366] p-4 text-white elevation-3 transition-all duration-[var(--dur-2)] hover:pr-5 md:bottom-8 md:left-8"
-
 /*
  * WO DIESE ABKUERZUNG NICHTS ZU SUCHEN HAT.
  *
@@ -37,6 +34,23 @@ export function StickyWhatsApp() {
   const label = `${t.contact.whatsappAction} — ${WHATSAPP_NUMBER}`
   const [visible, setVisible] = useState(false)
   const [amFuss, setAmFuss] = useState(false)
+
+  /*
+   * Arabisch (RTL): Die Hover-Enthuellung mit max-w-0 + physical ml/pr
+   * oeffnete eine gruene Kapsel ohne sichtbaren Text — die Glyphen lagen
+   * ausserhalb der overflow-Maske. Deshalb: Label dauerhaft sichtbar,
+   * logische Abstaende, kurzes „واتساب". Lateinische Locales behalten
+   * die kompakte Icon-Form mit Hover-Erweiterung.
+   */
+  const isAr = locale === "ar"
+  const shortLabel = isAr ? "واتساب" : "WhatsApp"
+  const buttonClassName = [
+    "group fixed bottom-5 start-5 z-40 flex items-center overflow-hidden rounded-full bg-[#25D366] p-4 text-white elevation-3 transition-all duration-[var(--dur-2)] md:bottom-8 md:start-8",
+    isAr ? "gap-2.5 pe-5" : "hover:pe-5",
+  ].join(" ")
+  const textClassName = isAr
+    ? "text-sm font-medium whitespace-nowrap"
+    : "max-w-0 overflow-hidden text-sm font-medium whitespace-nowrap transition-all duration-[var(--dur-2)] ease-brand group-hover:ms-2.5 group-hover:max-w-[9rem]"
 
   useEffect(() => {
     function onScroll() {
@@ -70,6 +84,13 @@ export function StickyWhatsApp() {
 
   if (!visible || amFuss || eigenerWeg) return null
 
+  const inner = (
+    <>
+      <WhatsAppIcon className="size-6 shrink-0" />
+      <span className={textClassName}>{shortLabel}</span>
+    </>
+  )
+
   if (reduceMotion) {
     return (
       <a
@@ -79,10 +100,7 @@ export function StickyWhatsApp() {
         aria-label={label}
         className={buttonClassName}
       >
-        <WhatsAppIcon className="size-6 shrink-0" />
-        <span className="max-w-0 overflow-hidden text-sm font-medium whitespace-nowrap transition-all duration-[var(--dur-2)] ease-brand group-hover:ml-2.5 group-hover:max-w-[9rem]">
-          WhatsApp
-        </span>
+        {inner}
       </a>
     )
   }
@@ -100,10 +118,7 @@ export function StickyWhatsApp() {
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         className={buttonClassName}
       >
-        <WhatsAppIcon className="size-6 shrink-0" />
-        <span className="max-w-0 overflow-hidden text-sm font-medium whitespace-nowrap transition-all duration-[var(--dur-2)] ease-brand group-hover:ml-2.5 group-hover:max-w-[9rem]">
-          WhatsApp
-        </span>
+        {inner}
       </motion.a>
     </AnimatePresence>
   )
