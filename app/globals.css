@@ -1054,16 +1054,32 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
 }
 
 /*
- * Keine lateinische Laufweite auf arabischem Text.
- *
- * `text-transform: uppercase` bleibt stehen: Arabisch kennt keine
- * Gross- und Kleinschreibung, die Regel ist dort wirkungslos — fuer die
- * lateinischen Woerter in denselben Labels bleibt sie richtig.
+ * Keine lateinische Laufweite auf arabischem Text — auch nicht ueber
+ * Tailwind `tracking-*` (Nav-Links, CTA-Zeilen). Arabisch ist verbunden;
+ * jede positive Laufweite reisst die Ligaturen auseinander.
  */
 [lang="ar"] :is(h1, h2, h3, h4, h5, h6),
 [lang="ar"] :is(.text-display, .text-subhead),
 [lang="ar"] :is(.type-display, .type-h1, .type-h2, .type-h3, .type-h4, .type-statement, .type-lead, .type-stat),
+[lang="ar"] :is(.eyebrow, .text-meta),
+[lang="ar"] :where([class*="tracking-"]) {
+  letter-spacing: normal;
+}
+
+/*
+ * Eyebrow/Meta waren JetBrains Mono + Versalien + 0,16em Laufweite.
+ * Lateinisch richtig — arabisch die „alte" Schrift oben in der Leiste und
+ * unter der Hero-Zeile: Mono hat kaum arabische Glyphen, der Fallback
+ * wirkte hart und fremd neben Readex/Cairo im Fliesstext.
+ *
+ * Arabisch: dieselbe Familie wie der Fliesstext, kein Uppercase, etwas
+ * groesser als 11px-Mono, damit Nav-CTA und Hero-Eyebrow lesbar bleiben.
+ */
 [lang="ar"] :is(.eyebrow, .text-meta) {
+  font-family: var(--font-arabic), var(--font-mplus), ui-sans-serif, system-ui, sans-serif;
+  text-transform: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
   letter-spacing: normal;
 }
 
