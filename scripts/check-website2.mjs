@@ -42,6 +42,8 @@ const PFLICHT = [
   "gate-02-proof-sales.md",
   /* Gate 03 */
   "gate-03-content-system.md",
+  /* Gate 04 */
+  "gate-04-visual-system.md",
 ]
 
 const GATES = ["G00", "G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08", "G09"]

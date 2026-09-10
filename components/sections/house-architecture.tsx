@@ -45,7 +45,43 @@ export function HouseArchitecture() {
   const layersTopDown = [...serviceLayers].reverse()
 
   return (
-    <section id="haus" aria-labelledby="haus-title" className="section-seam">
+    /*
+      GATE 04 · WEB-0037 — DIE EINE DUNKLE FLAECHE AUF DIESER SEITE.
+
+      -----------------------------------------------------------------------
+      DER BEFUND
+      `/unternehmen` lief ueber SIEBEN Creme-Sektionen am Stueck, ehe der
+      Abschluss dunkel wurde: C C C C C C C D, zusammen 9.415 Pixel auf dem
+      Schreibtisch. Fuenf der acht Sektionen tragen dieselbe Grammatik
+      (Eyebrow, H2, Vorspann daneben, Raster darunter). Das ist die
+      Gleichfoermigkeit, ueber die der Owner klagt — nicht zu wenig Inhalt,
+      sondern zu wenig Unterschied.
+
+      -----------------------------------------------------------------------
+      WARUM AUSGERECHNET HIER — UND NUR HIER
+      Die Regel fuer dunkle Flaechen lautet: Sie muessen verdient sein, nicht
+      im Wechsel verteilt. Ein Zebrastreifen aus Creme und Dunkel ist kein
+      Rhythmus, sondern ein Muster.
+
+      Diese Sektion ist die einzige der Seite, die das ganze Haus auf einmal
+      zeigt: Dach, fuenf Ebenen, der Betrieb quer darunter, die vier Produkte
+      an ihrer Ebene. Sie ist kein Textabschnitt, sie ist eine ZEICHNUNG — und
+      eine Zeichnung liest sich auf dunklem Grund als Zeichnung, waehrend sie
+      auf Creme wie ein weiterer Textblock mit Linien aussieht.
+
+      Damit wird aus C C C C C C C D die Folge C D C C C C C D: der Wechsel
+      faellt an der Stelle, an der die Seite ohnehin ihren Modus wechselt —
+      von der Herkunft (der Weg) zur Ordnung (das Haus) und zurueck zu den
+      Menschen (ueber uns).
+
+      -----------------------------------------------------------------------
+      WAS DAS NICHT IST
+      Kein zusaetzlicher Inhalt, kein neues Diagramm, keine zweite dunkle
+      Sektion. `section-dark` tauscht nur die Token-Werte des Teilbaums; jede
+      Linie, jede Ziffer und jedes Gold darin rechnet sich selbst um. Es ist
+      dieselbe Zeichnung auf anderem Grund.
+    */
+    <section id="haus" aria-labelledby="haus-title" className="section-dark">
       <div className="section-shell">
         <div className="grid gap-10 lg:grid-cols-12">
           <Reveal className="lg:col-span-7">

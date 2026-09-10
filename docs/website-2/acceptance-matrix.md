@@ -27,8 +27,8 @@ Das besitzende Gate bleibt in allen sieben Fällen unverändert; für G05 heißt
 | P1 | 11 |
 | P2 | 19 |
 | P3 | 13 |
-| CONFIRMED_CURRENT | 25 |
-| FIXED_ON_BRANCH | 15 |
+| CONFIRMED_CURRENT | 23 |
+| FIXED_ON_BRANCH | 17 |
 | NOT_REPRODUCED | 2 |
 | EXTERNAL_BLOCKED | 0 |
 | UNVERIFIED | 1 |
@@ -92,9 +92,9 @@ Alle Befunde sind einem Gate zugeordnet. Kein heimatloser Befund.
 | WEB-0031 | AUDIT-31 | CONFIRMED_CURRENT | `/karriere` | „Dein Platz" wechselt zum sonstigen „Sie" | Kapitelname duzt, Fließtext siezt | G03 |
 | WEB-0032 | AUDIT-32 | CONFIRMED_CURRENT | `/produkte/*` | Support- und Interessenformular auch bei nicht nutzbaren Produkten | Beide Blöcke auf allen vier Produktseiten, auch „im Aufbau" | G05 |
 | WEB-0033 | AUDIT-33 | CONFIRMED_CURRENT | Footer | Sehr umfangreich, auf jeder langen Seite dominant | 28 Ziele, 968 px Desktop / 1.887 px mobil | G04 |
-| WEB-0034 | AUDIT-34 | CONFIRMED_CURRENT | Mobiles Menü | Inhalt höher als ein Viewport | **1.071 px Inhalt bei 844 px Viewport**, 12 Ziele, scrollt | G04 |
+| WEB-0034 | AUDIT-34 | FIXED_ON_BRANCH | Mobiles Menü | Inhalt höher als ein Viewport | **1.071 px Inhalt bei 844 px Viewport**, 12 Ziele, scrollt | G04 |
 | WEB-0035 | AUDIT-35 | FIXED_ON_BRANCH | `/unternehmen` | Viel Meta-Erklärung über nicht genannte Zahlen | 5 von 8 Abschnitten reiner Text | G03 |
-| WEB-0039 | G00 | CONFIRMED_CURRENT | `/arbeiten` | Seite trägt 25 Eyebrows bei nur 191 Wörtern und 1 H2 | Höchstes Verhältnis Label zu Inhalt der ganzen Website | G04 |
+| WEB-0039 | G00 | FIXED_ON_BRANCH | `/arbeiten` | Seite trägt 25 Eyebrows bei nur 191 Wörtern und 1 H2 | Höchstes Verhältnis Label zu Inhalt der ganzen Website | G04 |
 | WEB-0042 | G00 | CONFIRMED_CURRENT | `/datenschutz` | Rechtstext ohne jede Gliederungsebene | 906 Wörter, **0 H2**, 18 Eyebrows, 5.432 px — die Struktur trägt keine Überschriften | G07 |
 | WEB-0043 | G00 | CONFIRMED_CURRENT | Arabischer Baum | Arabisch trägt dieselbe Länge und Wiederholung wie Deutsch | `/ar/leistungen` **61 Eyebrows, 14.898 px mobil**; `dir=rtl` und `lang=ar` korrekt, kein Überlauf | G04 |
 | WEB-0040 | G00 | NOT_REPRODUCED | Sitemap | Erst vermutet: `/arbeiten` fehlt in der Sitemap | Widerlegt — eigener Filterfehler. `/arbeiten` ist enthalten (24 Treffer). Bleibt als Beleg, dass nicht jede Vermutung ein Befund ist | G00 |
@@ -245,3 +245,53 @@ Wörter) auf ≥ 2 Routen, und paarweise 5-Gramm-Jaccard der Leistungsdetailseit
   Seitenüberlauf.
 - Preisinvariante maschinell: **0 Beträge geändert**.
 - Die sechs G18-Dateien sind bit-identisch (SHA-256).
+
+
+---
+
+## Gate 04 — was behoben wurde und woran man es misst
+
+Gemessen am 11.09.2026, gebaut und lokal ausgeliefert. Sichtbarkeit ohne
+Scrollen 1,2 s nach dem Laden; Höhen `document.scrollHeight` bei 1440 × 900
+und 390 × 844.
+
+### Der Fund, der keinen eigenen Befund hatte
+
+`Reveal` startete jede Sektion mit `opacity: 0`. **`/unternehmen` war zu 80 %
+unsichtbar** (7.526 von 9.377 px), `/` zu 50 %. Das erklärt gleichzeitig „wirkt
+unfertig" und „wirkt monoton" — 34 identische Aufblendungen sind selbst die
+Gleichförmigkeit. Nach der Änderung: **0 px unsichtbar.**
+
+Gate 00 hatte das Phänomen als WEB-0026 geprüft und `NOT_REPRODUCED` gesetzt —
+gemessen wurde above the fold, und dort war nichts. Es lag darunter. WEB-0026
+bleibt bei G08 und bleibt geschlossen; der Befund wird hier nur eingeordnet.
+
+| ID | Was geändert wurde | Beleg nach der Änderung | Stand |
+|---|---|---|---|
+| **WEB-0034** | Drei großzügige Abstände im Mobilmenü geben je ein wenig ab | **859 → 844 px** bei 844 px Fenster — scrollt nicht mehr. Zehn Ziele unverändert (Gate 00 maß 1.071 px / 12 Ziele; Gate 01 hatte zwei Rubriken entfernt) | **CLOSED** |
+| **WEB-0039** | nichts — Beleg war veraltet | `/arbeiten`: **2 Eyebrows bei 82 Wörtern** (Gate 00: 25 bei 191). Von Gate 01 und Gate 03 erledigt | **CLOSED** |
+| **WEB-0033** | Footer-Verzeichnis 4 Spalten → 2 ab 0 px | mobil **1.887 → 1.545 px**, auf jeder Seite. Desktop 968 → 975 px (+7 durch die größere Microcopy) | PARTIAL |
+| **WEB-0037** | `eyebrow` und `text-meta` **11 → 12 px** (Arabisch 13 px); ein verdienter dunkler Bruch auf `/unternehmen` | 309 Eyebrows lesbarer; `/unternehmen` C C C C C C C D → **C D C C C C C D**. Die Zahl gleichartiger Sektionsköpfe ist unverändert | PARTIAL — G04-Rest |
+| **WEB-0038** | Footer, Mobilmenü, Servicekopf, Sequenz | **Alle 17 geprüften Routen mobil kürzer** (−274 bis −375 px). Der Faktor bleibt 1,2–1,9, weil auch der Desktop kürzer wurde | PARTIAL |
+| **WEB-0016** | Kopf zweispaltig (die leeren 45 % rechts), „So läuft es" über die volle Breite als Sequenz | `webdesign` Desktop **2.817 → 2.544 px**, das Loch in der rechten Spalte ist weg. **Bilder weiterhin 0** | PARTIAL — Owner-Asset |
+| **WEB-0020** | nichts | Kein sicheres Bildmaterial für den Artikel vorhanden. §70 verbietet erfundene Assets | OWNER-ASSET |
+| **WEB-0043** | alle Änderungen greifen im arabischen Baum gleichermaßen | `/ar/leistungen` **15.105 px** — jetzt **kürzer** als Deutsch (15.978 px). `dir=rtl` intakt, Eyebrows 13 px, kein Überlauf | PARTIAL |
+
+### Was Gate 04 nicht getan hat
+
+Neue Diagramme **0** · neue Kartenraster **0** · neue dunkle Sektionen **1**
+(semantisch begründet) · neue Assets **0** · neue Wörter **0** · geänderte
+Preise **0**.
+
+`/leistungen` ist um 302 px kürzer — durch den Footer, nicht durch die
+Preistabelle. Der von Gate 03 gemessene **G18-Anteil von 27 %** steht
+unverändert darin und wurde nicht durch Spacing-Kompression kaschiert.
+
+### Prüfung nach der Änderung
+
+- 34 von 34 Postbuild-Gates grün.
+- `npm run a11y`: **124 Durchläufe** ohne Verletzung — auch nach der neuen
+  dunklen Fläche.
+- **625 interne Links** über 33 Zielseiten: kein toter Link, kein fehlender Anker.
+- 17 Routen × 3 Viewports (1440/768/390): kein Überlauf.
+- Preise und G18-Dateien unverändert (maschinell geprüft).

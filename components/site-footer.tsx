@@ -162,8 +162,28 @@ export function SiteFooter() {
           </ul>
         </nav>
 
-        {/* ---- 3 · Das Verzeichnis -------------------------------------- */}
-        <div className="border-line mt-12 grid gap-10 border-t pt-12 sm:grid-cols-2 lg:grid-cols-4">
+        {/* ---- 3 · Das Verzeichnis --------------------------------------
+
+            GATE 04 · WEB-0033 — VIER SPALTEN, DIE AUF DEM TELEFON VIER
+            ABSCHNITTE WURDEN.
+
+            Das Raster begann erst ab `sm` (640 px) zweispaltig. Darunter —
+            also auf jedem Telefon — standen die vier Verzeichnisspalten
+            untereinander: Seite, Produkte, Werkzeuge, Kontakt. Gemessen am
+            11.09.2026: Footer 1.887 px auf 390 Pixeln, bei 968 px auf dem
+            Schreibtisch. Der Abschluss war auf dem Telefon fast doppelt so
+            hoch wie am Rechner — und er steht unter JEDER Seite.
+
+            Zwei Spalten ab null. Dieselbe Entscheidung, die `ManagedOperations`
+            fuer seine sieben Begriffe schon getroffen hat („Zwei Spalten ab
+            null, drei ab sm"): Kurze Linklisten brauchen keine volle Breite,
+            sie brauchen ein Paar.
+
+            Was NICHT passiert ist: kein Link entfernt, keine Rubrik
+            eingeklappt, kein Accordion. Die 28 Ziele bleiben erreichbar — sie
+            stehen nur nicht mehr in einer Kolonne.
+        ------------------------------------------------------------------ */}
+        <div className="border-line mt-12 grid grid-cols-2 gap-x-8 gap-y-10 border-t pt-12 lg:grid-cols-4 lg:gap-10">
           <div>
             <p className="eyebrow text-gold-text">{t.footer.navLabel}</p>
             <ul className="mt-6 flex flex-col gap-3.5">

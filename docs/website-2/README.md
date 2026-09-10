@@ -47,6 +47,8 @@ nächsten Schritt versteht.
 | `gate-02-proof-sales.md` | Der Gate-Bericht: Beleg-Architektur, was gezeigt wird und was bewusst nicht |
 | **Gate 03** | |
 | `gate-03-content-system.md` | Ein Gedanke, ein Primary Home: Content-Canon, Duplikationsmessung, was bewusst blieb |
+| **Gate 04** | |
+| `gate-04-visual-system.md` | Visuelle Rollen, Bewegungsregel, Flächen-Canon — und was bewusst nicht dazukam |
 
 ## Statuskanon
 
@@ -82,7 +84,7 @@ Lokalisierung und Conversion-Blocker werden nicht leise abgestuft.
 | **G01** | Positionierung, Angebot, Informationsarchitektur | **CLOSED** |
 | **G02** | Proof, Vertrauen, Verkaufsarchitektur | **BUILT 🟢 · ACCEPTED 🟢 · OPERATIONAL 🟡 OWNER-ASSET** |
 | **G03** | Content-System und vollständige Copy | **BUILT 🟢 · ACCEPTED 🟢 · OPERATIONAL 🟢 · CLOSED 🟡 (G04-Rest)** |
-| G04 | Visuelles System und Designqualität | NOT_STARTED |
+| **G04** | Visuelles System und Designqualität | **BUILT 🟢 · ACCEPTED 🟢 · OPERATIONAL 🟢 · CLOSED 🟡 (Owner-Asset)** |
 | G05 | Seiten- und Produktumsetzung | NOT_STARTED |
 | G06 | Werkzeuge, Formulare, Integrationen | NOT_STARTED |
 | G07 | Barrierefreiheit, Mobile, Internationalisierung | NOT_STARTED |

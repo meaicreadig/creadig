@@ -60,12 +60,36 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
           </ol>
         </nav>
 
-        <Reveal className="mt-12">
-          <SectionEyebrow label={`${copy.layerLabel} · ${layer.name}`} />
-          <h1 className="type-h1 mt-7 max-w-4xl text-balance">{page.h1[locale]}</h1>
-          <p className="type-lead text-muted-foreground mt-8 max-w-2xl text-pretty">
-            {page.lead[locale]}
-          </p>
+        {/*
+          GATE 04 · WEB-0016 — DER KOPF STAND AUF EINER HALBEN SEITE.
+
+          Eyebrow, H1 und Einleitung untereinander, jeweils mit `max-w`. Bei
+          1440 Pixeln blieben die rechten rund 45 Prozent leer — auf allen
+          sechs Leistungsdetailseiten dieselbe Leere an derselben Stelle.
+
+          Genau diese Grammatik hat `components/ui/page-header.tsx` fuer den
+          Rest der Website schon abgeloest; im eigenen Kommentar dort steht,
+          warum: Sie macht aus „aufgeraeumt" „unfertig". Nur benutzen diese
+          sechs Seiten `PageHeader` nicht — sie bauen ihren Kopf selbst, und
+          die Korrektur ist an ihnen vorbeigegangen.
+
+          Jetzt dieselbe Zweispaltigkeit wie ueberall sonst: Titel links,
+          Einleitung rechts auf derselben Grundlinie. Kein neues Muster, das
+          vorhandene.
+        */}
+        <div className="mt-12 grid gap-x-10 gap-y-8 lg:grid-cols-12 lg:items-end">
+          <Reveal className="lg:col-span-7">
+            <SectionEyebrow label={`${copy.layerLabel} · ${layer.name}`} />
+            <h1 className="type-h1 mt-7 text-balance">{page.h1[locale]}</h1>
+          </Reveal>
+          <Reveal delay={0.08} className="lg:col-span-5">
+            <p className="type-lead text-muted-foreground max-w-2xl text-pretty">
+              {page.lead[locale]}
+            </p>
+          </Reveal>
+        </div>
+
+        <Reveal className="mt-8">
 
           {/*
             MP-E.5 — der Rueckweg zum Branchen-Einstieg. Er steht hier oben und
@@ -253,53 +277,6 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
               </Link>
             </Reveal>
 
-            {/*
-              MP10-1 — der Ablauf DIESER Leistung, nicht der des Hauses.
-
-              Hier standen die drei Schritte „Verstehen · Bauen · Betreiben"
-              aus dem Woerterbuch — auf allen sechs Seiten dieselben. Sie
-              beschreiben eine Haltung, und die stimmt; nur beantworten sie
-              nicht die Frage, mit der jemand auf einer Leistungsseite steht:
-              „Wenn ich hier zusage, was passiert dann konkret?"
-
-              `page.process` sagt genau das, in vier Schritten, je Leistung
-              verschieden. Kein Schritt behauptet etwas Neues — jeder ist eine
-              Umformulierung dessen, was unter „Was dazugehoert" ohnehin
-              schon steht. Fehlt die Liste, bleiben die drei Haus-Schritte:
-              lieber die allgemeine Antwort als gar keine.
-            */}
-            <Reveal delay={0.08} className="border-line mt-14 border-t pt-8">
-              <p className="eyebrow text-gold-text">{copy.processLabel}</p>
-              {page.process ? (
-                <ol className="mt-6 grid gap-8 sm:grid-cols-2">
-                  {page.process.map((step, i) => (
-                    <li key={step.key}>
-                      <span className="eyebrow text-muted-foreground">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <h2 className="text-subhead mt-3 text-lg">{step.title[locale]}</h2>
-                      <p className="type-small text-muted-foreground mt-3 text-pretty">
-                        {step.body[locale]}
-                      </p>
-                    </li>
-                  ))}
-                </ol>
-              ) : (
-                <div className="mt-6 grid gap-8 sm:grid-cols-3">
-                  {(["understand", "build", "operate"] as const).map((key, i) => (
-                    <div key={key}>
-                      <span className="eyebrow text-muted-foreground">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <h2 className="text-subhead mt-3 text-lg">{t.process.steps[key].name}</h2>
-                      <p className="type-small text-muted-foreground mt-3 text-pretty">
-                        {t.process.steps[key].what}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Reveal>
 
             {/*
               MP10-1 — „was aendert sich bei mir?"
@@ -474,6 +451,81 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
 
           </div>
         </div>
+
+        {/*
+          GATE 04 · WEB-0016 / WEB-0038 — DER ABLAUF VERLAESST DIE SPALTE.
+
+          -----------------------------------------------------------------
+          WAS DIE MESSUNG GEZEIGT HAT
+          Die Seite ist EIN zwoelfspaltiges Raster: links (7) Umfang, Grenze,
+          Beleg, Ebene und Ablauf, rechts (5) Fuer wen und Pakete. Die linke
+          Spalte ist rund 400 Pixel laenger als die rechte — gemessen am
+          11.09.2026 auf `/leistungen/webdesign`, 1440 Pixel breit.
+
+          Sichtbar ist davon ein Loch: Ab der Mitte der Seite steht rechts
+          nichts mehr, waehrend links der Ablauf weiterlaeuft. Kein Inhalt
+          fehlt, und trotzdem sieht die Seite unfertig aus.
+
+          -----------------------------------------------------------------
+          WARUM AUSGERECHNET DER ABLAUF
+          Weil er als Einziger kein Faktenblock ist, sondern eine FOLGE. Vier
+          Schritte in einer 7-Spalten-Kolumne bedeuten zweimal zwei
+          untereinander — die Reihenfolge, die der Inhalt behauptet, ist im
+          Bild nicht zu sehen. Ueber die volle Breite stehen sie
+          nebeneinander, und die Folge wird zur Form.
+
+          Damit bekommt die Seite zwei Bewegungen statt einer:
+          Fakten nebeneinander, danach die Sequenz quer darunter. Das ist der
+          Unterschied zwischen einem Raster und einer Komposition — und er
+          kostet kein einziges zusaetzliches Wort (Gate 03 bleibt unberuehrt).
+        */}
+          {/*
+            MP10-1 — der Ablauf DIESER Leistung, nicht der des Hauses.
+
+            Hier standen die drei Schritte „Verstehen · Bauen · Betreiben"
+            aus dem Woerterbuch — auf allen sechs Seiten dieselben. Sie
+            beschreiben eine Haltung, und die stimmt; nur beantworten sie
+            nicht die Frage, mit der jemand auf einer Leistungsseite steht:
+            „Wenn ich hier zusage, was passiert dann konkret?"
+
+            `page.process` sagt genau das, in vier Schritten, je Leistung
+            verschieden. Kein Schritt behauptet etwas Neues — jeder ist eine
+            Umformulierung dessen, was unter „Was dazugehoert" ohnehin
+            schon steht. Fehlt die Liste, bleiben die drei Haus-Schritte:
+            lieber die allgemeine Antwort als gar keine.
+          */}
+          <Reveal delay={0.08} className="border-line mt-14 border-t pt-8">
+            <p className="eyebrow text-gold-text">{copy.processLabel}</p>
+            {page.process ? (
+              <ol className="mt-8 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+                {page.process.map((step, i) => (
+                  <li key={step.key}>
+                    <span className="eyebrow text-muted-foreground">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h2 className="text-subhead mt-3 text-lg">{step.title[locale]}</h2>
+                    <p className="type-small text-muted-foreground mt-3 text-pretty">
+                      {step.body[locale]}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <div className="mt-8 grid gap-x-10 gap-y-10 sm:grid-cols-3">
+                {(["understand", "build", "operate"] as const).map((key, i) => (
+                  <div key={key}>
+                    <span className="eyebrow text-muted-foreground">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h2 className="text-subhead mt-3 text-lg">{t.process.steps[key].name}</h2>
+                    <p className="type-small text-muted-foreground mt-3 text-pretty">
+                      {t.process.steps[key].what}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Reveal>
 
         {/*
           BF-A10 — die Preisleiter.

@@ -259,7 +259,24 @@ export function SiteNav() {
                 </SheetTitle>
               </SheetHeader>
 
-              <nav aria-label="Mobile Navigation" className="flex flex-col px-6 pt-6">
+              {/*
+                GATE 04 · WEB-0034 — DAS MENUE SCROLLTE UM 15 PIXEL.
+
+                Der Befund aus Gate 00 nannte 1.071 px Inhalt bei 844 px
+                Fenster und zwoelf Ziele. Gemessen am 11.09.2026 sind es
+                859 px und zehn Ziele — Gate 01 hat zwei Rubriken aus dem
+                Hauptmenue genommen (`/arbeiten`, `/insights`), und damit ist
+                der groesste Teil des Problems schon weg gewesen.
+
+                Geblieben waren 15 Pixel. Fuenfzehn Pixel sind kein
+                Scrollbalken, sie sind ein Wackeln: Das Menue sieht
+                vollstaendig aus und bewegt sich trotzdem unter dem Finger.
+
+                Drei grosszuegige Abstaende geben je ein wenig ab (pt-6→pt-5,
+                pt-10→pt-8, mt-4→mt-3). Kein Ziel entfernt, keine Zeile
+                kleiner, keine Sprachliste eingeklappt.
+              */}
+              <nav aria-label="Mobile Navigation" className="flex flex-col px-6 pt-5">
                 {hauptNavLinks.map((link, index) => {
                   const hint = t.nav.hints[link.labelKey as keyof typeof t.nav.hints]
                   const linkClassName =
@@ -309,7 +326,7 @@ export function SiteNav() {
                 */}
               </nav>
 
-              <div className="flex flex-col gap-3 px-6 pt-10">
+              <div className="flex flex-col gap-3 px-6 pt-8">
                 <SheetClose asChild>
                   <Link
                     href="/termin"
@@ -326,7 +343,7 @@ export function SiteNav() {
                 >
                   <WhatsAppIcon className="size-5" /> WhatsApp
                 </a>
-                <Separator className="mt-4" />
+                <Separator className="mt-3" />
                 {/*
                   Im Menue braucht es kein Aufklapp-Menue im Aufklapp-Menue:
                   Die vier Sprachen stehen untereinander, jede Zeile 48 px

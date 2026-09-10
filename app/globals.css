@@ -528,9 +528,30 @@
  * text-meta = Mono-Nebeninformation in gemischter Schreibung (Fußnoten,
  *             Kennziffern, Zeilen im Footer) — nie versal, sonst schreit sie
  */
+/*
+ * GATE 04 — 11 PIXEL WAREN EINE ENTSCHEIDUNG GEGEN DEN LESER.
+ *
+ * Gemessen am 11.09.2026 ueber siebzehn Routen: 309 Eyebrows auf 11 px,
+ * fuenf auf 14 px. Dieselben 11 px trug `text-meta` — und `text-meta` ist
+ * NICHT dekorativ: Darin stehen die Bildunterschrift „Echte Oberflaeche,
+ * Demodaten.", die Fussnoten zur Bildherkunft, die Zugangslage eines
+ * Produkts, die Kontaktzeilen im Footer.
+ *
+ * Der externe Audit hat die Microcopy als Schwaeche markiert, und die
+ * Messung gibt ihm recht: Die wichtigste Beleg-Zeile der ganzen Website
+ * stand in der kleinsten Schrift, die sie hat.
+ *
+ * 12 px statt 11 px. Nicht 14 — das waere der naechste Sprung der Skala
+ * (`type-small`, 15 px) und wuerde aus einem Label einen Satz machen. Ein
+ * Pixel klingt nach nichts und ist der Unterschied zwischen „Nebenangabe"
+ * und „zu klein zum Lesen"; bei Versalien mit 0.16em Laufweite umso mehr.
+ *
+ * Die Laufweite bleibt, die Rollen bleiben, die Zahl der Labels bleibt —
+ * das war Gate 03. Hier aendert sich nur ihre Lesbarkeit.
+ */
 @utility eyebrow {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-weight: 500;
@@ -538,7 +559,7 @@
 
 @utility text-meta {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
   font-weight: 400;
 }
