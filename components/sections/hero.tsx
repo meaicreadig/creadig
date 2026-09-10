@@ -13,10 +13,17 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 const EASE = [0.22, 1, 0.36, 1] as const
 
 export function Hero() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
   const reduce = usePrefersReducedMotion()
 
   const lines = [t.hero.headlineLine1, t.hero.headlineLine2, t.hero.headlineLine3]
+  /*
+   * Die Zeilenmaske (`overflow-hidden`) schneidet die Enthuellung.
+   * Latein braucht nur ~0,35vw Polster. Arabische Glyphen tragen Punkte
+   * und Boegen ueber/unter der Zeile — bei zu wenig Padding enden Lam-Alif
+   * und Madda an einer geraden Kante. em skaliert mit dem Hero-Grad.
+   */
+  const linePad = locale === "ar" ? "py-[0.22em]" : "py-[0.35vw]"
 
   return (
     <section id="top" className="relative isolate flex min-h-[100svh] flex-col overflow-hidden">
@@ -37,7 +44,7 @@ export function Hero() {
             const words = line.split(" ")
             const isLast = i === lines.length - 1
             return (
-              <span key={line} className="block overflow-hidden py-[0.35vw]">
+              <span key={line} className={`block overflow-hidden ${linePad}`}>
                 <motion.span
                   className="block"
                   initial={reduce ? undefined : { y: "112%" }}

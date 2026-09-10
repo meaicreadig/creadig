@@ -1,5 +1,11 @@
 import type { Metadata, Viewport } from "next"
-import { Poppins, JetBrains_Mono, M_PLUS_Rounded_1c, Readex_Pro } from "next/font/google"
+import {
+  Poppins,
+  JetBrains_Mono,
+  M_PLUS_Rounded_1c,
+  Readex_Pro,
+  IBM_Plex_Sans_Arabic,
+} from "next/font/google"
 import "@/app/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LocaleProvider } from "@/components/locale-provider"
@@ -130,22 +136,33 @@ const jetbrains = JetBrains_Mono({
  * ausgewaehlt: System-Fallback, IBM Plex Sans Arabic, Readex Pro, Alexandria,
  * Tajawal und Noto Kufi Arabic nebeneinander, in denselben Graden.
  *
- * Readex Pro, weil es als einziges dieselbe Sache tut wie M PLUS Rounded 1c
- * auf der lateinischen Seite: runde Strichenden, niedriger Kontrast, ruhiger
- * Lauf. Alexandria und Noto Kufi wirken im Fliesstext mechanisch, Tajawal im
- * Kleinen duenn, IBM Plex Sans Arabic ist ausgezeichnet lesbar, aber
- * neutral-technisch — es passt zu einer Schrift, die creaDIG nicht benutzt.
+ * ZWEI ARABISCHE SCHNITTE — wie Latein Poppins/M PLUS:
+ *
+ *   Fliesstext → Readex Pro (`--font-arabic`). Runde Strichenden, ruhiger
+ *   Lauf; der Owner hat den Normal-Schnitt ausdruecklich fuer gut befunden.
+ *
+ *   Ueberschriften → IBM Plex Sans Arabic (`--font-arabic-display`). Readex
+ *   700 in Hero-Groesse wirkt schwarz und klemmt die oberen/unteren
+ *   Glyphen; Plex haelt Kontrast und Metrik bei grossen Graden. Neutral-
+ *   technisch passt zum System-Haus, nicht zur Agentur-Schrift.
  *
  * Die lateinische Schrift bleibt unangetastet (Owner-Formentscheidung vom
- * 27.08.2026). Readex steht in der Schriftliste NACH den lateinischen
- * Familien: Der Browser waehlt je ZEICHEN, also bleiben „creaDIG", „meAI"
- * und die Ziffern in der Hausschrift, und nur das Arabische kommt aus
- * Readex.
+ * 27.08.2026). Im arabischen Baum stehen beide Familien VORN vor Poppins/
+ * M PLUS — sonst greift die next/font-Fallback-Familie und das Arabische
+ * landet wieder auf der Systemschrift.
  */
 const readex = Readex_Pro({
   subsets: ["arabic"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-arabic",
+  display: "swap",
+  preload: false,
+})
+
+const plexArabic = IBM_Plex_Sans_Arabic({
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-arabic-display",
   display: "swap",
   preload: false,
 })
@@ -413,7 +430,7 @@ export function SiteShell({
     <html
       lang={locale}
       dir={LOCALE_DIR[locale]}
-      className={`${poppins.variable} ${mplusRounded.variable} ${jetbrains.variable} ${readex.variable}`}
+      className={`${poppins.variable} ${mplusRounded.variable} ${jetbrains.variable} ${readex.variable} ${plexArabic.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>

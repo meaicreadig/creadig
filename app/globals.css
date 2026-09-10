@@ -1038,17 +1038,18 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
  * deckt Arabisch ab. Das Arabische kam also nie bei Readex an; die
  * Aenderung waere unsichtbar geblieben.
  *
- * Deshalb steht Readex jetzt VORN — allerdings nur im arabischen Baum. Der
- * Preis: lateinische Woerter INNERHALB arabischer Saetze kommen dort
- * ebenfalls aus Readex. Das ist der bessere von zwei Fehlern: Ein Satz aus
- * einer Schrift liest sich ruhiger als einer aus zweien, und die Wortmarke
- * ist ohnehin eine SVG-Datei und davon nicht betroffen. Die Mono-Zeile
- * (Kennziffern, Telefon) behaelt JetBrains vorn — dort ist die Ziffer die
- * Hauptsache.
+ * Deshalb stehen die arabischen Familien jetzt VORN — allerdings nur im
+ * arabischen Baum. Display: IBM Plex Sans Arabic, Fliesstext: Readex Pro.
+ * Der Preis: lateinische Woerter INNERHALB arabischer Saetze kommen dort
+ * ebenfalls aus der arabischen Familie. Das ist der bessere von zwei Fehlern:
+ * Ein Satz aus einer Schrift liest sich ruhiger als einer aus zweien, und die
+ * Wortmarke ist ohnehin eine SVG-Datei und davon nicht betroffen. Die
+ * Mono-Zeile (Kennziffern, Telefon) behaelt JetBrains vorn — dort ist die
+ * Ziffer die Hauptsache.
  */
 [lang="ar"] {
   --font-sans: var(--font-arabic), var(--font-mplus), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-arabic), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-arabic-display), var(--font-arabic), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), var(--font-arabic), ui-monospace, monospace;
 }
 
@@ -1061,7 +1062,7 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
  */
 [lang="ar"] :is(h1, h2, h3, h4, h5, h6),
 [lang="ar"] :is(.text-display, .text-subhead),
-[lang="ar"] :is(.type-h1, .type-h2, .type-h3, .type-h4, .type-statement, .type-lead),
+[lang="ar"] :is(.type-display, .type-h1, .type-h2, .type-h3, .type-h4, .type-statement, .type-lead, .type-stat),
 [lang="ar"] :is(.eyebrow, .text-meta) {
   letter-spacing: normal;
 }
@@ -1069,23 +1070,26 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
 /*
  * Arabisch braucht mehr Durchschuss als Latein: Die Schrift traegt
  * Punkte unter und Zeichen ueber der Grundlinie, und bei enger Zeile
- * beruehren sie die Nachbarzeile. Nur der Durchschuss aendert sich, nicht
- * der Grad — die Groessenhierarchie bleibt dieselbe wie in den anderen drei
- * Sprachen.
+ * beruehren sie die Nachbarzeile. `type-display` hatte line-height: 1 —
+ * dort fehlte der Override, und die Hero-Maske schnitt die Glyphen.
  */
-[lang="ar"] :is(.type-h1, .type-h2, .type-h3, .type-h4) {
-  line-height: 1.32;
+[lang="ar"] :is(.type-display, .text-display) {
+  line-height: 1.28;
+  font-weight: 600;
+}
+
+[lang="ar"] :is(.type-h1, .type-h2, .type-h3, .type-h4, .type-statement, .type-stat) {
+  line-height: 1.35;
+}
+
+[lang="ar"] :is(.type-h1) {
+  font-weight: 600;
 }
 
 [lang="ar"] :is(.type-lead, .type-body, .type-small, p) {
   line-height: 1.9;
 }
 
-/*
- * Readex Pro laeuft optisch etwas kleiner als M PLUS Rounded 1c auf
- * derselben Pixelgroesse. Ein Zehntel mehr Schriftgrad gleicht das aus,
- * ohne die Skala zu verschieben.
- */
 [lang="ar"] body {
   font-size-adjust: none;
 }
