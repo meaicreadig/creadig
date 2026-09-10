@@ -84,7 +84,18 @@ export function ArbeitenPageBody() {
       {!ohneKundenwerk && <Portfolio heading={false} />}
       <CaseStudies />
       <Reviews />
-      <ClosingCta variant="work" />
+      {/*
+        GATE 02 — DER ABSCHLUSS SPRACH UEBER ETWAS, DAS NICHT DA WAR.
+
+        Die Variante `work` sagt: „Wir sagen Ihnen ehrlich, ob Ihr Vorhaben zu
+        dem passt, was Sie hier gesehen haben." Sie stammt aus der Zeit, als
+        diese Seite eine Werkschau war. Seit Gate 01 steht hier keine Arbeit
+        mehr — der Satz verweist auf einen leeren Bildschirm.
+
+        Solange keine Freigabe vorliegt, traegt die Seite den Grundfall.
+        Sobald Kundenwerk erscheint, ist die Variante wieder richtig.
+      */}
+      <ClosingCta variant={ohneKundenwerk ? "default" : "work"} />
     </main>
   )
 }

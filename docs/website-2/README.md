@@ -43,6 +43,8 @@ nächsten Schritt versteht.
 | `information-architecture.md` | Hauptmenü, Produkte/Arbeiten, Insights, Startseiten-Reihenfolge |
 | `page-contracts.md` | Je Route: eine Frage, ein nächster Schritt, was nicht draufgehört |
 | `route-transition-plan.md` | Welcher Übergang wartet auf welche Bedingung, und wer sie herstellt |
+| **Gate 02** | |
+| `gate-02-proof-sales.md` | Der Gate-Bericht: Beleg-Architektur, was gezeigt wird und was bewusst nicht |
 
 ## Statuskanon
 
@@ -75,8 +77,8 @@ Lokalisierung und Conversion-Blocker werden nicht leise abgestuft.
 | Gate | Inhalt | Stand |
 |---|---|---|
 | **G00** | Bestand, Wahrheit, Kontrollsystem | **CLOSED** |
-| **G01** | Positionierung, Angebot, Informationsarchitektur | **PASS — PENDING COMMIT** |
-| G02 | Proof, Vertrauen, Verkaufsarchitektur | NOT_STARTED |
+| **G01** | Positionierung, Angebot, Informationsarchitektur | **CLOSED** |
+| **G02** | Proof, Vertrauen, Verkaufsarchitektur | **BUILT 🟢 · ACCEPTED 🟢 · OPERATIONAL 🟡 OWNER-ASSET** |
 | G03 | Content-System und vollständige Copy | NOT_STARTED |
 | G04 | Visuelles System und Designqualität | NOT_STARTED |
 | G05 | Seiten- und Produktumsetzung | NOT_STARTED |
@@ -106,3 +108,5 @@ Was ein Kommentar nicht hält, prüft ein Gate im Postbuild.
 |---|---|
 | `scripts/check-website2.mjs` | Die Acceptance-Matrix: IDs, Gates, Prioritäten, Wahrheitsstände, Zusammenfassung, Verteilung, Artefakt-Vollständigkeit |
 | `scripts/check-einstiege.mjs` | Die Angebotsarchitektur und die Hauptnavigation (D-17, D-18, D-20) |
+| `scripts/check-beleg.mjs` | Produktbelege: Quelle, Prüfdatum, Zugangslage — und dass kein zurückgehaltenes Bild gezeigt wird (D-21, D-22, D-23) |
+| `npm run proof-drill` | Die Freigabewahrheit für Kundenbelege (älter als Gate 02, hier nur nachgeprüft) |

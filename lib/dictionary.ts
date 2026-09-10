@@ -591,7 +591,64 @@ export const dictionary = {
       sectorLabel: "Sektor",
       statusLabel: "Stand",
       regionLabel: "Markt",
-      liveLabel: "Live öffnen",
+      /*
+       * GATE 02 · WEB-0009 — DER KNOPF HIESS „LIVE OEFFNEN".
+       *
+       * Gemessen am 10.09.2026: `https://meai.run` antwortet mit 307 auf
+       * `/login`, und dort steht ohne Anmeldung lesbar „Geschlossenes System ·
+       * Zugang nur nach Verifizierung". Wer auf „Live oeffnen" drueckt, sieht
+       * also kein Produkt, sondern eine Anmeldemaske.
+       *
+       * Das ist keine Falschaussage — die Anwendung laeuft ja — aber es ist
+       * eine Erwartung, die die naechste Seite enttaeuscht. Und eine
+       * enttaeuschte Erwartung an genau der Stelle, an der jemand zum ersten
+       * Mal etwas Echtes sehen will, kostet mehr Vertrauen als der fehlende
+       * Einblick selbst.
+       *
+       * Der Knopf sagt jetzt, wohin er fuehrt. Die Zugangslage steht daneben
+       * (`zugang`), damit niemand sie erst durch Klicken erfaehrt.
+       */
+      liveLabel: "Zur Anwendung",
+      zugangLabel: "Zugang",
+      zugang: {
+        offen: "Ohne Konto benutzbar",
+        geschlossen: "Geschlossenes System — Konto nach Verifizierung",
+        /*
+         * SELBSTPRUEFUNG G02 — DIESE ZEILE BEHAUPTETE ZU VIEL.
+         *
+         * Sie lautete „Laeuft im eigenen Betrieb, keine oeffentliche Adresse".
+         * Auf `/produkte` stand sie damit unter CASSAMEA und meahv, deren
+         * Stand „Im Aufbau" ist — zwei Zeilen uebereinander, von denen die
+         * eine sagt, das Produkt laufe, und die andere, es werde gebaut.
+         *
+         * Ob ein Produkt laeuft, sagt der Stand (`outcome`). Diese Zeile
+         * beantwortet nur die Zugangsfrage, und die lautet hier schlicht:
+         * Es gibt keine Adresse, unter der Sie es aufrufen koennen.
+         */
+        intern: "Keine öffentliche Adresse",
+      },
+      /*
+       * GATE 02 · WEB-0002 — DIE AUFNAHME IM EINSATZ.
+       *
+       * Hier stand nur `screensPending`: „Oberflaechen zeigen wir erst, wenn
+       * wir die echte Anwendung mit Demodaten aufnehmen koennen." Der Satz
+       * ist richtig fuer VOLLBILD-Aufnahmen aus einer Demo-Instanz — und er
+       * stand auf `/produkte/fibero`, waehrend die Startseite genau dieses
+       * Produkt mit seiner echten Oberflaeche zeigt.
+       *
+       * Es sind zwei verschiedene Belegarten, und sie brauchen zwei
+       * verschiedene Saetze:
+       *
+       *   In situ    Die Anwendung im Einsatz fotografiert. Zeigt, DASS es
+       *              sie gibt und wo sie laeuft. Liegt vor.
+       *   Vollbild   Die Oberflaeche aufgenommen, Ansicht fuer Ansicht.
+       *              Zeigt, WIE sie arbeitet. Liegt nicht vor.
+       *
+       * Wer beides in einen Satz wirft, muss eines davon verschweigen.
+       */
+      situCaption: "Die Anwendung im Einsatz",
+      situPending:
+        "Das ist die Anwendung im Einsatz, nicht die Oberfläche Ansicht für Ansicht. Vollbild-Aufnahmen zeigen wir, sobald wir sie aus einer Demo-Instanz mit erfundenen Daten machen können — bis dahin steht hier das Bild, das es gibt, und nicht eines, das mehr behauptet.",
       backLabel: "Alle Produkte",
       /* Einordnung: wo das Produkt im Haus steht und was dazu passt. */
       systemLabel: "Einordnung im System",
@@ -1475,6 +1532,86 @@ export const dictionary = {
      * Was NICHT dasteht und auch nicht dazukommt: eine Mitarbeiterzahl, eine
      * Umsatzzahl, ein Standort, den es nicht gibt.
      */
+    /*
+     * GATE 02 · WEB-0007 — „WER MACHT DAS, UND WAS PASSIERT, WENN WIR
+     * VERANTWORTUNG ABGEBEN?"
+     *
+     * -----------------------------------------------------------------------
+     * DER BEFUND
+     * „Lieferfaehigkeit: weder Personen, Rollen noch Kapazitaetsmodell
+     * sichtbar." Gemessen in Gate 00: 858 Woerter auf `/unternehmen`, keine
+     * Rollenstruktur.
+     *
+     * `workModel` beantwortet inzwischen die erste Haelfte — WER fuehrt
+     * (Gruender), wer dazu kommt (Kernteam, Netzwerk). Die zweite Haelfte
+     * fehlte: Was passiert eigentlich, wenn ein Betrieb Verantwortung
+     * abgibt? Genau das fragt ein Mittelstaendler, bevor er ueber Geld
+     * spricht — und die Seite antwortete darauf nirgends.
+     *
+     * -----------------------------------------------------------------------
+     * WAS HIER STEHT — UND WAS AUSDRUECKLICH NICHT
+     * Kein Satz hier ist neu erfunden. Jede der sechs Antworten steht heute
+     * schon woertlich woanders auf der Website; neu ist, dass sie an EINER
+     * Stelle als Antwort auf EINE Frage stehen, und dass jede sagt, wo sie
+     * nachzulesen ist:
+     *
+     *   fuehrung    `workModel.items.founder`
+     *   umfang      `process.opsSteps.offer` — Angebot mit Umfang und Preis
+     *   pruefung    die eigene Barrierefreiheitspruefung (`/barrierefreiheit`)
+     *               und `retainer.includes` — Lauf bei jeder Aenderung
+     *   uebergabe   `packages.ownershipBody` — Code, Inhalte, Zugaenge, Domain
+     *   netzwerk    `workModel.items.network`
+     *   grenze      `managedOperations`-Hinweis + `retainer.excludes`
+     *
+     * Was hier NICHT steht: Mitarbeiterzahl, Kapazitaet, Vertretungsregel,
+     * Eskalationsstufe, Reaktionszeit. Alles fuenf waere behauptbar und
+     * keines davon belegt. Die letzte Zeile sagt das offen, statt es zu
+     * umgehen — ein Kaeufer, der die Grenze kennt, kann mit ihr rechnen.
+     */
+    lieferung: {
+      eyebrow: "Wenn Sie Verantwortung abgeben",
+      title: "Was dann tatsächlich passiert.",
+      lead: "Sechs Fragen, die vor jedem größeren Projekt kommen — und die Antworten, die heute gelten. Jede steht ausführlich an der Stelle, auf die sie verweist.",
+      items: {
+        fuehrung: {
+          name: "Wer führt",
+          what: "Ein Verantwortlicher, und es ist derselbe vom ersten Gespräch bis in den Betrieb. Kein Wechsel vom Verkauf zur Umsetzung.",
+          cta: "Arbeitsmodell",
+        },
+        umfang: {
+          name: "Wie der Umfang festgelegt wird",
+          what: "Ein festes Angebot mit Umfang, Preis und Zeitrahmen — vor dem Bau. Keine Stundenzettel, keine Nachforderungen.",
+          cta: "Ablauf und Preise",
+        },
+        pruefung: {
+          name: "Wie geprüft wird",
+          what: "Womit wir andere prüfen, haben wir zuerst an der eigenen Seite geprüft — mit Methode, Zahlen und den gefundenen Mängeln offen dokumentiert.",
+          cta: "Die eigene Prüfung",
+        },
+        uebergabe: {
+          name: "Was Ihnen gehört",
+          what: "Das System und alle Daten darin gehören Ihnen vom ersten Tag an. Code, Inhalte, Zugänge und Domain bleiben bei Ihnen, auch wenn die Betreuung endet.",
+          cta: "Betrieb und Eigentum",
+        },
+        netzwerk: {
+          name: "Wer sonst daran sitzt",
+          what: "Was ein Projekt zusätzlich braucht — Entwicklung, Text, Strategie — kommt aus einem festen Netzwerk im DACH-Raum. Keine anonymen Zukäufe.",
+          cta: "Arbeitsmodell",
+        },
+        grenze: {
+          name: "Was nicht zugesagt ist",
+          what: "Keine Verfügbarkeit in Prozent, keine Reaktionszeit in Stunden, kein 24/7, keine Rufbereitschaft. Monitoring meldet rund um die Uhr; zurück ruft ein Mensch am nächsten Werktag.",
+          cta: "Was dazugehört",
+        },
+      },
+      /*
+       * Der Satz, der die Seite von einer Werbeseite unterscheidet. Er nennt
+       * die Luecke, die ein grosser Kunde als erstes findet — bevor der
+       * Kunde sie findet.
+       */
+      limit:
+        "Was hier fehlt, fehlt bewusst: eine Mitarbeiterzahl, eine Kapazitätsgrenze und eine Vertretungsregel für den Fall, dass der Verantwortliche ausfällt. Alle drei ließen sich behaupten, keine davon ist heute belegt. Für ein abgegrenztes Projekt ist das tragbar; für den Kern eines Betriebs sollten Sie danach fragen.",
+    },
     workModel: {
       eyebrow: "So arbeiten wir",
       title: "Founder-led — und dazu genau die Leute, die ein Projekt braucht.",
@@ -1829,7 +1966,33 @@ export const dictionary = {
       eyebrow: "Betreiben",
       title: "Managed Betrieb.",
       lead: "Die fünf Ebenen stehen senkrecht aufeinander. Das hier liegt quer darunter und berührt jede von ihnen: Was gebaut ist, muss laufen — jeden Tag, auch an den Tagen, an denen niemand daran denkt.",
-      statement: "Wir übergeben nicht und verschwinden. Was wir gebaut haben, betreiben wir weiter — fällt nachts etwas aus, ist das unser Problem und nicht Ihres.",
+      /*
+       * GATE 02 — MONITORING IST NICHT DASSELBE WIE EIN MENSCH UM DREI UHR.
+       *
+       * Hier stand: „faellt nachts etwas aus, ist das unser Problem und nicht
+       * Ihres." Der Satz ist als Haltung gemeint und wird als Zusage gelesen:
+       * jemand ist nachts da. Zwei Bildschirmhoehen tiefer steht auf
+       * derselben Seite unter „Nicht enthalten": Rufbereitschaft,
+       * Wochenenddienst, zugesagte Reaktionszeit in Stunden — und beim
+       * Support „Rueckruf am naechsten Werktag".
+       *
+       * Beides zusammen ist kein Detailwiderspruch, sondern der teuerste, den
+       * eine Betriebsseite haben kann: Wer nach dem ersten Satz kauft, merkt
+       * es beim ersten naechtlichen Ausfall.
+       *
+       * Der Satz trennt jetzt, was getrennt gehoert — und was die Seite an
+       * anderer Stelle laengst richtig sagt (Karte 03: „wer zuerst: das
+       * Monitoring oder Ihr Kunde"):
+       *
+       *   Monitoring   automatisch, rund um die Uhr — meldet.
+       *   Mensch       am naechsten Werktag — ruft zurueck.
+       *   SLA          gibt es nicht, und es wird auch keine behauptet.
+       *
+       * Die Zusage wird damit kleiner und wahr. WEB-0006 bleibt bei Gate 03:
+       * dort geht es um die Copy-Konsistenz beider Seiten, hier nur um den
+       * einen Satz, der in die Irre fuehrt.
+       */
+      statement: "Wir übergeben nicht und verschwinden. Was wir gebaut haben, betreiben wir weiter — fällt nachts etwas aus, meldet es das Monitoring und nicht Ihr Kunde. Zurück ruft ein Mensch am nächsten Werktag.",
       itemsLabel: "Was dazugehört",
       items: {
         hosting: {
@@ -2981,7 +3144,16 @@ export const dictionary = {
       sectorLabel: "Sektör",
       statusLabel: "Durum",
       regionLabel: "Pazar",
-      liveLabel: "Canlı aç",
+      liveLabel: "Uygulamaya git",
+      zugangLabel: "Erişim",
+      zugang: {
+        offen: "Hesapsız kullanılabilir",
+        geschlossen: "Kapalı sistem — doğrulamadan sonra hesap",
+        intern: "Herkese açık adresi yok",
+      },
+      situCaption: "Uygulama sahada",
+      situPending:
+        "Bu, uygulamanın sahadaki hâli; arayüzün ekran ekran görüntüsü değil. Tam ekran görüntüleri, örnek verilerle bir demo kurulumundan alabildiğimizde yayımlarız — o zamana kadar burada var olan görsel duruyor, daha fazlasını iddia eden bir görsel değil.",
       backLabel: "Tüm ürünler",
       systemLabel: "Sistemdeki yeri",
       systemBody:
@@ -3467,6 +3639,45 @@ export const dictionary = {
       marketsLabel: "Pazarlar",
       honesty: "Uydurma çalışan veya ciro sayıları vermiyoruz. Kanıtımız yaptığımız işlerdir.",
     },
+    lieferung: {
+      eyebrow: "Sorumluluğu devrederken",
+      title: "O zaman gerçekte ne olur.",
+      lead: "Her büyük projeden önce gelen altı soru — ve bugün geçerli olan cevaplar. Her biri, işaret ettiği yerde ayrıntısıyla duruyor.",
+      items: {
+        fuehrung: {
+          name: "Kim yürütür",
+          what: "Tek bir sorumlu; ilk görüşmeden işletmeye kadar hep aynı kişi. Satıştan uygulamaya geçişte kişi değişmez.",
+          cta: "Çalışma modeli",
+        },
+        umfang: {
+          name: "Kapsam nasıl belirlenir",
+          what: "Kapsamı, fiyatı ve süresi belli sabit bir teklif — kurmaya başlamadan önce. Saat çizelgesi yok, ek talep yok.",
+          cta: "Süreç ve fiyatlar",
+        },
+        pruefung: {
+          name: "Nasıl denetlenir",
+          what: "Başkalarını denetlediğimiz yöntemi önce kendi sitemizde uyguladık — yöntemi, sayıları ve bulduğumuz eksikleri açıkça belgeleyerek.",
+          cta: "Kendi denetimimiz",
+        },
+        uebergabe: {
+          name: "Size ait olan",
+          what: "Sistem ve içindeki tüm veriler ilk günden itibaren sizindir. Kod, içerik, erişimler ve alan adı, bakım sona erse de sizde kalır.",
+          cta: "İşletme ve mülkiyet",
+        },
+        netzwerk: {
+          name: "Başında başka kim oturur",
+          what: "Bir projenin ek olarak ihtiyaç duyduğu şey — geliştirme, metin, strateji — DACH bölgesindeki sabit bir ağdan gelir. Adı sanı belirsiz alımlar değil.",
+          cta: "Çalışma modeli",
+        },
+        grenze: {
+          name: "Taahhüt edilmeyen",
+          what: "Yüzdeyle erişilebilirlik yok, saatle yanıt süresi yok, 7/24 yok, nöbet yok. İzleme kesintisiz bildirir; geri dönüşü bir insan ertesi iş günü yapar.",
+          cta: "Neler dahil",
+        },
+      },
+      limit:
+        "Burada eksik olan bilerek eksik: çalışan sayısı, kapasite sınırı ve sorumlunun devre dışı kalması hâlinde bir vekâlet kuralı. Üçü de iddia edilebilirdi, hiçbiri bugün belgeli değil. Sınırları belli bir proje için bu taşınabilir; bir işletmenin çekirdeği için bunu bize sormalısınız.",
+    },
     workModel: {
       eyebrow: "Nasıl çalışıyoruz",
       title: "Kurucu yönetiminde — ve bir projenin ihtiyaç duyduğu kişilerle.",
@@ -3598,7 +3809,7 @@ export const dictionary = {
       eyebrow: "İşletme",
       title: "Managed işletme.",
       lead: "Beş katman dikey olarak üst üste durur. Bu ise onların altında yatay uzanır ve hepsine dokunur: Kurulan şeyin işlemesi gerekir — her gün, kimsenin aklına gelmediği günlerde de.",
-      statement: "Teslim edip kaybolmayız. Kurduğumuz şeyi işletmeye devam ederiz — gece bir şey düşerse bu bizim sorunumuzdur, sizin değil.",
+      statement: "Teslim edip kaybolmayız. Kurduğumuz şeyi işletmeye devam ederiz — gece bir şey düşerse bunu izleme sistemi bildirir, müşteriniz değil. Geri dönüşü bir insan ertesi iş günü yapar.",
       itemsLabel: "Neler dahil",
       items: {
         hosting: {
@@ -4521,7 +4732,16 @@ export const dictionary = {
       sectorLabel: "Sector",
       statusLabel: "Status",
       regionLabel: "Market",
-      liveLabel: "Open live",
+      liveLabel: "Go to the application",
+      zugangLabel: "Access",
+      zugang: {
+        offen: "Usable without an account",
+        geschlossen: "Closed system — account after verification",
+        intern: "No public address",
+      },
+      situCaption: "The application in use",
+      situPending:
+        "This is the application in use, not the interface screen by screen. We will show full captures once we can take them from a demo instance with invented data — until then this is the picture that exists, not one that claims more.",
       backLabel: "All products",
       systemLabel: "Where it sits in the system",
       systemBody:
@@ -5008,6 +5228,45 @@ export const dictionary = {
       honesty:
         "We do not quote invented headcounts or revenue figures. Our proof is work we have built.",
     },
+    lieferung: {
+      eyebrow: "When you hand over responsibility",
+      title: "What actually happens then.",
+      lead: "Six questions that come up before any larger project — and the answers that hold today. Each one is set out in full where it points.",
+      items: {
+        fuehrung: {
+          name: "Who leads",
+          what: "One person is responsible, and it is the same one from the first conversation into operation. No handover from sales to delivery.",
+          cta: "How we work",
+        },
+        umfang: {
+          name: "How scope is fixed",
+          what: "A firm offer with scope, price and timeframe — before the build. No timesheets, no follow-up claims.",
+          cta: "Process and prices",
+        },
+        pruefung: {
+          name: "How it is checked",
+          what: "What we check for others, we first checked on our own site — with the method, the numbers and the faults we found documented openly.",
+          cta: "Our own audit",
+        },
+        uebergabe: {
+          name: "What belongs to you",
+          what: "The system and all the data in it are yours from day one. Code, content, access and domain stay with you even when the support ends.",
+          cta: "Operation and ownership",
+        },
+        netzwerk: {
+          name: "Who else works on it",
+          what: "Whatever a project additionally needs — development, copy, strategy — comes from a fixed network across Germany, Austria and Switzerland. Nothing bought in anonymously.",
+          cta: "How we work",
+        },
+        grenze: {
+          name: "What is not promised",
+          what: "No availability in percent, no response time in hours, no 24/7, no on-call duty. Monitoring reports around the clock; a human calls back the next working day.",
+          cta: "What is included",
+        },
+      },
+      limit:
+        "What is missing here is missing on purpose: a headcount, a capacity limit and a deputising rule for the case where the responsible person is unavailable. All three could be claimed; none of them is evidenced today. For a bounded project that is workable; for the core of a business you should ask about it.",
+    },
     workModel: {
       eyebrow: "How we work",
       title: "Founder-led — plus exactly the people a project needs.",
@@ -5139,7 +5398,7 @@ export const dictionary = {
       eyebrow: "Operate",
       title: "Managed operations.",
       lead: "The five levels stand vertically on each other. This runs across underneath them and touches every one: what has been built has to run — every day, including the days nobody thinks about it.",
-      statement: "We do not hand over and disappear. What we have built, we keep running — if something fails at night, that is our problem and not yours.",
+      statement: "We do not hand over and disappear. What we have built, we keep running — if something fails at night, the monitoring reports it, not your customer. A human calls back the next working day.",
       itemsLabel: "What is included",
       items: {
         hosting: {
@@ -6047,7 +6306,16 @@ export const dictionary = {
       sectorLabel: "القطاع",
       statusLabel: "الحالة",
       regionLabel: "السوق",
-      liveLabel: "فتح النسخة الحية",
+      liveLabel: "إلى التطبيق",
+      zugangLabel: "الوصول",
+      zugang: {
+        offen: "قابل للاستخدام دون حساب",
+        geschlossen: "نظام مغلق — حساب بعد التحقّق",
+        intern: "لا يوجد عنوان عام",
+      },
+      situCaption: "التطبيق أثناء الاستخدام",
+      situPending:
+        "هذه هي صورة التطبيق أثناء الاستخدام، لا الواجهة شاشةً بشاشة. سننشر لقطات كاملة حين نتمكن من أخذها من نسخة تجريبية ببيانات مُختلقة — وحتى ذلك الحين تبقى هنا الصورة الموجودة فعلًا، لا صورة تدّعي أكثر.",
       backLabel: "كل المنتجات",
       systemLabel: "موقعه في النظام",
       systemBody:
@@ -6534,6 +6802,45 @@ export const dictionary = {
       honesty:
         "لا نذكر أعداد موظفين أو أرقام إيرادات مُختلَقة. دليلنا هو عملٌ بنيناه.",
     },
+    lieferung: {
+      eyebrow: "حين تسلّمون المسؤولية",
+      title: "ما الذي يحدث عندئذٍ فعلًا.",
+      lead: "ستة أسئلة تسبق كل مشروع أكبر — والإجابات السارية اليوم. كل إجابة مشروحة بالتفصيل في الموضع الذي تشير إليه.",
+      items: {
+        fuehrung: {
+          name: "من يقود",
+          what: "مسؤول واحد، وهو نفسه من أول حديث حتى التشغيل. لا انتقال من البيع إلى التنفيذ.",
+          cta: "طريقة عملنا",
+        },
+        umfang: {
+          name: "كيف يُحدَّد النطاق",
+          what: "عرض ثابت بنطاق وسعر ومدة — قبل البناء. لا كشوف ساعات ولا مطالبات لاحقة.",
+          cta: "المسار والأسعار",
+        },
+        pruefung: {
+          name: "كيف يجري التدقيق",
+          what: "ما ندقّق به لدى الآخرين طبّقناه أولًا على موقعنا — مع توثيق المنهج والأرقام والعيوب التي وجدناها علنًا.",
+          cta: "تدقيقنا الخاص",
+        },
+        uebergabe: {
+          name: "ما يعود لكم",
+          what: "النظام وكل البيانات فيه ملككم من اليوم الأول. الكود والمحتوى والصلاحيات والنطاق تبقى لديكم حتى لو انتهت الرعاية.",
+          cta: "التشغيل والملكية",
+        },
+        netzwerk: {
+          name: "من يعمل عليه أيضًا",
+          what: "ما يحتاجه المشروع إضافيًا — تطوير أو نصوص أو استراتيجية — يأتي من شبكة ثابتة في ألمانيا والنمسا وسويسرا. لا شراء مجهول.",
+          cta: "طريقة عملنا",
+        },
+        grenze: {
+          name: "ما لا نتعهّد به",
+          what: "لا إتاحة بالنسبة المئوية، ولا زمن استجابة بالساعات، ولا خدمة على مدار الساعة، ولا مناوبة. المراقبة تُبلّغ دائمًا؛ ويعاود شخصٌ الاتصال في يوم العمل التالي.",
+          cta: "ما الذي يشمله",
+        },
+      },
+      limit:
+        "ما ينقص هنا ينقص عن قصد: عدد الموظفين، وحدّ الطاقة الاستيعابية، وقاعدة إنابة إن تعذّر حضور المسؤول. الثلاثة يمكن ادّعاؤها، ولا واحد منها موثَّق اليوم. لمشروع محدود النطاق هذا محتمل؛ أما لجوهر منشأة فينبغي أن تسألوا عنه.",
+    },
     workModel: {
       eyebrow: "هكذا نعمل",
       title: "بقيادة المؤسس — ومعه بالضبط من يحتاجه المشروع.",
@@ -6665,7 +6972,7 @@ export const dictionary = {
       eyebrow: "التشغيل",
       title: "التشغيل المُدار.",
       lead: "الطبقات الخمس تقوم رأسيًا بعضها فوق بعض. وهذا يمتدّ عرضيًا تحتها ويمسّ كل واحدة منها: ما بُني يجب أن يعمل — كل يوم، بما في ذلك الأيام التي لا يفكّر فيها أحد بذلك.",
-      statement: "لا نسلّم ونختفي. ما بنيناه نُبقيه يعمل — وإن تعطّل شيء ليلًا فتلك مشكلتنا لا مشكلتكم.",
+      statement: "لا نسلّم ونختفي. ما بنيناه نُبقيه يعمل — وإن تعطّل شيء ليلًا فالمراقبة هي التي تُبلّغ، لا عميلكم. ويعاود شخصٌ الاتصال في يوم العمل التالي.",
       itemsLabel: "ما يشمله",
       items: {
         hosting: {

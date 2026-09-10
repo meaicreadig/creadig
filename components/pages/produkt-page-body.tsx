@@ -13,6 +13,7 @@ import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
 import { ProductInterest } from "@/components/product/product-interest"
 import { eintragZu, standTraegt, veraltet, wegTraegt } from "@/lib/produkt"
 import { publishedServicePages } from "@/lib/service-pages"
+import { belegZu } from "@/lib/produkt-beleg"
 import {
   furtherProjects,
   productNeighbours,
@@ -63,6 +64,13 @@ export function ProduktPageBody({
   const copy = t.produktPage
   const world = productWorlds[product.slug]
   const neighbours = productNeighbours(product.slug)
+  /*
+   * GATE 02 · WEB-0002 / WEB-0009 — die geprueften oeffentlichen Tatsachen zu
+   * diesem Produkt: die bereits ausgelieferte Aufnahme im Einsatz und die
+   * Zugangslage, beide mit Quelle und Pruefdatum in `lib/produkt-beleg.ts`.
+   * Fehlt der Eintrag, faellt die Seite auf ihren bisherigen Zustand zurueck.
+   */
+  const beleg = belegZu(product.slug)
 
   /*
    * V2-4b — der Zustands-Badge. Abgeleitet aus `live` und der oeffentlichen
@@ -148,6 +156,22 @@ export function ProduktPageBody({
             <p className="type-body text-foreground/85 mt-3 text-pretty">
               {product.outcome[locale]}
             </p>
+            {/*
+              GATE 02 · WEB-0009 — WAS PASSIERT, WENN ICH KLICKE.
+
+              Der Stand sagt, wie weit das Produkt ist. Er sagt nicht, ob ein
+              Fremder es sehen kann — und genau das ist die naechste Frage.
+              Bei meAI lauten die beiden Antworten auseinander: Die Anwendung
+              laeuft, aber sie ist ein geschlossenes System. Wer das erst nach
+              dem Klick auf einer Anmeldemaske erfaehrt, liest den Stand
+              rueckwirkend als Uebertreibung.
+            */}
+            {beleg && (
+              <p className="text-meta text-muted-foreground mt-4 text-pretty">
+                <span className="text-gold-text">{copy.zugangLabel}: </span>
+                {copy.zugang[beleg.zugang]}
+              </p>
+            )}
           </div>
           <div className="border-line pt-7 sm:border-l sm:pl-8">
             <p className="eyebrow text-gold-text">{copy.regionLabel}</p>
@@ -268,6 +292,76 @@ export function ProduktPageBody({
                 </Reveal>
               ))}
             </div>
+          </div>
+        </section>
+      ) : beleg?.situBild ? (
+        /* ------------------------------------------------------------------
+           2b · GATE 02 · WEB-0002 — DIE AUFNAHME, DIE ES SCHON GAB.
+
+           Bis hierher stand an dieser Stelle nur `screensPending`: „Oberflaechen
+           zeigen wir erst, wenn wir die echte Anwendung mit Demodaten aufnehmen
+           koennen." Gemessen am 10.09.2026 stand dieser Satz auf
+           `/produkte/fibero` — waehrend die Startseite `/works/fibero.jpg`
+           ausliefert, die echte Oberflaeche desselben Produkts, mit dem
+           Canon-Label darunter.
+
+           Die Produktseite bestritt damit, was die Startseite zeigte. Und sie
+           tat es an der einzigen Stelle, an der jemand nach genau diesem Beleg
+           sucht: 0 Bilder im `main` von `/produkte/fibero` und `/produkte/meai`
+           (WEB-0002).
+
+           Was hier NICHT passiert: Es wird keine Aufnahme erfunden und keine
+           hochgestuft. Das Bild ist dasselbe, das seit dem 29.08.2026
+           ausgeliefert wird; neu ist nur der Ort und der Satz daneben, der
+           sagt, was es ist — die Anwendung im Einsatz, nicht die Oberflaeche
+           Ansicht fuer Ansicht.
+
+           Welche Aufnahme hier erscheinen darf, entscheidet `lib/produkt-beleg.ts`
+           und nicht dieses Markup. Zwei der vier vorhandenen Bilder erscheinen
+           bewusst nicht.
+           ------------------------------------------------------------------ */
+        <section aria-labelledby="interface-title" className="section-seam">
+          <div className="section-shell">
+            <Reveal>
+              <SectionEyebrow label={copy.situCaption} />
+              <h2 id="interface-title" className="sr-only">
+                {copy.situCaption}
+              </h2>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <figure className="mt-14">
+                <div className="border-line bg-surface elevation-1 relative aspect-[3/2] w-full overflow-hidden rounded-lg border">
+                  <Image
+                    src={beleg.situBild}
+                    alt={`${product.name} — ${copy.screensAlt}`}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 92vw"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+                {/*
+                  Das Demodaten-Label ist Pflicht, nicht Kosmetik
+                  (`docs/ops/demo-data-standard.md`) — und es steht als Text
+                  unter dem Bild, nicht als Wasserzeichen darauf.
+                */}
+                <figcaption className="text-meta text-muted-foreground mt-4 flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <span>{product.name}</span>
+                  <span className="text-gold-text">{copy.screensCaption}</span>
+                </figcaption>
+              </figure>
+            </Reveal>
+            {/*
+              Der Satz, der die Grenze dieses Belegs benennt. Er steht UNTER
+              dem Bild: Erst sieht der Leser, was es gibt, dann liest er, was
+              es nicht ist. Umgekehrt entwertet die Einschraenkung den Beleg,
+              bevor er gewirkt hat.
+            */}
+            <Reveal delay={0.12}>
+              <p className="type-small text-muted-foreground border-line mt-10 max-w-2xl border-t pt-6 text-pretty">
+                {copy.situPending}
+              </p>
+            </Reveal>
           </div>
         </section>
       ) : (

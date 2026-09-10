@@ -6,6 +6,7 @@ import { CompanyChapters } from "@/components/sections/company-chapters"
 import { HouseArchitecture } from "@/components/sections/house-architecture"
 import { About } from "@/components/sections/about"
 import { WorkModel } from "@/components/sections/work-model"
+import { DeliveryResponsibility } from "@/components/sections/delivery-responsibility"
 import { CompanyPhotos } from "@/components/sections/company-photos"
 import { LogoWall } from "@/components/sections/logo-wall"
 import { ClosingCta } from "@/components/sections/closing-cta"
@@ -65,6 +66,16 @@ export function UnternehmenPageBody({ location }: { location: React.ReactNode })
         das Haus ist, dann wer darin arbeitet — und erst danach, fuer wen.
       */}
       <WorkModel />
+      {/*
+        GATE 02 · WEB-0007 — die zweite Haelfte von „Wer macht das?".
+
+        `WorkModel` darueber sagt, WER fuehrt und wer dazukommt. Diese Sektion
+        sagt, was passiert, wenn ein Betrieb Verantwortung abgibt: Umfang,
+        Pruefung, Uebergabe, Eigentum — und was ausdruecklich nicht zugesagt
+        ist. Sie steht direkt dahinter, weil sie dieselbe Frage weiterfuehrt,
+        und vor den Fotos, weil sie schwerer wiegt als ein Bild.
+      */}
+      <DeliveryResponsibility />
       {/*
         Echte Fotos aus dem Haus (§10.6). Rendert nur, wenn unter
         public/images/unternehmen/ wirklich eins liegt — heute keins, also

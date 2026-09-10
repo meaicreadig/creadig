@@ -27,10 +27,10 @@ Das besitzende Gate bleibt in allen sieben Fällen unverändert; für G05 heißt
 | P1 | 11 |
 | P2 | 19 |
 | P3 | 13 |
-| CONFIRMED_CURRENT | 32 |
-| FIXED_ON_BRANCH | 7 |
+| CONFIRMED_CURRENT | 31 |
+| FIXED_ON_BRANCH | 9 |
 | NOT_REPRODUCED | 2 |
-| EXTERNAL_BLOCKED | 1 |
+| EXTERNAL_BLOCKED | 0 |
 | UNVERIFIED | 1 |
 | OWNER_BLOCKED | 0 |
 
@@ -43,14 +43,14 @@ Alle Befunde sind einem Gate zugeordnet. Kein heimatloser Befund.
 | ID | Quelle | Wahrheitsstand | Route/Bereich | Befund | Beleg aus Gate 00 | Gate |
 |---|---|---|---|---|---|---|
 | WEB-0001 | AUDIT-1 | CONFIRMED_CURRENT | `/arbeiten` | Keine freigegebene Kundenarbeit, obwohl „Arbeiten" genau das erwarten lässt | `/arbeiten` verlinkt **ausschließlich** die vier eigenen Produkte, 0 eigene Ziele, 191 Wörter | G02 |
-| WEB-0002 | AUDIT-2 | CONFIRMED_CURRENT | `/produkte`, Detailseiten | Vier Produkte als Hauptbeweis, drei „im Aufbau", Details nennen Bausteine statt Wirkung | `/produkte/fibero` und `/produkte/meai`: **0 Bilder** im `main` | G02 |
+| WEB-0002 | AUDIT-2 | FIXED_ON_BRANCH | `/produkte`, Detailseiten | Vier Produkte als Hauptbeweis, drei „im Aufbau", Details nennen Bausteine statt Wirkung | `/produkte/fibero` und `/produkte/meai`: **0 Bilder** im `main` | G02 |
 | WEB-0003 | AUDIT-3 | FIXED_ON_BRANCH | `/`, `/leistungen` | Fünf Ebenen werden vor dem Nutzerproblem erklärt | Startseite: 31 Eyebrows, 9 H2 vor der ersten Kundenwirkung | G01 |
 | WEB-0004 | AUDIT-4 | FIXED_ON_BRANCH | `/leistungen` | Operations und Intelligence sind Kategorien, kein kaufbarer Einstieg | Kein Preis, keine Projektgröße, kein Beispiel für beide Ebenen | G01 |
 | WEB-0005 | AUDIT-5 | FIXED_ON_BRANCH | `/produkte` + `/arbeiten` | Beide Seiten zeigen dieselbe Sammlung | **Identische vier Ziel-Links** auf beiden Seiten; `/arbeiten` hat kein einziges eigenes Ziel | G01 |
 | WEB-0006 | AUDIT-6 | CONFIRMED_CURRENT | `/betrieb`, `/leistungen` | „Fällt nachts etwas aus, ist das unser Problem" neben „kein 24/7", „Reaktionszeit in Stunden", „Wochenende" | Beide Aussagen auf **beiden** Seiten im selben Dokument nachgewiesen | G03 |
 | WEB-0007 | AUDIT-7 | CONFIRMED_CURRENT | `/unternehmen` | Lieferfähigkeit: weder Personen, Rollen noch Kapazitätsmodell sichtbar | 858 Wörter, 36 Eyebrows, keine Rollenstruktur | G02 |
 | WEB-0008 | AUDIT-8 | CONFIRMED_CURRENT | `/termin` | Vier Schritte für ein 20-Minuten-Erstgespräch | Fortschritt 25 % → 50 % über mehrere Schritte gemessen | G06 |
-| WEB-0009 | AUDIT-9 | EXTERNAL_BLOCKED | `meai.run` (extern) | „2-Faktor & Bot-Schutz folgen" als Sicherheits-Gegensignal | `meai.run` antwortet mit 307, Text von hier **nicht verifizierbar**; liegt außerhalb von creadig.de | G02 |
+| WEB-0009 | AUDIT-9 | FIXED_ON_BRANCH | `meai.run` (extern) | „2-Faktor & Bot-Schutz folgen" als Sicherheits-Gegensignal | `meai.run` antwortet mit 307, Text von hier **nicht verifizierbar**; liegt außerhalb von creadig.de | G02 |
 | WEB-0010 | AUDIT-10 | CONFIRMED_CURRENT | `/en/*`, `/ar/*` 404 | Lokalisierte 404-Seiten zeigen türkischen Haupttext | **Ursache gefunden:** `app/(en)/en/not-found.tsx:13` und `app/(ar)/ar/not-found.tsx:13` lesen beide `dictionary.tr.errorPages.notFound`. Live reproduziert | G07 |
 | WEB-0036 | G00 | CONFIRMED_CURRENT | `/leistungen/*` | 44 % wortgleiche Copy über vier Digital-Seiten | 8 von 18 tragenden Sätzen aus `/webdesign` stehen wortgleich auf ≥2 weiteren Seiten | G03 |
 
@@ -168,3 +168,35 @@ sondern ein Schaden, den Gate 01 selbst angerichtet hat.
   alle 200, `lang` und `dir` korrekt, Hauptmenü überall dieselben drei Rubriken.
 - Die sechs G18-Dateien sind bit-identisch zum Stand bei Zugbeginn (SHA-1
   verglichen).
+
+
+---
+
+## Gate 02 — was behoben wurde und woran man es misst
+
+Gemessen am 10.09.2026 gegen den Gate-02-Zug auf `feat/system-haus-site`,
+gebaut und lokal ausgeliefert. Methode wie in Gate 00/01.
+
+| ID | Was geändert wurde | Beleg nach der Änderung |
+|---|---|---|
+| **WEB-0002** | Die bereits öffentlich ausgelieferte, geprüfte Aufnahme der echten Oberfläche steht jetzt auf der Seite des Produkts, das sie zeigt — mit dem Canon-Label „Echte Oberfläche, Demodaten." | `/produkte/fibero` und `/produkte/meai`: **0 → 1 Bild** im `main`, in allen vier Sprachen. Zwei weitere vorhandene Aufnahmen bewusst **nicht** gezeigt (OA-2) |
+| **WEB-0009** | In Gate 00 nicht verifizierbar (307), am 10.09.2026 gelesen: „Geschlossenes System · Zugang nur nach Verifizierung". CTA „Live öffnen" → „Zur Anwendung"; Zugangslage steht neben dem Stand | `/produkte/meai` nennt die Zugangslage vor dem Klick; keine Sicherheitsaussage über meAI hinzugefügt |
+| **WEB-0007** | `/unternehmen` beantwortet die Übergabe-Frage in sechs belegten Punkten und nennt die drei Lücken, die bleiben | 858 → 1.103 Wörter; jede Antwort verweist auf ihre Fundstelle. **Teilweise gelöst** — Vertretung und Kapazität bleiben Owner (OA-4) |
+| **WEB-0001** | nicht lösbar ohne Kundenfreigabe. Architektur steht und ist geprüft | 0 Fälle, 0 Logos, 0 Zitate öffentlich · `npm run proof-drill` 40 Prüfungen grün |
+
+### Nebenwirkungen, gemessen und nicht verschwiegen
+
+| Betroffener Befund | Gate | Wirkung |
+|---|---|---|
+| **WEB-0037** · Extremwert Eyebrows | G04 | **schlechter** auf `/unternehmen`: 36 → 43 |
+| **WEB-0006** · Nachtverantwortung ↔ kein 24/7 | G03 | **besser**: der irreführende Satz trennt jetzt Monitoring, menschliche Reaktion und SLA. Besitzendes Gate bleibt **G03** (Copy-Konsistenz beider Seiten) |
+| **WEB-0017** · „Oberflächen zeigen wir erst …" trotz gezeigter Oberflächen | G03 | **aufgelöst für fibero und meAI**; für CASSAMEA und meahv trifft der Satz weiterhin zu, weil dort keine standardkonforme Aufnahme existiert |
+
+### Prüfung nach der Änderung
+
+- 33 von 33 Postbuild-Gates grün (32 bestehende plus `check-beleg.mjs`).
+- `npm run a11y`: **124 Durchläufe**, keine maschinell feststellbare Verletzung.
+- `npm run proof-drill`: 40 Prüfungen — ohne Freigabe erscheint weiterhin nichts.
+- Gegenprüfung auf Überclaiming über 15 Routen und 7 Mustergruppen:
+  **5 Treffer, alle Verneinungen** („kein 24/7", „keine Reaktionszeit in Stunden").
+- Die sechs G18-Dateien sind bit-identisch zum Stand bei Zugbeginn (SHA-256).

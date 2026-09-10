@@ -8,6 +8,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { StatusDot } from "@/components/ui/status-dot";
 import { ClosingCta } from "@/components/sections/closing-cta";
 import { genannteClientWorks, ownProducts, productWorks } from "@/lib/site-data";
+import { belegZu } from "@/lib/produkt-beleg";
 
 /**
  * Übersicht der vier eigenen Produkte (PHASE A).
@@ -38,6 +39,21 @@ export function ProduktePageBody() {
           <ul className="flex flex-col">
             {productWorks.map((product, i) => {
               const logo = ownProducts.find((p) => p.name === product.name);
+              /*
+                GATE 02 · WEB-0009 — die Zugangslage gehoert in die Uebersicht.
+
+                Die Zeile beantwortete „was ist es" und „wie weit ist es",
+                aber nicht die Frage, die unmittelbar davor kommt: Kann ich
+                es ueberhaupt ansehen? Bei meAI lauten Stand und Zugang
+                auseinander — die Anwendung laeuft, aber sie ist ein
+                geschlossenes System. Wer das erst nach dem Klick erfaehrt,
+                liest den Stand rueckwirkend als Uebertreibung.
+
+                Bewusst als Text und nicht als weiteres Bild: Dieselbe
+                Aufnahme auf Uebersicht UND Detailseite waere Tapete, kein
+                zusaetzlicher Beleg.
+              */
+              const beleg = belegZu(product.slug);
 
               return (
                 <Reveal
@@ -117,6 +133,11 @@ export function ProduktePageBody() {
                         <p className="text-meta text-muted-foreground mt-3">
                           {product.region}
                         </p>
+                        {beleg && (
+                          <p className="text-meta text-muted-foreground mt-2 text-pretty">
+                            {t.produktPage.zugang[beleg.zugang]}
+                          </p>
+                        )}
                         <span className="text-gold-text mt-6 inline-flex items-center gap-2 text-sm tracking-wide md:justify-end">
                           {copy.openLabel}
                           <ArrowRight

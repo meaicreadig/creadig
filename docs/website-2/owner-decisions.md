@@ -24,6 +24,26 @@ so vermerkt. Beides ist umkehrbar; keine Antwort ist damit vorweggenommen.
 
 ---
 
+## Owner-Asset-Warteschlange (Gate 02)
+
+Keine Frage nach einer Entscheidung — eine Liste von **Material**, das nur der
+Owner oder ein Kunde herstellen kann. Sortiert nach kommerzieller Wirkung.
+
+| # | Asset | Warum es wiegt | Wo es erscheinen würde | Minimum | Bis dahin |
+|---|---|---|---|---|---|
+| **OA-5** | **Eine schriftlich freigegebene Kundenarbeit** | Der einzige harte Blocker für Mittelstand und größer. Kein Fall, kein Logo, kein Zitat ist heute öffentlich | `/arbeiten`, Leistungsseiten, Startseite | Ein `releases`-Eintrag: Person, Rolle, Form, Datum, Umfang, Fundstelle | `/arbeiten` sagt truthful, dass keine Freigabe vorliegt |
+| **OA-2** | **Klärung zu `/works/cassamea.jpg` und `/works/meahv.jpg`** | Zwei von vier Produkten haben dadurch keine zeigbare Oberfläche | `/produkte/cassamea`, `/produkte/meahv` | Bestätigung, dass die sichtbaren Namen erfunden sind — oder Ersatzaufnahme | Beide Seiten zeigen kein Bild |
+| **OA-3** | **Vollbild-Aufnahmen aus einer Demo-Instanz** (4 Produkte) | Zeigt, WIE das System arbeitet, nicht nur DASS es existiert | `public/works/products/<slug>/` — rendert ohne Code-Eingriff | Demo-Mandant mit dem Musterbestand aus `docs/ops/demo-data-standard.md` | In-situ-Aufnahme plus Satz, was sie nicht ist |
+| **OA-4** | **Vertretungsregel und Kapazitätsaussage** | Die zwei Fragen, die ein Mittelständler vor jedem größeren Auftrag stellt | `/unternehmen`, Abschnitt „Wenn Sie Verantwortung abgeben" | Ein Satz, der hält: Wer übernimmt, wenn der Verantwortliche ausfällt | Die Lücke steht ausgesprochen auf der Seite |
+| **OA-1** | **Entscheidung zu den zwei zurückgehaltenen Bilddateien** | Sie liegen öffentlich unter `public/` und stehen im RSC-Payload ihrer Produktseiten | — | Entfernen oder als standardkonform bestätigen | `check-beleg.mjs` meldet es bei jedem Build |
+| **OA-6** | **Ein benanntes Integrationsbeispiel** | `/systeme` trägt 848 Wörter und keinen Beleg | `/systeme` | Ein realer Fall, anonymisierbar | Die Behauptung bleibt `CLAIM_ONLY` |
+| **OA-7** | **Reifegrad je Produkt** (`maturity`, heute überall `null`) | Der Badge rechnet ersatzweise aus `live` + Adresse | Produktseiten | Vier Werte, vom Owner bestätigt | Abgeleiteter Status plus Zugangslage |
+
+**Nicht gefragt wird nach** allem, was sich aus dem Repository oder der
+öffentlichen Produktadresse ableiten lässt — das hat Gate 02 selbst getan.
+
+---
+
 ## OD-1 · Produkte und Arbeiten — zwei Seiten oder eine?
 
 **Empfehlung: vorläufig zusammenlegen.**

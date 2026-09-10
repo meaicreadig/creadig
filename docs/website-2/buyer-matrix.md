@@ -8,6 +8,21 @@ Vier Größenklassen als **Prüfbrille**, nicht als Zielgruppen-Einschränkung.
 > Ein Unternehmen kann strategisch zum Markt gehören, während die Website für
 > sein Risikoprofil noch nicht genug beweist.
 
+## Stand nach Gate 02 (10.09.2026)
+
+Was sich je Klasse geändert hat — und was ausdrücklich nicht.
+
+| Klasse | Gewonnen | Weiterhin offen |
+|---|---|---|
+| **A · Kleinbetrieb** | Sieht jetzt eine echte Oberfläche statt nur einer Beschreibung; Festpreis und Ablauf unverändert klar | Kein vergleichbarer Kundenfall (WEB-0001) |
+| **B · Wachsender Betrieb** | Übergabe, Umfangskontrolle und Eigentum in sechs belegten Punkten; Zugangslage je Produkt | Kein Integrationsbeispiel mit Namen; keine Vertretungsregel |
+| **C · Etablierter Mittelstand** | Der Nachtsatz behauptet keine Rundumbetreuung mehr; die drei Lücken stehen ausgesprochen auf `/unternehmen` | Referenz, Kapazität, Vertretung, Betriebszusage in Zahlen — alle vier weiterhin **fehlend** |
+| **D · Größere Organisation** | Nichts Wesentliches. Das ist die richtige Antwort: Gate 02 hat für diese Klasse bewusst keine Reife behauptet | Alle Belege aus „Was ein großer Kunde glauben müsste" |
+
+**Die Bewertungen unten sind der Gate-00-Stand und bleiben stehen.** Was Gate
+02 daran geändert hat, steht in dieser Tabelle — die Klassen selbst wurden
+nicht neu bewertet, weil dafür Kundenbelege nötig wären, die es nicht gibt.
+
 ## A · Kleinbetrieb (5–15 Mitarbeitende)
 
 | | |
