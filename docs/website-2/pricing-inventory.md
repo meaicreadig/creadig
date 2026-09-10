@@ -1,7 +1,11 @@
 # Preis-Inventar
 
-**In Gate 00 wurde kein Preis geändert.** Diese Datei stellt fest, was
-öffentlich steht.
+**In Gate 00 wurde kein Preis geändert. In Gate 01 auch nicht.** Diese Datei
+stellt fest, was öffentlich steht.
+
+Gate 01 hat die **Platzierung** geändert, nicht die Beträge (D-19). Was sich
+verschoben hat, steht unten unter „Was Gate 01 an der Platzierung geändert
+hat".
 
 | Angebot | Preis | Art | Wo | Umfang | Rolle |
 |---|---|---|---|---|---|
@@ -32,6 +36,29 @@ Drei Größen werden heute vermischt:
 
 **Das ist keine Aussage darüber, dass die Preise falsch sind.** Es ist die
 Feststellung, dass ein Preis drei verschiedene Jobs gleichzeitig macht.
+
+## Was Gate 01 an der Platzierung geändert hat
+
+Kein Betrag wurde geändert, hinzugefügt oder entfernt. Geändert wurde, **wo**
+und **wie** ein Betrag gelesen wird.
+
+| | vorher | nach Gate 01 |
+|---|---|---|
+| Startseite, Überschrift | „Website-Paket ab **2.400 €** netto" | keine Zahl in einer Überschrift |
+| Startseite, sichtbare Beträge | 2.400 € | 2.400 € **und** 149 €, als zwei verschiedene *Arten* anzufangen |
+| `/leistungen`, je Ebene | kein Betrag an der Ebene | Betrag an der Ebene, wo einer bestätigt ist; sonst „Angebot nach Analyse" |
+| Retainer-Bedingung | nur auf `/betrieb`, also hinter dem Klick | zusätzlich an der Ebene und im Startseiten-Einstieg, vor dem Klick |
+| Preisleiter vollständig | `/leistungen#pakete` | unverändert `/leistungen#pakete` |
+
+**Die Regel dahinter (D-18):** Kein Betrag entsteht außerhalb von
+`lib/site-data.ts`. `lib/einstiege.ts` liest `packages` und `retainer` und
+tippt keine Zahl; `scripts/check-einstiege.mjs` weist jeden angezeigten Betrag
+gegen diese beiden Quellen nach.
+
+**Was das an der oben beschriebenen Spannung ändert:** Punkt 2 ist entschärft
+— derselbe Preis ankert die Startseite nicht mehr allein. Punkt 1 und Punkt 3
+bleiben unverändert bestehen; sie sind Preisfragen und gehören dem Owner
+(D-03, OD-6).
 
 Was G01/G02 zu entscheiden haben: ob Einstiegsangebot, Systemprojekt und
 Betriebsstufen getrennt sichtbar werden — und was auf der Startseite steht.

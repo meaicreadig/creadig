@@ -97,16 +97,48 @@ export const dictionary = {
      * auf die verlinkt wird.
      */
     home: {
+      /*
+       * GATE 01 · WEB-0003 — DIE ZWEITE SEKTION NENNT JETZT DAS PROBLEM.
+       *
+       * Sie hiess „creaDIG in einem Satz" und begann mit „Wir erfinden
+       * Systeme…". Das ist eine Selbstbeschreibung an Position zwei — vor
+       * jedem Satz darueber, warum jemand sie lesen sollte. Zusammen mit dem
+       * Hero standen damit zwei Erklaerungen des Hauses uebereinander, bevor
+       * das Wort „Zettel" ueberhaupt fiel.
+       *
+       * Die Reihenfolge ist umgedreht, nicht der Inhalt: Der alte Titelsatz
+       * steht unveraendert im Text, nur eine Zeile spaeter. Was jetzt oben
+       * steht, ist die Ausgangslage aus `services.layers.operations.problem`
+       * — derselbe Satz, den die Seite ohnehin traegt, an der Stelle, an der
+       * er den Rest ueberhaupt erst begruendet.
+       */
       statement: {
-        eyebrow: "creaDIG in einem Satz",
-        title: "Wir erfinden Systeme, bauen sie selbst und halten sie im Betrieb.",
-        body: "Kein klassisches IT-Systemhaus — keine Server, keine Lizenzen, kein Helpdesk. Ein System-Haus für digitale Betriebe: für Handwerk, Praxen, Gastronomie und Dienstleister, deren Arbeit heute an Zetteln, Tabellen und drei Programmen hängt, die nichts voneinander wissen. „Digitaler Betrieb“ ist dabei das Ergebnis, nicht die Voraussetzung — Sie müssen keine Digitalfirma sein, um bei uns anzufangen. Von der Marke über den Auftritt und den laufenden Betrieb bis zur Automatisierung und zur künstlichen Intelligenz: fünf Ebenen, und Sie steigen auf der ein, wo es bei Ihnen klemmt.",
+        eyebrow: "Woran es liegt",
+        title: "Die Arbeit ist da. Das System dahinter fehlt.",
+        body: "Zettel, Tabellen und drei Programme, die nichts voneinander wissen: Wer eine Frage beantworten will, sucht an vier Stellen — und die Antwort ist schon wieder alt, bevor sie fertig ist. Genau dafür gibt es creaDIG. Wir erfinden das System dahinter, bauen es selbst und halten es im Betrieb. Kein klassisches IT-Systemhaus — keine Server, keine Lizenzen, kein Helpdesk, sondern ein System-Haus für Handwerk, Praxen, Gastronomie und Dienstleister. „Digitaler Betrieb“ ist dabei das Ergebnis, nicht die Voraussetzung — Sie müssen keine Digitalfirma sein, um bei uns anzufangen. Von der Marke über den Auftritt und den laufenden Betrieb bis zur Automatisierung und zur künstlichen Intelligenz: fünf Ebenen, und Sie steigen auf der ein, wo es bei Ihnen klemmt.",
         cta: "Über das Unternehmen",
       },
+      /*
+       * GATE 01 · WEB-0005 — DIE SEKTION HIESS „AUSGEWAEHLTE ARBEITEN" UND
+       * ZEIGTE EIGENE PRODUKTE.
+       *
+       * `featuredWorks` loest gegen `registryWorks` auf, und `registryWorks`
+       * ist heute deckungsgleich mit `productWorks` — die dritte gefuehrte
+       * Kachel (`nv-swiss`) ist Kundenwerk ohne Freigabe und faellt still
+       * heraus. Uebrig blieben zwei eigene Produkte unter der Ueberschrift
+       * „Arbeiten", verlinkt auf `/arbeiten`, wo dieselbe Sammlung noch
+       * einmal stand.
+       *
+       * Jetzt sagt die Sektion, was sie zeigt, und verlinkt dorthin, wo es
+       * vollstaendig steht. Der Hinweis `note` nennt die Luecke selbst: zwei
+       * von vier. Ein Anreisser, der so tut, als sei er die Auswahl, ist eine
+       * kleine Luege ueber eine kleine Zahl.
+       */
       work: {
-        eyebrow: "Ausgewählte Arbeiten",
-        title: "Erst zeigen. Dann reden.",
-        cta: "Alle Arbeiten",
+        eyebrow: "Eigene Produkte",
+        title: "Erst bauen. Dann reden.",
+        note: "Zwei von vier. Die anderen beiden stehen auf der Produktseite.",
+        cta: "Alle vier Produkte",
         /*
          * MP10-2.4 — der Verweis AM ENDE der Werkschau.
          *
@@ -115,7 +147,7 @@ export const dictionary = {
          * Wer drei Arbeiten durchgescrollt hat, will genau das — und fand
          * am Ende nur eine Fussnote ueber Mockups und die naechste Sektion.
          */
-        ctaEnd: "Alle Arbeiten ansehen",
+        ctaEnd: "Alle vier Produkte ansehen",
       },
       /*
        * MP10-2.7 — die Ueberschrift ist in den Hero gezogen.
@@ -133,33 +165,61 @@ export const dictionary = {
         cta: "Alle Leistungen",
       },
       /*
-       * MP10-2.1 / 2.2 — DER EINSTIEG AUF DER STARTSEITE.
+       * GATE 01 · WEB-0024 — DIE STARTSEITE ANKERT NICHT MEHR AUF 2.400 EURO.
        *
        * -----------------------------------------------------------------------
-       * WARUM HIER EINE ZAHL STEHT — UND NUR EINE
-       * Die Startseite nannte keinen einzigen Preis. Das war als Haltung
-       * gedacht (ein System-Haus ist keine Preisliste), wirkte aber als
-       * Auskunftsverweigerung: Wer wissen will, ob er sich das leisten kann,
-       * und keine Zahl findet, geht — und zwar zu jemandem, der eine nennt.
+       * WAS HIER STAND UND WARUM ES SCHADETE
+       * Eine Ueberschrift, eine Zahl: „Website-Paket ab 2.400 EUR netto." Die
+       * Zahl ist richtig, der Ort war falsch. Sie war der einzige Preis auf der
+       * Startseite und damit der Massstab, an dem alles danach gelesen wurde —
+       * ein Haus, das Betrieb, Automatisierung und ein eigenes KI-System baut,
+       * stellte sich als Website-Anbieter mit einem Einstiegspreis vor.
        *
-       * Was hier NICHT steht, ist ein Paketblock. Ein Satz mit einer Zahl und
-       * einem Verweis; die Leiter, der Regelpreis und die Betreuung stehen
-       * weiter an genau einer Stelle, auf `/leistungen#pakete`. Die Zahl
-       * selbst kommt aus `site-data.packages` — sie wird hier nicht noch
-       * einmal getippt, sonst gibt es zwei Wahrheiten.
+       * Das externe Audit hat genau das benannt (AUDIT-24): Der Preis ankert
+       * creaDIG als Website-Anbieter. Wer zuerst 2.400 EUR liest, ordnet die
+       * fuenf Ebenen darunter als Zusatzleistungen ein, nicht als System.
        *
        * -----------------------------------------------------------------------
-       * WARUM ZWEI FRAGEN DANEBEN
-       * Es sind dieselben zwei, die im Erstgespraech immer zuerst kommen:
-       * was kostet das, wie laeuft das ab. Sie stehen wortgleich in der FAQ
-       * auf `/leistungen` — gespiegelt, nicht neu geschrieben: Die Sektion
-       * liest `t.faq.items`, damit die Antwort hier nicht in vier Wochen
-       * anders lautet als dort.
+       * WAS JETZT DASTEHT
+       * Nicht keine Zahl, sondern die STRUKTUR, in der Zahlen vorkommen: drei
+       * Arten anzufangen — Festpreis, monatlich, Angebot nach Analyse. Zwei
+       * davon haben heute einen bestaetigten Betrag (Website-Paket, laufende
+       * Betreuung), die dritte hat keinen und sagt das.
+       *
+       * Zwei Zahlen nebeneinander ankern nicht: Sie zeigen eine Spanne und eine
+       * Form. Eine allein ist ein Preisschild.
+       *
+       * Die Betraege kommen weiterhin aus `site-data` (`packages`, `retainer`)
+       * und werden hier nicht getippt. Die Preisleiter bleibt vollstaendig auf
+       * `/leistungen#pakete`.
+       *
+       * -----------------------------------------------------------------------
+       * WARUM ZWEI FRAGEN DANEBEN BLEIBEN
+       * Es sind dieselben zwei, die im Erstgespraech immer zuerst kommen: was
+       * kostet das, wie laeuft das ab. Sie stehen wortgleich in der FAQ auf
+       * `/leistungen` — gespiegelt, nicht neu geschrieben (`t.faq.items`),
+       * damit die Antwort hier nicht in vier Wochen anders lautet als dort.
        */
       entry: {
         eyebrow: "Einstieg",
-        priceLead: "Website-Paket ab",
-        priceNote: "netto. Festpreis für den vereinbarten Umfang.",
+        title: "Drei Arten anzufangen.",
+        lead: "Welche es wird, hängt davon ab, wo es klemmt — nicht davon, was wir gerade verkaufen wollen.",
+        arten: {
+          festpreis: {
+            label: "Festpreis ab",
+            body: "Ein vereinbarter Umfang, eine Zahl, kein Stundenzettel.",
+          },
+          monatlich: {
+            label: "Monatlich",
+            body: "Der laufende Betrieb — für Systeme, die wir gebaut haben.",
+          },
+          "nach-analyse": {
+            label: "Angebot nach Analyse",
+            body: "Zwanzig Minuten Erstgespräch, danach ein festes Angebot mit Umfang und Preis.",
+          },
+        },
+        ebenenLabel: "Gilt für",
+        nettoNote: "Alle Beträge netto.",
         priceCta: "Pakete und Preise",
         questionsLabel: "Zwei Fragen vorab",
         questionsCta: "Alle Fragen",
@@ -267,7 +327,7 @@ export const dictionary = {
       lead: "Nicht jede Anfrage beginnt mit einem Termin. Manche beginnen mit einem Blick auf das, was wir gebaut haben — auch das ist ein Weg zu uns. Beratung auf Deutsch und Türkisch.",
       metaTitle: "Kontakt — creaDIG Osnabrück",
       metaDescription:
-        "creaDIG erreichen: per WhatsApp, E-Mail, kostenloser Erstberatung oder direkt über unsere Arbeiten. ICO InnovationsCentrum Osnabrück, Beratung auf Deutsch und Türkisch.",
+        "creaDIG erreichen: per WhatsApp, E-Mail, kostenloser Erstberatung oder direkt über unsere eigenen Produkte. ICO InnovationsCentrum Osnabrück, Beratung auf Deutsch und Türkisch.",
       intentsLabel: "Womit möchten Sie anfangen?",
       intents: {
         talk: {
@@ -358,8 +418,20 @@ export const dictionary = {
      * sobald der Kunde sie freigegeben hat — vorher nicht.
      */
     arbeitenPage: {
+      /*
+       * GATE 01 · WEB-0005 — DIE SEITE BEKOMMT EINE EIGENE AUFGABE.
+       *
+       * Sie hiess „Gebaut. Und betrieben." und zeigte dieselben vier eigenen
+       * Produkte wie `/produkte` — gemessen in Gate 00: identische vier
+       * Ziel-Links auf beiden Seiten, kein einziges eigenes Ziel. Zwei
+       * Hauptmenuepunkte auf dieselbe Sammlung.
+       *
+       * `/produkte` ist ab jetzt der kanonische Ort der eigenen Produkte,
+       * `/arbeiten` der Ort fuer freigegebene Kundenarbeit. Der Titel sagt
+       * genau diesen Unterschied: fuer andere gebaut, nicht fuer uns.
+       */
       eyebrow: "Arbeiten",
-      title: "Gebaut. Und betrieben.",
+      title: "Für andere gebaut.",
       lead: "Vier eigene Produkte, die wir selbst erfunden und gebaut haben — dazu Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen, damit klar ist, was uns gehört.",
       /*
        * ZWEI FASSUNGEN, WEIL DIE SEITE ZWEI ZUSTAENDE HAT.
@@ -375,10 +447,11 @@ export const dictionary = {
        * gilt, entscheidet die Freigabelage, nicht der Text.
        */
       leadOhneKundenwerk:
-        "Vier eigene Produkte, die wir selbst erfunden, gebaut und betreiben. Kundenarbeiten stehen hier erst, wenn der Kunde sie schriftlich freigegeben hat — ohne Freigabe nennen wir keinen Namen.",
-      metaTitleOhneKundenwerk: "Arbeiten — vier eigene Produkte",
+        "Hier steht Kundenwerk — Arbeit, die wir für andere gebaut haben und die der Kunde schriftlich freigegeben hat. Heute liegt keine solche Freigabe vor, deshalb steht hier niemand. Was wir selbst erfunden und gebaut haben, steht auf der Produktseite.",
+      ohneKundenwerkCta: "Zu den eigenen Produkten",
+      metaTitleOhneKundenwerk: "Arbeiten — Kundenwerk nur mit schriftlicher Freigabe",
       metaDescriptionOhneKundenwerk:
-        "Die Werkschau von creaDIG: vier eigene Produkte, die wir selbst erfunden, gebaut und betreiben. Kundenarbeiten erscheinen erst mit schriftlicher Freigabe.",
+        "creaDIG zeigt Kundenwerk erst nach schriftlicher Freigabe des Kunden. Heute liegt keine vor. Die vier eigenen Produkte stehen auf der Produktseite.",
       metaTitle: "Arbeiten — eigene Produkte und Kundenwerk",
       metaDescription:
         "Die Werkschau von creaDIG: vier eigene Produkte und Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen — eigene Systeme und Auftragsarbeit sind nicht dasselbe.",
@@ -581,7 +654,7 @@ export const dictionary = {
     leistungenPage: {
       eyebrow: "Leistungen",
       title: "Fünf Ebenen. Ein System.",
-      lead: "Marke, Auftritt, Betrieb, Automatisierung, Intelligenz. Jede Ebene trägt die nächste — nicht nebeneinander, sondern als System. Was wir für unsere eigenen Produkte gebaut haben, bringen wir in Ihren Alltag.",
+      lead: "Der Betrieb läuft über Zettel, Tabellen und drei Programme, die nichts voneinander wissen. Wir ordnen das in ein System — auf der Ebene, auf der es bei Ihnen klemmt: Marke, Auftritt, Betrieb, Automatisierung, Intelligenz. Jede Ebene hat einen benannten Einstieg: mit Preis, wo es einen gibt, und mit einem Angebot nach Analyse, wo es keinen gibt.",
       metaTitle: "Leistungen — von der Marke bis zur KI",
       metaDescription:
         "Die fünf Ebenen von creaDIG: Marke, digitaler Auftritt, Operations, Automatisierung und KI. Für Unternehmen in Deutschland, Österreich und der Schweiz — auf Deutsch und Türkisch.",
@@ -619,7 +692,7 @@ export const dictionary = {
         arbeiten: "Ausgeführte Projekte, mit Namen",
         unternehmen: "Wer dahintersteht und wie wir arbeiten",
         insights: "Fachtexte aus dem laufenden Betrieb",
-        kontakt: "Vier Wege zum Gespräch",
+        kontakt: "Drei Wege zum Gespräch",
       },
       ueber: "Über uns",
       pakete: "Pakete",
@@ -685,8 +758,28 @@ export const dictionary = {
        * verschiedene Antworten auf „was macht ihr eigentlich", 800 Pixel
        * auseinander. Jetzt nennt er dieselben fuenf, in derselben Reihenfolge.
        */
+      /*
+       * GATE 01 · WEB-0011 — HIER STAND, WAS WIR TUN. JETZT STEHT, WAS
+       * DANACH ANDERS IST.
+       *
+       * Der Satz zaehlte die fuenf Ebenen auf: „Marke, digitaler Auftritt,
+       * Betrieb, Automatisierung und künstliche Intelligenz als ein System".
+       * Fuenf Substantive, alle richtig, und keines davon ist ein Ergebnis.
+       * Das externe Audit hat es in einem Satz zusammengefasst: emotional
+       * stark, konkret schwach — der Kaufgegenstand kommt spaet.
+       *
+       * Was hier jetzt steht, ist nicht neu erfunden. Es ist woertlich die
+       * Ausgangslage und das Ergebnis der Ebene Operations
+       * (`services.layers.operations.problem` / `.result`), also der Ebene,
+       * die die Kategorie „System-Haus fuer digitale Betriebe" ueberhaupt
+       * traegt. Der Unterschied ist die Stelle: Vorher musste jemand zwei
+       * Bildschirmhoehen scrollen und eine Klappe oeffnen, um ihn zu finden.
+       *
+       * Die fuenf Ebenen sind nicht verschwunden — sie stehen als Reihe
+       * direkt darunter. Sie stehen nur nicht mehr VOR dem Problem.
+       */
       subline:
-        "creaDIG baut Marke, digitalen Auftritt, Betrieb, Automatisierung und künstliche Intelligenz als ein System — für Unternehmen in Deutschland, Österreich und der Schweiz.",
+        "Wir bauen Betrieben das System, an dem ihre Arbeit hängt: Auftrag, Kunde, Beleg und Zahl an einem Ort. Danach gibt es eine Auskunft statt vier — und niemand sucht sie in drei Programmen zusammen.",
       /*
        * MP10-2.7 — der Satz, der die fuenf Ebenen zusammenbindet.
        *
@@ -696,9 +789,29 @@ export const dictionary = {
        * eine Ordnung — und genau das ist der Unterschied zwischen einem
        * Leistungskatalog und einem System-Haus.
        */
-      systemLine: "Fünf Ebenen. Ein System.",
+      /*
+       * GATE 01 · WEB-0003 — DAS EBENENMODELL WIRD ERKLAERT, NACHDEM DAS
+       * PROBLEM GENANNT IST.
+       *
+       * Hier stand „Fünf Ebenen. Ein System." — die Architektur des Hauses,
+       * ueber einer Reihe von fuenf Pillen, im ersten Blickfeld. Gemessen in
+       * Gate 00: 31 Eyebrows und 9 H2 auf der Startseite, bevor zum ersten
+       * Mal eine Kundenwirkung steht. Ein Modell, das erklaert wird, bevor
+       * jemand weiss, warum es ihn angeht, ist eine Hausaufgabe.
+       *
+       * Der Satz ist nicht gestrichen: Er ist die Ueberschrift von
+       * `/leistungen` und steht dort ueber der Pyramide, wo er hingehoert.
+       * Hier steht jetzt der Satz, der die Reihe darunter zu einem Einstieg
+       * macht statt zu einem Inhaltsverzeichnis.
+       */
+      systemLine: "Wo es bei Ihnen klemmt, fangen wir an.",
       ctaPrimary: "Projekt starten",
-      ctaSecondary: "Unsere Arbeit",
+      /*
+       * GATE 01 · WEB-0005 — der zweite Knopf zeigte auf `/arbeiten`, und
+       * dort standen dieselben vier eigenen Produkte wie auf `/produkte`.
+       * Er zeigt jetzt dorthin, wo sie vollstaendig stehen.
+       */
+      ctaSecondary: "Eigene Produkte",
       /*
        * MP10-2.5 — die Fusszeile des Hero nannte den Sitz ein zweites Mal,
        * 200 Pixel unter dem Eyebrow. Sie traegt jetzt den Markt, den der
@@ -1051,9 +1164,42 @@ export const dictionary = {
       eyebrow: "Leistungen",
       title: "Fünf Ebenen. Ein System.",
       lead: "Wir arbeiten von A bis Z — vom ersten Logo bis zum eigenen KI-System. Jede Ebene baut auf der darunter auf.",
+      /*
+       * GATE 01 · WEB-0004 — DIE BESCHRIFTUNGEN DES EINSTIEGS.
+       *
+       * Der Befund lautete: „Operations und Intelligence sind Kategorien, kein
+       * kaufbarer Einstieg." Gemessen in Gate 00: fuer beide Ebenen kein Preis,
+       * keine Projektgroesse, kein Beispiel.
+       *
+       * Die Ursache lag in der Struktur, nicht im Text — `publishedServicePages`
+       * deckt `identity`, `digital` und `automation` ab; fuer die anderen beiden
+       * gibt es keine Leistungsseite, also stand unter ihrer Ueberschrift nichts
+       * Kaufbares. Die Zuordnung selbst steht jetzt in `lib/einstiege.ts`; hier
+       * stehen nur ihre Beschriftungen.
+       *
+       * `angebotArt.nach-analyse` ist keine Ausweichformel, sondern der einzige
+       * ehrliche Zustand fuer Intelligence: Es gibt dort keinen bestaetigten
+       * Preis. Eine erfundene Zahl waere die einzige Zahl auf der Website, die
+       * niemand halten muss.
+       *
+       * `entryLabel` heisst nicht mehr „Einstieg": Diese Beschriftung traegt
+       * jetzt der Einstieg an der Ebene, und zweimal dasselbe Wort auf einer
+       * Seite fuer zwei verschiedene Dinge ist eine Verwechslung mit Ansage.
+       */
       forWhom: "Für wen",
       // Einstiegs-Chips ueber der Pyramide: die Vokabel, nach der gesucht wird.
-      entryLabel: "Einstieg",
+      entryLabel: "Direkt zur Leistung",
+      angebotLabel: "Einstieg",
+      belegLabel: "Beleg",
+      angebotArt: {
+        festpreis: "Festpreis ab",
+        monatlich: "Monatlich",
+        "nach-analyse": "Angebot nach Analyse",
+      },
+      angebotBedingung: "Nur für Systeme, die wir gebaut haben.",
+      angebotCta: "Einstieg ansehen",
+      belegCta: "Beleg ansehen",
+      belegEigenpruefung: "Unsere eigene Prüfung",
       /*
        * V2-2 — DIE EBENEN WAREN KATEGORIE-SPRACHE, KEINE LEISTUNG.
        *
@@ -2009,14 +2155,14 @@ export const dictionary = {
       title: "Sie führen den Betrieb. Wir bauen das System dahinter.",
       lead: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sehen uns den Betrieb an und sagen ehrlich, ob wir helfen können.",
       ctaPrimary: "Projekt starten",
-      ctaSecondary: "Arbeiten ansehen",
+      ctaSecondary: "Produkte ansehen",
       variants: {
         prices: {
           eyebrow: "Nächster Schritt",
           title: "Ein Festpreis für Ihren Umfang — nach zwanzig Minuten.",
           lead: "Was oben steht, ist der Einstieg. Was Ihr Betrieb braucht, sehen wir uns an, bevor irgendjemand eine Zahl nennt — kostenlos und unverbindlich.",
           ctaPrimary: "Festpreis-Angebot anfragen",
-          ctaSecondary: "Arbeiten ansehen",
+          ctaSecondary: "Produkte ansehen",
         },
         work: {
           eyebrow: "Nächster Schritt",
@@ -2569,16 +2715,17 @@ export const dictionary = {
     },
     home: {
       statement: {
-        eyebrow: "Tek cümlede creaDIG",
-        title: "Sistemleri biz icat eder, kendimiz kurar ve işler hâlde tutarız.",
-        body: "Klasik bir BT sistem evi değiliz — sunucu yok, lisans yok, yardım masası yok. Dijital işletmeler için bir sistem evi: işi bugün kâğıtlara, tablolara ve birbirinden habersiz üç programa dağılmış esnafa, muayenehanelere, restoranlara ve hizmet işletmelerine. „Dijital işletme“ burada sonuçtur, önkoşul değil — bize başlamak için dijital bir firma olmanız gerekmiyor. Markadan görünüme, günlük işletmeden otomasyona ve yapay zekâya: beş katman, ve siz nerede sıkışıyorsanız oradan girersiniz.",
+        eyebrow: "Sorun nerede",
+        title: "İş var. Arkasındaki sistem yok.",
+        body: "Kâğıtlar, tablolar ve birbirinden habersiz üç program: bir soruya cevap vermek isteyen dört yere bakar — ve cevap daha bitmeden eskimiştir. creaDIG tam bunun için var. Arkadaki sistemi biz kurgular, kendimiz kurar ve işler hâlde tutarız. Klasik bir BT sistem evi değiliz — sunucu yok, lisans yok, yardım masası yok; esnaf, muayenehane, restoran ve hizmet işletmeleri için bir sistem evi. „Dijital işletme“ burada sonuçtur, önkoşul değil — bize başlamak için dijital bir firma olmanız gerekmiyor. Markadan görünüme, günlük işletmeden otomasyona ve yapay zekâya: beş katman, ve siz nerede sıkışıyorsanız oradan girersiniz.",
         cta: "Şirket hakkında",
       },
       work: {
-        eyebrow: "Seçilmiş işler",
-        title: "Önce göster. Sonra konuş.",
-        cta: "Tüm işler",
-        ctaEnd: "Tüm işleri gör",
+        eyebrow: "Kendi ürünlerimiz",
+        title: "Önce kur. Sonra konuş.",
+        note: "Dörtten ikisi. Diğer ikisi ürünler sayfasında.",
+        cta: "Dört ürünün tümü",
+        ctaEnd: "Dört ürünün tümünü gör",
       },
       capabilities: {
         eyebrow: "Hizmetler",
@@ -2588,8 +2735,24 @@ export const dictionary = {
       },
       entry: {
         eyebrow: "Başlangıç",
-        priceLead: "Web sitesi paketi",
-        priceNote: "net'ten itibaren. Anlaşılan kapsam için sabit fiyat.",
+        title: "Başlamanın üç yolu.",
+        lead: "Hangisi olacağı nerede sıkıştığınıza bağlı — bizim o an ne satmak istediğimize değil.",
+        arten: {
+          festpreis: {
+            label: "Sabit fiyat",
+            body: "Anlaşılan kapsam, tek rakam, saat çizelgesi yok.",
+          },
+          monatlich: {
+            label: "Aylık",
+            body: "Süregelen işletme — kurduğumuz sistemler için.",
+          },
+          "nach-analyse": {
+            label: "Analiz sonrası teklif",
+            body: "Yirmi dakikalık ilk görüşme, ardından kapsamı ve fiyatı belli sabit bir teklif.",
+          },
+        },
+        ebenenLabel: "Şu katmanlar için",
+        nettoNote: "Tüm tutarlar nettir.",
         priceCta: "Paketler ve fiyatlar",
         questionsLabel: "Önce iki soru",
         questionsCta: "Tüm sorular",
@@ -2658,7 +2821,7 @@ export const dictionary = {
       lead: "Her başvuru bir randevuyla başlamaz. Bazıları neyi kurduğumuza bakmakla başlar — o da bize giden bir yoldur. Danışmanlık Almanca ve Türkçe.",
       metaTitle: "İletişim — creaDIG Osnabrück",
       metaDescription:
-        "creaDIG'e ulaşın: WhatsApp, e-posta, ücretsiz ilk görüşme veya doğrudan işlerimiz üzerinden. ICO InnovationsCentrum Osnabrück, Almanca ve Türkçe danışmanlık.",
+        "creaDIG'e ulaşın: WhatsApp, e-posta, ücretsiz ilk görüşme veya doğrudan kendi ürünlerimiz üzerinden. ICO InnovationsCentrum Osnabrück, Almanca ve Türkçe danışmanlık.",
       intentsLabel: "Neyle başlamak istersiniz?",
       intents: {
         talk: {
@@ -2724,13 +2887,14 @@ export const dictionary = {
     },
     arbeitenPage: {
       eyebrow: "İşler",
-      title: "Kuruldu. Ve işletiliyor.",
+      title: "Başkaları için kuruldu.",
       lead: "Kendi icat edip kurduğumuz dört ürün — ayrıca Almanya ve İsviçre'den müşteri işleri. Neyin bize ait olduğu açık olsun diye ayrı gösteriliyor.",
       leadOhneKundenwerk:
-        "Kendi icat ettiğimiz, kurduğumuz ve işlettiğimiz dört ürün. Müşteri işleri burada ancak müşteri yazılı onay verdiğinde yer alır — onay yoksa isim vermeyiz.",
-      metaTitleOhneKundenwerk: "İşler — kendi dört ürünümüz",
+        "Burada müşteri işleri yer alır — başkaları için kurduğumuz ve müşterinin yazılı olarak onayladığı işler. Bugün böyle bir onay yok, bu yüzden burada kimse yer almıyor. Kendi icat edip kurduklarımız ürünler sayfasında.",
+      ohneKundenwerkCta: "Kendi ürünlerimize",
+      metaTitleOhneKundenwerk: "İşler — müşteri işleri yalnızca yazılı onayla",
       metaDescriptionOhneKundenwerk:
-        "creaDIG seçkisi: kendi icat ettiğimiz, kurduğumuz ve işlettiğimiz dört ürün. Müşteri işleri yalnızca yazılı onayla görünür.",
+        "creaDIG müşteri işlerini ancak müşterinin yazılı onayından sonra gösterir. Bugün onay yok. Kendi dört ürünümüz ürünler sayfasında.",
       metaTitle: "İşler — kendi ürünlerimiz ve müşteri işleri",
       metaDescription:
         "creaDIG seçkisi: dört kendi ürün ve Almanya ile İsviçre'den müşteri işleri. Ayrı gösterilir — kendi sistemlerimiz ile sipariş işleri aynı şey değildir.",
@@ -2844,7 +3008,7 @@ export const dictionary = {
     leistungenPage: {
       eyebrow: "Hizmetler",
       title: "Beş katman. Tek sistem.",
-      lead: "Marka, dijital görünüm, operasyon, otomasyon, zekâ. Her katman bir sonrakini taşır — yan yana değil, bir sistem olarak. Kendi ürünlerimiz için kurduğumuzu sizin günlük işinize taşırız.",
+      lead: "İşletme kâğıtlar, tablolar ve birbirinden habersiz üç program üzerinden yürüyor. Biz bunu tek bir sisteme oturtuyoruz — hem de sizde nerede sıkışıyorsa o katmanda: marka, görünüm, işletme, otomasyon, zekâ. Her katmanın adı konmuş bir başlangıcı var: fiyatı olan yerde fiyatla, olmayan yerde analiz sonrası teklifle.",
       metaTitle: "Hizmetler — markadan yapay zekâya",
       metaDescription:
         "creaDIG'in beş katmanı: marka, dijital görünüm, operasyon, otomasyon ve yapay zekâ. Almanya, Avusturya ve İsviçre'deki işletmeler için — Almanca ve Türkçe.",
@@ -2868,7 +3032,7 @@ export const dictionary = {
         arbeiten: "Adıyla anılan tamamlanmış projeler",
         unternehmen: "Arkasında kim var ve nasıl çalışıyoruz",
         insights: "İşin içinden gelen uzman metinler",
-        kontakt: "Görüşmeye giden dört yol",
+        kontakt: "Görüşmeye giden üç yol",
       },
       ueber: "Hakkımızda",
       pakete: "Paketler",
@@ -2887,10 +3051,10 @@ export const dictionary = {
       headlineLine2: "görmediğini",
       headlineLine3: "inşa ediyoruz.",
       subline:
-        "creaDIG; Almanya, Avusturya ve İsviçre'deki işletmeler için markayı, dijital görünümü, işletmeyi, otomasyonu ve yapay zekâyı tek bir sistem olarak kurar.",
-      systemLine: "Beş katman. Tek sistem.",
+        "İşletmelere, işlerinin asıldığı sistemi kuruyoruz: iş emri, müşteri, belge ve rakam tek yerde. Sonrasında dört yerine tek bir bilgi var — ve kimse onu üç programdan toplamıyor.",
+      systemLine: "Nerede sıkışıyorsanız oradan başlıyoruz.",
       ctaPrimary: "Projeye başla",
-      ctaSecondary: "İşlerimiz",
+      ctaSecondary: "Kendi ürünlerimiz",
       location: "Almanya · Avusturya · İsviçre",
       scroll: "Kaydır",
     },
@@ -3097,7 +3261,18 @@ export const dictionary = {
       title: "Beş katman. Tek sistem.",
       lead: "A'dan Z'ye çalışıyoruz — ilk logodan kendi yapay zekâ sistemine kadar. Her katman altındakinin üzerine kurulur.",
       forWhom: "Kimler için",
-      entryLabel: "Başlangıç",
+      entryLabel: "Doğrudan hizmete",
+      angebotLabel: "Başlangıç",
+      belegLabel: "Kanıt",
+      angebotArt: {
+        festpreis: "Sabit fiyat",
+        monatlich: "Aylık",
+        "nach-analyse": "Analiz sonrası teklif",
+      },
+      angebotBedingung: "Yalnızca bizim kurduğumuz sistemler için.",
+      angebotCta: "Başlangıcı gör",
+      belegCta: "Kanıtı gör",
+      belegEigenpruefung: "Kendi denetimimiz",
       problemLabel: "Başlangıç durumu",
       solutionLabel: "Ne kuruyoruz",
       resultLabel: "Sonrasında ne değişir",
@@ -3669,14 +3844,14 @@ export const dictionary = {
       title: "İşletmenizi siz yönetirsiniz. Arkasındaki sistemi biz kurarız.",
       lead: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmeye bakar ve yardımcı olabilir miyiz, dürüstçe söyleriz.",
       ctaPrimary: "Projeye başla",
-      ctaSecondary: "İşleri gör",
+      ctaSecondary: "Ürünleri gör",
       variants: {
         prices: {
           eyebrow: "Sonraki adım",
           title: "Kapsamınıza sabit bir fiyat — yirmi dakika sonra.",
           lead: "Yukarıdaki, giriş adımıdır. İşletmenizin neye ihtiyacı olduğuna, kimse bir rakam söylemeden önce bakarız — ücretsiz ve bağlayıcı değil.",
           ctaPrimary: "Sabit fiyat teklifi isteyin",
-          ctaSecondary: "İşleri gör",
+          ctaSecondary: "Ürünleri gör",
         },
         work: {
           eyebrow: "Sonraki adım",
@@ -4087,16 +4262,17 @@ export const dictionary = {
     },
     home: {
       statement: {
-        eyebrow: "creaDIG in one sentence",
-        title: "We design systems, build them ourselves and keep them running.",
-        body: "Not a classic IT systems house — no servers, no licences, no helpdesk. A systems house for digitally run businesses: for trades, practices, restaurants and service companies whose work today hangs on notes, spreadsheets and three programs that know nothing about each other. Being a “digital operation” is the result here, not the entry requirement — you do not have to be a tech company to start with us. From the brand through the presence and day-to-day operations to automation and artificial intelligence: five levels, and you enter at the one where it hurts.",
+        eyebrow: "Where it goes wrong",
+        title: "The work is there. The system behind it is not.",
+        body: "Notes, spreadsheets and three programs that know nothing about each other: anyone who wants to answer a question looks in four places — and the answer is out of date before it is finished. That is what creaDIG exists for. We design the system behind it, build it ourselves and keep it running. Not a classic IT systems house — no servers, no licences, no helpdesk, but a systems house for trades, practices, restaurants and service companies. Being a “digital operation” is the result here, not the entry requirement — you do not have to be a tech company to start with us. From the brand through the presence and day-to-day operations to automation and artificial intelligence: five levels, and you enter at the one where it hurts.",
         cta: "About the company",
       },
       work: {
-        eyebrow: "Selected work",
-        title: "Show first. Talk after.",
-        cta: "All work",
-        ctaEnd: "See all work",
+        eyebrow: "Our own products",
+        title: "Build first. Talk after.",
+        note: "Two of four. The other two are on the products page.",
+        cta: "All four products",
+        ctaEnd: "See all four products",
       },
       capabilities: {
         eyebrow: "Services",
@@ -4106,8 +4282,24 @@ export const dictionary = {
       },
       entry: {
         eyebrow: "Getting started",
-        priceLead: "Website package from",
-        priceNote: "excl. VAT. Fixed price for the agreed scope.",
+        title: "Three ways to begin.",
+        lead: "Which one it is depends on where it is stuck — not on what we happen to want to sell.",
+        arten: {
+          festpreis: {
+            label: "Fixed price from",
+            body: "An agreed scope, one figure, no timesheet.",
+          },
+          monatlich: {
+            label: "Monthly",
+            body: "Ongoing operation — for systems we built.",
+          },
+          "nach-analyse": {
+            label: "Offer after analysis",
+            body: "A twenty-minute first call, then a firm offer with scope and price.",
+          },
+        },
+        ebenenLabel: "Applies to",
+        nettoNote: "All amounts excl. VAT.",
         priceCta: "Packages and prices",
         questionsLabel: "Two questions up front",
         questionsCta: "All questions",
@@ -4176,7 +4368,7 @@ export const dictionary = {
       lead: "Not every enquiry starts with an appointment. Some start with a look at what we have built — that is a route to us as well. Advice in German, Turkish and English.",
       metaTitle: "Contact — creaDIG Osnabrück",
       metaDescription:
-        "Reach creaDIG: by WhatsApp, email, a free first consultation, or straight through our work. ICO InnovationsCentrum Osnabrück, advice in German, Turkish and English.",
+        "Reach creaDIG: by WhatsApp, email, a free first consultation, or straight through our own products. ICO InnovationsCentrum Osnabrück, advice in German, Turkish and English.",
       intentsLabel: "Where would you like to start?",
       intents: {
         talk: {
@@ -4235,13 +4427,14 @@ export const dictionary = {
     },
     arbeitenPage: {
       eyebrow: "Work",
-      title: "Built. And operated.",
+      title: "Built for others.",
       lead: "Four products of our own that we invented and built ourselves — alongside client work from Germany and Switzerland. Listed separately, so it is clear what belongs to us.",
       leadOhneKundenwerk:
-        "Four products of our own that we invented, built and run ourselves. Client work appears here only once the client has released it in writing — without a release we name no one.",
-      metaTitleOhneKundenwerk: "Work — four products of our own",
+        "This is where client work goes — work we built for others and that the client has released in writing. Today no such release exists, so nobody is listed here. What we invented and built ourselves is on the products page.",
+      ohneKundenwerkCta: "To our own products",
+      metaTitleOhneKundenwerk: "Work — client work only with a written release",
       metaDescriptionOhneKundenwerk:
-        "The creaDIG portfolio: four products of our own that we invented, built and run ourselves. Client work appears only with a written release.",
+        "creaDIG shows client work only after the client has released it in writing. Today there is none. Our four own products are on the products page.",
       metaTitle: "Work — our own products and client work",
       metaDescription:
         "The creaDIG portfolio: four products of our own and client work from Germany and Switzerland. Listed separately — our own systems and commissioned work are not the same thing.",
@@ -4355,7 +4548,7 @@ export const dictionary = {
     leistungenPage: {
       eyebrow: "Services",
       title: "Five levels. One system.",
-      lead: "Brand, presence, operations, automation, intelligence. Each level carries the next — not side by side, but as one system. What we built for our own products, we bring into your working day.",
+      lead: "The business runs on notes, spreadsheets and three programs that know nothing about each other. We put that into one system — at the level where it is stuck for you: brand, presence, operations, automation, intelligence. Every level has a named entry point: with a price where there is one, and an offer after analysis where there is not.",
       metaTitle: "Services — from the brand to AI",
       metaDescription:
         "The five levels of creaDIG: brand, digital presence, operations, automation and AI. For companies in Germany, Austria and Switzerland — in German, Turkish and English.",
@@ -4379,7 +4572,7 @@ export const dictionary = {
         arbeiten: "Delivered projects, named",
         unternehmen: "Who is behind it and how we work",
         insights: "Technical notes from live operation",
-        kontakt: "Four ways to start a conversation",
+        kontakt: "Three ways to start a conversation",
       },
       ueber: "About us",
       pakete: "Packages",
@@ -4398,10 +4591,10 @@ export const dictionary = {
       headlineLine2: "what others",
       headlineLine3: "never see.",
       subline:
-        "creaDIG builds brand, digital presence, operations, automation and artificial intelligence as one system — for companies in Germany, Austria and Switzerland.",
-      systemLine: "Five levels. One system.",
+        "We build businesses the system their work actually hangs on: job, customer, document and figure in one place. After that there is one answer instead of four — and nobody assembles it from three programs.",
+      systemLine: "We start where it is stuck for you.",
       ctaPrimary: "Start a project",
-      ctaSecondary: "Our work",
+      ctaSecondary: "Our own products",
       location: "Germany · Austria · Switzerland",
       scroll: "Scroll",
     },
@@ -4608,7 +4801,18 @@ export const dictionary = {
       title: "Five levels. One system.",
       lead: "We work from A to Z — from the first logo to a company's own AI system. Each level builds on the one below it.",
       forWhom: "Who it is for",
-      entryLabel: "Entry point",
+      entryLabel: "Straight to the service",
+      angebotLabel: "Entry point",
+      belegLabel: "Proof",
+      angebotArt: {
+        festpreis: "Fixed price from",
+        monatlich: "Monthly",
+        "nach-analyse": "Offer after analysis",
+      },
+      angebotBedingung: "Only for systems we built.",
+      angebotCta: "See the entry point",
+      belegCta: "See the proof",
+      belegEigenpruefung: "Our own audit",
       problemLabel: "Starting point",
       solutionLabel: "What we build",
       resultLabel: "What is different afterwards",
@@ -5175,14 +5379,14 @@ export const dictionary = {
       title: "You run the business. We build the system behind it.",
       lead: "Twenty minutes, free and without obligation. We look at the operation and tell you honestly whether we can help.",
       ctaPrimary: "Start a project",
-      ctaSecondary: "See our work",
+      ctaSecondary: "See our products",
       variants: {
         prices: {
           eyebrow: "Next step",
           title: "A fixed price for your scope — after twenty minutes.",
           lead: "What is above is the entry point. What your business needs, we look at before anyone names a figure — free and without obligation.",
           ctaPrimary: "Request a fixed-price quote",
-          ctaSecondary: "See our work",
+          ctaSecondary: "See our products",
         },
         work: {
           eyebrow: "Next step",
@@ -5584,16 +5788,17 @@ export const dictionary = {
     },
     home: {
       statement: {
-        eyebrow: "creaDIG في جملة واحدة",
-        title: "نبتكر الأنظمة، ونبنيها بأنفسنا، ونُبقيها في التشغيل.",
-        body: "لسنا بيت أنظمة معلومات تقليديًا — لا خوادم ولا تراخيص ولا مكتب مساعدة. نحن بيت أنظمة للمنشآت التي تُدار رقميًا: للحرف والعيادات والمطاعم ومقدّمي الخدمات الذين يتعلّق عملهم اليوم بأوراق وجداول وثلاثة برامج لا يعرف بعضها بعضًا. «المنشأة الرقمية» هنا هي النتيجة لا الشرط — لستم بحاجة لأن تكونوا شركة تقنية كي تبدأوا معنا. من العلامة إلى الحضور والتشغيل اليومي والأتمتة والذكاء الاصطناعي: خمس طبقات، وتدخلون من الطبقة التي تؤلمكم.",
+        eyebrow: "أين يكمن الخلل",
+        title: "العمل موجود. النظام الذي خلفه غير موجود.",
+        body: "أوراق وجداول وثلاثة برامج لا يعرف بعضها بعضًا: من يريد الإجابة عن سؤال يبحث في أربعة مواضع — وتصبح الإجابة قديمة قبل أن تكتمل. لهذا وُجدت creaDIG. نصمّم النظام الذي يقف خلف ذلك، ونبنيه بأنفسنا، ونُبقيه في التشغيل. لسنا بيت أنظمة معلومات تقليديًا — لا خوادم ولا تراخيص ولا مكتب مساعدة، بل بيت أنظمة للحرف والعيادات والمطاعم ومقدّمي الخدمات. «المنشأة الرقمية» هنا هي النتيجة لا الشرط — لستم بحاجة لأن تكونوا شركة تقنية كي تبدأوا معنا. من العلامة إلى الحضور والتشغيل اليومي والأتمتة والذكاء الاصطناعي: خمس طبقات، وتدخلون من الطبقة التي تؤلمكم.",
         cta: "عن الشركة",
       },
       work: {
-        eyebrow: "أعمال مختارة",
-        title: "نُري أولًا. ثم نتحدث.",
-        cta: "كل الأعمال",
-        ctaEnd: "عرض كل الأعمال",
+        eyebrow: "منتجاتنا",
+        title: "نبني أولًا. ثم نتحدث.",
+        note: "اثنان من أربعة. الاثنان الآخران في صفحة المنتجات.",
+        cta: "المنتجات الأربعة",
+        ctaEnd: "عرض المنتجات الأربعة",
       },
       capabilities: {
         eyebrow: "الخدمات",
@@ -5603,8 +5808,24 @@ export const dictionary = {
       },
       entry: {
         eyebrow: "نقطة البداية",
-        priceLead: "باقة الموقع تبدأ من",
-        priceNote: "دون ضريبة القيمة المضافة. سعر ثابت للنطاق المتفق عليه.",
+        title: "ثلاث طرق للبدء.",
+        lead: "أيّها ستكون يعتمد على موضع التعثّر — لا على ما نرغب في بيعه.",
+        arten: {
+          festpreis: {
+            label: "سعر ثابت من",
+            body: "نطاق متفق عليه، رقم واحد، دون كشف ساعات.",
+          },
+          monatlich: {
+            label: "شهريًا",
+            body: "التشغيل المستمر — للأنظمة التي بنيناها.",
+          },
+          "nach-analyse": {
+            label: "عرض بعد التحليل",
+            body: "مكالمة أولى من عشرين دقيقة، ثم عرض ثابت بنطاق وسعر.",
+          },
+        },
+        ebenenLabel: "ينطبق على",
+        nettoNote: "كل المبالغ دون ضريبة القيمة المضافة.",
         priceCta: "الباقات والأسعار",
         questionsLabel: "سؤالان قبل البداية",
         questionsCta: "كل الأسئلة",
@@ -5673,7 +5894,7 @@ export const dictionary = {
       lead: "ليس كل استفسار يبدأ بموعد. بعضها يبدأ بنظرة على ما بنيناه — وهذا أيضًا طريق إلينا. استشارة بالألمانية والتركية والإنجليزية.",
       metaTitle: "التواصل — creaDIG أوسنابروك",
       metaDescription:
-        "التواصل مع creaDIG: عبر واتساب أو البريد الإلكتروني أو استشارة أولى مجانية أو مباشرةً من خلال أعمالنا. مركز ICO للابتكار في أوسنابروك، استشارة بالألمانية والتركية والإنجليزية.",
+        "التواصل مع creaDIG: عبر واتساب أو البريد الإلكتروني أو استشارة أولى مجانية أو مباشرةً من خلال منتجاتنا. مركز ICO للابتكار في أوسنابروك، استشارة بالألمانية والتركية والإنجليزية.",
       intentsLabel: "من أين تودّون البدء؟",
       intents: {
         talk: {
@@ -5732,13 +5953,14 @@ export const dictionary = {
     },
     arbeitenPage: {
       eyebrow: "الأعمال",
-      title: "مبنيّة. ومشغَّلة.",
+      title: "بُنيت للآخرين.",
       lead: "أربعة منتجات خاصة بنا ابتكرناها وبنيناها بأنفسنا — إلى جانب أعمال لعملاء في ألمانيا وسويسرا. مفصولة بوضوح ليتبيّن ما هو ملكنا.",
       leadOhneKundenwerk:
-        "أربعة منتجات خاصة بنا ابتكرناها وبنيناها ونشغّلها بأنفسنا. أعمال العملاء تظهر هنا فقط بعد موافقة خطية من العميل — وبدون موافقة لا نذكر اسمًا.",
-      metaTitleOhneKundenwerk: "الأعمال — أربعة منتجات خاصة بنا",
+        "هنا تُعرض أعمال العملاء — أعمال بنيناها لآخرين ووافق عليها العميل خطيًا. لا توجد اليوم موافقة كهذه، لذلك لا يظهر هنا أحد. أما ما ابتكرناه وبنيناه بأنفسنا فيوجد في صفحة المنتجات.",
+      ohneKundenwerkCta: "إلى منتجاتنا",
+      metaTitleOhneKundenwerk: "الأعمال — أعمال العملاء بموافقة خطية فقط",
       metaDescriptionOhneKundenwerk:
-        "معرض أعمال creaDIG: أربعة منتجات خاصة بنا ابتكرناها وبنيناها ونشغّلها بأنفسنا. أعمال العملاء لا تظهر إلا بموافقة خطية.",
+        "تعرض creaDIG أعمال العملاء بعد موافقة العميل خطيًا فقط. لا توجد موافقة اليوم. منتجاتنا الأربعة موجودة في صفحة المنتجات.",
       metaTitle: "الأعمال — منتجاتنا الخاصة وأعمال العملاء",
       metaDescription:
         "معرض أعمال creaDIG: أربعة منتجات خاصة وأعمال لعملاء في ألمانيا وسويسرا. مفصولة بوضوح — الأنظمة الخاصة والأعمال المكلَّف بها ليستا الشيء نفسه.",
@@ -5852,7 +6074,7 @@ export const dictionary = {
     leistungenPage: {
       eyebrow: "الخدمات",
       title: "خمس طبقات. نظام واحد.",
-      lead: "العلامة، الحضور، التشغيل، الأتمتة، الذكاء. كل طبقة تحمل التي تليها — لا جنبًا إلى جنب، بل كنظام واحد. ما بنيناه لمنتجاتنا نأتي به إلى يومكم العملي.",
+      lead: "تسير المنشأة على أوراق وجداول وثلاثة برامج لا يعرف بعضها بعضًا. نحن ننظّم ذلك في نظام واحد — عند الطبقة التي تتعثّرون عندها: العلامة، الحضور، التشغيل، الأتمتة، الذكاء. لكل طبقة نقطة بداية محدّدة: بسعر حيث يوجد سعر، وبعرض بعد التحليل حيث لا يوجد.",
       metaTitle: "الخدمات — من العلامة إلى الذكاء الاصطناعي",
       metaDescription:
         "طبقات creaDIG الخمس: العلامة، الحضور الرقمي، التشغيل، الأتمتة، والذكاء الاصطناعي. لشركات في ألمانيا والنمسا وسويسرا — بالألمانية والتركية والإنجليزية.",
@@ -5876,7 +6098,7 @@ export const dictionary = {
         arbeiten: "مشاريع منجزة، بالأسماء",
         unternehmen: "من يقف خلف ذلك وكيف نعمل",
         insights: "نصوص مهنية من التشغيل الجاري",
-        kontakt: "أربعة طرق لبدء الحديث",
+        kontakt: "ثلاث طرق لبدء الحديث",
       },
       ueber: "من نحن",
       pakete: "الباقات",
@@ -5895,10 +6117,10 @@ export const dictionary = {
       headlineLine2: "ما لا يراه",
       headlineLine3: "الآخرون.",
       subline:
-        "تبني creaDIG العلامة والحضور الرقمي والتشغيل والأتمتة والذكاء الاصطناعي كنظام واحد — لشركات في ألمانيا والنمسا وسويسرا.",
-      systemLine: "خمس طبقات. نظام واحد.",
+        "نبني للمنشآت النظام الذي يتعلّق به عملها فعليًا: أمر العمل والعميل والمستند والرقم في مكان واحد. بعدها هناك إجابة واحدة بدل أربع — ولا أحد يجمعها من ثلاثة برامج.",
+      systemLine: "نبدأ من حيث تتعثّرون.",
       ctaPrimary: "بدء مشروع",
-      ctaSecondary: "أعمالنا",
+      ctaSecondary: "منتجاتنا",
       location: "ألمانيا · النمسا · سويسرا",
       scroll: "تمرير",
     },
@@ -6105,7 +6327,18 @@ export const dictionary = {
       title: "خمس طبقات. نظام واحد.",
       lead: "نعمل من الألف إلى الياء — من أول شعار إلى نظام ذكاء اصطناعي خاص بالمنشأة. كل طبقة تقوم على التي تحتها.",
       forWhom: "لمن",
-      entryLabel: "نقطة الدخول",
+      entryLabel: "مباشرةً إلى الخدمة",
+      angebotLabel: "نقطة الدخول",
+      belegLabel: "الدليل",
+      angebotArt: {
+        festpreis: "سعر ثابت من",
+        monatlich: "شهريًا",
+        "nach-analyse": "عرض بعد التحليل",
+      },
+      angebotBedingung: "للأنظمة التي بنيناها فقط.",
+      angebotCta: "عرض نقطة البداية",
+      belegCta: "عرض الدليل",
+      belegEigenpruefung: "تدقيقنا الخاص",
       problemLabel: "نقطة البداية",
       solutionLabel: "ما الذي نبنيه",
       resultLabel: "ما الذي يختلف بعد ذلك",
@@ -6672,14 +6905,14 @@ export const dictionary = {
       title: "أنتم تديرون المنشأة. ونحن نبني النظام الذي خلفها.",
       lead: "عشرون دقيقة، مجانًا ودون التزام. ننظر في المنشأة ونقول بصراحة إن كنا نستطيع المساعدة.",
       ctaPrimary: "بدء مشروع",
-      ctaSecondary: "عرض الأعمال",
+      ctaSecondary: "عرض المنتجات",
       variants: {
         prices: {
           eyebrow: "الخطوة التالية",
           title: "سعر ثابت لنطاقكم — بعد عشرين دقيقة.",
           lead: "ما ورد أعلاه هو نقطة الدخول. أما ما تحتاجه منشأتكم فننظر فيه قبل أن يذكر أحدٌ رقمًا — مجانًا ودون التزام.",
           ctaPrimary: "طلب عرض بسعر ثابت",
-          ctaSecondary: "عرض الأعمال",
+          ctaSecondary: "عرض المنتجات",
         },
         work: {
           eyebrow: "الخطوة التالية",

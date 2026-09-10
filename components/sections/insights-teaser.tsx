@@ -50,8 +50,18 @@ export function InsightsTeaser() {
         <ul className="mt-16 grid gap-2.5 md:grid-cols-3">
           {entries.map((entry, i) => (
             <Reveal key={entry.slug} as="li" delay={0.06 * i} className="flex">
+              {/*
+                GATE 01 · WEB-0018 — DIE KACHEL FUEHRT IN DEN BEITRAG.
+
+                Sie zeigte Thema, Titel, Anriss und Datum eines bestimmten
+                Beitrags — und verlinkte auf die Uebersicht. Wer auf einen
+                Titel klickt und auf einer Liste landet, muss denselben Titel
+                ein zweites Mal suchen. Bei einem einzigen veroeffentlichten
+                Beitrag ist das besonders absurd: Die Liste enthaelt genau
+                das, was man gerade angeklickt hat.
+              */}
               <Link
-                href="/insights"
+                href={`/insights/${entry.slug}`}
                 className="group tile bg-background hover:bg-surface flex w-full flex-col gap-4 p-7 transition-colors duration-[var(--dur-2)]"
               >
                 <p className="eyebrow text-gold-text">{entry.topic[locale]}</p>

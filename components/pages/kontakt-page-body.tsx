@@ -42,7 +42,17 @@ const INTENTS = [
   { key: "talk" as const, href: "#kontakt", external: false },
   { key: "appointment" as const, href: "/termin", external: false },
   { key: "products" as const, href: "/produkte", external: false },
-  { key: "works" as const, href: "/arbeiten", external: false },
+  /*
+   * GATE 01 · WEB-0005 — der vierte Weg fuehrte nach `/arbeiten`.
+   *
+   * Seit `/produkte` der kanonische Ort der eigenen Produkte ist, zeigt
+   * `/arbeiten` nichts, solange keine Kundenfreigabe vorliegt. Zwei
+   * benachbarte Wege, von denen einer auf eine leere Seite fuehrt, sind
+   * kein Angebot — sie sind eine Enttaeuschung mit zwei Klicks Vorlauf.
+   *
+   * Der Eintrag kommt zurueck, sobald `/arbeiten` traegt (OD-2); die
+   * Beschriftung `kontaktPage.intents.works` bleibt dafuer im Woerterbuch.
+   */
 ]
 
 export function KontaktPageBody() {
@@ -84,7 +94,12 @@ export function KontaktPageBody() {
             </h2>
           </Reveal>
 
-          <div className="mt-12 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+          {/*
+            GATE 01 · WEB-0005 — vier Spalten fuer drei Kacheln haetten eine
+            Luecke gelassen, wo vorher der vierte Weg stand. Die Spaltenzahl
+            folgt jetzt der Zahl der Wege und nicht umgekehrt.
+          */}
+          <div className="mt-12 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
             {INTENTS.map((intent, i) => {
               const item = copy.intents[intent.key]
               const Icon = INTENT_ICONS[intent.key]

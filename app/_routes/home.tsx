@@ -3,7 +3,6 @@ import { HouseStatement } from "@/components/sections/house-statement"
 import { SelectedWork } from "@/components/sections/selected-work"
 import { CapabilityTiles } from "@/components/sections/capability-tiles"
 import { EntryLine } from "@/components/sections/entry-line"
-import { HouseProducts } from "@/components/sections/house-products"
 import { CaseStudies } from "@/components/sections/case-studies"
 import { ImpactBand } from "@/components/sections/impact-band"
 import { CompanyTeaser } from "@/components/sections/company-teaser"
@@ -39,8 +38,21 @@ import { ClosingCta } from "@/components/sections/closing-cta"
  * DIE REIHENFOLGE IST EIN ARGUMENT — UND EIN TAKT (VIS-2)
  * Arbeit kommt VOR der Erklärung (Sektion 3, groß). Vorher musste sich jemand
  * durch drei Sektionen Behauptung lesen, bevor er sah, ob wir etwas können.
- * Produkte stehen kurz danach — sie sind der Punkt, an dem klar wird, dass
- * das hier keine Agentur ist.
+ *
+ * GATE 01 hat zwei Dinge daran geaendert:
+ *
+ *   WEB-0003 — Sektion 2 nennt jetzt das PROBLEM und nicht mehr das Haus.
+ *   Das Ebenenmodell steht unveraendert an Position 4, aber es wird nicht
+ *   mehr erklaert, bevor jemand weiss, warum es ihn angeht. Gemessen in
+ *   Gate 00: 31 Eyebrows und 9 H2 vor der ersten Kundenwirkung.
+ *
+ *   WEB-0005 — die eigenen Produkte standen ZWEIMAL auf dieser Seite:
+ *   als „Ausgewählte Arbeiten" (Sektion 3, zwei von vier, verlinkt auf
+ *   `/arbeiten`) und als „Vier eigene Produkte" (Sektion 7, alle vier,
+ *   verlinkt auf `/produkte`). Dieselbe Quelle, dieselbe Aussage, 4.800
+ *   Pixel auseinander. Geblieben ist die Bildsektion; sie sagt jetzt, was
+ *   sie zeigt, und fuehrt nach `/produkte`. `HouseProducts` steht
+ *   vollstaendig auf der Produktseite und ist von hier gegangen.
  *
  * Neu ist, dass die Reihenfolge auch den RHYTHMUS trägt. Jede Sektion gehört
  * zu einem von drei Archetypen:
@@ -49,10 +61,10 @@ import { ClosingCta } from "@/components/sections/closing-cta"
  *   B · Raster      das Hairline-Gitter, dicht und zählbar
  *   C · Band        randlos, dunkel oder Bild, mit Bewegung
  *
- * Gelesen von oben: C A C B C B — C A — C. Keine zwei gleichen Archetypen
- * liegen nebeneinander. Vorher standen `CapabilityTiles` und `HouseProducts`
- * direkt hintereinander (zweimal B) und das dunkle Fundament-Band kam erst
- * danach; jetzt schiebt es sich dazwischen und bricht den Takt.
+ * Gelesen von oben: C A C B A C — A — C. Keine zwei gleichen Archetypen
+ * liegen nebeneinander. Mit `HouseProducts` an Position 7 stand nach dem
+ * dunklen Band ein zweites Raster; ohne sie folgt auf das Band direkt die
+ * Firmen-Zeile (A), und der Wechsel bleibt erhalten.
  *
  * ---------------------------------------------------------------------------
  * ZWEI SEKTIONEN RENDERN HEUTE NICHTS
@@ -108,7 +120,7 @@ export function HomeRoute() {
       {/* 2 · A — creaDIG in einem Satz. Die erste Pause. */}
       <HouseStatement />
 
-      {/* 3 · C — Arbeit vor Erklärung: randloses Band, drei Werke. → /arbeiten */}
+      {/* 3 · C — Beweis vor Erklärung: randloses Band, eigene Produkte. → /produkte */}
       <SelectedWork />
 
       {/* 4 · B — Die fünf Ebenen als Verteiler-Kacheln. → /leistungen */}
@@ -136,8 +148,21 @@ export function HomeRoute() {
       */}
       <ImpactBand />
 
-      {/* 7 · B — „We build our own." Der Aha-Moment. → /produkte */}
-      <HouseProducts />
+      {/*
+        7 — HIER STAND „VIER EIGENE PRODUKTE", UND SIE IST GEGANGEN (WEB-0005).
+
+        Die Sektion las `productWorks` — dieselbe Quelle wie die Bildsektion
+        oben, nur als Liste statt als Band. Gemessen in Gate 00: dieselben
+        vier Ziel-Links, dieselbe Aussage, auf derselben Seite.
+
+        Geblieben ist das Band oben: Es traegt Bilder, also den Beweis, und es
+        traegt den Takt (ohne es folgten zwei Rastersektionen aufeinander).
+        Die Liste mit Stand, Region und Wirkung steht vollstaendig auf
+        `/produkte` — einen Klick entfernt und dort ohne Dublette.
+
+        Die Komponente bleibt im Bestand. Sie ist das, was `/produkte` heute
+        rendert; von der Startseite ist sie genommen, nicht geloescht.
+      */}
 
       {/* 8 — Ein tiefer Kundenfall (gated auf schriftliche Freigabe). */}
       <CaseStudies />

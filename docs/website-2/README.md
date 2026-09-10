@@ -35,6 +35,14 @@ nächsten Schritt versteht.
 | `claim-proof-matrix.md` | Jede öffentliche Behauptung gegen ihren Beleg |
 | `pricing-inventory.md` | Jeder öffentliche Preis, ohne Änderung |
 | `buyer-matrix.md` | Vier Kundengrößen — Vertrauen, Blocker, nötiger Beleg |
+| `route-inventory.md` | Jede Route, ihre Sprachen, ihre Frage, ihr Haupt-CTA |
+| **Gate 01** | |
+| `gate-01-positioning-ia.md` | Der Gate-Bericht: was geändert wurde, gemessen, mit Rückweg |
+| `positioning-system.md` | Kategorie, Reihenfolge der Argumente, Ergebnissatz, was nicht behauptet wird |
+| `offer-architecture.md` | Fünf Ebenen × Einstieg: Art, Betrag, Route, Beleg |
+| `information-architecture.md` | Hauptmenü, Produkte/Arbeiten, Insights, Startseiten-Reihenfolge |
+| `page-contracts.md` | Je Route: eine Frage, ein nächster Schritt, was nicht draufgehört |
+| `route-transition-plan.md` | Welcher Übergang wartet auf welche Bedingung, und wer sie herstellt |
 
 ## Statuskanon
 
@@ -67,7 +75,7 @@ Lokalisierung und Conversion-Blocker werden nicht leise abgestuft.
 | Gate | Inhalt | Stand |
 |---|---|---|
 | **G00** | Bestand, Wahrheit, Kontrollsystem | **CLOSED** |
-| G01 | Positionierung, Angebot, Informationsarchitektur | NOT_STARTED |
+| **G01** | Positionierung, Angebot, Informationsarchitektur | **PASS — PENDING COMMIT** |
 | G02 | Proof, Vertrauen, Verkaufsarchitektur | NOT_STARTED |
 | G03 | Content-System und vollständige Copy | NOT_STARTED |
 | G04 | Visuelles System und Designqualität | NOT_STARTED |
@@ -84,3 +92,17 @@ Lokalisierung und Conversion-Blocker werden nicht leise abgestuft.
 3. Kein „behoben" ohne Beleg.
 4. Produktion, Branch und Preview werden nie vermischt.
 5. Neue Befunde bekommen eine neue ID, keine Wiederverwendung.
+6. Wer einen Befund auf `FIXED_ON_BRANCH` setzt, legt im selben Zug den
+   gemessenen Beleg **nach** der Änderung daneben — mit derselben Methode wie
+   die Ausgangsmessung.
+7. Nebenwirkungen auf fremde Befunde werden gemessen und benannt, auch wenn
+   sie das eigene Ergebnis schlechter aussehen lassen.
+
+## Maschinell gesicherte Entscheidungen
+
+Was ein Kommentar nicht hält, prüft ein Gate im Postbuild.
+
+| Skript | Sichert |
+|---|---|
+| `scripts/check-website2.mjs` | Die Acceptance-Matrix: IDs, Gates, Prioritäten, Wahrheitsstände, Zusammenfassung, Verteilung, Artefakt-Vollständigkeit |
+| `scripts/check-einstiege.mjs` | Die Angebotsarchitektur und die Hauptnavigation (D-17, D-18, D-20) |

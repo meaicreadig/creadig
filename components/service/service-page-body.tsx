@@ -318,8 +318,16 @@ export function ServicePageBody({ page }: { page: ServicePage }) {
                     </li>
                   ))}
                 </ul>
+                {/*
+                  GATE 01 · WEB-0005 — der Verweis fuehrte nach `/arbeiten`.
+                  Die Liste darueber kommt aus `productWorks` (heute loest
+                  kein Kundenwerk auf, weil keine Freigabe vorliegt), und
+                  `/arbeiten` zeigt seit Gate 01 keine eigenen Produkte mehr.
+                  Der Weiterweg gehoert dorthin, wo die Liste vollstaendig
+                  steht.
+                */}
                 <Link
-                  href="/arbeiten"
+                  href="/produkte"
                   className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
                 >
                   {copy.worksCta}

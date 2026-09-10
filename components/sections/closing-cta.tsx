@@ -40,8 +40,14 @@ export function ClosingCta({ variant = "default" }: { variant?: ClosingVariant }
     Der zweite Weg fuehrt dorthin, wo der Leser noch NICHT war: Unter einer
     Werkschau ist „noch mehr Arbeiten" kein Angebot mehr, unter einer
     Preistabelle schon.
+
+    GATE 01 · WEB-0005 — er fuehrte nach `/arbeiten`. Seit `/produkte` der
+    kanonische Ort der eigenen Produkte ist, zeigt `/arbeiten` nichts mehr,
+    solange keine Kundenfreigabe vorliegt. Ein zweiter Weg, der auf eine
+    Seite ohne Inhalt fuehrt, ist kein zweiter Weg — er ist eine Sackgasse
+    unter dem letzten Absatz der Seite.
   */
-  const secondaryHref = variant === "work" ? "/leistungen" : "/arbeiten"
+  const secondaryHref = variant === "work" ? "/leistungen" : "/produkte"
 
   return (
     <section

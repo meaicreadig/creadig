@@ -107,7 +107,7 @@ export function Hero() {
               {t.hero.ctaPrimary}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
             </MagneticButton>
-            <MagneticButton href="/arbeiten" variant="ghost" trackLocation="hero">
+            <MagneticButton href="/produkte" variant="ghost" trackLocation="hero">
               {t.hero.ctaSecondary}
             </MagneticButton>
           </div>

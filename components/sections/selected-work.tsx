@@ -65,8 +65,8 @@ export function SelectedWork() {
 
   return (
     <section
-      id="arbeiten"
-      aria-labelledby="arbeiten-title"
+      id="produkte"
+      aria-labelledby="produkte-title"
       className="border-line bg-surface overflow-hidden border-b"
     >
       {/* Kopf bleibt im Raster — nur die Bilder brechen aus. */}
@@ -74,13 +74,26 @@ export function SelectedWork() {
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
           <Reveal className="lg:col-span-8">
             <SectionEyebrow label={copy.eyebrow} />
-            <h2 id="arbeiten-title" className="type-h2 mt-7 text-balance">
+            <h2 id="produkte-title" className="type-h2 mt-7 text-balance">
               {copy.title}
             </h2>
+            {/*
+              GATE 01 · WEB-0005 — DIE SEKTION SAGT, WIE VIEL SIE ZEIGT.
+
+              `featuredWorks` loest gegen `registryWorks` auf. Die kuratierte
+              Liste nennt drei Slugs; der dritte (`nv-swiss`) ist Kundenwerk
+              ohne schriftliche Freigabe und faellt still heraus. Uebrig
+              bleiben zwei eigene Produkte — unter einer Ueberschrift, die
+              vorher „Ausgewählte Arbeiten" hiess.
+
+              Ein Anriss darf kuerzer sein als das Ganze. Er darf nur nicht so
+              tun, als sei er das Ganze.
+            */}
+            <p className="text-meta text-muted-foreground mt-5">{copy.note}</p>
           </Reveal>
           <Reveal delay={0.1} className="lg:col-span-4 lg:pb-3 lg:text-right">
             <Link
-              href="/arbeiten"
+              href="/produkte"
               className="group text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {copy.cta}
@@ -197,7 +210,7 @@ export function SelectedWork() {
               </p>
             )}
             <Link
-              href="/arbeiten"
+              href="/produkte"
               className="group text-gold-text hover:text-foreground inline-flex shrink-0 items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
             >
               {copy.ctaEnd}

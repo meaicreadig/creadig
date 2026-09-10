@@ -20,7 +20,14 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Logo } from "@/components/brand/logo"
-import { mainNavLinks } from "@/lib/site-data"
+/*
+ * GATE 01 — die Auswahl der Hauptrubriken ist eine Gate-01-Entscheidung und
+ * liegt deshalb in `lib/navigation.ts`, nicht in `lib/site-data.ts`. Die Quelle
+ * der Rubriken bleibt dort; hier kommt nur an, welche davon heute beworben
+ * werden (WEB-0005 fuer `/arbeiten`, WEB-0018 fuer `/insights`). Die Fusszeile
+ * liest weiterhin alle fuenf.
+ */
+import { hauptNavLinks } from "@/lib/navigation"
 import { localePath, locales, splitLocale } from "@/lib/routes"
 import { LanguageMenu, LOCALE_NAME } from "@/components/ui/language-menu"
 
@@ -142,7 +149,7 @@ export function SiteNav() {
         </Link>
 
         <nav aria-label="Hauptnavigation" className="hidden items-center gap-8 lg:flex">
-          {mainNavLinks.map((link) => {
+          {hauptNavLinks.map((link) => {
             const active = isActive(pathname, link.href)
             return (
               <Link
@@ -253,7 +260,7 @@ export function SiteNav() {
               </SheetHeader>
 
               <nav aria-label="Mobile Navigation" className="flex flex-col px-6 pt-6">
-                {mainNavLinks.map((link, index) => {
+                {hauptNavLinks.map((link, index) => {
                   const hint = t.nav.hints[link.labelKey as keyof typeof t.nav.hints]
                   const linkClassName =
                     "text-display border-b border-line py-5 text-3xl text-foreground"

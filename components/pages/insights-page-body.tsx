@@ -67,13 +67,19 @@ export function InsightsPageBody() {
                   {copy.emptyCtaProducts}
                   <ArrowUpRight className="size-4" strokeWidth={1.5} />
                 </Link>
-                <Link
-                  href="/arbeiten"
-                  className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
-                >
-                  {copy.emptyCtaWorks}
-                  <ArrowUpRight className="size-4" strokeWidth={1.5} />
-                </Link>
+                {/*
+                  GATE 01 · WEB-0005 — HIER STAND EIN ZWEITER WEG, UND ER
+                  FUEHRTE INS LEERE.
+
+                  Der Leerzustand bot zwei Ziele an: `/produkte` und
+                  `/arbeiten`. Seit Gate 01 zeigt `/arbeiten` nichts mehr,
+                  solange keine Kundenfreigabe vorliegt — ein zweiter Knopf
+                  auf eine leere Seite macht den Leerzustand doppelt.
+
+                  Er kommt zurueck, sobald `/arbeiten` etwas zeigt (OD-2).
+                  Die Beschriftung `emptyCtaWorks` bleibt im Woerterbuch
+                  stehen; sie wird dann gebraucht.
+                */}
               </div>
             </Reveal>
           ) : (

@@ -4,8 +4,9 @@ import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { serviceLayers } from "@/lib/site-data"
+import { formatPrice, productWorks, serviceLayers } from "@/lib/site-data"
 import { publishedServicePages } from "@/lib/service-pages"
+import { einstiegFuer } from "@/lib/einstiege"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { Disclosure } from "@/components/ui/disclosure"
 
@@ -41,6 +42,37 @@ const EINRUECKUNG = [
 
 export function Services({ heading = true }: { heading?: boolean }) {
   const { t, locale } = useLocale()
+
+  /*
+   * GATE 01 · WEB-0004 — DER EINSTIEG STEHT AN DER EBENE.
+   *
+   * Der Befund: „Operations und Intelligence sind Kategorien, kein kaufbarer
+   * Einstieg." Gemessen in Gate 00: fuer beide kein Preis, keine
+   * Projektgroesse, kein Beispiel.
+   *
+   * Die Ursache war strukturell. Die Chips ueber der Pyramide zeigen
+   * `publishedServicePages` — und die decken `identity`, `digital` und
+   * `automation` ab. Fuer die zwei Ebenen ohne Leistungsseite stand unter der
+   * Ueberschrift nichts, an dem sich ein Kaeufer festhalten kann; ihre Tiefe
+   * lag hinter einer Klappe, und dort standen Kategorie-Saetze.
+   *
+   * Jetzt traegt jede der fuenf Ebenen eine sichtbare Zeile — nicht in der
+   * Klappe, sondern im Kopf: die ART des Einstiegs, der Betrag, wenn es einen
+   * bestaetigten gibt, die Route, an der er beginnt, und ein Beleg, wo es
+   * einen gibt.
+   *
+   * Was hier NICHT passiert: Fuer Intelligence wird keine Zahl erfunden.
+   * `nach-analyse` ohne Betrag ist der wahre Zustand und wird so gezeigt.
+   */
+  const belegLabel = (href: string, art: "produkt" | "eigenpruefung" | null) => {
+    if (art === "eigenpruefung") return t.services.belegEigenpruefung
+    if (art === "produkt") {
+      const slug = href.split("/").pop()
+      const produkt = productWorks.find((w) => w.slug === slug)
+      if (produkt) return produkt.name
+    }
+    return t.services.belegCta
+  }
 
   return (
     <section id="leistungen" aria-labelledby="leistungen-title" className="section-seam">
@@ -175,6 +207,91 @@ export function Services({ heading = true }: { heading?: boolean }) {
                     </div>
                   </div>
 
+                  {/*
+                    GATE 01 · WEB-0004 — DIE EINSTIEGSZEILE.
+
+                    Sie steht zwischen Kopf und Klappe und ist immer sichtbar.
+                    Eine Ebene, deren Einstieg man aufklappen muss, hat keinen.
+
+                    Bewusst EINE Zeile und kein drittes Raster: Der erste
+                    Entwurf gab Einstieg, Verweis und Beleg je eine eigene
+                    Spalte. Auf 390 Pixeln stapeln drei Spalten, und fuenf
+                    gestapelte Bloecke haben die Seite um 997 Pixel wachsen
+                    lassen — auf der laengsten Seite der Website (WEB-0013).
+                    Als umbrechende Zeile kostet dieselbe Information einen
+                    Bruchteil davon.
+                  */}
+                  {(() => {
+                    const einstieg = einstiegFuer(layer.key)
+                    if (!einstieg) return null
+                    return (
+                      <div className="border-line mx-2 border-t py-4 md:mx-6">
+                        <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
+                          <span className="eyebrow text-muted-foreground">
+                            {t.services.angebotLabel}
+                          </span>
+                          <span className="type-small text-foreground/85">
+                            <span className="text-gold-text">
+                              {t.services.angebotArt[einstieg.art]}
+                            </span>
+                            {einstieg.betrag !== null && (
+                              <>
+                                {" "}
+                                <span className="text-subhead">
+                                  {formatPrice(einstieg.betrag, locale)}
+                                </span>
+                                {einstieg.art === "monatlich" && (
+                                  <span className="text-muted-foreground">
+                                    {" "}
+                                    {t.packages.monthly}
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </span>
+                          <Link
+                            href={einstieg.einstiegHref}
+                            className="text-gold-text hover:text-foreground inline-flex items-center gap-1.5 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
+                          >
+                            {t.services.angebotCta}
+                            <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
+                          </Link>
+                          {/*
+                            Der Beleg erscheint nur, wo es einen gibt. Fuer
+                            `identity` und `automation` steht hier heute
+                            nichts — ein zweiter Link auf dieselbe
+                            Leistungsseite waere kein Beleg, sondern eine
+                            Wiederholung mit anderer Beschriftung. Die Luecke
+                            gehoert zu WEB-0001 und damit zu Gate 02.
+                          */}
+                          {einstieg.belegHref && (
+                            <>
+                              <span className="eyebrow text-muted-foreground">
+                                {t.services.belegLabel}
+                              </span>
+                              <Link
+                                href={einstieg.belegHref}
+                                className="text-gold-text hover:text-foreground inline-flex items-center gap-1.5 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
+                              >
+                                {belegLabel(einstieg.belegHref, einstieg.belegArt)}
+                                <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
+                              </Link>
+                            </>
+                          )}
+                        </div>
+                        {/*
+                          Die Bedingung steht vor dem Klick und nicht auf der
+                          Zielseite: Die laufende Betreuung gibt es nur fuer
+                          Systeme, die wir gebaut haben (`retainer.precondition`).
+                        */}
+                        {einstieg.bedingung && (
+                          <p className="text-meta text-muted-foreground mt-2 text-pretty">
+                            {t.services.angebotBedingung}
+                          </p>
+                        )}
+                      </div>
+                    )
+                  })()}
                   {/*
                     V2-2 — die Tiefe unter dem Kopf.
 

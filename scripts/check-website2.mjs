@@ -35,6 +35,9 @@ const PFLICHT = [
   "README.md", "gate-00-baseline.md", "acceptance-matrix.md", "decision-log.md",
   "owner-decisions.md", "claim-proof-matrix.md", "pricing-inventory.md",
   "buyer-matrix.md", "route-inventory.md",
+  /* Gate 01 */
+  "gate-01-positioning-ia.md", "positioning-system.md", "offer-architecture.md",
+  "information-architecture.md", "page-contracts.md", "route-transition-plan.md",
 ]
 
 const GATES = ["G00", "G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08", "G09"]
@@ -68,6 +71,17 @@ const befunde = []
 for (const zeile of text.split("\n")) {
   const kopf = zeile.match(/^##\s+(P[0-3])\s/)
   if (kopf) { prio = kopf[1]; continue }
+  /*
+   * Jede andere Ueberschrift beendet den Prioritaetsabschnitt.
+   *
+   * Ohne diese Zeile lief `prio` bis zum Dateiende weiter — und die
+   * Gate-01-Belegtabelle im Anhang wurde als elf zusaetzliche Befunde
+   * gezaehlt. Das Gate hat es gemeldet (die Verteilung zaehlte 43, die Matrix
+   * 54), aber erst nachdem der Fehler schon in der Datei stand. Jetzt faellt
+   * er sofort auf: Eine Befundzeile ausserhalb ihres Abschnitts hat keine
+   * Prioritaet mehr und wird als solche gemeldet.
+   */
+  if (/^##\s/.test(zeile)) { prio = null; continue }
   if (!zeile.startsWith("| WEB-")) continue
   const spalten = zeile.split("|").map((s) => s.trim())
   const [, id, quelle, stand, route, , , gate] = spalten
@@ -106,10 +120,16 @@ const zaehl = {
   P1: befunde.filter((b) => b.prio === "P1").length,
   P2: befunde.filter((b) => b.prio === "P2").length,
   P3: befunde.filter((b) => b.prio === "P3").length,
-  CONFIRMED_CURRENT: befunde.filter((b) => b.stand === "CONFIRMED_CURRENT").length,
-  NOT_REPRODUCED: befunde.filter((b) => b.stand === "NOT_REPRODUCED").length,
-  EXTERNAL_BLOCKED: befunde.filter((b) => b.stand === "EXTERNAL_BLOCKED").length,
-  UNVERIFIED: befunde.filter((b) => b.stand === "UNVERIFIED").length,
+  /*
+   * Alle acht Wahrheitsstaende, nicht nur die vier, die in Gate 00 vorkamen.
+   * Gate 01 hat sieben Befunde auf FIXED_ON_BRANCH gesetzt; eine
+   * Zusammenfassung, die diesen Stand nicht zaehlt, kann ihn auch nicht
+   * falsch zaehlen — und genau das ist die stille Drift, gegen die dieses
+   * Gate gebaut ist.
+   */
+  ...Object.fromEntries(
+    STAENDE.map((stand) => [stand, befunde.filter((b) => b.stand === stand).length]),
+  ),
 }
 for (const [feld, ist] of Object.entries(zaehl)) {
   const soll = behauptet(feld)

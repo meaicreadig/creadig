@@ -181,8 +181,10 @@ export function HandwerkPageBody() {
               {copy.buildLayers[locale]}
               <ArrowUpRight className="size-4" strokeWidth={1.5} />
             </Link>
+            {/* GATE 01 · WEB-0005 — „Was wir gebaut haben" steht seit der
+                Trennung von Produkten und Kundenwerk auf `/produkte`. */}
             <Link
-              href="/arbeiten"
+              href="/produkte"
               className="cta-quiet inline-flex items-center gap-2.5 px-6 py-3.5 text-sm tracking-wide"
             >
               {copy.buildWorks[locale]}

@@ -1,5 +1,7 @@
 "use client"
 
+import { LocaleLink as Link } from "@/components/ui/locale-link"
+import { ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { Portfolio } from "@/components/sections/portfolio"
@@ -9,19 +11,45 @@ import { ClosingCta } from "@/components/sections/closing-cta"
 import { genannteClientWorks } from "@/lib/site-data"
 
 /**
- * Werkschau als eigene Route (PHASE A).
+ * KUNDENWERK ALS EIGENE ROUTE.
  *
- * Die Sektion lag bisher mitten auf der Startseite — mit Karten, Register und
- * beiden Werkgruppen. Das ist zu viel für einen Verteiler und zu wenig für
- * eine Referenzenseite. Hier hat sie den Platz, den sie braucht; die
- * Startseite reißt nur noch drei Arbeiten an.
+ * ---------------------------------------------------------------------------
+ * GATE 01 · WEB-0005 — DIE SEITE HATTE KEINE EIGENE AUFGABE
+ * Bis hierher rief sie `<Portfolio />` auf, und `Portfolio` zeigt
+ * `productWorks` — dieselben vier eigenen Produkte wie `/produkte`. Gemessen
+ * in Gate 00: identische vier Ziel-Links auf beiden Seiten, kein einziges
+ * eigenes Ziel auf dieser. Zwei Hauptmenuepunkte, eine Sammlung.
  *
- * Case-Studies und Bewertungen bleiben gated: Beide Sektionen rendern gar
- * nichts, solange keine schriftliche Freigabe vorliegt — kein „Demnächst",
- * keine Beispielfälle.
+ * Die Trennung, die Gate 01 gezogen hat:
+ *
+ *   `/produkte`  kanonischer Ort der eigenen Produkte. Bleibt im Hauptmenue.
+ *   `/arbeiten`  Ort fuer Kundenarbeit mit schriftlicher Freigabe.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM HIER HEUTE FAST NICHTS STEHT — UND WARUM DAS RICHTIG IST
+ * `genannteClientWorks` ist leer: Ohne schriftliche Freigabe nennt G13 keinen
+ * Kunden. Diese Seite hat damit heute nichts zu zeigen, das sie von
+ * `/produkte` unterscheidet.
+ *
+ * Die Alternative waere gewesen, die eigenen Produkte stehen zu lassen und die
+ * Ueberschrift „Arbeiten" ueber ihnen zu behalten. Das ist genau der Befund,
+ * den das externe Audit als ersten notiert hat: „Arbeiten" laesst
+ * Kundenarbeit erwarten und liefert Eigenbau. Eine duenne, wahre Seite ist
+ * besser als eine volle, die etwas anderes verspricht als sie haelt.
+ *
+ * Die Route bleibt: erreichbar, in der Sitemap, in der Fusszeile verlinkt.
+ * Aus dem Hauptmenue ist sie genommen (`lib/navigation.ts`). Sie kommt
+ * zurueck, sobald die erste Freigabe vorliegt — das ist Owner-Entscheidung
+ * OD-2, keine Ableitung aus einem Datenstand.
+ *
+ * `Portfolio` steht weiterhin im Bestand und wird hier wieder aufgerufen,
+ * sobald `genannteClientWorks` traegt. Case-Studies und Bewertungen bleiben
+ * gated: Beide rendern nichts, solange keine Freigabe vorliegt — kein
+ * „Demnaechst", keine Beispielfaelle.
  */
 export function ArbeitenPageBody() {
   const { t } = useLocale()
+  const ohneKundenwerk = genannteClientWorks.length === 0
 
   return (
     <main>
@@ -29,27 +57,33 @@ export function ArbeitenPageBody() {
         eyebrow={t.arbeitenPage.eyebrow}
         title={t.arbeitenPage.title}
         crumbLabel={t.nav.arbeiten}
-        /*
-          Der Vorspann folgt der Freigabelage, nicht dem Wunsch.
-
-          Er versprach „Kundenwerk … getrennt ausgewiesen"; darunter standen
-          vier eigene Produkte und kein Kunde, weil G13 ohne schriftliche
-          Freigabe keinen nennt. Die zweite Fassung erklaert die Luecke,
-          statt sie zu verschweigen — und verschwindet von selbst, sobald
-          die erste Freigabe vorliegt.
-        */
-        lead={
-          genannteClientWorks.length === 0
-            ? t.arbeitenPage.leadOhneKundenwerk
-            : t.arbeitenPage.lead
-        }
-      />
-      {/* Die H1 steht im Kopf — die Werkschau kommt ohne zweite Überschrift. */}
-      <Portfolio heading={false} />
+        lead={ohneKundenwerk ? t.arbeitenPage.leadOhneKundenwerk : t.arbeitenPage.lead}
+      >
+        {/*
+          Der Verweis steht im Kopf und nicht am Seitenende: Wer diese Seite
+          oeffnet, sucht gebaute Arbeit. Findet er hier keine, muss der Weg zu
+          der, die es gibt, im ersten Blickfeld stehen — nicht hinter zwei
+          leeren Sektionen.
+        */}
+        {ohneKundenwerk && (
+          <div className="border-line mt-12 border-t pt-6">
+            <Link
+              href="/produkte"
+              className="text-gold-text hover:text-foreground inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
+            >
+              {t.arbeitenPage.ohneKundenwerkCta}
+              <ArrowUpRight className="size-4" strokeWidth={1.5} />
+            </Link>
+          </div>
+        )}
+      </PageHeader>
+      {/*
+        Die Werkschau erscheint erst mit freigegebenem Kundenwerk. Vorher zeigt
+        sie eigene Produkte — und genau das war WEB-0005.
+      */}
+      {!ohneKundenwerk && <Portfolio heading={false} />}
       <CaseStudies />
       <Reviews />
-      {/* MP10-2 (Zusatz) — nach der Werkschau knuepft der Abschluss an das
-          Gesehene an, statt allgemein zum Start aufzurufen. */}
       <ClosingCta variant="work" />
     </main>
   )
