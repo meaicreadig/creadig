@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Poppins, JetBrains_Mono, M_PLUS_Rounded_1c } from "next/font/google"
+import { Poppins, JetBrains_Mono, M_PLUS_Rounded_1c, Readex_Pro } from "next/font/google"
 import "@/app/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LocaleProvider } from "@/components/locale-provider"
@@ -109,6 +109,45 @@ const jetbrains = JetBrains_Mono({
   weight: ["400", "500"],
   variable: "--font-jetbrains",
   display: "swap",
+})
+
+/*
+ * ===========================================================================
+ * ARABISCH — READEX PRO
+ * ===========================================================================
+ *
+ * Bis hierher lud die Seite fuer Arabisch GAR KEINE Schrift.
+ *
+ * Poppins, M PLUS Rounded 1c und JetBrains Mono sind alle auf `latin`
+ * beschnitten — kein einziges arabisches Zeichen ist darin. Jeder arabische
+ * Buchstabe fiel also auf das durch, was das Geraet des Besuchers zufaellig
+ * mitbringt: auf einem Mac Geeza Pro, auf Windows etwas anderes, auf Android
+ * wieder etwas anderes. Das arabische Erscheinungsbild von creaDIG war damit
+ * nicht gestaltet, sondern geliehen — und der Owner hat genau das gesehen:
+ * hart, starr, hoher Strichkontrast, neben einer runden lateinischen Schrift.
+ *
+ * Gemessen wurde am Musterblatt mit echtem creaDIG-Text, nicht nach Namen
+ * ausgewaehlt: System-Fallback, IBM Plex Sans Arabic, Readex Pro, Alexandria,
+ * Tajawal und Noto Kufi Arabic nebeneinander, in denselben Graden.
+ *
+ * Readex Pro, weil es als einziges dieselbe Sache tut wie M PLUS Rounded 1c
+ * auf der lateinischen Seite: runde Strichenden, niedriger Kontrast, ruhiger
+ * Lauf. Alexandria und Noto Kufi wirken im Fliesstext mechanisch, Tajawal im
+ * Kleinen duenn, IBM Plex Sans Arabic ist ausgezeichnet lesbar, aber
+ * neutral-technisch — es passt zu einer Schrift, die creaDIG nicht benutzt.
+ *
+ * Die lateinische Schrift bleibt unangetastet (Owner-Formentscheidung vom
+ * 27.08.2026). Readex steht in der Schriftliste NACH den lateinischen
+ * Familien: Der Browser waehlt je ZEICHEN, also bleiben „creaDIG", „meAI"
+ * und die Ziffern in der Hausschrift, und nur das Arabische kommt aus
+ * Readex.
+ */
+const readex = Readex_Pro({
+  subsets: ["arabic"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-arabic",
+  display: "swap",
+  preload: false,
 })
 
 /**
@@ -374,7 +413,7 @@ export function SiteShell({
     <html
       lang={locale}
       dir={LOCALE_DIR[locale]}
-      className={`${poppins.variable} ${mplusRounded.variable} ${jetbrains.variable}`}
+      className={`${poppins.variable} ${mplusRounded.variable} ${jetbrains.variable} ${readex.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>

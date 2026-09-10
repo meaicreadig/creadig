@@ -30,6 +30,10 @@ export function HouseStatement() {
       body={copy.body}
       cta={copy.cta}
       href="/unternehmen"
+      /* Siehe `editorial-section.tsx`: bricht den 4.933-px-Cremelauf am
+         Anfang der Seite und gibt dem Satz, der die Firma erklärt, den
+         Grund, der zu einer Aussage gehört. */
+      dunkel
     />
   )
 }

@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/ui/page-header"
 import { Reveal } from "@/components/ui/reveal"
 import { ClosingCta } from "@/components/sections/closing-cta"
 import { filledInsightCategories, insightsInCategory, publishedInsights } from "@/lib/insights"
+import { InsightFeature } from "@/components/insight/article-parts"
 
 /**
  * System-Notes (PHASE A — Gerüst).
@@ -38,6 +39,10 @@ export function InsightsPageBody() {
   const { t, locale } = useLocale()
   const copy = t.insightsPage
   const entries = publishedInsights
+  /* Alles ausser dem Aufmacher. Ist die Liste danach leer, entfaellt der
+     Faecher-Block ganz — sechs Ueberschriften ueber nichts waeren genau die
+     leeren Regalbretter, die dieser Bereich seit PHASE A ablehnt. */
+  const rest = entries.slice(1)
 
   return (
     <main>
@@ -76,7 +81,25 @@ export function InsightsPageBody() {
               <h2 id="insights-title" className="sr-only">
                 {copy.categoriesLabel}
               </h2>
-              {filledInsightCategories.map((categoryKey, groupIndex) => (
+
+              {/*
+                G-EDITORIAL — DER NEUESTE BEITRAG IST DER AUFMACHER.
+
+                Vorher war jeder Beitrag dieselbe schmale Zeile. Bei einem
+                einzigen veroeffentlichten Text hiess das: eine Zeile auf einer
+                leeren Seite — und eine Zeile sieht nicht nach Auswahl aus,
+                sondern nach Rest. Jetzt traegt der neueste Text die Breite,
+                die er verdient, mit seinem eigenen Ergebnis als Titelbild.
+                Die uebrigen stehen darunter weiter in ihren Faechern; bei
+                zehn Beitraegen ist das die richtige Ordnung, bei einem ist es
+                der Aufmacher allein.
+              */}
+              <Reveal>
+                <InsightFeature entry={entries[0]} />
+              </Reveal>
+
+              {rest.length > 0 &&
+                filledInsightCategories.map((categoryKey, groupIndex) => (
                 <section
                   key={categoryKey}
                   aria-labelledby={`insights-${categoryKey}`}
@@ -91,7 +114,9 @@ export function InsightsPageBody() {
                     </h3>
                   </Reveal>
                   <ul className="mt-8 flex flex-col">
-                    {insightsInCategory(categoryKey).map((entry, i) => (
+                    {insightsInCategory(categoryKey)
+                      .filter((e) => e.slug !== entries[0].slug)
+                      .map((entry, i) => (
                   <Reveal key={entry.slug} as="li" delay={0.05 * i} className="group">
                     {/*
                       Der ganze Eintrag ist der Link, nicht nur ein „Lesen"
@@ -132,7 +157,7 @@ export function InsightsPageBody() {
                   </ul>
                   <div className="border-line border-t" />
                 </section>
-              ))}
+                ))}
             </>
           )}
         </div>

@@ -106,15 +106,27 @@ export function SiteNav() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-[var(--dur-2)] ease-brand",
         /*
-           G-VISUAL — 85 % waren zu wenig, gemessen und nicht geschaetzt.
-           Ueber einem grauen Band scrollt der Untergrund durch und mischt
-           sich in die Leiste: Die Menuewoerter standen dann mit 3,83 : 1 auf
-           #dadad8 statt auf dem hellen Grund — unter den 4,5 : 1, die
-           Fliesstext braucht. Bei 95 % bleibt die Unschaerfe als Effekt
-           sichtbar, aber die Schrift steht auf einem definierten Grund.
+           G-VISUAL / G-EDITORIAL — ZWEIMAL GEMESSEN, ZWEIMAL KORRIGIERT.
+
+           Erst standen hier 85 % Deckkraft: ueber einem grauen Band mischte
+           sich der Untergrund in die Leiste, die Menuewoerter kamen auf
+           3,83 : 1. Dann 95 % — und das sah gerechnet aus, als waere es
+           gelöst (0,95 x 251 + 0,05 x 32 = 240, also fast cremeweiss).
+
+           Es war nicht geloest. Aus dem fertigen Bild ausgezaehlt, waehrend
+           die Leiste ueber dem dunklen Fussbereich stand: rgb(214, 213, 210).
+           Das sind 3,66 : 1 — schlechter als die Rechnung und immer noch
+           unter 4,5 : 1. `backdrop-filter` mischt anders, als die einfache
+           Alpha-Rechnung vermuten laesst; wer nur rechnet, glaubt an eine
+           Behebung, die es nicht gibt.
+
+           Jetzt deckend. Die Unschaerfe faellt damit weg, und das ist kein
+           Verlust: Ueber hellem Grund war sie kaum zu sehen, ueber dunklem
+           erzeugte sie genau das schlammige Grau, das oben ausgezaehlt ist.
+           Eine saubere Kante ist an dieser Stelle das ruhigere Bild.
         */
         scrolled
-          ? "border-b border-line bg-background/95 backdrop-blur-xl"
+          ? "border-b border-line bg-background"
           : "border-b border-transparent bg-transparent",
       )}
     >

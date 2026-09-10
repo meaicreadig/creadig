@@ -73,6 +73,21 @@ export type InsightBlock =
  * `components/pages/insights-page-body.tsx`). Sichtbar sind nur Faecher, in
  * denen etwas steht; welche leer sind, sagt `/status` dem Owner.
  */
+/**
+ * Eine Zahl aus dem Beitrag, mit ihrem Wort daneben.
+ *
+ * `wert` ist die Ziffer, `label` das, was sie zaehlt. `von` macht aus zwei
+ * Zahlen ein Verhaeltnis und damit einen Balken — „sieben von acht" ist eine
+ * Aussage, „sieben" allein ist eine Zahl.
+ */
+export type Kennzahl = {
+  wert: number
+  von?: number
+  label: Localized
+  /** Hebt die Zahl hervor, die den Beitrag traegt. Hoechstens eine. */
+  betont?: boolean
+}
+
 export const insightCategoryKeys = [
   "systems",
   "automation",
@@ -105,6 +120,19 @@ export type Insight = {
   metaTitle: Localized
   /** Der Text selbst. Leer heißt: Die Notiz hat keine eigene Seite. */
   body: InsightBlock[]
+  /**
+   * ZAHLEN, DIE IM TEXT SCHON STEHEN — nach vorn geholt.
+   *
+   * Optional und ausdruecklich KEIN Ort fuer neue Behauptungen. Was hier
+   * steht, muss woertlich im `body` desselben Beitrags nachlesbar sein; die
+   * Leiste oben ist eine Zusammenfassung, keine zweite Quelle. Ein Beitrag
+   * ohne belastbare Zahlen laesst das Feld weg — eine erfundene Kennzahl
+   * waere genau die Sorte Schmuck, die Gate 15 verbietet.
+   *
+   * `von` fuellt einen Balken: „7 von 8" wird sichtbar, statt gelesen zu
+   * werden. Ohne `von` steht die Zahl fuer sich.
+   */
+  kennzahlen?: Kennzahl[]
   /*
    * GATE 15 — HIER STAND `published: boolean`.
    *
@@ -356,6 +384,42 @@ export const insights: Insight[] = [
      * Jetzt schlaegt das Gate sie nach: Beide Fundstellen muessen als
      * Dateien existieren, sonst faellt der Build.
      */
+    /*
+     * Alle vier Zahlen stehen woertlich im Text darueber:
+     *
+     *   „Ergebnis: acht Befunde, sieben davon erheblich, keiner blockierend."
+     *   „Siebzehn Routen … auf 1440 x 900 und 390 x 844 Pixeln:
+     *    68 automatisierte Durchlaeufe mit axe-core ueber WCAG 2.1 A und AA."
+     *
+     * 17 Routen x 2 Fassungen x 2 Fenster = 68. Die Zahlen sind gegen den
+     * Fliesstext geprueft, nicht geschaetzt und nicht gerundet.
+     */
+    kennzahlen: [
+      {
+        wert: 8,
+        label: { de: "Befunde", tr: "bulgu", en: "defects", ar: "عيوب" },
+        betont: true,
+      },
+      {
+        wert: 7,
+        von: 8,
+        label: { de: "davon erheblich", tr: "ciddi", en: "of them serious", ar: "منها خطيرة" },
+      },
+      {
+        wert: 0,
+        von: 8,
+        label: { de: "blockierend", tr: "engelleyici", en: "blocking", ar: "معطِّلة" },
+      },
+      {
+        wert: 68,
+        label: {
+          de: "automatisierte Durchläufe",
+          tr: "otomatik tur",
+          en: "automated runs",
+          ar: "تشغيلة آلية",
+        },
+      },
+    ],
     belege: [
       {
         art: "eigener-befund",

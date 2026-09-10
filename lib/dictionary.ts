@@ -236,6 +236,12 @@ export const dictionary = {
       sourceStatement: "Erklärung zur Barrierefreiheit dieser Seite",
       sourceService: "Barrierefreiheit als Leistung",
       backCta: "Alle Notizen",
+      /* G-EDITORIAL — die Bausteine der Artikelseite. */
+      inThisArticle: "In diesem Artikel",
+      findingsLabel: "Der Befund in Zahlen",
+      evidenceLabel: "Worauf das steht",
+      readerAsks: "Die Frage danach",
+      articleType: "Befund",
     },
     /*
      * Kontaktseite (PHASE A, Master-Prompt 4 §7).
@@ -2618,6 +2624,11 @@ export const dictionary = {
       sourceStatement: "Bu sitenin erişilebilirlik beyanı",
       sourceService: "Hizmet olarak erişilebilirlik",
       backCta: "Tüm notlar",
+      inThisArticle: "Bu yazıda",
+      findingsLabel: "Bulgular, sayılarla",
+      evidenceLabel: "Neye dayanıyor",
+      readerAsks: "Sonraki soru",
+      articleType: "Bulgu",
     },
     kontaktPage: {
       eyebrow: "İletişim",
@@ -4119,6 +4130,11 @@ export const dictionary = {
       sourceStatement: "Accessibility statement for this site",
       sourceService: "Accessibility as a service",
       backCta: "All notes",
+      inThisArticle: "In this article",
+      findingsLabel: "The findings in numbers",
+      evidenceLabel: "What this rests on",
+      readerAsks: "The question after",
+      articleType: "Finding",
     },
     kontaktPage: {
       eyebrow: "Contact",
@@ -5599,6 +5615,11 @@ export const dictionary = {
       sourceStatement: "بيان إتاحة الوصول لهذا الموقع",
       sourceService: "إتاحة الوصول كخدمة",
       backCta: "كل الملاحظات",
+      inThisArticle: "في هذه المقالة",
+      findingsLabel: "النتائج بالأرقام",
+      evidenceLabel: "على ماذا يستند",
+      readerAsks: "السؤال بعد ذلك",
+      articleType: "نتيجة",
     },
     kontaktPage: {
       eyebrow: "التواصل",

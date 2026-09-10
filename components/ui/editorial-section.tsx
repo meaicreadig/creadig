@@ -47,6 +47,7 @@ export function EditorialSection({
   body,
   cta,
   href,
+  dunkel = false,
 }: {
   id: string
   eyebrow: string
@@ -54,11 +55,33 @@ export function EditorialSection({
   body: string
   cta: string
   href: string
+  /**
+   * Archetyp C, angewandt auf A: dieselbe ruhige Fläche, dunkler Grund.
+   *
+   * ---------------------------------------------------------------------
+   * WARUM ES DEN SCHALTER GIBT — GEMESSEN, NICHT GEFÜHLT
+   * Die Startseite hat zehn Abschnitte. Ausgezählt bei 1440 px: Vom oberen
+   * Rand bis zum ersten dunklen Band lagen 4.933 Pixel Creme am Stück —
+   * Hero, Haltung, Arbeiten, Leistungen, Einstieg, alle auf derselben
+   * Fläche. Fünf Abschnitte lang ändert sich nichts als der Text; das ist
+   * die „Creme-Monotonie", die diese Datei im Kopfkommentar selbst als
+   * Ursache für „still/boutique" benennt.
+   *
+   * Der Schalter ist keine Dekoration: Er steht genau an dem Abschnitt, an
+   * dem das Haus sagt, was es IST. Ein Satz, der die Firma erklärt, auf
+   * dunklem Grund liest sich als Aussage; auf derselben Fläche wie alles
+   * andere liest er sich als Absatz.
+   */
+  dunkel?: boolean
 }) {
   const titleId = `${id}-title`
 
   return (
-    <section id={id} aria-labelledby={titleId} className="section-seam">
+    <section
+      id={id}
+      aria-labelledby={titleId}
+      className={dunkel ? "section-dark" : "section-seam"}
+    >
       <div className="section-shell-band">
         <Reveal>
           <p className="eyebrow text-muted-foreground">{eyebrow}</p>

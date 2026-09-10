@@ -121,7 +121,17 @@ export function SiteFooter() {
                   rel="noopener noreferrer"
                   className={`${linkKlasse} font-mono`}
                 >
-                  {contact.whatsapp}
+                  {/*
+                    `dir="ltr"` ist hier kein Zierrat. Im arabischen Baum
+                    gehoert die Zeile zu einem RTL-Absatz, und der
+                    Bidi-Algorithmus schiebt das fuehrende „+" ans andere
+                    Ende: Aus „+41 76 504 58 79" wurde gerendert
+                    „79 58 504 76 41+". Die Ziffernfolge blieb lesbar, die
+                    Landesvorwahl stand hinten — eine Telefonnummer, die man
+                    so nicht abtippen kann. Eine Nummer ist immer LTR,
+                    unabhaengig vom Satz, in dem sie steht.
+                  */}
+                  <bdi dir="ltr">{contact.whatsapp}</bdi>
                 </a>
               </li>
             </ul>

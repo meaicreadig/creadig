@@ -1008,3 +1008,84 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
     scroll-behavior: auto;
   }
 }
+
+/* ==========================================================================
+ * ARABISCHE TYPOGRAFIE
+ * ==========================================================================
+ *
+ * Zwei Befunde, beide gemessen auf /ar/termin vor dieser Aenderung:
+ *
+ *   1 · KEINE ARABISCHE SCHRIFT WAR GELADEN.
+ *       `document.fonts.check()` meldete fuer die H1 „Poppins: JA" — aber
+ *       Poppins ist auf `latin` beschnitten. Was dort stand, kam vom
+ *       Betriebssystem des Besuchers. Behoben in `site-shell.tsx`.
+ *
+ *   2 · AUF DIE H1 WIRKTEN -1,92 px LAUFWEITE, AUF DIE EYEBROW +1,76 px.
+ *       Arabisch ist eine VERBUNDENE Schrift. Laufweite zieht die Verbindung
+ *       zwischen den Buchstaben eines Wortes auseinander oder quetscht sie
+ *       zusammen — aus einem Wort werden optisch Bruchstuecke. Genau das
+ *       macht den Eindruck „hart und anstrengend", den der Owner
+ *       zurueckgewiesen hat. Fuer lateinische Versalien ist dieselbe
+ *       Laufweite richtig; deshalb steht sie dort weiter.
+ *
+ * REIHENFOLGE DER SCHRIFTLISTE — EIN GEMESSENER UMWEG.
+ *
+ * Zuerst stand Readex HINTER den lateinischen Familien, damit „creaDIG" und
+ * „meAI" in der Hausschrift bleiben. Gemessen: Es griff nicht. `next/font`
+ * haengt an jede Familie eine eigene „… Fallback"-Familie an — eine lokale
+ * Systemschrift mit angeglichenen Metriken. Die Liste lautete damit
+ * effektiv „Poppins, Poppins Fallback, Readex Pro", und die Systemschrift
+ * deckt Arabisch ab. Das Arabische kam also nie bei Readex an; die
+ * Aenderung waere unsichtbar geblieben.
+ *
+ * Deshalb steht Readex jetzt VORN — allerdings nur im arabischen Baum. Der
+ * Preis: lateinische Woerter INNERHALB arabischer Saetze kommen dort
+ * ebenfalls aus Readex. Das ist der bessere von zwei Fehlern: Ein Satz aus
+ * einer Schrift liest sich ruhiger als einer aus zweien, und die Wortmarke
+ * ist ohnehin eine SVG-Datei und davon nicht betroffen. Die Mono-Zeile
+ * (Kennziffern, Telefon) behaelt JetBrains vorn — dort ist die Ziffer die
+ * Hauptsache.
+ */
+[lang="ar"] {
+  --font-sans: var(--font-arabic), var(--font-mplus), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-arabic), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), var(--font-arabic), ui-monospace, monospace;
+}
+
+/*
+ * Keine lateinische Laufweite auf arabischem Text.
+ *
+ * `text-transform: uppercase` bleibt stehen: Arabisch kennt keine
+ * Gross- und Kleinschreibung, die Regel ist dort wirkungslos — fuer die
+ * lateinischen Woerter in denselben Labels bleibt sie richtig.
+ */
+[lang="ar"] :is(h1, h2, h3, h4, h5, h6),
+[lang="ar"] :is(.text-display, .text-subhead),
+[lang="ar"] :is(.type-h1, .type-h2, .type-h3, .type-h4, .type-statement, .type-lead),
+[lang="ar"] :is(.eyebrow, .text-meta) {
+  letter-spacing: normal;
+}
+
+/*
+ * Arabisch braucht mehr Durchschuss als Latein: Die Schrift traegt
+ * Punkte unter und Zeichen ueber der Grundlinie, und bei enger Zeile
+ * beruehren sie die Nachbarzeile. Nur der Durchschuss aendert sich, nicht
+ * der Grad — die Groessenhierarchie bleibt dieselbe wie in den anderen drei
+ * Sprachen.
+ */
+[lang="ar"] :is(.type-h1, .type-h2, .type-h3, .type-h4) {
+  line-height: 1.32;
+}
+
+[lang="ar"] :is(.type-lead, .type-body, .type-small, p) {
+  line-height: 1.9;
+}
+
+/*
+ * Readex Pro laeuft optisch etwas kleiner als M PLUS Rounded 1c auf
+ * derselben Pixelgroesse. Ein Zehntel mehr Schriftgrad gleicht das aus,
+ * ohne die Skala zu verschieben.
+ */
+[lang="ar"] body {
+  font-size-adjust: none;
+}
