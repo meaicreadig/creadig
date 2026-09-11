@@ -63,18 +63,22 @@ export function Kaufwege() {
         </div>
 
         {/*
-          DIE FIT-FRAGE. Vier Saetze, von denen drei vom Systemprojekt
-          wegfuehren. Als nummerierte Liste und nicht als Karten: Es ist eine
+          DIE FIT-FRAGE. Drei Saetze, von denen zwei vom Systemprojekt
+          wegfuehren. Als nummerierte Zeilen und nicht als Karten: Es ist eine
           Abfolge von Faellen, keine Auswahl von Produkten.
+
+          Der vierte Satz ist in Phase 5 gegangen — „trifft keiner der fuenf
+          Treiber zu, reicht das Paket" steht wortgleich in der Preisleiter
+          derselben Seite, im `openDriversNote`.
         */}
-        <Reveal delay={0.14} className="border-line mt-16 border-t pt-10">
+        <Reveal delay={0.14} className="border-line mt-14 border-t pt-8">
           <h3 className="type-h3 max-w-3xl text-balance">{fitText.title[locale]}</h3>
-          <p className="type-body text-muted-foreground mt-4 max-w-2xl text-pretty">
+          <p className="type-body text-muted-foreground mt-3 max-w-2xl text-pretty">
             {fitText.lead[locale]}
           </p>
-          <ul className="mt-8 grid gap-x-10 gap-y-6 sm:grid-cols-2">
+          <ul className="mt-6 grid gap-x-10 gap-y-4 sm:grid-cols-3">
             {fitText.faelle.map((fall, i) => (
-              <li key={fall.de} className="border-line flex gap-4 border-t pt-4">
+              <li key={fall.de} className="border-line flex gap-3 border-t pt-3.5">
                 <span className="text-meta text-gold-text shrink-0 font-mono">
                   {String(i + 1).padStart(2, "0")}
                 </span>
@@ -85,80 +89,56 @@ export function Kaufwege() {
         </Reveal>
 
         {/*
-          DIE DREI WEGE. Je Weg: wann er gilt, wie der Preis entsteht, und
-          darunter die Angebote, die zu ihm gehoeren.
+          DIE DREI WEGE — FLACH STATT VERSCHACHTELT (PHASE 5).
+
+          Vorher trug jeder Weg einen eigenen Dreispalter (Nummer, „Wann",
+          „Wie der Preis entsteht") und darunter je Angebot einen zweiten
+          Dreispalter. Auf 1440 Pixeln las sich das als Tabelle; auf 390
+          zerfiel es in dreiunddreissig gestapelte Bloecke, und die Sektion
+          war mit 5.092 Pixeln der laengste Abschnitt der Seite.
+
+          Jetzt: eine Zeile je Weg, darunter eine Zeile je Angebot. Die
+          Bedingung und ihre Preisfolge stehen als EIN Satz — sie waren
+          ohnehin einer.
         */}
-        <div className="mt-20 flex flex-col gap-14">
+        <div className="mt-16 flex flex-col gap-10">
           {kaufwege.map((weg, wi) => {
             const wegText = kaufwegeText.wege[weg]
-            const liste = angeboteZu(weg)
             return (
-              <Reveal key={weg} delay={0.06 * wi}>
-                <div className="border-line border-t pt-8">
-                  <div className="grid gap-6 lg:grid-cols-12 lg:gap-10">
-                    <div className="lg:col-span-5">
-                      <p className="text-meta text-gold-text font-mono">
-                        {String(wi + 1).padStart(2, "0")}
-                      </p>
-                      <h3 className="type-h3 mt-3 text-balance">{wegText.name[locale]}</h3>
-                    </div>
-                    <div className="lg:col-span-4">
-                      <p className="eyebrow text-muted-foreground">
-                        {kaufwegeText.wannLabel[locale]}
-                      </p>
-                      <p className="type-small text-foreground/85 mt-2.5 text-pretty">
-                        {wegText.wann[locale]}
-                      </p>
-                    </div>
-                    <div className="lg:col-span-3">
-                      <p className="eyebrow text-muted-foreground">
-                        {kaufwegeText.preisLabel[locale]}
-                      </p>
-                      <p className="type-small text-foreground/85 mt-2.5 text-pretty">
-                        {wegText.preis[locale]}
-                      </p>
-                      {weg === "umfang-zuerst" && (
-                        <>
-                          <p className="type-small text-muted-foreground mt-3 text-pretty">
-                            {kaufwegeText.rechnerHinweis[locale]}
-                          </p>
-                          <Link
-                            href="/aufwandsrechner"
-                            className="text-gold-text eyebrow mt-2.5 inline-flex items-center gap-1.5 underline-offset-4 hover:underline"
-                          >
-                            {kaufwegeText.rechnerCta[locale]}
-                            <ArrowUpRight className="size-3" strokeWidth={1.5} />
-                          </Link>
-                        </>
-                      )}
-                    </div>
+              <Reveal key={weg} delay={0.05 * wi}>
+                <div className="border-line border-t pt-6">
+                  <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                    <span className="text-meta text-gold-text font-mono">
+                      {String(wi + 1).padStart(2, "0")}
+                    </span>
+                    <h3 className="type-h4">{wegText.name[locale]}</h3>
                   </div>
+                  <p className="type-small text-muted-foreground mt-2.5 max-w-3xl text-pretty">
+                    {wegText.wann[locale]}
+                  </p>
 
-                  <ul className="mt-9 flex flex-col">
-                    {liste.map((angebot) => {
+                  <ul className="mt-6 flex flex-col">
+                    {angeboteZu(weg).map((angebot) => {
                       const text = angebotText[angebot.key]
                       if (!text) return null
                       return (
                         <li
                           key={angebot.key}
-                          className="border-line grid gap-5 border-t py-6 lg:grid-cols-12 lg:gap-10"
+                          className="border-line grid gap-x-10 gap-y-2 border-t py-4 lg:grid-cols-12"
                         >
                           <div className="lg:col-span-5">
-                            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
-                              <p className="text-foreground text-base font-semibold">
+                            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                              <span className="text-foreground text-base font-semibold">
                                 {text.name[locale]}
-                              </p>
-                              {/*
-                                Der Betrag steht als Tatsache neben dem Namen,
-                                nicht als Auszeichnung darunter. „nach
-                                Zuschnitt" ist an dieser Stelle genauso eine
-                                Antwort wie eine Zahl — und die haeufigere.
-                              */}
+                              </span>
                               {angebot.betrag !== null ? (
                                 <span className="text-gold-text type-small font-mono">
                                   {formatPrice(angebot.betrag, locale)}
                                   {angebot.betragArt === "monatlich"
                                     ? ` ${kaufwegeText.betragArt.monatlich[locale]}`
+                                    : ""}
+                                  {angebot.betragBis !== null
+                                    ? ` · ${kaufwegeText.regulaerLabel[locale]} ${formatPrice(angebot.betragBis, locale)}`
                                     : ""}
                                 </span>
                               ) : (
@@ -166,40 +146,25 @@ export function Kaufwege() {
                                   {kaufwegeText.betragArt["nach-zuschnitt"][locale]}
                                 </span>
                               )}
-                              {angebot.betragBis !== null && (
-                                <span className="text-muted-foreground text-meta font-mono">
-                                  {kaufwegeText.regulaerLabel[locale]}{" "}
-                                  {formatPrice(angebot.betragBis, locale)}
-                                </span>
-                              )}
                             </div>
                             <Link
                               href={angebot.href}
-                              className="text-gold-text eyebrow mt-3.5 inline-flex items-center gap-1.5 underline-offset-4 hover:underline"
+                              className="text-gold-text eyebrow mt-2 inline-flex items-center gap-1.5 underline-offset-4 hover:underline"
                             >
                               {text.cta[locale]}
                               <ArrowUpRight className="size-3" strokeWidth={1.5} />
                             </Link>
                           </div>
-                          <div className="lg:col-span-4">
-                            <p className="eyebrow text-muted-foreground">
-                              {kaufwegeText.ergebnisLabel[locale]}
-                            </p>
-                            <p className="type-small text-foreground/85 mt-2.5 text-pretty">
-                              {text.ergebnis[locale]}
-                            </p>
-                          </div>
                           {/*
-                            Die Grenze steht gleichwertig neben dem Ergebnis
-                            und nicht kleiner darunter. Im Streitfall gilt das
-                            groessere Versprechen — deshalb muss das kleinere
-                            genauso gut lesbar sein.
+                            Die Grenze ist der einzige Teil, der nirgends
+                            sonst steht — deshalb ist sie der einzige, der
+                            geblieben ist.
                           */}
-                          <div className="lg:col-span-3">
+                          <div className="lg:col-span-7">
                             <p className="eyebrow text-muted-foreground">
                               {kaufwegeText.grenzeLabel[locale]}
                             </p>
-                            <p className="type-small text-muted-foreground mt-2.5 text-pretty">
+                            <p className="type-small text-muted-foreground mt-1.5 text-pretty">
                               {text.grenze[locale]}
                             </p>
                           </div>
@@ -207,17 +172,27 @@ export function Kaufwege() {
                       )
                     })}
                   </ul>
+
+                  {weg === "umfang-zuerst" && (
+                    <div className="border-line mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t pt-4">
+                      <p className="type-small text-muted-foreground text-pretty">
+                        {kaufwegeText.rechnerHinweis[locale]}
+                      </p>
+                      <Link
+                        href="/aufwandsrechner"
+                        className="text-gold-text eyebrow inline-flex items-center gap-1.5 underline-offset-4 hover:underline"
+                      >
+                        {kaufwegeText.rechnerCta[locale]}
+                        <ArrowUpRight className="size-3" strokeWidth={1.5} />
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </Reveal>
             )
           })}
         </div>
 
-        <Reveal delay={0.1}>
-          <p className="text-meta text-muted-foreground border-line mt-12 border-t pt-5">
-            {kaufwegeText.nettoHinweis[locale]}
-          </p>
-        </Reveal>
       </div>
     </section>
   )

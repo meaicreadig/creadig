@@ -26,6 +26,35 @@ export function arbeitenMetadata(locale: Locale): Metadata {
     path: "/arbeiten",
     title: ohneKundenwerk ? copy.metaTitleOhneKundenwerk : copy.metaTitle,
     description: ohneKundenwerk ? copy.metaDescriptionOhneKundenwerk : copy.metaDescription,
+    /*
+     * PHASE 6 · COMMERCIAL COMPLETION — DIE INDEXENTSCHEIDUNG.
+     *
+     * Diese Seite traegt heute 82 Woerter: eine Ueberschrift, den Satz, dass
+     * keine Freigabe vorliegt, und einen Verweis auf die Produkte. Das ist
+     * duenner Inhalt, und duenner Inhalt schadet nicht nur der Seite selbst,
+     * sondern der Bewertung der ganzen Domain.
+     *
+     * Drei Wege standen zur Wahl:
+     *
+     *   index, follow — eine fast leere Seite konkurriert um „creaDIG
+     *     Arbeiten" und liefert dem Sucher nichts. Verworfen.
+     *
+     *   Weiterleitung auf /produkte — genau die Vermischung, die Gate 01
+     *     mit D-16 aufgeloest hat: `/produkte` ist der Ort der eigenen
+     *     Produkte, `/arbeiten` der fuer freigegebene Kundenarbeit. Eine
+     *     Weiterleitung wuerde die Trennung technisch zuruecknehmen und die
+     *     Adresse fuer den Tag verbrennen, an dem sie traegt. Verworfen.
+     *
+     *   noindex, follow — die Seite bleibt erreichbar, bleibt verlinkt, gibt
+     *     ihre Verweiskraft weiter und steht nicht im Index. Gewaehlt.
+     *
+     * Die Bedingung ist dieselbe wie der sichtbare Text und wie die
+     * strukturierten Daten: `genannteClientWorks.length === 0`. Sobald die
+     * erste Freigabe vorliegt, steht die Seite ohne Code-Aenderung wieder im
+     * Index — in allen vier Sprachen zugleich. Denselben Mechanismus benutzt
+     * `/insights` seit seiner Einfuehrung.
+     */
+    noIndex: ohneKundenwerk,
   })
 }
 

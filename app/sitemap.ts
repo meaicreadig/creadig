@@ -78,7 +78,16 @@ const entries: Entry[] = [
     priority: 0.8,
   })),
 
-  { path: "/arbeiten", changeFrequency: "monthly", priority: 0.8 },
+  /*
+   * PHASE 6 — `/arbeiten` steht nur in der Sitemap, wenn dort etwas steht.
+   * Solange keine Kundenarbeit freigegeben ist, nimmt sich die Seite selbst
+   * aus dem Index (siehe `app/_routes/arbeiten.tsx`); eine Sitemap, die sie
+   * trotzdem anbietet, gibt zwei gegensaetzliche Anweisungen — genau der
+   * Widerspruch, den die Anmerkung oben fuer die Rechtsseiten beschreibt.
+   */
+  ...(genannteClientWorks.length > 0
+    ? [{ path: "/arbeiten", changeFrequency: "monthly" as const, priority: 0.8 }]
+    : []),
   ...genannteClientWorks.map((work) => ({
     path: `/arbeiten/${work.slug}`,
     changeFrequency: "monthly" as const,

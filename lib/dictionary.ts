@@ -329,6 +329,8 @@ export const dictionary = {
       metaDescription:
         "creaDIG erreichen: per WhatsApp, E-Mail, kostenloser Erstberatung oder direkt über unsere eigenen Produkte. ICO InnovationsCentrum Osnabrück, Beratung auf Deutsch und Türkisch.",
       intentsLabel: "Womit möchten Sie anfangen?",
+      /* PHASE 4 — der zweite Rang: Wege, die keinen Termin brauchen. */
+      ohneTerminLabel: "Ohne Termin weiterkommen",
       intents: {
         talk: {
           name: "Projekt besprechen",
@@ -336,9 +338,14 @@ export const dictionary = {
           cta: "Zu den direkten Wegen",
         },
         appointment: {
-          name: "Termin vereinbaren",
-          what: "Zwanzig Minuten Erstberatung, kostenlos — oder ein ausführliches Systemgespräch, wenn Ihr Vorhaben größer ist. Vier Schritte, dann steht die Anfrage.",
-          cta: "Termin anfragen",
+          name: "Kurzes Erstgespräch",
+          what: "Zwanzig Minuten, kostenlos, per Video. Wir hören zu und sagen ehrlich, ob wir helfen können — auch wenn die Antwort „noch nicht“ lautet.",
+          cta: "Erstgespräch anfragen",
+        },
+        system: {
+          name: "Systemgespräch",
+          what: "Fünfundvierzig Minuten, kostenlos. Für Vorhaben mit mehreren Abläufen, Rollen oder vorhandenen Programmen — danach steht ein Umfang, aus dem ein Festpreis wird.",
+          cta: "Systemgespräch anfragen",
         },
         products: {
           name: "Produkte ansehen",
@@ -2231,8 +2238,8 @@ export const dictionary = {
        */
       title: "In 20 Minuten unverbindlich.",
       lead: "Deutsch und Türkisch. Wählen Sie den Weg, der Ihnen am schnellsten passt.",
-      directTitle: "Drei Wege. Jeder endet bei einem Menschen.",
-      directLead: "Ein Erstgespräch läuft über die Terminanfrage — dort steht in vier Schritten, worum es geht. Wer nur eine Frage hat, schreibt direkt: per WhatsApp oder E-Mail, auf Deutsch oder Türkisch.",
+      directTitle: "Zwei Wege, ohne Termin. Beide enden bei einem Menschen.",
+      directLead: "Die beiden Gespräche stehen oben. Wer nur eine Frage hat, braucht keines davon und schreibt direkt: per WhatsApp oder E-Mail, auf Deutsch oder Türkisch.",
       mailTitle: "E-Mail",
       mailNote: "Für Unterlagen, Angebote und alles Schriftliche.",
       nameLabel: "Name",
@@ -2399,6 +2406,10 @@ export const dictionary = {
       title: "In vier Schritten zum Gespräch.",
       lead: "Sagen Sie uns, wann es Ihnen passt. Wir prüfen den Wunsch und bestätigen den Termin verbindlich per Rückmeldung — dieser Assistent bucht nichts automatisch.",
       stepOf: "Schritt",
+      /* PHASE 4 — die sichtbare Beschriftung der Leiste. „Schritt 3 von 4"
+         statt „75 %": Der Weg hat vier Schritte, und mehr sagt die Leiste
+         nicht. */
+      stepOfLabel: (schritt: number, von: number) => `Schritt ${schritt} von ${von}`,
       next: "Weiter",
       prev: "Zurück",
       /* BF-A3 / F8 — wird beim Schrittwechsel in einer Live-Region angesagt. */
@@ -3017,6 +3028,7 @@ export const dictionary = {
       metaDescription:
         "creaDIG'e ulaşın: WhatsApp, e-posta, ücretsiz ilk görüşme veya doğrudan kendi ürünlerimiz üzerinden. ICO InnovationsCentrum Osnabrück, Almanca ve Türkçe danışmanlık.",
       intentsLabel: "Neyle başlamak istersiniz?",
+      ohneTerminLabel: "Randevusuz ilerlemek",
       intents: {
         talk: {
           name: "Projeyi konuşmak",
@@ -3024,9 +3036,14 @@ export const dictionary = {
           cta: "Doğrudan yollara git",
         },
         appointment: {
-          name: "Randevu almak",
-          what: "Yirmi dakikalık ilk görüşme, ücretsiz — ya da işiniz daha büyükse ayrıntılı bir sistem görüşmesi. Dört adım, sonra talep hazır.",
-          cta: "Randevu iste",
+          name: "Kısa ilk görüşme",
+          what: "Yirmi dakika, ücretsiz, görüntülü. Dinleriz ve yardımcı olup olamayacağımızı dürüstçe söyleriz — cevap „henüz değil“ olsa bile.",
+          cta: "İlk görüşme iste",
+        },
+        system: {
+          name: "Sistem görüşmesi",
+          what: "Kırk beş dakika, ücretsiz. Birden fazla akışı, rolü ya da mevcut programı olan işler için — ardından bir kapsam çıkar ve ondan sabit fiyat doğar.",
+          cta: "Sistem görüşmesi iste",
         },
         products: {
           name: "Ürünlere bakmak",
@@ -4019,8 +4036,8 @@ export const dictionary = {
       eyebrow: "İletişim",
       title: "20 dakikada, bağlayıcı olmadan.",
       lead: "Almanca ve Türkçe. Size en hızlı gelen yolu seçin.",
-      directTitle: "Üç yol. Hepsi bir insana çıkar.",
-      directLead: "İlk görüşme randevu talebinden geçer — orada dört adımda konuyu anlatırsınız. Sadece bir sorusu olan doğrudan yazar: WhatsApp'tan ya da e-postayla, Almanca veya Türkçe.",
+      directTitle: "Randevusuz iki yol. İkisi de bir insana çıkar.",
+      directLead: "İki görüşme yukarıda duruyor. Sadece bir sorusu olanın hiçbirine ihtiyacı yok, doğrudan yazar: WhatsApp'tan ya da e-postayla, Almanca veya Türkçe.",
       mailTitle: "E-posta",
       mailNote: "Belgeler, teklifler ve yazılı her şey için.",
       nameLabel: "İsim",
@@ -4115,6 +4132,7 @@ export const dictionary = {
       title: "Dört adımda görüşmeye.",
       lead: "Size ne zaman uyduğunu söyleyin. Talebinizi inceler ve randevuyu dönüşümüzde bağlayıcı olarak onaylarız — bu asistan otomatik randevu oluşturmaz.",
       stepOf: "Adım",
+      stepOfLabel: (schritt: number, von: number) => `${von} adımdan ${schritt}.`,
       next: "Devam",
       prev: "Geri",
       stepAnnounce: (step: number, title: string) => `4 adımdan ${step}. adım: ${title}`,
@@ -4614,6 +4632,7 @@ export const dictionary = {
       metaDescription:
         "Reach creaDIG: by WhatsApp, email, a free first consultation, or straight through our own products. ICO InnovationsCentrum Osnabrück, advice in German, Turkish and English.",
       intentsLabel: "Where would you like to start?",
+      ohneTerminLabel: "Getting further without an appointment",
       intents: {
         talk: {
           name: "Discuss a project",
@@ -4621,9 +4640,14 @@ export const dictionary = {
           cta: "See the direct routes",
         },
         appointment: {
-          name: "Book an appointment",
-          what: "A twenty-minute first consultation, free — or a longer systems conversation if your undertaking is bigger. Four steps and your request is in.",
-          cta: "Request an appointment",
+          name: "Short first conversation",
+          what: "Twenty minutes, free of charge, by video. We listen and say honestly whether we can help — even when the answer is “not yet”.",
+          cta: "Request a first conversation",
+        },
+        system: {
+          name: "System conversation",
+          what: "Forty-five minutes, free of charge. For undertakings with several processes, roles or existing programs — afterwards there is a scope, and out of it comes a fixed price.",
+          cta: "Request a system conversation",
         },
         products: {
           name: "See the products",
@@ -5609,8 +5633,8 @@ export const dictionary = {
       eyebrow: "Contact",
       title: "Twenty minutes, no obligation.",
       lead: "German, Turkish and English. Choose whichever route suits you fastest.",
-      directTitle: "Three routes. Every one ends with a person.",
-      directLead: "A first conversation runs through the appointment request — four steps that set out what it is about. Anyone with just a question writes directly: by WhatsApp or email, in German, Turkish or English.",
+      directTitle: "Two routes, without an appointment. Both end with a person.",
+      directLead: "The two conversations are above. Anyone with just a question needs neither and writes directly: by WhatsApp or email, in German, Turkish or English.",
       mailTitle: "Email",
       mailNote: "For documents, proposals and anything in writing.",
       nameLabel: "Name",
@@ -5700,6 +5724,7 @@ export const dictionary = {
       title: "Four steps to a conversation.",
       lead: "Tell us when it suits you. We check the request and confirm the appointment bindingly in our reply — this assistant does not book anything automatically.",
       stepOf: "Step",
+      stepOfLabel: (schritt: number, von: number) => `Step ${schritt} of ${von}`,
       next: "Next",
       prev: "Back",
       stepAnnounce: (step: number, title: string) => `Step ${step} of 4: ${title}`,
@@ -6190,6 +6215,7 @@ export const dictionary = {
       metaDescription:
         "التواصل مع creaDIG: عبر واتساب أو البريد الإلكتروني أو استشارة أولى مجانية أو مباشرةً من خلال منتجاتنا. مركز ICO للابتكار في أوسنابروك، استشارة بالألمانية والتركية والإنجليزية.",
       intentsLabel: "من أين تودّون البدء؟",
+      ohneTerminLabel: "المضيّ قدمًا دون موعد",
       intents: {
         talk: {
           name: "مناقشة مشروع",
@@ -6197,9 +6223,14 @@ export const dictionary = {
           cta: "إلى الطرق المباشرة",
         },
         appointment: {
-          name: "حجز موعد",
-          what: "عشرون دقيقة استشارة أولى، مجانًا — أو جلسة نظام مفصّلة إن كان مشروعكم أكبر. أربع خطوات ويصلنا طلبكم.",
-          cta: "طلب موعد",
+          name: "محادثة أولى قصيرة",
+          what: "عشرون دقيقة، مجانًا، بالفيديو. نستمع ونقول بصراحة إن كنا نستطيع المساعدة — حتى لو كان الجواب «ليس بعد».",
+          cta: "اطلبوا محادثة أولى",
+        },
+        system: {
+          name: "محادثة النظام",
+          what: "خمس وأربعون دقيقة، مجانًا. لمشاريع فيها عدة مسارات أو أدوار أو برامج قائمة — وبعدها يوجد نطاق، ومنه يصدر سعر ثابت.",
+          cta: "اطلبوا محادثة نظام",
         },
         products: {
           name: "استعراض المنتجات",
@@ -7185,8 +7216,8 @@ export const dictionary = {
       eyebrow: "التواصل",
       title: "عشرون دقيقة، دون التزام.",
       lead: "بالألمانية والتركية والإنجليزية. اختاروا الطريق الأسرع لكم.",
-      directTitle: "ثلاثة طرق. كلٌّ منها ينتهي عند إنسان.",
-      directLead: "الحديث الأول يمرّ عبر طلب الموعد — أربع خطوات تبيّن عمّا يدور الأمر. ومن لديه سؤال فقط يكتب مباشرةً: عبر واتساب أو البريد، بالألمانية أو التركية أو الإنجليزية.",
+      directTitle: "طريقان دون موعد. كلاهما ينتهي عند إنسان.",
+      directLead: "المحادثتان مذكورتان أعلاه. ومن لديه سؤال فقط لا يحتاج إلى أيٍّ منهما ويكتب مباشرةً: عبر واتساب أو البريد، بالألمانية أو التركية أو الإنجليزية.",
       mailTitle: "البريد الإلكتروني",
       mailNote: "للمستندات والعروض وكل ما هو مكتوب.",
       nameLabel: "الاسم",
@@ -7276,6 +7307,7 @@ export const dictionary = {
       title: "أربع خطوات إلى الحديث.",
       lead: "قولوا لنا متى يناسبكم. نراجع الطلب ونؤكّد الموعد بشكل ملزِم في ردّنا — هذا المساعد لا يحجز شيئًا تلقائيًا.",
       stepOf: "خطوة",
+      stepOfLabel: (schritt: number, von: number) => `الخطوة ${schritt} من ${von}`,
       next: "التالي",
       prev: "السابق",
       stepAnnounce: (step: number, title: string) => `الخطوة ${step} من 4: ${title}`,

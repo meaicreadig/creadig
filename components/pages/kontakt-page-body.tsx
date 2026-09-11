@@ -1,6 +1,8 @@
 "use client"
 
 import { LocaleLink as Link } from "@/components/ui/locale-link"
+import { checkCopy } from "@/lib/betriebscheck"
+import { rechnerText } from "@/lib/rechner-text"
 import { ArrowRight, ArrowUpRight, CalendarDays, Layers, MessageSquare, Package } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
@@ -28,6 +30,7 @@ import { contact } from "@/lib/site-data"
 const INTENT_ICONS = {
   talk: MessageSquare,
   appointment: CalendarDays,
+  system: Layers,
   products: Package,
   works: Layers,
 } as const
@@ -38,9 +41,31 @@ const INTENT_ICONS = {
  * Seite. Das Formular gibt es nicht mehr; der Anker fuehrt jetzt auf die
  * direkten Wege, und die Beschriftung sagt das auch.
  */
+/*
+ * PHASE 4 · COMMERCIAL COMPLETION — DREI GLEICH GROSSE KACHELN WAREN KEINE
+ * REIHENFOLGE.
+ *
+ * Vorher standen „Projekt besprechen", „Termin vereinbaren" und „Produkte
+ * ansehen" gleichwertig nebeneinander, darunter noch WhatsApp und E-Mail.
+ * Fuenf gleichrangige Wege sind keine Auswahl, sondern eine Abwaelzung der
+ * Entscheidung auf den Besucher.
+ *
+ * Schwerer wog, was FEHLTE: Das Systemgespraech kam auf dieser Seite gar
+ * nicht vor. „Termin vereinbaren" nannte es im Fliesstext als Nebensatz und
+ * fuehrte auf `/termin` — also in den kurzen Weg. Wer ein Betriebsproblem
+ * hat, landete damit zuverlaessig in der falschen Erwartung.
+ *
+ * Jetzt zwei Raenge:
+ *   GESPRAECH   zwei Kacheln, zwei Dauern, zwei Ziele
+ *   OHNE TERMIN eine Zeile: selbst pruefen, selbst rechnen, direkt schreiben
+ */
+const GESPRAECHE = [
+  { key: "appointment" as const, href: "/termin" },
+  { key: "system" as const, href: "/termin?art=systemgespraech" },
+] as const
+
 const INTENTS = [
   { key: "talk" as const, href: "#kontakt", external: false },
-  { key: "appointment" as const, href: "/termin", external: false },
   { key: "products" as const, href: "/produkte", external: false },
   /*
    * GATE 01 · WEB-0005 — der vierte Weg fuehrte nach `/arbeiten`.
@@ -56,7 +81,7 @@ const INTENTS = [
 ]
 
 export function KontaktPageBody() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
   const copy = t.kontaktPage
 
   return (
@@ -99,8 +124,8 @@ export function KontaktPageBody() {
             Luecke gelassen, wo vorher der vierte Weg stand. Die Spaltenzahl
             folgt jetzt der Zahl der Wege und nicht umgekehrt.
           */}
-          <div className="mt-12 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-            {INTENTS.map((intent, i) => {
+          <div className="mt-12 grid gap-2.5 sm:grid-cols-2">
+            {GESPRAECHE.map((intent, i) => {
               const item = copy.intents[intent.key]
               const Icon = INTENT_ICONS[intent.key]
 
@@ -140,6 +165,35 @@ export function KontaktPageBody() {
               )
             })}
           </div>
+
+          {/*
+            ZWEITER RANG. Kein Termin noetig — und deshalb auch keine Kachel
+            in derselben Groesse. Drei Zeilen, die alle ohne Gespraech
+            weiterfuehren: selbst einschaetzen, selbst rechnen, direkt
+            schreiben.
+          */}
+          <Reveal delay={0.14} className="border-line mt-12 border-t pt-8">
+            <p className="eyebrow text-muted-foreground">{copy.ohneTerminLabel}</p>
+            <ul className="mt-5 flex flex-col gap-x-10 gap-y-3.5 sm:flex-row sm:flex-wrap">
+              <li>
+                <Link href="/betriebscheck" className="text-gold-text type-small underline-offset-4 hover:underline">
+                  {checkCopy.eyebrow[locale]}
+                </Link>
+              </li>
+              <li>
+                <Link href="/aufwandsrechner" className="text-gold-text type-small underline-offset-4 hover:underline">
+                  {rechnerText.name[locale]}
+                </Link>
+              </li>
+              {INTENTS.map((intent) => (
+                <li key={intent.key}>
+                  <Link href={intent.href} className="text-gold-text type-small underline-offset-4 hover:underline">
+                    {copy.intents[intent.key].name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
         </div>
       </section>
 

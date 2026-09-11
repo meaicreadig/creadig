@@ -290,6 +290,14 @@ export function TerminWizard() {
     })
   }
 
+  /*
+   * Der Systemweg qualifiziert, der kurze Weg nicht. Diese eine Zeile
+   * entscheidet in Schritt 3, in der Pruefung, in der Zusammenfassung und
+   * in der WhatsApp-Nachricht — damit die vier nicht auseinanderlaufen
+   * koennen.
+   */
+  const istSystemgespraech = type === "ar"
+
   const stepTitle =
     step === 1
       ? t.termin.step1.title
@@ -427,7 +435,8 @@ export function TerminWizard() {
   function validateForm() {
     const bad: Record<string, boolean> = {
       name: !form.name.trim(),
-      org: !form.org.trim(),
+      /* Pflicht nur dort, wo das Feld auch als Pflicht ausgezeichnet ist. */
+      org: istSystemgespraech && !form.org.trim(),
       email: !form.email.trim() || !EMAIL_RE.test(form.email.trim()),
       privacy: !privacyOk,
     }
@@ -453,10 +462,19 @@ export function TerminWizard() {
     { k: t.termin.step3.name, v: form.name },
     { k: t.termin.step3.phone, v: form.phone },
     { k: t.termin.step3.email, v: form.email },
-    { k: t.termin.step3.org, v: form.org },
-    { k: t.termin.step3.city, v: form.city || "–" },
+    { k: t.termin.step3.org, v: form.org || "–" },
     { k: t.termin.step3.interest, v: form.interest || "–" },
-    { k: t.termin.step3.size, v: form.size || "–" },
+    /*
+      PHASE 4 — dieselbe Regel wie bei den Treibern (Gate 06): Was auf dem
+      kurzen Weg nie gefragt wurde, erscheint hier nicht als Strich. Ein nie
+      gestelltes Feld liest der Verkauf sonst als verweigerte Antwort.
+    */
+    ...(istSystemgespraech
+      ? [
+          { k: t.termin.step3.city, v: form.city || "–" },
+          { k: t.termin.step3.size, v: form.size || "–" },
+        ]
+      : []),
     /*
       GATE 06 — die Treiber stehen NUR in der Zusammenfassung, wenn sie
       gefragt wurden. Bei der Erstberatung erscheinen sie nicht als fuenf
@@ -484,13 +502,13 @@ export function TerminWizard() {
     `🕐 *${t.termin.waTime}:* ${windowSummary}`,
     "",
     `👤 *${t.termin.waName}:* ${form.name}`,
-    `🏢 *${t.termin.waOrg}:* ${form.org}`,
-    `📍 *${t.termin.waCity}:* ${form.city || "–"}`,
+    `🏢 *${t.termin.waOrg}:* ${form.org || "–"}`,
+    ...(istSystemgespraech ? [`📍 *${t.termin.waCity}:* ${form.city || "–"}`] : []),
     `📧 *${t.termin.step3.email}:* ${form.email}`,
     `📱 *${t.termin.waPhone}:* ${form.phone}`,
     "",
     `💡 *${t.termin.waInterest}:* ${form.interest || "–"}`,
-    `👥 *${t.termin.waSize}:* ${form.size || "–"}`,
+    ...(istSystemgespraech ? [`👥 *${t.termin.waSize}:* ${form.size || "–"}`] : []),
     `🌍 *${t.termin.waLang}:* ${langLabel}`,
     "",
     `💬 *${t.termin.waNote}:* ${form.note || "–"}`,
@@ -526,7 +544,26 @@ export function TerminWizard() {
     }
   }
 
-  const progress = step === 5 ? 100 : [0, 25, 50, 75, 95][step] ?? 25
+  /*
+   * PHASE 4 · COMMERCIAL COMPLETION — DIE 95 PROZENT WAREN EINE BEHAUPTUNG.
+   *
+   * Hier stand `[0, 25, 50, 75, 95][step]`. Auf Schritt 4 — der letzten
+   * Eingabemaske, in der nur noch abgeschickt wird — zeigte die Leiste 95 %.
+   *
+   * Das ist keine Messung, das ist Verkaufspsychologie: „fast geschafft,
+   * jetzt nicht abbrechen". Sie ist zweimal falsch. Erstens sind vier von
+   * vier Schritten nicht 95 %. Zweitens beschreibt eine Prozentzahl ohne
+   * Bezugsgroesse gar nichts — 75 % wovon? Der Eingaben? Der Zeit? Der
+   * Wahrscheinlichkeit, dass ein Termin zustande kommt?
+   *
+   * Eine Fortschrittsanzeige beschreibt den Weg durch das Formular, sonst
+   * nichts. Der Weg hat vier Schritte, und auf dem vierten ist man beim
+   * vierten. Die Leiste fuellt sich entsprechend; die Beschriftung daneben
+   * sagt dasselbe in Worten statt in einer erfundenen Zahl.
+   */
+  const SCHRITTE = 4
+  const aktuellerSchritt = Math.min(step, SCHRITTE)
+  const progress = step === 5 ? 100 : (aktuellerSchritt / SCHRITTE) * 100
 
   return (
     <main className="relative min-h-dvh">
@@ -559,10 +596,7 @@ export function TerminWizard() {
         {/* Fortschritt */}
         <div className="mt-14">
           <div className="text-muted-foreground eyebrow flex items-baseline justify-between">
-            <span>
-              {t.termin.stepOf} {Math.min(step, 4)} / 4
-            </span>
-            <span>{progress}%</span>
+            <span>{t.termin.stepOfLabel(aktuellerSchritt, SCHRITTE)}</span>
           </div>
           <div className="bg-line mt-3 h-px w-full">
             <div
@@ -882,11 +916,31 @@ export function TerminWizard() {
                   className={cn(inputClass, invalid.name && invalidClass)}
                 />
               </label>
+              {/*
+                PHASE 4 — DER BETRIEB IST NUR BEIM SYSTEMGESPRAECH PFLICHT.
+
+                Gate 07 hat die Telefonpflicht mit einer Frage gekippt:
+                Traegt dieses Feld eine Entscheidung? Dieselbe Frage stellt
+                sich hier. Vor einem kostenlosen Zwanzig-Minuten-Gespraech
+                traegt der Firmenname keine: Das Gespraech findet statt,
+                egal ob er vorher dasteht, und wer ihn nennen will, nennt
+                ihn in der ersten Minute.
+
+                Beim Systemgespraech traegt er eine — dort wird vorbereitet,
+                und `qualification-canon.md` §8 nennt den Betrieb
+                ausdruecklich als Bedingung der Angebotsreife.
+
+                Das Feld bleibt in beiden Faellen. Was faellt, ist der Zwang
+                beim kurzen Weg.
+              */}
               <label className="flex flex-col gap-2">
-                <span className="eyebrow text-muted-foreground">{t.termin.step3.org} *</span>
+                <span className="eyebrow text-muted-foreground">
+                  {t.termin.step3.org}
+                  {istSystemgespraech ? " *" : ""}
+                </span>
                 <input
                   {...field("org")}
-                  required
+                  required={istSystemgespraech}
                   autoComplete="organization"
                   className={cn(inputClass, invalid.org && invalidClass)}
                 />
@@ -935,21 +989,44 @@ export function TerminWizard() {
                   className={cn(inputClass, invalid.email && invalidClass)}
                 />
               </label>
-              <label className="flex flex-col gap-2">
-                <span className="eyebrow text-muted-foreground">{t.termin.step3.city}</span>
-                <input {...field("city")} autoComplete="address-level2" className={inputClass} />
-              </label>
-              <label className="flex flex-col gap-2">
-                <span className="eyebrow text-muted-foreground">{t.termin.step3.size}</span>
-                <select {...field("size")} className={inputClass}>
-                  <option value="">{t.termin.step3.choose}</option>
-                  {t.termin.step3.sizes.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              {/*
+                PHASE 4 — ORT UND GROESSE STEHEN NUR AUF DEM SYSTEMWEG.
+
+                Beide sind Qualifizierung, und beide entscheiden vor einem
+                Videogespraech von zwanzig Minuten nichts: Der Ort spielt
+                keine Rolle, wenn niemand hinfaehrt, und die
+                Mitarbeiterzahl aendert an einer Erstberatung nichts.
+
+                Auf dem Systemweg aendern sie etwas — die Groesse sagt, mit
+                wie vielen Rollen zu rechnen ist, der Ort, ob mehrere
+                Standorte im Spiel sind. Dort stehen sie neben den fuenf
+                Treibern, zu denen sie gehoeren.
+
+                Gemessen vorher: beide Wege zeigten dieselben acht Felder.
+              */}
+              {istSystemgespraech && (
+                <>
+                  <label className="flex flex-col gap-2">
+                    <span className="eyebrow text-muted-foreground">{t.termin.step3.city}</span>
+                    <input
+                      {...field("city")}
+                      autoComplete="address-level2"
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className="flex flex-col gap-2">
+                    <span className="eyebrow text-muted-foreground">{t.termin.step3.size}</span>
+                    <select {...field("size")} className={inputClass}>
+                      <option value="">{t.termin.step3.choose}</option>
+                      {t.termin.step3.sizes.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </>
+              )}
               <label className="flex flex-col gap-2 sm:col-span-2">
                 <span className="eyebrow text-muted-foreground">{t.termin.step3.interest}</span>
                 <select {...field("interest")} className={inputClass}>
@@ -1081,6 +1158,15 @@ export function TerminWizard() {
                   <input
                     id="termin-privacy"
                     type="checkbox"
+                    /*
+                     * PHASE 4 — die Einwilligung IST Pflicht (sie wird in
+                     * `validateForm()` geprueft und vom Server verlangt), trug
+                     * das aber nicht im Markup. Fuer einen Screenreader war
+                     * sie damit ein beliebiges Haekchen unter zwei
+                     * Pflichtfeldern. `required` sagt jetzt dasselbe wie die
+                     * Pruefung dahinter.
+                     */
+                    required
                     checked={privacyOk}
                     onChange={(e) => {
                       setPrivacyOk(e.target.checked)

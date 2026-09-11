@@ -221,6 +221,8 @@ export function ProductInterest({
               <label className="flex cursor-pointer items-start gap-3.5">
                 <input
                   type="checkbox"
+                  /* PHASE 4 — Pflicht in der Pruefung, also auch im Markup. */
+                  required
                   checked={privacyOk}
                   onChange={(e) => {
                     setPrivacyOk(e.target.checked)

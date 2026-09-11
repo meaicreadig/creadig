@@ -1,7 +1,6 @@
 "use client"
 
-import { LocaleLink as Link } from "@/components/ui/locale-link"
-import { ArrowUpRight, CalendarDays, Mail } from "lucide-react"
+import { ArrowUpRight, Mail } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
@@ -75,43 +74,20 @@ export function ContactDirect() {
             </Reveal>
           </div>
 
-          {/* Rechts: die drei Wege, in der Reihenfolge ihrer Verbindlichkeit. */}
-          <div className="flex flex-col gap-2.5 lg:col-span-7">
-            <Reveal>
-              <Link
-                href="/termin"
-                className="group tile hover:bg-foreground/[0.03] relative flex items-start gap-5 p-7 transition-colors duration-[var(--dur-2)]"
-              >
-                <span
-                  aria-hidden="true"
-                  className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] group-hover:w-full"
-                />
-                <CalendarDays className="text-gold mt-1 size-5 shrink-0" strokeWidth={1.5} />
-                <span className="flex-1">
-                  <span className="text-display block text-xl">{t.contact.appointmentTitle}</span>
-                  <span className="text-muted-foreground mt-2 block text-sm">
-                    {t.contact.appointmentNote}
-                  </span>
-                  {/*
-                    E-K8: Was der Termin dem Gegenueber bringt, bevor er etwas
-                    kostet. Kein neues Versprechen — beschrieben ist, was
-                    ohnehin passiert (siehe Prozess-Schritt „Verstehen" und der
-                    Foerder-Hinweis „sagen wir das offen").
-                  */}
-                  <span className="type-small text-foreground/85 mt-3 block text-pretty">
-                    {t.contact.appointmentValue}
-                  </span>
-                  <span className="text-gold-text mt-3 block text-sm">
-                    {t.contact.appointmentCta}
-                  </span>
-                </span>
-                <ArrowUpRight
-                  className="text-line-strong group-hover:text-gold-text mt-1 size-4 transition-colors duration-[var(--dur-2)]"
-                  strokeWidth={1.5}
-                />
-              </Link>
-            </Reveal>
+          {/*
+            PHASE 4 · COMMERCIAL COMPLETION — DIE TERMIN-KACHEL IST GEGANGEN.
 
+            Hier standen drei Wege: Termin, WhatsApp, E-Mail. Seit die Seite
+            oben zwei GESPRAECHE als ersten Rang zeigt — das kurze
+            Erstgespraech und das Systemgespraech —, war die Termin-Kachel die
+            dritte Nennung desselben Wegs auf derselben Seite. Wer sie las,
+            hatte die Wahl schon zweimal getroffen.
+
+            Was bleibt, ist das, was oben NICHT steht: die beiden Wege ohne
+            Termin. Damit trennt die Seite sauber — oben sprechen, hier
+            schreiben.
+          */}
+          <div className="flex flex-col gap-2.5 lg:col-span-7">
             <Reveal delay={0.06}>
               <a
                 href={contact.whatsappHref}

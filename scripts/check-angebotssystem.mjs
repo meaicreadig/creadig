@@ -125,7 +125,12 @@ for (const a of angebote) {
     probleme.push(`Angebot „${a.key}" hat keinen Text.`)
     continue
   }
-  for (const feld of ["name", "ergebnis", "grenze", "cta"]) {
+  /*
+   * PHASE 5 — `ergebnis` ist gegangen: Jedes Angebot beschreibt seinen Umfang
+   * an seinem Ziel, und die Sektion hat ihn ein zweites Mal erzaehlt. Was
+   * Pflicht BLEIBT, ist die Grenze — sie steht nirgends sonst.
+   */
+  for (const feld of ["name", "grenze", "cta"]) {
     for (const l of LOCALES) {
       const wert = text[feld]?.[l]
       if (!wert || wert.trim() === "") {

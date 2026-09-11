@@ -219,30 +219,11 @@ export const kaufwegeText = {
     ar: "ليس كل مشروع يمكن تسعيره مسبقًا — لكن كل مشروع يمكن تصنيفه. وأيُّ الطرق الثلاثة ينطبق هو ما يحدّد إن كان الرقم مذكورًا في هذه الصفحة، أم ينشأ بعد محادثة، أم يجري شهريًا.",
   } satisfies Localized,
 
-  wannLabel: { de: "Wann", tr: "Ne zaman", en: "When", ar: "متى" } satisfies Localized,
-  preisLabel: {
-    de: "Wie der Preis entsteht",
-    tr: "Fiyat nasıl oluşur",
-    en: "How the price comes about",
-    ar: "كيف ينشأ السعر",
-  } satisfies Localized,
-  ergebnisLabel: {
-    de: "Was Sie bekommen",
-    tr: "Ne alırsınız",
-    en: "What you get",
-    ar: "ما الذي تحصلون عليه",
-  } satisfies Localized,
   grenzeLabel: {
     de: "Nicht enthalten",
     tr: "Dahil değil",
     en: "Not included",
     ar: "غير مشمول",
-  } satisfies Localized,
-  nettoHinweis: {
-    de: "Alle Beträge netto. Die vollständige Preisleiter steht weiter unten.",
-    tr: "Tüm tutarlar nettir. Tam fiyat listesi aşağıdadır.",
-    en: "All amounts excl. VAT. The full price ladder is further down.",
-    ar: "كل المبالغ دون ضريبة القيمة المضافة. وسلّم الأسعار الكامل أدناه.",
   } satisfies Localized,
 
   betragArt: {
@@ -285,17 +266,17 @@ export const kaufwegeText = {
         en: "The scope is fixed in advance",
         ar: "النطاق محدَّد سلفًا",
       } satisfies Localized,
+      /*
+       * PHASE 5 — „Wann" und „Wie der Preis entsteht" standen als zwei
+       * Spalten nebeneinander und sagten zusammen einen Satz. Jetzt sind
+       * sie einer: Die Bedingung und ihre Folge gehoeren zusammen, und auf
+       * 390 Pixeln waren es sonst zwei Bloecke untereinander.
+       */
       wann: {
-        de: "Sie wissen, was Sie brauchen, und es ist ein abgegrenztes Stück Arbeit.",
-        tr: "Ne istediğinizi biliyorsunuz ve iş sınırları belli.",
-        en: "You know what you need, and it is a bounded piece of work.",
-        ar: "تعرفون ما تحتاجون إليه، والعمل محدود الحدود.",
-      } satisfies Localized,
-      preis: {
-        de: "Die Zahl steht auf dieser Seite. Sie gilt für den vereinbarten Umfang und ändert sich danach nicht.",
-        tr: "Rakam bu sayfada duruyor. Kararlaştırılan kapsam için geçerlidir ve sonrasında değişmez.",
-        en: "The number is on this page. It applies to the agreed scope and does not change afterwards.",
-        ar: "الرقم مذكور في هذه الصفحة. يسري على النطاق المتفق عليه ولا يتغير بعد ذلك.",
+        de: "Sie wissen, was Sie brauchen, und es ist abgegrenzt. Dann steht die Zahl auf dieser Seite und gilt für den vereinbarten Umfang.",
+        tr: "Ne istediğinizi biliyorsunuz ve iş sınırlı. O zaman rakam bu sayfada durur ve kararlaştırılan kapsam için geçerlidir.",
+        en: "You know what you need and it is bounded. Then the number is on this page and applies to the agreed scope.",
+        ar: "تعرفون ما تحتاجون إليه والعمل محدود. عندها يكون الرقم في هذه الصفحة ويسري على النطاق المتفق عليه.",
       } satisfies Localized,
     },
     "umfang-zuerst": {
@@ -305,17 +286,17 @@ export const kaufwegeText = {
         en: "The scope comes first",
         ar: "النطاق يأتي أولًا",
       } satisfies Localized,
+      /*
+       * PHASE 5 — „Wann" und „Wie der Preis entsteht" standen als zwei
+       * Spalten nebeneinander und sagten zusammen einen Satz. Jetzt sind
+       * sie einer: Die Bedingung und ihre Folge gehoeren zusammen, und auf
+       * 390 Pixeln waren es sonst zwei Bloecke untereinander.
+       */
       wann: {
-        de: "Mehrere Abläufe, mehrere Rollen, vorhandene Programme — oder etwas, das vorher niemand gesehen hat.",
-        tr: "Birden fazla akış, birden fazla rol, mevcut programlar — ya da daha önce kimsenin görmediği bir şey.",
-        en: "Several processes, several roles, existing programs — or something nobody has seen yet.",
-        ar: "عدة مسارات، وعدة أدوار، وبرامج قائمة — أو شيء لم يره أحد من قبل.",
-      } satisfies Localized,
-      preis: {
-        de: "Erst wird der Umfang geschnitten, dann fällt ein Festpreis für genau diesen Umfang. Vorher nennt Ihnen niemand seriös eine Zahl.",
-        tr: "Önce kapsam belirlenir, sonra tam olarak o kapsam için sabit bir fiyat çıkar. Öncesinde kimse size ciddiyetle bir rakam söyleyemez.",
-        en: "First the scope is cut, then a fixed price follows for exactly that scope. Before that, nobody can seriously quote you a number.",
-        ar: "يُحدَّد النطاق أولًا، ثم يصدر سعر ثابت لذلك النطاق بالضبط. وقبل ذلك لا يستطيع أحد أن يذكر لكم رقمًا بجدية.",
+        de: "Mehrere Abläufe, Rollen oder vorhandene Programme. Dann wird erst der Umfang geschnitten — eine Zahl vorher wäre geraten.",
+        tr: "Birden fazla akış, rol ya da mevcut program. O zaman önce kapsam belirlenir — öncesinde bir rakam tahmin olurdu.",
+        en: "Several processes, roles or existing programs. Then the scope is cut first — a number before that would be a guess.",
+        ar: "عدة مسارات أو أدوار أو برامج قائمة. عندها يُحدَّد النطاق أولًا — وأي رقم قبله سيكون تخمينًا.",
       } satisfies Localized,
     },
     laufend: {
@@ -325,17 +306,17 @@ export const kaufwegeText = {
         en: "It is an ongoing state",
         ar: "إنها حالة مستمرة",
       } satisfies Localized,
+      /*
+       * PHASE 5 — „Wann" und „Wie der Preis entsteht" standen als zwei
+       * Spalten nebeneinander und sagten zusammen einen Satz. Jetzt sind
+       * sie einer: Die Bedingung und ihre Folge gehoeren zusammen, und auf
+       * 390 Pixeln waren es sonst zwei Bloecke untereinander.
+       */
       wann: {
-        de: "Etwas ist gebaut und muss weiterlaufen.",
-        tr: "Bir şey kuruldu ve işlemeye devam etmeli.",
-        en: "Something is built and has to keep running.",
-        ar: "شيءٌ بُني ويجب أن يستمر في العمل.",
-      } satisfies Localized,
-      preis: {
-        de: "Die Zahl gilt pro Monat, der Umfang ist gedeckelt, und gekündigt wird monatlich.",
-        tr: "Rakam aylıktır, kapsam tavanlıdır ve iptal aylıktır.",
-        en: "The number applies per month, the scope is capped, and it is cancellable monthly.",
-        ar: "الرقم شهري، والنطاق محدود بسقف، والإلغاء شهري.",
+        de: "Etwas ist gebaut und muss weiterlaufen. Dann gilt die Zahl pro Monat, der Umfang ist gedeckelt, gekündigt wird monatlich.",
+        tr: "Bir şey kuruldu ve işlemeye devam etmeli. O zaman rakam aylıktır, kapsam tavanlıdır, iptal aylıktır.",
+        en: "Something is built and has to keep running. Then the number applies per month, the scope is capped, cancellation is monthly.",
+        ar: "شيءٌ بُني ويجب أن يستمر. عندها يكون الرقم شهريًا، والنطاق محدودًا بسقف، والإلغاء شهريًا.",
       } satisfies Localized,
     },
   },
@@ -353,18 +334,26 @@ export const kaufwegeText = {
  * Terminanfrage fuehrt. Ein Aufruf, der nicht sagt, was als Naechstes
  * passiert, macht aus sechs verschiedenen Kaufwegen wieder einen Katalog.
  */
+/*
+ * PHASE 5 — „Was Sie bekommen" ist gegangen.
+ *
+ * Jedes dieser sechs Angebote hat ein Zuhause, an dem vollstaendig steht, was
+ * es enthaelt: das Website-Paket und die Pruefung in der Preisleiter derselben
+ * Seite, die laufende Betreuung im Abschnitt „Managed Betrieb" darueber, die
+ * drei uebrigen an ihrem Ziel. Diese Sektion hat sie alle noch einmal
+ * zusammengefasst — 170 Woerter, die eine Bildschirmlaenge kosteten und nichts
+ * entschieden.
+ *
+ * Was bleibt, ist das, was NIRGENDS sonst steht: die Grenze. Was ein Angebot
+ * nicht enthaelt, entscheidet spaeter den Streit, und es stand vor Phase 2 an
+ * keiner Stelle oeffentlich. D-25 gilt auch fuer die eigene Ergaenzung.
+ */
 export const angebotText: Record<
   string,
-  { name: Localized; ergebnis: Localized; grenze: Localized; cta: Localized }
+  { name: Localized; grenze: Localized; cta: Localized }
 > = {
   website: {
     name: { de: "Website-Paket", tr: "Web sitesi paketi", en: "Website package", ar: "باقة الموقع" },
-    ergebnis: {
-      de: "Eine Website mit Wegen für Anfragen und Bewerbungen, vier Wochen ab Materialeingang.",
-      tr: "Talep ve başvuru yolları olan bir web sitesi; malzeme ulaştıktan sonra dört hafta.",
-      en: "A website with paths for enquiries and applications, four weeks from receipt of your material.",
-      ar: "موقع فيه مسارات للاستفسارات وطلبات التوظيف، خلال أربعة أسابيع من استلام موادّكم.",
-    },
     grenze: {
       de: "Kein Shop, kein Buchungssystem, keine Anbindung an die Warenwirtschaft, keine mehreren Standorte mit eigenen Seiten. Das ist jeweils eigener Umfang.",
       tr: "Mağaza yok, randevu sistemi yok, stok sistemine bağlantı yok, kendi sayfaları olan birden fazla şube yok. Bunların her biri ayrı kapsamdır.",
@@ -384,12 +373,6 @@ export const angebotText: Record<
       tr: "Erişilebilirlik denetimi",
       en: "Accessibility audit",
       ar: "فحص إمكانية الوصول",
-    },
-    ergebnis: {
-      de: "Ein Befundbericht nach WCAG 2.1 AA — je Fund mit Seite, Element, Kriterium und Messwert. Er gehört Ihnen, auch wenn Sie danach nichts tun.",
-      tr: "WCAG 2.1 AA'ya göre bir bulgu raporu — her bulguda sayfa, öğe, ölçüt ve ölçüm değeri. Sonrasında hiçbir şey yapmasanız da rapor sizindir.",
-      en: "A findings report against WCAG 2.1 AA — each finding with page, element, criterion and measured value. It belongs to you even if you do nothing afterwards.",
-      ar: "تقرير نتائج وفق WCAG 2.1 AA — كل نتيجة بصفحتها وعنصرها ومعيارها وقيمتها المقيسة. والتقرير لكم حتى لو لم تفعلوا شيئًا بعده.",
     },
     grenze: {
       de: "Keine Konformitätszusage, keine Zertifizierung. Ein grüner automatischer Lauf heißt nicht barrierefrei.",
@@ -411,12 +394,6 @@ export const angebotText: Record<
       en: "Remediation after the audit",
       ar: "المعالجة بعد الفحص",
     },
-    ergebnis: {
-      de: "Die gefundenen Mängel im Code behoben — ohne Overlay, ohne Zusatzwerkzeug, mit Nachprüfung und Zahlen vorher und nachher.",
-      tr: "Bulunan eksikler kodun içinde giderilir — overlay olmadan, ek araç olmadan, yeniden denetim ve öncesi/sonrası rakamlarla.",
-      en: "The defects found, fixed in the code — no overlay, no add-on tool, with a retest and numbers before and after.",
-      ar: "تُعالَج العيوب المكتشفة داخل الشيفرة — دون طبقة تغطية ودون أداة إضافية، مع إعادة فحص وأرقام قبل وبعد.",
-    },
     grenze: {
       de: "Die Zahl fällt erst nach der Prüfung. Für Ungesehenes nennt niemand seriös einen Festpreis.",
       tr: "Rakam ancak denetimden sonra çıkar. Görülmemiş bir şey için kimse ciddiyetle sabit fiyat vermez.",
@@ -432,12 +409,6 @@ export const angebotText: Record<
   },
   systemprojekt: {
     name: { de: "Systemprojekt", tr: "Sistem projesi", en: "System project", ar: "مشروع نظام" },
-    ergebnis: {
-      de: "Ein System für Ihre Abläufe. Der Umfang wird im Systemgespräch geschnitten, danach gilt ein Festpreis für genau diesen Umfang.",
-      tr: "Akışlarınız için bir sistem. Kapsam sistem görüşmesinde belirlenir, ardından tam olarak o kapsam için sabit bir fiyat geçerli olur.",
-      en: "A system for your processes. The scope is cut in the system conversation, after which a fixed price applies for exactly that scope.",
-      ar: "نظام لمساراتكم. يُحدَّد النطاق في محادثة النظام، ثم يسري سعر ثابت لذلك النطاق بالضبط.",
-    },
     grenze: {
       de: "Kein Listenpreis und keine Spanne. Es gibt keine Reihe abgeschlossener Systemprojekte, aus der sich eine ableiten ließe — eine geratene Spanne wäre entweder peinlich oder bindend.",
       tr: "Liste fiyatı yok, aralık yok. Aralık türetilebilecek tamamlanmış sistem projeleri dizisi yok — tahmini bir aralık ya utandırıcı ya da bağlayıcı olurdu.",
@@ -457,19 +428,6 @@ export const angebotText: Record<
       tr: "Sürekli bakım",
       en: "Ongoing care",
       ar: "الرعاية المستمرة",
-    },
-    /*
-     * Hier stand zuerst der vollstaendige Leistungsumfang — dieselben fuenf
-     * Punkte, die „Managed Betrieb" auf derselben Seite achtzig Zeilen
-     * darueber bereits auffuehrt. Zwei Listen, ein Angebot: genau die
-     * Doppelung, gegen die Gate 03 angetreten ist. Hier steht deshalb, was
-     * die Kaufart ausmacht; was drin ist, steht dort, wo es hingehoert.
-     */
-    ergebnis: {
-      de: "Der laufende Betrieb einer Seite oder eines Systems, das wir gebaut haben — gedeckelter Umfang, monatlich kündbar.",
-      tr: "Kurduğumuz bir sitenin ya da sistemin süregelen işletimi — tavanlı kapsam, aylık iptal edilebilir.",
-      en: "The ongoing operation of a site or system we built — capped scope, cancellable monthly.",
-      ar: "التشغيل المستمر لموقع أو نظام بنيناه — نطاق محدود بسقف، وقابل للإلغاء شهريًا.",
     },
     /*
      * „Nur fuer Seiten und Systeme, die wir gebaut haben" stand hier und
@@ -496,12 +454,6 @@ export const angebotText: Record<
       tr: "Özel bir uygulamanın işletimi",
       en: "Operating a custom application",
       ar: "تشغيل تطبيق مخصَّص",
-    },
-    ergebnis: {
-      de: "Für ein System mit eigener Datenbank, Anbindungen und betrieblicher Verantwortung entsteht der Umfang im Gespräch — nach Oberfläche, Überwachung, Änderungsfrequenz und Risiko.",
-      tr: "Kendi veritabanı, bağlantıları ve operasyonel sorumluluğu olan bir sistemde kapsam görüşmede oluşur — arayüz, izleme, değişiklik sıklığı ve riske göre.",
-      en: "For a system with its own database, integrations and operational responsibility, the scope comes about in conversation — by surface, monitoring, change frequency and risk.",
-      ar: "لنظام له قاعدة بياناته وارتباطاته ومسؤوليته التشغيلية، ينشأ النطاق في المحادثة — بحسب الواجهة والمراقبة ووتيرة التغيير والمخاطر.",
     },
     grenze: {
       de: "Dafür gibt es heute keinen öffentlichen Preis und keine Betriebsstufe über der laufenden Betreuung. Reaktionszeit, Erreichbarkeit und Vertretung sind nicht zugesagt — solange das so ist, verkaufen wir darüber nichts.",
@@ -546,12 +498,6 @@ export const fitText = {
       tr: "Mevcut bir standart yazılım sorununuzu düzgün çözüyorsa, ucuz olan cevap odur. O zaman biz bir şey kurmayız.",
       en: "If existing standard software solves your problem cleanly, that is the cheaper answer. Then we build nothing.",
       ar: "إن كان برنامج جاهز قائم يحلّ مشكلتكم على نحو سليم، فهذا هو الجواب الأرخص. وعندها لا نبني شيئًا.",
-    },
-    {
-      de: "Trifft keiner der fünf Treiber zu, ist es kein Systemprojekt — dann reicht das Website-Paket.",
-      tr: "Beş etkenden hiçbiri geçerli değilse bu bir sistem projesi değildir — o zaman web sitesi paketi yeter.",
-      en: "If none of the five drivers apply, it is not a system project — then the website package is enough.",
-      ar: "إن لم ينطبق أيٌّ من المحرّكات الخمسة فليس هذا مشروع نظام — وعندها تكفي باقة الموقع.",
     },
     {
       de: "Klemmt es nur an der Übergabe zwischen Programmen, die Sie schon haben, ist das eine Anbindung. Sie gehört zu einem Systemprojekt, aber sie ist der kleinere Teil davon.",
