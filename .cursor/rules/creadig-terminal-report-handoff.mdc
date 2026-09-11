@@ -1,0 +1,33 @@
+---
+description: Terminal/Gate-Rapor paylaşımında otomatik push, analiz, ChatGPT katkı — kod yok
+alwaysApply: true
+---
+
+# creaDIG — Terminal-Rapor → Push → Analiz → ChatGPT-Handoff
+
+Owner bir **Terminal / Agent Gate-Raporu** (GATE-STATUS, Commits, FINAL) paylaştığında:
+
+## Zorunlu sıra (sorulmadan)
+
+1. **Push** — `origin`’deki branch’e unpushed commit’leri push et. Unrelated untracked (`screenshots 2/`, Inbox-Prompt) dokunma.
+2. **Production (Owner 12.09.2026 — otomatik):** Tip Ready Preview’ı **sorulmadan** `creadig.de`’ye promote et. Kural: **push = canlı**. Tek istisna: Owner/Prompt açıkça „kein Promote / kein Production“ derse.
+3. **Kısa Türkçe özet** — Ne yapıldı (2–4 cümle). Backend / Frontend ayrımı varsa belirt.
+4. **Analiz** — Hedeflenen şey yapıldı mı? BUILT / ACCEPTED / OPERATIONAL. Closure turu gerekir mi?
+5. **ChatGPT katkı** — **Kod yazma.** Sonraki Gate için ChatGPT’nin Master Prompt yazmasına ek girdi (yapıştırılabilir blok).
+
+## ChatGPT-blok içeriği (her seferinde)
+
+- Bir önceki Gate: hedef vs sonuç (1 kısa paragraf)
+- Korunacak kararlar / Canon (bullet)
+- Sonraki Gate’in **asıl sorusu** (tek cümle)
+- Zorunlu acceptance (task journeys / testler)
+- Bilinçli dışarıda bırakılanlar (scope guard)
+- Cross-gate handoff (rapordan)
+- Owner Activation Card varsa aynen taşı
+- „Ein Master-Run, kein Closure-Ketten“ hatırlatması
+
+## Yasak
+
+- Bu akışta yeni feature kodu, refactor, „bir de şunu düzelteyim“
+- Impressum / USt / AVV nagging
+- Gate’i yapay yeşile boyamak

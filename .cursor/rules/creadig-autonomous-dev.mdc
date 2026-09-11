@@ -70,7 +70,7 @@ Mockup-Richtung **01 · Die Fuge trägt** — nicht 02/03, außer Owner widerspr
 2. **Premium-Struktur & CD umsetzen** — Radius, Raster-Luft, Motion-Tokens, konsistente Komponenten
 3. **Inhaltliche Tiefe** — nur mit Owner-Text oder klar markierten Platzhaltern; **nichts erfinden** (Black Lock)
 4. **Architektur** — Dictionary server-side, Bundle, Tests — wenn Hebel hoch
-5. **Live-Merge** — nur auf Owner-Anweisung „jetzt deployen/live“
+5. **Live-Merge (Owner 12.09.2026):** Nach jedem **eigenen** abgeschlossenen Lauf standardmäßig **Commit (wenn echte Änderung) → Push → Production-Promote** (`creadig.de`). Nicht nachfragen. Ausnahme nur, wenn Owner/Prompt ausdrücklich „kein Promote / kein Production“ schreibt. G18-Fremd-WIP, Black-Lock und Secrets nie committen.
 
 **Nicht:** Bundle optimieren, während niemand die Preview sieht. **Nicht:** Analyse-Dokumente statt Code, wenn Owner „weiterentwickeln“ sagt.
 
