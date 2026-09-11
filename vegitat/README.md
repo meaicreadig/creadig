@@ -1,5 +1,11 @@
 # Vegitat – Finanzübersicht Zürich & Luzern (Analyse, Excel-Cockpit, Empfehlung)
 
+> **Stand 11. September 2026, Richtungsentscheid:** Der Inhaber wird nichts manuell erfassen. Die Lösung wird ein
+> webbasiertes Finanzboard mit Beleg-Upload (Fotos, PDFs, Screenshots von Kontoauszügen) und automatischer Zuordnung.
+> Die Anforderungen, die Datensammlung und die Methode zur Schuldenanalyse stehen in
+> [`KONZEPT_Finanzboard.md`](KONZEPT_Finanzboard.md). Es wird nichts programmiert, bis das Konzept abgenommen ist.
+> Die Excel-Datei unten bleibt nur als Referenz für Kategorien und Auswertungslogik.
+
 Kunde: Vegitat (veganer Döner / Cigköfte), zwei Filialen – Hauptgeschäft Langstrasse 192, Zürich und
 Bleicherstrasse 29, Luzern. Alle Beträge in Schweizer Franken (CHF).
 
