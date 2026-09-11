@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/ui/page-header"
 import { Services } from "@/components/sections/services"
 import { ManagedOperations } from "@/components/sections/managed-operations"
 import { Process } from "@/components/sections/process"
+import { Kaufwege } from "@/components/sections/kaufwege"
 import { Packages } from "@/components/sections/packages"
 import { Faq } from "@/components/sections/faq"
 import { ClosingCta } from "@/components/sections/closing-cta"
@@ -78,6 +79,25 @@ export function LeistungenPageBody() {
         Sektionen selbst sind unveraendert — nur ihre Reihenfolge ist ein
         anderes Argument.
       */}
+      {/*
+        PHASE 2 · COMMERCIAL COMPLETION — DIE KAUFLOGIK STAND NIRGENDS.
+
+        `docs/sales/offer-canon.md` beschreibt seit dem 05.09.2026
+        vollstaendig, wie bei creaDIG ein Preis zustande kommt. Auf der Seite
+        standen davon nur die Ergebnisse: Betraege in der Tabelle unten, die
+        fuenf Treiber daneben, der Pilotpreis in einer Fussnote. Die Regel
+        darueber — dass es DREI grundverschiedene Arten gibt, hier zu kaufen
+        — stand nirgends.
+
+        Ohne sie rechnet jemand mit einem Betriebsproblem still hoch: „3.900
+        fuer eine Seite, also 40.000 fuer mein System." Oder er liest 149 Euro
+        und haelt das fuer den Betrieb seiner Warenwirtschaft.
+
+        Die Sektion steht VOR den Fragen und vor der Preisleiter. Erst wie ein
+        Preis entsteht, dann die offenen Fragen, dann die Zahlen — wer die
+        Tabelle ohne diese Ordnung liest, liest eine Agenturpreisliste.
+      */}
+      <Kaufwege />
       <Faq />
       <Packages />
       {/* MP10-2 (Zusatz) — hier steht der Abschluss unmittelbar unter der

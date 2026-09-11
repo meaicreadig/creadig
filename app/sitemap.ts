@@ -111,6 +111,11 @@ const entries: Entry[] = [
   /* MP-D — das erste Werkzeug der Seite, nicht nur eine Darstellung. */
   { path: "/betriebscheck", changeFrequency: "monthly", priority: 0.8 },
 
+  /* PHASE 3 — das zweite Werkzeug: derselbe Rang, dieselbe Rolle. Es gibt
+     eine Antwort auf „was kostet der Schritt", ohne dass jemand etwas
+     hinterlassen muss. */
+  { path: "/aufwandsrechner", changeFrequency: "monthly", priority: 0.8 },
+
   /*
    * MP-E — der erste vertikale Einstieg. GENAU EINER: Die Stadt-und-Gewerk-
    * Streuung liegt in `lib/seo-landings.ts` und ist leer, weil keine Stadt

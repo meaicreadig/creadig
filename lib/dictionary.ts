@@ -2642,13 +2642,13 @@ export const dictionary = {
 
       statusTitle: "Stand der Umsetzung",
       statusBody:
-        "Der automatisierte Lauf vom 11. September 2026 über 124 Durchläufe (31 Routen, zwei Fenstergrößen, helle und dunkle Fassung) meldet keine maschinell feststellbare Verletzung von WCAG 2.1 AA. Die acht Mängel aus dem ersten Prüflauf vom 23. August 2026 sind behoben. Die Handprüfung — Tastaturdurchlauf, zugängliche Namen, Fokus, Struktur — blieb ohne offenen Punkt; sie stammt aus jenem Prüflauf und gilt für den damals geprüften Umfang.",
+        "Der automatisierte Lauf vom 11. September 2026 über 132 Durchläufe (33 Routen, zwei Fenstergrößen, helle und dunkle Fassung) meldet keine maschinell feststellbare Verletzung von WCAG 2.1 AA. Die acht Mängel aus dem ersten Prüflauf vom 23. August 2026 sind behoben. Die Handprüfung — Tastaturdurchlauf, zugängliche Namen, Fokus, Struktur — blieb ohne offenen Punkt; sie stammt aus jenem Prüflauf und gilt für den damals geprüften Umfang.",
       statusNote:
         "„Keine maschinell feststellbare Verletzung“ heißt nicht „barrierefrei“. Automatische Werkzeuge finden nur einen Teil der Barrieren; deshalb steht unten, was wir nicht geprüft haben.",
 
       checkedTitle: "Was geprüft wurde",
       checkedIntro:
-        "Zwölf Punkte nach WCAG 2.1 AA, in der deutschen und der türkischen Fassung, hell und dunkel, auf 1440 × 900 und 390 × 844 Pixeln:",
+        "Zwölf Punkte nach WCAG 2.1 AA, in der deutschen und der türkischen Fassung und auf einer arabischen Seite, hell und dunkel, auf 1440 × 900 und 390 × 844 Pixeln:",
       checked: [
         "Kontrast von Text und von Bedienelementen, in beiden Erscheinungsbildern",
         "Alternativtexte für informative Bilder; dekorative Grafiken stummgeschaltet",
@@ -2662,7 +2662,7 @@ export const dictionary = {
       ],
       pagesLabel: "Geprüfte Seiten",
       pagesBody:
-        "Einunddreißig Routen: Startseite, Leistungen und zwei Leistungs-Detailseiten, Insights und eine Notiz, Produkte und eine Produkt-Detailseite, Arbeiten, Unternehmen, Managed Betrieb, Systeme, Kontakt, der Betriebscheck mit Fragebogen und Ergebnis, der Termin-Assistent (Schritt 1 und Schritt 3), diese Seite, Datenschutz, Impressum und die Fehlerseite — die meisten davon in Deutsch und Türkisch.",
+        "Dreiunddreißig Routen: Startseite, Leistungen und zwei Leistungs-Detailseiten, Insights und eine Notiz, Produkte und eine Produkt-Detailseite, Arbeiten, Unternehmen, Managed Betrieb, Systeme, Kontakt, der Betriebscheck mit Fragebogen und Ergebnis, der Aufwandsrechner auf Deutsch und Arabisch, der Termin-Assistent (Schritt 1 und Schritt 3), diese Seite, Datenschutz, Impressum und die Fehlerseite — die meisten davon in Deutsch und Türkisch.",
 
       fixedTitle: "Was gefunden und behoben wurde",
       fixedIntro:
@@ -2683,7 +2683,7 @@ export const dictionary = {
       open: [
         "Kein Durchlauf mit einem blinden Nutzer. Wir haben die technischen Voraussetzungen geprüft (Name, Rolle, Zustand, Ansagen) — nicht, wie verständlich das Ergebnis im Alltag ist.",
         "Keine Prüfung mit Vergrößerungssoftware und keine Prüfung der Bedienung per Sprache.",
-        "Der automatisierte Lauf deckt die deutsche und die türkische Fassung ab. Die englische und die arabische Fassung stehen nicht in ihm — auch nicht die arabische Schreibrichtung von rechts nach links. Für sie gilt dieser Befund nicht.",
+        "Der automatisierte Lauf deckt die deutsche und die türkische Fassung ab. Die englische Fassung steht nicht in ihm; die arabische nur mit einer einzigen Seite, damit die Schreibrichtung von rechts nach links wenigstens einmal geprüft ist. Für alle übrigen englischen und arabischen Seiten gilt dieser Befund nicht.",
         "Die Erklärung stützt sich auf einen Prüflauf zu einem Stichtag. Jede Änderung an der Seite kann etwas brechen; der automatisierte Teil läuft deshalb bei jeder Änderung mit.",
         "Externe Wege — WhatsApp und das E-Mail-Programm — liegen außerhalb unserer Seite. Für ihre Barrierefreiheit können wir nicht einstehen. Deshalb gibt es zu jedem dieser Wege auch einen auf unserer Seite.",
       ],
@@ -4269,13 +4269,13 @@ export const dictionary = {
 
       statusTitle: "Uygulama durumu",
       statusBody:
-        "11 Eylül 2026 tarihli otomatik denetim, 124 tur boyunca (31 rota, iki pencere boyutu, açık ve koyu görünüm) makineyle saptanabilir hiçbir WCAG 2.1 AA ihlali bildirmiyor. 23 Ağustos 2026 tarihli ilk denetimde bulunan sekiz eksik giderildi. Elle yapılan denetim — klavyeyle gezinme, erişilebilir adlar, odak, yapı — açık nokta bırakmamıştı; o denetimden gelir ve o gün incelenen kapsam için geçerlidir.",
+        "11 Eylül 2026 tarihli otomatik denetim, 132 tur boyunca (33 rota, iki pencere boyutu, açık ve koyu görünüm) makineyle saptanabilir hiçbir WCAG 2.1 AA ihlali bildirmiyor. 23 Ağustos 2026 tarihli ilk denetimde bulunan sekiz eksik giderildi. Elle yapılan denetim — klavyeyle gezinme, erişilebilir adlar, odak, yapı — açık nokta bırakmamıştı; o denetimden gelir ve o gün incelenen kapsam için geçerlidir.",
       statusNote:
         "„Makineyle saptanabilir ihlal yok“ ifadesi „erişilebilir“ demek değildir. Otomatik araçlar engellerin yalnızca bir kısmını bulur; bu yüzden neyi denetlemediğimiz aşağıda yazıyor.",
 
       checkedTitle: "Neyi denetledik",
       checkedIntro:
-        "WCAG 2.1 AA'ya göre on iki madde, Almanca ve Türkçe sürümlerde, açık ve koyu görünümde, 1440 × 900 ve 390 × 844 piksel boyutlarında:",
+        "WCAG 2.1 AA'ya göre on iki madde, Almanca ve Türkçe sürümlerde ve bir Arapça sayfada, açık ve koyu görünümde, 1440 × 900 ve 390 × 844 piksel boyutlarında:",
       checked: [
         "Metin ve kontrol öğelerinin kontrastı, her iki görünümde",
         "Bilgi taşıyan görseller için alternatif metin; süsleyici grafikler sessize alındı",
@@ -4289,7 +4289,7 @@ export const dictionary = {
       ],
       pagesLabel: "Denetlenen sayfalar",
       pagesBody:
-        "Otuz bir rota: Ana sayfa, Hizmetler ve iki hizmet ayrıntı sayfası, Insights ve bir not, Ürünler ve bir ürün ayrıntı sayfası, İşler, Şirket, Managed İşletim, Sistemler, İletişim, soru formu ve sonucuyla İşletme Kontrolü, randevu asistanı (1. ve 3. adım), bu sayfa, Gizlilik, Künye ve hata sayfası — çoğu Almanca ve Türkçe.",
+        "Otuz üç rota: Ana sayfa, Hizmetler ve iki hizmet ayrıntı sayfası, Insights ve bir not, Ürünler ve bir ürün ayrıntı sayfası, İşler, Şirket, Managed İşletim, Sistemler, İletişim, soru formu ve sonucuyla İşletme Kontrolü, Almanca ve Arapça yük hesaplayıcı, randevu asistanı (1. ve 3. adım), bu sayfa, Gizlilik, Künye ve hata sayfası — çoğu Almanca ve Türkçe.",
 
       fixedTitle: "Ne bulundu ve giderildi",
       fixedIntro:
@@ -4310,7 +4310,7 @@ export const dictionary = {
       open: [
         "Görme engelli bir kullanıcıyla deneme yapılmadı. Teknik ön koşulları denetledik (ad, rol, durum, sesli bildirimler) — sonucun günlük kullanımda ne kadar anlaşılır olduğunu değil.",
         "Büyüteç yazılımıyla ve sesle kullanım denetlenmedi.",
-        "Otomatik denetim Almanca ve Türkçe sürümleri kapsar. İngilizce ve Arapça sürümler denetime dahil değildir — Arapçanın sağdan sola yazım yönü de. Bu bulgu onlar için geçerli değildir.",
+        "Otomatik denetim Almanca ve Türkçe sürümleri kapsar. İngilizce sürüm dahil değildir; Arapça yalnızca tek bir sayfayla dahildir, böylece sağdan sola yazım yönü en azından bir kez denetlenmiş olur. Kalan tüm İngilizce ve Arapça sayfalar için bu bulgu geçerli değildir.",
         "Beyan, belirli bir tarihteki denetime dayanır. Sayfadaki her değişiklik bir şeyi bozabilir; bu yüzden otomatik bölüm her değişiklikte birlikte çalışır.",
         "Dış yollar — WhatsApp ve e-posta programınız — sayfamızın dışındadır. Onların erişilebilirliğinden sorumlu olamayız. Bu yüzden her biri için sayfamızda da bir yol vardır.",
       ],
@@ -5852,12 +5852,12 @@ export const dictionary = {
         "Whether this website falls under the German Accessibility Strengthening Act has not been assessed legally — so we do not claim that it does. We publish this status because an agency that offers accessibility should open up its own site. This is not a legal assessment.",
       statusTitle: "Implementation status",
       statusBody:
-        "The automated run of 11 September 2026, across 124 passes (31 routes, two window sizes, light and dark appearance), reports no machine-detectable violation of WCAG 2.1 AA. The eight defects from the first audit run of 23 August 2026 are fixed. The manual review — keyboard pass, accessible names, focus, structure — was without an open item; it comes from that audit run and covers the scope examined then.",
+        "The automated run of 11 September 2026, across 132 passes (33 routes, two window sizes, light and dark appearance), reports no machine-detectable violation of WCAG 2.1 AA. The eight defects from the first audit run of 23 August 2026 are fixed. The manual review — keyboard pass, accessible names, focus, structure — was without an open item; it comes from that audit run and covers the scope examined then.",
       statusNote:
         "“No machine-detectable violation” does not mean “accessible”. Automated tools find only some barriers; that is why what we did not audit is set out below.",
       checkedTitle: "What was audited",
       checkedIntro:
-        "Twelve points against WCAG 2.1 AA, in the German and the Turkish version, light and dark, at 1440 × 900 and 390 × 844 pixels:",
+        "Twelve points against WCAG 2.1 AA, in the German and the Turkish version and on one Arabic page, light and dark, at 1440 × 900 and 390 × 844 pixels:",
       checked: [
         "Contrast of text and of controls, in both appearances",
         "Alternative text for informative images; decorative graphics muted",
@@ -5871,7 +5871,7 @@ export const dictionary = {
       ],
       pagesLabel: "Pages audited",
       pagesBody:
-        "Thirty-one routes: home, services and two service detail pages, insights and one note, products and one product detail page, work, company, managed operation, systems, contact, the business check with questionnaire and result, the appointment assistant (step 1 and step 3), this page, privacy, imprint and the error page — most of them in German and Turkish.",
+        "Thirty-three routes: home, services and two service detail pages, insights and one note, products and one product detail page, work, company, managed operation, systems, contact, the business check with questionnaire and result, the effort calculator in German and Arabic, the appointment assistant (step 1 and step 3), this page, privacy, imprint and the error page — most of them in German and Turkish.",
       fixedTitle: "What was found and fixed",
       fixedIntro:
         "Eight defects, none of them blocking, seven classified as serious. All fixed in the code — no overlay, no add-on tool:",
@@ -5890,7 +5890,7 @@ export const dictionary = {
       open: [
         "No pass with a blind user. We checked the technical prerequisites (name, role, state, announcements) — not how understandable the result is in daily use.",
         "No testing with magnification software and no testing of voice control.",
-        "The automated run covers the German and the Turkish version. The English and the Arabic version are not in it — nor is the Arabic right-to-left writing direction. This finding does not apply to them.",
+        "The automated run covers the German and the Turkish version. The English version is not in it; the Arabic one only with a single page, so that the right-to-left writing direction is checked at least once. For all remaining English and Arabic pages this finding does not apply.",
         "The statement rests on an audit run on one date. Every change to the site can break something; that is why the automated part runs with every change.",
         "External routes — WhatsApp and the email program — lie outside our site. We cannot vouch for their accessibility. That is why there is also a route on our own site for each of them.",
       ],
@@ -7428,12 +7428,12 @@ export const dictionary = {
         "لم نُخضع لفحص قانوني ما إذا كان هذا الموقع يقع تحت قانون تعزيز إتاحة الوصول الألماني — ولذلك لا ندّعي ذلك. ننشر هذه الحالة لأن وكالةً تعرض إتاحة الوصول ينبغي أن تكشف موقعها هي. وهذا ليس تقييمًا قانونيًا.",
       statusTitle: "حالة التنفيذ",
       statusBody:
-        "الجولة الآلية في 11 سبتمبر 2026، عبر 124 تمريرة (31 مسارًا، مقاسا نافذة، مظهران فاتح وداكن)، لا تُبلغ عن أي مخالفة قابلة للرصد آليًا لـ WCAG 2.1 AA. والعيوب الثمانية من جولة الفحص الأولى في 23 أغسطس 2026 عولجت. أما الفحص اليدوي — جولة لوحة المفاتيح، والأسماء المتاحة، والتركيز، والبنية — فكان دون نقطة مفتوحة؛ وهو من تلك الجولة ويسري على النطاق المفحوص حينها.",
+        "الجولة الآلية في 11 سبتمبر 2026، عبر 132 تمريرة (33 مسارًا، مقاسا نافذة، مظهران فاتح وداكن)، لا تُبلغ عن أي مخالفة قابلة للرصد آليًا لـ WCAG 2.1 AA. والعيوب الثمانية من جولة الفحص الأولى في 23 أغسطس 2026 عولجت. أما الفحص اليدوي — جولة لوحة المفاتيح، والأسماء المتاحة، والتركيز، والبنية — فكان دون نقطة مفتوحة؛ وهو من تلك الجولة ويسري على النطاق المفحوص حينها.",
       statusNote:
         "«لا مخالفة قابلة للرصد آليًا» لا تعني «متاح الوصول». الأدوات الآلية تجد جزءًا من العوائق فقط؛ لذلك يُذكر أدناه ما لم نفحصه.",
       checkedTitle: "ما الذي فُحص",
       checkedIntro:
-        "اثنتا عشرة نقطة وفق WCAG 2.1 AA، في النسختين الألمانية والتركية، فاتحًا وداكنًا، على 1440 × 900 و390 × 844 بكسل:",
+        "اثنتا عشرة نقطة وفق WCAG 2.1 AA، في النسختين الألمانية والتركية وفي صفحة عربية واحدة، فاتحًا وداكنًا، على 1440 × 900 و390 × 844 بكسل:",
       checked: [
         "تباين النصوص وعناصر التحكم، في المظهرين",
         "النصوص البديلة للصور المعلوماتية؛ والرسوم الزخرفية مكتومة",
@@ -7447,7 +7447,7 @@ export const dictionary = {
       ],
       pagesLabel: "الصفحات المفحوصة",
       pagesBody:
-        "واحد وثلاثون مسارًا: الرئيسية، والخدمات وصفحتا خدمة تفصيليتان، وInsights وملاحظة واحدة، والمنتجات وصفحة منتج تفصيلية، والأعمال، والشركة، والتشغيل المُدار، والأنظمة، والتواصل، وفحص المنشأة باستمارته ونتيجته، ومساعد المواعيد (الخطوة 1 والخطوة 3)، وهذه الصفحة، والخصوصية، وبيانات الناشر، وصفحة الخطأ — معظمها بالألمانية والتركية.",
+        "ثلاثة وثلاثون مسارًا: الرئيسية، والخدمات وصفحتا خدمة تفصيليتان، وInsights وملاحظة واحدة، والمنتجات وصفحة منتج تفصيلية، والأعمال، والشركة، والتشغيل المُدار، والأنظمة، والتواصل، وفحص المنشأة باستمارته ونتيجته، وحاسبة الجهد بالألمانية والعربية، ومساعد المواعيد (الخطوة 1 والخطوة 3)، وهذه الصفحة، والخصوصية، وبيانات الناشر، وصفحة الخطأ — معظمها بالألمانية والتركية.",
       fixedTitle: "ما الذي وُجد وعولج",
       fixedIntro:
         "ثمانية عيوب، لا شيء منها معطِّل، وسبعة مصنَّفة خطيرة. عولجت كلها في الشيفرة — دون طبقة تغطية ودون أداة إضافية:",
@@ -7466,7 +7466,7 @@ export const dictionary = {
       open: [
         "لا جولة مع مستخدم كفيف. فحصنا المتطلبات التقنية (الاسم والدور والحالة والإعلانات) — لا مدى وضوح النتيجة في الاستعمال اليومي.",
         "لا فحص ببرمجيات التكبير ولا فحص للتحكم الصوتي.",
-        "تغطّي الجولة الآلية النسختين الألمانية والتركية. أمّا النسختان الإنجليزية والعربية فليستا فيها — ولا اتّجاه الكتابة العربي من اليمين إلى اليسار. وهذا البيان لا يسري عليهما.",
+        "تغطّي الجولة الآلية النسختين الألمانية والتركية. أمّا النسخة الإنجليزية فليست فيها؛ والعربية بصفحة واحدة فقط، كي يُفحص اتّجاه الكتابة من اليمين إلى اليسار مرةً على الأقل. وهذا البيان لا يسري على بقية الصفحات الإنجليزية والعربية.",
         "يستند البيان إلى جولة فحص في تاريخ محدَّد. وكل تغيير في الموقع قد يكسر شيئًا؛ لذلك يعمل الجزء الآلي مع كل تغيير.",
         "الطرق الخارجية — واتساب وبرنامج البريد — خارج موقعنا. ولا نستطيع الضمان لإتاحة وصولها. لذلك يوجد لكل واحد منها طريقٌ على موقعنا أيضًا.",
       ],

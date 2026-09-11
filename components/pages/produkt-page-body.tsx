@@ -11,6 +11,7 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { StatusDot } from "@/components/ui/status-dot"
 import { MeaiSpotlight } from "@/components/sections/meai-spotlight"
 import { ProductInterest } from "@/components/product/product-interest"
+import { FiberoBetriebsbeleg } from "@/components/product/fibero-betriebsbeleg"
 import { eintragZu, standTraegt, veraltet, wegTraegt } from "@/lib/produkt"
 import { publishedServicePages } from "@/lib/service-pages"
 import { belegZu } from "@/lib/produkt-beleg"
@@ -390,6 +391,21 @@ export function ProduktPageBody({
           </div>
         </section>
       )}
+
+      {/* ------------------------------------------------------------------
+          1b — DER BETRIEBSBELEG (PHASE 3 · Commercial Completion).
+
+          Nur fuer fibero, und das ist keine Bevorzugung: fibero ist das
+          einzige der vier Produkte, das creaDIG im eigenen Tagesgeschaeft
+          betreibt — die anderen drei sind im Aufbau. Ein Betriebsbeleg fuer
+          ein System, das noch niemand betreibt, waere genau die Sorte
+          Behauptung, gegen die Phase 1 angetreten ist.
+
+          Er steht hier und nicht weiter unten: Wer wissen will, ob dieses
+          Haus einen betrieblichen Ablauf versteht, soll das lesen, bevor er
+          sich durch Funktionslisten arbeitet.
+          ------------------------------------------------------------------ */}
+      {product.slug === "fibero" && <FiberoBetriebsbeleg />}
 
       {/* ------------------------------------------------------------------
           2 — Was gebaut ist, in Bausteinen statt als Komma-Kette.

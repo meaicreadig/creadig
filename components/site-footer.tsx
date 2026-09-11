@@ -6,6 +6,7 @@ import { Logo } from "@/components/brand/logo"
 import { contact, navLinks, productWorks, serviceLayers, socialProfiles } from "@/lib/site-data"
 import { openConsentSettings } from "@/lib/consent"
 import { checkCopy } from "@/lib/betriebscheck"
+import { rechnerText } from "@/lib/rechner-text"
 import { handwerkCopy } from "@/lib/branchen"
 import { ArrowUpRight } from "lucide-react"
 
@@ -233,6 +234,11 @@ export function SiteFooter() {
               <li>
                 <Link href="/betriebscheck" className={linkKlasse}>
                   {checkCopy.eyebrow[locale]}
+                </Link>
+              </li>
+              <li>
+                <Link href="/aufwandsrechner" className={linkKlasse}>
+                  {rechnerText.name[locale]}
                 </Link>
               </li>
               <li>

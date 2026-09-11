@@ -329,6 +329,28 @@ export function Betriebscheck() {
                       </li>
                     ))}
                   </ul>
+                  {/*
+                    PHASE 3 — VON „ES KLEMMT" ZU „WAS KOSTET DAS".
+
+                    Der Check sagt bis hierhin, WO etwas offen ist. Die
+                    naechste Frage eines Geschaeftsfuehrers ist nicht „welche
+                    Ebene", sondern „was bindet das im Monat". Dafuer gibt es
+                    seit Phase 3 ein zweites Werkzeug — und es steht hier,
+                    weil hier die Frage entsteht.
+
+                    Kein Formular dazwischen, kein Lead-Gate, keine
+                    Uebergabe der Antworten: Der Rechner startet leer, und
+                    der Besucher gibt dort seine eigenen Zahlen ein. Die
+                    Antworten aus diesem Check weiterzureichen waere bequem
+                    und waere genau die stille Datenweitergabe, die dieser
+                    Check seit MP-D nicht macht.
+                  */}
+                  <Link
+                    href="/aufwandsrechner"
+                    className="text-gold-text eyebrow mt-6 inline-flex items-center gap-1.5 underline-offset-4 hover:underline"
+                  >
+                    {checkCopy.messenCta[locale]}
+                  </Link>
                 </div>
               )}
 

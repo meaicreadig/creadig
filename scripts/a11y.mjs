@@ -127,6 +127,15 @@ const ROUTES = [
    * fuenfzehn Antworten — ein Lauf, der nur die erste Haelfte prueft, prueft
    * das Formular nie.
    */
+  /*
+   * PHASE 3 — der Aufwandsrechner. Fuenf Zahlenfelder mit Hilfetexten, eine
+   * Live-Region und ein Ergebnis, das erst erscheint, wenn vier davon stehen.
+   * Genau die Mischung, in der Beschriftungen und Ansagen schiefgehen — und
+   * beide Sprachrichtungen, weil die Zahlen darin von links nach rechts
+   * laufen muessen, auch wenn der Satz es nicht tut.
+   */
+  { name: "aufwandsrechner", path: "/aufwandsrechner" },
+  { name: "aufwandsrechner-ar", path: "/ar/aufwandsrechner" },
   { name: "betriebscheck", path: "/betriebscheck" },
   { name: "betriebscheck-tr", path: "/tr/betriebscheck" },
   {

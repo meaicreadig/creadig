@@ -608,6 +608,19 @@ export const checkCopy = {
    * Sie sagt ausdruecklich „Ihre Angaben", damit niemand die Zeilen fuer
    * eine Diagnose haelt: Es sind die eigenen Antworten, nicht unser Urteil.
    */
+  /*
+   * PHASE 3 — der Weg vom offenen Punkt zur Groessenordnung. Bewusst eine
+   * Frage und keine Aufforderung: „Rechnen Sie jetzt" waere ein Verkauf,
+   * „was kostet einer dieser Punkte" ist die Frage, die der Leser gerade
+   * selbst hat.
+   */
+  messenCta: {
+    de: "Was kostet einer dieser Punkte im Monat?",
+    tr: "Bu noktalardan biri ayda ne kadara mal oluyor?",
+    en: "What does one of these points cost per month?",
+    ar: "كم يكلّف أحد هذه النقاط شهريًا؟",
+  },
+
   offenLabel: {
     de: "Was Sie selbst als offen angegeben haben",
     tr: "Kendi açık olarak belirttikleriniz",
