@@ -50,7 +50,7 @@ Die strukturellen Zahlen aus Phase 3 — **3** Datenherkünfte, **8**
 Faktenfelder, **2** Prüfstände — bleiben struktureller Beleg und werden nie
 mit einer Leistungszahl in dieselbe Tabelle geschrieben.
 
-## 4 · Die erste Handlung
+## 4 · Die erste Handlung (Internal Measured — parallel zu Market Proof)
 
 ```bash
 npm run messprobe -- --kennzahl fibero-ungeprueft --seite ausgang \
@@ -60,5 +60,8 @@ npm run messprobe -- --kennzahl fibero-ungeprueft --seite ausgang \
 
 Sie dauert Minuten. Danach müssen **28 Tage** vergehen, bevor ein Vergleich
 überhaupt etwas sagen darf — jeder Tag Verzögerung hängt eins zu eins hinten
-dran. Deshalb steht sie im Beleg-Cockpit an erster Stelle, obwohl sie zwei
-Schritte von öffentlich entfernt ist.
+dran.
+
+**P2:** Das ist **kein Market Proof**. Solange kein öffentlicher Kundenbeleg
+existiert, führt der Kundenfreigabe-Pfad im Beleg-Cockpit; diese Messprobe
+läuft parallel als Internal Measured Proof.

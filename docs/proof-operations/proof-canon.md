@@ -25,6 +25,11 @@ Nicht: Marketingidee → Text → Behauptung → später hoffentlich Beleg.
 fibero ist **GEBAUT** und **IM BETRIEB** und **ÖFFENTLICH** — und ausdrücklich
 nicht **GEMESSEN** und nicht **AM MARKT BELEGT**.
 
+**P2 · Market Proof:** Erst wenn reale Kundenarbeit + substanzielle Evidence +
+erforderliche Freigabe + öffentlicher Release vorliegen. Eine fibero-Messung
+oder eine Kapazitätszahl ist **kein** Market Proof — siehe
+`market-proof-activation.md`.
+
 ## 3 · Fünf Belegarten
 
 Drei kommen aus `lib/proof.ts` (`PROOF_KINDS`) und behalten ihre Namen; zwei

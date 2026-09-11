@@ -242,10 +242,17 @@ function fibero(proben: readonly Probe[]): Belegposten[] {
     },
     {
       key: "fibero-messung",
-      art: "kundenergebnis",
+      /*
+       * P2 · 11.09.2026: Das ist INTERNAL MEASURED PROOF am eigenen Produkt —
+       * niemals kundenergebnis / Market Proof. Eine eigene Messreihe beweist
+       * keinen Kunden-Outcome und darf den Freigabe-Pfad nicht verdrängen,
+       * solange noch kein öffentlicher Kundenbeleg existiert.
+       */
+      art: "eigenes-produkt",
       subjekt: "fibero",
       stand: "messung-noetig",
-      aussage: "Dass sich ein Vorgang messbar verändert hat.",
+      aussage:
+        "Dass sich ein eigener fibero-Vorgang messbar verändert hat (Internal Measured Proof — kein Kunden-Market-Proof).",
       fehlt:
         ausgang === 0
           ? `Kein Ausgangsstand erhoben. ${fiberoKennzahlen.length} Kennzahlen sind definiert und warten auf die erste Probe.`
@@ -253,7 +260,7 @@ function fibero(proben: readonly Probe[]): Belegposten[] {
       liegtBei: ausgang === 0 ? "owner" : "zeit",
       startetUhr: ausgang === 0,
       wirkung:
-        "Die erste belegte Wirkungszahl des Hauses — und die Grundlage, den Aufwandsrechner mit echten statt nur eingegebenen Werten zu untermauern.",
+        "Die erste belegte Wirkungszahl am eigenen Betrieb — Grundlage für den Aufwandsrechner. Beweist keinen Kunden-Outcome.",
       schritte: ausgang === 0 ? 2 : 1,
     },
   ]
@@ -332,18 +339,36 @@ const WIRKUNGSRANG: Record<Belegart, number> = {
  *
  * Zeitgebundene Posten rutschen ans Ende: Sie sind nicht erledigbar, nur
  * abwartbar, und oben wuerden sie jede Woche wie ein Versaeumnis aussehen.
+ *
+ * P2 · FIRST MARKET PROOF: Solange kein öffentlicher Kundenbeleg existiert,
+ * geht der Kundenfreigabe-Pfad (Market Proof) vor einer Uhr-startenden
+ * Eigenmessung (Internal Measured Proof). Die Messprobe bleibt parallel und
+ * zeitkritisch — sie wird nur nicht mehr als Market Proof missverstanden.
  */
 export function naechsteSchritte(proben: readonly Probe[] = []): Belegposten[] {
-  return belegposten(proben)
+  const alle = belegposten(proben)
+  const hatOeffentlichenKundenbeleg = alle.some(
+    (p) =>
+      (p.key.startsWith("fall-") || p.key.startsWith("arbeit-")) && p.stand === "oeffentlich",
+  )
+  const istMarketPfad = (p: Belegposten) =>
+    (p.art === "kundenprojekt" || p.art === "kundenergebnis") && p.stand === "freigabe-noetig"
+
+  return alle
     .filter((p) => p.stand !== "oeffentlich")
     .sort((a, b) => {
       /* Was nur abgewartet werden kann, steht nicht oben. */
       if ((a.liegtBei === "zeit") !== (b.liegtBei === "zeit")) return a.liegtBei === "zeit" ? 1 : -1
+      if (!hatOeffentlichenKundenbeleg) {
+        const aMarket = istMarketPfad(a)
+        const bMarket = istMarketPfad(b)
+        if (aMarket !== bMarket) return aMarket ? -1 : 1
+      }
       /*
-       * Ein Schritt, der eine Wartezeit startet, zählt wie ein Ein-Schritt-
-       * Posten: Nicht weil er weniger Arbeit wäre, sondern weil jeder Tag
-       * Verzögerung eins zu eins hinten dranhängt.
+       * Uhr-Start (fibero-Probe) vor sonstigen Owner-Schritten gleicher Nähe —
+       * parallel zum Market-Pfad, zeitkritisch, aber nicht als Market Proof.
        */
+      if (Boolean(a.startetUhr) !== Boolean(b.startetUhr)) return a.startetUhr ? -1 : 1
       const na = a.startetUhr ? 1 : a.schritte
       const nb = b.startetUhr ? 1 : b.schritte
       if (na !== nb) return na - nb

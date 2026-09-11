@@ -327,6 +327,31 @@ pruefe(
   )
 }
 
+/* P2 · Market Proof ≠ Internal Measured Proof */
+{
+  const fiberoMessung = belegposten([]).find((p) => p.key === "fibero-messung")
+  pruefe(
+    "fibero-Messung ist kein Kundenergebnis",
+    fiberoMessung?.art === "eigenes-produkt",
+    fiberoMessung?.art,
+  )
+  pruefe(
+    "fibero-Messung behauptet keinen Kunden-Outcome",
+    Boolean(fiberoMessung?.aussage && /Internal Measured|kein Kunden/i.test(fiberoMessung.aussage)),
+  )
+  const erster = wirksamsterSchritt([])
+  pruefe(
+    "ohne öffentlichen Kundenbeleg führt der Freigabe-Pfad",
+    Boolean(erster && (erster.art === "kundenprojekt" || erster.art === "kundenergebnis")),
+    erster?.key,
+  )
+  pruefe(
+    "der wirksamste Schritt ist nicht die fibero-Messung",
+    erster?.key !== "fibero-messung",
+    erster?.key,
+  )
+}
+
 /* ======================================================================= *
  * 7 · DER DURCHLAUF VON ENDE ZU ENDE
  *

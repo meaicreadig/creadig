@@ -1,32 +1,27 @@
 # Owner-Warteschlange
 
-> **Proof Operations P1 · 11.09.2026** · sortiert nach kommerzieller Wirkung
-> und Nähe — nicht nach Aufwand.
+> **Proof Operations P2 · 11.09.2026** · sortiert nach **Proof-Lane**, dann Nähe.  
+> Abgeleitet aus `naechsteSchritte()` in `lib/beleg-betrieb.ts`. Dieselbe
+> Reihenfolge steht live unter **`/admin/beleg`**.
 
-Abgeleitet aus `naechsteSchritte()` in `lib/beleg-betrieb.ts`. Dieselbe
-Reihenfolge steht live unter **`/admin/beleg`**.
+| # | Lane | Handlung | Gibt frei | Zeit? | Wirkung |
+|---|---|---|---|---|---|
+| **1** | **Market Proof** | **Candidate `nv-swiss` bestätigen und Freigabe holen** — Name + Fallstudie + Screenshot (Logo optional); Fundstelle später in `releases[]` (G18) | Erster öffentlicher Kunden-Lieferfall | Nein | `/arbeiten` kehrt nach Freigabe+G18 ohne Feature-Arbeit in Index zurück |
+| **2** | **Internal Measured** | **Erste Messprobe fibero** — `npm run messprobe -- --kennzahl fibero-ungeprueft --seite ausgang --wert … --faelle … --quelle system-zaehlung --von "Emin" --schreiben` | Startet 28-Tage-Uhr für eigenen Betriebsbeleg | **Ja — 28 Tage** | Kein Market Proof. Später echte Zahl für Aufwandsrechner |
+| **3** | Delivery | **Kapazität Projekte** nennen (parallele größere Deliveries, die Qualität halten) | `kapazitaet-projekte` | Nein | `/unternehmen` schließt benannte Lücke |
+| **4** | Delivery | **Vertretung** benennen (Person/Funktion, Zugang, Grenzen) | `vertretung-ausfall` | Nein | dieselbe Stelle |
+| **5** | Asset | **CASSAMEA: sichere Aufnahme** | Asset `freigegeben` | Nein | zeigbare Oberfläche |
+| **6** | Asset | **meahv: sichere Aufnahme** | Asset `freigegeben` | Nein | ebenso |
+| **7** | Compliance | **Drei AVV** (Vercel, Resend, Neon) bestätigen | `avv-*` | Nein | `/datenschutz` ohne offene Kennzeichnung |
+| **8** | Delivery | **Betriebskapazität** nennen | `kapazitaet-betrieb` | Nein | Betriebsstufe über Betreuung verkaufbar |
 
-| # | Handlung | Gibt frei | Zeitabhängig? | Wirkung auf die Website |
-|---|---|---|---|---|
-| **1** | **Erste Messprobe für fibero erfassen** — `npm run messprobe -- --kennzahl fibero-ungeprueft --seite ausgang --wert … --faelle … --quelle system-zaehlung --von "Emin" --schreiben` | Startet die Uhr für den ersten echten Wirkungsbeleg des Hauses | **Ja** — danach 28 Tage bis zum Vergleich | Heute keine. Nach 28 Tagen die erste belegte Zahl, die der Aufwandsrechner stützen kann |
-| **2** | **Eine Kundenfreigabe holen** — einen der drei Kandidaten wählen, schriftlich Name + Fallstudie freigeben lassen, Fundstelle in `releases[]` eintragen | Den ersten öffentlichen Kundenbeleg überhaupt | Nein | `/arbeiten` kehrt **ohne Code-Änderung** in Index und Sitemap zurück; der Mittelstands-Blocker fällt |
-| **3** | **Kapazität nennen** — eine Zahl, die auch im vollen Monat hält, mit dem Zeitraum, aus dem sie stammt | `kapazitaet-projekte` | Nein | `/unternehmen` schließt eine Lücke, die dort heute ausdrücklich benannt ist |
-| **4** | **Vertretung benennen** — eine reale Person oder Funktion mit Zugang, plus was sie fortführen kann und was nicht | `vertretung-ausfall` | Nein | Dieselbe Stelle; zweite der vier Antworten, die ein Mittelständler erwartet |
-| **5** | **CASSAMEA: sichere Aufnahme** — aus einer Demo-Instanz mit dem Musterbestand aus `docs/ops/demo-data-standard.md`, oder die Bestätigung, dass die sichtbaren Namen erfunden sind | Asset-Lage `freigegeben` | Nein | `/produkte/cassamea` bekommt eine zeigbare Oberfläche |
-| **6** | **meahv: sichere Aufnahme** — dasselbe | Asset-Lage `freigegeben` | Nein | `/produkte/meahv` ebenso |
-| **7** | **Drei AVV bestätigen** — Vercel, Resend, Neon im jeweiligen Dashboard abschließen und ablegen, dann Fundstelle und Datum eintragen | `avv-vercel`, `avv-resend`, `avv-neon` | Nein | `/datenschutz` darf schreiben, dass die Verträge bestehen, statt nur die vorgesehene Grundlage zu nennen |
-| **8** | **Betriebskapazität nennen** — wie viele Systeme gleichzeitig, und was es begrenzt | `kapazitaet-betrieb` | Nein | Eine Betriebsstufe über der laufenden Betreuung wäre verkaufbar (heute: `offer-canon.md` §6 verbietet es) |
+## Warum Freigabe vor Messprobe steht (P2)
 
-## Warum die Messprobe vor der Kundenfreigabe steht
-
-Sie ist zwei Schritte von öffentlich entfernt, die Freigabe nur einen. Sie
-steht trotzdem oben, weil sie **eine Wartezeit startet**: Jeder Tag, an dem
-sie nicht erhoben wird, verschiebt den ersten Wirkungsbeleg um einen Tag.
-Die Freigabe lässt sich nächste Woche genauso holen wie heute — die 28 Tage
-nicht.
+Die Messprobe startet eine Uhr — und erzeugt **Internal Measured Proof**.  
+Die Kundenfreigabe erzeugt den **ersten Market Proof**.  
+Das sind zwei Lanes. Market Proof hat Vorrang, solange noch kein öffentlicher Kundenbeleg existiert. Die Messprobe bleibt parallel und zeitkritisch.
 
 ## Was ausdrücklich **nicht** in dieser Liste steht
 
 Keine UI-Aufgabe, keine Metadatenfrage, keine Seitenlänge, keine
-CTA-Position. Für alles davon gilt seit Website-Phase 6:
-**material FIXABLE_NOW = 0.** Was hier steht, kann Code nicht lösen.
+CTA-Position. **material FIXABLE_NOW = 0.** Was hier steht, kann Code nicht lösen.

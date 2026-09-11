@@ -10,7 +10,8 @@ Beweis wird.
 | [Mess-Kanon](./measurement-canon.md) | Ausgang gegen Danach, vier Quellen, die drei Weigerungen |
 | [Freigabe-Kanon](./release-canon.md) | Die Kette, die granulare Erlaubnis, die Grenze zur Website |
 | [fibero-Messplan](./fibero-messplan.md) | Warum es keinen Vorher-Stand gibt und was stattdessen beginnt |
-| [Owner-Warteschlange](./owner-queue.md) | Acht Handlungen, nach Wirkung sortiert |
+| [Owner-Warteschlange](./owner-queue.md) | Handlungen nach Proof-Lane (Market → Measured → Delivery) |
+| [First Market Proof Activation](./market-proof-activation.md) | P2: Candidate, Permission, Release-Distanz, Lane-Grenzen |
 | [G18-Übergabe](./g18-uebergabe.md) | Was dort hängt und ab wann es blockiert |
 
 **Cockpit:** `/admin/beleg` — beantwortet *„Was ist heute die wirksamste
@@ -30,9 +31,10 @@ geschrieben).
 
 | | |
 |---|---|
-| Freigegebene Kundenfälle | **0** |
+| Freigegebene Kundenfälle / Market Proof | **0** |
+| First Case Candidate | **nv-swiss** (Lieferfall · Freigabe fehlt · G18 für Public) |
 | fibero historischer Vorher-Stand | **existiert nicht** |
-| fibero Messreihe | **definiert, 5 Kennzahlen, 0 Proben** |
+| fibero Messreihe | **definiert, 5 Kennzahlen, 0 Proben** (Internal Measured) |
 | Gesperrte Produktaufnahmen | **2** (CASSAMEA, meahv) |
 | Offene Owner-Tatsachen | **6** |
 
