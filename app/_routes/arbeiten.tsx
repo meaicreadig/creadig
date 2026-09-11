@@ -29,10 +29,32 @@ export function arbeitenMetadata(locale: Locale): Metadata {
   })
 }
 
+/*
+ * PHASE 1 · COMMERCIAL COMPLETION — DIE STRUKTURIERTEN DATEN BESCHRIEBEN EINE
+ * LISTE, DIE AUF DER SEITE NICHT STAND.
+ *
+ * Gemessen am 11.09.2026 auf der ausgelieferten Seite: Der sichtbare Text
+ * sagt „Heute liegt keine solche Freigabe vor, deshalb steht hier niemand" —
+ * und im selben Dokument lag eine `ItemList` namens „Arbeiten — eigene
+ * Produkte und Kundenwerk" mit fibero, meAI, CASSAMEA und meahv samt URLs.
+ *
+ * Das ist kein Schoenheitsfehler. Strukturierte Daten sind eine Aussage an
+ * Dritte darueber, was auf dieser Seite steht; eine Liste mit vier Eintraegen
+ * auf einer Seite mit null Eintraegen ist schlicht falsch — und sie traegt
+ * ausgerechnet das Wort „Kundenwerk" in den Namen, waehrend die Seite sagt,
+ * dass es keines gibt.
+ *
+ * Die Metadaten daneben hielten sich laengst an die Freigabelage
+ * (`ohneKundenwerk`). Die `ItemList` tut es jetzt auch: Solange die Seite
+ * nichts auflistet, listet auch das Schema nichts auf. Die Produkte stehen
+ * strukturiert auf `/produkte` — dort, wo sie auch sichtbar sind.
+ */
 function jsonLd(locale: Locale) {
   const t = dictionary[locale]
+  const brotkrume = breadcrumbList(locale, [{ name: t.nav.arbeiten, path: "/arbeiten" }])
+  if (genannteClientWorks.length === 0) return [brotkrume]
   return [
-    breadcrumbList(locale, [{ name: t.nav.arbeiten, path: "/arbeiten" }]),
+    brotkrume,
     {
       "@context": "https://schema.org",
       "@type": "ItemList",

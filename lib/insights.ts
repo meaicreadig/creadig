@@ -348,10 +348,10 @@ export const insights: Insight[] = [
       {
         kind: "text",
         text: {
-          de: "Alle acht Mängel sind behoben, im Code, ohne Overlay und ohne Zusatzwerkzeug. Der automatisierte Lauf meldet über 68 Durchläufe keine maschinell feststellbare Verletzung von WCAG 2.1 AA mehr; vorher waren es elf Stellen. Die Handprüfung ist ohne offenen Punkt.",
-          tr: "Sekiz eksiğin tamamı giderildi — kodun içinde, overlay olmadan, ek araç olmadan. Otomatik geçiş, 68 turda WCAG 2.1 AA'nın makineyle saptanabilir hiçbir ihlalini bildirmiyor; öncesinde on bir yer vardı. Elle denetimde açık madde yok.",
-          en: "All eight defects are fixed, in the code, without an overlay and without an add-on tool. Across 68 passes the automated run now reports no machine-detectable violation of WCAG 2.1 AA; before, there were eleven places. The manual review has no open item.",
-          ar: "عولجت العيوب الثمانية كلها في الشيفرة، دون طبقة تغطية ودون أداة إضافية. والجولة الآلية عبر 68 تمريرة لم تعد تُبلغ عن أي مخالفة قابلة للرصد آليًا لـ WCAG 2.1 AA؛ وكانت قبلها أحد عشر موضعًا. والفحص اليدوي دون نقطة مفتوحة.",
+          de: "Alle acht Mängel sind behoben, im Code, ohne Overlay und ohne Zusatzwerkzeug. Der automatisierte Lauf meldete an diesem Tag über 68 Durchläufe keine maschinell feststellbare Verletzung von WCAG 2.1 AA mehr; vorher waren es elf Stellen. Die Handprüfung ist ohne offenen Punkt.",
+          tr: "Sekiz eksiğin tamamı giderildi — kodun içinde, overlay olmadan, ek araç olmadan. Otomatik geçiş o gün, 68 turda WCAG 2.1 AA'nın makineyle saptanabilir hiçbir ihlalini bildirmedi; öncesinde on bir yer vardı. Elle denetimde açık madde yok.",
+          en: "All eight defects are fixed, in the code, without an overlay and without an add-on tool. On that day, across 68 passes, the automated run reported no machine-detectable violation of WCAG 2.1 AA; before, there were eleven places. The manual review has no open item.",
+          ar: "عولجت العيوب الثمانية كلها في الشيفرة، دون طبقة تغطية ودون أداة إضافية. والجولة الآلية في ذلك اليوم، عبر 68 تمريرة، لم تُبلغ عن أي مخالفة قابلة للرصد آليًا لـ WCAG 2.1 AA؛ وكانت قبلها أحد عشر موضعًا. والفحص اليدوي دون نقطة مفتوحة.",
         },
       },
       {

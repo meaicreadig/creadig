@@ -56,7 +56,7 @@ export const dictionary = {
         "creaDIG ist das Dach über eigenen Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie. System-Haus für Deutschland, Österreich und die Schweiz.",
       ogTitle: "creaDIG — Wir bauen, was andere nicht sehen.",
       ogDescription:
-        "System-Haus seit 2017. Eigene Produkte, echte Kunden, KI-Systeme, die wir bauen und betreiben. Deutschland, Österreich, Schweiz.",
+        "System-Haus seit 2017. Eigene Produkte und KI-Systeme, die wir selbst bauen und betreiben. Deutschland, Österreich, Schweiz.",
       organizationDescription:
         "System-Haus für Marke, Web, Operations, Automation und KI. Eigene Produkte: meAI, fibero, CASSAMEA, meahv.",
       /** Erster Eintrag jeder Brotkrume in den strukturierten Daten. */
@@ -211,7 +211,7 @@ export const dictionary = {
           },
           monatlich: {
             label: "Monatlich",
-            body: "Der laufende Betrieb — für Systeme, die wir gebaut haben.",
+            body: "Die laufende Betreuung der Seite, die wir gebaut haben — in festem Umfang.",
           },
           "nach-analyse": {
             label: "Angebot nach Analyse",
@@ -342,7 +342,7 @@ export const dictionary = {
         },
         products: {
           name: "Produkte ansehen",
-          what: "Vier eigene Systeme, die wir gebaut haben und selbst betreiben. Der schnellste Weg zu einem Urteil über uns.",
+          what: "Vier eigene Systeme, die wir von Grund auf gebaut haben — eines im Tagesbetrieb, drei im Aufbau. Der schnellste Weg zu einem Urteil über uns.",
           cta: "Zu den Produkten",
         },
         works: {
@@ -490,8 +490,8 @@ export const dictionary = {
        * im ersten Satz, was die Seite wirklich ist: ein Beleg, kein Regal.
        */
       eyebrow: "Beweis, kein Katalog",
-      title: "Vier Produkte, die wir selbst betreiben.",
-      lead: "Diese Seite verkauft nichts davon. Sie steht hier, weil sie belegt, was wir über uns sagen: Jedes dieser Systeme hat creaDIG von Grund auf gebaut — und setzt es im eigenen Tagesgeschäft ein. Was wir für Sie bauen, steht unter Leistungen.",
+      title: "Vier Produkte, die wir selbst gebaut haben.",
+      lead: "Diese Seite verkauft nichts davon. Sie steht hier, weil sie belegt, was wir über uns sagen: Jedes dieser Systeme hat creaDIG von Grund auf gebaut. Eines läuft im eigenen Tagesbetrieb, die drei anderen sind im Aufbau — der Stand steht an jedem Produkt. Was wir für Sie bauen, steht unter Leistungen.",
       metaTitle: "Eigene Produkte — meAI, fibero, CASSAMEA, meahv",
       metaDescription:
         "Die vier eigenen Produkte von creaDIG: meAI (KI-Business-Betriebssystem), fibero (Glasfaser-Operations), CASSAMEA (Gastro-Kasse, Schweiz) und meahv (Hausverwaltung).",
@@ -745,7 +745,7 @@ export const dictionary = {
        */
       hints: {
         leistungen: "Was wir für Sie bauen",
-        produkte: "Was wir selbst gebaut haben und betreiben — der Beweis, kein Katalog",
+        produkte: "Was wir selbst gebaut haben — der Beweis, kein Katalog",
         arbeiten: "Ausgeführte Projekte, mit Namen",
         unternehmen: "Wer dahintersteht und wie wir arbeiten",
         insights: "Fachtexte aus dem laufenden Betrieb",
@@ -955,7 +955,7 @@ export const dictionary = {
        * sondern ein Rest. Jetzt sagt der Satz, wonach eine Logo-Wand zuerst
        * gefragt wird: Was davon ist eures, und wer hat zugestimmt.
        */
-      note: "Eigene Produkte haben wir gebaut und betreiben sie selbst. Kunden stehen hier nur mit ihrer Zustimmung. Fremde Marken stehen gar nicht hier — ohne Freigabe kein Name.",
+      note: "Eigene Produkte haben wir selbst gebaut — mit dem Stand, den sie heute haben. Kunden stehen hier nur mit ihrer Zustimmung. Fremde Marken stehen gar nicht hier — ohne Freigabe kein Name.",
     },
     portfolio: {
       eyebrow: "Werkschau",
@@ -1254,7 +1254,7 @@ export const dictionary = {
         monatlich: "Monatlich",
         "nach-analyse": "Angebot nach Analyse",
       },
-      angebotBedingung: "Nur für Systeme, die wir gebaut haben.",
+      angebotBedingung: "Nur für Seiten, die wir gebaut haben — größerer Umfang nach Analyse.",
       angebotCta: "Einstieg ansehen",
       belegCta: "Beleg ansehen",
       belegEigenpruefung: "Unsere eigene Prüfung",
@@ -1905,7 +1905,7 @@ export const dictionary = {
         website: {
           name: "Website-Paket Handwerk",
           who: "Für Handwerksbetriebe und kleine Unternehmen",
-          outcome: "In vier Wochen online — mit Anfragen und Bewerbungen",
+          outcome: "In vier Wochen online — mit Wegen für Anfragen und Bewerbungen",
           includes: [
             "Website, gebaut für Anfragen — nicht als Broschüre",
             "Karriere-Unterseite für Bewerber",
@@ -2166,7 +2166,7 @@ export const dictionary = {
         },
         bilingual: {
           name: "Zwei Sprachen, zwei Adressen",
-          body: "Deutsch und Türkisch haben eigene URLs, eigene Titel, eigene strukturierte Daten und sind über hreflang verbunden — nicht ein Schalter, der im Browser Text austauscht.",
+          body: "Jede Sprachfassung hat eigene URLs, eigene Titel, eigene strukturierte Daten und ist über hreflang verbunden — nicht ein Schalter, der im Browser Text austauscht.",
         },
         images: {
           name: "Bilder in AVIF und WebP",
@@ -2278,7 +2278,7 @@ export const dictionary = {
       privacyConsentPrefix: "Ich habe die",
       privacyConsentLink: "Datenschutzerklärung",
       privacyConsentSuffix:
-        "gelesen und bin damit einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage verarbeitet und dafür über unseren Versanddienstleister Resend Inc. (USA) zugestellt werden — abgesichert über EU-Standardvertragsklauseln und, ergänzend, mit meiner ausdrücklichen Einwilligung in die Übermittlung in die USA (Art. 49 Abs. 1 lit. a DSGVO). Widerrufen kann ich das jederzeit für die Zukunft.",
+        "gelesen und bin damit einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage verarbeitet und dafür über unseren Versanddienstleister Resend Inc. (USA) zugestellt werden — auf der dafür vorgesehenen Grundlage der EU-Standardvertragsklauseln und, ergänzend, mit meiner ausdrücklichen Einwilligung in die Übermittlung in die USA (Art. 49 Abs. 1 lit. a DSGVO). Widerrufen kann ich das jederzeit für die Zukunft.",
       emailLabel: "E-Mail",
       emailPlaceholder: "damit wir antworten können",
       phoneLabel: "Telefon",
@@ -2431,7 +2431,7 @@ export const dictionary = {
         title: "Wann passt es Ihnen?",
         lead: "Wählen Sie einen oder mehrere Tage. Hervorgehobene Tage sind unsere bevorzugten Gesprächstage — andere Tage sind auf Anfrage möglich.",
         timeTitle: "Zeitfenster",
-        timeLead: "Mehrfachauswahl möglich. Alle Zeiten in MEZ.",
+        timeLead: "Mehrfachauswahl möglich. Alle Zeiten in deutscher Ortszeit (Europe/Berlin).",
         windows: [
           { id: "vormittag", label: "Vormittag", time: "09–12 Uhr" },
           { id: "nachmittag", label: "Nachmittag", time: "13–17 Uhr" },
@@ -2642,13 +2642,13 @@ export const dictionary = {
 
       statusTitle: "Stand der Umsetzung",
       statusBody:
-        "Nach dem Prüflauf vom 23. August 2026 sind alle acht gefundenen Mängel behoben. Der automatisierte Lauf über 68 Durchläufe (17 Seiten, zwei Fenstergrößen, helle und dunkle Fassung) meldet keine maschinell feststellbare Verletzung von WCAG 2.1 AA mehr. Die Handprüfung — Tastaturdurchlauf, zugängliche Namen, Fokus, Struktur — ist ebenfalls ohne offenen Punkt.",
+        "Der automatisierte Lauf vom 11. September 2026 über 124 Durchläufe (31 Routen, zwei Fenstergrößen, helle und dunkle Fassung) meldet keine maschinell feststellbare Verletzung von WCAG 2.1 AA. Die acht Mängel aus dem ersten Prüflauf vom 23. August 2026 sind behoben. Die Handprüfung — Tastaturdurchlauf, zugängliche Namen, Fokus, Struktur — blieb ohne offenen Punkt; sie stammt aus jenem Prüflauf und gilt für den damals geprüften Umfang.",
       statusNote:
         "„Keine maschinell feststellbare Verletzung“ heißt nicht „barrierefrei“. Automatische Werkzeuge finden nur einen Teil der Barrieren; deshalb steht unten, was wir nicht geprüft haben.",
 
       checkedTitle: "Was geprüft wurde",
       checkedIntro:
-        "Zwölf Punkte nach WCAG 2.1 AA, in beiden Sprachfassungen, hell und dunkel, auf 1440 × 900 und 390 × 844 Pixeln:",
+        "Zwölf Punkte nach WCAG 2.1 AA, in der deutschen und der türkischen Fassung, hell und dunkel, auf 1440 × 900 und 390 × 844 Pixeln:",
       checked: [
         "Kontrast von Text und von Bedienelementen, in beiden Erscheinungsbildern",
         "Alternativtexte für informative Bilder; dekorative Grafiken stummgeschaltet",
@@ -2662,7 +2662,7 @@ export const dictionary = {
       ],
       pagesLabel: "Geprüfte Seiten",
       pagesBody:
-        "Startseite, Leistungen und eine Leistungs-Detailseite, Produkte und eine Produkt-Detailseite, Arbeiten, Unternehmen, Kontakt, der Termin-Assistent (Schritt 1 und Schritt 3), Datenschutz, Impressum und die Fehlerseite — jeweils in Deutsch und Türkisch.",
+        "Einunddreißig Routen: Startseite, Leistungen und zwei Leistungs-Detailseiten, Insights und eine Notiz, Produkte und eine Produkt-Detailseite, Arbeiten, Unternehmen, Managed Betrieb, Systeme, Kontakt, der Betriebscheck mit Fragebogen und Ergebnis, der Termin-Assistent (Schritt 1 und Schritt 3), diese Seite, Datenschutz, Impressum und die Fehlerseite — die meisten davon in Deutsch und Türkisch.",
 
       fixedTitle: "Was gefunden und behoben wurde",
       fixedIntro:
@@ -2683,6 +2683,7 @@ export const dictionary = {
       open: [
         "Kein Durchlauf mit einem blinden Nutzer. Wir haben die technischen Voraussetzungen geprüft (Name, Rolle, Zustand, Ansagen) — nicht, wie verständlich das Ergebnis im Alltag ist.",
         "Keine Prüfung mit Vergrößerungssoftware und keine Prüfung der Bedienung per Sprache.",
+        "Der automatisierte Lauf deckt die deutsche und die türkische Fassung ab. Die englische und die arabische Fassung stehen nicht in ihm — auch nicht die arabische Schreibrichtung von rechts nach links. Für sie gilt dieser Befund nicht.",
         "Die Erklärung stützt sich auf einen Prüflauf zu einem Stichtag. Jede Änderung an der Seite kann etwas brechen; der automatisierte Teil läuft deshalb bei jeder Änderung mit.",
         "Externe Wege — WhatsApp und das E-Mail-Programm — liegen außerhalb unserer Seite. Für ihre Barrierefreiheit können wir nicht einstehen. Deshalb gibt es zu jedem dieser Wege auch einen auf unserer Seite.",
       ],
@@ -2699,7 +2700,7 @@ export const dictionary = {
       methodBody:
         "Nach einem festen Raster mit zwölf Punkten, damit zwei Personen unabhängig zum selben Ergebnis kommen. Automatisiert mit axe-core, von Hand mit Tastatur und Prüfung der zugänglichen Namen. Raster und vollständiger Befund liegen offen im Quelltext dieser Seite.",
       updatedLabel: "Stand",
-      updated: "23. August 2026",
+      updated: "11. September 2026",
     },
     legal: {
       imprintTitle: "Impressum",
@@ -2717,7 +2718,7 @@ export const dictionary = {
       smallBusinessNote:
         "Kleinunternehmer nach § 19 UStG — es wird keine Umsatzsteuer berechnet.",
       mstvLabel: "Verantwortlicher nach § 18 Abs. 2 MStV",
-      placeholderMark: "Platzhalter — wird vor dem Livegang ersetzt",
+      placeholderMark: "Platzhalter — noch nicht freigegeben",
       taxStatusPending: "Umsatzsteuer-Status noch nicht freigegeben.",
       phoneLabel: "Telefon",
       phonePending: "Deutsche Rufnummer folgt.",
@@ -2730,7 +2731,7 @@ export const dictionary = {
          lib/site-data.ts `processors`. */
       processorsLabel: "Wer in unserem Auftrag verarbeitet",
       processorsIntro:
-        "Diese Dienstleister verarbeiten personenbezogene Daten für uns — weisungsgebunden, nach einem Vertrag über die Auftragsverarbeitung (Art. 28 DSGVO) und, weil sie in den USA sitzen, abgesichert über die EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Weiter geben wir nichts.",
+        "Diese Dienstleister verarbeiten personenbezogene Daten für uns — weisungsgebunden. Vorgesehene Grundlage ist jeweils ein Vertrag über die Auftragsverarbeitung (Art. 28 DSGVO) und, weil sie in den USA sitzen, die EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Wo diese Grundlage vom Inhaber noch nicht bestätigt ist, steht es am Eintrag. Weiter geben wir nichts.",
       processorPurposeLabel: "Wofür",
       /* R-1: die einzelnen Dienste je Anbieter, mit Namen — sonst laeuft
          Speed Insights unbenannt unter "Reichweitenmessung" mit. */
@@ -2741,7 +2742,7 @@ export const dictionary = {
       processorDpaLink: "Vertrag ansehen",
       processorPendingMark: "Bestätigung durch den Inhaber offen",
       processorPendingNote:
-        "Die markierten Verträge hat der Inhaber noch nicht im jeweiligen Dashboard bestätigt und abgelegt. Wir schreiben deshalb nicht, dass sie bestehen — das holen wir vor dem Livegang nach.",
+        "Die markierten Verträge hat der Inhaber noch nicht im jeweiligen Dashboard bestätigt und abgelegt. Solange das so ist, schreiben wir nicht, dass sie bestehen — wir nennen die vorgesehene Grundlage und kennzeichnen, was offen ist.",
       processorPurposes: {
         /*
          * GATE 04 — DIE MESSUNG WAR ZU ENG BESCHRIEBEN.
@@ -2771,17 +2772,17 @@ export const dictionary = {
       privacyPoints: [
         {
           title: "Server-Logs",
-          body: "Beim Aufruf der Seite verarbeitet unser Hoster Vercel Inc. (USA) technisch notwendige Daten wie IP-Adresse, Zeitpunkt und aufgerufene Ressource. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO — ohne diese Verarbeitung lässt sich die Seite weder ausliefern noch gegen Missbrauch absichern. Mit Vercel besteht ein Vertrag über die Auftragsverarbeitung nach Art. 28 DSGVO.",
+          body: "Beim Aufruf der Seite verarbeitet unser Hoster Vercel Inc. (USA) technisch notwendige Daten wie IP-Adresse, Zeitpunkt und aufgerufene Ressource. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO — ohne diese Verarbeitung lässt sich die Seite weder ausliefern noch gegen Missbrauch absichern. Auf welcher Grundlage Vercel für uns verarbeitet und wie weit sie bestätigt ist, steht unten in der Liste der Verarbeiter.",
         },
         {
           title: "Hosting und Übermittlung in Drittländer",
-          body: "Diese Seite ist vollständig statisch und wird über das weltweite Content-Delivery-Netz von Vercel ausgeliefert — jeweils vom nächstgelegenen Standort. Eine Verarbeitung von Zugriffsdaten außerhalb der EU, insbesondere in den USA, ist deshalb nicht ausgeschlossen. Abgesichert ist sie über den Auftragsverarbeitungsvertrag mit Vercel Inc. einschließlich der EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Karten- und Werbedienste binden wir nicht ein und liefern alle Schriften lokal aus. Zur Reichweitenmessung setzen wir Vercel Web Analytics und Vercel Speed Insights ein — cookiefrei, ohne geräteübergreifende Kennung und erst nach Ihrer ausdrücklichen Einwilligung; ohne sie wird kein Skript geladen. Nutzen Sie den Kontaktweg über WhatsApp, gelten dafür zusätzlich die Bedingungen von Meta Platforms Ireland Ltd.",
+          body: "Diese Seite ist vollständig statisch und wird über das weltweite Content-Delivery-Netz von Vercel ausgeliefert — jeweils vom nächstgelegenen Standort. Eine Verarbeitung von Zugriffsdaten außerhalb der EU, insbesondere in den USA, ist deshalb nicht ausgeschlossen. Vorgesehene Grundlage dafür ist der Auftragsverarbeitungsvertrag mit Vercel Inc. einschließlich der EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO; wie weit er bestätigt ist, steht unten in der Liste der Verarbeiter. Karten- und Werbedienste binden wir nicht ein und liefern alle Schriften lokal aus. Zur Reichweitenmessung setzen wir Vercel Web Analytics und Vercel Speed Insights ein — cookiefrei, ohne geräteübergreifende Kennung und erst nach Ihrer ausdrücklichen Einwilligung; ohne sie wird kein Skript geladen. Nutzen Sie den Kontaktweg über WhatsApp, gelten dafür zusätzlich die Bedingungen von Meta Platforms Ireland Ltd.",
         },
         {
           title: "Kontaktformular, Termin und Produkt-Nachfrage",
-          body: "Wenn Sie eines unserer Formulare absenden, übermitteln wir Ihre Angaben — Name, Betrieb, E-Mail, Telefon und Ihre Nachricht — an unser Postfach info@creadig.de und schicken Ihnen eine Bestätigung. Für den Versand nutzen wir Resend (Resend Inc., USA) als Auftragsverarbeiter nach Art. 28 DSGVO, abgesichert über die EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Rechtsgrundlage ist Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO, die Sie vor dem Absenden ausdrücklich erteilen und jederzeit für die Zukunft widerrufen können. Eine Datenbank führen wir nicht: Ihre Anfrage liegt ausschließlich in unserem E-Mail-Postfach. Wählen Sie stattdessen den Weg über WhatsApp, gelten dafür die Bedingungen von Meta Platforms Ireland Ltd.",
+          body: "Wenn Sie eines unserer Formulare absenden, übermitteln wir Ihre Angaben — Name, Betrieb, E-Mail, Telefon und Ihre Nachricht — an unser Postfach info@creadig.de und schicken Ihnen eine Bestätigung. Für den Versand nutzen wir Resend (Resend Inc., USA) als Auftragsverarbeiter; vorgesehene Grundlage sind Art. 28 DSGVO und die EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Rechtsgrundlage ist Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO, die Sie vor dem Absenden ausdrücklich erteilen und jederzeit für die Zukunft widerrufen können. Eine Datenbank führen wir nicht: Ihre Anfrage liegt ausschließlich in unserem E-Mail-Postfach. Wählen Sie stattdessen den Weg über WhatsApp, gelten dafür die Bedingungen von Meta Platforms Ireland Ltd.",
           bodyStored:
-            "Wenn Sie eines unserer Formulare absenden, übermitteln wir Ihre Angaben — Name, Betrieb, E-Mail, Telefon und Ihre Nachricht — an unser Postfach info@creadig.de und schicken Ihnen eine Bestätigung. Für den Versand nutzen wir Resend (Resend Inc., USA) als Auftragsverarbeiter nach Art. 28 DSGVO, abgesichert über die EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Rechtsgrundlage ist Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO, die Sie vor dem Absenden ausdrücklich erteilen und jederzeit für die Zukunft widerrufen können. Zusätzlich speichern wir Ihre Anfrage in einer Datenbank, damit wir sie zuverlässig bearbeiten und den Bearbeitungsstand nachvollziehen können. Betreiber dieser Datenbank ist Neon, LLC als Auftragsverarbeiter nach Art. 28 DSGVO; die Daten liegen in der Region Frankfurt (aws-eu-central-1). Kommt kein Vertrag zustande, löschen wir Ihre Anfrage 12 Monate nach dem letzten Kontakt. Wählen Sie stattdessen den Weg über WhatsApp, gelten dafür die Bedingungen von Meta Platforms Ireland Ltd.",
+            "Wenn Sie eines unserer Formulare absenden, übermitteln wir Ihre Angaben — Name, Betrieb, E-Mail, Telefon und Ihre Nachricht — an unser Postfach info@creadig.de und schicken Ihnen eine Bestätigung. Für den Versand nutzen wir Resend (Resend Inc., USA) als Auftragsverarbeiter; vorgesehene Grundlage sind Art. 28 DSGVO und die EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO. Rechtsgrundlage ist Ihre Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO, die Sie vor dem Absenden ausdrücklich erteilen und jederzeit für die Zukunft widerrufen können. Zusätzlich speichern wir Ihre Anfrage in einer Datenbank, damit wir sie zuverlässig bearbeiten und den Bearbeitungsstand nachvollziehen können. Betreiber dieser Datenbank ist Neon, LLC als Auftragsverarbeiter auf derselben vorgesehenen Grundlage; die Daten liegen in der Region Frankfurt (aws-eu-central-1). Kommt kein Vertrag zustande, löschen wir Ihre Anfrage 12 Monate nach dem letzten Kontakt. Wählen Sie stattdessen den Weg über WhatsApp, gelten dafür die Bedingungen von Meta Platforms Ireland Ltd.",
         },
         {
           title: "Wie lange wir etwas aufbewahren",
@@ -2823,7 +2824,7 @@ export const dictionary = {
          Schaltern — wer „Alle akzeptieren" drueckt, muss vorher gelesen
          haben, worin er einwilligt. */
       thirdCountry:
-        "Die Reichweitenmessung läuft über Vercel Inc. in den USA. Erlauben Sie sie, willigen Sie zugleich ausdrücklich in die Übermittlung Ihrer Zugriffsdaten dorthin ein (Art. 49 Abs. 1 lit. a DSGVO) — zusätzlich zu den EU-Standardvertragsklauseln, die wir mit Vercel geschlossen haben. In den USA gilt kein dem europäischen gleichwertiges Datenschutzniveau: Behörden können Zugriff verlangen, und wirksame Rechtsbehelfe dagegen bestehen möglicherweise nicht. Ohne Ihre Einwilligung findet keine Übermittlung statt.",
+        "Die Reichweitenmessung läuft über Vercel Inc. in den USA. Erlauben Sie sie, willigen Sie zugleich ausdrücklich in die Übermittlung Ihrer Zugriffsdaten dorthin ein (Art. 49 Abs. 1 lit. a DSGVO) — zusätzlich zu den EU-Standardvertragsklauseln, die dafür als Grundlage vorgesehen sind. In den USA gilt kein dem europäischen gleichwertiges Datenschutzniveau: Behörden können Zugriff verlangen, und wirksame Rechtsbehelfe dagegen bestehen möglicherweise nicht. Ohne Ihre Einwilligung findet keine Übermittlung statt.",
       settingsLabel: "Cookie-Einstellungen",
       settingsTitle: "Datenschutz-Präferenzen",
       close: "Schließen",
@@ -2896,7 +2897,7 @@ export const dictionary = {
         "creaDIG, kendi sistemlerinin çatısıdır — markadan yapay zekâya. Onları biz kurarız ve biz işletiriz. Almanya, Avusturya ve İsviçre için sistem evi.",
       ogTitle: "creaDIG — Başkalarının göremediğini inşa ediyoruz.",
       ogDescription:
-        "2017'den beri sistem evi. Kendi ürünlerimiz, gerçek müşteriler ve kurup işlettiğimiz yapay zekâ sistemleri. Almanya, Avusturya, İsviçre.",
+        "2017'den beri sistem evi. Kendi ürünlerimiz ve kendimiz kurup işlettiğimiz yapay zekâ sistemleri. Almanya, Avusturya, İsviçre.",
       organizationDescription:
         "Marka, web, operations, automation ve yapay zekâ için sistem evi. Kendi ürünlerimiz: meAI, fibero, CASSAMEA, meahv.",
       breadcrumbHome: "Ana sayfa",
@@ -2937,7 +2938,7 @@ export const dictionary = {
           },
           monatlich: {
             label: "Aylık",
-            body: "Süregelen işletme — kurduğumuz sistemler için.",
+            body: "Kurduğumuz sitenin sürekli bakımı — tanımlı kapsamda.",
           },
           "nach-analyse": {
             label: "Analiz sonrası teklif",
@@ -3029,7 +3030,7 @@ export const dictionary = {
         },
         products: {
           name: "Ürünlere bakmak",
-          what: "Kurduğumuz ve kendimiz işlettiğimiz dört sistem. Hakkımızda karar vermenin en hızlı yolu.",
+          what: "Sıfırdan kurduğumuz dört kendi sistemimiz — biri günlük işletimde, üçü yapım aşamasında. Hakkımızda karar vermenin en hızlı yolu.",
           cta: "Ürünlere git",
         },
         works: {
@@ -3110,8 +3111,8 @@ export const dictionary = {
     },
     produktePage: {
       eyebrow: "Katalog değil, kanıt",
-      title: "Kendi işlettiğimiz dört ürün.",
-      lead: "Bu sayfa bunların hiçbirini satmıyor. Burada olmalarının nedeni, kendimiz hakkında söylediğimizi kanıtlamaları: Bu sistemlerin her birini creaDIG sıfırdan kurdu — ve kendi günlük işinde kullanıyor. Sizin için ne kurduğumuz Hizmetler altında.",
+      title: "Kendi kurduğumuz dört ürün.",
+      lead: "Bu sayfa bunların hiçbirini satmıyor. Burada olmalarının nedeni, kendimiz hakkında söylediğimizi kanıtlamaları: Bu sistemlerin her birini creaDIG sıfırdan kurdu. Biri kendi günlük işletiminde çalışıyor, diğer üçü yapım aşamasında — durum her ürünün yanında yazıyor. Sizin için ne kurduğumuz Hizmetler altında.",
       metaTitle: "Kendi ürünlerimiz — meAI, fibero, CASSAMEA, meahv",
       metaDescription:
         "creaDIG'in dört kendi ürünü: meAI (yapay zekâ tabanlı iş işletim sistemi), fibero (fiber operasyonu), CASSAMEA (İsviçre için gastronomi kasası) ve meahv (bina yönetimi).",
@@ -3230,7 +3231,7 @@ export const dictionary = {
       karriere: "Kariyer",
       hints: {
         leistungen: "Sizin için ne kurarız",
-        produkte: "Kendi kurduğumuz ve işlettiğimiz sistemler — katalog değil, kanıt",
+        produkte: "Kendi kurduğumuz sistemler — katalog değil, kanıt",
         arbeiten: "Adıyla anılan tamamlanmış projeler",
         unternehmen: "Arkasında kim var ve nasıl çalışıyoruz",
         insights: "İşin içinden gelen uzman metinler",
@@ -3299,7 +3300,7 @@ export const dictionary = {
       ownProducts: "Kendi ürünlerimiz",
       clients: "Müşteriler",
       brands: "Çalışma çevremizdeki markalar",
-      note: "Kendi ürünlerimizi biz kurduk ve kendimiz işletiyoruz. Müşteriler burada yalnızca onayıyla yer alır. Yabancı markalar ise hiç yer almaz — onay yoksa isim de yok.",
+      note: "Kendi ürünlerimizi biz kurduk — bugünkü durumlarıyla. Müşteriler burada yalnızca onayıyla yer alır. Yabancı markalar ise hiç yer almaz — onay yoksa isim de yok.",
     },
     portfolio: {
       eyebrow: "Seçki",
@@ -3472,7 +3473,7 @@ export const dictionary = {
         monatlich: "Aylık",
         "nach-analyse": "Analiz sonrası teklif",
       },
-      angebotBedingung: "Yalnızca bizim kurduğumuz sistemler için.",
+      angebotBedingung: "Yalnızca kurduğumuz siteler için — daha geniş kapsam analizden sonra.",
       angebotCta: "Başlangıcı gör",
       belegCta: "Kanıtı gör",
       belegEigenpruefung: "Kendi denetimimiz",
@@ -3807,7 +3808,7 @@ export const dictionary = {
         website: {
           name: "Zanaat Web Sitesi Paketi",
           who: "Zanaat işletmeleri ve küçük şirketler için",
-          outcome: "Dört haftada yayında — talepler ve başvurularla",
+          outcome: "Dört haftada yayında — talep ve başvuru yollarıyla",
           includes: [
             "Broşür değil, talep getirsin diye kurulan web sitesi",
             "Başvuru sahipleri için kariyer alt sayfası",
@@ -3964,7 +3965,7 @@ export const dictionary = {
         },
         bilingual: {
           name: "İki dil, iki adres",
-          body: "Almanca ve Türkçe'nin kendi URL'leri, kendi başlıkları, kendi yapılandırılmış verileri vardır ve hreflang ile bağlıdır — tarayıcıda metin değiştiren bir düğme değil.",
+          body: "Her dil sürümünün kendi URL'leri, kendi başlıkları, kendi yapılandırılmış verileri vardır ve hreflang ile bağlıdır — tarayıcıda metin değiştiren bir düğme değil.",
         },
         images: {
           name: "AVIF ve WebP görseller",
@@ -4045,7 +4046,7 @@ export const dictionary = {
       privacyConsentPrefix: "",
       privacyConsentLink: "Gizlilik politikasını",
       privacyConsentSuffix:
-        "okudum; bilgilerimin talebimin işlenmesi amacıyla kullanılmasını ve bunun için gönderim hizmet sağlayıcımız Resend Inc. (ABD) üzerinden iletilmesini kabul ediyorum — AB standart sözleşme maddeleriyle güvence altında ve buna ek olarak ABD'ye aktarıma açık onayımla (GDPR Md. 49/1-a). Onayımı geleceğe yönelik olarak istediğim zaman geri alabilirim.",
+        "okudum; bilgilerimin talebimin işlenmesi amacıyla kullanılmasını ve bunun için gönderim hizmet sağlayıcımız Resend Inc. (ABD) üzerinden iletilmesini kabul ediyorum — bunun için öngörülen AB standart sözleşme maddeleri dayanağıyla ve buna ek olarak ABD'ye aktarıma açık onayımla (GDPR Md. 49/1-a). Onayımı geleceğe yönelik olarak istediğim zaman geri alabilirim.",
       emailLabel: "E-posta",
       emailPlaceholder: "size dönebilmemiz için",
       phoneLabel: "Telefon",
@@ -4131,7 +4132,7 @@ export const dictionary = {
         title: "Size ne zaman uyar?",
         lead: "Bir veya birkaç gün seçin. Vurgulanan günler tercih ettiğimiz görüşme günleridir — diğer günler talep üzerine mümkündür.",
         timeTitle: "Zaman aralığı",
-        timeLead: "Birden fazla seçebilirsiniz. Tüm saatler Orta Avrupa saatidir.",
+        timeLead: "Birden fazla seçebilirsiniz. Tüm saatler Almanya yerel saatidir (Europe/Berlin).",
         windows: [
           { id: "vormittag", label: "Sabah", time: "09.00–12.00" },
           { id: "nachmittag", label: "Öğleden sonra", time: "13.00–17.00" },
@@ -4268,13 +4269,13 @@ export const dictionary = {
 
       statusTitle: "Uygulama durumu",
       statusBody:
-        "23 Ağustos 2026 tarihli denetimden sonra bulunan sekiz eksiğin tamamı giderildi. 68 turluk otomatik denetim (17 sayfa, iki pencere boyutu, açık ve koyu görünüm) artık makineyle saptanabilir hiçbir WCAG 2.1 AA ihlali bildirmiyor. Elle yapılan denetim — klavyeyle gezinme, erişilebilir adlar, odak, yapı — de açık nokta bırakmıyor.",
+        "11 Eylül 2026 tarihli otomatik denetim, 124 tur boyunca (31 rota, iki pencere boyutu, açık ve koyu görünüm) makineyle saptanabilir hiçbir WCAG 2.1 AA ihlali bildirmiyor. 23 Ağustos 2026 tarihli ilk denetimde bulunan sekiz eksik giderildi. Elle yapılan denetim — klavyeyle gezinme, erişilebilir adlar, odak, yapı — açık nokta bırakmamıştı; o denetimden gelir ve o gün incelenen kapsam için geçerlidir.",
       statusNote:
         "„Makineyle saptanabilir ihlal yok“ ifadesi „erişilebilir“ demek değildir. Otomatik araçlar engellerin yalnızca bir kısmını bulur; bu yüzden neyi denetlemediğimiz aşağıda yazıyor.",
 
       checkedTitle: "Neyi denetledik",
       checkedIntro:
-        "WCAG 2.1 AA'ya göre on iki madde, her iki dil sürümünde, açık ve koyu görünümde, 1440 × 900 ve 390 × 844 piksel boyutlarında:",
+        "WCAG 2.1 AA'ya göre on iki madde, Almanca ve Türkçe sürümlerde, açık ve koyu görünümde, 1440 × 900 ve 390 × 844 piksel boyutlarında:",
       checked: [
         "Metin ve kontrol öğelerinin kontrastı, her iki görünümde",
         "Bilgi taşıyan görseller için alternatif metin; süsleyici grafikler sessize alındı",
@@ -4288,7 +4289,7 @@ export const dictionary = {
       ],
       pagesLabel: "Denetlenen sayfalar",
       pagesBody:
-        "Ana sayfa, Hizmetler ve bir hizmet ayrıntı sayfası, Ürünler ve bir ürün ayrıntı sayfası, İşler, Şirket, İletişim, randevu asistanı (1. ve 3. adım), Gizlilik, Künye ve hata sayfası — her biri Almanca ve Türkçe.",
+        "Otuz bir rota: Ana sayfa, Hizmetler ve iki hizmet ayrıntı sayfası, Insights ve bir not, Ürünler ve bir ürün ayrıntı sayfası, İşler, Şirket, Managed İşletim, Sistemler, İletişim, soru formu ve sonucuyla İşletme Kontrolü, randevu asistanı (1. ve 3. adım), bu sayfa, Gizlilik, Künye ve hata sayfası — çoğu Almanca ve Türkçe.",
 
       fixedTitle: "Ne bulundu ve giderildi",
       fixedIntro:
@@ -4309,6 +4310,7 @@ export const dictionary = {
       open: [
         "Görme engelli bir kullanıcıyla deneme yapılmadı. Teknik ön koşulları denetledik (ad, rol, durum, sesli bildirimler) — sonucun günlük kullanımda ne kadar anlaşılır olduğunu değil.",
         "Büyüteç yazılımıyla ve sesle kullanım denetlenmedi.",
+        "Otomatik denetim Almanca ve Türkçe sürümleri kapsar. İngilizce ve Arapça sürümler denetime dahil değildir — Arapçanın sağdan sola yazım yönü de. Bu bulgu onlar için geçerli değildir.",
         "Beyan, belirli bir tarihteki denetime dayanır. Sayfadaki her değişiklik bir şeyi bozabilir; bu yüzden otomatik bölüm her değişiklikte birlikte çalışır.",
         "Dış yollar — WhatsApp ve e-posta programınız — sayfamızın dışındadır. Onların erişilebilirliğinden sorumlu olamayız. Bu yüzden her biri için sayfamızda da bir yol vardır.",
       ],
@@ -4325,7 +4327,7 @@ export const dictionary = {
       methodBody:
         "İki kişinin bağımsız olarak aynı sonuca ulaşması için on iki maddelik sabit bir şablona göre. Otomatik olarak axe-core ile, elle klavye ve erişilebilir ad denetimiyle. Şablon ve tam denetim raporu bu sayfanın kaynak kodunda açıkça yer alır.",
       updatedLabel: "Durum",
-      updated: "23 Ağustos 2026",
+      updated: "11 Eylül 2026",
     },
     legal: {
       imprintTitle: "Künye",
@@ -4343,7 +4345,7 @@ export const dictionary = {
       smallBusinessNote:
         "§ 19 UStG uyarınca küçük işletme — katma değer vergisi hesaplanmaz.",
       mstvLabel: "§ 18/2 MStV uyarınca sorumlu",
-      placeholderMark: "Yer tutucu — yayına almadan önce değiştirilecek",
+      placeholderMark: "Yer tutucu — henüz onaylanmadı",
       taxStatusPending: "KDV durumu henüz onaylanmadı.",
       phoneLabel: "Telefon",
       phonePending: "Almanya telefon numarası eklenecek.",
@@ -4354,7 +4356,7 @@ export const dictionary = {
       privacyIntro: "Bu sayfa bilinçli olarak sade kuruldu: siteler arası izleme yok, reklam çerezi yok, profil oluşturma yok. Kullandıklarımız aşağıda adıyla yazılı — ve erişim ölçümü ancak siz izin verdikten sonra yüklenir.",
       processorsLabel: "Bizim adımıza kim işliyor",
       processorsIntro:
-        "Bu hizmet sağlayıcılar kişisel verileri bizim için işler — talimatımıza bağlı olarak, veri işleyen sözleşmesi (GDPR Md. 28) kapsamında ve ABD'de bulundukları için GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altında. Bunun ötesinde hiçbir aktarım yapmıyoruz.",
+        "Bu hizmet sağlayıcılar kişisel verileri bizim için işler — talimatımıza bağlı olarak. Bunun için öngörülen dayanak her birinde veri işleyen sözleşmesi (GDPR Md. 28) ve ABD'de bulundukları için GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleridir. Bu dayanağın işletme sahibince henüz onaylanmadığı yerlerde bu, ilgili kaydın yanında yazar. Bunun ötesinde hiçbir aktarım yapmıyoruz.",
       processorPurposeLabel: "Ne için",
       processorServicesLabel: "Hizmetler",
       processorCountryLabel: "Merkez",
@@ -4363,7 +4365,7 @@ export const dictionary = {
       processorDpaLink: "Sözleşmeyi görüntüle",
       processorPendingMark: "İşletme sahibinin onayı bekleniyor",
       processorPendingNote:
-        "İşaretli sözleşmeleri işletme sahibi henüz ilgili panelde onaylayıp saklamadı. Bu yüzden var olduklarını yazmıyoruz — yayına almadan önce tamamlanacak.",
+        "İşaretli sözleşmeleri işletme sahibi henüz ilgili panelde onaylayıp saklamadı. Bu durum sürdükçe var olduklarını yazmıyoruz — öngörülen dayanağı belirtir ve neyin açık kaldığını işaretleriz.",
       processorPurposes: {
         vercel:
           "Barındırma, sayfanın içerik dağıtım ağı üzerinden sunulması ve sunucu kayıtları. Onayınızdan sonra ayrıca iki ayrı ölçüm: Vercel Web Analytics ve Vercel Speed Insights (gerçek çağrılarda sayfanın ne kadar hızlı yüklendiği). Web Analytics yalnızca sayfa görüntülemelerini değil, adlandırılmış olayları da kaydeder: işletme kontrolünün başlaması ve tamamlanması (olgunluk derecesi yirmilik aralık olarak, kesin değer olarak değil), randevu asistanındaki adımlar, düğme tıklamaları (sayfa ve konumla) ve bir talebin gönderilmesi (kaynağıyla). Ad, adres, mesaj veya işletme kontrolündeki tek tek yanıtlarınız iletilmez. Her iki ölçüm de çerezsizdir, ancak IP adresi ve sayfa yolunu işler — onay yoksa hiçbir betik yüklenmez.",
@@ -4375,17 +4377,17 @@ export const dictionary = {
       privacyPoints: [
         {
           title: "Sunucu kayıtları",
-          body: "Sayfa çağrıldığında sağlayıcımız Vercel Inc. (ABD) IP adresi, zaman ve çağrılan kaynak gibi teknik olarak gerekli verileri işler. Hukuki dayanak GDPR Md. 6/1-f'dir — bu işleme olmadan sayfa ne sunulabilir ne de kötüye kullanıma karşı korunabilir. Vercel ile GDPR Md. 28 uyarınca bir veri işleyen sözleşmesi mevcuttur.",
+          body: "Sayfa çağrıldığında sağlayıcımız Vercel Inc. (ABD) IP adresi, zaman ve çağrılan kaynak gibi teknik olarak gerekli verileri işler. Hukuki dayanak GDPR Md. 6/1-f'dir — bu işleme olmadan sayfa ne sunulabilir ne de kötüye kullanıma karşı korunabilir. Vercel'in bizim için hangi dayanakla işlediği ve bunun ne kadarının onaylandığı aşağıda veri işleyenler listesinde yazılıdır.",
         },
         {
           title: "Barındırma ve üçüncü ülkelere aktarım",
-          body: "Bu sayfa tamamen statiktir ve Vercel'in dünya çapındaki içerik dağıtım ağı üzerinden, her seferinde en yakın konumdan sunulur. Bu nedenle erişim verilerinin AB dışında, özellikle ABD'de işlenmesi ihtimali bulunur. Bu durum, Vercel Inc. ile yapılan veri işleyen sözleşmesi ve GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altına alınmıştır. Harita ve reklam hizmeti kullanmıyoruz ve tüm yazı tiplerini yerel olarak sunuyoruz. Erişim ölçümü için Vercel Web Analytics ve Vercel Speed Insights kullanıyoruz — çerezsiz, cihazlar arası kimlik olmadan ve yalnızca açık onayınızdan sonra; onay yoksa hiçbir betik yüklenmez. İletişim için WhatsApp'ı kullanırsanız, ek olarak Meta Platforms Ireland Ltd. koşulları geçerlidir.",
+          body: "Bu sayfa tamamen statiktir ve Vercel'in dünya çapındaki içerik dağıtım ağı üzerinden, her seferinde en yakın konumdan sunulur. Bu nedenle erişim verilerinin AB dışında, özellikle ABD'de işlenmesi ihtimali bulunur. Bunun için öngörülen dayanak, Vercel Inc. ile veri işleyen sözleşmesi ve GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleridir; onay durumu aşağıda veri işleyenler listesinde yazılıdır. Harita ve reklam hizmeti kullanmıyoruz ve tüm yazı tiplerini yerel olarak sunuyoruz. Erişim ölçümü için Vercel Web Analytics ve Vercel Speed Insights kullanıyoruz — çerezsiz, cihazlar arası kimlik olmadan ve yalnızca açık onayınızdan sonra; onay yoksa hiçbir betik yüklenmez. İletişim için WhatsApp'ı kullanırsanız, ek olarak Meta Platforms Ireland Ltd. koşulları geçerlidir.",
         },
         {
           title: "İletişim formu, randevu ve ürün talebi",
-          body: "Formlarımızdan birini gönderdiğinizde bilgilerinizi — ad, işletme, e-posta, telefon ve mesajınız — info@creadig.de posta kutumuza iletiriz ve size bir onay göndeririz. Gönderim için GDPR Md. 28 uyarınca veri işleyenimiz olan Resend'i (Resend Inc., ABD) kullanırız; aktarım GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altındadır. Hukuki dayanak, göndermeden önce açıkça verdiğiniz ve geleceğe yönelik olarak istediğiniz zaman geri alabileceğiniz GDPR Md. 6/1-a onayınızdır. Veritabanı tutmuyoruz: talebiniz yalnızca e-posta kutumuzda bulunur. Bunun yerine WhatsApp yolunu seçerseniz Meta Platforms Ireland Ltd. koşulları geçerlidir.",
+          body: "Formlarımızdan birini gönderdiğinizde bilgilerinizi — ad, işletme, e-posta, telefon ve mesajınız — info@creadig.de posta kutumuza iletiriz ve size bir onay göndeririz. Gönderim için veri işleyenimiz Resend'i (Resend Inc., ABD) kullanırız; öngörülen dayanak GDPR Md. 28 ve Md. 46/2-c uyarınca AB standart sözleşme maddeleridir. Hukuki dayanak, göndermeden önce açıkça verdiğiniz ve geleceğe yönelik olarak istediğiniz zaman geri alabileceğiniz GDPR Md. 6/1-a onayınızdır. Veritabanı tutmuyoruz: talebiniz yalnızca e-posta kutumuzda bulunur. Bunun yerine WhatsApp yolunu seçerseniz Meta Platforms Ireland Ltd. koşulları geçerlidir.",
           bodyStored:
-            "Formlarımızdan birini gönderdiğinizde bilgilerinizi — ad, işletme, e-posta, telefon ve mesajınız — info@creadig.de posta kutumuza iletiriz ve size bir onay göndeririz. Gönderim için GDPR Md. 28 uyarınca veri işleyenimiz olan Resend'i (Resend Inc., ABD) kullanırız; aktarım GDPR Md. 46/2-c uyarınca AB standart sözleşme maddeleriyle güvence altındadır. Hukuki dayanak, göndermeden önce açıkça verdiğiniz ve geleceğe yönelik olarak istediğiniz zaman geri alabileceğiniz GDPR Md. 6/1-a onayınızdır. Ayrıca talebinizi bir veritabanında saklarız; böylece güvenilir biçimde işleyebilir ve hangi aşamada olduğunu takip edebiliriz. Bu veritabanını GDPR Md. 28 uyarınca veri işleyen sıfatıyla Neon, LLC işletir; veriler Frankfurt bölgesinde (aws-eu-central-1) tutulur. Sözleşme kurulmazsa talebinizi son temastan 12 ay sonra sileriz. Bunun yerine WhatsApp yolunu seçerseniz Meta Platforms Ireland Ltd. koşulları geçerlidir.",
+            "Formlarımızdan birini gönderdiğinizde bilgilerinizi — ad, işletme, e-posta, telefon ve mesajınız — info@creadig.de posta kutumuza iletiriz ve size bir onay göndeririz. Gönderim için veri işleyenimiz Resend'i (Resend Inc., ABD) kullanırız; öngörülen dayanak GDPR Md. 28 ve Md. 46/2-c uyarınca AB standart sözleşme maddeleridir. Hukuki dayanak, göndermeden önce açıkça verdiğiniz ve geleceğe yönelik olarak istediğiniz zaman geri alabileceğiniz GDPR Md. 6/1-a onayınızdır. Ayrıca talebinizi bir veritabanında saklarız; böylece güvenilir biçimde işleyebilir ve hangi aşamada olduğunu takip edebiliriz. Bu veritabanını aynı öngörülen dayanakla veri işleyen sıfatıyla Neon, LLC işletir; veriler Frankfurt bölgesinde (aws-eu-central-1) tutulur. Sözleşme kurulmazsa talebinizi son temastan 12 ay sonra sileriz. Bunun yerine WhatsApp yolunu seçerseniz Meta Platforms Ireland Ltd. koşulları geçerlidir.",
         },
         {
           title: "Ne kadar süre saklıyoruz",
@@ -4424,7 +4426,7 @@ export const dictionary = {
       save: "Seçimi kaydet",
       alwaysActive: "Her zaman etkin",
       thirdCountry:
-        "Erişim ölçümü, ABD'deki Vercel Inc. üzerinden yürür. Buna izin verirseniz, erişim verilerinizin oraya aktarılmasına da açıkça onay vermiş olursunuz (GDPR Md. 49/1-a) — Vercel ile imzaladığımız AB standart sözleşme maddelerine ek olarak. ABD'de Avrupa'dakine denk bir veri koruma düzeyi yoktur: kamu kurumları erişim talep edebilir ve buna karşı etkili hukuki yollar bulunmayabilir. Onayınız olmadan hiçbir aktarım yapılmaz.",
+        "Erişim ölçümü, ABD'deki Vercel Inc. üzerinden yürür. Buna izin verirseniz, erişim verilerinizin oraya aktarılmasına da açıkça onay vermiş olursunuz (GDPR Md. 49/1-a) — bunun için öngörülen AB standart sözleşme maddelerine ek olarak. ABD'de Avrupa'dakine denk bir veri koruma düzeyi yoktur: kamu kurumları erişim talep edebilir ve buna karşı etkili hukuki yollar bulunmayabilir. Onayınız olmadan hiçbir aktarım yapılmaz.",
       settingsLabel: "Çerez ayarları",
       settingsTitle: "Gizlilik tercihleri",
       close: "Kapat",
@@ -4492,7 +4494,7 @@ export const dictionary = {
         "creaDIG is the house above its own systems — from brand to AI. We build them. And we run them. A systems house for Germany, Austria and Switzerland.",
       ogTitle: "creaDIG — we build what others never see.",
       ogDescription:
-        "A systems house since 2017. Our own products, real clients, AI systems we build and operate. Germany, Austria, Switzerland.",
+        "A systems house since 2017. Our own products and AI systems we build and operate ourselves. Germany, Austria, Switzerland.",
       organizationDescription:
         "Systems house for brand, web, operations, automation and AI. Our own products: meAI, fibero, CASSAMEA, meahv.",
       breadcrumbHome: "Home",
@@ -4533,7 +4535,7 @@ export const dictionary = {
           },
           monatlich: {
             label: "Monthly",
-            body: "Ongoing operation — for systems we built.",
+            body: "Ongoing care for the site we built — in a defined scope.",
           },
           "nach-analyse": {
             label: "Offer after analysis",
@@ -4699,8 +4701,8 @@ export const dictionary = {
     },
     produktePage: {
       eyebrow: "Proof, not a catalogue",
-      title: "Four products we run ourselves.",
-      lead: "This page sells none of them. It exists because it backs up what we say about ourselves: creaDIG built every one of these systems from the ground up — and uses it in its own day-to-day work. What we build for you is under Services.",
+      title: "Four products we built ourselves.",
+      lead: "This page sells none of them. It exists because it backs up what we say about ourselves: creaDIG built every one of these systems from the ground up. One runs in our own daily operation, the other three are in build — the status is stated on each product. What we build for you is under Services.",
       metaTitle: "Our own products — meAI, fibero, CASSAMEA, meahv",
       metaDescription:
         "The four products creaDIG built for itself: meAI (AI business operating system), fibero (fibre-optic operations), CASSAMEA (hospitality POS, Switzerland) and meahv (property management).",
@@ -4888,7 +4890,7 @@ export const dictionary = {
       ownProducts: "Own products",
       clients: "Clients",
       brands: "Brands in our working environment",
-      note: "We built our own products and operate them ourselves. Clients appear here only with their consent. Third-party brands do not appear at all — no name without approval.",
+      note: "We built our own products ourselves — with the status they have today. Clients appear here only with their consent. Third-party brands do not appear at all — no name without approval.",
     },
     portfolio: {
       eyebrow: "Portfolio",
@@ -5061,7 +5063,7 @@ export const dictionary = {
         monatlich: "Monthly",
         "nach-analyse": "Offer after analysis",
       },
-      angebotBedingung: "Only for systems we built.",
+      angebotBedingung: "Only for sites we built — a larger scope after analysis.",
       angebotCta: "See the entry point",
       belegCta: "See the proof",
       belegEigenpruefung: "Our own audit",
@@ -5397,7 +5399,7 @@ export const dictionary = {
         website: {
           name: "Website package for trades",
           who: "For trade businesses and small companies",
-          outcome: "Online in four weeks — with enquiries and applications",
+          outcome: "Online in four weeks — with paths for enquiries and applications",
           includes: [
             "A website built for enquiries — not as a brochure",
             "A careers page for applicants",
@@ -5553,7 +5555,7 @@ export const dictionary = {
         },
         bilingual: {
           name: "Two languages, two addresses",
-          body: "German and Turkish have their own URLs, their own titles, their own structured data and are linked by hreflang — not a switch that swaps text in the browser.",
+          body: "Each language version has its own URLs, its own titles, its own structured data and is linked by hreflang — not a switch that swaps text in the browser.",
         },
         images: {
           name: "Images in AVIF and WebP",
@@ -5634,7 +5636,7 @@ export const dictionary = {
       privacyConsentPrefix: "I have read the",
       privacyConsentLink: "privacy policy",
       privacyConsentSuffix:
-        "and agree that my details may be processed to handle my enquiry and delivered for that purpose via our sending provider Resend Inc. (USA) — safeguarded by EU standard contractual clauses and, in addition, with my explicit consent to the transfer to the USA (Art. 49(1)(a) GDPR). I can withdraw this at any time with effect for the future.",
+        "and agree that my details may be processed to handle my enquiry and delivered for that purpose via our sending provider Resend Inc. (USA) — on the basis of the EU standard contractual clauses provided for this and, in addition, with my explicit consent to the transfer to the USA (Art. 49(1)(a) GDPR). I can withdraw this at any time with effect for the future.",
       emailLabel: "Email",
       emailPlaceholder: "so we can reply",
       phoneLabel: "Phone",
@@ -5715,7 +5717,7 @@ export const dictionary = {
         title: "When suits you?",
         lead: "Choose one or more days. Highlighted days are our preferred days for conversations — other days are possible on request.",
         timeTitle: "Time windows",
-        timeLead: "You can pick more than one. All times CET.",
+        timeLead: "You can pick more than one. All times in German local time (Europe/Berlin).",
         windows: [
           { id: "vormittag", label: "Morning", time: "09:00–12:00" },
           { id: "nachmittag", label: "Afternoon", time: "13:00–17:00" },
@@ -5850,12 +5852,12 @@ export const dictionary = {
         "Whether this website falls under the German Accessibility Strengthening Act has not been assessed legally — so we do not claim that it does. We publish this status because an agency that offers accessibility should open up its own site. This is not a legal assessment.",
       statusTitle: "Implementation status",
       statusBody:
-        "After the audit run of 23 August 2026, all eight defects found are fixed. The automated run across 68 passes (17 pages, two window sizes, light and dark appearance) reports no machine-detectable violation of WCAG 2.1 AA. The manual review — keyboard pass, accessible names, focus, structure — is likewise without an open item.",
+        "The automated run of 11 September 2026, across 124 passes (31 routes, two window sizes, light and dark appearance), reports no machine-detectable violation of WCAG 2.1 AA. The eight defects from the first audit run of 23 August 2026 are fixed. The manual review — keyboard pass, accessible names, focus, structure — was without an open item; it comes from that audit run and covers the scope examined then.",
       statusNote:
         "“No machine-detectable violation” does not mean “accessible”. Automated tools find only some barriers; that is why what we did not audit is set out below.",
       checkedTitle: "What was audited",
       checkedIntro:
-        "Twelve points against WCAG 2.1 AA, in both language versions, light and dark, at 1440 × 900 and 390 × 844 pixels:",
+        "Twelve points against WCAG 2.1 AA, in the German and the Turkish version, light and dark, at 1440 × 900 and 390 × 844 pixels:",
       checked: [
         "Contrast of text and of controls, in both appearances",
         "Alternative text for informative images; decorative graphics muted",
@@ -5869,7 +5871,7 @@ export const dictionary = {
       ],
       pagesLabel: "Pages audited",
       pagesBody:
-        "Home, services and one service detail page, products and one product detail page, work, company, contact, the appointment assistant (step 1 and step 3), privacy, imprint and the error page — each in German and Turkish.",
+        "Thirty-one routes: home, services and two service detail pages, insights and one note, products and one product detail page, work, company, managed operation, systems, contact, the business check with questionnaire and result, the appointment assistant (step 1 and step 3), this page, privacy, imprint and the error page — most of them in German and Turkish.",
       fixedTitle: "What was found and fixed",
       fixedIntro:
         "Eight defects, none of them blocking, seven classified as serious. All fixed in the code — no overlay, no add-on tool:",
@@ -5888,6 +5890,7 @@ export const dictionary = {
       open: [
         "No pass with a blind user. We checked the technical prerequisites (name, role, state, announcements) — not how understandable the result is in daily use.",
         "No testing with magnification software and no testing of voice control.",
+        "The automated run covers the German and the Turkish version. The English and the Arabic version are not in it — nor is the Arabic right-to-left writing direction. This finding does not apply to them.",
         "The statement rests on an audit run on one date. Every change to the site can break something; that is why the automated part runs with every change.",
         "External routes — WhatsApp and the email program — lie outside our site. We cannot vouch for their accessibility. That is why there is also a route on our own site for each of them.",
       ],
@@ -5902,7 +5905,7 @@ export const dictionary = {
       methodBody:
         "Against a fixed twelve-point framework, so that two people arrive independently at the same result. Automated with axe-core, by hand with the keyboard and a check of accessible names. The framework and the full findings are open in the source of this site.",
       updatedLabel: "As of",
-      updated: "23 August 2026",
+      updated: "11 September 2026",
     },
     legal: {
       imprintTitle: "Imprint",
@@ -5920,7 +5923,7 @@ export const dictionary = {
       smallBusinessNote:
         "Small business under § 19 UStG — no VAT is charged.",
       mstvLabel: "Responsible under § 18(2) MStV",
-      placeholderMark: "Placeholder — will be replaced before launch",
+      placeholderMark: "Placeholder — not yet approved",
       taxStatusPending: "VAT status not yet released.",
       phoneLabel: "Phone",
       phonePending: "A German phone number follows.",
@@ -5931,7 +5934,7 @@ export const dictionary = {
       privacyIntro: "This site is deliberately built lean: no cross-site tracking, no advertising cookies, no profiling. What we do use is named below — and the analytics only load once you have allowed them.",
       processorsLabel: "Who processes on our behalf",
       processorsIntro:
-        "These service providers process personal data for us — on our instructions, under a data processing agreement (Art. 28 GDPR) and, because they are based in the USA, safeguarded by the EU standard contractual clauses under Art. 46(2)(c) GDPR. We pass on nothing further.",
+        "These service providers process personal data for us — on our instructions. The basis provided in each case is a data processing agreement (Art. 28 GDPR) and, because they are based in the USA, the EU standard contractual clauses under Art. 46(2)(c) GDPR. Where that basis has not yet been confirmed by the owner, it is marked on the entry. We pass on nothing further.",
       processorPurposeLabel: "Purpose",
       processorServicesLabel: "Services",
       processorCountryLabel: "Location",
@@ -5940,7 +5943,7 @@ export const dictionary = {
       processorDpaLink: "View the agreement",
       processorPendingMark: "Confirmation by the owner outstanding",
       processorPendingNote:
-        "The agreements marked have not yet been confirmed and filed by the owner in the respective dashboard. We therefore do not write that they exist — we will make that good before launch.",
+        "The agreements marked have not yet been confirmed and filed by the owner in the respective dashboard. While that is the case we do not write that they exist — we name the intended basis and mark what is open.",
       processorPurposes: {
         vercel:
           "Hosting, delivery of the site through the content delivery network, and server logs. After your consent, additionally two separate measurements: Vercel Web Analytics and Vercel Speed Insights (how fast the page loads on real visits). Web Analytics records not only page views but also named events: the start and completion of the Betriebscheck (with the maturity score as a band of twenty, not as an exact value), steps in the appointment assistant, clicks on buttons (with page and position), and the submission of an enquiry (with its source). Your name, address, message and individual Betriebscheck answers are not transmitted. Both measurements are cookie-free but process IP address and page path — without consent no script is loaded.",
@@ -5952,17 +5955,17 @@ export const dictionary = {
       privacyPoints: [
         {
           title: "Server logs",
-          body: "When the site is opened, our host Vercel Inc. (USA) processes technically necessary data such as IP address, time and requested resource. The legal basis is Art. 6(1)(f) GDPR — without this processing the site can neither be delivered nor protected against abuse. A data processing agreement under Art. 28 GDPR is in place with Vercel.",
+          body: "When the site is opened, our host Vercel Inc. (USA) processes technically necessary data such as IP address, time and requested resource. The legal basis is Art. 6(1)(f) GDPR — without this processing the site can neither be delivered nor protected against abuse. On what basis Vercel processes for us, and how far that is confirmed, is stated below in the list of processors.",
         },
         {
           title: "Hosting and transfer to third countries",
-          body: "This site is fully static and is delivered through Vercel's worldwide content delivery network — from the nearest location in each case. Processing of access data outside the EU, in particular in the USA, can therefore not be ruled out. It is safeguarded by the data processing agreement with Vercel Inc. including the EU standard contractual clauses under Art. 46(2)(c) GDPR. We embed no map or advertising services and deliver all fonts locally. For analytics we use Vercel Web Analytics and Vercel Speed Insights — cookie-free, without a cross-device identifier and only after your explicit consent; without it no script is loaded. If you use the WhatsApp route, the terms of Meta Platforms Ireland Ltd. additionally apply.",
+          body: "This site is fully static and is delivered through Vercel's worldwide content delivery network — from the nearest location in each case. Processing of access data outside the EU, in particular in the USA, can therefore not be ruled out. The basis provided for this is the data processing agreement with Vercel Inc. including the EU standard contractual clauses under Art. 46(2)(c) GDPR; how far it is confirmed is stated below in the list of processors. We embed no map or advertising services and deliver all fonts locally. For analytics we use Vercel Web Analytics and Vercel Speed Insights — cookie-free, without a cross-device identifier and only after your explicit consent; without it no script is loaded. If you use the WhatsApp route, the terms of Meta Platforms Ireland Ltd. additionally apply.",
         },
         {
           title: "Contact form, appointments and product enquiries",
-          body: "When you submit one of our forms, we transmit your details — name, business, email, phone and your message — to our inbox info@creadig.de and send you a confirmation. For delivery we use Resend (Resend Inc., USA) as a processor under Art. 28 GDPR, safeguarded by the EU standard contractual clauses under Art. 46(2)(c) GDPR. The legal basis is your consent under Art. 6(1)(a) GDPR, which you give explicitly before sending and can withdraw at any time with effect for the future. We do not keep a database: your enquiry sits solely in our email inbox. If you take the WhatsApp route instead, the terms of Meta Platforms Ireland Ltd. apply.",
+          body: "When you submit one of our forms, we transmit your details — name, business, email, phone and your message — to our inbox info@creadig.de and send you a confirmation. For delivery we use Resend (Resend Inc., USA) as a processor; the basis provided for this is Art. 28 GDPR and the EU standard contractual clauses under Art. 46(2)(c) GDPR. The legal basis is your consent under Art. 6(1)(a) GDPR, which you give explicitly before sending and can withdraw at any time with effect for the future. We do not keep a database: your enquiry sits solely in our email inbox. If you take the WhatsApp route instead, the terms of Meta Platforms Ireland Ltd. apply.",
           bodyStored:
-            "When you submit one of our forms, we transmit your details — name, business, email, phone and your message — to our inbox info@creadig.de and send you a confirmation. For delivery we use Resend (Resend Inc., USA) as a processor under Art. 28 GDPR, safeguarded by the EU standard contractual clauses under Art. 46(2)(c) GDPR. The legal basis is your consent under Art. 6(1)(a) GDPR, which you give explicitly before sending and can withdraw at any time with effect for the future. We additionally store your enquiry in a database so that we can handle it reliably and trace its progress. That database is operated by Neon, LLC as a processor under Art. 28 GDPR; the data is held in the Frankfurt region (aws-eu-central-1). If no contract comes about, we delete your enquiry 12 months after the last contact. If you take the WhatsApp route instead, the terms of Meta Platforms Ireland Ltd. apply.",
+            "When you submit one of our forms, we transmit your details — name, business, email, phone and your message — to our inbox info@creadig.de and send you a confirmation. For delivery we use Resend (Resend Inc., USA) as a processor; the basis provided for this is Art. 28 GDPR and the EU standard contractual clauses under Art. 46(2)(c) GDPR. The legal basis is your consent under Art. 6(1)(a) GDPR, which you give explicitly before sending and can withdraw at any time with effect for the future. We additionally store your enquiry in a database so that we can handle it reliably and trace its progress. That database is operated by Neon, LLC as a processor on the same intended basis; the data is held in the Frankfurt region (aws-eu-central-1). If no contract comes about, we delete your enquiry 12 months after the last contact. If you take the WhatsApp route instead, the terms of Meta Platforms Ireland Ltd. apply.",
         },
         {
           title: "How long we keep things",
@@ -6001,7 +6004,7 @@ export const dictionary = {
       save: "Save selection",
       alwaysActive: "Always active",
       thirdCountry:
-        "Analytics run through Vercel Inc. in the USA. If you allow them, you also explicitly consent to the transfer of your access data there (Art. 49(1)(a) GDPR) — in addition to the EU standard contractual clauses we have concluded with Vercel. The USA does not have a level of data protection equivalent to the European one: authorities can demand access, and effective legal remedies against this may not exist. Without your consent no transfer takes place.",
+        "Analytics run through Vercel Inc. in the USA. If you allow them, you also explicitly consent to the transfer of your access data there (Art. 49(1)(a) GDPR) — in addition to the EU standard contractual clauses provided as the basis for this. The USA does not have a level of data protection equivalent to the European one: authorities can demand access, and effective legal remedies against this may not exist. Without your consent no transfer takes place.",
       settingsLabel: "Cookie settings",
       settingsTitle: "Privacy preferences",
       close: "Close",
@@ -6067,7 +6070,7 @@ export const dictionary = {
         "creaDIG هي المظلة فوق أنظمتنا الخاصة — من العلامة إلى الذكاء الاصطناعي. نبنيها بأنفسنا. ونشغّلها بأنفسنا. بيت أنظمة لألمانيا والنمسا وسويسرا.",
       ogTitle: "creaDIG — نبني ما لا يراه الآخرون.",
       ogDescription:
-        "بيت أنظمة منذ 2017. منتجات خاصة بنا، عملاء حقيقيون، وأنظمة ذكاء اصطناعي نبنيها ونشغّلها. ألمانيا والنمسا وسويسرا.",
+        "بيت أنظمة منذ 2017. منتجات خاصة بنا وأنظمة ذكاء اصطناعي نبنيها ونشغّلها بأنفسنا. ألمانيا والنمسا وسويسرا.",
       organizationDescription:
         "بيت أنظمة للعلامة والويب والتشغيل والأتمتة والذكاء الاصطناعي. منتجاتنا الخاصة: meAI وfibero وCASSAMEA وmeahv.",
       breadcrumbHome: "الصفحة الرئيسية",
@@ -6108,7 +6111,7 @@ export const dictionary = {
           },
           monatlich: {
             label: "شهريًا",
-            body: "التشغيل المستمر — للأنظمة التي بنيناها.",
+            body: "الرعاية المستمرة للموقع الذي بنيناه — بنطاق محدَّد.",
           },
           "nach-analyse": {
             label: "عرض بعد التحليل",
@@ -6200,7 +6203,7 @@ export const dictionary = {
         },
         products: {
           name: "استعراض المنتجات",
-          what: "أربعة أنظمة خاصة بنا بنيناها ونشغّلها بأنفسنا. أسرع طريق لتكوين حكم علينا.",
+          what: "أربعة أنظمة خاصة بنا بنيناها من الأساس — واحد في التشغيل اليومي وثلاثة قيد البناء. أسرع طريق لتكوين حكم علينا.",
           cta: "إلى المنتجات",
         },
         works: {
@@ -6274,8 +6277,8 @@ export const dictionary = {
     },
     produktePage: {
       eyebrow: "دليل، لا كتالوج",
-      title: "أربعة منتجات نشغّلها بأنفسنا.",
-      lead: "هذه الصفحة لا تبيع أيًّا منها. هي هنا لأنها تُثبت ما نقوله عن أنفسنا: كل واحد من هذه الأنظمة بنته creaDIG من الأساس — وتستعمله في عملها اليومي. أما ما نبنيه لكم فتجدونه تحت الخدمات.",
+      title: "أربعة منتجات بنيناها بأنفسنا.",
+      lead: "هذه الصفحة لا تبيع أيًّا منها. هي هنا لأنها تُثبت ما نقوله عن أنفسنا: كل واحد من هذه الأنظمة بنته creaDIG من الأساس. واحد منها يعمل في تشغيلنا اليومي والثلاثة الأخرى قيد البناء — والحالة مذكورة عند كل منتج. أما ما نبنيه لكم فتجدونه تحت الخدمات.",
       metaTitle: "منتجاتنا الخاصة — meAI وfibero وCASSAMEA وmeahv",
       metaDescription:
         "منتجات creaDIG الأربعة: meAI (نظام تشغيل أعمال بالذكاء الاصطناعي)، وfibero (تشغيل شبكات الألياف)، وCASSAMEA (نقاط بيع للضيافة، سويسرا)، وmeahv (إدارة العقارات).",
@@ -6463,7 +6466,7 @@ export const dictionary = {
       ownProducts: "منتجات خاصة",
       clients: "العملاء",
       brands: "علامات في محيط عملنا",
-      note: "منتجاتنا الخاصة بنيناها ونشغّلها بأنفسنا. العملاء لا يظهرون هنا إلا بموافقتهم. أما العلامات الأخرى فلا تظهر أصلًا — لا اسم دون إذن.",
+      note: "منتجاتنا الخاصة بنيناها بأنفسنا — بحالتها اليوم. العملاء لا يظهرون هنا إلا بموافقتهم. أما العلامات الأخرى فلا تظهر أصلًا — لا اسم دون إذن.",
     },
     portfolio: {
       eyebrow: "معرض الأعمال",
@@ -6636,7 +6639,7 @@ export const dictionary = {
         monatlich: "شهريًا",
         "nach-analyse": "عرض بعد التحليل",
       },
-      angebotBedingung: "للأنظمة التي بنيناها فقط.",
+      angebotBedingung: "للمواقع التي بنيناها فقط — ونطاق أوسع بعد التحليل.",
       angebotCta: "عرض نقطة البداية",
       belegCta: "عرض الدليل",
       belegEigenpruefung: "تدقيقنا الخاص",
@@ -6972,7 +6975,7 @@ export const dictionary = {
         website: {
           name: "باقة الموقع للحِرف",
           who: "للمنشآت الحِرفية والشركات الصغيرة",
-          outcome: "على الشبكة خلال أربعة أسابيع — مع استفسارات وطلبات توظيف",
+          outcome: "على الشبكة خلال أربعة أسابيع — بمسارات للاستفسارات وطلبات التوظيف",
           includes: [
             "موقع مبنيّ للاستفسارات — لا ككتيّب",
             "صفحة توظيف للمتقدمين",
@@ -7209,7 +7212,7 @@ export const dictionary = {
       privacyConsentPrefix: "لقد قرأتُ",
       privacyConsentLink: "سياسة الخصوصية",
       privacyConsentSuffix:
-        "وأوافق على معالجة بياناتي لأغراض معالجة طلبي وتسليمها لهذا الغرض عبر مزوّد الإرسال Resend Inc. (الولايات المتحدة) — بضمان الشروط التعاقدية النموذجية للاتحاد الأوروبي، وإضافةً إلى ذلك بموافقتي الصريحة على النقل إلى الولايات المتحدة (المادة 49(1)(أ) من اللائحة العامة لحماية البيانات). ويمكنني سحب ذلك في أي وقت بأثر مستقبلي.",
+        "وأوافق على معالجة بياناتي لأغراض معالجة طلبي وتسليمها لهذا الغرض عبر مزوّد الإرسال Resend Inc. (الولايات المتحدة) — على أساس الشروط التعاقدية النموذجية للاتحاد الأوروبي المُقرَّرة لذلك، وإضافةً إلى ذلك بموافقتي الصريحة على النقل إلى الولايات المتحدة (المادة 49(1)(أ) من اللائحة العامة لحماية البيانات). ويمكنني سحب ذلك في أي وقت بأثر مستقبلي.",
       emailLabel: "البريد الإلكتروني",
       emailPlaceholder: "لنتمكن من الرد",
       phoneLabel: "الهاتف",
@@ -7290,7 +7293,7 @@ export const dictionary = {
         title: "متى يناسبكم؟",
         lead: "اختاروا يومًا أو أكثر. الأيام المميّزة هي أيامنا المفضّلة للحديث — وغيرها ممكن عند الطلب.",
         timeTitle: "النوافذ الزمنية",
-        timeLead: "يمكن اختيار أكثر من واحدة. كل الأوقات بتوقيت وسط أوروبا.",
+        timeLead: "يمكن اختيار أكثر من واحدة. كل الأوقات بالتوقيت المحلي في ألمانيا (Europe/Berlin).",
         windows: [
           { id: "vormittag", label: "صباحًا", time: "09:00–12:00" },
           { id: "nachmittag", label: "بعد الظهر", time: "13:00–17:00" },
@@ -7425,12 +7428,12 @@ export const dictionary = {
         "لم نُخضع لفحص قانوني ما إذا كان هذا الموقع يقع تحت قانون تعزيز إتاحة الوصول الألماني — ولذلك لا ندّعي ذلك. ننشر هذه الحالة لأن وكالةً تعرض إتاحة الوصول ينبغي أن تكشف موقعها هي. وهذا ليس تقييمًا قانونيًا.",
       statusTitle: "حالة التنفيذ",
       statusBody:
-        "بعد جولة الفحص في 23 أغسطس 2026، عولجت كل العيوب الثمانية التي وُجدت. والجولة الآلية عبر 68 تمريرة (17 صفحة، مقاسا نافذة، مظهران فاتح وداكن) لا تُبلغ عن أي مخالفة قابلة للرصد آليًا لـ WCAG 2.1 AA. والفحص اليدوي — جولة لوحة المفاتيح، والأسماء المتاحة، والتركيز، والبنية — كذلك دون نقطة مفتوحة.",
+        "الجولة الآلية في 11 سبتمبر 2026، عبر 124 تمريرة (31 مسارًا، مقاسا نافذة، مظهران فاتح وداكن)، لا تُبلغ عن أي مخالفة قابلة للرصد آليًا لـ WCAG 2.1 AA. والعيوب الثمانية من جولة الفحص الأولى في 23 أغسطس 2026 عولجت. أما الفحص اليدوي — جولة لوحة المفاتيح، والأسماء المتاحة، والتركيز، والبنية — فكان دون نقطة مفتوحة؛ وهو من تلك الجولة ويسري على النطاق المفحوص حينها.",
       statusNote:
         "«لا مخالفة قابلة للرصد آليًا» لا تعني «متاح الوصول». الأدوات الآلية تجد جزءًا من العوائق فقط؛ لذلك يُذكر أدناه ما لم نفحصه.",
       checkedTitle: "ما الذي فُحص",
       checkedIntro:
-        "اثنتا عشرة نقطة وفق WCAG 2.1 AA، في نسختَي اللغة، فاتحًا وداكنًا، على 1440 × 900 و390 × 844 بكسل:",
+        "اثنتا عشرة نقطة وفق WCAG 2.1 AA، في النسختين الألمانية والتركية، فاتحًا وداكنًا، على 1440 × 900 و390 × 844 بكسل:",
       checked: [
         "تباين النصوص وعناصر التحكم، في المظهرين",
         "النصوص البديلة للصور المعلوماتية؛ والرسوم الزخرفية مكتومة",
@@ -7444,7 +7447,7 @@ export const dictionary = {
       ],
       pagesLabel: "الصفحات المفحوصة",
       pagesBody:
-        "الرئيسية، والخدمات وصفحة خدمة تفصيلية، والمنتجات وصفحة منتج تفصيلية، والأعمال، والشركة، والتواصل، ومساعد المواعيد (الخطوة 1 والخطوة 3)، والخصوصية، وبيانات الناشر، وصفحة الخطأ — كلٌّ بالألمانية والتركية.",
+        "واحد وثلاثون مسارًا: الرئيسية، والخدمات وصفحتا خدمة تفصيليتان، وInsights وملاحظة واحدة، والمنتجات وصفحة منتج تفصيلية، والأعمال، والشركة، والتشغيل المُدار، والأنظمة، والتواصل، وفحص المنشأة باستمارته ونتيجته، ومساعد المواعيد (الخطوة 1 والخطوة 3)، وهذه الصفحة، والخصوصية، وبيانات الناشر، وصفحة الخطأ — معظمها بالألمانية والتركية.",
       fixedTitle: "ما الذي وُجد وعولج",
       fixedIntro:
         "ثمانية عيوب، لا شيء منها معطِّل، وسبعة مصنَّفة خطيرة. عولجت كلها في الشيفرة — دون طبقة تغطية ودون أداة إضافية:",
@@ -7463,6 +7466,7 @@ export const dictionary = {
       open: [
         "لا جولة مع مستخدم كفيف. فحصنا المتطلبات التقنية (الاسم والدور والحالة والإعلانات) — لا مدى وضوح النتيجة في الاستعمال اليومي.",
         "لا فحص ببرمجيات التكبير ولا فحص للتحكم الصوتي.",
+        "تغطّي الجولة الآلية النسختين الألمانية والتركية. أمّا النسختان الإنجليزية والعربية فليستا فيها — ولا اتّجاه الكتابة العربي من اليمين إلى اليسار. وهذا البيان لا يسري عليهما.",
         "يستند البيان إلى جولة فحص في تاريخ محدَّد. وكل تغيير في الموقع قد يكسر شيئًا؛ لذلك يعمل الجزء الآلي مع كل تغيير.",
         "الطرق الخارجية — واتساب وبرنامج البريد — خارج موقعنا. ولا نستطيع الضمان لإتاحة وصولها. لذلك يوجد لكل واحد منها طريقٌ على موقعنا أيضًا.",
       ],
@@ -7477,7 +7481,7 @@ export const dictionary = {
       methodBody:
         "وفق إطار ثابت من اثنتي عشرة نقطة، ليصل شخصان مستقلان إلى النتيجة نفسها. آليًا بـ axe-core، ويدويًا بلوحة المفاتيح وفحص الأسماء المتاحة. والإطار والنتائج الكاملة مكشوفة في مصدر هذا الموقع.",
       updatedLabel: "الحالة بتاريخ",
-      updated: "23 أغسطس 2026",
+      updated: "11 سبتمبر 2026",
     },
     legal: {
       imprintTitle: "بيانات الناشر",
@@ -7495,7 +7499,7 @@ export const dictionary = {
       smallBusinessNote:
         "منشأة صغيرة وفق المادة 19 من قانون ضريبة القيمة المضافة — لا تُحتسب ضريبة.",
       mstvLabel: "المسؤول وفق المادة 18(2) MStV",
-      placeholderMark: "عنصر نائب — يُستبدل قبل الإطلاق",
+      placeholderMark: "عنصر نائب — لم يُعتمد بعد",
       taxStatusPending: "حالة ضريبة القيمة المضافة لم تُعتمد بعد.",
       phoneLabel: "الهاتف",
       phonePending: "رقم هاتف ألماني يتبع.",
@@ -7506,7 +7510,7 @@ export const dictionary = {
       privacyIntro: "هذا الموقع مبنيّ خفيفًا عن قصد: لا تتبّع عبر المواقع، ولا ملفات تعريف ارتباط إعلانية، ولا تكوين ملفات شخصية. وما نستعمله مذكور أدناه بالاسم — وقياس الوصول لا يُحمَّل إلا بعد إذنكم.",
       processorsLabel: "من يعالج بتكليف منّا",
       processorsIntro:
-        "مقدّمو الخدمات هؤلاء يعالجون بيانات شخصية لحسابنا — وفق تعليماتنا، وبموجب عقد معالجة بالإنابة (المادة 28 من اللائحة العامة لحماية البيانات)، ولأنهم في الولايات المتحدة فبضمان الشروط التعاقدية النموذجية للاتحاد الأوروبي وفق المادة 46(2)(ج). ولا نمرّر شيئًا أبعد من ذلك.",
+        "مقدّمو الخدمات هؤلاء يعالجون بيانات شخصية لحسابنا — وفق تعليماتنا. والأساس المُقرَّر في كل حالة هو عقد معالجة بالإنابة (المادة 28 من اللائحة العامة لحماية البيانات)، ولأنهم في الولايات المتحدة فالشروط التعاقدية النموذجية للاتحاد الأوروبي وفق المادة 46(2)(ج). وحيث لم يؤكّد المالك هذا الأساس بعد، فذلك مُعلَّم عند القيد نفسه. ولا نمرّر شيئًا أبعد من ذلك.",
       processorPurposeLabel: "الغرض",
       processorServicesLabel: "الخدمات",
       processorCountryLabel: "المقر",
@@ -7515,7 +7519,7 @@ export const dictionary = {
       processorDpaLink: "عرض العقد",
       processorPendingMark: "تأكيد المالك معلّق",
       processorPendingNote:
-        "العقود المُعلَّمة لم يؤكّدها المالك بعد ويحفظها في لوحة كل مزوّد. لذلك لا نكتب أنها قائمة — سنستدرك ذلك قبل الإطلاق.",
+        "العقود المُعلَّمة لم يؤكّدها المالك بعد ويحفظها في لوحة كل مزوّد. وما دام الأمر كذلك لا نكتب أنها قائمة — بل نذكر الأساس المُقرَّر ونُعلِّم ما بقي مفتوحًا.",
       processorPurposes: {
         vercel:
           "الاستضافة، وتسليم الموقع عبر شبكة توزيع المحتوى، وسجلات الخادم. وبعد موافقتكم إضافةً إلى ذلك قياسان منفصلان: Vercel Web Analytics وVercel Speed Insights (بأي سرعة تُحمَّل الصفحة في الزيارات الحقيقية). لا يسجّل Web Analytics مشاهدات الصفحات فحسب، بل أحداثًا مسمّاة أيضًا: بدء فحص المنشأة وإتمامه (مع درجة النضج ضمن نطاق من عشرين، لا كقيمة دقيقة)، وخطوات مساعد المواعيد، والنقرات على الأزرار (مع الصفحة والموضع)، وإرسال الطلب (مع مصدره). ولا يُرسَل اسمكم ولا عنوانكم ولا رسالتكم ولا إجاباتكم المفردة في فحص المنشأة. كلا القياسين دون ملفات تعريف ارتباط، لكنهما يعالجان عنوان IP ومسار الصفحة — ودون موافقة لا يُحمَّل أي سكربت.",
@@ -7527,17 +7531,17 @@ export const dictionary = {
       privacyPoints: [
         {
           title: "سجلات الخادم",
-          body: "عند فتح الموقع يعالج مضيفنا Vercel Inc. (الولايات المتحدة) بيانات لازمة تقنيًا مثل عنوان IP والوقت والمورد المطلوب. والأساس القانوني هو المادة 6(1)(و) — فبدون هذه المعالجة لا يمكن تسليم الموقع ولا تأمينه ضد إساءة الاستعمال. ومع Vercel عقد معالجة بالإنابة وفق المادة 28.",
+          body: "عند فتح الموقع يعالج مضيفنا Vercel Inc. (الولايات المتحدة) بيانات لازمة تقنيًا مثل عنوان IP والوقت والمورد المطلوب. والأساس القانوني هو المادة 6(1)(و) — فبدون هذه المعالجة لا يمكن تسليم الموقع ولا تأمينه ضد إساءة الاستعمال. وأساسُ معالجة Vercel لحسابنا ومدى تأكيده مذكوران أدناه في قائمة المعالِجين.",
         },
         {
           title: "الاستضافة والنقل إلى دول ثالثة",
-          body: "هذا الموقع ثابت بالكامل ويُسلَّم عبر شبكة توزيع المحتوى العالمية لدى Vercel — من أقرب موقع في كل مرة. ولذلك لا يمكن استبعاد معالجة بيانات الوصول خارج الاتحاد الأوروبي، ولا سيما في الولايات المتحدة. وهي مضمونة بعقد المعالجة بالإنابة مع Vercel Inc. بما فيه الشروط التعاقدية النموذجية وفق المادة 46(2)(ج). ولا ندمج خدمات خرائط أو إعلانات، ونُسلّم كل الخطوط محليًا. ولقياس الوصول نستعمل Vercel Web Analytics وVercel Speed Insights — دون ملفات تعريف ارتباط، ودون معرّف عابر للأجهزة، وبعد موافقتكم الصريحة فقط؛ وبدونها لا يُحمَّل أي سكربت. وإن سلكتم طريق واتساب فتسري إضافةً إلى ذلك شروط Meta Platforms Ireland Ltd.",
+          body: "هذا الموقع ثابت بالكامل ويُسلَّم عبر شبكة توزيع المحتوى العالمية لدى Vercel — من أقرب موقع في كل مرة. ولذلك لا يمكن استبعاد معالجة بيانات الوصول خارج الاتحاد الأوروبي، ولا سيما في الولايات المتحدة. والأساس المُقرَّر لذلك هو عقد المعالجة بالإنابة مع Vercel Inc. بما فيه الشروط التعاقدية النموذجية وفق المادة 46(2)(ج)؛ ومدى تأكيده مذكور أدناه في قائمة المعالِجين. ولا ندمج خدمات خرائط أو إعلانات، ونُسلّم كل الخطوط محليًا. ولقياس الوصول نستعمل Vercel Web Analytics وVercel Speed Insights — دون ملفات تعريف ارتباط، ودون معرّف عابر للأجهزة، وبعد موافقتكم الصريحة فقط؛ وبدونها لا يُحمَّل أي سكربت. وإن سلكتم طريق واتساب فتسري إضافةً إلى ذلك شروط Meta Platforms Ireland Ltd.",
         },
         {
           title: "نموذج التواصل والمواعيد واستفسارات المنتجات",
-          body: "حين ترسلون أحد نماذجنا ننقل بياناتكم — الاسم والمنشأة والبريد والهاتف ورسالتكم — إلى بريدنا info@creadig.de ونرسل إليكم تأكيدًا. وللإرسال نستعمل Resend (Resend Inc.، الولايات المتحدة) كمعالج بالإنابة وفق المادة 28، بضمان الشروط التعاقدية النموذجية وفق المادة 46(2)(ج). والأساس القانوني هو موافقتكم وفق المادة 6(1)(أ)، التي تمنحونها صراحةً قبل الإرسال ويمكنكم سحبها في أي وقت بأثر مستقبلي. ونحن لا نحتفظ بقاعدة بيانات: طلبكم يوجد حصرًا في بريدنا الإلكتروني. وإن سلكتم طريق واتساب بدلًا من ذلك فتسري شروط Meta Platforms Ireland Ltd.",
+          body: "حين ترسلون أحد نماذجنا ننقل بياناتكم — الاسم والمنشأة والبريد والهاتف ورسالتكم — إلى بريدنا info@creadig.de ونرسل إليكم تأكيدًا. وللإرسال نستعمل Resend (Resend Inc.، الولايات المتحدة) كمعالج بالإنابة؛ والأساس المُقرَّر لذلك هو المادة 28 والشروط التعاقدية النموذجية وفق المادة 46(2)(ج). والأساس القانوني هو موافقتكم وفق المادة 6(1)(أ)، التي تمنحونها صراحةً قبل الإرسال ويمكنكم سحبها في أي وقت بأثر مستقبلي. ونحن لا نحتفظ بقاعدة بيانات: طلبكم يوجد حصرًا في بريدنا الإلكتروني. وإن سلكتم طريق واتساب بدلًا من ذلك فتسري شروط Meta Platforms Ireland Ltd.",
           bodyStored:
-            "حين ترسلون أحد نماذجنا ننقل بياناتكم — الاسم والمنشأة والبريد والهاتف ورسالتكم — إلى بريدنا info@creadig.de ونرسل إليكم تأكيدًا. وللإرسال نستعمل Resend (Resend Inc.، الولايات المتحدة) كمعالج بالإنابة وفق المادة 28، بضمان الشروط التعاقدية النموذجية وفق المادة 46(2)(ج). والأساس القانوني هو موافقتكم وفق المادة 6(1)(أ)، التي تمنحونها صراحةً قبل الإرسال ويمكنكم سحبها في أي وقت بأثر مستقبلي. ونحفظ طلبكم إضافةً إلى ذلك في قاعدة بيانات كي نتمكن من معالجته بموثوقية وتتبّع مرحلته. وتُشغّل قاعدة البيانات هذه شركة Neon, LLC كمعالج بالإنابة وفق المادة 28؛ والبيانات محفوظة في منطقة فرانكفورت (aws-eu-central-1). وإن لم يُبرَم عقد حذفنا طلبكم بعد 12 شهرًا من آخر تواصل. وإن سلكتم طريق واتساب بدلًا من ذلك فتسري شروط Meta Platforms Ireland Ltd.",
+            "حين ترسلون أحد نماذجنا ننقل بياناتكم — الاسم والمنشأة والبريد والهاتف ورسالتكم — إلى بريدنا info@creadig.de ونرسل إليكم تأكيدًا. وللإرسال نستعمل Resend (Resend Inc.، الولايات المتحدة) كمعالج بالإنابة؛ والأساس المُقرَّر لذلك هو المادة 28 والشروط التعاقدية النموذجية وفق المادة 46(2)(ج). والأساس القانوني هو موافقتكم وفق المادة 6(1)(أ)، التي تمنحونها صراحةً قبل الإرسال ويمكنكم سحبها في أي وقت بأثر مستقبلي. ونحفظ طلبكم إضافةً إلى ذلك في قاعدة بيانات كي نتمكن من معالجته بموثوقية وتتبّع مرحلته. وتُشغّل قاعدة البيانات هذه شركة Neon, LLC كمعالج بالإنابة على الأساس المُقرَّر نفسه؛ والبيانات محفوظة في منطقة فرانكفورت (aws-eu-central-1). وإن لم يُبرَم عقد حذفنا طلبكم بعد 12 شهرًا من آخر تواصل. وإن سلكتم طريق واتساب بدلًا من ذلك فتسري شروط Meta Platforms Ireland Ltd.",
         },
         {
           title: "كم نحتفظ بالأشياء",
@@ -7576,7 +7580,7 @@ export const dictionary = {
       save: "حفظ الاختيار",
       alwaysActive: "مفعَّل دائمًا",
       thirdCountry:
-        "قياس الوصول يجري عبر Vercel Inc. في الولايات المتحدة. وإن سمحتم به فأنتم توافقون صراحةً في الوقت نفسه على نقل بيانات وصولكم إلى هناك (المادة 49(1)(أ)) — إضافةً إلى الشروط التعاقدية النموذجية التي أبرمناها مع Vercel. ولا يسري في الولايات المتحدة مستوى حماية بيانات مكافئ للأوروبي: يمكن للسلطات طلب الوصول، وقد لا تتوفر سبل انتصاف فعّالة ضد ذلك. ودون موافقتكم لا يجري أي نقل.",
+        "قياس الوصول يجري عبر Vercel Inc. في الولايات المتحدة. وإن سمحتم به فأنتم توافقون صراحةً في الوقت نفسه على نقل بيانات وصولكم إلى هناك (المادة 49(1)(أ)) — إضافةً إلى الشروط التعاقدية النموذجية المُقرَّرة لذلك. ولا يسري في الولايات المتحدة مستوى حماية بيانات مكافئ للأوروبي: يمكن للسلطات طلب الوصول، وقد لا تتوفر سبل انتصاف فعّالة ضد ذلك. ودون موافقتكم لا يجري أي نقل.",
       settingsLabel: "إعدادات ملفات تعريف الارتباط",
       settingsTitle: "تفضيلات الخصوصية",
       close: "إغلاق",

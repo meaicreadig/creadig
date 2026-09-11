@@ -18,6 +18,31 @@ export function Hero() {
 
   const lines = [t.hero.headlineLine1, t.hero.headlineLine2, t.hero.headlineLine3]
   /*
+   * PHASE 1 · COMMERCIAL COMPLETION — DER HERO HIELT SICH SELBST VERBORGEN.
+   *
+   * Hier stand viermal `initial={{ opacity: 0 }}`: Eyebrow, Kopfzeile,
+   * Unterzeile und die Fusszeile des Bildschirms starteten unsichtbar und
+   * wurden erst von framer-motion eingeblendet. Das Server-HTML trug die
+   * Null also mit aus — wer die Startseite aufrief oder im Browser dorthin
+   * zurueck navigierte, sah bis zur Hydration eine leere Flaeche ueber die
+   * volle Fensterhoehe.
+   *
+   * GATE 04 hat genau diese Entscheidung fuer `Reveal` schon getroffen:
+   * Inhalt wird nie verborgen, Bewegung bewegt nur die Position. Der Hero
+   * war die letzte Stelle, die es noch anders machte — ausgerechnet die
+   * erste, die jemand sieht. Jetzt animiert er `y`, nicht Sichtbarkeit.
+   *
+   * Die Zeilenmaske bleibt, denn sie IST die Bewegung der Kopfzeile. Aber
+   * sie hat dasselbe Problem, nur anders geschrieben: framer-motion schreibt
+   * `initial` in das Server-HTML, gemessen am 11.09.2026 steht dort
+   * `style="transform:translateY(112%)"` an jeder der drei Zeilen. Ohne
+   * JavaScript bleibt die Ueberschrift damit dauerhaft aus der Maske
+   * geschoben — die Seite haette keine sichtbare H1.
+   *
+   * Deshalb der `<noscript>`-Block unten: Laeuft kein JavaScript, faengt
+   * auch keine Animation an, und dann ist der Startwert kein Startwert mehr,
+   * sondern ein Fehler. Er wird genau dort zurueckgenommen.
+   *
    * Die Zeilenmaske (`overflow-hidden`) schneidet die Enthuellung.
    * Arabisch: knappes em-Polster gegen Madda/Punkte — 0.22em hatte die
    * drei Hero-Zeilen sichtbar auseinandergezogen (Owner: „arası açılmış").
@@ -28,10 +53,19 @@ export function Hero() {
     <section id="top" className="relative isolate flex min-h-[100svh] flex-col overflow-hidden">
       <SystemField />
 
+      {/*
+        Kein JavaScript, keine Animation — und damit kein Grund, warum die
+        Kopfzeile 112 % unter ihrer Zeile stehen sollte. Greift nur im
+        `noscript`-Fall; mit JavaScript ist dieser Block nicht im Dokument.
+      */}
+      <noscript>
+        <style>{"#top h1 span[style]{transform:none!important}"}</style>
+      </noscript>
+
       <div className="section-gutter relative z-10 flex flex-1 flex-col justify-center pt-32 pb-14">
         <motion.div
-          initial={reduce ? undefined : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={reduce ? undefined : { y: 12 }}
+          animate={{ y: 0 }}
           transition={{ duration: 0.5, ease: EASE }}
         >
           <SectionEyebrow label={t.hero.eyebrow} />
@@ -64,8 +98,8 @@ export function Hero() {
         </h1>
 
         <motion.div
-          initial={reduce ? undefined : { opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={reduce ? undefined : { y: 24 }}
+          animate={{ y: 0 }}
           transition={{ duration: 0.7, delay: 0.38, ease: EASE }}
           className="border-line mt-14 grid gap-8 border-t pt-10 lg:grid-cols-12 lg:gap-12"
         >
@@ -115,8 +149,7 @@ export function Hero() {
       </div>
 
       <motion.div
-        initial={reduce ? undefined : { opacity: 0 }}
-        animate={{ opacity: 1 }}
+        animate={reduce ? undefined : { y: [6, 0] }}
         transition={{ duration: 0.6, delay: 0.6 }}
         className="section-gutter border-line relative z-10 flex items-center justify-between border-t py-5"
       >
