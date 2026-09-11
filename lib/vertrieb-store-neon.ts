@@ -19,6 +19,8 @@ import { SALES_LABELS_DE, TERMINAL_STATES } from "@/lib/lead-store"
 import {
   neonClient,
   readOwnerLoadSamples,
+  readMeasurementSamples,
+  writeMeasurementSample,
   writeOwnerLoadSample,
   type Sql,
 } from "@/lib/neon-client"
@@ -41,6 +43,7 @@ import type {
   VertriebStore,
   VertriebSummary,
   OwnerLoadSample,
+  MeasurementSampleRow,
 } from "@/lib/vertrieb"
 import { LIFECYCLE_LABELS, RELATIONSHIP_LABELS } from "@/lib/vertrieb"
 
@@ -1763,6 +1766,34 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
       try {
         await ready()
         return (await writeOwnerLoadSample(sql, input)) ? "neu" : "schon-gemessen"
+      } catch {
+        return "nicht-moeglich"
+      }
+    },
+
+    /* ── PROOF OPERATIONS P1 · die Messreihe zu beliebigen Kennzahlen ────
+     *
+     * Dieselbe Bauart wie Gate 27 daruber, aus demselben Grund: Die Tabelle
+     * steht absichtlich nicht in `REQUIRED_TABLES`. Ihr Fehlen darf das Haus
+     * nicht anhalten — es darf nur nicht als „nichts gemessen" durchgehen.
+     */
+
+    async measurementSamples(limit = 2000): Promise<MeasurementSampleRow[] | null> {
+      try {
+        await ready()
+        return await readMeasurementSamples(sql, limit)
+      } catch {
+        /* Kein `[]`. Eine Reihe, die niemand lesen konnte, ist keine leere Reihe. */
+        return null
+      }
+    },
+
+    async recordMeasurementSample(
+      input: MeasurementSampleRow,
+    ): Promise<"neu" | "schon-erfasst" | "nicht-moeglich"> {
+      try {
+        await ready()
+        return (await writeMeasurementSample(sql, input)) ? "neu" : "schon-erfasst"
       } catch {
         return "nicht-moeglich"
       }

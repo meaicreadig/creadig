@@ -605,6 +605,53 @@ export const SCHEMA: string[] = [
      created_at timestamptz NOT NULL DEFAULT now()
    )`,
   `CREATE UNIQUE INDEX IF NOT EXISTS owner_load_samples_day_idx ON owner_load_samples (measured_on)`,
+
+  /*
+   * 014 · PROOF OPERATIONS P1 — DIE MESSREIHE ZU BELIEBIGEN KENNZAHLEN.
+   *
+   * Zweite Ausnahme von der Hausregel „nicht speichern, was sich ableiten
+   * laesst" — aus demselben Grund wie `owner_load_samples`: Ein Verlauf
+   * laesst sich nicht ableiten.
+   *
+   * `metric_key` + `side` + `measured_on` IST EINDEUTIG.
+   * Eine Kennzahl hat je Seite und Tag genau einen Wert. Zwei Werte fuer
+   * denselben Tag waeren zwei Wahrheiten, und die spaeter geschriebene
+   * gewaenne, ohne besser zu sein.
+   *
+   * `side` UNTERSCHEIDET AUSGANG UND DANACH.
+   * Der ganze Sinn der Tabelle. Ohne diese Spalte waere ein Verlauf nur eine
+   * Kurve — und aus einer Kurve laesst sich jede gewuenschte Verbesserung
+   * herauslesen, indem man die Endpunkte waehlt.
+   *
+   * `cases` UND `source` SIND NOT NULL.
+   * Ueber wie viele Faelle gemessen wurde und woher der Wert kommt, ist Teil
+   * der Messung und nicht ihre Randnotiz. Eine Zahl ohne beides traegt
+   * nichts (`probeTraegt` in `lib/messreihe.ts`) — und was nichts traegt,
+   * soll gar nicht erst in eine Form passen, die traegt aussieht.
+   *
+   * KEINE SPALTE `improvement`, `trend` ODER `percent`.
+   * Das Urteil faellt aus zwei Proben und den Regeln in `lib/messreihe.ts`.
+   * Es faellt ausdruecklich NICHT, wenn weniger als 28 Tage dazwischen
+   * liegen, weniger als 20 Faelle dahinter stehen oder die Quellen sich
+   * unterscheiden. Eine gespeicherte Trendzahl waere genau das
+   * Automationstheater, das der Gate-Vertrag verbietet.
+   *
+   * Idempotent. Additiv. Aendert keine bestehende Zeile.
+   */
+  `CREATE TABLE IF NOT EXISTS measurement_samples (
+     id text PRIMARY KEY,
+     metric_key text NOT NULL,
+     side text NOT NULL,
+     measured_on date NOT NULL,
+     value numeric NOT NULL,
+     cases integer NOT NULL,
+     source text NOT NULL,
+     recorded_by text NOT NULL,
+     note text,
+     created_at timestamptz NOT NULL DEFAULT now()
+   )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS measurement_samples_key_idx
+     ON measurement_samples (metric_key, side, measured_on)`,
 ]
 
 /**
@@ -1003,6 +1050,15 @@ export async function applyExclusions(sql: Sql): Promise<void> {
  * ein. Wer das vergisst, merkt es beim naechsten Start gegen eine frische
  * Datenbank — und nicht in Produktion.
  */
+/*
+ * Was `verifySchema` als PFLICHT prueft.
+ *
+ * `owner_load_samples` (013) und `measurement_samples` (014) stehen bewusst
+ * NICHT hier. Beide sind Messreihen: Ohne sie faellt kein Vorgang aus, es
+ * entsteht nur kein Verlauf. Sie als Pflicht zu fuehren wuerde jede
+ * Umgebung, die noch nicht migriert ist, als kaputt melden — und damit die
+ * Pruefung abstumpfen, die die wirklich tragenden Tabellen schuetzt.
+ */
 const REQUIRED_TABLES = [
   "leads",
   "organisations",
@@ -1084,6 +1140,78 @@ export async function writeOwnerLoadSample(sql: Sql, input: OwnerLoadSample): Pr
      VALUES ($1, $2::date, $3::jsonb, $4, $5)
      ON CONFLICT DO NOTHING RETURNING id`,
     [`ol-${input.am}`, input.am, JSON.stringify(input.counts), input.vertriebGemessen, input.note],
+  )) as { id: string }[]
+  return rows.length > 0
+}
+
+/* ── Messreihe (Proof Operations P1) ────────────────────────────────────── */
+
+export type MessProbeZeile = {
+  kennzahl: string
+  seite: string
+  am: string
+  wert: number
+  faelle: number
+  quelle: string
+  von: string
+  notiz: string | null
+}
+
+/** Alle Proben, aelteste zuerst — der Verlauf bleibt vollstaendig lesbar. */
+export async function readMeasurementSamples(sql: Sql, limit = 2000): Promise<MessProbeZeile[]> {
+  const rows = (await sql.query(
+    `SELECT metric_key, side, to_char(measured_on, 'YYYY-MM-DD') AS am,
+            value, cases, source, recorded_by, note
+       FROM measurement_samples ORDER BY measured_on ASC, metric_key ASC LIMIT $1`,
+    [limit],
+  )) as {
+    metric_key: string
+    side: string
+    am: string
+    value: string | number
+    cases: number
+    source: string
+    recorded_by: string
+    note: string | null
+  }[]
+  return rows.map((r) => ({
+    kennzahl: r.metric_key,
+    seite: r.side,
+    am: r.am,
+    wert: Number(r.value),
+    faelle: Number(r.cases),
+    quelle: r.source,
+    von: r.recorded_by,
+    notiz: r.note,
+  }))
+}
+
+/**
+ * Eine Probe festhalten. `false`, wenn Kennzahl, Seite und Tag schon eine haben.
+ *
+ * Die Kennung entsteht aus genau diesen drei Angaben, nicht aus dem Zufall —
+ * deshalb faengt `ON CONFLICT DO NOTHING` ohne Ziel beides ab: den
+ * Primaerschluessel und den Eindeutigkeitsindex. Ueberschrieben wird nie. Wer
+ * sich vermessen hat, misst an einem anderen Tag noch einmal; die falsche
+ * Zahl bleibt sichtbar, damit sie erklaerbar bleibt.
+ */
+export async function writeMeasurementSample(sql: Sql, p: MessProbeZeile): Promise<boolean> {
+  const rows = (await sql.query(
+    `INSERT INTO measurement_samples
+       (id, metric_key, side, measured_on, value, cases, source, recorded_by, note)
+     VALUES ($1, $2, $3, $4::date, $5, $6, $7, $8, $9)
+     ON CONFLICT DO NOTHING RETURNING id`,
+    [
+      `ms-${p.kennzahl}-${p.seite}-${p.am}`,
+      p.kennzahl,
+      p.seite,
+      p.am,
+      p.wert,
+      p.faelle,
+      p.quelle,
+      p.von,
+      p.notiz,
+    ],
   )) as { id: string }[]
   return rows.length > 0
 }

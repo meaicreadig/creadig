@@ -162,6 +162,21 @@ export const FLAECHEN: readonly Flaeche[] = [
    */
   { pfad: "/admin/cockpit", klasse: "eigene-lage", fuer: ["owner"] },
 
+  /*
+   * PROOF OPERATIONS P1 — der Beleg-Betrieb.
+   *
+   * `fremde-personen`, obwohl die Seite keine Kundenakte zeigt: Sie nennt
+   * namentlich, WELCHER Kunde einer Veroeffentlichung noch nicht zugestimmt
+   * hat. Das ist eine Auskunft ueber einen Dritten, und sie ist heikler als
+   * eine Adresse — sie beschreibt seine Haltung.
+   *
+   * Nur `owner`. Nicht `vertrieb`: Wer taeglich mit Kunden spricht und
+   * gleichzeitig eine Liste sieht, auf der „Freigabe fehlt" steht, fragt
+   * irgendwann im falschen Moment danach. Die Freigabe holt der Owner, im
+   * dafuer vorgesehenen Gespraech.
+   */
+  { pfad: "/admin/beleg", klasse: "fremde-personen", fuer: ["owner"] },
+
   { pfad: "/admin/kunden", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   { pfad: "/admin/kunden/:id", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
 

@@ -515,6 +515,24 @@ export const EXCLUSION_OTHER_CONTEXT = "Arbeitskontakt ausserhalb des creaDIG-Ve
  * Deshalb: Wer Vertrieb 1.0 will, braucht die echte Datenbank. Fehlt sie,
  * meldet die Oberfläche das — und erfindet nichts.
  */
+/**
+ * Eine Zeile der Messreihe, wie sie in der Datenbank liegt.
+ *
+ * Bewusst flach und ohne die Typen aus `lib/messreihe.ts`: Der Store kennt
+ * keine Kennzahl-Definitionen, er transportiert Zeilen. Die Bedeutung
+ * bekommen sie erst dort, wo die Definition danebensteht.
+ */
+export type MeasurementSampleRow = {
+  kennzahl: string
+  seite: string
+  am: string
+  wert: number
+  faelle: number
+  quelle: string
+  von: string
+  notiz: string | null
+}
+
 export type VertriebStore = {
   summary(): Promise<VertriebSummary>
 
@@ -698,6 +716,29 @@ export type VertriebStore = {
    * Aufruf ueberschreibt deshalb nichts.
    */
   recordOwnerLoadSample(input: OwnerLoadSample): Promise<"neu" | "schon-gemessen" | "nicht-moeglich">
+
+  /* ── Proof Operations P1 · die Messreihe zu beliebigen Kennzahlen ────── */
+
+  /**
+   * Alle Messproben, aelteste zuerst — oder `null`.
+   *
+   * Dieselbe Unterscheidung wie bei `ownerLoadSamples`: `null` heisst „nicht
+   * lesbar", `[]` heisst „noch nichts erhoben". Beim Beleg-Betrieb wiegt der
+   * Unterschied besonders schwer — ein nicht lesbarer Tisch saehe sonst aus
+   * wie ein Haus, das nie gemessen hat.
+   */
+  measurementSamples(limit?: number): Promise<MeasurementSampleRow[] | null>
+
+  /**
+   * Eine Probe festhalten.
+   *
+   * `schon-erfasst`, wenn Kennzahl, Seite und Tag bereits eine haben.
+   * Ueberschrieben wird nie: Wer sich vermessen hat, misst an einem anderen
+   * Tag noch einmal — die falsche Zahl bleibt sichtbar und damit erklaerbar.
+   */
+  recordMeasurementSample(
+    input: MeasurementSampleRow,
+  ): Promise<"neu" | "schon-erfasst" | "nicht-moeglich">
 }
 
 /**

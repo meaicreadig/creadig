@@ -102,6 +102,16 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin/vertrieb", label: "Vertrieb", hint: "Anfragen, Pipeline, Beziehungen" },
   { href: "/admin/kunden", label: "Kunden", hint: "Bestand, Standorte, Historie" },
   { href: "/admin/material", label: "System", hint: "Material, Betrieb, Entscheidungen" },
+  /*
+   * PROOF OPERATIONS P1 — der Beleg-Betrieb bekommt einen eigenen Punkt und
+   * keinen Unterpunkt von „System".
+   *
+   * Der Materialstand beantwortet „was ist leer?". Der Beleg-Betrieb
+   * beantwortet „was wird als Naechstes beweisbar?" — eine Inventur gegen
+   * eine Reihenfolge. Als Unterseite von System waere die zweite Frage in der
+   * ersten verschwunden, und genau sie ist der Engpass dieses Hauses.
+   */
+  { href: "/admin/beleg", label: "Beleg", hint: "Was als Nächstes beweisbar wird" },
 ]
 
 export function AdminShell({
