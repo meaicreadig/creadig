@@ -8,7 +8,7 @@ Reihenfolge steht live unter **`/admin/beleg`**.
 
 | # | Handlung | Gibt frei | Zeitabhängig? | Wirkung auf die Website |
 |---|---|---|---|---|
-| **1** | **Erste Messprobe für fibero erfassen** — `npm run messprobe -- --kennzahl fibero-ungeprueft --seite ausgang --wert … --faelle … --quelle system-zaehlung --von "Emin" --schreiben` | Startet die Uhr für den ersten echten Wirkungsbeleg des Hauses | **Ja** — danach 28 Tage bis zum Vergleich | Heute keine. In drei Monaten die erste belegte Zahl, die der Aufwandsrechner stützen kann |
+| **1** | **Erste Messprobe für fibero erfassen** — `npm run messprobe -- --kennzahl fibero-ungeprueft --seite ausgang --wert … --faelle … --quelle system-zaehlung --von "Emin" --schreiben` | Startet die Uhr für den ersten echten Wirkungsbeleg des Hauses | **Ja** — danach 28 Tage bis zum Vergleich | Heute keine. Nach 28 Tagen die erste belegte Zahl, die der Aufwandsrechner stützen kann |
 | **2** | **Eine Kundenfreigabe holen** — einen der drei Kandidaten wählen, schriftlich Name + Fallstudie freigeben lassen, Fundstelle in `releases[]` eintragen | Den ersten öffentlichen Kundenbeleg überhaupt | Nein | `/arbeiten` kehrt **ohne Code-Änderung** in Index und Sitemap zurück; der Mittelstands-Blocker fällt |
 | **3** | **Kapazität nennen** — eine Zahl, die auch im vollen Monat hält, mit dem Zeitraum, aus dem sie stammt | `kapazitaet-projekte` | Nein | `/unternehmen` schließt eine Lücke, die dort heute ausdrücklich benannt ist |
 | **4** | **Vertretung benennen** — eine reale Person oder Funktion mit Zugang, plus was sie fortführen kann und was nicht | `vertretung-ausfall` | Nein | Dieselbe Stelle; zweite der vier Antworten, die ein Mittelständler erwartet |
