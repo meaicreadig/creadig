@@ -7,6 +7,7 @@ import { ArrowDown, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { heroChips } from "@/lib/site-data"
 import { SystemField } from "@/components/hero/system-field"
+import { ThesisLine } from "@/components/creative/thesis-line"
 import { MagneticButton } from "@/components/ui/magnetic-button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -105,11 +106,29 @@ export function Hero() {
           })}
         </h1>
 
+        {/*
+          DIE THESE ALS LINIE — UND WARUM SIE HIER HAENGT UND NICHT WEITER UNTEN.
+
+          Der erste Versuch ersetzte den Trennstrich ueber der Unterzeile: eine
+          Linie ueber die volle Inhaltsbreite, 1800 Pixel weit. Im Bild gemessen
+          war das Ergebnis genau das, was ersetzt werden sollte — ein
+          Trennstrich. Auf dieser Laenge verschwindet eine Haarlinie mit 30
+          Prozent Deckkraft, und drei Luecken darin liest niemand als Aussage.
+
+          Jetzt steht sie direkt unter der Kopfzeile und nur so breit wie ein
+          Satz. Damit gehoert sie sichtbar ZU „Wir bauen, was andere nicht
+          sehen." und nicht zwischen zwei Bloecke: links hoert sie dreimal auf,
+          in der Mitte steht ein Knoten, rechts laeuft sie durch.
+        */}
+        <div className="mt-9 max-w-xl">
+          <ThesisLine />
+        </div>
+
         <motion.div
           initial={reduce ? undefined : { y: 24 }}
           animate={{ y: 0 }}
           transition={{ duration: 0.7, delay: 0.38, ease: EASE }}
-          className="border-line mt-14 flex flex-col gap-8 border-t pt-10 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:gap-y-8"
+          className="mt-14 flex flex-col gap-8 pt-10 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:gap-y-8"
         >
           {/*
             Die Unterzeile bleibt beim Titel — sie erklaert ihn. Was nach

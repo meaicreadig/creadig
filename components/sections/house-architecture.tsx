@@ -3,6 +3,7 @@
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { SystemRail } from "@/components/creative/system"
 import { productWorks, productWorlds, serviceLayers } from "@/lib/site-data"
 
 /**
@@ -146,11 +147,34 @@ export function HouseArchitecture() {
               const fundament = i === layersTopDown.length - 1
               return (
                 <Reveal key={layer.key} as="li" delay={0.05 * i} y={12}>
+                  {/*
+                    DIE FUGE WAR EINE TRENNLINIE — JETZT IST SIE EINE SCHIENE.
+
+                    Jede Lage trug `border-t`. Fuenf waagerechte Striche in
+                    einem Rahmen ergeben aber genau das, was der Audit an
+                    dieser Stelle sieht: eine Tabelle. Und eine Tabelle
+                    TRENNT, waehrend dieses Bild VERBINDEN soll.
+
+                    Die Schiene sagt dasselbe im Vokabular des Hauses (Linie,
+                    Knoten, Luecke): eine durchgehende Linie durch alle fuenf
+                    Lagen, unten am Fundament ein kraeftigerer Knoten. Damit
+                    erbt „Das Haus" dieselbe Sprache wie das Systembild auf
+                    der Startseite — statt eine zweite zu erfinden.
+                  */}
                   <div
-                    className={`border-line grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 border-t px-5 py-6 md:grid-cols-12 md:gap-x-8 md:px-7 md:py-7 ${
+                    className={`flex items-stretch gap-5 px-5 md:gap-7 md:px-7 ${
                       fundament ? "bg-surface" : ""
                     }`}
                   >
+                    <SystemRail
+                      ton="verbunden"
+                      achse="stapel"
+                      erste={i === 0}
+                      letzte={fundament}
+                      gross={fundament}
+                      kraeftig={fundament}
+                    />
+                    <div className="grid flex-1 grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-2 py-6 md:grid-cols-12 md:gap-x-8 md:py-7">
                     {/*
                       Die Ziffer traegt die Ordnung. Sie steht in einer eigenen
                       Spalte, damit die drei Textspalten auf allen fuenf Zeilen
@@ -183,6 +207,7 @@ export function HouseArchitecture() {
                     <span className="type-small text-muted-foreground col-span-2 text-pretty md:col-span-8">
                       {layerCopy.what}
                     </span>
+                    </div>
                   </div>
                 </Reveal>
               )

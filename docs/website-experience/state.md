@@ -1,95 +1,97 @@
-# Website-Experience · Hauptbuch W00–W15
+# Website-Experience · Hauptbuch
 
 > Stand 13.09.2026 · Branch `feat/system-haus-site`
-> **Kein Lane ist CLOSED.** Eine gebaute Komponente ist kein Closure; Closure
-> verlangt die beabsichtigte Käufer-Erfahrung auf der **echten** Seite.
+> **Preview-ready ist nicht Closure.** Closure verlangt die beabsichtigte
+> Käufer-Erfahrung auf der **echten** Seite — es läuft nichts in Produktion.
 
-| Lane | BUILD | CUTOVER | LIVE | CLOSURE | Stand |
-|---|:--:|:--:|:--:|:--:|---|
-| **W00** Experience-Baseline | 🟢 | — | 🟢 | 🟢 | 48 Aufnahmen, 1440×900 und 390×844, hell und dunkel, vor der Änderung |
-| **W01** Creative-System | 🟡 | 🔴 | 🔴 | 🔴 | Richtung steht, **eine** Umsetzung. Ein Motiv wird erst durch Wiederkehr ein System |
-| **W02** Hero-These | 🔴 | 🔴 | 🔴 | 🔴 | unberührt — erste Ansicht trägt weiterhin keinen Beweis |
-| **W03** Systemvisualisierung | 🟡 | 🔴 | 🔴 | 🔴 | Betriebsfluss steht; die fünf Ebenen und „Das Haus" sind noch Liste bzw. Tabelle |
-| **W04** Content-Architektur | 🔴 | 🔴 | 🔴 | 🔴 | nicht begonnen |
-| **W05** Leistungen | 🔴 | 🔴 | 🔴 | 🔴 | nicht begonnen |
-| **W06** Produkte | 🔴 | 🔴 | 🔴 | 🔴 | nicht begonnen |
-| **W07** Beweis / Arbeiten | 🔴 | 🔴 | 🔴 | 🔴 | **wartet auf echte Freigabe** — kein Code-Problem |
-| **W08** Gravitas | 🔴 | 🔴 | 🔴 | 🔴 | nicht begonnen |
-| **W09** Käufer-Routen | 🔴 | 🔴 | 🔴 | 🔴 | nicht begonnen |
-| **W10** Bewegung | 🟡 | 🔴 | 🔴 | 🔴 | Bewegungs-Grammatik definiert und einmal umgesetzt (das Signal) |
-| **W11** Mobile | 🟡 | 🔴 | 🔴 | 🔴 | Prinzip steht (Spur senkrecht) und gilt für eine Sektion |
-| **W12** Wahrheits-Ton | 🔴 | 🔴 | 🔴 | 🔴 | nicht begonnen — die Entprominenzierung steht aus |
-| **W13** Editorialer Rhythmus | 🟡 | 🔴 | 🔴 | 🔴 | ein Taktbruch gesetzt (dunkel → Zeichnung → Bildband) |
-| **W14** Käufer-Audit | 🔴 | 🔴 | 🔴 | 🔴 | erst nach mehr Substanz sinnvoll |
-| **W15** Live Evolution | 🔴 | 🔴 | 🔴 | 🔴 | nichts in Produktion |
+## Master Run A · Creative Core & Site Architecture
+
+| Lane | BUILD | Preview-ready | Stand |
+|---|:--:|:--:|---|
+| **A01** Creative Direction | 🟢 | 🟢 | These, Vokabular, Bewegungs-, Artefakt- und Rhythmus-Sprache, Mobile-Prinzip |
+| **A02** Creative Primitives | 🟢 | 🟢 | `components/creative/system.tsx` — drei Bausteine, zwei Achsen |
+| **A03** Systembild | 🟢 | 🟢 | auf die Primitive umgestellt, zwei Fehler behoben |
+| **A04** Fünf Ebenen | 🟢 | 🟢 | Treppe → Schiene; eine durchgehende Linie, fünf Einstiege |
+| **A05** Das Haus | 🟢 | 🟢 | Zeilenrahmen → Schiene; Fundament als kräftiger Knoten |
+| **A06** Hero-These | 🟢 | 🟢 | Trennstrich → Thesenlinie unter der Kopfzeile |
+| **A07** Homepage-Komposition | 🟢 | 🟢 | Wege eingefügt, Reihenfolge zweimal korrigiert (siehe unten) |
+| **A08** Käufer-Routen | 🟢 | 🟢 | drei Wege nach Lage, ohne Größen-Etiketten, ohne Ebenen-Jargon |
+| **A09** Editorialer Rhythmus | 🟢 | 🟢 | fünf Modi; **gemessen**: keine drei benachbarten Abschnitte gleich |
+| **A10** Bewegungs-Grammatik | 🟢 | 🟢 | nur das Signal bewegt sich; Knoten zeigt Aktivierung |
+| **A11** Mobile-Fundament | 🟢 | 🟢 | Spur senkrecht, Knoten auf ihrer Beschriftung, ein DOM |
+| **A12** Wahrheits-Ton | 🟢 | 🟢 | **gemessen statt geändert** — Hierarchie stimmt bereits (siehe unten) |
+| **A13** Gemeinsame Bausteine | 🟢 | 🟢 | vier Dateien, keine Mikro-Komponenten-Wüste |
+| **A14** Visuelle Regression | 🟢 | 🟢 | 100 Aufnahmen vorher, 100 nachher |
+| **A15** Preview-Reife | 🟢 | 🟡 | alles grün; **Push/Preview wartet auf Owner** |
 
 ---
 
-## Was in dieser Runde entstanden ist
+## Vier Fehler, die erst die Messung gezeigt hat
 
-**Creative Direction** (`creative-direction.md`) — visuelle These,
-Signature-System, Diagramm- und Bewegungssprache, Artefakt- und Bildstil,
-editorialer Rhythmus, Mobile-Prinzip. Auf einer Seite, nicht als Markenbibel.
+Alle vier wären im Quelltext unsichtbar geblieben.
 
-**Das Systembild** (`components/sections/betriebsfluss.tsx`) — der erste
-Signature-Moment. Zwei Spuren derselben Strecke: sechs Stationen mit fünf
-echten Lücken, darunter dieselbe Strecke als eine durchgehende Linie.
+**1 · Die gebrochene Spur war nicht gebrochen.** Zuerst eine durchgehende
+graue Linie mit kurzen Querstrichen an den Übergaben — im Bild las sich das
+wie die Skala eines Lineals. Jetzt hört die Linie vor jeder Übergabe auf.
 
-Die Entscheidung dahinter: **kein neues Formvokabular.** Die Seite besitzt die
-Haarlinie bereits, benutzt sie aber dekorativ. Hier bekommt sie eine
-Bedeutung — sie ist der Weg, den die Arbeit durch den Betrieb nimmt. Deshalb
-sieht das Bild nach creaDIG aus und nicht nach einem Template mit Diagramm.
+**2 · Auf dem Telefon lag jede Beschriftung eine Station über ihrem Punkt.**
+`self-center` stellt beide auf dieselbe Achse.
 
-Die sechs Stationen sind **keine neue Behauptung**: Sie stehen wortgleich in
-`lib/branchen.ts`. Das Bild sagt nichts, was die Firma nicht sagt — es sagt es
-in zwei Sekunden statt in einem Absatz.
+**3 · Die Thesenlinie im Hero war ein Trennstrich.** Über 1.800 Pixel
+verschwindet eine Haarlinie mit 30 % Deckkraft, und drei Lücken darin liest
+niemand als Aussage. Jetzt steht sie direkt unter der Kopfzeile, nur so breit
+wie ein Satz.
 
-## Zwei Fehler, die erst das Bild gezeigt hat
+**4 · Die drei Wege standen an der falschen Stelle — zweimal.** Eingefügt
+hinter den Ebenen, verletzten sie zwei Entscheidungen, die schon im Quelltext
+standen: `EntryLine` gehört **direkt** hinter die Ebenen (wer gelesen hat, was
+das Haus macht, fragt als Nächstes nach dem Preis), und „Drei Wege hinein"
+landete unmittelbar neben „Drei Arten anzufangen" — zwei Abschnitte, die
+beide drei Möglichkeiten anbieten, etwas zu beginnen. Gemessen kam dazu:
+Ebenen, Wege und Einstieg waren drei benachbarte Abschnitte derselben
+Grammatik. Die Wege stehen jetzt **vor** der Architektur, hinter dem Beleg.
 
-Beide wären im Quelltext unsichtbar geblieben:
+---
 
-1. **Die gebrochene Spur war nicht gebrochen.** Erst gezeichnet als
-   durchgehende graue Linie mit kurzen Querstrichen an den Übergaben — im
-   Bild las sich das wie die Skala eines Lineals. Der einzige Satz, den die
-   Zeichnung sagen soll, war nicht zu sehen. Jetzt hört die Linie vor jeder
-   Übergabe auf: Zwischen zwei Stationen steht Papier.
-2. **Auf dem Telefon lag jede Beschriftung eine Station über ihrem Punkt.**
-   Die Beschriftung klebte oben an der Zelle, der Knoten sass in deren Mitte.
-   `self-center` stellt beide auf dieselbe Achse.
+## Was gemessen statt behauptet wurde
 
-## Geprüft
+| Frage | Messung | Ergebnis |
+|---|---|---|
+| Sind drei benachbarte Abschnitte gleich komponiert? | gerendertes DOM, Modus je Abschnitt aus Bild/Schiene/Preis/Grund | **nein** — die Regel hält |
+| Stehen Verneinungen zu weit vorn? | jeder Satz der Startseite, Position in seinem Abschnitt | **nein** — 86–100 % durch; die frühen sind entlastend („Sie brauchen nicht alle"), nicht selbstbegrenzend |
+| Bundle | `next build` vorher/nachher | Startseite 320 → **323 kB**, geteiltes JS 102 → **103 kB** |
+| Barrierefreiheit | axe, WCAG 2.1 AA | **132/132**, Exit 0 |
+| Gate-Kette | `npm run postbuild` | **40 × OK**, Exit 0 |
+| RTL | `/ar`, Systembild | Spur läuft rechts → links, **kein Sonderfall im Code** |
 
-| Prüfung | Ergebnis |
-|---|---|
-| `tsc` | sauber |
-| ESLint | keine Warnung |
-| Gate-Kette | **40 × OK**, Exit 0 |
-| a11y (axe, WCAG 2.1 AA) | **132/132**, Exit 0 |
-| Vier-Sprachen-Parität | erzwungen zur Übersetzungszeit (`SameShape`) — DE, TR, EN, AR ergänzt |
-| RTL | geprüft auf `/ar`: Spur läuft rechts → links, Lücken und Goldlinie gespiegelt, **kein Sonderfall im Code** |
-| Bewegung | `prefers-reduced-motion` doppelt gesperrt — im Hook und in `globals.css` |
-| G18 | sechs Hashes unverändert, unstaged |
+**A12 ist deshalb grün, ohne dass eine Zeile geändert wurde.** Die
+Wahrheits-Hierarchie der Startseite ist bereits richtig: erst was wir tun,
+dann der Beleg, dann die Grenze. Etwas zu „verbessern", das die Messung als
+in Ordnung ausweist, wäre Beschäftigung gewesen.
 
-## Was diese Runde ausdrücklich nicht getan hat
+---
 
-Sie hat **keinen Kundenbeleg ersetzt.** `/arbeiten` ist unverändert leer, und
-das Systembild trägt die Kennzeichnung „Modell, kein Kundenergebnis" **am
-Bild**, nicht im Kleingedruckten. Ein unbeschriftetes Vorher/Nachher würde als
-Messung gelesen — und eine gemessene Ersparnis gibt es nicht.
+## Was ausdrücklich nicht getan wurde
 
-Sie hat die Marke **nicht ausgetauscht**: keine neue Palette, keine neue
-Typografie, keine neue Navigation, kein 3D, keine KI-Bilder, kein Stock.
+**Kein drittes Hero-Zeichen.** Zwei Motive hat der Owner am 29.08.2026
+abgelehnt (Knoten-Netz, Schienen-Treppe); die Begründung steht in
+`system-field.tsx`. Die Thesenlinie ist kein Zeichen hinter der Schrift — ein
+vorhandener Trennstrich hat eine Bedeutung bekommen.
 
-## Nächste eigenständige Arbeit
+**Kein Kundenbeleg ersetzt.** `/arbeiten` ist unverändert leer. Das Systembild
+trägt „Modell, kein Kundenergebnis" am Bild.
 
-In dieser Reihenfolge, alle ohne Owner:
+**Keine zweite Metapher.** Die Treppe der fünf Ebenen war gut begründet — aber
+sie war ein zweites Bildvokabular. Ein Creative-System entsteht aus Wiederkehr.
 
-1. **Die Grammatik wiederholen** — die fünf Ebenen und „Das Haus" tragen
-   heute Liste und Tabelle. Erst die Wiederkehr macht aus einem Motiv ein
-   System (W01/W03).
-2. **Hero-These** (W02) — die erste Ansicht trägt weiterhin keinen Beweis.
-3. **Wahrheits-Ton entprominenzieren** (W12) — Wahrheit bleibt, Reihenfolge
-   ändert sich: was wir tun, dann der Beleg, dann die Grenze.
+---
 
-**Owner-abhängig und hier nicht lösbar:** der öffentliche Kundenbeleg (W07).
-Das Creative-System kann ihn nicht ersetzen und tut es nicht.
+## Nächste eigenständige Arbeit (Run B)
+
+1. Produkt-Detailseiten: reale Oberflächen im Systemfenster statt Standbild.
+2. `/leistungen` verdichten und bebildern.
+3. Betriebscheck-Ergebnis als persönliche Systemlandkarte.
+4. `/arbeiten` als Beweis-Architektur reframen, solange keine Freigabe vorliegt.
+
+**Owner-abhängig:** der öffentliche Kundenbeleg. Das Creative-System ersetzt
+ihn nicht.

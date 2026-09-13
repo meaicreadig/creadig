@@ -4,6 +4,7 @@ import { Betriebsfluss } from "@/components/sections/betriebsfluss"
 import { SelectedWork } from "@/components/sections/selected-work"
 import { CapabilityTiles } from "@/components/sections/capability-tiles"
 import { EntryLine } from "@/components/sections/entry-line"
+import { Wege } from "@/components/sections/wege"
 import { CaseStudies } from "@/components/sections/case-studies"
 import { ImpactBand } from "@/components/sections/impact-band"
 import { CompanyTeaser } from "@/components/sections/company-teaser"
@@ -142,6 +143,35 @@ export function HomeRoute() {
 
       {/* 3 · C — Beweis vor Erklärung: randloses Band, eigene Produkte. → /produkte */}
       <SelectedWork />
+
+      {/*
+        3b · DIE DREI WEGE — wo gehoere ich hin, bevor die Architektur kommt.
+
+        ZWEIMAL FALSCH PLATZIERT, BIS ES GEMESSEN WAR.
+
+        Erst standen sie hinter den Ebenen und vor `EntryLine`. Zwei Gruende
+        sprachen dagegen, und beide standen schon im Quelltext:
+
+          · `EntryLine` gehoert DIREKT hinter die Ebenen. Der Kommentar
+            darunter sagt warum: Wer gelesen hat, was das Haus alles macht,
+            fragt als Naechstes nach dem Preis. Dazwischen gehoert nichts.
+
+          · „Drei Wege hinein" landete damit unmittelbar neben „Drei Arten
+            anzufangen" — zwei Abschnitte, die beide drei Moeglichkeiten
+            anbieten, etwas zu beginnen. Nebeneinander gelesen ist das keine
+            Fuehrung, sondern eine Gabelung zu viel.
+
+        Gemessen kam dazu, dass Ebenen, Wege und Einstieg drei benachbarte
+        Abschnitte mit derselben Grammatik waren — genau die Gleichfoermigkeit,
+        gegen die diese Runde antritt.
+
+        Hier steht die Frage richtig: Problem (Haltung) → Bild (Systembild) →
+        Beleg (die zwei echten Aufnahmen) → WO GEHOERE ICH HIN → wie das Haus
+        geordnet ist → was es kostet. Die Wege kommen VOR der Architektur,
+        weil ein Kaeufer sich in einer Lage wiedererkennt und nicht in einem
+        Ebenenmodell.
+      */}
+      <Wege />
 
       {/* 4 · B — Die fünf Ebenen als Verteiler-Kacheln. → /leistungen */}
       <CapabilityTiles />

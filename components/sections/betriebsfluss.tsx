@@ -3,6 +3,7 @@
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { SystemRail } from "@/components/creative/system"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 
 /**
@@ -76,75 +77,6 @@ import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
  * im Arabischen laeuft die Spur von rechts nach links, ohne Sonderfall.
  */
 
-/** Ein Punkt auf der Spur. */
-function Knoten({ gold, puls, verzug }: { gold?: boolean; puls?: boolean; verzug: number }) {
-  return (
-    <span
-      aria-hidden="true"
-      style={puls ? { animationDelay: `${verzug * 0.32}s` } : undefined}
-      className={[
-        "relative z-1 size-[7px] shrink-0 rounded-full",
-        gold ? "bg-gold" : "bg-muted-foreground/45",
-        puls ? "animate-signal" : "",
-      ].join(" ")}
-    />
-  )
-}
-
-/**
- * Ein halbes Streckenstueck — die Haelfte links bzw. oberhalb eines Knotens
- * oder die Haelfte rechts bzw. unterhalb.
- *
- * WARUM HALBE STUECKE UND NICHT GANZE ZWISCHEN DEN KNOTEN
- * Ein ganzes Stueck zwischen zwei Stationen macht die Zellen ungleich breit:
- * Die erste haette keines, die anderen je eines. Genau das war der erste
- * Versuch, und gemessen im Bild standen „Anfrage" und „Angebot" dicht
- * beieinander, waehrend rechts Platz blieb.
- *
- * Mit je einer Haelfte pro Seite ist JEDE Zelle gleich gebaut — sechs
- * gleich breite Spalten, der Knoten immer in der Mitte, die Beschriftung
- * darunter zentriert. Die Bruchstelle faellt dann automatisch genau auf die
- * Zellgrenze, also zwischen zwei Stationen.
- */
-function Streckenstueck({
-  gebrochen,
-  unsichtbar,
-  seite,
-}: {
-  gebrochen: boolean
-  unsichtbar?: boolean
-  seite: "vor" | "nach"
-}) {
-  /*
-    DIE LUECKE IST DAS ARGUMENT — also muss sie eine echte Luecke sein.
-    Der erste Versuch zeichnete eine durchgehende graue Linie und setzte an
-    jede Uebergabe einen kurzen Querstrich. Im Bild gemessen las sich das
-    wie die Skala eines Lineals: eine Linie mit Markierungen, nicht eine
-    unterbrochene Linie. Damit war der einzige Satz, den die Zeichnung sagen
-    soll, nicht zu sehen.
-    Jetzt hoert das Streckenstueck vor der Zellgrenze auf. Zwischen zwei
-    Stationen steht Papier. Nichts erklaert das; man sieht es.
-  */
-  const luecke = gebrochen
-    ? seite === "vor"
-      ? "mt-4 md:mt-0 md:ms-4"
-      : "mb-4 md:mb-0 md:me-4"
-    : ""
-
-  return (
-    <span
-      aria-hidden="true"
-      className={[
-        "block flex-1",
-        /* senkrecht auf dem Telefon, waagerecht ab md */
-        "w-px min-h-5 md:h-px md:w-auto md:min-h-0",
-        luecke,
-        unsichtbar ? "bg-transparent" : gebrochen ? "bg-muted-foreground/30" : "bg-gold/60",
-      ].join(" ")}
-    />
-  )
-}
-
 /** Eine Spur: sechs Stationen, gleich breite Zellen. */
 function Spur({
   stationen,
@@ -180,11 +112,14 @@ function Spur({
                 Beschriftung, ab md eine Zeile darueber — dieselben Elemente,
                 nur andere Flussrichtung.
               */}
-              <span className="relative flex shrink-0 flex-col items-center md:w-full md:flex-row">
-                <Streckenstueck seite="vor" gebrochen={gebrochen} unsichtbar={ersteZelle} />
-                <Knoten gold={!gebrochen} puls={puls} verzug={i} />
-                <Streckenstueck seite="nach" gebrochen={gebrochen} unsichtbar={letzteZelle} />
-              </span>
+              <SystemRail
+                ton={gebrochen ? "offen" : "verbunden"}
+                achse="fluss"
+                erste={ersteZelle}
+                letzte={letzteZelle}
+                puls={puls}
+                verzug={i}
+              />
 
               {/*
                 AUF DEM TELEFON MUSS DIE BESCHRIFTUNG AUF IHREM KNOTEN LIEGEN.

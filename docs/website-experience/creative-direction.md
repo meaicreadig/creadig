@@ -34,6 +34,46 @@ sondern **der Weg, den die Arbeit nimmt.**
 
 ---
 
+## 1a · Die eine Regel
+
+> **Die Linie ist semantisch. Nie dekorativ.**
+
+Eine Linie aus dem Vokabular darf bedeuten: Fluss, Uebergabe, Verbindung,
+Unterbrechung, Zustand, Weg, Fortschritt, Signal.
+
+Sie darf **nicht** sein: ein Trennstrich, ein goldener Zierstrich, eine
+Tapete. Dafuer gibt es `border-line` — die Trennlinie des Design-Systems, die
+mit diesem Vokabular nichts zu tun hat.
+
+**Wer eine Linie setzt, muss sagen koennen, was an ihr entlanglaeuft.**
+
+Diese Regel hat in der Umsetzung zweimal eine Entscheidung umgedreht:
+
+- Beim Ueberfahren einer Ebenenzeile lief ein goldener Strich von links nach
+  rechts ein. Huebsch, ohne Bedeutung — ersetzt durch einen Knoten, der
+  groesser wird: *diese* Ebene ist gerade aktiv.
+- Die drei Wege waeren beinahe als Stationen auf einer Strecke gelandet. Das
+  haette behauptet, Weg A komme vor Weg B — waehrend der Text daneben das
+  Gegenteil sagt. Jetzt sind sie drei **Stellen, an denen man auf die Linie
+  aufspringt**, und die Linie laeuft an beiden Enden weiter.
+
+## 1b · Das Vokabular — drei Bausteine
+
+Umgesetzt in `components/creative/system.tsx`.
+
+| Baustein | Bedeutung | Form |
+|---|---|---|
+| **SystemLine** | der Weg, den die Arbeit nimmt | Haarlinie; `ton: offen` oder `verbunden` |
+| **SystemNode** | eine Station, ein Zustand, ein Einstieg | Punkt; gold = verbunden |
+| **Die Luecke** | eine Uebergabe von Hand | die Linie hoert vor der Grenze auf |
+
+Zwei Achsen: `fluss` (waagerecht ab `md`, senkrecht auf dem Telefon) und
+`stapel` (immer senkrecht — ein Stapel, der waagerecht liegt, ist keiner).
+
+Ein Vokabular mit vierzig Woertern ist kein Vokabular. Diese drei tragen alle
+vier Stellen, an denen die Seite heute ein System zeigt: Systembild, fuenf
+Ebenen, Das Haus, Hero.
+
 ## 2 · Signature-System · „Der Betriebsfluss"
 
 Ein wiederkehrendes Bild, überall dieselbe Grammatik:

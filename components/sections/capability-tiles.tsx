@@ -4,6 +4,7 @@ import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
+import { SystemRail } from "@/components/creative/system"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { serviceLayers } from "@/lib/site-data"
 import { publishedServicePages } from "@/lib/service-pages"
@@ -64,23 +65,22 @@ import { publishedServicePages } from "@/lib/service-pages"
  * als Loch auf.
  */
 /*
- * Die Stufen als feste Klassen.
+ * HIER STANDEN FUENF STUFEN-KLASSEN, UND SIE SIND GEGANGEN.
  *
- * Tailwind erzeugt nur, was es woertlich im Quelltext findet — ein
- * gerechnetes `md:ps-[${i * 2}%]` entstuende nie. Fuenf Literale sind
- * ausserdem ehrlicher: Die Treppe hat genau fuenf Stufen, und wer eine
- * sechste Ebene ergaenzt, muss hier hinsehen.
+ * Die Treppe (`ps-0`, `ps-[2%]`, `ps-[4%]` …) war die richtige Antwort auf
+ * ein echtes Problem: Fuenf gleich breite Karten nebeneinander sagten „fuenf
+ * Dienstleistungen", waehrend der Satz daneben sagt „jede Ebene traegt die
+ * naechste". Der Einzug hat das repariert.
  *
- * `ps-` ist logisch (padding-inline-start) — im Arabischen laeuft die Treppe
- * damit von rechts.
+ * Er war aber eine ZWEITE Bildsprache. Die Seite hat inzwischen eine erste:
+ * Linie, Knoten, Luecke (`components/creative/system.tsx`). Zwei Metaphern
+ * fuer dieselbe Aussage sind eine zu viel — ein Creative-System entsteht aus
+ * Wiederkehr, nicht aus Vielfalt.
+ *
+ * Die Schiene sagt dasselbe wie die Treppe und sagt es im Vokabular des
+ * Hauses: eine durchgehende Linie, fuenf Knoten. Die Ebenen gehoeren
+ * zusammen, und jeder Knoten ist ein Einstieg.
  */
-const STUFE = [
-  "ps-0 md:ps-0",
-  "ps-2 md:ps-[2%]",
-  "ps-4 md:ps-[4%]",
-  "ps-6 md:ps-[6%]",
-  "ps-8 md:ps-[8%]",
-] as const
 
 export function CapabilityTiles() {
   const { t, locale } = useLocale()
@@ -114,34 +114,29 @@ export function CapabilityTiles() {
             const pages = publishedServicePages.filter((page) => page.layer === layer.key)
 
             return (
-              <Reveal key={layer.key} as="li" delay={0.05 * i} className="group border-line border-t last:border-b">
-                <div>
-                  <Link
-                    href={`/leistungen#ebene-${layer.key}`}
-                    className={`hover:bg-surface relative flex flex-col gap-x-8 gap-y-3 py-7 transition-colors duration-[var(--dur-2)] md:flex-row md:items-baseline ${STUFE[i]}`}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
-                    />
-                    <span className="eyebrow text-gold-text md:w-12 md:shrink-0">
-                      {layer.level}
-                    </span>
+              <Reveal key={layer.key} as="li" delay={0.05 * i}>
+                <Link
+                  href={`/leistungen#ebene-${layer.key}`}
+                  className="group hover:bg-surface flex items-stretch gap-5 transition-colors duration-[var(--dur-2)] md:gap-7"
+                >
+                  {/*
+                    Die Schiene laeuft DURCH alle fuenf Zeilen — deshalb hat
+                    die Zeile keinen eigenen Rahmen und keinen Innenabstand
+                    oben: Eine Trennlinie zwischen den Ebenen wuerde genau die
+                    Verbindung zerschneiden, die das Bild behauptet.
+                  */}
+                  <SystemRail
+                    ton="verbunden"
+                    achse="stapel"
+                    erste={i === 0}
+                    letzte={i === serviceLayers.length - 1}
+                    aktivierbar
+                    ausrichtung="kopf"
+                  />
+
+                  <span className="flex flex-1 flex-col gap-x-8 gap-y-2 py-6 md:flex-row md:items-baseline">
+                    <span className="eyebrow text-gold-text md:w-12 md:shrink-0">{layer.level}</span>
                     <h3 className="type-h4 md:w-56 md:shrink-0">{layerCopy.name}</h3>
-                    {/*
-                      Beschreibung und granulare Seiten stehen in EINER
-                      Spalte, nicht in zweien.
-
-                      Der erste Versuch gab den Seiten eine eigene schmale
-                      Spalte rechts. Bei „Digital" sind es vier — sie
-                      stapelten dort untereinander und machten die Zeile
-                      doppelt so hoch wie „Identity" mit einer. Gemessen: der
-                      Abschnitt wuchs von 880 auf 1.081 Pixel, also genau in
-                      die falsche Richtung.
-
-                      Als Zeile unter der Beschreibung kostet dieselbe
-                      Information eine Zeile statt vier.
-                    */}
                     <span className="flex-1">
                       <span className="type-small text-muted-foreground block max-w-md text-pretty">
                         {layerCopy.what}
@@ -160,8 +155,8 @@ export function CapabilityTiles() {
                         </span>
                       )}
                     </span>
-                  </Link>
-                </div>
+                  </span>
+                </Link>
               </Reveal>
             )
           })}

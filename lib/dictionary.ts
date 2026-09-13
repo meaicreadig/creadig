@@ -151,6 +151,55 @@ export const dictionary = {
         modelNote: "Modell, kein Kundenergebnis. Es zeigt die Struktur, die wir bauen — keine gemessene Ersparnis.",
       },
       /*
+       * DIE DREI WEGE — Einstieg nach Lage, nicht nach Betriebsgroesse.
+       *
+       * Die Seite fuehrt heute mit ihrer eigenen Architektur: fuenf Ebenen,
+       * ein Haus, Identity bis Intelligence. Das ist richtig und bleibt —
+       * aber es ist die Ordnung des ANBIETERS. Ein Betrieb, der abends
+       * Rechnungen aus dem Gedaechtnis rekonstruiert, sucht nicht „Ebene
+       * 03", er sucht jemanden, der das abstellt.
+       *
+       * Deshalb keine Etiketten wie klein/mittel/gross: Die Groesse eines
+       * Betriebs sagt nicht, wo es klemmt. Jeder Weg nennt eine LAGE, in
+       * der sich jemand wiedererkennt, und fuehrt von dort in die Ebenen.
+       *
+       * `wenn` ist bewusst in der Sprache des Kunden geschrieben und nicht
+       * in unserer. Die Ebenen stehen dahinter, nicht davor.
+       */
+      wege: {
+        eyebrow: "Wo Sie einsteigen",
+        title: "Drei Wege hinein. Sie brauchen nicht alle.",
+        lead: "Welcher Weg Ihrer ist, ergibt sich aus dem, was heute klemmt — nicht aus der Größe Ihres Betriebs.",
+        note: "Kein Weg ist die Vorstufe eines anderen. Sie können auf jedem anfangen und auf jedem aufhören.",
+        cta: "Diesen Weg ansehen",
+        routen: [
+          {
+            key: "grundlage",
+            label: "Weg A",
+            title: "Die digitale Grundlage",
+            wenn: "Sie werden nicht gefunden, oder der Auftritt passt längst nicht mehr zu dem, was Sie können.",
+            start: "Marke, Auftritt, Website.",
+            href: "/leistungen#ebene-identity",
+          },
+          {
+            key: "betrieb",
+            label: "Weg B",
+            title: "Der Betrieb im System",
+            wenn: "Die Arbeit läuft. Sie läuft nur über Zettel, Tabellen und drei Programme, die nichts voneinander wissen.",
+            start: "Der Weg von der Anfrage bis zur Rechnung.",
+            href: "/leistungen#ebene-operations",
+          },
+          {
+            key: "entlastung",
+            label: "Weg C",
+            title: "Automatisierung und Intelligenz",
+            wenn: "Das System steht, aber Menschen tippen weiterhin ab, was das System längst weiß.",
+            start: "Wiederkehrende Arbeit und Entscheidungen.",
+            href: "/leistungen#ebene-automation",
+          },
+        ],
+      },
+      /*
        * GATE 01 · WEB-0005 — DIE SEKTION HIESS „AUSGEWAEHLTE ARBEITEN" UND
        * ZEIGTE EIGENE PRODUKTE.
        *
@@ -2971,6 +3020,40 @@ export const dictionary = {
         signalLabel: "Bir iş",
         modelNote: "Model, müşteri sonucu değil. Kurduğumuz yapıyı gösterir — ölçülmüş bir tasarruf değil.",
       },
+      /* Drei Wege. Dieselben Lagen, dieselbe Reihenfolge. */
+      wege: {
+        eyebrow: "Nereden girersiniz",
+        title: "İçeri üç yol var. Hepsi size gerekmiyor.",
+        lead: "Hangi yolun sizin olduğu, bugün nerede takıldığınızdan çıkar — işletmenizin büyüklüğünden değil.",
+        note: "Hiçbir yol diğerinin ön aşaması değil. Her birinde başlayabilir, her birinde durabilirsiniz.",
+        cta: "Bu yolu incele",
+        routen: [
+          {
+            key: "grundlage",
+            label: "Yol A",
+            title: "Dijital zemin",
+            wenn: "Bulunamıyorsunuz ya da görünüşünüz artık yapabildiklerinizi anlatmıyor.",
+            start: "Marka, kurumsal görünüm, web sitesi.",
+            href: "/leistungen#ebene-identity",
+          },
+          {
+            key: "betrieb",
+            label: "Yol B",
+            title: "İşletme sistemin içinde",
+            wenn: "İş yürüyor. Sadece kâğıtlar, tablolar ve birbirinden habersiz üç program üzerinden yürüyor.",
+            start: "Talepten faturaya giden yol.",
+            href: "/leistungen#ebene-operations",
+          },
+          {
+            key: "entlastung",
+            label: "Yol C",
+            title: "Otomasyon ve zekâ",
+            wenn: "Sistem kurulu, ama insanlar sistemin çoktan bildiğini hâlâ elle giriyor.",
+            start: "Tekrar eden işler ve kararlar.",
+            href: "/leistungen#ebene-automation",
+          },
+        ],
+      },
       work: {
         eyebrow: "Kendi ürünlerimiz",
         title: "Önce kur. Sonra konuş.",
@@ -4589,6 +4672,40 @@ export const dictionary = {
         signalLabel: "One job",
         modelNote: "A model, not a customer result. It shows the structure we build — not a measured saving.",
       },
+      /* Three routes. Same situations, same order. */
+      wege: {
+        eyebrow: "Where you start",
+        title: "Three ways in. You do not need all of them.",
+        lead: "Which one is yours follows from what is stuck today — not from the size of your business.",
+        note: "No route is a preliminary stage of another. You can begin on any of them and stop on any of them.",
+        cta: "See this route",
+        routen: [
+          {
+            key: "grundlage",
+            label: "Route A",
+            title: "The digital foundation",
+            wenn: "You are not being found, or your presence no longer matches what you can actually do.",
+            start: "Brand, presence, website.",
+            href: "/leistungen#ebene-identity",
+          },
+          {
+            key: "betrieb",
+            label: "Route B",
+            title: "The business inside the system",
+            wenn: "The work gets done. It just runs on notes, spreadsheets and three programmes that know nothing of each other.",
+            start: "The path from enquiry to invoice.",
+            href: "/leistungen#ebene-operations",
+          },
+          {
+            key: "entlastung",
+            label: "Route C",
+            title: "Automation and intelligence",
+            wenn: "The system is in place, but people still retype what the system already knows.",
+            start: "Repeated work and decisions.",
+            href: "/leistungen#ebene-automation",
+          },
+        ],
+      },
       work: {
         eyebrow: "Our own products",
         title: "Build first. Talk after.",
@@ -6185,6 +6302,40 @@ export const dictionary = {
         gapLabel: "نقطة انقطاع",
         signalLabel: "معاملة واحدة",
         modelNote: "نموذج، وليس نتيجة عميل. يوضّح البنية التي نبنيها — لا وفورات مقيسة.",
+      },
+      /* Drei Wege. Im Arabischen laeuft die Linie von rechts nach links. */
+      wege: {
+        eyebrow: "من أين تبدأ",
+        title: "ثلاثة مداخل. لا تحتاجها كلها.",
+        lead: "أيّها مدخلك يتحدّد بما يتعثّر اليوم — لا بحجم منشأتك.",
+        note: "ليس أيّ مسار مرحلة تمهيدية لآخر. يمكنك أن تبدأ عند أيّ منها وأن تتوقّف عند أيّ منها.",
+        cta: "اطّلع على هذا المسار",
+        routen: [
+          {
+            key: "grundlage",
+            label: "المسار أ",
+            title: "الأساس الرقمي",
+            wenn: "لا يعثر عليك أحد، أو أنّ حضورك لم يعد يعبّر عمّا تجيده.",
+            start: "العلامة والحضور والموقع.",
+            href: "/leistungen#ebene-identity",
+          },
+          {
+            key: "betrieb",
+            label: "المسار ب",
+            title: "المنشأة داخل النظام",
+            wenn: "العمل يُنجز. لكنّه يجري على أوراق وجداول وثلاثة برامج لا يعرف بعضها بعضًا.",
+            start: "الطريق من الطلب إلى الفاتورة.",
+            href: "/leistungen#ebene-operations",
+          },
+          {
+            key: "entlastung",
+            label: "المسار ج",
+            title: "الأتمتة والذكاء",
+            wenn: "النظام قائم، لكنّ الناس ما زالوا يُدخلون يدويًا ما يعرفه النظام أصلًا.",
+            start: "الأعمال المتكرّرة والقرارات.",
+            href: "/leistungen#ebene-automation",
+          },
+        ],
       },
       work: {
         eyebrow: "منتجاتنا",
