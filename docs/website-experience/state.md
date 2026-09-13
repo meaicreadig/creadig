@@ -26,6 +26,57 @@
 
 ---
 
+## Master Run B · Public Experience — Stand 13.09.2026
+
+| Lane | BUILD | Preview | Stand |
+|---|:--:|:--:|---|
+| **B01** Routen-Inventar | 🟢 | 🟢 | 19 Routen an der laufenden Seite gemessen (Höhe, Wörter, Bilder, Schienen) |
+| **B02** Startseite | 🟢 | 🟢 | Namenskonflikt behoben (Wege → Lagen) |
+| **B03** Leistungen | 🔴 | 🔴 | **offen** — 1.644 Wörter, 0 Artefakte |
+| **B04** Produkte-Übersicht | 🟡 | 🟡 | Reifegrad wird gezeigt (`StatusDot`); Dichte unverändert |
+| **B05** Produkt-Details | 🔴 | 🔴 | **offen**; CASSAMEA/meahv-Aufnahmen sind **Owner-zurückgehalten** |
+| **B06** Arbeiten / System-Case | 🟢 | 🟢 | Beleglage gebaut; Case-Architektur existierte bereits (8 Kapitel, G18) |
+| **B07** Unternehmen | 🟡 | 🟡 | Das Haus aus Run A; Gravitas-Text unverändert |
+| **B08** Betriebscheck | 🟢 | 🟢 | persönliche Systemlandkarte aus den eigenen Antworten |
+| **B09** Aufwandsrechner | 🔴 | 🔴 | **offen** |
+| **B10** Kontakt / Termin | 🔴 | 🔴 | **offen** |
+| **B11** Insights | 🔴 | 🔴 | **offen** |
+| **B12** Karriere | 🔴 | 🔴 | **offen** (inhaltlich eingefroren) |
+| **B13** Navigation / Fußzeile | 🟡 | 🟡 | Sprachumschalter folgt dem Markt; Rest unverändert |
+| **B14** Verdichtung | 🔴 | 🔴 | **offen** |
+| **B15** Artefakt-System | 🔴 | 🔴 | **offen** |
+| **B16** Mobile | 🟡 | 🟡 | neue Abschnitte geprüft; kein Durchgang über alle Routen |
+| **B17** Bewegung | 🟡 | 🟡 | Grammatik gilt; kein Durchgang über alle Routen |
+| **B18** Locale Intelligence | 🟢 | 🟢 | Middleware + Regelquelle + **27/27 Szenarien** |
+| **B19** DE/TR/EN/AR | 🟡 | 🟡 | neue Texte in vier Sprachen; keine Neufassung bestehender |
+| **B20** SEO / a11y / Performance | 🟢 | 🟢 | 40 Gates · a11y 132/132 · RTL geprüft |
+| **B21** Käufer-Audit | 🟡 | 🟡 | an den geänderten Flächen, nicht site-weit |
+| **B22** Adversarial Fixback | 🟢 | 🟢 | drei Befunde, zwei behoben, einer als Regel präzisiert |
+| **B23** Preview-Kandidat | 🟡 | 🟡 | grün, aber Run B ist **nicht** erschöpft |
+
+**Run B ist nicht abgeschlossen.** Acht Lanes stehen offen. Das ist keine
+Owner-Abhängigkeit, sondern nicht geleistete Arbeit — mit einer Ausnahme:
+CASSAMEA und meahv haben vorhandene, aber **bewusst zurückgehaltene**
+Aufnahmen (Gate OA-2), und daran ändert kein Design etwas.
+
+### Drei Befunde aus dem Gegenlesen
+
+**1 · Ein Namenskonflikt aus Run A.** „Drei Wege hinein" stand auf derselben
+Seite wie „Zwei Wege hinein — beide zum Festpreis" und „Drei Wege zu einem
+Preis". Die Seite benutzte das Wort bereits fünfmal. Der Neuankömmling
+weicht: drei **Lagen**.
+
+**2 · Eine Diagnose, die falsch war.** Ich hielt die Prüfpakete für
+maschinenabhängig und baute einen Sprachkeks ein. Nachgesehen: `a11y.mjs` und
+`screenshots.mjs` setzen `locale: "de-DE"` längst selbst. Die Änderung war
+überflüssig und hat den Lauf gebrochen — zurückgenommen.
+
+**3 · Die Linien-Regel war zu weit gefasst.** Siehe Präzisierung in der
+Creative Direction: Wo die Schiene liegt, aktiviert der Knoten; wo keine
+liegt, bleibt die vorhandene Hover-Anzeige. Zehn Komponenten behalten sie.
+
+---
+
 ## Vier Fehler, die erst die Messung gezeigt hat
 
 Alle vier wären im Quelltext unsichtbar geblieben.

@@ -57,6 +57,30 @@ Diese Regel hat in der Umsetzung zweimal eine Entscheidung umgedreht:
   Gegenteil sagt. Jetzt sind sie drei **Stellen, an denen man auf die Linie
   aufspringt**, und die Linie laeuft an beiden Enden weiter.
 
+### Praezisierung aus Run B — was die Regel NICHT meint
+
+Die Regel gilt fuer die **Systemlinie**: das Vokabular aus
+`components/creative/system.tsx`, das eine Aussage ueber den Betrieb macht.
+
+Sie gilt **nicht** fuer die Hover-Anzeige, die seit Langem in zehn
+Komponenten liegt (`bg-gold ... w-0 group-hover:w-full`). Die sagt nichts
+ueber den Betrieb; sie sagt „diese Zeile ist anklickbar". Das ist
+Bedienrueckmeldung, kein Systembild.
+
+In Run A habe ich sie bei den fuenf Ebenen entfernt und das mit der Regel
+begruendet. Die Begruendung war zu weit gefasst — nach ihr haetten zehn
+Komponenten ihre Rueckmeldung verloren, und die Seite waere unbedienbarer
+geworden, nicht praeziser.
+
+**Die Trennlinie, die tatsaechlich gilt:**
+
+> Wo die Schiene liegt, aktiviert der Knoten.
+> Wo keine Schiene liegt, bleibt die vorhandene Hover-Anzeige.
+
+Bei den fuenf Ebenen war die Entfernung deshalb trotzdem richtig — dort gibt
+es eine Schiene, und zwei Aktivierungsanzeigen nebeneinander waeren eine zu
+viel. Auf `/produkte` gibt es keine, also bleibt die Anzeige.
+
 ## 1b · Das Vokabular — drei Bausteine
 
 Umgesetzt in `components/creative/system.tsx`.
