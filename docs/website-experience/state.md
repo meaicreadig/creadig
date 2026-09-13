@@ -26,6 +26,40 @@
 
 ---
 
+## Completion Wave — Stand 13.09.2026
+
+| Lane | Stand | Beleg |
+|---|---|---|
+| **B03** Leistungen | 🟡 | Prozess auf die Strecke gestellt (erste Schiene + Zeig-Moment). `pakete` = 2.334 px / 487 W → **BLOCKED_G18**. Ebenen-Pyramide behält Einrückung: `tile`-Karten, kein Restposten-Zwang |
+| **B05** Produkt-Details | 🟡 | **Geprüft, nicht gebaut**: Die fehlende Aufnahme ist bereits benannt (`screensPending`). CASSAMEA/meahv → **OWNER_ASSET_DEPENDENCY** (Aufnahmen existieren, enthalten echte Daten) |
+| **B09** Aufwandsrechner | 🟢 | Modell-Kennzeichnung vorhanden und eindeutig; keine erfundene ROI |
+| **B10** Kontakt / Termin | 🟢 | 200, je eine `h1`, CTA vorhanden, kein Überlauf |
+| **B11** Insights | 🟢 | Index → Artikel → kommerzieller Rückweg (`/termin`, `/produkte`) vorhanden |
+| **B12** Karriere | 🟢 | **kein Sackgassen-Befund** — sechs Verweise inkl. `/karriere/bewerben`; Narrativ unberührt |
+| **B16** Mobile | 🟢 | 18 Routen × 2 Fenster gemessen: **kein waagerechter Überlauf**, je genau eine `h1`, alle 200 |
+| **B17** Bewegung | 🟢 | Fünf Animationsklassen; **alle 9** framer-motion-Dateien respektieren reduzierte Bewegung (zwei Treffer waren Kommentare) |
+| **B18** Locale | 🟢 | 27/27 nach Änderungen erneut grün |
+| **B19** Parität | 🟡 | Neue Texte in vier Sprachen; bestehende nicht neu gefasst |
+| **B20** Validierung | 🟢 | tsc · ESLint · 40 Gates · a11y 132/132 · RTL 5 Seiten |
+| **B04 / B07 / B13 / B14 / B15** | 🔴 | **nicht vertieft** — siehe unten |
+
+### Drei Korrekturen an eigenen Annahmen
+
+1. **`/karriere` sei eine Sackgasse.** War es nicht — mein Selektor suchte nur
+   `termin`/`kontakt`/`button`. Sechs Verweise sind da.
+2. **Die fehlende Produktaufnahme sei stumm.** Ist sie nicht — `screensPending`
+   sagt es, und zwar auf beiden betroffenen Seiten.
+3. **Zwei Dateien animierten ohne Rücksicht auf reduzierte Bewegung.** Das Wort
+   `framer-motion` stand dort nur im Kommentar; null Bewegungsaufrufe.
+
+### Ein Fehler, den ESLint gefunden hat
+
+Die marktabhängige Umschalter-Reihenfolge erzeugte bei jedem Rendern ein neues
+Feld und stand zugleich in einer Effekt-Abhängigkeit. `useMemo` — die
+Reihenfolge hängt nur an der aktiven Sprache.
+
+---
+
 ## Master Run B · Public Experience — Stand 13.09.2026
 
 | Lane | BUILD | Preview | Stand |

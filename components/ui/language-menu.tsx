@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useId, useRef, useState } from "react"
+import { useEffect, useId, useMemo, useRef, useState } from "react"
 import { Check, ChevronDown, Globe } from "lucide-react"
 import { umschalterReihenfolge } from "@/lib/locale-markt"
 import type { Locale } from "@/lib/dictionary"
@@ -68,7 +68,15 @@ export function LanguageMenu({
     er wahrscheinlich waehlt — und `locales` bleibt, was es ist: die Liste
     aller Sprachen, nicht eine Rangfolge.
   */
-  const sprachen = umschalterReihenfolge(locale)
+  /*
+    `useMemo`, weil die Liste in einer Abhaengigkeit steht.
+
+    Ohne sie entstuende bei jedem Rendern ein neues Feld, und der Effekt
+    weiter unten liefe jedes Mal mit — ESLint hat genau das gemeldet. Die
+    Reihenfolge haengt nur an der aktiven Sprache; sie neu zu berechnen,
+    wenn sich nichts geaendert hat, ist Arbeit ohne Anlass.
+  */
+  const sprachen = useMemo(() => umschalterReihenfolge(locale), [locale])
   const [aktiv, setAktiv] = useState(() => sprachen.indexOf(locale))
   const wurzel = useRef<HTMLDivElement>(null)
   const knopf = useRef<HTMLButtonElement>(null)
@@ -92,7 +100,7 @@ export function LanguageMenu({
   /* Beim Oeffnen steht die aktuelle Sprache unter dem Cursor, nicht die erste. */
   useEffect(() => {
     if (offen) setAktiv(sprachen.indexOf(locale))
-  }, [offen, locale])
+  }, [offen, locale, sprachen])
 
   const waehle = (code: Locale) => {
     setOffen(false)
