@@ -1,7 +1,7 @@
 # Programm-Hauptbuch
 
-> **Maßgebliche Statusquelle.** Stand: 13.09.2026
-> Production `35e1fa3` · Branch `feat/system-haus-site` @ `35e1fa3` · kein Drift
+> **Maßgebliche Statusquelle.** Stand: 13.09.2026 (Reaudit Owner)
+> Production zuletzt `35e1fa3` · Branch-Spitze lokal inkl. G36 · **Promote/Migration 014: Verfassung §5 — frische Owner-Zustimmung nötig**
 
 ## Das Hauptbuch
 
@@ -14,12 +14,12 @@
 | **F04** Vertrieb | Nachvollziehbarer Vorgang | 🟢 | 🟡 | 🔴 | 🔴 | `WAITING_OWNER` | Owner bestätigt, ob echte Vorgänge im System laufen | Nutzungswahrheit unbekannt |
 | **F05** Lieferung | Kontrollierte Lieferung | 🟢 | 🟡 | 🔴 | 🔴 | `WAITING_OWNER` | Ein echter Lieferzyklus im System | Schattenprozess außerhalb des Systems |
 | **F06** Beleg & Markt | Belegte Wirkung | 🟢 | 🟢 | 🔴 | 🔴 | `WAITING_OWNER` | Kundenfreigabe **und** erste Messprobe | Kunde · Migration · G18 |
-| **F07** Marketing | Veröffentlichung wirkt zurück | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | Owner entscheidet Umfang | kein System vorhanden |
+| **F07** Marketing | Veröffentlichung wirkt zurück | 🟡 | 🔴 | 🔴 | 🔴 | `BUILDING` | **Reconciliation:** vorhandene Redaktion/Insights/Veröffentlichungs-Bausteine gegen Closure-Vertrag (eine echte Publication + Reaktion) | fehlende echte Publication — nicht „Owner-Scope fehlt“ |
 | **F08** Finanzen | Wahre Zahlen | 🟡 | 🔴 | 🔴 | 🔴 | `BLOCKED_G18` | G18-Entsperrung | G18 (`rechnung.ts`) |
-| **F09** Produkte | Wahre Reife | 🟡 | 🟡 | 🟡 | 🔴 | `WAITING_OWNER` | Sichere Aufnahmen · Reifeentscheidung | Owner-Material |
-| **F10** Automatisierung | Sichere Entlastung | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | Owner entscheidet Umfang | kein Automatisierungslauf vorhanden |
+| **F09** Produkte | Wahre Reife | 🟡 | 🟡 | 🟡 | 🔴 | `BUILDING` | **Reconciliation:** Reife je Produkt vs. öffentliche Aussage; sichere Aufnahmen | Owner-Material nur wo Demo/Asset fehlt |
+| **F10** Automatisierung | Sichere Entlastung | 🟡 | 🔴 | 🔴 | 🔴 | `BUILDING` | **Reconciliation:** bestehende Automation/Intelligence (Empfehlung, Kreislauf, Alert…) gegen Closure (eine echte Auto + eine befolgte Empfehlung) | fehlender Live-Lauf — nicht „Owner-Scope fehlt“ |
 | **F11** Kapazität/Vertretung | Keine Ein-Personen-Blackbox | 🟢 | 🔴 | 🔴 | 🔴 | `WAITING_OWNER` | Zwei Owner-Tatsachen | Kapazität + Vertretung unbekannt |
-| **F12** Owner-Steuerung | Firma aus dem System führbar | 🟡 | 🟡 | 🟡 | 🔴 | `LIVE_EVOLUTION` | Ein realer Arbeitszyklus aus dem Control Center | F04/F05-Lücken |
+| **F12** Owner-Steuerung | Firma aus dem System führbar | 🟡 | 🟡 | 🟡 | 🔴 | `BUILDING` | **Integration-Analyse:** Control-Center → realer Arbeitszyklus; Schattenprozesse benennen | F04/F05-Nutzung · Vegitat-Entscheidung |
 
 **Kein Programm ist CLOSED.** Das ist kein Rückschritt — es ist die erste
 Trennung zwischen *gebaut* und *bewiesen*.
@@ -34,7 +34,7 @@ Trennung zwischen *gebaut* und *bewiesen*.
 | Branch-Spitze = `a5cad70` | **`35e1fa3`** | `git rev-parse` · `ls-remote` |
 | P2 **nicht** promoted | **promoted** — `a5cad70` um 00:15, `35e1fa3` um 00:20 | Vercel `action: promote` |
 | F06 Cutover offen | **F06 Cutover erledigt** | ebenda |
-| Marketing OS M0–M9 vorhanden | **nicht in diesem Repository** | keine Kampagnen-/Publikations-Module, keine Admin-Fläche |
+| Marketing OS M0–M9 als eigenes Kampagnen-Modul | **kein separates Modul** — Reconciliation nötig gegen vorhandene Bausteine (`insights`, Redaktion, Kreislauf, Empfehlung…) und Closure F07 | keine Kampagnen-Admin-Fläche ≠ „F07 ist nicht Scope“ |
 
 ### Was ich an meiner eigenen ersten Fassung korrigiert habe
 
@@ -99,26 +99,27 @@ Code-Arbeit und wartet auf niemanden, das andere ist eine Owner-Entscheidung
 
 ## Nächste eigenständige Arbeit
 
-Die erste Fassung nannte hier F05 und F12 als Bau-Lücken. **F05 war falsch** —
-die Fähigkeit ist vollständig da (siehe Korrektur oben). Damit sieht die Lage
-ehrlicher und unbequemer aus:
+**Korrigiert 13.09.2026 (Owner-Reaudit):** „Owner-unabhängige BUILD-Arbeit ist
+erschöpft“ war **zu früh**. FINAL PROGRAM definiert F07 und F10 bereits —
+das ist Scope, kein zusätzlicher Owner-Auftrag.
 
-**Owner-unabhängige BUILD-Arbeit, die ein echtes Geschäftsergebnis
-freischaltet, ist weitgehend erschöpft.** Was fehlt, sind Ereignisse: ein
-echter Besucher, ein echter Lead, eine Kundenfreigabe, eine Owner-Tatsache,
-28 Tage. Das ist kein Versäumnis — Verfassung §3 sagt ausdrücklich, dass
-Warten kein Versagen ist. Es wird nur dann zum Versäumnis, wenn jemand die
-Wartezeit mit Bauen füllt, das niemand bestellt hat.
+| Lane | Autonomous jetzt | Wartet parallel |
+|---|---|---|
+| **F07** | Reconciliation/Build-Lücken gegen Closure (Publication → Evidence → Response → Handoff) | echte Publication (LIVE) |
+| **F10** | Reconciliation/Build-Lücken (sichere Automation + Intelligence-Empfehlung) | echter Lauf (LIVE) |
+| **F09** | Produkt-Reife vs. öffentliche Aussage | sichere Aufnahmen wo nötig |
+| **F12** | Owner-Control Integration (eine Steuerungsfläche, Schattenprozesse) | realer Owner-Zyklus |
+| F03/F04/F06/F11 | — | Real-World / Owner / Kunde / Zeit |
 
-Erledigt in dieser Runde, weil beides auf niemanden wartete:
+Erledigt in dieser Runde (Code/Safety, kein zweites Delivery-System):
 
 | Arbeit | Warum sie ein Ergebnis schützt |
 |---|---|
-| **Schemastand-Gate (G36)** · `scripts/check-schemastand.mjs` | Seit dem 06.09.2026 migriert die Laufzeit nicht mehr selbst — sie kann einen Auseinanderlauf zwischen `SCHEMA[]` und den Migrationsdateien also auch nicht mehr ausgleichen. Bis heute hielt die Gleichheit **von Hand**. Jetzt hält sie ein Gate: 82 DDL-Anweisungen, beide Richtungen, und im Fehlerfall nennt es die abweichende Spalte statt nur die Tabelle. Die Kette steht auf **40** Prüfungen |
-| **Cutover-Paket 014** · [`cutover-014.md`](cutover-014.md) | §5 verlangt es für jeden Status `WAITING_CUTOVER_AUTHORITY`. Es fehlte. Die Owner-Entscheidung war damit eine Recherche; jetzt ist sie eine Entscheidung — Befehl, Smoke-Plan und Rollback stehen im Klartext |
+| **Schemastand-Gate (G36)** · `scripts/check-schemastand.mjs` | `SCHEMA[]` ↔ `migrations/*.sql` beidseitig; Drift = Exit 1. Kette **40** |
+| **Cutover-Paket 014** · [`cutover-014.md`](cutover-014.md) | §5-Paket für `WAITING_CUTOVER_AUTHORITY` — Befehl, Smoke, Rollback |
 
-Was als Nächstes owner-unabhängig wäre, ist bewusst **nicht** begonnen: F07
-(Marketing) und F10 (Automatisierung) stehen auf `NOT_STARTED`, weil ihr
-**Umfang** eine Owner-Entscheidung ist. Sie ohne Auftrag zu bauen hieße, sich
-den Auftrag selbst zu erteilen — und genau das trennt Arbeit von
-Beschäftigung.
+**Nicht vermischen:** Push von `28b427a` (Branch-Wahrheit) ≠ Production-Migration 014
+≠ Messprobe. Die 28-Tage-Uhr startet erst mit **erster akzeptierter realer Probe**.
+
+**Verfassung §5:** Diese Runde autorisiert **kein** Production-Promote und **kein**
+DB-Write. Promote/Migration brauchen frische Owner-Zustimmung.
