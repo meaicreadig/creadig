@@ -166,16 +166,16 @@ export const dictionary = {
        * `wenn` ist bewusst in der Sprache des Kunden geschrieben und nicht
        * in unserer. Die Ebenen stehen dahinter, nicht davor.
        */
-      wege: {
+      lagen: {
         eyebrow: "Wo Sie einsteigen",
-        title: "Drei Wege hinein. Sie brauchen nicht alle.",
-        lead: "Welcher Weg Ihrer ist, ergibt sich aus dem, was heute klemmt — nicht aus der Größe Ihres Betriebs.",
-        note: "Kein Weg ist die Vorstufe eines anderen. Sie können auf jedem anfangen und auf jedem aufhören.",
-        cta: "Diesen Weg ansehen",
+        title: "Drei Lagen, drei Anfänge.",
+        lead: "Welche davon Ihre ist, ergibt sich aus dem, was heute hakt — nicht aus der Größe Ihres Betriebs.",
+        note: "Keine Lage ist die Vorstufe einer anderen. Sie können bei jeder anfangen und bei jeder aufhören.",
+        cta: "Zur passenden Ebene",
         routen: [
           {
             key: "grundlage",
-            label: "Weg A",
+            label: "Lage A",
             title: "Die digitale Grundlage",
             wenn: "Sie werden nicht gefunden, oder der Auftritt passt längst nicht mehr zu dem, was Sie können.",
             start: "Marke, Auftritt, Website.",
@@ -183,7 +183,7 @@ export const dictionary = {
           },
           {
             key: "betrieb",
-            label: "Weg B",
+            label: "Lage B",
             title: "Der Betrieb im System",
             wenn: "Die Arbeit läuft. Sie läuft nur über Zettel, Tabellen und drei Programme, die nichts voneinander wissen.",
             start: "Der Weg von der Anfrage bis zur Rechnung.",
@@ -191,7 +191,7 @@ export const dictionary = {
           },
           {
             key: "entlastung",
-            label: "Weg C",
+            label: "Lage C",
             title: "Automatisierung und Intelligenz",
             wenn: "Das System steht, aber Menschen tippen weiterhin ab, was das System längst weiß.",
             start: "Wiederkehrende Arbeit und Entscheidungen.",
@@ -543,6 +543,61 @@ export const dictionary = {
       metaTitle: "Arbeiten — eigene Produkte und Kundenwerk",
       metaDescription:
         "Die Werkschau von creaDIG: vier eigene Produkte und Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen — eigene Systeme und Auftragsarbeit sind nicht dasselbe.",
+    },
+    /*
+     * DIE BELEGLAGE — die Rangfolge des Beweises, mit der leeren Stufe oben.
+     *
+     * `/arbeiten` war bis hierher eine ehrliche Sackgasse: 82 Woerter, ein
+     * Verweis, sonst nichts. Ehrlich war richtig, Sackgasse nicht. Wer diese
+     * Seite oeffnet, sucht Beweis — und Beweis GIBT es, nur nicht auf der
+     * obersten Stufe.
+     *
+     * Die Rangfolge ist keine Erfindung, sondern die Ordnung, nach der ein
+     * Dritter Belege gewichtet: freigegebene Kundenarbeit steht ueber
+     * eigenem Produkt, eigenes Produkt ueber Selbstpruefung, Selbstpruefung
+     * ueber Werkzeug. Genau deshalb steht die leere Stufe OBEN und wird
+     * nicht versteckt: Sie ist die wertvollste, und sie fehlt.
+     *
+     * Jede der drei belegten Stufen ist nachpruefbar — das ist die einzige
+     * Aussage, die diese Sektion ueber sich selbst macht.
+     */
+    beleglage: {
+      eyebrow: "Die Beleglage",
+      title: "Was heute belegt ist — und was nicht.",
+      lead: "Belege haben eine Rangfolge. Die oberste bestätigt ein Dritter; die drei darunter können Sie selbst nachprüfen.",
+      offenLabel: "steht aus",
+      belegtLabel: "nachprüfbar",
+      note: "Nur die oberste Stufe bestätigt jemand anderes. Deshalb ersetzt keine der drei darunter sie — sie tragen etwas anderes.",
+      stufen: [
+        {
+          key: "kunde",
+          rang: "01",
+          name: "Kundenarbeit, schriftlich freigegeben",
+          was: "Ein Fall mit Namen, Aufnahme und Ergebnis. Jeder Teil wird einzeln erlaubt: Name, Logo, Beschreibung, Aufnahme, Kennzahl, Zitat.",
+          href: "",
+        },
+        {
+          key: "produkt",
+          rang: "02",
+          name: "Eigene Produkte im Betrieb",
+          was: "fibero läuft im Glasfaser-Alltag, meAI im eigenen Haus. Die Aufnahmen zeigen die echte Oberfläche, nicht ein Modell.",
+          href: "/produkte/fibero",
+        },
+        {
+          key: "pruefung",
+          rang: "03",
+          name: "Die Prüfung am eigenen Haus",
+          was: "Wir haben die eigene Seite nach WCAG 2.1 AA geprüft, acht Mängel gefunden und behoben. Methode, Datum und Befunde stehen offen.",
+          href: "/barrierefreiheit",
+        },
+        {
+          key: "werkzeug",
+          rang: "04",
+          name: "Werkzeuge, die Sie selbst bedienen",
+          was: "Betriebscheck und Aufwandsrechner rechnen ausschließlich mit Ihren Angaben — keine Beispielzahlen, kein Vorher-Wert aus fremden Projekten.",
+          href: "/betriebscheck",
+        },
+      ],
     },
     arbeitPage: {
       breadcrumb: "Arbeiten",
@@ -3021,16 +3076,16 @@ export const dictionary = {
         modelNote: "Model, müşteri sonucu değil. Kurduğumuz yapıyı gösterir — ölçülmüş bir tasarruf değil.",
       },
       /* Drei Wege. Dieselben Lagen, dieselbe Reihenfolge. */
-      wege: {
+      lagen: {
         eyebrow: "Nereden girersiniz",
-        title: "İçeri üç yol var. Hepsi size gerekmiyor.",
-        lead: "Hangi yolun sizin olduğu, bugün nerede takıldığınızdan çıkar — işletmenizin büyüklüğünden değil.",
-        note: "Hiçbir yol diğerinin ön aşaması değil. Her birinde başlayabilir, her birinde durabilirsiniz.",
-        cta: "Bu yolu incele",
+        title: "Üç durum, üç başlangıç.",
+        lead: "Hangisinin sizin olduğu, bugün nerede takıldığınızdan çıkar — işletmenizin büyüklüğünden değil.",
+        note: "Hiçbir durum diğerinin ön aşaması değil. Her birinde başlayabilir, her birinde durabilirsiniz.",
+        cta: "İlgili katmana",
         routen: [
           {
             key: "grundlage",
-            label: "Yol A",
+            label: "Durum A",
             title: "Dijital zemin",
             wenn: "Bulunamıyorsunuz ya da görünüşünüz artık yapabildiklerinizi anlatmıyor.",
             start: "Marka, kurumsal görünüm, web sitesi.",
@@ -3038,7 +3093,7 @@ export const dictionary = {
           },
           {
             key: "betrieb",
-            label: "Yol B",
+            label: "Durum B",
             title: "İşletme sistemin içinde",
             wenn: "İş yürüyor. Sadece kâğıtlar, tablolar ve birbirinden habersiz üç program üzerinden yürüyor.",
             start: "Talepten faturaya giden yol.",
@@ -3046,7 +3101,7 @@ export const dictionary = {
           },
           {
             key: "entlastung",
-            label: "Yol C",
+            label: "Durum C",
             title: "Otomasyon ve zekâ",
             wenn: "Sistem kurulu, ama insanlar sistemin çoktan bildiğini hâlâ elle giriyor.",
             start: "Tekrar eden işler ve kararlar.",
@@ -3238,6 +3293,45 @@ export const dictionary = {
       metaTitle: "İşler — kendi ürünlerimiz ve müşteri işleri",
       metaDescription:
         "creaDIG seçkisi: dört kendi ürün ve Almanya ile İsviçre'den müşteri işleri. Ayrı gösterilir — kendi sistemlerimiz ile sipariş işleri aynı şey değildir.",
+    },
+    /* Die Beleglage. Dieselbe Rangfolge, dieselbe leere Stufe oben. */
+    beleglage: {
+      eyebrow: "Kanıt durumu",
+      title: "Bugün neyin kanıtı var — neyin yok.",
+      lead: "Kanıtların bir sıralaması vardır. En üsttekini üçüncü bir taraf doğrular; altındaki üçünü kendiniz kontrol edebilirsiniz.",
+      offenLabel: "bekliyor",
+      belegtLabel: "kontrol edilebilir",
+      note: "Yalnızca en üst basamağı bir başkası doğrular. Bu yüzden altındaki üçü onun yerine geçmez — başka bir şey taşırlar.",
+      stufen: [
+        {
+          key: "kunde",
+          rang: "01",
+          name: "Yazılı izinli müşteri işi",
+          was: "Adıyla, görüntüsüyle ve sonucuyla bir vaka. Her parçasına ayrı izin verilir: ad, logo, açıklama, ekran görüntüsü, rakam, alıntı.",
+          href: "",
+        },
+        {
+          key: "produkt",
+          rang: "02",
+          name: "Kendi ürünlerimiz işleyişte",
+          was: "fibero fiber altyapı sahasında, meAI kendi evimizde çalışıyor. Görüntüler gerçek arayüzü gösteriyor, bir maketi değil.",
+          href: "/produkte/fibero",
+        },
+        {
+          key: "pruefung",
+          rang: "03",
+          name: "Kendi evimizde yapılan denetim",
+          was: "Kendi sitemizi WCAG 2.1 AA'ya göre denetledik, sekiz kusur bulduk ve giderdik. Yöntem, tarih ve bulgular açık.",
+          href: "/barrierefreiheit",
+        },
+        {
+          key: "werkzeug",
+          rang: "04",
+          name: "Kendiniz kullanabileceğiniz araçlar",
+          was: "Betriebscheck ve Aufwandsrechner yalnızca sizin verdiğiniz bilgilerle hesaplar — örnek rakam yok, başka projelerden devşirilmiş bir öncesi yok.",
+          href: "/betriebscheck",
+        },
+      ],
     },
     arbeitPage: {
       breadcrumb: "İşler",
@@ -4673,16 +4767,16 @@ export const dictionary = {
         modelNote: "A model, not a customer result. It shows the structure we build — not a measured saving.",
       },
       /* Three routes. Same situations, same order. */
-      wege: {
+      lagen: {
         eyebrow: "Where you start",
-        title: "Three ways in. You do not need all of them.",
+        title: "Three situations, three starting points.",
         lead: "Which one is yours follows from what is stuck today — not from the size of your business.",
-        note: "No route is a preliminary stage of another. You can begin on any of them and stop on any of them.",
-        cta: "See this route",
+        note: "No situation is a preliminary stage of another. You can begin at any of them and stop at any of them.",
+        cta: "To the matching layer",
         routen: [
           {
             key: "grundlage",
-            label: "Route A",
+            label: "Situation A",
             title: "The digital foundation",
             wenn: "You are not being found, or your presence no longer matches what you can actually do.",
             start: "Brand, presence, website.",
@@ -4690,7 +4784,7 @@ export const dictionary = {
           },
           {
             key: "betrieb",
-            label: "Route B",
+            label: "Situation B",
             title: "The business inside the system",
             wenn: "The work gets done. It just runs on notes, spreadsheets and three programmes that know nothing of each other.",
             start: "The path from enquiry to invoice.",
@@ -4698,7 +4792,7 @@ export const dictionary = {
           },
           {
             key: "entlastung",
-            label: "Route C",
+            label: "Situation C",
             title: "Automation and intelligence",
             wenn: "The system is in place, but people still retype what the system already knows.",
             start: "Repeated work and decisions.",
@@ -4883,6 +4977,45 @@ export const dictionary = {
       metaTitle: "Work — our own products and client work",
       metaDescription:
         "The creaDIG portfolio: four products of our own and client work from Germany and Switzerland. Listed separately — our own systems and commissioned work are not the same thing.",
+    },
+    /* Die Beleglage. Same ranking, same empty rung at the top. */
+    beleglage: {
+      eyebrow: "The evidence",
+      title: "What is proven today — and what is not.",
+      lead: "Evidence has a ranking. The top rung is confirmed by someone else; the three below it you can check yourself.",
+      offenLabel: "outstanding",
+      belegtLabel: "checkable",
+      note: "Only the top rung is confirmed by another party. That is why none of the three below replaces it — they carry something else.",
+      stufen: [
+        {
+          key: "kunde",
+          rang: "01",
+          name: "Customer work, released in writing",
+          was: "A case with a name, a screen and a result. Every part is permitted separately: name, logo, description, screenshot, figure, quote.",
+          href: "",
+        },
+        {
+          key: "produkt",
+          rang: "02",
+          name: "Our own products in operation",
+          was: "fibero runs in fibre-optic fieldwork, meAI inside our own house. The images show the real interface, not a mock-up.",
+          href: "/produkte/fibero",
+        },
+        {
+          key: "pruefung",
+          rang: "03",
+          name: "The audit of our own house",
+          was: "We audited our own site against WCAG 2.1 AA, found eight defects and fixed them. Method, date and findings are open.",
+          href: "/barrierefreiheit",
+        },
+        {
+          key: "werkzeug",
+          rang: "04",
+          name: "Tools you can operate yourself",
+          was: "The operations check and the effort calculator work exclusively from your own figures — no sample numbers, no baseline borrowed from other projects.",
+          href: "/betriebscheck",
+        },
+      ],
     },
     arbeitPage: {
       breadcrumb: "Work",
@@ -6304,16 +6437,16 @@ export const dictionary = {
         modelNote: "نموذج، وليس نتيجة عميل. يوضّح البنية التي نبنيها — لا وفورات مقيسة.",
       },
       /* Drei Wege. Im Arabischen laeuft die Linie von rechts nach links. */
-      wege: {
+      lagen: {
         eyebrow: "من أين تبدأ",
-        title: "ثلاثة مداخل. لا تحتاجها كلها.",
+        title: "ثلاث حالات، ثلاث بدايات.",
         lead: "أيّها مدخلك يتحدّد بما يتعثّر اليوم — لا بحجم منشأتك.",
-        note: "ليس أيّ مسار مرحلة تمهيدية لآخر. يمكنك أن تبدأ عند أيّ منها وأن تتوقّف عند أيّ منها.",
-        cta: "اطّلع على هذا المسار",
+        note: "ليست أيّ حالة مرحلة تمهيدية لأخرى. يمكنك أن تبدأ عند أيّ منها وأن تتوقّف عند أيّ منها.",
+        cta: "إلى الطبقة المناسبة",
         routen: [
           {
             key: "grundlage",
-            label: "المسار أ",
+            label: "الحالة أ",
             title: "الأساس الرقمي",
             wenn: "لا يعثر عليك أحد، أو أنّ حضورك لم يعد يعبّر عمّا تجيده.",
             start: "العلامة والحضور والموقع.",
@@ -6321,7 +6454,7 @@ export const dictionary = {
           },
           {
             key: "betrieb",
-            label: "المسار ب",
+            label: "الحالة ب",
             title: "المنشأة داخل النظام",
             wenn: "العمل يُنجز. لكنّه يجري على أوراق وجداول وثلاثة برامج لا يعرف بعضها بعضًا.",
             start: "الطريق من الطلب إلى الفاتورة.",
@@ -6329,7 +6462,7 @@ export const dictionary = {
           },
           {
             key: "entlastung",
-            label: "المسار ج",
+            label: "الحالة ج",
             title: "الأتمتة والذكاء",
             wenn: "النظام قائم، لكنّ الناس ما زالوا يُدخلون يدويًا ما يعرفه النظام أصلًا.",
             start: "الأعمال المتكرّرة والقرارات.",
@@ -6514,6 +6647,45 @@ export const dictionary = {
       metaTitle: "الأعمال — منتجاتنا الخاصة وأعمال العملاء",
       metaDescription:
         "معرض أعمال creaDIG: أربعة منتجات خاصة وأعمال لعملاء في ألمانيا وسويسرا. مفصولة بوضوح — الأنظمة الخاصة والأعمال المكلَّف بها ليستا الشيء نفسه.",
+    },
+    /* Die Beleglage. Im Arabischen laeuft die Leiter von rechts. */
+    beleglage: {
+      eyebrow: "حالة الإثبات",
+      title: "ما هو مُثبَت اليوم — وما ليس كذلك.",
+      lead: "للأدلّة ترتيب. الدرجة العليا يؤكّدها طرف آخر؛ والثلاث التي تحتها يمكنك التحقّق منها بنفسك.",
+      offenLabel: "قيد الانتظار",
+      belegtLabel: "قابل للتحقّق",
+      note: "الدرجة العليا وحدها يؤكّدها طرف آخر. لذلك لا تحلّ أيّ من الثلاث تحتها محلّها — فهي تحمل شيئًا آخر.",
+      stufen: [
+        {
+          key: "kunde",
+          rang: "01",
+          name: "عمل لعميل بإذن مكتوب",
+          was: "حالة باسمها ولقطتها ونتيجتها. ويُمنح الإذن لكلّ جزء على حدة: الاسم، الشعار، الوصف، اللقطة، الرقم، الاقتباس.",
+          href: "",
+        },
+        {
+          key: "produkt",
+          rang: "02",
+          name: "منتجاتنا في التشغيل",
+          was: "يعمل fibero في ميدان الألياف الضوئية، ويعمل meAI داخل بيتنا. واللقطات تُظهر الواجهة الحقيقية لا نموذجًا.",
+          href: "/produkte/fibero",
+        },
+        {
+          key: "pruefung",
+          rang: "03",
+          name: "فحص بيتنا نحن",
+          was: "فحصنا موقعنا وفق WCAG 2.1 AA، فوجدنا ثمانية عيوب وأصلحناها. المنهج والتاريخ والنتائج معلنة.",
+          href: "/barrierefreiheit",
+        },
+        {
+          key: "werkzeug",
+          rang: "04",
+          name: "أدوات تشغّلها بنفسك",
+          was: "يحسب فحص التشغيل وحاسبة الجهد من معطياتك أنت فقط — بلا أرقام نموذجية وبلا حالة سابقة مستعارة من مشاريع أخرى.",
+          href: "/betriebscheck",
+        },
+      ],
     },
     arbeitPage: {
       breadcrumb: "الأعمال",

@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/ui/page-header"
 import { Portfolio } from "@/components/sections/portfolio"
 import { CaseStudies } from "@/components/sections/case-studies"
 import { Reviews } from "@/components/sections/reviews"
+import { Beleglage } from "@/components/sections/beleglage"
 import { ClosingCta } from "@/components/sections/closing-cta"
 import { genannteClientWorks } from "@/lib/site-data"
 
@@ -81,6 +82,16 @@ export function ArbeitenPageBody() {
         Die Werkschau erscheint erst mit freigegebenem Kundenwerk. Vorher zeigt
         sie eigene Produkte — und genau das war WEB-0005.
       */}
+      {/*
+        DIE BELEGLAGE — nur im Nullzustand.
+
+        Sobald freigegebenes Kundenwerk existiert, steht der Beweis oben auf
+        der Seite und braucht keine Erklaerung, warum er fehlt. Die Rangfolge
+        waere dann eine Relativierung des eigenen Belegs — genau das
+        Gegenteil ihrer Aufgabe.
+      */}
+      {ohneKundenwerk && <Beleglage />}
+
       {!ohneKundenwerk && <Portfolio heading={false} />}
       <CaseStudies />
       <Reviews />

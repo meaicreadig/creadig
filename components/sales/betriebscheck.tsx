@@ -5,6 +5,7 @@ import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { Send } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
+import { SystemRail } from "@/components/creative/system"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { contact, serviceLayers } from "@/lib/site-data"
 import { trackEvent, trackLead } from "@/lib/track"
@@ -236,28 +237,76 @@ export function Betriebscheck() {
               </div>
             </div>
 
-            {/* Fünf Balken — dieselbe Reihenfolge wie überall im Haus. */}
-            <div className="mt-12 flex flex-col gap-5">
-              {result.layers.map((layer) => (
-                <div key={layer.key} className="grid gap-2 md:grid-cols-12 md:items-center">
-                  <div className="flex items-baseline gap-4 md:col-span-4">
-                    <span className="eyebrow text-gold-text">{layer.level}</span>
-                    <span className="text-subhead">{layerName(layer.key)}</span>
-                  </div>
-                  <div className="md:col-span-7">
-                    <div className="bg-muted h-1.5 w-full overflow-hidden rounded-sm">
-                      <div
-                        className="bg-gold h-full rounded-sm"
-                        style={{ width: `${layer.percent}%` }}
-                      />
+            {/*
+              DIE PERSOENLICHE SYSTEMLANDKARTE.
+
+              Bis hierher standen hier fuenf Balken. Ein Balken sagt, WIE VIEL
+              — er sagt nicht, was das fuer den Betrieb bedeutet. Und genau
+              das ist die Frage, die jemand nach fuenfzehn Antworten hat.
+
+              Jetzt liegen dieselben fuenf Ebenen auf der Schiene, die im
+              ganzen Haus dasselbe bedeutet: Was verbunden ist, traegt. Wo die
+              Linie aufhoert, reicht der Betrieb von Hand weiter.
+
+              WORAUS DIE LUECKE FOLGT — UND WORAUS NICHT
+
+              Nicht aus einem Schwellenwert. Einen Prozentsatz zu setzen, ab
+              dem eine Ebene „schlecht" ist, waere ein erfundener Massstab,
+              und danach saehe jede Landkarte nach Benchmark aus, den niemand
+              erhoben hat.
+
+              Die Luecke folgt aus dem Befund, den `evaluateCheck` ohnehin
+              faellt: dem Engpass und der Ebene, die er blockiert. Bei
+              „kein Engpass" ist die Spur durchgehend, bei „gleichmaessig
+              schwach" traegt keine Stufe. Es kommt also keine zweite
+              Bewertung dazu — dieselbe Aussage bekommt ein Bild.
+
+              Der Balken bleibt: Er traegt die Zahl, die Schiene traegt die
+              Folge. Beides stammt ausschliesslich aus den eigenen Antworten.
+            */}
+            <ol className="mt-12 flex flex-col">
+              {result.layers.map((layer, i) => {
+                const gebrochen =
+                  result.befund === "kein-engpass"
+                    ? false
+                    : result.befund === "gleichmaessig-schwach"
+                      ? true
+                      : layer.key === result.bottleneck.key || layer.key === result.blocked?.key
+
+                return (
+                  <li key={layer.key} className="flex items-stretch gap-5 md:gap-7">
+                    <SystemRail
+                      ton={gebrochen ? "offen" : "verbunden"}
+                      achse="stapel"
+                      erste={i === 0}
+                      letzte={i === result.layers.length - 1}
+                      ausrichtung="kopf"
+                    />
+                    <div className="grid flex-1 gap-2 py-4 md:grid-cols-12 md:items-center">
+                      <div className="flex items-baseline gap-4 md:col-span-4">
+                        <span
+                          className={`eyebrow ${gebrochen ? "text-muted-foreground" : "text-gold-text"}`}
+                        >
+                          {layer.level}
+                        </span>
+                        <span className="text-subhead">{layerName(layer.key)}</span>
+                      </div>
+                      <div className="md:col-span-7">
+                        <div className="bg-muted h-1.5 w-full overflow-hidden rounded-sm">
+                          <div
+                            className={`h-full rounded-sm ${gebrochen ? "bg-muted-foreground/40" : "bg-gold"}`}
+                            style={{ width: `${layer.percent}%` }}
+                          />
+                        </div>
+                      </div>
+                      <span className="type-stat text-muted-foreground text-sm md:col-span-1 md:text-right">
+                        {layer.percent}%
+                      </span>
                     </div>
-                  </div>
-                  <span className="type-stat text-muted-foreground text-sm md:col-span-1 md:text-right">
-                    {layer.percent}%
-                  </span>
-                </div>
-              ))}
-            </div>
+                  </li>
+                )
+              })}
+            </ol>
 
             {/* Der Engpass-Satz. Das ist die eigentliche Aussage der Seite. */}
             <div className="border-line mt-12 border-t pt-8">

@@ -6,6 +6,8 @@ import { useRouter, usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import { Check, Menu, Sun } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
+import { hasConsent } from "@/lib/consent"
+import { LOCALE_COOKIE, LOCALE_COOKIE_MAXALTER } from "@/lib/locale-markt"
 import { useLocale } from "@/components/locale-provider"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { MoonIcon } from "@/components/ui/moon-icon"
@@ -71,6 +73,23 @@ function useLanguageSwitch() {
   const { path } = splitLocale(pathname)
 
   return (next: Locale) => {
+    /*
+      DIE WAHL MUSS DIE SITZUNG UEBERLEBEN.
+
+      Ohne diese Zeilen schickt die Sprachweiche in der Middleware einen
+      Besucher aus Riad bei jedem neuen Besuch wieder auf Arabisch — auch
+      wenn er beim letzten Mal ausdruecklich Englisch gewaehlt hat. Eine
+      Erkennung, die die Entscheidung eines Menschen jedes Mal ueberstimmt,
+      ist keine Hilfe, sondern eine Bevormundung.
+
+      Gespeichert wird unter derselben Einwilligung wie das Erscheinungsbild
+      (`functional`). Fehlt sie, gilt die Wahl trotzdem fuer diesen Besuch —
+      sie wird nur nicht erinnert. Erst die Erlaubnis, dann der Komfort.
+    */
+    if (typeof document !== "undefined" && hasConsent("functional")) {
+      document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=${LOCALE_COOKIE_MAXALTER}; samesite=lax`
+    }
+
     const target = localePath(path, next)
     const hash = typeof window !== "undefined" ? window.location.hash : ""
     const query = typeof window !== "undefined" ? window.location.search : ""

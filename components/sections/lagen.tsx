@@ -9,7 +9,15 @@ import { SystemRail } from "@/components/creative/system"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 
 /**
- * DIE DREI WEGE — der Einstieg nach Lage.
+ * DIE DREI LAGEN — der Einstieg nach Situation.
+ *
+ * HIESS BIS RUN B „DREI WEGE HINEIN", UND DAS WAR EIN FEHLER.
+ * Die Seite benutzt das Wort „Wege" bereits fuenfmal — unter anderem auf
+ * `/leistungen` fuer „Drei Wege zu einem Preis" und, zwei Abschnitte
+ * weiter, fuer „Zwei Wege hinein — beide zum Festpreis". Zwei Ueberschriften
+ * mit derselben Formel und verschiedener Bedeutung sind keine Fuehrung,
+ * sondern eine Verwechslung. Der Begriff, den dieser Abschnitt wirklich
+ * meint, stand ohnehin schon im Kommentar darunter: die LAGE.
  *
  * ═══════════════════════════════════════════════════════════════════════════
  * DAS PROBLEM, DAS DIESE SEKTION LOEST
@@ -21,7 +29,7 @@ import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
  * Betrieb muss erst die ganze Architektur entschluesseln, ehe er weiss, wo
  * er hingehoert.
  *
- * Drei Wege, benannt nach der LAGE, in der jemand steckt. Keine Etiketten
+ * Drei Lagen, benannt nach der Situation, in der jemand steckt. Keine Etiketten
  * wie klein/mittel/gross: Die Groesse eines Betriebs sagt nicht, wo es
  * klemmt, und ein Etikett, das einen Kunden als „klein" einsortiert, ist
  * ohnehin eine schlechte Eroeffnung.
@@ -49,18 +57,18 @@ import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
  * seinem eigenen Knoten, und die Linie laeuft vor dem ersten und hinter dem
  * letzten weiter: Der Betrieb lief vorher, und er laeuft nachher.
  */
-export function Wege() {
+export function Lagen() {
   const { t } = useLocale()
-  const copy = t.home.wege
+  const copy = t.home.lagen
   const reduce = usePrefersReducedMotion()
 
   return (
-    <section id="wege" aria-labelledby="wege-title" className="section-seam">
+    <section id="lagen" aria-labelledby="lagen-title" className="section-seam">
       <div className="section-shell">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
           <Reveal className="lg:col-span-7">
             <SectionEyebrow label={copy.eyebrow} />
-            <h2 id="wege-title" className="type-h2 mt-7 text-balance">
+            <h2 id="lagen-title" className="type-h2 mt-7 text-balance">
               {copy.title}
             </h2>
           </Reveal>
@@ -70,9 +78,9 @@ export function Wege() {
         </div>
 
         <ol className="mt-14 flex flex-col md:flex-row md:items-stretch">
-          {copy.routen.map((route, i) => (
+          {copy.routen.map((lage, i) => (
             <Reveal
-              key={route.key}
+              key={lage.key}
               as="li"
               delay={0.05 * i}
               className="flex flex-1 items-stretch gap-5 md:flex-col md:gap-0"
@@ -85,16 +93,16 @@ export function Wege() {
               <SystemRail ton="verbunden" achse="fluss" puls={!reduce} verzug={i} aktivierbar />
 
               <Link
-                href={route.href}
+                href={lage.href}
                 className="group hover:bg-surface flex flex-1 flex-col py-6 transition-colors duration-[var(--dur-2)] md:mt-5 md:pe-8"
               >
-                <span className="eyebrow text-gold-text">{route.label}</span>
-                <span className="type-h4 mt-3">{route.title}</span>
+                <span className="eyebrow text-gold-text">{lage.label}</span>
+                <span className="type-h4 mt-3">{lage.title}</span>
                 <span className="type-small text-muted-foreground mt-3 max-w-sm text-pretty">
-                  {route.wenn}
+                  {lage.wenn}
                 </span>
                 <span className="text-meta text-muted-foreground border-line mt-5 max-w-sm border-t pt-4">
-                  {route.start}
+                  {lage.start}
                 </span>
                 <span className="text-gold-text group-hover:text-foreground mt-5 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]">
                   {/*

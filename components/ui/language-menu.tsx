@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react"
 import { Check, ChevronDown, Globe } from "lucide-react"
-import { locales } from "@/lib/routes"
+import { umschalterReihenfolge } from "@/lib/locale-markt"
 import type { Locale } from "@/lib/dictionary"
 import { cn } from "@/lib/utils"
 
@@ -59,7 +59,17 @@ export function LanguageMenu({
   align?: "start" | "end"
 }) {
   const [offen, setOffen] = useState(false)
-  const [aktiv, setAktiv] = useState(() => locales.indexOf(locale))
+  /*
+    DIE REIHENFOLGE FOLGT DEM MARKT, NICHT DEM ALPHABET.
+
+    Wer in Riad sitzt, findet Arabisch zuerst und Englisch danach; Deutsch
+    steht hinten, weil er es mit hoher Wahrscheinlichkeit nicht liest. Die
+    Liste ist damit fuer jeden Besucher in der Reihenfolge sortiert, in der
+    er wahrscheinlich waehlt — und `locales` bleibt, was es ist: die Liste
+    aller Sprachen, nicht eine Rangfolge.
+  */
+  const sprachen = umschalterReihenfolge(locale)
+  const [aktiv, setAktiv] = useState(() => sprachen.indexOf(locale))
   const wurzel = useRef<HTMLDivElement>(null)
   const knopf = useRef<HTMLButtonElement>(null)
   const listeId = useId()
@@ -81,7 +91,7 @@ export function LanguageMenu({
 
   /* Beim Oeffnen steht die aktuelle Sprache unter dem Cursor, nicht die erste. */
   useEffect(() => {
-    if (offen) setAktiv(locales.indexOf(locale))
+    if (offen) setAktiv(sprachen.indexOf(locale))
   }, [offen, locale])
 
   const waehle = (code: Locale) => {
@@ -105,19 +115,19 @@ export function LanguageMenu({
     if (!offen) return
     if (e.key === "ArrowDown") {
       e.preventDefault()
-      setAktiv((i) => (i + 1) % locales.length)
+      setAktiv((i) => (i + 1) % sprachen.length)
     } else if (e.key === "ArrowUp") {
       e.preventDefault()
-      setAktiv((i) => (i - 1 + locales.length) % locales.length)
+      setAktiv((i) => (i - 1 + sprachen.length) % sprachen.length)
     } else if (e.key === "Home") {
       e.preventDefault()
       setAktiv(0)
     } else if (e.key === "End") {
       e.preventDefault()
-      setAktiv(locales.length - 1)
+      setAktiv(sprachen.length - 1)
     } else if (e.key === "Enter" || e.key === " ") {
       e.preventDefault()
-      waehle(locales[aktiv] as Locale)
+      waehle(sprachen[aktiv] as Locale)
     }
   }
 
@@ -158,7 +168,7 @@ export function LanguageMenu({
             align === "end" ? "end-0" : "start-0",
           )}
         >
-          {locales.map((code, i) => {
+          {sprachen.map((code, i) => {
             const gewaehlt = code === locale
             return (
               <li key={code} role="none">

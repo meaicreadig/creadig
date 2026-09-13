@@ -56,7 +56,8 @@
     "konversion-drill": "node scripts/konversion-drill.mjs",
     "erlebnis-drill": "node scripts/erlebnis-drill.mjs",
     "messprobe": "node --import ./scripts/lib/alias-hook.mjs scripts/messprobe.mjs",
-    "beleg-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/beleg-drill.mjs"
+    "beleg-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/beleg-drill.mjs",
+    "sprach-drill": "node scripts/sprach-drill.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

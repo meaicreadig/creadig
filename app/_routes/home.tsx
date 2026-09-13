@@ -4,7 +4,7 @@ import { Betriebsfluss } from "@/components/sections/betriebsfluss"
 import { SelectedWork } from "@/components/sections/selected-work"
 import { CapabilityTiles } from "@/components/sections/capability-tiles"
 import { EntryLine } from "@/components/sections/entry-line"
-import { Wege } from "@/components/sections/wege"
+import { Lagen } from "@/components/sections/lagen"
 import { CaseStudies } from "@/components/sections/case-studies"
 import { ImpactBand } from "@/components/sections/impact-band"
 import { CompanyTeaser } from "@/components/sections/company-teaser"
@@ -145,7 +145,7 @@ export function HomeRoute() {
       <SelectedWork />
 
       {/*
-        3b · DIE DREI WEGE — wo gehoere ich hin, bevor die Architektur kommt.
+        3b · DIE DREI LAGEN — wo gehoere ich hin, bevor die Architektur kommt.
 
         ZWEIMAL FALSCH PLATZIERT, BIS ES GEMESSEN WAR.
 
@@ -171,7 +171,7 @@ export function HomeRoute() {
         weil ein Kaeufer sich in einer Lage wiedererkennt und nicht in einem
         Ebenenmodell.
       */}
-      <Wege />
+      <Lagen />
 
       {/* 4 · B — Die fünf Ebenen als Verteiler-Kacheln. → /leistungen */}
       <CapabilityTiles />

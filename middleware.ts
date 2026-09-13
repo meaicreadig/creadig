@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
 import { ausweichZiel, darfBetreten } from "@/lib/rollen"
+import { LOCALE_COOKIE, nenntSprache, spracheFuer } from "@/lib/locale-markt"
+import { localePath } from "@/lib/routes"
 
 /**
  * MP-G · Die Tür vor dem Control Center.
@@ -30,8 +32,80 @@ import { ausweichZiel, darfBetreten } from "@/lib/rollen"
  * Center ist einsprachig deutsch und liegt bewusst ausserhalb der
  * `(de)`/`(tr)`-Bäume.
  */
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * DIE SPRACHWEICHE — und warum sie so wenig tut wie moeglich
+ *
+ * Eine automatische Sprachumleitung ist der schnellste Weg, eine Seite
+ * kaputtzumachen: Endlosschleifen, ein Suchindex voller Umleitungen, und
+ * Besucher, die ihre eigene Wahl nicht behalten duerfen. Deshalb greift sie
+ * hier nur in EINEM Fall — und laesst alles andere in Ruhe.
+ *
+ * SIE GREIFT NICHT, WENN:
+ *
+ *   · der Pfad schon eine Sprache nennt (`/tr`, `/en`, `/ar`).
+ *     Eine ausdrueckliche Adresse ist eine ausdrueckliche Absicht. Wer aus
+ *     Deutschland `/ar` oeffnet, will Arabisch — und bekommt Arabisch.
+ *
+ *   · ein Keks die Wahl des Menschen traegt. Einmal umgeschaltet, nie
+ *     wieder umgeleitet.
+ *
+ *   · kein `Accept-Language` mitkommt ODER er nur `*` sagt. Das ist die
+ *     ehrlichste Bot-Erkennung, die ohne Namensliste auskommt: Menschen
+ *     nennen eine Sprache, Werkzeuge und Crawler schicken „egal". Ohne
+ *     genannten Wunsch wird nicht geraten, und Deutsch bleibt stehen.
+ *
+ *   · die Entscheidung „Deutsch" lautet. Deutsch liegt an der Wurzel; es
+ *     gaebe kein anderes Ziel.
+ *
+ * SIE UMLEITET TEMPORAER (307), NIE DAUERHAFT.
+ * Eine 301 waere eine Aussage ueber die Adresse. Das hier ist eine Aussage
+ * ueber den Besucher — und der naechste ist ein anderer.
+ */
+const SPRACHFREI = /^\/(admin|api|_next|.*\..*)/
+const SCHON_UEBERSETZT = /^\/(tr|en|ar)(\/|$)/
+
+function sprachweiche(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  if (SPRACHFREI.test(pathname) || SCHON_UEBERSETZT.test(pathname)) return null
+
+  const gespeichert = request.cookies.get(LOCALE_COOKIE)?.value ?? null
+
+  /*
+    ZUERST STAND HIER `if (cookie) return null` — UND DAS WAR FALSCH HERUM.
+
+    Damit wurde die gespeicherte Wahl nicht BEACHTET, sondern UEBERSPRUNGEN:
+    Wer Englisch gewaehlt hatte und spaeter die blanke Adresse oeffnete,
+    landete wieder auf Deutsch. Die Wahl soll aber gelten, nicht nur die
+    Erkennung abschalten. Sie geht deshalb als oberste Stufe in die
+    Entscheidung ein.
+
+    Der Kopf `accept-language` bleibt Bedingung fuer das ERRATEN, nicht fuer
+    das Erinnern: Ohne Wahl und ohne Browsersprache wird nichts geraten.
+  */
+  const browsersprache = request.headers.get("accept-language")
+  if (!gespeichert && !nenntSprache(browsersprache)) return null
+
+  const sprache = spracheFuer({
+    gespeichert,
+    browsersprache,
+    land: request.headers.get("x-vercel-ip-country"),
+  })
+  if (sprache === "de") return null
+
+  const ziel = request.nextUrl.clone()
+  ziel.pathname = localePath(pathname, sprache)
+  if (ziel.pathname === pathname) return null
+  return NextResponse.redirect(ziel, 307)
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  /* Alles ausserhalb von /admin geht hoechstens durch die Sprachweiche. */
+  if (!pathname.startsWith("/admin")) {
+    return sprachweiche(request) ?? NextResponse.next()
+  }
 
   const configured =
     Boolean(process.env.ADMIN_PASSWORD) && Boolean(process.env.ADMIN_SESSION_SECRET)
@@ -82,5 +156,19 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  /*
+    Statische Dateien und Bilder bleiben aussen vor — eine Sprachweiche vor
+    einem Logo kostet nur Zeit. `SPRACHFREI` faengt den Rest ab.
+  */
+  matcher: [
+    /*
+      Der Admin-Pfad bleibt woertlich stehen. Das Rollen-Gate prueft genau
+      diesen Eintrag — und zu Recht: Eine Zugangspruefung, die nur noch aus
+      einem Negativ-Muster folgt, ist eine, die beim naechsten Umbau
+      unbemerkt aufgeht.
+    */
+    "/admin/:path*",
+    /* Alles Oeffentliche fuer die Sprachweiche; Dateien und Bilder nicht. */
+    "/((?!admin|_next/static|_next/image|favicon|.*\\..*).*)",
+  ],
 }
