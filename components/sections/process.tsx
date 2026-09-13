@@ -2,6 +2,7 @@
 
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
+import { SystemRail } from "@/components/creative/system"
 import { opsSteps, processSteps } from "@/lib/site-data"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -62,28 +63,67 @@ export function Process() {
           </h2>
         </Reveal>
 
-        <div className="mt-12 grid gap-x-2.5 gap-y-8 md:mt-20 md:gap-y-12 md:grid-cols-3">
+        {/*
+          EIN ABLAUF IST EINE STRECKE — HIER WAR ER EIN RASTER.
+
+          Verstehen, Bauen, Betreiben standen als drei Spalten nebeneinander,
+          jede mit einem eigenen `border-t` darueber. Drei Striche
+          nebeneinander sagen „drei Dinge". Der Text sagt aber etwas anderes:
+          eines FUEHRT ZUM naechsten, und das dritte hoert nicht auf.
+
+          Das ist genau die Aussage, fuer die es das Vokabular gibt. Deshalb
+          ist dies die einzige Stelle auf `/leistungen`, an der die Schiene
+          zwingend richtig ist: Ein Prozess IST ein Fluss.
+
+          Die Zierlinie beim Ueberfahren faellt damit weg — nicht, weil sie
+          haesslich waere, sondern weil hier jetzt eine Schiene liegt und der
+          Knoten die Aktivierung traegt (siehe Praezisierung in der Creative
+          Direction). Zwei Anzeigen fuer dieselbe Sache waeren eine zu viel.
+
+          Die Strecke laeuft hinter dem letzten Knoten WEITER: „Betreiben"
+          ist kein Ende, sondern der Zustand danach — derselbe Satz, den der
+          Betriebs-Abschnitt darueber schon macht.
+        */}
+        <ol className="mt-12 flex flex-col md:mt-20 md:flex-row md:items-stretch">
           {processSteps.map((step, i) => {
             const copy = t.process.steps[step.key]
             return (
               <Reveal
                 key={step.key}
+                as="li"
                 delay={0.08 * i}
-                className="group border-line relative border-t pt-6 md:pt-8 md:pr-10"
+                /*
+                  DER INNENABSTAND DARF NICHT AN DER ZELLE HAENGEN.
+
+                  Zuerst stand `md:pe-10` hier an der `li`. Im Bild gemessen
+                  riss das die Strecke zwischen den Schritten auf: Zwischen
+                  „Verstehen" und „Bauen" klaffte eine Luecke — und eine
+                  Luecke bedeutet in diesem Vokabular genau eine Sache, eine
+                  Uebergabe von Hand. Die Zeichnung behauptete damit das
+                  Gegenteil des Textes ueber ihr.
+
+                  Der Abstand gehoert an den INHALT, die Strecke laeuft
+                  durch.
+                */
+                className="group flex flex-1 items-stretch gap-5 md:flex-col md:gap-0"
               >
-                <span
-                  aria-hidden="true"
-                  className="bg-gold absolute top-0 start-0 h-px w-0 transition-all duration-[var(--dur-3)] ease-brand group-hover:w-full"
+                <SystemRail
+                  ton="verbunden"
+                  achse="fluss"
+                  erste={i === 0}
+                  aktivierbar
                 />
-                <span className="eyebrow text-gold-text">{step.step}</span>
-                <h3 className="type-h3 mt-4 md:mt-6">{copy.name}</h3>
-                <p className="type-body text-muted-foreground mt-3 max-w-sm text-pretty md:mt-5">
-                  {copy.what}
-                </p>
+                <span className="flex flex-1 flex-col pb-8 md:pt-6 md:pb-0 md:pe-10">
+                  <span className="eyebrow text-gold-text">{step.step}</span>
+                  <h3 className="type-h3 mt-4 md:mt-6">{copy.name}</h3>
+                  <p className="type-body text-muted-foreground mt-3 max-w-sm text-pretty md:mt-5">
+                    {copy.what}
+                  </p>
+                </span>
               </Reveal>
             )
           })}
-        </div>
+        </ol>
 
         <Reveal delay={0.2}>
           <p className="type-statement border-line mt-12 max-w-4xl border-t pt-8 text-balance md:mt-20 md:pt-12">
