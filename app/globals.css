@@ -1014,6 +1014,35 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
   animation: marquee-right 64s linear infinite;
 }
 
+/*
+ * DAS SIGNAL — der einzige bewegte Teil des Systembilds.
+ *
+ * Die Spur selbst bewegt sich nie. Was wandert, ist ein Vorgang: Die
+ * Knoten leuchten nacheinander auf, jeder mit dem Verzug seiner Position
+ * (`animationDelay` in `betriebsfluss.tsx`). Damit erklaert die Bewegung
+ * eine RICHTUNG — Arbeit laeuft durch den Betrieb — statt zu dekorieren.
+ *
+ * Die Ruhestufe ist sichtbar (0.45), nicht 0. Ein Knoten, der zwischen
+ * zwei Pulsen verschwindet, wuerde die Spur zerreissen, und genau das ist
+ * die Aussage der ANDEREN Spur.
+ */
+@keyframes signal {
+  0%,
+  62%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(1.55);
+  }
+}
+
+.animate-signal {
+  animation: signal 3.4s var(--ease-brand) infinite;
+}
+
 /* Hover pausiert die Logo-Leiste. */
 .marquee-track:hover .animate-marquee-left,
 .marquee-track:hover .animate-marquee-right {
@@ -1022,7 +1051,8 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
 
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee-left,
-  .animate-marquee-right {
+  .animate-marquee-right,
+  .animate-signal {
     animation: none;
   }
   html {

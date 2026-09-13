@@ -1,5 +1,6 @@
 import { Hero } from "@/components/sections/hero"
 import { HouseStatement } from "@/components/sections/house-statement"
+import { Betriebsfluss } from "@/components/sections/betriebsfluss"
 import { SelectedWork } from "@/components/sections/selected-work"
 import { CapabilityTiles } from "@/components/sections/capability-tiles"
 import { EntryLine } from "@/components/sections/entry-line"
@@ -119,6 +120,25 @@ export function HomeRoute() {
 
       {/* 2 · A — creaDIG in einem Satz. Die erste Pause. */}
       <HouseStatement />
+
+      {/*
+        2b · SYSTEMBILD — die Antwort auf den Satz darueber, als Zeichnung.
+
+        `HouseStatement` behauptet: „Die Arbeit ist da. Das System dahinter
+        fehlt." Darunter erklaeren das rund 130 Woerter. Der Buyer-Audit
+        nennt genau diese Stelle: zu viel erklaeren, zu wenig zeigen — und
+        als groesste visuelle Luecke „kein Systembild, kein
+        Signature-Moment".
+
+        Die Sektion steht HIER und nicht weiter unten, weil der Satz
+        darueber die Frage aufwirft, die sie beantwortet. Zwischen Aussage
+        und Beweis gehoert nichts.
+
+        Sie bricht zugleich den Takt: `HouseStatement` ist dunkel, das
+        Systembild steht auf Papier, danach folgt das randlose Bildband.
+        Dunkel → Papier → Bild, ohne zwei gleiche Grammatiken nebeneinander.
+      */}
+      <Betriebsfluss />
 
       {/* 3 · C — Beweis vor Erklärung: randloses Band, eigene Produkte. → /produkte */}
       <SelectedWork />

@@ -119,6 +119,38 @@ export const dictionary = {
         cta: "Über das Unternehmen",
       },
       /*
+       * DAS SYSTEMBILD — die These als Zeichnung statt als Absatz.
+       *
+       * Direkt darueber steht der Satz „Die Arbeit ist da. Das System
+       * dahinter fehlt." und darunter ein Absatz von rund 130 Woertern, der
+       * ihn erklaert. Das Erklaeren ist hier das Problem: Der Satz
+       * beschreibt eine unterbrochene Linie — und eine unterbrochene Linie
+       * kann man ZEIGEN.
+       *
+       * Die sechs Stationen sind keine neue Behauptung. Sie stehen bereits
+       * so in `lib/branchen.ts`: „Anfrage, Angebot, Termin, Auftrag,
+       * Dokumentation, Rechnung — sechs Schritte, meist sechs Werkzeuge."
+       * Das Bild sagt also nichts, was die Firma nicht ohnehin sagt; es
+       * sagt es nur in zwei Sekunden statt in einem Absatz.
+       *
+       * `modelNote` ist nicht schmueckend. Ohne sie waere die Zeichnung ein
+       * Vorher/Nachher ohne Messung — und genau das verbietet die
+       * Beleg-Ordnung. Sie bleibt am Bild, nicht im Kleingedruckten.
+       */
+      betriebsfluss: {
+        eyebrow: "Das Systembild",
+        title: "Sechs Schritte. Meist sechs Werkzeuge.",
+        lead: "Zwischen den Schritten liegen die Übergaben. Dort geht Zeit verloren, und dort wird abends rekonstruiert, was tagsüber niemand notiert hat.",
+        stations: ["Anfrage", "Angebot", "Termin", "Auftrag", "Dokumentation", "Rechnung"],
+        todayLabel: "Heute",
+        todayNote: "Fünf Übergaben von Hand.",
+        systemLabel: "Mit System",
+        systemNote: "Ein Weg. Ein Stand, den alle sehen.",
+        gapLabel: "Bruchstelle",
+        signalLabel: "Ein Vorgang",
+        modelNote: "Modell, kein Kundenergebnis. Es zeigt die Struktur, die wir bauen — keine gemessene Ersparnis.",
+      },
+      /*
        * GATE 01 · WEB-0005 — DIE SEKTION HIESS „AUSGEWAEHLTE ARBEITEN" UND
        * ZEIGTE EIGENE PRODUKTE.
        *
@@ -2925,6 +2957,20 @@ export const dictionary = {
         body: "Kâğıtlar, tablolar ve birbirinden habersiz üç program: bir soruya cevap vermek isteyen dört yere bakar — ve cevap daha bitmeden eskimiştir. creaDIG tam bunun için var. Arkadaki sistemi biz kurgular, kendimiz kurar ve işler hâlde tutarız. Klasik bir BT sistem evi değiliz — sunucu yok, lisans yok, yardım masası yok; esnaf, muayenehane, restoran ve hizmet işletmeleri için bir sistem evi. „Dijital işletme“ burada sonuçtur, önkoşul değil — bize başlamak için dijital bir firma olmanız gerekmiyor. Markadan görünüme, günlük işletmeden otomasyona ve yapay zekâya: beş katman, ve siz nerede sıkışıyorsanız oradan girersiniz.",
         cta: "Şirket hakkında",
       },
+      /* Das Systembild. Die Stationen sind dieselben sechs Schritte. */
+      betriebsfluss: {
+        eyebrow: "Sistem görüntüsü",
+        title: "Altı adım. Çoğu zaman altı ayrı araç.",
+        lead: "Adımların arasında devir noktaları var. Zaman orada kayboluyor; gün içinde kimsenin not almadığı şey akşam oradan yeniden kuruluyor.",
+        stations: ["Talep", "Teklif", "Randevu", "İş emri", "Belgeleme", "Fatura"],
+        todayLabel: "Bugün",
+        todayNote: "Elden beş devir.",
+        systemLabel: "Sistemle",
+        systemNote: "Tek yol. Herkesin gördüğü tek durum.",
+        gapLabel: "Kopma noktası",
+        signalLabel: "Bir iş",
+        modelNote: "Model, müşteri sonucu değil. Kurduğumuz yapıyı gösterir — ölçülmüş bir tasarruf değil.",
+      },
       work: {
         eyebrow: "Kendi ürünlerimiz",
         title: "Önce kur. Sonra konuş.",
@@ -4529,6 +4575,20 @@ export const dictionary = {
         body: "Notes, spreadsheets and three programs that know nothing about each other: anyone who wants to answer a question looks in four places — and the answer is out of date before it is finished. That is what creaDIG exists for. We design the system behind it, build it ourselves and keep it running. Not a classic IT systems house — no servers, no licences, no helpdesk, but a systems house for trades, practices, restaurants and service companies. Being a “digital operation” is the result here, not the entry requirement — you do not have to be a tech company to start with us. From the brand through the presence and day-to-day operations to automation and artificial intelligence: five levels, and you enter at the one where it hurts.",
         cta: "About the company",
       },
+      /* Das Systembild. Dieselben sechs Schritte, dieselbe Modell-Kennzeichnung. */
+      betriebsfluss: {
+        eyebrow: "The system picture",
+        title: "Six steps. Usually six tools.",
+        lead: "The handovers sit between the steps. That is where time is lost, and where the evening goes into reconstructing what nobody wrote down during the day.",
+        stations: ["Enquiry", "Quote", "Appointment", "Job", "Documentation", "Invoice"],
+        todayLabel: "Today",
+        todayNote: "Five handovers by hand.",
+        systemLabel: "With a system",
+        systemNote: "One path. One status everyone can see.",
+        gapLabel: "Break",
+        signalLabel: "One job",
+        modelNote: "A model, not a customer result. It shows the structure we build — not a measured saving.",
+      },
       work: {
         eyebrow: "Our own products",
         title: "Build first. Talk after.",
@@ -6111,6 +6171,20 @@ export const dictionary = {
         title: "العمل موجود. النظام الذي خلفه غير موجود.",
         body: "أوراق وجداول وثلاثة برامج لا يعرف بعضها بعضًا: من يريد الإجابة عن سؤال يبحث في أربعة مواضع — وتصبح الإجابة قديمة قبل أن تكتمل. لهذا وُجدت creaDIG. نصمّم النظام الذي يقف خلف ذلك، ونبنيه بأنفسنا، ونُبقيه في التشغيل. لسنا بيت أنظمة معلومات تقليديًا — لا خوادم ولا تراخيص ولا مكتب مساعدة، بل بيت أنظمة للحرف والعيادات والمطاعم ومقدّمي الخدمات. «المنشأة الرقمية» هنا هي النتيجة لا الشرط — لستم بحاجة لأن تكونوا شركة تقنية كي تبدأوا معنا. من العلامة إلى الحضور والتشغيل اليومي والأتمتة والذكاء الاصطناعي: خمس طبقات، وتدخلون من الطبقة التي تؤلمكم.",
         cta: "عن الشركة",
+      },
+      /* Das Systembild. Im Arabischen laeuft die Spur von rechts nach links. */
+      betriebsfluss: {
+        eyebrow: "صورة النظام",
+        title: "ست خطوات. وغالبًا ست أدوات.",
+        lead: "بين الخطوات تقع عمليات التسليم. هناك يضيع الوقت، وهناك يُعاد في المساء بناء ما لم يدوّنه أحد أثناء النهار.",
+        stations: ["طلب", "عرض سعر", "موعد", "أمر عمل", "توثيق", "فاتورة"],
+        todayLabel: "اليوم",
+        todayNote: "خمس عمليات تسليم يدوية.",
+        systemLabel: "مع نظام",
+        systemNote: "مسار واحد. وحالة واحدة يراها الجميع.",
+        gapLabel: "نقطة انقطاع",
+        signalLabel: "معاملة واحدة",
+        modelNote: "نموذج، وليس نتيجة عميل. يوضّح البنية التي نبنيها — لا وفورات مقيسة.",
       },
       work: {
         eyebrow: "منتجاتنا",
