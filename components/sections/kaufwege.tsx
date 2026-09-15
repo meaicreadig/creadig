@@ -118,7 +118,7 @@ export function Kaufwege() {
                   </p>
 
                   <ul className="mt-6 flex flex-col">
-                    {angeboteZu(weg).map((angebot) => {
+                    {angeboteZu(weg).map((angebot, ai) => {
                       const text = angebotText[angebot.key]
                       if (!text) return null
                       return (
@@ -179,9 +179,31 @@ export function Kaufwege() {
                             geblieben ist.
                           */}
                           <div className="lg:col-span-7">
-                            <p className="eyebrow text-muted-foreground">
-                              {kaufwegeText.grenzeLabel[locale]}
-                            </p>
+                            {/*
+                              B14 — DIE BESCHRIFTUNG STAND SECHSMAL AUF DER
+                              SEITE.
+
+                              „NICHT ENTHALTEN" gehoert zu jedem Angebot, also
+                              erschien es je Angebot — sechsmal in Grossbuchstaben
+                              auf einem Bildschirm. Der Inhalt darunter ist
+                              jedes Mal ein anderer und bleibt vollstaendig;
+                              die Ueberschrift dagegen sagt beim zweiten Mal
+                              nichts Neues und beim sechsten klingt sie nach
+                              Abwehr.
+
+                              Jetzt steht sie einmal je Kaufweg: dreimal statt
+                              sechsmal, und die Spalte darunter bleibt an
+                              derselben Kante.
+                            */}
+                            {ai === 0 ? (
+                              <p className="eyebrow text-muted-foreground">
+                                {kaufwegeText.grenzeLabel[locale]}
+                              </p>
+                            ) : (
+                              <p aria-hidden="true" className="eyebrow invisible">
+                                {kaufwegeText.grenzeLabel[locale]}
+                              </p>
+                            )}
                             <p className="type-small text-muted-foreground mt-1.5 text-pretty">
                               {text.grenze[locale]}
                             </p>

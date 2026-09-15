@@ -62,11 +62,26 @@ export function ManagedOperations() {
           </Reveal>
         </div>
 
-        <Reveal delay={0.14}>
-          <p className="type-statement border-line mt-16 max-w-4xl border-t pt-10 text-balance">
-            {copy.statement}
-          </p>
-        </Reveal>
+        {/*
+            B14 — HIER STAND DIESELBE ZUSAGE ZUM DRITTEN MAL AUF EINER SEITE.
+
+            Der Satz „Wir uebergeben nicht und verschwinden …" stand:
+
+              · im Prozess-Schritt „Betreiben", rund 150 Pixel weiter oben
+              · hier, als `type-statement` in grosser Schrift
+              · und gleich darunter noch einmal als „Betrieb statt Uebergabe"
+
+            Dreimal dieselbe Zusage macht sie nicht glaubwuerdiger. Sie macht
+            den Leser misstrauisch — wer etwas dreimal sagt, verteidigt sich.
+
+            Geblieben ist die Stelle, an der die Zusage etwas KOSTET: der
+            Betreuungsblock darunter mit Umfang und Preis. Der Prozess-Schritt
+            oben nennt sie im Ablauf. Diese mittlere Wiederholung trug nichts,
+            was nicht schon zweimal danebensteht.
+
+            `copy.statement` bleibt im Woerterbuch: Auf `/betrieb` ist es der
+            Kernsatz der Seite und steht dort genau einmal.
+        */}
 
         {/* Sieben Spalten, eine Reihe: die Schicht unter den fuenf Ebenen. */}
         <Reveal delay={0.18} className="mt-16">
