@@ -131,7 +131,25 @@ export function Kaufwege() {
                               <span className="text-foreground text-base font-semibold">
                                 {text.name[locale]}
                               </span>
-                              {angebot.betrag !== null ? (
+                              {/*
+                                B14 — DERSELBE BETRAG STAND ZWEIMAL AUF DIESER SEITE.
+
+                                Das Website-Paket verweist auf `#pakete`, also auf
+                                einen Abschnitt rund zweihundert Pixel weiter unten
+                                — und dort steht der Betrag noch einmal, mit
+                                Laufzeit, Leistungsumfang und Pilotpreis-Erklaerung.
+                                Zwei Zahlen fuer dasselbe Angebot auf einem
+                                Bildschirm sind keine Transparenz, sondern eine
+                                Frage, welche gilt.
+
+                                Geblieben ist die kanonische Stelle (`packages`,
+                                G18-gesperrt und unangetastet). Hier traegt die
+                                Beschriftung den Verweis ohnehin: „Paket und Preis
+                                ansehen". Betroffen ist genau EIN Angebot — die
+                                anderen verweisen auf andere Seiten, dort
+                                wiederholt sich nichts.
+                              */}
+                              {angebot.betrag !== null && !angebot.href.includes("#") ? (
                                 <span className="text-gold-text type-small font-mono">
                                   {formatPrice(angebot.betrag, locale)}
                                   {angebot.betragArt === "monatlich"
@@ -141,11 +159,11 @@ export function Kaufwege() {
                                     ? ` · ${kaufwegeText.regulaerLabel[locale]} ${formatPrice(angebot.betragBis, locale)}`
                                     : ""}
                                 </span>
-                              ) : (
+                              ) : angebot.betrag === null ? (
                                 <span className="text-muted-foreground type-small font-mono">
                                   {kaufwegeText.betragArt["nach-zuschnitt"][locale]}
                                 </span>
-                              )}
+                              ) : null}
                             </div>
                             <Link
                               href={angebot.href}

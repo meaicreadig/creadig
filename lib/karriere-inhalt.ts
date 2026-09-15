@@ -382,13 +382,31 @@ export const spurA = {
     ar: "لا نبحث عن بائع. نبحث عمّن ينظر إلى منشأة فيرى ما لا يعمل فيها — ويعرف الفرق بين ما يراه وما يفترضه بناءً عليه.",
   } as Localized,
 
+  /*
+   * HIER STAND EIN SATZ, DER EIN GESCHAEFTSMODELL BEHAUPTETE.
+   *
+   * „creaDIG verkauft heute ueber den Inhaber." — oeffentlich, in vier
+   * Sprachen, in grosser Schrift. Der Satz war als ehrliche Begruendung fuer
+   * die Rolle gemeint, und als solche war er nachvollziehbar. Er sagt aber
+   * etwas anderes, als er sagen wollte: Er macht aus einer Kapazitaetsfrage
+   * einen VERTRIEBSKANAL und damit eine Aussage ueber das Geschaeftsmodell.
+   *
+   * Ein Kaeufer, der ihn liest, erfaehrt nicht „hier fehlt eine Rolle",
+   * sondern „diese Firma haengt am Inhaber". Das ist eine andere Behauptung,
+   * sie steht in keinem Kanon, und sie gehoert nicht auf eine oeffentliche
+   * Seite.
+   *
+   * Der Grund fuer die Rolle bleibt vollstaendig erhalten — er wird nur dort
+   * erzaehlt, wo er hingehoert: bei Verantwortung und Gleichzeitigkeit, nicht
+   * beim Vertrieb. Die Karriere-Erzaehlung selbst ist unveraendert.
+   */
   warumEsGibt: {
     eyebrow: { de: "Warum es diese Rolle gibt", tr: "Bu rol neden var", en: "Why this role exists", ar: "لماذا يوجد هذا الدور" } as Localized,
     text: {
-      de: "creaDIG verkauft heute über den Inhaber. Das funktioniert, solange er selbst im Gespräch sitzt — und es hört auf zu funktionieren, sobald er gleichzeitig bauen soll. Was fehlt, ist niemand, der Angeboten hinterherruft. Was fehlt, ist jemand, der Betriebe findet, versteht und so beschreibt, dass ein Systemgespräch überhaupt Sinn ergibt.",
-      tr: "creaDIG bugün sahibi üzerinden satıyor. Bu, o görüşmede oturduğu sürece işliyor — aynı anda üretmesi gerektiğinde işlemez oluyor. Eksik olan, tekliflerin peşinden koşan biri değil. Eksik olan; işletmeleri bulan, anlayan ve sistem görüşmesini anlamlı kılacak şekilde tarif eden biri.",
-      en: "Today creaDIG sells through its owner. That works as long as he is in the conversation himself — and stops working the moment he is also supposed to build. What is missing is not someone chasing quotes. What is missing is someone who finds businesses, understands them, and describes them so that a system conversation makes sense at all.",
-      ar: "تبيع creaDIG اليوم عبر صاحبها. ينجح ذلك ما دام حاضرًا في الحديث — ويتوقّف حين يُطلب منه البناء في الوقت نفسه. الناقص ليس من يلاحق العروض، بل من يجد المنشآت ويفهمها ويصفها بحيث يصبح حديث النظام ذا معنى.",
+      de: "Wer heute ein Systemgespräch führt, ist derselbe, der danach baut. Das trägt, solange beides nacheinander passiert — und es hört auf zu tragen, sobald es gleichzeitig soll. Was fehlt, ist niemand, der Angeboten hinterherruft. Was fehlt, ist jemand, der Betriebe findet, versteht und so beschreibt, dass ein Systemgespräch überhaupt Sinn ergibt.",
+      tr: "Bugün sistem görüşmesini yürüten kişi, sonrasında inşa eden kişiyle aynı. Bu, ikisi arka arkaya olduğu sürece taşıyor — aynı anda olması gerektiğinde taşımıyor. Eksik olan, tekliflerin peşinden koşan biri değil. Eksik olan; işletmeleri bulan, anlayan ve sistem görüşmesini anlamlı kılacak şekilde tarif eden biri.",
+      en: "Whoever leads a system conversation today is the same person who builds afterwards. That holds as long as the two happen in sequence — and stops holding the moment they are supposed to happen at once. What is missing is not someone chasing quotes. What is missing is someone who finds businesses, understands them, and describes them so that a system conversation makes sense at all.",
+      ar: "من يُجري اليوم حديث النظام هو نفسه من يبني بعده. ينجح ذلك ما دام الأمران يجريان تباعًا — ويتوقّف حين يُطلب أن يجريا في آنٍ واحد. الناقص ليس من يلاحق العروض، بل من يجد المنشآت ويفهمها ويصفها بحيث يصبح حديث النظام ذا معنى.",
     } as Localized,
   },
 
