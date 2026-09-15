@@ -26,6 +26,47 @@
 
 ---
 
+## Final Completion Wave — Stand 15.09.2026
+
+**Run B bleibt OFFEN.** Ehrliche Schätzung: **~80 %**, nicht 90.
+
+| Lane | Stand | Messung |
+|---|---|---|
+| **B15** Artefakt-System | 🟢 | vorher **0 von 4** Artefakten mit Beleg-Rang, nachher **3 von 4** — jedes mit Rang *und* Grenzsatz. Das vierte (Haus-Zeichnung) beantwortet die vier Fragen bereits selbst |
+| **B14** Verdichtung | 🟡 | 441 Sätze gemessen, 36 auf mehr als einer Route. Davon echte Dopplung: **eine** (doppelter Betrag auf `/leistungen`) — entfernt. Ergebnis: **−6 Wörter**. Das ist keine Verdichtung, und ich gebe es nicht als solche aus |
+| **B04** Produkte | 🟡 | vier von fünf Pflichtangaben je Produkt vorhanden (Aufgabe · Reife · Beleg · Handlung); **Reife ist nicht eingeebnet** (fibero „Im Tagesbetrieb", drei „Im Aufbau"). Fehlt: das eine echte Bild — für zwei Produkte `OWNER_ASSET_DEPENDENCY`, für die anderen zwei läge es an dritter Stelle derselben Aufnahme |
+| **B07** Unternehmen | 🟡 | **materieller Fund behoben** (siehe unten); Gravitas-Text selbst nicht neu gefasst |
+| **B13** Navigation | 🟡 | Sprachumschalter folgt dem Markt; Fußzeile unverändert |
+| **B19** Parität | 🟡 | neue Texte in vier Sprachen; bestehende nicht durchgesehen |
+| **B21** Käufer-Audit | 🟡 | gemessen + einzelne Seiten qualitativ; **kein** vollständiger Durchgang über zwölf Seiten |
+| **B22** Fixback | 🟢 | vier Befunde, alle behoben oder begründet |
+| **B23** Preview | 🟡 | Validierung grün, 100 Aufnahmen — aber Run B ist nicht erschöpft |
+
+### Der materielle Fund dieser Runde
+
+Öffentlich auf `/karriere/dach-business-development`, in **vier Sprachen**, in
+großer Schrift: *„creaDIG verkauft heute über den Inhaber."*
+
+Als Begründung für eine offene Rolle nachvollziehbar — aber der Satz macht aus
+einer Kapazitätsfrage einen **Vertriebskanal** und damit eine Aussage über das
+Geschäftsmodell. Ein Käufer liest daraus nicht „hier fehlt eine Rolle", sondern
+„diese Firma hängt am Inhaber". Entfernt; der Grund für die Rolle steht
+unverändert da, nur bei Verantwortung statt bei Vertrieb.
+
+### Was offen bleibt — owner-unabhängig
+
+1. **B14** — echte Verdichtung der nicht gesperrten `/leistungen`-Abschnitte
+2. **B04** — Entscheidung, wo die zwei echten Produktaufnahmen leben
+3. **B07** — Gravitas-Durchgang auf `/unternehmen`
+4. **B13** — Fußzeile als Abschlussfläche
+5. **B19** — Durchsicht der bestehenden Texte in TR/EN/AR
+6. **B21** — vollständiger qualitativer Käufer-Durchgang
+
+`packages.tsx` bleibt **BLOCKED_G18**: 2.334 px und 487 Wörter von
+`/leistungen`, also 22 % der Höhe und 31 % der Wörter.
+
+---
+
 ## Completion Wave — Stand 13.09.2026
 
 | Lane | Stand | Beleg |
