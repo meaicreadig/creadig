@@ -1799,8 +1799,27 @@ export const dictionary = {
           what: "Jedes Projekt hat einen Verantwortlichen, und es ist immer derselbe. Er führt das erste Gespräch, er entwirft das System, und er geht ans Telefon, wenn etwas ist. Kein Wechsel vom Verkauf zur Umsetzung, keine Übergabe an jemanden, der nicht dabei war.",
         },
         core: {
+          /*
+           * B07/B22 — HIER STAND EINE BELASTBARKEIT, DIE NICHT BELEGT IST.
+           *
+           * „Gross genug, dass ein Urlaub kein Projekt anhaelt." Zwei
+           * Abschnitte weiter unten steht auf DERSELBEN Seite das Gegenteil:
+           *
+           *     „… eine Vertretungsregel fuer den Fall, dass der
+           *      Verantwortliche ausfaellt. Alle drei liessen sich
+           *      behaupten, keine davon ist heute belegt."
+           *
+           * Ein Kaeufer, der beide liest, glaubt danach keinen von beiden.
+           * Und die Aussage ist genau die Sorte Ausfallsicherheit, die ohne
+           * Vertretungsregel niemand zusagen kann.
+           *
+           * Geblieben ist der Vorteil, den ein kleines Team wirklich hat und
+           * der sich nachpruefen laesst: Wer fragt, bekommt eine Antwort von
+           * jemandem, der den Stand kennt — nicht erst, nachdem jemand ihn
+           * nachgelesen hat.
+           */
           name: "Ein kleines Kernteam",
-          what: "Klein genug, dass jeder weiß, woran die anderen arbeiten. Groß genug, dass ein Urlaub kein Projekt anhält.",
+          what: "Klein genug, dass jeder weiß, woran die anderen arbeiten — niemand muss erst den Stand nachlesen, bevor er antworten kann.",
         },
         network: {
           name: "Spezialisten nach Bedarf",
@@ -3993,7 +4012,7 @@ export const dictionary = {
         },
         core: {
           name: "Küçük bir çekirdek ekip",
-          what: "Herkesin diğerlerinin ne üzerinde çalıştığını bileceği kadar küçük. Bir tatilin projeyi durdurmayacağı kadar büyük.",
+          what: "Herkesin diğerlerinin ne üzerinde çalıştığını bileceği kadar küçük — kimse yanıt vermeden önce durumu okumak zorunda kalmıyor.",
         },
         network: {
           name: "İhtiyaca göre uzmanlar",
@@ -5689,7 +5708,7 @@ export const dictionary = {
         },
         core: {
           name: "A small core team",
-          what: "Small enough that everyone knows what the others are working on. Large enough that one holiday does not stop a project.",
+          what: "Small enough that everyone knows what the others are working on — nobody has to read up on the status before they can answer.",
         },
         network: {
           name: "Specialists as needed",
@@ -7370,7 +7389,7 @@ export const dictionary = {
         },
         core: {
           name: "فريق أساسي صغير",
-          what: "صغير بما يكفي ليعرف كلٌّ ما يعمل عليه الآخرون. وكبير بما يكفي ألّا توقف إجازةٌ واحدة مشروعًا.",
+          what: "صغير بما يكفي ليعرف كلٌّ ما يعمل عليه الآخرون — فلا يحتاج أحد إلى مراجعة الحالة قبل أن يُجيب.",
         },
         network: {
           name: "متخصصون عند الحاجة",
