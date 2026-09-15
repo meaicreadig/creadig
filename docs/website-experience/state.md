@@ -26,6 +26,51 @@
 
 ---
 
+## Final Closure Strike — Stand 15.09.2026
+
+**MASTER RUN B: owner-unabhängig abgeschlossen.** Ehrliche Schätzung: **~92 %**.
+
+| Lane | Stand | Beleg |
+|---|---|---|
+| **B14** Verdichtung | 🟢 | `/leistungen` 12.461 → **12.122 px**, 1.638 → **1.600 W**; „NICHT ENTHALTEN" **6 → 3**, „verschwinden" **4 → 2** |
+| **B04** Produkte | 🟢 + `OWNER_ASSET_DEPENDENCY` | fünf Pflichtangaben je Produkt; Reife nicht eingeebnet; CASSAMEA/meahv **absichtlich** ohne Aufnahme, Grund steht groß auf der Seite |
+| **B07** Unternehmen | 🟢 | unbelegte Ausfallsicherheit entfernt (siehe unten); Das Haus integriert; keine Inhaber-Vertriebsaussage |
+| **B13** Navigation | 🟢 | Kopf 6 Verweise · Fuß 28, **28 eindeutig** (kein Dublettenhaufen), 2 Abschluss-CTA, keine Sackgasse |
+| **B19** Parität | 🟢 | vier Sprachen auf allen Kernseiten, je genau eine `h1`; Grenzsatz auf `/arbeiten` in **allen vier** |
+| **B21** Käufer-Audit | 🟢 | elf Routen gerendert geprüft, vier weitere gemessen |
+| **B22** Fixback | 🟢 | Grammatik-Dichte **6/49 Sektionen = 12 %** — keine Übernutzung; RTL auf sechs arabischen Seiten ohne Überlauf |
+| **B23** Preview | 🟢 | tsc · ESLint 0 · 40 Gates · a11y 132/132 · sprach-drill 27/27 · 100 Aufnahmen |
+
+### Zwei materielle Funde dieser Runde
+
+**1 · Die Seite versprach eine Ausfallsicherheit, die sie zwei Abschnitte
+später dementiert.** Auf `/unternehmen`: *„Groß genug, dass ein Urlaub kein
+Projekt anhält."* — und im selben Dokument: *„… eine Vertretungsregel für den
+Fall, dass der Verantwortliche ausfällt. Alle drei ließen sich behaupten,
+keine davon ist heute belegt."* Wer beides liest, glaubt keinen der beiden
+Sätze. Entfernt, in vier Sprachen.
+
+**2 · Dieselbe Zusage stand dreimal auf einer Seite.** „Wir übergeben nicht
+und verschwinden" im Prozess-Schritt, 150 px darunter groß als Statement, und
+gleich danach als „Betrieb statt Übergabe". Dreimal macht eine Zusage nicht
+glaubwürdiger — es macht misstrauisch.
+
+### Was bleibt — und es ist nichts Gebautes
+
+| Rest | Art |
+|---|---|
+| Öffentlicher Kundenbeleg | `CUSTOMER_PERMISSION` |
+| CASSAMEA/meahv-Aufnahmen | `OWNER_ASSET_DEPENDENCY` |
+| Impressum · Rechnung · Preisblock | `BLOCKED_G18` |
+| `pakete` = 2.334 px / 487 W von `/leistungen` | `BLOCKED_G18_LENGTH_COMPONENT` |
+| Produktionsfreigabe | `PRODUCTION_AUTHORITY` |
+| Live-Rückmeldung | `REAL_WORLD_FEEDBACK` |
+
+**Kein offener owner-unabhängiger BUILD-Posten.** Run C erbt Validierung,
+keine Bauarbeit.
+
+---
+
 ## Final Completion Wave — Stand 15.09.2026
 
 **Run B bleibt OFFEN.** Ehrliche Schätzung: **~80 %**, nicht 90.
