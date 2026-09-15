@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import { Artefakt } from "@/components/creative/artefakt"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
@@ -345,8 +346,28 @@ export function ProduktPageBody({
               </h2>
             </Reveal>
             <Reveal delay={0.06}>
-              <figure className="mt-14">
-                <div className="border-line bg-surface elevation-1 relative aspect-[3/2] w-full overflow-hidden rounded-lg border">
+              {/*
+                B15 — DIE AUFNAHME TRAEGT JETZT IHREN RANG.
+
+                Bis hierher stand unter dem Bild der Produktname und das
+                Demodaten-Label. Beides richtig, beides unvollstaendig: Ein
+                Foto einer laufenden Anwendung kann gelesen werden wie ein
+                Kundenbeleg. Das ist es nicht — und der Unterschied ist genau
+                die Trennung, auf der dieses Haus besteht
+                (`docs/ops/proof-kinds.md`).
+
+                „Eigenes Produkt — belegt nicht: Dass ein Kunde damit
+                arbeitet." Der Satz kommt woertlich aus `PROOF_KINDS` und
+                nicht aus diesem Markup. Er steht damit an derselben Stelle
+                wie der Beleg, statt zwei Abschnitte weiter unten.
+              */}
+              <div className="mt-14">
+              <Artefakt
+                rang="eigenes-produkt"
+                was={`${product.name} — ${copy.situCaption}`}
+                quelle={`${copy.screensCaption} · ${beleg.geprueft}`}
+              >
+                <div className="relative aspect-[3/2] w-full">
                   <Image
                     src={beleg.situBild}
                     alt={`${product.name} — ${copy.screensAlt}`}
@@ -361,11 +382,8 @@ export function ProduktPageBody({
                   (`docs/ops/demo-data-standard.md`) — und es steht als Text
                   unter dem Bild, nicht als Wasserzeichen darauf.
                 */}
-                <figcaption className="text-meta text-muted-foreground mt-4 flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span>{product.name}</span>
-                  <span className="text-gold-text">{copy.screensCaption}</span>
-                </figcaption>
-              </figure>
+              </Artefakt>
+              </div>
             </Reveal>
             {/*
               Der Satz, der die Grenze dieses Belegs benennt. Er steht UNTER

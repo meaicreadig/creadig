@@ -544,6 +544,26 @@ export const checkCopy = {
   resultTitle: { de: "Ihr Ergebnis", tr: "Sonucunuz", en: "Your result", ar: "نتيجتكم" },
   showResult: { de: "Ergebnis zeigen", tr: "Sonucu göster", en: "Show the result", ar: "عرض النتيجة" },
   scoreLabel: { de: "Gesamt", tr: "Toplam", en: "Total", ar: "الإجمالي" },
+  /*
+   * DIE BILDUNTERSCHRIFT DER SYSTEMLANDKARTE (B15).
+   *
+   * Die Landkarte ist ein ARTEFAKT: Sie zeigt etwas, das es gibt — Ihre
+   * eigenen Antworten, auf die fuenf Ebenen verteilt. Was sie NICHT zeigt,
+   * muss danebenstehen, sonst liest sich eine Prozentzahl wie ein
+   * Branchenvergleich. Es gibt keinen; es gab nie eine Erhebung.
+   */
+  karteWas: {
+    de: "Ihre Antworten auf fünfzehn Fragen, auf die fünf Ebenen verteilt.",
+    tr: "On beş soruya verdiğiniz yanıtlar, beş katmana dağıtılmış.",
+    en: "Your answers to fifteen questions, distributed across the five layers.",
+    ar: "إجاباتكم عن خمسة عشر سؤالًا، موزّعة على الطبقات الخمس.",
+  },
+  karteGrenze: {
+    de: "keinen Vergleich mit anderen Betrieben und keine Messung in Ihrem System — nur das, was Sie selbst angegeben haben.",
+    tr: "başka işletmelerle bir karşılaştırma ya da sisteminizde yapılmış bir ölçüm değil — yalnızca sizin belirttikleriniz.",
+    en: "no comparison with other businesses and no measurement inside your system — only what you stated yourself.",
+    ar: "ليست مقارنة بمنشآت أخرى ولا قياسًا داخل نظامكم — بل ما ذكرتموه أنتم فقط.",
+  },
   bottleneckLabel: { de: "Größte Lücke", tr: "En büyük boşluk", en: "Biggest gap", ar: "أكبر فجوة" },
   bottleneckBlocked: {
     de: (weak: string, blocked: string) =>

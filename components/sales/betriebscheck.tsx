@@ -6,6 +6,7 @@ import { Send } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { SystemRail } from "@/components/creative/system"
+import { Artefakt } from "@/components/creative/artefakt"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { contact, serviceLayers } from "@/lib/site-data"
 import { trackEvent, trackLead } from "@/lib/track"
@@ -264,7 +265,23 @@ export function Betriebscheck() {
               Der Balken bleibt: Er traegt die Zahl, die Schiene traegt die
               Folge. Beides stammt ausschliesslich aus den eigenen Antworten.
             */}
-            <ol className="mt-12 flex flex-col">
+            {/*
+              B15 — DIE LANDKARTE IST EIN ARTEFAKT, ALSO TRAEGT SIE EINE
+              BILDUNTERSCHRIFT.
+
+              `randlos`, weil die Liste ihren Rahmen selbst mitbringt: Ein
+              zweiter Kasten drumherum waere Zierrat. Was das Bauteil hier
+              beitraegt, ist nicht der Rahmen, sondern der Satz darunter —
+              Rang, was es ist, und was es NICHT belegt.
+            */}
+            <div className="mt-12">
+            <Artefakt
+              rang="modell"
+              was={checkCopy.karteWas[locale]}
+              grenze={checkCopy.karteGrenze[locale]}
+              randlos
+            >
+            <ol className="flex flex-col">
               {result.layers.map((layer, i) => {
                 const gebrochen =
                   result.befund === "kein-engpass"
@@ -307,6 +324,8 @@ export function Betriebscheck() {
                 )
               })}
             </ol>
+            </Artefakt>
+            </div>
 
             {/* Der Engpass-Satz. Das ist die eigentliche Aussage der Seite. */}
             <div className="border-line mt-12 border-t pt-8">

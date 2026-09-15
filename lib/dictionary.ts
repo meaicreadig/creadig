@@ -599,6 +599,27 @@ export const dictionary = {
         },
       ],
     },
+    /*
+     * DIE BILDUNTERSCHRIFT EINES ARTEFAKTS.
+     *
+     * Nur die Struktur steht hier — was ein einzelnes Artefakt zeigt, steht
+     * bei ihm selbst. Die drei oberen Raenge sind woertlich die Beleg-Arten
+     * aus `docs/ops/proof-kinds.md`; „Eigene Pruefung" und „Modell" stehen
+     * ausdruecklich darunter, weil bei ihnen kein Dritter bestaetigt.
+     *
+     * `grenzeLabel` ist der Teil, der sonst fehlt: Jedes Artefakt sagt auch,
+     * was es NICHT belegt — in derselben Zeile wie das, was es belegt.
+     */
+    artefakt: {
+      rangLabel: {
+        kundenergebnis: "Kundenergebnis",
+        kundenprojekt: "Kundenprojekt",
+        "eigenes-produkt": "Eigenes Produkt",
+        eigenpruefung: "Eigene Prüfung",
+        modell: "Modell",
+      },
+      grenzeLabel: "Belegt nicht:",
+    },
     arbeitPage: {
       breadcrumb: "Arbeiten",
       kindLabel: "Art",
@@ -3333,6 +3354,17 @@ export const dictionary = {
         },
       ],
     },
+    /* Artefakt-Bildunterschrift. Dieselbe Rangfolge. */
+    artefakt: {
+      rangLabel: {
+        kundenergebnis: "Müşteri sonucu",
+        kundenprojekt: "Müşteri projesi",
+        "eigenes-produkt": "Kendi ürünümüz",
+        eigenpruefung: "Kendi denetimimiz",
+        modell: "Model",
+      },
+      grenzeLabel: "Şunu kanıtlamaz:",
+    },
     arbeitPage: {
       breadcrumb: "İşler",
       kindLabel: "Tür",
@@ -5017,6 +5049,17 @@ export const dictionary = {
         },
       ],
     },
+    /* Artefakt-Bildunterschrift. Dieselbe Rangfolge. */
+    artefakt: {
+      rangLabel: {
+        kundenergebnis: "Customer result",
+        kundenprojekt: "Customer project",
+        "eigenes-produkt": "Our own product",
+        eigenpruefung: "Our own audit",
+        modell: "Model",
+      },
+      grenzeLabel: "Does not prove:",
+    },
     arbeitPage: {
       breadcrumb: "Work",
       kindLabel: "Type",
@@ -6686,6 +6729,17 @@ export const dictionary = {
           href: "/betriebscheck",
         },
       ],
+    },
+    /* Artefakt-Bildunterschrift. Im Arabischen rechtsbuendig. */
+    artefakt: {
+      rangLabel: {
+        kundenergebnis: "نتيجة عميل",
+        kundenprojekt: "مشروع عميل",
+        "eigenes-produkt": "منتجنا نحن",
+        eigenpruefung: "فحصنا نحن",
+        modell: "نموذج",
+      },
+      grenzeLabel: "لا يُثبت:",
     },
     arbeitPage: {
       breadcrumb: "الأعمال",
