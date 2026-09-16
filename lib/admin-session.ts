@@ -180,3 +180,60 @@ export function sessionCookieOptions(maxAgeSeconds: number) {
 }
 
 export const SESSION_SECONDS = SESSION_MS / 1000
+
+/*
+ * ==========================================================================
+ * ADM-02 · H4 — WAS JEDE ADMIN-ANTWORT MITBRINGT (gemessen 16.09.2026)
+ * ==========================================================================
+ *
+ * Gemessen gegen `next start`: Die Seiten trugen `no-store` (weil
+ * `force-dynamic`) und `noindex` als Meta-Tag. Es fehlten:
+ *   · `X-Robots-Tag` — ein Meta-Tag steht nur in HTML; ein Redirect, ein
+ *     404 oder eine JSON-Antwort hatte gar keine Anweisung.
+ *   · `Cache-Control` auf der Anmelde-Route — ausgerechnet der Antwort, die
+ *     das Sitzungs-Cookie setzt.
+ * Beides wird hier an EINER Stelle definiert und von Middleware und Route
+ * gesetzt, statt sich auf das Rendering zu verlassen.
+ */
+export const ADMIN_RESPONSE_HEADERS: Readonly<Record<string, string>> = {
+  "X-Robots-Tag": "noindex, nofollow, noarchive",
+  "Cache-Control": "private, no-store, max-age=0",
+}
+
+export function withAdminHeaders<T extends { headers: Headers }>(response: T): T {
+  for (const [key, value] of Object.entries(ADMIN_RESPONSE_HEADERS)) {
+    response.headers.set(key, value)
+  }
+  return response
+}
+
+/**
+ * ADM-02 · H4 / B07 — kommt die Mutation von dieser Seite?
+ *
+ * Gemessen: `POST /api/admin/session` mit `Origin: https://evil.example`
+ * und richtigem Passwort ergab 200 samt Sitzungs-Cookie. Server Actions
+ * prüfen den Ursprung selbst — diese Route nicht.
+ *
+ * `SameSite=strict` schützt die BESTEHENDE Sitzung vor fremden Seiten, aber
+ * nicht die Anmeldung selbst (Login-CSRF) und nicht das Abmelden.
+ *
+ * Regel: Ein Browser schickt bei POST/DELETE immer `Origin`. Fehlt er, war es
+ * kein Browserformular dieser Seite — abgelehnt. Ist er da, muss sein Host
+ * dem Host der Anfrage entsprechen (hinter Vercel: `x-forwarded-host`).
+ */
+export function sameOrigin(request: Request): boolean {
+  const origin = request.headers.get("origin")
+  if (!origin) return false
+  let originHost: string
+  try {
+    originHost = new URL(origin).host
+  } catch {
+    return false
+  }
+  const hosts = [
+    request.headers.get("x-forwarded-host"),
+    request.headers.get("host"),
+    new URL(request.url).host,
+  ].filter((h): h is string => Boolean(h))
+  return hosts.includes(originHost)
+}

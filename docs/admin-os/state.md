@@ -34,7 +34,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 |---|:--:|:--:|:--:|:--:|---|---|---|
 | ADM-00 | 🟢 | — | — | 🟢 | `VERIFIED` | — (eingefroren, siehe unten) | — |
 | ADM-01 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Dark-Mode-Entscheidung beeinflusst nur Tokens, blockiert nicht |
-| ADM-02 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | H2 Sitzungswiderruf · H3 dauerhaftes Rate-Limit · H4 Header/Cache **gemessen** | Cutover H1 = Deploy (Produktionsautorität) |
+| ADM-02 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | H2 Sitzungswiderruf · H3 dauerhaftes Rate-Limit · Login-/Dashboard-Performance messen | Cutover H1/H4 = Deploy (Produktionsautorität) |
 | ADM-03 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | — |
 | ADM-04 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Anbieterfreigaben (nach A2-Einstufung) |
 | ADM-05 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | G18 für Rechnung (`lib/rechnung.ts`) |
@@ -52,7 +52,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | **H1** | `neonClient().ready()` führte bei jedem Kaltstart vor der ersten Abfrage `seedBestand()` und `applyExclusions()` aus; `listEnquiries` zusätzlich bei **jedem** Aufruf (~60 UPDATEs) → **Lesen schrieb**. | Code `lib/neon-client.ts`, `lib/vertrieb-store-neon.ts` | hoch | ADM-02 | **VERIFIED** (16.09.2026) — siehe §H1 |
 | **H2** | Sitzung ist zustandsloses HMAC-Cookie; Logout löscht nur das Cookie. Eine kopierte Sitzung bleibt bis Ablauf (8 h) gültig — **kein serverseitiger Widerruf** (B05). | Code `lib/admin-session.ts`, `app/api/admin/session/route.ts` | hoch | ADM-02/07 | offen |
 | **H3** | Rate-Limit ist In-Memory (`Map` in `lib/lead-guard.ts:141`) — nicht dauerhaft über Instanzen (B08). | Code | mittel | ADM-02 | offen |
-| **H4** | Kein `Cache-Control: no-store` für Admin-Antworten in `middleware.ts`/`next.config.ts` gefunden; `noindex` nur als Metadaten, kein `X-Robots-Tag`-Header (B01/B02). | Code (grep) — Runtime-Header noch nicht gemessen | mittel | ADM-02 | zu verifizieren |
+| **H4** | Admin-Antworten ohne `X-Robots-Tag`; Anmelde-Route ohne `no-store`; **Anmeldung mit fremdem `Origin` angenommen (200 + Cookie)**. | Runtime gemessen (`next start`) | mittel→hoch (Login-CSRF) | ADM-02 | **VERIFIED** (16.09.2026) — siehe §H4 |
 | **H5** | Admin ist einsprachig: `app/(admin)/layout.tsx` `lang="de"`, keine TR-Wörterbuchschicht für Admin. | Code | hoch für 99 % | ADM-01 | offen |
 | **H6** | Zwei Owner-Übersichten: `/admin` (Heute, `lib/attention.ts`) und `/admin/cockpit` (G34, Gedächtnis+Navigator). Überlappung → A4-Zusammenlegung. | Code | mittel | ADM-01 | offen |
 | **H7** | Kein Dark Mode im Admin-Code (kein `dark:`/`prefers-color-scheme` in `components/admin`, `app/(admin)`). Ältere Acceptance nennt „Mobil 390 dunkel" — nicht reproduziert. | Code; Widerspruch zu `docs/control-center/acceptance.md` #11 | niedrig | A10 | Owner-Entscheidung |
@@ -156,6 +156,31 @@ Mit eingefrorener Präzisierung:
 
 ---
 
+## H4 · Admin-Antworten und Ursprung (VERIFIED 16.09.2026)
+
+**Gemessen vorher** (lokaler Produktions-Build, Test-Zugangsdaten, keine Produktionsgeheimnisse): Seiten `no-store` ✓ · Cookie `HttpOnly; Secure; SameSite=strict; Max-Age=28800` ✓ · `<meta robots noindex>` ✓ · **kein** `X-Robots-Tag` (Seiten, 307, API) · Session-API **ohne** `Cache-Control` · `POST /api/admin/session` mit `Origin: https://evil.example` + richtigem Passwort → **200 + Set-Cookie**.
+
+**Änderung**: `ADMIN_RESPONSE_HEADERS` + `withAdminHeaders` + `sameOrigin` in `lib/admin-session.ts`; Middleware umhüllt jede `/admin*`-Antwort (auch 307/404); Session-Route: POST/DELETE ohne passenden `Origin` → 403, alle Antworten mit Admin-Headern. Gate `scripts/check-admin-antwort.mjs` (postbuild).
+
+**Gemessen nachher**
+| # | Anfrage | Ergebnis |
+|---|---|---|
+| 1 | GET `/admin/login` | 200 · `no-store` · `X-Robots-Tag` · CSP/XFO/Referrer/HSTS weiter vorhanden |
+| 2–3 | GET `/admin`, `/admin/gibtsnicht` ohne Sitzung | 307 → Login · `no-store` · `X-Robots-Tag` |
+| 4 | POST ohne `Origin` | **403** |
+| 5 | POST fremder `Origin`, richtiges Passwort | **403**, kein Cookie |
+| 6 | POST eigener `Origin`, falsch | 401 |
+| 7 | POST eigener `Origin`, richtig | 200 · Cookie wie vorher |
+| 8 | GET `/admin` mit Sitzung | 200 · `no-store` · `X-Robots-Tag` |
+| 9 | DELETE fremder `Origin` | **403** |
+| 10 | DELETE eigener `Origin` | 200 · Cookie gelöscht |
+| 11 | GET `/` (öffentlich) | 200 · **kein** Admin-Header (keine Seiteneffekte auf die Website) |
+| E2E | Chromium/Playwright: `/admin` → Login → Passwort + Enter → `/admin` (h1 „Heute") → Abmelden → `/admin` → Login | PASS |
+
+**Offen daraus (nicht H4):** CSP im Admin ist nur die schmale erzwungene Stufe, die volle steht auf Report-Only (seitenweit, `next.config.ts` SEC-3) → B06 in ADM-07. Abmelden widerruft weiterhin nicht serverseitig → H2.
+
+---
+
 ## Routen-Karte (A4)
 
 | Route | Heute | Schicksal | Ziel | Grund |
@@ -187,6 +212,7 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | Datum | Session | Ergebnis |
 |---|---|---|
 | 16.09.2026 | 1 | Vertrag + Addendum A1–A10 kanonisiert · Production-Spitze nachgeprüft · G18-Hashes erfasst · ADM-00 Funde H1–H7 |
-| 16.09.2026 | 1 | OD-1/OD-2 eingetragen · ADM-00 VERIFIED (Kritikalität, Entitätskarte, OWN/CONNECT, Abnahmeumfang) · **H1 VERIFIED** |
+| 16.09.2026 | 1 | OD-1/OD-2 eingetragen · ADM-00 VERIFIED (Kritikalität, Entitätskarte, OWN/CONNECT, Abnahmeumfang) · **H1 VERIFIED** (`c7619f1`) |
+| 16.09.2026 | 1 | **H4 VERIFIED** — Admin-Header + Ursprungsprüfung, vorher/nachher gemessen, Browser-E2E |
 
-**Fortsetzungspunkt:** ADM-02 — H4 zuerst **messen** (Header/Cache auf `/admin*` gegen `next start`), dann H2 Sitzungswiderruf (Sitzungstabelle via Migration, lokal geprobt; Produktion = Owner), dann H3 dauerhaftes Rate-Limit (Neon-Tabelle, keine neue Bezahl-Abhängigkeit). Danach ADM-01.
+**Fortsetzungspunkt:** ADM-02 — H2 serverseitiger Sitzungswiderruf (Entwurf: Sitzungs-ID im signierten Wert + Widerrufstabelle in Neon via Migration; Verhalten bei nicht erreichbarer DB festlegen und begründen; lokal geprobt, Produktion = Owner), dann H3 dauerhaftes Rate-Limit (Neon, keine neue Bezahl-Abhängigkeit), dann Login-/Dashboard-Messung (30 warm / 10 kalt, `next start`). Danach ADM-01.

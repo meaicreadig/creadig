@@ -5,7 +5,9 @@ import {
   adminConfigured,
   issueSession,
   rolleFuerPasswort,
+  sameOrigin,
   sessionCookieOptions,
+  withAdminHeaders,
 } from "@/lib/admin-session"
 import { bucketKey, callerAddress, withinLimit } from "@/lib/lead-guard"
 
@@ -35,7 +37,7 @@ export const dynamic = "force-dynamic"
 /** Zehn Versuche im Fenster von `lead-guard` (10 Minuten). */
 const MAX_ATTEMPTS = 10
 
-export async function POST(request: Request) {
+async function anmelden(request: Request): Promise<NextResponse> {
   if (!adminConfigured()) {
     /* Wie in der Middleware: Die Existenz wird nicht angekündigt. */
     return new NextResponse(null, { status: 404 })
@@ -80,9 +82,29 @@ export async function POST(request: Request) {
   return response
 }
 
-export async function DELETE() {
+async function abmelden(): Promise<NextResponse> {
   const response = NextResponse.json({ ok: true })
   /* Abmelden heisst: das Cookie sofort ungültig machen, nicht nur vergessen. */
   response.cookies.set(ADMIN_COOKIE, "", sessionCookieOptions(0))
   return response
+}
+
+/*
+ * ADM-02 · H4 — jede Antwort dieser Route bekommt die Admin-Header, und
+ * keine Mutation ohne Ursprung dieser Seite. Die 404 bei fehlender
+ * Einrichtung bleibt VOR der Ursprungspruefung: Wer nicht eingerichtet ist,
+ * verraet auch durch eine 403 nicht, dass es die Route gibt.
+ */
+export async function POST(request: Request) {
+  if (adminConfigured() && !sameOrigin(request)) {
+    return withAdminHeaders(NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 }))
+  }
+  return withAdminHeaders(await anmelden(request))
+}
+
+export async function DELETE(request: Request) {
+  if (!sameOrigin(request)) {
+    return withAdminHeaders(NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 }))
+  }
+  return withAdminHeaders(await abmelden())
 }

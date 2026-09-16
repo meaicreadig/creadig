@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
+import { ADMIN_COOKIE, verifySession, withAdminHeaders } from "@/lib/admin-session"
 import { ausweichZiel, darfBetreten } from "@/lib/rollen"
 import { LOCALE_COOKIE, nenntSprache, spracheFuer } from "@/lib/locale-markt"
 import { localePath } from "@/lib/routes"
@@ -106,6 +106,15 @@ export async function middleware(request: NextRequest) {
   if (!pathname.startsWith("/admin")) {
     return sprachweiche(request) ?? NextResponse.next()
   }
+
+  /*
+   * ADM-02 · H4 — jede Admin-Antwort, auch Umleitung und 404, traegt
+   * `X-Robots-Tag` und `no-store` (`lib/admin-session.ts`).
+   */
+  return withAdminHeaders(await adminZugang(request, pathname))
+}
+
+async function adminZugang(request: NextRequest, pathname: string): Promise<NextResponse> {
 
   const configured =
     Boolean(process.env.ADMIN_PASSWORD) && Boolean(process.env.ADMIN_SESSION_SECRET)
