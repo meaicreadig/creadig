@@ -1,4 +1,4 @@
-import { linkLeadToCrm, neonClient } from "@/lib/neon-client"
+import { linkLeadToCrm, markLeadExclusions, neonClient } from "@/lib/neon-client"
 
 import type { Locale } from "@/lib/dictionary"
 import type {
@@ -245,6 +245,20 @@ export function createNeonStore(connectionString: string): LeadStore {
         })
       } catch (error) {
         console.warn(`[lead] Verknuepfung zu Kontakt/Organisation fehlgeschlagen (${record.reference}):`, error)
+      }
+
+      /*
+       * ADM-02 · H1 — der Ausschluss entsteht im Schreibweg.
+       *
+       * Frueher markierte `ready()` Abnahmedatensaetze beim naechsten
+       * LESENDEN Zugriff. Jetzt markiert der Aufruf, der die Zeile anlegt —
+       * nach denselben Listen. Scheitert das, bleibt die Anfrage
+       * gespeichert; `npm run db-migrate` zieht den Ausschluss nach.
+       */
+      try {
+        await markLeadExclusions(sql, record)
+      } catch (error) {
+        console.warn(`[lead] Ausschlusspruefung fehlgeschlagen (${record.reference}):`, error)
       }
     },
 

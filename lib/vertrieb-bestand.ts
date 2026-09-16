@@ -421,7 +421,7 @@ export const AUSGESCHLOSSENE_REFERENZEN: string[] = [
 export const AUSGESCHLOSSENE_MAIL_ENDUNG = "@beispiel.invalid"
 
 /** Prefix-Muster für Abnahme-Fixtures (kleingeschrieben). */
-const TEST_PREFIXES = ["v11 abnahme", "gate4", "runde2"] as const
+export const TEST_PREFIXES = ["v11 abnahme", "gate4", "runde2"] as const
 
 function norm(value: string | null | undefined): string {
   return (value ?? "").trim().toLowerCase()
@@ -459,9 +459,37 @@ export function sqlLeadOperational(alias: string, includeExcluded?: boolean): st
 }
 
 /**
+ * Die Ausschlussregel für EINEN Datensatz — mit Grund.
+ *
+ * Dieselben Listen wie `applyExclusions` (SQL, tabellenweit) und
+ * `sqlLeadOperational` (Lesefilter). Aufgerufen im Schreibweg
+ * (`markLeadExclusions`, ADM-02 · H1) und von `isTestEnquiry`.
+ *
+ * Felder je Entität: Anfrage = name/business/email/reference ·
+ * Kontakt = name/email · Organisation = name.
+ */
+export function exclusionReasonFor(record: {
+  name?: string | null
+  business?: string | null
+  email?: string | null
+  reference?: string | null
+}): string | null {
+  const fields = [norm(record.name), norm(record.business)].filter((f) => f !== "")
+  const byName = AUSGESCHLOSSENE_NAMEN.find((e) => fields.includes(norm(e.name)))
+  if (byName) return byName.reason
+  if (record.reference && AUSGESCHLOSSENE_REFERENZEN.includes(record.reference)) return EXCLUSION_TESTDATA
+  const mail = norm(record.email)
+  if (mail !== "" && mail.endsWith(AUSGESCHLOSSENE_MAIL_ENDUNG)) {
+    return `Abnahmedatensatz — ${AUSGESCHLOSSENE_MAIL_ENDUNG} ist für Tests reserviert`
+  }
+  if (fields.some((f) => TEST_PREFIXES.some((p) => f.startsWith(p)))) return EXCLUSION_TESTDATA
+  return null
+}
+
+/**
  * Dieselbe Regel in JS — falls SQL-Filter aus irgendeinem Grund nicht greift,
  * wirft die Inbox die Zeile trotzdem raus. Kein zweites Wahrheitsmodell:
- * dieselben Listen und Prefixes.
+ * `exclusionReasonFor` über jedes Namensfeld.
  */
 export function isTestEnquiry(row: {
   reference?: string | null
@@ -473,11 +501,9 @@ export function isTestEnquiry(row: {
   excludedReason?: string | null
 }): boolean {
   if (row.excludedReason) return true
-  if (row.reference && AUSGESCHLOSSENE_REFERENZEN.includes(row.reference)) return true
-  const mail = norm(row.email)
-  if (mail.endsWith(AUSGESCHLOSSENE_MAIL_ENDUNG)) return true
-  const fields = [row.name, row.business, row.organisationName, row.contactName].map(norm)
-  const blocked = new Set(AUSGESCHLOSSENE_NAMEN.map((e) => e.name.toLowerCase()))
-  if (fields.some((f) => f && blocked.has(f))) return true
-  return fields.some((f) => TEST_PREFIXES.some((p) => f.startsWith(p)))
+  return [
+    { name: row.name, business: row.business, email: row.email, reference: row.reference },
+    { name: row.organisationName },
+    { name: row.contactName },
+  ].some((r) => exclusionReasonFor(r) !== null)
 }

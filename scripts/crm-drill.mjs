@@ -54,7 +54,7 @@ const sql = Object.assign(
 
 const { SCHEMA, BACKFILL, seedBestand, applyExclusions } = await import("../lib/neon-client.ts")
 
-/** Genau die Reihenfolge aus `neonClient().ready()` — kein Nachbau. */
+/** Genau die Reihenfolge aus `npm run db-migrate` — kein Nachbau (seit ADM-02 · H1 nicht mehr `ready()`). */
 const seedAlles = async (sql) => {
   for (const stmt of SCHEMA) await sql.query(stmt)
   for (const stmt of BACKFILL) await sql.query(stmt)
@@ -150,6 +150,60 @@ const fund = (await client.query(
    UNION ALL SELECT 'Anfrage   '||l.reference FROM leads l WHERE lower(l.email)='alt@abnahme.test'`)).rows
 for (const r of fund) console.log(`       · ${r.z}`)
 schritt("mindestens Kontakt, Betrieb und Anfrage auffindbar", fund.length >= 3, `${fund.length} Treffer`)
+
+console.log("\n10 · ADM-02 · H1 — Schreibweg-Ausschluss sagt dasselbe wie die tabellenweite SQL")
+/*
+ * Seit 16.09.2026 markiert nicht mehr `ready()` (beim LESEN), sondern der
+ * Schreibweg (`markLeadExclusions`). Beide Ausfuehrungen muessen fuer dieselbe
+ * Zeile denselben Grund ergeben — sonst waere es eine zweite Wahrheit.
+ */
+const { markLeadExclusions } = await import("../lib/neon-client.ts")
+const { AUSGESCHLOSSENE_REFERENZEN } = await import("../lib/vertrieb-bestand.ts")
+const faelle = [
+  { id: "h1-name", reference: "CD-H1-0001", name: "Echter Mensch Eins", business: "Gate4 Testbetrieb", email: "eins@h1.test" },
+  { id: "h1-mail", reference: "CD-H1-0002", name: "Echter Mensch Zwei", business: null, email: "zwei@beispiel.invalid" },
+  { id: "h1-ref", reference: AUSGESCHLOSSENE_REFERENZEN[0], name: "Echter Mensch Drei", business: "Drei Bau", email: "drei@h1.test" },
+  { id: "h1-prefix", reference: "CD-H1-0004", name: "runde2 Probe", business: null, email: "vier@h1.test" },
+  { id: "h1-echt", reference: "CD-H1-0005", name: "Emine Kaya", business: "Kaya Dach", email: "emine@kaya.test" },
+]
+for (const f of faelle) {
+  await client.query(
+    `INSERT INTO leads (id, reference, source, locale, name, business, email, phone,
+                        sales_status, handling_status, created_at, updated_at)
+     VALUES ($1,$2,'kontakt','de',$3,$4,$5,'0171 2','new','neu',now(),now())`,
+    [f.id, f.reference, f.name, f.business, f.email])
+  await linkLeadToCrm(sql, { ...f, phone: "0171 2", createdAt: new Date().toISOString() })
+  await markLeadExclusions(sql, f)
+}
+const ids = faelle.map((f) => f.id)
+const mails = faelle.map((f) => f.email.toLowerCase())
+const firmen = faelle.map((f) => f.business).filter(Boolean)
+const stand = async () => JSON.stringify((await client.query(
+  `SELECT 'lead:'||id AS k, excluded_reason AS r FROM leads WHERE id = ANY($1)
+   UNION ALL SELECT 'contact:'||email_normalised, excluded_reason FROM contacts WHERE email_normalised = ANY($2)
+   UNION ALL SELECT 'org:'||lower(name), excluded_reason FROM organisations WHERE name = ANY($3)
+   ORDER BY 1`, [ids, mails, firmen])).rows)
+const schreibweg = await stand()
+await client.query(`UPDATE leads SET excluded_reason = NULL WHERE id = ANY($1)`, [ids])
+await client.query(`UPDATE contacts SET excluded_reason = NULL WHERE email_normalised = ANY($1)`, [mails])
+await client.query(`UPDATE organisations SET excluded_reason = NULL WHERE name = ANY($1)`, [firmen])
+await applyExclusions(sql)
+const tabellenweit = await stand()
+schritt("Schreibweg = tabellenweite SQL (Anfrage, Kontakt, Organisation)", schreibweg === tabellenweit,
+  schreibweg === tabellenweit ? "" : `\n       Schreibweg:   ${schreibweg}\n       tabellenweit: ${tabellenweit}`)
+const markiert = JSON.parse(schreibweg).filter((z) => z.r !== null).map((z) => z.k)
+schritt("echte Anfrage bleibt unmarkiert", !markiert.some((k) => k.includes("h1-echt") || k.includes("kaya")), markiert.join(", "))
+schritt("vier Abnahmefaelle markiert", ["lead:h1-name", "lead:h1-mail", "lead:h1-ref", "lead:h1-prefix"].every((k) => markiert.includes(k)))
+
+const kontaktAbn = (await client.query(`SELECT id, organisation_id FROM contacts WHERE email_normalised='zwei@beispiel.invalid'`)).rows[0]
+const oppRow = (await client.query(
+  `INSERT INTO opportunities (id, organisation_id, contact_id, title, status, source, from_lead_id, excluded_reason, created_at, updated_at)
+   VALUES ('h1-opp', NULL, $1, 'H1 Probe', 'new', 'manuell', NULL,
+           coalesce((SELECT l.excluded_reason FROM leads l WHERE l.id = NULL::text),
+                    (SELECT org.excluded_reason FROM organisations org WHERE org.id = NULL::text),
+                    (SELECT c.excluded_reason FROM contacts c WHERE c.id = $1::text)),
+           now(), now()) RETURNING excluded_reason`, [kontaktAbn.id])).rows[0]
+schritt("Chance ohne Anfrage erbt Ausschluss vom Kontakt (sofort, nicht beim naechsten Start)", oppRow.excluded_reason !== null)
 
 await client.end()
 console.log(fehler === 0

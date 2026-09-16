@@ -77,7 +77,8 @@ if (!nurPruefen && !OHNE_ZUSTIMMUNG.has(db.kind)) {
   console.log("  Zustimmung fuer ein Produktionsziel liegt vor.\n")
 }
 
-const { SCHEMA, BACKFILL } = await import("../lib/neon-client.ts")
+const { SCHEMA, BACKFILL, seedBestand, applyExclusions } = await import("../lib/neon-client.ts")
+const { BESTAND_ORGANISATIONEN, BESTAND_KONTAKTE } = await import("../lib/vertrieb-bestand.ts")
 const client = new pg.Client({ connectionString: ZIEL })
 await client.connect()
 const sql = { query: async (t, p) => (await client.query(t, p ?? [])).rows }
@@ -86,6 +87,36 @@ const sql = { query: async (t, p) => (await client.query(t, p ?? [])).rows }
 const vorher = await client.query(
   `SELECT table_name || '.' || column_name AS ref FROM information_schema.columns WHERE table_schema='public'`)
 const vorherSet = new Set(vorher.rows.map(r => r.ref))
+
+/*
+ * ADM-02 · H1 — Bestand und Ausschluesse gehoeren seit 16.09.2026 HIERHER.
+ *
+ * Vorher liefen sie in `ready()`, also beim ersten lesenden Zugriff jedes
+ * Prozesses. Hier sind sie aufgerufen, gesperrt und sichtbar: `--check`
+ * zeigt, ob der Bestand eingespielt ist, ohne ihn einzuspielen.
+ */
+const bestandSoll = BESTAND_ORGANISATIONEN.length + BESTAND_KONTAKTE.length
+const bestandIst = async () => {
+  try {
+    const r = await client.query(
+      `SELECT count(*)::int AS n FROM import_log WHERE key LIKE 'org:%' OR key LIKE 'contact:%'`)
+    return r.rows[0].n
+  } catch { return null }
+}
+const zaehleAusschluss = async () => {
+  try {
+    const r = await client.query(`SELECT
+      (SELECT count(*) FROM leads WHERE excluded_reason IS NOT NULL)::int AS leads,
+      (SELECT count(*) FROM contacts WHERE excluded_reason IS NOT NULL)::int AS contacts,
+      (SELECT count(*) FROM organisations WHERE excluded_reason IS NOT NULL)::int AS organisations,
+      (SELECT count(*) FROM opportunities WHERE excluded_reason IS NOT NULL)::int AS opportunities`)
+    return r.rows[0]
+  } catch { return null }
+}
+const bestandVorher = await bestandIst()
+const ausschlussVorher = await zaehleAusschluss()
+console.log(`  Bestand:   ${bestandVorher ?? "nicht lesbar"} von ${bestandSoll} Eintraegen eingespielt`)
+if (ausschlussVorher) console.log(`  Ausschluss: ${JSON.stringify(ausschlussVorher)}`)
 
 if (nurPruefen) {
   console.log(`  ${vorherSet.size} Spalten vorhanden. Es wurde NICHTS geaendert.`)
@@ -97,6 +128,12 @@ if (nurPruefen) {
 let n = 0
 for (const stmt of SCHEMA) { await sql.query(stmt); n++ }
 for (const stmt of BACKFILL) { await sql.query(stmt); n++ }
+await seedBestand(sql)
+await applyExclusions(sql)
+const bestandNachher = await bestandIst()
+const ausschlussNachher = await zaehleAusschluss()
+console.log(`  Bestand:   ${bestandVorher ?? 0} → ${bestandNachher ?? "?"} von ${bestandSoll}`)
+if (ausschlussNachher) console.log(`  Ausschluss: ${JSON.stringify(ausschlussNachher)}`)
 
 const nachher = await client.query(
   `SELECT table_name || '.' || column_name AS ref FROM information_schema.columns WHERE table_schema='public'`)

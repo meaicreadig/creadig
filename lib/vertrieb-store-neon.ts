@@ -498,9 +498,8 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
   const client: {
     sql: Sql
     ready: () => Promise<void>
-    refreshExclusions: () => Promise<void>
   } = neonClient(connectionString)
-  const { sql, ready, refreshExclusions } = client
+  const { sql, ready } = client
 
   /** Chronik-Eintrag. Immer im selben Aufruf wie die Änderung. */
   async function note(
@@ -628,7 +627,12 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
      * Oberflaeche "Verkaufschance vorhanden" und nicht "gehoert zu".
      */
     async listEnquiries(query) {
-      await refreshExclusions()
+      /*
+       * ADM-02 · H1 — hier stand der tabellenweite Ausschluss: jedes Öffnen der
+       * Inbox schrieb ~60 UPDATEs. Markiert wird jetzt beim Speichern der
+       * Anfrage (`markLeadExclusions`). Lesen liest.
+       */
+      await ready()
       const where: string[] = [sqlLeadOperational("l", query.includeExcluded)]
       const params: unknown[] = []
 
@@ -927,7 +931,10 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
            (id, organisation_id, contact_id, title, status, source, from_lead_id,
             excluded_reason, created_at, updated_at)
          VALUES ($1,$2,$3,$4,'new',$5,$6,
-                 (SELECT l.excluded_reason FROM leads l WHERE l.id = $6::text),
+                 coalesce(
+                   (SELECT l.excluded_reason FROM leads l WHERE l.id = $6::text),
+                   (SELECT org.excluded_reason FROM organisations org WHERE org.id = $2::text),
+                   (SELECT c.excluded_reason FROM contacts c WHERE c.id = $3::text)),
                  now(), now())
          RETURNING id, organisation_id, contact_id, title, status, source,
                    next_action, next_action_at, last_contact_at, note,

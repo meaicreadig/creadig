@@ -6,6 +6,8 @@ import {
   AUSGESCHLOSSENE_REFERENZEN,
   BESTAND_KONTAKTE,
   BESTAND_ORGANISATIONEN,
+  TEST_PREFIXES,
+  exclusionReasonFor,
 } from "@/lib/vertrieb-bestand"
 import { EXCLUSION_TESTDATA } from "@/lib/vertrieb"
 import type { OwnerLoadSample } from "@/lib/vertrieb"
@@ -843,7 +845,7 @@ async function once(sql: Sql, key: string, step: () => Promise<void>): Promise<v
  * eine Wegwerf-Datenbank fahren kann. Ein Pruefskript, das den Import
  * nachbaut, prueft seinen eigenen Nachbau; nur der echte Pfad zeigt, was in
  * Produktion passiert. Aufgerufen wird sie weiterhin ausschliesslich aus
- * `neonClient().ready()`.
+ * `npm run db-migrate` — seit ADM-02 · H1 nicht mehr aus `ready()`.
  */
 export async function seedBestand(sql: Sql): Promise<void> {
   for (const org of BESTAND_ORGANISATIONEN) {
@@ -989,7 +991,7 @@ export async function applyExclusions(sql: Sql): Promise<void> {
    * Exakte Listen treffen Varianten (AR/EN/…) nicht immer; Prefix schon.
    * Kein `%Yilmaz%` — das träfe echte Prospects.
    */
-  for (const prefix of ["v11 abnahme%", "gate4%", "runde2%"] as const) {
+  for (const prefix of TEST_PREFIXES.map((p) => `${p}%`)) {
     await sql.query(
       `UPDATE leads SET excluded_reason = $1::text
         WHERE excluded_reason IS NULL
@@ -1034,6 +1036,73 @@ export async function applyExclusions(sql: Sql): Promise<void> {
        FROM contacts c
       WHERE o.contact_id = c.id AND c.excluded_reason IS NOT NULL AND o.excluded_reason IS NULL`,
   )
+}
+
+/**
+ * ADM-02 · H1 — dieselben Ausschlussregeln, auf EINEN Datensatz angewandt.
+ *
+ * ---------------------------------------------------------------------------
+ * WARUM ES DAS GIBT
+ * `applyExclusions()` lief in `ready()` — also vor jeder LESENDEN Abfrage
+ * eines frischen Prozesses. Wer die Inbox öffnete, schrieb in drei Tabellen.
+ * Der Admin-Vertrag verbietet genau das: Lesen liest.
+ *
+ * Der Grund, warum es dort stand, bleibt aber richtig: Ein Abnahmedatensatz
+ * darf nie in der operativen Inbox auftauchen. Er entsteht nur auf einem
+ * SCHREIBWEG — also wird er dort markiert, im selben Aufruf, der ihn anlegt.
+ *
+ * Die tabellenweite Fassung (`applyExclusions`) läuft explizit über
+ * `npm run db-migrate`: für neu in die Listen aufgenommene Namen, die auf
+ * schon vorhandene Zeilen treffen sollen.
+ *
+ * ---------------------------------------------------------------------------
+ * EINE REGEL, ZWEI AUSFÜHRUNGEN
+ * Diese Funktion und die SQL in `applyExclusions` müssen dasselbe sagen.
+ * Die Regel selbst steht in `lib/vertrieb-bestand.ts` (`exclusionReasonFor`),
+ * neben `isTestEnquiry` und dem Lesefilter `sqlLeadOperational`.
+ * `scripts/check-ausschluss.mjs` prüft die Regel; `crm-drill` prüft
+ * die SQL gegen eine Wegwerf-Datenbank. Wer eine Liste ändert, ändert beide
+ * Ausführungen nicht — beide lesen dieselben Konstanten.
+ */
+/**
+ * Markiert eine gerade gespeicherte Anfrage — und den Kontakt und die
+ * Organisation, die `linkLeadToCrm` für sie angelegt oder gefunden hat —
+ * nach denselben Regeln wie `applyExclusions`. Höchstens drei UPDATEs, und
+ * nur wenn eine Regel greift.
+ *
+ * `excluded_reason IS NULL` bleibt Bedingung: Ein von Hand aufgehobener
+ * Ausschluss wird nicht wieder gesetzt, ein vorhandener Grund nicht
+ * überschrieben.
+ */
+export async function markLeadExclusions(
+  sql: Sql,
+  lead: { id: string; name: string; business: string | null; email: string; reference: string },
+): Promise<void> {
+  const leadReason = exclusionReasonFor(lead)
+  if (leadReason) {
+    await sql.query(
+      `UPDATE leads SET excluded_reason = $2::text WHERE id = $1::text AND excluded_reason IS NULL`,
+      [lead.id, leadReason],
+    )
+  }
+
+  const contactReason = exclusionReasonFor({ name: lead.name, email: lead.email })
+  if (contactReason) {
+    await sql.query(
+      `UPDATE contacts SET excluded_reason = $2::text, updated_at = now()
+        WHERE email_normalised = lower(btrim($1::text)) AND excluded_reason IS NULL`,
+      [lead.email, contactReason],
+    )
+  }
+
+  const orgReason = lead.business ? exclusionReasonFor({ name: lead.business }) : null
+  if (orgReason) {
+    await sql.query(
+      `UPDATE organisations SET excluded_reason = $2::text, updated_at = now()
+        WHERE lower(name) = lower($1::text) AND excluded_reason IS NULL`,
+      [lead.business, orgReason],
+    )
+  }
 }
 
 /*
@@ -1245,7 +1314,7 @@ export async function verifySchema(sql: Sql): Promise<void> {
   )
 }
 
-const clients = new Map<string, { sql: Sql; ready: () => Promise<void>; refreshExclusions: () => Promise<void> }>()
+const clients = new Map<string, { sql: Sql; ready: () => Promise<void> }>()
 
 /**
  * Ein Client je Verbindungszeichenfolge, ein Schema-Lauf je Prozess.
@@ -1257,7 +1326,6 @@ const clients = new Map<string, { sql: Sql; ready: () => Promise<void>; refreshE
 export function neonClient(connectionString: string): {
   sql: Sql
   ready: () => Promise<void>
-  refreshExclusions: () => Promise<void>
 } {
   const cached = clients.get(connectionString)
   if (cached) return cached
@@ -1302,15 +1370,22 @@ export function neonClient(connectionString: string): {
          * still selbst zu tun. Angewandt wird ausschliesslich ueber
          * `npm run db-migrate`, absichtlich und benannt.
          *
-         * Der Bestand (`seedBestand`) und die Ausschluesse
-         * (`applyExclusions`) bleiben hier: Das sind DATEN, keine
-         * Struktur, und sie muessen bei jedem Start stimmen — ein
-         * Abnahmedatensatz, der nach einem Neustart wieder in der Inbox
-         * steht, war der Grund, warum sie ueberhaupt hierher kamen.
+         * ---------------------------------------------------------------
+         * ADM-02 · H1 (16.09.2026) — AUCH KEINE DATEN MEHR
+         *
+         * Bis heute liefen hier noch `seedBestand` und `applyExclusions`:
+         * INSERT und UPDATE vor der ersten lesenden Abfrage. Derselbe
+         * Konstruktionsfehler eine Ebene tiefer — die Inbox zu öffnen
+         * schrieb in drei Tabellen.
+         *
+         * Jetzt:
+         *   Bestand       → `npm run db-migrate` (explizit, gesperrt gegen
+         *                   Produktion ohne Zustimmung, mit Ausgabe)
+         *   Ausschluss    → im Schreibweg, der den Datensatz anlegt
+         *                   (`markLeadExclusions`, `createOpportunity`)
+         *                   und tabellenweit über `npm run db-migrate`
          */
         await verifySchema(sql)
-        await seedBestand(sql)
-        await applyExclusions(sql)
       })().catch((error) => {
         promise = null
         throw error
@@ -1319,12 +1394,7 @@ export function neonClient(connectionString: string): {
     return promise
   }
 
-  const refreshExclusions = async (): Promise<void> => {
-    await ready()
-    await applyExclusions(sql)
-  }
-
-  const entry = { sql, ready, refreshExclusions }
+  const entry = { sql, ready }
   clients.set(connectionString, entry)
   return entry
 }

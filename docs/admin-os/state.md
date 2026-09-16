@@ -1,0 +1,192 @@
+# Admin / Owner OS 1.0 · Ledger
+
+> **Maßgebliche Statusquelle** dieses Programms. Vertrag: `docs/admin-os/program.md`.
+> Stand **16.09.2026** · Session 1 · Branch `feat/system-haus-site` @ `814a02f`
+> Programmzustand: **IN_PROGRESS** — weder OWNER-INDEPENDENT BUILD COMPLETE noch LIVE 99 % ACCEPTED.
+> Vorgänger-Dokumente (bleiben Beleg, nicht Status): `docs/control-center/*`, `docs/final-live-completion/state.md` (F12 Owner-Steuerung).
+
+---
+
+## Ausgangslage (A1, verifiziert 16.09.2026)
+
+| Punkt | Wert | Evidenzart |
+|---|---|---|
+| HEAD / origin | `814a02f` = `origin/feat/system-haus-site` | Code (git) |
+| Production | `814a02f`, `dpl_9LLmNHNvcsowYCWDSvqWGfQYbWCW` | Runtime (Vercel API) |
+| Fremd-WIP (nicht anfassen) | 3 Audit-/Prompt-`.md` im Root · `screenshots 2/` · `scripts/.!12454!check-ownerlast.mjs` | git status |
+
+### G18-Hashes (SHA-256, vor Arbeit — Dateien sind lokal modifiziert, uncommitted)
+
+```
+fed8b14560c83b4fd2a90c6468c75cc381bfc7ec4027f5b7ac589bb3eabf2e2d  components/legal/legal-page.tsx
+519f89bac42371db75452c49dd9579f629af61fd76758d15874dd759e7d55d25  components/sections/packages.tsx
+efe3695d7c4622e568b0c690798567bbfd2c9e75a4ad8ac86c2cf80ab9130170  lib/material-status.ts
+d0a6a063e29996b7474446972ff204a153914f9fdb765e45a9981f9dac8fe442  lib/rechnung.ts
+43c6f528f16dcd722fc04c2508a09ac3094280ea083fb654b912cf8468713488  lib/site-data.ts
+dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnung-drill.mjs
+```
+
+---
+
+## Wellen
+
+| Welle | BUILD | CUTOVER | LIVE | CLOSURE | Status | Nächste konkrete Handlung | Blocker |
+|---|:--:|:--:|:--:|:--:|---|---|---|
+| ADM-00 | 🟢 | — | — | 🟢 | `VERIFIED` | — (eingefroren, siehe unten) | — |
+| ADM-01 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Dark-Mode-Entscheidung beeinflusst nur Tokens, blockiert nicht |
+| ADM-02 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | H2 Sitzungswiderruf · H3 dauerhaftes Rate-Limit · H4 Header/Cache **gemessen** | Cutover H1 = Deploy (Produktionsautorität) |
+| ADM-03 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | — |
+| ADM-04 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Anbieterfreigaben (nach A2-Einstufung) |
+| ADM-05 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | G18 für Rechnung (`lib/rechnung.ts`) |
+| ADM-06 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | meAI-Anbieter/Kosten = Owner |
+| ADM-07 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Produktionsautorität |
+
+**Bestand ist nicht leer** (Code-Evidenz): Anfragen, Organisationen, Kontakte, Standorte, Chancen, Aktivitäten, Recherche, Verlust, Angebote → Projekte (`lib/vertrieb.ts`), Beleg, Rollen (Owner/Vertrieb/Redaktion), Aufmerksamkeit (`lib/attention.ts`), Gedächtnis/Navigator (Cockpit), Migrationsbefehl mit Produktionssperre (`scripts/db-migrate.mjs`). Das Programm baut darauf auf.
+
+---
+
+## ADM-00 · Funde (erste Runde)
+
+| # | Fund | Evidenzart | Schwere | Welle | Status |
+|---|---|---|---|---|---|
+| **H1** | `neonClient().ready()` führte bei jedem Kaltstart vor der ersten Abfrage `seedBestand()` und `applyExclusions()` aus; `listEnquiries` zusätzlich bei **jedem** Aufruf (~60 UPDATEs) → **Lesen schrieb**. | Code `lib/neon-client.ts`, `lib/vertrieb-store-neon.ts` | hoch | ADM-02 | **VERIFIED** (16.09.2026) — siehe §H1 |
+| **H2** | Sitzung ist zustandsloses HMAC-Cookie; Logout löscht nur das Cookie. Eine kopierte Sitzung bleibt bis Ablauf (8 h) gültig — **kein serverseitiger Widerruf** (B05). | Code `lib/admin-session.ts`, `app/api/admin/session/route.ts` | hoch | ADM-02/07 | offen |
+| **H3** | Rate-Limit ist In-Memory (`Map` in `lib/lead-guard.ts:141`) — nicht dauerhaft über Instanzen (B08). | Code | mittel | ADM-02 | offen |
+| **H4** | Kein `Cache-Control: no-store` für Admin-Antworten in `middleware.ts`/`next.config.ts` gefunden; `noindex` nur als Metadaten, kein `X-Robots-Tag`-Header (B01/B02). | Code (grep) — Runtime-Header noch nicht gemessen | mittel | ADM-02 | zu verifizieren |
+| **H5** | Admin ist einsprachig: `app/(admin)/layout.tsx` `lang="de"`, keine TR-Wörterbuchschicht für Admin. | Code | hoch für 99 % | ADM-01 | offen |
+| **H6** | Zwei Owner-Übersichten: `/admin` (Heute, `lib/attention.ts`) und `/admin/cockpit` (G34, Gedächtnis+Navigator). Überlappung → A4-Zusammenlegung. | Code | mittel | ADM-01 | offen |
+| **H7** | Kein Dark Mode im Admin-Code (kein `dark:`/`prefers-color-scheme` in `components/admin`, `app/(admin)`). Ältere Acceptance nennt „Mobil 390 dunkel" — nicht reproduziert. | Code; Widerspruch zu `docs/control-center/acceptance.md` #11 | niedrig | A10 | Owner-Entscheidung |
+
+---
+
+## Owner-Entscheidungen (verbindlich, 16.09.2026)
+
+| # | Entscheidung | Wirkung |
+|---|---|---|
+| **OD-1** | **Dark Mode = POST-99 COMFORT.** Tokens themefähig bauen, kein zweites Theme im Programmbudget. | A10 geschlossen; kein 99 %-Kriterium |
+| **OD-2** | **Kritikalität nach Geschäftsfähigkeit, nicht nach Anbieter.** CRITICAL INBOUND: Website-Formular · manuelle Anfrage · bestehender E-Mail-Anfrageweg *falls* ADM-00 belegt, dass er heute real genutzt wird **und** ein wiederverwendbarer Adapter existiert. NON-CRITICAL: LinkedIn · Meta/Instagram · WhatsApp · Kalender · weitere Anbieter — außer ADM-00 belegt harte Abhängigkeit eines eingefrorenen kritischen Ablaufs. Ein nicht-kritischer Anbieter darf `BLOCKED_EXTERNAL` bleiben, ohne 99 % zu verhindern. | A2 eingefroren (unten) |
+
+---
+
+## ADM-00 · Eingefroren (16.09.2026)
+
+### Integrations-Kritikalität (A2 + OD-2)
+
+| Fähigkeit | Einstufung | Evidenz |
+|---|---|---|
+| Website-Formular → strukturierter `leads`-Datensatz | **CRITICAL** | Code: `app/api/lead/route.ts` → `storeLead()` **vor** dem Zustellversuch, Token-Fingerprint gegen Doppel-Submit. Vorhanden; E2E-Beweis in ADM-03 (A03). |
+| Manuelle Anfrage | **CRITICAL** | Code: **fehlt** — kein `createEnquiry` im `VertriebStore`, keine Admin-Aktion. → ADM-03 baut. |
+| E-Mail-Eingang | **NON-CRITICAL (Bedingung nicht erfüllt)** | Code: creaDIG-Repo hat nur **ausgehenden** Versand (Resend). Ein echter Gmail-OAuth/IMAP-Adapter existiert im **meAI-Altprodukt** (`~/Documents/meai/lib/meai/mail/`, Supabase-Tabelle `mail_oauth`, live laut `meai-v5/docs/BESTANDSAUFNAHME-LIVE.md` 15.09.2026) — andere Datenbank, anderes Identitätsmodell, **keine Verbindung** zum creaDIG-Admin; kein Beleg, dass creaDIG-Anfragen heute über ihn bearbeitet werden. Per E-Mail eingehende Anfragen werden bis dahin als **manuelle Anfrage mit Quelle `email`** erfasst. Umstufung nur mit Beleg (Owner-Tatsache: „Ich bearbeite Anfragen an info@ in meAI"). Falls gebaut: Reuse `lib/meai/mail` (A9), kein zweiter Mail-Speicher. |
+| LinkedIn · Meta/Instagram · WhatsApp · Kalender | **NON-CRITICAL** | Code: 0 Adapter, 0 OAuth im Repo. Kein eingefrorener kritischer Ablauf hängt davon ab. Connection Center zeigt sie ehrlich als `NOT_CONFIGURED`. |
+
+### Domänen-Entitätskarte (Code-Evidenz)
+
+| Entität | Speicher | Vorhanden | Lücke für 99 % |
+|---|---|---|---|
+| Anfrage | `leads` | Quelle, Sprache, UTM, Nachricht, `sales_status`, `handling` (neu/gesehen/bearbeitet/archiviert), `excluded_reason`, Token-Fingerprint | **Verantwortlicher** fehlt · manuelles Anlegen fehlt · Dublettenhinweis Anfrage fehlt |
+| Organisation | `organisations` | Stammdaten, `lifecycle` (unbekannt/prospect/kunde/ehemaliger-kunde), `lower(name)` eindeutig, Ausschluss | Archiv/Löschen/Export (A7) · Zusammenführen |
+| Standort | `locations` | CRUD | — |
+| Kontakt | `contacts` | `email_normalised`, `relationship` (4 Grade), `next_touch` | Kommunikationssprache · Zusammenführen · A7 |
+| Verkaufschance | `opportunities` | 9 Stufen, `from_lead_id` (echter FK), `next_action`/`_at`, `estimated_value` (null ≠ 0), `lost_reason`, Angebotsreife | **Verantwortlicher** · Versionsprüfung (A5) · Stufen gegen reale Praxis bestätigen |
+| Chronik | `activities` | `subject_type/id`, `kind` maschinenlesbar, `summary` | **Akteur + Herkunft** (HUMAN/SYSTEM/AUTOMATION/INTEGRATION) fehlen |
+| Angebot → Projekt → Übergabe | `offers`, `projects` | vollständige Kette (`lib/vertrieb.ts`, `lib/angebot.ts`, `lib/lieferung.ts`) | Nutzung, nicht Fähigkeit (F05) |
+| Rechnung/Zahlung | `invoices`, `payments` | Tabellen | Logik in `lib/rechnung.ts` → **BLOCKED_G18** |
+| Recherche | `research_cases`, `research_evidence` | kontrolliert, Beförderung explizit | — |
+| Beleg/Freigabe | **Code**, nicht DB (`lib/proof.ts` Typen; Einträge in `lib/site-data.ts`) | 5 Umfänge (name/logo/fallstudie/zahl/zitat), Formen, kein `approved: boolean` | Erfassen/Widerrufen in der UI unmöglich ohne Code-Commit; Einträge in G18-Datei → **Beleg-Brücke teilweise BLOCKED_G18** |
+| Messung | `owner_load_samples`, `measurement_samples` | vorhanden | — |
+| Sitzung | HMAC-Cookie, kein Speicher | Rollen Owner/Vertrieb/Redaktion über getrennte Passwörter | Widerruf (H2) · persönliche Identität |
+| Audit-Log | — | **fehlt** | ADM-02/07 |
+| Verbindung / Fähigkeit / Ereignis | — | **fehlt** | ADM-04 |
+| Automation / Ausführung | — | **fehlt** (Regel-Module `alert`, `kreislauf`, `empfehlung` rechnen, führen nicht aus) | ADM-06 |
+
+### OWN / CONNECT / LINK / OBSERVE
+
+| Arbeitsfeld | Entscheidung | Grund |
+|---|---|---|
+| Anfragen, Kontakte, Organisationen, Chancen, Chronik | **OWN** | Kern; existiert in Neon |
+| Angebot → Projekt → Übergabe | **OWN** (besteht) | Kette gebaut; kein Jira/Asana-Nachbau, kein Gantt/Kanban-Projektmodul |
+| Rechnung / Buchhaltung | **OBSERVE** Status (offen/gestellt/bezahlt) · Steuer/Buchhaltung **CONNECT** extern | G18 + keine erfundene USt-Wahrheit |
+| E-Mail | **LINK** (`mailto:`, Anfrage manuell mit Quelle `email`) · **CONNECT-LATER** über meAI-Adapter | OD-2 |
+| Kalender | **LINK** (`/termin`) | NON-CRITICAL |
+| Social (LinkedIn/Meta) | **OBSERVE** als Kanaleintrag im Connection Center, `NOT_CONFIGURED` | NON-CRITICAL, keine erfundene Fähigkeit |
+| Dateien / Beleg-Assets | **OWN** Freigabestatus · Dateien **LINK** (bestehender Ablageort) | kein Upload-Dienst ohne Kostenfreigabe |
+| Veröffentlichung | **OBSERVE** (`/arbeiten` liest nur freigegebene Projektion) | keine Auto-Veröffentlichung |
+| Monitoring | **OBSERVE** (Vercel-Laufzeit, Systemdiagnose im Admin) | kein eigener APM |
+
+### Eingefrorener Abnahmeumfang
+
+Kritisch für OWNER-INDEPENDENT BUILD COMPLETE: **A01–A14, A19–A28, A31, A32** + **B01–B11** (A6/A7).
+Mit eingefrorener Präzisierung:
+- **A15/A16/A17/A18** gelten für das **Website-Formular** (Doppel-Submit = doppelter Webhook-Ersatz, Zustellfehler = Anbieterfehler) und für das Verbindungsmodell mit mindestens einem Testanbieter-Fixture. Echte LinkedIn/Meta-Verbindung = OPTIONAL.
+- **A29/A30 + B12** gelten, weil ADM-06 im Scope ist; meAI-Anbieter/Kosten = Owner. Ohne Freigabe: regelbasierte Aufmerksamkeit (Degraded Mode) muss A30 trotzdem bestehen.
+- **A13/A14** Beleg: DB-gestützte Freigabe im Admin wird gebaut; die öffentliche Projektion aus `lib/site-data.ts` bleibt bis G18-Entsperrung `BLOCKED_G18` und zählt dann als benannter Rest.
+- **Chancen-Stufen:** bestehende 9 Stufen bleiben Maschinenwerte; ob `discovery`/`audit`/`negotiation` der realen Praxis entsprechen = Beobachtung in LIVE EVOLUTION, kein Umbau ohne Nutzungsbeleg.
+- **Nicht im Umfang:** Dark Mode (OD-1), Kampagnen-/Content-Suite, Support-Desk, Buchhaltung, Projektmanagement-Ausbau.
+
+**ADM-00 = `VERIFIED`** (Architektur + Umfang eingefroren). CLOSURE gilt mit Owner-Kenntnisnahme dieser Einstufung.
+
+---
+
+## H1 · Lesepfad schreibt nicht mehr (VERIFIED 16.09.2026)
+
+**Änderung**
+- `ready()` ruft nur noch `verifySchema()` (SELECT). Kein Seed, kein Ausschluss.
+- `listEnquiries` markiert nicht mehr. Der Lesefilter `sqlLeadOperational` + `isTestEnquiry` hielt Abnahmedatensätze schon vorher unabhängig von der Markierung aus der Inbox — Verhalten für den Owner unverändert.
+- **Schreibweg:** `LeadStore.save` → `markLeadExclusions()` (≤3 gezielte UPDATEs, nur wenn eine Regel greift). `createOpportunity` erbt `excluded_reason` im selben INSERT von Anfrage **oder** Organisation **oder** Kontakt (vorher nur Anfrage).
+- **Eine Regel:** `exclusionReasonFor()` in `lib/vertrieb-bestand.ts`; `isTestEnquiry` baut darauf auf; `TEST_PREFIXES` jetzt auch Quelle der SQL-Prefixe (vorher zweimal hart codiert).
+- **Explizite Wartung:** `npm run db-migrate` spielt nach SCHEMA/BACKFILL den Bestand ein und wendet die Ausschlüsse tabellenweit an; `--check` zeigt Bestand (x von 21) und Ausschlusszähler, **ohne** zu ändern. Produktionssperre unverändert.
+- **Gate:** `scripts/check-ausschluss.mjs` (in `postbuild`) — Regel-Fälle inkl. „kein unscharfer Treffer", `ready()` ohne INSERT/UPDATE/DELETE/Seed, kein Markieren im Lesepfad, Schreibweg markiert, Wartung explizit.
+
+**Evidenz**
+| Prüfung | Ergebnis | Art |
+|---|---|---|
+| `tsc --noEmit` | PASS | lokal |
+| ESLint geänderte Dateien | PASS | lokal |
+| `check-ausschluss` | PASS 31/31 | lokal |
+| `crm-drill` §10 gegen Wegwerf-Postgres | PASS — Schreibweg = tabellenweite SQL für Anfrage/Kontakt/Organisation; echte Anfrage unmarkiert; Chance erbt vom Kontakt sofort | reproduziert (DB lokal) |
+| `db-drills` (7 Läufe) | PASS | reproduziert (DB lokal) |
+| `npm run build` + komplette Gate-Kette | PASS (Exit 0) | Produktions-Build |
+| `npm run smoke` (öffentliche Seite + Lead-Route) | PASS 36/36 | Runtime lokal (A32 für geteilten Code) |
+| Admin-Seiten schreiben beim Rendern | 0 Treffer (Scan Lesemethoden + `app/(admin)` außer `actions.ts`) | Code |
+
+**Grenzen / Cutover**
+- Die §10-Chance nutzt die INSERT-Form von `createOpportunity` im Drill nach (der Store selbst spricht nur Neon-HTTP) — Nachbau, benannt.
+- Produktion: erst nach Deploy wirksam (Produktionsautorität). Vorher `npm run db-migrate -- --check` gegen Produktion zeigt, ob der Bestand dort vollständig ist — bisher hat jeder Kaltstart ihn eingespielt, also erwartet 21/21; **nicht gemessen**.
+- Wer künftig einen Namen zu `AUSGESCHLOSSENE_NAMEN` hinzufügt, muss `db-migrate` laufen lassen, damit **bestehende** Kontakte/Organisationen/Chancen markiert werden (Anfragen blendet der Lesefilter ohnehin aus). Steht im Kommentar an `markLeadExclusions`.
+
+---
+
+## Routen-Karte (A4)
+
+| Route | Heute | Schicksal | Ziel | Grund |
+|---|---|---|---|---|
+| `/admin/leads`, `/admin/leads/:id` | Redirect (307) | `REDIRECT` (besteht) | `/admin/vertrieb/anfragen[/:id]` | Bestand, `next.config.ts:243` |
+| `/admin/vertrieb/organisationen[/:id]` | Redirect | `REDIRECT` (besteht) | `/admin/kunden[/:id]` | Bestand, `next.config.ts:290` |
+| `/admin` (Heute) | Seite | offen (ADM-01) | Übersicht | H6 |
+| `/admin/cockpit` | Seite | offen (ADM-01) | Übersicht | H6 |
+| `/admin/material` | Seite | offen (ADM-01) | Einstellungen/System | Material dominiert nicht die Navigation |
+| `/admin/vertrieb`, `/anfragen`, `/beziehungen`, `/pipeline`, `/recherche`, `/verlust` | Seiten | offen (ADM-00 IA) | — | Ziel-IA §Anfragen/Kunden/Vertrieb |
+| `/admin/beleg` | Seite | offen | Nachweise & Freigaben | — |
+
+## Schreibpfade (A5)
+
+Noch nicht erhoben — ADM-03.
+
+## Integrationen (A2/A9)
+
+Noch nicht erhoben. Vorab bekannt: Website-Formular → `leads` (eigener Schreibpfad, OWN). meAI in eigenen Repos (`meai`, `meai-os`) — Reuse prüfen. LinkedIn/Instagram: Fähigkeit unbekannt, nicht angenommen.
+
+---
+
+## Owner-Handlungen (max. 3)
+
+Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
+
+## Session-Log
+
+| Datum | Session | Ergebnis |
+|---|---|---|
+| 16.09.2026 | 1 | Vertrag + Addendum A1–A10 kanonisiert · Production-Spitze nachgeprüft · G18-Hashes erfasst · ADM-00 Funde H1–H7 |
+| 16.09.2026 | 1 | OD-1/OD-2 eingetragen · ADM-00 VERIFIED (Kritikalität, Entitätskarte, OWN/CONNECT, Abnahmeumfang) · **H1 VERIFIED** |
+
+**Fortsetzungspunkt:** ADM-02 — H4 zuerst **messen** (Header/Cache auf `/admin*` gegen `next start`), dann H2 Sitzungswiderruf (Sitzungstabelle via Migration, lokal geprobt; Produktion = Owner), dann H3 dauerhaftes Rate-Limit (Neon-Tabelle, keine neue Bezahl-Abhängigkeit). Danach ADM-01.
