@@ -33,8 +33,8 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | Welle | BUILD | CUTOVER | LIVE | CLOSURE | Status | Nächste konkrete Handlung | Blocker |
 |---|:--:|:--:|:--:|:--:|---|---|---|
 | ADM-00 | 🟢 | — | — | 🟢 | `VERIFIED` | — (eingefroren, siehe unten) | — |
-| ADM-01 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Dark-Mode-Entscheidung beeinflusst nur Tokens, blockiert nicht |
-| ADM-02 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Abfragegrenzen (LIMIT/Paginierung/Indizes) prüfen → dann ADM-02 BUILT | Cutover H1–H4 = Deploy + Migrationen 015/016 · Produktionsmessung (Preview-Zugang) | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
+| ADM-01 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | i18n-Fundament DE/TR für Admin, dann Shell/IA/Übersicht | — |
+| ADM-02 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` | Cutover: Deploy + `db-migrate` 015/016 in Produktion, danach Widerruf/Versuchsfenster/Login live messen | Produktionsautorität (Owner) | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
 | ADM-03 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | — |
 | ADM-04 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Anbieterfreigaben (nach A2-Einstufung) |
 | ADM-05 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | G18 für Rechnung (`lib/rechnung.ts`) |
@@ -291,6 +291,19 @@ Mit eingefrorener Präzisierung:
 
 ---
 
+## ADM-02 · Abfragegrenzen (geprüft 17.09.2026, keine Änderung nötig)
+
+Statische Prüfung aller 32 lesenden Methoden in `lib/vertrieb-store-neon.ts` + Indexliste aus `SCHEMA`:
+- Alle **Listen mit Paginierung** (`listEnquiries`, `listOpportunities`, `listContacts`, `listOrganisations`, `listResearch`, `activities`, `summary`) tragen `LIMIT`; Verlust holt bewusst bis 500, Recherche bis 200 und nennt die Grenze.
+- **Kein N+1**: keine Abfrage in Schleifen; Heute lädt 3 Abfragen parallel (`Promise.all`).
+- **Indizes** auf jeder Filter-/Fremdschlüsselspalte (Status, `next_action_at`, `organisation_id`, `contact_id`, `from_lead_id`, `handling_status`, Aktivitäten `(subject_type, subject_id, created_at DESC)` …).
+- **Ohne LIMIT, bewusst**: an einen Datensatz gebundene Beziehungen (`contactsForOrganisation`, `opportunitiesFor*`, `listOffers`, `listProjects`, `listLocations`) und kleine Stammlisten (`organisationChoices`, `enquirySources`; Bestand heute ≈ 21 Organisationen). Eine harte Kappung würde Einträge still verstecken — schlimmer als eine lange Liste. Neu prüfen, wenn Organisationen > 1.000.
+- **Suche** `ILIKE '%…%'` ohne Trigramm-Index: bei heutigem Volumen unkritisch; `pg_trgm` erst mit Messung (Kostenfreiheit prüfen).
+
+**ADM-02 = BUILT** (lokal verifiziert: H1–H4, H8, H10–H13, A02, A19, A23, Abfragegrenzen). CUTOVER offen: Deploy + Migrationen 015/016 (Produktionsautorität), Produktionsmessung Login/Daten (Preview-Zugang).
+
+---
+
 ## Routen-Karte (A4)
 
 | Route | Heute | Schicksal | Ziel | Grund |
@@ -330,4 +343,4 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 17.09.2026 | 2 | **A02 lokal VERIFIED** (9 Fehlerzustände, 30 warm / 10 kalt) · H11 Navigation aus Login-Payload · H12 Login endlich |
 | 17.09.2026 | 2 | **A19 VERIFIED lokal** (32 Flächen × 2 Lagen) · H13 |
 
-**Fortsetzungspunkt:** ADM-02 — Abfragegrenzen: jede Listenabfrage im Vertriebsspeicher auf LIMIT/Paginierung, Indizes für Filterspalten (Migration nur lokal), N+1 auf Heute/Kundenakte. Danach ADM-02 als BUILT schließen und ADM-01 (Shell, Übersicht = Heute+Cockpit, DE/TR, Routen-Karte) beginnen.
+**Fortsetzungspunkt:** ADM-01 — (1) Admin-i18n-Fundament: Sprachpräferenz (Cookie), Wörterbuch DE/TR mit Paritäts-Gate, `lang` am `<html>`, Umschalter in Login + Shell ohne Kontextverlust; (2) Shell/Navigation nach Ziel-IA + Routen-Karte; (3) Übersicht = Heute + Cockpit. Reihenfolge begründet: jede weitere UI-Arbeit ohne i18n müsste doppelt gemacht werden.
