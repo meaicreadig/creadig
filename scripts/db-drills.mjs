@@ -64,6 +64,8 @@ const LAEUFE = [
   { name: "versuch", db: "drill_versuch", variable: "VERSUCH_DRILL_URL" },
   /* ADM-03 — die Kernschleife ueber den echten Store-Code. */
   { name: "kernschleife", db: "drill_kernschleife", variable: "KERNSCHLEIFE_DRILL_URL" },
+  /* ADM-05 · H20 — jeder Zustandswechsel der Betriebskette genau einmal. */
+  { name: "betriebskette", db: "drill_betriebskette", variable: "BETRIEBSKETTE_DRILL_URL" },
 ]
 
 function psql(sql) {

@@ -67,6 +67,8 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | **H16** | „Chance anlegen“: erst SELECT, dann INSERT, keine Eindeutigkeit → zwei gleichzeitige Klicks = zwei Chancen. | Code + Drill (10 parallel) | mittel | ADM-03 | **VERIFIED** — eindeutiger Index (017) + ON CONFLICT |
 | **H18** | `check-cockpit` war seit der DE/TR-Migration blind: Es suchte die deutschen Zustandswörter im Quelltext der Komponente; die stehen seit ADM-01 im Wörterbuch. Das Gate meldete „kennt den Zustand nicht-erhoben nicht", obwohl die Seite alle drei zeigt — **rot committet in `457b236`**. Zweiter Befund derselben Ursache: `<LageRegister />` trägt seither eine Eigenschaft, das Muster verlangte die blanke Form. | reproduziert (Blindprobe) | mittel (Testhygiene) | ADM-04 | **VERIFIED** — prüft jetzt die drei Schlüssel UND beide Wörterbücher; Blindprobe rot, danach grün |
 | **H19** | Bei nicht erreichbarem Sitzungsspeicher weist `middleware.ts` jede ändernde Anfrage mit 503 ab (H2, zur sicheren Seite). Im Browser stand davon nur „An unexpected response was received from the server" — der Admin sah aus, als nähme er Eingaben an. | Runtime gemessen (Lauf B, tote Datenbank) | mittel | ADM-04 | **VERIFIED** — `/admin/verbindungen` nennt die Schreibsperre und sperrt die Knöpfe (`aria-describedby`); E2E Lauf B |
+| **H20** | Fünf Zustandswechsel der Betriebskette prüften ihre eigene Wirkung nicht: Die Bedingung stand im `UPDATE`, das Ergebnis las niemand. Ein zweiter Klick auf „Angebot senden“ änderte nichts, **meldete Erfolg und schrieb eine zweite Chronikzeile** — in dem Protokoll, das die einzige Quelle darüber ist. Betroffen: `sendOffer`, `acceptOffer`, `acceptDelivery`, `handOver`; `addProjectChange` schrieb ausserdem eine gelesene Liste ganz zurück (verlorener Schreibvorgang bei zwei Menschen, doppelter Eintrag bei einem Doppelklick) — und eine Projektänderung ist Geld. | reproduziert (`betriebskette-drill`, Blindprobe gegen den alten Stand: 14 Befunde) | **hoch** | ADM-05 | **VERIFIED** — Bedingung + `RETURNING`-Prüfung je Wechsel, Anhängen atomar in einer Anweisung; 34/34 |
+| **H21** | Die Befunde und Mängel der Angebots- und Lieferkette entstehen als deutsche Sätze im Server (`lib/angebot.ts`, `lib/lieferung.ts`, Store) und werden unübersetzt angezeigt — auch in der türkischen Oberfläche. Das Sprach-Gate konnte es nicht sehen: Es zählt sichtbaren deutschen Text im JSX, nicht Text, der aus dem Server kommt. „ADM-01 · 0 offene Textstellen“ galt deshalb nur für die Oberfläche, nicht für alles, was ein Mensch liest. | Code + gerendert | mittel (A01) | ADM-05 | offen — Maschinenwerte + Wörterbuch; Abschnittstitel des Angebots bleiben deutsch (sie benennen ein deutsches Kundendokument) |
 | **H17** | `.env.local` enthält eine echte `DATABASE_URL`; Next füllt auch LEER gesetzte Variablen daraus → Prüfskripte mit `DATABASE_URL: ""` konnten eine echte DB erreichen (Rauchtest schickt Formularanfragen). Kein Vorfall (kein `LEAD_STORE` in `.env.local`). | Runtime gemessen | hoch (Risiko) | ADM-03 | **VERIFIED** — alle next-start-Skripte `LEAD_STORE=aus` + `.invalid`; Gate `check-pruefumgebung` |
 
 ---
@@ -447,7 +449,55 @@ und das Gate stehen schon.
 
 ## Schreibpfade (A5)
 
-Noch nicht erhoben — ADM-03.
+**Erhoben 17.09.2026** über alle 33 Server Actions (`app/(admin)/admin/vertrieb/actions.ts`, `app/(admin)/admin/verbindungen/actions.ts`) und die Methoden dahinter. Geprüft je Pfad: Doppel-Submit · veraltetes Schreiben · Race · Wirkung belegt · zweite Geschäftswirkung.
+
+**Gemeinsame Grundlage aller Pfade:** Jede Action prüft am Schreibpunkt selbst Sitzung, Widerruf und Rolle (H8) — die Middleware ist nicht die einzige Sperre. Jede schreibende Anfrage wird abgewiesen, solange der Sitzungswiderruf nicht prüfbar ist (H2); die Oberfläche sagt das inzwischen auch (H19).
+
+### 1 · Erzeugende Pfade — eine Wiederholung wäre ein zweiter Datensatz
+
+| Pfad | Schutz | Beleg |
+|---|---|---|
+| Anfrage erfassen (`createEnquiry`) | Idempotenzschlüssel aus dem Formular | `kernschleife-drill` K1: 10× gleichzeitig = 1 |
+| Chance anlegen (`createOpportunity`) | eindeutiger Index `opportunities_from_lead_unique` (017) + `ON CONFLICT` | K5: 10× gleichzeitig = 1 Chance, 1 Chronikzeile |
+| Projekt aufsetzen (`startProject`) | `ON CONFLICT (offer_id) DO NOTHING` + Zeilenprüfung | `betriebskette-drill` B3 |
+| Angebotsentwurf (`saveOfferDraft`) | `ON CONFLICT (id) DO UPDATE`; gesendet/angenommen wird nie überschrieben | G17 + B1 |
+| Standort anlegen (`createLocation`) | **kein** Idempotenzschlüssel — ein Doppelklick legt zwei an | bewusst: sichtbar in derselben Liste, in einem Klick löschbar, keine Aussenwirkung |
+
+### 2 · Zustandswechsel — eine Wiederholung wäre eine zweite Geschäftshandlung
+
+Alle mit Bedingung im `UPDATE` **und** `RETURNING`-Prüfung: Kam keine Zeile zurück, geschieht nichts und wird nichts behauptet.
+
+| Pfad | Bedingung | Chronik |
+|---|---|---|
+| Stufe wechseln / gewinnen / verlieren (`moveOpportunity`) | `updated_at` des gelesenen Stands → sonst `konflikt` | genau eine, mit `{von, nach, grund}` |
+| Angebot senden (`sendOffer`) | `state = 'entwurf'` | genau eine (**H20**) |
+| Zusage (`acceptOffer`) | `state = 'gesendet'`; Vorgang wird erst danach auf gewonnen gesetzt | genau eine (**H20**) |
+| Materialeingang (`receiveMaterial`) | `state = 'aufgesetzt'` | genau eine — die Frist beginnt einmal |
+| Abnahme (`acceptDelivery`) | `state = 'laeuft'` | genau eine (**H20**) |
+| Übergabe (`handOver`) | `state = 'abgenommen'` | genau eine (**H20**) |
+| Anfrage archivieren (`archiveLead`) | Zeilenprüfung, Dublette nur mit Bezug | genau eine |
+| Bearbeitungsstand (`setLeadHandling`) | Zustandsliste geprüft, sonst keine Änderung | genau eine |
+
+### 3 · Anhängende Pfade
+
+| Pfad | Schutz | Beleg |
+|---|---|---|
+| Projektänderung (`addProjectChange`) | `changes \|\| $2` **und** `NOT (changes @> $2)` in EINER Anweisung — kein verlorener Schreibvorgang, kein doppelter Eintrag | B5: 10 verschiedene gleichzeitig = 10, dieselbe zweimal = 1 |
+| Recherche-Beleg (`addEvidence`) | Belege werden nie ersetzt, nur abgelöst (`supersedeEvidence`) | G10/G11 |
+
+### 4 · Feldsetzer — der letzte Schreibvorgang gilt
+
+`setLeadResponsible` · `setLeadNextAction` · `setLeadOrganisation` · `setOpportunityResponsible` · `setOpportunityNextAction` · `setOpportunityNote` · `updateOpportunityOffer` · `updateContactRelationship` · `updateContactDetails` · `updateContactNextTouch` · `updateContactOrganisation` · `updateOrganisationDetails` · `updateOrganisationLifecycle` · `updateResearchCase` · `linkResearchContact` · `setContactSource` · `decideContact` · `updateLocation` · `deleteLocation`
+
+**Entschieden, nicht übersehen:** Diese Pfade haben keine Versionsprüfung. Ein zweiter Klick schreibt denselben Wert (keine zweite Wirkung); zwei Menschen auf demselben Feld überschreiben sich. In einem Haus mit drei Rollen ist das tragbar — **und es bleibt sichtbar**: Jeder dieser Pfade schreibt eine Chronikzeile mit Akteur, Herkunft und Zeitpunkt. Wer den Verantwortlichen überschrieben hat, steht danach in der Akte. Eine Versionsprüfung kommt dort hinzu, wo ein Feld Geld trägt — das sind heute genau die Pfade aus Abschnitt 2, und dort ist sie gebaut.
+
+### 5 · Verbindungen (ADM-04)
+
+| Pfad | Schutz |
+|---|---|
+| Verbindung prüfen | rein lesend; kein Versand, keine Zeile in einem fremden System; Zeitgrenze 8 s |
+| Prüfstand verbinden/widerrufen | idempotent, zweiter Aufruf meldet „keine zweite Wirkung“ |
+| Prüfstand-Ereignis | Idempotenzschlüssel aus dem Stand — zwei Klicks in derselben Sekunde ergeben eine Wirkung |
 
 ## Integrationen (A2/A9)
 

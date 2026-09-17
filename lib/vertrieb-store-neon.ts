@@ -1356,12 +1356,35 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         wiederkehrend: p.wiederkehrend === true,
       }))
 
-      await sql.query(
+      /*
+       * ADM-05 · H20 — DIE WIRKUNG WIRD GEPRUEFT, NICHT ANGENOMMEN.
+       *
+       * Die Bedingung `state = 'entwurf'` stand hier schon; das Ergebnis las
+       * niemand. Ein zweiter Klick aenderte deshalb nichts, meldete aber
+       * Erfolg UND schrieb eine zweite Chronikzeile „Angebot gesendet“.
+       * Der Owner las danach, er habe zweimal gesendet — in einem Protokoll,
+       * das er nicht nachpruefen kann, weil es SELBST die Quelle ist.
+       *
+       * `RETURNING id` macht aus der Annahme eine Messung: Kam keine Zeile
+       * zurueck, ist nichts geschehen, und es wird nichts behauptet.
+       */
+      const gesendet = await sql.query(
         `UPDATE offers SET state = 'gesendet', sent_at = now(),
                            sent_snapshot = $2::jsonb, updated_at = now()
-          WHERE id = $1::text AND state = 'entwurf'`,
+          WHERE id = $1::text AND state = 'entwurf'
+        RETURNING id`,
         [id, JSON.stringify(snapshot)],
       )
+      if (!gesendet.length) {
+        return [
+          {
+            abschnitt: "Angebot",
+            satz:
+              "Dieses Angebot ist nicht mehr im Entwurf — es wurde inzwischen gesendet. " +
+              "Es geht nicht ein zweites Mal hinaus.",
+          },
+        ]
+      }
       await note("opportunity", angebot.opportunityId, "offer.sent",
         `Angebot ${angebot.referenz} gesendet`, null)
       return []
@@ -1384,11 +1407,32 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
       const fehlt = fehltFuer({ ...angebot, annahme }, "angenommen", opp?.readinessEvidence ?? [])
       if (fehlt.length > 0) return fehlt
 
-      await sql.query(
+      /*
+       * ADM-05 · H20 — erst die Zustandsaenderung, dann ihre Folgen.
+       *
+       * Die Pruefung oben liest den Zustand und schreibt danach; zwischen
+       * beidem liegt ein Fenster. Zwei gleichzeitige Zusagen kamen beide
+       * durch die Pruefung, und beide setzten anschliessend den Vorgang auf
+       * „gewonnen“ und schrieben eine Chronikzeile — zwei Annahmen fuer
+       * ein Angebot. Die Bedingung im UPDATE laesst nur eine durch;
+       * `RETURNING` sagt, welche es war. Alles Weitere haengt jetzt daran.
+       */
+      const angenommen = await sql.query(
         `UPDATE offers SET state = 'angenommen', acceptance = $2::jsonb, updated_at = now()
-          WHERE id = $1::text AND state = 'gesendet'`,
+          WHERE id = $1::text AND state = 'gesendet'
+        RETURNING id`,
         [id, JSON.stringify(annahme)],
       )
+      if (!angenommen.length) {
+        return [
+          {
+            abschnitt: "Annahme",
+            satz:
+              "Dieses Angebot ist inzwischen nicht mehr im Zustand „gesendet“. " +
+              "Die Zusage wurde nicht erneut festgehalten.",
+          },
+        ]
+      }
       /*
        * Das Ja aendert den Vorgang mit — sonst stuende ein angenommenes
        * Angebot neben einer Verkaufschance in „Verhandlung", und die
@@ -1500,10 +1544,37 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         .filter((m) => m.bereich === "Aenderung")
       if (maengel.length > 0) return maengel
 
-      await sql.query(
-        `UPDATE projects SET changes = $2::jsonb, updated_at = now() WHERE id = $1::text`,
-        [projectId, JSON.stringify(naechste)],
+      /*
+       * ADM-05 · H20 — ANHAENGEN IN EINER ANWEISUNG, NICHT IN ZWEIEN.
+       *
+       * Vorher wurde die Liste gelesen, im Speicher ergaenzt und ganz
+       * zurueckgeschrieben. Zwei Menschen am selben Projekt loeschten sich
+       * damit gegenseitig die Aenderung (beide lasen dieselbe Liste); ein
+       * doppelter Klick trug dieselbe Aenderung zweimal ein — und eine
+       * Aenderung ist Geld.
+       *
+       * Jetzt haengt Postgres an (`||`) und lehnt dieselbe Aenderung ab
+       * (`NOT changes @> …`). Beides in EINER Anweisung: Zwischen Pruefen
+       * und Schreiben liegt kein Fenster mehr.
+       */
+      const eintrag = JSON.stringify([aenderung])
+      const ergaenzt = await sql.query(
+        `UPDATE projects
+            SET changes = changes || $2::jsonb, updated_at = now()
+          WHERE id = $1::text
+            AND state <> 'uebergeben'
+            AND NOT (changes @> $2::jsonb)
+        RETURNING id`,
+        [projectId, eintrag],
       )
+      if (!ergaenzt.length) {
+        return [
+          {
+            bereich: "Aenderung",
+            satz: "Diese Aenderung steht bereits am Projekt. Sie wurde kein zweites Mal eingetragen.",
+          },
+        ]
+      }
       await note("opportunity", projekt.opportunityId, "project.change",
         `Aenderung: ${aenderung.was}`,
         aenderung.zugestimmt ? `zugestimmt von ${aenderung.zugestimmt.von}` : "noch ohne Zustimmung")
@@ -1518,11 +1589,23 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
       const maengel = fehltFuerZustand({ ...projekt, abnahme }, "abgenommen")
       if (maengel.length > 0) return maengel
 
-      await sql.query(
+      /* ADM-05 · H20 — nur aus „laeuft“ heraus, und nur einmal. */
+      const abgenommen = await sql.query(
         `UPDATE projects SET acceptance = $2::jsonb, state = 'abgenommen', updated_at = now()
-          WHERE id = $1::text`,
+          WHERE id = $1::text AND state = 'laeuft'
+        RETURNING id`,
         [projectId, JSON.stringify(abnahme)],
       )
+      if (!abgenommen.length) {
+        return [
+          {
+            bereich: "Abnahme",
+            satz:
+              "Das Projekt ist nicht (mehr) im Zustand „laeuft“. Eine Abnahme wird nicht zweimal " +
+              "erteilt — was bereits abgenommen ist, bleibt es.",
+          },
+        ]
+      }
       await note("opportunity", projekt.opportunityId, "project.accepted",
         "Abnahme erteilt",
         `${abnahme.von} (${abnahme.rolle}), ${abnahme.form}, ${abnahme.am}`)
@@ -1546,11 +1629,21 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
       const maengel = fehltFuerZustand({ ...projekt, uebergabe: zusammen }, "uebergeben")
       if (maengel.length > 0) return maengel
 
-      await sql.query(
+      /* ADM-05 · H20 — die Uebergabe ist ein Abschluss, kein wiederholbarer Klick. */
+      const uebergeben = await sql.query(
         `UPDATE projects SET handover = $2::jsonb, state = 'uebergeben', updated_at = now()
-          WHERE id = $1::text`,
+          WHERE id = $1::text AND state = 'abgenommen'
+        RETURNING id`,
         [projectId, JSON.stringify(zusammen)],
       )
+      if (!uebergeben.length) {
+        return [
+          {
+            bereich: "Uebergabe",
+            satz: "Das Projekt ist nicht im Zustand „abgenommen“. Eine Uebergabe geschieht einmal.",
+          },
+        ]
+      }
       await note("opportunity", projekt.opportunityId, "project.handover",
         "Uebergabe vollstaendig",
         UEBERGABE_STUECKE.map((s) => s.label).join(", "))

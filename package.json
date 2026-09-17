@@ -39,6 +39,7 @@
     "verkauf-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/verkauf-drill.mjs",
     "kernschleife-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/kernschleife-drill.mjs",
     "verbindung-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/verbindung-drill.mjs",
+    "betriebskette-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/betriebskette-drill.mjs",
     "verbindungen-e2e": "node --import ./scripts/lib/alias-hook.mjs scripts/verbindungen-e2e.mjs",
     "versuch-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/versuch-drill.mjs",
     "admin-zustaende": "node --import ./scripts/lib/alias-hook.mjs scripts/admin-zustaende.mjs",
