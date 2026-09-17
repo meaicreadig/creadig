@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { SpeicherHinweis } from "@/components/admin/speicher-hinweis"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
 
 /**
  * Die Hülle der Kundensicht.
@@ -23,7 +24,7 @@ import { SpeicherHinweis } from "@/components/admin/speicher-hinweis"
  * Der Bereich hat zwei Ansichten: die Liste und die Akte. Eine Leiste mit
  * einem Punkt ist keine Navigation, sondern eine Überschrift mit Rahmen.
  */
-export function KundenShell({
+export async function KundenShell({
   title,
   lead,
   meta,
@@ -37,6 +38,7 @@ export function KundenShell({
   available: boolean
   children: ReactNode
 }) {
+  const { t } = await adminSprachKontext()
   return (
     <AdminShell title={title} lead={lead} meta={available ? meta : undefined}>
       {available ? (
@@ -47,7 +49,7 @@ export function KundenShell({
          * derselben Datenbank wie der Vertrieb; ist sie nicht erreichbar,
          * zeigt diese Seite nichts, statt Leere zu behaupten.
          */
-        <SpeicherHinweis bereich="Kunden" inhalt="Organisationen, Standorte und Ansprechpartner" />
+        <SpeicherHinweis bereich={t.nav.kunden.label} inhalt={t.speicher.inhaltKunden} />
       )}
     </AdminShell>
   )

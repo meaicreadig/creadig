@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next"
+
+import { adminSprache } from "@/lib/admin-i18n/server"
 import { Poppins, JetBrains_Mono, M_PLUS_Rounded_1c } from "next/font/google"
 import "@/app/globals.css"
 
@@ -57,10 +59,12 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminRootLayout({ children }: { children: React.ReactNode }) {
+  /* ADM-01 — `lang` folgt der gewählten Admin-Sprache (Screenreader, Silbentrennung, Suche). */
+  const sprache = await adminSprache()
   return (
     <html
-      lang="de"
+      lang={sprache}
       className={`${poppins.variable} ${mplusRounded.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >

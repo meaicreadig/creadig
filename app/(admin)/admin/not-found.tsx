@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import { UnavailableNote } from "@/components/admin/primitives"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
 
 /**
  * Im Control Center gibt es diese Adresse nicht.
@@ -17,25 +18,18 @@ import { UnavailableNote } from "@/components/admin/primitives"
  * „Anfragen, Pipeline, Beziehungen" im HTML von `/admin/login`). Diese Seite
  * braucht keine Navigation: Sie hat zwei Links.
  */
-export default function AdminNotFound() {
+export default async function AdminNotFound() {
+  const { t } = await adminSprachKontext()
   return (
-    <main className="bg-background text-foreground min-h-dvh px-6 py-16">
+    <main className="bg-background text-foreground min-h-dvh px-4 py-16 sm:px-6">
       <div className="mx-auto max-w-2xl">
-      <h1 className="type-h3 mb-6">Nicht gefunden</h1>
-      <UnavailableNote title="Diese Adresse gibt es hier nicht">
-        Die Datenquelle hat geantwortet — zu dieser Kennung liegt nur nichts
-        vor. Möglich ist ein alter Link, eine getippte Kennung oder ein
-        Datensatz, den es nicht mehr gibt.
-      </UnavailableNote>
-
-      <div className="mt-6 flex flex-wrap gap-6">
-        <Link href="/admin" className="text-gold-text text-sm underline underline-offset-4">
-          Zu Heute
-        </Link>
-        <Link href="/admin/material" className="text-gold-text text-sm underline underline-offset-4">
-          Zum Materialstand
-        </Link>
-      </div>
+        <h1 className="type-h3 mb-6">{t.nichtGefunden.titel}</h1>
+        <UnavailableNote title={t.nichtGefunden.hinweisTitel}>{t.nichtGefunden.hinweis}</UnavailableNote>
+        <div className="mt-6 flex flex-wrap gap-6">
+          <Link href="/admin" className="text-gold-text text-sm underline underline-offset-4">
+            {t.nichtGefunden.zurUebersicht}
+          </Link>
+        </div>
       </div>
     </main>
   )

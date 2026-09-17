@@ -33,7 +33,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | Welle | BUILD | CUTOVER | LIVE | CLOSURE | Status | Nächste konkrete Handlung | Blocker |
 |---|:--:|:--:|:--:|:--:|---|---|---|
 | ADM-00 | 🟢 | — | — | 🟢 | `VERIFIED` | — (eingefroren, siehe unten) | — |
-| ADM-01 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | i18n-Fundament DE/TR für Admin, dann Shell/IA/Übersicht | — |
+| ADM-01 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Übersicht = Heute + Cockpit (H6), dann Seiten migrieren (≥150 Textstellen) | Material-Beschriftungen BLOCKED_G18 |
 | ADM-02 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` | Cutover: Deploy + `db-migrate` 015/016 in Produktion, danach Widerruf/Versuchsfenster/Login live messen | Produktionsautorität (Owner) | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
 | ADM-03 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | — |
 | ADM-04 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Anbieterfreigaben (nach A2-Einstufung) |
@@ -304,6 +304,24 @@ Statische Prüfung aller 32 lesenden Methoden in `lib/vertrieb-store-neon.ts` + 
 
 ---
 
+## ADM-01 · Sprachfundament + Hülle (17.09.2026)
+
+**Gebaut**
+- `lib/admin-i18n/` — `de.ts` (Quelle), `tr.ts` gegen den abgeleiteten Typ `AdminTexte` (fehlender Schlüssel = Build-Fehler, per Wegwerf-Probe belegt), `server.ts` (`adminSprachKontext`: Cookie `cd_admin_sprache` → `Accept-Language: tr` → DE). Admin-Sprache ≠ Kundenkommunikationssprache ≠ Geschäftszeitzone (steht im Code).
+- `<html lang>` folgt der Wahl. `SprachUmschalter` auf Anmeldung und in der Hülle: Cookie + `router.refresh()` → Adresse, Filter, Formularinhalt bleiben.
+- Hülle nach Ziel-IA: **Übersicht · Anfragen · Kunden & Kontakte · Vertrieb · Nachweise & Freigaben · System** — nur, was die Rolle betreten darf (Sichtbarkeit; Sperre bleibt serverseitig). Aktiv = längster passender Pfad. Mobil einklappbar (`aria-expanded`), 44-px-Ziele.
+- Zweisprachig: Hülle, Navigation, Anmeldung (inkl. aller Fehlertexte), Abmelden, Datenbank-Hinweise, Nicht-gefunden, Fehlergrenze (über `<html lang>`).
+- Gate `check-admin-sprache` (postbuild): Parität 47/47 Texte, migrierte Dateien dürfen nicht zurückfallen, offener Stand wird gezählt.
+
+| Prüfung | Ergebnis | Art |
+|---|---|---|
+| `admin-sprache-e2e` S1–S8 | PASS 28/28 — TR per Browser; Umschalten auf Anmeldung behält eingetipptes Passwort; Umschalten in der Hülle behält `/admin/vertrieb/anfragen?status=neu&q=probe`; Wahl überdauert Neuladen; Vertrieb sieht System/Nachweise nicht; mobil 390 eingeklappt, per Tastatur offen, 0 px Überlauf, keine Ziele < 36 px; erster Tab = Sprunglink; **axe WCAG 2.1 AA 0 Verstöße** auf Anmeldung + Übersicht × DE/TR × 1440/390 | Chromium, `next start` |
+| `admin-e2e --nur-fehler` 16/16 · `admin-zustaende` 32/32 · build + Gates · smoke 36/36 · öffentliche a11y-Suite | PASS | lokal |
+
+**Offen (gezählt, nicht versteckt)**: 21 Dateien / **≥ 150** feste deutsche Textstellen in Seiten (Untergrenze — Texte in JS-Ausdrücken und Beschriftungen aus `lib/` wie Statusnamen und Aufmerksamkeitstexte zählt die Heuristik nicht). **BLOCKED_G18**: Beschriftungen der Material-/Systempunkte stammen aus `lib/material-status.ts` und bleiben in TR deutsch, bis G18 entsperrt ist.
+
+---
+
 ## Routen-Karte (A4)
 
 | Route | Heute | Schicksal | Ziel | Grund |
@@ -342,5 +360,6 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 17.09.2026 | 2 | **A23 / H10 VERIFIED** (Berliner Geschäftstag JS + SQL + Anzeige) |
 | 17.09.2026 | 2 | **A02 lokal VERIFIED** (9 Fehlerzustände, 30 warm / 10 kalt) · H11 Navigation aus Login-Payload · H12 Login endlich |
 | 17.09.2026 | 2 | **A19 VERIFIED lokal** (32 Flächen × 2 Lagen) · H13 |
+| 17.09.2026 | 2 | **ADM-01 Sprachfundament + Hülle VERIFIED** (DE/TR, Rolle, mobil, axe 0) |
 
-**Fortsetzungspunkt:** ADM-01 — (1) Admin-i18n-Fundament: Sprachpräferenz (Cookie), Wörterbuch DE/TR mit Paritäts-Gate, `lang` am `<html>`, Umschalter in Login + Shell ohne Kontextverlust; (2) Shell/Navigation nach Ziel-IA + Routen-Karte; (3) Übersicht = Heute + Cockpit. Reihenfolge begründet: jede weitere UI-Arbeit ohne i18n müsste doppelt gemacht werden.
+**Fortsetzungspunkt:** ADM-01 — Übersicht neu: (1) Heute zu tun (operative Aufmerksamkeit, Rang-Labels zweisprachig), (2) Ihre Entscheidungen (Navigator, Geschäftssprache, ohne Paragraphen/Code), (3) Systemzustand kompakt; Cockpit-Lage nach System; `/admin/cockpit` → Umleitung `/admin` (Routen-Karte). Danach Seiten nach Textstellen absteigend migrieren.

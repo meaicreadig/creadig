@@ -2,47 +2,69 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
 
-/**
- * Die Menüpunkte des Control Centers.
- *
- * Eigene Datei und `"use client"` aus genau einem Grund: `aria-current` muss
- * wissen, wo man ist. Ohne das ist die Markierung des aktiven Punktes nur
- * eine Farbe — für ein Vorleseprogramm bleibt die Liste dann eine Reihe
- * gleichwertiger Links, und der Nutzer erfährt nie, auf welcher Seite er
- * steht. Die Hülle drumherum bleibt serverseitig.
- */
 export type NavItem = { href: string; label: string; hint: string }
 
-export function AdminNav({ items }: { items: NavItem[] }) {
+/**
+ * Die Hauptnavigation.
+ *
+ * Aktiv ist der LÄNGSTE passende Eintrag: `/admin/vertrieb/anfragen` gehört
+ * zu „Anfragen“, nicht zusätzlich zu „Vertrieb“. `/admin` passt nur exakt.
+ *
+ * Mobil ist die Liste einklappbar (ADM-01): Vorher standen alle Einträge mit
+ * Beschreibung untereinander, bevor die Arbeitsfläche überhaupt begann. Nach
+ * einem Seitenwechsel schließt sie sich wieder.
+ */
+export function AdminNav({
+  items,
+  oeffnen,
+  schliessen,
+}: {
+  items: NavItem[]
+  oeffnen: string
+  schliessen: string
+}) {
   const pathname = usePathname()
+  const [offen, setOffen] = useState(false)
+  useEffect(() => setOffen(false), [pathname])
+
+  const passt = (href: string) => (href === "/admin" ? pathname === "/admin" : pathname === href || pathname.startsWith(`${href}/`))
+  const aktiv = items
+    .filter((i) => passt(i.href))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href
 
   return (
-    <ul className="flex flex-col gap-1">
-      {items.map((item) => {
-        /* `/admin` ist nur dann aktiv, wenn es GENAU `/admin` ist — sonst
-           leuchtet „Heute" auf jeder Unterseite mit. */
-        const active = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href)
-
-        return (
-          <li key={item.href}>
-            <Link
-              href={item.href}
-              aria-current={active ? "page" : undefined}
-              className={`block rounded-sm px-3 py-2.5 transition-colors duration-[var(--dur-1)] ${
-                active ? "bg-muted" : "hover:bg-muted"
-              }`}
-            >
-              <span
-                className={`text-subhead block text-sm ${active ? "text-gold-text" : ""}`}
+    <div>
+      <button
+        type="button"
+        aria-expanded={offen}
+        aria-controls="admin-hauptnavigation"
+        onClick={() => setOffen((o) => !o)}
+        className="border-line inline-flex min-h-11 items-center gap-2 rounded-sm border px-3 text-sm lg:hidden"
+      >
+        <span aria-hidden="true">{offen ? "✕" : "☰"}</span>
+        {offen ? schliessen : oeffnen}
+      </button>
+      <ul id="admin-hauptnavigation" className={`${offen ? "mt-3 flex" : "hidden"} flex-col gap-1 lg:mt-0 lg:flex`}>
+        {items.map((item) => {
+          const active = item.href === aktiv
+          return (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={`block rounded-sm px-3 py-2.5 transition-colors duration-[var(--dur-1)] ${
+                  active ? "bg-muted" : "hover:bg-muted"
+                }`}
               >
-                {item.label}
-              </span>
-              <span className="text-muted-foreground mt-0.5 block text-xs">{item.hint}</span>
-            </Link>
-          </li>
-        )
-      })}
-    </ul>
+                <span className={`text-subhead block text-sm ${active ? "text-gold-text" : ""}`}>{item.label}</span>
+                <span className="text-muted-foreground mt-0.5 block text-xs">{item.hint}</span>
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
   )
 }

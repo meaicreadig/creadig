@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 
 import { AdminField, AdminInput } from "@/components/admin/primitives"
+import type { AdminTexte } from "@/lib/admin-i18n"
 
 /**
  * Anmeldeformular.
@@ -35,16 +36,7 @@ const ZEITLIMIT_MS = 10_000
 type Phase = "bereit" | "pruefen" | "weiter"
 type Fehler = "ungueltig" | "zu-viele" | "nicht-eingerichtet" | "zeitueberschreitung" | "offline" | "stoerung"
 
-const FEHLERTEXT: Record<Fehler, string> = {
-  ungueltig: "Anmeldung nicht möglich.",
-  "zu-viele": "Zu viele Versuche. Bitte später erneut probieren.",
-  "nicht-eingerichtet": "Nicht eingerichtet.",
-  zeitueberschreitung: "Der Server hat nicht rechtzeitig geantwortet. Bitte erneut versuchen.",
-  offline: "Keine Internetverbindung. Bitte Verbindung prüfen und erneut versuchen.",
-  stoerung: "Der Server ist gerade gestört. Bitte in einem Moment erneut versuchen.",
-}
-
-export function AdminLoginForm() {
+export function AdminLoginForm({ texte }: { texte: AdminTexte["login"] }) {
   const router = useRouter()
   const [password, setPassword] = useState("")
   const [error, setError] = useState<Fehler | null>(null)
@@ -126,7 +118,7 @@ export function AdminLoginForm() {
         setError(fehler ?? "stoerung")
       }}
     >
-      <AdminField label="Passwort" htmlFor="password">
+      <AdminField label={texte.passwort} htmlFor="password">
         <AdminInput
           id="password"
           type="password"
@@ -145,7 +137,7 @@ export function AdminLoginForm() {
 
       {error && (
         <p role="alert" className="border-destructive/40 text-destructive border-s-2 py-1 ps-4 text-sm">
-          {FEHLERTEXT[error]}
+          {texte.fehler[error]}
         </p>
       )}
 
@@ -154,7 +146,7 @@ export function AdminLoginForm() {
         disabled={busy}
         className="cta-outline px-7 py-3.5 text-sm tracking-wide disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {phase === "pruefen" ? "Wird geprüft …" : phase === "weiter" ? "Angemeldet — Übersicht wird geladen …" : "Anmelden"}
+        {phase === "pruefen" ? texte.pruefen : phase === "weiter" ? texte.weiter : texte.anmelden}
       </button>
     </form>
   )

@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { SpeicherHinweis } from "@/components/admin/speicher-hinweis"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { VertriebNav } from "@/components/admin/vertrieb-nav"
 
 /**
@@ -12,7 +13,7 @@ import { VertriebNav } from "@/components/admin/vertrieb-nav"
  * Datenbank gibt. Beides an einer Stelle, weil beides sonst achtmal leicht
  * unterschiedlich wäre.
  */
-export function VertriebShell({
+export async function VertriebShell({
   title,
   lead,
   meta,
@@ -26,6 +27,7 @@ export function VertriebShell({
   available: boolean
   children: ReactNode
 }) {
+  const { t } = await adminSprachKontext()
   return (
     <AdminShell title={title} lead={lead} meta={available ? meta : undefined}>
       <VertriebNav />
@@ -38,10 +40,7 @@ export function VertriebShell({
            * ist der ganze Punkt: Eine leere Pipeline wäre eine Aussage über
            * das Geschäft; eine fehlende Datenbank ist eine über die Technik.
            */
-          <SpeicherHinweis
-            bereich="Vertrieb"
-            inhalt="Anfragen, Kontakte und Verkaufschancen"
-          />
+          <SpeicherHinweis bereich={t.nav.vertrieb.label} inhalt={t.speicher.inhaltVertrieb} />
         )}
       </div>
     </AdminShell>

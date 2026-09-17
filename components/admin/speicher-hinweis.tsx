@@ -1,5 +1,6 @@
 import { leadStoreConfigured } from "@/lib/lead-store"
 import { UnavailableNote } from "@/components/admin/primitives"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
 
 /**
  * ADM-02 · A19 — WELCHER der beiden Datenbank-Zustände, nicht „einer von beiden“.
@@ -21,26 +22,22 @@ export function speicherGrund(): SpeicherGrund {
   return leadStoreConfigured() ? "nicht-erreichbar" : "nicht-eingerichtet"
 }
 
-export function SpeicherHinweis({ bereich, inhalt }: { bereich: string; inhalt: string }) {
-  const grund = speicherGrund()
-  if (grund === "nicht-eingerichtet") {
+export async function SpeicherHinweis({ bereich, inhalt }: { bereich: string; inhalt: string }) {
+  const { t } = await adminSprachKontext()
+  if (speicherGrund() === "nicht-eingerichtet") {
     return (
-      <UnavailableNote title={`${bereich}: Datenbank nicht eingerichtet`}>
-        {inhalt} liegen in der Kunden- und Anfragedatenbank. Sie ist für diese
-        Umgebung noch nicht eingerichtet. Das ist keine leere Liste, sondern eine
-        fehlende Verbindung — Einrichtung unter System.
+      <UnavailableNote title={t.speicher.nichtEingerichtetTitel(bereich)}>
+        {t.speicher.nichtEingerichtetText(inhalt)}
       </UnavailableNote>
     )
   }
   return (
     <div>
-      <UnavailableNote title={`${bereich}: Datenbank gerade nicht erreichbar`}>
-        {inhalt} liegen in der Kunden- und Anfragedatenbank. Sie ist eingerichtet,
-        hat aber gerade nicht geantwortet. Das ist keine leere Liste, sondern
-        eine Störung — nichts wurde gelöscht.
+      <UnavailableNote title={t.speicher.nichtErreichbarTitel(bereich)}>
+        {t.speicher.nichtErreichbarText(inhalt)}
       </UnavailableNote>
       <a href="" className="text-gold-text mt-3 inline-block text-sm underline underline-offset-4">
-        Erneut laden
+        {t.speicher.erneutLaden}
       </a>
     </div>
   )

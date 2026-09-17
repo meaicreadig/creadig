@@ -4,13 +4,11 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 
 /**
- * Abmelden. Ein Knopf, ein Aufruf, eine Weiterleitung.
- *
- * `DELETE` und nicht `GET`: Ein Abmelde-Link, den ein Browser vorlädt oder ein
- * Bild-Tag aufruft, meldet den Owner mitten in der Arbeit ab. Das ist keine
- * Theorie — Link-Vorschauen und Prefetch tun genau das.
+ * Abmelden. Seit ADM-02 · H2 widerruft der Aufruf die Sitzung serverseitig
+ * (wo eine Datenbank eingerichtet ist). Beschriftung kommt aus den
+ * Admin-Texten der gewählten Sprache.
  */
-export function AdminLogout() {
+export function AdminLogout({ label, laeuft }: { label: string; laeuft: string }) {
   const router = useRouter()
   const [busy, setBusy] = useState(false)
 
@@ -26,7 +24,7 @@ export function AdminLogout() {
       }}
       className="cta-quiet inline-flex min-h-11 w-full items-center justify-center px-4 py-2.5 text-sm tracking-wide disabled:opacity-60"
     >
-      {busy ? "Wird abgemeldet …" : "Abmelden"}
+      {busy ? laeuft : label}
     </button>
   )
 }
