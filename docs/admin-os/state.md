@@ -361,6 +361,22 @@ Statische Prüfung aller 32 lesenden Methoden in `lib/vertrieb-store-neon.ts` + 
 
 ---
 
+## H14 · Produktions-Hotfix (vorbereitet 17.09.2026 — Owner-Freigabe im Zug erteilt)
+
+**Owner-Entscheidung 17.09.2026**: H14 sofort als isolierter Hotfix. Migrationen 015/016/017 **nicht** freigegeben (017 erst vor dem ersten Deploy, der sie braucht; vorher Cutover-Paket). Danach Programm ohne weitere Weichenstellung fortsetzen.
+
+| Punkt | Stand |
+|---|---|
+| Branch / Commit | `hotfix/h14-admin-anzeige` @ **`e1bc9ec`**, abgezweigt von Produktion `814a02f` |
+| Diff gegen Produktion | **1 Datei gelöscht**: `app/(admin)/admin/vertrieb/loading.tsx` — sonst nichts (keine ADM-Arbeit, kein DE/TR, kein G18, keine Migration, kein Schema) |
+| Wirkung, gemessen auf Produktionsbasis | je Seitenaufruf ein Speichern, Chromium: **vorher 16/20, nachher 20/20** (lokales Postgres, Testadapter nur uncommittet eingespielt und wieder entfernt) |
+| Sauberer Stand | tsc ✓ · ESLint ✓ · `npm run build` + alle Gates ✓ · smoke 36/36 ✓ · a11y 132 Durchläufe, 0 Verletzungen ✓ |
+| Push | **blockiert** — Berechtigungssystem hat `git push` abgelehnt; Owner führt aus |
+| Preview / Promote / Produktions-SHA | offen |
+| Nach Deploy | nicht-destruktive Rauchprüfung; kein Anfassen echter Kunden-/Anfragedaten |
+
+---
+
 ## Routen-Karte (A4)
 
 | Route | Heute | Schicksal | Ziel | Grund |
@@ -402,5 +418,6 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 17.09.2026 | 2 | **ADM-01 Sprachfundament + Hülle VERIFIED** (DE/TR, Rolle, mobil, axe 0) |
 | 17.09.2026 | 2 | **Übersicht = Heute + Cockpit VERIFIED lokal** (H6) · Scheinnull + Kennungen aus visueller Prüfung behoben |
 | 17.09.2026 | 2 | **ADM-03 BUILT/lokal VERIFIED** — Kernschleife Store + UI + Browser-E2E; H14 (veraltete Anzeige, vorbestehend) gefunden und behoben; H15–H17 |
+| 17.09.2026 | 3 | Owner: H14-Hotfix freigegeben, Migrationen nicht. Hotfix `e1bc9ec` isoliert gebaut und geprüft (16/20 → 20/20); Push vom Berechtigungssystem blockiert → Owner |
 
 **Fortsetzungspunkt:** ADM-01-Rest parallel zu ADM-05: Chance-Detail/Angebot/Lieferung zweisprachig (größter offener Block), dann Kundenakte + Beziehungen + Recherche. Danach ADM-04 (Verbindungsmodell, ehrlich NOT_CONFIGURED) und ADM-05 (Beleg-Freigaben in DB statt Code — Projektion nach /arbeiten BLOCKED_G18).
