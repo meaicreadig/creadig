@@ -1,16 +1,17 @@
 "use server"
 
 import { cookies } from "next/headers"
+import { setzeHinweis } from "@/lib/admin-hinweis"
 import { revalidatePath } from "next/cache"
 
 import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
-import { darfBetreten } from "@/lib/rollen"
+import { ROLLEN_KEYS, darfBetreten } from "@/lib/rollen"
 import { LOST_REASONS } from "@/lib/sales-playbook"
 
 import { SALES_STATES, getVertriebStore, type SalesStatus } from "@/lib/lead-store"
-import { HANDLING_STATES, LIFECYCLE_STAGES, RELATIONSHIP_LEVELS } from "@/lib/vertrieb"
-import type { HandlingStatus, LifecycleStage, LocationInput, RelationshipLevel } from "@/lib/vertrieb"
+import { ARCHIV_GRUENDE, HANDLING_STATES, LIFECYCLE_STAGES, MANUELLE_QUELLEN, RELATIONSHIP_LEVELS } from "@/lib/vertrieb"
+import type { ArchivGrund, HandlingStatus, LifecycleStage, LocationInput, ManuelleQuelle, RelationshipLevel } from "@/lib/vertrieb"
 import { OFFER_KINDS, OFFERS, type OfferKind } from "@/lib/offer-readiness"
 import { ABSCHNITTE, JA_FORMEN, KATALOG, KATALOG_LABEL, type Annahme, type Befund, type Position } from "@/lib/angebot"
 import { UEBERGABE_STUECKE, type Mangel, type UebergabeEintrag, type UebergabeKey } from "@/lib/lieferung"
@@ -62,10 +63,11 @@ function text(value: FormDataEntryValue | null): string | null {
  */
 async function requireStore() {
   const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
-  if (zugang.verdict !== "ok" || !darfBetreten(zugang.rolle, "/admin/vertrieb")) {
+  if (zugang.verdict !== "ok" || !zugang.rolle || !darfBetreten(zugang.rolle, "/admin/vertrieb")) {
     throw new Error("Nicht berechtigt")
   }
-  const store = getVertriebStore()
+  /* ADM-03 — die Instanz trägt die Rolle dieser Sitzung in jede Chronikzeile. */
+  const store = getVertriebStore({ kennung: zugang.rolle, herkunft: "HUMAN" })
   if (!store) throw new Error("Vertriebs-Speicher nicht verfügbar")
   return store
 }
@@ -129,7 +131,24 @@ export async function setOpportunityStatus(id: string, form: FormData): Promise<
   const altbestand = gewaehlt !== null && bisher !== null && gewaehlt === bisher
   const lostReason = status === "lost" && (ausVerzeichnis || altbestand) ? gewaehlt : null
 
-  await store.updateOpportunityStatus(id, status as SalesStatus, lostReason)
+  /*
+   * ADM-03 · A09 — mit dem Stand, den die Seite beim Laden gesehen hat. Hat
+   * inzwischen jemand anderes geändert, wird NICHTS überschrieben; die Seite
+   * lädt neu und sagt es.
+   */
+  const stand = text(form.get("stand"))
+  const ergebnis = stand
+    ? await store.moveOpportunity(id, status as SalesStatus, lostReason, stand)
+    : (await store.updateOpportunityStatus(id, status as SalesStatus, lostReason)) ? "ok" : "fehlt"
+  /* Kein Umleiten — siehe `lib/admin-hinweis.ts`. */
+  if (ergebnis === "konflikt" && process.env.EXPERIMENT_OHNE_COOKIE !== "1") await setzeHinweis("konflikt", id)
+  refresh(`/admin/vertrieb/pipeline/${id}`, "/admin/vertrieb/pipeline")
+}
+
+export async function setOpportunityResponsible(id: string, form: FormData): Promise<void> {
+  const wer = verantwortlicherAus(form)
+  if (wer === undefined) return
+  await (await requireStore()).setOpportunityResponsible(id, wer)
   refresh(`/admin/vertrieb/pipeline/${id}`, "/admin/vertrieb/pipeline")
 }
 
@@ -153,6 +172,97 @@ export async function setEnquiryHandling(id: string, form: FormData): Promise<vo
   if (typeof status !== "string" || !(HANDLING_STATES as readonly string[]).includes(status)) return
   await (await requireStore()).setLeadHandling(id, status as HandlingStatus)
   refresh(`/admin/vertrieb/anfragen/${id}`, "/admin/vertrieb/anfragen")
+}
+
+/* ── ADM-03 · Anfrage: erfassen, zuständig, nächster Schritt, archivieren ─── */
+
+/** `null` = niemand, `undefined` = ungültige Eingabe (keine Änderung). */
+function verantwortlicherAus(form: FormData): string | null | undefined {
+  const wert = form.get("verantwortlich")
+  if (wert === "" || wert === null) return null
+  return typeof wert === "string" && (ROLLEN_KEYS as readonly string[]).includes(wert) ? wert : undefined
+}
+
+export type ErfassenZustand = {
+  fehler: ("name" | "kontakt" | "mail")[]
+  werte: Record<string, string>
+  /** Gesetzt nach Erfolg — die Komponente navigiert selbst dorthin. */
+  angelegt?: string
+}
+
+/**
+ * Eine Anfrage von Hand erfassen (A03).
+ *
+ * Validierung serverseitig; bei einem Fehler kommen die Eingaben zurück, nichts
+ * geht verloren. Der Idempotenzschlüssel stammt aus dem Formular (beim Rendern
+ * erzeugt): Doppelt absenden ergibt eine Anfrage.
+ */
+export async function anfrageErfassen(_vorher: ErfassenZustand, form: FormData): Promise<ErfassenZustand> {
+  const werte = Object.fromEntries(
+    ["quelle", "sprache", "name", "email", "telefon", "betrieb", "nachricht", "verantwortlich", "idempotenz"].map((k) => [k, String(form.get(k) ?? "")]),
+  )
+  const fehler: ErfassenZustand["fehler"] = []
+  const name = text(form.get("name"))
+  const email = text(form.get("email"))
+  const telefon = text(form.get("telefon"))
+  if (!name) fehler.push("name")
+  if (!email && !telefon) fehler.push("kontakt")
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fehler.push("mail")
+  const quelle = (MANUELLE_QUELLEN as readonly string[]).includes(werte.quelle) ? (werte.quelle as ManuelleQuelle) : "sonstiges"
+  const idempotenz = /^[0-9a-f-]{36}$/.test(werte.idempotenz) ? werte.idempotenz : null
+  const verantwortlich = verantwortlicherAus(form)
+  if (fehler.length || !idempotenz || verantwortlich === undefined || !name) return { fehler, werte }
+
+  const store = await requireStore()
+  const { id } = await store.createEnquiry({
+    idempotenz,
+    quelle,
+    sprache: ["de", "tr", "en", "ar"].includes(werte.sprache) ? werte.sprache : "de",
+    name,
+    email,
+    telefon,
+    betrieb: text(form.get("betrieb")),
+    nachricht: text(form.get("nachricht")),
+    verantwortlich,
+  })
+  /*
+   * Kennung zurück, die Komponente navigiert (volle Navigation). Gemessen
+   * 17.09.2026: Mit der damaligen `vertrieb/loading.tsx` kam weder `redirect()`
+   * noch `router.push` nach dieser Action zuverlässig an — Anfrage gespeichert,
+   * Formular blieb stehen. Ursache entfernt; der Weg bleibt robust.
+   */
+  return { fehler: [], werte: {}, angelegt: id }
+}
+
+export async function setEnquiryOrganisation(id: string, form: FormData): Promise<void> {
+  const org = text(form.get("organisation"))
+  const ok = await (await requireStore()).setLeadOrganisation(id, org)
+  if (!ok) await setzeHinweis("nicht-gespeichert", id)
+  refresh(`/admin/vertrieb/anfragen/${id}`, "/admin/vertrieb/anfragen", "/admin/kunden")
+}
+
+export async function setEnquiryResponsible(id: string, form: FormData): Promise<void> {
+  const wer = verantwortlicherAus(form)
+  if (wer === undefined) return
+  await (await requireStore()).setLeadResponsible(id, wer)
+  refresh(`/admin/vertrieb/anfragen/${id}`, "/admin/vertrieb/anfragen", "/admin")
+}
+
+export async function setEnquiryNextAction(id: string, form: FormData): Promise<void> {
+  const action = text(form.get("nextAction"))
+  const at = action === null ? null : text(form.get("nextActionAt"))
+  if (at !== null && !/^\d{4}-\d{2}-\d{2}$/.test(at)) return
+  await (await requireStore()).setLeadNextAction(id, action, at)
+  refresh(`/admin/vertrieb/anfragen/${id}`, "/admin/vertrieb/anfragen", "/admin")
+}
+
+export async function archiveEnquiry(id: string, form: FormData): Promise<void> {
+  const grund = form.get("grund")
+  if (typeof grund !== "string" || !(ARCHIV_GRUENDE as readonly string[]).includes(grund)) return
+  const dubletteVon = text(form.get("dubletteVon"))
+  const ok = await (await requireStore()).archiveLead(id, grund as ArchivGrund, grund === "dublette" ? dubletteVon : null)
+  if (!ok) await setzeHinweis("nicht-gespeichert", id)
+  refresh(`/admin/vertrieb/anfragen/${id}`, "/admin/vertrieb/anfragen", "/admin")
 }
 
 /**

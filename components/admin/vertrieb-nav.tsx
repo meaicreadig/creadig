@@ -61,6 +61,9 @@ export function VertriebNav() {
           return (
             <li key={tab.href}>
               <Link
+                /* Kein Prefetch: Jede Admin-Seite ist dynamisch und fragt die Datenbank —
+                   Vorabladen hiess neun DB-Rundläufe je Seitenaufruf, die meisten verworfen (gemessen 17.09.2026). */
+                prefetch={false}
                 href={tab.href}
                 aria-current={active ? "page" : undefined}
                 /*

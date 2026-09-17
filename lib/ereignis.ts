@@ -50,6 +50,12 @@
 export const EREIGNISSE = [
   "lead.converted",
   "lead.handling",
+  /* ADM-03 · Kernschleife (17.09.2026) */
+  "lead.created",
+  "lead.responsible",
+  "lead.organisation",
+  "lead.archived",
+  "opportunity.responsible",
   "opportunity.created",
   "opportunity.status",
   "opportunity.note",

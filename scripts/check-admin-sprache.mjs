@@ -62,6 +62,11 @@ const MIGRIERT = new Set([
   "app/(admin)/admin/not-found.tsx",
   "app/(admin)/admin/page.tsx",
   "app/(admin)/admin/cockpit/page.tsx",
+  "app/(admin)/admin/vertrieb/anfragen/page.tsx",
+  "app/(admin)/admin/vertrieb/anfragen/[id]/page.tsx",
+  "app/(admin)/admin/vertrieb/anfragen/neu/page.tsx",
+  "components/admin/anfrage-erfassen-formular.tsx",
+  "components/admin/activity-log.tsx",
 ])
 const dateien = ["components/admin", "app/(admin)"]
   .flatMap((d) => readdirSync(d, { recursive: true }).map((f) => join(d, String(f))))

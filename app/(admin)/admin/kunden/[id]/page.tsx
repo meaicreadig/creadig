@@ -9,6 +9,7 @@ import {
   setOrganisationLifecycle,
 } from "@/app/(admin)/admin/vertrieb/actions"
 import { ActivityLog } from "@/components/admin/activity-log"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import {
   AdminField,
   AdminInput,
@@ -48,6 +49,7 @@ export const dynamic = "force-dynamic"
 export const metadata = { title: "Organisation" }
 
 export default async function OrganisationDetail({ params }: { params: Promise<{ id: string }> }) {
+  const sprachKontext = await adminSprachKontext()
   const { id } = await params
   const store = getVertriebStore()
   if (!store) return <KundenShell title="Kunde" available={false}>{null}</KundenShell>
@@ -265,7 +267,7 @@ export default async function OrganisationDetail({ params }: { params: Promise<{
           </section>
 
           <div className="mt-12">
-            <ActivityLog entries={activities} />
+            <ActivityLog entries={activities} t={sprachKontext.t} intl={sprachKontext.intl} />
           </div>
         </div>
 

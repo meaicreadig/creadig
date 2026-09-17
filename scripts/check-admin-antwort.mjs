@@ -67,5 +67,17 @@ pruefe(
 )
 if (serverDateien.length !== 1) console.log(`     gefunden: ${serverDateien.join(", ")}`)
 
+console.log("\n5 · Keine Lade-Grenze (loading.tsx) im Admin")
+/*
+ * Gemessen 17.09.2026 per Halbierung und A/B: `app/(admin)/admin/vertrieb/loading.tsx`
+ * liess die Anzeige nach dem Speichern veralten — gespeichert war, gezeigt
+ * wurde der alte Stand (je Seitenaufruf ein Speichern: 2–10 von 20 aktualisiert;
+ * ohne die Datei 20 von 20). Der Fehler bestand seit dem Einbau der Datei auch
+ * im produktiven Admin. Admin-Seiten rendern in 8–80 ms; eine Lade-Grenze
+ * bringt dort nichts und kostet die Verlässlichkeit jeder Server Action.
+ */
+const ladeGrenzen = readdirSync("app/(admin)", { recursive: true }).map(String).filter((f) => /(^|\/)loading\.tsx$/.test(f))
+pruefe("keine loading.tsx unter app/(admin)", ladeGrenzen.length === 0, ladeGrenzen.join(", "))
+
 console.log(fehler ? `\n✗ ${fehler} Befund(e)\n` : "\n✓ Admin-Antwort-Gate gruen\n")
 process.exit(fehler ? 1 : 0)

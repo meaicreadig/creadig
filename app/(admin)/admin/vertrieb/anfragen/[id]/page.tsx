@@ -1,349 +1,406 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
-import { createOpportunityFromEnquiry, setEnquiryHandling } from "@/app/(admin)/admin/vertrieb/actions"
-import { ActivityLog } from "@/components/admin/activity-log"
 import {
-  AdminField,
-  AdminInput,
-  AdminSelect,
-  DataValue,
-  Pill,
-  SectionHeader,
-  Surface,
-} from "@/components/admin/primitives"
+  archiveEnquiry,
+  createOpportunityFromEnquiry,
+  setEnquiryHandling,
+  setEnquiryNextAction,
+  setEnquiryOrganisation,
+  setEnquiryResponsible,
+} from "@/app/(admin)/admin/vertrieb/actions"
+import { ActivityLog } from "@/components/admin/activity-log"
+import { AdminField, AdminInput, AdminSelect, DataValue, Pill, SectionHeader, Surface } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
-import { getVertriebStore } from "@/lib/lead-store"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
+import { leseHinweis } from "@/lib/admin-hinweis"
 import { CHECK_QUESTIONS } from "@/lib/betriebscheck"
 import { dictionary } from "@/lib/dictionary"
-import { HANDLING_LABELS, HANDLING_STATES, LIFECYCLE_LABELS } from "@/lib/vertrieb"
-import { ENTRY_INTENT, firstActionFor } from "@/lib/sales-playbook"
-import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
+import { datumAnzeige, GESCHAEFTS_ZEITZONE, geschaeftsTag } from "@/lib/geschaeftszeit"
+import { getVertriebStore } from "@/lib/lead-store"
+import { ROLLEN_KEYS } from "@/lib/rollen"
+import { ARCHIV_GRUENDE, HANDLING_STATES, LIFECYCLE_LABELS } from "@/lib/vertrieb"
 
 /**
- * Eine Anfrage.
+ * Eine Anfrage (ADM-03, 17.09.2026 — zweisprachig, mit Kernschleife).
  *
  * ---------------------------------------------------------------------------
  * DER BELEG BLEIBT UNANGETASTET
- * Nachricht, Absenderangaben, Quelle und Zeitpunkt sind das, was jemand
- * tatsächlich abgeschickt hat. Sie sind hier zu LESEN, nicht zu ändern — auch
- * dann nicht, wenn der Kontakt später eine neue Telefonnummer bekommt. Wer
- * den Beleg mitpflegt, kann hinterher nicht mehr sagen, was ursprünglich
- * dastand.
- *
- * Änderbar ist genau eines: der Bearbeitungszustand. Und die Aktion, aus der
- * Anfrage einen Vorgang zu machen.
+ * Nachricht, Absenderangaben, Quelle und Zeitpunkt sind, was tatsächlich
+ * übermittelt wurde — hier zu LESEN, nicht zu ändern. Wer den Beleg mitpflegt,
+ * kann hinterher nicht mehr sagen, was ursprünglich dastand.
  *
  * ---------------------------------------------------------------------------
- * BETRIEBSCHECK
- * Seit 03.09.2026 zweigeteilt, und die Teilung ist Absicht:
+ * WAS HIER GETAN WIRD (Information → Entscheidung → Handlung)
+ *   rechte Spalte  nächster Schritt + Termin, Verantwortlicher, Bearbeitung
+ *   Qualifizieren  Verkaufschance anlegen (nie automatisch) ODER archivieren
+ *                  mit Grund — „Dublette“ nur mit Bezug auf eine andere Anfrage
+ *   Dubletten      Hinweise mit Grund; nichts wird verschmolzen
+ *   Chronik        wer, was, wann — Mensch/System/Automation getrennt
  *
- *   Der BEFUND (Reifegrad, Engpass, Zahl der „Nicht"-Antworten) steht als
- *   Feld — serverseitig aus den Antworten gerechnet, nicht vom Formular
- *   entgegengenommen. Er beantwortet die Frage, die man vor dem Anruf hat.
- *
- *   Die ANTWORTEN stehen weiter im Klartext der Nachricht, so wie sie
- *   eingegangen sind. Sie sind der Beleg, und ein Beleg wird nicht
- *   nachgebaut.
- *
- * Keine Balken und keine Ebenen-Grafik: Der Engpass ist EIN Wert, und ein
- * einzelner Wert braucht kein Diagramm. Der Reifegrad steht ohne Ampelfarbe
- * da — er bleibt eine Diagnose, keine Kaufwahrscheinlichkeit, und ein roter
- * Punkt neben einer niedrigen Zahl würde den Absender bewerten statt seinen
- * Betrieb zu beschreiben.
+ * Betriebscheck: Befund als Feld (serverseitig gerechnet), Antworten im
+ * Klartext der Nachricht. Keine Ampel — Diagnose, keine Kaufwahrscheinlichkeit.
  */
 export const dynamic = "force-dynamic"
 
-export const metadata = { title: "Anfrage" }
+export async function generateMetadata() {
+  const { t } = await adminSprachKontext()
+  return { title: t.nav.anfragen.label }
+}
 
 export default async function AnfrageDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const fehler = (await leseHinweis(id)) === "nicht-gespeichert"
+  const { t, sprache, intl } = await adminSprachKontext()
   const store = getVertriebStore()
-  if (!store) return <VertriebShell title="Anfrage" available={false}>{null}</VertriebShell>
+  if (!store) return <VertriebShell title={t.nav.anfragen.label} available={false}>{null}</VertriebShell>
 
-  let enquiry, activities, organisation
+  let enquiry, activities, organisation, dubletten, organisationen
   try {
     enquiry = await store.getEnquiry(id)
     if (!enquiry) notFound()
-    activities = await store.activities("lead", id)
-    /* Nur wenn die Anfrage schon einer Organisation zugeordnet ist. Ohne
-       Zuordnung wird hier nichts gesucht und nichts geraten. */
-    organisation = enquiry.organisationId ? await store.getOrganisation(enquiry.organisationId) : null
-  } catch {
-    return <VertriebShell title="Anfrage" available={false}>{null}</VertriebShell>
+    ;[activities, organisation, dubletten, organisationen] = await Promise.all([
+      store.activities("lead", id),
+      enquiry.organisationId ? store.getOrganisation(enquiry.organisationId) : Promise.resolve(null),
+      store.possibleDuplicates(id),
+      store.organisationChoices(),
+    ])
+  } catch (error) {
+    if (error && typeof error === "object" && "digest" in error && String((error as { digest: unknown }).digest).startsWith("NEXT_")) throw error
+    return <VertriebShell title={t.nav.anfragen.label} available={false}>{null}</VertriebShell>
   }
 
+  const b = t.begriffe
+  const a = t.anfrage
+  const quelleName = b.quelle[enquiry.source] ?? enquiry.source
   const isCheck = enquiry.source === "betriebscheck"
-
-  /*
-   * Der Befund hängt am Reifegrad, nicht am Engpass.
-   *
-   * `!= null` fängt beides ab: das fehlende Feld bei Anfragen von vor dieser
-   * Änderung UND `undefined` aus dem Entwicklungs-Dateispeicher, der alte
-   * JSON-Zeilen ohne diese Schlüssel zurückliest.
-   *
-   * Ein fehlender Engpass ist dagegen KEIN fehlender Befund, sondern selbst
-   * ein Ergebnis: Sind alle fünf Ebenen gleich stark, gibt es keinen — und
-   * dann steht genau das da statt einer Ebene, die zufällig zuerst in der
-   * Liste steht.
-   */
-  const layers = dictionary.de.services.layers
+  const layers = dictionary[sprache].services.layers
   const engpassKey = enquiry.checkBottleneck as keyof typeof layers | null
   const befund =
     enquiry.checkScore != null
       ? {
           score: enquiry.checkScore,
-          engpass:
-            engpassKey != null && engpassKey in layers ? layers[engpassKey].name : null,
+          engpass: engpassKey != null && engpassKey in layers ? layers[engpassKey].name : null,
           manualSpots: enquiry.checkManualSpots ?? 0,
         }
       : null
   const utm = [enquiry.utmSource, enquiry.utmMedium, enquiry.utmCampaign].filter(Boolean).join(" · ")
+  const archiviert = enquiry.handlingStatus === "archiviert"
+  const ueberfaellig = enquiry.nextActionAt !== null && enquiry.nextActionAt < geschaeftsTag()
 
   return (
     <VertriebShell
       title={enquiry.organisationName ?? enquiry.business ?? enquiry.name}
-      lead={`Eingegangen über ${enquiry.source}.`}
+      lead={a.eingegangenUeber(quelleName)}
       meta={
         <>
           <span className="block font-mono text-xs">{enquiry.reference}</span>
           <span className="mt-1 block">
-            <Pill severity={enquiry.handlingStatus === "neu" ? "attention" : "neutral"}>
-              {HANDLING_LABELS[enquiry.handlingStatus]}
-            </Pill>
+            <Pill severity={enquiry.handlingStatus === "neu" ? "attention" : "neutral"}>{b.bearbeitung[enquiry.handlingStatus]}</Pill>
           </span>
         </>
       }
       available
     >
       <Link href="/admin/vertrieb/anfragen" className="text-gold-text text-sm underline underline-offset-4">
-        ← Alle Anfragen
+        {a.alle}
       </Link>
 
+      {fehler ? (
+        <p role="alert" className="border-destructive/40 text-destructive mt-4 border-s-2 py-1 ps-4 text-sm">
+          {a.nichtGespeichert}
+        </p>
+      ) : null}
+
       <div className="mt-8 grid gap-10 lg:grid-cols-[2fr_1fr] lg:gap-12">
-        {/* ── Arbeitsfläche ── */}
         <div className="min-w-0">
+          {/* ── Beleg ── */}
           <section aria-labelledby="nachricht-titel">
-            <SectionHeader id="nachricht-titel" title={isCheck ? "Betriebscheck" : "Nachricht"} />
-            {isCheck && (
-              <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
-                Reifegrad-Diagnose, wie der Absender sie ausgefüllt hat. Keine
-                Kaufwahrscheinlichkeit und keine Bewertung des Absenders.
-              </p>
-            )}
+            <SectionHeader id="nachricht-titel" title={isCheck ? a.betriebscheck : a.nachricht} />
+            {isCheck ? <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">{a.betriebscheckHinweis}</p> : null}
             {befund ? (
-              /*
-                `DataValue` erzeugt `dt`/`dd`; beide brauchen ein `dl` als
-                Elternteil. Ohne das ist die Auszeichnung ungültig und ein
-                Vorleseprogramm liest drei zusammenhanglose Textstücke statt
-                drei beschrifteter Werte. Dieselbe Hülle wie im Absender-Block.
-              */
               <Surface className="mt-4">
                 <dl className="flex flex-wrap gap-x-12 gap-y-5">
-                  <DataValue label="Reifegrad">
+                  <DataValue label={a.reifegrad}>
                     <span className="tabular-nums">{befund.score}</span>
                     <span className="text-muted-foreground"> / 100</span>
                   </DataValue>
-                  <DataValue label="Engpass">
-                    {befund.engpass ?? (
-                      <span className="text-muted-foreground">
-                        keiner — alle fünf Ebenen gleich stark
-                      </span>
-                    )}
+                  <DataValue label={a.engpass}>
+                    {befund.engpass ?? <span className="text-muted-foreground">{a.keinEngpass}</span>}
                   </DataValue>
-                  <DataValue label="Mit „Nicht“ beantwortet">
+                  <DataValue label={a.mitNicht}>
                     <span className="tabular-nums">{befund.manualSpots}</span>
-                    <span className="text-muted-foreground"> von {CHECK_QUESTIONS.length}</span>
+                    <span className="text-muted-foreground"> {a.vonN(CHECK_QUESTIONS.length)}</span>
                   </DataValue>
                 </dl>
               </Surface>
             ) : null}
-
-            {isCheck && !befund ? (
-              <p className="type-small text-muted-foreground mt-4 max-w-2xl text-pretty">
-                Zu dieser Anfrage ist kein Befund gespeichert. Sie ist eingegangen,
-                bevor der Betriebscheck ihn als Feld ablegte (vor dem 03.09.2026) —
-                die Antworten selbst stehen unverändert darunter.
-              </p>
-            ) : null}
-
+            {isCheck && !befund ? <p className="type-small text-muted-foreground mt-4 max-w-2xl text-pretty">{a.keinBefund}</p> : null}
             {enquiry.message ? (
               <Surface className="mt-4">
                 <p className="type-body text-foreground/90 whitespace-pre-line">{enquiry.message}</p>
               </Surface>
             ) : (
-              <p className="type-small text-muted-foreground mt-4">Keine Nachricht übermittelt.</p>
+              <p className="type-small text-muted-foreground mt-4">{a.keineNachricht}</p>
             )}
           </section>
 
-          {/* ── Bearbeitung ── */}
-          <section aria-labelledby="bearbeitung-titel" className="mt-10">
-            <SectionHeader id="bearbeitung-titel" title="Bearbeitung" />
-            <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
-              Der Zustand des Eingangs, nicht des Geschäfts. Eine Anfrage kann
-              bearbeitet sein, ohne dass je ein Vorgang daraus wird.
-            </p>
-            <form action={setEnquiryHandling.bind(null, enquiry.id)} className="mt-4 flex flex-wrap items-end gap-4">
-              <AdminField label="Zustand" htmlFor="handling">
-                <AdminSelect id="handling" name="handling" defaultValue={enquiry.handlingStatus}>
-                  {HANDLING_STATES.map((s) => (
-                    <option key={s} value={s}>{HANDLING_LABELS[s]}</option>
-                  ))}
-                </AdminSelect>
-              </AdminField>
-              <button type="submit" className="cta-quiet px-4 py-2 text-sm">Speichern</button>
-            </form>
-          </section>
-
-          {/* ── Was das Haus über diese Anfrage schon weiss ── */}
+          {/* ── Einordnung ── */}
           <section aria-labelledby="triage-titel" className="mt-10">
-            <SectionHeader id="triage-titel" title="Einordnung" />
-            <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
-              Nur Tatsachen aus dem Bestand — keine Bewertung, keine
-              Empfehlung, keine Wahrscheinlichkeit. Was daraus folgt,
-              entscheiden Sie.
-            </p>
+            <SectionHeader id="triage-titel" title={a.einordnung} />
+            <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">{a.einordnungHinweis}</p>
             <Surface padding="sm" className="mt-4">
               <ul className="flex flex-col gap-2">
-                {/*
-                  Vier Sätze, jeder mit einer Quelle dahinter. Sie ersparen
-                  genau das, was ein Mensch sonst vor jedem Rückruf von Hand
-                  zusammensucht: Kennen wir den Betrieb? War er schon Kunde?
-                  Liegt ein Befund vor? Was hat er überhaupt angefragt?
-                */}
                 <li className="type-small text-foreground/90">
-                  {organisation
-                    ? `Bekannter Betrieb: ${organisation.name} — Kundenhistorie „${LIFECYCLE_LABELS[organisation.lifecycle]}“.`
-                    : "Keiner bekannten Organisation zugeordnet."}
+                  {organisation ? a.bekannterBetrieb(organisation.name, LIFECYCLE_LABELS[organisation.lifecycle]) : a.keinBetrieb}
                 </li>
-                <li className="type-small text-foreground/90">
-                  {enquiry.contactName
-                    ? `Bekannter Ansprechpartner: ${enquiry.contactName}.`
-                    : "Kein hinterlegter Ansprechpartner — der Absender steht nur auf dieser Anfrage."}
-                </li>
-                <li className="type-small text-foreground/90">
-                  {befund
-                    ? `Betriebscheck liegt vor: ${befund.score}/100${befund.engpass ? `, Engpass ${befund.engpass}` : ", kein Engpass"}.`
-                    : "Kein Betriebscheck-Befund zu dieser Anfrage."}
-                </li>
-                <li className="type-small text-foreground/90">
-                  {ENTRY_INTENT[enquiry.source]?.label ?? `Eingang über „${enquiry.source}“.`}
-                </li>
+                <li className="type-small text-foreground/90">{enquiry.contactName ? a.bekannterKontakt(enquiry.contactName) : a.keinKontakt}</li>
+                <li className="type-small text-foreground/90">{befund ? a.befundLiegtVor(befund.score, befund.engpass) : a.keinBefundKurz}</li>
+                <li className="type-small text-foreground/90">{b.eingangsabsicht[enquiry.source] ?? a.eingangUeber(quelleName)}</li>
               </ul>
             </Surface>
           </section>
 
-          {/* ── Verkaufschance ── */}
-          <section aria-labelledby="chance-titel" className="mt-10">
-            <SectionHeader id="chance-titel" title="Verkaufschance" />
+          {/* ── Qualifizieren ── */}
+          <section aria-labelledby="entscheidung-titel" className="mt-10">
+            <SectionHeader id="entscheidung-titel" title={a.entscheidungTitel} />
             {enquiry.opportunityId ? (
               <p className="type-body mt-4">
-                Zu dieser Anfrage gibt es einen Vorgang:{" "}
+                {a.chanceVorhanden}{" "}
                 <Link href={`/admin/vertrieb/pipeline/${enquiry.opportunityId}`} className="text-gold-text underline underline-offset-4">
-                  in der Pipeline öffnen
+                  {a.chanceOeffnen}
                 </Link>
+              </p>
+            ) : archiviert ? (
+              <p className="type-body mt-4">
+                {a.archiviertMit(enquiry.archiveReason ? (b.archivGrund[enquiry.archiveReason] ?? enquiry.archiveReason) : b.unbekannt)}
+                {enquiry.duplicateOf ? (
+                  <>
+                    {" "}
+                    {a.dubletteVon}:{" "}
+                    <Link href={`/admin/vertrieb/anfragen/${enquiry.duplicateOf}`} className="text-gold-text underline underline-offset-4">
+                      {a.oeffnen}
+                    </Link>
+                  </>
+                ) : null}
               </p>
             ) : (
               <>
-                <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
-                  Aus dieser Anfrage ist noch kein Vorgang entstanden. Das ist
-                  der Normalfall — ein Vorgang entsteht, wenn Sie ihn anlegen.
-                </p>
+                <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">{a.entscheidungHinweis}</p>
                 <form action={createOpportunityFromEnquiry.bind(null, enquiry.id)} className="mt-4 flex flex-wrap items-end gap-4">
-                  <AdminField label="Bezeichnung" htmlFor="title" className="flex-1 basis-64">
-                    <AdminInput
-                      id="title"
-                      name="title"
-                      defaultValue={enquiry.organisationName ?? enquiry.business ?? enquiry.name}
-                      placeholder="worum es geht"
-                    />
+                  <AdminField label={a.bezeichnung} htmlFor="title" className="flex-1 basis-64">
+                    <AdminInput id="title" name="title" defaultValue={enquiry.organisationName ?? enquiry.business ?? enquiry.name} />
                   </AdminField>
-                  {/*
-                    GATE 4 — EIN VORGANG ENTSTEHT NIE OHNE ERSTEN SCHRITT.
-
-                    Vorher entstand er mit leerem `nextAction` und fiel damit
-                    ab der ersten Sekunde in die Rubrik „ohne nächsten
-                    Schritt“ — sichtbar in „Heute“, aber eben als Mangel,
-                    den derselbe Mensch gerade selbst erzeugt hat.
-
-                    Der Vorschlag kommt aus der Eingangsabsicht (Gate 3) und
-                    ist überschreibbar. Nichts wird automatisch entschieden:
-                    Der Vorgang entsteht weiterhin nur, wenn jemand ihn
-                    anlegt.
-                  */}
-                  <AdminField label="Erster Schritt" htmlFor="firstAction" className="flex-1 basis-56">
-                    <AdminInput
-                      id="firstAction"
-                      name="firstAction"
-                      defaultValue={firstActionFor(enquiry.source)}
-                      placeholder="was zuerst passiert"
-                    />
+                  <AdminField label={a.ersterSchritt} htmlFor="firstAction" className="flex-1 basis-56">
+                    <AdminInput id="firstAction" name="firstAction" defaultValue={b.ersterSchritt[enquiry.source] ?? b.ersterSchrittStandard} />
                   </AdminField>
-                  <button type="submit" className="cta-quiet px-4 py-2 text-sm">Verkaufschance anlegen</button>
+                  <button type="submit" className="cta-outline min-h-11 px-5 py-2.5 text-sm">
+                    {a.chanceAnlegen}
+                  </button>
+                </form>
+
+                <form action={archiveEnquiry.bind(null, enquiry.id)} className="border-line mt-6 flex flex-wrap items-end gap-4 border-t pt-6">
+                  <AdminField label={a.archivGrund} htmlFor="grund">
+                    <AdminSelect id="grund" name="grund" defaultValue="kein-bedarf">
+                      {ARCHIV_GRUENDE.filter((g) => g !== "dublette").map((g) => (
+                        <option key={g} value={g}>
+                          {b.archivGrund[g]}
+                        </option>
+                      ))}
+                    </AdminSelect>
+                  </AdminField>
+                  <button type="submit" className="cta-quiet min-h-11 px-4 py-2 text-sm">
+                    {a.archivieren}
+                  </button>
                 </form>
               </>
             )}
           </section>
 
+          {/* ── Dubletten ── */}
+          <section aria-labelledby="dubletten-titel" className="mt-10">
+            <SectionHeader id="dubletten-titel" title={a.dublettenTitel} count={dubletten.length ? String(dubletten.length) : undefined} />
+            {dubletten.length === 0 ? (
+              <p className="type-small text-muted-foreground mt-3">{a.keineDubletten}</p>
+            ) : (
+              <>
+                <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">{a.dublettenHinweis}</p>
+                <ul className="mt-4 flex flex-col gap-2.5">
+                  {dubletten.map((d) => (
+                    <li key={`${d.art}:${d.id}`}>
+                      <Surface padding="sm" className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                        <span className="min-w-0">
+                          <Link
+                            href={d.art === "anfrage" ? `/admin/vertrieb/anfragen/${d.id}` : d.art === "kontakt" ? `/admin/vertrieb/beziehungen/${d.id}` : `/admin/kunden/${d.id}`}
+                            className="text-subhead text-sm underline-offset-4 hover:underline"
+                          >
+                            {d.titel}
+                          </Link>
+                          <span className="type-small text-muted-foreground mt-1 block">
+                            {b.dublettenArt[d.art]} · {b.dublettenGrund[d.grund]}
+                            {d.am ? ` · ${datumAnzeige(d.am, intl)}` : ""}
+                          </span>
+                        </span>
+                        {d.art === "anfrage" && !archiviert && !enquiry.opportunityId ? (
+                          <form action={archiveEnquiry.bind(null, enquiry.id)}>
+                            <input type="hidden" name="grund" value="dublette" />
+                            <input type="hidden" name="dubletteVon" value={d.id} />
+                            <button type="submit" className="cta-quiet min-h-11 px-3 py-2 text-xs">
+                              {a.alsDubletteArchivieren}
+                            </button>
+                          </form>
+                        ) : null}
+                      </Surface>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </section>
+
           <div className="mt-12">
-            <ActivityLog entries={activities} />
+            <ActivityLog entries={activities} t={t} intl={intl} />
           </div>
         </div>
 
-        {/* ── Zusammenhang ── */}
-        <aside aria-labelledby="kontext-titel" className="min-w-0">
-          <SectionHeader id="kontext-titel" title="Absender" />
-          <p className="type-small text-muted-foreground mt-3 text-pretty">
-            Wie im Formular übermittelt. Der Beleg ändert sich nicht mit.
-          </p>
-          <dl className="mt-4 flex flex-col gap-4">
-            <DataValue label="Name">{enquiry.name}</DataValue>
-            <DataValue label="Betrieb">{enquiry.business}</DataValue>
-            <DataValue label="E-Mail">
-              <a href={`mailto:${enquiry.email}`} className="underline underline-offset-4">{enquiry.email}</a>
-            </DataValue>
-            <DataValue label="Telefon">
-              {enquiry.phone ? (
-                <a href={`tel:${enquiry.phone.replace(/\s/g, "")}`} className="underline underline-offset-4">{enquiry.phone}</a>
-              ) : null}
-            </DataValue>
-          </dl>
+        {/* ── Rechte Spalte: was als Nächstes, wer, Zustand, Zusammenhang ── */}
+        <aside aria-label={a.naechsterSchrittTitel} className="flex min-w-0 flex-col gap-10">
+          <section aria-labelledby="schritt-titel">
+            <SectionHeader id="schritt-titel" title={a.naechsterSchrittTitel} />
+            {enquiry.nextAction ? (
+              <p className={`type-body mt-3 ${ueberfaellig ? "text-destructive" : ""}`}>
+                {enquiry.nextAction}
+                {enquiry.nextActionAt ? <span className="text-muted-foreground tabular-nums"> · {datumAnzeige(enquiry.nextActionAt, intl)}</span> : null}
+              </p>
+            ) : (
+              <p className="type-small text-muted-foreground mt-3">{a.naechsterSchrittLeer}</p>
+            )}
+            <form action={setEnquiryNextAction.bind(null, enquiry.id)} className="mt-4 flex flex-col gap-3">
+              <AdminField label={a.naechsterSchrittFeld} htmlFor="nextAction">
+                <AdminInput id="nextAction" name="nextAction" defaultValue={enquiry.nextAction ?? ""} />
+              </AdminField>
+              <AdminField label={a.naechsterSchrittDatum} htmlFor="nextActionAt">
+                <AdminInput id="nextActionAt" name="nextActionAt" type="date" defaultValue={enquiry.nextActionAt ?? ""} />
+              </AdminField>
+              <button type="submit" className="cta-quiet min-h-11 self-start px-4 py-2 text-sm">
+                {t.formular.speichern}
+              </button>
+            </form>
+          </section>
 
-          <div className="mt-10">
-            <SectionHeader title="Verknüpft" as="h3" />
+          <section aria-labelledby="zustaendig-titel">
+            <SectionHeader id="zustaendig-titel" title={a.verantwortlich} />
+            <form action={setEnquiryResponsible.bind(null, enquiry.id)} className="mt-4 flex flex-wrap items-end gap-3">
+              <AdminField label={a.verantwortlich} htmlFor="verantwortlich">
+                <AdminSelect id="verantwortlich" name="verantwortlich" defaultValue={enquiry.responsible ?? ""}>
+                  <option value="">{b.niemand}</option>
+                  {ROLLEN_KEYS.map((r) => (
+                    <option key={r} value={r}>
+                      {b.rolle[r] ?? r}
+                    </option>
+                  ))}
+                </AdminSelect>
+              </AdminField>
+              <button type="submit" className="cta-quiet min-h-11 px-4 py-2 text-sm">
+                {t.formular.speichern}
+              </button>
+            </form>
+          </section>
+
+          <section aria-labelledby="zustand-titel">
+            <SectionHeader id="zustand-titel" title={a.zustand} />
+            {archiviert ? (
+              <p className="type-small text-muted-foreground mt-3">{b.bearbeitung.archiviert}</p>
+            ) : (
+              <form action={setEnquiryHandling.bind(null, enquiry.id)} className="mt-4 flex flex-wrap items-end gap-3">
+                <AdminField label={a.zustand} htmlFor="handling">
+                  <AdminSelect id="handling" name="handling" defaultValue={enquiry.handlingStatus}>
+                    {HANDLING_STATES.filter((s) => s !== "archiviert").map((s) => (
+                      <option key={s} value={s}>
+                        {b.bearbeitung[s]}
+                      </option>
+                    ))}
+                  </AdminSelect>
+                </AdminField>
+                <button type="submit" className="cta-quiet min-h-11 px-4 py-2 text-sm">
+                  {t.formular.speichern}
+                </button>
+              </form>
+            )}
+          </section>
+
+          <section aria-labelledby="absender-titel">
+            <SectionHeader id="absender-titel" title={a.absender} />
+            <p className="type-small text-muted-foreground mt-3 text-pretty">{a.absenderHinweis}</p>
             <dl className="mt-4 flex flex-col gap-4">
-              <DataValue label="Kontakt">
+              <DataValue label={a.name}>{enquiry.name}</DataValue>
+              <DataValue label={a.betrieb}>{enquiry.business}</DataValue>
+              <DataValue label={a.email}>
+                {enquiry.email ? (
+                  <a href={`mailto:${enquiry.email}`} className="underline underline-offset-4">
+                    {enquiry.email}
+                  </a>
+                ) : null}
+              </DataValue>
+              <DataValue label={a.telefon}>
+                {enquiry.phone ? (
+                  <a href={`tel:${enquiry.phone.replace(/\s/g, "")}`} className="underline underline-offset-4">
+                    {enquiry.phone}
+                  </a>
+                ) : null}
+              </DataValue>
+            </dl>
+          </section>
+
+          <section aria-labelledby="verknuepft-titel">
+            <SectionHeader id="verknuepft-titel" title={a.verknuepft} as="h3" />
+            <dl className="mt-4 flex flex-col gap-4">
+              <DataValue label={a.kontakt}>
                 {enquiry.contactId ? (
                   <Link href={`/admin/vertrieb/beziehungen/${enquiry.contactId}`} className="text-gold-text underline underline-offset-4">
-                    {enquiry.contactName ?? "öffnen"}
+                    {enquiry.contactName ?? a.oeffnen}
                   </Link>
                 ) : null}
               </DataValue>
-              <DataValue label="Organisation">{enquiry.organisationName}</DataValue>
-            </dl>
-          </div>
-
-          <div className="mt-10">
-            <SectionHeader title="Herkunft" as="h3" />
-            <dl className="mt-4 flex flex-col gap-4">
-              <DataValue label="Quelle">{enquiry.source}</DataValue>
-              <DataValue label="Sprache">{enquiry.locale.toUpperCase()}</DataValue>
-              <DataValue label="Seite">{enquiry.siteUrl}</DataValue>
-              <DataValue label="Kampagne">{utm || null}</DataValue>
-              <DataValue label="Eingegangen">
-                <time dateTime={enquiry.createdAt}>{formatDateTime(enquiry.createdAt)}</time>
+              <DataValue label={a.organisation}>
+                {enquiry.organisationId ? (
+                  <Link href={`/admin/kunden/${enquiry.organisationId}`} className="text-gold-text underline underline-offset-4">
+                    {enquiry.organisationName ?? a.oeffnen}
+                  </Link>
+                ) : null}
               </DataValue>
             </dl>
-          </div>
+            {/* ADM-03 · A04 — ausdrücklich zuordnen statt nur über den gleichen Namen. */}
+            <form action={setEnquiryOrganisation.bind(null, enquiry.id)} className="mt-4 flex flex-wrap items-end gap-3">
+              <AdminField label={a.zuordnen} htmlFor="organisation">
+                <AdminSelect id="organisation" name="organisation" defaultValue={enquiry.organisationId ?? ""}>
+                  <option value="">{a.keineOrganisation}</option>
+                  {organisationen.map((o) => (
+                    <option key={o.id} value={o.id}>{o.name}</option>
+                  ))}
+                </AdminSelect>
+              </AdminField>
+              <button type="submit" className="cta-quiet min-h-11 px-4 py-2 text-sm">{t.formular.speichern}</button>
+            </form>
+          </section>
+
+          <section aria-labelledby="herkunft-titel">
+            <SectionHeader id="herkunft-titel" title={a.herkunft} as="h3" />
+            <dl className="mt-4 flex flex-col gap-4">
+              <DataValue label={a.quelle}>{quelleName}</DataValue>
+              <DataValue label={a.sprache}>{enquiry.locale.toUpperCase()}</DataValue>
+              <DataValue label={a.seite}>{enquiry.siteUrl}</DataValue>
+              <DataValue label={a.kampagne}>{utm || null}</DataValue>
+              <DataValue label={a.eingegangen}>
+                <time dateTime={enquiry.createdAt}>
+                  {new Date(enquiry.createdAt).toLocaleString(intl, { timeZone: GESCHAEFTS_ZEITZONE, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                </time>
+              </DataValue>
+            </dl>
+          </section>
+
         </aside>
       </div>
     </VertriebShell>
   )
-}
-
-function formatDateTime(iso: string): string {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime())
-    ? iso
-    : d.toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
 }

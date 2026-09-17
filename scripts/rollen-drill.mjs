@@ -45,8 +45,9 @@ p(R.darfBetreten("vertrieb", "/admin/kunden/abc123"), "die Kundenakte schon")
 console.log("\nR4 · Jede Flaeche mit Personendaten ist eng vergeben")
 const eng = R.FLAECHEN.filter((f) => R.KLASSEN[f.klasse].eng)
 /* 12 → 13 seit `157e1fa` (/admin/beleg, Owner-only). Der Drill war seitdem rot,
-   ohne dass es auffiel — er stand in keiner Kette. Nachgezogen 17.09.2026 (ADM-02). */
-p(eng.length === 13, `${eng.length} Flaechen tragen Personendaten Dritter`)
+   ohne dass es auffiel — er stand in keiner Kette. Nachgezogen 17.09.2026 (ADM-02).
+   13 → 14: /admin/vertrieb/anfragen/neu (ADM-03, Owner + Vertrieb). */
+p(eng.length === 14, `${eng.length} Flaechen tragen Personendaten Dritter`)
 p(eng.every((f) => !f.fuer.includes("redaktion")), "keine davon fuer die Redaktion")
 p(eng.every((f) => f.fuer.includes("owner")), "alle fuer den Owner")
 

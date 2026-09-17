@@ -52,6 +52,9 @@ export function AdminNav({
           return (
             <li key={item.href}>
               <Link
+                /* Kein Prefetch: Jede Admin-Seite ist dynamisch und fragt die Datenbank —
+                   Vorabladen hiess neun DB-Rundläufe je Seitenaufruf, die meisten verworfen (gemessen 17.09.2026). */
+                prefetch={false}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={`block rounded-sm px-3 py-2.5 transition-colors duration-[var(--dur-1)] ${

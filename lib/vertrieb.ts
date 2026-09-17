@@ -452,6 +452,8 @@ export type EnquiryRow = {
 export type EnquiryQuery = {
   search?: string
   handling?: HandlingStatus
+  /** ADM-03 · A07 — Anfragen mit nächstem Schritt heute oder früher (nicht archiviert). */
+  faellig?: boolean
   source?: string
   limit?: number
   offset?: number
@@ -495,6 +497,9 @@ export type VertriebSummary = {
   newEnquiries: number
   dueToday: number
   overdue: number
+  /** ADM-03 · A07 — dieselbe Frage für Anfragen mit nächstem Schritt. */
+  enquiriesDueToday: number
+  enquiriesOverdue: number
   openOpportunities: number
   withoutNextAction: number
   warmWithoutOpportunity: number
@@ -753,6 +758,8 @@ export type VertriebStore = {
   /** Archivieren mit Grund; bei `dublette` die Kennung der ersten Anfrage. Nichts wird gelöscht oder verschmolzen. */
   archiveLead(leadId: string, grund: ArchivGrund, dubletteVon: string | null): Promise<boolean>
   possibleDuplicates(leadId: string): Promise<DublettenKandidat[]>
+  /** ADM-03 · A04 — ausdrücklich einer bestehenden Organisation zuordnen (oder lösen). */
+  setLeadOrganisation(leadId: string, organisationId: string | null): Promise<boolean>
   setOpportunityResponsible(id: string, verantwortlich: string | null): Promise<boolean>
   /** Stufenwechsel mit Versionsprüfung: `konflikt`, wenn der Datensatz seit `stand` geändert wurde. */
   moveOpportunity(id: string, status: SalesStatus, lostReason: string | null, stand: string): Promise<Schreibergebnis>

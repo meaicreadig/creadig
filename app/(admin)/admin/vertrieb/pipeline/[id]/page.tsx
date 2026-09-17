@@ -12,9 +12,13 @@ import {
   saveAngebotEntwurf,
   sendAngebot,
   setOpportunityOffer,
+  setOpportunityResponsible,
   setOpportunityStatus,
 } from "@/app/(admin)/admin/vertrieb/actions"
 import { ActivityLog } from "@/components/admin/activity-log"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
+import { leseHinweis } from "@/lib/admin-hinweis"
+import { ROLLEN_KEYS } from "@/lib/rollen"
 import {
   AdminField,
   AdminInput,
@@ -55,6 +59,8 @@ export const metadata = { title: "Verkaufschance" }
 
 export default async function ChanceDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const konflikt = (await leseHinweis(id)) === "konflikt"
+  const { t, intl } = await adminSprachKontext()
   const store = getVertriebStore()
   if (!store) return <VertriebShell title="Verkaufschance" available={false}>{null}</VertriebShell>
 
@@ -97,6 +103,12 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
         ← Zur Pipeline
       </Link>
 
+      {konflikt ? (
+        <p role="alert" className="border-destructive/40 text-destructive mt-4 max-w-3xl border-s-2 py-1 ps-4 text-sm text-pretty">
+          {t.chance.konflikt}
+        </p>
+      ) : null}
+
       <div className="mt-8 grid gap-10 lg:grid-cols-[2fr_1fr] lg:gap-12">
         <div className="min-w-0">
           {/* ── Status ── */}
@@ -125,7 +137,28 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
               </p>
             </Surface>
 
+            {opp.status === "won" ? (
+              /* ADM-03 · A11 — ein Gewinn führt irgendwohin, aber nichts geschieht von selbst. */
+              <Surface padding="sm" className="border-gold/40 mt-4 border">
+                <p className="text-subhead text-sm">{t.chance.gewonnenTitel}</p>
+                <p className="type-small text-foreground/90 mt-2 text-pretty">
+                  {(projekte ?? []).length > 0
+                    ? t.chance.gewonnenMitProjekt
+                    : (angebote ?? []).some((a) => a.zustand === "angenommen")
+                      ? t.chance.gewonnenMitAngebot
+                      : t.chance.gewonnenOhneAngebot}
+                </p>
+                <p className="mt-3 flex flex-wrap gap-5 text-sm">
+                  <a href="#angebotsmappe-titel" className="text-gold-text underline underline-offset-4">{t.chance.zumAngebot}</a>
+                  <a href="#lieferung-titel" className="text-gold-text underline underline-offset-4">{t.chance.zurLieferung}</a>
+                </p>
+                <p className="text-muted-foreground mt-2 text-xs">{t.chance.keineAutomatik}</p>
+              </Surface>
+            ) : null}
+
             <form action={setOpportunityStatus.bind(null, opp.id)} className="mt-5 flex flex-wrap items-end gap-4">
+              {/* ADM-03 · A09 — der Stand, den diese Seite gesehen hat. */}
+              <input type="hidden" name="stand" value={opp.updatedAt} />
               <AdminField label="Pipeline-Status" htmlFor="status">
                 {/*
                   `audit` wird nicht mehr angeboten — Gate 3 hat entschieden,
@@ -371,11 +404,24 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
           </section>
 
           <div className="mt-12">
-            <ActivityLog entries={activities} />
+            <ActivityLog entries={activities} t={t} intl={intl} />
           </div>
         </div>
 
         <aside className="min-w-0">
+          <SectionHeader title={t.anfrage.verantwortlich} />
+          <form action={setOpportunityResponsible.bind(null, opp.id)} className="mt-4 mb-10 flex flex-wrap items-end gap-3">
+            <AdminField label={t.anfrage.verantwortlich} htmlFor="verantwortlich">
+              <AdminSelect id="verantwortlich" name="verantwortlich" defaultValue={opp.responsible ?? ""}>
+                <option value="">{t.begriffe.niemand}</option>
+                {ROLLEN_KEYS.map((r) => (
+                  <option key={r} value={r}>{t.begriffe.rolle[r] ?? r}</option>
+                ))}
+              </AdminSelect>
+            </AdminField>
+            <button type="submit" className="cta-quiet min-h-11 px-4 py-2 text-sm">{t.formular.speichern}</button>
+          </form>
+
           <SectionHeader title="Beteiligte" />
           <dl className="mt-4 flex flex-col gap-4">
             <DataValue label="Kontakt">

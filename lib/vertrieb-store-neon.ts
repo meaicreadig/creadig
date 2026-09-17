@@ -583,11 +583,16 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
              WHERE og.lifecycle IN ('kunde','ehemaliger-kunde') AND og.excluded_reason IS NULL
                AND NOT EXISTS (SELECT 1 FROM opportunities o
                                 WHERE o.organisation_id = og.id AND ${OPEN_CLAUSE}))::int
-             AS customers_without_opportunity`,
+             AS customers_without_opportunity,
+           (SELECT count(*) FROM leads l WHERE l.handling_status <> 'archiviert'
+              AND l.next_action_at = ${SQL_HEUTE} AND ${sqlLeadOperational("l")})::int AS enquiries_due_today,
+           (SELECT count(*) FROM leads l WHERE l.handling_status <> 'archiviert'
+              AND l.next_action_at < ${SQL_HEUTE} AND ${sqlLeadOperational("l")})::int AS enquiries_overdue`,
       )) as {
         new_enquiries: number; due_today: number; overdue: number
         open_opportunities: number; without_next_action: number
         warm_without_opportunity: number; customers_without_opportunity: number
+        enquiries_due_today: number; enquiries_overdue: number
       }[]
 
       /*
@@ -630,12 +635,14 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
       const c = counts ?? {
         new_enquiries: 0, due_today: 0, overdue: 0,
         open_opportunities: 0, without_next_action: 0, warm_without_opportunity: 0,
-        customers_without_opportunity: 0,
+        customers_without_opportunity: 0, enquiries_due_today: 0, enquiries_overdue: 0,
       }
       return {
         newEnquiries: c.new_enquiries,
         dueToday: c.due_today,
         overdue: c.overdue,
+        enquiriesDueToday: c.enquiries_due_today,
+        enquiriesOverdue: c.enquiries_overdue,
         openOpportunities: c.open_opportunities,
         withoutNextAction: c.without_next_action,
         warmWithoutOpportunity: c.warm_without_opportunity,
@@ -675,6 +682,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
        * es lokal keine Datenbank gibt.
        */
       if (query.handling) { params.push(query.handling); where.push(`l.handling_status = $${params.length}`) }
+      if (query.faellig) where.push(`l.handling_status <> 'archiviert' AND l.next_action_at IS NOT NULL AND l.next_action_at <= ${SQL_HEUTE}`)
       if (query.source) { params.push(query.source); where.push(`l.source = $${params.length}`) }
       if (query.search?.trim()) {
         params.push(`%${query.search.trim()}%`)
@@ -1084,6 +1092,19 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
       await markLeadExclusions(sql, { id, name: input.name, business: input.betrieb, email: input.email, reference })
       await note("lead", id, "lead.created", "Anfrage von Hand erfasst", null, { quelle: input.quelle, verantwortlich: input.verantwortlich })
       return { id, neu: true }
+    },
+
+    async setLeadOrganisation(leadId, organisationId) {
+      await ready()
+      const rows = (await sql.query(
+        `UPDATE leads SET organisation_id = $2::text, updated_at = now()
+          WHERE id = $1 AND ($2::text IS NULL OR EXISTS (SELECT 1 FROM organisations o WHERE o.id = $2::text))
+        RETURNING id`,
+        [leadId, organisationId],
+      )) as { id: string }[]
+      if (!rows.length) return false
+      await note("lead", leadId, "lead.organisation", "Organisation zugeordnet", null, { nach: organisationId })
+      return true
     },
 
     async setLeadResponsible(leadId, verantwortlich) {

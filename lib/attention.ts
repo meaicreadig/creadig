@@ -201,15 +201,17 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
 
   if (store) {
     try {
-      const [summary, neue, pflege] = await Promise.all([
+      const [summary, neue, pflege, faelligeAnfragen] = await Promise.all([
         store.summary(),
         store.listEnquiries({ handling: "neu", limit: 12 }),
         store.listContacts({ bucket: "pflege-faellig", limit: 12 }),
+        /* ADM-03 · A07 — ein zugesagter Rückruf auf eine Anfrage ist genauso fällig wie einer auf eine Chance. */
+        store.listEnquiries({ faellig: true, limit: 12 }),
       ])
       salesMeasured = true
       kennzahlen = {
-        ueberfaellig: summary.overdue,
-        heuteFaellig: summary.dueToday,
+        ueberfaellig: summary.overdue + summary.enquiriesOverdue,
+        heuteFaellig: summary.dueToday + summary.enquiriesDueToday,
         neueAnfragen: summary.newEnquiries,
         ohneSchritt: summary.withoutNextAction,
       }
@@ -264,6 +266,19 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
           anfrage: { quelle: e.source, referenz: e.reference },
           href: `/admin/vertrieb/anfragen/${e.id}`,
           due: null,
+        })
+      }
+
+      /* ── 4b · Anfragen mit fälligem Schritt (ADM-03) ────────────────────── */
+      for (const e of faelligeAnfragen.rows) {
+        if (!e.nextActionAt) continue
+        items.push({
+          id: `lead-schritt:${e.id}`,
+          rank: e.nextActionAt < today ? "ueberfaellig" : "heute-faellig",
+          title: e.organisationName ?? e.business ?? e.name,
+          detail: e.nextAction,
+          href: `/admin/vertrieb/anfragen/${e.id}`,
+          due: e.nextActionAt,
         })
       }
 

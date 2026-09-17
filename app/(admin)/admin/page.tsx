@@ -60,8 +60,9 @@ const SCHWERE: Record<AttentionRank, "neutral" | "attention" | "critical"> = {
 }
 
 const KENNZAHL_WEG: Record<keyof Kennzahlen, string> = {
-  ueberfaellig: "/admin/vertrieb/pipeline?bucket=ueberfaellig",
-  heuteFaellig: "/admin/vertrieb/pipeline?bucket=faellig",
+  /* ADM-03 — zählen Chancen UND Anfragen; beide stehen gemeinsam in „Heute zu tun“. */
+  ueberfaellig: "#heute-titel",
+  heuteFaellig: "#heute-titel",
   neueAnfragen: "/admin/vertrieb/anfragen?status=neu",
   ohneSchritt: "/admin/vertrieb/pipeline?bucket=ohne-schritt",
 }

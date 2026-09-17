@@ -73,6 +73,21 @@ p(await vertrieb.setLeadNextAction(a.id, "Zurückrufen", "2026-09-18"), "nächst
 const a2 = await owner.getEnquiry(a.id)
 p(a2.responsible === "vertrieb" && a2.nextAction === "Zurückrufen" && a2.nextActionAt === "2026-09-18", "nach Neuladen persistent", `${a2.responsible} · ${a2.nextAction} · ${a2.nextActionAt}`)
 
+const faellig = await owner.listEnquiries({ faellig: true, limit: 50 })
+p(!faellig.rows.some((r) => r.id === a.id), "Schritt morgen: noch nicht fällig")
+await vertrieb.setLeadNextAction(a.id, "Zurückrufen", "2020-01-01")
+const faellig2 = await owner.listEnquiries({ faellig: true, limit: 50 })
+p(faellig2.rows.some((r) => r.id === a.id), "Schritt in der Vergangenheit: fällig (Übersicht zeigt ihn)")
+const sum = await owner.summary()
+p(sum.enquiriesOverdue >= 1, "Zählung überfälliger Anfragen", String(sum.enquiriesOverdue))
+
+console.log("\nK3b · Organisation ausdrücklich zuordnen (A04)")
+const zielOrg = (await q(`SELECT id, name FROM organisations WHERE excluded_reason IS NULL AND import_key IS NOT NULL ORDER BY name LIMIT 1`))[0]
+p(await owner.setLeadOrganisation(a.id, zielOrg.id), `zugeordnet: ${zielOrg.name}`)
+p((await owner.getEnquiry(a.id)).organisationId === zielOrg.id, "nach Neuladen persistent")
+p(!(await owner.setLeadOrganisation(a.id, "gibt-es-nicht")), "unbekannte Organisation abgelehnt")
+p((await owner.getEnquiry(a.id)).organisationId === zielOrg.id, "und nichts verändert")
+
 console.log("\nK4 · Dubletten")
 const doppel = await owner.createEnquiry(eingabe({ name: "Emine Kaya", betrieb: "Kaya Dach Probe", nachricht: "zweiter Anruf" }))
 const kandidaten = await owner.possibleDuplicates(doppel.id)

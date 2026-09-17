@@ -35,7 +35,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | ADM-00 | 🟢 | — | — | 🟢 | `VERIFIED` | — (eingefroren, siehe unten) | — |
 | ADM-01 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Seiten migrieren (≥140 Textstellen, 20 Dateien) — zuerst Anfragen + Pipeline (werden in ADM-03 ohnehin umgebaut) | Material-Beschriftungen BLOCKED_G18 |
 | ADM-02 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` | Cutover: Deploy + `db-migrate` 015/016 in Produktion, danach Widerruf/Versuchsfenster/Login live messen | Produktionsautorität (Owner) | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
-| ADM-03 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | — |
+| ADM-03 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | Cutover: Migration 017 **vor** Deploy; danach echte Anfrage im System (LIVE) | Produktionsautorität (Owner) |
 | ADM-04 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Anbieterfreigaben (nach A2-Einstufung) |
 | ADM-05 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | G18 für Rechnung (`lib/rechnung.ts`) |
 | ADM-06 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | meAI-Anbieter/Kosten = Owner |
@@ -62,6 +62,10 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | **H11** | Login-Seite (ohne Anmeldung) enthielt im Seiten-Payload die komplette Admin-Navigation samt Bereichsbeschreibungen — über `not-found.tsx` → `AdminShell`. | Runtime gemessen (`curl /admin/login`) | niedrig (Info-Abfluss, keine Daten) | ADM-02 | **VERIFIED** (17.09.2026) |
 | **H12** | Login-Formular: kein Zeitlimit (hängendes Netz = „Wird geprüft …“ für immer), Netz-/Serverfehler lasen sich wie falsches Passwort, nach Erfolg weiter „Wird geprüft …“ während der Navigation. | Code + E2E | mittel (A02) | ADM-02 | **VERIFIED** (17.09.2026) — siehe §A02 |
 | **H13** | Datenzustände: Vertrieb/Kunden sagten in beiden Lagen „nicht eingerichtet oder nicht erreichbar“; Heute ohne Speicher verschwieg den fehlenden Vertrieb; Recherche/Verlust fielen bei Störung auf die Fehlerseite der ganzen Ansicht; Recherche-Detail ohne Speicher = „Nicht gefunden“; Beleg „Datenbank nicht gelesen“ ohne Lage. | Runtime (gerenderter Crawl, 32 Flächen × 2 Lagen) | mittel (A19) | ADM-02 | **VERIFIED** (17.09.2026) — siehe §A19 |
+| **H14** | **Anzeige nach dem Speichern veraltet** — seit dem Einbau von `app/(admin)/admin/vertrieb/loading.tsx` übernahm der Browser die neu gerenderte Seite nach einer Server Action oft nicht: gespeichert war, gezeigt wurde der alte Stand (auch im PRODUKTIVEN Stand `91044de`: Notiz 8/20). Folge für den Owner: erneutes Speichern, Misstrauen in die Daten. | Runtime gemessen, Halbierung über 4 Stände + A/B | **hoch** | ADM-03 | **VERIFIED** (17.09.2026) — Datei entfernt, Gate `check-admin-antwort` §5; 20/20 + 20/20 |
+| **H15** | Inbox-Filter `lower(btrim(email)) NOT LIKE …` ergab bei Anfragen ohne Mail NULL → telefonische Anfragen wären still aus der Inbox verschwunden. | Code + Drill | hoch | ADM-03 | **VERIFIED** — `coalesce` |
+| **H16** | „Chance anlegen“: erst SELECT, dann INSERT, keine Eindeutigkeit → zwei gleichzeitige Klicks = zwei Chancen. | Code + Drill (10 parallel) | mittel | ADM-03 | **VERIFIED** — eindeutiger Index (017) + ON CONFLICT |
+| **H17** | `.env.local` enthält eine echte `DATABASE_URL`; Next füllt auch LEER gesetzte Variablen daraus → Prüfskripte mit `DATABASE_URL: ""` konnten eine echte DB erreichen (Rauchtest schickt Formularanfragen). Kein Vorfall (kein `LEAD_STORE` in `.env.local`). | Runtime gemessen | hoch (Risiko) | ADM-03 | **VERIFIED** — alle next-start-Skripte `LEAD_STORE=aus` + `.invalid`; Gate `check-pruefumgebung` |
 
 ---
 
@@ -336,6 +340,27 @@ Statische Prüfung aller 32 lesenden Methoden in `lib/vertrieb-store-neon.ts` + 
 
 ---
 
+## ADM-03 · Kernschleife (BUILT + lokal VERIFIED 17.09.2026)
+
+**Migration 017** (`scripts/migrations/017-kernschleife.sql`): Anfrage ohne Pflicht-Mail/-Telefon, `responsible`, `archive_reason`, `duplicate_of`; Chance `responsible` + `opportunities_from_lead_unique`; Chronik `actor`/`origin`/`data` (alt = NULL = unbekannt). **Cutover-Reihenfolge: erst `db-migrate` (017), dann ausliefern** — die Laufzeit prüft die Spalten als Pflicht. Scheitert der eindeutige Index an vorhandenen Doppel-Chancen, steht die Prüfabfrage in der .sql-Datei.
+
+**Store**: `createEnquiry` (idempotent), `setLeadResponsible`, `setLeadNextAction`, `setLeadOrganisation`, `archiveLead` (Grund; Dublette nur mit Bezug, nichts verschmolzen), `possibleDuplicates`, `setOpportunityResponsible`, `moveOpportunity` (Versionsprüfung → `konflikt`, Historie `{von, nach, grund}`), `listEnquiries({faellig})`, `summary.enquiriesDueToday/Overdue`. Jede Action-Instanz trägt den Akteur (Rolle, `HUMAN`).
+**Oberfläche (DE/TR)**: Anfragen-Liste (Hauptaktion „Anfrage erfassen“, Spalten Verantwortlich + nächster Schritt), Anfrage erfassen (feldgenaue Fehler, `aria-invalid/describedby`, Eingaben bleiben), Anfrage-Detail (Beleg, Einordnung, Qualifizieren = Chance anlegen ODER archivieren mit Grund, Dubletten mit „als Dublette archivieren“, rechte Spalte: nächster Schritt, Verantwortlich, Bearbeitung, Zuordnung zu Organisation), Chronik mit Akteur + Herkunft. Chance: Konflikthinweis, Verantwortlich, **Gewonnen → nächster Betriebsschritt** (nichts automatisch). Übersicht zählt fällige Anfrage-Schritte mit.
+**Prüfbarkeit**: `LEAD_STORE=pg-lokal` — derselbe Store gegen Postgres auf diesem Rechner (nur localhost).
+
+| Prüfung | Ergebnis | Art |
+|---|---|---|
+| `kernschleife-drill` K1–K8 (+K3b) | PASS 40/40 — 10× gleichzeitig erfassen = 1; ohne Mail in Inbox; fällig/überfällig; Zuordnung; Dubletten; 10× gleichzeitig Chance = 1; Konflikt überschreibt nichts; Historie; Verlust; Akteur/Herkunft | reproduziert (DB lokal) |
+| `admin-kernschleife-e2e` E03–E12, EP, E26, E27 | **PASS, 3 Läufe in Folge + Schlusslauf** — Website- und Hand-Anfrage in Inbox; Validierung; Doppelklick = 1; Zuordnung nach Neuladen; neuer Betrieb = 1 Organisation; Dublette; nächster Schritt **ohne Neuladen sichtbar** + in Übersicht; Doppelklick Chance = 1; Stufe + Chronik „Neu → Qualifiziert · Owner · Mensch“; zwei Tabs → Konflikt, nichts überschrieben; Verlust in Verlust-Schleife; Gewonnen → nächster Betriebsschritt, kein Projekt automatisch; Kundenakte; Abmelden + andere Rolle anmelden → alles da; mobil 390; nur Tastatur | Chromium, `next start`, Postgres lokal |
+| Konflikt-Schleife 15× · realistisches Speichern 20×/20× | 15/15 · 20/20 + 20/20 | Chromium |
+| `db-drills` 10/10 · build + alle Gates · `admin-e2e` 16/16 · `admin-zustaende` 32/32 · `admin-sprache-e2e` · smoke 36/36 | PASS | lokal |
+
+**Irrwege, offen benannt (damit niemand sie wiederholt)**: Die veraltete Anzeige (H14) habe ich zuerst den Middleware-Headern (H4), dann `router.push`/`redirect`, einer asynchronen Lade-Anzeige, dem Hinweis-Cookie und der Tab-Sichtbarkeit zugeschrieben — jedes Mal per Messung widerlegt, einmal nach einem zufällig grünen Lauf zu früh bestätigt und zurückgenommen. Entscheidend waren eine Baseline aus dem produktiven Stand und eine Halbierung über Git-Worktrees. Übrig geblieben: Erfassen navigiert voll (`location.assign`), Konflikt/Fehler per kurzlebigem Hinweis-Cookie statt Umleitung — beides robust und begründet, nicht mehr als Ursache behauptet.
+
+**Grenzen**: Chance-Detail (Angebot/Lieferung/Stufenregeln), Kundenakte, Beziehungen, Recherche noch deutsch (gezählt: 17 Dateien / ≥123 Stellen). A04 „Kontakt ausdrücklich zuordnen“ nur über Kontaktseite (Organisation ja). Verlustgründe bleiben als gespeicherte deutsche Sätze Schlüssel (keine Datenmigration), Anzeige übersetzt.
+
+---
+
 ## Routen-Karte (A4)
 
 | Route | Heute | Schicksal | Ziel | Grund |
@@ -376,5 +401,6 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 17.09.2026 | 2 | **A19 VERIFIED lokal** (32 Flächen × 2 Lagen) · H13 |
 | 17.09.2026 | 2 | **ADM-01 Sprachfundament + Hülle VERIFIED** (DE/TR, Rolle, mobil, axe 0) |
 | 17.09.2026 | 2 | **Übersicht = Heute + Cockpit VERIFIED lokal** (H6) · Scheinnull + Kennungen aus visueller Prüfung behoben |
+| 17.09.2026 | 2 | **ADM-03 BUILT/lokal VERIFIED** — Kernschleife Store + UI + Browser-E2E; H14 (veraltete Anzeige, vorbestehend) gefunden und behoben; H15–H17 |
 
-**Fortsetzungspunkt:** ADM-03 zuerst funktional (manuelle Anfrage, Verantwortlicher, Akteur/Herkunft in der Chronik, Stufen-Historie, Versionsprüfung A5) — die dabei angefassten Seiten werden im selben Zug zweisprachig migriert. Begründung: Anfragen/Pipeline/Akte ändern sich in ADM-03 ohnehin; sie vorher nur zu übersetzen wäre doppelte Arbeit.
+**Fortsetzungspunkt:** ADM-01-Rest parallel zu ADM-05: Chance-Detail/Angebot/Lieferung zweisprachig (größter offener Block), dann Kundenakte + Beziehungen + Recherche. Danach ADM-04 (Verbindungsmodell, ehrlich NOT_CONFIGURED) und ADM-05 (Beleg-Freigaben in DB statt Code — Projektion nach /arbeiten BLOCKED_G18).

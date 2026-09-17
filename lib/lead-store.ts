@@ -4,7 +4,7 @@ import nodePath from "node:path"
 import { raiseAlert } from "@/lib/alert"
 import { createNeonStore } from "@/lib/lead-store-neon"
 import { createNeonVertrieb } from "@/lib/vertrieb-store-neon"
-import type { VertriebStore } from "@/lib/vertrieb"
+import type { Akteur, VertriebStore } from "@/lib/vertrieb"
 import type { Locale } from "@/lib/dictionary"
 
 /**
@@ -467,11 +467,22 @@ export function getLeadStore(): LeadStore | null {
  * Fehlt die Datenbank, gibt diese Funktion `null` zurueck und die
  * Oberflaeche sagt das. Sie erfindet nichts.
  */
-export function getVertriebStore(): VertriebStore | null {
+export function getVertriebStore(akteur?: Akteur): VertriebStore | null {
   const art = process.env.LEAD_STORE?.trim()
   if (art !== "neon" && art !== "pg-lokal") return null
   const url = process.env.DATABASE_URL?.trim()
   if (!url) return null
+  /*
+   * ADM-03 — mit Akteur eine eigene Instanz: Jede Chronikzeile, die sie
+   * schreibt, trägt diese Rolle. Die Verbindung selbst ist gecacht.
+   */
+  if (akteur) {
+    try {
+      return createNeonVertrieb(url, akteur)
+    } catch {
+      return null
+    }
+  }
   if (!vertriebStore) {
     /*
      * `neon()` prueft die Zeichenkette sofort und wirft bei einer kaputten.
