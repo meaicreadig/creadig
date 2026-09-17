@@ -1,4 +1,8 @@
+import { cookies } from "next/headers"
+
 import { AdminShell } from "@/components/admin/admin-shell"
+import { LageRegister } from "@/components/admin/lage-register"
+import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
 import { ITEM_GROUPS, collect } from "@/lib/material-status"
 import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 
@@ -31,7 +35,9 @@ export const dynamic = "force-dynamic"
 
 export const metadata = { title: "Materialstand" }
 
-export default function ControlCenterHome() {
+export default async function ControlCenterHome() {
+  /* ADM-01 — die Lage-Register (vormals Cockpit) sieht nur der Owner; sie waren nie für andere Rollen freigegeben. */
+  const { rolle } = await verifySession((await cookies()).get(ADMIN_COOKIE)?.value)
   const { open, done } = collect()
   const stand = new Date().toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE,
     day: "2-digit",
@@ -54,6 +60,12 @@ export default function ControlCenterHome() {
         </>
       }
     >
+      {rolle === "owner" ? (
+        <div className="border-line mb-12 border-b pb-10">
+          <LageRegister />
+        </div>
+      ) : null}
+
       {/* ── Was Aufmerksamkeit braucht ── */}
       <section aria-labelledby="offen-titel">
         <h2 id="offen-titel" className="eyebrow text-gold-text">

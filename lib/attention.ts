@@ -85,11 +85,33 @@ export type AttentionItem = {
   id: string
   rank: AttentionRank
   title: string
+  /**
+   * Freitext aus dem Datensatz (nächster Schritt, Owner-Handlung) — in der
+   * Sprache, in der ein Mensch ihn geschrieben hat. Nie ein zusammengesetzter
+   * Satz: Die Oberfläche setzt Sätze in IHRER Sprache zusammen (ADM-01).
+   */
   detail: string | null
+  /** Nur bei neuen Anfragen: woher und unter welcher Nummer. */
+  anfrage?: { quelle: string; referenz: string }
   /** Wohin der Klick führt. Auf den Datensatz, nicht auf eine Liste. */
   href: string
   /** Fälligkeit als ISO-Datum, wenn es eine gibt. Nie geschätzt. */
   due: string | null
+}
+
+/**
+ * ADM-01 — die exakten Zahlen hinter der Übersicht.
+ *
+ * Die Aufmerksamkeitsliste holt je Art höchstens zwölf Einträge. Eine Zahl
+ * „12 neue Anfragen" aus dieser Liste wäre bei 30 eine Lüge. Diese Zahlen
+ * kommen aus `summary()` (count(*)) — `null`, wenn der Vertrieb nicht
+ * gemessen wurde.
+ */
+export type Kennzahlen = {
+  ueberfaellig: number
+  heuteFaellig: number
+  neueAnfragen: number
+  ohneSchritt: number
 }
 
 export type AttentionBoard = {
@@ -100,6 +122,7 @@ export type AttentionBoard = {
    * „nichts los" — es heisst „nicht gemessen", und die Oberfläche sagt das.
    */
   salesMeasured: boolean
+  kennzahlen: Kennzahlen | null
   /** Material ausserhalb von Betrieb und Entscheidungen — als Zahl. */
   materialRest: number
   materialOpen: number
@@ -174,6 +197,7 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
   }
 
   let salesMeasured = false
+  let kennzahlen: Kennzahlen | null = null
 
   if (store) {
     try {
@@ -183,6 +207,12 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
         store.listContacts({ bucket: "pflege-faellig", limit: 12 }),
       ])
       salesMeasured = true
+      kennzahlen = {
+        ueberfaellig: summary.overdue,
+        heuteFaellig: summary.dueToday,
+        neueAnfragen: summary.newEnquiries,
+        ohneSchritt: summary.withoutNextAction,
+      }
 
       const today = geschaeftsTag()
 
@@ -230,7 +260,8 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
           id: `lead:${e.id}`,
           rank: "neue-anfrage",
           title: e.organisationName ?? e.business ?? e.name,
-          detail: `Über ${e.source} · ${e.reference}`,
+          detail: null,
+          anfrage: { quelle: e.source, referenz: e.reference },
           href: `/admin/vertrieb/anfragen/${e.id}`,
           due: null,
         })
@@ -252,6 +283,7 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
          sie zeigt keine leere Pipeline, denn das wäre eine Aussage über das
          Geschäft statt über die Technik. */
       salesMeasured = false
+      kennzahlen = null
     }
   }
 
@@ -299,6 +331,7 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
     items: sorted,
     counts,
     salesMeasured,
+    kennzahlen,
     materialRest,
     materialOpen: open.length,
     materialDone: done.length,

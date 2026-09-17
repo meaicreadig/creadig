@@ -32,7 +32,14 @@ import { flaecheZu } from "../lib/rollen.ts"
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const fehler = []
 
-const datei = path.join(ROOT, "app", "(admin)", "admin", "cockpit", "page.tsx")
+/*
+ * ADM-01 (17.09.2026): Das Cockpit ist keine eigene Seite mehr — seine
+ * Register stehen als `LageRegister` unter System, `/admin/cockpit` leitet
+ * dorthin um. Die Regeln dieses Gates gelten unveraendert fuer die
+ * Komponente, die sie jetzt traegt; zusaetzlich (§5), dass nur der Owner
+ * sie sieht.
+ */
+const datei = path.join(ROOT, "components", "admin", "lage-register.tsx")
 const roh = readFileSync(datei, "utf8")
 function ohneKommentare(q) {
   return q.replace(/\/\*[\s\S]*?\*\//g, " ").split("\n").map((z) => z.replace(/\/\/.*$/, "")).join("\n")
@@ -112,6 +119,17 @@ if (!flaeche) {
     "Das Cockpit ist als Flaeche mit Personendaten Dritter eingetragen. Es zeigt Auskuenfte " +
       "aus Registern, keine Kundenakte — die engere Klasse waere hier falsch und wuerde Rechte verengen, die es nicht braucht.",
   )
+}
+
+/* ═══ 5 · Umzug: Umleitung und Owner-Sicht ═══════════════════════════════ */
+
+const umleitung = ohneKommentare(readFileSync(path.join(ROOT, "app", "(admin)", "admin", "cockpit", "page.tsx"), "utf8"))
+if (!/redirect\(\s*["']\/admin\/material#lage["']\s*\)/.test(umleitung)) {
+  fehler.push("`/admin/cockpit` leitet nicht auf `/admin/material#lage` um — gemerkte Links liefen ins Leere.")
+}
+const system = ohneKommentare(readFileSync(path.join(ROOT, "app", "(admin)", "admin", "material", "page.tsx"), "utf8"))
+if (!/rolle === "owner" \? \([\s\S]{0,120}<LageRegister \/>/.test(system)) {
+  fehler.push("Die Lage-Register stehen unter System nicht ausschliesslich fuer den Owner — die Cockpit-Freigabe war Owner-only.")
 }
 
 /* ═══ AUSGABE ════════════════════════════════════════════════════════════ */

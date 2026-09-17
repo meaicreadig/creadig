@@ -31,7 +31,7 @@ const ZUSTANDSWORTE = [
   "nicht gemessen", "Etwas ist schiefgegangen", "Nicht gefunden", "keine Datenquelle",
 ]
 /* Eine Null vor einem Geschaeftsobjekt ist eine Messung — ohne Speicher kann es keine sein. */
-const NULL_MUSTER = /(?<![\d.,])0\s+(Kunden|Anfragen|Vorg\w*|Chancen|Verkaufschancen|Organisation\w*|Kontakt\w*|offen\w*|Eintr\w*|Treffer|Beziehung\w*|Recherche\w*|Verlust\w*)/g
+const NULL_MUSTER = /(?<![\d.,])0\s+(Kunden|Anfragen|Vorg\w*|Chancen|Verkaufschancen|Organisation\w*|Kontakt\w*|offen\w*|Eintr\w*|Treffer|Beziehung\w*|Recherche\w*|Verlust\w*|Punkte?|madde)/g
 
 
 async function lauf(name, env) {

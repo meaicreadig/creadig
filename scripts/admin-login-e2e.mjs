@@ -159,7 +159,7 @@ async function fehlerzustaende(browser) {
     const phasen = await page.evaluate(() => window.__phasen ?? null).catch(() => null)
     const h1 = await page.locator("h1").first().textContent()
     pruefe("F7 Erfolg: Zustand wechselt von „pruefen“ zu „weiter“", Array.isArray(phasen) && phasen.includes("pruefen") && phasen.includes("weiter"), JSON.stringify(phasen))
-    pruefe("F7 Erfolg: Uebersicht erreicht", h1 === "Heute", String(h1))
+    pruefe("F7 Erfolg: Uebersicht erreicht", h1 === "Übersicht", String(h1))
     await context.close()
   }
   {

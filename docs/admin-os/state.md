@@ -33,7 +33,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | Welle | BUILD | CUTOVER | LIVE | CLOSURE | Status | Nächste konkrete Handlung | Blocker |
 |---|:--:|:--:|:--:|:--:|---|---|---|
 | ADM-00 | 🟢 | — | — | 🟢 | `VERIFIED` | — (eingefroren, siehe unten) | — |
-| ADM-01 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Übersicht = Heute + Cockpit (H6), dann Seiten migrieren (≥150 Textstellen) | Material-Beschriftungen BLOCKED_G18 |
+| ADM-01 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Seiten migrieren (≥140 Textstellen, 20 Dateien) — zuerst Anfragen + Pipeline (werden in ADM-03 ohnehin umgebaut) | Material-Beschriftungen BLOCKED_G18 |
 | ADM-02 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` | Cutover: Deploy + `db-migrate` 015/016 in Produktion, danach Widerruf/Versuchsfenster/Login live messen | Produktionsautorität (Owner) | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
 | ADM-03 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | — |
 | ADM-04 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Anbieterfreigaben (nach A2-Einstufung) |
@@ -54,7 +54,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | **H3** | Rate-Limit nur im Arbeitsspeicher je Instanz (Admin-Anmeldung, Formular-Absendung) — nicht dauerhaft über Instanzen (B08). | Code | mittel | ADM-02 | **BUILT + lokal VERIFIED** (17.09.2026) — Live nach Migration 016 · siehe §H3 |
 | **H4** | Admin-Antworten ohne `X-Robots-Tag`; Anmelde-Route ohne `no-store`; **Anmeldung mit fremdem `Origin` angenommen (200 + Cookie)**. | Runtime gemessen (`next start`) | mittel→hoch (Login-CSRF) | ADM-02 | **VERIFIED** (16.09.2026) — siehe §H4 |
 | **H5** | Admin ist einsprachig: `app/(admin)/layout.tsx` `lang="de"`, keine TR-Wörterbuchschicht für Admin. | Code | hoch für 99 % | ADM-01 | offen |
-| **H6** | Zwei Owner-Übersichten: `/admin` (Heute, `lib/attention.ts`) und `/admin/cockpit` (G34, Gedächtnis+Navigator). Überlappung → A4-Zusammenlegung. | Code | mittel | ADM-01 | offen |
+| **H6** | Zwei Owner-Übersichten: `/admin` (Heute, `lib/attention.ts`) und `/admin/cockpit` (G34, Gedächtnis+Navigator). Überlappung → A4-Zusammenlegung. | Code | mittel | ADM-01 | **VERIFIED** (17.09.2026) |
 | **H7** | Kein Dark Mode im Admin-Code (kein `dark:`/`prefers-color-scheme` in `components/admin`, `app/(admin)`). Ältere Acceptance nennt „Mobil 390 dunkel" — nicht reproduziert. | Code; Widerspruch zu `docs/control-center/acceptance.md` #11 | niedrig | A10 | Owner-Entscheidung |
 | **H8** | Die 27 Server Actions (`app/(admin)/admin/vertrieb/actions.ts`) prüften weder Sitzung noch Rolle — nur die Middleware schützte sie (Annahme über Next-Routing). | Code | hoch (A20) | ADM-02 | **VERIFIED** (17.09.2026) — siehe §H2 |
 | **H9** | `rollen-drill` war seit `157e1fa` rot (12 statt 13 Personendaten-Flächen), stand in keiner Kette. | reproduziert | niedrig (Testhygiene) | ADM-02 | **VERIFIED** — nachgezogen, jetzt in `postbuild` |
@@ -322,14 +322,28 @@ Statische Prüfung aller 32 lesenden Methoden in `lib/vertrieb-store-neon.ts` + 
 
 ---
 
+## ADM-01 · Übersicht = Heute + Cockpit (VERIFIED lokal 17.09.2026)
+
+**Gebaut**: `app/(admin)/admin/page.tsx` neu, zweisprachig. (1) Kennzahlen aus `summary()` (exakt, `count(*)`), jede ein Link in die gefilterte Liste; ohne Messung „—“ + „nicht gemessen“. (2) Heute zu tun — operative Punkte mit Rang, Fälligkeit (Berliner Tag, Sprach-Locale), Link auf den Datensatz; Hinweis, wenn die Liste gekürzt ist; ehrlicher Leerzustand mit nächstem Schritt. (3) Systemzustand + Materialvorrat als eine Zeile. (4) Ihre Entscheidungen (5 sichtbar, Rest unter System). `lib/attention.ts` liefert `kennzahlen` und strukturierte Anfragedaten statt eines deutschen Satzes. Cockpit-Register → `components/admin/lage-register.tsx` unter System (nur Owner), `/admin/cockpit` leitet um; `check-cockpit` prüft jetzt Komponente, Umleitung und Owner-Sicht.
+
+**Visuelle Prüfung** (lokale Screenshots, nicht committet: TR 1440 px, DE 390 px) fand und behob zwei Fehler: „Heute zu tun · 0 Punkte“ trotz ungemessenem Vertrieb (**Scheinnull**) und interne Kennungen „(§10.6)“, „(BF-8)“, „(MP10-2.10)“ in Titeln (Anzeige-Filter; Quelle G18 unverändert). `admin-zustaende` erkennt „0 Punkte/madde“ jetzt selbst.
+
+| Prüfung | Ergebnis |
+|---|---|
+| build + Gates (inkl. `check-cockpit` §5, `check-admin-sprache`) · `admin-zustaende` 32/32 · `admin-sprache-e2e` (axe 0 auf Übersicht DE/TR × Desktop/Mobil) · `admin-e2e` 16/16 · smoke 36/36 | PASS |
+
+**Rest, benannt**: Detailtexte der Betriebs-/Entscheidungspunkte enthalten Umgebungsvariablen und Pfade und sind deutsch — Quelle `lib/material-status.ts` → **BLOCKED_G18**. Mit echter Datenbank (Kennzahlen > 0, Liste gefüllt) lokal nicht laufzeitprüfbar → Preview.
+
+---
+
 ## Routen-Karte (A4)
 
 | Route | Heute | Schicksal | Ziel | Grund |
 |---|---|---|---|---|
 | `/admin/leads`, `/admin/leads/:id` | Redirect (307) | `REDIRECT` (besteht) | `/admin/vertrieb/anfragen[/:id]` | Bestand, `next.config.ts:243` |
 | `/admin/vertrieb/organisationen[/:id]` | Redirect | `REDIRECT` (besteht) | `/admin/kunden[/:id]` | Bestand, `next.config.ts:290` |
-| `/admin` (Heute) | Seite | offen (ADM-01) | Übersicht | H6 |
-| `/admin/cockpit` | Seite | offen (ADM-01) | Übersicht | H6 |
+| `/admin` (Heute) | Seite | **ERSETZT** 17.09.2026 | Übersicht (gleiche Adresse) | H6 — Kennzahlen, Heute zu tun, Systemzustand, Entscheidungen |
+| `/admin/cockpit` | Seite | **REDIRECT** (serverseitig, 307) 17.09.2026 | `/admin/material#lage` | H6 — Lage-Register unter System, nur Owner; Owner-Freigabe greift vor der Umleitung |
 | `/admin/material` | Seite | offen (ADM-01) | Einstellungen/System | Material dominiert nicht die Navigation |
 | `/admin/vertrieb`, `/anfragen`, `/beziehungen`, `/pipeline`, `/recherche`, `/verlust` | Seiten | offen (ADM-00 IA) | — | Ziel-IA §Anfragen/Kunden/Vertrieb |
 | `/admin/beleg` | Seite | offen | Nachweise & Freigaben | — |
@@ -361,5 +375,6 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 17.09.2026 | 2 | **A02 lokal VERIFIED** (9 Fehlerzustände, 30 warm / 10 kalt) · H11 Navigation aus Login-Payload · H12 Login endlich |
 | 17.09.2026 | 2 | **A19 VERIFIED lokal** (32 Flächen × 2 Lagen) · H13 |
 | 17.09.2026 | 2 | **ADM-01 Sprachfundament + Hülle VERIFIED** (DE/TR, Rolle, mobil, axe 0) |
+| 17.09.2026 | 2 | **Übersicht = Heute + Cockpit VERIFIED lokal** (H6) · Scheinnull + Kennungen aus visueller Prüfung behoben |
 
-**Fortsetzungspunkt:** ADM-01 — Übersicht neu: (1) Heute zu tun (operative Aufmerksamkeit, Rang-Labels zweisprachig), (2) Ihre Entscheidungen (Navigator, Geschäftssprache, ohne Paragraphen/Code), (3) Systemzustand kompakt; Cockpit-Lage nach System; `/admin/cockpit` → Umleitung `/admin` (Routen-Karte). Danach Seiten nach Textstellen absteigend migrieren.
+**Fortsetzungspunkt:** ADM-03 zuerst funktional (manuelle Anfrage, Verantwortlicher, Akteur/Herkunft in der Chronik, Stufen-Historie, Versionsprüfung A5) — die dabei angefassten Seiten werden im selben Zug zweisprachig migriert. Begründung: Anfragen/Pipeline/Akte ändern sich in ADM-03 ohnehin; sie vorher nur zu übersetzen wäre doppelte Arbeit.

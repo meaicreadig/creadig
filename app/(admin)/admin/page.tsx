@@ -2,59 +2,53 @@ import Link from "next/link"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { Pill, SectionHeader, Surface, UnavailableNote } from "@/components/admin/primitives"
-import {
-  ATTENTION_LABELS,
-  type AttentionRank,
-  collectAttention,
-} from "@/lib/attention"
+import { type AttentionItem, type AttentionRank, type Kennzahlen, collectAttention } from "@/lib/attention"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
+import { datumAnzeige, GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 import { getVertriebStore, leadStoreConfigured } from "@/lib/lead-store"
-import { ITEM_GROUPS, collect } from "@/lib/material-status"
-import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 
 /**
- * Heute — die Startseite des Control Centers.
+ * ÜBERSICHT — die Startseite des Admin (ADM-01, 17.09.2026).
  *
  * ---------------------------------------------------------------------------
- * DIE EINE FRAGE
- * „Was braucht heute Aufmerksamkeit?"
- *
- * Diese Seite hat sie lange nicht beantwortet, und der Grund war keine
- * fehlende Fähigkeit: Sie war eine SYNCHRONE Komponente und konnte deshalb
- * nichts abfragen, was eine Datenbank braucht. Übrig blieb, was ohne Warten
- * zu haben war — Materialzahlen und der Satz, ein Lead-Speicher sei
- * eingerichtet. Das ist eine Aussage über den Bauzustand der Software; wer
- * ein Unternehmen führt, braucht eine Aussage über das Unternehmen.
- *
- * Sie ist jetzt async und liest `collectAttention()`. Dort steht, warum die
- * Rangfolge so ist, wie sie ist, und warum nichts doppelt vorkommen kann.
+ * WAS SIE ERSETZT
+ * „Heute“ (Aufmerksamkeitsliste + Material-Nebenspalte) und „Cockpit“
+ * (Lage-Register + Vorschläge). Zwei Owner-Startflächen mit überlappender
+ * Frage sind eine zu viel. Die Lage-Register stehen jetzt unter System
+ * (`/admin/material#lage`), `/admin/cockpit` leitet dorthin um.
  *
  * ---------------------------------------------------------------------------
- * KEINE NEUE DOMÄNE
- * Es entsteht keine Tabelle und kein zweites Modell. Zusammengetragen wird
- * ausschliesslich, was Vertrieb und Materialstand ohnehin schon führen. Jede
- * Zeile führt auf ihren Datensatz — eine Übersicht, aus der man nicht
- * herauskommt, ist ein Poster.
+ * DIE ORDNUNG — INFORMATION → ENTSCHEIDUNG → HANDLUNG
+ *   1 Kennzahlen      exakte Zahlen (count(*)), jede ein Weg in die gefilterte Liste
+ *   2 Heute zu tun    operative Punkte, jeder ein Weg auf seinen Datensatz
+ *   3 Systemzustand   gestörter Betrieb — ohne ihn kommen keine Anfragen an
+ *   4 Entscheidungen  was nur der Owner kann
+ * Material für die Website ist ein Vorrat, keine Fälligkeit: eine Zeile mit Weg.
  *
  * ---------------------------------------------------------------------------
- * WARUM DAS MATERIAL IN DIE NEBENSPALTE RÜCKT
- * Es bleibt unverändert erhoben und unverändert gezeigt, aber es ist ein
- * Vorrat, keine Fälligkeit. Ein Vorrat gehört neben die Arbeit, nicht davor.
- * Die beiden Materialpunkte, die WIRKLICH heute drücken — gestörter Betrieb
- * und offene Eigentümer-Entscheidungen — stehen deshalb oben in der Liste,
- * nicht hier unten in einer Zahl.
+ * WAS NICHT ÜBERSETZT WERDEN KANN
+ * Beschriftungen von Betriebs- und Entscheidungspunkten kommen aus
+ * `lib/material-status.ts` (G18-gesperrt) und erscheinen in TR deutsch.
+ * Freitext aus Datensätzen (nächster Schritt, Namen) bleibt, wie ein Mensch
+ * ihn geschrieben hat.
  */
 export const dynamic = "force-dynamic"
 
-export const metadata = { title: "Heute" }
+export async function generateMetadata() {
+  const { t } = await adminSprachKontext()
+  return { title: t.uebersicht.titel }
+}
 
-/**
- * Dringlichkeit als Farbe — an dem, was Nichtstun kostet.
- *
- * Rot nur, wo etwas bereits verloren geht: Der Weg ist gestört, oder eine
- * Zusage ist gebrochen. Gold, wo der Tag noch reicht. Grau, wo niemand von
- * aussen wartet. Wäre alles rot, wäre nichts rot.
- */
-const RANK_SEVERITY: Record<AttentionRank, "neutral" | "attention" | "critical"> = {
+const OPERATIV: readonly AttentionRank[] = [
+  "ueberfaellig",
+  "heute-faellig",
+  "neue-anfrage",
+  "schritt-ohne-termin",
+  "ohne-schritt",
+  "beziehung-faellig",
+]
+
+const SCHWERE: Record<AttentionRank, "neutral" | "attention" | "critical"> = {
   betriebsblocker: "critical",
   ueberfaellig: "critical",
   "heute-faellig": "attention",
@@ -65,27 +59,29 @@ const RANK_SEVERITY: Record<AttentionRank, "neutral" | "attention" | "critical">
   entscheidung: "neutral",
 }
 
-function faellig(due: string | null) {
-  if (!due) return null
-  const [y, m, d] = due.split("-")
-  return `${d}.${m}.${y}`
+const KENNZAHL_WEG: Record<keyof Kennzahlen, string> = {
+  ueberfaellig: "/admin/vertrieb/pipeline?bucket=ueberfaellig",
+  heuteFaellig: "/admin/vertrieb/pipeline?bucket=faellig",
+  neueAnfragen: "/admin/vertrieb/anfragen?status=neu",
+  ohneSchritt: "/admin/vertrieb/pipeline?bucket=ohne-schritt",
 }
 
-export default async function Today() {
+const ENTSCHEIDUNGEN_SICHTBAR = 5
+
+export default async function Uebersicht() {
+  const { t, intl } = await adminSprachKontext()
   const hasStore = leadStoreConfigured()
   const board = await collectAttention(getVertriebStore())
 
-  const { open, done } = collect()
+  const operativ = board.items.filter((i) => OPERATIV.includes(i.rank))
+  const betrieb = board.items.filter((i) => i.rank === "betriebsblocker")
+  const entscheidungen = board.items.filter((i) => i.rank === "entscheidung")
+  const k = board.kennzahlen
+  const gezaehlt = k ? k.ueberfaellig + k.heuteFaellig + k.neueAnfragen + k.ohneSchritt : 0
+  const abgeschnitten = k !== null && gezaehlt > operativ.filter((i) => i.rank !== "beziehung-faellig" && i.rank !== "schritt-ohne-termin").length
 
-  /* Gruppen mit offenen Punkten, größte zuerst — gemessen, nicht gesetzt. */
-  const byGroup = ITEM_GROUPS.map((group) => ({
-    ...group,
-    count: open.filter((item) => item.group === group.key).length,
-  }))
-    .filter((group) => group.count > 0)
-    .sort((a, b) => b.count - a.count)
-
-  const stand = new Date().toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE,
+  const stand = new Date().toLocaleString(intl, {
+    timeZone: GESCHAEFTS_ZEITZONE,
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -94,155 +90,158 @@ export default async function Today() {
   })
 
   return (
-    <AdminShell
-      title="Heute"
-      lead="Was Aufmerksamkeit braucht — aus den Quellen, die es wirklich gibt."
-      meta={<span className="block">Stand {stand}</span>}
-    >
-      <div className="grid gap-10 lg:grid-cols-[2fr_1fr] lg:gap-12">
-        {/* ── Arbeitsfläche: die Aufmerksamkeitsliste ── */}
+    <AdminShell title={t.uebersicht.titel} lead={t.uebersicht.lead} meta={<span className="block">{t.uebersicht.stand(stand)}</span>}>
+      {/* ── 1 · Kennzahlen ── */}
+      <section aria-label={t.uebersicht.kennzahlenLabel}>
+        <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
+          {(Object.keys(KENNZAHL_WEG) as (keyof Kennzahlen)[]).map((schluessel) => (
+            <li key={schluessel}>
+              {k ? (
+                <Link href={KENNZAHL_WEG[schluessel]} className="group block h-full">
+                  <Surface padding="sm" className="h-full">
+                    <span className="type-small text-muted-foreground block">{t.uebersicht.kennzahl[schluessel]}</span>
+                    <span
+                      className={`mt-1 block text-2xl font-semibold tabular-nums group-hover:underline group-hover:underline-offset-4 ${
+                        schluessel === "ueberfaellig" && k[schluessel] > 0 ? "text-destructive" : ""
+                      }`}
+                    >
+                      {k[schluessel]}
+                    </span>
+                  </Surface>
+                </Link>
+              ) : (
+                <Surface padding="sm" className="h-full">
+                  <span className="type-small text-muted-foreground block">{t.uebersicht.kennzahl[schluessel]}</span>
+                  <span className="mt-1 block text-2xl font-semibold" aria-hidden="true">—</span>
+                  <span className="text-muted-foreground block text-xs">{t.uebersicht.nichtGemessen}</span>
+                </Surface>
+              )}
+            </li>
+          ))}
+        </ul>
+        {!hasStore ? (
+          <div className="mt-4">
+            <UnavailableNote title={t.uebersicht.vertriebNichtEingerichtetTitel}>{t.uebersicht.vertriebNichtEingerichtet}</UnavailableNote>
+          </div>
+        ) : !board.salesMeasured ? (
+          <div className="mt-4">
+            <UnavailableNote title={t.uebersicht.vertriebNichtErreichbarTitel}>{t.uebersicht.vertriebNichtErreichbar}</UnavailableNote>
+          </div>
+        ) : null}
+      </section>
+
+      <div className="mt-10 grid gap-10 lg:grid-cols-[2fr_1fr] lg:gap-12">
+        {/* ── 2 · Heute zu tun ── */}
         <section aria-labelledby="heute-titel" className="min-w-0">
+          {/* Ohne Messung keine Zahl — „0 Punkte“ wäre eine Behauptung über das Geschäft. */}
           <SectionHeader
             id="heute-titel"
-            title="Aufmerksamkeit"
-            count={
-              board.items.length === 0
-                ? "nichts offen"
-                : `${board.items.length} ${board.items.length === 1 ? "Punkt" : "Punkte"}`
-            }
+            title={t.uebersicht.heuteTitel}
+            count={board.salesMeasured ? t.uebersicht.punkte(operativ.length) : t.uebersicht.nichtGemessen}
           />
-
-          {board.items.length === 0 ? (
-            <p className="type-body text-foreground/85 mt-5 max-w-2xl text-pretty">
-              {board.salesMeasured
-                ? "Nichts fällig. Kein Vorgang schuldet heute einen Schritt, keine Anfrage wartet, kein Betriebspunkt ist offen."
-                : "Aus dem Materialstand ist nichts offen. Der Vertrieb konnte nicht gemessen werden — was dort liegt, steht hier nicht."}
-            </p>
-          ) : (
-            <ul className="mt-5 flex flex-col gap-2.5">
-              {board.items.map((item) => (
-                <li key={item.id}>
-                  <Link href={item.href} className="group block">
-                    <Surface
-                      padding="sm"
-                      className="flex items-baseline justify-between gap-6"
-                    >
-                      <span className="min-w-0">
-                        <span className="text-subhead block text-sm group-hover:underline group-hover:underline-offset-4">
-                          {item.title}
-                        </span>
-                        {item.detail ? (
-                          <span className="type-small text-muted-foreground mt-1 block text-pretty">
-                            {item.detail}
-                          </span>
-                        ) : null}
-                      </span>
-                      <span className="flex shrink-0 items-baseline gap-2">
-                        {item.due ? (
-                          <span className="text-meta text-muted-foreground tabular-nums">
-                            {faellig(item.due)}
-                          </span>
-                        ) : null}
-                        <Pill severity={RANK_SEVERITY[item.rank]}>
-                          {ATTENTION_LABELS[item.rank]}
-                        </Pill>
-                      </span>
-                    </Surface>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {!hasStore ? (
-            <div className="mt-5">
-              {/* ADM-02 · A19 — ohne Datenbank fehlt der Vertrieb in dieser Liste; das muss hier stehen, nicht nur unter Vertrieb. */}
-              <UnavailableNote title="Vertrieb nicht eingerichtet">
-                Die Kunden- und Anfragedatenbank ist für diese Umgebung nicht
-                eingerichtet. Neue Anfragen, offene Vorgänge und fällige
-                Kontaktpflege können deshalb hier nicht erscheinen — das ist
-                keine Null, sondern eine fehlende Verbindung.
-              </UnavailableNote>
-            </div>
-          ) : null}
-
-          {hasStore && !board.salesMeasured ? (
-            <div className="mt-5">
-              <UnavailableNote title="Vertrieb nicht erreichbar — nicht gemessen">
-                Ein Lead-Speicher ist eingerichtet, war aber gerade nicht
-                erreichbar. Offene Vorgänge, neue Anfragen und fällige
-                Kontaktpflege fehlen deshalb in dieser Liste. Das ist keine
-                Null, sondern eine fehlende Messung.
-              </UnavailableNote>
-            </div>
+          {board.salesMeasured && operativ.length === 0 ? (
+            <Surface padding="sm" className="mt-5">
+              <p className="type-body text-foreground/85 text-pretty">{t.uebersicht.heuteLeer}</p>
+              <p className="type-small text-muted-foreground mt-2 text-pretty">{t.uebersicht.heuteLeerNaechstes}</p>
+              <div className="mt-3 flex flex-wrap gap-5">
+                <Link href="/admin/vertrieb/anfragen" className="text-gold-text text-sm underline underline-offset-4">
+                  {t.uebersicht.zuDenAnfragen}
+                </Link>
+                <Link href="/admin/vertrieb/pipeline" className="text-gold-text text-sm underline underline-offset-4">
+                  {t.uebersicht.zurPipeline}
+                </Link>
+              </div>
+            </Surface>
+          ) : operativ.length > 0 ? (
+            <>
+              <Punktliste items={operativ} t={t} intl={intl} />
+              {abgeschnitten ? <p className="type-small text-muted-foreground mt-3">{t.uebersicht.weitere(gezaehlt)}</p> : null}
+            </>
           ) : null}
         </section>
 
-        {/* ── Nebenspalte ── */}
-        <aside className="min-w-0 flex flex-col gap-10">
-          <section aria-labelledby="material-titel">
-            <SectionHeader
-              id="material-titel"
-              title="Material"
-              count={`${open.length} offen · ${done.length} steht`}
-            />
+        <aside className="flex min-w-0 flex-col gap-10">
+          {/* ── 3 · Systemzustand ── */}
+          <section aria-labelledby="system-titel">
+            <SectionHeader id="system-titel" title={t.uebersicht.systemTitel} count={betrieb.length ? t.uebersicht.punkte(betrieb.length) : undefined} />
+            {betrieb.length === 0 ? (
+              <p className="type-small text-muted-foreground mt-4">{t.uebersicht.systemOk}</p>
+            ) : (
+              <Punktliste items={betrieb} t={t} intl={intl} />
+            )}
+            <p className="type-small text-muted-foreground mt-4">{t.uebersicht.materialZeile(board.materialRest)}</p>
+            <Link href="/admin/material" className="text-gold-text mt-2 inline-block text-sm underline underline-offset-4">
+              {t.uebersicht.zumSystem}
+            </Link>
+          </section>
 
-            {open.length === 0 ? (
-              <p className="type-small text-muted-foreground mt-5 max-w-2xl text-pretty">
-                Nichts offen. Jedes Material, das die Website zeigen könnte, ist
-                da.
-              </p>
+          {/* ── 4 · Entscheidungen ── */}
+          <section aria-labelledby="entscheidungen-titel">
+            <SectionHeader id="entscheidungen-titel" title={t.uebersicht.entscheidungenTitel} count={entscheidungen.length ? t.uebersicht.punkte(entscheidungen.length) : undefined} />
+            {entscheidungen.length === 0 ? (
+              <p className="type-small text-muted-foreground mt-4">{t.uebersicht.entscheidungenLeer}</p>
             ) : (
               <>
-                <p className="type-small text-muted-foreground mt-4 text-pretty">
-                  Nach Bereichen geordnet, der größte zuerst. Gearbeitet wird im
-                  Materialstand.
-                </p>
-
-                <ul className="mt-5 flex flex-col gap-2.5">
-                  {byGroup.map((group) => (
-                    <li key={group.key}>
-                      <Surface
-                        padding="sm"
-                        className="flex items-baseline justify-between gap-6"
-                      >
-                        <span className="text-subhead min-w-0 text-sm">
-                          {group.label}
-                        </span>
-                        <span className="text-meta text-gold-text shrink-0 tabular-nums">
-                          {group.count} offen
-                        </span>
-                      </Surface>
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href="/admin/material"
-                  className="text-gold-text mt-5 inline-block text-sm underline underline-offset-4"
-                >
-                  Zum Materialstand
-                </Link>
+                <Punktliste items={entscheidungen.slice(0, ENTSCHEIDUNGEN_SICHTBAR)} t={t} intl={intl} ohneRang />
+                {entscheidungen.length > ENTSCHEIDUNGEN_SICHTBAR ? (
+                  <Link href="/admin/material#gruppe-entscheidungen" className="text-gold-text mt-3 inline-block text-sm underline underline-offset-4">
+                    {t.uebersicht.alleEntscheidungen(entscheidungen.length)}
+                  </Link>
+                ) : null}
               </>
             )}
           </section>
-
-          {hasStore ? null : (
-            <section aria-labelledby="vertrieb-titel">
-              <SectionHeader id="vertrieb-titel" title="Vertrieb" />
-              <div className="mt-5">
-                <UnavailableNote title="Keine Lead-Quelle">
-                  Es ist kein Lead-Speicher eingerichtet (<code>LEAD_STORE</code>{" "}
-                  ist nicht gesetzt). Anfragen laufen heute ausschließlich als
-                  E-Mail ins Postfach — sie sind also nicht verloren, aber hier
-                  nicht zählbar. Das ist keine Null, sondern eine fehlende
-                  Messung.
-                </UnavailableNote>
-              </div>
-            </section>
-          )}
         </aside>
       </div>
     </AdminShell>
+  )
+}
+
+/**
+ * Interne Kennungen am Ende eines Titels („(§10.6)“, „(BF-8)“, „(MP10-2.10)“)
+ * sind Arbeitsnotizen, keine Geschäftssprache. Sie stammen aus
+ * `lib/material-status.ts` (G18-gesperrt) — geändert wird dort nichts, nur
+ * hier nicht angezeigt. Im Materialstand unter System bleiben sie sichtbar.
+ */
+function ohneKennung(titel: string): string {
+  return titel.replace(/\s*\((?:§\s*[\d.]+|[A-Z]{1,5}\d*(?:[-.][\w.]+)+)\)\s*$/u, "").trim()
+}
+
+function Punktliste({
+  items,
+  t,
+  intl,
+  ohneRang = false,
+}: {
+  items: AttentionItem[]
+  t: Awaited<ReturnType<typeof adminSprachKontext>>["t"]
+  intl: string
+  ohneRang?: boolean
+}) {
+  return (
+    <ul className="mt-5 flex flex-col gap-2.5">
+      {items.map((item) => (
+        <li key={item.id}>
+          <Link href={item.href} className="group block">
+            <Surface padding="sm" className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+              <span className="min-w-0">
+                <span className="text-subhead block text-sm group-hover:underline group-hover:underline-offset-4">{ohneKennung(item.title)}</span>
+                {item.anfrage ? (
+                  <span className="type-small text-muted-foreground mt-1 block">{t.uebersicht.anfrageMeta(item.anfrage.quelle, item.anfrage.referenz)}</span>
+                ) : item.detail ? (
+                  <span className="type-small text-muted-foreground mt-1 block text-pretty">{item.detail}</span>
+                ) : null}
+              </span>
+              <span className="flex shrink-0 items-baseline gap-2">
+                {item.due ? (
+                  <span className="text-meta text-muted-foreground tabular-nums">{t.uebersicht.faelligAm(datumAnzeige(item.due, intl))}</span>
+                ) : null}
+                {ohneRang ? null : <Pill severity={SCHWERE[item.rank]}>{t.rang[item.rank]}</Pill>}
+              </span>
+            </Surface>
+          </Link>
+        </li>
+      ))}
+    </ul>
   )
 }
