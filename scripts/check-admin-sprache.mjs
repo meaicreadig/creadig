@@ -67,6 +67,23 @@ const MIGRIERT = new Set([
   "app/(admin)/admin/vertrieb/anfragen/neu/page.tsx",
   "components/admin/anfrage-erfassen-formular.tsx",
   "components/admin/activity-log.tsx",
+  "app/(admin)/admin/vertrieb/pipeline/[id]/page.tsx",
+  "components/admin/angebot-mappe.tsx",
+  "components/admin/lieferung-mappe.tsx",
+  "app/(admin)/admin/vertrieb/pipeline/page.tsx",
+  "app/(admin)/admin/vertrieb/verlust/page.tsx",
+  "app/(admin)/admin/vertrieb/page.tsx",
+  "app/(admin)/admin/kunden/page.tsx",
+  "app/(admin)/admin/vertrieb/beziehungen/page.tsx",
+  "app/(admin)/admin/vertrieb/recherche/page.tsx",
+  "app/(admin)/admin/vertrieb/recherche/[id]/page.tsx",
+  "app/(admin)/admin/kunden/[id]/page.tsx",
+  "app/(admin)/admin/vertrieb/beziehungen/[id]/page.tsx",
+  "app/(admin)/admin/beleg/page.tsx",
+  "app/(admin)/error.tsx",
+  "app/(admin)/admin/material/page.tsx",
+  "components/admin/lage-register.tsx",
+  "components/admin/primitives.tsx",
 ])
 const dateien = ["components/admin", "app/(admin)"]
   .flatMap((d) => readdirSync(d, { recursive: true }).map((f) => join(d, String(f))))

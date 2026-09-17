@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from "react"
 
+import { adminTexte, type AdminSprache } from "@/lib/admin-i18n"
 import { cn } from "@/lib/utils"
 
 /**
@@ -144,10 +145,11 @@ export function DataValue({
  * beruhigendere Zahl zeigen. `title` macht es auch für Vorleseprogramme und
  * für die Maus eindeutig.
  */
-export function Unknown() {
+export function Unknown({ sprache = "de" }: { sprache?: AdminSprache }) {
+  const t = adminTexte(sprache).primitives
   return (
-    <span className="text-muted-foreground" title="Keine Angabe">
-      —<span className="sr-only"> keine Angabe</span>
+    <span className="text-muted-foreground" title={t.keineAngabe}>
+      —<span className="sr-only"> {t.keineAngabeKlein}</span>
     </span>
   )
 }
@@ -206,7 +208,8 @@ export function Speicherstand({
   wartet,
   ok,
   punkte,
-  erfolgssatz = "Gespeichert.",
+  erfolgssatz,
+  sprache = "de",
 }: {
   wartet: boolean
   /**
@@ -224,7 +227,10 @@ export function Speicherstand({
    */
   punkte: { wo: string; satz: string }[]
   erfolgssatz?: string
+  sprache?: AdminSprache
 }) {
+  const texte = adminTexte(sprache)
+  const t = texte.primitives
   const gescheitert = ok === false && punkte.length > 0
   const gelungen = ok === true
   if (!wartet && !gescheitert && !gelungen) return null
@@ -232,14 +238,13 @@ export function Speicherstand({
   return (
     <div role="status" aria-live="polite" className="mt-4">
       {wartet ? (
-        <p className="type-small text-muted-foreground">Wird gespeichert …</p>
+        <p className="type-small text-muted-foreground">{texte.formular.speichernLaeuft}</p>
       ) : gelungen ? (
-        <p className="type-small text-gold-text">{erfolgssatz}</p>
+        <p className="type-small text-gold-text">{erfolgssatz ?? t.gespeichert}</p>
       ) : (
         <Surface padding="sm">
           <p className="type-small text-subhead">
-            Das geht so nicht hinaus — {punkte.length} offene
-            {punkte.length === 1 ? "r Punkt" : " Punkte"}:
+            {t.offenePunkte(punkte.length)}
           </p>
           <ul className="mt-3 flex flex-col gap-2">
             {punkte.map((b, i) => (
@@ -278,18 +283,19 @@ export function Abschneidehinweis({
   gezeigt,
   grenze,
   wie,
+  sprache = "de",
 }: {
   gezeigt: number
   grenze: number
   /** Was der Owner tun kann, um den Rest zu sehen. */
   wie: string
+  sprache?: AdminSprache
 }) {
+  const t = adminTexte(sprache).primitives
   if (gezeigt < grenze) return null
   return (
     <p className="type-small text-muted-foreground border-line mt-4 border-s-2 py-1 ps-4 text-pretty">
-      Diese Liste zeigt {grenze} Eintraege — die Obergrenze. Ob es mehr gibt, steht hier nicht.
-      {" "}
-      {wie}
+      {t.abschneidehinweis(grenze, wie)}
     </p>
   )
 }

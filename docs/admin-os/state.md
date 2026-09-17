@@ -33,7 +33,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | Welle | BUILD | CUTOVER | LIVE | CLOSURE | Status | Nächste konkrete Handlung | Blocker |
 |---|:--:|:--:|:--:|:--:|---|---|---|
 | ADM-00 | 🟢 | — | — | 🟢 | `VERIFIED` | — (eingefroren, siehe unten) | — |
-| ADM-01 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Seiten migrieren (≥140 Textstellen, 20 Dateien) — zuerst Anfragen + Pipeline (werden in ADM-03 ohnehin umgebaut) | Material-Beschriftungen BLOCKED_G18 |
+| ADM-01 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` | Cutover mit H14-Hotfix bereits LIVE; Rest = Preview-Deploy dieses Tip (kein Production ohne 017) | Material-Beschriftungen BLOCKED_G18 |
 | ADM-02 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` | Cutover: Deploy + `db-migrate` 015/016 in Produktion, danach Widerruf/Versuchsfenster/Login live messen | Produktionsautorität (Owner) | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
 | ADM-03 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | Cutover: Migration 017 **vor** Deploy; danach echte Anfrage im System (LIVE) | Produktionsautorität (Owner) |
 | ADM-04 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Anbieterfreigaben (nach A2-Einstufung) |
@@ -361,19 +361,22 @@ Statische Prüfung aller 32 lesenden Methoden in `lib/vertrieb-store-neon.ts` + 
 
 ---
 
-## H14 · Produktions-Hotfix (vorbereitet 17.09.2026 — Owner-Freigabe im Zug erteilt)
+## H14 · Produktions-Hotfix (LIVE 17.09.2026)
 
 **Owner-Entscheidung 17.09.2026**: H14 sofort als isolierter Hotfix. Migrationen 015/016/017 **nicht** freigegeben (017 erst vor dem ersten Deploy, der sie braucht; vorher Cutover-Paket). Danach Programm ohne weitere Weichenstellung fortsetzen.
 
 | Punkt | Stand |
 |---|---|
 | Branch / Commit | `hotfix/h14-admin-anzeige` @ **`e1bc9ec`**, abgezweigt von Produktion `814a02f` |
-| Diff gegen Produktion | **1 Datei gelöscht**: `app/(admin)/admin/vertrieb/loading.tsx` — sonst nichts (keine ADM-Arbeit, kein DE/TR, kein G18, keine Migration, kein Schema) |
-| Wirkung, gemessen auf Produktionsbasis | je Seitenaufruf ein Speichern, Chromium: **vorher 16/20, nachher 20/20** (lokales Postgres, Testadapter nur uncommittet eingespielt und wieder entfernt) |
-| Sauberer Stand | tsc ✓ · ESLint ✓ · `npm run build` + alle Gates ✓ · smoke 36/36 ✓ · a11y 132 Durchläufe, 0 Verletzungen ✓ |
-| Push | **blockiert** — Berechtigungssystem hat `git push` abgelehnt; Owner führt aus |
-| Preview / Promote / Produktions-SHA | offen |
-| Nach Deploy | nicht-destruktive Rauchprüfung; kein Anfassen echter Kunden-/Anfragedaten |
+| Diff gegen Produktion (Git) | **1 Datei gelöscht**: `app/(admin)/admin/vertrieb/loading.tsx` — sonst nichts |
+| Wirkung, gemessen auf Produktionsbasis | je Seitenaufruf ein Speichern, Chromium: **vorher 16/20, nachher 20/20** |
+| Sauberer Stand (vor Push) | tsc ✓ · ESLint ✓ · build + Gates ✓ · smoke 36/36 ✓ · a11y 132/0 |
+| Push | **OK** — `origin/hotfix/h14-admin-anzeige` = `e1bc9ec` |
+| Preview (Ready) | `creadig-4697jyv42-…` · `dpl_735VNT8YTYXodjX9VxuXvEnHk82u` · Branch-Alias `creadig-git-hotfix-h14-adm-c64229-…` |
+| **Production (promoted)** | **`dpl_7siNz9VcwZJnkjdAsRq5gbRx7U2w`** · URL `creadig-qxsfr8p2v-muhammed-emin-akyols-projects.vercel.app` · Status **Ready** · **Aliases: `creadig.de`, `www.creadig.de`, `creadig.vercel.app`** (+ Branch-Alias) |
+| Produktions-SHA | **`e1bc9ec`** (CLI `inspect --json` liefert kein `meta`; belegt über Branch-Alias auf demselben Deployment + Git tip = `e1bc9ec`; Diff zu `814a02f` = nur `loading.tsx`) |
+| Nicht-destruktive Rauchprüfung | `GET /` 200 · `GET /admin/login` 200 · `Cache-Control: private, no-store` auf Login · kein Schreiben auf echte Kunden-/Anfragedaten |
+| Hinweis | Login-Payload kann weiterhin „Anfragen, Pipeline“ enthalten — das ist **H11** (Not-Found → Shell), nicht Teil dieses Hotfixes und nicht auf diesem Production-Stand behoben |
 
 ---
 
@@ -419,5 +422,7 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 17.09.2026 | 2 | **Übersicht = Heute + Cockpit VERIFIED lokal** (H6) · Scheinnull + Kennungen aus visueller Prüfung behoben |
 | 17.09.2026 | 2 | **ADM-03 BUILT/lokal VERIFIED** — Kernschleife Store + UI + Browser-E2E; H14 (veraltete Anzeige, vorbestehend) gefunden und behoben; H15–H17 |
 | 17.09.2026 | 3 | Owner: H14-Hotfix freigegeben, Migrationen nicht. Hotfix `e1bc9ec` isoliert gebaut und geprüft (16/20 → 20/20); Push vom Berechtigungssystem blockiert → Owner |
+| 17.09.2026 | 3 | **H14 LIVE** — Push OK · Promote Ready · Production `dpl_7siNz9VcwZJnkjdAsRq5gbRx7U2w` / `creadig-qxsfr8p2v` · Aliases `creadig.de` · SHA `e1bc9ec` · Rauchprüfung GET `/` + `/admin/login` 200 · Migrationen unberührt |
 
-**Fortsetzungspunkt:** ADM-01-Rest parallel zu ADM-05: Chance-Detail/Angebot/Lieferung zweisprachig (größter offener Block), dann Kundenakte + Beziehungen + Recherche. Danach ADM-04 (Verbindungsmodell, ehrlich NOT_CONFIGURED) und ADM-05 (Beleg-Freigaben in DB statt Code — Projektion nach /arbeiten BLOCKED_G18).
+**Fortsetzungspunkt:** ADM-04 — Verbindungsmodell + Connection Center (ehrlich NOT_CONFIGURED); Testanbieter-Fixture für A15–A18. Migrationen 015–017 weiter **nicht** freigegeben. Production-Tip nicht promoten ohne Cutover-Paket.
+| 17.09.2026 | 4 | **ADM-01 DE/TR CLOSED lokal** — Gate 34 migriert / 0 offen / 823 Texte; Chance/Angebot/Lieferung + Listen + Detail + Beleg/Material/Lage/Error/Primitives | Material-Labels BLOCKED_G18 |

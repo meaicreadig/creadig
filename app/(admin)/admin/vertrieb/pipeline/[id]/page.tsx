@@ -55,14 +55,17 @@ import { GESCHAEFTS_ZEITZONE, datumAnzeige, geschaeftsTag } from "@/lib/geschaef
  */
 export const dynamic = "force-dynamic"
 
-export const metadata = { title: "Verkaufschance" }
+export async function generateMetadata() {
+  const { t } = await adminSprachKontext()
+  return { title: t.chance.titel }
+}
 
 export default async function ChanceDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const konflikt = (await leseHinweis(id)) === "konflikt"
-  const { t, intl } = await adminSprachKontext()
+  const { t, intl, sprache } = await adminSprachKontext()
   const store = getVertriebStore()
-  if (!store) return <VertriebShell title="Verkaufschance" available={false}>{null}</VertriebShell>
+  if (!store) return <VertriebShell title={t.chance.titel} available={false}>{null}</VertriebShell>
 
   let opp, activities, lead, angebote, projekte
   try {
@@ -75,7 +78,7 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
       store.listProjects(id),
     ])
   } catch {
-    return <VertriebShell title="Verkaufschance" available={false}>{null}</VertriebShell>
+    return <VertriebShell title={t.chance.titel} available={false}>{null}</VertriebShell>
   }
 
   const closed = TERMINAL_STATES.includes(opp.status)
@@ -91,16 +94,16 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
   return (
     <VertriebShell
       title={opp.title}
-      lead={opp.organisationName ? `Organisation: ${opp.organisationName}` : undefined}
+      lead={opp.organisationName ? t.chance.organisationLead(opp.organisationName) : undefined}
       meta={
         <Pill severity={opp.status === "lost" ? "critical" : closed ? "neutral" : "attention"}>
-          {SALES_LABELS_DE[opp.status]}
+          {t.begriffe.stufe[opp.status] ?? SALES_LABELS_DE[opp.status]}
         </Pill>
       }
       available
     >
       <Link href="/admin/vertrieb/pipeline" className="text-gold-text text-sm underline underline-offset-4">
-        ← Zur Pipeline
+        {t.chance.zurPipeline}
       </Link>
 
       {konflikt ? (
@@ -113,7 +116,7 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
         <div className="min-w-0">
           {/* ── Status ── */}
           <section aria-labelledby="status-titel">
-            <SectionHeader id="status-titel" title="Status" />
+            <SectionHeader id="status-titel" title={t.chance.statusTitel} />
             {/*
               GATE 4 — DIE REGEL STEHT DA, WO ENTSCHIEDEN WIRD.
 
@@ -129,11 +132,11 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
             */}
             <Surface padding="sm" className="mt-4">
               <p className="type-small text-foreground/90 text-pretty">
-                <span className="text-subhead">{SALES_LABELS_DE[opp.status]}: </span>
+                <span className="text-subhead">{t.begriffe.stufe[opp.status] ?? SALES_LABELS_DE[opp.status]}: </span>
                 {STAGE_RULES[opp.status].meaning}
               </p>
               <p className="type-small text-muted-foreground mt-2 text-pretty">
-                Hierher gehört ein Vorgang, wenn: {STAGE_RULES[opp.status].entry}
+                {t.chance.hierherWenn} {STAGE_RULES[opp.status].entry}
               </p>
             </Surface>
 
@@ -159,7 +162,7 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
             <form action={setOpportunityStatus.bind(null, opp.id)} className="mt-5 flex flex-wrap items-end gap-4">
               {/* ADM-03 · A09 — der Stand, den diese Seite gesehen hat. */}
               <input type="hidden" name="stand" value={opp.updatedAt} />
-              <AdminField label="Pipeline-Status" htmlFor="status">
+              <AdminField label={t.chance.pipelineStatus} htmlFor="status">
                 {/*
                   `audit` wird nicht mehr angeboten — Gate 3 hat entschieden,
                   dass zwischen Gespräch und Angebot EIN Schritt liegt, und der
@@ -169,11 +172,11 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                 */}
                 <AdminSelect id="status" name="status" defaultValue={opp.status}>
                   {(opp.status === "audit" ? SALES_STATES : OFFERED_STAGES).map((s) => (
-                    <option key={s} value={s}>{SALES_LABELS_DE[s]}</option>
+                    <option key={s} value={s}>{t.begriffe.stufe[s] ?? SALES_LABELS_DE[s]}</option>
                   ))}
                 </AdminSelect>
               </AdminField>
-              <AdminField label="Grund — nur bei „Verloren“" htmlFor="lostReason" className="flex-1 basis-64">
+              <AdminField label={t.chance.verlustGrund} htmlFor="lostReason" className="flex-1 basis-64">
                 {/*
                   GATE 16 — HIER STAND EIN `<input list=…>`.
 
@@ -189,9 +192,9 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                   Zielbild, und ein Satz konnte das nie.
                 */}
                 <AdminSelect id="lostReason" name="lostReason" defaultValue={opp.lostReason ?? ""}>
-                  <option value="">— kein Grund —</option>
+                  <option value="">{t.chance.keinGrund}</option>
                   {LOST_REASONS.map((r) => (
-                    <option key={r} value={r}>{r}</option>
+                    <option key={t.begriffe.verlustGrund[r] ?? r} value={r}>{r}</option>
                   ))}
                   {/*
                     Altbestand: Steht im Datensatz ein Freitext von früher,
@@ -200,40 +203,38 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                     speichert, ohne ihn anzufassen, verlöre ihn sonst.
                   */}
                   {opp.lostReason && !(LOST_REASONS as readonly string[]).includes(opp.lostReason) && (
-                    <option value={opp.lostReason}>{opp.lostReason} (Altbestand)</option>
+                    <option value={opp.lostReason}>{opp.lostReason} {t.chance.altbestand}</option>
                   )}
                 </AdminSelect>
               </AdminField>
-              <button type="submit" className="cta-quiet px-4 py-2 text-sm">Status speichern</button>
+              <button type="submit" className="cta-quiet px-4 py-2 text-sm">{t.chance.statusSpeichern}</button>
             </form>
           </section>
 
           {/* ── Nächster Schritt ── */}
           <section aria-labelledby="schritt-titel" className="mt-10">
-            <SectionHeader id="schritt-titel" title="Nächster Schritt" />
+            <SectionHeader id="schritt-titel" title={t.chance.schrittTitel} />
             <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
-              Ein Satz genügt. Das Feld leer zu lassen löscht den Schritt und
-              sein Datum — es gibt hier absichtlich kein Aufgabenverwaltungssystem.
+              {t.chance.schrittHinweis}
               {STAGE_RULES[opp.status].suggests && (
-                <> Auf dieser Stufe steht meist an:{" "}
+                <> {t.chance.schrittMeistens}{" "}
                   <span className="text-foreground">{STAGE_RULES[opp.status].suggests}</span>.
                 </>
               )}
             </p>
             {STAGE_RULES[opp.status].active && !opp.nextAction && (
               <p className="text-destructive type-small mt-3">
-                Kein nächster Schritt. Ein laufender Vorgang ohne Schritt fällt
-                aus jeder Ansicht heraus, bis ihn jemand zufällig wiederfindet.
+                {t.chance.schrittFehlt}
               </p>
             )}
             <form action={setOpportunityNextAction.bind(null, opp.id)} className="mt-4 flex flex-wrap items-end gap-4">
-              <AdminField label="Was passiert als Nächstes" htmlFor="nextAction" className="flex-1 basis-64">
+              <AdminField label={t.chance.wasAlsNaechstes} htmlFor="nextAction" className="flex-1 basis-64">
                 <AdminInput
                   id="nextAction"
                   name="nextAction"
                   list="naechste-schritte"
                   defaultValue={opp.nextAction ?? ""}
-                  placeholder="z. B. Rückruf mit Terminvorschlag"
+                  placeholder={t.chance.schrittPlatzhalter}
                 />
                 {/* Vorschläge, keine Liste zum Auswählen: Der zwölfte Fall
                     kommt garantiert, und dann soll dort die Wahrheit stehen
@@ -242,14 +243,14 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                   {NEXT_ACTIONS.map((a) => <option key={a} value={a} />)}
                 </datalist>
               </AdminField>
-              <AdminField label="Bis wann" htmlFor="nextActionAt">
+              <AdminField label={t.chance.bisWann} htmlFor="nextActionAt">
                 <AdminInput id="nextActionAt" name="nextActionAt" type="date" defaultValue={opp.nextActionAt ?? ""} />
               </AdminField>
-              <button type="submit" className="cta-quiet px-4 py-2 text-sm">Schritt speichern</button>
+              <button type="submit" className="cta-quiet px-4 py-2 text-sm">{t.chance.schrittSpeichern}</button>
             </form>
             {overdue && (
               <p className="text-destructive type-small mt-3">
-                Überfällig seit {formatDate(opp.nextActionAt!)}.
+                {t.chance.ueberfaelligSeit(formatDate(opp.nextActionAt!))}
               </p>
             )}
           </section>
@@ -267,15 +268,15 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
               Frage da. Eine Quote laedt dazu ein, Haken zu setzen, damit sie
               steigt; eine offene Frage laedt dazu ein, sie zu beantworten. */}
           <section aria-labelledby="angebot-titel" className="mt-10">
-            <SectionHeader id="angebot-titel" title="Angebot" />
+            <SectionHeader id="angebot-titel" title={t.chance.angebotTitel} />
             <form action={setOpportunityOffer.bind(null, opp.id)} className="mt-4">
-              <AdminField label="Was wird angeboten" htmlFor="offerKind">
+              <AdminField label={t.chance.wasWirdAngeboten} htmlFor="offerKind">
                 <AdminSelect id="offerKind" name="offerKind" defaultValue={opp.offerKind ?? ""}>
-                  <option value="">Noch nicht entschieden</option>
+                  <option value="">{t.chance.nochNichtEntschieden}</option>
                   {OFFER_KINDS.map((k) => (
                     <option key={k} value={k}>
                       {OFFERS[k].label}
-                      {OFFERS[k].publicPrice ? ` — ${OFFERS[k].publicPrice}` : " — nach Zuschnitt"}
+                      {OFFERS[k].publicPrice ? ` — ${OFFERS[k].publicPrice}` : "{t.chance.nachZuschnitt}"}
                     </option>
                   ))}
                 </AdminSelect>
@@ -284,7 +285,7 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
               {opp.offerKind && (
                 <fieldset className="mt-6">
                   <legend className="type-small text-muted-foreground">
-                    Was dafür belegt ist — bestätigen Sie nur, was Sie wissen.
+                    {t.chance.belegeLegende}
                   </legend>
                   <div className="mt-4 flex flex-col gap-4">
                     {OFFERS[opp.offerKind].evidence.map((e) => {
@@ -309,17 +310,17 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                 </fieldset>
               )}
               <button type="submit" className="cta-quiet mt-5 px-4 py-2 text-sm">
-                Angebot speichern
+                {t.chance.angebotSpeichern}
               </button>
             </form>
 
             {readiness && (
               <p className={`type-small mt-5 ${readiness.ready ? "text-gold-text" : "text-muted-foreground"}`}>
                 {readiness.ready ? (
-                  <>Angebotsreif. Eine Zahl kann genannt werden.</>
+                  <>{t.chance.angebotsreif}</>
                 ) : (
                   <>
-                    Noch offen, bevor eine Zahl genannt wird:{" "}
+                    {t.chance.nochOffen}{" "}
                     {readiness.open.map((e) => e.label).join(" · ")}
                   </>
                 )}
@@ -339,11 +340,9 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
               Dieselbe Luecke wie in Gate 12: Der Aktenschrank stand, der
               Stift lag daneben, und der Weg, eine Akte anzulegen, fehlte. */}
           <section aria-labelledby="angebotsmappe-titel" className="mt-10">
-            <SectionHeader id="angebotsmappe-titel" title="Angebotsdokument" />
+            <SectionHeader id="angebotsmappe-titel" title={t.chance.angebotsdokumentTitel} />
             <p className="type-small text-muted-foreground mt-2 max-w-2xl text-pretty">
-              Neun Abschnitte nach dem Hausschema. Gesendet wird nur, was vollständig ist und dessen
-              Angebotsreife oben steht — und angenommen nur mit Person, Form, Datum und Fundstelle.
-              Ein Ja ohne diese vier ist ein Haken.
+              {t.chance.angebotsdokumentHinweis}
             </p>
             <div className="mt-5">
               <AngebotMappe
@@ -351,6 +350,7 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                 referenz={lead?.reference ?? ""}
                 offerKind={opp.offerKind}
                 angebote={angebote ?? []}
+                sprache={sprache}
                 speichern={saveAngebotEntwurf}
                 senden={sendAngebot}
                 annehmen={acceptAngebot}
@@ -371,11 +371,9 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
               wirkten nirgends — dieselbe Bauart wie in G13, G15, G16 und
               G17. */}
           <section aria-labelledby="lieferung-titel" className="mt-10">
-            <SectionHeader id="lieferung-titel" title="Lieferung & Abnahme" />
+            <SectionHeader id="lieferung-titel" title={t.chance.lieferungTitel} />
             <p className="type-small text-muted-foreground mt-2 max-w-2xl text-pretty">
-              Der Livetermin steht hier nicht als Feld — er wird aus dem Materialeingang gerechnet.
-              Eine Änderung wirkt erst mit Zustimmung, und übergeben ist erst, was alle vier Stücke
-              aus dem öffentlichen Versprechen enthält.
+              {t.chance.lieferungHinweis}
             </p>
             <div className="mt-5">
               <LieferungMappe
@@ -384,6 +382,7 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                   .filter((a) => a.zustand === "angenommen")
                   .map((a) => ({ id: a.id, referenz: a.referenz }))}
                 projekte={projekte ?? []}
+                sprache={sprache}
                 starten={projektStarten}
                 material={materialEingetroffen}
                 abnahme={abnahmeEintragen}
@@ -394,12 +393,12 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
 
           {/* ── Notiz ── */}
           <section aria-labelledby="notiz-titel" className="mt-10">
-            <SectionHeader id="notiz-titel" title="Notiz" />
+            <SectionHeader id="notiz-titel" title={t.chance.notizTitel} />
             <form action={setOpportunityNote.bind(null, opp.id)} className="mt-4">
-              <AdminField label="Intern" htmlFor="note">
-                <AdminTextarea id="note" name="note" rows={4} defaultValue={opp.note ?? ""} placeholder="Was man beim nächsten Mal wissen muss." />
+              <AdminField label={t.chance.notizIntern} htmlFor="note">
+                <AdminTextarea id="note" name="note" rows={4} defaultValue={opp.note ?? ""} placeholder={t.chance.notizPlatzhalter} />
               </AdminField>
-              <button type="submit" className="cta-quiet mt-4 px-4 py-2 text-sm">Notiz speichern</button>
+              <button type="submit" className="cta-quiet mt-4 px-4 py-2 text-sm">{t.chance.notizSpeichern}</button>
             </form>
           </section>
 
@@ -422,47 +421,47 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
             <button type="submit" className="cta-quiet min-h-11 px-4 py-2 text-sm">{t.formular.speichern}</button>
           </form>
 
-          <SectionHeader title="Beteiligte" />
+          <SectionHeader title={t.chance.beteiligte} />
           <dl className="mt-4 flex flex-col gap-4">
-            <DataValue label="Kontakt">
+            <DataValue label={t.chance.kontakt}>
               {opp.contactId ? (
                 <Link href={`/admin/vertrieb/beziehungen/${opp.contactId}`} className="text-gold-text underline underline-offset-4">
-                  {opp.contactName ?? "öffnen"}
+                  {opp.contactName ?? t.chance.oeffnen}
                 </Link>
               ) : null}
             </DataValue>
-            <DataValue label="Organisation">{opp.organisationName}</DataValue>
+            <DataValue label={t.chance.organisation}>{opp.organisationName}</DataValue>
           </dl>
 
           <div className="mt-10">
-            <SectionHeader title="Herkunft" as="h3" />
+            <SectionHeader title={t.chance.herkunft} as="h3" />
             <dl className="mt-4 flex flex-col gap-4">
-              <DataValue label="Quelle">{opp.source}</DataValue>
-              <DataValue label="Aus Anfrage">
+              <DataValue label={t.chance.quelle}>{opp.source}</DataValue>
+              <DataValue label={t.chance.ausAnfrage}>
                 {lead ? (
                   <Link href={`/admin/vertrieb/anfragen/${lead.id}`} className="text-gold-text font-mono text-xs underline underline-offset-4">
                     {lead.reference}
                   </Link>
                 ) : null}
               </DataValue>
-              <DataValue label="Geschätzter Wert">
+              <DataValue label={t.chance.geschaetzterWert}>
                 {/* `null` heisst nicht geschätzt — nicht null Euro. */}
-                {opp.estimatedValue === null ? null : `${opp.estimatedValue.toLocaleString("de-DE")} €`}
+                {opp.estimatedValue === null ? null : `${opp.estimatedValue.toLocaleString(intl)} €`}
               </DataValue>
             </dl>
           </div>
 
           <div className="mt-10">
-            <SectionHeader title="Zeiten" as="h3" />
+            <SectionHeader title={t.chance.zeiten} as="h3" />
             <dl className="mt-4 flex flex-col gap-4">
-              <DataValue label="Angelegt">
-                <time dateTime={opp.createdAt}>{formatDateTime(opp.createdAt)}</time>
+              <DataValue label={t.chance.angelegt}>
+                <time dateTime={opp.createdAt}>{formatDateTime(opp.createdAt, intl)}</time>
               </DataValue>
-              <DataValue label="Letzter Kontakt">
-                {opp.lastContactAt ? <time dateTime={opp.lastContactAt}>{formatDateTime(opp.lastContactAt)}</time> : null}
+              <DataValue label={t.chance.letzterKontakt}>
+                {opp.lastContactAt ? <time dateTime={opp.lastContactAt}>{formatDateTime(opp.lastContactAt, intl)}</time> : null}
               </DataValue>
-              <DataValue label="Zuletzt geändert">
-                <time dateTime={opp.updatedAt}>{formatDateTime(opp.updatedAt)}</time>
+              <DataValue label={t.chance.zuletztGeaendert}>
+                <time dateTime={opp.updatedAt}>{formatDateTime(opp.updatedAt, intl)}</time>
               </DataValue>
             </dl>
           </div>
@@ -475,9 +474,9 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
 function formatDate(iso: string): string {
   return datumAnzeige(iso)
 }
-function formatDateTime(iso: string): string {
+function formatDateTime(iso: string, locale: string): string {
   const d = new Date(iso)
   return Number.isNaN(d.getTime())
     ? iso
-    : d.toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    : d.toLocaleString(locale, { timeZone: GESCHAEFTS_ZEITZONE, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
 }

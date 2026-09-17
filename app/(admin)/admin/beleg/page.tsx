@@ -1,12 +1,11 @@
 import { AdminShell } from "@/components/admin/admin-shell"
 import {
-  BELEGART_LABEL,
-  STAND_LABEL,
   belegposten,
   naechsteSchritte,
   uebersicht,
   wirksamsterSchritt,
 } from "@/lib/beleg-betrieb"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { fiberoKennzahlen, HISTORISCHER_BEFUND, MESSUNG_START } from "@/lib/fibero-messung"
 import { MIND_ABSTAND_TAGE, MIND_FAELLE, type Probe } from "@/lib/messreihe"
 import { getVertriebStore, leadStoreConfigured } from "@/lib/lead-store"
@@ -47,7 +46,10 @@ import { getVertriebStore, leadStoreConfigured } from "@/lib/lead-store"
  */
 export const dynamic = "force-dynamic"
 
-export const metadata = { title: "Beleg-Betrieb" }
+export async function generateMetadata() {
+  const { t } = await adminSprachKontext()
+  return { title: t.beleg.titel }
+}
 
 async function ladeProben(): Promise<{ proben: Probe[]; gelesen: boolean }> {
   /*
@@ -76,6 +78,8 @@ async function ladeProben(): Promise<{ proben: Probe[]; gelesen: boolean }> {
 }
 
 export default async function BelegBetrieb() {
+  const { t } = await adminSprachKontext()
+  const b = t.beleg
   const { proben, gelesen } = await ladeProben()
   const u = uebersicht(proben)
   const erster = wirksamsterSchritt(proben)
@@ -85,15 +89,13 @@ export default async function BelegBetrieb() {
 
   return (
     <AdminShell
-      title="Beleg-Betrieb"
-      lead="Nicht was fehlt, sondern was als Nächstes beweisbar wird. Diese Ansicht erfindet nichts — sie liest die Freigaben, die Produktbelege, die Messreihe und die offenen Owner-Tatsachen und sortiert sie danach, wie nah sie an öffentlich sind."
+      title={b.titel}
+      lead={b.lead}
       meta={
         <>
-          <span className="block">
-            {u.oeffentlich} öffentlich · {offen.length} offen
-          </span>
+          <span className="block">{b.meta(u.oeffentlich, offen.length)}</span>
           <span className="text-gold-text mt-1 block">
-            {u.kundenfaelleOeffentlich} freigegebene Kundenfälle
+            {b.kundenfaelle(u.kundenfaelleOeffentlich)}
           </span>
         </>
       }
@@ -101,23 +103,18 @@ export default async function BelegBetrieb() {
       {/* ── DIE EINE FRAGE ─────────────────────────────────────────────── */}
       <section aria-labelledby="naechster-titel">
         <h2 id="naechster-titel" className="eyebrow text-gold-text">
-          Die wirksamste nächste Handlung
+          {b.naechsterTitel}
         </h2>
 
         {erster === null ? (
           <p className="type-body text-foreground/85 mt-5 max-w-2xl text-pretty">
-            Nichts offen. Jeder Beleg, den dieses Haus führen kann, ist öffentlich.
+            {b.leer}
           </p>
         ) : (
           <div className="border-gold/45 bg-background mt-5 border-s-2 p-6">
             <p className="text-meta text-muted-foreground">
-              {BELEGART_LABEL[erster.art]} · liegt bei{" "}
-              {erster.liegtBei === "kunde"
-                ? "dem Kunden"
-                : erster.liegtBei === "owner"
-                  ? "dem Inhaber"
-                  : "der Zeit"}
-              {erster.startetUhr ? " · startet eine Wartezeit" : ""}
+              {b.art[erster.art]} · {b.liegtBei[erster.liegtBei]}
+              {erster.startetUhr ? b.startetWartezeit : ""}
             </p>
             <h3 className="text-subhead mt-3 text-lg">{erster.subjekt}</h3>
             <p className="type-body text-foreground/85 mt-4 max-w-3xl text-pretty">{erster.fehlt}</p>
@@ -130,9 +127,9 @@ export default async function BelegBetrieb() {
       <section aria-labelledby="offen-titel" className="border-line mt-12 border-t pt-8">
         <div className="border-line flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b pb-2">
           <h2 id="offen-titel" className="text-subhead text-base">
-            Was noch fehlt
+            {b.offenTitel}
           </h2>
-          <span className="text-meta text-muted-foreground shrink-0">{offen.length} Posten</span>
+          <span className="text-meta text-muted-foreground shrink-0">{b.offenePosten(offen.length)}</span>
         </div>
 
         <ul className="mt-3 flex flex-col gap-2.5">
@@ -146,7 +143,7 @@ export default async function BelegBetrieb() {
                   {p.subjekt}
                 </h3>
                 <span className="text-meta text-muted-foreground shrink-0">
-                  {STAND_LABEL[p.stand]}
+                  {b.stand[p.stand]}
                 </span>
               </div>
               {p.fehlt && (
@@ -162,10 +159,10 @@ export default async function BelegBetrieb() {
       <section aria-labelledby="messung-titel" className="border-line mt-12 border-t pt-8">
         <div className="border-line flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b pb-2">
           <h2 id="messung-titel" className="text-subhead text-base">
-            Messreihe fibero
+            {b.messungTitel}
           </h2>
           <span className="text-meta text-muted-foreground shrink-0">
-            {u.probenErhoben} Proben {gelesen ? "" : leadStoreConfigured() ? "· Messreihe nicht erreichbar — nicht gemessen" : "· Messreihe nicht eingerichtet — nicht gemessen"}
+            {b.probenMeta(u.probenErhoben, gelesen, leadStoreConfigured())}
           </span>
         </div>
 
@@ -175,12 +172,11 @@ export default async function BelegBetrieb() {
           Wer diese Zeile ueberliest, erfindet in sechs Monaten eine.
         */}
         <p className="type-small text-muted-foreground mt-4 max-w-3xl text-pretty">
-          <span className="text-foreground">Historischer Vorher-Stand: existiert nicht.</span>{" "}
+          <span className="text-foreground">{b.historischerVorherstand}</span>{" "}
           {HISTORISCHER_BEFUND}
         </p>
         <p className="type-small text-muted-foreground mt-3 max-w-3xl text-pretty">
-          Erhoben wird ab {MESSUNG_START} der Ausgangsstand <em>mit</em> fibero. Ein Vergleich
-          zählt erst ab {MIND_ABSTAND_TAGE} Tagen Abstand und {MIND_FAELLE} Fällen je Seite.
+          {b.messungHinweis(MESSUNG_START, MIND_ABSTAND_TAGE, MIND_FAELLE)}
         </p>
 
         <ul className="mt-5 flex flex-col gap-2.5">
@@ -193,12 +189,12 @@ export default async function BelegBetrieb() {
                 <div className="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1">
                   <h3 className="text-subhead text-sm">{k.key}</h3>
                   <span className="text-meta text-muted-foreground shrink-0 font-mono">
-                    {ausgang} Ausgang · {danach} danach · {k.einheit}
+                    {b.kennzahlMeta(ausgang, danach, k.einheit)}
                   </span>
                 </div>
                 <p className="type-small text-muted-foreground mt-2 text-pretty">{k.definition}</p>
                 <p className="text-meta text-muted-foreground mt-2 text-pretty">
-                  Quelle: {k.quelle} · Nicht mitgezählt: {k.ausgenommen}
+                  {b.quelle(k.quelle, k.ausgenommen)}
                 </p>
                 {/*
                   DER BEFEHL STEHT DA, NICHT NUR DER WUNSCH.
@@ -225,7 +221,7 @@ export default async function BelegBetrieb() {
       {/* ── WAS STEHT ──────────────────────────────────────────────────── */}
       <section aria-labelledby="steht-titel" className="border-line mt-12 border-t pt-8">
         <h2 id="steht-titel" className="eyebrow text-muted-foreground">
-          Steht
+          {b.stehtTitel}
         </h2>
         <ul className="mt-4 flex flex-col gap-1.5">
           {oeffentlich.map((p) => (

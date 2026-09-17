@@ -1,6 +1,7 @@
 "use client"
 
 import { UnavailableNote } from "@/components/admin/primitives"
+import { adminTexte, type AdminSprache } from "@/lib/admin-i18n"
 
 /**
  * Wenn im Control Center etwas wirft.
@@ -32,29 +33,25 @@ export default function AdminError({
    * Fehlergrenze läuft im Browser. Deshalb eine schlichte eigene Fläche mit
    * der Sprache aus `<html lang>`.
    */
-  const tr = typeof document !== "undefined" && document.documentElement.lang === "tr"
+  const sprache: AdminSprache =
+    typeof document !== "undefined" && document.documentElement.lang === "tr" ? "tr" : "de"
+  const t = adminTexte(sprache).fehler
   return (
     <main className="bg-background text-foreground min-h-dvh px-4 py-10 sm:px-6">
       <div className="mx-auto max-w-2xl">
-      <h1 className="type-h3 mb-6">{tr ? "Bir şeyler ters gitti" : "Etwas ist schiefgegangen"}</h1>
-      <UnavailableNote title={tr ? "Bu görünüm yüklenemedi" : "Diese Ansicht konnte nicht geladen werden"}>
-        {tr ? (
-          <>Hata bizim tarafımızda. En sık neden: bir veri kaynağı yanıt vermiyor. Bu, verilerin <strong>eksik</strong> olduğu anlamına gelmez — yalnızca şu an ulaşılamıyorlar.</>
-        ) : (
-          <>Der Fehler liegt auf unserer Seite. Häufigste Ursache: eine Datenquelle antwortet nicht. Das heißt <strong>nicht</strong>, dass Daten fehlen — nur, dass sie gerade nicht erreichbar sind.</>
-        )}
-      </UnavailableNote>
+        <h1 className="type-h3 mb-6">{t.titel}</h1>
+        <UnavailableNote title={t.hinweisTitel}>{t.hinweis}</UnavailableNote>
 
-      <div className="mt-6 flex flex-wrap items-center gap-4">
-        <button type="button" onClick={reset} className="cta-quiet px-4 py-2 text-sm">
-          {tr ? "Tekrar dene" : "Erneut versuchen"}
-        </button>
-        {error.digest && (
-          <span className="text-meta text-muted-foreground">
-            {tr ? "Kayıt kimliği:" : "Kennung fürs Protokoll:"} <code className="font-mono">{error.digest}</code>
-          </span>
-        )}
-      </div>
+        <div className="mt-6 flex flex-wrap items-center gap-4">
+          <button type="button" onClick={reset} className="cta-quiet px-4 py-2 text-sm">
+            {t.erneut}
+          </button>
+          {error.digest && (
+            <span className="text-meta text-muted-foreground">
+              {t.digest} <code className="font-mono">{error.digest}</code>
+            </span>
+          )}
+        </div>
       </div>
     </main>
   )

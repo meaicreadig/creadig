@@ -1,4 +1,5 @@
 import { Pill, SectionHeader, Surface } from "@/components/admin/primitives"
+import { adminTexte, type AdminSprache } from "@/lib/admin-i18n"
 import { kontext, nichtErhoben, offen } from "@/lib/gedaechtnis"
 import { WER_LABELS, reihenfolge } from "@/lib/navigator"
 
@@ -12,7 +13,8 @@ import { WER_LABELS, reihenfolge } from "@/lib/navigator"
  * Inhalt und Quellen (`gedaechtnis`, `navigator`) sind unverändert; die Seite
  * rechnet weiterhin nichts. Texte sind noch deutsch (offener Übersetzungsstand).
  */
-export function LageRegister() {
+export function LageRegister({ sprache = "de" }: { sprache?: AdminSprache }) {
+  const t = adminTexte(sprache).lage
   const lagen = kontext()
   const stehen = lagen.filter((a) => a.steht === true)
   const nichtOk = offen()
@@ -23,14 +25,13 @@ export function LageRegister() {
     <section id="lage" aria-labelledby="lage-titel" className="scroll-mt-8">
       <SectionHeader
         id="lage-titel"
-        title="Lage des Hauses"
-        count={`${stehen.length} steht · ${nichtOk.length} offen · ${unbekannt.length} nicht erhoben`}
+        title={t.titel}
+        count={t.count(stehen.length, nichtOk.length, unbekannt.length)}
       />
       <div>
-        <h3 className="text-subhead mt-6 text-base">Wie es steht</h3>
+        <h3 className="text-subhead mt-6 text-base">{t.wieEsSteht}</h3>
         <p className="type-small text-muted-foreground mt-2 max-w-2xl text-pretty">
-          Jede Zeile trägt ihre Fundstelle. Eine Auskunft ohne Beleg gibt es nicht — sie wäre eine
-          Behauptung mit Systemstimme, und der widerspricht niemand.
+          {t.wieEsStehtHinweis}
         </p>
         <ul className="mt-5 flex flex-col gap-3">
           {lagen.map((a) => (
@@ -39,7 +40,7 @@ export function LageRegister() {
                 <div className="flex flex-wrap items-baseline gap-3">
                   <span className="text-subhead">{a.frage}</span>
                   <Pill severity={a.steht === false ? "attention" : "neutral"}>
-                    {a.steht === true ? "steht" : a.steht === false ? "offen" : "nicht erhoben"}
+                    {a.steht === true ? t.status.steht : a.steht === false ? t.status.offen : t.status.nichtErhoben}
                   </Pill>
                 </div>
                 <p className="type-small text-foreground/90 mt-2 text-pretty">{a.antwort}</p>
@@ -53,15 +54,13 @@ export function LageRegister() {
       </div>
 
       <div className="mt-10">
-        <h3 className="text-subhead text-base">Was daraus folgt</h3>
+        <h3 className="text-subhead text-base">{t.wasDarausFolgt}</h3>
         <p className="type-small text-muted-foreground mt-2 max-w-2xl text-pretty">
-          Erst messen, dann beheben — nicht weil Messen wichtiger wäre, sondern weil eine Reparatur
-          an ungemessener Stelle die Messung für immer unmöglich macht. Innerhalb der beiden Gruppen
-          wird nicht sortiert: Eine Rangfolge wäre eine Entscheidung, und die gehört Ihnen.
+          {t.wasDarausFolgtHinweis}
         </p>
         {schritte.length === 0 ? (
           <Surface padding="sm" className="mt-5">
-            <p className="type-small text-foreground/90">Nichts offen. Das kommt vor.</p>
+            <p className="type-small text-foreground/90">{t.leer}</p>
           </Surface>
         ) : (
           <ul className="mt-5 flex flex-col gap-3">

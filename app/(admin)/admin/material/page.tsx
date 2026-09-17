@@ -2,6 +2,7 @@ import { cookies } from "next/headers"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { LageRegister } from "@/components/admin/lage-register"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
 import { ITEM_GROUPS, collect } from "@/lib/material-status"
 import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
@@ -33,13 +34,17 @@ import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
  */
 export const dynamic = "force-dynamic"
 
-export const metadata = { title: "Materialstand" }
+export async function generateMetadata() {
+  const { t } = await adminSprachKontext()
+  return { title: t.material.titel }
+}
 
 export default async function ControlCenterHome() {
+  const { sprache, t, intl } = await adminSprachKontext()
   /* ADM-01 — die Lage-Register (vormals Cockpit) sieht nur der Owner; sie waren nie für andere Rollen freigegeben. */
   const { rolle } = await verifySession((await cookies()).get(ADMIN_COOKIE)?.value)
   const { open, done } = collect()
-  const stand = new Date().toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE,
+  const stand = new Date().toLocaleString(intl, { timeZone: GESCHAEFTS_ZEITZONE,
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -49,27 +54,27 @@ export default async function ControlCenterHome() {
 
   return (
     <AdminShell
-      title="Materialstand"
-      lead="Abgeleitet aus denselben Daten, aus denen die Website gebaut wird. Diese Ansicht ändert nichts und erfindet nichts — sie sagt, was leer ist."
+      title={t.material.titel}
+      lead={t.material.lead}
       meta={
         <>
-          <span className="block">Stand {stand}</span>
+          <span className="block">{t.material.stand(stand)}</span>
           <span className="text-gold-text mt-1 block">
-            {open.length} offen · {done.length} erledigt
+            {t.material.meta(open.length, done.length)}
           </span>
         </>
       }
     >
       {rolle === "owner" ? (
         <div className="border-line mb-12 border-b pb-10">
-          <LageRegister />
+          <LageRegister sprache={sprache} />
         </div>
       ) : null}
 
       {/* ── Was Aufmerksamkeit braucht ── */}
       <section aria-labelledby="offen-titel">
         <h2 id="offen-titel" className="eyebrow text-gold-text">
-          Braucht Aufmerksamkeit
+          {t.material.aufmerksamkeit}
         </h2>
 
         {open.length === 0 ? (
@@ -78,7 +83,7 @@ export default async function ControlCenterHome() {
             eine gute. MP-G §42: Empty States sind Teil des Produkts.
           */
           <p className="type-body text-foreground/85 mt-5 max-w-2xl text-pretty">
-            Nichts offen. Jedes Material, das die Website zeigen könnte, ist da.
+            {t.material.leerOffen}
           </p>
         ) : (
           /*
@@ -103,7 +108,7 @@ export default async function ControlCenterHome() {
                       {group.label}
                     </h3>
                     <span className="text-meta text-muted-foreground shrink-0">
-                      {inGroup.length} offen
+                      {t.material.offen(inGroup.length)}
                     </span>
                   </div>
 
@@ -129,12 +134,12 @@ export default async function ControlCenterHome() {
       {/* ── Was steht ── */}
       <section aria-labelledby="erledigt-titel" className="border-line mt-12 border-t pt-8">
         <h2 id="erledigt-titel" className="eyebrow text-muted-foreground">
-          Steht
+          {t.material.steht}
         </h2>
 
         {done.length === 0 ? (
           <p className="type-body text-muted-foreground mt-5 text-pretty">
-            Noch nichts abgehakt.
+            {t.material.leerErledigt}
           </p>
         ) : (
           <ul className="mt-5 flex flex-col">

@@ -21,79 +21,40 @@ import {
   SEITEN_HINWEIS_AB,
   type Angebot,
 } from "@/lib/angebot"
+import { adminTexte } from "@/lib/admin-i18n"
+import type { AdminSprache } from "@/lib/admin-i18n/sprache"
 import { OFFER_KINDS, OFFERS } from "@/lib/offer-readiness"
 import type { AngebotAntwort } from "@/app/(admin)/admin/vertrieb/actions"
 
 /**
  * GATE 17 · Die Angebotsmappe an einem Vorgang.
  *
- * ═══════════════════════════════════════════════════════════════════════════
- * WARUM DIESE FLAECHE UEBERHAUPT EXISTIERT
- *
- * Gate 12 hat den teuersten Befund dieses Hauses geliefert: `research_cases`
- * war leer, nicht weil niemand recherchiert hatte, sondern weil das Ergebnis
- * nirgends hin konnte — es gab den Aktenschrank und den Stift, aber keinen
- * Weg, eine Akte anzulegen.
- *
- * Genau der Zustand drohte hier wieder. Das Angebotsschema steht seit dem
- * 29.08. in `docs/sales/proposal-outline.md`, die Regeln stehen jetzt in
- * `lib/angebot.ts`, die Tabelle existiert — und ohne diese Flaeche haette
- * ein Angebot weiterhin in einem Textprogramm daneben entstehen muessen,
- * wo keine dieser Regeln gilt.
- *
- * ═══════════════════════════════════════════════════════════════════════════
- * WARUM DIE BEFUNDE HIER STEHEN UND NICHT IM LOG
- *
- * „Senden" kann fehlschlagen, und zwar aus einem SACHLICHEN Grund: ein
- * Pflichtabschnitt fehlt, die Angebotsreife steht nicht, eine Zahl hat keine
- * Deckung. Ein Formular, das dann einfach nichts tut, wird dreimal gedrueckt
- * und danach fuer kaputt gehalten.
- *
- * Deshalb geben die Aktionen Befunde zurueck, und deshalb ist diese Flaeche
- * eine Client-Komponente: Sie hat keinen eigenen Zustand ausser dem, was die
- * letzte Aktion geantwortet hat.
+ * ADM-01: Beschriftungen aus `adminTexte(sprache)` — Client darf Server-Props
+ * mit Funktionen nicht entgegennehmen, deshalb die Sprache und das Wörterbuch hier.
  */
 
-/*
- * DER ANFANGSZUSTAND — und warum er an seiner IDENTITAET erkannt wird.
- *
- * `LEER` traegt `ok: true`, weil der Typ nur zwei Zustaende kennt. „Noch
- * nichts abgeschickt" sieht darin aus wie „hat geklappt" — und die
- * Speicheranzeige haette beim blossen Oeffnen der Seite „Gespeichert."
- * gemeldet.
- *
- * `useActionState` gibt genau dieses Objekt zurueck, bis eine Aktion
- * gelaufen ist. Der Vergleich auf Referenzgleichheit unterscheidet die
- * beiden Faelle deshalb sicher, ohne den Antworttyp der Server-Aktion um
- * einen dritten Zustand zu erweitern.
- */
 const LEER: AngebotAntwort = { ok: true, befunde: [] }
-
-/*
- * `Befunde` ist durch `Speicherstand` ersetzt. Sie zeigte nur den Fehler:
- * bei Erfolg nichts, waehrend des Speicherns nichts. Wer nichts sieht,
- * drueckt noch einmal — und bei „Angebot senden" ist der zweite Klick eine
- * zweite Zusage.
- */
 
 export function AngebotMappe({
   opportunityId,
   referenz,
   offerKind,
   angebote,
+  sprache,
   speichern,
   senden,
   annehmen,
 }: {
   opportunityId: string
-  /** Die Lead-Referenz — dieselbe Nummer wie in der Eingangsbestaetigung. */
   referenz: string
   offerKind: string | null
   angebote: Angebot[]
+  sprache: AdminSprache
   speichern: (opportunityId: string, form: FormData) => Promise<AngebotAntwort>
   senden: (opportunityId: string, form: FormData) => Promise<AngebotAntwort>
   annehmen: (opportunityId: string, form: FormData) => Promise<AngebotAntwort>
 }) {
+  const t = adminTexte(sprache).angebotMappe
   const [neuAntwort, neuAction, neuWartet] = useActionState(
     async (_: AngebotAntwort, form: FormData) => speichern(opportunityId, form),
     LEER,
@@ -123,48 +84,41 @@ export function AngebotMappe({
                     {ANGEBOT_ZUSTAENDE[a.zustand].label}
                   </Pill>
                   <span className="type-small text-muted-foreground">
-                    {OFFERS[a.kind].label} · gültig bis {a.gueltigBis}
+                    {OFFERS[a.kind].label} · {t.gueltigBis} {a.gueltigBis}
                   </span>
                 </div>
                 {a.annahme && (
                   <p className="type-small text-muted-foreground mt-2 text-pretty">
-                    Ja von {a.annahme.von} ({a.annahme.rolle}), {a.annahme.form}, {a.annahme.am} —{" "}
-                    {a.annahme.fundstelle}
+                    {t.jaVon(a.annahme.von, a.annahme.rolle, a.annahme.form, a.annahme.am, a.annahme.fundstelle)}
                   </p>
                 )}
                 {a.zustand === "gesendet" && (
-                  /*
-                    Das Ja verlangt dieselben vier Angaben wie eine Freigabe in
-                    Gate 13: Person, Form, Datum, Fundstelle. Ein muendliches
-                    Ja ist ein Ja — dann steht das da, mit dem Namen dessen,
-                    der es gesagt hat.
-                  */
                   <form action={jaAction} className="mt-4 flex flex-wrap items-end gap-3">
                     <input type="hidden" name="id" value={a.id} />
-                    <AdminField label="Wer hat zugesagt" htmlFor={`von-${a.id}`}>
-                      <AdminInput id={`von-${a.id}`} name="von" placeholder="Name" />
+                    <AdminField label={t.werHatZugesagt} htmlFor={`von-${a.id}`}>
+                      <AdminInput id={`von-${a.id}`} name="von" placeholder={t.namePlatzhalter} />
                     </AdminField>
-                    <AdminField label="Rolle" htmlFor={`rolle-${a.id}`}>
-                      <AdminInput id={`rolle-${a.id}`} name="rolle" placeholder="Geschäftsführung" />
+                    <AdminField label={t.rolle} htmlFor={`rolle-${a.id}`}>
+                      <AdminInput id={`rolle-${a.id}`} name="rolle" placeholder={t.rollePlatzhalter} />
                     </AdminField>
-                    <AdminField label="Wie" htmlFor={`form-${a.id}`}>
+                    <AdminField label={t.wie} htmlFor={`form-${a.id}`}>
                       <AdminSelect id={`form-${a.id}`} name="form" defaultValue="muendlich">
                         {JA_FORMEN.map((f) => (
                           <option key={f} value={f}>{f}</option>
                         ))}
                       </AdminSelect>
                     </AdminField>
-                    <AdminField label="Wann" htmlFor={`am-${a.id}`}>
+                    <AdminField label={t.wann} htmlFor={`am-${a.id}`}>
                       <AdminInput id={`am-${a.id}`} name="am" type="date" />
                     </AdminField>
-                    <AdminField label="Wo steht es" htmlFor={`fund-${a.id}`} className="flex-1 basis-64">
+                    <AdminField label={t.woStehtEs} htmlFor={`fund-${a.id}`} className="flex-1 basis-64">
                       <AdminInput
                         id={`fund-${a.id}`}
                         name="fundstelle"
-                        placeholder="Gesprächsnotiz vom …, Postfach, unterschriebenes PDF"
+                        placeholder={t.fundstellePlatzhalter}
                       />
                     </AdminField>
-                    <button type="submit" className="cta-quiet px-4 py-2 text-sm">Als angenommen eintragen</button>
+                    <button type="submit" className="cta-quiet px-4 py-2 text-sm">{t.alsAngenommen}</button>
                   </form>
                 )}
               </Surface>
@@ -176,44 +130,37 @@ export function AngebotMappe({
         wartet={jaWartet}
         ok={jaAntwort === LEER ? null : jaAntwort.ok}
         punkte={jaAntwort.befunde.map((b) => ({ wo: b.abschnitt, satz: b.satz }))}
-        erfolgssatz="Annahme festgehalten."
+        erfolgssatz={t.annahmeFestgehalten}
       />
 
       <form action={neuAction} className="mt-2">
         {entwurf && <input type="hidden" name="id" value={entwurf.id} />}
         <div className="flex flex-wrap gap-4">
-          <AdminField label="Referenz" htmlFor="a-referenz">
-            {/*
-              Vorbelegt mit der Lead-Referenz: Das Schema verlangt DIESELBE
-              Nummer wie in der Eingangsbestaetigung, damit der Kunde nicht
-              zwei hat. Aenderbar bleibt sie trotzdem — ein Angebot kann aus
-              einem Vorgang ohne Anfrage entstehen.
-            */}
+          <AdminField label={t.referenz} htmlFor="a-referenz">
             <AdminInput id="a-referenz" name="referenz" defaultValue={entwurf?.referenz ?? referenz} />
           </AdminField>
-          <AdminField label="Angebotsart" htmlFor="a-kind">
+          <AdminField label={t.angebotsart} htmlFor="a-kind">
             <AdminSelect id="a-kind" name="kind" defaultValue={entwurf?.kind ?? offerKind ?? "website"}>
               {OFFER_KINDS.map((k) => (
                 <option key={k} value={k}>{OFFERS[k].label}</option>
               ))}
             </AdminSelect>
           </AdminField>
-          <AdminField label="Sprache" htmlFor="a-sprache">
+          <AdminField label={t.sprache} htmlFor="a-sprache">
             <AdminSelect id="a-sprache" name="sprache" defaultValue={entwurf?.sprache ?? "de"}>
               {["de", "tr", "en", "ar"].map((l) => (
                 <option key={l} value={l}>{l.toUpperCase()}</option>
               ))}
             </AdminSelect>
           </AdminField>
-          <AdminField label="Gültig bis" htmlFor="a-gueltig">
+          <AdminField label={t.gueltigBis} htmlFor="a-gueltig">
             <AdminInput id="a-gueltig" name="gueltigBis" type="date" defaultValue={entwurf?.gueltigBis ?? ""} />
           </AdminField>
         </div>
 
         <fieldset className="mt-6">
           <legend className="type-small text-muted-foreground">
-            Positionen — jede Zahl kommt aus dem Katalog. Ein eigener Betrag verlangt eine Owner-Freigabe
-            mit Fundstelle; die entsteht in einem Postfach, nicht in einem Auswahlfeld.
+            {t.positionenLegende}
           </legend>
           <div className="mt-4 flex flex-col gap-3">
             {(Object.keys(KATALOG_LABEL) as (keyof typeof KATALOG_LABEL)[]).map((k) => {
@@ -230,7 +177,7 @@ export function AngebotMappe({
                   />
                   <span className="type-small text-foreground">
                     {KATALOG_LABEL[k]}
-                    <span className="text-muted-foreground"> — {betrag ?? "keine Zahl hinterlegt"}</span>
+                    <span className="text-muted-foreground"> — {betrag ?? t.keineZahl}</span>
                   </span>
                 </label>
               )
@@ -242,7 +189,7 @@ export function AngebotMappe({
           {ABSCHNITTE.map((a) => (
             <AdminField
               key={a.key}
-              label={`${a.nummer} · ${a.titel}${a.pflicht ? "" : " (darf fehlen)"}`}
+              label={`${a.nummer} · ${a.titel}${a.pflicht ? "" : t.darfFehlen}`}
               htmlFor={`abschnitt_${a.key}`}
             >
               <AdminTextarea
@@ -257,34 +204,32 @@ export function AngebotMappe({
         </div>
 
         <button type="submit" className="cta-quiet mt-6 px-4 py-2 text-sm">
-          {entwurf ? "Entwurf speichern" : "Entwurf anlegen"}
+          {entwurf ? t.entwurfSpeichern : t.entwurfAnlegen}
         </button>
       </form>
       <Speicherstand
         wartet={neuWartet}
         ok={neuAntwort === LEER ? null : neuAntwort.ok}
         punkte={neuAntwort.befunde.map((b) => ({ wo: b.abschnitt, satz: b.satz }))}
-        erfolgssatz="Entwurf gespeichert."
+        erfolgssatz={t.entwurfGespeichert}
       />
 
       {entwurf && (
         <>
           <form action={sendenAction} className="mt-6">
             <input type="hidden" name="id" value={entwurf.id} />
-            <button type="submit" className="cta-outline px-5 py-2.5 text-sm">Angebot senden</button>
+            <button type="submit" className="cta-outline px-5 py-2.5 text-sm">{t.angebotSenden}</button>
             <span className="type-small text-muted-foreground ms-4">
-              {seiten(entwurf)} Seite(n)
-              {seiten(entwurf) > SEITEN_HINWEIS_AB
-                ? " — länger als sechs. Das ist kein Fehler, sondern ein Verdacht: meistens fehlt eine Entscheidung, nicht eine Seite."
-                : ""}
+              {t.seiten(seiten(entwurf))}
+              {seiten(entwurf) > SEITEN_HINWEIS_AB ? t.seitenHinweis : ""}
             </span>
           </form>
           <Speicherstand
-        wartet={sendenWartet}
-        ok={sendenAntwort === LEER ? null : sendenAntwort.ok}
-        punkte={sendenAntwort.befunde.map((b) => ({ wo: b.abschnitt, satz: b.satz }))}
-        erfolgssatz="Angebot gesendet."
-      />
+            wartet={sendenWartet}
+            ok={sendenAntwort === LEER ? null : sendenAntwort.ok}
+            punkte={sendenAntwort.befunde.map((b) => ({ wo: b.abschnitt, satz: b.satz }))}
+            erfolgssatz={t.angebotGesendet}
+          />
         </>
       )}
     </div>

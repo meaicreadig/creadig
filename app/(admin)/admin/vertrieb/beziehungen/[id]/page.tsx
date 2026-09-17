@@ -19,9 +19,9 @@ import {
   SectionHeader,
 } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
-import { SALES_LABELS_DE, getVertriebStore } from "@/lib/lead-store"
-import { LIFECYCLE_LABELS, RELATIONSHIP_LABELS, RELATIONSHIP_LEVELS } from "@/lib/vertrieb"
-import { GESCHAEFTS_ZEITZONE, datumAnzeige } from "@/lib/geschaeftszeit"
+import { getVertriebStore } from "@/lib/lead-store"
+import { RELATIONSHIP_LEVELS } from "@/lib/vertrieb"
+import { datumAnzeige } from "@/lib/geschaeftszeit"
 
 /**
  * Ein Kontakt.
@@ -43,13 +43,16 @@ import { GESCHAEFTS_ZEITZONE, datumAnzeige } from "@/lib/geschaeftszeit"
  */
 export const dynamic = "force-dynamic"
 
-export const metadata = { title: "Kontakt" }
+export async function generateMetadata() {
+  const { t } = await adminSprachKontext()
+  return { title: t.beziehungDetail.titel }
+}
 
 export default async function KontaktDetail({ params }: { params: Promise<{ id: string }> }) {
-  const sprachKontext = await adminSprachKontext()
+  const { t, intl } = await adminSprachKontext()
   const { id } = await params
   const store = getVertriebStore()
-  if (!store) return <VertriebShell title="Kontakt" available={false}>{null}</VertriebShell>
+  if (!store) return <VertriebShell title={t.beziehungDetail.titel} available={false}>{null}</VertriebShell>
 
   let contact, enquiries, opportunities, activities, organisation, organisationChoices
   try {
@@ -63,7 +66,7 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
     ])
     organisation = contact.organisationId ? await store.getOrganisation(contact.organisationId) : null
   } catch {
-    return <VertriebShell title="Kontakt" available={false}>{null}</VertriebShell>
+    return <VertriebShell title={t.beziehungDetail.titel} available={false}>{null}</VertriebShell>
   }
 
   const warm = contact.relationship === "warm" || contact.relationship === "eng"
@@ -72,106 +75,104 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
     <VertriebShell
       title={contact.name}
       lead={contact.organisationName ?? undefined}
-      meta={<Pill severity={warm ? "attention" : "neutral"}>{RELATIONSHIP_LABELS[contact.relationship]}</Pill>}
+      meta={<Pill severity={warm ? "attention" : "neutral"}>{t.begriffe.beziehung[contact.relationship] ?? contact.relationship}</Pill>}
       available
     >
       <Link href="/admin/vertrieb/beziehungen" className="text-gold-text text-sm underline underline-offset-4">
-        ← Alle Beziehungen
+        {t.beziehungDetail.alleBeziehungen}
       </Link>
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[2fr_1fr] lg:gap-12">
         <div className="min-w-0">
           {/* ── Beziehung ── */}
           <section aria-labelledby="grad-titel">
-            <SectionHeader id="grad-titel" title="Beziehung" />
+            <SectionHeader id="grad-titel" title={t.beziehungDetail.beziehung} />
             <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
-              Unabhängig von jedem Vorgang. Jemand kann eng sein, ohne dass
-              gerade etwas läuft — und fremd mit einer laufenden Chance.
+              {t.beziehungDetail.beziehungHinweis}
             </p>
             <form action={setRelationship.bind(null, contact.id)} className="mt-4 flex flex-wrap items-end gap-4">
-              <AdminField label="Grad" htmlFor="relationship">
+              <AdminField label={t.beziehungDetail.grad} htmlFor="relationship">
                 <AdminSelect id="relationship" name="relationship" defaultValue={contact.relationship}>
                   {RELATIONSHIP_LEVELS.map((r) => (
-                    <option key={r} value={r}>{RELATIONSHIP_LABELS[r]}</option>
+                    <option key={r} value={r}>{t.begriffe.beziehung[r] ?? r}</option>
                   ))}
                 </AdminSelect>
               </AdminField>
-              <button type="submit" className="cta-quiet px-4 py-2 text-sm">Speichern</button>
+              <button type="submit" className="cta-quiet px-4 py-2 text-sm">{t.formular.speichern}</button>
             </form>
           </section>
 
           {/* ── Beziehungspflege ── */}
           <section aria-labelledby="pflege-titel" className="mt-10">
-            <SectionHeader id="pflege-titel" title="Nächster Beziehungsschritt" />
+            <SectionHeader id="pflege-titel" title={t.beziehungDetail.naechsterSchritt} />
             <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
-              Kontaktpflege, nicht Vertrieb. Leer lassen löscht Schritt und Datum.
+              {t.beziehungDetail.naechsterSchrittHinweis}
             </p>
             <form action={setNextTouch.bind(null, contact.id)} className="mt-4 flex flex-wrap items-end gap-4">
-              <AdminField label="Was ansteht" htmlFor="nextTouch" className="flex-1 basis-64">
-                <AdminInput id="nextTouch" name="nextTouch" defaultValue={contact.nextTouch ?? ""} placeholder="z. B. im Herbst wieder melden" />
+              <AdminField label={t.beziehungDetail.wasAnsteht} htmlFor="nextTouch" className="flex-1 basis-64">
+                <AdminInput id="nextTouch" name="nextTouch" defaultValue={contact.nextTouch ?? ""} placeholder={t.beziehungDetail.wasAnstehtPlatzhalter} />
               </AdminField>
-              <AdminField label="Bis wann" htmlFor="nextTouchAt">
+              <AdminField label={t.beziehungDetail.bisWann} htmlFor="nextTouchAt">
                 <AdminInput id="nextTouchAt" name="nextTouchAt" type="date" defaultValue={contact.nextTouchAt ?? ""} />
               </AdminField>
-              <button type="submit" className="cta-quiet px-4 py-2 text-sm">Speichern</button>
+              <button type="submit" className="cta-quiet px-4 py-2 text-sm">{t.formular.speichern}</button>
             </form>
           </section>
 
           {/* ── Angaben ── */}
           <section aria-labelledby="angaben-titel" className="mt-10">
-            <SectionHeader id="angaben-titel" title="Angaben" />
+            <SectionHeader id="angaben-titel" title={t.beziehungDetail.angaben} />
             <form action={setContactDetails.bind(null, contact.id)} className="mt-4 flex flex-col gap-4">
               <div className="flex flex-wrap gap-4">
-                <AdminField label="Name" htmlFor="name" className="flex-1 basis-56">
+                <AdminField label={t.beziehungDetail.name} htmlFor="name" className="flex-1 basis-56">
                   <AdminInput id="name" name="name" defaultValue={contact.name} required />
                 </AdminField>
-                <AdminField label="Telefon" htmlFor="phone" className="flex-1 basis-44">
+                <AdminField label={t.beziehungDetail.telefon} htmlFor="phone" className="flex-1 basis-44">
                   <AdminInput id="phone" name="phone" type="tel" defaultValue={contact.phone ?? ""} />
                 </AdminField>
               </div>
               <div className="flex flex-wrap gap-4">
-                <AdminField label="Rolle im Betrieb" htmlFor="role" className="flex-1 basis-56">
-                  <AdminInput id="role" name="role" defaultValue={contact.role ?? ""} placeholder="soweit bekannt" />
+                <AdminField label={t.beziehungDetail.rolleImBetrieb} htmlFor="role" className="flex-1 basis-56">
+                  <AdminInput id="role" name="role" defaultValue={contact.role ?? ""} placeholder={t.beziehungDetail.rollePlatzhalter} />
                 </AdminField>
-                <AdminField label="LinkedIn-Adresse" htmlFor="linkedinUrl" className="flex-1 basis-64">
-                  <AdminInput id="linkedinUrl" name="linkedinUrl" type="url" defaultValue={contact.linkedinUrl ?? ""} placeholder="https://www.linkedin.com/in/…" />
+                <AdminField label={t.beziehungDetail.linkedinAdresse} htmlFor="linkedinUrl" className="flex-1 basis-64">
+                  <AdminInput id="linkedinUrl" name="linkedinUrl" type="url" defaultValue={contact.linkedinUrl ?? ""} placeholder={t.beziehungDetail.linkedinPlatzhalter} />
                 </AdminField>
               </div>
-              <AdminField label="Interne Notiz" htmlFor="note">
+              <AdminField label={t.beziehungDetail.interneNotiz} htmlFor="note">
                 <AdminTextarea id="note" name="note" rows={3} defaultValue={contact.note ?? ""} />
               </AdminField>
               <div>
-                <button type="submit" className="cta-quiet px-4 py-2 text-sm">Angaben speichern</button>
+                <button type="submit" className="cta-quiet px-4 py-2 text-sm">{t.beziehungDetail.angabenSpeichern}</button>
               </div>
             </form>
           </section>
 
           {/* ── Zugehörigkeit ── */}
           <section aria-labelledby="zugehoerig-titel" className="mt-10">
-            <SectionHeader id="zugehoerig-titel" title="Gehört zu" />
+            <SectionHeader id="zugehoerig-titel" title={t.beziehungDetail.gehoertZu} />
             <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
-              Nicht jeder Mensch gehört zu einem Betrieb. „Keine Zuordnung“ ist
-              eine gültige Antwort und keine offene Aufgabe.
+              {t.beziehungDetail.gehoertZuHinweis}
             </p>
             <form action={setContactOrganisation.bind(null, contact.id)} className="mt-4 flex flex-wrap items-end gap-4">
-              <AdminField label="Organisation" htmlFor="organisationId" className="flex-1 basis-64">
+              <AdminField label={t.beziehungDetail.organisation} htmlFor="organisationId" className="flex-1 basis-64">
                 <AdminSelect id="organisationId" name="organisationId" defaultValue={contact.organisationId ?? ""}>
-                  <option value="">keine Zuordnung</option>
+                  <option value="">{t.beziehungDetail.keineZuordnung}</option>
                   {organisationChoices.map((o) => (
                     <option key={o.id} value={o.id}>{o.name}</option>
                   ))}
                 </AdminSelect>
               </AdminField>
-              <button type="submit" className="cta-quiet px-4 py-2 text-sm">Speichern</button>
+              <button type="submit" className="cta-quiet px-4 py-2 text-sm">{t.formular.speichern}</button>
             </form>
           </section>
 
           {/* ── Vorgänge ── */}
           <section aria-labelledby="chancen-titel" className="mt-10">
-            <SectionHeader id="chancen-titel" title="Verkaufschancen" count={`${opportunities.length}`} />
+            <SectionHeader id="chancen-titel" title={t.beziehungDetail.verkaufschancen} count={`${opportunities.length}`} />
             {opportunities.length === 0 ? (
               <p className="type-small text-muted-foreground mt-4 text-pretty">
-                Kein Vorgang. Das ist keine Lücke — eine Beziehung braucht keine.
+                {t.beziehungDetail.keinVorgang}
               </p>
             ) : (
               <ul className="mt-4 flex flex-col">
@@ -180,7 +181,7 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
                     <Link href={`/admin/vertrieb/pipeline/${o.id}`} className="text-subhead min-w-0 flex-1 text-sm underline-offset-4 hover:underline">
                       {o.title}
                     </Link>
-                    <Pill severity={o.status === "lost" ? "critical" : "neutral"}>{SALES_LABELS_DE[o.status]}</Pill>
+                    <Pill severity={o.status === "lost" ? "critical" : "neutral"}>{t.begriffe.stufe[o.status] ?? o.status}</Pill>
                   </li>
                 ))}
               </ul>
@@ -189,9 +190,9 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
 
           {/* ── Anfragen ── */}
           <section aria-labelledby="anfragen-titel" className="mt-10">
-            <SectionHeader id="anfragen-titel" title="Anfragen" count={`${enquiries.length}`} as="h3" />
+            <SectionHeader id="anfragen-titel" title={t.beziehungDetail.anfragen} count={`${enquiries.length}`} as="h3" />
             {enquiries.length === 0 ? (
-              <p className="type-small text-muted-foreground mt-4">Keine Anfrage verknüpft.</p>
+              <p className="type-small text-muted-foreground mt-4">{t.beziehungDetail.keineAnfrageVerknuepft}</p>
             ) : (
               <ul className="mt-4 flex flex-col">
                 {enquiries.map((e) => (
@@ -200,7 +201,7 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
                       {e.reference}
                     </Link>
                     <span className="text-muted-foreground min-w-0 flex-1 text-xs">{e.source}</span>
-                    <span className="text-meta text-muted-foreground shrink-0 tabular-nums">{formatDate(e.createdAt)}</span>
+                    <span className="text-meta text-muted-foreground shrink-0 tabular-nums">{formatDate(e.createdAt, intl)}</span>
                   </li>
                 ))}
               </ul>
@@ -208,43 +209,43 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
           </section>
 
           <div className="mt-12">
-            <ActivityLog entries={activities} t={sprachKontext.t} intl={sprachKontext.intl} />
+            <ActivityLog entries={activities} t={t} intl={intl} />
           </div>
         </div>
 
         <aside className="min-w-0">
-          <SectionHeader title="Erreichbar" />
+          <SectionHeader title={t.beziehungDetail.erreichbar} />
           <p className="type-small text-muted-foreground mt-3 text-pretty">
-            Nur was wirklich hinterlegt ist. Kein Weg wird angeboten, den es nicht gibt.
+            {t.beziehungDetail.erreichbarHinweis}
           </p>
           <dl className="mt-4 flex flex-col gap-4">
-            <DataValue label="E-Mail">
+            <DataValue label={t.beziehungDetail.email}>
               {/* Ein Kontakt aus der Bestandsliste hat oft keine. Ein
                   „mailto:"-Link ins Leere wäre schlimmer als ein Strich. */}
               {contact.email ? (
                 <a href={`mailto:${contact.email}`} className="underline underline-offset-4">{contact.email}</a>
               ) : null}
             </DataValue>
-            <DataValue label="Telefon">
+            <DataValue label={t.beziehungDetail.telefon}>
               {contact.phone ? (
                 <a href={`tel:${contact.phone.replace(/\s/g, "")}`} className="underline underline-offset-4">{contact.phone}</a>
               ) : null}
             </DataValue>
-            <DataValue label="LinkedIn">
+            <DataValue label={t.beziehungDetail.linkedIn}>
               {contact.linkedinUrl ? (
                 <a href={contact.linkedinUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
-                  Profil öffnen
+                  {t.beziehungDetail.profilOeffnen}
                 </a>
               ) : null}
             </DataValue>
-            <DataValue label="Rolle">{contact.role}</DataValue>
+            <DataValue label={t.beziehungDetail.rolle}>{contact.role}</DataValue>
           </dl>
 
           {organisation && (
             <div className="mt-10">
-              <SectionHeader title="Organisation" as="h3" />
+              <SectionHeader title={t.beziehungDetail.organisationTitel} as="h3" />
               <dl className="mt-4 flex flex-col gap-4">
-                <DataValue label="Name">
+                <DataValue label={t.beziehungDetail.name}>
                   <Link href={`/admin/kunden/${organisation.id}`} className="text-gold-text underline underline-offset-4">
                     {organisation.name}
                   </Link>
@@ -252,9 +253,9 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
                 {/* Die dritte Achse — hier nur zu lesen. Geändert wird sie
                     bei der Organisation, weil sie ihr gehört, nicht dem
                     Menschen. */}
-                <DataValue label="Kundenhistorie">{LIFECYCLE_LABELS[organisation.lifecycle]}</DataValue>
-                <DataValue label="Ort">{organisation.city}</DataValue>
-                <DataValue label="Website">
+                <DataValue label={t.beziehungDetail.kundenhistorie}>{t.begriffe.lebenszyklus[organisation.lifecycle] ?? organisation.lifecycle}</DataValue>
+                <DataValue label={t.beziehungDetail.ort}>{organisation.city}</DataValue>
+                <DataValue label={t.beziehungDetail.website}>
                   {organisation.website ? (
                     <a href={organisation.website} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
                       {organisation.website}
@@ -266,15 +267,15 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
           )}
 
           <div className="mt-10">
-            <SectionHeader title="Zeiten" as="h3" />
+            <SectionHeader title={t.beziehungDetail.zeiten} as="h3" />
             <dl className="mt-4 flex flex-col gap-4">
-              <DataValue label="Letzte Berührung">
+              <DataValue label={t.beziehungDetail.letzteBeruehrung}>
                 {contact.lastInteractionAt ? (
-                  <time dateTime={contact.lastInteractionAt}>{formatDateTime(contact.lastInteractionAt)}</time>
+                  <time dateTime={contact.lastInteractionAt}>{formatDateTime(contact.lastInteractionAt, intl)}</time>
                 ) : null}
               </DataValue>
-              <DataValue label="Erfasst">
-                <time dateTime={contact.createdAt}>{formatDateTime(contact.createdAt)}</time>
+              <DataValue label={t.beziehungDetail.erfasst}>
+                <time dateTime={contact.createdAt}>{formatDateTime(contact.createdAt, intl)}</time>
               </DataValue>
             </dl>
           </div>
@@ -284,12 +285,9 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
   )
 }
 
-function formatDate(iso: string): string {
-  return datumAnzeige(iso)
+function formatDate(iso: string, locale: string): string {
+  return datumAnzeige(iso, locale)
 }
-function formatDateTime(iso: string): string {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime())
-    ? iso
-    : d.toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
+function formatDateTime(iso: string, locale: string): string {
+  return datumAnzeige(iso, locale, "lang")
 }

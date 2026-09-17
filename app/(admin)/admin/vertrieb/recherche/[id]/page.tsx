@@ -16,13 +16,13 @@ import {
   SectionHeader,
 } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { getVertriebStore } from "@/lib/lead-store"
 import {
   EXCLUSIONS,
   RESEARCH_STATES,
   SIGNALS,
   SOURCES,
-  STATE_MEANING,
   abbruch,
   alterInTagen,
   einordnung,
@@ -31,9 +31,7 @@ import {
 } from "@/lib/research"
 import {
   CONTACT_SOURCES,
-  CONTACT_SOURCE_LABEL,
   DECISIONS,
-  DECISION_LABEL,
   ansprachedeckung,
   kontaktLage,
 } from "@/lib/contact-access"
@@ -55,13 +53,17 @@ import { datumAnzeige } from "@/lib/geschaeftszeit"
  */
 export const dynamic = "force-dynamic"
 
-export const metadata = { title: "Recherche · Betrieb" }
+export async function generateMetadata() {
+  const { t } = await adminSprachKontext()
+  return { title: t.rechercheDetail.titel }
+}
 
-function fmt(iso: string): string {
-  return datumAnzeige(iso, "de-DE", "lang")
+function fmt(iso: string, intl: string): string {
+  return datumAnzeige(iso, intl, "lang")
 }
 
 export default async function RechercheDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { t, intl } = await adminSprachKontext()
   const { id } = await params
   const store = getVertriebStore()
   /*
@@ -69,7 +71,7 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
    * gar nicht gesucht. Und ein Speicherfehler ist keine fehlende Kennung.
    */
   const nichtVerfuegbar = (
-    <VertriebShell title="Recherche" available={false}>
+    <VertriebShell title={t.rechercheDetail.titel} available={false}>
       {null}
     </VertriebShell>
   )
@@ -97,27 +99,35 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
   const belegteSignale = new Set(gueltig.filter((x) => x.kind === "signal").map((x) => x.ref))
 
   return (
-    <VertriebShell title={fall.organisationName} lead={STATE_MEANING[fall.status]} available>
+    <VertriebShell
+      title={fall.organisationName}
+      lead={t.rechercheDetail.statusBedeutung[fall.status] ?? fall.status}
+      available
+    >
       <Link href="/admin/vertrieb/recherche" className="type-small text-gold-text underline underline-offset-4">
-        ← Zur Recherche
+        {t.rechercheDetail.zurListe}
       </Link>
 
       <div className="mt-10 grid gap-12 lg:grid-cols-12">
         <div className="min-w-0 lg:col-span-7">
           {/* ── Urteil ── */}
           <section aria-labelledby="urteil">
-            <SectionHeader id="urteil" title="Urteil" />
+            <SectionHeader id="urteil" title={t.rechercheDetail.urteil} />
             <div className="mt-5 flex flex-col gap-5">
               {([
-                ["Passung", e.passung],
-                ["Zugang", e.zugang],
-                ["Bedienbarkeit", e.bedienbarkeit],
-                ["Kaufkraft", e.kaufkraft],
+                ["passung", e.passung],
+                ["zugang", e.zugang],
+                ["bedienbarkeit", e.bedienbarkeit],
+                ["kaufkraft", e.kaufkraft],
               ] as const).map(([name, achse]) => (
                 <div key={name}>
                   <span className="flex items-center gap-3">
-                    <span className="eyebrow text-muted-foreground w-32 shrink-0">{name}</span>
-                    <Pill severity={achse.urteil === "passend" ? "attention" : "neutral"}>{achse.urteil}</Pill>
+                    <span className="eyebrow text-muted-foreground w-32 shrink-0">
+                      {t.rechercheDetail.achsen[name] ?? name}
+                    </span>
+                    <Pill severity={achse.urteil === "passend" ? "attention" : "neutral"}>
+                      {t.rechercheDetail.urteile[achse.urteil] ?? achse.urteil}
+                    </Pill>
                   </span>
                   <ul className="mt-2 ms-32 flex flex-col gap-1">
                     {achse.gruende.map((g) => (
@@ -132,28 +142,25 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
 
           {/* ── Belege ── */}
           <section aria-labelledby="belege" className="mt-12">
-            <SectionHeader id="belege" title="Belege" />
+            <SectionHeader id="belege" title={t.rechercheDetail.belege} />
             {mehrfach.length > 0 && (
               <p className="text-gold-text type-small mt-4 text-pretty">
-                Mehrfach belegt: {mehrfach.map((k) => k.ref).join(", ")}. Mehrere gültige Belege
-                können sich <em>decken</em> oder <em>widersprechen</em> — das steht in den Sätzen,
-                nicht in der Struktur, und deshalb sagt es Ihnen niemand außer Ihnen selbst. Der
-                neuere ist dabei nicht automatisch der bessere.
+                {t.rechercheDetail.mehrfachBelegtHinweis(mehrfach.map((k) => k.ref).join(", "))}
               </p>
             )}
             {gueltig.length === 0 ? (
               <p className="type-small text-muted-foreground mt-4">
-                Noch kein Beleg. Ohne Quelle zählt keine Beobachtung.
+                {t.rechercheDetail.keinBeleg}
               </p>
             ) : (
               <ul className="mt-4 flex flex-col">
                 {gueltig.map((b) => (
                   <li key={b.id} className="border-line border-b py-4">
                     <span className="flex flex-wrap items-baseline gap-3">
-                      <Pill severity="neutral">{b.kind}</Pill>
+                      <Pill severity="neutral">{t.rechercheDetail.belegArten[b.kind] ?? b.kind}</Pill>
                       {b.ref && <span className="text-meta text-gold-text">{b.ref}</span>}
                       <span className="text-meta text-muted-foreground">
-                        {SOURCES[b.sourceKind].label} · {fmt(b.observedAt)}
+                        {(t.rechercheDetail.quellen[b.sourceKind] ?? SOURCES[b.sourceKind].label)} · {fmt(b.observedAt, intl)}
                       </span>
                     </span>
                     <p className="type-small text-foreground mt-2 text-pretty">{b.claim}</p>
@@ -172,8 +179,7 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
             {abgeloest.length > 0 && (
               <details className="mt-5">
                 <summary className="type-small text-muted-foreground cursor-pointer">
-                  {abgeloest.length} abgelöste{abgeloest.length === 1 ? "r" : ""} Beleg
-                  {abgeloest.length === 1 ? "" : "e"} — bleiben in der Akte
+                  {t.rechercheDetail.abgeloesteBelege(abgeloest.length)}
                 </summary>
                 <ul className="mt-3 flex flex-col gap-2">
                   {abgeloest.map((b) => (
@@ -193,19 +199,23 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
               ist eine ENTSCHEIDUNG. Zwischen beiden steht dieser Abschnitt,
               und er entscheidet nichts von selbst. */}
           <section aria-labelledby="kontakt" className="mt-12">
-            <SectionHeader id="kontakt" title="Kontakt & Zugang" />
+            <SectionHeader id="kontakt" title={t.rechercheDetail.kontaktZugang} />
 
             <div className="mt-5 flex flex-col gap-4">
               {([
-                ["Passung", lage.passung],
-                ["Person", lage.person],
-                ["Zugang", lage.zugang],
-                ["Anlass", lage.anlass],
+                ["passung", lage.passung],
+                ["person", lage.person],
+                ["zugang", lage.zugang],
+                ["anlass", lage.anlass],
               ] as const).map(([name, achse]) => (
                 <div key={name} className="flex flex-col gap-1 sm:flex-row sm:gap-4">
-                  <span className="eyebrow text-muted-foreground sm:w-24 sm:shrink-0">{name}</span>
+                  <span className="eyebrow text-muted-foreground sm:w-24 sm:shrink-0">
+                    {t.rechercheDetail.achsen[name] ?? name}
+                  </span>
                   <span className="min-w-0">
-                    <Pill severity={achse.urteil === "ja" ? "attention" : "neutral"}>{achse.urteil}</Pill>
+                    <Pill severity={achse.urteil === "ja" ? "attention" : "neutral"}>
+                      {t.rechercheDetail.urteile[achse.urteil] ?? achse.urteil}
+                    </Pill>
                     <span className="type-small text-muted-foreground ms-3 text-pretty">{achse.grund}</span>
                   </span>
                 </div>
@@ -218,9 +228,9 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
 
             {/* Person zuordnen */}
             <form action={setResearchPerson.bind(null, fall.id)} className="mt-7 flex flex-col gap-5">
-              <AdminField label="Wer ist die relevante Person?" htmlFor="contactId">
+              <AdminField label={t.rechercheDetail.personRelevant} htmlFor="contactId">
                 <AdminSelect id="contactId" name="contactId" defaultValue={fall.contactId ?? ""}>
-                  <option value="">keine Person zugeordnet</option>
+                  <option value="">{t.rechercheDetail.keinePersonZugeordnet}</option>
                   {kandidaten.map((k) => (
                     <option key={k.id} value={k.id}>
                       {k.name}{k.role ? ` — ${k.role}` : ""}
@@ -229,26 +239,28 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
                 </AdminSelect>
               </AdminField>
               <div className="grid gap-5 sm:grid-cols-2">
-                <AdminField label="Fundstelle zur Person" htmlFor="sourceUrl">
+                <AdminField label={t.rechercheDetail.fundstelleZurPerson} htmlFor="sourceUrl">
                   <AdminInput id="sourceUrl" name="sourceUrl" type="url" placeholder="https://…/impressum" />
                 </AdminField>
-                <AdminField label="Woher" htmlFor="sourceKind">
+                <AdminField label={t.rechercheDetail.woher} htmlFor="sourceKind">
                   <AdminSelect id="sourceKind" name="sourceKind" defaultValue={person?.sourceKind ?? ""}>
                     <option value="">—</option>
                     {CONTACT_SOURCES.map((k) => (
-                      <option key={k} value={k}>{CONTACT_SOURCE_LABEL[k]}</option>
+                      <option key={k} value={k}>{t.rechercheDetail.kontaktQuellen[k] ?? k}</option>
                     ))}
                   </AdminSelect>
                 </AdminField>
               </div>
-              <button type="submit" className="cta-quiet self-start px-4 py-2 text-sm">Person speichern</button>
+              <button type="submit" className="cta-quiet self-start px-4 py-2 text-sm">{t.rechercheDetail.personSpeichern}</button>
             </form>
 
             {person && (
               <dl className="border-line mt-7 flex flex-col gap-4 border-t pt-6">
-                <DataValue label="Rolle">{person.role}</DataValue>
-                <DataValue label="Nähe">{person.relationship}</DataValue>
-                <DataValue label="LinkedIn">
+                <DataValue label={t.rechercheDetail.rolle}>{person.role}</DataValue>
+                <DataValue label={t.rechercheDetail.naehe}>
+                  {t.begriffe.beziehung[person.relationship] ?? person.relationship}
+                </DataValue>
+                <DataValue label={t.rechercheDetail.linkedIn}>
                   {person.linkedinUrl ? (
                     <a
                       href={person.linkedinUrl}
@@ -256,11 +268,11 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
                       rel="noopener noreferrer nofollow"
                       className="text-gold-text underline underline-offset-4"
                     >
-                      Profil öffnen
+                      {t.rechercheDetail.profilOeffnen}
                     </a>
                   ) : null}
                 </DataValue>
-                <DataValue label="Fundstelle">
+                <DataValue label={t.rechercheDetail.fundstelle}>
                   {person.sourceUrl ? (
                     <a
                       href={person.sourceUrl}
@@ -277,28 +289,33 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
 
             {/* Das Entscheidungstor */}
             <div className="border-gold/45 mt-8 border-s-2 ps-6">
-              <p className="eyebrow text-gold-text">Entscheidung</p>
+              <p className="eyebrow text-gold-text">{t.rechercheDetail.entscheidung}</p>
               <p className="type-small text-muted-foreground mt-3 max-w-xl text-pretty">
                 {deckung.gedeckt
-                  ? `Eine Ansprache wäre gedeckt: ${deckung.grund}`
-                  : `Eine Ansprache wäre NICHT gedeckt: ${deckung.grund}`}
+                  ? t.rechercheDetail.anspracheGedeckt(deckung.grund)
+                  : t.rechercheDetail.anspracheNichtGedeckt(deckung.grund)}
               </p>
               <form action={decideResearchContact.bind(null, fall.id)} className="mt-5 flex flex-col gap-5">
-                <AdminField label="Was entscheiden Sie?" htmlFor="decision">
+                <AdminField label={t.rechercheDetail.wasEntscheidenSie} htmlFor="decision">
                   <AdminSelect id="decision" name="decision" defaultValue={fall.contactDecision ?? ""}>
-                    <option value="">noch nicht entschieden</option>
+                    <option value="">{t.rechercheDetail.nochNichtEntschieden}</option>
                     {DECISIONS.map((d) => (
                       <option key={d} value={d} disabled={d === "vorbereiten" && !deckung.gedeckt}>
-                        {DECISION_LABEL[d]}
-                        {d === "vorbereiten" && !deckung.gedeckt ? " — nicht gedeckt" : ""}
+                        {t.rechercheDetail.entscheidungen[d] ?? d}
+                        {d === "vorbereiten" && !deckung.gedeckt ? ` — ${t.rechercheDetail.nichtGedeckt}` : ""}
                       </option>
                     ))}
                   </AdminSelect>
                 </AdminField>
-                <AdminField label="Warum" htmlFor="note">
-                  <AdminInput id="note" name="note" defaultValue={fall.contactDecisionNote ?? ""} placeholder="Ein Satz, der die Entscheidung trägt." />
+                <AdminField label={t.rechercheDetail.warum} htmlFor="note">
+                  <AdminInput
+                    id="note"
+                    name="note"
+                    defaultValue={fall.contactDecisionNote ?? ""}
+                    placeholder={t.rechercheDetail.entscheidungPlatzhalter}
+                  />
                 </AdminField>
-                <button type="submit" className="cta-quiet self-start px-4 py-2 text-sm">Entscheidung festhalten</button>
+                <button type="submit" className="cta-quiet self-start px-4 py-2 text-sm">{t.rechercheDetail.entscheidungFesthalten}</button>
               </form>
               <ul className="mt-6 flex flex-col gap-1">
                 {lage.niemalsAutomatisch.map((n) => (
@@ -310,116 +327,121 @@ export default async function RechercheDetail({ params }: { params: Promise<{ id
 
           {/* ── Beleg hinzufügen ── */}
           <section aria-labelledby="neuer-beleg" className="mt-12">
-            <SectionHeader id="neuer-beleg" title="Beleg hinzufügen" />
+            <SectionHeader id="neuer-beleg" title={t.rechercheDetail.belegHinzufuegen} />
             <form action={addResearchEvidence.bind(null, fall.id)} className="mt-4 flex flex-col gap-5">
               <div className="grid gap-5 sm:grid-cols-2">
-                <AdminField label="Art" htmlFor="kind">
+                <AdminField label={t.rechercheDetail.art} htmlFor="kind">
                   <AdminSelect id="kind" name="kind" defaultValue="signal">
-                    <option value="signal">Signal — stützt einen Betriebszustand</option>
-                    <option value="fact">Beobachtung — Tatsache ohne Signalbezug</option>
-                    <option value="anlass">Anlass — öffentliches Ereignis</option>
-                    <option value="ausschluss">Ausschluss</option>
+                    <option value="signal">{t.rechercheDetail.belegArten.signal}</option>
+                    <option value="fact">{t.rechercheDetail.belegArten.fact}</option>
+                    <option value="anlass">{t.rechercheDetail.belegArten.anlass}</option>
+                    <option value="ausschluss">{t.rechercheDetail.belegArten.ausschluss}</option>
                   </AdminSelect>
                 </AdminField>
-                <AdminField label="Bezug (bei Signal oder Ausschluss)" htmlFor="ref">
+                <AdminField label={t.rechercheDetail.bezug} htmlFor="ref">
                   <AdminSelect id="ref" name="ref" defaultValue="">
                     <option value="">—</option>
                     {Object.entries(SIGNALS).map(([k, s]) => (
-                      <option key={k} value={k}>{s.label}</option>
+                      <option key={k} value={k}>{t.rechercheDetail.signale[k] ?? s.label}</option>
                     ))}
                     {EXCLUSIONS.map((x) => (
-                      <option key={x.key} value={x.key}>Ausschluss: {x.label}</option>
-                    ))}
-                  </AdminSelect>
-                </AdminField>
-              </div>
-              <AdminField label="Was wurde beobachtet — nicht, was es bedeutet" htmlFor="claim">
-                <AdminInput id="claim" name="claim" required placeholder="z. B. Stellenanzeige nennt Lexware, Excel und ein Branchenprogramm" />
-              </AdminField>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <AdminField label="Fundstelle (Pflicht)" htmlFor="sourceUrl">
-                  <AdminInput id="sourceUrl" name="sourceUrl" type="url" required placeholder="https://…" />
-                </AdminField>
-                <AdminField label="Quellenart" htmlFor="sourceKind">
-                  <AdminSelect id="sourceKind" name="sourceKind" defaultValue="website">
-                    {(Object.keys(SOURCES) as SourceKind[]).map((k) => (
-                      <option key={k} value={k}>
-                        {SOURCES[k].label}{SOURCES[k].automatisch ? "" : " · nur von Hand"}
+                      <option key={x.key} value={x.key}>
+                        {t.rechercheDetail.belegArten.ausschluss}: {t.rechercheDetail.ausschluesse[x.key] ?? x.label}
                       </option>
                     ))}
                   </AdminSelect>
                 </AdminField>
               </div>
-              <button type="submit" className="cta-quiet self-start px-4 py-2 text-sm">Beleg speichern</button>
+              <AdminField label={t.rechercheDetail.beobachtet} htmlFor="claim">
+                <AdminInput id="claim" name="claim" required placeholder={t.rechercheDetail.beobachtetPlatzhalter} />
+              </AdminField>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <AdminField label={t.rechercheDetail.fundstellePflicht} htmlFor="sourceUrl">
+                  <AdminInput id="sourceUrl" name="sourceUrl" type="url" required placeholder="https://…" />
+                </AdminField>
+                <AdminField label={t.rechercheDetail.quellenart} htmlFor="sourceKind">
+                  <AdminSelect id="sourceKind" name="sourceKind" defaultValue="website">
+                    {(Object.keys(SOURCES) as SourceKind[]).map((k) => (
+                      <option key={k} value={k}>
+                        {(t.rechercheDetail.quellen[k] ?? SOURCES[k].label)}
+                        {SOURCES[k].automatisch ? "" : ` · ${t.rechercheDetail.nurVonHand}`}
+                      </option>
+                    ))}
+                  </AdminSelect>
+                </AdminField>
+              </div>
+              <button type="submit" className="cta-quiet self-start px-4 py-2 text-sm">{t.rechercheDetail.belegSpeichern}</button>
             </form>
           </section>
         </div>
 
         {/* ── Seitenspalte ── */}
         <aside className="min-w-0 lg:col-span-5">
-          <SectionHeader title="Herkunft" />
+          <SectionHeader title={t.rechercheDetail.herkunft} />
           <dl className="mt-4 flex flex-col gap-4">
-            <DataValue label="Warum entdeckt">{fall.discoveryWhy}</DataValue>
-            <DataValue label="Gefunden über">{SOURCES[fall.discoveryKind].label}</DataValue>
-            <DataValue label="Entdeckt am">{fmt(fall.discoveredAt)}</DataValue>
-            <DataValue label="Jüngster Beleg">
-              {tage === null ? null : `vor ${tage} Tagen`}
+            <DataValue label={t.rechercheDetail.warumEntdeckt}>{fall.discoveryWhy}</DataValue>
+            <DataValue label={t.rechercheDetail.gefundenUeber}>
+              {t.rechercheDetail.quellen[fall.discoveryKind] ?? SOURCES[fall.discoveryKind].label}
+            </DataValue>
+            <DataValue label={t.rechercheDetail.entdecktAm}>{fmt(fall.discoveredAt, intl)}</DataValue>
+            <DataValue label={t.rechercheDetail.juengsterBeleg}>
+              {tage === null ? null : t.rechercheDetail.vorTagen(tage)}
             </DataValue>
           </dl>
           {!SOURCES[fall.discoveryKind].automatisch && (
             <p className="type-small text-muted-foreground mt-4 text-pretty">
-              {SOURCES[fall.discoveryKind].hinweis}
+              {t.rechercheDetail.quellenHinweis[fall.discoveryKind] ?? SOURCES[fall.discoveryKind].hinweis}
             </p>
           )}
 
-          <div className="mt-12"><SectionHeader title="Was noch offen ist" /></div>
+          <div className="mt-12"><SectionHeader title={t.rechercheDetail.wasNochOffenIst} /></div>
           <ul className="mt-4 flex flex-col gap-2">
             {Object.entries(SIGNALS)
               .filter(([k]) => !belegteSignale.has(k))
               .slice(0, 5)
               .map(([k, s]) => (
                 <li key={k} className="type-small text-muted-foreground text-pretty">
-                  ? {s.label} — {s.evidence}
+                  ? {t.rechercheDetail.signale[k] ?? s.label} — {s.evidence}
                 </li>
               ))}
           </ul>
 
-          <div className="mt-12"><SectionHeader title="Zustand" /></div>
+          <div className="mt-12"><SectionHeader title={t.rechercheDetail.zustand} /></div>
           <form action={setResearchCase.bind(null, fall.id)} className="mt-4 flex flex-col gap-5">
-            <AdminField label="Recherchezustand" htmlFor="status">
+            <AdminField label={t.rechercheDetail.recherchezustand} htmlFor="status">
               <AdminSelect id="status" name="status" defaultValue={fall.status}>
                 {RESEARCH_STATES.map((s) => (
-                  <option key={s} value={s}>{s} — {STATE_MEANING[s]}</option>
+                  <option key={s} value={s}>
+                    {t.begriffe.rechercheStatus[s] ?? s} — {t.rechercheDetail.statusBedeutung[s] ?? s}
+                  </option>
                 ))}
               </AdminSelect>
             </AdminField>
-            <AdminField label="Zugang" htmlFor="access">
+            <AdminField label={t.rechercheDetail.zugang} htmlFor="access">
               <AdminSelect id="access" name="access" defaultValue={fall.access ?? ""}>
-                <option value="">nicht recherchiert</option>
-                <option value="empfehlung">Empfehlung</option>
-                <option value="netzwerk">Netzwerk</option>
-                <option value="eingehend">selbst angefragt</option>
-                <option value="bestandskunde">Bestandskunde</option>
-                <option value="keiner">kein ehrlicher Weg</option>
+                <option value="">{t.rechercheDetail.zugangNichtRecherchiert}</option>
+                <option value="empfehlung">{t.rechercheDetail.zugangsoptionen.empfehlung}</option>
+                <option value="netzwerk">{t.rechercheDetail.zugangsoptionen.netzwerk}</option>
+                <option value="eingehend">{t.rechercheDetail.zugangsoptionen.eingehend}</option>
+                <option value="bestandskunde">{t.rechercheDetail.zugangsoptionen.bestandskunde}</option>
+                <option value="keiner">{t.rechercheDetail.zugangsoptionen.keiner}</option>
               </AdminSelect>
             </AdminField>
-            <AdminField label="Heute bedienbar" htmlFor="serviceable">
+            <AdminField label={t.rechercheDetail.heuteBedienbar} htmlFor="serviceable">
               <AdminSelect id="serviceable" name="serviceable" defaultValue={fall.serviceable === null ? "" : String(fall.serviceable)}>
-                <option value="">nicht geprüft</option>
-                <option value="true">ja</option>
-                <option value="false">nein — z. B. Rechnungslage ungeklärt</option>
+                <option value="">{t.rechercheDetail.serviceableOptionen.unbekannt}</option>
+                <option value="true">{t.rechercheDetail.serviceableOptionen.ja}</option>
+                <option value="false">{t.rechercheDetail.serviceableOptionen.nein}</option>
               </AdminSelect>
             </AdminField>
-            <AdminField label="Nächster Schritt" htmlFor="nextAction">
+            <AdminField label={t.rechercheDetail.naechsterSchritt} htmlFor="nextAction">
               <AdminInput id="nextAction" name="nextAction" defaultValue={fall.nextAction ?? ""} placeholder={stop.warum} />
             </AdminField>
-            <button type="submit" className="cta-quiet self-start px-4 py-2 text-sm">Zustand speichern</button>
+            <button type="submit" className="cta-quiet self-start px-4 py-2 text-sm">{t.rechercheDetail.zustandSpeichern}</button>
           </form>
 
           <p className="type-small text-muted-foreground border-line mt-10 border-t pt-5 text-pretty">
-            Aus dieser Seite entsteht keine Verkaufschance, kein Kontakt und keine
-            Werbeeinwilligung. Wer angesprochen wird und wie, entscheidet G11 —
-            auch dann, wenn hier ein Anlass belegt ist.
+            {t.rechercheDetail.fuss}
           </p>
         </aside>
       </div>

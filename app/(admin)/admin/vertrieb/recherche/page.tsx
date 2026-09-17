@@ -2,27 +2,20 @@ import Link from "next/link"
 
 import { Abschneidehinweis, Pill, SectionHeader } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { getVertriebStore } from "@/lib/lead-store"
-import { RESEARCH_STATES, STATE_MEANING, abbruch, alterInTagen, einordnung, mehrfachBelegt } from "@/lib/research"
+import { RESEARCH_STATES, abbruch, alterInTagen, einordnung, mehrfachBelegt } from "@/lib/research"
 
 /**
- * Vertrieb · Recherche.
- *
- * ---------------------------------------------------------------------------
- * SORTIERT NACH ARBEIT, NICHT NACH ALPHABET
- * Oben steht, woran heute etwas zu tun ist. Ein Betrieb, dem ein zweites
- * Signal fehlt, ist Arbeit; einer, der zurueckgestellt ist, ist es nicht.
- *
- * ---------------------------------------------------------------------------
- * KEINE PUNKTZAHL
- * Die Spalte „Passung" traegt ein Wort und einen Grund, keine Zahl. Wer
- * widerspricht, widerspricht einem Satz.
+ * Vertrieb · Recherche — ADM-01 DE/TR.
  */
 export const dynamic = "force-dynamic"
 
-export const metadata = { title: "Recherche" }
+export async function generateMetadata() {
+  const { t } = await adminSprachKontext()
+  return { title: t.rechercheListe.titel }
+}
 
-/** Arbeit zuerst. Die Reihenfolge IST die Aussage. */
 const RANG: Record<string, number> = {
   "beleg-fehlt": 0,
   "in-recherche": 1,
@@ -38,11 +31,11 @@ export default async function RecherchePage({
 }: {
   searchParams: Promise<{ status?: string }>
 }) {
+  const { t } = await adminSprachKontext()
   const { status } = await searchParams
   const store = getVertriebStore()
-  /* ADM-02 · A19 — nicht eingerichtet und nicht erreichbar zeigen dieselbe Hülle; welcher Fall, sagt sie selbst. */
   const nichtVerfuegbar = (
-    <VertriebShell title="Recherche" lead="Betriebe finden, belegen, einordnen." available={false}>
+    <VertriebShell title={t.rechercheListe.titel} lead={t.rechercheListe.lead} available={false}>
       {null}
     </VertriebShell>
   )
@@ -51,8 +44,6 @@ export default async function RecherchePage({
   const gefiltert = (RESEARCH_STATES as readonly string[]).includes(status ?? "")
     ? (status as (typeof RESEARCH_STATES)[number])
     : undefined
-  /* Die Obergrenze steht als Konstante, damit der Hinweis unten dieselbe
-     Zahl nennt, die oben geholt wurde — zwei Zahlen wuerden auseinanderlaufen. */
   const GRENZE = 200
   const faelle = await store.listResearch({ status: gefiltert, limit: GRENZE }).catch(() => null)
   if (faelle === null) return nichtVerfuegbar
@@ -60,18 +51,18 @@ export default async function RecherchePage({
 
   return (
     <VertriebShell
-      title="Recherche"
-      lead="Betriebe finden, belegen, einordnen — bis klar ist, ob ein Gespräch lohnt."
+      title={t.rechercheListe.titel}
+      lead={t.rechercheListe.lead}
       available
     >
-      <nav aria-label="Zustand" className="flex flex-wrap gap-2">
+      <nav aria-label={t.rechercheListe.zustandNav} className="flex flex-wrap gap-2">
         <Link
           href="/admin/vertrieb/recherche"
           className={`type-small rounded-sm border px-3 py-1.5 ${
             gefiltert ? "border-line-strong text-muted-foreground" : "border-gold text-gold-text"
           }`}
         >
-          alle
+          {t.rechercheListe.alle}
         </Link>
         {RESEARCH_STATES.map((s) => (
           <Link
@@ -81,23 +72,22 @@ export default async function RecherchePage({
               gefiltert === s ? "border-gold text-gold-text" : "border-line-strong text-muted-foreground"
             }`}
           >
-            {s}
+            {t.begriffe.rechercheStatus[s] ?? s}
           </Link>
         ))}
       </nav>
 
       {sortiert.length === 0 ? (
         <section className="border-line mt-10 border-s-2 py-6 ps-6">
-          <SectionHeader title="Noch kein Betrieb in der Recherche" />
+          <SectionHeader title={t.rechercheListe.leerTitel} />
           <p className="type-small text-muted-foreground mt-4 max-w-2xl text-pretty">
-            Ein Betrieb kommt hier hinein, sobald ein Anlass ihn hineinbringt — eine
-            Stellenanzeige, die drei Werkzeuge nebeneinander nennt; eine Ausschreibung; ein
-            Hinweis aus dem Netzwerk. Die Recherche endet, wenn zwei Betriebssignale belegt
-            sind oder ein Ausschluss feststeht. Nicht später.
+            {t.rechercheListe.leerText}
           </p>
           <p className="type-small text-muted-foreground mt-4">
-            Woran ein passender Betrieb zu erkennen ist, steht im Zielbild:{" "}
-            <code className="text-gold-text">docs/sales/market-canon.md</code>
+            {t.rechercheListe.zielbildHinweis}{" "}
+            <Link href="/admin/material#gruppe-entscheidungen" className="text-gold-text underline underline-offset-4">
+              {t.rechercheListe.zielbildLink}
+            </Link>
           </p>
         </section>
       ) : (
@@ -116,26 +106,25 @@ export default async function RecherchePage({
                 >
                   <span className="lg:w-72 lg:shrink-0">
                     <span className="type-small text-foreground block">{f.organisationName}</span>
-                    <span className="text-meta text-muted-foreground block">{f.status}</span>
+                    <span className="text-meta text-muted-foreground block">
+                      {t.begriffe.rechercheStatus[f.status] ?? f.status}
+                    </span>
                   </span>
                   <span className="lg:w-40 lg:shrink-0">
                     <Pill severity={e.passung.urteil === "passend" ? "attention" : "neutral"}>
-                      {e.passung.urteil}
+                      {t.rechercheListe.passung[e.passung.urteil] ?? e.passung.urteil}
                     </Pill>
                   </span>
                   <span className="type-small text-muted-foreground min-w-0 flex-1 text-pretty">
                     {stop.warum}
                   </span>
                   <span className="text-meta text-muted-foreground lg:w-52 lg:shrink-0 lg:text-end">
-                    {/* GATE 11 — ob eine Person am Vorgang haengt, ist die
-                        zweite Frage nach der Passung. Sie gehoert in die
-                        Uebersicht, sonst sucht man sie in jedem Detail. */}
-                    {f.contactId ? "Person" : "ohne Person"}
+                    {f.contactId ? t.rechercheListe.mitPerson : t.rechercheListe.ohnePerson}
                     {f.contactDecision ? ` · ${f.contactDecision}` : ""}
                     {" · "}
-                    {belegt} {belegt === 1 ? "Signal" : "Signale"}
-                    {tage !== null && ` · ${tage} T`}
-                    {mehrfach > 0 && ` · ${mehrfach} mehrfach belegt`}
+                    {t.rechercheListe.signal(belegt)}
+                    {tage !== null && ` · ${t.rechercheListe.tage(tage)}`}
+                    {mehrfach > 0 && ` · ${t.rechercheListe.mehrfach(mehrfach)}`}
                   </span>
                 </Link>
               </li>
@@ -147,14 +136,12 @@ export default async function RecherchePage({
       <Abschneidehinweis
         gezeigt={sortiert.length}
         grenze={GRENZE}
-        wie="Über die Zustände oben lässt sich die Menge eingrenzen."
+        wie={t.rechercheListe.abschneideWie}
       />
 
-      <p className="type-small text-muted-foreground border-line mt-10 border-t pt-6 max-w-2xl text-pretty">
-        Recherche ist kein Vertrieb. Hier entsteht keine Verkaufschance, kein Kontakt und
-        keine Werbeeinwilligung — nur ein begründetes Urteil darüber, ob ein Gespräch lohnt.
-        {" "}
-        <span className="text-foreground">{STATE_MEANING["bereit-fuer-kontakt"]}</span>
+      <p className="type-small text-muted-foreground border-line mt-10 max-w-2xl border-t pt-6 text-pretty">
+        {t.rechercheListe.fuss}{" "}
+        <span className="text-foreground">{t.rechercheListe.bereitFuerKontakt}</span>
       </p>
     </VertriebShell>
   )
