@@ -37,6 +37,7 @@
     "lieferung-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/lieferung-drill.mjs",
     "produkt-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/produkt-drill.mjs",
     "verkauf-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/verkauf-drill.mjs",
+    "versuch-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/versuch-drill.mjs",
     "sitzung-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/sitzung-drill.mjs",
     "rollen-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/rollen-drill.mjs",
     "betrieb-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/betrieb-drill.mjs",

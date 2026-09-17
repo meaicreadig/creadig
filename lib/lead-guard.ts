@@ -155,6 +155,15 @@ export function callerAddress(request: Request): string {
   return request.headers.get("x-real-ip")?.trim() || "unknown"
 }
 
+/**
+ * ADM-02 · H3 — ist ein `bucketKey` pseudonym (signiert) oder die rohe Adresse?
+ * Nur ein signierter Schluessel darf in eine Datenbank: Ein SHA-256 ueber eine
+ * IPv4-Adresse laesst sich durch Ausprobieren aller Adressen zurueckrechnen.
+ */
+export function bucketKeyIsPseudonymous(): boolean {
+  return secret() !== null
+}
+
 export async function bucketKey(scope: string, address: string): Promise<string> {
   const value = secret()
   // Ohne Geheimnis kein Hash — dann steht die Adresse nur im Arbeitsspeicher

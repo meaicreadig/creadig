@@ -60,6 +60,8 @@ const LAEUFE = [
   { name: "kette", db: "drill_kette", variable: "KETTE_DRILL_URL" },
   /* ADM-02 · H2 — Sitzungswiderruf. */
   { name: "sitzung", db: "drill_sitzung", variable: "SITZUNG_DRILL_URL" },
+  /* ADM-02 · H3 — Versuchsfenster ueber Instanzen. */
+  { name: "versuch", db: "drill_versuch", variable: "VERSUCH_DRILL_URL" },
 ]
 
 function psql(sql) {

@@ -12,6 +12,7 @@ import {
   verifyFormToken,
   withinLimit,
 } from "@/lib/lead-guard"
+import { durableWithinLimit } from "@/lib/rate-limit"
 import { createLeadIdentity } from "@/lib/lead-id"
 import { evaluateCheck, parseCheckAnswers } from "@/lib/betriebscheck"
 import { findExistingSubmission, storeLead } from "@/lib/lead-store"
@@ -878,7 +879,8 @@ export async function POST(request: Request) {
     Skript ohne gültiges Token soll das Fenster eines echten Besuchers hinter
     derselben Firmen-IP nicht auffüllen können.
   */
-  if (!withinLimit(await bucketKey("lead", callerAddress(request)), LIMITS.submitsPerWindow, now)) {
+  /* ADM-02 · H3 — Absendungen zaehlen ueber Instanzen hinweg; Token-Ausgabe bleibt im Arbeitsspeicher (kostet nichts). */
+  if (!(await durableWithinLimit(await bucketKey("lead", callerAddress(request)), LIMITS.submitsPerWindow, { now })).erlaubt) {
     console.warn("[lead] Fenster ausgeschoepft — nichts verschickt")
     return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 })
   }

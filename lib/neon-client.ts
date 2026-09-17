@@ -669,6 +669,18 @@ export const SCHEMA: string[] = [
    )`,
   `CREATE INDEX IF NOT EXISTS admin_session_revocations_expires_idx
     ON admin_session_revocations (expires_at)`,
+
+  /*
+   * 016 · ADMIN OS · H3 — Versuchsfenster ueber Instanzen.
+   * Siehe `scripts/migrations/016-versuchsfenster.sql` und `lib/rate-limit.ts`.
+   * Nicht Pflicht: Ohne sie zaehlt das Fenster im Arbeitsspeicher.
+   */
+  `CREATE TABLE IF NOT EXISTS rate_limit_windows (
+     bucket text NOT NULL,
+     window_start timestamptz NOT NULL,
+     hits integer NOT NULL,
+     PRIMARY KEY (bucket, window_start)
+   )`,
 ]
 
 /**

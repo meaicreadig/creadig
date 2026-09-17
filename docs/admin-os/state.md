@@ -34,7 +34,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 |---|:--:|:--:|:--:|:--:|---|---|---|
 | ADM-00 | 🟢 | — | — | 🟢 | `VERIFIED` | — (eingefroren, siehe unten) | — |
 | ADM-01 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Dark-Mode-Entscheidung beeinflusst nur Tokens, blockiert nicht |
-| ADM-02 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | H3 dauerhaftes Rate-Limit · Login-/Dashboard-Performance messen · Zeitzone Europe/Berlin | Cutover H1/H2/H4 = Deploy + Migration 015 (Produktionsautorität) |
+| ADM-02 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Europe/Berlin-Geschäftstag (A23) · Login-/Dashboard-Messung · Ladegrenzen/Datenzustände | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) |
 | ADM-03 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | — |
 | ADM-04 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Anbieterfreigaben (nach A2-Einstufung) |
 | ADM-05 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | G18 für Rechnung (`lib/rechnung.ts`) |
@@ -51,7 +51,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 |---|---|---|---|---|---|
 | **H1** | `neonClient().ready()` führte bei jedem Kaltstart vor der ersten Abfrage `seedBestand()` und `applyExclusions()` aus; `listEnquiries` zusätzlich bei **jedem** Aufruf (~60 UPDATEs) → **Lesen schrieb**. | Code `lib/neon-client.ts`, `lib/vertrieb-store-neon.ts` | hoch | ADM-02 | **VERIFIED** (16.09.2026) — siehe §H1 |
 | **H2** | Sitzung zustandslos; Abmelden löschte nur das Cookie, eine Kopie galt bis zu 8 h weiter — **kein serverseitiger Widerruf** (B04/B05). | Code | hoch | ADM-02 | **BUILT + lokal VERIFIED** (17.09.2026) — Live-Widerruf erst mit Migration 015 in Produktion · siehe §H2 |
-| **H3** | Rate-Limit ist In-Memory (`Map` in `lib/lead-guard.ts:141`) — nicht dauerhaft über Instanzen (B08). | Code | mittel | ADM-02 | offen |
+| **H3** | Rate-Limit nur im Arbeitsspeicher je Instanz (Admin-Anmeldung, Formular-Absendung) — nicht dauerhaft über Instanzen (B08). | Code | mittel | ADM-02 | **BUILT + lokal VERIFIED** (17.09.2026) — Live nach Migration 016 · siehe §H3 |
 | **H4** | Admin-Antworten ohne `X-Robots-Tag`; Anmelde-Route ohne `no-store`; **Anmeldung mit fremdem `Origin` angenommen (200 + Cookie)**. | Runtime gemessen (`next start`) | mittel→hoch (Login-CSRF) | ADM-02 | **VERIFIED** (16.09.2026) — siehe §H4 |
 | **H5** | Admin ist einsprachig: `app/(admin)/layout.tsx` `lang="de"`, keine TR-Wörterbuchschicht für Admin. | Code | hoch für 99 % | ADM-01 | offen |
 | **H6** | Zwei Owner-Übersichten: `/admin` (Heute, `lib/attention.ts`) und `/admin/cockpit` (G34, Gedächtnis+Navigator). Überlappung → A4-Zusammenlegung. | Code | mittel | ADM-01 | offen |
@@ -212,6 +212,22 @@ Mit eingefrorener Präzisierung:
 
 ---
 
+## H3 · Versuchsfenster über Instanzen (17.09.2026)
+
+**Änderung**: `lib/rate-limit.ts` `durableWithinLimit()` — feste 10-min-Fenster in `rate_limit_windows` (Migration **016**), atomarer Upsert `… RETURNING hits`. Eingesetzt für Admin-Anmeldung und Formular-**Absendung** (Token-Ausgabe bleibt im Arbeitsspeicher). `lib/neon-abfrage.ts` = gemeinsamer schmaler Neon-Zugang (auch von `admin-widerruf` genutzt).
+**Datenschutz**: DB nur mit **signiertem** Schlüssel (`bucketKeyIsPseudonymous()`), zusätzlich SHA-256; ohne Geheimnis bleibt die Adresse im Arbeitsspeicher. Fenster > 1 Tag werden gelöscht. Keine IP, kein Name in der Tabelle.
+**Degradation**: kein Speicher / Tabelle fehlt / Fehler → bisheriges Arbeitsspeicher-Fenster (Owner wird nicht ausgesperrt).
+
+| Prüfung | Ergebnis | Art |
+|---|---|---|
+| `versuch-drill` V1–V7 | PASS 13/13 — 10 von 12 erlaubt; **20 getrennte Verbindungen gleichzeitig → genau 5 von 5 erlaubt** (atomar); neues Fenster frei; nur SHA-256-Hex gespeichert; Altfenster geräumt; ohne Geheimnis nichts in der DB; gestörter Speicher → Fallback | reproduziert (DB lokal) |
+| `db-drills` 9/9 · build + Gates · smoke 36/36 (inkl. Formular-Ablehnungen) · tsc · ESLint | PASS | lokal |
+
+**Grenze**: Neon-HTTP-Pfad nur über Fallback laufzeitgeprüft; Live-Beweis nach Migration 016 (11 Fehlversuche aus zwei Regionen/Instanzen → 429).
+**Rechtlicher Hinweis (Owner, nicht blockierend)**: pseudonyme Missbrauchsabwehr ≤ 1 Tag — ob die Datenschutzerklärung das nennen soll, gehört zu `docs/ops/privacy-persistence-gate.md` (Datenschutztext = G18-gesperrt).
+
+---
+
 ## Routen-Karte (A4)
 
 | Route | Heute | Schicksal | Ziel | Grund |
@@ -246,5 +262,6 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 16.09.2026 | 1 | OD-1/OD-2 eingetragen · ADM-00 VERIFIED (Kritikalität, Entitätskarte, OWN/CONNECT, Abnahmeumfang) · **H1 VERIFIED** (`c7619f1`) |
 | 16.09.2026 | 1 | **H4 VERIFIED** — Admin-Header + Ursprungsprüfung, vorher/nachher gemessen, Browser-E2E |
 | 17.09.2026 | 2 | **H2 BUILT/lokal VERIFIED** (Widerruf, Migration 015) · **H8 VERIFIED** (Actions autorisieren selbst) · H9 rollen-drill repariert |
+| 17.09.2026 | 2 | **H3 BUILT/lokal VERIFIED** (Versuchsfenster, Migration 016) |
 
-**Fortsetzungspunkt:** ADM-02 — H3 dauerhaftes Rate-Limit (Neon-Tabelle, Migration 016, gleicher Degradationsvertrag), dann Europe/Berlin-Geschäftstag (A23), dann Login-/Dashboard-Messung (30 warm / 10 kalt). Danach ADM-01.
+**Fortsetzungspunkt:** ADM-02 — Europe/Berlin-Geschäftstag (A23: heute/überfällig an Mitternacht + Sommerzeit), dann Login-/Dashboard-Messung (30 warm / 10 kalt, `next start`), dann Datenzustände (A19). Danach ADM-01.

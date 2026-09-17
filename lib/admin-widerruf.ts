@@ -1,4 +1,4 @@
-import { neon } from "@neondatabase/serverless"
+import { neonAbfrage, tabelleFehlt as fehlt, type Abfrage } from "@/lib/neon-abfrage"
 
 import { verifySession, type SessionErgebnis } from "@/lib/admin-session"
 
@@ -38,22 +38,12 @@ import { verifySession, type SessionErgebnis } from "@/lib/admin-session"
  *     Sitzung soll aber auch nichts veraendern koennen.
  */
 
-export type Abfrage = (text: string, params: unknown[]) => Promise<Record<string, unknown>[]>
+export type { Abfrage }
 
 export const WIDERRUF_ALLE = "*"
 
 /** Die Abfragefunktion — oder `null`, wenn kein Speicher eingerichtet ist. */
-export function widerrufSpeicher(): Abfrage | null {
-  if (process.env.LEAD_STORE?.trim() !== "neon") return null
-  const url = process.env.DATABASE_URL?.trim()
-  if (!url) return null
-  try {
-    const sql = neon(url)
-    return (text, params) => sql.query(text, params) as Promise<Record<string, unknown>[]>
-  } catch {
-    return null
-  }
-}
+export const widerrufSpeicher = neonAbfrage
 
 export async function istWiderrufen(q: Abfrage, sid: string, issuedAt: number): Promise<boolean> {
   const rows = await q(
@@ -139,10 +129,6 @@ export async function pruefeZugang(
   }
 }
 
-/** Postgres `42P01 undefined_table` — ueber Neon-HTTP und `pg` gleich. */
 export function tabelleFehlt(error: unknown): boolean {
-  if (!error || typeof error !== "object") return false
-  const e = error as { code?: unknown; message?: unknown }
-  if (e.code === "42P01") return true
-  return typeof e.message === "string" && /relation "admin_session_revocations" does not exist/.test(e.message)
+  return fehlt(error, "admin_session_revocations")
 }

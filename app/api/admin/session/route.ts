@@ -10,7 +10,8 @@ import {
   withAdminHeaders,
 } from "@/lib/admin-session"
 import { alleWiderrufen, pruefeZugang, widerrufSpeicher, widerrufen } from "@/lib/admin-widerruf"
-import { bucketKey, callerAddress, withinLimit } from "@/lib/lead-guard"
+import { bucketKey, callerAddress } from "@/lib/lead-guard"
+import { durableWithinLimit } from "@/lib/rate-limit"
 
 /**
  * MP-G · Anmelden und Abmelden am Control Center.
@@ -45,7 +46,8 @@ async function anmelden(request: Request): Promise<NextResponse> {
   }
 
   const key = await bucketKey("admin-login", callerAddress(request))
-  if (!withinLimit(key, MAX_ATTEMPTS, Date.now())) {
+  /* ADM-02 · H3 — ueber Instanzen hinweg (`lib/rate-limit.ts`). */
+  if (!(await durableWithinLimit(key, MAX_ATTEMPTS)).erlaubt) {
     return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 })
   }
 
