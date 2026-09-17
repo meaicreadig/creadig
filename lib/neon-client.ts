@@ -698,6 +698,32 @@ export const SCHEMA: string[] = [
   `ALTER TABLE activities ADD COLUMN IF NOT EXISTS actor text`,
   `ALTER TABLE activities ADD COLUMN IF NOT EXISTS origin text`,
   `ALTER TABLE activities ADD COLUMN IF NOT EXISTS data jsonb`,
+
+  /*
+   * 018 · ADMIN OS · ADM-05 — Freigaben (Beleg-Erlaubnis).
+   * Siehe `scripts/migrations/018-freigaben.sql`. Sie HAELT eine Erlaubnis
+   * fest; die oeffentliche Projektion liest weiterhin `lib/site-data.ts`
+   * (G18). Der eindeutige Index macht das Erfassen idempotent.
+   */
+  `CREATE TABLE IF NOT EXISTS releases (
+     id text PRIMARY KEY,
+     organisation_id text NOT NULL REFERENCES organisations (id),
+     by_name text NOT NULL,
+     by_role text NOT NULL,
+     by_company text NOT NULL,
+     form text NOT NULL,
+     granted_on date NOT NULL,
+     scopes text[] NOT NULL DEFAULT '{}',
+     reference text NOT NULL,
+     withdrawn_at timestamptz,
+     withdrawn_reason text,
+     actor text,
+     created_at timestamptz NOT NULL DEFAULT now(),
+     updated_at timestamptz NOT NULL DEFAULT now()
+   )`,
+  `CREATE INDEX IF NOT EXISTS releases_organisation_idx ON releases (organisation_id)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS releases_eindeutig
+     ON releases (organisation_id, lower(btrim(by_name)), form, granted_on, lower(btrim(reference)))`,
   `CREATE INDEX IF NOT EXISTS leads_responsible_idx ON leads (responsible)`,
   `CREATE INDEX IF NOT EXISTS opportunities_responsible_idx ON opportunities (responsible)`,
 ]

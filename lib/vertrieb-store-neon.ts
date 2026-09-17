@@ -51,6 +51,8 @@ import type {
   DublettenKandidat,
   Herkunft,
   ManuelleAnfrage,
+  ReleaseEingabe,
+  ReleaseRow,
   Schreibergebnis,
 } from "@/lib/vertrieb"
 import { AKTEUR_SYSTEM } from "@/lib/vertrieb"
@@ -2096,6 +2098,143 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
      * steht absichtlich nicht in `REQUIRED_TABLES`. Ihr Fehlen darf das Haus
      * nicht anhalten — es darf nur nicht als „nichts gemessen" durchgehen.
      */
+
+    /* ══ ADM-05 · A13/A14 · FREIGABEN ═══════════════════════════════════
+     *
+     * Die Erlaubnis, einen Kunden zu zeigen, war bis heute Code in
+     * `lib/site-data.ts`: erfassbar nur mit einem Commit, widerrufbar nur
+     * mit einem Deploy. Ein Kunde, der anruft und sagt „nehmen Sie das
+     * bitte raus", darf darauf nicht warten.
+     *
+     * Was diese drei Methoden NICHT tun: die oeffentliche Seite steuern.
+     * Sie HALTEN die Erlaubnis fest. Die Bruecke zur Projektion ist G18
+     * gesperrt, und die Oberflaeche sagt das dort, wo es zaehlt.
+     */
+
+    async listReleases(organisationId?: string): Promise<ReleaseRow[] | null> {
+      try {
+        await ready()
+        const params: unknown[] = []
+        let where = ""
+        if (organisationId) {
+          params.push(organisationId)
+          where = `WHERE r.organisation_id = $1::text`
+        }
+        const rows = (await sql.query(
+          `SELECT r.*, org.name AS organisation_name
+             FROM releases r
+             JOIN organisations org ON org.id = r.organisation_id
+             ${where}
+            ORDER BY r.granted_on DESC, r.created_at DESC`,
+          params,
+        )) as Record<string, unknown>[]
+        return rows.map((r) => ({
+          id: String(r.id),
+          organisationId: String(r.organisation_id),
+          organisationName: String(r.organisation_name),
+          by: { name: String(r.by_name), role: String(r.by_role), company: String(r.by_company) },
+          form: String(r.form),
+          grantedOn: tag(r.granted_on as Ts),
+          scopes: (r.scopes as string[] | null) ?? [],
+          reference: String(r.reference),
+          withdrawnAt: r.withdrawn_at ? new Date(r.withdrawn_at as string).toISOString() : null,
+          withdrawnReason: (r.withdrawn_reason as string | null) ?? null,
+          actor: (r.actor as string | null) ?? null,
+          createdAt: new Date(r.created_at as string).toISOString(),
+        }))
+      } catch {
+        /*
+         * Kein `[]`. Eine Freigabereihe, die niemand lesen konnte, ist nicht
+         * „keine Erlaubnis" — und der Unterschied entscheidet, ob ein Beleg
+         * still von der Seite faellt oder ohne Ja darauf steht.
+         */
+        return null
+      }
+    },
+
+    async recordRelease(input: ReleaseEingabe): Promise<{ id: string; neu: boolean } | null> {
+      await ready()
+      const id = randomUUID()
+      /*
+       * Idempotent ueber den eindeutigen Index (018): dieselbe Organisation,
+       * derselbe Mensch, dieselbe Form, dasselbe Datum, dieselbe Fundstelle
+       * = EINE Erlaubnis. Zwei Klicks erzeugen keine zweite.
+       */
+      const rows = (await sql.query(
+        `INSERT INTO releases (id, organisation_id, by_name, by_role, by_company,
+                               form, granted_on, scopes, reference, actor,
+                               created_at, updated_at)
+         VALUES ($1::text, $2::text, $3::text, $4::text, $5::text,
+                 $6::text, $7::date, $8::text[], $9::text, $10::text, now(), now())
+         ON CONFLICT DO NOTHING
+         RETURNING id`,
+        [
+          id,
+          input.organisationId,
+          input.name,
+          input.role,
+          input.company,
+          input.form,
+          input.grantedOn,
+          input.scopes,
+          input.reference,
+          akteur.kennung,
+        ],
+      )) as { id: string }[]
+      if (!rows.length) {
+        const vorhanden = (await sql.query(
+          `SELECT id FROM releases
+            WHERE organisation_id = $1::text
+              AND lower(btrim(by_name)) = lower(btrim($2::text))
+              AND form = $3::text
+              AND granted_on = $4::date
+              AND lower(btrim(reference)) = lower(btrim($5::text))`,
+          [input.organisationId, input.name, input.form, input.grantedOn, input.reference],
+        )) as { id: string }[]
+        return vorhanden.length ? { id: vorhanden[0].id, neu: false } : null
+      }
+      await note(
+        "organisation",
+        input.organisationId,
+        "release.granted",
+        `Freigabe erfasst: ${input.scopes.join(", ")}`,
+        `${input.name} (${input.role}), ${input.form}, ${input.grantedOn} — ${input.reference}`,
+        { scopes: input.scopes, form: input.form },
+      )
+      return { id, neu: true }
+    },
+
+    async withdrawRelease(id: string, grund: string): Promise<"ok" | "schon-widerrufen" | "fehlt"> {
+      await ready()
+      const bestand = (await sql.query(
+        `SELECT organisation_id, withdrawn_at FROM releases WHERE id = $1::text`,
+        [id],
+      )) as { organisation_id: string; withdrawn_at: string | null }[]
+      if (!bestand.length) return "fehlt"
+      /*
+       * Bedingung im UPDATE, nicht nur im Kopf (H20): Ein zweiter Widerruf
+       * darf weder das Datum des ersten ueberschreiben noch eine zweite
+       * Chronikzeile schreiben — sonst stuende in der Akte, der Kunde habe
+       * zweimal widersprochen.
+       */
+      const rows = (await sql.query(
+        `UPDATE releases
+            SET withdrawn_at = now(), withdrawn_reason = $2::text, updated_at = now()
+          WHERE id = $1::text AND withdrawn_at IS NULL
+        RETURNING organisation_id`,
+        [id, grund],
+      )) as { organisation_id: string }[]
+      if (!rows.length) return "schon-widerrufen"
+      await note(
+        "organisation",
+        rows[0].organisation_id,
+        "release.withdrawn",
+        "Freigabe zurueckgezogen",
+        grund,
+        { grund },
+      )
+      return "ok"
+    },
 
     async measurementSamples(limit = 2000): Promise<MeasurementSampleRow[] | null> {
       try {

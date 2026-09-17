@@ -66,6 +66,8 @@ const LAEUFE = [
   { name: "kernschleife", db: "drill_kernschleife", variable: "KERNSCHLEIFE_DRILL_URL" },
   /* ADM-05 · H20 — jeder Zustandswechsel der Betriebskette genau einmal. */
   { name: "betriebskette", db: "drill_betriebskette", variable: "BETRIEBSKETTE_DRILL_URL" },
+  /* ADM-05 · A13/A14 — Erlaubnis und Widerruf. */
+  { name: "freigabe", db: "drill_freigabe", variable: "FREIGABE_DRILL_URL" },
 ]
 
 function psql(sql) {

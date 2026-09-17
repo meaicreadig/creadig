@@ -63,6 +63,7 @@ pruefe("Ueberall abmelden nur fuer Owner", /alle && zugang\.rolle !== "owner"/.t
 const SCHREIBPUNKTE = new Map([
   [join("app", "(admin)", "admin", "vertrieb", "actions.ts"), "requireStore()"],
   [join("app", "(admin)", "admin", "verbindungen", "actions.ts"), "requireOwner()"],
+  [join("app", "(admin)", "admin", "beleg", "actions.ts"), "requireOwnerStore()"],
 ])
 
 for (const [datei, waechter] of SCHREIBPUNKTE) {

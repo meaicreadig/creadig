@@ -37,7 +37,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | ADM-02 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` | Cutover: Deploy + `db-migrate` 015/016 in Produktion, danach Widerruf/Versuchsfenster/Login live messen | Produktionsautorität (Owner) | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
 | ADM-03 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | Cutover: Migration 017 **vor** Deploy; danach echte Anfrage im System (LIVE) | Produktionsautorität (Owner) |
 | ADM-04 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | Cutover: mit dem ADM-01/02/03-Paket ausliefern; danach Prüfung gegen die echten Speicher | keiner — **keine CRITICAL-Fähigkeit wartet auf einen Anbieter** (A2) |
-| ADM-05 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | G18 für Rechnung (`lib/rechnung.ts`) |
+| ADM-05 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | H21 (Serversätze DE/TR), dann Cutover mit Migration 018 | Beleg-Brücke zur öffentlichen Seite + Rechnung = **BLOCKED_G18** |
 | ADM-06 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | meAI-Anbieter/Kosten = Owner |
 | ADM-07 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Produktionsautorität |
 
@@ -415,6 +415,55 @@ und das Gate stehen schon.
 
 ---
 
+## ADM-05 · Betrieb, Kommerz, Beleg (BUILT + lokal VERIFIED 17.09.2026)
+
+### 1 · Die Betriebskette geschieht genau einmal (H20)
+
+Angebot senden · zusagen · Material · Abnahme · Übergabe sind **Geschäftshandlungen**, keine
+Speichervorgänge. Fünf von ihnen prüften ihre eigene Wirkung nicht: Die Bedingung stand im `UPDATE`,
+das Ergebnis las niemand. Jeder Wechsel trägt jetzt seine Bedingung **und** eine `RETURNING`-Prüfung;
+kam keine Zeile zurück, wird nichts behauptet, sondern gesagt, was der Fall ist. `addProjectChange`
+hängt in **einer** Anweisung an (`changes || $2` mit `NOT changes @> $2`) — kein verlorener
+Schreibvorgang, kein doppelter Eintrag.
+
+### 2 · Erlaubnisse als Datensatz statt als Commit (A13/A14)
+
+**Migration 018** (`scripts/migrations/018-freigaben.sql`): Tabelle `releases` — Person, Rolle, Firma,
+Form, Datum, Umfänge, Fundstelle, Widerruf mit Grund, Akteur. Eindeutiger Index
+(`Organisation, Mensch, Form, Datum, Fundstelle`) macht das Erfassen idempotent.
+
+Bis heute stand die Zustimmung eines Kunden ausschliesslich als Code in `lib/site-data.ts`: Erfassen
+hiess committen, **Widerrufen hiess committen und ausliefern**. Ein Kunde, der anruft, darf darauf
+nicht warten.
+
+Oberfläche unter `/admin/beleg` (Owner-only, DE/TR): Liste mit Zustand, Umfängen, Person, Form, Datum,
+Fundstelle und Akteur · Erfassen mit feldgenauen Fehlern · **die Form begrenzt den Umfang sichtbar**
+(eine öffentliche Bewertung trägt ein Zitat, kein Logo — `FORM_SCOPES`) · Zurückziehen mit Pflichtgrund,
+**ohne die Zeile zu löschen**.
+
+**Die Grenze steht VOR der Liste, nicht darunter:** Dieses Register hält die Erlaubnis fest und setzt
+sie **nicht** durch. Die öffentliche Projektion liest weiterhin `lib/site-data.ts` (G18) — ein Widerruf
+hier nimmt auf creadig.de nichts herunter. Wer das nicht sagt, baut eine Freigabeverwaltung, auf die
+sich jemand verlässt.
+
+| Prüfung | Ergebnis | Art |
+|---|---|---|
+| `betriebskette-drill` B1–B7 | **34/34** — zweimal senden = einmal; 10× gleichzeitig = 1 Zusage; Projekt/Fristbeginn einmal; dieselbe Änderung zweimal = 1, zehn verschiedene gleichzeitig = 10; Abnahme und Übergabe je einmal und nur in der richtigen Reihenfolge; je genau **eine** Chronikzeile | Postgres lokal |
+| Blindprobe gegen den alten Stand | **14 Befunde** — der Probelauf ist nicht dekorativ | Postgres lokal |
+| `freigabe-drill` F1–F8 | **PASS** — erfassen mit Akteur und Chronik; 10× gleichzeitig = 1; ohne Erlaubnis deckt nichts (A13); Form begrenzt Umfang; Widerruf wirkt sofort, Zeile und Umfang bleiben lesbar (A14); zweiter Widerruf wirkt nicht erneut; **der Widerruf des Namens lässt die Fallstudie mitfallen**, eine neue Namensfreigabe trägt sie wieder | Postgres lokal |
+| `freigabe-e2e` G1–G10 | **34/34** — Warnung vor der Liste; feldgenaue Fehler mit `aria-describedby`; gesperrte Umfänge mit Grund; erfassen, doppelt erfassen, widerrufen; Vertrieb kommt nicht hinein; TR ohne deutschen Rest; axe 0 in DE und TR | Chromium, `next start`, Postgres lokal |
+| `db-drills` **12/12** · `admin-zustaende` 34/34 · build + alle Gates | PASS | lokal |
+
+### 3 · Was in ADM-05 offen bleibt
+
+| Punkt | Warum | Wer |
+|---|---|---|
+| Widerruf wirkt auf creadig.de | Die öffentliche Projektion liegt in `lib/site-data.ts` — **BLOCKED_G18** | Owner (G18-Entsperrung) |
+| Rechnung/Zahlung im Betriebsablauf | `lib/rechnung.ts` — **BLOCKED_G18** | Owner |
+| H21 · deutsche Sätze aus dem Server in der türkischen Oberfläche | Befunde/Mängel und die Kataloge von Angebot, Reife und Lieferung entstehen als deutscher Text im Server | Agent — nächster Schritt |
+
+---
+
 ## H14 · Produktions-Hotfix (LIVE 17.09.2026)
 
 **Owner-Entscheidung 17.09.2026**: H14 sofort als isolierter Hotfix. Migrationen 015/016/017 **nicht** freigegeben (017 erst vor dem ersten Deploy, der sie braucht; vorher Cutover-Paket). Danach Programm ohne weitere Weichenstellung fortsetzen.
@@ -540,7 +589,9 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 17.09.2026 | 3 | Owner: H14-Hotfix freigegeben, Migrationen nicht. Hotfix `e1bc9ec` isoliert gebaut und geprüft (16/20 → 20/20); Push vom Berechtigungssystem blockiert → Owner |
 | 17.09.2026 | 3 | **H14 LIVE** — Push OK · Promote Ready · Production `dpl_7siNz9VcwZJnkjdAsRq5gbRx7U2w` / `creadig-qxsfr8p2v` · Aliases `creadig.de` · SHA `e1bc9ec` · Rauchprüfung GET `/` + `/admin/login` 200 · Migrationen unberührt |
 
+| 17.09.2026 | 4 | **ADM-01 DE/TR CLOSED lokal** — Gate 34 migriert / 0 offen / 823 Texte; Chance/Angebot/Lieferung + Listen + Detail + Beleg/Material/Lage/Error/Primitives (Material-Labels BLOCKED_G18) |
 | 17.09.2026 | 4 | **ADM-04 BUILT/lokal VERIFIED** — Verbindungsverzeichnis `/admin/verbindungen` (DE/TR, Owner-only), Fähigkeit ≠ Autorisierung ≠ Adresse, Prüfung getrennt von Ableitung, Prüfstand für A15–A18; Gate + Drill in `postbuild`; H18 (blindes Cockpit-Gate) und H19 (stille Schreibsperre) gefunden und behoben |
+| 17.09.2026 | 4 | **ADM-05 BUILT/lokal VERIFIED** — Betriebskette H20 (jeder Zustandswechsel genau einmal, Blindprobe 14 Befunde) · §Schreibpfade (A5) erhoben · Migration 018 + Erlaubnisse mit Widerruf unter `/admin/beleg` (A13/A14), DE/TR, axe 0 |
 
-**Fortsetzungspunkt:** ADM-05 — Betrieb/Kommerz/Beleg. Migrationen 015–017 weiter **nicht** freigegeben. Production-Tip nicht promoten ohne Cutover-Paket.
-| 17.09.2026 | 4 | **ADM-01 DE/TR CLOSED lokal** — Gate 34 migriert / 0 offen / 823 Texte; Chance/Angebot/Lieferung + Listen + Detail + Beleg/Material/Lage/Error/Primitives | Material-Labels BLOCKED_G18 |
+
+**Fortsetzungspunkt:** H21 (deutsche Serversätze in der türkischen Oberfläche), dann ADM-06. Migrationen 015–018 weiter **nicht** freigegeben. Production-Tip nicht promoten ohne Cutover-Paket.

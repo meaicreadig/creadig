@@ -596,6 +596,43 @@ export type MeasurementSampleRow = {
   notiz: string | null
 }
 
+/* ── ADM-05 · Freigaben ─────────────────────────────────────────────────── */
+
+/**
+ * Eine Freigabe, wie sie in der Datenbank steht.
+ *
+ * Bewusst nahe an `Release` aus `lib/proof.ts` — dieselbe Sache, einmal als
+ * Code-Eintrag der oeffentlichen Seite und einmal als erfasste Zeile. Die
+ * Bruecke zwischen beiden ist `releaseAusZeile()` und nicht ein zweites
+ * Modell, damit die Deckungsrechnung fuer beide dieselbe bleibt.
+ */
+export type ReleaseRow = {
+  id: string
+  organisationId: string
+  organisationName: string
+  by: { name: string; role: string; company: string }
+  form: string
+  /** YYYY-MM-DD */
+  grantedOn: string
+  scopes: string[]
+  reference: string
+  withdrawnAt: string | null
+  withdrawnReason: string | null
+  actor: string | null
+  createdAt: string
+}
+
+export type ReleaseEingabe = {
+  organisationId: string
+  name: string
+  role: string
+  company: string
+  form: string
+  grantedOn: string
+  scopes: string[]
+  reference: string
+}
+
 export type VertriebStore = {
   summary(): Promise<VertriebSummary>
 
@@ -804,6 +841,35 @@ export type VertriebStore = {
    * Unterschied besonders schwer — ein nicht lesbarer Tisch saehe sonst aus
    * wie ein Haus, das nie gemessen hat.
    */
+  /* ── ADM-05 · A13/A14 · Freigaben (Beleg-Erlaubnis) ────────────────────
+   *
+   * Die Erlaubnis eines Kunden ist eine TATSACHE mit Datum, Person und
+   * Fundstelle — kein Feld am Kunden. Deshalb eine eigene Reihe: Ein Kunde
+   * kann mehrere erteilt haben, und eine zurueckgezogene bleibt stehen.
+   *
+   * `null` heisst hier wie ueberall „nicht lesbar", `[]` heisst „keine
+   * erteilt". Bei einer Freigabe ist der Unterschied der ganze Punkt: Wer
+   * eine unlesbare Tabelle als „keine Erlaubnis" liest, nimmt still einen
+   * Beleg von der Seite; wer sie als „Erlaubnis" liest, zeigt etwas ohne Ja.
+   */
+  listReleases(organisationId?: string): Promise<ReleaseRow[] | null>
+
+  /**
+   * Eine erteilte Freigabe festhalten.
+   *
+   * Idempotent ueber (Organisation, Mensch, Form, Datum, Fundstelle): Zwei
+   * Klicks auf „Erfassen" sind eine Erlaubnis, nicht zwei.
+   */
+  recordRelease(input: ReleaseEingabe): Promise<{ id: string; neu: boolean } | null>
+
+  /**
+   * Eine Freigabe zurueckziehen — mit Grund, und ohne die Zeile zu loeschen.
+   *
+   * Man muss spaeter erklaeren koennen, warum damals etwas veroeffentlicht
+   * wurde. Ein zweiter Widerruf wirkt nicht erneut (`schon-widerrufen`).
+   */
+  withdrawRelease(id: string, grund: string): Promise<"ok" | "schon-widerrufen" | "fehlt">
+
   measurementSamples(limit?: number): Promise<MeasurementSampleRow[] | null>
 
   /**
