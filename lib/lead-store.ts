@@ -398,7 +398,8 @@ export function getLeadStore(): LeadStore | null {
   const kind = process.env.LEAD_STORE?.trim()
   if (!kind) return null
 
-  if (kind === "neon") {
+  /* ADM-03: `pg-lokal` ist derselbe Store gegen ein lokales Postgres — nur für Prüfläufe (`lib/neon-client.ts`). */
+  if (kind === "neon" || kind === "pg-lokal") {
     const url = process.env.DATABASE_URL?.trim()
     if (!url) {
       /*
@@ -467,7 +468,8 @@ export function getLeadStore(): LeadStore | null {
  * Oberflaeche sagt das. Sie erfindet nichts.
  */
 export function getVertriebStore(): VertriebStore | null {
-  if (process.env.LEAD_STORE?.trim() !== "neon") return null
+  const art = process.env.LEAD_STORE?.trim()
+  if (art !== "neon" && art !== "pg-lokal") return null
   const url = process.env.DATABASE_URL?.trim()
   if (!url) return null
   if (!vertriebStore) {

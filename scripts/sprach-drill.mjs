@@ -93,7 +93,11 @@ async function warte(ms = 60_000) {
   throw new Error("Server kam nicht hoch")
 }
 
-const server = spawn("npx", ["next", "start", "-p", String(PORT)], { stdio: "ignore" })
+const server = spawn("npx", ["next", "start", "-p", String(PORT)], {
+  stdio: "ignore",
+  /* ADM-03: nie eine echte Datenbank aus .env.local */
+  env: { ...process.env, LEAD_STORE: "aus", DATABASE_URL: "postgres://kein-speicher.invalid/pruefung" },
+})
 const probleme = []
 let geprueft = 0
 

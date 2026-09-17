@@ -237,6 +237,11 @@ const server = spawn("npx", ["next", "start", "-p", String(PORT)], {
   env: {
     ...process.env,
     NODE_ENV: "production",
+    // ADM-03: Der Rauchtest schickt echte Formularanfragen. Ohne diese Sperre
+    // fuellte Next `LEAD_STORE`/`DATABASE_URL` aus .env.local — und die
+    // Testanfragen laegen in der Datenbank dahinter.
+    LEAD_STORE: "aus",
+    DATABASE_URL: "postgres://kein-speicher.invalid/pruefung",
     // Absichtlich ungueltig: Ein echter Versandversuch MUSS scheitern, sonst
     // beweist der Honeypot-Test nichts.
     RESEND_API_KEY: "re_smoketest_invalid",

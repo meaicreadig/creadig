@@ -62,6 +62,8 @@ const LAEUFE = [
   { name: "sitzung", db: "drill_sitzung", variable: "SITZUNG_DRILL_URL" },
   /* ADM-02 · H3 — Versuchsfenster ueber Instanzen. */
   { name: "versuch", db: "drill_versuch", variable: "VERSUCH_DRILL_URL" },
+  /* ADM-03 — die Kernschleife ueber den echten Store-Code. */
+  { name: "kernschleife", db: "drill_kernschleife", variable: "KERNSCHLEIFE_DRILL_URL" },
 ]
 
 function psql(sql) {

@@ -1,4 +1,5 @@
 import { neon, type NeonQueryFunction } from "@neondatabase/serverless"
+import pg from "pg"
 
 import {
   AUSGESCHLOSSENE_MAIL_ENDUNG,
@@ -681,6 +682,24 @@ export const SCHEMA: string[] = [
      hits integer NOT NULL,
      PRIMARY KEY (bucket, window_start)
    )`,
+
+  /*
+   * 017 · ADMIN OS · ADM-03 — die Kernschleife.
+   * Siehe `scripts/migrations/017-kernschleife.sql` (Warum, und was zu tun ist,
+   * wenn der eindeutige Index an vorhandenen Dubletten scheitert).
+   */
+  `ALTER TABLE leads ALTER COLUMN email DROP NOT NULL`,
+  `ALTER TABLE leads ALTER COLUMN phone DROP NOT NULL`,
+  `ALTER TABLE leads ADD COLUMN IF NOT EXISTS responsible text`,
+  `ALTER TABLE leads ADD COLUMN IF NOT EXISTS archive_reason text`,
+  `ALTER TABLE leads ADD COLUMN IF NOT EXISTS duplicate_of text`,
+  `ALTER TABLE opportunities ADD COLUMN IF NOT EXISTS responsible text`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS opportunities_from_lead_unique ON opportunities (from_lead_id) WHERE from_lead_id IS NOT NULL`,
+  `ALTER TABLE activities ADD COLUMN IF NOT EXISTS actor text`,
+  `ALTER TABLE activities ADD COLUMN IF NOT EXISTS origin text`,
+  `ALTER TABLE activities ADD COLUMN IF NOT EXISTS data jsonb`,
+  `CREATE INDEX IF NOT EXISTS leads_responsible_idx ON leads (responsible)`,
+  `CREATE INDEX IF NOT EXISTS opportunities_responsible_idx ON opportunities (responsible)`,
 ]
 
 /**
@@ -778,9 +797,12 @@ export const BACKFILL: string[] = [
  */
 export async function linkLeadToCrm(
   sql: Sql,
-  lead: { id: string; name: string; email: string; phone: string; business: string | null; createdAt: string },
+  lead: { id: string; name: string; email: string | null; phone: string | null; business: string | null; createdAt: string },
+  /** ADM-03 — wer die Anfrage hereingebracht hat. Website-Formular: `website`/`SYSTEM`. */
+  akteur: { kennung: string; herkunft: string } = { kennung: "website", herkunft: "SYSTEM" },
 ): Promise<void> {
   const business = lead.business?.trim() ?? ""
+  const email = lead.email?.trim() ?? ""
 
   if (business !== "") {
     await sql.query(
@@ -791,39 +813,62 @@ export async function linkLeadToCrm(
     )
   }
 
-  await sql.query(
-    `INSERT INTO contacts (id, organisation_id, name, email, email_normalised, phone,
-                           relationship, last_interaction_at, created_at, updated_at)
-     SELECT gen_random_uuid()::text,
-            (SELECT id FROM organisations WHERE lower(name) = lower($5::text)),
-            $1::text, $2::text, lower(btrim($2::text)), nullif(btrim($3::text), ''),
-            'unbekannt', $4::timestamptz, now(), now()
-     ON CONFLICT (email_normalised) DO UPDATE
-       SET last_interaction_at = greatest(
-             coalesce(contacts.last_interaction_at, to_timestamp(0)), excluded.last_interaction_at),
-           organisation_id = coalesce(contacts.organisation_id, excluded.organisation_id),
-           phone = coalesce(contacts.phone, excluded.phone),
-           updated_at = now()`,
-    [lead.name, lead.email, lead.phone, lead.createdAt, business],
-  )
+  if (email !== "") {
+    await sql.query(
+      `INSERT INTO contacts (id, organisation_id, name, email, email_normalised, phone,
+                             relationship, last_interaction_at, created_at, updated_at)
+       SELECT gen_random_uuid()::text,
+              (SELECT id FROM organisations WHERE lower(name) = lower($5::text)),
+              $1::text, $2::text, lower(btrim($2::text)), nullif(btrim(coalesce($3::text, '')), ''),
+              'unbekannt', $4::timestamptz, now(), now()
+       ON CONFLICT (email_normalised) DO UPDATE
+         SET last_interaction_at = greatest(
+               coalesce(contacts.last_interaction_at, to_timestamp(0)), excluded.last_interaction_at),
+             organisation_id = coalesce(contacts.organisation_id, excluded.organisation_id),
+             phone = coalesce(contacts.phone, excluded.phone),
+             updated_at = now()`,
+      [lead.name, email, lead.phone, lead.createdAt, business],
+    )
+
+    await sql.query(
+      `UPDATE leads l
+          SET contact_id = c.id,
+              organisation_id = (SELECT id FROM organisations WHERE lower(name) = lower($2::text))
+         FROM contacts c
+        WHERE l.id = $1 AND c.email_normalised = lower(btrim(l.email))`,
+      [lead.id, business],
+    )
+  } else {
+    /*
+     * ADM-03 — ohne Mail gibt es keinen Schlüssel, an dem ein Mensch sicher
+     * wiedererkannt würde. Der Kontakt entsteht trotzdem (sonst hinge die
+     * Anfrage an niemandem); mögliche Doppelungen zeigt die Anfrage offen an
+     * (`possibleDuplicates`: gleicher Name, gleiche Telefonnummer).
+     */
+    await sql.query(
+      `WITH neu AS (
+         INSERT INTO contacts (id, organisation_id, name, email, email_normalised, phone,
+                               relationship, last_interaction_at, created_at, updated_at)
+         VALUES (gen_random_uuid()::text,
+                 (SELECT id FROM organisations WHERE lower(name) = lower($4::text)),
+                 $1::text, NULL, NULL, nullif(btrim(coalesce($2::text, '')), ''),
+                 'unbekannt', $3::timestamptz, now(), now())
+         RETURNING id, organisation_id)
+       UPDATE leads SET contact_id = neu.id, organisation_id = neu.organisation_id
+         FROM neu WHERE leads.id = $5`,
+      [lead.name, lead.phone, lead.createdAt, business, lead.id],
+    )
+  }
 
   await sql.query(
-    `UPDATE leads l
-        SET contact_id = c.id,
-            organisation_id = (SELECT id FROM organisations WHERE lower(name) = lower($2::text))
-       FROM contacts c
-      WHERE l.id = $1 AND c.email_normalised = lower(btrim(l.email))`,
-    [lead.id, business],
-  )
-
-  await sql.query(
-    `INSERT INTO activities (id, subject_type, subject_id, kind, summary, created_at)
+    `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
      SELECT 'act-in-' || l.id, 'lead', l.id, 'lead.received',
-            'Anfrage eingegangen über ' || l.source, l.created_at
+            'Anfrage eingegangen über ' || l.source, $2::text, $3::text,
+            jsonb_build_object('quelle', l.source), l.created_at
        FROM leads l
       WHERE l.id = $1
         AND NOT EXISTS (SELECT 1 FROM activities a WHERE a.id = 'act-in-' || l.id)`,
-    [lead.id],
+    [lead.id, akteur.kennung, akteur.herkunft],
   )
 }
 
@@ -1103,7 +1148,7 @@ export async function applyExclusions(sql: Sql): Promise<void> {
  */
 export async function markLeadExclusions(
   sql: Sql,
-  lead: { id: string; name: string; business: string | null; email: string; reference: string },
+  lead: { id: string; name: string; business: string | null; email: string | null; reference: string },
 ): Promise<void> {
   const leadReason = exclusionReasonFor(lead)
   if (leadReason) {
@@ -1114,7 +1159,7 @@ export async function markLeadExclusions(
   }
 
   const contactReason = exclusionReasonFor({ name: lead.name, email: lead.email })
-  if (contactReason) {
+  if (contactReason && lead.email) {
     await sql.query(
       `UPDATE contacts SET excluded_reason = $2::text, updated_at = now()
         WHERE email_normalised = lower(btrim($1::text)) AND excluded_reason IS NULL`,
@@ -1186,6 +1231,14 @@ const REQUIRED_COLUMNS: [table: string, column: string][] = [
   /* Gate 11 — Kontakt & Zugang. */
   ["contacts", "source_kind"],
   ["research_cases", "contact_decision"],
+  /* ADM-03 · 017 — Kernschleife. Vor dem Deploy migrieren. */
+  ["leads", "responsible"],
+  ["leads", "archive_reason"],
+  ["leads", "duplicate_of"],
+  ["opportunities", "responsible"],
+  ["activities", "actor"],
+  ["activities", "origin"],
+  ["activities", "data"],
 ]
 
 /**
@@ -1341,6 +1394,58 @@ export async function verifySchema(sql: Sql): Promise<void> {
   )
 }
 
+/*
+ * ==========================================================================
+ * ADM-03 — LOKALES POSTGRES, AUSSCHLIESSLICH FÜR PRÜFLÄUFE
+ * ==========================================================================
+ *
+ * Der Store spricht Neon über HTTP. Ein Neon-HTTP-Endpunkt existiert auf
+ * keinem Arbeitsplatz — deshalb war der ganze Vertrieb im Browser nie gegen
+ * eine echte Datenbank prüfbar: kein Anlegen, kein Neuladen, kein erneutes
+ * Anmelden mit Beleg der Persistenz (Abnahme A03–A12).
+ *
+ * `LEAD_STORE=pg-lokal` führt DENSELBEN Store-Code über `pg` gegen ein
+ * Postgres auf diesem Rechner. Zwei Sperren, beide nötig:
+ *   · der Adapter ist ausdrücklich gewählt (`pg-lokal`, nicht `neon`)
+ *   · das Ziel liegt auf diesem Rechner (localhost / 127.0.0.1 / ::1)
+ * Fehlt eine, gilt die Verbindung als Neon — und scheitert dort laut.
+ *
+ * Bewusst KEINE Prüfung auf `VERCEL`: `vercel env pull` schreibt `VERCEL=1`
+ * in `.env.local`, Next lädt die Datei auch lokal — die Sperre hätte den
+ * Arbeitsplatz für Vercel gehalten (gemessen 17.09.2026). Die tragende
+ * Sperre ist das Ziel: Ein Vercel-Server erreicht kein localhost-Postgres.
+ *
+ * DATE wird als UTC-Mitternacht gelesen, genau wie Neon auf einem
+ * UTC-Server. Sonst verschöbe die Zone des Arbeitsplatzes jedes Datum und
+ * der Prüflauf fände Fehler, die es in Produktion nicht gibt.
+ */
+export function istLokalesPostgres(connectionString: string): boolean {
+  if (process.env.LEAD_STORE?.trim() !== "pg-lokal") return false
+  try {
+    const host = new URL(connectionString).hostname
+    return ["localhost", "127.0.0.1", "::1", "[::1]"].includes(host)
+  } catch {
+    return false
+  }
+}
+
+function lokalesPostgres(connectionString: string): Sql {
+  const pool = new pg.Pool({
+    connectionString,
+    max: 5,
+    types: {
+      getTypeParser: (oid: number, format?: "text" | "binary") =>
+        oid === 1082
+          ? (wert: string) => new Date(`${wert}T00:00:00Z`)
+          : pg.types.getTypeParser(oid, format as "text"),
+    },
+  })
+  const query = async (text: string, params?: unknown[]) => (await pool.query(text, params as unknown[])).rows
+  return Object.assign(() => {
+    throw new Error("Tagged-Template-Aufrufe sind im lokalen Prüfadapter nicht vorgesehen — `sql.query` benutzen.")
+  }, { query }) as unknown as Sql
+}
+
 const clients = new Map<string, { sql: Sql; ready: () => Promise<void> }>()
 
 /**
@@ -1357,7 +1462,7 @@ export function neonClient(connectionString: string): {
   const cached = clients.get(connectionString)
   if (cached) return cached
 
-  const sql = neon(connectionString)
+  const sql = istLokalesPostgres(connectionString) ? lokalesPostgres(connectionString) : neon(connectionString)
   let promise: Promise<void> | null = null
 
   const ready = (): Promise<void> => {

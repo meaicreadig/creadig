@@ -267,7 +267,7 @@ const asJson = process.argv.includes("--json")
 const server = spawn("npx", ["next", "start", "-p", String(PORT)], {
   cwd: ROOT,
   stdio: "ignore",
-  env: { ...process.env, NODE_ENV: "production" },
+  env: { ...process.env, NODE_ENV: "production", /* ADM-03: nie eine echte Datenbank (.env.local) */ LEAD_STORE: "aus", DATABASE_URL: "postgres://kein-speicher.invalid/pruefung" },
 })
 
 let browser

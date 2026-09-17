@@ -305,6 +305,8 @@ export type Opportunity = {
    * zweiten „Verkaufschance anlegen" auf eine Vermutung stützen.
    */
   fromLeadId: string | null
+  /** ADM-03 — wer sich kümmert (Rollen-Schlüssel). */
+  responsible: string | null
   /*
    * GATE 08 — was verkauft wird, und was dafuer belegt ist.
    *
@@ -339,8 +341,58 @@ export type Activity = {
   kind: string
   summary: string
   detail: string | null
+  /** ADM-03 · 017 — wer: Rollen-Schluessel, `website` oder `system`. `null` = vor 017, unbekannt. */
+  actor: string | null
+  /** ADM-03 · 017 — Herkunft. `null` = vor 017, unbekannt (nicht „System“). */
+  origin: Herkunft | null
+  /** ADM-03 · 017 — maschinenlesbare Werte (z. B. `{ von, nach }`). Die Oberfläche übersetzt. */
+  data: Record<string, unknown> | null
   createdAt: string
 }
+
+/* ========================================================================== *
+ * ADM-03 · AKTEUR, HERKUNFT, KERNSCHLEIFE
+ * ========================================================================== */
+
+export const HERKUENFTE = ["HUMAN", "SYSTEM", "AUTOMATION", "INTEGRATION"] as const
+export type Herkunft = (typeof HERKUENFTE)[number]
+
+/** Wer eine Änderung auslöst. `kennung` ist ein Rollen-Schlüssel, `website` oder `system` — nie ein Name. */
+export type Akteur = { kennung: string; herkunft: Herkunft }
+export const AKTEUR_SYSTEM: Akteur = { kennung: "system", herkunft: "SYSTEM" }
+export const AKTEUR_WEBSITE: Akteur = { kennung: "website", herkunft: "SYSTEM" }
+
+/** Wie eine von Hand erfasste Anfrage hereinkam. Maschinenwerte; Beschriftung in den Admin-Texten. */
+export const MANUELLE_QUELLEN = ["telefon", "email", "persoenlich", "empfehlung", "messe", "social", "sonstiges"] as const
+export type ManuelleQuelle = (typeof MANUELLE_QUELLEN)[number]
+
+/** Warum eine Anfrage archiviert wird. Archivieren ohne Grund gibt es nicht. */
+export const ARCHIV_GRUENDE = ["kein-bedarf", "nicht-erreichbar", "ausserhalb-angebot", "dublette", "spam", "sonstiges"] as const
+export type ArchivGrund = (typeof ARCHIV_GRUENDE)[number]
+
+export type ManuelleAnfrage = {
+  /** Vom Formular mitgebracht: Zweimal absenden legt EINE Anfrage an. */
+  idempotenz: string
+  quelle: ManuelleQuelle
+  sprache: string
+  name: string
+  email: string | null
+  telefon: string | null
+  betrieb: string | null
+  nachricht: string | null
+  verantwortlich: string | null
+}
+
+export type DublettenKandidat = {
+  art: "anfrage" | "kontakt" | "organisation"
+  id: string
+  titel: string
+  /** Woran erkannt — Maschinenwert, die Oberfläche übersetzt. */
+  grund: "gleiche-email" | "gleiches-telefon" | "gleicher-betrieb" | "gleicher-name"
+  am: string | null
+}
+
+export type Schreibergebnis = "ok" | "konflikt" | "fehlt"
 
 /* ========================================================================== *
  * ANFRAGE — angereichert für die Inbox
@@ -359,8 +411,9 @@ export type EnquiryRow = {
   source: string
   locale: string
   name: string
-  email: string
-  phone: string
+  /** ADM-03: telefonische und persönliche Anfragen haben oft keine Mail. */
+  email: string | null
+  phone: string | null
   business: string | null
   message: string | null
   siteUrl: string | null
@@ -368,6 +421,11 @@ export type EnquiryRow = {
   utmMedium: string | null
   utmCampaign: string | null
   handlingStatus: HandlingStatus
+  responsible: string | null
+  archiveReason: string | null
+  duplicateOf: string | null
+  nextAction: string | null
+  nextActionAt: string | null
   contactId: string | null
   contactName: string | null
   organisationId: string | null
@@ -686,6 +744,18 @@ export type VertriebStore = {
   leadForOpportunity(opportunityId: string): Promise<{ id: string; reference: string } | null>
 
   setLeadHandling(leadId: string, status: HandlingStatus): Promise<boolean>
+
+  /* ── ADM-03 · Kernschleife ─────────────────────────────────────────── */
+  /** Idempotent über `idempotenz`: zweites Absenden liefert dieselbe Anfrage, `neu: false`. */
+  createEnquiry(input: ManuelleAnfrage): Promise<{ id: string; neu: boolean }>
+  setLeadResponsible(leadId: string, verantwortlich: string | null): Promise<boolean>
+  setLeadNextAction(leadId: string, action: string | null, at: string | null): Promise<boolean>
+  /** Archivieren mit Grund; bei `dublette` die Kennung der ersten Anfrage. Nichts wird gelöscht oder verschmolzen. */
+  archiveLead(leadId: string, grund: ArchivGrund, dubletteVon: string | null): Promise<boolean>
+  possibleDuplicates(leadId: string): Promise<DublettenKandidat[]>
+  setOpportunityResponsible(id: string, verantwortlich: string | null): Promise<boolean>
+  /** Stufenwechsel mit Versionsprüfung: `konflikt`, wenn der Datensatz seit `stand` geändert wurde. */
+  moveOpportunity(id: string, status: SalesStatus, lostReason: string | null, stand: string): Promise<Schreibergebnis>
 
   activities(subjectType: ActivitySubject, subjectId: string, limit?: number): Promise<Activity[]>
 

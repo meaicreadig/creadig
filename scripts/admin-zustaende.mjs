@@ -79,7 +79,7 @@ async function lauf(name, env) {
 }
 
 const alle = [
-  ...(await lauf("ohne", { LEAD_STORE: "", DATABASE_URL: "" })),
+  ...(await lauf("ohne", { LEAD_STORE: "aus", DATABASE_URL: "postgres://kein-speicher.invalid/pruefung" })),
   ...(await lauf("gestoert", { LEAD_STORE: "neon", DATABASE_URL: "postgresql://nobody:nothing@127.0.0.1:9/tot" })),
 ]
 let befunde = 0

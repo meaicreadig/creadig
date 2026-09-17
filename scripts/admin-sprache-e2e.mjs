@@ -27,7 +27,7 @@ const VERTRIEB = "probe-vertrieb-nur-lokal"
 const server = spawn("npx", ["next", "start", "-p", String(PORT)], {
   stdio: "ignore",
   env: {
-    ...process.env, NODE_ENV: "production", LEAD_STORE: "", DATABASE_URL: "",
+    ...process.env, NODE_ENV: "production", LEAD_STORE: "aus", DATABASE_URL: "postgres://kein-speicher.invalid/pruefung",
     ADMIN_PASSWORD: OWNER, ADMIN_PASSWORD_VERTRIEB: VERTRIEB,
     ADMIN_SESSION_SECRET: "probe-sitzung-nur-lokal-0123456789abcdef0123456789",
   },

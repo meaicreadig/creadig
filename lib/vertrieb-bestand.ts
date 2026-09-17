@@ -453,7 +453,8 @@ export function sqlLeadOperational(alias: string, includeExcluded?: boolean): st
     AND ${alias}.reference NOT IN (${refs})
     AND lower(btrim(coalesce(${alias}.business, ''))) NOT IN (${names})
     AND lower(btrim(${alias}.name)) NOT IN (${names})
-    AND lower(btrim(${alias}.email)) NOT LIKE '%${mail}'
+    -- ADM-03: coalesce, sonst ergibt NULL NOT LIKE ein NULL und eine Anfrage ohne Mail verschwindet aus der Inbox
+    AND lower(btrim(coalesce(${alias}.email, ''))) NOT LIKE '%${mail}'
     AND NOT (${prefixSql})
   )`
 }

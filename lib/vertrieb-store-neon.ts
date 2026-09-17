@@ -17,6 +17,8 @@ import type { SalesStatus } from "@/lib/lead-store"
 import { isTestEnquiry, sqlLeadOperational } from "@/lib/vertrieb-bestand"
 import { SALES_LABELS_DE, TERMINAL_STATES } from "@/lib/lead-store"
 import {
+  linkLeadToCrm,
+  markLeadExclusions,
   neonClient,
   readOwnerLoadSamples,
   readMeasurementSamples,
@@ -44,7 +46,15 @@ import type {
   VertriebSummary,
   OwnerLoadSample,
   MeasurementSampleRow,
+  Akteur,
+  ArchivGrund,
+  DublettenKandidat,
+  Herkunft,
+  ManuelleAnfrage,
+  Schreibergebnis,
 } from "@/lib/vertrieb"
+import { AKTEUR_SYSTEM } from "@/lib/vertrieb"
+import { createLeadIdentity } from "@/lib/lead-id"
 import { LIFECYCLE_LABELS, RELATIONSHIP_LABELS } from "@/lib/vertrieb"
 import { SQL_HEUTE } from "@/lib/geschaeftszeit"
 
@@ -161,6 +171,7 @@ type OppRowDb = {
   next_action: string | null; next_action_at: Ts | null; last_contact_at: Ts | null
   note: string | null; estimated_value: number | null; lost_reason: string | null
   from_lead_id: string | null
+  responsible: string | null
   offer_kind: string | null; readiness_evidence: string[] | null
   created_at: Ts; updated_at: Ts
   organisation_name?: string | null; contact_name?: string | null
@@ -181,6 +192,7 @@ function toOpportunity(r: OppRowDb): OpportunityRow {
     estimatedValue: r.estimated_value,
     lostReason: r.lost_reason,
     fromLeadId: r.from_lead_id,
+    responsible: r.responsible ?? null,
     offerKind: (r.offer_kind as OpportunityRow["offerKind"]) ?? null,
     /* Postgres liefert `null` fuer eine nie gesetzte Spalte in alten Zeilen —
        leer ist hier die richtige Lesart, nicht „unbekannt". */
@@ -305,8 +317,10 @@ function toLocation(r: LocRowDb): Location {
 
 type EnqRowDb = {
   id: string; reference: string; source: string; locale: string
-  name: string; email: string; phone: string
+  name: string; email: string | null; phone: string | null
   business: string | null; message: string | null; site_url: string | null
+  responsible: string | null; archive_reason: string | null; duplicate_of: string | null
+  next_action: string | null; next_action_at: Ts | null
   utm_source: string | null; utm_medium: string | null; utm_campaign: string | null
   handling_status: string
   contact_id: string | null; contact_name: string | null
@@ -326,6 +340,11 @@ function toEnquiry(r: EnqRowDb): EnquiryRow {
     business: r.business, message: r.message, siteUrl: r.site_url,
     utmSource: r.utm_source, utmMedium: r.utm_medium, utmCampaign: r.utm_campaign,
     handlingStatus: r.handling_status as HandlingStatus,
+    responsible: r.responsible,
+    archiveReason: r.archive_reason,
+    duplicateOf: r.duplicate_of,
+    nextAction: r.next_action,
+    nextActionAt: day(r.next_action_at),
     contactId: r.contact_id, contactName: r.contact_name,
     organisationId: r.organisation_id, organisationName: r.organisation_name,
     opportunityId: r.opportunity_id,
@@ -342,6 +361,7 @@ const ENQ_COLUMNS = `
   l.business, l.message, l.site_url,
   l.utm_source, l.utm_medium, l.utm_campaign,
   l.handling_status, l.contact_id, l.organisation_id, l.excluded_reason,
+  l.responsible, l.archive_reason, l.duplicate_of, l.next_action, l.next_action_at,
   l.check_score, l.check_bottleneck, l.check_manual_spots,
   c.name AS contact_name, org.name AS organisation_name,
   (SELECT o2.id FROM opportunities o2
@@ -357,7 +377,7 @@ const ENQ_FROM = `
 const OPP_COLUMNS = `
   o.id, o.organisation_id, o.contact_id, o.title, o.status, o.source,
   o.next_action, o.next_action_at, o.last_contact_at, o.note,
-  o.estimated_value, o.lost_reason, o.from_lead_id, o.offer_kind, o.readiness_evidence,
+  o.estimated_value, o.lost_reason, o.from_lead_id, o.responsible, o.offer_kind, o.readiness_evidence,
   o.created_at, o.updated_at,
   org.name AS organisation_name, c.name AS contact_name
 `
@@ -495,25 +515,32 @@ const OPEN_CLAUSE = `o.status NOT IN ('won','lost') AND o.excluded_reason IS NUL
 const live = (alias: string, include: boolean | undefined): string =>
   include ? "" : `${alias}.excluded_reason IS NULL`
 
-export function createNeonVertrieb(connectionString: string): VertriebStore {
+/**
+ * ADM-03 — `akteur` steht in jeder Chronikzeile, die diese Instanz schreibt.
+ * Eine Action holt sich eine eigene Instanz mit ihrer Rolle (die Verbindung
+ * ist je Adresse gecacht, die Instanz kostet nur eine Closure). Ohne Angabe
+ * schreibt die Instanz `system`/`SYSTEM` — z. B. für Prüfläufe.
+ */
+export function createNeonVertrieb(connectionString: string, akteur: Akteur = AKTEUR_SYSTEM): VertriebStore {
   const client: {
     sql: Sql
     ready: () => Promise<void>
   } = neonClient(connectionString)
   const { sql, ready } = client
 
-  /** Chronik-Eintrag. Immer im selben Aufruf wie die Änderung. */
+  /** Chronik-Eintrag. Immer im selben Aufruf wie die Änderung — mit Akteur und Herkunft (ADM-03). */
   async function note(
     subjectType: ActivitySubject,
     subjectId: string,
     kind: string,
     summary: string,
     detail: string | null = null,
+    data: Record<string, unknown> | null = null,
   ): Promise<void> {
     await sql.query(
-      `INSERT INTO activities (id, subject_type, subject_id, kind, summary, detail, created_at)
-       VALUES ($1,$2,$3,$4,$5,$6, now())`,
-      [randomUUID(), subjectType, subjectId, kind, summary, detail],
+      `INSERT INTO activities (id, subject_type, subject_id, kind, summary, detail, actor, origin, data, created_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb, now())`,
+      [randomUUID(), subjectType, subjectId, kind, summary, detail, akteur.kennung, akteur.herkunft, data === null ? null : JSON.stringify(data)],
     )
   }
 
@@ -937,11 +964,26 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
                    (SELECT org.excluded_reason FROM organisations org WHERE org.id = $2::text),
                    (SELECT c.excluded_reason FROM contacts c WHERE c.id = $3::text)),
                  now(), now())
+         ON CONFLICT (from_lead_id) WHERE from_lead_id IS NOT NULL DO NOTHING
          RETURNING id, organisation_id, contact_id, title, status, source,
                    next_action, next_action_at, last_contact_at, note,
-                   estimated_value, lost_reason, from_lead_id, created_at, updated_at`,
+                   estimated_value, lost_reason, from_lead_id, responsible, created_at, updated_at`,
         [id, input.organisationId, input.contactId, input.title, input.source, input.fromLeadId ?? null],
       )) as OppRowDb[]
+
+      /*
+       * ADM-03 · A08 — der zweite gleichzeitige Klick.
+       * Die Prüfung oben (SELECT) sehen beide leer; die Datenbank lässt nur
+       * einen einfügen (`opportunities_from_lead_unique`, Migration 017). Der
+       * andere bekommt hier die bestehende Chance — ohne zweiten Chronikeintrag.
+       */
+      if (!rows.length && input.fromLeadId) {
+        const bestehend = (await sql.query(
+          `SELECT ${OPP_COLUMNS} ${OPP_FROM} WHERE o.from_lead_id = $1 LIMIT 1`,
+          [input.fromLeadId],
+        )) as OppRowDb[]
+        return toOpportunity(bestehend[0])
+      }
 
       await note("opportunity", id, "opportunity.created", `Verkaufschance angelegt: ${input.title}`)
 
@@ -951,33 +993,184 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
           [input.fromLeadId],
         )
         await note("lead", input.fromLeadId, "lead.converted", "Verkaufschance aus dieser Anfrage angelegt")
-        await note("opportunity", id, "opportunity.fromLead", "Entstanden aus einer Website-Anfrage")
+        await note("opportunity", id, "opportunity.fromLead", "Entstanden aus einer Anfrage", null, { anfrage: input.fromLeadId })
       }
       return toOpportunity(rows[0])
     },
 
     async updateOpportunityStatus(id, status: SalesStatus, lostReason) {
       await ready()
+      const vorher = (await sql.query(`SELECT status, updated_at FROM opportunities WHERE id = $1`, [id])) as { status: string; updated_at: Ts }[]
+      if (!vorher.length) return false
+      return (await this.moveOpportunity(id, status, lostReason, iso(vorher[0].updated_at))) === "ok"
+    },
+
+    /**
+     * ADM-03 · A09 — Stufenwechsel mit Versionsprüfung und Historie.
+     *
+     * `stand` ist `updatedAt`, das die Oberfläche beim Laden gesehen hat. Hat
+     * seitdem jemand anderes geändert, schreibt dieser Aufruf NICHT und meldet
+     * `konflikt` — sonst überschreibt der zweite still den ersten. Die Chronik
+     * erhält `{ von, nach }` als Daten, nicht als deutschen Satz.
+     */
+    async moveOpportunity(id, status: SalesStatus, lostReason, stand): Promise<Schreibergebnis> {
+      await ready()
+      const alt = (await sql.query(
+        `SELECT status FROM opportunities WHERE id = $1`, [id],
+      )) as { status: string }[]
+      if (!alt.length) return "fehlt"
       const rows = (await sql.query(
         `UPDATE opportunities
             SET status      = $2::text,
                 lost_reason = CASE WHEN $2::text = 'lost' THEN $3::text ELSE NULL END,
                 last_contact_at = now(),
                 updated_at  = now()
-          WHERE id = $1
+          WHERE id = $1 AND date_trunc('milliseconds', updated_at) = date_trunc('milliseconds', $4::timestamptz)
         RETURNING id`,
-        [id, status, lostReason],
+        [id, status, lostReason, stand],
       )) as { id: string }[]
-      if (!rows.length) return false
-
+      if (!rows.length) return "konflikt"
       const closing = TERMINAL_STATES.includes(status)
       await note(
-        "opportunity", id,
+        "opportunity",
+        id,
         closing ? `opportunity.${status}` : "opportunity.status",
         `Status: ${SALES_LABELS_DE[status]}`,
         status === "lost" ? lostReason : null,
+        { von: alt[0].status, nach: status, ...(status === "lost" ? { grund: lostReason } : {}) },
       )
+      return "ok"
+    },
+
+    async setOpportunityResponsible(id, verantwortlich) {
+      await ready()
+      const rows = (await sql.query(
+        `UPDATE opportunities SET responsible = $2::text, updated_at = now() WHERE id = $1 RETURNING id`,
+        [id, verantwortlich],
+      )) as { id: string }[]
+      if (!rows.length) return false
+      await note("opportunity", id, "opportunity.responsible", "Verantwortlich geändert", null, { nach: verantwortlich })
       return true
+    },
+
+    /**
+     * ADM-03 · A03 — eine Anfrage von Hand erfassen.
+     *
+     * Idempotent über `submission_key = manuell:<idempotenz>`: Das Formular
+     * trägt einen beim Rendern erzeugten Schlüssel. Doppelklick, Zurück +
+     * erneut absenden, zwei Tabs — eine Anfrage. Kontakt/Organisation entstehen
+     * über denselben Weg wie bei der Website (`linkLeadToCrm`), Ausschlüsse
+     * ebenso (`markLeadExclusions`).
+     */
+    async createEnquiry(input: ManuelleAnfrage) {
+      await ready()
+      const schluessel = `manuell:${input.idempotenz}`
+      const { id, reference } = createLeadIdentity()
+      const jetzt = new Date().toISOString()
+      const eingefuegt = (await sql.query(
+        `INSERT INTO leads (id, reference, submission_key, source, locale, name, email, phone, business, message,
+                            sales_status, handling_status, responsible, created_at, updated_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'new','neu',$11,$12,$12)
+         ON CONFLICT (submission_key) DO NOTHING
+         RETURNING id`,
+        [id, reference, schluessel, input.quelle, input.sprache, input.name, input.email, input.telefon,
+         input.betrieb, input.nachricht, input.verantwortlich, jetzt],
+      )) as { id: string }[]
+      if (!eingefuegt.length) {
+        const vorhanden = (await sql.query(`SELECT id FROM leads WHERE submission_key = $1`, [schluessel])) as { id: string }[]
+        return { id: vorhanden[0].id, neu: false }
+      }
+      await linkLeadToCrm(sql, { id, name: input.name, email: input.email, phone: input.telefon, business: input.betrieb, createdAt: jetzt }, akteur)
+      await markLeadExclusions(sql, { id, name: input.name, business: input.betrieb, email: input.email, reference })
+      await note("lead", id, "lead.created", "Anfrage von Hand erfasst", null, { quelle: input.quelle, verantwortlich: input.verantwortlich })
+      return { id, neu: true }
+    },
+
+    async setLeadResponsible(leadId, verantwortlich) {
+      await ready()
+      const rows = (await sql.query(
+        `UPDATE leads SET responsible = $2::text, updated_at = now() WHERE id = $1 RETURNING id`,
+        [leadId, verantwortlich],
+      )) as { id: string }[]
+      if (!rows.length) return false
+      await note("lead", leadId, "lead.responsible", "Verantwortlich geändert", null, { nach: verantwortlich })
+      return true
+    },
+
+    async setLeadNextAction(leadId, action, at) {
+      await ready()
+      const rows = (await sql.query(
+        `UPDATE leads
+            SET next_action    = $2::text,
+                next_action_at = CASE WHEN $2::text IS NULL THEN NULL ELSE $3::date END,
+                updated_at     = now()
+          WHERE id = $1
+        RETURNING id`,
+        [leadId, action, at],
+      )) as { id: string }[]
+      if (!rows.length) return false
+      await note("lead", leadId, "lead.nextAction", "Nächster Schritt gesetzt", action, { schritt: action, am: action ? at : null })
+      return true
+    },
+
+    async archiveLead(leadId, grund: ArchivGrund, dubletteVon) {
+      await ready()
+      if (grund === "dublette" && (!dubletteVon || dubletteVon === leadId)) return false
+      const rows = (await sql.query(
+        `UPDATE leads
+            SET handling_status = 'archiviert', archive_reason = $2::text,
+                duplicate_of = CASE WHEN $2::text = 'dublette' THEN $3::text ELSE NULL END,
+                updated_at = now()
+          WHERE id = $1 AND ($2::text <> 'dublette' OR EXISTS (SELECT 1 FROM leads d WHERE d.id = $3::text))
+        RETURNING id`,
+        [leadId, grund, dubletteVon],
+      )) as { id: string }[]
+      if (!rows.length) return false
+      await note("lead", leadId, "lead.archived", "Anfrage archiviert", null, { grund, dubletteVon: grund === "dublette" ? dubletteVon : null })
+      return true
+    },
+
+    /**
+     * ADM-03 · A06 — mögliche Dubletten, NUR als Hinweis.
+     * Gleiche Mail, gleiche Telefonziffern, gleicher Betrieb, gleicher Name.
+     * Nichts wird zusammengeführt; die Entscheidung trifft ein Mensch.
+     */
+    async possibleDuplicates(leadId): Promise<DublettenKandidat[]> {
+      await ready()
+      const rows = (await sql.query(
+        `WITH a AS (
+           SELECT id, lower(btrim(coalesce(email, ''))) AS mail,
+                  regexp_replace(coalesce(phone, ''), '\\D', '', 'g') AS tel,
+                  lower(btrim(coalesce(business, ''))) AS firma,
+                  lower(btrim(name)) AS person, contact_id, organisation_id
+             FROM leads WHERE id = $1)
+         SELECT 'anfrage' AS art, l.id, coalesce(l.business, l.name) || ' · ' || l.reference AS titel,
+                CASE WHEN a.mail <> '' AND lower(btrim(coalesce(l.email,''))) = a.mail THEN 'gleiche-email'
+                     WHEN length(a.tel) >= 6 AND regexp_replace(coalesce(l.phone,''), '\\D', '', 'g') = a.tel THEN 'gleiches-telefon'
+                     WHEN a.firma <> '' AND lower(btrim(coalesce(l.business,''))) = a.firma THEN 'gleicher-betrieb'
+                     ELSE 'gleicher-name' END AS grund,
+                l.created_at AS am
+           FROM leads l, a
+          WHERE l.id <> a.id AND l.excluded_reason IS NULL
+            AND ((a.mail <> '' AND lower(btrim(coalesce(l.email,''))) = a.mail)
+              OR (length(a.tel) >= 6 AND regexp_replace(coalesce(l.phone,''), '\\D', '', 'g') = a.tel)
+              OR (a.firma <> '' AND lower(btrim(coalesce(l.business,''))) = a.firma)
+              OR (lower(btrim(l.name)) = a.person))
+         UNION ALL
+         SELECT 'kontakt', c.id, c.name, CASE WHEN a.mail <> '' AND c.email_normalised = a.mail THEN 'gleiche-email' ELSE 'gleicher-name' END, c.created_at
+           FROM contacts c, a
+          WHERE c.excluded_reason IS NULL AND c.id IS DISTINCT FROM a.contact_id
+            AND ((a.mail <> '' AND c.email_normalised = a.mail) OR lower(btrim(c.name)) = a.person)
+         UNION ALL
+         SELECT 'organisation', o.id, o.name, 'gleicher-betrieb', o.created_at
+           FROM organisations o, a
+          WHERE o.excluded_reason IS NULL AND a.firma <> '' AND o.id IS DISTINCT FROM a.organisation_id
+            AND lower(o.name) = a.firma
+         ORDER BY 5 DESC NULLS LAST
+         LIMIT 20`,
+        [leadId],
+      )) as { art: DublettenKandidat["art"]; id: string; titel: string; grund: DublettenKandidat["grund"]; am: Ts | null }[]
+      return rows.map((r) => ({ art: r.art, id: r.id, titel: r.titel, grund: r.grund, am: isoOrNull(r.am) }))
     },
 
     async updateOpportunityNextAction(id, action, at) {
@@ -1729,13 +1922,14 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
     async activities(subjectType: ActivitySubject, subjectId: string, limit = 50): Promise<Activity[]> {
       await ready()
       const rows = (await sql.query(
-        `SELECT id, subject_type, subject_id, kind, summary, detail, created_at
+        `SELECT id, subject_type, subject_id, kind, summary, detail, actor, origin, data, created_at
            FROM activities WHERE subject_type = $1 AND subject_id = $2
           ORDER BY created_at DESC LIMIT $3`,
         [subjectType, subjectId, limit],
       )) as {
         id: string; subject_type: string; subject_id: string
-        kind: string; summary: string; detail: string | null; created_at: Ts
+        kind: string; summary: string; detail: string | null
+        actor: string | null; origin: string | null; data: Record<string, unknown> | string | null; created_at: Ts
       }[]
       return rows.map((r) => ({
         id: r.id,
@@ -1744,6 +1938,9 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
         kind: r.kind,
         summary: r.summary,
         detail: r.detail,
+        actor: r.actor,
+        origin: (r.origin as Herkunft | null) ?? null,
+        data: typeof r.data === "string" ? (JSON.parse(r.data) as Record<string, unknown>) : r.data,
         createdAt: iso(r.created_at),
       }))
     },

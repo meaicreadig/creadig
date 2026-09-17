@@ -37,8 +37,9 @@ const ENV = {
   NODE_ENV: "production",
   ADMIN_PASSWORD: "probe-owner-nur-lokal",
   ADMIN_SESSION_SECRET: "probe-sitzung-nur-lokal-0123456789abcdef0123456789",
-  LEAD_STORE: "",
-  DATABASE_URL: "",
+  /* Nicht leer: Next fuellt leere Variablen aus .env.local (dort liegt eine echte Verbindung). */
+  LEAD_STORE: "aus",
+  DATABASE_URL: "postgres://kein-speicher.invalid/pruefung",
 }
 process.env.ADMIN_SESSION_SECRET = ENV.ADMIN_SESSION_SECRET
 const S = await import("../lib/admin-session.ts")
@@ -225,7 +226,7 @@ function zusammenfassen(name, proben) {
   return z
 }
 
-const bericht = { umgebung: { modus: "next start (Produktions-Build)", browser: "Chromium (Playwright)", netz: "localhost, keine Drosselung", datenbank: "keine (LEAD_STORE leer) — Datenlatenz NICHT enthalten", datum: new Date().toISOString() } }
+const bericht = { umgebung: { modus: "next start (Produktions-Build)", browser: "Chromium (Playwright)", netz: "localhost, keine Drosselung", datenbank: "keine (LEAD_STORE=aus) — Datenlatenz NICHT enthalten", datum: new Date().toISOString() } }
 const browser = await chromium.launch()
 try {
   await starte()
