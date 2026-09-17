@@ -1,5 +1,6 @@
 import { AdminShell } from "@/components/admin/admin-shell"
 import { ITEM_GROUPS, collect } from "@/lib/material-status"
+import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 
 /**
  * MP-G · G.1 — die erste und heute einzige Seite des Control Centers.
@@ -32,7 +33,7 @@ export const metadata = { title: "Materialstand" }
 
 export default function ControlCenterHome() {
   const { open, done } = collect()
-  const stand = new Date().toLocaleString("de-DE", {
+  const stand = new Date().toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE,
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

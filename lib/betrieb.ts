@@ -46,6 +46,7 @@
  */
 
 import { retainer } from "@/lib/site-data"
+import { geschaeftsTag, plusTage, wochentag } from "@/lib/geschaeftszeit"
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * 1 · DER LEISTUNGSUMFANG
@@ -144,12 +145,14 @@ export type Anliegen = {
  * Richtung: Der Fehler faellt zu Lasten des Hauses, nicht des Kunden.
  */
 export function naechsterWerktag(zeitpunkt: string): string | null {
-  const d = new Date(zeitpunkt)
-  if (Number.isNaN(d.getTime())) return null
+  /* ADM-02 · A23: der Eingangstag ist der BERLINER Tag — eine Anfrage Montag
+     00:30 kam Montag, nicht Sonntag (UTC). */
+  let tag = geschaeftsTag(zeitpunkt)
+  if (!tag) return null
   do {
-    d.setUTCDate(d.getUTCDate() + 1)
-  } while (d.getUTCDay() === 0 || d.getUTCDay() === 6)
-  return d.toISOString().slice(0, 10)
+    tag = plusTage(tag, 1)
+  } while (wochentag(tag) === 0 || wochentag(tag) === 6)
+  return tag
 }
 
 /** Bis wann zurueckgerufen sein muss. */
@@ -169,7 +172,7 @@ export function rueckrufOffen(a: Anliegen, heute = new Date()): boolean {
   if (a.beantwortet) return false
   const frist = rueckrufFrist(a)
   if (!frist) return false
-  return heute.toISOString().slice(0, 10) > frist
+  return geschaeftsTag(heute) > frist
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

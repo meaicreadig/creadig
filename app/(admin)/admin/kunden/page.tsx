@@ -5,6 +5,7 @@ import { KundenShell } from "@/components/admin/kunden-shell"
 import { getVertriebStore } from "@/lib/lead-store"
 import { LIFECYCLE_LABELS, LIFECYCLE_STAGES, RELATIONSHIP_LABELS } from "@/lib/vertrieb"
 import type { LifecycleStage, OrganisationQuery, OrganisationRow } from "@/lib/vertrieb"
+import { datumAnzeige } from "@/lib/geschaeftszeit"
 
 /**
  * Vertrieb · Organisationen.
@@ -215,6 +216,5 @@ function Td({ children }: { children: React.ReactNode }) {
    Center gleich aus, und ein unlesbarer Wert wird durchgereicht statt als
    „Invalid Date" angezeigt. */
 function formatDate(iso: string): string {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })
+  return datumAnzeige(iso)
 }

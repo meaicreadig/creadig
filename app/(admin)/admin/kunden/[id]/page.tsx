@@ -23,6 +23,7 @@ import { KundenShell } from "@/components/admin/kunden-shell"
 import { SALES_LABELS_DE, getVertriebStore } from "@/lib/lead-store"
 import { LIFECYCLE_LABELS, LIFECYCLE_NOTES, LIFECYCLE_STAGES, RELATIONSHIP_LABELS } from "@/lib/vertrieb"
 import type { Location } from "@/lib/vertrieb"
+import { GESCHAEFTS_ZEITZONE, datumAnzeige } from "@/lib/geschaeftszeit"
 
 /**
  * Eine Organisation.
@@ -428,12 +429,11 @@ function LocationForm({ organisationId, location }: { organisationId: string; lo
 }
 
 function formatDate(iso: string): string {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })
+  return datumAnzeige(iso)
 }
 function formatDateTime(iso: string): string {
   const d = new Date(iso)
   return Number.isNaN(d.getTime())
     ? iso
-    : d.toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    : d.toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
 }

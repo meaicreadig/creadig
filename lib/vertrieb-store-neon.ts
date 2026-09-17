@@ -46,6 +46,7 @@ import type {
   MeasurementSampleRow,
 } from "@/lib/vertrieb"
 import { LIFECYCLE_LABELS, RELATIONSHIP_LABELS } from "@/lib/vertrieb"
+import { SQL_HEUTE } from "@/lib/geschaeftszeit"
 
 /**
  * Vertrieb 1.0 — die Datenbankseite.
@@ -531,9 +532,9 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
            (SELECT count(*) FROM leads
              WHERE handling_status = 'neu' AND ${sqlLeadOperational("leads")})::int AS new_enquiries,
            (SELECT count(*) FROM opportunities o WHERE ${OPEN_CLAUSE}
-              AND o.next_action_at = current_date)::int AS due_today,
+              AND o.next_action_at = ${SQL_HEUTE})::int AS due_today,
            (SELECT count(*) FROM opportunities o WHERE ${OPEN_CLAUSE}
-              AND o.next_action_at < current_date)::int AS overdue,
+              AND o.next_action_at < ${SQL_HEUTE})::int AS overdue,
            (SELECT count(*) FROM opportunities o WHERE ${OPEN_CLAUSE})::int AS open_opportunities,
            (SELECT count(*) FROM opportunities o WHERE ${OPEN_CLAUSE}
               AND o.next_action IS NULL)::int AS without_next_action,
@@ -588,7 +589,7 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
       const attention = (await sql.query(
         `SELECT ${OPP_COLUMNS} ${OPP_FROM}
           WHERE ${OPEN_CLAUSE}
-            AND (o.next_action_at IS NULL OR o.next_action_at <= current_date)
+            AND (o.next_action_at IS NULL OR o.next_action_at <= ${SQL_HEUTE})
           ORDER BY (o.next_action_at IS NULL), o.next_action_at ASC NULLS LAST, o.updated_at DESC
           LIMIT 12`,
       )) as OppRowDb[]
@@ -844,8 +845,8 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
       if (query.status) { params.push(query.status); where.push(`o.status = $${params.length}`) }
       switch (query.bucket) {
         case "offen": where.push(OPEN_CLAUSE); break
-        case "faellig": where.push(`${OPEN_CLAUSE} AND o.next_action_at = current_date`); break
-        case "ueberfaellig": where.push(`${OPEN_CLAUSE} AND o.next_action_at < current_date`); break
+        case "faellig": where.push(`${OPEN_CLAUSE} AND o.next_action_at = ${SQL_HEUTE}`); break
+        case "ueberfaellig": where.push(`${OPEN_CLAUSE} AND o.next_action_at < ${SQL_HEUTE}`); break
         case "ohne-schritt": where.push(`${OPEN_CLAUSE} AND o.next_action IS NULL`); break
         case "abgeschlossen": where.push(`o.status IN ('won','lost')`); break
         default: break
@@ -1367,7 +1368,7 @@ export function createNeonVertrieb(connectionString: string): VertriebStore {
           where.push(`NOT EXISTS (SELECT 1 FROM opportunities o WHERE o.contact_id = c.id AND ${OPEN_CLAUSE})`)
           break
         case "pflege-faellig":
-          where.push(`c.next_touch_at IS NOT NULL AND c.next_touch_at <= current_date`)
+          where.push(`c.next_touch_at IS NOT NULL AND c.next_touch_at <= ${SQL_HEUTE}`)
           break
       }
       if (query.search?.trim()) {

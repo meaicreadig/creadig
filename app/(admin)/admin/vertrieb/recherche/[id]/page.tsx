@@ -37,6 +37,7 @@ import {
   ansprachedeckung,
   kontaktLage,
 } from "@/lib/contact-access"
+import { datumAnzeige } from "@/lib/geschaeftszeit"
 
 /**
  * Vertrieb · Recherche · ein Betrieb.
@@ -57,7 +58,7 @@ export const dynamic = "force-dynamic"
 export const metadata = { title: "Recherche · Betrieb" }
 
 function fmt(iso: string): string {
-  return new Date(iso).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" })
+  return datumAnzeige(iso, "de-DE", "lang")
 }
 
 export default async function RechercheDetail({ params }: { params: Promise<{ id: string }> }) {

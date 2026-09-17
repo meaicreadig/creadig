@@ -205,6 +205,16 @@ const oppRow = (await client.query(
            now(), now()) RETURNING excluded_reason`, [kontaktAbn.id])).rows[0]
 schritt("Chance ohne Anfrage erbt Ausschluss vom Kontakt (sofort, nicht beim naechsten Start)", oppRow.excluded_reason !== null)
 
+console.log("\n11 · ADM-02 · A23 — SQL-Geschaeftstag = JS-Geschaeftstag an Mitternacht und Sommerzeit")
+const { SQL_HEUTE, geschaeftsTag } = await import("../lib/geschaeftszeit.ts")
+schritt("SQL_HEUTE rechnet in Europe/Berlin", SQL_HEUTE.includes("AT TIME ZONE 'Europe/Berlin'"))
+const sqlTag = SQL_HEUTE.replace("now()", "$1::timestamptz")
+for (const iso of ["2026-09-16T21:59:00Z", "2026-09-16T22:00:00Z", "2026-01-15T23:00:00Z", "2026-03-29T00:59:00Z",
+                   "2026-03-29T01:00:00Z", "2026-10-25T00:30:00Z", "2026-10-25T01:30:00Z", "2026-10-25T23:00:00Z"]) {
+  const r = (await client.query(`SELECT to_char(${sqlTag}, 'YYYY-MM-DD') AS t`, [iso])).rows[0].t
+  schritt(`${iso} → ${r}`, r === geschaeftsTag(new Date(iso)), `JS ${geschaeftsTag(new Date(iso))}`)
+}
+
 await client.end()
 console.log(fehler === 0
   ? "\nAlle Pruefungen bestanden — der Kundenkern haelt.\n"

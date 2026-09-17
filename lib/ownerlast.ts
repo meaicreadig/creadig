@@ -44,6 +44,7 @@
  * zweite Wahrheit ueber dieselbe Arbeit.
  */
 import { ATTENTION_RANKS, type AttentionBoard, type AttentionRank } from "@/lib/attention"
+import { geschaeftsTag } from "@/lib/geschaeftszeit"
 
 /* ── Die zwei Klassen ───────────────────────────────────────────────────── */
 
@@ -234,15 +235,15 @@ export function vergleich(frueh: Messung | null, spaet: Messung | null): Verglei
 /* ── Von der Oberflaeche zur Messung ────────────────────────────────────── */
 
 /**
- * Der Tag einer Messung, ISO, in UTC.
+ * Der Tag einer Messung, ISO — der BERLINER Geschäftstag (ADM-02 · A23).
  *
- * Nicht `toLocaleDateString`: Wer um 23:30 in Berlin misst, misst nach UTC den
- * Vortag — und zwei Messungen am selben lokalen Tag waeren dann zwei Tage. Der
- * Abstand zwischen Messungen ist die einzige Zahl, an der dieses Gate haengt;
- * sie darf nicht von der Tageszeit abhaengen.
+ * Vorher UTC. Der Abstand zwischen Messungen ist die Zahl, an der dieses Gate
+ * haengt, und „derselbe Tag" muss meinen, was der Owner meint: Eine Messung
+ * um 00:30 und eine um 10:00 desselben Berliner Tages lagen im Sommer auf
+ * ZWEI UTC-Tagen. In der Geschaeftszone ist es einer.
  */
 export function messtag(jetzt: Date = new Date()): string {
-  return jetzt.toISOString().slice(0, 10)
+  return geschaeftsTag(jetzt)
 }
 
 /**

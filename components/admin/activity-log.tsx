@@ -1,5 +1,6 @@
 import { SectionHeader } from "@/components/admin/primitives"
 import type { Activity } from "@/lib/vertrieb"
+import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 
 /**
  * Die Chronik eines Vorgangs.
@@ -52,7 +53,7 @@ export function ActivityLog({ entries }: { entries: Activity[] }) {
 function formatDateTime(iso: string): string {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return iso
-  return d.toLocaleString("de-DE", {
+  return d.toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE,
     day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit",
   })
 }

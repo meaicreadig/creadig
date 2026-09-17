@@ -20,6 +20,7 @@ import {
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { SALES_LABELS_DE, getVertriebStore } from "@/lib/lead-store"
 import { LIFECYCLE_LABELS, RELATIONSHIP_LABELS, RELATIONSHIP_LEVELS } from "@/lib/vertrieb"
+import { GESCHAEFTS_ZEITZONE, datumAnzeige } from "@/lib/geschaeftszeit"
 
 /**
  * Ein Kontakt.
@@ -282,12 +283,11 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
 }
 
 function formatDate(iso: string): string {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })
+  return datumAnzeige(iso)
 }
 function formatDateTime(iso: string): string {
   const d = new Date(iso)
   return Number.isNaN(d.getTime())
     ? iso
-    : d.toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    : d.toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
 }

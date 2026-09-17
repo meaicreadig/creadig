@@ -18,6 +18,7 @@ import { CHECK_QUESTIONS } from "@/lib/betriebscheck"
 import { dictionary } from "@/lib/dictionary"
 import { HANDLING_LABELS, HANDLING_STATES, LIFECYCLE_LABELS } from "@/lib/vertrieb"
 import { ENTRY_INTENT, firstActionFor } from "@/lib/sales-playbook"
+import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 
 /**
  * Eine Anfrage.
@@ -344,5 +345,5 @@ function formatDateTime(iso: string): string {
   const d = new Date(iso)
   return Number.isNaN(d.getTime())
     ? iso
-    : d.toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    : d.toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
 }

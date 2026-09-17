@@ -1,5 +1,6 @@
 import { collect } from "@/lib/material-status"
 import type { VertriebStore } from "@/lib/vertrieb"
+import { geschaeftsTag } from "@/lib/geschaeftszeit"
 
 /**
  * Was heute Aufmerksamkeit braucht — aus allen Quellen, die es wirklich gibt.
@@ -183,7 +184,7 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
       ])
       salesMeasured = true
 
-      const today = new Date().toISOString().slice(0, 10)
+      const today = geschaeftsTag()
 
       /* ── 2/3/5 · Vorgänge ───────────────────────────────────────────────
          `summary().attention` liefert die Vorgänge, die einen Schritt

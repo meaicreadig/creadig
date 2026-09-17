@@ -31,6 +31,7 @@ import { LieferungMappe } from "@/components/admin/lieferung-mappe"
 import { SALES_LABELS_DE, SALES_STATES, TERMINAL_STATES, getVertriebStore } from "@/lib/lead-store"
 import { LOST_REASONS, NEXT_ACTIONS, OFFERED_STAGES, STAGE_RULES } from "@/lib/sales-playbook"
 import { OFFER_KINDS, OFFERS, readinessFor } from "@/lib/offer-readiness"
+import { GESCHAEFTS_ZEITZONE, datumAnzeige, geschaeftsTag } from "@/lib/geschaeftszeit"
 
 /**
  * Eine Verkaufschance.
@@ -79,7 +80,7 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
   */
   const readiness = opp.offerKind ? readinessFor(opp.offerKind, opp.readinessEvidence) : null
 
-  const overdue = opp.nextActionAt !== null && opp.nextActionAt < new Date().toISOString().slice(0, 10)
+  const overdue = opp.nextActionAt !== null && opp.nextActionAt < geschaeftsTag()
 
   return (
     <VertriebShell
@@ -426,12 +427,11 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
 }
 
 function formatDate(iso: string): string {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })
+  return datumAnzeige(iso)
 }
 function formatDateTime(iso: string): string {
   const d = new Date(iso)
   return Number.isNaN(d.getTime())
     ? iso
-    : d.toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    : d.toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
 }

@@ -5,6 +5,7 @@ import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { getVertriebStore } from "@/lib/lead-store"
 import { RELATIONSHIP_LABELS, RELATIONSHIP_LEVELS } from "@/lib/vertrieb"
 import type { ContactQuery, ContactRow, RelationshipLevel } from "@/lib/vertrieb"
+import { datumAnzeige, geschaeftsTag } from "@/lib/geschaeftszeit"
 
 /**
  * Vertrieb · Beziehungen.
@@ -105,7 +106,7 @@ export default async function BeziehungenPage({
 }
 
 function ContactTable({ rows }: { rows: ContactRow[] }) {
-  const heute = new Date().toISOString().slice(0, 10)
+  const heute = geschaeftsTag()
   return (
     <div className="border-line mt-6 overflow-x-auto rounded-md border">
       <table className="w-full min-w-[54rem] border-collapse text-start">
@@ -173,6 +174,5 @@ function Td({ children }: { children: React.ReactNode }) {
   return <td className="px-4 py-3 align-top">{children}</td>
 }
 function formatDate(iso: string): string {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })
+  return datumAnzeige(iso)
 }

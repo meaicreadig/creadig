@@ -34,7 +34,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 |---|:--:|:--:|:--:|:--:|---|---|---|
 | ADM-00 | 🟢 | — | — | 🟢 | `VERIFIED` | — (eingefroren, siehe unten) | — |
 | ADM-01 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Dark-Mode-Entscheidung beeinflusst nur Tokens, blockiert nicht |
-| ADM-02 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Europe/Berlin-Geschäftstag (A23) · Login-/Dashboard-Messung · Ladegrenzen/Datenzustände | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) |
+| ADM-02 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Login-/Dashboard-Messung · Datenzustände (A19) · Ladegrenzen | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
 | ADM-03 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | — |
 | ADM-04 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Anbieterfreigaben (nach A2-Einstufung) |
 | ADM-05 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | G18 für Rechnung (`lib/rechnung.ts`) |
@@ -58,6 +58,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | **H7** | Kein Dark Mode im Admin-Code (kein `dark:`/`prefers-color-scheme` in `components/admin`, `app/(admin)`). Ältere Acceptance nennt „Mobil 390 dunkel" — nicht reproduziert. | Code; Widerspruch zu `docs/control-center/acceptance.md` #11 | niedrig | A10 | Owner-Entscheidung |
 | **H8** | Die 27 Server Actions (`app/(admin)/admin/vertrieb/actions.ts`) prüften weder Sitzung noch Rolle — nur die Middleware schützte sie (Annahme über Next-Routing). | Code | hoch (A20) | ADM-02 | **VERIFIED** (17.09.2026) — siehe §H2 |
 | **H9** | `rollen-drill` war seit `157e1fa` rot (12 statt 13 Personendaten-Flächen), stand in keiner Kette. | reproduziert | niedrig (Testhygiene) | ADM-02 | **VERIFIED** — nachgezogen, jetzt in `postbuild` |
+| **H10** | Geschäftstag in UTC: „heute“ 12× als `toISOString().slice(0,10)`, SQL `current_date` (7×), Datums-/Zeitanzeige ohne Zone → zwischen 00:00 und 01:00/02:00 Berlin war heute gestern (fällig/überfällig um einen Tag falsch). | Code + reproduziert (Gate §2) | hoch (A23) | ADM-02 | **VERIFIED** (17.09.2026) — siehe §A23 |
 
 ---
 
@@ -228,6 +229,21 @@ Mit eingefrorener Präzisierung:
 
 ---
 
+## A23 · Berliner Geschäftstag (VERIFIED 17.09.2026)
+
+**Änderung**: `lib/geschaeftszeit.ts` — `GESCHAEFTS_ZEITZONE`, `geschaeftsTag()`, `SQL_HEUTE` = `(now() AT TIME ZONE 'Europe/Berlin')::date`, `datumAnzeige()`, zonenfreie `plusTage`/`wochentag`. Umgestellt: 9 Admin-Seiten (Anzeige + heute), `lib/attention.ts`, 7 SQL-Filter in `vertrieb-store-neon.ts` (fällig/überfällig/Pflege), `betrieb.naechsterWerktag`/`rueckrufOffen` (Eingangstag = Berliner Tag), `vollmacht.abgelaufen`, `ownerlast.messtag`, 8 Zeitpunkt-Anzeigen mit `timeZone`. Reine Datumsarithmetik (`lieferung.livetermin`, DATE-Spalten) bleibt bewusst zonenfrei.
+
+| Prüfung | Ergebnis | Art |
+|---|---|---|
+| `check-geschaeftszeit` (postbuild) | PASS — 13 Grenzfälle (Mitternacht Sommer/Winter, Sommerzeitbeginn 29.03., -ende 25.10. inkl. doppelter 02:30, Silvester); „00:30 Berlin: gestern = überfällig, in UTC nicht“ (alter Fehler reproduziert); Werktage „Montag 00:30 → Dienstag“; Anzeige DE/TR; Scan: kein UTC-heute, kein `current_date`, keine Datumsanzeige ohne Zone in Admin | lokal |
+| `crm-drill` §11 | PASS 9/9 — SQL-Geschäftstag = JS-Geschäftstag an 8 Grenzzeitpunkten gegen Postgres | reproduziert (DB lokal) |
+| 24 zonenrelevante/abhängige Drills (betrieb, vollmacht, ownerlast, kundenerfolg, …) | alle Exit 0 | lokal |
+| build + Gates · db-drills 9/9 · smoke 36/36 · tsc · ESLint | PASS | lokal |
+
+**BLOCKED_G18**: `lib/rechnung.ts` `faelligAm()` rechnet mit `setDate` (Serverzone) + `toISOString` — Fälligkeit einer Rechnung kann an Mitternacht um einen Tag springen. Fix erst nach G18-Entsperrung (eine Zeile: `plusTage(geschaeftsTag(r.gestelltAm), r.zahlungszielTage)`).
+
+---
+
 ## Routen-Karte (A4)
 
 | Route | Heute | Schicksal | Ziel | Grund |
@@ -263,5 +279,6 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 16.09.2026 | 1 | **H4 VERIFIED** — Admin-Header + Ursprungsprüfung, vorher/nachher gemessen, Browser-E2E |
 | 17.09.2026 | 2 | **H2 BUILT/lokal VERIFIED** (Widerruf, Migration 015) · **H8 VERIFIED** (Actions autorisieren selbst) · H9 rollen-drill repariert |
 | 17.09.2026 | 2 | **H3 BUILT/lokal VERIFIED** (Versuchsfenster, Migration 016) |
+| 17.09.2026 | 2 | **A23 / H10 VERIFIED** (Berliner Geschäftstag JS + SQL + Anzeige) |
 
-**Fortsetzungspunkt:** ADM-02 — Europe/Berlin-Geschäftstag (A23: heute/überfällig an Mitternacht + Sommerzeit), dann Login-/Dashboard-Messung (30 warm / 10 kalt, `next start`), dann Datenzustände (A19). Danach ADM-01.
+**Fortsetzungspunkt:** ADM-02 — Login-/Dashboard-Messung (30 warm / 10 kalt, `next start`, Stufen Klick→Auth→Shell→Daten), dann Datenzustände A19 (DB-Ausfall ≠ 0) je Admin-Fläche prüfen. Danach ADM-01.

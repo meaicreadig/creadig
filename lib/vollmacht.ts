@@ -57,6 +57,7 @@ import {
   type Wirkung,
 } from "@/lib/ereignis"
 import { FLAECHEN, ROLLEN, istRolle, type Rolle } from "@/lib/rollen"
+import { geschaeftsTag } from "@/lib/geschaeftszeit"
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * 1 · DIE VOLLMACHT
@@ -173,7 +174,7 @@ export function fehltAnVollmacht(v: Vollmacht, heute = new Date()): Mangel[] {
 
 export function abgelaufen(v: Vollmacht, heute = new Date()): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(v.gueltigBis ?? "")) return false
-  return heute.toISOString().slice(0, 10) > v.gueltigBis
+  return geschaeftsTag(heute) > v.gueltigBis
 }
 
 export function gueltig(v: Vollmacht, heute = new Date()): boolean {

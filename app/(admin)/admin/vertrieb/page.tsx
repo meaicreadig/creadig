@@ -4,6 +4,7 @@ import { Pill, SectionHeader, Surface } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { SALES_LABELS_DE, getVertriebStore } from "@/lib/lead-store"
 import type { OpportunityRow, VertriebSummary } from "@/lib/vertrieb"
+import { GESCHAEFTS_ZEITZONE, datumAnzeige, geschaeftsTag } from "@/lib/geschaeftszeit"
 
 /**
  * Vertrieb · Übersicht.
@@ -44,7 +45,7 @@ export default async function VertriebUebersicht() {
     return <VertriebShell title="Vertrieb" available={false}>{null}</VertriebShell>
   }
 
-  const stand = new Date().toLocaleString("de-DE", {
+  const stand = new Date().toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE,
     day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
   })
 
@@ -180,12 +181,9 @@ function AttentionRow({ opportunity: o }: { opportunity: OpportunityRow }) {
 }
 
 function today(): string {
-  return new Date().toISOString().slice(0, 10)
+  return geschaeftsTag()
 }
 
 function formatDate(iso: string): string {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime())
-    ? iso
-    : d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })
+  return datumAnzeige(iso)
 }

@@ -6,6 +6,7 @@ import { getVertriebStore } from "@/lib/lead-store"
 import { isTestEnquiry } from "@/lib/vertrieb-bestand"
 import { HANDLING_LABELS, HANDLING_STATES } from "@/lib/vertrieb"
 import type { EnquiryRow, HandlingStatus } from "@/lib/vertrieb"
+import { datumAnzeige } from "@/lib/geschaeftszeit"
 
 /**
  * Vertrieb · Anfragen — die Inbox.
@@ -171,6 +172,5 @@ function Td({ children }: { children: React.ReactNode }) {
   return <td className="px-4 py-3 align-top">{children}</td>
 }
 function formatDate(iso: string): string {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })
+  return datumAnzeige(iso)
 }

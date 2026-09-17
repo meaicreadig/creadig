@@ -9,6 +9,7 @@ import {
 } from "@/lib/attention"
 import { getVertriebStore, leadStoreConfigured } from "@/lib/lead-store"
 import { ITEM_GROUPS, collect } from "@/lib/material-status"
+import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 
 /**
  * Heute — die Startseite des Control Centers.
@@ -84,7 +85,7 @@ export default async function Today() {
     .filter((group) => group.count > 0)
     .sort((a, b) => b.count - a.count)
 
-  const stand = new Date().toLocaleString("de-DE", {
+  const stand = new Date().toLocaleString("de-DE", { timeZone: GESCHAEFTS_ZEITZONE,
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
