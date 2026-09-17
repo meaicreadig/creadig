@@ -34,7 +34,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 |---|:--:|:--:|:--:|:--:|---|---|---|
 | ADM-00 | 🟢 | — | — | 🟢 | `VERIFIED` | — (eingefroren, siehe unten) | — |
 | ADM-01 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Dark-Mode-Entscheidung beeinflusst nur Tokens, blockiert nicht |
-| ADM-02 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Login-/Dashboard-Messung · Datenzustände (A19) · Ladegrenzen | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
+| ADM-02 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Datenzustände A19 je Fläche · Ladegrenzen/Suspense · Abfragegrenzen | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
 | ADM-03 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | — |
 | ADM-04 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Anbieterfreigaben (nach A2-Einstufung) |
 | ADM-05 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | G18 für Rechnung (`lib/rechnung.ts`) |
@@ -59,6 +59,8 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | **H8** | Die 27 Server Actions (`app/(admin)/admin/vertrieb/actions.ts`) prüften weder Sitzung noch Rolle — nur die Middleware schützte sie (Annahme über Next-Routing). | Code | hoch (A20) | ADM-02 | **VERIFIED** (17.09.2026) — siehe §H2 |
 | **H9** | `rollen-drill` war seit `157e1fa` rot (12 statt 13 Personendaten-Flächen), stand in keiner Kette. | reproduziert | niedrig (Testhygiene) | ADM-02 | **VERIFIED** — nachgezogen, jetzt in `postbuild` |
 | **H10** | Geschäftstag in UTC: „heute“ 12× als `toISOString().slice(0,10)`, SQL `current_date` (7×), Datums-/Zeitanzeige ohne Zone → zwischen 00:00 und 01:00/02:00 Berlin war heute gestern (fällig/überfällig um einen Tag falsch). | Code + reproduziert (Gate §2) | hoch (A23) | ADM-02 | **VERIFIED** (17.09.2026) — siehe §A23 |
+| **H11** | Login-Seite (ohne Anmeldung) enthielt im Seiten-Payload die komplette Admin-Navigation samt Bereichsbeschreibungen — über `not-found.tsx` → `AdminShell`. | Runtime gemessen (`curl /admin/login`) | niedrig (Info-Abfluss, keine Daten) | ADM-02 | **VERIFIED** (17.09.2026) |
+| **H12** | Login-Formular: kein Zeitlimit (hängendes Netz = „Wird geprüft …“ für immer), Netz-/Serverfehler lasen sich wie falsches Passwort, nach Erfolg weiter „Wird geprüft …“ während der Navigation. | Code + E2E | mittel (A02) | ADM-02 | **VERIFIED** (17.09.2026) — siehe §A02 |
 
 ---
 
@@ -244,6 +246,36 @@ Mit eingefrorener Präzisierung:
 
 ---
 
+## A02 · Anmeldung: Fehlerzustände und Messung (17.09.2026)
+
+**Änderung**: `admin-login-form.tsx` — Zustände `bereit → pruefen → weiter`; 10-s-Zeitlimit (AbortController); eigene Texte für offline, Zeitüberschreitung, Serverstörung (5xx/403), zu viele Versuche, nicht eingerichtet; ein Text für alle Rateergebnisse bleibt; nur ein Rateergebnis leert das Feld; nach Erfolg „Angemeldet — Übersicht wird geladen …“. `not-found.tsx` ohne Navigation (H11). Werkzeug `scripts/admin-login-e2e.mjs` (`npm run admin-e2e`).
+
+| Fehlerzustand (Chromium, `next start`) | Ergebnis |
+|---|---|
+| F1 falsches Passwort → allgemeine Meldung, Feld geleert | PASS |
+| F2 Server antwortet 11,5 s nicht → „nicht rechtzeitig“ nach 10,4 s, Passwort bleibt, Knopf bedienbar | PASS |
+| F3 offline → eigene Meldung | PASS |
+| F4 429 · F5 500/502 → eigene Meldungen | PASS |
+| F6 Enter + Enter + Klick → **genau 1** Anmeldeaufruf | PASS |
+| F7 Erfolg: Zustände `pruefen → weiter`, Übersicht „Heute“ erreicht | PASS |
+| F8 abgelaufene (korrekt signierte) Sitzung → `/admin/login?abgelaufen=1`, kein geschützter Inhalt | PASS |
+| F9 Absenden vor Hydration (JS aus) → kein Passwort in der URL | PASS |
+
+**Messung** — Umgebung: lokaler Produktions-Build (`next start`), Chromium/Playwright, localhost ohne Drosselung, **ohne Datenbank** (Datenlatenz nicht enthalten), Apple-Silicon-Mac, 17.09.2026. Probe = Klick bis Stufe; „kalt“ = erste Anmeldung nach Serverstart (Login-Seite zuvor geladen).
+
+| Stufe | warm n=30 p50 / p95 | kalt n=10 p50 / p95 | Budget |
+|---|---|---|---|
+| Rückmeldung (Knopfzustand) | 23 / 25 ms | 23 / 23 ms | ≤ 100 ms ✓ |
+| Auth-Antwort | 25 / 29 ms | 31 / 35 ms | Timeout 10 s ✓ |
+| Adresse `/admin` | 42 / 46 ms | 58 / 62 ms | — |
+| Shell nutzbar (h1) | 45 / 49 ms | 61 / 65 ms | ≤ 2 s ✓ |
+| Fehler | 0 | 0 | — |
+
+**Was diese Zahlen NICHT sind**: keine Produktionswahrheit. Es fehlen Netzlaufzeit, Vercel-Kaltstart, Neon-Latenz (Widerrufsprüfung + Daten). Produktionsmessung (gleiches Skript gegen Preview) braucht Push/Preview-Zugang → **WAITING_OWNER** (Deployment Protection). Datenbudgets (warm ≤ 3 s, kalt ≤ 5 s) sind lokal **NOT_RUN** (keine Neon-kompatible lokale DB).
+**Geprüft statt angenommen**: `x-forwarded-for` ist auf Vercel nicht fälschbar (Vercel überschreibt den Header, Doku „Request headers“, 17.09.2026) — das Versuchsfenster ist nicht per Header umgehbar. Das Messskript setzt ihn nur lokal, damit 40 Proben nicht in 429 laufen.
+
+---
+
 ## Routen-Karte (A4)
 
 | Route | Heute | Schicksal | Ziel | Grund |
@@ -280,5 +312,6 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 17.09.2026 | 2 | **H2 BUILT/lokal VERIFIED** (Widerruf, Migration 015) · **H8 VERIFIED** (Actions autorisieren selbst) · H9 rollen-drill repariert |
 | 17.09.2026 | 2 | **H3 BUILT/lokal VERIFIED** (Versuchsfenster, Migration 016) |
 | 17.09.2026 | 2 | **A23 / H10 VERIFIED** (Berliner Geschäftstag JS + SQL + Anzeige) |
+| 17.09.2026 | 2 | **A02 lokal VERIFIED** (9 Fehlerzustände, 30 warm / 10 kalt) · H11 Navigation aus Login-Payload · H12 Login endlich |
 
-**Fortsetzungspunkt:** ADM-02 — Login-/Dashboard-Messung (30 warm / 10 kalt, `next start`, Stufen Klick→Auth→Shell→Daten), dann Datenzustände A19 (DB-Ausfall ≠ 0) je Admin-Fläche prüfen. Danach ADM-01.
+**Fortsetzungspunkt:** ADM-02 — A19 Datenzustände: jede Admin-Fläche gegen „nicht eingerichtet“ und „Speicher gestört“ prüfen (kein „0“ statt unbekannt), unabhängige Lade-/Fehlergrenzen auf Heute; Abfragegrenzen (LIMIT/Paginierung) prüfen. Danach ADM-01.

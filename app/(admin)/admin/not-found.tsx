@@ -1,6 +1,5 @@
 import Link from "next/link"
 
-import { AdminShell } from "@/components/admin/admin-shell"
 import { UnavailableNote } from "@/components/admin/primitives"
 
 /**
@@ -10,10 +9,19 @@ import { UnavailableNote } from "@/components/admin/primitives"
  * Speicher hat geantwortet, und zu dieser Kennung liegt nichts vor. Das ist
  * eine ANDERE Aussage als „Speicher nicht erreichbar" — und sie muss anders
  * aussehen, sonst sucht man an der falschen Stelle.
+ *
+ * ADM-02 · H11 (17.09.2026) — OHNE NAVIGATION.
+ * Next legt die Not-Found-Grenze eines Segments in den Seiten-Payload JEDER
+ * Seite darunter — auch der Anmeldung. Mit `AdminShell` stand dort die ganze
+ * Navigation samt Bereichsbeschreibungen, lesbar ohne Anmeldung (gemessen:
+ * „Anfragen, Pipeline, Beziehungen" im HTML von `/admin/login`). Diese Seite
+ * braucht keine Navigation: Sie hat zwei Links.
  */
 export default function AdminNotFound() {
   return (
-    <AdminShell title="Nicht gefunden">
+    <main className="bg-background text-foreground min-h-dvh px-6 py-16">
+      <div className="mx-auto max-w-2xl">
+      <h1 className="type-h3 mb-6">Nicht gefunden</h1>
       <UnavailableNote title="Diese Adresse gibt es hier nicht">
         Die Datenquelle hat geantwortet — zu dieser Kennung liegt nur nichts
         vor. Möglich ist ein alter Link, eine getippte Kennung oder ein
@@ -28,6 +36,7 @@ export default function AdminNotFound() {
           Zum Materialstand
         </Link>
       </div>
-    </AdminShell>
+      </div>
+    </main>
   )
 }

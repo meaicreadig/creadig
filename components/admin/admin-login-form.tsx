@@ -9,20 +9,47 @@ import { AdminField, AdminInput } from "@/components/admin/primitives"
  * Anmeldeformular.
  *
  * ---------------------------------------------------------------------------
- * EINE FEHLERMELDUNG FÜR ALLES
+ * EINE FEHLERMELDUNG FÜR ALLE RATEERGEBNISSE
  * Falsches Passwort, leeres Feld, kaputte Anfrage — der Text ist immer
- * derselbe. Wer unterscheidet, hilft beim Durchprobieren. Nur zwei Zustände
- * bekommen eine eigene Antwort, weil sie kein Rateergebnis sind: das
- * ausgeschöpfte Versuchsfenster und die nicht eingerichtete Umgebung.
+ * derselbe. Wer unterscheidet, hilft beim Durchprobieren. Eigene Antworten
+ * bekommen nur Zustände, die KEIN Rateergebnis sind: ausgeschöpftes
+ * Versuchsfenster, nicht eingerichtete Umgebung — und (ADM-02 · A02) alles,
+ * was am Netz oder am Server liegt.
+ *
+ * ---------------------------------------------------------------------------
+ * ADM-02 · A02 (17.09.2026) — ENDLICH UND EHRLICH
+ * Vorher: kein Zeitlimit (ein hängendes Netz ließ „Wird geprüft …" für immer
+ * stehen), Zeitüberschreitung und Netzfehler lasen sich wie ein falsches
+ * Passwort, und nach erfolgreicher Anmeldung stand während der Navigation
+ * weiter „Wird geprüft …" — obwohl nichts mehr geprüft wurde.
+ *
+ * Jetzt: 10 s Zeitlimit; offline, Zeitüberschreitung und Serverstörung haben
+ * eigene Texte und behalten das eingegebene Passwort; nach dem Erfolg heißt
+ * der Zustand „Angemeldet — Übersicht wird geladen …".
  *
  * `router.refresh()` nach dem Erfolg ist nicht optional: Ohne ihn bedient der
  * Client-Cache die Zielseite aus der Zeit vor der Anmeldung.
  */
+const ZEITLIMIT_MS = 10_000
+
+type Phase = "bereit" | "pruefen" | "weiter"
+type Fehler = "ungueltig" | "zu-viele" | "nicht-eingerichtet" | "zeitueberschreitung" | "offline" | "stoerung"
+
+const FEHLERTEXT: Record<Fehler, string> = {
+  ungueltig: "Anmeldung nicht möglich.",
+  "zu-viele": "Zu viele Versuche. Bitte später erneut probieren.",
+  "nicht-eingerichtet": "Nicht eingerichtet.",
+  zeitueberschreitung: "Der Server hat nicht rechtzeitig geantwortet. Bitte erneut versuchen.",
+  offline: "Keine Internetverbindung. Bitte Verbindung prüfen und erneut versuchen.",
+  stoerung: "Der Server ist gerade gestört. Bitte in einem Moment erneut versuchen.",
+}
+
 export function AdminLoginForm() {
   const router = useRouter()
   const [password, setPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<Fehler | null>(null)
+  const [phase, setPhase] = useState<Phase>("bereit")
+  const busy = phase !== "bereit"
 
   return (
     <form
@@ -48,32 +75,55 @@ export function AdminLoginForm() {
        */
       method="post"
       className="mt-8 flex flex-col gap-6"
+      data-phase={phase}
       onSubmit={async (event) => {
         event.preventDefault()
+        if (busy) return
         setError(null)
-        setBusy(true)
 
-        const response = await fetch("/api/admin/session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password }),
-        }).catch(() => null)
+        if (typeof navigator !== "undefined" && navigator.onLine === false) {
+          setError("offline")
+          return
+        }
+
+        setPhase("pruefen")
+        const abbruch = new AbortController()
+        const uhr = setTimeout(() => abbruch.abort(), ZEITLIMIT_MS)
+        let response: Response | null = null
+        let fehler: Fehler | null = null
+        try {
+          response = await fetch("/api/admin/session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password }),
+            signal: abbruch.signal,
+          })
+        } catch (e) {
+          fehler = e instanceof DOMException && e.name === "AbortError"
+            ? "zeitueberschreitung"
+            : navigator.onLine === false ? "offline" : "stoerung"
+        } finally {
+          clearTimeout(uhr)
+        }
 
         if (response?.ok) {
+          setPhase("weiter")
           router.replace("/admin")
           router.refresh()
           return
         }
 
-        setBusy(false)
-        setPassword("")
-        if (response?.status === 429) {
-          setError("Zu viele Versuche. Bitte später erneut probieren.")
-        } else if (response?.status === 503 || response?.status === 404) {
-          setError("Nicht eingerichtet.")
-        } else {
-          setError("Anmeldung nicht möglich.")
+        if (!fehler && response) {
+          if (response.status === 429) fehler = "zu-viele"
+          else if (response.status === 404) fehler = "nicht-eingerichtet"
+          else if (response.status >= 500 || response.status === 403) fehler = "stoerung"
+          else fehler = "ungueltig"
         }
+
+        setPhase("bereit")
+        /* Nur ein Rateergebnis leert das Feld — an Netz oder Server hat der Mensch nichts falsch gemacht. */
+        if (fehler === "ungueltig") setPassword("")
+        setError(fehler ?? "stoerung")
       }}
     >
       <AdminField label="Passwort" htmlFor="password">
@@ -95,7 +145,7 @@ export function AdminLoginForm() {
 
       {error && (
         <p role="alert" className="border-destructive/40 text-destructive border-s-2 py-1 ps-4 text-sm">
-          {error}
+          {FEHLERTEXT[error]}
         </p>
       )}
 
@@ -104,7 +154,7 @@ export function AdminLoginForm() {
         disabled={busy}
         className="cta-outline px-7 py-3.5 text-sm tracking-wide disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {busy ? "Wird geprüft …" : "Anmelden"}
+        {phase === "pruefen" ? "Wird geprüft …" : phase === "weiter" ? "Angemeldet — Übersicht wird geladen …" : "Anmelden"}
       </button>
     </form>
   )
