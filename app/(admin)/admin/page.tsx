@@ -154,9 +154,21 @@ export default async function Today() {
             </ul>
           )}
 
+          {!hasStore ? (
+            <div className="mt-5">
+              {/* ADM-02 · A19 — ohne Datenbank fehlt der Vertrieb in dieser Liste; das muss hier stehen, nicht nur unter Vertrieb. */}
+              <UnavailableNote title="Vertrieb nicht eingerichtet">
+                Die Kunden- und Anfragedatenbank ist für diese Umgebung nicht
+                eingerichtet. Neue Anfragen, offene Vorgänge und fällige
+                Kontaktpflege können deshalb hier nicht erscheinen — das ist
+                keine Null, sondern eine fehlende Verbindung.
+              </UnavailableNote>
+            </div>
+          ) : null}
+
           {hasStore && !board.salesMeasured ? (
             <div className="mt-5">
-              <UnavailableNote title="Vertrieb nicht gemessen">
+              <UnavailableNote title="Vertrieb nicht erreichbar — nicht gemessen">
                 Ein Lead-Speicher ist eingerichtet, war aber gerade nicht
                 erreichbar. Offene Vorgänge, neue Anfragen und fällige
                 Kontaktpflege fehlen deshalb in dieser Liste. Das ist keine

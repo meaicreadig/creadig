@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { Abschneidehinweis, Pill, SectionHeader, UnavailableNote } from "@/components/admin/primitives"
+import { Abschneidehinweis, Pill, SectionHeader } from "@/components/admin/primitives"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { getVertriebStore } from "@/lib/lead-store"
 import { RESEARCH_STATES, STATE_MEANING, abbruch, alterInTagen, einordnung, mehrfachBelegt } from "@/lib/research"
@@ -40,15 +40,13 @@ export default async function RecherchePage({
 }) {
   const { status } = await searchParams
   const store = getVertriebStore()
-  if (!store) {
-    return (
-      <VertriebShell title="Recherche" lead="Betriebe finden, belegen, einordnen." available={false}>
-        <UnavailableNote title="Recherche nicht verfügbar">
-          Der Vertriebs-Speicher ist nicht erreichbar.
-        </UnavailableNote>
-      </VertriebShell>
-    )
-  }
+  /* ADM-02 · A19 — nicht eingerichtet und nicht erreichbar zeigen dieselbe Hülle; welcher Fall, sagt sie selbst. */
+  const nichtVerfuegbar = (
+    <VertriebShell title="Recherche" lead="Betriebe finden, belegen, einordnen." available={false}>
+      {null}
+    </VertriebShell>
+  )
+  if (!store) return nichtVerfuegbar
 
   const gefiltert = (RESEARCH_STATES as readonly string[]).includes(status ?? "")
     ? (status as (typeof RESEARCH_STATES)[number])
@@ -56,7 +54,8 @@ export default async function RecherchePage({
   /* Die Obergrenze steht als Konstante, damit der Hinweis unten dieselbe
      Zahl nennt, die oben geholt wurde — zwei Zahlen wuerden auseinanderlaufen. */
   const GRENZE = 200
-  const faelle = await store.listResearch({ status: gefiltert, limit: GRENZE })
+  const faelle = await store.listResearch({ status: gefiltert, limit: GRENZE }).catch(() => null)
+  if (faelle === null) return nichtVerfuegbar
   const sortiert = [...faelle].sort((a, b) => (RANG[a.status] ?? 9) - (RANG[b.status] ?? 9))
 
   return (

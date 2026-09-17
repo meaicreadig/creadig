@@ -44,7 +44,10 @@ export default async function VerlustPage() {
    * Marktwissen — und das ist genau der Fehler, gegen den sie gebaut ist.
    */
   const GRENZE = 500
-  const { rows, total } = await store.listOpportunities({ status: "lost", limit: GRENZE })
+  /* ADM-02 · A19 — eine Störung zeigt die Hülle mit ihrem Zustand, nicht die Fehlerseite der ganzen Ansicht. */
+  const verloren = await store.listOpportunities({ status: "lost", limit: GRENZE }).catch(() => null)
+  if (!verloren) return <VertriebShell title="Verlust-Schleife" available={false}>{null}</VertriebShell>
+  const { rows, total } = verloren
   const schleife = marktRueckmeldung(rows.map((r) => r.lostReason))
   const druck = unterDruck(schleife)
   const gezaehlt = schleife.rueckmeldungen.reduce((n, r) => n + r.anzahl, 0)

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
-import { UnavailableNote } from "@/components/admin/primitives"
+import { SpeicherHinweis } from "@/components/admin/speicher-hinweis"
 import { VertriebNav } from "@/components/admin/vertrieb-nav"
 
 /**
@@ -38,13 +38,10 @@ export function VertriebShell({
            * ist der ganze Punkt: Eine leere Pipeline wäre eine Aussage über
            * das Geschäft; eine fehlende Datenbank ist eine über die Technik.
            */
-          <UnavailableNote title="Vertrieb braucht die Datenbank">
-            Anfragen, Kontakte und Verkaufschancen liegen in der
-            Lead-Datenbank. Ist sie nicht eingerichtet oder gerade nicht
-            erreichbar, kann diese Ansicht nichts zeigen — und zeigt deshalb
-            nichts, statt Leere zu behaupten. Der Weg über das Formular ins
-            Postfach läuft davon unberührt weiter.
-          </UnavailableNote>
+          <SpeicherHinweis
+            bereich="Vertrieb"
+            inhalt="Anfragen, Kontakte und Verkaufschancen"
+          />
         )}
       </div>
     </AdminShell>

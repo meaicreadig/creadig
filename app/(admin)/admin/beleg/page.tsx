@@ -9,7 +9,7 @@ import {
 } from "@/lib/beleg-betrieb"
 import { fiberoKennzahlen, HISTORISCHER_BEFUND, MESSUNG_START } from "@/lib/fibero-messung"
 import { MIND_ABSTAND_TAGE, MIND_FAELLE, type Probe } from "@/lib/messreihe"
-import { getVertriebStore } from "@/lib/lead-store"
+import { getVertriebStore, leadStoreConfigured } from "@/lib/lead-store"
 
 /**
  * PROOF OPERATIONS · DAS BELEG-COCKPIT.
@@ -58,7 +58,7 @@ async function ladeProben(): Promise<{ proben: Probe[]; gelesen: boolean }> {
   const store = getVertriebStore()
   /* Ohne konfigurierte Datenbank ist die Reihe nicht leer — sie ist nicht lesbar. */
   if (!store) return { proben: [], gelesen: false }
-  const zeilen = await store.measurementSamples()
+  const zeilen = await store.measurementSamples().catch(() => null)
   if (zeilen === null) return { proben: [], gelesen: false }
   return {
     proben: zeilen.map((z) => ({
@@ -165,7 +165,7 @@ export default async function BelegBetrieb() {
             Messreihe fibero
           </h2>
           <span className="text-meta text-muted-foreground shrink-0">
-            {u.probenErhoben} Proben {gelesen ? "" : "· Datenbank nicht gelesen"}
+            {u.probenErhoben} Proben {gelesen ? "" : leadStoreConfigured() ? "· Messreihe nicht erreichbar — nicht gemessen" : "· Messreihe nicht eingerichtet — nicht gemessen"}
           </span>
         </div>
 

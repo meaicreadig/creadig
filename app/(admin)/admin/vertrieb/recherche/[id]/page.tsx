@@ -64,9 +64,19 @@ function fmt(iso: string): string {
 export default async function RechercheDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const store = getVertriebStore()
-  if (!store) notFound()
+  /*
+   * ADM-02 · A19 — ohne Speicher ist ein Fall nicht „nicht gefunden“: Es wurde
+   * gar nicht gesucht. Und ein Speicherfehler ist keine fehlende Kennung.
+   */
+  const nichtVerfuegbar = (
+    <VertriebShell title="Recherche" available={false}>
+      {null}
+    </VertriebShell>
+  )
+  if (!store) return nichtVerfuegbar
 
-  const fall = await store.getResearch(id)
+  const fall = await store.getResearch(id).catch(() => undefined)
+  if (fall === undefined) return nichtVerfuegbar
   if (!fall) notFound()
 
   const e = einordnung(fall)

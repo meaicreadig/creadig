@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
-import { UnavailableNote } from "@/components/admin/primitives"
+import { SpeicherHinweis } from "@/components/admin/speicher-hinweis"
 
 /**
  * Die Hülle der Kundensicht.
@@ -47,12 +47,7 @@ export function KundenShell({
          * derselben Datenbank wie der Vertrieb; ist sie nicht erreichbar,
          * zeigt diese Seite nichts, statt Leere zu behaupten.
          */
-        <UnavailableNote title="Der Bestand braucht die Datenbank">
-          Organisationen, Standorte und Ansprechpartner liegen in der
-          Lead-Datenbank. Ist sie nicht eingerichtet oder gerade nicht
-          erreichbar, kann diese Ansicht nichts zeigen. Das ist keine leere
-          Kundenliste, sondern eine fehlende Messung.
-        </UnavailableNote>
+        <SpeicherHinweis bereich="Kunden" inhalt="Organisationen, Standorte und Ansprechpartner" />
       )}
     </AdminShell>
   )

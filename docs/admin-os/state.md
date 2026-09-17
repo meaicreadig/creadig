@@ -34,7 +34,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 |---|:--:|:--:|:--:|:--:|---|---|---|
 | ADM-00 | 🟢 | — | — | 🟢 | `VERIFIED` | — (eingefroren, siehe unten) | — |
 | ADM-01 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Dark-Mode-Entscheidung beeinflusst nur Tokens, blockiert nicht |
-| ADM-02 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Datenzustände A19 je Fläche · Ladegrenzen/Suspense · Abfragegrenzen | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
+| ADM-02 | 🟡 | 🔴 | 🔴 | 🔴 | `IN_PROGRESS` | Abfragegrenzen (LIMIT/Paginierung/Indizes) prüfen → dann ADM-02 BUILT | Cutover H1–H4 = Deploy + Migrationen 015/016 · Produktionsmessung (Preview-Zugang) | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
 | ADM-03 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | — |
 | ADM-04 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Anbieterfreigaben (nach A2-Einstufung) |
 | ADM-05 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | G18 für Rechnung (`lib/rechnung.ts`) |
@@ -61,6 +61,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | **H10** | Geschäftstag in UTC: „heute“ 12× als `toISOString().slice(0,10)`, SQL `current_date` (7×), Datums-/Zeitanzeige ohne Zone → zwischen 00:00 und 01:00/02:00 Berlin war heute gestern (fällig/überfällig um einen Tag falsch). | Code + reproduziert (Gate §2) | hoch (A23) | ADM-02 | **VERIFIED** (17.09.2026) — siehe §A23 |
 | **H11** | Login-Seite (ohne Anmeldung) enthielt im Seiten-Payload die komplette Admin-Navigation samt Bereichsbeschreibungen — über `not-found.tsx` → `AdminShell`. | Runtime gemessen (`curl /admin/login`) | niedrig (Info-Abfluss, keine Daten) | ADM-02 | **VERIFIED** (17.09.2026) |
 | **H12** | Login-Formular: kein Zeitlimit (hängendes Netz = „Wird geprüft …“ für immer), Netz-/Serverfehler lasen sich wie falsches Passwort, nach Erfolg weiter „Wird geprüft …“ während der Navigation. | Code + E2E | mittel (A02) | ADM-02 | **VERIFIED** (17.09.2026) — siehe §A02 |
+| **H13** | Datenzustände: Vertrieb/Kunden sagten in beiden Lagen „nicht eingerichtet oder nicht erreichbar“; Heute ohne Speicher verschwieg den fehlenden Vertrieb; Recherche/Verlust fielen bei Störung auf die Fehlerseite der ganzen Ansicht; Recherche-Detail ohne Speicher = „Nicht gefunden“; Beleg „Datenbank nicht gelesen“ ohne Lage. | Runtime (gerenderter Crawl, 32 Flächen × 2 Lagen) | mittel (A19) | ADM-02 | **VERIFIED** (17.09.2026) — siehe §A19 |
 
 ---
 
@@ -276,6 +277,20 @@ Mit eingefrorener Präzisierung:
 
 ---
 
+## A19 · Datenzustände je Fläche (VERIFIED lokal 17.09.2026)
+
+**Änderung**: `components/admin/speicher-hinweis.tsx` — `speicherGrund()` (eingerichtet + keine Daten ⇒ nicht erreichbar) und ein Hinweis je Lage; Störung mit „Erneut laden“. Vertriebs- und Kunden-Hülle nutzen ihn; Recherche (Liste + Detail) und Verlust fangen Speicherfehler selbst; Heute nennt „Vertrieb nicht eingerichtet“ bzw. „nicht erreichbar — nicht gemessen“; Beleg nennt die Lage der Messreihe. Werkzeug `scripts/admin-zustaende.mjs` (`npm run admin-zustaende`, Exit ≠ 0 bei Befund).
+
+| Lauf | Flächen | Ergebnis |
+|---|---|---|
+| ohne Speicher | 16 (inkl. 5 Detailseiten mit unbekannter Kennung) | 16/16 — Zustand „nicht eingerichtet“, nie „erreichbar“, keine Null vor Geschäftsobjekten, kein 5xx, keine Fehlerseite |
+| Speicher eingerichtet, tot | 16 | 16/16 — Zustand „nicht erreichbar“, nie „eingerichtet“, keine Null, keine Fehlerseite |
+
+**Ausnahmen, benannt**: `/admin/material` (liest keinen Speicher). `/admin/cockpit` sagt bei gestörtem Speicher „nicht eingerichtet“ — wird mit Heute zusammengelegt (H6, ADM-01), dort neu geprüft.
+**Grenze**: „Nicht gefunden“ bei erreichbarem Speicher + unbekannter Kennung ist lokal nicht laufzeitprüfbar (kein Neon) — Code-Pfad `notFound()` unverändert.
+
+---
+
 ## Routen-Karte (A4)
 
 | Route | Heute | Schicksal | Ziel | Grund |
@@ -313,5 +328,6 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 17.09.2026 | 2 | **H3 BUILT/lokal VERIFIED** (Versuchsfenster, Migration 016) |
 | 17.09.2026 | 2 | **A23 / H10 VERIFIED** (Berliner Geschäftstag JS + SQL + Anzeige) |
 | 17.09.2026 | 2 | **A02 lokal VERIFIED** (9 Fehlerzustände, 30 warm / 10 kalt) · H11 Navigation aus Login-Payload · H12 Login endlich |
+| 17.09.2026 | 2 | **A19 VERIFIED lokal** (32 Flächen × 2 Lagen) · H13 |
 
-**Fortsetzungspunkt:** ADM-02 — A19 Datenzustände: jede Admin-Fläche gegen „nicht eingerichtet“ und „Speicher gestört“ prüfen (kein „0“ statt unbekannt), unabhängige Lade-/Fehlergrenzen auf Heute; Abfragegrenzen (LIMIT/Paginierung) prüfen. Danach ADM-01.
+**Fortsetzungspunkt:** ADM-02 — Abfragegrenzen: jede Listenabfrage im Vertriebsspeicher auf LIMIT/Paginierung, Indizes für Filterspalten (Migration nur lokal), N+1 auf Heute/Kundenakte. Danach ADM-02 als BUILT schließen und ADM-01 (Shell, Übersicht = Heute+Cockpit, DE/TR, Routen-Karte) beginnen.
