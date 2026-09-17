@@ -95,8 +95,10 @@ export default async function VerlustPage() {
                   <li key={d.hypothese.key}>
                     <Surface padding="sm">
                       <div className="flex flex-wrap items-baseline gap-3">
-                        <span className="text-subhead">{d.hypothese.satz}</span>
-                        <Pill>{d.hypothese.status}</Pill>
+                        <span className="text-subhead">
+                          {t.hypothese.satz[d.hypothese.key as keyof typeof t.hypothese.satz] ?? d.hypothese.satz}
+                        </span>
+                        <Pill>{t.hypothese.status[d.hypothese.status as keyof typeof t.hypothese.status] ?? d.hypothese.status}</Pill>
                       </div>
                       <p className="type-small text-muted-foreground mt-2 text-pretty">
                         {t.verlust.beruehrtVon(
@@ -110,7 +112,7 @@ export default async function VerlustPage() {
                       </p>
                       <p className="type-small text-foreground/90 mt-2 text-pretty">
                         <span className="text-subhead">{t.verlust.entscheidet}</span>
-                        {d.hypothese.pruefen}
+                        {t.hypothese.pruefen[d.hypothese.key as keyof typeof t.hypothese.pruefen] ?? d.hypothese.pruefen}
                       </p>
                       <p className="type-small text-muted-foreground mt-2 text-pretty">
                         {t.verlust.registerHinweis}

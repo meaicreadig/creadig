@@ -42,6 +42,7 @@
     "betriebskette-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/betriebskette-drill.mjs",
     "freigabe-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/freigabe-drill.mjs",
     "freigabe-e2e": "node --import ./scripts/lib/alias-hook.mjs scripts/freigabe-e2e.mjs",
+    "befund-sprache-e2e": "node --import ./scripts/lib/alias-hook.mjs scripts/befund-sprache-e2e.mjs",
     "verbindungen-e2e": "node --import ./scripts/lib/alias-hook.mjs scripts/verbindungen-e2e.mjs",
     "versuch-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/versuch-drill.mjs",
     "admin-zustaende": "node --import ./scripts/lib/alias-hook.mjs scripts/admin-zustaende.mjs",

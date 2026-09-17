@@ -342,7 +342,59 @@ export const REFERENZ_MUSTER = /^CD-\d{6}-[0-9a-f]{4}$/i
 const VERKNAPPUNG =
   /(nur noch heute|nur heute|letzte chance|jetzt zugreifen|solange der vorrat|nur diese woche|einmalige gelegenheit|sichern sie sich)/i
 
-export type Befund = { abschnitt: string; satz: string }
+/* ── ADM-05 · H21 · WAS UEBERSETZT WIRD UND WAS NICHT ─────────────────────
+ *
+ * Ein Befund ist ab hier ein MASCHINENWERT, kein Satz. Der Satz entsteht in
+ * der Oberflaeche, aus dem Woerterbuch, in der Sprache des Menschen davor.
+ *
+ * Bis zum 17.09.2026 entstanden diese Saetze hier — als deutscher Text im
+ * Server. Sie erschienen deshalb auch in der tuerkischen Oberflaeche auf
+ * Deutsch, und das Sprach-Gate konnte es nicht sehen: Es zaehlt sichtbaren
+ * deutschen Text im JSX, nicht Text, der aus dem Server kommt.
+ *
+ * Die Trennlinie, die dabei gezogen wurde:
+ *
+ *   uebersetzt      Was eine REGEL dieses Hauses ist — Befunde, Maengel,
+ *                   Reifekriterien, Zustandsbeschreibungen.
+ *   nicht uebersetzt Was ein NAME in einem Kundendokument ist — Paket- und
+ *                   Produktnamen, die Abschnittsueberschriften des Angebots,
+ *                   gespeicherte Verlustgruende.
+ *
+ * Der zweite Teil ist kein Versaeumnis. Wer auf Tuerkisch „06 Fiyat" liest
+ * und dann deutschen Text in einen Abschnitt tippt, der beim Kunden „06
+ * Preis" heisst, arbeitet an einem Dokument, das er nicht sieht.
+ */
+export const BEFUND_CODES = [
+  "referenz-muster",
+  "reife-offen",
+  "abschnitt-leer",
+  "keine-position",
+  "katalog-ohne-zahl",
+  "betrag-ohne-freigabe",
+  "kein-gueltigkeitsdatum",
+  "verknappung",
+  "ja-ohne-beleg",
+  /* Aus dem Speicher — Zustandswechsel, die nicht (mehr) moeglich sind. */
+  "angebot-fehlt",
+  "vorgang-fehlt",
+  "nicht-im-entwurf",
+  "nicht-gesendet",
+  "keine-angebotsart",
+  "kein-angebot-angegeben",
+] as const
+export type BefundCode = (typeof BEFUND_CODES)[number]
+
+export type Befund = {
+  /**
+   * Wo — ein Abschnittsschluessel des Angebots oder ein Bereich. Maschinenwert.
+   * Abschnitte zeigt die Oberflaeche mit ihrer DEUTSCHEN Ueberschrift; sie
+   * benennen ein Dokument, das der Kunde auf Deutsch bekommt.
+   */
+  bereich: string
+  code: BefundCode
+  /** Werte fuer den Satz — Namen, Referenzen, Fundstellen. Nie uebersetzt. */
+  werte?: Record<string, string>
+}
 
 /**
  * Was einem Angebot fehlt, um in diesen Zustand zu gehen.
@@ -359,12 +411,7 @@ export function fehltFuer(
   const fehlt: Befund[] = []
 
   if (!REFERENZ_MUSTER.test(angebot.referenz)) {
-    fehlt.push({
-      abschnitt: "Formales",
-      satz:
-        `Die Referenz „${angebot.referenz}" folgt nicht dem Muster CD-YYMMDD-####. ` +
-        "Sie soll dieselbe Nummer sein wie in der Eingangsbestaetigung — sonst hat der Kunde zwei.",
-    })
+    fehlt.push({ bereich: "formales", code: "referenz-muster", werte: { referenz: angebot.referenz } })
   }
 
   if (!istVerbindlich(ziel)) return fehlt
@@ -372,10 +419,7 @@ export function fehltFuer(
   /* ── Angebotsreife (G07/G08) ─────────────────────────────────────────── */
   const reife = readinessFor(angebot.kind, belege)
   for (const offen of reife.open) {
-    fehlt.push({
-      abschnitt: "Angebotsreife",
-      satz: `${offen.label} — ${offen.why}`,
-    })
+    fehlt.push({ bereich: "reife", code: "reife-offen", werte: { beleg: offen.key } })
   }
 
   /* ── Die Pflichtabschnitte ───────────────────────────────────────────── */
@@ -383,38 +427,27 @@ export function fehltFuer(
     if (!a.pflicht) continue
     const text = (angebot.abschnitte[a.key] ?? "").trim()
     if (text.length === 0) {
-      fehlt.push({ abschnitt: `${a.nummer} ${a.titel}`, satz: a.regel })
+      fehlt.push({ bereich: a.key, code: "abschnitt-leer" })
     }
   }
 
   /* ── Jede Zahl aus dem Katalog oder mit Freigabe ──────────────────────── */
   if (angebot.positionen.length === 0) {
-    fehlt.push({
-      abschnitt: "06 Preis",
-      satz: "Keine Position. Ein Angebot ohne Zahl ist ein Gespraechsprotokoll.",
-    })
+    fehlt.push({ bereich: "preis", code: "keine-position" })
   }
   for (const p of angebot.positionen) {
     if (p.art === "katalog") {
       if (betragVon(p) === null) {
-        fehlt.push({
-          abschnitt: "06 Preis",
-          satz: `„${p.was}" verweist auf ${p.quelle}, und dort steht keine Zahl.`,
-        })
+        fehlt.push({ bereich: "preis", code: "katalog-ohne-zahl", werte: { was: p.was, quelle: p.quelle } })
       }
     } else if (!freigabeTraegt(p.freigabe)) {
-      fehlt.push({
-        abschnitt: "06 Preis",
-        satz:
-          `„${p.was}" traegt einen eigenen Betrag ohne belastbare Owner-Freigabe. ` +
-          "Jede Zahl steht im Katalog oder ist freigegeben — mit Wer, Wann und Fundstelle.",
-      })
+      fehlt.push({ bereich: "preis", code: "betrag-ohne-freigabe", werte: { was: p.was } })
     }
   }
 
   /* ── Gueltigkeit ─────────────────────────────────────────────────────── */
   if (!/^\d{4}-\d{2}-\d{2}$/.test(angebot.gueltigBis)) {
-    fehlt.push({ abschnitt: "Formales", satz: "Kein Gueltigkeitsdatum (YYYY-MM-DD)." })
+    fehlt.push({ bereich: "formales", code: "kein-gueltigkeitsdatum" })
   }
 
   /*
@@ -424,22 +457,13 @@ export function fehltFuer(
   for (const [key, text] of Object.entries(angebot.abschnitte)) {
     const treffer = text.match(VERKNAPPUNG)
     if (treffer) {
-      const a = ABSCHNITTE.find((x) => x.key === key)
-      fehlt.push({
-        abschnitt: a ? `${a.nummer} ${a.titel}` : key,
-        satz: `„${treffer[0]}" ist Verknappungssprache. Ein Angebot laeuft ab, weil Preise sich aendern — nicht um zu druecken.`,
-      })
+      fehlt.push({ bereich: key, code: "verknappung", werte: { treffer: treffer[0] } })
     }
   }
 
   /* ── Das Ja ──────────────────────────────────────────────────────────── */
   if (ziel === "angenommen" && !annahmeTraegt(angebot.annahme)) {
-    fehlt.push({
-      abschnitt: "Annahme",
-      satz:
-        "Ein Ja ohne Person, Form, Datum und Fundstelle ist ein Haken. " +
-        "Ein muendliches Ja ist ein Ja — dann steht das da, mit dem Namen dessen, der es gesagt hat.",
-    })
+    fehlt.push({ bereich: "annahme", code: "ja-ohne-beleg" })
   }
 
   return fehlt

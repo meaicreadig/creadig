@@ -920,6 +920,197 @@ export const de = {
     quelle: (quelle: string, ausgenommen: string) => `Quelle: ${quelle} · Nicht mitgezählt: ${ausgenommen}`,
     stehtTitel: "Steht",
   },
+  /**
+   * ADM-05 · H21 — was der SERVER findet, in der Sprache des Menschen davor.
+   *
+   * Befunde und Mängel entstehen als Maschinenwerte (`lib/angebot.ts`,
+   * `lib/lieferung.ts`). Hier bekommen sie ihren Satz. Platzhalter in
+   * geschweiften Klammern werden in der Oberfläche eingesetzt — sie tragen
+   * Namen und Referenzen und werden nie übersetzt.
+   *
+   * NICHT übersetzt wird, was ein Name im Kundendokument ist: Paketnamen,
+   * die Abschnittsüberschriften des Angebots, gespeicherte Verlustgründe.
+   * Wer auf Türkisch „06 Fiyat“ liest und deutschen Text in einen Abschnitt
+   * tippt, der beim Kunden „06 Preis“ heißt, arbeitet an einem Dokument,
+   * das er nicht sieht.
+   */
+  /**
+   * ADM-05 · H21 — die Markthypothesen im Verlust-Register.
+   *
+   * Sie stehen als Maschinenwerte in `lib/market.ts` und werden hier benannt.
+   * Belege und Gegenbelege bleiben dort und erscheinen nicht in dieser
+   * Ansicht — sie sind Analyse, keine Beschriftung.
+   */
+  hypothese: {
+    status: {
+      ungeprueft: "ungeprüft",
+      gestuetzt: "gestützt",
+      widerlegt: "widerlegt",
+      schwach: "schwach",
+    },
+    satz: {
+      handwerk: "Handwerksbetriebe mit 5–50 Mitarbeitern sind der Kernmarkt.",
+      naehe: "Nähe ist der stärkste Vorhersager — nicht die Branche.",
+      branche: "Die Branche sagt die Passung voraus.",
+      "tr-de": "Die türkisch-deutsche Diaspora ist ein Zielsegment.",
+      mehrstandort: "Betriebe mit mehreren Standorten passen besonders gut.",
+      schweiz: "Die Schweiz ist ein echter Markt, kein Zufall.",
+    },
+    pruefen: {
+      handwerk: "Der erste verkaufte Handwerksbetrieb entscheidet — bis dahin bleibt es eine Wette, keine Strategie.",
+      naehe: "Ob Nähe oder Beziehung wirkt, trennt sich erst an einem Kunden, den niemand vermittelt hat.",
+      branche: "Erledigt. Deshalb ordnet dieses Modell nach Betriebszustand ein, nicht nach Wirtschaftszweig.",
+      "tr-de":
+        "Als Segment erledigt. Bleibt als Zugangsvorteil — und dort ist er echt: vier Sprachen und Vertrauen sind ein Weg hinein, den Mitbewerber nicht haben.",
+      mehrstandort: "Drei unabhängige Mehrstandort-Kunden machen daraus ein Muster.",
+      schweiz: "Die Bedienbarkeit entscheidet. Die Nachfrage ist belegt.",
+    },
+  },
+  befunde: {
+    bereich: {
+      angebot: "Angebot",
+      formales: "Formales",
+      reife: "Angebotsreife",
+      preis: "Preis",
+      annahme: "Annahme",
+      grundlage: "Grundlage",
+      material: "Material",
+      aenderung: "Änderung",
+      abnahme: "Abnahme",
+      uebergabe: "Übergabe",
+    },
+    code: {
+      "referenz-muster":
+        "Die Referenz „{referenz}“ folgt nicht dem Muster CD-JJMMTT-####. Sie soll dieselbe Nummer sein wie in der Eingangsbestätigung — sonst hat der Kunde zwei.",
+      "reife-offen": "{beleg} — {warum}",
+      "abschnitt-leer": "Dieser Pflichtabschnitt ist leer. {regel}",
+      "keine-position": "Keine Position. Ein Angebot ohne Zahl ist ein Gesprächsprotokoll.",
+      "katalog-ohne-zahl": "„{was}“ verweist auf {quelle}, und dort steht keine Zahl.",
+      "betrag-ohne-freigabe":
+        "„{was}“ trägt einen eigenen Betrag ohne belastbare Freigabe. Jede Zahl steht im Katalog oder ist freigegeben — mit Wer, Wann und Fundstelle.",
+      "kein-gueltigkeitsdatum": "Kein Gültigkeitsdatum (JJJJ-MM-TT).",
+      verknappung:
+        "„{treffer}“ ist Verknappungssprache. Ein Angebot läuft ab, weil Preise sich ändern — nicht um zu drücken.",
+      "ja-ohne-beleg":
+        "Ein Ja ohne Person, Form, Datum und Fundstelle ist ein Haken. Ein mündliches Ja ist ein Ja — dann steht das da, mit dem Namen dessen, der es gesagt hat.",
+      "angebot-fehlt": "Es gibt kein Angebot mit dieser Kennung.",
+      "vorgang-fehlt": "Der Vorgang zu diesem Angebot existiert nicht mehr.",
+      "nicht-im-entwurf":
+        "Dieses Angebot ist nicht mehr im Entwurf — es liegt bereits beim Kunden. Was gesendet wurde, wird nicht rückwirkend umgeschrieben.",
+      "nicht-gesendet":
+        "Nur ein gesendetes Angebot kann angenommen werden. Was nie beim Kunden lag, kann er nicht zusagen.",
+      "keine-angebotsart": "Keine gültige Angebotsart gewählt.",
+      "kein-angebot-angegeben": "Kein Angebot angegeben.",
+      "kein-ja":
+        "Kein angenommenes Angebot. Ein Projekt ohne Ja ist eine Absichtserklärung, und sein Umfang wäre das, was zuletzt jemand gesagt hat.",
+      "kein-materialeingang":
+        "Kein Materialeingang. Die öffentliche Zusage lautet: vier Wochen ab Materialeingang. Ohne ihn läuft keine Frist, und ein Termin wäre erfunden.",
+      "aenderung-unbeziffert":
+        "„{was}“ ist zugestimmt, aber nicht beziffert. Eine Zustimmung zu einer unbekannten Zahl ist keine.",
+      "keine-abnahme":
+        "Keine belastbare Abnahme. Eine Lieferung ohne Abnahme ist keine — und ein Haken ohne Person, Form, Datum und Fundstelle ist keine Abnahme.",
+      "uebergabe-unvollstaendig": "{stueck} fehlt oder ist ohne Weg festgehalten. {was}",
+      "projekt-fehlt": "Es gibt kein Projekt mit dieser Kennung.",
+      "angebot-nicht-angenommen":
+        "Dieses Angebot ist nicht angenommen. Ein Projekt ohne Ja ist eine Absichtserklärung.",
+      "projekt-laeuft-schon": "Zu diesem Angebot läuft bereits ein Projekt.",
+      "datum-ungueltig": "Kein gültiges Datum (JJJJ-MM-TT).",
+      "nicht-aufgesetzt": "Das Projekt ist nicht im Zustand „aufgesetzt“.",
+      "nicht-laeuft":
+        "Das Projekt ist nicht (mehr) im Zustand „läuft“. Eine Abnahme wird nicht zweimal erteilt — was bereits abgenommen ist, bleibt es.",
+      "nicht-abgenommen": "Das Projekt ist nicht im Zustand „abgenommen“. Eine Übergabe geschieht einmal.",
+      "schon-uebergeben": "Ein übergebenes Projekt ändert sich nicht mehr.",
+      "aenderung-doppelt": "Diese Änderung steht bereits am Projekt. Sie wurde kein zweites Mal eingetragen.",
+      "kein-projekt-angegeben": "Kein Projekt angegeben.",
+    },
+    /** Die Reifekriterien je Angebotsart — Regeln dieses Hauses, keine Produktnamen. */
+    reife: {
+      betrieb: {
+        label: "Betrieb und Ansprechpartner stehen fest",
+        warum: "Ein Festpreis geht an jemanden. Ohne Gegenüber ist es kein Angebot, sondern eine Preisliste.",
+      },
+      umfang: {
+        label: "Der Fall passt in den Paketumfang",
+        warum: "Shop, Buchung, mehrere Standorte oder eine Schnittstelle sprengen das Paket — dann ist es ein Systemprojekt.",
+      },
+      material: {
+        label: "Der Betrieb kann Texte, Bilder und Zugänge liefern",
+        warum: "Die vier Wochen laufen ab Materialeingang. Ohne diese Zusage ist der Zeitrahmen keine Zusage.",
+      },
+      seite: {
+        label: "Die zu prüfende Seite ist benannt",
+        warum: "Der Festpreis gilt für einen Auftritt. Welchen, muss vorher feststehen.",
+      },
+      pruefung: {
+        label: "Ein Prüfbericht liegt vor",
+        warum: "Ohne Befunde ist jede Zahl geraten. Für Ungesehenes nennt niemand seriös einen Preis.",
+      },
+      zugang: {
+        label: "Der Code-Zugang ist geklärt",
+        warum: "Ob wir selbst ändern dürfen oder über Dritte gehen müssen, bewegt die Spanne am stärksten.",
+      },
+      "eigenes-system": {
+        label: "Das System stammt von uns — oder wir haben es angesehen und übernehmen es",
+        warum: "Wir stehen nicht für Code gerade, den wir nicht kennen.",
+      },
+      grenze: {
+        label: "Der Betrieb kennt die Grenze — zwei Inhaltsänderungen im Monat",
+        warum: "Was nicht enthalten ist, gehört ins Gespräch und nicht in die erste Rechnung.",
+      },
+      problem: {
+        label: "Das Problem ist beschrieben — was klemmt, im Betrieb, nicht im System",
+        warum: "Ein Umfang ohne Problem ist eine Wunschliste.",
+      },
+      ablaeufe: {
+        label: "Die betroffenen Abläufe sind benannt",
+        warum: "Wie viele Abläufe das System abbilden soll.",
+      },
+      "rollen-orte": {
+        label: "Rollen und Standorte sind bekannt",
+        warum: "Wer sieht was, und an wie vielen Orten wird gearbeitet.",
+      },
+      bestand: {
+        label: "Vorhandene Systeme und Altdaten sind geklärt",
+        warum: "Eine Anbindung samt Datenübernahme ist oft der größte Einzelposten.",
+      },
+      ergebnis: {
+        label: "Das gewünschte Ergebnis ist vereinbart",
+        warum: "Woran der Betrieb merkt, dass es besser ist. Ohne das gibt es keine Abnahme.",
+      },
+    },
+    /** Die Regel je Pflichtabschnitt. Die Überschrift des Abschnitts bleibt deutsch. */
+    abschnittRegel: {
+      ausgangslage:
+        "Würde der Kunde diesen Absatz unterschreiben, ohne etwas zu korrigieren? Wenn nein, war das Gespräch zu kurz.",
+      verstanden: "Wo bricht es, und warum kostet das. Keine Schuldzuweisung.",
+      umfang:
+        "Bausteine, und die Abgrenzung gehört HIERHIN, nicht in die Fußnote. Ein Angebot ohne sie erzeugt die Nachforderung, die es vermeiden sollte.",
+      architektur: "So viel, wie öffentlich sein darf, so wenig wie nötig. Kein Tech-Stack als Imponierliste.",
+      zeit:
+        "Abschnitte mit Zwischenständen, nicht ein Datum am Ende. Und was der Kunde liefern muss — ein Angebot, das die Mitwirkung nicht benennt, verschiebt später die Schuld.",
+      preis: "Eine Zahl, netto, mit Zahlungsschritten. Einmalig und laufend werden nie addiert dargestellt.",
+      betrieb:
+        "Der Absatz, der creaDIG von einer Agentur unterscheidet — er fehlt in KEINEM Angebot, auch nicht in einem, das nur einen Auftritt enthält.",
+      "nicht-versprochen": "Ein Angebot, das nichts ausschließt, hat alles versprochen.",
+      "naechster-schritt": "Genau einer. Mit Datum.",
+    },
+    /** Die vier Stücke der Übergabe. */
+    uebergabestueck: {
+      code: { label: "Code", was: "Das Repository oder das Archiv — vollständig, nicht als Auszug." },
+      inhalte: { label: "Inhalte", was: "Texte, Bilder, Dokumente, in bearbeitbarer Form." },
+      zugaenge: {
+        label: "Zugänge",
+        was: "Konten und Rechte, übertragen — nicht Zugangsdaten in einer Nachricht.",
+      },
+      domain: { label: "Domain", was: "Auf den Kunden umgeschrieben, mit Nachweis beim Registrar." },
+    },
+    projektzustand: {
+      aufgesetzt: { label: "Aufgesetzt", was: "Das Ja steht, das Projekt existiert. Das Material fehlt noch." },
+      laeuft: { label: "Läuft", was: "Das Material ist da, die Frist läuft." },
+      abgenommen: { label: "Abgenommen", was: "Der Kunde hat bestätigt, dass es funktioniert." },
+      uebergeben: { label: "Übergeben", was: "Code, Inhalte, Zugänge und Domain sind beim Kunden." },
+    },
+  },
   freigaben: {
     titel: "Erlaubnisse",
     lead:

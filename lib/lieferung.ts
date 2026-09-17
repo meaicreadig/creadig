@@ -244,7 +244,36 @@ export type Projekt = {
  * 5 · DIE PRUEFUNG
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-export type Mangel = { bereich: string; satz: string }
+/* ── ADM-05 · H21 — Maschinenwerte statt Saetze (siehe `lib/angebot.ts`) ── */
+export const MANGEL_CODES = [
+  "kein-ja",
+  "kein-materialeingang",
+  "aenderung-unbeziffert",
+  "keine-abnahme",
+  "uebergabe-unvollstaendig",
+  /* Aus dem Speicher — Zustandswechsel, die nicht (mehr) moeglich sind. */
+  "projekt-fehlt",
+  "angebot-fehlt",
+  "angebot-nicht-angenommen",
+  "projekt-laeuft-schon",
+  "datum-ungueltig",
+  "nicht-aufgesetzt",
+  "nicht-laeuft",
+  "nicht-abgenommen",
+  "schon-uebergeben",
+  "aenderung-doppelt",
+  "kein-projekt-angegeben",
+  "kein-angebot-angegeben",
+] as const
+export type MangelCode = (typeof MANGEL_CODES)[number]
+
+export type Mangel = {
+  /** Maschinenwert: grundlage · material · aenderung · abnahme · uebergabe. */
+  bereich: string
+  code: MangelCode
+  /** Werte fuer den Satz — nie uebersetzt. */
+  werte?: Record<string, string>
+}
 
 /**
  * Was einem Projekt fehlt, um in diesen Zustand zu gehen.
@@ -256,44 +285,26 @@ export function fehltFuerZustand(projekt: Projekt, ziel: ProjektZustand): Mangel
   const fehlt: Mangel[] = []
 
   if (!projekt.offerId?.trim()) {
-    fehlt.push({
-      bereich: "Grundlage",
-      satz:
-        "Kein angenommenes Angebot. Ein Projekt ohne Ja ist eine Absichtserklaerung, " +
-        "und sein Umfang waere das, was zuletzt jemand gesagt hat.",
-    })
+    fehlt.push({ bereich: "grundlage", code: "kein-ja" })
   }
 
   if (ziel === "aufgesetzt") return fehlt
 
   if (!projekt.materialEingang) {
-    fehlt.push({
-      bereich: "Material",
-      satz:
-        "Kein Materialeingang. Die oeffentliche Zusage lautet: vier Wochen ab Materialeingang. " +
-        "Ohne ihn laeuft keine Frist, und ein Termin waere erfunden.",
-    })
+    fehlt.push({ bereich: "material", code: "kein-materialeingang" })
   }
 
   /* Eine Aenderung, die nicht beziffert ist, kann niemand zustimmen. */
   for (const a of projekt.aenderungen) {
     if (a.zugestimmt && a.tage === null) {
-      fehlt.push({
-        bereich: "Aenderung",
-        satz: `„${a.was}" ist zugestimmt, aber nicht beziffert. Eine Zustimmung zu einer unbekannten Zahl ist keine.`,
-      })
+      fehlt.push({ bereich: "aenderung", code: "aenderung-unbeziffert", werte: { was: a.was } })
     }
   }
 
   if (ziel === "laeuft") return fehlt
 
   if (!annahmeTraegt(projekt.abnahme)) {
-    fehlt.push({
-      bereich: "Abnahme",
-      satz:
-        "Keine belastbare Abnahme. Eine Lieferung ohne Abnahme ist keine — und ein Haken ohne " +
-        "Person, Form, Datum und Fundstelle ist keine Abnahme.",
-    })
+    fehlt.push({ bereich: "abnahme", code: "keine-abnahme" })
   }
 
   if (ziel === "abgenommen") return fehlt
@@ -301,10 +312,7 @@ export function fehltFuerZustand(projekt: Projekt, ziel: ProjektZustand): Mangel
   for (const stueck of UEBERGABE_STUECKE) {
     const e = projekt.uebergabe[stueck.key]
     if (!e || !e.am?.trim() || (e.wie?.trim().length ?? 0) < 4) {
-      fehlt.push({
-        bereich: "Uebergabe",
-        satz: `${stueck.label} fehlt oder ist ohne Weg festgehalten. ${stueck.was}`,
-      })
+      fehlt.push({ bereich: "uebergabe", code: "uebergabe-unvollstaendig", werte: { stueck: stueck.key } })
     }
   }
 

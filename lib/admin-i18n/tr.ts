@@ -917,6 +917,173 @@ export const tr: AdminTexte = {
     quelle: (quelle, ausgenommen) => `Kaynak: ${quelle} · Hariç tutulan: ${ausgenommen}`,
     stehtTitel: "Mevcut",
   },
+  hypothese: {
+    status: {
+      ungeprueft: "sınanmadı",
+      gestuetzt: "destekleniyor",
+      widerlegt: "çürütüldü",
+      schwach: "zayıf",
+    },
+    satz: {
+      handwerk: "5–50 çalışanlı esnaf ve zanaat işletmeleri ana pazardır.",
+      naehe: "Yakınlık en güçlü göstergedir — sektör değil.",
+      branche: "Sektör, uyumu önceden söyler.",
+      "tr-de": "Türk-Alman diasporası bir hedef segmenttir.",
+      mehrstandort: "Birden çok şubesi olan işletmeler özellikle uygundur.",
+      schweiz: "İsviçre gerçek bir pazardır, tesadüf değil.",
+    },
+    pruefen: {
+      handwerk: "İlk satılan zanaat işletmesi karar verir — o zamana kadar bu bir bahistir, strateji değil.",
+      naehe: "Yakınlığın mı yoksa ilişkinin mi işlediği, ancak kimsenin aracılık etmediği bir müşteride ayrışır.",
+      branche: "Kapandı. Bu yüzden model, işletmeleri ekonomik sektöre göre değil, işletme durumuna göre sınıflar.",
+      "tr-de":
+        "Segment olarak kapandı. Erişim avantajı olarak kalır — ve orada gerçektir: dört dil ve güven, rakiplerin sahip olmadığı bir giriş yoludur.",
+      mehrstandort: "Birbirinden bağımsız üç çok şubeli müşteri bunu bir örüntü yapar.",
+      schweiz: "Kullanılabilirlik karar verir. Talep belgelidir.",
+    },
+  },
+  befunde: {
+    bereich: {
+      angebot: "Teklif",
+      formales: "Biçimsel",
+      reife: "Teklif olgunluğu",
+      preis: "Fiyat",
+      annahme: "Kabul",
+      grundlage: "Dayanak",
+      material: "Materyal",
+      aenderung: "Değişiklik",
+      abnahme: "Teslim onayı",
+      uebergabe: "Devir",
+    },
+    code: {
+      "referenz-muster":
+        "„{referenz}“ referansı CD-YYAAGG-#### kalıbına uymuyor. Bu numara, alındı onayındaki numarayla aynı olmalı — yoksa müşterinin elinde iki numara olur.",
+      "reife-offen": "{beleg} — {warum}",
+      "abschnitt-leer": "Bu zorunlu bölüm boş. {regel}",
+      "keine-position": "Hiç kalem yok. Rakamsız bir teklif, görüşme notudur.",
+      "katalog-ohne-zahl": "„{was}“ {quelle} kaynağına işaret ediyor, orada ise bir rakam yok.",
+      "betrag-ohne-freigabe":
+        "„{was}“ kendi tutarını taşıyor ama dayanaklı bir onayı yok. Her rakam ya katalogda durur ya da onaylıdır — kim, ne zaman ve nerede bilgisiyle.",
+      "kein-gueltigkeitsdatum": "Geçerlilik tarihi yok (YYYY-AA-GG).",
+      verknappung:
+        "„{treffer}“ kıtlık dilidir. Bir teklif, fiyatlar değiştiği için sona erer — baskı kurmak için değil.",
+      "ja-ohne-beleg":
+        "Kişisi, biçimi, tarihi ve kaynağı olmayan bir evet yalnızca bir işarettir. Sözlü bir evet de evettir — o zaman bunu söyleyenin adıyla birlikte yazılır.",
+      "angebot-fehlt": "Bu kimliğe sahip bir teklif yok.",
+      "vorgang-fehlt": "Bu teklife ait fırsat artık mevcut değil.",
+      "nicht-im-entwurf":
+        "Bu teklif artık taslak değil — müşteriye ulaştı. Gönderilmiş olan geriye dönük olarak değiştirilmez.",
+      "nicht-gesendet":
+        "Yalnızca gönderilmiş bir teklif kabul edilebilir. Müşteriye hiç ulaşmamış olana o evet diyemez.",
+      "keine-angebotsart": "Geçerli bir teklif türü seçilmedi.",
+      "kein-angebot-angegeben": "Teklif belirtilmedi.",
+      "kein-ja":
+        "Kabul edilmiş bir teklif yok. Evet'i olmayan bir proje bir niyet beyanıdır; kapsamı da en son birinin söylediği şey olurdu.",
+      "kein-materialeingang":
+        "Materyal girişi yok. Kamuya verilen söz şudur: materyal girişinden itibaren dört hafta. Materyal olmadan hiçbir süre işlemez ve verilecek tarih uydurma olur.",
+      "aenderung-unbeziffert":
+        "„{was}“ onaylanmış ama rakamlandırılmamış. Bilinmeyen bir rakama verilen onay, onay değildir.",
+      "keine-abnahme":
+        "Dayanaklı bir teslim onayı yok. Onayı olmayan bir teslim, teslim değildir — kişisi, biçimi, tarihi ve kaynağı olmayan bir işaret de onay değildir.",
+      "uebergabe-unvollstaendig": "{stueck} eksik ya da yolu belirtilmeden kaydedilmiş. {was}",
+      "projekt-fehlt": "Bu kimliğe sahip bir proje yok.",
+      "angebot-nicht-angenommen":
+        "Bu teklif kabul edilmemiş. Evet'i olmayan bir proje bir niyet beyanıdır.",
+      "projekt-laeuft-schon": "Bu teklife bağlı bir proje zaten yürüyor.",
+      "datum-ungueltig": "Geçerli bir tarih değil (YYYY-AA-GG).",
+      "nicht-aufgesetzt": "Proje „kuruldu“ durumunda değil.",
+      "nicht-laeuft":
+        "Proje artık „yürüyor“ durumunda değil. Teslim onayı iki kez verilmez — onaylanmış olan onaylı kalır.",
+      "nicht-abgenommen": "Proje „onaylandı“ durumunda değil. Devir bir kez gerçekleşir.",
+      "schon-uebergeben": "Devredilmiş bir proje artık değişmez.",
+      "aenderung-doppelt": "Bu değişiklik projede zaten var. İkinci kez kaydedilmedi.",
+      "kein-projekt-angegeben": "Proje belirtilmedi.",
+    },
+    reife: {
+      betrieb: {
+        label: "İşletme ve muhatap belli",
+        warum: "Sabit fiyat birine verilir. Karşısında kimse yoksa bu teklif değil, fiyat listesidir.",
+      },
+      umfang: {
+        label: "Durum paket kapsamına sığıyor",
+        warum: "Mağaza, randevu, birden çok şube ya da bir arayüz paketi aşar — o zaman bu bir sistem projesidir.",
+      },
+      material: {
+        label: "İşletme metin, görsel ve erişim sağlayabiliyor",
+        warum: "Dört hafta materyal girişinden itibaren işler. Bu taahhüt olmadan süre bir taahhüt değildir.",
+      },
+      seite: {
+        label: "Denetlenecek site belirlendi",
+        warum: "Sabit fiyat tek bir site için geçerlidir. Hangisi olduğu önceden belli olmalı.",
+      },
+      pruefung: {
+        label: "Bir denetim raporu var",
+        warum: "Bulgular olmadan her rakam tahmindir. Görülmemiş bir işe kimse ciddi bir fiyat vermez.",
+      },
+      zugang: {
+        label: "Koda erişim netleşti",
+        warum: "Kendimiz mi değiştireceğiz yoksa üçüncü taraf üzerinden mi gideceğiz — aralığı en çok bu belirler.",
+      },
+      "eigenes-system": {
+        label: "Sistem bizden — ya da inceleyip devraldık",
+        warum: "Tanımadığımız bir kodun arkasında duramayız.",
+      },
+      grenze: {
+        label: "İşletme sınırı biliyor — ayda iki içerik değişikliği",
+        warum: "Dahil olmayan şey görüşmeye aittir, ilk faturaya değil.",
+      },
+      problem: {
+        label: "Sorun tarif edildi — işletmede neyin takıldığı, sistemde değil",
+        warum: "Sorunsuz bir kapsam, dilek listesidir.",
+      },
+      ablaeufe: {
+        label: "İlgili süreçler adlandırıldı",
+        warum: "Sistemin kaç süreci karşılaması gerektiği.",
+      },
+      "rollen-orte": {
+        label: "Roller ve konumlar biliniyor",
+        warum: "Kim neyi görüyor ve kaç yerde çalışılıyor.",
+      },
+      bestand: {
+        label: "Mevcut sistemler ve eski veriler netleşti",
+        warum: "Veri aktarımıyla birlikte bir entegrasyon çoğu zaman en büyük tek kalemdir.",
+      },
+      ergebnis: {
+        label: "İstenen sonuç üzerinde anlaşıldı",
+        warum: "İşletmenin daha iyi olduğunu neyden anlayacağı. Bu olmadan teslim onayı olmaz.",
+      },
+    },
+    abschnittRegel: {
+      ausgangslage:
+        "Müşteri bu paragrafı hiçbir şeyi düzeltmeden imzalar mıydı? Hayırsa, görüşme kısa kalmıştır.",
+      verstanden: "Nerede kırılıyor ve bu neden maliyet yaratıyor. Suçlama yok.",
+      umfang:
+        "Yapı taşları — ve sınırlar BURAYA aittir, dipnota değil. Sınırsız bir teklif, önlemesi gereken ek talebi kendisi doğurur.",
+      architektur: "Kamuya açık olabilecek kadar çok, gerektiği kadar az. Hava atmak için teknoloji listesi değil.",
+      zeit:
+        "Ara durumlarıyla birlikte bölümler, sonda tek bir tarih değil. Ve müşterinin neyi teslim etmesi gerektiği — katkıyı adlandırmayan bir teklif suçu sonraya erteler.",
+      preis: "Tek bir rakam, net, ödeme adımlarıyla. Tek seferlik ve sürekli tutarlar asla toplanarak gösterilmez.",
+      betrieb:
+        "creaDIG'i bir ajanstan ayıran paragraf — HİÇBİR teklifte eksik olmaz, yalnızca bir site içeren teklifte bile.",
+      "nicht-versprochen": "Hiçbir şeyi dışarıda bırakmayan bir teklif, her şeyi vaat etmiştir.",
+      "naechster-schritt": "Tam olarak bir tane. Tarihiyle.",
+    },
+    uebergabestueck: {
+      code: { label: "Kod", was: "Depo ya da arşiv — tümüyle, parça olarak değil." },
+      inhalte: { label: "İçerikler", was: "Metinler, görseller, belgeler; düzenlenebilir biçimde." },
+      zugaenge: {
+        label: "Erişimler",
+        was: "Hesaplar ve yetkiler devredilir — bir mesajdaki şifreler değil.",
+      },
+      domain: { label: "Alan adı", was: "Müşteri adına aktarılmış, kayıt kuruluşunda belgesiyle." },
+    },
+    projektzustand: {
+      aufgesetzt: { label: "Kuruldu", was: "Evet var, proje mevcut. Materyal henüz eksik." },
+      laeuft: { label: "Yürüyor", was: "Materyal geldi, süre işliyor." },
+      abgenommen: { label: "Onaylandı", was: "Müşteri çalıştığını doğruladı." },
+      uebergeben: { label: "Devredildi", was: "Kod, içerikler, erişimler ve alan adı müşteride." },
+    },
+  },
   freigaben: {
     titel: "İzinler",
     lead:

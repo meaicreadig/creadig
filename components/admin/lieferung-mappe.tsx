@@ -12,10 +12,10 @@ import {
 } from "@/components/admin/primitives"
 import { JA_FORMEN } from "@/lib/angebot"
 import { adminTexte } from "@/lib/admin-i18n"
+import { befundZeilen } from "@/lib/admin-i18n/befund"
 import type { AdminSprache } from "@/lib/admin-i18n/sprache"
 import {
   BELEG_FRAGE,
-  PROJEKT_ZUSTAENDE,
   UEBERGABE_STUECKE,
   belegMoment,
   livetermin,
@@ -51,7 +51,8 @@ export function LieferungMappe({
   abnahme: (opportunityId: string, form: FormData) => Promise<LieferAntwort>
   uebergabe: (opportunityId: string, form: FormData) => Promise<LieferAntwort>
 }) {
-  const t = adminTexte(sprache).lieferungMappe
+  const texte = adminTexte(sprache)
+  const t = texte.lieferungMappe
   const [startA, startAction, startW] = useActionState(
     async (_: LieferAntwort, f: FormData) => starten(opportunityId, f), LEER)
   const [matA, matAction, matW] = useActionState(
@@ -86,7 +87,7 @@ export function LieferungMappe({
       <Speicherstand
         wartet={startW}
         ok={startA === LEER ? null : startA.ok}
-        punkte={startA.maengel.map((x) => ({ wo: x.bereich, satz: x.satz }))}
+        punkte={befundZeilen(startA.maengel, texte)}
         erfolgssatz={t.projektAufgesetzt}
       />
 
@@ -98,9 +99,9 @@ export function LieferungMappe({
             <li key={p.id}>
               <Surface padding="sm">
                 <div className="flex flex-wrap items-baseline gap-3">
-                  <span className="text-subhead">{PROJEKT_ZUSTAENDE[p.zustand].label}</span>
+                  <span className="text-subhead">{texte.befunde.projektzustand[p.zustand].label}</span>
                   <Pill severity={p.zustand === "uebergeben" ? "attention" : "neutral"}>
-                    {PROJEKT_ZUSTAENDE[p.zustand].was}
+                    {texte.befunde.projektzustand[p.zustand].was}
                   </Pill>
                 </div>
 
@@ -170,11 +171,11 @@ export function LieferungMappe({
                     <div className="mt-4 flex flex-col gap-4">
                       {UEBERGABE_STUECKE.map((s) => (
                         <div key={s.key} className="flex flex-wrap items-end gap-3">
-                          <AdminField label={t.stueckAm(s.label)} htmlFor={`am_${s.key}_${p.id}`}>
+                          <AdminField label={t.stueckAm(texte.befunde.uebergabestueck[s.key].label)} htmlFor={`am_${s.key}_${p.id}`}>
                             <AdminInput id={`am_${s.key}_${p.id}`} name={`am_${s.key}`} type="date" />
                           </AdminField>
                           <AdminField label={t.wieKlein} htmlFor={`wie_${s.key}_${p.id}`} className="flex-1 basis-64">
-                            <AdminInput id={`wie_${s.key}_${p.id}`} name={`wie_${s.key}`} placeholder={s.was} />
+                            <AdminInput id={`wie_${s.key}_${p.id}`} name={`wie_${s.key}`} placeholder={texte.befunde.uebergabestueck[s.key].was} />
                           </AdminField>
                         </div>
                       ))}
@@ -189,7 +190,7 @@ export function LieferungMappe({
                       const e = p.uebergabe[s.key]
                       return (
                         <li key={s.key} className="type-small text-muted-foreground">
-                          {s.label}: {e ? `${e.am} — ${e.wie}` : "—"}
+                          {texte.befunde.uebergabestueck[s.key].label}: {e ? `${e.am} — ${e.wie}` : "—"}
                         </li>
                       )
                     })}
@@ -203,19 +204,19 @@ export function LieferungMappe({
       <Speicherstand
         wartet={matW}
         ok={matA === LEER ? null : matA.ok}
-        punkte={matA.maengel.map((x) => ({ wo: x.bereich, satz: x.satz }))}
+        punkte={befundZeilen(matA.maengel, texte)}
         erfolgssatz={t.gespeichert}
       />
       <Speicherstand
         wartet={abnW}
         ok={abnA === LEER ? null : abnA.ok}
-        punkte={abnA.maengel.map((x) => ({ wo: x.bereich, satz: x.satz }))}
+        punkte={befundZeilen(abnA.maengel, texte)}
         erfolgssatz={t.abnahmeFestgehalten}
       />
       <Speicherstand
         wartet={uebW}
         ok={uebA === LEER ? null : uebA.ok}
-        punkte={uebA.maengel.map((x) => ({ wo: x.bereich, satz: x.satz }))}
+        punkte={befundZeilen(uebA.maengel, texte)}
         erfolgssatz={t.uebergabeFestgehalten}
       />
     </div>

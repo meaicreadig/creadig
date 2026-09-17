@@ -37,7 +37,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | ADM-02 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` | Cutover: Deploy + `db-migrate` 015/016 in Produktion, danach Widerruf/Versuchsfenster/Login live messen | Produktionsautorität (Owner) | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
 | ADM-03 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | Cutover: Migration 017 **vor** Deploy; danach echte Anfrage im System (LIVE) | Produktionsautorität (Owner) |
 | ADM-04 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | Cutover: mit dem ADM-01/02/03-Paket ausliefern; danach Prüfung gegen die echten Speicher | keiner — **keine CRITICAL-Fähigkeit wartet auf einen Anbieter** (A2) |
-| ADM-05 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | H21 (Serversätze DE/TR), dann Cutover mit Migration 018 | Beleg-Brücke zur öffentlichen Seite + Rechnung = **BLOCKED_G18** |
+| ADM-05 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | Cutover mit Migration 018 | Beleg-Brücke zur öffentlichen Seite + Rechnung = **BLOCKED_G18** |
 | ADM-06 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | meAI-Anbieter/Kosten = Owner |
 | ADM-07 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Produktionsautorität |
 
@@ -68,7 +68,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | **H18** | `check-cockpit` war seit der DE/TR-Migration blind: Es suchte die deutschen Zustandswörter im Quelltext der Komponente; die stehen seit ADM-01 im Wörterbuch. Das Gate meldete „kennt den Zustand nicht-erhoben nicht", obwohl die Seite alle drei zeigt — **rot committet in `457b236`**. Zweiter Befund derselben Ursache: `<LageRegister />` trägt seither eine Eigenschaft, das Muster verlangte die blanke Form. | reproduziert (Blindprobe) | mittel (Testhygiene) | ADM-04 | **VERIFIED** — prüft jetzt die drei Schlüssel UND beide Wörterbücher; Blindprobe rot, danach grün |
 | **H19** | Bei nicht erreichbarem Sitzungsspeicher weist `middleware.ts` jede ändernde Anfrage mit 503 ab (H2, zur sicheren Seite). Im Browser stand davon nur „An unexpected response was received from the server" — der Admin sah aus, als nähme er Eingaben an. | Runtime gemessen (Lauf B, tote Datenbank) | mittel | ADM-04 | **VERIFIED** — `/admin/verbindungen` nennt die Schreibsperre und sperrt die Knöpfe (`aria-describedby`); E2E Lauf B |
 | **H20** | Fünf Zustandswechsel der Betriebskette prüften ihre eigene Wirkung nicht: Die Bedingung stand im `UPDATE`, das Ergebnis las niemand. Ein zweiter Klick auf „Angebot senden“ änderte nichts, **meldete Erfolg und schrieb eine zweite Chronikzeile** — in dem Protokoll, das die einzige Quelle darüber ist. Betroffen: `sendOffer`, `acceptOffer`, `acceptDelivery`, `handOver`; `addProjectChange` schrieb ausserdem eine gelesene Liste ganz zurück (verlorener Schreibvorgang bei zwei Menschen, doppelter Eintrag bei einem Doppelklick) — und eine Projektänderung ist Geld. | reproduziert (`betriebskette-drill`, Blindprobe gegen den alten Stand: 14 Befunde) | **hoch** | ADM-05 | **VERIFIED** — Bedingung + `RETURNING`-Prüfung je Wechsel, Anhängen atomar in einer Anweisung; 34/34 |
-| **H21** | Die Befunde und Mängel der Angebots- und Lieferkette entstehen als deutsche Sätze im Server (`lib/angebot.ts`, `lib/lieferung.ts`, Store) und werden unübersetzt angezeigt — auch in der türkischen Oberfläche. Das Sprach-Gate konnte es nicht sehen: Es zählt sichtbaren deutschen Text im JSX, nicht Text, der aus dem Server kommt. „ADM-01 · 0 offene Textstellen“ galt deshalb nur für die Oberfläche, nicht für alles, was ein Mensch liest. | Code + gerendert | mittel (A01) | ADM-05 | offen — Maschinenwerte + Wörterbuch; Abschnittstitel des Angebots bleiben deutsch (sie benennen ein deutsches Kundendokument) |
+| **H21** | Die Befunde und Mängel der Angebots- und Lieferkette entstanden als deutsche Sätze im Server (`lib/angebot.ts`, `lib/lieferung.ts`, Store) und wurden unübersetzt angezeigt — auch in der türkischen Oberfläche. Dasselbe galt für Reifekriterien, Projektzustände, Übergabestücke und die Markthypothesen. Das Sprach-Gate konnte es nicht sehen: Es zählt sichtbaren deutschen Text im JSX, nicht Text, der über eine Server Action ankommt. „ADM-01 · 0 offene Textstellen“ galt deshalb nur für die Oberfläche, nicht für alles, was ein Mensch liest. | Code + gerendert (`befund-sprache-e2e`) | mittel (A01) | ADM-05 | **VERIFIED** (17.09.2026) — Befund/Mangel sind Maschinenwerte, der Satz entsteht im Wörterbuch (`lib/admin-i18n/befund.ts`); Gate §3 prüft 61 Maschinenwerte + 6 Hypothesen in DE **und** TR, Blindprobe rot; bewusst deutsch bleiben Paketnamen und die Abschnittsüberschriften des Angebots — sie benennen ein Dokument, das der Kunde auf Deutsch bekommt |
 | **H17** | `.env.local` enthält eine echte `DATABASE_URL`; Next füllt auch LEER gesetzte Variablen daraus → Prüfskripte mit `DATABASE_URL: ""` konnten eine echte DB erreichen (Rauchtest schickt Formularanfragen). Kein Vorfall (kein `LEAD_STORE` in `.env.local`). | Runtime gemessen | hoch (Risiko) | ADM-03 | **VERIFIED** — alle next-start-Skripte `LEAD_STORE=aus` + `.invalid`; Gate `check-pruefumgebung` |
 
 ---
@@ -460,7 +460,24 @@ sich jemand verlässt.
 |---|---|---|
 | Widerruf wirkt auf creadig.de | Die öffentliche Projektion liegt in `lib/site-data.ts` — **BLOCKED_G18** | Owner (G18-Entsperrung) |
 | Rechnung/Zahlung im Betriebsablauf | `lib/rechnung.ts` — **BLOCKED_G18** | Owner |
-| H21 · deutsche Sätze aus dem Server in der türkischen Oberfläche | Befunde/Mängel und die Kataloge von Angebot, Reife und Lieferung entstehen als deutscher Text im Server | Agent — nächster Schritt |
+
+### 4 · H21 · Was der Server findet, in der Sprache des Menschen davor
+
+Befund und Mangel sind seit dem 17.09.2026 **Maschinenwerte** (`bereich`, `code`, `werte`); den Satz baut
+`lib/admin-i18n/befund.ts` aus dem Wörterbuch. Dasselbe gilt für Reifekriterien, Pflichtabschnitts-Regeln,
+Übergabestücke, Projektzustände und die Markthypothesen im Verlust-Register.
+
+**Die Trennlinie, ausdrücklich gezogen:** Übersetzt wird, was eine **Regel dieses Hauses** ist. Nicht
+übersetzt wird, was ein **Name in einem Kundendokument** ist — Paket- und Produktnamen, die
+Abschnittsüberschriften des Angebots („06 Preis“), gespeicherte Verlustgründe. Wer auf Türkisch
+„06 Fiyat“ liest und dann deutschen Text in einen Abschnitt tippt, der beim Kunden „06 Preis“ heißt,
+arbeitet an einem Dokument, das er nicht sieht.
+
+| Prüfung | Ergebnis |
+|---|---|
+| `check-admin-sprache` §3 (neu, in `postbuild`) | 61 Maschinenwerte + 6 Hypothesen in DE **und** TR · Gegenprobe: die Domänenmodule bauen keine fertigen Sätze mehr · **Blindprobe** (neuer Code ohne Text) → rot |
+| `befund-sprache-e2e` S1–S5 | **11/11** — unvollständiges Angebot senden: Befunde türkisch, der alte deutsche Satz kommt nicht mehr vor; Reifekriterien türkisch; Abschnittsüberschrift bleibt deutsch; auf Deutsch stehen die deutschen Sätze |
+| `admin-sprache-e2e` · `admin-e2e` 18/18 · `admin-kernschleife-e2e` 33/33 · `admin-zustaende` 34/34 · `db-drills` 12/12 | PASS |
 
 ---
 
@@ -591,7 +608,7 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 
 | 17.09.2026 | 4 | **ADM-01 DE/TR CLOSED lokal** — Gate 34 migriert / 0 offen / 823 Texte; Chance/Angebot/Lieferung + Listen + Detail + Beleg/Material/Lage/Error/Primitives (Material-Labels BLOCKED_G18) |
 | 17.09.2026 | 4 | **ADM-04 BUILT/lokal VERIFIED** — Verbindungsverzeichnis `/admin/verbindungen` (DE/TR, Owner-only), Fähigkeit ≠ Autorisierung ≠ Adresse, Prüfung getrennt von Ableitung, Prüfstand für A15–A18; Gate + Drill in `postbuild`; H18 (blindes Cockpit-Gate) und H19 (stille Schreibsperre) gefunden und behoben |
-| 17.09.2026 | 4 | **ADM-05 BUILT/lokal VERIFIED** — Betriebskette H20 (jeder Zustandswechsel genau einmal, Blindprobe 14 Befunde) · §Schreibpfade (A5) erhoben · Migration 018 + Erlaubnisse mit Widerruf unter `/admin/beleg` (A13/A14), DE/TR, axe 0 |
+| 17.09.2026 | 4 | **ADM-05 BUILT/lokal VERIFIED** — Betriebskette H20 (jeder Zustandswechsel genau einmal, Blindprobe 14 Befunde) · §Schreibpfade (A5) erhoben · Migration 018 + Erlaubnisse mit Widerruf unter `/admin/beleg` (A13/A14), DE/TR, axe 0 · **H21** behoben: Serverbefunde sind Maschinenwerte, Gate §3 sieht sie |
 
 
-**Fortsetzungspunkt:** H21 (deutsche Serversätze in der türkischen Oberfläche), dann ADM-06. Migrationen 015–018 weiter **nicht** freigegeben. Production-Tip nicht promoten ohne Cutover-Paket.
+**Fortsetzungspunkt:** ADM-06 — Automation/Analytics/meAI. Migrationen 015–018 weiter **nicht** freigegeben. Production-Tip nicht promoten ohne Cutover-Paket.

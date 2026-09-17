@@ -1336,11 +1336,11 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
     async sendOffer(id: string): Promise<Befund[]> {
       await ready()
       const angebot = await this.getOffer(id)
-      if (!angebot) return [{ abschnitt: "Angebot", satz: "Es gibt kein Angebot mit dieser Kennung." }]
+      if (!angebot) return [{ bereich: "angebot", code: "angebot-fehlt" }]
 
       const opp = await this.getOpportunity(angebot.opportunityId)
       if (!opp) {
-        return [{ abschnitt: "Angebot", satz: "Der Vorgang zu diesem Angebot existiert nicht mehr." }]
+        return [{ bereich: "angebot", code: "vorgang-fehlt" }]
       }
 
       const fehlt = fehltFuer(angebot, "gesendet", opp.readinessEvidence)
@@ -1378,14 +1378,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         [id, JSON.stringify(snapshot)],
       )
       if (!gesendet.length) {
-        return [
-          {
-            abschnitt: "Angebot",
-            satz:
-              "Dieses Angebot ist nicht mehr im Entwurf — es wurde inzwischen gesendet. " +
-              "Es geht nicht ein zweites Mal hinaus.",
-          },
-        ]
+        return [{ bereich: "angebot", code: "nicht-im-entwurf" }]
       }
       await note("opportunity", angebot.opportunityId, "offer.sent",
         `Angebot ${angebot.referenz} gesendet`, null)
@@ -1395,14 +1388,9 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
     async acceptOffer(id: string, annahme: Annahme): Promise<Befund[]> {
       await ready()
       const angebot = await this.getOffer(id)
-      if (!angebot) return [{ abschnitt: "Angebot", satz: "Es gibt kein Angebot mit dieser Kennung." }]
+      if (!angebot) return [{ bereich: "angebot", code: "angebot-fehlt" }]
       if (angebot.zustand !== "gesendet") {
-        return [
-          {
-            abschnitt: "Annahme",
-            satz: "Nur ein gesendetes Angebot kann angenommen werden. Was nie beim Kunden lag, kann er nicht zusagen.",
-          },
-        ]
+        return [{ bereich: "annahme", code: "nicht-gesendet" }]
       }
 
       const opp = await this.getOpportunity(angebot.opportunityId)
@@ -1426,14 +1414,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         [id, JSON.stringify(annahme)],
       )
       if (!angenommen.length) {
-        return [
-          {
-            abschnitt: "Annahme",
-            satz:
-              "Dieses Angebot ist inzwischen nicht mehr im Zustand „gesendet“. " +
-              "Die Zusage wurde nicht erneut festgehalten.",
-          },
-        ]
+        return [{ bereich: "annahme", code: "nicht-gesendet" }]
       }
       /*
        * Das Ja aendert den Vorgang mit — sonst stuende ein angenommenes
@@ -1475,19 +1456,12 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         [offerId],
       )) as { id: string; opportunity_id: string; state: string }[]
       if (!rows.length) {
-        return { id: null, maengel: [{ bereich: "Grundlage", satz: "Es gibt kein Angebot mit dieser Kennung." }] }
+        return { id: null, maengel: [{ bereich: "grundlage", code: "angebot-fehlt" }] }
       }
       if (rows[0].state !== "angenommen") {
         return {
           id: null,
-          maengel: [
-            {
-              bereich: "Grundlage",
-              satz:
-                "Dieses Angebot ist nicht angenommen. Ein Projekt ohne Ja ist eine Absichtserklaerung, " +
-                "und sein Umfang waere das, was zuletzt jemand gesagt hat.",
-            },
-          ],
+          maengel: [{ bereich: "grundlage", code: "angebot-nicht-angenommen" as const }],
         }
       }
 
@@ -1502,7 +1476,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
       if (!ergebnis.length) {
         return {
           id: null,
-          maengel: [{ bereich: "Grundlage", satz: "Zu diesem Angebot laeuft bereits ein Projekt." }],
+          maengel: [{ bereich: "grundlage", code: "projekt-laeuft-schon" }],
         }
       }
       await note("opportunity", rows[0].opportunity_id, "project.started", "Projekt aufgesetzt", null)
@@ -1512,7 +1486,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
     async receiveMaterial(projectId: string, am: string): Promise<Mangel[]> {
       await ready()
       if (!/^\d{4}-\d{2}-\d{2}$/.test(am)) {
-        return [{ bereich: "Material", satz: "Kein gueltiges Datum (YYYY-MM-DD)." }]
+        return [{ bereich: "material", code: "datum-ungueltig" }]
       }
       const rows = await sql.query(
         `UPDATE projects SET material_received = $2::date, state = 'laeuft', updated_at = now()
@@ -1521,7 +1495,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         [projectId, am],
       )
       if (!rows.length) {
-        return [{ bereich: "Material", satz: "Das Projekt ist nicht im Zustand „aufgesetzt“." }]
+        return [{ bereich: "material", code: "nicht-aufgesetzt" }]
       }
       /*
        * Die Frist beginnt hier — und deshalb steht sie in der Chronik. Wer
@@ -1536,10 +1510,10 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
     async addProjectChange(projectId: string, aenderung: Aenderung): Promise<Mangel[]> {
       await ready()
       const rows = (await sql.query(`SELECT * FROM projects WHERE id = $1::text`, [projectId])) as ProjectRow[]
-      if (!rows.length) return [{ bereich: "Aenderung", satz: "Es gibt kein Projekt mit dieser Kennung." }]
+      if (!rows.length) return [{ bereich: "aenderung", code: "projekt-fehlt" }]
       const projekt = toProjekt(rows[0])
       if (projekt.zustand === "uebergeben") {
-        return [{ bereich: "Aenderung", satz: "Ein uebergebenes Projekt aendert sich nicht mehr." }]
+        return [{ bereich: "aenderung", code: "schon-uebergeben" }]
       }
       const naechste = [...projekt.aenderungen, aenderung]
       const maengel = fehltFuerZustand({ ...projekt, aenderungen: naechste }, "laeuft")
@@ -1570,12 +1544,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         [projectId, eintrag],
       )
       if (!ergaenzt.length) {
-        return [
-          {
-            bereich: "Aenderung",
-            satz: "Diese Aenderung steht bereits am Projekt. Sie wurde kein zweites Mal eingetragen.",
-          },
-        ]
+        return [{ bereich: "aenderung", code: "aenderung-doppelt" }]
       }
       await note("opportunity", projekt.opportunityId, "project.change",
         `Aenderung: ${aenderung.was}`,
@@ -1586,7 +1555,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
     async acceptDelivery(projectId: string, abnahme: Annahme): Promise<Mangel[]> {
       await ready()
       const rows = (await sql.query(`SELECT * FROM projects WHERE id = $1::text`, [projectId])) as ProjectRow[]
-      if (!rows.length) return [{ bereich: "Abnahme", satz: "Es gibt kein Projekt mit dieser Kennung." }]
+      if (!rows.length) return [{ bereich: "abnahme", code: "projekt-fehlt" }]
       const projekt = toProjekt(rows[0])
       const maengel = fehltFuerZustand({ ...projekt, abnahme }, "abgenommen")
       if (maengel.length > 0) return maengel
@@ -1599,14 +1568,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         [projectId, JSON.stringify(abnahme)],
       )
       if (!abgenommen.length) {
-        return [
-          {
-            bereich: "Abnahme",
-            satz:
-              "Das Projekt ist nicht (mehr) im Zustand „laeuft“. Eine Abnahme wird nicht zweimal " +
-              "erteilt — was bereits abgenommen ist, bleibt es.",
-          },
-        ]
+        return [{ bereich: "abnahme", code: "nicht-laeuft" }]
       }
       await note("opportunity", projekt.opportunityId, "project.accepted",
         "Abnahme erteilt",
@@ -1617,7 +1579,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
     async handOver(projectId: string, stuecke): Promise<Mangel[]> {
       await ready()
       const rows = (await sql.query(`SELECT * FROM projects WHERE id = $1::text`, [projectId])) as ProjectRow[]
-      if (!rows.length) return [{ bereich: "Uebergabe", satz: "Es gibt kein Projekt mit dieser Kennung." }]
+      if (!rows.length) return [{ bereich: "uebergabe", code: "projekt-fehlt" }]
       const projekt = toProjekt(rows[0])
 
       /* Nur bekannte Stuecke — ein Schluessel aus einem manipulierten
@@ -1639,12 +1601,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         [projectId, JSON.stringify(zusammen)],
       )
       if (!uebergeben.length) {
-        return [
-          {
-            bereich: "Uebergabe",
-            satz: "Das Projekt ist nicht im Zustand „abgenommen“. Eine Uebergabe geschieht einmal.",
-          },
-        ]
+        return [{ bereich: "uebergabe", code: "nicht-abgenommen" }]
       }
       await note("opportunity", projekt.opportunityId, "project.handover",
         "Uebergabe vollstaendig",

@@ -300,8 +300,13 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                             className="accent-gold mt-1 size-4 shrink-0"
                           />
                           <span>
-                            <span className="type-small text-foreground block">{e.label}</span>
-                            <span className="type-small text-muted-foreground block">{e.why}</span>
+                            {/* ADM-05 · H21 — die Reifekriterien sind Regeln dieses Hauses, also übersetzt. */}
+                            <span className="type-small text-foreground block">
+                              {t.befunde.reife[e.key as keyof typeof t.befunde.reife]?.label ?? e.label}
+                            </span>
+                            <span className="type-small text-muted-foreground block">
+                              {t.befunde.reife[e.key as keyof typeof t.befunde.reife]?.warum ?? e.why}
+                            </span>
                           </span>
                         </label>
                       )
@@ -321,7 +326,9 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                 ) : (
                   <>
                     {t.chance.nochOffen}{" "}
-                    {readiness.open.map((e) => e.label).join(" · ")}
+                    {readiness.open
+                      .map((e) => t.befunde.reife[e.key as keyof typeof t.befunde.reife]?.label ?? e.label)
+                      .join(" · ")}
                   </>
                 )}
               </p>

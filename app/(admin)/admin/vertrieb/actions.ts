@@ -648,7 +648,7 @@ export async function saveAngebotEntwurf(
   const store = (await requireStore())
   const kind = text(form.get("kind"))
   if (!kind || !(OFFER_KINDS as readonly string[]).includes(kind)) {
-    return { ok: false, befunde: [{ abschnitt: "Angebotsart", satz: "Keine gültige Angebotsart gewählt." }] }
+    return { ok: false, befunde: [{ bereich: "angebot", code: "keine-angebotsart" as const }] }
   }
 
   const abschnitte: Record<string, string> = {}
@@ -692,8 +692,8 @@ export async function saveAngebotEntwurf(
       ok: false,
       befunde: [
         {
-          abschnitt: "Angebot",
-          satz: "Dieses Angebot liegt bereits beim Kunden. Was gesendet wurde, wird nicht rückwirkend umgeschrieben.",
+          bereich: "angebot",
+          code: "nicht-im-entwurf" as const,
         },
       ],
     }
@@ -704,7 +704,7 @@ export async function saveAngebotEntwurf(
 
 export async function sendAngebot(opportunityId: string, form: FormData): Promise<AngebotAntwort> {
   const id = text(form.get("id"))
-  if (!id) return { ok: false, befunde: [{ abschnitt: "Angebot", satz: "Kein Angebot angegeben." }] }
+  if (!id) return { ok: false, befunde: [{ bereich: "angebot", code: "kein-angebot-angegeben" as const }] }
   const befunde = await (await requireStore()).sendOffer(id)
   refresh(`/admin/vertrieb/pipeline/${opportunityId}`, "/admin/vertrieb/pipeline")
   return { ok: befunde.length === 0, befunde }
@@ -712,7 +712,7 @@ export async function sendAngebot(opportunityId: string, form: FormData): Promis
 
 export async function acceptAngebot(opportunityId: string, form: FormData): Promise<AngebotAntwort> {
   const id = text(form.get("id"))
-  if (!id) return { ok: false, befunde: [{ abschnitt: "Angebot", satz: "Kein Angebot angegeben." }] }
+  if (!id) return { ok: false, befunde: [{ bereich: "angebot", code: "kein-angebot-angegeben" as const }] }
 
   const form_ = text(form.get("form"))
   const annahme: Annahme = {
@@ -738,7 +738,7 @@ export type LieferAntwort = { ok: boolean; maengel: Mangel[] }
 
 export async function projektStarten(opportunityId: string, form: FormData): Promise<LieferAntwort> {
   const offerId = text(form.get("offerId"))
-  if (!offerId) return { ok: false, maengel: [{ bereich: "Grundlage", satz: "Kein Angebot angegeben." }] }
+  if (!offerId) return { ok: false, maengel: [{ bereich: "grundlage", code: "kein-angebot-angegeben" as const }] }
   const { maengel } = await (await requireStore()).startProject(offerId)
   refresh(`/admin/vertrieb/pipeline/${opportunityId}`)
   return { ok: maengel.length === 0, maengel }
@@ -751,7 +751,7 @@ export async function materialEingetroffen(
   const id = text(form.get("id"))
   const am = text(form.get("am"))
   if (!id || !am) {
-    return { ok: false, maengel: [{ bereich: "Material", satz: "Projekt oder Datum fehlt." }] }
+    return { ok: false, maengel: [{ bereich: "material", code: "kein-projekt-angegeben" as const }] }
   }
   const maengel = await (await requireStore()).receiveMaterial(id, am)
   refresh(`/admin/vertrieb/pipeline/${opportunityId}`)
@@ -760,7 +760,7 @@ export async function materialEingetroffen(
 
 export async function abnahmeEintragen(opportunityId: string, form: FormData): Promise<LieferAntwort> {
   const id = text(form.get("id"))
-  if (!id) return { ok: false, maengel: [{ bereich: "Abnahme", satz: "Kein Projekt angegeben." }] }
+  if (!id) return { ok: false, maengel: [{ bereich: "abnahme", code: "kein-projekt-angegeben" as const }] }
   const gewaehlt = text(form.get("form"))
   const abnahme: Annahme = {
     von: text(form.get("von")) ?? "",
@@ -778,7 +778,7 @@ export async function abnahmeEintragen(opportunityId: string, form: FormData): P
 
 export async function uebergabeEintragen(opportunityId: string, form: FormData): Promise<LieferAntwort> {
   const id = text(form.get("id"))
-  if (!id) return { ok: false, maengel: [{ bereich: "Uebergabe", satz: "Kein Projekt angegeben." }] }
+  if (!id) return { ok: false, maengel: [{ bereich: "uebergabe", code: "kein-projekt-angegeben" as const }] }
   const stuecke: Partial<Record<UebergabeKey, UebergabeEintrag>> = {}
   for (const stueck of UEBERGABE_STUECKE) {
     const am = text(form.get(`am_${stueck.key}`))

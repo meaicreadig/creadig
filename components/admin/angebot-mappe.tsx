@@ -22,6 +22,7 @@ import {
   type Angebot,
 } from "@/lib/angebot"
 import { adminTexte } from "@/lib/admin-i18n"
+import { befundZeilen } from "@/lib/admin-i18n/befund"
 import type { AdminSprache } from "@/lib/admin-i18n/sprache"
 import { OFFER_KINDS, OFFERS } from "@/lib/offer-readiness"
 import type { AngebotAntwort } from "@/app/(admin)/admin/vertrieb/actions"
@@ -54,7 +55,8 @@ export function AngebotMappe({
   senden: (opportunityId: string, form: FormData) => Promise<AngebotAntwort>
   annehmen: (opportunityId: string, form: FormData) => Promise<AngebotAntwort>
 }) {
-  const t = adminTexte(sprache).angebotMappe
+  const texte = adminTexte(sprache)
+  const t = texte.angebotMappe
   const [neuAntwort, neuAction, neuWartet] = useActionState(
     async (_: AngebotAntwort, form: FormData) => speichern(opportunityId, form),
     LEER,
@@ -129,7 +131,7 @@ export function AngebotMappe({
       <Speicherstand
         wartet={jaWartet}
         ok={jaAntwort === LEER ? null : jaAntwort.ok}
-        punkte={jaAntwort.befunde.map((b) => ({ wo: b.abschnitt, satz: b.satz }))}
+        punkte={befundZeilen(jaAntwort.befunde, texte)}
         erfolgssatz={t.annahmeFestgehalten}
       />
 
@@ -197,7 +199,8 @@ export function AngebotMappe({
                 name={`abschnitt_${a.key}`}
                 rows={3}
                 defaultValue={entwurf?.abschnitte[a.key] ?? ""}
-                placeholder={a.regel}
+                /* Die Regel ist eine Anweisung dieses Hauses — übersetzt. Die Überschrift daneben nicht. */
+                placeholder={texte.befunde.abschnittRegel[a.key as keyof typeof texte.befunde.abschnittRegel] ?? a.regel}
               />
             </AdminField>
           ))}
@@ -210,7 +213,7 @@ export function AngebotMappe({
       <Speicherstand
         wartet={neuWartet}
         ok={neuAntwort === LEER ? null : neuAntwort.ok}
-        punkte={neuAntwort.befunde.map((b) => ({ wo: b.abschnitt, satz: b.satz }))}
+        punkte={befundZeilen(neuAntwort.befunde, texte)}
         erfolgssatz={t.entwurfGespeichert}
       />
 
@@ -227,7 +230,7 @@ export function AngebotMappe({
           <Speicherstand
             wartet={sendenWartet}
             ok={sendenAntwort === LEER ? null : sendenAntwort.ok}
-            punkte={sendenAntwort.befunde.map((b) => ({ wo: b.abschnitt, satz: b.satz }))}
+            punkte={befundZeilen(sendenAntwort.befunde, texte)}
             erfolgssatz={t.angebotGesendet}
           />
         </>
