@@ -18,7 +18,7 @@ const PORT = 4393
 const BASE = `http://127.0.0.1:${PORT}`
 const PASSWORT = "probe-owner-nur-lokal"
 const ROUTEN = [
-  "/admin", "/admin/cockpit", "/admin/material", "/admin/beleg", "/admin/verbindungen",
+  "/admin", "/admin/cockpit", "/admin/material", "/admin/beleg", "/admin/verbindungen", "/admin/automationen",
   "/admin/kunden", "/admin/kunden/gibt-es-nicht",
   "/admin/vertrieb", "/admin/vertrieb/anfragen", "/admin/vertrieb/anfragen/gibt-es-nicht",
   "/admin/vertrieb/beziehungen", "/admin/vertrieb/beziehungen/gibt-es-nicht",

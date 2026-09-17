@@ -596,6 +596,25 @@ export type MeasurementSampleRow = {
   notiz: string | null
 }
 
+/* ── ADM-06 · Automation ────────────────────────────────────────────────── */
+
+export type AutomationLaufRow = {
+  id: string
+  ausloeser: string
+  ereignis: string
+  gegenstandArt: string
+  gegenstand: string
+  wirkung: string
+  zustand: string
+  ergebnis: string | null
+  daten: Record<string, string | number> | null
+  versuche: number
+  fehler: string | null
+  erledigtAt: string | null
+  erledigtVon: string | null
+  createdAt: string
+}
+
 /* ── ADM-05 · Freigaben ─────────────────────────────────────────────────── */
 
 /**
@@ -841,6 +860,25 @@ export type VertriebStore = {
    * Unterschied besonders schwer — ein nicht lesbarer Tisch saehe sonst aus
    * wie ein Haus, das nie gemessen hat.
    */
+  /* ── ADM-06 · A29 · Automation ─────────────────────────────────────────
+   *
+   * Das Protokoll der Ausfuehrungen und die Schalter. `null` heisst wie
+   * ueberall „nicht lesbar" — hier besonders wichtig: Eine unlesbare
+   * Protokolltabelle als „keine offenen Erinnerungen" zu lesen, hiesse dem
+   * Owner zu sagen, es sei nichts zu tun.
+   */
+  listAutomationRuns(query?: { zustand?: string; limit?: number }): Promise<AutomationLaufRow[] | null>
+  listAutomationSwitches(): Promise<{ ausloeser: string; aktiv: boolean; geaendertVon: string | null }[] | null>
+  /** An oder aus. Idempotent: zweimal dasselbe ist kein zweiter Wechsel. */
+  setAutomationSwitch(ausloeser: string, aktiv: boolean): Promise<"ok" | "unveraendert" | "nicht-moeglich">
+  /**
+   * Eine Ausfuehrung abhaken oder zuruecknehmen.
+   *
+   * Der Eintrag bleibt in beiden Faellen stehen. Eine Automation, deren Spur
+   * man loeschen kann, ist nicht beobachtbar.
+   */
+  closeAutomationRun(id: string, zustand: "erledigt" | "zurueckgenommen"): Promise<"ok" | "schon-geschlossen" | "fehlt">
+
   /* ── ADM-05 · A13/A14 · Freigaben (Beleg-Erlaubnis) ────────────────────
    *
    * Die Erlaubnis eines Kunden ist eine TATSACHE mit Datum, Person und

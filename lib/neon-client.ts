@@ -724,6 +724,39 @@ export const SCHEMA: string[] = [
   `CREATE INDEX IF NOT EXISTS releases_organisation_idx ON releases (organisation_id)`,
   `CREATE UNIQUE INDEX IF NOT EXISTS releases_eindeutig
      ON releases (organisation_id, lower(btrim(by_name)), form, granted_on, lower(btrim(reference)))`,
+
+  /*
+   * 019 · ADMIN OS · ADM-06 — Automation: Ausfuehrung, Protokoll, Schalter.
+   * Siehe `scripts/migrations/019-automation.sql` und `lib/automation.ts`.
+   * Eine Automation aendert KEINEN Geschaeftsdatensatz; ihre Wirkung ist ihr
+   * Eintrag hier. Deshalb ist Umkehrbarkeit eine Eigenschaft der Bauart.
+   */
+  `CREATE TABLE IF NOT EXISTS automation_runs (
+     id text PRIMARY KEY,
+     ausloeser text NOT NULL,
+     ereignis text NOT NULL,
+     gegenstand_art text NOT NULL,
+     gegenstand text NOT NULL,
+     schluessel text NOT NULL,
+     wirkung text NOT NULL,
+     zustand text NOT NULL DEFAULT 'offen',
+     ergebnis text,
+     daten jsonb,
+     versuche integer NOT NULL DEFAULT 1,
+     fehler text,
+     erledigt_at timestamptz,
+     erledigt_von text,
+     created_at timestamptz NOT NULL DEFAULT now(),
+     updated_at timestamptz NOT NULL DEFAULT now()
+   )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS automation_runs_schluessel_idx ON automation_runs (schluessel)`,
+  `CREATE INDEX IF NOT EXISTS automation_runs_offen_idx ON automation_runs (zustand, created_at DESC)`,
+  `CREATE TABLE IF NOT EXISTS automation_switches (
+     ausloeser text PRIMARY KEY,
+     aktiv boolean NOT NULL DEFAULT true,
+     geaendert_at timestamptz NOT NULL DEFAULT now(),
+     geaendert_von text
+   )`,
   `CREATE INDEX IF NOT EXISTS leads_responsible_idx ON leads (responsible)`,
   `CREATE INDEX IF NOT EXISTS opportunities_responsible_idx ON opportunities (responsible)`,
 ]

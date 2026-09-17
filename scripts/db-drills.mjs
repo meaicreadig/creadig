@@ -68,6 +68,8 @@ const LAEUFE = [
   { name: "betriebskette", db: "drill_betriebskette", variable: "BETRIEBSKETTE_DRILL_URL" },
   /* ADM-05 · A13/A14 — Erlaubnis und Widerruf. */
   { name: "freigabe", db: "drill_freigabe", variable: "FREIGABE_DRILL_URL" },
+  /* ADM-06 · A29 — Automationen: beobachtbar, steuerbar, umkehrbar. */
+  { name: "automation", db: "drill_automation", variable: "AUTOMATION_DRILL_URL" },
 ]
 
 function psql(sql) {

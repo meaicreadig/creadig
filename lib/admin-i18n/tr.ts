@@ -30,6 +30,7 @@ export const tr: AdminTexte = {
     vertrieb: { label: "Satış", hint: "Fırsatlar, süreç, araştırma, kayıp" },
     nachweise: { label: "Kanıtlar ve onaylar", hint: "Sırada kanıtlanabilecek olan" },
     verbindungen: { label: "Bağlantılar", hint: "Giriş ve çıkış yolları, dürüstçe" },
+    automationen: { label: "Otomasyonlar", hint: "Kendiliğinden çalışanlar — ve asla çalışmayacaklar" },
     system: { label: "Sistem", hint: "Kurulum, materyal, tanılama" },
   },
   login: {
@@ -1083,6 +1084,67 @@ export const tr: AdminTexte = {
       abgenommen: { label: "Onaylandı", was: "Müşteri çalıştığını doğruladı." },
       uebergeben: { label: "Devredildi", was: "Kod, içerikler, erişimler ve alan adı müşteride." },
     },
+  },
+  automationen: {
+    titel: "Otomasyonlar",
+    lead:
+      "Tekrar otomatikleştirilir, sorumluluk değil. Bir otomasyon not düşer, hatırlatır, bir işi kurum içinde ilgili yere taşır ya da bir durumu yeniden hesaplar — asla karar vermez, söz vermez ve kimseye ulaşmaz.",
+    meta: (offen: number, aktiv: number, gesamt: number) =>
+      `${offen} açık · ${gesamt} otomasyondan ${aktiv} tanesi açık`,
+    keineAenderung:
+      "Hiçbir otomasyon bir iş kaydını değiştirmez. Buradakiler onun tüm etkisidir — bu yüzden her biri tümüyle geri alınabilir.",
+    ausloeserTitel: "Otomatik çalışanlar",
+    laufTitel: "Çalışmış olanlar",
+    offeneTitel: "Sizi bekleyenler",
+    keineLaeufe: "Henüz hiçbir şey çalışmadı.",
+    keineOffenen: "Bekleyen bir şey yok.",
+    nichtLesbar: "Kayıt okunamıyor — bu, hiçbir şeyin çalışmadığı anlamına gelmez.",
+    an: "Açık",
+    aus: "Kapalı",
+    einschalten: "Aç",
+    abschalten: "Kapat",
+    wechselLaeuft: "Değiştiriliyor …",
+    abhaken: "Tamamlandı",
+    zuruecknehmen: "Geri al",
+    laeuftGerade: "Kaydediliyor …",
+    aufEreignis: (ereignis: string) => `şu olayda çalışır: ${ereignis}`,
+    hoechstens: (n: number) => (n === 1 ? "en çok bir deneme" : `en çok ${n} deneme`),
+    wirkung: {
+      notieren: "Not düşer",
+      erinnern: "Hatırlatır",
+      weiterreichen: "Kurum içinde iletir",
+      pruefen: "Yeniden hesaplar",
+    },
+    zustand: {
+      offen: "Açık",
+      erledigt: "Tamamlandı",
+      zurueckgenommen: "Geri alındı",
+      fehlgeschlagen: "Başarısız",
+    },
+    ausloeser: {
+      "abnahme-erinnert-an-freigabe": {
+        name: "Teslim onayından sonra izni hatırlat",
+        was: "Bir müşteri teslimi onayladığında, yazılı izni artık istemeyi hatırlatır. Hatırlatır, sormaz — soruyu bir insan sorar.",
+      },
+      "uebergabe-notiert-vollstaendigkeit": {
+        name: "Devri geçmişe kaydet",
+        was: "Bir devirden sonra dört parçadan hangilerinin devredildiğini geçmişe yazar.",
+      },
+      "verlust-prueft-muster": {
+        name: "Kayıpta örüntü hesapla",
+        was: "Bir kayıpta aynı gerekçenin örüntü hâline gelip gelmediğini hesaplar ve sonucu yazar. Hedef tabloyu yine bir insan değiştirir.",
+      },
+    },
+    ergebnis: {
+      "freigabe-fragen": "Teslim onayı alındı. Şimdi yazılı izni isteyin.",
+      "uebergabe-vollstaendig": "Devredildi: 4 parçadan {anzahl} tanesi ({stuecke}).",
+      "muster-erkannt": "„{grund}“ artık {anzahl}× görünüyor — {ab} kezden itibaren bu bir örüntüdür, tekil bir durum değil.",
+      "kein-muster": "„{grund}“ {anzahl}× görünüyor — henüz örüntü değil ({ab} kezden itibaren).",
+    },
+    erledigtVon: (wer: string, wann: string) => `${wer} · ${wann}`,
+    nichtVerantwortungTitel: "Asla otomatik olmayanlar",
+    nichtVerantwortung:
+      "Birine ulaşmak, teklif göndermek veya kabul etmek, teslimi onaylamak, fatura kesmek, bir alacaktan vazgeçmek, referans istemek, izin oluşturmak, olgunluk derecesi belirlemek, fiyat söylemek. Bunlar karardır ve kararı bir insan verir.",
   },
   freigaben: {
     titel: "İzinler",

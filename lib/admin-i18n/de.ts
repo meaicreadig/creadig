@@ -31,6 +31,7 @@ export const de = {
     vertrieb: { label: "Vertrieb", hint: "Chancen, Pipeline, Recherche, Verlust" },
     nachweise: { label: "Nachweise & Freigaben", hint: "Was als Nächstes beweisbar wird" },
     verbindungen: { label: "Verbindungen", hint: "Wege herein und hinaus, ehrlich benannt" },
+    automationen: { label: "Automationen", hint: "Was ohne Zutun läuft — und was nie" },
     system: { label: "System", hint: "Einrichtung, Material, Diagnose" },
   },
   login: {
@@ -1110,6 +1111,67 @@ export const de = {
       abgenommen: { label: "Abgenommen", was: "Der Kunde hat bestätigt, dass es funktioniert." },
       uebergeben: { label: "Übergeben", was: "Code, Inhalte, Zugänge und Domain sind beim Kunden." },
     },
+  },
+  automationen: {
+    titel: "Automationen",
+    lead:
+      "Wiederholung wird automatisiert, Verantwortung nicht. Eine Automation notiert, erinnert, reicht intern weiter oder rechnet eine Lage nach — sie entscheidet nie, sagt nie zu und spricht niemanden an.",
+    meta: (offen: number, aktiv: number, gesamt: number) =>
+      `${offen} offen · ${aktiv} von ${gesamt} eingeschaltet`,
+    keineAenderung:
+      "Keine Automation ändert einen Geschäftsdatensatz. Was hier steht, ist ihre ganze Wirkung — deshalb lässt sich jede vollständig zurücknehmen.",
+    ausloeserTitel: "Was automatisch läuft",
+    laufTitel: "Was gelaufen ist",
+    offeneTitel: "Wartet auf Sie",
+    keineLaeufe: "Noch nichts gelaufen.",
+    keineOffenen: "Nichts wartet.",
+    nichtLesbar: "Das Protokoll ist nicht lesbar — das heißt nicht, dass nichts gelaufen ist.",
+    an: "Eingeschaltet",
+    aus: "Abgeschaltet",
+    einschalten: "Einschalten",
+    abschalten: "Abschalten",
+    wechselLaeuft: "Wird umgestellt …",
+    abhaken: "Erledigt",
+    zuruecknehmen: "Zurücknehmen",
+    laeuftGerade: "Wird gespeichert …",
+    aufEreignis: (ereignis: string) => `läuft bei: ${ereignis}`,
+    hoechstens: (n: number) => (n === 1 ? "höchstens ein Versuch" : `höchstens ${n} Versuche`),
+    wirkung: {
+      notieren: "Notiert",
+      erinnern: "Erinnert",
+      weiterreichen: "Reicht intern weiter",
+      pruefen: "Rechnet nach",
+    },
+    zustand: {
+      offen: "Offen",
+      erledigt: "Erledigt",
+      zurueckgenommen: "Zurückgenommen",
+      fehlgeschlagen: "Fehlgeschlagen",
+    },
+    ausloeser: {
+      "abnahme-erinnert-an-freigabe": {
+        name: "Nach der Abnahme an die Freigabe erinnern",
+        was: "Wenn ein Kunde abgenommen hat, erinnert sie daran, jetzt nach der schriftlichen Freigabe zu fragen. Erinnern, nicht fragen — die Frage stellt ein Mensch.",
+      },
+      "uebergabe-notiert-vollstaendigkeit": {
+        name: "Übergabe in der Chronik festhalten",
+        was: "Schreibt nach einer Übergabe in die Chronik, welche der vier Stücke übergeben wurden.",
+      },
+      "verlust-prueft-muster": {
+        name: "Bei einem Verlust nach Mustern rechnen",
+        was: "Rechnet bei einem Verlust nach, ob derselbe Grund zum Muster geworden ist, und schreibt das Ergebnis hin. Das Zielbild ändert weiterhin ein Mensch.",
+      },
+    },
+    ergebnis: {
+      "freigabe-fragen": "Die Abnahme steht. Fragen Sie jetzt nach der schriftlichen Freigabe.",
+      "uebergabe-vollstaendig": "Übergeben: {anzahl} von 4 Stücken ({stuecke}).",
+      "muster-erkannt": "„{grund}“ steht jetzt {anzahl}× — ab {ab} ist es ein Muster, keine Einzelheit.",
+      "kein-muster": "„{grund}“ steht {anzahl}× — noch kein Muster (ab {ab}).",
+    },
+    erledigtVon: (wer: string, wann: string) => `${wer} · ${wann}`,
+    nichtVerantwortungTitel: "Was nie automatisch geschieht",
+    nichtVerantwortung:
+      "Ansprechen, ein Angebot senden oder annehmen, abnehmen, eine Rechnung stellen, eine Forderung ausbuchen, um eine Empfehlung bitten, eine Freigabe erzeugen, einen Reifegrad setzen, einen Preis nennen. Das sind Entscheidungen, und die trifft ein Mensch.",
   },
   freigaben: {
     titel: "Erlaubnisse",

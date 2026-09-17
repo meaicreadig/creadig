@@ -50,12 +50,14 @@ import type {
   ArchivGrund,
   DublettenKandidat,
   Herkunft,
+  AutomationLaufRow,
   ManuelleAnfrage,
   ReleaseEingabe,
   ReleaseRow,
   Schreibergebnis,
 } from "@/lib/vertrieb"
 import { AKTEUR_SYSTEM } from "@/lib/vertrieb"
+import { abgeschaltete, entscheide } from "@/lib/automation"
 import { createLeadIdentity } from "@/lib/lead-id"
 import { LIFECYCLE_LABELS, RELATIONSHIP_LABELS } from "@/lib/vertrieb"
 import { SQL_HEUTE } from "@/lib/geschaeftszeit"
@@ -531,6 +533,109 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
   const { sql, ready } = client
 
   /** Chronik-Eintrag. Immer im selben Aufruf wie die Änderung — mit Akteur und Herkunft (ADM-03). */
+  /* ══ ADM-06 · DER LAEUFER ═══════════════════════════════════════════════
+   *
+   * Er wird an genau den Stellen gerufen, an denen eines der drei Ereignisse
+   * aus `lib/ereignis.ts` entsteht — nicht in `note()` fuer alle
+   * dreiundzwanzig Arten. Der Unterschied ist Last: Ein Haken in `note()`
+   * haette bei JEDER Chronikzeile drei Abfragen ausgeloest, auch bei den
+   * zwanzig Arten, an denen kein Ausloeser haengt.
+   *
+   * ZWEI DINGE DARF ER NIE:
+   *
+   *   1 · Die Geschaeftshandlung mitreissen. Wer eine Anfrage qualifiziert,
+   *       hat das getan — auch wenn die Automation danach scheitert. Deshalb
+   *       faengt er ALLES und schreibt hoechstens seinen eigenen Fehler.
+   *
+   *   2 · Einen Geschaeftsdatensatz aendern. Seine Wirkung ist die Zeile im
+   *       Protokoll (und bei `notieren` eine Chronikzeile mit Herkunft
+   *       AUTOMATION). Siehe `lib/automation.ts`.
+   *
+   * Fehlt die Tabelle (Migration 019 nicht angewendet), geschieht nichts —
+   * still und ohne Ausfall. Eine Automation, die einen Vertriebsvorgang
+   * abbricht, weil ihr eigenes Protokoll fehlt, waere die schlechteste
+   * denkbare Reihenfolge.
+   */
+  async function automationen(
+    ereignis: string,
+    gegenstandArt: ActivitySubject,
+    gegenstand: string,
+    daten: Record<string, unknown> | null = null,
+  ): Promise<void> {
+    try {
+      const [schalterRoh, laeufeRoh] = await Promise.all([
+        sql.query(`SELECT ausloeser, aktiv FROM automation_switches`),
+        sql.query(
+          `SELECT ausloeser, schluessel, versuche FROM automation_runs WHERE gegenstand = $1::text`,
+          [gegenstand],
+        ),
+      ])
+      const schalter = schalterRoh as { ausloeser: string; aktiv: boolean }[]
+      const laeufe = laeufeRoh as { ausloeser: string; schluessel: string; versuche: number }[]
+      const versuche: Record<string, number> = {}
+      for (const l of laeufe) versuche[l.ausloeser] = (versuche[l.ausloeser] ?? 0) + l.versuche
+
+      const entscheidungen = entscheide({
+        ereignis,
+        gegenstand,
+        daten,
+        abgeschaltet: abgeschaltete(schalter),
+        protokoll: laeufe.map((l) => l.schluessel),
+        versuche,
+      })
+
+      for (const { ausfuehrung, schluessel } of entscheidungen) {
+        /* Der eindeutige Schluessel entscheidet, nicht die Pruefung davor:
+           Zwei Instanzen koennen gleichzeitig hier ankommen. */
+        const eingetragen = (await sql.query(
+          `INSERT INTO automation_runs
+             (id, ausloeser, ereignis, gegenstand_art, gegenstand, schluessel, wirkung,
+              zustand, ergebnis, daten, versuche, created_at, updated_at)
+           VALUES ($1::text,$2::text,$3::text,$4::text,$5::text,$6::text,$7::text,
+                   'offen',$8::text,$9::jsonb,1, now(), now())
+           ON CONFLICT (schluessel) DO NOTHING
+           RETURNING id`,
+          [
+            randomUUID(),
+            ausfuehrung.ausloeser,
+            ereignis,
+            gegenstandArt,
+            gegenstand,
+            schluessel,
+            ausfuehrung.wirkung,
+            ausfuehrung.ergebnis,
+            JSON.stringify(ausfuehrung.daten),
+          ],
+        )) as { id: string }[]
+        if (!eingetragen.length) continue
+
+        if (ausfuehrung.chronik) {
+          /*
+           * Die einzige Wirkung, die in die Chronik gehoert. Sie traegt
+           * `AUTOMATION` als Herkunft — wer sie spaeter liest, sieht sofort,
+           * dass hier kein Mensch gehandelt hat.
+           */
+          await sql.query(
+            `INSERT INTO activities (id, subject_type, subject_id, kind, summary, detail, actor, origin, data, created_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,'AUTOMATION',$8::jsonb, now())`,
+            [
+              randomUUID(),
+              gegenstandArt,
+              gegenstand,
+              `automation.${ausfuehrung.ergebnis}`,
+              ausfuehrung.ausloeser,
+              null,
+              ausfuehrung.ausloeser,
+              JSON.stringify(ausfuehrung.daten),
+            ],
+          )
+        }
+      }
+    } catch {
+      /* Siehe oben: nie die Geschaeftshandlung mitreissen. */
+    }
+  }
+
   async function note(
     subjectType: ActivitySubject,
     subjectId: string,
@@ -1049,6 +1154,22 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         status === "lost" ? lostReason : null,
         { von: alt[0].status, nach: status, ...(status === "lost" ? { grund: lostReason } : {}) },
       )
+      /*
+       * ADM-06 — nur ein Verlust rechnet nach (`verlust-prueft-muster`). Die
+       * Zahl kommt aus der Datenbank, nicht aus einer Schaetzung: Wie oft
+       * dieser Grund bisher vorkam, entscheidet, ob es ein Muster ist (G16).
+       */
+      if (status === "lost" && lostReason) {
+        const gezaehlt = (await sql.query(
+          `SELECT count(*)::int AS n FROM opportunities WHERE status = 'lost' AND lost_reason = $1::text`,
+          [lostReason],
+        )) as { n: number }[]
+        await automationen("opportunity.status", "opportunity", id, {
+          nach: status,
+          grund: lostReason,
+          gleicherGrund: gezaehlt[0]?.n ?? 0,
+        })
+      }
       return "ok"
     },
 
@@ -1573,6 +1694,8 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
       await note("opportunity", projekt.opportunityId, "project.accepted",
         "Abnahme erteilt",
         `${abnahme.von} (${abnahme.rolle}), ${abnahme.form}, ${abnahme.am}`)
+      /* ADM-06 — erinnert an die schriftliche Freigabe (G13). Erinnern, nicht fragen. */
+      await automationen("project.accepted", "opportunity", projekt.opportunityId, { projekt: projectId })
       return []
     },
 
@@ -1606,6 +1729,10 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
       await note("opportunity", projekt.opportunityId, "project.handover",
         "Uebergabe vollstaendig",
         UEBERGABE_STUECKE.map((s) => s.label).join(", "))
+      /* ADM-06 — schreibt in die Chronik, WELCHE Stuecke uebergeben wurden (G19). */
+      await automationen("project.handover", "opportunity", projekt.opportunityId, {
+        stuecke: Object.keys(zusammen),
+      })
       return []
     },
 
@@ -2055,6 +2182,101 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
      * steht absichtlich nicht in `REQUIRED_TABLES`. Ihr Fehlen darf das Haus
      * nicht anhalten — es darf nur nicht als „nichts gemessen" durchgehen.
      */
+
+    /* ══ ADM-06 · A29 · AUTOMATION — beobachtbar, steuerbar, umkehrbar ═══ */
+
+    async listAutomationRuns(query): Promise<AutomationLaufRow[] | null> {
+      try {
+        await ready()
+        const params: unknown[] = []
+        let where = ""
+        if (query?.zustand) {
+          params.push(query.zustand)
+          where = `WHERE zustand = $1::text`
+        }
+        params.push(query?.limit ?? 200)
+        const rows = (await sql.query(
+          `SELECT * FROM automation_runs ${where}
+            ORDER BY created_at DESC LIMIT $${params.length}`,
+          params,
+        )) as Record<string, unknown>[]
+        return rows.map((r) => ({
+          id: String(r.id),
+          ausloeser: String(r.ausloeser),
+          ereignis: String(r.ereignis),
+          gegenstandArt: String(r.gegenstand_art),
+          gegenstand: String(r.gegenstand),
+          wirkung: String(r.wirkung),
+          zustand: String(r.zustand),
+          ergebnis: (r.ergebnis as string | null) ?? null,
+          daten: (r.daten as Record<string, string | number> | null) ?? null,
+          versuche: Number(r.versuche ?? 1),
+          fehler: (r.fehler as string | null) ?? null,
+          erledigtAt: r.erledigt_at ? new Date(r.erledigt_at as string).toISOString() : null,
+          erledigtVon: (r.erledigt_von as string | null) ?? null,
+          createdAt: new Date(r.created_at as string).toISOString(),
+        }))
+      } catch {
+        /*
+         * Kein `[]`. Ein unlesbares Protokoll als „keine offenen
+         * Erinnerungen" zu lesen, hiesse dem Owner zu sagen, es sei nichts
+         * zu tun — und das ist die eine Aussage, die hier nie geraten wird.
+         */
+        return null
+      }
+    },
+
+    async listAutomationSwitches() {
+      try {
+        await ready()
+        const rows = (await sql.query(
+          `SELECT ausloeser, aktiv, geaendert_von FROM automation_switches`,
+        )) as { ausloeser: string; aktiv: boolean; geaendert_von: string | null }[]
+        return rows.map((r) => ({ ausloeser: r.ausloeser, aktiv: r.aktiv, geaendertVon: r.geaendert_von ?? null }))
+      } catch {
+        return null
+      }
+    },
+
+    async setAutomationSwitch(ausloeser, aktiv) {
+      await ready()
+      try {
+        /*
+         * Idempotent ueber die Bedingung: Zweimal „aus" ist ein Zustand,
+         * kein zweiter Wechsel — und erzeugt deshalb auch keinen zweiten
+         * Zeitpunkt, an dem angeblich jemand etwas umgestellt hat.
+         */
+        const rows = (await sql.query(
+          `INSERT INTO automation_switches (ausloeser, aktiv, geaendert_at, geaendert_von)
+           VALUES ($1::text, $2::boolean, now(), $3::text)
+           ON CONFLICT (ausloeser) DO UPDATE
+              SET aktiv = EXCLUDED.aktiv, geaendert_at = now(), geaendert_von = EXCLUDED.geaendert_von
+            WHERE automation_switches.aktiv IS DISTINCT FROM EXCLUDED.aktiv
+           RETURNING ausloeser`,
+          [ausloeser, aktiv, akteur.kennung],
+        )) as { ausloeser: string }[]
+        return rows.length ? "ok" : "unveraendert"
+      } catch {
+        return "nicht-moeglich"
+      }
+    },
+
+    async closeAutomationRun(id, zustand) {
+      await ready()
+      const bestand = (await sql.query(`SELECT zustand FROM automation_runs WHERE id = $1::text`, [id])) as {
+        zustand: string
+      }[]
+      if (!bestand.length) return "fehlt"
+      /* Bedingung im UPDATE (H20): Ein zweites Abhaken ist kein zweites Abhaken. */
+      const rows = (await sql.query(
+        `UPDATE automation_runs
+            SET zustand = $2::text, erledigt_at = now(), erledigt_von = $3::text, updated_at = now()
+          WHERE id = $1::text AND zustand = 'offen'
+        RETURNING id`,
+        [id, zustand, akteur.kennung],
+      )) as { id: string }[]
+      return rows.length ? "ok" : "schon-geschlossen"
+    },
 
     /* ══ ADM-05 · A13/A14 · FREIGABEN ═══════════════════════════════════
      *

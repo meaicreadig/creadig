@@ -179,6 +179,19 @@ export const FLAECHEN: readonly Flaeche[] = [
   { pfad: "/admin/verbindungen", klasse: "eigene-lage", fuer: ["owner"] },
 
   /*
+   * ADM-06 — die Automationen.
+   *
+   * `eigene-lage`: Die Seite zeigt, was das System selbsttaetig getan hat.
+   * Sie nennt Vorgaenge nur ueber ihre Kennung, keinen Menschen.
+   *
+   * Nur `owner`. Wer eine Automation ein- oder ausschalten darf, entscheidet
+   * darueber, was im Haus ohne Zutun geschieht — das ist keine
+   * Vertriebsaufgabe. Und die Liste der offenen Wirkungen ist eine
+   * Arbeitsliste des Inhabers, keine zweite Pipeline.
+   */
+  { pfad: "/admin/automationen", klasse: "eigene-lage", fuer: ["owner"] },
+
+  /*
    * PROOF OPERATIONS P1 — der Beleg-Betrieb.
    *
    * `fremde-personen`, obwohl die Seite keine Kundenakte zeigt: Sie nennt
