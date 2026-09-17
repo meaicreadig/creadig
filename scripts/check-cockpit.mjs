@@ -28,6 +28,8 @@ import { fileURLToPath } from "node:url"
 import { kontext, nichtErhoben, offen } from "../lib/gedaechtnis.ts"
 import { reihenfolge } from "../lib/navigator.ts"
 import { flaecheZu } from "../lib/rollen.ts"
+import { de } from "../lib/admin-i18n/de.ts"
+import { tr } from "../lib/admin-i18n/tr.ts"
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const fehler = []
@@ -90,14 +92,33 @@ for (const verboten of ["site-data", "vertrieb-store", "lead-store", "neon-clien
  * Prosa ueber eine Regel ist kein Beweis, dass die Regel wirkt. Gesucht
  * sind die drei Beschriftungen, die ein Mensch auf der Seite liest.
  */
-if (!/nicht erhoben/i.test(quelle)) {
-  fehler.push(
-    "Das Cockpit kennt den Zustand nicht-erhoben nicht. Dann hat es zwei Zustaende statt drei — und eine " +
-      "offene Owner-Frage sieht aus wie ein Systemfehler.",
-  )
-}
-if (!/steht/i.test(quelle) || !/offen/i.test(quelle)) {
-  fehler.push("Das Cockpit unterscheidet nicht zwischen steht und offen.")
+/*
+ * ADM-04 · H18 (17.09.2026) — DIESE PRUEFUNG WAR SEIT DER DE/TR-MIGRATION BLIND.
+ *
+ * Bis hierher suchte sie die deutschen Woerter im Quelltext der Komponente.
+ * Seit ADM-01 stehen die Beschriftungen im Woerterbuch, und die Komponente
+ * enthaelt nur noch Schluessel — der Waechter meldete deshalb „kennt den
+ * Zustand nicht-erhoben nicht", obwohl die Seite alle drei zeigt. Ein Gate,
+ * das nach einer Uebersetzung rot wird, wird abgeschaltet statt gelesen.
+ *
+ * Gesucht ist jetzt die WIRKUNG in beiden Haelften: Die Komponente muss die
+ * drei Zustaende auseinanderhalten, UND beide Sprachen muessen fuer jeden
+ * ein Wort haben. Eine leere tuerkische Beschriftung waere derselbe Verlust
+ * wie ein fehlender Zustand.
+ */
+for (const zustand of ["steht", "offen", "nichtErhoben"]) {
+  if (!new RegExp(`status\\.${zustand}\\b`).test(quelle)) {
+    fehler.push(
+      `Das Cockpit unterscheidet den Zustand ${zustand} nicht mehr. Dann hat es zwei Zustaende statt drei — ` +
+        "und eine offene Owner-Frage sieht aus wie ein Systemfehler.",
+    )
+  }
+  for (const [name, woerterbuch] of [["DE", de], ["TR", tr]]) {
+    const wort = woerterbuch.lage?.status?.[zustand]
+    if (typeof wort !== "string" || wort.trim().length === 0) {
+      fehler.push(`Der Zustand ${zustand} hat in ${name} keine Beschriftung — er waere auf der Seite leer.`)
+    }
+  }
 }
 
 /* ═══ 3 · Es zeigt die Belege ════════════════════════════════════════════ */
@@ -128,7 +149,8 @@ if (!/redirect\(\s*["']\/admin\/material#lage["']\s*\)/.test(umleitung)) {
   fehler.push("`/admin/cockpit` leitet nicht auf `/admin/material#lage` um — gemerkte Links liefen ins Leere.")
 }
 const system = ohneKommentare(readFileSync(path.join(ROOT, "app", "(admin)", "admin", "material", "page.tsx"), "utf8"))
-if (!/rolle === "owner" \? \([\s\S]{0,120}<LageRegister \/>/.test(system)) {
+/* Die Komponente traegt seit ADM-01 ihre Sprache als Eigenschaft — Eigenschaften sind erlaubt, das Weglassen der Rollenfrage nicht. */
+if (!/rolle === "owner" \? \([\s\S]{0,160}<LageRegister\b/.test(system)) {
   fehler.push("Die Lage-Register stehen unter System nicht ausschliesslich fuer den Owner — die Cockpit-Freigabe war Owner-only.")
 }
 

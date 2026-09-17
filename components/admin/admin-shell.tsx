@@ -19,6 +19,7 @@ const NAV = [
   { key: "kunden", href: "/admin/kunden" },
   { key: "vertrieb", href: "/admin/vertrieb" },
   { key: "nachweise", href: "/admin/beleg" },
+  { key: "verbindungen", href: "/admin/verbindungen" },
   { key: "system", href: "/admin/material" },
 ] as const
 

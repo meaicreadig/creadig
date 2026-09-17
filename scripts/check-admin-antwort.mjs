@@ -47,25 +47,59 @@ pruefe("Middleware prueft ueber pruefeZugang (Signatur + Widerruf)", /await prue
 pruefe("Middleware kennt verdict `revoked`", /verdict === "revoked"/.test(mw))
 pruefe("Abmelden widerruft serverseitig", /await widerrufen\(speicher, zugang\.sid/.test(route))
 pruefe("Ueberall abmelden nur fuer Owner", /alle && zugang\.rolle !== "owner"/.test(route))
-const actions = readFileSync("app/(admin)/admin/vertrieb/actions.ts", "utf8")
-pruefe("Actions: requireStore prueft Sitzung + Rolle", /async function requireStore\(\)[\s\S]{0,300}pruefeZugang[\s\S]{0,200}darfBetreten/.test(actions))
-const exportiert = [...actions.matchAll(/\nexport async function (\w+)\([^)]*\)[^{]*\{/g)]
-let ohne = []
-for (const m of exportiert) {
-  let i = m.index + m[0].length, tiefe = 1
-  while (tiefe && i < actions.length) { const c = actions[i++]; if (c === "{") tiefe++; else if (c === "}") tiefe-- }
-  if (!actions.slice(m.index, i).includes("requireStore()")) ohne.push(m[1])
+/*
+ * ADM-04 — DIE LISTE DER SCHREIBPUNKTE, NICHT IHRE ZAHL.
+ *
+ * Bis hierher stand hier „genau eine `use server`-Datei". Das war die
+ * richtige Absicht in der falschen Form: Sie verbot nicht das UNGEPRUEFTE
+ * Modul, sondern das ZWEITE — und ein Programm, das eine zweite Flaeche mit
+ * Handlungen baut, haette diesen Waechter gelockert statt erfuellt.
+ *
+ * Jetzt steht hier ein Register: Jede `use server`-Datei muss darin stehen
+ * UND ihren Waechter in JEDER exportierten Funktion aufrufen. Eine neue
+ * Datei faellt weiterhin auf; sie faellt nur nicht mehr auf, WEIL sie neu
+ * ist, sondern weil niemand gesagt hat, wer sie bewacht.
+ */
+const SCHREIBPUNKTE = new Map([
+  [join("app", "(admin)", "admin", "vertrieb", "actions.ts"), "requireStore()"],
+  [join("app", "(admin)", "admin", "verbindungen", "actions.ts"), "requireOwner()"],
+])
+
+for (const [datei, waechter] of SCHREIBPUNKTE) {
+  const quelle = readFileSync(datei, "utf8")
+  const name = waechter.replace("()", "")
+  pruefe(
+    `${datei}: \`${name}\` prueft Sitzung + Rolle`,
+    new RegExp(`async function ${name}\\(\\)[\\s\\S]{0,400}pruefeZugang[\\s\\S]{0,300}darfBetreten`).test(quelle),
+  )
+  const exportiert = [...quelle.matchAll(/\nexport async function (\w+)\([^)]*\)[^{]*\{/g)]
+  const ohne = []
+  for (const m of exportiert) {
+    let i = m.index + m[0].length
+    let tiefe = 1
+    while (tiefe && i < quelle.length) {
+      const c = quelle[i++]
+      if (c === "{") tiefe++
+      else if (c === "}") tiefe--
+    }
+    if (!quelle.slice(m.index, i).includes(waechter)) ohne.push(m[1])
+  }
+  pruefe(
+    `${datei}: jede exportierte Action (${exportiert.length}) ruft ${waechter}`,
+    ohne.length === 0 && exportiert.length > 0,
+    ohne.join(", "),
+  )
 }
-pruefe(`jede exportierte Action (${exportiert.length}) ruft requireStore`, ohne.length === 0 && exportiert.length > 0)
-if (ohne.length) console.log(`     ohne: ${ohne.join(", ")}`)
+
 const serverDateien = ["app", "lib"]
   .flatMap((d) => readdirSync(d, { recursive: true }).map((f) => join(d, String(f))))
   .filter((f) => /\.(ts|tsx)$/.test(f) && /^\s*["']use server["']/m.test(readFileSync(f, "utf8")))
+const unbekannt = serverDateien.filter((f) => !SCHREIBPUNKTE.has(f))
 pruefe(
-  "jede \"use server\"-Datei ist bekannt und geprueft",
-  serverDateien.length === 1 && serverDateien[0] === join("app", "(admin)", "admin", "vertrieb", "actions.ts"),
+  `jede "use server"-Datei steht im Register (${serverDateien.length})`,
+  unbekannt.length === 0 && serverDateien.length === SCHREIBPUNKTE.size,
+  unbekannt.length ? `unbekannt: ${unbekannt.join(", ")}` : "",
 )
-if (serverDateien.length !== 1) console.log(`     gefunden: ${serverDateien.join(", ")}`)
 
 console.log("\n5 · Keine Lade-Grenze (loading.tsx) im Admin")
 /*

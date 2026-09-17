@@ -18,7 +18,7 @@ const PORT = 4393
 const BASE = `http://127.0.0.1:${PORT}`
 const PASSWORT = "probe-owner-nur-lokal"
 const ROUTEN = [
-  "/admin", "/admin/cockpit", "/admin/material", "/admin/beleg",
+  "/admin", "/admin/cockpit", "/admin/material", "/admin/beleg", "/admin/verbindungen",
   "/admin/kunden", "/admin/kunden/gibt-es-nicht",
   "/admin/vertrieb", "/admin/vertrieb/anfragen", "/admin/vertrieb/anfragen/gibt-es-nicht",
   "/admin/vertrieb/beziehungen", "/admin/vertrieb/beziehungen/gibt-es-nicht",
@@ -87,7 +87,15 @@ for (const z of alle) {
   /* Der Zustand muss zum Lauf passen: ohne Speicher „nicht eingerichtet“, gestoert „nicht erreichbar“ — nie beides, nie keiner. */
   const soll = z.lauf === "ohne" ? /nicht eingerichtet/i : /nicht erreichbar/i
   const falsch = z.lauf === "ohne" ? /nicht erreichbar/i : /nicht eingerichtet/i
-  const ausgenommen = z.route === "/admin/material" || z.route === "/admin/cockpit"
+  /*
+   * ADM-04 — `/admin/verbindungen` sagt, was EINGERICHTET ist, nicht was
+   * gerade antwortet: Der Zustand wird aus der Umgebung abgeleitet, und die
+   * Seite ruft beim Rendern ausdruecklich kein fremdes System an (H1). Sie
+   * schreibt stattdessen „in dieser Sitzung nicht geprueft" hin und bietet
+   * die Messung als Handlung an. Die Antwort „eingerichtet, antwortet nicht"
+   * wird deshalb dort bewiesen, wo sie entsteht — `verbindungen-e2e.mjs`.
+   */
+  const ausgenommen = z.route === "/admin/material" || z.route === "/admin/cockpit" || z.route === "/admin/verbindungen"
   const problem =
     z.status >= 500 || z.nullen.length > 0 || z.worte.includes("LAEDT-NOCH") ||
     z.worte.includes("Etwas ist schiefgegangen") ||

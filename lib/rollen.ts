@@ -163,6 +163,22 @@ export const FLAECHEN: readonly Flaeche[] = [
   { pfad: "/admin/cockpit", klasse: "eigene-lage", fuer: ["owner"] },
 
   /*
+   * ADM-04 — das Verbindungsverzeichnis.
+   *
+   * `eigene-lage` und nicht `fremde-personen`: Die Seite nennt keinen
+   * Menschen. Sie sagt, welche Wege in dieses Haus fuehren und ob sie
+   * eingerichtet sind.
+   *
+   * Trotzdem nur `owner`. Sie ist die Landkarte der Angriffsflaeche — welche
+   * Zugaenge existieren, welche gerade nicht antworten, welcher Weg gerade
+   * offen ist. Das ist die Auskunft, die man zuerst haben will, wenn man
+   * hineinkommen moechte, und `vertrieb` braucht sie fuer keine einzige
+   * Aufgabe. Ausserdem loest sie Pruefungen gegen fremde Systeme aus; wer
+   * das darf, entscheidet ueber Last und Kosten.
+   */
+  { pfad: "/admin/verbindungen", klasse: "eigene-lage", fuer: ["owner"] },
+
+  /*
    * PROOF OPERATIONS P1 — der Beleg-Betrieb.
    *
    * `fremde-personen`, obwohl die Seite keine Kundenakte zeigt: Sie nennt

@@ -36,7 +36,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | ADM-01 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` | Cutover mit H14-Hotfix bereits LIVE; Rest = Preview-Deploy dieses Tip (kein Production ohne 017) | Material-Beschriftungen BLOCKED_G18 |
 | ADM-02 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` | Cutover: Deploy + `db-migrate` 015/016 in Produktion, danach Widerruf/Versuchsfenster/Login live messen | Produktionsautorität (Owner) | Cutover H1–H4 = Deploy + Migrationen 015/016 (Produktionsautorität) · `rechnung.faelligAm` BLOCKED_G18 |
 | ADM-03 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | Cutover: Migration 017 **vor** Deploy; danach echte Anfrage im System (LIVE) | Produktionsautorität (Owner) |
-| ADM-04 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Anbieterfreigaben (nach A2-Einstufung) |
+| ADM-04 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | Cutover: mit dem ADM-01/02/03-Paket ausliefern; danach Prüfung gegen die echten Speicher | keiner — **keine CRITICAL-Fähigkeit wartet auf einen Anbieter** (A2) |
 | ADM-05 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | G18 für Rechnung (`lib/rechnung.ts`) |
 | ADM-06 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | meAI-Anbieter/Kosten = Owner |
 | ADM-07 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Produktionsautorität |
@@ -65,6 +65,8 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | **H14** | **Anzeige nach dem Speichern veraltet** — seit dem Einbau von `app/(admin)/admin/vertrieb/loading.tsx` übernahm der Browser die neu gerenderte Seite nach einer Server Action oft nicht: gespeichert war, gezeigt wurde der alte Stand (auch im PRODUKTIVEN Stand `91044de`: Notiz 8/20). Folge für den Owner: erneutes Speichern, Misstrauen in die Daten. | Runtime gemessen, Halbierung über 4 Stände + A/B | **hoch** | ADM-03 | **VERIFIED** (17.09.2026) — Datei entfernt, Gate `check-admin-antwort` §5; 20/20 + 20/20 |
 | **H15** | Inbox-Filter `lower(btrim(email)) NOT LIKE …` ergab bei Anfragen ohne Mail NULL → telefonische Anfragen wären still aus der Inbox verschwunden. | Code + Drill | hoch | ADM-03 | **VERIFIED** — `coalesce` |
 | **H16** | „Chance anlegen“: erst SELECT, dann INSERT, keine Eindeutigkeit → zwei gleichzeitige Klicks = zwei Chancen. | Code + Drill (10 parallel) | mittel | ADM-03 | **VERIFIED** — eindeutiger Index (017) + ON CONFLICT |
+| **H18** | `check-cockpit` war seit der DE/TR-Migration blind: Es suchte die deutschen Zustandswörter im Quelltext der Komponente; die stehen seit ADM-01 im Wörterbuch. Das Gate meldete „kennt den Zustand nicht-erhoben nicht", obwohl die Seite alle drei zeigt — **rot committet in `457b236`**. Zweiter Befund derselben Ursache: `<LageRegister />` trägt seither eine Eigenschaft, das Muster verlangte die blanke Form. | reproduziert (Blindprobe) | mittel (Testhygiene) | ADM-04 | **VERIFIED** — prüft jetzt die drei Schlüssel UND beide Wörterbücher; Blindprobe rot, danach grün |
+| **H19** | Bei nicht erreichbarem Sitzungsspeicher weist `middleware.ts` jede ändernde Anfrage mit 503 ab (H2, zur sicheren Seite). Im Browser stand davon nur „An unexpected response was received from the server" — der Admin sah aus, als nähme er Eingaben an. | Runtime gemessen (Lauf B, tote Datenbank) | mittel | ADM-04 | **VERIFIED** — `/admin/verbindungen` nennt die Schreibsperre und sperrt die Knöpfe (`aria-describedby`); E2E Lauf B |
 | **H17** | `.env.local` enthält eine echte `DATABASE_URL`; Next füllt auch LEER gesetzte Variablen daraus → Prüfskripte mit `DATABASE_URL: ""` konnten eine echte DB erreichen (Rauchtest schickt Formularanfragen). Kein Vorfall (kein `LEAD_STORE` in `.env.local`). | Runtime gemessen | hoch (Risiko) | ADM-03 | **VERIFIED** — alle next-start-Skripte `LEAD_STORE=aus` + `.invalid`; Gate `check-pruefumgebung` |
 
 ---
@@ -106,7 +108,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | Messung | `owner_load_samples`, `measurement_samples` | vorhanden | — |
 | Sitzung | HMAC-Cookie, kein Speicher | Rollen Owner/Vertrieb/Redaktion über getrennte Passwörter | Widerruf (H2) · persönliche Identität |
 | Audit-Log | — | **fehlt** | ADM-02/07 |
-| Verbindung / Fähigkeit / Ereignis | — | **fehlt** | ADM-04 |
+| Verbindung / Fähigkeit / Ereignis | **Code + Umgebung**, bewusst keine Tabelle (A9) | Inventar, 7 Zustände, drei Ebenen, Prüfprotokoll je Instanz | **gebaut in ADM-04** — eine Verbindung mit echtem Anbieter erst, wenn der Owner eine freigibt |
 | Automation / Ausführung | — | **fehlt** (Regel-Module `alert`, `kreislauf`, `empfehlung` rechnen, führen nicht aus) | ADM-06 |
 
 ### OWN / CONNECT / LINK / OBSERVE
@@ -361,6 +363,56 @@ Statische Prüfung aller 32 lesenden Methoden in `lib/vertrieb-store-neon.ts` + 
 
 ---
 
+## ADM-04 · Verbindungen (BUILT + lokal VERIFIED 17.09.2026)
+
+**Kein zweiter Wahrheitsspeicher, keine Migration.** Der Zustand jedes Kanals wird aus Code und Umgebung
+dieser Instanz ABGELEITET (`lib/verbindungen.ts`) — eine eigene Verbindungstabelle hätte neben der
+Umgebung gestanden und wäre auseinandergelaufen (A9). Gemessen wird getrennt und nur auf Auslösung
+(`lib/verbindungen-pruefung.ts`); die Seite ruft beim Rendern kein fremdes System an (H1).
+
+**Drei Ebenen je Kanal** — Fähigkeit · Autorisierung · Adresse. Ein Profillink wird nie als Verbindung
+gezählt: Das Gate prüft strukturell, dass jede Karte mit Adresse den Zustand `LINK_ONLY` trägt.
+
+| Fähigkeit | Einstufung | Zustand ohne Einrichtung | Zustand eingerichtet | prüfbar |
+|---|---|---|---|:--:|
+| Website-Anfrageformular | **CRITICAL** | `NOT_CONFIGURED` | `CONNECTED` | ja (liest eine Zeile) |
+| Anfrage von Hand | **CRITICAL** | `NOT_CONFIGURED` | `CONNECTED` | ja (liest Kennzahlen) |
+| E-Mail-Eingang | OPTIONAL | `NOT_CONFIGURED` (kein Adapter im Repo) | — | nein |
+| E-Mail-Versand | OPTIONAL | `NOT_CONFIGURED` | `CONNECTED` | nur Einrichtung — **kein Testversand** |
+| Terminseite · WhatsApp | OPTIONAL | `LINK_ONLY` | — | nein |
+| LinkedIn · Meta/Instagram | OPTIONAL | `NOT_CONFIGURED` | — | nein |
+| Prüfstand (Testanbieter) | OPTIONAL | nur mit `VERBINDUNG_FIXTURE=an`, nie in Produktion | — | — |
+
+**Die Frage oben:** „Kommt eine Anfrage an?" zählt ausschliesslich CRITICAL. Ein nicht eingerichteter
+LinkedIn-Kanal löst keine Warnung aus — eine Warnung, die immer steht, wird nach dem dritten Mal Tapete.
+
+**Prüfung behauptet nur, was sie getan hat.** Ergebnis trägt `reichweite`: `gemessen` (Gegenstelle hat
+geantwortet, mit Dauer) oder `konfiguration` (nur Einrichtung, nichts gesendet). Zeitgrenze 8 s. Das
+Protokoll liegt im Arbeitsspeicher der Instanz und sagt das auf der Seite — eine gespeicherte Messung von
+vorgestern sähe aus wie ein Zustand.
+
+**Rolle:** `/admin/verbindungen` ist Owner-only (`eigene-lage`). Sie nennt keinen Menschen, ist aber die
+Landkarte der Zugänge; `vertrieb` braucht sie für keine Aufgabe, und sie löst Prüfungen gegen fremde
+Systeme aus.
+
+| Prüfung | Ergebnis | Art |
+|---|---|---|
+| `verbindung-drill` V0/V1/V1b · A15–A18 · V2 | PASS 58/58 — Inventar ehrlich · Zustand folgt Umgebung · Prüfstand nie in Produktion · verbinden/widerrufen idempotent · 10× gleichzeitig derselbe Schlüssel = 1 Wirkung · Widerruf lehnt ab · Anbieterfehler = `DEGRADED` mit erhaltener Erlaubnis · jeder Maschinenwert in DE **und** TR | rein, ohne Server |
+| `check-verbindungen` (Gate, in `postbuild`) | PASS — Fläche angemeldet + Owner-only · Seite misst nicht beim Rendern · jede Action prüft selbst · Prüfstand in Produktion hart aus · Prüfpfad ohne `fetch`/Versand/Schreiben · eingefrorene Kritikalität | statisch |
+| `verbindungen-e2e` — 3 Welten, 46 Prüfungen | **PASS** — A: nicht eingerichtet, Prüfung meldet es, Vertrieb kommt nicht hinein, kein Prüfstand · B: Schreibsperre benannt, Knopf gesperrt (H19) · C: echte Postgres, „Antwortet." in 4 ms, A15–A18 im Browser, TR ohne deutschen Rest, mobil 390 ohne Überlauf, axe 0 in drei Lagen | Chromium, `next start`, Postgres lokal |
+| `admin-zustaende` mit neuer Route | **34/34** (vorher 32) | gerendert, 2 Lagen |
+| build + alle Gates · `admin-e2e` · `admin-sprache-e2e` · smoke | PASS | lokal |
+
+**A2-Stand:** Keine CRITICAL-Fähigkeit hängt an einer Anbieterfreigabe. Der Eingang ist vollständig in
+eigener Hand (Formular + Handerfassung); LinkedIn/Meta/Kalender/WhatsApp bleiben OPTIONAL und
+`NOT_CONFIGURED`, ohne 99 % zu blockieren. **ADM-04 ist damit nicht `WAITING_EXTERNAL`.**
+
+**Grenze, offen benannt:** Der Prüfstand beweist das MODELL (A15–A18), nicht einen Anbieter. Sobald der
+Owner eine echte Integration freigibt, wird sie gegen dasselbe Modell gebaut — die Karte, die Zustände
+und das Gate stehen schon.
+
+---
+
 ## H14 · Produktions-Hotfix (LIVE 17.09.2026)
 
 **Owner-Entscheidung 17.09.2026**: H14 sofort als isolierter Hotfix. Migrationen 015/016/017 **nicht** freigegeben (017 erst vor dem ersten Deploy, der sie braucht; vorher Cutover-Paket). Danach Programm ohne weitere Weichenstellung fortsetzen.
@@ -391,6 +443,7 @@ Statische Prüfung aller 32 lesenden Methoden in `lib/vertrieb-store-neon.ts` + 
 | `/admin/material` | Seite | offen (ADM-01) | Einstellungen/System | Material dominiert nicht die Navigation |
 | `/admin/vertrieb`, `/anfragen`, `/beziehungen`, `/pipeline`, `/recherche`, `/verlust` | Seiten | offen (ADM-00 IA) | — | Ziel-IA §Anfragen/Kunden/Vertrieb |
 | `/admin/beleg` | Seite | offen | Nachweise & Freigaben | — |
+| `/admin/verbindungen` | **NEU** 17.09.2026 | — | — | ADM-04 · Verbindungsverzeichnis, Owner-only, in der Navigation zwischen Nachweisen und System |
 
 ## Schreibpfade (A5)
 
@@ -398,7 +451,20 @@ Noch nicht erhoben — ADM-03.
 
 ## Integrationen (A2/A9)
 
-Noch nicht erhoben. Vorab bekannt: Website-Formular → `leads` (eigener Schreibpfad, OWN). meAI in eigenen Repos (`meai`, `meai-os`) — Reuse prüfen. LinkedIn/Instagram: Fähigkeit unbekannt, nicht angenommen.
+**Erhoben 17.09.2026** — Quelle: `lib/verbindungen.ts` (abgeleitet aus Code + Umgebung), sichtbar unter `/admin/verbindungen`.
+
+| Fähigkeit | Einstufung | Adapter im Repo | Autorisierung | Reuse-Entscheidung (A9) |
+|---|---|---|---|---|
+| Website-Formular → `leads` | **CRITICAL** | ja (`app/api/lead/route.ts` → `storeLead`) | öffentlich + Token/Fingerprint | OWN, bleibt |
+| Anfrage von Hand | **CRITICAL** | ja (ADM-03 `createEnquiry`) | Admin-Sitzung + Rolle | OWN |
+| E-Mail-Versand (Resend) | OPTIONAL | ja (ausgehend) | `RESEND_API_KEY` | bestehend, kein zweiter Versandweg |
+| E-Mail-Eingang | OPTIONAL | **nein** — echter Adapter nur im meAI-Altprodukt (andere DB) | — | **kein zweiter Mail-Speicher**; falls gebaut: `lib/meai/mail` wiederverwenden |
+| Kalender | OPTIONAL | nein (nur `/termin`) | — | LINK, kein Sync |
+| WhatsApp | OPTIONAL | nein (nur `wa.me`) | — | LINK |
+| LinkedIn · Meta/Instagram | OPTIONAL | nein | kein OAuth | OBSERVE, ehrlich `NOT_CONFIGURED` |
+| Prüfstand (Testanbieter) | — | Fixture, Arbeitsspeicher | Fixture-Token | nie Produktion (`VERBINDUNG_FIXTURE` + `VERCEL_ENV`-Sperre) |
+
+**Folge für A2:** Keine CRITICAL-Fähigkeit hängt an einer fremden Freigabe. Das Programm ist deshalb wegen Integrationen **nicht** `WAITING_EXTERNAL`.
 
 ---
 
@@ -424,5 +490,7 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 17.09.2026 | 3 | Owner: H14-Hotfix freigegeben, Migrationen nicht. Hotfix `e1bc9ec` isoliert gebaut und geprüft (16/20 → 20/20); Push vom Berechtigungssystem blockiert → Owner |
 | 17.09.2026 | 3 | **H14 LIVE** — Push OK · Promote Ready · Production `dpl_7siNz9VcwZJnkjdAsRq5gbRx7U2w` / `creadig-qxsfr8p2v` · Aliases `creadig.de` · SHA `e1bc9ec` · Rauchprüfung GET `/` + `/admin/login` 200 · Migrationen unberührt |
 
-**Fortsetzungspunkt:** ADM-04 — Verbindungsmodell + Connection Center (ehrlich NOT_CONFIGURED); Testanbieter-Fixture für A15–A18. Migrationen 015–017 weiter **nicht** freigegeben. Production-Tip nicht promoten ohne Cutover-Paket.
+| 17.09.2026 | 4 | **ADM-04 BUILT/lokal VERIFIED** — Verbindungsverzeichnis `/admin/verbindungen` (DE/TR, Owner-only), Fähigkeit ≠ Autorisierung ≠ Adresse, Prüfung getrennt von Ableitung, Prüfstand für A15–A18; Gate + Drill in `postbuild`; H18 (blindes Cockpit-Gate) und H19 (stille Schreibsperre) gefunden und behoben |
+
+**Fortsetzungspunkt:** ADM-05 — Betrieb/Kommerz/Beleg. Migrationen 015–017 weiter **nicht** freigegeben. Production-Tip nicht promoten ohne Cutover-Paket.
 | 17.09.2026 | 4 | **ADM-01 DE/TR CLOSED lokal** — Gate 34 migriert / 0 offen / 823 Texte; Chance/Angebot/Lieferung + Listen + Detail + Beleg/Material/Lage/Error/Primitives | Material-Labels BLOCKED_G18 |
