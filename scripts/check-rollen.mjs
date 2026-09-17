@@ -108,7 +108,9 @@ if (!ausstellen) fehler.push("`issueSession()` gibt es nicht mehr.")
 if (!pruefen) fehler.push("`verifySession()` gibt es nicht mehr.")
 
 /* Beide muessen die Rolle in die signierte Nutzlast nehmen. */
-const signiertRolle = (q) => /sign\(\s*`\$\{rolle\}\.\$\{expiresAt\}`|sign\(\s*nutzlast/.test(q)
+/* ADM-02 · H2: die Nutzlast traegt seit 17.09.2026 zusaetzlich die Sitzungs-ID
+   (`${rolle}.${expiresAt}.${sid}`) — die Rolle bleibt UNTER der Signatur. */
+const signiertRolle = (q) => /sign\(\s*`\$\{rolle\}\.\$\{expiresAt\}\.\$\{sid\}`|sign\(\s*nutzlast/.test(q)
 if (ausstellen && !signiertRolle(ausstellen)) {
   fehler.push(
     "`issueSession()` signiert die Rolle nicht mit. Stuende sie neben der Signatur, koennte " +
@@ -120,6 +122,9 @@ if (pruefen && !signiertRolle(pruefen)) {
     "`verifySession()` prueft die Signatur nicht ueber der Rolle. Ausstellen und Pruefen " +
       "muessen ueber dasselbe signieren.",
   )
+}
+if (ausstellen && !/const nutzlast = `\$\{rolle\}\.\$\{expiresAt\}\.\$\{sid\}`/.test(ausstellen)) {
+  fehler.push("`issueSession()` signiert die Sitzungs-ID nicht mit — ohne sie ist Abmelden kein Widerruf (ADM-02 · H2).")
 }
 if (!/istRolle\s*\(/.test(pruefen)) {
   fehler.push("Die Sitzung prueft die Rolle nicht gegen das Register.")

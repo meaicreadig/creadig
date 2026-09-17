@@ -10,7 +10,8 @@
  * haelt fest, dass die Stellen, die ihn tragen, nicht still verschwinden.
  * Aufruf: `node --import ./scripts/lib/alias-hook.mjs scripts/check-admin-antwort.mjs`
  */
-import { readFileSync } from "node:fs"
+import { readFileSync, readdirSync } from "node:fs"
+import { join } from "node:path"
 
 import { ADMIN_RESPONSE_HEADERS, sameOrigin } from "@/lib/admin-session"
 
@@ -40,6 +41,31 @@ const route = readFileSync("app/api/admin/session/route.ts", "utf8")
 pruefe("POST prueft Ursprung", /export async function POST[\s\S]{0,200}sameOrigin\(request\)/.test(route))
 pruefe("DELETE prueft Ursprung", /export async function DELETE[\s\S]{0,120}sameOrigin\(request\)/.test(route))
 pruefe("Route-Antworten tragen Admin-Header", (route.match(/withAdminHeaders\(/g) ?? []).length >= 4)
+
+console.log("\n4 · Widerruf und Autorisierung am Schreibpunkt (H2/H8)")
+pruefe("Middleware prueft ueber pruefeZugang (Signatur + Widerruf)", /await pruefeZugang\(request\.cookies\.get\(ADMIN_COOKIE\)\?\.value, \{ aendernd \}\)/.test(mw))
+pruefe("Middleware kennt verdict `revoked`", /verdict === "revoked"/.test(mw))
+pruefe("Abmelden widerruft serverseitig", /await widerrufen\(speicher, zugang\.sid/.test(route))
+pruefe("Ueberall abmelden nur fuer Owner", /alle && zugang\.rolle !== "owner"/.test(route))
+const actions = readFileSync("app/(admin)/admin/vertrieb/actions.ts", "utf8")
+pruefe("Actions: requireStore prueft Sitzung + Rolle", /async function requireStore\(\)[\s\S]{0,300}pruefeZugang[\s\S]{0,200}darfBetreten/.test(actions))
+const exportiert = [...actions.matchAll(/\nexport async function (\w+)\([^)]*\)[^{]*\{/g)]
+let ohne = []
+for (const m of exportiert) {
+  let i = m.index + m[0].length, tiefe = 1
+  while (tiefe && i < actions.length) { const c = actions[i++]; if (c === "{") tiefe++; else if (c === "}") tiefe-- }
+  if (!actions.slice(m.index, i).includes("requireStore()")) ohne.push(m[1])
+}
+pruefe(`jede exportierte Action (${exportiert.length}) ruft requireStore`, ohne.length === 0 && exportiert.length > 0)
+if (ohne.length) console.log(`     ohne: ${ohne.join(", ")}`)
+const serverDateien = ["app", "lib"]
+  .flatMap((d) => readdirSync(d, { recursive: true }).map((f) => join(d, String(f))))
+  .filter((f) => /\.(ts|tsx)$/.test(f) && /^\s*["']use server["']/m.test(readFileSync(f, "utf8")))
+pruefe(
+  "jede \"use server\"-Datei ist bekannt und geprueft",
+  serverDateien.length === 1 && serverDateien[0] === join("app", "(admin)", "admin", "vertrieb", "actions.ts"),
+)
+if (serverDateien.length !== 1) console.log(`     gefunden: ${serverDateien.join(", ")}`)
 
 console.log(fehler ? `\n✗ ${fehler} Befund(e)\n` : "\n✓ Admin-Antwort-Gate gruen\n")
 process.exit(fehler ? 1 : 0)

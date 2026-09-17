@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { ADMIN_COOKIE, verifySession, withAdminHeaders } from "@/lib/admin-session"
+import { ADMIN_COOKIE, sessionCookieOptions, withAdminHeaders } from "@/lib/admin-session"
+import { pruefeZugang } from "@/lib/admin-widerruf"
 import { ausweichZiel, darfBetreten } from "@/lib/rollen"
 import { LOCALE_COOKIE, nenntSprache, spracheFuer } from "@/lib/locale-markt"
 import { localePath } from "@/lib/routes"
@@ -125,7 +126,19 @@ async function adminZugang(request: NextRequest, pathname: string): Promise<Next
   /* Die Anmeldeseite selbst darf nicht hinter der Anmeldung liegen. */
   if (pathname === "/admin/login") return NextResponse.next()
 
-  const { verdict, rolle } = await verifySession(request.cookies.get(ADMIN_COOKIE)?.value)
+  /*
+   * ADM-02 · H2 — Signatur, Ablauf UND Widerruf (`lib/admin-widerruf.ts`).
+   * Alles ausser GET/HEAD gilt als aendernd (Server Actions sind POST).
+   */
+  const aendernd = request.method !== "GET" && request.method !== "HEAD"
+  const { verdict, rolle } = await pruefeZugang(request.cookies.get(ADMIN_COOKIE)?.value, { aendernd })
+
+  if (verdict === "unavailable" && aendernd) {
+    return NextResponse.json(
+      { ok: false, error: "session_store_unavailable" },
+      { status: 503, headers: { "Retry-After": "30" } },
+    )
+  }
 
   /*
    * GATE 32 — ZWEI FRAGEN, NICHT EINE.
@@ -161,6 +174,12 @@ async function adminZugang(request: NextRequest, pathname: string): Promise<Next
    * Center hat heute eine Seite. Nach dem Anmelden geht es auf `/admin`.
    */
   if (verdict === "expired") login.searchParams.set("abgelaufen", "1")
+  if (verdict === "revoked") {
+    login.searchParams.set("widerrufen", "1")
+    const antwort = NextResponse.redirect(login)
+    antwort.cookies.set(ADMIN_COOKIE, "", sessionCookieOptions(0))
+    return antwort
+  }
   return NextResponse.redirect(login)
 }
 

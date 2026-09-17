@@ -1,6 +1,11 @@
 "use server"
 
+import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
+
+import { ADMIN_COOKIE } from "@/lib/admin-session"
+import { pruefeZugang } from "@/lib/admin-widerruf"
+import { darfBetreten } from "@/lib/rollen"
 import { LOST_REASONS } from "@/lib/sales-playbook"
 
 import { SALES_STATES, getVertriebStore, type SalesStatus } from "@/lib/lead-store"
@@ -45,7 +50,21 @@ function text(value: FormDataEntryValue | null): string | null {
   return trimmed.length === 0 ? null : trimmed
 }
 
-function requireStore() {
+/*
+ * ADM-02 · H8 (17.09.2026) — DIE ACTION PRUEFT SELBST.
+ *
+ * Bis hierher verliess sich jede Action allein auf `middleware.ts`. Das
+ * haelt nur, solange eine Action ausschliesslich ueber eine Admin-Adresse
+ * erreichbar ist — eine Annahme ueber das Routing von Next, keine Regel
+ * dieses Hauses. Der Admin-Vertrag verlangt Autorisierung serverseitig am
+ * Schreibpunkt: Sitzung, Widerruf und Rolle werden deshalb HIER erneut
+ * geprueft, bevor der Speicher auch nur geholt wird.
+ */
+async function requireStore() {
+  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
+  if (zugang.verdict !== "ok" || !darfBetreten(zugang.rolle, "/admin/vertrieb")) {
+    throw new Error("Nicht berechtigt")
+  }
   const store = getVertriebStore()
   if (!store) throw new Error("Vertriebs-Speicher nicht verfügbar")
   return store
@@ -104,7 +123,7 @@ export async function setOpportunityStatus(id: string, form: FormData): Promise<
    * gespeicherten Wert exakt entsprechen.
    */
   const gewaehlt = text(form.get("lostReason"))
-  const store = requireStore()
+  const store = (await requireStore())
   const bisher = status === "lost" ? (await store.getOpportunity(id))?.lostReason ?? null : null
   const ausVerzeichnis = gewaehlt !== null && (LOST_REASONS as readonly string[]).includes(gewaehlt)
   const altbestand = gewaehlt !== null && bisher !== null && gewaehlt === bisher
@@ -118,12 +137,12 @@ export async function setOpportunityNextAction(id: string, form: FormData): Prom
   const action = text(form.get("nextAction"))
   /* Ein Datum ohne Aufgabe ist keine Aufgabe. */
   const at = action === null ? null : text(form.get("nextActionAt"))
-  await requireStore().updateOpportunityNextAction(id, action, at)
+  await (await requireStore()).updateOpportunityNextAction(id, action, at)
   refresh(`/admin/vertrieb/pipeline/${id}`, "/admin/vertrieb/pipeline")
 }
 
 export async function setOpportunityNote(id: string, form: FormData): Promise<void> {
-  await requireStore().updateOpportunityNote(id, text(form.get("note")))
+  await (await requireStore()).updateOpportunityNote(id, text(form.get("note")))
   refresh(`/admin/vertrieb/pipeline/${id}`)
 }
 
@@ -132,7 +151,7 @@ export async function setOpportunityNote(id: string, form: FormData): Promise<vo
 export async function setEnquiryHandling(id: string, form: FormData): Promise<void> {
   const status = form.get("handling")
   if (typeof status !== "string" || !(HANDLING_STATES as readonly string[]).includes(status)) return
-  await requireStore().setLeadHandling(id, status as HandlingStatus)
+  await (await requireStore()).setLeadHandling(id, status as HandlingStatus)
   refresh(`/admin/vertrieb/anfragen/${id}`, "/admin/vertrieb/anfragen")
 }
 
@@ -144,7 +163,7 @@ export async function setEnquiryHandling(id: string, form: FormData): Promise<vo
  * Vorgang trotzdem, nur eben ohne sie. Erfunden wird nichts.
  */
 export async function createOpportunityFromEnquiry(id: string, form: FormData): Promise<void> {
-  const store = requireStore()
+  const store = (await requireStore())
   const enquiry = await store.getEnquiry(id)
   if (!enquiry) return
 
@@ -188,7 +207,7 @@ export async function createOpportunityFromEnquiry(id: string, form: FormData): 
  * unbekannter Wert aendert nichts, statt eine kaputte Zeile zu erzeugen.
  */
 export async function setOpportunityOffer(id: string, form: FormData): Promise<void> {
-  const store = requireStore()
+  const store = (await requireStore())
   const raw = text(form.get("offerKind"))
   const offerKind: OfferKind | null =
     raw && (OFFER_KINDS as readonly string[]).includes(raw) ? (raw as OfferKind) : null
@@ -228,7 +247,7 @@ export async function createOpportunityForOrganisation(
   organisationId: string,
   form: FormData,
 ): Promise<void> {
-  const store = requireStore()
+  const store = (await requireStore())
   const organisation = await store.getOrganisation(organisationId)
   if (!organisation) return
 
@@ -260,7 +279,7 @@ export async function createOpportunityForOrganisation(
  * einer KI gelesen. Er muss Daten bleiben.
  */
 export async function addResearchEvidence(caseId: string, form: FormData): Promise<void> {
-  const store = requireStore()
+  const store = (await requireStore())
   const kind = text(form.get("kind"))
   const claim = text(form.get("claim"))
   const sourceUrl = text(form.get("sourceUrl"))
@@ -289,7 +308,7 @@ export async function addResearchEvidence(caseId: string, form: FormData): Promi
  * Mensch.
  */
 export async function setResearchCase(id: string, form: FormData): Promise<void> {
-  const store = requireStore()
+  const store = (await requireStore())
   const status = text(form.get("status"))
   const access = text(form.get("access"))
   const serviceable = text(form.get("serviceable"))
@@ -314,7 +333,7 @@ export async function setResearchCase(id: string, form: FormData): Promise<void>
  * Vermutung darf keinen Menschen erreichen.
  */
 export async function setResearchPerson(caseId: string, form: FormData): Promise<void> {
-  const store = requireStore()
+  const store = (await requireStore())
   const contactId = text(form.get("contactId"))
   if (!contactId) {
     await store.linkResearchContact(caseId, null)
@@ -344,7 +363,7 @@ export async function setResearchPerson(caseId: string, form: FormData): Promise
  * Gate.
  */
 export async function decideResearchContact(caseId: string, form: FormData): Promise<void> {
-  const store = requireStore()
+  const store = (await requireStore())
   const raw = text(form.get("decision"))
   const decision = DECISIONS.includes(raw as Decision) ? (raw as Decision) : null
   await store.decideContact(caseId, decision, text(form.get("note")))
@@ -356,12 +375,12 @@ export async function decideResearchContact(caseId: string, form: FormData): Pro
 export async function setRelationship(id: string, form: FormData): Promise<void> {
   const level = form.get("relationship")
   if (typeof level !== "string" || !(RELATIONSHIP_LEVELS as readonly string[]).includes(level)) return
-  await requireStore().updateContactRelationship(id, level as RelationshipLevel)
+  await (await requireStore()).updateContactRelationship(id, level as RelationshipLevel)
   refresh(`/admin/vertrieb/beziehungen/${id}`, "/admin/vertrieb/beziehungen")
 }
 
 export async function setContactDetails(id: string, form: FormData): Promise<void> {
-  const store = requireStore()
+  const store = (await requireStore())
   const contact = await store.getContact(id)
   if (!contact) return
 
@@ -387,14 +406,14 @@ export async function setContactDetails(id: string, form: FormData): Promise<voi
 export async function setContactOrganisation(id: string, form: FormData): Promise<void> {
   const raw = form.get("organisationId")
   const organisationId = typeof raw === "string" && raw.trim() !== "" ? raw.trim() : null
-  await requireStore().updateContactOrganisation(id, organisationId)
+  await (await requireStore()).updateContactOrganisation(id, organisationId)
   refresh(`/admin/vertrieb/beziehungen/${id}`, "/admin/vertrieb/beziehungen")
 }
 
 export async function setNextTouch(id: string, form: FormData): Promise<void> {
   const touch = text(form.get("nextTouch"))
   const at = touch === null ? null : text(form.get("nextTouchAt"))
-  await requireStore().updateContactNextTouch(id, touch, at)
+  await (await requireStore()).updateContactNextTouch(id, touch, at)
   refresh(`/admin/vertrieb/beziehungen/${id}`, "/admin/vertrieb/beziehungen")
 }
 
@@ -409,7 +428,7 @@ export async function setNextTouch(id: string, form: FormData): Promise<void> {
  * nicht provozieren.
  */
 export async function setOrganisationDetails(id: string, form: FormData): Promise<void> {
-  const store = requireStore()
+  const store = (await requireStore())
   const organisation = await store.getOrganisation(id)
   if (!organisation) return
 
@@ -440,7 +459,7 @@ export async function setOrganisationDetails(id: string, form: FormData): Promis
 export async function setOrganisationLifecycle(id: string, form: FormData): Promise<void> {
   const stage = form.get("lifecycle")
   if (typeof stage !== "string" || !(LIFECYCLE_STAGES as readonly string[]).includes(stage)) return
-  await requireStore().updateOrganisationLifecycle(id, stage as LifecycleStage)
+  await (await requireStore()).updateOrganisationLifecycle(id, stage as LifecycleStage)
   refresh(`/admin/kunden/${id}`, "/admin/kunden")
 }
 
@@ -465,7 +484,7 @@ function locationInput(form: FormData): LocationInput | null {
 export async function addLocation(organisationId: string, form: FormData): Promise<void> {
   const input = locationInput(form)
   if (!input) return
-  await requireStore().createLocation(organisationId, input)
+  await (await requireStore()).createLocation(organisationId, input)
   refresh(`/admin/kunden/${organisationId}`)
 }
 
@@ -476,7 +495,7 @@ export async function saveLocation(
 ): Promise<void> {
   const input = locationInput(form)
   if (!input) return
-  await requireStore().updateLocation(locationId, input)
+  await (await requireStore()).updateLocation(locationId, input)
   refresh(`/admin/kunden/${organisationId}`)
 }
 
@@ -489,7 +508,7 @@ export async function saveLocation(
  * hält fest, dass es geschehen ist.
  */
 export async function removeLocation(organisationId: string, locationId: string): Promise<void> {
-  await requireStore().deleteLocation(locationId)
+  await (await requireStore()).deleteLocation(locationId)
   refresh(`/admin/kunden/${organisationId}`)
 }
 
@@ -516,7 +535,7 @@ export async function saveAngebotEntwurf(
   opportunityId: string,
   form: FormData,
 ): Promise<AngebotAntwort> {
-  const store = requireStore()
+  const store = (await requireStore())
   const kind = text(form.get("kind"))
   if (!kind || !(OFFER_KINDS as readonly string[]).includes(kind)) {
     return { ok: false, befunde: [{ abschnitt: "Angebotsart", satz: "Keine gültige Angebotsart gewählt." }] }
@@ -576,7 +595,7 @@ export async function saveAngebotEntwurf(
 export async function sendAngebot(opportunityId: string, form: FormData): Promise<AngebotAntwort> {
   const id = text(form.get("id"))
   if (!id) return { ok: false, befunde: [{ abschnitt: "Angebot", satz: "Kein Angebot angegeben." }] }
-  const befunde = await requireStore().sendOffer(id)
+  const befunde = await (await requireStore()).sendOffer(id)
   refresh(`/admin/vertrieb/pipeline/${opportunityId}`, "/admin/vertrieb/pipeline")
   return { ok: befunde.length === 0, befunde }
 }
@@ -593,7 +612,7 @@ export async function acceptAngebot(opportunityId: string, form: FormData): Prom
     am: text(form.get("am")) ?? "",
     fundstelle: text(form.get("fundstelle")) ?? "",
   }
-  const befunde = await requireStore().acceptOffer(id, annahme)
+  const befunde = await (await requireStore()).acceptOffer(id, annahme)
   refresh(`/admin/vertrieb/pipeline/${opportunityId}`, "/admin/vertrieb/pipeline")
   return { ok: befunde.length === 0, befunde }
 }
@@ -610,7 +629,7 @@ export type LieferAntwort = { ok: boolean; maengel: Mangel[] }
 export async function projektStarten(opportunityId: string, form: FormData): Promise<LieferAntwort> {
   const offerId = text(form.get("offerId"))
   if (!offerId) return { ok: false, maengel: [{ bereich: "Grundlage", satz: "Kein Angebot angegeben." }] }
-  const { maengel } = await requireStore().startProject(offerId)
+  const { maengel } = await (await requireStore()).startProject(offerId)
   refresh(`/admin/vertrieb/pipeline/${opportunityId}`)
   return { ok: maengel.length === 0, maengel }
 }
@@ -624,7 +643,7 @@ export async function materialEingetroffen(
   if (!id || !am) {
     return { ok: false, maengel: [{ bereich: "Material", satz: "Projekt oder Datum fehlt." }] }
   }
-  const maengel = await requireStore().receiveMaterial(id, am)
+  const maengel = await (await requireStore()).receiveMaterial(id, am)
   refresh(`/admin/vertrieb/pipeline/${opportunityId}`)
   return { ok: maengel.length === 0, maengel }
 }
@@ -642,7 +661,7 @@ export async function abnahmeEintragen(opportunityId: string, form: FormData): P
     am: text(form.get("am")) ?? "",
     fundstelle: text(form.get("fundstelle")) ?? "",
   }
-  const maengel = await requireStore().acceptDelivery(id, abnahme)
+  const maengel = await (await requireStore()).acceptDelivery(id, abnahme)
   refresh(`/admin/vertrieb/pipeline/${opportunityId}`, "/admin/vertrieb/pipeline")
   return { ok: maengel.length === 0, maengel }
 }
@@ -656,7 +675,7 @@ export async function uebergabeEintragen(opportunityId: string, form: FormData):
     const wie = text(form.get(`wie_${stueck.key}`))
     if (am && wie) stuecke[stueck.key] = { am, wie }
   }
-  const maengel = await requireStore().handOver(id, stuecke)
+  const maengel = await (await requireStore()).handOver(id, stuecke)
   refresh(`/admin/vertrieb/pipeline/${opportunityId}`)
   return { ok: maengel.length === 0, maengel }
 }

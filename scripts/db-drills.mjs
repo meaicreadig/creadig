@@ -58,6 +58,8 @@ const LAEUFE = [
   { name: "rechnung", db: "drill_rechnung", variable: "RECHNUNG_DRILL_URL" },
   /* GATE 20 — die Kette ueber Angebot, Rechnung und Lieferung hinweg. */
   { name: "kette", db: "drill_kette", variable: "KETTE_DRILL_URL" },
+  /* ADM-02 · H2 — Sitzungswiderruf. */
+  { name: "sitzung", db: "drill_sitzung", variable: "SITZUNG_DRILL_URL" },
 ]
 
 function psql(sql) {

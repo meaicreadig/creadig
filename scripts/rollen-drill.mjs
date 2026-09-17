@@ -44,19 +44,21 @@ p(R.darfBetreten("vertrieb", "/admin/kunden/abc123"), "die Kundenakte schon")
 
 console.log("\nR4 · Jede Flaeche mit Personendaten ist eng vergeben")
 const eng = R.FLAECHEN.filter((f) => R.KLASSEN[f.klasse].eng)
-p(eng.length === 12, `${eng.length} Flaechen tragen Personendaten Dritter`)
+/* 12 → 13 seit `157e1fa` (/admin/beleg, Owner-only). Der Drill war seitdem rot,
+   ohne dass es auffiel — er stand in keiner Kette. Nachgezogen 17.09.2026 (ADM-02). */
+p(eng.length === 13, `${eng.length} Flaechen tragen Personendaten Dritter`)
 p(eng.every((f) => !f.fuer.includes("redaktion")), "keine davon fuer die Redaktion")
 p(eng.every((f) => f.fuer.includes("owner")), "alle fuer den Owner")
 
 console.log("\nR5 · Die Sitzung traegt die Rolle — und sie ist mitsigniert")
 const token = await S.issueSession("vertrieb")
-p(typeof token === "string" && token.split(".").length === 3, "drei Felder: Rolle, Ablauf, Signatur")
+p(typeof token === "string" && token.split(".").length === 4, "vier Felder: Rolle, Ablauf, Sitzungs-ID, Signatur (ADM-02 · H2)")
 const echt = await S.verifySession(token)
 p(echt.verdict === "ok" && echt.rolle === "vertrieb", "die Rolle kommt zurueck")
 
 console.log("\nR6 · Der Angriff, gegen den die Signatur ueber der Rolle liegt")
-const [, ablauf, sig] = token.split(".")
-const gefaelscht = `owner.${ablauf}.${sig}`
+const [, ablauf, sid, sig] = token.split(".")
+const gefaelscht = `owner.${ablauf}.${sid}.${sig}`
 const versuch = await S.verifySession(gefaelscht)
 p(versuch.verdict === "invalid", "Rolle auf `owner` umgeschrieben: ungueltig",
   "laege die Rolle neben der Signatur, waere das die Uebernahme")
@@ -64,10 +66,11 @@ p(versuch.rolle === null, "und es kommt keine Rolle zurueck")
 
 console.log("\nR7 · Weitere Faelschungen")
 const faelle = [
-  ["vertrieb.<ablauf>.falsch", `vertrieb.${ablauf}.${"a".repeat(sig.length)}`],
+  ["vertrieb.<ablauf>.<sid>.falsch", `vertrieb.${ablauf}.${sid}.${"a".repeat(sig.length)}`],
   ["altes Format ohne Rolle", `${ablauf}.${sig}`],
-  ["Rolle, die es nicht gibt", `admin.${ablauf}.${sig}`],
-  ["vier Felder", `vertrieb.${ablauf}.${sig}.x`],
+  ["altes Format ohne Sitzungs-ID", `vertrieb.${ablauf}.${sig}`],
+  ["Rolle, die es nicht gibt", `admin.${ablauf}.${sid}.${sig}`],
+  ["fuenf Felder", `vertrieb.${ablauf}.${sid}.${sig}.x`],
   ["leer", ""],
   ["nur Punkte", "..."],
   ["sehr lang", "x".repeat(500)],

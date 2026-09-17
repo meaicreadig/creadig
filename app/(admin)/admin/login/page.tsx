@@ -21,6 +21,8 @@ export default async function AdminLoginPage({
 }) {
   const params = await searchParams
   const expired = params.abgelaufen === "1"
+  /* ADM-02 · H2 — eine widerrufene Sitzung ist kein Ablauf und kein Fehler. */
+  const revoked = params.widerrufen === "1"
 
   return (
     <main className="bg-background text-foreground grid min-h-dvh place-items-center px-6 py-16">
@@ -33,6 +35,14 @@ export default async function AdminLoginPage({
             className="border-gold/45 text-foreground/80 type-small mt-6 border-s-2 ps-4 text-pretty"
           >
             Die Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.
+          </p>
+        )}
+        {revoked && (
+          <p
+            role="status"
+            className="border-gold/45 text-foreground/80 type-small mt-6 border-s-2 ps-4 text-pretty"
+          >
+            Diese Sitzung wurde abgemeldet. Bitte melden Sie sich erneut an.
           </p>
         )}
         <AdminLoginForm />

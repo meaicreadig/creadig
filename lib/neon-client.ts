@@ -654,6 +654,21 @@ export const SCHEMA: string[] = [
    )`,
   `CREATE UNIQUE INDEX IF NOT EXISTS measurement_samples_key_idx
      ON measurement_samples (metric_key, side, measured_on)`,
+
+  /*
+   * 015 · ADMIN OS · H2 — widerrufene Admin-Sitzungen.
+   * Siehe `scripts/migrations/015-sitzungswiderruf.sql` und
+   * `lib/admin-widerruf.ts`. Nicht in `REQUIRED_TABLES`: Fehlt sie, faellt
+   * kein Vertriebsvorgang aus — Abmelden wirkt dann nur im eigenen Browser.
+   */
+  `CREATE TABLE IF NOT EXISTS admin_session_revocations (
+     sid text PRIMARY KEY,
+     revoked_at timestamptz NOT NULL DEFAULT now(),
+     expires_at timestamptz NOT NULL,
+     reason text NOT NULL
+   )`,
+  `CREATE INDEX IF NOT EXISTS admin_session_revocations_expires_idx
+    ON admin_session_revocations (expires_at)`,
 ]
 
 /**

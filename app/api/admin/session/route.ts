@@ -9,6 +9,7 @@ import {
   sessionCookieOptions,
   withAdminHeaders,
 } from "@/lib/admin-session"
+import { alleWiderrufen, pruefeZugang, widerrufSpeicher, widerrufen } from "@/lib/admin-widerruf"
 import { bucketKey, callerAddress, withinLimit } from "@/lib/lead-guard"
 
 /**
@@ -82,8 +83,43 @@ async function anmelden(request: Request): Promise<NextResponse> {
   return response
 }
 
-async function abmelden(): Promise<NextResponse> {
-  const response = NextResponse.json({ ok: true })
+/*
+ * ADM-02 · H2 — Abmelden WIDERRUFT, statt nur zu vergessen.
+ *
+ * Mit Speicher wird die Sitzungs-ID gesperrt; eine Kopie des Cookies gilt ab
+ * dann nirgends mehr. `?alle=1` (nur Owner) sperrt jede bis jetzt
+ * ausgestellte Sitzung.
+ *
+ * Die Antwort sagt ehrlich, was passiert ist: `revoked: "server"` nur, wenn
+ * der Eintrag geschrieben wurde. Ohne Speicher oder bei einem Fehler lautet
+ * sie `revoked: "browser-only"` — das Cookie ist in DIESEM Browser weg, eine
+ * Kopie gilt bis zum Ablauf. Das Cookie wird in jedem Fall geloescht.
+ */
+async function abmelden(request: Request): Promise<NextResponse> {
+  const alle = new URL(request.url).searchParams.get("alle") === "1"
+  const cookie = request.headers.get("cookie")?.match(/(?:^|;\s*)cd_admin=([^;]*)/)?.[1]
+  const speicher = widerrufSpeicher()
+  const zugang = await pruefeZugang(cookie ? decodeURIComponent(cookie) : undefined, {
+    aendernd: false,
+    speicher,
+  })
+
+  if (alle && zugang.rolle !== "owner") {
+    return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 })
+  }
+
+  let revoked: "server" | "browser-only" = "browser-only"
+  if (speicher && zugang.verdict === "ok" && zugang.sid && zugang.expiresAt) {
+    try {
+      if (alle) await alleWiderrufen(speicher)
+      else await widerrufen(speicher, zugang.sid, zugang.expiresAt, "abmelden")
+      revoked = "server"
+    } catch (error) {
+      console.warn("[admin] Widerruf nicht gespeichert:", error instanceof Error ? error.message : "unbekannt")
+    }
+  }
+
+  const response = NextResponse.json({ ok: true, revoked, scope: alle ? "all" : "session" })
   /* Abmelden heisst: das Cookie sofort ungültig machen, nicht nur vergessen. */
   response.cookies.set(ADMIN_COOKIE, "", sessionCookieOptions(0))
   return response
@@ -106,5 +142,5 @@ export async function DELETE(request: Request) {
   if (!sameOrigin(request)) {
     return withAdminHeaders(NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 }))
   }
-  return withAdminHeaders(await abmelden())
+  return withAdminHeaders(await abmelden(request))
 }

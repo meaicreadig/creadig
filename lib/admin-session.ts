@@ -100,34 +100,46 @@ export function passwordMatches(input: unknown): boolean {
 }
 
 /**
- * `<rolle>.<ablaufZeitpunkt>.<signatur>`
+ * `<rolle>.<ablaufZeitpunkt>.<sitzungsId>.<signatur>`
  *
  * GATE 32 — die Rolle steht IN der Sitzung und ist mitsigniert.
  *
- * Vorher lautete das Format `<ablauf>.<signatur>` und trug keine Identitaet:
- * `verifySession()` sagte „ok", nicht WER. Damit konnte die Middleware nur
- * eine Frage stellen — angemeldet oder nicht.
- *
  * Die Rolle darf nicht NEBEN der Signatur stehen, sondern muss UNTER ihr
- * liegen: Signiert wird `<rolle>.<ablauf>`. Sonst koennte jeder das erste
- * Feld auf `owner` aendern und behielte eine gueltige Signatur. Der
- * Probelauf faehrt genau diesen Angriff.
+ * liegen: Signiert wird alles davor. Sonst koennte jeder das erste Feld auf
+ * `owner` aendern und behielte eine gueltige Signatur. Der Probelauf faehrt
+ * genau diesen Angriff.
  *
- * Alte Sitzungen (zwei Felder) werden ungueltig. Das ist beabsichtigt, und
- * die Kosten sind eine Anmeldung: Einer Sitzung ohne Rolle koennte man nur
- * eine raten, und geraten wird hier nichts.
+ * ADM-02 · H2 (17.09.2026) — die SITZUNGS-ID.
+ * Vorher trug die Sitzung keine Identitaet, die man widerrufen konnte:
+ * Abmelden loeschte das Cookie im eigenen Browser, eine Kopie blieb acht
+ * Stunden gueltig. Jetzt bekommt jede Anmeldung eine zufaellige, mitsignierte
+ * ID; `lib/admin-widerruf.ts` fuehrt die widerrufenen. Jede Anmeldung erzeugt
+ * eine NEUE ID — eine vorher untergeschobene Sitzung wird nicht uebernommen
+ * (Fixation).
+ *
+ * Alte Sitzungen (drei Felder) werden ungueltig. Die Kosten sind eine
+ * Anmeldung.
  */
 export async function issueSession(rolle: Rolle, now = Date.now()): Promise<string | null> {
   const s = secret()
   if (!s) return null
   const expiresAt = String(now + SESSION_MS)
-  const nutzlast = `${rolle}.${expiresAt}`
+  const sid = crypto.randomUUID().replace(/-/g, "")
+  const nutzlast = `${rolle}.${expiresAt}.${sid}`
   return `${nutzlast}.${await sign(nutzlast, s)}`
 }
 
-export type SessionVerdict = "ok" | "missing" | "invalid" | "expired" | "unavailable"
+export type SessionVerdict = "ok" | "missing" | "invalid" | "expired" | "unavailable" | "revoked"
 
-export type SessionErgebnis = { verdict: SessionVerdict; rolle: Rolle | null }
+export type SessionErgebnis = {
+  verdict: SessionVerdict
+  rolle: Rolle | null
+  /** Nur bei gueltiger Signatur gesetzt. */
+  sid?: string
+  /** Ausstellungszeitpunkt (ms) — fuer „alle Sitzungen abmelden". */
+  issuedAt?: number
+  expiresAt?: number
+}
 
 export async function verifySession(
   value: unknown,
@@ -140,21 +152,28 @@ export async function verifySession(
   if (value.length > 200) return { verdict: "invalid", rolle: null }
 
   const teile = value.split(".")
-  if (teile.length !== 3) return { verdict: "invalid", rolle: null }
-  const [rolle, expiresAt, signature] = teile
+  if (teile.length !== 4) return { verdict: "invalid", rolle: null }
+  const [rolle, expiresAt, sid, signature] = teile
   if (!istRolle(rolle)) return { verdict: "invalid", rolle: null }
   if (!/^\d+$/.test(expiresAt)) return { verdict: "invalid", rolle: null }
+  if (!/^[0-9a-f]{32}$/.test(sid)) return { verdict: "invalid", rolle: null }
 
   /*
    * Erst die Signatur, dann die Zeit. Andersherum würde ein abgelaufener,
    * aber gefälschter Wert dieselbe Antwort bekommen wie ein abgelaufener
    * echter — und damit verraten, dass die Fälschung an der Zeit scheiterte.
    */
-  if (!equal(signature, await sign(`${rolle}.${expiresAt}`, s))) {
+  if (!equal(signature, await sign(`${rolle}.${expiresAt}.${sid}`, s))) {
     return { verdict: "invalid", rolle: null }
   }
   if (Number(expiresAt) < now) return { verdict: "expired", rolle: null }
-  return { verdict: "ok", rolle }
+  return {
+    verdict: "ok",
+    rolle,
+    sid,
+    expiresAt: Number(expiresAt),
+    issuedAt: Number(expiresAt) - SESSION_MS,
+  }
 }
 
 /**
