@@ -24,7 +24,7 @@
   <header class="top">
     <div class="top-left">
       <div class="eyebrow" id="eyebrow">Hochzeitskonvoi</div>
-      <h1 class="couple" id="couple">Braut &amp; Bräutigam</h1>
+      <h1 class="couple" id="couple">Hidayet &amp; Emine Akyol</h1>
       <div class="meta" id="dateLabel">Start 12:00 Uhr</div>
     </div>
     <button id="joinBtn" class="btn btn-primary" type="button">
@@ -59,6 +59,11 @@
     <div class="sheet-peek">
       <div class="progress" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
       <div class="progress-meta"><span id="progressLeft">0 %</span><span id="progressRight">Ziel</span></div>
+      <div class="legend" aria-label="Legende">
+        <span><i class="sw sw-p1"></i>Zur Braut</span>
+        <span><i class="sw sw-p2"></i>Konvoi mit Brautpaar</span>
+        <span><i class="sw sw-done"></i>Gefahren</span>
+      </div>
     </div>
     <div class="sheet-body">
       <h2 class="h">Route</h2>
@@ -73,7 +78,7 @@
 
       <div class="actions">
         <a id="gmapsLink" class="btn btn-ghost" target="_blank" rel="noopener">Route in Google Maps</a>
-        <a id="navLink" class="btn btn-ghost" target="_blank" rel="noopener">Zum Ziel navigieren</a>
+        <a id="navLink" class="btn btn-ghost" target="_blank" rel="noopener">Navigieren</a>
         <button id="shareBtn" class="btn btn-ghost" type="button">Link teilen</button>
       </div>
       <p class="rules">Warnblinker an · Abstand halten · Hupen ausdrücklich erlaubt 🎉</p>
@@ -84,6 +89,7 @@
     <form method="dialog" id="joinForm" novalidate>
       <h2 id="joinTitle">Ich fahre mit</h2>
       <p class="hint">Dein Auto erscheint live auf der Karte, solange die Seite offen bleibt. Handy am besten in die Halterung, Bildschirm bleibt an.</p>
+      <p class="note" id="joinNote" hidden>Live-Teilen ist noch nicht eingeschaltet: Dein Auto siehst vorerst nur du selbst.</p>
 
       <label class="field">
         <span>Name (z. B. Fabian, Tim, Familie Yılmaz)</span>

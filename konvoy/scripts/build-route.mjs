@@ -6,13 +6,18 @@ import { writeFile, stat } from 'node:fs/promises'
 import { EVENT } from '../public/data/event.js'
 import { buildRoute } from '../lib/route-builder.js'
 
+const km = (m) => (m / 1000).toFixed(1) + ' km'
+const min = (s) => Math.round(s / 60) + ' min'
 const target = new URL('../public/data/route.json', import.meta.url)
 try {
   const route = await buildRoute(EVENT)
   await writeFile(target, JSON.stringify(route))
-  console.log(`Route: ${(route.distance / 1000).toFixed(1)} km, ${Math.round(route.duration / 60)} min (Planer) — ${route.waypoints.length} Stationen`)
-  for (const w of route.waypoints) console.log(` · ${w.type.padEnd(5)} ${w.name} → ${w.label}`)
+  const f = EVENT.speedFactor || 1
+  console.log(`Route: ${km(route.distance)}, ${min(route.duration)} Planer / ${min(route.duration * f)} Konvoi — ${route.waypoints.length} Stationen, ${route.geometry.coordinates.length} Stützpunkte`)
+  for (const p of route.phases) console.log(`Phase „${p.name}“: ${km(p.distance)}, ${min(p.duration)} Planer / ${min(p.duration * f)} Konvoi (Meter ${p.startM}–${p.endM})`)
+  for (const w of route.waypoints) console.log(` · P${w.phase} ${w.type.padEnd(6)} ${String(w.at).padStart(6)} m  ${w.name} → ${w.label} [${w.query}] (${w.lat.toFixed(5)}, ${w.lng.toFixed(5)})`)
   for (const w of route.warnings) console.log(` ! ${w}`)
+  if (!route.loops.length) console.log(' ✓ keine Wende-Schleifen')
 } catch (err) {
   console.error('Route konnte nicht erzeugt werden:', err?.message || err)
   const existing = await stat(target).catch(() => null)

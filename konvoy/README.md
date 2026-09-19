@@ -1,7 +1,10 @@
 # KONVOY — Hochzeitskonvoi · Live-Karte
 
-Eine mobile One-Page-Seite für den Hochzeitskonvoi: feste Route auf der Karte, gefahrener Weg **blau**, Rest **grau**,
-Ziel markiert, Autos live per GPS. Das Brautauto führt, jedes Auto tippt oben „Ich fahre mit“ und gibt seinen Namen ein.
+Eine mobile One-Page-Seite für den Hochzeitskonvoi in **zwei Phasen**: erst vom Bräutigam **zur Braut** (Route **gold**),
+dann als **Konvoi mit dem Brautpaar** zum Ziel (Route **schiefer**), gefahrener Weg **blau** darüber. Alle Linien liegen rechts
+in Fahrtrichtung versetzt — wo Hin- und Rückweg dieselbe Straße nutzen, sieht man zwei Spuren nebeneinander.
+Autos laufen live per GPS **auf der Straße** (Map-Matching entlang der Route, keine Abkürzungen durch Kurven).
+Das Brautauto führt und meldet seinen Fortschritt; jedes Auto tippt oben „Ich fahre mit“ und gibt seinen Namen ein.
 
 Technik wie bei FIBERO: **MapLibre GL + CARTO-Basemap**, Geocoding über **Photon**, Routing über **OSRM**.
 Live-Positionen über eine kleine **Supabase**-Tabelle (Polling alle 3 s, keine Accounts). Kein Build-Schritt, reines HTML/CSS/JS.
@@ -24,12 +27,21 @@ Live-Positionen über eine kleine **Supabase**-Tabelle (Polling alle 3 s, keine 
 3. **Vercel:** Im Projekt `konvoy` die Umgebungsvariablen setzen und neu deployen:
    `SUPABASE_URL` = Project URL · `SUPABASE_ANON_KEY` = anon public Key.
 
-Ohne diese Werte läuft die Seite trotzdem (Route, Stationen, Zeiten), nur ohne Live-Autos. Der Anon-Key ist per Design öffentlich.
+Ohne diese Werte läuft die Seite trotzdem (Route, Stationen, Zeiten). „Ich fahre mit“ funktioniert dann nur lokal: man sieht
+sein eigenes Auto, geteilt wird nichts. Sobald die Werte gesetzt sind, wird ohne Code-Änderung geteilt. Der Anon-Key ist per Design öffentlich.
+
+Wer die Tabelle schon aus der ersten Version hat: `supabase/schema.sql` einfach noch einmal ausführen (ergänzt die Spalte `progress`).
 
 ## Anpassen
 
 - **Namen, Datum, Startzeit, PIN, Stationen:** `public/data/event.js`. Nach dem Push berechnet der Vercel-Build die Route neu.
-- **Route prüfen:** `https://<domain>/api/route?fresh=1` zeigt die aktuell aufgelösten Stationen. Lokal: `node scripts/build-route.mjs`.
+- **Wegpunkt-Typen:** `start` · `via` (nur durchfahren) · `stop` (Halt mit `dwell` Minuten) · `pickup` (Braut abholen = Grenze
+  zwischen Phase 1 und 2, mit `dwell`) · `end`. Optional je Wegpunkt: `bbox` (eigener Suchraum fürs Geocoding) oder feste
+  `lat`/`lng` (dann kein Geocoding).
+- **Wende-Schleifen:** Liegt ein Wegpunkt hinter der Abbiege-Kreuzung oder in einer Sackgasse, fährt OSRM hin und zurück.
+  Der Build meldet das als `! Wende-Schleife bei … m` — dann den Wegpunkt mit `lat`/`lng` auf den befahrenen Abschnitt pinnen.
+- **Route prüfen:** `https://<domain>/api/route?fresh=1` zeigt die aktuell aufgelösten Stationen. Lokal: `node scripts/build-route.mjs`
+  (zeigt Phasen, Streckenmeter je Station, Warnungen).
 - **Demo ohne GPS:** `https://<domain>/?demo=1` zeigt einen simulierten Konvoi.
 
 ## Am Hochzeitstag

@@ -14,8 +14,12 @@ create table if not exists public.konvoy_positions (
   heading     real,
   speed       real,
   accuracy    real,
+  progress    real,          -- Streckenmeter auf der Route (meldet das Brautauto, Zuschauer übernehmen ihn)
   updated_at  timestamptz not null default now()
 );
+
+-- Für Tabellen aus der ersten Version (ohne progress):
+alter table public.konvoy_positions add column if not exists progress real;
 
 create index if not exists konvoy_positions_event_idx
   on public.konvoy_positions (event, updated_at desc);
@@ -44,8 +48,9 @@ create policy "konvoy update" on public.konvoy_positions for update to anon, aut
 create policy "konvoy delete" on public.konvoy_positions for delete to anon, authenticated using (true);
 
 -- Sicht mit Alter der Position in Sekunden (Server-Uhr) — die App liest nur diese Sicht.
-create or replace view public.konvoy_live with (security_invoker = true) as
-  select id, event, name, color, lead, lat, lng, heading, speed, accuracy, updated_at,
+drop view if exists public.konvoy_live;
+create view public.konvoy_live with (security_invoker = true) as
+  select id, event, name, color, lead, lat, lng, heading, speed, accuracy, progress, updated_at,
          extract(epoch from (now() - updated_at))::int as age
   from public.konvoy_positions;
 
