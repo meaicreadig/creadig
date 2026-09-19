@@ -3,10 +3,10 @@
 // Schlägt der Dienst fehl, bleibt eine vorhandene route.json erhalten und der Build läuft weiter —
 // die Seite fällt dann zur Laufzeit auf /api/route zurück.
 import { writeFile, stat } from 'node:fs/promises'
-import { EVENT } from '../data/event.js'
+import { EVENT } from '../public/data/event.js'
 import { buildRoute } from '../lib/route-builder.js'
 
-const target = new URL('../data/route.json', import.meta.url)
+const target = new URL('../public/data/route.json', import.meta.url)
 try {
   const route = await buildRoute(EVENT)
   await writeFile(target, JSON.stringify(route))

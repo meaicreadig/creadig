@@ -1,6 +1,6 @@
 // GET /api/route — geocodiert die Stationen aus data/event.js und holt die Straßenroute (OSRM).
 // Die App nutzt zuerst data/route.json (eingefrorener Stand); dieser Endpunkt ist Fallback + Werkzeug.
-import { EVENT } from '../data/event.js'
+import { EVENT } from '../public/data/event.js'
 import { buildRoute } from '../lib/route-builder.js'
 
 export default async function handler(req, res) {

@@ -10,9 +10,9 @@ Live-Positionen über eine kleine **Supabase**-Tabelle (Polling alle 3 s, keine 
 
 | Datei | Zweck |
 |---|---|
-| `index.html`, `styles.css`, `app.js`, `geo.js` | Die Seite (mobil, Deutsch) |
-| `data/event.js` | **Die einzige Datei, die pro Hochzeit angepasst wird**: Namen, Datum, Startzeit, PIN, Route |
-| `data/route.json` | Eingefrorene Route (Geometrie + Stationen). Wird von `/api/route` erzeugt |
+| `public/` (`index.html`, `styles.css`, `app.js`, `geo.js`) | Die Seite (mobil, Deutsch) |
+| `public/data/event.js` | **Die einzige Datei, die pro Hochzeit angepasst wird**: Namen, Datum, Startzeit, PIN, Route |
+| `public/data/route.json` | Eingefrorene Route (Geometrie + Stationen). Wird bei jedem Vercel-Build erzeugt |
 | `api/route.js` | Geocodiert die Stationen aus `event.js` und holt die Straßenroute (Fallback + Werkzeug) |
 | `api/config.js` | Gibt die öffentlichen Supabase-Zugangsdaten aus den Vercel-Umgebungsvariablen aus |
 | `supabase/schema.sql` | Tabelle + Rechte für die Live-Positionen, einmal im SQL-Editor ausführen |
@@ -28,9 +28,8 @@ Ohne diese Werte läuft die Seite trotzdem (Route, Stationen, Zeiten), nur ohne 
 
 ## Anpassen
 
-- **Namen, Datum, Startzeit, PIN, Stationen:** `data/event.js`.
-- **Route neu berechnen** nach Änderungen an den Stationen: `https://<domain>/api/route?fresh=1` öffnen,
-  die Antwort als `data/route.json` speichern und committen. Lokal: `node scripts/build-route.mjs`.
+- **Namen, Datum, Startzeit, PIN, Stationen:** `public/data/event.js`. Nach dem Push berechnet der Vercel-Build die Route neu.
+- **Route prüfen:** `https://<domain>/api/route?fresh=1` zeigt die aktuell aufgelösten Stationen. Lokal: `node scripts/build-route.mjs`.
 - **Demo ohne GPS:** `https://<domain>/?demo=1` zeigt einen simulierten Konvoi.
 
 ## Am Hochzeitstag
