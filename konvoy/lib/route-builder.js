@@ -34,7 +34,10 @@ export async function buildRoute(EVENT) {
   const warnings = []
   const points = []
   for (const wp of EVENT.waypoints) {
-    const g = await geocode(wp, EVENT.geo)
+    // Feste Koordinaten in event.js (lat/lng) überspringen das Geocoding — z. B. für exakte Kreuzungen.
+    const g = typeof wp.lat === 'number' && typeof wp.lng === 'number'
+      ? { lat: wp.lat, lng: wp.lng, label: wp.address || wp.name, query: 'fest', osm: '' }
+      : await geocode(wp, EVENT.geo)
     if (!g) {
       const msg = `Nicht gefunden: ${wp.name} (${wp.queries.join(' | ')})`
       if (wp.type === 'via') { warnings.push(msg + ' — Wegpunkt übersprungen'); continue }

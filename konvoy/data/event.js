@@ -25,6 +25,7 @@ export const EVENT = {
   //  - via  = Straße, durch die der Konvoi fährt (nur Wegpunkt, kein Halt)
   //  - stop = geplanter Halt mit Dauer in Minuten
   //  - queries = Suchbegriffe fürs Geocoding, der erste Treffer im Suchraum gewinnt
+  //  - lat/lng = optional feste Koordinaten (z. B. exakte Kreuzung), dann kein Geocoding
   waypoints: [
     { type: 'start', name: 'Start', address: 'Belmer Straße 18, Osnabrück',
       queries: ['Belmer Straße 18, Osnabrück'] },
