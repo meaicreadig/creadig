@@ -1,0 +1,9 @@
+{
+  "functions": {
+    "api/route.js": { "maxDuration": 30 }
+  },
+  "headers": [
+    { "source": "/data/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=60, s-maxage=300" }] },
+    { "source": "/(.*)\\.(js|css)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=300" }] }
+  ]
+}

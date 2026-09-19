@@ -1,0 +1,11 @@
+{
+  "name": "konvoy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Hochzeitskonvoi – Live-Karte (Route, Autos, Ziel)",
+  "scripts": {
+    "route": "node scripts/build-route.mjs",
+    "dev": "npx -y serve -l 3000 ."
+  }
+}
