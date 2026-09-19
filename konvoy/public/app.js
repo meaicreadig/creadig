@@ -83,6 +83,7 @@ async function boot() {
   prepareStations(route)
   S.times = plannedTimes(route)
   S.supa = cfg
+  setLive(DEMO ? 'demo' : cfg ? 'live' : 'off')
   updateJoinButton()
   renderStops()
   renderActions()
@@ -92,6 +93,7 @@ async function boot() {
     if (cfg) startPolling()
     if (S.self?.joined) startTracking()
   }
+  requestAnimationFrame(updatePeek)
   requestAnimationFrame(tick)
   setInterval(updateStatus, 1000)
 }
@@ -140,7 +142,7 @@ function renderHeader() {
   const d = startDate()
   const dateStr = EVENT.date ? d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' : ''
   const anchor = EVENT.waypoints.find((w) => typeof w.time === 'string')
-  $('#dateLabel').textContent = `${dateStr}Treffen ${EVENT.startTime || '12:00'} Uhr` + (anchor ? ` · ${anchor.short || anchor.name} ${anchor.time} Uhr` : '')
+  $('#dateLabel').textContent = `${dateStr}` + (EVENT.meetTime ? `Treffen ${EVENT.meetTime} · ` : '') + `Abfahrt ${EVENT.startTime || '12:00'}` + (anchor ? ` · ${anchor.short || anchor.name} ${anchor.time} Uhr` : ' Uhr')
   updateJoinButton()
 }
 
@@ -150,20 +152,39 @@ function fixedTime(wp) {
   return typeof t === 'string' && /^\d{1,2}:\d{2}$/.test(t) ? t : null
 }
 
-/** Zeitplan: ab einem Anker (z. B. Braut 13:15) rückwärts zum Start und vorwärts zum Ziel; ohne Anker ab Startzeit. */
+/**
+ * Zeitplan mit Fixpunkten: Abfahrt (startTime) ist fest, ebenso jede Station mit `time` (z. B. Braut 13:15).
+ * Zwischen zwei Fixpunkten werden die Fahrzeiten so gestreckt oder gestaucht, dass beide Zeiten stimmen;
+ * Halte behalten ihre Dauer. Nach dem letzten Fixpunkt gilt die normale Konvoi-Geschwindigkeit.
+ */
 function plannedTimes(route) {
   const wps = route.waypoints
   const f = EVENT.speedFactor || 1
   const leg = (i) => (route.legs[i]?.duration || 0) * f * 1000
   const dwell = (i) => (wps[i].dwell || 0) * 60000
-  const k = wps.findIndex((w) => fixedTime(w))
-  const a = k >= 0 ? k : 0
-  const arriveA = startDate()
-  if (k >= 0) { const [h, m] = fixedTime(wps[k]).split(':').map(Number); arriveA.setHours(h, m, 0, 0) }
   const times = new Array(wps.length)
-  times[a] = { arrive: arriveA, depart: new Date(arriveA.getTime() + dwell(a)) }
-  for (let i = a + 1; i < wps.length; i++) { const arrive = new Date(times[i - 1].depart.getTime() + leg(i - 1)); times[i] = { arrive, depart: new Date(arrive.getTime() + dwell(i)) } }
-  for (let i = a - 1; i >= 0; i--) { const depart = new Date(times[i + 1].arrive.getTime() - leg(i)); times[i] = { arrive: new Date(depart.getTime() - dwell(i)), depart } }
+  const t0 = startDate()
+  times[0] = { arrive: t0, depart: new Date(t0.getTime() + dwell(0)) }
+  let prev = 0
+  const anchors = wps.map((w, i) => (i > 0 && fixedTime(w) ? i : -1)).filter((i) => i > 0)
+  const fill = (from, to, scale) => {
+    for (let i = from + 1; i <= to; i++) {
+      const arrive = new Date(times[i - 1].depart.getTime() + leg(i - 1) * scale)
+      times[i] = { arrive, depart: new Date(arrive.getTime() + dwell(i)) }
+    }
+  }
+  for (const k of anchors) {
+    const [h, m] = fixedTime(wps[k]).split(':').map(Number)
+    const target = new Date(t0); target.setHours(h, m, 0, 0)
+    let travel = 0, pause = 0
+    for (let i = prev; i < k; i++) { travel += leg(i); if (i > prev) pause += dwell(i) }
+    const available = target.getTime() - times[prev].depart.getTime() - pause
+    const scale = travel > 0 ? Math.max(0.3, available / travel) : 1
+    fill(prev, k, scale)
+    times[k] = { arrive: target, depart: new Date(target.getTime() + dwell(k)) }   // exakt auf den Fixpunkt
+    prev = k
+  }
+  fill(prev, wps.length - 1, 1)
   return times
 }
 
@@ -185,7 +206,7 @@ function renderStops() {
     li.className = 'stop-item ' + wp.type
     li.dataset.index = i
     const t = S.times[i]
-    const timeHtml = wp.type === 'start' ? `${fmtTime(t.depart)}<small>Abfahrt ca. · Treffen ${EVENT.startTime || '12:00'}</small>`
+    const timeHtml = wp.type === 'start' ? `${fmtTime(t.depart)}<small>Abfahrt${EVENT.meetTime ? ` · Treffen ${EVENT.meetTime}` : ''}</small>`
       : wp.type === 'pickup' ? `${fmtTime(t.arrive)}<small>ca. ${wp.dwell || 20} Min. bei der Braut</small>`
       : wp.dwell ? `${fmtTime(t.arrive)}<small>ca. ${wp.dwell} Min. Halt</small>`
       : `${fmtTime(t.arrive)}<small>Ankunft ca.</small>`
@@ -598,7 +619,7 @@ function updateStatus() {
   const now = Date.now()
   if (!lead) {
     const t0 = startDate()
-    const when = EVENT.date && now < t0.getTime() ? `Start in ${fmtMin((t0.getTime() - now) / 1000)}` : `Start ${EVENT.startTime || '12:00'} Uhr`
+    const when = EVENT.date && now < t0.getTime() ? `Abfahrt in ${fmtMin((t0.getTime() - now) / 1000)}` : `Abfahrt ${EVENT.startTime || '12:00'} Uhr`
     setPhase('waiting', `Konvoi steht beim Bräutigam · ${when}`)
     markStops(-1)
     updateNav(S.selfD ?? 0)
@@ -651,9 +672,10 @@ function startPolling() {
       const r = await fetch(q, { headers: headers() })
       if (!r.ok) throw new Error('HTTP ' + r.status)
       applyPositions(await r.json())
+      if (S.pollFails >= 3) setLive('live')
       S.pollFails = 0
     } catch (e) {
-      if (++S.pollFails === 3) setPhase('lost', 'Verbindung zum Live-Server unterbrochen …')
+      if (++S.pollFails === 3) { setPhase('lost', 'Verbindung zum Live-Server unterbrochen …'); setLive('error') }
       console.warn('poll', e)
     }
   }
@@ -752,6 +774,20 @@ async function requestWakeLock() {
   try { S.wakeLock = await navigator.wakeLock.request('screen') } catch {}
 }
 
+function setLive(state) {
+  const el = $('#liveBadge')
+  if (!el) return
+  const txt = { live: 'LIVE', off: 'OFFLINE', error: 'VERBINDUNG …', demo: 'DEMO' }[state] || ''
+  el.className = 'live-badge ' + state
+  el.textContent = txt
+}
+
+/** Sichtbarer Teil des Sheets = Griff + Peek, exakt gemessen (sonst blitzt der Inhalt darunter durch). */
+function updatePeek() {
+  const h = $('#sheetToggle')?.offsetHeight || 22, p = $('.sheet-peek')?.offsetHeight || 96
+  document.documentElement.style.setProperty('--peek', `${h + p}px`)
+}
+
 function updateJoinButton() {
   const btn = $('#joinBtn')
   btn.classList.toggle('joined', S.joined)
@@ -762,7 +798,23 @@ function updateJoinButton() {
 
 // ── UI-Verdrahtung ────────────────────────────────────────────────────────────
 function bindUi() {
-  $('#sheetToggle').addEventListener('click', () => $('#sheet').classList.toggle('open'))
+  const sheet = $('#sheet'), body = $('.sheet-body')
+  $('#sheetToggle').addEventListener('click', () => sheet.classList.toggle('open'))
+  $('.sheet-peek').addEventListener('click', () => sheet.classList.toggle('open'))
+  // Wischen: hoch = öffnen, runter = schließen (im gescrollten Inhalt nur, wenn ganz oben)
+  let ty = null, tx = null
+  sheet.addEventListener('touchstart', (e) => { ty = e.touches[0].clientY; tx = e.touches[0].clientX }, { passive: true })
+  sheet.addEventListener('touchend', (e) => {
+    if (ty == null) return
+    const t = e.changedTouches[0], dy = t.clientY - ty, dx = Math.abs(t.clientX - tx)
+    ty = null
+    if (dx > Math.abs(dy) || Math.abs(dy) < 28) return
+    if (dy < 0) sheet.classList.add('open')
+    else if (!body.contains(e.target) || body.scrollTop <= 0) sheet.classList.remove('open')
+  }, { passive: true })
+  updatePeek()
+  window.addEventListener('resize', updatePeek)
+  document.fonts?.ready?.then(updatePeek)
   $('#btnFit').addEventListener('click', () => setMode('fit'))
   $('#btnFollow').addEventListener('click', () => setMode(S.mode === 'follow' ? 'fit' : 'follow'))
   $('#btnDrive').addEventListener('click', () => setMode(S.mode === 'drive' ? 'fit' : 'drive'))
@@ -771,6 +823,12 @@ function bindUi() {
   const chips = $('#colorChips')
   chips.innerHTML = COLORS.map((c, i) => `<label style="background:${c}" title="Farbe"><input type="radio" name="color" value="${c}" ${i === 0 ? 'checked' : ''}></label>`).join('')
   $('#leadCheck').addEventListener('change', (e) => { $('#pinField').hidden = !e.target.checked })
+  $('#roleSeg').addEventListener('change', (e) => {
+    const lead = e.target.value === 'lead'
+    $('#leadCheck').checked = lead
+    $('#pinField').hidden = !lead
+    if (lead) setTimeout(() => $('#pinInput').focus(), 50)
+  })
 
   $('#joinBtn').addEventListener('click', () => {
     if (S.joined) {
@@ -783,6 +841,10 @@ function bindUi() {
     }
     if (S.self?.name) $('#nameInput').value = S.self.name
     if (S.self?.color) { const r = chips.querySelector(`input[value="${S.self.color}"]`); if (r) r.checked = true }
+    const wasLead = !!S.self?.lead
+    $(`#roleSeg input[value="${wasLead ? 'lead' : 'guest'}"]`).checked = true
+    $('#leadCheck').checked = wasLead
+    $('#pinField').hidden = !wasLead
     $('#joinError').hidden = true
     $('#joinDialog').showModal()
   })

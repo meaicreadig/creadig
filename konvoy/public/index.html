@@ -23,7 +23,7 @@
 
   <header class="top">
     <div class="top-left">
-      <div class="eyebrow" id="eyebrow">Hochzeitskonvoi</div>
+      <div class="eyebrow-row"><div class="eyebrow" id="eyebrow">Hochzeitskonvoi</div><span class="live-badge" id="liveBadge"></span></div>
       <h1 class="couple" id="couple">Hidayet &amp; Emine Akyol</h1>
       <div class="meta" id="dateLabel">Start 12:00 Uhr</div>
     </div>
@@ -101,13 +101,17 @@
         <div class="chips" id="colorChips"></div>
       </div>
 
-      <label class="check">
-        <input id="leadCheck" name="lead" type="checkbox">
-        <span>Ich bin das <b>Brautauto</b> (Führungsfahrzeug)</span>
-      </label>
-      <label class="field" id="pinField" hidden>
-        <span>PIN fürs Brautauto</span>
-        <input id="pinInput" name="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="PIN">
+      <div class="field">
+        <span>Wer bist du?</span>
+        <div class="segmented" id="roleSeg">
+          <label><input type="radio" name="role" value="guest" checked><span>Gast · ich fahre mit</span></label>
+          <label><input type="radio" name="role" value="lead"><span>♥ Brautauto · mit PIN</span></label>
+        </div>
+      </div>
+      <input id="leadCheck" name="lead" type="checkbox" hidden>
+      <label class="field pin" id="pinField" hidden>
+        <span>PIN fürs Brautauto (Fahrer)</span>
+        <input id="pinInput" name="pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="• • • •">
       </label>
 
       <p class="error" id="joinError" hidden></p>

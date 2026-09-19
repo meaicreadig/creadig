@@ -14,7 +14,8 @@ export const EVENT = {
   title: 'Hochzeitskonvoi',
   couple: 'Hidayet & Emine Akyol',
   date: '2026-09-19',            // Hochzeitstag — mit Datum läuft der Countdown
-  startTime: '12:00',
+  meetTime: '11:30',             // Treffen beim Bräutigam
+  startTime: '12:00',            // Abfahrt des Konvois (fester Zeitpunkt)
 
   // PIN, den nur das Brautauto (Führungsfahrzeug) kennt.
   leadPin: '1453',
