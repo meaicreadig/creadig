@@ -8,6 +8,20 @@ export default async function handler(req, res) {
   const headers = { apikey: key, Accept: 'application/json' }
   if (/^eyJ/.test(key)) headers.Authorization = `Bearer ${key}`
   try {
+    // ?write=1 → Schreibweg prüfen: Testzeile anlegen, zurücklesen, löschen (zeigt fehlende RLS-Policies sofort)
+    if (req.query && 'write' in req.query) {
+      const row = { id: 'health-check', event: 'health-check', name: 'health', color: '#000000', lead: false, lat: 52.27, lng: 8.05, progress: 0 }
+      const w = await fetch(`${url}/rest/v1/konvoy_positions?on_conflict=id`, {
+        method: 'POST', headers: { ...headers, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(row),
+      })
+      const wText = w.ok ? null : (await w.text()).slice(0, 300)
+      const rb = await fetch(`${url}/rest/v1/konvoy_live?id=eq.health-check&select=id,age,progress`, { headers })
+      let back = []
+      try { back = await rb.json() } catch {}
+      const d = await fetch(`${url}/rest/v1/konvoy_positions?id=eq.health-check`, { method: 'DELETE', headers })
+      const ok = w.ok && Array.isArray(back) && back.length === 1 && d.ok
+      return res.status(200).json({ configured: true, ok, write: w.status, readBack: Array.isArray(back) ? back.length : null, delete: d.status, error: wText })
+    }
     const r = await fetch(`${url}/rest/v1/konvoy_live?select=id,age&limit=5`, { headers })
     const text = await r.text()
     let rows = null
