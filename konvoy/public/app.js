@@ -140,7 +140,7 @@ function renderHeader() {
   $('#couple').textContent = EVENT.couple || ''
   document.title = `${EVENT.title || 'Hochzeitskonvoi'}${EVENT.couple ? ' · ' + EVENT.couple : ''}`
   const d = startDate()
-  const dateStr = EVENT.date ? d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' : ''
+  const dateStr = EVENT.date ? d.toLocaleDateString('de-DE', { day: 'numeric', month: 'short' }) + ' · ' : ''
   const anchor = EVENT.waypoints.find((w) => typeof w.time === 'string')
   $('#dateLabel').textContent = `${dateStr}` + (EVENT.meetTime ? `Treffen ${EVENT.meetTime} · ` : '') + `Abfahrt ${EVENT.startTime || '12:00'}` + (anchor ? ` · ${anchor.short || anchor.name} ${anchor.time} Uhr` : ' Uhr')
   updateJoinButton()
