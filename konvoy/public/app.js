@@ -139,18 +139,32 @@ function renderHeader() {
   document.title = `${EVENT.title || 'Hochzeitskonvoi'}${EVENT.couple ? ' · ' + EVENT.couple : ''}`
   const d = startDate()
   const dateStr = EVENT.date ? d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' : ''
-  $('#dateLabel').textContent = `${dateStr}Start ${EVENT.startTime || '12:00'} Uhr`
+  const anchor = EVENT.waypoints.find((w) => typeof w.time === 'string')
+  $('#dateLabel').textContent = `${dateStr}Treffen ${EVENT.startTime || '12:00'} Uhr` + (anchor ? ` · ${anchor.short || anchor.name} ${anchor.time} Uhr` : '')
   updateJoinButton()
 }
 
+/** Feste Uhrzeit eines Wegpunkts (aus route.json oder, falls dort fehlend, aus event.js per Name). */
+function fixedTime(wp) {
+  const t = wp.time || EVENT.waypoints.find((w) => w.name === wp.name && w.type === wp.type)?.time
+  return typeof t === 'string' && /^\d{1,2}:\d{2}$/.test(t) ? t : null
+}
+
+/** Zeitplan: ab einem Anker (z. B. Braut 13:15) rückwärts zum Start und vorwärts zum Ziel; ohne Anker ab Startzeit. */
 function plannedTimes(route) {
-  let t = startDate()
-  return route.waypoints.map((wp, i) => {
-    if (i > 0) t = new Date(t.getTime() + (route.legs[i - 1]?.duration || 0) * (EVENT.speedFactor || 1) * 1000)
-    const arrive = t
-    if (wp.dwell) t = new Date(t.getTime() + wp.dwell * 60000)
-    return { arrive, depart: t }
-  })
+  const wps = route.waypoints
+  const f = EVENT.speedFactor || 1
+  const leg = (i) => (route.legs[i]?.duration || 0) * f * 1000
+  const dwell = (i) => (wps[i].dwell || 0) * 60000
+  const k = wps.findIndex((w) => fixedTime(w))
+  const a = k >= 0 ? k : 0
+  const arriveA = startDate()
+  if (k >= 0) { const [h, m] = fixedTime(wps[k]).split(':').map(Number); arriveA.setHours(h, m, 0, 0) }
+  const times = new Array(wps.length)
+  times[a] = { arrive: arriveA, depart: new Date(arriveA.getTime() + dwell(a)) }
+  for (let i = a + 1; i < wps.length; i++) { const arrive = new Date(times[i - 1].depart.getTime() + leg(i - 1)); times[i] = { arrive, depart: new Date(arrive.getTime() + dwell(i)) } }
+  for (let i = a - 1; i >= 0; i--) { const depart = new Date(times[i + 1].arrive.getTime() - leg(i)); times[i] = { arrive: new Date(depart.getTime() - dwell(i)), depart } }
+  return times
 }
 
 function stopBadge(wp, n) {
@@ -171,7 +185,7 @@ function renderStops() {
     li.className = 'stop-item ' + wp.type
     li.dataset.index = i
     const t = S.times[i]
-    const timeHtml = wp.type === 'start' ? `${fmtTime(t.depart)}<small>Abfahrt</small>`
+    const timeHtml = wp.type === 'start' ? `${fmtTime(t.depart)}<small>Abfahrt ca. · Treffen ${EVENT.startTime || '12:00'}</small>`
       : wp.type === 'pickup' ? `${fmtTime(t.arrive)}<small>ca. ${wp.dwell || 20} Min. bei der Braut</small>`
       : wp.dwell ? `${fmtTime(t.arrive)}<small>ca. ${wp.dwell} Min. Halt</small>`
       : `${fmtTime(t.arrive)}<small>Ankunft ca.</small>`
@@ -622,7 +636,11 @@ function markStops(d) {
 
 // ── Live: Supabase (REST, Polling) ────────────────────────────────────────────
 function headers(extra = {}) {
-  return { apikey: S.supa.anonKey, Authorization: `Bearer ${S.supa.anonKey}`, ...extra }
+  // Legacy-Anon-Key ist ein JWT (eyJ…) und geht auch als Bearer; neue Publishable-Keys (sb_publishable_…) nur als apikey.
+  const key = S.supa.anonKey
+  const h = { apikey: key, ...extra }
+  if (/^eyJ/.test(key)) h.Authorization = `Bearer ${key}`
+  return h
 }
 
 function startPolling() {

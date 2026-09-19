@@ -13,11 +13,11 @@ export const EVENT = {
 
   title: 'Hochzeitskonvoi',
   couple: 'Hidayet & Emine Akyol',
-  date: '',                      // TODO: 'YYYY-MM-DD' — leer = Countdown aus, nur "Start 12:00 Uhr"
+  date: '2026-09-19',            // Hochzeitstag — mit Datum läuft der Countdown
   startTime: '12:00',
 
-  // PIN, den nur das Brautauto (Führungsfahrzeug) kennt. TODO: echte PIN vom Owner
-  leadPin: '1234',
+  // PIN, den nur das Brautauto (Führungsfahrzeug) kennt.
+  leadPin: '1453',
 
   // Konvois fahren langsamer als der Routenplaner rechnet (Kolonne, Hupen, Ampeln).
   speedFactor: 1.5,
@@ -34,6 +34,7 @@ export const EVENT = {
   //  - pickup = Braut abholen: beendet Phase 1, startet Phase 2 (Pflicht-Halt mit dwell)
   //  - queries = Suchbegriffe fürs Geocoding, der erste Treffer im Suchraum gewinnt
   //  - bbox    = optional eigener Suchraum [minLon, minLat, maxLon, maxLat]
+  //  - time    = optional feste Uhrzeit 'HH:MM' (Anker: Zeiten davor rückwärts, danach vorwärts gerechnet)
   //  - lat/lng = optional feste Koordinaten (exakte Kreuzung / Straßenabschnitt), dann kein Geocoding.
   //              Gepinnt wird immer auf dem Abschnitt, der tatsächlich befahren wird — ein Punkt hinter
   //              der Abbiege-Kreuzung erzeugt sonst eine Wende-Schleife.
@@ -56,7 +57,7 @@ export const EVENT = {
     { type: 'via', name: 'Meller Straße', bbox: EAST, queries: ['Meller Straße, Osnabrück'] },
     // Haus der Braut — gepinnt auf die Richtungsfahrbahn Süd der Iburger Straße vor Nr. 46
     { type: 'pickup', name: 'Haus der Braut', short: 'Braut', address: 'Iburger Straße 46, 49082 Osnabrück-Schölerberg',
-      lat: 52.261627, lng: 8.055887, dwell: 20,
+      lat: 52.261627, lng: 8.055887, dwell: 20, time: '13:15',   // feste Ankunft bei der Braut — Zeitplan rechnet davor rückwärts, danach vorwärts
       note: 'Parken: Parkplatz Landesamt für Soziales, Iburger Straße 30',
       queries: ['Iburger Straße 46, Osnabrück'] },
 

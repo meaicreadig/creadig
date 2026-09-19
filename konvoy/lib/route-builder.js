@@ -122,7 +122,7 @@ export async function buildRoute(EVENT) {
     generatedAt: new Date().toISOString(),
     eventId: EVENT.id,
     waypoints: points.map((p, i) => ({
-      type: p.type, name: p.name, short: p.short || null, address: p.address || null, dwell: p.dwell || 0, note: p.note || null,
+      type: p.type, name: p.name, short: p.short || null, address: p.address || null, dwell: p.dwell || 0, note: p.note || null, time: p.time || null,
       phase: pickupIdx > 0 && i > pickupIdx ? 2 : 1,
       lat: p.lat, lng: p.lng, label: p.label, query: p.query, osm: p.osm,
       snapped: j.waypoints?.[i]?.location || [p.lng, p.lat],
