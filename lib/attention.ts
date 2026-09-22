@@ -112,6 +112,16 @@ export type Kennzahlen = {
   heuteFaellig: number
   neueAnfragen: number
   ohneSchritt: number
+  /**
+   * ADM-06 · A25 — woraus sich die beiden Fälligkeitszahlen zusammensetzen.
+   * Sie zählen Chancen UND Anfragen; eine Liste dahinter gibt es nur je Art.
+   * Ohne diese Aufteilung führte die Zahl auf eine gekürzte Liste, die sie
+   * nicht erklären konnte.
+   */
+  aufteilung: {
+    ueberfaellig: { chancen: number; anfragen: number }
+    heuteFaellig: { chancen: number; anfragen: number }
+  }
 }
 
 export type AttentionBoard = {
@@ -214,6 +224,10 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
         heuteFaellig: summary.dueToday + summary.enquiriesDueToday,
         neueAnfragen: summary.newEnquiries,
         ohneSchritt: summary.withoutNextAction,
+        aufteilung: {
+          ueberfaellig: { chancen: summary.overdue, anfragen: summary.enquiriesOverdue },
+          heuteFaellig: { chancen: summary.dueToday, anfragen: summary.enquiriesDueToday },
+        },
       }
 
       const today = geschaeftsTag()

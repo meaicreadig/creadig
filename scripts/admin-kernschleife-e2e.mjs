@@ -17,6 +17,7 @@
  *   E10 Verloren mit Grund → Verlust-Schleife zählt ihn
  *   E11 Gewonnen → nächster Betriebsschritt sichtbar, nichts automatisch
  *   E12 Kundenakte zeigt Anfrage + Chance
+ *   E25 Drilldown (A25): jede Kennzahl = Zeilen der Liste dahinter
  *   E30 meAI (A30): nächster Schritt aus Regeln, mit Belegen in Menschensprache
  *   EP  Abmelden, neu anmelden → alles noch da
  *   E26 Mobil 390: Anfrage erfassen + nächster Schritt
@@ -249,6 +250,52 @@ try {
   p(belege.length > 0, "der Vorschlag nennt seine Belege", belege.join(" | "))
   p(belege.every((b) => !/\b(true|false|won)\b/.test(b)) && belege.some((b) => b.includes("Angebotsart nicht gewählt")), "Belege in Menschensprache (H21); ohne Angebotsart ist die Reife offen, nicht erfüllt (H24)", belege.join(" | "))
   await meai.screenshot({ path: process.env.E2E_SHOT_DIR ? `${process.env.E2E_SHOT_DIR}/meai-a30.png` : "/dev/null" }).catch(() => {})
+
+  console.log("\nE25 · Drilldown: jede Zahl führt zu genau den Zeilen, die sie zählt")
+  {
+    /* Fälligkeiten herstellen — je Art überfällig UND heute, damit keine Seite leer aufgeht. */
+    const heute = (await q(`SELECT (now() AT TIME ZONE 'Europe/Berlin')::date::text AS d`))[0].d
+    await q(`UPDATE leads SET next_action = 'Probe', next_action_at = $1::date - 3 WHERE id = $2`, [heute, idVerlust])
+    /* nur das Datum — EP prüft den Schritttext später */
+    await q(`UPDATE leads SET next_action_at = $1::date WHERE id = $2`, [heute, idHand])
+    /* Drei offene Chancen über die Oberfläche: überfällig, heute, ohne Schritt. */
+    const offen = []
+    for (const name of ["Drill Eins", "Drill Zwei", "Drill Drei"]) {
+      const lid = await erfassen(page, { quelle: "telefon", name, betrieb: `${name} GmbH`, telefon: "+49 441 424242" })
+      await page.getByRole("button", { name: "Verkaufschance anlegen" }).click()
+      await bis(async () => (await zahl(`SELECT count(*) n FROM opportunities WHERE from_lead_id = $1`, [lid])) === 1)
+      offen.push((await q(`SELECT id FROM opportunities WHERE from_lead_id = $1`, [lid]))[0].id)
+    }
+    await q(`UPDATE opportunities SET next_action = 'Probe', next_action_at = $1::date - 2 WHERE id = $2`, [heute, offen[0]])
+    await q(`UPDATE opportunities SET next_action = 'Probe', next_action_at = $1::date WHERE id = $2`, [heute, offen[1]])
+    await q(`UPDATE opportunities SET next_action = NULL, next_action_at = NULL WHERE id = $1`, [offen[2]])
+
+    await page.goto(`${BASE}/admin`, { waitUntil: "networkidle" })
+    const kachel = async (key) => Number(await page.locator(`[data-kennzahl="${key}"]`).innerText())
+    const teile = async (key) => page.locator(`[data-teil^="${key}-"]`).evaluateAll((els) => els.map((e) => e.getAttribute("href")))
+    const zeilen = async (href) => {
+      await page.goto(`${BASE}${href}`, { waitUntil: "networkidle" })
+      return page.locator("main table tbody tr").count()
+    }
+    for (const key of ["ueberfaellig", "heuteFaellig"]) {
+      await page.goto(`${BASE}/admin`, { waitUntil: "networkidle" })
+      const n = await kachel(key)
+      const wege = await teile(key)
+      let summe = 0
+      for (const w of wege) summe += await zeilen(w)
+      p(wege.length === 2 && n === summe && n >= 2, `${key}: Kachel ${n} = Chancen + Anfragen dahinter`, `${wege.join(" + ")} = ${summe}`)
+    }
+    for (const [key, href] of [["neueAnfragen", "/admin/vertrieb/anfragen?status=neu"], ["ohneSchritt", "/admin/vertrieb/pipeline?bucket=ohne-schritt"]]) {
+      await page.goto(`${BASE}/admin`, { waitUntil: "networkidle" })
+      const n = await kachel(key)
+      const ziel = await page.locator(`[data-kennzahl="${key}"]`).locator("xpath=ancestor::a").getAttribute("href")
+      const z = await zeilen(ziel)
+      p(ziel === href && n === z && n > 0, `${key}: Kachel ${n} = ${z} Zeilen hinter ${ziel}`)
+    }
+    /* Der Filter bleibt beim Suchen stehen — sonst zeigt die zweite Seite eine andere Menge als die Zahl. */
+    await page.goto(`${BASE}/admin/vertrieb/anfragen?faellig=ueberfaellig`, { waitUntil: "networkidle" })
+    p(await page.locator('input[type="hidden"][name="faellig"]').count() === 1 && await page.locator("[data-filter-faellig]").isVisible(), "Fälligkeitsfilter sichtbar und bleibt bei der Suche erhalten")
+  }
 
   console.log("\nE12 · Kundenakte")
   await page.goto(`${BASE}/admin/kunden/${org.id}`, { waitUntil: "networkidle" })

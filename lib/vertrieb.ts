@@ -452,8 +452,13 @@ export type EnquiryRow = {
 export type EnquiryQuery = {
   search?: string
   handling?: HandlingStatus
-  /** ADM-03 · A07 — Anfragen mit nächstem Schritt heute oder früher (nicht archiviert). */
-  faellig?: boolean
+  /**
+   * ADM-03 · A07 — Anfragen mit nächstem Schritt heute oder früher (nicht archiviert).
+   * ADM-06 · A25 — `"heute"`/`"ueberfaellig"` trennen beides, mit genau der
+   * Bedingung aus `summary()`: Die Zahl auf der Übersicht und die Liste
+   * dahinter zählen dieselben Zeilen.
+   */
+  faellig?: boolean | "heute" | "ueberfaellig"
   source?: string
   limit?: number
   offset?: number

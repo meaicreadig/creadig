@@ -59,10 +59,27 @@ const SCHWERE: Record<AttentionRank, "neutral" | "attention" | "critical"> = {
   entscheidung: "neutral",
 }
 
-const KENNZAHL_WEG: Record<keyof Kennzahlen, string> = {
-  /* ADM-03 — zählen Chancen UND Anfragen; beide stehen gemeinsam in „Heute zu tun“. */
-  ueberfaellig: "#heute-titel",
-  heuteFaellig: "#heute-titel",
+type KennzahlSchluessel = Exclude<keyof Kennzahlen, "aufteilung">
+
+/*
+ * ADM-06 · A25 — JEDE ZAHL FÜHRT ZU DEN ZEILEN, DIE SIE ZÄHLT.
+ *
+ * Bis 22.09.2026 führten „Überfällig“ und „Heute fällig“ auf `#heute-titel`:
+ * eine Liste mit höchstens zwölf Einträgen je Art. Bei 30 überfälligen
+ * Vorgängen erklärte sie die Zahl nicht — sie widersprach ihr. Beide Zahlen
+ * zählen Chancen UND Anfragen; eine vollständige Liste gibt es je Art. Die
+ * Kachel zeigt deshalb die Summe und darunter beide Wege, jeder mit seinem
+ * Anteil — gefiltert mit derselben Bedingung, mit der `summary()` zählt.
+ */
+const KENNZAHL_WEG: Record<KennzahlSchluessel, string | { chancen: string; anfragen: string }> = {
+  ueberfaellig: {
+    chancen: "/admin/vertrieb/pipeline?bucket=ueberfaellig",
+    anfragen: "/admin/vertrieb/anfragen?faellig=ueberfaellig",
+  },
+  heuteFaellig: {
+    chancen: "/admin/vertrieb/pipeline?bucket=faellig",
+    anfragen: "/admin/vertrieb/anfragen?faellig=heute",
+  },
   neueAnfragen: "/admin/vertrieb/anfragen?status=neu",
   ohneSchritt: "/admin/vertrieb/pipeline?bucket=ohne-schritt",
 }
@@ -95,30 +112,55 @@ export default async function Uebersicht() {
       {/* ── 1 · Kennzahlen ── */}
       <section aria-label={t.uebersicht.kennzahlenLabel}>
         <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
-          {(Object.keys(KENNZAHL_WEG) as (keyof Kennzahlen)[]).map((schluessel) => (
-            <li key={schluessel}>
-              {k ? (
-                <Link href={KENNZAHL_WEG[schluessel]} className="group block h-full">
+          {(Object.keys(KENNZAHL_WEG) as KennzahlSchluessel[]).map((schluessel) => {
+            const weg = KENNZAHL_WEG[schluessel]
+            const zahl = k ? (
+              <span
+                className={`mt-1 block text-2xl font-semibold tabular-nums ${typeof weg === "string" ? "group-hover:underline group-hover:underline-offset-4" : ""} ${
+                  schluessel === "ueberfaellig" && k[schluessel] > 0 ? "text-destructive" : ""
+                }`}
+                data-kennzahl={schluessel}
+              >
+                {k[schluessel]}
+              </span>
+            ) : null
+            return (
+              <li key={schluessel}>
+                {k && typeof weg === "string" ? (
+                  <Link href={weg} className="group block h-full">
+                    <Surface padding="sm" className="h-full">
+                      <span className="type-small text-muted-foreground block">{t.uebersicht.kennzahl[schluessel]}</span>
+                      {zahl}
+                    </Surface>
+                  </Link>
+                ) : k && typeof weg !== "string" ? (
                   <Surface padding="sm" className="h-full">
                     <span className="type-small text-muted-foreground block">{t.uebersicht.kennzahl[schluessel]}</span>
-                    <span
-                      className={`mt-1 block text-2xl font-semibold tabular-nums group-hover:underline group-hover:underline-offset-4 ${
-                        schluessel === "ueberfaellig" && k[schluessel] > 0 ? "text-destructive" : ""
-                      }`}
-                    >
-                      {k[schluessel]}
+                    {zahl}
+                    {/* Zwei Wege statt einer Kachel-Verknüpfung: ein Link im Link wäre keiner. */}
+                    <span className="mt-1 flex flex-wrap gap-x-3 text-xs">
+                      {(["chancen", "anfragen"] as const).map((art) => (
+                        <Link
+                          key={art}
+                          href={weg[art]}
+                          className="text-gold-text underline underline-offset-4"
+                          data-teil={`${schluessel}-${art}`}
+                        >
+                          {t.uebersicht.teil[art](k.aufteilung[schluessel as "ueberfaellig" | "heuteFaellig"][art])}
+                        </Link>
+                      ))}
                     </span>
                   </Surface>
-                </Link>
-              ) : (
-                <Surface padding="sm" className="h-full">
-                  <span className="type-small text-muted-foreground block">{t.uebersicht.kennzahl[schluessel]}</span>
-                  <span className="mt-1 block text-2xl font-semibold" aria-hidden="true">—</span>
-                  <span className="text-muted-foreground block text-xs">{t.uebersicht.nichtGemessen}</span>
-                </Surface>
-              )}
-            </li>
-          ))}
+                ) : (
+                  <Surface padding="sm" className="h-full">
+                    <span className="type-small text-muted-foreground block">{t.uebersicht.kennzahl[schluessel]}</span>
+                    <span className="mt-1 block text-2xl font-semibold" aria-hidden="true">—</span>
+                    <span className="text-muted-foreground block text-xs">{t.uebersicht.nichtGemessen}</span>
+                  </Surface>
+                )}
+              </li>
+            )
+          })}
         </ul>
         {!hasStore ? (
           <div className="mt-4">

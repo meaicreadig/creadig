@@ -61,6 +61,10 @@ export const tr: AdminTexte = {
       neueAnfragen: "Yeni talepler",
       ohneSchritt: "Sonraki adımı yok",
     },
+    teil: {
+      chancen: (n: number) => `${n} fırsat`,
+      anfragen: (n: number) => `${n} talep`,
+    },
     nichtGemessen: "ölçülmedi",
     heuteTitel: "Bugün yapılacaklar",
     heuteLeer: "Vadesi gelen bir şey yok. Hiçbir süreç bugün bir adım beklemiyor, bekleyen talep yok.",
@@ -234,6 +238,10 @@ export const tr: AdminTexte = {
     eingaenge: "Gelenler",
     vonGesamt: (n, gesamt) => `${gesamt} içinden ${n}`,
     leerGefiltert: "Bu seçime uyan talep yok.",
+    faelligFilter: {
+      heute: "Filtre: sonraki adımın vadesi bugün.",
+      ueberfaellig: "Filtre: sonraki adım gecikmiş.",
+    },
     filterZuruecksetzen: "Filtreleri sıfırla",
     leer: "Henüz talep yok. Talepler web sitesinden gelir — ya da elle bir tane kaydedebilirsiniz.",
     tabelleBeschriftung: "Numara, gönderen, kuruluş, kaynak, geliş, işlem durumu, sorumlu, sonraki adım ve satış fırsatı ile talepler",

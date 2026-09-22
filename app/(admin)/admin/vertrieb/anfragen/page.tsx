@@ -33,7 +33,7 @@ export async function generateMetadata() {
 export default async function AnfragenPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string; source?: string }>
+  searchParams: Promise<{ q?: string; status?: string; source?: string; faellig?: string }>
 }) {
   const { t, intl } = await adminSprachKontext()
   const store = getVertriebStore()
@@ -45,12 +45,14 @@ export default async function AnfragenPage({
     ? (params.status as HandlingStatus)
     : undefined
   const source = typeof params.source === "string" && params.source ? params.source : undefined
+  /* ADM-06 · A25 — der Weg von der Übersicht: dieselbe Bedingung, mit der dort gezählt wird. */
+  const faellig = params.faellig === "heute" || params.faellig === "ueberfaellig" ? params.faellig : undefined
 
   let page: { rows: EnquiryRow[]; total: number }
   let sources: string[]
   try {
     ;[page, sources] = await Promise.all([
-      store.listEnquiries({ search: search || undefined, handling, source, limit: 100 }),
+      store.listEnquiries({ search: search || undefined, handling, source, faellig, limit: 100 }),
       store.enquirySources(),
     ])
   } catch {
@@ -67,6 +69,8 @@ export default async function AnfragenPage({
     <VertriebShell title={t.nav.anfragen.label} lead={l.lead} meta={<span className="block">{l.gesamt(total)}</span>} available>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <form method="get" className="flex flex-1 flex-wrap items-end gap-4">
+          {/* Ein Suchbegriff hebt den Fälligkeitsfilter nicht still auf. */}
+          {faellig ? <input type="hidden" name="faellig" value={faellig} /> : null}
           <AdminField label={l.suche} htmlFor="q" className="flex-1 basis-64">
             <AdminInput id="q" name="q" type="search" defaultValue={search} placeholder={l.suchePlatzhalter} />
           </AdminField>
@@ -92,10 +96,17 @@ export default async function AnfragenPage({
         </Link>
       </div>
 
+      {faellig ? (
+        <p className="type-small text-foreground/90 border-line mt-6 border-s-2 py-1 ps-4" data-filter-faellig={faellig}>
+          {l.faelligFilter[faellig]}{" · "}
+          <Link href="/admin/vertrieb/anfragen" className="text-gold-text underline underline-offset-4">{l.filterZuruecksetzen}</Link>
+        </p>
+      ) : null}
+
       <div className="mt-10">
         <SectionHeader title={l.eingaenge} count={l.vonGesamt(rows.length, total)} />
         {rows.length === 0 ? (
-          search || handling || source ? (
+          search || handling || source || faellig ? (
             <p className="type-body text-foreground/85 mt-5 max-w-2xl text-pretty">
               {l.leerGefiltert}{" "}
               <Link href="/admin/vertrieb/anfragen" className="text-gold-text underline underline-offset-4">{l.filterZuruecksetzen}</Link>

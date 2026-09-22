@@ -789,7 +789,10 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
        * es lokal keine Datenbank gibt.
        */
       if (query.handling) { params.push(query.handling); where.push(`l.handling_status = $${params.length}`) }
-      if (query.faellig) where.push(`l.handling_status <> 'archiviert' AND l.next_action_at IS NOT NULL AND l.next_action_at <= ${SQL_HEUTE}`)
+      if (query.faellig) {
+        const vergleich = query.faellig === "heute" ? "=" : query.faellig === "ueberfaellig" ? "<" : "<="
+        where.push(`l.handling_status <> 'archiviert' AND l.next_action_at IS NOT NULL AND l.next_action_at ${vergleich} ${SQL_HEUTE}`)
+      }
       if (query.source) { params.push(query.source); where.push(`l.source = $${params.length}`) }
       if (query.search?.trim()) {
         params.push(`%${query.search.trim()}%`)

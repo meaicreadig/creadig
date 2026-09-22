@@ -62,6 +62,10 @@ export const de = {
       neueAnfragen: "Neue Anfragen",
       ohneSchritt: "Ohne nächsten Schritt",
     },
+    teil: {
+      chancen: (n: number) => (n === 1 ? "1 Chance" : `${n} Chancen`),
+      anfragen: (n: number) => (n === 1 ? "1 Anfrage" : `${n} Anfragen`),
+    },
     nichtGemessen: "nicht gemessen",
     heuteTitel: "Heute zu tun",
     heuteLeer: "Nichts fällig. Kein Vorgang schuldet heute einen Schritt, keine Anfrage wartet.",
@@ -235,6 +239,10 @@ export const de = {
     eingaenge: "Eingänge",
     vonGesamt: (n: number, gesamt: number) => `${n} von ${gesamt}`,
     leerGefiltert: "Keine Anfrage passt zu dieser Auswahl.",
+    faelligFilter: {
+      heute: "Gefiltert: nächster Schritt heute fällig.",
+      ueberfaellig: "Gefiltert: nächster Schritt überfällig.",
+    },
     filterZuruecksetzen: "Filter zurücksetzen",
     leer: "Noch keine Anfrage. Anfragen kommen über die Website herein — oder Sie erfassen eine von Hand.",
     tabelleBeschriftung: "Anfragen mit Nummer, Absender, Organisation, Quelle, Eingang, Bearbeitung, Verantwortlichem, nächstem Schritt und Verkaufschance",
