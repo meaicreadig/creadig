@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<title>Angebot – Interne Struktur und digitaler Vertrieb – Vegitat × Vegilab</title>
+<style>
+  @font-face { font-family: 'Poppins'; font-weight: 400; src: url(fonts/Poppins-400.woff2) format('woff2'); }
+  @font-face { font-family: 'Poppins'; font-weight: 500; src: url(fonts/Poppins-500.woff2) format('woff2'); }
+  @font-face { font-family: 'Poppins'; font-weight: 600; src: url(fonts/Poppins-600.woff2) format('woff2'); }
+  @font-face { font-family: 'Poppins'; font-weight: 700; src: url(fonts/Poppins-700.woff2) format('woff2'); }
+  @font-face { font-family: 'Open Sans'; font-weight: 300 800; src: url(fonts/OpenSans-400.woff2) format('woff2'); }
+  @page { size: A4; margin: 16mm 18mm 20mm 18mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: 'Open Sans', 'Liberation Sans', Arial, sans-serif; color: #14130f; font-size: 10.5pt; line-height: 1.55; background: #fff; }
+  h1, h2, h3, h4 { font-family: 'Poppins', 'Liberation Sans', Arial, sans-serif; color: #14130f; margin: 0; }
+  h2 { font-size: 20pt; font-weight: 600; line-height: 1.2; margin: 0 0 4mm; }
+  h3 { font-size: 12.5pt; font-weight: 600; margin: 6mm 0 2mm; }
+  p { margin: 0 0 3mm; }
+  .sheet { break-before: page; position: relative; min-height: 258mm; padding-bottom: 9mm; }
+  .eyebrow { font-family: 'Poppins', 'Liberation Sans', Arial, sans-serif; font-size: 8.5pt; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #be904e; margin: 0 0 2mm; }
+  .muted { color: #5d5a52; }
+  .small { font-size: 9pt; }
+  .lead { font-size: 11.5pt; }
+  .rule { border: 0; border-top: 1px solid #e4e2dc; margin: 5mm 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+  .card { background: #f6f5f2; border-radius: 4mm; padding: 5mm 6mm; }
+  .card h4 { font-size: 10.5pt; font-weight: 600; margin: 0 0 1.5mm; }
+  .card p, .card li { font-size: 10pt; }
+  ul { margin: 0 0 3mm; padding-left: 5mm; }
+  li { margin: 0 0 1.2mm; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 5mm; font-size: 9.6pt; }
+  th { text-align: left; font-family: 'Poppins', 'Liberation Sans', Arial, sans-serif; font-weight: 600; font-size: 8.5pt; letter-spacing: 1px; text-transform: uppercase; color: #be904e; padding: 2mm 2.5mm; border-bottom: 1.5px solid #be904e; }
+  td { padding: 2.2mm 2.5mm; border-bottom: 1px solid #e4e2dc; vertical-align: top; }
+  td.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  tr.total td { font-weight: 600; border-bottom: 2px solid #14130f; }
+  .callout { border-left: 3px solid #be904e; padding: 2mm 0 2mm 4mm; margin: 4mm 0; }
+  .callout p { margin: 0; }
+  .figure { margin: 4mm 0 5mm; }
+  .figure img { width: 100%; border-radius: 3mm; display: block; }
+  .figure figcaption { font-size: 9pt; color: #5d5a52; margin-top: 2mm; }
+  .pfoot { position: absolute; left: 0; right: 0; bottom: 0; font-size: 8pt; color: #8a867e; display: flex; justify-content: space-between; border-top: 1px solid #e4e2dc; padding-top: 2mm; }
+  /* Cover */
+  .cover { background: #0c0c0e; color: #f4f2ef; border-radius: 5mm; padding: 16mm 14mm; min-height: 255mm; display: flex; flex-direction: column; justify-content: space-between; }
+  .cover .eyebrow { color: #e4c378; }
+  .cover h1 { font-size: 34pt; font-weight: 600; line-height: 1.08; color: #f4f2ef; margin: 4mm 0 5mm; }
+  .cover .sub { font-size: 14pt; color: #f4f2ef; max-width: 150mm; line-height: 1.4; }
+  .cover .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; font-size: 10pt; color: #c9c5bd; }
+  .cover .meta b { color: #f4f2ef; font-weight: 600; display: block; margin-bottom: 1mm; font-family: 'Poppins', 'Liberation Sans', Arial, sans-serif; }
+  .cover .conf { font-size: 8.5pt; color: #a9a6a0; border-top: 1px solid #2a2a30; padding-top: 4mm; }
+  .wordmark { font-family: 'Poppins', 'Liberation Sans', Arial, sans-serif; font-weight: 600; font-size: 13pt; }
+  .wordmark span { color: #e4c378; }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; margin: 3mm 0 5mm; }
+  .step { background: #f6f5f2; border-radius: 4mm; padding: 5mm; }
+  .step .n { font-family: 'Poppins', 'Liberation Sans', Arial, sans-serif; font-size: 22pt; font-weight: 600; color: #be904e; line-height: 1; }
+  .step h4 { font-size: 10.5pt; font-weight: 600; margin: 2mm 0 1mm; }
+  .step .t { font-size: 9pt; font-weight: 600; color: #be904e; margin-bottom: 1.5mm; }
+  .step p { font-size: 9.6pt; margin: 0; }
+  .sig { display: grid; grid-template-columns: 1fr 1fr; gap: 12mm; margin-top: 10mm; }
+  .sig div { border-top: 1px solid #14130f; padding-top: 2mm; font-size: 9.5pt; }
+  .toc { columns: 2; column-gap: 8mm; font-size: 9.8pt; }
+  .toc div { break-inside: avoid; padding: 1mm 0; border-bottom: 1px solid #e4e2dc; }
+  .toc span { color: #be904e; font-family: 'Poppins', 'Liberation Sans', Arial, sans-serif; font-weight: 600; margin-right: 2mm; }
+  .tr-box { background: #f6f5f2; border-radius: 4mm; padding: 6mm 7mm; }
+  .kv { display: grid; grid-template-columns: 42mm 1fr; gap: 1.5mm 4mm; font-size: 10pt; }
+  .kv b { font-weight: 600; }
+  .avoid { break-inside: avoid; }
+  .tight .card { padding: 3.5mm 5mm; }
+  .tight p, .tight li, .tight .card p { font-size: 9.4pt; }
+  .tight h2 { font-size: 18pt; }
+  .tight .lead { font-size: 9.8pt; }
+  .zielbild .figure { margin: 3mm 0 4mm; }
+  .zielbild .figure img { width: 88%; margin: 0 auto; }
+  .zielbild table { font-size: 9pt; }
+  .zielbild td { padding: 1.8mm 2.5mm; }
+  .zielbild .figure figcaption { font-size: 8.5pt; }
+  .tight h3 { margin: 4mm 0 1.5mm; }
+  .tight table { font-size: 9.2pt; margin-bottom: 3mm; }
+  .tight td { padding: 1.8mm 2.5mm; }
+  .tight p { margin-bottom: 2mm; }
+</style>
+</head>
+<body>
+
+<!-- ============ Cover ============ -->
+<section class="cover">
+  <div>
+    <div class="wordmark">crea<span>DIG</span></div>
+  </div>
+  <div>
+    <p class="eyebrow">Angebot · Interne Struktur und digitaler Vertrieb</p>
+    <h1>Vegitat × Vegilab</h1>
+    <p class="sub">Eine interne Struktur, die Bestellung, Produktion und Franchise-Abrechnung verbindet. Aufgebaut, betrieben und weiterentwickelt aus einer Hand.</p>
+  </div>
+  <div>
+    <div class="meta">
+      <div><b>Für</b>Vegitat GmbH<br>Mutalip Karahan<br>Klybeckstrasse 62<br>4057 Basel, Schweiz</div>
+      <div><b>Von</b>creaDIG · Business Architecture &amp; Operations<br>Muhammed Emin Akyol<br>[Strasse Nr.] · [PLZ] Hannover, Deutschland<br>hallo@creadig.de · [Telefon]</div>
+      <div><b>Angebot</b>Nr. A-2026-09-VEG-01<br>Datum: 22. September 2026<br>Gültig bis: 31. Oktober 2026</div>
+      <div><b>Umfang</b>Strukturaufnahme, Systemaufbau in drei Phasen, laufende Rolle Digitaler Vertrieb &amp; Struktur</div>
+    </div>
+    <p class="conf" style="margin-top:8mm">Vertraulich. Dieses Angebot ist ausschliesslich für die Vegitat GmbH bestimmt. Konzept, Struktur und Inhalte dürfen ohne schriftliche Zustimmung von creaDIG nicht an Dritte weitergegeben oder für Dritte verwendet werden.</p>
+  </div>
+</section>
+
+<!-- ============ Türkçe özet 1 ============ -->
+<section class="sheet tight">
+  <p class="eyebrow">Özet · Türkçe</p>
+  <h2>Ne teklif ediyorum, kısaca.</h2>
+  <p class="lead">Bu doküman Almanca resmi teklif. Bu iki sayfa, onun Türkçe özeti. Rakamlar ve şartlar Almanca bölümde bağlayıcıdır.</p>
+
+  <h3>Amaç</h3>
+  <p>Bugün sipariş WhatsApp'tan, üretim tahminle, franchise hesabı elle; bütün resim tek yerde görünmüyor. Teklif: sipariş, üretim ve mutabakatı tek iç sistemde birleştiren dört portal; kurulumu, işletmesi ve geliştirmesi tek elde.</p>
+
+  <h3>Ne kuruluyor</h3>
+  <div class="grid2">
+    <div class="card"><h4>Admin-Portal · CEO</h4><p>Her şeyi görür: siparişler, cirolar, mutabakat, sorunlu noktalar. Gerekince müdahale eder.</p></div>
+    <div class="card"><h4>VT · Vegitat</h4><p>Franchise veren. Marka ve kurallar, siparişleri toplar, raporlar, aylık mutabakat ve pay.</p></div>
+    <div class="card"><h4>VL · Vegilab</h4><p>Üretim. Toplu ihtiyacı görür, planlar, üretir, teslim eder. İleride ayrı şirket ya da lisanslı üretim, komisyonu sistem hesaplar.</p></div>
+    <div class="card"><h4>Franchise-Portal</h4><p>Basel, Zürich, Luzern. Sipariş verir, ciroyu bildirir, kendi hesabını görür. Yeni şube ilk gün portalla açılır.</p></div>
+  </div>
+
+  <h3>Dahil olmayanlar</h3>
+  <p>Kasa sistemi, müşteri siparişleri ve teslimat platformları, muhasebe, Vegilab kuruluşunun hukuki kısmı, donanım. İleride ayrı adım olarak eklenebilir.</p>
+
+  <h3>Adımlar ve süreler</h3>
+  <table>
+    <tr><th>Adım</th><th>İçerik</th><th>Süre</th><th>Sonuç</th></tr>
+    <tr><td>1 · Yapı analizi</td><td>Yerinde, tüm taraflarla. Detaylı sistem tasarımı burada yazılır.</td><td>2 hafta</td><td>Onaylı tasarım ve plan</td></tr>
+    <tr><td>2 · Dijital sipariş</td><td>Franchise-Portal siparişi Vegitat'a verir, Vegilab toplu ihtiyacı görür.</td><td>4 ila 6 hafta</td><td>WhatsApp devreden çıkar</td></tr>
+    <tr><td>3 · Mutabakat ve Admin</td><td>Şube cirosu, yüzde pay, aylık rapor otomatik. Admin-Portal tam.</td><td>6 ila 8 hafta</td><td>İlk otomatik aylık mutabakat</td></tr>
+    <tr><td>4 · Sürekli rol</td><td>İşletme, geliştirme, Drittgeschäfte, online satış, sonra kasa.</td><td>süresiz</td><td>Yaşayan sistem</td></tr>
+  </table>
+  <p class="small muted">Çekirdek yaklaşık 3 ila 4 ayda çalışır. Kesin süreler yapı analizinden sonra netleşir. Başlangıç: onaydan sonraki 14 gün içinde.</p>
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 2</span></div>
+</section>
+
+<!-- ============ Türkçe özet 2 ============ -->
+<section class="sheet">
+  <p class="eyebrow">Özet · Türkçe</p>
+  <h2>İş birliği modeli ve rakamlar.</h2>
+
+  <h3>Üç parça</h3>
+  <table>
+    <tr><th>Parça</th><th>Ne için</th><th>Rakam, CHF</th></tr>
+    <tr><td>A · Sistem kurulumu</td><td>Adım 1, 2 ve 3. Sabit fiyat, aşama teslimatına bağlı ödeme.</td><td class="num">6'000 + 16'000 + 18'000 = 40'000</td></tr>
+    <tr><td>B · Sürekli rol</td><td>5. aydan itibaren „Dijital satış ve yapı sorumlusu". Haftada 3 gün, işletme, destek, geliştirme, yönetim ve aylık rapor dahil. Süresiz, asgari 12 ay, 3 ay ihbar.</td><td class="num">5'500 / ay</td></tr>
+    <tr><td>C · Başarı payı</td><td>Drittgeschäfte ve online satış başlayınca, sistem üzerinden geçen net cirodan.</td><td class="num">% 3</td></tr>
+  </table>
+
+  <h3>Kalıcı şekil</h3>
+  <p>Üçüncü adım tamamlanınca taraflar 30 gün içinde kalıcı şekli belirler: mandat devam eder, Vegitat GmbH'de ya da kurulacak Vegilab şirketinde kadro, ya da ortaklık. Kadro halinde Basel'e taşınma öngörülüyor.</p>
+
+  <h3>Sahiplik ve gizlilik</h3>
+  <ul>
+    <li>Sistem, veriler ve erişimler Vegitat'ındır; her aşamanın ödemesiyle o aşamanın sonucu Vegitat'a geçer.</li>
+    <li>creaDIG'in kendi araçları, kütüphaneleri ve yöntemleri creaDIG'de kalır.</li>
+    <li>Her adımın sonunda durulabilir. Kurulan sende kalır.</li>
+    <li>Hosting ve lisanslar Vegitat adına açılır ve doğrudan Vegitat tarafından ödenir. Yol masrafları belgeyle, aylık üst sınırlı.</li>
+    <li>Bu doküman gizlidir; konsept üçüncü kişilere verilmez.</li>
+  </ul>
+
+  <h3>Senden gereken</h3>
+  <ul>
+    <li>Yapı analizi için yerinde iki üç gün, ekibe ve WhatsApp sipariş geçmişine erişim, mevcut franchise kuralı.</li>
+    <li>Her şube için bir muhatap, Vegilab için üretim sorumlusu.</li>
+    <li>Haftada 30 dakika yönetim görüşmesi.</li>
+  </ul>
+
+  <h3>Sonraki adım</h3>
+  <p>Bir hafta içinde 30 dakikalık soru görüşmesi, ardından son sayfadaki onay ve yapı analizi için tarih: 41. ya da 42. hafta, yani 5 ila 16 Ekim 2026.</p>
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 3</span></div>
+</section>
+
+<!-- ============ 1 Ausgangslage ============ -->
+<section class="sheet">
+  <p class="eyebrow">Inhalt</p>
+  <div class="toc">
+    <div><span>1</span>Ausgangslage</div>
+    <div><span>2</span>Ziel und Nutzen</div>
+    <div><span>3</span>Zielbild: vier Portale, ein System</div>
+    <div><span>4</span>Leistungsumfang</div>
+    <div><span>5</span>Vorgehen in Phasen</div>
+    <div><span>6</span>Zeitplan</div>
+    <div><span>7</span>Rollen und Zusammenarbeit</div>
+    <div><span>8</span>Zusammenarbeitsmodell und Konditionen</div>
+    <div><span>9</span>Eigentum, Daten, Vertraulichkeit</div>
+    <div><span>10</span>Nächste Schritte und Annahme</div>
+  </div>
+  <hr class="rule">
+
+  <p class="eyebrow">1</p>
+  <h2>Ausgangslage</h2>
+  <p class="lead">Vegitat wächst über Franchise-Standorte, Vegilab produziert. Die interne Struktur zwischen beiden ist bisher nicht abgebildet. Sie läuft über Personen, Telefon und WhatsApp.</p>
+  <div class="grid2">
+    <div class="card"><h4>Bestellung</h4><p>Die Standorte Basel, Zürich und Luzern bestellen per WhatsApp bei Vegilab. Es gibt keinen Bestellstand, keine Historie und keine Planungsgrundlage für die Produktion.</p></div>
+    <div class="card"><h4>Franchise-Abrechnung</h4><p>Umsätze und Abgaben werden von Hand abgerechnet. Es gibt keinen Monatsbericht auf Knopfdruck und keine für beide Seiten transparente Sicht.</p></div>
+    <div class="card"><h4>Vegilab</h4><p>Vegilab produziert heute nur für Vegitat und läuft organisatorisch unter Vegitat. Eine Trennung als eigene Einheit ist angedacht, auch als lizenzierter Produktionsbetrieb mit Kommission an Vegitat.</p></div>
+    <div class="card"><h4>Führung</h4><p>Das Gesamtbild ist an keiner Stelle sichtbar. Wer den Überblick will, muss nachfragen. Entscheidungen stützen sich auf Schätzung statt auf Zahlen.</p></div>
+  </div>
+  <div class="callout"><p>Das Ziel des Unternehmens, weitere Standorte in der Schweiz zu eröffnen, verschärft die Lage: Jeder neue Standort auf WhatsApp vergrössert die Unordnung. Jeder neue Standort auf einem Portal bringt vom ersten Tag an Ordnung.</p></div>
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 4</span></div>
+</section>
+
+<!-- ============ 2 Ziel und Nutzen ============ -->
+<section class="sheet">
+  <p class="eyebrow">2</p>
+  <h2>Ziel und Nutzen</h2>
+  <p class="lead">Eine interne Struktur, in der Bestellung, Produktion und Abrechnung in einem Fluss laufen, und eine Person, die sie aufbaut, betreibt und weiterentwickelt.</p>
+  <h3>Was am Ende steht</h3>
+  <ul>
+    <li>Jeder Standort bestellt digital. Vegitat bündelt, Vegilab sieht den echten Bedarf und produziert danach.</li>
+    <li>Umsatz je Standort, Abgabe in Prozent und Monatsabrechnung entstehen automatisch, für Franchise und, wenn gewünscht, für die Produktionslizenz zwischen Vegitat und Vegilab.</li>
+    <li>Die Geschäftsführung sieht das Ganze auf einem Bildschirm und greift dort ein, wo es hakt.</li>
+    <li>Neue Standorte werden vom ersten Tag an über das Portal angebunden.</li>
+    <li>Die Struktur trägt spätere Schritte: Drittgeschäft für Vegilab-Produkte, Online-Verkauf, Kasse, Personal, Einkauf.</li>
+  </ul>
+  <h3>Nutzen je Beteiligtem</h3>
+  <table>
+    <tr><th>Für</th><th>Nutzen</th></tr>
+    <tr><td>Geschäftsführung</td><td>Gesamtbild auf einen Blick. Entscheidungen aus Zahlen statt aus Nachfragen. Wissen liegt im System, nicht in einzelnen Personen.</td></tr>
+    <tr><td>Franchisenehmer</td><td>Bestellung vom Telefon in Minuten. Eigene Umsätze und Abgaben jederzeit sichtbar, Diskussionen entfallen. Ein neuer Standort startet mit Struktur.</td></tr>
+    <tr><td>Vegilab</td><td>Produktion nach echtem Bedarf statt nach Schätzung. Mit eigener Struktur später auch Verkauf an Drittgeschäfte und ein sauberes Lizenz- oder Kommissionsmodell gegenüber Vegitat.</td></tr>
+  </table>
+  <p class="small muted">Dieses Angebot nennt bewusst keine Umsatz- oder Einsparungszahlen. Belastbare Kennzahlen entstehen in Phase 1 aus den echten Daten.</p>
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 5</span></div>
+</section>
+
+<!-- ============ 3 Zielbild ============ -->
+<section class="sheet zielbild">
+  <p class="eyebrow">3</p>
+  <h2>Zielbild: vier Portale, ein System</h2>
+  <figure class="figure">
+    <img src="architektur-de.png" alt="Architektur: Admin-Portal oben, Vegitat und Vegilab in der Mitte, Franchise-Portal und spätere Drittgeschäfte unten, mit nummeriertem Ablauf 1 bis 4">
+    <figcaption>Ablauf: 1 Standort bestellt und meldet Umsatz · 2 Vegitat bündelt, Vegilab sieht den Bedarf · 3 Vegilab produziert und liefert · 4 Monatsabrechnung und Abgabe. Gold: Bestell- und Produktionsfluss. Grau: Berichts- und Abgabefluss. Gestrichelt: noch offen.</figcaption>
+  </figure>
+  <table>
+    <tr><th>Portal</th><th>Nutzer</th><th>Sieht</th><th>Tut</th></tr>
+    <tr><td>Admin-Portal</td><td>Geschäftsführung</td><td>Alle Bestellungen, Umsätze, Abrechnungen, Produktionsstand, offene Punkte</td><td>Steuert, greift ein, gibt frei</td></tr>
+    <tr><td>VT · Vegitat</td><td>Zentrale</td><td>Gebündelte Bestellungen, Franchise-Regeln, Berichte</td><td>Bündelt, rechnet monatlich ab, führt die Marke</td></tr>
+    <tr><td>VL · Vegilab</td><td>Produktion</td><td>Gebündelten Bedarf, Planung, Lieferstatus</td><td>Plant, produziert, meldet Lieferung</td></tr>
+    <tr><td>Franchise-Portal</td><td>Standorte</td><td>Eigene Bestellungen, eigene Umsätze, eigene Abrechnung</td><td>Bestellt, meldet Umsatz, bestätigt Abrechnung</td></tr>
+    <tr><td>Drittgeschäfte</td><td>Später: externe Abnehmer</td><td>Eigenes Sortiment, eigene Bestellungen</td><td>Bestellt über Vegitat oder direkt bei Vegilab; Weg wird in Phase 1 festgelegt</td></tr>
+  </table>
+  <p class="small muted">Die detaillierte Systembeschreibung, also Datenflüsse, Rollen und Rechte im Einzelnen, Bildschirme und Schnittstellen, ist das Ergebnis von Phase 1 und wird dort dokumentiert.</p>
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 6</span></div>
+</section>
+
+<!-- ============ 4 Leistungsumfang ============ -->
+<section class="sheet">
+  <p class="eyebrow">4</p>
+  <h2>Leistungsumfang</h2>
+  <div class="grid2">
+    <div>
+      <h3 style="margin-top:0">Enthalten</h3>
+      <ul>
+        <li>Strukturaufnahme vor Ort und Systemdesign</li>
+        <li>Franchise-Portal: Bestellung, Umsatzmeldung, eigene Abrechnung</li>
+        <li>Vegitat-Portal: Bündelung, Regeln, Berichte, Monatsabrechnung</li>
+        <li>Vegilab-Portal: Bedarf, Planung, Lieferstatus; optional Lizenz- oder Kommissionsabrechnung gegenüber Vegitat</li>
+        <li>Admin-Portal: Kennzahlen, Problemstellen, Eingriff, Freigaben</li>
+        <li>Einführung und Schulung der Nutzer an allen Standorten</li>
+        <li>Betrieb, Support und Weiterentwicklung im Rahmen der laufenden Rolle</li>
+        <li>Monatliches schriftliches Reporting an die Geschäftsführung</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="margin-top:0">Nicht enthalten</h3>
+      <ul>
+        <li>Kassensystem; als späterer Schritt möglich, separates Angebot</li>
+        <li>Kundenbestellungen, Webshop, Lieferplattformen; als Phase 4 möglich</li>
+        <li>Buchhaltung, Treuhand, Steuerberatung</li>
+        <li>Gründung und Rechtsberatung für eine Vegilab-Gesellschaft; Struktur und Prozesse dafür sind enthalten</li>
+        <li>Hardware, Geräte, Netzwerk und Internetanschluss vor Ort</li>
+        <li>Marketing, Content, Social Media</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout"><p>Grundsatz: Erst sichtbar machen, dann steuern. Der Kern wird in drei Phasen aufgebaut. Jede Phase liefert ein nutzbares Ergebnis, und nach jeder Phase kann die Vegitat GmbH entscheiden, ob es weitergeht.</p></div>
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 7</span></div>
+</section>
+
+<!-- ============ 5 Phasen ============ -->
+<section class="sheet">
+  <p class="eyebrow">5</p>
+  <h2>Vorgehen in Phasen</h2>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><h4>Strukturaufnahme und Systemdesign</h4><div class="t">rund 2 Wochen</div><p>Vor Ort mit allen Beteiligten: wer bestellt was, wann, bei wem. Bestellhistorie, Franchise-Regeln, Produktionsablauf. Ergebnis: das abgestimmte Systemdesign als Grundlage für alles Weitere.</p></div>
+    <div class="step"><div class="n">2</div><h4>Digitale Bestellung</h4><div class="t">4 bis 6 Wochen</div><p>Das Franchise-Portal bestellt bei Vegitat, Vegilab sieht den gebündelten Bedarf und meldet Lieferung und Status. WhatsApp wird abgelöst, die ersten Zahlen laufen ein.</p></div>
+    <div class="step"><div class="n">3</div><h4>Abrechnung und Admin</h4><div class="t">6 bis 8 Wochen</div><p>Umsatz je Standort, Abgabe in Prozent, Monatsabrechnung automatisch. Admin-Portal mit Kennzahlen und Problemstellen. Die Geschäftsführung sieht alles und greift ein.</p></div>
+  </div>
+  <table>
+    <tr><th>Phase</th><th>Lieferobjekt</th><th>Abnahmekriterium</th></tr>
+    <tr><td>1 · Strukturaufnahme</td><td>Systemdesign-Dokument, Prozesslandkarte, Rollen und Rechte, verbindlicher Plan für Phase 2 und 3</td><td>Systemdesign von der Geschäftsführung freigegeben</td></tr>
+    <tr><td>2 · Digitale Bestellung</td><td>Franchise-Portal und Vegilab-Sicht im Betrieb, Nutzer geschult</td><td>Alle Standorte bestellen zwei Wochen lang ausschliesslich über das Portal</td></tr>
+    <tr><td>3 · Abrechnung und Admin</td><td>Umsatzerfassung, Monatsabrechnung, Admin-Portal</td><td>Erste Monatsabrechnung aus dem System, von der Geschäftsführung bestätigt</td></tr>
+    <tr><td>4 · Laufende Rolle</td><td>Betrieb, Support, Weiterentwicklung; Drittgeschäft-Kanal, Online-Verkauf, später Kasse, Personal, Einkauf</td><td>Monatliches Reporting, jährliche Zielvereinbarung</td></tr>
+  </table>
+  <p class="small muted">Die Werte für die Abrechnung werden zunächst im Portal erfasst und später automatisch aus der Kasse übernommen, sobald ein Kassensystem angebunden ist.</p>
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 8</span></div>
+</section>
+
+<!-- ============ 6 Zeitplan ============ -->
+<section class="sheet">
+  <p class="eyebrow">6</p>
+  <h2>Zeitplan</h2>
+  <p class="lead">Start innerhalb von 14 Tagen nach Annahme des Angebots. Vorschlag: Kalenderwoche 41 oder 42, also 5. bis 16. Oktober 2026.</p>
+  <table>
+    <tr><th>Zeitraum</th><th>Phase</th><th>Meilenstein</th></tr>
+    <tr><td>KW 41 bis 42</td><td>1 · Strukturaufnahme</td><td>Systemdesign freigegeben, Ende Oktober 2026</td></tr>
+    <tr><td>KW 43 bis 48</td><td>2 · Digitale Bestellung</td><td>Alle Standorte bestellen über das Portal, Anfang Dezember 2026</td></tr>
+    <tr><td>KW 49 bis KW 6/2027</td><td>3 · Abrechnung und Admin</td><td>Erste automatische Monatsabrechnung, Februar 2027; Feiertage berücksichtigt</td></tr>
+    <tr><td>ab März 2027</td><td>4 · Laufende Rolle</td><td>Betrieb, Drittgeschäft-Kanal, Online-Verkauf, weitere Module</td></tr>
+  </table>
+  <p>Der Kern läuft damit rund vier Monate nach dem Start. Die Dauer der Phasen 2 und 3 wird in Phase 1 präzisiert; Abweichungen werden schriftlich festgehalten.</p>
+  <h3>Präsenz in Basel</h3>
+  <ul>
+    <li>Phase 1: zwei bis drei Tage vor Ort, mit allen Standorten und der Produktion.</li>
+    <li>Phase 2 und 3: ein bis zwei Tage vor Ort pro Monat, Einführung und Schulung; übrige Zeit remote.</li>
+    <li>Ab Phase 4: rund zwei Tage vor Ort pro Monat, wöchentliche Steuerung remote, Erreichbarkeit an Werktagen.</li>
+  </ul>
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 9</span></div>
+</section>
+
+<!-- ============ 7 Rollen ============ -->
+<section class="sheet">
+  <p class="eyebrow">7</p>
+  <h2>Rollen und Zusammenarbeit</h2>
+  <table>
+    <tr><th>Seite</th><th>Rolle</th><th>Beitrag</th></tr>
+    <tr><td>Vegitat GmbH</td><td>Mutalip Karahan, Auftraggeber und Entscheider</td><td>Wöchentlicher Steuerungstermin von 30 Minuten. Zugang zu Team, Bestellhistorie und Franchise-Regeln. Zwei bis drei Tage vor Ort in Phase 1. Freigabe der Phasen.</td></tr>
+    <tr><td>Standorte</td><td>Je Standort eine Kontaktperson</td><td>Mitwirkung in der Strukturaufnahme, Testbestellungen, Rückmeldungen in der Einführung.</td></tr>
+    <tr><td>Vegilab</td><td>Produktionsverantwortliche Person</td><td>Produktionsablauf, Kapazitäten, Lieferwege; Test der Bedarfs- und Liefersicht.</td></tr>
+    <tr><td>creaDIG</td><td>Muhammed Emin Akyol, Verantwortlicher Digitaler Vertrieb &amp; Struktur</td><td>Strukturaufnahme, Systemdesign, Aufbau, Einführung, Schulung, Betrieb, Weiterentwicklung, monatliches Reporting.</td></tr>
+  </table>
+  <h3>Arbeitsrhythmus</h3>
+  <ul>
+    <li>Wöchentlich 30 Minuten Steuerung zwischen Geschäftsführung und creaDIG: Stand, Entscheidungen, nächste Schritte.</li>
+    <li>Monatlich ein schriftlicher Bericht: was gebaut wurde, was läuft, was offen ist, Kennzahlen.</li>
+    <li>Nach jeder Phase eine Abnahme gemäss Abschnitt 5.</li>
+  </ul>
+  <h3>Über creaDIG</h3>
+  <p>creaDIG ist ein Systemhaus für Business Architecture und Operations mit Kunden in Deutschland und der Schweiz. creaDIG baut und betreibt eigene Systeme, darunter ein Kassensystem für die Gastronomie in der Schweiz. Grundsatz: verstehen, bauen, betreiben.</p>
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 10</span></div>
+</section>
+
+<!-- ============ 8 Konditionen ============ -->
+<section class="sheet">
+  <p class="eyebrow">8</p>
+  <h2>Zusammenarbeitsmodell und Konditionen</h2>
+  <p class="lead">Drei Bausteine: der Aufbau des Systems zum Festpreis, die laufende Rolle als Mandat und eine Erfolgsbeteiligung, sobald das System Umsatz bringt.</p>
+
+  <h3>A · Systemaufbau, Phasen 1 bis 3, Festpreis</h3>
+  <table>
+    <tr><th>Phase</th><th>Leistung</th><th>Fälligkeit</th><th>Betrag</th></tr>
+    <tr><td>1</td><td>Strukturaufnahme und Systemdesign</td><td>bei Freigabe des Systemdesigns</td><td class="num">CHF 6'000</td></tr>
+    <tr><td>2</td><td>Digitale Bestellung</td><td>50 % bei Start, 50 % bei Abnahme</td><td class="num">CHF 16'000</td></tr>
+    <tr><td>3</td><td>Abrechnung und Admin</td><td>50 % bei Start, 50 % bei Abnahme</td><td class="num">CHF 18'000</td></tr>
+    <tr class="total"><td></td><td>Summe Systemaufbau</td><td></td><td class="num">CHF 40'000</td></tr>
+  </table>
+  <p class="small">Die Festpreise enthalten die Arbeitszeit von creaDIG in den Phasen 1 bis 3 im Umfang von rund drei Tagen pro Woche. Nach jeder Phase kann die Vegitat GmbH die Zusammenarbeit beenden; bezahlte Ergebnisse bleiben bei ihr.</p>
+
+  <h3>B · Laufende Rolle ab Phase 4, Mandat</h3>
+  <div class="kv">
+    <b>Rolle</b><span>Verantwortlicher Digitaler Vertrieb &amp; Struktur, im Unternehmen sichtbar mit Funktion und Adresse, vertraglich als Mandat über creaDIG</span>
+    <b>Kapazität</b><span>drei Tage pro Woche</span>
+    <b>Enthalten</b><span>Betrieb und Support der Portale, Weiterentwicklung im Rahmen der Kapazität, Steuerung, Einführung neuer Standorte, monatliches Reporting</span>
+    <b>Honorar</b><span>CHF 5'500 pro Monat, im Voraus zum Monatsanfang</span>
+    <b>Laufzeit</b><span>unbefristet, Mindestlaufzeit 12 Monate, danach Kündigungsfrist 3 Monate zum Monatsende</span>
+  </div>
+
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 11</span></div>
+</section>
+
+<section class="sheet">
+  <p class="eyebrow">8 · Fortsetzung</p>
+  <h2>Konditionen, Fortsetzung</h2>
+  <h3 style="margin-top:2mm">C · Erfolgsbeteiligung</h3>
+  <p>Sobald das System Verkaufskanäle trägt, also Drittgeschäft für Vegilab-Produkte und Online-Verkauf, erhält creaDIG 3 % des über das System abgewickelten Nettoumsatzes dieser Kanäle, monatlich abgerechnet. Die Beteiligung beginnt mit der Aktivierung des jeweiligen Kanals und wird in Phase 4 schriftlich präzisiert.</p>
+
+  <h3>D · Übergang in eine dauerhafte Form</h3>
+  <p>Nach Abnahme von Phase 3 legen die Parteien innerhalb von 30 Tagen die dauerhafte Form der Zusammenarbeit fest: Fortführung des Mandats, Festanstellung bei der Vegitat GmbH oder bei der künftigen Vegilab-Gesellschaft, oder eine Beteiligung. Für eine Festanstellung ist ein Umzug nach Basel vorgesehen.</p>
+
+  <h3>Nebenkosten und Zahlungsbedingungen</h3>
+  <ul>
+    <li>Hosting, Lizenzen und Domains laufen auf die Vegitat GmbH und werden von ihr direkt bezahlt; Richtwert CHF 150 bis 300 pro Monat, Festlegung in Phase 1.</li>
+    <li>Reisekosten nach Basel nach Beleg; ab Phase 2 begrenzt auf CHF 600 pro Monat, in Phase 1 nach tatsächlichem Aufwand.</li>
+    <li>Alle Beträge in CHF, netto. Leistungsort ist die Schweiz; es wird keine deutsche Umsatzsteuer ausgewiesen. Eine allfällige Schweizer Bezugsteuer trägt die Auftraggeberin.</li>
+    <li>Zahlungsziel 14 Tage nach Rechnungsstellung.</li>
+  </ul>
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 12</span></div>
+</section>
+
+<!-- ============ 9 Eigentum ============ -->
+<section class="sheet">
+  <p class="eyebrow">9</p>
+  <h2>Eigentum, Daten, Vertraulichkeit</h2>
+  <h3>Eigentum</h3>
+  <ul>
+    <li>Das System, die Daten und alle Zugänge gehören der Vegitat GmbH. Mit der Bezahlung einer Phase geht das Ergebnis dieser Phase vollständig auf sie über.</li>
+    <li>Werkzeuge, Bibliotheken, Vorlagen und Methoden, die creaDIG unabhängig von diesem Auftrag entwickelt hat oder entwickelt, bleiben Eigentum von creaDIG. Die Vegitat GmbH erhält daran ein zeitlich unbegrenztes Nutzungsrecht für das System.</li>
+    <li>Hosting und Lizenzen laufen von Beginn an auf die Vegitat GmbH, damit die Sichtbarkeit und die Kontrolle jederzeit bei ihr liegen.</li>
+  </ul>
+  <h3>Daten</h3>
+  <ul>
+    <li>Betriebs-, Umsatz- und Personendaten werden ausschliesslich für den Zweck dieses Systems verarbeitet und in der Schweiz oder der EU gehostet; Festlegung in Phase 1.</li>
+    <li>Rollen und Rechte stellen sicher, dass jeder Standort nur die eigenen Daten sieht.</li>
+    <li>Bei Beendigung übergibt creaDIG alle Zugänge, Daten und Dokumentationen vollständig und löscht eigene Kopien.</li>
+  </ul>
+  <h3>Vertraulichkeit</h3>
+  <ul>
+    <li>Beide Seiten behandeln alle geschäftlichen Informationen aus dieser Zusammenarbeit vertraulich, auch nach ihrem Ende.</li>
+    <li>Dieses Angebot, sein Konzept und seine Struktur sind vertraulich und dürfen ohne schriftliche Zustimmung von creaDIG weder an Dritte weitergegeben noch für die Umsetzung durch Dritte verwendet werden.</li>
+    <li>Eine ausführliche Vertraulichkeitsvereinbarung wird auf Wunsch vor Phase 1 unterzeichnet.</li>
+  </ul>
+  <div class="callout"><p>Kurz gesagt: Das System und die Daten gehören Vegitat. Nach jeder Phase kann die Vegitat GmbH anhalten. Was gebaut ist, bleibt bei ihr.</p></div>
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 13</span></div>
+</section>
+
+<!-- ============ 10 Nächste Schritte ============ -->
+<section class="sheet">
+  <p class="eyebrow">10</p>
+  <h2>Nächste Schritte und Annahme</h2>
+  <table>
+    <tr><th>Schritt</th><th>Was</th><th>Wann</th></tr>
+    <tr><td>1</td><td>Rückfragen zum Angebot, 30 Minuten, persönlich oder telefonisch</td><td>innerhalb einer Woche</td></tr>
+    <tr><td>2</td><td>Annahme des Angebots durch Unterschrift auf dieser Seite</td><td>bis 31. Oktober 2026</td></tr>
+    <tr><td>3</td><td>Termin für die Strukturaufnahme vor Ort</td><td>KW 41 oder 42, 5. bis 16. Oktober 2026</td></tr>
+    <tr><td>4</td><td>Start Phase 1</td><td>innerhalb von 14 Tagen nach Annahme</td></tr>
+  </table>
+  <h3>Annahme</h3>
+  <p>Die Vegitat GmbH nimmt das Angebot A-2026-09-VEG-01 vom 22. September 2026 an. Beauftragt wird zunächst Phase 1, Strukturaufnahme und Systemdesign, zum Festpreis von CHF 6'000. Die Phasen 2 und 3 sowie die laufende Rolle werden nach Freigabe des Systemdesigns gemäss diesem Angebot beauftragt.</p>
+  <div class="sig">
+    <div><b>Vegitat GmbH</b><br>Mutalip Karahan<br><br><br>Ort, Datum, Unterschrift</div>
+    <div><b>creaDIG</b><br>Muhammed Emin Akyol<br><br><br>Ort, Datum, Unterschrift</div>
+  </div>
+  <hr class="rule" style="margin-top:14mm">
+  <p class="small muted">creaDIG · Business Architecture &amp; Operations · Muhammed Emin Akyol · [Strasse Nr.] · [PLZ] Hannover · Deutschland · hallo@creadig.de · [Telefon] · [USt-IdNr.]</p>
+  <div class="pfoot"><span>creaDIG · Angebot A-2026-09-VEG-01 · Vegitat × Vegilab · Vertraulich</span><span>22. September 2026 · Seite 14</span></div>
+</section>
+</body>
+</html>
