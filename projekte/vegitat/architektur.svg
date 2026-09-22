@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 940" width="1600" height="940" role="img" aria-label="Interne Struktur von Vegitat und Vegilab: Das Admin-Portal des CEO liegt über allem. In der Mitte Vegitat als Franchisegeber und Vegilab als Produktion. Darunter das Franchise-Portal der Filialen und die späteren Drittgeschäfte. Bestellungen und Umsätze fließen vom Franchise-Portal an Vegitat, als gebündelter Bedarf weiter an Vegilab. Lieferung, Status, Monatsbericht und Abgabe fließen zurück.">
+  <defs>
+    <marker id="headGold" orient="auto" markerWidth="14" markerHeight="14" refX="11" refY="7" markerUnits="userSpaceOnUse">
+      <path d="M3 2 L11 7 L3 12" fill="none" stroke="#be904e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="headGrey" orient="auto" markerWidth="14" markerHeight="14" refX="11" refY="7" markerUnits="userSpaceOnUse">
+      <path d="M3 2 L11 7 L3 12" fill="none" stroke="#8a8780" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect width="1600" height="940" fill="#0c0c0e"/>
+
+  <!-- Titel -->
+  <text x="80" y="62" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#f4f2ef">Vegitat × Vegilab · Interne Struktur</text>
+  <text x="80" y="92" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#a9a6a0">Vier Portale, ein System: Bestellung, Produktion und Franchise-Abrechnung laufen zusammen.</text>
+
+  <!-- Admin-Portal -->
+  <rect x="80" y="124" width="1440" height="86" rx="14" fill="#131316" stroke="#be904e" stroke-width="2.5"/>
+  <text x="110" y="160" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#e4c378">ADMIN-PORTAL · CEO</text>
+  <text x="110" y="189" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">sieht alles: Struktur · Bestellungen · Umsätze · Abrechnung · Problemstellen. Greift ein, wo es hakt.</text>
+
+  <!-- VT Vegitat -->
+  <rect x="80" y="300" width="560" height="170" rx="14" fill="#131316" stroke="#34343b" stroke-width="1.5"/>
+  <text x="110" y="334" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="3" fill="#e4c378">VT</text>
+  <text x="110" y="370" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#f4f2ef">Vegitat</text>
+  <text x="110" y="406" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Franchisegeber · Marke</text>
+  <text x="110" y="432" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Bestellungen bündeln · Berichte · Abrechnung</text>
+
+  <!-- VL Vegilab -->
+  <rect x="960" y="300" width="560" height="170" rx="14" fill="#131316" stroke="#34343b" stroke-width="1.5"/>
+  <text x="990" y="334" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="3" fill="#e4c378">VL</text>
+  <text x="990" y="370" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#f4f2ef">Vegilab</text>
+  <text x="990" y="406" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Produktion · künftig eigene Firma</text>
+  <text x="990" y="432" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Bedarf · Planung · Lieferung</text>
+
+  <!-- Franchise-Portal -->
+  <rect x="80" y="580" width="560" height="170" rx="14" fill="#131316" stroke="#34343b" stroke-width="1.5"/>
+  <text x="110" y="614" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="3" fill="#e4c378">FRANCHISE-PORTAL</text>
+  <text x="110" y="650" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#f4f2ef">Franchisenehmer</text>
+  <text x="110" y="686" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Basel · Zürich · Luzern</text>
+  <text x="110" y="712" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">bestellt · meldet Umsatz · sieht die eigene Abrechnung</text>
+
+  <!-- Drittgeschäfte (später) -->
+  <rect x="960" y="580" width="560" height="170" rx="14" fill="#101013" stroke="#6f6c66" stroke-width="2" stroke-dasharray="10 8"/>
+  <text x="990" y="614" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="3" fill="#a9a6a0">SPÄTER</text>
+  <text x="990" y="650" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#f4f2ef">Drittgeschäfte</text>
+  <text x="990" y="686" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">B2B-Abnehmer für Vegilab-Produkte</text>
+  <text x="990" y="712" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Weg noch offen: über Vegitat oder direkt</text>
+
+  <!-- Verbindungen -->
+  <g fill="none" stroke="#be904e" stroke-width="2.5" stroke-linecap="round">
+    <path d="M360 210 L360 297" marker-end="url(#headGold)"/>
+    <path d="M1240 210 L1240 297" marker-end="url(#headGold)"/>
+    <path d="M640 360 L957 360" marker-end="url(#headGold)"/>
+    <path d="M960 415 L643 415" marker-end="url(#headGold)"/>
+    <path d="M170 580 L170 473" marker-end="url(#headGold)"/>
+    <path d="M550 470 L550 577" marker-end="url(#headGold)"/>
+  </g>
+  <path d="M1240 580 L1240 473" fill="none" stroke="#8a8780" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="8 8" marker-end="url(#headGrey)"/>
+
+  <!-- Beschriftungen der Verbindungen -->
+  <g font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="15" fill="#a9a6a0">
+    <text x="374" y="260">sieht · steuert</text>
+    <text x="1254" y="260">sieht · steuert</text>
+    <text x="800" y="347" text-anchor="middle">gebündelter Bedarf</text>
+    <text x="800" y="443" text-anchor="middle">Lieferung · Status</text>
+    <text x="186" y="517">Bestellung</text>
+    <text x="186" y="539">Umsatz</text>
+    <text x="534" y="517" text-anchor="end">Monatsbericht</text>
+    <text x="534" y="539" text-anchor="end">Abgabe in %</text>
+    <text x="1254" y="530">noch offen</text>
+  </g>
+
+  <!-- Fußzeile -->
+  <line x1="80" y1="800" x2="1520" y2="800" stroke="#2a2a30" stroke-width="1"/>
+  <g font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="15" fill="#a9a6a0">
+    <text x="80" y="836">Gestrichelt = noch offen. Kassensystem nicht im ersten Schritt. Später andockbar: Kasse · Personal · Einkauf.</text>
+    <text x="80" y="862">Datenweg: Franchise bestellt bei Vegitat, Vegitat bündelt, Vegilab produziert. Umsatz und Abgabe laufen monatlich als Bericht zurück.</text>
+  </g>
+  <text x="1520" y="900" text-anchor="end" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#f4f2ef">crea<tspan fill="#e4c378">DIG</tspan> <tspan font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="14" font-weight="400" fill="#a9a6a0">· Systemhaus · DE + CH</tspan></text>
+</svg>
