@@ -9,9 +9,9 @@ Alt satır: creaDIG · Emin Akyol · İş mimarisi ve operasyon · DE + CH
 ## 2 · Bugün her şey WhatsApp üzerinden yürüyor.
 - **Sipariş** — Basel, Zürich ve Luzern siparişlerini Vegilab'a WhatsApp'tan veriyor. Sipariş durumu yok, geçmiş yok, planlama yok.
 - **Franchise** — Cirolar ve paylar elle hesaplanıyor. Tek tuşla aylık rapor yok, iki taraf için de şeffaf bir görünüm yok.
-- **Şirket** — Vegilab yalnızca Vegitat için üretiyor ve Vegitat'ın altında çalışıyor. Kendi yapısı olmadan üçüncü işletmelere satış olmaz.
+- **Şirket** — Vegilab yalnızca Vegitat için üretiyor ve Vegitat'ın altında çalışıyor. Kendi yapısı olmadan üçüncü işletmelere satış yönetilemez.
 
-**Yönetim bütünü ancak sorduğunda görüyor.**
+**Bütün resim tek yerde değil. Sormadan görünmüyor.**
 
 ## 3 · Mimari: dört portal, tek sistem.
 ![Mimari](architektur-tr.png)
@@ -26,7 +26,7 @@ Akış: **1** şube sipariş verir ve ciro bildirir → **2** Vegitat toplar, Ve
 Alt satır: Sonra: Kasa · Personel · Satın alma. Kapsam iç yapı; müşteri siparişleri ve teslimat platformları bu adımda yok.
 
 ## 4 · Ne kazanılır: kontrol, düzen, büyüme.
-- **Yönetim** — Bütün resim tek ekranda: sipariş, ciro, hesap, üretim. Kararlar sorarak değil, bakarak verilir. Kişiye bağımlılık azalır.
+- **Yönetim** — Bütün resim tek ekranda: sipariş, ciro, hesap, üretim. Kararlar sorarak değil, bakarak verilir. Bilgi kişilerde değil, sistemde durur.
 - **Franchise** — Sipariş telefondan, dakikalar içinde. Kendi cirosunu ve payını görür, tartışma biter. Yeni şube ilk gün portalla açılır.
 - **Vegilab** — Tahminle değil, gerçek ihtiyaçla üretir. Kendi yapısıyla ileride Drittgeschäfte'ye de satabilir.
 
@@ -37,14 +37,13 @@ Alt satır: Sonra: Kasa · Personel · Satın alma. Kapsam iç yapı; müşteri 
 2. **Dijital sipariş · yaklaşık 4 ila 6 hafta** — Franchise-Portal siparişi Vegitat'a verir, Vegilab toplu ihtiyacı görür. WhatsApp devreden çıkar, ilk rakamlar akmaya başlar.
 3. **Mutabakat ve Admin · yaklaşık 6 ila 8 hafta** — Şube başına ciro, yüzde pay, aylık rapor otomatik. Yönetim her şeyi kendi portalında görür ve müdahale eder.
 
-Çekirdek yaklaşık 3 ila 4 ayda çalışır, süreler yapı analizinden sonra kesinleşir. Sonrası: Drittgeschäfte, kasa, personel, satın alma.
+Çekirdek yaklaşık 3 ila 4 ayda çalışır, süreler yapı analizinden sonra kesinleşir. Sonrası: Drittgeschäfte, kasa, personel, satın alma. Müşteri siparişleri ve teslimat platformları bu adımda yok, ileride bağlanabilir.
 
 ## 6 · Kurmak ve işletmek. Rolüm ve sonraki adım.
 **Kurup teslim edip gitmek değil. Kurmak, işletmek ve sürekli geliştirmek. Bunun için içeride bir sorumlu gerekir. Bu sorumluluğu üstlenmeye hazırım.**
-- **İçeriden sorumluluk** — Yapı ve dijital satış için içeride bir sorumlu, uzun vadeli. Şekli ve ortaklık: birlikte karara bağlanır.
+- **İçeriden sorumluluk** — Yapı ve dijital satış için içeride bir sorumlu, uzun vadeli. Şekli birlikte karara bağlanır.
 - **Saatlik proje değil** — “Şunu yap, şunu ver” işi değil. Bakımı yapılan, takip edilen ve geliştirilen bir sistem.
-- **Sonraki adım** — Yapı analizine evet. Senden gereken: yerinde iki üç gün, ekibe ve WhatsApp sipariş geçmişine erişim, mevcut franchise kuralı.
+- **Sonraki adım** — Yapı analizine evet. Başlangıç önümüzdeki iki hafta içinde, yerinde. Senden gereken: iki üç gün, ekibe ve sipariş geçmişine erişim, franchise kuralı.
 
-**Sistem ve veriler Vegitat'ındır. creaDIG kurar ve işletir, sahibi Vegitat'tır.**
+**Sistem ve veriler Vegitat'ın. Her adımın sonunda durabilirsin, kurulan sende kalır.**
 
-Arkamda creaDIG var: kendi sistemlerini kuran ve işleten bir yapı; aralarında İsviçre'de gastronomi için bir kasa sistemi de var.
