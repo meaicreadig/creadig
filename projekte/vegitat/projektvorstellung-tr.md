@@ -39,11 +39,12 @@ Alt satır: Sonra: Kasa · Personel · Satın alma. Kapsam iç yapı; müşteri 
 
 Çekirdek yaklaşık 3 ila 4 ayda çalışır, süreler yapı analizinden sonra kesinleşir. Sonrası: Drittgeschäfte, kasa, personel, satın alma. Müşteri siparişleri ve teslimat platformları bu adımda yok, ileride bağlanabilir.
 
-## 6 · Kurmak ve işletmek. Rolüm ve sonraki adım.
-**Kurup teslim edip gitmek değil. Kurmak, işletmek ve sürekli geliştirmek. Bunun için içeride bir sorumlu gerekir. Bu sorumluluğu üstlenmeye hazırım.**
-- **İçeriden sorumluluk** — Yapı ve dijital satış için içeride bir sorumlu, uzun vadeli. Şekli birlikte karara bağlanır.
-- **Saatlik proje değil** — “Şunu yap, şunu ver” işi değil. Bakımı yapılan, takip edilen ve geliştirilen bir sistem.
+## 6 · Kurmak, işletmek, geliştirmek. Sonraki adım.
+**Böyle bir sistem kurulup bırakılmaz. Yaşar, bakım ister, gelişir. Bunun için içeride bir sorumlu gerekir; bu sorumluluğu üstlenmeye hazırım.**
+- **İçeride bir sorumlu** — Yapı ve dijital satış tek elde, şirket içinde, uzun vadeli. Şekli birlikte belirleriz.
+- **Adım adım, görünür** — Her adımın sonunda çalışan bir parça, her ay bir rapor. Ne kurulduğu, ne kaldığı hep görünür.
 - **Sonraki adım** — Yapı analizine evet. Başlangıç önümüzdeki iki hafta içinde, yerinde. Senden gereken: iki üç gün, ekibe ve sipariş geçmişine erişim, franchise kuralı.
 
 **Sistem ve veriler Vegitat'ın. Her adımın sonunda durabilirsin, kurulan sende kalır.**
 
+Sözlü, sorarsa: „Bunu parça başı iş olarak değil, içeride kalıcı bir sorumluluk olarak görüyorum." Ortaklık slaytta yok; konu açılırsa açık, birlikte konuşulur.
