@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 960" width="1600" height="960" role="img" aria-label="Vegitat ve Vegilab iç yapısı: en üstte CEO'nun Admin-Portal'ı her şeyi görür. Ortada franchise veren Vegitat ve üreten Vegilab. Altta şubelerin Franchise-Portal'ı ve sonraya bırakılan Drittgeschäfte. Akış: bir, şube sipariş verir ve ciro bildirir; iki, Vegitat toplar, Vegilab toplu ihtiyacı görür; üç, Vegilab üretir ve teslim eder; dört, ay sonunda mutabakat ve pay otomatik.">
+  <defs>
+    <linearGradient id="goldStroke" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#be904e"/><stop offset="1" stop-color="#e4c378"/></linearGradient>
+    <linearGradient id="adminFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a1712"/><stop offset="1" stop-color="#131316"/></linearGradient>
+    <filter id="shadow" x="-10%" y="-20%" width="120%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000000" flood-opacity="0.5"/></filter>
+    <marker id="headGold" orient="auto" markerWidth="14" markerHeight="14" refX="11" refY="7" markerUnits="userSpaceOnUse">
+      <path d="M3 2 L11 7 L3 12" fill="none" stroke="#be904e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="headGrey" orient="auto-start-reverse" markerWidth="14" markerHeight="14" refX="11" refY="7" markerUnits="userSpaceOnUse">
+      <path d="M3 2 L11 7 L3 12" fill="none" stroke="#9a968e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect width="1600" height="960" fill="#0c0c0e"/>
+
+  <text x="80" y="62" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#f4f2ef">Vegitat × Vegilab · İç Yapı</text>
+  <text x="80" y="92" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#a9a6a0">Dört portal, tek sistem: sipariş, üretim ve franchise mutabakatı tek akışta.</text>
+
+  <!-- Admin-Portal -->
+  <rect x="80" y="124" width="1440" height="82" rx="16" fill="url(#adminFill)" stroke="url(#goldStroke)" stroke-width="2.5" filter="url(#shadow)"/>
+  <text x="110" y="158" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#e4c378">ADMIN-PORTAL · CEO</text>
+  <text x="110" y="187" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">her şeyi görür: siparişler, cirolar, mutabakat, sorunlu noktalar. Gerekince müdahale eder.</text>
+
+  <!-- VT -->
+  <rect x="80" y="300" width="560" height="180" rx="16" fill="#131316" stroke="#2c2c33" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="110" y="334" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="3" fill="#e4c378">FRANCHISE VEREN</text>
+  <text x="110" y="370" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#f4f2ef">VT · Vegitat</text>
+  <text x="110" y="406" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Marka, kurallar · siparişleri toplar</text>
+  <text x="110" y="432" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Raporlar · aylık mutabakat · pay</text>
+
+  <!-- VL -->
+  <rect x="960" y="300" width="560" height="180" rx="16" fill="#131316" stroke="#2c2c33" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="990" y="334" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="3" fill="#e4c378">ÜRETİM</text>
+  <text x="990" y="370" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#f4f2ef">VL · Vegilab</text>
+  <text x="990" y="406" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">İhtiyacı görür · planlar · üretir</text>
+  <text x="990" y="432" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Teslim eder · ileride ayrı şirket</text>
+
+  <!-- Franchise-Portal -->
+  <rect x="80" y="580" width="560" height="180" rx="16" fill="#131316" stroke="#2c2c33" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="110" y="614" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="3" fill="#e4c378">SAHA · ŞUBELER</text>
+  <text x="110" y="650" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#f4f2ef">Franchise-Portal</text>
+  <text x="110" y="686" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Basel · Zürich · Luzern</text>
+  <text x="110" y="712" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Sipariş verir · ciro bildirir · kendi hesabını görür</text>
+
+  <!-- Drittgeschäfte -->
+  <rect x="960" y="580" width="560" height="180" rx="16" fill="#101013" stroke="#6f6c66" stroke-width="2" stroke-dasharray="10 8"/>
+  <text x="990" y="614" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="13" font-weight="700" letter-spacing="3" fill="#a9a6a0">SONRA · B2B</text>
+  <text x="990" y="650" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#f4f2ef">Drittgeschäfte · später</text>
+  <text x="990" y="686" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Vegilab ürünleri için dış alıcılar</text>
+  <text x="990" y="712" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="17" fill="#c9c5bd">Yol açık: Vegitat üzerinden ya da doğrudan</text>
+
+  <!-- Akışlar -->
+  <g fill="none" stroke="#9a968e" stroke-width="2" stroke-linecap="round">
+    <path d="M360 209 L360 297" marker-start="url(#headGrey)" marker-end="url(#headGrey)"/>
+    <path d="M1240 209 L1240 297" marker-start="url(#headGrey)" marker-end="url(#headGrey)"/>
+    <path d="M550 480 L550 577" marker-end="url(#headGrey)"/>
+  </g>
+  <g fill="none" stroke="#be904e" stroke-width="3" stroke-linecap="round">
+    <path d="M640 362 L957 362" marker-end="url(#headGold)"/>
+    <path d="M960 420 L643 420" marker-end="url(#headGold)"/>
+    <path d="M170 580 L170 483" marker-end="url(#headGold)"/>
+  </g>
+  <path d="M1240 580 L1240 483" fill="none" stroke="#6f6c66" stroke-width="2" stroke-linecap="round" stroke-dasharray="8 8" marker-end="url(#headGrey)"/>
+
+  <!-- Adım rozetleri -->
+  <g font-family="Poppins, Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#0c0c0e" text-anchor="middle">
+    <circle cx="200" cy="514" r="15" fill="#be904e"/><text x="200" y="514" dominant-baseline="central">1</text>
+    <circle cx="790" cy="340" r="15" fill="#be904e"/><text x="790" y="340" dominant-baseline="central">2</text>
+    <circle cx="790" cy="446" r="15" fill="#be904e"/><text x="790" y="446" dominant-baseline="central">3</text>
+    <circle cx="580" cy="514" r="15" fill="#9a968e"/><text x="580" y="514" dominant-baseline="central">4</text>
+  </g>
+
+  <!-- Etiketler -->
+  <g font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="15" fill="#a9a6a0">
+    <text x="376" y="258">görür · yönetir</text>
+    <text x="1256" y="258">görür · yönetir</text>
+    <text x="814" y="345">toplu ihtiyaç</text>
+    <text x="814" y="451">üretir · teslim eder</text>
+    <text x="224" y="509">sipariş verir</text>
+    <text x="224" y="531">ciro bildirir</text>
+    <text x="604" y="509">aylık mutabakat</text>
+    <text x="604" y="531">pay (%)</text>
+    <text x="1256" y="532">henüz açık</text>
+  </g>
+
+  <!-- Lejant -->
+  <g font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="15" fill="#a9a6a0">
+    <circle cx="88" cy="818" r="7" fill="#be904e"/><text x="104" y="823">Sipariş ve üretim akışı</text>
+    <circle cx="330" cy="818" r="7" fill="#9a968e"/><text x="346" y="823">Rapor ve pay akışı</text>
+    <line x1="520" y1="818" x2="552" y2="818" stroke="#6f6c66" stroke-width="2" stroke-dasharray="6 5"/><text x="566" y="823">Henüz açık</text>
+    <text x="1186" y="823" text-anchor="end">Sonra:</text>
+    <rect x="1200" y="804" width="70" height="28" rx="14" fill="none" stroke="#3a3a42" stroke-width="1.5"/><text x="1235" y="823" text-anchor="middle">Kasa</text>
+    <rect x="1282" y="804" width="100" height="28" rx="14" fill="none" stroke="#3a3a42" stroke-width="1.5"/><text x="1332" y="823" text-anchor="middle">Personel</text>
+    <rect x="1394" y="804" width="126" height="28" rx="14" fill="none" stroke="#3a3a42" stroke-width="1.5"/><text x="1457" y="823" text-anchor="middle">Satın alma</text>
+  </g>
+
+  <line x1="80" y1="868" x2="1520" y2="868" stroke="#2a2a30" stroke-width="1"/>
+  <text x="80" y="912" font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="14" fill="#6f6c66">Kapsam: iç yapı. Müşteri siparişleri ve teslimat platformları bu adımda yok.</text>
+  <text x="1520" y="912" text-anchor="end" font-family="Poppins, Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#f4f2ef">crea<tspan fill="#e4c378">DIG</tspan> <tspan font-family="Open Sans, Arial, Helvetica, sans-serif" font-size="14" font-weight="400" fill="#a9a6a0">· İş mimarisi ve operasyon · DE + CH</tspan></text>
+</svg>

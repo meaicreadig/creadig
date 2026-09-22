@@ -1,6 +1,6 @@
 # Vegitat × Vegilab — Proje sunumu „İç Yapı“ (Türkçe fassung der Folien)
 
-Folien: https://claude.ai/artifact/Cf3bqzKq33KS8QyTdopMZm · Systemnamen bleiben deutsch (Admin-Portal, VT · Vegitat, VL · Vegilab, Franchise-Portal, Drittgeschäfte · später).
+Folien: https://claude.ai/artifact/Cf3bqzKq33KS8QyTdopMZm · Grafik: `architektur-tr.svg` / `architektur-tr.png` · Systemnamen bleiben deutsch (Admin-Portal, VT · Vegitat, VL · Vegilab, Franchise-Portal, Drittgeschäfte · später).
 
 ## 1 · Başlık
 **Vegitat × Vegilab** — Sipariş, üretim ve franchise'ı birbirine bağlayan bir iç yapı.
@@ -14,15 +14,16 @@ Alt satır: creaDIG · Emin Akyol · İş mimarisi ve operasyon · DE + CH
 **Yönetim bütünü ancak sorduğunda görüyor.**
 
 ## 3 · Mimari: dört portal, tek sistem.
-Admin görür, Vegitat yönetir, Vegilab üretir, franchise sipariş verir.
-- **Admin-Portal · CEO** — her şeyi görür: yapı, siparişler, cirolar, hesaplaşma, sorunlu noktalar. Gerektiğinde müdahale eder.
-- **VT · Vegitat** — Franchise veren · marka · siparişleri toplar · raporlar · hesaplaşma
+![Mimari](architektur-tr.png)
+
+Akış: **1** şube sipariş verir ve ciro bildirir → **2** Vegitat toplar, Vegilab toplu ihtiyacı görür → **3** Vegilab üretir ve teslim eder → **4** ay sonunda mutabakat ve pay otomatik. Altın çizgi = sipariş ve üretim, gri = rapor ve pay, kesik = henüz açık.
+- **Admin-Portal · CEO** — her şeyi görür: siparişler, cirolar, mutabakat, sorunlu noktalar. Gerekince müdahale eder.
+- **VT · Vegitat** — Franchise veren · marka, kurallar · siparişleri toplar · raporlar · aylık mutabakat · pay
 - **VL · Vegilab** — Üretim, ileride ayrı şirket · ihtiyaç · planlama · teslimat
 - **Franchise-Portal** — Basel · Zürich · Luzern · sipariş verir · ciroyu bildirir · kendi hesabını görür
 - **Drittgeschäfte · später** — Vegilab için B2B alıcılar. Yol henüz açık: Vegitat üzerinden ya da doğrudan.
 
-Oklar: görür · yönetir / toplu ihtiyaç / teslimat · durum / Sipariş · Ciro / Aylık rapor · Pay (%) / henüz açık.
-Alt satır: Kesik çizgi = henüz açık · Kasa sistemi ilk adımda yok · sonradan eklenebilir: kasa, personel, satın alma.
+Alt satır: Sonra: Kasa · Personel · Satın alma. Kapsam iç yapı; müşteri siparişleri ve teslimat platformları bu adımda yok.
 
 ## 4 · Ne kazanılır: kontrol, düzen, büyüme.
 - **Yönetim** — Bütün resim tek ekranda: sipariş, ciro, hesap, üretim. Kararlar sorarak değil, bakarak verilir. Kişiye bağımlılık azalır.
@@ -34,7 +35,7 @@ Alt satır: Kesik çizgi = henüz açık · Kasa sistemi ilk adımda yok · sonr
 ## 5 · Üç adım: önce görünür kıl, sonra yönet.
 1. **Yapı analizi · yaklaşık 2 hafta** — Yerinde, tüm taraflarla: kim, neyi, ne zaman, kimden sipariş ediyor. Sonuç: üzerinde anlaşılmış mimari, sonraki her şeyin temeli.
 2. **Dijital sipariş · yaklaşık 4 ila 6 hafta** — Franchise-Portal siparişi Vegitat'a verir, Vegilab toplu ihtiyacı görür. WhatsApp devreden çıkar, ilk rakamlar akmaya başlar.
-3. **Hesaplaşma ve Admin · yaklaşık 6 ila 8 hafta** — Şube başına ciro, yüzde pay, aylık rapor otomatik. Yönetim her şeyi kendi portalında görür ve müdahale eder.
+3. **Mutabakat ve Admin · yaklaşık 6 ila 8 hafta** — Şube başına ciro, yüzde pay, aylık rapor otomatik. Yönetim her şeyi kendi portalında görür ve müdahale eder.
 
 Çekirdek yaklaşık 3 ila 4 ayda çalışır, süreler yapı analizinden sonra kesinleşir. Sonrası: Drittgeschäfte, kasa, personel, satın alma.
 
