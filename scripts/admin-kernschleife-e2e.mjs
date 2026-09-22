@@ -17,6 +17,7 @@
  *   E10 Verloren mit Grund → Verlust-Schleife zählt ihn
  *   E11 Gewonnen → nächster Betriebsschritt sichtbar, nichts automatisch
  *   E12 Kundenakte zeigt Anfrage + Chance
+ *   E30 meAI (A30): nächster Schritt aus Regeln, mit Belegen in Menschensprache
  *   EP  Abmelden, neu anmelden → alles noch da
  *   E26 Mobil 390: Anfrage erfassen + nächster Schritt
  *   E27 Tastatur: Anfrage erfassen ohne Maus
@@ -239,6 +240,15 @@ try {
   const main = await page.locator("main").innerText()
   p(main.includes("Gewonnen — der nächste Schritt im Betrieb") && main.includes("Noch kein angenommenes Angebot"), "nächster Betriebsschritt sichtbar")
   p((await zahl(`SELECT count(*) n FROM projects WHERE opportunity_id = $1`, [oppId])) === 0, "kein Projekt automatisch angelegt")
+
+  console.log("\nE30 · meAI: nächster Schritt mit Beleg, ohne KI (A30)")
+  const meai = page.locator("[data-meai]")
+  const meaiText = await meai.innerText().catch(() => "")
+  p(meaiText.includes("aus Regeln") && meaiText.includes("keine KI eingerichtet") && meaiText.includes("Regelwerk") && !meaiText.includes("die Belege tragen es"), "Quelle sichtbar: aus Regeln, keine KI", meaiText.replace(/\s+/g, " ").slice(0, 160))
+  const belege = await meai.locator("[data-belege] li").allInnerTexts()
+  p(belege.length > 0, "der Vorschlag nennt seine Belege", belege.join(" | "))
+  p(belege.every((b) => !/\b(true|false|won)\b/.test(b)) && belege.some((b) => b.includes("Angebotsart nicht gewählt")), "Belege in Menschensprache (H21); ohne Angebotsart ist die Reife offen, nicht erfüllt (H24)", belege.join(" | "))
+  await meai.screenshot({ path: process.env.E2E_SHOT_DIR ? `${process.env.E2E_SHOT_DIR}/meai-a30.png` : "/dev/null" }).catch(() => {})
 
   console.log("\nE12 · Kundenakte")
   await page.goto(`${BASE}/admin/kunden/${org.id}`, { waitUntil: "networkidle" })

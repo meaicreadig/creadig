@@ -24,11 +24,13 @@ import {
   AdminInput,
   AdminSelect,
   AdminTextarea,
-  DataValue,
   Pill,
   SectionHeader,
   Surface,
 } from "@/components/admin/primitives"
+import {
+  DataValue,
+} from "@/components/admin/primitives-i18n"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { AngebotMappe } from "@/components/admin/angebot-mappe"
 import { LieferungMappe } from "@/components/admin/lieferung-mappe"
@@ -36,6 +38,7 @@ import { SALES_LABELS_DE, SALES_STATES, TERMINAL_STATES, getVertriebStore } from
 import { LOST_REASONS, NEXT_ACTIONS, OFFERED_STAGES, STAGE_RULES } from "@/lib/sales-playbook"
 import { OFFER_KINDS, OFFERS, readinessFor } from "@/lib/offer-readiness"
 import { GESCHAEFTS_ZEITZONE, datumAnzeige, geschaeftsTag } from "@/lib/geschaeftszeit"
+import { naechsterSchritt } from "@/lib/meai"
 
 /**
  * Eine Verkaufschance.
@@ -90,6 +93,48 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
   const readiness = opp.offerKind ? readinessFor(opp.offerKind, opp.readinessEvidence) : null
 
   const overdue = opp.nextActionAt !== null && opp.nextActionAt < geschaeftsTag()
+
+  /*
+   * ADM-06 · A30 — DER NAECHSTE SCHRITT, MIT SEINEM BELEG.
+   *
+   * Die Merkmale tragen ausschliesslich Maschinenwerte: kein Name, keine
+   * Nachricht, kein Freitext (PII-Grenze, `lib/meai.ts`). Das ist nicht
+   * Vorsicht fuer spaeter — es ist die Bedingung dafuer, dass hier je ein
+   * Anbieter angeschlossen werden darf, ohne dass Kundendaten das Haus
+   * verlassen.
+   *
+   * Angeschlossen ist heute keiner: Anbieter und Kosten entscheidet der
+   * Owner (A8). Die Antwort kommt deshalb aus Regeln — vollstaendig, mit
+   * denselben Belegen und in derselben Form. Ein „Degraded Mode", der in
+   * Wahrheit eine leere Flaeche ist, waere keiner.
+   */
+  const freigaben = await store.listReleases(opp.organisationId ?? "").catch(() => null)
+  const letztesAngebot = angebote?.[0] ?? null
+  const letztesProjekt = projekte?.[0] ?? null
+  const vorschlag = await naechsterSchritt(
+    {
+      kennung: opp.id,
+      status: opp.status,
+      tageOhneBeruehrung: null,
+      hatNaechstenSchritt: Boolean(opp.nextAction),
+      naechsterSchrittUeberfaellig: overdue,
+      hatVerantwortlichen: Boolean(opp.responsible),
+      /*
+       * ADM-06 · H24 — OHNE ANGEBOTSART IST DIE REIFE UNBEKANNT, NICHT ERFÜLLT.
+       * `[]` hiess hier „nichts offen" und ergab „Das Angebot schreiben — die
+       * Belege tragen es" für einen Vorgang, an dem noch gar nichts geprüft
+       * war. Die fehlende Wahl ist selbst der offene Beleg.
+       */
+      reifeOffen: readiness ? readiness.open.map((e) => e.key) : ["angebotsart"],
+      angebotZustand: letztesAngebot ? (letztesAngebot.zustand as "entwurf" | "gesendet" | "angenommen") : "keins",
+      projektZustand: letztesProjekt
+        ? (letztesProjekt.zustand as "aufgesetzt" | "laeuft" | "abgenommen" | "uebergeben")
+        : "keins",
+      /* `null` (nicht lesbar) heisst NICHT „Freigabe liegt vor". */
+      freigabeOffen: (freigaben ?? []).every((r) => r.withdrawnAt !== null),
+    },
+    null,
+  )
 
   return (
     <VertriebShell
@@ -333,6 +378,65 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                 )}
               </p>
             )}
+          </section>
+
+          {/* ── ADM-06 · A30 · DER NÄCHSTE SCHRITT, MIT SEINEM BELEG ────── */}
+          <section aria-labelledby="meai-titel" className="mt-10" data-meai>
+            <SectionHeader
+              id="meai-titel"
+              title={t.meai.titel}
+              count={
+                <>
+                  {t.meai.quelle[vorschlag.quelle]} · {t.meai.vertrauen[vorschlag.vertrauen]}
+                </>
+              }
+            />
+            <p className="type-small text-muted-foreground mt-2 max-w-2xl text-pretty">{t.meai.lead}</p>
+
+            <Surface className="mt-5">
+              <p className="type-body text-foreground/90 text-pretty">
+                {t.meai.vorschlag[vorschlag.vorschlag]}
+              </p>
+
+              {vorschlag.vorschlag === "unbekannt" ? (
+                <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
+                  {t.meai.unbekanntHinweis}
+                </p>
+              ) : (
+                <>
+                  {/*
+                    DIE BELEGE STEHEN DABEI, NICHT AUF EINER UNTERSEITE.
+                    Ein Vorschlag ohne seinen Beleg ist eine Meinung mit
+                    Systemstimme — und der widerspricht niemand.
+                  */}
+                  <h3 className="text-meta text-muted-foreground mt-5">{t.meai.belegeTitel}</h3>
+                  <ul className="mt-2 flex flex-wrap gap-2" data-belege>
+                    {vorschlag.evidenz.map((e, i) => (
+                      <li key={`${e.merkmal}-${e.wert}-${i}`}>
+                        <Pill>
+                          {t.meai.merkmal[e.merkmal as keyof typeof t.meai.merkmal] ?? e.merkmal}:{" "}
+                          {e.merkmal === "status"
+                            ? (t.begriffe.stufe[e.wert] ?? e.wert)
+                            : e.merkmal === "reifeOffen"
+                              ? (t.befunde.reife[e.wert as keyof typeof t.befunde.reife]?.label ?? t.meai.wert[e.wert] ?? e.wert)
+                              : (t.meai.wert[e.wert] ?? e.wert)}
+                        </Pill>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+
+              <p className="type-small text-muted-foreground border-line mt-5 border-s-2 py-1 ps-4 text-pretty">
+                {vorschlag.befund
+                  ? t.meai.befund[vorschlag.befund as keyof typeof t.meai.befund]
+                  : t.meai.ohneAnbieter}
+                {" · "}
+                <span className="tabular-nums">{t.meai.gemessen(vorschlag.dauerMs)}</span>
+                {" · "}
+                {vorschlag.quelle === "regel" ? t.meai.regelwerk : vorschlag.modell}
+              </p>
+            </Surface>
           </section>
 
           {/* ── Angebotsdokument ───────────────────────────────────────────

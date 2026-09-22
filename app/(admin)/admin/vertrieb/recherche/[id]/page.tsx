@@ -11,10 +11,12 @@ import {
   AdminField,
   AdminInput,
   AdminSelect,
-  DataValue,
   Pill,
   SectionHeader,
 } from "@/components/admin/primitives"
+import {
+  DataValue,
+} from "@/components/admin/primitives-i18n"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { getVertriebStore } from "@/lib/lead-store"

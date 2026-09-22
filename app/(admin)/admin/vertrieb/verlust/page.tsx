@@ -1,6 +1,13 @@
 import Link from "next/link"
 
-import { Abschneidehinweis, Pill, SectionHeader, Surface } from "@/components/admin/primitives"
+import {
+  Pill,
+  SectionHeader,
+  Surface,
+} from "@/components/admin/primitives"
+import {
+  Abschneidehinweis,
+} from "@/components/admin/primitives-i18n"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { getVertriebStore } from "@/lib/lead-store"

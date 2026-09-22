@@ -1112,6 +1112,61 @@ export const de = {
       uebergeben: { label: "Übergeben", was: "Code, Inhalte, Zugänge und Domain sind beim Kunden." },
     },
   },
+  meai: {
+    titel: "Nächster Schritt",
+    lead: "Was dieser Vorgang als Nächstes braucht — mit dem Beleg, aus dem es folgt.",
+    quelle: {
+      regel: "aus Regeln",
+      modell: "aus dem Modell",
+    },
+    vertrauen: {
+      belegt: "belegt",
+      unbekannt: "nicht belegt",
+    },
+    unbekanntHinweis:
+      "Kein Fall greift. Das ist eine Antwort — „weitermachen wie bisher“ wäre keine, sie klänge nur nach einer.",
+    belegeTitel: "Woraus das folgt",
+    ohneAnbieter:
+      "Es ist keine KI eingerichtet. Diese Antwort kommt aus Regeln und ist vollständig — Anbieter und Kosten entscheidet der Inhaber.",
+    gemessen: (ms: number) => `${ms} ms`,
+    vorschlag: {
+      "schritt-setzen": "Einen nächsten Schritt setzen — mit Datum.",
+      "schritt-einholen": "Den überfälligen Schritt nachholen oder neu terminieren.",
+      "verantwortlichen-setzen": "Festlegen, wer sich kümmert.",
+      "reife-belegen": "Die fehlenden Belege holen, bevor eine Zahl genannt wird.",
+      "angebot-schreiben": "Das Angebot schreiben — die Belege tragen es.",
+      "angebot-nachfassen": "Beim Kunden nachfassen; das Angebot liegt dort.",
+      "projekt-aufsetzen": "Das Projekt aus dem angenommenen Angebot aufsetzen.",
+      "freigabe-holen": "Nach der schriftlichen Freigabe fragen.",
+      unbekannt: "Unbekannt.",
+    },
+    regelwerk: "Regelwerk",
+    /** ADM-06 · H21 — Belegwerte sind Maschinenwerte; hier stehen sie in der Sprache des Menschen. */
+    wert: {
+      true: "ja", false: "nein", keins: "keins", entwurf: "Entwurf", gesendet: "gesendet", angenommen: "angenommen",
+      aufgesetzt: "aufgesetzt", laeuft: "läuft", abgenommen: "abgenommen", uebergeben: "übergeben",
+      angebotsart: "Angebotsart nicht gewählt",
+    } as Record<string, string>,
+    merkmal: {
+      status: "Stufe",
+      tageOhneBeruehrung: "Tage ohne Berührung",
+      hatNaechstenSchritt: "Nächster Schritt gesetzt",
+      naechsterSchrittUeberfaellig: "Nächster Schritt überfällig",
+      hatVerantwortlichen: "Verantwortlicher",
+      reifeOffen: "Beleg offen",
+      angebotZustand: "Angebot",
+      projektZustand: "Projekt",
+      freigabeOffen: "Freigabe offen",
+    },
+    befund: {
+      "unbekannter-vorschlag": "Der Vorschlag steht nicht in der Liste dessen, was hier vorgeschlagen werden darf.",
+      "evidenz-nicht-im-kontext": "Ein genannter Beleg steht nicht in diesem Vorgang. Die Antwort wurde verworfen.",
+      "keine-evidenz": "Die Antwort nannte keinen Beleg. Sie wurde verworfen.",
+      "pii-grenze": "Der Vorgang trug ein Feld, das dieses Haus nicht herausgibt. Es wurde nichts gefragt.",
+      "anbieter-fehler": "Die KI hat nicht geantwortet. Diese Antwort kommt aus Regeln.",
+      "kein-anbieter": "Es ist keine KI eingerichtet. Diese Antwort kommt aus Regeln.",
+    },
+  },
   automationen: {
     titel: "Automationen",
     lead:

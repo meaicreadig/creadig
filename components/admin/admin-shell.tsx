@@ -71,7 +71,19 @@ export async function AdminShell({
       <div className="lg:grid lg:min-h-dvh lg:grid-cols-[15rem_1fr]">
         <nav
           aria-label={t.shell.navLabel}
-          className="border-line bg-surface flex flex-col gap-4 border-b px-4 py-4 sm:px-6 lg:sticky lg:top-0 lg:h-dvh lg:gap-6 lg:border-r lg:border-b-0 lg:px-5 lg:py-7"
+          /*
+            ADM-06 · H22 — DIE SEITENLEISTE SCROLLT, WENN SIE NICHT PASST.
+
+            Gemessen 17.09.2026 (Kernschleifen-E2E, 1280×720): Mit acht
+            Bereichen reichte die Liste bis unter den unteren Rand, und der
+            Abmelden-Knopf im `mt-auto`-Block lag ausserhalb des sichtbaren
+            Bereichs — `lg:h-dvh` ohne Ueberlauf schneidet ihn ab. Wer sich
+            nicht abmelden kann, hat ein Sicherheitsproblem, kein Layoutproblem.
+
+            Der Fehler wächst mit der Navigation: Jeder neue Bereich bringt
+            ihn früher. Deshalb scrollt die Leiste jetzt, statt zu schneiden.
+          */
+          className="border-line bg-surface flex flex-col gap-4 border-b px-4 py-4 sm:px-6 lg:sticky lg:top-0 lg:h-dvh lg:gap-6 lg:overflow-y-auto lg:border-r lg:border-b-0 lg:px-5 lg:py-7"
         >
           <div className="flex items-start justify-between gap-3">
             <div>

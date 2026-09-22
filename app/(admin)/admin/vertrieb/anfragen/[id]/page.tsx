@@ -10,7 +10,17 @@ import {
   setEnquiryResponsible,
 } from "@/app/(admin)/admin/vertrieb/actions"
 import { ActivityLog } from "@/components/admin/activity-log"
-import { AdminField, AdminInput, AdminSelect, DataValue, Pill, SectionHeader, Surface } from "@/components/admin/primitives"
+import {
+  AdminField,
+  AdminInput,
+  AdminSelect,
+  Pill,
+  SectionHeader,
+  Surface,
+} from "@/components/admin/primitives"
+import {
+  DataValue,
+} from "@/components/admin/primitives-i18n"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { leseHinweis } from "@/lib/admin-hinweis"

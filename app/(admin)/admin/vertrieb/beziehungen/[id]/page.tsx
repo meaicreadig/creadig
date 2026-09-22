@@ -14,10 +14,12 @@ import {
   AdminInput,
   AdminSelect,
   AdminTextarea,
-  DataValue,
   Pill,
   SectionHeader,
 } from "@/components/admin/primitives"
+import {
+  DataValue,
+} from "@/components/admin/primitives-i18n"
 import { VertriebShell } from "@/components/admin/vertrieb-shell"
 import { getVertriebStore } from "@/lib/lead-store"
 import { RELATIONSHIP_LEVELS } from "@/lib/vertrieb"

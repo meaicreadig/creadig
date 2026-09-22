@@ -16,11 +16,13 @@ import {
   AdminInput,
   AdminSelect,
   AdminTextarea,
-  DataValue,
   Pill,
   SectionHeader,
   Surface,
 } from "@/components/admin/primitives"
+import {
+  DataValue,
+} from "@/components/admin/primitives-i18n"
 import { KundenShell } from "@/components/admin/kunden-shell"
 import { getVertriebStore } from "@/lib/lead-store"
 import { LIFECYCLE_NOTES, LIFECYCLE_STAGES } from "@/lib/vertrieb"

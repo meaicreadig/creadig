@@ -1085,6 +1085,61 @@ export const tr: AdminTexte = {
       uebergeben: { label: "Devredildi", was: "Kod, içerikler, erişimler ve alan adı müşteride." },
     },
   },
+  meai: {
+    titel: "Sonraki adım",
+    lead: "Bu fırsatın sırada neye ihtiyacı var — ve bunun hangi kanıttan çıktığı.",
+    quelle: {
+      regel: "kurallardan",
+      modell: "modelden",
+    },
+    vertrauen: {
+      belegt: "kanıtlı",
+      unbekannt: "kanıtsız",
+    },
+    unbekanntHinweis:
+      "Hiçbir durum uymuyor. Bu da bir cevaptır — „eskisi gibi devam“ cevap değildir, yalnızca cevap gibi duyulur.",
+    belegeTitel: "Bunun dayanağı",
+    ohneAnbieter:
+      "Kurulu bir yapay zekâ yok. Bu cevap kurallardan gelir ve eksiksizdir — sağlayıcıya ve maliyete sahip karar verir.",
+    gemessen: (ms: number) => `${ms} ms`,
+    vorschlag: {
+      "schritt-setzen": "Bir sonraki adımı belirleyin — tarihiyle.",
+      "schritt-einholen": "Geciken adımı tamamlayın ya da yeniden tarihlendirin.",
+      "verantwortlichen-setzen": "Kimin ilgileneceğini belirleyin.",
+      "reife-belegen": "Bir rakam söylenmeden önce eksik kanıtları toplayın.",
+      "angebot-schreiben": "Teklifi yazın — kanıtlar bunu taşıyor.",
+      "angebot-nachfassen": "Müşteriyi arayın; teklif onlarda.",
+      "projekt-aufsetzen": "Kabul edilmiş tekliften projeyi kurun.",
+      "freigabe-holen": "Yazılı izni isteyin.",
+      unbekannt: "Bilinmiyor.",
+    },
+    regelwerk: "kural seti",
+    /** ADM-06 · H21 — Belegwerte sind Maschinenwerte; hier stehen sie in der Sprache des Menschen. */
+    wert: {
+      true: "evet", false: "hayır", keins: "yok", entwurf: "taslak", gesendet: "gönderildi", angenommen: "kabul edildi",
+      aufgesetzt: "kuruldu", laeuft: "sürüyor", abgenommen: "teslim alındı", uebergeben: "devredildi",
+      angebotsart: "teklif türü seçilmedi",
+    } as Record<string, string>,
+    merkmal: {
+      status: "Aşama",
+      tageOhneBeruehrung: "Temassız geçen gün",
+      hatNaechstenSchritt: "Sonraki adım belirlenmiş",
+      naechsterSchrittUeberfaellig: "Sonraki adım gecikmiş",
+      hatVerantwortlichen: "Sorumlu",
+      reifeOffen: "Eksik kanıt",
+      angebotZustand: "Teklif",
+      projektZustand: "Proje",
+      freigabeOffen: "İzin eksik",
+    },
+    befund: {
+      "unbekannter-vorschlag": "Öneri, burada önerilebileceklerin listesinde yok.",
+      "evidenz-nicht-im-kontext": "Belirtilen bir kanıt bu fırsatta yok. Cevap geçersiz sayıldı.",
+      "keine-evidenz": "Cevap hiçbir kanıt göstermedi. Geçersiz sayıldı.",
+      "pii-grenze": "Fırsat, bu evin dışarı vermediği bir alan taşıyordu. Hiçbir şey sorulmadı.",
+      "anbieter-fehler": "Yapay zekâ yanıt vermedi. Bu cevap kurallardan geliyor.",
+      "kein-anbieter": "Kurulu bir yapay zekâ yok. Bu cevap kurallardan geliyor.",
+    },
+  },
   automationen: {
     titel: "Otomasyonlar",
     lead:

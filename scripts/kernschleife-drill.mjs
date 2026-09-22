@@ -24,6 +24,9 @@ process.env.LEAD_STORE = "pg-lokal"
 
 const { SCHEMA, BACKFILL, seedBestand, applyExclusions } = await import("../lib/neon-client.ts")
 const { createNeonVertrieb } = await import("../lib/vertrieb-store-neon.ts")
+const { geschaeftsTag, plusTage } = await import("../lib/geschaeftszeit.ts")
+/* Relativ zum Berliner Geschäftstag — ein festes Datum wird nach einem Tag rot. */
+const MORGEN = plusTage(geschaeftsTag(), 1)
 
 let fehler = 0
 const p = (ok, name, detail = "") => {
@@ -69,9 +72,9 @@ p(Boolean(gefunden?.contactId) && Boolean(gefunden?.organisationId), "Kontakt un
 
 console.log("\nK3 · Verantwortlich + nächster Schritt")
 p(await vertrieb.setLeadResponsible(a.id, "vertrieb"), "Verantwortlich auf Vertrieb")
-p(await vertrieb.setLeadNextAction(a.id, "Zurückrufen", "2026-09-18"), "nächster Schritt mit Datum")
+p(await vertrieb.setLeadNextAction(a.id, "Zurückrufen", MORGEN), "nächster Schritt mit Datum")
 const a2 = await owner.getEnquiry(a.id)
-p(a2.responsible === "vertrieb" && a2.nextAction === "Zurückrufen" && a2.nextActionAt === "2026-09-18", "nach Neuladen persistent", `${a2.responsible} · ${a2.nextAction} · ${a2.nextActionAt}`)
+p(a2.responsible === "vertrieb" && a2.nextAction === "Zurückrufen" && a2.nextActionAt === MORGEN, "nach Neuladen persistent", `${a2.responsible} · ${a2.nextAction} · ${a2.nextActionAt}`)
 
 const faellig = await owner.listEnquiries({ faellig: true, limit: 50 })
 p(!faellig.rows.some((r) => r.id === a.id), "Schritt morgen: noch nicht fällig")

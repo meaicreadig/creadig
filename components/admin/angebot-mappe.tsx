@@ -8,9 +8,11 @@ import {
   AdminSelect,
   AdminTextarea,
   Pill,
-  Speicherstand,
   Surface,
 } from "@/components/admin/primitives"
+import {
+  Speicherstand,
+} from "@/components/admin/primitives-i18n"
 import {
   ABSCHNITTE,
   ANGEBOT_ZUSTAENDE,

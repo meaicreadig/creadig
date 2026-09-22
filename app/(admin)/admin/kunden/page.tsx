@@ -1,6 +1,15 @@
 import Link from "next/link"
 
-import { AdminField, AdminInput, AdminSelect, Pill, SectionHeader, Unknown } from "@/components/admin/primitives"
+import {
+  AdminField,
+  AdminInput,
+  AdminSelect,
+  Pill,
+  SectionHeader,
+} from "@/components/admin/primitives"
+import {
+  Unknown,
+} from "@/components/admin/primitives-i18n"
 import { KundenShell } from "@/components/admin/kunden-shell"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import type { AdminTexte } from "@/lib/admin-i18n"

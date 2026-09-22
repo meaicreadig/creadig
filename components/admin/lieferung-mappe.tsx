@@ -7,9 +7,11 @@ import {
   AdminInput,
   AdminSelect,
   Pill,
-  Speicherstand,
   Surface,
 } from "@/components/admin/primitives"
+import {
+  Speicherstand,
+} from "@/components/admin/primitives-i18n"
 import { JA_FORMEN } from "@/lib/angebot"
 import { adminTexte } from "@/lib/admin-i18n"
 import { befundZeilen } from "@/lib/admin-i18n/befund"
