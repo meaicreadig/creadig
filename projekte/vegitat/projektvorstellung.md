@@ -1,7 +1,7 @@
 # Vegitat × Vegilab — Projektvorstellung „Interne Struktur“
 
 **Stand:** 2026-09-22 · Termin mit Mutalip Karahan (Gründer, Vegitat GmbH, Basel)
-**Folien:** 5 Folien, jetzt auf Türkisch, Systemnamen deutsch, Sprechernotizen auf Türkisch → https://claude.ai/artifact/Cf3bqzKq33KS8QyTdopMZm · Türkischer Folientext: `projektvorstellung-tr.md` · Deutsche Textfassung: unten
+**Folien:** 6 Folien, jetzt auf Türkisch, Systemnamen deutsch, Sprechernotizen auf Türkisch → https://claude.ai/artifact/Cf3bqzKq33KS8QyTdopMZm · Türkischer Folientext: `projektvorstellung-tr.md` · Deutsche Textfassung: unten
 **Architektur-Grafik:** `architektur.svg` (Vektor) · `architektur.png` (fürs Handy / WhatsApp)
 
 ## Leitplanken aus dem Briefing
