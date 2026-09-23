@@ -2,7 +2,7 @@
 
 > **Maßgebliche Statusquelle** dieses Programms. Vertrag: `docs/admin-os/program.md`.
 > Stand **23.09.2026** · Session 5 · Branch `feat/system-haus-site`
-> Programmzustand: **OWNER-INDEPENDENT BUILD COMPLETE + CUTOVER READY** — **nicht** LIVE 99 % ACCEPTED.
+> Programmzustand: **PRODUCTION DEPLOYED · LIVE VERIFICATION OPEN** — Migration 015–019 angewendet, Promote live; R9/R5-DB-Beleg wartet auf Production-Env (`LEAD_TOKEN_SECRET`/`RESEND`/`LEAD_FROM` nur Preview). **nicht** LIVE 99 % ACCEPTED.
 > Abnahmematrix: `docs/admin-os/abnahme.md` · Cutover-Paket: `docs/admin-os/cutover.md`.
 > Vorgänger-Dokumente (bleiben Beleg, nicht Status): `docs/control-center/*`, `docs/final-live-completion/state.md` (F12 Owner-Steuerung).
 
@@ -642,6 +642,7 @@ Löschung je Person (B11) · Dark Mode (POST-99, OD-1).
 
 | 22.09.2026 | 5 | **ADM-06/3 Drilldown (A25) VERIFIED lokal** — H26; E25 im Browser (2 = 1+1, 2 = 1+1, 4 = 4, 1 = 1) · admin-sprache-e2e + admin-zustaende 36/36 + db-drills 13/13 grün · **ADM-06 BUILT** |
 | 23.09.2026 | 5 | **ADM-07 BUILT/lokal VERIFIED — OWNER-INDEPENDENT BUILD COMPLETE + CUTOVER READY.** Abnahmematrix A01–A32 + B01–B12 erhoben und gefahren (`docs/admin-os/abnahme.md`); neuer `abnahme-e2e` (B01–B09, A21/A22/A24/A28, B11) · **B11 gebaut** (`lib/auskunft.ts`, `auskunft-drill`) · H27–H30 + A28 behoben · A31 Sicherung→Rückspielung vollständig durchgespielt (12 Schritte) · db-drills 14/14 · smoke 36/36 · a11y 132 · mobile 6×16 · vitals 14/14 · alle Admin-E2E grün · **Cutover-Paket** `docs/admin-os/cutover.md` mit 4 Owner-Handlungen |
-| 23.09.2026 | 6 | **Cutover vorbereitet und generalprobt, nicht ausgeführt.** Produktionswahrheit geprüft: Live = `e1bc9ec` / `dpl_7siNz9VcwZJnkjdAsRq5gbRx7U2w`, Aliase `creadig.de` + `www`; Kandidat `c395e91` liegt als **fertige Preview** `dpl_BSnKQFit8hcoKVfSUow3t2sAcXWz` (READY). Vier Cutover-Befehle gebaut (`cutover-preflight`, `-sicherung`, `-migration`, `-nachpruefung`, `-live`) und **gegen eine lokale Kopie vollständig durchgespielt** — Preflight grün, Sicherung+Rückspielung 12/12, Nachprüfung grün, Live-Abnahme grün ausser R4 (lokal nicht beweisbar, erwartet). **Blocker: Zugangsdaten sind für den Agenten maskiert** (`cutover.md` §11) — Migration und Live-Abnahme laufen beim Owner. H14-Schutz geprüft (kein `loading.tsx`), G18-Hashes unverändert. |
+| 23.09.2026 | 6 | **Cutover vorbereitet und generalprobt, nicht ausgeführt.** (historisch — Agent-Maskierung) Vier Cutover-Befehle gebaut und lokal generalprobt. |
+| 23.09.2026 | 6 | **CUTOVER O1–O2 ausgeführt.** Preflight grün (0 Dubletten) · Sicherung+Rückspielprobe 12/12 · Migration 015–019 · Nachprüfung grün (7/32/15/2/14) · Promote `dpl_6oQPnEwd8muy5DELveVzfQVYRVoj` → `creadig.de` READY · Fixback `14b4460` · Live: R1–R4/R6/R8 + A01/A25/A26 grün; **R4 `revoked:server`** · R5 liefert 429, aber `rate_limit_windows`=0 weil Production kein `LEAD_TOKEN_SECRET`/`RESEND_API_KEY` → Arbeitsspeicher-Fallback · R9 `not_configured` (+ `LEAD_FROM`) · G18 unberührt · H14 absent |
 
-**Fortsetzungspunkt:** Owner führt O1–O2 aus (`cutover.md` §10). Meldet er „Nachprüfung grün", promotet der Agent `dpl_BSnKQFit8hcoKVfSUow3t2sAcXWz` auf Produktion und der Owner startet O3 (`npm run cutover-live`). Erst danach: `LIVE 99 % VERIFIED · READY FOR OWNER ACCEPTANCE`.
+**Fortsetzungspunkt:** Owner kopiert Preview→Production Env (`LEAD_TOKEN_SECRET`, `RESEND_API_KEY`, `LEAD_FROM`, `LEAD_TO`) unter https://vercel.com/muhammed-emin-akyols-projects/creadig/settings/environment-variables — danach `npm run cutover-live` erneut. Dann erst `LIVE 99 % VERIFIED · READY FOR OWNER ACCEPTANCE`.
