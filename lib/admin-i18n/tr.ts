@@ -22,6 +22,7 @@ export const tr: AdminTexte = {
     menueSchliessen: "Menüyü kapat",
     abmelden: "Çıkış yap",
     abmeldenLaeuft: "Çıkış yapılıyor …",
+    ungespeichert: "Bu sayfada henüz kaydedilmemiş bir şey var. Yine de ayrılmak istiyor musunuz?",
   },
   nav: {
     uebersicht: { label: "Genel bakış", hint: "Bugün önemli olan" },
@@ -816,6 +817,9 @@ export const tr: AdminTexte = {
   beziehungDetail: {
     titel: "Kişi",
     alleBeziehungen: "← Tüm ilişkiler",
+    auskunftTitel: "Bilgi dosyası",
+    auskunftHinweis: "Bu evin bu kişi hakkında tuttuğu her şey — talepler, fırsatlar, kayıt geçmişi, izinler — iletilebilir bir dosya olarak. Bilgi verildiği kayda geçer; içeriği geçmez.",
+    auskunftKnopf: "Bilgi dosyasını indir",
     beziehung: "İlişki",
     beziehungHinweis: "Her süreçten bağımsızdır. Bir kişi şu an hiçbir şey yürümüyor olsa da yakın olabilir — ya da açık bir fırsat varken yabancı kalabilir.",
     grad: "Derece",

@@ -68,7 +68,7 @@ export default async function AnfragenPage({
   return (
     <VertriebShell title={t.nav.anfragen.label} lead={l.lead} meta={<span className="block">{l.gesamt(total)}</span>} available>
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <form method="get" className="flex flex-1 flex-wrap items-end gap-4">
+        <form method="get" data-wache="aus" className="flex flex-1 flex-wrap items-end gap-4">
           {/* Ein Suchbegriff hebt den Fälligkeitsfilter nicht still auf. */}
           {faellig ? <input type="hidden" name="faellig" value={faellig} /> : null}
           <AdminField label={l.suche} htmlFor="q" className="flex-1 basis-64">

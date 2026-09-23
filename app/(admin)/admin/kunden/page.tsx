@@ -62,7 +62,7 @@ export default async function OrganisationenPage({
       meta={<span className="block">{t.kundenListe.gesamt(page.total)}</span>}
       available
     >
-      <form method="get" className="flex flex-wrap items-end gap-4">
+      <form method="get" data-wache="aus" className="flex flex-wrap items-end gap-4">
         <AdminField label={t.kundenListe.suche} htmlFor="q" className="flex-1 basis-64">
           <AdminInput id="q" name="q" type="search" defaultValue={search} placeholder={t.kundenListe.suchePlatzhalter} />
         </AdminField>

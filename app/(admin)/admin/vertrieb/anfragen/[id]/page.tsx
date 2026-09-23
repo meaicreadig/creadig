@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
+import { istNavigationsfehler } from "@/lib/navigationsfehler"
+
 import {
   archiveEnquiry,
   createOpportunityFromEnquiry,
@@ -76,7 +78,8 @@ export default async function AnfrageDetail({ params }: { params: Promise<{ id: 
       store.organisationChoices(),
     ])
   } catch (error) {
-    if (error && typeof error === "object" && "digest" in error && String((error as { digest: unknown }).digest).startsWith("NEXT_")) throw error
+    /* ADM-07 · H27 — dieselbe Regel wie auf jeder anderen Detailseite. */
+    if (istNavigationsfehler(error)) throw error
     return <VertriebShell title={t.nav.anfragen.label} available={false}>{null}</VertriebShell>
   }
 

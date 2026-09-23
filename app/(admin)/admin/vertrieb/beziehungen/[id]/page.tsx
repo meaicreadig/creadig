@@ -1,5 +1,10 @@
 import Link from "next/link"
+import { cookies } from "next/headers"
 import { notFound } from "next/navigation"
+
+import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
+
+import { istNavigationsfehler } from "@/lib/navigationsfehler"
 
 import {
   setContactDetails,
@@ -67,11 +72,16 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
       store.organisationChoices(),
     ])
     organisation = contact.organisationId ? await store.getOrganisation(contact.organisationId) : null
-  } catch {
+  } catch (error) {
+    /* ADM-07 · H27 — `notFound()` wirft auch; wer es faengt, faengt die Navigation. */
+    if (istNavigationsfehler(error)) throw error
+
     return <VertriebShell title={t.beziehungDetail.titel} available={false}>{null}</VertriebShell>
   }
 
   const warm = contact.relationship === "warm" || contact.relationship === "eng"
+  /* ADM-07 · B11 — die Auskunft ist der vollstaendige Personenauszug: nur Owner. */
+  const { rolle } = await verifySession((await cookies()).get(ADMIN_COOKIE)?.value)
 
   return (
     <VertriebShell
@@ -242,6 +252,26 @@ export default async function KontaktDetail({ params }: { params: Promise<{ id: 
             </DataValue>
             <DataValue label={t.beziehungDetail.rolle}>{contact.role}</DataValue>
           </dl>
+
+          {/* ── ADM-07 · B11 · AUSKUNFT ─────────────────────────────────────
+              Der Weg fuer die Frage „welche Daten haben Sie ueber mich".
+              Er steht hier und nicht in einem Menue: Beantwortet wird sie an
+              der Person, ueber die gefragt wurde. */}
+          {rolle === "owner" ? (
+            <div className="mt-10">
+              <SectionHeader title={t.beziehungDetail.auskunftTitel} as="h3" />
+              <p className="type-small text-muted-foreground mt-3 max-w-2xl text-pretty">
+                {t.beziehungDetail.auskunftHinweis}
+              </p>
+              <a
+                href={`/api/admin/auskunft?kontakt=${encodeURIComponent(contact.id)}`}
+                className="cta-quiet mt-4 inline-flex min-h-11 items-center px-4 py-2 text-sm"
+                data-auskunft
+              >
+                {t.beziehungDetail.auskunftKnopf}
+              </a>
+            </div>
+          ) : null}
 
           {organisation && (
             <div className="mt-10">

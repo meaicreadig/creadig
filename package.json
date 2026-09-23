@@ -45,6 +45,8 @@
     "meai-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/meai-drill.mjs",
     "freigabe-e2e": "node --import ./scripts/lib/alias-hook.mjs scripts/freigabe-e2e.mjs",
     "befund-sprache-e2e": "node --import ./scripts/lib/alias-hook.mjs scripts/befund-sprache-e2e.mjs",
+    "auskunft-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/auskunft-drill.mjs",
+    "abnahme-e2e": "node --import ./scripts/lib/alias-hook.mjs scripts/abnahme-e2e.mjs",
     "automation-e2e": "node --import ./scripts/lib/alias-hook.mjs scripts/automation-e2e.mjs",
     "verbindungen-e2e": "node --import ./scripts/lib/alias-hook.mjs scripts/verbindungen-e2e.mjs",
     "versuch-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/versuch-drill.mjs",

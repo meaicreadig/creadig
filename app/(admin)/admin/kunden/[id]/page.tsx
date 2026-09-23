@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
+import { istNavigationsfehler } from "@/lib/navigationsfehler"
+
 import {
   addLocation,
   removeLocation,
@@ -71,7 +73,10 @@ export default async function OrganisationDetail({ params }: { params: Promise<{
       store.leadsForOrganisation(id),
       store.activities("organisation", id),
     ])
-  } catch {
+  } catch (error) {
+    /* ADM-07 · H27 — `notFound()` wirft auch; wer es faengt, faengt die Navigation. */
+    if (istNavigationsfehler(error)) throw error
+
     return <KundenShell title={t.kundenDetail.kundeTitel} available={false}>{null}</KundenShell>
   }
 

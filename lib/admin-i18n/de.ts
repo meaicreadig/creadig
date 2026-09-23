@@ -23,6 +23,7 @@ export const de = {
     menueSchliessen: "Menü schließen",
     abmelden: "Abmelden",
     abmeldenLaeuft: "Wird abgemeldet …",
+    ungespeichert: "Auf dieser Seite steht etwas, das noch nicht gespeichert ist. Seite trotzdem verlassen?",
   },
   nav: {
     uebersicht: { label: "Übersicht", hint: "Was heute zählt" },
@@ -817,6 +818,9 @@ export const de = {
   beziehungDetail: {
     titel: "Kontakt",
     alleBeziehungen: "← Alle Beziehungen",
+    auskunftTitel: "Auskunft",
+    auskunftHinweis: "Alles, was dieses Haus über diese Person führt — Anfragen, Vorgänge, Chronik, Freigaben — als Datei zum Weitergeben. Dass eine Auskunft erteilt wurde, steht danach in der Akte; ihr Inhalt nicht.",
+    auskunftKnopf: "Auskunft herunterladen",
     beziehung: "Beziehung",
     beziehungHinweis: "Unabhängig von jedem Vorgang. Jemand kann eng sein, ohne dass gerade etwas läuft — und fremd mit einer laufenden Chance.",
     grad: "Grad",

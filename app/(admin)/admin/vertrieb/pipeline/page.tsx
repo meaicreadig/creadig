@@ -58,7 +58,7 @@ export default async function PipelinePage({
       meta={<span className="block">{t.pipeline.gesamt(page.total)}</span>}
       available
     >
-      <form method="get" className="flex flex-wrap items-end gap-4">
+      <form method="get" data-wache="aus" className="flex flex-wrap items-end gap-4">
         <AdminField label={t.pipeline.suche} htmlFor="q" className="flex-1 basis-64">
           <AdminInput
             id="q"

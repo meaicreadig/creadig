@@ -1,8 +1,9 @@
 # Admin / Owner OS 1.0 · Ledger
 
 > **Maßgebliche Statusquelle** dieses Programms. Vertrag: `docs/admin-os/program.md`.
-> Stand **16.09.2026** · Session 1 · Branch `feat/system-haus-site` @ `814a02f`
-> Programmzustand: **IN_PROGRESS** — weder OWNER-INDEPENDENT BUILD COMPLETE noch LIVE 99 % ACCEPTED.
+> Stand **23.09.2026** · Session 5 · Branch `feat/system-haus-site`
+> Programmzustand: **OWNER-INDEPENDENT BUILD COMPLETE + CUTOVER READY** — **nicht** LIVE 99 % ACCEPTED.
+> Abnahmematrix: `docs/admin-os/abnahme.md` · Cutover-Paket: `docs/admin-os/cutover.md`.
 > Vorgänger-Dokumente (bleiben Beleg, nicht Status): `docs/control-center/*`, `docs/final-live-completion/state.md` (F12 Owner-Steuerung).
 
 ---
@@ -39,7 +40,7 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | ADM-04 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | Cutover: mit dem ADM-01/02/03-Paket ausliefern; danach Prüfung gegen die echten Speicher | keiner — **keine CRITICAL-Fähigkeit wartet auf einen Anbieter** (A2) |
 | ADM-05 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) | Cutover mit Migration 018 | Beleg-Brücke zur öffentlichen Seite + Rechnung = **BLOCKED_G18** |
 | ADM-06 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) — Automation (A29), meAI (A30/B12), Drilldown (A25) | Cutover mit Migration 019 im selben Paket wie 015–018 | meAI-**Anbieter/Kosten = Owner** (A8·8, optional) — blockiert 99 % **nicht** |
-| ADM-07 | 🔴 | 🔴 | 🔴 | 🔴 | `NOT_STARTED` | — | Produktionsautorität |
+| ADM-07 | 🟢 | 🔴 | 🔴 | 🔴 | `BUILT` (lokal VERIFIED) — A01–A32 + B01–B12 in `abnahme.md` | Cutover-Paket liegt vor (`cutover.md`): O1 Sicherung · O2 Migration · O3 Deploy · O4 Rauchtest | Produktionsautorität (Owner) — **B05/B08 live** und Löschfristen (B11) |
 
 **Bestand ist nicht leer** (Code-Evidenz): Anfragen, Organisationen, Kontakte, Standorte, Chancen, Aktivitäten, Recherche, Verlust, Angebote → Projekte (`lib/vertrieb.ts`), Beleg, Rollen (Owner/Vertrieb/Redaktion), Aufmerksamkeit (`lib/attention.ts`), Gedächtnis/Navigator (Cockpit), Migrationsbefehl mit Produktionssperre (`scripts/db-migrate.mjs`). Das Programm baut darauf auf.
 
@@ -75,6 +76,12 @@ dc3bdab1bd64ced536707528e48eed3dfa7913652cf1454e2f0b781af26293f6  scripts/rechnu
 | **H24** | meAI „Nächster Schritt“: Ohne gewählte Angebotsart wurde die Reife als `[]` = „nichts offen“ übergeben → Vorschlag „Das Angebot schreiben — die Belege tragen es“ für einen Vorgang, an dem nichts geprüft war. Unbekannt als erfüllt gelesen — genau der Fehler, den A8·3 verbietet, nur vor dem Modell statt im Modell. | gerendert (E30-Screenshot) | mittel (A30) | ADM-06 | **VERIFIED** (22.09.2026) — fehlende Wahl ist selbst der offene Beleg (`angebotsart`); Eval-Fall `ohne-angebotsart`; E30 prüft es im Browser |
 | **H25** | `kernschleife-drill` hatte „morgen“ als festes Datum `2026-09-18` → ab 18.09. rot (Zeitbombe), `db-drills` 12/13. | reproduziert 22.09.2026 | niedrig (Testhygiene) | ADM-06 | **VERIFIED** — relativ zum Berliner Geschäftstag (`plusTage(geschaeftsTag(), 1)`); db-drills 13/13 |
 | **H26** | Übersicht: „Überfällig“ und „Heute fällig“ zählten Chancen **und** Anfragen (`count(*)`), führten aber auf `#heute-titel` — eine Liste mit höchstens zwölf Einträgen je Art. Bei mehr als zwölf widersprach die Liste der Zahl; eine vollständige Liste gab es für Anfragen gar nicht (kein Fälligkeitsfilter in der Inbox). | Code | mittel (A25) | ADM-06 | **VERIFIED** (22.09.2026) — Kachel zeigt Summe + zwei Wege (Chancen → `pipeline?bucket=…`, Anfragen → `anfragen?faellig=heute\|ueberfaellig`), Filter mit derselben Bedingung wie `summary()`; E25: Kachel = Zeilen dahinter für alle vier Kennzahlen, Filter bleibt bei der Suche |
+| **H27** | `notFound()` stand in einem `try`, dessen `catch` „Datenbank nicht erreichbar“ antwortete. Eine erfundene Datensatz-Kennung ergab **200 mit Störungsmeldung** statt 404 — A21 verletzt und A19 gleich mit: Das Haus behauptete eine Störung, die es nicht gab. Betroffen: Chance, Kunde, Kontakt (die Anfrage hatte eine eigene Kopie der Regel). | gemessen (`abnahme-e2e` §A21) | hoch | ADM-07 | **VERIFIED** (22.09.2026) — `lib/navigationsfehler.ts`, eine Regel für alle vier |
+| **H28** | Im Admin galt nur die kleine CSP; die vollständige lief als Bericht. Die Begründung dafür („statische Seite, keine fremden Eingaben“) trifft im Admin auf **keinen** der beiden Punkte zu. Ein zweiter `headers()`-Eintrag half nicht — die Konfiguration überschreibt die Middleware, gemessen. | gemessen (`abnahme-e2e` §B06) | mittel | ADM-07 | **VERIFIED** (22.09.2026) — `lib/csp.ts` über `ADMIN_RESPONSE_HEADERS`, allgemeine Regel nimmt `/admin` aus |
+| **H29** | Ein abgestürzter Prüflauf liess seinen Server auf dem Port stehen (`npm exec` bekam SIGTERM, das Kind nicht). Der nächste Lauf mass die **alte** Fassung — drei „Befunde“ waren Gespenster. Eine Prüfung, die still am falschen Objekt misst, ist schlimmer als keine. | reproduziert 22.09.2026 | hoch (Testwahrheit) | ADM-07 | **VERIFIED** — Port wird vorher geprüft (lauter Abbruch), Prozessgruppe wird beendet |
+| **H30** | Türkische Suche fand `Işık` nur bei exakt `Işık`: `ş`/`ı` sind eigene Buchstaben, `ILIKE` kennt sie nicht als Variante. Bei einer Nische, die ausdrücklich türkischsprachige Betriebe sind, ist das keine Suche. | gemessen (`abnahme-e2e` §A24) | mittel (A24) | ADM-07 | **VERIFIED** — `lib/tuerkisch.ts`, vier Suchpfade, Wort und Spalte auf denselben Nenner |
+| **A28** | Ungespeicherte Eingaben verschwanden beim Klick auf einen anderen Bereich — ohne Nachfrage, ohne Spur. | Code + gemessen | mittel (A28) | ADM-07 | **VERIFIED** — `components/admin/ungespeichert-wache.tsx`, Filter-/Suchformulare ausdrücklich ausgenommen |
+| **B11** | Eine Auskunft über eine Person gab es nicht — weder Weg noch Datei. Die Spuren eines Menschen liegen in fünf Tabellen; von Hand zusammengetragen fehlt beim dritten Mal eine. | Code | mittel (B11) | ADM-07 | **VERIFIED** — `lib/auskunft.ts` + Owner-Route + Vermerk ohne Inhalt; Löschung mit Fristenkonflikt bleibt Owner |
 
 ---
 
@@ -591,7 +598,16 @@ Alle mit Bedingung im `UPDATE` **und** `RETURNING`-Prüfung: Kam keine Zeile zur
 
 ## Owner-Handlungen (max. 3)
 
-Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
+**Drei offen — der Cutover.** Vollständig beschrieben in `docs/admin-os/cutover.md` §10:
+
+| # | Handlung | Blockiert |
+|---|---|---|
+| **O1** | Sichern, Rückspielung proben, Migration 015–019 anwenden | alles Weitere |
+| **O2** | Deploy + Promote des aktuellen HEAD | Betrieb mit dem neuen Stand |
+| **O3** | Rauchtest R1–R9 abnehmen (darunter B05/B08 live) | `LIVE 99 % ACCEPTED` |
+
+Nicht blockierend: meAI-Anbieter/Kosten (A8·8) · Aufbewahrungsfristen für die
+Löschung je Person (B11) · Dark Mode (POST-99, OD-1).
 
 ## Session-Log
 
@@ -618,5 +634,8 @@ Keine offen. (OD-1/OD-2 entschieden 16.09.2026.)
 | 22.09.2026 | 5 | **ADM-06/2 meAI BUILT/lokal VERIFIED** — Qualitätsvertrag A8 in `lib/meai.ts` + Fixture-Eval `lib/meai-eval.ts` (10 Fälle, 6 Prüf-Anbieter: brav/halluziniert/leckt/erfindet/rät/kaputt); `meai-drill` M1–M8 grün im `postbuild` (**B12** ohne Anbieter); Chance-Detail zeigt „Nächster Schritt“ mit Belegen in DE/TR, Quelle „aus Regeln“ (**A30** Degraded Mode, E30 im Browser) · H22–H25 behoben · build + alle Gates, db-drills 13/13, Kernschleifen-E2E grün |
 
 | 22.09.2026 | 5 | **ADM-06/3 Drilldown (A25) VERIFIED lokal** — H26; E25 im Browser (2 = 1+1, 2 = 1+1, 4 = 4, 1 = 1) · admin-sprache-e2e + admin-zustaende 36/36 + db-drills 13/13 grün · **ADM-06 BUILT** |
+| 23.09.2026 | 5 | **ADM-07 BUILT/lokal VERIFIED — OWNER-INDEPENDENT BUILD COMPLETE + CUTOVER READY.** Abnahmematrix A01–A32 + B01–B12 erhoben und gefahren (`docs/admin-os/abnahme.md`); neuer `abnahme-e2e` (B01–B09, A21/A22/A24/A28, B11) · **B11 gebaut** (`lib/auskunft.ts`, `auskunft-drill`) · H27–H30 + A28 behoben · A31 Sicherung→Rückspielung vollständig durchgespielt (12 Schritte) · db-drills 14/14 · smoke 36/36 · a11y 132 · mobile 6×16 · vitals 14/14 · alle Admin-E2E grün · **Cutover-Paket** `docs/admin-os/cutover.md` mit 4 Owner-Handlungen |
 
-**Fortsetzungspunkt:** ADM-07 — Gesamtlauf A01–A32 + B01–B12 lokal (Matrix: Szenario → Beleg/Skript → Stand), Lücken schließen; danach Cutover-Paket für den Owner. Migrationen 015–019 weiter **nicht** freigegeben. meAI-Anbieter/Kosten = Owner (optional, blockiert nicht). Production-Tip nicht promoten ohne Cutover-Paket.
+**Fortsetzungspunkt:** **Owner-Handlungen O1–O4 aus `docs/admin-os/cutover.md`** — Sicherung + Rückspielprobe, Migration 015–019, Deploy/Promote, Rauchtest R1–R9. Danach Live-Abnahme §8 und erst dann `LIVE 99 % ACCEPTED`. Ohne diese vier bleibt jede weitere Welle ohne Wirkung auf den Betrieb.
+
+**Owner-Entscheidungen, die den Cutover nicht blockieren:** meAI-Anbieter/Kosten (A8·8) · Aufbewahrungsfristen für die Löschung je Person (B11) · Dark Mode (POST-99).

@@ -55,7 +55,7 @@ export default async function BeziehungenPage({
       meta={<span className="block">{t.beziehungenListe.gesamt(page.total)}</span>}
       available
     >
-      <form method="get" className="flex flex-wrap items-end gap-4">
+      <form method="get" data-wache="aus" className="flex flex-wrap items-end gap-4">
         <AdminField label={t.beziehungenListe.suche} htmlFor="q" className="flex-1 basis-64">
           <AdminInput id="q" name="q" type="search" defaultValue={search} placeholder={t.beziehungenListe.suchePlatzhalter} />
         </AdminField>

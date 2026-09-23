@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto"
+import { sqlTuerkisch, tuerkischVergleich } from "@/lib/tuerkisch"
 
 import { OFFERS } from "@/lib/offer-readiness"
 import { KATALOG, fehltFuer, type Angebot, type Annahme, type Befund, type Position } from "@/lib/angebot"
@@ -795,9 +796,10 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
       }
       if (query.source) { params.push(query.source); where.push(`l.source = $${params.length}`) }
       if (query.search?.trim()) {
-        params.push(`%${query.search.trim()}%`)
+        /* ADM-07 · A24 — Suchwort und Spalte auf denselben Nenner (`lib/tuerkisch.ts`). */
+        params.push(`%${tuerkischVergleich(query.search.trim())}%`)
         const n = params.length
-        where.push(`(l.reference ILIKE $${n} OR l.business ILIKE $${n} OR l.name ILIKE $${n} OR l.email ILIKE $${n})`)
+        where.push(`(${sqlTuerkisch("l.reference")} LIKE $${n} OR ${sqlTuerkisch("l.business")} LIKE $${n} OR ${sqlTuerkisch("l.name")} LIKE $${n} OR ${sqlTuerkisch("l.email")} LIKE $${n})`)
       }
       const clause = where.length ? `WHERE ${where.join(" AND ")}` : ""
 
@@ -997,9 +999,10 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         default: break
       }
       if (query.search?.trim()) {
-        params.push(`%${query.search.trim()}%`)
+        /* ADM-07 · A24 — Suchwort und Spalte auf denselben Nenner (`lib/tuerkisch.ts`). */
+        params.push(`%${tuerkischVergleich(query.search.trim())}%`)
         const n = params.length
-        where.push(`(o.title ILIKE $${n} OR org.name ILIKE $${n} OR c.name ILIKE $${n})`)
+        where.push(`(${sqlTuerkisch("o.title")} LIKE $${n} OR ${sqlTuerkisch("org.name")} LIKE $${n} OR ${sqlTuerkisch("c.name")} LIKE $${n})`)
       }
       const clause = where.length ? `WHERE ${where.join(" AND ")}` : ""
 
@@ -1768,9 +1771,10 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
           break
       }
       if (query.search?.trim()) {
-        params.push(`%${query.search.trim()}%`)
+        /* ADM-07 · A24 — Suchwort und Spalte auf denselben Nenner (`lib/tuerkisch.ts`). */
+        params.push(`%${tuerkischVergleich(query.search.trim())}%`)
         const n = params.length
-        where.push(`(c.name ILIKE $${n} OR c.email ILIKE $${n} OR org.name ILIKE $${n})`)
+        where.push(`(${sqlTuerkisch("c.name")} LIKE $${n} OR ${sqlTuerkisch("c.email")} LIKE $${n} OR ${sqlTuerkisch("org.name")} LIKE $${n})`)
       }
       const clause = where.length ? `WHERE ${where.join(" AND ")}` : ""
 
@@ -1882,9 +1886,10 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         default: break
       }
       if (query.search?.trim()) {
-        params.push(`%${query.search.trim()}%`)
+        /* ADM-07 · A24 — Suchwort und Spalte auf denselben Nenner (`lib/tuerkisch.ts`). */
+        params.push(`%${tuerkischVergleich(query.search.trim())}%`)
         const n = params.length
-        where.push(`(org.name ILIKE $${n} OR org.city ILIKE $${n} OR org.industry ILIKE $${n})`)
+        where.push(`(${sqlTuerkisch("org.name")} LIKE $${n} OR ${sqlTuerkisch("org.city")} LIKE $${n} OR ${sqlTuerkisch("org.industry")} LIKE $${n})`)
       }
       const clause = where.length ? `WHERE ${where.join(" AND ")}` : ""
 
@@ -2292,6 +2297,12 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
      * Sie HALTEN die Erlaubnis fest. Die Bruecke zur Projektion ist G18
      * gesperrt, und die Oberflaeche sagt das dort, wo es zaehlt.
      */
+
+    async vermerkeAuskunft(kontaktId: string, bereiche: Record<string, number>): Promise<void> {
+      await ready()
+      /* Kein Inhalt, nur Umfang — siehe `lib/vertrieb.ts`. */
+      await note("contact", kontaktId, "auskunft.erteilt", "Auskunft erteilt", null, { bereiche })
+    },
 
     async listReleases(organisationId?: string): Promise<ReleaseRow[] | null> {
       try {

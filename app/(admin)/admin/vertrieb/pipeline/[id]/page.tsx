@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
+import { istNavigationsfehler } from "@/lib/navigationsfehler"
+
 import {
   setOpportunityNextAction,
   setOpportunityNote,
@@ -80,7 +82,10 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
       store.listOffers(id),
       store.listProjects(id),
     ])
-  } catch {
+  } catch (error) {
+    /* ADM-07 · H27 — `notFound()` wirft auch; wer es faengt, faengt die Navigation. */
+    if (istNavigationsfehler(error)) throw error
+
     return <VertriebShell title={t.chance.titel} available={false}>{null}</VertriebShell>
   }
 

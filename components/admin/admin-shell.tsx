@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { UngespeichertWache } from "@/components/admin/ungespeichert-wache"
 import { AdminLogout } from "@/components/admin/admin-logout"
 import { AdminNav, type NavItem } from "@/components/admin/admin-nav"
 import { SprachUmschalter } from "@/components/admin/sprach-umschalter"
@@ -61,6 +62,8 @@ export async function AdminShell({
 
   return (
     <div className="bg-background text-foreground min-h-dvh">
+      {/* ADM-07 · A28 — eine Wache für jedes Formular dieser Oberfläche. */}
+      <UngespeichertWache frage={t.shell.ungespeichert} />
       <a
         href="#arbeitsflaeche"
         className="sr-only focus:not-sr-only focus:bg-background focus:text-foreground focus:border-gold focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:border focus:px-5 focus:py-3 focus:text-sm"

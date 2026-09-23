@@ -827,6 +827,16 @@ export type VertriebStore = {
 
   activities(subjectType: ActivitySubject, subjectId: string, limit?: number): Promise<Activity[]>
 
+  /**
+   * ADM-07 · B11 — dass eine Auskunft erteilt wurde, steht in der Akte.
+   *
+   * Ohne den Inhalt: Was in der Auskunft stand, weiss die Auskunft. Hier
+   * steht nur, dass sie erstellt wurde, von wem und wie viele Zeilen je
+   * Bereich — genug fuer die Frage „wurde geantwortet", zu wenig fuer eine
+   * zweite Kopie der Personendaten in der Chronik.
+   */
+  vermerkeAuskunft(kontaktId: string, bereiche: Record<string, number>): Promise<void>
+
   /* ── GATE 27 · Die Messreihe zur Owner-Last ────────────────────────────
    *
    * Die einzige Reihe in diesem Haus, die GESPEICHERT wird. Alles andere

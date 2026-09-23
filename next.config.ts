@@ -209,7 +209,32 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }]
+    return [
+      /*
+       * ADM-07 · H28 — NICHT `/(.*)`, SONDERN „ALLES AUSSER ADMIN".
+       *
+       * Gemessen 22.09.2026: Die Middleware setzt für Admin-Antworten die
+       * schärfere Policy (`lib/csp.ts`) — und diese Regel hier überschrieb
+       * sie anschliessend wieder mit der öffentlichen. Die Köpfe aus der
+       * Konfiguration gelten nach der Middleware, nicht vor ihr.
+       *
+       * Deshalb nimmt die allgemeine Regel den Admin aus. Alles andere
+       * (Sicherheitsköpfe, HSTS, Permissions-Policy) bekommt der Admin
+       * weiterhin — nur eben ohne die öffentliche CSP darüber.
+       */
+      { source: "/((?!admin|api/admin).*)", headers: securityHeaders },
+      { source: "/:pfad(admin|api/admin)/:rest*", headers: securityHeaders.filter((h) => !h.key.startsWith("Content-Security-Policy")) },
+      { source: "/admin", headers: securityHeaders.filter((h) => !h.key.startsWith("Content-Security-Policy")) },
+      /*
+       * ADM-07 · H28 — die schärfere Policy des Admin steht NICHT hier.
+       *
+       * Ein Eintrag für `/admin/:pfad*` kam an der Admin-Antwort nicht an
+       * (gemessen 22.09.2026): Diese Adressen beantwortet die Middleware.
+       * Sie steht deshalb in `lib/csp.ts` und wird über
+       * `ADMIN_RESPONSE_HEADERS` gesetzt — dort, wo die Köpfe nachweislich
+       * ankommen. Hier bleibt nur der Hinweis, damit niemand sie sucht.
+       */
+    ]
   },
   async redirects() {
     return [

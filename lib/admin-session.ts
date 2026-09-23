@@ -1,4 +1,5 @@
 import { equal, sign } from "@/lib/hmac"
+import { ADMIN_CSP } from "@/lib/csp"
 import { ROLLEN, ROLLEN_KEYS, istRolle, type Rolle } from "@/lib/rollen"
 
 /**
@@ -217,6 +218,8 @@ export const SESSION_SECONDS = SESSION_MS / 1000
 export const ADMIN_RESPONSE_HEADERS: Readonly<Record<string, string>> = {
   "X-Robots-Tag": "noindex, nofollow, noarchive",
   "Cache-Control": "private, no-store, max-age=0",
+  /* ADM-07 · H28 — im Admin gilt die volle Policy, nicht der Bericht (`lib/csp.ts`). */
+  "Content-Security-Policy": ADMIN_CSP,
 }
 
 export function withAdminHeaders<T extends { headers: Headers }>(response: T): T {
