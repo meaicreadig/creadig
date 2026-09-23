@@ -47,7 +47,7 @@
     "befund-sprache-e2e": "node --import ./scripts/lib/alias-hook.mjs scripts/befund-sprache-e2e.mjs",
     "cutover-preflight": "node --env-file=.env.local scripts/cutover-preflight.mjs",
     "cutover-sicherung": "node --env-file=.env.local scripts/cutover-sicherung.mjs",
-    "cutover-migration": "CREADIG_MIGRATE_PRODUCTION=ja-ich-migriere-produktion node --env-file=.env.local scripts/db-migrate.mjs",
+    "cutover-migration": "CREADIG_MIGRATE_PRODUCTION=ja-ich-migriere-produktion node --env-file=.env.local --import ./scripts/lib/alias-hook.mjs scripts/db-migrate.mjs",
     "cutover-nachpruefung": "node --env-file=.env.local scripts/cutover-nachpruefung.mjs",
     "cutover-live": "node --env-file=.env.local scripts/cutover-live.mjs",
     "auskunft-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/auskunft-drill.mjs",

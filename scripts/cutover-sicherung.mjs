@@ -38,8 +38,18 @@ if (!url || url.startsWith("[")) {
 const out = arg("--out", `${process.env.HOME}/creadig-backups`)
 const ziel = arg("--target", "g1_cutover")
 
-console.log("\n══ STAGE 2 · Sicherung ══\n")
-const sicherung = spawnSync("node", ["scripts/db-backup.mjs", "--url", url, "--out", out], { encoding: "utf8" })
+/*
+ * Dieser Befehl IST die bewusste Produktions-Sicherung des Cutover.
+ * env-guard sperrt managed+production ohne Ausnahme — hier setzen wir sie
+ * einmal, sichtbar, und nur fuer die Kindprozesse dieses Laufs.
+ */
+process.env.CREADIG_ALLOW_UNSAFE_DB = "ich-weiss-was-ich-tue"
+console.log("\n══ STAGE 2 · Sicherung ══")
+console.log("(Cutover-Ausnahme: CREADIG_ALLOW_UNSAFE_DB gesetzt — bewusst)\n")
+const sicherung = spawnSync("node", ["scripts/db-backup.mjs", "--url", url, "--out", out], {
+  encoding: "utf8",
+  env: process.env,
+})
 process.stdout.write(sicherung.stdout ?? "")
 if (sicherung.status !== 0) {
   process.stderr.write(sicherung.stderr ?? "")

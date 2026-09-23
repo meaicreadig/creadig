@@ -82,10 +82,26 @@ if (existsSync(ziel)) {
 console.log(`Sicherung  ${db.host}/${db.db}  (${db.kind}, Umgebung ${env.kind})`)
 console.log(`Ziel       ${ziel}`)
 
+/* Neon/Postgres 18 verlangt einen passenden Client. PATH allein reicht oft
+   nicht (Homebrew haelt 17 vorne) — deshalb gezielt suchen. */
+const pgKandidaten = [
+  process.env.PG_DUMP,
+  "/opt/homebrew/opt/postgresql@18/bin/pg_dump",
+  "/usr/local/opt/postgresql@18/bin/pg_dump",
+  "pg_dump",
+].filter(Boolean)
+const pgDump = pgKandidaten.find((p) => p === "pg_dump" || existsSync(p))
+if (!pgDump) {
+  console.error("ABGEBROCHEN — pg_dump nicht gefunden (postgresql@18 empfohlen).")
+  process.exit(4)
+}
+const pgRestore = pgDump.replace(/pg_dump$/, "pg_restore")
+console.log(`Client     ${pgDump}`)
+
 /* Die Verbindungszeichenfolge geht als Argument an pg_dump und NICHT durch
    eine Shell — kein Zitieren, kein Verlauf, kein Prozesslisten-Leck ueber
    eine Kommandozeile, die wir selbst zusammenbauen. */
-const lauf = spawnSync("pg_dump", ["--format=custom", "--no-owner", "--no-privileges", "--file", ziel, url], {
+const lauf = spawnSync(pgDump, ["--format=custom", "--no-owner", "--no-privileges", "--file", ziel, url], {
   stdio: ["ignore", "inherit", "inherit"],
 })
 
@@ -105,7 +121,7 @@ if (groesse < 1024) {
 }
 
 /* Gegenprobe ohne Rueckspielung: Kann pg_restore die Datei ueberhaupt lesen? */
-const inhalt = spawnSync("pg_restore", ["--list", ziel], { encoding: "utf8" })
+const inhalt = spawnSync(pgRestore, ["--list", ziel], { encoding: "utf8" })
 if (inhalt.status !== 0) {
   console.error("ABGEBROCHEN — die Datei ist geschrieben, aber pg_restore kann sie nicht lesen.")
   process.exit(7)
