@@ -26,7 +26,7 @@
 
 | Punkt | Wert |
 |---|---|
-| Aktueller HEAD | siehe `git rev-parse HEAD` auf `feat/system-haus-site` — Stand dieses Dokuments: **ADM-07-Commit** |
+| Auszuliefernder Stand | **`76cbe67`** (ADM-07-Abnahme) auf `feat/system-haus-site`. Kommt danach noch ein Commit, gilt der neue HEAD — die Liste in §2 ändert sich dadurch nicht, die Zahl in der Zeile darunter schon. |
 | Produktions-Basis heute | **`e1bc9ec`** · Deployment `dpl_7siNz9VcwZJnkjdAsRq5gbRx7U2w` · Aliase `creadig.de`, `www.creadig.de` |
 | Commits seit der Basis | **22** (`git log --oneline e1bc9ec..HEAD`) — ADM-01 bis ADM-07 |
 | Migrationen | **015, 016, 017, 018, 019** — in dieser Reihenfolge |
