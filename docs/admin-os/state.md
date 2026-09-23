@@ -598,13 +598,20 @@ Alle mit Bedingung im `UPDATE` **und** `RETURNING`-Prüfung: Kam keine Zeile zur
 
 ## Owner-Handlungen (max. 3)
 
-**Drei offen — der Cutover.** Vollständig beschrieben in `docs/admin-os/cutover.md` §10:
+**Drei offen — der Cutover, als drei Befehle.** Vollständig in `docs/admin-os/cutover.md` §10:
 
-| # | Handlung | Blockiert |
+| # | Befehl | Blockiert |
 |---|---|---|
-| **O1** | Sichern, Rückspielung proben, Migration 015–019 anwenden | alles Weitere |
-| **O2** | Deploy + Promote des aktuellen HEAD | Betrieb mit dem neuen Stand |
-| **O3** | Rauchtest R1–R9 abnehmen (darunter B05/B08 live) | `LIVE 99 % ACCEPTED` |
+| **O1** | `npm run cutover-preflight` (nur lesend) | alles Weitere |
+| **O2** | `cutover-sicherung` → `cutover-migration` → `cutover-nachpruefung` | Betrieb mit dem neuen Stand |
+| **O3** | nach dem Promote: `npm run cutover-live` | `LIVE 99 % VERIFIED` |
+
+**Warum der Agent es nicht selbst tut** (gemessen 23.09.2026, `cutover.md` §11):
+In seiner Umgebung sind alle Produktionszugangsdaten maskiert (`.env.local`
+liefert `[SENSITIVE]`), `vercel env pull` ist gesperrt. Er erreicht die
+Produktionsdatenbank nicht und kann sich am Live-Admin nicht anmelden. Das
+Promote selbst könnte er (Vercel-Zugang besteht) — es kommt aber erst **nach**
+der Migration, weil der neue Stand 017 braucht.
 
 Nicht blockierend: meAI-Anbieter/Kosten (A8·8) · Aufbewahrungsfristen für die
 Löschung je Person (B11) · Dark Mode (POST-99, OD-1).
@@ -635,7 +642,6 @@ Löschung je Person (B11) · Dark Mode (POST-99, OD-1).
 
 | 22.09.2026 | 5 | **ADM-06/3 Drilldown (A25) VERIFIED lokal** — H26; E25 im Browser (2 = 1+1, 2 = 1+1, 4 = 4, 1 = 1) · admin-sprache-e2e + admin-zustaende 36/36 + db-drills 13/13 grün · **ADM-06 BUILT** |
 | 23.09.2026 | 5 | **ADM-07 BUILT/lokal VERIFIED — OWNER-INDEPENDENT BUILD COMPLETE + CUTOVER READY.** Abnahmematrix A01–A32 + B01–B12 erhoben und gefahren (`docs/admin-os/abnahme.md`); neuer `abnahme-e2e` (B01–B09, A21/A22/A24/A28, B11) · **B11 gebaut** (`lib/auskunft.ts`, `auskunft-drill`) · H27–H30 + A28 behoben · A31 Sicherung→Rückspielung vollständig durchgespielt (12 Schritte) · db-drills 14/14 · smoke 36/36 · a11y 132 · mobile 6×16 · vitals 14/14 · alle Admin-E2E grün · **Cutover-Paket** `docs/admin-os/cutover.md` mit 4 Owner-Handlungen |
+| 23.09.2026 | 6 | **Cutover vorbereitet und generalprobt, nicht ausgeführt.** Produktionswahrheit geprüft: Live = `e1bc9ec` / `dpl_7siNz9VcwZJnkjdAsRq5gbRx7U2w`, Aliase `creadig.de` + `www`; Kandidat `c395e91` liegt als **fertige Preview** `dpl_BSnKQFit8hcoKVfSUow3t2sAcXWz` (READY). Vier Cutover-Befehle gebaut (`cutover-preflight`, `-sicherung`, `-migration`, `-nachpruefung`, `-live`) und **gegen eine lokale Kopie vollständig durchgespielt** — Preflight grün, Sicherung+Rückspielung 12/12, Nachprüfung grün, Live-Abnahme grün ausser R4 (lokal nicht beweisbar, erwartet). **Blocker: Zugangsdaten sind für den Agenten maskiert** (`cutover.md` §11) — Migration und Live-Abnahme laufen beim Owner. H14-Schutz geprüft (kein `loading.tsx`), G18-Hashes unverändert. |
 
-**Fortsetzungspunkt:** **Owner-Handlungen O1–O4 aus `docs/admin-os/cutover.md`** — Sicherung + Rückspielprobe, Migration 015–019, Deploy/Promote, Rauchtest R1–R9. Danach Live-Abnahme §8 und erst dann `LIVE 99 % ACCEPTED`. Ohne diese vier bleibt jede weitere Welle ohne Wirkung auf den Betrieb.
-
-**Owner-Entscheidungen, die den Cutover nicht blockieren:** meAI-Anbieter/Kosten (A8·8) · Aufbewahrungsfristen für die Löschung je Person (B11) · Dark Mode (POST-99).
+**Fortsetzungspunkt:** Owner führt O1–O2 aus (`cutover.md` §10). Meldet er „Nachprüfung grün", promotet der Agent `dpl_BSnKQFit8hcoKVfSUow3t2sAcXWz` auf Produktion und der Owner startet O3 (`npm run cutover-live`). Erst danach: `LIVE 99 % VERIFIED · READY FOR OWNER ACCEPTANCE`.

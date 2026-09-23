@@ -62,67 +62,60 @@ gehört in die Nachprüfung (§6).**
 
 ---
 
-## 3 · Preflight — vor der ersten Anweisung
-
-Alles hier ist **lesend**. Gegen die Produktionsdatenbank ausführen:
-
-```sql
--- P1 · Der UNIQUE-Index aus 017 scheitert, wenn es schon Dubletten gibt.
---      Das ist der einzige Punkt, an dem eine Migration hart abbrechen kann.
-SELECT from_lead_id, count(*) FROM opportunities
- WHERE from_lead_id IS NOT NULL GROUP BY from_lead_id HAVING count(*) > 1;
--- Erwartung: 0 Zeilen. Sonst: vor der Migration entscheiden, welche Chance bleibt.
-
--- P2 · Welche Tabellen existieren heute?
-SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY 1;
--- Erwartung: OHNE admin_session_revocations, rate_limit_windows, releases,
---            automation_runs, automation_switches.
-
--- P3 · Wie gross ist der Bestand vorher? (Vergleichswert für §6)
-SELECT (SELECT count(*) FROM leads) AS anfragen,
-       (SELECT count(*) FROM organisations) AS organisationen,
-       (SELECT count(*) FROM contacts) AS kontakte,
-       (SELECT count(*) FROM opportunities) AS chancen,
-       (SELECT count(*) FROM activities) AS chronik;
-```
+## 3 · Preflight — ein Befehl, nur lesend
 
 ```bash
-# P4 · Was fehlt, ohne etwas zu ändern:
-MIGRATE_URL="<produktion>" npm run db-migrate -- --check
+npm run cutover-preflight
 ```
 
----
+`scripts/cutover-preflight.mjs` stellt genau die Fragen, die vor einer
+Migration zählen, und ändert nichts:
+
+| Punkt | Frage | Bedeutung |
+|---|---|---|
+| **P1** | Gibt es zwei Chancen aus derselben Anfrage? | **Der einzige harte Stopper.** Der eindeutige Index aus 017 scheitert daran. Zusammengeführt wird nichts automatisch — welche Chance die echte ist, entscheidet der Owner. |
+| P2 | Welche Tabellen stehen heute da? | Zeigt, ob 015–019 teilweise schon angewendet sind |
+| P3 | Wie viele Anfragen, Organisationen, Kontakte, Chancen, Chronikzeilen? | Vergleichswerte für §6 — die Ausgabe nennt sie in der Form, die `--vorher` erwartet |
+| P5 | Welche 017-Spalten fehlen noch? | Zeigt, was die Migration zu tun hat |
+| P6/P7 | Halten die übrigen Annahmen (Fremdschlüssel, Eindeutigkeiten)? | Fängt Abbrüche vor der Mutation ab |
+
+Die Ausgabe enthält **keine** Verbindungszeichenfolge, kein Passwort und
+keine Personendaten — sie darf weitergegeben werden.
+
+Gegen eine lokale Kopie am 23.09.2026 durchgespielt: grün.
 
 ## 4 · Sicherung — Pflicht, nicht Empfehlung
 
 ```bash
-# S1 · Sicherung ziehen (schreibt NICHT in die Datenbank)
-node scripts/db-backup.mjs --url "<produktion>" --out ~/creadig-backups
-
-# S2 · Die Sicherung EINMAL zurückspielen, bevor sie gebraucht wird.
-#      Eine Sicherung, die nie zurückgespielt wurde, ist eine Vermutung.
-node scripts/db-restore-drill.mjs --dump ~/creadig-backups/<datei>.dump \
-  --target g1_cutover --source "<produktion>"
+npm run cutover-sicherung
 ```
 
-Lokal am 22.09.2026 vollständig durchgespielt: 12 Schritte, Schema 366 Zeilen,
-20 Kerntabellen, Zeilenzahlen identisch, Anwendungsabfrage läuft auf der
-Rückspielung (`docs/admin-os/abnahme.md` §A31).
+Ein Befehl, zwei Schritte, eine Regel: `pg_dump` der Produktion in ein
+Verzeichnis ausserhalb des Arbeitsbaums (`~/creadig-backups`), danach
+**Rückspielung derselben Datei** in eine frische lokale Wegwerf-Datenbank mit
+Vergleich von Schema, Kerntabellen, Zeilenzahlen, Verknüpfungen und einer
+echten Anwendungsabfrage. Scheitert der zweite Schritt, endet der Befehl mit
+einem Fehlercode — **und dann wird nicht migriert.**
 
-**Ohne erfolgreiches S2 wird nicht migriert.**
-
----
+Am 22.09. (lokale Daten) und 23.09.2026 (über dieses Skript) je vollständig
+durchgespielt: 12 Schritte, 0 fehlgeschlagen.
 
 ## 5 · Reihenfolge — Migration zuerst, dann Deploy
 
 ```
-S1/S2 Sicherung + Rückspielprobe
+P     npm run cutover-preflight
   ↓
-M     MIGRATE_URL="<produktion>" CREADIG_MIGRATE_PRODUCTION=ja-ich-migriere-produktion npm run db-migrate
+S     npm run cutover-sicherung        (Sicherung + Rueckspielprobe)
+  ↓
+M     npm run cutover-migration        (= db-migrate mit ausdruecklicher Zustimmung)
   ↓
 D     Deploy des aktuellen HEAD (Preview), danach Promote auf Produktion
   ↓
-V     Nachprüfung (§6) → Rauchtest (§7) → Live-Abnahme (§8)
+N     npm run cutover-nachpruefung -- --vorher <Zahlen aus P3>
+  ↓
+D2    Promote der verifizierten Preview auf Produktion
+  ↓
+L     npm run cutover-live             (R1-R9 + Live-Abnahme, §7/§8)
 ```
 
 **Warum in dieser Reihenfolge:** Alle fünf Migrationen sind **additiv** (neue
@@ -138,69 +131,67 @@ ausführen**, nicht von Hand nacharbeiten.
 
 ---
 
-## 6 · Nachprüfung direkt nach der Migration (lesend)
+## 6 · Nachprüfung direkt nach der Migration — ein Befehl, nur lesend
 
-```sql
--- N1 · Die fünf neuen Tabellen sind da
-SELECT table_name FROM information_schema.tables
- WHERE table_schema='public'
-   AND table_name IN ('admin_session_revocations','rate_limit_windows','releases',
-                      'automation_runs','automation_switches') ORDER BY 1;   -- 5 Zeilen
-
--- N2 · 017 sitzt
-SELECT column_name, is_nullable FROM information_schema.columns
- WHERE table_name='leads' AND column_name IN ('email','phone','responsible','archive_reason','duplicate_of');
-SELECT indexname FROM pg_indexes WHERE indexname='opportunities_from_lead_unique';
-
--- N3 · Nichts ist verloren gegangen (gegen P3 halten)
-SELECT (SELECT count(*) FROM leads) AS anfragen,
-       (SELECT count(*) FROM organisations) AS organisationen,
-       (SELECT count(*) FROM contacts) AS kontakte,
-       (SELECT count(*) FROM opportunities) AS chancen,
-       (SELECT count(*) FROM activities) AS chronik;
+```bash
+npm run cutover-nachpruefung -- --vorher anfragen=…,organisationen=…,kontakte=…,chancen=…,chronik=…
 ```
 
-Die Zahlen aus N3 dürfen gegenüber P3 **nicht kleiner** sein. Grösser dürfen
-`organisationen`/`kontakte` nur werden, wenn der Backfill etwas gefunden hat,
-das vorher fehlte — der Befehl sagt es in seiner Ausgabe (`Bestand: x → y`).
+Die Zahlen sind die aus P3. Geprüft wird:
 
----
+* **N1** die fünf Tabellen aus 015–019 sind da
+* **N2** jede 017-Spalte, beide gelockerten NOT-NULL-Bedingungen, die drei
+  tragenden Indizes (`opportunities_from_lead_unique`,
+  `automation_runs_schluessel_idx`, `releases_eindeutig`)
+* **N3** **nichts ist verschwunden** — keine Zahl darf unter den Wert aus P3 fallen
+* **N4** keine offensichtlichen Waisen (Anfrage → Kontakt, Chance → Organisation)
 
-## 7 · Rauchtest nach dem Promote (nicht-destruktiv)
+Rot heisst: **nicht deployen.**
+
+## 7 · Rauchtest R1–R9 und Live-Abnahme — ein Befehl
+
+```bash
+npm run cutover-live
+```
+
+`scripts/cutover-live.mjs` fährt gegen `https://creadig.de`:
 
 | # | Prüfung | Erwartung |
 |---|---|---|
-| R1 | `GET https://creadig.de/` | 200, Seite steht |
-| R2 | `GET https://creadig.de/admin/login` | 200 · `Cache-Control: private, no-store` · `X-Robots-Tag: noindex` · **`Content-Security-Policy: default-src 'self'` …** (neu, H28) |
-| R3 | Anmelden als Owner | Übersicht mit echten Zahlen, keine „0", kein Ladezustand |
-| R4 | **B05 live**: Anmelden, Cookie kopieren, abmelden, Kopie benutzen | Antwort der Abmeldung `revoked: "server"` (**nicht** `browser-only`) · die Kopie landet auf `/admin/login` |
-| R5 | **B08 live**: 11 Fehlversuche von einer Adresse | ab dem 11. `429` · `SELECT count(*) FROM rate_limit_windows` > 0 |
-| R6 | Eine erfundene Kennung öffnen (`/admin/vertrieb/pipeline/<uuid>`) | „nicht gefunden" (404), **nicht** „Datenbank nicht erreichbar" (H27) |
-| R7 | Türkische Suche in der Anfragenliste (`?q=isik` o. ä.) | findet den Betrieb mit `Işık` (H30) |
-| R8 | `/admin/automationen` als Owner | Seite steht, Schalter sichtbar, Protokoll leer |
-| R9 | Öffentliche Seite: Formular absenden (echte Testanfrage) | Anfrage erscheint in der Inbox mit Quelle `kontakt` |
+| R1 | Öffentliche Seite | 200 |
+| R2 | `/admin/login` | `no-store` · `noindex` · **volle CSP `default-src 'self'`** (H28 live) |
+| R3 | Anmelden, Übersicht | 200, echte Abschnitte, keine Störungsmeldung |
+| **R4** | **Widerruf**: anmelden, Cookie kopieren, abmelden, Kopie benutzen | Antwort `revoked: "server"` · Kopie landet auf `/admin/login` — **lokal nicht beweisbar** |
+| **R5** | **Versuchsfenster**: Fehlversuche in Serie | 429 · auch das richtige Passwort kommt nicht durch · Zeile in `rate_limit_windows` — **lokal nicht beweisbar** |
+| R6 | Erfundene Kennungen (Chance, Kunde, Anfrage) | 404, kein 500 (H27 live) |
+| R7 | Türkische Suche `sivgin` · `ŞIVGIN` · `isik` · `IŞIK` | findet dieselbe Probe (H30 live) |
+| R8 | `/admin/automationen`, `/verbindungen`, `/beleg`, `/material` | je 200 |
+| R9 | Anfrage über das **öffentliche Formular** | gespeichert; Versand getrennt beurteilt |
+| B11 | Auskunft je Person | Owner 200 mit der richtigen Person · ohne Sitzung 401 |
 
-R4 und R5 sind die zwei Punkte, die **lokal nicht** prüfbar waren. Sie sind der
-eigentliche Grund, warum „LIVE 99 %" erst nach dem Cutover behauptet werden darf.
+Danach im Browser: **H14** (dreimal speichern, dreimal der neue Stand),
+**A28** (ungespeicherter Text bleibt), **A25** (Kachel = Zeilen dahinter),
+**A01** (türkische Oberfläche), **A26** (mobil 390 ohne Überlauf).
 
----
+**Testdaten:** genau eine Anfrage, über den echten öffentlichen Weg, im Namen
+und Betrieb mit `ZZ Cutover-Probe` markiert. Am Ende wird sie **archiviert,
+nicht gelöscht**. An echten Kundendatensätzen ändert der Lauf nichts.
 
-## 8 · Live-Abnahme (danach, mit echten Daten, in Ruhe)
+**R5 kostet, was es beweist:** Das Versuchsfenster gilt je Adresse — diese
+Internetverbindung kann sich danach bis zu zehn Minuten nicht anmelden.
+Deshalb läuft R5 zuletzt; `--ohne-r5` überspringt ihn, dann bleibt B08 live
+unbewiesen.
 
-1. **Eine echte Anfrage** von aussen durch die ganze Kette: Eingang → Kunde
-   zuordnen → Chance → nächster Schritt → Angebot → gewonnen/verloren.
-2. **Zwei Geräte**: dieselbe Anfrage am Telefon und am Rechner bearbeiten.
-3. **Zweite Rolle**: Anmeldung als Vertrieb — `/admin/beleg`, `/admin/automationen`,
+## 8 · Live-Abnahme mit echten Vorgängen (danach, in Ruhe)
+
+Was das Skript nicht ersetzt, weil es echte Arbeit ist:
+
+1. Eine echte Anfrage von aussen durch die ganze Kette bis gewonnen/verloren.
+2. Dieselbe Anfrage am Telefon und am Rechner bearbeiten.
+3. Anmeldung als Vertrieb: `/admin/beleg`, `/admin/automationen`,
    `/admin/verbindungen`, `/admin/cockpit` müssen umleiten.
-4. **Sprache**: Oberfläche auf Türkisch umschalten, dieselbe Kette einmal gehen.
-5. **Automation**: Eine Abnahme eintragen → im Protokoll steht die Erinnerung,
-   abhaken und zurücknehmen funktioniert, der Eintrag bleibt.
-6. **Auskunft (B11)**: Für einen echten Kontakt die Auskunft herunterladen,
-   Inhalt gegen die Akte halten, Vermerk in der Chronik prüfen.
-7. Nach 7 Tagen Betrieb: `docs/admin-os/state.md` auf `LIVE 99 % ACCEPTED`
-   setzen — oder die Lücke benennen, die es verhindert.
-
----
+4. Eine Abnahme eintragen → Automationsprotokoll prüfen, abhaken, zurücknehmen.
+5. Nach 7 Tagen Betrieb: `state.md` auf `LIVE 99 % ACCEPTED` — oder die Lücke benennen.
 
 ## 9 · Rückweg
 
@@ -216,25 +207,66 @@ Verantwortliche, Archivgründe und Chronik-Akteure.
 
 ---
 
-## 10 · Was der Owner tun muss — drei Handlungen
+## 10 · Was der Owner tun muss — drei Befehle
 
-Der Vertrag erlaubt höchstens drei (`program.md` §1). Deshalb sind Sicherung,
-Rückspielprobe und Migration **eine** Handlung: Sie gehören in eine Sitzung, in
-dieser Reihenfolge, und keine davon ist ohne die vorherige sinnvoll.
+Der Vertrag erlaubt höchstens drei Owner-Handlungen (`program.md` §1). Es sind
+drei Befehle geworden, weil ein vierter Grund dazukam: **die
+Produktionszugangsdaten sind für den ausführenden Agenten nicht lesbar** (§11).
 
-| # | Handlung | Befehle | Warum nur der Owner |
-|---|---|---|---|
-| **O1** | **Sichern, Rückspielung proben, migrieren** (§3 P1–P4 → §4 S1/S2 → §5 M) | `npm run db-migrate -- --check` · `node scripts/db-backup.mjs --url …` · `node scripts/db-restore-drill.mjs --dump …` · `CREADIG_MIGRATE_PRODUCTION=ja-ich-migriere-produktion npm run db-migrate` | Zugriff auf die Produktionsdatenbank; eine Schema-Änderung dort ist eine Entscheidung, kein Nebeneffekt |
-| **O2** | **Deploy + Promote** des aktuellen HEAD (§5 D) | Push, Preview-Deploy, Promote | Produktionsautorität (Push- und Deploy-Rechte liegen beim Owner) |
-| **O3** | **Rauchtest R1–R9 abnehmen** (§7) und Ergebnis melden | Browser + zwei SQL-Abfragen | Nur mit echtem Zugang messbar — vor allem **R4** (Widerruf) und **R5** (Versuchsfenster), die zwei lokal unbeweisbaren Punkte |
+Alle drei laufen im Projektverzeichnis. Die Zugangsdaten kommen aus
+`.env.local` — sie stehen in keinem Befehl, in keiner Ausgabe, in keinem Log.
 
-Nach O3 gehört genau eine Zeile in `docs/admin-os/state.md`: was R1–R9 ergeben
-haben. Erst danach ist die Live-Abnahme (§8) an der Reihe.
+```bash
+# 1 · Ansehen, nichts ändern. Rot heisst: hier aufhören.
+npm run cutover-preflight
+
+# 2 · Sichern, Rückspielung beweisen, dann migrieren.
+npm run cutover-sicherung
+npm run cutover-migration
+npm run cutover-nachpruefung -- --vorher <die Zahlen aus Schritt 1>
+
+# 3 · Nach dem Promote: Rauchtest und Live-Abnahme.
+npm run cutover-live
+```
+
+**Dazwischen gehört das Promote** — das kann der Agent übernehmen, sobald
+Schritt 2 grün gemeldet ist: Die Preview zum auszuliefernden Stand ist gebaut
+und `READY` (`dpl_BSnKQFit8hcoKVfSUow3t2sAcXWz`), das Promote braucht keine
+Datenbankzugangsdaten.
+
+| # | Handlung | Warum nur der Owner |
+|---|---|---|
+| **O1** | Preflight ansehen | Zugriff auf die Produktionsdatenbank |
+| **O2** | Sichern → Rückspielprobe → migrieren → nachprüfen | dieselbe Zugriffsgrenze; die Migration ist ausserdem eine Entscheidung |
+| **O3** | Nach dem Promote `cutover-live` laufen lassen | braucht das Admin-Passwort und eine echte Verbindung |
+
+## 11 · Warum der Agent den Cutover nicht selbst ausführen konnte
+
+Gemessen am 23.09.2026: In der Umgebung, in der der Agent arbeitet, werden
+Geheimnisse **maskiert**. Jeder Zugangswert in `.env.local` — `DATABASE_URL`,
+`ADMIN_PASSWORD`, alle `DATABASE_PG*` — kommt beim Lesen als `[SENSITIVE]`
+zurück (geprüft: 13 Zeichen statt der echten Länge; ein selbst geschriebener
+Vergleichswert kam unverändert zurück). `vercel env pull` ist in dieser
+Umgebung gesperrt.
+
+Damit gilt:
+
+* Der Agent kann die Produktionsdatenbank **nicht** erreichen — weder lesend
+  (Preflight) noch schreibend (Migration).
+* Er kann sich am Produktions-Admin **nicht** anmelden (R3–R9).
+* Er kann die Preview **promoten** (Vercel-Zugang besteht) — tut es aber
+  nicht, weil der neue Stand Migration 017 braucht. Code vor Schema zu
+  promoten hiesse, den Admin in Fehlerzustände zu schicken.
+
+Das ist kein Fehler des Programms und kein offener Punkt der Abnahme, sondern
+eine Grenze der Werkstatt. Die Arbeit, die sie ersetzt, ist erledigt: Jeder
+Schritt ist ein einziger Befehl, jeder Befehl ist gegen eine lokale Kopie
+durchgespielt, jede Ausgabe ist ohne Geheimnisse weitergebbar.
 
 **Offene Owner-Entscheidungen, die den Cutover NICHT blockieren:**
 
 | Frage | Wofür | Folge heute |
 |---|---|---|
 | meAI-Anbieter und Kostenrahmen | A8 · Punkt 8 | Antwort kommt aus Regeln, vollständig und belegt (A30 grün) |
-| Aufbewahrungsfristen (`docs/ops/neon-decision-pack.md`) | B11 · Löschung je Person mit Sperre statt Löschen | Auskunft ist gebaut und grün; die **Löschung** mit Fristenkonflikt bleibt offen und nennt „unbekannt" statt einer erfundenen Frist |
+| Aufbewahrungsfristen (`docs/ops/neon-decision-pack.md`) | B11 · Löschung je Person | Auskunft ist gebaut und grün; die Löschung nennt „unbekannt" statt einer erfundenen Frist |
 | Dark Mode | A10 (OD-1) | POST-99, zählt nicht zu 99 % |
