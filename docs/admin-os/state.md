@@ -2,7 +2,7 @@
 
 > **Maßgebliche Statusquelle** dieses Programms. Vertrag: `docs/admin-os/program.md`.
 > Stand **23.09.2026** · Session 5 · Branch `feat/system-haus-site`
-> Programmzustand: **PRODUCTION DEPLOYED · LIVE VERIFICATION OPEN** — DB-Ziel MATCH YES (Owner 24.09.2026: lokal cutover-host = Production Neon host `ep-summer-sky-b1eispp7-pooler…/neondb`). Safety-Stop aufgehoben. Offen: Production-Env `LEAD_TOKEN_SECRET`/`RESEND_API_KEY`/`LEAD_FROM`/`LEAD_TO` (nur Preview) → R9/`not_configured`. **nicht** LIVE 99 % ACCEPTED.
+> Programmzustand: **LIVE 99 % VERIFIED · READY FOR OWNER ACCEPTANCE** — Cutover O1–O4 technisch grün (Migration 015–019, Promote, R1–R9 inkl. R4 server-revoke + R5 DB-Fenster, Live-Abnahme). **nicht** LIVE 99 % ACCEPTED (Owner-Abnahme ausstehend).
 > Abnahmematrix: `docs/admin-os/abnahme.md` · Cutover-Paket: `docs/admin-os/cutover.md`.
 > Vorgänger-Dokumente (bleiben Beleg, nicht Status): `docs/control-center/*`, `docs/final-live-completion/state.md` (F12 Owner-Steuerung).
 
@@ -645,5 +645,6 @@ Löschung je Person (B11) · Dark Mode (POST-99, OD-1).
 | 23.09.2026 | 6 | **Cutover vorbereitet und generalprobt, nicht ausgeführt.** (historisch — Agent-Maskierung) Vier Cutover-Befehle gebaut und lokal generalprobt. |
 | 23.09.2026 | 6 | **CUTOVER O1–O2 ausgeführt.** Preflight grün (0 Dubletten) · Sicherung+Rückspielprobe 12/12 · Migration 015–019 · Nachprüfung grün (7/32/15/2/14) · Promote `dpl_6oQPnEwd8muy5DELveVzfQVYRVoj` → `creadig.de` READY · Fixback `14b4460` · Live: R1–R4/R6/R8 + A01/A25/A26 grün; **R4 `revoked:server`** · R5 liefert 429, aber `rate_limit_windows`=0 weil Production kein `LEAD_TOKEN_SECRET`/`RESEND_API_KEY` → Arbeitsspeicher-Fallback · R9 `not_configured` (+ `LEAD_FROM`) · G18 unberührt · H14 absent |
 | 24.09.2026 | 6 | **DB-Ziel Safety-Stop CLEARED — MATCH YES.** Owner bestätigt: lokal cutover-Ziel = Production Neon (`ep-summer-sky-b1eispp7-pooler.c-5.eu-central-1.aws.neon.tech/neondb`, LOCAL_FP `55675b35c64cb347`). `VERCEL_ENV=preview` in `.env.local` war nur Datei-Etikett (env-guard), nicht Neon-Branch. CLI kann Sensitive Production-`DATABASE_URL` nicht lesen — Vergleich über Owner/Dashboard-Host. Migration 015–019 damit als Production-Schema bestätigt. |
+| 24.09.2026 | 6 | **LIVE 99 % VERIFIED.** Owner: Preview→Production Env (`LEAD_*`/`RESEND`). Redeploy `dpl_2HHFhaHjLK74xSQN2WNVtt79Mesp` · `/api/lead` Token OK · `cutover-live` **LIVE GRUEN**: R1–R9, B11, H14 3/3, A28, A25, A01, A26 · **R4 `revoked:server`** · **R5 429 + `rate_limit_windows` 4 Zeilen** · Probe archiviert. |
 
-**Fortsetzungspunkt:** Owner kopiert Preview→Production Env (`LEAD_TOKEN_SECRET`, `RESEND_API_KEY`, `LEAD_FROM`, `LEAD_TO`) unter https://vercel.com/muhammed-emin-akyols-projects/creadig/settings/environment-variables — danach Agent `npm run cutover-live` erneut. Dann erst `LIVE 99 % VERIFIED · READY FOR OWNER ACCEPTANCE`.
+**Fortsetzungspunkt:** Owner öffnet https://creadig.de/admin — echte Nutzung / Abnahme. Bei OK: **LIVE 99 % ACCEPTED**. Residuen (blockieren nicht): Dark Mode, meAI-Anbieter, Website Run C, Aufbewahrungs-/Löschfristen.

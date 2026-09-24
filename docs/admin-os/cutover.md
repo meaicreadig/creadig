@@ -287,6 +287,4 @@ Cutover-Ziels ist derselbe wie Production Neon:
 (LOCAL_FP `55675b35c64cb347`). Damit sind Preflight, Sicherung, Migration
 015–019 und Nachprüfung gegen **Production** belegt. Safety-Stop aufgehoben.
 
-**Noch offen für LIVE 99 %:** Production-Env ohne Formular-Geheimnisse
-(`LEAD_TOKEN_SECRET`, `RESEND_API_KEY`, `LEAD_FROM`, `LEAD_TO` nur Preview)
-→ R9 `not_configured`; R5-DB-Beleg braucht dasselbe Token-Geheimnis.
+**Noch offen für LIVE 99 %:** ~~Production-Env ohne Formular-Geheimnisse~~ — **erledigt 24.09.2026** (Owner; Redeploy). `cutover-live` **LIVE GRUEN** inkl. R4/R5-DB. Status: **LIVE 99 % VERIFIED · READY FOR OWNER ACCEPTANCE**.
