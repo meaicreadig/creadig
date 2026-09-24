@@ -65,6 +65,7 @@ const SCHREIBPUNKTE = new Map([
   [join("app", "(admin)", "admin", "verbindungen", "actions.ts"), "requireOwner()"],
   [join("app", "(admin)", "admin", "beleg", "actions.ts"), "requireOwnerStore()"],
   [join("app", "(admin)", "admin", "automationen", "actions.ts"), "requireOwnerStore()"],
+  [join("app", "(admin)", "admin", "veroeffentlichungen", "actions.ts"), "requireOwnerStore()"],
 ])
 
 for (const [datei, waechter] of SCHREIBPUNKTE) {

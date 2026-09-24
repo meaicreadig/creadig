@@ -757,6 +757,38 @@ export const SCHEMA: string[] = [
      geaendert_at timestamptz NOT NULL DEFAULT now(),
      geaendert_von text
    )`,
+  /*
+   * 020 · MARKETING · B-3 — Das Veroeffentlichungsregister.
+   *
+   * Siehe `scripts/migrations/020-veroeffentlichungen.sql`.
+   *
+   * WARUM EINE EIGENE TABELLE UND NICHT DIE CHRONIK
+   * `activities` traegt einen CHECK auf vier Subjektarten (lead, contact,
+   * organisation, opportunity). Eine Veroeffentlichung ist keines davon — sie
+   * haengt an keinem Datensatz, sondern an einem Datum und einem Kanal. Sie
+   * dort unterzubringen haette denselben CHECK aufbohren muessen: dieselbe
+   * Migration, nur mit unklarer Semantik. Also die klare Form.
+   *
+   * NICHT PFLICHT (`REQUIRED_TABLES`): Fehlt sie, faellt kein Vertriebsvorgang
+   * aus — es gibt dann nur kein Register.
+   */
+  `CREATE TABLE IF NOT EXISTS publications (
+     id text PRIMARY KEY,
+     was text NOT NULL,
+     kanal text NOT NULL
+       CHECK (kanal IN ('linkedin','website','netzwerk','gespraech','andere')),
+     veroeffentlicht_am date NOT NULL,
+     url text,
+     reaktion text NOT NULL DEFAULT 'keine'
+       CHECK (reaktion IN ('keine','kommentar','nachricht','anruf','empfehlung','anfrage','andere')),
+     reaktion_notiz text,
+     bezug_art text CHECK (bezug_art IN ('kontakt','organisation','anfrage','chance')),
+     bezug_id text,
+     actor text,
+     created_at timestamptz NOT NULL DEFAULT now(),
+     updated_at timestamptz NOT NULL DEFAULT now()
+   )`,
+  `CREATE INDEX IF NOT EXISTS publications_datum_idx ON publications (veroeffentlicht_am DESC)`,
   `CREATE INDEX IF NOT EXISTS leads_responsible_idx ON leads (responsible)`,
   `CREATE INDEX IF NOT EXISTS opportunities_responsible_idx ON opportunities (responsible)`,
 ]

@@ -657,6 +657,48 @@ export type ReleaseEingabe = {
   reference: string
 }
 
+/* ========================================================================== *
+ * B-3 · VEROEFFENTLICHUNGEN
+ * ========================================================================== */
+
+export const PUBLICATION_KANAELE = ["linkedin", "website", "netzwerk", "gespraech", "andere"] as const
+export type PublicationKanal = (typeof PUBLICATION_KANAELE)[number]
+
+export const PUBLICATION_REAKTIONEN = [
+  "keine",
+  "kommentar",
+  "nachricht",
+  "anruf",
+  "empfehlung",
+  "anfrage",
+  "andere",
+] as const
+export type PublicationReaktion = (typeof PUBLICATION_REAKTIONEN)[number]
+
+export const PUBLICATION_BEZUG_ARTEN = ["kontakt", "organisation", "anfrage", "chance"] as const
+export type PublicationBezugArt = (typeof PUBLICATION_BEZUG_ARTEN)[number]
+
+export type PublicationRow = {
+  id: string
+  was: string
+  kanal: PublicationKanal
+  /** YYYY-MM-DD */
+  veroeffentlichtAm: string
+  url: string | null
+  reaktion: PublicationReaktion
+  reaktionNotiz: string | null
+  bezug: { art: PublicationBezugArt; id: string; titel: string | null } | null
+  actor: string | null
+  createdAt: string
+}
+
+export type PublicationEingabe = {
+  was: string
+  kanal: PublicationKanal
+  veroeffentlichtAm: string
+  url: string | null
+}
+
 export type VertriebStore = {
   summary(): Promise<VertriebSummary>
 
@@ -836,6 +878,28 @@ export type VertriebStore = {
    * zweite Kopie der Personendaten in der Chronik.
    */
   vermerkeAuskunft(kontaktId: string, bereiche: Record<string, number>): Promise<void>
+
+  /* ── B-3 · Veroeffentlichungsregister ───────────────────────────────────
+   *
+   * Vier Fragen, keine fuenfte: was, wo, wann, und hat jemand geantwortet.
+   * Bewusst KEIN Redaktionssystem — der Engpass ist das Veroeffentlichen,
+   * nicht seine Verwaltung.
+   */
+  listPublications(query?: { kanal?: PublicationKanal; limit?: number }): Promise<PublicationRow[] | null>
+  recordPublication(input: PublicationEingabe): Promise<{ id: string } | null>
+  /**
+   * Die Reaktion nachtragen.
+   *
+   * Zeigt sie auf einen Datensatz (`bezug`), schreibt der Store zusaetzlich
+   * eine Chronikzeile AN DIESEM Datensatz. Damit bleibt die
+   * Beziehungsgeschichte an einer Stelle — das Register ist kein zweites CRM.
+   */
+  setPublicationReaktion(
+    id: string,
+    reaktion: PublicationReaktion,
+    notiz: string | null,
+    bezug: { art: PublicationBezugArt; id: string } | null,
+  ): Promise<boolean>
 
   /* ── GATE 27 · Die Messreihe zur Owner-Last ────────────────────────────
    *

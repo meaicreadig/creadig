@@ -22,6 +22,7 @@ const NAV = [
   { key: "nachweise", href: "/admin/beleg" },
   { key: "verbindungen", href: "/admin/verbindungen" },
   { key: "automationen", href: "/admin/automationen" },
+  { key: "veroeffentlichungen", href: "/admin/veroeffentlichungen" },
   { key: "system", href: "/admin/material" },
 ] as const
 

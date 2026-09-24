@@ -56,6 +56,10 @@ import type {
   ReleaseEingabe,
   ReleaseRow,
   Schreibergebnis,
+  PublicationBezugArt,
+  PublicationKanal,
+  PublicationReaktion,
+  PublicationRow,
 } from "@/lib/vertrieb"
 import { AKTEUR_SYSTEM } from "@/lib/vertrieb"
 import { abgeschaltete, entscheide } from "@/lib/automation"
@@ -2302,6 +2306,124 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
       await ready()
       /* Kein Inhalt, nur Umfang — siehe `lib/vertrieb.ts`. */
       await note("contact", kontaktId, "auskunft.erteilt", "Auskunft erteilt", null, { bereiche })
+    },
+
+    /* ── B-3 · Veroeffentlichungsregister ─────────────────────────────── */
+
+    async listPublications(query): Promise<PublicationRow[] | null> {
+      try {
+        await ready()
+        const params: unknown[] = []
+        let where = ""
+        if (query?.kanal) {
+          params.push(query.kanal)
+          where = `WHERE p.kanal = $1::text`
+        }
+        params.push(Math.min(query?.limit ?? 100, 200))
+        /*
+         * Der Titel des Bezugs wird MITGELESEN, nicht gespeichert.
+         *
+         * Eine Kopie des Namens im Register waere eine zweite Wahrheit ueber
+         * denselben Menschen — genau das, was B-3 nicht sein soll. Aendert
+         * jemand den Namen im CRM, aendert sich die Anzeige hier mit.
+         */
+        const rows = (await sql.query(
+          `SELECT p.*,
+                  CASE p.bezug_art
+                    WHEN 'kontakt' THEN (SELECT c.name FROM contacts c WHERE c.id = p.bezug_id)
+                    WHEN 'organisation' THEN (SELECT o.name FROM organisations o WHERE o.id = p.bezug_id)
+                    WHEN 'anfrage' THEN (SELECT l.reference FROM leads l WHERE l.id = p.bezug_id)
+                    WHEN 'chance' THEN (SELECT x.title FROM opportunities x WHERE x.id = p.bezug_id)
+                  END AS bezug_titel
+             FROM publications p
+             ${where}
+            ORDER BY p.veroeffentlicht_am DESC, p.created_at DESC
+            LIMIT $${params.length}`,
+          params,
+        )) as Record<string, unknown>[]
+        return rows.map((r) => ({
+          id: String(r.id),
+          was: String(r.was),
+          kanal: r.kanal as PublicationKanal,
+          veroeffentlichtAm: tag(r.veroeffentlicht_am as Ts),
+          url: (r.url as string | null) ?? null,
+          reaktion: r.reaktion as PublicationReaktion,
+          reaktionNotiz: (r.reaktion_notiz as string | null) ?? null,
+          bezug: r.bezug_art
+            ? {
+                art: r.bezug_art as PublicationBezugArt,
+                id: String(r.bezug_id),
+                titel: (r.bezug_titel as string | null) ?? null,
+              }
+            : null,
+          actor: (r.actor as string | null) ?? null,
+          createdAt: iso(r.created_at as Ts),
+        }))
+      } catch {
+        /* Fehlt die Tabelle (Migration 020 nicht angewendet), ist das kein
+           Ausfall des Vertriebs — die Oberflaeche sagt „nicht eingerichtet". */
+        return null
+      }
+    },
+
+    async recordPublication(input): Promise<{ id: string } | null> {
+      await ready()
+      const id = randomUUID()
+      try {
+        await sql.query(
+          `INSERT INTO publications (id, was, kanal, veroeffentlicht_am, url, actor, created_at, updated_at)
+           VALUES ($1,$2,$3,$4::date,$5,$6, now(), now())`,
+          [id, input.was.trim(), input.kanal, input.veroeffentlichtAm, input.url?.trim() || null, akteur.kennung],
+        )
+        return { id }
+      } catch {
+        return null
+      }
+    },
+
+    async setPublicationReaktion(id, reaktion, notiz, bezug): Promise<boolean> {
+      await ready()
+      const rows = (await sql.query(
+        `UPDATE publications
+            SET reaktion = $2::text,
+                reaktion_notiz = $3,
+                bezug_art = $4,
+                bezug_id = $5,
+                updated_at = now()
+          WHERE id = $1::text
+        RETURNING id, was, kanal`,
+        [id, reaktion, notiz?.trim() || null, bezug?.art ?? null, bezug?.id ?? null],
+      )) as { was: string; kanal: string }[]
+      if (rows.length === 0) return false
+
+      /*
+       * DIE BRUECKE ZUR CHRONIK — und die Grenze des Registers.
+       *
+       * Wurde aus der Reaktion ein Kontakt mit einem Menschen, gehoert das in
+       * SEINE Geschichte, nicht in eine zweite. Deshalb schreibt der Store
+       * hier eine Chronikzeile an genau diesem Datensatz — und nur hier. Ohne
+       * Bezug bleibt die Reaktion im Register: Ein Kommentar ohne Person ist
+       * keine Beziehungsgeschichte.
+       */
+      if (bezug && reaktion !== "keine") {
+        const subjekt: ActivitySubject | null =
+          bezug.art === "kontakt" ? "contact"
+          : bezug.art === "organisation" ? "organisation"
+          : bezug.art === "anfrage" ? "lead"
+          : bezug.art === "chance" ? "opportunity"
+          : null
+        if (subjekt) {
+          await note(
+            subjekt,
+            bezug.id,
+            "veroeffentlichung.reaktion",
+            `Reaktion auf eine Veroeffentlichung: ${rows[0].was}`,
+            notiz?.trim() || null,
+            { reaktion, kanal: rows[0].kanal, veroeffentlichung: id },
+          )
+        }
+      }
+      return true
     },
 
     async listReleases(organisationId?: string): Promise<ReleaseRow[] | null> {

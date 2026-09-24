@@ -192,6 +192,13 @@ export const FLAECHEN: readonly Flaeche[] = [
   { pfad: "/admin/automationen", klasse: "eigene-lage", fuer: ["owner"] },
 
   /*
+   * B-3 — Das Veroeffentlichungsregister. Nur `owner`: Was nach aussen geht,
+   * verantwortet das Haus selbst, und die Reaktionen darauf sind Namen von
+   * Menschen, die noch keine Kunden sind.
+   */
+  { pfad: "/admin/veroeffentlichungen", klasse: "eigene-lage", fuer: ["owner"] },
+
+  /*
    * PROOF OPERATIONS P1 — der Beleg-Betrieb.
    *
    * `fremde-personen`, obwohl die Seite keine Kundenakte zeigt: Sie nennt
