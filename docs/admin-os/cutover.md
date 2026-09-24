@@ -270,3 +270,23 @@ durchgespielt, jede Ausgabe ist ohne Geheimnisse weitergebbar.
 | meAI-Anbieter und Kostenrahmen | A8 · Punkt 8 | Antwort kommt aus Regeln, vollständig und belegt (A30 grün) |
 | Aufbewahrungsfristen (`docs/ops/neon-decision-pack.md`) | B11 · Löschung je Person | Auskunft ist gebaut und grün; die Löschung nennt „unbekannt" statt einer erfundenen Frist |
 | Dark Mode | A10 (OD-1) | POST-99, zählt nicht zu 99 % |
+
+---
+
+## 12 · DB-Ziel Safety-Stop — CLEARED (24.09.2026)
+
+Zwischen Sicherung und der Bewertung „Production-Migration" bestand ein
+Widerspruch: `cutover-sicherung` meldete `Umgebung preview` (weil
+`.env.local` `VERCEL_ENV=preview` trägt — Datei-Etikett aus einem früheren
+`vercel env pull`, **nicht** der Neon-Branch). Sensitive Production-
+`DATABASE_URL` ist per CLI/`env pull` **nicht** lesbar (`[SENSITIVE]`).
+
+**Owner-Bestätigung 24.09.2026: MATCH YES** — Host/DB des lokalen
+Cutover-Ziels ist derselbe wie Production Neon:
+`ep-summer-sky-b1eispp7-pooler.c-5.eu-central-1.aws.neon.tech/neondb`
+(LOCAL_FP `55675b35c64cb347`). Damit sind Preflight, Sicherung, Migration
+015–019 und Nachprüfung gegen **Production** belegt. Safety-Stop aufgehoben.
+
+**Noch offen für LIVE 99 %:** Production-Env ohne Formular-Geheimnisse
+(`LEAD_TOKEN_SECRET`, `RESEND_API_KEY`, `LEAD_FROM`, `LEAD_TO` nur Preview)
+→ R9 `not_configured`; R5-DB-Beleg braucht dasselbe Token-Geheimnis.
