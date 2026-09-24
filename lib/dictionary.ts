@@ -115,7 +115,7 @@ export const dictionary = {
       statement: {
         eyebrow: "Woran es liegt",
         title: "Die Arbeit ist da. Das System dahinter fehlt.",
-        body: "Zettel, Tabellen und drei Programme, die nichts voneinander wissen: Wer eine Frage beantworten will, sucht an vier Stellen — und die Antwort ist schon wieder alt, bevor sie fertig ist. Genau dafür gibt es creaDIG. Wir erfinden das System dahinter, bauen es selbst und halten es im Betrieb. Kein klassisches IT-Systemhaus — keine Server, keine Lizenzen, kein Helpdesk, sondern ein System-Haus für Handwerk, Praxen, Gastronomie und Dienstleister. „Digitaler Betrieb“ ist dabei das Ergebnis, nicht die Voraussetzung — Sie müssen keine Digitalfirma sein, um bei uns anzufangen. Von der Marke über den Auftritt und den laufenden Betrieb bis zur Automatisierung und zur künstlichen Intelligenz: fünf Ebenen, und Sie steigen auf der ein, wo es bei Ihnen klemmt.",
+        body: "Genau dafür gibt es creaDIG: Wir erfinden das System dahinter, bauen es selbst und halten es im Betrieb. Kein klassisches IT-Systemhaus — keine Server, keine Lizenzen, kein Helpdesk, sondern ein System-Haus für Handwerk, Praxen, Gastronomie und Dienstleister. „Digitaler Betrieb“ ist dabei das Ergebnis, nicht die Voraussetzung: Sie müssen keine Digitalfirma sein, um anzufangen.",
         cta: "Über das Unternehmen",
       },
       /*
@@ -3098,7 +3098,7 @@ export const dictionary = {
       statement: {
         eyebrow: "Sorun nerede",
         title: "İş var. Arkasındaki sistem yok.",
-        body: "Kâğıtlar, tablolar ve birbirinden habersiz üç program: bir soruya cevap vermek isteyen dört yere bakar — ve cevap daha bitmeden eskimiştir. creaDIG tam bunun için var. Arkadaki sistemi biz kurgular, kendimiz kurar ve işler hâlde tutarız. Klasik bir BT sistem evi değiliz — sunucu yok, lisans yok, yardım masası yok; esnaf, muayenehane, restoran ve hizmet işletmeleri için bir sistem evi. „Dijital işletme“ burada sonuçtur, önkoşul değil — bize başlamak için dijital bir firma olmanız gerekmiyor. Markadan görünüme, günlük işletmeden otomasyona ve yapay zekâya: beş katman, ve siz nerede sıkışıyorsanız oradan girersiniz.",
+        body: "creaDIG tam bunun için var: arkadaki sistemi biz kurgular, kendimiz kurar ve işler hâlde tutarız. Klasik bir BT sistem evi değiliz — sunucu yok, lisans yok, yardım masası yok; esnaf, muayenehane, restoran ve hizmet işletmeleri için bir sistem evi. „Dijital işletme“ burada sonuçtur, önkoşul değil: başlamak için dijital bir firma olmanız gerekmiyor.",
         cta: "Şirket hakkında",
       },
       /* Das Systembild. Die Stationen sind dieselben sechs Schritte. */
@@ -4800,7 +4800,7 @@ export const dictionary = {
       statement: {
         eyebrow: "Where it goes wrong",
         title: "The work is there. The system behind it is not.",
-        body: "Notes, spreadsheets and three programs that know nothing about each other: anyone who wants to answer a question looks in four places — and the answer is out of date before it is finished. That is what creaDIG exists for. We design the system behind it, build it ourselves and keep it running. Not a classic IT systems house — no servers, no licences, no helpdesk, but a systems house for trades, practices, restaurants and service companies. Being a “digital operation” is the result here, not the entry requirement — you do not have to be a tech company to start with us. From the brand through the presence and day-to-day operations to automation and artificial intelligence: five levels, and you enter at the one where it hurts.",
+        body: "That is what creaDIG exists for: we design the system behind it, build it ourselves and keep it running. Not a classic IT systems house — no servers, no licences, no helpdesk, but a systems house for trades, practices, restaurants and service companies. Being a “digital operation” is the result here, not the entry requirement: you do not have to be a tech company to start.",
         cta: "About the company",
       },
       /* Das Systembild. Dieselben sechs Schritte, dieselbe Modell-Kennzeichnung. */
@@ -6481,7 +6481,7 @@ export const dictionary = {
       statement: {
         eyebrow: "أين يكمن الخلل",
         title: "العمل موجود. النظام الذي خلفه غير موجود.",
-        body: "أوراق وجداول وثلاثة برامج لا يعرف بعضها بعضًا: من يريد الإجابة عن سؤال يبحث في أربعة مواضع — وتصبح الإجابة قديمة قبل أن تكتمل. لهذا وُجدت creaDIG. نصمّم النظام الذي يقف خلف ذلك، ونبنيه بأنفسنا، ونُبقيه في التشغيل. لسنا بيت أنظمة معلومات تقليديًا — لا خوادم ولا تراخيص ولا مكتب مساعدة، بل بيت أنظمة للحرف والعيادات والمطاعم ومقدّمي الخدمات. «المنشأة الرقمية» هنا هي النتيجة لا الشرط — لستم بحاجة لأن تكونوا شركة تقنية كي تبدأوا معنا. من العلامة إلى الحضور والتشغيل اليومي والأتمتة والذكاء الاصطناعي: خمس طبقات، وتدخلون من الطبقة التي تؤلمكم.",
+        body: "لهذا وُجدت creaDIG: نصمّم النظام الذي يقف خلفه، ونبنيه بأنفسنا، ونُبقيه في التشغيل. لسنا بيت أنظمة معلومات تقليديًا — لا خوادم ولا تراخيص ولا مكتب مساعدة، بل بيت أنظمة للحرف والعيادات والمطاعم ومقدّمي الخدمات. «المنشأة الرقمية» هنا هي النتيجة لا الشرط: لستم بحاجة لأن تكونوا شركة تقنية كي تبدأوا.",
         cta: "عن الشركة",
       },
       /* Das Systembild. Im Arabischen laeuft die Spur von rechts nach links. */
