@@ -52,6 +52,29 @@
 | **Corporate Truth** | Vertragspartner, Steuerstatus, deutsche Rufnummer, Kapazitätszusage | Owner (teils Steuerberater) | Impressum, Rechnung, Preiswahrheit, Kapazitätsaussage |
 | **Erster Kundenbeleg** | NV SWISS / maqam / Bir Damla Hayır | Kunde (Owner muss fragen) | B-1 zeigt dann echte Fälle |
 
+## 3b · Design-Delta (DVA) — was gemessen wurde, bevor gebaut wurde
+
+| Anspruch | Befund | Stand |
+|---|---|---|
+| „Home ist zu textlastig" | **NICHT REPRODUZIERT** in dieser Form: 864 Wörter auf elf Abschnitten, 78 im Schnitt (`scripts/dichte.mjs`, 1440 px). | keine Umgestaltung um einen Phantom-Befund |
+| Semantisches Linien-System (DV01–DV03) | **ALREADY_DONE**: `components/creative/system.tsx` (Knoten · Strecke · Schiene) in sieben Abschnitten, mit Vorher/Nachher, eigener Mobil-Geometrie und `prefers-reduced-motion` | nicht neu gebaut |
+| Fünf Ebenen / Prozess visuell (DV06/DV07) | **ALREADY_DONE**: `capability-tiles`, `process`, `lagen` tragen dieselbe Schiene | nicht neu gebaut |
+| Textreduktion, wo ein Bild trägt (DV05) | **NEW_DELTA**: „Woran es liegt" trug 130 Wörter **und** direkt darunter dieselbe Aussage als Zeichnung | **fertig** (`4b63d6b`): 130 → 67 Wörter, DE/TR/EN/AR |
+| Generierte Medien (DV10–DV13) | **NICHT VERWENDET** | Die Seite trägt ihre Aussage ohne Video; ein Clip hätte hier nichts erklärt, was die Zeichnung nicht zeigt. |
+| Performance nach der Kürzung | LCP 44–92 ms, CLS 0.000, 14/14 unter den Schwellen | keine Regression |
+
+## 3c · Adversarialer Durchgang (24.09.2026)
+
+| Frage | Antwort | Beleg |
+|---|---|---|
+| Kann unfreigegebener Beleg öffentlich werden? | nein — ohne Erlaubnis kein Fall, feldweise geprüft | `freigabe-bruecke-drill` T1–T3 |
+| Wirkt ein Widerruf? | ja, sofort über die Marke; spätestens nach 5 Minuten | T4/T5 + `revalidateTag` in den Beleg-Aktionen |
+| Was bei Datenbankausfall? | **leer**, nicht „alles" | T7 |
+| Verlässt Internes das Haus? | nein — kein Name, keine Fundstelle, keine Kennung im öffentlichen Objekt | T6 |
+| Wird ein Profillink als Integration dargestellt? | nein — LinkedIn steht auf `NOT_CONFIGURED` | `lib/verbindungen.ts` |
+| Entsteht eine zweite Beziehungsgeschichte? | nein — Reaktion mit Bezug schreibt in die Akte des Menschen, ohne Bezug bleibt sie im Register | `veroeffentlichung-drill` V3–V5 |
+| G18 / fremde Arbeit berührt? | nein — alle sechs Hashes unverändert | `shasum` vor und nach dieser Runde |
+
 ## 4 · Zustände, sauber getrennt
 
 * **Technische Finalisierung:** `IN_PROGRESS` — B-1, B-3, MS18, MS22 fertig; B-2 wartet auf G18 + Owner; Design-Delta (DVA) läuft.
