@@ -9,6 +9,7 @@ import {
   imprintDetails,
   processors,
   processorsConfirmed,
+  steuerstatusFreigegeben,
 } from "@/lib/site-data"
 import { openConsentSettings } from "@/lib/consent"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
@@ -37,12 +38,25 @@ export function LegalPage({
   const { t } = useLocale()
   const title = kind === "imprint" ? t.legal.imprintTitle : t.legal.privacyTitle
 
-  // Umsatzsteuer: entweder USt-IdNr. (§ 27 a UStG) oder § 19-Hinweis — nie beides.
-  const vatValue = imprintDetails.vatId
-    ? imprintDetails.vatId
-    : imprintDetails.smallBusiness
-      ? t.legal.smallBusinessNote
-      : null
+  /*
+   * Umsatzsteuer: entweder USt-IdNr. (§ 27 a UStG) oder § 19-Hinweis — nie beides.
+   *
+   * „Nie beides" stand hier als Kommentar und wurde nicht geprueft. Gemessen:
+   * Sind beide Felder gesetzt, zeigte diese Seite die USt-IdNr., waehrend die
+   * Preiszeile im selben Moment den § 19-Hinweis zeigte — zwei Steueraussagen
+   * auf einem Auftritt. Und ein einzeln gesetztes Feld liess die
+   * Platzhalter-Markierung verschwinden, obwohl `taxStatusPending` noch stand.
+   *
+   * Die Zeile fragt jetzt dieselbe Bedingung wie G18: erst freigegeben und
+   * eindeutig, dann eine Angabe. Sonst bleibt der markierte Platzhalter — eine
+   * offen gekennzeichnete Luecke ist besser als eine Angabe, hinter der das
+   * Haus nicht steht.
+   */
+  const vatValue = !steuerstatusFreigegeben()
+    ? null
+    : imprintDetails.vatId
+      ? imprintDetails.vatId
+      : t.legal.smallBusinessNote
 
   /*
     `pending` heisst: Die Zeile steht da, damit das Impressum vollstaendig
@@ -55,11 +69,14 @@ export function LegalPage({
     ...(imprintDetails.legalForm
       ? [{ label: t.legal.legalFormLabel, value: imprintDetails.legalForm }]
       : []),
-    ...(vatValue
-      ? [{ label: t.legal.vatLabel, value: vatValue }]
-      : imprintDetails.taxStatusPending
-        ? [{ label: t.legal.vatLabel, value: t.legal.taxStatusPending, pending: true }]
-        : []),
+    /*
+      Kein echter Wert heisst immer markierter Platzhalter — nicht nur, solange
+      `taxStatusPending` steht. Widersprechen sich die hinterlegten Angaben,
+      war `taxStatusPending` bereits geloescht und die Zeile fiel ganz weg: ein
+      Impressum ohne Umsatzsteuer-Zeile, weil zu viel eingetragen war. Der
+      Kommentar darueber nennt das selbst „ein halbes Impressum".
+    */
+    { label: t.legal.vatLabel, ...(vatValue ? { value: vatValue } : { value: t.legal.taxStatusPending, pending: true }) },
     ...(imprintDetails.mstvResponsible
       ? [{ label: t.legal.mstvLabel, value: imprintDetails.mstvResponsible }]
       : []),

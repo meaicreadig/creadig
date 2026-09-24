@@ -165,13 +165,46 @@ p(st.ok && /Rückzahlung ist ein eigener Vorgang/.test(st.grund),
 /* ══ R15 · Der Steuer-Schnappschuss friert ein ══ */
 console.log("\nR15 · Was raus ist, rechnet sich nicht neu")
 const vorher = { ...S.imprintDetails }
+
+/*
+ * DIESER ABSCHNITT HAT BIS ZUM G18-LAUF EINEN DEFEKT FESTGESCHRIEBEN.
+ *
+ * Er setzte `smallBusiness = true` und LIESS `taxStatusPending` auf `true`
+ * stehen — und verlangte dann, die Rechnung sei stellbar. Damit hat der
+ * Probelauf genau den Zustand als richtig abgenommen, den das Haus selbst
+ * ausschliesst: entschieden und gleichzeitig nicht freigegeben. Ein
+ * Probelauf, der einen unmoeglichen Zustand gruen faerbt, prueft nichts —
+ * er verteidigt den Fehler.
+ *
+ * Jetzt wird die Freigabe mitgesetzt, und die beiden Zustaende daneben
+ * werden ausdruecklich angegriffen.
+ */
 S.imprintDetails.smallBusiness = true
-p(R.steuerlage().art === "kleinunternehmer", "mit gesetztem Kleinunternehmer-Status greift § 19")
+p(!R.steuerlage().entschieden, "gesetzter Kleinunternehmer-Status allein entscheidet nichts, solange pending steht")
+p(!R.stellbarkeit(entwurf()).ok, "und eine Rechnung bleibt gesperrt — die Freigabe ist kein Schmuck")
+
+S.imprintDetails.taxStatusPending = false
+p(R.steuerlage().art === "kleinunternehmer", "mit Freigabe UND gesetztem Status greift § 19")
+p(R.steuerlage().widerspruch === null, "und es steht kein Widerspruch im Weg")
 const alt = gestellt()
 p(R.zahlungslage(alt).bruttoCent === brutto,
   "eine bereits gestellte Rechnung bleibt bei ihrem Schnappschuss", R.euro(R.zahlungslage(alt).bruttoCent))
 p(R.stellbarkeit(entwurf()).ok, "und ein NEUER Entwurf waere jetzt stellbar — die Sperre ist keine Blockade")
+
+/* Beides nebeneinander — der Fall, den `imprintDetails` ausdruecklich ausschliesst. */
+S.imprintDetails.vatId = "DE000000000"
+p(!R.steuerlage().entschieden, "USt-IdNr. UND Kleinunternehmer nebeneinander entscheiden nichts")
+p(R.steuerlage().art === "offen" && R.steuerlage().hinweis === null,
+  "es wird kein Hinweis erfunden, der auf der Rechnung stuende")
+p(R.steuerlage().widerspruch !== null, "der Widerspruch wird benannt, nicht stillschweigend aufgeloest")
+p(/eine USt-IdNr\. und der Kleinunternehmer-Status/.test(R.stellbarkeit(entwurf()).grund),
+  "und die Sperre sagt WAS zu tun ist, statt „nicht entschieden“ zu melden")
+
 S.imprintDetails.smallBusiness = vorher.smallBusiness
+S.imprintDetails.vatId = vorher.vatId
+S.imprintDetails.taxStatusPending = vorher.taxStatusPending
+p(R.steuerlage().art === "offen" && R.steuerlage().widerspruch === null,
+  "und der Ausgangszustand steht danach wieder")
 
 /* ══ R16 · Ueberfaellig wird angezeigt, nicht gemahnt ══ */
 console.log("\nR16 · Ueberfaellig ist eine Anzeige")

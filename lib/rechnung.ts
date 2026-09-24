@@ -59,7 +59,7 @@
  * die § 14 UStG nennt. Ob sie im Einzelfall vollstaendig ist, entscheidet
  * ein Steuerberater und nicht diese Datei.
  */
-import { imprintDetails } from "@/lib/site-data"
+import { imprintDetails, steuerstatusFreigegeben, steuerstatusWiderspruch } from "@/lib/site-data"
 
 /* ── Geld ───────────────────────────────────────────────────────────────── */
 
@@ -98,6 +98,16 @@ export type Steuerlage = {
   /** Der Satz, der auf der Rechnung stehen muesste. `null`, solange offen. */
   hinweis: string | null
   entschieden: boolean
+  /**
+   * Warum der Status nicht entschieden IST, obwohl Angaben dastehen.
+   *
+   * `null` im Normalfall — auch bei schlicht fehlender Angabe. Er traegt nur
+   * den Fall, in dem sich die hinterlegten Angaben WIDERSPRECHEN. Ohne ihn
+   * bekaeme der Owner die Antwort „nicht entschieden" und wuerde daraufhin
+   * noch ein Feld setzen; die Sperre haette ihn in die falsche Richtung
+   * geschickt. Ein Grund, der nicht sagt WAS, ist eine Fehlermeldung.
+   */
+  widerspruch: string | null
 }
 
 /**
@@ -108,21 +118,38 @@ export type Steuerlage = {
  * waeren zwei Wahrheiten, und die falsche stuende auf der Rechnung.
  */
 export function steuerlage(): Steuerlage {
+  /*
+   * ZUERST DIE FREIGABE, DANN DIE ART — UND NIE UMGEKEHRT.
+   *
+   * Bis hierher stand die Kleinunternehmer-Frage VOR der Freigabe. Sie hat
+   * deshalb `taxStatusPending` gar nicht gelesen: Ein gesetztes Feld galt als
+   * Entscheidung, und eine Rechnung waere rausgegangen, waehrend das Haus im
+   * Impressum noch „Status noch nicht freigegeben" schrieb. Die Reihenfolge
+   * war der Fehler, nicht die Regel.
+   */
+  if (!steuerstatusFreigegeben())
+    return {
+      art: "offen",
+      satz: 0,
+      hinweis: null,
+      entschieden: false,
+      widerspruch: steuerstatusWiderspruch(),
+    }
   if (imprintDetails.smallBusiness === true)
     return {
       art: "kleinunternehmer",
       satz: 0,
       hinweis: "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
       entschieden: true,
+      widerspruch: null,
     }
-  if (imprintDetails.vatId && !imprintDetails.taxStatusPending)
-    return {
-      art: "regelbesteuert",
-      satz: 19,
-      hinweis: "Alle Beträge zzgl. 19 % Umsatzsteuer.",
-      entschieden: true,
-    }
-  return { art: "offen", satz: 0, hinweis: null, entschieden: false }
+  return {
+    art: "regelbesteuert",
+    satz: 19,
+    hinweis: "Alle Beträge zzgl. 19 % Umsatzsteuer.",
+    entschieden: true,
+    widerspruch: null,
+  }
 }
 
 export function summe(positionen: readonly Position[], lage: Steuerlage): Summe {
@@ -254,9 +281,11 @@ export function stellbarkeit(r: Pick<Rechnung, "positionen" | "zustand">): Stell
     fehlend,
     grund: lage.entschieden
       ? `Es fehlt: ${fehlend.join(" · ")}.`
-      : "Der Umsatzsteuer-Status ist nicht entschieden. Eine Rechnung muss sich festlegen — " +
-        "entweder sie weist Umsatzsteuer aus oder sie trägt den Hinweis nach § 19 UStG. " +
-        "Ein Drittes gibt es nicht. Entwürfe bleiben möglich.",
+      : lage.widerspruch
+        ? `${lage.widerspruch} Entwürfe bleiben möglich.`
+        : "Der Umsatzsteuer-Status ist nicht entschieden. Eine Rechnung muss sich festlegen — " +
+          "entweder sie weist Umsatzsteuer aus oder sie trägt den Hinweis nach § 19 UStG. " +
+          "Ein Drittes gibt es nicht. Entwürfe bleiben möglich.",
   }
 }
 

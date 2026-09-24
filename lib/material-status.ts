@@ -36,6 +36,8 @@ import {
   productWorlds,
   retainerPublished,
   socialProfiles,
+  steuerstatusFreigegeben,
+  steuerstatusWiderspruch,
   logoFreigabe,
   fallFreigabe,
 } from "@/lib/site-data"
@@ -404,7 +406,16 @@ export function collect(): { open: Item[]; done: Item[] } {
     ok: imprintComplete,
     detail: [
       imprintDetails.legalForm ? null : "Rechtsform fehlt",
-      imprintDetails.vatId || imprintDetails.smallBusiness ? null : "Umsatzsteuer-Status fehlt",
+      /*
+       * Die dritte Fassung derselben Frage — bis hierher „ein Feld ist
+       * gesetzt", waehrend G18 „freigegeben und eindeutig" verlangte. Der
+       * Materialstand haette den Punkt abgehakt, waehrend die Rechnung
+       * gesperrt blieb: erledigt an der einen Stelle, blockiert an der
+       * anderen. Jetzt fragt er dieselbe Bedingung wie das Rechnungs-Gate.
+       */
+      steuerstatusFreigegeben()
+        ? null
+        : (steuerstatusWiderspruch() ?? "Umsatzsteuer-Status fehlt"),
       imprintDetails.mstvResponsible ? null : "Verantwortlicher nach MStV fehlt",
       imprintDetails.phone ? null : "deutsche Rufnummer fehlt",
     ]

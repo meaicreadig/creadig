@@ -4,7 +4,8 @@ import { ArrowUpRight, Check } from "lucide-react"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { formatPrice, imprintDetails, packages } from "@/lib/site-data"
+import { formatPrice, packages } from "@/lib/site-data"
+import { steuerlage } from "@/lib/rechnung"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 export function Packages() {
@@ -251,9 +252,24 @@ export function Packages() {
           {/*
             GATE 04 — die Steuerzeile folgt dem Steuerstatus, nicht einer
             zweiten, unabhaengig gepflegten Zeichenkette. Setzt der Inhaber
-            `smallBusiness: true`, verschwindet der 19-%-Satz von selbst.
+            den Kleinunternehmer-Status, verschwindet der 19-%-Satz von selbst.
+
+            G18 — SIE FRAGT JETZT DAS GATE, NICHT DAS FELD.
+
+            Vorher stand hier `imprintDetails.smallBusiness === true`. Das ist
+            dieselbe Frage wie in `steuerlage()`, nur mit einer anderen Latte:
+            Ein gesetztes Feld haette die Preiszeile umgestellt, waehrend die
+            Freigabe noch ausstand und das Impressum weiter „Status noch nicht
+            freigegeben" schrieb — der Preis haette sich auf eine Entscheidung
+            berufen, die es nicht gab.
+
+            Solange der Status offen ist, bleibt der bisherige Satz stehen: Er
+            ist die Annahme, die das Haus heute trifft, und sie steht als
+            offener Punkt im Materialstand. Erfunden wird nichts.
           */}
-          {imprintDetails.smallBusiness === true ? t.packages.netNoteSmallBusiness : t.packages.netNote}
+          {steuerlage().art === "kleinunternehmer"
+            ? t.packages.netNoteSmallBusiness
+            : t.packages.netNote}
         </p>
 
         {/*

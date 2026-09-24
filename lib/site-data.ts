@@ -2073,7 +2073,58 @@ export const processors: Processor[] = [
 /** Solange das `false` ist, bleibt der offene Hinweis auf der Seite stehen. */
 export const processorsConfirmed = processors.every((p) => p.dpaConfirmed)
 
+/*
+ * ==========================================================================
+ * DER STEUERSTATUS ALS ENTSCHEIDUNG — NICHT ALS GESETZTES FELD
+ * ==========================================================================
+ *
+ * Die drei Felder darueber tragen einen Vertrag, der bis hierher nur als
+ * Kommentar dastand: „Entweder `vatId` ODER `smallBusiness` — nicht beides",
+ * und daneben `taxStatusPending` als Sperre, solange nichts freigegeben ist.
+ *
+ * Ein Kommentar haelt nichts. Gemessen wurde:
+ *
+ *   `smallBusiness: true` bei gleichzeitig `taxStatusPending: true` galt als
+ *   ENTSCHIEDEN — eine Rechnung waere stellbar gewesen, waehrend das Haus
+ *   selbst noch sagte, der Status sei nicht freigegeben. Fuer die USt-IdNr.
+ *   galt dieselbe Frage strenger. Zwei verschiedene Latten fuer dieselbe
+ *   Entscheidung.
+ *
+ *   Und `vatId` UND `smallBusiness: true` nebeneinander — der Fall, den der
+ *   Kommentar ausdruecklich ausschliesst — wurde still zu
+ *   „Kleinunternehmer" aufgeloest. Die Rechnung waere mit dem § 19-Hinweis
+ *   rausgegangen, obwohl eine USt-IdNr. hinterlegt ist.
+ *
+ * Beides steht jetzt als Bedingung da, nicht als Absicht. Sie steht HIER und
+ * nicht in `lib/rechnung.ts`, weil sie von den Feldern handelt: Das Impressum
+ * besitzt die Angabe, G18 besitzt die Folge (Satz, Hinweis, Stellbarkeit).
+ * Eine Bedingung, die in zwei Dateien noch einmal nachgebaut wird, laeuft in
+ * vier Wochen auseinander — genau der Fehler, den sie hier korrigiert.
+ */
+export function steuerstatusWiderspruch(): string | null {
+  if (Boolean(imprintDetails.vatId) && imprintDetails.smallBusiness === true)
+    return (
+      "Es sind gleichzeitig eine USt-IdNr. und der Kleinunternehmer-Status hinterlegt. " +
+      "Beides zusammen gibt es nicht — eine Rechnung weist entweder Umsatzsteuer aus " +
+      "oder beruft sich auf § 19 UStG. Eine der beiden Angaben ist zu loeschen."
+    )
+  return null
+}
+
+/**
+ * Ist der Steuerstatus freigegeben UND eindeutig?
+ *
+ * Freigegeben heisst: `taxStatusPending` steht nicht mehr. Eindeutig heisst:
+ * genau eine der beiden Angaben ist gesetzt — nicht keine, nicht beide.
+ */
+export function steuerstatusFreigegeben(): boolean {
+  if (imprintDetails.taxStatusPending) return false
+  const ustIdNr = Boolean(imprintDetails.vatId)
+  const kleinunternehmer = imprintDetails.smallBusiness === true
+  return ustIdNr !== kleinunternehmer
+}
+
 export const imprintComplete =
   Boolean(imprintDetails.legalForm) &&
-  (Boolean(imprintDetails.vatId) || imprintDetails.smallBusiness === true) &&
+  steuerstatusFreigegeben() &&
   Boolean(imprintDetails.mstvResponsible)
