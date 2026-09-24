@@ -52,6 +52,11 @@ if (!PASSWORT || PASSWORT.startsWith("[")) {
   process.exit(2)
 }
 
+/*
+ * Die Marke steht in `TEST_PREFIXES` (lib/vertrieb-bestand.ts) — sonst bleibt
+ * die Probe nach dem Lauf als echte Zeile in den Zahlen des Eigentuemers
+ * stehen. Gemessen am 24.09.2026: Genau das war passiert.
+ */
 const MARKE = "ZZ Cutover-Probe"
 let fehler = 0
 const p = (ok, name, detail = "") => {

@@ -420,8 +420,23 @@ export const AUSGESCHLOSSENE_REFERENZEN: string[] = [
 /** Für Tests reservierte Endung — RFC 2606. Gehört nie einem Menschen. */
 export const AUSGESCHLOSSENE_MAIL_ENDUNG = "@beispiel.invalid"
 
-/** Prefix-Muster für Abnahme-Fixtures (kleingeschrieben). */
-export const TEST_PREFIXES = ["v11 abnahme", "gate4", "runde2"] as const
+/**
+ * Prefix-Muster für Abnahme-Fixtures (kleingeschrieben).
+ *
+ * `zz cutover-probe` kam am 24.09.2026 dazu, und zwar nach einer Messung:
+ * Die Live-Abnahme des Cutover legt GENAU EINE markierte Anfrage über den
+ * echten öffentlichen Weg an (`scripts/cutover-live.mjs`). Die Anfrage wurde
+ * danach archiviert — die daraus entstandene CHANCE blieb offen stehen und
+ * war anschliessend die einzige offene Chance der Produktion: „1 offene
+ * Chance, 1 neue Anfrage" in der Übersicht des Eigentümers, beides Probe.
+ *
+ * Eine Probe, die in der Zahl steht, ist schlimmer als keine Probe: Sie
+ * macht aus einer leeren Pipeline eine gefüllte, und die nächste
+ * Entscheidung stützt sich darauf. Der Datensatz wird deshalb nicht
+ * gelöscht, sondern erkannt — sichtbar mit Grund, gefiltert in jeder
+ * Zählung.
+ */
+export const TEST_PREFIXES = ["v11 abnahme", "gate4", "runde2", "zz cutover-probe"] as const
 
 function norm(value: string | null | undefined): string {
   return (value ?? "").trim().toLowerCase()

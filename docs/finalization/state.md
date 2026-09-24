@@ -75,7 +75,33 @@
 | Entsteht eine zweite Beziehungsgeschichte? | nein — Reaktion mit Bezug schreibt in die Akte des Menschen, ohne Bezug bleibt sie im Register | `veroeffentlichung-drill` V3–V5 |
 | G18 / fremde Arbeit berührt? | nein — alle sechs Hashes unverändert | `shasum` vor und nach dieser Runde |
 
+## 3d · Abschlusslauf 24.09.2026 (Owner-Entscheidungen ausgeführt)
+
+| Punkt | Entscheidung | Ergebnis |
+|---|---|---|
+| **G18** | KEEP / RECONCILE | Sechs Dateien als **eine** Arbeit committet (`5c78336`). Steuerstatus ist jetzt überall dieselbe Bedingung: freigegeben **und** eindeutig. Widerspruch wird benannt, nicht aufgelöst. Beleg: rechnung-drill 49/49, check-rechnung, check-commercial-truth, check-ownerlast, db-drills 16/16, build. **G18-Sperre gefallen.** |
+| **Migration 020** | APPLY | Frische Sicherung + Rückspielprobe **12/12** (Zeilenzahlen identisch) → 020 angewendet → Nachprüfung grün (Bestand 9/33/16 unverändert; Chancen 2→3 und Chronik 22→23 stammen aus der Live-Abnahme des Owners, nicht aus der Migration). Tabelle `publications` mit 3 CHECKs + Datumsindex. |
+| **Register live** | — | Angemeldet auf Produktion: eintragen, Reaktion, Neuladen, DE/TR, mobil 390 — alles grün; **keine Chronikzeile ohne Bezug** (kein zweites CRM). Die Probezeile wurde danach wieder entfernt. |
+| **Analytics** | ENABLE wenn kostenfrei | **Nicht ausführbar von hier**: `vercel project web-analytics` ist in dieser Umgebung gesperrt, und die Projekt-API kennt kein Feld dafür. Das Aktivieren selbst kostet nichts (Web Analytics ist im Plan enthalten, nur mit Datenpunkt-Grenze). Eine Zeile für den Owner. |
+
+### Befund aus dem Abschlusslauf: die Probe stand in den echten Zahlen
+
+Die Live-Abnahme des Cutover legt **eine** markierte Anfrage über den echten
+öffentlichen Weg an. Die Anfrage wurde danach archiviert — die daraus
+entstandene **Chance** nicht. Gemessen am 24.09.2026 zeigte die Übersicht
+deshalb „1 offene Chance · 1 neue Anfrage", und beides war Probe.
+
+Eine Probe in der Zahl ist schlimmer als keine Probe: Sie macht aus einer
+leeren Pipeline eine gefüllte. Gelöscht wurde nichts — der Marker
+`zz cutover-probe` steht jetzt in `TEST_PREFIXES`, also greift dieselbe
+Ausschlussmechanik wie für alle Abnahmedatensätze: sichtbar mit Grund auf der
+Detailseite, gefiltert in jeder Zählung. Nach dem Nachziehen:
+**0 offene Chancen, 0 neue Anfragen** — die Zahlen des Eigentümers sind wieder
+seine eigenen.
+
 ## 4 · Zustände, sauber getrennt
 
-* **Technische Finalisierung:** `WAITING_OWNER` — alles owner-unabhängige ist gebaut und belegt (B-1, B-3, MS18, MS22, Design-Delta). Offen sind nur noch Punkte, die eine Owner-Tatsache brauchen: G18-Entscheidung (schaltet B-2 frei), Migration 020, Analytics-Schalter, Corporate Truth, erste Kundenfreigabe.
+* **Technische Finalisierung:** `OWNER-INDEPENDENT TECHNICAL FINALIZATION COMPLETE`. G18 aufgelöst, 020 angewendet und live geprüft, Register live, Testdaten aus den Zahlen. **STOP-BUILD.**
+* **Offen — und zwar nur noch als Owner-/Kundentatsache:** Steuerstatus (Steuerberater), deutsche Rufnummer, LinkedIn-Adressen für B‑2, Analytics-Schalter, erste Kundenfreigabe, Reaktionszusage „zwei Werktage".
+* **Geschäftliche Aktivierung:** `NOT_YET_USED` — kein synthetischer Datensatz zählt dafür.
 * **Geschäftliche Aktivierung:** `NOT_YET_USED` — kein synthetischer Datensatz zählt dafür. Das entscheidet der Owner mit echten Gesprächen, nicht dieses Repository.
