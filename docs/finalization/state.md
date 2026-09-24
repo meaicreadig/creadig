@@ -77,5 +77,5 @@
 
 ## 4 · Zustände, sauber getrennt
 
-* **Technische Finalisierung:** `IN_PROGRESS` — B-1, B-3, MS18, MS22 fertig; B-2 wartet auf G18 + Owner; Design-Delta (DVA) läuft.
+* **Technische Finalisierung:** `WAITING_OWNER` — alles owner-unabhängige ist gebaut und belegt (B-1, B-3, MS18, MS22, Design-Delta). Offen sind nur noch Punkte, die eine Owner-Tatsache brauchen: G18-Entscheidung (schaltet B-2 frei), Migration 020, Analytics-Schalter, Corporate Truth, erste Kundenfreigabe.
 * **Geschäftliche Aktivierung:** `NOT_YET_USED` — kein synthetischer Datensatz zählt dafür. Das entscheidet der Owner mit echten Gesprächen, nicht dieses Repository.
