@@ -15,6 +15,12 @@ __v0_jsx-dev-runtime.ts
 # Environment variables
 .env
 .env*.local
+# Cutover-Hilfsdateien tragen dieselben Geheimnisse wie `.env.local` — nur
+# ohne `.local` im Namen. Gemessen am 24.09.2026: `.env.production.cutover`
+# lag unignoriert im Baum. Ein Muster, das nur eine Schreibweise kennt,
+# schuetzt die zweite nicht.
+.env.production.*
+.env.*.cutover
 # .env.example ist die Vorlage OHNE Werte und gehoert ins Repo.
 !.env.example
 

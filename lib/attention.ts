@@ -95,6 +95,14 @@ export type AttentionItem = {
   anfrage?: { quelle: string; referenz: string }
   /** Wohin der Klick führt. Auf den Datensatz, nicht auf eine Liste. */
   href: string
+  /**
+   * MSA-16 — innerhalb eines Rangs: was zuerst zaehlt.
+   *
+   * Nur die Entscheidungen tragen es heute (Geld vor Beleg vor Richtung).
+   * Ohne Gewicht entscheidet weiter das Faelligkeitsdatum und danach der
+   * Alphabet-Zufall — und der hat „Echte Fotos" vor „Impressum" gestellt.
+   */
+  gewicht?: number
   /** Fälligkeit als ISO-Datum, wenn es eine gibt. Nie geschätzt. */
   due: string | null
 }
@@ -123,6 +131,14 @@ export type Kennzahlen = {
     heuteFaellig: { chancen: number; anfragen: number }
   }
 }
+
+export const ENTSCHEIDUNG_BLOCKIERT_GESCHAEFT = [
+  "Impressum vollständig",
+  "Steuerausweis auf den Preisen (§ 27 a / § 19 UStG)",
+  "Freigabe NV SWISS (C-2)",
+  "Freigabe maqam (C-2)",
+  "Freigabe Bir Damla Hayır (C-2)",
+] as const
 
 export type AttentionBoard = {
   items: AttentionItem[]
@@ -321,13 +337,69 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
      blockieren wie ein fehlendes Bild — nur fällt eine offene Entscheidung
      niemandem auf, weil sie nirgends als Lücke sichtbar wird. Genau deshalb
      gehört sie hierher. */
-  for (const item of open.filter((i) => i.group === "entscheidungen")) {
+  /*
+   * MSA-16 — NICHT JEDE ENTSCHEIDUNG KOSTET DASSELBE.
+   *
+   * Gemessen am 24.09.2026: Unter „Ihre Entscheidungen" standen acht Punkte
+   * aus der Gruppe `entscheidungen` — darunter Fotos fuer die Unternehmens-
+   * seite und die Frage, ob ein Social-Profil gepflegt wird. NICHT darunter
+   * standen: „Impressum vollstaendig — Steuerstatus und Rufnummer freigeben"
+   * und die drei ausstehenden Kundenfreigaben. Die liegen in den Gruppen
+   * `recht` und `referenzen` und fielen damit in die Sammelzahl „x Punkte im
+   * Material".
+   *
+   * Das ist die falsche Reihenfolge: Das eine haelt eine Rechnung und die
+   * oeffentliche Rechtsangabe auf, das andere ist eine Geschmacksfrage. Die
+   * Owner-Liste zeigt hoechstens fuenf — also entscheidet die Reihenfolge,
+   * was der Eigentuemer ueberhaupt sieht.
+   *
+   * Die Gewichtung faellt aus der WIRKUNG, nicht aus der Gruppe an sich:
+   *
+   *   1 · `recht`       — blockiert Geld und oeffentliche Rechtswahrheit
+   *   2 · `referenzen`  — blockiert den ersten oeffentlichen Beleg
+   *   3 · `entscheidungen` — Richtung, wichtig, aber nicht blockierend
+   *
+   * Geaendert wird dafuer NICHTS an `lib/material-status.ts` (G18). Die
+   * Punkte bleiben, wo sie sind; hier entsteht nur ihre Reihenfolge.
+   */
+  const ENTSCHEIDUNGS_GEWICHT: Record<string, number> = {
+    recht: 1,
+    referenzen: 2,
+    entscheidungen: 3,
+  }
+
+  /*
+   * UND EINE STUFE DARUEBER: WAS GELD ODER DEN ERSTEN BELEG AUFHAELT.
+   *
+   * Die Gruppe allein reicht nicht. In `recht` stehen neben dem Impressum
+   * auch drei Auftragsverarbeitungsvertraege — wichtig, aber sie halten
+   * keine Rechnung auf. Ohne diese Liste haetten sie die fuenf sichtbaren
+   * Plaetze belegt und „Impressum vollstaendig" auf Platz vier gedrueckt.
+   *
+   * Die Namen stehen hier ausgeschrieben, weil ihre Quelle
+   * (`lib/material-status.ts`) unter G18 gesperrt ist und kein Feld dafuer
+   * bekommen kann. Verschwindet einer, faellt er still auf sein Gruppen-
+   * gewicht zurueck — deshalb prueft `check-ownerlast`, dass es sie gibt.
+   */
+  const BLOCKIERT_GESCHAEFT: readonly string[] = ENTSCHEIDUNG_BLOCKIERT_GESCHAEFT
+  const entscheidungen = open
+    .filter((i) => i.group in ENTSCHEIDUNGS_GEWICHT)
+    /* Ohne benannte Owner-Handlung ist es eine Luecke, keine Entscheidung. */
+    .filter((i) => Boolean(i.owner))
+    .sort(
+      (a, b) =>
+        (BLOCKIERT_GESCHAEFT.includes(a.label) ? 0 : ENTSCHEIDUNGS_GEWICHT[a.group]) -
+        (BLOCKIERT_GESCHAEFT.includes(b.label) ? 0 : ENTSCHEIDUNGS_GEWICHT[b.group]),
+    )
+
+  for (const item of entscheidungen) {
     items.push({
       id: `entscheidung:${item.label}`,
       rank: "entscheidung",
       title: item.label,
       detail: ownerAction(item.owner),
-      href: "/admin/material",
+      href: `/admin/material#gruppe-${item.group}`,
+      gewicht: BLOCKIERT_GESCHAEFT.includes(item.label) ? 0 : ENTSCHEIDUNGS_GEWICHT[item.group],
       due: null,
     })
   }
@@ -336,7 +408,7 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
      und sie würden alles darüber erdrücken. Es erscheint als Zahl mit einem
      Weg dorthin; gearbeitet wird im Materialstand. */
   const materialRest = open.filter(
-    (i) => i.group !== "betrieb" && i.group !== "entscheidungen",
+    (i) => i.group !== "betrieb" && !(i.group in ENTSCHEIDUNGS_GEWICHT && Boolean(i.owner)),
   ).length
 
   const seen = new Set<string>()
@@ -345,6 +417,9 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
     .sort((a, b) => {
       const rang = ATTENTION_RANKS.indexOf(a.rank) - ATTENTION_RANKS.indexOf(b.rank)
       if (rang !== 0) return rang
+      /* MSA-16 — dann das Gewicht, wo es eines gibt (Entscheidungen). */
+      const gewicht = (a.gewicht ?? 99) - (b.gewicht ?? 99)
+      if (gewicht !== 0) return gewicht
       /* Innerhalb eines Rangs: das älteste Versprechen zuerst. */
       if (a.due && b.due) return a.due.localeCompare(b.due)
       if (a.due) return -1

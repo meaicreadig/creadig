@@ -188,6 +188,20 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
               <p className="type-small text-muted-foreground mt-2 text-pretty">
                 {t.chance.hierherWenn} {STAGE_RULES[opp.status].entry}
               </p>
+              {/*
+                MSA-08 — die zwei Fragen stehen da, wo das Gespraech vorbereitet
+                wird. Kein Pflichtfeld: Die Antwort ist ein Satz eines Menschen
+                und gehoert in die Notiz, nicht in eine Auswahlliste.
+              */}
+              {STAGE_RULES[opp.status].fragen ? (
+                <ul className="mt-4 flex flex-col gap-2">
+                  {STAGE_RULES[opp.status].fragen!.map((frage) => (
+                    <li key={frage} className="type-small text-foreground/90 border-line border-s-2 py-0.5 ps-4 text-pretty">
+                      {t.chance.fragen[frage] ?? frage}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </Surface>
 
             {opp.status === "won" ? (

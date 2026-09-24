@@ -255,6 +255,18 @@ export const de = {
     vorhanden: "vorhanden",
   },
   chance: {
+    /*
+     * MSA-08 — die Fragen stehen im Playbook auf Deutsch (`lib/sales-playbook.ts`).
+     * Hier steht dieselbe Fassung noch einmal, damit die tuerkische Seite eine
+     * Entsprechung hat und die Paritaetspruefung nicht ins Leere greift.
+     */
+    fragen: {
+      "Wer entscheidet ausser Ihnen? (Und: wer muss es mittragen, auch ohne zu entscheiden?)":
+        "Wer entscheidet außer Ihnen? (Und: wer muss es mittragen, auch ohne zu entscheiden?)",
+      "Bis wann muss es laufen — und warum gerade dann?":
+        "Bis wann muss es laufen — und warum gerade dann?",
+      "Wer entscheidet ausser Ihnen?": "Wer entscheidet außer Ihnen?",
+    } as Record<string, string>,
     titel: "Verkaufschance",
     zurPipeline: "← Zur Pipeline",
     organisationLead: (name: string) => `Organisation: ${name}`,

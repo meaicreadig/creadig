@@ -254,6 +254,13 @@ export const tr: AdminTexte = {
     vorhanden: "var",
   },
   chance: {
+    fragen: {
+      "Wer entscheidet ausser Ihnen? (Und: wer muss es mittragen, auch ohne zu entscheiden?)":
+        "Sizin dışınızda kim karar veriyor? (Ve: karar vermese de kimin desteklemesi gerekiyor?)",
+      "Bis wann muss es laufen — und warum gerade dann?":
+        "Ne zamana kadar çalışır olmalı — ve neden tam o zaman?",
+      "Wer entscheidet ausser Ihnen?": "Sizin dışınızda kim karar veriyor?",
+    } as Record<string, string>,
     titel: "Satış fırsatı",
     zurPipeline: "← Satış sürecine dön",
     organisationLead: (name: string) => `Kuruluş: ${name}`,

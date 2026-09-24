@@ -206,6 +206,33 @@ console.log(
     `${O.MIND_ABSTAND_TAGE} Tage`,
 )
 
+/*
+ * MSA-16 — DIE FUENF, DIE OBEN STEHEN MUESSEN.
+ *
+ * `lib/attention.ts` hebt fuenf Owner-Entscheidungen ueber alle anderen:
+ * Impressum, Steuerausweis und die drei Kundenfreigaben. Es tut das ueber
+ * ihre Beschriftung, weil ihre Quelle (`lib/material-status.ts`) unter G18
+ * gesperrt ist und kein Feld dafuer bekommen kann.
+ *
+ * Eine Liste aus Beschriftungen rostet still: Wird ein Punkt umbenannt,
+ * faellt er auf sein Gruppengewicht zurueck und verschwindet aus den fuenf
+ * sichtbaren Plaetzen — ohne dass irgendwo etwas rot wird. Deshalb hier.
+ */
+{
+  const { ENTSCHEIDUNG_BLOCKIERT_GESCHAEFT } = await import("@/lib/attention")
+  const { collect } = await import("@/lib/material-status")
+  const alle = [...collect().open, ...collect().done].map((i) => i.label)
+  for (const label of ENTSCHEIDUNG_BLOCKIERT_GESCHAEFT) {
+    if (!alle.includes(label)) {
+      probleme.push(
+        `Owner-Blocker „${label}" gibt es im Materialstand nicht mehr — ` +
+          `er wuerde in „Ihre Entscheidungen" nach unten rutschen. ` +
+          `Umbenannt? Dann in lib/attention.ts nachziehen.`,
+      )
+    }
+  }
+}
+
 if (probleme.length > 0) {
   console.error("\nOwner-Last-Gate: die Kennzahl liesse sich verbessern, ohne dass etwas besser wird.\n")
   for (const p of probleme) console.error(`  ${p}`)

@@ -49,6 +49,24 @@ export type StageRule = {
    * Schritt ein Befund und keine Kleinigkeit.
    */
   active: boolean
+  /**
+   * MSA-08 — die zwei Fragen, die ein Gespraech entscheidbar machen.
+   *
+   * Aus der Marktanalyse vom 24.09.2026: Zwei Dinge fehlten in Gespraechen
+   * immer wieder, und beide kosten nichts ausser einem Satz —
+   *
+   *   Wer entscheidet ausser Ihnen?
+   *   Bis wann muss es laufen, und warum gerade dann?
+   *
+   * Ohne die erste verhandelt man mit jemandem, der nicht zusagen kann; ohne
+   * die zweite hat ein Angebot keinen Anlass und wird vertagt.
+   *
+   * Sie stehen ausdruecklich NICHT als eigene Felder im Datenmodell. Die
+   * Antworten sind Saetze eines Menschen und gehoeren in die Notiz — ein
+   * Pflichtfeld daraus zu machen hiesse, ein Gespraech zu einem Formular zu
+   * erziehen. Sie stehen dort, wo gearbeitet wird: an der Stufe.
+   */
+  fragen?: string[]
 }
 
 /**
@@ -85,6 +103,10 @@ export const STAGE_RULES: Record<SalesStatus, StageRule> = {
       "und die Bereitschaft zum nächsten Schritt. Kein Budget nötig — danach fragt " +
       "dieses Haus im Erstgespräch nicht.",
     suggests: "Systemgespräch vereinbaren",
+    fragen: [
+      "Wer entscheidet ausser Ihnen?",
+      "Bis wann muss es laufen — und warum gerade dann?",
+    ],
     active: true,
   },
   discovery: {
@@ -94,6 +116,10 @@ export const STAGE_RULES: Record<SalesStatus, StageRule> = {
       "steht im Aufnahmebogen darunter: bestätigtes Problem, betroffene Ebenen, " +
       "gewünschtes Ergebnis, Einschränkungen.",
     suggests: "Umfang klären",
+    fragen: [
+      "Wer entscheidet ausser Ihnen? (Und: wer muss es mittragen, auch ohne zu entscheiden?)",
+      "Bis wann muss es laufen — und warum gerade dann?",
+    ],
     active: true,
   },
   audit: {
@@ -102,6 +128,10 @@ export const STAGE_RULES: Record<SalesStatus, StageRule> = {
       "Gleichbedeutend mit „Systemgespräch“. Der Wert wird nicht mehr neu vergeben; " +
       "bestehende Vorgänge behalten ihn, damit keine Zeile verändert wird.",
     suggests: "Umfang klären",
+    fragen: [
+      "Wer entscheidet ausser Ihnen? (Und: wer muss es mittragen, auch ohne zu entscheiden?)",
+      "Bis wann muss es laufen — und warum gerade dann?",
+    ],
     active: true,
   },
   proposal: {
