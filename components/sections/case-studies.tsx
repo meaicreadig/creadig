@@ -2,7 +2,7 @@
 
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { approvedCaseStudies } from "@/lib/site-data"
+import type { OeffentlicherFall } from "@/lib/freigabe-projektion"
 import { CaseStudyBody } from "@/components/sections/case-study-body"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -15,10 +15,19 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
  * stimmt; und sie verschwindet spurlos, bis der Owner Freigaben liefert
  * (siehe lib/site-data.ts → caseStudies).
  */
-export function CaseStudies() {
+export function CaseStudies({ faelle }: { faelle: OeffentlicherFall[] }) {
   const { t } = useLocale()
 
-  if (approvedCaseStudies.length === 0) return null
+  /*
+   * B-1 — DIE LISTE KOMMT VON AUSSEN, NICHT AUS DEM QUELLTEXT.
+   *
+   * Bis zum 24.09.2026 las diese Sektion `approvedCaseStudies`: die
+   * Freigaben standen als Feld in `lib/site-data.ts`. Ein Widerruf im Admin
+   * erreichte sie damit nie. Jetzt entscheidet die Erlaubnislage des Admin
+   * (`lib/freigabe-projektion.ts`), und diese Sektion zeigt, was sie bekommt
+   * — leer bleibt leer.
+   */
+  if (faelle.length === 0) return null
 
   return (
     <section id="kundenfaelle" aria-labelledby="kundenfaelle-title" className="section-seam">
@@ -38,7 +47,7 @@ export function CaseStudies() {
         </div>
 
         <div className="mt-20 flex flex-col gap-12">
-          {approvedCaseStudies.map((study, i) => (
+          {faelle.map((study, i) => (
             <Reveal
               key={study.slug}
               delay={0.06 * i}

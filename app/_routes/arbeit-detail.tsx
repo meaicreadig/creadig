@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { ArbeitPageBody } from "@/components/pages/arbeit-page-body"
-import { approvedCaseStudies, genannteClientWorks } from "@/lib/site-data"
+import { genannteClientWorks } from "@/lib/site-data"
+import { oeffentlicheFaelle } from "@/lib/freigabe-oeffentlich"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { pageMetadata } from "@/lib/page-metadata"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
@@ -59,7 +60,13 @@ export async function ArbeitRoute({
   const work = findWork(slug)
   if (!work) notFound()
 
-  const study = approvedCaseStudies.find((c) => c.slug === work.slug) ?? null
+  /*
+   * B-1 — auch die Detailseite fragt die Erlaubnislage, nicht den Quelltext.
+   * Ohne Erlaubnis bleibt `study` null, und die Seite zeigt das Werk ohne
+   * Fallstudie — so wie vorher auch, nur jetzt aus dem richtigen Grund.
+   */
+  const { faelle } = await oeffentlicheFaelle()
+  const study = faelle.find((c) => c.slug === work.slug) ?? null
 
   const jsonLd = breadcrumbList(locale, [
     { name: dictionary[locale].nav.arbeiten, path: "/arbeiten" },

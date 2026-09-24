@@ -1,7 +1,9 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { revalidatePath } from "next/cache"
+import { revalidatePath, revalidateTag } from "next/cache"
+
+import { FREIGABEN_TAG } from "@/lib/freigabe-projektion"
 
 import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
@@ -120,6 +122,15 @@ export async function freigabeErfassen(
   if (!ergebnis) return { fehler: ["organisation"], werte, umfaenge }
 
   revalidatePath("/admin/beleg")
+  /*
+   * B-1 — die oeffentliche Seite haengt an dieser Erlaubnis.
+   *
+   * Ohne diese Zeile wuerde ein Widerruf erst beim naechsten Ablauf des
+   * Zwischenspeichers wirken (fuenf Minuten). Mit ihr wirkt er bei der
+   * naechsten Anfrage. Ein Mensch, der seine Erlaubnis zurueckzieht, erwartet
+   * zu Recht das Zweite.
+   */
+  revalidateTag(FREIGABEN_TAG)
   /* Leere Werte: Das Formular ist nach dem Erfassen leer, nicht vorbelegt. */
   return { fehler: [], werte: {}, erfasst: ergebnis.neu ? "neu" : "schon-erfasst" }
 }
@@ -137,4 +148,13 @@ export async function freigabeWiderrufen(id: string, form: FormData): Promise<vo
   if (!id || !grund) return
   await store.withdrawRelease(id, grund)
   revalidatePath("/admin/beleg")
+  /*
+   * B-1 — die oeffentliche Seite haengt an dieser Erlaubnis.
+   *
+   * Ohne diese Zeile wuerde ein Widerruf erst beim naechsten Ablauf des
+   * Zwischenspeichers wirken (fuenf Minuten). Mit ihr wirkt er bei der
+   * naechsten Anfrage. Ein Mensch, der seine Erlaubnis zurueckzieht, erwartet
+   * zu Recht das Zweite.
+   */
+  revalidateTag(FREIGABEN_TAG)
 }

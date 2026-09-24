@@ -50,6 +50,7 @@
     "cutover-migration": "CREADIG_MIGRATE_PRODUCTION=ja-ich-migriere-produktion node --env-file=.env.local --import ./scripts/lib/alias-hook.mjs scripts/db-migrate.mjs",
     "cutover-nachpruefung": "node --env-file=.env.local scripts/cutover-nachpruefung.mjs",
     "cutover-live": "node --env-file=.env.local scripts/cutover-live.mjs",
+    "freigabe-bruecke-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/freigabe-bruecke-drill.mjs",
     "auskunft-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/auskunft-drill.mjs",
     "abnahme-e2e": "node --import ./scripts/lib/alias-hook.mjs scripts/abnahme-e2e.mjs",
     "automation-e2e": "node --import ./scripts/lib/alias-hook.mjs scripts/automation-e2e.mjs",

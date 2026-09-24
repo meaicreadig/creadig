@@ -6,6 +6,7 @@ import { CapabilityTiles } from "@/components/sections/capability-tiles"
 import { EntryLine } from "@/components/sections/entry-line"
 import { Lagen } from "@/components/sections/lagen"
 import { CaseStudies } from "@/components/sections/case-studies"
+import { oeffentlicheFaelle } from "@/lib/freigabe-oeffentlich"
 import { ImpactBand } from "@/components/sections/impact-band"
 import { CompanyTeaser } from "@/components/sections/company-teaser"
 import { InsightsTeaser } from "@/components/sections/insights-teaser"
@@ -90,7 +91,9 @@ import { ClosingCta } from "@/components/sections/closing-cta"
  * Die Sektionen selbst brauchen nichts davon zu wissen: Sie lesen ihre Texte
  * ohnehin über `useLocale()`, und das Layout hat die Sprache bereits gesetzt.
  */
-export function HomeRoute() {
+export async function HomeRoute() {
+  /* B-1 — die Erlaubnislage des Admin entscheidet, was hier steht. */
+  const { faelle } = await oeffentlicheFaelle()
   return (
     <main id="top">
       {/* 1 · C — Wer wir sind, in einer Headline und vier Absprungpunkten. */}
@@ -215,7 +218,7 @@ export function HomeRoute() {
       */}
 
       {/* 8 — Ein tiefer Kundenfall (gated auf schriftliche Freigabe). */}
-      <CaseStudies />
+      <CaseStudies faelle={faelle} />
 
       {/*
         9 · A — MP10-2.5: WER, DANN WO. Die beiden Sektionen sind getauscht.

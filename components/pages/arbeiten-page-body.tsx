@@ -6,6 +6,7 @@ import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { Portfolio } from "@/components/sections/portfolio"
 import { CaseStudies } from "@/components/sections/case-studies"
+import type { OeffentlicherFall } from "@/lib/freigabe-projektion"
 import { Reviews } from "@/components/sections/reviews"
 import { Beleglage } from "@/components/sections/beleglage"
 import { ClosingCta } from "@/components/sections/closing-cta"
@@ -48,7 +49,7 @@ import { genannteClientWorks } from "@/lib/site-data"
  * gated: Beide rendern nichts, solange keine Freigabe vorliegt — kein
  * „Demnaechst", keine Beispielfaelle.
  */
-export function ArbeitenPageBody() {
+export function ArbeitenPageBody({ faelle }: { faelle: OeffentlicherFall[] }) {
   const { t } = useLocale()
   const ohneKundenwerk = genannteClientWorks.length === 0
 
@@ -93,7 +94,7 @@ export function ArbeitenPageBody() {
       {ohneKundenwerk && <Beleglage />}
 
       {!ohneKundenwerk && <Portfolio heading={false} />}
-      <CaseStudies />
+      <CaseStudies faelle={faelle} />
       <Reviews />
       {/*
         GATE 02 — DER ABSCHLUSS SPRACH UEBER ETWAS, DAS NICHT DA WAR.

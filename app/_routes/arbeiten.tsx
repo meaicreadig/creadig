@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { ArbeitenPageBody } from "@/components/pages/arbeiten-page-body"
+import { oeffentlicheFaelle } from "@/lib/freigabe-oeffentlich"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { pageMetadata } from "@/lib/page-metadata"
 import { genannteClientWorks, registryWorks, workHref } from "@/lib/site-data"
@@ -98,14 +99,16 @@ function jsonLd(locale: Locale) {
   ]
 }
 
-export function ArbeitenRoute({ locale }: { locale: Locale }) {
+export async function ArbeitenRoute({ locale }: { locale: Locale }) {
+  /* B-1 — dieselbe Quelle wie auf der Startseite: der Admin, nicht der Quelltext. */
+  const { faelle } = await oeffentlicheFaelle()
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd(locale)) }}
       />
-      <ArbeitenPageBody />
+      <ArbeitenPageBody faelle={faelle} />
     </>
   )
 }

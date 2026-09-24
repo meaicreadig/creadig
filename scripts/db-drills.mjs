@@ -71,6 +71,7 @@ const LAEUFE = [
   /* ADM-06 · A29 — Automationen: beobachtbar, steuerbar, umkehrbar. */
   { name: "automation", db: "drill_automation", variable: "AUTOMATION_DRILL_URL" },
   { name: "auskunft", db: "drill_auskunft", variable: "AUSKUNFT_DRILL_URL" },
+  { name: "freigabe-bruecke", db: "drill_freigabe_bruecke", variable: "FREIGABE_DRILL_URL" },
 ]
 
 function psql(sql) {
