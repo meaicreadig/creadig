@@ -32,7 +32,8 @@ import { usePathname } from "next/navigation"
  */
 const TABS = [
   { href: "/admin/vertrieb", label: "Übersicht" },
-  { href: "/admin/vertrieb/anfragen", label: "Anfragen" },
+  /* W6 · A1 — „Anfragen" steht in der Hauptnavigation; hier stand dieselbe
+     Route ein zweites Mal. Die Route bleibt, der doppelte Reiter geht. */
   /* GATE 10 — Recherche steht VOR der Pipeline: Was hier entsteht, wird
      dort erst zur Chance, und die Reihenfolge der Reiter sollte die
      Reihenfolge der Arbeit spiegeln. */

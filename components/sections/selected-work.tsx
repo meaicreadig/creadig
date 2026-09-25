@@ -41,7 +41,14 @@ export function SelectedWork() {
   const { t, locale } = useLocale()
   const copy = t.home.work
 
-  if (featuredWorks.length === 0) return null
+  /*
+   * W4 — die Sektion zeigt ECHTE Oberflaechen oder nichts. Die bisherigen
+   * Bilder waren generierte Szenen (lib/media-provenance.ts); ein Monogramm
+   * auf grauem Grund an ihrer Stelle waere ein Platzhalter auf der Startseite.
+   * Sobald unter `public/works/products/<slug>/` echte Screens liegen und am
+   * Werk stehen, kehrt die Sektion ohne Code-Aenderung zurueck.
+   */
+  if (!featuredWorks.some((w) => w.image)) return null
 
   const proofs = new Set(
     featuredWorks.map((w) => w.imageProof).filter((p): p is NonNullable<typeof p> => Boolean(p)),

@@ -17,6 +17,7 @@ import {
   type Release,
 } from "@/lib/proof"
 import { publishedInsights } from "@/lib/insights"
+import { findOffer, offerAmount } from "@/lib/offers"
 
 export type Region = "DE" | "CH" | "DE & CH"
 
@@ -186,7 +187,7 @@ export type Work = {
    * `customer-photo` = echte Kundenoberfläche in situ
    * `null` = kein Bild
    */
-  imageProof: "mockup" | "product-photo" | "customer-photo" | null
+  imageProof: "mockup" | "product-photo" | "customer-photo" | "illustration" | null
   /** Monogramm für Karten ohne Bild. */
   mark: string
   href?: string
@@ -262,8 +263,9 @@ export const productWorks: Work[] = [
     kind: "Produkt",
     region: "DE",
     // Owner 29.08.2026: Feld-Szene mit echter fibero Map-Center-Oberfläche.
-    image: "/works/fibero.jpg",
-    imageProof: "product-photo",
+    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
+    image: null,
+    imageProof: null,
     mark: "fb",
     live: true,
   },
@@ -288,8 +290,9 @@ export const productWorks: Work[] = [
     kind: "Produkt",
     region: "DE & CH",
     // Owner 29.08.2026: Laptop-Szene mit echter meAI-Oberfläche (Demodaten).
-    image: "/works/meai.jpg",
-    imageProof: "product-photo",
+    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
+    image: null,
+    imageProof: null,
     mark: "me",
     href: "https://meai.run",
     live: true,
@@ -316,8 +319,9 @@ export const productWorks: Work[] = [
     kind: "Produkt",
     region: "CH",
     // Owner 29.08.2026: POS-Szene mit echter CASSAMEA-Oberfläche (Demodaten).
-    image: "/works/cassamea.jpg",
-    imageProof: "product-photo",
+    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
+    image: null,
+    imageProof: null,
     mark: "CA",
   },
   {
@@ -341,8 +345,9 @@ export const productWorks: Work[] = [
     kind: "Produkt",
     region: "DE",
     // Owner 30.08.2026: Laptop-Szene mit echter meahv-Oberfläche (Objekte & Einheiten).
-    image: "/works/meahv.jpg",
-    imageProof: "product-photo",
+    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
+    image: null,
+    imageProof: null,
     mark: "hv",
   },
 ]
@@ -632,8 +637,9 @@ export const clientWorks: Work[] = [
     kind: "Kundenwerk",
     region: "CH",
     // Owner 29.08.2026: Kundenbild (Laptop-Szene mit echter nvswiss.ch-Oberfläche).
-    image: "/works/nv-swiss.jpg",
-    imageProof: "customer-photo",
+    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
+    image: null,
+    imageProof: null,
     mark: "NV",
     href: "https://nvswiss.ch",
     live: true,
@@ -658,8 +664,9 @@ export const clientWorks: Work[] = [
     kind: "Kundenwerk",
     region: null,
     // Owner 29.08.2026: Kundenbild (Boutique-Laptop, echte maqam-Oberfläche).
-    image: "/works/maqam.jpg",
-    imageProof: "customer-photo",
+    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
+    image: null,
+    imageProof: null,
     mark: "mq",
     // Logo: public/brand/clients/maqam.png (schwarz entfernt → transparent)
     releases: [],
@@ -682,8 +689,9 @@ export const clientWorks: Work[] = [
     kind: "Kundenwerk",
     region: "DE",
     // Owner 29.08.2026: Kundenbild (Laptop-Szene mit echter Oberfläche).
-    image: "/works/bir-damla-hayir.jpg",
-    imageProof: "customer-photo",
+    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
+    image: null,
+    imageProof: null,
     mark: "bd",
     // Logo: public/brand/clients/bir-damla-hayir.png
     releases: [],
@@ -1016,7 +1024,8 @@ export const caseStudies: CaseStudy[] = [
     chapters: { ...emptyChapters },
     metrics: [],
     voice: null,
-    image: "/works/nv-swiss.jpg",
+    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
+    image: null,
     mark: "NV",
     releases: [],
   },
@@ -1032,7 +1041,8 @@ export const caseStudies: CaseStudy[] = [
     chapters: { ...emptyChapters },
     metrics: [],
     voice: null,
-    image: "/works/maqam.jpg",
+    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
+    image: null,
     mark: "mq",
     releases: [],
   },
@@ -1048,7 +1058,8 @@ export const caseStudies: CaseStudy[] = [
     chapters: { ...emptyChapters },
     metrics: [],
     voice: null,
-    image: "/works/bir-damla-hayir.jpg",
+    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
+    image: null,
     mark: "bd",
     releases: [],
   },
@@ -1259,7 +1270,7 @@ export const furtherProjects: {
     name: "Ops-Retainer",
     what: {
       de: "Operations-System für Handwerksbetriebe",
-      tr: "Zanaat işletmeleri için operasyon sistemi",
+      tr: "Usta ve esnaf işletmeleri için operasyon sistemi",
       en: "An operations system for trade businesses",
       ar: "نظام تشغيل للمنشآت الحِرفية",
     },
@@ -1526,31 +1537,12 @@ export const opsSteps = [
  * steht es im Woerterbuch begruendet, und `Intl` wuerde sonst von selbst
  * auf arabisch-indische Ziffern wechseln.
  */
-const PRICE_FORMAT: Record<Locale, { tag: string; wrap: (n: string) => string }> = {
-  de: { tag: "de-DE", wrap: (n) => `${n} €` },
-  tr: { tag: "tr-TR", wrap: (n) => `${n} €` },
-  en: { tag: "en-GB", wrap: (n) => `€${n}` },
-  /*
-   * Arabisch gruppiert hier mit PUNKT, nicht mit Komma — und zwar
-   * absichtlich gegen das, was `Intl` fuer „ar" liefert.
-   *
-   * Die arabische Fassung des Hauses schreibt Betraege durchgaengig als
-   * „1.500 يورو" (`service-pages.ts`) und „2.400 يورو" (FAQ im
-   * Woerterbuch). Haette der Formatierer hier „2,400" erzeugt, staende auf
-   * derselben Seite beides — genau der Fehler, gegen den dieser
-   * Formatierer gebaut wurde, nur eine Sprache weiter.
-   *
-   * Deshalb die deutschen Trennzeichen mit arabischer Waehrungsangabe. Die
-   * westlichen Ziffern sind ohnehin gesetzt (siehe Woerterbuch); `de-DE`
-   * liefert sie mit.
-   */
-  ar: { tag: "de-DE", wrap: (n) => `${n} يورو` },
-}
-
-export function formatPrice(amount: number, locale: Locale): string {
-  const format = PRICE_FORMAT[locale]
-  return format.wrap(new Intl.NumberFormat(format.tag).format(amount))
-}
+/*
+ * Formatierer und Betraege stehen seit W1 in `lib/offers.ts` — der einen
+ * Preisquelle, aus der auch das Woerterbuch seine Platzhalter fuellt. Hier
+ * nur noch der Re-Export, damit kein Aufrufer umziehen muss.
+ */
+export { formatPrice } from "@/lib/offers"
 
 export type Package = {
   key: "website" | "audit"
@@ -1570,8 +1562,12 @@ export type Package = {
    * Luecke steht auf `/status`.
    */
   duration: Localized | null
-  /** Regelpreis ab dem dritten Betrieb — steht offen daneben. */
-  regularAmount?: number
+  /**
+   * Der Pilotplatz je Gewerk — ein eigener Kasten neben dem Festpreis, nie
+   * statt ihm. Er ist ein Tausch: der niedrigere Betrag gegen die schriftliche
+   * Referenzfreigabe (`offers` → `website-pilot`).
+   */
+  pilotAmount?: number
   recommended: boolean
   /**
    * Wohin die Schaltfläche fuehrt. Ohne Angabe in den Termin-Assistenten
@@ -1589,9 +1585,9 @@ export type Package = {
 export const packages: Package[] = [
   {
     key: "website",
-    amount: 2400,
+    amount: findOffer("website").amount ?? 0,
     period: null,
-    regularAmount: 3900,
+    pilotAmount: offerAmount("website-pilot") ?? undefined,
     recommended: false,
     /*
      * GATE 3 — HIER STAND `null` MIT EINEM TODO, WAEHREND DIE ZUSAGE LAENGST
@@ -1632,7 +1628,7 @@ export const packages: Package[] = [
      * Angebot.
      */
     key: "audit",
-    amount: 1500,
+    amount: findOffer("audit").amount ?? 0,
     period: null,
     recommended: false,
     ctaHref: "/leistungen/barrierefreiheit-website",
@@ -1687,7 +1683,7 @@ export const managedOperations = [
 
 export const retainer = {
   /** Preis pro Monat, netto. `null` = der Block erscheint nicht. */
-  amount: 149 as number | null,
+  amount: offerAmount("betreuung"),
   /** Was tatsächlich geliefert wird — vom Owner bestätigt, nicht abgeleitet. */
   description: {
     de: "Nach dem Livegang bleibt die Seite in Betrieb — und wir bleiben ansprechbar. Kein Paket, das etwas verwaltet, sondern der Mensch, der sie gebaut hat.",

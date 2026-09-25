@@ -116,7 +116,7 @@ export const angebote: Angebot[] = [
     kaufweg: "fester-umfang",
     betragArt: "festpreis",
     betrag: websitePaket?.amount ?? null,
-    betragBis: websitePaket?.regularAmount ?? null,
+    betragBis: websitePaket?.pilotAmount ?? null,
     href: "/leistungen#pakete",
     kanon: "offer-canon.md §3, §4",
   },
@@ -237,7 +237,7 @@ export const kaufwegeText = {
     } satisfies Localized,
     spanne: { de: "Spanne", tr: "aralık", en: "range", ar: "نطاق" } satisfies Localized,
   },
-  regulaerLabel: { de: "Regelpreis", tr: "Standart fiyat", en: "Standard price", ar: "السعر العادي" } satisfies Localized,
+  regulaerLabel: { de: "Pilotplatz", tr: "Pilot yer", en: "Pilot place", ar: "مقعد تجريبي" } satisfies Localized,
 
   /*
    * Der Rechner steht an genau EINEM Kaufweg: dort, wo der Preis erst nach
@@ -410,10 +410,10 @@ export const angebotText: Record<
   systemprojekt: {
     name: { de: "Systemprojekt", tr: "Sistem projesi", en: "System project", ar: "مشروع نظام" },
     grenze: {
-      de: "Kein Listenpreis und keine Spanne. Es gibt keine Reihe abgeschlossener Systemprojekte, aus der sich eine ableiten ließe — eine geratene Spanne wäre entweder peinlich oder bindend.",
-      tr: "Liste fiyatı yok, aralık yok. Aralık türetilebilecek tamamlanmış sistem projeleri dizisi yok — tahmini bir aralık ya utandırıcı ya da bağlayıcı olurdu.",
-      en: "No list price and no range. There is no series of completed system projects from which one could be derived — a guessed range would be either embarrassing or binding.",
-      ar: "لا سعر قائمة ولا نطاق سعري. فليست هناك سلسلة مشاريع أنظمة مكتملة يمكن اشتقاق نطاق منها — والنطاق المُخمَّن إما محرج وإما مُلزِم.",
+      de: "Kein Listenpreis und keine Spanne: Der Festpreis entsteht nach dem Systemgespräch, für genau Ihren Umfang.",
+      tr: "Liste fiyatı yok, aralık yok: Sabit fiyat, sistem görüşmesinden sonra tam sizin kapsamınız için oluşur.",
+      en: "No list price and no range: the fixed price comes after the system call, for exactly your scope.",
+      ar: "لا سعر قائمة ولا نطاق سعري: يأتي السعر الثابت بعد محادثة النظام، لنطاقكم بالضبط.",
     },
     cta: {
       de: "Systemgespräch anfragen",

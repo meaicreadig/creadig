@@ -6,68 +6,94 @@ import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { Disclosure } from "@/components/ui/disclosure"
-import { formatPrice } from "@/lib/site-data"
-import { ebenenEinstiege, type EinstiegsArt } from "@/lib/einstiege"
+import { findOffer, formatPrice, offerAmount } from "@/lib/offers"
 
 /**
- * DER EINSTIEG AUF DER STARTSEITE — GATE 01 · WEB-0024.
+ * DIE ANGEBOTE AUF DER STARTSEITE (W1/W2 · §12).
  *
- * ---------------------------------------------------------------------------
- * WAS HIER VORHER STAND
- * Eine Ueberschrift und eine Zahl: „Website-Paket ab 2.400 EUR netto." Sie war
- * der einzige Preis der Startseite. Das externe Audit hat daraus den Befund
- * gemacht, der diese Datei ausgeloest hat (AUDIT-24): Der Preis ankert creaDIG
- * als Website-Anbieter. Wer ihn zuerst liest, ordnet Betrieb, Automatisierung
- * und ein eigenes KI-System darunter als Zusatzleistungen ein.
+ * Vorher: „Drei Arten anzufangen" — Festpreis AB, Monatlich, Analyse — und die
+ * 149 EUR standen an der Ebene „Operations", also als Preis fuer Systemarbeit.
+ * Damit war die sichtbarste Zahl der Seite eine Website-Betreuung, und sie
+ * stand an der falschen Stelle.
  *
- * ---------------------------------------------------------------------------
- * WAS JETZT DASTEHT — UND WARUM DAS KEIN RUECKZIEHER IST
- * Der Preis ist nicht verschwunden; er ist einer von dreien geworden. Die
- * Sektion zeigt die drei ARTEN, auf die ein Anfang zustande kommt:
+ * Jetzt die Angebote in Kundensprache, aus `lib/offers.ts`:
  *
- *   Festpreis            ein vereinbarter Umfang, eine Zahl
- *   Monatlich            der laufende Betrieb eines Systems, das wir bauten
- *   Angebot nach Analyse kein Listenpreis, sondern ein Gespraech davor
+ *   Website          Festpreis — der Pilotplatz als eigener Kasten daran
+ *   Systemanalyse    erscheint erst, wenn der Owner den Betrag nennt (O3)
+ *   Systemprojekt    Angebot nach Analyse — keine Zahl, ein Weg
+ *   Website-Betreuung monatlich, nur fuer Seiten, die wir gebaut haben
+ *   BFSG-Pruefung    als Verweis fuer alle, deren Seite schon steht
  *
- * Zwei davon tragen heute einen bestaetigten Betrag. Zwei Zahlen nebeneinander
- * ankern nicht — sie zeigen eine Spanne und eine Form; eine allein ist ein
- * Preisschild. Und die dritte Art sagt aus, dass es dort keinen Listenpreis
- * gibt, statt die Frage offen zu lassen: Wer keine Auskunft findet,
- * beantwortet sie selbst, und zwar gegen uns.
- *
- * ---------------------------------------------------------------------------
- * WO DIE ZAHLEN HERKOMMEN
- * Aus `lib/einstiege.ts`, und die liest ausschliesslich `packages` und
- * `retainer` aus `lib/site-data.ts`. Hier wird kein Betrag getippt. Wo `betrag`
- * `null` ist, steht das Etikett ohne Zahl — nicht „auf Anfrage" als Floskel,
- * sondern die Art des Einstiegs als Aussage.
- *
- * Die vollstaendige Preisleiter bleibt an genau einer Stelle:
- * `/leistungen#pakete`.
- *
- * ---------------------------------------------------------------------------
- * DIE ZWEI FRAGEN DANEBEN BLEIBEN
- * Dieselben zwei, die im Erstgespraech zuerst kommen. Sie kommen aus
- * `t.faq.items` und werden nicht zweitgeschrieben, damit die Antwort hier
- * nicht in vier Wochen anders lautet als auf `/leistungen`.
+ * Kein Betrag wird hier getippt; kein „ab".
  */
 
-/** Reihenfolge der Arten: erst was eine Zahl hat, dann was keine hat. */
-const ARTEN: EinstiegsArt[] = ["festpreis", "monatlich", "nach-analyse"]
+type Zeile = {
+  key: string
+  name: string
+  art: string
+  betrag: number | null
+  monatlich: boolean
+  body: string
+  cta: string
+  href: string
+  bedingung?: string
+}
 
 export function EntryLine() {
   const { t, locale } = useLocale()
   const copy = t.home.entry
+  const website = findOffer("website")
+  const pilot = findOffer("website-pilot")
+  const analyse = findOffer("analyse")
+  const betreuung = findOffer("betreuung")
 
-  /*
-   * Gruppiert, nicht aufgezaehlt: Drei der fuenf Ebenen laufen ueber „Angebot
-   * nach Analyse". Fuenf Zeilen zu zeigen, von denen drei dasselbe sagen,
-   * waere eine Liste; drei Arten mit den Ebenen daneben sind eine Ordnung.
-   */
-  const gruppen = ARTEN.map((art) => ({
-    art,
-    eintraege: ebenenEinstiege.filter((e) => e.art === art),
-  })).filter((g) => g.eintraege.length > 0)
+  const zeilen: Zeile[] = [
+    {
+      key: "website",
+      name: website.label[locale],
+      art: copy.angebote.website.art,
+      betrag: offerAmount("website"),
+      monatlich: false,
+      body: copy.angebote.website.body,
+      cta: copy.angebote.website.cta,
+      href: "/leistungen#pakete",
+      bedingung: pilot.published ? pilot.condition?.[locale] : undefined,
+    },
+    ...(analyse.published && analyse.amount !== null
+      ? [
+          {
+            key: "analyse",
+            name: analyse.label[locale],
+            art: copy.angebote.analyse.art,
+            betrag: analyse.amount,
+            monatlich: false,
+            body: copy.angebote.analyse.body,
+            cta: copy.angebote.analyse.cta,
+            href: "/termin?art=systemgespraech",
+          },
+        ]
+      : []),
+    {
+      key: "systemprojekt",
+      name: copy.angebote.systemprojekt.name,
+      art: copy.angebote.systemprojekt.art,
+      betrag: null,
+      monatlich: false,
+      body: copy.angebote.systemprojekt.body,
+      cta: copy.angebote.systemprojekt.cta,
+      href: "/termin?art=systemgespraech",
+    },
+    {
+      key: "betreuung",
+      name: betreuung.label[locale],
+      art: copy.angebote.betreuung.art,
+      betrag: offerAmount("betreuung"),
+      monatlich: true,
+      body: copy.angebote.betreuung.body,
+      cta: copy.angebote.betreuung.cta,
+      href: "/betrieb",
+    },
+  ]
 
   const questions = t.faq.items.slice(0, 2)
 
@@ -87,72 +113,54 @@ export function EntryLine() {
             </Reveal>
 
             <ul className="border-line mt-10 flex flex-col border-t">
-              {gruppen.map((gruppe, i) => {
-                const artCopy = copy.arten[gruppe.art]
-                /*
-                 * Der Betrag steht an der Art, nicht an der Ebene: Innerhalb
-                 * einer Art gibt es heute genau einen (`festpreis` das
-                 * Website-Paket, `monatlich` die Betreuung). Faende sich je
-                 * ein zweiter, stuende hier der niedrigste mit „ab" davor —
-                 * bis dahin waere eine Spanne eine Behauptung ueber ein
-                 * Angebot, das es nicht gibt.
-                 */
-                const mitBetrag = gruppe.eintraege.find((e) => e.betrag !== null)
-                const ebenen = gruppe.eintraege
-                  .map((e) => t.services.layers[e.layer].name)
-                  .join(" · ")
-                return (
-                  <Reveal key={gruppe.art} as="li" delay={0.06 * i} className="border-line border-b">
-                    <div className="grid gap-x-8 gap-y-3 py-7 md:grid-cols-12 md:items-baseline">
-                      <p className="md:col-span-4">
-                        <span className="eyebrow text-gold-text block">{artCopy.label}</span>
-                        {mitBetrag?.betrag != null && (
-                          <span className="type-h4 mt-2.5 block">
-                            {formatPrice(mitBetrag.betrag, locale)}
-                            {gruppe.art === "monatlich" && (
-                              <span className="type-small text-muted-foreground ms-1.5">
-                                {t.packages.monthly}
-                              </span>
-                            )}
-                          </span>
-                        )}
-                      </p>
-                      <div className="md:col-span-8">
-                        <p className="type-small text-foreground/85 max-w-md text-pretty">
-                          {artCopy.body}
+              {zeilen.map((zeile) => (
+                <li key={zeile.key} className="border-line border-b">
+                  <div className="grid gap-x-8 gap-y-3 py-7 md:grid-cols-12 md:items-baseline">
+                    <p className="md:col-span-4">
+                      <span className="text-subhead block text-lg">{zeile.name}</span>
+                      <span className="eyebrow text-gold-text mt-2 block">{zeile.art}</span>
+                      {zeile.betrag !== null && (
+                        <span className="type-h4 mt-2.5 block">
+                          {formatPrice(zeile.betrag, locale)}
+                          {zeile.monatlich && (
+                            <span className="type-small text-muted-foreground ms-1.5">
+                              {t.packages.monthly}
+                            </span>
+                          )}
+                        </span>
+                      )}
+                    </p>
+                    <div className="md:col-span-8">
+                      <p className="type-small text-foreground/85 max-w-md text-pretty">{zeile.body}</p>
+                      {zeile.bedingung && (
+                        <p className="border-line text-meta text-muted-foreground mt-3 inline-block rounded-lg border px-3 py-2">
+                          {zeile.bedingung}
                         </p>
-                        {/*
-                          Die Bedingung steht VOR dem Klick und nicht auf der
-                          Zielseite: Die laufende Betreuung gibt es nur fuer
-                          Systeme, die wir gebaut haben (`retainer.precondition`).
-                          Wer sie erst auf `/betrieb` liest, hat den Preis
-                          bereits als sein Angebot verstanden.
-                        */}
-                        {gruppe.eintraege.some((e) => e.bedingung) && (
-                          <p className="text-meta text-muted-foreground mt-2">
-                            {t.services.angebotBedingung}
-                          </p>
-                        )}
-                        <p className="text-meta text-muted-foreground mt-3">
-                          <span className="text-gold-text">{copy.ebenenLabel}: </span>
-                          {ebenen}
-                        </p>
-                      </div>
+                      )}
+                      <Link
+                        href={zeile.href}
+                        className="text-gold-text hover:text-foreground mt-3 flex w-fit items-center gap-1.5 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
+                      >
+                        {zeile.cta}
+                        <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
+                      </Link>
                     </div>
-                  </Reveal>
-                )
-              })}
+                  </div>
+                </li>
+              ))}
             </ul>
 
             <Reveal delay={0.2}>
-              <p className="text-meta text-muted-foreground mt-6">{copy.nettoNote}</p>
-              <Link
-                href="/leistungen#pakete"
-                className="text-gold-text hover:text-foreground mt-6 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
-              >
-                {copy.priceCta}
-                <ArrowUpRight className="size-4" strokeWidth={1.5} />
-              </Link>
+              <p className="type-small text-muted-foreground mt-6">
+                {copy.auditNote}{" "}
+                <Link
+                  href="/leistungen/barrierefreiheit-website"
+                  className="text-gold-text hover:text-foreground underline-offset-4 hover:underline"
+                >
+                  {copy.auditCta}
+                </Link>
+              </p>
+              <p className="text-meta text-muted-foreground mt-3">{copy.nettoNote}</p>
             </Reveal>
           </div>
 

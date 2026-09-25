@@ -1,5 +1,7 @@
 "use client"
 
+import { ArrowUpRight } from "lucide-react"
+import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
@@ -37,7 +39,14 @@ import { productWorks, productWorlds, serviceLayers } from "@/lib/site-data"
  * sein kann: Er zeigt nur, was ohnehin belegt in den Daten steht. Deshalb
  * steht er hier, waehrend Fotos, Screens und Fallbeschreibungen noch fehlen.
  */
-export function HouseArchitecture() {
+/*
+ * W2 — `kompakt` ersetzt auf der Startseite die drei Lagen UND die fuenf
+ * Kacheln: dieselben fuenf Ebenen, einmal als Bild statt zweimal als Liste.
+ * Ohne Produktreihe (die zeigt `SelectedWork` mit echten Aufnahmen) und mit
+ * genau einem Weg weiter. `voll` bleibt die Fassung fuer /unternehmen.
+ */
+export function HouseArchitecture({ variant = "voll" }: { variant?: "voll" | "kompakt" }) {
+  const kompakt = variant === "kompakt"
   const { t, locale } = useLocale()
   const copy = t.architecture
 
@@ -88,11 +97,13 @@ export function HouseArchitecture() {
           <Reveal className="lg:col-span-7">
             <SectionEyebrow label={copy.eyebrow} />
             <h2 id="haus-title" className="type-h2 mt-7 text-balance">
-              {copy.title}
+              {kompakt ? copy.kompaktTitle : copy.title}
             </h2>
           </Reveal>
           <Reveal delay={0.1} className="flex items-end lg:col-span-5">
-            <p className="type-lead text-muted-foreground max-w-md text-pretty">{copy.lead}</p>
+            <p className="type-lead text-muted-foreground max-w-md text-pretty">
+              {kompakt ? copy.kompaktLead : copy.lead}
+            </p>
           </Reveal>
         </div>
 
@@ -242,6 +253,18 @@ export function HouseArchitecture() {
             </div>
           </Reveal>
 
+          {kompakt ? (
+            <Reveal delay={0.16}>
+              <Link
+                href="/leistungen"
+                className="text-gold-text hover:text-foreground mt-10 inline-flex items-center gap-2 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
+              >
+                {t.home.capabilities.cta}
+                <ArrowUpRight className="size-4" strokeWidth={1.5} />
+              </Link>
+            </Reveal>
+          ) : (
+            <>
           {/* ---- Vier eigene Produkte ------------------------------------ */}
           <Reveal delay={0.16}>
             <p className="eyebrow text-muted-foreground mt-16">{copy.productsLabel}</p>
@@ -281,6 +304,8 @@ export function HouseArchitecture() {
           <figcaption className="type-small text-muted-foreground border-line mt-12 border-t pt-6 text-pretty">
             {copy.caption}
           </figcaption>
+            </>
+          )}
         </figure>
       </div>
     </section>

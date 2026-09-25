@@ -24,7 +24,11 @@ export function InsightsTeaser() {
   const copy = t.home.insights
   const entries = publishedInsights.slice(0, MAX_TEASERS)
 
-  if (entries.length === 0) return null
+  /*
+   * W2 — erst ab ZWEI Notizen. Eine einzelne Karte auf der Startseite liest
+   * sich als „hier schreibt jemand einmal im Jahr"; sie steht auf /insights.
+   */
+  if (entries.length < 2) return null
 
   return (
     <section id="insights" aria-labelledby="insights-teaser-title" className="section-seam">

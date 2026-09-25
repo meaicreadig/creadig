@@ -85,7 +85,7 @@ if (seiten.length === 0) {
 
 /* --- 1.1 Jeder gefuehrte Betrag steht in site-data ----------------------- */
 const erlaubteBetraege = new Set(
-  [...packages.flatMap((p) => [p.amount, p.regularAmount]), retainer.amount].filter(
+  [...packages.flatMap((p) => [p.amount, p.pilotAmount]), retainer.amount].filter(
     (b) => typeof b === "number",
   ),
 )

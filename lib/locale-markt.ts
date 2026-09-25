@@ -1,5 +1,5 @@
 import type { Locale } from "@/lib/dictionary"
-import { DEFAULT_LOCALE, locales } from "@/lib/routes"
+import { DEFAULT_LOCALE, isIndexed, locales } from "@/lib/routes"
 
 /**
  * LOCALE INTELLIGENCE — welche Sprache ein Erstbesucher bekommt.
@@ -142,13 +142,18 @@ export function spracheFuer(eingabe: {
   const gewaehlt = eingabe.gespeichert ? unterstuetzt(eingabe.gespeichert) : null
   if (gewaehlt) return gewaehlt
 
+  /*
+   * S1 — eine zurueckgestellte Sprache wird nie ERRATEN, nur gewaehlt.
+   * Wer sie ausdruecklich waehlt (Keks oder Pfad), bekommt sie weiterhin.
+   */
   const browser = ausBrowsersprache(eingabe.browsersprache)
-  if (browser) return browser
+  if (browser) return isIndexed(browser) ? browser : "en"
 
   const land = (eingabe.land ?? "").trim().toUpperCase()
   if (land === SCHWEIZ) return "en"
 
-  return ausHerkunft(land) ?? "en"
+  const herkunft = ausHerkunft(land)
+  return herkunft && isIndexed(herkunft) ? herkunft : "en"
 }
 
 /**
@@ -169,7 +174,8 @@ export function umschalterReihenfolge(aktiv: Locale): Locale[] {
     tr: ["tr", "en", "ar", "de"],
     en: ["en", "de", "tr", "ar"],
   }
-  return ordnungen[aktiv] ?? ordnungen[DEFAULT_LOCALE]
+  /* S1 — eine zurueckgestellte Sprache steht nur noch dort, wo man schon ist. */
+  return (ordnungen[aktiv] ?? ordnungen[DEFAULT_LOCALE]).filter((l) => l === aktiv || isIndexed(l))
 }
 
 /** Der Name des Kekses, in dem die ausdrueckliche Wahl liegt. */

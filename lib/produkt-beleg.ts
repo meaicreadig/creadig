@@ -144,8 +144,9 @@ export type ProduktBeleg = {
 export const produktBelege: ProduktBeleg[] = [
   {
     slug: "fibero",
-    situBild: "/works/fibero.jpg",
-    grundOhneBild: null,
+    /* W4 — die Aufnahme war eine generierte Szene (lib/media-provenance.ts). */
+    situBild: null,
+    grundOhneBild: "szene-generiert",
     /*
      * fibero hat keine oeffentliche Adresse (`href` in `site-data` ist nicht
      * gesetzt). Es laeuft im Glasfaser-Alltag — das ist der Beleg, und
@@ -158,8 +159,9 @@ export const produktBelege: ProduktBeleg[] = [
   },
   {
     slug: "meai",
-    situBild: "/works/meai.jpg",
-    grundOhneBild: null,
+    /* W4 — die Aufnahme war eine generierte Szene (lib/media-provenance.ts). */
+    situBild: null,
+    grundOhneBild: "szene-generiert",
     /*
      * WEB-0009. `https://meai.run` antwortet mit 307 auf `/login?next=%2F`.
      * Dort steht ohne Anmeldung lesbar „Geschlossenes System · Zugang nur

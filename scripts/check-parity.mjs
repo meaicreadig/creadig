@@ -81,6 +81,29 @@ function measure(source) {
 const problems = []
 const rows = []
 
+/*
+ * Betriebsfluss v2 (W3): Unter jeder Station steht genau EIN Werkzeug. Eine
+ * Sprache mit fuenf Werkzeugen fuer sechs Stationen verschiebt jedes Wort
+ * um eine Station — gelesen wird dann „Termin: Zettel". Geprueft am Quelltext,
+ * weil dieses Gate ohne Alias-Hook laeuft.
+ */
+{
+  const woerterbuch = fs.readFileSync(path.join(ROOT, "lib", "dictionary.ts"), "utf8")
+  const bloecke = [...woerterbuch.matchAll(/betriebsfluss: \{([\s\S]*?)\n\s{6}\},/g)]
+  const zaehle = (block, feld) => {
+    const m = block.match(new RegExp(`\\b${feld}: \\[([^\\]]*)\\]`))
+    return m ? [...m[1].matchAll(/"[^"]*"/g)].length : -1
+  }
+  if (bloecke.length !== 4) problems.push(`Betriebsfluss: ${bloecke.length} Sprachbloecke statt 4 gefunden`)
+  for (const [i, [, block]] of bloecke.entries()) {
+    const stationen = zaehle(block, "stations")
+    const werkzeuge = zaehle(block, "tools")
+    if (stationen !== werkzeuge) {
+      problems.push(`Betriebsfluss (Block ${i + 1}): ${stationen} Stationen, aber ${werkzeuge} Werkzeuge`)
+    }
+  }
+}
+
 for (const slug of slugs()) {
   const de = html(path.join(APP, "leistungen", `${slug}.html`))
   const tr = html(path.join(APP, "tr", "leistungen", `${slug}.html`))

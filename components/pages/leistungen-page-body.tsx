@@ -3,9 +3,6 @@
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { Services } from "@/components/sections/services"
-import { ManagedOperations } from "@/components/sections/managed-operations"
-import { Process } from "@/components/sections/process"
-import { Kaufwege } from "@/components/sections/kaufwege"
 import { Packages } from "@/components/sections/packages"
 import { Faq } from "@/components/sections/faq"
 import { ClosingCta } from "@/components/sections/closing-cta"
@@ -17,8 +14,7 @@ import { ClosingCta } from "@/components/sections/closing-cta"
  * strukturierten Daten liefert die Server-Seite darüber.
  *
  * Die Reihenfolge folgt der Frage, in der jemand liest: Was können Sie? (die
- * fünf Ebenen) → Wie läuft das? (Prozess und die vier operativen Schritte) →
- * Was kostet das? (Pakete) → Und die Fragen, die dann noch offen sind (FAQ).
+ * fünf Ebenen) → Was ist noch offen? (FAQ) → Was kostet das? (Pakete).
  *
  * Pakete und FAQ standen bis PHASE A auf der Startseite. Sie sind dort nicht
  * gestrichen worden, sie sind hierher gezogen: Eine Preistabelle auf der
@@ -58,46 +54,16 @@ export function LeistungenPageBody() {
       {/* Die H1 steht im Kopf — die Ebenen kommen ohne zweite Überschrift. */}
       <Services heading={false} />
       {/*
-        Der Betrieb steht direkt unter der Pyramide — er ist die Schicht, die
-        quer unter allen fuenf Ebenen liegt, nicht die sechste Stufe darin
-        (KIZILELMA §10.1). Danach erst der Ablauf: Was gebaut wird, dann was
-        laufend gilt, dann wie es zustande kommt.
+        W2 — DIE SEITE HALBIERT (gemessen 2.266 Woerter im Hauptteil).
+
+        Gegangen sind drei Sektionen, die jeweils eine zweite Ordnung neben die
+        Preistabelle stellten: „Drei Wege zu einem Preis" (Kaufwege), der
+        Managed Betrieb mit seinen sieben Punkten (steht vollstaendig auf
+        /betrieb) und der dreistufige Ablauf (die FAQ beantwortet „Wie laeuft
+        ein Projekt ab?" in zwei Saetzen). Es bleibt EINE Preistabelle aus
+        `lib/offers.ts` — Website, Pilotplatz, Pruefung, Betreuung, und der
+        Weg fuer alles Groessere.
       */}
-      <ManagedOperations />
-      <Process />
-      {/*
-        MP10-2.2 — DIE FRAGEN STEHEN JETZT VOR DEN PREISEN.
-
-        Bis hierher stand die Preistabelle direkt hinter dem Ablauf und die
-        FAQ dahinter. Das ist die Reihenfolge eines Katalogs: erst die Zahl,
-        dann die Erklaerung. Ein Leser, der bei 2.400 EUR haengen bleibt,
-        liest die Erklaerung nicht mehr — er hat schon entschieden.
-
-        Umgekehrt beantwortet die FAQ genau die zwei Fragen, die vor dem Preis
-        stehen muessen: was das kostet und wie es ablaeuft. Wer beide gelesen
-        hat, liest die Tabelle als Bestaetigung statt als Ueberraschung. Die
-        Sektionen selbst sind unveraendert — nur ihre Reihenfolge ist ein
-        anderes Argument.
-      */}
-      {/*
-        PHASE 2 · COMMERCIAL COMPLETION — DIE KAUFLOGIK STAND NIRGENDS.
-
-        `docs/sales/offer-canon.md` beschreibt seit dem 05.09.2026
-        vollstaendig, wie bei creaDIG ein Preis zustande kommt. Auf der Seite
-        standen davon nur die Ergebnisse: Betraege in der Tabelle unten, die
-        fuenf Treiber daneben, der Pilotpreis in einer Fussnote. Die Regel
-        darueber — dass es DREI grundverschiedene Arten gibt, hier zu kaufen
-        — stand nirgends.
-
-        Ohne sie rechnet jemand mit einem Betriebsproblem still hoch: „3.900
-        fuer eine Seite, also 40.000 fuer mein System." Oder er liest 149 Euro
-        und haelt das fuer den Betrieb seiner Warenwirtschaft.
-
-        Die Sektion steht VOR den Fragen und vor der Preisleiter. Erst wie ein
-        Preis entsteht, dann die offenen Fragen, dann die Zahlen — wer die
-        Tabelle ohne diese Ordnung liest, liest eine Agenturpreisliste.
-      */}
-      <Kaufwege />
       <Faq />
       <Packages />
       {/* MP10-2 (Zusatz) — hier steht der Abschluss unmittelbar unter der

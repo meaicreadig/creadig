@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto"
 import { sqlTuerkisch, tuerkischVergleich } from "@/lib/tuerkisch"
+import { istQuelle, istZustand } from "@/lib/veroeffentlichung-zustand"
 
 import { OFFERS } from "@/lib/offer-readiness"
 import { KATALOG, fehltFuer, type Angebot, type Annahme, type Befund, type Position } from "@/lib/angebot"
@@ -2337,7 +2338,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
                   END AS bezug_titel
              FROM publications p
              ${where}
-            ORDER BY p.veroeffentlicht_am DESC, p.created_at DESC
+            ORDER BY p.veroeffentlicht_am DESC NULLS FIRST, p.created_at DESC
             LIMIT $${params.length}`,
           params,
         )) as Record<string, unknown>[]
@@ -2345,7 +2346,12 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
           id: String(r.id),
           was: String(r.was),
           kanal: r.kanal as PublicationKanal,
-          veroeffentlichtAm: tag(r.veroeffentlicht_am as Ts),
+          /* §18 — vor Migration 021 gibt es die Spalte nicht; `p.*` liefert
+             dann nichts, und jeder Eintrag ist, was er war: veroeffentlicht. */
+          zustand: istZustand(r.zustand) ? r.zustand : "veroeffentlicht",
+          quelle: istQuelle(r.quelle_art) ? { art: r.quelle_art, id: (r.quelle_id as string | null) ?? null } : null,
+          freigegebenVon: (r.freigegeben_von as string | null) ?? null,
+          veroeffentlichtAm: r.veroeffentlicht_am ? tag(r.veroeffentlicht_am as Ts) : null,
           url: (r.url as string | null) ?? null,
           reaktion: r.reaktion as PublicationReaktion,
           reaktionNotiz: (r.reaktion_notiz as string | null) ?? null,
@@ -2378,6 +2384,58 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         return { id }
       } catch {
         return null
+      }
+    },
+
+    /* §18 — Entwurf → Freigabe → Veroeffentlichung. Jede Stufe prueft den
+       Vorzustand IN der Anweisung (`WHERE zustand = …`): Ein Doppelklick
+       oder ein veralteter Tab kann keinen Schritt ueberspringen. Fehlen die
+       Spalten (021 nicht angewendet), liefern alle drei `null`/`false`. */
+    async recordDraft(input): Promise<{ id: string } | null> {
+      await ready()
+      const id = randomUUID()
+      try {
+        await sql.query(
+          `INSERT INTO publications (id, was, kanal, zustand, quelle_art, quelle_id, actor, created_at, updated_at)
+           VALUES ($1,$2,$3,'entwurf',$4,$5,$6, now(), now())`,
+          [id, input.was.trim(), input.kanal, input.quelle, input.quelleId?.trim() || null, akteur.kennung],
+        )
+        return { id }
+      } catch {
+        return null
+      }
+    },
+
+    async approvePublication(id): Promise<boolean> {
+      await ready()
+      if (akteur.kennung !== "owner") return false
+      try {
+        const rows = (await sql.query(
+          `UPDATE publications
+              SET zustand = 'freigegeben', freigegeben_von = $2, freigegeben_am = now(), updated_at = now()
+            WHERE id = $1::text AND zustand = 'entwurf'
+          RETURNING id`,
+          [id, akteur.kennung],
+        )) as unknown[]
+        return rows.length === 1
+      } catch {
+        return false
+      }
+    },
+
+    async markPublished(id, am, url): Promise<boolean> {
+      await ready()
+      try {
+        const rows = (await sql.query(
+          `UPDATE publications
+              SET zustand = 'veroeffentlicht', veroeffentlicht_am = $2::date, url = COALESCE($3, url), updated_at = now()
+            WHERE id = $1::text AND zustand = 'freigegeben'
+          RETURNING id`,
+          [id, am, url?.trim() || null],
+        )) as unknown[]
+        return rows.length === 1
+      } catch {
+        return false
       }
     },
 

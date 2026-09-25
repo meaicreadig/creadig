@@ -6,7 +6,16 @@ import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { datumAnzeige, geschaeftsTag } from "@/lib/geschaeftszeit"
 import { getVertriebStore } from "@/lib/lead-store"
 import { PUBLICATION_BEZUG_ARTEN, PUBLICATION_KANAELE, PUBLICATION_REAKTIONEN } from "@/lib/vertrieb"
-import { reaktionEintragen, veroeffentlichungErfassen } from "./actions"
+import { PUBLICATION_QUELLEN, PUBLICATION_ZUSTAENDE, istZustand, kannFreigeben, kannVeroeffentlichen } from "@/lib/veroeffentlichung-zustand"
+import { cookies } from "next/headers"
+import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
+import {
+  alsVeroeffentlichtEintragen,
+  entwurfAnlegen,
+  entwurfFreigeben,
+  reaktionEintragen,
+  veroeffentlichungErfassen,
+} from "./actions"
 
 /**
  * B-3 · DAS VERÖFFENTLICHUNGSREGISTER — EINE FLÄCHE, VIER FRAGEN.
@@ -50,7 +59,7 @@ export async function generateMetadata() {
 export default async function Veroeffentlichungen({
   searchParams,
 }: {
-  searchParams: Promise<{ kanal?: string }>
+  searchParams: Promise<{ kanal?: string; zustand?: string }>
 }) {
   const { t, intl, sprache } = await adminSprachKontext()
   const v = t.veroeffentlichungen
@@ -59,14 +68,52 @@ export default async function Veroeffentlichungen({
     ? (params.kanal as (typeof PUBLICATION_KANAELE)[number])
     : undefined
 
+  const zustand = istZustand(params.zustand) ? params.zustand : undefined
+  const { rolle } = await verifySession((await cookies()).get(ADMIN_COOKIE)?.value)
+
   const store = getVertriebStore()
-  const eintraege = store ? await store.listPublications({ kanal, limit: 100 }) : null
+  const alle = store ? await store.listPublications({ kanal, limit: 100 }) : null
+  /* §18 — der Zustand wird hier gefiltert, nicht in der Abfrage: Vor
+     Migration 021 kennt die Tabelle die Spalte nicht, und jede Zeile ist
+     dann `veroeffentlicht`. So bleibt die Seite in beiden Staenden lesbar. */
+  const eintraege = alle && zustand ? alle.filter((e) => e.zustand === zustand) : alle
 
   /* Die eine Zahl, die etwas entscheidet: Hat Veröffentlichen Gespräche ausgelöst? */
   const mitReaktion = (eintraege ?? []).filter((e) => e.reaktion !== "keine")
 
   return (
     <AdminShell title={v.titel} lead={v.lead}>
+      {/* ── §18 · Entwurf mit Quelle ─────────────────────────────────── */}
+      <section aria-labelledby="entwurf-titel" className="mb-14">
+        <SectionHeader id="entwurf-titel" title={v.entwurfTitel} />
+        <p className="type-small text-muted-foreground mt-2 max-w-2xl text-pretty">{v.entwurfHinweis}</p>
+        <Surface className="mt-5">
+          <form action={entwurfAnlegen} className="flex flex-wrap items-end gap-4">
+            <AdminField label={v.was} htmlFor="entwurf-was" className="flex-1 basis-72">
+              <AdminInput id="entwurf-was" name="was" required maxLength={200} placeholder={v.wasPlatzhalter} />
+            </AdminField>
+            <AdminField label={v.kanal} htmlFor="entwurf-kanal">
+              <AdminSelect id="entwurf-kanal" name="kanal" defaultValue="linkedin">
+                {PUBLICATION_KANAELE.map((k) => (
+                  <option key={k} value={k}>{v.kanaele[k]}</option>
+                ))}
+              </AdminSelect>
+            </AdminField>
+            <AdminField label={v.quelle} htmlFor="entwurf-quelle">
+              <AdminSelect id="entwurf-quelle" name="quelle" defaultValue="build">
+                {PUBLICATION_QUELLEN.map((q) => (
+                  <option key={q} value={q}>{v.quellen[q]}</option>
+                ))}
+              </AdminSelect>
+            </AdminField>
+            <AdminField label={v.quelleId} htmlFor="entwurf-quelleId" className="flex-1 basis-56">
+              <AdminInput id="entwurf-quelleId" name="quelleId" maxLength={120} />
+            </AdminField>
+            <button type="submit" className="cta-outline min-h-11 px-5 py-2.5 text-sm">{v.entwurfAnlegen}</button>
+          </form>
+        </Surface>
+      </section>
+
       {/* ── Eintragen ─────────────────────────────────────────────────── */}
       <section aria-labelledby="erfassen-titel">
         <SectionHeader id="erfassen-titel" title={v.erfassenTitel} />
@@ -111,6 +158,14 @@ export default async function Veroeffentlichungen({
               ))}
             </AdminSelect>
           </AdminField>
+          <AdminField label={v.zustand} htmlFor="zustandFilter">
+            <AdminSelect id="zustandFilter" name="zustand" defaultValue={zustand ?? ""}>
+              <option value="">{v.alleZustaende}</option>
+              {PUBLICATION_ZUSTAENDE.map((z) => (
+                <option key={z} value={z}>{v.zustaende[z]}</option>
+              ))}
+            </AdminSelect>
+          </AdminField>
           <button type="submit" className="cta-quiet min-h-11 px-4 py-2 text-sm">{v.anwenden}</button>
         </form>
 
@@ -129,7 +184,8 @@ export default async function Veroeffentlichungen({
                     <div className="min-w-0">
                       <p className="type-body text-foreground text-pretty">{e.was}</p>
                       <p className="type-small text-muted-foreground mt-1">
-                        {v.kanaele[e.kanal]} · {datumAnzeige(e.veroeffentlichtAm, intl)}
+                        {v.kanaele[e.kanal]} · {e.veroeffentlichtAm ? datumAnzeige(e.veroeffentlichtAm, intl) : v.ohneDatum}
+                        {e.quelle ? ` · ${v.quellen[e.quelle.art]}` : null}
                         {e.url ? (
                           <>
                             {" · "}
@@ -140,8 +196,36 @@ export default async function Veroeffentlichungen({
                         ) : null}
                       </p>
                     </div>
-                    <Pill severity={e.reaktion === "keine" ? "neutral" : "attention"}>{v.reaktionen[e.reaktion]}</Pill>
+                    {e.zustand === "veroeffentlicht" ? (
+                      <Pill severity={e.reaktion === "keine" ? "neutral" : "attention"}>{v.reaktionen[e.reaktion]}</Pill>
+                    ) : (
+                      <Pill severity="attention">{v.zustaende[e.zustand]}</Pill>
+                    )}
                   </div>
+
+                  {/* §18 — Entwurf: nur der Owner gibt frei. */}
+                  {e.zustand === "entwurf" ? (
+                    kannFreigeben(e, rolle) ? (
+                      <form action={entwurfFreigeben.bind(null, e.id)} className="border-line mt-4 border-t pt-4">
+                        <button type="submit" className="cta-outline min-h-11 px-5 py-2.5 text-sm">{v.freigeben}</button>
+                      </form>
+                    ) : (
+                      <p className="type-small text-muted-foreground border-line mt-4 border-t pt-4">{v.nurOwnerGibtFrei}</p>
+                    )
+                  ) : null}
+
+                  {/* §18 — Freigegeben: erst jetzt darf es als veroeffentlicht eingetragen werden. */}
+                  {kannVeroeffentlichen(e) ? (
+                    <form action={alsVeroeffentlichtEintragen.bind(null, e.id)} className="border-line mt-4 flex flex-wrap items-end gap-3 border-t pt-4">
+                      <AdminField label={v.am} htmlFor={`am-${e.id}`}>
+                        <AdminInput id={`am-${e.id}`} name="am" type="date" defaultValue={geschaeftsTag()} required />
+                      </AdminField>
+                      <AdminField label={v.url} htmlFor={`url-${e.id}`} className="flex-1 basis-56">
+                        <AdminInput id={`url-${e.id}`} name="url" type="url" placeholder="https://" />
+                      </AdminField>
+                      <button type="submit" className="cta-outline min-h-11 px-5 py-2.5 text-sm">{v.alsVeroeffentlicht}</button>
+                    </form>
+                  ) : null}
 
                   {e.reaktionNotiz ? (
                     <p className="type-small text-foreground/90 border-line mt-3 border-s-2 py-1 ps-4 text-pretty">
@@ -166,7 +250,8 @@ export default async function Veroeffentlichungen({
                     </p>
                   ) : null}
 
-                  {/* Nachtragen: was daraus wurde. */}
+                  {/* Nachtragen: was daraus wurde — nur, was hinausging. */}
+                  {e.zustand === "veroeffentlicht" ? (
                   <form action={reaktionEintragen.bind(null, e.id)} className="border-line mt-4 flex flex-wrap items-end gap-3 border-t pt-4">
                     <AdminField label={v.reaktion} htmlFor={`reaktion-${e.id}`}>
                       <AdminSelect id={`reaktion-${e.id}`} name="reaktion" defaultValue={e.reaktion}>
@@ -191,6 +276,7 @@ export default async function Veroeffentlichungen({
                     </AdminField>
                     <button type="submit" className="cta-quiet min-h-11 px-4 py-2 text-sm">{v.speichern}</button>
                   </form>
+                  ) : null}
                 </Surface>
               </li>
             ))}

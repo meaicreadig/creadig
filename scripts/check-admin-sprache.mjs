@@ -133,6 +133,21 @@ console.log(`  migriert: ${MIGRIERT.size} Dateien · offen: ${offeneDateien} Dat
  * in BEIDEN Sprachen einen Satz hat. Ein neuer Code ohne Text faellt damit
  * beim Bauen auf und nicht beim Kunden.
  * ═══════════════════════════════════════════════════════════════════════════ */
+/* W6 · A3 — keine Technik-Begriffe in der Oberflaeche. „Migration 020" ist
+   ein Wort fuer den, der die Datenbank baut, nicht fuer den, der sie nutzt. */
+console.log("\n2b · Keine Migrationsnummern im sichtbaren Text")
+{
+  const texte = []
+  const sammle = (o) => {
+    if (typeof o === "string") texte.push(o)
+    else if (o && typeof o === "object") for (const v of Object.values(o)) sammle(v)
+  }
+  sammle(de)
+  sammle(tr)
+  const technik = texte.filter((t) => /\bMigration \d{3}\b/i.test(t))
+  pruefe("Admin-Texte nennen keine Migrationsnummer", technik.length === 0, technik.slice(0, 2).join(" | "))
+}
+
 console.log("\n3 · Maschinenwerte aus dem Server haben in beiden Sprachen einen Text")
 const { BEFUND_CODES, ABSCHNITTE } = await import("@/lib/angebot")
 const { MANGEL_CODES, UEBERGABE_STUECKE, PROJEKT_ZUSTAENDE } = await import("@/lib/lieferung")

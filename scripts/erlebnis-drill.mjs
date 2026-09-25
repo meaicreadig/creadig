@@ -205,7 +205,12 @@ try {
   }
 
   /* ===================================================================== *
-   * 5 · DIE KAUFLOGIK IST NOCH DA (KEINE VEREINFACHUNG OHNE DECKUNG)
+   * 5 · DIE KAUFLOGIK STEHT IN EINER PREISTABELLE (W1/W2)
+   *
+   * Bis zum 25.09.2026 prueften wir hier die Sektion „Drei Wege zu einem
+   * Preis". Sie ist gegangen — die Final Implementation hat die Seite auf
+   * EINE Preistabelle aus `lib/offers.ts` gestellt. Was die Kauflogik trug,
+   * muss trotzdem auf der Seite stehen; genau das prueft dieser Block.
    * ===================================================================== */
   {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: "de-DE" })
@@ -213,22 +218,14 @@ try {
     await page.goto(`${BASE}/leistungen`, { waitUntil: "networkidle" })
     const text = await page.locator("main").innerText()
     const stellen = [
-      ["drei Kaufwege", /Umfang steht vorher fest/i.test(text) && /Umfang entsteht zuerst/i.test(text) && /laufender Zustand/i.test(text)],
-      ["149-Unterscheidung", /Individualanwendung/i.test(text)],
-      ["keine Stufe darueber", /keine Betriebsstufe über der laufenden Betreuung/i.test(text)],
-      ["Standardsoftware-Fall", /Standardsoftware/i.test(text)],
-      ["Anbindung als eigener Fall", /Anbindung/i.test(text)],
-      ["Systemprojekt ohne Listenpreis", /Kein Listenpreis und keine Spanne/i.test(text)],
+      ["Website zum Festpreis", /Festpreis/i.test(text) && /3\.900/.test(text)],
+      ["Pilotplatz mit Gegenleistung", /Pilotplatz/i.test(text) && /Referenzfreigabe/i.test(text)],
+      ["Systemprojekt nach Analyse", /Angebot nach Analyse/i.test(text)],
+      ["Betreuung nur fuer eigene Seiten", /Nur für Seiten, die wir gebaut haben/i.test(text)],
+      ["kein „ab“ vor einem Festpreis", !/\bab\s+\d{1,3}\.\d{3}/i.test(text)],
     ]
     for (const [name, da] of stellen) pruefe(`Kauflogik erhalten: ${name}`, da)
-
-    /* Und die Sektion darf nicht wieder wachsen. */
-    const woerter = await page.evaluate(() => {
-      const s = document.querySelector("#kaufwege")
-      return s ? (s.innerText || "").trim().split(/\s+/).filter(Boolean).length : -1
-    })
-    console.log(`  /leistungen · Sektion „Kaufwege": ${woerter} Woerter`)
-    pruefe("Kaufwege bleibt unter 470 Woertern", woerter > 0 && woerter < 470, `${woerter}`)
+    pruefe("keine zweite Ordnung neben der Preistabelle", (await page.$("#kaufwege")) === null)
     await ctx.close()
   }
 } finally {

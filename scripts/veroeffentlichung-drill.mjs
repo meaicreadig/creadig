@@ -148,6 +148,44 @@ console.log("\nV8 · Fehlt die Tabelle, faellt nichts aus")
   p(typeof summary.newEnquiries === "number", "und der Vertrieb antwortet weiter")
 }
 
+console.log("\nV9 · §18 Freigabe-Schutz: entwurf → freigegeben → veroeffentlicht, nie direkt")
+{
+  const { kannVeroeffentlichen, kannFreigeben } = await import("@/lib/veroeffentlichung-zustand")
+  /* V8 hat die Tabelle entfernt — neu aufsetzen, dann einen Eintrag auf dem
+     alten Weg („schon hinaus") anlegen, bevor der neue Weg geprueft wird. */
+  for (const stmt of SCHEMA) await q(stmt)
+  const altEintrag = await store.recordPublication({ was: "Bestand", kanal: "website", veroeffentlichtAm: "2026-09-01", url: null })
+  p(kannVeroeffentlichen({ zustand: "entwurf" }) === false, "rein: Entwurf ist nicht veroeffentlichbar")
+  p(kannVeroeffentlichen({ zustand: "freigegeben" }) === true, "rein: Freigegebenes ist veroeffentlichbar")
+  p(kannFreigeben({ zustand: "entwurf" }, "redaktion") === false, "rein: Redaktion gibt nicht frei")
+  p(kannFreigeben({ zustand: "entwurf" }, "owner") === true, "rein: Owner gibt frei")
+
+  const entwurf = await store.recordDraft({ was: "Einwand: Gehoert mir das dann?", kanal: "linkedin", quelle: "einwand", quelleId: null })
+  p(Boolean(entwurf?.id), "Entwurf angelegt")
+  p((await store.markPublished(entwurf.id, "2026-09-25", null)) === false, "Entwurf laesst sich NICHT direkt veroeffentlichen")
+
+  const redaktion = createNeonVertrieb(ZIEL, { kennung: "redaktion", herkunft: "HUMAN" })
+  p((await redaktion.approvePublication(entwurf.id)) === false, "Redaktion kann nicht freigeben (Store prueft selbst)")
+  p((await store.approvePublication(entwurf.id)) === true, "Owner gibt frei")
+  p((await store.approvePublication(entwurf.id)) === false, "zweite Freigabe ist wirkungslos")
+  p((await store.markPublished(entwurf.id, "2026-09-25", "https://example.invalid/b")) === true, "Freigegebenes wird veroeffentlicht")
+
+  const l = await store.listPublications({ limit: 50 })
+  const zeile = l?.find((x) => x.id === entwurf.id)
+  p(zeile?.zustand === "veroeffentlicht" && zeile?.veroeffentlichtAm === "2026-09-25", "Zustand und Datum stehen")
+  p(zeile?.quelle?.art === "einwand" && zeile?.freigegebenVon === "owner", "Quelle und Freigebender stehen")
+  const alt = l?.find((x) => x.id === altEintrag?.id)
+  p(alt?.zustand === "veroeffentlicht", "Bestand (vor 021 eingetragen) bleibt veroeffentlicht")
+
+  let abgewiesen = false
+  try {
+    await q(`INSERT INTO publications (id, was, kanal, zustand) VALUES ('ohne-datum','x','website','veroeffentlicht')`)
+  } catch {
+    abgewiesen = true
+  }
+  p(abgewiesen, "Datenbank weist „veroeffentlicht ohne Datum“ ab")
+}
+
 await client.end()
 console.log(
   fehler === 0

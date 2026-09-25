@@ -158,7 +158,7 @@ export function traegtDerPreis(
   aufwand: readonly Aufwand[],
 ): Margenlage {
   const paket = packages.find((p) => p.key === paketKey)
-  const preis = paket ? (paket.regularAmount ?? paket.amount) : null
+  const preis = paket ? paket.amount : null
   return marge(preis === null ? null : preis * 100, aufwand)
 }
 

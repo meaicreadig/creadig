@@ -78,6 +78,24 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://creadig.de"
 /** Alle Sprachen, in denen die Seite ausgeliefert wird — Reihenfolge = Rang. */
 export const locales = ["de", "tr", "en", "ar"] as const
 
+/*
+ * S1 — WELCHE SPRACHEN SUCHMASCHINEN ANGEBOTEN WERDEN.
+ *
+ * `locales` sagt, welche Routenbaeume gebaut werden. Diese Liste sagt, welche
+ * davon in hreflang, Sitemap und Sprachwechsler stehen und indexiert werden.
+ * Eine Sprache, die hier fehlt, bleibt erreichbar (keine 404), traegt aber
+ * `noindex` und taucht in keiner Alternativ-Liste auf.
+ *
+ * OWNER-ENTSCHEIDUNG O5 — Empfehlung: Arabisch zurueckstellen (kein
+ * Kaeufersegment, aber jeder Text viermal gepflegt). Umsetzen heisst: "ar"
+ * aus dieser Zeile nehmen. Sonst nichts.
+ */
+export const INDEXED_LOCALES = ["de", "tr", "en", "ar"] as const satisfies readonly Locale[]
+
+export function isIndexed(locale: Locale): boolean {
+  return (INDEXED_LOCALES as readonly Locale[]).includes(locale)
+}
+
 /**
  * Deutscher Pfad → Pfad in der Zielsprache.
  *
@@ -171,7 +189,7 @@ export function localeAlternates(path: string, locale: Locale) {
     Woerterbuch hat, kann hier keine Adresse auftauchen, die es nicht gibt.
   */
   const languages: Record<string, string> = {}
-  for (const other of locales) languages[other] = localePath(path, other)
+  for (const other of locales) if (isIndexed(other)) languages[other] = localePath(path, other)
   languages["x-default"] = localePath(path, DEFAULT_LOCALE)
 
   return { canonical: localePath(path, locale), languages }

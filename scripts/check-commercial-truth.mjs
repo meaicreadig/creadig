@@ -33,6 +33,8 @@ import { fileURLToPath } from "node:url"
 
 import { processors } from "@/lib/site-data"
 import { genannteClientWorks, productWorks } from "@/lib/site-data"
+import { ebenenEinstiege } from "@/lib/einstiege"
+import { findOffer } from "@/lib/offers"
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const APP_DIR = path.join(ROOT, ".next", "server", "app")
@@ -237,8 +239,43 @@ if (genannteClientWorks.length === 0) {
   )
 }
 
+/* ---------------------------------------------------------------------------
+ * 8 · W1 — JEDER BETRAG AUS EINER QUELLE (R1–R3)
+ *
+ * R1  Im Quelltext von Woerterbuch und Leistungsseiten steht kein Betrag als
+ *     Literal. Betraege sind Platzhalter (`{price:website}`) oder kommen aus
+ *     `lib/offers.ts`. Kommentare zaehlen nicht.
+ * R2  Die Website-Betreuung ist monatlich und steht nie als Preis an der
+ *     Ebene „Operations".
+ * R3  Kein „ab" vor einem Festpreis in der ausgelieferten Seite.
+ * ------------------------------------------------------------------------- */
+{
+  const BETRAG = /(\d{1,3}[.,]\d{3}|\b149)\s?(€|EUR\b|يورو)|€\s?\d/
+  for (const datei of ["lib/dictionary.ts", "lib/service-pages.ts"]) {
+    const zeilen = fs.readFileSync(path.join(ROOT, datei), "utf8").split("\n")
+    zeilen.forEach((zeile, i) => {
+      const t = zeile.trim()
+      if (t.startsWith("*") || t.startsWith("/*") || t.startsWith("//")) return
+      if (BETRAG.test(zeile)) probleme.push(`${datei}:${i + 1}: Betrag als Literal — gehoert nach lib/offers.ts: ${t.slice(0, 80)}`)
+    })
+  }
+  const betreuung = findOffer("betreuung")
+  if (betreuung.period !== "month") probleme.push("offers: die Website-Betreuung ist nicht monatlich.")
+  const ops = ebenenEinstiege.find((e) => e.layer === "operations")
+  if (ops && ops.betrag !== null) {
+    probleme.push(`einstiege: „Operations" traegt ${ops.betrag} € — die Website-Betreuung ist kein Preis fuer Systemarbeit (R2).`)
+  }
+  for (const s of seiten) {
+    /* Gelesen wird der sichtbare Text: „Festpreis ab" und die Zahl stehen oft
+       in zwei Elementen, und ein Muster ueber das Markup saehe sie nie. */
+    const text = s.text.replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;|\s+/g, " ")
+    const m = text.match(/\b(ab|from|itibaren|من)\s(\d{1,3}[.,]\d{3}|149)\s?(€|يورو)|\bfrom €\s?\d/i)
+    if (m) probleme.push(`${s.kurz}: „${m[0]}" — ein Festpreis traegt kein „ab" (R3).`)
+  }
+}
+
 console.log(
-  `\nHandels-Wahrheits-Gate — ${seiten.length} gebaute Seiten · 7 Regeln · ` +
+  `\nHandels-Wahrheits-Gate — ${seiten.length} gebaute Seiten · 8 Regeln · ` +
     `${processors.length} Verarbeiter (${offeneVerarbeiter.length} offen) · ` +
     `${productWorks.length} Produkte (${imBetrieb} im Betrieb)`,
 )

@@ -33,7 +33,7 @@
  * Was es NICHT tut: eine Datenschutzerklaerung formulieren oder beurteilen,
  * ob sie juristisch traegt. Das ist keine Frage an ein Skript.
  */
-import { readFileSync } from "node:fs"
+import { readFileSync, readdirSync } from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -41,6 +41,9 @@ import { KAMPAGNEN_FELDER, datenschutzText, kampagneSpeicherbar } from "../lib/h
 import { VERLUST_LEHREN, lehrenVollstaendig, lehreZu } from "../lib/verlust.ts"
 import { LOST_REASONS } from "../lib/sales-playbook.ts"
 import { dictionary } from "../lib/dictionary.ts"
+import { mediaProvenance, taugtAlsBeleg } from "../lib/media-provenance.ts"
+import { caseStudies, clientWorks, productWorks } from "../lib/site-data.ts"
+import { produktBelege } from "../lib/produkt-beleg.ts"
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const fehler = []
@@ -144,6 +147,36 @@ console.log(
     ? "  Die Datenschutzerklaerung NENNT die Kampagnenherkunft — die Felder gehen durch."
     : "  Die Datenschutzerklaerung nennt die Kampagnenherkunft NICHT — die Felder fallen an der Tuer.",
 )
+
+/* ---------------------------------------------------------------------------
+ * W4 · §11 — BILDHERKUNFT
+ *
+ * 1  Jede Datei direkt unter public/works und public/images hat einen Eintrag
+ *    in lib/media-provenance.ts. Ein Bild ohne Herkunft ist eines, bei dem
+ *    niemand mehr weiss, ob es echt ist.
+ * 2  Kein Werk, kein Fall und kein Produktbeleg verweist auf ein Bild mit
+ *    Herkunft „illustration" — und kein Werk traegt `imageProof: "illustration"`.
+ * ------------------------------------------------------------------------- */
+for (const ordner of ["works", "images"]) {
+  for (const e of readdirSync(path.join(ROOT, "public", ordner), { withFileTypes: true })) {
+    if (!e.isFile() || e.name === "README.md" || e.name.startsWith(".")) continue
+    const src = `/${ordner}/${e.name}`
+    if (!mediaProvenance.some((m) => m.src === src)) {
+      fehler.push(`${src} hat keinen Herkunftseintrag in lib/media-provenance.ts.`)
+    }
+  }
+}
+const belegBilder = [
+  ...[...productWorks, ...clientWorks].map((w) => [`Werk ${w.slug}`, w.image]),
+  ...caseStudies.map((c) => [`Fall ${c.slug}`, c.image]),
+  ...produktBelege.map((b) => [`Produktbeleg ${b.slug}`, b.situBild]),
+]
+for (const [wer, src] of belegBilder) {
+  if (!taugtAlsBeleg(src)) fehler.push(`${wer} verweist auf ${src} — Herkunft „illustration" oder unbekannt, kein Beleg.`)
+}
+for (const w of [...productWorks, ...clientWorks]) {
+  if (w.imageProof === "illustration") fehler.push(`Werk ${w.slug}: „illustration" darf nicht als Produkt- oder Kundenbeleg stehen.`)
+}
 
 if (fehler.length > 0) {
   console.error(`\nABGEBROCHEN — ${fehler.length} Befund(e):\n`)

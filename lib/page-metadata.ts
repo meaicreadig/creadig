@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { dictionary, type Locale } from "@/lib/dictionary"
-import { SITE_URL, localeAlternates, localeUrl, locales, openGraphLocale } from "@/lib/routes"
+import { SITE_URL, isIndexed, localeAlternates, localeUrl, locales, openGraphLocale } from "@/lib/routes"
 
 /**
  * T-1 / SEO-1 — die Kopfdaten jeder Unterseite, an einer Stelle.
@@ -103,7 +103,7 @@ export function pageMetadata({
        * OpenGraph erlaubt mehrere `alternateLocale`; hier stehen alle
        * gepflegten ausser der eigenen.
        */
-      alternateLocale: locales.filter((l) => l !== locale).map((l) => openGraphLocale[l]),
+      alternateLocale: locales.filter((l) => l !== locale && isIndexed(l)).map((l) => openGraphLocale[l]),
       siteName: "creaDIG",
       type,
       images: ogImage(locale),
@@ -118,6 +118,7 @@ export function pageMetadata({
       description,
       images: ogImage(locale),
     },
-    ...(noIndex ? { robots: { index: false, follow: true } } : {}),
+    /* S1 — eine zurueckgestellte Sprache bleibt erreichbar, wird aber nicht indexiert. */
+    ...(noIndex || !isIndexed(locale) ? { robots: { index: false, follow: true } } : {}),
   }
 }

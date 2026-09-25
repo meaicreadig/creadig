@@ -1,6 +1,7 @@
 import type { Locale } from "@/lib/dictionary"
 import type { Localized, Package } from "@/lib/site-data"
 import { genannteClientWorks, productWorks } from "@/lib/site-data"
+import { findOffer, formatPrice, localizedPrice, localizedRange, remediationRange, VAT_PERCENT } from "@/lib/offers"
 
 /**
  * Granulare Leistungsseiten (E-K4).
@@ -255,7 +256,7 @@ export const servicePages: ServicePage[] = [
     },
     forWhom: {
       de: ["Bäckerei, Praxis, Restaurant, Handwerksbetrieb", "Betriebe ohne eigene IT-Abteilung"],
-      tr: ["Fırın, muayenehane, restoran, zanaat işletmesi", "Kendi BT birimi olmayan işletmeler"],
+      tr: ["Fırın, muayenehane, restoran, usta işletmesi", "Kendi BT birimi olmayan işletmeler"],
       en: ["Bakeries, practices, restaurants, trade businesses", "Businesses without their own IT department"],
       ar: ["مخابز وعيادات ومطاعم ومنشآت حِرفية", "منشآت دون قسم تقنية معلومات خاص"],
     },
@@ -358,7 +359,7 @@ export const servicePages: ServicePage[] = [
     },
     forWhom: {
       de: ["Gründer und neue Betriebe", "Handwerk vor dem ersten Auftritt"],
-      tr: ["Girişimciler ve yeni işletmeler", "İlk görünümünden önceki zanaat işletmeleri"],
+      tr: ["Girişimciler ve yeni işletmeler", "İlk görünümünden önceki usta ve esnaf işletmeleri"],
       en: ["Founders and new businesses", "Trades before their first public presence"],
       ar: ["المؤسسون والمنشآت الجديدة", "الحِرف قبل أول ظهور علني"],
     },
@@ -411,11 +412,11 @@ export const servicePages: ServicePage[] = [
   },
   {
     slug: "website-handwerk",
-    chip: { de: "Website fürs Handwerk", tr: "Zanaat için web sitesi", en: "Website for trades", ar: "موقع للحِرف" },
+    chip: { de: "Website fürs Handwerk", tr: "Usta işletmeleri için web sitesi", en: "Website for trades", ar: "موقع للحِرف" },
     layer: "digital",
     h1: {
       de: "Website für Handwerksbetriebe.",
-      tr: "Zanaat işletmeleri için web sitesi.",
+      tr: "Usta ve esnaf işletmeleri için web sitesi.",
       en: "Websites for trade businesses.",
       ar: "مواقع للمنشآت الحِرفية.",
     },
@@ -425,10 +426,16 @@ export const servicePages: ServicePage[] = [
       en: "Businesses with 6–20 staff in North Rhine-Westphalia and Lower Saxony are our focus. We look at the business before we build a line — and then build what holds up in daily work.",
       ar: "المنشآت من 6 إلى 20 موظفًا في شمال الراين وساكسونيا السفلى هي مجال تركيزنا. ننظر في المنشأة قبل أن نبني سطرًا — ثم نبني ما يصمد في العمل اليومي.",
     },
-    metaTitle: { de: "Website für Handwerksbetriebe", tr: "Zanaat işletmeleri için web sitesi", en: "Websites for trade businesses", ar: "مواقع للمنشآت الحِرفية" },
+    /* S3 — der Betrag im Titel kommt aus `lib/offers.ts`, nie getippt. */
+    metaTitle: {
+      de: `Website für Handwerksbetriebe · Festpreis ${formatPrice(findOffer("website").amount ?? 0, "de")}`,
+      tr: `Usta ve esnaf işletmeleri için web sitesi · Sabit fiyat ${formatPrice(findOffer("website").amount ?? 0, "tr")}`,
+      en: `Websites for trade businesses · fixed price ${formatPrice(findOffer("website").amount ?? 0, "en")}`,
+      ar: `مواقع للمنشآت الحِرفية · سعر ثابت ${formatPrice(findOffer("website").amount ?? 0, "ar")}`,
+    },
     metaDescription: {
       de: "Websites für Handwerksbetriebe mit 6–20 Mitarbeitern in NRW und Niedersachsen. Erst den Betrieb verstehen, dann bauen, dann betreiben.",
-      tr: "NRW ve Aşağı Saksonya'da 6–20 çalışanlı zanaat işletmeleri için web siteleri. Önce işletmeyi anlamak, sonra kurmak, sonra işletmek.",
+      tr: "NRW ve Aşağı Saksonya'da 6–20 çalışanlı usta ve esnaf işletmeleri için web siteleri. Önce işletmeyi anlamak, sonra kurmak, sonra işletmek.",
       en: "Websites for trade businesses with 6–20 staff in North Rhine-Westphalia and Lower Saxony. Understand the business first, then build, then operate.",
       ar: "مواقع للمنشآت الحِرفية من 6 إلى 20 موظفًا في شمال الراين وساكسونيا السفلى. نفهم المنشأة أولًا، ثم نبني، ثم نشغّل.",
     },
@@ -464,7 +471,7 @@ export const servicePages: ServicePage[] = [
         "Betriebe mit wachsendem Papierberg",
       ],
       tr: [
-        "6–20 çalışanlı zanaat işletmeleri (NRW & Aşağı Saksonya)",
+        "6–20 çalışanlı usta ve esnaf işletmeleri (NRW & Aşağı Saksonya)",
         "Evrak yükü büyüyen işletmeler",
       ],
       en: [
@@ -539,10 +546,10 @@ export const servicePages: ServicePage[] = [
       ar: "استشارة ومستندات ومتابعة جارية بالألمانية والتركية — وعبر واتساب بالكامل إن رغبتم. دون مترجم في الوسط، ودون موقع مترجَم نصفيًا.",
     },
     metaTitle: {
-      de: "Zweisprachige Website und Betreuung (DE/TR)",
-      tr: "İki dilli web sitesi ve destek (DE/TR)",
-      en: "A bilingual website and support (DE/TR)",
-      ar: "موقع ومتابعة بلغتين (DE/TR)",
+      de: "Zweisprachige Website Deutsch-Türkisch",
+      tr: "Almanca-Türkçe iki dilli web sitesi",
+      en: "Bilingual website German–Turkish",
+      ar: "موقع ثنائي اللغة ألماني-تركي",
     },
     metaDescription: {
       de: "Website, Marke und laufende Betreuung auf Deutsch und Türkisch. Für Betriebe mit Kundschaft oder Mitarbeitern in beiden Sprachen — Kommunikation auf Wunsch über WhatsApp.",
@@ -795,10 +802,10 @@ export const servicePages: ServicePage[] = [
       ar: "عميلٌ يترك الطلب لأن قارئ الشاشة لديه لا يقرأ الحقل الإلزامي. لا يكتب لكم لماذا — يختفي ببساطة. نفحص موقعكم وفق WCAG 2.1 AA يدويًا، ونكتب كل نتيجة بدليلها، ونعالجها في الشيفرة. لا طبقة تغطية ولا أداة إضافية.",
     },
     metaTitle: {
-      de: "Barrierefreiheit Website & BFSG Onlineshop",
-      tr: "Web sitesi erişilebilirliği & BFSG (Almanya)",
-      en: "Website accessibility & BFSG for online shops",
-      ar: "إتاحة وصول الموقع والمتجر الإلكتروني وفق BFSG",
+      de: "Barrierefreiheit prüfen lassen (BFSG) · Festpreis",
+      tr: "Web sitesi erişilebilirlik denetimi (BFSG) · Sabit fiyat",
+      en: "Accessibility audit for your website (BFSG) · fixed price",
+      ar: "فحص إتاحة وصول الموقع (BFSG) · سعر ثابت",
     },
     metaDescription: {
       de: "Barrierefreiheit für Website und Onlineshop: manuelle Prüfung nach WCAG 2.1 AA, Befundbericht mit Belegen, Behebung im Code — ohne Overlay. Aus Osnabrück, auf Deutsch und Türkisch.",
@@ -848,7 +855,7 @@ export const servicePages: ServicePage[] = [
       ],
       tr: [
         "Online mağazası veya randevu/rezervasyon akışı olan işletmeler",
-        "Zanaat, KOBİ ve gastronomi — ağırlık Almanya",
+        "Usta ve esnaf işletmeleri, KOBİ ve gastronomi — ağırlık Almanya",
         "Mevcut bir sitesi olan ve önce durumunu öğrenmek isteyenler",
       ],
       en: [
@@ -997,7 +1004,7 @@ export const servicePages: ServicePage[] = [
       steps: [
         {
           key: "pruefung",
-          price: { de: "1.500 €", tr: "1.500 €", en: "€1,500", ar: "1.500 يورو" },
+          price: localizedPrice(findOffer("audit").amount ?? 0),
           kind: "fixed",
           title: { de: "Prüfung", tr: "Denetim", en: "Audit", ar: "الفحص" },
           body: {
@@ -1009,7 +1016,7 @@ export const servicePages: ServicePage[] = [
         },
         {
           key: "behebung",
-          price: { de: "2.000–4.000 €", tr: "2.000–4.000 €", en: "€2,000–4,000", ar: "2.000–4.000 يورو" },
+          price: localizedRange(remediationRange.from, remediationRange.to),
           kind: "offer",
           title: { de: "Behebung", tr: "Giderme", en: "Remediation", ar: "المعالجة" },
           body: {
@@ -1021,9 +1028,9 @@ export const servicePages: ServicePage[] = [
         },
         {
           key: "betreuung",
-          price: { de: "149 €", tr: "149 €", en: "€149", ar: "149 يورو" },
+          price: localizedPrice(findOffer("betreuung").amount ?? 0),
           kind: "monthly",
-          title: { de: "Betreuung", tr: "Sürekli destek", en: "Support", ar: "المتابعة" },
+          title: { de: "Website-Betreuung", tr: "Web sitesi bakımı", en: "Website care", ar: "رعاية الموقع" },
           body: {
             de: "Kein neuer Posten, sondern die laufende Betreuung, die es ohnehin gibt: Darin läuft der automatisierte Barrierefreiheits-Lauf bei jeder Änderung mit — denn jede Änderung an einer Seite kann eine Barriere zurückbringen. Einmal im Jahr sehen wir zusätzlich von Hand nach.",
             tr: "Yeni bir kalem değil, hâlihazırda var olan sürekli destek: İçinde otomatik erişilebilirlik geçişi her değişiklikte birlikte çalışır — çünkü sitedeki her değişiklik bir engeli geri getirebilir. Yılda bir kez ayrıca elle bakarız.",
@@ -1033,10 +1040,10 @@ export const servicePages: ServicePage[] = [
         },
       ],
       note: {
-        de: "Alle Preise netto, zzgl. 19 % USt. Die Prüfung ist der Einstieg und steht für sich: Sie verpflichtet zu keiner Behebung, und der Bericht bleibt bei Ihnen.",
-        tr: "Tüm fiyatlar nettir, %19 KDV hariç. Denetim giriş adımıdır ve tek başına durur: Hiçbir gidermeye mecbur bırakmaz, rapor sizde kalır.",
-        en: "All prices excl. VAT, plus 19% VAT. The audit is the entry point and stands on its own: it commits you to no remediation, and the report stays with you.",
-        ar: "كل الأسعار دون ضريبة، تُضاف إليها 19٪. والفحص هو نقطة الدخول وقائم بذاته: لا يُلزم بأي معالجة، والتقرير يبقى لديكم.",
+        de: `Alle Preise netto, zzgl. ${VAT_PERCENT} % USt. Die Prüfung ist der Einstieg und steht für sich: Sie verpflichtet zu keiner Behebung, und der Bericht bleibt bei Ihnen.`,
+        tr: `Tüm fiyatlar nettir, %${VAT_PERCENT} KDV hariç. Denetim giriş adımıdır ve tek başına durur: Hiçbir gidermeye mecbur bırakmaz, rapor sizde kalır.`,
+        en: `All prices excl. VAT, plus ${VAT_PERCENT}% VAT. The audit is the entry point and stands on its own: it commits you to no remediation, and the report stays with you.`,
+        ar: `كل الأسعار دون ضريبة، تُضاف إليها ${VAT_PERCENT}٪. والفحص هو نقطة الدخول وقائم بذاته: لا يُلزم بأي معالجة، والتقرير يبقى لديكم.`,
       },
     },
     packageKeys: ["website"],

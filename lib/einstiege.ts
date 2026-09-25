@@ -1,4 +1,4 @@
-import { packages, retainer, serviceLayers } from "@/lib/site-data"
+import { packages, serviceLayers } from "@/lib/site-data"
 import { publishedServicePages, type ServiceLayerKey } from "@/lib/service-pages"
 
 /* ==========================================================================
@@ -122,12 +122,18 @@ export const ebenenEinstiege: EbenenEinstieg[] = [
      * gehoert davor und nicht ins Kleingedruckte.
      */
     layer: "operations",
-    art: retainer.amount === null ? "nach-analyse" : "monatlich",
-    betrag: retainer.amount,
+    /*
+     * W1 · R2 — die 149 EUR sind WEBSITE-Betreuung. An der Ebene „Operations"
+     * standen sie als Preis fuer Systembetrieb und haben damit genau die
+     * Arbeit verbilligt, die nach Analyse bepreist wird. Systembetrieb hat
+     * keinen Listenpreis; die Website-Betreuung steht bei der Website.
+     */
+    art: "nach-analyse",
+    betrag: null,
     einstiegHref: "/betrieb",
     belegHref: "/produkte/fibero",
     belegArt: "produkt",
-    bedingung: true,
+    bedingung: false,
   },
   {
     layer: "automation",

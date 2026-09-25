@@ -160,8 +160,14 @@ export const ABSCHNITTE: readonly Abschnitt[] = [
 
 /** Was der Katalog hergibt. Mehr Quellen gibt es nicht. */
 export const KATALOG = {
-  "paket-website": () => packages.find((p) => p.key === "website")?.amount ?? null,
-  "paket-website-regulaer": () => packages.find((p) => p.key === "website")?.regularAmount ?? null,
+  /*
+   * W1 — der Festpreis ist jetzt `amount`, der Pilot ein eigener Betrag.
+   * Die SCHLUESSEL bleiben, weil gespeicherte Angebote sie tragen und ihren
+   * Betrag beim Anzeigen aufloesen: `paket-website` war immer der Pilotbetrag
+   * und bleibt es — ein altes Angebot aendert seine Summe nicht.
+   */
+  "paket-website": () => packages.find((p) => p.key === "website")?.pilotAmount ?? null,
+  "paket-website-regulaer": () => packages.find((p) => p.key === "website")?.amount ?? null,
   "paket-pruefung": () => packages.find((p) => p.key === "audit")?.amount ?? null,
   "betrieb-monatlich": () => retainer.amount,
 } as const
@@ -176,8 +182,8 @@ export type KatalogKey = keyof typeof KATALOG
  * nach Feld etwas anderes tut.
  */
 export const KATALOG_LABEL: Record<KatalogKey, string> = {
-  "paket-website": "Website-Paket",
-  "paket-website-regulaer": "Website-Paket (Regelpreis)",
+  "paket-website": "Website-Paket (Pilotplatz gegen Referenzfreigabe)",
+  "paket-website-regulaer": "Website-Paket (Festpreis)",
   "paket-pruefung": "Barrierefreiheits-Pruefung",
   "betrieb-monatlich": "Betrieb, monatlich",
 }

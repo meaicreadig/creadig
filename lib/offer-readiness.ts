@@ -47,11 +47,12 @@
  * hat: eine Zahl an zwei Stellen, die irgendwann auseinanderlaufen.
  */
 import { formatPrice, packages, retainer } from "@/lib/site-data"
+import { localizedRange, remediationRange } from "@/lib/offers"
 
 const preis = (amount: number | null | undefined): string | null =>
   typeof amount === "number" ? formatPrice(amount, "de") : null
 
-const websitePreis = preis(packages.find((p) => p.key === "website")?.regularAmount)
+const websitePreis = preis(packages.find((p) => p.key === "website")?.amount)
 const pruefungPreis = preis(packages.find((p) => p.key === "audit")?.amount)
 const betriebPreis = preis(retainer.amount)
 
@@ -117,7 +118,7 @@ export const OFFERS: Record<OfferKind, OfferDefinition> = {
   behebung: {
     label: "Barrierefreiheits-Behebung",
     priceShape: "spanne",
-    publicPrice: "2.000–4.000 €",
+    publicPrice: localizedRange(remediationRange.from, remediationRange.to).de,
     evidence: [
       {
         key: "pruefung",

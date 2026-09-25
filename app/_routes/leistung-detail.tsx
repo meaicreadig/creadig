@@ -5,7 +5,7 @@ import { findServicePage, publishedServicePages } from "@/lib/service-pages"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { pageMetadata } from "@/lib/page-metadata"
 import { address, areaServed } from "@/lib/site-data"
-import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
+import { breadcrumbList, jsonLdScript, offerCatalog } from "@/lib/json-ld"
 import { SITE_URL, localeUrl } from "@/lib/routes"
 
 /**
@@ -87,6 +87,8 @@ export async function ServiceRoute({
       availableLanguage: ["de", "tr"],
       url: localeUrl(`/leistungen/${page.slug}`, locale),
     },
+    /* S2 — der Katalog nur auf Seiten, die Preise zeigen. */
+    ...(page.priceLadder || (page.packageKeys?.length ?? 0) > 0 ? [offerCatalog(locale)] : []),
   ]
 
   return (

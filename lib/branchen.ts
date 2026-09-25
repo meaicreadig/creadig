@@ -159,7 +159,7 @@ export const HANDWERK_WORKFLOW: WorkflowStep[] = [
 export const handwerkCopy = {
   metaTitle: {
     de: "Handwerk: Ihr Betrieb läuft — aber wie viel davon noch per Hand?",
-    tr: "Zanaat: İşletmeniz yürüyor — peki ne kadarı hâlâ elle?",
+    tr: "Usta işletmeleri: İşletmeniz yürüyor — peki ne kadarı hâlâ elle?",
     en: "Trades: your business runs — but how much of it still by hand?",
     ar: "الحِرف: منشأتكم تعمل — لكن كم منها ما يزال يدويًا؟",
   },
@@ -169,7 +169,7 @@ export const handwerkCopy = {
     en: "Enquiry, quote, appointment, job, documentation, invoice — six steps, usually six tools. The operations check shows in two minutes where it snags.",
     ar: "استفسار، عرض، موعد، طلب، توثيق، فاتورة — ست خطوات، وغالبًا ست أدوات. فحص المنشأة يُظهر في دقيقتين أين يعلق الأمر.",
   },
-  eyebrow: { de: "Branche · Handwerk", tr: "Sektör · Zanaat", en: "Sector · trades", ar: "قطاع · الحِرف" },
+  eyebrow: { de: "Branche · Handwerk", tr: "Sektör · Usta ve esnaf işletmeleri", en: "Sector · trades", ar: "قطاع · الحِرف" },
   /* Owner-Vorgabe aus dem Master-Prompt — nicht umformuliert. */
   title: {
     de: "Ihr Betrieb läuft. Aber wie viel davon noch per Hand?",
@@ -225,7 +225,7 @@ export const handwerkCopy = {
     en: "We do not build a tool for one step, we build the connection between them. Where the presence is missing we start there; where it stands, we start behind it.",
     ar: "لا نبني أداة لخطوة واحدة، بل الرابط بينها. فحيث ينقص الحضور نبدأ من هناك؛ وحيث هو قائم نبدأ من خلفه.",
   },
-  buildWebsite: { de: "Website fürs Handwerk", tr: "Zanaat için web sitesi", en: "Website for trades", ar: "موقع للحِرف" },
+  buildWebsite: { de: "Website fürs Handwerk", tr: "Usta işletmeleri için web sitesi", en: "Website for trades", ar: "موقع للحِرف" },
   buildLayers: { de: "Die fünf Ebenen", tr: "Beş katman", en: "The five levels", ar: "الطبقات الخمس" },
   buildWorks: { de: "Was wir gebaut haben", tr: "Neler kurduk", en: "What we built", ar: "ما الذي بنيناه" },
   /* MP-E.5 · Der Rückweg von der Leistungsseite auf den Einstieg. */
@@ -237,7 +237,7 @@ export const handwerkCopy = {
   },
   backlinkCta: {
     de: "Der Einstieg für Handwerksbetriebe",
-    tr: "Zanaat işletmeleri için giriş",
+    tr: "Usta ve esnaf işletmeleri için giriş",
     en: "The entry point for trade businesses",
     ar: "نقطة البداية للمنشآت الحِرفية",
   },

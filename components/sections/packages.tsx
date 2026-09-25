@@ -5,11 +5,13 @@ import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { formatPrice, packages } from "@/lib/site-data"
+import { findOffer, offerAmount } from "@/lib/offers"
 import { steuerlage } from "@/lib/rechnung"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
 export function Packages() {
   const { t, locale } = useLocale()
+  const betreuung = offerAmount("betreuung")
 
   return (
     <section id="pakete" aria-labelledby="pakete-title" className="section-seam">
@@ -111,17 +113,17 @@ export function Packages() {
                 )}
 
                 {/*
-                  Der Referenzpreis wird offen als solcher benannt, mit dem
-                  Regelpreis daneben. Ein Nachlass, den der Kunde erst bei der
-                  zweiten Rechnung bemerkt, ist kein Entgegenkommen.
+                  W1 — der Festpreis ist DER Preis. Der Pilotplatz steht als
+                  eigener Kasten darunter, mit seiner Gegenleistung: ein
+                  niedrigerer Betrag gegen die schriftliche Referenzfreigabe.
                 */}
-                {pkg.regularAmount !== undefined && (
-                  <div className="mt-5 flex flex-col gap-2">
+                {pkg.pilotAmount !== undefined && (
+                  <div className="border-line mt-5 flex flex-col gap-2 rounded-xl border p-4">
+                    <p className="text-meta text-gold-text">
+                      {t.packages.pilotLabel}: {formatPrice(pkg.pilotAmount, locale)}
+                    </p>
                     <p className="type-small text-muted-foreground text-pretty">
                       {t.packages.referenceNote}
-                    </p>
-                    <p className="text-meta text-muted-foreground">
-                      {t.packages.regularLabel}: {formatPrice(pkg.regularAmount, locale)}
                     </p>
                   </div>
                 )}
@@ -208,26 +210,8 @@ export function Packages() {
             <p className="type-body text-muted-foreground mt-4 text-pretty">
               {t.packages.openNote}
             </p>
-            {/*
-              GATE 05 — die Treiber, damit sich der Kunde einordnen kann.
-
-              Zwischen „3.900 EUR" und „auf Anfrage" stand nichts. Wer eine
-              groessere Sache hat, konnte nicht erkennen, ob er ueberhaupt
-              gemeint ist. Keine Spanne — die waere erfunden —, sondern die
-              Fragen, an denen sich Umfang entscheidet.
-            */}
-            <p className="eyebrow text-muted-foreground mt-7">{t.packages.openDriversLabel}</p>
-            <ul className="mt-3 grid gap-2.5 sm:grid-cols-2">
-              {t.packages.openDrivers.map((driver) => (
-                <li key={driver} className="flex gap-3">
-                  <span aria-hidden="true" className="bg-gold/60 mt-2 size-1 shrink-0" />
-                  <span className="type-small text-muted-foreground text-pretty">{driver}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="type-small text-muted-foreground mt-5 text-pretty">
-              {t.packages.openDriversNote}
-            </p>
+            {/* W2 — die fuenf Treiber stehen im Systemgespraech, nicht vor ihm
+                (docs/sales/offer-canon.md §7). Hier genuegt der Weg. */}
           </div>
           {/*
             GATE 3 — der Verweis fuehrt jetzt in GENAU das Gespraech, das der
@@ -246,6 +230,29 @@ export function Packages() {
             <ArrowUpRight className="size-4" strokeWidth={1.5} />
           </Link>
         </Reveal>
+
+        {/*
+          W1 · R2 — die Website-Betreuung steht HIER, bei der Website, und
+          nirgends als Preis fuer Systemarbeit. Betrag aus `lib/offers.ts`.
+        */}
+        {betreuung !== null && (
+          <div className="border-line mt-px flex flex-col gap-3 border-t px-8 py-6 md:flex-row md:items-baseline md:justify-between md:px-9">
+            <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <span className="eyebrow text-muted-foreground">{findOffer("betreuung").label[locale]}</span>
+              <span className="text-subhead text-lg">
+                {formatPrice(betreuung, locale)} {t.packages.monthly}
+              </span>
+              <span className="type-small text-muted-foreground">{t.packages.betreuungNote}</span>
+            </p>
+            <Link
+              href="/betrieb"
+              className="text-gold-text hover:text-foreground inline-flex shrink-0 items-center gap-1.5 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
+            >
+              {t.packages.betreuungCta}
+              <ArrowUpRight className="size-3.5" strokeWidth={1.5} />
+            </Link>
+          </div>
+        )}
 
         {/* Netto ist eine Pflichtangabe, keine Fussnote (M12-4). */}
         <p className="type-small text-muted-foreground border-line mt-8 border-t pt-6">
@@ -272,18 +279,6 @@ export function Packages() {
             : t.packages.netNote}
         </p>
 
-        {/*
-          V2-3 — der Satz, der die Rubrik einordnet.
-
-          Ohne ihn steht eine Preistabelle unter fuenf Ebenen und macht das
-          Groessere klein: Wer 2.400 EUR liest, hat die Antwort auf „was ist
-          das hier" gefunden, bevor er die Ebenen zu Ende gelesen hat. Der
-          Satz sagt ausdruecklich, dass dies der Einstieg ist und nicht die
-          Hauptarchitektur (KIZILELMA §10.7).
-        */}
-        <p className="type-body text-foreground/85 border-line mt-6 max-w-3xl border-t pt-6 text-pretty">
-          {t.packages.entryNote}
-        </p>
 
       </div>
     </section>

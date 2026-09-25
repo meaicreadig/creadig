@@ -6,6 +6,7 @@ import { type AttentionItem, type AttentionRank, type Kennzahlen, collectAttenti
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { datumAnzeige, GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 import { getVertriebStore, leadStoreConfigured } from "@/lib/lead-store"
+import { SystemErledigt } from "@/components/admin/system-erledigt"
 
 /**
  * ÜBERSICHT — die Startseite des Admin (ADM-01, 17.09.2026).
@@ -217,6 +218,9 @@ export default async function Uebersicht() {
               {t.uebersicht.zumSystem}
             </Link>
           </section>
+
+          {/* ── 3b · W6 · A4 — was das System selbst erledigt hat ── */}
+          <SystemErledigt />
 
           {/* ── 4 · Entscheidungen ── */}
           <section aria-labelledby="entscheidungen-titel">

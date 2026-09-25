@@ -3,7 +3,7 @@ import { publishedInsights, readableInsights } from "@/lib/insights"
 import { publishedSeoLandings } from "@/lib/seo-landings"
 import { publishedServicePages } from "@/lib/service-pages"
 import { genannteClientWorks, productWorks } from "@/lib/site-data"
-import { localeUrl, locales, DEFAULT_LOCALE } from "@/lib/routes"
+import { localeUrl, locales, DEFAULT_LOCALE, isIndexed } from "@/lib/routes"
 import { ROLLEN } from "@/lib/karriere"
 
 /**
@@ -161,7 +161,7 @@ const entries: Entry[] = [
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return entries.flatMap((entry) =>
-    locales.map((locale) => ({
+    locales.filter(isIndexed).map((locale) => ({
       url: localeUrl(entry.path, locale),
       changeFrequency: entry.changeFrequency,
       // Deutsch ist der Schwerpunktmarkt und führt deshalb; der Abstand ist
@@ -178,7 +178,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
        */
       alternates: {
         languages: {
-          ...Object.fromEntries(locales.map((l) => [l, localeUrl(entry.path, l)])),
+          ...Object.fromEntries(locales.filter(isIndexed).map((l) => [l, localeUrl(entry.path, l)])),
           "x-default": localeUrl(entry.path, DEFAULT_LOCALE),
         },
       },

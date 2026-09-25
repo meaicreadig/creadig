@@ -61,6 +61,15 @@ export type SeoLanding = {
    */
   body: Localized[]
   published: boolean
+  /*
+   * S5 — was eine Landingpage tragen muss, bevor sie veroeffentlicht wird.
+   * `check-seo.mjs` bricht den Build, wenn `proofRefs` leer ist oder eine
+   * Stadt ohne freigegebenen Fall in genau dieser Stadt genannt wird.
+   */
+  intent: "commercial" | "problem" | "local"
+  /** Verweise auf Belege (Fall-Slug, Produkt, Pruefung) — nie leer, wenn veroeffentlicht. */
+  proofRefs: string[]
+  cta: "erstgespraech" | "systemgespraech" | "pruefung"
 }
 
 /** TODO (Owner): Städte/Leistungen benennen. Leer = es gibt keine Landing. */

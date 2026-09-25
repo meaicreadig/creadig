@@ -23,6 +23,9 @@ import { fileURLToPath } from "node:url"
 import { genannteClientWorks, productWorks } from "@/lib/site-data"
 import { publishedServicePages } from "@/lib/service-pages"
 import { ROLLEN } from "@/lib/karriere"
+import { INDEXED_LOCALES } from "@/lib/routes"
+import { seoLandings } from "@/lib/seo-landings"
+import { approvedCaseStudies } from "@/lib/site-data"
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const APP_DIR = path.join(ROOT, ".next", "server", "app")
@@ -61,7 +64,8 @@ const hreflangs = (html) => [...html.matchAll(/hreflang="([^"]*)"/gi)].map((m) =
 const jsonLd = (html) =>
   [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1])
 
-const LOCALES = ["de", "tr", "en", "ar"]
+/* S1 — erwartet werden die INDEXIERTEN Sprachen, nicht alle gebauten. */
+const LOCALES = [...INDEXED_LOCALES]
 
 /* ---------------------------------------------------------------------------
  * 1 · /arbeiten — DIE INDEXENTSCHEIDUNG FOLGT DER FREIGABELAGE
@@ -230,6 +234,39 @@ const LOCALES = ["de", "tr", "en", "ar"]
     if (d.length < 60 || d.length > 200) {
       hinweise.push(`index: Beschreibung ist ${d.length} Zeichen lang.`)
     }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 7 · FINAL IMPLEMENTATION · W5
+ *
+ * S2  Angebotsmarkup nur auf Angebotsseiten, nie Bewertungs-Markup.
+ * S4  Genau EIN H1 im Server-HTML jeder oeffentlichen Seite.
+ * S5  Eine SEO-Landingpage ohne Beleg oder mit Stadt ohne Fall baut nicht.
+ * S6  Kein Linktext „hier" — der Anker ist Kundensprache.
+ * ------------------------------------------------------------------------- */
+const oeffentlich = seiten.filter((s) => !/^(admin|_|api)/.test(s.kurz) && !/^_?(not-found|global-error|_not-found)/.test(path.basename(s.kurz)))
+for (const s of oeffentlich) {
+  const ld = jsonLd(s.text).join("\n")
+  const angebotsseite = /(^|\/)leistungen(\/|\.html$)/.test(s.kurz)
+  if (/"@type":"OfferCatalog"/.test(ld) && !angebotsseite) {
+    probleme.push(`${s.kurz}: OfferCatalog auf einer Seite ohne Angebote.`)
+  }
+  if (/"@type":"(AggregateRating|Review)"/.test(ld)) {
+    probleme.push(`${s.kurz}: Bewertungs-Markup — gibt es in diesem Haus nicht.`)
+  }
+  const h1 = (s.text.match(/<h1[\s>]/g) ?? []).length
+  if (h1 !== 1) probleme.push(`${s.kurz}: ${h1} H1 im Server-HTML (erwartet genau eins).`)
+  const hier = [...s.text.matchAll(/<a\b[^>]*>\s*(hier|hier klicken|click here|here|buraya tıklayın|buraya)\s*<\/a>/gi)]
+  if (hier.length > 0) probleme.push(`${s.kurz}: Linktext „${hier[0][1]}" — der Anker muss sagen, wohin er fuehrt.`)
+}
+for (const l of seoLandings) {
+  if (!l.published) continue
+  if (l.proofRefs.length === 0) {
+    probleme.push(`SEO-Landing „${l.slug}": veroeffentlicht ohne Beleg (proofRefs leer).`)
+  }
+  if (l.city && !approvedCaseStudies.some((c) => JSON.stringify(c).includes(l.city))) {
+    probleme.push(`SEO-Landing „${l.slug}": Stadt „${l.city}" ohne freigegebenen Fall dort — das waere eine Stadtseite ohne Substanz.`)
   }
 }
 

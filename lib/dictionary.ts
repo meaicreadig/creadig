@@ -1,6 +1,8 @@
 // i18n-ready dictionary. DE ist primär, TR ist gleichwertig.
 // Alle Inhalte sind echt. Keine erfundenen Zahlen, Zitate oder Auszeichnungen.
 
+import { fillOfferTokensDeep } from "@/lib/offers"
+
 export type Locale = "de" | "tr" | "en" | "ar"
 
 export const WHATSAPP_NUMBER = "+41 76 504 58 79"
@@ -25,7 +27,7 @@ export function whatsappLink(locale: Locale): string {
   )
 }
 
-export const dictionary = {
+const rawDictionary = {
   de: {
     /*
      * GROW-1 — die Kopfdaten der Seite, jetzt zweisprachig.
@@ -51,7 +53,9 @@ export const dictionary = {
        * `organizationDescription`. Was sich aendert, ist die Reihenfolge:
        * erst wer wir sind, dann was wir tun.
        */
-      siteTitle: "creaDIG — System-Haus für digitale Betriebe",
+      /* S3 — „System-Haus" bleibt Markenwort im Text, aber nicht im Titel:
+         Wer „Systemhaus" sucht, will IT-Hardware und Microsoft 365. */
+      siteTitle: "creaDIG: Websites und digitale Abläufe für Betriebe",
       siteDescription:
         "creaDIG ist das Dach über eigenen Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie. System-Haus für Deutschland, Österreich und die Schweiz.",
       ogTitle: "creaDIG — Wir bauen, was andere nicht sehen.",
@@ -143,12 +147,17 @@ export const dictionary = {
         lead: "Zwischen den Schritten liegen die Übergaben. Dort geht Zeit verloren, und dort wird abends rekonstruiert, was tagsüber niemand notiert hat.",
         stations: ["Anfrage", "Angebot", "Termin", "Auftrag", "Dokumentation", "Rechnung"],
         todayLabel: "Heute",
-        todayNote: "Fünf Übergaben von Hand.",
+        todayNote: "Jedes Werkzeug kennt nur seinen Schritt.",
         systemLabel: "Mit System",
         systemNote: "Ein Weg. Ein Stand, den alle sehen.",
         gapLabel: "Bruchstelle",
         signalLabel: "Ein Vorgang",
         modelNote: "Modell, kein Kundenergebnis. Es zeigt die Struktur, die wir bauen — keine gemessene Ersparnis.",
+        tools: ["WhatsApp", "Excel", "Kalender", "Zettel", "E-Mail", "Rechnungsprogramm"],
+        handoffCount: "5 Übergaben von Hand",
+        systemCount: "1 durchgehender Weg",
+        ownership: "Gehört Ihnen: Code und Daten",
+        handoffSr: "Übergabe von Hand",
       },
       /*
        * DIE DREI WEGE — Einstieg nach Lage, nicht nach Betriebsgroesse.
@@ -282,26 +291,35 @@ export const dictionary = {
        * damit die Antwort hier nicht in vier Wochen anders lautet als dort.
        */
       entry: {
-        eyebrow: "Einstieg",
-        title: "Drei Arten anzufangen.",
-        lead: "Welche es wird, hängt davon ab, wo es klemmt — nicht davon, was wir gerade verkaufen wollen.",
-        arten: {
-          festpreis: {
-            label: "Festpreis ab",
-            body: "Ein vereinbarter Umfang, eine Zahl, kein Stundenzettel.",
+        eyebrow: "Angebote",
+        title: "Was es kostet, steht hier.",
+        lead: "Ein Festpreis für die Website. Was darüber hinausgeht, bekommt nach einem Gespräch einen Festpreis für genau Ihren Umfang.",
+        angebote: {
+          website: {
+            art: "Festpreis",
+            body: "Die Website für Ihren Betrieb — gebaut für Anfragen, in vier Wochen online. Seite und Zugänge gehören Ihnen.",
+            cta: "Paket ansehen",
           },
-          monatlich: {
-            label: "Monatlich",
-            body: "Die laufende Betreuung der Seite, die wir gebaut haben — in festem Umfang.",
+          analyse: {
+            art: "Festpreis, anrechenbar",
+            body: "Wir sehen uns Ihre Abläufe an und schreiben auf, was ein System lösen würde. Der Betrag wird auf das Projekt angerechnet.",
+            cta: "Systemgespräch vereinbaren",
           },
-          "nach-analyse": {
-            label: "Angebot nach Analyse",
-            body: "Zwanzig Minuten Erstgespräch, danach ein festes Angebot mit Umfang und Preis.",
+          systemprojekt: {
+            name: "Systemprojekt",
+            art: "Angebot nach Analyse",
+            body: "Wenn mehr hakt als die Website: Nach dem Systemgespräch bekommen Sie einen Festpreis für genau Ihren Umfang.",
+            cta: "Systemgespräch vereinbaren",
+          },
+          betreuung: {
+            art: "monatlich",
+            body: "Hosting, Updates und zwei Änderungen im Monat — für Seiten, die wir gebaut haben. Monatlich kündbar.",
+            cta: "Umfang ansehen",
           },
         },
-        ebenenLabel: "Gilt für",
+        auditNote: "Ihre Seite steht schon?",
+        auditCta: "Barrierefreiheit prüfen lassen (BFSG)",
         nettoNote: "Alle Beträge netto.",
-        priceCta: "Pakete und Preise",
         questionsLabel: "Zwei Fragen vorab",
         questionsCta: "Alle Fragen",
       },
@@ -405,7 +423,7 @@ export const dictionary = {
     kontaktPage: {
       eyebrow: "Kontakt",
       title: "Wählen Sie den Weg, der passt.",
-      lead: "Nicht jede Anfrage beginnt mit einem Termin. Manche beginnen mit einem Blick auf das, was wir gebaut haben — auch das ist ein Weg zu uns. Beratung auf Deutsch und Türkisch.",
+      lead: "Nicht jede Anfrage beginnt mit einem Termin. Manche beginnen mit einem Blick auf das, was wir gebaut haben — auch das ist ein Weg zu uns. Beratung auf {sprachen}.",
       metaTitle: "Kontakt — creaDIG Osnabrück",
       metaDescription:
         "creaDIG erreichen: per WhatsApp, E-Mail, kostenloser Erstberatung oder direkt über unsere eigenen Produkte. ICO InnovationsCentrum Osnabrück, Beratung auf Deutsch und Türkisch.",
@@ -580,7 +598,7 @@ export const dictionary = {
           key: "produkt",
           rang: "02",
           name: "Eigene Produkte im Betrieb",
-          was: "fibero läuft im Glasfaser-Alltag, meAI im eigenen Haus. Die Aufnahmen zeigen die echte Oberfläche, nicht ein Modell.",
+          was: "fibero läuft im Glasfaser-Alltag, meAI im eigenen Haus. Beide haben wir selbst gebaut, und beide betreiben wir selbst — die Produktseite nennt, was darin steckt.",
           href: "/produkte/fibero",
         },
         {
@@ -655,7 +673,7 @@ export const dictionary = {
        */
       eyebrow: "Beweis, kein Katalog",
       title: "Vier Produkte, die wir selbst gebaut haben.",
-      lead: "Diese Seite verkauft nichts davon. Sie steht hier, weil sie belegt, was wir über uns sagen: Jedes dieser Systeme hat creaDIG von Grund auf gebaut. Eines läuft im eigenen Tagesbetrieb, die drei anderen sind im Aufbau — der Stand steht an jedem Produkt. Was wir für Sie bauen, steht unter Leistungen.",
+      lead: "Die Seite belegt, was wir über uns sagen: Jedes dieser Systeme hat creaDIG von Grund auf gebaut. Eines läuft im eigenen Tagesbetrieb, die drei anderen sind im Aufbau — der Stand steht an jedem Produkt. Was wir für Sie bauen, steht unter Leistungen.",
       metaTitle: "Eigene Produkte — meAI, fibero, CASSAMEA, meahv",
       metaDescription:
         "Die vier eigenen Produkte von creaDIG: meAI (KI-Business-Betriebssystem), fibero (Glasfaser-Operations), CASSAMEA (Gastro-Kasse, Schweiz) und meahv (Hausverwaltung).",
@@ -1025,7 +1043,7 @@ export const dictionary = {
        * Hier steht jetzt der Satz, der die Reihe darunter zu einem Einstieg
        * macht statt zu einem Inhaltsverzeichnis.
        */
-      systemLine: "Wo es bei Ihnen klemmt, fangen wir an.",
+      systemLine: "Sie führen den Betrieb. Wir bauen das System dahinter.",
       ctaPrimary: "Projekt starten",
       /*
        * GATE 01 · WEB-0005 — der zweite Knopf zeigte auf `/arbeiten`, und
@@ -1217,7 +1235,7 @@ export const dictionary = {
       items: [
         {
           q: "Was kostet ein Auftritt bei creaDIG?",
-          a: "Das Website-Paket kostet 3.900 € netto. Für den ersten Betrieb in einem Gewerk, für das wir noch nichts gebaut haben, gilt ein Pilotpreis von 2.400 € netto. Die laufende Betreuung kostet 149 € netto im Monat. Alle Preise zzgl. 19 % USt., Festpreis für den vereinbarten Umfang.",
+          a: "Das Website-Paket kostet {price:website} netto, als Festpreis. Pro Gewerk gibt es einen Pilotplatz für {price:website-pilot} netto — im Tausch gegen die schriftliche Freigabe, Ihren Betrieb als Referenz zu zeigen. Die Website-Betreuung kostet {price:betreuung} netto im Monat. Alle Preise zzgl. {vat} % USt., Festpreis für den vereinbarten Umfang.",
         },
         {
           q: "Wie läuft ein Projekt ab?",
@@ -1225,7 +1243,7 @@ export const dictionary = {
         },
         {
           q: "Was ist meAI?",
-          a: "meAI ist unser KI-Business-Betriebssystem — es bündelt Zahlen, Aufgaben und Dokumente und bereitet Entscheidungen vor. Live unter meai.run.",
+          a: "meAI ist unser KI-Business-Betriebssystem — es bündelt Zahlen, Aufgaben und Dokumente und bereitet Entscheidungen vor. Es ist im Aufbau; unter meai.run erreichbar, Zugang nach Verifizierung.",
         },
         {
           q: "Arbeiten Sie auch in der Schweiz?",
@@ -1256,7 +1274,7 @@ export const dictionary = {
          */
         {
           q: "Wem gehört das System — und was passiert, wenn ich die Betreuung kündige?",
-          a: "Das System und alle Daten darin gehören Ihnen, vom ersten Tag an. Die laufende Betreuung für 149 € netto im Monat ist monatlich kündbar, ohne Mindestlaufzeit. Danach bleibt alles bei Ihnen: Code, Inhalte, Zugänge und Domain — wir händigen aus, was wir haben, und Sie können mit jedem anderen weiterarbeiten. Was aufhört, ist die Betreuung, nicht Ihr Zugriff.",
+          a: "Das System und alle Daten darin gehören Ihnen, vom ersten Tag an. Die Website-Betreuung für {price:betreuung} netto im Monat ist monatlich kündbar, ohne Mindestlaufzeit. Danach bleibt alles bei Ihnen: Code, Inhalte, Zugänge und Domain — wir händigen aus, was wir haben, und Sie können mit jedem anderen weiterarbeiten. Was aufhört, ist die Betreuung, nicht Ihr Zugriff.",
         },
       ],
     },
@@ -1372,6 +1390,8 @@ export const dictionary = {
       eyebrow: "Das Haus",
       title: "Ein Dach, fünf Ebenen, vier Produkte.",
       lead: "Das ganze Unternehmen in einer Ansicht: oben das Dach, darunter die fünf Ebenen, quer darunter der Betrieb — und unten die vier eigenen Produkte, jedes an der Ebene, auf der es sitzt.",
+      kompaktTitle: "Ein Dach, fünf Ebenen.",
+      kompaktLead: "Das ganze Haus in einer Ansicht: oben das Dach, darunter die fünf Ebenen, quer darunter der Betrieb. Sie können auf jeder Ebene einsteigen — und auf jeder aufhören.",
       roofLabel: "Das Dach",
       roofNote: "System-Haus, Osnabrück, seit 2017",
       layersLabel: "Fünf Ebenen",
@@ -1414,7 +1434,7 @@ export const dictionary = {
       angebotLabel: "Einstieg",
       belegLabel: "Beleg",
       angebotArt: {
-        festpreis: "Festpreis ab",
+        festpreis: "Festpreis",
         monatlich: "Monatlich",
         "nach-analyse": "Angebot nach Analyse",
       },
@@ -1556,9 +1576,9 @@ export const dictionary = {
     },
     meai: {
       eyebrow: "Flagship · meai.run",
-      title: "Ihr unsichtbarer Geschäftsführer.",
+      title: "Der Überblick über Ihren Betrieb.",
       lead: "meAI ist unser KI-Business-Betriebssystem. Es liest den Betrieb, bereitet Entscheidungen vor und hält zusammen, was sonst in Köpfen und Zetteln verteilt liegt.",
-      dna: "Die seltene Doppel-DNA: Wir bauen das KI-System nicht nur — wir führen unseren eigenen Betrieb damit. Was meAI kann, ist an unserem eigenen Alltag erprobt, bevor es zu einem Kunden kommt.",
+      dna: "Wir bauen das KI-System nicht nur — wir führen unseren eigenen Betrieb damit. Was meAI kann, ist an unserem eigenen Alltag erprobt, bevor es zu einem Kunden kommt.",
       cta: "meai.run öffnen",
       capabilities: {
         overview: {
@@ -1775,7 +1795,7 @@ export const dictionary = {
        * Kunde sie findet.
        */
       limit:
-        "Was hier fehlt, fehlt bewusst: eine Mitarbeiterzahl, eine Kapazitätsgrenze und eine Vertretungsregel für den Fall, dass der Verantwortliche ausfällt. Alle drei ließen sich behaupten, keine davon ist heute belegt. Für ein abgegrenztes Projekt ist das tragbar; für den Kern eines Betriebs sollten Sie danach fragen.",
+        "Mitarbeiterzahl, Kapazitätsgrenze und Vertretungsregel nennen wir erst, wenn sie belegt sind — fragen Sie danach, wenn es um den Kern Ihres Betriebs geht.",
     },
     workModel: {
       eyebrow: "So arbeiten wir",
@@ -1890,8 +1910,8 @@ export const dictionary = {
        * zu ueberlassen.
        */
       eyebrow: "Einstiegsangebote",
-      title: "Zwei Wege hinein — beide zum Festpreis.",
-      lead: "Nicht jeder Betrieb fängt oben an. Diese beiden Angebote sind der Einstieg: klar umrissen, vorher bepreist, ohne dass Sie das ganze Haus mitbestellen.",
+      title: "Was es kostet.",
+      lead: "Festpreise für die Website und die Prüfung, ein fester Weg für alles Größere. Jede Zahl gilt für den genannten Umfang.",
       entryNote:
         "Das ist der Einstieg, nicht die Hauptarchitektur. Was creaDIG als System-Haus baut, steht oben in den fünf Ebenen und wird nach Umfang gerechnet — nicht nach Paket.",
       forWhom: "Für wen",
@@ -1971,8 +1991,8 @@ export const dictionary = {
        * wird das Zeigen.
        */
       referenceNote:
-        "Pilotpreis für den ersten Betrieb in einem Gewerk, für das wir noch nichts gebaut haben. Sie sehen vorher keine vergleichbare Arbeit von uns — dieses Risiko tragen Sie, und der Preis trägt es mit. Dafür dürfen wir das Ergebnis zeigen und Ihren Betrieb nennen; ein Lob ist nicht verlangt. Welche Gewerke schon stehen, sehen Sie unter Arbeiten. Ab dem zweiten Betrieb im selben Gewerk gilt der Regelpreis.",
-      regularLabel: "Regelpreis",
+        "Ein Pilotplatz je Gewerk: Für den ersten Betrieb in einem Gewerk, für das wir noch nichts gebaut haben, gilt {price:website-pilot} statt des Festpreises. Die Gegenleistung ist eine schriftliche Referenzfreigabe — wir dürfen das Ergebnis zeigen und Ihren Betrieb nennen; ein Lob ist nicht verlangt. Als Pilotbetrieb sehen Sie jede Woche den Stand und zahlen den Pilotpreis.",
+      pilotLabel: "Pilotplatz",
       /*
        * MP10-2.3 — das Etikett der Projektdauer.
        *
@@ -2014,11 +2034,12 @@ export const dictionary = {
        * Leiter) bleibt unangetastet. Es steht kein zweiter Preis da, sondern
        * ein offener Satz und ein Gespraech.
        */
-      openEyebrow: "Größerer Umfang",
-      openPrice: "auf Anfrage",
-      openNote:
-        "Mehrere Standorte, ein Shop, Schnittstellen in die Warenwirtschaft oder ein System, das über die Website hinausgeht: Dafür gibt es keinen Listenpreis, aber einen festen Weg. Im Systemgespräch — 45 Minuten, kostenlos — sehen wir uns den Betrieb an und schneiden den Umfang zu. Daraus wird ein Festpreis für genau diesen Umfang, und danach ändert sich die Zahl nicht.",
+      openEyebrow: "Systemprojekt",
+      openPrice: "Angebot nach Analyse",
+      openNote: "Mehrere Standorte, Schnittstellen, ein System über die Website hinaus: Im Systemgespräch (45 Minuten, kostenlos) schneiden wir den Umfang zu. Daraus wird ein Festpreis für genau diesen Umfang.",
       openCta: "Systemgespräch vereinbaren",
+      betreuungNote: "Nur für Seiten, die wir gebaut haben. Monatlich kündbar.",
+      betreuungCta: "Umfang ansehen",
       /*
        * ==================================================================
        * GATE 05 — DIE LUECKE ZWISCHEN 3.900 EUR UND „AUF ANFRAGE".
@@ -2260,7 +2281,7 @@ export const dictionary = {
      */
     systemePage: {
       eyebrow: "Systeme",
-      title: "Integration first.",
+      title: "Erst die Anbindung, dann das System.",
       lead: "Ein neues System ersetzt selten alles. Meistens muss es neben dem laufen, was schon da ist — und mit ihm reden. Was dabei zu klären ist, steht hier.",
       metaTitle: "Systeme & Integration — Schnittstellen, Daten, Betrieb",
       metaDescription:
@@ -2413,9 +2434,9 @@ export const dictionary = {
        * Eingabefeld mehr an, sondern drei Wege.
        */
       title: "In 20 Minuten unverbindlich.",
-      lead: "Deutsch und Türkisch. Wählen Sie den Weg, der Ihnen am schnellsten passt.",
+      lead: "{sprachen}. Wählen Sie den Weg, der Ihnen am schnellsten passt.",
       directTitle: "Zwei Wege, ohne Termin. Beide enden bei einem Menschen.",
-      directLead: "Die beiden Gespräche stehen oben. Wer nur eine Frage hat, braucht keines davon und schreibt direkt: per WhatsApp oder E-Mail, auf Deutsch oder Türkisch.",
+      directLead: "Die beiden Gespräche stehen oben. Wer nur eine Frage hat, braucht keines davon und schreibt direkt: per WhatsApp oder E-Mail, auf {sprachen:oder}.",
       mailTitle: "E-Mail",
       mailNote: "Für Unterlagen, Angebote und alles Schriftliche.",
       nameLabel: "Name",
@@ -2665,7 +2686,7 @@ export const dictionary = {
         choose: "Bitte wählen",
         errRequired: "Bitte füllen Sie die Pflichtfelder korrekt aus.",
         errEmail: "Bitte eine gültige E-Mail-Adresse angeben.",
-        interests: ["Website-Paket Handwerk", "Laufende Betreuung — 149 € / Monat", "Etwas anderes — Marke, Software oder Automatisierung", "Noch unklar"],
+        interests: ["Website-Paket Handwerk", "Website-Betreuung — {price:betreuung} / Monat", "Etwas anderes — Marke, Software oder Automatisierung", "Noch unklar"],
         sizes: ["1–4 Mitarbeiter", "5–15 Mitarbeiter", "16–30 Mitarbeiter", "über 30 Mitarbeiter"],
       },
       /*
@@ -3079,7 +3100,7 @@ export const dictionary = {
 
   tr: {
     meta: {
-      siteTitle: "creaDIG — dijital işletmeler için sistem evi",
+      siteTitle: "creaDIG: İşletmeler için web siteleri ve dijital iş akışları",
       siteDescription:
         "creaDIG, kendi sistemlerinin çatısıdır — markadan yapay zekâya. Onları biz kurarız ve biz işletiriz. Almanya, Avusturya ve İsviçre için sistem evi.",
       ogTitle: "creaDIG — Başkalarının göremediğini inşa ediyoruz.",
@@ -3098,7 +3119,7 @@ export const dictionary = {
       statement: {
         eyebrow: "Sorun nerede",
         title: "İş var. Arkasındaki sistem yok.",
-        body: "creaDIG tam bunun için var: arkadaki sistemi biz kurgular, kendimiz kurar ve işler hâlde tutarız. Klasik bir BT sistem evi değiliz — sunucu yok, lisans yok, yardım masası yok; esnaf, muayenehane, restoran ve hizmet işletmeleri için bir sistem evi. „Dijital işletme“ burada sonuçtur, önkoşul değil: başlamak için dijital bir firma olmanız gerekmiyor.",
+        body: "creaDIG tam bunun için var: arkadaki sistemi biz kurgular, kendimiz kurar ve işler hâlde tutarız. Klasik bir BT sistem evi değiliz — sunucu yok, lisans yok, yardım masası yok; esnaf, muayenehane, restoran ve hizmet işletmeleri için bir sistem evi. “Dijital işletme” burada sonuçtur, önkoşul değil: başlamak için dijital bir firma olmanız gerekmiyor.",
         cta: "Şirket hakkında",
       },
       /* Das Systembild. Die Stationen sind dieselben sechs Schritte. */
@@ -3108,12 +3129,17 @@ export const dictionary = {
         lead: "Adımların arasında devir noktaları var. Zaman orada kayboluyor; gün içinde kimsenin not almadığı şey akşam oradan yeniden kuruluyor.",
         stations: ["Talep", "Teklif", "Randevu", "İş emri", "Belgeleme", "Fatura"],
         todayLabel: "Bugün",
-        todayNote: "Elden beş devir.",
+        todayNote: "Her araç yalnızca kendi adımını bilir.",
         systemLabel: "Sistemle",
         systemNote: "Tek yol. Herkesin gördüğü tek durum.",
         gapLabel: "Kopma noktası",
         signalLabel: "Bir iş",
         modelNote: "Model, müşteri sonucu değil. Kurduğumuz yapıyı gösterir — ölçülmüş bir tasarruf değil.",
+        tools: ["WhatsApp", "Excel", "Takvim", "Kâğıt not", "E-posta", "Fatura programı"],
+        handoffCount: "Elden 5 devir",
+        systemCount: "1 kesintisiz yol",
+        ownership: "Size ait: kod ve veriler",
+        handoffSr: "Elden devir",
       },
       /* Drei Wege. Dieselben Lagen, dieselbe Reihenfolge. */
       lagen: {
@@ -3163,27 +3189,36 @@ export const dictionary = {
         cta: "Tüm hizmetler",
       },
       entry: {
-        eyebrow: "Başlangıç",
-        title: "Başlamanın üç yolu.",
-        lead: "Hangisi olacağı nerede sıkıştığınıza bağlı — bizim o an ne satmak istediğimize değil.",
-        arten: {
-          festpreis: {
-            label: "Sabit fiyat",
-            body: "Anlaşılan kapsam, tek rakam, saat çizelgesi yok.",
+        eyebrow: "Teklifler",
+        title: "Ne kadar tuttuğu burada yazıyor.",
+        lead: "Web sitesi için sabit fiyat. Bunun ötesine geçen her şey, bir görüşmeden sonra tam sizin kapsamınız için sabit bir fiyat alır.",
+        angebote: {
+          website: {
+            art: "Sabit fiyat",
+            body: "İşletmeniz için web sitesi — talep getirmek için kurulur, dört haftada yayında. Site ve erişimler sizindir.",
+            cta: "Paketi görün",
           },
-          monatlich: {
-            label: "Aylık",
-            body: "Kurduğumuz sitenin sürekli bakımı — tanımlı kapsamda.",
+          analyse: {
+            art: "Sabit fiyat, projeye mahsup edilir",
+            body: "İş akışlarınıza bakar ve bir sistemin neyi çözeceğini yazıya dökeriz. Tutar projeden düşülür.",
+            cta: "Sistem görüşmesi ayarlayın",
           },
-          "nach-analyse": {
-            label: "Analiz sonrası teklif",
-            body: "Yirmi dakikalık ilk görüşme, ardından kapsamı ve fiyatı belli sabit bir teklif.",
+          systemprojekt: {
+            name: "Sistem projesi",
+            art: "Analizden sonra teklif",
+            body: "Sorun web sitesinden büyükse: Sistem görüşmesinden sonra tam sizin kapsamınız için sabit bir fiyat alırsınız.",
+            cta: "Sistem görüşmesi ayarlayın",
+          },
+          betreuung: {
+            art: "aylık",
+            body: "Hosting, güncellemeler ve ayda iki değişiklik — kurduğumuz siteler için. Her ay iptal edilebilir.",
+            cta: "Kapsamı görün",
           },
         },
-        ebenenLabel: "Şu katmanlar için",
+        auditNote: "Siteniz zaten var mı?",
+        auditCta: "Erişilebilirliği denetletin (BFSG)",
         nettoNote: "Tüm tutarlar nettir.",
-        priceCta: "Paketler ve fiyatlar",
-        questionsLabel: "Önce iki soru",
+        questionsLabel: "Önceden iki soru",
         questionsCta: "Tüm sorular",
       },
       products: {
@@ -3247,7 +3282,7 @@ export const dictionary = {
     kontaktPage: {
       eyebrow: "İletişim",
       title: "Size uyan yolu seçin.",
-      lead: "Her başvuru bir randevuyla başlamaz. Bazıları neyi kurduğumuza bakmakla başlar — o da bize giden bir yoldur. Danışmanlık Almanca ve Türkçe.",
+      lead: "Her başvuru bir randevuyla başlamaz. Bazıları neyi kurduğumuza bakmakla başlar — o da bize giden bir yoldur. Danışmanlık {sprachen}.",
       metaTitle: "İletişim — creaDIG Osnabrück",
       metaDescription:
         "creaDIG'e ulaşın: WhatsApp, e-posta, ücretsiz ilk görüşme veya doğrudan kendi ürünlerimiz üzerinden. ICO InnovationsCentrum Osnabrück, Almanca ve Türkçe danışmanlık.",
@@ -3261,7 +3296,7 @@ export const dictionary = {
         },
         appointment: {
           name: "Kısa ilk görüşme",
-          what: "Yirmi dakika, ücretsiz, görüntülü. Dinleriz ve yardımcı olup olamayacağımızı dürüstçe söyleriz — cevap „henüz değil“ olsa bile.",
+          what: "Yirmi dakika, ücretsiz, görüntülü. Dinleriz ve yardımcı olup olamayacağımızı dürüstçe söyleriz — cevap “henüz değil” olsa bile.",
           cta: "İlk görüşme iste",
         },
         system: {
@@ -3354,7 +3389,7 @@ export const dictionary = {
           key: "produkt",
           rang: "02",
           name: "Kendi ürünlerimiz işleyişte",
-          was: "fibero fiber altyapı sahasında, meAI kendi evimizde çalışıyor. Görüntüler gerçek arayüzü gösteriyor, bir maketi değil.",
+          was: "fibero fiber altyapı sahasında, meAI kendi evimizde çalışıyor. İkisini de kendimiz kurduk ve kendimiz işletiyoruz — ürün sayfası içinde ne olduğunu anlatır.",
           href: "/produkte/fibero",
         },
         {
@@ -3403,7 +3438,7 @@ export const dictionary = {
     produktePage: {
       eyebrow: "Katalog değil, kanıt",
       title: "Kendi kurduğumuz dört ürün.",
-      lead: "Bu sayfa bunların hiçbirini satmıyor. Burada olmalarının nedeni, kendimiz hakkında söylediğimizi kanıtlamaları: Bu sistemlerin her birini creaDIG sıfırdan kurdu. Biri kendi günlük işletiminde çalışıyor, diğer üçü yapım aşamasında — durum her ürünün yanında yazıyor. Sizin için ne kurduğumuz Hizmetler altında.",
+      lead: "Bu sayfa kendimiz hakkında söylediğimizi kanıtlar: Bu sistemlerin her birini creaDIG sıfırdan kurdu. Biri kendi günlük işletiminde çalışıyor, diğer üçü yapım aşamasında — durum her ürünün yanında yazıyor. Sizin için ne kurduğumuz Hizmetler altında.",
       metaTitle: "Kendi ürünlerimiz — meAI, fibero, CASSAMEA, meahv",
       metaDescription:
         "creaDIG'in dört kendi ürünü: meAI (yapay zekâ tabanlı iş işletim sistemi), fibero (fiber operasyonu), CASSAMEA (İsviçre için gastronomi kasası) ve meahv (bina yönetimi).",
@@ -3545,8 +3580,8 @@ export const dictionary = {
       headlineLine2: "görmediğini",
       headlineLine3: "inşa ediyoruz.",
       subline:
-        "İşletmelere, işlerinin asıldığı sistemi kuruyoruz: iş emri, müşteri, belge ve rakam tek yerde. Sonrasında dört yerine tek bir bilgi var — ve kimse onu üç programdan toplamıyor.",
-      systemLine: "Nerede sıkışıyorsanız oradan başlıyoruz.",
+        "İşletmelere, işlerinin döndüğü sistemi kuruyoruz: iş emri, müşteri, belge ve rakam tek yerde. Sonrasında dört yerine tek bir bilgi var — ve kimse onu üç programdan toplamıyor.",
+      systemLine: "İşletmenizi siz yönetirsiniz. Arkasındaki sistemi biz kurarız.",
       ctaPrimary: "Projeye başla",
       ctaSecondary: "Kendi ürünlerimiz",
       location: "Almanya · Avusturya · İsviçre",
@@ -3608,7 +3643,7 @@ export const dictionary = {
       viewLive: "Canlı gör",
       mockupNote: "Ürün kartları: açıklayıcı maketler, ekran görüntüsü değil.",
       productPhotoNote:
-        "Ürün görselleri gerçek arayüzü gösterir (demodaten) — maket değil.",
+        "Ürün görselleri gerçek arayüzü gösterir (örnek veri) — maket değil.",
       customerPhotoNote: "Müşteri görselleri gerçek arayüzü gösterir — maket değil.",
       imageNoteMixed:
         "Gerçek arayüzler (ürün ve müşteri) ile açıklayıcı maketler — ayrı etiketlenir, karıştırılmaz.",
@@ -3663,8 +3698,8 @@ export const dictionary = {
       moreCta: "Doğrudan sorun",
       items: [
         {
-          q: "creaDIG ile bir kimlik ne kadar?",
-          a: "Web sitesi paketi 3.900 € nettir. Henüz hiçbir şey kurmadığımız bir meslek dalındaki ilk işletme için 2.400 € net pilot fiyat geçerlidir. Sürekli destek aylık 149 € nettir. Tüm fiyatlar %19 KDV hariçtir; kararlaştırılan kapsam için sabit fiyattır.",
+          q: "creaDIG ile bir web sitesi ne kadar?",
+          a: "Web sitesi paketi sabit fiyatla {price:website} nettir. Her meslek dalında bir pilot yer vardır: {price:website-pilot} net — karşılığında işletmenizi referans olarak göstermemize yazılı izin verirsiniz. Web sitesi bakımı aylık {price:betreuung} nettir. Tüm fiyatlar %{vat} KDV hariçtir; kararlaştırılan kapsam için sabit fiyattır.",
         },
         {
           q: "Proje nasıl ilerler?",
@@ -3672,7 +3707,7 @@ export const dictionary = {
         },
         {
           q: "meAI nedir?",
-          a: "meAI, yapay zekâ tabanlı iş işletim sistemimizdir — sayıları, görevleri ve belgeleri toplar, kararları hazırlar. meai.run adresinde canlı.",
+          a: "meAI, yapay zekâ tabanlı iş işletim sistemimizdir — sayıları, görevleri ve belgeleri toplar, kararları hazırlar. Kuruluş aşamasında; meai.run adresinden ulaşılabilir, erişim doğrulamadan sonra.",
         },
         {
           q: "İsviçre'de de çalışıyor musunuz?",
@@ -3684,7 +3719,7 @@ export const dictionary = {
         },
         {
           q: "Sistem kime ait — ve desteği iptal edersem ne olur?",
-          a: "Sistem ve içindeki tüm veriler ilk günden itibaren size aittir. Aylık 149 € net sürekli destek, asgari süre olmadan aylık iptal edilebilir. Sonrasında her şey sizde kalır: kod, içerik, erişimler ve alan adı — elimizdekini teslim ederiz, dilediğiniz başka biriyle devam edebilirsiniz. Biten şey destektir, erişiminiz değil.",
+          a: "Sistem ve içindeki tüm veriler ilk günden itibaren size aittir. Aylık {price:betreuung} net web sitesi bakımı, asgari süre olmadan aylık iptal edilebilir. Sonrasında her şey sizde kalır: kod, içerik, erişimler ve alan adı — elimizdekini teslim ederiz, dilediğiniz başka biriyle devam edebilirsiniz. Biten şey destektir, erişiminiz değil.",
         },
       ],
     },
@@ -3741,6 +3776,8 @@ export const dictionary = {
       eyebrow: "Ev",
       title: "Tek çatı, beş katman, dört ürün.",
       lead: "Tüm şirket tek bir görünümde: en üstte çatı, altında beş katman, onların altında yatay olarak işletme — ve en altta kendi dört ürünümüz, her biri oturduğu katmanda.",
+      kompaktTitle: "Tek çatı, beş katman.",
+      kompaktLead: "Tüm ev tek bir görünümde: en üstte çatı, altında beş katman, onların altında yatay olarak işletme. Her katmanda başlayabilir — ve her katmanda durabilirsiniz.",
       roofLabel: "Çatı",
       roofNote: "Sistem evi, Osnabrück, 2017'den beri",
       layersLabel: "Beş katman",
@@ -3853,7 +3890,7 @@ export const dictionary = {
             "Sayılar var, karar yok. Karar vermek isteyen beş rapor açıyor ve sonrasında daha çok şey biliyor — ama daha iyi bilmiyor.",
           solution:
             "Bunun üzerine gösteren değil okuyan bir sistem kuruyoruz: sıraya koyar, önceliklendirir ve seçenekleri hazırlar. meAI bizim kendi sistemimiz — biz kurduk, biz işletiyoruz ve bir işletmeye gitmeden önce kendi günlük işimizde denendi.",
-          result: "„Bugün önce ne var“ sorusunun bir cevabı olur — ve yanında nedeni yazar.",
+          result: "“Bugün önce ne var” sorusunun bir cevabı olur — ve yanında nedeni yazar.",
           projects: [
             "Analiz",
             "Önceliklendirme",
@@ -3873,9 +3910,9 @@ export const dictionary = {
     },
     meai: {
       eyebrow: "Amiral gemisi · meai.run",
-      title: "Görünmeyen genel müdürünüz.",
+      title: "İşletmenize tek bakışta hâkimiyet.",
       lead: "meAI, yapay zekâ tabanlı iş işletim sistemimizdir. İşletmeyi okur, kararları hazırlar ve kafalarda ile kâğıtlarda dağılan her şeyi bir arada tutar.",
-      dna: "Ender bir çifte DNA: Yapay zekâ sistemini yalnızca kurmuyoruz — kendi işletmemizi onunla yönetiyoruz. meAI'ın yaptığı her şey, bir müşteriye gitmeden önce kendi günlük işimizde sınanıyor.",
+      dna: "Yapay zekâ sistemini yalnızca kurmuyoruz — kendi işletmemizi onunla yönetiyoruz. meAI'ın yaptığı her şey, bir müşteriye gitmeden önce kendi günlük işimizde sınanıyor.",
       cta: "meai.run'ı aç",
       capabilities: {
         overview: {
@@ -3949,7 +3986,7 @@ export const dictionary = {
         "Ekip büyüyor; yeni pozisyonlar hazırlanıyor.",
       nicheLabel: "Odak alanları",
       niches: [
-        "6–20 çalışanlı zanaat işletmeleri — ağırlıkla Almanya",
+        "6–20 çalışanlı usta ve esnaf işletmeleri — ağırlıkla Almanya",
         "Kendi BT birimi olmayan küçük ve orta ölçekli işletmeler",
         "Almanya ve İsviçre'de gastronomi",
       ],
@@ -3999,7 +4036,7 @@ export const dictionary = {
         },
       },
       limit:
-        "Burada eksik olan bilerek eksik: çalışan sayısı, kapasite sınırı ve sorumlunun devre dışı kalması hâlinde bir vekâlet kuralı. Üçü de iddia edilebilirdi, hiçbiri bugün belgeli değil. Sınırları belli bir proje için bu taşınabilir; bir işletmenin çekirdeği için bunu bize sormalısınız.",
+        "Çalışan sayısını, kapasite sınırını ve vekâlet kuralını ancak belgelendiğinde söylüyoruz — işletmenizin çekirdeği söz konusuysa bunu sorun.",
     },
     workModel: {
       eyebrow: "Nasıl çalışıyoruz",
@@ -4056,8 +4093,8 @@ export const dictionary = {
     },
     packages: {
       eyebrow: "Giriş teklifleri",
-      title: "İçeri iki yol — ikisi de sabit fiyatlı.",
-      lead: "Her işletme en üstten başlamaz. Bu iki teklif giriş adımıdır: sınırları belli, fiyatı önceden yazılı, tüm evi birden sipariş etmeden.",
+      title: "Ne kadar tutar.",
+      lead: "Web sitesi ve denetim için sabit fiyat, daha büyük her şey için sabit bir yol. Her rakam belirtilen kapsam için geçerlidir.",
       entryNote:
         "Bu giriş adımıdır, ana mimari değil. creaDIG'in sistem evi olarak kurduğu şey yukarıda beş katmanda durur ve pakete göre değil, kapsama göre hesaplanır.",
       forWhom: "Kimler için",
@@ -4067,16 +4104,17 @@ export const dictionary = {
         audit: "Web siteniz zaten var",
       },
       referenceNote:
-        "Henüz hiçbir şey kurmadığımız bir meslek dalındaki ilk işletme için pilot fiyat. Öncesinde bizden karşılaştırılabilir bir iş göremezsiniz — bu riski siz taşırsınız, fiyat da onu birlikte taşır. Karşılığında sonucu gösterebilir ve işletmenizi anabiliriz; övgü istenmez. Hangi meslek dallarının hazır olduğunu Çalışmalar bölümünde görürsünüz. Aynı meslek dalındaki ikinci işletmeden itibaren normal fiyat geçerlidir.",
-      regularLabel: "Normal fiyat",
+        "Her meslek dalında bir pilot yer: Henüz hiçbir şey kurmadığımız bir meslek dalındaki ilk işletme için sabit fiyat yerine {price:website-pilot} geçerlidir. Karşılığı yazılı bir referans iznidir — sonucu gösterebilir ve işletmenizin adını anabiliriz; övgü istenmez. Pilot işletme olarak durumu her hafta görür ve pilot fiyatı ödersiniz.",
+      pilotLabel: "Pilot yer",
       durationLabel: "Proje süresi",
       netNote: "Tüm fiyatlar nettir, %19 KDV hariç.",
       netNoteSmallBusiness: "Tüm fiyatlar nettir. § 19 UStG uyarınca (küçük işletme düzenlemesi) KDV gösterilmez.",
-      openEyebrow: "Daha büyük kapsam",
-      openPrice: "talep üzerine",
-      openNote:
-        "Birden fazla şube, bir mağaza, stok sistemine bağlantılar ya da web sitesinin ötesine geçen bir sistem: Bunun liste fiyatı yok, ama net bir yolu var. Sistem görüşmesinde — 45 dakika, ücretsiz — işletmeye bakar ve kapsamı birlikte belirleriz. Ardından tam olarak o kapsam için sabit bir fiyat çıkar ve sonrasında rakam değişmez.",
+      openEyebrow: "Sistem projesi",
+      openPrice: "Analizden sonra teklif",
+      openNote: "Birden fazla şube, arayüzler, web sitesinin ötesinde bir sistem: Sistem görüşmesinde (45 dakika, ücretsiz) kapsamı belirleriz. Buradan tam bu kapsam için sabit bir fiyat çıkar.",
       openCta: "Sistem görüşmesi ayarla",
+      betreuungNote: "Yalnızca kurduğumuz siteler için. Her ay iptal edilebilir.",
+      betreuungCta: "Kapsamı görün",
       openDriversLabel: "Kapsamı — dolayısıyla fiyatı — belirleyenler",
       openDrivers: [
         "Sistemin işletmedeki kaç akışı kapsayacağı",
@@ -4097,8 +4135,8 @@ export const dictionary = {
       monthly: "/ ay",
       items: {
         website: {
-          name: "Zanaat Web Sitesi Paketi",
-          who: "Zanaat işletmeleri ve küçük şirketler için",
+          name: "Usta İşletmeleri için Web Sitesi Paketi",
+          who: "Usta ve esnaf işletmeleri ile küçük şirketler için",
           outcome: "Dört haftada yayında — talep ve başvuru yollarıyla",
           includes: [
             "Broşür değil, talep getirsin diye kurulan web sitesi",
@@ -4164,7 +4202,7 @@ export const dictionary = {
           what: "İşletmede yanlış olduğu ortaya çıkan şey değiştirilir — belgelenip öylece bırakılmaz. Aylık değişiklikler kapsamında; yeni eklenen her şey kendi başına bir projedir.",
         },
       },
-      note: "Yüzdeyle verilmiş erişilebilirlik oranı yok, saatle verilmiş yanıt süresi yok, „7/24“ yok. Verdiğimiz söz burada yazandır — tatilde de tutarız.",
+      note: "Yüzdeyle verilmiş erişilebilirlik oranı yok, saatle verilmiş yanıt süresi yok, “7/24” yok. Verdiğimiz söz burada yazandır — tatilde de tutarız.",
     },
 
     systemePage: {
@@ -4287,7 +4325,7 @@ export const dictionary = {
       why: [
         {
           name: "Kuran, yerini bilir",
-          body: "Yabancı bir bakım ekibi her hatada önce yabancı kod okur. Biz kendi kodumuzu okuruz — bu yüzden „çabuk olur mu?“ sorusunun cevabı burada çoğu zaman evettir.",
+          body: "Yabancı bir bakım ekibi her hatada önce yabancı kod okur. Biz kendi kodumuzu okuruz — bu yüzden “çabuk olur mu?” sorusunun cevabı burada çoğu zaman evettir.",
         },
         {
           name: "Sisteme kimse dokunmasa da yaşlanır",
@@ -4309,9 +4347,9 @@ export const dictionary = {
     contact: {
       eyebrow: "İletişim",
       title: "20 dakikada, bağlayıcı olmadan.",
-      lead: "Almanca ve Türkçe. Size en hızlı gelen yolu seçin.",
+      lead: "{sprachen}. Size en hızlı gelen yolu seçin.",
       directTitle: "Randevusuz iki yol. İkisi de bir insana çıkar.",
-      directLead: "İki görüşme yukarıda duruyor. Sadece bir sorusu olanın hiçbirine ihtiyacı yok, doğrudan yazar: WhatsApp'tan ya da e-postayla, Almanca veya Türkçe.",
+      directLead: "İki görüşme yukarıda duruyor. Sadece bir sorusu olanın hiçbirine ihtiyacı yok, doğrudan yazar: WhatsApp'tan ya da e-postayla, {sprachen:oder}.",
       mailTitle: "E-posta",
       mailNote: "Belgeler, teklifler ve yazılı her şey için.",
       nameLabel: "İsim",
@@ -4330,7 +4368,7 @@ export const dictionary = {
       appointmentTitle: "Ücretsiz ilk görüşme",
       appointmentNote: "20 dakika, görüntülü. Ücretsiz ve bağlayıcı değil.",
       appointmentValue:
-        "İşletmenize bakar ve ne inşa edeceğimizi söyleriz — neyi inşa etmeyeceğimizi de. Cevap „henüz değil“ olsa bile.",
+        "İşletmenize bakar ve ne inşa edeceğimizi söyleriz — neyi inşa etmeyeceğimizi de. Cevap “henüz değil” olsa bile.",
       appointmentCta: "Randevu talep et",
       locationsLabel: "Merkez",
       marketsLabel: "Pazarlar",
@@ -4462,7 +4500,7 @@ export const dictionary = {
         choose: "Lütfen seçin",
         errRequired: "Lütfen zorunlu alanları doğru doldurun.",
         errEmail: "Lütfen geçerli bir e-posta adresi girin.",
-        interests: ["Zanaat Web Sitesi Paketi", "Sürekli destek — aylık 149 €", "Başka bir şey — marka, yazılım veya otomasyon", "Henüz belirsiz"],
+        interests: ["Usta İşletmeleri için Web Sitesi Paketi", "Web sitesi bakımı — aylık {price:betreuung}", "Başka bir şey — marka, yazılım veya otomasyon", "Henüz belirsiz"],
         sizes: ["1–4 çalışan", "5–15 çalışan", "16–30 çalışan", "30'dan fazla çalışan"],
       },
       scope: {
@@ -4563,7 +4601,7 @@ export const dictionary = {
       statusBody:
         "11 Eylül 2026 tarihli otomatik denetim, 132 tur boyunca (33 rota, iki pencere boyutu, açık ve koyu görünüm) makineyle saptanabilir hiçbir WCAG 2.1 AA ihlali bildirmiyor. 23 Ağustos 2026 tarihli ilk denetimde bulunan sekiz eksik giderildi. Elle yapılan denetim — klavyeyle gezinme, erişilebilir adlar, odak, yapı — açık nokta bırakmamıştı; o denetimden gelir ve o gün incelenen kapsam için geçerlidir.",
       statusNote:
-        "„Makineyle saptanabilir ihlal yok“ ifadesi „erişilebilir“ demek değildir. Otomatik araçlar engellerin yalnızca bir kısmını bulur; bu yüzden neyi denetlemediğimiz aşağıda yazıyor.",
+        "“Makineyle saptanabilir ihlal yok” ifadesi “erişilebilir” demek değildir. Otomatik araçlar engellerin yalnızca bir kısmını bulur; bu yüzden neyi denetlemediğimiz aşağıda yazıyor.",
 
       checkedTitle: "Neyi denetledik",
       checkedIntro:
@@ -4577,7 +4615,7 @@ export const dictionary = {
         "Her kontrol öğesinde görünür odak",
         "İçeriğe atlama bağlantısı, başlık yapısı, landmark'lar",
         "Her dil sürümü için dil işaretlemesi",
-        "„Hareketi azalt“ ayarında, %200 yakınlaştırmada ve 320 piksel genişlikte davranış",
+        "“Hareketi azalt” ayarında, %200 yakınlaştırmada ve 320 piksel genişlikte davranış",
       ],
       pagesLabel: "Denetlenen sayfalar",
       pagesBody:
@@ -4585,7 +4623,7 @@ export const dictionary = {
 
       fixedTitle: "Ne bulundu ve giderildi",
       fixedIntro:
-        "Sekiz eksik; hiçbiri engelleyici değil, yedisi „ciddi“ olarak sınıflandırıldı. Hepsi kodda giderildi — overlay yok, ek araç yok:",
+        "Sekiz eksik; hiçbiri engelleyici değil, yedisi “ciddi” olarak sınıflandırıldı. Hepsi kodda giderildi — overlay yok, ek araç yok:",
       fixed: [
         "Kontrastı yetersiz metin renkleri (yer tutucularda 2,4 : 1'e kadar düşen)",
         "üst çubuktaki üç kontrol öğesinde görünür odak yokluğu",
@@ -4595,7 +4633,7 @@ export const dictionary = {
         "randevu asistanında adım değişiminin sesli bildirilmemesi",
       ],
       fixedEarlier:
-        "Daha önce, ayrı bir turda: „Hareketi azalt“ sistem ayarı açıkken, kaydırmayla beliren bölümler görünmez kalıyordu — bir sayfada 33 blok. Bu sayfanın en ağır hatasıydı ve tam olarak bu ayarın kendisi için yapıldığı insanları etkiliyordu.",
+        "Daha önce, ayrı bir turda: “Hareketi azalt” sistem ayarı açıkken, kaydırmayla beliren bölümler görünmez kalıyordu — bir sayfada 33 blok. Bu sayfanın en ağır hatasıydı ve tam olarak bu ayarın kendisi için yapıldığı insanları etkiliyordu.",
 
       openTitle: "Bilinen sınırlamalar",
       openIntro: "Neyi denetlemediğimiz ve bunun anlamı:",
@@ -4693,7 +4731,7 @@ export const dictionary = {
         },
         {
           title: "Onay ve yerel kayıt",
-          body: "Onay penceresindeki kararınızı tarayıcınızın yerel deposunda saklıyoruz („creadig_consent“ anahtarı). Yalnızca onayınızla ek olarak görünümü (açık/koyu) hatırlıyoruz; onay yoksa bu ayar sadece açık oturum için geçerlidir. Dili hiç saklamıyoruz — o, sayfanın adresinde durur. Bu sırada üçüncü taraflara hiçbir veri aktarılmaz. Seçiminizi istediğiniz zaman „Çerez ayarları“ üzerinden değiştirebilir veya geri alabilirsiniz — geri aldığınızda ilgili kayıtları anında sileriz.",
+          body: "Onay penceresindeki kararınızı tarayıcınızın yerel deposunda saklıyoruz (“creadig_consent” anahtarı). Yalnızca onayınızla ek olarak görünümü (açık/koyu) hatırlıyoruz; onay yoksa bu ayar sadece açık oturum için geçerlidir. Dili hiç saklamıyoruz — o, sayfanın adresinde durur. Bu sırada üçüncü taraflara hiçbir veri aktarılmaz. Seçiminizi istediğiniz zaman “Çerez ayarları” üzerinden değiştirebilir veya geri alabilirsiniz — geri aldığınızda ilgili kayıtları anında sileriz.",
         },
         {
           title: "Haklarınız",
@@ -4711,7 +4749,7 @@ export const dictionary = {
       privacyPrefix: "Ayrıntılar",
       privacyLink: "gizlilik metnimizde",
       revoke:
-        "Seçiminizi istediğiniz zaman alt bilgideki „Çerez ayarları“ üzerinden değiştirebilir veya geri alabilirsiniz.",
+        "Seçiminizi istediğiniz zaman alt bilgideki “Çerez ayarları” üzerinden değiştirebilir veya geri alabilirsiniz.",
       acceptAll: "Tümünü kabul et",
       essentialOnly: "Yalnızca zorunlu olanlar",
       customize: "Kişisel gizlilik tercihleri",
@@ -4781,7 +4819,7 @@ export const dictionary = {
    */
   en: {
     meta: {
-      siteTitle: "creaDIG — a systems house for digitally run businesses",
+      siteTitle: "creaDIG: websites and digital workflows for businesses",
       siteDescription:
         "creaDIG is the house above its own systems — from brand to AI. We build them. And we run them. A systems house for Germany, Austria and Switzerland.",
       ogTitle: "creaDIG — we build what others never see.",
@@ -4810,12 +4848,17 @@ export const dictionary = {
         lead: "The handovers sit between the steps. That is where time is lost, and where the evening goes into reconstructing what nobody wrote down during the day.",
         stations: ["Enquiry", "Quote", "Appointment", "Job", "Documentation", "Invoice"],
         todayLabel: "Today",
-        todayNote: "Five handovers by hand.",
+        todayNote: "Each tool knows only its own step.",
         systemLabel: "With a system",
         systemNote: "One path. One status everyone can see.",
         gapLabel: "Break",
         signalLabel: "One job",
         modelNote: "A model, not a customer result. It shows the structure we build — not a measured saving.",
+        tools: ["WhatsApp", "Excel", "Calendar", "Paper notes", "Email", "Invoicing software"],
+        handoffCount: "5 handovers by hand",
+        systemCount: "1 continuous path",
+        ownership: "Yours: code and data",
+        handoffSr: "Handover by hand",
       },
       /* Three routes. Same situations, same order. */
       lagen: {
@@ -4865,27 +4908,36 @@ export const dictionary = {
         cta: "All services",
       },
       entry: {
-        eyebrow: "Getting started",
-        title: "Three ways to begin.",
-        lead: "Which one it is depends on where it is stuck — not on what we happen to want to sell.",
-        arten: {
-          festpreis: {
-            label: "Fixed price from",
-            body: "An agreed scope, one figure, no timesheet.",
+        eyebrow: "Offers",
+        title: "What it costs is written here.",
+        lead: "A fixed price for the website. Anything beyond that gets a fixed price for exactly your scope after one conversation.",
+        angebote: {
+          website: {
+            art: "Fixed price",
+            body: "The website for your business — built for enquiries, online in four weeks. The site and the access belong to you.",
+            cta: "See the package",
           },
-          monatlich: {
-            label: "Monthly",
-            body: "Ongoing care for the site we built — in a defined scope.",
+          analyse: {
+            art: "Fixed price, credited",
+            body: "We look at how your work flows and write down what a system would solve. The amount is credited to the project.",
+            cta: "Book a system call",
           },
-          "nach-analyse": {
-            label: "Offer after analysis",
-            body: "A twenty-minute first call, then a firm offer with scope and price.",
+          systemprojekt: {
+            name: "System project",
+            art: "Quote after analysis",
+            body: "When more is stuck than the website: after the system call you get a fixed price for exactly your scope.",
+            cta: "Book a system call",
+          },
+          betreuung: {
+            art: "monthly",
+            body: "Hosting, updates and two changes a month — for sites we built. Cancel any month.",
+            cta: "See the scope",
           },
         },
-        ebenenLabel: "Applies to",
+        auditNote: "Your site already exists?",
+        auditCta: "Have its accessibility audited (BFSG)",
         nettoNote: "All amounts excl. VAT.",
-        priceCta: "Packages and prices",
-        questionsLabel: "Two questions up front",
+        questionsLabel: "Two questions first",
         questionsCta: "All questions",
       },
       products: {
@@ -4949,7 +5001,7 @@ export const dictionary = {
     kontaktPage: {
       eyebrow: "Contact",
       title: "Choose the route that fits.",
-      lead: "Not every enquiry starts with an appointment. Some start with a look at what we have built — that is a route to us as well. Advice in German, Turkish and English.",
+      lead: "Not every enquiry starts with an appointment. Some start with a look at what we have built — that is a route to us as well. Advice in {sprachen}.",
       metaTitle: "Contact — creaDIG Osnabrück",
       metaDescription:
         "Reach creaDIG: by WhatsApp, email, a free first consultation, or straight through our own products. ICO InnovationsCentrum Osnabrück, advice in German, Turkish and English.",
@@ -5049,7 +5101,7 @@ export const dictionary = {
           key: "produkt",
           rang: "02",
           name: "Our own products in operation",
-          was: "fibero runs in fibre-optic fieldwork, meAI inside our own house. The images show the real interface, not a mock-up.",
+          was: "fibero runs in fibre-optic fieldwork, meAI inside our own house. We built both ourselves, and we run both ourselves — the product page says what is inside.",
           href: "/produkte/fibero",
         },
         {
@@ -5098,7 +5150,7 @@ export const dictionary = {
     produktePage: {
       eyebrow: "Proof, not a catalogue",
       title: "Four products we built ourselves.",
-      lead: "This page sells none of them. It exists because it backs up what we say about ourselves: creaDIG built every one of these systems from the ground up. One runs in our own daily operation, the other three are in build — the status is stated on each product. What we build for you is under Services.",
+      lead: "This page backs up what we say about ourselves: creaDIG built every one of these systems from the ground up. One runs in our own daily operation, the other three are in build — the status is stated on each product. What we build for you is under Services.",
       metaTitle: "Our own products — meAI, fibero, CASSAMEA, meahv",
       metaDescription:
         "The four products creaDIG built for itself: meAI (AI business operating system), fibero (fibre-optic operations), CASSAMEA (hospitality POS, Switzerland) and meahv (property management).",
@@ -5241,7 +5293,7 @@ export const dictionary = {
       headlineLine3: "never see.",
       subline:
         "We build businesses the system their work actually hangs on: job, customer, document and figure in one place. After that there is one answer instead of four — and nobody assembles it from three programs.",
-      systemLine: "We start where it is stuck for you.",
+      systemLine: "You run the business. We build the system behind it.",
       ctaPrimary: "Start a project",
       ctaSecondary: "Our own products",
       location: "Germany · Austria · Switzerland",
@@ -5359,7 +5411,7 @@ export const dictionary = {
       items: [
         {
           q: "What does a creaDIG presence cost?",
-          a: "The website package costs €3,900 excl. VAT. For the first business in a trade we have not yet built for, a pilot price of €2,400 excl. VAT applies. Ongoing support costs €149 excl. VAT per month. All prices plus 19% VAT, fixed price for the agreed scope.",
+          a: "The website package costs {price:website} excl. VAT, as a fixed price. Each trade has one pilot place at {price:website-pilot} excl. VAT — in exchange for written permission to show your business as a reference. Website care costs {price:betreuung} excl. VAT per month. All prices plus {vat}% VAT, fixed price for the agreed scope.",
         },
         {
           q: "How does a project run?",
@@ -5367,7 +5419,7 @@ export const dictionary = {
         },
         {
           q: "What is meAI?",
-          a: "meAI is our AI business operating system — it brings together figures, tasks and documents and prepares decisions. Live at meai.run.",
+          a: "meAI is our AI business operating system — it brings together figures, tasks and documents and prepares decisions. It is in build; reachable at meai.run, access after verification.",
         },
         {
           q: "Do you work in Switzerland as well?",
@@ -5379,7 +5431,7 @@ export const dictionary = {
         },
         {
           q: "Who owns the system — and what happens if I cancel the support?",
-          a: "The system and all the data in it belong to you from day one. Ongoing support at €149 excl. VAT per month can be cancelled monthly, with no minimum term. Afterwards everything stays with you: code, content, access and domain — we hand over what we hold, and you can continue with anyone else. What ends is the support, not your access.",
+          a: "The system and all the data in it belong to you from day one. Website care at {price:betreuung} excl. VAT per month can be cancelled monthly, with no minimum term. Afterwards everything stays with you: code, content, access and domain — we hand over what we hold, and you can continue with anyone else. What ends is the support, not your access.",
         },
       ],
     },
@@ -5436,6 +5488,8 @@ export const dictionary = {
       eyebrow: "The house",
       title: "One roof, five levels, four products.",
       lead: "The whole company in one view: the roof on top, the five levels below it, operations running across underneath — and at the bottom the four products of our own, each on the level where it sits.",
+      kompaktTitle: "One roof, five levels.",
+      kompaktLead: "The whole house in one view: the roof on top, the five levels below, operations running across underneath. You can start at any level — and stop at any level.",
       roofLabel: "The roof",
       roofNote: "Systems house, Osnabrück, since 2017",
       layersLabel: "Five levels",
@@ -5455,7 +5509,7 @@ export const dictionary = {
       angebotLabel: "Entry point",
       belegLabel: "Proof",
       angebotArt: {
-        festpreis: "Fixed price from",
+        festpreis: "Fixed price",
         monatlich: "Monthly",
         "nach-analyse": "Offer after analysis",
       },
@@ -5568,9 +5622,9 @@ export const dictionary = {
     },
     meai: {
       eyebrow: "Flagship · meai.run",
-      title: "Your invisible managing director.",
+      title: "An overview of your business.",
       lead: "meAI is our AI business operating system. It reads the business, prepares decisions and holds together what would otherwise be scattered across heads and scraps of paper.",
-      dna: "The rare double DNA: we do not only build the AI system — we run our own business on it. What meAI can do has been proven in our own working day before it reaches a client.",
+      dna: "We do not only build the AI system — we run our own business on it. What meAI can do has been proven in our own working day before it reaches a client.",
       cta: "Open meai.run",
       capabilities: {
         overview: {
@@ -5695,7 +5749,7 @@ export const dictionary = {
         },
       },
       limit:
-        "What is missing here is missing on purpose: a headcount, a capacity limit and a deputising rule for the case where the responsible person is unavailable. All three could be claimed; none of them is evidenced today. For a bounded project that is workable; for the core of a business you should ask about it.",
+        "We state headcount, capacity limit and deputising rule only once they are evidenced — ask about them if the core of your business is at stake.",
     },
     workModel: {
       eyebrow: "How we work",
@@ -5752,8 +5806,8 @@ export const dictionary = {
     },
     packages: {
       eyebrow: "Entry offers",
-      title: "Two ways in — both at a fixed price.",
-      lead: "Not every business starts at the top. These two offers are the entry point: clearly bounded, priced in advance, without you having to order the whole house.",
+      title: "What it costs.",
+      lead: "Fixed prices for the website and the audit, a fixed route for anything larger. Every figure applies to the stated scope.",
       entryNote:
         "This is the entry point, not the main architecture. What creaDIG builds as a systems house is set out above in the five levels and is quoted by scope — not by package.",
       forWhom: "Who it is for",
@@ -5763,16 +5817,17 @@ export const dictionary = {
         audit: "Your website already exists",
       },
       referenceNote:
-        "A pilot price for the first business in a trade we have not yet built for. You cannot look at comparable work of ours beforehand — you carry that risk, and the price carries it with you. In return we may show the result and name your business; praise is not required. Which trades already exist you can see under Work. From the second business in the same trade onwards the standard price applies.",
-      regularLabel: "Standard price",
+        "One pilot place per trade: for the first business in a trade we have not yet built for, {price:website-pilot} applies instead of the fixed price. In return you give written permission to use you as a reference — we may show the result and name your business; no praise is asked for. As a pilot business you see the status every week and pay the pilot price.",
+      pilotLabel: "Pilot place",
       durationLabel: "Project duration",
       netNote: "All prices excl. VAT, plus 19% VAT.",
       netNoteSmallBusiness: "All prices net. No VAT is shown under § 19 UStG (small-business rule).",
-      openEyebrow: "Larger scope",
-      openPrice: "on request",
-      openNote:
-        "Several locations, a shop, interfaces into inventory management, or a system that goes beyond the website: there is no list price for that, but there is a fixed path. In the system conversation — 45 minutes, free of charge — we look at the business and cut the scope to size. Out of that comes a fixed price for exactly that scope, and afterwards the number does not change.",
+      openEyebrow: "System project",
+      openPrice: "Quote after analysis",
+      openNote: "Several locations, interfaces, a system beyond the website: in the system call (45 minutes, free) we cut the scope. That becomes a fixed price for exactly this scope.",
       openCta: "System conversation",
+      betreuungNote: "Only for sites we built. Cancel any month.",
+      betreuungCta: "See the scope",
       openDriversLabel: "What drives the scope — and with it the price",
       openDrivers: [
         "How many workflows in the business the system has to cover",
@@ -6004,9 +6059,9 @@ export const dictionary = {
     contact: {
       eyebrow: "Contact",
       title: "Twenty minutes, no obligation.",
-      lead: "German, Turkish and English. Choose whichever route suits you fastest.",
+      lead: "{sprachen}. Choose whichever route suits you fastest.",
       directTitle: "Two routes, without an appointment. Both end with a person.",
-      directLead: "The two conversations are above. Anyone with just a question needs neither and writes directly: by WhatsApp or email, in German, Turkish or English.",
+      directLead: "The two conversations are above. Anyone with just a question needs neither and writes directly: by WhatsApp or email, in {sprachen:oder}.",
       mailTitle: "Email",
       mailNote: "For documents, proposals and anything in writing.",
       nameLabel: "Name",
@@ -6152,7 +6207,7 @@ export const dictionary = {
         choose: "Please choose",
         errRequired: "Please complete the required fields correctly.",
         errEmail: "Please give a valid email address.",
-        interests: ["Website package for trades", "Ongoing support — €149 / month", "Something else — brand, software or automation", "Not sure yet"],
+        interests: ["Website package for trades", "Website care — {price:betreuung} / month", "Something else — brand, software or automation", "Not sure yet"],
         sizes: ["1–4 staff", "5–15 staff", "16–30 staff", "more than 30 staff"],
       },
       scope: {
@@ -6462,7 +6517,7 @@ export const dictionary = {
    */
   ar: {
     meta: {
-      siteTitle: "creaDIG — بيت أنظمة للمنشآت التي تُدار رقميًا",
+      siteTitle: "creaDIG: مواقع وسير عمل رقمي للمنشآت",
       siteDescription:
         "creaDIG هي المظلة فوق أنظمتنا الخاصة — من العلامة إلى الذكاء الاصطناعي. نبنيها بأنفسنا. ونشغّلها بأنفسنا. بيت أنظمة لألمانيا والنمسا وسويسرا.",
       ogTitle: "creaDIG — نبني ما لا يراه الآخرون.",
@@ -6491,12 +6546,17 @@ export const dictionary = {
         lead: "بين الخطوات تقع عمليات التسليم. هناك يضيع الوقت، وهناك يُعاد في المساء بناء ما لم يدوّنه أحد أثناء النهار.",
         stations: ["طلب", "عرض سعر", "موعد", "أمر عمل", "توثيق", "فاتورة"],
         todayLabel: "اليوم",
-        todayNote: "خمس عمليات تسليم يدوية.",
+        todayNote: "كل أداة لا تعرف إلا خطوتها.",
         systemLabel: "مع نظام",
         systemNote: "مسار واحد. وحالة واحدة يراها الجميع.",
         gapLabel: "نقطة انقطاع",
         signalLabel: "معاملة واحدة",
         modelNote: "نموذج، وليس نتيجة عميل. يوضّح البنية التي نبنيها — لا وفورات مقيسة.",
+        tools: ["واتساب", "إكسل", "التقويم", "أوراق", "البريد الإلكتروني", "برنامج الفواتير"],
+        handoffCount: "5 عمليات تسليم يدوية",
+        systemCount: "مسار واحد متصل",
+        ownership: "ملككم: الشيفرة والبيانات",
+        handoffSr: "تسليم يدوي",
       },
       /* Drei Wege. Im Arabischen laeuft die Linie von rechts nach links. */
       lagen: {
@@ -6546,27 +6606,36 @@ export const dictionary = {
         cta: "كل الخدمات",
       },
       entry: {
-        eyebrow: "نقطة البداية",
-        title: "ثلاث طرق للبدء.",
-        lead: "أيّها ستكون يعتمد على موضع التعثّر — لا على ما نرغب في بيعه.",
-        arten: {
-          festpreis: {
-            label: "سعر ثابت من",
-            body: "نطاق متفق عليه، رقم واحد، دون كشف ساعات.",
+        eyebrow: "العروض",
+        title: "التكلفة مكتوبة هنا.",
+        lead: "سعر ثابت للموقع. وكل ما يتجاوز ذلك يحصل بعد محادثة واحدة على سعر ثابت لنطاقكم بالضبط.",
+        angebote: {
+          website: {
+            art: "سعر ثابت",
+            body: "موقع لمنشأتكم — مبني لجلب الاستفسارات، وعلى الإنترنت خلال أربعة أسابيع. الموقع وصلاحيات الوصول ملككم.",
+            cta: "عرض الباقة",
           },
-          monatlich: {
-            label: "شهريًا",
-            body: "الرعاية المستمرة للموقع الذي بنيناه — بنطاق محدَّد.",
+          analyse: {
+            art: "سعر ثابت يُحتسب من المشروع",
+            body: "ننظر في سير عملكم ونكتب ما الذي سيحلّه نظام. ويُحتسب المبلغ من المشروع.",
+            cta: "حجز محادثة النظام",
           },
-          "nach-analyse": {
-            label: "عرض بعد التحليل",
-            body: "مكالمة أولى من عشرين دقيقة، ثم عرض ثابت بنطاق وسعر.",
+          systemprojekt: {
+            name: "مشروع النظام",
+            art: "عرض بعد التحليل",
+            body: "حين يتعثّر أكثر من الموقع: بعد محادثة النظام تحصلون على سعر ثابت لنطاقكم بالضبط.",
+            cta: "حجز محادثة النظام",
+          },
+          betreuung: {
+            art: "شهريًا",
+            body: "استضافة وتحديثات وتغييران في الشهر — للمواقع التي بنيناها. قابلة للإنهاء شهريًا.",
+            cta: "عرض النطاق",
           },
         },
-        ebenenLabel: "ينطبق على",
-        nettoNote: "كل المبالغ دون ضريبة القيمة المضافة.",
-        priceCta: "الباقات والأسعار",
-        questionsLabel: "سؤالان قبل البداية",
+        auditNote: "موقعكم قائم بالفعل؟",
+        auditCta: "فحص إتاحة الوصول (BFSG)",
+        nettoNote: "كل المبالغ دون ضريبة.",
+        questionsLabel: "سؤالان مسبقًا",
         questionsCta: "كل الأسئلة",
       },
       products: {
@@ -6630,7 +6699,7 @@ export const dictionary = {
     kontaktPage: {
       eyebrow: "التواصل",
       title: "اختاروا الطريق الذي يناسبكم.",
-      lead: "ليس كل استفسار يبدأ بموعد. بعضها يبدأ بنظرة على ما بنيناه — وهذا أيضًا طريق إلينا. استشارة بالألمانية والتركية والإنجليزية.",
+      lead: "ليس كل استفسار يبدأ بموعد. بعضها يبدأ بنظرة على ما بنيناه — وهذا أيضًا طريق إلينا. استشارة بـ{sprachen}.",
       metaTitle: "التواصل — creaDIG أوسنابروك",
       metaDescription:
         "التواصل مع creaDIG: عبر واتساب أو البريد الإلكتروني أو استشارة أولى مجانية أو مباشرةً من خلال منتجاتنا. مركز ICO للابتكار في أوسنابروك، استشارة بالألمانية والتركية والإنجليزية.",
@@ -6730,7 +6799,7 @@ export const dictionary = {
           key: "produkt",
           rang: "02",
           name: "منتجاتنا في التشغيل",
-          was: "يعمل fibero في ميدان الألياف الضوئية، ويعمل meAI داخل بيتنا. واللقطات تُظهر الواجهة الحقيقية لا نموذجًا.",
+          was: "يعمل fibero في ميدان الألياف الضوئية، ويعمل meAI داخل بيتنا. بنيناهما بأنفسنا ونشغّلهما بأنفسنا — وصفحة المنتج تذكر ما بداخلهما.",
           href: "/produkte/fibero",
         },
         {
@@ -6779,7 +6848,7 @@ export const dictionary = {
     produktePage: {
       eyebrow: "دليل، لا كتالوج",
       title: "أربعة منتجات بنيناها بأنفسنا.",
-      lead: "هذه الصفحة لا تبيع أيًّا منها. هي هنا لأنها تُثبت ما نقوله عن أنفسنا: كل واحد من هذه الأنظمة بنته creaDIG من الأساس. واحد منها يعمل في تشغيلنا اليومي والثلاثة الأخرى قيد البناء — والحالة مذكورة عند كل منتج. أما ما نبنيه لكم فتجدونه تحت الخدمات.",
+      lead: "تُثبت هذه الصفحة ما نقوله عن أنفسنا: كل واحد من هذه الأنظمة بنته creaDIG من الأساس. واحد منها يعمل في تشغيلنا اليومي والثلاثة الأخرى قيد البناء — والحالة مذكورة عند كل منتج. أما ما نبنيه لكم فتجدونه تحت الخدمات.",
       metaTitle: "منتجاتنا الخاصة — meAI وfibero وCASSAMEA وmeahv",
       metaDescription:
         "منتجات creaDIG الأربعة: meAI (نظام تشغيل أعمال بالذكاء الاصطناعي)، وfibero (تشغيل شبكات الألياف)، وCASSAMEA (نقاط بيع للضيافة، سويسرا)، وmeahv (إدارة العقارات).",
@@ -6922,7 +6991,7 @@ export const dictionary = {
       headlineLine3: "الآخرون.",
       subline:
         "نبني للمنشآت النظام الذي يتعلّق به عملها فعليًا: أمر العمل والعميل والمستند والرقم في مكان واحد. بعدها هناك إجابة واحدة بدل أربع — ولا أحد يجمعها من ثلاثة برامج.",
-      systemLine: "نبدأ من حيث تتعثّرون.",
+      systemLine: "أنتم تديرون المنشأة. ونحن نبني النظام الذي خلفها.",
       ctaPrimary: "بدء مشروع",
       ctaSecondary: "منتجاتنا",
       location: "ألمانيا · النمسا · سويسرا",
@@ -7040,7 +7109,7 @@ export const dictionary = {
       items: [
         {
           q: "كم يكلّف الحضور الرقمي لدى creaDIG؟",
-          a: "باقة الموقع بـ 3.900 يورو دون ضريبة. ولأول منشأة في حرفة لم نبنِ لها شيئًا بعد يسري سعر تجريبي قدره 2.400 يورو دون ضريبة. المتابعة الجارية بـ 149 يورو دون ضريبة شهريًا. كل الأسعار تُضاف إليها ضريبة 19٪، بسعر ثابت للنطاق المتفق عليه.",
+          a: "باقة الموقع بسعر ثابت {price:website} دون ضريبة. ولكل حرفة مقعد تجريبي بـ {price:website-pilot} دون ضريبة — مقابل إذن مكتوب بعرض منشأتكم كمرجع. رعاية الموقع بـ {price:betreuung} دون ضريبة شهريًا. كل الأسعار تُضاف إليها ضريبة {vat}٪، بسعر ثابت للنطاق المتفق عليه.",
         },
         {
           q: "كيف يسير المشروع؟",
@@ -7048,7 +7117,7 @@ export const dictionary = {
         },
         {
           q: "ما هو meAI؟",
-          a: "meAI هو نظام تشغيل الأعمال بالذكاء الاصطناعي لدينا — يجمع الأرقام والمهام والمستندات ويُهيّئ القرارات. حيّ على meai.run.",
+          a: "meAI هو نظام تشغيل الأعمال بالذكاء الاصطناعي لدينا — يجمع الأرقام والمهام والمستندات ويُهيّئ القرارات. وهو قيد البناء؛ متاح على meai.run، والدخول بعد التحقق.",
         },
         {
           q: "هل تعملون في سويسرا أيضًا؟",
@@ -7060,7 +7129,7 @@ export const dictionary = {
         },
         {
           q: "لمن يعود النظام — وماذا يحدث إن أنهيتُ المتابعة؟",
-          a: "النظام وكل البيانات فيه ملككم من اليوم الأول. المتابعة الجارية بـ 149 يورو دون ضريبة شهريًا قابلة للإنهاء شهريًا دون حد أدنى للمدة. وبعدها يبقى كل شيء لديكم: الشيفرة والمحتوى والصلاحيات والنطاق — نسلّم ما بحوزتنا، ويمكنكم المتابعة مع أي جهة أخرى. ما ينتهي هو المتابعة، لا وصولكم.",
+          a: "النظام وكل البيانات فيه ملككم من اليوم الأول. رعاية الموقع بـ {price:betreuung} دون ضريبة شهريًا قابلة للإنهاء شهريًا دون حد أدنى للمدة. وبعدها يبقى كل شيء لديكم: الشيفرة والمحتوى والصلاحيات والنطاق — نسلّم ما بحوزتنا، ويمكنكم المتابعة مع أي جهة أخرى. ما ينتهي هو المتابعة، لا وصولكم.",
         },
       ],
     },
@@ -7117,6 +7186,8 @@ export const dictionary = {
       eyebrow: "البيت",
       title: "مظلة واحدة، خمس طبقات، أربعة منتجات.",
       lead: "الشركة كلها في عرضٍ واحد: المظلة في الأعلى، وتحتها الطبقات الخمس، ويمتدّ التشغيل عرضيًا تحتها — وفي الأسفل المنتجات الأربعة، كلٌّ عند الطبقة التي يجلس عليها.",
+      kompaktTitle: "مظلة واحدة، خمس طبقات.",
+      kompaktLead: "البيت كله في عرضٍ واحد: المظلة في الأعلى، وتحتها الطبقات الخمس، ويمتدّ التشغيل عرضيًا تحتها. يمكنكم البدء من أي طبقة — والتوقف عند أي طبقة.",
       roofLabel: "المظلة",
       roofNote: "بيت أنظمة، أوسنابروك، منذ 2017",
       layersLabel: "خمس طبقات",
@@ -7136,7 +7207,7 @@ export const dictionary = {
       angebotLabel: "نقطة الدخول",
       belegLabel: "الدليل",
       angebotArt: {
-        festpreis: "سعر ثابت من",
+        festpreis: "سعر ثابت",
         monatlich: "شهريًا",
         "nach-analyse": "عرض بعد التحليل",
       },
@@ -7249,9 +7320,9 @@ export const dictionary = {
     },
     meai: {
       eyebrow: "المنتج الرائد · meai.run",
-      title: "مديركم التنفيذي غير المرئي.",
+      title: "نظرة شاملة على منشأتكم.",
       lead: "meAI هو نظام تشغيل الأعمال بالذكاء الاصطناعي لدينا. يقرأ المنشأة، ويُهيّئ القرارات، ويجمع ما يتفرّق عادةً بين الرؤوس وقصاصات الورق.",
-      dna: "الحمض النووي المزدوج النادر: نحن لا نبني نظام الذكاء الاصطناعي فحسب — بل ندير به منشأتنا. ما يستطيعه meAI مُجرَّب في يومنا العملي قبل أن يصل إلى عميل.",
+      dna: "نحن لا نبني نظام الذكاء الاصطناعي فحسب — بل ندير به منشأتنا. ما يستطيعه meAI مُجرَّب في يومنا العملي قبل أن يصل إلى عميل.",
       cta: "فتح meai.run",
       capabilities: {
         overview: {
@@ -7376,7 +7447,7 @@ export const dictionary = {
         },
       },
       limit:
-        "ما ينقص هنا ينقص عن قصد: عدد الموظفين، وحدّ الطاقة الاستيعابية، وقاعدة إنابة إن تعذّر حضور المسؤول. الثلاثة يمكن ادّعاؤها، ولا واحد منها موثَّق اليوم. لمشروع محدود النطاق هذا محتمل؛ أما لجوهر منشأة فينبغي أن تسألوا عنه.",
+        "لا نذكر عدد الموظفين وحدّ الطاقة وقاعدة الإنابة إلا حين تكون موثَّقة — اسألوا عنها إن تعلّق الأمر بجوهر منشأتكم.",
     },
     workModel: {
       eyebrow: "هكذا نعمل",
@@ -7433,8 +7504,8 @@ export const dictionary = {
     },
     packages: {
       eyebrow: "عروض البداية",
-      title: "طريقان للدخول — كلاهما بسعر ثابت.",
-      lead: "ليست كل منشأة تبدأ من الأعلى. هذان العرضان هما نقطة الدخول: محدَّدان بوضوح، ومسعّران مسبقًا، دون أن تطلبوا البيت كله.",
+      title: "التكلفة.",
+      lead: "أسعار ثابتة للموقع وللفحص، وطريق ثابت لكل ما هو أكبر. كل رقم يسري على النطاق المذكور.",
       entryNote:
         "هذه نقطة الدخول، لا البنية الأساسية. أما ما تبنيه creaDIG كبيت أنظمة فمذكور أعلاه في الطبقات الخمس ويُحسب بحسب النطاق — لا بالباقة.",
       forWhom: "لمن",
@@ -7444,16 +7515,17 @@ export const dictionary = {
         audit: "موقعكم قائم بالفعل",
       },
       referenceNote:
-        "سعر تجريبي لأول منشأة في حرفة لم نبنِ لها شيئًا بعد. لا يمكنكم الاطلاع مسبقًا على عمل مماثل لنا — أنتم تحملون هذه المخاطرة، والسعر يحملها معكم. وفي المقابل يجوز لنا عرض النتيجة وذكر منشأتكم؛ ولا يُطلب مديح. وأيّ الحرف قائمة بالفعل ترونه تحت الأعمال. ومن المنشأة الثانية في الحرفة نفسها يسري السعر المعتاد.",
-      regularLabel: "السعر المعتاد",
+        "مقعد تجريبي واحد لكل حرفة: لأول منشأة في حرفة لم نبنِ لها شيئًا بعد يسري {price:website-pilot} بدل السعر الثابت. والمقابل إذن مكتوب بذكركم كمرجع — يحق لنا عرض النتيجة وذكر اسم منشأتكم، ولا يُطلب أي مديح. وبصفتكم منشأة تجريبية ترون الحالة كل أسبوع وتدفعون السعر التجريبي.",
+      pilotLabel: "مقعد تجريبي",
       durationLabel: "مدة المشروع",
       netNote: "كل الأسعار دون ضريبة، تُضاف إليها ضريبة 19٪.",
       netNoteSmallBusiness: "كل الأسعار صافية. لا تُحتسب ضريبة القيمة المضافة وفق المادة 19 من قانون ضريبة المبيعات الألماني (نظام المنشآت الصغيرة).",
-      openEyebrow: "نطاق أكبر",
-      openPrice: "عند الطلب",
-      openNote:
-        "مواقع متعددة، أو متجر، أو واجهات إلى نظام المخزون، أو نظام يتجاوز الموقع: لا توجد لذلك قائمة أسعار، لكن يوجد طريق واضح. في حديث النظام — خمس وأربعون دقيقة، مجانًا — ننظر في المنشأة ونحدّد النطاق معًا. ومن ذلك يخرج سعر ثابت لهذا النطاق بالضبط، ولا يتغيّر الرقم بعده.",
+      openEyebrow: "مشروع النظام",
+      openPrice: "عرض بعد التحليل",
+      openNote: "عدة فروع، واجهات ربط، نظام يتجاوز الموقع: في محادثة النظام (45 دقيقة، مجانًا) نحدّد النطاق. ومنه يأتي سعر ثابت لهذا النطاق بالضبط.",
       openCta: "حديث النظام",
+      betreuungNote: "للمواقع التي بنيناها فقط. قابلة للإنهاء شهريًا.",
+      betreuungCta: "عرض النطاق",
       openDriversLabel: "ما يحدّد النطاق — ومعه السعر",
       openDrivers: [
         "كم عدد مسارات العمل التي يغطّيها النظام في المنشأة",
@@ -7685,9 +7757,9 @@ export const dictionary = {
     contact: {
       eyebrow: "التواصل",
       title: "عشرون دقيقة، دون التزام.",
-      lead: "بالألمانية والتركية والإنجليزية. اختاروا الطريق الأسرع لكم.",
+      lead: "بـ{sprachen}. اختاروا الطريق الأسرع لكم.",
       directTitle: "طريقان دون موعد. كلاهما ينتهي عند إنسان.",
-      directLead: "المحادثتان مذكورتان أعلاه. ومن لديه سؤال فقط لا يحتاج إلى أيٍّ منهما ويكتب مباشرةً: عبر واتساب أو البريد، بالألمانية أو التركية أو الإنجليزية.",
+      directLead: "المحادثتان مذكورتان أعلاه. ومن لديه سؤال فقط لا يحتاج إلى أيٍّ منهما ويكتب مباشرةً: عبر واتساب أو البريد، بـ{sprachen:oder}.",
       mailTitle: "البريد الإلكتروني",
       mailNote: "للمستندات والعروض وكل ما هو مكتوب.",
       nameLabel: "الاسم",
@@ -7833,7 +7905,7 @@ export const dictionary = {
         choose: "يُرجى الاختيار",
         errRequired: "يُرجى تعبئة الحقول الإلزامية بشكل صحيح.",
         errEmail: "يُرجى ذكر عنوان بريد إلكتروني صالح.",
-        interests: ["باقة الموقع للحِرف", "المتابعة الجارية — 149 يورو / شهريًا", "شيء آخر — علامة أو برمجيات أو أتمتة", "غير محدَّد بعد"],
+        interests: ["باقة الموقع للحِرف", "رعاية الموقع — {price:betreuung} / شهريًا", "شيء آخر — علامة أو برمجيات أو أتمتة", "غير محدَّد بعد"],
         sizes: ["1–4 موظفين", "5–15 موظفًا", "16–30 موظفًا", "أكثر من 30 موظفًا"],
       },
       scope: {
@@ -8117,6 +8189,19 @@ export const dictionary = {
     },
   },
 } as const
+
+/*
+ * Beträge stehen im Wörterbuch nur als Platzhalter (`{price:website}`) und
+ * werden hier einmal gefüllt — aus `lib/offers.ts`, der einen Preisquelle.
+ * Typ und Form bleiben die des Literals; nur die Zeichenketten tragen danach
+ * die Zahl in der Schreibweise ihrer Sprache.
+ */
+export const dictionary: typeof rawDictionary = {
+  de: fillOfferTokensDeep(rawDictionary.de, "de"),
+  tr: fillOfferTokensDeep(rawDictionary.tr, "tr"),
+  en: fillOfferTokensDeep(rawDictionary.en, "en"),
+  ar: fillOfferTokensDeep(rawDictionary.ar, "ar"),
+}
 
 export type Dictionary = (typeof dictionary)["de"]
 

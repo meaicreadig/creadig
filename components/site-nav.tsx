@@ -30,7 +30,7 @@ import { Logo } from "@/components/brand/logo"
  * liest weiterhin alle fuenf.
  */
 import { hauptNavLinks } from "@/lib/navigation"
-import { localePath, locales, splitLocale } from "@/lib/routes"
+import { isIndexed, localePath, locales, splitLocale } from "@/lib/routes"
 import { LanguageMenu, LOCALE_NAME } from "@/components/ui/language-menu"
 
 import { whatsappLink, type Locale } from "@/lib/dictionary"
@@ -372,7 +372,7 @@ export function SiteNav() {
                 */}
                 <p className="eyebrow text-muted-foreground mt-1">{t.nav.language}</p>
                 <ul className="mt-1 flex flex-col">
-                  {locales.map((code) => {
+                  {locales.filter((code) => code === locale || isIndexed(code)).map((code) => {
                     const gewaehlt = code === locale
                     return (
                       <li key={code}>

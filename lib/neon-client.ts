@@ -789,6 +789,20 @@ export const SCHEMA: string[] = [
      updated_at timestamptz NOT NULL DEFAULT now()
    )`,
   `CREATE INDEX IF NOT EXISTS publications_datum_idx ON publications (veroeffentlicht_am DESC)`,
+  /*
+   * 021 · §18 — DER FREIGABE-SCHUTZ. Siehe `scripts/migrations/021-veroeffentlichung-zustand.sql`.
+   * Bestehende Zeilen bekommen `veroeffentlicht` und behalten ihr Datum —
+   * sie erfuellen die neue Bedingung ohne Nacharbeit. Produktion NUR mit
+   * Owner-Freigabe (O7) ueber `npm run cutover-migration`.
+   */
+  `ALTER TABLE publications ADD COLUMN IF NOT EXISTS zustand text NOT NULL DEFAULT 'veroeffentlicht' CHECK (zustand IN ('entwurf','freigegeben','veroeffentlicht'))`,
+  `ALTER TABLE publications ADD COLUMN IF NOT EXISTS quelle_art text CHECK (quelle_art IN ('lieferung','einwand','beleg','build'))`,
+  `ALTER TABLE publications ADD COLUMN IF NOT EXISTS quelle_id text`,
+  `ALTER TABLE publications ADD COLUMN IF NOT EXISTS freigegeben_von text`,
+  `ALTER TABLE publications ADD COLUMN IF NOT EXISTS freigegeben_am timestamptz`,
+  `ALTER TABLE publications ALTER COLUMN veroeffentlicht_am DROP NOT NULL`,
+  `ALTER TABLE publications DROP CONSTRAINT IF EXISTS publications_datum_bei_veroeff`,
+  `ALTER TABLE publications ADD CONSTRAINT publications_datum_bei_veroeff CHECK (zustand <> 'veroeffentlicht' OR veroeffentlicht_am IS NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS leads_responsible_idx ON leads (responsible)`,
   `CREATE INDEX IF NOT EXISTS opportunities_responsible_idx ON opportunities (responsible)`,
 ]

@@ -1,5 +1,6 @@
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { localeUrl } from "@/lib/routes"
+import { publishedOffers } from "@/lib/offers"
 
 /**
  * SEC-7 — strukturierte Daten sicher in ein <script>-Element schreiben.
@@ -68,5 +69,44 @@ export function breadcrumbList(
         item: localeUrl(step.path, locale),
       })),
     ],
+  }
+}
+
+/*
+ * S2 — DER ANGEBOTSKATALOG STEHT NUR DORT, WO DIE ANGEBOTE STEHEN.
+ *
+ * Er hing am Organisations-Datensatz im Layout und damit an JEDER Seite —
+ * auch an der Startseite, am Impressum, an /karriere. Strukturierte Daten
+ * beschreiben, was auf der Seite sichtbar ist; ein Katalog ueber einer
+ * Seite ohne Preise ist eine Behauptung, die die Seite nicht traegt.
+ *
+ * Werte kommen aus `lib/offers.ts`. Der Pilotplatz steht NICHT darin: Sein
+ * Betrag haengt an einer Gegenleistung, und maschinenlesbar bliebe nur die
+ * kleinere Zahl als „Preis" uebrig.
+ */
+export function offerCatalog(locale: Locale) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "OfferCatalog",
+    name: dictionary[locale].home.entry.eyebrow,
+    itemListElement: publishedOffers
+      .filter((o) => !o.condition)
+      .map((o) => ({
+        "@type": "Offer",
+        name: o.label[locale],
+        priceCurrency: "EUR",
+        ...(o.period === "month"
+          ? {
+              priceSpecification: {
+                "@type": "UnitPriceSpecification",
+                price: o.amount,
+                priceCurrency: "EUR",
+                billingDuration: 1,
+                unitCode: "MON",
+              },
+            }
+          : { price: o.amount }),
+        availability: "https://schema.org/InStock",
+      })),
   }
 }

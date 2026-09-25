@@ -16,6 +16,7 @@ import {
   type PublicationReaktion,
   type VertriebStore,
 } from "@/lib/vertrieb"
+import { istQuelle } from "@/lib/veroeffentlichung-zustand"
 
 /**
  * B-3 · ZWEI HANDLUNGEN, MEHR NICHT.
@@ -90,5 +91,38 @@ export async function reaktionEintragen(id: string, formData: FormData): Promise
     String(formData.get("notiz") ?? "").trim() || null,
     bezug,
   )
+  revalidatePath("/admin/veroeffentlichungen")
+}
+
+/* ═══ §18 — Entwurf → Freigabe → Veroeffentlichung ═══════════════════════
+ *
+ * Drei Aktionen, drei Tueren; die mittlere nur fuer den Owner.
+ */
+export async function entwurfAnlegen(formData: FormData): Promise<void> {
+  const store = await requireOwnerStore()
+  const was = String(formData.get("was") ?? "").trim()
+  const kanal = formData.get("kanal")
+  const quelle = formData.get("quelle")
+  if (!was || !istKanal(kanal) || !istQuelle(quelle)) return
+  await store.recordDraft({ was, kanal, quelle, quelleId: String(formData.get("quelleId") ?? "").trim() || null })
+  revalidatePath("/admin/veroeffentlichungen")
+}
+
+export async function entwurfFreigeben(id: string): Promise<void> {
+  const store = await requireOwnerStore()
+  /* §18 — die Freigabe ist eine Owner-Handlung. Geprueft HIER und noch einmal
+     im Store (`approvePublication` kennt die Rolle, mit der er gebaut wurde):
+     Eine Aktion ist eine oeffentliche Adresse, ein versteckter Knopf keine Sicherung. */
+  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
+  if (zugang.rolle !== "owner") throw new Error("Nur der Owner gibt frei")
+  await store.approvePublication(id)
+  revalidatePath("/admin/veroeffentlichungen")
+}
+
+export async function alsVeroeffentlichtEintragen(id: string, formData: FormData): Promise<void> {
+  const store = await requireOwnerStore()
+  const am = String(formData.get("am") ?? "").trim()
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(am)) return
+  await store.markPublished(id, am, String(formData.get("url") ?? "").trim() || null)
   revalidatePath("/admin/veroeffentlichungen")
 }

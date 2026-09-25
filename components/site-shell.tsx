@@ -14,19 +14,10 @@ import { SiteFooter } from "@/components/site-footer"
 import { StickyWhatsApp } from "@/components/sticky-whatsapp"
 import { CookieConsent } from "@/components/consent/cookie-consent"
 import { GatedAnalytics } from "@/components/consent/gated-analytics"
-import {
-  address,
-  aggregateRating,
-  areaServed,
-  approvedReviews,
-  packages,
-  retainer,
-  retainerPublished,
-  socialProfiles,
-} from "@/lib/site-data"
+import { address, areaServed, socialProfiles } from "@/lib/site-data"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { jsonLdScript } from "@/lib/json-ld"
-import { SITE_URL, localeAlternates, localeUrl, locales, openGraphLocale } from "@/lib/routes"
+import { SITE_URL, isIndexed, localeAlternates, localeUrl, locales, openGraphLocale } from "@/lib/routes"
 import { ogImage } from "@/lib/page-metadata"
 
 /**
@@ -222,7 +213,7 @@ export function shellMetadata(locale: Locale): Metadata {
        * OpenGraph erlaubt mehrere `alternateLocale`; hier stehen alle
        * gepflegten ausser der eigenen.
        */
-      alternateLocale: locales.filter((l) => l !== locale).map((l) => openGraphLocale[l]),
+      alternateLocale: locales.filter((l) => l !== locale && isIndexed(l)).map((l) => openGraphLocale[l]),
       type: "website",
       siteName: "creaDIG",
       url: localeUrl("/", locale),
@@ -306,7 +297,7 @@ function organizationSchema(locale: Locale) {
   const t = dictionary[locale]
   return {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "ProfessionalService",
     name: "creaDIG",
     description: t.meta.organizationDescription,
     foundingDate: "2017",
@@ -321,85 +312,19 @@ function organizationSchema(locale: Locale) {
       addressCountry: address.countryCode,
     },
     founder: { "@type": "Person", name: address.owner },
-    telephone: "+41765045879",
+    /*
+     * Keine Rufnummer, bis die deutsche feststeht (O2). Name, Adresse und
+     * Telefon muessen ueberall gleich sein — eine Schweizer Nummer an einem
+     * Osnabruecker Sitz ist genau die Abweichung, die lokale Suche bestraft.
+     */
     url: localeUrl("/", locale),
     ...(socialProfiles.length > 0 ? { sameAs: socialProfiles.map((p) => p.url) } : {}),
     /*
-     * Die drei Pakete als Angebotskatalog (E-K3). Preise und Namen kommen aus
-     * derselben Quelle wie die Anzeige — sie koennen nicht auseinanderlaufen.
-     * `MON` ist die UN/CEFACT-Einheit fuer Monat.
+     * S2 — kein Angebotskatalog, keine Bewertungen, keine Sterne an diesem
+     * Datensatz. Er steht im Layout, also an JEDER Seite; Angebote stehen nur
+     * auf den Angebotsseiten (`offerCatalog()` in lib/json-ld.ts), und
+     * Bewertungs-Markup gibt es in diesem Haus nicht (Kanon).
      */
-    hasOfferCatalog: {
-      "@type": "OfferCatalog",
-      name: "creaDIG Pakete",
-      itemListElement: packages.map((pkg) => ({
-        "@type": "Offer",
-        name: t.packages.items[pkg.key].name,
-        description: t.packages.items[pkg.key].who,
-        priceCurrency: "EUR",
-        price: pkg.amount,
-        ...(pkg.period
-          ? {
-              priceSpecification: {
-                "@type": "UnitPriceSpecification",
-                price: pkg.amount,
-                priceCurrency: "EUR",
-                billingDuration: 1,
-                unitCode: pkg.period,
-              },
-            }
-          : {}),
-        availability: "https://schema.org/InStock",
-      })),
-    },
-    ...(retainerPublished && retainer.amount
-      ? {
-          makesOffer: {
-            "@type": "Offer",
-            name: t.packages.retainerEyebrow,
-            description: retainer.description?.[locale],
-            priceCurrency: "EUR",
-            priceSpecification: {
-              "@type": "UnitPriceSpecification",
-              price: retainer.amount,
-              priceCurrency: "EUR",
-              billingDuration: 1,
-              unitCode: "MON",
-            },
-            availability: "https://schema.org/InStock",
-          },
-        }
-      : {}),
-    ...(aggregateRating
-      ? {
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: aggregateRating.value,
-            reviewCount: aggregateRating.count,
-            bestRating: 5,
-          },
-        }
-      : {}),
-    ...(approvedReviews.length > 0
-      ? {
-          review: approvedReviews.map((r) => ({
-            "@type": "Review",
-            author: { "@type": "Person", name: r.name },
-            datePublished: r.date,
-            reviewBody: r.text,
-            inLanguage: r.lang,
-            ...(r.rating !== null
-              ? {
-                  reviewRating: {
-                    "@type": "Rating",
-                    ratingValue: r.rating,
-                    bestRating: 5,
-                  },
-                }
-              : {}),
-          })),
-        }
-      : {}),
   }
 }
 

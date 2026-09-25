@@ -1,5 +1,6 @@
 import type { ContactSource, Decision, PersonRef } from "@/lib/contact-access"
 import type { EvidenceKind, ResearchCase, ResearchState, SourceKind } from "@/lib/research"
+import type { PublicationQuelle, PublicationZustand } from "@/lib/veroeffentlichung-zustand"
 import type { OfferKind } from "@/lib/offer-readiness"
 import type { SalesStatus } from "@/lib/lead-store"
 import type { Angebot, Annahme, Befund, Position } from "@/lib/angebot"
@@ -682,8 +683,15 @@ export type PublicationRow = {
   id: string
   was: string
   kanal: PublicationKanal
-  /** YYYY-MM-DD */
-  veroeffentlichtAm: string
+  /**
+   * §18 — `veroeffentlicht` fuer jeden Eintrag vor Migration 021 und fuer
+   * jeden von Hand nachgetragenen Beitrag; `entwurf`/`freigegeben` erst mit 021.
+   */
+  zustand: PublicationZustand
+  quelle: { art: PublicationQuelle; id: string | null } | null
+  freigegebenVon: string | null
+  /** YYYY-MM-DD — `null`, solange nichts hinausging. */
+  veroeffentlichtAm: string | null
   url: string | null
   reaktion: PublicationReaktion
   reaktionNotiz: string | null
@@ -887,6 +895,15 @@ export type VertriebStore = {
    */
   listPublications(query?: { kanal?: PublicationKanal; limit?: number }): Promise<PublicationRow[] | null>
   recordPublication(input: PublicationEingabe): Promise<{ id: string } | null>
+  /**
+   * §18 — ein Entwurf mit Quelle. `null`, wenn das Register den Zustand noch
+   * nicht kennt (Migration 021 fehlt) — die Oberflaeche sagt das.
+   */
+  recordDraft(input: { was: string; kanal: PublicationKanal; quelle: PublicationQuelle; quelleId: string | null }): Promise<{ id: string } | null>
+  /** Nur `entwurf` → `freigegeben`. Die Rolle prueft der Aufrufer UND der Store. */
+  approvePublication(id: string): Promise<boolean>
+  /** Nur `freigegeben` → `veroeffentlicht`, mit Datum und Adresse. Nie aus `entwurf`. */
+  markPublished(id: string, am: string, url: string | null): Promise<boolean>
   /**
    * Die Reaktion nachtragen.
    *

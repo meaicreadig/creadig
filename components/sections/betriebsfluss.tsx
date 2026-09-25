@@ -5,6 +5,7 @@ import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 import { SystemRail } from "@/components/creative/system"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
+import { useSeenOnce } from "@/lib/use-seen-once"
 
 /**
  * DAS SYSTEMBILD — der Signature-Moment des Creative-Systems.
@@ -77,69 +78,106 @@ import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
  * im Arabischen laeuft die Spur von rechts nach links, ohne Sonderfall.
  */
 
+/*
+ * ═══════════════════════════════════════════════════════════════════════════
+ * V2 — WAS DAS BILD JETZT ZUSAETZLICH SAGT (W3)
+ *
+ * Abstrakte Knoten zeigt jeder iPaaS. Zwei Dinge machen es zu diesem Haus:
+ *
+ *   · Unter der getrennten Spur stehen die ECHTEN Werkzeuge — WhatsApp,
+ *     Excel, Kalender, Zettel, E-Mail, Rechnungsprogramm. Ein Handwerker
+ *     erkennt seinen Tag, keine Infografik.
+ *   · Die Gold-Spur endet in einer Marke: „Gehoert Ihnen: Code und Daten".
+ *     Das ist das Alleinstellungsmerkmal, das bisher nur als Fliesstext stand.
+ *
+ * Der Zustandswechsel getrennt → verbunden passiert GENAU EINMAL, beim ersten
+ * Einblenden, und nur als CSS (`clip-path`, siehe `globals.css`). Ohne JS und
+ * bei reduzierter Bewegung steht der verbundene Zustand sofort da — die
+ * Animation darf entfallen, die Information nie.
+ */
+
 /** Eine Spur: sechs Stationen, gleich breite Zellen. */
 function Spur({
   stationen,
+  werkzeuge,
   gebrochen,
   label,
+  zaehler,
   note,
   puls,
+  uebergabeSr,
+  eigentum,
 }: {
   stationen: readonly string[]
+  werkzeuge?: readonly string[]
   gebrochen: boolean
   label: string
+  zaehler: string
   note: string
   puls: boolean
+  uebergabeSr?: string
+  eigentum?: string
 }) {
   return (
-    <div>
+    <div data-spur={gebrochen ? "getrennt" : "system"}>
       <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
         <span className={`eyebrow ${gebrochen ? "text-muted-foreground" : "text-gold-text"}`}>
           {label}
         </span>
+        <span className={`text-subhead text-base ${gebrochen ? "text-muted-foreground" : "text-foreground"}`}>
+          {zaehler}
+        </span>
         <span className="type-small text-muted-foreground">{note}</span>
       </div>
 
-      <ol className="mt-6 flex flex-col md:flex-row md:items-stretch">
-        {stationen.map((station, i) => {
-          const ersteZelle = i === 0
-          const letzteZelle = i === stationen.length - 1
+      <div className="betriebsfluss-spur">
+        <ol className="mt-6 flex flex-col md:flex-row md:items-stretch">
+          {stationen.map((station, i) => {
+            const ersteZelle = i === 0
+            const letzteZelle = i === stationen.length - 1
+            const werkzeug = werkzeuge?.[i]
 
-          return (
-            <li key={station} className="flex flex-1 items-stretch gap-4 md:flex-col md:gap-0">
-              {/*
-                Die Schiene. Auf dem Telefon eine Spalte links neben der
-                Beschriftung, ab md eine Zeile darueber — dieselben Elemente,
-                nur andere Flussrichtung.
-              */}
-              <SystemRail
-                ton={gebrochen ? "offen" : "verbunden"}
-                achse="fluss"
-                erste={ersteZelle}
-                letzte={letzteZelle}
-                puls={puls}
-                verzug={i}
-              />
+            return (
+              <li key={station} className="flex flex-1 items-stretch gap-4 md:flex-col md:gap-0">
+                <SystemRail
+                  ton={gebrochen ? "offen" : "verbunden"}
+                  achse="fluss"
+                  erste={ersteZelle}
+                  letzte={letzteZelle}
+                  puls={puls}
+                  verzug={i}
+                />
 
-              {/*
-                AUF DEM TELEFON MUSS DIE BESCHRIFTUNG AUF IHREM KNOTEN LIEGEN.
-                Zuerst stand hier `pb-7`: Die Beschriftung klebte oben an der
-                Zelle, der Knoten sass in deren Mitte — im Bild lag damit jedes
-                Wort eine Station ueber seinem Punkt. `self-center` stellt
-                beide auf dieselbe Achse; den Abstand zwischen den Stationen
-                tragen die Streckenstuecke, nicht ein Innenabstand.
-              */}
-              <span
-                className={`type-small self-center py-4 md:mt-4 md:self-auto md:py-0 md:text-center ${
-                  gebrochen ? "text-muted-foreground" : "text-foreground"
-                }`}
-              >
-                {station}
-              </span>
-            </li>
-          )
-        })}
-      </ol>
+                {/*
+                  Mobil steht das Werkzeug RECHTS neben der Station, nicht
+                  darunter — sonst verdoppelt sich die Hoehe der Spur. Ab md
+                  stehen beide mittig unter dem Knoten.
+                */}
+                <span className="flex flex-wrap items-baseline gap-x-3 self-center py-4 md:mt-4 md:flex-col md:items-center md:gap-y-1 md:self-auto md:py-0 md:text-center">
+                  <span
+                    className={`text-base md:text-lg ${gebrochen ? "text-muted-foreground" : "text-foreground"}`}
+                  >
+                    {station}
+                  </span>
+                  {werkzeug && <span className="text-meta text-muted-foreground">{werkzeug}</span>}
+                  {gebrochen && !letzteZelle && uebergabeSr && (
+                    <span className="sr-only">{uebergabeSr}</span>
+                  )}
+                </span>
+              </li>
+            )
+          })}
+        </ol>
+
+        {eigentum && (
+          <p className="mt-6 flex justify-end md:mt-5">
+            <span className="border-gold/60 text-gold-text text-meta inline-flex items-center gap-2 rounded-full border px-3 py-1.5">
+              <span aria-hidden="true" className="bg-gold size-[7px] rounded-full" />
+              {eigentum}
+            </span>
+          </p>
+        )}
+      </div>
     </div>
   )
 }
@@ -148,9 +186,19 @@ export function Betriebsfluss() {
   const { t } = useLocale()
   const copy = t.home.betriebsfluss
   const reduce = usePrefersReducedMotion()
+  const { ref, seen, bereit } = useSeenOnce<HTMLElement>()
+
+  /* Server-HTML, vor der Hydration und bei reduzierter Bewegung: verbunden. */
+  const zustand = !bereit || seen || reduce ? "verbunden" : "getrennt"
 
   return (
-    <section id="systembild" aria-labelledby="systembild-title" className="section-seam">
+    <section
+      ref={ref}
+      id="systembild"
+      aria-labelledby="systembild-title"
+      className="section-seam"
+      data-state={zustand}
+    >
       <div className="section-shell">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
           <Reveal className="lg:col-span-7">
@@ -170,32 +218,35 @@ export function Betriebsfluss() {
           ist es dieselbe Strecke zweimal — und der Unterschied liegt genau
           dort, wo das Auge ohnehin hinspringt.
         */}
-        <Reveal delay={0.15} className="mt-14 flex flex-col gap-12 md:gap-14">
+        <div className="mt-14 flex flex-col gap-12 md:gap-14">
           <Spur
             stationen={copy.stations}
+            werkzeuge={copy.tools}
             gebrochen
             label={copy.todayLabel}
+            zaehler={copy.handoffCount}
             note={copy.todayNote}
             puls={false}
+            uebergabeSr={copy.handoffSr}
           />
           <Spur
             stationen={copy.stations}
             gebrochen={false}
             label={copy.systemLabel}
+            zaehler={copy.systemCount}
             note={copy.systemNote}
-            puls={!reduce}
+            puls={false}
+            eigentum={copy.ownership}
           />
-        </Reveal>
+        </div>
 
         {/*
           Die Modell-Kennzeichnung steht am Bild, nicht in der Fusszeile.
           Wer sie erst unten findet, hat das Bild vorher als Messung gelesen.
         */}
-        <Reveal delay={0.2}>
-          <p className="text-meta text-muted-foreground border-line mt-10 max-w-xl border-t pt-4">
-            {copy.modelNote}
-          </p>
-        </Reveal>
+        <p className="text-meta text-muted-foreground border-line mt-10 max-w-xl border-t pt-4">
+          {copy.modelNote}
+        </p>
       </div>
     </section>
   )

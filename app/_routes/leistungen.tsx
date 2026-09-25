@@ -4,7 +4,7 @@ import { dictionary, type Locale } from "@/lib/dictionary"
 import { pageMetadata } from "@/lib/page-metadata"
 import { publishedServicePages } from "@/lib/service-pages"
 import { address, areaServed } from "@/lib/site-data"
-import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
+import { breadcrumbList, jsonLdScript, offerCatalog } from "@/lib/json-ld"
 import { SITE_URL, localeUrl } from "@/lib/routes"
 
 /**
@@ -48,6 +48,7 @@ function jsonLd(locale: Locale) {
   const copy = t.leistungenPage
   return [
     breadcrumbList(locale, [{ name: t.nav.leistungen, path: "/leistungen" }]),
+    offerCatalog(locale),
     {
       "@context": "https://schema.org",
       "@type": "ItemList",
