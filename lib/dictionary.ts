@@ -3015,7 +3015,7 @@ const rawDictionary = {
         },
         {
           title: "Schriften",
-          body: "Poppins und JetBrains Mono werden zusammen mit der Seite lokal ausgeliefert. Es besteht keine Verbindung zu Google Fonts; Ihre IP-Adresse wird dafür an keinen Dritten übermittelt.",
+          body: "Manrope und JetBrains Mono werden zusammen mit der Seite lokal ausgeliefert. Es besteht keine Verbindung zu Google Fonts; Ihre IP-Adresse wird dafür an keinen Dritten übermittelt.",
         },
         {
           title: "Einwilligung und lokale Speicherung",
@@ -4757,7 +4757,7 @@ const rawDictionary = {
         },
         {
           title: "Yazı tipleri",
-          body: "Poppins ve JetBrains Mono sayfayla birlikte yerel olarak sunulur. Google Fonts ile bağlantı kurulmaz; bu nedenle IP adresiniz üçüncü bir tarafa iletilmez.",
+          body: "Manrope ve JetBrains Mono sayfayla birlikte yerel olarak sunulur. Google Fonts ile bağlantı kurulmaz; bu nedenle IP adresiniz üçüncü bir tarafa iletilmez.",
         },
         {
           title: "Onay ve yerel kayıt",
@@ -6472,7 +6472,7 @@ const rawDictionary = {
         },
         {
           title: "Fonts",
-          body: "Poppins and JetBrains Mono are delivered locally together with the site. There is no connection to Google Fonts; your IP address is not transmitted to any third party for this.",
+          body: "Manrope and JetBrains Mono are delivered locally together with the site. There is no connection to Google Fonts; your IP address is not transmitted to any third party for this.",
         },
         {
           title: "Consent and local storage",
@@ -8185,7 +8185,7 @@ const rawDictionary = {
         },
         {
           title: "الخطوط",
-          body: "يُسلَّم خطّا Poppins وJetBrains Mono محليًا مع الموقع. ولا يوجد اتصال بـ Google Fonts؛ ولا يُنقل عنوان IP الخاص بكم لأي طرف ثالث لأجل ذلك.",
+          body: "يُسلَّم خطّا Manrope وJetBrains Mono محليًا مع الموقع. ولا يوجد اتصال بـ Google Fonts؛ ولا يُنقل عنوان IP الخاص بكم لأي طرف ثالث لأجل ذلك.",
         },
         {
           title: "الموافقة والتخزين المحلي",

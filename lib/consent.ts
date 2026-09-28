@@ -12,7 +12,7 @@
  * (`consent.thirdCountry` in `dictionary.ts`), sichtbar ÜBER den Schaltern
  * und nicht in einem aufklappbaren Detail.
  *
- * Die Schriften bleiben unberührt: Poppins und JetBrains Mono lädt
+ * Die Schriften bleiben unberührt: Manrope und JetBrains Mono lädt
  * `next/font` beim Build herunter, ausgeliefert werden sie vom eigenen
  * Server. Maps und Werbe-Tags gibt es weiterhin nicht.
  *

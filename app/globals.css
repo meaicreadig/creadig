@@ -53,7 +53,7 @@
    *   --font-sans     Fliesstext. M PLUS Rounded 1c: runde Strichenden,
    *                   passt zur kommenden runden Geometrie und zur Marke
    *                   („verbinden", nicht „trennen").
-   *   --font-display  Ueberschriften. Bleibt Poppins — dieser Schritt
+   *   --font-display  Ueberschriften. Seit 28.09.2026 Manrope (vorher Poppins) — dieser Schritt
    *                   tauscht ausdruecklich NUR die Textschrift und ruehrt
    *                   die Hierarchie nicht an.
    *
@@ -62,7 +62,7 @@
    * `type-small` erben still den Fliesstext.
    */
   --font-sans: var(--font-mplus), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
   /*
@@ -1191,7 +1191,7 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
  */
 [lang="ar"] {
   --font-sans: var(--font-arabic), var(--font-mplus), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-arabic-display), var(--font-arabic), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-arabic-display), var(--font-arabic), var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), var(--font-arabic), ui-monospace, monospace;
 }
 
