@@ -57,21 +57,28 @@ export function ThesisLine() {
         keine gestrichelte Linie: Eine Strichelung ist ein Linienstil, eine
         Luecke ist ein Zustand.
       */}
+      {/*
+        PHASE 1 · PREMIUM — die Linie erzaehlt ihren Satz einmal in der Zeit:
+        Die drei Stuecke setzen sich (`thesis-piece`), danach zieht die
+        Goldstrecke vom Knoten aus durch (`thesis-draw`). Beides ist reines
+        CSS, laeuft einmal und endet im selben Bild wie vorher. Der Startwert
+        ist nie null (D-28), bei reduzierter Bewegung gibt es keine Animation.
+      */}
       <span className="flex flex-[1.1] items-center gap-4">
-        <span className="bg-muted-foreground/40 h-px flex-1" />
-        <span className="bg-muted-foreground/40 h-px flex-1" />
-        <span className="bg-muted-foreground/40 h-px flex-1" />
+        <span className="thesis-piece bg-muted-foreground/40 h-px flex-1" style={{ animationDelay: "0.1s" }} />
+        <span className="thesis-piece bg-muted-foreground/40 h-px flex-1" style={{ animationDelay: "0.18s" }} />
+        <span className="thesis-piece bg-muted-foreground/40 h-px flex-1" style={{ animationDelay: "0.26s" }} />
       </span>
 
       {/* Hier faengt das System an. */}
       <span className="mx-3 flex items-center">
-        <SystemNode ton="verbunden" />
+        <SystemNode ton="verbunden" gross />
       </span>
 
       {/* Und hier laeuft es durch. */}
       <span className="flex flex-[1.4] items-center">
-        <span className="bg-gold/70 h-px flex-1" />
-        <SystemNode ton="verbunden" puls={!reduce} verzug={2} />
+        <span className="thesis-draw bg-gold/80 h-[2px] flex-1 rounded-full" />
+        <SystemNode ton="verbunden" gross puls={!reduce} verzug={4} />
       </span>
     </div>
   )

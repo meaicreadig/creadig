@@ -274,14 +274,19 @@
  * aber eben dunkel. Spezifitaet 0,2,0 schlaegt `.section-dark` (0,1,0).
  */
 .dark .section-dark {
-  --background: #272420;
+  /*
+   * PHASE 1 · PREMIUM — war #272420: 7 Stufen ueber dem Grund, auf den
+   * meisten Bildschirmen nicht als Kapitelwechsel lesbar. #2c2824 haelt den
+   * Ton und macht den Rhythmus Grund -> Band -> Grund auch im Dunkeln sichtbar.
+   */
+  --background: #2c2824;
   --foreground: #fbfbf9;
-  --surface: #312d28;
-  --surface-raised: #393530;
-  --muted: #312d28;
-  --muted-foreground: #aaa39b;
-  --line: #3e3932;
-  --line-strong: #534d45;
+  --surface: #35312b;
+  --surface-raised: #3d3832;
+  --muted: #35312b;
+  --muted-foreground: #aca59d;
+  --line: #433d36;
+  --line-strong: #585148;
   --gold: #d3a763;
   --gold-soft: #e4c378;
   --gold-deep: #be904e;
@@ -1071,6 +1076,61 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
   [data-spur="system"] .betriebsfluss-spur {
     clip-path: none !important;
     transition: none !important;
+  }
+}
+
+/*
+ * PHASE 1 · PREMIUM — die Thesenlinie im Hero sagt ihren Satz einmal in der
+ * Zeit. Die drei grauen Stuecke setzen sich, dann zieht die Goldstrecke vom
+ * Knoten aus durch. Startwerte sind nie null (D-28): Das Stueck steht ab dem
+ * ersten Frame da, es rueckt nur in seine Lage; die Goldstrecke beginnt bei
+ * 12 % Laenge. RTL zieht von rechts. Reduzierte Bewegung: keine Animation.
+ */
+@keyframes thesis-piece {
+  from {
+    opacity: 0.35;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes thesis-draw {
+  from {
+    transform: scaleX(0.12);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.thesis-piece {
+  animation: thesis-piece 600ms var(--ease-brand) both;
+}
+.thesis-draw {
+  transform-origin: left center;
+  animation: thesis-draw 1200ms var(--ease-brand) 0.45s both;
+}
+[dir="rtl"] .thesis-draw {
+  transform-origin: right center;
+}
+[dir="rtl"] .thesis-piece {
+  animation-name: thesis-piece-rtl;
+}
+@keyframes thesis-piece-rtl {
+  from {
+    opacity: 0.35;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thesis-piece,
+  .thesis-draw {
+    animation: none;
   }
 }
 
