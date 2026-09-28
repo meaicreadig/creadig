@@ -61,6 +61,15 @@ export function ClosingCta({ variant = "default" }: { variant?: ClosingVariant }
         aria-hidden="true"
         className="via-gold/60 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent"
       />
+      {/*
+        PHASE 1 · PREMIUM — die untere Hairline allein war im Bild zu leise:
+        Band und Footer lasen sich als eine Flaeche. Dieselbe Goldkante wie
+        oben schliesst das Band sichtbar ab, ohne neuen Farbton.
+      */}
+      <div
+        aria-hidden="true"
+        className="via-gold/35 absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent to-transparent"
+      />
 
       <div className="section-shell-tight relative">
         <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
