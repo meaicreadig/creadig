@@ -26,6 +26,7 @@ export const de = {
     ungespeichert: "Auf dieser Seite steht etwas, das noch nicht gespeichert ist. Seite trotzdem verlassen?",
   },
   nav: {
+    marketing: { label: "Marketing-Übersicht", hint: "LinkedIn, Kanäle, Reaktionen auf einen Blick" },
     veroeffentlichungen: { label: "Veröffentlichungen", hint: "Was hinausging, und was zurückkam" },
     uebersicht: { label: "Übersicht", hint: "Was heute zählt" },
     anfragen: { label: "Anfragen", hint: "Eingang, Qualifizierung, nächster Schritt" },

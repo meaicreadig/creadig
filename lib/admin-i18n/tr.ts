@@ -25,6 +25,7 @@ export const tr: AdminTexte = {
     ungespeichert: "Bu sayfada henüz kaydedilmemiş bir şey var. Yine de ayrılmak istiyor musunuz?",
   },
   nav: {
+    marketing: { label: "Pazarlama özeti", hint: "LinkedIn, kanallar, tepkiler tek bakışta" },
     veroeffentlichungen: { label: "Yayınlar", hint: "Ne çıktı, ne geri döndü" },
     uebersicht: { label: "Genel bakış", hint: "Bugün önemli olan" },
     anfragen: { label: "Talepler", hint: "Gelen, değerlendirme, sonraki adım" },
@@ -154,7 +155,7 @@ export const tr: AdminTexte = {
       "in-recherche": "Araştırmada",
       "beleg-fehlt": "Kanıt eksik",
       eingeordnet: "Sınıflandırıldı",
-      "bereit-fuer-kontakt": "İletişime hazır",
+      "bereit-fuer-kontakt": "İletişime haz��r",
       zurueckgestellt: "Ertelendi",
       ausgeschlossen: "Hariç tutuldu",
     },
@@ -1014,7 +1015,7 @@ export const tr: AdminTexte = {
       "kein-ja":
         "Kabul edilmiş bir teklif yok. Evet'i olmayan bir proje bir niyet beyanıdır; kapsamı da en son birinin söylediği şey olurdu.",
       "kein-materialeingang":
-        "Materyal girişi yok. Kamuya verilen söz şudur: materyal girişinden itibaren dört hafta. Materyal olmadan hiçbir süre işlemez ve verilecek tarih uydurma olur.",
+        "Materyal girişi yok. Kamuya verilen söz şudur: materyal girişinden itibaren dört hafta. Materyal olmadan hiçbir s��re işlemez ve verilecek tarih uydurma olur.",
       "aenderung-unbeziffert":
         "„{was}“ onaylanmış ama rakamlandırılmamış. Bilinmeyen bir rakama verilen onay, onay değildir.",
       "keine-abnahme":

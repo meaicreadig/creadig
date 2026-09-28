@@ -198,6 +198,9 @@ export const FLAECHEN: readonly Flaeche[] = [
    */
   { pfad: "/admin/veroeffentlichungen", klasse: "eigene-lage", fuer: ["owner"] },
 
+  /* Marketing-Übersicht: liest dieselben Veröffentlichungen, also dieselbe Regel — nur `owner`. */
+  { pfad: "/admin/marketing", klasse: "eigene-lage", fuer: ["owner"] },
+
   /*
    * PROOF OPERATIONS P1 — der Beleg-Betrieb.
    *
