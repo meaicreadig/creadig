@@ -900,6 +900,21 @@ const rawDictionary = {
       pricingLabel: "Preise",
       pricingNote:
         "Standard-Produkte sind transparent bepreist. Systementwicklung rechnen wir individuell ab — nach Umfang, nicht nach Stunden.",
+      flow: {
+        eyebrow: "Ein Haus statt fünf",
+        title: "Fünf Ebenen. Meist fünf Anbieter.",
+        lead: "Die Marke vom Grafiker, die Website von der Agentur, die Software vom Softwarehaus. Jeder liefert seinen Teil — und zwischen ihnen übersetzt der Betrieb selbst.",
+        vendors: ["Grafiker", "Webagentur", "Softwarehaus", "Freelancer", "KI-Berater"],
+        todayLabel: "Heute",
+        todayCount: "4 Übergaben zwischen Anbietern",
+        todayNote: "Jeder kennt nur seine Ebene.",
+        systemLabel: "Mit creaDIG",
+        systemCount: "1 Haus, 1 Ansprechpartner",
+        systemNote: "Jede Ebene baut auf der darunter auf.",
+        ownership: "Gehört Ihnen: Code und Daten",
+        handoffSr: "Übergabe an einen anderen Anbieter",
+        modelNote: "Modell, kein Kundenergebnis. Es zeigt die Struktur, die wir bauen — keine gemessene Ersparnis.",
+      },
     },
     nav: {
       home: "Startseite",
@@ -3429,7 +3444,7 @@ const rawDictionary = {
       whatLabel: "Konu ne",
       backLabel: "Tüm işler",
       caseGatedNote:
-        "Başlangıç durumu, çözüm ve sonucu içeren ayrıntılı bir vaka anlatımını yalnızca müşterinin yazılı onayıyla yayımlarız. Onay geldiğinde burada yer alır.",
+        "Başlangıç durumu, çözüm ve sonucu içeren ayr��ntılı bir vaka anlatımını yalnızca müşterinin yazılı onayıyla yayımlarız. Onay geldiğinde burada yer alır.",
       ctaTitle: "İşletmenizde de benzer bir durum mu var?",
       ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmenize bakar ve yardımcı olup olamayacağımızı dürüstçe söyleriz.",
       ctaPrimary: "Projeye başla",
@@ -3544,6 +3559,21 @@ const rawDictionary = {
       pricingLabel: "Fiyatlar",
       pricingNote:
         "Standart ürünlerin fiyatı şeffaftır. Sistem geliştirmeyi kapsama göre ayrıca hesaplarız — saate göre değil.",
+      flow: {
+        eyebrow: "Beş yerine tek ev",
+        title: "Beş katman. Çoğu zaman beş ayrı firma.",
+        lead: "Marka grafikerden, web sitesi ajanstan, yazılım yazılım evinden. Her biri kendi parçasını teslim eder — aradaki çeviriyi işletme kendisi yapar.",
+        vendors: ["Grafiker", "Web ajansı", "Yazılım evi", "Serbest çalışan", "Yapay zekâ danışmanı"],
+        todayLabel: "Bugün",
+        todayCount: "Firmalar arasında 4 devir",
+        todayNote: "Her biri yalnızca kendi katmanını bilir.",
+        systemLabel: "creaDIG ile",
+        systemCount: "1 ev, 1 muhatap",
+        systemNote: "Her katman altındakinin üzerine kurulur.",
+        ownership: "Size ait: kod ve veri",
+        handoffSr: "Başka bir firmaya devir",
+        modelNote: "Model, müşteri sonucu değil. Kurduğumuz yapıyı gösterir — ölçülmüş bir tasarrufu değil.",
+      },
     },
     nav: {
       home: "Ana sayfa",
@@ -4021,7 +4051,7 @@ const rawDictionary = {
         },
         uebergabe: {
           name: "Size ait olan",
-          what: "Sistem ve içindeki tüm veriler ilk günden itibaren sizindir. Kod, içerik, erişimler ve alan adı, bakım sona erse de sizde kalır.",
+          what: "Sistem ve içindeki tüm veriler ilk günden itibaren sizindir. Kod, i��erik, erişimler ve alan adı, bakım sona erse de sizde kalır.",
           cta: "İşletme ve mülkiyet",
         },
         netzwerk: {
@@ -4294,7 +4324,7 @@ const rawDictionary = {
         },
         bilingual: {
           name: "İki dil, iki adres",
-          body: "Her dil sürümünün kendi URL'leri, kendi başlıkları, kendi yapılandırılmış verileri vardır ve hreflang ile bağlıdır — tarayıcıda metin değiştiren bir düğme değil.",
+          body: "Her dil sürümünün kendi URL'leri, kendi başlıkları, kendi yapılandır��lmış verileri vardır ve hreflang ile bağlıdır — tarayıcıda metin değiştiren bir düğme değil.",
         },
         images: {
           name: "AVIF ve WebP görseller",
@@ -4660,7 +4690,7 @@ const rawDictionary = {
       updated: "11 Eylül 2026",
     },
     legal: {
-      imprintTitle: "Künye",
+      imprintTitle: "K��nye",
       privacyTitle: "Gizlilik",
       imprintMetaDescription: "creaDIG'in sağlayıcı bilgileri ve iletişim.",
       privacyMetaDescription:
@@ -5256,6 +5286,21 @@ const rawDictionary = {
       pricingLabel: "Prices",
       pricingNote:
         "Standard products are priced transparently. Systems development is quoted individually — by scope, not by the hour.",
+      flow: {
+        eyebrow: "One house instead of five",
+        title: "Five layers. Usually five vendors.",
+        lead: "The brand from a designer, the website from an agency, the software from a software house. Each delivers its part — and the business translates between them itself.",
+        vendors: ["Designer", "Web agency", "Software house", "Freelancer", "AI consultant"],
+        todayLabel: "Today",
+        todayCount: "4 handoffs between vendors",
+        todayNote: "Each one only knows its own layer.",
+        systemLabel: "With creaDIG",
+        systemCount: "1 house, 1 contact",
+        systemNote: "Each layer builds on the one below.",
+        ownership: "Yours: code and data",
+        handoffSr: "Handoff to another vendor",
+        modelNote: "A model, not a client result. It shows the structure we build — not a measured saving.",
+      },
     },
     nav: {
       home: "Home",
@@ -6848,7 +6893,7 @@ const rawDictionary = {
     produktePage: {
       eyebrow: "دليل، لا كتالوج",
       title: "أربعة منتجات بنيناها بأنفسنا.",
-      lead: "تُثبت هذه الصفحة ما نقوله عن أنفسنا: كل واحد من هذه الأنظمة بنته creaDIG من الأساس. واحد منها يعمل في تشغيلنا اليومي والثلاثة الأخرى قيد البناء — والحالة مذكورة عند كل منتج. أما ما نبنيه لكم فتجدونه تحت الخدمات.",
+      lead: "تُثبت هذه الصفحة ما نقوله عن أنفسنا: كل واحد من هذه الأنظمة بنته creaDIG من الأساس. واحد منها يعمل في تشغيلنا اليومي والثلاثة الأخرى قيد البناء — وا��حالة مذكورة عند كل منتج. أما ما نبنيه لكم فتجدونه تحت الخدمات.",
       metaTitle: "منتجاتنا الخاصة — meAI وfibero وCASSAMEA وmeahv",
       metaDescription:
         "منتجات creaDIG الأربعة: meAI (نظام تشغيل أعمال بالذكاء الاصطناعي)، وfibero (تشغيل شبكات الألياف)، وCASSAMEA (نقاط بيع للضيافة، سويسرا)، وmeahv (إدارة العقارات).",
@@ -6954,6 +6999,21 @@ const rawDictionary = {
       pricingLabel: "الأسعار",
       pricingNote:
         "المنتجات القياسية مسعّرة بشفافية. أما تطوير الأنظمة فيُحسب إفراديًا — بحسب النطاق، لا بالساعة.",
+      flow: {
+        eyebrow: "بيت واحد بدل خمسة",
+        title: "خمس طبقات. وغالبًا خمسة مزوّدين.",
+        lead: "الهوية من مصمّم، والموقع من وكالة، والبرمجيات من شركة برمجة. كلٌّ يسلّم جزأه — والمنشأة تترجم بينهم بنفسها.",
+        vendors: ["مصمّم", "وكالة ويب", "شركة برمجيات", "مستقل", "مستشار ذكاء اصطناعي"],
+        todayLabel: "اليوم",
+        todayCount: "4 عمليات تسليم بين المزوّدين",
+        todayNote: "كلٌّ يعرف طبقته فقط.",
+        systemLabel: "مع creaDIG",
+        systemCount: "بيت واحد، جهة تواصل واحدة",
+        systemNote: "كل طبقة تُبنى على التي تحتها.",
+        ownership: "ملكك: الشيفرة والبيانات",
+        handoffSr: "تسليم إلى مزوّد آخر",
+        modelNote: "نموذج، لا نتيجة عميل. يُظهر البنية التي نبنيها — لا توفيرًا مُقاسًا.",
+      },
     },
     nav: {
       home: "الرئيسية",
@@ -7262,7 +7322,7 @@ const rawDictionary = {
           what: "نقاط البيع والتخطيط والفوترة والإدارة — المنشأة داخل نظام واحد.",
           who: "الضيافة، والعمل الميداني، والإدارة، ومقدّمو الخدمات.",
           problem:
-            "المنشأة تسير على أوراق وجداول وثلاثة برامج لا يعرف بعضها بعضًا. من أراد إجابة سؤالٍ واحد بحث في أربعة مواضع — وتكون الإجابة قد قدُمت قبل أن تكتمل.",
+            "المنشأة تسير على أوراق وجداول وثلاثة برامج ��ا يعرف بعضها بعضًا. من أراد إجابة سؤالٍ واحد بحث في أربعة مواضع — وتكون الإجابة قد قدُمت قبل أن تكتمل.",
           solution:
             "نُنظّم المنشأة في نظام واحد: الطلب والعميل والمستند والرقم في مكان واحد، مع واجهات لما يجب أن يبقى. ما يجب أن يكون مخصَّصًا نبنيه؛ وما هو متاح جاهزًا لا نشتريه مرتين.",
           result: "مصدر إجابة واحد بدل أربعة. ومن ينضمّ حديثًا يجد طريقه في النظام لا في ذاكرة زميل.",
@@ -7391,7 +7451,7 @@ const rawDictionary = {
       founderLabel: "المؤسس وقائد الأنظمة",
       founder: "محمد أمين أكيول",
       body1:
-        "بدأت creaDIG في 2017 كوكالة. تحوّلت المشاريع إلى منتجات، والمنتجات إلى بيت أنظمة — واليوم تعمل تحت هذه المظلة أربعة أنظمة خاصة، إلى جانب متابعة المنشآت التي بنيناها لها.",
+        "بدأت creaDIG في 2017 كوكالة. تحوّلت المشاريع إلى منتجات، والمنتجات إلى بيت أنظمة — واليوم تعمل تحت هذه المظلة أربعة أنظمة خاصة، ��لى جانب متابعة المنشآت التي بنيناها لها.",
       body2:
         "الفريق ينمو؛ والوظائف التالية قيد الإعداد.",
       nicheLabel: "مجالات التركيز",
@@ -7708,7 +7768,7 @@ const rawDictionary = {
         },
         images: {
           name: "الصور بصيغتَي AVIF وWebP",
-          body: "الصور تُحوَّل وقت البناء وتُسلَّم بالمقاس الذي يحتاجه التخطيط فعلًا. ومن لا يدعم AVIF يحصل على WebP — تلقائيًا، لا بتفرّع في الشيفرة.",
+          body: "الصور تُحوَّل وقت البناء وتُسلَّم بالمقاس الذي ي��تاجه التخطيط فعلًا. ومن لا يدعم AVIF يحصل على WebP — تلقائيًا، لا بتفرّع في الشيفرة.",
         },
         gates: {
           name: "ثلاثة فحوص في البناء",
@@ -7828,7 +7888,7 @@ const rawDictionary = {
           title: "سعر ثابت لنطاقكم — بعد عشرين دقيقة.",
           lead: "ما ورد أعلاه هو نقطة الدخول. أما ما تحتاجه منشأتكم فننظر فيه قبل أن يذكر أحدٌ رقمًا — مجانًا ودون التزام.",
           ctaPrimary: "طلب عرض بسعر ثابت",
-          ctaSecondary: "عرض المنتجات",
+          ctaSecondary: "��رض المنتجات",
         },
         work: {
           eyebrow: "الخطوة التالية",
@@ -8029,7 +8089,7 @@ const rawDictionary = {
         "ألوان نصوص بتباين غير كافٍ (وصولًا إلى 2,4 : 1 في النصوص النائبة)",
         "غياب التركيز المرئي عن ثلاثة عناصر تحكم في الشريط العلوي",
         "غياب رابط التخطي إلى المحتوى",
-        "أيام التقويم في مساعد المواعيد دون اسم ذي دلالة",
+        "أيام التقويم في مساعد المواعيد دون اسم ذي دلا��ة",
         "تسميتان ألمانيتان بقيتا في النسخة التركية",
         "تغيير الخطوة في مساعد المواعيد لم يكن يُعلَن",
       ],
@@ -8136,7 +8196,7 @@ const rawDictionary = {
           body: "لكم في أي وقت حق الوصول (المادة 15) والتصحيح (16) والمحو (17) وتقييد المعالجة (18) ونقل البيانات (20) والاعتراض (21). وتكفي رسالة إلى العنوان المذكور أدناه. وبصرف النظر عن ذلك لكم حق تقديم شكوى إلى سلطة إشراف على حماية البيانات (المادة 77) — والمختصة لمقرّنا هي مفوّضة حماية البيانات لولاية ساكسونيا السفلى.",
         },
       ],
-      privacyNote: "ستخضع هذه النسخة لمراجعة قانونية نهائية مع بيانات الشركة الكاملة.",
+      privacyNote: "ستخضع هذه الن��خة لمراجعة قانونية نهائية مع بيانات الشركة الكاملة.",
     },
     consent: {
       title: "موافقتكم",
