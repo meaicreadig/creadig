@@ -7,6 +7,7 @@ import { ArrowDown, ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { heroChips } from "@/lib/site-data"
 import { SystemField } from "@/components/hero/system-field"
+import { HeroStage, HeroStageCompact } from "@/components/hero/hero-stage"
 import { ThesisLine } from "@/components/creative/thesis-line"
 import { MagneticButton } from "@/components/ui/magnetic-button"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
@@ -47,6 +48,12 @@ export function Hero() {
       <SystemField />
 
       <div className="section-gutter relative z-10 flex flex-1 flex-col justify-center pt-32 pb-14">
+        {/*
+          28.09.2026 — links der Satz, rechts der Beweis. Unter `lg` bleibt der
+          Kopf wie er war; die Buehne steht dort kompakt unter den Knoepfen.
+        */}
+        <div className="lg:grid lg:grid-cols-12 lg:items-center lg:gap-x-12">
+        <div className="lg:col-span-7">
         <motion.div
           initial={reduce ? undefined : { y: 12 }}
           animate={{ y: 0 }}
@@ -122,6 +129,12 @@ export function Hero() {
         */}
         <div className="mt-9 max-w-xl">
           <ThesisLine />
+        </div>
+        </div>
+
+        <div className="hidden lg:col-span-5 lg:block">
+          <HeroStage />
+        </div>
         </div>
 
         <motion.div
@@ -201,6 +214,10 @@ export function Hero() {
             </MagneticButton>
           </div>
         </motion.div>
+
+        <div className="mt-12 lg:hidden">
+          <HeroStageCompact />
+        </div>
       </div>
 
       <motion.div

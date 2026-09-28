@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import {
-  Poppins,
+  Manrope,
   JetBrains_Mono,
   M_PLUS_Rounded_1c,
   Readex_Pro,
@@ -44,13 +44,14 @@ import { ogImage } from "@/lib/page-metadata"
  * Adresse.
  */
 
-// CEO-Entscheidung: Poppins — rund-geometrisch, passt zum Logo. Nicht Geist.
-// Traegt seit dem Form-Entscheid (27.08.2026) nur noch die UEBERSCHRIFTEN
-// (`--font-display`); der Fliesstext liegt darunter auf M PLUS Rounded 1c.
-const poppins = Poppins({
+// Owner-Entscheidung 28.09.2026: Manrope loest Poppins als UEBERSCHRIFT ab.
+// Poppins las sich wie jede Vorlage und stand gegen die feine, einlinige
+// Wortmarke; Manrope ist ruhig-geometrisch und steht naeher am Logo.
+// Traegt nur `--font-display`; der Fliesstext bleibt M PLUS Rounded 1c.
+const manrope = Manrope({
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins",
+  variable: "--font-manrope",
   display: "swap",
 })
 
@@ -354,7 +355,7 @@ export function SiteShell({
     <html
       lang={locale}
       dir={LOCALE_DIR[locale]}
-      className={`${poppins.variable} ${mplusRounded.variable} ${jetbrains.variable} ${readex.variable} ${cairo.variable}`}
+      className={`${manrope.variable} ${mplusRounded.variable} ${jetbrains.variable} ${readex.variable} ${cairo.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>
