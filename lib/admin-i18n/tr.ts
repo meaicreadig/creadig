@@ -35,6 +35,13 @@ export const tr: AdminTexte = {
     automationen: { label: "Otomasyonlar", hint: "Kendiliğinden çalışanlar — ve asla çalışmayacaklar" },
     system: { label: "Kurulum", hint: "Materyal, erişimler, tanılama" },
   },
+  navGruppen: {
+    cockpit: "Kokpit",
+    vertrieb: "Satış",
+    kunden: "Müşteriler ve projeler",
+    marketing: "Pazarlama",
+    system: "Sistem",
+  },
   login: {
     titel: "Giriş",
     passwort: "Şifre",

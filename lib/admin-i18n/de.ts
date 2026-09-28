@@ -36,6 +36,13 @@ export const de = {
     automationen: { label: "Automationen", hint: "Was ohne Zutun läuft — und was nie" },
     system: { label: "Einrichtung", hint: "Material, Zugänge, Diagnose" },
   },
+  navGruppen: {
+    cockpit: "Cockpit",
+    vertrieb: "Vertrieb",
+    kunden: "Kunden & Projekte",
+    marketing: "Marketing",
+    system: "System",
+  },
   login: {
     titel: "Anmeldung",
     passwort: "Passwort",
