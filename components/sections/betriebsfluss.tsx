@@ -97,7 +97,7 @@ import { useSeenOnce } from "@/lib/use-seen-once"
  */
 
 /** Eine Spur: sechs Stationen, gleich breite Zellen. */
-function Spur({
+export function Spur({
   stationen,
   werkzeuge,
   gebrochen,

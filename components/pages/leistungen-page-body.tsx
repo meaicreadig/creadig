@@ -3,6 +3,7 @@
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { Services } from "@/components/sections/services"
+import { EbenenFluss } from "@/components/sections/ebenen-fluss"
 import { Packages } from "@/components/sections/packages"
 import { Faq } from "@/components/sections/faq"
 import { ClosingCta } from "@/components/sections/closing-cta"
@@ -51,6 +52,8 @@ export function LeistungenPageBody() {
         </div>
       </PageHeader>
 
+      {/* PHASE 3 — das Bild vor der Liste: erst sehen, warum ein Haus, dann die Ebenen im Detail. */}
+      <EbenenFluss />
       {/* Die H1 steht im Kopf — die Ebenen kommen ohne zweite Überschrift. */}
       <Services heading={false} />
       {/*
