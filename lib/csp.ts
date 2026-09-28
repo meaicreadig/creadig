@@ -31,7 +31,14 @@
 export const ADMIN_CSP = [
   "default-src 'self'",
   /* Next-Hydration und das Theme-Boot-Skript; siehe Abwägung in next.config.ts. */
-  "script-src 'self' 'unsafe-inline'",
+  /*
+   * Nur im Entwicklungsserver: React/Next brauchen dort `eval` fuer Fehler-
+   * Stacks und Fast Refresh. Ohne diesen Zusatz hydriert der Admin in der
+   * Vorschau nicht. Produktion bleibt unveraendert.
+   */
+  process.env.NODE_ENV === "development"
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+    : "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
