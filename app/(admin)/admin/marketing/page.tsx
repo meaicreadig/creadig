@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import { AdminShell } from "@/components/admin/admin-shell"
+import { PostWerkstatt } from "@/components/admin/post-werkstatt"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { ladeMarketing } from "@/lib/marketing"
 
@@ -9,6 +10,23 @@ export const dynamic = "force-dynamic"
 const TEXT = {
   de: {
     titel: "Marketing",
+    werkstatt: {
+      titel: "LinkedIn-Werkstatt",
+      anlass: "Anlass",
+      anlaesse: { lieferung: "Lieferung", einwand: "Einwand", beleg: "Beleg", build: "Build Note" },
+      stichpunkte: "Stichpunkte",
+      platzhalter: "z. B. Tischlerei Meyer: Aufträge liefen über 4 Excel-Listen. Jetzt ein System, Angebot bis Rechnung an einem Ort.",
+      erzeugen: "Entwurf erzeugen",
+      erzeugt: "Schreibt …",
+      vorschau: "Vorschau wie auf LinkedIn",
+      mehr: "… mehr",
+      weniger: "weniger",
+      kopieren: "Kopieren",
+      kopiert: "Kopiert",
+      speichern: "Als Entwurf speichern",
+      gespeichert: "In Veröffentlichungen gespeichert",
+      leer: "Stichpunkte links eingeben – der Entwurf erscheint hier.",
+    },
     meta: "LinkedIn, Website, Netzwerk — was hinausging und was zurückkam",
     posts: "Veröffentlicht · 30 Tage",
     reaktion: "Mit Reaktion · 30 Tage",
@@ -31,6 +49,23 @@ const TEXT = {
   },
   tr: {
     titel: "Pazarlama",
+    werkstatt: {
+      titel: "LinkedIn atölyesi",
+      anlass: "Konu",
+      anlaesse: { lieferung: "Teslimat", einwand: "İtiraz", beleg: "Kanıt", build: "Build Note" },
+      stichpunkte: "Notlar",
+      platzhalter: "örn. Marangoz Meyer: siparişler 4 Excel listesindeydi. Şimdi tek sistem, tekliften faturaya tek yerde.",
+      erzeugen: "Taslak oluştur",
+      erzeugt: "Yazıyor …",
+      vorschau: "LinkedIn'deki gibi önizleme",
+      mehr: "… devamı",
+      weniger: "daha az",
+      kopieren: "Kopyala",
+      kopiert: "Kopyalandı",
+      speichern: "Taslak olarak kaydet",
+      gespeichert: "Yayınlar'a kaydedildi",
+      leer: "Soldaki alana notları yazın – taslak burada görünür. Metin Almanca üretilir.",
+    },
     meta: "LinkedIn, web sitesi, ağ — ne çıktı, ne geri döndü",
     posts: "Yayınlanan · 30 gün",
     reaktion: "Tepki alan · 30 gün",
@@ -191,6 +226,8 @@ export default async function MarketingSeite() {
           <Leer text={d.letzte ? t.keineDaten : t.nichtGemessen} />
         )}
       </section>
+
+      <PostWerkstatt t={t.werkstatt} />
     </AdminShell>
   )
 }
