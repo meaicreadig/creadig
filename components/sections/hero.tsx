@@ -130,6 +130,16 @@ export function Hero() {
         <div className="mt-9 max-w-xl">
           <ThesisLine />
         </div>
+
+        {/*
+          Zwischen `sm` und `lg` stand die Buehne erst unter den Knoepfen —
+          ausserhalb des ersten Bildschirms. Hier rueckt sie direkt unter
+          den Satz. Auf Telefonen bleibt sie unten, damit der Aufruf ueber
+          der Falz bleibt (siehe Phase 5 weiter unten).
+        */}
+        <div className="mt-10 hidden sm:block lg:hidden">
+          <HeroStageCompact />
+        </div>
         </div>
 
         <div className="hidden lg:col-span-5 lg:block">
@@ -215,7 +225,7 @@ export function Hero() {
           </div>
         </motion.div>
 
-        <div className="mt-12 lg:hidden">
+        <div className="mt-12 sm:hidden">
           <HeroStageCompact />
         </div>
       </div>
