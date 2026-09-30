@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
+import { Menu, X } from "lucide-react"
 
 export type NavItem = { href: string; label: string; hint: string; gruppe: string }
 
@@ -50,7 +51,7 @@ export function AdminNav({
         onClick={() => setOffen((o) => !o)}
         className="border-line inline-flex min-h-11 items-center gap-2 rounded-sm border px-3 text-sm lg:hidden"
       >
-        <span aria-hidden="true">{offen ? "✕" : "☰"}</span>
+        {offen ? <X aria-hidden="true" className="size-4" /> : <Menu aria-hidden="true" className="size-4" />}
         {offen ? schliessen : oeffnen}
       </button>
       <div id="admin-hauptnavigation" className={`${offen ? "mt-3 flex" : "hidden"} flex-col gap-5 lg:mt-0 lg:flex`}>
