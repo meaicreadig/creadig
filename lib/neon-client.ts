@@ -814,6 +814,15 @@ export const SCHEMA: string[] = [
    )`,
   /* 023 · Marketing-Kanal je Anfrage. Siehe `scripts/migrations/023-lead-kanal.sql`. */
   `ALTER TABLE leads ADD COLUMN IF NOT EXISTS channel text`,
+  /* 024 · LinkedIn-Verbindung (ein Konto). Siehe `scripts/migrations/024-linkedin-verbindung.sql`. */
+  `CREATE TABLE IF NOT EXISTS linkedin_connection (
+     id integer PRIMARY KEY CHECK (id = 1),
+     person_urn text NOT NULL,
+     name text NOT NULL,
+     token_enc text NOT NULL,
+     expires_at timestamptz,
+     updated_at timestamptz NOT NULL DEFAULT now()
+   )`,
 ]
 
 /**

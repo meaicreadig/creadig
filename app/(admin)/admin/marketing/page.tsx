@@ -2,6 +2,7 @@ import Link from "next/link"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { PostWerkstatt } from "@/components/admin/post-werkstatt"
+import { linkedinStatus } from "@/lib/linkedin"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { ladeMarketing } from "@/lib/marketing"
 import { KATALOG, ladeSichtbarkeit, type SichtbarkeitGruppe } from "@/lib/sichtbarkeit"
@@ -31,6 +32,18 @@ const TEXT = {
       speichern: "Als Entwurf speichern",
       gespeichert: "Gespeichert",
       nurKopieren: "Kopieren und dort einfügen",
+      li: {
+        verbinden: "LinkedIn verbinden",
+        verbundenAls: "Verbunden als {name}",
+        trennen: "Trennen",
+        veroeffentlichen: "Direkt auf LinkedIn veröffentlichen",
+        bestaetigen: "Wirklich veröffentlichen? Nochmals klicken",
+        sendet: "Wird veröffentlicht …",
+        live: "Veröffentlicht und im Register eingetragen.",
+        ansehen: "Beitrag ansehen",
+        firmaHinweis:
+          "Die Unternehmensseite braucht eine eigene Freigabe von LinkedIn (Community Management API). Bis dahin: kopieren und auf der Seite einfügen.",
+      },
       leer: "Stichpunkte links eingeben – die Fassungen erscheinen hier.",
     },
     woche: "Diese Woche",
@@ -77,6 +90,18 @@ const TEXT = {
       speichern: "Taslak olarak kaydet",
       gespeichert: "Kaydedildi",
       nurKopieren: "Kopyalayıp orada yapıştırın",
+      li: {
+        verbinden: "LinkedIn'i bağla",
+        verbundenAls: "Bağlı hesap: {name}",
+        trennen: "Bağlantıyı kes",
+        veroeffentlichen: "Doğrudan LinkedIn'de yayınla",
+        bestaetigen: "Emin misiniz? Tekrar tıklayın",
+        sendet: "Yayınlanıyor …",
+        live: "Yayınlandı ve kayda eklendi.",
+        ansehen: "Paylaşımı gör",
+        firmaHinweis:
+          "Şirket sayfası için LinkedIn'in ayrı onayı gerekiyor (Community Management API). O zamana kadar: kopyalayıp sayfaya yapıştırın.",
+      },
       leer: "Soldaki alana notları yazın – versiyonlar burada görünür. Metinler Almanca üretilir.",
     },
     woche: "Bu hafta",
@@ -246,7 +271,9 @@ export default async function MarketingSeite() {
         )}
       </section>
 
-      <PostWerkstatt t={t.werkstatt} />
+      <div id="werkstatt" className="scroll-mt-6">
+        <PostWerkstatt t={t.werkstatt} linkedin={await linkedinStatus()} />
+      </div>
 
       <Sichtbarkeit erledigt={await ladeSichtbarkeit()} tr={sprache === "tr"} />
     </AdminShell>
