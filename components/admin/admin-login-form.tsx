@@ -100,8 +100,8 @@ export function AdminLoginForm({ texte }: { texte: AdminTexte["login"] }) {
 
         if (response?.ok) {
           setPhase("weiter")
-          router.replace("/admin")
-          router.refresh()
+          /* One full load instead of replace()+refresh(), which rendered the cockpit twice. */
+          window.location.replace("/admin")
           return
         }
 
