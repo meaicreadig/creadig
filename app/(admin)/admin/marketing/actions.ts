@@ -6,6 +6,9 @@ import { generateText } from "ai"
 import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
 import { darfBetreten } from "@/lib/rollen"
+import { neonAbfrage } from "@/lib/neon-abfrage"
+import { KATALOG } from "@/lib/sichtbarkeit"
+import { revalidatePath } from "next/cache"
 
 export type PostAnlass = "lieferung" | "einwand" | "beleg" | "build"
 export type Plattform = "person" | "firma" | "instagram" | "google"
@@ -46,6 +49,26 @@ function zerlegen(roh: string): Record<Plattform, string> | null {
     texte[schluessel] = teile[i + 1]?.trim() ?? ""
   }
   return PLATTFORMEN.every((p) => texte[p]) ? texte : null
+}
+
+export async function sichtbarkeitUmschalten(formData: FormData): Promise<void> {
+  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
+  if (zugang.verdict !== "ok" || !zugang.rolle || !darfBetreten(zugang.rolle, "/admin/marketing")) return
+  const key = String(formData.get("key") ?? "")
+  if (!KATALOG.some((e) => e.key === key)) return
+  const eingetragen = formData.get("eingetragen") === "1"
+  const q = neonAbfrage()
+  if (!q) return
+  try {
+    await q(
+      `INSERT INTO visibility_listings (key, eingetragen, actor, updated_at) VALUES ($1, $2, $3, now())
+       ON CONFLICT (key) DO UPDATE SET eingetragen = EXCLUDED.eingetragen, actor = EXCLUDED.actor, updated_at = now()`,
+      [key, eingetragen, zugang.rolle],
+    )
+  } catch {
+    return
+  }
+  revalidatePath("/admin/marketing")
 }
 
 export async function postEntwerfen(anlass: PostAnlass, stichpunkte: string): Promise<PostErgebnis> {

@@ -4,6 +4,9 @@ import { AdminShell } from "@/components/admin/admin-shell"
 import { PostWerkstatt } from "@/components/admin/post-werkstatt"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { ladeMarketing } from "@/lib/marketing"
+import { KATALOG, ladeSichtbarkeit, type SichtbarkeitGruppe } from "@/lib/sichtbarkeit"
+import { ArrowUpRight, Check } from "lucide-react"
+import { sichtbarkeitUmschalten } from "./actions"
 
 export const dynamic = "force-dynamic"
 
@@ -244,7 +247,90 @@ export default async function MarketingSeite() {
       </section>
 
       <PostWerkstatt t={t.werkstatt} />
+
+      <Sichtbarkeit erledigt={await ladeSichtbarkeit()} tr={sprache === "tr"} />
     </AdminShell>
+  )
+}
+
+const GRUPPEN: Record<SichtbarkeitGruppe, { de: string; tr: string }> = {
+  google: { de: "Suche & Karten", tr: "Arama ve harita" },
+  verzeichnis: { de: "Verzeichnisse", tr: "Rehberler" },
+  agentur: { de: "Agentur-Plattformen", tr: "Ajans platformları" },
+  vertrauen: { de: "Vertrauen", tr: "Güven" },
+}
+
+function Sichtbarkeit({ erledigt, tr }: { erledigt: Set<string> | null; tr: boolean }) {
+  const anzahl = erledigt ? KATALOG.filter((e) => erledigt.has(e.key)).length : null
+  const prozent = anzahl !== null ? Math.round((anzahl / KATALOG.length) * 100) : 0
+
+  return (
+    <section className="border-border bg-surface mt-6 flex flex-col gap-5 rounded-lg border p-4" aria-labelledby="sichtbarkeit">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h2 id="sichtbarkeit" className="text-muted-foreground font-mono text-[11px] uppercase tracking-widest">
+            {tr ? "Görünürlük" : "Sichtbarkeit"}
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            {tr ? "Bir kez kaydol, bulun." : "Einmal eintragen, gefunden werden."}
+          </p>
+        </div>
+        <p className="font-mono text-2xl tabular-nums">
+          {anzahl ?? "—"}
+          <span className="text-muted-foreground text-base">/{KATALOG.length}</span>
+        </p>
+      </div>
+
+      <div className="bg-muted h-1 overflow-hidden rounded-full" aria-hidden="true">
+        <div className="bg-primary h-full rounded-full transition-all" style={{ width: `${prozent}%` }} />
+      </div>
+
+      {erledigt === null && (
+        <p className="text-muted-foreground text-sm">{tr ? "Henüz ölçülmedi (tablo yok)." : "Nicht gemessen (Tabelle fehlt)."}</p>
+      )}
+
+      <div className="grid gap-5 md:grid-cols-2">
+        {(Object.keys(GRUPPEN) as SichtbarkeitGruppe[]).map((g) => (
+          <div key={g} className="flex flex-col gap-2">
+            <h3 className="text-muted-foreground text-xs">{GRUPPEN[g][tr ? "tr" : "de"]}</h3>
+            <ul className="border-border divide-border divide-y rounded-md border">
+              {KATALOG.filter((e) => e.gruppe === g).map((e) => {
+                const ok = erledigt?.has(e.key) ?? false
+                return (
+                  <li key={e.key} className="flex items-center gap-3 px-3 py-2">
+                    <form action={sichtbarkeitUmschalten}>
+                      <input type="hidden" name="key" value={e.key} />
+                      <input type="hidden" name="eingetragen" value={ok ? "0" : "1"} />
+                      <button
+                        type="submit"
+                        disabled={erledigt === null}
+                        aria-label={`${e.name}: ${ok ? (tr ? "kayıtlı" : "eingetragen") : tr ? "eksik" : "offen"}`}
+                        aria-pressed={ok}
+                        className={`flex size-5 items-center justify-center rounded-full border transition-colors disabled:opacity-40 ${
+                          ok ? "bg-primary border-primary text-primary-foreground" : "border-border hover:border-primary"
+                        }`}
+                      >
+                        {ok && <Check className="size-3" aria-hidden="true" />}
+                      </button>
+                    </form>
+                    <span className={`flex-1 text-sm ${ok ? "text-muted-foreground line-through" : ""}`}>{e.name}</span>
+                    <a
+                      href={e.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs"
+                    >
+                      {tr ? "Aç" : "Öffnen"}
+                      <ArrowUpRight className="size-3" aria-hidden="true" />
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 
