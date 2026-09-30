@@ -53,7 +53,7 @@ export async function ladeCockpit(): Promise<CockpitDaten> {
     ),
     eins(
       `SELECT coalesce(sum(estimated_value), 0) AS wert, count(*) AS offen
-         FROM opportunities WHERE status NOT IN ('won','lost')`,
+         FROM opportunities WHERE status NOT IN ('won','lost') AND excluded_reason IS NULL`,
       (r) => ({ wert: zahl(r[0]?.wert), offen: zahl(r[0]?.offen) }),
     ),
     eins(`SELECT count(*) AS n FROM invoices WHERE state = 'gestellt'`, (r) => zahl(r[0]?.n)),
@@ -65,7 +65,7 @@ export async function ladeCockpit(): Promise<CockpitDaten> {
         GROUP BY w ORDER BY w`,
       (r) => r.map((x) => ({ start: String(x.start), anzahl: zahl(x.anzahl) })),
     ),
-    eins(`SELECT status AS stufe, count(*) AS anzahl FROM opportunities GROUP BY status`, (r) =>
+    eins(`SELECT status AS stufe, count(*) AS anzahl FROM opportunities WHERE excluded_reason IS NULL GROUP BY status`, (r) =>
       r.map((x) => ({ stufe: String(x.stufe), anzahl: zahl(x.anzahl) })),
     ),
     eins(

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { ChevronDown } from "lucide-react"
 import { notFound } from "next/navigation"
 
 import { istNavigationsfehler } from "@/lib/navigationsfehler"
@@ -26,6 +27,8 @@ import {
   DataValue,
 } from "@/components/admin/primitives-i18n"
 import { KundenShell } from "@/components/admin/kunden-shell"
+import { KundenKopf } from "@/components/admin/kunden-kopf"
+import { ladeKundenkartenKopf } from "@/lib/kundenkarte"
 import { getVertriebStore } from "@/lib/lead-store"
 import { LIFECYCLE_NOTES, LIFECYCLE_STAGES } from "@/lib/vertrieb"
 import type { Location } from "@/lib/vertrieb"
@@ -81,6 +84,21 @@ export default async function OrganisationDetail({ params }: { params: Promise<{
   }
 
   const kunde = organisation.lifecycle === "kunde"
+  const kopf = await ladeKundenkartenKopf(organisation.id)
+
+  const offeneChancen = opportunities.filter((o) => o.status !== "won" && o.status !== "lost")
+  const mitSchritt = offeneChancen
+    .filter((o) => o.nextAction)
+    .sort((a, b) => (a.nextActionAt ?? "9999").localeCompare(b.nextActionAt ?? "9999"))[0]
+  const kontaktMitSchritt = contacts
+    .filter((c) => c.nextTouch)
+    .sort((a, b) => (a.nextTouchAt ?? "9999").localeCompare(b.nextTouchAt ?? "9999"))[0]
+  const schritt = mitSchritt
+    ? { text: mitSchritt.nextAction as string, datum: mitSchritt.nextActionAt, href: `/admin/vertrieb/pipeline/${mitSchritt.id}` }
+    : kontaktMitSchritt
+      ? { text: `${kontaktMitSchritt.name}: ${kontaktMitSchritt.nextTouch}`, datum: kontaktMitSchritt.nextTouchAt, href: `/admin/vertrieb/beziehungen/${kontaktMitSchritt.id}` }
+      : null
+  const ersteChanceHref = offeneChancen[0] ? `/admin/vertrieb/pipeline/${offeneChancen[0].id}` : null
 
   return (
     <KundenShell
@@ -108,8 +126,61 @@ export default async function OrganisationDetail({ params }: { params: Promise<{
         </Surface>
       )}
 
+      <KundenKopf kopf={kopf} schritt={schritt} ersteChanceHref={ersteChanceHref} t={t} intl={intl} />
+
       <div className="mt-8 grid gap-10 lg:grid-cols-[2fr_1fr] lg:gap-12">
         <div className="min-w-0">
+          {/* ── Verkaufschancen ── */}
+          <section aria-labelledby="org-chancen-titel">
+            <SectionHeader id="org-chancen-titel" title={t.kundenDetail.verkaufschancen} count={`${opportunities.length}`} />
+            {opportunities.length === 0 ? (
+              <p className="type-small text-muted-foreground mt-4 text-pretty">
+                {t.kundenDetail.keinVorgang}
+              </p>
+            ) : (
+              <ul className="mt-4 flex flex-col">
+                {opportunities.map((o) => (
+                  <li key={o.id} className="border-line flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b py-3 last:border-b-0">
+                    <span className="min-w-0 flex-1">
+                      <Link href={`/admin/vertrieb/pipeline/${o.id}`} className="text-subhead block text-sm underline-offset-4 hover:underline">
+                        {o.title}
+                      </Link>
+                      {/*
+                        Der nächste Schritt steht beim Vorgang, weil er dort
+                        gepflegt wird. Hier wird er nur gezeigt — es entsteht
+                        keine zweite Stelle, an der man ihn ändern könnte, und
+                        damit auch keine doppelte Datenpflege.
+                      */}
+                      {o.nextAction ? (
+                        <span className="text-muted-foreground mt-0.5 block text-xs">
+                          {t.kundenDetail.naechsterSchritt}: {o.nextAction}
+                          {o.nextActionAt ? ` · ${formatDate(o.nextActionAt, intl)}` : ""}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground mt-0.5 block text-xs">
+                          {t.kundenDetail.keinNaechsterSchritt}
+                        </span>
+                      )}
+                    </span>
+                    <Pill severity={o.status === "lost" ? "critical" : "neutral"}>{t.begriffe.stufe[o.status] ?? o.status}</Pill>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <div className="mt-12">
+            <ActivityLog entries={activities} t={t} intl={intl} />
+          </div>
+
+          <details className="border-line group mt-12 rounded-lg border">
+            <summary className="text-subhead cursor-pointer list-none p-4 text-sm marker:hidden">
+              <span className="flex items-center justify-between gap-4">
+                {t.kundenkarte.stammdaten}
+                <ChevronDown aria-hidden="true" className="text-muted-foreground size-4 shrink-0 transition-transform group-open:rotate-180" />
+              </span>
+            </summary>
+            <div className="border-line border-t p-4">
           {/* ── Kundenhistorie ── */}
           <section aria-labelledby="historie-titel">
             <SectionHeader id="historie-titel" title={t.kundenDetail.kundenhistorie} />
@@ -230,49 +301,8 @@ export default async function OrganisationDetail({ params }: { params: Promise<{
               </form>
             </div>
           </section>
-
-          {/* ── Verkaufschancen ── */}
-          <section aria-labelledby="org-chancen-titel" className="mt-12">
-            <SectionHeader id="org-chancen-titel" title={t.kundenDetail.verkaufschancen} count={`${opportunities.length}`} />
-            {opportunities.length === 0 ? (
-              <p className="type-small text-muted-foreground mt-4 text-pretty">
-                {t.kundenDetail.keinVorgang}
-              </p>
-            ) : (
-              <ul className="mt-4 flex flex-col">
-                {opportunities.map((o) => (
-                  <li key={o.id} className="border-line flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b py-3 last:border-b-0">
-                    <span className="min-w-0 flex-1">
-                      <Link href={`/admin/vertrieb/pipeline/${o.id}`} className="text-subhead block text-sm underline-offset-4 hover:underline">
-                        {o.title}
-                      </Link>
-                      {/*
-                        Der nächste Schritt steht beim Vorgang, weil er dort
-                        gepflegt wird. Hier wird er nur gezeigt — es entsteht
-                        keine zweite Stelle, an der man ihn ändern könnte, und
-                        damit auch keine doppelte Datenpflege.
-                      */}
-                      {o.nextAction ? (
-                        <span className="text-muted-foreground mt-0.5 block text-xs">
-                          {t.kundenDetail.naechsterSchritt}: {o.nextAction}
-                          {o.nextActionAt ? ` · ${formatDate(o.nextActionAt, intl)}` : ""}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground mt-0.5 block text-xs">
-                          {t.kundenDetail.keinNaechsterSchritt}
-                        </span>
-                      )}
-                    </span>
-                    <Pill severity={o.status === "lost" ? "critical" : "neutral"}>{t.begriffe.stufe[o.status] ?? o.status}</Pill>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-
-          <div className="mt-12">
-            <ActivityLog entries={activities} t={t} intl={intl} />
-          </div>
+            </div>
+          </details>
         </div>
 
         <aside className="min-w-0">
