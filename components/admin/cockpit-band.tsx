@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import { type CockpitDaten, STUFEN } from "@/lib/cockpit"
+import { kanalName } from "@/lib/kanal"
 
 type Sprache = "de" | "tr"
 
@@ -16,7 +17,9 @@ const TEXT = {
     vorwoche: (d: number) => (d === 0 ? "wie Vorwoche" : `${d > 0 ? "+" : ""}${d} zur Vorwoche`),
     wochen: "Anfragen je Woche",
     stufen: "Pipeline nach Stufe",
-    quellen: "Herkunft · 90 Tage",
+    quellen: "Kanal · 90 Tage",
+    offen: "Nicht eingeordnet",
+    gewonnen: (n: number) => `${n} gewonnen`,
     keineDaten: "Noch keine Daten",
     stufe: {
       new: "Neu", contacted: "Kontakt", qualified: "Qualifiziert", discovery: "Gespräch", audit: "Check",
@@ -34,7 +37,9 @@ const TEXT = {
     vorwoche: (d: number) => (d === 0 ? "geçen haftayla aynı" : `geçen haftaya göre ${d > 0 ? "+" : ""}${d}`),
     wochen: "Haftalık talepler",
     stufen: "Aşamaya göre pipeline",
-    quellen: "Kaynak · 90 gün",
+    quellen: "Kanal · 90 gün",
+    offen: "Seçilmedi",
+    gewonnen: (n: number) => `${n} kazanıldı`,
     keineDaten: "Henüz veri yok",
     stufe: {
       new: "Yeni", contacted: "Temas", qualified: "Nitelikli", discovery: "Görüşme", audit: "Check",
@@ -153,9 +158,14 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
             <ul className="flex flex-col gap-2.5">
               {daten.quellen.map((q) => (
                 <li key={q.quelle} className="flex flex-col gap-1">
-                  <span className="flex justify-between text-sm">
-                    <span className="truncate">{q.quelle}</span>
-                    <span className="tabular-nums">{q.anzahl}</span>
+                  <span className="flex justify-between gap-2 text-sm">
+                    <span className={`truncate ${q.quelle === "offen" ? "text-muted-foreground" : ""}`}>
+                      {q.quelle === "offen" ? t.offen : kanalName(q.quelle, sprache)}
+                    </span>
+                    <span className="flex gap-2 tabular-nums">
+                      {q.gewonnen > 0 ? <span className="text-gold-text">{t.gewonnen(q.gewonnen)}</span> : null}
+                      <span>{q.anzahl}</span>
+                    </span>
                   </span>
                   <span className="bg-foreground/10 block h-1.5 overflow-hidden rounded-full">
                     <span className="bg-gold block h-full rounded-full" style={{ width: `${(q.anzahl / maxQuelle) * 100}%` }} />
