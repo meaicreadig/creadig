@@ -13,13 +13,15 @@ export type MarketingDaten = {
   kanaele: { kanal: string; anzahl: number }[] | null
   reaktionen: { reaktion: string; anzahl: number }[] | null
   letzte: { was: string; kanal: string; datum: string; reaktion: string; url: string | null }[] | null
+  woche: { tag: string; posts: { was: string; kanal: string }[] }[] | null
+  pipeline: { entwurf: number; freigegeben: number } | null
 }
 
 export async function ladeMarketing(): Promise<MarketingDaten> {
   const q = neonAbfrage()
   const leer: MarketingDaten = {
     posts30: null, mitReaktion30: null, anfragenAusPosts90: null, linkedinLeads90: null,
-    wochen: null, kanaele: null, reaktionen: null, letzte: null,
+    wochen: null, kanaele: null, reaktionen: null, letzte: null, woche: null, pipeline: null,
   }
   if (!q) return leer
 
@@ -32,7 +34,7 @@ export async function ladeMarketing(): Promise<MarketingDaten> {
   }
   const zahl = (v: unknown) => Number(v ?? 0)
 
-  const [summe, anfragen, linkedin, wochen, kanaele, reaktionen, letzte] = await Promise.all([
+  const [summe, anfragen, linkedin, wochen, kanaele, reaktionen, letzte, woche, pipeline] = await Promise.all([
     eins(
       `SELECT count(*) AS posts, count(*) FILTER (WHERE reaktion <> 'keine') AS reaktion
          FROM publications WHERE veroeffentlicht_am >= current_date - 30 AND veroeffentlicht_am <= current_date`,
@@ -75,6 +77,26 @@ export async function ladeMarketing(): Promise<MarketingDaten> {
           reaktion: String(x.reaktion), url: x.url ? String(x.url) : null,
         })),
     ),
+    eins(
+      `SELECT to_char(d, 'YYYY-MM-DD') AS tag,
+              coalesce(json_agg(json_build_object('was', p.was, 'kanal', p.kanal)) FILTER (WHERE p.id IS NOT NULL), '[]') AS posts
+         FROM generate_series(date_trunc('week', current_date), date_trunc('week', current_date) + interval '6 days', interval '1 day') AS d
+         LEFT JOIN publications p ON p.veroeffentlicht_am = d::date
+        GROUP BY d ORDER BY d`,
+      (r) =>
+        r.map((x) => ({
+          tag: String(x.tag),
+          posts: (Array.isArray(x.posts) ? x.posts : []).map((p: { was: unknown; kanal: unknown }) => ({
+            was: String(p.was), kanal: String(p.kanal),
+          })),
+        })),
+    ),
+    eins(
+      `SELECT count(*) FILTER (WHERE zustand = 'entwurf') AS entwurf,
+              count(*) FILTER (WHERE zustand = 'freigegeben') AS freigegeben
+         FROM publications`,
+      (r) => ({ entwurf: zahl(r[0]?.entwurf), freigegeben: zahl(r[0]?.freigegeben) }),
+    ),
   ])
 
   return {
@@ -86,5 +108,7 @@ export async function ladeMarketing(): Promise<MarketingDaten> {
     kanaele,
     reaktionen,
     letzte,
+    woche,
+    pipeline,
   }
 }

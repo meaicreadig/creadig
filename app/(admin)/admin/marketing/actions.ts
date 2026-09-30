@@ -8,7 +8,10 @@ import { pruefeZugang } from "@/lib/admin-widerruf"
 import { darfBetreten } from "@/lib/rollen"
 
 export type PostAnlass = "lieferung" | "einwand" | "beleg" | "build"
-export type PostErgebnis = { text: string } | { fehler: string }
+export type Plattform = "person" | "firma" | "instagram" | "google"
+export type PostErgebnis = { texte: Record<Plattform, string> } | { fehler: string }
+
+const PLATTFORMEN: Plattform[] = ["person", "firma", "instagram", "google"]
 
 const ANLASS: Record<PostAnlass, string> = {
   lieferung: "Ein Projekt wurde ausgeliefert. Zeige, welches unsichtbare Problem jetzt gelöst ist.",
@@ -17,16 +20,33 @@ const ANLASS: Record<PostAnlass, string> = {
   build: "Eine Build Note: ein Blick hinter die Kulissen, wie ein System entsteht.",
 }
 
-const SYSTEM = `Du schreibst LinkedIn-Beiträge für creaDIG, ein System-Haus für digitale Betriebe aus Osnabrück (seit 2017).
+const SYSTEM = `Du schreibst Social-Media-Texte für creaDIG, ein System-Haus für digitale Betriebe aus Osnabrück (seit 2017).
 Haltung: "Wir bauen, was andere nicht sehen" – das Unsichtbare im Betrieb sichtbar machen (Marke, Web, Betriebssoftware, Automation, KI/meAI).
-Zielgruppe: Inhaber und Entscheider kleiner und mittlerer Betriebe im DACH-Raum.
-Regeln:
-- Deutsch, per Sie, ruhig, präzise, ohne Werbesprache und ohne Superlative.
-- Erste Zeile ist ein konkreter Einstieg, der ohne "mehr anzeigen" trägt.
-- Kurze Absätze, 120–220 Wörter, keine Emojis, höchstens 3 Hashtags am Ende.
-- Erfinde keine Kunden, Zahlen oder Ergebnisse. Nutze nur, was in den Stichpunkten steht.
-- Schluss mit einer offenen Frage oder einem leisen nächsten Schritt, kein "Jetzt anfragen!".
-Gib nur den Beitragstext aus.`
+Zielgruppe: Inhaber und Entscheider kleiner und mittlerer Betriebe in Deutschland, Österreich und der Schweiz.
+Allgemein: Deutsch, per Sie, ruhig, präzise, keine Werbesprache, keine Superlative, keine Emojis.
+Erfinde keine Kunden, Zahlen oder Ergebnisse. Nutze nur, was in den Stichpunkten steht.
+
+Schreibe aus denselben Stichpunkten vier Fassungen, jede unter ihrer eigenen Markierungszeile:
+### PERSON
+LinkedIn, persönliches Profil des Gründers, Ich-Form. Erste Zeile trägt ohne "mehr anzeigen". Kurze Absätze, 120–220 Wörter, höchstens 3 Hashtags am Ende, Schluss mit offener Frage.
+### FIRMA
+LinkedIn-Unternehmensseite, Wir-Form, sachlicher. 80–150 Wörter, höchstens 3 Hashtags, leiser nächster Schritt.
+### INSTAGRAM
+Bildunterschrift. Starker erster Satz, 60–120 Wörter, kurze Zeilen. Danach eine Zeile "Slides:" mit 4 sehr kurzen Folientexten (je max. 8 Wörter, nummeriert). Am Ende 5–8 Hashtags inkl. #osnabrück.
+### GOOGLE
+Beitrag im Google-Unternehmensprofil. 50–90 Wörter, lokal (Osnabrück/Region), konkreter Nutzen, keine Hashtags.
+
+Gib nur die vier Abschnitte mit den Markierungszeilen aus.`
+
+function zerlegen(roh: string): Record<Plattform, string> | null {
+  const teile = roh.split(/^###\s*(PERSON|FIRMA|INSTAGRAM|GOOGLE)\s*$/m)
+  const texte = {} as Record<Plattform, string>
+  for (let i = 1; i < teile.length; i += 2) {
+    const schluessel = teile[i].toLowerCase() as Plattform
+    texte[schluessel] = teile[i + 1]?.trim() ?? ""
+  }
+  return PLATTFORMEN.every((p) => texte[p]) ? texte : null
+}
 
 export async function postEntwerfen(anlass: PostAnlass, stichpunkte: string): Promise<PostErgebnis> {
   const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
@@ -41,9 +61,10 @@ export async function postEntwerfen(anlass: PostAnlass, stichpunkte: string): Pr
       model: "openai/gpt-5-mini",
       system: SYSTEM,
       prompt: `Anlass: ${ANLASS[anlass]}\n\nStichpunkte:\n${eingabe}`,
-      maxOutputTokens: 900,
+      maxOutputTokens: 5000,
     })
-    return { text: text.trim() }
+    const texte = zerlegen(text)
+    return texte ? { texte } : { fehler: "Entwurf unvollständig. Bitte erneut versuchen." }
   } catch {
     return { fehler: "Entwurf konnte nicht erzeugt werden. Bitte erneut versuchen." }
   }

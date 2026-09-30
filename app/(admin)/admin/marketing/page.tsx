@@ -11,22 +11,29 @@ const TEXT = {
   de: {
     titel: "Marketing",
     werkstatt: {
-      titel: "LinkedIn-Werkstatt",
+      titel: "Beitrags-Werkstatt · ein Gedanke, vier Kanäle",
       anlass: "Anlass",
       anlaesse: { lieferung: "Lieferung", einwand: "Einwand", beleg: "Beleg", build: "Build Note" },
+      plattformen: { person: "LinkedIn · Profil", firma: "LinkedIn · Firma", instagram: "Instagram", google: "Google Profil" },
+      kopfzeile: { person: "Gründer · creaDIG", firma: "creaDIG", instagram: "@creadig", google: "creaDIG · Osnabrück" },
       stichpunkte: "Stichpunkte",
       platzhalter: "z. B. Tischlerei Meyer: Aufträge liefen über 4 Excel-Listen. Jetzt ein System, Angebot bis Rechnung an einem Ort.",
-      erzeugen: "Entwurf erzeugen",
+      erzeugen: "Vier Fassungen erzeugen",
       erzeugt: "Schreibt …",
-      vorschau: "Vorschau wie auf LinkedIn",
       mehr: "… mehr",
       weniger: "weniger",
       kopieren: "Kopieren",
       kopiert: "Kopiert",
+      oeffnen: "Plattform öffnen",
       speichern: "Als Entwurf speichern",
-      gespeichert: "In Veröffentlichungen gespeichert",
-      leer: "Stichpunkte links eingeben – der Entwurf erscheint hier.",
+      gespeichert: "Gespeichert",
+      nurKopieren: "Kopieren und dort einfügen",
+      leer: "Stichpunkte links eingeben – die Fassungen erscheinen hier.",
     },
+    woche: "Diese Woche",
+    ziel: (n: number, z: number) => `LinkedIn ${n} / ${z}`,
+    pipeline: (e: number, f: number) => `${e} Entwürfe · ${f} freigegeben`,
+    tage: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
     meta: "LinkedIn, Website, Netzwerk — was hinausging und was zurückkam",
     posts: "Veröffentlicht · 30 Tage",
     reaktion: "Mit Reaktion · 30 Tage",
@@ -50,22 +57,29 @@ const TEXT = {
   tr: {
     titel: "Pazarlama",
     werkstatt: {
-      titel: "LinkedIn atölyesi",
+      titel: "Paylaşım atölyesi · bir fikir, dört kanal",
       anlass: "Konu",
       anlaesse: { lieferung: "Teslimat", einwand: "İtiraz", beleg: "Kanıt", build: "Build Note" },
+      plattformen: { person: "LinkedIn · Profil", firma: "LinkedIn · Şirket", instagram: "Instagram", google: "Google Profil" },
+      kopfzeile: { person: "Kurucu · creaDIG", firma: "creaDIG", instagram: "@creadig", google: "creaDIG · Osnabrück" },
       stichpunkte: "Notlar",
       platzhalter: "örn. Marangoz Meyer: siparişler 4 Excel listesindeydi. Şimdi tek sistem, tekliften faturaya tek yerde.",
-      erzeugen: "Taslak oluştur",
+      erzeugen: "Dört versiyon oluştur",
       erzeugt: "Yazıyor …",
-      vorschau: "LinkedIn'deki gibi önizleme",
       mehr: "… devamı",
       weniger: "daha az",
       kopieren: "Kopyala",
       kopiert: "Kopyalandı",
+      oeffnen: "Platformu aç",
       speichern: "Taslak olarak kaydet",
-      gespeichert: "Yayınlar'a kaydedildi",
-      leer: "Soldaki alana notları yazın – taslak burada görünür. Metin Almanca üretilir.",
+      gespeichert: "Kaydedildi",
+      nurKopieren: "Kopyalayıp orada yapıştırın",
+      leer: "Soldaki alana notları yazın – versiyonlar burada görünür. Metinler Almanca üretilir.",
     },
+    woche: "Bu hafta",
+    ziel: (n: number, z: number) => `LinkedIn ${n} / ${z}`,
+    pipeline: (e: number, f: number) => `${e} taslak · ${f} onaylı`,
+    tage: ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"],
     meta: "LinkedIn, web sitesi, ağ — ne çıktı, ne geri döndü",
     posts: "Yayınlanan · 30 gün",
     reaktion: "Tepki alan · 30 gün",
@@ -124,7 +138,9 @@ export default async function MarketingSeite() {
         </Link>
       </div>
 
-      <ul className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <WochenPlan d={d} t={t} />
+
+      <ul className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {kacheln.map((k) => (
           <li key={k.label} className="border-border bg-surface flex flex-col gap-2 rounded-lg border p-4">
             <span className="text-muted-foreground font-mono text-[11px] uppercase tracking-widest">{k.label}</span>
@@ -229,6 +245,70 @@ export default async function MarketingSeite() {
 
       <PostWerkstatt t={t.werkstatt} />
     </AdminShell>
+  )
+}
+
+const LINKEDIN_ZIEL = 3
+
+function WochenPlan({ d, t }: { d: Awaited<ReturnType<typeof ladeMarketing>>; t: (typeof TEXT)["de"] | (typeof TEXT)["tr"] }) {
+  if (!d.woche) return null
+  const heute = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date())
+  const linkedin = d.woche.reduce((n, tag) => n + tag.posts.filter((p) => p.kanal === "linkedin").length, 0)
+  const erreicht = Math.min(linkedin, LINKEDIN_ZIEL)
+
+  return (
+    <section className="border-border bg-surface mt-6 flex flex-col gap-4 rounded-lg border p-4" aria-labelledby="woche">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 id="woche" className="text-muted-foreground font-mono text-[11px] uppercase tracking-widest">
+          {t.woche}
+        </h2>
+        <div className="flex flex-wrap items-center gap-4 text-sm">
+          <span className="flex items-center gap-2">
+            <span className="flex gap-1" aria-hidden="true">
+              {Array.from({ length: LINKEDIN_ZIEL }, (_, i) => (
+                <span key={i} className={`size-2.5 rounded-full ${i < erreicht ? "bg-gold" : "bg-foreground/15"}`} />
+              ))}
+            </span>
+            <span className={`tabular-nums ${linkedin >= LINKEDIN_ZIEL ? "text-gold-text" : ""}`}>
+              {t.ziel(linkedin, LINKEDIN_ZIEL)}
+            </span>
+          </span>
+          {d.pipeline ? (
+            <Link href="/admin/veroeffentlichungen" className="text-muted-foreground hover:text-foreground tabular-nums">
+              {t.pipeline(d.pipeline.entwurf, d.pipeline.freigegeben)}
+            </Link>
+          ) : null}
+        </div>
+      </div>
+
+      <ol className="grid grid-cols-7 gap-1.5">
+        {d.woche.map((tag, i) => {
+          const istHeute = tag.tag === heute
+          return (
+            <li
+              key={tag.tag}
+              className={`flex min-h-20 flex-col gap-1.5 rounded-md border p-2 ${
+                istHeute ? "border-gold" : "border-border"
+              }`}
+            >
+              <span className={`flex justify-between text-[11px] ${istHeute ? "text-gold-text" : "text-muted-foreground"}`}>
+                <span>{t.tage[i]}</span>
+                <span className="tabular-nums">{tag.tag.slice(8)}</span>
+              </span>
+              {tag.posts.map((p, j) => (
+                <span
+                  key={j}
+                  title={p.was}
+                  className={`block h-1.5 rounded-full ${p.kanal === "linkedin" ? "bg-gold" : "bg-foreground/40"}`}
+                >
+                  <span className="sr-only">{`${t.kanal[p.kanal] ?? p.kanal}: ${p.was}`}</span>
+                </span>
+              ))}
+            </li>
+          )
+        })}
+      </ol>
+    </section>
   )
 }
 

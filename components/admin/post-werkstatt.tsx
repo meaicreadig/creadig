@@ -2,49 +2,63 @@
 
 import { useState, useTransition } from "react"
 
-import { postEntwerfen, type PostAnlass } from "@/app/(admin)/admin/marketing/actions"
+import { postEntwerfen, type Plattform, type PostAnlass } from "@/app/(admin)/admin/marketing/actions"
 import { entwurfAnlegen } from "@/app/(admin)/admin/veroeffentlichungen/actions"
 
-const LIMIT = 3000
 const VORSCHAU_ZEILEN = 3
+const PLATTFORMEN: Plattform[] = ["person", "firma", "instagram", "google"]
+
+const PLATTFORM_INFO: Record<Plattform, { limit: number; oeffnen: string; speicherbar: boolean }> = {
+  person: { limit: 3000, oeffnen: "https://www.linkedin.com/feed/?shareActive=true", speicherbar: true },
+  firma: { limit: 3000, oeffnen: "https://www.linkedin.com/feed/?shareActive=true", speicherbar: true },
+  instagram: { limit: 2200, oeffnen: "https://www.instagram.com/", speicherbar: false },
+  google: { limit: 1500, oeffnen: "https://business.google.com/", speicherbar: false },
+}
 
 type Texte = {
   titel: string
   anlass: string
   anlaesse: Record<PostAnlass, string>
+  plattformen: Record<Plattform, string>
+  kopfzeile: Record<Plattform, string>
   stichpunkte: string
   platzhalter: string
   erzeugen: string
   erzeugt: string
-  vorschau: string
   mehr: string
   weniger: string
   kopieren: string
   kopiert: string
+  oeffnen: string
   speichern: string
   gespeichert: string
+  nurKopieren: string
   leer: string
 }
 
 export function PostWerkstatt({ t }: { t: Texte }) {
   const [anlass, setAnlass] = useState<PostAnlass>("lieferung")
   const [stichpunkte, setStichpunkte] = useState("")
-  const [text, setText] = useState("")
+  const [texte, setTexte] = useState<Record<Plattform, string> | null>(null)
+  const [aktiv, setAktiv] = useState<Plattform>("person")
   const [fehler, setFehler] = useState<string | null>(null)
   const [offen, setOffen] = useState(false)
   const [kopiert, setKopiert] = useState(false)
-  const [gespeichert, setGespeichert] = useState(false)
+  const [gespeichert, setGespeichert] = useState<Partial<Record<Plattform, boolean>>>({})
   const [laeuft, starte] = useTransition()
   const [speichert, speichere] = useTransition()
+
+  const text = texte?.[aktiv] ?? ""
+  const info = PLATTFORM_INFO[aktiv]
 
   const erzeugen = () =>
     starte(async () => {
       setFehler(null)
-      setGespeichert(false)
+      setGespeichert({})
       const r = await postEntwerfen(anlass, stichpunkte)
       if ("fehler" in r) setFehler(r.fehler)
       else {
-        setText(r.text)
+        setTexte(r.texte)
         setOffen(false)
       }
     })
@@ -62,7 +76,7 @@ export function PostWerkstatt({ t }: { t: Texte }) {
       fd.set("kanal", "linkedin")
       fd.set("quelle", anlass)
       await entwurfAnlegen(fd)
-      setGespeichert(true)
+      setGespeichert((g) => ({ ...g, [aktiv]: true }))
     })
 
   const zeilen = text.split("\n")
@@ -124,15 +138,36 @@ export function PostWerkstatt({ t }: { t: Texte }) {
         </div>
 
         <div className="flex flex-col gap-3">
-          <span className="text-muted-foreground text-xs">{t.vorschau}</span>
-          <article className="border-border bg-background flex flex-col gap-3 rounded-lg border p-4" aria-live="polite">
+          <div role="tablist" aria-label={t.titel} className="border-border flex gap-1 overflow-x-auto border-b">
+            {PLATTFORMEN.map((p) => (
+              <button
+                key={p}
+                type="button"
+                role="tab"
+                aria-selected={aktiv === p}
+                onClick={() => {
+                  setAktiv(p)
+                  setOffen(false)
+                }}
+                className={`-mb-px shrink-0 border-b-2 px-3 py-2 text-sm transition-colors ${
+                  aktiv === p
+                    ? "border-gold text-foreground"
+                    : "text-muted-foreground hover:text-foreground border-transparent"
+                }`}
+              >
+                {t.plattformen[p]}
+              </button>
+            ))}
+          </div>
+
+          <article role="tabpanel" className="border-border bg-background flex flex-col gap-3 rounded-lg border p-4" aria-live="polite">
             <header className="flex items-center gap-3">
               <span className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-full font-serif text-sm font-semibold">
-                cD
+                {aktiv === "person" ? "EA" : "cD"}
               </span>
               <span className="flex flex-col">
-                <span className="text-foreground text-sm font-semibold">creaDIG</span>
-                <span className="text-muted-foreground text-xs">System-Haus für digitale Betriebe</span>
+                <span className="text-foreground text-sm font-semibold">{t.kopfzeile[aktiv]}</span>
+                <span className="text-muted-foreground text-xs">{t.plattformen[aktiv]}</span>
               </span>
             </header>
             {text ? (
@@ -156,9 +191,9 @@ export function PostWerkstatt({ t }: { t: Texte }) {
           {text && (
             <div className="flex flex-wrap items-center gap-3">
               <span
-                className={`font-mono text-xs tabular-nums ${text.length > LIMIT ? "text-destructive" : "text-muted-foreground"}`}
+                className={`font-mono text-xs tabular-nums ${text.length > info.limit ? "text-destructive" : "text-muted-foreground"}`}
               >
-                {text.length} / {LIMIT}
+                {text.length} / {info.limit}
               </span>
               <button
                 type="button"
@@ -167,14 +202,26 @@ export function PostWerkstatt({ t }: { t: Texte }) {
               >
                 {kopiert ? t.kopiert : t.kopieren}
               </button>
-              <button
-                type="button"
-                onClick={speichern}
-                disabled={speichert || gespeichert}
-                className="border-primary text-primary rounded-md border px-3 py-1.5 text-sm disabled:opacity-60"
+              <a
+                href={info.oeffnen}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border-border text-foreground hover:border-foreground/40 rounded-md border px-3 py-1.5 text-sm"
               >
-                {gespeichert ? t.gespeichert : t.speichern}
-              </button>
+                {t.oeffnen}
+              </a>
+              {info.speicherbar ? (
+                <button
+                  type="button"
+                  onClick={speichern}
+                  disabled={speichert || gespeichert[aktiv]}
+                  className="border-primary text-primary rounded-md border px-3 py-1.5 text-sm disabled:opacity-60"
+                >
+                  {gespeichert[aktiv] ? t.gespeichert : t.speichern}
+                </button>
+              ) : (
+                <span className="text-muted-foreground text-xs">{t.nurKopieren}</span>
+              )}
             </div>
           )}
         </div>
