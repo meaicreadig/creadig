@@ -14,7 +14,7 @@ export type CockpitDaten = {
   posts7: number | null
   wochen: { start: string; anzahl: number }[] | null
   stufen: { stufe: string; anzahl: number }[] | null
-  quellen: { quelle: string; anzahl: number }[] | null
+  quellen: { quelle: string; anzahl: number; gewonnen: number }[] | null
 }
 
 const LEER: CockpitDaten = {
@@ -69,10 +69,12 @@ export async function ladeCockpit(): Promise<CockpitDaten> {
       r.map((x) => ({ stufe: String(x.stufe), anzahl: zahl(x.anzahl) })),
     ),
     eins(
-      `SELECT coalesce(nullif(utm_source, ''), source) AS quelle, count(*) AS anzahl
+      `SELECT coalesce(nullif(channel, ''), nullif(utm_source, ''), 'offen') AS quelle,
+              count(*) AS anzahl,
+              count(*) FILTER (WHERE sales_status = 'won') AS gewonnen
          FROM leads WHERE created_at >= now() - interval '90 days'
-        GROUP BY 1 ORDER BY 2 DESC LIMIT 5`,
-      (r) => r.map((x) => ({ quelle: String(x.quelle), anzahl: zahl(x.anzahl) })),
+        GROUP BY 1 ORDER BY 2 DESC LIMIT 6`,
+      (r) => r.map((x) => ({ quelle: String(x.quelle), anzahl: zahl(x.anzahl), gewonnen: zahl(x.gewonnen) })),
     ),
   ])
 

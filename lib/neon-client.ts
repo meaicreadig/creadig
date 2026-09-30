@@ -812,6 +812,8 @@ export const SCHEMA: string[] = [
      actor text,
      updated_at timestamptz NOT NULL DEFAULT now()
    )`,
+  /* 023 · Marketing-Kanal je Anfrage. Siehe `scripts/migrations/023-lead-kanal.sql`. */
+  `ALTER TABLE leads ADD COLUMN IF NOT EXISTS channel text`,
 ]
 
 /**

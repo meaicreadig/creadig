@@ -11,6 +11,9 @@ import {
   setEnquiryOrganisation,
   setEnquiryResponsible,
 } from "@/app/(admin)/admin/vertrieb/actions"
+import { setzeKanal } from "@/app/(admin)/admin/vertrieb/kanal-actions"
+import { KANAELE, KANAL_NAME } from "@/lib/kanal"
+import { ladeKanal } from "@/lib/kanal-store"
 import { ActivityLog } from "@/components/admin/activity-log"
 import {
   AdminField,
@@ -67,15 +70,20 @@ export default async function AnfrageDetail({ params }: { params: Promise<{ id: 
   const store = getVertriebStore()
   if (!store) return <VertriebShell title={t.nav.anfragen.label} available={false}>{null}</VertriebShell>
 
-  let enquiry, activities, organisation, dubletten, organisationen
+  const kanalSprache = sprache === "tr" ? "tr" : "de"
+  const kanalText = kanalSprache === "tr"
+    ? { label: "Pazarlama kanalı", offen: "Henüz seçilmedi" }
+    : { label: "Marketing-Kanal", offen: "Noch nicht eingeordnet" }
+  let enquiry, activities, organisation, dubletten, organisationen, kanal
   try {
     enquiry = await store.getEnquiry(id)
     if (!enquiry) notFound()
-    ;[activities, organisation, dubletten, organisationen] = await Promise.all([
+    ;[activities, organisation, dubletten, organisationen, kanal] = await Promise.all([
       store.activities("lead", id),
       enquiry.organisationId ? store.getOrganisation(enquiry.organisationId) : Promise.resolve(null),
       store.possibleDuplicates(id),
       store.organisationChoices(),
+      ladeKanal(id),
     ])
   } catch (error) {
     /* ADM-07 · H27 — dieselbe Regel wie auf jeder anderen Detailseite. */
@@ -399,15 +407,30 @@ export default async function AnfrageDetail({ params }: { params: Promise<{ id: 
 
           <section aria-labelledby="herkunft-titel">
             <SectionHeader id="herkunft-titel" title={a.herkunft} as="h3" />
+            {kanal !== undefined ? (
+              <form action={setzeKanal.bind(null, enquiry.id)} className="mt-4 flex flex-wrap items-end gap-3">
+                <AdminField label={kanalText.label} htmlFor="kanal">
+                  <AdminSelect key={kanal ?? "leer"} id="kanal" name="kanal" defaultValue={kanal ?? ""}>
+                    <option value="">{kanalText.offen}</option>
+                    {KANAELE.map((k) => (
+                      <option key={k} value={k}>{KANAL_NAME[kanalSprache][k]}</option>
+                    ))}
+                  </AdminSelect>
+                </AdminField>
+                <button type="submit" className="cta-quiet min-h-11 px-4 py-2 text-sm">{t.formular.speichern}</button>
+              </form>
+            ) : null}
             <dl className="mt-4 flex flex-col gap-4">
               <DataValue label={a.quelle}>{quelleName}</DataValue>
               <DataValue label={a.sprache}>{enquiry.locale.toUpperCase()}</DataValue>
               <DataValue label={a.seite}>{enquiry.siteUrl}</DataValue>
               <DataValue label={a.kampagne}>{utm || null}</DataValue>
               <DataValue label={a.eingegangen}>
-                <time dateTime={enquiry.createdAt}>
-                  {new Date(enquiry.createdAt).toLocaleString(intl, { timeZone: GESCHAEFTS_ZEITZONE, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                </time>
+                {Number.isNaN(new Date(enquiry.createdAt).getTime()) ? null : (
+                  <time dateTime={enquiry.createdAt}>
+                    {new Date(enquiry.createdAt).toLocaleString(intl, { timeZone: GESCHAEFTS_ZEITZONE, day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  </time>
+                )}
               </DataValue>
             </dl>
           </section>
