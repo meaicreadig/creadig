@@ -299,6 +299,7 @@ export function PostWerkstatt({ t, linkedin }: { t: Texte; linkedin: LinkedinSta
                   )}
                 </>
               ) : (
+                // eslint-disable-next-line @next/next/no-html-link-for-pages -- API-Route leitet zu LinkedIn weiter, braucht vollen Seitenwechsel
                 <a
                   href="/api/linkedin/start"
                   className="bg-primary text-primary-foreground self-start rounded-md px-4 py-2 text-sm font-medium"
