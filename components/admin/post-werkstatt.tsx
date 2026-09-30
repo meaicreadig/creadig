@@ -2,7 +2,14 @@
 
 import { useState, useTransition } from "react"
 
-import { postEntwerfen, type Plattform, type PostAnlass } from "@/app/(admin)/admin/marketing/actions"
+import {
+  linkedinTrennen,
+  linkedinVeroeffentlichen,
+  postEntwerfen,
+  type Plattform,
+  type PostAnlass,
+} from "@/app/(admin)/admin/marketing/actions"
+import type { LinkedinStatus } from "@/lib/linkedin"
 import { entwurfAnlegen } from "@/app/(admin)/admin/veroeffentlichungen/actions"
 
 const VORSCHAU_ZEILEN = 3
@@ -34,9 +41,38 @@ type Texte = {
   gespeichert: string
   nurKopieren: string
   leer: string
+  li: {
+    verbinden: string
+    verbundenAls: string
+    trennen: string
+    veroeffentlichen: string
+    bestaetigen: string
+    sendet: string
+    live: string
+    ansehen: string
+    firmaHinweis: string
+  }
 }
 
-export function PostWerkstatt({ t }: { t: Texte }) {
+export function PostWerkstatt({ t, linkedin }: { t: Texte; linkedin: LinkedinStatus }) {
+  const [bestaetigt, setBestaetigt] = useState(false)
+  const [live, setLive] = useState<{ url: string | null } | null>(null)
+  const [sendet, sende] = useTransition()
+
+  const veroeffentlichen = () => {
+    if (!bestaetigt) {
+      setBestaetigt(true)
+      return
+    }
+    sende(async () => {
+      setFehler(null)
+      const r = await linkedinVeroeffentlichen(text)
+      setBestaetigt(false)
+      if ("fehler" in r) setFehler(r.fehler)
+      else setLive({ url: r.url })
+    })
+  }
+
   const [anlass, setAnlass] = useState<PostAnlass>("lieferung")
   const [stichpunkte, setStichpunkte] = useState("")
   const [texte, setTexte] = useState<Record<Plattform, string> | null>(null)
@@ -224,6 +260,55 @@ export function PostWerkstatt({ t }: { t: Texte }) {
               )}
             </div>
           )}
+
+          {aktiv === "person" && (
+            <div className="border-border flex flex-col gap-3 rounded-lg border p-4">
+              {linkedin.verbunden ? (
+                <>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-foreground text-sm">
+                      <span aria-hidden className="bg-primary mr-2 inline-block size-2 rounded-full" />
+                      {t.li.verbundenAls.replace("{name}", linkedin.name)}
+                    </span>
+                    <form action={linkedinTrennen}>
+                      <button type="submit" className="text-muted-foreground hover:text-foreground text-xs underline">
+                        {t.li.trennen}
+                      </button>
+                    </form>
+                  </div>
+                  {live ? (
+                    <p className="text-foreground text-sm" role="status">
+                      {t.li.live}{" "}
+                      {live.url && (
+                        <a href={live.url} target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                          {t.li.ansehen}
+                        </a>
+                      )}
+                    </p>
+                  ) : (
+                    text && (
+                      <button
+                        type="button"
+                        onClick={veroeffentlichen}
+                        disabled={sendet || text.length > info.limit}
+                        className="bg-primary text-primary-foreground self-start rounded-md px-4 py-2 text-sm font-medium disabled:opacity-40"
+                      >
+                        {sendet ? t.li.sendet : bestaetigt ? t.li.bestaetigen : t.li.veroeffentlichen}
+                      </button>
+                    )
+                  )}
+                </>
+              ) : (
+                <a
+                  href="/api/linkedin/start"
+                  className="bg-primary text-primary-foreground self-start rounded-md px-4 py-2 text-sm font-medium"
+                >
+                  {t.li.verbinden}
+                </a>
+              )}
+            </div>
+          )}
+          {aktiv === "firma" && <p className="text-muted-foreground text-xs leading-relaxed">{t.li.firmaHinweis}</p>}
         </div>
       </div>
     </section>

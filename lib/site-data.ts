@@ -1251,7 +1251,10 @@ export type SocialProfile = {
   url: string
 }
 
-export const socialProfiles: SocialProfile[] = []
+/* 30.09.2026: LinkedIn-Unternehmensseite freigegeben (gehört creaDIG, wird gepflegt). */
+export const socialProfiles: SocialProfile[] = [
+  { label: "LI", name: "creaDIG auf LinkedIn", url: "https://www.linkedin.com/company/creadig" },
+]
 
 /**
  * Was sonst noch unter dem Dach läuft.

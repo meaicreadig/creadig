@@ -9,6 +9,8 @@ import { darfBetreten } from "@/lib/rollen"
 import { neonAbfrage } from "@/lib/neon-abfrage"
 import { KATALOG } from "@/lib/sichtbarkeit"
 import { revalidatePath } from "next/cache"
+import { aufLinkedinVeroeffentlichen, verbindungTrennen } from "@/lib/linkedin"
+import { getVertriebStore } from "@/lib/lead-store"
 
 export type PostAnlass = "lieferung" | "einwand" | "beleg" | "build"
 export type Plattform = "person" | "firma" | "instagram" | "google"
@@ -68,6 +70,47 @@ export async function sichtbarkeitUmschalten(formData: FormData): Promise<void> 
   } catch {
     return
   }
+  revalidatePath("/admin/marketing")
+}
+
+export type LinkedinErgebnis = { ok: true; url: string | null } | { fehler: string }
+
+export async function linkedinVeroeffentlichen(text: string): Promise<LinkedinErgebnis> {
+  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
+  if (zugang.verdict !== "ok" || zugang.rolle !== "owner") return { fehler: "Nur der Inhaber darf veröffentlichen." }
+  const inhalt = text.trim()
+  if (inhalt.length < 10 || inhalt.length > 3000) return { fehler: "Der Text muss zwischen 10 und 3000 Zeichen lang sein." }
+
+  const r = await aufLinkedinVeroeffentlichen(inhalt).catch(() => ({ ok: false as const, grund: "abgelehnt" as const }))
+  if (!r.ok) {
+    return {
+      fehler:
+        r.grund === "nicht-verbunden"
+          ? "LinkedIn ist nicht (mehr) verbunden. Bitte neu verbinden."
+          : "LinkedIn hat den Beitrag abgelehnt. Bitte später erneut versuchen.",
+    }
+  }
+
+  const heute = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date())
+  try {
+    await getVertriebStore({ kennung: zugang.rolle, herkunft: "HUMAN" })?.recordPublication({
+      was: inhalt.split("\n")[0].slice(0, 200),
+      kanal: "linkedin",
+      veroeffentlichtAm: heute,
+      url: r.url,
+    })
+  } catch {
+    /* Der Beitrag ist live; ein fehlender Registereintrag darf das nicht als Fehler melden. */
+  }
+  revalidatePath("/admin/marketing")
+  revalidatePath("/admin/veroeffentlichungen")
+  return { ok: true, url: r.url }
+}
+
+export async function linkedinTrennen(): Promise<void> {
+  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
+  if (zugang.verdict !== "ok" || zugang.rolle !== "owner") return
+  await verbindungTrennen()
   revalidatePath("/admin/marketing")
 }
 
