@@ -14,16 +14,21 @@ import { darfBetreten } from "@/lib/rollen"
  * Automationen erscheinen, wenn sie gebaut sind, nicht vorher.
  * Routen bleiben, wo sie sind; die Karte alter Adressen steht im Ledger (A4).
  */
+/*
+ * Fünf Bereiche statt neun loser Punkte (Gesamtplan, Etappe 1). Keine Route
+ * wandert oder verschwindet — nur die Einordnung in der Leiste ändert sich.
+ */
 const NAV = [
-  { key: "uebersicht", href: "/admin" },
-  { key: "anfragen", href: "/admin/vertrieb/anfragen" },
-  { key: "kunden", href: "/admin/kunden" },
-  { key: "vertrieb", href: "/admin/vertrieb" },
-  { key: "nachweise", href: "/admin/beleg" },
-  { key: "verbindungen", href: "/admin/verbindungen" },
-  { key: "automationen", href: "/admin/automationen" },
-  { key: "veroeffentlichungen", href: "/admin/veroeffentlichungen" },
-  { key: "system", href: "/admin/material" },
+  { key: "uebersicht", href: "/admin", gruppe: "cockpit" },
+  { key: "anfragen", href: "/admin/vertrieb/anfragen", gruppe: "vertrieb" },
+  { key: "vertrieb", href: "/admin/vertrieb", gruppe: "vertrieb" },
+  { key: "kunden", href: "/admin/kunden", gruppe: "kunden" },
+  { key: "nachweise", href: "/admin/beleg", gruppe: "kunden" },
+  { key: "marketing", href: "/admin/marketing", gruppe: "marketing" },
+  { key: "veroeffentlichungen", href: "/admin/veroeffentlichungen", gruppe: "marketing" },
+  { key: "verbindungen", href: "/admin/verbindungen", gruppe: "system" },
+  { key: "automationen", href: "/admin/automationen", gruppe: "system" },
+  { key: "system", href: "/admin/material", gruppe: "system" },
 ] as const
 
 /**
@@ -52,6 +57,7 @@ export async function AdminShell({
     href: n.href,
     label: t.nav[n.key].label,
     hint: t.nav[n.key].hint,
+    gruppe: t.navGruppen[n.gruppe],
   }))
   const umschalter = (
     <SprachUmschalter

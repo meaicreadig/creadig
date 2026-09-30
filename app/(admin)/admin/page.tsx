@@ -7,6 +7,8 @@ import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { datumAnzeige, GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 import { getVertriebStore, leadStoreConfigured } from "@/lib/lead-store"
 import { SystemErledigt } from "@/components/admin/system-erledigt"
+import { CockpitBand } from "@/components/admin/cockpit-band"
+import { ladeCockpit } from "@/lib/cockpit"
 
 /**
  * ÜBERSICHT — die Startseite des Admin (ADM-01, 17.09.2026).
@@ -88,9 +90,9 @@ const KENNZAHL_WEG: Record<KennzahlSchluessel, string | { chancen: string; anfra
 const ENTSCHEIDUNGEN_SICHTBAR = 5
 
 export default async function Uebersicht() {
-  const { t, intl } = await adminSprachKontext()
+  const { t, intl, sprache } = await adminSprachKontext()
   const hasStore = leadStoreConfigured()
-  const board = await collectAttention(getVertriebStore())
+  const [board, cockpit] = await Promise.all([collectAttention(getVertriebStore()), ladeCockpit()])
 
   const operativ = board.items.filter((i) => OPERATIV.includes(i.rank))
   const betrieb = board.items.filter((i) => i.rank === "betriebsblocker")
@@ -109,7 +111,9 @@ export default async function Uebersicht() {
   })
 
   return (
-    <AdminShell title={t.uebersicht.titel} lead={t.uebersicht.lead} meta={<span className="block">{t.uebersicht.stand(stand)}</span>}>
+    <AdminShell title={t.uebersicht.titel} meta={<span className="block">{t.uebersicht.stand(stand)}</span>}>
+      <CockpitBand daten={cockpit} sprache={sprache === "tr" ? "tr" : "de"} intl={intl} />
+
       {/* ── 1 · Kennzahlen ── */}
       <section aria-label={t.uebersicht.kennzahlenLabel}>
         <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4">

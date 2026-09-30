@@ -805,6 +805,13 @@ export const SCHEMA: string[] = [
   `ALTER TABLE publications ADD CONSTRAINT publications_datum_bei_veroeff CHECK (zustand <> 'veroeffentlicht' OR veroeffentlicht_am IS NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS leads_responsible_idx ON leads (responsible)`,
   `CREATE INDEX IF NOT EXISTS opportunities_responsible_idx ON opportunities (responsible)`,
+  /* 022 · Sichtbarkeit. Siehe `scripts/migrations/022-sichtbarkeit.sql`. Nicht Pflicht. */
+  `CREATE TABLE IF NOT EXISTS visibility_listings (
+     key text PRIMARY KEY,
+     eingetragen boolean NOT NULL DEFAULT false,
+     actor text,
+     updated_at timestamptz NOT NULL DEFAULT now()
+   )`,
 ]
 
 /**
