@@ -80,7 +80,7 @@ export function renderOgImage(locale: Locale) {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "#201e1b",
+          background: "#0a1322",
           padding: 72,
           position: "relative",
         }}
@@ -93,7 +93,7 @@ export function renderOgImage(locale: Locale) {
             left: 0,
             right: 0,
             height: 6,
-            background: "linear-gradient(90deg, #8f6a33 0%, #e4c378 50%, #8f6a33 100%)",
+            background: "linear-gradient(90deg, #3d6bf5 0%, #a9c4ff 50%, #3d6bf5 100%)",
           }}
         />
 
@@ -124,7 +124,7 @@ export function renderOgImage(locale: Locale) {
               display: "flex",
               fontSize: 52,
               lineHeight: 1.15,
-              color: "#fbfbf9",
+              color: "#eef2f8",
               maxWidth: 860,
               letterSpacing: -1.5,
             }}
@@ -136,7 +136,7 @@ export function renderOgImage(locale: Locale) {
               display: "flex",
               fontSize: 28,
               lineHeight: 1.5,
-              color: "#a7a099",
+              color: "#93a1b8",
               maxWidth: 760,
             }}
           >
@@ -145,18 +145,18 @@ export function renderOgImage(locale: Locale) {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-          <div style={{ display: "flex", height: 1, background: "#3e3932" }} />
+          <div style={{ display: "flex", height: 1, background: "#1b2a43" }} />
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
               fontSize: 24,
-              color: "#a7a099",
+              color: "#93a1b8",
               letterSpacing: 2,
             }}
           >
             <div style={{ display: "flex" }}>{t.disciplines}</div>
-            <div style={{ display: "flex", color: "#d3a763" }}>{t.origin}</div>
+            <div style={{ display: "flex", color: "#8fb0ff" }}>{t.origin}</div>
           </div>
         </div>
       </div>

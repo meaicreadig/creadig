@@ -693,7 +693,7 @@ export function TerminWizard() {
                         type === option.id ? "border-gold bg-gold" : "border-line-strong",
                       )}
                     >
-                      {type === option.id && <Check className="size-3 text-[#201e1b]" strokeWidth={3} />}
+                      {type === option.id && <Check className="size-3 text-primary-foreground" strokeWidth={3} />}
                     </span>
                   </span>
                   <span className="type-body text-muted-foreground mt-4 text-pretty">
@@ -805,7 +805,7 @@ export function TerminWizard() {
                         cell.past && "text-muted-foreground/35 pointer-events-none",
                         !cell.past && "hover:bg-gold/10",
                         cell.today && "font-semibold",
-                        isChosen(cell.key) && "bg-gold text-[#201e1b]",
+                        isChosen(cell.key) && "bg-gold text-primary-foreground",
                         !cell.past &&
                           !isChosen(cell.key) &&
                           dates.length >= MAX_DATES &&
@@ -847,7 +847,7 @@ export function TerminWizard() {
                     className={cn(
                       "flex flex-col items-start gap-1 rounded-sm border px-5 py-3 text-start transition-colors duration-[var(--dur-1)]",
                       windows.includes(window.id)
-                        ? "border-gold bg-gold text-[#201e1b]"
+                        ? "border-gold bg-gold text-primary-foreground"
                         : "border-line-strong hover:border-gold hover:text-gold-text",
                     )}
                   >
@@ -1127,7 +1127,7 @@ export function TerminWizard() {
                       className={cn(
                         "rounded-sm border px-5 py-2.5 text-sm transition-colors duration-[var(--dur-1)]",
                         meetingLang === option.id
-                          ? "border-gold bg-gold text-[#201e1b]"
+                          ? "border-gold bg-gold text-primary-foreground"
                           : "border-line-strong hover:border-gold hover:text-gold-text",
                       )}
                     >

@@ -80,7 +80,7 @@ export const ownProducts: ProductLogo[] = [
     name: "meAI",
     logoPath: "/brand/products/meai.png",
     mark: "me",
-    color: "#be904e",
+    color: "#2f5bea",
     region: "DE & CH",
     dunkel: "original",
   },
@@ -800,7 +800,7 @@ export const clientLogos: BrandLogo[] = clientWorks
     region: work.region,
     // Kein Markenfarben-Raten: bis ein Logo vorliegt, traegt die Kachel die
     // Hausfarbe. Eine erfundene Markenfarbe waere eine erfundene Angabe.
-    color: "#be904e",
+    color: "#2f5bea",
     dunkel: work.dunkel,
   }))
 
@@ -1272,10 +1272,10 @@ export const furtherProjects: {
   {
     name: "Ops-Retainer",
     what: {
-      de: "Operations-System für Handwerksbetriebe",
-      tr: "Usta ve esnaf işletmeleri için operasyon sistemi",
-      en: "An operations system for trade businesses",
-      ar: "نظام تشغيل للمنشآت الحِرفية",
+      de: "Operations-System für Ihr Unternehmen",
+      tr: "İşletmeniz için operasyon sistemi",
+      en: "An operations system for your company",
+      ar: "نظام تشغيل لشركتك",
     },
     kind: { de: "Dienstleistung", tr: "Hizmet", en: "Service", ar: "خدمة" },
   },

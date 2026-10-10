@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next"
 
 import { adminSprache } from "@/lib/admin-i18n/server"
-import { Manrope, JetBrains_Mono, M_PLUS_Rounded_1c } from "next/font/google"
+import { Geist, Geist_Mono, } from "next/font/google"
 import "@/app/globals.css"
 
 /**
@@ -26,25 +26,16 @@ import "@/app/globals.css"
  *   TR              Einsprachig deutsch (MP-G §50, Owner-Freigabe steht aus).
  */
 
-const manrope = Manrope({
-  subsets: ["latin"],
-  weight: ["600", "700"],
-  variable: "--font-manrope",
+const geist = Geist({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-geist",
   display: "swap",
 })
 
-const mplusRounded = M_PLUS_Rounded_1c({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mplus",
-  display: "swap",
-  preload: false,
-})
 
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-jetbrains",
+const geistMono = Geist_Mono({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-geist-mono",
   display: "swap",
 })
 
@@ -65,7 +56,7 @@ export default async function AdminRootLayout({ children }: { children: React.Re
   return (
     <html
       lang={sprache}
-      className={`${manrope.variable} ${mplusRounded.variable} ${jetbrains.variable}`}
+      className={`${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>{children}</body>

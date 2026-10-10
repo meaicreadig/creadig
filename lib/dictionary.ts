@@ -56,23 +56,23 @@ const rawDictionary = {
       /* S3 — „System-Haus" bleibt Markenwort im Text, aber nicht im Titel:
          Wer „Systemhaus" sucht, will IT-Hardware und Microsoft 365. */
       /* PAKET 1 — EINE Firmenbeschreibung fuer Google, Besucher und KI-Suche:
-         wer (Handwerks- und Servicebetriebe), was (ein eigenes System von der
+         wer (Unternehmen), was (ein eigenes System von der
          Anfrage bis zur Rechnung), warum anders (wir betreiben es, Code und
          Daten gehoeren dem Kunden). Dieselbe Aussage steht in Hero und Kategorie. */
-      siteTitle: "creaDIG: Digitale Systeme für Handwerks- und Servicebetriebe",
+      siteTitle: "creaDIG: Digitale Systeme für Unternehmen",
       siteDescription:
-        "creaDIG baut Handwerks- und Servicebetrieben ein eigenes digitales System – von der Anfrage bis zur Rechnung. Wir betreiben es. Code und Daten gehören Ihnen.",
+        "creaDIG baut Unternehmen ein eigenes digitales System – von der Anfrage bis zur Rechnung. Wir betreiben es. Code und Daten gehören Ihnen.",
       ogTitle: "creaDIG — Von der Anfrage bis zur Rechnung: ein System.",
       ogDescription:
-        "System-Haus für digitale Betriebe aus Osnabrück, seit 2017. Ein eigenes System für SHK-, Elektro- und Servicebetriebe – gebaut und betrieben von uns, Code und Daten bei Ihnen.",
+        "System-Haus für digitale Betriebe aus Osnabrück, seit 2017. Ein eigenes System für Unternehmen jeder Branche – gebaut und betrieben von uns, Code und Daten bei Ihnen.",
       organizationDescription:
-        "System-Haus für digitale Betriebe: creaDIG baut Handwerks- und technischen Servicebetrieben ein durchgehendes digitales System von der Anfrage bis zur Rechnung und betreibt es. Code und Daten gehören dem Kunden. Eigene Systeme: fibero, meAI, CASSAMEA, meahv.",
+        "System-Haus für digitale Betriebe: creaDIG baut Unternehmen ein durchgehendes digitales System von der Anfrage bis zur Rechnung und betreibt es. Code und Daten gehören dem Kunden. Eigene Systeme: fibero, meAI, CASSAMEA, meahv.",
       /** Erster Eintrag jeder Brotkrume in den strukturierten Daten. */
       breadcrumbHome: "Startseite",
       /* T-1 — Alt-Text des Vorschaubildes. Er stand nur in
          app/_routes/og-image.tsx; von dort kann ihn der Kopfdaten-Helfer
          nicht holen, ohne `fs` und `next/og` in jede Seite zu ziehen. */
-      ogImageAlt: "creaDIG — Digitale Systeme für Handwerks- und Servicebetriebe",
+      ogImageAlt: "creaDIG — Digitale Systeme für Unternehmen",
     },
     /*
      * DIE KATEGORIE IN EINEM SATZ (KIZILELMA §10.1).
@@ -95,7 +95,7 @@ const rawDictionary = {
     brand: {
       categoryLabel: "Kategorie",
       category:
-        "Kein IT-Systemhaus für Server und Lizenzen. Ein System-Haus für digitale Betriebe: ein eigenes System für Handwerks- und Servicebetriebe, von der Anfrage bis zur Rechnung.",
+        "Kein IT-Systemhaus für Server und Lizenzen. Ein System-Haus für digitale Betriebe: ein eigenes System für Unternehmen, von der Anfrage bis zur Rechnung.",
     },
     /*
      * Verteiler-Startseite (PHASE A, Master-Prompt 4 §4).
@@ -163,6 +163,9 @@ const rawDictionary = {
         systemCount: "1 durchgehender Weg",
         ownership: "Gehört Ihnen: Code und Daten",
         handoffSr: "Übergabe von Hand",
+        metricHandoffs: "Übergaben von Hand",
+        metricTools: "Werkzeuge",
+        replay: "Nochmal ansehen",
       },
       /*
        * DIE DREI WEGE — Einstieg nach Lage, nicht nach Betriebsgroesse.
@@ -1038,10 +1041,10 @@ const rawDictionary = {
        * Datenhoheit. „System-Haus für digitale Betriebe" bleibt Markenwort und
        * wird in `systemLine` sofort erklaert.
        */
-      eyebrow: "Für Handwerks- und Servicebetriebe · Osnabrück · seit 2017",
-      headlineLine1: "Von der Anfrage",
-      headlineLine2: "bis zur Rechnung:",
-      headlineLine3: "ein System.",
+      eyebrow: "Digitale Systeme für Unternehmen · Osnabrück · seit 2017",
+      headlineLine1: "Alles.",
+      headlineLine2: "In einem",
+      headlineLine3: "System.",
       /*
        * Glasklare Subline (§4.1): Vorher stand hier ein Markenbild („das Dach
        * ueber unseren Systemen"). Schoen — aber wer creaDIG nicht kennt, weiss
@@ -1075,7 +1078,7 @@ const rawDictionary = {
        * direkt darunter. Sie stehen nur nicht mehr VOR dem Problem.
        */
       subline:
-        "Anfragen per WhatsApp, Aufträge in Excel, Fotos im Handy, Rechnungen im dritten Programm: Wir bauen SHK-, Elektro- und technischen Servicebetrieben ein eigenes digitales System, in dem das alles zusammenläuft. Wir betreiben es für Sie. Code und Daten gehören Ihnen.",
+        "Anfragen im Postfach, Zahlen in Excel, Abläufe im Kopf, Rechnungen im dritten Programm: Wir bauen Ihrem Unternehmen ein eigenes digitales System, in dem das alles zusammenläuft. Wir betreiben es für Sie. Code und Daten gehören Ihnen.",
       /*
        * MP10-2.7 — der Satz, der die fuenf Ebenen zusammenbindet.
        *
@@ -2163,8 +2166,8 @@ const rawDictionary = {
       monthly: "/ Monat",
       items: {
         website: {
-          name: "Website-Paket Handwerk",
-          who: "Für Handwerksbetriebe und kleine Unternehmen",
+          name: "Website-Paket",
+          who: "Für Unternehmen jeder Branche",
           outcome: "In vier Wochen online — mit Wegen für Anfragen und Bewerbungen",
           includes: [
             "Website, gebaut für Anfragen — nicht als Broschüre",
@@ -2742,7 +2745,7 @@ const rawDictionary = {
         choose: "Bitte wählen",
         errRequired: "Bitte füllen Sie die Pflichtfelder korrekt aus.",
         errEmail: "Bitte eine gültige E-Mail-Adresse angeben.",
-        interests: ["Website-Paket Handwerk", "Website-Betreuung — {price:betreuung} / Monat", "Etwas anderes — Marke, Software oder Automatisierung", "Noch unklar"],
+        interests: ["Website-Paket", "Website-Betreuung — {price:betreuung} / Monat", "Etwas anderes — Marke, Software oder Automatisierung", "Noch unklar"],
         sizes: ["1–4 Mitarbeiter", "5–15 Mitarbeiter", "16–30 Mitarbeiter", "über 30 Mitarbeiter"],
       },
       /*
@@ -3156,20 +3159,20 @@ const rawDictionary = {
 
   tr: {
     meta: {
-      siteTitle: "creaDIG: Zanaat ve servis işletmeleri için dijital sistemler",
+      siteTitle: "creaDIG: Şirketler için dijital sistemler",
       siteDescription:
-        "creaDIG, zanaat ve servis işletmelerine talepten faturaya kadar kendi dijital sistemlerini kurar ve işletir. Kod ve veriler sizindir.",
+        "creaDIG, şirketlere talepten faturaya kadar kendi dijital sistemlerini kurar ve işletir. Kod ve veriler sizindir.",
       ogTitle: "creaDIG — Talepten faturaya kadar: tek sistem.",
       ogDescription:
         "Osnabrück'ten dijital işletmeler için sistem evi, 2017'den beri. Tesisat, elektrik ve servis işletmelerine kendi sistemleri — biz kurar ve işletiriz, kod ve veriler sizde kalır.",
       organizationDescription:
-        "Dijital işletmeler için sistem evi: creaDIG, zanaat ve teknik servis işletmelerine talepten faturaya kadar uçtan uca bir dijital sistem kurar ve işletir. Kod ve veriler müşteriye aittir. Kendi sistemlerimiz: fibero, meAI, CASSAMEA, meahv.",
+        "Dijital işletmeler için sistem evi: creaDIG, şirketlere talepten faturaya kadar uçtan uca bir dijital sistem kurar ve işletir. Kod ve veriler müşteriye aittir. Kendi sistemlerimiz: fibero, meAI, CASSAMEA, meahv.",
       breadcrumbHome: "Ana sayfa",
-      ogImageAlt: "creaDIG — Zanaat ve servis işletmeleri için dijital sistemler",
+      ogImageAlt: "creaDIG — Şirketler için dijital sistemler",
     },
     brand: {
       categoryLabel: "Kategori",
-      category: "Sunucu ve lisans satan bir BT firması değil. Dijital işletmeler için bir sistem evi: zanaat ve servis işletmelerine talepten faturaya kadar kendi sistemleri.",
+      category: "Sunucu ve lisans satan bir BT firması değil. Dijital işletmeler için bir sistem evi: şirketlere talepten faturaya kadar kendi sistemleri.",
     },
     home: {
       statement: {
@@ -3196,6 +3199,9 @@ const rawDictionary = {
         systemCount: "1 kesintisiz yol",
         ownership: "Size ait: kod ve veriler",
         handoffSr: "Elden devir",
+        metricHandoffs: "elden devir",
+        metricTools: "araç",
+        replay: "Tekrar izle",
       },
       /* Drei Wege. Dieselben Lagen, dieselbe Reihenfolge. */
       lagen: {
@@ -3673,12 +3679,12 @@ const rawDictionary = {
       skipToContent: "İçeriğe geç",
     },
     hero: {
-      eyebrow: "Zanaat ve servis işletmeleri için · Osnabrück · 2017'den beri",
-      headlineLine1: "Talepten",
-      headlineLine2: "faturaya kadar:",
-      headlineLine3: "tek sistem.",
+      eyebrow: "Şirketler için dijital sistemler · Osnabrück · 2017'den beri",
+      headlineLine1: "Her şey.",
+      headlineLine2: "Tek bir",
+      headlineLine3: "sistemde.",
       subline:
-        "Talepler WhatsApp'ta, işler Excel'de, fotoğraflar telefonda, faturalar üçüncü bir programda: Tesisat, elektrik ve teknik servis işletmelerine hepsinin bir araya geldiği kendi dijital sistemlerini kuruyoruz. Sistemi sizin için işletiyoruz. Kod ve veriler sizindir.",
+        "Talepler e-postada, rakamlar Excel'de, süreçler akılda, faturalar üçüncü bir programda: Şirketinize hepsinin bir araya geldiği kendi dijital sisteminizi kuruyoruz. Sistemi sizin için işletiyoruz. Kod ve veriler sizindir.",
       systemLine: "Dijital işletmeler için sistem evi şu demek: İşletmeyi siz yönetirsiniz, arkasındaki sistemi biz kurar ve işletiriz.",
       ctaPrimary: "Ücretsiz ön görüşme",
       ctaSecondary: "Sistemlerimizi görün",
@@ -4234,7 +4240,7 @@ const rawDictionary = {
       items: {
         website: {
           name: "Usta İşletmeleri için Web Sitesi Paketi",
-          who: "Usta ve esnaf işletmeleri ile küçük şirketler için",
+          who: "Her sektörden şirketler için",
           outcome: "Dört haftada yayında — talep ve başvuru yollarıyla",
           includes: [
             "Broşür değil, talep getirsin diye kurulan web sitesi",
@@ -4917,20 +4923,20 @@ const rawDictionary = {
    */
   en: {
     meta: {
-      siteTitle: "creaDIG: digital systems for trade and service businesses",
+      siteTitle: "creaDIG: digital systems for companies",
       siteDescription:
-        "creaDIG builds trade and service businesses their own digital system – from enquiry to invoice. We run it for you. Code and data belong to you.",
+        "creaDIG builds companies their own digital system – from enquiry to invoice. We run it for you. Code and data belong to you.",
       ogTitle: "creaDIG — from enquiry to invoice: one system.",
       ogDescription:
-        "A systems house for digital operations from Osnabrück, since 2017. One system for plumbing, electrical and service businesses – built and run by us, code and data stay with you.",
+        "A systems house for digital operations from Osnabrück, since 2017. One system for companies in any industry – built and run by us, code and data stay with you.",
       organizationDescription:
-        "Systems house for digital operations: creaDIG builds trade and technical service businesses one end-to-end digital system from enquiry to invoice and runs it. Code and data belong to the client. Own systems: fibero, meAI, CASSAMEA, meahv.",
+        "Systems house for digital operations: creaDIG builds companies one end-to-end digital system from enquiry to invoice and runs it. Code and data belong to the client. Own systems: fibero, meAI, CASSAMEA, meahv.",
       breadcrumbHome: "Home",
-      ogImageAlt: "creaDIG — digital systems for trade and service businesses",
+      ogImageAlt: "creaDIG — digital systems for companies",
     },
     brand: {
       categoryLabel: "Category",
-      category: "Not an IT reseller for servers and licences. A systems house for digital operations: one system for trade and service businesses, from enquiry to invoice.",
+      category: "Not an IT reseller for servers and licences. A systems house for digital operations: one system for companies, from enquiry to invoice.",
     },
     home: {
       statement: {
@@ -4957,6 +4963,9 @@ const rawDictionary = {
         systemCount: "1 continuous path",
         ownership: "Yours: code and data",
         handoffSr: "Handover by hand",
+        metricHandoffs: "handovers by hand",
+        metricTools: "tools",
+        replay: "Watch again",
       },
       /* Three routes. Same situations, same order. */
       lagen: {
@@ -5427,12 +5436,12 @@ const rawDictionary = {
       skipToContent: "Skip to content",
     },
     hero: {
-      eyebrow: "For trade and service businesses · Osnabrück · since 2017",
-      headlineLine1: "From enquiry",
-      headlineLine2: "to invoice:",
-      headlineLine3: "one system.",
+      eyebrow: "Digital systems for companies · Osnabrück · since 2017",
+      headlineLine1: "Everything.",
+      headlineLine2: "In one",
+      headlineLine3: "system.",
       subline:
-        "Enquiries on WhatsApp, jobs in Excel, photos on phones, invoices in a third program: we build plumbing, electrical and technical service businesses their own digital system where all of it comes together. We run it for you. Code and data belong to you.",
+        "Enquiries in the inbox, numbers in Excel, processes in people's heads, invoices in a third program: we build your company its own digital system where all of it comes together. We run it for you. Code and data belong to you.",
       systemLine: "A systems house for digital operations means: you run the business, we build and run the system behind it.",
       ctaPrimary: "Free first call",
       ctaSecondary: "See our systems",
@@ -5988,8 +5997,8 @@ const rawDictionary = {
       monthly: "/ month",
       items: {
         website: {
-          name: "Website package for trades",
-          who: "For trade businesses and small companies",
+          name: "Website package",
+          who: "For companies in any industry",
           outcome: "Online in four weeks — with paths for enquiries and applications",
           includes: [
             "A website built for enquiries — not as a brochure",
@@ -6347,7 +6356,7 @@ const rawDictionary = {
         choose: "Please choose",
         errRequired: "Please complete the required fields correctly.",
         errEmail: "Please give a valid email address.",
-        interests: ["Website package for trades", "Website care — {price:betreuung} / month", "Something else — brand, software or automation", "Not sure yet"],
+        interests: ["Website package", "Website care — {price:betreuung} / month", "Something else — brand, software or automation", "Not sure yet"],
         sizes: ["1–4 staff", "5–15 staff", "16–30 staff", "more than 30 staff"],
       },
       scope: {
@@ -6657,20 +6666,20 @@ const rawDictionary = {
    */
   ar: {
     meta: {
-      siteTitle: "creaDIG: أنظمة رقمية لمنشآت الحِرف والخدمات",
+      siteTitle: "creaDIG: أنظمة رقمية للشركات",
       siteDescription:
-        "تبني creaDIG لمنشآت الحِرف والخدمات نظامًا رقميًا خاصًا بها — من الطلب حتى الفاتورة. ونشغّله لكم. الشيفرة والبيانات ملك لكم.",
+        "تبني creaDIG للشركات نظامًا رقميًا خاصًا بها — من الطلب حتى الفاتورة. ونشغّله لكم. الشيفرة والبيانات ملك لكم.",
       ogTitle: "creaDIG — من الطلب حتى الفاتورة: نظام واحد.",
       ogDescription:
         "بيت أنظمة للمنشآت الرقمية من أوسنابروك منذ 2017. نظام خاص لمنشآت التمديدات الصحية والكهرباء والخدمات — نبنيه ونشغّله، والشيفرة والبيانات تبقى لديكم.",
       organizationDescription:
-        "بيت أنظمة للمنشآت الرقمية: تبني creaDIG لمنشآت الحِرف والخدمات الفنية نظامًا رقميًا متكاملًا من الطلب حتى الفاتورة وتشغّله. الشيفرة والبيانات ملك للعميل. أنظمتنا الخاصة: fibero وmeAI وCASSAMEA وmeahv.",
+        "بيت أنظمة للمنشآت الرقمية: تبني creaDIG للشركات الفنية نظامًا رقميًا متكاملًا من الطلب حتى الفاتورة وتشغّله. الشيفرة والبيانات ملك للعميل. أنظمتنا الخاصة: fibero وmeAI وCASSAMEA وmeahv.",
       breadcrumbHome: "الصفحة الرئيسية",
-      ogImageAlt: "creaDIG — أنظمة رقمية لمنشآت الحِرف والخدمات",
+      ogImageAlt: "creaDIG — أنظمة رقمية للشركات",
     },
     brand: {
       categoryLabel: "التصنيف",
-      category: "لسنا شركة تقنية تبيع الخوادم والتراخيص. نحن بيت أنظمة للمنشآت الرقمية: نظام خاص لمنشآت الحِرف والخدمات، من الطلب حتى الفاتورة.",
+      category: "لسنا شركة تقنية تبيع الخوادم والتراخيص. نحن بيت أنظمة للمنشآت الرقمية: نظام خاص للشركات، من الطلب حتى الفاتورة.",
     },
     home: {
       statement: {
@@ -6697,6 +6706,9 @@ const rawDictionary = {
         systemCount: "مسار واحد متصل",
         ownership: "ملككم: الشيفرة والبيانات",
         handoffSr: "تسليم يدوي",
+        metricHandoffs: "تسليمات يدوية",
+        metricTools: "أدوات",
+        replay: "شاهد مرة أخرى",
       },
       /* Drei Wege. Im Arabischen laeuft die Linie von rechts nach links. */
       lagen: {
@@ -7167,12 +7179,12 @@ const rawDictionary = {
       skipToContent: "الانتقال إلى المحتوى",
     },
     hero: {
-      eyebrow: "لمنشآت الحِرف والخدمات · أوسنابروك · منذ 2017",
-      headlineLine1: "من الطلب",
-      headlineLine2: "حتى الفاتورة:",
-      headlineLine3: "نظام واحد.",
+      eyebrow: "أنظمة رقمية للشركات · أوسنابروك · منذ 2017",
+      headlineLine1: "كل شيء.",
+      headlineLine2: "في نظام",
+      headlineLine3: "واحد.",
       subline:
-        "طلبات على واتساب، وأوامر عمل في Excel، وصور في الهواتف، وفواتير في برنامج ثالث: نبني لمنشآت التمديدات الصحية والكهرباء والخدمات الفنية نظامًا رقميًا خاصًا يجتمع فيه كل ذلك. ونشغّله لكم. الشيفرة والبيانات ملك لكم.",
+        "طلبات على واتساب، وأوامر عمل في Excel، وصور في الهواتف، وفواتير في برنامج ثالث: نبني لشركتكم نظامًا رقميًا خاصًا يجتمع فيه كل ذلك. ونشغّله لكم. الشيفرة والبيانات ملك لكم.",
       systemLine: "بيت أنظمة للمنشآت الرقمية يعني: أنتم تديرون المنشأة، ونحن نبني النظام الذي خلفها ونشغّله.",
       ctaPrimary: "مكالمة أولى مجانية",
       ctaSecondary: "شاهدوا أنظمتنا",

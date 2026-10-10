@@ -3,7 +3,7 @@
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { Spur } from "@/components/sections/betriebsfluss"
+import { Spur } from "@/components/sections/spur"
 import { serviceLayerKeys } from "@/lib/site-data"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { useSeenOnce } from "@/lib/use-seen-once"

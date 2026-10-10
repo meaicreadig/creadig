@@ -41,7 +41,8 @@ export function Hero() {
    * Arabisch: knappes em-Polster gegen Madda/Punkte — 0.22em hatte die
    * drei Hero-Zeilen sichtbar auseinandergezogen (Owner: „arası açılmış").
    */
-  const linePad = locale === "ar" ? "py-[0.07em]" : "py-[0.35vw]"
+  // Die Maske braucht unten Platz fuer Unterlaengen (g, y, p), sonst schneidet sie sie ab.
+  const linePad = locale === "ar" ? "py-[0.07em]" : "pt-[0.02em] pb-[0.16em] -mb-[0.1em]"
 
   return (
     <section id="top" className="relative isolate flex min-h-[100svh] flex-col overflow-hidden">

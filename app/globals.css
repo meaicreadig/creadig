@@ -61,9 +61,9 @@
    * unten greift bewusst auf `--font-display` zu, `type-lead` / `type-body` /
    * `type-small` erben still den Fliesstext.
    */
-  --font-sans: var(--font-mplus), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   /*
    * BEWEGUNG — DIE ERSTE ZEILE EINER SPRACHE, DIE ES NOCH NICHT GAB.
@@ -115,17 +115,17 @@
 
 /* Hell = Default. Warmes Papierweiss, warm-anthrazit Text — kein reines Schwarz. */
 :root {
-  --background: #fbfbf9;
-  --foreground: #2a2723;
-  --surface: #f5f5f4;
+  --background: #f5f7fa;
+  --foreground: #0d1a2e;
+  --surface: #edf1f6;
   --surface-raised: #ffffff;
-  --muted: #f0efec;
-  --muted-foreground: #6f6a62;
-  --line: #e6e4df;
-  --line-strong: #cbc7c0;
-  --gold: #be904e;
-  --gold-soft: #e4c378;
-  --gold-deep: #8f6a33;
+  --muted: #e9eef5;
+  --muted-foreground: #55627a;
+  --line: #dde3ec;
+  --line-strong: #b9c3d3;
+  --gold: #2f5bea;
+  --gold-soft: #8fb0ff;
+  --gold-deep: #1e3fae;
   /* 4,7:1 auf #fbfbf9 — AA auch für Fließtext. */
   /*
    * BF-A3 / F1 — war #8f6a33. Auf der Standardflaeche reichte das knapp
@@ -134,27 +134,27 @@
    * 4,5 : 1. Der neue Wert haelt auf ALLEN fuenf hellen Flaechen der Seite
    * mindestens 4,74 : 1 und bleibt dieselbe Goldfamilie.
    */
-  --gold-text: #87632f;
+  --gold-text: #2448c8;
   /* Signatur-Motiv (Dreiecks-Mesh) */
-  --mesh: #ded9d0;
-  --mesh-fill: #be904e;
+  --mesh: #d6deea;
+  --mesh-fill: #2f5bea;
 
   --card: #ffffff;
-  --card-foreground: #2a2723;
+  --card-foreground: #0d1a2e;
   --popover: #ffffff;
-  --popover-foreground: #2a2723;
+  --popover-foreground: #0d1a2e;
   /* Gold ist die Primärfarbe — nicht Schwarz. */
-  --primary: #be904e;
-  --primary-foreground: #201e1b;
-  --secondary: #f0efec;
-  --secondary-foreground: #2a2723;
-  --accent: #be904e;
-  --accent-foreground: #201e1b;
-  --destructive: #a63527;
-  --destructive-foreground: #fbfbf9;
-  --border: #e6e4df;
-  --input: #cbc7c0;
-  --ring: #be904e;
+  --primary: #2f5bea;
+  --primary-foreground: #ffffff;
+  --secondary: #e9eef5;
+  --secondary-foreground: #0d1a2e;
+  --accent: #2f5bea;
+  --accent-foreground: #ffffff;
+  --destructive: #e0533a;
+  --destructive-foreground: #ffffff;
+  --border: #dde3ec;
+  --input: #b9c3d3;
+  --ring: #2f5bea;
   /* shadcn-Basis folgt dem Bedienelement, nicht der Kachel. */
   --radius: 0.5rem;
 
@@ -166,53 +166,53 @@
    * Wurf, der die Hoehe traegt.
    */
   --elevation-1:
-    0 1px 2px rgba(42, 39, 35, 0.05), 0 10px 26px -18px rgba(42, 39, 35, 0.22);
+    0 1px 2px rgba(13, 26, 46, 0.05), 0 10px 26px -18px rgba(13, 26, 46, 0.22);
   --elevation-2:
-    0 2px 5px rgba(42, 39, 35, 0.06), 0 20px 46px -24px rgba(42, 39, 35, 0.3);
+    0 2px 5px rgba(13, 26, 46, 0.06), 0 20px 46px -24px rgba(13, 26, 46, 0.3);
   --elevation-3:
-    0 4px 10px rgba(42, 39, 35, 0.08), 0 34px 80px -28px rgba(42, 39, 35, 0.42);
+    0 4px 10px rgba(13, 26, 46, 0.08), 0 34px 80px -28px rgba(13, 26, 46, 0.42);
 }
 
 .dark {
-  --background: #201e1b;
-  --foreground: #fbfbf9;
-  --surface: #2a2723;
-  --surface-raised: #322e29;
-  --muted: #2a2723;
-  --muted-foreground: #a7a099;
-  --line: #35312c;
-  --line-strong: #4a453e;
-  --gold: #d3a763;
-  --gold-soft: #e4c378;
-  --gold-deep: #be904e;
+  --background: #0a1322;
+  --foreground: #eef2f8;
+  --surface: #0f1b2f;
+  --surface-raised: #14233b;
+  --muted: #0f1b2f;
+  --muted-foreground: #93a1b8;
+  --line: #1b2a43;
+  --line-strong: #2b3e5e;
+  --gold: #6b93ff;
+  --gold-soft: #a9c4ff;
+  --gold-deep: #3d6bf5;
   /* 7,5:1 auf #201e1b. */
-  --gold-text: #d3a763;
-  --mesh: #3a352f;
-  --mesh-fill: #d3a763;
+  --gold-text: #8fb0ff;
+  --mesh: #1b2a43;
+  --mesh-fill: #6b93ff;
 
-  --card: #2a2723;
-  --card-foreground: #fbfbf9;
-  --popover: #2a2723;
-  --popover-foreground: #fbfbf9;
-  --primary: #d3a763;
-  --primary-foreground: #201e1b;
-  --secondary: #2a2723;
-  --secondary-foreground: #fbfbf9;
-  --accent: #d3a763;
-  --accent-foreground: #201e1b;
-  --destructive: #c4574a;
-  --destructive-foreground: #201e1b;
-  --border: #35312c;
-  --input: #4a453e;
-  --ring: #d3a763;
+  --card: #0f1b2f;
+  --card-foreground: #eef2f8;
+  --popover: #0f1b2f;
+  --popover-foreground: #eef2f8;
+  --primary: #6b93ff;
+  --primary-foreground: #0a1322;
+  --secondary: #0f1b2f;
+  --secondary-foreground: #eef2f8;
+  --accent: #6b93ff;
+  --accent-foreground: #0a1322;
+  --destructive: #ff7a5c;
+  --destructive-foreground: #0a1322;
+  --border: #1b2a43;
+  --input: #2b3e5e;
+  --ring: #6b93ff;
 
   /* Im Dunkeln traegt ein warmer Schatten nicht — hier zaehlt Tiefe, nicht Ton. */
   --elevation-1:
-    0 1px 2px rgba(12, 10, 9, 0.4), 0 10px 26px -18px rgba(12, 10, 9, 0.7);
+    0 1px 2px rgba(3, 8, 18, 0.4), 0 10px 26px -18px rgba(3, 8, 18, 0.7);
   --elevation-2:
-    0 2px 5px rgba(12, 10, 9, 0.45), 0 20px 46px -24px rgba(12, 10, 9, 0.8);
+    0 2px 5px rgba(3, 8, 18, 0.45), 0 20px 46px -24px rgba(3, 8, 18, 0.8);
   --elevation-3:
-    0 4px 10px rgba(12, 10, 9, 0.5), 0 34px 80px -28px rgba(12, 10, 9, 0.9);
+    0 4px 10px rgba(3, 8, 18, 0.5), 0 34px 80px -28px rgba(3, 8, 18, 0.9);
 }
 
 /*
@@ -233,37 +233,37 @@
  * umgekehrt im Seitengrund, statt sich abzuheben.
  */
 .section-dark {
-  --background: #201e1b;
-  --foreground: #fbfbf9;
-  --surface: #2a2723;
-  --surface-raised: #322e29;
-  --muted: #2a2723;
-  --muted-foreground: #a7a099;
-  --line: #35312c;
-  --line-strong: #4a453e;
-  --gold: #d3a763;
-  --gold-soft: #e4c378;
-  --gold-deep: #be904e;
+  --background: #0d1a2e;
+  --foreground: #eef2f8;
+  --surface: #132440;
+  --surface-raised: #182b4b;
+  --muted: #132440;
+  --muted-foreground: #93a1b8;
+  --line: #20345a;
+  --line-strong: #2b3e5e;
+  --gold: #6b93ff;
+  --gold-soft: #a9c4ff;
+  --gold-deep: #3d6bf5;
   /* 7,5:1 auf #201e1b — Gold traegt hier auch Fliesstext. */
-  --gold-text: #d3a763;
-  --mesh: #3a352f;
-  --mesh-fill: #d3a763;
-  --card: #2a2723;
-  --card-foreground: #fbfbf9;
-  --primary: #d3a763;
-  --primary-foreground: #201e1b;
-  --secondary: #2a2723;
-  --secondary-foreground: #fbfbf9;
-  --border: #35312c;
-  --input: #4a453e;
-  --ring: #d3a763;
+  --gold-text: #8fb0ff;
+  --mesh: #20345a;
+  --mesh-fill: #6b93ff;
+  --card: #132440;
+  --card-foreground: #eef2f8;
+  --primary: #6b93ff;
+  --primary-foreground: #0a1322;
+  --secondary: #132440;
+  --secondary-foreground: #eef2f8;
+  --border: #20345a;
+  --input: #2b3e5e;
+  --ring: #6b93ff;
   /* Warmer Schatten traegt auf dunklem Grund nicht — hier zaehlt Tiefe. */
   --elevation-1:
-    0 1px 2px rgba(12, 10, 9, 0.4), 0 10px 26px -18px rgba(12, 10, 9, 0.7);
+    0 1px 2px rgba(3, 8, 18, 0.4), 0 10px 26px -18px rgba(3, 8, 18, 0.7);
   --elevation-2:
-    0 2px 5px rgba(12, 10, 9, 0.45), 0 20px 46px -24px rgba(12, 10, 9, 0.8);
+    0 2px 5px rgba(3, 8, 18, 0.45), 0 20px 46px -24px rgba(3, 8, 18, 0.8);
   --elevation-3:
-    0 4px 10px rgba(12, 10, 9, 0.5), 0 34px 80px -28px rgba(12, 10, 9, 0.9);
+    0 4px 10px rgba(3, 8, 18, 0.5), 0 34px 80px -28px rgba(3, 8, 18, 0.9);
   background-color: var(--background);
   color: var(--foreground);
 }
@@ -279,29 +279,29 @@
    * meisten Bildschirmen nicht als Kapitelwechsel lesbar. #2c2824 haelt den
    * Ton und macht den Rhythmus Grund -> Band -> Grund auch im Dunkeln sichtbar.
    */
-  --background: #2c2824;
-  --foreground: #fbfbf9;
-  --surface: #35312b;
-  --surface-raised: #3d3832;
-  --muted: #35312b;
-  --muted-foreground: #aca59d;
-  --line: #433d36;
-  --line-strong: #585148;
-  --gold: #d3a763;
-  --gold-soft: #e4c378;
-  --gold-deep: #be904e;
-  --gold-text: #d3a763;
-  --mesh: #423c34;
-  --mesh-fill: #d3a763;
-  --card: #312d28;
-  --card-foreground: #fbfbf9;
-  --primary: #d3a763;
-  --primary-foreground: #201e1b;
-  --secondary: #312d28;
-  --secondary-foreground: #fbfbf9;
-  --border: #3e3932;
-  --input: #534d45;
-  --ring: #d3a763;
+  --background: #0f1d36;
+  --foreground: #eef2f8;
+  --surface: #15274a;
+  --surface-raised: #1a2e55;
+  --muted: #15274a;
+  --muted-foreground: #93a1b8;
+  --line: #233a63;
+  --line-strong: #2b3e5e;
+  --gold: #6b93ff;
+  --gold-soft: #a9c4ff;
+  --gold-deep: #3d6bf5;
+  --gold-text: #8fb0ff;
+  --mesh: #233a63;
+  --mesh-fill: #6b93ff;
+  --card: #15274a;
+  --card-foreground: #eef2f8;
+  --primary: #6b93ff;
+  --primary-foreground: #0a1322;
+  --secondary: #15274a;
+  --secondary-foreground: #eef2f8;
+  --border: #233a63;
+  --input: #2b3e5e;
+  --ring: #6b93ff;
 }
 
 @layer base {
@@ -413,9 +413,9 @@
  */
 @utility type-display {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(3rem, 11vw, 7rem);
-  letter-spacing: -0.045em;
+  font-weight: 600;
+  font-size: clamp(3rem, 10vw, 7.5rem);
+  letter-spacing: -0.055em;
   /* 0.95 kappte Unterlängen der 3-zeiligen DE-Headline. */
   line-height: 1;
 }
@@ -1190,9 +1190,9 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
  * Ziffer die Hauptsache.
  */
 [lang="ar"] {
-  --font-sans: var(--font-arabic), var(--font-mplus), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-arabic-display), var(--font-arabic), var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), var(--font-arabic), ui-monospace, monospace;
+  --font-sans: var(--font-arabic), var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-arabic-display), var(--font-arabic), var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), var(--font-arabic), ui-monospace, monospace;
 }
 
 /*
@@ -1218,7 +1218,7 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
  * groesser als 11px-Mono, damit Nav-CTA und Hero-Eyebrow lesbar bleiben.
  */
 [lang="ar"] :is(.eyebrow, .text-meta) {
-  font-family: var(--font-arabic), var(--font-mplus), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-arabic), var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   text-transform: none;
   font-size: 0.8125rem;
   font-weight: 500;

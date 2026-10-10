@@ -1,8 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import {
-  Manrope,
-  JetBrains_Mono,
-  M_PLUS_Rounded_1c,
+import { Geist, Geist_Mono,
   Readex_Pro,
   Cairo,
 } from "next/font/google"
@@ -49,10 +46,9 @@ import { ogImage } from "@/lib/page-metadata"
 // Poppins las sich wie jede Vorlage und stand gegen die feine, einlinige
 // Wortmarke; Manrope ist ruhig-geometrisch und steht naeher am Logo.
 // Traegt nur `--font-display`; der Fliesstext bleibt M PLUS Rounded 1c.
-const manrope = Manrope({
+const geist = Geist({
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-manrope",
+  variable: "--font-geist",
   display: "swap",
 })
 
@@ -91,22 +87,14 @@ const manrope = Manrope({
  * Der Preis ist ein kurzer Wechsel von der Ersatzschrift auf die echte
  * (`display: swap`). Den zahlen wir; 3,7 MB Vorladen zahlen wir nicht.
  */
-const mplusRounded = M_PLUS_Rounded_1c({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "700"],
-  variable: "--font-mplus",
-  display: "swap",
-  preload: false,
-})
 
 // Monospace nur für Eyebrows und Kennziffern.
 // `latin-ext` ist Pflicht, nicht Komfort: Ohne diesen Subset fehlen ş, ğ, ı,
 // İ und ç — und genau die stehen in den türkischen Labels. Der Browser fiele
 // dort auf eine System-Monospace zurück, mitten im Wort.
-const jetbrains = JetBrains_Mono({
+const geistMono = Geist_Mono({
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500"],
-  variable: "--font-jetbrains",
+  variable: "--font-geist-mono",
   display: "swap",
 })
 
@@ -241,8 +229,8 @@ export function shellMetadata(locale: Locale): Metadata {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfbf9" },
-    { media: "(prefers-color-scheme: dark)", color: "#201e1b" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f7fa" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a1322" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -356,7 +344,7 @@ export function SiteShell({
     <html
       lang={locale}
       dir={LOCALE_DIR[locale]}
-      className={`${manrope.variable} ${mplusRounded.variable} ${jetbrains.variable} ${readex.variable} ${cairo.variable}`}
+      className={`${geist.variable} ${geistMono.variable} ${readex.variable} ${cairo.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>
