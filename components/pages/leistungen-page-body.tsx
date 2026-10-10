@@ -2,7 +2,7 @@
 
 import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
-import { Services } from "@/components/sections/services"
+import { EbenenExplorer } from "@/components/sections/ebenen-explorer"
 import { EbenenFluss } from "@/components/sections/ebenen-fluss"
 import { Packages } from "@/components/sections/packages"
 import { Faq } from "@/components/sections/faq"
@@ -55,7 +55,7 @@ export function LeistungenPageBody() {
       {/* PHASE 3 — das Bild vor der Liste: erst sehen, warum ein Haus, dann die Ebenen im Detail. */}
       <EbenenFluss />
       {/* Die H1 steht im Kopf — die Ebenen kommen ohne zweite Überschrift. */}
-      <Services heading={false} />
+      <EbenenExplorer />
       {/*
         W2 — DIE SEITE HALBIERT (gemessen 2.266 Woerter im Hauptteil).
 

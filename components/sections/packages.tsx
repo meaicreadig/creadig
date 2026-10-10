@@ -1,13 +1,14 @@
 "use client"
 
-import { ArrowUpRight, Check } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
-import { formatPrice, packages } from "@/lib/site-data"
+import { formatPrice } from "@/lib/site-data"
 import { findOffer, offerAmount } from "@/lib/offers"
 import { steuerlage } from "@/lib/rechnung"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
+import { PaketWahl } from "@/components/sections/paket-wahl"
 
 export function Packages() {
   const { t, locale } = useLocale()
@@ -30,167 +31,7 @@ export function Packages() {
           </Reveal>
         </div>
 
-        {/*
-          Spaltenzahl folgt der Kartenzahl. Vorher stand hier fest
-          `lg:grid-cols-3` — mit einem einzigen Angebot haette die Karte auf
-          einem Drittel der Breite geklebt und der Rest waere leer geblieben.
-          Kein Design-Eingriff, nur die Vermeidung eines Bruchs.
-        */}
-        <div
-          className={`mt-20 grid gap-2.5 ${
-            packages.length >= 3
-              ? "lg:grid-cols-3"
-              : packages.length === 2
-                ? "lg:grid-cols-2"
-                : "lg:grid-cols-1"
-          }`}
-        >
-          {packages.map((pkg, i) => {
-            const copy = t.packages.items[pkg.key]
-
-            return (
-              <Reveal
-                key={pkg.key}
-                delay={0.08 * i}
-                className={`group tile relative flex flex-col p-8 transition-[background-color,box-shadow] duration-[var(--dur-2)] md:p-9 ${
-                  // Das empfohlene Paket liegt eine Stufe hoeher — die einzige
-                  // Karte der Seite, die den Grund verlaesst.
-                  pkg.recommended
-                    ? "bg-surface-raised elevation-2 relative z-10"
-                    : "hover:bg-foreground/[0.02]"
-                }`}
-              >
-                <span
-                  aria-hidden="true"
-                  className={`bg-gold absolute top-0 start-0 h-px transition-all duration-[var(--dur-3)] ease-brand ${
-                    pkg.recommended ? "w-full" : "w-0 group-hover:w-full"
-                  }`}
-                />
-
-                <div className="flex items-start justify-between gap-4">
-                  <p className="eyebrow text-muted-foreground">
-                    {t.packages.entryKind[pkg.key]}
-                  </p>
-                  {pkg.recommended && (
-                    <span className="border-gold text-gold-text eyebrow shrink-0 border px-2.5 py-1">
-                      {t.packages.recommended}
-                    </span>
-                  )}
-                </div>
-
-                {/*
-                  Feste Hoehe fuer den Namen: „Growth Partner" bricht auf zwei
-                  Zeilen um, „Identity" nicht — ohne Reserve sassen die drei
-                  Preise auf drei verschiedenen Hoehen und liessen sich nicht
-                  mehr vergleichen. Genau das soll eine Preistabelle koennen.
-                */}
-                <h3 className="type-h3 mt-5 lg:min-h-[2.24em]">{copy.name}</h3>
-
-                <div className="mt-6 flex items-baseline gap-2.5">
-                  <span className="type-stat">{formatPrice(pkg.amount, locale)}</span>
-                  <span className="eyebrow text-muted-foreground">
-                    {pkg.period ? t.packages.monthly : t.packages.once}
-                  </span>
-                </div>
-
-                {/*
-                  MP10-2.3 — die Projektdauer, direkt unter dem Preis.
-
-                  „Was kostet das" und „wie lange dauert das" sind eine Frage,
-                  nicht zwei: Ein Festpreis ohne Zeitrahmen laesst genau die
-                  Unsicherheit stehen, die er beseitigen soll.
-
-                  Heute ist `duration` bei beiden Angeboten `null` und die
-                  Zeile rendert nicht. Das ist Absicht — eine geschaetzte
-                  Dauer ist eine Zusage, die im ersten Projekt bricht. Die
-                  Luecke steht auf `/status`.
-                */}
-                {pkg.duration && (
-                  <p className="type-small text-muted-foreground mt-4">
-                    <span className="eyebrow text-gold-text">{t.packages.durationLabel}: </span>
-                    {pkg.duration[locale]}
-                  </p>
-                )}
-
-                {/*
-                  W1 — der Festpreis ist DER Preis. Der Pilotplatz steht als
-                  eigener Kasten darunter, mit seiner Gegenleistung: ein
-                  niedrigerer Betrag gegen die schriftliche Referenzfreigabe.
-                */}
-                {pkg.pilotAmount !== undefined && (
-                  <div className="border-line mt-5 flex flex-col gap-2 rounded-xl border p-4">
-                    <p className="text-meta text-gold-text">
-                      {t.packages.pilotLabel}: {formatPrice(pkg.pilotAmount, locale)}
-                    </p>
-                    <p className="type-small text-muted-foreground text-pretty">
-                      {t.packages.referenceNote}
-                    </p>
-                  </div>
-                )}
-
-                {/* „Für wen" — Zeile aus der bisherigen Live-Seite übernommen. */}
-                <div className="border-line mt-8 border-t pt-6">
-                  <p className="eyebrow text-muted-foreground group-hover:text-gold-text transition-colors duration-[var(--dur-2)]">
-                    {t.packages.forWhom}
-                  </p>
-                  {/* Zweizeilige Reserve, gleiche Begruendung wie beim Namen. */}
-                  <p className="type-body text-foreground/85 mt-3 text-pretty lg:min-h-[3.4em]">
-                    {copy.who}
-                  </p>
-                  <p className="type-body text-gold-text mt-4 flex gap-2 text-pretty">
-                    <span aria-hidden="true">→</span>
-                    <span>{copy.outcome}</span>
-                  </p>
-                </div>
-
-                <ul className="mt-8 flex flex-1 flex-col gap-3.5">
-                  {copy.includes.map((item) => (
-                    <li key={item} className="flex gap-3">
-                      <Check className="text-gold mt-0.5 size-4 shrink-0" strokeWidth={1.5} />
-                      <span className="type-small text-muted-foreground text-pretty">
-                        {item}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                <p className="text-muted-foreground text-meta mt-8">
-                  {copy.note}
-                </p>
-
-                {/* Führt wie auf der alten Seite in den Termin-Wizard.
-                    Auch hier ein LocaleLink: Das nackte <a> sprang auf
-                    /tr/... in die deutsche Fassung — der Regel-Pruefer sieht
-                    das bei einem Template-Literal nicht. */}
-                <Link
-                  /*
-                    Ohne eigenes Ziel in den Termin-Assistenten. Die Pruefung
-                    hat eins: eine Seite mit Grenze, Preisleiter und
-                    Kurz-Check. Wer aus einer Kachel heraus direkt in ein
-                    Terminformular faellt, hat nicht gelesen, was er bucht.
-                  */
-                  href={pkg.ctaHref ?? `/termin?paket=${pkg.key}`}
-                  /*
-                    Beide Knoepfe sind jetzt Umrisse — die Empfehlung steckt
-                    in der KANTENFARBE, nicht mehr in einer Goldflaeche.
-                    Gold fuehrt, neutral folgt; das ist derselbe Unterschied
-                    wie zwischen `primary` und `ghost` beim Hero-Knopf.
-                  */
-                  className={
-                    pkg.recommended
-                      ? "cta-outline mt-7 inline-flex items-center justify-between gap-2 px-5 py-3.5 text-sm tracking-wide"
-                      : "cta-quiet mt-7 inline-flex items-center justify-between gap-2 px-5 py-3.5 text-sm tracking-wide"
-                  }
-                >
-                  <span className="flex w-full items-center justify-between gap-2">
-                    {copy.cta}
-                    <ArrowUpRight className="size-4" strokeWidth={1.5} />
-                  </span>
-                </Link>
-              </Reveal>
-            )
-          })}
-        </div>
+        <PaketWahl />
 
         {/*
           BF-9 — die obere Oeffnung der Leiter.
