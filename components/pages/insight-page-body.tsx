@@ -238,7 +238,7 @@ export function InsightPageBody({ entry }: { entry: Insight }) {
         </div>
       </article>
 
-      <ClosingCta />
+      <ClosingCta variant="insights" />
     </main>
   )
 }

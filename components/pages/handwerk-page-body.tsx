@@ -194,7 +194,7 @@ export function HandwerkPageBody() {
         </div>
       </section>
 
-      <ClosingCta />
+      <ClosingCta variant="sector" />
     </main>
   )
 }

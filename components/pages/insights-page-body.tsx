@@ -169,7 +169,7 @@ export function InsightsPageBody() {
         </div>
       </section>
 
-      <ClosingCta />
+      <ClosingCta variant="insights" />
     </main>
   )
 }

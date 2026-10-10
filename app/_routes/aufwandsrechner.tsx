@@ -80,7 +80,7 @@ export function AufwandsrechnerRoute({ locale }: { locale: Locale }) {
           lead={rechnerText.lead[locale]}
         />
         <Aufwandsrechner />
-        <ClosingCta />
+        <ClosingCta variant="check" />
       </main>
     </>
   )

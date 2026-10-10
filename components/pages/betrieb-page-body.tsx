@@ -241,7 +241,7 @@ export function BetriebPageBody() {
         </section>
       )}
 
-      <ClosingCta variant="prices" />
+      <ClosingCta variant="operations" />
     </main>
   )
 }

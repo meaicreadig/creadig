@@ -31,7 +31,32 @@ import { SectionEyebrow } from "@/components/ui/section-eyebrow"
  * (`t.closing.variants`), nicht aus dem Markup — sonst gaebe es drei
  * Fassungen desselben Satzes in drei Sprachen an drei Orten.
  */
-export type ClosingVariant = "default" | "prices" | "work"
+export type ClosingVariant =
+  | "default"
+  | "prices"
+  | "work"
+  | "systems"
+  | "operations"
+  | "company"
+  | "insights"
+  | "products"
+  | "check"
+  | "sector"
+
+/* Each closing knows the page above it, so the second path leads somewhere
+   the reader has not been yet. */
+const SECONDARY_HREF: Record<ClosingVariant, string> = {
+  default: "/produkte",
+  prices: "/produkte",
+  work: "/leistungen",
+  systems: "/leistungen",
+  operations: "/leistungen",
+  company: "/produkte",
+  insights: "/betriebscheck",
+  products: "/leistungen",
+  check: "/leistungen",
+  sector: "/betriebscheck",
+}
 
 export function ClosingCta({ variant = "default" }: { variant?: ClosingVariant } = {}) {
   const { t } = useLocale()
@@ -47,7 +72,7 @@ export function ClosingCta({ variant = "default" }: { variant?: ClosingVariant }
     Seite ohne Inhalt fuehrt, ist kein zweiter Weg — er ist eine Sackgasse
     unter dem letzten Absatz der Seite.
   */
-  const secondaryHref = variant === "work" ? "/leistungen" : "/produkte"
+  const secondaryHref = SECONDARY_HREF[variant]
 
   return (
     <section
