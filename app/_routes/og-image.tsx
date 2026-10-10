@@ -27,36 +27,36 @@ export const contentType = "image/png"
 
 const copy = {
   de: {
-    alt: "creaDIG — System-Haus für Marke, Web und KI",
-    headline: "Wir bauen, was andere nicht sehen.",
+    alt: "creaDIG — Digitale Systeme für Handwerks- und Servicebetriebe",
+    headline: "Von der Anfrage bis zur Rechnung: ein System.",
     lead:
-      "Das Dach über unseren Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie.",
-    disciplines: "SYSTEM-HAUS · MARKE · WEB · KI",
-    origin: "SEIT 2017 · OSNABRÜCK · DACH",
+      "Für Handwerks- und Servicebetriebe. Wir bauen und betreiben es. Code und Daten gehören Ihnen.",
+    disciplines: "SYSTEM-HAUS FÜR DIGITALE BETRIEBE",
+    origin: "SEIT 2017 · OSNABRÜCK",
   },
   tr: {
-    alt: "creaDIG — marka, web ve yapay zekâ için sistem evi",
-    headline: "Başkalarının göremediğini inşa ediyoruz.",
+    alt: "creaDIG — Zanaat ve servis işletmeleri için dijital sistemler",
+    headline: "Talepten faturaya kadar: tek sistem.",
     lead:
-      "Sistemlerimizin çatısı — markadan yapay zekâya. Onları biz kurarız. Ve biz işletiriz.",
-    disciplines: "SISTEM EVI · MARKA · WEB · YAPAY ZEKÂ",
-    origin: "2017'DEN BERI · OSNABRÜCK · DACH",
+      "Zanaat ve servis işletmeleri için. Biz kurar ve işletiriz. Kod ve veriler sizindir.",
+    disciplines: "DIJITAL IŞLETMELER IÇIN SISTEM EVI",
+    origin: "2017'DEN BERI · OSNABRÜCK",
   },
   en: {
-    alt: "creaDIG — systems house for brand, web and AI",
-    headline: "We build what others never see.",
+    alt: "creaDIG — digital systems for trade and service businesses",
+    headline: "From enquiry to invoice: one system.",
     lead:
-      "The roof above our own systems — from brand to AI. We build them. And we run them.",
-    disciplines: "SYSTEMS HOUSE · BRAND · WEB · AI",
-    origin: "SINCE 2017 · OSNABRÜCK · DACH",
+      "For trade and service businesses. We build and run it. Code and data belong to you.",
+    disciplines: "SYSTEMS HOUSE FOR DIGITAL OPERATIONS",
+    origin: "SINCE 2017 · OSNABRÜCK",
   },
   ar: {
-    alt: "creaDIG — بيت أنظمة للعلامة والويب والذكاء الاصطناعي",
-    headline: "نبني ما لا يراه الآخرون.",
+    alt: "creaDIG — أنظمة رقمية لمنشآت الحِرف والخدمات",
+    headline: "من الطلب حتى الفاتورة: نظام واحد.",
     lead:
-      "المظلة فوق أنظمتنا — من العلامة إلى الذكاء الاصطناعي. نبنيها بأنفسنا. ونشغّلها بأنفسنا.",
-    disciplines: "بيت أنظمة · علامة · ويب · ذكاء اصطناعي",
-    origin: "منذ 2017 · أوسنابروك · DACH",
+      "لمنشآت الحِرف والخدمات. نبنيه ونشغّله. الشيفرة والبيانات ملك لكم.",
+    disciplines: "بيت أنظمة للمنشآت الرقمية",
+    origin: "منذ 2017 · أوسنابروك",
   },
 } as const
 

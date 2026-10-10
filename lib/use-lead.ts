@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef } from "react"
+import { herkunftFuerAnfrage } from "@/lib/herkunft-client"
 
 /**
  * BF-2 — die Formularseite des Missbrauchsschutzes.
@@ -76,7 +77,7 @@ export function useLeadSubmit() {
         const response = await fetch("/api/lead", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...payload, token: token.current }),
+          body: JSON.stringify({ ...herkunftFuerAnfrage(), ...payload, token: token.current }),
         })
         const data = (await response.json().catch(() => null)) as LeadResponse | null
         return { ...(data ?? {}), status: response.status }

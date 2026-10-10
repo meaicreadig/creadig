@@ -14,6 +14,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { StickyWhatsApp } from "@/components/sticky-whatsapp"
 import { CookieConsent } from "@/components/consent/cookie-consent"
 import { GatedAnalytics } from "@/components/consent/gated-analytics"
+import { HerkunftMerker } from "@/components/herkunft-merker"
 import { address, areaServed, socialProfiles } from "@/lib/site-data"
 import { dictionary, type Locale } from "@/lib/dictionary"
 import { jsonLdScript } from "@/lib/json-ld"
@@ -398,6 +399,7 @@ export function SiteShell({
             <CookieConsent />
             {/* Laedt erst nach Einwilligung in die Kategorie `statistics`. */}
             <GatedAnalytics />
+            <HerkunftMerker />
           </LocaleProvider>
         </ThemeProvider>
       </body>
