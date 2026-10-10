@@ -55,20 +55,24 @@ const rawDictionary = {
        */
       /* S3 — „System-Haus" bleibt Markenwort im Text, aber nicht im Titel:
          Wer „Systemhaus" sucht, will IT-Hardware und Microsoft 365. */
-      siteTitle: "creaDIG: Websites und digitale Abläufe für Betriebe",
+      /* PAKET 1 — EINE Firmenbeschreibung fuer Google, Besucher und KI-Suche:
+         wer (Handwerks- und Servicebetriebe), was (ein eigenes System von der
+         Anfrage bis zur Rechnung), warum anders (wir betreiben es, Code und
+         Daten gehoeren dem Kunden). Dieselbe Aussage steht in Hero und Kategorie. */
+      siteTitle: "creaDIG: Digitale Systeme für Handwerks- und Servicebetriebe",
       siteDescription:
-        "creaDIG ist das Dach über eigenen Systemen — von Marke bis KI. Wir bauen sie. Und wir betreiben sie. System-Haus für Deutschland, Österreich und die Schweiz.",
-      ogTitle: "creaDIG — Wir bauen, was andere nicht sehen.",
+        "creaDIG baut Handwerks- und Servicebetrieben ein eigenes digitales System – von der Anfrage bis zur Rechnung. Wir betreiben es. Code und Daten gehören Ihnen.",
+      ogTitle: "creaDIG — Von der Anfrage bis zur Rechnung: ein System.",
       ogDescription:
-        "System-Haus seit 2017. Eigene Produkte und KI-Systeme, die wir selbst bauen und betreiben. Deutschland, Österreich, Schweiz.",
+        "System-Haus für digitale Betriebe aus Osnabrück, seit 2017. Ein eigenes System für SHK-, Elektro- und Servicebetriebe – gebaut und betrieben von uns, Code und Daten bei Ihnen.",
       organizationDescription:
-        "System-Haus für Marke, Web, Operations, Automation und KI. Eigene Produkte: meAI, fibero, CASSAMEA, meahv.",
+        "System-Haus für digitale Betriebe: creaDIG baut Handwerks- und technischen Servicebetrieben ein durchgehendes digitales System von der Anfrage bis zur Rechnung und betreibt es. Code und Daten gehören dem Kunden. Eigene Systeme: fibero, meAI, CASSAMEA, meahv.",
       /** Erster Eintrag jeder Brotkrume in den strukturierten Daten. */
       breadcrumbHome: "Startseite",
       /* T-1 — Alt-Text des Vorschaubildes. Er stand nur in
          app/_routes/og-image.tsx; von dort kann ihn der Kopfdaten-Helfer
          nicht holen, ohne `fs` und `next/og` in jede Seite zu ziehen. */
-      ogImageAlt: "creaDIG — System-Haus für Marke, Web und KI",
+      ogImageAlt: "creaDIG — Digitale Systeme für Handwerks- und Servicebetriebe",
     },
     /*
      * DIE KATEGORIE IN EINEM SATZ (KIZILELMA §10.1).
@@ -90,7 +94,8 @@ const rawDictionary = {
      */
     brand: {
       categoryLabel: "Kategorie",
-      category: "Kein klassisches IT-Systemhaus. Ein System-Haus für digitale Betriebe.",
+      category:
+        "Kein IT-Systemhaus für Server und Lizenzen. Ein System-Haus für digitale Betriebe: ein eigenes System für Handwerks- und Servicebetriebe, von der Anfrage bis zur Rechnung.",
     },
     /*
      * Verteiler-Startseite (PHASE A, Master-Prompt 4 §4).
@@ -342,8 +347,8 @@ const rawDictionary = {
        */
       company: {
         eyebrow: "Das Unternehmen",
-        title: "Ein Haus, das wächst.",
-        body: "Gegründet 2017, geführt von Muhammed Emin Akyol — mit einem kleinen Kernteam und einem spezialisierten Netzwerk im DACH-Raum.",
+        title: "Wer Ihr System baut, geht danach ans Telefon.",
+        body: "Muhammed Emin Akyol hat creaDIG 2017 gegründet und ist Ihr direkter Ansprechpartner – vom ersten Gespräch über den Bau bis zum Betrieb. Sitz im ICO InnovationsCentrum Osnabrück, mit einem kleinen Kernteam und einem spezialisierten Netzwerk.",
         cta: "Mehr über uns",
       },
       insights: {
@@ -996,10 +1001,20 @@ const rawDictionary = {
        * unveraendert eine Sektion spaeter — jetzt als Vertiefung und nicht
        * mehr als Nachreichung.
        */
-      eyebrow: "System-Haus für digitale Betriebe · Osnabrück · seit 2017",
-      headlineLine1: "Wir bauen,",
-      headlineLine2: "was andere",
-      headlineLine3: "nicht sehen.",
+      /*
+       * PAKET 1 — DIE KOPFZEILE NENNT DEN KAUFGEGENSTAND.
+       *
+       * „Wir bauen, was andere nicht sehen." war Haltung ohne Gegenstand: Wer
+       * creaDIG nicht kannte, wusste danach nicht, was gebaut wird. Jetzt traegt
+       * die Kopfzeile das Ergebnis (ein System, Anfrage bis Rechnung), der
+       * Eyebrow die Zielgruppe und die Unterzeile Problem, Loesung und
+       * Datenhoheit. „System-Haus für digitale Betriebe" bleibt Markenwort und
+       * wird in `systemLine` sofort erklaert.
+       */
+      eyebrow: "Für Handwerks- und Servicebetriebe · Osnabrück · seit 2017",
+      headlineLine1: "Von der Anfrage",
+      headlineLine2: "bis zur Rechnung:",
+      headlineLine3: "ein System.",
       /*
        * Glasklare Subline (§4.1): Vorher stand hier ein Markenbild („das Dach
        * ueber unseren Systemen"). Schoen — aber wer creaDIG nicht kennt, weiss
@@ -1033,7 +1048,7 @@ const rawDictionary = {
        * direkt darunter. Sie stehen nur nicht mehr VOR dem Problem.
        */
       subline:
-        "Wir bauen Betrieben das System, an dem ihre Arbeit hängt: Auftrag, Kunde, Beleg und Zahl an einem Ort. Danach gibt es eine Auskunft statt vier — und niemand sucht sie in drei Programmen zusammen.",
+        "Anfragen per WhatsApp, Aufträge in Excel, Fotos im Handy, Rechnungen im dritten Programm: Wir bauen SHK-, Elektro- und technischen Servicebetrieben ein eigenes digitales System, in dem das alles zusammenläuft. Wir betreiben es für Sie. Code und Daten gehören Ihnen.",
       /*
        * MP10-2.7 — der Satz, der die fuenf Ebenen zusammenbindet.
        *
@@ -1058,20 +1073,19 @@ const rawDictionary = {
        * Hier steht jetzt der Satz, der die Reihe darunter zu einem Einstieg
        * macht statt zu einem Inhaltsverzeichnis.
        */
-      systemLine: "Sie führen den Betrieb. Wir bauen das System dahinter.",
-      ctaPrimary: "Projekt starten",
+      systemLine: "System-Haus für digitale Betriebe heißt: Sie führen den Betrieb, wir bauen und betreiben das System dahinter.",
+      ctaPrimary: "Kostenloses Erstgespräch",
       /*
        * GATE 01 · WEB-0005 — der zweite Knopf zeigte auf `/arbeiten`, und
        * dort standen dieselben vier eigenen Produkte wie auf `/produkte`.
        * Er zeigt jetzt dorthin, wo sie vollstaendig stehen.
        */
-      ctaSecondary: "Eigene Produkte",
+      ctaSecondary: "Unsere Systeme ansehen",
       /*
-       * MP10-2.5 — die Fusszeile des Hero nannte den Sitz ein zweites Mal,
-       * 200 Pixel unter dem Eyebrow. Sie traegt jetzt den Markt, den der
-       * Eyebrow abgegeben hat.
+       * MP10-2.5 — die Fusszeile des Hero traegt den Markt. Paket 1: mit
+       * Hierarchie — Deutschland ist der Schwerpunkt, AT/CH sind moeglich.
        */
-      location: "Deutschland · Österreich · Schweiz",
+      location: "Schwerpunkt Deutschland · auch Österreich und Schweiz",
       scroll: "Scrollen",
     },
     impact: {
@@ -3115,20 +3129,20 @@ const rawDictionary = {
 
   tr: {
     meta: {
-      siteTitle: "creaDIG: İşletmeler için web siteleri ve dijital iş akışları",
+      siteTitle: "creaDIG: Zanaat ve servis işletmeleri için dijital sistemler",
       siteDescription:
-        "creaDIG, kendi sistemlerinin çatısıdır — markadan yapay zekâya. Onları biz kurarız ve biz işletiriz. Almanya, Avusturya ve İsviçre için sistem evi.",
-      ogTitle: "creaDIG — Başkalarının göremediğini inşa ediyoruz.",
+        "creaDIG, zanaat ve servis işletmelerine talepten faturaya kadar kendi dijital sistemlerini kurar ve işletir. Kod ve veriler sizindir.",
+      ogTitle: "creaDIG — Talepten faturaya kadar: tek sistem.",
       ogDescription:
-        "2017'den beri sistem evi. Kendi ürünlerimiz ve kendimiz kurup işlettiğimiz yapay zekâ sistemleri. Almanya, Avusturya, İsviçre.",
+        "Osnabrück'ten dijital işletmeler için sistem evi, 2017'den beri. Tesisat, elektrik ve servis işletmelerine kendi sistemleri — biz kurar ve işletiriz, kod ve veriler sizde kalır.",
       organizationDescription:
-        "Marka, web, operations, automation ve yapay zekâ için sistem evi. Kendi ürünlerimiz: meAI, fibero, CASSAMEA, meahv.",
+        "Dijital işletmeler için sistem evi: creaDIG, zanaat ve teknik servis işletmelerine talepten faturaya kadar uçtan uca bir dijital sistem kurar ve işletir. Kod ve veriler müşteriye aittir. Kendi sistemlerimiz: fibero, meAI, CASSAMEA, meahv.",
       breadcrumbHome: "Ana sayfa",
-      ogImageAlt: "creaDIG — marka, web ve yapay zekâ için sistem evi",
+      ogImageAlt: "creaDIG — Zanaat ve servis işletmeleri için dijital sistemler",
     },
     brand: {
       categoryLabel: "Kategori",
-      category: "Klasik bir BT sistem evi değil. Dijital işletmeler için bir sistem evi.",
+      category: "Sunucu ve lisans satan bir BT firması değil. Dijital işletmeler için bir sistem evi: zanaat ve servis işletmelerine talepten faturaya kadar kendi sistemleri.",
     },
     home: {
       statement: {
@@ -3241,8 +3255,8 @@ const rawDictionary = {
       },
       company: {
         eyebrow: "Şirket",
-        title: "Büyüyen bir ev.",
-        body: "2017'de kuruldu, Muhammed Emin Akyol yönetiminde — küçük bir çekirdek ekip ve DACH bölgesinde uzman bir ağla birlikte.",
+        title: "Sisteminizi kuran, sonra telefonu da açan.",
+        body: "Muhammed Emin Akyol creaDIG'i 2017'de kurdu ve ilk görüşmeden kuruluma ve işletmeye kadar doğrudan muhatabınızdır. Merkez: ICO InnovationsCentrum Osnabrück; küçük bir çekirdek ekip ve uzman bir ağla.",
         cta: "Hakkımızda daha fazlası",
       },
       insights: {
@@ -3543,7 +3557,7 @@ const rawDictionary = {
         "Arayüzleri ancak gerçek uygulamayı örnek verilerle kaydedebildiğimizde paylaşırız. O zamana kadar burada ne kurulduğu yazar — başka bir şey iddia eden bir görsel değil.",
       screensLabel: "Gerçek arayüz",
       screensCaption: "Gerçek arayüz, örnek veriler.",
-      screensAlt: "örnek verilerle gerçek arayüz",
+      screensAlt: "örnek verilerle ger��ek arayüz",
       ctaTitle: "Bu sizin işletmenize uyar mı?",
       ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmenize bakar ve yardımcı olup olamayacağımızı dürüstçe söyleriz.",
       ctaPrimary: "Projeye başla",
@@ -3605,16 +3619,16 @@ const rawDictionary = {
       skipToContent: "İçeriğe geç",
     },
     hero: {
-      eyebrow: "Dijital işletmeler için sistem evi · Osnabrück · 2017'den beri",
-      headlineLine1: "Başkalarının",
-      headlineLine2: "görmediğini",
-      headlineLine3: "inşa ediyoruz.",
+      eyebrow: "Zanaat ve servis işletmeleri için · Osnabrück · 2017'den beri",
+      headlineLine1: "Talepten",
+      headlineLine2: "faturaya kadar:",
+      headlineLine3: "tek sistem.",
       subline:
-        "İşletmelere, işlerinin döndüğü sistemi kuruyoruz: iş emri, müşteri, belge ve rakam tek yerde. Sonrasında dört yerine tek bir bilgi var — ve kimse onu üç programdan toplamıyor.",
-      systemLine: "İşletmenizi siz yönetirsiniz. Arkasındaki sistemi biz kurarız.",
-      ctaPrimary: "Projeye başla",
-      ctaSecondary: "Kendi ürünlerimiz",
-      location: "Almanya · Avusturya · İsviçre",
+        "Talepler WhatsApp'ta, işler Excel'de, fotoğraflar telefonda, faturalar üçüncü bir programda: Tesisat, elektrik ve teknik servis işletmelerine hepsinin bir araya geldiği kendi dijital sistemlerini kuruyoruz. Sistemi sizin için işletiyoruz. Kod ve veriler sizindir.",
+      systemLine: "Dijital işletmeler için sistem evi şu demek: İşletmeyi siz yönetirsiniz, arkasındaki sistemi biz kurar ve işletiriz.",
+      ctaPrimary: "Ücretsiz ön görüşme",
+      ctaSecondary: "Sistemlerimizi görün",
+      location: "Ağırlık Almanya · Avusturya ve İsviçre de",
       scroll: "Kaydır",
     },
     impact: {
@@ -4546,7 +4560,7 @@ const rawDictionary = {
           "Başka bir şey",
         ],
         rolesLabel: "Farklı görevleri olan birden fazla kişi mi çalışıyor?",
-        rolesOptions: ["Hayır, esasen tek kişi", "Evet, birkaç kişi", "Evet, birden fazla alan"],
+        rolesOptions: ["Hayır, esasen tek kişi", "Evet, birka�� kişi", "Evet, birden fazla alan"],
         sitesLabel: "Kaç yerde çalışılıyor?",
         sitesOptions: ["Tek yer", "İki ile üç", "Üçten fazla"],
         systemsLabel: "Taşınması gereken program veya veri var mı?",
@@ -4849,20 +4863,20 @@ const rawDictionary = {
    */
   en: {
     meta: {
-      siteTitle: "creaDIG: websites and digital workflows for businesses",
+      siteTitle: "creaDIG: digital systems for trade and service businesses",
       siteDescription:
-        "creaDIG is the house above its own systems — from brand to AI. We build them. And we run them. A systems house for Germany, Austria and Switzerland.",
-      ogTitle: "creaDIG — we build what others never see.",
+        "creaDIG builds trade and service businesses their own digital system – from enquiry to invoice. We run it for you. Code and data belong to you.",
+      ogTitle: "creaDIG — from enquiry to invoice: one system.",
       ogDescription:
-        "A systems house since 2017. Our own products and AI systems we build and operate ourselves. Germany, Austria, Switzerland.",
+        "A systems house for digital operations from Osnabrück, since 2017. One system for plumbing, electrical and service businesses – built and run by us, code and data stay with you.",
       organizationDescription:
-        "Systems house for brand, web, operations, automation and AI. Our own products: meAI, fibero, CASSAMEA, meahv.",
+        "Systems house for digital operations: creaDIG builds trade and technical service businesses one end-to-end digital system from enquiry to invoice and runs it. Code and data belong to the client. Own systems: fibero, meAI, CASSAMEA, meahv.",
       breadcrumbHome: "Home",
-      ogImageAlt: "creaDIG — systems house for brand, web and AI",
+      ogImageAlt: "creaDIG — digital systems for trade and service businesses",
     },
     brand: {
       categoryLabel: "Category",
-      category: "Not a classic IT systems house. A systems house for digital operations.",
+      category: "Not an IT reseller for servers and licences. A systems house for digital operations: one system for trade and service businesses, from enquiry to invoice.",
     },
     home: {
       statement: {
@@ -4975,8 +4989,8 @@ const rawDictionary = {
       },
       company: {
         eyebrow: "The company",
-        title: "A house that grows.",
-        body: "Founded in 2017, led by Muhammed Emin Akyol — with a small core team and a specialised network across Germany, Austria and Switzerland.",
+        title: "Whoever builds your system picks up the phone afterwards.",
+        body: "Muhammed Emin Akyol founded creaDIG in 2017 and is your direct contact — from the first call through the build to operation. Based at ICO InnovationsCentrum Osnabrück, with a small core team and a specialised network.",
         cta: "More about us",
       },
       insights: {
@@ -5332,16 +5346,16 @@ const rawDictionary = {
       skipToContent: "Skip to content",
     },
     hero: {
-      eyebrow: "A systems house for digitally run businesses · Osnabrück · since 2017",
-      headlineLine1: "We build",
-      headlineLine2: "what others",
-      headlineLine3: "never see.",
+      eyebrow: "For trade and service businesses · Osnabrück · since 2017",
+      headlineLine1: "From enquiry",
+      headlineLine2: "to invoice:",
+      headlineLine3: "one system.",
       subline:
-        "We build businesses the system their work actually hangs on: job, customer, document and figure in one place. After that there is one answer instead of four — and nobody assembles it from three programs.",
-      systemLine: "You run the business. We build the system behind it.",
-      ctaPrimary: "Start a project",
-      ctaSecondary: "Our own products",
-      location: "Germany · Austria · Switzerland",
+        "Enquiries on WhatsApp, jobs in Excel, photos on phones, invoices in a third program: we build plumbing, electrical and technical service businesses their own digital system where all of it comes together. We run it for you. Code and data belong to you.",
+      systemLine: "A systems house for digital operations means: you run the business, we build and run the system behind it.",
+      ctaPrimary: "Free first call",
+      ctaSecondary: "See our systems",
+      location: "Focus Germany · also Austria and Switzerland",
       scroll: "Scroll",
     },
     impact: {
@@ -6562,20 +6576,20 @@ const rawDictionary = {
    */
   ar: {
     meta: {
-      siteTitle: "creaDIG: مواقع وسير عمل رقمي للمنشآت",
+      siteTitle: "creaDIG: أنظمة رقمية لمنشآت الحِرف والخدمات",
       siteDescription:
-        "creaDIG هي المظلة فوق أنظمتنا الخاصة — من العلامة إلى الذكاء الاصطناعي. نبنيها بأنفسنا. ونشغّلها بأنفسنا. بيت أنظمة لألمانيا والنمسا وسويسرا.",
-      ogTitle: "creaDIG — نبني ما لا يراه الآخرون.",
+        "تبني creaDIG لمنشآت الحِرف والخدمات نظامًا رقميًا خاصًا بها — من الطلب حتى الفاتورة. ونشغّله لكم. الشيفرة والبيانات ملك لكم.",
+      ogTitle: "creaDIG — من الطلب حتى الفاتورة: نظام واحد.",
       ogDescription:
-        "بيت أنظمة منذ 2017. منتجات خاصة بنا وأنظمة ذكاء اصطناعي نبنيها ونشغّلها بأنفسنا. ألمانيا والنمسا وسويسرا.",
+        "بيت أنظمة للمنشآت الرقمية من أوسنابروك منذ 2017. نظام خاص لمنشآت التمديدات الصحية والكهرباء والخدمات — نبنيه ونشغّله، والشيفرة والبيانات تبقى لديكم.",
       organizationDescription:
-        "بيت أنظمة للعلامة والويب والتشغيل والأتمتة والذكاء الاصطناعي. منتجاتنا الخاصة: meAI وfibero وCASSAMEA وmeahv.",
+        "بيت أنظمة للمنشآت الرقمية: تبني creaDIG لمنشآت الحِرف والخدمات الفنية نظامًا رقميًا متكاملًا من الطلب حتى الفاتورة وتشغّله. الشيفرة والبيانات ملك للعميل. أنظمتنا الخاصة: fibero وmeAI وCASSAMEA وmeahv.",
       breadcrumbHome: "الصفحة الرئيسية",
-      ogImageAlt: "creaDIG — بيت أنظمة للعلامة والويب والذكاء الاصطناعي",
+      ogImageAlt: "creaDIG — أنظمة رقمية لمنشآت الحِرف والخدمات",
     },
     brand: {
       categoryLabel: "التصنيف",
-      category: "لسنا بيت تقنية معلومات تقليديًا. نحن بيت أنظمة للمنشآت الرقمية.",
+      category: "لسنا شركة تقنية تبيع الخوادم والتراخيص. نحن بيت أنظمة للمنشآت الرقمية: نظام خاص لمنشآت الحِرف والخدمات، من الطلب حتى الفاتورة.",
     },
     home: {
       statement: {
@@ -6614,7 +6628,7 @@ const rawDictionary = {
           {
             key: "grundlage",
             label: "الحالة أ",
-            title: "الأساس الرقمي",
+            title: "الأساس ا��رقمي",
             wenn: "لا يعثر عليك أحد، أو أنّ حضورك لم يعد يعبّر عمّا تجيده.",
             start: "العلامة والحضور والموقع.",
             href: "/leistungen#ebene-identity",
@@ -6688,8 +6702,8 @@ const rawDictionary = {
       },
       company: {
         eyebrow: "الشركة",
-        title: "بيتٌ ينمو.",
-        body: "تأسست في 2017 بقيادة محمد أمين أكيول — مع فريق أساسي صغير وشبكة متخصصة في ألمانيا والنمسا وسويسرا.",
+        title: "من يبني نظامكم يردّ على الهاتف بعدها.",
+        body: "أسّس محمد أمين أكيول creaDIG عام 2017، وهو جهة تواصلكم المباشرة — من المكالمة الأولى مرورًا بالبناء حتى التشغيل. المقر: ICO InnovationsCentrum Osnabrück، مع فريق أساسي صغير وشبكة متخصصة.",
         cta: "المزيد عنا",
       },
       insights: {
@@ -7045,16 +7059,16 @@ const rawDictionary = {
       skipToContent: "الانتقال إلى المحتوى",
     },
     hero: {
-      eyebrow: "بيت أنظمة للمنشآت التي تُدار رقميًا · أوسنابروك · منذ 2017",
-      headlineLine1: "نبني",
-      headlineLine2: "ما لا يراه",
-      headlineLine3: "الآخرون.",
+      eyebrow: "لمنشآت الحِرف والخدمات · أوسنابروك · منذ 2017",
+      headlineLine1: "من الطلب",
+      headlineLine2: "حتى الفاتورة:",
+      headlineLine3: "نظام واحد.",
       subline:
-        "نبني للمنشآت النظام الذي يتعلّق به عملها فعليًا: أمر العمل والعميل والمستند والرقم في مكان واحد. بعدها هناك إجابة واحدة بدل أربع — ولا أحد يجمعها من ثلاثة برامج.",
-      systemLine: "أنتم تديرون المنشأة. ونحن نبني النظام الذي خلفها.",
-      ctaPrimary: "بدء مشروع",
-      ctaSecondary: "منتجاتنا",
-      location: "ألمانيا · النمسا · سويسرا",
+        "طلبات على واتساب، وأوامر عمل في Excel، وصور في الهواتف، وفواتير في برنامج ثالث: نبني لمنشآت التمديدات الصحية والكهرباء والخدمات الفنية نظامًا رقميًا خاصًا يجتمع فيه كل ذلك. ونشغّله لكم. الشيفرة والبيانات ملك لكم.",
+      systemLine: "بيت أنظمة للمنشآت الرقمية يعني: أنتم تديرون المنشأة، ونحن نبني النظام الذي خلفها ونشغّله.",
+      ctaPrimary: "مكالمة أولى مجانية",
+      ctaSecondary: "شاهدوا أنظمتنا",
+      location: "التركيز على ألمانيا · وكذلك النمسا وسويسرا",
       scroll: "تمرير",
     },
     impact: {
@@ -7114,7 +7128,7 @@ const rawDictionary = {
       mockupNote: "بطاقات المنتجات: نماذج توضيحية، لا لقطات شاشة.",
       productPhotoNote:
         "صور المنتجات تُظهر الواجهة الحقيقية (ببيانات تجريبية) — لا نماذج.",
-      customerPhotoNote: "صور العملاء تُظهر الواجهة الحقيقية — لا نماذج.",
+      customerPhotoNote: "صور العمل��ء تُظهر الواجهة الحقيقية — لا نماذج.",
       imageNoteMixed:
         "واجهات حقيقية (منتجات وعملاء) ونماذج توضيحية — موسومة بشكل منفصل، لا مختلطة.",
       viewLabel: "العرض",
@@ -7359,7 +7373,7 @@ const rawDictionary = {
           problem:
             "الأرقام موجودة، والقرار ليس كذلك. من أراد اتخاذه فتح خمسة تقارير وخرج يعرف أكثر — لا أفضل.",
           solution:
-            "نبني فوق ذلك نظامًا يقرأ بدل أن يعرض: يصنّف، ويرتّب الأولويات، ويُهيّئ الخيارات. وmeAI هو نسختنا منه — بنيناه ونشغّله، وجرّبناه في يومنا العملي قبل أن يصل إلى منشأة.",
+            "نبني فوق ذلك نظامًا يقرأ بدل أن يعرض: يصنّف، ويرتّب الأولويات، ويُهيّئ الخيارات. وmeAI هو نسختنا منه — بنيناه ونشغّله، وجرّبناه في يومنا العملي قبل أ�� يصل إلى منشأة.",
           result: "سؤال «ما الذي يأتي أولًا اليوم» صار له جواب — والسبب مكتوب بجانبه.",
           projects: [
             "التحليل",
@@ -7695,7 +7709,7 @@ const rawDictionary = {
         },
         data: {
           name: "البيانات وقواعد البيانات",
-          body: "أين تعيش البيانات، ولمن تعود، وكيف تبدو حين تصير خاطئة. نموذج بيانات لا يعكس المنشأة يُلتفّ عليه في التشغيل — وعندها يعود أحدهم إلى صيانة جدول جانبي.",
+          body: "أين تعيش البيانات، ولمن تعود، وكيف تبدو ح��ن تصير خاطئة. نموذج بيانات لا يعكس المنشأة يُلتفّ عليه في التشغيل — وعندها يعود أحدهم إلى صيانة جدول جانبي.",
           question: "أي سجلّ هو الحقيقة حين يتناقض موضعان؟",
         },
         hosting: {
@@ -7790,7 +7804,7 @@ const rawDictionary = {
       lead: "معظم المشاريع تنتهي عند الإطلاق. وبعده يبدأ الجزء الذي لا يبيعه أحد: التحديثات والأعطال والثغرات الأمنية والتغييرات الصغيرة التي فجأةً لا يستطيع أحد إجراءها. نحن نبقى.",
       metaTitle: "التشغيل المُدار — استضافة ومراقبة وتحديثات ونسخ احتياطي",
       metaDescription:
-        "creaDIG تشغّل ما بنته creaDIG: الاستضافة والمراقبة والتحديثات والأمان والنسخ الاحتياطي والدعم والتطوير المستمر. قابل للإنهاء شهريًا — النظام والبيانات ملككم.",
+        "creaDIG تشغّل ما بنته creaDIG: ��لاستضافة والمراقبة والتحديثات والأمان والنسخ الاحتياطي والدعم والتطوير المستمر. قابل للإنهاء شهريًا — النظام والبيانات ملككم.",
       whyLabel: "لماذا التشغيل بدل التسليم",
       why: [
         {
@@ -8193,7 +8207,7 @@ const rawDictionary = {
         },
         {
           title: "حقوقكم",
-          body: "لكم في أي وقت حق الوصول (المادة 15) والتصحيح (16) والمحو (17) وتقييد المعالجة (18) ونقل البيانات (20) والاعتراض (21). وتكفي رسالة إلى العنوان المذكور أدناه. وبصرف النظر عن ذلك لكم حق تقديم شكوى إلى سلطة إشراف على حماية البيانات (المادة 77) — والمختصة لمقرّنا هي مفوّضة حماية البيانات لولاية ساكسونيا السفلى.",
+          body: "لكم في أي وقت حق الوصول (المادة 15) والتصحيح (16) والمحو (17) وتقييد المعالجة (18) ونقل البيانات (20) والاعتراض (21). وتكفي رسالة إلى العنوان المذكور أدناه. وبصرف النظر عن ذلك لكم حق تقديم شكوى إلى سلطة إشراف على حماية البيانات (المادة 77) — والمختصة لمقرّنا هي مفوّضة حماية البيانات لولاية ساك��ونيا السفلى.",
         },
       ],
       privacyNote: "ستخضع هذه الن��خة لمراجعة قانونية نهائية مع بيانات الشركة الكاملة.",
