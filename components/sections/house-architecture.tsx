@@ -1,6 +1,10 @@
 "use client"
 
+import { useEffect, useState } from "react"
+import { motion } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
+import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
+import { useSeenOnce } from "@/lib/use-seen-once"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
@@ -53,6 +57,23 @@ export function HouseArchitecture({ variant = "voll" }: { variant?: "voll" | "ko
   /* Von oben nach unten gelesen: 05 zuerst, 01 zuletzt — dieselbe Richtung
      wie die Pyramide auf /leistungen, dort nur andersherum gestapelt. */
   const layersTopDown = [...serviceLayers].reverse()
+
+  /* Der Strom: Vom Fundament (unten) nach oben leuchtet eine Ebene nach der
+     anderen auf, dann eine kurze Pause — das Haus „arbeitet". */
+  const reduce = usePrefersReducedMotion()
+  const { ref: figureRef, seen } = useSeenOnce<HTMLElement>(0.3)
+  const [active, setActive] = useState<number | null>(null)
+  useEffect(() => {
+    if (!seen || reduce) return
+    const n = layersTopDown.length
+    let step = 0
+    const id = window.setInterval(() => {
+      const pos = step % (n + 2)
+      setActive(pos < n ? n - 1 - pos : null)
+      step += 1
+    }, 850)
+    return () => window.clearInterval(id)
+  }, [seen, reduce, layersTopDown.length])
 
   return (
     /*
@@ -140,7 +161,7 @@ export function HouseArchitecture({ variant = "voll" }: { variant?: "voll" | "ko
           Element, sondern die Klammer um alle: der Rahmen, der das Tragwerk
           zusammenhaelt. Deshalb steht der Name jetzt AM Rahmen.
         */}
-        <figure className="mt-20">
+        <figure ref={figureRef} className="mt-20">
           {/* ---- Der Rahmen: creaDIG haelt das Tragwerk ------------------ */}
           <Reveal>
             <div className="border-gold/50 border border-b-0 px-5 pt-5 pb-0 md:px-7 md:pt-6">
@@ -156,6 +177,7 @@ export function HouseArchitecture({ variant = "voll" }: { variant?: "voll" | "ko
             {layersTopDown.map((layer, i) => {
               const layerCopy = t.services.layers[layer.key]
               const fundament = i === layersTopDown.length - 1
+              const lit = active === i
               return (
                 <Reveal key={layer.key} as="li" delay={0.05 * i} y={12}>
                   {/*
@@ -173,10 +195,31 @@ export function HouseArchitecture({ variant = "voll" }: { variant?: "voll" | "ko
                     der Startseite — statt eine zweite zu erfinden.
                   */}
                   <div
-                    className={`flex items-stretch gap-5 px-5 md:gap-7 md:px-7 ${
+                    className={`relative flex items-stretch gap-5 overflow-hidden px-5 md:gap-7 md:px-7 ${
                       fundament ? "bg-surface" : ""
                     }`}
                   >
+                    <motion.span
+                      aria-hidden="true"
+                      className="bg-gold/[0.07] pointer-events-none absolute inset-0"
+                      initial={false}
+                      animate={{ opacity: lit ? 1 : 0 }}
+                      transition={{ duration: 0.5 }}
+                    />
+                    <motion.span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-gold/15 to-transparent"
+                      initial={false}
+                      animate={lit ? { left: ["-35%", "105%"], opacity: [0, 1, 0] } : { opacity: 0 }}
+                      transition={{ duration: 0.85, ease: "easeInOut" }}
+                    />
+                    <motion.span
+                      aria-hidden="true"
+                      className="bg-gold pointer-events-none absolute inset-x-0 bottom-0 h-px origin-left"
+                      initial={false}
+                      animate={{ scaleX: lit ? 1 : 0, opacity: lit ? 1 : 0 }}
+                      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    />
                     <SystemRail
                       ton="verbunden"
                       achse="stapel"
@@ -206,8 +249,8 @@ export function HouseArchitecture({ variant = "voll" }: { variant?: "voll" | "ko
                       Nummerierungen fuer dieselben fuenf Zeilen.
                     */}
                     <span
-                      className={`text-display text-2xl leading-none tabular-nums md:col-span-1 md:text-[2rem] ${
-                        fundament ? "text-gold-text" : "text-muted-foreground"
+                      className={`text-display relative text-2xl leading-none tabular-nums transition-colors duration-500 md:col-span-1 md:text-[2rem] ${
+                        fundament || lit ? "text-gold-text" : "text-muted-foreground"
                       }`}
                     >
                       {layer.level}
@@ -230,7 +273,13 @@ export function HouseArchitecture({ variant = "voll" }: { variant?: "voll" | "ko
             und liegt unter 01 — das ist der Satz „das Fundament, auf dem
             alles steht" als Strich statt als Behauptung.
           */}
-          <div aria-hidden="true" className="bg-gold h-[3px] w-full" />
+          <motion.div
+            aria-hidden="true"
+            className="bg-gold h-[3px] w-full origin-left"
+            initial={false}
+            animate={{ scaleX: seen || reduce ? 1 : 0 }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+          />
 
           {/* ---- Quer darunter: der Betrieb ------------------------------ */}
           {/*

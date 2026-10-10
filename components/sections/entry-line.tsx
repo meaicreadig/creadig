@@ -1,6 +1,9 @@
 "use client"
 
+import { useRef } from "react"
+import { motion, useScroll, useSpring } from "framer-motion"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
+import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { ArrowUpRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { Reveal } from "@/components/ui/reveal"
@@ -41,6 +44,12 @@ export function EntryLine() {
   const questions = t.faq.items.slice(0, 2)
   const felder = ["fuerWen", "bekommen", "kosten", "dauer", "danach"] as const
 
+  /* Die Leiter fuellt sich mit dem Scrollen: Wer liest, sieht den Weg wachsen. */
+  const reduce = usePrefersReducedMotion()
+  const ladderRef = useRef<HTMLOListElement>(null)
+  const { scrollYProgress } = useScroll({ target: ladderRef, offset: ["start 75%", "end 55%"] })
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 24, mass: 0.4 })
+
   return (
     <section id="einstieg" aria-labelledby="einstieg-title" className="section-seam">
       <div className="section-shell-tight">
@@ -54,11 +63,38 @@ export function EntryLine() {
               <p className="type-body text-muted-foreground mt-5 max-w-xl text-pretty">{copy.lead}</p>
             </Reveal>
 
-            <ol className="border-line mt-10 flex flex-col border-t">
-              {STUFEN.map(({ key, href }) => {
+            <ol ref={ladderRef} className="border-line relative mt-10 flex flex-col border-t ps-8 md:ps-10">
+              <span aria-hidden="true" className="bg-line absolute start-[7px] top-0 bottom-0 w-px md:start-[11px]" />
+              <motion.span
+                aria-hidden="true"
+                className="bg-gold absolute start-[7px] top-0 bottom-0 w-px origin-top md:start-[11px]"
+                style={{ scaleY: reduce ? 1 : progress }}
+              />
+              {STUFEN.map(({ key, href }, i) => {
                 const stufe = copy.stufen[key]
                 return (
-                  <li key={key} className="border-line border-b">
+                  <motion.li
+                    key={key}
+                    className="border-line relative border-b"
+                    initial={reduce ? false : { opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.05 * i }}
+                  >
+                    <motion.span
+                      aria-hidden="true"
+                      className="border-gold bg-background absolute -start-8 top-9 flex size-[15px] items-center justify-center rounded-full border md:-start-10 md:size-[23px]"
+                      initial={reduce ? false : { scale: 0.5, opacity: 0.3 }}
+                      whileInView={{ scale: 1, opacity: 1 }}
+                      viewport={{ amount: 1, margin: "0px 0px -40% 0px" }}
+                      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <motion.span
+                        className="bg-gold block size-[7px] rounded-full md:size-[9px]"
+                        animate={reduce ? undefined : { scale: [1, 1.6, 1], opacity: [1, 0.55, 1] }}
+                        transition={{ duration: 2.4, repeat: Infinity, delay: 0.6 * i, ease: "easeInOut" }}
+                      />
+                    </motion.span>
                     <article className="grid gap-x-8 gap-y-4 py-8 md:grid-cols-12">
                       <header className="md:col-span-4">
                         <p className="eyebrow text-gold-text">{stufe.stufe}</p>
@@ -92,7 +128,7 @@ export function EntryLine() {
                         </p>
                       )}
                     </article>
-                  </li>
+                  </motion.li>
                 )
               })}
             </ol>
