@@ -62,8 +62,8 @@ console.log("\nH4 · Die echte Erklaerung, gegen das echte Verhalten")
 const text = H.datenschutzText(D.dictionary.de.legal)
 p(text.length > 500, "die Erklaerung wird gelesen", `${text.length} Zeichen`)
 p(/Name, Betrieb, E-Mail, Telefon/.test(text), "sie nennt die heutigen Kategorien")
-p(!H.kampagneSpeicherbar(text), "und die Kampagnenherkunft ist NICHT darunter",
-  "deshalb faellt sie heute an der Tuer")
+p(H.kampagneSpeicherbar(text), "und die Kampagnenherkunft ist darunter",
+  "seit dem Satz im Kontaktformular-Abschnitt gehen die Felder durch")
 
 console.log("\nV1 · Eine Liste, aus der nichts folgt, ist Freitext mit Kaesten")
 p(V.lehrenVollstaendig(), "jeder Grund der Auswahlliste traegt eine Lehre")
