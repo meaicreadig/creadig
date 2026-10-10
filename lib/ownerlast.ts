@@ -57,6 +57,7 @@ export const ABNEHMBAR: readonly AttentionRank[] = [
   "ueberfaellig",
   "heute-faellig",
   "neue-anfrage",
+  "kunde-gefaehrdet",
   "schritt-ohne-termin",
   "ohne-schritt",
   "beziehung-faellig",
