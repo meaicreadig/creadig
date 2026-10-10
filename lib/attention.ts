@@ -1,6 +1,7 @@
 import { collect } from "@/lib/material-status"
 import type { VertriebStore } from "@/lib/vertrieb"
 import { geschaeftsTag } from "@/lib/geschaeftszeit"
+import { ladeKundenLage } from "@/lib/kundenkarte"
 
 /**
  * Was heute Aufmerksamkeit braucht — aus allen Quellen, die es wirklich gibt.
@@ -61,6 +62,7 @@ export const ATTENTION_RANKS = [
   "ueberfaellig",
   "heute-faellig",
   "neue-anfrage",
+  "kunde-gefaehrdet",
   "schritt-ohne-termin",
   "ohne-schritt",
   "beziehung-faellig",
@@ -74,6 +76,7 @@ export const ATTENTION_LABELS: Record<AttentionRank, string> = {
   ueberfaellig: "Überfällig",
   "heute-faellig": "Heute fällig",
   "neue-anfrage": "Neue Anfrage",
+  "kunde-gefaehrdet": "Kunde gefährdet",
   "schritt-ohne-termin": "Schritt ohne Termin",
   "ohne-schritt": "Ohne nächsten Schritt",
   "beziehung-faellig": "Kontaktpflege fällig",
@@ -93,6 +96,8 @@ export type AttentionItem = {
   detail: string | null
   /** Nur bei neuen Anfragen: woher und unter welcher Nummer. */
   anfrage?: { quelle: string; referenz: string }
+  /** Nur bei gefährdeten Kunden: warum. Den Satz baut die Oberfläche in ihrer Sprache. */
+  kunde?: { tageOhneKontakt: number | null; offeneRechnungen: number }
   /** Wohin der Klick führt. Auf den Datensatz, nicht auf eine Liste. */
   href: string
   /**
@@ -149,6 +154,8 @@ export type AttentionBoard = {
    */
   salesMeasured: boolean
   kennzahlen: Kennzahlen | null
+  /** Kunden ohne einen belegten Kontakt. `null` = nicht gemessen. */
+  kundenOhneBeleg: number | null
   /** Material ausserhalb von Betrieb und Entscheidungen — als Zahl. */
   materialRest: number
   materialOpen: number
@@ -332,6 +339,29 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
     }
   }
 
+  /* ── 4c · Gefährdete Kunden ───────────────────────────────────────────────
+     Ein Kunde, der still wird oder nicht zahlt, meldet sich nicht von selbst.
+     Der Klick führt auf seine Kundenkarte, wo der nächste Schritt steht. */
+  let kundenOhneBeleg: number | null = null
+  if (store) {
+    const lage = await ladeKundenLage()
+    if (lage) {
+      kundenOhneBeleg = lage.ohneBeleg
+      for (const k of lage.gefaehrdet) {
+        items.push({
+          id: `kunde:${k.id}`,
+          rank: "kunde-gefaehrdet",
+          title: k.name,
+          detail: null,
+          kunde: { tageOhneKontakt: k.tageOhneKontakt, offeneRechnungen: k.offeneRechnungen },
+          href: `/admin/kunden/${k.id}`,
+          gewicht: k.gesundheit === "rot" ? 0 : 1,
+          due: null,
+        })
+      }
+    }
+  }
+
   /* ── 7 · Entscheidungen des Eigentümers ─────────────────────────────────
      Sie stehen im Materialstand, weil sie Arbeit genauso zuverlässig
      blockieren wie ein fehlendes Bild — nur fällt eine offene Entscheidung
@@ -436,6 +466,7 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
     counts,
     salesMeasured,
     kennzahlen,
+    kundenOhneBeleg,
     materialRest,
     materialOpen: open.length,
     materialDone: done.length,

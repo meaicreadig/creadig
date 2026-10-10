@@ -46,6 +46,7 @@ const OPERATIV: readonly AttentionRank[] = [
   "ueberfaellig",
   "heute-faellig",
   "neue-anfrage",
+  "kunde-gefaehrdet",
   "schritt-ohne-termin",
   "ohne-schritt",
   "beziehung-faellig",
@@ -56,6 +57,7 @@ const SCHWERE: Record<AttentionRank, "neutral" | "attention" | "critical"> = {
   ueberfaellig: "critical",
   "heute-faellig": "attention",
   "neue-anfrage": "attention",
+  "kunde-gefaehrdet": "attention",
   "schritt-ohne-termin": "neutral",
   "ohne-schritt": "neutral",
   "beziehung-faellig": "neutral",
@@ -99,7 +101,7 @@ export default async function Uebersicht() {
   const entscheidungen = board.items.filter((i) => i.rank === "entscheidung")
   const k = board.kennzahlen
   const gezaehlt = k ? k.ueberfaellig + k.heuteFaellig + k.neueAnfragen + k.ohneSchritt : 0
-  const abgeschnitten = k !== null && gezaehlt > operativ.filter((i) => i.rank !== "beziehung-faellig" && i.rank !== "schritt-ohne-termin").length
+  const abgeschnitten = k !== null && gezaehlt > operativ.filter((i) => i.rank !== "beziehung-faellig" && i.rank !== "schritt-ohne-termin" && i.rank !== "kunde-gefaehrdet").length
 
   const stand = new Date().toLocaleString(intl, {
     timeZone: GESCHAEFTS_ZEITZONE,
@@ -206,6 +208,14 @@ export default async function Uebersicht() {
               {abgeschnitten ? <p className="type-small text-muted-foreground mt-3">{t.uebersicht.weitere(gezaehlt)}</p> : null}
             </>
           ) : null}
+          {board.kundenOhneBeleg ? (
+            <p className="type-small text-muted-foreground mt-4 text-pretty" data-hinweis="kunden-ohne-beleg">
+              {t.uebersicht.kundenOhneBeleg(board.kundenOhneBeleg)}{" "}
+              <Link href="/admin/kunden" className="text-gold-text underline underline-offset-4">
+                {t.uebersicht.zuDenKunden}
+              </Link>
+            </p>
+          ) : null}
         </section>
 
         <aside className="flex min-w-0 flex-col gap-10">
@@ -279,6 +289,10 @@ function Punktliste({
                 <span className="text-subhead block text-sm group-hover:underline group-hover:underline-offset-4">{ohneKennung(item.title)}</span>
                 {item.anfrage ? (
                   <span className="type-small text-muted-foreground mt-1 block">{t.uebersicht.anfrageMeta(item.anfrage.quelle, item.anfrage.referenz)}</span>
+                ) : item.kunde ? (
+                  <span className="type-small text-muted-foreground mt-1 block">
+                    {t.uebersicht.kundeMeta(item.kunde.tageOhneKontakt, item.kunde.offeneRechnungen)}
+                  </span>
                 ) : item.detail ? (
                   <span className="type-small text-muted-foreground mt-1 block text-pretty">{item.detail}</span>
                 ) : null}

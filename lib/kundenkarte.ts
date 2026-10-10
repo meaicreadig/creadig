@@ -34,6 +34,76 @@ export function gesundheitAus(tage: number | null, offeneRechnungen: number | nu
   return "gruen"
 }
 
+export type GefaehrdeterKunde = {
+  id: string
+  name: string
+  gesundheit: "gelb" | "rot"
+  tageOhneKontakt: number | null
+  offeneRechnungen: number
+}
+
+export type KundenLage = {
+  /** Kunden mit Risiko: lange ohne Kontakt (rot) oder offene Rechnung. */
+  gefaehrdet: GefaehrdeterKunde[]
+  /** Kunden ohne einen einzigen belegten Kontakt — ihre Gesundheit ist nicht messbar. */
+  ohneBeleg: number
+}
+
+/**
+ * Die Lage aller aktiven Kunden in EINER Abfrage, für „Heute".
+ *
+ * Gelb allein (21–44 Tage) kommt nicht auf die Liste — das ist Kontaktpflege,
+ * kein Risiko. Auf die Liste kommt, was Geld oder den Kunden kostet: rot oder
+ * eine offene Rechnung. `null` heisst „nicht gemessen", nie „alles gut".
+ */
+export async function ladeKundenLage(): Promise<KundenLage | null> {
+  const q = neonAbfrage()
+  if (!q) return null
+  try {
+    const rows = await q(
+      `SELECT org.id, org.name,
+              greatest(
+                (SELECT max(a.created_at) FROM activities a
+                  WHERE a.subject_type = 'organisation' AND a.subject_id = org.id),
+                (SELECT max(o.last_contact_at) FROM opportunities o
+                  WHERE o.organisation_id = org.id AND o.excluded_reason IS NULL)
+              ) AS letzter,
+              (SELECT count(*) FROM invoices i
+                WHERE i.state = 'gestellt'
+                  AND i.opportunity_id IN (SELECT o.id FROM opportunities o
+                                            WHERE o.organisation_id = org.id AND o.excluded_reason IS NULL)
+                  AND NOT EXISTS (SELECT 1 FROM payments p WHERE p.invoice_id = i.id)) AS offen
+         FROM organisations org
+        WHERE org.lifecycle = 'kunde' AND org.excluded_reason IS NULL`,
+      [],
+    )
+    const gefaehrdet: GefaehrdeterKunde[] = []
+    let ohneBeleg = 0
+    for (const r of rows) {
+      const offen = Number(r.offen ?? 0)
+      const tage = r.letzter ? Math.floor((Date.now() - new Date(String(r.letzter)).getTime()) / 86_400_000) : null
+      if (tage === null && offen === 0) {
+        ohneBeleg++
+        continue
+      }
+      const stufe = gesundheitAus(tage, offen)
+      if (stufe === "rot" || offen > 0) {
+        gefaehrdet.push({
+          id: String(r.id),
+          name: String(r.name),
+          gesundheit: stufe === "rot" ? "rot" : "gelb",
+          tageOhneKontakt: tage,
+          offeneRechnungen: offen,
+        })
+      }
+    }
+    gefaehrdet.sort((a, b) => (a.gesundheit === b.gesundheit ? (b.tageOhneKontakt ?? 0) - (a.tageOhneKontakt ?? 0) : a.gesundheit === "rot" ? -1 : 1))
+    return { gefaehrdet, ohneBeleg }
+  } catch {
+    return null
+  }
+}
+
 export async function ladeKundenkartenKopf(organisationId: string): Promise<KundenkartenKopf> {
   const q = neonAbfrage()
   const leer: KundenkartenKopf = {

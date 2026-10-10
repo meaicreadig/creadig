@@ -83,6 +83,11 @@ export const tr: AdminTexte = {
     zuDenAnfragen: "Taleplere git",
     weitere: (n) => `Her türden yalnızca ilk kayıtlar listelenir — toplam ${n}. Tam listeler göstergelerden açılır.`,
     anfrageMeta: (quelle, referenz) => `${quelle} üzerinden · ${referenz}`,
+    kundeMeta: (tage, offen) =>
+      [tage === null ? null : `${tage} gündür temas yok`, offen > 0 ? `${offen} açık fatura` : null].filter(Boolean).join(" · "),
+    kundenOhneBeleg: (n) =>
+      `${n} müşteri için kayıtlı hiçbir temas yok — memnun olup olmadıkları ölçülemiyor. Müşteri kartındaki kronolojiye bir kayıt yeterli.`,
+    zuDenKunden: "Müşterilere git",
     faelligAm: (datum) => `vade ${datum}`,
     systemTitel: "Sistem durumu",
     systemOk: "Arızalı bir işletim noktası yok.",
@@ -108,6 +113,7 @@ export const tr: AdminTexte = {
     ueberfaellig: "Gecikmiş",
     "heute-faellig": "Bugün vadeli",
     "neue-anfrage": "Yeni talep",
+    "kunde-gefaehrdet": "Müşteri risk altında",
     "schritt-ohne-termin": "Tarihsiz adım",
     "ohne-schritt": "Sonraki adım yok",
     "beziehung-faellig": "İlişki takibi zamanı",

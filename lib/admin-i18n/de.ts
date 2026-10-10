@@ -84,6 +84,13 @@ export const de = {
     zuDenAnfragen: "Zu den Anfragen",
     weitere: (n: number) => `Nur die ersten Einträge je Art sind aufgeführt — insgesamt ${n}. Vollständige Listen über die Kennzahlen.`,
     anfrageMeta: (quelle: string, referenz: string) => `über ${quelle} · ${referenz}`,
+    kundeMeta: (tage: number | null, offen: number) =>
+      [tage === null ? null : `seit ${tage} Tagen kein Kontakt`, offen > 0 ? `${offen} offene Rechnung${offen === 1 ? "" : "en"}` : null]
+        .filter(Boolean)
+        .join(" · "),
+    kundenOhneBeleg: (n: number) =>
+      `${n} Kunde${n === 1 ? "" : "n"} ohne belegten Kontakt — ob sie zufrieden sind, ist nicht messbar. Ein Eintrag in der Chronik der Kundenkarte genügt.`,
+    zuDenKunden: "Zu den Kunden",
     faelligAm: (datum: string) => `fällig ${datum}`,
     systemTitel: "Systemzustand",
     systemOk: "Kein Betriebspunkt ist gestört.",
@@ -109,6 +116,7 @@ export const de = {
     ueberfaellig: "Überfällig",
     "heute-faellig": "Heute fällig",
     "neue-anfrage": "Neue Anfrage",
+    "kunde-gefaehrdet": "Kunde gefährdet",
     "schritt-ohne-termin": "Schritt ohne Termin",
     "ohne-schritt": "Ohne nächsten Schritt",
     "beziehung-faellig": "Kontaktpflege fällig",
