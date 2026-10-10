@@ -250,7 +250,7 @@ export function SystemePageBody() {
         </div>
       </section>
 
-      <ClosingCta />
+      <ClosingCta variant="systems" />
     </main>
   )
 }

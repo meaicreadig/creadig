@@ -59,7 +59,7 @@ export function BetriebscheckRoute({ locale }: { locale: Locale }) {
       />
       <main className="relative pt-32 md:pt-40">
         <Betriebscheck />
-        <ClosingCta />
+        <ClosingCta variant="check" />
       </main>
     </>
   )

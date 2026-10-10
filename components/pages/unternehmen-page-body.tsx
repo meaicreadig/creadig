@@ -93,7 +93,7 @@ export function UnternehmenPageBody({ location }: { location: React.ReactNode })
         Eintraege sind unbelegt und deshalb entfernt (V2-5 · §9.9) — die
         offene Frage steht im Audit-Backlog, nicht auf der Seite.
       */}
-      <ClosingCta />
+      <ClosingCta variant="company" />
     </main>
   )
 }

@@ -223,7 +223,7 @@ export function ProduktePageBody() {
         </section>
       )}
 
-      <ClosingCta />
+      <ClosingCta variant="products" />
     </main>
   );
 }
