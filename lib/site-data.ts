@@ -862,6 +862,32 @@ export const clientWorks: Work[] = [
     ],
     approvedSentence: null,
   },
+  {
+    slug: "allrein-ofra",
+    sector: { de: "Reinigungsmittel · Verpackung", tr: "Temizlik ürünleri · ambalaj", en: "Cleaning products · packaging", ar: "منتجات تنظيف · تغليف" },
+    year: "2021–2022",
+    name: "Allrein-Ofra GmbH",
+    what: {
+      de: "Hersteller von Reinigungsmitteln — Etiketten und Produkt-Mockups für das Sortiment, dazu die Produktkataloge 2021 und 2022.",
+      tr: "Temizlik ürünleri üreticisi — ürün yelpazesi için etiketler ve ürün mockup'ları, ayrıca 2021 ve 2022 ürün katalogları.",
+      en: "Cleaning-product manufacturer — labels and product mockups for the range, plus the 2021 and 2022 product catalogues.",
+      ar: "مُصنِّع منتجات تنظيف — ملصقات ونماذج منتجات للتشكيلة، إضافةً إلى كتالوجَي المنتجات 2021 و2022.",
+    },
+    built: {
+      de: "Etikettengestaltung, Produkt-Mockups, Katalog 2021 und 2022, Druckvorstufe.",
+      tr: "Etiket tasarımı, ürün mockup'ları, 2021 ve 2022 katalogları, baskı öncesi hazırlık.",
+      en: "Label design, product mockups, 2021 and 2022 catalogues, prepress.",
+      ar: "تصميم الملصقات، نماذج المنتجات، كتالوجا 2021 و2022، ما قبل الطباعة.",
+    },
+    outcome: { de: "Kundenwerk · im Handel", tr: "Müşteri işi · satışta", en: "Client work · on sale", ar: "عمل لعميل · في السوق" },
+    kind: "Kundenwerk",
+    region: "DE",
+    image: "/works/allrein-ofra.png",
+    imageProof: "mockup",
+    mark: "AO",
+    releases: [],
+    approvedSentence: null,
+  },
   /*
    * [OWNER-BESTAETIGUNG AUSSTEHEND] — Rumi's Maison
    *
