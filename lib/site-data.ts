@@ -781,7 +781,15 @@ export const clientWorks: Work[] = [
     imageProof: null,
     mark: "vc",
     href: "https://www.vegancatering.ch",
-    releases: [],
+    releases: [
+      {
+        by: { name: "Ansprechperson des Kunden (dem Owner persönlich bekannt)", role: "Geschäftsführung", company: "vegancatering.ch" },
+        form: "schriftliche-nachricht",
+        at: "2026-10-11",
+        scopes: ["name", "logo", "fallstudie"],
+        reference: "Schriftliche Nachricht an den Owner, eigenes Postfach/Messenger, Bestätigung im Chat am 11.10.2026",
+      },
+    ],
     approvedSentence: null,
   },
   {
@@ -809,7 +817,15 @@ export const clientWorks: Work[] = [
     mark: "en",
     href: "https://ennur.org",
     live: true,
-    releases: [],
+    releases: [
+      {
+        by: { name: "Ansprechperson der Stiftung (dem Owner persönlich bekannt)", role: "Vorstand / Projektverantwortung", company: "ennur.org" },
+        form: "schriftliche-nachricht",
+        at: "2026-10-11",
+        scopes: ["name", "logo", "fallstudie"],
+        reference: "Schriftliche Nachricht an den Owner, eigenes Postfach/Messenger, Bestätigung im Chat am 11.10.2026",
+      },
+    ],
     approvedSentence: null,
   },
   {
@@ -835,7 +851,15 @@ export const clientWorks: Work[] = [
     image: "/works/an-automobile.png",
     imageProof: "mockup",
     mark: "AN",
-    releases: [],
+    releases: [
+      {
+        by: { name: "Inhaber (dem Owner persönlich bekannt)", role: "Inhaber", company: "A+N Automobile" },
+        form: "schriftliche-nachricht",
+        at: "2026-10-11",
+        scopes: ["name", "logo", "fallstudie"],
+        reference: "Schriftliche Nachricht an den Owner, eigenes Postfach/Messenger, Bestätigung im Chat am 11.10.2026",
+      },
+    ],
     approvedSentence: null,
   },
   /*
@@ -1665,7 +1689,7 @@ export const opsSteps = [
  *
  * `packages` trug den Preis als fertige Zeichenkette: `price: "€2.400"`.
  * Eine Zeichenkette kennt keine Sprache. Auf der englischen Seite stand
- * damit in der Kachel „€2.400" und in der FAQ „€2,400" — dieselbe Zahl,
+ * damit in der Kachel „€2.400" und in der FAQ „���2,400" — dieselbe Zahl,
  * zwei Schreibweisen, und die erste liest ein englischer Leser als ZWEI
  * EURO VIERZIG. Ein Preisfehler um den Faktor tausend, verursacht von
  * einem Punkt.
