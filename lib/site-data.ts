@@ -1295,8 +1295,9 @@ export const furtherProjects: {
  */
 export const navLinks = [
   { href: "/leistungen", labelKey: "leistungen" as const },
-  { href: "/produkte", labelKey: "produkte" as const },
+  { href: "/systeme", labelKey: "systeme" as const },
   { href: "/arbeiten", labelKey: "arbeiten" as const },
+  { href: "/produkte", labelKey: "produkte" as const },
   { href: "/unternehmen", labelKey: "unternehmen" as const },
   { href: "/insights", labelKey: "insights" as const },
 ]

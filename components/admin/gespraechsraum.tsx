@@ -41,6 +41,13 @@ function uhr(sek: number): string {
   return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`
 }
 
+function inTagen(tage: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() + tage)
+  const p = (n: number) => String(n).padStart(2, "0")
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+}
+
 function kalenderZeit(datum: string, zeit: string, plusMin = 0): string {
   const [y, mo, d] = datum.split("-").map(Number)
   const [h, mi] = zeit.split(":").map(Number)
@@ -199,6 +206,14 @@ export function Gespraechsraum({
     })
   }
 
+  const vorlageSetzen = (label: string, tage: number) =>
+    setE((v) => ({ ...v, folge: label, folgeAm: inTagen(tage) }))
+
+  const mitschrift = Object.values(e.abschnitte).join(" ").toLowerCase()
+  const erkannt = e.folge.trim()
+    ? null
+    : (t.vorlagen.find(([, , muster]) => new RegExp(muster, "i").test(mitschrift)) ?? null)
+
   const hatInhalt = Object.values(e.abschnitte).some((s) => s?.trim()) || e.folge.trim().length > 0
   const firma = kontakt.organisation ? ` · ${kontakt.organisation}` : ""
   const status = laeuft ? t.live : e.sek > 0 ? t.pausiert : t.bereit
@@ -277,7 +292,7 @@ export function Gespraechsraum({
   return (
     <section
       aria-label={t.raumLabel}
-      className="border-line bg-surface/40 grid overflow-hidden rounded-xl border xl:grid-cols-[minmax(0,1fr)_22rem]"
+      className="border-line bg-surface/40 grid rounded-xl border xl:grid-cols-[minmax(0,1fr)_24rem]"
     >
       {/* Dokument */}
       <div className="flex min-w-0 flex-col gap-8 p-6 sm:p-10">
@@ -463,20 +478,53 @@ export function Gespraechsraum({
       {/* Aktivität */}
       <aside
         aria-label={t.aktivitaet}
-        className="border-line bg-background/60 flex min-h-[32rem] flex-col border-t xl:border-t-0 xl:border-l"
+        className="border-line bg-background/60 flex flex-col rounded-b-xl border-t xl:sticky xl:top-6 xl:max-h-[calc(100dvh-3rem)] xl:self-start xl:rounded-r-xl xl:rounded-bl-none xl:border-t-0 xl:border-l"
       >
-        <div className="border-line flex items-center justify-between border-b px-5 py-4">
-          <h2 className="font-display text-base font-semibold">{t.aktivitaet}</h2>
-          <History aria-hidden="true" className="text-muted-foreground size-4" />
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-5 py-5">{abschlussKarte ?? verlauf}</div>
-
         {!gespeichert && (
-          <div className="border-line bg-surface flex flex-col gap-3 border-t p-4">
-            <label htmlFor="g-folge" className="text-muted-foreground text-xs">
-              {t.folgeTitel}
-            </label>
+          <div className="border-line bg-surface flex flex-col gap-3 border-b p-5 xl:rounded-tr-xl">
+            <div className="flex items-center justify-between gap-3">
+              <label htmlFor="g-folge" className="font-display text-base font-semibold">
+                {t.folgeTitel}
+              </label>
+              <span className="text-muted-foreground font-mono text-xs tabular-nums">{uhr(e.sek)}</span>
+            </div>
+
+            {erkannt && (
+              <div className="border-gold/40 bg-gold/10 flex items-center justify-between gap-3 rounded-md border px-3 py-2">
+                <span className="flex min-w-0 flex-col">
+                  <span className="text-gold-text font-mono text-[10px] tracking-widest uppercase">{t.erkannt}</span>
+                  <span className="truncate text-sm">{erkannt[0]}</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => vorlageSetzen(erkannt[0], erkannt[1])}
+                  className="bg-gold text-primary-foreground hover:bg-gold-deep shrink-0 rounded px-2.5 py-1 text-xs font-medium transition-colors"
+                >
+                  {t.uebernehmen}
+                </button>
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label={t.schnellwahl}>
+              {t.vorlagen.map(([label, tage]) => {
+                const an = e.folge === label && e.folgeAm === inTagen(tage)
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    aria-pressed={an}
+                    onClick={() => vorlageSetzen(label, tage)}
+                    className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${
+                      an
+                        ? "border-gold bg-gold/15 text-foreground"
+                        : "border-line text-muted-foreground hover:border-line-strong hover:text-foreground"
+                    }`}
+                  >
+                    {label} <span className="font-mono text-[10px] opacity-70">+{tage}d</span>
+                  </button>
+                )
+              })}
+            </div>
             <input
               id="g-folge"
               value={e.folge}
@@ -519,10 +567,18 @@ export function Gespraechsraum({
                 {fehler}
               </p>
             ) : (
-              <p className="text-muted-foreground text-xs leading-relaxed">{t.entwurfHinweis}</p>
+              <p className="text-muted-foreground text-xs leading-relaxed">
+                {e.folgeAm ? t.inUebersicht : t.entwurfHinweis}
+              </p>
             )}
           </div>
         )}
+
+        <div className="border-line flex items-center justify-between border-b px-5 py-4">
+          <h2 className="font-display text-base font-semibold">{t.aktivitaet}</h2>
+          <History aria-hidden="true" className="text-muted-foreground size-4" />
+        </div>
+        <div className="min-h-48 flex-1 overflow-y-auto px-5 py-5">{abschlussKarte ?? verlauf}</div>
       </aside>
     </section>
   )

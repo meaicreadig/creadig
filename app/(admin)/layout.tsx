@@ -66,7 +66,7 @@ export default async function AdminRootLayout({ children }: { children: React.Re
   return (
     <html
       lang={sprache}
-      className={`dark bg-background ${manrope.variable} ${mplusRounded.variable} ${jetbrains.variable}`}
+      className={`dark admin-marke bg-background ${manrope.variable} ${mplusRounded.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>{children}</body>
