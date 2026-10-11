@@ -823,6 +823,15 @@ export const SCHEMA: string[] = [
      expires_at timestamptz,
      updated_at timestamptz NOT NULL DEFAULT now()
    )`,
+  /* 025 · Admin-Konten (E-Mail + Passwort). Siehe `scripts/migrations/025-admin-konten.sql`. */
+  `CREATE TABLE IF NOT EXISTS admin_users (
+     email text PRIMARY KEY,
+     name text,
+     rolle text NOT NULL,
+     password_hash text NOT NULL,
+     created_at timestamptz NOT NULL DEFAULT now(),
+     last_login_at timestamptz
+   )`,
 ]
 
 /**
@@ -1020,7 +1029,7 @@ async function once(sql: Sql, key: string, step: () => Promise<void>): Promise<v
  * NIEMALS ÜBERSCHREIBEN
  * Jedes Feld geht über `coalesce(vorhanden, neu)`: Was schon dasteht, bleibt
  * stehen. Trifft der Import auf eine Organisation, die bereits aus einer
- * Anfrage entstanden ist, ergänzt er sie und übernimmt sie — er ersetzt sie
+ * Anfrage entstanden ist, erg��nzt er sie und übernimmt sie — er ersetzt sie
  * nicht. Beim Namen ist das entscheidend: Zwei Zeilen für denselben Betrieb
  * wären genau die Dublette, die dieser Import verhindern soll.
  *

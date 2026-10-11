@@ -4,7 +4,6 @@ import {
   SESSION_SECONDS,
   adminConfigured,
   issueSession,
-  rolleFuerPasswort,
   sameOrigin,
   sessionCookieOptions,
   withAdminHeaders,
@@ -12,6 +11,7 @@ import {
 import { alleWiderrufen, pruefeZugang, widerrufSpeicher, widerrufen } from "@/lib/admin-widerruf"
 import { bucketKey, callerAddress } from "@/lib/lead-guard"
 import { durableWithinLimit } from "@/lib/rate-limit"
+import { anmeldenMitEmail } from "@/lib/admin-konten"
 
 /**
  * MP-G · Anmelden und Abmelden am Control Center.
@@ -51,38 +51,31 @@ async function anmelden(request: Request): Promise<NextResponse> {
     return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 })
   }
 
-  let payload: { password?: unknown }
+  let payload: { email?: unknown; password?: unknown }
   try {
-    payload = (await request.json()) as { password?: unknown }
+    payload = (await request.json()) as { email?: unknown; password?: unknown }
   } catch {
     return NextResponse.json({ ok: false, error: "bad_request" }, { status: 400 })
   }
 
-  /*
-   * GATE 32 — WELCHE Rolle, nicht nur OB.
-   *
-   * `rolleFuerPasswort()` prueft jede gesetzte Rollen-Variable zeitkonstant
-   * und gibt die Rolle zurueck. Ist keine gesetzt oder passt keine, ist die
-   * Antwort dieselbe wie vorher: eine einzige, fuer alles.
-   *
-   * Eine Antwort für alles: falsches Passwort, leeres Feld, falscher Typ,
-   * unbekannte Rolle. Wer unterscheidet, sagt einem Angreifer, wie weit er
-   * ist — und mit Rollen waere die Auskunft doppelt wertvoll: Sie verriete
-   * auch, WELCHES Passwort er fast getroffen hat.
-   */
-  const rolle = rolleFuerPasswort(payload.password)
-  if (!rolle) {
-    return NextResponse.json({ ok: false, error: "invalid" }, { status: 401 })
-  }
-
-  const session = await issueSession(rolle)
-  if (!session) {
+  /* E-Mail + Passwort (lib/admin-konten.ts). Eine Antwort für alle Fehlschläge. */
+  let kontoRolle: Awaited<ReturnType<typeof anmeldenMitEmail>> = null
+  try {
+    kontoRolle = await anmeldenMitEmail(payload.email, payload.password)
+  } catch (error) {
+    console.warn("[admin] Konto-Anmeldung gestört:", error instanceof Error ? error.message : "unbekannt")
     return NextResponse.json({ ok: false, error: "unavailable" }, { status: 503 })
   }
-
-  const response = NextResponse.json({ ok: true })
-  response.cookies.set(ADMIN_COOKIE, session, sessionCookieOptions(SESSION_SECONDS))
-  return response
+  if (!kontoRolle) {
+    return NextResponse.json({ ok: false, error: "invalid" }, { status: 401 })
+  }
+  const kontoSession = await issueSession(kontoRolle)
+  if (!kontoSession) {
+    return NextResponse.json({ ok: false, error: "unavailable" }, { status: 503 })
+  }
+  const kontoResponse = NextResponse.json({ ok: true })
+  kontoResponse.cookies.set(ADMIN_COOKIE, kontoSession, sessionCookieOptions(SESSION_SECONDS))
+  return kontoResponse
 }
 
 /*

@@ -47,7 +47,9 @@ export const de = {
   },
   login: {
     titel: "Anmeldung",
+    email: "E-Mail",
     passwort: "Passwort",
+    ersteAnmeldung: "Erste Anmeldung: Ihre E-Mail und das bisherige Admin-Passwort — daraus entsteht Ihr Konto.",
     anmelden: "Anmelden",
     pruefen: "Wird geprüft …",
     weiter: "Angemeldet — Übersicht wird geladen …",

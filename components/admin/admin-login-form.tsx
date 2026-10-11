@@ -38,6 +38,7 @@ type Fehler = "ungueltig" | "zu-viele" | "nicht-eingerichtet" | "zeitueberschrei
 
 export function AdminLoginForm({ texte }: { texte: AdminTexte["login"] }) {
   const router = useRouter()
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<Fehler | null>(null)
   const [phase, setPhase] = useState<Phase>("bereit")
@@ -87,7 +88,7 @@ export function AdminLoginForm({ texte }: { texte: AdminTexte["login"] }) {
           response = await fetch("/api/admin/session", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ password }),
+            body: JSON.stringify({ email, password }),
             signal: abbruch.signal,
           })
         } catch (e) {
@@ -118,13 +119,29 @@ export function AdminLoginForm({ texte }: { texte: AdminTexte["login"] }) {
         setError(fehler ?? "stoerung")
       }}
     >
+      <AdminField label={texte.email} htmlFor="email">
+        <AdminInput
+          id="email"
+          type="email"
+          name="email"
+          autoComplete="username"
+          autoFocus
+          required
+          value={email}
+          onChange={(event) => {
+            setEmail(event.target.value)
+            setError(null)
+          }}
+          aria-invalid={error ? true : undefined}
+        />
+      </AdminField>
+
       <AdminField label={texte.passwort} htmlFor="password">
         <AdminInput
           id="password"
           type="password"
           name="password"
           autoComplete="current-password"
-          autoFocus
           required
           value={password}
           onChange={(event) => {

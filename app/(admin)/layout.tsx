@@ -56,7 +56,7 @@ export default async function AdminRootLayout({ children }: { children: React.Re
   return (
     <html
       lang={sprache}
-      className={`${geist.variable} ${geistMono.variable}`}
+      className={`dark bg-background ${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>{children}</body>
