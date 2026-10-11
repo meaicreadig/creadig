@@ -33,6 +33,7 @@ export const tr: AdminTexte = {
     vertrieb: { label: "Satış", hint: "Fırsatlar, süreç, araştırma, kayıp" },
     nachweise: { label: "Kanıtlar ve onaylar", hint: "Sırada kanıtlanabilecek olan" },
     verbindungen: { label: "Bağlantılar", hint: "Giriş ve çıkış yolları, dürüstçe" },
+    gespraech: { label: "Görüşme odası", hint: "Ara, not al, takip randevusu" },
     automationen: { label: "Otomasyonlar", hint: "Kendiliğinden çalışanlar — ve asla çalışmayacaklar" },
     system: { label: "Kurulum", hint: "Materyal, erişimler, tanılama" },
   },
@@ -615,7 +616,7 @@ export const tr: AdminTexte = {
     },
     tage: (n) => (n === 1 ? "1 gün" : `${n} gün`),
     mitPerson: "Kişi",
-    ohnePerson: "kişisiz",
+    ohnePerson: "ki��isiz",
     signal: (n) => (n === 1 ? "1 sinyal" : `${n} sinyal`),
     mehrfach: (n) => `${n} kez doğrulandı`,
     fuss: "Araştırma satış değildir. Burada satış fırsatı, kişi kaydı veya pazarlama izni oluşmaz — yalnızca bir görüşmenin değip değmeyeceğine dair gerekçeli bir yargı.",
@@ -1076,7 +1077,7 @@ export const tr: AdminTexte = {
       },
       pruefung: {
         label: "Bir denetim raporu var",
-        warum: "Bulgular olmadan her rakam tahmindir. Görülmemiş bir işe kimse ciddi bir fiyat vermez.",
+        warum: "Bulgular olmadan her rakam tahmindir. Gör��lmemiş bir işe kimse ciddi bir fiyat vermez.",
       },
       zugang: {
         label: "Koda erişim netleşti",

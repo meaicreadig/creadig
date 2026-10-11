@@ -20,6 +20,7 @@ import { darfBetreten } from "@/lib/rollen"
  */
 const NAV = [
   { key: "uebersicht", href: "/admin", gruppe: "cockpit" },
+  { key: "gespraech", href: "/admin/gespraech", gruppe: "cockpit" },
   { key: "anfragen", href: "/admin/vertrieb/anfragen", gruppe: "vertrieb" },
   { key: "vertrieb", href: "/admin/vertrieb", gruppe: "vertrieb" },
   { key: "kunden", href: "/admin/kunden", gruppe: "kunden" },
