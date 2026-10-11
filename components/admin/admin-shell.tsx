@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import Link from "next/link"
+import { Settings } from "lucide-react"
 import { UngespeichertWache } from "@/components/admin/ungespeichert-wache"
 import { Logo } from "@/components/brand/logo"
 import { AdminLogout } from "@/components/admin/admin-logout"
@@ -29,10 +30,14 @@ const NAV = [
   { key: "nachweise", href: "/admin/beleg", gruppe: "kunden" },
   { key: "marketing", href: "/admin/marketing", gruppe: "marketing" },
   { key: "veroeffentlichungen", href: "/admin/veroeffentlichungen", gruppe: "marketing" },
-  { key: "verbindungen", href: "/admin/verbindungen", gruppe: "system" },
-  { key: "automationen", href: "/admin/automationen", gruppe: "system" },
-  { key: "system", href: "/admin/material", gruppe: "system" },
 ] as const
+
+/*
+ * Verbindungen, Automationen und Einrichtung sind Technik, die im Hintergrund
+ * läuft — sie stehen nicht im Menü, sondern hinter dem Zahnrad unten.
+ * Gestörter Betrieb meldet sich von selbst auf der Übersicht.
+ */
+const SYSTEM_HREF = "/admin/material"
 
 /**
  * ADM-01 — die Hülle jeder Admin-Seite.
@@ -58,6 +63,7 @@ export async function AdminShell({
   const { rolle } = await verifySession((await cookies()).get(ADMIN_COOKIE)?.value)
   const items: NavItem[] = NAV.filter((n) => darfBetreten(rolle, n.href)).map((n) => ({
     href: n.href,
+    icon: n.key,
     label: t.nav[n.key].label,
     hint: t.nav[n.key].hint,
     gruppe: t.navGruppen[n.gruppe],
@@ -109,7 +115,20 @@ export async function AdminShell({
           <AdminNav items={items} oeffnen={t.shell.menueOeffnen} schliessen={t.shell.menueSchliessen} />
 
           <div className="border-line mt-auto hidden flex-col gap-3 border-t pt-5 lg:flex">
-            {umschalter}
+            <div className="flex items-center justify-between gap-3">
+              {umschalter}
+              {darfBetreten(rolle, SYSTEM_HREF) && (
+                <Link
+                  href={SYSTEM_HREF}
+                  prefetch={false}
+                  title={t.nav.system.label}
+                  className="text-muted-foreground hover:text-gold-text hover:bg-muted inline-flex size-9 items-center justify-center rounded-md transition-colors"
+                >
+                  <Settings aria-hidden="true" className="size-4" />
+                  <span className="sr-only">{t.nav.system.label}</span>
+                </Link>
+              )}
+            </div>
             <AdminLogout label={t.shell.abmelden} laeuft={t.shell.abmeldenLaeuft} />
           </div>
         </nav>

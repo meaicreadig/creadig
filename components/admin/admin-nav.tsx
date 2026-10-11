@@ -3,9 +3,32 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Menu, X } from "lucide-react"
+import {
+  BadgeCheck,
+  Building2,
+  Inbox,
+  LayoutDashboard,
+  Megaphone,
+  Menu,
+  MessagesSquare,
+  Send,
+  TrendingUp,
+  X,
+  type LucideIcon,
+} from "lucide-react"
 
-export type NavItem = { href: string; label: string; hint: string; gruppe: string }
+export type NavItem = { href: string; label: string; hint: string; gruppe: string; icon?: string }
+
+const ICONS: Record<string, LucideIcon> = {
+  uebersicht: LayoutDashboard,
+  gespraech: MessagesSquare,
+  anfragen: Inbox,
+  vertrieb: TrendingUp,
+  kunden: Building2,
+  nachweise: BadgeCheck,
+  marketing: Megaphone,
+  veroeffentlichungen: Send,
+}
 
 /**
  * Die Hauptnavigation.
@@ -57,10 +80,11 @@ export function AdminNav({
       <div id="admin-hauptnavigation" className={`${offen ? "mt-3 flex" : "hidden"} flex-col gap-5 lg:mt-0 lg:flex`}>
         {gruppen.map(([gruppe, eintraege]) => (
           <div key={gruppe}>
-            <p className="eyebrow text-muted-foreground px-3 pb-1.5 text-[0.65rem]">{gruppe}</p>
+            <p className="text-muted-foreground/70 px-3 pb-2 font-mono text-[0.625rem] tracking-[0.18em] uppercase">{gruppe}</p>
             <ul className="flex flex-col gap-0.5">
               {eintraege.map((item) => {
                 const active = item.href === aktiv
+                const Icon = item.icon ? ICONS[item.icon] : undefined
                 return (
                   <li key={item.href}>
                     <Link
@@ -70,10 +94,19 @@ export function AdminNav({
                       href={item.href}
                       title={item.hint}
                       aria-current={active ? "page" : undefined}
-                      className={`flex items-center gap-2.5 rounded-sm border-l-2 px-3 py-2 text-sm transition-colors duration-[var(--dur-1)] ${
-                        active ? "border-gold bg-muted text-gold-text" : "hover:bg-muted border-transparent"
+                      className={`group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-[var(--dur-1)] ${
+                        active
+                          ? "bg-gold/10 text-gold-text font-medium"
+                          : "text-foreground/75 hover:bg-muted hover:text-foreground"
                       }`}
                     >
+                      {active && <span aria-hidden="true" className="bg-gold absolute inset-y-1.5 left-0 w-0.5 rounded-full" />}
+                      {Icon && (
+                        <Icon
+                          aria-hidden="true"
+                          className={`size-4 shrink-0 ${active ? "text-gold" : "text-muted-foreground group-hover:text-foreground"}`}
+                        />
+                      )}
                       {item.label}
                       <span className="sr-only"> — {item.hint}</span>
                     </Link>

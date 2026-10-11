@@ -48,7 +48,8 @@ export type GespraechText = {
   fehlerLeer: string
   fehlerSpeicher: string
   gespeichertEyebrow: string
-  gespeichertTitel: (name: string, min: number) => string
+  /** Platzhalter {name} und {min} — keine Funktion, weil das Objekt an eine Client-Komponente geht. */
+  gespeichertTitel: string
   folgeBereit: string
   ohneFolge: string
   icsLaden: string
@@ -136,7 +137,7 @@ const DE: GespraechText = {
   fehlerLeer: "Es gibt noch nichts zu speichern.",
   fehlerSpeicher: "Speichern fehlgeschlagen. Der Entwurf ist noch da, bitte erneut versuchen.",
   gespeichertEyebrow: "In der Akte",
-  gespeichertTitel: (name, min) => `Gespräch mit ${name} gespeichert (${min} Min).`,
+  gespeichertTitel: "Gespräch mit {name} gespeichert ({min} Min).",
   folgeBereit: "Nächster Schritt",
   ohneFolge: "Kein nächster Schritt gesetzt. Du kannst ihn jederzeit in der Kundenakte nachtragen.",
   icsLaden: "In Kalender eintragen (.ics)",
@@ -225,7 +226,7 @@ const TR: GespraechText = {
   fehlerLeer: "Kaydedilecek bir şey yok.",
   fehlerSpeicher: "Kayıt başarısız. Taslak duruyor, lütfen tekrar dene.",
   gespeichertEyebrow: "Dosyada",
-  gespeichertTitel: (name, min) => `${name} ile görüşme kaydedildi (${min} dk).`,
+  gespeichertTitel: "{name} ile görüşme kaydedildi ({min} dk).",
   folgeBereit: "Sonraki adım",
   ohneFolge: "Sonraki adım girilmedi. Müşteri dosyasından istediğin zaman ekleyebilirsin.",
   icsLaden: "Takvime ekle (.ics)",
