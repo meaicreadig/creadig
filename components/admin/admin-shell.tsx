@@ -105,9 +105,14 @@ export async function AdminShell({
           className="border-line bg-surface flex flex-col gap-4 border-b px-4 py-4 sm:px-6 lg:sticky lg:top-0 lg:h-dvh lg:gap-6 lg:overflow-y-auto lg:border-r lg:border-b-0 lg:px-5 lg:py-7"
         >
           <div className="flex items-start justify-between gap-3">
-            <Link href="/admin" className="flex flex-col gap-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-gold">
+            <Link href="/admin" className="flex flex-col gap-4 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-gold">
               <Logo variant="light" className="h-6" />
-              <span className="text-meta text-gold-text tracking-widest uppercase">{t.shell.produkt}</span>
+              <span className="flex items-center gap-2.5">
+                <span aria-hidden="true" className="bg-gold h-px w-6" />
+                <span className="text-gold-text font-mono text-[10px] tracking-[0.32em] uppercase">
+                  {t.shell.produkt}
+                </span>
+              </span>
             </Link>
             <div className="lg:hidden">{umschalter}</div>
           </div>

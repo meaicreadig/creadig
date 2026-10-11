@@ -1251,3 +1251,12 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
 [lang="ar"] body {
   font-size-adjust: none;
 }
+
+/* Admin trägt das Gold aus dem Logo (#BE904E / #E4C378); die Webseite behält ihr Kobalt. */
+html.admin-marke.dark {
+  --gold: #d4ad66;
+  --gold-soft: #e4c378;
+  --gold-deep: #be904e;
+  --gold-text: #e4c378;
+  --primary-foreground: #0a1322;
+}

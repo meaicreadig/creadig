@@ -36,15 +36,20 @@ export default async function AdminLoginPage({
   return (
     <main className="bg-background text-foreground grid min-h-dvh place-items-center px-6 py-16">
       <div className="border-line bg-surface w-full max-w-md rounded-2xl border p-8 shadow-2xl sm:p-10">
-        <div className="flex items-center justify-between gap-4">
-          <Logo variant="light" className="h-7" priority />
+        <div className="flex justify-end">
           <SprachUmschalter
             aktuell={sprache}
             label={t.sprache.umschalterLabel}
             namen={{ de: { kurz: "DE", name: "Deutsch" }, tr: { kurz: "TR", name: "Türkçe" } }}
           />
         </div>
-        <h1 className="type-h3 mt-8">{t.shell.produkt}</h1>
+        <div className="border-line mt-6 flex flex-col gap-5 border-b pb-8">
+          <Logo variant="light" className="h-8 w-auto self-start" priority />
+          <span className="flex items-center gap-3">
+            <span aria-hidden="true" className="bg-gold h-px w-8" />
+            <h1 className="text-gold-text font-mono text-xs tracking-[0.32em] uppercase">{t.shell.produkt}</h1>
+          </span>
+        </div>
         {!(await hatKonten()) && (
           <p className="type-small text-muted-foreground mt-3 text-pretty">{t.login.ersteAnmeldung}</p>
         )}

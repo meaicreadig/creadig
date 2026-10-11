@@ -84,12 +84,23 @@ export default async function GespraechSeite({
     )
   }
 
-  const [kontakte, kontakt, verlauf] = await Promise.all([
+  const [alle, kontakt, verlauf] = await Promise.all([
     sucheKontakte(q ?? null),
     kontaktId ? holeKontakt(kontaktId) : Promise.resolve(null),
     gespraeche(kontaktId ?? null, kontaktId ? 12 : 8),
   ])
   const heute = new Date().toISOString().slice(0, 10)
+  const sucht = Boolean(q?.trim())
+  const faelligeKontakte = sucht ? [] : alle.filter((k) => k.nextTouchAt && k.nextTouchAt <= heute)
+  const kontakte = sucht
+    ? alle
+    : [
+        ...faelligeKontakte,
+        ...alle
+          .filter((k) => k.lastInteractionAt && !faelligeKontakte.includes(k))
+          .slice(0, Math.max(0, 5 - faelligeKontakte.length)),
+        ...(kontakt && !alle.slice(0, 5).some((k) => k.id === kontakt.id) ? [kontakt] : []),
+      ].filter((k, i, liste) => liste.findIndex((x) => x.id === k.id) === i)
 
   return (
     <AdminShell title={t.titel} lead={kontakt ? undefined : t.lead}>
@@ -108,11 +119,19 @@ export default async function GespraechSeite({
           </form>
 
           <p className="text-muted-foreground px-1 font-mono text-[11px] tracking-widest uppercase">
-            {t.kontakte} · {kontakte.length}
+            {sucht
+              ? `${t.treffer} · ${kontakte.length}`
+              : faelligeKontakte.length > 0
+                ? t.faelligListe
+                : t.zuletztKontakte}
           </p>
 
           <ul className="flex max-h-[28rem] flex-col gap-0.5 overflow-y-auto">
-            {kontakte.length === 0 && <li className="text-muted-foreground px-1 py-2 text-sm">{t.keineKontakte}</li>}
+            {kontakte.length === 0 && (
+              <li className="text-muted-foreground px-1 py-2 text-sm leading-relaxed">
+                {sucht ? t.keineKontakte : t.sucheHinweis}
+              </li>
+            )}
             {kontakte.map((k) => {
               const aktiv = k.id === kontaktId
               const faellig = k.nextTouchAt && k.nextTouchAt <= heute

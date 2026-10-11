@@ -69,6 +69,16 @@ export type GespraechText = {
   leitfragen: string
   aktivitaet: string
   offen: string
+  faelligListe: string
+  zuletztKontakte: string
+  sucheHinweis: string
+  treffer: string
+  schnellwahl: string
+  /** [Bezeichnung, Tage ab heute] — erkannt wird per Stichwort in der Mitschrift. */
+  vorlagen: [string, number, string][]
+  erkannt: string
+  uebernehmen: string
+  inUebersicht: string
 }
 
 const DE: GespraechText = {
@@ -157,6 +167,20 @@ const DE: GespraechText = {
   leitfragen: "Leitfragen",
   aktivitaet: "Aktivität",
   offen: "Nicht gesetzt",
+  faelligListe: "Heute dran",
+  zuletztKontakte: "Zuletzt gesprochen",
+  sucheHinweis: "Tippe einen Namen, eine Firma oder Nummer. Hier stehen nur fällige und zuletzt gesprochene Kontakte.",
+  treffer: "Treffer",
+  schnellwahl: "Schnellwahl",
+  vorlagen: [
+    ["Rückruf", 2, "rückruf|zurückrufen|anrufen"],
+    ["Angebot schicken", 3, "angebot|preis|kosten"],
+    ["Vor-Ort-Termin", 7, "vor ort|treffen|besuch|termin"],
+    ["Nachfassen", 14, "überlegen|melden|später|nachfassen"],
+  ],
+  erkannt: "Aus der Mitschrift erkannt",
+  uebernehmen: "Übernehmen",
+  inUebersicht: "Erscheint am Tag automatisch in deiner Übersicht unter „Heute zu tun“.",
 }
 
 const TR: GespraechText = {
@@ -246,6 +270,20 @@ const TR: GespraechText = {
   leitfragen: "Yönlendirici sorular",
   aktivitaet: "Aktivite",
   offen: "Belirlenmedi",
+  faelligListe: "Bugün sırada",
+  zuletztKontakte: "Son konuşulanlar",
+  sucheHinweis: "İsim, firma veya numara yaz. Burada yalnızca vadesi gelen ve son konuşulan kişiler görünür.",
+  treffer: "Sonuç",
+  schnellwahl: "Hızlı seçim",
+  vorlagen: [
+    ["Geri ara", 2, "geri ara|arayacak|ara"],
+    ["Teklif gönder", 3, "teklif|fiyat|maliyet"],
+    ["Yerinde görüşme", 7, "yerinde|buluş|ziyaret|randevu"],
+    ["Takip et", 14, "düşün|haber|sonra|takip"],
+  ],
+  erkannt: "Notlardan algılandı",
+  uebernehmen: "Uygula",
+  inUebersicht: "O gün otomatik olarak Genel bakış’ta „Bugün yapılacaklar“ altında görünür.",
 }
 
 export function gespraechText(sprache: AdminSprache): GespraechText {
