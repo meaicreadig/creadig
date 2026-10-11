@@ -1019,6 +1019,12 @@ input[data-admin-control][type="date"]:hover::-webkit-calendar-picker-indicator 
   animation: marquee-right 64s linear infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .client-motion {
+    animation: none !important;
+  }
+}
+
 /*
  * DAS SIGNAL — der einzige bewegte Teil des Systembilds.
  *

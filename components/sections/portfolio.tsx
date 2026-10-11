@@ -35,6 +35,56 @@ function MonogramPanel({ mark }: { mark: string }) {
   );
 }
 
+function deliverablesOf(work: Work, locale: Locale): string[] {
+  const source = work.built?.[locale] ?? work.sector[locale];
+  const items = source
+    .split(/\s*(?:[,;·•/]|\s(?:und|and|ve|و)\s)\s*/)
+    .map((item) => item.replace(/[.]+$/, "").trim())
+    .filter((item) => item.length > 1);
+  return items.length > 0 ? items : [work.name];
+}
+
+/*
+ * Kundenwerk zeigt kein Vorschaubild mehr (Owner-Entscheid 11.10.): Statt
+ * fremder Druckdateien laeuft der belegte Leistungsumfang als Band durch die
+ * Karte — zwei Reihen gegenlaeufig, Gold traegt die Leistung, die zweite
+ * Reihe die Branche. Bei reduzierter Bewegung steht das Band still.
+ */
+function ClientMotionPanel({ work, locale }: { work: Work; locale: Locale }) {
+  const deliverables = deliverablesOf(work, locale);
+  const row: string[] = [];
+  while (row.length < 6) row.push(...deliverables);
+  const secondRow = [work.sector[locale], work.name, ...deliverables.slice().reverse()];
+
+  return (
+    <div
+      aria-hidden="true"
+      className="bg-surface absolute inset-0 flex flex-col justify-center gap-3 overflow-hidden"
+    >
+      <div className="client-motion flex w-max animate-marquee-left items-center whitespace-nowrap [animation-duration:28s] group-hover:[animation-play-state:paused]">
+        {[...row, ...row].map((item, index) => (
+          <span key={index} className="flex items-center">
+            <span className="text-display text-gold-text px-5 text-3xl lg:text-4xl">
+              {item}
+            </span>
+            <span className="bg-gold size-1.5 shrink-0 rounded-full" />
+          </span>
+        ))}
+      </div>
+      <div className="client-motion flex w-max animate-marquee-right items-center whitespace-nowrap [animation-duration:36s] group-hover:[animation-play-state:paused]">
+        {[...secondRow, ...secondRow, ...secondRow, ...secondRow].map((item, index) => (
+          <span
+            key={index}
+            className="eyebrow text-muted-foreground border-border mx-2 border px-3 py-1.5"
+          >
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /*
  * Seit PHASE A fuehrt jede Karte nach INNEN — eigene Produkte auf ihre Welt
  * unter /produkte, Kundenwerk auf seine Seite unter /arbeiten. Vorher fuehrte
@@ -68,7 +118,9 @@ function WorkCard({
           compact ? "aspect-[16/9]" : "aspect-[16/10]",
         )}
       >
-        {work.image ? (
+        {work.kind === "Kundenwerk" ? (
+          <ClientMotionPanel work={work} locale={locale} />
+        ) : work.image ? (
           <Image
             src={work.image}
             alt={`${work.name} — ${work.what[locale]}`}
@@ -85,7 +137,10 @@ function WorkCard({
         )}
         <div
           aria-hidden="true"
-          className="from-ink/55 via-ink/5 absolute inset-0 bg-gradient-to-t to-transparent opacity-70 transition-opacity duration-[var(--dur-3)] group-hover:opacity-40"
+          className={cn(
+            "from-ink/55 via-ink/5 absolute inset-0 bg-gradient-to-t to-transparent opacity-70 transition-opacity duration-[var(--dur-3)] group-hover:opacity-40",
+            work.kind === "Kundenwerk" && "hidden",
+          )}
         />
 
         <div className="absolute top-4 start-4 flex items-center gap-2">

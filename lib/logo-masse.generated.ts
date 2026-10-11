@@ -29,6 +29,7 @@ export const LOGO_MASSE: Readonly<Record<string, LogoMass>> = {
   "/brand/products/fibero.svg": { breite: 1028.9, hoehe: 296.89, verhaeltnis: 3.4656 },
   "/brand/products/meahv.png": { breite: 695, hoehe: 739, verhaeltnis: 0.9405 },
   "/brand/products/meai.png": { breite: 133, hoehe: 75, verhaeltnis: 1.7733 },
+  "/brand/clients/allrein-ofra.svg": { breite: 2580, hoehe: 329, verhaeltnis: 7.8419 },
   "/brand/clients/bir-damla-hayir.png": { breite: 354, hoehe: 381, verhaeltnis: 0.9291 },
   "/brand/clients/maqam.png": { breite: 854, hoehe: 146, verhaeltnis: 5.8493 },
   "/brand/clients/nv-swiss.png": { breite: 1080, hoehe: 235, verhaeltnis: 4.5957 },
