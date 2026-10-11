@@ -225,7 +225,52 @@ export type Work = {
    * `releases` (Gate 13).
    */
   dunkel?: LogoDunkel
+  /**
+   * Leistungsart eines Kundenwerks — ordnet die Werkschau nach dem, was
+   * gebaut wurde, nicht nach Branche. Nur fuer `kind: "Kundenwerk"`.
+   */
+  discipline?: Discipline
 }
+
+/*
+ * Owner 11.10.2026: Kundenarbeiten strukturiert zeigen. Drei Stufen, die zur
+ * Ebenen-Logik des Hauses passen — vom einzelnen Druckstueck bis zum
+ * durchgehenden System. Die Reihenfolge ist die Reihenfolge der Werkschau.
+ */
+export type Discipline = "system" | "marke-web" | "gestaltung"
+
+export const disciplines: { key: Discipline; label: Localized; note: Localized }[] = [
+  {
+    key: "system",
+    label: { de: "Systeme & Plattformen", tr: "Sistemler & platformlar", en: "Systems & platforms", ar: "أنظمة ومنصات" },
+    note: {
+      de: "Vom Logo bis zur Systemarchitektur — durchgehend gebaut.",
+      tr: "Logodan sistem mimarisine — uçtan uca kuruldu.",
+      en: "From the logo to the system architecture — built end to end.",
+      ar: "من الشعار إلى بنية النظام — مبنيّ من البداية إلى النهاية.",
+    },
+  },
+  {
+    key: "marke-web",
+    label: { de: "Marke & Web", tr: "Marka & web", en: "Brand & web", ar: "علامة وويب" },
+    note: {
+      de: "Auftritt, Website und der Weg zur Anfrage.",
+      tr: "Görünüm, web sitesi ve talebe giden yol.",
+      en: "Presence, website and the path to the enquiry.",
+      ar: "الحضور والموقع والطريق إلى الطلب.",
+    },
+  },
+  {
+    key: "gestaltung",
+    label: { de: "Gestaltung & Druck", tr: "Tasarım & baskı", en: "Design & print", ar: "تصميم وطباعة" },
+    note: {
+      de: "Flyer, Speisekarten, Etiketten, Kataloge, Werbetechnik — gestaltet und druckfertig.",
+      tr: "El ilanı, menü, etiket, katalog, reklam tekniği — tasarlandı ve baskıya hazır.",
+      en: "Flyers, menus, labels, catalogues, signage — designed and print-ready.",
+      ar: "منشورات وقوائم طعام وملصقات وكتالوجات ولافتات — مصمّمة وجاهزة للطباعة.",
+    },
+  },
+]
 
 /** Eigene Produkte — die großen Cases. */
 export const productWorks: Work[] = [
@@ -263,10 +308,11 @@ export const productWorks: Work[] = [
     kind: "Produkt",
     region: "DE",
     // Owner 29.08.2026: Feld-Szene mit echter fibero Map-Center-Oberfläche.
-    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
-    image: null,
-    imageProof: null,
+    // Owner 11.10.2026: echter Screenshot von fibero.vercel.app (Zugang).
+    image: "/works/fibero.png",
+    imageProof: "product-photo",
     mark: "fb",
+    href: "https://fibero.vercel.app",
     live: true,
   },
   /*
@@ -322,9 +368,9 @@ export const productWorks: Work[] = [
     kind: "Produkt",
     region: "DE & CH",
     // Owner 29.08.2026: Laptop-Szene mit echter meAI-Oberfläche (Demodaten).
-    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
-    image: null,
-    imageProof: null,
+    // Owner 11.10.2026: echter Screenshot von meai.run (Zugang).
+    image: "/works/meai.png",
+    imageProof: "product-photo",
     mark: "me",
     href: "https://meai.run",
     live: true,
@@ -351,10 +397,11 @@ export const productWorks: Work[] = [
     kind: "Produkt",
     region: "CH",
     // Owner 29.08.2026: POS-Szene mit echter CASSAMEA-Oberfläche (Demodaten).
-    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
-    image: null,
-    imageProof: null,
+    // Owner 11.10.2026: echter Screenshot von cassamea.com.
+    image: "/works/cassamea.png",
+    imageProof: "product-photo",
     mark: "CA",
+    href: "https://www.cassamea.com",
   },
   {
     slug: "meahv",
@@ -697,6 +744,7 @@ export const clientWorks: Work[] = [
     image: null,
     imageProof: null,
     mark: "NV",
+    discipline: "marke-web",
     href: "https://nvswiss.ch",
     live: true,
     // Logo unter public/brand/clients/nv-swiss.png (Owner geliefert).
@@ -724,6 +772,7 @@ export const clientWorks: Work[] = [
     image: null,
     imageProof: null,
     mark: "mq",
+    discipline: "marke-web",
     // Logo: public/brand/clients/maqam.png (schwarz entfernt → transparent)
     releases: [],
     approvedSentence: null,
@@ -749,6 +798,7 @@ export const clientWorks: Work[] = [
     image: null,
     imageProof: null,
     mark: "bd",
+    discipline: "marke-web",
     // Logo: public/brand/clients/bir-damla-hayir.png
     releases: [],
     approvedSentence: null,
@@ -780,6 +830,7 @@ export const clientWorks: Work[] = [
     image: null,
     imageProof: null,
     mark: "vc",
+    discipline: "system",
     href: "https://www.vegancatering.ch",
     releases: [
       {
@@ -815,6 +866,7 @@ export const clientWorks: Work[] = [
     image: null,
     imageProof: null,
     mark: "en",
+    discipline: "system",
     href: "https://ennur.org",
     live: true,
     releases: [
@@ -847,9 +899,11 @@ export const clientWorks: Work[] = [
     },
     outcome: { de: "Kundenwerk · vor Ort", tr: "Müşteri işi · yerinde", en: "Client work · on site", ar: "عمل لعميل · في الموقع" },
     kind: "Kundenwerk",
+    discipline: "gestaltung",
     region: "DE",
-    image: "/works/an-automobile.png",
-    imageProof: "mockup",
+    // Owner 11.10.2026: nur erwähnen, KEIN Bild zeigen.
+    image: null,
+    imageProof: null,
     mark: "AN",
     releases: [
       {
@@ -885,7 +939,125 @@ export const clientWorks: Work[] = [
     image: "/works/allrein-ofra.png",
     imageProof: "mockup",
     mark: "AO",
-    releases: [],
+    discipline: "gestaltung",
+    releases: [
+      {
+        by: { name: "Ansprechperson des Kunden (dem Owner persönlich bekannt)", role: "Geschäftsführung", company: "Allrein-Ofra GmbH" },
+        form: "schriftliche-nachricht",
+        at: "2026-10-11",
+        scopes: ["name", "logo", "fallstudie"],
+        reference: "Schriftliche Nachricht an den Owner, eigenes Postfach/Messenger, Bestätigung im Chat am 11.10.2026",
+      },
+    ],
+    approvedSentence: null,
+  },
+  {
+    slug: "star-imbiss",
+    sector: { de: "Gastronomie · Speisekarte", tr: "Gastronomi · menü", en: "Hospitality · menu", ar: "ضيافة · قائمة طعام" },
+    year: null,
+    name: "Star Imbiss Dinklage",
+    what: {
+      de: "Imbiss in Dinklage — Speisekarte gestaltet und gedruckt: Kebap, Pizza, Nudeln, 86 Gerichte auf einen Blick.",
+      tr: "Dinklage'de büfe — menü tasarlandı ve basıldı: kebap, pizza, makarna, tek bakışta 86 yemek.",
+      en: "Takeaway in Dinklage — menu designed and printed: kebab, pizza, pasta, 86 dishes at a glance.",
+      ar: "مطعم وجبات سريعة في دينكلاغه — قائمة طعام مصمّمة ومطبوعة: كباب وبيتزا ومعكرونة، 86 طبقًا بنظرة واحدة.",
+    },
+    built: {
+      de: "Speisekarten-Gestaltung, Produktbilder, Druckvorstufe, Druck.",
+      tr: "Menü tasarımı, ürün görselleri, baskı öncesi hazırlık, baskı.",
+      en: "Menu design, product imagery, prepress, print.",
+      ar: "تصميم القائمة، صور المنتجات، ما قبل الطباعة، الطباعة.",
+    },
+    outcome: { de: "Kundenwerk · im Laden", tr: "Müşteri işi · dükkânda", en: "Client work · in the shop", ar: "عمل لعميل · في المحل" },
+    kind: "Kundenwerk",
+    discipline: "gestaltung",
+    region: "DE",
+    image: "/works/star-imbiss.jpg",
+    imageProof: "mockup",
+    mark: "SI",
+    releases: [
+      {
+        by: { name: "Inhaber (dem Owner persönlich bekannt)", role: "Inhaber", company: "Star Imbiss, Am Markt 29, 49413 Dinklage" },
+        form: "schriftliche-nachricht",
+        at: "2026-10-11",
+        scopes: ["name", "fallstudie"],
+        reference: "Schriftliche Nachricht an den Owner, eigenes Postfach/Messenger, Bestätigung im Chat am 11.10.2026",
+      },
+    ],
+    approvedSentence: null,
+  },
+  /*
+   * Owner 11.10.2026: Fuer diese beiden nur die LEISTUNG nennen — kein Logo,
+   * keine Website, kein Bild. Darum Freigabe nur fuer `name`.
+   */
+  {
+    slug: "big-bielefeld",
+    sector: { de: "Gemeinde · Verband", tr: "Cemaat · birlik", en: "Community · association", ar: "جماعة · اتحاد" },
+    year: null,
+    name: "BIG — Bündnis Islamischer Gemeinden in Bielefeld",
+    what: {
+      de: "Gemeindeverband in Bielefeld — Flyer, Einladungskarten und Mockups für Veranstaltungen.",
+      tr: "Bielefeld'de cemaatler birliği — etkinlikler için el ilanları, davetiyeler ve mockup'lar.",
+      en: "Community association in Bielefeld — flyers, invitation cards and mockups for events.",
+      ar: "اتحاد جماعات في بيليفيلد — منشورات وبطاقات دعوة ونماذج للفعاليات.",
+    },
+    built: {
+      de: "Flyer, Einladungskarten, Mockups, Druckvorstufe.",
+      tr: "El ilanları, davetiyeler, mockup'lar, baskı öncesi hazırlık.",
+      en: "Flyers, invitation cards, mockups, prepress.",
+      ar: "منشورات، بطاقات دعوة، نماذج، ما قبل الطباعة.",
+    },
+    outcome: { de: "Kundenwerk · laufend", tr: "Müşteri işi · süregelen", en: "Client work · ongoing", ar: "عمل لعميل · مستمر" },
+    kind: "Kundenwerk",
+    discipline: "gestaltung",
+    region: "DE",
+    image: null,
+    imageProof: null,
+    mark: "BIG",
+    releases: [
+      {
+        by: { name: "Ansprechperson des Verbands (dem Owner persönlich bekannt)", role: "Vorstand", company: "BIG Bielefeld e. V." },
+        form: "schriftliche-nachricht",
+        at: "2026-10-11",
+        scopes: ["name"],
+        reference: "Schriftliche Nachricht an den Owner, eigenes Postfach/Messenger, Bestätigung im Chat am 11.10.2026",
+      },
+    ],
+    approvedSentence: null,
+  },
+  {
+    slug: "integrationsrat-bielefeld",
+    sector: { de: "Kommune · Integration", tr: "Belediye · uyum", en: "Municipal · integration", ar: "بلدية · اندماج" },
+    year: null,
+    name: "Integrationsrat Bielefeld",
+    what: {
+      de: "Ausschuss für Chancengerechtigkeit und Integration — Flyer und Einladungskarten für Programme und Begegnungen.",
+      tr: "Fırsat eşitliği ve uyum komisyonu — programlar ve buluşmalar için el ilanları ve davetiyeler.",
+      en: "Committee for equal opportunity and integration — flyers and invitation cards for programmes and encounters.",
+      ar: "لجنة تكافؤ الفرص والاندماج — منشورات وبطاقات دعوة للبرامج واللقاءات.",
+    },
+    built: {
+      de: "Flyer, Einladungskarten, Mockups, Druckvorstufe.",
+      tr: "El ilanları, davetiyeler, mockup'lar, baskı öncesi hazırlık.",
+      en: "Flyers, invitation cards, mockups, prepress.",
+      ar: "منشورات، بطاقات دعوة، نماذج، ما قبل الطباعة.",
+    },
+    outcome: { de: "Kundenwerk", tr: "Müşteri işi", en: "Client work", ar: "عمل لعميل" },
+    kind: "Kundenwerk",
+    discipline: "gestaltung",
+    region: "DE",
+    image: null,
+    imageProof: null,
+    mark: "IR",
+    releases: [
+      {
+        by: { name: "Ansprechperson des Integrationsrats (dem Owner persönlich bekannt)", role: "Geschäftsstelle", company: "Integrationsrat Bielefeld" },
+        form: "schriftliche-nachricht",
+        at: "2026-10-11",
+        scopes: ["name"],
+        reference: "Schriftliche Nachricht an den Owner, eigenes Postfach/Messenger, Bestätigung im Chat am 11.10.2026",
+      },
+    ],
     approvedSentence: null,
   },
   /*

@@ -11,6 +11,7 @@ import { useLocale } from "@/components/locale-provider";
 import type { Locale } from "@/lib/dictionary";
 import { WorkRegistry } from "@/components/sections/work-registry";
 import {
+  disciplines,
   genannteClientWorks,
   furtherProjects,
   productWorks,
@@ -303,19 +304,47 @@ export function Portfolio({ heading = true }: { heading?: boolean }) {
                   note={t.portfolio.clientWorkNote}
                 />
               </Reveal>
-              <div className="mt-8 grid gap-6 md:grid-cols-3 lg:gap-8">
-                {genannteClientWorks.map((work, index) => (
-                  <Reveal key={work.slug} delay={index * 0.08} className="flex">
-                    <WorkCard
-                      work={work}
-                      builtLabel={t.portfolio.built}
-                      locale={locale}
-                      kindLabel={t.portfolio.kindClientWork}
-                      compact
-                    />
-                  </Reveal>
-                ))}
-              </div>
+              {/*
+                Owner 11.10.2026: nach Leistungsart ordnen — vom System bis
+                zum Druckstueck. Werke ohne `discipline` landen am Ende.
+              */}
+              {[...disciplines.map((d) => d.key), undefined].map((key) => {
+                const group = genannteClientWorks.filter((w) => w.discipline === key);
+                if (group.length === 0) return null;
+                const meta = disciplines.find((d) => d.key === key);
+                return (
+                  <div key={key ?? "rest"} className="mt-10 md:mt-14">
+                    {meta && (
+                      <Reveal>
+                        <div className="border-line flex flex-col gap-1 border-t pt-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+                          <h3 className="type-h4 text-foreground">
+                            {meta.label[locale]}
+                            <span className="text-gold-text ms-3 font-mono text-sm">
+                              {group.length}
+                            </span>
+                          </h3>
+                          <p className="type-small text-muted-foreground text-pretty sm:max-w-md sm:text-end">
+                            {meta.note[locale]}
+                          </p>
+                        </div>
+                      </Reveal>
+                    )}
+                    <div className="mt-6 grid gap-6 md:grid-cols-3 lg:gap-8">
+                      {group.map((work, index) => (
+                        <Reveal key={work.slug} delay={(index % 3) * 0.08} className="flex">
+                          <WorkCard
+                            work={work}
+                            builtLabel={t.portfolio.built}
+                            locale={locale}
+                            kindLabel={t.portfolio.kindClientWork}
+                            compact
+                          />
+                        </Reveal>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
               {view === "cards" && (
                 <p className="text-muted-foreground text-meta mt-6">
                   {t.portfolio.customerPhotoNote}
