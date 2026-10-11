@@ -46,7 +46,9 @@ export const tr: AdminTexte = {
   },
   login: {
     titel: "Giriş",
+    email: "E-posta",
     passwort: "Şifre",
+    ersteAnmeldung: "İlk giriş: e-postanız ve mevcut admin şifresi — hesabınız bundan oluşturulur.",
     anmelden: "Giriş yap",
     pruefen: "Kontrol ediliyor …",
     weiter: "Giriş yapıldı — genel bakış yükleniyor …",

@@ -1,4 +1,6 @@
 import { AdminLoginForm } from "@/components/admin/admin-login-form"
+import { Logo } from "@/components/brand/logo"
+import { hatKonten } from "@/lib/admin-konten"
 import { SprachUmschalter } from "@/components/admin/sprach-umschalter"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 
@@ -33,16 +35,19 @@ export default async function AdminLoginPage({
 
   return (
     <main className="bg-background text-foreground grid min-h-dvh place-items-center px-6 py-16">
-      <div className="w-full max-w-sm">
-        <div className="flex items-start justify-between gap-4">
-          <p className="eyebrow text-gold-text">creaDIG</p>
+      <div className="border-line bg-surface w-full max-w-md rounded-2xl border p-8 shadow-2xl sm:p-10">
+        <div className="flex items-center justify-between gap-4">
+          <Logo variant="light" className="h-7" priority />
           <SprachUmschalter
             aktuell={sprache}
             label={t.sprache.umschalterLabel}
             namen={{ de: { kurz: "DE", name: "Deutsch" }, tr: { kurz: "TR", name: "Türkçe" } }}
           />
         </div>
-        <h1 className="type-h3 mt-2">{t.shell.produkt}</h1>
+        <h1 className="type-h3 mt-8">{t.shell.produkt}</h1>
+        {!(await hatKonten()) && (
+          <p className="type-small text-muted-foreground mt-3 text-pretty">{t.login.ersteAnmeldung}</p>
+        )}
         {expired && (
           <p
             role="status"

@@ -68,7 +68,7 @@ export function gespraechVerfuegbar(): boolean {
 type KontaktZeile = {
   id: string
   name: string
-  email: string
+  email: string | null
   phone: string | null
   role: string | null
   organisation: string | null
@@ -92,7 +92,7 @@ function alsKontakt(z: KontaktZeile): GespraechKontakt {
   return {
     id: z.id,
     name: z.name,
-    email: z.email.endsWith(OHNE_MAIL) ? null : z.email,
+    email: !z.email || z.email.endsWith(OHNE_MAIL) ? null : z.email,
     phone: z.phone,
     role: z.role,
     organisation: z.organisation,
