@@ -1,7 +1,7 @@
 "use client"
 
-import { useRef } from "react"
-import { motion, useScroll, useSpring } from "framer-motion"
+import { useId, useRef, useState, type KeyboardEvent } from "react"
+import { AnimatePresence, motion } from "framer-motion"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
 import { ArrowUpRight } from "lucide-react"
@@ -19,6 +19,11 @@ import { findOffer, formatPrice } from "@/lib/offers"
  * Betrieb. Jede Stufe beantwortet dieselben fuenf Fragen (fuer wen, was,
  * Kosten, Dauer, danach), damit niemand zwischen Kacheln vergleichen muss.
  *
+ * Seit 11.10.: Stufen-Auswahl statt vier untereinander ausgeklappter Bloecke.
+ * Die Leiter war ~2500 px hoch und las sich wie eine Tabelle. Jetzt zeigt
+ * links der Weg alle vier Stufen auf einen Blick, rechts steht genau eine —
+ * die Gold-Linie fuellt sich bis zur gewaehlten Stufe.
+ *
  * Betraege kommen ausschliesslich ueber `{price:<key>}` aus `lib/offers.ts`.
  * Der Analysepreis erscheint erst, wenn der Owner ihn dort veroeffentlicht
  * (O3); bis dahin steht nur „Festpreis, anrechenbar".
@@ -33,6 +38,8 @@ const STUFEN: { key: StufeKey; href: string }[] = [
   { key: "betrieb", href: "/betrieb" },
 ]
 
+const FELDER = ["fuerWen", "bekommen", "kosten", "dauer", "danach"] as const
+
 export function EntryLine() {
   const { t, locale } = useLocale()
   const copy = t.home.entry
@@ -40,15 +47,32 @@ export function EntryLine() {
   const analyse = findOffer("analyse")
   const analyseBetrag =
     analyse.published && analyse.amount !== null ? formatPrice(analyse.amount, locale) : null
-
   const questions = t.faq.items.slice(0, 2)
-  const felder = ["fuerWen", "bekommen", "kosten", "dauer", "danach"] as const
 
-  /* Die Leiter fuellt sich mit dem Scrollen: Wer liest, sieht den Weg wachsen. */
   const reduce = usePrefersReducedMotion()
-  const ladderRef = useRef<HTMLOListElement>(null)
-  const { scrollYProgress } = useScroll({ target: ladderRef, offset: ["start 75%", "end 55%"] })
-  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 24, mass: 0.4 })
+  const [aktiv, setAktiv] = useState(0)
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+  const baseId = useId()
+
+  const { key: aktivKey, href: aktivHref } = STUFEN[aktiv]
+  const stufe = copy.stufen[aktivKey]
+
+  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    const next =
+      event.key === "ArrowDown" || event.key === "ArrowRight"
+        ? (aktiv + 1) % STUFEN.length
+        : event.key === "ArrowUp" || event.key === "ArrowLeft"
+          ? (aktiv - 1 + STUFEN.length) % STUFEN.length
+          : event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? STUFEN.length - 1
+              : null
+    if (next === null) return
+    event.preventDefault()
+    setAktiv(next)
+    tabRefs.current[next]?.focus()
+  }
 
   return (
     <section id="einstieg" aria-labelledby="einstieg-title" className="section-seam">
@@ -63,57 +87,111 @@ export function EntryLine() {
               <p className="type-body text-muted-foreground mt-5 max-w-xl text-pretty">{copy.lead}</p>
             </Reveal>
 
-            <ol ref={ladderRef} className="border-line relative mt-10 flex flex-col border-t ps-8 md:ps-10">
-              <span aria-hidden="true" className="bg-line absolute start-[7px] top-0 bottom-0 w-px md:start-[11px]" />
-              <motion.span
-                aria-hidden="true"
-                className="bg-gold absolute start-[7px] top-0 bottom-0 w-px origin-top md:start-[11px]"
-                style={{ scaleY: reduce ? 1 : progress }}
-              />
-              {STUFEN.map(({ key, href }, i) => {
-                const stufe = copy.stufen[key]
-                return (
-                  <motion.li
-                    key={key}
-                    className="border-line relative border-b"
-                    initial={reduce ? false : { opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.05 * i }}
-                  >
-                    <motion.span
-                      aria-hidden="true"
-                      className="border-gold bg-background absolute -start-8 top-9 flex size-[15px] items-center justify-center rounded-full border md:-start-10 md:size-[23px]"
-                      initial={reduce ? false : { scale: 0.5, opacity: 0.3 }}
-                      whileInView={{ scale: 1, opacity: 1 }}
-                      viewport={{ amount: 1, margin: "0px 0px -40% 0px" }}
-                      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      <motion.span
-                        className="bg-gold block size-[7px] rounded-full md:size-[9px]"
-                        animate={reduce ? undefined : { scale: [1, 1.6, 1], opacity: [1, 0.55, 1] }}
-                        transition={{ duration: 2.4, repeat: Infinity, delay: 0.6 * i, ease: "easeInOut" }}
-                      />
-                    </motion.span>
-                    <article className="grid gap-x-8 gap-y-4 py-8 md:grid-cols-12">
-                      <header className="md:col-span-4">
-                        <p className="eyebrow text-gold-text">{stufe.stufe}</p>
-                        <h3 className="text-subhead mt-2 text-lg text-balance">{stufe.name}</h3>
-                        <Link
-                          href={href}
-                          className="text-gold-text hover:text-foreground mt-3 flex w-fit items-center gap-1.5 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
+            <Reveal delay={0.08}>
+              <div className="border-line mt-10 grid overflow-hidden rounded-2xl border md:grid-cols-12">
+                <div
+                  role="tablist"
+                  aria-orientation="vertical"
+                  aria-label={copy.title}
+                  onKeyDown={onKeyDown}
+                  className="border-line relative flex flex-col border-b p-3 md:col-span-5 md:border-e md:border-b-0"
+                >
+                  <span aria-hidden="true" className="bg-line absolute start-[27px] top-9 bottom-9 w-px" />
+                  <motion.span
+                    aria-hidden="true"
+                    className="bg-gold absolute start-[27px] top-9 w-px origin-top"
+                    initial={false}
+                    animate={{ height: `calc((100% - 4.5rem) * ${aktiv / (STUFEN.length - 1)})` }}
+                    transition={reduce ? { duration: 0 } : { duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  />
+                  {STUFEN.map(({ key }, i) => {
+                    const s = copy.stufen[key]
+                    const selected = i === aktiv
+                    const erreicht = i <= aktiv
+                    return (
+                      <button
+                        key={key}
+                        ref={(el) => {
+                          tabRefs.current[i] = el
+                        }}
+                        type="button"
+                        role="tab"
+                        id={`${baseId}-tab-${key}`}
+                        aria-selected={selected}
+                        aria-controls={`${baseId}-panel`}
+                        tabIndex={selected ? 0 : -1}
+                        onClick={() => setAktiv(i)}
+                        className={`relative flex items-start gap-4 rounded-xl px-3 py-4 text-start transition-colors duration-[var(--dur-2)] focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                          selected ? "bg-surface" : "hover:bg-surface/60"
+                        }`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={`relative z-10 mt-0.5 flex size-[17px] shrink-0 items-center justify-center rounded-full border transition-colors duration-[var(--dur-2)] ${
+                            erreicht ? "border-gold bg-background" : "border-line bg-background"
+                          }`}
                         >
-                          {stufe.cta}
-                          <ArrowUpRight className="size-3.5" strokeWidth={1.5} aria-hidden="true" />
-                        </Link>
+                          <span
+                            className={`block size-[7px] rounded-full transition-all duration-[var(--dur-2)] ${
+                              selected ? "bg-gold scale-125" : erreicht ? "bg-gold/70" : "bg-line"
+                            }`}
+                          />
+                        </span>
+                        <span className="flex min-w-0 flex-col gap-1">
+                          <span className={`eyebrow ${selected ? "text-gold-text" : "text-muted-foreground"}`}>
+                            {s.stufe}
+                          </span>
+                          <span
+                            className={`text-subhead text-base text-balance ${
+                              selected ? "text-foreground" : "text-foreground/75"
+                            }`}
+                          >
+                            {s.name}
+                          </span>
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                <div
+                  role="tabpanel"
+                  id={`${baseId}-panel`}
+                  aria-labelledby={`${baseId}-tab-${aktivKey}`}
+                  className="relative p-6 md:col-span-7 md:p-8"
+                >
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.article
+                      key={aktivKey}
+                      initial={reduce ? false : { opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }}
+                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      className="flex flex-col gap-6"
+                    >
+                      <header className="flex flex-col gap-2">
+                        <p className="eyebrow text-gold-text">{stufe.stufe}</p>
+                        <h3 className="type-h4 text-balance">{stufe.name}</h3>
                       </header>
-                      <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-[9rem_1fr] md:col-span-8">
-                        {felder.map((feld) => (
-                          <div key={feld} className="contents">
+
+                      <dl className="flex flex-col gap-4">
+                        {FELDER.map((feld) => (
+                          <div
+                            key={feld}
+                            className={
+                              feld === "kosten"
+                                ? "border-gold/40 bg-surface flex flex-col gap-1 rounded-xl border px-4 py-3"
+                                : "flex flex-col gap-1"
+                            }
+                          >
                             <dt className="text-meta text-muted-foreground">{copy.labels[feld]}</dt>
-                            <dd className="type-small text-foreground/85 text-pretty">
+                            <dd
+                              className={`text-pretty ${
+                                feld === "kosten" ? "text-foreground type-body" : "type-small text-foreground/85"
+                              }`}
+                            >
                               {stufe[feld]}
-                              {feld === "kosten" && key === "analyse" && analyseBetrag && (
+                              {feld === "kosten" && aktivKey === "analyse" && analyseBetrag && (
                                 <span className="text-foreground mt-1 block">
                                   {copy.analysePreis}: {analyseBetrag}
                                 </span>
@@ -122,16 +200,25 @@ export function EntryLine() {
                           </div>
                         ))}
                       </dl>
-                      {key === "einstieg" && pilot.published && pilot.condition && (
-                        <p className="border-line text-meta text-muted-foreground rounded-lg border px-3 py-2 md:col-span-8 md:col-start-5">
+
+                      {aktivKey === "einstieg" && pilot.published && pilot.condition && (
+                        <p className="border-line text-meta text-muted-foreground rounded-lg border px-3 py-2">
                           {pilot.condition[locale]}
                         </p>
                       )}
-                    </article>
-                  </motion.li>
-                )
-              })}
-            </ol>
+
+                      <Link
+                        href={aktivHref}
+                        className="text-gold-text hover:text-foreground flex w-fit items-center gap-1.5 text-sm tracking-wide transition-colors duration-[var(--dur-2)]"
+                      >
+                        {stufe.cta}
+                        <ArrowUpRight className="size-3.5" strokeWidth={1.5} aria-hidden="true" />
+                      </Link>
+                    </motion.article>
+                  </AnimatePresence>
+                </div>
+              </div>
+            </Reveal>
 
             <Reveal delay={0.2}>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
