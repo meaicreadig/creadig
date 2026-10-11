@@ -56,6 +56,18 @@ export type GespraechText = {
   neuesGespraech: string
   zurAkte: string
   min: string
+  zentrale: string
+  gespraechChip: string
+  status: string
+  live: string
+  pausiert: string
+  bereit: string
+  naechsterKontakt: string
+  zuletztGesprochen: string
+  themen: string
+  leitfragen: string
+  aktivitaet: string
+  offen: string
 }
 
 const DE: GespraechText = {
@@ -132,6 +144,18 @@ const DE: GespraechText = {
   neuesGespraech: "Neues Gespräch",
   zurAkte: "Zur Kundenakte",
   min: "Min",
+  zentrale: "Zentrale",
+  gespraechChip: "Gespräch",
+  status: "Status",
+  live: "Läuft",
+  pausiert: "Pausiert",
+  bereit: "Bereit",
+  naechsterKontakt: "Nächster Kontakt",
+  zuletztGesprochen: "Zuletzt gesprochen",
+  themen: "Themen",
+  leitfragen: "Leitfragen",
+  aktivitaet: "Aktivität",
+  offen: "Nicht gesetzt",
 }
 
 const TR: GespraechText = {
@@ -209,6 +233,18 @@ const TR: GespraechText = {
   neuesGespraech: "Yeni görüşme",
   zurAkte: "Müşteri dosyasına git",
   min: "dk",
+  zentrale: "Merkez",
+  gespraechChip: "Görüşme",
+  status: "Durum",
+  live: "Sürüyor",
+  pausiert: "Duraklatıldı",
+  bereit: "Hazır",
+  naechsterKontakt: "Sonraki temas",
+  zuletztGesprochen: "Son görüşme",
+  themen: "Konular",
+  leitfragen: "Yönlendirici sorular",
+  aktivitaet: "Aktivite",
+  offen: "Belirlenmedi",
 }
 
 export function gespraechText(sprache: AdminSprache): GespraechText {

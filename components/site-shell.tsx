@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono,
+import {
+  Manrope,
+  M_PLUS_Rounded_1c,
+  JetBrains_Mono,
   Readex_Pro,
   Cairo,
 } from "next/font/google"
@@ -46,10 +49,19 @@ import { ogImage } from "@/lib/page-metadata"
 // Poppins las sich wie jede Vorlage und stand gegen die feine, einlinige
 // Wortmarke; Manrope ist ruhig-geometrisch und steht naeher am Logo.
 // Traegt nur `--font-display`; der Fliesstext bleibt M PLUS Rounded 1c.
-const geist = Geist({
+const manrope = Manrope({
   subsets: ["latin", "latin-ext"],
-  variable: "--font-geist",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-manrope",
   display: "swap",
+})
+
+const mplusRounded = M_PLUS_Rounded_1c({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "700"],
+  variable: "--font-mplus",
+  display: "swap",
+  preload: false,
 })
 
 /*
@@ -92,9 +104,10 @@ const geist = Geist({
 // `latin-ext` ist Pflicht, nicht Komfort: Ohne diesen Subset fehlen ş, ğ, ı,
 // İ und ç — und genau die stehen in den türkischen Labels. Der Browser fiele
 // dort auf eine System-Monospace zurück, mitten im Wort.
-const geistMono = Geist_Mono({
+const jetbrains = JetBrains_Mono({
   subsets: ["latin", "latin-ext"],
-  variable: "--font-geist-mono",
+  weight: ["400", "500"],
+  variable: "--font-jetbrains",
   display: "swap",
 })
 
@@ -344,7 +357,7 @@ export function SiteShell({
     <html
       lang={locale}
       dir={LOCALE_DIR[locale]}
-      className={`${geist.variable} ${geistMono.variable} ${readex.variable} ${cairo.variable}`}
+      className={`${manrope.variable} ${mplusRounded.variable} ${jetbrains.variable} ${readex.variable} ${cairo.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>

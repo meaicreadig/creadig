@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Plus, Search } from "lucide-react"
 
 import { kontaktAnlegen } from "@/app/(admin)/admin/gespraech/actions"
 import { AdminShell } from "@/components/admin/admin-shell"
@@ -20,17 +21,28 @@ export async function generateMetadata() {
 }
 
 const FELD =
-  "border-line bg-surface focus:border-gold w-full border px-3 py-2.5 text-sm outline-none transition-colors"
+  "border-line bg-background focus:border-gold w-full rounded-md border px-3 py-2 text-sm outline-none transition-colors"
+
+function initialen(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase())
+    .join("")
+}
 
 function Verlauf({ eintraege, t, mitName }: { eintraege: GespraechEintrag[]; t: GespraechText; mitName?: boolean }) {
   if (eintraege.length === 0) return <p className="text-muted-foreground text-sm leading-relaxed">{t.keinVerlauf}</p>
   return (
-    <ol className="flex flex-col gap-3">
+    <ol className="relative flex flex-col gap-5">
+      <span aria-hidden="true" className="bg-line absolute top-2 bottom-2 left-[5px] w-px" />
       {eintraege.map((g) => (
-        <li key={g.id} className="border-line border-l-2 pl-4">
+        <li key={g.id} className="relative pl-6">
+          <span aria-hidden="true" className="bg-gold ring-background absolute top-1.5 left-0 size-[11px] rounded-full ring-4" />
           <details className="group">
             <summary className="cursor-pointer list-none">
-              <p className="text-muted-foreground font-mono text-xs">
+              <p className="text-muted-foreground font-mono text-[11px] tabular-nums">
                 {new Date(g.createdAt).toLocaleString(t.locale, { dateStyle: "medium", timeStyle: "short" })}
                 {g.dauerSek ? ` · ${Math.max(1, Math.round(g.dauerSek / 60))} ${t.min}` : ""}
               </p>
@@ -45,7 +57,9 @@ function Verlauf({ eintraege, t, mitName }: { eintraege: GespraechEintrag[]; t: 
               <p className="mt-1 text-sm leading-relaxed text-pretty">{g.summary.replace(/^Gespräch · \d+ Min · /, "")}</p>
             </summary>
             {g.detail && (
-              <p className="text-muted-foreground mt-3 text-sm leading-relaxed whitespace-pre-line">{g.detail}</p>
+              <p className="text-muted-foreground border-line mt-3 rounded-md border p-3 text-xs leading-relaxed whitespace-pre-line">
+                {g.detail}
+              </p>
             )}
           </details>
         </li>
@@ -64,7 +78,7 @@ export default async function GespraechSeite({
 
   if (!gespraechVerfuegbar()) {
     return (
-      <AdminShell title={t.titel} lead={t.lead}>
+      <AdminShell title={t.titel}>
         <p className="text-muted-foreground">{t.nichtVerfuegbar}</p>
       </AdminShell>
     )
@@ -78,22 +92,27 @@ export default async function GespraechSeite({
   const heute = new Date().toISOString().slice(0, 10)
 
   return (
-    <AdminShell title={t.titel} lead={t.lead}>
-      <div className="grid gap-8 lg:grid-cols-[17rem_1fr] 2xl:grid-cols-[17rem_1fr_19rem]">
-        <aside aria-label={t.kontakte} className="flex flex-col gap-4">
-          <form role="search" className="flex gap-2">
+    <AdminShell title={t.titel} lead={kontakt ? undefined : t.lead}>
+      <div className="grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
+        <aside aria-label={t.kontakte} className="flex flex-col gap-3 lg:sticky lg:top-6 lg:self-start">
+          <form role="search" className="relative">
             {kontaktId && <input type="hidden" name="kontakt" value={kontaktId} />}
             <label htmlFor="g-suche" className="sr-only">
               {t.suche}
             </label>
-            <input id="g-suche" name="q" defaultValue={q ?? ""} placeholder={t.suche} className={FELD} />
-            <button type="submit" className="border-line-strong hover:border-gold border px-3 text-sm transition-colors">
+            <Search aria-hidden="true" className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+            <input id="g-suche" name="q" defaultValue={q ?? ""} placeholder={t.suche} className={`${FELD} pl-9`} />
+            <button type="submit" className="sr-only">
               {t.suchen}
             </button>
           </form>
 
-          <ul className="flex max-h-[26rem] flex-col overflow-y-auto">
-            {kontakte.length === 0 && <li className="text-muted-foreground py-2 text-sm">{t.keineKontakte}</li>}
+          <p className="text-muted-foreground px-1 font-mono text-[11px] tracking-widest uppercase">
+            {t.kontakte} · {kontakte.length}
+          </p>
+
+          <ul className="flex max-h-[28rem] flex-col gap-0.5 overflow-y-auto">
+            {kontakte.length === 0 && <li className="text-muted-foreground px-1 py-2 text-sm">{t.keineKontakte}</li>}
             {kontakte.map((k) => {
               const aktiv = k.id === kontaktId
               const faellig = k.nextTouchAt && k.nextTouchAt <= heute
@@ -102,18 +121,30 @@ export default async function GespraechSeite({
                   <Link
                     href={`/admin/gespraech?kontakt=${k.id}${q ? `&q=${encodeURIComponent(q)}` : ""}`}
                     aria-current={aktiv ? "page" : undefined}
-                    className={`border-line flex flex-col gap-0.5 border-b px-3 py-2.5 transition-colors ${
-                      aktiv ? "bg-surface border-l-gold border-l-2" : "hover:bg-surface"
+                    className={`flex items-center gap-3 rounded-md px-2 py-2 transition-colors ${
+                      aktiv ? "bg-surface ring-line-strong ring-1" : "hover:bg-surface"
                     }`}
                   >
-                    <span className="flex items-center justify-between gap-2 text-sm font-medium">
-                      <span className="truncate">{k.name}</span>
-                      {faellig && (
-                        <span className="text-gold-text shrink-0 font-mono text-[11px] uppercase">{t.heuteFaellig}</span>
-                      )}
+                    <span
+                      aria-hidden="true"
+                      className={`flex size-8 shrink-0 items-center justify-center rounded-full font-mono text-[11px] ${
+                        aktiv ? "bg-gold text-primary-foreground" : "bg-secondary text-foreground"
+                      }`}
+                    >
+                      {initialen(k.name)}
                     </span>
-                    <span className="text-muted-foreground truncate text-xs">
-                      {[k.organisation, k.phone].filter(Boolean).join(" · ") || "—"}
+                    <span className="flex min-w-0 flex-1 flex-col">
+                      <span className="flex items-center justify-between gap-2 text-sm font-medium">
+                        <span className="truncate">{k.name}</span>
+                        {faellig && (
+                          <span className="bg-gold/15 text-gold-text shrink-0 rounded px-1.5 font-mono text-[10px] uppercase">
+                            {t.heuteFaellig}
+                          </span>
+                        )}
+                      </span>
+                      <span className="text-muted-foreground truncate text-xs">
+                        {[k.organisation, k.phone].filter(Boolean).join(" · ") || "—"}
+                      </span>
                     </span>
                   </Link>
                 </li>
@@ -121,26 +152,32 @@ export default async function GespraechSeite({
             })}
           </ul>
 
-          <details className="border-line border p-4" open={kontakte.length === 0}>
-            <summary className="cursor-pointer text-sm font-medium">{t.neuerKontakt}</summary>
-            <form action={kontaktAnlegen} className="mt-4 flex flex-col gap-3">
-              <label className="flex flex-col gap-1 text-xs">
+          <details className="group border-line rounded-lg border" open={kontakte.length === 0}>
+            <summary className="hover:bg-surface flex cursor-pointer list-none items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium">
+              <Plus aria-hidden="true" className="size-4 transition-transform group-open:rotate-45" />
+              {t.neuerKontakt}
+            </summary>
+            <form action={kontaktAnlegen} className="flex flex-col gap-3 px-3 pb-3">
+              <label className="text-muted-foreground flex flex-col gap-1 text-xs">
                 {t.name}
                 <input name="name" required maxLength={160} className={FELD} />
               </label>
-              <label className="flex flex-col gap-1 text-xs">
+              <label className="text-muted-foreground flex flex-col gap-1 text-xs">
                 {t.firma}
                 <input name="firma" maxLength={160} className={FELD} />
               </label>
-              <label className="flex flex-col gap-1 text-xs">
+              <label className="text-muted-foreground flex flex-col gap-1 text-xs">
                 {t.telefon}
                 <input name="phone" type="tel" maxLength={60} className={FELD} />
               </label>
-              <label className="flex flex-col gap-1 text-xs">
+              <label className="text-muted-foreground flex flex-col gap-1 text-xs">
                 {t.email}
                 <input name="email" type="email" maxLength={200} className={FELD} />
               </label>
-              <button type="submit" className="bg-gold text-background hover:bg-gold-deep px-4 py-2.5 text-sm font-medium transition-colors">
+              <button
+                type="submit"
+                className="bg-gold text-primary-foreground hover:bg-gold-deep rounded-md px-4 py-2 text-sm font-medium transition-colors"
+              >
                 {t.anlegen}
               </button>
             </form>
@@ -149,19 +186,31 @@ export default async function GespraechSeite({
 
         <div className="min-w-0">
           {kontakt ? (
-            <Gespraechsraum key={kontakt.id} kontakt={kontakt} t={t} />
+            <Gespraechsraum
+              key={kontakt.id}
+              kontakt={kontakt}
+              t={t}
+              verlauf={<Verlauf eintraege={verlauf} t={t} />}
+            />
           ) : (
-            <div className="border-line flex min-h-80 flex-col justify-center gap-3 border border-dashed p-8">
-              <h2 className="type-h3 text-balance">{t.waehlen}</h2>
-              <p className="text-muted-foreground max-w-lg leading-relaxed text-pretty">{t.waehlenText}</p>
+            <div className="border-line grid overflow-hidden rounded-xl border xl:grid-cols-[minmax(0,1fr)_22rem]">
+              <div className="flex min-h-96 flex-col justify-center gap-3 p-8 sm:p-12">
+                <p className="eyebrow text-gold-text">{t.zentrale}</p>
+                <h2 className="font-display text-3xl font-semibold tracking-tight text-balance">{t.waehlen}</h2>
+                <p className="text-muted-foreground max-w-lg leading-relaxed text-pretty">{t.waehlenText}</p>
+              </div>
+              <aside
+                aria-label={t.zuletzt}
+                className="border-line bg-background/60 flex flex-col border-t xl:border-t-0 xl:border-l"
+              >
+                <h2 className="border-line font-display border-b px-5 py-4 text-base font-semibold">{t.zuletzt}</h2>
+                <div className="px-5 py-5">
+                  <Verlauf eintraege={verlauf} t={t} mitName />
+                </div>
+              </aside>
             </div>
           )}
         </div>
-
-        <aside aria-label={kontakt ? t.verlauf : t.zuletzt} className="flex flex-col gap-4 lg:col-span-2 2xl:col-span-1">
-          <h2 className="eyebrow text-gold-text">{kontakt ? t.verlauf : t.zuletzt}</h2>
-          <Verlauf eintraege={verlauf} t={t} mitName={!kontakt} />
-        </aside>
       </div>
     </AdminShell>
   )
