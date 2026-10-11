@@ -269,6 +269,38 @@ export const productWorks: Work[] = [
     mark: "fb",
     live: true,
   },
+  /*
+   * Owner 11.10.2026: Entstanden als Auftrag fuer einen Gastro-Franchise-
+   * nehmer (Zuerich, Luzern), seither eigenes Produkt fuer alle Kunden.
+   * Der Auftraggeber wird NICHT genannt — dafuer braeuchte es seine
+   * schriftliche Freigabe (Gate 13). Das Produkt selbst gehoert dem Haus.
+   */
+  {
+    slug: "stammo",
+    sector: { de: "Gastronomie · Kundenbindung", tr: "Gastronomi · Müşteri sadakati", en: "Hospitality · loyalty", ar: "ضيافة · ولاء العملاء" },
+    year: "2026",
+    name: "Stammo",
+    what: {
+      de: "Digitale Stempelkarte im Apple und Google Wallet — erkennt, wenn Stammgäste wegbleiben, und holt sie zurück.",
+      tr: "Apple ve Google Wallet'ta dijital damga kartı — müdavimlerin uzaklaştığını fark eder ve onları geri getirir.",
+      en: "A digital stamp card in Apple and Google Wallet — notices when regulars drift away and brings them back.",
+      ar: "بطاقة طوابع رقمية في Apple وGoogle Wallet — تلاحظ غياب الزبائن الدائمين وتعيدهم.",
+    },
+    built: {
+      de: "Marke, Produkt, Wallet-Pässe, Scanner, Dashboard, Abo-System — von Grund auf.",
+      tr: "Marka, ürün, Wallet kartları, tarayıcı, panel, abonelik sistemi — sıfırdan.",
+      en: "Brand, product, wallet passes, scanner, dashboard, subscriptions — from the ground up.",
+      ar: "العلامة والمنتج وبطاقات المحفظة والماسح ولوحة التحكم ونظام الاشتراك — من الأساس.",
+    },
+    outcome: { de: "Live unter stammo.app · im Einsatz bei Gastrobetrieben", tr: "stammo.app adresinde canlı · gastronomi işletmelerinde kullanımda", en: "Live at stammo.app · in use at hospitality businesses", ar: "حيّ على stammo.app · قيد الاستخدام لدى مطاعم" },
+    kind: "Produkt",
+    region: "DE & CH",
+    image: "/works/stammo.png",
+    imageProof: "product-photo",
+    mark: "st",
+    href: "https://stammo.app",
+    live: true,
+  },
   {
     slug: "meai",
     sector: { de: "KI · Business-Software", tr: "Yapay zekâ · İş yazılımı", en: "AI · business software", ar: "ذكاء اصطناعي · برمجيات أعمال" },
@@ -532,6 +564,30 @@ export const productWorlds: Record<string, ProductWorld> = {
     operations: null,
     learnings: [],
   },
+  stammo: {
+    blocks: [
+      { de: "Marke & Produkt", tr: "Marka & ürün", en: "Brand & product", ar: "العلامة والمنتج" },
+      { de: "Apple- & Google-Wallet-Pässe", tr: "Apple & Google Wallet kartları", en: "Apple & Google Wallet passes", ar: "بطاقات Apple وGoogle Wallet" },
+      { de: "Scanner & Dashboard", tr: "Tarayıcı & panel", en: "Scanner & dashboard", ar: "الماسح ولوحة التحكم" },
+      { de: "Abo-System & Automatiken", tr: "Abonelik sistemi & otomasyonlar", en: "Subscriptions & automations", ar: "الاشتراكات والأتمتة" },
+    ],
+    layer: "automation",
+    maturity: "live",
+    story: {
+      de: "Stammo begann als Auftrag: Ein Gastro-Franchisenehmer in Zürich und Luzern wollte eine Stempelkarte ohne Papier. Daraus wurde ein eigenes Produkt — heute steht es jedem Betrieb offen, auf Deutsch und Französisch.",
+      tr: "Stammo bir siparişle başladı: Zürih ve Luzern'deki bir gastronomi franchise'ı kâğıtsız bir damga kartı istedi. Bundan kendi ürünümüz doğdu — bugün Almanca ve Fransızca olarak her işletmeye açık.",
+      en: "Stammo began as a commission: a hospitality franchisee in Zurich and Lucerne wanted a stamp card without paper. It became a product of its own — open to every business today, in German and French.",
+      ar: "بدأ Stammo كطلب من عميل: صاحب امتياز مطاعم في زيورخ ولوتسيرن أراد بطاقة طوابع بلا ورق. ومن ذلك وُلد منتج خاص بنا — مفتوح اليوم لكل منشأة بالألمانية والفرنسية.",
+    },
+    houseContext: null,
+    flagship: false,
+    problem: null,
+    thesis: null,
+    functions: [],
+    architecture: null,
+    operations: null,
+    learnings: [],
+  },
   cassamea: {
     blocks: [
       { de: "Kassen-Software", tr: "Kasa yazılımı", en: "POS software", ar: "برمجيات نقاط البيع" },
@@ -698,6 +754,91 @@ export const clientWorks: Work[] = [
     approvedSentence: null,
   },
   /*
+   * Owner 11.10.2026 — drei neue Kundenarbeiten. Inhalt steht, sichtbar
+   * werden sie mit der schriftlichen Freigabe des Kunden (`releases`).
+   */
+  {
+    slug: "vegancatering",
+    sector: { de: "Gastronomie · Catering", tr: "Gastronomi · Catering", en: "Hospitality · catering", ar: "ضيافة · تموين" },
+    year: "2026",
+    name: "vegancatering.ch",
+    what: {
+      de: "Veganes Catering aus Zürich — vom Logo bis zur Systemarchitektur.",
+      tr: "Zürih'ten vegan catering — logodan sistem mimarisine kadar.",
+      en: "Vegan catering from Zurich — from the logo to the system architecture.",
+      ar: "تموين نباتي من زيورخ — من الشعار إلى بنية النظام.",
+    },
+    built: {
+      de: "Logo, Marke, Website, Bestell- und Systemarchitektur.",
+      tr: "Logo, marka, web sitesi, sipariş ve sistem mimarisi.",
+      en: "Logo, brand, website, ordering and system architecture.",
+      ar: "الشعار والعلامة والموقع وبنية الطلبات والنظام.",
+    },
+    outcome: { de: "Kundenwerk · im Aufbau", tr: "Müşteri işi · kuruluyor", en: "Client work · in build", ar: "عمل لعميل · قيد البناء" },
+    kind: "Kundenwerk",
+    region: "CH",
+    image: null,
+    imageProof: null,
+    mark: "vc",
+    href: "https://www.vegancatering.ch",
+    releases: [],
+    approvedSentence: null,
+  },
+  {
+    slug: "ennur",
+    sector: { de: "Stiftung · Bildung", tr: "Vakıf · eğitim", en: "Foundation · education", ar: "وقف · تعليم" },
+    year: "2026",
+    name: "ennur.org",
+    what: {
+      de: "Digitale Quran-Bibliothek für eine Stiftung — von Anfang bis Ende.",
+      tr: "Bir vakıf için dijital Kur'an kütüphanesi — baştan sona.",
+      en: "A digital Quran library for a foundation — from start to finish.",
+      ar: "مكتبة قرآنية رقمية لوقف — من البداية إلى النهاية.",
+    },
+    built: {
+      de: "Konzept, Marke, Plattform, Inhaltsstruktur, Betrieb.",
+      tr: "Konsept, marka, platform, içerik yapısı, işletme.",
+      en: "Concept, brand, platform, content structure, operation.",
+      ar: "المفهوم والعلامة والمنصة وبنية المحتوى والتشغيل.",
+    },
+    outcome: { de: "Kundenwerk · live", tr: "Müşteri işi · canlı", en: "Client work · live", ar: "عمل لعميل · حيّ" },
+    kind: "Kundenwerk",
+    region: "DE",
+    image: null,
+    imageProof: null,
+    mark: "en",
+    href: "https://ennur.org",
+    live: true,
+    releases: [],
+    approvedSentence: null,
+  },
+  {
+    slug: "an-automobile",
+    sector: { de: "Autohandel · Werbetechnik", tr: "Oto ticareti · reklam tekniği", en: "Car dealership · signage", ar: "تجارة سيارات · لافتات" },
+    year: "2026",
+    name: "A+N Automobile",
+    what: {
+      de: "Autohandel in Diepholz — Fassadenbanner als Selbstklebefolie, Gestaltung und Druck.",
+      tr: "Diepholz'da oto ticareti — yapışkanlı folyo cephe bandı, tasarım ve baskı.",
+      en: "Car dealership in Diepholz — self-adhesive façade banner, design and print.",
+      ar: "تجارة سيارات في ديبهولتس — لافتة واجهة لاصقة، تصميم وطباعة.",
+    },
+    built: {
+      de: "Gestaltung, Druckvorstufe, Selbstklebefolie.",
+      tr: "Tasarım, baskı öncesi hazırlık, yapışkanlı folyo.",
+      en: "Design, prepress, self-adhesive foil.",
+      ar: "التصميم وما قبل الطباعة والملصق اللاصق.",
+    },
+    outcome: { de: "Kundenwerk · vor Ort", tr: "Müşteri işi · yerinde", en: "Client work · on site", ar: "عمل لعميل · في الموقع" },
+    kind: "Kundenwerk",
+    region: "DE",
+    image: "/works/an-automobile.png",
+    imageProof: "mockup",
+    mark: "AN",
+    releases: [],
+    approvedSentence: null,
+  },
+  /*
    * [OWNER-BESTAETIGUNG AUSSTEHEND] — Rumi's Maison
    *
    * Frage an den Owner: echter zahlender Kunde, ja oder nein? Bis zur
@@ -852,7 +993,7 @@ export function workHref(work: Work): string {
  * Slugs, keine Kopien: Der Inhalt bleibt in `productWorks`/`clientWorks`, hier
  * steht nur die Reihenfolge. Wer einen Slug aendert, faellt beim Build auf.
  */
-export const featuredWorkSlugs = ["fibero", "meai", "nv-swiss"] as const
+export const featuredWorkSlugs = ["stammo", "fibero", "meai", "nv-swiss"] as const
 
 /** Aufgeloest in der Reihenfolge oben; unbekannte Slugs fallen still weg. */
 export const featuredWorks: Work[] = featuredWorkSlugs
