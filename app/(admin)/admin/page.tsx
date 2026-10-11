@@ -219,19 +219,13 @@ export default async function Uebersicht() {
         </section>
 
         <aside className="flex min-w-0 flex-col gap-10">
-          {/* ── 3 · Systemzustand ── */}
-          <section aria-labelledby="system-titel">
-            <SectionHeader id="system-titel" title={t.uebersicht.systemTitel} count={betrieb.length ? t.uebersicht.punkte(betrieb.length) : undefined} />
-            {betrieb.length === 0 ? (
-              <p className="type-small text-muted-foreground mt-4">{t.uebersicht.systemOk}</p>
-            ) : (
+          {/* ── 3 · Systemzustand — nur bei echter Störung; Einrichtung läuft im Hintergrund ── */}
+          {betrieb.length > 0 ? (
+            <section aria-labelledby="system-titel">
+              <SectionHeader id="system-titel" title={t.uebersicht.systemTitel} count={t.uebersicht.punkte(betrieb.length)} />
               <Punktliste items={betrieb} t={t} intl={intl} />
-            )}
-            <p className="type-small text-muted-foreground mt-4">{t.uebersicht.materialZeile(board.materialRest)}</p>
-            <Link href="/admin/material" className="text-gold-text mt-2 inline-block text-sm underline underline-offset-4">
-              {t.uebersicht.zumSystem}
-            </Link>
-          </section>
+            </section>
+          ) : null}
 
           {/* ── 3b · W6 · A4 — was das System selbst erledigt hat ── */}
           <SystemErledigt />

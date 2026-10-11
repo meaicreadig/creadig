@@ -209,7 +209,9 @@ export function Gespraechsraum({
     <div aria-live="polite" className="flex flex-col gap-4">
       <p className="eyebrow text-gold-text">{t.gespeichertEyebrow}</p>
       <p className="font-display text-lg font-semibold text-balance">
-        {t.gespeichertTitel(kontakt.name, Math.max(1, Math.round(gespeichert.sek / 60)))}
+        {t.gespeichertTitel
+          .replace("{name}", kontakt.name)
+          .replace("{min}", String(Math.max(1, Math.round(gespeichert.sek / 60))))}
       </p>
       {gespeichert.folge && gespeichert.folgeAm ? (
         <>
