@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import Link from "next/link"
 import { UngespeichertWache } from "@/components/admin/ungespeichert-wache"
 import { Logo } from "@/components/brand/logo"
 import { AdminLogout } from "@/components/admin/admin-logout"
@@ -98,10 +99,10 @@ export async function AdminShell({
           className="border-line bg-surface flex flex-col gap-4 border-b px-4 py-4 sm:px-6 lg:sticky lg:top-0 lg:h-dvh lg:gap-6 lg:overflow-y-auto lg:border-r lg:border-b-0 lg:px-5 lg:py-7"
         >
           <div className="flex items-start justify-between gap-3">
-            <a href="/admin" className="flex flex-col gap-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-gold">
+            <Link href="/admin" className="flex flex-col gap-2 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-gold">
               <Logo variant="light" className="h-6" />
               <span className="text-meta text-gold-text tracking-widest uppercase">{t.shell.produkt}</span>
-            </a>
+            </Link>
             <div className="lg:hidden">{umschalter}</div>
           </div>
 
