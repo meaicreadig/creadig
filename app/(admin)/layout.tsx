@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next"
 
 import { adminSprache } from "@/lib/admin-i18n/server"
-import { Geist, Geist_Mono, } from "next/font/google"
+import { JetBrains_Mono, Manrope, M_PLUS_Rounded_1c } from "next/font/google"
 import "@/app/globals.css"
 
 /**
@@ -26,16 +26,26 @@ import "@/app/globals.css"
  *   TR              Einsprachig deutsch (MP-G §50, Owner-Freigabe steht aus).
  */
 
-const geist = Geist({
+/* Dieselben Markenschriften wie die Webseite (Owner-Entscheidung, nicht ändern ohne Freigabe). */
+const manrope = Manrope({
   subsets: ["latin", "latin-ext"],
-  variable: "--font-geist",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-manrope",
   display: "swap",
 })
 
-
-const geistMono = Geist_Mono({
+const mplusRounded = M_PLUS_Rounded_1c({
   subsets: ["latin", "latin-ext"],
-  variable: "--font-geist-mono",
+  weight: ["400", "500", "700"],
+  variable: "--font-mplus",
+  display: "swap",
+  preload: false,
+})
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500"],
+  variable: "--font-jetbrains",
   display: "swap",
 })
 
@@ -56,7 +66,7 @@ export default async function AdminRootLayout({ children }: { children: React.Re
   return (
     <html
       lang={sprache}
-      className={`dark bg-background ${geist.variable} ${geistMono.variable}`}
+      className={`dark bg-background ${manrope.variable} ${mplusRounded.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>{children}</body>
