@@ -285,6 +285,12 @@ export function Gespraechsraum({
         >
           {t.zurAkte}
         </Link>
+        <Link
+          href={`/admin/termine?kontakt=${encodeURIComponent(kontakt.id)}`}
+          className="text-gold-text text-sm underline-offset-4 hover:underline"
+        >
+          {t.terminmail}
+        </Link>
       </div>
     </div>
   ) : null

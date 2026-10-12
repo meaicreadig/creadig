@@ -56,6 +56,7 @@ export type GespraechText = {
   googleKalender: string
   neuesGespraech: string
   zurAkte: string
+  terminmail: string
   min: string
   zentrale: string
   gespraechChip: string
@@ -154,6 +155,7 @@ const DE: GespraechText = {
   googleKalender: "Google Kalender",
   neuesGespraech: "Neues Gespräch",
   zurAkte: "Zur Kundenakte",
+  terminmail: "Terminmail senden",
   min: "Min",
   zentrale: "Zentrale",
   gespraechChip: "Gespräch",
@@ -257,6 +259,7 @@ const TR: GespraechText = {
   googleKalender: "Google Takvim",
   neuesGespraech: "Yeni görüşme",
   zurAkte: "Müşteri dosyasına git",
+  terminmail: "Randevu e-postası gönder",
   min: "dk",
   zentrale: "Merkez",
   gespraechChip: "Görüşme",

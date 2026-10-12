@@ -219,6 +219,9 @@ export const FLAECHEN: readonly Flaeche[] = [
   /* Zentrale Stufe A — Gesprächsraum: Mitschrift am Kontakt, also Personendaten Dritter. */
   { pfad: "/admin/gespraech", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
 
+  /* Termin-Motor — Buchungen tragen Namen und E-Mail der Gäste. */
+  { pfad: "/admin/termine", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
+
   { pfad: "/admin/kunden", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   { pfad: "/admin/kunden/:id", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
 
