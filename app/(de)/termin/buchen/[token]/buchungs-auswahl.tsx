@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState, useTransition } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { CalendarCheck } from "lucide-react"
 
@@ -139,9 +140,9 @@ export function BuchungsAuswahl({ token, slots, timezone, dauer }: { token: stri
         </div>
         <p className="text-muted-foreground text-xs leading-relaxed">
           Ihre Angaben nutzen wir nur für diesen Termin. Mehr in der{" "}
-          <a href="/datenschutz" className="underline underline-offset-4">
+          <Link href="/datenschutz" className="underline underline-offset-4">
             Datenschutzerklärung
-          </a>
+          </Link>
           .
         </p>
       </form>
