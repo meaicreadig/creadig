@@ -200,6 +200,9 @@ export const FLAECHEN: readonly Flaeche[] = [
 
   /* Marketing-Übersicht: liest dieselben Veröffentlichungen, also dieselbe Regel — nur `owner`. */
   { pfad: "/admin/marketing", klasse: "eigene-lage", fuer: ["owner"] },
+  /* Mail-Studio: Verteiler enthält fremde Adressen — ebenfalls nur `owner`. */
+  { pfad: "/admin/marketing/mail", klasse: "fremde-personen", fuer: ["owner"] },
+  { pfad: "/admin/marketing/mail/:id", klasse: "fremde-personen", fuer: ["owner"] },
 
   /*
    * PROOF OPERATIONS P1 — der Beleg-Betrieb.
@@ -315,7 +318,7 @@ export function uebergabe(rolle: Rolle): Uebergabepunkt[] {
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * 5 · WAS DIE LAGE HEUTE IST
- * ═══════════════════════════════════════════��═══════════════════════════════ */
+ * ═══════════════════════════════════════════���═══════════════════════════════ */
 
 /**
  * Welche Rollen tatsaechlich vergeben sind.

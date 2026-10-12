@@ -64,7 +64,7 @@ import { localePath } from "@/lib/routes"
  * ueber den Besucher — und der naechste ist ein anderer.
  */
 /* `/termin` gibt es nur einmal: Buchungslinks aus Mails muessen in jeder Browsersprache aufgehen. */
-const SPRACHFREI = /^\/(admin|api|_next|termin(\/|$)|.*\..*)/
+const SPRACHFREI = /^\/(admin|api|_next|termin(\/|$)|mail(\/|$)|.*\..*)/
 const SCHON_UEBERSETZT = /^\/(tr|en|ar)(\/|$)/
 
 function sprachweiche(request: NextRequest) {
