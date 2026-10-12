@@ -34,6 +34,7 @@ export const tr: AdminTexte = {
     nachweise: { label: "Kanıtlar ve onaylar", hint: "Sırada kanıtlanabilecek olan" },
     verbindungen: { label: "Bağlantılar", hint: "Giriş ve çıkış yolları, dürüstçe" },
     gespraech: { label: "Görüşme odası", hint: "Ara, not al, takip randevusu" },
+    termine: { label: "Randevular", hint: "Müsaitlik, blokajlar, rezervasyonlar" },
     automationen: { label: "Otomasyonlar", hint: "Kendiliğinden çalışanlar — ve asla çalışmayacaklar" },
     system: { label: "Kurulum", hint: "Materyal, erişimler, tanılama" },
   },
@@ -446,7 +447,7 @@ export const tr: AdminTexte = {
       `${inhalt} müşteri ve talep veritabanında tutulur. Kurulu, ancak şu an yanıt vermedi. Bu boş bir liste değil, bir arızadır — hiçbir şey silinmedi.`,
     erneutLaden: "Yeniden yükle",
     inhaltVertrieb: "Talepler, kişiler ve satış fırsatları",
-    inhaltKunden: "Kuruluşlar, lokasyonlar ve irtibat kişileri",
+    inhaltKunden: "Kuruluşlar, lokasyonlar ve irtibat ki��ileri",
   },
   pipeline: {
     titel: "Satış süreci",

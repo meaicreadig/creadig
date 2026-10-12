@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import {
   BadgeCheck,
   Building2,
+  CalendarClock,
   Inbox,
   LayoutDashboard,
   Megaphone,
@@ -22,6 +23,7 @@ export type NavItem = { href: string; label: string; hint: string; gruppe: strin
 const ICONS: Record<string, LucideIcon> = {
   uebersicht: LayoutDashboard,
   gespraech: MessagesSquare,
+  termine: CalendarClock,
   anfragen: Inbox,
   vertrieb: TrendingUp,
   kunden: Building2,

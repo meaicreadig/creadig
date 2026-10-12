@@ -30,6 +30,7 @@ export const de = {
     veroeffentlichungen: { label: "Veröffentlichungen", hint: "Was hinausging, und was zurückkam" },
     uebersicht: { label: "Übersicht", hint: "Was heute zählt" },
     gespraech: { label: "Gesprächsraum", hint: "Anrufen, mitschreiben, Folgetermin" },
+    termine: { label: "Termine", hint: "Verfügbarkeit, Sperren, Buchungen" },
     anfragen: { label: "Anfragen", hint: "Eingang, Qualifizierung, nächster Schritt" },
     kunden: { label: "Kunden & Kontakte", hint: "Organisationen, Personen, Historie" },
     vertrieb: { label: "Vertrieb", hint: "Chancen, Pipeline, Recherche, Verlust" },
