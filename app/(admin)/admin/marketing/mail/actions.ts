@@ -1,0 +1,211 @@
+"use server"
+
+import { cookies } from "next/headers"
+import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
+
+import { ADMIN_COOKIE } from "@/lib/admin-session"
+import { pruefeZugang } from "@/lib/admin-widerruf"
+import { darfBetreten } from "@/lib/rollen"
+import { siteUrl } from "@/lib/termine/mail"
+import { schreibeKampagne, type KampagnenAnlass, type KiKampagne } from "@/lib/mailing/ki"
+import {
+  aktiveEmpfaenger,
+  empfaengerEintragen,
+  empfaengerStatus,
+  kampagne,
+  kampagneAbschliessen,
+  kampagneAnlegen,
+  kampagneLoeschen,
+  kampagneSpeichern,
+  kontaktFuerVerteiler,
+  zustellungErgebnis,
+  zustellungenVormerken,
+  type Basis,
+} from "@/lib/mailing/store"
+import { anredeFuer, kampagnenHtml, kampagnenText, type KampagnenInhalt } from "@/lib/mailing/vorlage"
+
+const PFAD = "/admin/marketing/mail"
+
+async function darf(aendernd = true): Promise<boolean> {
+  const z = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd })
+  return z.verdict === "ok" && Boolean(z.rolle) && darfBetreten(z.rolle, "/admin/marketing")
+}
+
+function bereinigt(k: KampagnenInhalt): KampagnenInhalt {
+  return {
+    subject: String(k.subject ?? "").trim().slice(0, 120),
+    preheader: String(k.preheader ?? "").trim().slice(0, 160),
+    headline: String(k.headline ?? "").trim().slice(0, 140),
+    body: String(k.body ?? "").slice(0, 8000),
+    ctaText: String(k.ctaText ?? "").trim().slice(0, 40),
+    ctaUrl: String(k.ctaUrl ?? "").trim().slice(0, 500),
+  }
+}
+
+function pruefen(k: KampagnenInhalt): string | null {
+  if (!k.subject) return "Betreff fehlt."
+  if (k.body.trim().length < 40) return "Inhalt ist zu kurz."
+  if (k.ctaText && !/^https:\/\/[^\s]+$/.test(k.ctaUrl)) return "Knopf-Link muss mit https:// beginnen."
+  return null
+}
+
+function absender() {
+  const key = process.env.RESEND_API_KEY?.trim()
+  const from = process.env.MAIL_FROM?.trim() || process.env.LEAD_FROM?.trim()
+  const replyTo = process.env.MAIL_REPLY_TO?.trim() || process.env.LEAD_TO?.trim() || undefined
+  return key && from ? { key, from, replyTo } : null
+}
+
+type Ergebnis = { ok: true; hinweis?: string } | { fehler: string }
+
+export async function kiEntwurf(anlass: KampagnenAnlass, stichpunkte: string): Promise<KiKampagne> {
+  if (!(await darf(false))) return { fehler: "Kein Zugang." }
+  if (stichpunkte.trim().length < 10) return { fehler: "Bitte ein paar Stichpunkte eingeben." }
+  return schreibeKampagne(anlass, stichpunkte)
+}
+
+export async function neueKampagne(): Promise<void> {
+  if (!(await darf())) return
+  const id = await kampagneAnlegen({ ctaUrl: `${siteUrl()}/termin` })
+  redirect(`${PFAD}/${id}`)
+}
+
+export async function speichern(id: string, roh: KampagnenInhalt): Promise<Ergebnis> {
+  if (!(await darf())) return { fehler: "Kein Zugang." }
+  const ok = await kampagneSpeichern(id, bereinigt(roh))
+  if (!ok) return { fehler: "Bereits versendete Kampagnen sind gesperrt." }
+  revalidatePath(PFAD)
+  return { ok: true }
+}
+
+export async function loeschen(id: string): Promise<void> {
+  if (!(await darf())) return
+  await kampagneLoeschen(id)
+  revalidatePath(PFAD)
+  redirect(PFAD)
+}
+
+export async function testSenden(id: string, roh: KampagnenInhalt): Promise<Ergebnis> {
+  if (!(await darf())) return { fehler: "Kein Zugang." }
+  const k = bereinigt(roh)
+  const problem = pruefen(k)
+  if (problem) return { fehler: problem }
+  const a = absender()
+  const an = process.env.MAIL_REPLY_TO?.trim() || process.env.LEAD_TO?.trim()
+  if (!a || !an) return { fehler: "Mailversand ist nicht eingerichtet." }
+  await kampagneSpeichern(id, k)
+  const abmeldeUrl = `${siteUrl()}/mail/abmelden/test`
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${a.key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: a.from,
+      to: [an],
+      subject: `[Test] ${k.subject}`,
+      html: kampagnenHtml(k, { siteUrl: siteUrl(), abmeldeUrl, anrede: anredeFuer("Muhammed Emin Akyol") }),
+      text: kampagnenText(k, { abmeldeUrl, anrede: anredeFuer("Muhammed Emin Akyol") }),
+    }),
+  })
+  if (!res.ok) return { fehler: `Versand fehlgeschlagen (${res.status}).` }
+  return { ok: true, hinweis: `Test an ${an} gesendet.` }
+}
+
+export async function versenden(id: string, roh: KampagnenInhalt): Promise<Ergebnis> {
+  if (!(await darf())) return { fehler: "Kein Zugang." }
+  const k = bereinigt(roh)
+  const problem = pruefen(k)
+  if (problem) return { fehler: problem }
+  const a = absender()
+  if (!a) return { fehler: "Mailversand ist nicht eingerichtet." }
+  const vorhanden = await kampagne(id)
+  if (!vorhanden) return { fehler: "Kampagne nicht gefunden." }
+  if (vorhanden.status === "entwurf") await kampagneSpeichern(id, k)
+  if ((await aktiveEmpfaenger()).length === 0) return { fehler: "Der Verteiler ist leer." }
+
+  const basis = siteUrl()
+  const offen = await zustellungenVormerken(id)
+  let gesendet = 0
+  let fehler = 0
+  for (let i = 0; i < offen.length; i += 50) {
+    const stapel = offen.slice(i, i + 50)
+    const mails = stapel.map((z) => {
+      const abmeldeUrl = `${basis}/mail/abmelden/${z.token}`
+      const ctaHref = `${basis}/api/mail/k/${z.id}`
+      const anrede = anredeFuer(z.name)
+      return {
+        from: a.from,
+        to: [z.email],
+        subject: k.subject,
+        html: kampagnenHtml(k, { siteUrl: basis, abmeldeUrl, ctaHref, pixelUrl: `${basis}/api/mail/o/${z.id}`, anrede }),
+        text: kampagnenText(k, { abmeldeUrl, ctaHref, anrede }),
+        ...(a.replyTo ? { reply_to: a.replyTo } : {}),
+        headers: {
+          "List-Unsubscribe": `<${basis}/api/mail/abmelden/${z.token}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+      }
+    })
+    try {
+      const res = await fetch("https://api.resend.com/emails/batch", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${a.key}`, "Content-Type": "application/json", "Idempotency-Key": `${id}-${i}-${stapel[0].id}` },
+        body: JSON.stringify(mails),
+      })
+      if (res.ok) {
+        await zustellungErgebnis(stapel.map((z) => z.id), true)
+        gesendet += stapel.length
+      } else {
+        await zustellungErgebnis(stapel.map((z) => z.id), false, `HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`)
+        fehler += stapel.length
+      }
+    } catch (e) {
+      await zustellungErgebnis(stapel.map((z) => z.id), false, String(e).slice(0, 300))
+      fehler += stapel.length
+    }
+  }
+  if (gesendet > 0) await kampagneAbschliessen(id)
+  revalidatePath(PFAD)
+  revalidatePath(`${PFAD}/${id}`)
+  if (gesendet === 0 && fehler === 0) return { ok: true, hinweis: "Alle Empfänger hatten diese Kampagne bereits." }
+  if (gesendet === 0) return { fehler: `Versand fehlgeschlagen (${fehler} Empfänger).` }
+  return { ok: true, hinweis: `${gesendet} Mails versendet${fehler ? `, ${fehler} fehlgeschlagen` : ""}.` }
+}
+
+/* Verteiler ---------------------------------------------------------------- */
+
+function basisAus(v: FormDataEntryValue | null): Basis | null {
+  return v === "einwilligung" || v === "bestandskunde" ? v : null
+}
+
+export async function empfaengerHinzufuegen(formData: FormData): Promise<void> {
+  if (!(await darf())) return
+  const email = String(formData.get("email") ?? "").trim()
+  const basis = basisAus(formData.get("basis"))
+  const quelle = String(formData.get("quelle") ?? "").trim().slice(0, 200)
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !basis || quelle.length < 3 || formData.get("bestaetigt") !== "1") return
+  const name = String(formData.get("name") ?? "").trim().slice(0, 120) || null
+  await empfaengerEintragen({ email: email.slice(0, 200), name, basis, source: quelle })
+  revalidatePath(PFAD)
+}
+
+export async function kontakteUebernehmen(formData: FormData): Promise<void> {
+  if (!(await darf())) return
+  const basis = basisAus(formData.get("basis"))
+  const quelle = String(formData.get("quelle") ?? "").trim().slice(0, 200)
+  if (!basis || quelle.length < 3 || formData.get("bestaetigt") !== "1") return
+  const ids = formData.getAll("kontakt").map(String).slice(0, 200)
+  for (const id of ids) {
+    const c = await kontaktFuerVerteiler(id.slice(0, 80))
+    if (c) await empfaengerEintragen({ email: c.email, name: c.name, basis, source: quelle, contactId: c.id })
+  }
+  revalidatePath(PFAD)
+}
+
+export async function empfaengerUmschalten(formData: FormData): Promise<void> {
+  if (!(await darf())) return
+  const id = String(formData.get("id") ?? "").slice(0, 80)
+  const status = formData.get("status") === "aktiv" ? "aktiv" : "abgemeldet"
+  await empfaengerStatus(id, status)
+  revalidatePath(PFAD)
+}

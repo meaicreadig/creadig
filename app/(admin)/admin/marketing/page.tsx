@@ -164,6 +164,13 @@ export default async function MarketingSeite() {
         >
           {t.alle}
         </Link>
+        <Link
+          href="/admin/marketing/mail"
+          className="border-gold text-gold-text inline-flex h-10 items-center gap-1.5 rounded-md border px-4 text-sm font-medium transition-colors hover:bg-muted/40"
+        >
+          {sprache === "tr" ? "E-posta pazarlama" : "E-Mail-Marketing"}
+          <ArrowUpRight className="size-4" aria-hidden="true" />
+        </Link>
       </div>
 
       <WochenPlan d={d} t={t} />

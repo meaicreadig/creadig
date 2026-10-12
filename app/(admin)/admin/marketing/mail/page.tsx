@@ -1,0 +1,276 @@
+import Link from "next/link"
+
+import { AdminShell } from "@/components/admin/admin-shell"
+import { AdminField, AdminInput, AdminSelect, Pill, SectionHeader, Surface, UnavailableNote } from "@/components/admin/primitives"
+import { adminSprachKontext } from "@/lib/admin-i18n/server"
+import { empfaenger, freieKontakte, kampagnen, type Empfaenger, type FreierKontakt, type Kampagne } from "@/lib/mailing/store"
+
+import { empfaengerHinzufuegen, empfaengerUmschalten, kontakteUebernehmen, neueKampagne } from "./actions"
+
+export const dynamic = "force-dynamic"
+
+const T = {
+  de: {
+    title: "E-Mail-Marketing",
+    lead: "Kampagnen schreiben, an den Verteiler senden und sehen, wer reagiert. Jede Adresse hat eine dokumentierte Rechtsgrundlage und kann sich mit einem Klick abmelden.",
+    aktiv: "Aktive Empfänger",
+    versendet: "Versendete Kampagnen",
+    oeffnung: "Öffnungsrate (ungefähr)",
+    klick: "Klickrate",
+    kampagnen: "Kampagnen",
+    neu: "Neue Kampagne",
+    keine: "Noch keine Kampagne. Lege die erste an — die KI schreibt den Entwurf aus deinen Stichpunkten.",
+    entwurf: "Entwurf",
+    gesendet: "Versendet",
+    ohneBetreff: "Ohne Betreff",
+    verteiler: "Verteiler",
+    einzeln: "Adresse eintragen",
+    email: "E-Mail",
+    name: "Name (für die Anrede)",
+    basis: "Rechtsgrundlage",
+    einwilligung: "Einwilligung",
+    bestandskunde: "Bestandskunde (§7 Abs. 3 UWG)",
+    quelle: "Nachweis / Quelle",
+    quelleHint: "z. B. Formular creadig.de, 12.10.2026",
+    bestaetigt: "Ich habe eine Einwilligung oder eine Kundenbeziehung mit diesem Kontakt.",
+    eintragen: "Eintragen",
+    ausCrm: "Aus Kontakten übernehmen",
+    keineFreien: "Alle Kontakte mit E-Mail-Adresse sind bereits im Verteiler.",
+    uebernehmen: "Ausgewählte übernehmen",
+    leer: "Der Verteiler ist noch leer.",
+    abmelden: "Abmelden",
+    aktivieren: "Wieder aktiv",
+    status: { aktiv: "aktiv", abgemeldet: "abgemeldet", unzustellbar: "unzustellbar" },
+    db: "Datenbank nicht erreichbar",
+    dbText: "Die Tabellen für Mail-Marketing (Migration 027) fehlen oder die Verbindung ist gestört.",
+  },
+  tr: {
+    title: "E-posta pazarlama",
+    lead: "Kampanya yaz, listeye gönder, kimin tepki verdiğini gör. Her adresin belgelenmiş bir hukuki dayanağı var ve tek tıkla abonelikten çıkabilir.",
+    aktiv: "Aktif alıcı",
+    versendet: "Gönderilen kampanya",
+    oeffnung: "Açılma oranı (yaklaşık)",
+    klick: "Tıklama oranı",
+    kampagnen: "Kampanyalar",
+    neu: "Yeni kampanya",
+    keine: "Henüz kampanya yok. İlkini oluştur — yapay zekâ notlarından taslağı yazar.",
+    entwurf: "Taslak",
+    gesendet: "Gönderildi",
+    ohneBetreff: "Konusuz",
+    verteiler: "Dağıtım listesi",
+    einzeln: "Adres ekle",
+    email: "E-posta",
+    name: "İsim (hitap için)",
+    basis: "Hukuki dayanak",
+    einwilligung: "Onay (izin)",
+    bestandskunde: "Mevcut müşteri (UWG §7/3)",
+    quelle: "Kanıt / kaynak",
+    quelleHint: "örn. creadig.de formu, 12.10.2026",
+    bestaetigt: "Bu kişiden onayım var veya müşteri ilişkimiz var.",
+    eintragen: "Ekle",
+    ausCrm: "Kişilerden aktar",
+    keineFreien: "E-posta adresi olan tüm kişiler zaten listede.",
+    uebernehmen: "Seçilenleri aktar",
+    leer: "Liste henüz boş.",
+    abmelden: "Çıkar",
+    aktivieren: "Tekrar aktif",
+    status: { aktiv: "aktif", abgemeldet: "çıktı", unzustellbar: "ulaşılamıyor" },
+    db: "Veritabanına ulaşılamıyor",
+    dbText: "E-posta pazarlama tabloları (migration 027) eksik veya bağlantı bozuk.",
+  },
+}
+
+function prozent(teil: number, ganz: number): string {
+  return ganz > 0 ? `${Math.round((teil / ganz) * 100)} %` : "—"
+}
+
+export default async function MailMarketingSeite() {
+  const { sprache, intl } = await adminSprachKontext()
+  const t = sprache === "tr" ? T.tr : T.de
+  let daten: { k: Kampagne[]; e: Empfaenger[]; f: FreierKontakt[] } | null = null
+  try {
+    const [k, e, f] = await Promise.all([kampagnen(), empfaenger(), freieKontakte()])
+    daten = { k, e, f }
+  } catch {
+    daten = null
+  }
+
+  if (!daten) {
+    return (
+      <AdminShell title={t.title} lead={t.lead}>
+        <UnavailableNote title={t.db}>{t.dbText}</UnavailableNote>
+      </AdminShell>
+    )
+  }
+
+  const datum = new Intl.DateTimeFormat(intl, { dateStyle: "medium", timeZone: "Europe/Berlin" })
+  const versendet = daten.k.filter((k) => k.status === "versendet")
+  const summeGesendet = versendet.reduce((s, k) => s + k.gesendet, 0)
+  const aktive = daten.e.filter((e) => e.status === "aktiv").length
+
+  const kennzahlen = [
+    { label: t.aktiv, wert: String(aktive) },
+    { label: t.versendet, wert: String(versendet.length) },
+    { label: t.oeffnung, wert: prozent(versendet.reduce((s, k) => s + k.geoeffnet, 0), summeGesendet) },
+    { label: t.klick, wert: prozent(versendet.reduce((s, k) => s + k.geklickt, 0), summeGesendet) },
+  ]
+
+  return (
+    <AdminShell title={t.title} lead={t.lead}>
+      <div className="flex flex-col gap-10">
+        <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {kennzahlen.map((z) => (
+            <Surface key={z.label} padding="sm">
+              <dt className="text-meta text-muted-foreground">{z.label}</dt>
+              <dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{z.wert}</dd>
+            </Surface>
+          ))}
+        </dl>
+
+        <section aria-labelledby="kampagnen" className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <SectionHeader id="kampagnen" title={t.kampagnen} count={daten.k.length} />
+            </div>
+            <form action={neueKampagne}>
+              <button className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-medium">{t.neu}</button>
+            </form>
+          </div>
+          {daten.k.length === 0 ? (
+            <p className="text-muted-foreground text-sm leading-relaxed">{t.keine}</p>
+          ) : (
+            <ul className="border-line divide-line flex flex-col divide-y rounded-md border">
+              {daten.k.map((k) => (
+                <li key={k.id}>
+                  <Link
+                    href={`/admin/marketing/mail/${k.id}`}
+                    className="hover:bg-muted/40 flex flex-col gap-2 px-4 py-3 transition-colors sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium">{k.subject || t.ohneBetreff}</span>
+                      <span className="text-meta text-muted-foreground block truncate">
+                        {datum.format(new Date(k.sentAt ?? k.updatedAt))}
+                        {k.preheader ? ` · ${k.preheader}` : ""}
+                      </span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-3">
+                      {k.status === "versendet" && (
+                        <span className="text-meta text-muted-foreground tabular-nums">
+                          {k.gesendet} → {prozent(k.geoeffnet, k.gesendet)} / {prozent(k.geklickt, k.gesendet)}
+                        </span>
+                      )}
+                      <Pill severity={k.status === "entwurf" ? "attention" : "neutral"}>
+                        {k.status === "entwurf" ? t.entwurf : t.gesendet}
+                      </Pill>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section aria-labelledby="verteiler" className="flex flex-col gap-4">
+          <SectionHeader id="verteiler" title={t.verteiler} count={`${aktive} / ${daten.e.length}`} />
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Surface>
+              <form action={empfaengerHinzufuegen} className="flex flex-col gap-4">
+                <h3 className="text-subhead text-sm">{t.einzeln}</h3>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <AdminField label={t.email} htmlFor="m-email">
+                    <AdminInput id="m-email" name="email" type="email" required autoComplete="off" />
+                  </AdminField>
+                  <AdminField label={t.name} htmlFor="m-name">
+                    <AdminInput id="m-name" name="name" autoComplete="off" />
+                  </AdminField>
+                </div>
+                <BasisFelder t={t} prefix="m" />
+                <button className="bg-primary text-primary-foreground self-start rounded-md px-4 py-2 text-sm font-medium">{t.eintragen}</button>
+              </form>
+            </Surface>
+
+            <Surface>
+              <form action={kontakteUebernehmen} className="flex flex-col gap-4">
+                <h3 className="text-subhead text-sm">{t.ausCrm}</h3>
+                {daten.f.length === 0 ? (
+                  <p className="text-muted-foreground text-sm leading-relaxed">{t.keineFreien}</p>
+                ) : (
+                  <>
+                    <fieldset className="border-line max-h-48 overflow-y-auto rounded-sm border">
+                      <legend className="sr-only">{t.ausCrm}</legend>
+                      {daten.f.map((c) => (
+                        <label key={c.id} className="hover:bg-muted/40 flex cursor-pointer items-center gap-3 px-3 py-2 text-sm">
+                          <input type="checkbox" name="kontakt" value={c.id} className="accent-[var(--gold)]" />
+                          <span className="min-w-0 flex-1 truncate">
+                            {c.name}
+                            {c.firma ? <span className="text-muted-foreground"> · {c.firma}</span> : null}
+                          </span>
+                          <span className="text-meta text-muted-foreground hidden truncate sm:block">{c.email}</span>
+                        </label>
+                      ))}
+                    </fieldset>
+                    <BasisFelder t={t} prefix="c" />
+                    <button className="bg-primary text-primary-foreground self-start rounded-md px-4 py-2 text-sm font-medium">{t.uebernehmen}</button>
+                  </>
+                )}
+              </form>
+            </Surface>
+          </div>
+
+          {daten.e.length === 0 ? (
+            <p className="text-muted-foreground text-sm">{t.leer}</p>
+          ) : (
+            <ul className="border-line divide-line flex flex-col divide-y rounded-md border">
+              {daten.e.map((e) => (
+                <li key={e.id} className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-medium">{e.name ?? e.email}</span>
+                    <span className="text-meta text-muted-foreground block truncate">
+                      {e.name ? `${e.email} · ` : ""}
+                      {e.basis === "einwilligung" ? t.einwilligung : t.bestandskunde} · {e.source} · {datum.format(new Date(e.consentAt))}
+                    </span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-3">
+                    <Pill severity={e.status === "aktiv" ? "neutral" : "critical"}>{t.status[e.status]}</Pill>
+                    {e.status !== "unzustellbar" && (
+                      <form action={empfaengerUmschalten}>
+                        <input type="hidden" name="id" value={e.id} />
+                        <input type="hidden" name="status" value={e.status === "aktiv" ? "abgemeldet" : "aktiv"} />
+                        <button className="text-meta text-muted-foreground hover:text-foreground underline underline-offset-4">
+                          {e.status === "aktiv" ? t.abmelden : t.aktivieren}
+                        </button>
+                      </form>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+    </AdminShell>
+  )
+}
+
+function BasisFelder({ t, prefix }: { t: (typeof T)["de"]; prefix: string }) {
+  return (
+    <>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <AdminField label={t.basis} htmlFor={`${prefix}-basis`}>
+          <AdminSelect id={`${prefix}-basis`} name="basis" defaultValue="einwilligung">
+            <option value="einwilligung">{t.einwilligung}</option>
+            <option value="bestandskunde">{t.bestandskunde}</option>
+          </AdminSelect>
+        </AdminField>
+        <AdminField label={t.quelle} htmlFor={`${prefix}-quelle`}>
+          <AdminInput id={`${prefix}-quelle`} name="quelle" required minLength={3} placeholder={t.quelleHint} />
+        </AdminField>
+      </div>
+      <label className="text-muted-foreground flex items-start gap-2 text-sm leading-relaxed">
+        <input type="checkbox" name="bestaetigt" value="1" required className="mt-1 accent-[var(--gold)]" />
+        {t.bestaetigt}
+      </label>
+    </>
+  )
+}
