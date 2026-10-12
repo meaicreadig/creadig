@@ -22,6 +22,13 @@ const TEXT = {
     offen: "Nicht eingeordnet",
     gewonnen: (n: number) => `${n} gewonnen`,
     keineDaten: "Noch keine Daten",
+    termine: "Termine · 7 Tage",
+    keineTermine: "Keine Termine gebucht",
+    linksOffen: "Terminlink ohne Antwort",
+    keineLinks: "Alle Links beantwortet",
+    seit: (tage: number) => `vor ${tage} Tagen gesendet`,
+    nachfassen: "Nachfassen",
+    gast: "Gast",
     stufe: {
       new: "Neu", contacted: "Kontakt", qualified: "Qualifiziert", discovery: "Gespräch", audit: "Check",
       proposal: "Angebot", negotiation: "Verhandlung", won: "Gewonnen", lost: "Verloren",
@@ -43,6 +50,13 @@ const TEXT = {
     offen: "Seçilmedi",
     gewonnen: (n: number) => `${n} kazanıldı`,
     keineDaten: "Henüz veri yok",
+    termine: "Randevular · 7 gün",
+    keineTermine: "Alınmış randevu yok",
+    linksOffen: "Yanıtsız randevu linki",
+    keineLinks: "Tüm linkler yanıtlandı",
+    seit: (tage: number) => `${tage} gün önce gönderildi`,
+    nachfassen: "Takip et",
+    gast: "Misafir",
     stufe: {
       new: "Yeni", contacted: "Temas", qualified: "Nitelikli", discovery: "Görüşme", audit: "Check",
       proposal: "Teklif", negotiation: "Pazarlık", won: "Kazanıldı", lost: "Kaybedildi",
@@ -91,9 +105,59 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
   const stufenAktiv = STUFEN.filter((s) => (stufenMap.get(s) ?? 0) > 0)
   const stufenSumme = stufenAktiv.reduce((a, s) => a + (stufenMap.get(s) ?? 0), 0)
   const maxQuelle = Math.max(1, ...(daten.quellen ?? []).map((q) => q.anzahl))
+  const terminZeit = new Intl.DateTimeFormat(intl, {
+    weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin",
+  })
+  const jetzt = Date.now()
 
   return (
     <section aria-label={t.label} className="mb-12">
+      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+        <Panel titel={t.termine}>
+          {daten.termine && daten.termine.length > 0 ? (
+            <ul className="flex flex-col">
+              {daten.termine.map((x) => (
+                <li key={x.start} className="border-line border-b last:border-b-0">
+                  <Link
+                    href={x.kontaktId ? `/admin/gespraech?kontakt=${encodeURIComponent(x.kontaktId)}` : "/admin/termine"}
+                    className="hover:text-gold-text flex items-baseline justify-between gap-3 py-2.5 text-sm transition-colors"
+                  >
+                    <span className="truncate">{x.name || t.gast}</span>
+                    <span className="text-muted-foreground shrink-0 font-mono text-xs tabular-nums">{terminZeit.format(new Date(x.start))}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground text-sm">{daten.termine ? t.keineTermine : t.nichtGemessen}</p>
+          )}
+        </Panel>
+
+        <Panel titel={t.linksOffen}>
+          {daten.linksOffen && daten.linksOffen.length > 0 ? (
+            <ul className="flex flex-col">
+              {daten.linksOffen.map((x) => (
+                <li key={x.token} className="border-line flex items-center justify-between gap-3 border-b py-2.5 last:border-b-0">
+                  <span className="flex min-w-0 flex-col">
+                    <span className="truncate text-sm">{x.name || t.gast}</span>
+                    <span className="text-muted-foreground text-xs">
+                      {t.seit(Math.max(1, Math.floor((jetzt - new Date(x.seit).getTime()) / 86_400_000)))}
+                    </span>
+                  </span>
+                  <Link
+                    href={x.kontaktId ? `/admin/termine?kontakt=${encodeURIComponent(x.kontaktId)}` : "/admin/termine"}
+                    className="border-gold/40 text-gold-text hover:bg-gold/10 shrink-0 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors"
+                  >
+                    {t.nachfassen}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground text-sm">{daten.linksOffen ? t.keineLinks : t.nichtGemessen}</p>
+          )}
+        </Panel>
+      </div>
       <ul className="border-line bg-line grid grid-cols-2 gap-px overflow-hidden rounded-lg border lg:grid-cols-4">
         {kacheln.map((k) => (
           <li key={k.label} className="bg-surface">
