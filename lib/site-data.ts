@@ -77,7 +77,7 @@ export const ownProducts: ProductLogo[] = [
   // Owner 29.08.2026: Gold-Icon unter public/brand/products/meai.png
   // Gold (#be904e) steht auf dem dunklen Grund von selbst — keine Silhouette.
   {
-    name: "meAI",
+    name: "meai",
     logoPath: "/brand/products/meai.png",
     mark: "me",
     color: "#2f5bea",
@@ -94,7 +94,7 @@ export const ownProducts: ProductLogo[] = [
     dunkel: "silhouette",
   },
   {
-    name: "CASSAMEA",
+    name: "cassamea",
     logoPath: "/brand/products/cassamea.svg",
     mark: "CA",
     color: "#f0743c",
@@ -325,7 +325,7 @@ export const productWorks: Work[] = [
     slug: "stammo",
     sector: { de: "Gastronomie · Kundenbindung", tr: "Gastronomi · Müşteri sadakati", en: "Hospitality · loyalty", ar: "ضيافة · ولاء العملاء" },
     year: "2026",
-    name: "Stammo",
+    name: "stammo",
     what: {
       de: "Digitale Stempelkarte im Apple und Google Wallet — erkennt, wenn Stammgäste wegbleiben, und holt sie zurück.",
       tr: "Apple ve Google Wallet'ta dijital damga kartı — müdavimlerin uzaklaştığını fark eder ve onları geri getirir.",
@@ -351,7 +351,7 @@ export const productWorks: Work[] = [
     slug: "meai",
     sector: { de: "KI · Business-Software", tr: "Yapay zekâ · İş yazılımı", en: "AI · business software", ar: "ذكاء اصطناعي · برمجيات أعمال" },
     year: null,
-    name: "meAI",
+    name: "meai",
     what: {
       de: "KI-Business-Betriebssystem für kleine und mittlere Betriebe.",
       tr: "Küçük ve orta ölçekli işletmeler için yapay zekâ tabanlı iş işletim sistemi.",
@@ -380,7 +380,7 @@ export const productWorks: Work[] = [
     slug: "cassamea",
     sector: { de: "Gastronomie · Kasse", tr: "Gastronomi · Kasa", en: "Hospitality · point of sale", ar: "ضيافة · نقاط بيع" },
     year: null,
-    name: "CASSAMEA",
+    name: "cassamea",
     what: {
       de: "Die Kasse, die mitdenkt — für die Gastronomie, gebaut für Schweizer Anforderungen.",
       tr: "Birlikte düşünen kasa — gastronomi için, İsviçre gerekliliklerine göre kuruldu.",
