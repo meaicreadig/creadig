@@ -37,12 +37,14 @@ export const tr: AdminTexte = {
     termine: { label: "Randevular", hint: "Müsaitlik, blokajlar, rezervasyonlar" },
     automationen: { label: "Otomasyonlar", hint: "Kendiliğinden çalışanlar — ve asla çalışmayacaklar" },
     system: { label: "Kurulum", hint: "Materyal, erişimler, tanılama" },
+    firma: { label: "Firma beyni", hint: "Biz kimiz — her yapay zekânın temeli" },
   },
   navGruppen: {
     cockpit: "Kokpit",
     vertrieb: "Satış",
     kunden: "Müşteriler ve projeler",
     marketing: "Pazarlama",
+    firma: "Firma",
     system: "Sistem",
   },
   login: {
@@ -1072,7 +1074,7 @@ export const tr: AdminTexte = {
       },
       material: {
         label: "İşletme metin, görsel ve erişim sağlayabiliyor",
-        warum: "Dört hafta materyal girişinden itibaren işler. Bu taahhüt olmadan süre bir taahhüt değildir.",
+        warum: "Dört hafta materyal girişinden itibaren işler. Bu taahhüt olmadan süre bir taahhüt de��ildir.",
       },
       seite: {
         label: "Denetlenecek site belirlendi",
@@ -1379,7 +1381,7 @@ export const tr: AdminTexte = {
       umfaenge: "En az bir kapsam.",
       fundstelle: "Kaynak olmadan onay bulunamaz.",
     },
-    formTraegtNicht: "{form}, „{umfang}“ kapsamını taşımaz — bu biçim yalnızca müşterinin kendi yayımladığını kapsar.",
+    formTraegtNicht: "{form}, ��{umfang}“ kapsamını taşımaz — bu biçim yalnızca müşterinin kendi yayımladığını kapsar.",
     scope: {
       name: "Adı anmak",
       logo: "Logoyu göstermek",
