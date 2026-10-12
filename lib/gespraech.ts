@@ -288,5 +288,12 @@ export async function speichereGespraech(
     [input.kontaktId, input.folge, input.folgeAm],
   )
 
+  const { ereignis } = await import("@/lib/motor/ereignis")
+  await ereignis("gespraech_notiert", {
+    kontaktId: input.kontaktId,
+    daten: { folge: input.folge, folgeAm: input.folgeAm, interessen: input.interessen },
+    schluessel: `gespraech:${id}`,
+  })
+
   return { id }
 }

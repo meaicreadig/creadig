@@ -8,6 +8,10 @@
     {
       "path": "/api/selftest",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/motor/takt",
+      "schedule": "0 6 * * *"
     }
   ]
 }

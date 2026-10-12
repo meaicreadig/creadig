@@ -906,8 +906,15 @@ export const clientWorks: Work[] = [
     discipline: "system",
     href: "https://kibos.app",
     live: true,
-    // Bleibt unsichtbar, bis die schriftliche Freigabe des Verbands hier eingetragen ist (Gate 13).
-    releases: [],
+    releases: [
+      {
+        by: { name: "Ansprechperson des Verbands (dem Owner persönlich bekannt)", role: "Vorstand", company: "IGMG Regionalverband Nord Ruhr e.V." },
+        form: "schriftliche-nachricht",
+        at: "2026-10-12",
+        scopes: ["name", "logo", "fallstudie"],
+        reference: "Schriftliche Nachricht an den Owner, eigenes Postfach/Messenger, Bestätigung im Chat am 12.10.2026",
+      },
+    ],
     approvedSentence: null,
   },
   {
@@ -1445,7 +1452,7 @@ export const caseStudies: CaseStudy[] = [
     context: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya", en: "Non-profit · aid · Germany", ar: "غير ربحي · إغاثة · ألمانيا" },
     card: {
       project: "Bir Damla Hayır",
-      category: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya", en: "Non-profit · aid · Germany", ar: "غير ربحي · إغاثة · ألمانيا" },
+      category: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya", en: "Non-profit · aid · Germany", ar: "غير ربحي · إغاثة · أ��مانيا" },
       services: null,
     },
     chapters: { ...emptyChapters },

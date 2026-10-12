@@ -589,6 +589,14 @@ export async function storeLead(record: LeadRecord): Promise<StoreOutcome> {
      */
     const outcome: StoreOutcome = existing ? "updated" : "created"
     console.info(`[lead] ${outcome} ${next.reference} (${store.name})`)
+    if (outcome === "created") {
+      const { ereignis } = await import("@/lib/motor/ereignis")
+      await ereignis("anfrage_eingegangen", {
+        subjekt: `lead:${next.id}`,
+        daten: { reference: next.reference },
+        schluessel: `lead:${next.id}`,
+      })
+    }
     return outcome
   } catch (error) {
     await raiseAlert(

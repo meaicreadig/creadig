@@ -314,10 +314,17 @@ export async function bucheTermin(e: {
        SELECT $2, $3, link.token, $4, link.contact_id, link.organisation_id, link.meeting_kind, link.topic,
          $5::timestamptz, $6::timestamptz, tstzrange($5::timestamptz, $7::timestamptz, '[)'), $8, 'booked', $9, $10, $11, 'feed_only'
          FROM link
-       RETURNING id`,
+       RETURNING id, contact_id`,
       [link.token, id, referenz(), manageToken, start.toISOString(), ende.toISOString(), halteEnde.toISOString(), einstellungen.timezone, e.name, e.email, e.note],
     )
     if (rows.length === 0) return { ok: false, grund: "link" }
+    const { ereignis } = await import("@/lib/motor/ereignis")
+    await ereignis("termin_gebucht", {
+      kontaktId: (rows[0].contact_id as string | null) ?? null,
+      subjekt: `termin:${id}`,
+      daten: { start: start.toISOString() },
+      schluessel: `termin_gebucht:${id}`,
+    })
   } catch (error) {
     const code = (error as { code?: string }).code
     if (code === "23P01" || String((error as Error).message).includes("appointments_no_overlap")) return { ok: false, grund: "vergeben" }

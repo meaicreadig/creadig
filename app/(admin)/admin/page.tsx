@@ -100,6 +100,11 @@ export default async function Uebersicht() {
   const [board, cockpit] = await Promise.all([collectAttention(getVertriebStore()), ladeCockpit()])
   if (cockpit.linksOffen?.some((x) => !x.entwurf)) {
     after(() => bereiteNachfassVor().catch((e) => console.error("[nachfass]", e instanceof Error ? e.message : e)))
+    after(() =>
+      import("@/lib/motor/takt")
+        .then(({ takt }) => takt())
+        .catch((e) => console.error("[motor]", e instanceof Error ? e.message : e)),
+    )
   }
 
   const operativ = board.items.filter((i) => OPERATIV.includes(i.rank))
