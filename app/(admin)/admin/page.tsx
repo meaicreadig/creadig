@@ -1,4 +1,7 @@
 import Link from "next/link"
+import { after } from "next/server"
+
+import { bereiteNachfassVor } from "@/lib/termine/nachfass"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { Pill, SectionHeader, Surface, UnavailableNote } from "@/components/admin/primitives"
@@ -95,6 +98,9 @@ export default async function Uebersicht() {
   const { t, intl, sprache } = await adminSprachKontext()
   const hasStore = leadStoreConfigured()
   const [board, cockpit] = await Promise.all([collectAttention(getVertriebStore()), ladeCockpit()])
+  if (cockpit.linksOffen?.some((x) => !x.entwurf)) {
+    after(() => bereiteNachfassVor().catch((e) => console.error("[nachfass]", e instanceof Error ? e.message : e)))
+  }
 
   const operativ = board.items.filter((i) => OPERATIV.includes(i.rank))
   const betrieb = board.items.filter((i) => i.rank === "betriebsblocker")
