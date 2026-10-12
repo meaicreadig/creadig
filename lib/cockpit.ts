@@ -17,6 +17,8 @@ export type CockpitDaten = {
   wochen: { start: string; anzahl: number }[] | null
   stufen: { stufe: string; anzahl: number }[] | null
   quellen: { quelle: string; anzahl: number; gewonnen: number }[] | null
+  termine: { start: string; name: string; kontaktId: string | null }[] | null
+  linksOffen: { token: string; name: string; kontaktId: string | null; seit: string }[] | null
 }
 
 const LEER: CockpitDaten = {
@@ -30,6 +32,8 @@ const LEER: CockpitDaten = {
   wochen: null,
   stufen: null,
   quellen: null,
+  termine: null,
+  linksOffen: null,
 }
 
 export const STUFEN = ["new", "contacted", "qualified", "discovery", "audit", "proposal", "negotiation", "won", "lost"] as const
@@ -47,7 +51,7 @@ export async function ladeCockpit(): Promise<CockpitDaten> {
   }
   const zahl = (v: unknown) => Number(v ?? 0)
 
-  const [anfragen, pipeline, rechnungen, posts, wochen, stufen, quellen] = await Promise.all([
+  const [anfragen, pipeline, rechnungen, posts, wochen, stufen, quellen, termine, linksOffen] = await Promise.all([
     eins(
       `SELECT count(*) FILTER (WHERE created_at >= now() - interval '7 days') AS jetzt,
               count(*) FILTER (WHERE created_at >= now() - interval '14 days' AND created_at < now() - interval '7 days') AS vorher
@@ -96,6 +100,33 @@ export async function ladeCockpit(): Promise<CockpitDaten> {
         GROUP BY 1 ORDER BY 2 DESC LIMIT 6`,
       (r) => r.map((x) => ({ quelle: String(x.quelle), anzahl: zahl(x.anzahl), gewonnen: zahl(x.gewonnen) })),
     ),
+    eins(
+      `SELECT a.starts_at, a.guest_name, a.contact_id
+         FROM appointments a
+        WHERE a.status IN ('booked','confirmed','pending_calendar','rescheduled')
+          AND a.starts_at >= now() AND a.starts_at < now() + interval '7 days'
+        ORDER BY a.starts_at LIMIT 5`,
+      (r) =>
+        r.map((x) => ({
+          start: new Date(x.starts_at as string).toISOString(),
+          name: String(x.guest_name ?? ""),
+          kontaktId: x.contact_id ? String(x.contact_id) : null,
+        })),
+    ),
+    eins(
+      `SELECT b.token, b.contact_id, b.created_at, coalesce(c.name, '') AS name
+         FROM booking_links b LEFT JOIN contacts c ON c.id = b.contact_id
+        WHERE b.used_at IS NULL AND b.revoked_at IS NULL AND b.expires_at > now()
+          AND b.created_at < now() - interval '3 days'
+        ORDER BY b.created_at LIMIT 5`,
+      (r) =>
+        r.map((x) => ({
+          token: String(x.token),
+          name: String(x.name),
+          kontaktId: x.contact_id ? String(x.contact_id) : null,
+          seit: new Date(x.created_at as string).toISOString(),
+        })),
+    ),
   ])
 
   return {
@@ -109,5 +140,7 @@ export async function ladeCockpit(): Promise<CockpitDaten> {
     wochen,
     stufen,
     quellen,
+    termine,
+    linksOffen,
   }
 }
