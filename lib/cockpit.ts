@@ -18,7 +18,15 @@ export type CockpitDaten = {
   stufen: { stufe: string; anzahl: number }[] | null
   quellen: { quelle: string; anzahl: number; gewonnen: number }[] | null
   termine: { start: string; name: string; kontaktId: string | null }[] | null
-  linksOffen: { token: string; name: string; kontaktId: string | null; seit: string }[] | null
+  linksOffen:
+    | {
+        token: string
+        name: string
+        kontaktId: string | null
+        seit: string
+        entwurf: { id: string; betreff: string; text: string; status: string } | null
+      }[]
+    | null
 }
 
 const LEER: CockpitDaten = {
@@ -114,18 +122,29 @@ export async function ladeCockpit(): Promise<CockpitDaten> {
         })),
     ),
     eins(
-      `SELECT b.token, b.contact_id, b.created_at, coalesce(c.name, '') AS name
-         FROM booking_links b LEFT JOIN contacts c ON c.id = b.contact_id
+      `SELECT b.token, b.contact_id, b.created_at, coalesce(c.name, '') AS name, e.id AS entwurf_id, e.data AS entwurf
+         FROM booking_links b
+         LEFT JOIN contacts c ON c.id = b.contact_id
+         LEFT JOIN LATERAL (
+           SELECT a.id, a.data FROM activities a
+            WHERE a.subject_type = 'contact' AND a.subject_id = b.contact_id
+              AND a.kind = 'nachfass_entwurf' AND a.data->>'token' = b.token
+            ORDER BY a.created_at DESC LIMIT 1) e ON true
         WHERE b.used_at IS NULL AND b.revoked_at IS NULL AND b.expires_at > now()
           AND b.created_at < now() - interval '3 days'
+          AND coalesce(e.data->>'status', 'offen') = 'offen'
         ORDER BY b.created_at LIMIT 5`,
       (r) =>
-        r.map((x) => ({
-          token: String(x.token),
-          name: String(x.name),
-          kontaktId: x.contact_id ? String(x.contact_id) : null,
-          seit: new Date(x.created_at as string).toISOString(),
-        })),
+        r.map((x) => {
+          const d = x.entwurf as Record<string, string> | null
+          return {
+            token: String(x.token),
+            name: String(x.name),
+            kontaktId: x.contact_id ? String(x.contact_id) : null,
+            seit: new Date(x.created_at as string).toISOString(),
+            entwurf: x.entwurf_id && d ? { id: String(x.entwurf_id), betreff: d.betreff ?? "", text: d.text ?? "", status: d.status ?? "offen" } : null,
+          }
+        }),
     ),
   ])
 

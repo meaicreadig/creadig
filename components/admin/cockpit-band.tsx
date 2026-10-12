@@ -2,6 +2,7 @@ import Link from "next/link"
 
 import { type CockpitDaten, STUFEN } from "@/lib/cockpit"
 import { kanalName } from "@/lib/kanal"
+import { NachfassKarte } from "@/components/admin/nachfass-karte"
 
 type Sprache = "de" | "tr"
 
@@ -137,19 +138,14 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
           {daten.linksOffen && daten.linksOffen.length > 0 ? (
             <ul className="flex flex-col">
               {daten.linksOffen.map((x) => (
-                <li key={x.token} className="border-line flex items-center justify-between gap-3 border-b py-2.5 last:border-b-0">
-                  <span className="flex min-w-0 flex-col">
+                <li key={x.token} className="border-line flex flex-col gap-2 border-b py-3 last:border-b-0">
+                  <span className="flex items-baseline justify-between gap-3">
                     <span className="truncate text-sm">{x.name || t.gast}</span>
-                    <span className="text-muted-foreground text-xs">
+                    <span className="text-muted-foreground shrink-0 text-xs">
                       {t.seit(Math.max(1, Math.floor((jetzt - new Date(x.seit).getTime()) / 86_400_000)))}
                     </span>
                   </span>
-                  <Link
-                    href={x.kontaktId ? `/admin/termine?kontakt=${encodeURIComponent(x.kontaktId)}` : "/admin/termine"}
-                    className="border-gold/40 text-gold-text hover:bg-gold/10 shrink-0 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors"
-                  >
-                    {t.nachfassen}
-                  </Link>
+                  <NachfassKarte sprache={sprache} kontaktId={x.kontaktId} entwurf={x.entwurf} />
                 </li>
               ))}
             </ul>

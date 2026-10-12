@@ -12,6 +12,7 @@ import { AdminSelect, SectionHeader, Surface } from "@/components/admin/primitiv
 import { TerminmailEntwurf } from "@/components/admin/terminmail-entwurf"
 import { sign } from "@/lib/hmac"
 import { mailEingerichtet, siteUrl, terminZeitText } from "@/lib/termine/mail"
+import { holeNachfassEntwurf } from "@/lib/termine/nachfass"
 import {
   GESPRAECHSARTEN,
   einladungsKontakt,
@@ -52,7 +53,7 @@ function entwurf(name: string, notiz: string | null) {
   ].join("\n\n")
 }
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ meldung?: string; kontakt?: string }> }) {
+export default async function Page({ searchParams }: { searchParams: Promise<{ meldung?: string; kontakt?: string; entwurf?: string }> }) {
   const sp = await searchParams
   if (!termineVerfuegbar()) {
     return (
@@ -61,11 +62,12 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
       </AdminShell>
     )
   }
-  const [einstellungen, liste, gesperrt, kontakt] = await Promise.all([
+  const [einstellungen, liste, gesperrt, kontakt, nachfass] = await Promise.all([
     holeEinstellungen(),
     kommendeTermine(),
     sperren(),
     sp.kontakt ? einladungsKontakt(sp.kontakt) : Promise.resolve(null),
+    sp.entwurf ? holeNachfassEntwurf(sp.entwurf).catch(() => null) : Promise.resolve(null),
   ])
   const secret = process.env.ADMIN_SESSION_SECRET?.trim()
   const feedKey = secret ? await sign("termine-feed", secret) : null
@@ -115,8 +117,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
                 </label>
                 <TerminmailEntwurf
                   kontaktId={kontakt.id}
-                  startBetreff="Unser nächster Termin"
-                  startText={entwurf(kontakt.name, kontakt.letzteNotiz)}
+                  startBetreff={nachfass?.kontaktId === kontakt.id ? nachfass.betreff : "Unser nächster Termin"}
+                  startText={nachfass?.kontaktId === kontakt.id ? nachfass.text : entwurf(kontakt.name, kontakt.letzteNotiz)}
                 />
                 <p className="text-muted-foreground text-xs">
                   Empfänger: {kontakt.email ?? "keine E-Mail hinterlegt"}
