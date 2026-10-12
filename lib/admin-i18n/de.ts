@@ -38,12 +38,14 @@ export const de = {
     verbindungen: { label: "Verbindungen", hint: "Wege herein und hinaus, ehrlich benannt" },
     automationen: { label: "Automationen", hint: "Was ohne Zutun läuft — und was nie" },
     system: { label: "Einrichtung", hint: "Material, Zugänge, Diagnose" },
+    firma: { label: "Firmengehirn", hint: "Wer wir sind — Grundlage jeder KI" },
   },
   navGruppen: {
     cockpit: "Cockpit",
     vertrieb: "Vertrieb",
     kunden: "Kunden & Projekte",
     marketing: "Marketing",
+    firma: "Firma",
     system: "System",
   },
   login: {

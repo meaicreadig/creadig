@@ -9,6 +9,7 @@ import {
 } from "@/app/(admin)/admin/termine/actions"
 import { AdminShell } from "@/components/admin/admin-shell"
 import { AdminSelect, SectionHeader, Surface } from "@/components/admin/primitives"
+import { TerminmailEntwurf } from "@/components/admin/terminmail-entwurf"
 import { sign } from "@/lib/hmac"
 import { mailEingerichtet, siteUrl, terminZeitText } from "@/lib/termine/mail"
 import {
@@ -112,14 +113,11 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
                   Thema (intern)
                   <input name="thema" maxLength={160} className={FELD} placeholder="z. B. Website-Relaunch" />
                 </label>
-                <label className="flex flex-col gap-1.5 text-sm">
-                  Betreff
-                  <input name="betreff" required maxLength={160} defaultValue="Unser nächster Termin" className={FELD} />
-                </label>
-                <label className="flex flex-col gap-1.5 text-sm">
-                  Text <span className="text-muted-foreground text-xs">{"{link} wird durch den persönlichen Buchungslink ersetzt."}</span>
-                  <textarea name="text" required rows={9} defaultValue={entwurf(kontakt.name, kontakt.letzteNotiz)} className={`${FELD} leading-relaxed`} />
-                </label>
+                <TerminmailEntwurf
+                  kontaktId={kontakt.id}
+                  startBetreff="Unser nächster Termin"
+                  startText={entwurf(kontakt.name, kontakt.letzteNotiz)}
+                />
                 <p className="text-muted-foreground text-xs">
                   Empfänger: {kontakt.email ?? "keine E-Mail hinterlegt"}
                   {!mailEingerichtet() && " · Mailversand ist nicht eingerichtet"}
