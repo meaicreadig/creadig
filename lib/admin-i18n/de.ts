@@ -38,7 +38,6 @@ export const de = {
     verbindungen: { label: "Verbindungen", hint: "Wege herein und hinaus, ehrlich benannt" },
     automationen: { label: "Automationen", hint: "Was ohne Zutun läuft — und was nie" },
     system: { label: "Einrichtung", hint: "Material, Zugänge, Diagnose" },
-    firma: { label: "Firmengehirn", hint: "Wer wir sind — Grundlage jeder KI" },
   },
   navGruppen: {
     cockpit: "Cockpit",
@@ -513,7 +512,7 @@ export const de = {
     zielbildTitel: "Was das Zielbild angeht",
     nurMuster: "Nur Muster. Eine einzelne Absage dreht kein Zielbild.",
     keinDruck: "Keine offene Annahme steht durch diese Verluste unter Druck.",
-    keinDruckDetail: "Entweder ist noch keine Häufung ein Muster, oder die gehäuften Gründe sagen über das Zielbild nichts — „Zeitpunkt passt nicht“ ist kein Nein, und „Keine Rückmeldung“ sagt mehr über unser Nachfassen als über den Markt.",
+    keinDruckDetail: "Entweder ist noch keine Häufung ein Muster, oder die geh��uften Gründe sagen über das Zielbild nichts — „Zeitpunkt passt nicht“ ist kein Nein, und „Keine Rückmeldung“ sagt mehr über unser Nachfassen als über den Markt.",
     beruehrtVon: (liste: string) => `Berührt von: ${liste}`,
     entscheidet: "Was sie entscheidet: ",
     registerHinweis: "Das Register ändert ein Mensch, nicht dieser Zähler — mit einem Satz im Gegenbeleg.",
