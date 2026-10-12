@@ -37,7 +37,6 @@ export const tr: AdminTexte = {
     termine: { label: "Randevular", hint: "Müsaitlik, blokajlar, rezervasyonlar" },
     automationen: { label: "Otomasyonlar", hint: "Kendiliğinden çalışanlar — ve asla çalışmayacaklar" },
     system: { label: "Kurulum", hint: "Materyal, erişimler, tanılama" },
-    firma: { label: "Firma beyni", hint: "Biz kimiz — her yapay zekânın temeli" },
   },
   navGruppen: {
     cockpit: "Kokpit",
@@ -446,7 +445,7 @@ export const tr: AdminTexte = {
       `${inhalt} müşteri ve talep veritabanında tutulur. Bu ortam için henüz kurulmadı. Bu boş bir liste değil, eksik bir bağlantıdır — kurulum Sistem altında.`,
     nichtErreichbarTitel: (bereich) => `${bereich}: veritabanına şu an ulaşılamıyor`,
     nichtErreichbarText: (inhalt) =>
-      `${inhalt} müşteri ve talep veritabanında tutulur. Kurulu, ancak şu an yanıt vermedi. Bu boş bir liste değil, bir arızadır — hiçbir şey silinmedi.`,
+      `${inhalt} müşteri ve talep veritabanında tutulur. Kurulu, ancak şu an yanıt vermedi. Bu boş bir liste değil, bir ar��zadır — hiçbir şey silinmedi.`,
     erneutLaden: "Yeniden yükle",
     inhaltVertrieb: "Talepler, kişiler ve satış fırsatları",
     inhaltKunden: "Kuruluşlar, lokasyonlar ve irtibat ki��ileri",
@@ -1024,7 +1023,7 @@ export const tr: AdminTexte = {
         "„{referenz}“ referansı CD-YYAAGG-#### kalıbına uymuyor. Bu numara, alındı onayındaki numarayla aynı olmalı — yoksa müşterinin elinde iki numara olur.",
       "reife-offen": "{beleg} — {warum}",
       "abschnitt-leer": "Bu zorunlu bölüm boş. {regel}",
-      "keine-position": "Hiç kalem yok. Rakamsız bir teklif, görüşme notudur.",
+      "keine-position": "Hi�� kalem yok. Rakamsız bir teklif, görüşme notudur.",
       "katalog-ohne-zahl": "„{was}“ {quelle} kaynağına işaret ediyor, orada ise bir rakam yok.",
       "betrag-ohne-freigabe":
         "„{was}“ kendi tutarını taşıyor ama dayanaklı bir onayı yok. Her rakam ya katalogda durur ya da onaylıdır — kim, ne zaman ve nerede bilgisiyle.",
@@ -1222,7 +1221,7 @@ export const tr: AdminTexte = {
     erfassenTitel: "Çıkanı kaydedin",
     erfassenHinweis: "Bir cümle yeter. İçeriğin kendisi yayımlandığı yerde durur; burada yalnızca var olduğu yazar.",
     was: "Ne",
-    wasPlatzhalter: "örn. Build Note: Teklifleri neden otomatikleştirmiyoruz",
+    wasPlatzhalter: "��rn. Build Note: Teklifleri neden otomatikleştirmiyoruz",
     kanal: "Nerede",
     am: "Ne zaman",
     url: "Adres (isteğe bağlı)",

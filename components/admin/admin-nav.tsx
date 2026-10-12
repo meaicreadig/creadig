@@ -12,7 +12,6 @@ import {
   Megaphone,
   Menu,
   MessagesSquare,
-  Brain,
   Send,
   TrendingUp,
   X,
@@ -31,7 +30,6 @@ const ICONS: Record<string, LucideIcon> = {
   nachweise: BadgeCheck,
   marketing: Megaphone,
   veroeffentlichungen: Send,
-  firma: Brain,
 }
 
 /**
