@@ -1,4 +1,5 @@
 import { neonAbfrage } from "@/lib/neon-abfrage"
+import { steuerlage, summe, type Position, type Steuerlage } from "@/lib/rechnung"
 
 /**
  * Cockpit-Band der Admin-Startseite: nur Lese-Abfragen auf bestehende
@@ -10,7 +11,8 @@ export type CockpitDaten = {
   anfragenVor7: number | null
   pipelineWert: number | null
   pipelineOffen: number | null
-  rechnungenGestellt: number | null
+  rechnungenOffenCent: number | null
+  rechnungenOffen: number | null
   posts7: number | null
   wochen: { start: string; anzahl: number }[] | null
   stufen: { stufe: string; anzahl: number }[] | null
@@ -22,7 +24,8 @@ const LEER: CockpitDaten = {
   anfragenVor7: null,
   pipelineWert: null,
   pipelineOffen: null,
-  rechnungenGestellt: null,
+  rechnungenOffenCent: null,
+  rechnungenOffen: null,
   posts7: null,
   wochen: null,
   stufen: null,
@@ -56,7 +59,24 @@ export async function ladeCockpit(): Promise<CockpitDaten> {
          FROM opportunities WHERE status NOT IN ('won','lost') AND excluded_reason IS NULL`,
       (r) => ({ wert: zahl(r[0]?.wert), offen: zahl(r[0]?.offen) }),
     ),
-    eins(`SELECT count(*) AS n FROM invoices WHERE state = 'gestellt'`, (r) => zahl(r[0]?.n)),
+    eins(
+      `SELECT i.positions, i.tax_snapshot,
+              coalesce((SELECT sum(p.amount_cent) FROM payments p WHERE p.invoice_id = i.id), 0) AS bezahlt
+         FROM invoices i WHERE i.state = 'gestellt'`,
+      (r) => {
+        let offenCent = 0
+        let anzahl = 0
+        for (const z of r) {
+          const lage = (z.tax_snapshot as Steuerlage | null) ?? steuerlage()
+          const rest = summe((z.positions ?? []) as Position[], lage).bruttoCent - zahl(z.bezahlt)
+          if (rest > 0) {
+            offenCent += rest
+            anzahl++
+          }
+        }
+        return { offenCent, anzahl }
+      },
+    ),
     eins(`SELECT count(*) AS n FROM publications WHERE veroeffentlicht_am >= current_date - 7`, (r) => zahl(r[0]?.n)),
     eins(
       `SELECT to_char(w, 'YYYY-MM-DD') AS start, count(l.id) AS anzahl
@@ -83,7 +103,8 @@ export async function ladeCockpit(): Promise<CockpitDaten> {
     anfragenVor7: anfragen?.vorher ?? null,
     pipelineWert: pipeline?.wert ?? null,
     pipelineOffen: pipeline?.offen ?? null,
-    rechnungenGestellt: rechnungen,
+    rechnungenOffenCent: rechnungen?.offenCent ?? null,
+    rechnungenOffen: rechnungen?.anzahl ?? null,
     posts7: posts,
     wochen,
     stufen,
