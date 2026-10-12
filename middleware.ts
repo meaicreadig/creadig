@@ -63,7 +63,8 @@ import { localePath } from "@/lib/routes"
  * Eine 301 waere eine Aussage ueber die Adresse. Das hier ist eine Aussage
  * ueber den Besucher — und der naechste ist ein anderer.
  */
-const SPRACHFREI = /^\/(admin|api|_next|.*\..*)/
+/* `/termin` gibt es nur einmal: Buchungslinks aus Mails muessen in jeder Browsersprache aufgehen. */
+const SPRACHFREI = /^\/(admin|api|_next|termin(\/|$)|.*\..*)/
 const SCHON_UEBERSETZT = /^\/(tr|en|ar)(\/|$)/
 
 function sprachweiche(request: NextRequest) {

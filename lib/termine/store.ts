@@ -361,12 +361,22 @@ export async function sageTerminAb(id: string, grund: string | null, von: string
 /* Protokoll (activities)                                                    */
 /* ------------------------------------------------------------------------ */
 
+/*
+ * activities kennt nur lead/contact/organisation/opportunity als Bezug.
+ * Ohne Kontakt gibt es keinen Ort für den Eintrag — der Termin selbst bleibt die Quelle.
+ * Ein fehlgeschlagener Protokolleintrag darf eine gültige Buchung nie scheitern lassen.
+ */
 async function protokoll(q: Abfrage, kontaktId: string | null, kind: string, summary: string, data: Record<string, unknown>, actor = "system") {
-  await q(
-    `INSERT INTO activities (id, subject_type, subject_id, kind, summary, detail, actor, origin, data, created_at)
-     VALUES ($1, $2, $3, $4, $5, NULL, $6, 'termine', $7::jsonb, now())`,
-    [`act_${neuesToken(9)}`, kontaktId ? "contact" : "system", kontaktId ?? "termine", kind, summary, actor, JSON.stringify(data)],
-  )
+  if (!kontaktId) return
+  try {
+    await q(
+      `INSERT INTO activities (id, subject_type, subject_id, kind, summary, detail, actor, origin, data, created_at)
+       VALUES ($1, 'contact', $2, $3, $4, NULL, $5, 'termine', $6::jsonb, now())`,
+      [`act_${neuesToken(9)}`, kontaktId, kind, summary, actor, JSON.stringify(data)],
+    )
+  } catch (e) {
+    console.error("[termine] Protokolleintrag fehlgeschlagen:", e instanceof Error ? e.message : e)
+  }
 }
 
 export async function protokolliere(kontaktId: string | null, kind: string, summary: string, data: Record<string, unknown>, actor: string) {
