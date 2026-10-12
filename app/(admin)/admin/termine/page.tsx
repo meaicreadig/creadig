@@ -8,7 +8,7 @@ import {
   verfuegbarkeitSpeichern,
 } from "@/app/(admin)/admin/termine/actions"
 import { AdminShell } from "@/components/admin/admin-shell"
-import { SectionHeader, Surface } from "@/components/admin/primitives"
+import { AdminSelect, SectionHeader, Surface } from "@/components/admin/primitives"
 import { sign } from "@/lib/hmac"
 import { mailEingerichtet, siteUrl, terminZeitText } from "@/lib/termine/mail"
 import {
@@ -91,13 +91,13 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
                 <div className="grid gap-4 md:grid-cols-3">
                   <label className="flex flex-col gap-1.5 text-sm">
                     Gesprächsart
-                    <select name="art" className={FELD} defaultValue="kennenlernen">
+                    <AdminSelect name="art" defaultValue="kennenlernen">
                       {Object.entries(GESPRAECHSARTEN).map(([k, v]) => (
                         <option key={k} value={k}>
                           {v.label} · {v.dauer} Min.
                         </option>
                       ))}
-                    </select>
+                    </AdminSelect>
                   </label>
                   <label className="flex flex-col gap-1.5 text-sm">
                     Nur diese Woche (ab)
@@ -224,13 +224,13 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
               </label>
               <label className="flex flex-col gap-1.5 text-sm">
                 Art
-                <select name="art" className={FELD}>
+                <AdminSelect name="art">
                   {Object.entries(SPERR_ART).map(([k, v]) => (
                     <option key={k} value={k}>
                       {v}
                     </option>
                   ))}
-                </select>
+                </AdminSelect>
               </label>
               <label className="flex flex-col gap-1.5 text-sm">
                 Notiz
