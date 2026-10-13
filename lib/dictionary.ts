@@ -57,16 +57,16 @@ const rawDictionary = {
          Wer „Systemhaus" sucht, will IT-Hardware und Microsoft 365. */
       /* PAKET 1 — EINE Firmenbeschreibung fuer Google, Besucher und KI-Suche:
          wer (Unternehmen), was (ein eigenes System von der
-         Anfrage bis zur Rechnung), warum anders (wir betreiben es, Code und
+         ersten Kontakt bis zum laufenden Betrieb), warum anders (wir betreiben es, Code und
          Daten gehoeren dem Kunden). Dieselbe Aussage steht in Hero und Kategorie. */
       siteTitle: "creaDIG: Digitale Systeme für Unternehmen",
       siteDescription:
-        "creaDIG baut Unternehmen ein eigenes digitales System – von der Anfrage bis zur Rechnung. Wir betreiben es. Code und Daten gehören Ihnen.",
-      ogTitle: "creaDIG — Von der Anfrage bis zur Rechnung: ein System.",
+        "creaDIG baut Unternehmen ein eigenes digitales System – vom ersten Kontakt bis zum laufenden Betrieb. Wir betreiben es. Code und Daten gehören Ihnen.",
+      ogTitle: "creaDIG — Ein eigenes System für Ihr Unternehmen.",
       ogDescription:
         "System-Haus für digitale Betriebe aus Osnabrück, seit 2017. Ein eigenes System für Unternehmen jeder Branche – gebaut und betrieben von uns, Code und Daten bei Ihnen.",
       organizationDescription:
-        "System-Haus für digitale Betriebe: creaDIG baut Unternehmen ein durchgehendes digitales System von der Anfrage bis zur Rechnung und betreibt es. Code und Daten gehören dem Kunden. Eigene Systeme: fibero, meAI, CASSAMEA, meahv.",
+        "System-Haus für digitale Betriebe: creaDIG baut Unternehmen ein durchgehendes digitales System vom ersten Kontakt bis zum laufenden Betrieb und betreibt es. Code und Daten gehören dem Kunden. Eigene Systeme: fibero, meAI, CASSAMEA, meahv.",
       /** Erster Eintrag jeder Brotkrume in den strukturierten Daten. */
       breadcrumbHome: "Startseite",
       /* T-1 — Alt-Text des Vorschaubildes. Er stand nur in
@@ -95,7 +95,7 @@ const rawDictionary = {
     brand: {
       categoryLabel: "Kategorie",
       category:
-        "Kein IT-Systemhaus für Server und Lizenzen. Ein System-Haus für digitale Betriebe: ein eigenes System für Unternehmen, von der Anfrage bis zur Rechnung.",
+        "Kein IT-Systemhaus für Server und Lizenzen. Ein System-Haus für digitale Betriebe: ein eigenes System für Unternehmen, vom ersten Kontakt bis zum laufenden Betrieb.",
     },
     /*
      * Verteiler-Startseite (PHASE A, Master-Prompt 4 §4).
@@ -203,7 +203,7 @@ const rawDictionary = {
             label: "Lage B",
             title: "Der Betrieb im System",
             wenn: "Die Arbeit läuft. Sie läuft nur über Zettel, Tabellen und drei Programme, die nichts voneinander wissen.",
-            start: "Der Weg von der Anfrage bis zur Rechnung.",
+            start: "Der Weg vom ersten Kontakt bis zum erledigten Auftrag.",
             href: "/leistungen#ebene-operations",
           },
           {
@@ -3210,18 +3210,18 @@ const rawDictionary = {
     meta: {
       siteTitle: "creaDIG: Şirketler için dijital sistemler",
       siteDescription:
-        "creaDIG, şirketlere talepten faturaya kadar kendi dijital sistemlerini kurar ve işletir. Kod ve veriler sizindir.",
-      ogTitle: "creaDIG — Talepten faturaya kadar: tek sistem.",
+        "creaDIG, şirketlere ilk temastan işleyen operasyona kadar kendi dijital sistemlerini kurar ve işletir. Kod ve veriler sizindir.",
+      ogTitle: "creaDIG — İşletmenize ait tek bir sistem.",
       ogDescription:
         "Osnabrück'ten dijital işletmeler için sistem evi, 2017'den beri. Tesisat, elektrik ve servis işletmelerine kendi sistemleri — biz kurar ve işletiriz, kod ve veriler sizde kalır.",
       organizationDescription:
-        "Dijital işletmeler için sistem evi: creaDIG, şirketlere talepten faturaya kadar uçtan uca bir dijital sistem kurar ve işletir. Kod ve veriler müşteriye aittir. Kendi sistemlerimiz: fibero, meAI, CASSAMEA, meahv.",
+        "Dijital işletmeler için sistem evi: creaDIG, şirketlere ilk temastan işleyen operasyona kadar uçtan uca bir dijital sistem kurar ve işletir. Kod ve veriler müşteriye aittir. Kendi sistemlerimiz: fibero, meAI, CASSAMEA, meahv.",
       breadcrumbHome: "Ana sayfa",
       ogImageAlt: "creaDIG — Şirketler için dijital sistemler",
     },
     brand: {
       categoryLabel: "Kategori",
-      category: "Sunucu ve lisans satan bir BT firması değil. Dijital işletmeler için bir sistem evi: şirketlere talepten faturaya kadar kendi sistemleri.",
+      category: "Sunucu ve lisans satan bir BT firması değil. Dijital işletmeler için bir sistem evi: şirketlere ilk temastan işleyen operasyona kadar kendi sistemleri.",
     },
     home: {
       statement: {
@@ -3273,7 +3273,7 @@ const rawDictionary = {
             label: "Durum B",
             title: "İşletme sistemin içinde",
             wenn: "İş yürüyor. Sadece kâğıtlar, tablolar ve birbirinden habersiz üç program üzerinden yürüyor.",
-            start: "Talepten faturaya giden yol.",
+            start: "İlk temastan tamamlanan işe giden yol.",
             href: "/leistungen#ebene-operations",
           },
           {
@@ -5023,18 +5023,18 @@ const rawDictionary = {
     meta: {
       siteTitle: "creaDIG: digital systems for companies",
       siteDescription:
-        "creaDIG builds companies their own digital system – from enquiry to invoice. We run it for you. Code and data belong to you.",
-      ogTitle: "creaDIG — from enquiry to invoice: one system.",
+        "creaDIG builds companies their own digital system – from first contact to running operations. We run it for you. Code and data belong to you.",
+      ogTitle: "creaDIG — one system that belongs to your company.",
       ogDescription:
         "A systems house for digital operations from Osnabrück, since 2017. One system for companies in any industry – built and run by us, code and data stay with you.",
       organizationDescription:
-        "Systems house for digital operations: creaDIG builds companies one end-to-end digital system from enquiry to invoice and runs it. Code and data belong to the client. Own systems: fibero, meAI, CASSAMEA, meahv.",
+        "Systems house for digital operations: creaDIG builds companies one end-to-end digital system from first contact to running operations and runs it. Code and data belong to the client. Own systems: fibero, meAI, CASSAMEA, meahv.",
       breadcrumbHome: "Home",
       ogImageAlt: "creaDIG — digital systems for companies",
     },
     brand: {
       categoryLabel: "Category",
-      category: "Not an IT reseller for servers and licences. A systems house for digital operations: one system for companies, from enquiry to invoice.",
+      category: "Not an IT reseller for servers and licences. A systems house for digital operations: one system for companies, from first contact to running operations.",
     },
     home: {
       statement: {
@@ -5086,7 +5086,7 @@ const rawDictionary = {
             label: "Situation B",
             title: "The business inside the system",
             wenn: "The work gets done. It just runs on notes, spreadsheets and three programmes that know nothing of each other.",
-            start: "The path from enquiry to invoice.",
+            start: "The path from first contact to finished job.",
             href: "/leistungen#ebene-operations",
           },
           {
