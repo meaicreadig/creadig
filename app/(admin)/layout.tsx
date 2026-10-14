@@ -58,6 +58,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  themeColor: "#f5f7fa",
+  colorScheme: "light",
 }
 
 export default async function AdminRootLayout({ children }: { children: React.ReactNode }) {
@@ -66,7 +68,7 @@ export default async function AdminRootLayout({ children }: { children: React.Re
   return (
     <html
       lang={sprache}
-      className={`dark admin-marke bg-background ${manrope.variable} ${mplusRounded.variable} ${jetbrains.variable}`}
+      className={`admin-marke bg-background ${manrope.variable} ${mplusRounded.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>{children}</body>

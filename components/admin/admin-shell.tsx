@@ -86,7 +86,7 @@ export async function AdminShell({
         {t.shell.springen}
       </a>
 
-      <div className="lg:grid lg:min-h-dvh lg:grid-cols-[15rem_1fr]">
+      <div className="lg:grid lg:min-h-dvh lg:grid-cols-[17rem_1fr]">
         <nav
           aria-label={t.shell.navLabel}
           /*
@@ -101,24 +101,19 @@ export async function AdminShell({
             Der Fehler wächst mit der Navigation: Jeder neue Bereich bringt
             ihn früher. Deshalb scrollt die Leiste jetzt, statt zu schneiden.
           */
-          className="border-line bg-surface flex flex-col gap-4 border-b px-4 py-4 sm:px-6 lg:sticky lg:top-0 lg:h-dvh lg:gap-6 lg:overflow-y-auto lg:border-r lg:border-b-0 lg:px-5 lg:py-7"
+          className="bg-card flex flex-col gap-4 px-4 py-4 shadow-sm sm:px-6 lg:sticky lg:top-4 lg:m-4 lg:h-[calc(100dvh-2rem)] lg:gap-8 lg:overflow-y-auto lg:rounded-3xl lg:px-5 lg:py-8"
         >
           <div className="flex items-start justify-between gap-3">
-            <Link href="/admin" className="flex flex-col gap-4 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-gold">
-              <Logo variant="light" className="h-6" />
-              <span className="flex items-center gap-2.5">
-                <span aria-hidden="true" className="bg-gold h-px w-6" />
-                <span className="text-gold-text font-mono text-[10px] tracking-[0.32em] uppercase">
-                  {t.shell.produkt}
-                </span>
-              </span>
+            <Link href="/admin" className="flex flex-col gap-3 rounded-xl px-2 outline-none focus-visible:ring-2 focus-visible:ring-primary">
+              <Logo variant="dark" className="h-6" />
+              <span className="text-muted-foreground text-xs font-medium tracking-wide">{t.shell.produkt}</span>
             </Link>
             <div className="lg:hidden">{umschalter}</div>
           </div>
 
           <AdminNav items={items} oeffnen={t.shell.menueOeffnen} schliessen={t.shell.menueSchliessen} />
 
-          <div className="border-line mt-auto hidden flex-col gap-3 border-t pt-5 lg:flex">
+          <div className="bg-background mt-auto hidden flex-col gap-3 rounded-2xl p-3 lg:flex">
             <div className="flex items-center justify-between gap-3">
               {umschalter}
               {darfBetreten(rolle, SYSTEM_HREF) && (
@@ -126,7 +121,7 @@ export async function AdminShell({
                   href={SYSTEM_HREF}
                   prefetch={false}
                   title={t.nav.system.label}
-                  className="text-muted-foreground hover:text-gold-text hover:bg-muted inline-flex size-9 items-center justify-center rounded-md transition-colors"
+                  className="text-muted-foreground hover:text-primary hover:bg-card inline-flex size-9 items-center justify-center rounded-full transition-colors"
                 >
                   <Settings aria-hidden="true" className="size-4" />
                   <span className="sr-only">{t.nav.system.label}</span>
@@ -137,18 +132,18 @@ export async function AdminShell({
           </div>
         </nav>
 
-        <main id="arbeitsflaeche" tabIndex={-1} className="min-w-0 px-4 py-6 outline-none sm:px-6 lg:px-10 lg:py-10">
-          <header className="border-line flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2 border-b pb-6">
-            <div className="min-w-0">
-              <h1 className="type-h3">{title}</h1>
-              {lead && <p className="type-small text-muted-foreground mt-2 max-w-2xl text-pretty">{lead}</p>}
+        <main id="arbeitsflaeche" tabIndex={-1} className="mx-auto w-full max-w-6xl min-w-0 px-5 py-8 outline-none sm:px-8 lg:px-10 lg:py-12">
+          <header className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+            <div className="flex min-w-0 flex-col gap-2">
+              <h1 className="font-sans text-3xl font-semibold tracking-tight text-balance md:text-4xl">{title}</h1>
+              {lead && <p className="text-muted-foreground max-w-2xl leading-relaxed text-pretty">{lead}</p>}
             </div>
-            {meta && <div className="text-meta text-muted-foreground shrink-0">{meta}</div>}
+            {meta && <div className="bg-card text-muted-foreground shrink-0 rounded-full px-4 py-2 text-sm shadow-sm">{meta}</div>}
           </header>
 
-          <div className="mt-8">{children}</div>
+          <div className="mt-10">{children}</div>
 
-          <div className="border-line mt-12 border-t pt-6 lg:hidden">
+          <div className="mt-12 lg:hidden">
             <AdminLogout label={t.shell.abmelden} laeuft={t.shell.abmeldenLaeuft} />
           </div>
         </main>

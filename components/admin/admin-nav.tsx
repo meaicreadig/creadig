@@ -74,7 +74,7 @@ export function AdminNav({
         aria-expanded={offen}
         aria-controls="admin-hauptnavigation"
         onClick={() => setOffen((o) => !o)}
-        className="border-line inline-flex min-h-11 items-center gap-2 rounded-sm border px-3 text-sm lg:hidden"
+        className="bg-background inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-medium lg:hidden"
       >
         {offen ? <X aria-hidden="true" className="size-4" /> : <Menu aria-hidden="true" className="size-4" />}
         {offen ? schliessen : oeffnen}
@@ -82,8 +82,8 @@ export function AdminNav({
       <div id="admin-hauptnavigation" className={`${offen ? "mt-3 flex" : "hidden"} flex-col gap-5 lg:mt-0 lg:flex`}>
         {gruppen.map(([gruppe, eintraege]) => (
           <div key={gruppe}>
-            <p className="text-muted-foreground/70 px-3 pb-2 font-mono text-[0.625rem] tracking-[0.18em] uppercase">{gruppe}</p>
-            <ul className="flex flex-col gap-0.5">
+            <p className="text-muted-foreground px-4 pb-2 text-xs font-medium">{gruppe}</p>
+            <ul className="flex flex-col gap-1">
               {eintraege.map((item) => {
                 const active = item.href === aktiv
                 const Icon = item.icon ? ICONS[item.icon] : undefined
@@ -96,17 +96,16 @@ export function AdminNav({
                       href={item.href}
                       title={item.hint}
                       aria-current={active ? "page" : undefined}
-                      className={`group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors duration-[var(--dur-1)] ${
+                      className={`group relative flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium transition-colors duration-[var(--dur-1)] ${
                         active
-                          ? "bg-gold/10 text-gold-text font-medium"
-                          : "text-foreground/75 hover:bg-muted hover:text-foreground"
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-foreground/75 hover:bg-background hover:text-foreground"
                       }`}
                     >
-                      {active && <span aria-hidden="true" className="bg-gold absolute inset-y-1.5 left-0 w-0.5 rounded-full" />}
                       {Icon && (
                         <Icon
                           aria-hidden="true"
-                          className={`size-4 shrink-0 ${active ? "text-gold" : "text-muted-foreground group-hover:text-foreground"}`}
+                          className={`size-4 shrink-0 ${active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"}`}
                         />
                       )}
                       {item.label}
