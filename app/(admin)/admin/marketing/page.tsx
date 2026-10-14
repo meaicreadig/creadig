@@ -154,7 +154,7 @@ export default async function MarketingSeite() {
       <div className="flex flex-wrap gap-3">
         <Link
           href="/admin/veroeffentlichungen#erfassen"
-          className="bg-foreground text-background inline-flex h-10 items-center rounded-md px-4 text-sm font-medium transition-opacity hover:opacity-90"
+          className="bg-primary text-primary-foreground inline-flex h-10 items-center rounded-md px-4 text-sm font-medium transition-opacity hover:opacity-90"
         >
           {t.neu}
         </Link>
@@ -195,7 +195,7 @@ export default async function MarketingSeite() {
                 <div key={w.start} className="flex h-full flex-1 flex-col items-center justify-end gap-1.5">
                   <span className="text-muted-foreground text-[10px] tabular-nums">{w.anzahl || ""}</span>
                   <div
-                    className={`w-full rounded-sm ${i === d.wochen!.length - 1 ? "bg-gold" : "bg-foreground/20"}`}
+                    className={`w-full rounded-sm ${i === d.wochen!.length - 1 ? "bg-gold" : "bg-primary/20"}`}
                     style={{ height: `${Math.max(4, (w.anzahl / maxWoche) * 100)}%` }}
                   />
                 </div>
@@ -215,9 +215,9 @@ export default async function MarketingSeite() {
                     <span>{t.kanal[k.kanal] ?? k.kanal}</span>
                     <span className="tabular-nums">{k.anzahl}</span>
                   </span>
-                  <span className="bg-foreground/10 block h-1.5 overflow-hidden rounded-full">
+                  <span className="bg-primary/10 block h-1.5 overflow-hidden rounded-full">
                     <span
-                      className={`block h-full rounded-full ${k.kanal === "linkedin" ? "bg-gold" : "bg-foreground/40"}`}
+                      className={`block h-full rounded-full ${k.kanal === "linkedin" ? "bg-gold" : "bg-primary/40"}`}
                       style={{ width: `${(k.anzahl / maxKanal) * 100}%` }}
                     />
                   </span>
@@ -386,7 +386,7 @@ function WochenPlan({ d, t }: { d: Awaited<ReturnType<typeof ladeMarketing>>; t:
           <span className="flex items-center gap-2">
             <span className="flex gap-1" aria-hidden="true">
               {Array.from({ length: LINKEDIN_ZIEL }, (_, i) => (
-                <span key={i} className={`size-2.5 rounded-full ${i < erreicht ? "bg-gold" : "bg-foreground/15"}`} />
+                <span key={i} className={`size-2.5 rounded-full ${i < erreicht ? "bg-gold" : "bg-primary/15"}`} />
               ))}
             </span>
             <span className={`tabular-nums ${linkedin >= LINKEDIN_ZIEL ? "text-gold-text" : ""}`}>
@@ -419,7 +419,7 @@ function WochenPlan({ d, t }: { d: Awaited<ReturnType<typeof ladeMarketing>>; t:
                 <span
                   key={j}
                   title={p.was}
-                  className={`block h-1.5 rounded-full ${p.kanal === "linkedin" ? "bg-gold" : "bg-foreground/40"}`}
+                  className={`block h-1.5 rounded-full ${p.kanal === "linkedin" ? "bg-gold" : "bg-primary/40"}`}
                 >
                   <span className="sr-only">{`${t.kanal[p.kanal] ?? p.kanal}: ${p.was}`}</span>
                 </span>

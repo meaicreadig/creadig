@@ -41,7 +41,7 @@ export function SprachUmschalter({
             starte(() => router.refresh())
           }}
           className={`min-h-9 min-w-11 rounded-sm px-2.5 text-xs font-medium tracking-wide transition-colors duration-[var(--dur-1)] ${
-            s === aktuell ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted"
+            s === aktuell ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
           }`}
         >
           <span aria-hidden="true">{namen[s].kurz}</span>

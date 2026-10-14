@@ -308,7 +308,7 @@ export function EinzelmailStudio({
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-meta text-muted-foreground max-w-sm leading-relaxed">{t.kiHint}</p>
-            <button type="button" onClick={() => kiSchreiben()} disabled={laeuft || anweisung.trim().length < 5} className={`bg-gold text-[#0F1B2D] ${knopf}`}>
+            <button type="button" onClick={() => kiSchreiben()} disabled={laeuft || anweisung.trim().length < 5} className={`bg-primary text-primary-foreground ${knopf}`}>
               {laeuft ? t.schreibt : t.schreiben}
             </button>
           </div>
