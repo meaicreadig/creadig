@@ -45,6 +45,12 @@ export const mediaProvenance: MediaProvenance[] = [
   { src: "/works/maqam.jpg", origin: "illustration", herkunft: SZENE, alt: null, replaceWith: "customer-site" },
   { src: "/works/bir-damla-hayir.jpg", origin: "illustration", herkunft: SZENE, alt: null, replaceWith: "customer-site" },
   { src: "/works/rumis-maison.png", origin: "illustration", herkunft: "Nicht bestätigtes Projekt; erscheint nirgends.", alt: null, replaceWith: null },
+  { src: "/works/fibero.png", origin: "real-ui", herkunft: "Echter Screenshot der laufenden fibero-App (Anmeldung), unverändert.", alt: null, replaceWith: null },
+  { src: "/works/meai.png", origin: "real-ui", herkunft: "Echter Screenshot der laufenden meAI-App (Anmeldung), unverändert.", alt: null, replaceWith: null },
+  { src: "/works/cassamea.png", origin: "real-ui", herkunft: "Echter Screenshot der laufenden Cassamea-App (Startbildschirm), unverändert.", alt: null, replaceWith: null },
+  { src: "/works/stammo.png", origin: "real-ui", herkunft: "Echter Screenshot der laufenden Stammo-App, unverändert.", alt: null, replaceWith: null },
+  { src: "/works/allrein-ofra.png", origin: "real-ui", herkunft: "Originaldatei des gestalteten Kundenwerks, vom Owner geliefert.", alt: null, replaceWith: null },
+  { src: "/works/star-imbiss.jpg", origin: "real-ui", herkunft: "Originaldatei der gestalteten Speisekarte, vom Owner geliefert.", alt: null, replaceWith: null },
   {
     src: "/images/ico-osnabrueck.jpg",
     origin: "real-photo",
