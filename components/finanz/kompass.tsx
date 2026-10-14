@@ -26,13 +26,13 @@ export function FinanzKompass({
 
   return (
     <section aria-labelledby="kompass" className="grid gap-5 lg:grid-cols-5">
-      <div className="finanz-glanz bg-primary text-primary-foreground relative flex flex-col gap-8 overflow-hidden rounded-[2rem] p-7 md:p-9 lg:col-span-3">
+      <div className="bg-card relative flex flex-col gap-8 overflow-hidden rounded-[2rem] p-7 shadow-sm md:p-9 lg:col-span-3">
         <div className="relative flex flex-col gap-2">
-          <h2 id="kompass" className="text-primary-foreground/80 text-sm font-medium">
+          <h2 id="kompass" className="text-muted-foreground text-sm font-medium">
             Frei verfügbar
           </h2>
-          <p className="font-sans text-5xl font-semibold tracking-tight tabular-nums md:text-7xl">{eurRund(frei)}</p>
-          <p className="text-primary-foreground/80 text-sm leading-relaxed">Kontostand minus Steuertopf – dieses Geld gehört wirklich dir.</p>
+          <p className="text-primary font-sans text-5xl font-semibold tracking-tight tabular-nums md:text-7xl">{eurRund(frei)}</p>
+          <p className="text-muted-foreground text-sm leading-relaxed">Kontostand minus Steuertopf – dieses Geld gehört wirklich dir.</p>
         </div>
 
         <dl className="relative grid grid-cols-2 gap-x-4 gap-y-5 md:grid-cols-4">
@@ -46,10 +46,10 @@ export function FinanzKompass({
           {verlauf.map((m) => (
             <div key={m.schluessel} className="flex flex-1 flex-col items-center gap-1.5">
               <div className="flex h-20 w-full items-end justify-center gap-1">
-                <span className="bg-primary-foreground w-1/3 rounded-full" style={{ height: `${Math.max(4, (m.einCent / max) * 100)}%` }} title={`Ein ${eur(m.einCent)}`} />
-                <span className="bg-primary-foreground/35 w-1/3 rounded-full" style={{ height: `${Math.max(4, (m.ausCent / max) * 100)}%` }} title={`Aus ${eur(m.ausCent)}`} />
+                <span className="bg-primary w-1/3 rounded-full" style={{ height: `${Math.max(4, (m.einCent / max) * 100)}%` }} title={`Ein ${eur(m.einCent)}`} />
+                <span className="bg-primary/25 w-1/3 rounded-full" style={{ height: `${Math.max(4, (m.ausCent / max) * 100)}%` }} title={`Aus ${eur(m.ausCent)}`} />
               </div>
-              <span className="text-primary-foreground/70 text-xs">{monatKurz(m.schluessel)}</span>
+              <span className="text-muted-foreground text-xs">{monatKurz(m.schluessel)}</span>
             </div>
           ))}
         </div>
@@ -85,7 +85,7 @@ export function FinanzKompass({
 function Kennzahl({ titel, wert }: { titel: string; wert: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <dt className="text-primary-foreground/70 text-xs font-medium">{titel}</dt>
+      <dt className="text-muted-foreground text-xs font-medium">{titel}</dt>
       <dd className="text-lg font-semibold tabular-nums">{wert}</dd>
     </div>
   )

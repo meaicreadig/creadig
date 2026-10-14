@@ -15,9 +15,9 @@ export default async function FinanzSteuern() {
   return (
     <FinanzShell aktiv="steuern" titel="Steuern" unterzeile="Der Steuertopf rechnet live mit. Was dem Finanzamt gehört, ist hier schon beiseitegelegt.">
       <section aria-label="Steuertopf" className="grid gap-5 md:grid-cols-3">
-        <div className="finanz-glanz bg-primary text-primary-foreground relative flex flex-col gap-2 overflow-hidden rounded-[2rem] p-7">
-          <span className="text-primary-foreground/80 text-sm font-medium">Steuertopf gesamt</span>
-          <span className="text-4xl font-semibold tracking-tight tabular-nums">{eurRund(topf.gesamtCent)}</span>
+        <div className="bg-card flex flex-col gap-2 rounded-[2rem] p-7 shadow-sm">
+          <span className="text-muted-foreground text-sm font-medium">Steuertopf gesamt</span>
+          <span className="text-primary text-4xl font-semibold tracking-tight tabular-nums">{eurRund(topf.gesamtCent)}</span>
         </div>
         <Karte titel="Umsatzsteuer offen" wert={eurRund(topf.ustOffenCent)} />
         <Karte titel="ESt-Rücklage" wert={eurRund(topf.estRuecklageCent)} fuss={`Gewinn bisher ${eur(topf.gewinnJahrCent)} netto`} />
