@@ -1,15 +1,16 @@
 import Link from "next/link"
-import { CalendarClock, Compass, Settings2, Waves } from "lucide-react"
+import { CalendarClock, Compass, Receipt, Settings2, Waves } from "lucide-react"
 
 import { Logo } from "@/components/brand/logo"
 import { Abmelden } from "@/components/finanz/anmeldung"
 import { finanzBasis } from "@/lib/finanz/basis"
 
-export type FinanzBereich = "heute" | "geldfluss" | "steuern" | "grundlagen"
+export type FinanzBereich = "heute" | "geldfluss" | "belege" | "steuern" | "grundlagen"
 
 const BEREICHE: { key: FinanzBereich; pfad: string; label: string; Icon: typeof Compass }[] = [
   { key: "heute", pfad: "", label: "Heute", Icon: Compass },
   { key: "geldfluss", pfad: "/geldfluss", label: "Geldfluss", Icon: Waves },
+  { key: "belege", pfad: "/belege", label: "Belege", Icon: Receipt },
   { key: "steuern", pfad: "/steuern", label: "Steuern", Icon: CalendarClock },
   { key: "grundlagen", pfad: "/grundlagen", label: "Grundlagen", Icon: Settings2 },
 ]
@@ -65,7 +66,7 @@ export async function FinanzShell({
       </main>
 
       <nav aria-label="Bereiche" className="bg-card fixed inset-x-3 bottom-3 z-20 rounded-full p-1 shadow-lg md:hidden">
-        <ul className="grid grid-cols-4">
+        <ul className="grid grid-cols-5">
           {BEREICHE.map(({ key, pfad, label, Icon }) => (
             <li key={key}>
               <Link
