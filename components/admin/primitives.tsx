@@ -53,8 +53,8 @@ export function Surface({
   padding?: "none" | "sm" | "md"
   className?: string
 }) {
-  const pad = padding === "none" ? "" : padding === "sm" ? "p-4" : "p-5"
-  return <div className={`tile bg-surface ${pad} ${className}`}>{children}</div>
+  const pad = padding === "none" ? "" : padding === "sm" ? "p-5" : "p-6 md:p-7"
+  return <div className={`bg-card rounded-3xl shadow-sm ${pad} ${className}`}>{children}</div>
 }
 
 /* ------------------------------------------------------------------------ */
@@ -74,8 +74,8 @@ export function SectionHeader({
   as?: "h2" | "h3"
 }) {
   return (
-    <div className="border-line flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b pb-2">
-      <As id={id} className="text-subhead text-base">
+    <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 pb-1">
+      <As id={id} className="font-sans text-lg font-semibold tracking-tight">
         {title}
       </As>
       {count !== undefined && (
@@ -106,7 +106,7 @@ export function Pill({
 }) {
   return (
     <span
-      className={`inline-flex shrink-0 items-center rounded-sm border px-2 py-0.5 text-xs leading-5 whitespace-nowrap ${SEVERITY[severity]}`}
+      className={`inline-flex shrink-0 items-center rounded-full border px-2.5 py-0.5 text-xs leading-5 whitespace-nowrap ${SEVERITY[severity]}`}
     >
       {children}
     </span>
@@ -132,7 +132,7 @@ export function UnavailableNote({
   children: ReactNode
 }) {
   return (
-    <div className="border-line bg-muted/40 rounded-md border border-dashed p-5">
+    <div className="bg-card rounded-3xl p-6 shadow-sm">
       <p className="text-subhead text-sm">{title}</p>
       <p className="type-small text-muted-foreground mt-2 max-w-2xl text-pretty">{children}</p>
     </div>
@@ -151,7 +151,7 @@ export function UnavailableNote({
  * Fokusstil neben dem Rest der Oberfläche.
  */
 const controlClass =
-  "w-full min-w-0 rounded-sm border border-line bg-background px-3 py-2 text-sm text-foreground " +
+  "w-full min-w-0 rounded-xl border border-line bg-background px-3.5 py-2.5 text-sm text-foreground " +
   "placeholder:text-muted-foreground " +
   "transition-colors duration-[var(--dur-1)] " +
   "focus-visible:border-gold " +
