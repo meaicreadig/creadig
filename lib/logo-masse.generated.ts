@@ -24,6 +24,7 @@ export const LOGO_MASSE: Readonly<Record<string, LogoMass>> = {
   "/brand/creadig-logo-light.svg": { breite: 1743, hoehe: 186, verhaeltnis: 9.3710 },
   "/brand/creadig-logo.png": { breite: 5425, hoehe: 1500, verhaeltnis: 3.6167 },
   "/brand/creadig-logo.svg": { breite: 1743, hoehe: 186, verhaeltnis: 9.3710 },
+  "/brand/creadig-mail-logo.png": { breite: 520, hoehe: 144, verhaeltnis: 3.6111 },
   "/brand/products/cassamea.png": { breite: 6967, hoehe: 3917, verhaeltnis: 1.7787 },
   "/brand/products/cassamea.svg": { breite: 1324, hoehe: 158, verhaeltnis: 8.3797 },
   "/brand/products/fibero.svg": { breite: 1028.9, hoehe: 296.89, verhaeltnis: 3.4656 },
