@@ -23,9 +23,13 @@ export type FelderBild = {
   offen: { anzahl: number; bruttoCent: number }
   quellen: { quelle: string; anzahl: number }[]
   monate: { schluessel: string; felder: Record<string, number> }[]
+  pruefung: { zuPruefen: number; unklar: number; fremdwaehrung: number; privat: number }
 }
 
-const NETTO = `CASE WHEN b.ust_satz > 0 THEN round(b.brutto_cent * 100.0 / (100 + b.ust_satz)) ELSE b.brutto_cent END`
+const NETTO_ROH = `CASE WHEN b.ust_satz > 0 THEN b.brutto_cent * 100.0 / (100 + b.ust_satz) ELSE b.brutto_cent END`
+/** Gewinnwirksam im Belegjahr: Anlagegut nur 1. AfA-Rate, sonst abzugsfähiger Anteil. */
+const NETTO = `round(CASE WHEN b.afa_jahre > 0 THEN (${NETTO_ROH}) / b.afa_jahre
+  ELSE (${NETTO_ROH}) * COALESCE(b.abzug_prozent, 100) / 100.0 END)`
 const FELD = `COALESCE(b.geschaeftsfeld, fb.geschaeftsfeld, 'offen')`
 const JOIN = `FROM fin_buchungen b
   LEFT JOIN fin_belege fb ON fb.quelle = 'fibero' AND b.id = 'fibero-exp-' || fb.extern_id`
@@ -33,9 +37,10 @@ const JOIN = `FROM fin_buchungen b
 export async function ladeFelder(db: Abfrage, jahr: string): Promise<FelderBild> {
   await belegeSchema(db)
   const p = [`${jahr}-01-01`, `${Number(jahr) + 1}-01-01`]
-  const basis = `b.storniert_at IS NULL AND b.status = 'gebucht' AND b.datum >= $1 AND b.datum < $2`
+  const basis = `b.storniert_at IS NULL AND b.status = 'gebucht' AND b.datum >= $1 AND b.datum < $2
+    AND b.kategorie <> 'Privatentnahme'`
 
-  const [zeilen, offen, quellen, monate] = await Promise.all([
+  const [zeilen, offen, quellen, monate, afa, pruef] = await Promise.all([
     db(`SELECT ${FELD} AS feld, b.art, sum(${NETTO}) AS netto, count(*) AS c ${JOIN} WHERE ${basis} GROUP BY 1, 2`, p),
     db(
       `SELECT count(*) AS c, coalesce(sum(b.brutto_cent),0) AS s FROM fin_buchungen b
@@ -49,7 +54,28 @@ export async function ladeFelder(db: Abfrage, jahr: string): Promise<FelderBild>
          ${JOIN} WHERE ${basis} GROUP BY 1, 2 ORDER BY 1`,
       p,
     ),
+    db(
+      `SELECT ${FELD} AS feld, extract(year FROM b.datum)::int AS start, b.afa_jahre AS n, ${NETTO_ROH} AS netto
+         ${JOIN} WHERE b.storniert_at IS NULL AND b.status = 'gebucht' AND b.afa_jahre > 0 AND b.datum < $1`,
+      [p[0]],
+    ),
+    db(
+      `SELECT count(*) FILTER (WHERE b.pruefung = 'zu_pruefen') AS zu_pruefen,
+              count(*) FILTER (WHERE b.pruefung = 'unklar') AS unklar,
+              count(*) FILTER (WHERE b.waehrung IS NOT NULL AND b.waehrung <> 'EUR') AS fremd,
+              count(*) FILTER (WHERE b.kategorie = 'Privatentnahme') AS privat
+         FROM fin_buchungen b WHERE ${basis.replace("AND b.kategorie <> 'Privatentnahme'", "")}`,
+      p,
+    ),
   ])
+
+  for (const r of afa) {
+    const n = Number(r.n)
+    const netto = Number(r.netto)
+    const proJahr = netto / n
+    const rate = Math.round(Math.max(0, Math.min(proJahr, netto - (Number(jahr) - Number(r.start)) * proJahr)))
+    if (rate > 0) zeilen.push({ feld: r.feld, art: "ausgabe", netto: rate, c: 0 })
+  }
 
   const labels = new Map<string, string>([
     ...GESCHAEFTSFELDER.map((g) => [g.key, g.label] as [string, string]),
@@ -81,5 +107,11 @@ export async function ladeFelder(db: Abfrage, jahr: string): Promise<FelderBild>
     offen: { anzahl: Number(offen[0]?.c ?? 0), bruttoCent: Number(offen[0]?.s ?? 0) },
     quellen: quellen.map((r) => ({ quelle: String(r.quelle), anzahl: Number(r.c) })),
     monate: [...proMonat.entries()].map(([schluessel, f]) => ({ schluessel, felder: f })),
+    pruefung: {
+      zuPruefen: Number(pruef[0]?.zu_pruefen ?? 0),
+      unklar: Number(pruef[0]?.unklar ?? 0),
+      fremdwaehrung: Number(pruef[0]?.fremd ?? 0),
+      privat: Number(pruef[0]?.privat ?? 0),
+    },
   }
 }

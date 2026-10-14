@@ -67,6 +67,19 @@ export function Geschaeftsfelder({
         />
       </div>
 
+      {bild.pruefung.zuPruefen + bild.pruefung.unklar + bild.pruefung.fremdwaehrung + bild.pruefung.privat > 0 && (
+        <p className="bg-card text-muted-foreground rounded-3xl px-5 py-3 text-sm leading-relaxed">
+          {[
+            bild.pruefung.zuPruefen > 0 && `${bild.pruefung.zuPruefen} Belege noch zu prüfen`,
+            bild.pruefung.unklar > 0 && `${bild.pruefung.unklar} mit unklarem Abzug`,
+            bild.pruefung.fremdwaehrung > 0 && `${bild.pruefung.fremdwaehrung} in Fremdwährung (EZB-Kurs umgerechnet)`,
+            bild.pruefung.privat > 0 && `${bild.pruefung.privat} privat, nicht als Aufwand gezählt`,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
+      )}
+
       <div className="bg-card flex flex-col gap-1 rounded-[2rem] p-3 sm:p-4">
         {bild.felder.length === 0 ? (
           <p className="text-muted-foreground p-4">Für {bild.jahr} gibt es noch keine Buchungen.</p>
