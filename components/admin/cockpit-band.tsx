@@ -178,7 +178,7 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
                 <div key={w.start} className="flex h-full flex-1 flex-col items-center justify-end gap-1.5">
                   <span className="text-muted-foreground text-[10px] tabular-nums">{w.anzahl || ""}</span>
                   <div
-                    className={`w-full rounded-sm ${i === daten.wochen!.length - 1 ? "bg-gold" : "bg-foreground/20"}`}
+                    className={`w-full rounded-sm ${i === daten.wochen!.length - 1 ? "bg-gold" : "bg-primary/20"}`}
                     style={{ height: `${Math.max(4, (w.anzahl / maxWoche) * 100)}%` }}
                   />
                 </div>
@@ -196,7 +196,7 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
                 {stufenAktiv.map((s) => (
                   <div
                     key={s}
-                    className={s === "won" ? "bg-gold" : s === "lost" ? "bg-destructive/60" : "bg-foreground/25 border-surface border-r-2 last:border-r-0"}
+                    className={s === "won" ? "bg-gold" : s === "lost" ? "bg-destructive/60" : "bg-primary/25 border-surface border-r-2 last:border-r-0"}
                     style={{ width: `${((stufenMap.get(s) ?? 0) / stufenSumme) * 100}%` }}
                   />
                 ))}
@@ -229,7 +229,7 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
                       <span>{q.anzahl}</span>
                     </span>
                   </span>
-                  <span className="bg-foreground/10 block h-1.5 overflow-hidden rounded-full">
+                  <span className="bg-primary/10 block h-1.5 overflow-hidden rounded-full">
                     <span className="bg-gold block h-full rounded-full" style={{ width: `${(q.anzahl / maxQuelle) * 100}%` }} />
                   </span>
                 </li>

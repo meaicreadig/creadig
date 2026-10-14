@@ -1,5 +1,8 @@
 import Link from "next/link"
 import { after } from "next/server"
+import { Suspense } from "react"
+
+import { MorgenAssistent, MorgenAssistentLaedt } from "@/components/admin/morgen-assistent"
 
 import { bereiteNachfassVor } from "@/lib/termine/nachfass"
 
@@ -125,6 +128,10 @@ export default async function Uebersicht() {
 
   return (
     <AdminShell title={t.uebersicht.titel} meta={<span className="block">{t.uebersicht.stand(stand)}</span>}>
+      <Suspense fallback={<MorgenAssistentLaedt sprache={sprache === "tr" ? "tr" : "de"} />}>
+        <MorgenAssistent sprache={sprache === "tr" ? "tr" : "de"} />
+      </Suspense>
+
       <CockpitBand daten={cockpit} sprache={sprache === "tr" ? "tr" : "de"} intl={intl} />
 
       {/* ── 1 · Kennzahlen ── */}
