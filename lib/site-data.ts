@@ -619,7 +619,7 @@ export const productWorlds: Record<string, ProductWorld> = {
       { de: "Abo-System & Automatiken", tr: "Abonelik sistemi & otomasyonlar", en: "Subscriptions & automations", ar: "الاشتراكات والأتمتة" },
     ],
     layer: "automation",
-    maturity: "live",
+    maturity: null,
     story: {
       de: "Stammo begann als Auftrag: Ein Gastro-Franchisenehmer in Zürich und Luzern wollte eine Stempelkarte ohne Papier. Daraus wurde ein eigenes Produkt — heute steht es jedem Betrieb offen, auf Deutsch und Französisch.",
       tr: "Stammo bir siparişle başladı: Zürih ve Luzern'deki bir gastronomi franchise'ı kâğıtsız bir damga kartı istedi. Bundan kendi ürünümüz doğdu — bugün Almanca ve Fransızca olarak her işletmeye açık.",

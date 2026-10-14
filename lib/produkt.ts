@@ -228,6 +228,12 @@ export const PORTFOLIO: readonly PortfolioEintrag[] = [
     stand: null,
     rueckmeldung: { art: "postfach", an: "info@creadig.de, Betreff meahv", fuer: "beides" },
   },
+  {
+    slug: "stammo",
+    eigentuemer: "Owner",
+    stand: null,
+    rueckmeldung: { art: "postfach", an: "info@creadig.de, Betreff Stammo", fuer: "beides" },
+  },
 ]
 
 export function eintragZu(slug: string): PortfolioEintrag | null {
