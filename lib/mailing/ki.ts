@@ -29,19 +29,23 @@ KNOPF: <Text für den Handlungsknopf, 2–4 Wörter>
 <Inhalt>`
 
 export type KiEinzelmail =
-  | { inhalt: { subject: string; preheader: string; headline: string; anrede: string; body: string; ctaText: string; zweitText: string; gruss: string } }
+  | { inhalt: { subject: string; preheader: string; headline: string; kennung: string; ctaHinweis: string; anrede: string; body: string; ctaText: string; zweitText: string; gruss: string } }
   | { fehler: string }
 
 const SYSTEM_EINZEL = `Du schreibst eine persönliche 1:1-Geschäftsmail für creaDIG im Namen von Muhammed Emin Akyol (Osnabrück) – keine Werbe-Mail, kein Newsletter.
 Muhammed sagt dir in eigenen Worten (oft Deutsch, manchmal Türkisch, mit Tippfehlern), was er will. Verstehe die Absicht und schreibe daraus eine fertige, versandbereite Mail.
 Gibt es schon einen Entwurf, ÄNDERE ihn gezielt nach der Anweisung und behalte alles andere bei.
-Regeln: Erfinde keine Fakten, Preise, Zusagen oder Gesprächsinhalte, die nicht genannt sind. Per Sie, ruhig, klar, menschlich, keine Werbesprache, keine Superlative, keine Emojis, kein Fachjargon (Empfänger sind oft nicht technisch).
-Die Mail hat immer EIN klares Ziel (meist: Termin vereinbaren). Kurz: 90–180 Wörter. Kurze Absätze, getrennt durch Leerzeile. Optional EINE Liste mit Zeilen "- ".
-Die Vorlage setzt Logo, Unterschrift (Name, Gründer · creaDIG) und Firmenzeile selbst – schreibe sie NICHT in den Inhalt. Anrede und Grußformel gibst du separat aus.
+Regeln: Erfinde keine Fakten, Preise, Zusagen oder Gesprächsinhalte, die nicht genannt sind. Per Sie, kein Fachjargon (Empfänger sind oft nicht technisch), keine Emojis, keine Floskeln wie "innovativ" oder "maßgeschneidert".
+Ton: selbstbewusst, auf Augenhöhe, aus Sicht des Empfängers. Erst sein Gewinn, dann das Angebot. Kurze, starke Sätze. Kein Bitten, kein Entschuldigen, kein "ich würde mich freuen, wenn …" – sondern klar sagen, was er bekommt.
+Die Mail hat immer EIN klares Ziel (meist: Termin vereinbaren). 110–200 Wörter.
+Struktur (nutze sie, die Vorlage gestaltet sie): kurze Absätze getrennt durch Leerzeile; genau EINE Vorteilsliste mit 3 Zeilen im Format "- Kurzer Titel: ein Satz"; optional EINE Kernaussage als Zeile "> …" (max. 10 Wörter); **fett** sparsam für 1–2 Schlüsselbegriffe.
+Die Vorlage setzt Logo, Unterschrift (Name, Gründer · creaDIG), Kontaktleiste und Firmenzeile selbst – schreibe sie NICHT in den Inhalt. Anrede und Grußformel gibst du separat aus.
 Antwortformat exakt, jede Marke auf eigener Zeile:
-BETREFF: <max. 70 Zeichen>
+BETREFF: <max. 70 Zeichen, weckt Interesse, kein Clickbait>
 VORSCHAU: <Vorschautext im Postfach, max. 90 Zeichen>
-TITEL: <Überschrift in der Mail, max. 70 Zeichen, sachlich>
+KENNUNG: <kleine Zeile über der Überschrift, max. 40 Zeichen, z. B. "Persönlich für VI-SEC">
+TITEL: <Überschrift in der Mail, max. 70 Zeichen, eine selbstbewusste Aussage über den Gewinn des Empfängers; ein Schlüsselwort darf **fett** sein>
+HINWEIS: <ein Satz über den Knöpfen, der zum Termin einlädt, max. 110 Zeichen>
 ANREDE: <z. B. "Sehr geehrte Damen und Herren," oder "Guten Tag Herr Baser,">
 KNOPF: <Text für den Haupt-Knopf, 2–4 Wörter, meist zur Terminbuchung>
 ZWEITKNOPF: <Text für den zweiten Knopf, 2–4 Wörter, meist zum Kontaktformular>
@@ -71,6 +75,8 @@ export async function schreibeEinzelmail(anweisung: string, entwurf: string, emp
         subject: subject.slice(0, 140),
         preheader: feld("VORSCHAU").slice(0, 160),
         headline: feld("TITEL").slice(0, 140),
+        kennung: feld("KENNUNG").slice(0, 60),
+        ctaHinweis: feld("HINWEIS").slice(0, 160),
         anrede: feld("ANREDE").slice(0, 120),
         ctaText: feld("KNOPF").slice(0, 40),
         zweitText: feld("ZWEITKNOPF").slice(0, 40),

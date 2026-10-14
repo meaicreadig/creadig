@@ -10,34 +10,46 @@ import { einzelmailSenden, kiEinzelmail } from "../actions"
 
 export const dynamic = "force-dynamic"
 
-const VISEC_ENTWURF = `vor Kurzem hatte ich ein persönliches Gespräch mit Herrn Baser. Dabei ging es um Ihre offene Stelle – und darum, dass eine neue Fachkraft allein wenig bringt, wenn die Abläufe und Strukturen dahinter fehlen.
+const VISEC_ENTWURF = `vor Kurzem habe ich mit Herrn Baser über Ihre offene Stelle gesprochen. Dabei wurde eines klar: Sie brauchen dafür nicht zwingend eine neue Fachkraft – Sie brauchen **Abläufe, die verlässlich laufen**.
 
-Genau das baue ich auf: ein Grundsystem, das die Abläufe rund um diese Position trägt. So startet die neue Fachkraft von Anfang an in geordnete Prozesse, statt sich alles erst selbst zusammensuchen zu müssen.
+Genau das baue ich: ein Grundsystem für Ihren Betrieb, das die Aufgaben rund um diese Position trägt. Auf Wunsch übernehme ich auch die Pflege und die laufende Arbeit gleich mit.
 
-Herr Baser meinte, ich solle Ihnen kurz schreiben, damit wir einen Termin finden. Gerne zeige ich Ihnen in 20–30 Minuten unverbindlich, wie das bei Ihnen konkret aussehen könnte – gern auch bei Ihnen vor Ort in Osnabrück.
+- Keine Fachkraft nötig: Das System ist so gebaut, dass Ihr Team es ohne Spezialwissen nutzt.
+- Pflege aus einer Hand: Wartung, Anpassungen und laufende Arbeit kann ich komplett übernehmen.
+- Ein fester Ansprechpartner: Sie sprechen direkt mit mir – nicht mit einer Hotline.
 
-Sie können direkt über den Knopf einen passenden Termin wählen oder mir über das Kontaktformular schreiben.`
+> Weniger Personalsuche. Mehr Ruhe im Betrieb.
+
+Herr Baser meinte, ich solle mich direkt bei Ihnen melden. In 20–30 Minuten zeige ich Ihnen unverbindlich, wie das bei Ihnen konkret aussieht – gern auch bei Ihnen vor Ort.`
+
+function adresse(von: string): string {
+  return von.match(/<([^>]+)>/)?.[1]?.trim() || (von.includes("@") ? von.trim() : "")
+}
 
 export default async function EinzelmailSeite() {
   const { sprache } = await adminSprachKontext()
   const tr = sprache === "tr"
   const basis = siteUrl()
 
+  const von = process.env.MAIL_FROM?.trim() || process.env.LEAD_FROM?.trim() || ""
+
   const start: Einzelmail = {
     an: "info@vi-sec.de",
-    subject: "Termin nach meinem Gespräch mit Herrn Baser",
-    preheader: "Kurz vorgestellt: ein Grundsystem für Ihre neue Fachkraft",
-    headline: "Ein Grundsystem für Ihre neue Fachkraft",
+    subject: "Ihre offene Stelle – es geht auch ohne neue Fachkraft",
+    preheader: "Nach meinem Gespräch mit Herrn Baser: ein System, das die Arbeit trägt",
+    kennung: "Persönlich für VI-SEC",
+    headline: "Ihre Abläufe laufen – **ohne dass Sie erst eine Stelle besetzen.**",
     anrede: "Sehr geehrte Damen und Herren,",
     body: VISEC_ENTWURF,
+    ctaHinweis: "Wählen Sie direkt einen passenden Termin – oder schreiben Sie mir in einer Minute.",
     ctaText: "Termin wählen",
     ctaUrl: `${basis}/termin`,
     zweitText: "Kontaktformular",
     zweitUrl: `${basis}/kontakt`,
     gruss: "Mit freundlichen Grüßen",
+    telefon: "0176 41965356",
+    kontaktMail: adresse(process.env.MAIL_REPLY_TO?.trim() || von),
   }
-
-  const von = process.env.MAIL_FROM?.trim() || process.env.LEAD_FROM?.trim() || ""
 
   return (
     <AdminShell

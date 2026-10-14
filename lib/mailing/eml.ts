@@ -4,16 +4,30 @@
  * den man nur noch absendet. Läuft im Browser und auf dem Server.
  */
 
-import { kampagnenHtml } from "@/lib/mailing/vorlage"
+import { kampagnenHtml, LOGO_CID } from "@/lib/mailing/vorlage"
 
-export function einzelmailHtml(m: Einzelmail, siteUrl: string): string {
+export function einzelmailHtml(m: Einzelmail, siteUrl: string, logoSrc?: string): string {
   return kampagnenHtml(
     { subject: m.subject, preheader: m.preheader, headline: m.headline, body: m.body, ctaText: m.ctaText, ctaUrl: m.ctaUrl },
-    { siteUrl, anrede: m.anrede || undefined, gruss: m.gruss || undefined, zweitLink: { text: m.zweitText, url: m.zweitUrl } },
+    {
+      siteUrl,
+      logoSrc,
+      anrede: m.anrede || undefined,
+      gruss: m.gruss || undefined,
+      zweitLink: { text: m.zweitText, url: m.zweitUrl },
+      kennung: m.kennung,
+      ctaHinweis: m.ctaHinweis,
+      telefon: m.telefon,
+      email: m.kontaktMail,
+    },
   )
 }
 
 export type Einzelmail = {
+  kennung: string
+  ctaHinweis: string
+  telefon: string
+  kontaktMail: string
   an: string
   subject: string
   preheader: string
@@ -45,18 +59,42 @@ function kopfWort(s: string): string {
 export function einzelmailText(m: Einzelmail): string {
   return [
     m.anrede,
-    m.body.replace(/^## /gm, "").replace(/^- /gm, "• "),
+    m.body.replace(/^## /gm, "").replace(/^- /gm, "• ").replace(/^> /gm, "").replace(/\*\*/g, ""),
     m.ctaText && m.ctaUrl ? `${m.ctaText}: ${m.ctaUrl}` : "",
     m.zweitText && m.zweitUrl ? `${m.zweitText}: ${m.zweitUrl}` : "",
     `${m.gruss || "Viele Grüße"}\nMuhammed Emin Akyol\nGründer · creaDIG`,
-    "—\ncreaDIG solutions UG (haftungsbeschränkt) · Osnabrück · creadig.de",
+    ["—", m.telefon, m.kontaktMail, "creaDIG solutions UG (haftungsbeschränkt) · Osnabrück · creadig.de"].filter(Boolean).join("\n"),
   ]
     .filter(Boolean)
     .join("\n\n")
 }
 
-export function baueEml(m: Einzelmail, html: string, von?: string): string {
+/** html muss das Logo als `cid:${LOGO_CID}` referenzieren, wenn logoPngBase64 mitkommt. */
+export function baueEml(m: Einzelmail, html: string, von?: string, logoPngBase64?: string): string {
   const grenze = `creadig-${Math.random().toString(36).slice(2)}`
+  const bund = `${grenze}-rel`
+  const htmlTeil = [
+    "Content-Type: text/html; charset=UTF-8",
+    "Content-Transfer-Encoding: base64",
+    "",
+    zeilen76(base64Utf8(html)),
+  ]
+  const htmlBlock = logoPngBase64
+    ? [
+        `Content-Type: multipart/related; boundary="${bund}"`,
+        "",
+        `--${bund}`,
+        ...htmlTeil,
+        `--${bund}`,
+        'Content-Type: image/png; name="creadig-logo.png"',
+        "Content-Transfer-Encoding: base64",
+        `Content-ID: <${LOGO_CID}>`,
+        'Content-Disposition: inline; filename="creadig-logo.png"',
+        "",
+        zeilen76(logoPngBase64),
+        `--${bund}--`,
+      ]
+    : htmlTeil
   const kopf = [
     von ? `From: ${von}` : "",
     m.an ? `To: ${m.an}` : "",
@@ -76,10 +114,7 @@ export function baueEml(m: Einzelmail, html: string, von?: string): string {
     "",
     zeilen76(base64Utf8(einzelmailText(m))),
     `--${grenze}`,
-    "Content-Type: text/html; charset=UTF-8",
-    "Content-Transfer-Encoding: base64",
-    "",
-    zeilen76(base64Utf8(html)),
+    ...htmlBlock,
     `--${grenze}--`,
     "",
   ].join("\r\n")
