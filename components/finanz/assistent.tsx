@@ -2,7 +2,7 @@
 
 import { useActionState, useRef } from "react"
 
-import { assistentFragen, type AssistentAntwort } from "@/app/(admin)/admin/finanz/actions"
+import { assistentFragen, type AssistentAntwort } from "@/app/(finanz)/finanz/actions"
 
 const SCHNELL = [
   "Was ist diesen Monat das Wichtigste?",
@@ -23,7 +23,7 @@ export function FinanzAssistent() {
   }
 
   return (
-    <section aria-labelledby="assistent-titel" className="tile bg-surface flex flex-col gap-5 p-5 md:p-6">
+    <section aria-labelledby="assistent-titel" className="bg-card rounded-[2rem] flex flex-col gap-5 p-5 md:p-6">
       <div className="flex flex-col gap-1">
         <h2 id="assistent-titel" className="text-subhead text-lg">
           Finanzassistent
@@ -66,14 +66,14 @@ export function FinanzAssistent() {
               formRef.current?.requestSubmit()
             }
           }}
-          className="border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring w-full resize-y rounded-md border px-3 py-2 text-base leading-relaxed focus-visible:ring-2 focus-visible:outline-none"
+          className="border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring w-full resize-y rounded-2xl border px-3 py-2 text-base leading-relaxed focus-visible:ring-2 focus-visible:outline-none"
         />
         <div className="flex items-center justify-between gap-3">
           <span className="type-small text-muted-foreground">Enter senden · Shift+Enter neue Zeile</span>
           <button
             type="submit"
             disabled={laeuft}
-            className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-medium disabled:opacity-60"
+            className="bg-primary text-primary-foreground rounded-2xl px-4 py-2 text-sm font-medium disabled:opacity-60"
           >
             {laeuft ? "Denkt nach …" : "Fragen"}
           </button>
@@ -83,7 +83,7 @@ export function FinanzAssistent() {
       <div aria-live="polite">
         {zustand && "fehler" in zustand && <p className="text-destructive text-sm">{zustand.fehler}</p>}
         {zustand && "antwort" in zustand && (
-          <article className="border-primary/40 bg-background flex flex-col gap-3 rounded-md border p-4">
+          <article className="border-primary/40 bg-background flex flex-col gap-3 rounded-2xl border p-4">
             <p className="type-small text-primary">{zustand.frage}</p>
             <div className="text-foreground text-base leading-relaxed whitespace-pre-wrap">{zustand.antwort}</div>
           </article>

@@ -64,7 +64,7 @@ import { localePath } from "@/lib/routes"
  * ueber den Besucher — und der naechste ist ein anderer.
  */
 /* `/termin` gibt es nur einmal: Buchungslinks aus Mails muessen in jeder Browsersprache aufgehen. */
-const SPRACHFREI = /^\/(admin|api|_next|termin(\/|$)|mail(\/|$)|.*\..*)/
+const SPRACHFREI = /^\/(admin|finanz(\/|$)|api|_next|termin(\/|$)|mail(\/|$)|.*\..*)/
 const SCHON_UEBERSETZT = /^\/(tr|en|ar)(\/|$)/
 
 function sprachweiche(request: NextRequest) {
@@ -104,15 +104,17 @@ function sprachweiche(request: NextRequest) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  /* finanz.creadig.de ist die Tür zur Finanzabteilung — dieselbe Anmeldung, derselbe Schutz. */
-  if ((request.headers.get("host") ?? "").startsWith("finanz.")) {
-    const ziel = pathname === "/" || pathname === "/admin" || !pathname.startsWith("/admin")
-    if (ziel && !pathname.startsWith("/api")) {
-      const url = request.nextUrl.clone()
-      url.pathname = "/admin/finanz"
-      url.search = ""
-      return NextResponse.redirect(url, 307)
-    }
+  /*
+   * creaDIG Finanz ist eine eigene Anwendung: finanz.creadig.de zeigt sie an der Wurzel
+   * (intern /finanz/*), ohne Umweg über Website oder Control Center.
+   */
+  const finanzHost = (request.headers.get("host") ?? "").startsWith("finanz.")
+  let intern = pathname
+  if (finanzHost && !/^\/(api|_next|finanz)(\/|$)/.test(pathname) && !/\.[a-z0-9]+$/i.test(pathname)) {
+    intern = pathname === "/" ? "/finanz" : `/finanz${pathname}`
+  }
+  if (intern === "/finanz" || intern.startsWith("/finanz/")) {
+    return withAdminHeaders(await finanzZugang(request, intern, finanzHost))
   }
 
   /* Alles ausserhalb von /admin geht hoechstens durch die Sprachweiche. */
@@ -125,6 +127,34 @@ export async function middleware(request: NextRequest) {
    * `X-Robots-Tag` und `no-store` (`lib/admin-session.ts`).
    */
   return withAdminHeaders(await adminZugang(request, pathname))
+}
+
+/** Finanz: nur der Inhaber. Gleiche Sitzung und Widerrufsprüfung wie das Control Center. */
+async function finanzZugang(request: NextRequest, intern: string, finanzHost: boolean): Promise<NextResponse> {
+  const weiter = () =>
+    intern === request.nextUrl.pathname
+      ? NextResponse.next()
+      : NextResponse.rewrite(new URL(intern + request.nextUrl.search, request.url))
+
+  if (!process.env.ADMIN_PASSWORD || !process.env.ADMIN_SESSION_SECRET) {
+    return new NextResponse(null, { status: 404 })
+  }
+  if (intern === "/finanz/login") return weiter()
+
+  const aendernd = request.method !== "GET" && request.method !== "HEAD"
+  const { verdict, rolle } = await pruefeZugang(request.cookies.get(ADMIN_COOKIE)?.value, { aendernd })
+  if (verdict === "unavailable" && aendernd) {
+    return NextResponse.json({ ok: false, error: "session_store_unavailable" }, { status: 503 })
+  }
+  if (verdict === "ok" && rolle === "owner") return weiter()
+
+  const login = request.nextUrl.clone()
+  login.pathname = finanzHost ? "/login" : "/finanz/login"
+  login.search = ""
+  if (verdict === "expired") login.searchParams.set("abgelaufen", "1")
+  const antwort = NextResponse.redirect(login)
+  if (verdict === "revoked") antwort.cookies.set(ADMIN_COOKIE, "", sessionCookieOptions(0))
+  return antwort
 }
 
 async function adminZugang(request: NextRequest, pathname: string): Promise<NextResponse> {

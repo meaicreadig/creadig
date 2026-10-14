@@ -225,7 +225,6 @@ export const FLAECHEN: readonly Flaeche[] = [
   /* Termin-Motor — Buchungen tragen Namen und E-Mail der Gäste. */
   { pfad: "/admin/termine", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   /* Die Finanzabteilung — Konto, Steuern, Fristen. Nur der Inhaber. */
-  { pfad: "/admin/finanz", klasse: "eigene-lage", fuer: ["owner"] },
 
   { pfad: "/admin/kunden", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   { pfad: "/admin/kunden/:id", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },

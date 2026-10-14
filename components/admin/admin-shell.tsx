@@ -25,7 +25,6 @@ const NAV = [
   { key: "uebersicht", href: "/admin", gruppe: "cockpit" },
   { key: "gespraech", href: "/admin/gespraech", gruppe: "cockpit" },
   { key: "termine", href: "/admin/termine", gruppe: "cockpit" },
-  { key: "finanz", href: "/admin/finanz", gruppe: "cockpit" },
   { key: "vertrieb", href: "/admin/vertrieb", gruppe: "vertrieb" },
   { key: "kunden", href: "/admin/kunden", gruppe: "kunden" },
   { key: "nachweise", href: "/admin/beleg", gruppe: "kunden" },

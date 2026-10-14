@@ -1266,3 +1266,21 @@ html.admin-marke.dark {
   --gold-text: #e4c378;
   --primary-foreground: #0a1322;
 }
+
+/* creaDIG Finanz · ein ruhiger Lichtzug über der Hauptzahl */
+@keyframes finanz-glanz {
+  0% { transform: translateX(-60%) skewX(-12deg); }
+  60%, 100% { transform: translateX(320%) skewX(-12deg); }
+}
+.finanz-glanz::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 35%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.16), transparent);
+  animation: finanz-glanz 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .finanz-glanz::after { animation: none; display: none; }
+}

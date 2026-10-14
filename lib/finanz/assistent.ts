@@ -2,7 +2,7 @@ import "server-only"
 
 import { generateText } from "ai"
 
-import { eur } from "@/components/admin/finanz/format"
+import { eur } from "@/components/finanz/format"
 import type { Lage } from "@/lib/finanz/lage"
 
 const SYSTEM = `Du bist der Finanzassistent von creaDIG (Einzelunternehmen von Muhammed Emin Akyol, Osnabrück, Deutschland).

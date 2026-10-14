@@ -1,6 +1,6 @@
-import { fristAnlegen, fristErledigt } from "@/app/(admin)/admin/finanz/actions"
+import { fristAnlegen, fristErledigt } from "@/app/(finanz)/finanz/actions"
 import { AdminField, AdminInput, Pill, SectionHeader } from "@/components/admin/primitives"
-import { eur, tag } from "@/components/admin/finanz/format"
+import { eur, tag } from "@/components/finanz/format"
 import { stufe, type Frist, type Stufe } from "@/lib/finanz/rechnen"
 
 const STUFE: Record<Stufe, { text: (t: number) => string; schwere: "neutral" | "attention" | "critical" }> = {
@@ -17,7 +17,7 @@ export function FristenListe({ fristen, heute, ustOffenCent }: { fristen: Frist[
   return (
     <section aria-labelledby="fristen" className="flex flex-col gap-4">
       <SectionHeader id="fristen" title="Finanzamt & Fristen" count={`${offen.length} offen`} />
-      <div className="tile bg-surface flex flex-col p-2">
+      <div className="bg-card rounded-[2rem] flex flex-col p-2">
         {offen.length === 0 && <p className="type-small text-muted-foreground p-4">Keine offenen Fristen.</p>}
         <ul className="flex flex-col">
           {offen.map((f) => {
@@ -45,7 +45,7 @@ export function FristenListe({ fristen, heute, ustOffenCent }: { fristen: Frist[
                     Gezahlter Betrag
                   </label>
                   <AdminInput id={`betrag-${f.id}`} name="betrag" inputMode="decimal" placeholder="Betrag €" className="w-28" />
-                  <button type="submit" className="border-gold text-gold-text hover:bg-gold/10 rounded-sm border px-3 py-2 text-sm whitespace-nowrap">
+                  <button type="submit" className="border-gold text-gold-text hover:bg-gold/10 rounded-full border px-3 py-2 text-sm whitespace-nowrap">
                     Erledigt
                   </button>
                 </form>
@@ -60,7 +60,7 @@ export function FristenListe({ fristen, heute, ustOffenCent }: { fristen: Frist[
         )}
       </div>
 
-      <details className="tile bg-surface group p-4">
+      <details className="bg-card rounded-[2rem] group p-4">
         <summary className="text-muted-foreground cursor-pointer text-sm">Eigene Frist hinzufügen</summary>
         <form action={fristAnlegen} className="mt-4 grid gap-3 md:grid-cols-4 md:items-end">
           <AdminField label="Was" htmlFor="frist-titel" className="md:col-span-2">
@@ -72,7 +72,7 @@ export function FristenListe({ fristen, heute, ustOffenCent }: { fristen: Frist[
           <AdminField label="Betrag (optional)" htmlFor="frist-betrag">
             <AdminInput id="frist-betrag" name="betrag" inputMode="decimal" placeholder="0,00" />
           </AdminField>
-          <button type="submit" className="bg-gold text-background rounded-sm px-4 py-2 text-sm font-medium md:col-start-4">
+          <button type="submit" className="bg-gold text-background rounded-full px-4 py-2 text-sm font-medium md:col-start-4">
             Frist anlegen
           </button>
         </form>

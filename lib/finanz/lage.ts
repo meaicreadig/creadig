@@ -1,6 +1,6 @@
 import "server-only"
 
-import { eur } from "@/components/admin/finanz/format"
+import { eur } from "@/components/finanz/format"
 import {
   heuteBerlin,
   kompass,

@@ -1,5 +1,5 @@
 import { SectionHeader } from "@/components/admin/primitives"
-import { eur, eurRund, tag } from "@/components/admin/finanz/format"
+import { eur, eurRund, tag } from "@/components/finanz/format"
 import type { Bewegung, Woche } from "@/lib/finanz/rechnen"
 
 export function LiquiditaetsBand({
@@ -22,7 +22,7 @@ export function LiquiditaetsBand({
         title="Liquidität · nächste 13 Wochen"
         count={tief ? `Tiefpunkt ${eurRund(tief.standCent)} am ${tag(tief.bis)}` : undefined}
       />
-      <div className="tile bg-surface flex flex-col gap-4 p-6">
+      <div className="bg-card rounded-[2rem] flex flex-col gap-4 p-6">
         <div className="relative flex h-44 items-end gap-1.5" role="img" aria-label="Erwarteter Kontostand je Woche">
           {topfCent > 0 && (
             <div

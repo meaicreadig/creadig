@@ -35,7 +35,6 @@ export const tr: AdminTexte = {
     verbindungen: { label: "Bağlantılar", hint: "Giriş ve çıkış yolları, dürüstçe" },
     gespraech: { label: "Görüşme odası", hint: "Ara, not al, takip randevusu" },
     termine: { label: "Randevular", hint: "Müsaitlik, blokajlar, rezervasyonlar" },
-    finanz: { label: "Finans", hint: "Likidite, vergi kumbarası, vergi dairesi" },
     automationen: { label: "Otomasyonlar", hint: "Kendiliğinden çalışanlar — ve asla çalışmayacaklar" },
     system: { label: "Kurulum", hint: "Materyal, erişimler, tanılama" },
   },

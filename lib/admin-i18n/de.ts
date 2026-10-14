@@ -31,7 +31,6 @@ export const de = {
     uebersicht: { label: "Übersicht", hint: "Was heute zählt" },
     gespraech: { label: "Gesprächsraum", hint: "Anrufen, mitschreiben, Folgetermin" },
     termine: { label: "Termine", hint: "Verfügbarkeit, Sperren, Buchungen" },
-    finanz: { label: "Finanzen", hint: "Liquidität, Steuertopf, Finanzamt" },
     anfragen: { label: "Anfragen", hint: "Eingang, Qualifizierung, nächster Schritt" },
     kunden: { label: "Kunden & Kontakte", hint: "Organisationen, Personen, Historie" },
     vertrieb: { label: "Vertrieb", hint: "Chancen, Pipeline, Recherche, Verlust" },
