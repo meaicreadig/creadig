@@ -14,6 +14,7 @@ import {
   MessagesSquare,
   Send,
   TrendingUp,
+  Wallet,
   X,
   type LucideIcon,
 } from "lucide-react"
@@ -24,6 +25,7 @@ const ICONS: Record<string, LucideIcon> = {
   uebersicht: LayoutDashboard,
   gespraech: MessagesSquare,
   termine: CalendarClock,
+  finanz: Wallet,
   anfragen: Inbox,
   vertrieb: TrendingUp,
   kunden: Building2,
