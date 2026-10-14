@@ -4,7 +4,7 @@
  * den man nur noch absendet. Läuft im Browser und auf dem Server.
  */
 
-import { kampagnenHtml, LOGO_CID } from "@/lib/mailing/vorlage"
+import { FIRMA, kampagnenHtml, LOGO_CID } from "@/lib/mailing/vorlage"
 
 export function einzelmailHtml(m: Einzelmail, siteUrl: string, logoSrc?: string): string {
   return kampagnenHtml(
@@ -62,8 +62,8 @@ export function einzelmailText(m: Einzelmail): string {
     m.body.replace(/^## /gm, "").replace(/^- /gm, "• ").replace(/^> /gm, "").replace(/\*\*/g, ""),
     m.ctaText && m.ctaUrl ? `${m.ctaText}: ${m.ctaUrl}` : "",
     m.zweitText && m.zweitUrl ? `${m.zweitText}: ${m.zweitUrl}` : "",
-    `${m.gruss || "Viele Grüße"}\nMuhammed Emin Akyol\nGründer · creaDIG`,
-    ["—", m.telefon, m.kontaktMail, "creaDIG solutions UG (haftungsbeschränkt) · Osnabrück · creadig.de"].filter(Boolean).join("\n"),
+    `${m.gruss || "Viele Grüße"}\nMuhammed Emin Akyol\nGründer · ${FIRMA}`,
+    ["—", m.telefon, m.kontaktMail, `${FIRMA} · Osnabrück · creadig.de`].filter(Boolean).join("\n"),
   ]
     .filter(Boolean)
     .join("\n\n")
