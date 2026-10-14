@@ -9,6 +9,10 @@ import { finanzBasis } from "@/lib/finanz/basis"
 import { berechneLage } from "@/lib/finanz/lage"
 import { stufe } from "@/lib/finanz/rechnen"
 import { finanzDb } from "@/lib/finanz/store"
+import { after } from "next/server"
+import { Geschaeftsfelder } from "@/components/finanz/geschaeftsfelder"
+import { ladeFelder } from "@/lib/finanz/felder"
+import { abgleichFaellig, abgleichStand, gleicheFiberoAb } from "@/lib/finanz/fibero-abgleich"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Heute" }
@@ -18,17 +22,29 @@ function gruss() {
   return h < 11 ? "Guten Morgen." : h < 18 ? "Guten Tag." : "Guten Abend."
 }
 
-export default async function FinanzHeute() {
+export default async function FinanzHeute({ searchParams }: { searchParams: Promise<{ jahr?: string }> }) {
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="heute" titel={gruss()}><OhneSpeicher /></FinanzShell>
+
+  const abgleich = await abgleichFaellig(db).catch(() => ({ sofort: false, faellig: false }))
+  if (abgleich.sofort) await gleicheFiberoAb(db).catch(() => null)
+  else if (abgleich.faellig) after(() => gleicheFiberoAb(db).catch(() => null))
 
   const basis = await finanzBasis()
   const { heute, fristen, stand, topf, frei, verlauf, reichweite, hinweise } = await berechneLage(db)
   const naechste = fristen.filter((f) => !f.erledigt).slice(0, 3)
 
+  const diesesJahr = heute.slice(0, 4)
+  const jahre = [diesesJahr, String(Number(diesesJahr) - 1)]
+  const gewaehlt = (await searchParams).jahr
+  const jahr = gewaehlt && jahre.includes(gewaehlt) ? gewaehlt : diesesJahr
+  const [felder, abgleichsStand] = await Promise.all([ladeFelder(db, jahr), abgleichStand(db)])
+
   return (
     <FinanzShell aktiv="heute" titel={gruss()} unterzeile="Vorne steht, was dich voranbringt. Der Rest läuft im Hintergrund.">
       <FinanzKompass stand={stand} frei={frei} topf={topf} reichweite={reichweite} hinweise={hinweise} verlauf={verlauf} />
+
+      <Geschaeftsfelder bild={felder} stand={abgleichsStand} basis={basis || "/"} jahre={jahre} />
 
       <div className="grid gap-5 lg:grid-cols-5">
         <div className="lg:col-span-3">
