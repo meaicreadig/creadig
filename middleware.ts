@@ -104,6 +104,17 @@ function sprachweiche(request: NextRequest) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  /* finanz.creadig.de ist die Tür zur Finanzabteilung — dieselbe Anmeldung, derselbe Schutz. */
+  if ((request.headers.get("host") ?? "").startsWith("finanz.")) {
+    const ziel = pathname === "/" || pathname === "/admin" || !pathname.startsWith("/admin")
+    if (ziel && !pathname.startsWith("/api")) {
+      const url = request.nextUrl.clone()
+      url.pathname = "/admin/finanz"
+      url.search = ""
+      return NextResponse.redirect(url, 307)
+    }
+  }
+
   /* Alles ausserhalb von /admin geht hoechstens durch die Sprachweiche. */
   if (!pathname.startsWith("/admin")) {
     return sprachweiche(request) ?? NextResponse.next()
