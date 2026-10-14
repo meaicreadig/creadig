@@ -1,6 +1,6 @@
-import { buchungAnlegen, buchungBestaetigen, buchungStornieren } from "@/app/(admin)/admin/finanz/actions"
+import { buchungAnlegen, buchungBestaetigen, buchungStornieren } from "@/app/(finanz)/finanz/actions"
 import { AdminField, AdminInput, AdminSelect, Pill, SectionHeader } from "@/components/admin/primitives"
-import { eur, tag } from "@/components/admin/finanz/format"
+import { eur, tag } from "@/components/finanz/format"
 import { KATEGORIEN, type Buchung } from "@/lib/finanz/rechnen"
 
 const WIEDER = { keine: "", monatlich: "monatlich", quartal: "vierteljährlich", jaehrlich: "jährlich" } as const
@@ -9,13 +9,13 @@ export function BuchungErfassen({ heute }: { heute: string }) {
   return (
     <section aria-labelledby="erfassen" className="flex flex-col gap-4">
       <SectionHeader id="erfassen" title="Buchung erfassen" />
-      <form action={buchungAnlegen} className="tile bg-surface grid grid-cols-2 gap-4 p-5">
+      <form action={buchungAnlegen} className="bg-card rounded-[2rem] grid grid-cols-2 gap-4 p-5">
         <fieldset className="col-span-2 flex gap-2">
           <legend className="sr-only">Art</legend>
           {(["einnahme", "ausgabe"] as const).map((a) => (
             <label
               key={a}
-              className="border-line has-[:checked]:border-gold has-[:checked]:text-gold-text flex flex-1 cursor-pointer items-center justify-center rounded-sm border px-3 py-2 text-sm"
+              className="border-line has-[:checked]:border-gold has-[:checked]:text-gold-text flex flex-1 cursor-pointer items-center justify-center rounded-full border px-3 py-2 text-sm"
             >
               <input type="radio" name="art" value={a} defaultChecked={a === "einnahme"} className="sr-only" />
               {a === "einnahme" ? "Einnahme" : "Ausgabe"}
@@ -75,7 +75,7 @@ export function BuchungErfassen({ heute }: { heute: string }) {
         <AdminField label="Notiz" htmlFor="b-notiz" className="col-span-2">
           <AdminInput id="b-notiz" name="notiz" placeholder="optional" />
         </AdminField>
-        <button type="submit" className="bg-gold text-background col-span-2 rounded-sm px-4 py-2.5 text-sm font-medium">
+        <button type="submit" className="bg-gold text-background col-span-2 rounded-full px-4 py-2.5 text-sm font-medium">
           Buchen
         </button>
         <p className="text-muted-foreground col-span-2 text-xs leading-relaxed">
@@ -91,7 +91,7 @@ export function BuchungsListe({ buchungen, heute }: { buchungen: Buchung[]; heut
   return (
     <section aria-labelledby="buchungen" className="flex flex-col gap-4">
       <SectionHeader id="buchungen" title="Buchungen" count={`${buchungen.filter((b) => !b.storniert).length} wirksam`} />
-      <div className="tile bg-surface p-2">
+      <div className="bg-card rounded-[2rem] p-2">
         {liste.length === 0 ? (
           <p className="type-small text-muted-foreground p-4">
             Noch keine Buchungen. Fang mit deinem Kontostand in den Einstellungen unten an, dann trag die festen Kosten ein.
@@ -125,14 +125,14 @@ export function BuchungsListe({ buchungen, heute }: { buchungen: Buchung[]; heut
                     {b.status === "geplant" && (
                       <form action={buchungBestaetigen}>
                         <input type="hidden" name="id" value={b.id} />
-                        <button type="submit" className="text-gold-text hover:bg-gold/10 rounded-sm px-2 py-1 text-xs">
+                        <button type="submit" className="text-gold-text hover:bg-gold/10 rounded-full px-2 py-1 text-xs">
                           bezahlt
                         </button>
                       </form>
                     )}
                     <form action={buchungStornieren}>
                       <input type="hidden" name="id" value={b.id} />
-                      <button type="submit" className="text-muted-foreground hover:text-destructive rounded-sm px-2 py-1 text-xs">
+                      <button type="submit" className="text-muted-foreground hover:text-destructive rounded-full px-2 py-1 text-xs">
                         stornieren
                       </button>
                     </form>

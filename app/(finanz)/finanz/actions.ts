@@ -5,17 +5,16 @@ import { revalidatePath } from "next/cache"
 
 import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
-import { darfBetreten } from "@/lib/rollen"
 import { KATEGORIEN, type Art } from "@/lib/finanz/rechnen"
 import { finanzDb, protokolliere } from "@/lib/finanz/store"
 import { berechneLage } from "@/lib/finanz/lage"
 import { frageAssistent } from "@/lib/finanz/assistent"
 
-const PFAD = "/admin/finanz"
+const PFAD = "/finanz"
 
 async function zugang() {
   const z = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
-  if (z.verdict !== "ok" || !z.rolle || !darfBetreten(z.rolle, PFAD)) throw new Error("Nicht berechtigt")
+  if (z.verdict !== "ok" || !z.rolle || z.rolle !== "owner") throw new Error("Nicht berechtigt")
   const db = await finanzDb()
   if (!db) throw new Error("Kein Speicher verbunden")
   return db
@@ -80,7 +79,7 @@ export async function buchungAnlegen(form: FormData) {
     [id, art, status, datum, betrag, kategorie === "Privatentnahme" ? 0 : ust, kategorie, feld(form, "gegenpartei", 120), feld(form, "notiz", 500), wiederholung],
   )
   await protokolliere(db, "buchung_angelegt", { id, art, betrag, datum, kategorie })
-  revalidatePath(PFAD)
+  revalidatePath(PFAD, "layout")
 }
 
 export async function buchungBestaetigen(form: FormData) {
@@ -89,7 +88,7 @@ export async function buchungBestaetigen(form: FormData) {
   if (!id) return
   await db(`UPDATE fin_buchungen SET status = 'gebucht' WHERE id = $1 AND storniert_at IS NULL`, [id])
   await protokolliere(db, "buchung_bestaetigt", { id })
-  revalidatePath(PFAD)
+  revalidatePath(PFAD, "layout")
 }
 
 export async function buchungStornieren(form: FormData) {
@@ -98,7 +97,7 @@ export async function buchungStornieren(form: FormData) {
   if (!id) return
   await db(`UPDATE fin_buchungen SET storniert_at = now() WHERE id = $1 AND storniert_at IS NULL`, [id])
   await protokolliere(db, "buchung_storniert", { id })
-  revalidatePath(PFAD)
+  revalidatePath(PFAD, "layout")
 }
 
 export async function fristErledigt(form: FormData) {
@@ -119,7 +118,7 @@ export async function fristErledigt(form: FormData) {
     )
   }
   await protokolliere(db, "frist_erledigt", { id, betrag })
-  revalidatePath(PFAD)
+  revalidatePath(PFAD, "layout")
 }
 
 export async function fristAnlegen(form: FormData) {
@@ -135,7 +134,7 @@ export async function fristAnlegen(form: FormData) {
     cent(feld(form, "betrag")),
   ])
   await protokolliere(db, "frist_angelegt", { id, titel, faellig })
-  revalidatePath(PFAD)
+  revalidatePath(PFAD, "layout")
 }
 
 export async function einstellungenSpeichern(form: FormData) {
@@ -151,5 +150,5 @@ export async function einstellungenSpeichern(form: FormData) {
     [stand, am, quote, form.get("ust_pflichtig") === "on", feld(form, "ust_rhythmus") === "monatlich" ? "monatlich" : "quartal"],
   )
   await protokolliere(db, "einstellungen", { stand, am, quote })
-  revalidatePath(PFAD)
+  revalidatePath(PFAD, "layout")
 }
