@@ -1,13 +1,14 @@
 /**
- * creaDIG-Mailvorlage im Webseiten-Design: helles Blau-Grau, Königsblau als Akzent,
- * runde Formen, Markenschriften (Manrope + M PLUS Rounded 1c) per Webfont.
+ * creaDIG-Mailvorlage im Webseiten-Design: helles Blau-Grau, Königsblau als Hauptfarbe,
+ * Logo-Gold als Akzent, runde Formen, Markenschriften (Manrope + M PLUS Rounded 1c).
  * Bewusst ohne `server-only`: dieselbe Funktion rendert die Live-Vorschau im
  * Studio, die .eml-Datei und die versendete Mail — was man sieht, ist was ankommt.
  * Tabellen + Inline-Styles für Outlook/Gmail; Apple Mail und iOS bekommen
  * zusätzlich Webfonts und dezente Bewegung (Lichtlinie, Knopf-Glanz).
  *
  * Text-Syntax im Inhalt: Leerzeile = neuer Absatz, "## " = Zwischentitel,
- * Zeilen mit "- " = Vorteilsliste ("Titel: Text" macht den Titel fett),
+ * Zeilen mit "- " = Vorteilsliste ("Titel: Text" macht den Titel fett,
+ * optional "[icon] " davor, z. B. "- [shield] Sicher: ..."),
  * "> " = hervorgehobene Aussage, **so** = fett (in der Überschrift: blau).
  */
 
@@ -22,11 +23,13 @@ export type KampagnenInhalt = {
 
 const BLAU = "#2F5BEA"
 const BLAU_TIEF = "#1E3FAE"
-const BLAU_HELL = "#8FB0FF"
+const GOLD = "#BE904E"
+const GOLD_HELL = "#E4C378"
+const GOLD_NEBEL = "#FBF5EA"
 const TINTE = "#0D1A2E"
 const TEXT = "#33405A"
 const GRAU = "#6B7891"
-const LINIE = "#DDE3EC"
+const LINIE = "#E3E8F0"
 const NEBEL = "#EEF3FF"
 const ZEMIN = "#F5F7FA"
 const WEISS = "#FFFFFF"
@@ -39,6 +42,21 @@ export const LOGO_PFAD = "/brand/creadig-mail-logo.png"
 export const LOGO_CID = "creadig-logo"
 export const FIRMA = "creaDIG Solutions"
 
+export const LISTEN_ICONS = ["layers", "shield", "user", "zap", "sparkles", "clock", "calendar", "globe"] as const
+type ListenIcon = (typeof LISTEN_ICONS)[number]
+const ICON_FOLGE: ListenIcon[] = ["layers", "shield", "user", "zap", "sparkles", "clock"]
+
+const iconPfad = (name: string, art: "list" | "gold") => `/brand/mail/${name}-${art}.png`
+
+/** Alle Bilder, die eine Mail verwenden kann – für das Einbetten in .eml-Dateien. */
+export function mailBildPfade(): string[] {
+  return [LOGO_PFAD, ...LISTEN_ICONS.map((n) => iconPfad(n, "list")), ...["phone", "mail", "globe"].map((n) => iconPfad(n, "gold"))]
+}
+
+export function cidFuer(pfad: string): string {
+  return pfad === LOGO_PFAD ? LOGO_CID : `creadig-${pfad.split("/").pop()?.replace(/\.png$/, "")}`
+}
+
 function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
 }
@@ -49,25 +67,33 @@ function inline(s: string, fett = TINTE): string {
 
 const P = `margin:0 0 18px;font-size:15px;line-height:1.75;color:${TEXT};font-family:${SCHRIFT}`
 
-function liste(zeilen: string[]): string {
+type Bild = (pfad: string) => string
+
+function liste(zeilen: string[], bild: Bild): string {
   const reihen = zeilen
     .map((z, i) => {
-      const roh = z.trim().slice(2)
+      let roh = z.trim().slice(2)
+      let icon: string = ICON_FOLGE[i % ICON_FOLGE.length]
+      const tag = roh.match(/^\[([a-z]+)\]\s*/)
+      if (tag) {
+        if ((LISTEN_ICONS as readonly string[]).includes(tag[1])) icon = tag[1]
+        roh = roh.slice(tag[0].length)
+      }
       const doppel = roh.indexOf(": ")
       const inhalt =
         doppel > 0 && doppel < 60
-          ? `<strong style="display:block;color:${TINTE};font-size:15px;font-weight:700;margin-bottom:3px;font-family:${TITEL}">${inline(roh.slice(0, doppel))}</strong>${inline(roh.slice(doppel + 2))}`
+          ? `<strong style="display:block;color:${TINTE};font-size:15px;font-weight:800;margin-bottom:4px;font-family:${TITEL}">${inline(roh.slice(0, doppel))}</strong>${inline(roh.slice(doppel + 2))}`
           : inline(roh)
-      const abstand = i === zeilen.length - 1 ? "0" : "10px"
-      return `<tr><td style="padding:0 0 ${abstand}"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${WEISS}" style="background:${WEISS};border:1px solid ${LINIE};border-radius:18px"><tr>
-<td valign="top" style="width:38px;padding:16px 0 16px 18px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" valign="middle" width="26" height="26" bgcolor="${NEBEL}" style="width:26px;height:26px;background:${NEBEL};border-radius:13px;color:${BLAU};font-size:13px;font-weight:700;line-height:26px;font-family:Arial,'Segoe UI Symbol',sans-serif">&#10003;</td></tr></table></td>
-<td valign="top" style="padding:16px 20px 16px 12px;font-size:14px;line-height:1.65;color:${TEXT};font-family:${SCHRIFT}">${inhalt}</td></tr></table></td></tr>`
+      const abstand = i === zeilen.length - 1 ? "0" : "12px"
+      return `<tr><td style="padding:0 0 ${abstand}"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${WEISS}" style="background:${WEISS};border:1px solid ${LINIE};border-radius:22px;box-shadow:0 6px 18px rgba(13,26,46,0.04)"><tr>
+<td valign="top" width="68" style="width:68px;padding:18px 0 18px 18px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" valign="middle" width="44" height="44" bgcolor="${NEBEL}" style="width:44px;height:44px;background:${NEBEL};border-radius:22px"><img src="${esc(bild(iconPfad(icon, "list")))}" width="22" height="22" alt="" style="display:block;border:0;width:22px;height:22px"></td></tr></table></td>
+<td valign="middle" style="padding:18px 22px 18px 6px;font-size:14px;line-height:1.65;color:${TEXT};font-family:${SCHRIFT}">${inhalt}</td></tr></table></td></tr>`
     })
     .join("")
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 26px">${reihen}</table>`
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 28px">${reihen}</table>`
 }
 
-function bloecke(body: string): string {
+function bloecke(body: string, bild: Bild): string {
   return body
     .trim()
     .split(/\n\s*\n/)
@@ -75,13 +101,15 @@ function bloecke(body: string): string {
     .filter(Boolean)
     .map((b) => {
       if (b.startsWith("## ")) {
-        return `<h2 style="margin:32px 0 12px;font-size:20px;line-height:1.3;color:${TINTE};font-weight:800;letter-spacing:-0.2px;font-family:${TITEL}">${inline(b.slice(3), BLAU)}</h2>`
+        return `<h2 style="margin:34px 0 14px;font-size:20px;line-height:1.3;color:${TINTE};font-weight:800;letter-spacing:-0.2px;font-family:${TITEL}">${inline(b.slice(3), BLAU)}</h2>`
       }
       const zeilen = b.split("\n")
-      if (zeilen.every((z) => z.trim().startsWith("- "))) return liste(zeilen)
+      if (zeilen.every((z) => z.trim().startsWith("- "))) return liste(zeilen, bild)
       if (zeilen.every((z) => z.trim().startsWith("> "))) {
-        const satz = zeilen.map((z) => inline(z.trim().slice(2), BLAU)).join("<br>")
-        return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 28px"><tr><td align="center" bgcolor="${NEBEL}" style="background:${NEBEL};border-radius:24px;padding:28px 28px"><p style="margin:0;font-size:21px;line-height:1.4;color:${BLAU_TIEF};font-weight:800;letter-spacing:-0.3px;font-family:${TITEL}">${satz}</p></td></tr></table>`
+        const satz = zeilen.map((z) => inline(z.trim().slice(2), GOLD)).join("<br>")
+        return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 30px"><tr><td align="center" bgcolor="${GOLD_NEBEL}" style="background:${GOLD_NEBEL};background-image:linear-gradient(135deg,#FCF7EE 0%,${GOLD_NEBEL} 60%,#F8EEDC 100%);border-radius:26px;padding:30px 30px 28px">
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 14px"><tr><td width="36" height="3" bgcolor="${GOLD}" style="width:36px;height:3px;line-height:3px;font-size:0;background:${GOLD};border-radius:2px">&nbsp;</td></tr></table>
+<p style="margin:0;font-size:22px;line-height:1.4;color:${TINTE};font-weight:800;letter-spacing:-0.3px;font-family:${TITEL}">${satz}</p></td></tr></table>`
       }
       return `<p style="${P}">${inline(b).replace(/\n/g, "<br>")}</p>`
     })
@@ -90,19 +118,21 @@ function bloecke(body: string): string {
 
 function knopf(text: string, href: string, art: "voll" | "rand"): string {
   const voll = art === "voll"
-  return `<td style="padding:0 10px 10px 0"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td bgcolor="${voll ? BLAU : WEISS}" class="${voll ? "glanz" : ""}" style="background:${voll ? BLAU : WEISS};border-radius:999px;${voll ? `box-shadow:0 8px 22px rgba(47,91,234,0.32)` : `border:1.5px solid ${BLAU}`}"><a href="${esc(href)}" style="display:inline-block;padding:${voll ? "15px 30px" : "13.5px 26px"};font-size:15px;font-weight:700;color:${voll ? WEISS : BLAU};text-decoration:none;border-radius:999px;font-family:${TITEL}">${esc(text)}${voll ? "&nbsp;&nbsp;&rarr;" : ""}</a></td></tr></table></td>`
+  return `<td style="padding:0 10px 10px 0"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td bgcolor="${voll ? BLAU : WEISS}" class="${voll ? "glanz" : ""}" style="background:${voll ? BLAU : WEISS};${voll ? `background-image:linear-gradient(135deg,${BLAU},${BLAU_TIEF});` : ""}border-radius:999px;${voll ? `box-shadow:0 10px 26px rgba(47,91,234,0.32)` : `border:1.5px solid ${BLAU}`}"><a href="${esc(href)}" style="display:inline-block;padding:${voll ? "16px 32px" : "14.5px 28px"};font-size:15px;font-weight:700;color:${voll ? WEISS : BLAU};text-decoration:none;border-radius:999px;font-family:${TITEL}">${esc(text)}${voll ? "&nbsp;&nbsp;&rarr;" : ""}</a></td></tr></table></td>`
 }
 
-function chip(inhalt: string, href: string): string {
-  return `<td style="padding:0 8px 8px 0"><a href="${esc(href)}" style="display:inline-block;padding:9px 16px;background:${ZEMIN};border:1px solid ${LINIE};border-radius:999px;font-size:13px;color:${TINTE};text-decoration:none;font-family:${SCHRIFT}">${inhalt}</a></td>`
+function kontaktZeile(icon: string, text: string, href: string, bild: Bild): string {
+  return `<tr><td style="padding:0 0 8px"><a href="${esc(href)}" style="text-decoration:none"><table role="presentation" cellpadding="0" cellspacing="0"><tr>
+<td valign="middle" width="30" height="30" align="center" bgcolor="${GOLD_NEBEL}" style="width:30px;height:30px;background:${GOLD_NEBEL};border-radius:15px"><img src="${esc(bild(iconPfad(icon, "gold")))}" width="15" height="15" alt="" style="display:block;border:0;width:15px;height:15px"></td>
+<td valign="middle" style="padding-left:12px;font-size:14px;color:${TINTE};font-family:${SCHRIFT}">${esc(text)}</td></tr></table></a></td></tr>`
 }
 
-function kontaktChips(o: { telefon?: string; email?: string; web: string }): string {
-  const teile: string[] = []
-  if (o.telefon?.trim()) teile.push(chip(`<span style="color:${BLAU};font-weight:700">Tel</span>&nbsp; ${esc(o.telefon)}`, `tel:${o.telefon.replace(/[^\d+]/g, "")}`))
-  if (o.email?.trim()) teile.push(chip(`<span style="color:${BLAU}">@</span>&nbsp; ${esc(o.email)}`, `mailto:${o.email}`))
-  teile.push(chip(`<span style="color:${BLAU}">&#9679;</span>&nbsp; ${esc(o.web.replace(/^https?:\/\//, "").replace(/\/$/, ""))}`, o.web))
-  return `<table role="presentation" cellpadding="0" cellspacing="0"><tr>${teile.join("")}</tr></table>`
+function kontakt(o: { telefon?: string; email?: string; web: string }, bild: Bild): string {
+  const reihen: string[] = []
+  if (o.telefon?.trim()) reihen.push(kontaktZeile("phone", o.telefon, `tel:${o.telefon.replace(/[^\d+]/g, "")}`, bild))
+  if (o.email?.trim()) reihen.push(kontaktZeile("mail", o.email, `mailto:${o.email}`, bild))
+  reihen.push(kontaktZeile("globe", o.web.replace(/^https?:\/\//, "").replace(/\/$/, ""), o.web, bild))
+  return `<table role="presentation" cellpadding="0" cellspacing="0">${reihen.join("")}</table>`
 }
 
 export function kampagnenHtml(
@@ -115,32 +145,33 @@ export function kampagnenHtml(
     anrede?: string
     zweitLink?: { text: string; url: string }
     gruss?: string
-    logoSrc?: string
+    /** Wie Bildpfade (z. B. "/brand/…png") zu src werden: Vorschau relativ, .eml per cid:. */
+    bildSrc?: Bild
     kennung?: string
     ctaHinweis?: string
     telefon?: string
     email?: string
   },
 ): string {
+  const bild: Bild = o.bildSrc ?? ((p) => `${o.siteUrl}${p}`)
   const ctaHref = o.ctaHref ?? k.ctaUrl
-  const logo = o.logoSrc ?? `${o.siteUrl}${LOGO_PFAD}`
   const hatHaupt = Boolean(k.ctaText.trim() && k.ctaUrl.trim())
   const hatZweit = Boolean(o.zweitLink?.text.trim() && o.zweitLink.url.trim())
   const knoepfe =
     hatHaupt || hatZweit
-      ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:12px 0 8px"><tr><td bgcolor="${ZEMIN}" style="background:${ZEMIN};border-radius:28px;border:1px solid ${LINIE};padding:30px 30px 20px">
-<p style="margin:0 0 10px"><span style="display:inline-block;padding:5px 12px;background:${WEISS};border-radius:999px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:${BLAU};font-weight:700;font-family:${TITEL}">N&auml;chster Schritt</span></p>
-<p style="margin:0 0 20px;font-size:17px;line-height:1.5;color:${TINTE};font-weight:700;font-family:${TITEL}">${esc(o.ctaHinweis?.trim() || "Wählen Sie direkt einen passenden Termin – oder schreiben Sie mir in einer Minute.")}</p>
+      ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:14px 0 8px"><tr><td bgcolor="${NEBEL}" style="background:${NEBEL};background-image:linear-gradient(135deg,#E6EEFF 0%,${NEBEL} 60%,#F7F9FF 100%);border-radius:28px;padding:32px 32px 22px">
+<p style="margin:0 0 12px;font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:${GOLD};font-weight:800;font-family:${TITEL}">N&auml;chster Schritt</p>
+<p style="margin:0 0 22px;font-size:18px;line-height:1.45;color:${TINTE};font-weight:800;letter-spacing:-0.2px;font-family:${TITEL}">${esc(o.ctaHinweis?.trim() || "Wählen Sie direkt einen passenden Termin – oder schreiben Sie mir in einer Minute.")}</p>
 <table role="presentation" cellpadding="0" cellspacing="0"><tr>${hatHaupt ? knopf(k.ctaText, ctaHref, "voll") : ""}${hatZweit && o.zweitLink ? knopf(o.zweitLink.text, o.zweitLink.url, "rand") : ""}</tr></table>
 </td></tr></table>`
       : ""
   const abmeldung = o.abmeldeUrl
-    ? `<br>Sie erhalten diese Nachricht, weil Sie mit creaDIG in Kontakt stehen. <a href="${esc(o.abmeldeUrl)}" style="color:${GRAU};text-decoration:underline">Abmelden</a>`
+    ? `<br>Sie erhalten diese Nachricht, weil Sie mit ${FIRMA} in Kontakt stehen. <a href="${esc(o.abmeldeUrl)}" style="color:${GRAU};text-decoration:underline">Abmelden</a>`
     : ""
   const anrede = o.anrede ? `<p style="${P};color:${TINTE};font-weight:700">${esc(o.anrede)}</p>` : ""
   const pixel = o.pixelUrl ? `<img src="${esc(o.pixelUrl)}" width="1" height="1" alt="" style="display:block;border:0;width:1px;height:1px">` : ""
   const kennung = o.kennung?.trim()
-    ? `<p style="margin:0 0 18px"><span style="display:inline-block;padding:6px 14px;background:${WEISS};border-radius:999px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:${BLAU};font-weight:700;font-family:${TITEL}">&#9679;&nbsp; ${esc(o.kennung)}</span></p>`
+    ? `<p style="margin:0 0 20px"><span style="display:inline-block;padding:7px 15px;background:${WEISS};border:1px solid #EBDDC4;border-radius:999px;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:${GOLD};font-weight:800;font-family:${TITEL}"><span style="color:${GOLD_HELL}">&#9679;</span>&nbsp; ${esc(o.kennung)}</span></p>`
     : ""
 
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light"><title>${esc(k.subject)}</title>
@@ -148,52 +179,59 @@ export function kampagnenHtml(
 <style>
 @import url('${FONTS}');
 @keyframes licht{0%{background-position:-200% 0}100%{background-position:200% 0}}
-@keyframes atem{0%,100%{box-shadow:0 8px 22px rgba(47,91,234,.30)}50%{box-shadow:0 10px 34px rgba(47,91,234,.55)}}
-@keyframes auf{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.licht{background-image:linear-gradient(90deg,${BLAU} 0%,${BLAU_HELL} 25%,${BLAU} 50%,${BLAU_HELL} 75%,${BLAU} 100%)!important;background-size:200% 100%!important;animation:licht 4s linear infinite}
+@keyframes atem{0%,100%{box-shadow:0 10px 26px rgba(47,91,234,.30)}50%{box-shadow:0 12px 36px rgba(47,91,234,.55)}}
+@keyframes auf{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.licht{background-image:linear-gradient(90deg,${GOLD} 0%,${GOLD_HELL} 25%,${BLAU} 50%,${GOLD_HELL} 75%,${GOLD} 100%)!important;background-size:200% 100%!important;animation:licht 5s linear infinite}
 .glanz{animation:atem 2.8s ease-in-out infinite}
-.auf{animation:auf .8s ease-out both}
+.auf{animation:auf .9s ease-out both}
 @media (prefers-reduced-motion:reduce){.licht,.glanz,.auf{animation:none!important}}
-@media (max-width:620px){.px{padding-left:22px!important;padding-right:22px!important}.hero{padding:30px 24px!important}.h1{font-size:27px!important}}
+@media (max-width:620px){.px{padding-left:22px!important;padding-right:22px!important}.hero{padding:32px 24px!important}.h1{font-size:28px!important}}
 </style></head>
 <body style="margin:0;padding:0;background:${ZEMIN};font-family:${SCHRIFT};-webkit-font-smoothing:antialiased">
 <span style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">${esc(k.preheader)}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</span>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${ZEMIN}" style="background:${ZEMIN}"><tr><td align="center" style="padding:36px 12px 28px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${WEISS}" style="max-width:640px;background:${WEISS};border-radius:32px;overflow:hidden;box-shadow:0 20px 60px rgba(13,26,46,0.08)">
-<tr><td align="center" class="px" style="padding:34px 40px 26px"><img src="${esc(logo)}" width="168" alt="creaDIG" style="display:block;border:0;width:168px;height:auto;max-width:100%"></td></tr>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${WEISS}" style="max-width:640px;background:${WEISS};border-radius:32px;overflow:hidden;box-shadow:0 24px 64px rgba(13,26,46,0.08)">
+<tr><td align="center" class="px" style="padding:36px 40px 28px"><img src="${esc(bild(LOGO_PFAD))}" width="172" alt="creaDIG" style="display:block;border:0;width:172px;height:auto;max-width:100%"></td></tr>
 <tr><td class="px" style="padding:0 20px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="${NEBEL}" class="hero auf" style="background:${NEBEL};background-image:linear-gradient(135deg,#E6EEFF 0%,${NEBEL} 55%,#F7F9FF 100%);border-radius:26px;padding:40px 36px 36px">
-${kennung}<h1 class="h1" style="margin:0;font-size:32px;line-height:1.18;color:${TINTE};font-weight:800;letter-spacing:-0.6px;font-family:${TITEL}">${inline(k.headline || k.subject, BLAU)}</h1>
-<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:24px"><tr><td width="96" height="4" bgcolor="${BLAU}" class="licht" style="width:96px;height:4px;line-height:4px;font-size:0;background:${BLAU};border-radius:2px">&nbsp;</td></tr></table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="${NEBEL}" class="hero auf" style="background:${NEBEL};background-image:linear-gradient(135deg,#E3ECFF 0%,${NEBEL} 50%,#FBF7EF 100%);border-radius:28px;padding:44px 38px 38px">
+${kennung}<h1 class="h1" style="margin:0;font-size:33px;line-height:1.16;color:${TINTE};font-weight:800;letter-spacing:-0.7px;font-family:${TITEL}">${inline(k.headline || k.subject, BLAU)}</h1>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:26px"><tr><td width="112" height="4" bgcolor="${GOLD}" class="licht" style="width:112px;height:4px;line-height:4px;font-size:0;background:${GOLD};border-radius:2px">&nbsp;</td></tr></table>
 </td></tr></table>
 </td></tr>
-<tr><td class="px" style="padding:38px 44px 8px">
-${anrede}${bloecke(k.body)}${knoepfe}
+<tr><td class="px" style="padding:40px 44px 8px">
+${anrede}${bloecke(k.body, bild)}${knoepfe}
 </td></tr>
-<tr><td class="px" style="padding:26px 44px 38px">
-<p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:${TEXT};font-family:${SCHRIFT}">${esc(o.gruss ?? "Viele Grüße")}</p>
-<table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:18px"><tr>
-<td valign="middle" width="52"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td align="center" valign="middle" width="52" height="52" bgcolor="${BLAU}" style="width:52px;height:52px;background:${BLAU};background-image:linear-gradient(135deg,${BLAU},${BLAU_TIEF});border-radius:26px;color:${WEISS};font-size:17px;font-weight:800;line-height:52px;font-family:${TITEL}">EA</td></tr></table></td>
-<td valign="middle" style="padding-left:16px"><p style="margin:0;font-size:17px;font-weight:800;color:${TINTE};font-family:${TITEL}">Muhammed Emin Akyol</p><p style="margin:3px 0 0;font-size:13px;color:${GRAU};font-family:${SCHRIFT}">Gr&uuml;nder &middot; ${FIRMA}</p></td>
-</tr></table>
-${kontaktChips({ telefon: o.telefon, email: o.email, web: o.siteUrl })}
+<tr><td class="px" style="padding:30px 44px 40px">
+<p style="margin:0 0 22px;font-size:15px;line-height:1.6;color:${TEXT};font-family:${SCHRIFT}">${esc(o.gruss ?? "Viele Grüße")}</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:22px"><tr><td>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:14px"><tr><td width="40" height="3" bgcolor="${GOLD}" style="width:40px;height:3px;line-height:3px;font-size:0;background:${GOLD};border-radius:2px">&nbsp;</td></tr></table>
+<p style="margin:0;font-size:19px;font-weight:800;color:${TINTE};letter-spacing:-0.2px;font-family:${TITEL}">Muhammed Emin Akyol</p>
+<p style="margin:4px 0 0;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:${GOLD};font-weight:700;font-family:${TITEL}">Gr&uuml;nder &middot; ${FIRMA}</p>
+</td></tr></table>
+${kontakt({ telefon: o.telefon, email: o.email, web: o.siteUrl }, bild)}
 </td></tr>
 </table>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px"><tr><td style="padding:20px 20px 0;text-align:center;font-size:12px;line-height:1.7;color:${GRAU};font-family:${SCHRIFT}">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px"><tr><td style="padding:22px 20px 0;text-align:center;font-size:12px;line-height:1.7;color:${GRAU};font-family:${SCHRIFT}">
 ${FIRMA} &middot; Osnabr&uuml;ck &middot; <a href="${esc(o.siteUrl)}/impressum" style="color:${GRAU}">Impressum</a> &middot; <a href="${esc(o.siteUrl)}/datenschutz" style="color:${GRAU}">Datenschutz</a>${abmeldung}
 </td></tr></table>${pixel}</td></tr></table></body></html>`
 }
 
+const ohneIconTags = (s: string) => s.replace(/^- \[[a-z]+\]\s*/gm, "- ")
+
 export function kampagnenText(k: KampagnenInhalt, o: { abmeldeUrl: string; ctaHref?: string; anrede?: string }): string {
   const teile = [
-    k.headline || k.subject,
+    k.headline.replace(/\*\*/g, "") || k.subject,
     o.anrede ?? "",
-    k.body.replace(/^## /gm, "").replace(/^- /gm, "• ").replace(/^> /gm, "").replace(/\*\*/g, ""),
+    ohneIconTags(k.body).replace(/^## /gm, "").replace(/^- /gm, "• ").replace(/^> /gm, "").replace(/\*\*/g, ""),
     k.ctaText && k.ctaUrl ? `${k.ctaText}: ${o.ctaHref ?? k.ctaUrl}` : "",
     `Viele Grüße\nMuhammed Emin Akyol\nGründer · ${FIRMA}`,
     `—\n${FIRMA} · Osnabrück\nAbmelden: ${o.abmeldeUrl}`,
   ]
   return teile.filter(Boolean).join("\n\n")
+}
+
+export function textOhneIcons(s: string): string {
+  return ohneIconTags(s)
 }
 
 export function anredeFuer(name: string | null): string {

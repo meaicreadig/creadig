@@ -3,9 +3,9 @@
 import { useMemo, useState, useTransition, type ReactNode } from "react"
 
 import { AdminField, AdminInput, AdminTextarea } from "@/components/admin/primitives"
-import { baueEml, einzelmailHtml, type Einzelmail } from "@/lib/mailing/eml"
+import { baueEml, einzelmailHtml, type EingebettetesBild, type Einzelmail } from "@/lib/mailing/eml"
 import type { KiEinzelmail } from "@/lib/mailing/ki"
-import { LOGO_CID, LOGO_PFAD } from "@/lib/mailing/vorlage"
+import { cidFuer, mailBildPfade } from "@/lib/mailing/vorlage"
 
 type Ergebnis = { ok: true; hinweis?: string } | { fehler: string }
 
@@ -93,9 +93,9 @@ function dateiname(betreff: string): string {
   return `${s || "creadig-mail"}.eml`
 }
 
-async function logoBase64(): Promise<string | undefined> {
+async function bildBase64(pfad: string): Promise<string | undefined> {
   try {
-    const res = await fetch(LOGO_PFAD)
+    const res = await fetch(pfad)
     if (!res.ok) return undefined
     const bytes = new Uint8Array(await res.arrayBuffer())
     let bin = ""
@@ -105,6 +105,18 @@ async function logoBase64(): Promise<string | undefined> {
     return undefined
   }
 }
+
+async function alleBilder(): Promise<EingebettetesBild[]> {
+  const bilder = await Promise.all(
+    mailBildPfade().map(async (pfad) => {
+      const base64 = await bildBase64(pfad)
+      return base64 ? { cid: cidFuer(pfad), name: pfad.split("/").pop() ?? "bild.png", base64 } : null
+    }),
+  )
+  return bilder.filter((b): b is EingebettetesBild => b !== null)
+}
+
+const vorschauBild = (pfad: string) => pfad
 
 function Gruppe({ titel, offen, children }: { titel: string; offen?: boolean; children: ReactNode }) {
   return (
@@ -145,7 +157,7 @@ export function EinzelmailStudio({
   const [breite, setBreite] = useState<"desktop" | "mobil">("desktop")
   const [laeuft, starte] = useTransition()
 
-  const html = useMemo(() => einzelmailHtml(m, siteUrl, LOGO_PFAD), [m, siteUrl])
+  const html = useMemo(() => einzelmailHtml(m, siteUrl, vorschauBild), [m, siteUrl])
 
   const feld = (name: keyof Einzelmail) => (e: { target: { value: string } }) => {
     setM((v) => ({ ...v, [name]: e.target.value }))
@@ -171,9 +183,10 @@ export function EinzelmailStudio({
   }
 
   async function herunterladen() {
-    const logo = await logoBase64()
-    const emlHtml = einzelmailHtml(m, siteUrl, logo ? `cid:${LOGO_CID}` : `${siteUrl}${LOGO_PFAD}`)
-    const datei = new Blob([baueEml(m, emlHtml, von, logo)], { type: "message/rfc822" })
+    const bilder = await alleBilder()
+    const vorhanden = new Set(bilder.map((b) => b.cid))
+    const emlHtml = einzelmailHtml(m, siteUrl, (pfad) => (vorhanden.has(cidFuer(pfad)) ? `cid:${cidFuer(pfad)}` : `${siteUrl}${pfad}`))
+    const datei = new Blob([baueEml(m, emlHtml, von, bilder)], { type: "message/rfc822" })
     const url = URL.createObjectURL(datei)
     const a = document.createElement("a")
     a.href = url

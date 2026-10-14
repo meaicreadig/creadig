@@ -1,5 +1,6 @@
 "use client"
 
+import { Sparkles } from "lucide-react"
 import { useMemo, useState, useTransition } from "react"
 
 import { AdminField, AdminInput, AdminSelect, AdminTextarea, Surface } from "@/components/admin/primitives"
@@ -132,7 +133,7 @@ export function MailStudio({
     })
   }
 
-  const knopf = "rounded-md px-4 py-2 text-sm font-medium transition-opacity disabled:opacity-40"
+  const knopf = "rounded-full px-5 py-2.5 text-sm font-semibold transition-all hover:-translate-y-px disabled:translate-y-0 disabled:opacity-40"
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
@@ -152,9 +153,12 @@ export function MailStudio({
             ))}
           </dl>
         ) : (
-          <Surface className="border-gold/60 border">
+          <Surface className="border-gold/50 rounded-3xl border">
             <div className="flex flex-col gap-4">
-              <h2 className="text-subhead text-gold-text text-sm">{t.ki}</h2>
+              <h2 className="text-subhead text-gold-text flex items-center gap-2 text-sm">
+                <Sparkles className="size-4" aria-hidden="true" />
+                {t.ki}
+              </h2>
               <AdminField label={t.anlass} htmlFor="ki-anlass">
                 <AdminSelect id="ki-anlass" value={anlass} onChange={(e) => setAnlass(e.target.value as KampagnenAnlass)}>
                   {(Object.keys(t.anlaesse) as KampagnenAnlass[]).map((a) => (
@@ -233,30 +237,30 @@ export function MailStudio({
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
             <p className="text-meta text-muted-foreground">{t.postfach}</p>
-            <div role="group" className="border-line flex rounded-md border p-0.5">
+            <div role="group" className="border-line flex rounded-full border p-0.5">
               {(["desktop", "mobil"] as const).map((b) => (
                 <button
                   key={b}
                   type="button"
                   aria-pressed={breite === b}
                   onClick={() => setBreite(b)}
-                  className={`rounded-sm px-3 py-1 text-xs ${breite === b ? "bg-muted text-foreground" : "text-muted-foreground"}`}
+                  className={`rounded-full px-3 py-1 text-xs ${breite === b ? "bg-muted text-foreground" : "text-muted-foreground"}`}
                 >
                   {b === "desktop" ? t.desktop : t.mobil}
                 </button>
               ))}
             </div>
           </div>
-          <Surface padding="sm">
-            <p className="truncate text-sm font-semibold">creaDIG · {k.subject || "—"}</p>
+          <Surface padding="sm" className="rounded-2xl">
+            <p className="truncate text-sm font-semibold">creaDIG Solutions · {k.subject || "—"}</p>
             <p className="text-meta text-muted-foreground truncate">{k.preheader || k.body.slice(0, 90)}</p>
           </Surface>
-          <div className="border-line overflow-hidden rounded-md border">
+          <div className="border-line overflow-hidden rounded-3xl border bg-[#F5F7FA] shadow-lg">
             <iframe
               title={t.postfach}
               srcDoc={html}
               sandbox=""
-              className={`mx-auto block h-[640px] w-full transition-[max-width] ${breite === "mobil" ? "max-w-[390px]" : "max-w-full"}`}
+              className={`mx-auto block h-[720px] w-full transition-[max-width] ${breite === "mobil" ? "max-w-[390px]" : "max-w-full"}`}
             />
           </div>
         </div>

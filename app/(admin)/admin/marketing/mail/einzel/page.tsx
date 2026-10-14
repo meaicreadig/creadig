@@ -14,9 +14,9 @@ const VISEC_ENTWURF = `vor Kurzem habe ich mit Herrn Baser über Ihre offene Ste
 
 Genau das baue ich: ein Grundsystem für Ihren Betrieb, das die Aufgaben rund um diese Position trägt. Auf Wunsch übernehme ich auch die Pflege und die laufende Arbeit gleich mit.
 
-- Keine Fachkraft nötig: Das System ist so gebaut, dass Ihr Team es ohne Spezialwissen nutzt.
-- Pflege aus einer Hand: Wartung, Anpassungen und laufende Arbeit kann ich komplett übernehmen.
-- Ein fester Ansprechpartner: Sie sprechen direkt mit mir – nicht mit einer Hotline.
+- [layers] Keine Fachkraft nötig: Das System ist so gebaut, dass Ihr Team es ohne Spezialwissen nutzt.
+- [shield] Pflege aus einer Hand: Wartung, Anpassungen und laufende Arbeit kann ich komplett übernehmen.
+- [user] Ein fester Ansprechpartner: Sie sprechen direkt mit mir – nicht mit einer Hotline.
 
 > Weniger Personalsuche. Mehr Ruhe im Betrieb.
 
@@ -35,9 +35,9 @@ export default async function EinzelmailSeite() {
 
   const start: Einzelmail = {
     an: "info@vi-sec.de",
-    subject: "Ihre offene Stelle – es geht auch ohne neue Fachkraft",
-    preheader: "Nach meinem Gespräch mit Herrn Baser: ein System, das die Arbeit trägt",
-    kennung: "Persönlich für VI-SEC",
+    subject: "Nach unserem Gespräch mit Herrn Baser – Ihre offene Stelle",
+    preheader: "Herr Baser hat mich gebeten, mich bei Ihnen zu melden – kurz und persönlich.",
+    kennung: "Auf Empfehlung von Herrn Baser",
     headline: "Ihre Abläufe laufen – **ohne dass Sie erst eine Stelle besetzen.**",
     anrede: "Sehr geehrte Damen und Herren,",
     body: VISEC_ENTWURF,
