@@ -81,16 +81,20 @@ function einzelBereinigt(m: Einzelmail): Einzelmail {
     ctaUrl: s(m.ctaUrl, 500).trim(),
     zweitText: s(m.zweitText, 40).trim(),
     zweitUrl: s(m.zweitUrl, 500).trim(),
-    gruss: s(m.gruss, 60).trim(),
+  gruss: s(m.gruss, 60).trim(),
+  kennung: s(m.kennung, 60).trim(),
+  ctaHinweis: s(m.ctaHinweis, 160).trim(),
+  telefon: s(m.telefon, 40).trim(),
+  kontaktMail: s(m.kontaktMail, 200).trim(),
   }
-}
+  }
 
 export async function kiEinzelmail(anweisung: string, entwurf: Einzelmail): Promise<KiEinzelmail> {
   if (!(await darf(false))) return { fehler: "Kein Zugang." }
   if (anweisung.trim().length < 5) return { fehler: "Sag der KI kurz, was sie schreiben oder ändern soll." }
   const m = einzelBereinigt(entwurf)
   const bisher = m.body.trim()
-    ? [`Betreff: ${m.subject}`, `Titel: ${m.headline}`, `Anrede: ${m.anrede}`, m.body, `Knopf: ${m.ctaText}`, `Zweitknopf: ${m.zweitText}`, `Gruß: ${m.gruss}`].join("\n")
+    ? [`Betreff: ${m.subject}`, `Kennung: ${m.kennung}`, `Titel: ${m.headline}`, `Hinweis: ${m.ctaHinweis}`, `Anrede: ${m.anrede}`, m.body, `Knopf: ${m.ctaText}`, `Zweitknopf: ${m.zweitText}`, `Gruß: ${m.gruss}`].join("\n")
     : ""
   return schreibeEinzelmail(anweisung, bisher, m.an)
 }
