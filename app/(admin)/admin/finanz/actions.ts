@@ -8,6 +8,8 @@ import { pruefeZugang } from "@/lib/admin-widerruf"
 import { darfBetreten } from "@/lib/rollen"
 import { KATEGORIEN, type Art } from "@/lib/finanz/rechnen"
 import { finanzDb, protokolliere } from "@/lib/finanz/store"
+import { berechneLage } from "@/lib/finanz/lage"
+import { frageAssistent } from "@/lib/finanz/assistent"
 
 const PFAD = "/admin/finanz"
 
@@ -17,6 +19,23 @@ async function zugang() {
   const db = await finanzDb()
   if (!db) throw new Error("Kein Speicher verbunden")
   return db
+}
+
+export type AssistentAntwort = { frage: string; antwort: string } | { fehler: string } | null
+
+export async function assistentFragen(_prev: AssistentAntwort, form: FormData): Promise<AssistentAntwort> {
+  const frage = feld(form, "frage", 1000)
+  if (!frage) return { fehler: "Bitte eine Frage eingeben." }
+  let db
+  try {
+    db = await zugang()
+  } catch {
+    return { fehler: "Nicht berechtigt." }
+  }
+  const lage = await berechneLage(db)
+  const r = await frageAssistent(lage, frage)
+  await protokolliere(db, "assistent_frage", { zeichen: frage.length, ok: "antwort" in r })
+  return "antwort" in r ? { frage, antwort: r.antwort } : r
 }
 
 function feld(form: FormData, name: string, max = 200): string | null {
