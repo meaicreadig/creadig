@@ -4,14 +4,16 @@
  * den man nur noch absendet. Läuft im Browser und auf dem Server.
  */
 
-import { FIRMA, kampagnenHtml, LOGO_CID } from "@/lib/mailing/vorlage"
+import { FIRMA, kampagnenHtml, textOhneIcons } from "@/lib/mailing/vorlage"
 
-export function einzelmailHtml(m: Einzelmail, siteUrl: string, logoSrc?: string): string {
+export type EingebettetesBild = { cid: string; name: string; base64: string }
+
+export function einzelmailHtml(m: Einzelmail, siteUrl: string, bildSrc?: (pfad: string) => string): string {
   return kampagnenHtml(
     { subject: m.subject, preheader: m.preheader, headline: m.headline, body: m.body, ctaText: m.ctaText, ctaUrl: m.ctaUrl },
     {
       siteUrl,
-      logoSrc,
+      bildSrc,
       anrede: m.anrede || undefined,
       gruss: m.gruss || undefined,
       zweitLink: { text: m.zweitText, url: m.zweitUrl },
@@ -59,7 +61,7 @@ function kopfWort(s: string): string {
 export function einzelmailText(m: Einzelmail): string {
   return [
     m.anrede,
-    m.body.replace(/^## /gm, "").replace(/^- /gm, "• ").replace(/^> /gm, "").replace(/\*\*/g, ""),
+    textOhneIcons(m.body).replace(/^## /gm, "").replace(/^- /gm, "• ").replace(/^> /gm, "").replace(/\*\*/g, ""),
     m.ctaText && m.ctaUrl ? `${m.ctaText}: ${m.ctaUrl}` : "",
     m.zweitText && m.zweitUrl ? `${m.zweitText}: ${m.zweitUrl}` : "",
     `${m.gruss || "Viele Grüße"}\nMuhammed Emin Akyol\nGründer · ${FIRMA}`,
@@ -69,8 +71,8 @@ export function einzelmailText(m: Einzelmail): string {
     .join("\n\n")
 }
 
-/** html muss das Logo als `cid:${LOGO_CID}` referenzieren, wenn logoPngBase64 mitkommt. */
-export function baueEml(m: Einzelmail, html: string, von?: string, logoPngBase64?: string): string {
+/** html muss jedes Bild als `cid:<cid>` referenzieren, das in `bilder` mitkommt. */
+export function baueEml(m: Einzelmail, html: string, von?: string, bilder: EingebettetesBild[] = []): string {
   const grenze = `creadig-${Math.random().toString(36).slice(2)}`
   const bund = `${grenze}-rel`
   const htmlTeil = [
@@ -79,19 +81,22 @@ export function baueEml(m: Einzelmail, html: string, von?: string, logoPngBase64
     "",
     zeilen76(base64Utf8(html)),
   ]
-  const htmlBlock = logoPngBase64
+  const genutzt = bilder.filter((b) => html.includes(`cid:${b.cid}`))
+  const htmlBlock = genutzt.length
     ? [
         `Content-Type: multipart/related; boundary="${bund}"`,
         "",
         `--${bund}`,
         ...htmlTeil,
-        `--${bund}`,
-        'Content-Type: image/png; name="creadig-logo.png"',
-        "Content-Transfer-Encoding: base64",
-        `Content-ID: <${LOGO_CID}>`,
-        'Content-Disposition: inline; filename="creadig-logo.png"',
-        "",
-        zeilen76(logoPngBase64),
+        ...genutzt.flatMap((b) => [
+          `--${bund}`,
+          `Content-Type: image/png; name="${b.name}"`,
+          "Content-Transfer-Encoding: base64",
+          `Content-ID: <${b.cid}>`,
+          `Content-Disposition: inline; filename="${b.name}"`,
+          "",
+          zeilen76(b.base64),
+        ]),
         `--${bund}--`,
       ]
     : htmlTeil
