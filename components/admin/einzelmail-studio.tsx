@@ -5,7 +5,7 @@ import { useMemo, useState, useTransition, type ReactNode } from "react"
 import { AdminField, AdminInput, AdminTextarea } from "@/components/admin/primitives"
 import { baueEml, einzelmailHtml, type EingebettetesBild, type Einzelmail } from "@/lib/mailing/eml"
 import type { KiEinzelmail } from "@/lib/mailing/ki"
-import { cidFuer, mailBildPfade } from "@/lib/mailing/vorlage"
+import { cidFuer, mailBildPfade, MAIL_SCHRIFTEN, schriftPfad } from "@/lib/mailing/vorlage"
 
 type Ergebnis = { ok: true; hinweis?: string } | { fehler: string }
 
@@ -116,7 +116,15 @@ async function alleBilder(): Promise<EingebettetesBild[]> {
   return bilder.filter((b): b is EingebettetesBild => b !== null)
 }
 
+async function alleSchriften(): Promise<Map<string, string>> {
+  const paare = await Promise.all(
+    MAIL_SCHRIFTEN.map(async (datei) => [datei, await bildBase64(schriftPfad(datei))] as const),
+  )
+  return new Map(paare.filter((p): p is readonly [(typeof MAIL_SCHRIFTEN)[number], string] => Boolean(p[1])))
+}
+
 const vorschauBild = (pfad: string) => pfad
+const vorschauSchrift = (datei: string) => schriftPfad(datei)
 
 function Gruppe({ titel, offen, children }: { titel: string; offen?: boolean; children: ReactNode }) {
   return (
@@ -157,7 +165,7 @@ export function EinzelmailStudio({
   const [breite, setBreite] = useState<"desktop" | "mobil">("desktop")
   const [laeuft, starte] = useTransition()
 
-  const html = useMemo(() => einzelmailHtml(m, siteUrl, vorschauBild), [m, siteUrl])
+  const html = useMemo(() => einzelmailHtml(m, siteUrl, vorschauBild, vorschauSchrift), [m, siteUrl])
 
   const feld = (name: keyof Einzelmail) => (e: { target: { value: string } }) => {
     setM((v) => ({ ...v, [name]: e.target.value }))
@@ -183,9 +191,17 @@ export function EinzelmailStudio({
   }
 
   async function herunterladen() {
-    const bilder = await alleBilder()
+    const [bilder, schriften] = await Promise.all([alleBilder(), alleSchriften()])
     const vorhanden = new Set(bilder.map((b) => b.cid))
-    const emlHtml = einzelmailHtml(m, siteUrl, (pfad) => (vorhanden.has(cidFuer(pfad)) ? `cid:${cidFuer(pfad)}` : `${siteUrl}${pfad}`))
+    const emlHtml = einzelmailHtml(
+      m,
+      siteUrl,
+      (pfad) => (vorhanden.has(cidFuer(pfad)) ? `cid:${cidFuer(pfad)}` : `${siteUrl}${pfad}`),
+      (datei) => {
+        const b64 = schriften.get(datei as (typeof MAIL_SCHRIFTEN)[number])
+        return b64 ? `data:font/woff2;base64,${b64}` : `${siteUrl}${schriftPfad(datei)}`
+      },
+    )
     const datei = new Blob([baueEml(m, emlHtml, von, bilder)], { type: "message/rfc822" })
     const url = URL.createObjectURL(datei)
     const a = document.createElement("a")

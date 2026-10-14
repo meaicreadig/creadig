@@ -36,7 +36,20 @@ const WEISS = "#FFFFFF"
 
 const TITEL = "Manrope,'Segoe UI',-apple-system,Helvetica,Arial,sans-serif"
 const SCHRIFT = "'M PLUS Rounded 1c',Nunito,'Segoe UI',-apple-system,Helvetica,Arial,sans-serif"
-const FONTS = "https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap"
+/** Markenschriften als eigene Dateien (latin), damit sie nicht an blockierten Google-Fonts scheitern. */
+export const MAIL_SCHRIFTEN = ["manrope.woff2", "mplus-400.woff2", "mplus-700.woff2"] as const
+export const schriftPfad = (datei: string) => `/fonts/mail/${datei}`
+type Schrift = (datei: string) => string
+
+function schriftCss(src: Schrift): string {
+  const face = (familie: string, gewicht: string, datei: string) =>
+    `@font-face{font-family:'${familie}';font-style:normal;font-weight:${gewicht};font-display:swap;src:url('${src(datei)}') format('woff2')}`
+  return [
+    face("Manrope", "200 800", "manrope.woff2"),
+    face("M PLUS Rounded 1c", "400", "mplus-400.woff2"),
+    face("M PLUS Rounded 1c", "700", "mplus-700.woff2"),
+  ].join("\n")
+}
 
 export const LOGO_PFAD = "/brand/creadig-mail-logo.png"
 export const LOGO_CID = "creadig-logo"
@@ -107,8 +120,8 @@ function bloecke(body: string, bild: Bild): string {
       if (zeilen.every((z) => z.trim().startsWith("- "))) return liste(zeilen, bild)
       if (zeilen.every((z) => z.trim().startsWith("> "))) {
         const satz = zeilen.map((z) => inline(z.trim().slice(2), GOLD)).join("<br>")
-        return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 30px"><tr><td align="center" bgcolor="${GOLD_NEBEL}" style="background:${GOLD_NEBEL};background-image:linear-gradient(135deg,#FCF7EE 0%,${GOLD_NEBEL} 60%,#F8EEDC 100%);border-radius:26px;padding:30px 30px 28px">
-<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 14px"><tr><td width="36" height="3" bgcolor="${GOLD}" style="width:36px;height:3px;line-height:3px;font-size:0;background:${GOLD};border-radius:2px">&nbsp;</td></tr></table>
+        return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 30px"><tr><td align="center" bgcolor="${GOLD_NEBEL}" style="background:${GOLD_NEBEL};background-image:linear-gradient(135deg,#FCF7EE 0%,${GOLD_NEBEL} 60%,#F8EEDC 100%);border-radius:26px;padding:26px 30px 30px">
+<p style="margin:0 0 2px;font-size:46px;line-height:1;color:${GOLD};font-weight:800;font-family:${TITEL}">&ldquo;</p>
 <p style="margin:0;font-size:22px;line-height:1.4;color:${TINTE};font-weight:800;letter-spacing:-0.3px;font-family:${TITEL}">${satz}</p></td></tr></table>`
       }
       return `<p style="${P}">${inline(b).replace(/\n/g, "<br>")}</p>`
@@ -147,6 +160,8 @@ export function kampagnenHtml(
     gruss?: string
     /** Wie Bildpfade (z. B. "/brand/…png") zu src werden: Vorschau relativ, .eml per cid:. */
     bildSrc?: Bild
+    /** Wie Schriftdateien zu URLs werden: Standard = absolute Webseiten-URL, .eml = data:-URI. */
+    schriftSrc?: Schrift
     kennung?: string
     ctaHinweis?: string
     telefon?: string
@@ -171,21 +186,22 @@ export function kampagnenHtml(
   const anrede = o.anrede ? `<p style="${P};color:${TINTE};font-weight:700">${esc(o.anrede)}</p>` : ""
   const pixel = o.pixelUrl ? `<img src="${esc(o.pixelUrl)}" width="1" height="1" alt="" style="display:block;border:0;width:1px;height:1px">` : ""
   const kennung = o.kennung?.trim()
-    ? `<p style="margin:0 0 20px"><span style="display:inline-block;padding:7px 15px;background:${WEISS};border:1px solid #EBDDC4;border-radius:999px;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:${GOLD};font-weight:800;font-family:${TITEL}"><span style="color:${GOLD_HELL}">&#9679;</span>&nbsp; ${esc(o.kennung)}</span></p>`
+    ? `<p style="margin:0 0 22px"><span style="display:inline-block;padding:8px 16px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);border-radius:999px;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:${WEISS};font-weight:800;font-family:${TITEL}"><span style="color:${GOLD_HELL}">&#9679;</span>&nbsp; ${esc(o.kennung)}</span></p>`
     : ""
+  const schrift: Schrift = o.schriftSrc ?? ((d) => `${o.siteUrl}${schriftPfad(d)}`)
 
-  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light"><title>${esc(k.subject)}</title>
-<link rel="stylesheet" href="${FONTS}">
+  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"><title>${esc(k.subject)}</title>
 <style>
-@import url('${FONTS}');
-@keyframes licht{0%{background-position:-200% 0}100%{background-position:200% 0}}
-@keyframes atem{0%,100%{box-shadow:0 10px 26px rgba(47,91,234,.30)}50%{box-shadow:0 12px 36px rgba(47,91,234,.55)}}
-@keyframes auf{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.licht{background-image:linear-gradient(90deg,${GOLD} 0%,${GOLD_HELL} 25%,${BLAU} 50%,${GOLD_HELL} 75%,${GOLD} 100%)!important;background-size:200% 100%!important;animation:licht 5s linear infinite}
+${schriftCss(schrift)}
+:root{color-scheme:light only;supported-color-schemes:light only}
+@keyframes atem{0%,100%{box-shadow:0 10px 26px rgba(47,91,234,.30)}50%{box-shadow:0 14px 38px rgba(47,91,234,.55)}}
+@keyframes auf{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fluss{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 .glanz{animation:atem 2.8s ease-in-out infinite}
-.auf{animation:auf .9s ease-out both}
-@media (prefers-reduced-motion:reduce){.licht,.glanz,.auf{animation:none!important}}
-@media (max-width:620px){.px{padding-left:22px!important;padding-right:22px!important}.hero{padding:32px 24px!important}.h1{font-size:28px!important}}
+.auf{animation:auf .9s cubic-bezier(.2,.7,.2,1) both}
+.fluss{background-size:220% 220%!important;animation:fluss 9s ease-in-out infinite,auf .9s cubic-bezier(.2,.7,.2,1) both}
+@media (prefers-reduced-motion:reduce){.glanz,.auf,.fluss{animation:none!important}}
+@media (max-width:620px){.px{padding-left:22px!important;padding-right:22px!important}.hero{padding:34px 26px!important}.h1{font-size:29px!important}}
 </style></head>
 <body style="margin:0;padding:0;background:${ZEMIN};font-family:${SCHRIFT};-webkit-font-smoothing:antialiased">
 <span style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">${esc(k.preheader)}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</span>
@@ -193,9 +209,8 @@ export function kampagnenHtml(
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${WEISS}" style="max-width:640px;background:${WEISS};border-radius:32px;overflow:hidden;box-shadow:0 24px 64px rgba(13,26,46,0.08)">
 <tr><td align="center" class="px" style="padding:36px 40px 28px"><img src="${esc(bild(LOGO_PFAD))}" width="172" alt="creaDIG" style="display:block;border:0;width:172px;height:auto;max-width:100%"></td></tr>
 <tr><td class="px" style="padding:0 20px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="${NEBEL}" class="hero auf" style="background:${NEBEL};background-image:linear-gradient(135deg,#E3ECFF 0%,${NEBEL} 50%,#FBF7EF 100%);border-radius:28px;padding:44px 38px 38px">
-${kennung}<h1 class="h1" style="margin:0;font-size:33px;line-height:1.16;color:${TINTE};font-weight:800;letter-spacing:-0.7px;font-family:${TITEL}">${inline(k.headline || k.subject, BLAU)}</h1>
-<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:26px"><tr><td width="112" height="4" bgcolor="${GOLD}" class="licht" style="width:112px;height:4px;line-height:4px;font-size:0;background:${GOLD};border-radius:2px">&nbsp;</td></tr></table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="${BLAU}" class="hero fluss" style="background:${BLAU};background-image:linear-gradient(125deg,#3D6BFF 0%,${BLAU} 38%,#2448C9 70%,#3A66F5 100%);border-radius:28px;padding:46px 40px 44px;box-shadow:0 22px 50px rgba(47,91,234,0.28)">
+${kennung}<h1 class="h1" style="margin:0;font-size:34px;line-height:1.16;color:${WEISS};font-weight:800;letter-spacing:-0.8px;font-family:${TITEL}">${inline(k.headline || k.subject, GOLD_HELL)}</h1>
 </td></tr></table>
 </td></tr>
 <tr><td class="px" style="padding:40px 44px 8px">
@@ -204,7 +219,6 @@ ${anrede}${bloecke(k.body, bild)}${knoepfe}
 <tr><td class="px" style="padding:30px 44px 40px">
 <p style="margin:0 0 22px;font-size:15px;line-height:1.6;color:${TEXT};font-family:${SCHRIFT}">${esc(o.gruss ?? "Viele Grüße")}</p>
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:22px"><tr><td>
-<table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:14px"><tr><td width="40" height="3" bgcolor="${GOLD}" style="width:40px;height:3px;line-height:3px;font-size:0;background:${GOLD};border-radius:2px">&nbsp;</td></tr></table>
 <p style="margin:0;font-size:19px;font-weight:800;color:${TINTE};letter-spacing:-0.2px;font-family:${TITEL}">Muhammed Emin Akyol</p>
 <p style="margin:4px 0 0;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:${GOLD};font-weight:700;font-family:${TITEL}">Gr&uuml;nder &middot; ${FIRMA}</p>
 </td></tr></table>
