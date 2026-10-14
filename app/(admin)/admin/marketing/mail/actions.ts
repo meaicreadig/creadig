@@ -8,7 +8,8 @@ import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
 import { darfBetreten } from "@/lib/rollen"
 import { siteUrl } from "@/lib/termine/mail"
-import { schreibeKampagne, type KampagnenAnlass, type KiKampagne } from "@/lib/mailing/ki"
+import { einzelmailHtml, einzelmailText, type Einzelmail } from "@/lib/mailing/eml"
+import { schreibeEinzelmail, schreibeKampagne, type KampagnenAnlass, type KiEinzelmail, type KiKampagne } from "@/lib/mailing/ki"
 import {
   aktiveEmpfaenger,
   empfaengerEintragen,
@@ -63,6 +64,58 @@ export async function kiEntwurf(anlass: KampagnenAnlass, stichpunkte: string): P
   if (!(await darf(false))) return { fehler: "Kein Zugang." }
   if (stichpunkte.trim().length < 10) return { fehler: "Bitte ein paar Stichpunkte eingeben." }
   return schreibeKampagne(anlass, stichpunkte)
+}
+
+/* Persönliche Einzelmail ------------------------------------------------------ */
+
+function einzelBereinigt(m: Einzelmail): Einzelmail {
+  const s = (v: unknown, n: number) => String(v ?? "").slice(0, n)
+  return {
+    an: s(m.an, 200).trim(),
+    subject: s(m.subject, 140).trim(),
+    preheader: s(m.preheader, 160).trim(),
+    headline: s(m.headline, 140).trim(),
+    anrede: s(m.anrede, 120).trim(),
+    body: s(m.body, 8000),
+    ctaText: s(m.ctaText, 40).trim(),
+    ctaUrl: s(m.ctaUrl, 500).trim(),
+    zweitText: s(m.zweitText, 40).trim(),
+    zweitUrl: s(m.zweitUrl, 500).trim(),
+    gruss: s(m.gruss, 60).trim(),
+  }
+}
+
+export async function kiEinzelmail(anweisung: string, entwurf: Einzelmail): Promise<KiEinzelmail> {
+  if (!(await darf(false))) return { fehler: "Kein Zugang." }
+  if (anweisung.trim().length < 5) return { fehler: "Sag der KI kurz, was sie schreiben oder ändern soll." }
+  const m = einzelBereinigt(entwurf)
+  const bisher = m.body.trim()
+    ? [`Betreff: ${m.subject}`, `Titel: ${m.headline}`, `Anrede: ${m.anrede}`, m.body, `Knopf: ${m.ctaText}`, `Zweitknopf: ${m.zweitText}`, `Gruß: ${m.gruss}`].join("\n")
+    : ""
+  return schreibeEinzelmail(anweisung, bisher, m.an)
+}
+
+export async function einzelmailSenden(roh: Einzelmail): Promise<Ergebnis> {
+  if (!(await darf())) return { fehler: "Kein Zugang." }
+  const m = einzelBereinigt(roh)
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.an)) return { fehler: "Empfänger-Adresse fehlt oder ist ungültig." }
+  if (!m.subject || m.body.trim().length < 40) return { fehler: "Betreff oder Inhalt fehlt." }
+  const a = absender()
+  if (!a) return { fehler: "Mailversand ist nicht eingerichtet – nutze den .eml-Download." }
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${a.key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: a.from,
+      to: [m.an],
+      ...(a.replyTo ? { reply_to: a.replyTo, bcc: [a.replyTo] } : {}),
+      subject: m.subject,
+      html: einzelmailHtml(m, siteUrl()),
+      text: einzelmailText(m),
+    }),
+  })
+  if (!res.ok) return { fehler: `Versand fehlgeschlagen (${res.status}).` }
+  return { ok: true, hinweis: `An ${m.an} gesendet${a.replyTo ? ` (Kopie an ${a.replyTo})` : ""}.` }
 }
 
 export async function neueKampagne(): Promise<void> {

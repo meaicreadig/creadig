@@ -132,9 +132,14 @@ export default async function MailMarketingSeite() {
             <div className="min-w-0 flex-1">
               <SectionHeader id="kampagnen" title={t.kampagnen} count={daten.k.length} />
             </div>
-            <form action={neueKampagne}>
-              <button className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-medium">{t.neu}</button>
-            </form>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link href="/admin/marketing/mail/einzel" className="border-gold/60 text-gold-text rounded-md border px-4 py-2 text-sm font-medium">
+                {sprache === "tr" ? "Kişisel e-posta" : "Persönliche Mail"}
+              </Link>
+              <form action={neueKampagne}>
+                <button className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-medium">{t.neu}</button>
+              </form>
+            </div>
           </div>
           {daten.k.length === 0 ? (
             <p className="text-muted-foreground text-sm leading-relaxed">{t.keine}</p>

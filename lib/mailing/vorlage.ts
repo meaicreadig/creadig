@@ -55,13 +55,28 @@ function bloecke(body: string): string {
 
 export function kampagnenHtml(
   k: KampagnenInhalt,
-  o: { siteUrl: string; abmeldeUrl: string; ctaHref?: string; pixelUrl?: string; anrede?: string },
+  o: {
+    siteUrl: string
+    abmeldeUrl?: string
+    ctaHref?: string
+    pixelUrl?: string
+    anrede?: string
+    zweitLink?: { text: string; url: string }
+    gruss?: string
+  },
 ): string {
   const ctaHref = o.ctaHref ?? k.ctaUrl
+  const zweit =
+    o.zweitLink?.text.trim() && o.zweitLink.url.trim()
+      ? `<td style="padding-left:10px"><a href="${esc(o.zweitLink.url)}" style="display:inline-block;padding:13px 22px;font-size:15px;font-weight:700;color:${NACHT};text-decoration:none;border:1px solid ${GOLD};border-radius:6px;font-family:${SCHRIFT}">${esc(o.zweitLink.text)}</a></td>`
+      : ""
   const knopf =
     k.ctaText.trim() && k.ctaUrl.trim()
-      ? `<table role="presentation" style="margin:8px 0 8px"><tr><td style="background:${NACHT};border-radius:6px;border-bottom:3px solid ${GOLD}"><a href="${esc(ctaHref)}" style="display:inline-block;padding:14px 26px;font-size:15px;font-weight:700;color:#FFFFFF;text-decoration:none;font-family:${SCHRIFT}">${esc(k.ctaText)} &rarr;</a></td></tr></table>`
+      ? `<table role="presentation" style="margin:8px 0 8px"><tr><td style="background:${NACHT};border-radius:6px;border-bottom:3px solid ${GOLD}"><a href="${esc(ctaHref)}" style="display:inline-block;padding:14px 26px;font-size:15px;font-weight:700;color:#FFFFFF;text-decoration:none;font-family:${SCHRIFT}">${esc(k.ctaText)} &rarr;</a></td>${zweit}</tr></table>`
       : ""
+  const abmeldung = o.abmeldeUrl
+    ? `<br>Sie erhalten diese Nachricht, weil Sie mit creaDIG in Kontakt stehen. <a href="${esc(o.abmeldeUrl)}" style="color:${NACHT};font-weight:600">Abmelden</a>`
+    : ""
   const anrede = o.anrede ? `<p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:${TEXT}">${esc(o.anrede)}</p>` : ""
   const pixel = o.pixelUrl ? `<img src="${esc(o.pixelUrl)}" width="1" height="1" alt="" style="display:block;border:0;width:1px;height:1px">` : ""
 
@@ -78,13 +93,12 @@ export function kampagnenHtml(
 <tr><td style="padding:34px 32px 10px">
 <h1 style="margin:0 0 20px;font-size:24px;line-height:1.25;color:${NACHT};font-weight:800">${esc(k.headline || k.subject)}</h1>
 ${anrede}${bloecke(k.body)}${knopf}
-<p style="margin:26px 0 0;font-size:15px;line-height:1.6;color:${TEXT}">Viele Grüße<br><strong style="color:${NACHT}">Muhammed Emin Akyol</strong><br><span style="color:${GRAU}">Gründer · creaDIG</span></p>
+<p style="margin:26px 0 0;font-size:15px;line-height:1.6;color:${TEXT}">${esc(o.gruss ?? "Viele Grüße")}<br><strong style="color:${NACHT}">Muhammed Emin Akyol</strong><br><span style="color:${GRAU}">Gründer · creaDIG</span></p>
 </td></tr>
 <tr><td style="padding:24px 32px 0"><div style="height:1px;background:${LINIE}"></div></td></tr>
 <tr><td style="padding:18px 32px 28px;font-size:12px;line-height:1.65;color:${GRAU}">
 creaDIG solutions UG (haftungsbeschränkt) · Osnabrück<br>
-<a href="${esc(o.siteUrl)}" style="color:${GRAU}">creadig.de</a> · <a href="${esc(o.siteUrl)}/impressum" style="color:${GRAU}">Impressum</a> · <a href="${esc(o.siteUrl)}/datenschutz" style="color:${GRAU}">Datenschutz</a><br>
-Sie erhalten diese Nachricht, weil Sie mit creaDIG in Kontakt stehen. <a href="${esc(o.abmeldeUrl)}" style="color:${NACHT};font-weight:600">Abmelden</a>
+<a href="${esc(o.siteUrl)}" style="color:${GRAU}">creadig.de</a> · <a href="${esc(o.siteUrl)}/impressum" style="color:${GRAU}">Impressum</a> · <a href="${esc(o.siteUrl)}/datenschutz" style="color:${GRAU}">Datenschutz</a>${abmeldung}
 </td></tr></table>${pixel}</td></tr></table></body></html>`
 }
 
