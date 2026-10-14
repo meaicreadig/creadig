@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { CalendarClock, Compass, Receipt, Settings2, Waves } from "lucide-react"
+import { CalendarClock, Compass, Receipt, Settings, Waves } from "lucide-react"
 
 import { Logo } from "@/components/brand/logo"
 import { Abmelden } from "@/components/finanz/anmeldung"
@@ -7,12 +7,23 @@ import { finanzBasis } from "@/lib/finanz/basis"
 
 export type FinanzBereich = "heute" | "geldfluss" | "belege" | "steuern" | "grundlagen"
 
-const BEREICHE: { key: FinanzBereich; pfad: string; label: string; Icon: typeof Compass }[] = [
-  { key: "heute", pfad: "", label: "Heute", Icon: Compass },
-  { key: "geldfluss", pfad: "/geldfluss", label: "Geldfluss", Icon: Waves },
-  { key: "belege", pfad: "/belege", label: "Belege", Icon: Receipt },
-  { key: "steuern", pfad: "/steuern", label: "Steuern", Icon: CalendarClock },
-  { key: "grundlagen", pfad: "/grundlagen", label: "Grundlagen", Icon: Settings2 },
+type Bereich = { key: FinanzBereich; pfad: string; label: string; Icon: typeof Compass }
+
+const GRUPPEN: { titel: string; bereiche: Bereich[] }[] = [
+  { titel: "Cockpit", bereiche: [{ key: "heute", pfad: "", label: "Heute", Icon: Compass }] },
+  {
+    titel: "Geld",
+    bereiche: [
+      { key: "geldfluss", pfad: "/geldfluss", label: "Geldfluss", Icon: Waves },
+      { key: "belege", pfad: "/belege", label: "Belege", Icon: Receipt },
+    ],
+  },
+  { titel: "Finanzamt", bereiche: [{ key: "steuern", pfad: "/steuern", label: "Steuern", Icon: CalendarClock }] },
+]
+
+const MOBIL: Bereich[] = [
+  ...GRUPPEN.flatMap((g) => g.bereiche),
+  { key: "grundlagen", pfad: "/grundlagen", label: "Grundlagen", Icon: Settings },
 ]
 
 export async function FinanzShell({
@@ -27,37 +38,69 @@ export async function FinanzShell({
   children: React.ReactNode
 }) {
   const basis = await finanzBasis()
+  const ziel = (pfad: string) => `${basis}${pfad}` || "/"
+
   return (
-    <div className="flex min-h-dvh flex-col">
-      <header className="bg-background/85 sticky top-0 z-20 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 md:px-8">
-          <Link href={basis || "/"} className="flex items-center gap-3" aria-label="creaDIG Finanz – Heute">
-            <Logo variant="dark" className="h-5" />
-            <span className="bg-primary text-primary-foreground rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wide">
-              Finanz
-            </span>
-          </Link>
-          <nav aria-label="Bereiche" className="hidden md:block">
-            <ul className="bg-card flex items-center gap-1 rounded-full p-1 shadow-sm">
-              {BEREICHE.map(({ key, pfad, label, Icon }) => (
-                <li key={key}>
-                  <Link
-                    href={`${basis}${pfad}` || "/"}
-                    aria-current={aktiv === key ? "page" : undefined}
-                    className="text-muted-foreground hover:text-foreground aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors"
-                  >
-                    <Icon className="size-4" aria-hidden />
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+    <div className="bg-background text-foreground min-h-dvh lg:grid lg:grid-cols-[17rem_1fr]">
+      <aside className="bg-card hidden flex-col gap-8 px-5 py-8 shadow-sm lg:sticky lg:top-4 lg:m-4 lg:flex lg:h-[calc(100dvh-2rem)] lg:overflow-y-auto lg:rounded-3xl">
+        <Link href={ziel("")} className="flex flex-col gap-3 rounded-xl px-2" aria-label="creaDIG Finanz – Heute">
+          <Logo variant="dark" className="h-6" />
+          <span className="text-muted-foreground text-xs font-medium tracking-wide">Finanz</span>
+        </Link>
+
+        <nav aria-label="Bereiche" className="flex flex-col gap-5">
+          {GRUPPEN.map((g) => (
+            <div key={g.titel}>
+              <p className="text-muted-foreground px-4 pb-2 text-xs font-medium">{g.titel}</p>
+              <ul className="flex flex-col gap-1">
+                {g.bereiche.map(({ key, pfad, label, Icon }) => {
+                  const an = aktiv === key
+                  return (
+                    <li key={key}>
+                      <Link
+                        href={ziel(pfad)}
+                        aria-current={an ? "page" : undefined}
+                        className={`group flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium transition-colors ${
+                          an ? "bg-primary text-primary-foreground shadow-sm" : "text-foreground/75 hover:bg-background hover:text-foreground"
+                        }`}
+                      >
+                        <Icon aria-hidden className={`size-4 shrink-0 ${an ? "" : "text-muted-foreground group-hover:text-foreground"}`} />
+                        {label}
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          ))}
+        </nav>
+
+        <div className="bg-background mt-auto flex flex-col gap-3 rounded-2xl p-3">
+          <div className="flex items-center justify-between gap-3 px-1">
+            <span className="text-muted-foreground text-xs font-medium">creaDIG Solutions</span>
+            <Link
+              href={ziel("/grundlagen")}
+              aria-current={aktiv === "grundlagen" ? "page" : undefined}
+              title="Grundlagen"
+              className="text-muted-foreground hover:text-primary hover:bg-card aria-[current=page]:text-primary inline-flex size-9 items-center justify-center rounded-full transition-colors"
+            >
+              <Settings aria-hidden className="size-4" />
+              <span className="sr-only">Grundlagen</span>
+            </Link>
+          </div>
           <Abmelden ziel={`${basis}/login`} />
         </div>
+      </aside>
+
+      <header className="bg-background/85 sticky top-0 z-20 flex items-center justify-between gap-4 px-5 py-4 backdrop-blur lg:hidden">
+        <Link href={ziel("")} className="flex items-center gap-3" aria-label="creaDIG Finanz – Heute">
+          <Logo variant="dark" className="h-5" />
+          <span className="text-muted-foreground text-xs font-medium">Finanz</span>
+        </Link>
+        <Abmelden ziel={`${basis}/login`} />
       </header>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-5 pt-6 pb-28 md:px-8 md:pt-10 md:pb-16">
+      <main className="mx-auto flex w-full max-w-6xl min-w-0 flex-col gap-8 px-5 pt-4 pb-28 sm:px-8 lg:px-10 lg:py-12">
         <div className="flex flex-col gap-2">
           <h1 className="font-sans text-3xl font-semibold tracking-tight text-balance md:text-4xl">{titel}</h1>
           {unterzeile && <p className="text-muted-foreground max-w-2xl leading-relaxed text-pretty">{unterzeile}</p>}
@@ -65,12 +108,12 @@ export async function FinanzShell({
         {children}
       </main>
 
-      <nav aria-label="Bereiche" className="bg-card fixed inset-x-3 bottom-3 z-20 rounded-full p-1 shadow-lg md:hidden">
+      <nav aria-label="Bereiche" className="bg-card fixed inset-x-3 bottom-3 z-20 rounded-full p-1 shadow-lg lg:hidden">
         <ul className="grid grid-cols-5">
-          {BEREICHE.map(({ key, pfad, label, Icon }) => (
+          {MOBIL.map(({ key, pfad, label, Icon }) => (
             <li key={key}>
               <Link
-                href={`${basis}${pfad}` || "/"}
+                href={ziel(pfad)}
                 aria-current={aktiv === key ? "page" : undefined}
                 className="text-muted-foreground aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground flex flex-col items-center gap-0.5 rounded-full py-2 text-xs font-medium"
               >
