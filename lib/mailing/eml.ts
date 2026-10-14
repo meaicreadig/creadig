@@ -8,12 +8,18 @@ import { FIRMA, kampagnenHtml, textOhneIcons } from "@/lib/mailing/vorlage"
 
 export type EingebettetesBild = { cid: string; name: string; base64: string }
 
-export function einzelmailHtml(m: Einzelmail, siteUrl: string, bildSrc?: (pfad: string) => string): string {
+export function einzelmailHtml(
+  m: Einzelmail,
+  siteUrl: string,
+  bildSrc?: (pfad: string) => string,
+  schriftSrc?: (datei: string) => string,
+): string {
   return kampagnenHtml(
     { subject: m.subject, preheader: m.preheader, headline: m.headline, body: m.body, ctaText: m.ctaText, ctaUrl: m.ctaUrl },
     {
       siteUrl,
       bildSrc,
+      schriftSrc,
       anrede: m.anrede || undefined,
       gruss: m.gruss || undefined,
       zweitLink: { text: m.zweitText, url: m.zweitUrl },
