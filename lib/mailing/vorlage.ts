@@ -186,7 +186,7 @@ export function kampagnenHtml(
   const anrede = o.anrede ? `<p style="${P};color:${TINTE};font-weight:700">${esc(o.anrede)}</p>` : ""
   const pixel = o.pixelUrl ? `<img src="${esc(o.pixelUrl)}" width="1" height="1" alt="" style="display:block;border:0;width:1px;height:1px">` : ""
   const kennung = o.kennung?.trim()
-    ? `<p style="margin:0 0 22px"><span style="display:inline-block;padding:8px 16px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);border-radius:999px;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:${WEISS};font-weight:800;font-family:${TITEL}"><span style="color:${GOLD_HELL}">&#9679;</span>&nbsp; ${esc(o.kennung)}</span></p>`
+    ? `<p style="margin:0 0 16px;font-size:12px;letter-spacing:1.8px;text-transform:uppercase;color:${GOLD};font-weight:800;font-family:${TITEL}">${esc(o.kennung)}</p>`
     : ""
   const schrift: Schrift = o.schriftSrc ?? ((d) => `${o.siteUrl}${schriftPfad(d)}`)
 
@@ -199,18 +199,19 @@ ${schriftCss(schrift)}
 @keyframes fluss{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 .glanz{animation:atem 2.8s ease-in-out infinite}
 .auf{animation:auf .9s cubic-bezier(.2,.7,.2,1) both}
-.fluss{background-size:220% 220%!important;animation:fluss 9s ease-in-out infinite,auf .9s cubic-bezier(.2,.7,.2,1) both}
+.fluss{background-size:240% 240%!important;animation:fluss 14s ease-in-out infinite,auf 1.1s cubic-bezier(.2,.7,.2,1) .15s both}
 @media (prefers-reduced-motion:reduce){.glanz,.auf,.fluss{animation:none!important}}
-@media (max-width:620px){.px{padding-left:22px!important;padding-right:22px!important}.hero{padding:34px 26px!important}.h1{font-size:29px!important}}
+@media (max-width:620px){.px{padding-left:22px!important;padding-right:22px!important}.px-hero{padding-left:14px!important;padding-right:14px!important}.hero{padding:32px 24px!important}.h1{font-size:27px!important}}
 </style></head>
 <body style="margin:0;padding:0;background:${ZEMIN};font-family:${SCHRIFT};-webkit-font-smoothing:antialiased">
 <span style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">${esc(k.preheader)}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</span>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${ZEMIN}" style="background:${ZEMIN}"><tr><td align="center" style="padding:36px 12px 28px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${WEISS}" style="max-width:640px;background:${WEISS};border-radius:32px;overflow:hidden;box-shadow:0 24px 64px rgba(13,26,46,0.08)">
-<tr><td align="center" class="px" style="padding:36px 40px 28px"><img src="${esc(bild(LOGO_PFAD))}" width="172" alt="creaDIG" style="display:block;border:0;width:172px;height:auto;max-width:100%"></td></tr>
-<tr><td class="px" style="padding:0 20px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="${BLAU}" class="hero fluss" style="background:${BLAU};background-image:linear-gradient(125deg,#3D6BFF 0%,${BLAU} 38%,#2448C9 70%,#3A66F5 100%);border-radius:28px;padding:46px 40px 44px;box-shadow:0 22px 50px rgba(47,91,234,0.28)">
-${kennung}<h1 class="h1" style="margin:0;font-size:34px;line-height:1.16;color:${WEISS};font-weight:800;letter-spacing:-0.8px;font-family:${TITEL}">${inline(k.headline || k.subject, GOLD_HELL)}</h1>
+<tr><td align="center" class="px auf" style="padding:44px 40px 34px"><img src="${esc(bild(LOGO_PFAD))}" width="236" alt="creaDIG" style="display:block;border:0;width:236px;height:auto;max-width:100%;margin:0 auto">
+<p style="margin:14px 0 0;font-size:10.5px;letter-spacing:3.2px;text-transform:uppercase;color:${GRAU};font-weight:700;font-family:${TITEL}">System-Haus f&uuml;r digitale Betriebe</p></td></tr>
+<tr><td class="px-hero" style="padding:0 32px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td bgcolor="${NEBEL}" class="hero fluss" style="background:${NEBEL};background-image:linear-gradient(120deg,#E9EFFF 0%,#F4F7FF 35%,${GOLD_NEBEL} 65%,#EEF3FF 100%);border-radius:28px;padding:42px 40px 44px">
+${kennung}<h1 class="h1" style="margin:0;font-size:32px;line-height:1.2;color:${TINTE};font-weight:800;letter-spacing:-0.7px;font-family:${TITEL}">${inline(k.headline || k.subject, BLAU)}</h1>
 </td></tr></table>
 </td></tr>
 <tr><td class="px" style="padding:40px 44px 8px">
