@@ -6,6 +6,7 @@ import type { Abfrage } from "@/lib/neon-abfrage"
 import {
   addTage,
   berechne,
+  DOK_TEXT,
   heuteBerlin,
   steuerModus,
   type DokArt,
@@ -227,7 +228,7 @@ function zeile(r: Record<string, unknown>): Dokument {
     angebotId: t(r.angebot_id),
     stornoVonId: t(r.storno_von_id),
     anzahlungProzent: r.anzahlung_prozent === null ? null : Number(r.anzahlung_prozent),
-    sprache: (r.sprache === "en" ? "en" : "de") as Sprache,
+    sprache: (r.sprache === "en" ? "en" : r.sprache === "tr" ? "tr" : "de") as Sprache,
     titel: String(r.titel ?? ""),
     kunde: r.kunde as Kunde,
     datum: String(r.datum),
@@ -532,14 +533,24 @@ export async function markiereGeoeffnet(db: Abfrage, id: string): Promise<void> 
 export async function rechnungAusAngebot(db: Abfrage, angebotId: string, anzahlungProzent: number | null): Promise<string | null> {
   const a = await ladeDokument(db, angebotId)
   if (!a || a.art !== "angebot" || a.status !== "angenommen" || !a.summen) return null
-  const en = a.sprache === "en"
-  const bezug = `${en ? "Quotation" : "Angebot"} ${a.nummer}`
+  const ANZAHLUNG_TEXT: Record<Sprache, { anzahlung: (p: number) => string; abzug: (nr: string) => string }> = {
+    de: { anzahlung: (p) => `Anzahlung ${p} %`, abzug: (nr) => `Abzüglich Anzahlung ${nr}` },
+    en: { anzahlung: (p) => `Advance payment ${p} %`, abzug: (nr) => `Less advance payment ${nr}` },
+    tr: { anzahlung: (p) => `Peşinat %${p}`, abzug: (nr) => `${nr} peşinat mahsubu` },
+  }
+  const text = ANZAHLUNG_TEXT[a.sprache]
+  const bezug = `${DOK_TEXT[a.sprache].angebot} ${a.nummer}`
+  const EINLEITUNG_TEXT: Record<Sprache, string> = {
+    de: `Gemäß ${bezug} berechnen wir Ihnen folgende Leistungen:`,
+    en: `As agreed in ${bezug}, we invoice the following services:`,
+    tr: `${bezug} kapsamında aşağıdaki hizmetleri faturalandırıyoruz:`,
+  }
   let positionen: Position[]
 
   if (anzahlungProzent) {
     const p = Math.min(Math.max(Math.round(anzahlungProzent), 1), 99)
     positionen = a.summen.gruppen.map((g) => ({
-      titel: en ? `Advance payment ${p} %` : `Anzahlung ${p} %`,
+      titel: text.anzahlung(p),
       beschreibung: `${bezug}${a.titel ? ` – ${a.titel}` : ""}`,
       menge: 1,
       einheit: "Pauschal",
@@ -560,7 +571,7 @@ export async function rechnungAusAngebot(db: Abfrage, angebotId: string, anzahlu
     for (const z of anzahlungen) {
       for (const g of ((z.summen as Summen | null)?.gruppen ?? [])) {
         positionen.push({
-          titel: en ? `Less advance payment ${z.nummer}` : `Abzüglich Anzahlung ${z.nummer}`,
+          titel: text.abzug(String(z.nummer)),
           beschreibung: "",
           menge: 1,
           einheit: "Pauschal",
@@ -579,7 +590,7 @@ export async function rechnungAusAngebot(db: Abfrage, angebotId: string, anzahlu
     kunde: a.kunde,
     geschaeftsfeld: a.geschaeftsfeld,
     leistungszeitraum: a.leistungszeitraum,
-    einleitung: en ? `As agreed in ${bezug}, we invoice the following services:` : `Gemäß ${bezug} berechnen wir Ihnen folgende Leistungen:`,
+    einleitung: EINLEITUNG_TEXT[a.sprache],
     schluss: "",
     positionen,
     rabattProzent: 0,
@@ -605,7 +616,11 @@ export async function storniere(db: Abfrage, id: string, grund: string): Promise
   const positionen = d.positionen.map((p) => ({ ...p, preisCent: -p.preisCent }))
   const summen = berechne(positionen, d.rabattProzent, d.steuerModus ?? "normal")
   const token = randomBytes(24).toString("base64url")
-  const en = d.sprache === "en"
+  const STORNO_TEXT: Record<Sprache, (nummer: string, datum: string) => string> = {
+    de: (nr, dat) => `Diese Rechnung storniert die Rechnung ${nr} vom ${dat}.`,
+    en: (nr, dat) => `This invoice cancels invoice ${nr} dated ${dat}.`,
+    tr: (nr, dat) => `Bu fatura, ${dat} tarihli ${nr} numaralı faturayı iptal eder.`,
+  }
   await db(
     `INSERT INTO fin_dokumente (id, art, status, nummer, storno_von_id, angebot_id, sprache, titel, kunde, datum, leistungszeitraum, einleitung,
        schluss, rabatt_prozent, geschaeftsfeld, positionen, steuer_modus, summen, absender, token, versendet_at, pruefsumme)
@@ -619,7 +634,7 @@ export async function storniere(db: Abfrage, id: string, grund: string): Promise
       d.titel,
       JSON.stringify(d.kunde),
       d.leistungszeitraum,
-      `${en ? "This invoice cancels invoice" : "Diese Rechnung storniert die Rechnung"} ${d.nummer} ${en ? "dated" : "vom"} ${d.datum}.${grund ? ` ${grund}` : ""}`,
+      `${STORNO_TEXT[d.sprache](String(d.nummer), d.datum)}${grund ? ` ${grund}` : ""}`,
       d.rabattProzent,
       d.geschaeftsfeld,
       JSON.stringify(positionen),

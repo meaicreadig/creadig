@@ -197,9 +197,10 @@ export function DokumentEditor({
               <Eingabe label="USt-IdNr. (optional)" id="k-ust" value={e.kunde.ustId} onChange={(v) => setK({ ustId: v })} placeholder="z. B. ATU12345678" />
               <Eingabe label="E-Mail für den Versand" id="k-mail" type="email" value={e.kunde.email} onChange={(v) => setK({ email: v })} />
               <Feldrahmen label="Sprache" id="k-spr">
-                <AdminSelect id="k-spr" className={kontrolle} value={e.sprache} onChange={(v) => setE((x) => ({ ...x, sprache: v.target.value === "en" ? "en" : "de" }))}>
+                <AdminSelect id="k-spr" className={kontrolle} value={e.sprache} onChange={(v) => setE((x) => ({ ...x, sprache: v.target.value === "en" ? "en" : v.target.value === "tr" ? "tr" : "de" }))}>
                   <option value="de">Deutsch</option>
                   <option value="en">Englisch</option>
+                  <option value="tr">Türkisch</option>
                 </AdminSelect>
               </Feldrahmen>
             </div>

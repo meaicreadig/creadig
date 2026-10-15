@@ -5,7 +5,7 @@
  */
 
 export type DokArt = "angebot" | "rechnung" | "storno"
-export type Sprache = "de" | "en"
+export type Sprache = "de" | "en" | "tr"
 export type SteuerModus = "normal" | "klein" | "reverse" | "drittland"
 
 export type AngebotStatus = "entwurf" | "versendet" | "angenommen" | "abgelehnt" | "aenderung" | "ersetzt" | "verworfen"
@@ -248,6 +248,42 @@ export const DOK_TEXT = {
       drittland: "Service not taxable in Germany (place of supply outside Germany).",
     } satisfies Record<SteuerModus, string>,
   },
+  tr: {
+    angebot: "Teklif",
+    rechnung: "Fatura",
+    storno: "İptal faturası",
+    nummer: "Numara",
+    datum: "Tarih",
+    gueltig: "Geçerlilik tarihi",
+    faellig: "Son ödeme tarihi",
+    leistung: "Hizmet dönemi",
+    version: "Versiyon",
+    pos: "Sıra",
+    beschreibung: "Hizmet",
+    menge: "Miktar",
+    preis: "Birim fiyat",
+    betrag: "Tutar",
+    optional: "Opsiyonel",
+    zwischen: "Ara toplam",
+    rabatt: "İskonto",
+    netto: "Net tutar",
+    ust: "KDV",
+    gesamt: "Genel toplam",
+    optionalSumme: "Opsiyonel hizmetler (dahil değildir)",
+    zahlung: "Lütfen tutarı fatura numarasını belirterek şu tarihe kadar havale ediniz:",
+    bank: "Banka bilgileri",
+    steuernr: "Vergi numarası",
+    ustid: "KDV numarası",
+    ihreUstid: "KDV numaranız",
+    inhaber: "İşletme sahibi",
+    storniert: "Bu fatura şu faturayı iptal eder:",
+    hinweis: {
+      normal: "",
+      klein: "§ 19 Alman KDV Kanunu uyarınca (küçük işletme) KDV hesaplanmamıştır.",
+      reverse: "Ters vergilendirme (Reverse Charge): KDV, hizmeti alan tarafından beyan edilir (AB Direktifi 2006/112/EC Madde 196).",
+      drittland: "Almanya'da vergiye tabi olmayan hizmet (ifa yeri Almanya dışında).",
+    } satisfies Record<SteuerModus, string>,
+  },
 } as const
 
 export const ART_LABEL: Record<DokArt, string> = { angebot: "Angebot", rechnung: "Rechnung", storno: "Storno" }
@@ -267,16 +303,18 @@ export const STATUS_LABEL: Record<string, string> = {
   verworfen: "Verworfen",
 }
 
+const LOCALE: Record<Sprache, string> = { de: "de-DE", en: "en-GB", tr: "tr-TR" }
+
 export function formatEuro(cent: number, sprache: Sprache = "de"): string {
-  return new Intl.NumberFormat(sprache === "de" ? "de-DE" : "en-GB", { style: "currency", currency: "EUR" }).format(cent / 100)
+  return new Intl.NumberFormat(LOCALE[sprache], { style: "currency", currency: "EUR" }).format(cent / 100)
 }
 
 export function formatDatum(iso: string, sprache: Sprache = "de"): string {
-  return new Intl.DateTimeFormat(sprache === "de" ? "de-DE" : "en-GB", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" }).format(
+  return new Intl.DateTimeFormat(LOCALE[sprache], { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" }).format(
     new Date(`${iso}T00:00:00Z`),
   )
 }
 
 export function formatMenge(n: number, sprache: Sprache = "de"): string {
-  return new Intl.NumberFormat(sprache === "de" ? "de-DE" : "en-GB", { maximumFractionDigits: 3 }).format(n)
+  return new Intl.NumberFormat(LOCALE[sprache], { maximumFractionDigits: 3 }).format(n)
 }

@@ -30,6 +30,7 @@ export const dokumentUrl = (token: string) => `${siteUrl()}/dokument/${token}`
 function anrede(d: Dokument): string {
   const name = d.kunde.name.trim()
   if (d.sprache === "en") return name ? `Dear ${name},` : "Dear Sir or Madam,"
+  if (d.sprache === "tr") return name ? `Sayın ${name},` : "Sayın Yetkili,"
   return name ? `Guten Tag ${name},` : "Sehr geehrte Damen und Herren,"
 }
 
@@ -37,6 +38,7 @@ type Inhalt = { betreff: string; kennung: string; titel: string; absaetze: strin
 
 function inhalt(d: Dokument, art: MailArt): Inhalt {
   const en = d.sprache === "en"
+  const tr = d.sprache === "tr"
   const T = DOK_TEXT[d.sprache]
   const name = d.art === "angebot" ? T.angebot : d.art === "storno" ? T.storno : T.rechnung
   const nr = `${d.nummer}${d.art === "angebot" && d.version > 1 ? ` (${T.version} ${d.version})` : ""}`
@@ -49,58 +51,67 @@ function inhalt(d: Dokument, art: MailArt): Inhalt {
     return {
       betreff: `${name} ${nr}${thema}`,
       kennung: `${name} ${nr}`,
-      titel: d.titel || (en ? "Your quotation" : "Ihr Angebot"),
-      absaetze: en
-        ? [`thank you for your interest. Please find our quotation below – you can review it online, select optional services and accept it with one click.`, gueltig ? `The quotation is valid until ${gueltig}.` : ""]
-        : [`vielen Dank für Ihr Interesse. Anbei erhalten Sie unser Angebot – Sie können es online ansehen, optionale Leistungen auswählen und mit einem Klick annehmen.`, gueltig ? `Das Angebot ist gültig bis ${gueltig}. Bei Fragen oder Änderungswünschen antworten Sie einfach auf diese Mail.` : ""],
-      knopf: en ? "View quotation" : "Angebot ansehen",
+      titel: d.titel || (tr ? "Teklifiniz" : en ? "Your quotation" : "Ihr Angebot"),
+      absaetze: tr
+        ? [`ilginiz için teşekkür ederiz. Teklifimizi aşağıda bulabilirsiniz – çevrimiçi inceleyebilir, opsiyonel hizmetleri seçebilir ve tek tıkla kabul edebilirsiniz.`, gueltig ? `Teklifin geçerlilik süresi ${gueltig} tarihine kadardır.` : ""]
+        : en
+          ? [`thank you for your interest. Please find our quotation below – you can review it online, select optional services and accept it with one click.`, gueltig ? `The quotation is valid until ${gueltig}.` : ""]
+          : [`vielen Dank für Ihr Interesse. Anbei erhalten Sie unser Angebot – Sie können es online ansehen, optionale Leistungen auswählen und mit einem Klick annehmen.`, gueltig ? `Das Angebot ist gültig bis ${gueltig}. Bei Fragen oder Änderungswünschen antworten Sie einfach auf diese Mail.` : ""],
+      knopf: tr ? "Teklifi görüntüle" : en ? "View quotation" : "Angebot ansehen",
     }
   }
   if (art === "versand" && d.art === "storno") {
     return {
       betreff: `${name} ${nr}`,
       kennung: `${name} ${nr}`,
-      titel: en ? "Cancellation of your invoice" : "Stornierung Ihrer Rechnung",
-      absaetze: [d.einleitung, en ? "No payment is required for the cancelled invoice." : "Für die stornierte Rechnung ist keine Zahlung mehr nötig."],
-      knopf: en ? "View document" : "Dokument ansehen",
+      titel: tr ? "Faturanızın iptali" : en ? "Cancellation of your invoice" : "Stornierung Ihrer Rechnung",
+      absaetze: [d.einleitung, tr ? "İptal edilen fatura için artık ödeme yapmanıza gerek yoktur." : en ? "No payment is required for the cancelled invoice." : "Für die stornierte Rechnung ist keine Zahlung mehr nötig."],
+      knopf: tr ? "Belgeyi görüntüle" : en ? "View document" : "Dokument ansehen",
     }
   }
   if (art === "versand") {
     return {
       betreff: `${name} ${nr}${thema}`,
       kennung: `${name} ${nr}`,
-      titel: en ? `Invoice over ${betrag}` : `Rechnung über ${betrag}`,
-      absaetze: en
-        ? [`thank you for your trust. Please find your invoice below.`, `Please transfer ${betrag} by ${faellig}, quoting ${d.nummer}.`]
-        : [`vielen Dank für Ihr Vertrauen. Anbei erhalten Sie Ihre Rechnung.`, `Bitte überweisen Sie ${betrag} bis zum ${faellig} unter Angabe der Nummer ${d.nummer}.`],
-      knopf: en ? "View invoice" : "Rechnung ansehen",
+      titel: tr ? `${betrag} tutarında fatura` : en ? `Invoice over ${betrag}` : `Rechnung über ${betrag}`,
+      absaetze: tr
+        ? [`güveniniz için teşekkür ederiz. Faturanızı aşağıda bulabilirsiniz.`, `Lütfen ${betrag} tutarını ${faellig} tarihine kadar, açıklama kısmında ${d.nummer} numarasını belirterek havale ediniz.`]
+        : en
+          ? [`thank you for your trust. Please find your invoice below.`, `Please transfer ${betrag} by ${faellig}, quoting ${d.nummer}.`]
+          : [`vielen Dank für Ihr Vertrauen. Anbei erhalten Sie Ihre Rechnung.`, `Bitte überweisen Sie ${betrag} bis zum ${faellig} unter Angabe der Nummer ${d.nummer}.`],
+      knopf: tr ? "Faturayı görüntüle" : en ? "View invoice" : "Rechnung ansehen",
     }
   }
   if (art === "nachfrage") {
     return {
-      betreff: en ? `Follow-up: ${name} ${nr}` : `Kurze Rückfrage zu ${name} ${nr}`,
+      betreff: tr ? `Kısa hatırlatma: ${name} ${nr}` : en ? `Follow-up: ${name} ${nr}` : `Kurze Rückfrage zu ${name} ${nr}`,
       kennung: `${name} ${nr}`,
-      titel: en ? "Any questions about our quotation?" : "Haben Sie Fragen zu unserem Angebot?",
-      absaetze: en
-        ? [`I wanted to briefly follow up on our quotation${thema}. If anything is unclear or you would like changes, just let me know – you can also request changes directly online.`, gueltig ? `The quotation is valid until ${gueltig}.` : ""]
-        : [`ich wollte kurz nachfragen, ob Sie unser Angebot${thema ? ` „${d.titel}“` : ""} schon ansehen konnten. Wenn etwas unklar ist oder Sie Änderungen wünschen, sagen Sie mir einfach Bescheid – das geht auch direkt online.`, gueltig ? `Das Angebot gilt bis ${gueltig}.` : ""],
-      knopf: en ? "View quotation" : "Angebot ansehen",
+      titel: tr ? "Teklifimizle ilgili sorunuz var mı?" : en ? "Any questions about our quotation?" : "Haben Sie Fragen zu unserem Angebot?",
+      absaetze: tr
+        ? [`teklifimizi${thema ? ` „${d.titel}“` : ""} inceleme fırsatınız oldu mu diye kısaca sormak istedim. Bir şey belirsizse veya değişiklik isterseniz bana haber vermeniz yeterli – bunu çevrimiçi olarak da yapabilirsiniz.`, gueltig ? `Teklif ${gueltig} tarihine kadar geçerlidir.` : ""]
+        : en
+          ? [`I wanted to briefly follow up on our quotation${thema}. If anything is unclear or you would like changes, just let me know – you can also request changes directly online.`, gueltig ? `The quotation is valid until ${gueltig}.` : ""]
+          : [`ich wollte kurz nachfragen, ob Sie unser Angebot${thema ? ` „${d.titel}“` : ""} schon ansehen konnten. Wenn etwas unklar ist oder Sie Änderungen wünschen, sagen Sie mir einfach Bescheid – das geht auch direkt online.`, gueltig ? `Das Angebot gilt bis ${gueltig}.` : ""],
+      knopf: tr ? "Teklifi görüntüle" : en ? "View quotation" : "Angebot ansehen",
     }
   }
   if (art === "bestaetigung") {
     return {
-      betreff: en ? `Order confirmation · ${name} ${nr}` : `Auftragsbestätigung · ${name} ${nr}`,
-      kennung: en ? "Order confirmation" : "Auftragsbestätigung",
-      titel: en ? "Thank you – your order is confirmed." : "Vielen Dank – Ihr Auftrag ist bestätigt.",
-      absaetze: en
-        ? [`we have received your acceptance of quotation ${nr} (${betrag}). We will be in touch shortly with the next steps.`, `You can view the accepted version at any time via the link below.`]
-        : [`wir haben Ihre Annahme des Angebots ${nr} (${betrag}) erhalten. Wir melden uns in Kürze mit den nächsten Schritten.`, `Die angenommene Fassung können Sie jederzeit über den Link unten ansehen.`],
-      knopf: en ? "View accepted quotation" : "Angenommenes Angebot ansehen",
+      betreff: tr ? `Sipariş onayı · ${name} ${nr}` : en ? `Order confirmation · ${name} ${nr}` : `Auftragsbestätigung · ${name} ${nr}`,
+      kennung: tr ? "Sipariş onayı" : en ? "Order confirmation" : "Auftragsbestätigung",
+      titel: tr ? "Teşekkürler – siparişiniz onaylandı." : en ? "Thank you – your order is confirmed." : "Vielen Dank – Ihr Auftrag ist bestätigt.",
+      absaetze: tr
+        ? [`${nr} numaralı teklifi (${betrag}) kabul ettiğinize dair onayınızı aldık. Sonraki adımlar için kısa süre içinde sizinle iletişime geçeceğiz.`, `Kabul edilen sürümü aşağıdaki bağlantıdan her zaman görüntüleyebilirsiniz.`]
+        : en
+          ? [`we have received your acceptance of quotation ${nr} (${betrag}). We will be in touch shortly with the next steps.`, `You can view the accepted version at any time via the link below.`]
+          : [`wir haben Ihre Annahme des Angebots ${nr} (${betrag}) erhalten. Wir melden uns in Kürze mit den nächsten Schritten.`, `Die angenommene Fassung können Sie jederzeit über den Link unten ansehen.`],
+      knopf: tr ? "Kabul edilen teklifi görüntüle" : en ? "View accepted quotation" : "Angenommenes Angebot ansehen",
     }
   }
   const stufe = Number(art.slice(-1)) as 1 | 2 | 3
   const titelDe = { 1: "Freundliche Zahlungserinnerung", 2: "1. Mahnung", 3: "2. Mahnung" }[stufe]
   const titelEn = { 1: "Friendly payment reminder", 2: "First reminder", 3: "Final reminder" }[stufe]
+  const titelTr = { 1: "Dostane ödeme hatırlatması", 2: "1. İhtarname", 3: "2. İhtarname" }[stufe]
   const tonDe = {
     1: `sicher ist es im Alltag untergegangen: Die Rechnung ${d.nummer} über ${betrag} war am ${faellig} fällig. Falls Sie bereits überwiesen haben, betrachten Sie diese Nachricht bitte als gegenstandslos.`,
     2: `leider konnten wir zur Rechnung ${d.nummer} über ${betrag} (fällig am ${faellig}) noch keinen Zahlungseingang feststellen. Bitte überweisen Sie den Betrag innerhalb der nächsten 7 Tage.`,
@@ -111,12 +122,18 @@ function inhalt(d: Dokument, art: MailArt): Inhalt {
     2: `we have not yet received payment for invoice ${d.nummer} over ${betrag} (due ${faellig}). Please transfer the amount within the next 7 days.`,
     3: `despite our reminders, invoice ${d.nummer} over ${betrag} (due ${faellig}) is still outstanding. Please settle the amount immediately, within 7 days at the latest. If there is a problem, please contact us directly.`,
   }[stufe]
+  const tonTr = {
+    1: `günlük yoğunlukta gözden kaçmış olabilir: ${betrag} tutarındaki ${d.nummer} numaralı faturanın son ödeme tarihi ${faellig} idi. Eğer ödemeyi zaten yaptıysanız, bu mesajı dikkate almayınız.`,
+    2: `${betrag} tutarındaki ${d.nummer} numaralı fatura (son ödeme tarihi ${faellig}) için maalesef henüz bir ödeme tespit edemedik. Lütfen tutarı önümüzdeki 7 gün içinde havale ediniz.`,
+    3: `hatırlatmalarımıza rağmen ${betrag} tutarındaki ${d.nummer} numaralı fatura (son ödeme tarihi ${faellig}) hâlâ ödenmemiştir. Lütfen tutarı gecikmeksizin, en geç 7 gün içinde ödeyiniz. Bir sorun varsa lütfen doğrudan bizimle iletişime geçiniz.`,
+  }[stufe]
+  const titel = tr ? titelTr : en ? titelEn : titelDe
   return {
-    betreff: `${en ? titelEn : titelDe} · ${name} ${d.nummer}`,
+    betreff: `${titel} · ${name} ${d.nummer}`,
     kennung: `${name} ${d.nummer}`,
-    titel: en ? titelEn : titelDe,
-    absaetze: [en ? tonEn : tonDe],
-    knopf: en ? "View invoice" : "Rechnung ansehen",
+    titel,
+    absaetze: [tr ? tonTr : en ? tonEn : tonDe],
+    knopf: tr ? "Faturayı görüntüle" : en ? "View invoice" : "Rechnung ansehen",
   }
 }
 
@@ -135,7 +152,7 @@ export function dokumentMail(d: Dokument, art: MailArt): { betreff: string; html
   const f = d.absender
   const lang = d.sprache satisfies Sprache
   const absaetze = [anrede(d), ...i.absaetze.filter(Boolean)]
-  const gruss = lang === "en" ? "Kind regards" : "Viele Grüße"
+  const gruss = lang === "en" ? "Kind regards" : lang === "tr" ? "Saygılarımızla" : "Viele Grüße"
   const inhaber = f?.inhaber || "Muhammed Emin Akyol"
 
   const html = `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><title>${esc(i.betreff)}</title></head>

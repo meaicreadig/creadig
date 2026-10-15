@@ -4,11 +4,16 @@ import { useActionState, useState } from "react"
 import { Check, MessageSquareText, X } from "lucide-react"
 
 import { kundeAntwortet, type KundenErgebnis } from "@/app/(finanz)/dokument/[token]/actions"
+import type { Sprache } from "@/lib/finanz/auftraege/rechnen"
 
 type Optional = { index: number; titel: string; betrag: string }
 type Wahl = "angenommen" | "aenderung" | "abgelehnt"
 
-const TEXT = {
+const TEXT: Record<Sprache, {
+  frage: string; annehmen: string; aendern: string; ablehnen: string; optional: string; name: string
+  bestaetigen: string; aenderungLabel: string; grund: string
+  senden: Record<Wahl, string>; sendet: string; danke: string
+}> = {
   de: {
     frage: "Wie möchten Sie fortfahren?",
     annehmen: "Annehmen",
@@ -37,9 +42,23 @@ const TEXT = {
     sendet: "Sending …",
     danke: "Thank you – we have received your response.",
   },
+  tr: {
+    frage: "Nasıl devam etmek istersiniz?",
+    annehmen: "Kabul et",
+    aendern: "Değişiklik talep et",
+    ablehnen: "Reddet",
+    optional: "Opsiyonel hizmetler – dahil edilecekleri seçin",
+    name: "Ad ve soyadınız",
+    bestaetigen: "Bu teklifi bağlayıcı olarak kabul ediyorum.",
+    aenderungLabel: "Neyi uyarlamamızı istersiniz?",
+    grund: "Bize bir sebep belirtmek ister misiniz? (opsiyonel)",
+    senden: { angenommen: "Bağlayıcı olarak kabul et", aenderung: "Değişiklik talebini gönder", abgelehnt: "Teklifi reddet" },
+    sendet: "Gönderiliyor …",
+    danke: "Teşekkürler – yanıtınız bize ulaştı.",
+  },
 }
 
-export function KundenAntwort({ token, sprache, optionale }: { token: string; sprache: "de" | "en"; optionale: Optional[] }) {
+export function KundenAntwort({ token, sprache, optionale }: { token: string; sprache: Sprache; optionale: Optional[] }) {
   const t = TEXT[sprache]
   const [wahl, setWahl] = useState<Wahl>("angenommen")
   const [ergebnis, aktion, laeuft] = useActionState<KundenErgebnis, FormData>(kundeAntwortet.bind(null, token), null)

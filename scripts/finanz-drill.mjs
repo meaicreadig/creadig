@@ -37,8 +37,9 @@ const { FINANZ_SCHEMA } = await import("../lib/finanz/store.ts")
 const { AUFTRAEGE_SCHEMA, speichereFirma, legeEntwurfAn, speichereEntwurf, schreibeFest, ladeDokument,
   ladeDokumentPerToken, ladeVerwandte, ladeVerlauf, verwerfeEntwurf, neueVersion, beantworteAngebot,
   markiereGeoeffnet, rechnungAusAngebot, markiereBezahlt, storniere, anzeigeStatus } = await import("../lib/finanz/auftraege/store.ts")
-const { berechne, steuerModus, leererKunde, leerePosition, heuteBerlin, addTage } = await import("../lib/finanz/auftraege/rechnen.ts")
+const { berechne, steuerModus, leererKunde, leerePosition, heuteBerlin, addTage, formatEuro } = await import("../lib/finanz/auftraege/rechnen.ts")
 const { fehltFuerERechnung, erzeugeXRechnung } = await import("../lib/finanz/auftraege/erechnung.ts")
+const { dokumentMail } = await import("../lib/finanz/auftraege/mail.ts")
 const { ABGLEICH_SCHEMA, gleicheFiberoAb } = await import("../lib/finanz/fibero-abgleich.ts")
 
 for (const s of FINANZ_SCHEMA) await db(s)
@@ -113,10 +114,10 @@ p(rabatt.bruttoCent === rabatt.nettoCent + rabatt.ustCent, "Brutto = Netto + USt
 console.log("\nF2 · Nummernkreis")
 
 await setUstPflichtig(true)
-const neueRechnung = async (kundeDaten, art = "rechnung") => {
+const neueRechnung = async (kundeDaten, art = "rechnung", sprache = "de") => {
   const id = await legeEntwurfAn(db, art, { titel: "ABNAHME Nr.", kunde: kundeDaten })
   await speichereEntwurf(db, id, {
-    sprache: "de", titel: "ABNAHME Nr.", kunde: kundeDaten, datum: heuteBerlin(), gueltigBis: art === "angebot" ? addTage(heuteBerlin(), 30) : null,
+    sprache, titel: "ABNAHME Nr.", kunde: kundeDaten, datum: heuteBerlin(), gueltigBis: art === "angebot" ? addTage(heuteBerlin(), 30) : null,
     zahlungszielTage: 14, leistungszeitraum: "Oktober 2026", einleitung: "", schluss: "", rabattProzent: 0, geschaeftsfeld: "it",
     positionen: [position()],
   })
@@ -326,6 +327,36 @@ const standNach3 = await db(`SELECT lauf_at FROM fin_abgleich WHERE quelle='fibe
 p(standNach3.length === 1, "F5.4 fin_abgleich haelt genau EINE Zeile je Quelle (ON CONFLICT, kein Verlauf von Laeufen)")
 
 globalThis.fetch = echterFetch
+
+/* ══ F6 · Türkisch (TR) auf der Kunden-Dokumentseite ══ */
+console.log("\nF6 · Türkisch (TR)")
+
+p(/€/.test(formatEuro(123456, "tr")) && /1[.,]234[.,]56/.test(formatEuro(123456, "tr")), "formatEuro() liefert ein Ergebnis fuer tr-TR", formatEuro(123456, "tr"))
+
+const trAngebot = await neueRechnung(kunde({ land: "DE", email: "tr-kunde@abnahme.invalid" }), "angebot", "tr")
+const festTrAngebot = await schreibeFest(db, trAngebot)
+p(festTrAngebot.ok, "F6.1 ein TR-Angebot wird genauso festgeschrieben wie DE/EN")
+
+const mailTrAngebot = dokumentMail(festTrAngebot.dok, "versand")
+p(mailTrAngebot.html.includes('lang="tr"'), "F6.2 die Versand-Mail traegt lang=\"tr\"")
+p(mailTrAngebot.betreff.includes("Teklif"), "und der Betreff nennt das Dokument auf Tuerkisch (Teklif statt Angebot/Quotation)")
+p(mailTrAngebot.text.includes("Saygılarımızla"), "und der Gruss steht auf Tuerkisch")
+
+await beantworteAngebot(db, trAngebot, { antwort: "angenommen", name: "ABNAHME TR Kunde", text: "Olur.", quelle: "kunde" })
+const trRechnungId = await rechnungAusAngebot(db, trAngebot, 40)
+const festTrRechnung = await schreibeFest(db, trRechnungId)
+p(festTrRechnung.ok, "F6.3 aus dem angenommenen TR-Angebot entsteht eine sendbare TR-Anzahlungsrechnung")
+p(festTrRechnung.dok.positionen.some((pos) => pos.titel.startsWith("Peşinat %")), "und die Position traegt den tuerkischen Anzahlungstext (Peşinat), nicht den deutschen oder englischen")
+
+const mailTrRechnung = dokumentMail(festTrRechnung.dok, "mahnung_1")
+p(mailTrRechnung.betreff.includes("hatırlatma"), "F6.4 auch die Zahlungserinnerung ist auf Tuerkisch uebersetzt, nicht nur der Versand")
+
+const trStornoId = await storniere(db, trRechnungId, "ABNAHME")
+const trStorno = await ladeDokument(db, trStornoId)
+p(trStorno.einleitung.includes("numaralı faturayı iptal eder"), "F6.5 der Storno-Hinweistext ist auf Tuerkisch — derselbe Satz, den DE/EN schon hatten")
+
+const fehltTr = fehltFuerERechnung(festTrRechnung.dok, festTrRechnung.dok.absender)
+p(fehltTr.length === 0, "F6.6 eine TR-Rechnung ist genauso E-Rechnungs-faehig wie DE/EN — die Sprache des Dokuments ist keine Pflichtangabe")
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await c.end()

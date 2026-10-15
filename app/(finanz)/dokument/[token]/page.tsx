@@ -34,6 +34,17 @@ const HINWEIS = {
     zahlen: "Please transfer the amount using the invoice number as payment reference.",
     drucken: "Print / PDF",
   },
+  tr: {
+    angenommen: (n: string, am: string) => `${am} tarihinde ${n} tarafından kabul edildi. Güveniniz için teşekkür ederiz.`,
+    abgelehnt: "Bu teklifi reddettiniz. Geri bildiriminiz için teşekkür ederiz.",
+    aenderung: "Değişiklik talebiniz bize ulaştı. Kısa süre içinde güncellenmiş bir teklif göndereceğiz.",
+    ersetzt: "Bu teklifin daha yeni bir versiyonu var. Lütfen son e-postadaki bağlantıyı kullanın.",
+    abgelaufen: "Bu teklifin geçerlilik süresi doldu. Bize ulaşın – memnuniyetle yenileriz.",
+    bezahlt: (am: string) => `${am} tarihinde ödendi. Teşekkür ederiz.`,
+    storniert: "Bu fatura iptal edilmiştir.",
+    zahlen: "Lütfen tutarı fatura numarasını açıklama olarak belirterek havale ediniz.",
+    drucken: "Yazdır / PDF",
+  },
 }
 
 export default async function KundenDokument({ params }: { params: Promise<{ token: string }> }) {

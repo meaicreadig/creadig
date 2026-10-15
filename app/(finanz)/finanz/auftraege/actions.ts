@@ -104,7 +104,7 @@ export async function entwurfSpeichern(id: string, roh: Entwurf): Promise<Ergebn
   const positionen = (Array.isArray(roh.positionen) ? roh.positionen : []).slice(0, 80).map((p) => sauberePosition(p, istRechnung)).filter(Boolean) as Position[]
   const datum = ISO.test(String(roh.datum)) ? roh.datum : heuteBerlin()
   const e: Entwurf = {
-    sprache: roh.sprache === "en" ? "en" : "de",
+    sprache: roh.sprache === "en" ? "en" : roh.sprache === "tr" ? "tr" : "de",
     titel: s(roh.titel, 160),
     kunde: saubererKunde(roh.kunde),
     datum,
