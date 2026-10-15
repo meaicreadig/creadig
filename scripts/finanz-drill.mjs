@@ -799,6 +799,74 @@ p(!(await pruefeRateLimit(db, n_schluessel, 10, 60)), "N5 der 11. Versuch innerh
 p(await pruefeRateLimit(db, "ABNAHME-dokument-token-2:203.0.113.9", 10, 60), "N6 ein ANDERER Token (anderer Schlüssel) hat sein eigenes, unabhängiges Kontingent")
 p(await pruefeRateLimit(db, "ABNAHME-dokument-token-1:198.51.100.7", 10, 60), "N7 derselbe Token, aber eine ANDERE IP, hat ebenfalls sein eigenes Kontingent")
 
+/* ══ Z · Ende-zu-Ende (Phase 9) — eine durchgehende Geschichte, auf den Cent ══ */
+console.log("\nZ · Ende-zu-Ende")
+
+const z_kunde = kunde({ name: "ABNAHME Ende-zu-Ende Kunde" })
+const z_jahr = heuteBerlin().slice(0, 4)
+
+/* Angebot → Annahme */
+const z_angebotId = await neueRechnung(z_kunde, "angebot", "de", [position({ preisCent: 300_000 })])
+const z_festAngebot = await schreibeFest(db, z_angebotId)
+p(z_festAngebot.ok && z_festAngebot.dok.summen.bruttoCent === 357000, "Z1 Angebot über 3.000,00 € netto wird festgeschrieben — brutto 3.570,00 € bei 19 %", String(z_festAngebot.dok.summen.bruttoCent))
+p(await beantworteAngebot(db, z_angebotId, { antwort: "angenommen", name: "ABNAHME Kunde", text: "Angenommen.", quelle: "kunde" }), "Z2 Angebot wird angenommen")
+
+/* Rechnung MIT Anzahlung (30 %) */
+const z_reId = await rechnungAusAngebot(db, z_angebotId, 30)
+p(z_reId !== null, "Z3 aus dem angenommenen Angebot entsteht eine Anzahlungsrechnung (30 %)")
+const z_festRe = await schreibeFest(db, z_reId)
+p(z_festRe.ok && z_festRe.dok.summen.nettoCent === 90000 && z_festRe.dok.summen.bruttoCent === 107100,
+  "Z4 die Anzahlungsrechnung lautet exakt auf 900,00 € netto / 1.071,00 € brutto (30 % von 3.000,00 €)", String(z_festRe.dok.summen))
+
+const z_euerVorBezahlung = await berechneEuer(db, z_jahr)
+
+/* Teilzahlung von Hand */
+const z_teil = await erfasseZahlung(db, z_reId, 50000, heuteBerlin(), "manuell", null)
+p(z_teil.ok && z_teil.stand.status === "teilbezahlt" && z_teil.stand.offenCent === 57100, "Z5 eine Teilzahlung von 500,00 € lässt genau 571,00 € offen")
+
+/* Restzahlung über den Bank-Import, automatisch vorgeschlagen und bestätigt */
+await importiereBankUmsaetze(db, [{ ref: "z-restzahlung", datum: heuteBerlin(), betragCent: 57100, verwendungszweck: `Überweisung ${z_festRe.dok.nummer}`, gegenpartei: "ABNAHME Ende-zu-Ende Kunde" }], "csv")
+const z_vorschlag = (await ladeOffeneBankUmsaetze(db)).find((u) => u.id === "z-restzahlung")
+p(z_vorschlag?.vorschlag?.dokumentId === z_reId, "Z6 der Bank-Import schlägt die Restzahlung automatisch der richtigen Rechnung vor (Rechnungsnummer im Verwendungszweck)")
+const z_zuordnung = await bestaetigeZuordnung(db, "z-restzahlung", z_reId)
+p(z_zuordnung.ok && z_zuordnung.stand.status === "bezahlt" && z_zuordnung.stand.offenCent === 0, "Z7 nach der Bestätigung ist die Anzahlungsrechnung vollständig bezahlt, Rest exakt 0")
+
+const z_euerNachBezahlung = await berechneEuer(db, z_jahr)
+p(z_euerNachBezahlung.summeEinnahmenCent - z_euerVorBezahlung.summeEinnahmenCent === 90000,
+  "Z8 die EÜR verbucht die Anzahlung ERST jetzt, bei tatsächlichem Zahlungseingang (Ist-Versteuerung) — exakt 900,00 € netto, kein Cent mehr oder weniger",
+  String(z_euerNachBezahlung.summeEinnahmenCent - z_euerVorBezahlung.summeEinnahmenCent))
+
+/* Eine ZWEITE Rechnung, die storniert wird */
+const z_re2Id = await neueRechnung(z_kunde, "rechnung", "de", [position({ preisCent: 50_000 })])
+const z_festRe2 = await schreibeFest(db, z_re2Id)
+const z_stornoId = await storniere(db, z_re2Id, "ABNAHME Kunde storniert")
+p(z_stornoId !== null, "Z9 die zweite Rechnung wird storniert")
+p((await ladeDokument(db, z_re2Id)).status === "storniert", "Z10 … und steht entsprechend auf `storniert`")
+const z_stornoDok = await ladeDokument(db, z_stornoId)
+p(z_stornoDok?.summen.bruttoCent === -z_festRe2.dok.summen.bruttoCent, "Z11 die Stornorechnung trägt denselben Betrag mit umgekehrtem Vorzeichen — nichts wird gelöscht, nur gegengebucht")
+
+/* Beleg-Upload (ohne Blob — siehe Abschnitt H) */
+await db(
+  `INSERT INTO fin_belege (id, quelle, extern_id, art, datum, haendler, brutto_cent, netto_cent, vorsteuer_cent, kategorie, datei_status)
+   VALUES ('ABNAHME-z-beleg','hand','ABNAHME-sha-z','beleg',$1,'ABNAHME Ende-zu-Ende Lieferant',11900,10000,1900,'Software & Hosting','kopiert')`,
+  [heuteBerlin()],
+)
+p((await ordneZu(db, ["ABNAHME-z-beleg"], "it")) === 1, "Z12 der hochgeladene Beleg wird einem Geschäftsfeld zugeordnet und erzeugt eine Ausgaben-Buchung")
+
+/* Eingehende E-Rechnung (dieselbe Eigenrechnung als CII-Fixtur, wie in Abschnitt I) */
+const z_eingehend = erzeugeXRechnung(z_festRe.dok, z_festRe.dok.absender, true)
+const z_eingehendGelesen = z_eingehend.ok ? await leseERechnung(Buffer.from(z_eingehend.xml, "utf8"), "application/xml") : null
+p(z_eingehendGelesen?.daten.rechnungsnummer === z_festRe.dok.nummer && z_eingehendGelesen?.daten.bruttoCent === 107100,
+  "Z13 eine eingehende E-Rechnung (CII) wird korrekt gelesen — Nummer und Betrag stimmen exakt mit der Ausgangsrechnung überein")
+
+/* Steuerberater-Paket für das Jahr */
+const z_paket = await erzeugeSteuerberaterPaket(db, z_jahr)
+const z_zip = await JSZipMod.loadAsync(z_paket)
+p(z_zip.file(`euer/EUER_${z_jahr}.pdf`) !== null && z_zip.file(`datev/EXTF_Buchungsstapel_${z_jahr}.csv`) !== null,
+  "Z14 das Steuerberater-Paket für das Jahr enthält EÜR-PDF und DATEV-Buchungsstapel — inklusive der gesamten Ende-zu-Ende-Geschichte")
+const z_zipHatAnzahlungsXml = Object.keys(z_zip.files).some((n) => n.startsWith("rechnungen/") && n.includes(z_festRe.dok.nummer))
+p(z_zipHatAnzahlungsXml, "Z15 … und die Anzahlungsrechnung liegt darin auch als eigene XRechnung-XML — dieselbe Nummer, nicht nur eine Zahl in der EÜR")
+
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
 process.exit(fehler === 0 ? 0 : 1)
