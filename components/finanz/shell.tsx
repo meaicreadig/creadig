@@ -1,16 +1,24 @@
 import Link from "next/link"
-import { CalendarClock, Compass, Receipt, Settings, Waves } from "lucide-react"
+import { CalendarClock, Compass, FileCheck2, FileText, Package, Receipt, Settings, Waves } from "lucide-react"
 
 import { Logo } from "@/components/brand/logo"
 import { Abmelden } from "@/components/finanz/anmeldung"
 import { finanzBasis } from "@/lib/finanz/basis"
 
-export type FinanzBereich = "heute" | "geldfluss" | "belege" | "steuern" | "grundlagen"
+export type FinanzBereich = "heute" | "angebote" | "rechnungen" | "leistungen" | "geldfluss" | "belege" | "steuern" | "grundlagen"
 
 type Bereich = { key: FinanzBereich; pfad: string; label: string; Icon: typeof Compass }
 
 const GRUPPEN: { titel: string; bereiche: Bereich[] }[] = [
   { titel: "Cockpit", bereiche: [{ key: "heute", pfad: "", label: "Heute", Icon: Compass }] },
+  {
+    titel: "Aufträge",
+    bereiche: [
+      { key: "angebote", pfad: "/angebote", label: "Angebote", Icon: FileText },
+      { key: "rechnungen", pfad: "/rechnungen", label: "Rechnungen", Icon: FileCheck2 },
+      { key: "leistungen", pfad: "/leistungen", label: "Leistungen", Icon: Package },
+    ],
+  },
   {
     titel: "Geld",
     bereiche: [
@@ -21,8 +29,9 @@ const GRUPPEN: { titel: string; bereiche: Bereich[] }[] = [
   { titel: "Finanzamt", bereiche: [{ key: "steuern", pfad: "/steuern", label: "Steuern", Icon: CalendarClock }] },
 ]
 
+const MOBIL_KEYS: FinanzBereich[] = ["heute", "angebote", "rechnungen", "geldfluss", "steuern"]
 const MOBIL: Bereich[] = [
-  ...GRUPPEN.flatMap((g) => g.bereiche),
+  ...GRUPPEN.flatMap((g) => g.bereiche).filter((b) => MOBIL_KEYS.includes(b.key)),
   { key: "grundlagen", pfad: "/grundlagen", label: "Grundlagen", Icon: Settings },
 ]
 

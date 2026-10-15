@@ -64,7 +64,7 @@ import { localePath } from "@/lib/routes"
  * ueber den Besucher — und der naechste ist ein anderer.
  */
 /* `/termin` gibt es nur einmal: Buchungslinks aus Mails muessen in jeder Browsersprache aufgehen. */
-const SPRACHFREI = /^\/(admin|finanz(\/|$)|api|_next|termin(\/|$)|mail(\/|$)|.*\..*)/
+const SPRACHFREI = /^\/(admin|finanz(\/|$)|dokument(\/|$)|api|_next|termin(\/|$)|mail(\/|$)|.*\..*)/
 const SCHON_UEBERSETZT = /^\/(tr|en|ar)(\/|$)/
 
 function sprachweiche(request: NextRequest) {
@@ -110,7 +110,7 @@ export async function middleware(request: NextRequest) {
    */
   const finanzHost = (request.headers.get("host") ?? "").startsWith("finanz.")
   let intern = pathname
-  if (finanzHost && !/^\/(api|_next|finanz)(\/|$)/.test(pathname) && !/\.[a-z0-9]+$/i.test(pathname)) {
+  if (finanzHost && !/^\/(api|_next|finanz|dokument)(\/|$)/.test(pathname) && !/\.[a-z0-9]+$/i.test(pathname)) {
     intern = pathname === "/" ? "/finanz" : `/finanz${pathname}`
   }
   if (intern === "/finanz" || intern.startsWith("/finanz/")) {
