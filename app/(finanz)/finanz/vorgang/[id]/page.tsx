@@ -21,6 +21,7 @@ import { GESCHAEFTSFELDER } from "@/lib/finanz/belege"
 import { ART_LABEL, formatEuro, heuteBerlin, naechsteMahnstufe, steuerModus, tageZwischen } from "@/lib/finanz/auftraege/rechnen"
 import { anzeigeStatus, ladeDokument, ladeFirma, ladeKunden, ladeLeistungen, ladeVerlauf, ladeVerwandte } from "@/lib/finanz/auftraege/store"
 import { dokumentUrl } from "@/lib/finanz/auftraege/mail"
+import { fehltFuerERechnung } from "@/lib/finanz/auftraege/erechnung"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Vorgang" }
@@ -53,6 +54,7 @@ export default async function Vorgang({ params }: { params: Promise<{ id: string
   if (!d || d.status === "verworfen") notFound()
   const basis = await finanzBasis()
   const { firma, ustPflichtig } = await ladeFirma(db)
+  const eFehlt = fehltFuerERechnung(d, d.absender ?? firma)
   const modus = steuerModus(d.kunde, ustPflichtig)
   const bereich = d.art === "angebot" ? "angebote" : "rechnungen"
   const status = anzeigeStatus(d)
@@ -105,6 +107,17 @@ export default async function Vorgang({ params }: { params: Promise<{ id: string
           {url && <LinkKopieren url={url} />}
           {url && <a href={url} target="_blank" rel="noreferrer" className="bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition-colors">Kundenansicht</a>}
           <DruckKnopf />
+          {d.art === "rechnung" && d.nummer && (
+            eFehlt.length === 0 ? (
+              <a href={`/api/finanz/erechnung/${d.id}`} download className="bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition-colors">
+                E-Rechnung (XRechnung)
+              </a>
+            ) : (
+              <span title={eFehlt.join(" · ")} className="text-muted-foreground bg-secondary/60 inline-flex cursor-help items-center rounded-full px-4 py-2 text-sm">
+                E-Rechnung: {eFehlt.length} Angabe{eFehlt.length === 1 ? "" : "n"} fehlt
+              </span>
+            )
+          )}
           {d.status === "versendet" && <NachfassKnopf id={d.id} label="Erneut senden" erneut />}
           {d.art === "angebot" && d.status === "versendet" && <NachfassKnopf id={d.id} label="Nachfrage senden" />}
           {mahn && <NachfassKnopf id={d.id} label={["", "Zahlungserinnerung", "1. Mahnung", "2. Mahnung"][mahn]} />}

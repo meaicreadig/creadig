@@ -178,7 +178,11 @@ ${eckdaten(d).map(([k, v]) => `<tr><td style="padding:12px 20px;font-size:13px;c
 
 export type MailErgebnis = { ok: true } | { ok: false; grund: string }
 
-export async function sendeDokumentMail(d: Dokument, art: MailArt): Promise<MailErgebnis> {
+export async function sendeDokumentMail(
+  d: Dokument,
+  art: MailArt,
+  anhang?: { dateiname: string; inhalt: string },
+): Promise<MailErgebnis> {
   const key = process.env.RESEND_API_KEY?.trim()
   const from = process.env.MAIL_FROM?.trim() || process.env.LEAD_FROM?.trim()
   if (!key || !from) return { ok: false, grund: "Mailversand ist nicht eingerichtet (RESEND_API_KEY / LEAD_FROM)." }
@@ -195,6 +199,7 @@ export async function sendeDokumentMail(d: Dokument, art: MailArt): Promise<Mail
       subject: m.betreff,
       html: m.html,
       text: m.text,
+      ...(anhang ? { attachments: [{ filename: anhang.dateiname, content: Buffer.from(anhang.inhalt, "utf8").toString("base64") }] } : {}),
     }),
   })
   if (!res.ok) return { ok: false, grund: `Versand fehlgeschlagen (Resend ${res.status}).` }
