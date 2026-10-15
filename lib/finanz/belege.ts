@@ -260,6 +260,42 @@ export async function ordneHaendlerZu(db: Abfrage, haendler: string, feld: Gesch
   return r.length
 }
 
+export type BelegExport = {
+  id: string
+  datum: string | null
+  haendler: string
+  bruttoCent: number
+  kategorie: string
+  geschaeftsfeld: Geschaeftsfeld | null
+  dateiPfad: string | null
+  dateiTyp: string | null
+  dateiName: string | null
+  erechnungXml: string | null
+}
+
+/** Alle Belege eines Jahres mit kopierter Datei — fürs Steuerberater-Paket (Phase 5), nicht auf die Eingangskorb-Seitenbegrenzung beschränkt. */
+export async function ladeBelegeFuerExport(db: Abfrage, jahr: string): Promise<BelegExport[]> {
+  await belegeSchema(db)
+  const r = await db(
+    `SELECT id, to_char(datum,'YYYY-MM-DD') AS datum, haendler, brutto_cent, kategorie, geschaeftsfeld,
+            datei_pfad, datei_typ, datei_quelle_pfad, erechnung_xml
+       FROM fin_belege WHERE datum >= $1 AND datum < $2 AND datei_status = 'kopiert' ORDER BY datum`,
+    [`${jahr}-01-01`, `${Number(jahr) + 1}-01-01`],
+  )
+  return r.map((x) => ({
+    id: String(x.id),
+    datum: x.datum ? String(x.datum) : null,
+    haendler: String(x.haendler ?? ""),
+    bruttoCent: n(x.brutto_cent),
+    kategorie: String(x.kategorie ?? ""),
+    geschaeftsfeld: x.geschaeftsfeld && istGeschaeftsfeld(String(x.geschaeftsfeld)) ? (String(x.geschaeftsfeld) as Geschaeftsfeld) : null,
+    dateiPfad: x.datei_pfad ? String(x.datei_pfad) : null,
+    dateiTyp: x.datei_typ ? String(x.datei_typ) : null,
+    dateiName: x.datei_quelle_pfad ? (String(x.datei_quelle_pfad).split("/").pop() ?? null) : null,
+    erechnungXml: x.erechnung_xml ? String(x.erechnung_xml) : null,
+  }))
+}
+
 export async function dateiVon(db: Abfrage, id: string): Promise<{ pfad: string; typ: string | null; name: string } | null> {
   const [r] = await db(`SELECT datei_pfad, datei_typ, datei_quelle_pfad FROM fin_belege WHERE id = $1 AND datei_status = 'kopiert'`, [id])
   if (!r?.datei_pfad) return null

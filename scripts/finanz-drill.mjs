@@ -40,6 +40,12 @@ const { BELEGE_SCHEMA, ordneZu, ladeBelege } = await import("../lib/finanz/beleg
 const { leseERechnungXml, leseERechnung, leseEingebettetesXml } = await import("../lib/finanz/e-eingang.ts")
 const { paragraph19Status } = await import("../lib/finanz/paragraph19.ts")
 const { berechneLage } = await import("../lib/finanz/lage.ts")
+const { berechneEuer } = await import("../lib/finanz/euer.ts")
+const { erzeugeDatevCsv } = await import("../lib/finanz/datev.ts")
+const { erzeugeEuerPdf } = await import("../lib/finanz/euer-pdf.ts")
+const { erzeugeRechnungsPdf } = await import("../lib/finanz/auftraege/pdf.ts")
+const { erzeugeSteuerberaterPaket } = await import("../lib/finanz/steuerberater-export.ts")
+const JSZipMod = (await import("jszip")).default
 
 for (const s of FINANZ_SCHEMA) await db(s)
 for (const s of AUFTRAEGE_SCHEMA) await db(s)
@@ -563,6 +569,67 @@ p(j_lage.hinweise.some((h) => h.text.includes("§ 19")), "J10 der Kompass zeigt 
 await setUstPflichtig(true)
 const j_lageUmgestellt = await berechneLage(db)
 p(j_lageUmgestellt.paragraph19 === null, "J11 nach der Umstellung auf umsatzsteuerpflichtig zeigt der Kompass die § 19-Ampel nicht mehr — sie gilt nicht mehr")
+
+/* ══ K · EÜR, DATEV-Export, Steuerberater-Paket (Phase 5) ══ */
+console.log("\nK · EÜR und Steuerberater-Paket")
+
+const k_jahr = heuteBerlin().slice(0, 4)
+/*
+ * Vorher/Nachher-Differenz statt absoluter Summen: andere Abschnitte dieses
+ * Laufs (F2/F4/J) haben im selben Jahr bereits eigene echte Buchungen
+ * gebucht. Die Probe prueft deshalb, was DIESE Fixtur veraendert, nicht den
+ * globalen Stand.
+ */
+const k_vorher = await berechneEuer(db, k_jahr)
+await db(`INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, quelle) VALUES
+  ('ABNAHME-k-ein-1','einnahme','gebucht',$1,500000,0,'Projekt / Kunde','ABNAHME Kunde A','manuell'),
+  ('ABNAHME-k-ein-2','einnahme','gebucht',$1,119000,19,'Beratung','ABNAHME Kunde B','manuell'),
+  ('ABNAHME-k-aus-1','ausgabe','gebucht',$1,23800,19,'Software & Hosting','ABNAHME Anbieter','manuell'),
+  ('ABNAHME-k-aus-2','ausgabe','gebucht',$1,100000,0,'Privatentnahme',NULL,'manuell'),
+  ('ABNAHME-k-storniert','einnahme','gebucht',$1,999900,19,'Sonstiges','ABNAHME Storno','manuell')`,
+  [`${k_jahr}-04-01`])
+await db(`UPDATE fin_buchungen SET storniert_at = now() WHERE id = 'ABNAHME-k-storniert'`)
+
+const k_euer = await berechneEuer(db, k_jahr)
+const k_erwarteteEinnahmenDelta = 500000 + Math.round((119000 * 100) / 119)
+const k_erwarteteAusgabenDelta = 20000 // 23800 brutto bei 19 % → 20000 netto — die EÜR rechnet netto, nicht brutto
+p(k_euer.summeEinnahmenCent - k_vorher.summeEinnahmenCent === k_erwarteteEinnahmenDelta,
+  "K1 EÜR-Einnahmen steigen genau um die beiden NICHT-stornierten Buchungen (netto, § 19 + 19 % gemischt) — die stornierte zählt nicht mit",
+  String(k_euer.summeEinnahmenCent - k_vorher.summeEinnahmenCent))
+p(k_euer.summeAusgabenCent - k_vorher.summeAusgabenCent === k_erwarteteAusgabenDelta,
+  "K2 EÜR-Ausgaben steigen nur um die EINE abzugsfähige Buchung — die Privatentnahme zählt NICHT als Betriebsausgabe")
+p(k_euer.ausgaben.every((a) => a.kategorie !== "Privatentnahme"), "K3 Privatentnahme taucht in der Ausgabenliste selbst gar nicht erst auf")
+p(k_euer.privatentnahmeCent - k_vorher.privatentnahmeCent === 100000, "K4 Privatentnahme steht trotzdem nachrichtlich (bewegt das Konto, nicht den Gewinn)")
+p(k_euer.gewinnCent === k_euer.summeEinnahmenCent - k_euer.summeAusgabenCent, "K5 Gewinn = Einnahmen minus Ausgaben, nachgerechnet")
+
+const k_csv = erzeugeDatevCsv(
+  [{ datum: `${k_jahr}-04-01`, bruttoCent: 119000, ustSatz: 19, art: "einnahme", kategorie: "Beratung", gegenpartei: "ABNAHME Kunde B", belegnummer: "RE-ABNAHME-0001" }],
+  k_jahr,
+)
+const k_zeilen = k_csv.trim().split("\r\n")
+p(k_zeilen[0].startsWith('"EXTF";700;21;'), "K6 DATEV-CSV: Kopfzeile beginnt mit dem gültigen EXTF-Kennzeichen", k_zeilen[0].slice(0, 30))
+const k_spaltenAnzahl = k_zeilen[1].split(";").length
+p(k_zeilen[2].split(";").length === k_spaltenAnzahl, "K7 die Datenzeile hat exakt so viele Felder wie die Spaltenkopfzeile")
+p(k_zeilen[2].split(";")[0] === "1190,00", "K8 der Betrag steht mit Komma als Dezimaltrennzeichen (DATEV-Format)", k_zeilen[2].split(";")[0])
+p(k_zeilen[2].includes("RE-ABNAHME-0001"), "K9 die Rechnungsnummer steht im Belegfeld 1")
+p(k_zeilen[2].split(";")[8] === "3", "K10 BU-Schlüssel 3 (USt 19 % auf Erlöse) wird korrekt gesetzt")
+
+const k_euerPdf = await erzeugeEuerPdf(k_euer, TESTFIRMA.name)
+p(Buffer.from(k_euerPdf.slice(0, 5)).toString("latin1") === "%PDF-", "K11 die EÜR-PDF ist eine echte PDF-Datei")
+
+const k_rechnungPdf = await erzeugeRechnungsPdf(fest2.dok, fest2.dok.absender)
+p(Buffer.from(k_rechnungPdf.slice(0, 5)).toString("latin1") === "%PDF-" && k_rechnungPdf.length > 500,
+  "K12 eine Ausgangsrechnung lässt sich als eigenständige PDF erzeugen (ohne Headless-Browser)")
+
+const k_paket = await erzeugeSteuerberaterPaket(db, k_jahr)
+const k_zip = await JSZipMod.loadAsync(k_paket)
+p(k_zip.file(`euer/EUER_${k_jahr}.pdf`) !== null, "K13 Steuerberater-Paket enthält die EÜR-PDF")
+p(k_zip.file(`datev/EXTF_Buchungsstapel_${k_jahr}.csv`) !== null, "K14 … den DATEV-Buchungsstapel")
+p(k_zip.file("PRUEFSUMMEN.sha256") !== null, "K15 … eine Prüfsummenliste")
+const k_pruefsummen = await k_zip.file("PRUEFSUMMEN.sha256").async("string")
+p(/^[0-9a-f]{64}  /.test(k_pruefsummen.trim().split("\n")[0]), "K16 jede Zeile der Prüfsummenliste trägt einen echten SHA-256-Hash")
+p(Object.keys(k_zip.files).some((n) => n.startsWith("rechnungen/") && n.endsWith(".xml")),
+  "K17 mindestens eine Ausgangsrechnung liegt auch als XRechnung-XML im Paket")
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
