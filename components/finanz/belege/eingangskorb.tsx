@@ -1,4 +1,4 @@
-import { FileText, Paperclip } from "lucide-react"
+import { FileCheck2, FileText, Paperclip } from "lucide-react"
 
 import { zuordnen } from "@/app/(finanz)/finanz/belege/actions"
 import { GESCHAEFTSFELDER, type Beleg, type BelegeUebersicht } from "@/lib/finanz/belege"
@@ -41,6 +41,13 @@ function BelegZeile({ b, basis, zugeordnet }: { b: Beleg; basis: string; zugeord
               .filter(Boolean)
               .join(" · ")}
           </span>
+          {b.erechnung && (
+            <span className="text-primary mt-0.5 flex items-center gap-1.5 text-xs font-medium">
+              <FileCheck2 className="size-3.5 shrink-0" aria-hidden />
+              E-Rechnung ({b.erechnung.format.toUpperCase()}){b.erechnung.nummer ? ` · Nr. ${b.erechnung.nummer}` : ""}
+              {b.erechnung.iban ? ` · IBAN ${b.erechnung.iban}` : ""}
+            </span>
+          )}
         </div>
       </div>
       <div className="flex shrink-0 flex-col gap-2 md:items-end">

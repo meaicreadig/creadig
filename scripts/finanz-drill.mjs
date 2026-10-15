@@ -18,6 +18,7 @@
  * werden nie in echte Produktionsdaten geschrieben — dieselbe Wegwerf-
  * Datenbank-Disziplin wie rechnung-drill.mjs & Co.
  */
+import { PDFDocument } from "pdf-lib"
 import { oeffneDrillDb } from "./lib/drill-db.mjs"
 
 let fehler = 0
@@ -35,7 +36,8 @@ const { berechne, steuerModus, leererKunde, leerePosition, heuteBerlin, addTage,
 const { fehltFuerERechnung, erzeugeXRechnung } = await import("../lib/finanz/auftraege/erechnung.ts")
 const { dokumentMail } = await import("../lib/finanz/auftraege/mail.ts")
 const { ABGLEICH_SCHEMA, gleicheFiberoAb } = await import("../lib/finanz/fibero-abgleich.ts")
-const { BELEGE_SCHEMA, ordneZu } = await import("../lib/finanz/belege.ts")
+const { BELEGE_SCHEMA, ordneZu, ladeBelege } = await import("../lib/finanz/belege.ts")
+const { leseERechnungXml, leseERechnung, leseEingebettetesXml } = await import("../lib/finanz/e-eingang.ts")
 
 for (const s of FINANZ_SCHEMA) await db(s)
 for (const s of AUFTRAEGE_SCHEMA) await db(s)
@@ -466,6 +468,65 @@ const nachZweitemZuordnen = await db(`SELECT count(*) n FROM fin_buchungen WHERE
 p(Number(nachZweitemZuordnen[0].n) === 1, "H6 ein zweites Mal zuordnen erzeugt KEINE zweite Buchung (idempotent ueber die feste ID)")
 p(await wirft(() => db(`UPDATE fin_buchungen SET brutto_cent = 1 WHERE id = $1`, [`beleg-${belegId}`])),
   "H7 die entstandene Buchung ist danach so unveraenderbar wie jede andere gebuchte Zeile (GoBD-Trigger aus F7 gilt auch hier)")
+
+/* ══ I · Eingehende E-Rechnungen (Phase 3) — UBL, CII, ZUGFeRD ══ */
+console.log("\nI · Eingehende E-Rechnung (UBL/CII/ZUGFeRD)")
+
+const i_cii = erzeugeXRechnung(fest2.dok, fest2.dok.absender, true)
+p(i_cii.ok, "I1 Fixtur: die eigene CII-Ausgangsrechnung (re2) dient als CII-Probe fuer das Lesen")
+const i_ciiGelesen = i_cii.ok ? leseERechnungXml(i_cii.xml) : null
+p(i_ciiGelesen?.format === "cii", "I2 CII wird als CII erkannt")
+p(i_ciiGelesen?.rechnungsnummer === fest2.dok.nummer, "I3 CII: Rechnungsnummer korrekt gelesen", i_ciiGelesen?.rechnungsnummer)
+p(i_ciiGelesen?.bruttoCent === fest2.dok.summen.bruttoCent, "I4 CII: Bruttobetrag korrekt gelesen (Cent)", String(i_ciiGelesen?.bruttoCent))
+p(i_ciiGelesen?.iban !== null && i_ciiGelesen.iban === TESTFIRMA.iban, "I5 CII: IBAN korrekt gelesen")
+
+const i_ublXml = `<?xml version="1.0" encoding="UTF-8"?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+  xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+  xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+  <cbc:ID>ABNAHME-UBL-2026-0007</cbc:ID>
+  <cbc:IssueDate>2026-09-15</cbc:IssueDate>
+  <cbc:DueDate>2026-09-29</cbc:DueDate>
+  <cac:AccountingSupplierParty><cac:Party>
+    <cac:PartyLegalEntity><cbc:RegistrationName>ABNAHME UBL Lieferant AG</cbc:RegistrationName></cac:PartyLegalEntity>
+  </cac:Party></cac:AccountingSupplierParty>
+  <cac:PaymentMeans><cac:PayeeFinancialAccount><cbc:ID>DE02500105170137075030</cbc:ID></cac:PayeeFinancialAccount></cac:PaymentMeans>
+  <cac:TaxTotal><cbc:TaxAmount currencyID="EUR">190.00</cbc:TaxAmount></cac:TaxTotal>
+  <cac:LegalMonetaryTotal>
+    <cbc:TaxExclusiveAmount currencyID="EUR">1000.00</cbc:TaxExclusiveAmount>
+    <cbc:PayableAmount currencyID="EUR">1190.00</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+</Invoice>`
+const i_ublGelesen = leseERechnungXml(i_ublXml)
+p(i_ublGelesen?.format === "ubl", "I6 UBL wird als UBL erkannt (derselbe Parser, andere Syntax)")
+p(i_ublGelesen?.lieferant === "ABNAHME UBL Lieferant AG", "I7 UBL: Lieferant korrekt gelesen")
+p(i_ublGelesen?.bruttoCent === 119000 && i_ublGelesen?.nettoCent === 100000 && i_ublGelesen?.ustCent === 19000, "I8 UBL: Netto/USt/Brutto korrekt gelesen")
+p(i_ublGelesen?.faellig === "2026-09-29", "I9 UBL: Faelligkeit korrekt gelesen")
+
+const i_pdf = await PDFDocument.create()
+i_pdf.addPage([200, 200])
+await i_pdf.attach(Buffer.from(i_cii.ok ? i_cii.xml : "", "utf-8"), "factur-x.xml", { mimeType: "application/xml", description: "Factur-X/ZUGFeRD" })
+const i_pdfBytes = await i_pdf.save()
+const i_eingebettet = await leseEingebettetesXml(i_pdfBytes)
+p(i_eingebettet !== null && i_eingebettet.includes(fest2.dok.nummer), "I10 ZUGFeRD: eingebettetes XML wird aus dem PDF extrahiert")
+const i_zugferd = await leseERechnung(Buffer.from(i_pdfBytes), "application/pdf")
+p(i_zugferd?.daten.format === "cii" && i_zugferd?.daten.rechnungsnummer === fest2.dok.nummer,
+  "I11 ZUGFeRD-PDF liefert am Ende dieselbe CII-Extraktion wie die reine XML-Datei")
+
+p(leseERechnungXml("Das ist kein XML, sondern ein Kassenbon-Foto als Text-Blob.") === null,
+  "I12 ein normaler Beleg (kein UBL/CII) wird NICHT als E-Rechnung fehlinterpretiert — null, kein Rateversuch")
+
+// Readable-view: Original-XML + extrahierte Felder landen in fin_belege und sind ueber ladeBelege() sichtbar.
+const i_belegId = "ABNAHME-erechnung-1"
+await db(
+  `INSERT INTO fin_belege (id, quelle, extern_id, art, datum, haendler, brutto_cent, netto_cent, vorsteuer_cent, kategorie, datei_status, erechnung_format, erechnung_xml, erechnung_nummer, erechnung_iban)
+   VALUES ($1,'hand','ABNAHME-sha-erechnung','beleg',$2,$3,$4,$5,$6,'Fremdleistung','kopiert','ubl',$7,$8,$9)`,
+  [i_belegId, i_ublGelesen.datum, i_ublGelesen.lieferant, i_ublGelesen.bruttoCent, i_ublGelesen.nettoCent, i_ublGelesen.ustCent, i_ublXml, i_ublGelesen.rechnungsnummer, i_ublGelesen.iban],
+)
+const i_uebersicht = await ladeBelege(db, null)
+const i_korbEintrag = i_uebersicht.korb.find((b) => b.id === i_belegId)
+p(i_korbEintrag?.erechnung?.format === "ubl" && i_korbEintrag?.erechnung?.nummer === "ABNAHME-UBL-2026-0007" && i_korbEintrag?.erechnung?.iban === "DE02500105170137075030",
+  "I13 die lesbare Ansicht (ladeBelege) zeigt Format/Nummer/IBAN — kein rohes XML, aber auch nichts verloren")
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()

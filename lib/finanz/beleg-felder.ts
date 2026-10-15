@@ -16,4 +16,12 @@ export type Geschaeftsfeld = (typeof GESCHAEFTSFELDER)[number]["key"]
 export const istGeschaeftsfeld = (v: string): v is Geschaeftsfeld => GESCHAEFTSFELDER.some((g) => g.key === v)
 
 export const HAND_UPLOAD_MAX_BYTES = 20 * 1024 * 1024
-export const HAND_UPLOAD_TYPEN = ["application/pdf", "image/jpeg", "image/png", "image/heic", "image/heif"] as const
+export const HAND_UPLOAD_TYPEN = [
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/heic",
+  "image/heif",
+  "application/xml",
+  "text/xml",
+] as const

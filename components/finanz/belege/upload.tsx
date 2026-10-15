@@ -2,7 +2,7 @@
 
 import { useActionState, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Sparkles, Upload } from "lucide-react"
+import { FileCheck2, Loader2, Sparkles, Upload } from "lucide-react"
 
 import { auslesen, hochladen } from "@/app/(finanz)/finanz/belege/actions"
 import { AdminField, AdminInput, AdminSelect, AdminTextarea } from "@/components/admin/primitives"
@@ -10,10 +10,15 @@ import { GESCHAEFTSFELDER, HAND_UPLOAD_MAX_BYTES, HAND_UPLOAD_TYPEN } from "@/li
 
 const ANNEHMEN = HAND_UPLOAD_TYPEN.join(",")
 const MAX_MB = Math.round(HAND_UPLOAD_MAX_BYTES / 1024 / 1024)
+const KOENNTE_E_RECHNUNG_SEIN = (typ: string) => typ === "application/pdf" || typ === "application/xml" || typ === "text/xml"
+
+type ERechnungStand = { format: "ubl" | "cii"; xml: string; nummer: string | null; iban: string | null } | null
 
 /**
- * Beleg selbst hochladen (Phase 2) — Drag & Drop oder Handy-Kamera. Die KI
- * liest optional vor, der Mensch bestaetigt immer: kein Feld wird
+ * Beleg selbst hochladen (Phase 2+3) — Drag & Drop oder Handy-Kamera. Zuerst
+ * der kostenlose, deterministische E-Rechnung-Parser (UBL/CII, auch aus
+ * ZUGFeRD-PDF) — erst wenn der nichts findet, der optionale KI-Vorschlag
+ * fuer ein normales Foto. Der Mensch bestaetigt immer: kein Feld wird
  * uebernommen, ohne dass es im Formular sichtbar steht und editierbar bleibt.
  */
 export function BelegUpload({ bereit, kiBereit }: { bereit: boolean; kiBereit: boolean }) {
@@ -22,6 +27,7 @@ export function BelegUpload({ bereit, kiBereit }: { bereit: boolean; kiBereit: b
   const [dateiName, setDateiName] = useState<string | null>(null)
   const [liestAus, setLiestAus] = useState(false)
   const [hinweis, setHinweis] = useState<string | null>(null)
+  const [eRechnung, setERechnung] = useState<ERechnungStand>(null)
   const [felder, setFelder] = useState({ datum: "", haendler: "", betrag: "", ustSatz: "19", kategorie: "", geschaeftsfeld: "", notiz: "" })
   const [ergebnis, aktion, sendetGerade] = useActionState(hochladen, null)
 
@@ -37,7 +43,8 @@ export function BelegUpload({ bereit, kiBereit }: { bereit: boolean; kiBereit: b
     if (!datei) return
     setDateiName(datei.name)
     setHinweis(null)
-    if (!kiBereit) return
+    setERechnung(null)
+    if (!kiBereit && !KOENNTE_E_RECHNUNG_SEIN(datei.type)) return
     setLiestAus(true)
     try {
       const fd = new FormData()
@@ -52,8 +59,13 @@ export function BelegUpload({ bereit, kiBereit }: { bereit: boolean; kiBereit: b
           ustSatz: r.vorschlag.ustSatz !== null ? String(r.vorschlag.ustSatz) : f.ustSatz,
           kategorie: r.vorschlag.kategorie ?? f.kategorie,
         }))
-        setHinweis("Vorschlag der KI eingetragen — bitte prüfen und bei Bedarf korrigieren.")
-      } else {
+        if (r.quelle === "erechnung") {
+          setERechnung({ format: r.format, xml: r.xml, nummer: r.rechnungsnummer, iban: r.iban })
+          setHinweis(`E-Rechnung erkannt (${r.format.toUpperCase()}) — Felder aus dem Original übernommen, bitte prüfen.`)
+        } else {
+          setHinweis("Vorschlag der KI eingetragen — bitte prüfen und bei Bedarf korrigieren.")
+        }
+      } else if (kiBereit || KOENNTE_E_RECHNUNG_SEIN(datei.type)) {
         setHinweis(r.fehler)
       }
     } finally {
@@ -88,6 +100,14 @@ export function BelegUpload({ bereit, kiBereit }: { bereit: boolean; kiBereit: b
         }}
         onDragOver={(e) => e.preventDefault()}
       >
+        {eRechnung && (
+          <>
+            <input type="hidden" name="erechnungFormat" value={eRechnung.format} />
+            <input type="hidden" name="erechnungXml" value={eRechnung.xml} />
+            <input type="hidden" name="erechnungNummer" value={eRechnung.nummer ?? ""} />
+            <input type="hidden" name="erechnungIban" value={eRechnung.iban ?? ""} />
+          </>
+        )}
         <label
           htmlFor="beleg-datei"
           className="border-border bg-background hover:border-primary flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed px-6 py-8 text-center transition-colors"
@@ -147,7 +167,8 @@ export function BelegUpload({ bereit, kiBereit }: { bereit: boolean; kiBereit: b
 
         {hinweis && (
           <p className="bg-secondary text-secondary-foreground flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm">
-            <Sparkles className="size-4 shrink-0" aria-hidden /> {hinweis}
+            {eRechnung ? <FileCheck2 className="size-4 shrink-0" aria-hidden /> : <Sparkles className="size-4 shrink-0" aria-hidden />} {hinweis}
+            {eRechnung?.iban && <span className="font-mono text-xs">· IBAN {eRechnung.iban}</span>}
           </p>
         )}
         {ergebnis && !ergebnis.ok && <p className="text-destructive text-sm">{ergebnis.fehler}</p>}

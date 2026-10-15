@@ -48,6 +48,16 @@ export const BELEGE_SCHEMA = [
     UNIQUE (quelle, extern_id))`,
   `CREATE INDEX IF NOT EXISTS fin_belege_korb_idx ON fin_belege (geschaeftsfeld, datum DESC)`,
   `CREATE INDEX IF NOT EXISTS fin_belege_datei_idx ON fin_belege (datei_status)`,
+  /*
+   * Phase 3 — eingehende E-Rechnung (UBL/CII, auch aus ZUGFeRD/Factur-X-PDF
+   * ausgelesen). Das Original-XML bleibt stehen, unabhaengig davon, was der
+   * Mensch nachher an den uebrigen Feldern korrigiert — siehe
+   * lib/finanz/e-eingang.ts und "Lesbare Ansicht" in eingangskorb.tsx.
+   */
+  `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS erechnung_format text CHECK (erechnung_format IN ('ubl','cii'))`,
+  `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS erechnung_xml text`,
+  `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS erechnung_nummer text`,
+  `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS erechnung_iban text`,
   `CREATE TABLE IF NOT EXISTS fin_kopierlaeufe (
     id text PRIMARY KEY,
     quelle text NOT NULL,
@@ -83,6 +93,8 @@ export type Beleg = {
   archiviert: boolean
   hatDatei: boolean
   dateiName: string | null
+  /** Nur gesetzt, wenn eine eingehende E-Rechnung (UBL/CII, auch aus ZUGFeRD-PDF) erkannt wurde. */
+  erechnung: { format: "ubl" | "cii"; nummer: string | null; iban: string | null } | null
 }
 
 export type Kennzahlen = {
@@ -113,10 +125,14 @@ function zuBeleg(r: Record<string, unknown>): Beleg {
     archiviert: Boolean(r.archiviert),
     hatDatei: r.datei_status === "kopiert",
     dateiName: pfad ? pfad.split("/").pop() ?? pfad : null,
+    erechnung:
+      r.erechnung_format === "ubl" || r.erechnung_format === "cii"
+        ? { format: r.erechnung_format, nummer: r.erechnung_nummer ? String(r.erechnung_nummer) : null, iban: r.erechnung_iban ? String(r.erechnung_iban) : null }
+        : null,
   }
 }
 
-const SPALTEN = `id, art, to_char(datum,'YYYY-MM-DD') AS datum, haendler, brutto_cent, vorsteuer_cent, kategorie,
+const SPALTEN = `id, art, to_char(datum,'YYYY-MM-DD') AS datum, haendler, brutto_cent, vorsteuer_cent, kategorie, erechnung_format, erechnung_nummer, erechnung_iban,
   geschaeftsfeld, archiviert, datei_status, datei_quelle_pfad`
 
 /** Die Ist-Werte aus Finanz — gleiche Definition wie die Soll-Werte der Quelle. */
@@ -265,6 +281,8 @@ export type BelegEingabe = {
   kategorie: string
   geschaeftsfeld: Geschaeftsfeld | null
   notiz: string
+  /** Gesetzt, wenn die Datei als UBL/CII erkannt wurde (auch aus einem ZUGFeRD-PDF) — das Original-XML bleibt erhalten. */
+  erechnung: { format: "ubl" | "cii"; xml: string; nummer: string | null; iban: string | null } | null
 }
 
 export type HochladenErgebnis = { ok: true; id: string; doppelt: boolean } | { ok: false; fehler: string }
@@ -297,11 +315,13 @@ export async function ladeBelegHoch(db: Abfrage, datei: Blob, eingabe: BelegEing
   const id = randomUUID()
   await db(
     `INSERT INTO fin_belege (id, quelle, extern_id, art, datum, haendler, brutto_cent, netto_cent, vorsteuer_cent, kategorie,
-       geschaeftsfeld, zugeordnet_at, datei_status, datei_pfad, datei_sha256, datei_bytes, datei_typ, rohdaten)
-     VALUES ($1,'hand',$2,'beleg',$3,$4,$5,$6,$7,$8,$9,CASE WHEN $9::text IS NULL THEN NULL ELSE now() END,'kopiert',$10,$11,$12,$13,$14::jsonb)`,
+       geschaeftsfeld, zugeordnet_at, datei_status, datei_pfad, datei_sha256, datei_bytes, datei_typ, rohdaten,
+       erechnung_format, erechnung_xml, erechnung_nummer, erechnung_iban)
+     VALUES ($1,'hand',$2,'beleg',$3,$4,$5,$6,$7,$8,$9,CASE WHEN $9::text IS NULL THEN NULL ELSE now() END,'kopiert',$10,$11,$12,$13,$14::jsonb,$15,$16,$17,$18)`,
     [
       id, sha, eingabe.datum, eingabe.haendler, eingabe.bruttoCent, nettoCent, vorsteuerCent, eingabe.kategorie,
       eingabe.geschaeftsfeld, blob.pathname, sha, bytes.length, datei.type, JSON.stringify({ notiz: eingabe.notiz }),
+      eingabe.erechnung?.format ?? null, eingabe.erechnung?.xml ?? null, eingabe.erechnung?.nummer ?? null, eingabe.erechnung?.iban ?? null,
     ],
   )
   if (eingabe.geschaeftsfeld) await verbucheBeleg(db, id)
