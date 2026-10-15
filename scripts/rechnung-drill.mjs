@@ -12,20 +12,17 @@
  * einen Import, eine Konsole, ein spaeteres Skript. Beide werden hier
  * angegriffen.
  */
-import pg from "pg"
 import { randomUUID } from "node:crypto"
-import { requireSafeTarget } from "./lib/env-guard.mjs"
-
-const ZIEL = process.env.RECHNUNG_DRILL_URL || "postgres://localhost/g18_abnahme"
-requireSafeTarget(ZIEL, "Rechnungs-Probelauf")
+import { oeffneDrillDb } from "./lib/drill-db.mjs"
 
 let fehler = 0
 const p = (ok, n, d = "") => { if (!ok) fehler++; console.log(`  ${ok ? "ok  " : "FEHL"} ${n}${d ? ` — ${d}` : ""}`) }
 const wirft = async (fn) => { try { await fn(); return false } catch { return true } }
 
-const c = new pg.Client({ connectionString: ZIEL })
-await c.connect()
-const sql = { query: async (t, ps) => (await c.query(t, ps ?? [])).rows }
+const { query, close, backend } = await oeffneDrillDb({ envVar: "RECHNUNG_DRILL_URL", zweck: "Rechnungs-Probelauf" })
+console.log(`  (Backend: ${backend})`)
+const c = { query }
+const sql = { query }
 
 const { SCHEMA, BACKFILL } = await import("../lib/neon-client.ts")
 const R = await import("../lib/rechnung.ts")
@@ -253,5 +250,5 @@ const chancen = Number((await sql.query("SELECT count(*) n FROM opportunities WH
 p(chancen === 1, "und eine Rechnung erzeugt keine zweite Verkaufschance")
 
 console.log(`\n  ${fehler === 0 ? "Eine Rechnung ist keine Zahlung." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
-await c.end()
+await close()
 process.exit(fehler === 0 ? 0 : 1)

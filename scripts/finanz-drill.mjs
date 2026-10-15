@@ -18,20 +18,14 @@
  * werden nie in echte Produktionsdaten geschrieben — dieselbe Wegwerf-
  * Datenbank-Disziplin wie rechnung-drill.mjs & Co.
  */
-import pg from "pg"
-import { requireSafeTarget } from "./lib/env-guard.mjs"
-
-const ZIEL = process.env.FINANZ_DRILL_URL || "postgres://localhost/drill_finanz"
-requireSafeTarget(ZIEL, { zweck: "Finanz-Probelauf" })
+import { oeffneDrillDb } from "./lib/drill-db.mjs"
 
 let fehler = 0
 const p = (ok, n, d = "") => { if (!ok) fehler++; console.log(`  ${ok ? "ok  " : "FEHL"} ${n}${d ? ` — ${d}` : ""}`) }
 const wirft = async (fn) => { try { await fn(); return false } catch { return true } }
 
-const c = new pg.Client({ connectionString: ZIEL })
-await c.connect()
-/** @type {(text: string, params?: unknown[]) => Promise<Record<string, unknown>[]>} */
-const db = async (text, params) => (await c.query(text, params ?? [])).rows
+const { query: db, close, backend } = await oeffneDrillDb({ envVar: "FINANZ_DRILL_URL", zweck: "Finanz-Probelauf" })
+console.log(`  (Backend: ${backend})`)
 
 const { FINANZ_SCHEMA } = await import("../lib/finanz/store.ts")
 const { AUFTRAEGE_SCHEMA, speichereFirma, legeEntwurfAn, speichereEntwurf, schreibeFest, ladeDokument,
@@ -359,5 +353,5 @@ const fehltTr = fehltFuerERechnung(festTrRechnung.dok, festTrRechnung.dok.absend
 p(fehltTr.length === 0, "F6.6 eine TR-Rechnung ist genauso E-Rechnungs-faehig wie DE/EN — die Sprache des Dokuments ist keine Pflichtangabe")
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
-await c.end()
+await close()
 process.exit(fehler === 0 ? 0 : 1)

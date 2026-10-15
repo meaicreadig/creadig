@@ -30,20 +30,17 @@
  * die Kette TRAEGT — an einem vollstaendig durchgespielten Vorgang gegen eine
  * echte Datenbank, mit allen Sperren scharf.
  */
-import pg from "pg"
 import { randomUUID } from "node:crypto"
-import { requireSafeTarget } from "./lib/env-guard.mjs"
-
-const ZIEL = process.env.KETTE_DRILL_URL || "postgres://localhost/drill_kette"
-requireSafeTarget(ZIEL, "Ketten-Probelauf")
+import { oeffneDrillDb } from "./lib/drill-db.mjs"
 
 let fehler = 0
 const p = (ok, n, d = "") => { if (!ok) fehler++; console.log(`  ${ok ? "ok  " : "FEHL"} ${n}${d ? ` — ${d}` : ""}`) }
 const wirft = async (fn) => { try { await fn(); return false } catch { return true } }
 
-const c = new pg.Client({ connectionString: ZIEL })
-await c.connect()
-const sql = { query: async (t, ps) => (await c.query(t, ps ?? [])).rows }
+const { query, close, backend } = await oeffneDrillDb({ envVar: "KETTE_DRILL_URL", zweck: "Ketten-Probelauf" })
+console.log(`  (Backend: ${backend})`)
+const c = { query }
+const sql = { query }
 const z = async (t, ps) => Number((await sql.query(t, ps))[0].n)
 
 const { SCHEMA, BACKFILL } = await import("../lib/neon-client.ts")
@@ -209,5 +206,5 @@ console.log(
   `  (Owner-Zahlen) und G33 (Vertretung) — siehe \`npm run kreislauf-drill\`.`)
 
 console.log(`\n  ${fehler === 0 ? "Die Kette traegt — bis zu der Stelle, an der ein Mensch fehlt." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
-await c.end()
+await close()
 process.exit(fehler === 0 ? 0 : 1)
