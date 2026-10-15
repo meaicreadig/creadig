@@ -152,3 +152,19 @@ export async function einstellungenSpeichern(form: FormData) {
   await protokolliere(db, "einstellungen", { stand, am, quote })
   revalidatePath(PFAD, "layout")
 }
+
+/**
+ * § 19-Wächter (Phase 4): der Vorschlag aus dem Kompass, EXPLIZIT bestätigt —
+ * keine automatische Umstellung, nur weil eine Grenze rechnerisch
+ * überschritten ist. Ab jetzt rechnen NEUE Rechnungen mit USt
+ * (steuerModus() liest fin_einstellungen.ust_pflichtig, siehe
+ * lib/finanz/auftraege/rechnen.ts); bereits festgeschriebene Rechnungen
+ * bleiben unverändert (GoBD-Festschreibung, Phase 1).
+ */
+export async function aufUstPflichtUmstellen(form: FormData): Promise<void> {
+  const db = await zugang()
+  if (form.get("bestaetigt") !== "on") throw new Error("Bitte die Bestätigung ankreuzen.")
+  await db(`UPDATE fin_einstellungen SET ust_pflichtig = true, updated_at = now() WHERE id = 'haupt'`, [])
+  await protokolliere(db, "paragraph19_umgestellt", { von: "klein", nach: "regelbesteuert" })
+  revalidatePath(PFAD, "layout")
+}

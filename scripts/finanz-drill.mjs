@@ -38,6 +38,8 @@ const { dokumentMail } = await import("../lib/finanz/auftraege/mail.ts")
 const { ABGLEICH_SCHEMA, gleicheFiberoAb } = await import("../lib/finanz/fibero-abgleich.ts")
 const { BELEGE_SCHEMA, ordneZu, ladeBelege } = await import("../lib/finanz/belege.ts")
 const { leseERechnungXml, leseERechnung, leseEingebettetesXml } = await import("../lib/finanz/e-eingang.ts")
+const { paragraph19Status } = await import("../lib/finanz/paragraph19.ts")
+const { berechneLage } = await import("../lib/finanz/lage.ts")
 
 for (const s of FINANZ_SCHEMA) await db(s)
 for (const s of AUFTRAEGE_SCHEMA) await db(s)
@@ -46,36 +48,21 @@ for (const s of BELEGE_SCHEMA) await db(s)
 
 /*
  * Ein Probelauf muss zweimal dasselbe sagen — dieselbe Ueberlegung wie in
- * rechnung-drill.mjs. Was ein FRUEHERER LAUF VON IHM SELBST hinterlassen
- * hat, raeumt er zuerst weg (am Titel-Praefix "ABNAHME" erkennbar).
- *
- * Seit den GoBD-Triggern (F7) ist genau das in der Tabelle selbst verboten,
- * sobald eine Nummer steht — zu Recht, das ist ihr ganzer Zweck. Fuer den
- * Probelauf eigenen Aufraeumschritt werden die Trigger deshalb kurz
- * abgeschaltet (Tabelleneigentuemer-Recht, kein Superuser noetig) und direkt
- * danach wieder angeschaltet — eine Ausnahme fuer das Werkzeug, die in
- * Produktion nie gebraucht wird, weil dort niemand `ABNAHME`-Fixturen anlegt.
+ * rechnung-drill.mjs. Erst war das ein selektives Loeschen an Titel-/ID-
+ * Praefix ("ABNAHME") — das reichte, solange jede Pruefung nur einzelne,
+ * selbst angelegte Zeilen ansah. Seit § 19 (Phase 4) ueber ALLE Buchungen
+ * eines Jahres summiert, reicht selektiv nicht mehr: eine echte, aus einem
+ * Testdokument abgeleitete Buchung (z. B. `re-<docid>-19`, nicht
+ * ABNAHME-praefigiert) blieb vom vorigen Lauf stehen und floss in die Summe
+ * des naechsten mit ein. Eine Wegwerf-Datenbank, die wirklich wegwerfbar
+ * sein soll, wird deshalb komplett geleert, nicht nach Muster gefiltert —
+ * TRUNCATE loest ausserdem keine Zeilen-Trigger aus, die GoBD-Sperren aus
+ * Phase 1 muessen dafuer nicht extra abgeschaltet werden.
  */
-for (const t of ["fin_dokumente", "fin_buchungen", "fin_dokument_verlauf", "fin_protokoll"]) {
-  await db(`ALTER TABLE ${t} DISABLE TRIGGER ALL`)
-}
-await db(`DELETE FROM fin_dokument_verlauf WHERE dokument_id IN (SELECT id FROM fin_dokumente WHERE titel LIKE 'ABNAHME%' OR id LIKE 'ABNAHME-%')`)
-await db(`DELETE FROM fin_dokumente WHERE titel LIKE 'ABNAHME%' OR id LIKE 'ABNAHME-%'`)
-await db(`DELETE FROM fin_kunden WHERE schluessel LIKE '%abnahme.invalid%'`)
-await db(`DELETE FROM fin_buchungen WHERE quelle_ref LIKE 'ABNAHME%' OR id LIKE 'fibero-%' OR id LIKE 'ABNAHME-%'`)
-await db(`DELETE FROM fin_abgleich WHERE quelle = 'fibero'`)
-await db(`DELETE FROM fin_belege WHERE id LIKE 'ABNAHME-%' OR extern_id LIKE 'ABNAHME-%'`)
-for (const t of ["fin_dokumente", "fin_buchungen", "fin_dokument_verlauf", "fin_protokoll"]) {
-  await db(`ALTER TABLE ${t} ENABLE TRIGGER ALL`)
-}
-/*
- * Der Zaehler selbst muss mit zurueckgesetzt werden — sonst entsteht durch
- * das Aufraeumen genau das, was pruefeNummernkreis() zu Recht meldet: Zahlen,
- * die ein frueherer Lauf gezogen UND durch Loeschen wieder entfernt hat,
- * stehen als Luecke da. Eine Wegwerf-Datenbank, die wirklich wegwerfbar sein
- * soll, muss auch den Zaehler wegwerfen, nicht nur die Dokumente.
- */
-await db(`DELETE FROM fin_nummernkreis`)
+await db(
+  `TRUNCATE fin_dokument_verlauf, fin_dokumente, fin_buchungen, fin_protokoll, fin_kunden,
+            fin_nummernkreis, fin_abgleich, fin_belege, fin_fristen`,
+)
 
 /* ------------------------------------------------------------------------ */
 /* Testfirma — eindeutig als Test gekennzeichnet (nie echte Owner-Daten)     */
@@ -527,6 +514,55 @@ const i_uebersicht = await ladeBelege(db, null)
 const i_korbEintrag = i_uebersicht.korb.find((b) => b.id === i_belegId)
 p(i_korbEintrag?.erechnung?.format === "ubl" && i_korbEintrag?.erechnung?.nummer === "ABNAHME-UBL-2026-0007" && i_korbEintrag?.erechnung?.iban === "DE02500105170137075030",
   "I13 die lesbare Ansicht (ladeBelege) zeigt Format/Nummer/IBAN — kein rohes XML, aber auch nichts verloren")
+
+/* ══ J · § 19-Waechter (Phase 4) ══ */
+console.log("\nJ · § 19-Waechter — Umsatzgrenzen ab 2025")
+
+const buchungFixture = (id, datum, bruttoCent, extra = {}) => ({
+  id, art: "einnahme", status: "gebucht", datum, bruttoCent, ustSatz: 0,
+  kategorie: "Projekt", gegenpartei: null, notiz: null, wiederholung: "keine", storniert: false, ...extra,
+})
+
+p(paragraph19Status([], "2026-06-15").ampel === "ruhig", "J1 ohne Buchungen: ruhig, 0 Umsatz")
+
+const j_achtung = [buchungFixture("j1", "2026-01-10", 85_000_00)]
+p(paragraph19Status(j_achtung, "2026-06-15").ampel === "achtung", "J2 85.000 € von 100.000 € (85 %): Achtung", String(paragraph19Status(j_achtung, "2026-06-15").anteilLaufendesJahr))
+
+const j_kritisch = [buchungFixture("j1", "2026-01-10", 96_000_00)]
+p(paragraph19Status(j_kritisch, "2026-06-15").ampel === "kritisch", "J3 96.000 € (96 %): kritisch — ab 95 %")
+
+const j_ueberschritten = [buchungFixture("j1", "2026-01-10", 90_000_00), buchungFixture("j2", "2026-03-20", 15_000_00)]
+const j_statusUeberschritten = paragraph19Status(j_ueberschritten, "2026-06-15")
+p(j_statusUeberschritten.ampel === "ueberschritten" && j_statusUeberschritten.ueberschrittenAm === "2026-03-20",
+  "J4 90.000 € + 15.000 € am 20.03.: ueberschritten GENAU an dem Tag, an dem die Grenze faellt", j_statusUeberschritten.ueberschrittenAm)
+p(j_statusUeberschritten.ueberschrittenBeiBuchungId === "j2", "und die ueberschreitende Buchung wird benannt")
+
+const j_vorjahr = [buchungFixture("j0", "2025-05-01", 30_000_00)]
+const j_statusVorjahr = paragraph19Status(j_vorjahr, "2026-06-15")
+p(j_statusVorjahr.ampel === "ueberschritten" && j_statusVorjahr.vorjahrUeberschritten === true,
+  "J5 Vorjahresumsatz 30.000 € über 25.000 €: ueberschritten, auch ohne eine einzige Buchung im laufenden Jahr")
+
+const j_storniert = [buchungFixture("j1", "2026-01-10", 90_000_00), buchungFixture("j2", "2026-03-20", 15_000_00, { storniert: true })]
+p(paragraph19Status(j_storniert, "2026-06-15").ampel === "achtung", "J6 eine stornierte Buchung zaehlt nicht mit")
+
+const j_geplant = [buchungFixture("j1", "2026-01-10", 90_000_00), buchungFixture("j2", "2026-03-20", 15_000_00, { status: "geplant" })]
+p(paragraph19Status(j_geplant, "2026-06-15").ampel === "achtung",
+  "J7 eine nur GEPLANTE (noch nicht zugeflossene) Einnahme zaehlt nicht — § 19 misst Ist-Versteuerung, nicht gestellte Rechnungen")
+
+const j_mitUst = [buchungFixture("j1", "2026-01-10", 119_00, { ustSatz: 19 })]
+p(paragraph19Status(j_mitUst, "2026-06-15").laufendesJahrUmsatzCent === 100_00,
+  "J8 eine Buchung MIT USt zaehlt netto (119,00 € brutto bei 19 % → 100,00 € Umsatz), nicht brutto")
+
+/* Realer Durchlauf gegen die Datenbank: dieselbe Rechnung wie berechneLage() sie zieht. */
+await setUstPflichtig(false)
+await db(`INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, quelle) VALUES ('ABNAHME-j19-1','einnahme','gebucht',$1,9600000,0,'Projekt','manuell')`, [`${heuteBerlin().slice(0, 4)}-01-15`])
+const j_lage = await berechneLage(db)
+p(j_lage.paragraph19 !== null && j_lage.paragraph19.ampel === "kritisch", "J9 berechneLage() zieht dieselbe Grenze — 96.000 € im laufenden Jahr meldet kritisch")
+p(j_lage.hinweise.some((h) => h.text.includes("§ 19")), "J10 der Kompass zeigt einen Hinweis dazu (nicht nur die stille Zahl)")
+
+await setUstPflichtig(true)
+const j_lageUmgestellt = await berechneLage(db)
+p(j_lageUmgestellt.paragraph19 === null, "J11 nach der Umstellung auf umsatzsteuerpflichtig zeigt der Kompass die § 19-Ampel nicht mehr — sie gilt nicht mehr")
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()

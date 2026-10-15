@@ -31,7 +31,7 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
   else if (abgleich.faellig) after(() => gleicheFiberoAb(db).catch(() => null))
 
   const basis = await finanzBasis()
-  const { heute, fristen, stand, topf, frei, verlauf, reichweite, hinweise } = await berechneLage(db)
+  const { heute, fristen, stand, topf, frei, verlauf, reichweite, hinweise, paragraph19 } = await berechneLage(db)
   const naechste = fristen.filter((f) => !f.erledigt).slice(0, 3)
 
   const diesesJahr = heute.slice(0, 4)
@@ -42,7 +42,7 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
 
   return (
     <FinanzShell aktiv="heute" titel={gruss()} unterzeile="Vorne steht, was dich voranbringt. Der Rest läuft im Hintergrund.">
-      <FinanzKompass stand={stand} frei={frei} topf={topf} reichweite={reichweite} hinweise={hinweise} verlauf={verlauf} />
+      <FinanzKompass stand={stand} frei={frei} topf={topf} reichweite={reichweite} hinweise={hinweise} verlauf={verlauf} paragraph19={paragraph19} />
 
       <Geschaeftsfelder bild={felder} stand={abgleichsStand} fiberoAktiv={fiberoKonfiguriert()} basis={basis || "/"} jahre={jahre} />
 
