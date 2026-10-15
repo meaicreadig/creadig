@@ -28,6 +28,16 @@ import {
   type Firma,
 } from "@/lib/finanz/auftraege/store"
 import { sendeDokumentMail, type MailArt } from "@/lib/finanz/auftraege/mail"
+import { erzeugeXRechnung } from "@/lib/finanz/auftraege/erechnung"
+import { ladeFirma, type Dokument } from "@/lib/finanz/auftraege/store"
+
+/** Rechnungen gehen immer mit XRechnung-XML raus, sobald alle Angaben dafür vorliegen. */
+async function eRechnungAnhang(db: Awaited<ReturnType<typeof zugang>>, d: Dokument) {
+  if (d.art !== "rechnung") return undefined
+  const { firma, ustPflichtig } = await ladeFirma(db)
+  const e = erzeugeXRechnung(d, firma, ustPflichtig)
+  return e.ok ? { dateiname: e.dateiname, inhalt: e.xml } : undefined
+}
 
 async function zugang() {
   const z = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
@@ -118,7 +128,7 @@ export async function entwurfSenden(id: string, roh: Entwurf): Promise<Ergebnis>
   const db = await zugang()
   const fest = await schreibeFest(db, id)
   if (!fest.ok) return fest
-  const mail = await sendeDokumentMail(fest.dok, "versand")
+  const mail = await sendeDokumentMail(fest.dok, "versand", await eRechnungAnhang(db, fest.dok))
   await protokolliere(db, "dokument_versendet", { id, nummer: fest.dok.nummer, mail: mail.ok })
   neu()
   if (!mail.ok) return { ok: true, hinweis: `${fest.dok.nummer} ist festgeschrieben, aber die Mail ging nicht raus: ${mail.grund} Den Kundenlink kannst du manuell schicken.` }
@@ -204,7 +214,7 @@ export async function erneutSenden(id: string): Promise<Ergebnis> {
   const db = await zugang()
   const d = await ladeDokument(db, id)
   if (!d || d.status === "entwurf" || !d.token) return { ok: false, fehler: ["Noch nicht versendet."] }
-  const r = await sendeDokumentMail(d, "versand")
+  const r = await sendeDokumentMail(d, "versand", await eRechnungAnhang(db, d))
   if (!r.ok) return { ok: false, fehler: [r.grund] }
   return { ok: true, hinweis: "Erneut gesendet." }
 }
