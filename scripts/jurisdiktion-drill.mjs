@@ -8,6 +8,7 @@
  */
 const J = await import("../lib/jurisdiktion.ts")
 const R = await import("../lib/rechnung.ts")
+const S = await import("../lib/site-data.ts")
 
 let fehler = 0
 const p = (ok, n, d = "") => { if (!ok) fehler++; console.log(`  ${ok ? "ok  " : "FEHL"} ${n}${d ? ` — ${d}` : ""}`) }
@@ -37,11 +38,22 @@ for (const m of J.MAERKTE) {
 p(!J.darfVerkaufenIn("US").ja, "ein nicht gefuehrter Markt erst recht nicht")
 p(J.geklaerteMaerkte().length === 0, "heute ist kein Markt geklaert")
 
+/*
+ * Seit dem 15.10.2026 ist der Steuerstatus entschieden (§ 19, Finanz-
+ * Abschluss — siehe `lib/rechnung.ts`). Die deutsche Lage hat deshalb keine
+ * eigene Steuer-Luecke mehr. Simuliert wird trotzdem der offene Fall, damit
+ * die Weiterleitung an G18 weiterhin gemessen bleibt, nicht nur behauptet.
+ */
 console.log("\nJ3 · Die Steuerfrage bleibt bei G18")
-p(R.steuerlage().art === "offen", "der Steuerstatus ist offen (G18)")
-p(J.luecken("DE").some((l) => l.punkt === "steuer"), "und die deutsche Lage uebernimmt das")
+p(R.steuerlage().entschieden, "der Steuerstatus ist entschieden (G18, § 19 seit 15.10.2026)")
+p(!J.luecken("DE").some((l) => l.punkt === "steuer"), "und die deutsche Lage uebernimmt das — keine Steuer-Luecke mehr")
+
+const j3Vorher = S.imprintDetails.taxStatusPending
+S.imprintDetails.taxStatusPending = true
+p(J.luecken("DE").some((l) => l.punkt === "steuer"), "simuliert offen: die deutsche Lage uebernimmt das wieder")
 p(/G18/.test(J.luecken("DE").find((l) => l.punkt === "steuer").satz), "mit ausdruecklichem Verweis",
   "zwei Fassungen derselben Rechtsfrage waeren in vier Wochen zwei verschiedene")
+S.imprintDetails.taxStatusPending = j3Vorher
 
 console.log("\nJ4 · Deutschland ist weiter als die Schweiz — aber nicht fertig")
 p(J.luecken("DE").length < J.luecken("CH").length, "DE hat weniger offene Punkte als CH")

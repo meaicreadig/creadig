@@ -187,17 +187,26 @@ p(consent.length === 0, "kein Feld fuer eine Werbeeinwilligung im ganzen Schema"
 p(await z("SELECT count(*) n FROM research_cases WHERE contact_decision IS NOT NULL") === 0,
   "keine Kontaktentscheidung von selbst gesetzt")
 
-/* ══ K13 · Der schaerfste Befund der Kette ══ */
+/*
+ * ══ K13 · Der schaerfste Befund der Kette ══
+ *
+ * Bis zum 15.10.2026 war das der schaerfste Befund: vollstaendig geliefert,
+ * und trotzdem keine Rechnung moeglich. Der Inhaber hat die G04-Schuld seit
+ * dem beglichen (§ 19 UStG, siehe `lib/rechnung.ts`) — die Sperre ist jetzt
+ * aufgehoben, weil der Mensch entschieden hat, nicht weil Code es erzwungen
+ * haette.
+ */
 console.log("\nK13 · Wo die Kette heute wirklich haengt")
 const stell = R.stellbarkeit({ positionen: [{ label: "x", menge: 1, einzelpreisCent: 100 }], zustand: "entwurf" })
-p(!stell.ok, "die Rechnung kann NICHT gestellt werden — der Steuerstatus ist offen")
+p(stell.ok, "die Rechnung kann gestellt werden — der Steuerstatus ist seit dem 15.10.2026 entschieden (§ 19)")
 p(L.darfInZustand(projekt, "uebergeben") !== undefined, "die Lieferung laeuft davon unberuehrt weiter")
 console.log(
   `\n  Das ist der Betriebszustand heute: creaDIG kann ein Projekt vollstaendig\n` +
-  `  liefern und abnehmen lassen — und dafuer keine Rechnung stellen. Die Sperre\n` +
-  `  ist richtig; sie steht an der einen Stelle, an der ein Dokument nach\n` +
-  `  draussen ginge. Aufgehoben wird sie nicht mit Code, sondern mit dem\n` +
-  `  Umsatzsteuer-Status (G04-Owner-Schuld).`)
+  `  liefern, abnehmen lassen UND dafuer eine Rechnung stellen — G18 ist seit\n` +
+  `  dem 15.10.2026 entschieden (§ 19 UStG). Was die Kette insgesamt trotzdem\n` +
+  `  noch nicht durchgaengig macht, haengt nicht mehr an der Rechnung, sondern\n` +
+  `  an vorgelagerten Entscheidungen: G17 (Rechtslage je Markt), G23/G24\n` +
+  `  (Owner-Zahlen) und G33 (Vertretung) — siehe \`npm run kreislauf-drill\`.`)
 
 console.log(`\n  ${fehler === 0 ? "Die Kette traegt — bis zu der Stelle, an der ein Mensch fehlt." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await c.end()

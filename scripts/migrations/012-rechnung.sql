@@ -81,6 +81,15 @@
 -- Dokument nach draussen ginge — und nirgends sonst.
 --
 -- Idempotent. Additiv. Aendert keine bestehende Zeile.
+--
+-- ---------------------------------------------------------------------------
+-- NACHTRAG (Finanz-Abschluss, 15.10.2026) — EIN NUMMERNKREIS, NICHT ZWEI
+--
+-- `number` traegt einen eigenen UNIQUE-Index, aber keinen Schreibpfad: kein
+-- Code in diesem Repo setzt ihn je. `lib/finanz/auftraege/store.ts`
+-- (`fin_nummernkreis`) ist die einzige aktive Quelle fuer Angebots- und
+-- Rechnungsnummern von creaDIG. Siehe `lib/rechnung.ts` fuer die ausfuehrliche
+-- Begruendung.
 -- ===========================================================================
 
 CREATE TABLE IF NOT EXISTS invoices (

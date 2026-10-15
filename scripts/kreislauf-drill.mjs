@@ -63,26 +63,31 @@ p(new Set(K.STATIONEN.map((s) => s.key)).size === K.STATIONEN.length, "jede Stat
 console.log("\nK2 · Aendert das Gate seine Antwort, aendert der Kreislauf seine")
 
 /*
- * Der einzige Beweis, der zaehlt: Wenn in der KOPIE der Umsatzsteuer-Status
- * entschieden ist, darf die Station „Rechnung" dort nicht mehr gesperrt
- * sein. Steht die Sperre trotzdem, hat dieses Modul sie hingeschrieben statt
- * gefragt — und wuerde sie auch dann noch melden, wenn G18 laengst geklaert
- * waere.
+ * Der einzige Beweis, der zaehlt: Aendert sich die Antwort des Gates (G18),
+ * muss sich die Antwort des Kreislaufs mitaendern — in beide Richtungen.
+ *
+ * Bis zum 15.10.2026 war die Realquelle offen, und dieser Block patchte eine
+ * KOPIE auf „entschieden", um zu zeigen, dass die Sperre dann verschwindet.
+ * Seit der Inhaber § 19 bestaetigt hat, ist die Realquelle selbst entschieden
+ * (siehe `lib/rechnung.ts`) — der Beweis laeuft deshalb jetzt umgekehrt:
+ * eine KOPIE wird auf „offen" zurueckgepatcht, und die Sperre muss dort
+ * wieder erscheinen, waehrend die unveraenderte Kopie (= heutige Realitaet)
+ * frei bleibt.
  */
-const geklaert = angriff(({ lies, schreib }) => {
+const offen = angriff(({ lies, schreib }) => {
   const t = lies("lib/rechnung.ts")
   schreib(
     "lib/rechnung.ts",
     t.replace(
       "export function steuerlage(): Steuerlage {",
-      "export function steuerlage(): Steuerlage {\n  return { art: 'kleinunternehmer', satz: 0, hinweis: null, entschieden: true }\n  // eslint-disable-next-line no-unreachable",
+      "export function steuerlage(): Steuerlage {\n  return { art: 'offen', satz: 0, hinweis: null, entschieden: false, widerspruch: null }\n  // eslint-disable-next-line no-unreachable",
     ),
   )
 })
-p(geklaert.code === 0, "mit geklaerter Steuerfrage besteht die Pruefung weiter")
-p(!/G18 Rechnung →/.test(geklaert.aus), "und die Rechnung ist nicht mehr gesperrt",
-  "die Sperre kam aus G18, nicht aus einer Zeile in diesem Modul")
-p(/G18 Rechnung →/.test(angriff(() => {}).aus), "unveraendert steht sie dagegen da")
+p(offen.code === 0, "mit offenem Steuerstatus besteht die Pruefung weiter")
+p(/G18 Rechnung →/.test(offen.aus), "und die Rechnung ist dann gesperrt",
+  "die Sperre kommt aus G18, nicht aus einer Zeile in diesem Modul")
+p(!/G18 Rechnung →/.test(angriff(() => {}).aus), "unveraendert steht sie heute nicht mehr da — § 19 seit 15.10.2026")
 
 const besetzt = angriff(({ lies, schreib }) => {
   const t = lies("scripts/check-kreislauf.mjs")

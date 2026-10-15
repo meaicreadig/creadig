@@ -41,17 +41,25 @@ const h = V.huerden("fibero")
 const bedingungen = h.map((x) => x.bedingung)
 p(bedingungen.includes("Reifegrad"), "ohne bestaetigten Reifegrad keine Zusage")
 p(bedingungen.includes("Preis"), "ohne Preisquelle kein Verkauf")
-p(bedingungen.includes("Steuerlage"), "ohne geklaerte Steuerlage kein Verkauf",
-  "was niemand abrechnen kann, kann niemand verkaufen")
+p(!bedingungen.includes("Steuerlage"), "die Steuerlage ist seit dem 15.10.2026 entschieden (§ 19) — keine Huerde mehr")
 p(bedingungen.includes("Betrieb danach"), "ohne Betrieb danach kein Verkauf")
 p(!bedingungen.includes("Eigentuemer"), "der Eigentuemer steht (G24)")
 p(!bedingungen.includes("Rueckmeldeweg"), "und der Rueckmeldeweg auch (G24)")
 p(h.every((x) => x.satz.length > 40), "jede Huerde als Satz, nicht als Zahl")
 
+/*
+ * Reale Ausgangslage seit dem 15.10.2026: entschieden. Simuliert wird
+ * trotzdem der offene Fall (dieselbe Technik wie in rechnung-drill.mjs /
+ * jurisdiktion-drill.mjs), damit die Grenze weiterhin gemessen bleibt.
+ */
 console.log("\nV3 · Die Steuerlage ist die kaufmaennische Grenze")
-p(R.steuerlage().art === "offen", "der Umsatzsteuer-Status ist heute offen (G18)")
-p(bedingungen.includes("Steuerlage"), "und genau das haelt jedes Produkt auf",
+p(R.steuerlage().entschieden, "der Umsatzsteuer-Status ist entschieden (G18, § 19 seit 15.10.2026)")
+const v3Vorher = S.imprintDetails.taxStatusPending
+S.imprintDetails.taxStatusPending = true
+const hOffen = V.huerden("fibero").map((x) => x.bedingung)
+p(hOffen.includes("Steuerlage"), "simuliert offen: genau das haelt dann jedes Produkt auf",
   "eine technische Reife hilft dagegen nicht")
+S.imprintDetails.taxStatusPending = v3Vorher
 
 console.log("\nV4 · Verkaeuflich ist nicht dasselbe wie fertig")
 p(V.VERKAUFSREIFE_AB.includes("pilot"), "ein Pilot darf verkauft werden — als Pilot")

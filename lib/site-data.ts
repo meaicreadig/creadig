@@ -2335,16 +2335,22 @@ export const imprintDetails = {
    * `true`, wenn die Kleinunternehmerregelung nach § 19 UStG greift.
    * Dann tritt der entsprechende Hinweis an die Stelle der USt-IdNr.
    * Entweder `vatId` ODER `smallBusiness` muss gesetzt sein — nicht beides.
+   *
+   * Vom Inhaber bestätigt: Kleinunternehmer nach § 19 UStG (15.10.2026,
+   * Finanz-Abschluss-Durchlauf).
    */
-  smallBusiness: null as boolean | null,
+  smallBusiness: true as boolean | null,
   /**
    * Klar markierter Platzhalter, solange der Steuerstatus nicht freigegeben
    * ist. Er ist NICHT als Angabe gemeint und wird auf der Seite auch nicht so
    * gesetzt: Die Zeile traegt sichtbar die Kennzeichnung „Platzhalter" und der
    * Pending-Hinweis bleibt stehen. Ohne den echten Wert kein Livegang
    * (Live-Checkliste, Phase 5).
+   *
+   * Freigegeben (15.10.2026): der Inhaber hat § 19 UStG bestätigt, siehe
+   * `smallBusiness` oben.
    */
-  taxStatusPending: true,
+  taxStatusPending: false,
   /**
    * Verantwortlicher nach § 18 Abs. 2 MStV (Name; Anschrift nur, wenn sie
    * von der Geschäftsanschrift abweicht). Vom Inhaber bestätigt (22.08.2026).
