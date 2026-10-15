@@ -578,6 +578,7 @@ export async function rechnungAusAngebot(db: Abfrage, angebotId: string, anzahlu
     titel: a.titel,
     kunde: a.kunde,
     geschaeftsfeld: a.geschaeftsfeld,
+    leistungszeitraum: a.leistungszeitraum,
     einleitung: en ? `As agreed in ${bezug}, we invoice the following services:` : `Gemäß ${bezug} berechnen wir Ihnen folgende Leistungen:`,
     schluss: "",
     positionen,
