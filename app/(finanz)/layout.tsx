@@ -17,7 +17,7 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 
 export default function FinanzRootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={`bg-background ${manrope.variable} ${mplusRounded.variable} ${jetbrains.variable}`}>
+    <html lang="de" className={`bg-background text-[15px] ${manrope.variable} ${mplusRounded.variable} ${jetbrains.variable}`}>
       <body className="bg-background text-foreground font-sans antialiased">{children}</body>
     </html>
   )

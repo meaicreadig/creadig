@@ -109,10 +109,10 @@ export async function FinanzShell({
         <Abmelden ziel={`${basis}/login`} />
       </header>
 
-      <main className="mx-auto flex w-full max-w-6xl min-w-0 flex-col gap-8 px-5 pt-4 pb-28 sm:px-8 lg:px-10 lg:py-12">
-        <div className="flex flex-col gap-2">
-          <h1 className="font-sans text-3xl font-semibold tracking-tight text-balance md:text-4xl">{titel}</h1>
-          {unterzeile && <p className="text-muted-foreground max-w-2xl leading-relaxed text-pretty">{unterzeile}</p>}
+      <main className="mx-auto flex w-full max-w-6xl min-w-0 flex-col gap-6 px-5 pt-4 pb-28 sm:px-8 lg:px-10 lg:py-9">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="font-sans text-2xl font-semibold tracking-tight text-balance md:text-[1.75rem]">{titel}</h1>
+          {unterzeile && <p className="text-muted-foreground max-w-2xl text-sm leading-relaxed text-pretty">{unterzeile}</p>}
         </div>
         {children}
       </main>
