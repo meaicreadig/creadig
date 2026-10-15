@@ -48,6 +48,7 @@ const { erzeugeRechnungsPdf } = await import("../lib/finanz/auftraege/pdf.ts")
 const { erzeugeSteuerberaterPaket } = await import("../lib/finanz/steuerberater-export.ts")
 const { leseCamt053, leseBankCsv } = await import("../lib/finanz/bank-import.ts")
 const { importiereBankUmsaetze, ladeOffeneBankUmsaetze, bestaetigeZuordnung, ignoriereUmsatz } = await import("../lib/finanz/bank-abgleich.ts")
+const { erstelleMorgenBericht, sendeMorgenmailFallsFaellig } = await import("../lib/finanz/morgenmail.ts")
 const JSZipMod = (await import("jszip")).default
 
 for (const s of FINANZ_SCHEMA) await db(s)
@@ -747,6 +748,41 @@ await ignoriereUmsatz(db, "abgleich-kein-treffer")
 p((await ladeOffeneBankUmsaetze(db)).every((u) => u.id !== "abgleich-kein-treffer"), "L25 ignoriereUmsatz() nimmt einen Umsatz aus dem Eingangskorb, ohne ihn zu loeschen")
 const l_ignorierterStatus = await db(`SELECT status FROM fin_bank_umsaetze WHERE id = $1`, ["abgleich-kein-treffer"])
 p(l_ignorierterStatus[0]?.status === "ignoriert", "… die Zeile bleibt erhalten, nur der Status aendert sich (append-only im Geiste, nichts verschwindet)")
+
+/* ══ M · Besitzer-Morgenmail (Phase 7) ══ */
+console.log("\nM · Besitzer-Morgenmail")
+
+const m_korbVorher = (await erstelleMorgenBericht(db)).belegeImKorb
+await db(
+  `INSERT INTO fin_belege (id, quelle, extern_id, art, datum, haendler, brutto_cent, netto_cent, vorsteuer_cent, kategorie, datei_status)
+   VALUES ('ABNAHME-m-beleg-korb','hand','ABNAHME-sha-m','beleg','2026-10-10','ABNAHME Haendler M',5000,4201,799,'Büro','kopiert')`,
+)
+const m_re1 = await neueRechnung(kunde())
+await schreibeFest(db, m_re1)
+await db(`UPDATE fin_dokumente SET faellig_am = $2 WHERE id = $1`, [m_re1, addTage(heuteBerlin(), -10)])
+
+const m_bericht = await erstelleMorgenBericht(db)
+p(m_bericht.belegeImKorb === m_korbVorher + 1, "M1 erstelleMorgenBericht() zaehlt den neu angelegten, nicht zugeordneten Beleg mit")
+const m_mahnung = m_bericht.faelligeMahnungen.find((x) => x.id === m_re1)
+p(m_mahnung?.stufe === 1 && m_mahnung.tageUeberfaellig === 10, "M2 eine seit 10 Tagen ueberfaellige, frische Rechnung erscheint als faellige Zahlungserinnerung (Stufe 1)")
+p(m_bericht.bankUmsaetzeOffen === (await ladeOffeneBankUmsaetze(db)).length, "M3 bankUmsaetzeOffen im Bericht stimmt mit dem tatsaechlichen Eingangskorb ueberein")
+
+await setUstPflichtig(false)
+const m_berichtKlein = await erstelleMorgenBericht(db)
+p(typeof m_berichtKlein.paragraph19Hinweis === "string" || m_berichtKlein.paragraph19Hinweis === null,
+  "M4 paragraph19Hinweis ist entweder ein Text (Ampel nicht ruhig) oder null (ruhig) — nie etwas anderes")
+await setUstPflichtig(true)
+const m_berichtRegelbesteuert = await erstelleMorgenBericht(db)
+p(m_berichtRegelbesteuert.paragraph19Hinweis === null, "M5 bei Umsatzsteuerpflicht zeigt der Bericht keinen § 19-Hinweis — er gilt nicht mehr")
+
+const m_versand1 = await sendeMorgenmailFallsFaellig(db)
+p(!m_versand1.versendet && /RESEND_API_KEY|MAIL_FROM|LEAD_TO/.test(m_versand1.grund ?? ""),
+  "M6 ohne RESEND_API_KEY/MAIL_FROM/LEAD_TO wird nichts verschickt, aber klar benannt, woran es fehlt (optionales Modul, siehe .env.example)", m_versand1.grund)
+
+await db(`INSERT INTO fin_protokoll (aktion, daten) VALUES ('morgenmail_gesendet', $1::jsonb)`, [JSON.stringify({ datum: heuteBerlin() })])
+const m_versand2 = await sendeMorgenmailFallsFaellig(db)
+p(!m_versand2.versendet && m_versand2.grund === "heute bereits verschickt",
+  "M7 ist fuer heute schon ein Protokolleintrag vorhanden, verschickt ein zweiter Lauf (z. B. ein erneuter Cron) nichts mehr — hoechstens eine Mail pro Tag")
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
