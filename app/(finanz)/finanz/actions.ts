@@ -9,6 +9,8 @@ import { KATEGORIEN, type Art } from "@/lib/finanz/rechnen"
 import { finanzDb, protokolliere } from "@/lib/finanz/store"
 import { berechneLage } from "@/lib/finanz/lage"
 import { frageAssistent } from "@/lib/finanz/assistent"
+import { leseBankCsv, leseCamt053 } from "@/lib/finanz/bank-import"
+import { bestaetigeZuordnung, ignoriereUmsatz, importiereBankUmsaetze } from "@/lib/finanz/bank-abgleich"
 
 const PFAD = "/finanz"
 
@@ -167,4 +169,41 @@ export async function aufUstPflichtUmstellen(form: FormData): Promise<void> {
   await db(`UPDATE fin_einstellungen SET ust_pflichtig = true, updated_at = now() WHERE id = 'haupt'`, [])
   await protokolliere(db, "paragraph19_umgestellt", { von: "klein", nach: "regelbesteuert" })
   revalidatePath(PFAD, "layout")
+}
+
+/* ------------------------------------------------------------------------ */
+/* Bank-Import (Phase 6)                                                     */
+/* ------------------------------------------------------------------------ */
+
+export type BankImportErgebnis = { ok: true; anzahl: number } | { ok: false; fehler: string }
+
+/** CSV oder camt.053 — am Inhalt erkannt, nicht an der Dateiendung. */
+export async function bankImportieren(_prev: BankImportErgebnis | null, form: FormData): Promise<BankImportErgebnis> {
+  const db = await zugang()
+  const datei = form.get("datei")
+  if (!(datei instanceof Blob) || datei.size === 0) return { ok: false, fehler: "Bitte eine Datei auswählen." }
+  const text = await datei.text()
+  const istCamt = /<Document[\s>]/i.test(text) && /BkToCstmrStmt/i.test(text)
+  try {
+    const umsaetze = istCamt ? leseCamt053(text) : leseBankCsv(text)
+    if (umsaetze.length === 0) return { ok: false, fehler: "Keine Umsätze erkannt — Format prüfen (CSV-Spalten oder camt.053-Struktur)." }
+    const anzahl = await importiereBankUmsaetze(db, umsaetze, istCamt ? "camt053" : "csv")
+    await protokolliere(db, "bank_import", { gelesen: umsaetze.length, neu: anzahl, quelle: istCamt ? "camt053" : "csv" })
+    revalidatePath("/finanz/geldfluss")
+    return { ok: true, anzahl }
+  } catch (e) {
+    return { ok: false, fehler: `Import fehlgeschlagen: ${e instanceof Error ? e.message : "unbekannter Fehler"}` }
+  }
+}
+
+export async function bankUmsatzZuordnen(form: FormData): Promise<void> {
+  const db = await zugang()
+  await bestaetigeZuordnung(db, String(form.get("umsatzId") ?? ""), String(form.get("dokumentId") ?? ""))
+  revalidatePath("/finanz/geldfluss", "layout")
+}
+
+export async function bankUmsatzIgnorieren(form: FormData): Promise<void> {
+  const db = await zugang()
+  await ignoriereUmsatz(db, String(form.get("umsatzId") ?? ""))
+  revalidatePath("/finanz/geldfluss")
 }

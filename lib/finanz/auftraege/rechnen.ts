@@ -9,7 +9,7 @@ export type Sprache = "de" | "en" | "tr"
 export type SteuerModus = "normal" | "klein" | "reverse" | "drittland"
 
 export type AngebotStatus = "entwurf" | "versendet" | "angenommen" | "abgelehnt" | "aenderung" | "ersetzt" | "verworfen"
-export type RechnungStatus = "entwurf" | "versendet" | "bezahlt" | "storniert" | "verworfen"
+export type RechnungStatus = "entwurf" | "versendet" | "teilbezahlt" | "bezahlt" | "storniert" | "verworfen"
 export type DokStatus = AngebotStatus | RechnungStatus
 
 export type Kunde = {
@@ -298,6 +298,7 @@ export const STATUS_LABEL: Record<string, string> = {
   ersetzt: "Ersetzt",
   abgelaufen: "Abgelaufen",
   bezahlt: "Bezahlt",
+  teilbezahlt: "Teilweise bezahlt",
   ueberfaellig: "Überfällig",
   storniert: "Storniert",
   verworfen: "Verworfen",

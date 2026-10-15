@@ -192,6 +192,46 @@ export const AUFTRAEGE_SCHEMA = [
   `DROP TRIGGER IF EXISTS trg_fin_protokoll_nur_insert ON fin_protokoll`,
   `CREATE TRIGGER trg_fin_protokoll_nur_insert BEFORE UPDATE OR DELETE ON fin_protokoll
      FOR EACH ROW EXECUTE FUNCTION fin_nur_insert()`,
+
+  /*
+   * Phase 6 — Teilzahlungen als eigene Zeilen, nicht als ein Betrag-Feld.
+   * Dieselbe Entscheidung wie bei `payments` im Gate-18-Schema (siehe
+   * lib/rechnung.ts): „Eine Teilzahlung ist kein Sonderfall, sondern zwei
+   * Zeilen." Append-only wie fin_dokument_verlauf/fin_protokoll — ein
+   * Zahlungseingang wird storniert durch einen GEGENeintrag, nicht durch
+   * Loeschen der Zeile.
+   */
+  `CREATE TABLE IF NOT EXISTS fin_zahlungen (
+    id text PRIMARY KEY,
+    dokument_id text NOT NULL,
+    datum date NOT NULL,
+    cent bigint NOT NULL,
+    quelle text NOT NULL DEFAULT 'manuell' CHECK (quelle IN ('manuell','bank')),
+    ref text,
+    erstellt_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE INDEX IF NOT EXISTS fin_zahlungen_dokument_idx ON fin_zahlungen (dokument_id)`,
+  `DROP TRIGGER IF EXISTS trg_fin_zahlungen_nur_insert ON fin_zahlungen`,
+  `CREATE TRIGGER trg_fin_zahlungen_nur_insert BEFORE UPDATE OR DELETE ON fin_zahlungen
+     FOR EACH ROW EXECUTE FUNCTION fin_nur_insert()`,
+
+  /*
+   * Bank-Import (CSV und camt.053) — jeder Umsatz einmal, ueber eine stabile
+   * Referenz (Bankreferenz, sonst eine Pruefsumme aus Datum+Betrag+
+   * Verwendungszweck) idempotent. Nicht zugeordnete Umsaetze sind der
+   * Eingangskorb dieses Imports.
+   */
+  `CREATE TABLE IF NOT EXISTS fin_bank_umsaetze (
+    id text PRIMARY KEY,
+    datum date NOT NULL,
+    betrag_cent bigint NOT NULL,
+    verwendungszweck text NOT NULL DEFAULT '',
+    gegenpartei text,
+    quelle text NOT NULL CHECK (quelle IN ('csv','camt053')),
+    status text NOT NULL DEFAULT 'offen' CHECK (status IN ('offen','zugeordnet','ignoriert')),
+    zugeordnet_dokument_id text,
+    rohdaten jsonb NOT NULL DEFAULT '{}'::jsonb,
+    created_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE INDEX IF NOT EXISTS fin_bank_umsaetze_status_idx ON fin_bank_umsaetze (status, datum DESC)`,
 ]
 
 let bereit: Promise<void> | null = null
@@ -689,12 +729,70 @@ export async function rechnungAusAngebot(db: Abfrage, angebotId: string, anzahlu
   })
 }
 
+/* ------------------------------------------------------------------------ */
+/* Teilzahlungen (Phase 6) — eine Zahlung ist eine Zeile, kein Betrag-Feld   */
+/* ------------------------------------------------------------------------ */
+
+export type Zahlung = { id: string; datum: string; cent: number; quelle: "manuell" | "bank"; ref: string | null }
+
+export async function ladeZahlungen(db: Abfrage, dokumentId: string): Promise<Zahlung[]> {
+  const r = await db(`SELECT id, to_char(datum,'YYYY-MM-DD') AS datum, cent, quelle, ref FROM fin_zahlungen WHERE dokument_id = $1 ORDER BY datum, erstellt_at`, [dokumentId])
+  return r.map((x) => ({ id: String(x.id), datum: String(x.datum), cent: Number(x.cent), quelle: x.quelle === "bank" ? "bank" : "manuell", ref: x.ref ? String(x.ref) : null }))
+}
+
+export async function bezahltCent(db: Abfrage, dokumentId: string): Promise<number> {
+  const [r] = await db(`SELECT coalesce(sum(cent), 0) AS s FROM fin_zahlungen WHERE dokument_id = $1`, [dokumentId])
+  return Number(r?.s ?? 0)
+}
+
+export type Zahlungsstand = { bezahltCent: number; offenCent: number; status: "teilbezahlt" | "bezahlt"; ueberzahlt: boolean }
+
+/**
+ * Erfasst einen Zahlungseingang — Teil- oder Restzahlung, manuell oder aus
+ * dem Bank-Import (Phase 6). "bezahlt" erst bei Rest ≤ 0 — eine
+ * Ueberzahlung zaehlt als bezahlt UND wird gemeldet (Hinweis, kein eigener
+ * Status: siehe ueberzahlt im Rueckgabewert). Die geplante Buchung wechselt
+ * GENAU EINMAL auf 'gebucht', beim Erreichen von Rest ≤ 0 — nicht bei jeder
+ * Teilzahlung — und ist danach unveraenderbar (GoBD-Festschreibung, Phase 1).
+ */
+export async function erfasseZahlung(
+  db: Abfrage,
+  dokumentId: string,
+  cent: number,
+  datum: string,
+  quelle: "manuell" | "bank" = "manuell",
+  ref: string | null = null,
+): Promise<{ ok: true; stand: Zahlungsstand } | { ok: false; fehler: string }> {
+  if (!Number.isFinite(cent) || cent <= 0) return { ok: false, fehler: "Der Betrag muss größer als 0 sein." }
+  const d = await ladeDokument(db, dokumentId)
+  if (!d || d.art !== "rechnung" || !["versendet", "teilbezahlt"].includes(d.status) || !d.summen) {
+    return { ok: false, fehler: "Nur eine offene Rechnung kann einen Zahlungseingang erfassen." }
+  }
+
+  await db(`INSERT INTO fin_zahlungen (id, dokument_id, datum, cent, quelle, ref) VALUES ($1,$2,$3,$4,$5,$6)`, [crypto.randomUUID(), dokumentId, datum, cent, quelle, ref])
+  const bezahlt = await bezahltCent(db, dokumentId)
+  const rest = d.summen.bruttoCent - bezahlt
+  const neuerStatus: "teilbezahlt" | "bezahlt" = rest <= 0 ? "bezahlt" : "teilbezahlt"
+
+  await db(
+    `UPDATE fin_dokumente SET status = $2, bezahlt_am = CASE WHEN $2 = 'bezahlt' THEN $3::date ELSE bezahlt_am END, updated_at = now() WHERE id = $1`,
+    [dokumentId, neuerStatus, datum],
+  )
+  if (neuerStatus === "bezahlt") {
+    await db(`UPDATE fin_buchungen SET status='gebucht', datum=$2 WHERE quelle='rechnung' AND quelle_ref=$1 AND storniert_at IS NULL`, [dokumentId, datum])
+  }
+  await verlauf(db, dokumentId, quelle === "bank" ? "zahlung_bank" : "zahlung", { cent, datum, bezahltGesamt: bezahlt, rest, ref })
+  return { ok: true, stand: { bezahltCent: bezahlt, offenCent: rest, status: neuerStatus, ueberzahlt: rest < 0 } }
+}
+
+/** Schreibt genau den offenen Rest als eine einzige Zahlung — die bestehende "Als bezahlt markieren"-Oberfläche bleibt ein Klick. */
 export async function markiereBezahlt(db: Abfrage, id: string, am: string): Promise<boolean> {
-  const [r] = await db(`UPDATE fin_dokumente SET status='bezahlt', bezahlt_am=$2, updated_at=now() WHERE id=$1 AND art='rechnung' AND status='versendet' RETURNING id`, [id, am])
-  if (!r) return false
-  await db(`UPDATE fin_buchungen SET status='gebucht', datum=$2 WHERE quelle='rechnung' AND quelle_ref=$1 AND storniert_at IS NULL`, [id, am])
-  await verlauf(db, id, "bezahlt", { am })
-  return true
+  const d = await ladeDokument(db, id)
+  if (!d || !d.summen) return false
+  const rest = d.summen.bruttoCent - (await bezahltCent(db, id))
+  if (rest <= 0) return false
+  const r = await erfasseZahlung(db, id, rest, am, "manuell", null)
+  return r.ok
 }
 
 /** Storno: neues Dokument mit negativen Beträgen + eigene Nummer; Forderung im Hauptbuch storniert. */
@@ -757,7 +855,7 @@ export function anzeigeStatus(d: Dokument, heute = heuteBerlin()): string {
     if (d.gueltigBis && d.gueltigBis < heute) return "abgelaufen"
     return d.geoeffnetAt ? "geoeffnet" : "versendet"
   }
-  if (d.art === "rechnung" && d.status === "versendet" && d.faelligAm && d.faelligAm < heute) return "ueberfaellig"
+  if (d.art === "rechnung" && (d.status === "versendet" || d.status === "teilbezahlt") && d.faelligAm && d.faelligAm < heute) return "ueberfaellig"
   return d.status
 }
 

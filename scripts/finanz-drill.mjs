@@ -31,7 +31,8 @@ console.log(`  (Backend: ${backend})`)
 const { FINANZ_SCHEMA } = await import("../lib/finanz/store.ts")
 const { AUFTRAEGE_SCHEMA, speichereFirma, legeEntwurfAn, speichereEntwurf, schreibeFest, ladeDokument,
   ladeDokumentPerToken, ladeVerwandte, ladeVerlauf, verwerfeEntwurf, neueVersion, beantworteAngebot,
-  markiereGeoeffnet, rechnungAusAngebot, markiereBezahlt, storniere, anzeigeStatus, pruefeNummernkreis } = await import("../lib/finanz/auftraege/store.ts")
+  markiereGeoeffnet, rechnungAusAngebot, markiereBezahlt, storniere, anzeigeStatus, pruefeNummernkreis,
+  erfasseZahlung, ladeZahlungen, bezahltCent } = await import("../lib/finanz/auftraege/store.ts")
 const { berechne, steuerModus, leererKunde, leerePosition, heuteBerlin, addTage, formatEuro } = await import("../lib/finanz/auftraege/rechnen.ts")
 const { fehltFuerERechnung, erzeugeXRechnung } = await import("../lib/finanz/auftraege/erechnung.ts")
 const { dokumentMail } = await import("../lib/finanz/auftraege/mail.ts")
@@ -45,6 +46,8 @@ const { erzeugeDatevCsv } = await import("../lib/finanz/datev.ts")
 const { erzeugeEuerPdf } = await import("../lib/finanz/euer-pdf.ts")
 const { erzeugeRechnungsPdf } = await import("../lib/finanz/auftraege/pdf.ts")
 const { erzeugeSteuerberaterPaket } = await import("../lib/finanz/steuerberater-export.ts")
+const { leseCamt053, leseBankCsv } = await import("../lib/finanz/bank-import.ts")
+const { importiereBankUmsaetze, ladeOffeneBankUmsaetze, bestaetigeZuordnung, ignoriereUmsatz } = await import("../lib/finanz/bank-abgleich.ts")
 const JSZipMod = (await import("jszip")).default
 
 for (const s of FINANZ_SCHEMA) await db(s)
@@ -67,7 +70,7 @@ for (const s of BELEGE_SCHEMA) await db(s)
  */
 await db(
   `TRUNCATE fin_dokument_verlauf, fin_dokumente, fin_buchungen, fin_protokoll, fin_kunden,
-            fin_nummernkreis, fin_abgleich, fin_belege, fin_fristen`,
+            fin_nummernkreis, fin_abgleich, fin_belege, fin_fristen, fin_zahlungen, fin_bank_umsaetze`,
 )
 
 /* ------------------------------------------------------------------------ */
@@ -127,12 +130,12 @@ p(rabatt.bruttoCent === rabatt.nettoCent + rabatt.ustCent, "Brutto = Netto + USt
 console.log("\nF2 · Nummernkreis")
 
 await setUstPflichtig(true)
-const neueRechnung = async (kundeDaten, art = "rechnung", sprache = "de") => {
+const neueRechnung = async (kundeDaten, art = "rechnung", sprache = "de", positionen = [position()]) => {
   const id = await legeEntwurfAn(db, art, { titel: "ABNAHME Nr.", kunde: kundeDaten })
   await speichereEntwurf(db, id, {
     sprache, titel: "ABNAHME Nr.", kunde: kundeDaten, datum: heuteBerlin(), gueltigBis: art === "angebot" ? addTage(heuteBerlin(), 30) : null,
     zahlungszielTage: 14, leistungszeitraum: "Oktober 2026", einleitung: "", schluss: "", rabattProzent: 0, geschaeftsfeld: "it",
-    positionen: [position()],
+    positionen,
   })
   return id
 }
@@ -630,6 +633,120 @@ const k_pruefsummen = await k_zip.file("PRUEFSUMMEN.sha256").async("string")
 p(/^[0-9a-f]{64}  /.test(k_pruefsummen.trim().split("\n")[0]), "K16 jede Zeile der Prüfsummenliste trägt einen echten SHA-256-Hash")
 p(Object.keys(k_zip.files).some((n) => n.startsWith("rechnungen/") && n.endsWith(".xml")),
   "K17 mindestens eine Ausgangsrechnung liegt auch als XRechnung-XML im Paket")
+
+/* ══ L · Teilzahlungen und Bank-Import (Phase 6) ══ */
+console.log("\nL · Teilzahlungen und Bank-Import")
+
+const l_re1 = await neueRechnung(kunde())
+const l_fest1 = await schreibeFest(db, l_re1)
+p(l_fest1.ok, "L1 Testrechnung wird festgeschrieben (brutto 1.190,00 €)", String(l_fest1.dok?.summen?.bruttoCent))
+const l_brutto1 = l_fest1.dok.summen.bruttoCent
+
+const l_teil1 = await erfasseZahlung(db, l_re1, 50000, heuteBerlin(), "manuell", null)
+p(l_teil1.ok && l_teil1.stand.status === "teilbezahlt" && l_teil1.stand.offenCent === l_brutto1 - 50000,
+  "L2 eine Teilzahlung von 500,00 € setzt den Status auf `teilbezahlt`, der Rest stimmt", JSON.stringify(l_teil1))
+p(anzeigeStatus(await ladeDokument(db, l_re1)) === "teilbezahlt", "L3 anzeigeStatus() zeigt `teilbezahlt`")
+p((await bezahltCent(db, l_re1)) === 50000, "L4 bezahltCent() summiert die Zahlungen korrekt")
+const l_zahlungenZwischen = await ladeZahlungen(db, l_re1)
+p(l_zahlungenZwischen.length === 1 && l_zahlungenZwischen[0].cent === 50000 && l_zahlungenZwischen[0].quelle === "manuell",
+  "L5 ladeZahlungen() liefert genau die eine erfasste Zahlung")
+
+const l_buchungVorRest = await db(`SELECT status FROM fin_buchungen WHERE quelle='rechnung' AND quelle_ref=$1 AND storniert_at IS NULL`, [l_re1])
+p(l_buchungVorRest[0]?.status === "geplant", "L6 solange Rest offen ist, bleibt die geplante Buchung `geplant` — nicht bei jeder Teilzahlung gebucht")
+
+const l_rest = l_brutto1 - 50000
+const l_teil2 = await erfasseZahlung(db, l_re1, l_rest, heuteBerlin(), "manuell", null)
+p(l_teil2.ok && l_teil2.stand.status === "bezahlt" && l_teil2.stand.offenCent === 0 && !l_teil2.stand.ueberzahlt,
+  "L7 die Restzahlung bringt den Rest auf 0 und setzt `bezahlt`")
+p((await ladeDokument(db, l_re1)).status === "bezahlt", "L8 der Dokumentstatus steht nach dem Neuladen auf `bezahlt`")
+const l_buchungNachRest = await db(`SELECT status FROM fin_buchungen WHERE quelle='rechnung' AND quelle_ref=$1 AND storniert_at IS NULL`, [l_re1])
+p(l_buchungNachRest[0]?.status === "gebucht", "L9 … und GENAU JETZT, bei Rest 0, wechselt die geplante Buchung auf `gebucht`")
+
+const l_nachBezahlt = await erfasseZahlung(db, l_re1, 100, heuteBerlin(), "manuell", null)
+p(!l_nachBezahlt.ok, "L10 eine bereits vollständig bezahlte Rechnung nimmt keine weitere Zahlung mehr an")
+
+const l_re2 = await neueRechnung(kunde())
+const l_fest2 = await schreibeFest(db, l_re2)
+const l_ueberzahlung = await erfasseZahlung(db, l_re2, l_fest2.dok.summen.bruttoCent + 5000, heuteBerlin(), "manuell", null)
+p(l_ueberzahlung.ok && l_ueberzahlung.stand.status === "bezahlt" && l_ueberzahlung.stand.ueberzahlt && l_ueberzahlung.stand.offenCent === -5000,
+  "L11 eine Überzahlung gilt als bezahlt UND wird als Überzahlung gemeldet (Hinweis, kein Blocker)")
+
+const l_re3 = await neueRechnung(kunde())
+await schreibeFest(db, l_re3)
+await markiereBezahlt(db, l_re3, heuteBerlin())
+p((await ladeDokument(db, l_re3)).status === "bezahlt", "L12 markiereBezahlt() bleibt abwärtskompatibel: ein Klick zahlt den vollen Rest in einem Schritt")
+
+p(await wirft(() => db(`UPDATE fin_zahlungen SET cent = 1 WHERE dokument_id = $1`, [l_re1])), "L13 fin_zahlungen ist GoBD-gesperrt: UPDATE wird vom Trigger verweigert")
+p(await wirft(() => db(`DELETE FROM fin_zahlungen WHERE dokument_id = $1`, [l_re1])), "L14 … DELETE ebenso")
+
+/* -- CSV-Import -- */
+const l_csv = '"Buchungstag";"Verwendungszweck";"Betrag"\n"15.04.2026";"Vielen Dank";"1.234,56"\n'
+const l_csvUmsaetze = leseBankCsv(l_csv)
+p(l_csvUmsaetze.length === 1 && l_csvUmsaetze[0].datum === "2026-04-15" && l_csvUmsaetze[0].betragCent === 123456 && l_csvUmsaetze[0].verwendungszweck === "Vielen Dank",
+  "L15 CSV-Import: deutsches Datum und Komma-Betrag werden korrekt erkannt", JSON.stringify(l_csvUmsaetze[0]))
+
+const l_importiert1 = await importiereBankUmsaetze(db, l_csvUmsaetze, "csv")
+const l_importiert2 = await importiereBankUmsaetze(db, l_csvUmsaetze, "csv")
+p(l_importiert1 === 1 && l_importiert2 === 0, "L16 derselbe CSV-Import ein zweites Mal bringt keine Dubletten (Prüfsumme als Schlüssel)")
+
+/* -- camt.053-Import -- */
+const l_camt = `<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02">
+  <BkToCstmrStmt>
+    <Stmt>
+      <Ntry>
+        <Amt Ccy="EUR">${(l_brutto1 / 100).toFixed(2)}</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <BookgDt><Dt>2026-04-20</Dt></BookgDt>
+        <AcctSvcrRef>REF-ABNAHME-001</AcctSvcrRef>
+        <NtryDtls>
+          <TxDtls>
+            <RmtInf><Ustrd>${l_fest1.dok.nummer} Vielen Dank</Ustrd></RmtInf>
+            <RltdPties><Dbtr><Nm>ABNAHME Kunde</Nm></Dbtr></RltdPties>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>`
+const l_camtUmsaetze = leseCamt053(l_camt)
+p(l_camtUmsaetze.length === 1 && l_camtUmsaetze[0].betragCent === l_brutto1 && l_camtUmsaetze[0].verwendungszweck.includes(l_fest1.dok.nummer) && l_camtUmsaetze[0].gegenpartei === "ABNAHME Kunde",
+  "L17 camt.053-Import: Betrag, Verwendungszweck und Gegenpartei korrekt gelesen", JSON.stringify(l_camtUmsaetze[0]))
+
+/* -- Auto-Abgleich -- */
+const l_re4 = await neueRechnung(kunde({ name: "ABNAHME Sonderkunde Bankabgleich" }))
+const l_fest4 = await schreibeFest(db, l_re4)
+await importiereBankUmsaetze(db, [{ ref: "abgleich-per-nummer", datum: heuteBerlin(), betragCent: l_fest4.dok.summen.bruttoCent, verwendungszweck: `Überweisung ${l_fest4.dok.nummer} danke`, gegenpartei: "Irgendwer GmbH" }], "csv")
+const l_offenNachNummer = await ladeOffeneBankUmsaetze(db)
+const l_treffer1 = l_offenNachNummer.find((u) => u.id === "abgleich-per-nummer")
+p(l_treffer1?.vorschlag?.dokumentId === l_re4 && l_treffer1.vorschlag.grund.includes("Rechnungsnummer"),
+  "L18 Auto-Abgleich per Rechnungsnummer im Verwendungszweck funktioniert, auch wenn Gegenpartei abweicht")
+
+const l_re5 = await neueRechnung(kunde({ name: "ABNAHME Sonderkunde Fuzzy" }), "rechnung", "de", [position({ preisCent: 250_000 })])
+const l_fest5 = await schreibeFest(db, l_re5)
+await importiereBankUmsaetze(db, [{ ref: "abgleich-per-betrag-kunde", datum: heuteBerlin(), betragCent: l_fest5.dok.summen.bruttoCent, verwendungszweck: "Zahlung Projekt Oktober", gegenpartei: "ABNAHME Sonderkunde Fuzzy" }], "csv")
+const l_offenNachBetrag = await ladeOffeneBankUmsaetze(db)
+const l_treffer2 = l_offenNachBetrag.find((u) => u.id === "abgleich-per-betrag-kunde")
+p(l_treffer2?.vorschlag?.dokumentId === l_re5 && l_treffer2.vorschlag.grund.includes("Betrag und Kunde"),
+  "L19 ohne Rechnungsnummer im Text: Betrag + Kundenname im Verwendungszweck/Gegenpartei genügt als Vorschlag")
+
+await importiereBankUmsaetze(db, [{ ref: "abgleich-kein-treffer", datum: heuteBerlin(), betragCent: 777_77, verwendungszweck: "Diverses, ohne Bezug", gegenpartei: "Unbekannt" }], "csv")
+const l_offenOhneTreffer = await ladeOffeneBankUmsaetze(db)
+p(l_offenOhneTreffer.find((u) => u.id === "abgleich-kein-treffer")?.vorschlag === null, "L20 ohne Nummer, Betrag oder Kundenbezug bleibt der Vorschlag leer — landet im Eingangskorb")
+
+const l_zuordnung = await bestaetigeZuordnung(db, "abgleich-per-nummer", l_re4)
+p(l_zuordnung.ok && l_zuordnung.stand.status === "bezahlt", "L21 bestaetigeZuordnung() bucht die Zahlung auf die Rechnung — ein Klick, Rechnung ist jetzt bezahlt")
+p((await ladeOffeneBankUmsaetze(db)).every((u) => u.id !== "abgleich-per-nummer"), "L22 … und der Umsatz verschwindet aus dem offenen Eingangskorb")
+const l_zahlungAusBank = (await ladeZahlungen(db, l_re4)).find((z) => z.quelle === "bank")
+p(l_zahlungAusBank?.ref === "abgleich-per-nummer", "L23 die Zahlung in fin_zahlungen trägt die Bankreferenz als ref — nachvollziehbar, woher sie kam")
+
+const l_erneuteZuordnung = await bestaetigeZuordnung(db, "abgleich-per-nummer", l_re4)
+p(!l_erneuteZuordnung.ok, "L24 ein bereits zugeordneter Umsatz lässt sich nicht noch einmal zuordnen")
+
+await ignoriereUmsatz(db, "abgleich-kein-treffer")
+p((await ladeOffeneBankUmsaetze(db)).every((u) => u.id !== "abgleich-kein-treffer"), "L25 ignoriereUmsatz() nimmt einen Umsatz aus dem Eingangskorb, ohne ihn zu loeschen")
+const l_ignorierterStatus = await db(`SELECT status FROM fin_bank_umsaetze WHERE id = $1`, ["abgleich-kein-treffer"])
+p(l_ignorierterStatus[0]?.status === "ignoriert", "… die Zeile bleibt erhalten, nur der Status aendert sich (append-only im Geiste, nichts verschwindet)")
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()

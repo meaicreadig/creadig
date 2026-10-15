@@ -2,11 +2,13 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 
 import { FinanzShell, OhneSpeicher } from "@/components/finanz/shell"
+import { tag } from "@/components/finanz/format"
 import { AdminInput } from "@/components/admin/primitives"
 import { DokumentBlatt } from "@/components/finanz/auftraege/dokument-blatt"
 import { DokumentEditor } from "@/components/finanz/auftraege/editor"
 import { StatusPille } from "@/components/finanz/auftraege/status-pille"
 import { DruckKnopf, LinkKopieren, NachfassKnopf } from "@/components/finanz/auftraege/knoepfe"
+import { TeilzahlungForm } from "@/components/finanz/auftraege/teilzahlung"
 import {
   bezahltMarkieren,
   entwurfVerwerfen,
@@ -19,7 +21,7 @@ import { finanzBasis } from "@/lib/finanz/basis"
 import { finanzDb } from "@/lib/finanz/store"
 import { GESCHAEFTSFELDER } from "@/lib/finanz/belege"
 import { ART_LABEL, formatEuro, heuteBerlin, naechsteMahnstufe, steuerModus, tageZwischen } from "@/lib/finanz/auftraege/rechnen"
-import { anzeigeStatus, ladeDokument, ladeFirma, ladeKunden, ladeLeistungen, ladeVerlauf, ladeVerwandte } from "@/lib/finanz/auftraege/store"
+import { anzeigeStatus, ladeDokument, ladeFirma, ladeKunden, ladeLeistungen, ladeVerlauf, ladeVerwandte, ladeZahlungen } from "@/lib/finanz/auftraege/store"
 import { dokumentUrl } from "@/lib/finanz/auftraege/mail"
 import { fehltFuerERechnung } from "@/lib/finanz/auftraege/erechnung"
 
@@ -85,7 +87,13 @@ export default async function Vorgang({ params }: { params: Promise<{ id: string
     )
   }
 
-  const [verlauf, verwandte] = await Promise.all([ladeVerlauf(db, d.id), ladeVerwandte(db, d)])
+  const [verlauf, verwandte, zahlungen] = await Promise.all([
+    ladeVerlauf(db, d.id),
+    ladeVerwandte(db, d),
+    d.art === "rechnung" ? ladeZahlungen(db, d.id) : Promise.resolve([]),
+  ])
+  const bezahltSchonCent = zahlungen.reduce((s, z) => s + z.cent, 0)
+  const offenCent = (d.summen?.bruttoCent ?? 0) - bezahltSchonCent
   const url = d.token ? dokumentUrl(d.token) : null
   const heute = heuteBerlin()
   const mahn = d.art === "rechnung" && d.status === "versendet" && d.faelligAm ? naechsteMahnstufe(tageZwischen(d.faelligAm, heute), d.mahnstufe) : null
@@ -160,24 +168,44 @@ export default async function Vorgang({ params }: { params: Promise<{ id: string
           </div>
         )}
 
-        {d.art === "rechnung" && d.status === "versendet" && (
-          <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
-            <form action={bezahltMarkieren} className="bg-background flex items-end gap-2 rounded-full p-1.5 ps-4">
-              <input type="hidden" name="id" value={d.id} />
-              <label className="text-muted-foreground flex items-center gap-2 text-sm">
-                Zahlung am
-                <AdminInput name="am" type="date" defaultValue={heute} className="w-40" aria-label="Zahlungsdatum" />
-              </label>
-              <button className="bg-primary text-primary-foreground rounded-full px-4 py-2 text-sm font-semibold">Als bezahlt buchen</button>
-            </form>
-            <details className="bg-background rounded-3xl px-4 py-2">
-              <summary className="text-muted-foreground cursor-pointer py-1 text-sm">Stornieren …</summary>
-              <form action={stornieren} className="flex flex-wrap items-end gap-2 py-2">
+        {d.art === "rechnung" && (d.status === "versendet" || d.status === "teilbezahlt") && (
+          <div className="flex flex-col gap-3">
+            {d.status === "teilbezahlt" && (
+              <p className="text-muted-foreground text-sm">
+                Bisher eingegangen: <span className="text-foreground font-semibold tabular-nums">{formatEuro(bezahltSchonCent)}</span> · offen:{" "}
+                <span className="text-foreground font-semibold tabular-nums">{formatEuro(offenCent)}</span>
+              </p>
+            )}
+            <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
+              <form action={bezahltMarkieren} className="bg-background flex items-end gap-2 rounded-full p-1.5 ps-4">
                 <input type="hidden" name="id" value={d.id} />
-                <AdminInput name="grund" placeholder="Grund (optional)" className="w-64" aria-label="Storno-Grund" />
-                <button className="bg-destructive text-primary-foreground rounded-full px-4 py-2 text-sm font-medium">Stornorechnung erstellen</button>
+                <label className="text-muted-foreground flex items-center gap-2 text-sm">
+                  Zahlung am
+                  <AdminInput name="am" type="date" defaultValue={heute} className="w-40" aria-label="Zahlungsdatum" />
+                </label>
+                <button className="bg-primary text-primary-foreground rounded-full px-4 py-2 text-sm font-semibold">
+                  {d.status === "teilbezahlt" ? "Rest als bezahlt buchen" : "Als bezahlt buchen"}
+                </button>
               </form>
-            </details>
+              <TeilzahlungForm id={d.id} heute={heute} />
+              <details className="bg-background rounded-3xl px-4 py-2">
+                <summary className="text-muted-foreground cursor-pointer py-1 text-sm">Stornieren …</summary>
+                <form action={stornieren} className="flex flex-wrap items-end gap-2 py-2">
+                  <input type="hidden" name="id" value={d.id} />
+                  <AdminInput name="grund" placeholder="Grund (optional)" className="w-64" aria-label="Storno-Grund" />
+                  <button className="bg-destructive text-primary-foreground rounded-full px-4 py-2 text-sm font-medium">Stornorechnung erstellen</button>
+                </form>
+              </details>
+            </div>
+            {zahlungen.length > 0 && (
+              <ul className="text-muted-foreground flex flex-col gap-1 text-xs">
+                {zahlungen.map((z) => (
+                  <li key={z.id}>
+                    {tag(z.datum)} · {formatEuro(z.cent)} · {z.quelle === "bank" ? "aus Bank-Import" : "von Hand"}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
       </section>

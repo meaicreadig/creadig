@@ -9,10 +9,12 @@ import { pruefeZugang } from "@/lib/admin-widerruf"
 import { finanzBasis } from "@/lib/finanz/basis"
 import { finanzDb, protokolliere } from "@/lib/finanz/store"
 import { istGeschaeftsfeld } from "@/lib/finanz/belege"
-import { EINHEITEN, heuteBerlin, naechsteMahnstufe, tageZwischen, UST_SAETZE, type Entwurf, type Kunde, type Position } from "@/lib/finanz/auftraege/rechnen"
+import { EINHEITEN, formatEuro, heuteBerlin, naechsteMahnstufe, tageZwischen, UST_SAETZE, type Entwurf, type Kunde, type Position } from "@/lib/finanz/auftraege/rechnen"
 import {
   auftraegeSchema,
   beantworteAngebot,
+  bezahltCent,
+  erfasseZahlung,
   FIRMA_STANDARD,
   ladeDokument,
   legeEntwurfAn,
@@ -178,6 +180,23 @@ export async function bezahltMarkieren(form: FormData): Promise<void> {
   neu()
 }
 
+/** Teilzahlung von Hand erfassen (Phase 6) — derselbe Weg, den auch der Bank-Abgleich benutzt (erfasseZahlung()). */
+export async function teilzahlungErfassen(_prev: Ergebnis | null, form: FormData): Promise<Ergebnis> {
+  const db = await zugang()
+  const am = s(form.get("am"), 10)
+  const r = await erfasseZahlung(db, s(form.get("id"), 64), cent(form.get("betrag")), ISO.test(am) ? am : heuteBerlin(), "manuell", null)
+  neu()
+  if (!r.ok) return { ok: false, fehler: [r.fehler] }
+  return {
+    ok: true,
+    hinweis: r.stand.ueberzahlt
+      ? `Zahlung erfasst — ${formatEuro(-r.stand.offenCent)} zu viel eingegangen. Das ist ein Vorgang, keine Rundung.`
+      : r.stand.status === "bezahlt"
+        ? "Zahlung erfasst — die Rechnung ist jetzt vollständig bezahlt."
+        : `Zahlung erfasst — noch ${formatEuro(r.stand.offenCent)} offen.`,
+  }
+}
+
 export async function stornieren(form: FormData): Promise<void> {
   const db = await zugang()
   const sid = await storniere(db, s(form.get("id"), 64), s(form.get("grund"), 300))
@@ -193,7 +212,7 @@ export async function stornieren(form: FormData): Promise<void> {
 export async function nachfassen(id: string): Promise<Ergebnis> {
   const db = await zugang()
   const d = await ladeDokument(db, id)
-  if (!d || d.status !== "versendet") return { ok: false, fehler: ["Nur offene Dokumente."] }
+  if (!d || (d.status !== "versendet" && d.status !== "teilbezahlt")) return { ok: false, fehler: ["Nur offene Dokumente."] }
   let art: MailArt = "nachfrage"
   let stufe: number | null = null
   if (d.art === "rechnung") {
@@ -203,7 +222,9 @@ export async function nachfassen(id: string): Promise<Ergebnis> {
     art = `mahnung_${n}` as MailArt
     stufe = n
   }
-  const r = await sendeDokumentMail({ ...d, mahnstufe: stufe ?? d.mahnstufe }, art)
+  const offenCent = d.status === "teilbezahlt" && d.summen ? d.summen.bruttoCent - (await bezahltCent(db, id)) : d.summen?.bruttoCent
+  const mahnDokument = d.summen && offenCent !== undefined ? { ...d, summen: { ...d.summen, bruttoCent: offenCent } } : d
+  const r = await sendeDokumentMail({ ...mahnDokument, mahnstufe: stufe ?? d.mahnstufe }, art)
   if (!r.ok) return { ok: false, fehler: [r.grund] }
   await vermerkeNachfass(db, id, stufe)
   neu()
