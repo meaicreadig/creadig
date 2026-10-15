@@ -3,10 +3,12 @@ import { Search } from "lucide-react"
 import { FinanzShell, OhneSpeicher } from "@/components/finanz/shell"
 import { Kopierlauf } from "@/components/finanz/belege/kopierlauf"
 import { Eingangskorb } from "@/components/finanz/belege/eingangskorb"
+import { BelegUpload } from "@/components/finanz/belege/upload"
 import { eurRund } from "@/components/finanz/format"
 import { finanzDb } from "@/lib/finanz/store"
 import { finanzBasis } from "@/lib/finanz/basis"
-import { GESCHAEFTSFELDER, belegeSchema, ladeBelege, letzterAbgleich } from "@/lib/finanz/belege"
+import { GESCHAEFTSFELDER, belegeSchema, belegUploadBereit, ladeBelege, letzterAbgleich } from "@/lib/finanz/belege"
+import { belegKiBereit } from "@/lib/finanz/beleg-ki"
 import { kopierlaufBereit } from "@/lib/finanz/kopierlauf-fibero"
 
 export const dynamic = "force-dynamic"
@@ -69,6 +71,7 @@ export default async function FinanzBelege({ searchParams }: { searchParams: Pro
         />
       </form>
 
+      <BelegUpload bereit={belegUploadBereit()} kiBereit={belegKiBereit()} />
       <Eingangskorb daten={daten} basis={basis} />
       <Kopierlauf bereit={kopierlaufBereit()} letzter={letzter} />
     </FinanzShell>

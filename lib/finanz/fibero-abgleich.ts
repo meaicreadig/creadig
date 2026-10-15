@@ -96,7 +96,8 @@ const monatsEnde = (periode: unknown) => {
   const [j, m] = periode.split("-").map(Number)
   return new Date(Date.UTC(j, m, 0)).toISOString().slice(0, 10)
 }
-const satz = (bruttoCent: number, ustCent: number) => {
+/** Naechster von 0/7/19, aus dem Verhaeltnis Brutto/USt — wenn nur der Betrag bekannt ist, nicht der Satz selbst. */
+export const naechsterUstSatz = (bruttoCent: number, ustCent: number) => {
   const netto = bruttoCent - ustCent
   if (ustCent <= 0 || netto <= 0) return 0
   const p = (ustCent / netto) * 100
@@ -238,7 +239,7 @@ export async function gleicheFiberoAb(db: Abfrage): Promise<AbgleichErgebnis> {
         art: "ausgabe",
         datum: d,
         brutto_cent: brutto,
-        ust_satz: privat ? 0 : satz(brutto, mwst),
+        ust_satz: privat ? 0 : naechsterUstSatz(brutto, mwst),
         kategorie,
         gegenpartei: r.haendler ? String(r.haendler) : null,
         notiz:

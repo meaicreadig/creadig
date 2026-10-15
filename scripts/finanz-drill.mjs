@@ -35,10 +35,12 @@ const { berechne, steuerModus, leererKunde, leerePosition, heuteBerlin, addTage,
 const { fehltFuerERechnung, erzeugeXRechnung } = await import("../lib/finanz/auftraege/erechnung.ts")
 const { dokumentMail } = await import("../lib/finanz/auftraege/mail.ts")
 const { ABGLEICH_SCHEMA, gleicheFiberoAb } = await import("../lib/finanz/fibero-abgleich.ts")
+const { BELEGE_SCHEMA, ordneZu } = await import("../lib/finanz/belege.ts")
 
 for (const s of FINANZ_SCHEMA) await db(s)
 for (const s of AUFTRAEGE_SCHEMA) await db(s)
 for (const s of ABGLEICH_SCHEMA) await db(s)
+for (const s of BELEGE_SCHEMA) await db(s)
 
 /*
  * Ein Probelauf muss zweimal dasselbe sagen — dieselbe Ueberlegung wie in
@@ -60,6 +62,7 @@ await db(`DELETE FROM fin_dokumente WHERE titel LIKE 'ABNAHME%' OR id LIKE 'ABNA
 await db(`DELETE FROM fin_kunden WHERE schluessel LIKE '%abnahme.invalid%'`)
 await db(`DELETE FROM fin_buchungen WHERE quelle_ref LIKE 'ABNAHME%' OR id LIKE 'fibero-%' OR id LIKE 'ABNAHME-%'`)
 await db(`DELETE FROM fin_abgleich WHERE quelle = 'fibero'`)
+await db(`DELETE FROM fin_belege WHERE id LIKE 'ABNAHME-%' OR extern_id LIKE 'ABNAHME-%'`)
 for (const t of ["fin_dokumente", "fin_buchungen", "fin_dokument_verlauf", "fin_protokoll"]) {
   await db(`ALTER TABLE ${t} ENABLE TRIGGER ALL`)
 }
@@ -429,6 +432,40 @@ const treffer = luecken.find((l) => l.praefix === "RE" && l.jahr === 2019)
 p(treffer !== undefined && treffer.fehlend.includes(2) && treffer.hoechsteVergeben === 3,
   "G16 eine kuenstlich erzeugte Luecke (RE-2019: 1 und 3 vorhanden, 2 fehlt) wird erkannt",
   treffer ? `fehlend: ${treffer.fehlend.join(",")}` : "nicht gefunden")
+
+/* ══ H · Belege selbst hochladen (Phase 2) ══ */
+console.log("\nH · Beleg-Upload — Zuordnung erzeugt eine Buchung")
+
+/*
+ * ladeBelegHoch() selbst braucht einen echten BLOB_READ_WRITE_TOKEN (Vercel
+ * Blob) — den gibt es in diesem Probelauf bewusst nicht (optionales Modul,
+ * siehe .env.example). Geprueft wird deshalb die Haelfte, die keinen
+ * Dateispeicher braucht: eine Zeile landet in fin_belege genau wie
+ * ladeBelegHoch() sie anlaegt (quelle='hand', extern_id=Pruefsumme), und
+ * ordneZu()/verbucheBeleg() muessen daraus eine Buchung machen.
+ */
+const belegId = "ABNAHME-beleg-1"
+await db(
+  `INSERT INTO fin_belege (id, quelle, extern_id, art, datum, haendler, brutto_cent, netto_cent, vorsteuer_cent, kategorie, datei_status)
+   VALUES ($1,'hand','ABNAHME-sha-1','beleg','2026-10-01','ABNAHME Haendler',11900,10000,1900,'Büro','kopiert')`,
+  [belegId],
+)
+p((await db(`SELECT geschaeftsfeld FROM fin_buchungen WHERE id = $1`, [`beleg-${belegId}`])).length === 0,
+  "H1 ohne Geschaeftsfeld entsteht noch keine Buchung — der Beleg liegt im Eingangskorb")
+
+const zugeordnetAnzahl = await ordneZu(db, [belegId], "it")
+p(zugeordnetAnzahl === 1, "H2 ordneZu() ordnet den Beleg dem Geschaeftsfeld zu")
+const [buchung] = await db(`SELECT art, status, brutto_cent, ust_satz, geschaeftsfeld, quelle, quelle_ref FROM fin_buchungen WHERE id = $1`, [`beleg-${belegId}`])
+p(buchung !== undefined, "H3 die Zuordnung erzeugt eine Buchung (beleg-<id>)")
+p(buchung?.art === "ausgabe" && buchung?.status === "gebucht" && Number(buchung?.brutto_cent) === 11900 && Number(buchung?.ust_satz) === 19,
+  "H4 Art, Status, Betrag und USt-Satz stimmen mit dem Beleg ueberein (11900 Cent, 19 %, aus dem Verhaeltnis Brutto/Vorsteuer bestimmt)")
+p(buchung?.quelle === "beleg" && buchung?.quelle_ref === belegId, "H5 quelle='beleg' und quelle_ref zeigen zurueck auf den Beleg")
+
+await ordneZu(db, [belegId], "software")
+const nachZweitemZuordnen = await db(`SELECT count(*) n FROM fin_buchungen WHERE quelle_ref = $1`, [belegId])
+p(Number(nachZweitemZuordnen[0].n) === 1, "H6 ein zweites Mal zuordnen erzeugt KEINE zweite Buchung (idempotent ueber die feste ID)")
+p(await wirft(() => db(`UPDATE fin_buchungen SET brutto_cent = 1 WHERE id = $1`, [`beleg-${belegId}`])),
+  "H7 die entstandene Buchung ist danach so unveraenderbar wie jede andere gebuchte Zeile (GoBD-Trigger aus F7 gilt auch hier)")
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
