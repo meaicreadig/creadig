@@ -62,23 +62,19 @@ export default async function Vorgang({ params }: { params: Promise<{ id: string
   if (d.status === "entwurf") {
     const [leistungen, kunden] = await Promise.all([ladeLeistungen(db, true), ladeKunden(db)])
     return (
-      <FinanzShell aktiv={bereich} titel={d.art === "rechnung" ? "Neue Rechnung" : d.version > 1 ? `Angebot · Version ${d.version}` : "Neues Angebot"} unterzeile="Entwurf – erst beim Senden bekommt das Dokument seine Nummer und wird unveränderbar.">
-        <Zurueck href={`${basis}/${bereich}`} />
+      <FinanzShell aktiv={bereich} titel={d.art === "rechnung" ? "Neue Rechnung" : d.version > 1 ? `Angebot · Version ${d.version}` : "Neues Angebot"}>
         <DokumentEditor
           id={d.id}
           art={d.art === "rechnung" ? "rechnung" : "angebot"}
           start={d}
+          firma={firma}
+          zurueck={`${basis}/${bereich}`}
+          grundlagen={`${basis}/grundlagen`}
           leistungen={leistungen}
           kunden={kunden}
           felder={GESCHAEFTSFELDER.filter((g) => g.key !== "privat").map((g) => ({ key: g.key, label: g.label }))}
           ustPflichtig={ustPflichtig}
         />
-        <details className="group">
-          <summary className="text-primary cursor-pointer text-sm font-medium">Vorschau des gespeicherten Stands</summary>
-          <div className="mt-4">
-            <DokumentBlatt d={d} firma={firma} modus={modus} />
-          </div>
-        </details>
         <form action={entwurfVerwerfen}>
           <input type="hidden" name="id" value={d.id} />
           <button type="submit" className="text-muted-foreground hover:text-destructive text-sm">Entwurf verwerfen</button>
