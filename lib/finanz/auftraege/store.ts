@@ -102,6 +102,96 @@ export const AUFTRAEGE_SCHEMA = [
   `ALTER TABLE fin_buchungen ADD COLUMN IF NOT EXISTS geschaeftsfeld text`,
   `ALTER TABLE fin_buchungen ADD COLUMN IF NOT EXISTS quelle_ref text`,
   `ALTER TABLE fin_einstellungen ADD COLUMN IF NOT EXISTS firma jsonb NOT NULL DEFAULT '{}'::jsonb`,
+
+  /*
+   * GoBD-FESTSCHREIBUNG — unveraenderbar in der Datenbank, nicht nur in der
+   * Oberflaeche. Lesbare Fassung: scripts/migrations/030-gobd-festschreibung.sql
+   * (dort steht auch, warum die Angebot-Annahme-Ausnahme existiert und warum
+   * quelle='fibero' von der Buchungssperre ausgenommen ist).
+   */
+  `CREATE OR REPLACE FUNCTION fin_dokumente_festschreibung() RETURNS trigger AS $BODY$
+   BEGIN
+     IF OLD.nummer IS NULL THEN
+       RETURN NEW;
+     END IF;
+
+     IF OLD.art = 'angebot' AND OLD.status = 'versendet' AND NEW.status = 'angenommen' THEN
+       IF NEW.nummer IS DISTINCT FROM OLD.nummer
+          OR NEW.kunde IS DISTINCT FROM OLD.kunde
+          OR NEW.datum IS DISTINCT FROM OLD.datum
+          OR NEW.pruefsumme IS DISTINCT FROM OLD.pruefsumme
+          OR NEW.steuer_modus IS DISTINCT FROM OLD.steuer_modus
+       THEN
+         RAISE EXCEPTION 'fin_dokumente %: festgeschrieben (Nummer %) — bei Annahme duerfen nur Positionen/Summen abweichen', OLD.id, OLD.nummer;
+       END IF;
+       RETURN NEW;
+     END IF;
+
+     IF NEW.nummer IS DISTINCT FROM OLD.nummer
+        OR NEW.positionen IS DISTINCT FROM OLD.positionen
+        OR NEW.summen IS DISTINCT FROM OLD.summen
+        OR NEW.kunde IS DISTINCT FROM OLD.kunde
+        OR NEW.datum IS DISTINCT FROM OLD.datum
+        OR NEW.pruefsumme IS DISTINCT FROM OLD.pruefsumme
+        OR NEW.steuer_modus IS DISTINCT FROM OLD.steuer_modus
+     THEN
+       RAISE EXCEPTION 'fin_dokumente %: festgeschrieben (Nummer %) — nummer/positionen/summen/kunde/datum/pruefsumme/steuer_modus sind unveraenderbar', OLD.id, OLD.nummer;
+     END IF;
+     RETURN NEW;
+   END;
+   $BODY$ LANGUAGE plpgsql`,
+  `DROP TRIGGER IF EXISTS trg_fin_dokumente_festschreibung ON fin_dokumente`,
+  `CREATE TRIGGER trg_fin_dokumente_festschreibung BEFORE UPDATE ON fin_dokumente
+     FOR EACH ROW EXECUTE FUNCTION fin_dokumente_festschreibung()`,
+  `CREATE OR REPLACE FUNCTION fin_dokumente_kein_delete() RETURNS trigger AS $BODY$
+   BEGIN
+     IF OLD.nummer IS NOT NULL THEN
+       RAISE EXCEPTION 'fin_dokumente %: festgeschrieben (Nummer %) — loeschen verboten, stattdessen stornieren', OLD.id, OLD.nummer;
+     END IF;
+     RETURN OLD;
+   END;
+   $BODY$ LANGUAGE plpgsql`,
+  `DROP TRIGGER IF EXISTS trg_fin_dokumente_kein_delete ON fin_dokumente`,
+  `CREATE TRIGGER trg_fin_dokumente_kein_delete BEFORE DELETE ON fin_dokumente
+     FOR EACH ROW EXECUTE FUNCTION fin_dokumente_kein_delete()`,
+
+  `CREATE OR REPLACE FUNCTION fin_buchungen_festschreibung() RETURNS trigger AS $BODY$
+   BEGIN
+     IF OLD.status <> 'gebucht' OR OLD.quelle = 'fibero' THEN
+       RETURN NEW;
+     END IF;
+     IF (to_jsonb(NEW) - 'storniert_at') IS DISTINCT FROM (to_jsonb(OLD) - 'storniert_at') THEN
+       RAISE EXCEPTION 'fin_buchungen %: gebucht — nur storniert_at darf noch gesetzt werden', OLD.id;
+     END IF;
+     RETURN NEW;
+   END;
+   $BODY$ LANGUAGE plpgsql`,
+  `DROP TRIGGER IF EXISTS trg_fin_buchungen_festschreibung ON fin_buchungen`,
+  `CREATE TRIGGER trg_fin_buchungen_festschreibung BEFORE UPDATE ON fin_buchungen
+     FOR EACH ROW EXECUTE FUNCTION fin_buchungen_festschreibung()`,
+  `CREATE OR REPLACE FUNCTION fin_buchungen_kein_delete() RETURNS trigger AS $BODY$
+   BEGIN
+     IF OLD.status = 'gebucht' AND OLD.quelle <> 'fibero' THEN
+       RAISE EXCEPTION 'fin_buchungen %: gebucht — loeschen verboten, stattdessen stornieren (storniert_at)', OLD.id;
+     END IF;
+     RETURN OLD;
+   END;
+   $BODY$ LANGUAGE plpgsql`,
+  `DROP TRIGGER IF EXISTS trg_fin_buchungen_kein_delete ON fin_buchungen`,
+  `CREATE TRIGGER trg_fin_buchungen_kein_delete BEFORE DELETE ON fin_buchungen
+     FOR EACH ROW EXECUTE FUNCTION fin_buchungen_kein_delete()`,
+
+  `CREATE OR REPLACE FUNCTION fin_nur_insert() RETURNS trigger AS $BODY$
+   BEGIN
+     RAISE EXCEPTION '% ist ein Verlauf — nur INSERT, kein UPDATE und kein DELETE', TG_TABLE_NAME;
+   END;
+   $BODY$ LANGUAGE plpgsql`,
+  `DROP TRIGGER IF EXISTS trg_fin_dokument_verlauf_nur_insert ON fin_dokument_verlauf`,
+  `CREATE TRIGGER trg_fin_dokument_verlauf_nur_insert BEFORE UPDATE OR DELETE ON fin_dokument_verlauf
+     FOR EACH ROW EXECUTE FUNCTION fin_nur_insert()`,
+  `DROP TRIGGER IF EXISTS trg_fin_protokoll_nur_insert ON fin_protokoll`,
+  `CREATE TRIGGER trg_fin_protokoll_nur_insert BEFORE UPDATE OR DELETE ON fin_protokoll
+     FOR EACH ROW EXECUTE FUNCTION fin_nur_insert()`,
 ]
 
 let bereit: Promise<void> | null = null
@@ -669,4 +759,52 @@ export function anzeigeStatus(d: Dokument, heute = heuteBerlin()): string {
   }
   if (d.art === "rechnung" && d.status === "versendet" && d.faelligAm && d.faelligAm < heute) return "ueberfaellig"
   return d.status
+}
+
+/* ------------------------------------------------------------------------ */
+/* Nummernkreis-Pruefung (GoBD: Lueckenlosigkeit je Praefix + Jahr)          */
+/* ------------------------------------------------------------------------ */
+
+export type NummernkreisLuecke = {
+  praefix: string
+  jahr: number
+  /** Nummern, die zwischen 1 und der hoechsten vergebenen fehlen — eine echte Luecke. */
+  fehlend: number[]
+  hoechsteVergeben: number
+  /** Stand des Zaehlers (fin_nummernkreis). Groesser als hoechsteVergeben heisst: eine Nummer wurde gezogen, aber nie auf einem Dokument festgeschrieben. */
+  zaehlerstand: number
+}
+
+/**
+ * Sollte im Normalbetrieb immer ein leeres Array liefern — jede Nummer
+ * entsteht einmalig in schreibeFest() (`naechsteNummer()`), nie im Entwurf.
+ * Ein Treffer bedeutet: etwas hat an fin_dokumente vorbeigeschrieben (Import,
+ * Konsole, ein abgebrochener Vorgang zwischen Zaehler und UPDATE) — derselbe
+ * Fall, gegen den die Trigger aus scripts/migrations/030-gobd-festschreibung.sql
+ * schreibend schuetzen. Diese Funktion prueft stattdessen LESEND, ob er
+ * trotzdem passiert ist.
+ */
+export async function pruefeNummernkreis(db: Abfrage): Promise<NummernkreisLuecke[]> {
+  await auftraegeSchema(db)
+  const vergeben = await db(
+    `SELECT split_part(nummer, '-', 1) AS praefix, split_part(nummer, '-', 2)::int AS jahr,
+            array_agg(DISTINCT split_part(nummer, '-', 3)::int ORDER BY split_part(nummer, '-', 3)::int) AS vorhanden
+       FROM fin_dokumente WHERE nummer IS NOT NULL GROUP BY 1, 2`,
+    [],
+  )
+  const kreise = await db(`SELECT praefix, jahr, letzte FROM fin_nummernkreis`, [])
+  const zaehlerVon = new Map(kreise.map((k) => [`${k.praefix}-${k.jahr}`, Number(k.letzte)]))
+
+  const luecken: NummernkreisLuecke[] = []
+  for (const r of vergeben) {
+    const vorhanden = (r.vorhanden as unknown[]).map(Number)
+    const hoechste = vorhanden.length ? vorhanden[vorhanden.length - 1] : 0
+    const fehlend: number[] = []
+    for (let i = 1; i <= hoechste; i++) if (!vorhanden.includes(i)) fehlend.push(i)
+    const zaehlerstand = zaehlerVon.get(`${r.praefix}-${r.jahr}`) ?? hoechste
+    if (fehlend.length > 0 || zaehlerstand > hoechste) {
+      luecken.push({ praefix: String(r.praefix), jahr: Number(r.jahr), fehlend, hoechsteVergeben: hoechste, zaehlerstand })
+    }
+  }
+  return luecken.sort((a, b) => a.praefix.localeCompare(b.praefix) || a.jahr - b.jahr)
 }

@@ -30,7 +30,7 @@ console.log(`  (Backend: ${backend})`)
 const { FINANZ_SCHEMA } = await import("../lib/finanz/store.ts")
 const { AUFTRAEGE_SCHEMA, speichereFirma, legeEntwurfAn, speichereEntwurf, schreibeFest, ladeDokument,
   ladeDokumentPerToken, ladeVerwandte, ladeVerlauf, verwerfeEntwurf, neueVersion, beantworteAngebot,
-  markiereGeoeffnet, rechnungAusAngebot, markiereBezahlt, storniere, anzeigeStatus } = await import("../lib/finanz/auftraege/store.ts")
+  markiereGeoeffnet, rechnungAusAngebot, markiereBezahlt, storniere, anzeigeStatus, pruefeNummernkreis } = await import("../lib/finanz/auftraege/store.ts")
 const { berechne, steuerModus, leererKunde, leerePosition, heuteBerlin, addTage, formatEuro } = await import("../lib/finanz/auftraege/rechnen.ts")
 const { fehltFuerERechnung, erzeugeXRechnung } = await import("../lib/finanz/auftraege/erechnung.ts")
 const { dokumentMail } = await import("../lib/finanz/auftraege/mail.ts")
@@ -44,12 +44,33 @@ for (const s of ABGLEICH_SCHEMA) await db(s)
  * Ein Probelauf muss zweimal dasselbe sagen — dieselbe Ueberlegung wie in
  * rechnung-drill.mjs. Was ein FRUEHERER LAUF VON IHM SELBST hinterlassen
  * hat, raeumt er zuerst weg (am Titel-Praefix "ABNAHME" erkennbar).
+ *
+ * Seit den GoBD-Triggern (F7) ist genau das in der Tabelle selbst verboten,
+ * sobald eine Nummer steht — zu Recht, das ist ihr ganzer Zweck. Fuer den
+ * Probelauf eigenen Aufraeumschritt werden die Trigger deshalb kurz
+ * abgeschaltet (Tabelleneigentuemer-Recht, kein Superuser noetig) und direkt
+ * danach wieder angeschaltet — eine Ausnahme fuer das Werkzeug, die in
+ * Produktion nie gebraucht wird, weil dort niemand `ABNAHME`-Fixturen anlegt.
  */
-await db(`DELETE FROM fin_dokument_verlauf WHERE dokument_id IN (SELECT id FROM fin_dokumente WHERE titel LIKE 'ABNAHME%')`)
-await db(`DELETE FROM fin_dokumente WHERE titel LIKE 'ABNAHME%'`)
+for (const t of ["fin_dokumente", "fin_buchungen", "fin_dokument_verlauf", "fin_protokoll"]) {
+  await db(`ALTER TABLE ${t} DISABLE TRIGGER ALL`)
+}
+await db(`DELETE FROM fin_dokument_verlauf WHERE dokument_id IN (SELECT id FROM fin_dokumente WHERE titel LIKE 'ABNAHME%' OR id LIKE 'ABNAHME-%')`)
+await db(`DELETE FROM fin_dokumente WHERE titel LIKE 'ABNAHME%' OR id LIKE 'ABNAHME-%'`)
 await db(`DELETE FROM fin_kunden WHERE schluessel LIKE '%abnahme.invalid%'`)
-await db(`DELETE FROM fin_buchungen WHERE quelle_ref LIKE 'ABNAHME%' OR id LIKE 'fibero-%'`)
+await db(`DELETE FROM fin_buchungen WHERE quelle_ref LIKE 'ABNAHME%' OR id LIKE 'fibero-%' OR id LIKE 'ABNAHME-%'`)
 await db(`DELETE FROM fin_abgleich WHERE quelle = 'fibero'`)
+for (const t of ["fin_dokumente", "fin_buchungen", "fin_dokument_verlauf", "fin_protokoll"]) {
+  await db(`ALTER TABLE ${t} ENABLE TRIGGER ALL`)
+}
+/*
+ * Der Zaehler selbst muss mit zurueckgesetzt werden — sonst entsteht durch
+ * das Aufraeumen genau das, was pruefeNummernkreis() zu Recht meldet: Zahlen,
+ * die ein frueherer Lauf gezogen UND durch Loeschen wieder entfernt hat,
+ * stehen als Luecke da. Eine Wegwerf-Datenbank, die wirklich wegwerfbar sein
+ * soll, muss auch den Zaehler wegwerfen, nicht nur die Dokumente.
+ */
+await db(`DELETE FROM fin_nummernkreis`)
 
 /* ------------------------------------------------------------------------ */
 /* Testfirma — eindeutig als Test gekennzeichnet (nie echte Owner-Daten)     */
@@ -351,6 +372,63 @@ p(trStorno.einleitung.includes("numaralı faturayı iptal eder"), "F6.5 der Stor
 
 const fehltTr = fehltFuerERechnung(festTrRechnung.dok, festTrRechnung.dok.absender)
 p(fehltTr.length === 0, "F6.6 eine TR-Rechnung ist genauso E-Rechnungs-faehig wie DE/EN — die Sprache des Dokuments ist keine Pflichtangabe")
+
+/* ══ F7 · GoBD-Festschreibung — unveraenderbar in der Datenbank, nicht nur in der Oberflaeche ══ */
+console.log("\nF7 · GoBD-Festschreibung (Trigger)")
+
+const g1 = await db(`SELECT id, positionen, status FROM fin_dokumente WHERE id = $1`, [re2])
+p(g1[0].status === "versendet", "G1 Fixtur fuer die Trigger-Proben: re2 (Reverse-Charge-Rechnung) steht noch auf versendet")
+
+p(await wirft(() => db(`UPDATE fin_dokumente SET positionen = '[]'::jsonb WHERE id = $1`, [re2])),
+  "G2 positionen einer festgeschriebenen Rechnung direkt per SQL aendern wird abgelehnt")
+p(await wirft(() => db(`UPDATE fin_dokumente SET nummer = 'RE-2099-9999' WHERE id = $1`, [re2])),
+  "G3 die Nummer selbst direkt aendern wird abgelehnt")
+p(await wirft(() => db(`UPDATE fin_dokumente SET summen = '{}'::jsonb WHERE id = $1`, [re2])),
+  "G4 die Summen direkt aendern wird abgelehnt")
+p(await wirft(() => db(`UPDATE fin_dokumente SET kunde = '{}'::jsonb WHERE id = $1`, [re2])),
+  "G5 der Kunde direkt aendern wird abgelehnt")
+p(!(await wirft(() => db(`UPDATE fin_dokumente SET mahnstufe = 1 WHERE id = $1`, [re2]))),
+  "G6 ein Statusfeld (mahnstufe) darf sich dagegen weiter aendern")
+p(await wirft(() => db(`DELETE FROM fin_dokumente WHERE id = $1`, [re2])),
+  "G7 eine festgeschriebene Rechnung direkt loeschen wird abgelehnt — stornieren statt loeschen")
+
+const gebuchteFibero = await db(`SELECT id FROM fin_buchungen WHERE quelle='fibero' LIMIT 1`)
+const gebuchteManuell = await db(
+  `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, quelle)
+   VALUES ('ABNAHME-gobd-manuell','einnahme','gebucht',current_date,10000,19,'Test','manuell') RETURNING id`,
+)
+p(await wirft(() => db(`UPDATE fin_buchungen SET brutto_cent = 1 WHERE id = $1`, [gebuchteManuell[0].id])),
+  "G8 eine gebuchte, manuelle Buchung direkt im Betrag aendern wird abgelehnt")
+p(!(await wirft(() => db(`UPDATE fin_buchungen SET storniert_at = now() WHERE id = $1`, [gebuchteManuell[0].id]))),
+  "G9 stornieren (storniert_at setzen) bleibt dagegen erlaubt")
+p(await wirft(() => db(`DELETE FROM fin_buchungen WHERE id = $1`, [gebuchteManuell[0].id])),
+  "G10 eine gebuchte, manuelle Buchung direkt loeschen wird abgelehnt")
+p(!(await wirft(() => db(`UPDATE fin_buchungen SET brutto_cent = brutto_cent + 1 WHERE id = $1`, [gebuchteFibero[0].id]))),
+  "G11 eine gebuchte fibero-Buchung darf sich dagegen aendern — das ist der laufende Spiegel, nicht derselbe Fall")
+
+const verlaufZeile = await db(`SELECT id FROM fin_dokument_verlauf WHERE dokument_id = $1 LIMIT 1`, [re2])
+p(await wirft(() => db(`UPDATE fin_dokument_verlauf SET aktion = 'gefaelscht' WHERE id = $1`, [verlaufZeile[0].id])),
+  "G12 fin_dokument_verlauf: UPDATE wird abgelehnt — ein Verlauf wird nicht umgeschrieben")
+p(await wirft(() => db(`DELETE FROM fin_dokument_verlauf WHERE id = $1`, [verlaufZeile[0].id])),
+  "G13 fin_dokument_verlauf: DELETE wird abgelehnt — ein Ereignis wird nicht ungeschehen gemacht")
+
+const protokollZeile = await db(`SELECT id FROM fin_protokoll LIMIT 1`)
+if (protokollZeile.length) {
+  p(await wirft(() => db(`UPDATE fin_protokoll SET aktion = 'gefaelscht' WHERE id = $1`, [protokollZeile[0].id])),
+    "G14 fin_protokoll: UPDATE wird ebenso abgelehnt")
+} else {
+  p(true, "G14 fin_protokoll: keine Zeile zum Pruefen vorhanden, uebersprungen")
+}
+
+p((await pruefeNummernkreis(db)).length === 0, "G15 im gesunden Normalbetrieb meldet pruefeNummernkreis() keine Luecke")
+
+await db(`INSERT INTO fin_dokumente (id, art, status, nummer, datum) VALUES ('ABNAHME-luecke', 'rechnung', 'versendet', 'RE-2019-0001', '2019-01-01')`)
+await db(`INSERT INTO fin_dokumente (id, art, status, nummer, datum) VALUES ('ABNAHME-luecke-3', 'rechnung', 'versendet', 'RE-2019-0003', '2019-01-01')`)
+const luecken = await pruefeNummernkreis(db)
+const treffer = luecken.find((l) => l.praefix === "RE" && l.jahr === 2019)
+p(treffer !== undefined && treffer.fehlend.includes(2) && treffer.hoechsteVergeben === 3,
+  "G16 eine kuenstlich erzeugte Luecke (RE-2019: 1 und 3 vorhanden, 2 fehlt) wird erkannt",
+  treffer ? `fehlend: ${treffer.fehlend.join(",")}` : "nicht gefunden")
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
