@@ -7,6 +7,13 @@ import { finanzDb } from "@/lib/finanz/store"
 import { beantworteAngebot, ladeDokument, ladeDokumentPerToken } from "@/lib/finanz/auftraege/store"
 import { meldeInhaber, sendeDokumentMail } from "@/lib/finanz/auftraege/mail"
 import type { Sprache } from "@/lib/finanz/auftraege/rechnen"
+import { callerAdresse, pruefeRateLimit } from "@/lib/finanz/rate-limit"
+
+const ZU_VIEL_TEXT: Record<Sprache, string> = {
+  de: "Zu viele Versuche. Bitte in einer Stunde erneut versuchen oder uns direkt antworten.",
+  en: "Too many attempts. Please try again in an hour, or reply to us directly.",
+  tr: "Çok fazla deneme. Lütfen bir saat sonra tekrar deneyin veya doğrudan bize yazın.",
+}
 
 export type KundenErgebnis = { ok: true } | { ok: false; fehler: string } | null
 
@@ -16,6 +23,10 @@ export async function kundeAntwortet(token: string, _prev: KundenErgebnis, form:
   if (!db) return { ok: false, fehler: "Gerade nicht erreichbar. Bitte später erneut versuchen." }
   const d = await ladeDokumentPerToken(db, token)
   if (!d || d.art !== "angebot") return { ok: false, fehler: "Dokument nicht gefunden." }
+
+  const ip = callerAdresse(await headers())
+  const erlaubt = await pruefeRateLimit(db, `dokument:${token}:${ip}`, 10, 60)
+  if (!erlaubt) return { ok: false, fehler: ZU_VIEL_TEXT[d.sprache] }
 
   const antwortRoh = form.get("antwort")
   const antwort = antwortRoh === "abgelehnt" ? "abgelehnt" : antwortRoh === "aenderung" ? "aenderung" : "angenommen"

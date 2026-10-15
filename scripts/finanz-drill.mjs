@@ -49,12 +49,14 @@ const { erzeugeSteuerberaterPaket } = await import("../lib/finanz/steuerberater-
 const { leseCamt053, leseBankCsv } = await import("../lib/finanz/bank-import.ts")
 const { importiereBankUmsaetze, ladeOffeneBankUmsaetze, bestaetigeZuordnung, ignoriereUmsatz } = await import("../lib/finanz/bank-abgleich.ts")
 const { erstelleMorgenBericht, sendeMorgenmailFallsFaellig } = await import("../lib/finanz/morgenmail.ts")
+const { RATE_LIMIT_SCHEMA, pruefeRateLimit, callerAdresse } = await import("../lib/finanz/rate-limit.ts")
 const JSZipMod = (await import("jszip")).default
 
 for (const s of FINANZ_SCHEMA) await db(s)
 for (const s of AUFTRAEGE_SCHEMA) await db(s)
 for (const s of ABGLEICH_SCHEMA) await db(s)
 for (const s of BELEGE_SCHEMA) await db(s)
+for (const s of RATE_LIMIT_SCHEMA) await db(s)
 
 /*
  * Ein Probelauf muss zweimal dasselbe sagen — dieselbe Ueberlegung wie in
@@ -71,7 +73,7 @@ for (const s of BELEGE_SCHEMA) await db(s)
  */
 await db(
   `TRUNCATE fin_dokument_verlauf, fin_dokumente, fin_buchungen, fin_protokoll, fin_kunden,
-            fin_nummernkreis, fin_abgleich, fin_belege, fin_fristen, fin_zahlungen, fin_bank_umsaetze`,
+            fin_nummernkreis, fin_abgleich, fin_belege, fin_fristen, fin_zahlungen, fin_bank_umsaetze, fin_rate_limits`,
 )
 
 /* ------------------------------------------------------------------------ */
@@ -783,6 +785,19 @@ await db(`INSERT INTO fin_protokoll (aktion, daten) VALUES ('morgenmail_gesendet
 const m_versand2 = await sendeMorgenmailFallsFaellig(db)
 p(!m_versand2.versendet && m_versand2.grund === "heute bereits verschickt",
   "M7 ist fuer heute schon ein Protokolleintrag vorhanden, verschickt ein zweiter Lauf (z. B. ein erneuter Cron) nichts mehr — hoechstens eine Mail pro Tag")
+
+/* ══ N · Missbrauchsschutz /dokument/[token] (Phase 8) ══ */
+console.log("\nN · Rate-Limit")
+
+p(callerAdresse(new Headers({ "x-forwarded-for": "203.0.113.9, 10.0.0.1" })) === "203.0.113.9", "N1 callerAdresse() nimmt die ERSTE Adresse aus x-forwarded-for (der Aufrufer, nicht ein zwischengeschalteter Proxy)")
+p(callerAdresse(new Headers({ "x-real-ip": "203.0.113.9" })) === "203.0.113.9", "N2 … oder x-real-ip, wenn x-forwarded-for fehlt")
+p(callerAdresse(new Headers()) === "unbekannt", "N3 … oder ein fester Platzhalter, wenn beides fehlt (lokal; im Betrieb reicht Vercel immer eine Adresse durch)")
+
+const n_schluessel = "ABNAHME-dokument-token-1:203.0.113.9"
+for (let i = 0; i < 10; i++) p(await pruefeRateLimit(db, n_schluessel, 10, 60), `N4.${i + 1} Versuch ${i + 1}/10 ist innerhalb des Limits erlaubt`)
+p(!(await pruefeRateLimit(db, n_schluessel, 10, 60)), "N5 der 11. Versuch innerhalb derselben Stunde wird abgelehnt")
+p(await pruefeRateLimit(db, "ABNAHME-dokument-token-2:203.0.113.9", 10, 60), "N6 ein ANDERER Token (anderer Schlüssel) hat sein eigenes, unabhängiges Kontingent")
+p(await pruefeRateLimit(db, "ABNAHME-dokument-token-1:198.51.100.7", 10, 60), "N7 derselbe Token, aber eine ANDERE IP, hat ebenfalls sein eigenes Kontingent")
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
