@@ -19,11 +19,14 @@ function Kennzahl({ label, wert, hinweis, warnung }: { label: string; wert: stri
 export function Geschaeftsfelder({
   bild,
   stand,
+  fiberoAktiv,
   basis,
   jahre,
 }: {
   bild: FelderBild
   stand: AbgleichStand
+  /** Optionales Modul (siehe .env.example) — ohne FIBERO_SUPABASE_* zeigt diese Seite dazu gar nichts, statt eine Leerzeile zu behaupten. */
+  fiberoAktiv: boolean
   basis: string
   jahre: string[]
 }) {
@@ -117,23 +120,25 @@ export function Geschaeftsfelder({
         )}
       </div>
 
-      <div className="text-muted-foreground flex flex-col gap-2 px-2 text-sm">
-        <p>
-          fibero {stand.laufAt ? `abgeglichen ${ZEIT.format(new Date(stand.laufAt))}` : "noch nicht abgeglichen"}
-          {stand.ergebnis
-            ? ` · ${Object.entries(stand.ergebnis)
-                .filter(([, t]) => !t.fehler)
-                .map(([k, t]) => `${t.anzahl} ${namen[k] ?? k}`)
-                .join(" · ")}`
-            : ""}
-          {" · läuft automatisch"}
-        </p>
-        {fehler.length > 0 ? (
-          <p className="text-destructive">
-            Nicht gelesen: {fehler.map(([k, t]) => `${namen[k] ?? k} (${t.fehler})`).join(", ")}
+      {fiberoAktiv && (
+        <div className="text-muted-foreground flex flex-col gap-2 px-2 text-sm">
+          <p>
+            fibero {stand.laufAt ? `abgeglichen ${ZEIT.format(new Date(stand.laufAt))}` : "noch nicht abgeglichen"}
+            {stand.ergebnis
+              ? ` · ${Object.entries(stand.ergebnis)
+                  .filter(([, t]) => !t.fehler)
+                  .map(([k, t]) => `${t.anzahl} ${namen[k] ?? k}`)
+                  .join(" · ")}`
+              : ""}
+            {" · läuft automatisch"}
           </p>
-        ) : null}
-      </div>
+          {fehler.length > 0 ? (
+            <p className="text-destructive">
+              Nicht gelesen: {fehler.map(([k, t]) => `${namen[k] ?? k} (${t.fehler})`).join(", ")}
+            </p>
+          ) : null}
+        </div>
+      )}
     </section>
   )
 }

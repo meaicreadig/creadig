@@ -12,7 +12,7 @@ import { finanzDb } from "@/lib/finanz/store"
 import { after } from "next/server"
 import { Geschaeftsfelder } from "@/components/finanz/geschaeftsfelder"
 import { ladeFelder } from "@/lib/finanz/felder"
-import { abgleichFaellig, abgleichStand, gleicheFiberoAb } from "@/lib/finanz/fibero-abgleich"
+import { abgleichFaellig, abgleichStand, fiberoKonfiguriert, gleicheFiberoAb } from "@/lib/finanz/fibero-abgleich"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Heute" }
@@ -44,7 +44,7 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
     <FinanzShell aktiv="heute" titel={gruss()} unterzeile="Vorne steht, was dich voranbringt. Der Rest läuft im Hintergrund.">
       <FinanzKompass stand={stand} frei={frei} topf={topf} reichweite={reichweite} hinweise={hinweise} verlauf={verlauf} />
 
-      <Geschaeftsfelder bild={felder} stand={abgleichsStand} basis={basis || "/"} jahre={jahre} />
+      <Geschaeftsfelder bild={felder} stand={abgleichsStand} fiberoAktiv={fiberoKonfiguriert()} basis={basis || "/"} jahre={jahre} />
 
       <div className="grid gap-5 lg:grid-cols-5">
         <div className="lg:col-span-3">

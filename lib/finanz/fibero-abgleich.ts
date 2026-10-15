@@ -54,6 +54,16 @@ function zugang() {
   return { url, headers: { apikey: key, Authorization: `Bearer ${key}` } }
 }
 
+/**
+ * Der Schalter von aussen: ist das optionale Modul ueberhaupt eingerichtet?
+ * Reine Praesenzpruefung, kein Geheimnis verlaesst diese Funktion — fuer
+ * die Oberflaeche, die sonst keinen Grund haette, die Glasfaser-Zeile
+ * ueberhaupt zu zeigen (siehe components/finanz/geschaeftsfelder.tsx).
+ */
+export function fiberoKonfiguriert(): boolean {
+  return zugang() !== null
+}
+
 type Zeile = Record<string, unknown>
 type Teil = { anzahl: number; fehler: string | null }
 export type AbgleichErgebnis = { rechnungen: Teil; subunternehmer: Teil; belege: Teil }
