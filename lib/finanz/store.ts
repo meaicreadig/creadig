@@ -86,8 +86,10 @@ export async function ladeAlles(db: Abfrage): Promise<{
   )
   const b = await db(
     `SELECT id, art, status, to_char(datum,'YYYY-MM-DD') AS datum, brutto_cent, ust_satz, kategorie,
-            gegenpartei, notiz, wiederholung, storniert_at IS NOT NULL AS storniert
-       FROM fin_buchungen ORDER BY datum DESC, created_at DESC LIMIT 2000`,
+            gegenpartei, notiz, wiederholung, storniert_at IS NOT NULL AS storniert,
+            to_jsonb(fin_buchungen) -> 'abzug_prozent' AS abzug_prozent,
+            to_jsonb(fin_buchungen) -> 'afa_jahre' AS afa_jahre
+       FROM fin_buchungen ORDER BY datum DESC, created_at DESC LIMIT 5000`,
     [],
   )
   const f = await db(
@@ -117,6 +119,8 @@ export async function ladeAlles(db: Abfrage): Promise<{
       notiz: text(r.notiz),
       wiederholung: r.wiederholung as Wiederholung,
       storniert: Boolean(r.storniert),
+      abzugProzent: r.abzug_prozent === null || r.abzug_prozent === undefined ? null : Number(r.abzug_prozent),
+      afaJahre: r.afa_jahre === null || r.afa_jahre === undefined ? null : Number(r.afa_jahre),
     })),
     fristen: f.map((r) => ({
       id: String(r.id),

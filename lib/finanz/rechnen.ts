@@ -20,6 +20,10 @@ export type Buchung = {
   notiz: string | null
   wiederholung: Wiederholung
   storniert: boolean
+  /** Abzugsfähiger Anteil in % (z. B. Bewirtung 70). Fehlt = 100. */
+  abzugProzent?: number | null
+  /** Anlagegut: Nutzungsdauer in Jahren, Aufwand linear verteilt (AfA). */
+  afaJahre?: number | null
 }
 
 export type Einstellungen = {
@@ -112,6 +116,28 @@ export function ustCent(b: Pick<Buchung, "bruttoCent" | "ustSatz">, ustPflichtig
   return b.bruttoCent - nettoCent(b, ustPflichtig)
 }
 
+/**
+ * Gewinnwirksamer Netto-Betrag einer Buchung im Jahr `jahr`. Vorsteuer bleibt
+ * davon unberührt (voll im Monat des Belegs). Anlagegüter werden linear über
+ * die Nutzungsdauer verteilt, teilweise abzugsfähige Kosten anteilig gezählt.
+ */
+export function aufwandImJahr(
+  b: Pick<Buchung, "bruttoCent" | "ustSatz" | "datum" | "abzugProzent" | "afaJahre">,
+  jahr: string,
+  ustPflichtig: boolean,
+): number {
+  const netto = nettoCent(b, ustPflichtig)
+  const start = Number(b.datum.slice(0, 4))
+  const j = Number(jahr)
+  if (b.afaJahre && b.afaJahre > 0) {
+    const proJahr = netto / b.afaJahre
+    const schon = (j - start) * proJahr
+    return j < start ? 0 : Math.round(Math.max(0, Math.min(proJahr, netto - schon)))
+  }
+  if (j !== start) return 0
+  return Math.round((netto * (b.abzugProzent ?? 100)) / 100)
+}
+
 function vorzeichen(b: Pick<Buchung, "art">): 1 | -1 {
   return b.art === "einnahme" ? 1 : -1
 }
@@ -158,8 +184,8 @@ export function steuertopf(
 
   const jahr = heute.slice(0, 4)
   const gewinnJahrCent = gebucht
-    .filter((b) => b.datum.startsWith(jahr) && !KEIN_BETRIEBSAUFWAND.has(b.kategorie))
-    .reduce((s, b) => s + vorzeichen(b) * nettoCent(b, e.ustPflichtig), 0)
+    .filter((b) => b.datum.slice(0, 4) <= jahr && !KEIN_BETRIEBSAUFWAND.has(b.kategorie))
+    .reduce((s, b) => s + vorzeichen(b) * aufwandImJahr(b, jahr, e.ustPflichtig), 0)
 
   const estGezahlt = fristen
     .filter((f) => f.art === "est" && f.erledigt && f.faellig.startsWith(jahr))
