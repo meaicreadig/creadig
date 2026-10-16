@@ -43,6 +43,8 @@ const { paragraph19Status } = await import("../lib/finanz/paragraph19.ts")
 const { berechneLage } = await import("../lib/finanz/lage.ts")
 const { berechneEuer } = await import("../lib/finanz/euer.ts")
 const { ladeFelder } = await import("../lib/finanz/felder.ts")
+const { kompass } = await import("../lib/finanz/rechnen.ts")
+const { eur: formatEuroKompakt } = await import("../components/finanz/format.ts")
 const { erzeugeDatevCsv } = await import("../lib/finanz/datev.ts")
 const { erzeugeEuerPdf } = await import("../lib/finanz/euer-pdf.ts")
 const { erzeugeRechnungsPdf } = await import("../lib/finanz/auftraege/pdf.ts")
@@ -666,6 +668,39 @@ p((o_jahr4Afa?.cent ?? 0) === 0, "O3 nach Ablauf der Nutzungsdauer (3 Jahre): ke
 const o_feldJahr2 = await ladeFelder(db, String(o_jahr + 1))
 p(o_feldJahr2.summe.ausCent >= 100000,
   "O4 dieselbe Abschreibung taucht konsistent auch in der Geschäftsfelder-Ansicht (ladeFelder()) auf — eine Formel, nicht zwei auseinanderlaufende")
+
+/* ══ P · Kompass — Wachstumssignale aus echten Zahlen ══ */
+console.log("\nP · Kompass-Wachstumssignale")
+
+// 6 Monate stetig 1.000,00 € Ausgaben, keine Einnahmen — Schnitt und "diff > 0"-Hinweis bleiben neutral/aus.
+const p_verlaufRuhig = Array.from({ length: 6 }, (_, i) => ({ schluessel: `2026-0${i + 1}`, einCent: 0, ausCent: 100000 }))
+const p_basis = { topf: { ustOffenCent: 0, estRuecklageCent: 0, gewinnJahrCent: 0, gesamtCent: 0 }, wochen: [], fristen: [], buchungen: [], heute: "2026-06-15", eur: formatEuroKompakt }
+
+const p_puffer = kompass({ ...p_basis, freiCent: 900000, verlauf: p_verlaufRuhig, reichweite: 9, felder: [] })
+p(p_puffer.some((h) => h.schwere === "neutral" && h.text.includes("3.000,00") && h.text.includes("6-Monats-Ziel")),
+  "P1 9 Monate Puffer bei 6 Monaten Ziel: der Überschuss (3.000,00 €) steht als konkrete Zahl im Hinweis, nicht nur ein Satz ohne Betrag", JSON.stringify(p_puffer))
+
+const p_keinUeberschuss = kompass({ ...p_basis, freiCent: 600000, verlauf: p_verlaufRuhig, reichweite: 6, felder: [] })
+p(!p_keinUeberschuss.some((h) => h.text.includes("liegen über dem 6-Monats-Ziel")),
+  "P2 genau am 6-Monats-Ziel (kein Überschuss): kein falscher Überschuss-Betrag behauptet")
+
+const p_felderKonzentriert = [
+  { label: "IT", einCent: 500000, ausCent: 100000, anzahl: 5 },
+  { label: "Glasfaser", einCent: 100000, ausCent: 50000, anzahl: 3 },
+]
+const p_margeKonzentriert = kompass({ ...p_basis, freiCent: 0, verlauf: [], reichweite: null, felder: p_felderKonzentriert })
+p(p_margeKonzentriert.some((h) => h.text.startsWith("IT trägt dieses Jahr 89 %") && h.text.includes("4.000,00") && h.text.includes("4.500,00")),
+  "P3 ein Geschäftsfeld, das 89 % der Marge trägt, wird mit Anteil und beiden Beträgen benannt — eine Beobachtung, keine Handlungsanweisung", JSON.stringify(p_margeKonzentriert))
+
+const p_nurEinFeld = kompass({ ...p_basis, freiCent: 0, verlauf: [], reichweite: null, felder: [{ label: "IT", einCent: 500000, ausCent: 100000, anzahl: 5 }] })
+p(!p_nurEinFeld.some((h) => h.text.includes("trägt dieses Jahr")), "P4 mit nur einem aktiven Geschäftsfeld gibt es nichts zu vergleichen — kein Hinweis")
+
+const p_felderDefizit = [
+  { label: "IT", einCent: 100000, ausCent: 300000, anzahl: 5 },
+  { label: "Glasfaser", einCent: 50000, ausCent: 50000, anzahl: 3 },
+]
+const p_margeDefizit = kompass({ ...p_basis, freiCent: 0, verlauf: [], reichweite: null, felder: p_felderDefizit })
+p(!p_margeDefizit.some((h) => h.text.includes("trägt dieses Jahr")), "P5 bei insgesamt negativer Marge (Verlust) wird kein Investitions-Hebel behauptet — zu früh für diese Frage")
 
 /* ══ L · Teilzahlungen und Bank-Import (Phase 6) ══ */
 console.log("\nL · Teilzahlungen und Bank-Import")

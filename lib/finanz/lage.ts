@@ -15,6 +15,7 @@ import {
 } from "@/lib/finanz/rechnen"
 import { ladeAlles, sichereFristen, type finanzDb } from "@/lib/finanz/store"
 import { paragraph19Status } from "@/lib/finanz/paragraph19"
+import { ladeFelder } from "@/lib/finanz/felder"
 
 type Db = NonNullable<Awaited<ReturnType<typeof finanzDb>>>
 
@@ -32,7 +33,8 @@ export async function berechneLage(db: Db) {
   const wochen = liquiditaet(stand, bewegungen, heute)
   const verlauf = monate(buchungen, heute)
   const reichweite = reichweiteMonate(frei, verlauf)
-  const hinweise = kompass({ freiCent: frei, topf, wochen, fristen, buchungen, verlauf, reichweite, heute, eur })
+  const { felder } = await ladeFelder(db, heute.slice(0, 4))
+  const hinweise = kompass({ freiCent: frei, topf, wochen, fristen, buchungen, verlauf, reichweite, heute, eur, felder })
   const paragraph19 = einstellungen.ustPflichtig ? null : paragraph19Status(buchungen, heute)
   if (paragraph19 && paragraph19.ampel !== "ruhig") {
     hinweise.unshift({

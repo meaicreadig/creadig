@@ -24,6 +24,8 @@ export type MorgenBericht = {
   paragraph19Hinweis: string | null
   belegeImKorb: number
   bankUmsaetzeOffen: number
+  /** Kompass()-Hinweise mit schwere="neutral" — Wachstum/Kapital, keine Störung, aber auch nicht nur bei Problemen interessant. */
+  wachstumsHinweise: string[]
 }
 
 export async function erstelleMorgenBericht(db: Abfrage): Promise<MorgenBericht> {
@@ -49,12 +51,14 @@ export async function erstelleMorgenBericht(db: Abfrage): Promise<MorgenBericht>
     .map((f) => ({ titel: f.titel, faellig: f.faellig, tageBis: tageZwischen(heute, f.faellig) }))
 
   const paragraph19Hinweis = lage.hinweise.find((h) => h.text.includes("§ 19"))?.text ?? null
+  const wachstumsHinweise = lage.hinweise.filter((h) => h.schwere === "neutral").map((h) => h.text)
 
-  return { heute, faelligeMahnungen, fristen, paragraph19Hinweis, belegeImKorb: belege.korbAnzahl, bankUmsaetzeOffen: bankUmsaetze.length }
+  return { heute, faelligeMahnungen, fristen, paragraph19Hinweis, belegeImKorb: belege.korbAnzahl, bankUmsaetzeOffen: bankUmsaetze.length, wachstumsHinweise }
 }
 
-function istRuhig(b: MorgenBericht): boolean {
-  return b.faelligeMahnungen.length === 0 && b.fristen.length === 0 && !b.paragraph19Hinweis && b.belegeImKorb === 0 && b.bankUmsaetzeOffen === 0
+/** "Ruhig" meint: nichts Dringendes — Wachstumshinweise zählen bewusst nicht mit, die sind gerade an ruhigen Tagen am nützlichsten. */
+function istDringend(b: MorgenBericht): boolean {
+  return b.faelligeMahnungen.length > 0 || b.fristen.length > 0 || Boolean(b.paragraph19Hinweis) || b.belegeImKorb > 0 || b.bankUmsaetzeOffen > 0
 }
 
 const STUFEN_TEXT = ["", "Zahlungserinnerung", "1. Mahnung", "2. Mahnung"]
@@ -63,8 +67,9 @@ function berichtMail(b: MorgenBericht): { subject: string; text: string; html: s
   const basis = siteUrl()
   const absaetze: string[] = []
   const details: [string, string][] = []
+  const dringend = istDringend(b)
 
-  if (istRuhig(b)) {
+  if (!dringend) {
     absaetze.push("Heute ist nichts Dringendes offen — kein Mahnungsfall, keine Frist in den nächsten 14 Tagen, kein unbearbeiteter Eingang.")
   } else {
     if (b.faelligeMahnungen.length) {
@@ -81,16 +86,17 @@ function berichtMail(b: MorgenBericht): { subject: string; text: string; html: s
     if (b.bankUmsaetzeOffen > 0) details.push(["Bank-Import", `${b.bankUmsaetzeOffen} Umsatz/Umsätze warten auf Zuordnung`])
     absaetze.push("Kurzer Überblick über das, was heute Aufmerksamkeit braucht. Nichts davon wurde automatisch verschickt oder gebucht — jede Handlung bleibt ein Klick in Finanz.")
   }
+  if (b.wachstumsHinweise.length) details.push(["Wachstum & Kapital", b.wachstumsHinweise.join("\n")])
 
   const text = `${absaetze.join("\n\n")}\n\n${details.map(([k, v]) => `${k}:\n${v}`).join("\n\n")}\n\n${basis}/finanz`
   const html = mailLayout({
-    vorschau: istRuhig(b) ? "Heute ist nichts Dringendes offen." : "Kurzer Finanz-Überblick für heute.",
+    vorschau: dringend ? "Kurzer Finanz-Überblick für heute." : "Heute ist nichts Dringendes offen.",
     titel: `Finanz-Überblick · ${b.heute}`,
     absaetze,
     details,
     knopf: { text: "In Finanz öffnen", href: `${basis}/finanz` },
   })
-  return { subject: istRuhig(b) ? `Finanz: alles ruhig · ${b.heute}` : `Finanz-Überblick · ${b.heute}`, text, html }
+  return { subject: dringend ? `Finanz-Überblick · ${b.heute}` : `Finanz: alles ruhig · ${b.heute}`, text, html }
 }
 
 /** Höchstens eine Morgenmail pro Tag — ein zweiter Cron-Lauf oder ein manueller Trigger am selben Tag verschickt nichts erneut. */
@@ -107,6 +113,6 @@ export async function sendeMorgenmailFallsFaellig(db: Abfrage): Promise<{ versen
   const versand = await sendeMail({ to, subject: mail.subject, text: mail.text, html: mail.html })
   if (!versand.ok) return { versendet: false, grund: versand.grund === "nicht_eingerichtet" ? "RESEND_API_KEY/MAIL_FROM fehlt" : versand.detail }
 
-  await protokolliere(db, "morgenmail_gesendet", { datum: heute, mahnungen: bericht.faelligeMahnungen.length, fristen: bericht.fristen.length, belegeImKorb: bericht.belegeImKorb, bankUmsaetzeOffen: bericht.bankUmsaetzeOffen })
+  await protokolliere(db, "morgenmail_gesendet", { datum: heute, mahnungen: bericht.faelligeMahnungen.length, fristen: bericht.fristen.length, belegeImKorb: bericht.belegeImKorb, bankUmsaetzeOffen: bericht.bankUmsaetzeOffen, wachstumsHinweise: bericht.wachstumsHinweise.length })
   return { versendet: true }
 }

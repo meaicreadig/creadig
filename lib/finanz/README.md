@@ -110,6 +110,30 @@ zählte `teilbezahlt` nirgends mit, der Bank-Abgleich hatte keine deterministisc
 Tie-Break-Regel bei mehreren Treffern, und es gab keinen manuellen
 Zuordnungsweg, wenn der automatische Vorschlag fehlte oder falsch lag.
 
+Danach zwei fachliche Nachträge auf ausdrücklichen Wunsch (nicht im
+10-Phasen-Prompt, aber in dessen Geist — reale Finanz-Daten, keine
+Spekulation):
+
+- **AfA/Anlagevermögen aus Handeingabe**: Die Rechenlogik für mehrjährige
+  Abschreibung (`aufwandImJahr()`, `NETTO_SQL`, `berechneEuer()`s
+  Carry-forward über die Nutzungsdauer) war immer schon vollständig —
+  aber nur über den Fibero-Abgleich erreichbar. `buchungAnlegen()` hat jetzt
+  ein optionales „Nutzungsdauer (Jahre)"-Feld; die GWG-Grenze entscheidet
+  weiterhin der Steuerberater.
+- **Kompass-Wachstumssignale** (`lib/finanz/rechnen.ts`, `kompass()`):
+  zwei neue, rein zahlengetriebene `Hinweis`e mit `schwere: "neutral"` —
+  (1) wie viel freies Kapital über dem 6-Monats-Ziel-Puffer liegt, als
+  konkreter Euro-Betrag statt eines Allgemeinplatzes, und (2) welches
+  Geschäftsfeld dieses Jahr den größten Anteil des Gewinns trägt (ab 50 %
+  bei mindestens zwei aktiven Feldern, nie bei Gesamtverlust). Beides sind
+  Beobachtungen aus echten Zahlen, keine KI-Empfehlungen — die
+  unternehmensweite „Empfehlungs-Gate" (G28/G29, `lib/gedaechtnis.ts` /
+  `lib/navigator.ts`) ist ein strikt separates, regelbasiertes System ohne
+  jede KI-Bewertung und liest heute keine Finanz-Daten; diese Signale laufen
+  bewusst innerhalb von Finanz, nicht dort hinein. Werden zusätzlich in der
+  Besitzer-Morgenmail unter „Wachstum & Kapital" angezeigt, auch an ruhigen
+  Tagen ohne dringenden Anlass — gerade dann sind sie am nützlichsten.
+
 ### Drill
 
 ```
