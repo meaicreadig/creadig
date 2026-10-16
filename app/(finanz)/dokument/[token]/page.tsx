@@ -6,7 +6,7 @@ import { KundenAntwort } from "@/components/finanz/auftraege/kunden-antwort"
 import { DruckKnopf } from "@/components/finanz/auftraege/knoepfe"
 import { finanzDb } from "@/lib/finanz/store"
 import { formatDatum, formatEuro, heuteBerlin, positionNetto, steuerModus } from "@/lib/finanz/auftraege/rechnen"
-import { ladeDokumentPerToken, ladeFirma, markiereGeoeffnet } from "@/lib/finanz/auftraege/store"
+import { bezahltCent, ladeDokumentPerToken, ladeFirma, markiereGeoeffnet } from "@/lib/finanz/auftraege/store"
 
 export const dynamic = "force-dynamic"
 export const metadata: Metadata = { title: "Ihr Dokument", robots: { index: false, follow: false } }
@@ -19,6 +19,7 @@ const HINWEIS = {
     ersetzt: "Zu diesem Angebot gibt es eine neuere Fassung. Bitte nutzen Sie den Link aus der neuesten Mail.",
     abgelaufen: "Die Gültigkeit dieses Angebots ist abgelaufen. Melden Sie sich gern – wir erneuern es.",
     bezahlt: (am: string) => `Bezahlt am ${am}. Vielen Dank.`,
+    teilbezahlt: (bezahlt: string, offen: string) => `Vielen Dank für Ihre Teilzahlung von ${bezahlt}. Noch offen: ${offen}.`,
     storniert: "Diese Rechnung wurde storniert.",
     zahlen: "Bitte überweisen Sie den Betrag mit der Rechnungsnummer als Verwendungszweck.",
     drucken: "Drucken / PDF",
@@ -30,6 +31,7 @@ const HINWEIS = {
     ersetzt: "There is a newer version of this quotation. Please use the link from the latest email.",
     abgelaufen: "This quotation has expired. Get in touch – we are happy to renew it.",
     bezahlt: (am: string) => `Paid on ${am}. Thank you.`,
+    teilbezahlt: (bezahlt: string, offen: string) => `Thank you for your partial payment of ${bezahlt}. Still outstanding: ${offen}.`,
     storniert: "This invoice has been cancelled.",
     zahlen: "Please transfer the amount using the invoice number as payment reference.",
     drucken: "Print / PDF",
@@ -41,6 +43,7 @@ const HINWEIS = {
     ersetzt: "Bu teklifin daha yeni bir versiyonu var. Lütfen son e-postadaki bağlantıyı kullanın.",
     abgelaufen: "Bu teklifin geçerlilik süresi doldu. Bize ulaşın – memnuniyetle yenileriz.",
     bezahlt: (am: string) => `${am} tarihinde ödendi. Teşekkür ederiz.`,
+    teilbezahlt: (bezahlt: string, offen: string) => `${bezahlt} tutarındaki kısmi ödemeniz için teşekkür ederiz. Kalan tutar: ${offen}.`,
     storniert: "Bu fatura iptal edilmiştir.",
     zahlen: "Lütfen tutarı fatura numarasını açıklama olarak belirterek havale ediniz.",
     drucken: "Yazdır / PDF",
@@ -72,7 +75,10 @@ export default async function KundenDokument({ params }: { params: Promise<{ tok
     else if (d.status === "ersetzt") hinweis = t.ersetzt
     else if (abgelaufen) hinweis = t.abgelaufen
   } else if (d.status === "bezahlt") hinweis = t.bezahlt(datum(d.bezahltAm))
-  else if (d.status === "storniert") hinweis = t.storniert
+  else if (d.status === "teilbezahlt" && d.summen) {
+    const bezahlt = await bezahltCent(db, d.id)
+    hinweis = t.teilbezahlt(formatEuro(bezahlt, d.sprache), formatEuro(d.summen.bruttoCent - bezahlt, d.sprache))
+  } else if (d.status === "storniert") hinweis = t.storniert
   else if (d.art === "rechnung") hinweis = t.zahlen
 
   const optionale = d.positionen

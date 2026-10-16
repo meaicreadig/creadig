@@ -33,6 +33,9 @@ export type Einstellungen = {
   ustPflichtig: boolean
   ustRhythmus: "monatlich" | "quartal"
   ustBezahltBis: string
+  /** Letzter aus einem Bank-Import gelesener Saldo — ein Vorschlag, nie automatisch übernommen (siehe FinanzEinstellungen). */
+  bankSaldoCent: number | null
+  bankSaldoAm: string | null
 }
 
 export type FristArt = "ust" | "est" | "sonstig"

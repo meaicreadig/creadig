@@ -745,6 +745,13 @@ export async function bezahltCent(db: Abfrage, dokumentId: string): Promise<numb
   return Number(r?.s ?? 0)
 }
 
+/** Dieselbe Summe für mehrere Rechnungen auf einmal — für Listen/KPIs, die sonst eine Abfrage je Zeile bräuchten. */
+export async function bezahltCentBulk(db: Abfrage, dokumentIds: string[]): Promise<Record<string, number>> {
+  if (dokumentIds.length === 0) return {}
+  const r = await db(`SELECT dokument_id, sum(cent)::bigint AS s FROM fin_zahlungen WHERE dokument_id = ANY($1::text[]) GROUP BY dokument_id`, [dokumentIds])
+  return Object.fromEntries(r.map((x) => [String(x.dokument_id), Number(x.s)]))
+}
+
 export type Zahlungsstand = { bezahltCent: number; offenCent: number; status: "teilbezahlt" | "bezahlt"; ueberzahlt: boolean }
 
 /**
@@ -755,6 +762,54 @@ export type Zahlungsstand = { bezahltCent: number; offenCent: number; status: "t
  * GENAU EINMAL auf 'gebucht', beim Erreichen von Rest ≤ 0 — nicht bei jeder
  * Teilzahlung — und ist danach unveraenderbar (GoBD-Festschreibung, Phase 1).
  */
+/**
+ * Verbucht EXAKT diese eine Zahlung sofort als `gebucht`-Cash-Ereignis — nicht
+ * erst bei vollständiger Bezahlung. Kontostand/Liquidität (rechnen.ts) und die
+ * EÜR (Ist-Versteuerung) sehen eine Teilzahlung so an dem Tag, an dem sie
+ * tatsächlich einging, statt alles auf einmal am Tag der letzten Rate.
+ *
+ * Je USt-Gruppe eine eigene Zeile (dieselbe Aufteilung wie bucheGeplant()):
+ * eine Zahlung wird der Reihe nach (USt-Satz aufsteigend, fest aber
+ * willkürlich — keine Zahlungsavis nennt uns, welcher Teil welche Position
+ * begleicht) auf die noch offenen geplanten Gruppen verteilt. Eine geplante
+ * Gruppe schrumpft um den erhaltenen Anteil oder verschwindet bei Rest 0 —
+ * `geplant` ist noch nicht festgeschrieben (siehe fin_buchungen_festschreibung()),
+ * UPDATE/DELETE bleiben also erlaubt. Ein darüber hinausgehender Rest
+ * (Überzahlung) zählt als 0 %-Einnahme, weil ihm keine Rechnungsposition mehr
+ * zuzuordnen ist.
+ */
+async function verbucheZahlungGebucht(db: Abfrage, dokumentId: string, zahlungId: string, cent: number, datum: string): Promise<void> {
+  const geplant = await db(
+    `SELECT id, brutto_cent, ust_satz, kategorie, gegenpartei, geschaeftsfeld
+       FROM fin_buchungen WHERE quelle='rechnung' AND quelle_ref=$1 AND status='geplant' AND storniert_at IS NULL
+       ORDER BY ust_satz ASC`,
+    [dokumentId],
+  )
+
+  let rest = cent
+  for (const g of geplant) {
+    if (rest <= 0) break
+    const bruttoOffen = Number(g.brutto_cent)
+    const nimm = Math.min(bruttoOffen, rest)
+    await db(
+      `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, notiz, quelle, quelle_ref, geschaeftsfeld)
+       VALUES ($1,'einnahme','gebucht',$2,$3,$4,$5,$6,'Zahlungseingang','rechnung',$7,$8)`,
+      [`${zahlungId}-${g.ust_satz}`, datum, nimm, g.ust_satz, g.kategorie, g.gegenpartei, dokumentId, g.geschaeftsfeld],
+    )
+    const verbleibt = bruttoOffen - nimm
+    if (verbleibt > 0) await db(`UPDATE fin_buchungen SET brutto_cent = $2 WHERE id = $1`, [g.id, verbleibt])
+    else await db(`DELETE FROM fin_buchungen WHERE id = $1`, [g.id])
+    rest -= nimm
+  }
+  if (rest > 0) {
+    await db(
+      `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, notiz, quelle, quelle_ref)
+       VALUES ($1,'einnahme','gebucht',$2,$3,0,'Überzahlung',NULL,'Zahlungseingang über dem offenen Rest','rechnung',$4)`,
+      [`${zahlungId}-ueberzahlung`, datum, rest, dokumentId],
+    )
+  }
+}
+
 export async function erfasseZahlung(
   db: Abfrage,
   dokumentId: string,
@@ -769,7 +824,9 @@ export async function erfasseZahlung(
     return { ok: false, fehler: "Nur eine offene Rechnung kann einen Zahlungseingang erfassen." }
   }
 
-  await db(`INSERT INTO fin_zahlungen (id, dokument_id, datum, cent, quelle, ref) VALUES ($1,$2,$3,$4,$5,$6)`, [crypto.randomUUID(), dokumentId, datum, cent, quelle, ref])
+  const zahlungId = crypto.randomUUID()
+  await db(`INSERT INTO fin_zahlungen (id, dokument_id, datum, cent, quelle, ref) VALUES ($1,$2,$3,$4,$5,$6)`, [zahlungId, dokumentId, datum, cent, quelle, ref])
+  await verbucheZahlungGebucht(db, dokumentId, zahlungId, cent, datum)
   const bezahlt = await bezahltCent(db, dokumentId)
   const rest = d.summen.bruttoCent - bezahlt
   const neuerStatus: "teilbezahlt" | "bezahlt" = rest <= 0 ? "bezahlt" : "teilbezahlt"
@@ -778,9 +835,6 @@ export async function erfasseZahlung(
     `UPDATE fin_dokumente SET status = $2, bezahlt_am = CASE WHEN $2 = 'bezahlt' THEN $3::date ELSE bezahlt_am END, updated_at = now() WHERE id = $1`,
     [dokumentId, neuerStatus, datum],
   )
-  if (neuerStatus === "bezahlt") {
-    await db(`UPDATE fin_buchungen SET status='gebucht', datum=$2 WHERE quelle='rechnung' AND quelle_ref=$1 AND storniert_at IS NULL`, [dokumentId, datum])
-  }
   await verlauf(db, dokumentId, quelle === "bank" ? "zahlung_bank" : "zahlung", { cent, datum, bezahltGesamt: bezahlt, rest, ref })
   return { ok: true, stand: { bezahltCent: bezahlt, offenCent: rest, status: neuerStatus, ueberzahlt: rest < 0 } }
 }

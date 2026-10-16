@@ -9,7 +9,7 @@ import { KATEGORIEN, type Art } from "@/lib/finanz/rechnen"
 import { finanzDb, protokolliere } from "@/lib/finanz/store"
 import { berechneLage } from "@/lib/finanz/lage"
 import { frageAssistent } from "@/lib/finanz/assistent"
-import { leseBankCsv, leseCamt053 } from "@/lib/finanz/bank-import"
+import { leseBankCsv, leseBankCsvSaldo, leseCamt053, leseCamt053Saldo } from "@/lib/finanz/bank-import"
 import { bestaetigeZuordnung, ignoriereUmsatz, importiereBankUmsaetze } from "@/lib/finanz/bank-abgleich"
 
 const PFAD = "/finanz"
@@ -155,6 +155,18 @@ export async function einstellungenSpeichern(form: FormData) {
   revalidatePath(PFAD, "layout")
 }
 
+/** Kontostand aus dem zuletzt importierten Bank-Saldo übernehmen (Phase 6/9) — ein Klick, nie automatisch. */
+export async function kontostandAusBankUebernehmen(): Promise<void> {
+  const db = await zugang()
+  await db(
+    `UPDATE fin_einstellungen SET kontostand_cent = bank_saldo_cent, kontostand_am = bank_saldo_am, updated_at = now()
+       WHERE id = 'haupt' AND bank_saldo_cent IS NOT NULL AND bank_saldo_am IS NOT NULL`,
+    [],
+  )
+  await protokolliere(db, "kontostand_aus_bank_uebernommen", {})
+  revalidatePath(PFAD, "layout")
+}
+
 /**
  * § 19-Wächter (Phase 4): der Vorschlag aus dem Kompass, EXPLIZIT bestätigt —
  * keine automatische Umstellung, nur weil eine Grenze rechnerisch
@@ -188,8 +200,19 @@ export async function bankImportieren(_prev: BankImportErgebnis | null, form: Fo
     const umsaetze = istCamt ? leseCamt053(text) : leseBankCsv(text)
     if (umsaetze.length === 0) return { ok: false, fehler: "Keine Umsätze erkannt — Format prüfen (CSV-Spalten oder camt.053-Struktur)." }
     const anzahl = await importiereBankUmsaetze(db, umsaetze, istCamt ? "camt053" : "csv")
-    await protokolliere(db, "bank_import", { gelesen: umsaetze.length, neu: anzahl, quelle: istCamt ? "camt053" : "csv" })
+
+    const saldo = istCamt ? leseCamt053Saldo(text) : leseBankCsvSaldo(text)
+    if (saldo) {
+      await db(
+        `UPDATE fin_einstellungen SET bank_saldo_cent = $1, bank_saldo_am = $2
+           WHERE id = 'haupt' AND (bank_saldo_am IS NULL OR bank_saldo_am < $2::date)`,
+        [saldo.cent, saldo.datum],
+      )
+    }
+
+    await protokolliere(db, "bank_import", { gelesen: umsaetze.length, neu: anzahl, quelle: istCamt ? "camt053" : "csv", saldoGefunden: saldo !== null })
     revalidatePath("/finanz/geldfluss")
+    revalidatePath("/finanz")
     return { ok: true, anzahl }
   } catch (e) {
     return { ok: false, fehler: `Import fehlgeschlagen: ${e instanceof Error ? e.message : "unbekannter Fehler"}` }

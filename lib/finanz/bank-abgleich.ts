@@ -34,6 +34,26 @@ export type OffenerBankUmsatz = {
 
 const normalisiere = (s: string) => s.toLowerCase().replace(/[^a-z0-9äöüß]+/g, " ").trim()
 
+export type OffeneRechnungFuerAbgleich = { id: string; nummer: string; kunde: string; offenCent: number }
+
+/** Alle offenen Rechnungen mit ihrem aktuellen Rest — Grundlage für den Vorschlag UND für die manuelle Zuordnung in der Oberfläche. */
+export async function ladeOffeneRechnungenFuerAbgleich(db: Abfrage): Promise<OffeneRechnungFuerAbgleich[]> {
+  const r = await db(
+    `SELECT fd.id, fd.nummer, fd.kunde, (fd.summen->>'bruttoCent')::bigint AS brutto_cent,
+            coalesce((SELECT sum(z.cent) FROM fin_zahlungen z WHERE z.dokument_id = fd.id), 0) AS bezahlt_cent
+       FROM fin_dokumente fd
+      WHERE fd.art = 'rechnung' AND fd.status IN ('versendet','teilbezahlt') AND fd.nummer IS NOT NULL
+      ORDER BY fd.created_at ASC`,
+    [],
+  )
+  return r.map((x) => ({
+    id: String(x.id),
+    nummer: String(x.nummer),
+    kunde: (() => { const k = x.kunde as { firma?: string; name?: string }; return k.firma || k.name || "" })(),
+    offenCent: Number(x.brutto_cent ?? 0) - Number(x.bezahlt_cent ?? 0),
+  }))
+}
+
 export async function ladeOffeneBankUmsaetze(db: Abfrage): Promise<OffenerBankUmsatz[]> {
   const umsaetze = await db(
     `SELECT id, to_char(datum,'YYYY-MM-DD') AS datum, betrag_cent, verwendungszweck, gegenpartei
@@ -42,19 +62,7 @@ export async function ladeOffeneBankUmsaetze(db: Abfrage): Promise<OffenerBankUm
   )
   if (umsaetze.length === 0) return []
 
-  const offeneRechnungen = await db(
-    `SELECT fd.id, fd.nummer, fd.kunde, (fd.summen->>'bruttoCent')::bigint AS brutto_cent,
-            coalesce((SELECT sum(z.cent) FROM fin_zahlungen z WHERE z.dokument_id = fd.id), 0) AS bezahlt_cent
-       FROM fin_dokumente fd
-      WHERE fd.art = 'rechnung' AND fd.status IN ('versendet','teilbezahlt') AND fd.nummer IS NOT NULL`,
-    [],
-  )
-  const kandidaten = offeneRechnungen.map((r) => ({
-    id: String(r.id),
-    nummer: String(r.nummer),
-    kunde: (() => { const k = r.kunde as { firma?: string; name?: string }; return k.firma || k.name || "" })(),
-    offenCent: Number(r.brutto_cent ?? 0) - Number(r.bezahlt_cent ?? 0),
-  }))
+  const kandidaten = await ladeOffeneRechnungenFuerAbgleich(db)
 
   return umsaetze.map((u) => {
     const zweck = String(u.verwendungszweck ?? "")
@@ -67,11 +75,14 @@ export async function ladeOffeneBankUmsaetze(db: Abfrage): Promise<OffenerBankUm
     if (perNummer) {
       vorschlag = { dokumentId: perNummer.id, nummer: perNummer.nummer, kunde: perNummer.kunde, offenCent: perNummer.offenCent, grund: `Rechnungsnummer ${perNummer.nummer} im Verwendungszweck gefunden` }
     } else {
-      const perBetragUndKunde = kandidaten.find((k) => {
-        if (k.offenCent <= 0 || Math.abs(k.offenCent - betrag) > 100) return false
-        const kundeNorm = normalisiere(k.kunde)
-        return kundeNorm.length > 2 && (zweckNorm.includes(kundeNorm) || (gegenpartei && normalisiere(gegenpartei).includes(kundeNorm)))
-      })
+      /* Mehrere Treffer möglich (zwei Kunden mit ähnlichem Namen, ähnlicher Rest) — der mit dem genaueren Betrag gewinnt, nicht der erste in beliebiger DB-Reihenfolge. */
+      const perBetragUndKunde = kandidaten
+        .filter((k) => {
+          if (k.offenCent <= 0 || Math.abs(k.offenCent - betrag) > 100) return false
+          const kundeNorm = normalisiere(k.kunde)
+          return kundeNorm.length > 2 && (zweckNorm.includes(kundeNorm) || (gegenpartei && normalisiere(gegenpartei).includes(kundeNorm)))
+        })
+        .sort((a, b) => Math.abs(a.offenCent - betrag) - Math.abs(b.offenCent - betrag))[0]
       if (perBetragUndKunde) {
         vorschlag = { dokumentId: perBetragUndKunde.id, nummer: perBetragUndKunde.nummer, kunde: perBetragUndKunde.kunde, offenCent: perBetragUndKunde.offenCent, grund: "Betrag und Kunde passen zum offenen Rest" }
       }

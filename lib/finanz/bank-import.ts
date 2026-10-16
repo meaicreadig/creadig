@@ -59,10 +59,35 @@ export function leseCamt053(xml: string): BankUmsatz[] {
   return umsaetze
 }
 
+export type BankSaldo = { cent: number; datum: string }
+
+/** Schluss-Saldo (CLBD = closing booked, sonst CLAV = closing available) — fürs optionale Übernehmen in die Kontostand-Einstellung. */
+export function leseCamt053Saldo(xml: string): BankSaldo | null {
+  const doc = camtParser.parse(xml) as Record<string, unknown>
+  const stmts = alsArray((doc?.Document as Record<string, unknown>)?.BkToCstmrStmt && ((doc.Document as Record<string, unknown>).BkToCstmrStmt as Record<string, unknown>).Stmt) as Record<string, unknown>[]
+
+  let bester: BankSaldo | null = null
+  for (const stmt of stmts) {
+    const baelle = alsArray(stmt.Bal as Record<string, unknown> | Record<string, unknown>[])
+    for (const bal of baelle) {
+      const tp = bal.Tp as Record<string, unknown> | undefined
+      const code = text((tp?.CdOrPrtry as Record<string, unknown>)?.Cd)
+      if (code !== "CLBD" && code !== "CLAV") continue
+      const betrag = Number(text(bal.Amt))
+      const richtung = text(bal.CdtDbtInd) === "CRDT" ? 1 : -1
+      const datum = text((bal.Dt as Record<string, unknown>)?.Dt)
+      if (!datum || !Number.isFinite(betrag)) continue
+      if (code === "CLBD" || !bester) bester = { cent: Math.round(betrag * 100) * richtung, datum }
+    }
+  }
+  return bester
+}
+
 const SPALTEN_DATUM = ["buchungstag", "valutadatum", "datum", "wertstellung"]
 const SPALTEN_BETRAG = ["betrag", "umsatz", "betrag (eur)", "betrag eur"]
 const SPALTEN_ZWECK = ["verwendungszweck", "buchungstext", "vwz", "zahlungsreferenz"]
 const SPALTEN_PARTEI = ["beguenstigter/zahlungspflichtiger", "empfaenger", "auftraggeber", "name", "zahlungsbeteiligter"]
+const SPALTEN_SALDO = ["saldo nach buchung", "saldo", "kontostand"]
 
 function normalisiereHeader(h: string): string {
   return h.trim().toLowerCase().replace(/^﻿/, "").replace(/"/g, "")
@@ -129,4 +154,25 @@ export function leseBankCsv(text: string): BankUmsatz[] {
     umsaetze.push({ ref: pruefsummenRef(datum, betragCent, verwendungszweck), datum, betragCent, verwendungszweck, gegenpartei })
   }
   return umsaetze
+}
+
+/** Saldospalte, sofern die Bank eine mitliefert — fürs optionale Übernehmen in die Kontostand-Einstellung. Nimmt die Zeile mit dem jüngsten Datum, unabhängig von der Zeilenreihenfolge im Export. */
+export function leseBankCsvSaldo(text: string): BankSaldo | null {
+  const zeilen = text.split(/\r?\n/).filter((z) => z.trim())
+  if (zeilen.length < 2) return null
+  const trenner = (zeilen[0].match(/;/g)?.length ?? 0) >= (zeilen[0].match(/,/g)?.length ?? 0) ? ";" : ","
+  const header = parseCsvZeile(zeilen[0], trenner).map(normalisiereHeader)
+  const iDatum = findeSpalte(header, SPALTEN_DATUM)
+  const iSaldo = findeSpalte(header, SPALTEN_SALDO)
+  if (iDatum === -1 || iSaldo === -1) return null
+
+  let bester: BankSaldo | null = null
+  for (const zeile of zeilen.slice(1)) {
+    const felder = parseCsvZeile(zeile, trenner)
+    const datum = parseDatum(felder[iDatum] ?? "")
+    const saldo = parseBetrag(felder[iSaldo] ?? "")
+    if (!datum || saldo === null) continue
+    if (!bester || datum > bester.datum) bester = { cent: Math.round(saldo * 100), datum }
+  }
+  return bester
 }

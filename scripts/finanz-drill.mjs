@@ -645,6 +645,9 @@ const l_fest1 = await schreibeFest(db, l_re1)
 p(l_fest1.ok, "L1 Testrechnung wird festgeschrieben (brutto 1.190,00 €)", String(l_fest1.dok?.summen?.bruttoCent))
 const l_brutto1 = l_fest1.dok.summen.bruttoCent
 
+/* kontostand_am defaultet auf HEUTE (Neuanlage, noch kein echter Startwert) — kontostandHeute() zaehlt nur datum > kontostand_am, eine sinnvolle Kontostand-Probe braucht also einen Startpunkt in der Vergangenheit. */
+await db(`UPDATE fin_einstellungen SET kontostand_am = $1 WHERE id = 'haupt'`, [addTage(heuteBerlin(), -365)])
+const l_standVorTeilzahlung = (await berechneLage(db)).stand
 const l_teil1 = await erfasseZahlung(db, l_re1, 50000, heuteBerlin(), "manuell", null)
 p(l_teil1.ok && l_teil1.stand.status === "teilbezahlt" && l_teil1.stand.offenCent === l_brutto1 - 50000,
   "L2 eine Teilzahlung von 500,00 € setzt den Status auf `teilbezahlt`, der Rest stimmt", JSON.stringify(l_teil1))
@@ -654,16 +657,27 @@ const l_zahlungenZwischen = await ladeZahlungen(db, l_re1)
 p(l_zahlungenZwischen.length === 1 && l_zahlungenZwischen[0].cent === 50000 && l_zahlungenZwischen[0].quelle === "manuell",
   "L5 ladeZahlungen() liefert genau die eine erfasste Zahlung")
 
-const l_buchungVorRest = await db(`SELECT status FROM fin_buchungen WHERE quelle='rechnung' AND quelle_ref=$1 AND storniert_at IS NULL`, [l_re1])
-p(l_buchungVorRest[0]?.status === "geplant", "L6 solange Rest offen ist, bleibt die geplante Buchung `geplant` — nicht bei jeder Teilzahlung gebucht")
+const l_buchungenVorRest = await db(`SELECT status, brutto_cent FROM fin_buchungen WHERE quelle='rechnung' AND quelle_ref=$1 AND storniert_at IS NULL ORDER BY status`, [l_re1])
+p(l_buchungenVorRest.some((b) => b.status === "geplant" && Number(b.brutto_cent) === l_brutto1 - 50000),
+  "L6 der noch offene Rest (690,00 €) steht weiter als `geplant` — nicht bei jeder Teilzahlung sofort alles gebucht", JSON.stringify(l_buchungenVorRest))
+p(l_buchungenVorRest.some((b) => b.status === "gebucht" && Number(b.brutto_cent) === 50000),
+  "L6b … UND die Teilzahlung selbst ist sofort `gebucht` — als eigene Zeile, an dem Tag, an dem sie wirklich einging")
+const l_standNachTeilzahlung = (await berechneLage(db)).stand
+p(l_standNachTeilzahlung - l_standVorTeilzahlung === 50000,
+  "L6c der Kontostand (kontostandHeute(), Geldfluss) sieht die Teilzahlung SOFORT — nicht erst, wenn die Rechnung ganz bezahlt ist",
+  String(l_standNachTeilzahlung - l_standVorTeilzahlung))
 
 const l_rest = l_brutto1 - 50000
 const l_teil2 = await erfasseZahlung(db, l_re1, l_rest, heuteBerlin(), "manuell", null)
 p(l_teil2.ok && l_teil2.stand.status === "bezahlt" && l_teil2.stand.offenCent === 0 && !l_teil2.stand.ueberzahlt,
   "L7 die Restzahlung bringt den Rest auf 0 und setzt `bezahlt`")
 p((await ladeDokument(db, l_re1)).status === "bezahlt", "L8 der Dokumentstatus steht nach dem Neuladen auf `bezahlt`")
-const l_buchungNachRest = await db(`SELECT status FROM fin_buchungen WHERE quelle='rechnung' AND quelle_ref=$1 AND storniert_at IS NULL`, [l_re1])
-p(l_buchungNachRest[0]?.status === "gebucht", "L9 … und GENAU JETZT, bei Rest 0, wechselt die geplante Buchung auf `gebucht`")
+const l_buchungenNachRest = await db(`SELECT status, brutto_cent FROM fin_buchungen WHERE quelle='rechnung' AND quelle_ref=$1 AND storniert_at IS NULL`, [l_re1])
+p(l_buchungenNachRest.every((b) => b.status === "gebucht") && l_buchungenNachRest.reduce((s, b) => s + Number(b.brutto_cent), 0) === l_brutto1,
+  "L9 … und bei Rest 0 ist GENAU der volle Rechnungsbetrag `gebucht` — als Summe zweier Zahlungen (500,00 € + 691,00 €), keine `geplant`-Zeile bleibt übrig", JSON.stringify(l_buchungenNachRest))
+const l_standNachVollzahlung = (await berechneLage(db)).stand
+p(l_standNachVollzahlung - l_standNachTeilzahlung === l_rest,
+  "L9b der Kontostand steigt bei der Restzahlung nur noch um den Rest (691,00 €) — die 500,00 € wurden nicht doppelt gezählt")
 
 const l_nachBezahlt = await erfasseZahlung(db, l_re1, 100, heuteBerlin(), "manuell", null)
 p(!l_nachBezahlt.ok, "L10 eine bereits vollständig bezahlte Rechnung nimmt keine weitere Zahlung mehr an")
@@ -673,6 +687,26 @@ const l_fest2 = await schreibeFest(db, l_re2)
 const l_ueberzahlung = await erfasseZahlung(db, l_re2, l_fest2.dok.summen.bruttoCent + 5000, heuteBerlin(), "manuell", null)
 p(l_ueberzahlung.ok && l_ueberzahlung.stand.status === "bezahlt" && l_ueberzahlung.stand.ueberzahlt && l_ueberzahlung.stand.offenCent === -5000,
   "L11 eine Überzahlung gilt als bezahlt UND wird als Überzahlung gemeldet (Hinweis, kein Blocker)")
+const l_ueberzahlungBuchung = await db(`SELECT ust_satz, brutto_cent FROM fin_buchungen WHERE quelle='rechnung' AND quelle_ref=$1 AND kategorie='Überzahlung'`, [l_re2])
+p(l_ueberzahlungBuchung.length === 1 && Number(l_ueberzahlungBuchung[0].ust_satz) === 0 && Number(l_ueberzahlungBuchung[0].brutto_cent) === 5000,
+  "L11b … und die 50,00 € darüber stehen als eigene 0 %-Einnahme im Hauptbuch — keiner Rechnungsposition mehr zuzuordnen, aber nicht verloren")
+
+/* Zahlung quer über zwei USt-Saetze: fuellt der Reihe nach (USt aufsteigend), nicht proportional. */
+const l_re_mix = await neueRechnung(kunde(), "rechnung", "de", [position({ preisCent: 40_000, ustSatz: 0 }), position({ preisCent: 60_000, ustSatz: 19 })])
+await schreibeFest(db, l_re_mix)
+const l_geplantMixVorher = await db(`SELECT ust_satz, brutto_cent FROM fin_buchungen WHERE quelle='rechnung' AND quelle_ref=$1 AND status='geplant' ORDER BY ust_satz`, [l_re_mix])
+p(l_geplantMixVorher.length === 2 && Number(l_geplantMixVorher[0].ust_satz) === 0 && Number(l_geplantMixVorher[0].brutto_cent) === 40000 && Number(l_geplantMixVorher[1].ust_satz) === 19 && Number(l_geplantMixVorher[1].brutto_cent) === 71400,
+  "L11c Fixtur: eine Rechnung mit zwei USt-Sätzen legt zwei getrennte geplante Buchungen an (0 % und 19 %)", JSON.stringify(l_geplantMixVorher))
+// 50.000 Cent reichen die 0 %-Gruppe (40.000) komplett ab und gehen mit 10.000 Cent in die 19 %-Gruppe.
+await erfasseZahlung(db, l_re_mix, 50000, heuteBerlin(), "manuell", null)
+const l_mixNachher = await db(`SELECT status, ust_satz, brutto_cent FROM fin_buchungen WHERE quelle='rechnung' AND quelle_ref=$1 ORDER BY ust_satz, status`, [l_re_mix])
+p(l_mixNachher.filter((b) => b.status === "gebucht").length === 2
+    && l_mixNachher.some((b) => b.status === "gebucht" && Number(b.ust_satz) === 0 && Number(b.brutto_cent) === 40000)
+    && l_mixNachher.some((b) => b.status === "gebucht" && Number(b.ust_satz) === 19 && Number(b.brutto_cent) === 10000),
+  "L11d die Teilzahlung füllt zuerst die 0 %-Gruppe ganz auf (40.000 Cent gebucht) und bucht den Rest (10.000 Cent) in die 19 %-Gruppe", JSON.stringify(l_mixNachher))
+p(l_mixNachher.some((b) => b.status === "geplant" && Number(b.ust_satz) === 19 && Number(b.brutto_cent) === 61400),
+  "L11e … die 19 %-Gruppe bleibt mit dem Rest (61.400 Cent) weiter `geplant` — keine Gruppe verschwindet, bevor sie wirklich beglichen ist")
+p(!l_mixNachher.some((b) => Number(b.ust_satz) === 0 && b.status === "geplant"), "L11f … die 0 %-Gruppe ist vollständig aufgebraucht und als `geplant`-Zeile verschwunden")
 
 const l_re3 = await neueRechnung(kunde())
 await schreibeFest(db, l_re3)

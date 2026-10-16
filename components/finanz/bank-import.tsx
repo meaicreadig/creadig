@@ -3,16 +3,19 @@
 import { useActionState } from "react"
 
 import { bankImportieren, bankUmsatzIgnorieren, bankUmsatzZuordnen, type BankImportErgebnis } from "@/app/(finanz)/finanz/actions"
-import { AdminInput } from "@/components/admin/primitives"
+import { AdminInput, AdminSelect } from "@/components/admin/primitives"
 import { eur, tag } from "@/components/finanz/format"
-import type { OffenerBankUmsatz } from "@/lib/finanz/bank-abgleich"
+import type { OffeneRechnungFuerAbgleich, OffenerBankUmsatz } from "@/lib/finanz/bank-abgleich"
 
 /**
  * Bank-Import (Phase 6) — zuerst ohne PSD2: CSV oder camt.053 hochladen.
  * Jede Zeile ist ein Vorschlag, keine Buchung — bestätigt wird mit einem
- * Klick, nicht zugeordnete Umsätze bleiben sichtbar im Eingangskorb.
+ * Klick, nicht zugeordnete Umsätze bleiben sichtbar im Eingangskorb. Passt
+ * der Vorschlag nicht oder fehlt er, lässt sich dieselbe Zuordnung manuell
+ * auf jede offene Rechnung lenken (bankUmsatzZuordnen() kennt keinen
+ * Unterschied zwischen Vorschlag und Handauswahl).
  */
-export function BankImportKarte({ offeneUmsaetze }: { offeneUmsaetze: OffenerBankUmsatz[] }) {
+export function BankImportKarte({ offeneUmsaetze, offeneRechnungen }: { offeneUmsaetze: OffenerBankUmsatz[]; offeneRechnungen: OffeneRechnungFuerAbgleich[] }) {
   const [ergebnis, importieren, laeuft] = useActionState<BankImportErgebnis | null, FormData>(bankImportieren, null)
 
   return (
@@ -59,7 +62,26 @@ export function BankImportKarte({ offeneUmsaetze }: { offeneUmsaetze: OffenerBan
                   <button className="bg-primary text-primary-foreground rounded-full px-3 py-1.5 text-xs font-semibold">Bestätigen</button>
                 </form>
               ) : (
-                <p className="text-muted-foreground text-xs italic">Kein passender Vorschlag — manuell bei der Rechnung als Teilzahlung erfassen.</p>
+                <p className="text-muted-foreground text-xs italic">Kein passender Vorschlag.</p>
+              )}
+              {offeneRechnungen.length > 0 && (
+                <details className="text-xs">
+                  <summary className="text-muted-foreground cursor-pointer">{u.vorschlag ? "… oder einer anderen Rechnung zuordnen" : "Manuell einer Rechnung zuordnen"}</summary>
+                  <form action={bankUmsatzZuordnen} className="mt-2 flex flex-wrap items-center gap-2">
+                    <input type="hidden" name="umsatzId" value={u.id} />
+                    <AdminSelect name="dokumentId" className="max-w-xs" aria-label="Rechnung auswählen" defaultValue="">
+                      <option value="" disabled>
+                        Rechnung wählen …
+                      </option>
+                      {offeneRechnungen.map((r) => (
+                        <option key={r.id} value={r.id}>
+                          {r.nummer} · {r.kunde} · offen {eur(r.offenCent)}
+                        </option>
+                      ))}
+                    </AdminSelect>
+                    <button className="bg-secondary text-secondary-foreground rounded-full px-3 py-1.5 text-xs font-medium">Zuordnen</button>
+                  </form>
+                </details>
               )}
             </li>
           ))}

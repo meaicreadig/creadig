@@ -91,6 +91,24 @@ Entwickler ohne Repo-Kontext — nicht zum manuellen Ausführen gedacht.
 | `031-zahlungen-bank.sql` | `fin_zahlungen`, `fin_bank_umsaetze` | 6 |
 | (keine Tabelle — `lib/termine/mail.ts` wiederverwendet) | — | 7 |
 | `032-rate-limits.sql` | `fin_rate_limits` | 8 |
+| `034-bank-saldo.sql` | `fin_einstellungen.bank_saldo_cent`/`bank_saldo_am` — Vorschlag aus dem Bank-Import, Kontostand erst nach Klick übernommen | 9 (Professional-Pass) |
+
+### Professional-Pass (nach Phase 9, auf eigenen Wunsch)
+
+Eine Selbstprüfung nach Phase 9 fand mehrere Stellen, die `teilbezahlt`
+(Phase 6) nicht kannten, und einen echten Zeitpunktfehler im Kernbuch: eine
+Teilzahlung erzeugte keine eigene Buchung, sondern blieb bis zur komplett
+bezahlten Rechnung unsichtbar für Kontostand (`kontostandHeute()`),
+Liquiditätsprognose und EÜR — die ganze Summe sprang dann auf einmal, am Tag
+der LETZTEN Rate, in die Vergangenheit der ersten Teilzahlung hinein. Behoben:
+`erfasseZahlung()` bucht jetzt JEDE Zahlung sofort als eigene `gebucht`-Zeile
+(`verbucheZahlungGebucht()`, je USt-Satz-Gruppe eine, der Reihe nach gefüllt),
+die ursprüngliche `geplant`-Zeile schrumpft oder verschwindet entsprechend.
+Zusätzlich behoben: Kunden-Dokumentseite kannte `teilbezahlt` nicht (zeigte
+den vollen Betrag ohne Hinweis auf bereits Gezahltes), die Rechnungen-Liste
+zählte `teilbezahlt` nirgends mit, der Bank-Abgleich hatte keine deterministische
+Tie-Break-Regel bei mehreren Treffern, und es gab keinen manuellen
+Zuordnungsweg, wenn der automatische Vorschlag fehlte oder falsch lag.
 
 ### Drill
 
