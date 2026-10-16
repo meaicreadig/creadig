@@ -32,6 +32,7 @@ import {
 import { sendeDokumentMail, type MailArt } from "@/lib/finanz/auftraege/mail"
 import { erzeugeXRechnung } from "@/lib/finanz/auftraege/erechnung"
 import { ladeFirma, type Dokument } from "@/lib/finanz/auftraege/store"
+import { entwerfeMahnung } from "@/lib/finanz/assistent"
 
 /** Rechnungen gehen immer mit XRechnung-XML raus, sobald alle Angaben dafür vorliegen. */
 async function eRechnungAnhang(db: Awaited<ReturnType<typeof zugang>>, d: Dokument) {
@@ -292,4 +293,34 @@ export async function firmaSpeichern(form: FormData): Promise<void> {
   await speichereFirma(db, f)
   await protokolliere(db, "firma_gespeichert", {})
   neu()
+}
+
+export type MahnEntwurfErgebnis = { entwurf: string } | { fehler: string } | null
+
+/**
+ * Persönlicher KI-Mahnungsentwurf für einen Einzelfall (nie automatisch
+ * verschickt — siehe entwerfeMahnung()). Die reguläre Mahnstufen-Vorlage
+ * (nachfassen()) bleibt der Standardweg; das hier ist ein Zweites für
+ * schwierige Fälle, wo ein persönlicher Ton mehr bringt als die Vorlage.
+ */
+export async function mahnungEntwerfen(_prev: MahnEntwurfErgebnis, form: FormData): Promise<MahnEntwurfErgebnis> {
+  const db = await zugang()
+  const id = s(form.get("id"), 64)
+  const notiz = s(form.get("notiz"), 500)
+  const d = await ladeDokument(db, id)
+  if (!d || d.art !== "rechnung" || !d.summen || !d.faelligAm) return { fehler: "Rechnung nicht gefunden." }
+
+  const offenerRestCent = d.summen.bruttoCent - (await bezahltCent(db, id))
+  const tageUeberfaellig = tageZwischen(d.faelligAm, heuteBerlin())
+  const r = await entwerfeMahnung({
+    nummer: d.nummer ?? "",
+    kunde: d.kunde.firma || d.kunde.name,
+    sprache: d.sprache,
+    offenerRestCent,
+    tageUeberfaellig,
+    mahnstufe: d.mahnstufe,
+    notiz: notiz || undefined,
+  })
+  await protokolliere(db, "mahnung_entwurf", { id, ok: "entwurf" in r })
+  return r
 }

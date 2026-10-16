@@ -133,6 +133,17 @@ Spekulation):
   bewusst innerhalb von Finanz, nicht dort hinein. Werden zusätzlich in der
   Besitzer-Morgenmail unter „Wachstum & Kapital" angezeigt, auch an ruhigen
   Tagen ohne dringenden Anlass — gerade dann sind sie am nützlichsten.
+- **KI-Mahnungsentwurf** (`entwerfeMahnung()` in `lib/finanz/assistent.ts`,
+  Oberfläche: `components/finanz/auftraege/mahn-entwurf.tsx` auf
+  `/finanz/vorgang/[id]`): ein ZWEITER, persönlicherer Weg neben der festen
+  DE/EN/TR-Mahnstufen-Vorlage (`nachfassen()`) — für Einzelfälle, wo ein
+  individueller Ton mehr bringt als die Vorlage (optionale Notiz, z. B.
+  „Kunde bat um Aufschub"). Nutzt nur echte Rechnungsdaten (Nummer, offener
+  Rest, Tage überfällig), erfindet nichts. Wird NIE automatisch verschickt —
+  der Entwurf landet editierbar in der Oberfläche, Muhammed kopiert und
+  verschickt ihn selbst. Braucht AI_GATEWAY_API_KEY (lokal nicht
+  eingerichtet, siehe .env.example); ohne Zugang ein klarer Fehlertext statt
+  eines Absturzes oder erfundenen Entwurfs (Drill-Abschnitt Q).
 
 ### Drill
 

@@ -9,6 +9,7 @@ import { DokumentEditor } from "@/components/finanz/auftraege/editor"
 import { StatusPille } from "@/components/finanz/auftraege/status-pille"
 import { DruckKnopf, LinkKopieren, NachfassKnopf } from "@/components/finanz/auftraege/knoepfe"
 import { TeilzahlungForm } from "@/components/finanz/auftraege/teilzahlung"
+import { MahnEntwurf } from "@/components/finanz/auftraege/mahn-entwurf"
 import {
   bezahltMarkieren,
   entwurfVerwerfen,
@@ -130,6 +131,8 @@ export default async function Vorgang({ params }: { params: Promise<{ id: string
           {d.art === "angebot" && d.status === "versendet" && <NachfassKnopf id={d.id} label="Nachfrage senden" />}
           {mahn && <NachfassKnopf id={d.id} label={["", "Zahlungserinnerung", "1. Mahnung", "2. Mahnung"][mahn]} />}
         </div>
+
+        {d.art === "rechnung" && (d.status === "versendet" || d.status === "teilbezahlt") && <MahnEntwurf id={d.id} />}
 
         {d.art === "angebot" && ["versendet", "aenderung", "abgelehnt"].includes(d.status) && (
           <div className="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">

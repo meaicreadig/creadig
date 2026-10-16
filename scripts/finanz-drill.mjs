@@ -45,6 +45,7 @@ const { berechneEuer } = await import("../lib/finanz/euer.ts")
 const { ladeFelder } = await import("../lib/finanz/felder.ts")
 const { kompass } = await import("../lib/finanz/rechnen.ts")
 const { eur: formatEuroKompakt } = await import("../components/finanz/format.ts")
+const { entwerfeMahnung } = await import("../lib/finanz/assistent.ts")
 const { erzeugeDatevCsv } = await import("../lib/finanz/datev.ts")
 const { erzeugeEuerPdf } = await import("../lib/finanz/euer-pdf.ts")
 const { erzeugeRechnungsPdf } = await import("../lib/finanz/auftraege/pdf.ts")
@@ -701,6 +702,13 @@ const p_felderDefizit = [
 ]
 const p_margeDefizit = kompass({ ...p_basis, freiCent: 0, verlauf: [], reichweite: null, felder: p_felderDefizit })
 p(!p_margeDefizit.some((h) => h.text.includes("trägt dieses Jahr")), "P5 bei insgesamt negativer Marge (Verlust) wird kein Investitions-Hebel behauptet — zu früh für diese Frage")
+
+/* ══ Q · KI-Mahnungsentwurf (persönlich, nie automatisch verschickt) ══ */
+console.log("\nQ · KI-Mahnungsentwurf")
+
+const q_ergebnis = await entwerfeMahnung({ nummer: "RE-ABNAHME-0001", kunde: "ABNAHME Kunde", sprache: "de", offenerRestCent: 50000, tageUeberfaellig: 20, mahnstufe: 1, notiz: "Kunde bat um Aufschub" })
+p(!("entwurf" in q_ergebnis) && "fehler" in q_ergebnis && /KI-Guthaben|Verbindung/.test(q_ergebnis.fehler),
+  "Q1 ohne AI-Gateway-Zugang (hier nicht eingerichtet) liefert entwerfeMahnung() einen klaren Fehler statt eines Absturzes oder eines erfundenen Entwurfs", JSON.stringify(q_ergebnis))
 
 /* ══ L · Teilzahlungen und Bank-Import (Phase 6) ══ */
 console.log("\nL · Teilzahlungen und Bank-Import")
