@@ -75,11 +75,18 @@ export function BuchungErfassen({ heute }: { heute: string }) {
         <AdminField label="Notiz" htmlFor="b-notiz" className="col-span-2">
           <AdminInput id="b-notiz" name="notiz" placeholder="optional" />
         </AdminField>
+        <AdminField label="Nutzungsdauer AfA (Jahre)" htmlFor="b-afa" className="col-span-1">
+          <AdminInput id="b-afa" name="afa_jahre" type="number" min={0} max={50} placeholder="z. B. 3" />
+        </AdminField>
+        <p className="text-muted-foreground col-span-1 self-end pb-2 text-xs leading-relaxed">
+          Nur bei Ausgaben: Anlagegut über mehrere Jahre abschreiben statt sofort voll absetzen. Leer lassen für normale, sofort abzugsfähige Kosten.
+        </p>
         <button type="submit" className="bg-gold text-background col-span-2 rounded-full px-4 py-2.5 text-sm font-medium">
           Buchen
         </button>
         <p className="text-muted-foreground col-span-2 text-xs leading-relaxed">
-          Wird die falsche Art zur Kategorie gewählt, lehnt das System ab. Buchungen werden nie gelöscht, nur storniert.
+          Wird die falsche Art zur Kategorie gewählt, lehnt das System ab. Buchungen werden nie gelöscht, nur storniert. Ob ein Anlagegut
+          sofort abzugsfähig ist oder über die Nutzungsdauer abgeschrieben werden muss (GWG-Grenze), entscheidet der Steuerberater.
         </p>
       </form>
     </section>
@@ -109,6 +116,7 @@ export function BuchungsListe({ buchungen, heute }: { buchungen: Buchung[]; heut
                   <span className="text-muted-foreground truncate text-xs">
                     {b.kategorie}
                     {b.wiederholung !== "keine" ? ` · ${WIEDER[b.wiederholung]}` : ""}
+                    {b.afaJahre ? ` · AfA ${b.afaJahre} Jahre` : ""}
                     {b.notiz ? ` · ${b.notiz}` : ""}
                   </span>
                 </div>

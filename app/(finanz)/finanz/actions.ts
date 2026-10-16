@@ -67,18 +67,21 @@ export async function buchungAnlegen(form: FormData) {
   const ust = Number(feld(form, "ust") ?? 19)
   const status = feld(form, "status") === "geplant" ? "geplant" : "gebucht"
   const wiederholung = feld(form, "wiederholung") ?? "keine"
+  const afaRoh = feld(form, "afa_jahre")
+  const afaJahre = art === "ausgabe" && afaRoh ? Number(afaRoh) : null
 
   if (!betrag || betrag <= 0 || betrag > 100_000_000_00) throw new Error("Betrag ungültig")
   if (!datum || !ISO.test(datum)) throw new Error("Datum ungültig")
   if (!kategorie || !KATEGORIEN[art].includes(kategorie)) throw new Error("Kategorie ungültig")
   if (![0, 7, 19].includes(ust)) throw new Error("USt-Satz ungültig")
   if (!["keine", "monatlich", "quartal", "jaehrlich"].includes(wiederholung)) throw new Error("Wiederholung ungültig")
+  if (afaJahre !== null && (!Number.isInteger(afaJahre) || afaJahre < 1 || afaJahre > 50)) throw new Error("Nutzungsdauer ungültig")
 
   const id = crypto.randomUUID()
   await db(
-    `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, notiz, wiederholung)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-    [id, art, status, datum, betrag, kategorie === "Privatentnahme" ? 0 : ust, kategorie, feld(form, "gegenpartei", 120), feld(form, "notiz", 500), wiederholung],
+    `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, notiz, wiederholung, afa_jahre)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+    [id, art, status, datum, betrag, kategorie === "Privatentnahme" ? 0 : ust, kategorie, feld(form, "gegenpartei", 120), feld(form, "notiz", 500), wiederholung, afaJahre],
   )
   await protokolliere(db, "buchung_angelegt", { id, art, betrag, datum, kategorie })
   revalidatePath(PFAD, "layout")

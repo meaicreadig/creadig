@@ -42,6 +42,7 @@ const { leseERechnungXml, leseERechnung, leseEingebettetesXml } = await import("
 const { paragraph19Status } = await import("../lib/finanz/paragraph19.ts")
 const { berechneLage } = await import("../lib/finanz/lage.ts")
 const { berechneEuer } = await import("../lib/finanz/euer.ts")
+const { ladeFelder } = await import("../lib/finanz/felder.ts")
 const { erzeugeDatevCsv } = await import("../lib/finanz/datev.ts")
 const { erzeugeEuerPdf } = await import("../lib/finanz/euer-pdf.ts")
 const { erzeugeRechnungsPdf } = await import("../lib/finanz/auftraege/pdf.ts")
@@ -636,6 +637,35 @@ const k_pruefsummen = await k_zip.file("PRUEFSUMMEN.sha256").async("string")
 p(/^[0-9a-f]{64}  /.test(k_pruefsummen.trim().split("\n")[0]), "K16 jede Zeile der Prüfsummenliste trägt einen echten SHA-256-Hash")
 p(Object.keys(k_zip.files).some((n) => n.startsWith("rechnungen/") && n.endsWith(".xml")),
   "K17 mindestens eine Ausgangsrechnung liegt auch als XRechnung-XML im Paket")
+
+/* ══ O · AfA / Anlagevermögen — mehrjährige Abschreibung ══ */
+console.log("\nO · AfA / Anlagevermögen")
+
+const o_jahr = Number(heuteBerlin().slice(0, 4))
+// 3.570,00 € brutto bei 19 % → 3.000,00 € netto, auf 3 Jahre abgeschrieben → 1.000,00 €/Jahr. Kategorie "Hardware" kommt sonst nirgends im Drill vor — absolute Prüfung statt Vorher/Nachher-Delta reicht.
+await db(
+  `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, quelle, afa_jahre)
+   VALUES ('ABNAHME-o-afa-1','ausgabe','gebucht',$1,357000,19,'Hardware','ABNAHME Anlagegut-Lieferant','manuell',3)`,
+  [`${o_jahr}-03-01`],
+)
+
+const o_jahr1 = await berechneEuer(db, String(o_jahr))
+const o_jahr1Afa = o_jahr1.ausgaben.find((a) => a.kategorie === "Hardware")
+p(o_jahr1Afa?.cent === 100000,
+  "O1 Anschaffungsjahr: genau die erste AfA-Rate (1.000,00 €) fließt in die EÜR, nicht der volle Kaufpreis (3.000,00 €)", JSON.stringify(o_jahr1Afa))
+
+const o_jahr2 = await berechneEuer(db, String(o_jahr + 1))
+const o_jahr2Afa = o_jahr2.ausgaben.find((a) => a.kategorie === "Hardware")
+p(o_jahr2Afa?.cent === 100000,
+  "O2 Folgejahr (ohne neue Buchung!): die zweite AfA-Rate (1.000,00 €) erscheint trotzdem — die Abschreibung läuft über die Nutzungsdauer weiter", JSON.stringify(o_jahr2Afa))
+
+const o_jahr4 = await berechneEuer(db, String(o_jahr + 3))
+const o_jahr4Afa = o_jahr4.ausgaben.find((a) => a.kategorie === "Hardware")
+p((o_jahr4Afa?.cent ?? 0) === 0, "O3 nach Ablauf der Nutzungsdauer (3 Jahre): keine weitere AfA-Rate mehr — vollständig abgeschrieben")
+
+const o_feldJahr2 = await ladeFelder(db, String(o_jahr + 1))
+p(o_feldJahr2.summe.ausCent >= 100000,
+  "O4 dieselbe Abschreibung taucht konsistent auch in der Geschäftsfelder-Ansicht (ladeFelder()) auf — eine Formel, nicht zwei auseinanderlaufende")
 
 /* ══ L · Teilzahlungen und Bank-Import (Phase 6) ══ */
 console.log("\nL · Teilzahlungen und Bank-Import")
