@@ -43,8 +43,13 @@
  * DIE GRENZE, DIE DIESES GATE NICHT UEBERSCHREITET
  *
  * Der Kanon nennt sie selbst: „haengt am Umsatzsteuer-Status
- * (G04-Owner-Schuld)". `imprintDetails.taxStatusPending` steht seit G04 auf
- * `true` — weder `vatId` noch `smallBusiness` ist entschieden.
+ * (G04-Owner-Schuld)". Der Inhaber hat diese Schuld am 15.10.2026 beglichen:
+ * § 19 UStG (Kleinunternehmer), `imprintDetails.smallBusiness = true`,
+ * `taxStatusPending = false`. `steuerlage()` liefert seitdem `entschieden:
+ * true` statt `offen` — die fuenf Aufrufstellen (`packages.tsx`, `cockpit.ts`,
+ * `jurisdiktion.ts`, `kreislauf.ts`, `verkauf.ts`) muessen dafuer nichts
+ * aendern, weil sie alle ueber diese eine Funktion lesen und nie selbst
+ * entscheiden.
  *
  * Eine Rechnung MUSS sich festlegen: entweder weist sie Umsatzsteuer aus,
  * oder sie traegt den Hinweis nach § 19 UStG. Ein Drittes gibt es nicht.
@@ -58,6 +63,33 @@
  * KEINE RECHTSBERATUNG. Was unten als Pflichtangabe steht, ist die Liste,
  * die § 14 UStG nennt. Ob sie im Einzelfall vollstaendig ist, entscheidet
  * ein Steuerberater und nicht diese Datei.
+ *
+ * ---------------------------------------------------------------------------
+ * EIN NUMMERNKREIS, NICHT ZWEI (Finanz-Abschluss, 15.10.2026)
+ *
+ * `invoices.number` (Migration 012, dieses Gate) traegt einen eigenen
+ * UNIQUE-Index und koennte — wuerde je ein Schreibpfad dafuer gebaut — eine
+ * zweite, von `fin_nummernkreis` unabhaengige Zaehlung erzeugen. Zwei
+ * Nummernkreise fuer dieselbe Firma sind ein GoBD-Risiko (Lueckenlosigkeit
+ * ist pro Firma definiert, nicht pro Tabelle).
+ *
+ * Gemessen am 15.10.2026: `invoices` traegt null Zeilen, `payments` null
+ * Zeilen, und kein Code in diesem Repo schreibt je eine `number` in diese
+ * Tabelle — `stellbarkeit()`, `zahlungslage()`, `faelligkeit()` und
+ * `stornierbar()` sind Regeln ohne Schreibpfad, nirgends aufgerufen ausser
+ * aus diesem Modul selbst. Die Entscheidung trifft deshalb keine Migration:
+ *
+ *   `lib/finanz/auftraege/*` (`fin_dokumente` + `fin_nummernkreis`) ist die
+ *   EINZIGE Quelle fuer neue Angebots-/Rechnungsnummern von creaDIG. Dieses
+ *   Modul bleibt Regelwerk fuer die Opportunity-Pipeline (G18: darf diese
+ *   Chance ueberhaupt abgerechnet werden?) und `invoices`/`payments` bleiben
+ *   als Schema stehen, OHNE dass je eine eigene Nummer vergeben wird.
+ *
+ *   Sollte spaeter ein Schreibpfad fuer `invoices` entstehen (eine "Rechnung
+ *   stellen"-Aktion aus der Opportunity-Ansicht), MUSS er seine Nummer ueber
+ *   `lib/finanz/auftraege/store.ts` (`naechsteNummer` / `fin_nummernkreis`)
+ *   beziehen und darf keinen eigenen Zaehler anlegen. `invoices.number`
+ *   speichert dann einen Spiegel dieser Nummer, keine eigene.
  */
 import { imprintDetails, steuerstatusFreigegeben, steuerstatusWiderspruch } from "@/lib/site-data"
 

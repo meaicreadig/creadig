@@ -1,11 +1,54 @@
 import { eur, eurRund, monatKurz } from "@/components/finanz/format"
 import type { Hinweis, Monat, Steuertopf } from "@/lib/finanz/rechnen"
+import type { Paragraph19Status } from "@/lib/finanz/paragraph19"
+import { aufUstPflichtUmstellen } from "@/app/(finanz)/finanz/actions"
 
 const SCHWERE = {
   critical: { text: "Jetzt", punkt: "bg-destructive" },
   attention: { text: "Bald", punkt: "bg-amber-500" },
   neutral: { text: "Gut", punkt: "bg-primary" },
 } as const
+
+const AMPEL = {
+  ruhig: { balken: "bg-primary", text: "text-muted-foreground" },
+  achtung: { balken: "bg-amber-500", text: "text-amber-600" },
+  kritisch: { balken: "bg-destructive", text: "text-destructive" },
+  ueberschritten: { balken: "bg-destructive", text: "text-destructive" },
+} as const
+
+function Paragraph19Ampel({ status }: { status: Paragraph19Status }) {
+  const t = AMPEL[status.ampel]
+  const breite = Math.min(100, Math.round(status.anteilLaufendesJahr * 100))
+  return (
+    <div className="bg-background flex flex-col gap-2 rounded-2xl p-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-sm font-medium">§ 19-Umsatzgrenze (laufendes Jahr)</span>
+        <span className={`text-sm font-semibold tabular-nums ${t.text}`}>{eur(status.laufendesJahrUmsatzCent)} / 100.000 €</span>
+      </div>
+      <div className="bg-muted h-2 overflow-hidden rounded-full" role="img" aria-label={`${breite}% der § 19-Umsatzgrenze erreicht`}>
+        <div className={`h-full rounded-full ${t.balken}`} style={{ width: `${breite}%` }} />
+      </div>
+      <p className={`text-xs ${status.ampel === "ruhig" ? "text-muted-foreground" : t.text}`}>
+        {status.ampel === "ueberschritten"
+          ? status.vorjahrUeberschritten
+            ? `Vorjahresumsatz (${eur(status.vorjahrUmsatzCent)}) über 25.000 € — § 19 gilt dieses Jahr eigentlich nicht mehr.`
+            : `Grenze am ${status.ueberschrittenAm} überschritten — ab da keine Rechnung mehr ohne USt.`
+          : `Noch ${eur(status.abstandLaufendesJahrCent)} Luft bis zur Grenze.`}
+      </p>
+      {status.ampel !== "ruhig" && (
+        <form action={aufUstPflichtUmstellen} className="flex flex-col gap-2 border-t pt-3">
+          <label className="flex items-start gap-2 text-xs leading-relaxed">
+            <input type="checkbox" name="bestaetigt" required className="accent-primary mt-0.5 size-3.5" />
+            Ich stelle Finanz jetzt auf umsatzsteuerpflichtig um — neue Rechnungen weisen ab sofort USt aus. Bereits festgeschriebene Rechnungen bleiben unverändert.
+          </label>
+          <button type="submit" className="bg-primary text-primary-foreground w-fit rounded-full px-4 py-2 text-xs font-semibold">
+            Auf umsatzsteuerpflichtig umstellen
+          </button>
+        </form>
+      )}
+    </div>
+  )
+}
 
 export function FinanzKompass({
   stand,
@@ -14,6 +57,7 @@ export function FinanzKompass({
   reichweite,
   hinweise,
   verlauf,
+  paragraph19,
 }: {
   stand: number
   frei: number
@@ -21,6 +65,7 @@ export function FinanzKompass({
   reichweite: number | null
   hinweise: Hinweis[]
   verlauf: Monat[]
+  paragraph19: Paragraph19Status | null
 }) {
   const max = Math.max(1, ...verlauf.flatMap((m) => [m.einCent, m.ausCent]))
 
@@ -53,6 +98,8 @@ export function FinanzKompass({
             </div>
           ))}
         </div>
+
+        {paragraph19 && <Paragraph19Ampel status={paragraph19} />}
       </div>
 
       <div className="bg-card flex flex-col gap-5 rounded-[2rem] p-7 lg:col-span-2">

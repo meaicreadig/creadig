@@ -14,6 +14,8 @@ import {
   steuertopf,
 } from "@/lib/finanz/rechnen"
 import { ladeAlles, sichereFristen, type finanzDb } from "@/lib/finanz/store"
+import { paragraph19Status } from "@/lib/finanz/paragraph19"
+import { ladeFelder } from "@/lib/finanz/felder"
 
 type Db = NonNullable<Awaited<ReturnType<typeof finanzDb>>>
 
@@ -21,8 +23,11 @@ type Db = NonNullable<Awaited<ReturnType<typeof finanzDb>>>
 export async function berechneLage(db: Db) {
   const heute = heuteBerlin()
   const erst = await ladeAlles(db)
-  await sichereFristen(db, sollFristen(erst.einstellungen, heute))
-  const { einstellungen, buchungen, fristen } = await ladeAlles(db)
+  /* Nur neu laden, wenn wirklich eine Frist gefehlt hat — sonst reicht der erste Lauf. */
+  const vorhanden = new Set(erst.fristen.map((f) => f.id))
+  const fehlend = sollFristen(erst.einstellungen, heute).filter((f) => !vorhanden.has(f.id))
+  if (fehlend.length) await sichereFristen(db, fehlend)
+  const { einstellungen, buchungen, fristen } = fehlend.length ? await ladeAlles(db) : erst
 
   const stand = kontostandHeute(einstellungen, buchungen, heute)
   const topf = steuertopf(einstellungen, buchungen, fristen, heute)
@@ -31,9 +36,22 @@ export async function berechneLage(db: Db) {
   const wochen = liquiditaet(stand, bewegungen, heute)
   const verlauf = monate(buchungen, heute)
   const reichweite = reichweiteMonate(frei, verlauf)
-  const hinweise = kompass({ freiCent: frei, topf, wochen, fristen, buchungen, verlauf, reichweite, heute, eur })
+  const { felder } = await ladeFelder(db, heute.slice(0, 4))
+  const hinweise = kompass({ freiCent: frei, topf, wochen, fristen, buchungen, verlauf, reichweite, heute, eur, felder })
+  const paragraph19 = einstellungen.ustPflichtig ? null : paragraph19Status(buchungen, heute)
+  if (paragraph19 && paragraph19.ampel !== "ruhig") {
+    hinweise.unshift({
+      schwere: paragraph19.ampel === "ueberschritten" ? "critical" : paragraph19.ampel === "kritisch" ? "critical" : "attention",
+      text:
+        paragraph19.ampel === "ueberschritten"
+          ? paragraph19.vorjahrUeberschritten
+            ? `Vorjahresumsatz ${eur(paragraph19.vorjahrUmsatzCent)} liegt über der § 19-Grenze (25.000 €) — § 19 gilt dieses Jahr eigentlich nicht mehr. Mit dem Steuerberater klären.`
+            : `Umsatz im laufenden Jahr hat am ${paragraph19.ueberschrittenAm} die § 19-Grenze (100.000 €) überschritten — ab da ist keine Rechnung mehr ohne USt zulässig.`
+          : `§ 19-Umsatzgrenze (laufendes Jahr): ${eur(paragraph19.laufendesJahrUmsatzCent)} von 100.000 € — noch ${eur(paragraph19.abstandLaufendesJahrCent)} Luft.`,
+    })
+  }
 
-  return { heute, einstellungen, buchungen, fristen, stand, topf, frei, bewegungen, wochen, verlauf, reichweite, hinweise }
+  return { heute, einstellungen, buchungen, fristen, stand, topf, frei, bewegungen, wochen, verlauf, reichweite, hinweise, paragraph19 }
 }
 
 export type Lage = Awaited<ReturnType<typeof berechneLage>>

@@ -12,7 +12,8 @@ import { finanzDb } from "@/lib/finanz/store"
 import { after } from "next/server"
 import { Geschaeftsfelder } from "@/components/finanz/geschaeftsfelder"
 import { ladeFelder } from "@/lib/finanz/felder"
-import { abgleichFaellig, abgleichStand, gleicheFiberoAb } from "@/lib/finanz/fibero-abgleich"
+import { abgleichFaellig, abgleichStand, fiberoKonfiguriert, gleicheFiberoAb } from "@/lib/finanz/fibero-abgleich"
+import { finanzOwnerSeite } from "@/lib/finanz/zugang"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Heute" }
@@ -23,6 +24,7 @@ function gruss() {
 }
 
 export default async function FinanzHeute({ searchParams }: { searchParams: Promise<{ jahr?: string }> }) {
+  await finanzOwnerSeite()
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="heute" titel={gruss()}><OhneSpeicher /></FinanzShell>
 
@@ -31,7 +33,7 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
   else if (abgleich.faellig) after(() => gleicheFiberoAb(db).catch(() => null))
 
   const basis = await finanzBasis()
-  const { heute, fristen, stand, topf, frei, verlauf, reichweite, hinweise } = await berechneLage(db)
+  const { heute, fristen, stand, topf, frei, verlauf, reichweite, hinweise, paragraph19 } = await berechneLage(db)
   const naechste = fristen.filter((f) => !f.erledigt).slice(0, 3)
 
   const diesesJahr = heute.slice(0, 4)
@@ -42,9 +44,9 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
 
   return (
     <FinanzShell aktiv="heute" titel={gruss()} unterzeile="Vorne steht, was dich voranbringt. Der Rest läuft im Hintergrund.">
-      <FinanzKompass stand={stand} frei={frei} topf={topf} reichweite={reichweite} hinweise={hinweise} verlauf={verlauf} />
+      <FinanzKompass stand={stand} frei={frei} topf={topf} reichweite={reichweite} hinweise={hinweise} verlauf={verlauf} paragraph19={paragraph19} />
 
-      <Geschaeftsfelder bild={felder} stand={abgleichsStand} basis={basis || "/"} jahre={jahre} />
+      <Geschaeftsfelder bild={felder} stand={abgleichsStand} fiberoAktiv={fiberoKonfiguriert()} basis={basis || "/"} jahre={jahre} />
 
       <div className="grid gap-5 lg:grid-cols-5">
         <div className="lg:col-span-3">

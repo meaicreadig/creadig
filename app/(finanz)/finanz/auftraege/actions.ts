@@ -9,10 +9,12 @@ import { pruefeZugang } from "@/lib/admin-widerruf"
 import { finanzBasis } from "@/lib/finanz/basis"
 import { finanzDb, protokolliere } from "@/lib/finanz/store"
 import { istGeschaeftsfeld } from "@/lib/finanz/belege"
-import { EINHEITEN, heuteBerlin, naechsteMahnstufe, tageZwischen, UST_SAETZE, type Entwurf, type Kunde, type Position } from "@/lib/finanz/auftraege/rechnen"
+import { EINHEITEN, formatEuro, heuteBerlin, naechsteMahnstufe, tageZwischen, UST_SAETZE, type Entwurf, type Kunde, type Position } from "@/lib/finanz/auftraege/rechnen"
 import {
   auftraegeSchema,
   beantworteAngebot,
+  bezahltCent,
+  erfasseZahlung,
   FIRMA_STANDARD,
   ladeDokument,
   legeEntwurfAn,
@@ -30,6 +32,7 @@ import {
 import { sendeDokumentMail, type MailArt } from "@/lib/finanz/auftraege/mail"
 import { erzeugeXRechnung } from "@/lib/finanz/auftraege/erechnung"
 import { ladeFirma, type Dokument } from "@/lib/finanz/auftraege/store"
+import { entwerfeMahnung } from "@/lib/finanz/assistent"
 
 /** Rechnungen gehen immer mit XRechnung-XML raus, sobald alle Angaben dafür vorliegen. */
 async function eRechnungAnhang(db: Awaited<ReturnType<typeof zugang>>, d: Dokument) {
@@ -104,7 +107,7 @@ export async function entwurfSpeichern(id: string, roh: Entwurf): Promise<Ergebn
   const positionen = (Array.isArray(roh.positionen) ? roh.positionen : []).slice(0, 80).map((p) => sauberePosition(p, istRechnung)).filter(Boolean) as Position[]
   const datum = ISO.test(String(roh.datum)) ? roh.datum : heuteBerlin()
   const e: Entwurf = {
-    sprache: roh.sprache === "en" ? "en" : "de",
+    sprache: roh.sprache === "en" ? "en" : roh.sprache === "tr" ? "tr" : "de",
     titel: s(roh.titel, 160),
     kunde: saubererKunde(roh.kunde),
     datum,
@@ -178,6 +181,23 @@ export async function bezahltMarkieren(form: FormData): Promise<void> {
   neu()
 }
 
+/** Teilzahlung von Hand erfassen (Phase 6) — derselbe Weg, den auch der Bank-Abgleich benutzt (erfasseZahlung()). */
+export async function teilzahlungErfassen(_prev: Ergebnis | null, form: FormData): Promise<Ergebnis> {
+  const db = await zugang()
+  const am = s(form.get("am"), 10)
+  const r = await erfasseZahlung(db, s(form.get("id"), 64), cent(form.get("betrag")), ISO.test(am) ? am : heuteBerlin(), "manuell", null)
+  neu()
+  if (!r.ok) return { ok: false, fehler: [r.fehler] }
+  return {
+    ok: true,
+    hinweis: r.stand.ueberzahlt
+      ? `Zahlung erfasst — ${formatEuro(-r.stand.offenCent)} zu viel eingegangen. Das ist ein Vorgang, keine Rundung.`
+      : r.stand.status === "bezahlt"
+        ? "Zahlung erfasst — die Rechnung ist jetzt vollständig bezahlt."
+        : `Zahlung erfasst — noch ${formatEuro(r.stand.offenCent)} offen.`,
+  }
+}
+
 export async function stornieren(form: FormData): Promise<void> {
   const db = await zugang()
   const sid = await storniere(db, s(form.get("id"), 64), s(form.get("grund"), 300))
@@ -193,7 +213,7 @@ export async function stornieren(form: FormData): Promise<void> {
 export async function nachfassen(id: string): Promise<Ergebnis> {
   const db = await zugang()
   const d = await ladeDokument(db, id)
-  if (!d || d.status !== "versendet") return { ok: false, fehler: ["Nur offene Dokumente."] }
+  if (!d || (d.status !== "versendet" && d.status !== "teilbezahlt")) return { ok: false, fehler: ["Nur offene Dokumente."] }
   let art: MailArt = "nachfrage"
   let stufe: number | null = null
   if (d.art === "rechnung") {
@@ -203,7 +223,9 @@ export async function nachfassen(id: string): Promise<Ergebnis> {
     art = `mahnung_${n}` as MailArt
     stufe = n
   }
-  const r = await sendeDokumentMail({ ...d, mahnstufe: stufe ?? d.mahnstufe }, art)
+  const offenCent = d.status === "teilbezahlt" && d.summen ? d.summen.bruttoCent - (await bezahltCent(db, id)) : d.summen?.bruttoCent
+  const mahnDokument = d.summen && offenCent !== undefined ? { ...d, summen: { ...d.summen, bruttoCent: offenCent } } : d
+  const r = await sendeDokumentMail({ ...mahnDokument, mahnstufe: stufe ?? d.mahnstufe }, art)
   if (!r.ok) return { ok: false, fehler: [r.grund] }
   await vermerkeNachfass(db, id, stufe)
   neu()
@@ -271,4 +293,34 @@ export async function firmaSpeichern(form: FormData): Promise<void> {
   await speichereFirma(db, f)
   await protokolliere(db, "firma_gespeichert", {})
   neu()
+}
+
+export type MahnEntwurfErgebnis = { entwurf: string } | { fehler: string } | null
+
+/**
+ * Persönlicher KI-Mahnungsentwurf für einen Einzelfall (nie automatisch
+ * verschickt — siehe entwerfeMahnung()). Die reguläre Mahnstufen-Vorlage
+ * (nachfassen()) bleibt der Standardweg; das hier ist ein Zweites für
+ * schwierige Fälle, wo ein persönlicher Ton mehr bringt als die Vorlage.
+ */
+export async function mahnungEntwerfen(_prev: MahnEntwurfErgebnis, form: FormData): Promise<MahnEntwurfErgebnis> {
+  const db = await zugang()
+  const id = s(form.get("id"), 64)
+  const notiz = s(form.get("notiz"), 500)
+  const d = await ladeDokument(db, id)
+  if (!d || d.art !== "rechnung" || !d.summen || !d.faelligAm) return { fehler: "Rechnung nicht gefunden." }
+
+  const offenerRestCent = d.summen.bruttoCent - (await bezahltCent(db, id))
+  const tageUeberfaellig = tageZwischen(d.faelligAm, heuteBerlin())
+  const r = await entwerfeMahnung({
+    nummer: d.nummer ?? "",
+    kunde: d.kunde.firma || d.kunde.name,
+    sprache: d.sprache,
+    offenerRestCent,
+    tageUeberfaellig,
+    mahnstufe: d.mahnstufe,
+    notiz: notiz || undefined,
+  })
+  await protokolliere(db, "mahnung_entwurf", { id, ok: "entwurf" in r })
+  return r
 }

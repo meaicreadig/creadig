@@ -36,6 +36,9 @@ export const FINANZ_SCHEMA = [
     ust_rhythmus text NOT NULL DEFAULT 'quartal' CHECK (ust_rhythmus IN ('monatlich','quartal')),
     ust_bezahlt_bis date NOT NULL DEFAULT (date_trunc('quarter', CURRENT_DATE) - interval '1 day')::date,
     updated_at timestamptz NOT NULL DEFAULT now())`,
+  /* Phase 6/9 — letzter aus einem Bank-Import gelesener Saldo, ein Vorschlag fürs Einstellungen-Formular, nie automatisch übernommen. */
+  `ALTER TABLE fin_einstellungen ADD COLUMN IF NOT EXISTS bank_saldo_cent bigint`,
+  `ALTER TABLE fin_einstellungen ADD COLUMN IF NOT EXISTS bank_saldo_am date`,
   `CREATE TABLE IF NOT EXISTS fin_fristen (
     id text PRIMARY KEY,
     titel text NOT NULL,
@@ -80,7 +83,8 @@ export async function ladeAlles(db: Abfrage): Promise<{
 }> {
   const [e] = await db(
     `SELECT kontostand_cent, to_char(kontostand_am,'YYYY-MM-DD') AS kontostand_am, est_quote, ust_pflichtig,
-            ust_rhythmus, to_char(ust_bezahlt_bis,'YYYY-MM-DD') AS ust_bezahlt_bis
+            ust_rhythmus, to_char(ust_bezahlt_bis,'YYYY-MM-DD') AS ust_bezahlt_bis,
+            bank_saldo_cent, to_char(bank_saldo_am,'YYYY-MM-DD') AS bank_saldo_am
        FROM fin_einstellungen WHERE id = 'haupt'`,
     [],
   )
@@ -106,6 +110,8 @@ export async function ladeAlles(db: Abfrage): Promise<{
       ustPflichtig: Boolean(e?.ust_pflichtig),
       ustRhythmus: e?.ust_rhythmus === "monatlich" ? "monatlich" : "quartal",
       ustBezahltBis: String(e?.ust_bezahlt_bis),
+      bankSaldoCent: e?.bank_saldo_cent === null || e?.bank_saldo_cent === undefined ? null : zahl(e.bank_saldo_cent),
+      bankSaldoAm: e?.bank_saldo_am ? String(e.bank_saldo_am) : null,
     },
     buchungen: b.map((r) => ({
       id: String(r.id),

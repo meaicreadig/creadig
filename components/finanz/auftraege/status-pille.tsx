@@ -6,6 +6,7 @@ const TON: Record<string, string> = {
   geoeffnet: "bg-secondary text-primary",
   angenommen: "bg-primary text-primary-foreground",
   bezahlt: "bg-primary text-primary-foreground",
+  teilbezahlt: "bg-accent text-accent-foreground",
   aenderung: "bg-accent text-accent-foreground",
   ueberfaellig: "bg-destructive text-primary-foreground",
   abgelaufen: "bg-background text-muted-foreground",

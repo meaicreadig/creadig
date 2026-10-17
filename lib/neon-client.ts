@@ -523,6 +523,14 @@ export const SCHEMA: string[] = [
    *   invoices_draft_check     Ein Entwurf traegt keine Nummer.
    *   payments_amount_check    Ein Eingang ueber 0 ist kein Eingang.
    *
+   * EIN NUMMERNKREIS, NICHT ZWEI (Finanz-Abschluss, 15.10.2026, siehe
+   * `lib/rechnung.ts`): `number` traegt zwar einen eigenen UNIQUE-Index,
+   * aber es gibt in diesem Repo keinen Schreibpfad, der ihn je setzt —
+   * `lib/finanz/auftraege/store.ts` (`fin_nummernkreis`) ist die einzige
+   * aktive Quelle fuer Angebots-/Rechnungsnummern. Ein kuenftiger
+   * Schreibpfad fuer `invoices.number` MUSS seine Nummer von dort beziehen,
+   * nie einen eigenen Zaehler.
+   *
    * Idempotent. Aendert keine bestehende Zeile.
    */
   `CREATE TABLE IF NOT EXISTS invoices (

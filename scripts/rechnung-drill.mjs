@@ -12,20 +12,17 @@
  * einen Import, eine Konsole, ein spaeteres Skript. Beide werden hier
  * angegriffen.
  */
-import pg from "pg"
 import { randomUUID } from "node:crypto"
-import { requireSafeTarget } from "./lib/env-guard.mjs"
-
-const ZIEL = process.env.RECHNUNG_DRILL_URL || "postgres://localhost/g18_abnahme"
-requireSafeTarget(ZIEL, "Rechnungs-Probelauf")
+import { oeffneDrillDb } from "./lib/drill-db.mjs"
 
 let fehler = 0
 const p = (ok, n, d = "") => { if (!ok) fehler++; console.log(`  ${ok ? "ok  " : "FEHL"} ${n}${d ? ` — ${d}` : ""}`) }
 const wirft = async (fn) => { try { await fn(); return false } catch { return true } }
 
-const c = new pg.Client({ connectionString: ZIEL })
-await c.connect()
-const sql = { query: async (t, ps) => (await c.query(t, ps ?? [])).rows }
+const { query, close, backend } = await oeffneDrillDb({ envVar: "RECHNUNG_DRILL_URL", zweck: "Rechnungs-Probelauf" })
+console.log(`  (Backend: ${backend})`)
+const c = { query }
+const sql = { query }
 
 const { SCHEMA, BACKFILL } = await import("../lib/neon-client.ts")
 const R = await import("../lib/rechnung.ts")
@@ -63,23 +60,41 @@ const entwurf = (o = {}) => ({
   zahlungen: [], ...o,
 })
 
-/* ══ R1 · Der Steuerstatus sperrt das Stellen, nicht das Arbeiten ══ */
-console.log("\nR1 · Offener Steuerstatus")
-p(S.imprintDetails.taxStatusPending === true, "Ausgangslage: taxStatusPending steht auf true (G04-Schuld)")
-p(!R.steuerlage().entschieden, "die Steuerlage ist damit nicht entschieden")
+/*
+ * ══ R1 · Der Steuerstatus sperrt das Stellen, nicht das Arbeiten ══
+ *
+ * Der Inhaber hat die G04-Schuld am 15.10.2026 beglichen: § 19 UStG,
+ * `smallBusiness = true`, `taxStatusPending = false` (Finanz-Abschluss,
+ * siehe `lib/rechnung.ts`). Dieser Probelauf hatte bis dahin die offene
+ * Ausgangslage als IST-Zustand gemessen — das war wahr, bis der Inhaber
+ * entschied. Jetzt misst er zuerst den realen, entschiedenen Zustand und
+ * simuliert danach testweise den offenen (dieselbe Mutier-und-
+ * Wiederherstell-Technik wie in R15), damit die Sperre weiterhin gegen
+ * BEIDE Zustaende gemessen bleibt, nicht nur behauptet wird.
+ */
+console.log("\nR1 · Entschiedener Steuerstatus")
+p(S.imprintDetails.taxStatusPending === false, "Ausgangslage: taxStatusPending steht auf false (§ 19, vom Inhaber bestaetigt 15.10.2026)")
+p(R.steuerlage().entschieden, "die Steuerlage ist damit entschieden")
+p(R.steuerlage().art === "kleinunternehmer" && R.steuerlage().hinweis !== null,
+  "und der § 19-Hinweis steht auf der Rechnung")
+
+const r1Vorher = S.imprintDetails.taxStatusPending
+S.imprintDetails.taxStatusPending = true
+p(!R.steuerlage().entschieden, "simuliert offen: die Steuerlage ist dann nicht entschieden")
 p(R.steuerlage().art === "offen" && R.steuerlage().hinweis === null,
   "und es wird kein Satz erfunden, der auf der Rechnung stuende")
 const s1 = R.stellbarkeit(entwurf())
-p(!s1.ok, "eine Rechnung kann nicht gestellt werden")
+p(!s1.ok, "eine Rechnung kann dann nicht gestellt werden")
 p(/Ein Drittes gibt es nicht/.test(s1.grund), "mit dem Grund als Satz, nicht als Fehlercode")
 p(/Entwürfe bleiben möglich/.test(s1.grund), "und der Entwurf bleibt ausdruecklich erlaubt")
+S.imprintDetails.taxStatusPending = r1Vorher
 
 /* ══ R2 · Pflichtangaben ══ */
 console.log("\nR2 · Pflichtangaben nach § 14 UStG")
 const pflicht = R.pflichtangaben()
 p(pflicht.length === 3, `${pflicht.length} Angaben geprueft`)
 p(pflicht.every((a) => a.woher.length > 0), "jede sagt, WOHER sie kommt — keine haengt in der Luft")
-p(pflicht.some((a) => !a.vorhanden), "mindestens eine fehlt heute", pflicht.filter((a) => !a.vorhanden).map((a) => a.key).join(", "))
+p(pflicht.every((a) => a.vorhanden), "heute liegen alle drei vor — Rechtsform, § 19-Status und MStV-Verantwortlicher sind entschieden")
 
 /* ══ R3–R6 · Der Zahlungsstand faellt aus den Eingaengen ══ */
 console.log("\nR3–R6 · Gestellt ist nicht bezahlt")
@@ -165,6 +180,7 @@ p(st.ok && /Rückzahlung ist ein eigener Vorgang/.test(st.grund),
 /* ══ R15 · Der Steuer-Schnappschuss friert ein ══ */
 console.log("\nR15 · Was raus ist, rechnet sich nicht neu")
 const vorher = { ...S.imprintDetails }
+const vorherLage = R.steuerlage()
 
 /*
  * DIESER ABSCHNITT HAT BIS ZUM G18-LAUF EINEN DEFEKT FESTGESCHRIEBEN.
@@ -176,10 +192,14 @@ const vorher = { ...S.imprintDetails }
  * Probelauf, der einen unmoeglichen Zustand gruen faerbt, prueft nichts —
  * er verteidigt den Fehler.
  *
- * Jetzt wird die Freigabe mitgesetzt, und die beiden Zustaende daneben
- * werden ausdruecklich angegriffen.
+ * Seit dem 15.10.2026 ist `taxStatusPending` real `false` (Finanz-
+ * Abschluss). Dieser Block geht testweise zurueck zum unentschiedenen
+ * Zustand und wieder vor, damit die Sperre weiterhin gegen jeden
+ * Zwischenzustand gemessen bleibt — und stellt am Ende die reale Lage
+ * wieder her, statt einen fest verdrahteten "offen"-Zustand zu erwarten.
  */
 S.imprintDetails.smallBusiness = true
+S.imprintDetails.taxStatusPending = true
 p(!R.steuerlage().entschieden, "gesetzter Kleinunternehmer-Status allein entscheidet nichts, solange pending steht")
 p(!R.stellbarkeit(entwurf()).ok, "und eine Rechnung bleibt gesperrt — die Freigabe ist kein Schmuck")
 
@@ -203,8 +223,8 @@ p(/eine USt-IdNr\. und der Kleinunternehmer-Status/.test(R.stellbarkeit(entwurf(
 S.imprintDetails.smallBusiness = vorher.smallBusiness
 S.imprintDetails.vatId = vorher.vatId
 S.imprintDetails.taxStatusPending = vorher.taxStatusPending
-p(R.steuerlage().art === "offen" && R.steuerlage().widerspruch === null,
-  "und der Ausgangszustand steht danach wieder")
+p(R.steuerlage().art === vorherLage.art && R.steuerlage().widerspruch === vorherLage.widerspruch,
+  "und der Ausgangszustand steht danach wieder", R.steuerlage().art)
 
 /* ══ R16 · Ueberfaellig wird angezeigt, nicht gemahnt ══ */
 console.log("\nR16 · Ueberfaellig ist eine Anzeige")
@@ -230,5 +250,5 @@ const chancen = Number((await sql.query("SELECT count(*) n FROM opportunities WH
 p(chancen === 1, "und eine Rechnung erzeugt keine zweite Verkaufschance")
 
 console.log(`\n  ${fehler === 0 ? "Eine Rechnung ist keine Zahlung." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
-await c.end()
+await close()
 process.exit(fehler === 0 ? 0 : 1)

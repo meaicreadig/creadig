@@ -54,6 +54,16 @@ function zugang() {
   return { url, headers: { apikey: key, Authorization: `Bearer ${key}` } }
 }
 
+/**
+ * Der Schalter von aussen: ist das optionale Modul ueberhaupt eingerichtet?
+ * Reine Praesenzpruefung, kein Geheimnis verlaesst diese Funktion — fuer
+ * die Oberflaeche, die sonst keinen Grund haette, die Glasfaser-Zeile
+ * ueberhaupt zu zeigen (siehe components/finanz/geschaeftsfelder.tsx).
+ */
+export function fiberoKonfiguriert(): boolean {
+  return zugang() !== null
+}
+
 type Zeile = Record<string, unknown>
 type Teil = { anzahl: number; fehler: string | null }
 export type AbgleichErgebnis = { rechnungen: Teil; subunternehmer: Teil; belege: Teil }
@@ -86,7 +96,8 @@ const monatsEnde = (periode: unknown) => {
   const [j, m] = periode.split("-").map(Number)
   return new Date(Date.UTC(j, m, 0)).toISOString().slice(0, 10)
 }
-const satz = (bruttoCent: number, ustCent: number) => {
+/** Naechster von 0/7/19, aus dem Verhaeltnis Brutto/USt — wenn nur der Betrag bekannt ist, nicht der Satz selbst. */
+export const naechsterUstSatz = (bruttoCent: number, ustCent: number) => {
   const netto = bruttoCent - ustCent
   if (ustCent <= 0 || netto <= 0) return 0
   const p = (ustCent / netto) * 100
@@ -228,7 +239,7 @@ export async function gleicheFiberoAb(db: Abfrage): Promise<AbgleichErgebnis> {
         art: "ausgabe",
         datum: d,
         brutto_cent: brutto,
-        ust_satz: privat ? 0 : satz(brutto, mwst),
+        ust_satz: privat ? 0 : naechsterUstSatz(brutto, mwst),
         kategorie,
         gegenpartei: r.haendler ? String(r.haendler) : null,
         notiz:

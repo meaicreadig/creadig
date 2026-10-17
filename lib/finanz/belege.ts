@@ -1,6 +1,10 @@
 import "server-only"
 
+import { createHash, randomUUID } from "node:crypto"
+import { put } from "@vercel/blob"
+
 import type { Abfrage } from "@/lib/neon-abfrage"
+import { naechsterUstSatz } from "@/lib/finanz/fibero-abgleich"
 
 /**
  * Belege in creaDIG Finanz. Jede Zeile hat zwei Achsen: Quelle (woher) ×
@@ -9,17 +13,8 @@ import type { Abfrage } from "@/lib/neon-abfrage"
  * GRUNDSATZ: nichts wird gelöscht. Quelldaten (quelle_*) werden beim Kopieren
  * überschrieben, eigene Entscheidungen (geschaeftsfeld) nie.
  */
-export const GESCHAEFTSFELDER = [
-  { key: "glasfaser", label: "Glasfaser-Dienstleistung" },
-  { key: "it", label: "IT-Dienstleistung" },
-  { key: "software", label: "Software-Abo" },
-  { key: "ecommerce", label: "E-Commerce" },
-  { key: "privat", label: "Privat / nicht betrieblich" },
-  { key: "sonstiges", label: "Sonstiges" },
-] as const
-
-export type Geschaeftsfeld = (typeof GESCHAEFTSFELDER)[number]["key"]
-export const istGeschaeftsfeld = (v: string): v is Geschaeftsfeld => GESCHAEFTSFELDER.some((g) => g.key === v)
+export { GESCHAEFTSFELDER, HAND_UPLOAD_MAX_BYTES, HAND_UPLOAD_TYPEN, istGeschaeftsfeld, type Geschaeftsfeld } from "@/lib/finanz/beleg-felder"
+import { GESCHAEFTSFELDER, HAND_UPLOAD_MAX_BYTES, HAND_UPLOAD_TYPEN, istGeschaeftsfeld, type Geschaeftsfeld } from "@/lib/finanz/beleg-felder"
 
 export const BELEGE_SCHEMA = [
   `CREATE TABLE IF NOT EXISTS fin_belege (
@@ -53,6 +48,16 @@ export const BELEGE_SCHEMA = [
     UNIQUE (quelle, extern_id))`,
   `CREATE INDEX IF NOT EXISTS fin_belege_korb_idx ON fin_belege (geschaeftsfeld, datum DESC)`,
   `CREATE INDEX IF NOT EXISTS fin_belege_datei_idx ON fin_belege (datei_status)`,
+  /*
+   * Phase 3 — eingehende E-Rechnung (UBL/CII, auch aus ZUGFeRD/Factur-X-PDF
+   * ausgelesen). Das Original-XML bleibt stehen, unabhaengig davon, was der
+   * Mensch nachher an den uebrigen Feldern korrigiert — siehe
+   * lib/finanz/e-eingang.ts und "Lesbare Ansicht" in eingangskorb.tsx.
+   */
+  `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS erechnung_format text CHECK (erechnung_format IN ('ubl','cii'))`,
+  `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS erechnung_xml text`,
+  `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS erechnung_nummer text`,
+  `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS erechnung_iban text`,
   `CREATE TABLE IF NOT EXISTS fin_kopierlaeufe (
     id text PRIMARY KEY,
     quelle text NOT NULL,
@@ -88,6 +93,8 @@ export type Beleg = {
   archiviert: boolean
   hatDatei: boolean
   dateiName: string | null
+  /** Nur gesetzt, wenn eine eingehende E-Rechnung (UBL/CII, auch aus ZUGFeRD-PDF) erkannt wurde. */
+  erechnung: { format: "ubl" | "cii"; nummer: string | null; iban: string | null } | null
 }
 
 export type Kennzahlen = {
@@ -118,10 +125,14 @@ function zuBeleg(r: Record<string, unknown>): Beleg {
     archiviert: Boolean(r.archiviert),
     hatDatei: r.datei_status === "kopiert",
     dateiName: pfad ? pfad.split("/").pop() ?? pfad : null,
+    erechnung:
+      r.erechnung_format === "ubl" || r.erechnung_format === "cii"
+        ? { format: r.erechnung_format, nummer: r.erechnung_nummer ? String(r.erechnung_nummer) : null, iban: r.erechnung_iban ? String(r.erechnung_iban) : null }
+        : null,
   }
 }
 
-const SPALTEN = `id, art, to_char(datum,'YYYY-MM-DD') AS datum, haendler, brutto_cent, vorsteuer_cent, kategorie,
+const SPALTEN = `id, art, to_char(datum,'YYYY-MM-DD') AS datum, haendler, brutto_cent, vorsteuer_cent, kategorie, erechnung_format, erechnung_nummer, erechnung_iban,
   geschaeftsfeld, archiviert, datei_status, datei_quelle_pfad`
 
 /** Die Ist-Werte aus Finanz — gleiche Definition wie die Soll-Werte der Quelle. */
@@ -199,6 +210,30 @@ export async function ladeBelege(db: Abfrage, suche: string | null): Promise<Bel
   }
 }
 
+/**
+ * Ein zugeordneter Beleg ist eine Ausgabe — die Buchung entsteht hier, nicht
+ * erst beim naechsten Abgleich. Idempotent ueber eine feste ID (beleg-<id>):
+ * ein zweiter Aufruf fuer denselben Beleg erzeugt keine zweite Buchung. Die
+ * Buchung selbst ist danach so unveraenderbar wie jede andere 'gebucht'-Zeile
+ * (siehe scripts/migrations/030-gobd-festschreibung.sql) — eine Korrektur
+ * laeuft ueber Storno, nicht ueber ein zweites Mal Zuordnen.
+ */
+export async function verbucheBeleg(db: Abfrage, belegId: string): Promise<boolean> {
+  const [r] = await db(
+    `SELECT datum, haendler, brutto_cent, vorsteuer_cent, kategorie, geschaeftsfeld FROM fin_belege WHERE id = $1`,
+    [belegId],
+  )
+  if (!r || !r.geschaeftsfeld || n(r.brutto_cent) <= 0) return false
+  const satz = naechsterUstSatz(n(r.brutto_cent), n(r.vorsteuer_cent))
+  const ergebnis = await db(
+    `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, quelle, quelle_ref, geschaeftsfeld)
+     VALUES ($1,'ausgabe','gebucht',coalesce($2::date, CURRENT_DATE),$3,$4,$5,$6,'beleg',$7,$8)
+     ON CONFLICT (id) DO NOTHING RETURNING id`,
+    [`beleg-${belegId}`, r.datum, n(r.brutto_cent), satz, String(r.kategorie ?? "") || "Beleg", r.haendler ? String(r.haendler) : null, belegId, r.geschaeftsfeld],
+  )
+  return ergebnis.length > 0
+}
+
 export async function ordneZu(db: Abfrage, ids: string[], feld: Geschaeftsfeld | null): Promise<number> {
   if (ids.length === 0) return 0
   const r = await db(
@@ -206,6 +241,7 @@ export async function ordneZu(db: Abfrage, ids: string[], feld: Geschaeftsfeld |
       WHERE id = ANY($2::text[]) RETURNING id`,
     [feld, ids],
   )
+  if (feld) for (const row of r) await verbucheBeleg(db, String(row.id))
   await db(`INSERT INTO fin_protokoll (aktion, daten) VALUES ('beleg_zugeordnet', $1)`, [JSON.stringify({ ids, feld })])
   return r.length
 }
@@ -217,14 +253,116 @@ export async function ordneHaendlerZu(db: Abfrage, haendler: string, feld: Gesch
       WHERE geschaeftsfeld IS NULL AND haendler = $2 RETURNING id`,
     [feld, name],
   )
+  for (const row of r) await verbucheBeleg(db, String(row.id))
   await db(`INSERT INTO fin_protokoll (aktion, daten) VALUES ('haendler_zugeordnet', $1)`, [
     JSON.stringify({ haendler: name, feld, anzahl: r.length }),
   ])
   return r.length
 }
 
+export type BelegExport = {
+  id: string
+  datum: string | null
+  haendler: string
+  bruttoCent: number
+  kategorie: string
+  geschaeftsfeld: Geschaeftsfeld | null
+  dateiPfad: string | null
+  dateiTyp: string | null
+  dateiName: string | null
+  erechnungXml: string | null
+}
+
+/** Alle Belege eines Jahres mit kopierter Datei — fürs Steuerberater-Paket (Phase 5), nicht auf die Eingangskorb-Seitenbegrenzung beschränkt. */
+export async function ladeBelegeFuerExport(db: Abfrage, jahr: string): Promise<BelegExport[]> {
+  await belegeSchema(db)
+  const r = await db(
+    `SELECT id, to_char(datum,'YYYY-MM-DD') AS datum, haendler, brutto_cent, kategorie, geschaeftsfeld,
+            datei_pfad, datei_typ, datei_quelle_pfad, erechnung_xml
+       FROM fin_belege WHERE datum >= $1 AND datum < $2 AND datei_status = 'kopiert' ORDER BY datum`,
+    [`${jahr}-01-01`, `${Number(jahr) + 1}-01-01`],
+  )
+  return r.map((x) => ({
+    id: String(x.id),
+    datum: x.datum ? String(x.datum) : null,
+    haendler: String(x.haendler ?? ""),
+    bruttoCent: n(x.brutto_cent),
+    kategorie: String(x.kategorie ?? ""),
+    geschaeftsfeld: x.geschaeftsfeld && istGeschaeftsfeld(String(x.geschaeftsfeld)) ? (String(x.geschaeftsfeld) as Geschaeftsfeld) : null,
+    dateiPfad: x.datei_pfad ? String(x.datei_pfad) : null,
+    dateiTyp: x.datei_typ ? String(x.datei_typ) : null,
+    dateiName: x.datei_quelle_pfad ? (String(x.datei_quelle_pfad).split("/").pop() ?? null) : null,
+    erechnungXml: x.erechnung_xml ? String(x.erechnung_xml) : null,
+  }))
+}
+
 export async function dateiVon(db: Abfrage, id: string): Promise<{ pfad: string; typ: string | null; name: string } | null> {
   const [r] = await db(`SELECT datei_pfad, datei_typ, datei_quelle_pfad FROM fin_belege WHERE id = $1 AND datei_status = 'kopiert'`, [id])
   if (!r?.datei_pfad) return null
   return { pfad: String(r.datei_pfad), typ: r.datei_typ ? String(r.datei_typ) : null, name: String(r.datei_quelle_pfad ?? "beleg").split("/").pop() ?? "beleg" }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Eigener Beleg-Upload (Phase 2) — Handy-Kamera, Drag & Drop                */
+/* ------------------------------------------------------------------------ */
+
+/** Ist der private Dateispeicher ueberhaupt eingerichtet? Praesenzpruefung, kein Geheimnis. */
+export const belegUploadBereit = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN)
+
+export type BelegEingabe = {
+  datum: string | null
+  haendler: string
+  bruttoCent: number
+  ustSatz: 0 | 7 | 19
+  kategorie: string
+  geschaeftsfeld: Geschaeftsfeld | null
+  notiz: string
+  /** Gesetzt, wenn die Datei als UBL/CII erkannt wurde (auch aus einem ZUGFeRD-PDF) — das Original-XML bleibt erhalten. */
+  erechnung: { format: "ubl" | "cii"; xml: string; nummer: string | null; iban: string | null } | null
+}
+
+export type HochladenErgebnis = { ok: true; id: string; doppelt: boolean } | { ok: false; fehler: string }
+
+/**
+ * Datei → privater Vercel Blob (finanz/belege/hand/<sha256>), Pruefsumme als
+ * extern_id: ein zweites Hochladen DERSELBEN Datei landet nicht zweimal in
+ * fin_belege (UNIQUE (quelle, extern_id)) — derselbe Mechanismus wie beim
+ * fibero-Spiegel, nur mit dem Dateiinhalt statt einer externen ID als
+ * Schluessel. fibero selbst wird dabei nie beruehrt: dies ist ein eigener
+ * Beleg, keine fibero-Zeile.
+ */
+export async function ladeBelegHoch(db: Abfrage, datei: Blob, eingabe: BelegEingabe): Promise<HochladenErgebnis> {
+  if (!belegUploadBereit()) return { ok: false, fehler: "Datei-Speicher ist nicht eingerichtet (BLOB_READ_WRITE_TOKEN fehlt) — optionales Modul, siehe .env.example." }
+  if (datei.size === 0) return { ok: false, fehler: "Leere Datei." }
+  if (datei.size > HAND_UPLOAD_MAX_BYTES) return { ok: false, fehler: `Datei zu groß (max. ${HAND_UPLOAD_MAX_BYTES / 1024 / 1024} MB).` }
+  if (!(HAND_UPLOAD_TYPEN as readonly string[]).includes(datei.type)) return { ok: false, fehler: "Nur PDF, JPG, PNG oder HEIC." }
+
+  await belegeSchema(db)
+  const bytes = Buffer.from(await datei.arrayBuffer())
+  const sha = createHash("sha256").update(bytes).digest("hex")
+
+  const vorhanden = await db(`SELECT id FROM fin_belege WHERE quelle='hand' AND extern_id=$1`, [sha])
+  if (vorhanden.length) return { ok: true, id: String(vorhanden[0].id), doppelt: true }
+
+  const blob = await put(`finanz/belege/hand/${sha}`, bytes, { access: "private", contentType: datei.type, addRandomSuffix: false, allowOverwrite: true })
+
+  const vorsteuerCent = eingabe.ustSatz === 0 ? 0 : Math.round((eingabe.bruttoCent * eingabe.ustSatz) / (100 + eingabe.ustSatz))
+  const nettoCent = eingabe.bruttoCent - vorsteuerCent
+  const id = randomUUID()
+  await db(
+    `INSERT INTO fin_belege (id, quelle, extern_id, art, datum, haendler, brutto_cent, netto_cent, vorsteuer_cent, kategorie,
+       geschaeftsfeld, zugeordnet_at, datei_status, datei_pfad, datei_sha256, datei_bytes, datei_typ, rohdaten,
+       erechnung_format, erechnung_xml, erechnung_nummer, erechnung_iban)
+     VALUES ($1,'hand',$2,'beleg',$3,$4,$5,$6,$7,$8,$9,CASE WHEN $9::text IS NULL THEN NULL ELSE now() END,'kopiert',$10,$11,$12,$13,$14::jsonb,$15,$16,$17,$18)`,
+    [
+      id, sha, eingabe.datum, eingabe.haendler, eingabe.bruttoCent, nettoCent, vorsteuerCent, eingabe.kategorie,
+      eingabe.geschaeftsfeld, blob.pathname, sha, bytes.length, datei.type, JSON.stringify({ notiz: eingabe.notiz }),
+      eingabe.erechnung?.format ?? null, eingabe.erechnung?.xml ?? null, eingabe.erechnung?.nummer ?? null, eingabe.erechnung?.iban ?? null,
+    ],
+  )
+  if (eingabe.geschaeftsfeld) await verbucheBeleg(db, id)
+  await db(`INSERT INTO fin_protokoll (aktion, daten) VALUES ('beleg_hochgeladen', $1)`, [
+    JSON.stringify({ id, haendler: eingabe.haendler, bruttoCent: eingabe.bruttoCent }),
+  ])
+  return { ok: true, id, doppelt: false }
 }

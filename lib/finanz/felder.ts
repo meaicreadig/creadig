@@ -26,10 +26,12 @@ export type FelderBild = {
   pruefung: { zuPruefen: number; unklar: number; fremdwaehrung: number; privat: number }
 }
 
-const NETTO_ROH = `CASE WHEN b.ust_satz > 0 THEN b.brutto_cent * 100.0 / (100 + b.ust_satz) ELSE b.brutto_cent END`
-/** Gewinnwirksam im Belegjahr: Anlagegut nur 1. AfA-Rate, sonst abzugsfähiger Anteil. */
-const NETTO = `round(CASE WHEN b.afa_jahre > 0 THEN (${NETTO_ROH}) / b.afa_jahre
-  ELSE (${NETTO_ROH}) * COALESCE(b.abzug_prozent, 100) / 100.0 END)`
+export const NETTO_ROH_SQL = `CASE WHEN b.ust_satz > 0 THEN b.brutto_cent * 100.0 / (100 + b.ust_satz) ELSE b.brutto_cent END`
+/** Gewinnwirksam im Belegjahr: Anlagegut nur 1. AfA-Rate, sonst abzugsfähiger Anteil. Exportiert, weil lib/finanz/euer.ts dieselbe Rechnung braucht — eine Formel, nicht zwei. */
+export const NETTO_SQL = `round(CASE WHEN b.afa_jahre > 0 THEN (${NETTO_ROH_SQL}) / b.afa_jahre
+  ELSE (${NETTO_ROH_SQL}) * COALESCE(b.abzug_prozent, 100) / 100.0 END)`
+const NETTO_ROH = NETTO_ROH_SQL
+const NETTO = NETTO_SQL
 const FELD = `COALESCE(b.geschaeftsfeld, fb.geschaeftsfeld, 'offen')`
 const JOIN = `FROM fin_buchungen b
   LEFT JOIN fin_belege fb ON fb.quelle = 'fibero' AND b.id = 'fibero-exp-' || fb.extern_id`

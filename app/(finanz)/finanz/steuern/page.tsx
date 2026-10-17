@@ -1,17 +1,27 @@
 import { FinanzShell, OhneSpeicher } from "@/components/finanz/shell"
 import { FristenListe } from "@/components/finanz/fristen"
+import { FinanzEuer } from "@/components/finanz/euer"
 import { eur, eurRund } from "@/components/finanz/format"
 import { berechneLage } from "@/lib/finanz/lage"
 import { finanzDb } from "@/lib/finanz/store"
+import { berechneEuer } from "@/lib/finanz/euer"
+import { finanzOwnerSeite } from "@/lib/finanz/zugang"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Steuern" }
 
-export default async function FinanzSteuern() {
+export default async function FinanzSteuern({ searchParams }: { searchParams: Promise<{ jahr?: string }> }) {
+  await finanzOwnerSeite()
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="steuern" titel="Steuern"><OhneSpeicher /></FinanzShell>
 
   const { heute, fristen, topf } = await berechneLage(db)
+  const diesesJahr = heute.slice(0, 4)
+  const jahre = [diesesJahr, String(Number(diesesJahr) - 1), String(Number(diesesJahr) - 2)]
+  const gewaehlt = (await searchParams).jahr
+  const jahr = gewaehlt && jahre.includes(gewaehlt) ? gewaehlt : diesesJahr
+  const euer = await berechneEuer(db, jahr)
+
   return (
     <FinanzShell aktiv="steuern" titel="Steuern" unterzeile="Der Steuertopf rechnet live mit. Was dem Finanzamt gehört, ist hier schon beiseitegelegt.">
       <section aria-label="Steuertopf" className="grid gap-5 md:grid-cols-3">
@@ -23,6 +33,7 @@ export default async function FinanzSteuern() {
         <Karte titel="ESt-Rücklage" wert={eurRund(topf.estRuecklageCent)} fuss={`Gewinn bisher ${eur(topf.gewinnJahrCent)} netto`} />
       </section>
       <FristenListe fristen={fristen} heute={heute} ustOffenCent={topf.ustOffenCent} />
+      <FinanzEuer euer={euer} jahre={jahre} jahrAktuell={jahr} />
     </FinanzShell>
   )
 }

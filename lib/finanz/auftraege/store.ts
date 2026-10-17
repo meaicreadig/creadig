@@ -6,6 +6,7 @@ import type { Abfrage } from "@/lib/neon-abfrage"
 import {
   addTage,
   berechne,
+  DOK_TEXT,
   heuteBerlin,
   steuerModus,
   type DokArt,
@@ -101,6 +102,138 @@ export const AUFTRAEGE_SCHEMA = [
   `ALTER TABLE fin_buchungen ADD COLUMN IF NOT EXISTS geschaeftsfeld text`,
   `ALTER TABLE fin_buchungen ADD COLUMN IF NOT EXISTS quelle_ref text`,
   `ALTER TABLE fin_einstellungen ADD COLUMN IF NOT EXISTS firma jsonb NOT NULL DEFAULT '{}'::jsonb`,
+
+  /*
+   * GoBD-FESTSCHREIBUNG — unveraenderbar in der Datenbank, nicht nur in der
+   * Oberflaeche. Lesbare Fassung: scripts/migrations/030-gobd-festschreibung.sql
+   * (dort steht auch, warum die Angebot-Annahme-Ausnahme existiert und warum
+   * quelle='fibero' von der Buchungssperre ausgenommen ist).
+   */
+  `CREATE OR REPLACE FUNCTION fin_dokumente_festschreibung() RETURNS trigger AS $BODY$
+   BEGIN
+     IF OLD.nummer IS NULL THEN
+       RETURN NEW;
+     END IF;
+
+     IF OLD.art = 'angebot' AND OLD.status = 'versendet' AND NEW.status = 'angenommen' THEN
+       IF NEW.nummer IS DISTINCT FROM OLD.nummer
+          OR NEW.kunde IS DISTINCT FROM OLD.kunde
+          OR NEW.datum IS DISTINCT FROM OLD.datum
+          OR NEW.pruefsumme IS DISTINCT FROM OLD.pruefsumme
+          OR NEW.steuer_modus IS DISTINCT FROM OLD.steuer_modus
+       THEN
+         RAISE EXCEPTION 'fin_dokumente %: festgeschrieben (Nummer %) — bei Annahme duerfen nur Positionen/Summen abweichen', OLD.id, OLD.nummer;
+       END IF;
+       RETURN NEW;
+     END IF;
+
+     IF NEW.nummer IS DISTINCT FROM OLD.nummer
+        OR NEW.positionen IS DISTINCT FROM OLD.positionen
+        OR NEW.summen IS DISTINCT FROM OLD.summen
+        OR NEW.kunde IS DISTINCT FROM OLD.kunde
+        OR NEW.datum IS DISTINCT FROM OLD.datum
+        OR NEW.pruefsumme IS DISTINCT FROM OLD.pruefsumme
+        OR NEW.steuer_modus IS DISTINCT FROM OLD.steuer_modus
+     THEN
+       RAISE EXCEPTION 'fin_dokumente %: festgeschrieben (Nummer %) — nummer/positionen/summen/kunde/datum/pruefsumme/steuer_modus sind unveraenderbar', OLD.id, OLD.nummer;
+     END IF;
+     RETURN NEW;
+   END;
+   $BODY$ LANGUAGE plpgsql`,
+  `DROP TRIGGER IF EXISTS trg_fin_dokumente_festschreibung ON fin_dokumente`,
+  `CREATE TRIGGER trg_fin_dokumente_festschreibung BEFORE UPDATE ON fin_dokumente
+     FOR EACH ROW EXECUTE FUNCTION fin_dokumente_festschreibung()`,
+  `CREATE OR REPLACE FUNCTION fin_dokumente_kein_delete() RETURNS trigger AS $BODY$
+   BEGIN
+     IF OLD.nummer IS NOT NULL THEN
+       RAISE EXCEPTION 'fin_dokumente %: festgeschrieben (Nummer %) — loeschen verboten, stattdessen stornieren', OLD.id, OLD.nummer;
+     END IF;
+     RETURN OLD;
+   END;
+   $BODY$ LANGUAGE plpgsql`,
+  `DROP TRIGGER IF EXISTS trg_fin_dokumente_kein_delete ON fin_dokumente`,
+  `CREATE TRIGGER trg_fin_dokumente_kein_delete BEFORE DELETE ON fin_dokumente
+     FOR EACH ROW EXECUTE FUNCTION fin_dokumente_kein_delete()`,
+
+  `CREATE OR REPLACE FUNCTION fin_buchungen_festschreibung() RETURNS trigger AS $BODY$
+   BEGIN
+     IF OLD.status <> 'gebucht' OR OLD.quelle = 'fibero' THEN
+       RETURN NEW;
+     END IF;
+     IF (to_jsonb(NEW) - 'storniert_at') IS DISTINCT FROM (to_jsonb(OLD) - 'storniert_at') THEN
+       RAISE EXCEPTION 'fin_buchungen %: gebucht — nur storniert_at darf noch gesetzt werden', OLD.id;
+     END IF;
+     RETURN NEW;
+   END;
+   $BODY$ LANGUAGE plpgsql`,
+  `DROP TRIGGER IF EXISTS trg_fin_buchungen_festschreibung ON fin_buchungen`,
+  `CREATE TRIGGER trg_fin_buchungen_festschreibung BEFORE UPDATE ON fin_buchungen
+     FOR EACH ROW EXECUTE FUNCTION fin_buchungen_festschreibung()`,
+  `CREATE OR REPLACE FUNCTION fin_buchungen_kein_delete() RETURNS trigger AS $BODY$
+   BEGIN
+     IF OLD.status = 'gebucht' AND OLD.quelle <> 'fibero' THEN
+       RAISE EXCEPTION 'fin_buchungen %: gebucht — loeschen verboten, stattdessen stornieren (storniert_at)', OLD.id;
+     END IF;
+     RETURN OLD;
+   END;
+   $BODY$ LANGUAGE plpgsql`,
+  `DROP TRIGGER IF EXISTS trg_fin_buchungen_kein_delete ON fin_buchungen`,
+  `CREATE TRIGGER trg_fin_buchungen_kein_delete BEFORE DELETE ON fin_buchungen
+     FOR EACH ROW EXECUTE FUNCTION fin_buchungen_kein_delete()`,
+
+  `CREATE OR REPLACE FUNCTION fin_nur_insert() RETURNS trigger AS $BODY$
+   BEGIN
+     RAISE EXCEPTION '% ist ein Verlauf — nur INSERT, kein UPDATE und kein DELETE', TG_TABLE_NAME;
+   END;
+   $BODY$ LANGUAGE plpgsql`,
+  `DROP TRIGGER IF EXISTS trg_fin_dokument_verlauf_nur_insert ON fin_dokument_verlauf`,
+  `CREATE TRIGGER trg_fin_dokument_verlauf_nur_insert BEFORE UPDATE OR DELETE ON fin_dokument_verlauf
+     FOR EACH ROW EXECUTE FUNCTION fin_nur_insert()`,
+  `DROP TRIGGER IF EXISTS trg_fin_protokoll_nur_insert ON fin_protokoll`,
+  `CREATE TRIGGER trg_fin_protokoll_nur_insert BEFORE UPDATE OR DELETE ON fin_protokoll
+     FOR EACH ROW EXECUTE FUNCTION fin_nur_insert()`,
+
+  /*
+   * Phase 6 — Teilzahlungen als eigene Zeilen, nicht als ein Betrag-Feld.
+   * Dieselbe Entscheidung wie bei `payments` im Gate-18-Schema (siehe
+   * lib/rechnung.ts): „Eine Teilzahlung ist kein Sonderfall, sondern zwei
+   * Zeilen." Append-only wie fin_dokument_verlauf/fin_protokoll — ein
+   * Zahlungseingang wird storniert durch einen GEGENeintrag, nicht durch
+   * Loeschen der Zeile.
+   */
+  `CREATE TABLE IF NOT EXISTS fin_zahlungen (
+    id text PRIMARY KEY,
+    dokument_id text NOT NULL,
+    datum date NOT NULL,
+    cent bigint NOT NULL,
+    quelle text NOT NULL DEFAULT 'manuell' CHECK (quelle IN ('manuell','bank')),
+    ref text,
+    erstellt_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE INDEX IF NOT EXISTS fin_zahlungen_dokument_idx ON fin_zahlungen (dokument_id)`,
+  /* Ein Bankumsatz kann nur EINE Zahlung sein — schützt gegen doppeltes Bestätigen (scripts/migrations/035-finanz-sicherheit.sql). */
+  `CREATE UNIQUE INDEX IF NOT EXISTS fin_zahlungen_bank_ref_uidx ON fin_zahlungen (ref) WHERE quelle = 'bank' AND ref IS NOT NULL`,
+  `DROP TRIGGER IF EXISTS trg_fin_zahlungen_nur_insert ON fin_zahlungen`,
+  `CREATE TRIGGER trg_fin_zahlungen_nur_insert BEFORE UPDATE OR DELETE ON fin_zahlungen
+     FOR EACH ROW EXECUTE FUNCTION fin_nur_insert()`,
+
+  /*
+   * Bank-Import (CSV und camt.053) — jeder Umsatz einmal, ueber eine stabile
+   * Referenz (Bankreferenz, sonst eine Pruefsumme aus Datum+Betrag+
+   * Verwendungszweck) idempotent. Nicht zugeordnete Umsaetze sind der
+   * Eingangskorb dieses Imports.
+   */
+  `CREATE TABLE IF NOT EXISTS fin_bank_umsaetze (
+    id text PRIMARY KEY,
+    datum date NOT NULL,
+    betrag_cent bigint NOT NULL,
+    verwendungszweck text NOT NULL DEFAULT '',
+    gegenpartei text,
+    quelle text NOT NULL CHECK (quelle IN ('csv','camt053')),
+    status text NOT NULL DEFAULT 'offen' CHECK (status IN ('offen','zugeordnet','ignoriert')),
+    zugeordnet_dokument_id text,
+    rohdaten jsonb NOT NULL DEFAULT '{}'::jsonb,
+    created_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE INDEX IF NOT EXISTS fin_bank_umsaetze_status_idx ON fin_bank_umsaetze (status, datum DESC)`,
 ]
 
 let bereit: Promise<void> | null = null
@@ -227,7 +360,7 @@ function zeile(r: Record<string, unknown>): Dokument {
     angebotId: t(r.angebot_id),
     stornoVonId: t(r.storno_von_id),
     anzahlungProzent: r.anzahlung_prozent === null ? null : Number(r.anzahlung_prozent),
-    sprache: (r.sprache === "en" ? "en" : "de") as Sprache,
+    sprache: (r.sprache === "en" ? "en" : r.sprache === "tr" ? "tr" : "de") as Sprache,
     titel: String(r.titel ?? ""),
     kunde: r.kunde as Kunde,
     datum: String(r.datum),
@@ -532,14 +665,24 @@ export async function markiereGeoeffnet(db: Abfrage, id: string): Promise<void> 
 export async function rechnungAusAngebot(db: Abfrage, angebotId: string, anzahlungProzent: number | null): Promise<string | null> {
   const a = await ladeDokument(db, angebotId)
   if (!a || a.art !== "angebot" || a.status !== "angenommen" || !a.summen) return null
-  const en = a.sprache === "en"
-  const bezug = `${en ? "Quotation" : "Angebot"} ${a.nummer}`
+  const ANZAHLUNG_TEXT: Record<Sprache, { anzahlung: (p: number) => string; abzug: (nr: string) => string }> = {
+    de: { anzahlung: (p) => `Anzahlung ${p} %`, abzug: (nr) => `Abzüglich Anzahlung ${nr}` },
+    en: { anzahlung: (p) => `Advance payment ${p} %`, abzug: (nr) => `Less advance payment ${nr}` },
+    tr: { anzahlung: (p) => `Peşinat %${p}`, abzug: (nr) => `${nr} peşinat mahsubu` },
+  }
+  const text = ANZAHLUNG_TEXT[a.sprache]
+  const bezug = `${DOK_TEXT[a.sprache].angebot} ${a.nummer}`
+  const EINLEITUNG_TEXT: Record<Sprache, string> = {
+    de: `Gemäß ${bezug} berechnen wir Ihnen folgende Leistungen:`,
+    en: `As agreed in ${bezug}, we invoice the following services:`,
+    tr: `${bezug} kapsamında aşağıdaki hizmetleri faturalandırıyoruz:`,
+  }
   let positionen: Position[]
 
   if (anzahlungProzent) {
     const p = Math.min(Math.max(Math.round(anzahlungProzent), 1), 99)
     positionen = a.summen.gruppen.map((g) => ({
-      titel: en ? `Advance payment ${p} %` : `Anzahlung ${p} %`,
+      titel: text.anzahlung(p),
       beschreibung: `${bezug}${a.titel ? ` – ${a.titel}` : ""}`,
       menge: 1,
       einheit: "Pauschal",
@@ -554,13 +697,13 @@ export async function rechnungAusAngebot(db: Abfrage, angebotId: string, anzahlu
       positionen = positionen.map((p) => ({ ...p, preisCent: Math.round(p.preisCent * (1 - a.rabattProzent / 100)) }))
     }
     const anzahlungen = await db(
-      `SELECT nummer, summen FROM fin_dokumente WHERE angebot_id=$1 AND art='rechnung' AND anzahlung_prozent IS NOT NULL AND status IN ('versendet','bezahlt')`,
+      `SELECT nummer, summen FROM fin_dokumente WHERE angebot_id=$1 AND art='rechnung' AND anzahlung_prozent IS NOT NULL AND status IN ('versendet','teilbezahlt','bezahlt')`,
       [angebotId],
     )
     for (const z of anzahlungen) {
       for (const g of ((z.summen as Summen | null)?.gruppen ?? [])) {
         positionen.push({
-          titel: en ? `Less advance payment ${z.nummer}` : `Abzüglich Anzahlung ${z.nummer}`,
+          titel: text.abzug(String(z.nummer)),
           beschreibung: "",
           menge: 1,
           einheit: "Pauschal",
@@ -578,7 +721,8 @@ export async function rechnungAusAngebot(db: Abfrage, angebotId: string, anzahlu
     titel: a.titel,
     kunde: a.kunde,
     geschaeftsfeld: a.geschaeftsfeld,
-    einleitung: en ? `As agreed in ${bezug}, we invoice the following services:` : `Gemäß ${bezug} berechnen wir Ihnen folgende Leistungen:`,
+    leistungszeitraum: a.leistungszeitraum,
+    einleitung: EINLEITUNG_TEXT[a.sprache],
     schluss: "",
     positionen,
     rabattProzent: 0,
@@ -587,24 +731,170 @@ export async function rechnungAusAngebot(db: Abfrage, angebotId: string, anzahlu
   })
 }
 
-export async function markiereBezahlt(db: Abfrage, id: string, am: string): Promise<boolean> {
-  const [r] = await db(`UPDATE fin_dokumente SET status='bezahlt', bezahlt_am=$2, updated_at=now() WHERE id=$1 AND art='rechnung' AND status='versendet' RETURNING id`, [id, am])
-  if (!r) return false
-  await db(`UPDATE fin_buchungen SET status='gebucht', datum=$2 WHERE quelle='rechnung' AND quelle_ref=$1 AND storniert_at IS NULL`, [id, am])
-  await verlauf(db, id, "bezahlt", { am })
-  return true
+/* ------------------------------------------------------------------------ */
+/* Teilzahlungen (Phase 6) — eine Zahlung ist eine Zeile, kein Betrag-Feld   */
+/* ------------------------------------------------------------------------ */
+
+export type Zahlung = { id: string; datum: string; cent: number; quelle: "manuell" | "bank"; ref: string | null }
+
+export async function ladeZahlungen(db: Abfrage, dokumentId: string): Promise<Zahlung[]> {
+  const r = await db(`SELECT id, to_char(datum,'YYYY-MM-DD') AS datum, cent, quelle, ref FROM fin_zahlungen WHERE dokument_id = $1 ORDER BY datum, erstellt_at`, [dokumentId])
+  return r.map((x) => ({ id: String(x.id), datum: String(x.datum), cent: Number(x.cent), quelle: x.quelle === "bank" ? "bank" : "manuell", ref: x.ref ? String(x.ref) : null }))
 }
 
-/** Storno: neues Dokument mit negativen Beträgen + eigene Nummer; Forderung im Hauptbuch storniert. */
+export async function bezahltCent(db: Abfrage, dokumentId: string): Promise<number> {
+  const [r] = await db(`SELECT coalesce(sum(cent), 0) AS s FROM fin_zahlungen WHERE dokument_id = $1`, [dokumentId])
+  return Number(r?.s ?? 0)
+}
+
+/** Dieselbe Summe für mehrere Rechnungen auf einmal — für Listen/KPIs, die sonst eine Abfrage je Zeile bräuchten. */
+export async function bezahltCentBulk(db: Abfrage, dokumentIds: string[]): Promise<Record<string, number>> {
+  if (dokumentIds.length === 0) return {}
+  const r = await db(`SELECT dokument_id, sum(cent)::bigint AS s FROM fin_zahlungen WHERE dokument_id = ANY($1::text[]) GROUP BY dokument_id`, [dokumentIds])
+  return Object.fromEntries(r.map((x) => [String(x.dokument_id), Number(x.s)]))
+}
+
+export type Zahlungsstand = { bezahltCent: number; offenCent: number; status: "teilbezahlt" | "bezahlt"; ueberzahlt: boolean }
+
+/**
+ * Erfasst einen Zahlungseingang — Teil- oder Restzahlung, manuell oder aus
+ * dem Bank-Import (Phase 6). "bezahlt" erst bei Rest ≤ 0 — eine
+ * Ueberzahlung zaehlt als bezahlt UND wird gemeldet (Hinweis, kein eigener
+ * Status: siehe ueberzahlt im Rueckgabewert). Die geplante Buchung wechselt
+ * GENAU EINMAL auf 'gebucht', beim Erreichen von Rest ≤ 0 — nicht bei jeder
+ * Teilzahlung — und ist danach unveraenderbar (GoBD-Festschreibung, Phase 1).
+ */
+/**
+ * Verbucht EXAKT diese eine Zahlung sofort als `gebucht`-Cash-Ereignis — nicht
+ * erst bei vollständiger Bezahlung. Kontostand/Liquidität (rechnen.ts) und die
+ * EÜR (Ist-Versteuerung) sehen eine Teilzahlung so an dem Tag, an dem sie
+ * tatsächlich einging, statt alles auf einmal am Tag der letzten Rate.
+ *
+ * Je USt-Gruppe eine eigene Zeile (dieselbe Aufteilung wie bucheGeplant()):
+ * eine Zahlung wird der Reihe nach (USt-Satz aufsteigend, fest aber
+ * willkürlich — keine Zahlungsavis nennt uns, welcher Teil welche Position
+ * begleicht) auf die noch offenen geplanten Gruppen verteilt. Eine geplante
+ * Gruppe schrumpft um den erhaltenen Anteil oder verschwindet bei Rest 0 —
+ * `geplant` ist noch nicht festgeschrieben (siehe fin_buchungen_festschreibung()),
+ * UPDATE/DELETE bleiben also erlaubt. Ein darüber hinausgehender Rest
+ * (Überzahlung) zählt als 0 %-Einnahme, weil ihm keine Rechnungsposition mehr
+ * zuzuordnen ist.
+ */
+async function verbucheZahlungGebucht(db: Abfrage, dokumentId: string, zahlungId: string, cent: number, datum: string): Promise<void> {
+  const geplant = await db(
+    `SELECT id, brutto_cent, ust_satz, kategorie, gegenpartei, geschaeftsfeld
+       FROM fin_buchungen WHERE quelle='rechnung' AND quelle_ref=$1 AND status='geplant' AND storniert_at IS NULL
+       ORDER BY ust_satz ASC`,
+    [dokumentId],
+  )
+
+  let rest = cent
+  for (const g of geplant) {
+    if (rest <= 0) break
+    const bruttoOffen = Number(g.brutto_cent)
+    const nimm = Math.min(bruttoOffen, rest)
+    await db(
+      `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, notiz, quelle, quelle_ref, geschaeftsfeld)
+       VALUES ($1,'einnahme','gebucht',$2,$3,$4,$5,$6,'Zahlungseingang','rechnung',$7,$8)`,
+      [`${zahlungId}-${g.ust_satz}`, datum, nimm, g.ust_satz, g.kategorie, g.gegenpartei, dokumentId, g.geschaeftsfeld],
+    )
+    const verbleibt = bruttoOffen - nimm
+    if (verbleibt > 0) await db(`UPDATE fin_buchungen SET brutto_cent = $2 WHERE id = $1`, [g.id, verbleibt])
+    else await db(`DELETE FROM fin_buchungen WHERE id = $1`, [g.id])
+    rest -= nimm
+  }
+  if (rest > 0) {
+    await db(
+      `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, notiz, quelle, quelle_ref)
+       VALUES ($1,'einnahme','gebucht',$2,$3,0,'Überzahlung',NULL,'Zahlungseingang über dem offenen Rest','rechnung',$4)`,
+      [`${zahlungId}-ueberzahlung`, datum, rest, dokumentId],
+    )
+  }
+}
+
+export async function erfasseZahlung(
+  db: Abfrage,
+  dokumentId: string,
+  cent: number,
+  datum: string,
+  quelle: "manuell" | "bank" = "manuell",
+  ref: string | null = null,
+  /** Idempotenz-Schlüssel: dieselbe ID zweimal (Doppelklick, Wiederholung nach Netzfehler) erfasst die Zahlung genau einmal. */
+  zahlungIdVorgabe?: string,
+): Promise<{ ok: true; stand: Zahlungsstand } | { ok: false; fehler: string }> {
+  if (!Number.isFinite(cent) || cent <= 0 || !Number.isInteger(cent)) return { ok: false, fehler: "Der Betrag muss größer als 0 sein." }
+  const d = await ladeDokument(db, dokumentId)
+  if (!d || d.art !== "rechnung" || !["versendet", "teilbezahlt"].includes(d.status) || !d.summen) {
+    return { ok: false, fehler: "Nur eine offene Rechnung kann einen Zahlungseingang erfassen." }
+  }
+
+  const zahlungId = zahlungIdVorgabe && /^[A-Za-z0-9_-]{8,80}$/.test(zahlungIdVorgabe) ? zahlungIdVorgabe : crypto.randomUUID()
+  /*
+   * Neon über HTTP kennt keine Transaktion über mehrere Aufrufe. Deshalb sichert
+   * EIN atomarer Schritt den Platz: Nur wer die Zahlungszeile wirklich anlegt,
+   * bucht weiter. Ein zweiter Aufruf mit derselben ID (oder derselben
+   * Bankreferenz, siehe Unique-Index) läuft ins Leere statt doppelt zu zählen.
+   */
+  const angelegt = await db(
+    `INSERT INTO fin_zahlungen (id, dokument_id, datum, cent, quelle, ref) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING RETURNING id`,
+    [zahlungId, dokumentId, datum, cent, quelle, ref],
+  )
+  if (angelegt.length === 0) {
+    const bezahltBisher = await bezahltCent(db, dokumentId)
+    const restBisher = d.summen.bruttoCent - bezahltBisher
+    return { ok: true, stand: { bezahltCent: bezahltBisher, offenCent: restBisher, status: restBisher <= 0 ? "bezahlt" : "teilbezahlt", ueberzahlt: restBisher < 0 } }
+  }
+  await verbucheZahlungGebucht(db, dokumentId, zahlungId, cent, datum)
+  const bezahlt = await bezahltCent(db, dokumentId)
+  const rest = d.summen.bruttoCent - bezahlt
+  const neuerStatus: "teilbezahlt" | "bezahlt" = rest <= 0 ? "bezahlt" : "teilbezahlt"
+
+  await db(
+    `UPDATE fin_dokumente SET status = $2, bezahlt_am = CASE WHEN $2 = 'bezahlt' THEN $3::date ELSE bezahlt_am END, updated_at = now() WHERE id = $1`,
+    [dokumentId, neuerStatus, datum],
+  )
+  await verlauf(db, dokumentId, quelle === "bank" ? "zahlung_bank" : "zahlung", { cent, datum, bezahltGesamt: bezahlt, rest, ref })
+  return { ok: true, stand: { bezahltCent: bezahlt, offenCent: rest, status: neuerStatus, ueberzahlt: rest < 0 } }
+}
+
+/** Schreibt genau den offenen Rest als eine einzige Zahlung — die bestehende "Als bezahlt markieren"-Oberfläche bleibt ein Klick. */
+export async function markiereBezahlt(db: Abfrage, id: string, am: string): Promise<boolean> {
+  const d = await ladeDokument(db, id)
+  if (!d || !d.summen) return false
+  const rest = d.summen.bruttoCent - (await bezahltCent(db, id))
+  if (rest <= 0) return false
+  const r = await erfasseZahlung(db, id, rest, am, "manuell", null)
+  return r.ok
+}
+
+/**
+ * Storno: neues Dokument mit negativen Beträgen + eigene Nummer. Auch eine
+ * teilweise oder ganz bezahlte Rechnung lässt sich stornieren (z. B. falscher
+ * Betrag): Nur die noch OFFENE Forderung (geplant) wird storniert — das Geld,
+ * das tatsächlich eingegangen ist, bleibt als Einnahme stehen (Zuflussprinzip)
+ * und erscheint im Vorgang als Guthaben des Kunden, bis es erstattet oder auf
+ * eine neue Rechnung angerechnet wird (siehe guthabenAusStorno()).
+ */
 export async function storniere(db: Abfrage, id: string, grund: string): Promise<string | null> {
   const d = await ladeDokument(db, id)
-  if (!d || d.art !== "rechnung" || d.status !== "versendet" || !d.summen) return null
+  if (!d || d.art !== "rechnung" || !["versendet", "teilbezahlt", "bezahlt"].includes(d.status) || !d.summen) return null
+  /* Atomarer Platz: nur ein Aufruf darf von offen → storniert wechseln (Doppelklick erzeugt keine zweite Stornorechnung). */
+  const gesperrt = await db(
+    `UPDATE fin_dokumente SET status='storniert', updated_at=now() WHERE id=$1 AND status IN ('versendet','teilbezahlt','bezahlt') RETURNING id`,
+    [id],
+  )
+  if (gesperrt.length === 0) return null
+  const bereitsBezahlt = await bezahltCent(db, id)
   const sid = crypto.randomUUID()
   const nummer = await naechsteNummer(db, "storno", heuteBerlin())
   const positionen = d.positionen.map((p) => ({ ...p, preisCent: -p.preisCent }))
   const summen = berechne(positionen, d.rabattProzent, d.steuerModus ?? "normal")
   const token = randomBytes(24).toString("base64url")
-  const en = d.sprache === "en"
+  const STORNO_TEXT: Record<Sprache, (nummer: string, datum: string) => string> = {
+    de: (nr, dat) => `Diese Rechnung storniert die Rechnung ${nr} vom ${dat}.`,
+    en: (nr, dat) => `This invoice cancels invoice ${nr} dated ${dat}.`,
+    tr: (nr, dat) => `Bu fatura, ${dat} tarihli ${nr} numaralı faturayı iptal eder.`,
+  }
   await db(
     `INSERT INTO fin_dokumente (id, art, status, nummer, storno_von_id, angebot_id, sprache, titel, kunde, datum, leistungszeitraum, einleitung,
        schluss, rabatt_prozent, geschaeftsfeld, positionen, steuer_modus, summen, absender, token, versendet_at, pruefsumme)
@@ -618,7 +908,7 @@ export async function storniere(db: Abfrage, id: string, grund: string): Promise
       d.titel,
       JSON.stringify(d.kunde),
       d.leistungszeitraum,
-      `${en ? "This invoice cancels invoice" : "Diese Rechnung storniert die Rechnung"} ${d.nummer} ${en ? "dated" : "vom"} ${d.datum}.${grund ? ` ${grund}` : ""}`,
+      `${STORNO_TEXT[d.sprache](String(d.nummer), d.datum)}${grund ? ` ${grund}` : ""}`,
       d.rabattProzent,
       d.geschaeftsfeld,
       JSON.stringify(positionen),
@@ -629,11 +919,53 @@ export async function storniere(db: Abfrage, id: string, grund: string): Promise
       createHash("sha256").update(JSON.stringify({ nummer, von: d.nummer, summen })).digest("hex"),
     ],
   )
-  await db(`UPDATE fin_dokumente SET status='storniert', updated_at=now() WHERE id=$1`, [id])
-  await db(`UPDATE fin_buchungen SET storniert_at=now() WHERE quelle='rechnung' AND quelle_ref=$1 AND storniert_at IS NULL`, [id])
-  await verlauf(db, id, "storniert", { durch: sid, nummer, grund })
+  await db(`UPDATE fin_buchungen SET storniert_at=now() WHERE quelle='rechnung' AND quelle_ref=$1 AND status='geplant' AND storniert_at IS NULL`, [id])
+  await verlauf(db, id, "storniert", { durch: sid, nummer, grund, bereitsBezahltCent: bereitsBezahlt })
   await verlauf(db, sid, "festgeschrieben", { nummer, storno_von: d.nummer })
+  if (bereitsBezahlt > 0) await verlauf(db, id, "guthaben_offen", { cent: bereitsBezahlt })
   return sid
+}
+
+export type Guthaben = { cent: number; erledigt: "erstattet" | "angerechnet" | null; erledigtAm: string | null }
+
+/** Geld, das auf eine später stornierte Rechnung schon eingegangen ist — steht dem Kunden zu, bis es erstattet oder angerechnet ist. */
+export async function guthabenAusStorno(db: Abfrage, id: string): Promise<Guthaben | null> {
+  const r = await db(
+    `SELECT aktion, daten, to_char(created_at AT TIME ZONE 'Europe/Berlin','YYYY-MM-DD') AS am FROM fin_dokument_verlauf
+      WHERE dokument_id=$1 AND aktion IN ('guthaben_offen','guthaben_erstattet','guthaben_angerechnet') ORDER BY created_at`,
+    [id],
+  )
+  const offen = r.find((x) => x.aktion === "guthaben_offen")
+  if (!offen) return null
+  const erledigt = r.find((x) => x.aktion !== "guthaben_offen")
+  return {
+    cent: Number((offen.daten as { cent?: number }).cent ?? 0),
+    erledigt: erledigt ? (erledigt.aktion === "guthaben_erstattet" ? "erstattet" : "angerechnet") : null,
+    erledigtAm: erledigt ? String(erledigt.am) : null,
+  }
+}
+
+/**
+ * Guthaben erledigen. "erstattet" bucht das zurückgezahlte Geld als Ausgabe
+ * (Abfluss, § 11 EStG) — idempotent über eine feste Buchungs-ID.
+ * "angerechnet" vermerkt nur, dass der Betrag auf einer neuen Rechnung
+ * abgezogen wurde (die neue Rechnung trägt dafür eine Minus-Position).
+ */
+export async function erledigeGuthaben(db: Abfrage, id: string, wie: "erstattet" | "angerechnet", am: string): Promise<boolean> {
+  const g = await guthabenAusStorno(db, id)
+  if (!g || g.erledigt || g.cent <= 0) return false
+  const d = await ladeDokument(db, id)
+  if (!d) return false
+  if (wie === "erstattet") {
+    const neu = await db(
+      `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, notiz, quelle, quelle_ref, geschaeftsfeld)
+       VALUES ($1,'ausgabe','gebucht',$2,$3,0,'Sonstiges',$4,$5,'rechnung',$6,$7) ON CONFLICT (id) DO NOTHING RETURNING id`,
+      [`erstattung-${id}`, am, g.cent, d.kunde.firma || d.kunde.name || null, `Erstattung zu stornierter Rechnung ${d.nummer}`, id, d.geschaeftsfeld],
+    )
+    if (neu.length === 0) return false
+  }
+  await verlauf(db, id, wie === "erstattet" ? "guthaben_erstattet" : "guthaben_angerechnet", { cent: g.cent, am })
+  return true
 }
 
 export async function vermerkeNachfass(db: Abfrage, id: string, stufe: number | null): Promise<void> {
@@ -651,6 +983,54 @@ export function anzeigeStatus(d: Dokument, heute = heuteBerlin()): string {
     if (d.gueltigBis && d.gueltigBis < heute) return "abgelaufen"
     return d.geoeffnetAt ? "geoeffnet" : "versendet"
   }
-  if (d.art === "rechnung" && d.status === "versendet" && d.faelligAm && d.faelligAm < heute) return "ueberfaellig"
+  if (d.art === "rechnung" && (d.status === "versendet" || d.status === "teilbezahlt") && d.faelligAm && d.faelligAm < heute) return "ueberfaellig"
   return d.status
+}
+
+/* ------------------------------------------------------------------------ */
+/* Nummernkreis-Pruefung (GoBD: Lueckenlosigkeit je Praefix + Jahr)          */
+/* ------------------------------------------------------------------------ */
+
+export type NummernkreisLuecke = {
+  praefix: string
+  jahr: number
+  /** Nummern, die zwischen 1 und der hoechsten vergebenen fehlen — eine echte Luecke. */
+  fehlend: number[]
+  hoechsteVergeben: number
+  /** Stand des Zaehlers (fin_nummernkreis). Groesser als hoechsteVergeben heisst: eine Nummer wurde gezogen, aber nie auf einem Dokument festgeschrieben. */
+  zaehlerstand: number
+}
+
+/**
+ * Sollte im Normalbetrieb immer ein leeres Array liefern — jede Nummer
+ * entsteht einmalig in schreibeFest() (`naechsteNummer()`), nie im Entwurf.
+ * Ein Treffer bedeutet: etwas hat an fin_dokumente vorbeigeschrieben (Import,
+ * Konsole, ein abgebrochener Vorgang zwischen Zaehler und UPDATE) — derselbe
+ * Fall, gegen den die Trigger aus scripts/migrations/030-gobd-festschreibung.sql
+ * schreibend schuetzen. Diese Funktion prueft stattdessen LESEND, ob er
+ * trotzdem passiert ist.
+ */
+export async function pruefeNummernkreis(db: Abfrage): Promise<NummernkreisLuecke[]> {
+  await auftraegeSchema(db)
+  const vergeben = await db(
+    `SELECT split_part(nummer, '-', 1) AS praefix, split_part(nummer, '-', 2)::int AS jahr,
+            array_agg(DISTINCT split_part(nummer, '-', 3)::int ORDER BY split_part(nummer, '-', 3)::int) AS vorhanden
+       FROM fin_dokumente WHERE nummer IS NOT NULL GROUP BY 1, 2`,
+    [],
+  )
+  const kreise = await db(`SELECT praefix, jahr, letzte FROM fin_nummernkreis`, [])
+  const zaehlerVon = new Map(kreise.map((k) => [`${k.praefix}-${k.jahr}`, Number(k.letzte)]))
+
+  const luecken: NummernkreisLuecke[] = []
+  for (const r of vergeben) {
+    const vorhanden = (r.vorhanden as unknown[]).map(Number)
+    const hoechste = vorhanden.length ? vorhanden[vorhanden.length - 1] : 0
+    const fehlend: number[] = []
+    for (let i = 1; i <= hoechste; i++) if (!vorhanden.includes(i)) fehlend.push(i)
+    const zaehlerstand = zaehlerVon.get(`${r.praefix}-${r.jahr}`) ?? hoechste
+    if (fehlend.length > 0 || zaehlerstand > hoechste) {
+      luecken.push({ praefix: String(r.praefix), jahr: Number(r.jahr), fehlend, hoechsteVergeben: hoechste, zaehlerstand })
+    }
+  }
+  return luecken.sort((a, b) => a.praefix.localeCompare(b.praefix) || a.jahr - b.jahr)
 }

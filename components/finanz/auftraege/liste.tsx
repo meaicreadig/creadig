@@ -24,7 +24,7 @@ export function aufgabenFuer(docs: Dokument[]): Aufgabe[] {
       else if (!d.geoeffnetAt && seit >= 3 && !nachgefasst) liste.push({ dok: d, text: `seit ${seit} Tagen ungeöffnet`, knopf: "Nachfrage senden" })
       else if (d.geoeffnetAt && seit >= 5 && !nachgefasst) liste.push({ dok: d, text: "geöffnet, aber noch keine Antwort – kurz anrufen?", knopf: "Nachfrage senden" })
     }
-    if (d.art === "rechnung" && d.status === "versendet" && d.faelligAm) {
+    if (d.art === "rechnung" && (d.status === "versendet" || d.status === "teilbezahlt") && d.faelligAm) {
       const tage = tageZwischen(d.faelligAm, heute)
       const n = naechsteMahnstufe(tage, d.mahnstufe)
       if (n) liste.push({ dok: d, text: `seit ${tage} Tagen überfällig`, knopf: ["", "Zahlungserinnerung", "1. Mahnung", "2. Mahnung"][n] })

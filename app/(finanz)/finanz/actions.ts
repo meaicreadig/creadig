@@ -9,6 +9,8 @@ import { KATEGORIEN, type Art } from "@/lib/finanz/rechnen"
 import { finanzDb, protokolliere } from "@/lib/finanz/store"
 import { berechneLage } from "@/lib/finanz/lage"
 import { frageAssistent } from "@/lib/finanz/assistent"
+import { leseBankCsv, leseBankCsvSaldo, leseCamt053, leseCamt053Saldo } from "@/lib/finanz/bank-import"
+import { bestaetigeZuordnung, ignoriereUmsatz, importiereBankUmsaetze } from "@/lib/finanz/bank-abgleich"
 
 const PFAD = "/finanz"
 
@@ -65,18 +67,21 @@ export async function buchungAnlegen(form: FormData) {
   const ust = Number(feld(form, "ust") ?? 19)
   const status = feld(form, "status") === "geplant" ? "geplant" : "gebucht"
   const wiederholung = feld(form, "wiederholung") ?? "keine"
+  const afaRoh = feld(form, "afa_jahre")
+  const afaJahre = art === "ausgabe" && afaRoh ? Number(afaRoh) : null
 
   if (!betrag || betrag <= 0 || betrag > 100_000_000_00) throw new Error("Betrag ungültig")
   if (!datum || !ISO.test(datum)) throw new Error("Datum ungültig")
   if (!kategorie || !KATEGORIEN[art].includes(kategorie)) throw new Error("Kategorie ungültig")
   if (![0, 7, 19].includes(ust)) throw new Error("USt-Satz ungültig")
   if (!["keine", "monatlich", "quartal", "jaehrlich"].includes(wiederholung)) throw new Error("Wiederholung ungültig")
+  if (afaJahre !== null && (!Number.isInteger(afaJahre) || afaJahre < 1 || afaJahre > 50)) throw new Error("Nutzungsdauer ungültig")
 
   const id = crypto.randomUUID()
   await db(
-    `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, notiz, wiederholung)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-    [id, art, status, datum, betrag, kategorie === "Privatentnahme" ? 0 : ust, kategorie, feld(form, "gegenpartei", 120), feld(form, "notiz", 500), wiederholung],
+    `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, notiz, wiederholung, afa_jahre)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+    [id, art, status, datum, betrag, kategorie === "Privatentnahme" ? 0 : ust, kategorie, feld(form, "gegenpartei", 120), feld(form, "notiz", 500), wiederholung, afaJahre],
   )
   await protokolliere(db, "buchung_angelegt", { id, art, betrag, datum, kategorie })
   revalidatePath(PFAD, "layout")
@@ -151,4 +156,80 @@ export async function einstellungenSpeichern(form: FormData) {
   )
   await protokolliere(db, "einstellungen", { stand, am, quote })
   revalidatePath(PFAD, "layout")
+}
+
+/** Kontostand aus dem zuletzt importierten Bank-Saldo übernehmen (Phase 6/9) — ein Klick, nie automatisch. */
+export async function kontostandAusBankUebernehmen(): Promise<void> {
+  const db = await zugang()
+  await db(
+    `UPDATE fin_einstellungen SET kontostand_cent = bank_saldo_cent, kontostand_am = bank_saldo_am, updated_at = now()
+       WHERE id = 'haupt' AND bank_saldo_cent IS NOT NULL AND bank_saldo_am IS NOT NULL`,
+    [],
+  )
+  await protokolliere(db, "kontostand_aus_bank_uebernommen", {})
+  revalidatePath(PFAD, "layout")
+}
+
+/**
+ * § 19-Wächter (Phase 4): der Vorschlag aus dem Kompass, EXPLIZIT bestätigt —
+ * keine automatische Umstellung, nur weil eine Grenze rechnerisch
+ * überschritten ist. Ab jetzt rechnen NEUE Rechnungen mit USt
+ * (steuerModus() liest fin_einstellungen.ust_pflichtig, siehe
+ * lib/finanz/auftraege/rechnen.ts); bereits festgeschriebene Rechnungen
+ * bleiben unverändert (GoBD-Festschreibung, Phase 1).
+ */
+export async function aufUstPflichtUmstellen(form: FormData): Promise<void> {
+  const db = await zugang()
+  if (form.get("bestaetigt") !== "on") throw new Error("Bitte die Bestätigung ankreuzen.")
+  await db(`UPDATE fin_einstellungen SET ust_pflichtig = true, updated_at = now() WHERE id = 'haupt'`, [])
+  await protokolliere(db, "paragraph19_umgestellt", { von: "klein", nach: "regelbesteuert" })
+  revalidatePath(PFAD, "layout")
+}
+
+/* ------------------------------------------------------------------------ */
+/* Bank-Import (Phase 6)                                                     */
+/* ------------------------------------------------------------------------ */
+
+export type BankImportErgebnis = { ok: true; anzahl: number } | { ok: false; fehler: string }
+
+/** CSV oder camt.053 — am Inhalt erkannt, nicht an der Dateiendung. */
+export async function bankImportieren(_prev: BankImportErgebnis | null, form: FormData): Promise<BankImportErgebnis> {
+  const db = await zugang()
+  const datei = form.get("datei")
+  if (!(datei instanceof Blob) || datei.size === 0) return { ok: false, fehler: "Bitte eine Datei auswählen." }
+  const text = await datei.text()
+  const istCamt = /<Document[\s>]/i.test(text) && /BkToCstmrStmt/i.test(text)
+  try {
+    const umsaetze = istCamt ? leseCamt053(text) : leseBankCsv(text)
+    if (umsaetze.length === 0) return { ok: false, fehler: "Keine Umsätze erkannt — Format prüfen (CSV-Spalten oder camt.053-Struktur)." }
+    const anzahl = await importiereBankUmsaetze(db, umsaetze, istCamt ? "camt053" : "csv")
+
+    const saldo = istCamt ? leseCamt053Saldo(text) : leseBankCsvSaldo(text)
+    if (saldo) {
+      await db(
+        `UPDATE fin_einstellungen SET bank_saldo_cent = $1, bank_saldo_am = $2
+           WHERE id = 'haupt' AND (bank_saldo_am IS NULL OR bank_saldo_am < $2::date)`,
+        [saldo.cent, saldo.datum],
+      )
+    }
+
+    await protokolliere(db, "bank_import", { gelesen: umsaetze.length, neu: anzahl, quelle: istCamt ? "camt053" : "csv", saldoGefunden: saldo !== null })
+    revalidatePath("/finanz/geldfluss")
+    revalidatePath("/finanz")
+    return { ok: true, anzahl }
+  } catch (e) {
+    return { ok: false, fehler: `Import fehlgeschlagen: ${e instanceof Error ? e.message : "unbekannter Fehler"}` }
+  }
+}
+
+export async function bankUmsatzZuordnen(form: FormData): Promise<void> {
+  const db = await zugang()
+  await bestaetigeZuordnung(db, String(form.get("umsatzId") ?? ""), String(form.get("dokumentId") ?? ""))
+  revalidatePath("/finanz/geldfluss", "layout")
+}
+
+export async function bankUmsatzIgnorieren(form: FormData): Promise<void> {
+  const db = await zugang()
+  await ignoriereUmsatz(db, String(form.get("umsatzId") ?? ""))
+  revalidatePath("/finanz/geldfluss")
 }

@@ -68,3 +68,46 @@ export async function frageAssistent(lage: Lage, frage: string): Promise<{ antwo
     return { fehler: "Assistent gerade nicht erreichbar (KI-Guthaben oder Verbindung prüfen)." }
   }
 }
+
+/**
+ * Persönlicher Mahnungs-Entwurf (nicht die feste DE/EN/TR-Mahnstufen-Vorlage
+ * aus lib/finanz/auftraege/mail.ts — die bleibt die rechtssichere
+ * Standardroute). Dieser Entwurf ist ein Zweites, Weicheres für schwierige
+ * Einzelfälle: wird NIE automatisch verschickt, landet als bearbeitbarer Text
+ * in der Oberfläche, zum Kopieren/Anpassen durch Muhammed selbst.
+ */
+export type MahnKontext = {
+  nummer: string
+  kunde: string
+  sprache: "de" | "en" | "tr"
+  offenerRestCent: number
+  tageUeberfaellig: number
+  mahnstufe: number
+  notiz?: string
+}
+
+const SPRACHE_NAME: Record<MahnKontext["sprache"], string> = { de: "Deutsch", en: "Englisch", tr: "Türkisch" }
+
+const MAHN_SYSTEM = `Du schreibst EINEN Entwurf für eine persönliche Nachricht an einen Kunden wegen einer überfälligen Rechnung — für creaDIG Solutions (Einzelunternehmen von Muhammed Emin Akyol).
+Regeln:
+- Nur ein Entwurf, kein Versand. Muhammed liest, bearbeitet und entscheidet selbst, ob und wie er ihn verschickt.
+- Nenne Rechnungsnummer, offenen Betrag und überfällige Tage GENAU wie im KONTEXT angegeben. Erfinde keine Zahlen, keine Zahlungshistorie, keine Details, die nicht im KONTEXT stehen.
+- Ton: höflich, direkt, ruhig. Kein Drohton, keine Paragraphen-Zitate, keine Inkasso-Sprache — das übernimmt bei Bedarf die reguläre Mahnstufen-Vorlage, nicht dieser Entwurf.
+- Sprache GENAU wie im KONTEXT angegeben (de/en/tr), keine Mischung.
+- Max. 120 Wörter, keine Betreffzeile, direkt mit der Anrede beginnen.
+- Wenn eine NOTIZ im KONTEXT steht (z. B. "Kunde bat um Aufschub"), berücksichtige sie sinngemäß im Ton, ohne sie wörtlich zu zitieren.`
+
+export async function entwerfeMahnung(kontext: MahnKontext): Promise<{ entwurf: string } | { fehler: string }> {
+  try {
+    const { text } = await generateText({
+      model: "openai/gpt-5.4-mini",
+      system: MAHN_SYSTEM,
+      prompt: `KONTEXT:\nRechnungsnummer: ${kontext.nummer}\nKunde: ${kontext.kunde}\nSprache: ${SPRACHE_NAME[kontext.sprache]}\nOffener Betrag: ${eur(kontext.offenerRestCent)}\nTage überfällig: ${kontext.tageUeberfaellig}\nBisherige Mahnstufe: ${kontext.mahnstufe}${kontext.notiz ? `\nNotiz: ${kontext.notiz}` : ""}\n\nSchreib den Entwurf.`,
+      maxOutputTokens: 400,
+    })
+    const entwurf = text.trim()
+    return entwurf ? { entwurf } : { fehler: "Kein Entwurf erhalten. Bitte erneut versuchen." }
+  } catch {
+    return { fehler: "Assistent gerade nicht erreichbar (KI-Guthaben oder Verbindung prüfen)." }
+  }
+}

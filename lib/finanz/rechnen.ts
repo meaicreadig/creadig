@@ -33,6 +33,9 @@ export type Einstellungen = {
   ustPflichtig: boolean
   ustRhythmus: "monatlich" | "quartal"
   ustBezahltBis: string
+  /** Letzter aus einem Bank-Import gelesener Saldo — ein Vorschlag, nie automatisch übernommen (siehe FinanzEinstellungen). */
+  bankSaldoCent: number | null
+  bankSaldoAm: string | null
 }
 
 export type FristArt = "ust" | "est" | "sonstig"
@@ -66,6 +69,13 @@ export const KATEGORIEN: Record<Art, readonly string[]> = {
 
 /** Privatentnahmen bewegen das Konto, aber nicht den Gewinn. */
 export const KEIN_BETRIEBSAUFWAND = new Set(["Privatentnahme"])
+
+/**
+ * Zuflüsse, die KEIN Umsatz im Sinne von § 19 UStG sind (Geldbewegung ohne
+ * Leistung). Zählen nicht zur Kleinunternehmergrenze. Großschreibung egal.
+ */
+export const KEIN_UMSATZ = ["Privateinlage", "Darlehen", "Kredit", "Erstattung", "Rückerstattung", "Umbuchung"] as const
+export const istKeinUmsatz = (kategorie: string) => KEIN_UMSATZ.some((k) => k.toLowerCase() === kategorie.trim().toLowerCase())
 
 /* ------------------------------------------------------------------------ */
 /* Datum                                                                     */
@@ -374,6 +384,9 @@ export function reichweiteMonate(freiCent: number, verlauf: Monat[]): number | n
   return schnitt > 0 ? Math.max(0, freiCent / schnitt) : null
 }
 
+/** Nur die Form, die kompass() braucht — kein Import aus lib/finanz/felder.ts, damit diese Datei "rein, ohne Datenbank" bleibt (siehe Kopfkommentar). lib/finanz/felder.ts' FeldZeile passt strukturell hinein. */
+export type GeschaeftsfeldMarge = { label: string; einCent: number; ausCent: number; anzahl: number }
+
 export function kompass(input: {
   freiCent: number
   topf: Steuertopf
@@ -384,8 +397,9 @@ export function kompass(input: {
   reichweite: number | null
   heute: string
   eur: (c: number) => string
+  felder?: GeschaeftsfeldMarge[]
 }): Hinweis[] {
-  const { freiCent, topf, wochen, fristen, buchungen, verlauf, reichweite, heute, eur } = input
+  const { freiCent, topf, wochen, fristen, buchungen, verlauf, reichweite, heute, eur, felder } = input
   const h: Hinweis[] = []
 
   for (const f of fristen.filter((x) => !x.erledigt)) {
@@ -417,8 +431,18 @@ export function kompass(input: {
 
   if (reichweite !== null && reichweite < 3)
     h.push({ schwere: "attention", text: `Freies Geld reicht für ${reichweite.toFixed(1)} Monate. Ziel sind 3–6 Monate Puffer.` })
-  else if (reichweite !== null && reichweite >= 6)
-    h.push({ schwere: "neutral", text: `Puffer für ${reichweite.toFixed(1)} Monate. Überschuss über 6 Monate kann arbeiten: Rücklage, Investition, Vermögen.` })
+  else if (reichweite !== null && reichweite >= 6) {
+    const vollMonate = verlauf.slice(0, -1).filter((m) => m.ausCent > 0)
+    const schnittAusgabe = vollMonate.length ? vollMonate.reduce((s, m) => s + m.ausCent, 0) / vollMonate.length : 0
+    const ueberPuffer = schnittAusgabe > 0 ? Math.round(freiCent - schnittAusgabe * 6) : 0
+    h.push({
+      schwere: "neutral",
+      text:
+        ueberPuffer > 0
+          ? `Puffer für ${reichweite.toFixed(1)} Monate — ${eur(ueberPuffer)} liegen über dem 6-Monats-Ziel. Das ist Kapital, das arbeiten könnte: Investition, Rücklage oder Anlage.`
+          : `Puffer für ${reichweite.toFixed(1)} Monate. Überschuss über 6 Monate kann arbeiten: Rücklage, Investition, Vermögen.`,
+    })
+  }
 
   const jetzt = verlauf.at(-1)
   const vorher = verlauf.slice(0, -1).filter((m) => m.einCent || m.ausCent)
@@ -428,7 +452,23 @@ export function kompass(input: {
     if (diff > 0) h.push({ schwere: "neutral", text: `Dieser Monat liegt ${eur(diff)} über deinem Schnitt. Weiter so.` })
   }
 
-  return h.slice(0, 5)
+  /* Wo trägt zusätzliche Investition den größten Hebel? Nur eine Beobachtung aus den Zahlen — keine Empfehlung, welches Feld "richtig" ist. */
+  const aktiveFelder = (felder ?? []).filter((f) => f.anzahl > 0)
+  if (aktiveFelder.length >= 2) {
+    const gesamtMarge = aktiveFelder.reduce((s, f) => s + f.einCent - f.ausCent, 0)
+    if (gesamtMarge > 0) {
+      const bestes = aktiveFelder.reduce((max, f) => (f.einCent - f.ausCent > max.einCent - max.ausCent ? f : max))
+      const marge = bestes.einCent - bestes.ausCent
+      const anteil = marge / gesamtMarge
+      if (anteil >= 0.5)
+        h.push({
+          schwere: "neutral",
+          text: `${bestes.label} trägt dieses Jahr ${Math.round(anteil * 100)} % deines Gewinns (${eur(marge)} von ${eur(gesamtMarge)}). Dort hat zusätzliche Investition rechnerisch den größten Hebel.`,
+        })
+    }
+  }
+
+  return h.slice(0, 6)
 }
 
 export function datumKurz(iso: string): string {
