@@ -10,12 +10,14 @@ import { finanzBasis } from "@/lib/finanz/basis"
 import { GESCHAEFTSFELDER, belegeSchema, belegUploadBereit, ladeBelege, letzterAbgleich } from "@/lib/finanz/belege"
 import { belegKiBereit } from "@/lib/finanz/beleg-ki"
 import { kopierlaufBereit } from "@/lib/finanz/kopierlauf-fibero"
+import { finanzOwnerSeite } from "@/lib/finanz/zugang"
 
 export const dynamic = "force-dynamic"
 export const maxDuration = 60
 export const metadata = { title: "Belege" }
 
 export default async function FinanzBelege({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  await finanzOwnerSeite()
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="belege" titel="Belege"><OhneSpeicher /></FinanzShell>
   await belegeSchema(db)

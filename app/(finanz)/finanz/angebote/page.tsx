@@ -4,11 +4,13 @@ import { finanzBasis } from "@/lib/finanz/basis"
 import { finanzDb } from "@/lib/finanz/store"
 import { formatEuro, heuteBerlin } from "@/lib/finanz/auftraege/rechnen"
 import { ladeDokumente } from "@/lib/finanz/auftraege/store"
+import { finanzOwnerSeite } from "@/lib/finanz/zugang"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Angebote" }
 
 export default async function Angebote() {
+  await finanzOwnerSeite()
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="angebote" titel="Angebote"><OhneSpeicher /></FinanzShell>
 

@@ -32,7 +32,7 @@ const { FINANZ_SCHEMA } = await import("../lib/finanz/store.ts")
 const { AUFTRAEGE_SCHEMA, speichereFirma, legeEntwurfAn, speichereEntwurf, schreibeFest, ladeDokument,
   ladeDokumentPerToken, ladeVerwandte, ladeVerlauf, verwerfeEntwurf, neueVersion, beantworteAngebot,
   markiereGeoeffnet, rechnungAusAngebot, markiereBezahlt, storniere, anzeigeStatus, pruefeNummernkreis,
-  erfasseZahlung, ladeZahlungen, bezahltCent } = await import("../lib/finanz/auftraege/store.ts")
+  erfasseZahlung, ladeZahlungen, bezahltCent, guthabenAusStorno } = await import("../lib/finanz/auftraege/store.ts")
 const { berechne, steuerModus, leererKunde, leerePosition, heuteBerlin, addTage, formatEuro } = await import("../lib/finanz/auftraege/rechnen.ts")
 const { fehltFuerERechnung, erzeugeXRechnung } = await import("../lib/finanz/auftraege/erechnung.ts")
 const { dokumentMail } = await import("../lib/finanz/auftraege/mail.ts")
@@ -691,7 +691,7 @@ const p_felderKonzentriert = [
 ]
 const p_margeKonzentriert = kompass({ ...p_basis, freiCent: 0, verlauf: [], reichweite: null, felder: p_felderKonzentriert })
 p(p_margeKonzentriert.some((h) => h.text.startsWith("IT trägt dieses Jahr 89 %") && h.text.includes("4.000,00") && h.text.includes("4.500,00")),
-  "P3 ein Geschäftsfeld, das 89 % der Marge trägt, wird mit Anteil und beiden Beträgen benannt — eine Beobachtung, keine Handlungsanweisung", JSON.stringify(p_margeKonzentriert))
+  "P3 ein Geschäftsfeld, das 89 % der Marge trägt, wird mit Anteil und beiden Betr��gen benannt — eine Beobachtung, keine Handlungsanweisung", JSON.stringify(p_margeKonzentriert))
 
 const p_nurEinFeld = kompass({ ...p_basis, freiCent: 0, verlauf: [], reichweite: null, felder: [{ label: "IT", einCent: 500000, ausCent: 100000, anzahl: 5 }] })
 p(!p_nurEinFeld.some((h) => h.text.includes("trägt dieses Jahr")), "P4 mit nur einem aktiven Geschäftsfeld gibt es nichts zu vergleichen — kein Hinweis")
@@ -707,8 +707,10 @@ p(!p_margeDefizit.some((h) => h.text.includes("trägt dieses Jahr")), "P5 bei in
 console.log("\nQ · KI-Mahnungsentwurf")
 
 const q_ergebnis = await entwerfeMahnung({ nummer: "RE-ABNAHME-0001", kunde: "ABNAHME Kunde", sprache: "de", offenerRestCent: 50000, tageUeberfaellig: 20, mahnstufe: 1, notiz: "Kunde bat um Aufschub" })
-p(!("entwurf" in q_ergebnis) && "fehler" in q_ergebnis && /KI-Guthaben|Verbindung/.test(q_ergebnis.fehler),
-  "Q1 ohne AI-Gateway-Zugang (hier nicht eingerichtet) liefert entwerfeMahnung() einen klaren Fehler statt eines Absturzes oder eines erfundenen Entwurfs", JSON.stringify(q_ergebnis))
+const q_ohneKi = "fehler" in q_ergebnis && /KI-Guthaben|Verbindung/.test(q_ergebnis.fehler)
+const q_mitKi = "entwurf" in q_ergebnis && typeof q_ergebnis.entwurf === "string" && q_ergebnis.entwurf.trim().length > 40 && /500,00/.test(q_ergebnis.entwurf)
+p(q_ohneKi || q_mitKi,
+  "Q1 entwerfeMahnung(): ohne AI Gateway ein klarer Fehler, mit AI Gateway ein echter Entwurf, der den offenen Rest (500,00 €) nennt", q_ohneKi ? "ohne KI" : "mit KI")
 
 /* ══ L · Teilzahlungen und Bank-Import (Phase 6) ══ */
 console.log("\nL · Teilzahlungen und Bank-Import")
@@ -973,6 +975,60 @@ p(z_zip.file(`euer/EUER_${z_jahr}.pdf`) !== null && z_zip.file(`datev/EXTF_Buchu
   "Z14 das Steuerberater-Paket für das Jahr enthält EÜR-PDF und DATEV-Buchungsstapel — inklusive der gesamten Ende-zu-Ende-Geschichte")
 const z_zipHatAnzahlungsXml = Object.keys(z_zip.files).some((n) => n.startsWith("rechnungen/") && n.includes(z_festRe.dok.nummer))
 p(z_zipHatAnzahlungsXml, "Z15 … und die Anzahlungsrechnung liegt darin auch als eigene XRechnung-XML — dieselbe Nummer, nicht nur eine Zahl in der EÜR")
+
+/* ══ R · Robustheit — Anzahlung, Doppelklick, Storno bezahlter Rechnungen, Bank-Dubletten, § 19 ══ */
+console.log("\nR · Robustheit")
+
+/* K3 · teilbezahlte Anzahlung wird in der Schlussrechnung abgezogen */
+const r_angebot = await neueRechnung(kunde({ name: "ABNAHME Robust Anzahlung" }), "angebot", "de", [position({ preisCent: 300_000 })])
+await schreibeFest(db, r_angebot)
+await beantworteAngebot(db, r_angebot, { antwort: "angenommen", name: "ABNAHME", text: "Ja.", quelle: "kunde" })
+const r_anz = await rechnungAusAngebot(db, r_angebot, 30)
+await schreibeFest(db, r_anz)
+await erfasseZahlung(db, r_anz, 50000, heuteBerlin(), "manuell", null)
+p((await ladeDokument(db, r_anz)).status === "teilbezahlt", "R1 Anzahlung (1.071,00 €) ist mit 500,00 € teilbezahlt")
+const r_schluss = await rechnungAusAngebot(db, r_angebot, null)
+const r_schlussDok = r_schluss ? await ladeDokument(db, r_schluss) : null
+p(!!r_schlussDok && r_schlussDok.positionen.some((pos) => pos.titel.startsWith("Abzüglich Anzahlung")),
+  "R2 die Schlussrechnung zieht die TEILBEZAHLTE Anzahlung ab — keine Doppelforderung", JSON.stringify(r_schlussDok?.summen?.nettoCent))
+const r_schlussFest = r_schluss ? await schreibeFest(db, r_schluss) : null
+p(!!r_schlussFest?.ok && r_schlussFest.dok.summen.nettoCent === 210000, "R3 … festgeschriebene Schlussrechnung netto exakt 2.100,00 € (3.000 − 900)", String(r_schlussFest?.ok ? r_schlussFest.dok.summen.nettoCent : JSON.stringify(r_schlussFest)))
+
+/* K4 · Doppelklick: gleichzeitige Bestätigung und gleiche Idempotenz-ID */
+const r_re = await neueRechnung(kunde({ name: "ABNAHME Robust Doppelklick" }))
+const r_fest = await schreibeFest(db, r_re)
+await importiereBankUmsaetze(db, [{ ref: "robust-doppelklick", datum: heuteBerlin(), betragCent: 30000, verwendungszweck: `RE ${r_fest.dok.nummer}`, gegenpartei: "ABNAHME" }], "csv")
+const r_parallel = await Promise.all([bestaetigeZuordnung(db, "robust-doppelklick", r_re), bestaetigeZuordnung(db, "robust-doppelklick", r_re)])
+const r_zeilen = await db(`SELECT count(*)::int AS n FROM fin_zahlungen WHERE dokument_id=$1`, [r_re])
+p(r_parallel.filter((x) => x.ok).length === 1 && Number(r_zeilen[0].n) === 1, "R4 zwei gleichzeitige Bestätigungen desselben Bankumsatzes ergeben GENAU eine Zahlung", JSON.stringify(r_zeilen))
+await Promise.all([
+  erfasseZahlung(db, r_re, 10000, heuteBerlin(), "manuell", null, "robust-idempotenz-1"),
+  erfasseZahlung(db, r_re, 10000, heuteBerlin(), "manuell", null, "robust-idempotenz-1"),
+])
+p((await bezahltCent(db, r_re)) === 40000, "R5 dieselbe Zahlungs-ID zweimal (Doppelklick) wird nur einmal gezählt", String(await bezahltCent(db, r_re)))
+
+/* K5 · teilbezahlte Rechnung stornieren → Guthaben */
+const r_storno = await storniere(db, r_re, "ABNAHME falscher Betrag")
+p(r_storno !== null, "R6 eine teilbezahlte Rechnung lässt sich stornieren (Stornorechnung entsteht)")
+const r_guthaben = await guthabenAusStorno(db, r_re)
+p(r_guthaben?.cent === 40000 && r_guthaben.erledigt === null, "R7 die bereits gezahlten 400,00 € bleiben als offenes Guthaben des Kunden stehen", JSON.stringify(r_guthaben))
+p((await bezahltCent(db, r_re)) === 40000, "R8 die Zahlungen selbst bleiben unverändert erhalten (nie löschen)")
+
+/* O3 · zwei echte, identische Bankzeilen */
+const r_csv = '"Buchungstag";"Verwendungszweck";"Betrag"\n"16.04.2026";"Spende";"50,00"\n"16.04.2026";"Spende";"50,00"\n'
+const r_zeilenCsv = leseBankCsv(r_csv)
+p(r_zeilenCsv.length === 2 && r_zeilenCsv[0].ref !== r_zeilenCsv[1].ref, "R9 zwei identische 50-€-Zeilen bekommen unterschiedliche Referenzen")
+const r_imp1 = await importiereBankUmsaetze(db, r_zeilenCsv, "csv")
+const r_imp2 = await importiereBankUmsaetze(db, leseBankCsv(r_csv), "csv")
+p(r_imp1 === 2 && r_imp2 === 0, "R10 beide werden importiert, dieselbe Datei erneut bringt keine Dubletten", `${r_imp1}/${r_imp2}`)
+
+/* O7 · Privateinlage/Darlehen zählen nicht als Umsatz */
+const r_p19 = paragraph19Status([
+  buchungFixture("r1", "2026-02-01", 90_000_00, { kategorie: "Privateinlage" }),
+  buchungFixture("r2", "2026-03-01", 50_000_00, { kategorie: "Darlehen" }),
+  buchungFixture("r3", "2026-04-01", 10_000_00),
+], "2026-06-15")
+p(r_p19.ampel === "ruhig", "R11 § 19: Privateinlage und Darlehen (140.000 €) zählen nicht — nur 10.000 € echter Umsatz, Ampel ruhig", r_p19.ampel)
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()

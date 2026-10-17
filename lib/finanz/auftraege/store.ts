@@ -210,6 +210,8 @@ export const AUFTRAEGE_SCHEMA = [
     ref text,
     erstellt_at timestamptz NOT NULL DEFAULT now())`,
   `CREATE INDEX IF NOT EXISTS fin_zahlungen_dokument_idx ON fin_zahlungen (dokument_id)`,
+  /* Ein Bankumsatz kann nur EINE Zahlung sein — schützt gegen doppeltes Bestätigen (scripts/migrations/035-finanz-sicherheit.sql). */
+  `CREATE UNIQUE INDEX IF NOT EXISTS fin_zahlungen_bank_ref_uidx ON fin_zahlungen (ref) WHERE quelle = 'bank' AND ref IS NOT NULL`,
   `DROP TRIGGER IF EXISTS trg_fin_zahlungen_nur_insert ON fin_zahlungen`,
   `CREATE TRIGGER trg_fin_zahlungen_nur_insert BEFORE UPDATE OR DELETE ON fin_zahlungen
      FOR EACH ROW EXECUTE FUNCTION fin_nur_insert()`,
@@ -695,7 +697,7 @@ export async function rechnungAusAngebot(db: Abfrage, angebotId: string, anzahlu
       positionen = positionen.map((p) => ({ ...p, preisCent: Math.round(p.preisCent * (1 - a.rabattProzent / 100)) }))
     }
     const anzahlungen = await db(
-      `SELECT nummer, summen FROM fin_dokumente WHERE angebot_id=$1 AND art='rechnung' AND anzahlung_prozent IS NOT NULL AND status IN ('versendet','bezahlt')`,
+      `SELECT nummer, summen FROM fin_dokumente WHERE angebot_id=$1 AND art='rechnung' AND anzahlung_prozent IS NOT NULL AND status IN ('versendet','teilbezahlt','bezahlt')`,
       [angebotId],
     )
     for (const z of anzahlungen) {
@@ -817,15 +819,31 @@ export async function erfasseZahlung(
   datum: string,
   quelle: "manuell" | "bank" = "manuell",
   ref: string | null = null,
+  /** Idempotenz-Schlüssel: dieselbe ID zweimal (Doppelklick, Wiederholung nach Netzfehler) erfasst die Zahlung genau einmal. */
+  zahlungIdVorgabe?: string,
 ): Promise<{ ok: true; stand: Zahlungsstand } | { ok: false; fehler: string }> {
-  if (!Number.isFinite(cent) || cent <= 0) return { ok: false, fehler: "Der Betrag muss größer als 0 sein." }
+  if (!Number.isFinite(cent) || cent <= 0 || !Number.isInteger(cent)) return { ok: false, fehler: "Der Betrag muss größer als 0 sein." }
   const d = await ladeDokument(db, dokumentId)
   if (!d || d.art !== "rechnung" || !["versendet", "teilbezahlt"].includes(d.status) || !d.summen) {
     return { ok: false, fehler: "Nur eine offene Rechnung kann einen Zahlungseingang erfassen." }
   }
 
-  const zahlungId = crypto.randomUUID()
-  await db(`INSERT INTO fin_zahlungen (id, dokument_id, datum, cent, quelle, ref) VALUES ($1,$2,$3,$4,$5,$6)`, [zahlungId, dokumentId, datum, cent, quelle, ref])
+  const zahlungId = zahlungIdVorgabe && /^[A-Za-z0-9_-]{8,80}$/.test(zahlungIdVorgabe) ? zahlungIdVorgabe : crypto.randomUUID()
+  /*
+   * Neon über HTTP kennt keine Transaktion über mehrere Aufrufe. Deshalb sichert
+   * EIN atomarer Schritt den Platz: Nur wer die Zahlungszeile wirklich anlegt,
+   * bucht weiter. Ein zweiter Aufruf mit derselben ID (oder derselben
+   * Bankreferenz, siehe Unique-Index) läuft ins Leere statt doppelt zu zählen.
+   */
+  const angelegt = await db(
+    `INSERT INTO fin_zahlungen (id, dokument_id, datum, cent, quelle, ref) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING RETURNING id`,
+    [zahlungId, dokumentId, datum, cent, quelle, ref],
+  )
+  if (angelegt.length === 0) {
+    const bezahltBisher = await bezahltCent(db, dokumentId)
+    const restBisher = d.summen.bruttoCent - bezahltBisher
+    return { ok: true, stand: { bezahltCent: bezahltBisher, offenCent: restBisher, status: restBisher <= 0 ? "bezahlt" : "teilbezahlt", ueberzahlt: restBisher < 0 } }
+  }
   await verbucheZahlungGebucht(db, dokumentId, zahlungId, cent, datum)
   const bezahlt = await bezahltCent(db, dokumentId)
   const rest = d.summen.bruttoCent - bezahlt
@@ -849,10 +867,24 @@ export async function markiereBezahlt(db: Abfrage, id: string, am: string): Prom
   return r.ok
 }
 
-/** Storno: neues Dokument mit negativen Beträgen + eigene Nummer; Forderung im Hauptbuch storniert. */
+/**
+ * Storno: neues Dokument mit negativen Beträgen + eigene Nummer. Auch eine
+ * teilweise oder ganz bezahlte Rechnung lässt sich stornieren (z. B. falscher
+ * Betrag): Nur die noch OFFENE Forderung (geplant) wird storniert — das Geld,
+ * das tatsächlich eingegangen ist, bleibt als Einnahme stehen (Zuflussprinzip)
+ * und erscheint im Vorgang als Guthaben des Kunden, bis es erstattet oder auf
+ * eine neue Rechnung angerechnet wird (siehe guthabenAusStorno()).
+ */
 export async function storniere(db: Abfrage, id: string, grund: string): Promise<string | null> {
   const d = await ladeDokument(db, id)
-  if (!d || d.art !== "rechnung" || d.status !== "versendet" || !d.summen) return null
+  if (!d || d.art !== "rechnung" || !["versendet", "teilbezahlt", "bezahlt"].includes(d.status) || !d.summen) return null
+  /* Atomarer Platz: nur ein Aufruf darf von offen → storniert wechseln (Doppelklick erzeugt keine zweite Stornorechnung). */
+  const gesperrt = await db(
+    `UPDATE fin_dokumente SET status='storniert', updated_at=now() WHERE id=$1 AND status IN ('versendet','teilbezahlt','bezahlt') RETURNING id`,
+    [id],
+  )
+  if (gesperrt.length === 0) return null
+  const bereitsBezahlt = await bezahltCent(db, id)
   const sid = crypto.randomUUID()
   const nummer = await naechsteNummer(db, "storno", heuteBerlin())
   const positionen = d.positionen.map((p) => ({ ...p, preisCent: -p.preisCent }))
@@ -887,11 +919,53 @@ export async function storniere(db: Abfrage, id: string, grund: string): Promise
       createHash("sha256").update(JSON.stringify({ nummer, von: d.nummer, summen })).digest("hex"),
     ],
   )
-  await db(`UPDATE fin_dokumente SET status='storniert', updated_at=now() WHERE id=$1`, [id])
-  await db(`UPDATE fin_buchungen SET storniert_at=now() WHERE quelle='rechnung' AND quelle_ref=$1 AND storniert_at IS NULL`, [id])
-  await verlauf(db, id, "storniert", { durch: sid, nummer, grund })
+  await db(`UPDATE fin_buchungen SET storniert_at=now() WHERE quelle='rechnung' AND quelle_ref=$1 AND status='geplant' AND storniert_at IS NULL`, [id])
+  await verlauf(db, id, "storniert", { durch: sid, nummer, grund, bereitsBezahltCent: bereitsBezahlt })
   await verlauf(db, sid, "festgeschrieben", { nummer, storno_von: d.nummer })
+  if (bereitsBezahlt > 0) await verlauf(db, id, "guthaben_offen", { cent: bereitsBezahlt })
   return sid
+}
+
+export type Guthaben = { cent: number; erledigt: "erstattet" | "angerechnet" | null; erledigtAm: string | null }
+
+/** Geld, das auf eine später stornierte Rechnung schon eingegangen ist — steht dem Kunden zu, bis es erstattet oder angerechnet ist. */
+export async function guthabenAusStorno(db: Abfrage, id: string): Promise<Guthaben | null> {
+  const r = await db(
+    `SELECT aktion, daten, to_char(created_at AT TIME ZONE 'Europe/Berlin','YYYY-MM-DD') AS am FROM fin_dokument_verlauf
+      WHERE dokument_id=$1 AND aktion IN ('guthaben_offen','guthaben_erstattet','guthaben_angerechnet') ORDER BY created_at`,
+    [id],
+  )
+  const offen = r.find((x) => x.aktion === "guthaben_offen")
+  if (!offen) return null
+  const erledigt = r.find((x) => x.aktion !== "guthaben_offen")
+  return {
+    cent: Number((offen.daten as { cent?: number }).cent ?? 0),
+    erledigt: erledigt ? (erledigt.aktion === "guthaben_erstattet" ? "erstattet" : "angerechnet") : null,
+    erledigtAm: erledigt ? String(erledigt.am) : null,
+  }
+}
+
+/**
+ * Guthaben erledigen. "erstattet" bucht das zurückgezahlte Geld als Ausgabe
+ * (Abfluss, § 11 EStG) — idempotent über eine feste Buchungs-ID.
+ * "angerechnet" vermerkt nur, dass der Betrag auf einer neuen Rechnung
+ * abgezogen wurde (die neue Rechnung trägt dafür eine Minus-Position).
+ */
+export async function erledigeGuthaben(db: Abfrage, id: string, wie: "erstattet" | "angerechnet", am: string): Promise<boolean> {
+  const g = await guthabenAusStorno(db, id)
+  if (!g || g.erledigt || g.cent <= 0) return false
+  const d = await ladeDokument(db, id)
+  if (!d) return false
+  if (wie === "erstattet") {
+    const neu = await db(
+      `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, gegenpartei, notiz, quelle, quelle_ref, geschaeftsfeld)
+       VALUES ($1,'ausgabe','gebucht',$2,$3,0,'Sonstiges',$4,$5,'rechnung',$6,$7) ON CONFLICT (id) DO NOTHING RETURNING id`,
+      [`erstattung-${id}`, am, g.cent, d.kunde.firma || d.kunde.name || null, `Erstattung zu stornierter Rechnung ${d.nummer}`, id, d.geschaeftsfeld],
+    )
+    if (neu.length === 0) return false
+  }
+  await verlauf(db, id, wie === "erstattet" ? "guthaben_erstattet" : "guthaben_angerechnet", { cent: g.cent, am })
+  return true
 }
 
 export async function vermerkeNachfass(db: Abfrage, id: string, stufe: number | null): Promise<void> {

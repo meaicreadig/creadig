@@ -5,11 +5,13 @@ import { BankImportKarte } from "@/components/finanz/bank-import"
 import { berechneLage } from "@/lib/finanz/lage"
 import { finanzDb } from "@/lib/finanz/store"
 import { ladeOffeneBankUmsaetze, ladeOffeneRechnungenFuerAbgleich } from "@/lib/finanz/bank-abgleich"
+import { finanzOwnerSeite } from "@/lib/finanz/zugang"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Geldfluss" }
 
 export default async function FinanzGeldfluss() {
+  await finanzOwnerSeite()
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="geldfluss" titel="Geldfluss"><OhneSpeicher /></FinanzShell>
 

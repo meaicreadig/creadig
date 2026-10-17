@@ -23,8 +23,11 @@ type Db = NonNullable<Awaited<ReturnType<typeof finanzDb>>>
 export async function berechneLage(db: Db) {
   const heute = heuteBerlin()
   const erst = await ladeAlles(db)
-  await sichereFristen(db, sollFristen(erst.einstellungen, heute))
-  const { einstellungen, buchungen, fristen } = await ladeAlles(db)
+  /* Nur neu laden, wenn wirklich eine Frist gefehlt hat — sonst reicht der erste Lauf. */
+  const vorhanden = new Set(erst.fristen.map((f) => f.id))
+  const fehlend = sollFristen(erst.einstellungen, heute).filter((f) => !vorhanden.has(f.id))
+  if (fehlend.length) await sichereFristen(db, fehlend)
+  const { einstellungen, buchungen, fristen } = fehlend.length ? await ladeAlles(db) : erst
 
   const stand = kontostandHeute(einstellungen, buchungen, heute)
   const topf = steuertopf(einstellungen, buchungen, fristen, heute)

@@ -1,4 +1,4 @@
-import type { Buchung } from "@/lib/finanz/rechnen"
+import { istKeinUmsatz, type Buchung } from "@/lib/finanz/rechnen"
 
 /**
  * § 19 Abs. 1 UStG, Fassung ab 01.01.2025 (Jahressteuergesetz 2024, BGBl. 2024
@@ -41,7 +41,7 @@ export function paragraph19Status(buchungen: Buchung[], heute: string): Paragrap
   const jahr = Number(heute.slice(0, 4))
   const einnahmenJahr = (j: number) =>
     buchungen
-      .filter((b) => !b.storniert && b.art === "einnahme" && b.status === "gebucht" && b.datum.startsWith(String(j)))
+      .filter((b) => !b.storniert && b.art === "einnahme" && b.status === "gebucht" && b.datum.startsWith(String(j)) && !istKeinUmsatz(b.kategorie))
       .sort((a, b) => a.datum.localeCompare(b.datum))
 
   const vorjahrUmsatzCent = einnahmenJahr(jahr - 1).reduce((s, b) => s + nettoDerBuchung(b), 0)

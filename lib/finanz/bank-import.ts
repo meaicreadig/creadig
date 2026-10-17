@@ -25,8 +25,23 @@ const text = (v: unknown): string => {
   if (typeof v === "object") return text((v as Record<string, unknown>)["#text"])
   return String(v).trim()
 }
-const pruefsummenRef = (datum: string, betragCent: number, verwendungszweck: string) =>
-  `csv-${createHash("sha256").update(`${datum}|${betragCent}|${verwendungszweck}`).digest("hex").slice(0, 24)}`
+/*
+ * Ohne Bankreferenz entscheidet der Inhalt — plus eine Laufnummer unter
+ * IDENTISCHEN Zeilen derselben Datei. So bleiben zwei echte 50-€-Zahlungen am
+ * selben Tag zwei Umsätze, und dieselbe Datei zweimal importiert bleibt
+ * trotzdem ohne Doppelte (gleiche Zeilen → gleiche Laufnummern → gleiche Refs).
+ */
+const pruefsummenRef = (praefix: string, schluessel: string, laufnummer: number) =>
+  `${praefix}-${createHash("sha256").update(`${schluessel}|#${laufnummer}`).digest("hex").slice(0, 24)}`
+
+function laufnummernZaehler() {
+  const gesehen = new Map<string, number>()
+  return (schluessel: string) => {
+    const n = gesehen.get(schluessel) ?? 0
+    gesehen.set(schluessel, n + 1)
+    return n
+  }
+}
 
 const camtParser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_", removeNSPrefix: true, trimValues: true })
 
@@ -35,16 +50,16 @@ export function leseCamt053(xml: string): BankUmsatz[] {
   const doc = camtParser.parse(xml) as Record<string, unknown>
   const stmts = alsArray((doc?.Document as Record<string, unknown>)?.BkToCstmrStmt && ((doc.Document as Record<string, unknown>).BkToCstmrStmt as Record<string, unknown>).Stmt) as Record<string, unknown>[]
   const umsaetze: BankUmsatz[] = []
+  const laufnummer = laufnummernZaehler()
 
   for (const stmt of stmts) {
     const eintraege = alsArray(stmt.Ntry as Record<string, unknown> | Record<string, unknown>[])
-    eintraege.forEach((e, i) => {
+    eintraege.forEach((e) => {
       const betrag = Number(text((e.Amt as Record<string, unknown>) ?? e.Amt))
       const richtung = text(e.CdtDbtInd) === "CRDT" ? 1 : -1
       const bookgDt = e.BookgDt as Record<string, unknown> | undefined
       const valDt = e.ValDt as Record<string, unknown> | undefined
       const datum = text(bookgDt?.Dt) || text(valDt?.Dt)
-      const ref = text(e.AcctSvcrRef) || text(e.NtryRef) || `camt-${datum}-${i}`
       const txDtls = alsArray((e.NtryDtls as Record<string, unknown>)?.TxDtls as Record<string, unknown> | Record<string, unknown>[])[0] as Record<string, unknown> | undefined
       const rmtInf = txDtls?.RmtInf as Record<string, unknown> | undefined
       const verwendungszweck = alsArray(rmtInf?.Ustrd as string | string[]).map(text).filter(Boolean).join(" ")
@@ -53,6 +68,9 @@ export function leseCamt053(xml: string): BankUmsatz[] {
       const gegenpartei = text(parteiObj?.Nm) || null
 
       if (!datum || !Number.isFinite(betrag)) return
+      const iban = text((((richtung > 0 ? rltdPties?.DbtrAcct : rltdPties?.CdtrAcct) as Record<string, unknown> | undefined)?.Id as Record<string, unknown> | undefined)?.IBAN)
+      const schluessel = `${datum}|${Math.round(betrag * 100) * richtung}|${verwendungszweck}|${gegenpartei ?? ""}|${iban}`
+      const ref = text(e.AcctSvcrRef) || text(e.NtryRef) || pruefsummenRef("camt", schluessel, laufnummer(schluessel))
       umsaetze.push({ ref, datum, betragCent: Math.round(betrag * 100) * richtung, verwendungszweck, gegenpartei })
     })
   }
@@ -143,6 +161,7 @@ export function leseBankCsv(text: string): BankUmsatz[] {
   if (iDatum === -1 || iBetrag === -1) return []
 
   const umsaetze: BankUmsatz[] = []
+  const laufnummer = laufnummernZaehler()
   for (const zeile of zeilen.slice(1)) {
     const felder = parseCsvZeile(zeile, trenner)
     const datum = parseDatum(felder[iDatum] ?? "")
@@ -151,7 +170,8 @@ export function leseBankCsv(text: string): BankUmsatz[] {
     const verwendungszweck = iZweck >= 0 ? (felder[iZweck] ?? "") : ""
     const gegenpartei = iPartei >= 0 ? (felder[iPartei] ?? null) || null : null
     const betragCent = Math.round(betrag * 100)
-    umsaetze.push({ ref: pruefsummenRef(datum, betragCent, verwendungszweck), datum, betragCent, verwendungszweck, gegenpartei })
+    const schluessel = `${datum}|${betragCent}|${verwendungszweck}|${gegenpartei ?? ""}`
+    umsaetze.push({ ref: pruefsummenRef("csv", schluessel, laufnummer(schluessel)), datum, betragCent, verwendungszweck, gegenpartei })
   }
   return umsaetze
 }

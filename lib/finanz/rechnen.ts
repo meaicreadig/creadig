@@ -70,6 +70,13 @@ export const KATEGORIEN: Record<Art, readonly string[]> = {
 /** Privatentnahmen bewegen das Konto, aber nicht den Gewinn. */
 export const KEIN_BETRIEBSAUFWAND = new Set(["Privatentnahme"])
 
+/**
+ * Zuflüsse, die KEIN Umsatz im Sinne von § 19 UStG sind (Geldbewegung ohne
+ * Leistung). Zählen nicht zur Kleinunternehmergrenze. Großschreibung egal.
+ */
+export const KEIN_UMSATZ = ["Privateinlage", "Darlehen", "Kredit", "Erstattung", "Rückerstattung", "Umbuchung"] as const
+export const istKeinUmsatz = (kategorie: string) => KEIN_UMSATZ.some((k) => k.toLowerCase() === kategorie.trim().toLowerCase())
+
 /* ------------------------------------------------------------------------ */
 /* Datum                                                                     */
 /* ------------------------------------------------------------------------ */

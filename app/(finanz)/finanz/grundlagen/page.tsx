@@ -5,11 +5,13 @@ import { NummernkreisWarnung } from "@/components/finanz/nummernkreis-warnung"
 import { berechneLage } from "@/lib/finanz/lage"
 import { finanzDb } from "@/lib/finanz/store"
 import { ladeFirma, pruefeNummernkreis } from "@/lib/finanz/auftraege/store"
+import { finanzOwnerSeite } from "@/lib/finanz/zugang"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Grundlagen" }
 
 export default async function FinanzGrundlagen() {
+  await finanzOwnerSeite()
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="grundlagen" titel="Grundlagen"><OhneSpeicher /></FinanzShell>
 

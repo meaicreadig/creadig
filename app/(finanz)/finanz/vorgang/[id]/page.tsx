@@ -25,6 +25,7 @@ import { ART_LABEL, formatEuro, heuteBerlin, naechsteMahnstufe, steuerModus, tag
 import { anzeigeStatus, ladeDokument, ladeFirma, ladeKunden, ladeLeistungen, ladeVerlauf, ladeVerwandte, ladeZahlungen } from "@/lib/finanz/auftraege/store"
 import { dokumentUrl } from "@/lib/finanz/auftraege/mail"
 import { fehltFuerERechnung } from "@/lib/finanz/auftraege/erechnung"
+import { finanzOwnerSeite } from "@/lib/finanz/zugang"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Vorgang" }
@@ -49,6 +50,7 @@ const VERLAUF: Record<string, string> = {
 const ZEIT = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" })
 
 export default async function Vorgang({ params }: { params: Promise<{ id: string }> }) {
+  await finanzOwnerSeite()
   const { id } = await params
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="angebote" titel="Vorgang"><OhneSpeicher /></FinanzShell>
@@ -210,6 +212,28 @@ export default async function Vorgang({ params }: { params: Promise<{ id: string
               </ul>
             )}
           </div>
+        )}
+
+        {d.art === "rechnung" && d.status === "bezahlt" && (
+          <details className="bg-background w-fit rounded-3xl px-4 py-2">
+            <summary className="text-muted-foreground cursor-pointer py-1 text-sm">Bezahlte Rechnung stornieren …</summary>
+            <p className="text-muted-foreground max-w-prose py-1 text-xs leading-relaxed">
+              Die Zahlung bleibt erhalten und wird als Guthaben des Kunden geführt, bis du sie erstattest oder auf eine neue Rechnung anrechnest.
+            </p>
+            <form action={stornieren} className="flex flex-wrap items-end gap-2 py-2">
+              <input type="hidden" name="id" value={d.id} />
+              <AdminInput name="grund" placeholder="Grund (optional)" className="w-64" aria-label="Storno-Grund" />
+              <button className="bg-destructive text-primary-foreground rounded-full px-4 py-2 text-sm font-medium">Stornorechnung erstellen</button>
+            </form>
+          </details>
+        )}
+
+        {d.art === "rechnung" && d.status === "storniert" && bezahltSchonCent > 0 && (
+          <p className="bg-background w-fit rounded-3xl px-4 py-3 text-sm">
+            Guthaben des Kunden aus dieser Rechnung:{" "}
+            <span className="text-primary font-semibold tabular-nums">{formatEuro(bezahltSchonCent)}</span>
+            <span className="text-muted-foreground"> · erstatten oder auf die nächste Rechnung anrechnen</span>
+          </p>
         )}
       </section>
 

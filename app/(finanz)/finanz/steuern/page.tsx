@@ -5,11 +5,13 @@ import { eur, eurRund } from "@/components/finanz/format"
 import { berechneLage } from "@/lib/finanz/lage"
 import { finanzDb } from "@/lib/finanz/store"
 import { berechneEuer } from "@/lib/finanz/euer"
+import { finanzOwnerSeite } from "@/lib/finanz/zugang"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Steuern" }
 
 export default async function FinanzSteuern({ searchParams }: { searchParams: Promise<{ jahr?: string }> }) {
+  await finanzOwnerSeite()
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="steuern" titel="Steuern"><OhneSpeicher /></FinanzShell>
 

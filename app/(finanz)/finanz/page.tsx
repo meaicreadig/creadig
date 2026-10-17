@@ -13,6 +13,7 @@ import { after } from "next/server"
 import { Geschaeftsfelder } from "@/components/finanz/geschaeftsfelder"
 import { ladeFelder } from "@/lib/finanz/felder"
 import { abgleichFaellig, abgleichStand, fiberoKonfiguriert, gleicheFiberoAb } from "@/lib/finanz/fibero-abgleich"
+import { finanzOwnerSeite } from "@/lib/finanz/zugang"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Heute" }
@@ -23,6 +24,7 @@ function gruss() {
 }
 
 export default async function FinanzHeute({ searchParams }: { searchParams: Promise<{ jahr?: string }> }) {
+  await finanzOwnerSeite()
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="heute" titel={gruss()}><OhneSpeicher /></FinanzShell>
 

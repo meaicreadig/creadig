@@ -5,6 +5,7 @@ import { finanzDb } from "@/lib/finanz/store"
 import { GESCHAEFTSFELDER } from "@/lib/finanz/belege"
 import { EINHEITEN, formatEuro, UST_SAETZE } from "@/lib/finanz/auftraege/rechnen"
 import { ladeLeistungen, type Leistung } from "@/lib/finanz/auftraege/store"
+import { finanzOwnerSeite } from "@/lib/finanz/zugang"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Leistungen" }
@@ -12,6 +13,7 @@ export const metadata = { title: "Leistungen" }
 const FELDER = GESCHAEFTSFELDER.filter((g) => g.key !== "privat")
 
 export default async function Leistungen() {
+  await finanzOwnerSeite()
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="leistungen" titel="Leistungen"><OhneSpeicher /></FinanzShell>
   const liste = await ladeLeistungen(db)
