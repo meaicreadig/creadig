@@ -1,6 +1,6 @@
 import { eur, eurRund, monatKurz } from "@/components/finanz/format"
 import type { Hinweis, Monat, Steuertopf } from "@/lib/finanz/rechnen"
-import type { Paragraph19Status } from "@/lib/finanz/paragraph19"
+import type { Paragraph19Projektion, Paragraph19Status } from "@/lib/finanz/paragraph19"
 import { aufUstPflichtUmstellen } from "@/app/(finanz)/finanz/actions"
 
 const SCHWERE = {
@@ -16,7 +16,7 @@ const AMPEL = {
   ueberschritten: { balken: "bg-destructive", text: "text-destructive" },
 } as const
 
-function Paragraph19Ampel({ status }: { status: Paragraph19Status }) {
+function Paragraph19Ampel({ status, vorschau }: { status: Paragraph19Status; vorschau: Paragraph19Projektion | null }) {
   const t = AMPEL[status.ampel]
   const breite = Math.min(100, Math.round(status.anteilLaufendesJahr * 100))
   return (
@@ -35,6 +35,12 @@ function Paragraph19Ampel({ status }: { status: Paragraph19Status }) {
             : `Grenze am ${status.ueberschrittenAm} überschritten — ab da keine Rechnung mehr ohne USt.`
           : `Noch ${eur(status.abstandLaufendesJahrCent)} Luft bis zur Grenze.`}
       </p>
+      {/* Projektion (Phase 4) — ausschließlich eine Was-wäre-wenn-Zeile, niemals vermischt mit der echten Zahl oben und löst keine § 19-Aktion aus. */}
+      {vorschau?.sichtbar && (
+        <p className="text-muted-foreground text-xs italic">
+          Falls deine Beratungs-Ziele eintreffen: ~{eur(vorschau.projektionCent)} — Grenze wäre dann in Reichweite.
+        </p>
+      )}
       {status.ampel !== "ruhig" && (
         <form action={aufUstPflichtUmstellen} className="flex flex-col gap-2 border-t pt-3">
           <label className="flex items-start gap-2 text-xs leading-relaxed">
@@ -58,6 +64,7 @@ export function FinanzKompass({
   hinweise,
   verlauf,
   paragraph19,
+  paragraph19Vorschau,
 }: {
   stand: number
   frei: number
@@ -66,6 +73,7 @@ export function FinanzKompass({
   hinweise: Hinweis[]
   verlauf: Monat[]
   paragraph19: Paragraph19Status | null
+  paragraph19Vorschau?: Paragraph19Projektion | null
 }) {
   const max = Math.max(1, ...verlauf.flatMap((m) => [m.einCent, m.ausCent]))
 
@@ -99,7 +107,7 @@ export function FinanzKompass({
           ))}
         </div>
 
-        {paragraph19 && <Paragraph19Ampel status={paragraph19} />}
+        {paragraph19 && <Paragraph19Ampel status={paragraph19} vorschau={paragraph19Vorschau ?? null} />}
       </div>
 
       <div className="bg-card flex flex-col gap-5 rounded-[2rem] p-7 lg:col-span-2">

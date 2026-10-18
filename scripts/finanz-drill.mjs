@@ -32,17 +32,19 @@ const { FINANZ_SCHEMA } = await import("../lib/finanz/store.ts")
 const { AUFTRAEGE_SCHEMA, speichereFirma, legeEntwurfAn, speichereEntwurf, schreibeFest, ladeDokument,
   ladeDokumentPerToken, ladeVerwandte, ladeVerlauf, verwerfeEntwurf, neueVersion, beantworteAngebot,
   markiereGeoeffnet, rechnungAusAngebot, markiereBezahlt, storniere, anzeigeStatus, pruefeNummernkreis,
-  erfasseZahlung, ladeZahlungen, bezahltCent, guthabenAusStorno } = await import("../lib/finanz/auftraege/store.ts")
+  erfasseZahlung, ladeZahlungen, bezahltCent, guthabenAusStorno, ladeLeistungen } = await import("../lib/finanz/auftraege/store.ts")
 const { berechne, steuerModus, leererKunde, leerePosition, heuteBerlin, addTage, formatEuro } = await import("../lib/finanz/auftraege/rechnen.ts")
 const { fehltFuerERechnung, erzeugeXRechnung } = await import("../lib/finanz/auftraege/erechnung.ts")
 const { dokumentMail } = await import("../lib/finanz/auftraege/mail.ts")
 const { ABGLEICH_SCHEMA, gleicheFiberoAb } = await import("../lib/finanz/fibero-abgleich.ts")
-const { BELEGE_SCHEMA, ordneZu, ladeBelege } = await import("../lib/finanz/belege.ts")
+const { BELEGE_SCHEMA, GESCHAEFTSFELDER, istGeschaeftsfeld, ordneZu, ladeBelege } = await import("../lib/finanz/belege.ts")
 const { leseERechnungXml, leseERechnung, leseEingebettetesXml } = await import("../lib/finanz/e-eingang.ts")
-const { paragraph19Status } = await import("../lib/finanz/paragraph19.ts")
+const { paragraph19Status, paragraph19Projektion } = await import("../lib/finanz/paragraph19.ts")
 const { berechneLage } = await import("../lib/finanz/lage.ts")
 const { berechneEuer } = await import("../lib/finanz/euer.ts")
 const { ladeFelder } = await import("../lib/finanz/felder.ts")
+const { ZIELE_SCHEMA, ladeZiele, zielAnlegen, zielAktualisieren, zielVerwerfen, istPlatzhalterZiel, offeneBeratungsZieleCent } = await import("../lib/finanz/ziele.ts")
+const { ladeDiversifikation } = await import("../lib/finanz/diversifikation.ts")
 const { kompass } = await import("../lib/finanz/rechnen.ts")
 const { eur: formatEuroKompakt } = await import("../components/finanz/format.ts")
 const { entwerfeMahnung } = await import("../lib/finanz/assistent.ts")
@@ -61,6 +63,7 @@ for (const s of AUFTRAEGE_SCHEMA) await db(s)
 for (const s of ABGLEICH_SCHEMA) await db(s)
 for (const s of BELEGE_SCHEMA) await db(s)
 for (const s of RATE_LIMIT_SCHEMA) await db(s)
+for (const s of ZIELE_SCHEMA) await db(s)
 
 /*
  * Ein Probelauf muss zweimal dasselbe sagen — dieselbe Ueberlegung wie in
@@ -141,7 +144,7 @@ const neueRechnung = async (kundeDaten, art = "rechnung", sprache = "de", positi
   const id = await legeEntwurfAn(db, art, { titel: "ABNAHME Nr.", kunde: kundeDaten })
   await speichereEntwurf(db, id, {
     sprache, titel: "ABNAHME Nr.", kunde: kundeDaten, datum: heuteBerlin(), gueltigBis: art === "angebot" ? addTage(heuteBerlin(), 30) : null,
-    zahlungszielTage: 14, leistungszeitraum: "Oktober 2026", einleitung: "", schluss: "", rabattProzent: 0, geschaeftsfeld: "it",
+    zahlungszielTage: 14, leistungszeitraum: "Oktober 2026", einleitung: "", schluss: "", rabattProzent: 0, geschaeftsfeld: "digitalprodukte",
     positionen,
   })
   return id
@@ -458,7 +461,7 @@ await db(
 p((await db(`SELECT geschaeftsfeld FROM fin_buchungen WHERE id = $1`, [`beleg-${belegId}`])).length === 0,
   "H1 ohne Geschaeftsfeld entsteht noch keine Buchung — der Beleg liegt im Eingangskorb")
 
-const zugeordnetAnzahl = await ordneZu(db, [belegId], "it")
+const zugeordnetAnzahl = await ordneZu(db, [belegId], "digitalprodukte")
 p(zugeordnetAnzahl === 1, "H2 ordneZu() ordnet den Beleg dem Geschaeftsfeld zu")
 const [buchung] = await db(`SELECT art, status, brutto_cent, ust_satz, geschaeftsfeld, quelle, quelle_ref FROM fin_buchungen WHERE id = $1`, [`beleg-${belegId}`])
 p(buchung !== undefined, "H3 die Zuordnung erzeugt eine Buchung (beleg-<id>)")
@@ -466,7 +469,7 @@ p(buchung?.art === "ausgabe" && buchung?.status === "gebucht" && Number(buchung?
   "H4 Art, Status, Betrag und USt-Satz stimmen mit dem Beleg ueberein (11900 Cent, 19 %, aus dem Verhaeltnis Brutto/Vorsteuer bestimmt)")
 p(buchung?.quelle === "beleg" && buchung?.quelle_ref === belegId, "H5 quelle='beleg' und quelle_ref zeigen zurueck auf den Beleg")
 
-await ordneZu(db, [belegId], "software")
+await ordneZu(db, [belegId], "beratung")
 const nachZweitemZuordnen = await db(`SELECT count(*) n FROM fin_buchungen WHERE quelle_ref = $1`, [belegId])
 p(Number(nachZweitemZuordnen[0].n) === 1, "H6 ein zweites Mal zuordnen erzeugt KEINE zweite Buchung (idempotent ueber die feste ID)")
 p(await wirft(() => db(`UPDATE fin_buchungen SET brutto_cent = 1 WHERE id = $1`, [`beleg-${belegId}`])),
@@ -960,7 +963,7 @@ await db(
    VALUES ('ABNAHME-z-beleg','hand','ABNAHME-sha-z','beleg',$1,'ABNAHME Ende-zu-Ende Lieferant',11900,10000,1900,'Software & Hosting','kopiert')`,
   [heuteBerlin()],
 )
-p((await ordneZu(db, ["ABNAHME-z-beleg"], "it")) === 1, "Z12 der hochgeladene Beleg wird einem Geschäftsfeld zugeordnet und erzeugt eine Ausgaben-Buchung")
+p((await ordneZu(db, ["ABNAHME-z-beleg"], "digitalprodukte")) === 1, "Z12 der hochgeladene Beleg wird einem Geschäftsfeld zugeordnet und erzeugt eine Ausgaben-Buchung")
 
 /* Eingehende E-Rechnung (dieselbe Eigenrechnung als CII-Fixtur, wie in Abschnitt I) */
 const z_eingehend = erzeugeXRechnung(z_festRe.dok, z_festRe.dok.absender, true)
@@ -1029,6 +1032,152 @@ const r_p19 = paragraph19Status([
   buchungFixture("r3", "2026-04-01", 10_000_00),
 ], "2026-06-15")
 p(r_p19.ampel === "ruhig", "R11 § 19: Privateinlage und Darlehen (140.000 €) zählen nicht — nur 10.000 € echter Umsatz, Ampel ruhig", r_p19.ampel)
+
+/* ══ S · Säulen-Rename (Säulen-Durchlauf, Phase 0) ══ */
+console.log("\nS · Geschäftsfelder neu geordnet — sechs Säulen, alte Werte korrekt behandelt")
+
+p(
+  [...GESCHAEFTSFELDER.map((g) => g.key)].sort().join(",") === ["beratung", "content", "digitalprodukte", "glasfaser", "privat", "sonstiges"].sort().join(","),
+  "S1 GESCHAEFTSFELDER sind genau diese sechs Schlüssel — nicht mehr, nicht weniger",
+  GESCHAEFTSFELDER.map((g) => g.key).join(","),
+)
+p(!istGeschaeftsfeld("it") && !istGeschaeftsfeld("software") && !istGeschaeftsfeld("ecommerce"), "S2 die alten Schlüssel 'it'/'software'/'ecommerce' sind keine gültigen Geschäftsfelder mehr")
+p(istGeschaeftsfeld("digitalprodukte") && istGeschaeftsfeld("beratung") && istGeschaeftsfeld("content"), "S3 die drei neuen Säulen-Schlüssel sind gültig")
+
+const SAEULEN_MIGRATION_SQL = `UPDATE fin_buchungen SET geschaeftsfeld = 'digitalprodukte'
+  WHERE geschaeftsfeld IN ('it','software','ecommerce') AND (status <> 'gebucht' OR quelle = 'fibero')`
+
+/* Noch nicht gebuchte Alt-Buchung — die Migrations-UPDATE (BELEGE_SCHEMA) darf und soll sie übersetzen. */
+await db(`INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, quelle, geschaeftsfeld) VALUES
+  ('ABNAHME-saeulen-geplant','einnahme','geplant',$1,10000,19,'Projekt / Kunde','manuell','it')`, [heuteBerlin()])
+await db(SAEULEN_MIGRATION_SQL)
+const s_geplant = await db(`SELECT geschaeftsfeld FROM fin_buchungen WHERE id = 'ABNAHME-saeulen-geplant'`)
+p(s_geplant[0]?.geschaeftsfeld === "digitalprodukte", "S4 eine noch nicht gebuchte Alt-Buchung wird von der Migrations-UPDATE auf 'digitalprodukte' übersetzt")
+
+/*
+ * Bereits GEBUCHTE Alt-Buchungen — GoBD-festgeschrieben
+ * (trg_fin_buchungen_festschreibung, scripts/migrations/030-gobd-
+ * festschreibung.sql). Die reale Migrations-UPDATE darf sie NICHT anfassen
+ * (sonst Exception) — der Trigger lässt nur storniert_at zu.
+ */
+await db(`INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, quelle, geschaeftsfeld) VALUES
+  ('ABNAHME-saeulen-gebucht-software','einnahme','gebucht',$1,25000,19,'Projekt / Kunde','manuell','software'),
+  ('ABNAHME-saeulen-gebucht-ecommerce','einnahme','gebucht',$1,15000,19,'Projekt / Kunde','manuell','ecommerce'),
+  ('ABNAHME-saeulen-glasfaser','einnahme','gebucht',$1,10000,19,'Fibero-Rechnung','manuell','glasfaser')`,
+  [heuteBerlin()])
+p(await wirft(() => db(`UPDATE fin_buchungen SET geschaeftsfeld = 'digitalprodukte' WHERE id = 'ABNAHME-saeulen-gebucht-software'`)),
+  "S5 eine bereits GEBUCHTE Alt-Buchung per UPDATE umzuschreiben löst die GoBD-Exception aus — genau das soll sie")
+await db(SAEULEN_MIGRATION_SQL)
+const s_gebucht = await db(`SELECT id, geschaeftsfeld FROM fin_buchungen WHERE id LIKE 'ABNAHME-saeulen-gebucht-%' ORDER BY id`)
+p(s_gebucht.every((r) => r.geschaeftsfeld === (r.id.includes("software") ? "software" : "ecommerce")),
+  "S6 die reale Migrations-UPDATE lässt bereits gebuchte Zeilen unberührt — keine Exception, keine Datenänderung, keine verlorene Zuordnung")
+
+const s_felder = await ladeFelder(db, heuteBerlin().slice(0, 4))
+const s_digital = s_felder.felder.find((f) => f.key === "digitalprodukte")
+p((s_digital?.anzahl ?? 0) >= 2,
+  "S7 ladeFelder() gruppiert die GoBD-eingefrorenen 'software'- und 'ecommerce'-Zeilen trotzdem unter 'digitalprodukte' — keine Buchung verliert ihre Zuordnung, auch optisch nicht",
+  String(s_digital?.anzahl))
+
+const s_nachGlasfaser = await db(`SELECT geschaeftsfeld FROM fin_buchungen WHERE id = 'ABNAHME-saeulen-glasfaser'`)
+p(s_nachGlasfaser[0]?.geschaeftsfeld === "glasfaser", "S8 'glasfaser' bleibt unverändert — keine erfundene Verbindung zu den drei Säulen")
+
+/* ══ T · Ziele-Modul (Phase 1) — abgeleiteter Fortschritt, Platzhalter erkennbar ══ */
+console.log("\nT · Ziele — Fortschritt aus dem Hauptbuch, nie eine zweite Zahl")
+
+const t_ziele0 = await ladeZiele(db)
+const t_platzhalter = t_ziele0.filter((z) => z.istPlatzhalter)
+p(["digitalprodukte", "beratung", "content"].every((s) => t_platzhalter.some((z) => z.saeule === s)),
+  "T1 je ein Platzhalter-Ziel für die drei Säulen mit Umsatzziel existiert (additiv angelegt, siehe ZIELE_SCHEMA)")
+p(t_platzhalter.every((z) => z.zielbetragCent === 0 && z.status === "aktiv"), "T2 Platzhalter tragen Betrag 0 und bleiben aktiv — sie werden nie automatisch 'erreicht'")
+p(istPlatzhalterZiel("Platzhalter – vom Owner zu ersetzen") && !istPlatzhalterZiel("ABNAHME Erster Beratungskunde"),
+  "T3 das Namensmuster erkennt nur echte Platzhalter, keine echten Zieltitel")
+
+const t_zielId = await zielAnlegen(db, { saeule: "beratung", titel: "ABNAHME Erster Beratungskunde", zielbetragCent: 50000, frist: addTage(heuteBerlin(), 90), notiz: null })
+const t_vorBuchung = (await ladeZiele(db)).find((z) => z.id === t_zielId)
+p(t_vorBuchung?.standCent === 0 && t_vorBuchung?.status === "aktiv", "T4 frisch angelegtes Ziel: Fortschritt 0, aktiv")
+
+await db(`INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, quelle, geschaeftsfeld) VALUES
+  ('ABNAHME-ziel-beratung-1','einnahme','gebucht',$1,50000,19,'Beratung','manuell','beratung')`, [heuteBerlin()])
+const t_nachBuchung = (await ladeZiele(db)).find((z) => z.id === t_zielId)
+p(t_nachBuchung?.standCent === 50000, "T5 Fortschritt kommt exakt aus der echten Buchung derselben Säule — eine Quelle der Wahrheit, kein Doppel-Erfassen")
+p(t_nachBuchung?.status === "erreicht" && t_nachBuchung?.erreichtAt !== null, "T6 Zielerreichung setzt den Status korrekt, sobald der abgeleitete Stand die Zielsumme erreicht")
+
+const t_zielId2 = await zielAnlegen(db, { saeule: "content", titel: "ABNAHME Zu verwerfendes Ziel", zielbetragCent: 10000, frist: addTage(heuteBerlin(), 30), notiz: null })
+await zielVerwerfen(db, t_zielId2)
+const t_verworfen = (await ladeZiele(db)).find((z) => z.id === t_zielId2)
+p(t_verworfen?.status === "verworfen", "T7 Verwerfen setzt den Status final — unabhängig vom Fortschritt")
+
+await zielAktualisieren(db, t_zielId, { saeule: "beratung", titel: "ABNAHME Erster Beratungskunde (angepasst)", zielbetragCent: 60000, frist: addTage(heuteBerlin(), 120), notiz: "angepasst" })
+const t_bearbeitet = (await ladeZiele(db)).find((z) => z.id === t_zielId)
+p(t_bearbeitet?.titel === "ABNAHME Erster Beratungskunde (angepasst)" && t_bearbeitet?.zielbetragCent === 60000, "T8 Bearbeiten übernimmt die neuen Werte")
+
+/* ══ U · AI-UGC-Video — zweiphasiges Modell (Phase 2) ══ */
+console.log("\nU · AI-UGC-Video — Phase A (intern) → Phase B (verkaufsfähig) in einem Schritt")
+
+/* Ausgangszustand erzwingen, unabhängig vom Verlauf früherer Durchläufe (fin_leistungen wird nicht getruncatet, siehe TRUNCATE-Kommentar oben). */
+await db(`UPDATE fin_leistungen SET aktiv = false, geschaeftsfeld = 'content' WHERE id = 'leistung-ai-ugc-video'`)
+const u_vorAktivierung = await db(`SELECT aktiv, geschaeftsfeld FROM fin_leistungen WHERE id = 'leistung-ai-ugc-video'`)
+p(u_vorAktivierung[0]?.aktiv === false && u_vorAktivierung[0]?.geschaeftsfeld === "content", "U1 AI-UGC-Video existiert, Phase A: inaktiv, Geschäftsfeld 'content'")
+p((await ladeLeistungen(db, true)).every((l) => l.id !== "leistung-ai-ugc-video"), "U2 inaktive Leistungen erscheinen nicht im Angebots-Editor (nurAktiv=true)")
+
+/* Dieselbe Anweisung wie leistungUmschalten() in app/(finanz)/finanz/auftraege/actions.ts — ein Klick macht beides. */
+await db(
+  `UPDATE fin_leistungen SET aktiv = NOT aktiv,
+     geschaeftsfeld = CASE WHEN NOT aktiv AND geschaeftsfeld = 'content' THEN 'digitalprodukte' ELSE geschaeftsfeld END
+   WHERE id = 'leistung-ai-ugc-video'`,
+)
+const u_nachAktivierung = await db(`SELECT aktiv, geschaeftsfeld FROM fin_leistungen WHERE id = 'leistung-ai-ugc-video'`)
+p(u_nachAktivierung[0]?.aktiv === true, "U3 nach Aktivierung erscheint die Leistung (aktiv = true)")
+p(u_nachAktivierung[0]?.geschaeftsfeld === "digitalprodukte", "U4 der Geschäftsfeld-Wechsel auf 'digitalprodukte' wird in demselben Schritt korrekt übernommen")
+p((await ladeLeistungen(db, true)).some((l) => l.id === "leistung-ai-ugc-video"), "U5 jetzt erscheint sie im Angebots-Editor")
+
+/* ══ V · Diversifikation (Phase 3) ══ */
+console.log("\nV · Diversifikation — Konzentrationsrisiko aus echten Zahlen")
+
+await db(`TRUNCATE fin_buchungen`)
+const v_heute = heuteBerlin()
+const v_leer = await ladeDiversifikation(db, v_heute)
+p(v_leer.aktiveSaeulen === 0 && v_leer.anteile.length === 0, "V1 ohne Einnahmen: keine aktive Säule")
+
+await db(`INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, quelle, geschaeftsfeld) VALUES
+  ('ABNAHME-div-1','einnahme','gebucht',$1,100000,19,'Projekt / Kunde','manuell','digitalprodukte')`, [v_heute])
+const v_eins = await ladeDiversifikation(db, v_heute)
+p(v_eins.aktiveSaeulen === 1 && v_eins.konzentriert === false, "V2 genau EINE aktive Säule: kein Konzentrations-Hinweis (zu wenig Säulen für eine Aussage, nicht trotzdem 100 % behaupten)")
+
+await db(`INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, quelle, geschaeftsfeld) VALUES
+  ('ABNAHME-div-2','einnahme','gebucht',$1,10000,19,'Beratung','manuell','beratung')`, [v_heute])
+const v_zwei = await ladeDiversifikation(db, v_heute)
+const v_digital = v_zwei.anteile.find((a) => a.key === "digitalprodukte")
+p(v_zwei.aktiveSaeulen === 2 && Math.abs((v_digital?.anteil ?? 0) - 100000 / 110000) < 0.0001, "V3 zwei aktive Säulen: Anteil wird exakt berechnet", String(v_digital?.anteil))
+p(v_zwei.konzentriert === true && v_zwei.hoechsteSaeule?.key === "digitalprodukte", "V4 ab 70 % Anteil EINER Säule bei mind. 2 aktiven Säulen: als konzentriert markiert")
+
+await db(`INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, quelle, geschaeftsfeld) VALUES
+  ('ABNAHME-div-3','einnahme','gebucht',$1,70000,19,'Content','manuell','content')`, [v_heute])
+const v_drei = await ladeDiversifikation(db, v_heute)
+p(v_drei.aktiveSaeulen === 3, "V5 drei aktive Säulen werden alle gezählt", String(v_drei.aktiveSaeulen))
+p(v_drei.konzentriert === false, "V6 bei ausgeglichenerer Verteilung (100.000 / 70.000 / 10.000) greift der 70-%-Schwellenwert nicht mehr", JSON.stringify(v_drei.anteile.map((a) => a.anteil)))
+
+/* ══ W · § 19-Projektion (Phase 4) ══ */
+console.log("\nW · § 19-Projektion — Was-wäre-wenn, nie vermischt mit der echten Zahl")
+
+const w_status = paragraph19Status([buchungFixture("w1", "2026-01-10", 85_000_00)], "2026-06-15")
+const w_ohneZiele = paragraph19Projektion(w_status, 0)
+p(w_ohneZiele.sichtbar === false && w_ohneZiele.projektionCent === w_status.laufendesJahrUmsatzCent, "W1 ohne offene Beratungs-Ziele: Projektion unsichtbar, entspricht der echten Zahl")
+
+const w_mitZielen = paragraph19Projektion(w_status, 20_000_00)
+p(w_mitZielen.sichtbar === true && w_mitZielen.projektionCent === w_status.laufendesJahrUmsatzCent + 20_000_00,
+  "W2 mit offenen Beratungs-Zielen: Projektion = echter Umsatz PLUS Zielsumme, sichtbar")
+p(w_status.laufendesJahrUmsatzCent === 85_000_00, "W3 die echte Zahl selbst bleibt von der Projektion unangetastet (keine Vermischung)")
+
+const w_jahr = heuteBerlin().slice(0, 4)
+await db(`INSERT INTO fin_ziele (id, saeule, titel, zielbetrag_cent, frist, notiz) VALUES
+  ('ABNAHME-w-ziel-echt', 'beratung', 'ABNAHME Beratungsziel laufendes Jahr', 2000000, $1, null),
+  ('ABNAHME-w-ziel-platzhalter', 'beratung', 'Platzhalter – vom Owner zu ersetzen', 999999, $1, null),
+  ('ABNAHME-w-ziel-verworfen', 'beratung', 'ABNAHME verworfenes Ziel', 500000, $1, null)
+  ON CONFLICT (id) DO NOTHING`, [`${w_jahr}-12-31`])
+await db(`UPDATE fin_ziele SET status = 'verworfen' WHERE id = 'ABNAHME-w-ziel-verworfen'`)
+const w_offen = await offeneBeratungsZieleCent(db, heuteBerlin())
+p(w_offen === 2000000, "W4 offeneBeratungsZieleCent() zählt nur aktive, NICHT-platzhalter Beratungs-Ziele mit Frist im laufenden Jahr", String(w_offen))
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()

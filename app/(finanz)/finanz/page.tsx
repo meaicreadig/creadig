@@ -14,6 +14,10 @@ import { Geschaeftsfelder } from "@/components/finanz/geschaeftsfelder"
 import { ladeFelder } from "@/lib/finanz/felder"
 import { abgleichFaellig, abgleichStand, fiberoKonfiguriert, gleicheFiberoAb } from "@/lib/finanz/fibero-abgleich"
 import { finanzOwnerSeite } from "@/lib/finanz/zugang"
+import { ZieleKachel } from "@/components/finanz/ziele"
+import { ladeZiele } from "@/lib/finanz/ziele"
+import { Diversifikationskachel } from "@/components/finanz/diversifikation"
+import { ladeDiversifikation } from "@/lib/finanz/diversifikation"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Heute" }
@@ -33,20 +37,39 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
   else if (abgleich.faellig) after(() => gleicheFiberoAb(db).catch(() => null))
 
   const basis = await finanzBasis()
-  const { heute, fristen, stand, topf, frei, verlauf, reichweite, hinweise, paragraph19 } = await berechneLage(db)
+  const { heute, fristen, stand, topf, frei, verlauf, reichweite, hinweise, paragraph19, paragraph19Vorschau } = await berechneLage(db)
   const naechste = fristen.filter((f) => !f.erledigt).slice(0, 3)
 
   const diesesJahr = heute.slice(0, 4)
   const jahre = [diesesJahr, String(Number(diesesJahr) - 1)]
   const gewaehlt = (await searchParams).jahr
   const jahr = gewaehlt && jahre.includes(gewaehlt) ? gewaehlt : diesesJahr
-  const [felder, abgleichsStand] = await Promise.all([ladeFelder(db, jahr), abgleichStand(db)])
+  const [felder, abgleichsStand, ziele, diversifikation] = await Promise.all([
+    ladeFelder(db, jahr),
+    abgleichStand(db),
+    ladeZiele(db),
+    ladeDiversifikation(db, heute),
+  ])
 
   return (
     <FinanzShell aktiv="heute" titel={gruss()} unterzeile="Vorne steht, was dich voranbringt. Der Rest läuft im Hintergrund.">
-      <FinanzKompass stand={stand} frei={frei} topf={topf} reichweite={reichweite} hinweise={hinweise} verlauf={verlauf} paragraph19={paragraph19} />
+      <FinanzKompass
+        stand={stand}
+        frei={frei}
+        topf={topf}
+        reichweite={reichweite}
+        hinweise={hinweise}
+        verlauf={verlauf}
+        paragraph19={paragraph19}
+        paragraph19Vorschau={paragraph19Vorschau}
+      />
 
       <Geschaeftsfelder bild={felder} stand={abgleichsStand} fiberoAktiv={fiberoKonfiguriert()} basis={basis || "/"} jahre={jahre} />
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <ZieleKachel ziele={ziele} basis={basis || "/"} />
+        <Diversifikationskachel bild={diversifikation} />
+      </div>
 
       <div className="grid gap-5 lg:grid-cols-5">
         <div className="lg:col-span-3">

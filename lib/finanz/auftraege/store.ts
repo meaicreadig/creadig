@@ -39,7 +39,7 @@ export const AUFTRAEGE_SCHEMA = [
     einheit text NOT NULL DEFAULT 'Pauschal',
     preis_cent bigint NOT NULL DEFAULT 0,
     ust_satz int NOT NULL DEFAULT 19 CHECK (ust_satz IN (0,7,19)),
-    geschaeftsfeld text NOT NULL DEFAULT 'it',
+    geschaeftsfeld text NOT NULL DEFAULT 'digitalprodukte',
     aktiv boolean NOT NULL DEFAULT true,
     created_at timestamptz NOT NULL DEFAULT now())`,
   `CREATE TABLE IF NOT EXISTS fin_kunden (
@@ -73,7 +73,7 @@ export const AUFTRAEGE_SCHEMA = [
     einleitung text NOT NULL DEFAULT '',
     schluss text NOT NULL DEFAULT '',
     rabatt_prozent numeric(5,2) NOT NULL DEFAULT 0,
-    geschaeftsfeld text NOT NULL DEFAULT 'it',
+    geschaeftsfeld text NOT NULL DEFAULT 'digitalprodukte',
     positionen jsonb NOT NULL DEFAULT '[]'::jsonb,
     steuer_modus text,
     summen jsonb,
@@ -102,6 +102,21 @@ export const AUFTRAEGE_SCHEMA = [
   `ALTER TABLE fin_buchungen ADD COLUMN IF NOT EXISTS geschaeftsfeld text`,
   `ALTER TABLE fin_buchungen ADD COLUMN IF NOT EXISTS quelle_ref text`,
   `ALTER TABLE fin_einstellungen ADD COLUMN IF NOT EXISTS firma jsonb NOT NULL DEFAULT '{}'::jsonb`,
+  /* Säulen-Durchlauf — 'it'/'software'/'ecommerce' → 'digitalprodukte', siehe lib/finanz/beleg-felder.ts. */
+  `ALTER TABLE fin_leistungen ALTER COLUMN geschaeftsfeld SET DEFAULT 'digitalprodukte'`,
+  `UPDATE fin_leistungen SET geschaeftsfeld = 'digitalprodukte' WHERE geschaeftsfeld IN ('it','software','ecommerce')`,
+  `ALTER TABLE fin_dokumente ALTER COLUMN geschaeftsfeld SET DEFAULT 'digitalprodukte'`,
+  `UPDATE fin_dokumente SET geschaeftsfeld = 'digitalprodukte' WHERE geschaeftsfeld IN ('it','software','ecommerce')`,
+  /*
+   * Phase 2 (Säulen-Durchlauf) — AI-UGC-Video, zweiphasig: Phase A = interne
+   * Methode (aktiv=false, taucht deshalb in keinem Angebot auf), Phase B =
+   * Owner aktiviert UND wechselt das Geschäftsfeld auf 'digitalprodukte',
+   * sobald die Methode an Marken verkauft wird (siehe leistungUmschalten()
+   * in app/(finanz)/finanz/auftraege/actions.ts — ein Klick macht beides).
+   */
+  `INSERT INTO fin_leistungen (id, titel, beschreibung, einheit, preis_cent, ust_satz, geschaeftsfeld, aktiv) VALUES
+     ('leistung-ai-ugc-video', 'AI-UGC-Video', 'Interne Methode (Phase A) -- noch nicht verkaufsfaehig. Aktivieren wechselt automatisch auf Digitalprodukte (Phase B).', 'Pauschal', 0, 19, 'content', false)
+   ON CONFLICT (id) DO NOTHING`,
 
   /*
    * GoBD-FESTSCHREIBUNG — unveraenderbar in der Datenbank, nicht nur in der
@@ -371,7 +386,7 @@ function zeile(r: Record<string, unknown>): Dokument {
     einleitung: String(r.einleitung ?? ""),
     schluss: String(r.schluss ?? ""),
     rabattProzent: Number(r.rabatt_prozent ?? 0),
-    geschaeftsfeld: String(r.geschaeftsfeld ?? "it"),
+    geschaeftsfeld: String(r.geschaeftsfeld ?? "digitalprodukte"),
     positionen: (r.positionen ?? []) as Position[],
     steuerModus: (r.steuer_modus ?? null) as SteuerModus | null,
     summen: (r.summen ?? null) as Summen | null,
@@ -493,7 +508,7 @@ export async function legeEntwurfAn(db: Abfrage, art: "angebot" | "rechnung", vo
       vorlage?.einleitung ?? "",
       vorlage?.schluss ?? "",
       vorlage?.rabattProzent ?? 0,
-      vorlage?.geschaeftsfeld ?? "it",
+      vorlage?.geschaeftsfeld ?? "digitalprodukte",
       JSON.stringify(vorlage?.positionen ?? []),
       vorlage?.angebotId ?? null,
       vorlage?.anzahlungProzent ?? null,

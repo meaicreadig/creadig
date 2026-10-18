@@ -1,11 +1,11 @@
 import Link from "next/link"
-import { CalendarClock, Compass, FileCheck2, FileText, Package, Receipt, Settings, Waves } from "lucide-react"
+import { CalendarClock, Compass, FileCheck2, FileText, Package, Receipt, Settings, Target, Waves } from "lucide-react"
 
 import { Logo } from "@/components/brand/logo"
 import { Abmelden } from "@/components/finanz/anmeldung"
 import { finanzBasis } from "@/lib/finanz/basis"
 
-export type FinanzBereich = "heute" | "angebote" | "rechnungen" | "leistungen" | "geldfluss" | "belege" | "steuern" | "grundlagen"
+export type FinanzBereich = "heute" | "angebote" | "rechnungen" | "leistungen" | "geldfluss" | "belege" | "ziele" | "steuern" | "grundlagen"
 
 type Bereich = { key: FinanzBereich; pfad: string; label: string; Icon: typeof Compass }
 
@@ -24,6 +24,7 @@ const GRUPPEN: { titel: string; bereiche: Bereich[] }[] = [
     bereiche: [
       { key: "geldfluss", pfad: "/geldfluss", label: "Geldfluss", Icon: Waves },
       { key: "belege", pfad: "/belege", label: "Belege", Icon: Receipt },
+      { key: "ziele", pfad: "/ziele", label: "Ziele", Icon: Target },
     ],
   },
   { titel: "Finanzamt", bereiche: [{ key: "steuern", pfad: "/steuern", label: "Steuern", Icon: CalendarClock }] },

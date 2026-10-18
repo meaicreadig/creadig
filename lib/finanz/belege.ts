@@ -13,7 +13,7 @@ import { naechsterUstSatz } from "@/lib/finanz/fibero-abgleich"
  * GRUNDSATZ: nichts wird gelöscht. Quelldaten (quelle_*) werden beim Kopieren
  * überschrieben, eigene Entscheidungen (geschaeftsfeld) nie.
  */
-export { GESCHAEFTSFELDER, HAND_UPLOAD_MAX_BYTES, HAND_UPLOAD_TYPEN, istGeschaeftsfeld, type Geschaeftsfeld } from "@/lib/finanz/beleg-felder"
+export { GESCHAEFTSFELDER, HAND_UPLOAD_MAX_BYTES, HAND_UPLOAD_TYPEN, istGeschaeftsfeld, geschaeftsfeldSchluessel, type Geschaeftsfeld } from "@/lib/finanz/beleg-felder"
 import { GESCHAEFTSFELDER, HAND_UPLOAD_MAX_BYTES, HAND_UPLOAD_TYPEN, istGeschaeftsfeld, type Geschaeftsfeld } from "@/lib/finanz/beleg-felder"
 
 export const BELEGE_SCHEMA = [
@@ -66,6 +66,28 @@ export const BELEGE_SCHEMA = [
     stimmt boolean,
     gestartet_at timestamptz NOT NULL DEFAULT now(),
     fertig_at timestamptz)`,
+  /*
+   * Säulen-Durchlauf — 'it', 'software' und 'ecommerce' waren drei Felder für
+   * dieselbe Säule (Digitalprodukte & -dienstleistungen); 'glasfaser',
+   * 'privat' und 'sonstiges' bleiben unverändert. Additiv, idempotent: läuft
+   * irrelevant oft, verliert keine Buchung ihre Zuordnung. ALTER vor UPDATE,
+   * damit die Spalte unabhängig von der Reihenfolge der *_SCHEMA-Arrays
+   * existiert (fin_buchungen selbst legt store.ts an, geschaeftsfeld kommt
+   * aus fibero-abgleich.ts / auftraege/store.ts hinzu).
+   *
+   * fin_buchungen: NUR Zeilen, die der GoBD-Festschreibungs-Trigger
+   * (trg_fin_buchungen_festschreibung, scripts/migrations/030-gobd-
+   * festschreibung.sql) noch ändern lässt — status<>'gebucht' oder
+   * quelle='fibero'. Eine bereits gebuchte, nicht-fibero Zeile zu
+   * übersetzen würde der Trigger mit einer Exception verweigern (genau das
+   * soll er auch): deren geschaeftsfeld bleibt für immer der Wert von
+   * damals und wird stattdessen beim Lesen übersetzt, siehe
+   * geschaeftsfeldSchluessel() in lib/finanz/beleg-felder.ts.
+   */
+  `ALTER TABLE fin_buchungen ADD COLUMN IF NOT EXISTS geschaeftsfeld text`,
+  `UPDATE fin_buchungen SET geschaeftsfeld = 'digitalprodukte'
+     WHERE geschaeftsfeld IN ('it','software','ecommerce') AND (status <> 'gebucht' OR quelle = 'fibero')`,
+  `UPDATE fin_belege SET geschaeftsfeld = 'digitalprodukte' WHERE geschaeftsfeld IN ('it','software','ecommerce')`,
 ]
 
 let bereit: Promise<void> | null = null

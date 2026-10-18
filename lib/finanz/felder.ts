@@ -1,7 +1,7 @@
 import "server-only"
 
 import type { Abfrage } from "@/lib/neon-abfrage"
-import { GESCHAEFTSFELDER, belegeSchema } from "@/lib/finanz/belege"
+import { GESCHAEFTSFELDER, belegeSchema, geschaeftsfeldSchluessel } from "@/lib/finanz/belege"
 
 /**
  * Ergebnis je Geschäftsfeld (netto, gebucht, nicht storniert). Das Feld eines
@@ -83,9 +83,15 @@ export async function ladeFelder(db: Abfrage, jahr: string): Promise<FelderBild>
     ...GESCHAEFTSFELDER.map((g) => [g.key, g.label] as [string, string]),
     ["offen", "Noch nicht zugeordnet"],
   ])
+  /*
+   * geschaeftsfeldSchluessel() uebersetzt auch einen alten, GoBD-
+   * eingefrorenen Wert ('it'/'software'/'ecommerce') auf seine neue Saeule
+   * — eine schon gebuchte Zeile kann die Spalte selbst nicht mehr aendern
+   * (siehe BELEGE_SCHEMA), zaehlt hier aber trotzdem korrekt mit.
+   */
   const karte = new Map<string, FeldZeile>()
   for (const r of zeilen) {
-    const key = String(r.feld)
+    const key = geschaeftsfeldSchluessel(String(r.feld))
     const z = karte.get(key) ?? { key, label: labels.get(key) ?? key, einCent: 0, ausCent: 0, anzahl: 0 }
     if (r.art === "einnahme") z.einCent += Number(r.netto)
     else z.ausCent += Number(r.netto)
@@ -97,8 +103,9 @@ export async function ladeFelder(db: Abfrage, jahr: string): Promise<FelderBild>
   const proMonat = new Map<string, Record<string, number>>()
   for (const r of monate) {
     const m = String(r.m)
+    const key = geschaeftsfeldSchluessel(String(r.feld))
     const eintrag = proMonat.get(m) ?? {}
-    eintrag[String(r.feld)] = Number(r.netto)
+    eintrag[key] = (eintrag[key] ?? 0) + Number(r.netto)
     proMonat.set(m, eintrag)
   }
 
