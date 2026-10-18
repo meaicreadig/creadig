@@ -14,8 +14,9 @@ import {
   steuertopf,
 } from "@/lib/finanz/rechnen"
 import { ladeAlles, sichereFristen, type finanzDb } from "@/lib/finanz/store"
-import { paragraph19Status } from "@/lib/finanz/paragraph19"
+import { paragraph19Projektion, paragraph19Status } from "@/lib/finanz/paragraph19"
 import { ladeFelder } from "@/lib/finanz/felder"
+import { offeneBeratungsZieleCent } from "@/lib/finanz/ziele"
 
 type Db = NonNullable<Awaited<ReturnType<typeof finanzDb>>>
 
@@ -39,6 +40,7 @@ export async function berechneLage(db: Db) {
   const { felder } = await ladeFelder(db, heute.slice(0, 4))
   const hinweise = kompass({ freiCent: frei, topf, wochen, fristen, buchungen, verlauf, reichweite, heute, eur, felder })
   const paragraph19 = einstellungen.ustPflichtig ? null : paragraph19Status(buchungen, heute)
+  const paragraph19Vorschau = paragraph19 ? paragraph19Projektion(paragraph19, await offeneBeratungsZieleCent(db, heute)) : null
   if (paragraph19 && paragraph19.ampel !== "ruhig") {
     hinweise.unshift({
       schwere: paragraph19.ampel === "ueberschritten" ? "critical" : paragraph19.ampel === "kritisch" ? "critical" : "attention",
@@ -51,7 +53,7 @@ export async function berechneLage(db: Db) {
     })
   }
 
-  return { heute, einstellungen, buchungen, fristen, stand, topf, frei, bewegungen, wochen, verlauf, reichweite, hinweise, paragraph19 }
+  return { heute, einstellungen, buchungen, fristen, stand, topf, frei, bewegungen, wochen, verlauf, reichweite, hinweise, paragraph19, paragraph19Vorschau }
 }
 
 export type Lage = Awaited<ReturnType<typeof berechneLage>>

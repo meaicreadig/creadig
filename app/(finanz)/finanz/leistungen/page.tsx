@@ -34,6 +34,7 @@ export default async function Leistungen() {
               <span className="font-medium">
                 {l.titel}
                 <span className="text-muted-foreground font-normal"> · {FELDER.find((f) => f.key === l.geschaeftsfeld)?.label}</span>
+                {!l.aktiv && <span className="text-muted-foreground font-normal"> · Intern — noch nicht verkaufsfähig</span>}
               </span>
               <span className="text-primary font-semibold tabular-nums">
                 {formatEuro(l.preisCent)} <span className="text-muted-foreground text-xs font-normal">/ {l.einheit} · {l.ustSatz} %</span>
@@ -82,7 +83,7 @@ function LeistungsForm({ l }: { l?: Leistung }) {
         </AdminSelect>
       </AdminField>
       <AdminField label="Geschäftsfeld" htmlFor={`${p}-f`}>
-        <AdminSelect id={`${p}-f`} name="geschaeftsfeld" defaultValue={l?.geschaeftsfeld ?? "it"}>
+        <AdminSelect id={`${p}-f`} name="geschaeftsfeld" defaultValue={l?.geschaeftsfeld ?? "digitalprodukte"}>
           {FELDER.map((f) => <option key={f.key} value={f.key}>{f.label}</option>)}
         </AdminSelect>
       </AdminField>

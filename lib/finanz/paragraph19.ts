@@ -82,3 +82,24 @@ export function paragraph19Status(buchungen: Buchung[], heute: string): Paragrap
     ueberschrittenBeiBuchungId,
   }
 }
+
+export type Paragraph19Projektion = {
+  projektionCent: number
+  zieleCent: number
+  sichtbar: boolean
+}
+
+/**
+ * Vorausschauende Projektion (Phase 4, Säulen-Durchlauf): echter laufender
+ * Jahresumsatz (status.laufendesJahrUmsatzCent, rechtlich verbindlich) PLUS
+ * offene Beratungs-Ziele mit Frist im laufenden Jahr (lib/finanz/ziele.ts,
+ * offeneBeratungsZieleCent() — dort bereits ohne Platzhalter gefiltert).
+ * Rein additiv: ändert NIE status selbst, beeinflusst keine § 19-Aktion.
+ */
+export function paragraph19Projektion(status: Paragraph19Status, offeneBeratungsZieleCent: number): Paragraph19Projektion {
+  return {
+    projektionCent: status.laufendesJahrUmsatzCent + offeneBeratungsZieleCent,
+    zieleCent: offeneBeratungsZieleCent,
+    sichtbar: offeneBeratungsZieleCent > 0,
+  }
+}

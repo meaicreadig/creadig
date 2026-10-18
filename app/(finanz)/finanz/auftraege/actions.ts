@@ -117,7 +117,7 @@ export async function entwurfSpeichern(id: string, roh: Entwurf): Promise<Ergebn
     einleitung: s(roh.einleitung, 3000),
     schluss: s(roh.schluss, 3000),
     rabattProzent: Math.round(zahl(roh.rabattProzent, 0, 100, 0) * 100) / 100,
-    geschaeftsfeld: istGeschaeftsfeld(String(roh.geschaeftsfeld)) ? roh.geschaeftsfeld : "it",
+    geschaeftsfeld: istGeschaeftsfeld(String(roh.geschaeftsfeld)) ? roh.geschaeftsfeld : "digitalprodukte",
     positionen,
   }
   const ok = await speichereEntwurf(db, id, e)
@@ -271,15 +271,28 @@ export async function leistungSpeichern(form: FormData): Promise<void> {
       EINHEITEN.includes(einheit as "Stück") ? einheit : "Pauschal",
       cent(form.get("preis")),
       [0, 7, 19].includes(satz) ? satz : 19,
-      istGeschaeftsfeld(feld) ? feld : "it",
+      istGeschaeftsfeld(feld) ? feld : "digitalprodukte",
     ],
   )
   neu()
 }
 
+/**
+ * Phase A → Phase B (AI-UGC-Video, siehe fin_leistungen-Seed in
+ * auftraege/store.ts) ist ein bewusster Ein-Klick-Schritt: wird eine
+ * inaktive 'content'-Leistung aktiviert, wechselt das Geschäftsfeld in
+ * derselben Anweisung auf 'digitalprodukte' — kein zweiter Schritt im
+ * Bearbeiten-Formular nötig. Jede andere Umschaltung (Deaktivieren, oder
+ * Aktivieren außerhalb von 'content') lässt das Geschäftsfeld unverändert.
+ */
 export async function leistungUmschalten(form: FormData): Promise<void> {
   const db = await zugang()
-  await db(`UPDATE fin_leistungen SET aktiv = NOT aktiv WHERE id = $1`, [s(form.get("id"), 64)])
+  await db(
+    `UPDATE fin_leistungen SET aktiv = NOT aktiv,
+       geschaeftsfeld = CASE WHEN NOT aktiv AND geschaeftsfeld = 'content' THEN 'digitalprodukte' ELSE geschaeftsfeld END
+     WHERE id = $1`,
+    [s(form.get("id"), 64)],
+  )
   neu()
 }
 
