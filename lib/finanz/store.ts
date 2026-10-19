@@ -90,6 +90,12 @@ export const FINANZ_SCHEMA = [
     ergebnis text,
     entschieden_at timestamptz,
     created_at timestamptz NOT NULL DEFAULT now())`,
+  /* Fahrten Aug–Okt 2026, gerechnet nach fibero-Methode (Privatauto 0,30 €/km). Jan–Jul bleiben wie aus fibero gebucht. */
+  `INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, notiz, quelle, pauschal_menge) VALUES
+    ('pausch-fahrt-2026-08', 'ausgabe', 'gebucht', '2026-08-31', 182712, 0, 'Fahrtkosten (km-Pauschale)', '6.090,4 km × 0,30 € (fibero-Methode)', 'pauschale', 6090.4),
+    ('pausch-fahrt-2026-09', 'ausgabe', 'gebucht', '2026-09-30', 112098, 0, 'Fahrtkosten (km-Pauschale)', '3.736,6 km × 0,30 € (fibero-Methode)', 'pauschale', 3736.6),
+    ('pausch-fahrt-2026-10', 'ausgabe', 'gebucht', '2026-10-19', 86073, 0, 'Fahrtkosten (km-Pauschale)', '2.869,1 km × 0,30 € (fibero-Methode, Stand 19.10.)', 'pauschale', 2869.1)
+   ON CONFLICT (id) DO NOTHING`,
 ]
 
 let schemaBereit: Promise<void> | null = null
