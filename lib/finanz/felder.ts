@@ -39,7 +39,7 @@ const JOIN = `FROM fin_buchungen b
 export async function ladeFelder(db: Abfrage, jahr: string): Promise<FelderBild> {
   await belegeSchema(db)
   const p = [`${jahr}-01-01`, `${Number(jahr) + 1}-01-01`]
-  const basis = `b.storniert_at IS NULL AND b.status = 'gebucht' AND b.datum >= $1 AND b.datum < $2
+  const basis = `b.storniert_at IS NULL AND b.archiviert_at IS NULL AND b.status = 'gebucht' AND b.datum >= $1 AND b.datum < $2
     AND b.kategorie <> 'Privatentnahme'`
 
   const [zeilen, offen, quellen, monate, afa, pruef] = await Promise.all([

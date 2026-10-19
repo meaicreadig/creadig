@@ -36,7 +36,7 @@ async function datevBuchungenFuerJahr(db: Abfrage, jahr: string): Promise<DatevB
        FROM fin_buchungen b
        LEFT JOIN fin_dokumente fd ON b.quelle = 'rechnung' AND fd.id = b.quelle_ref
        LEFT JOIN fin_belege fb ON b.quelle = 'beleg' AND fb.id = b.quelle_ref
-      WHERE b.storniert_at IS NULL AND b.status = 'gebucht' AND b.datum >= $1 AND b.datum < $2
+      WHERE b.storniert_at IS NULL AND b.archiviert_at IS NULL AND b.status = 'gebucht' AND b.datum >= $1 AND b.datum < $2
       ORDER BY b.datum, b.id`,
     [`${jahr}-01-01`, `${Number(jahr) + 1}-01-01`],
   )

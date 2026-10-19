@@ -24,6 +24,10 @@ export type Buchung = {
   abzugProzent?: number | null
   /** Anlagegut: Nutzungsdauer in Jahren, Aufwand linear verteilt (AfA). */
   afaJahre?: number | null
+  /** Steuer-Pauschale: zählt im Gewinn, bewegt aber kein Geld. */
+  ohneGeldfluss?: boolean
+  /** Archivierter Beleg (z. B. Tank bei km-Pauschale): bewegt das Konto, zählt nicht im Gewinn. */
+  archiviert?: boolean
 }
 
 export type Einstellungen = {
@@ -153,6 +157,8 @@ function vorzeichen(b: Pick<Buchung, "art">): 1 | -1 {
 }
 
 const wirksam = (b: Buchung) => !b.storniert
+/** Echte Geldbewegung — ohne Pauschalen. */
+const geldfluss = (b: Buchung) => wirksam(b) && !b.ohneGeldfluss
 
 /* ------------------------------------------------------------------------ */
 /* Kontostand                                                                */
@@ -160,7 +166,7 @@ const wirksam = (b: Buchung) => !b.storniert
 
 export function kontostandHeute(e: Einstellungen, buchungen: Buchung[], heute: string): number {
   return buchungen
-    .filter((b) => wirksam(b) && b.status === "gebucht" && b.datum > e.kontostandAm && b.datum <= heute)
+    .filter((b) => geldfluss(b) && b.status === "gebucht" && b.datum > e.kontostandAm && b.datum <= heute)
     .reduce((s, b) => s + vorzeichen(b) * b.bruttoCent, e.kontostandCent)
 }
 
@@ -181,7 +187,7 @@ export function steuertopf(
   fristen: Frist[],
   heute: string,
 ): Steuertopf {
-  const gebucht = buchungen.filter((b) => wirksam(b) && b.status === "gebucht" && b.datum <= heute)
+  const gebucht = buchungen.filter((b) => wirksam(b) && !b.archiviert && b.status === "gebucht" && b.datum <= heute)
 
   const ustOffenCent = e.ustPflichtig
     ? Math.max(
@@ -221,7 +227,7 @@ export function kuenftigeBewegungen(
   horizont: string,
 ): Bewegung[] {
   const liste: Bewegung[] = []
-  for (const b of buchungen.filter(wirksam)) {
+  for (const b of buchungen.filter(geldfluss)) {
     const titel = b.gegenpartei ?? b.kategorie
     if (b.datum > heute && b.datum <= horizont) {
       liste.push({ datum: b.datum, cent: vorzeichen(b) * b.bruttoCent, titel, quelle: "buchung" })
@@ -368,7 +374,7 @@ export function monate(buchungen: Buchung[], heute: string, anzahl = 6): Monat[]
     let ein = 0
     let aus = 0
     for (const b of buchungen) {
-      if (!wirksam(b) || b.status !== "gebucht" || !b.datum.startsWith(schluessel)) continue
+      if (!geldfluss(b) || b.status !== "gebucht" || !b.datum.startsWith(schluessel)) continue
       if (b.art === "einnahme") ein += b.bruttoCent
       else aus += b.bruttoCent
     }

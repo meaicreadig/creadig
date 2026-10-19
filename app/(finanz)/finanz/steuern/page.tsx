@@ -1,4 +1,7 @@
+import Link from "next/link"
+
 import { FinanzShell, OhneSpeicher } from "@/components/finanz/shell"
+import { finanzBasis } from "@/lib/finanz/basis"
 import { FristenListe } from "@/components/finanz/fristen"
 import { FinanzEuer } from "@/components/finanz/euer"
 import { eur, eurRund } from "@/components/finanz/format"
@@ -20,7 +23,7 @@ export default async function FinanzSteuern({ searchParams }: { searchParams: Pr
   const jahre = [diesesJahr, String(Number(diesesJahr) - 1), String(Number(diesesJahr) - 2)]
   const gewaehlt = (await searchParams).jahr
   const jahr = gewaehlt && jahre.includes(gewaehlt) ? gewaehlt : diesesJahr
-  const euer = await berechneEuer(db, jahr)
+  const [euer, basis] = await Promise.all([berechneEuer(db, jahr), finanzBasis()])
 
   return (
     <FinanzShell aktiv="steuern" titel="Steuern" unterzeile="Der Steuertopf rechnet live mit. Was dem Finanzamt gehört, ist hier schon beiseitegelegt.">
@@ -32,6 +35,13 @@ export default async function FinanzSteuern({ searchParams }: { searchParams: Pr
         <Karte titel="Umsatzsteuer offen" wert={eurRund(topf.ustOffenCent)} />
         <Karte titel="ESt-Rücklage" wert={eurRund(topf.estRuecklageCent)} fuss={`Gewinn bisher ${eur(topf.gewinnJahrCent)} netto`} />
       </section>
+      <Link href={`${basis}/pauschalen?jahr=${jahr}`} className="bg-card flex items-center justify-between gap-4 rounded-[2rem] p-7">
+        <span className="flex flex-col gap-1">
+          <span className="font-semibold">Pauschalen &amp; Sonderausgaben</span>
+          <span className="text-muted-foreground text-sm">Fahrten, Verpflegung, Homeoffice · Archiv der Tank-/Essensbelege · Spenden</span>
+        </span>
+        <span className="text-primary text-sm font-medium">Öffnen</span>
+      </Link>
       <FristenListe fristen={fristen} heute={heute} ustOffenCent={topf.ustOffenCent} />
       <FinanzEuer euer={euer} jahre={jahre} jahrAktuell={jahr} />
     </FinanzShell>
