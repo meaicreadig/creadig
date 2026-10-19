@@ -41,14 +41,16 @@ aus einer Variable gelesen. Für eine zweite Firma bräuchte der Prompt
 dieselben Firmendaten, die `ladeFirma()` ohnehin schon lädt (siehe Punkt 1),
 statt sie ein zweites Mal hart zu hinterlegen.
 
-## 4 · `GESCHAEFTSFELDER` in `lib/finanz/belege.ts`
+## 4 · `GESCHAEFTSFELDER` in `lib/finanz/beleg-felder.ts`
 
-Die Liste der Geschäftsfelder (`glasfaser`, `it`, `software`, `ecommerce`,
-`privat`, `sonstiges`) ist eine feste, für creaDIGs eigenes Geschäft
-geschnittene Aufzählung — Grundlage für Belege, Buchungen und die
-Auswertung nach Geschäftsfeldern (`components/finanz/geschaeftsfelder.tsx`).
-Eine andere Firma hätte andere Felder; die Liste müsste je Mandant
-konfigurierbar werden, nicht eine zweite feste Aufzählung danaben.
+Die Liste der Geschäftsfelder (`digitalprodukte`, `beratung`, `content`,
+`glasfaser`, `privat`, `sonstiges` — seit dem Säulen-Durchlauf, siehe
+„Säulen, Ziele, Diversifikation, § 19-Projektion" unten) ist eine feste, für
+creaDIGs eigene Einkommensarchitektur geschnittene Aufzählung — Grundlage
+für Belege, Buchungen und die Auswertung nach Geschäftsfeldern
+(`components/finanz/geschaeftsfelder.tsx`). Eine andere Firma hätte andere
+Felder; die Liste müsste je Mandant konfigurierbar werden, nicht eine zweite
+feste Aufzählung daneben.
 
 ## Was NICHT hart „eine Firma" ist
 
@@ -92,6 +94,7 @@ Entwickler ohne Repo-Kontext — nicht zum manuellen Ausführen gedacht.
 | (keine Tabelle — `lib/termine/mail.ts` wiederverwendet) | — | 7 |
 | `032-rate-limits.sql` | `fin_rate_limits` | 8 |
 | `034-bank-saldo.sql` | `fin_einstellungen.bank_saldo_cent`/`bank_saldo_am` — Vorschlag aus dem Bank-Import, Kontostand erst nach Klick übernommen | 9 (Professional-Pass) |
+| `036-saeulen-ziele.sql` | `fin_ziele` (neu), `geschaeftsfeld`-Übersetzung auf `fin_buchungen`/`fin_belege`/`fin_leistungen`/`fin_dokumente` | Säulen-Durchlauf |
 
 ### Professional-Pass (nach Phase 9, auf eigenen Wunsch)
 
@@ -145,6 +148,50 @@ Spekulation):
   eingerichtet, siehe .env.example); ohne Zugang ein klarer Fehlertext statt
   eines Absturzes oder erfundenen Entwurfs (Drill-Abschnitt Q).
 
+### Säulen, Ziele, Diversifikation, § 19-Projektion (Säulen-Durchlauf)
+
+Der Owner führt sein Geschäft als drei grundverschiedene Einkommenssäulen
+(Digitalprodukte & -dienstleistungen, internationale Beratung, Content &
+eigene Marke) plus Glasfaser-Subunternehmertum als unveränderte vierte,
+physische Altlast — keine der drei Säulen. `GESCHAEFTSFELDER`
+(`lib/finanz/beleg-felder.ts`) spiegelt das: `digitalprodukte` (ersetzt die
+früheren `it`/`software`/`ecommerce`), `beratung`, `content`, `glasfaser`,
+`privat`, `sonstiges`.
+
+- **Migration der alten Werte ist zweigeteilt**, weil die GoBD-Festschreibung
+  (`trg_fin_buchungen_festschreibung`, 030) eine bereits `gebucht`e,
+  nicht-fibero Zeile strikt vor jeder Spaltenänderung schützt — auch vor
+  dieser Migration. `fin_belege`/`fin_leistungen`/`fin_dokumente` tragen
+  keine solche Sperre und werden per `UPDATE` direkt übersetzt; eine schon
+  gebuchte `fin_buchungen`-Zeile bleibt für immer bei ihrem damaligen Wert
+  und wird stattdessen beim Lesen übersetzt (`geschaeftsfeldSchluessel()`,
+  `lib/finanz/beleg-felder.ts`, angewendet in `lib/finanz/felder.ts` und
+  `lib/finanz/diversifikation.ts`). Keine Buchung verliert ihre Zuordnung —
+  die alte Zeile bleibt unangetastet, erscheint aber überall korrekt unter
+  der neuen Säule.
+- **Ziele** (`lib/finanz/ziele.ts`, Seite `/finanz/ziele`): ein Ziel-Tracker
+  für Säulen ohne (noch) echte Buchungen. Der Fortschritt ist NIE eine
+  eigene Zahl, sondern immer aus `fin_buchungen` derselben Säule seit Anlage
+  des Ziels abgeleitet. Ein Platzhalter-Ziel (Betrag 0) erkennt sich am
+  Titel-Präfix „Platzhalter –" (`istPlatzhalterZiel()`), nicht an einer
+  eigenen Spalte.
+- **Diversifikation** (`lib/finanz/diversifikation.ts`, Dashboard-Kachel):
+  Anteil jeder Säule an den Einnahmen der letzten 12 Monate, rein aus
+  `fin_buchungen` abgeleitet. Ab 70 % Anteil einer Säule bei mindestens zwei
+  aktiven Säulen ein ruhiger Konzentrations-Hinweis; bei weniger als zwei
+  aktiven Säulen eine eigene, zurückhaltende Formulierung statt einer
+  Prozentzahl, die mehr Verteilung behauptet, als es gibt.
+- **§ 19-Projektion** (`paragraph19Projektion()` in `lib/finanz/
+  paragraph19.ts`): eine zweite, klar als Projektion beschriftete Kennzahl
+  neben der echten, rechtlich verbindlichen § 19-Zahl — echter laufender
+  Jahresumsatz PLUS offene, nicht-Platzhalter Beratungs-Ziele mit Frist im
+  laufenden Jahr. Ändert nie das Ergebnis von `paragraph19Status()` und löst
+  keine der echten § 19-Umstellungs-Aktionen aus.
+
+Bewusst NICHT gebaut: Reichweite/Follower/Content-KPIs — Finanz bildet nur
+die monetäre Seite ab, eine „Marketing"-Seite ist ein eigenes, späteres
+Thema.
+
 ### Drill
 
 ```
@@ -158,7 +205,9 @@ Räumt sich selbst per `TRUNCATE` auf, bei jedem Lauf, bevor er beginnt.
 Abschnitte F–N prüfen je ein Gebiet einzeln, Abschnitt Z eine durchgehende
 Geschichte (Angebot → Annahme → Anzahlungsrechnung → Teilzahlung →
 Restzahlung per Bank-Import → Storno → Beleg → eingehende E-Rechnung → EÜR →
-Steuerberater-Paket), jeder Betrag exakt auf den Cent geprüft.
+Steuerberater-Paket), jeder Betrag exakt auf den Cent geprüft. Abschnitte
+S–W (Säulen-Durchlauf): S Geschäftsfelder-Rename inkl. GoBD-Grenzfall, T
+Ziele, U AI-UGC-Video (Phase A/B), V Diversifikation, W § 19-Projektion.
 
 ### Cron (Vercel, `vercel.json`)
 
