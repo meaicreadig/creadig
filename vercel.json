@@ -10,6 +10,10 @@
       "schedule": "0 5 * * 1"
     },
     {
+      "path": "/api/assistent/truppe",
+      "schedule": "0 5 * * *"
+    },
+    {
       "path": "/api/selftest",
       "schedule": "0 7 * * *"
     },

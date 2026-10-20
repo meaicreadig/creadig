@@ -21,6 +21,17 @@ const SCHEMA = [
     created_at timestamptz NOT NULL DEFAULT now(),
     erledigt_at timestamptz)`,
   `CREATE INDEX IF NOT EXISTS assistent_freigaben_offen_idx ON assistent_freigaben (created_at DESC) WHERE status = 'offen'`,
+  `ALTER TABLE assistent_freigaben ADD COLUMN IF NOT EXISTS quelle text`,
+  `ALTER TABLE assistent_freigaben ADD COLUMN IF NOT EXISTS agent text`,
+  `CREATE INDEX IF NOT EXISTS assistent_freigaben_quelle_idx ON assistent_freigaben (quelle)`,
+  `CREATE TABLE IF NOT EXISTS assistent_laeufe (
+    id text PRIMARY KEY,
+    agent text NOT NULL,
+    ergebnis text NOT NULL DEFAULT '',
+    anzahl int NOT NULL DEFAULT 0,
+    fehler text,
+    created_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE INDEX IF NOT EXISTS assistent_laeufe_agent_idx ON assistent_laeufe (agent, created_at DESC)`,
 ]
 
 export const FREIGABE_ARTEN = ["mail", "aufgabe", "termin", "linkedin", "kapital", "notiz"] as const
@@ -35,8 +46,11 @@ export type Freigabe = {
   empfaenger: string | null
   betreff: string | null
   status: "offen" | "freigegeben" | "verworfen"
+  agent: string | null
   zeit: string
 }
+
+export type Lauf = { agent: string; ergebnis: string; anzahl: number; fehler: string | null; zeit: string }
 
 /** Schutz gegen Kreditverbrauch: so viele Fragen pro Tag. */
 export const TAGESLIMIT = 60
@@ -96,22 +110,67 @@ export async function legeFreigabeAn(f: {
   inhalt: string
   empfaenger?: string | null
   betreff?: string | null
-}): Promise<string> {
+  /** Stabiler Schlüssel – dieselbe Quelle wird nie zweimal vorgeschlagen. */
+  quelle?: string | null
+  agent?: string | null
+}): Promise<string | null> {
   const q = await assistentDb()
   if (!q) throw new Error("Datenbank nicht verfügbar")
+  if (f.quelle && (await quelleBekannt(f.quelle))) return null
   const id = neueId("frg")
   await q(
-    `INSERT INTO assistent_freigaben (id, art, titel, inhalt, empfaenger, betreff) VALUES ($1, $2, $3, $4, $5, $6)`,
-    [id, f.art, f.titel.slice(0, 160), f.inhalt.slice(0, 6000), f.empfaenger ?? null, f.betreff?.slice(0, 200) ?? null],
+    `INSERT INTO assistent_freigaben (id, art, titel, inhalt, empfaenger, betreff, quelle, agent) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    [
+      id,
+      f.art,
+      f.titel.slice(0, 160),
+      f.inhalt.slice(0, 6000),
+      f.empfaenger ?? null,
+      f.betreff?.slice(0, 200) ?? null,
+      f.quelle ?? null,
+      f.agent ?? null,
+    ],
   )
   return id
+}
+
+export async function quelleBekannt(quelle: string): Promise<boolean> {
+  const q = await assistentDb()
+  if (!q) return true
+  const rows = (await q(`SELECT 1 FROM assistent_freigaben WHERE quelle = $1 LIMIT 1`, [quelle])) as unknown[]
+  return rows.length > 0
+}
+
+export async function protokolliereLauf(l: { agent: string; ergebnis: string; anzahl: number; fehler?: string | null }) {
+  const q = await assistentDb()
+  if (!q) return
+  await q(`INSERT INTO assistent_laeufe (id, agent, ergebnis, anzahl, fehler) VALUES ($1, $2, $3, $4, $5)`, [
+    neueId("lauf"),
+    l.agent,
+    l.ergebnis.slice(0, 300),
+    l.anzahl,
+    l.fehler?.slice(0, 300) ?? null,
+  ])
+}
+
+/** Letzter Lauf je Agent. */
+export async function letzteLaeufe(): Promise<Record<string, Lauf>> {
+  const q = await assistentDb()
+  if (!q) return {}
+  const rows = (await q(
+    `SELECT DISTINCT ON (agent) agent, ergebnis, anzahl, fehler, created_at FROM assistent_laeufe ORDER BY agent, created_at DESC`,
+    [],
+  )) as { agent: string; ergebnis: string; anzahl: number; fehler: string | null; created_at: string | Date }[]
+  return Object.fromEntries(
+    rows.map((r) => [r.agent, { agent: r.agent, ergebnis: r.ergebnis, anzahl: r.anzahl, fehler: r.fehler, zeit: new Date(r.created_at).toISOString() }]),
+  )
 }
 
 export async function ladeFreigaben(): Promise<Freigabe[]> {
   const q = await assistentDb()
   if (!q) return []
   const rows = (await q(
-    `SELECT id, art, titel, inhalt, empfaenger, betreff, status, created_at FROM assistent_freigaben
+    `SELECT id, art, titel, inhalt, empfaenger, betreff, status, agent, created_at FROM assistent_freigaben
      WHERE status = 'offen' OR erledigt_at > now() - interval '3 days'
      ORDER BY (status = 'offen') DESC, created_at DESC LIMIT 50`,
     [],
