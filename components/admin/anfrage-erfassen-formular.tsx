@@ -26,12 +26,15 @@ export function AnfrageErfassenFormular({
   quellen,
   rollen,
   sprache,
+  vorbelegung,
   t,
 }: {
   idempotenz: string
   quellen: { wert: string; name: string }[]
   rollen: { wert: string; name: string }[]
   sprache: string
+  /** Aus einem Link (z. B. Messen) vorbefüllt; eigene Eingaben nach einem Fehler haben Vorrang. */
+  vorbelegung?: { quelle?: string; nachricht?: string }
   /* Nur Zeichenketten: Textfunktionen lassen sich nicht an eine Client-Komponente übergeben. */
   t: ErfassenTexte
 }) {
@@ -62,7 +65,7 @@ export function AnfrageErfassenFormular({
       ) : null}
 
       <AdminField label={t.erfassen.quelle} htmlFor="quelle">
-        <AdminSelect id="quelle" name="quelle" defaultValue={w.quelle || "telefon"}>
+        <AdminSelect id="quelle" name="quelle" defaultValue={w.quelle || vorbelegung?.quelle || "telefon"}>
           {quellen.map((q) => (
             <option key={q.wert} value={q.wert}>
               {q.name}
@@ -122,7 +125,7 @@ export function AnfrageErfassenFormular({
         <textarea
           id="nachricht"
           name="nachricht"
-          defaultValue={w.nachricht}
+          defaultValue={w.nachricht ?? vorbelegung?.nachricht}
           rows={5}
           aria-describedby="nachricht-hinweis"
           className="border-line bg-background focus-visible:ring-gold w-full rounded-sm border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"

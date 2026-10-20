@@ -22,7 +22,8 @@ export async function generateMetadata() {
   return { title: t.erfassen.titel }
 }
 
-export default async function AnfrageErfassen() {
+export default async function AnfrageErfassen({ searchParams }: { searchParams: Promise<{ quelle?: string; messe?: string }> }) {
+  const sp = await searchParams
   const { t, sprache } = await adminSprachKontext()
   const verfuegbar = leadStoreConfigured()
   return (
@@ -34,6 +35,10 @@ export default async function AnfrageErfassen() {
         <AnfrageErfassenFormular
           idempotenz={randomUUID()}
           sprache={sprache}
+          vorbelegung={{
+            quelle: (MANUELLE_QUELLEN as readonly string[]).includes(sp.quelle ?? "") ? sp.quelle : undefined,
+            nachricht: sp.messe ? `Kontakt auf der Messe: ${sp.messe.slice(0, 200)}` : undefined,
+          }}
           quellen={MANUELLE_QUELLEN.map((q) => ({ wert: q, name: t.begriffe.quelle[q] ?? q }))}
           rollen={ROLLEN_KEYS.map((r) => ({ wert: r, name: t.begriffe.rolle[r] ?? r }))}
           t={{
