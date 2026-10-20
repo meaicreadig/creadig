@@ -1,6 +1,7 @@
 import "server-only"
 
 import { neonAbfrage, type Abfrage } from "@/lib/neon-abfrage"
+import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 
 /** Legt sich selbst an (additiv), weil die Produktions-DATABASE_URL "Sensitive" ist. */
 const SCHEMA = [
@@ -303,6 +304,7 @@ export async function protokolliereLauf(l: { agent: string; ergebnis: string; an
     l.anzahl,
     l.fehler?.slice(0, 300) ?? null,
   ])
+  await protokolliereFaden(q, "system", "assistent", `${l.agent}${l.fehler ? " (Fehler)" : ""}`)
 }
 
 /** Letzter Lauf je Agent. */

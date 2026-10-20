@@ -14,6 +14,7 @@ import { firmenRahmen, INHABER } from "./rahmen"
 import { findeKontaktMail } from "./kontaktsuche"
 import { ergaenzeFehlendeAdressen, istMail, nachfassen } from "./versand"
 import { holeEingang } from "@/lib/eingang"
+import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 import {
   assistentDb,
   ladeFreigaben,
@@ -145,6 +146,7 @@ async function messen(): Promise<Ergebnis> {
     })
     if (id) neu++
   }
+  if (neu > 0) await protokolliereFaden(await assistentDb().catch(() => null), "messen", "assistent", `${neu} Vorbereitungspläne`)
   return { ergebnis: teil.length ? `${neu} neue Vorbereitungspläne · ${teil.length} Messen zugesagt` : "Noch keine Messe zugesagt", anzahl: neu }
 }
 
@@ -379,6 +381,7 @@ async function rat(): Promise<Ergebnis> {
     letzteLaeufe(),
     ladeRaete(2),
   ])
+  await protokolliereFaden(await assistentDb().catch(() => null), "finanz", "assistent", "Rat liest Finanzrahmen")
   if (frueher[0]?.woche === woche) return { ergebnis: "Sitzung dieser Woche hat schon getagt", anzahl: 0 }
 
   const zugesagt = Object.entries(status).filter(([, s]) => s === "teilnehmen").map(([k]) => k)

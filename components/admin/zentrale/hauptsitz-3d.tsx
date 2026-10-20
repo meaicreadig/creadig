@@ -2,11 +2,14 @@
 
 import { useEffect, useMemo, useRef } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import { ContactShadows, Environment, Html, Lightformer, OrbitControls, RoundedBox } from "@react-three/drei"
+import { ContactShadows, Environment, Html, Lightformer, OrbitControls, QuadraticBezierLine, RoundedBox } from "@react-three/drei"
 import * as THREE from "three"
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib"
 import type { Etage, Raum } from "@/lib/zentrale/hauptsitz"
 import type { Zustand } from "@/lib/zentrale/netz"
+import { useJetzt } from "./use-jetzt"
+import { agentFrisch, fadenLive, vorText, type LiveFaden } from "@/lib/zentrale/aktivitaet"
+import type { Sprache } from "@/lib/zentrale/netz-karte"
 
 /* Maße in Metern — echtes Bürogeschoss: 3,6 m Geschosshöhe, 7 m Raumbreite. */
 const H = 3.6
@@ -103,7 +106,12 @@ function Gehirn({ hoehe }: { hoehe: number }) {
   )
 }
 
-function Arbeitsplatz({ x, z, an }: { x: number; z: number; an: boolean }) {
+function Arbeitsplatz({ x, z, an, besetzt }: { x: number; z: number; an: boolean; besetzt: boolean }) {
+  const schirm = useRef<THREE.MeshStandardMaterial>(null)
+  useFrame(({ clock }) => {
+    // Puls nur bei echtem, frischem Lauf – sonst bleibt der Schirm ruhig.
+    if (schirm.current && an) schirm.current.emissiveIntensity = 0.9 + Math.sin(clock.getElapsedTime() * 2.4) * 0.35
+  })
   return (
     <group position={[x, 0, z]}>
       <mesh position={[0, 0.74, 0]} castShadow receiveShadow>
@@ -123,7 +131,8 @@ function Arbeitsplatz({ x, z, an }: { x: number; z: number; an: boolean }) {
       <mesh position={[0, 1.06, -0.234]}>
         <planeGeometry args={[0.66, 0.38]} />
         <meshStandardMaterial
-          color={an ? "#dfe7ff" : "#1b1f26"}
+          ref={schirm}
+          color={an ? "#dfe7ff" : besetzt ? "#4a5160" : "#1b1f26"}
           emissive={an ? FARBE.blau : "#000000"}
           emissiveIntensity={an ? 0.9 : 0}
           toneMapped={!an}
@@ -156,20 +165,29 @@ function RaumModell({
   gewaehlt,
   zeigeLabel,
   onWahl,
+  jetzt,
+  innen,
+  sprache,
 }: {
   raum: Raum
   gewaehlt: boolean
   zeigeLabel: boolean
   onWahl: (id: string) => void
+  jetzt: number | null
+  /** Echtes Ereignis innerhalb dieses Raums (Verbindung zwischen zwei Flächen derselben Abteilung) im Live-Fenster. */
+  innen: boolean
+  sprache: Sprache
 }) {
   const x = raumX(raum.spalte)
   const leer = raum.besetzung === "leer"
-  const plaetze = Math.max(raum.agenten.length, leer ? 2 : 1)
+  const plaetze = Math.max(raum.agenten.length, 1)
+  const innenLicht = useRef<THREE.MeshStandardMaterial>(null)
   const status = useRef<THREE.MeshStandardMaterial>(null)
   const warnt = raum.zustand === "achtung" || raum.zustand === "stoerung"
 
   useFrame(({ clock }) => {
     if (status.current && warnt) status.current.emissiveIntensity = 0.6 + Math.sin(clock.getElapsedTime() * 3) * 0.4
+    if (innenLicht.current && innen) innenLicht.current.emissiveIntensity = 0.7 + Math.sin(clock.getElapsedTime() * 2.4) * 0.3
   })
 
   return (
@@ -194,7 +212,20 @@ function RaumModell({
         {Array.from({ length: plaetze }).map((_, i) => {
           const reihe = Math.floor(i / 2)
           const seite = i % 2 === 0 ? -1.3 : 1.3
-          return <Arbeitsplatz key={i} x={plaetze === 1 ? 0 : seite} z={-1.2 + reihe * 2.2} an={!leer && i < raum.agenten.length} />
+          const stand = raum.agentenStand[i]
+          const an = jetzt !== null && !!stand && agentFrisch(stand, jetzt)
+          return (
+            <group key={i}>
+              <Arbeitsplatz x={plaetze === 1 ? 0 : seite} z={-1.2 + reihe * 2.2} an={an} besetzt={!!stand} />
+              {gewaehlt && stand && (
+                <Html position={[plaetze === 1 ? 0 : seite, 1.7, -1.2 + reihe * 2.2]} center distanceFactor={10} zIndexRange={[10, 0]}>
+                  <span className="pointer-events-none whitespace-nowrap rounded-full bg-card/90 px-2.5 py-1 font-sans text-[11px] text-foreground shadow-sm backdrop-blur">
+                    {stand.name} · {stand.zeit && jetzt !== null ? `${sprache === "tr" ? "son aktif" : "zuletzt aktiv"} ${vorText(stand.zeit, jetzt, sprache)}` : sprache === "tr" ? "henüz çalışma yok" : "noch kein Lauf erfasst"}
+                  </span>
+                </Html>
+              )}
+            </group>
+          )
         })}
         {!leer && (
           <mesh position={[RAUM_B / 2 - 0.9, 0.55, 2.6]} castShadow>
@@ -203,6 +234,13 @@ function RaumModell({
           </mesh>
         )}
       </group>
+
+      {innen && (
+        <mesh position={[0, PLATTE + 0.02, 0.6]}>
+          <boxGeometry args={[RAUM_B - 0.2, 0.02, TIEFE - 2.8]} />
+          <meshStandardMaterial ref={innenLicht} color={FARBE.blau} emissive={FARBE.blau} emissiveIntensity={0.8} transparent opacity={0.18} toneMapped={false} />
+        </mesh>
+      )}
 
       <mesh position={[0, H - 0.08, 0.6]}>
         <boxGeometry args={[RAUM_B * 0.55, 0.04, 1.2]} />
@@ -267,12 +305,18 @@ function Geschoss({
   fokus,
   onRaum,
   onEtage,
+  jetzt,
+  innenRaeume,
+  sprache,
 }: {
   etage: Etage
   raeume: Raum[]
   fokus: Fokus
   onRaum: (id: string) => void
   onEtage: (i: number) => void
+  jetzt: number | null
+  innenRaeume: Set<string>
+  sprache: Sprache
 }) {
   const gruppe = useRef<THREE.Group>(null)
   const basisY = etage.index * H
@@ -334,6 +378,9 @@ function Geschoss({
           gewaehlt={fokus.raum === r.id}
           zeigeLabel={imFokus && fokus.raum === null}
           onWahl={onRaum}
+          jetzt={jetzt}
+          innen={innenRaeume.has(r.id)}
+          sprache={sprache}
         />
       ))}
 
@@ -350,6 +397,53 @@ function Geschoss({
           </button>
         </Html>
     </group>
+  )
+}
+
+/** Eine Linie zwischen zwei Abteilungs-Gebäuden – nur gerendert, solange das echte Ereignis im Live-Fenster liegt. */
+function Verbindung({ von, nach }: { von: THREE.Vector3; nach: THREE.Vector3 }) {
+  const linie = useRef<{ material: { dashOffset: number } } | null>(null)
+  const mitte = useMemo(() => {
+    const m = von.clone().add(nach).multiplyScalar(0.5)
+    m.z += 2.5 + von.distanceTo(nach) * 0.15
+    return m
+  }, [von, nach])
+  useFrame((_, dt) => {
+    if (linie.current) linie.current.material.dashOffset -= dt * 1.2
+  })
+  return (
+    <QuadraticBezierLine
+      ref={linie as never}
+      start={von}
+      end={nach}
+      mid={mitte}
+      color={FARBE.blau}
+      lineWidth={3}
+      dashed
+      dashScale={4}
+      dashSize={1}
+      gapSize={0.6}
+      transparent
+      opacity={0.9}
+    />
+  )
+}
+
+function Verbindungen({ faeden, raeume, fokus, jetzt }: { faeden: LiveFaden[]; raeume: Raum[]; fokus: Fokus; jetzt: number | null }) {
+  if (jetzt === null) return null
+  const sichtbar = faeden.filter((f) => f.raumVon !== f.raumNach && fadenLive(f.zeit, jetzt))
+  return (
+    <>
+      {sichtbar.map((f) => {
+        const a = raeume.find((r) => r.id === f.raumVon)
+        const b = raeume.find((r) => r.id === f.raumNach)
+        if (!a || !b) return null
+        // Angehobene Geschosse (über dem Fokus) bewegen sich – dort wäre die Linie falsch verankert.
+        if (fokus.etage !== null && (a.etage > fokus.etage || b.etage > fokus.etage)) return null
+        const punkt = (r: Raum) => new THREE.Vector3(raumX(r.spalte), r.etage * H + H / 2 + PLATTE / 2, TIEFE / 2 + 0.3)
+        return <Verbindung key={`${f.von}>${f.nach}`} von={punkt(a)} nach={punkt(b)} />
+      })}
+    </>
   )
 }
 
@@ -416,6 +510,8 @@ export default function Hauptsitz3D({
   onRaum,
   onEtage,
   onLeer,
+  faeden,
+  sprache,
 }: {
   etagen: Etage[]
   raeume: Raum[]
@@ -423,8 +519,15 @@ export default function Hauptsitz3D({
   onRaum: (id: string) => void
   onEtage: (i: number) => void
   onLeer: () => void
+  faeden: LiveFaden[]
+  sprache: Sprache
 }) {
   const hoehe = etagen.length * H
+  const jetzt = useJetzt()
+  const innenRaeume = useMemo(
+    () => new Set(jetzt === null ? [] : faeden.filter((f) => f.raumVon === f.raumNach && fadenLive(f.zeit, jetzt)).map((f) => f.raumVon)),
+    [faeden, jetzt],
+  )
   return (
     <Canvas
       shadows
@@ -464,8 +567,12 @@ export default function Hauptsitz3D({
           fokus={fokus}
           onRaum={onRaum}
           onEtage={onEtage}
+          jetzt={jetzt}
+          innenRaeume={innenRaeume}
+          sprache={sprache}
         />
       ))}
+      <Verbindungen faeden={faeden} raeume={raeume} fokus={fokus} jetzt={jetzt} />
       <Dach y={hoehe} angehoben={fokus.etage !== null} />
       <ContactShadows position={[0, 0.01, 0]} opacity={0.35} scale={60} blur={2.4} far={20} />
 

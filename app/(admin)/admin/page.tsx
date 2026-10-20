@@ -21,6 +21,7 @@ import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
 import { Hauptsitz } from "@/components/admin/zentrale/hauptsitz"
 import { ladeNetz } from "@/lib/zentrale/netz"
 import { bauHauptsitz } from "@/lib/zentrale/hauptsitz"
+import { ladeLive } from "@/lib/zentrale/live"
 
 /**
  * ÜBERSICHT — die Startseite des Admin (ADM-01, 17.09.2026).
@@ -88,8 +89,11 @@ export default async function Uebersicht() {
     cookies().then((c) => verifySession(c.get(ADMIN_COOKIE)?.value)),
   ])
   const netzSprache = sprache === "tr" ? "tr" : "de"
-  const netz = await ladeNetz({ sprache: netzSprache, board, cockpit, truppe, owner: session?.rolle === "owner" })
-  const hauptsitz = bauHauptsitz(netz, netzSprache, session?.rolle === "owner")
+  const [netz, live] = await Promise.all([
+    ladeNetz({ sprache: netzSprache, board, cockpit, truppe, owner: session?.rolle === "owner" }),
+    ladeLive(),
+  ])
+  const hauptsitz = bauHauptsitz(netz, netzSprache, session?.rolle === "owner", live)
   if (cockpit.linksOffen?.some((x) => !x.entwurf)) {
     after(() => bereiteNachfassVor().catch((e) => console.error("[nachfass]", e instanceof Error ? e.message : e)))
     after(() =>
@@ -118,7 +122,7 @@ export default async function Uebersicht() {
   return (
     <AdminShell title={t.uebersicht.titel} meta={<span className="block">{t.uebersicht.stand(stand)}</span>}>
       {/* ── 0 · Die Zentrale: jede Fläche als Knoten am Gehirn, live ── */}
-      <Hauptsitz etagen={hauptsitz.etagen} raeume={hauptsitz.raeume} sprache={netzSprache} />
+      <Hauptsitz etagen={hauptsitz.etagen} raeume={hauptsitz.raeume} faeden={hauptsitz.faeden} sprache={netzSprache} />
 
       <div className="mt-10">
         <Suspense fallback={<MorgenAssistentLaedt sprache={netzSprache} />}>

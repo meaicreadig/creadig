@@ -4,7 +4,8 @@
  * was Szene und Seitenpanel zeigen. Etage 0 = Erdgeschoss (Fundament), 4 = Leitung.
  */
 import { ABTEILUNGEN, BEREICHE, type BereichId, type Besetzung } from "@/lib/zentrale/abteilungen"
-import { KNOTEN, type KnotenId, type Sprache } from "@/lib/zentrale/netz-karte"
+import type { AgentStand, LiveDaten, LiveFaden } from "@/lib/zentrale/aktivitaet"
+import { FAEDEN, KNOTEN, type KnotenId, type Sprache } from "@/lib/zentrale/netz-karte"
 import type { NetzLage, Zustand } from "@/lib/zentrale/netz"
 
 export const ETAGEN_FOLGE: BereichId[] = ["verwaltung", "betrieb", "technik", "markt", "leitung"]
@@ -34,12 +35,19 @@ export type Raum = {
   zeile: string
   punkte: string[]
   agenten: string[]
+  /** Pro zugeordnetem Agenten der echte letzte Lauf (zeit null = nie einer erfasst). */
+  agentenStand: AgentStand[]
   wege: { label: string; href: string }[]
 }
 
 export type Etage = { index: number; bereich: BereichId; name: string; zustand: Zustand }
 
-export function bauHauptsitz(netz: NetzLage, sprache: Sprache, istOwner: boolean): { etagen: Etage[]; raeume: Raum[] } {
+export function bauHauptsitz(
+  netz: NetzLage,
+  sprache: Sprache,
+  istOwner: boolean,
+  live?: LiveDaten,
+): { etagen: Etage[]; raeume: Raum[]; faeden: LiveFaden[] } {
   const erlaubt = new Set(KNOTEN.filter((k) => !k.nurOwner || istOwner).map((k) => k.id))
   const raeume: Raum[] = []
 
@@ -69,6 +77,13 @@ export function bauHauptsitz(netz: NetzLage, sprache: Sprache, istOwner: boolean
             : sprache === "tr" ? "Henüz ölçülen bir alan yok." : "Noch keine gemessene Fläche."),
         punkte: signale.flatMap((s) => s.punkte).slice(0, 4),
         agenten: a.agenten.map((g) => AGENT_NAMEN[g]?.[sprache] ?? g),
+        agentenStand: a.agenten.map((g) => ({
+          id: g,
+          name: AGENT_NAMEN[g]?.[sprache] ?? g,
+          takt: live?.takte[g] ?? null,
+          zeit: live?.laeufe[g]?.zeit ?? null,
+          fehler: live?.laeufe[g]?.fehler ?? false,
+        })),
         wege: [...wege, ...signale.flatMap((s) => s.wege)].filter((w, i, all) => all.findIndex((x) => x.href === w.href) === i).slice(0, 5),
       })
     })
@@ -83,5 +98,17 @@ export function bauHauptsitz(netz: NetzLage, sprache: Sprache, istOwner: boolean
       .reduce<Zustand>((s, r) => (RANG[r.zustand] > RANG[s] ? r.zustand : s), "ruhig"),
   }))
 
-  return { etagen, raeume }
+  // Knoten → Raum (erste Abteilung, die die Fläche führt). Eine Verbindung existiert nur mit echtem Zeitstempel.
+  const raumVon = new Map<string, string>()
+  for (const a of ABTEILUNGEN) for (const k of a.knoten) if (!raumVon.has(k)) raumVon.set(k, a.id)
+  const faeden: LiveFaden[] = []
+  for (const f of FAEDEN) {
+    const zeit = live?.faeden[`${f.von}>${f.nach}`]
+    const von = raumVon.get(f.von)
+    const nach = raumVon.get(f.nach)
+    if (!zeit || !von || !nach || !erlaubt.has(f.von) || !erlaubt.has(f.nach)) continue
+    faeden.push({ von: f.von, nach: f.nach, raumVon: von, raumNach: nach, was: f.was[sprache], zeit })
+  }
+
+  return { etagen, raeume, faeden }
 }
