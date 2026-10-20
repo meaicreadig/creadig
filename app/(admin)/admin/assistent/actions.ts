@@ -7,8 +7,13 @@ import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
 import { antworte } from "@/lib/assistent/agent"
 import { AGENT_KEYS, fuehreAgentAus, type AgentKey } from "@/lib/assistent/truppe"
+import { veroeffentliche } from "@/lib/assistent/linkedin"
 import {
+  aendereInhalt,
   beantworteRat,
+  ergaenzeExtra,
+  ladeFreigabe,
+  ladeLinkedin,
   fragenHeute,
   ladeVerlauf,
   setzeFreigabe,
@@ -69,6 +74,28 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
   const id = form.get("id")
   const status = form.get("status")
   if (typeof id !== "string" || (status !== "freigegeben" && status !== "verworfen")) return
-  await setzeFreigabe(id.slice(0, 80), status)
+  const fid = id.slice(0, 80)
+  const f = await ladeFreigabe(fid)
+  if (!f || f.status !== "offen") return
+
+  const titel = form.get("titel")
+  const inhalt = form.get("inhalt")
+  if (status === "freigegeben" && typeof titel === "string" && typeof inhalt === "string" && inhalt.trim()) {
+    await aendereInhalt(fid, titel.trim() || f.titel, inhalt.trim())
+  }
+
+  if (status === "freigegeben" && f.art === "linkedin" && (await ladeLinkedin())) {
+    const text = typeof inhalt === "string" && inhalt.trim() ? inhalt.trim() : f.inhalt
+    try {
+      const postUrn = await veroeffentliche({ text, bildPfad: f.bildPfad, alt: f.extra.alt })
+      await ergaenzeExtra(fid, { postUrn, fehler: undefined })
+    } catch (e) {
+      console.error("[linkedin] post", e)
+      await ergaenzeExtra(fid, { fehler: e instanceof Error ? e.message.slice(0, 200) : "Veröffentlichung fehlgeschlagen" })
+      revalidatePath("/admin/assistent")
+      return
+    }
+  }
+  await setzeFreigabe(fid, status)
   revalidatePath("/admin/assistent")
 }
