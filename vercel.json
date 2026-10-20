@@ -6,6 +6,10 @@
   "cleanUrls": true,
   "crons": [
     {
+      "path": "/api/messen/radar",
+      "schedule": "0 5 * * 1"
+    },
+    {
       "path": "/api/selftest",
       "schedule": "0 7 * * *"
     },

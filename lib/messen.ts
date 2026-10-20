@@ -8,7 +8,9 @@ export const MESSE_KATEGORIEN = {
   glasfaser: "Glasfaser, Telekom & Tiefbau",
   digital: "Digitale Produkte & IT",
   druck: "3D-Druck & Industrie",
-  handel: "E-Commerce, Handel & Gastro",
+  handel: "E-Commerce, Handel & Digitale Gastro",
+  aussenhandel: "Außenhandel & China",
+  quran: "Koran, Bildung & Islamische Medien",
   franchise: "Franchise & Gründung",
   moebel: "Möbel & Wohnen",
   mode: "Mode & Textil",
@@ -19,6 +21,7 @@ export type MesseKategorie = keyof typeof MESSE_KATEGORIEN
 export const MESSE_REGIONEN = {
   dach: "DACH",
   tr: "Türkei",
+  golf: "Golfstaaten",
   eu: "Europa",
   welt: "Weitere Märkte",
 } as const
@@ -46,8 +49,8 @@ export type Messe = {
 
 export const MESSEN: readonly Messe[] = [
   // Glasfaser, Telekom & Tiefbau
-  { name: "ANGA COM", ort: "Köln", land: "DE", region: "dach", kategorie: "glasfaser", monat: 6, rhythmus: 1, url: "https://www.anga-com.com", nutzen: "Leitmesse Breitband & Glasfaser — Netzbetreiber, GU, Tiefbau. Beste Bühne für fibero.", empfehlung: "ausstellen" },
-  { name: "FIBERDAYS", ort: "Wiesbaden", land: "DE", region: "dach", kategorie: "glasfaser", monat: 5, rhythmus: 1, url: "https://www.fiberdays.de", nutzen: "BREKO-Glasfasermesse — Ausbauer und Montagefirmen, direkte fibero-Zielgruppe.", empfehlung: "ausstellen" },
+  { name: "ANGA COM", ort: "Köln", land: "DE", region: "dach", kategorie: "glasfaser", monat: 6, rhythmus: 1, url: "https://www.anga-com.com", nutzen: "Leitmesse Breitband & Glasfaser — Netzbetreiber, GU, Tiefbau. Beste Bühne für fibero.", empfehlung: "beobachten" },
+  { name: "FIBERDAYS", ort: "Wiesbaden", land: "DE", region: "dach", kategorie: "glasfaser", monat: 5, rhythmus: 1, url: "https://www.fiberdays.de", nutzen: "BREKO-Glasfasermesse — Ausbauer und Montagefirmen, direkte fibero-Zielgruppe.", empfehlung: "beobachten" },
   { name: "FTTH Conference", ort: "wechselnd", land: "EU", region: "eu", kategorie: "glasfaser", monat: 5, rhythmus: 1, url: "https://www.ftthconference.eu", nutzen: "Europäischer FTTH-Kongress — Kontakte zu Ausbauern in ganz Europa.", empfehlung: "besuchen" },
   { name: "Broadband World Forum", ort: "Amsterdam", land: "NL", region: "eu", kategorie: "glasfaser", monat: 10, rhythmus: 1, url: "https://broadband-forum.com", nutzen: "Breitband-Strategie Europa — Netzbetreiber und Investoren.", empfehlung: "beobachten" },
   { name: "bauma", ort: "München", land: "DE", region: "dach", kategorie: "glasfaser", monat: 4, rhythmus: 3, referenzJahr: 2025, url: "https://bauma.de", nutzen: "Weltleitmesse Bau & Tiefbau — Tiefbaufirmen im Glasfaserausbau, Kunden für fibero.", empfehlung: "besuchen" },
@@ -73,7 +76,7 @@ export const MESSEN: readonly Messe[] = [
   { name: "GITEX Global", ort: "Dubai", land: "AE", region: "welt", kategorie: "digital", monat: 10, rhythmus: 1, url: "https://www.gitex.com", nutzen: "Tech-Leitmesse Golfstaaten — Einstieg für die Golf-Vision.", empfehlung: "beobachten" },
 
   // 3D-Druck & Industrie
-  { name: "EXPO 3D İstanbul", ort: "Istanbul (İFM)", land: "TR", region: "tr", kategorie: "druck", monat: 9, rhythmus: 1, termin: { von: "2027-09-30", bis: "2027-10-02" }, url: "https://www.expo3d.com.tr", nutzen: "3D-Druck-Messe der Türkei — Drucker, Material, Lieferanten und Kunden direkt vor Ort.", empfehlung: "besuchen" },
+  { name: "EXPO 3D İstanbul", ort: "Istanbul (İFM)", land: "TR", region: "tr", kategorie: "druck", monat: 9, rhythmus: 1, termin: { von: "2027-09-30", bis: "2027-10-02" }, url: "https://www.expo3d.com.tr", nutzen: "3D-Druck-Messe der T��rkei — Drucker, Material, Lieferanten und Kunden direkt vor Ort.", empfehlung: "besuchen" },
   { name: "Formnext", ort: "Frankfurt am Main", land: "DE", region: "dach", kategorie: "druck", monat: 11, rhythmus: 1, url: "https://formnext.mesago.com", nutzen: "Weltleitmesse Additive Fertigung — Lieferanten, Kunden, Trends.", empfehlung: "besuchen" },
   { name: "Rapid.Tech 3D", ort: "Erfurt", land: "DE", region: "dach", kategorie: "druck", monat: 5, rhythmus: 1, url: "https://www.rapidtech-3d.de", nutzen: "Anwendertagung 3D-Druck — kleiner, gut für erste Kontakte.", empfehlung: "besuchen" },
   { name: "AMB", ort: "Stuttgart", land: "DE", region: "dach", kategorie: "druck", monat: 9, rhythmus: 2, referenzJahr: 2026, url: "https://www.messe-stuttgart.de/amb", nutzen: "Metallbearbeitung inkl. Additiv — Industrie-Mittelstand Süddeutschland.", empfehlung: "beobachten" },
@@ -93,7 +96,7 @@ export const MESSEN: readonly Messe[] = [
   { name: "EuroShop", ort: "Düsseldorf", land: "DE", region: "dach", kategorie: "handel", monat: 2, rhythmus: 3, referenzJahr: 2026, url: "https://www.euroshop.de", nutzen: "Weltleitmesse Retail — Ladentechnik, Kassensysteme, Treue (stammo).", empfehlung: "besuchen" },
   { name: "Paris Retail Week", ort: "Paris", land: "FR", region: "eu", kategorie: "handel", monat: 9, rhythmus: 1, url: "https://www.parisretailweek.com", nutzen: "Handel & E-Commerce Frankreich — stammo-Partner im FR-Markt.", empfehlung: "beobachten" },
   { name: "World Food Istanbul", ort: "Istanbul", land: "TR", region: "tr", kategorie: "handel", monat: 9, rhythmus: 1, url: "https://www.worldfood-istanbul.com", nutzen: "Lebensmittel-Messe Türkei — Gastro- und Handelskontakte.", empfehlung: "beobachten" },
-  { name: "Gulfood", ort: "Dubai", land: "AE", region: "welt", kategorie: "handel", monat: 2, rhythmus: 1, url: "https://www.gulfood.com", nutzen: "Größte Food-Messe der Welt (helal) — Golfmarkt und Gastro-Ketten.", empfehlung: "beobachten" },
+  { name: "Gulfood", ort: "Dubai", land: "AE", region: "golf", kategorie: "handel", monat: 2, rhythmus: 1, url: "https://www.gulfood.com", nutzen: "Größte Food-Messe der Welt (helal) — Golfmarkt und Gastro-Ketten.", empfehlung: "beobachten" },
 
   // Franchise & Gründung
   { name: "Franchise Expo Germany", ort: "Frankfurt (Messe, The Forum)", land: "DE", region: "dach", kategorie: "franchise", monat: 11, rhythmus: 1, termin: { von: "2026-11-06", bis: "2026-11-07" }, url: "https://franchiseexpogermany.com", nutzen: "Franchise-Systeme und Gründer — stammo für Ketten (wie Vegitat), neue Systempartner.", empfehlung: "besuchen" },
@@ -119,18 +122,37 @@ export const MESSEN: readonly Messe[] = [
   // Wirtschaft, Helal & Netzwerk
   { name: "Helal Expo / World Halal Summit", ort: "Istanbul (İFM)", land: "TR", region: "tr", kategorie: "netzwerk", monat: 11, rhythmus: 1, termin: { von: "2026-11-25", bis: "2026-11-28" }, url: "https://www.helalexpo.com.tr", nutzen: "Helal-Wirtschaft weltweit — Golfstaaten, Lebensmittel, Handel; Netzwerk für Gastro und Export.", empfehlung: "besuchen" },
   { name: "MÜSİAD EXPO", ort: "Istanbul (İFM)", land: "TR", region: "tr", kategorie: "netzwerk", monat: 9, rhythmus: 2, referenzJahr: 2026, url: "https://www.musiadexpo.org", nutzen: "Größte Unternehmermesse der Türkei — Firmen aus über 100 Ländern, Golf- und Export-Kontakte.", empfehlung: "ausstellen" },
+
+  // Außenhandel & China (ohne Reise nach China)
+  { name: "China Homelife Türkiye", ort: "Istanbul", land: "TR", region: "tr", kategorie: "aussenhandel", monat: 6, rhythmus: 1, url: "https://www.meorient.com", nutzen: "Chinesische Hersteller stellen in Istanbul aus — Einkauf und Partner ohne Reise nach China.", empfehlung: "besuchen" },
+  { name: "Canton Fair Europe-Partnertage", ort: "wechselnd (Europa)", land: "EU", region: "eu", kategorie: "aussenhandel", monat: 6, rhythmus: 1, url: "https://www.cantonfair.org.cn/en-US", nutzen: "Vertreter der Canton Fair in Europa — Zugang zu China-Lieferanten vor Ort.", empfehlung: "beobachten" },
+
+  // Golfstaaten: Digital, Koran & Bildung
+  { name: "LEAP", ort: "Riad (Malham)", land: "SA", region: "golf", kategorie: "digital", monat: 2, rhythmus: 1, url: "https://onegiantleap.com", nutzen: "Größte Tech-Messe Saudi-Arabiens — Investoren und Käufer für digitale Produkte im Golf.", empfehlung: "besuchen" },
+  { name: "Riyadh International Book Fair", ort: "Riad", land: "SA", region: "golf", kategorie: "quran", monat: 10, rhythmus: 1, url: "https://literature.moc.gov.sa", nutzen: "Größte Buchmesse am Golf — Verlage für Koran, Tafsir und islamische Bildung, digitale Formate.", empfehlung: "besuchen" },
+  { name: "Sharjah International Book Fair", ort: "Sharjah (Expo Centre)", land: "AE", region: "golf", kategorie: "quran", monat: 11, rhythmus: 1, url: "https://www.sibf.com", nutzen: "Eine der größten Buchmessen der Welt — Koran-Verlage, Bildungsträger, digitale Lernprodukte.", empfehlung: "besuchen" },
 ]
+
+/** Stabiler Schlüssel für Status und Vorschläge. */
+export function messeKey(name: string): string {
+  return name
+    .toLocaleLowerCase("de")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+}
 
 export type MesseTermin = Messe & { jahr: number; monateBis: number; bestaetigt: boolean }
 
 const MONATE_KURZ = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"]
 
-export function naechsteTermine(heute = new Date()): MesseTermin[] {
+export function naechsteTermine<T extends Messe>(heute = new Date(), liste: readonly T[] = MESSEN as readonly T[]): (T & MesseTermin)[] {
   const jahr = heute.getFullYear()
   const monat = heute.getMonth() + 1
   const heuteIso = heute.toISOString().slice(0, 10)
 
-  return MESSEN.map((m) => {
+  return liste.map((m) => {
     if (m.termin && m.termin.bis >= heuteIso) {
       const j = Number(m.termin.von.slice(0, 4))
       const mo = Number(m.termin.von.slice(5, 7))
