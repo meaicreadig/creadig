@@ -84,10 +84,11 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
     await aendereInhalt(fid, titel.trim() || f.titel, inhalt.trim())
   }
 
-  if (status === "freigegeben" && f.art === "linkedin" && (await ladeLinkedin())) {
+  const kanal = form.get("ziel") === "firma" ? "firma" : "inhaber"
+  if (status === "freigegeben" && f.art === "linkedin" && (await ladeLinkedin(kanal))) {
     const text = typeof inhalt === "string" && inhalt.trim() ? inhalt.trim() : f.inhalt
     try {
-      const postUrn = await veroeffentliche({ text, bildPfad: f.bildPfad, alt: f.extra.alt })
+      const postUrn = await veroeffentliche({ text, bildPfad: f.bildPfad, alt: f.extra.alt, kanal })
       await ergaenzeExtra(fid, { postUrn, fehler: undefined })
     } catch (e) {
       console.error("[linkedin] post", e)

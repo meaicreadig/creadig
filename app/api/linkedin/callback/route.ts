@@ -17,9 +17,10 @@ export async function GET(req: NextRequest) {
 
   let ergebnis = "abgebrochen"
   if (code && state && erwartet && state === erwartet) {
+    const kanal = state.startsWith("firma.") ? "firma" : "inhaber"
     try {
-      await verbindeMitCode(code, req.nextUrl.origin)
-      ergebnis = "verbunden"
+      await verbindeMitCode(code, req.nextUrl.origin, kanal)
+      ergebnis = kanal === "firma" ? "firma-verbunden" : "verbunden"
     } catch (e) {
       console.error("[linkedin]", e)
       ergebnis = "fehler"

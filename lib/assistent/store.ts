@@ -213,26 +213,35 @@ export async function letzteArtikel(limit = 10): Promise<{ titel: string; status
 
 export type LinkedinVerbindung = { accessToken: string; personUrn: string; name: string | null; ablauf: string }
 
-export async function ladeLinkedin(): Promise<LinkedinVerbindung | null> {
+/** "inhaber" = persönliches Profil, "firma" = creaDIG-Firmenseite (zweite LinkedIn-App). personUrn trägt dann die Organisations-URN. */
+export type LinkedinKanal = "inhaber" | "firma"
+
+export async function ladeLinkedin(kanal: LinkedinKanal = "inhaber"): Promise<LinkedinVerbindung | null> {
   const q = await assistentDb()
   if (!q) return null
   const rows = (await q(
-    `SELECT access_token, person_urn, name, expires_at FROM assistent_linkedin WHERE id = 'inhaber' AND expires_at > now()`,
-    [],
+    `SELECT access_token, person_urn, name, expires_at FROM assistent_linkedin WHERE id = $1 AND expires_at > now()`,
+    [kanal],
   )) as { access_token: string; person_urn: string; name: string | null; expires_at: string | Date }[]
   const r = rows[0]
   return r ? { accessToken: r.access_token, personUrn: r.person_urn, name: r.name, ablauf: new Date(r.expires_at).toISOString() } : null
 }
 
-export async function speichereLinkedin(v: { accessToken: string; personUrn: string; name: string | null; gueltigSek: number }) {
+export async function speichereLinkedin(v: {
+  kanal: LinkedinKanal
+  accessToken: string
+  personUrn: string
+  name: string | null
+  gueltigSek: number
+}) {
   const q = await assistentDb()
   if (!q) throw new Error("Datenbank nicht verfügbar")
   await q(
     `INSERT INTO assistent_linkedin (id, access_token, person_urn, name, expires_at)
-     VALUES ('inhaber', $1, $2, $3, now() + make_interval(secs => $4))
+     VALUES ($5, $1, $2, $3, now() + make_interval(secs => $4))
      ON CONFLICT (id) DO UPDATE SET access_token = EXCLUDED.access_token, person_urn = EXCLUDED.person_urn,
        name = EXCLUDED.name, expires_at = EXCLUDED.expires_at, updated_at = now()`,
-    [v.accessToken, v.personUrn, v.name, v.gueltigSek],
+    [v.accessToken, v.personUrn, v.name, v.gueltigSek, v.kanal],
   )
 }
 
