@@ -6,12 +6,22 @@ import { collectAttention } from "@/lib/attention"
 import { MESSEN, messeKey, type Messe } from "@/lib/messen"
 import { ladeStatus, ladeVorschlaege } from "@/lib/messen-radar"
 import { getVertriebStore } from "@/lib/lead-store"
-import { ladeVerkaufslage } from "@/lib/verkaufen"
+import { ladeVerkaufslage, MONATSZIEL_EUR as MONATSZIEL } from "@/lib/verkaufen"
 import { erstelleEntwurf, ladeEntwuerfe } from "@/lib/verkaufen-entwurf"
 
-import { legeFreigabeAn, letzteLaeufe, protokolliereLauf, quelleBekannt } from "./store"
+import { firmenRahmen, INHABER } from "./rahmen"
+import {
+  ladeFreigaben,
+  ladeRaete,
+  legeFreigabeAn,
+  letzteLaeufe,
+  protokolliereLauf,
+  quelleBekannt,
+  speichereRat,
+  type RatProtokoll,
+} from "./store"
 
-export const AGENT_KEYS = ["lage", "vertrieb", "messen", "kapital", "redaktion"] as const
+export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "redaktion"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
 
 export type AgentInfo = {
@@ -23,6 +33,8 @@ export type AgentInfo = {
 }
 
 export const AGENTEN: AgentInfo[] = [
+  { key: "rat", name: "Geschäftsleitung", aufgabe: "CEO, CFO, Vertrieb und Marketing tagen wöchentlich, prüfen gegen dein Budget und beschließen.", takt: "woechentlich", ki: true },
+  { key: "jaeger", name: "Kunden-Jäger", aufgabe: "Findet jede Woche echte Firmen für fibero, creaDIG oder stammo und schreibt die Erstmail.", takt: "woechentlich", ki: true },
   { key: "lage", name: "Lage", aufgabe: "Sammelt alles, was im System auf deine Entscheidung wartet.", takt: "taeglich", ki: false },
   { key: "vertrieb", name: "Vertrieb", aufgabe: "Findet stille oder überfällige Abschlüsse und schreibt die nächste Mail.", takt: "taeglich", ki: true },
   { key: "messen", name: "Messen", aufgabe: "Bereitet jede Messe vor, bei der du teilnimmst: Plan, Kontakte, Unterkunft.", takt: "taeglich", ki: false },
@@ -184,7 +196,134 @@ Erste Zeile = Titel, dann Leerzeile, dann Text.`,
   return { ergebnis: id ? "Neuer Artikelentwurf bereit" : "Artikel liegt schon bereit", anzahl: id ? 1 : 0 }
 }
 
-const LAEUFER: Record<AgentKey, () => Promise<Ergebnis>> = { lage, vertrieb, messen, kapital, redaktion }
+type Ziel = { firma: string; ort: string; website: string; warum: string; betreff: string; mail: string }
+
+const JAGDREVIER = [
+  {
+    produkt: "fibero",
+    suche:
+      "Glasfaser-Montagefirmen, FTTH-Tiefbau- und Spleißbetriebe (5–80 Mitarbeiter) in Niedersachsen, NRW, Bremen, Hamburg, Hessen, die als Subunternehmer für Netzbetreiber arbeiten",
+    angebot: "fibero: Aufmaß, Fotos, Hausanschlüsse und Abrechnung an einem Ort statt Excel und WhatsApp",
+  },
+  {
+    produkt: "creaDIG Web & System",
+    suche:
+      "Vereine, Verbände, Moscheegemeinden, Stiftungen und mittelständische Betriebe in Niedersachsen/NRW mit sichtbar veralteter Webseite oder ohne Online-Anmeldung/Mitgliederverwaltung",
+    angebot: "creaDIG: moderne Webseite plus System (Anmeldung, Mitglieder, Termine) aus einer Hand",
+  },
+  {
+    produkt: "stammo",
+    suche:
+      "inhabergeführte Cafés, Bäckereien, Imbisse und vegane Restaurants mit 2–6 Filialen in Deutschland, Österreich, Schweiz oder dem Elsass",
+    angebot: "stammo: Stempelkarte im Apple/Google Wallet, die Stammgäste zurückholt",
+  },
+]
+
+async function jaeger(): Promise<Ergebnis> {
+  const woche = kw(new Date())
+  const revier = JAGDREVIER[Number(woche.split("-")[1]) % JAGDREVIER.length]
+  const { text } = await generateText({
+    model: RECHERCHE,
+    prompt: `${INHABER}
+Finde 3 echte, aktuell existierende Firmen als Neukunden für ${revier.produkt}.
+Zielgruppe: ${revier.suche}.
+Nur Firmen mit eigener Webseite, die du in der Quelle gesehen hast. Keine Konzerne. Keine Erfindungen.
+Für jede Firma eine kurze Erstmail auf Deutsch (60–110 Wörter, per Sie, Absender Muhammed Emin Akyol): ein konkreter Bezug zur Firma, ein Nutzen aus "${revier.angebot}", eine kleine Frage am Ende (z. B. 15 Minuten Telefonat). Kein Werbeton.
+Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","warum":"1 Satz, warum gerade diese Firma","betreff":"","mail":""}]`,
+  })
+  const ziele = jsonListe<Ziel>(text).filter((z) => z?.firma && z?.website?.startsWith("http") && z?.mail)
+  let neu = 0
+  for (const z of ziele.slice(0, 3)) {
+    const id = await legeFreigabeAn({
+      art: "mail",
+      titel: `Neukunde ${revier.produkt}: ${z.firma} (${z.ort})`,
+      betreff: z.betreff,
+      inhalt: `${z.mail}\n\n---\nWarum diese Firma: ${z.warum}\nWebseite: ${z.website}\nE-Mail-Adresse bitte im Impressum prüfen und eintragen.`,
+      quelle: `jaeger:${z.firma.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+      agent: "jaeger",
+    })
+    if (id) neu++
+  }
+  return { ergebnis: `${neu} neue Firmen für ${revier.produkt} gefunden`, anzahl: neu }
+}
+
+async function rat(): Promise<Ergebnis> {
+  const woche = kw(new Date())
+  const [rahmen, verkauf, status, offene, laeufe, frueher] = await Promise.all([
+    firmenRahmen(),
+    ladeVerkaufslage(),
+    ladeStatus(),
+    ladeFreigaben(),
+    letzteLaeufe(),
+    ladeRaete(2),
+  ])
+  if (frueher[0]?.woche === woche) return { ergebnis: "Sitzung dieser Woche hat schon getagt", anzahl: 0 }
+
+  const zugesagt = Object.entries(status).filter(([, s]) => s === "teilnehmen").map(([k]) => k)
+  const lagebild = {
+    finanzen: rahmen.text,
+    vertrieb: {
+      monatszielEur: MONATSZIEL,
+      deals: verkauf.deals.slice(0, 8).map((d) => ({ firma: d.firma ?? d.titel, stufe: d.stufe, wertEur: d.wert, naechsterSchritt: d.naechsterSchritt, warnungen: d.warnungen })),
+    },
+    messenZugesagt: zugesagt,
+    offeneFreigaben: offene.filter((f) => f.status === "offen").map((f) => `${f.agent ?? "?"}: ${f.titel}`).slice(0, 12),
+    letzteAgentenLaeufe: Object.values(laeufe).map((l) => `${l.agent}: ${l.ergebnis}`),
+    letzteSitzung: frueher[0]
+      ? { beschluesse: frueher[0].protokoll.beschluesse.map((b) => b.was), frage: frueher[0].protokoll.frage, antwortVonEmin: frueher[0].antwort ?? "noch keine Antwort" }
+      : null,
+  }
+
+  const { text } = await generateText({
+    model: MODELL,
+    maxOutputTokens: 2500,
+    prompt: `Ihr seid die Geschäftsleitung von creaDIG Solutions und haltet die Wochensitzung KW ${woche}. Ihr behandelt die Firma als eure eigene und denkt wie Gründer, die aus wenig viel machen.
+${INHABER}
+
+Teilnehmer: CEO (Richtung, Fokus, sagt Nein zu Ablenkung), CFO (prüft jede Idee gegen das Budget unten – blockiert alles, was nicht bezahlbar ist), Vertrieb (Abschlüsse, Neukunden), Marketing (LinkedIn-Artikel, Sichtbarkeit, organisch zuerst).
+
+Lagebild (echte Daten, nichts dazuerfinden):
+${JSON.stringify(lagebild, null, 1)}
+
+Regeln:
+- Nur Beschlüsse, die mit dem Budget machbar sind. Summe kostenEur aller Beschlüsse ≤ ${rahmen.spielraumEur}. Kostenlos ist bevorzugt.
+- Was der CFO oder CEO ablehnt (z. B. Messestand, bezahlte Werbung, neues Produkt), kommt mit Grund in "verworfen".
+- Emin hat ca. 10 Stunden pro Woche für Vertrieb. Maximal 3 Beschlüsse. Jeder Beschluss konkret und in einer Woche erledigbar.
+- "wer": "truppe" = die KI-Agenten bereiten vor; "emin" = nur er kann es tun (Anruf, Termin, Unterschrift).
+- Wenn Emin letzte Woche geantwortet hat, berücksichtigt seine Antwort ausdrücklich.
+- "frage": genau eine Rückfrage an Emin, deren Antwort die nächste Sitzung besser macht.
+- Deutsch, klar, keine Floskeln.
+
+Antworte NUR mit JSON: {"lage":"2 Sätze","stimmen":[{"rolle":"CEO","sagt":""},{"rolle":"CFO","sagt":""},{"rolle":"Vertrieb","sagt":""},{"rolle":"Marketing","sagt":""}],"beschluesse":[{"was":"","warum":"","kostenEur":0,"wer":"emin"}],"verworfen":["Idee – Grund"],"frage":""}`,
+  })
+
+  const start = text.indexOf("{")
+  const ende = text.lastIndexOf("}")
+  let p: RatProtokoll | null = null
+  try {
+    p = JSON.parse(text.slice(start, ende + 1)) as RatProtokoll
+  } catch {
+    p = null
+  }
+  if (!p?.lage || !Array.isArray(p.stimmen) || !Array.isArray(p.beschluesse)) throw new Error("Sitzungsprotokoll unlesbar")
+  p.beschluesse = p.beschluesse.slice(0, 3).map((b) => ({ ...b, kostenEur: Math.max(0, Number(b.kostenEur) || 0), wer: b.wer === "truppe" ? "truppe" : "emin" }))
+  p.verworfen = Array.isArray(p.verworfen) ? p.verworfen.slice(0, 4) : []
+  if (!(await speichereRat(woche, p))) return { ergebnis: "Sitzung dieser Woche hat schon getagt", anzahl: 0 }
+
+  for (const [i, b] of p.beschluesse.entries()) {
+    if (b.wer !== "emin") continue
+    await legeFreigabeAn({
+      art: "aufgabe",
+      titel: `Beschluss: ${b.was}`.slice(0, 160),
+      inhalt: `${b.warum}\n\nKosten: ${b.kostenEur ? `${b.kostenEur} €` : "keine"}\nAus der Wochensitzung KW ${woche}.`,
+      quelle: `rat:${woche}:${i}`,
+      agent: "rat",
+    })
+  }
+  return { ergebnis: `Sitzung KW ${woche.split("-")[1]}: ${p.beschluesse.length} Beschlüsse`, anzahl: p.beschluesse.length }
+}
+
+const LAEUFER: Record<AgentKey, () => Promise<Ergebnis>> = { lage, vertrieb, messen, kapital, redaktion, jaeger, rat }
 
 export async function fuehreAgentAus(key: AgentKey): Promise<void> {
   try {

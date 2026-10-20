@@ -8,6 +8,7 @@ import {
   Check,
   ClipboardList,
   Coins,
+  Crosshair,
   Handshake,
   Mail,
   Newspaper,
@@ -15,17 +16,148 @@ import {
   Play,
   Radar,
   StickyNote,
+  Users,
   X,
 } from "lucide-react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { AssistentChat } from "@/components/admin/assistent-chat"
 import { collectAttention } from "@/lib/attention"
-import { fragenHeute, ladeFreigaben, ladeVerlauf, letzteLaeufe, TAGESLIMIT, type Freigabe, type FreigabeArt, type Lauf } from "@/lib/assistent/store"
+import {
+  fragenHeute,
+  ladeFreigaben,
+  ladeRaete,
+  ladeVerlauf,
+  letzteLaeufe,
+  TAGESLIMIT,
+  type Freigabe,
+  type FreigabeArt,
+  type Lauf,
+  type Rat,
+} from "@/lib/assistent/store"
+import { firmenRahmen, type Rahmen } from "@/lib/assistent/rahmen"
 import { AGENTEN, fuehreFaelligeAus, type AgentInfo, type AgentKey } from "@/lib/assistent/truppe"
 import { getVertriebStore } from "@/lib/lead-store"
 
-import { agentStarten, freigabeEntscheiden } from "./actions"
+import { agentStarten, freigabeEntscheiden, ratAntworten } from "./actions"
+
+const euro = (n: number) => `${Math.round(n).toLocaleString("de-DE")} €`
+
+function Sitzung({ rat, rahmen }: { rat: Rat | undefined; rahmen: Rahmen }) {
+  return (
+    <section aria-labelledby="rat-titel" className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="rat-titel" className="font-sans text-xl font-semibold text-foreground">
+          Geschäftsleitung
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Budget diese Woche: <span className="font-medium text-primary">{euro(rahmen.spielraumEur)}</span>
+          {rahmen.reichweiteMonate !== null ? ` · Reichweite ${rahmen.reichweiteMonate.toFixed(1)} Monate` : ""}
+        </p>
+      </div>
+
+      {!rat ? (
+        <div className="flex flex-col gap-3 rounded-3xl bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-pretty leading-relaxed text-muted-foreground">
+            Die erste Wochensitzung hat noch nicht getagt. CEO, CFO, Vertrieb und Marketing prüfen deine Lage gegen dein Budget und
+            beschließen höchstens drei Schritte.
+          </p>
+          <form action={agentStarten}>
+            <input type="hidden" name="agent" value="rat" />
+            <button className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90">
+              <Play className="size-4" aria-hidden="true" />
+              Sitzung jetzt einberufen
+            </button>
+          </form>
+        </div>
+      ) : (
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+          <article className="flex flex-col gap-5 rounded-3xl bg-card p-6 shadow-sm">
+            <div className="flex flex-col gap-1">
+              <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                Sitzung KW {rat.woche.split("-")[1]} · {seit(rat.zeit)}
+              </span>
+              <p className="text-pretty leading-relaxed text-foreground">{rat.protokoll.lage}</p>
+            </div>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {rat.protokoll.stimmen.map((s) => (
+                <li key={s.rolle} className="flex flex-col gap-1 rounded-2xl bg-muted/60 p-4">
+                  <span className="text-xs font-semibold text-primary">{s.rolle}</span>
+                  <p className="text-sm leading-relaxed text-foreground">{s.sagt}</p>
+                </li>
+              ))}
+            </ul>
+            {rat.protokoll.verworfen.length ? (
+              <div className="flex flex-col gap-2">
+                <span className="text-xs font-semibold text-muted-foreground">Bewusst verworfen</span>
+                <ul className="flex flex-col gap-1.5">
+                  {rat.protokoll.verworfen.map((v) => (
+                    <li key={v} className="flex gap-2 text-sm leading-relaxed text-muted-foreground">
+                      <X className="mt-1 size-3.5 shrink-0" aria-hidden="true" />
+                      {v}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </article>
+
+          <div className="flex flex-col gap-4">
+            <article className="flex flex-col gap-3 rounded-3xl bg-card p-6 shadow-sm">
+              <h3 className="font-sans text-base font-semibold text-foreground">Beschlüsse</h3>
+              <ol className="flex flex-col gap-3">
+                {rat.protokoll.beschluesse.map((b, i) => (
+                  <li key={b.was} className="flex gap-3">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                      {i + 1}
+                    </span>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-medium leading-relaxed text-foreground">{b.was}</p>
+                      <p className="text-sm leading-relaxed text-muted-foreground">{b.warum}</p>
+                      <span className="text-xs text-muted-foreground">
+                        {b.wer === "emin" ? "Du" : "Truppe bereitet vor"} · {b.kostenEur ? euro(b.kostenEur) : "kostenlos"}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </article>
+
+            <article className="flex flex-col gap-3 rounded-3xl bg-primary/5 p-6">
+              <h3 className="font-sans text-base font-semibold text-foreground">Rückfrage an dich</h3>
+              <p className="text-pretty text-sm leading-relaxed text-foreground">{rat.protokoll.frage}</p>
+              {rat.antwort ? (
+                <p className="rounded-2xl bg-card p-4 text-sm leading-relaxed text-muted-foreground">
+                  <span className="font-medium text-foreground">Deine Antwort: </span>
+                  {rat.antwort}
+                </p>
+              ) : (
+                <form action={ratAntworten} className="flex flex-col gap-2">
+                  <input type="hidden" name="id" value={rat.id} />
+                  <label htmlFor="rat-antwort" className="sr-only">
+                    Antwort an die Geschäftsleitung
+                  </label>
+                  <textarea
+                    id="rat-antwort"
+                    name="antwort"
+                    rows={3}
+                    required
+                    maxLength={2000}
+                    placeholder="Deine Antwort fließt in die nächste Sitzung ein …"
+                    className="resize-none rounded-2xl bg-card p-4 text-sm leading-relaxed text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary"
+                  />
+                  <button className="self-end rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90">
+                    Antworten
+                  </button>
+                </form>
+              )}
+            </article>
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
 
 export const metadata: Metadata = { title: "Assistent" }
 export const dynamic = "force-dynamic"
@@ -41,6 +173,8 @@ const ART: Record<FreigabeArt, { label: string; Icon: typeof Mail }> = {
 }
 
 const AGENT_ICON: Record<AgentKey, typeof Mail> = {
+  rat: Users,
+  jaeger: Crosshair,
   lage: Radar,
   vertrieb: Handshake,
   messen: CalendarRange,
@@ -166,12 +300,14 @@ function FreigabeKarte({ f }: { f: Freigabe }) {
 }
 
 export default async function AssistentPage() {
-  const [verlauf, freigaben, heute, laeufe, board] = await Promise.all([
+  const [verlauf, freigaben, heute, laeufe, board, raete, rahmen] = await Promise.all([
     ladeVerlauf(40),
     ladeFreigaben(),
     fragenHeute(),
     letzteLaeufe(),
     collectAttention(getVertriebStore()).catch(() => null),
+    ladeRaete(1).catch(() => []),
+    firmenRahmen(),
   ])
   after(() => fuehreFaelligeAus().catch(() => undefined))
 
@@ -182,6 +318,8 @@ export default async function AssistentPage() {
   return (
     <AdminShell title="Assistent" meta={<span className="block">Deine Truppe arbeitet im Hintergrund – du entscheidest</span>}>
       <div className="flex flex-col gap-10">
+        <Sitzung rat={raete[0]} rahmen={rahmen} />
+
         <section aria-labelledby="truppe-titel" className="flex flex-col gap-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 id="truppe-titel" className="font-sans text-xl font-semibold text-foreground">
@@ -189,7 +327,7 @@ export default async function AssistentPage() {
             </h2>
             <p className="text-sm text-muted-foreground">Arbeitet jeden Morgen von selbst · KI nur, wo es sich lohnt</p>
           </div>
-          <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {AGENTEN.map((a) => (
               <AgentKarte key={a.key} a={a} lauf={laeufe[a.key]} />
             ))}

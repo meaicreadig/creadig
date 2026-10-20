@@ -32,6 +32,13 @@ const SCHEMA = [
     fehler text,
     created_at timestamptz NOT NULL DEFAULT now())`,
   `CREATE INDEX IF NOT EXISTS assistent_laeufe_agent_idx ON assistent_laeufe (agent, created_at DESC)`,
+  `CREATE TABLE IF NOT EXISTS assistent_rat (
+    id text PRIMARY KEY,
+    woche text NOT NULL UNIQUE,
+    protokoll jsonb NOT NULL,
+    antwort text,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    beantwortet_at timestamptz)`,
 ]
 
 export const FREIGABE_ARTEN = ["mail", "aufgabe", "termin", "linkedin", "kapital", "notiz"] as const
@@ -176,6 +183,43 @@ export async function ladeFreigaben(): Promise<Freigabe[]> {
     [],
   )) as (Omit<Freigabe, "zeit"> & { created_at: string | Date })[]
   return rows.map(({ created_at, ...r }) => ({ ...r, zeit: new Date(created_at).toISOString() }))
+}
+
+export type RatStimme = { rolle: string; sagt: string }
+export type RatBeschluss = { was: string; warum: string; kostenEur: number; wer: "truppe" | "emin" }
+export type RatProtokoll = {
+  lage: string
+  stimmen: RatStimme[]
+  beschluesse: RatBeschluss[]
+  verworfen: string[]
+  frage: string
+}
+export type Rat = { id: string; woche: string; protokoll: RatProtokoll; antwort: string | null; zeit: string }
+
+export async function speichereRat(woche: string, protokoll: RatProtokoll): Promise<boolean> {
+  const q = await assistentDb()
+  if (!q) return false
+  const rows = (await q(
+    `INSERT INTO assistent_rat (id, woche, protokoll) VALUES ($1, $2, $3::jsonb) ON CONFLICT (woche) DO NOTHING RETURNING id`,
+    [neueId("rat"), woche, JSON.stringify(protokoll)],
+  )) as { id: string }[]
+  return rows.length > 0
+}
+
+export async function ladeRaete(limit = 3): Promise<Rat[]> {
+  const q = await assistentDb()
+  if (!q) return []
+  const rows = (await q(
+    `SELECT id, woche, protokoll, antwort, created_at FROM assistent_rat ORDER BY created_at DESC LIMIT $1`,
+    [limit],
+  )) as { id: string; woche: string; protokoll: RatProtokoll; antwort: string | null; created_at: string | Date }[]
+  return rows.map((r) => ({ id: r.id, woche: r.woche, protokoll: r.protokoll, antwort: r.antwort, zeit: new Date(r.created_at).toISOString() }))
+}
+
+export async function beantworteRat(id: string, antwort: string): Promise<void> {
+  const q = await assistentDb()
+  if (!q) throw new Error("Datenbank nicht verfügbar")
+  await q(`UPDATE assistent_rat SET antwort = $2, beantwortet_at = now() WHERE id = $1`, [id, antwort])
 }
 
 export async function setzeFreigabe(id: string, status: "freigegeben" | "verworfen"): Promise<void> {

@@ -7,7 +7,8 @@ import { morgenBriefing } from "@/lib/admin/morgen-briefing"
 import { ladeStatus, messenFuerKalender } from "@/lib/messen-radar"
 import { ladeVerkaufslage, MONATSZIEL_EUR } from "@/lib/verkaufen"
 
-import { FREIGABE_ARTEN, ladeFreigaben, legeFreigabeAn, type Nachricht } from "./store"
+import { firmenRahmen } from "./rahmen"
+import { FREIGABE_ARTEN, ladeFreigaben, ladeRaete, legeFreigabeAn, type Nachricht } from "./store"
 
 const MODELL = "openai/gpt-5.4-mini"
 
@@ -20,6 +21,8 @@ Regeln:
 - Du handelst nie selbst. Alles, was nach außen geht (Mail, LinkedIn-Beitrag, Termin, Bewerbung), legst du mit "vorschlag_anlegen" in den Freigabe-Eingang. Er gibt frei.
 - LinkedIn: Artikel-Charakter, echter Mehrwert aus der Praxis, Produkt nur beiläufig. Keine Werbesprache.
 - Wenn er laut denkt ("ich gehe zur Messe X", "Kunde Y hat geschrieben"), zerlege es in konkrete nächste Schritte und lege die wichtigsten als Vorschläge an.
+- Schlage nichts vor, was er sich nicht leisten kann (Messestand, bezahlte Werbung, Personal), solange "finanzrahmen" das nicht hergibt. Biete stattdessen die kostenlose Variante an.
+- Er ist allein. Ihr (die Truppe) seid sein Team: denkt wie Mitinhaber, sagt auch Nein, wenn etwas vom Fokus ablenkt.
 - Ende jede Antwort mit genau einem klaren nächsten Schritt.`
 
 export async function antworte(verlauf: Nachricht[]): Promise<string> {
@@ -31,6 +34,16 @@ export async function antworte(verlauf: Nachricht[]): Promise<string> {
         const l = await ladeVerkaufslage()
         return { monatszielEur: MONATSZIEL_EUR, ...l }
       },
+    }),
+    finanzrahmen: tool({
+      description: "Frei verfügbares Geld, Reichweite und Ausgaben-Spielraum. Vor JEDEM Vorschlag, der Geld kostet, aufrufen.",
+      inputSchema: z.object({}),
+      execute: async () => firmenRahmen(),
+    }),
+    geschaeftsleitung: tool({
+      description: "Letzte Wochensitzung der KI-Geschäftsleitung: Beschlüsse, verworfene Ideen, Rückfrage und Emins Antwort.",
+      inputSchema: z.object({}),
+      execute: async () => (await ladeRaete(1))[0] ?? null,
     }),
     tageslage: tool({
       description: "Heutiges Morgenbriefing des Admin: Lage und die drei wichtigsten Schritte.",
