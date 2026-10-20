@@ -169,6 +169,8 @@ export function kampagnenHtml(
     ctaHinweis?: string
     telefon?: string
     email?: string
+    /** Zeile unter dem Absendernamen, Standard "Gründer · creaDIG Solutions". */
+    rolle?: string
   },
 ): string {
   const bild: Bild = o.bildSrc ?? ((p) => `${o.siteUrl}${p}`)
@@ -224,7 +226,7 @@ ${anrede}${bloecke(k.body, bild)}${knoepfe}
 <p style="margin:0 0 22px;font-size:15px;line-height:1.6;color:${TEXT};font-family:${SCHRIFT}">${esc(o.gruss ?? "Viele Grüße")}</p>
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:22px"><tr><td>
 <p style="margin:0;font-size:19px;font-weight:800;color:${TINTE};letter-spacing:-0.2px;font-family:${TITEL}">${esc(o.absender || ABSENDER)}</p>
-<p style="margin:4px 0 0;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:${GOLD};font-weight:700;font-family:${TITEL}">Gr&uuml;nder &middot; ${FIRMA}</p>
+<p style="margin:4px 0 0;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:${GOLD};font-weight:700;font-family:${TITEL}">${o.rolle ? esc(o.rolle) : `Gr&uuml;nder &middot; ${FIRMA}`}</p>
 </td></tr></table>
 ${kontakt({ telefon: o.telefon, email: o.email, web: o.siteUrl }, bild)}
 </td></tr>
