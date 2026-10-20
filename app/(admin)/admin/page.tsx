@@ -18,9 +18,9 @@ import { ladeCockpit } from "@/lib/cockpit"
 import { zaehleOffen } from "@/lib/assistent/store"
 import { cookies } from "next/headers"
 import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
-import { ZentraleSzene } from "@/components/admin/zentrale/zentrale-szene"
+import { Hauptsitz } from "@/components/admin/zentrale/hauptsitz"
 import { ladeNetz } from "@/lib/zentrale/netz"
-import { FAEDEN, KNOTEN } from "@/lib/zentrale/netz-karte"
+import { bauHauptsitz } from "@/lib/zentrale/hauptsitz"
 
 /**
  * ÜBERSICHT — die Startseite des Admin (ADM-01, 17.09.2026).
@@ -89,7 +89,7 @@ export default async function Uebersicht() {
   ])
   const netzSprache = sprache === "tr" ? "tr" : "de"
   const netz = await ladeNetz({ sprache: netzSprache, board, cockpit, truppe })
-  const szenenKnoten = KNOTEN.filter((n) => !n.nurOwner || session.rolle === "owner").map((n) => ({ ...n, signal: netz[n.id] }))
+  const hauptsitz = bauHauptsitz(netz, netzSprache, session?.rolle === "owner")
   if (cockpit.linksOffen?.some((x) => !x.entwurf)) {
     after(() => bereiteNachfassVor().catch((e) => console.error("[nachfass]", e instanceof Error ? e.message : e)))
     after(() =>
@@ -118,7 +118,7 @@ export default async function Uebersicht() {
   return (
     <AdminShell title={t.uebersicht.titel} meta={<span className="block">{t.uebersicht.stand(stand)}</span>}>
       {/* ── 0 · Die Zentrale: jede Fläche als Knoten am Gehirn, live ── */}
-      <ZentraleSzene knoten={szenenKnoten} faeden={[...FAEDEN]} sprache={netzSprache} />
+      <Hauptsitz etagen={hauptsitz.etagen} raeume={hauptsitz.raeume} sprache={netzSprache} />
 
       <div className="mt-10">
         <Suspense fallback={<MorgenAssistentLaedt sprache={netzSprache} />}>
