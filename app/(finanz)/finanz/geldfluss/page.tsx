@@ -35,16 +35,10 @@ export default async function FinanzGeldfluss({ searchParams }: { searchParams: 
   return (
     <FinanzShell aktiv="geldfluss" titel="Geldfluss" unterzeile="Was kommt, was geht – und wie dein Konto in 13 Wochen aussieht.">
       <LiquiditaetsBand wochen={szenarien[aktiv].wochen} topfCent={topf.gesamtCent} bewegungen={szenarien[aktiv].bewegungen} szenarien={szenarien} aktiv={aktiv} basis={basis} />
-      <div className="grid gap-8 lg:grid-cols-5">
-        <div className="lg:col-span-2">
-          <BuchungErfassen heute={heute} />
-        </div>
-        <div className="lg:col-span-3">
-          <BuchungsListe buchungen={buchungen} heute={heute} />
-        </div>
-      </div>
       <BankImportKarte offeneUmsaetze={offeneUmsaetze} offeneRechnungen={offeneRechnungen} />
       <BankAusgabenKarte abbuchungen={abbuchungen} />
+      <BuchungErfassen heute={heute} />
+      <BuchungsListe buchungen={buchungen} heute={heute} />
     </FinanzShell>
   )
 }

@@ -216,7 +216,7 @@ export async function ladeBelege(db: Abfrage, suche: string | null): Promise<Bel
          FROM fin_belege WHERE geschaeftsfeld IS NULL GROUP BY 1 HAVING count(*) > 1 ORDER BY 2 DESC LIMIT 12`,
       [],
     ),
-    db(`SELECT ${SPALTEN} FROM fin_belege WHERE geschaeftsfeld IS NOT NULL ${filter} ORDER BY zugeordnet_at DESC NULLS LAST LIMIT 40`, p),
+    db(`SELECT ${SPALTEN} FROM fin_belege WHERE geschaeftsfeld IS NOT NULL ${filter} ORDER BY zugeordnet_at DESC NULLS LAST LIMIT 400`, p),
     db(
       `SELECT geschaeftsfeld AS g, count(*) AS c, coalesce(sum(brutto_cent) FILTER (WHERE NOT archiviert),0) AS b
          FROM fin_belege WHERE geschaeftsfeld IS NOT NULL GROUP BY 1`,

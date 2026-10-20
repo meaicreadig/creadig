@@ -1,6 +1,8 @@
 import { bankAusgabeBuchen, bankUmsatzIgnorieren } from "@/app/(finanz)/finanz/actions"
 import { AdminSelect } from "@/components/admin/primitives"
 import { eur, tag } from "@/components/finanz/format"
+import { Karte } from "@/components/finanz/karte"
+import { MehrListe } from "@/components/finanz/mehr-liste"
 import type { AusgehenderBankUmsatz } from "@/lib/finanz/bank-abgleich"
 import { GESCHAEFTSFELDER } from "@/lib/finanz/beleg-felder"
 import { KATEGORIEN } from "@/lib/finanz/rechnen"
@@ -12,17 +14,19 @@ import { KATEGORIEN } from "@/lib/finanz/rechnen"
  */
 export function BankAusgabenKarte({ abbuchungen }: { abbuchungen: AusgehenderBankUmsatz[] }) {
   return (
-    <div className="bg-background flex flex-col gap-4 rounded-3xl p-5">
-      <div>
-        <h2 className="text-lg font-semibold">Offene Abbuchungen</h2>
-        <p className="text-muted-foreground text-sm">Importierte Abbuchungen ohne Buchung — Kategorie wählen, als Ausgabe buchen.</p>
-      </div>
+    <Karte
+      titel="Bank: Abbuchungen"
+      untertitel="Bekannte Gegenparteien werden nach Verlauf automatisch gebucht — hier stehen nur neue."
+      zahl={String(abbuchungen.length)}
+      fuss="offen"
+      warnung={abbuchungen.length > 0}
+      offen={abbuchungen.length > 0}
+    >
       {abbuchungen.length === 0 ? (
         <p className="text-muted-foreground text-sm">Keine offene Abbuchung.</p>
       ) : (
-        <ul className="flex flex-col gap-2">
-          {abbuchungen.map((u) => (
-            <li key={u.id} className="flex flex-col gap-2 rounded-2xl border border-border/60 p-3 text-sm">
+        <MehrListe start={6} kinder={abbuchungen.map((u) => (
+            <li key={u.id} className="border-line mb-2 flex flex-col gap-2 rounded-2xl border p-3 text-sm">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-muted-foreground">
                   {tag(u.datum)} · <span className="text-foreground font-semibold tabular-nums">−{eur(u.betragCent)}</span>
@@ -59,9 +63,8 @@ export function BankAusgabenKarte({ abbuchungen }: { abbuchungen: AusgehenderBan
                 <button className="bg-primary text-primary-foreground rounded-full px-3 py-1.5 text-xs font-semibold">Als Ausgabe buchen</button>
               </form>
             </li>
-          ))}
-        </ul>
+          ))} />
       )}
-    </div>
+    </Karte>
   )
 }

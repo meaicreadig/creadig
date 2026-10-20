@@ -1085,10 +1085,10 @@ p(s_nachGlasfaser[0]?.geschaeftsfeld === "glasfaser", "S8 'glasfaser' bleibt unv
 console.log("\nT · Ziele — Fortschritt aus dem Hauptbuch, nie eine zweite Zahl")
 
 const t_ziele0 = await ladeZiele(db)
-const t_platzhalter = t_ziele0.filter((z) => z.istPlatzhalter)
+const t_platzhalter = t_ziele0.filter((z) => z.istPlatzhalter || z.titel.startsWith("Jahresziel"))
 p(["digitalprodukte", "beratung", "content"].every((s) => t_platzhalter.some((z) => z.saeule === s)),
-  "T1 je ein Platzhalter-Ziel für die drei Säulen mit Umsatzziel existiert (additiv angelegt, siehe ZIELE_SCHEMA)")
-p(t_platzhalter.every((z) => z.zielbetragCent === 0 && z.status === "aktiv"), "T2 Platzhalter tragen Betrag 0 und bleiben aktiv — sie werden nie automatisch 'erreicht'")
+  "T1 je ein Ziel für die drei Säulen existiert: Platzhalter, oder — sobald Einnahmen da sind — das automatisch hochgerechnete Jahresziel")
+p(t_platzhalter.filter((z) => z.istPlatzhalter).every((z) => z.zielbetragCent === 0 && z.status === "aktiv"), "T2 Platzhalter tragen Betrag 0 und bleiben aktiv — sie werden nie automatisch 'erreicht'")
 p(istPlatzhalterZiel("Platzhalter – vom Owner zu ersetzen") && !istPlatzhalterZiel("ABNAHME Erster Beratungskunde"),
   "T3 das Namensmuster erkennt nur echte Platzhalter, keine echten Zieltitel")
 
@@ -1440,6 +1440,15 @@ console.log("\nV · Auto-Zuordnung — Verlauf zuerst, KI nur mit Schwelle, nie 
   const r2 = await AU.ordneAllesAutomatischZu(db, false)
   p(r2.belegeVerlauf === 0, "V9 zweiter Lauf ändert nichts", JSON.stringify(r2))
   p(r.belegeVerlauf >= 1, "V10 Lauf meldet die Zahl der Zuordnungen")
+}
+
+/* ══ Q · Ziele ersetzen Platzhalter selbst ══ */
+console.log("\nQ · Jahresziel-Vorschlag")
+{
+  const { jahreszielVorschlagCent } = await import("../lib/finanz/ziele.ts")
+  p(jahreszielVorschlagCent(0, 100) === 0, "Q1 ohne Umsatz kein Vorschlag")
+  p(jahreszielVorschlagCent(1_000_000, 73) === 6_500_000 || jahreszielVorschlagCent(1_000_000, 73) === 6_250_000, "Q2 Hochrechnung aufs Jahr +25 %, auf 500 € aufgerundet", String(jahreszielVorschlagCent(1_000_000, 73)))
+  p(jahreszielVorschlagCent(1_000_000, 365) >= 1_250_000, "Q3 am Jahresende mindestens bisheriger Umsatz +25 %")
 }
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)

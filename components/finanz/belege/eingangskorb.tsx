@@ -3,6 +3,8 @@ import { FileCheck2, FileText, Paperclip } from "lucide-react"
 import { zuordnen } from "@/app/(finanz)/finanz/belege/actions"
 import { GESCHAEFTSFELDER, type Beleg, type BelegeUebersicht } from "@/lib/finanz/belege"
 import { eur, tag } from "@/components/finanz/format"
+import { Karte } from "@/components/finanz/karte"
+import { MehrListe } from "@/components/finanz/mehr-liste"
 
 const FELD_LABEL = Object.fromEntries(GESCHAEFTSFELDER.map((g) => [g.key, g.label]))
 
@@ -68,6 +70,7 @@ function BelegZeile({ b, basis, zugeordnet }: { b: Beleg; basis: string; zugeord
           <form action={zuordnen} className="flex items-center gap-2">
             <input type="hidden" name="id" value={b.id} />
             <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-semibold">
+              {b.zuordnungQuelle === "ki" ? "KI · " : b.zuordnungQuelle === "verlauf" ? "automatisch · " : ""}
               {b.geschaeftsfeld ? FELD_LABEL[b.geschaeftsfeld] : ""}
             </span>
             <button type="submit" name="feld" value="korb" className="text-muted-foreground hover:text-foreground text-xs underline-offset-4 hover:underline">
@@ -83,64 +86,52 @@ function BelegZeile({ b, basis, zugeordnet }: { b: Beleg; basis: string; zugeord
 }
 
 export function Eingangskorb({ daten, basis }: { daten: BelegeUebersicht; basis: string }) {
+  const korbSumme = daten.korb.reduce((x, b) => x + b.bruttoCent, 0)
   return (
-    <div className="flex flex-col gap-8">
-      {daten.korbHaendler.length > 0 && (
-        <section aria-labelledby="haendler-titel" className="bg-card flex flex-col gap-4 rounded-3xl p-6 shadow-sm md:p-8">
-          <div className="flex flex-col gap-1">
-            <h2 id="haendler-titel" className="text-xl font-semibold tracking-tight">
-              Schnell zuordnen
-            </h2>
-            <p className="text-muted-foreground text-sm leading-relaxed">Ein Klick ordnet alle offenen Belege eines Händlers zu.</p>
-          </div>
-          <ul className="divide-border flex flex-col divide-y">
-            {daten.korbHaendler.map((h) => (
-              <li key={h.haendler} className="flex flex-col gap-3 py-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex flex-col">
-                  <span className="font-medium">{h.haendler}</span>
-                  <span className="text-muted-foreground text-sm">
-                    {h.anzahl} Belege · {eur(h.bruttoCent)}
+    <div className="flex flex-col gap-4">
+      <Karte
+        titel="Noch ohne Geschäftsfeld"
+        untertitel="Bekannte Händler ordnet das System selbst zu. Hier steht nur, was neu oder unsicher ist."
+        zahl={String(daten.korbAnzahl)}
+        fuss={daten.korb.length ? eur(korbSumme) : "alles zugeordnet"}
+        warnung={daten.korbAnzahl > 0}
+        offen={daten.korbAnzahl > 0}
+      >
+        {daten.korbHaendler.length > 0 && (
+          <div className="bg-background flex flex-col gap-3 rounded-2xl p-4">
+            <p className="text-sm font-medium">Schnell zuordnen – ein Klick für alle Belege eines Händlers</p>
+            <MehrListe
+              start={4}
+              kinder={daten.korbHaendler.map((h) => (
+                <li key={h.haendler} className="border-line flex flex-col gap-2 border-b py-3 last:border-0 md:flex-row md:items-center md:justify-between">
+                  <span className="text-sm">
+                    <strong>{h.haendler}</strong> · {h.anzahl} Belege · {eur(h.bruttoCent)}
                   </span>
-                </div>
-                <FeldKnoepfe haendler={h.haendler} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <section aria-labelledby="korb-titel" className="bg-card flex flex-col gap-2 rounded-3xl p-6 shadow-sm md:p-8">
-        <h2 id="korb-titel" className="text-xl font-semibold tracking-tight">
-          Eingangskorb
-        </h2>
+                  <FeldKnoepfe haendler={h.haendler} />
+                </li>
+              ))}
+            />
+          </div>
+        )}
         {daten.korb.length === 0 ? (
-          <p className="text-muted-foreground py-4 leading-relaxed">
-            {daten.gesamt === 0 ? "Noch keine Belege. Starten Sie oben den Umzug aus fibero." : "Alles zugeordnet. Der Korb ist leer."}
-          </p>
+          <p className="text-muted-foreground py-4 text-sm">{daten.gesamt === 0 ? "Noch keine Belege. Starten Sie unten den Umzug aus fibero oder laden Sie einen Beleg hoch." : "Alles zugeordnet. Der Korb ist leer."}</p>
         ) : (
-          <ul className="divide-border flex flex-col divide-y">
-            {daten.korb.map((b) => (
-              <BelegZeile key={b.id} b={b} basis={basis} />
-            ))}
-          </ul>
+          <MehrListe start={8} kinder={daten.korb.map((b) => <BelegZeile key={b.id} b={b} basis={basis} />)} />
         )}
-        {daten.korbAnzahl > daten.korb.length && (
-          <p className="text-muted-foreground text-sm">Es werden die neuesten {daten.korb.length} von {daten.korbAnzahl} angezeigt.</p>
-        )}
-      </section>
+        {daten.korbAnzahl > daten.korb.length && <p className="text-muted-foreground text-sm">Es werden die neuesten {daten.korb.length} von {daten.korbAnzahl} angezeigt.</p>}
+      </Karte>
 
-      {daten.zugeordnet.length > 0 && (
-        <section aria-labelledby="zu-titel" className="bg-card flex flex-col gap-2 rounded-3xl p-6 shadow-sm md:p-8">
-          <h2 id="zu-titel" className="text-xl font-semibold tracking-tight">
-            Zuletzt zugeordnet
-          </h2>
-          <ul className="divide-border flex flex-col divide-y">
-            {daten.zugeordnet.map((b) => (
-              <BelegZeile key={b.id} b={b} basis={basis} zugeordnet />
-            ))}
-          </ul>
-        </section>
-      )}
+      {GESCHAEFTSFELDER.map((g) => {
+        const zeilen = daten.zugeordnet.filter((b) => b.geschaeftsfeld === g.key)
+        const kennzahl = daten.felder.find((f) => f.key === g.key)
+        if (!kennzahl || kennzahl.anzahl === 0) return null
+        const auto = zeilen.filter((b) => b.zuordnungQuelle === "verlauf" || b.zuordnungQuelle === "ki").length
+        return (
+          <Karte key={g.key} titel={g.label} untertitel={`${kennzahl.anzahl} Belege${auto ? ` · ${auto} automatisch zugeordnet` : ""}`} zahl={eur(kennzahl.bruttoCent)} fuss="brutto">
+            <MehrListe start={10} kinder={zeilen.map((b) => <BelegZeile key={b.id} b={b} basis={basis} zugeordnet />)} />
+          </Karte>
+        )
+      })}
     </div>
   )
 }

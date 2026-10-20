@@ -5,6 +5,8 @@ import { useActionState } from "react"
 import { bankImportieren, bankUmsatzIgnorieren, bankUmsatzZuordnen, type BankImportErgebnis } from "@/app/(finanz)/finanz/actions"
 import { AdminInput, AdminSelect } from "@/components/admin/primitives"
 import { eur, tag } from "@/components/finanz/format"
+import { Karte } from "@/components/finanz/karte"
+import { MehrListe } from "@/components/finanz/mehr-liste"
 import type { OffeneRechnungFuerAbgleich, OffenerBankUmsatz } from "@/lib/finanz/bank-abgleich"
 
 /**
@@ -19,11 +21,15 @@ export function BankImportKarte({ offeneUmsaetze, offeneRechnungen }: { offeneUm
   const [ergebnis, importieren, laeuft] = useActionState<BankImportErgebnis | null, FormData>(bankImportieren, null)
 
   return (
-    <div className="bg-background flex flex-col gap-4 rounded-3xl p-5">
-      <div>
-        <h2 className="text-lg font-semibold">Bank-Import</h2>
-        <p className="text-muted-foreground text-sm">CSV oder camt.053 (Kontoauszug-XML) hochladen — ohne PSD2, von Hand exportiert.</p>
-      </div>
+    <Karte
+      titel="Bank: Zahlungseingänge"
+      untertitel="Exakte Treffer mit Rechnungsnummer werden automatisch zugeordnet — hier steht nur, was Entscheidung braucht."
+      zahl={String(offeneUmsaetze.length)}
+      fuss="offen"
+      warnung={offeneUmsaetze.length > 0}
+      offen={offeneUmsaetze.length > 0}
+    >
+      <p className="text-muted-foreground text-sm">Kontoauszug als CSV oder camt.053 hochladen (ohne PSD2, von Hand exportiert).</p>
       <form action={importieren} className="flex flex-wrap items-end gap-2">
         <AdminInput type="file" name="datei" accept=".csv,.xml,text/csv,text/xml,application/xml" required className="max-w-xs" aria-label="Bankauszug-Datei" />
         <button disabled={laeuft} className="bg-primary text-primary-foreground rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-60">
@@ -36,9 +42,8 @@ export function BankImportKarte({ offeneUmsaetze, offeneRechnungen }: { offeneUm
       {offeneUmsaetze.length === 0 ? (
         <p className="text-muted-foreground text-sm">Kein offener Umsatz im Eingangskorb.</p>
       ) : (
-        <ul className="flex flex-col gap-2">
-          {offeneUmsaetze.map((u) => (
-            <li key={u.id} className="flex flex-col gap-2 rounded-2xl border border-border/60 p-3 text-sm">
+        <MehrListe start={6} kinder={offeneUmsaetze.map((u) => (
+            <li key={u.id} className="border-line mb-2 flex flex-col gap-2 rounded-2xl border p-3 text-sm">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-muted-foreground">
                   {tag(u.datum)} · <span className="text-foreground font-semibold tabular-nums">{eur(u.bruttoCent)}</span>
@@ -84,9 +89,8 @@ export function BankImportKarte({ offeneUmsaetze, offeneRechnungen }: { offeneUm
                 </details>
               )}
             </li>
-          ))}
-        </ul>
+          ))} />
       )}
-    </div>
+    </Karte>
   )
 }
