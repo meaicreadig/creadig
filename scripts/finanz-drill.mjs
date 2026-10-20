@@ -1304,6 +1304,48 @@ console.log("\nB · Steuerbescheide")
   await db(`DELETE FROM fin_bescheide WHERE jahr IN (2098, 2099)`)
 }
 
+/* ══ I · Investment ══ */
+console.log("\nI · Investment — investierbar, Vermögen, Anlagen")
+{
+  const I = await import("../lib/finanz/investment.ts")
+  const monate = [
+    { schluessel: "2026-05", einCent: 0, ausCent: 100000 },
+    { schluessel: "2026-06", einCent: 0, ausCent: 300000 },
+    { schluessel: "2026-07", einCent: 0, ausCent: 0 },       // zählt nicht (keine Ausgaben)
+    { schluessel: "2026-10", einCent: 0, ausCent: 900000 },   // laufender Monat zählt nicht
+  ]
+  const inv = I.investierbar(5000000, monate)
+  p(inv.schnittAusgabeCent === 200000 && inv.reserveCent === 1200000 && inv.investierbarCent === 3800000, "I1 Reserve = 6 × Ø volle Monate mit Ausgaben; investierbar = frei − Reserve", JSON.stringify(inv))
+  p(I.investierbar(500000, monate).investierbarCent === 0, "I2 unter der Reserve ist nichts investierbar (nie negativ)")
+  p(I.investierbar(1000000, []).reichweite === null && I.investierbar(1000000, []).investierbarCent === 1000000, "I3 ohne Historie: keine Reichweite, keine erfundene Reserve")
+  const a = I.nachAnlage(inv, 4000000)
+  p(a.unterReserve && a.ueberInvestierbar && a.reichweite === 5, "I4 Was-wäre-wenn: über investierbar → unter Reserve, Reichweite 5,0 Monate", JSON.stringify(a))
+  p(!I.nachAnlage(inv, 3000000).unterReserve, "I5 innerhalb von investierbar bleibt die Reserve unangetastet")
+
+  const an = (o) => ({ id: o.id, name: o.id, klasse: "etf", einstandCent: 100000, seit: "2026-01-01", notiz: null, wertCent: 100000, stand: "2026-10-01", ...o })
+  const b = I.vermoegensbild([an({ id: "a", wertCent: 150000 }), an({ id: "b", klasse: "tagesgeld", wertCent: 50000, einstandCent: 50000 }), an({ id: "c", wertCent: null, stand: null }), an({ id: "d", stand: "2026-06-01" })], 1000000, "2026-10-20")
+  p(b.anlagenWertCent === 300000 && b.einstandCent === 250000 && b.ergebnisCent === 50000, "I6 nur bewertete Anlagen zählen", JSON.stringify([b.anlagenWertCent, b.einstandCent, b.ergebnisCent]))
+  p(Math.abs((b.renditeProzent ?? 0) - 20) < 1e-9, "I7 Rendite = Ergebnis ÷ Einstand")
+  p(b.konzentriert?.klasse === "etf" && b.veraltet.length === 1 && b.veraltet[0].id === "d", "I8 Konzentration ab 60 %, veralteter Stand erkannt")
+  p(b.gesamtCent === 1300000, "I9 Gesamtvermögen = freies Geld + Anlagen")
+  const fr = I.feldRendite([{ key: "a", label: "A", einCent: 300, ausCent: 100 }, { key: "b", label: "B", einCent: 100, ausCent: 0 }, { key: "privat", label: "P", einCent: 5, ausCent: 5 }])
+  p(fr.length === 2 && fr[0].key === "a" && fr[0].ruckfluss === 3 && fr[1].ruckfluss === null, "I10 Rückfluss je Euro; ohne Einsatz ehrlich leer; privat ausgeschlossen")
+
+  await db(`DELETE FROM fin_anlagen_staende WHERE anlage_id LIKE 'anlage-%'`).catch(() => null)
+  const neu = await I.legeAnlageAn(db, { name: "ABNAHME ETF", klasse: "etf", einstandCent: 100000, seit: "2026-09-01", wertCent: null, notiz: null }, "2026-10-20")
+  const l1 = (await I.ladeAnlagen(db)).find((x) => neu.ok && x.id === neu.id)
+  p(l1 && l1.wertCent === 100000 && l1.stand === "2026-09-01", "I11 ohne eigenen Wert gilt der Einstand als erster Stand (mit Stichtag des Kaufs)")
+  p(neu.ok && (await I.bewerteAnlage(db, neu.id, 120000, "2026-10-20")) && (await I.bewerteAnlage(db, neu.id, 125000, "2026-10-20")), "I12 Bewerten; derselbe Tag überschreibt")
+  const l2 = (await I.ladeAnlagen(db)).find((x) => neu.ok && x.id === neu.id)
+  p(l2 && l2.wertCent === 125000 && l2.stand === "2026-10-20", "I13 Anzeige nimmt den neuesten Stichtag")
+  p(!(await I.legeAnlageAn(db, { name: " ", klasse: "etf", einstandCent: 0, seit: "2026-09-01", wertCent: null, notiz: null }, "2026-10-20")).ok, "I14 ohne Namen keine Anlage")
+  if (neu.ok) {
+    await I.archiviereAnlage(db, neu.id)
+    p(!(await I.ladeAnlagen(db)).some((x) => x.id === neu.id), "I15 archiviert = aus der Liste, Stände bleiben erhalten")
+    p((await db(`SELECT count(*) AS c FROM fin_anlagen_staende WHERE anlage_id = $1`, [neu.id]))[0].c > 0, "I16 Historie wird nie gelöscht")
+  }
+}
+
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
 process.exit(fehler === 0 ? 0 : 1)
