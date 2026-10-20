@@ -140,7 +140,6 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
     try {
       const postUrn = await veroeffentliche({ text, bildPfad: f.bildPfad, alt: f.extra.alt, kanal })
       await ergaenzeExtra(fid, { postUrn, fehler: undefined })
-<<<<<<< HEAD
       /* Jeder echte Post gehört ins Veröffentlichungsregister — wie bei der Werkstatt unter /admin/marketing. */
       const heute = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date())
       try {
