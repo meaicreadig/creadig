@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache"
 
 import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
+import { findeOderLegeFirma } from "@/lib/kundenfaden"
 import { neonAbfrage } from "@/lib/neon-abfrage"
 import { darfBetreten } from "@/lib/rollen"
 import { ladeVerkaufslage, OFFENE_STUFEN, type OffeneStufe } from "@/lib/verkaufen"
@@ -51,13 +52,7 @@ export async function dealAnlegen(form: FormData): Promise<void> {
   const am = schritt && datumRoh && /^\d{4}-\d{2}-\d{2}$/.test(datumRoh) ? datumRoh : null
   const notiz = text(form.get("notiz"), 2000)
 
-  const org = await q(
-    `INSERT INTO organisations (id, name, website, created_at, updated_at)
-     VALUES ($1, $2, $3, now(), now())
-     ON CONFLICT ((lower(name))) DO UPDATE SET website = coalesce(organisations.website, EXCLUDED.website), updated_at = now()
-     RETURNING id`,
-    [`org-${crypto.randomUUID()}`, firma, website],
-  )
+  const org = [await findeOderLegeFirma(q, { name: firma, website })]
   await q(
     `INSERT INTO opportunities (id, organisation_id, title, status, source, next_action, next_action_at,
                                 last_contact_at, note, estimated_value, created_at, updated_at)

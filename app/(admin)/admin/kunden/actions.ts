@@ -7,6 +7,7 @@ import { redirect } from "next/navigation"
 
 import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
+import { findeOderLegeFirma } from "@/lib/kundenfaden"
 import { neonAbfrage } from "@/lib/neon-abfrage"
 import { darfBetreten } from "@/lib/rollen"
 
@@ -32,19 +33,14 @@ export async function kundeAnlegen(form: FormData): Promise<void> {
   if (website && !/^https?:\/\//i.test(website)) website = `https://${website}`
   const q = neonAbfrage()
   if (!q) zurueck("Speicher nicht verfügbar")
-  const id = `org-${randomUUID().slice(0, 8)}`
-  try {
-    await q!(
-      `INSERT INTO organisations (id, name, website, city, note, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, now(), now())`,
-      [id, name, website, text(form.get("city"), 120), text(form.get("note"), 1000)],
-    )
-  } catch (e) {
-    if (String((e as Error).message).includes("organisations_name_key")) zurueck(`„${name}“ gibt es schon`)
-    throw e
-  }
+  const firma = await findeOderLegeFirma(q!, {
+    name: name!,
+    website,
+    city: text(form.get("city"), 120),
+    note: text(form.get("note"), 1000),
+  })
   revalidatePath("/admin/kunden")
-  redirect(`/admin/kunden/${id}`)
+  redirect(`/admin/kunden/${firma.id}${firma.neu ? "" : `?meldung=${encodeURIComponent(`Gibt es schon als „${firma.name}“`)}`}`)
 }
 
 export async function kundeLoeschen(form: FormData): Promise<void> {
@@ -53,9 +49,20 @@ export async function kundeLoeschen(form: FormData): Promise<void> {
   if (!id) zurueck("Kunde fehlt")
   const q = neonAbfrage()
   if (!q) zurueck("Speicher nicht verfügbar")
-  const deals = await q!(`SELECT count(*)::int AS n FROM opportunities WHERE organisation_id = $1`, [id])
-  if (Number(deals[0]?.n ?? 0) > 0) zurueck("Hat noch Verkaufschancen — erst dort abschließen oder entfernen")
+  const gewonnen = await q!(`SELECT count(*)::int AS n FROM opportunities WHERE organisation_id = $1 AND status = 'won'`, [id])
+  if (Number(gewonnen[0]?.n ?? 0) > 0) zurueck("Hat einen gewonnenen Auftrag — bleibt als Nachweis erhalten")
   try {
+    // Komplett entfernen: Verlauf, Chancen, Kontakte, Termine – sonst bleiben Waisen auf anderen Seiten stehen.
+    await q!(
+      `DELETE FROM activities WHERE subject_id = $1
+          OR subject_id IN (SELECT id FROM contacts WHERE organisation_id = $1)
+          OR subject_id IN (SELECT id FROM opportunities WHERE organisation_id = $1)`,
+      [id],
+    )
+    await q!(`DELETE FROM opportunities WHERE organisation_id = $1`, [id])
+    await q!(`DELETE FROM appointments WHERE organisation_id = $1`, [id]).catch(() => undefined)
+    await q!(`DELETE FROM booking_links WHERE organisation_id = $1`, [id]).catch(() => undefined)
+    await q!(`DELETE FROM contacts WHERE organisation_id = $1`, [id])
     const weg = await q!(`DELETE FROM organisations WHERE id = $1 RETURNING name`, [id])
     if (weg.length === 0) zurueck("Kunde nicht gefunden")
     revalidatePath("/admin/kunden")
