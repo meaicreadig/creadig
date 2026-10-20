@@ -260,6 +260,11 @@ export async function speichereLinkedin(v: {
   )
 }
 
+export async function trenneLinkedin(kanal: LinkedinKanal) {
+  const q = await assistentDb()
+  if (q) await q(`DELETE FROM assistent_linkedin WHERE id = $1`, [kanal])
+}
+
 export async function quelleBekannt(quelle: string): Promise<boolean> {
   const q = await assistentDb()
   if (!q) return true

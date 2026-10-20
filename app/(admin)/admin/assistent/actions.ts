@@ -25,12 +25,14 @@ import {
   type Nachricht,
 } from "@/lib/assistent/store"
 import { darfBetreten } from "@/lib/rollen"
+import { getVertriebStore } from "@/lib/lead-store"
 
 async function pruefe() {
   const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
   if (zugang.verdict !== "ok" || !zugang.rolle || !darfBetreten(zugang.rolle, "/admin/assistent")) {
     throw new Error("Nicht berechtigt")
   }
+  return zugang.rolle
 }
 
 export type FrageErgebnis = { ok: true; antwort: Nachricht } | { ok: false; fehler: string }
@@ -82,7 +84,7 @@ export async function antwortErhalten(form: FormData): Promise<void> {
 }
 
 export async function freigabeEntscheiden(form: FormData): Promise<void> {
-  await pruefe()
+  const rolle = await pruefe()
   const id = form.get("id")
   const status = form.get("status")
   if (typeof id !== "string" || (status !== "freigegeben" && status !== "verworfen")) return
@@ -124,11 +126,30 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
   }
 
   const kanal = form.get("ziel") === "firma" ? "firma" : "inhaber"
-  if (status === "freigegeben" && f.art === "linkedin" && (await ladeLinkedin(kanal))) {
+  if (status === "freigegeben" && f.art === "linkedin") {
+    /* Ohne Verbindung wird NICHT als freigegeben markiert: Der Inhaber muss sehen, dass nichts gepostet wurde. */
+    if (!(await ladeLinkedin(kanal))) {
+      await ergaenzeExtra(fid, { fehler: `${kanal === "firma" ? "Firmenseite" : "LinkedIn"} ist nicht verbunden — nichts wurde gepostet. Bitte verbinden und erneut freigeben.` })
+      revalidatePath("/admin/assistent")
+      return
+    }
     const text = typeof inhalt === "string" && inhalt.trim() ? inhalt.trim() : f.inhalt
     try {
       const postUrn = await veroeffentliche({ text, bildPfad: f.bildPfad, alt: f.extra.alt, kanal })
       await ergaenzeExtra(fid, { postUrn, fehler: undefined })
+      /* Jeder echte Post gehört ins Veröffentlichungsregister — wie bei der Werkstatt unter /admin/marketing. */
+      const heute = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date())
+      try {
+        await getVertriebStore({ kennung: rolle, herkunft: "HUMAN" })?.recordPublication({
+          was: text.split("\n")[0].slice(0, 200),
+          kanal: "linkedin",
+          veroeffentlichtAm: heute,
+          url: postUrn.startsWith("urn:li:") ? `https://www.linkedin.com/feed/update/${postUrn}/` : null,
+        })
+        revalidatePath("/admin/veroeffentlichungen")
+      } catch {
+        /* Der Beitrag ist live; ein fehlender Registereintrag darf das nicht als Fehler melden. */
+      }
     } catch (e) {
       console.error("[linkedin] post", e)
       await ergaenzeExtra(fid, { fehler: e instanceof Error ? e.message.slice(0, 200) : "Veröffentlichung fehlgeschlagen" })
