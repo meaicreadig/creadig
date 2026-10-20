@@ -1208,6 +1208,45 @@ const n_bu = await db(`SELECT art, brutto_cent, kategorie, geschaeftsfeld FROM f
 p(n_bu.length === 1 && n_bu[0].art === "ausgabe" && Number(n_bu[0].brutto_cent) === 2380 && n_bu[0].geschaeftsfeld === "sonstiges", "V8 genau eine Ausgaben-Buchung mit Kategorie und Geschaeftsfeld")
 p(!(await ladeAusgehendeBankUmsaetze(db)).some((u) => u.id === "ABNAHME-n-abbuchung"), "V9 die Abbuchung ist aus dem Eingangskorb verschwunden")
 
+/* ══ Y · Liquidität spricht die Wahrheit — Steuerabfluss, Überfälliges, Pipeline ══ */
+console.log("\nY · Liquiditäts-Szenarien")
+{
+  const R = await import("../lib/finanz/rechnen.ts")
+  const heute = "2026-10-20"
+  const b = (o) => ({ id: o.id, art: "einnahme", status: "geplant", datum: heute, bruttoCent: 100000, ustSatz: 0, kategorie: "Beratung", gegenpartei: o.id, notiz: null, wiederholung: "keine", storniert: false, ...o })
+  const topf = { ustOffenCent: 190000, estRuecklageCent: 900000, gewinnJahrCent: 3000000, gesamtCent: 1090000 }
+  const fristen = [
+    { id: "ust-1", titel: "USt Q3", art: "ust", faellig: "2026-10-10", periodeEnde: "2026-09-30", betragCent: null, erledigt: false },
+    { id: "ust-2", titel: "USt Q4", art: "ust", faellig: "2027-01-10", periodeEnde: "2026-12-31", betragCent: null, erledigt: false },
+    { id: "est-a", titel: "ESt Dez", art: "est", faellig: "2026-12-10", periodeEnde: null, betragCent: null, erledigt: false },
+    { id: "est-b", titel: "ESt mit Betrag", art: "est", faellig: "2026-11-10", periodeEnde: null, betragCent: 50000, erledigt: false },
+  ]
+  const geschaetzt = R.geschaetzteFristBetraege(fristen, topf, heute)
+  p(geschaetzt.get("ust-1") === 190000 && !geschaetzt.has("ust-2"), "Y1 gesamter USt-Saldo landet auf der frühesten offenen USt-Frist, nicht doppelt")
+  p(geschaetzt.get("est-a") === 900000 && !geschaetzt.has("est-b"), "Y2 ESt-Rücklage verteilt sich auf Fristen ohne Betrag; eine Frist mit eigenem Betrag bleibt unberührt", `${geschaetzt.get("est-a")}`)
+  const ohne = R.kuenftigeBewegungen([], fristen, heute, "2027-01-20")
+  const mit = R.kuenftigeBewegungen([], fristen, heute, "2027-01-20", { topf })
+  p(ohne.length === 1 && mit.length === 3 && mit.filter((x) => x.geschaetzt).length === 2, "Y3 ohne Topf bleibt das alte Verhalten, mit Topf stehen die Steuerabflüsse im Band (als geschätzt gekennzeichnet)")
+  p(mit.find((x) => x.titel === "USt Q3")?.datum === heute, "Y4 eine überfällige Steuerfrist belastet das Band ab heute, nicht in der Vergangenheit")
+
+  const ueberf = [b({ id: "alt", datum: "2026-09-01", bruttoCent: 250000 })]
+  const v = R.kuenftigeBewegungen(ueberf, [], heute, "2027-01-20", { szenario: "vorsichtig" })
+  const e = R.kuenftigeBewegungen(ueberf, [], heute, "2027-01-20", { szenario: "erwartet" })
+  p(v.length === 0, "Y5 vorsichtig: eine überfällige Forderung zählt nicht")
+  p(e.length === 1 && e[0].cent === 250000 && e[0].datum === R.plusTage(heute, R.UEBERFAELLIG_ANNAHME_TAGE) && e[0].geschaetzt === true, "Y6 erwartet: sie kommt mit Verzug, gekennzeichnet")
+
+  const pipeline = [
+    { id: "o1", titel: "Chance A", wertCent: 1000000, status: "negotiation", erwartetAm: null },
+    { id: "o2", titel: "Chance B", wertCent: 400000, status: "new", erwartetAm: null },
+    { id: "o3", titel: "Chance C", wertCent: 500000, status: "proposal", erwartetAm: "2026-12-01" },
+  ]
+  const o = R.kuenftigeBewegungen([], [], heute, "2027-01-20", { szenario: "optimistisch", pipeline })
+  p(o.length === 2 && o.find((x) => x.titel.startsWith("Chance A"))?.cent === 500000 && o.find((x) => x.titel.startsWith("Chance C"))?.cent === 150000, "Y7 nur Stufen mit Gewicht, Betrag × Gewicht, Chance ohne Wert/Stufe bleibt draußen")
+  p(R.kuenftigeBewegungen([], [], heute, "2027-01-20", { szenario: "erwartet", pipeline }).length === 0, "Y8 ohne Szenario 'optimistisch' kommt die Pipeline nie ins Band")
+  const tief = (bw) => Math.min(...R.liquiditaet(100000, bw, heute).map((w) => w.standCent))
+  p(tief(mit) < tief(ohne), "Y9 mit Steuerabfluss liegt der Tiefpunkt tiefer als im alten, zu schönen Band", `${tief(mit)} < ${tief(ohne)}`)
+}
+
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
 process.exit(fehler === 0 ? 0 : 1)

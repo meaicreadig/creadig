@@ -1,15 +1,30 @@
+import Link from "next/link"
+
 import { SectionHeader } from "@/components/admin/primitives"
 import { eur, eurRund, tag } from "@/components/finanz/format"
-import type { Bewegung, Woche } from "@/lib/finanz/rechnen"
+import type { Bewegung, Szenario, Woche } from "@/lib/finanz/rechnen"
+
+const SZ_LABEL: Record<Szenario, string> = { vorsichtig: "Vorsichtig", erwartet: "Erwartet", optimistisch: "Mit Pipeline" }
+const SZ_HINWEIS: Record<Szenario, string> = {
+  vorsichtig: "Nur Gebuchtes und Geplantes, dazu die Steuerzahlungen. Überfälliges und Chancen zählen nicht.",
+  erwartet: "Dazu überfällige Forderungen, die mit gut drei Wochen Verzug eingehen.",
+  optimistisch: "Dazu gewichtete Verkaufschancen (Angebot 30 %, Verhandlung 50 %) — eine Schätzung, kein Geld.",
+}
 
 export function LiquiditaetsBand({
   wochen,
   topfCent,
   bewegungen,
+  szenarien,
+  aktiv = "vorsichtig",
+  basis = "",
 }: {
   wochen: Woche[]
   topfCent: number
   bewegungen: Bewegung[]
+  szenarien?: Record<Szenario, { wochen: Woche[] }>
+  aktiv?: Szenario
+  basis?: string
 }) {
   const max = Math.max(1, topfCent, ...wochen.map((w) => Math.abs(w.standCent)))
   const tief = wochen.reduce((a, w) => (w.standCent < a.standCent ? w : a), wochen[0])
@@ -23,6 +38,27 @@ export function LiquiditaetsBand({
         count={tief ? `Tiefpunkt ${eurRund(tief.standCent)} am ${tag(tief.bis)}` : undefined}
       />
       <div className="bg-card rounded-[2rem] flex flex-col gap-4 p-6">
+        {szenarien && (
+          <div className="flex flex-col gap-2">
+            <div role="tablist" aria-label="Szenario" className="flex flex-wrap gap-2">
+              {(Object.keys(SZ_LABEL) as Szenario[]).map((k) => {
+                const tief = szenarien[k].wochen.reduce((a, w) => Math.min(a, w.standCent), Infinity)
+                return (
+                  <Link
+                    key={k}
+                    href={`${basis}/geldfluss?szenario=${k}`}
+                    role="tab"
+                    aria-selected={k === aktiv}
+                    className={`rounded-full px-4 py-2 text-sm font-medium ${k === aktiv ? "bg-primary text-primary-foreground" : "bg-background text-foreground/75"}`}
+                  >
+                    {SZ_LABEL[k]} <span className="tabular-nums opacity-75">· Tiefpunkt {eurRund(tief)}</span>
+                  </Link>
+                )
+              })}
+            </div>
+            <p className="type-small text-muted-foreground">{SZ_HINWEIS[aktiv]}</p>
+          </div>
+        )}
         <div className="relative flex h-44 items-end gap-1.5" role="img" aria-label="Erwarteter Kontostand je Woche">
           {topfCent > 0 && (
             <div
@@ -53,10 +89,13 @@ export function LiquiditaetsBand({
 
         {bewegungen.length > 0 ? (
           <ul className="border-line grid gap-x-8 gap-y-2 border-t pt-4 text-sm md:grid-cols-2">
-            {bewegungen.slice(0, 8).map((b, i) => (
+            {bewegungen.slice(0, 10).map((b, i) => (
               <li key={`${b.datum}-${i}`} className="flex items-baseline justify-between gap-3">
                 <span className="text-muted-foreground w-20 shrink-0 tabular-nums">{tag(b.datum)}</span>
-                <span className="min-w-0 flex-1 truncate">{b.titel}</span>
+                <span className="min-w-0 flex-1 truncate">
+                  {b.titel}
+                  {b.geschaetzt && <span className="text-muted-foreground"> · geschätzt</span>}
+                </span>
                 <span className={`tabular-nums ${b.cent < 0 ? "text-muted-foreground" : "text-gold-text"}`}>
                   {b.cent > 0 ? "+" : ""}
                   {eur(b.cent)}
