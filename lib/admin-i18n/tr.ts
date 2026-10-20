@@ -803,6 +803,9 @@ export const tr: AdminTexte = {
     },
   },
   kundenkarte: {
+    zahlungsdauer: "Ort. ödeme süresi",
+    tageKurz: "gün",
+    ueberfaelligKurz: "vadesi geçmiş",
     naechsterSchritt: "Sonraki adım",
     keinSchritt: "Sonraki adım belirlenmedi",
     schrittAnlegen: "Fırsatı aç ve adım belirle",

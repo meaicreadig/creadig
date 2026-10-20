@@ -1346,6 +1346,37 @@ console.log("\nI · Investment — investierbar, Vermögen, Anlagen")
   }
 }
 
+/* ══ K · Finanz → Kunde ══ */
+console.log("\nK · Kunden-Bezug — Geld je Organisation aus Finanz")
+{
+  const { ladeKundenGeld } = await import("../lib/finanz/kunden-bezug.ts")
+  await db(`CREATE TABLE IF NOT EXISTS organisations (id text PRIMARY KEY, name text)`)
+  await db(`CREATE TABLE IF NOT EXISTS contacts (id text PRIMARY KEY, organisation_id text, email text)`)
+  await db(`CREATE TABLE IF NOT EXISTS opportunities (id text PRIMARY KEY, organisation_id text)`)
+  await db(`INSERT INTO organisations VALUES ('k-org','ABNAHME Kunde GmbH'),('k-leer','ABNAHME Leer') ON CONFLICT DO NOTHING`)
+  await db(`INSERT INTO contacts VALUES ('k-c','k-org','abnahme-k@example.invalid') ON CONFLICT DO NOTHING`)
+  const kd = (o) => ({ name: "X", firma: "", strasse: "", plzOrt: "", land: "Deutschland", email: "", ustId: "", ...o })
+  const mk = async (kunde, brutto, status, faellig, datum) => {
+    const id = await legeEntwurfAn(db, "rechnung", { titel: "ABNAHME K", kunde })
+    await db(`UPDATE fin_dokumente SET status=$2, summen=$3::jsonb, faellig_am=$4::date, datum=$5::date, nummer=$6 WHERE id=$1`,
+      [id, status, JSON.stringify({ bruttoCent: brutto }), faellig, datum, `ABN-K-${id.slice(-6)}`])
+    return id
+  }
+  const a = await mk(kd({ email: "ABNAHME-K@example.invalid" }), 100000, "bezahlt", "2026-08-10", "2026-07-27")
+  await db(`INSERT INTO fin_zahlungen (id, dokument_id, datum, cent) VALUES ('k-z1',$1,'2026-08-06',100000)`, [a])
+  await mk(kd({ firma: "abnahme kunde gmbh" }), 50000, "versendet", "2026-09-01", "2026-08-18")
+  await mk(kd({ email: "abnahme-k@example.invalid" }), 30000, "versendet", "2026-12-01", "2026-10-15")
+  const m = await ladeKundenGeld(db, "2026-10-20", ["k-org", "k-leer"])
+  const g = m.get("k-org")
+  p(g && g.eingenommenCent === 100000, "K1 eingenommen = Summe echter Zahlungen aus fin_zahlungen", JSON.stringify(g))
+  p(g && g.offeneRechnungen === 2 && g.offenCent === 80000, "K2 offene Rechnungen über E-Mail UND Firmenname zugeordnet")
+  p(g && g.ueberfaelligAnzahl === 1 && g.ueberfaelligCent === 50000, "K3 überfällig = Fälligkeit vor heute")
+  p(g && g.zahlungsdauerTage === 10, "K4 Zahlungsdauer = Rechnungsdatum → letzte Zahlung", String(g?.zahlungsdauerTage))
+  p(!m.has("k-leer"), "K5 Organisation ohne Dokumente erscheint nicht (kein erfundener Wert)")
+  const { gesundheitAus } = await import("../lib/kundenkarte.ts")
+  p(gesundheitAus(2, 1, 1) === "rot" && gesundheitAus(2, 1, 0) === "gelb" && gesundheitAus(2, 0, 0) === "gruen", "K6 überfällige Rechnung macht rot, auch bei frischem Kontakt")
+}
+
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
 process.exit(fehler === 0 ? 0 : 1)

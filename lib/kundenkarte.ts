@@ -1,4 +1,7 @@
 import { neonAbfrage } from "@/lib/neon-abfrage"
+import { keinKundenGeld, ladeKundenGeld, type KundenGeld } from "@/lib/finanz/kunden-bezug"
+
+const heuteIso = () => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date())
 
 /**
  * Der Kopf der Kundenkarte: Geld, Gesundheit, letzter Kontakt.
@@ -14,6 +17,12 @@ export type KundenkartenKopf = {
   eingenommenCent: number | null
   /** Gestellte Rechnungen ohne Zahlungseingang. */
   offeneRechnungen: number | null
+  /** Offener Rechnungsbetrag (brutto) — nur für den Inhaber, sonst null. */
+  offenCent: number | null
+  /** Davon überfällig (Fälligkeit vor heute) — Anzahl; null = nicht gemessen. */
+  ueberfaellig: number | null
+  /** Ø Tage bis zur Zahlung bezahlter Rechnungen. */
+  zahlungsdauerTage: number | null
   /** Gesendete Angebote, noch ohne Antwort. */
   offeneAngebote: number | null
   /** Geschätzter Wert offener Chancen, in Euro. */
@@ -27,7 +36,9 @@ export type KundenkartenKopf = {
 const GELB_AB_TAGEN = 21
 const ROT_AB_TAGEN = 45
 
-export function gesundheitAus(tage: number | null, offeneRechnungen: number | null): Gesundheit {
+export function gesundheitAus(tage: number | null, offeneRechnungen: number | null, ueberfaellig: number | null = null): Gesundheit {
+  /* Eine überfällige Rechnung kostet Geld — rot, auch wenn der Kontakt frisch ist. */
+  if ((ueberfaellig ?? 0) > 0) return "rot"
   if (tage === null) return "unbekannt"
   if (tage >= ROT_AB_TAGEN) return "rot"
   if (tage >= GELB_AB_TAGEN || (offeneRechnungen ?? 0) > 0) return "gelb"
@@ -67,26 +78,24 @@ export async function ladeKundenLage(): Promise<KundenLage | null> {
                   WHERE a.subject_type = 'organisation' AND a.subject_id = org.id),
                 (SELECT max(o.last_contact_at) FROM opportunities o
                   WHERE o.organisation_id = org.id AND o.excluded_reason IS NULL)
-              ) AS letzter,
-              (SELECT count(*) FROM invoices i
-                WHERE i.state = 'gestellt'
-                  AND i.opportunity_id IN (SELECT o.id FROM opportunities o
-                                            WHERE o.organisation_id = org.id AND o.excluded_reason IS NULL)
-                  AND NOT EXISTS (SELECT 1 FROM payments p WHERE p.invoice_id = i.id)) AS offen
+              ) AS letzter
          FROM organisations org
         WHERE org.lifecycle = 'kunde' AND org.excluded_reason IS NULL`,
       [],
     )
+    /* Offene Rechnungen kommen aus Finanz (fin_dokumente) — eine Quelle, siehe lib/finanz/kunden-bezug.ts. */
+    const geld = await ladeKundenGeld(q, heuteIso(), rows.map((r) => String(r.id))).catch(() => new Map<string, KundenGeld>())
     const gefaehrdet: GefaehrdeterKunde[] = []
     let ohneBeleg = 0
     for (const r of rows) {
-      const offen = Number(r.offen ?? 0)
+      const g = geld.get(String(r.id)) ?? keinKundenGeld(String(r.id))
+      const offen = g.offeneRechnungen
       const tage = r.letzter ? Math.floor((Date.now() - new Date(String(r.letzter)).getTime()) / 86_400_000) : null
       if (tage === null && offen === 0) {
         ohneBeleg++
         continue
       }
-      const stufe = gesundheitAus(tage, offen)
+      const stufe = gesundheitAus(tage, offen, g.ueberfaelligAnzahl)
       if (stufe === "rot" || offen > 0) {
         gefaehrdet.push({
           id: String(r.id),
@@ -104,11 +113,15 @@ export async function ladeKundenLage(): Promise<KundenLage | null> {
   }
 }
 
-export async function ladeKundenkartenKopf(organisationId: string): Promise<KundenkartenKopf> {
+export async function ladeKundenkartenKopf(organisationId: string, optionen: { geldSichtbar?: boolean } = {}): Promise<KundenkartenKopf> {
+  const geldSichtbar = optionen.geldSichtbar ?? false
   const q = neonAbfrage()
   const leer: KundenkartenKopf = {
     eingenommenCent: null,
     offeneRechnungen: null,
+    offenCent: null,
+    ueberfaellig: null,
+    zahlungsdauerTage: null,
     offeneAngebote: null,
     potenzialEuro: null,
     letzterKontakt: null,
@@ -127,23 +140,10 @@ export async function ladeKundenkartenKopf(organisationId: string): Promise<Kund
   const zahl = (v: unknown) => Number(v ?? 0)
   const chancen = `SELECT id FROM opportunities WHERE organisation_id = $1 AND excluded_reason IS NULL`
 
-  const [eingenommen, rechnungen, angebote, potenzial, kontakt] = await Promise.all([
-    eins(
-      `SELECT coalesce(sum(p.amount_cent), 0) AS n
-         FROM payments p JOIN invoices i ON i.id = p.invoice_id
-        WHERE i.opportunity_id IN (${chancen})`,
-      (r) => zahl(r[0]?.n),
-    ),
-    eins(
-      `SELECT count(*) AS n FROM invoices i
-        WHERE i.state = 'gestellt' AND i.opportunity_id IN (${chancen})
-          AND NOT EXISTS (SELECT 1 FROM payments p WHERE p.invoice_id = i.id)`,
-      (r) => zahl(r[0]?.n),
-    ),
-    eins(
-      `SELECT count(*) AS n FROM offers WHERE state = 'gesendet' AND opportunity_id IN (${chancen})`,
-      (r) => zahl(r[0]?.n),
-    ),
+  const [geld, potenzial, kontakt] = await Promise.all([
+    ladeKundenGeld(q, heuteIso(), [organisationId])
+      .then((m) => m.get(organisationId) ?? keinKundenGeld(organisationId))
+      .catch(() => null),
     eins(
       `SELECT coalesce(sum(estimated_value), 0) AS n FROM opportunities
         WHERE organisation_id = $1 AND excluded_reason IS NULL AND status NOT IN ('won','lost')`,
@@ -161,12 +161,16 @@ export async function ladeKundenkartenKopf(organisationId: string): Promise<Kund
   const tage = kontakt ? Math.floor((Date.now() - new Date(kontakt).getTime()) / 86_400_000) : null
 
   return {
-    eingenommenCent: eingenommen,
-    offeneRechnungen: rechnungen,
-    offeneAngebote: angebote,
+    /* Beträge sieht nur der Inhaber (Finanz ist owner-only); die Anzahlen tragen die Gesundheit für alle. */
+    eingenommenCent: geld && geldSichtbar ? geld.eingenommenCent : null,
+    offeneRechnungen: geld ? geld.offeneRechnungen : null,
+    offenCent: geld && geldSichtbar ? geld.offenCent : null,
+    ueberfaellig: geld ? geld.ueberfaelligAnzahl : null,
+    zahlungsdauerTage: geld && geldSichtbar ? geld.zahlungsdauerTage : null,
+    offeneAngebote: geld ? geld.offeneAngebote : null,
     potenzialEuro: potenzial,
     letzterKontakt: kontakt,
     tageOhneKontakt: tage,
-    gesundheit: gesundheitAus(tage, rechnungen),
+    gesundheit: gesundheitAus(tage, geld ? geld.offeneRechnungen : null, geld ? geld.ueberfaelligAnzahl : null),
   }
 }
