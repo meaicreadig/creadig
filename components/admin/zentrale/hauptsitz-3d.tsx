@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useRef } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import { ContactShadows, Environment, Html, Lightformer, OrbitControls, QuadraticBezierLine, RoundedBox } from "@react-three/drei"
+import { ContactShadows, Environment, Html, Lightformer, OrbitControls, QuadraticBezierLine, useTexture } from "@react-three/drei"
+import { Bloom, EffectComposer, N8AO, SMAA, ToneMapping, Vignette } from "@react-three/postprocessing"
+import { ToneMappingMode } from "postprocessing"
 import * as THREE from "three"
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib"
 import type { Etage, Raum } from "@/lib/zentrale/hauptsitz"
@@ -35,6 +37,114 @@ const FARBE = {
 }
 
 const KLEIDUNG = ["#2f3a4c", "#6b7686", "#e6e2da", "#44505f", "#8a6f5a"]
+const HAAR = ["#2a1d15", "#15110e", "#5b3a22", "#b98d4f", "#7a4a2a"]
+
+/* PBR-Materialien (Poly Haven, CC0) – Ordner unter /public/3d, Konvention siehe public/3d/README.md. */
+type PbrOrdner = "metal-plate" | "smooth-concrete" | "brushed-concrete"
+/** Eine Texturkachel entspricht ca. 2,5 m am Bauteil. */
+const KACHEL = 2.5
+
+function usePbr(ordner: PbrOrdner, tint = "#ffffff") {
+  const [diff, nor, arm] = useTexture([`/3d/${ordner}/diff.jpg`, `/3d/${ordner}/nor.jpg`, `/3d/${ordner}/arm.jpg`])
+  return useMemo(() => {
+    ;[diff, nor, arm].forEach((t) => {
+      t.wrapS = t.wrapT = THREE.RepeatWrapping
+      t.anisotropy = 8
+    })
+    diff.colorSpace = THREE.SRGBColorSpace
+    return new THREE.MeshStandardMaterial({
+      color: tint,
+      map: diff,
+      normalMap: nor,
+      aoMap: arm,
+      roughnessMap: arm,
+      metalnessMap: arm,
+      metalness: 1,
+      roughness: 1,
+    })
+  }, [diff, nor, arm, tint])
+}
+
+/** Box-Geometrie, deren UVs in Metern skaliert sind – so bleibt die Kachelung auf jeder Fläche im selben Maßstab. */
+const boxCache = new Map<string, THREE.BoxGeometry>()
+function weltBox(b: number, h: number, t: number) {
+  const key = `${b}|${h}|${t}`
+  const vorhanden = boxCache.get(key)
+  if (vorhanden) return vorhanden
+  const g = new THREE.BoxGeometry(b, h, t)
+  const uv = g.attributes.uv as THREE.BufferAttribute
+  // Flächenfolge in BoxGeometry: +x, -x, +y, -y, +z, -z (je 4 Vertices)
+  const maße: [number, number][] = [[t, h], [t, h], [b, t], [b, t], [b, h], [b, h]]
+  maße.forEach(([u, v], f) => {
+    for (let i = f * 4; i < f * 4 + 4; i++) uv.setXY(i, (uv.getX(i) * u) / KACHEL, (uv.getY(i) * v) / KACHEL)
+  })
+  boxCache.set(key, g)
+  return g
+}
+
+type PbrBoxProps = Omit<React.ComponentProps<"mesh">, "args" | "geometry" | "material"> & {
+  args: [number, number, number]
+  ordner: PbrOrdner
+  tint?: string
+  roughness?: number
+  metalness?: number
+}
+
+function PbrBox({ args, ordner, tint, roughness, metalness, ...mesh }: PbrBoxProps) {
+  const mat = usePbr(ordner, tint)
+  const material = useMemo(() => {
+    if (roughness === undefined && metalness === undefined) return mat
+    const m = mat.clone()
+    if (roughness !== undefined) m.roughness = roughness
+    if (metalness !== undefined) m.metalness = metalness
+    return m
+  }, [mat, roughness, metalness])
+  return <mesh {...mesh} geometry={weltBox(...args)} material={material} />
+}
+
+/** Segmentiert eine Fassadenreihe in Glas-Läufe und massive Paneele. */
+function fassadenSegmente(kanten: number[], massiv: Set<number>) {
+  const glas: [number, number][] = []
+  const voll: [number, number][] = []
+  let start: number | null = null
+  for (let i = 0; i < kanten.length - 1; i++) {
+    if (massiv.has(i)) {
+      if (start !== null) glas.push([kanten[start], kanten[i]])
+      start = null
+      voll.push([kanten[i], kanten[i + 1]])
+    } else if (start === null) start = i
+  }
+  if (start !== null) glas.push([kanten[start], kanten[kanten.length - 1]])
+  return { glas, voll }
+}
+
+/** Kleiner deterministischer Zufall (kein Math.random im Render). */
+function zufall(seed: number) {
+  let s = seed >>> 0
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0
+    let t = s
+    t = Math.imul(t ^ (t >>> 15), t | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+const BAUM_X = [-14, -8, 8, 14, -19, 19]
+const BAUM_TOENE = ["#566f4a", "#647f55", "#4c6a44"]
+const BAEUME = BAUM_X.map((_, b) => {
+  const r = zufall(b * 7919 + 13)
+  return Array.from({ length: 7 }).map((__, k) => {
+    const winkel = r() * Math.PI * 2
+    const abstand = k === 0 ? 0 : 0.35 + r() * 0.75
+    const farbe = new THREE.Color(BAUM_TOENE[Math.floor(r() * BAUM_TOENE.length)]).offsetHSL((r() - 0.5) * 0.03, (r() - 0.5) * 0.08, (r() - 0.5) * 0.07)
+    return {
+      pos: [Math.cos(winkel) * abstand, 3.1 + r() * 1.3 + (k === 0 ? 0.3 : 0), Math.sin(winkel) * abstand] as [number, number, number],
+      r: k === 0 ? 1.15 + r() * 0.2 : 0.6 + r() * 0.5,
+      farbe: `#${farbe.getHexString()}`,
+    }
+  })
+})
 
 function Glas({ opacity = 0.32 }: { opacity?: number }) {
   return (
@@ -52,7 +162,18 @@ function Glas({ opacity = 0.32 }: { opacity?: number }) {
   )
 }
 
-function Person({ farbe }: { farbe: string }) {
+function Person({ farbe, haar, an }: { farbe: string; haar: string; an: boolean }) {
+  const arme = useRef<(THREE.Group | null)[]>([])
+  const phase = useMemo(() => (farbe.charCodeAt(1) + farbe.charCodeAt(3)) % 7, [farbe])
+  useFrame(({ clock }, dt) => {
+    const t = clock.getElapsedTime()
+    arme.current.forEach((g, i) => {
+      if (!g) return
+      // Tippen: schnelle, kleine Schwingung, links/rechts versetzt – ohne Lauf bleiben die Arme in Grundhaltung.
+      const soll = an ? Math.sin(t * 11 + phase + i * Math.PI) * 0.09 + Math.sin(t * 4.3 + phase * 2 + i) * 0.03 : 0
+      g.rotation.x = THREE.MathUtils.damp(g.rotation.x, soll, 12, dt)
+    })
+  })
   return (
     <group position={[0, 0, 0.6]}>
       <mesh position={[0, 0.92, 0.04]} castShadow>
@@ -63,6 +184,11 @@ function Person({ farbe }: { farbe: string }) {
         <sphereGeometry args={[0.11, 16, 12]} />
         <meshStandardMaterial color="#c9a184" roughness={0.7} />
       </mesh>
+      {/* Haare: Kappe über Oberkopf und Hinterkopf, Gesicht (−z) bleibt frei */}
+      <mesh position={[0, 1.395, 0.0]} rotation={[0.45, 0, 0]} castShadow>
+        <sphereGeometry args={[0.122, 16, 12, 0, Math.PI * 2, 0, 1.85]} />
+        <meshStandardMaterial color={haar} roughness={0.9} />
+      </mesh>
       <mesh position={[0, 0.56, -0.2]} castShadow>
         <boxGeometry args={[0.34, 0.13, 0.46]} />
         <meshStandardMaterial color="#2c313a" roughness={0.9} />
@@ -71,11 +197,24 @@ function Person({ farbe }: { farbe: string }) {
         <boxGeometry args={[0.3, 0.5, 0.11]} />
         <meshStandardMaterial color="#2c313a" roughness={0.9} />
       </mesh>
-      {[-0.2, 0.2].map((ax) => (
-        <mesh key={ax} position={[ax, 0.88, -0.16]} rotation={[1.1, 0, 0]}>
-          <capsuleGeometry args={[0.05, 0.3, 4, 8]} />
-          <meshStandardMaterial color={farbe} roughness={0.85} />
-        </mesh>
+      {[-0.2, 0.2].map((ax, i) => (
+        // Pivot an der Schulter, damit die Hand den Bogen über die Tastatur beschreibt
+        <group
+          key={ax}
+          ref={(g) => {
+            arme.current[i] = g
+          }}
+          position={[ax, 0.97, 0.02]}
+        >
+          <mesh position={[0, -0.09, -0.178]} rotation={[1.1, 0, 0]} castShadow>
+            <capsuleGeometry args={[0.05, 0.3, 4, 8]} />
+            <meshStandardMaterial color={farbe} roughness={0.85} />
+          </mesh>
+          <mesh position={[0, -0.18, -0.36]} castShadow>
+            <sphereGeometry args={[0.045, 10, 8]} />
+            <meshStandardMaterial color="#c9a184" roughness={0.7} />
+          </mesh>
+        </group>
       ))}
     </group>
   )
@@ -151,22 +290,43 @@ function Kamera({ fokus, raeume }: { fokus: Fokus; raeume: Raum[] }) {
   return null
 }
 
-function Gehirn({ hoehe }: { hoehe: number }) {
+/**
+ * Die Säule ist immer durchgehend: unteres Segment bleibt stehen, oberes Segment fährt mit den angehobenen
+ * Geschossen (gleiches damp wie Geschoss/Dach), ein Schaftstück füllt die entstehende Lücke.
+ */
+function Gehirn({ hoehe, fokus }: { hoehe: number; fokus: Fokus }) {
   const puls = useRef<THREE.Mesh>(null)
   const kern = useRef<THREE.MeshStandardMaterial>(null)
-  useFrame(({ clock }) => {
+  const oben = useRef<THREE.Group>(null)
+  const schaft = useRef<THREE.Mesh>(null)
+  const streifen = useRef<THREE.Mesh>(null)
+  const lift = useRef(0)
+  const angehoben = fokus.etage !== null
+  const yTop = fokus.etage === null ? hoehe : Math.min((fokus.etage + 1) * H, hoehe)
+  useFrame(({ clock }, dt) => {
     const t = clock.getElapsedTime()
-    if (puls.current) puls.current.position.y = ((t * 3) % hoehe) + 0.2
+    lift.current = THREE.MathUtils.damp(lift.current, angehoben ? ANHEBEN : 0, 4, dt)
+    const l = lift.current
+    if (oben.current) oben.current.position.y = l
+    if (schaft.current) schaft.current.visible = l > 0.02
+    const gesamt = hoehe + l
+    if (streifen.current) {
+      streifen.current.scale.y = gesamt
+      streifen.current.position.y = gesamt / 2
+    }
+    if (puls.current) puls.current.position.y = ((t * 3) % gesamt) + 0.2
     if (kern.current) kern.current.emissiveIntensity = 0.55 + Math.sin(t * 1.6) * 0.15
   })
   return (
     <group position={[0, 0, -TIEFE / 2 + 1.3]}>
-      <mesh position={[0, hoehe / 2, 0]} castShadow>
-        <boxGeometry args={[2.2, hoehe, 1.6]} />
-        <meshStandardMaterial color={FARBE.betonDunkel} roughness={0.85} />
-      </mesh>
-      <mesh position={[0, hoehe / 2, 0.81]}>
-        <planeGeometry args={[0.18, hoehe]} />
+      <PbrBox args={[2.2, yTop, 1.6]} position={[0, yTop / 2, 0]} ordner="brushed-concrete" tint="#9ea4ad" castShadow receiveShadow />
+      <group ref={oben}>
+        <PbrBox args={[2.2, hoehe - yTop, 1.6]} position={[0, yTop + (hoehe - yTop) / 2, 0]} ordner="brushed-concrete" tint="#9ea4ad" castShadow receiveShadow />
+        {/* Schaftstück: wandert mit dem oberen Segment und überbrückt die Lücke zum stehenden Teil */}
+        <PbrBox ref={schaft} args={[2.204, ANHEBEN, 1.604]} position={[0, yTop - ANHEBEN / 2, 0]} ordner="brushed-concrete" tint="#9ea4ad" castShadow />
+      </group>
+      <mesh ref={streifen} position={[0, hoehe / 2, 0.81]}>
+        <planeGeometry args={[0.18, 1]} />
         <meshStandardMaterial ref={kern} color={FARBE.blau} emissive={FARBE.blau} emissiveIntensity={0.6} toneMapped={false} />
       </mesh>
       <mesh ref={puls} position={[0, 1, 0.83]}>
@@ -177,7 +337,7 @@ function Gehirn({ hoehe }: { hoehe: number }) {
   )
 }
 
-function Arbeitsplatz({ x, z, an, besetzt, farbe }: { x: number; z: number; an: boolean; besetzt: boolean; farbe: string }) {
+function Arbeitsplatz({ x, z, an, besetzt, farbe, haar }: { x: number; z: number; an: boolean; besetzt: boolean; farbe: string; haar: string }) {
   const schirm = useRef<THREE.MeshStandardMaterial>(null)
   useFrame(({ clock }) => {
     // Puls nur bei echtem, frischem Lauf – sonst bleibt der Schirm ruhig.
@@ -227,7 +387,7 @@ function Arbeitsplatz({ x, z, an, besetzt, farbe }: { x: number; z: number; an: 
           <meshStandardMaterial color={FARBE.alu} metalness={0.7} roughness={0.3} />
         </mesh>
       </group>
-      {besetzt && <Person farbe={farbe} />}
+      {besetzt && <Person farbe={farbe} haar={haar} an={an} />}
     </group>
   )
 }
@@ -275,10 +435,7 @@ function RaumModell({
       }}
       onPointerOut={() => (document.body.style.cursor = "")}
     >
-      <mesh position={[0, PLATTE / 2 + 0.005, 0.6]} receiveShadow>
-        <boxGeometry args={[RAUM_B - 0.1, 0.01, TIEFE - 2.6]} />
-        <meshStandardMaterial color={leer ? "#bdbab4" : FARBE.boden} roughness={0.95} />
-      </mesh>
+      <PbrBox args={[RAUM_B - 0.1, 0.01, TIEFE - 2.6]} position={[0, PLATTE / 2 + 0.005, 0.6]} ordner="smooth-concrete" tint={leer ? "#bdbab4" : FARBE.boden} receiveShadow />
 
       <group position={[0, PLATTE, 0]}>
         {Array.from({ length: plaetze }).map((_, i) => {
@@ -288,7 +445,7 @@ function RaumModell({
           const an = jetzt !== null && !!stand && agentFrisch(stand, jetzt)
           return (
             <group key={i}>
-              <Arbeitsplatz x={plaetze === 1 ? 0 : seite} z={-1.2 + reihe * 2.2} an={an} besetzt={!!stand} farbe={KLEIDUNG[(raum.etage * 3 + raum.spalte + i) % KLEIDUNG.length]} />
+              <Arbeitsplatz x={plaetze === 1 ? 0 : seite} z={-1.2 + reihe * 2.2} an={an} besetzt={!!stand} farbe={KLEIDUNG[(raum.etage * 3 + raum.spalte + i) % KLEIDUNG.length]} haar={HAAR[(raum.etage * 2 + raum.spalte * 3 + i * 2 + 1) % HAAR.length]} />
               {gewaehlt && stand && (
                 <Html position={[plaetze === 1 ? 0 : seite, 1.7, -1.2 + reihe * 2.2]} center distanceFactor={10} zIndexRange={[10, 0]}>
                   <span className="pointer-events-none whitespace-nowrap rounded-full bg-card/90 px-2.5 py-1 font-sans text-[11px] text-foreground shadow-sm backdrop-blur">
@@ -400,54 +557,56 @@ function Geschoss({
     gruppe.current.position.y = THREE.MathUtils.damp(gruppe.current.position.y, soll, 4, dt)
   })
 
-  const pfosten = useMemo(() => {
-    const xs: number[] = []
-    for (let x = -BREITE / 2; x <= BREITE / 2 + 0.01; x += 1.5) xs.push(x)
-    return xs
+  // Front: 14 Felder à 1,5 m. Massiv: Eckfelder (0, 13) und zwei Pfeiler auf den Raumgrenzen (4, 9).
+  // Seiten: 8 Felder à 1,25 m. Massiv: Eckfelder (0, 7) und ein Pfeiler (3).
+  const front = useMemo(() => {
+    const kanten = Array.from({ length: 15 }, (_, i) => -BREITE / 2 + i * 1.5)
+    return { kanten, ...fassadenSegmente(kanten, new Set([0, 4, 9, 13])) }
   }, [])
-  const seitenPfosten = useMemo(() => {
-    const zs: number[] = []
-    for (let z = -TIEFE / 2 + 1.25; z < TIEFE / 2; z += 1.25) zs.push(z)
-    return zs
+  const seite = useMemo(() => {
+    const kanten = Array.from({ length: 9 }, (_, i) => -TIEFE / 2 + i * 1.25)
+    return { kanten, ...fassadenSegmente(kanten, new Set([0, 3, 7])) }
   }, [])
   const glasH = H - PLATTE
   const glasY = H / 2 + PLATTE / 2
+  const SEITE_X = BREITE / 2
 
   return (
     <group ref={gruppe} position={[0, basisY, 0]}>
-      <RoundedBox args={[BREITE + 0.6, PLATTE, TIEFE + 0.6]} radius={0.03} smoothness={2} position={[0, PLATTE / 2, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color={FARBE.anthrazit} roughness={0.55} metalness={0.35} />
-      </RoundedBox>
+      <PbrBox args={[BREITE + 0.6, PLATTE, TIEFE + 0.6]} position={[0, PLATTE / 2, 0]} ordner="smooth-concrete" tint="#8f959e" castShadow receiveShadow />
 
-      {/* Geschossdecke innen sichtbar hell, Kante außen anthrazit wie eine echte Fassadenblende */}
-      <mesh position={[0, H - 0.03, -0.2]}>
-        <boxGeometry args={[BREITE - 0.1, 0.06, TIEFE - 0.5]} />
-        <meshStandardMaterial color="#f1f1ef" roughness={0.95} />
-      </mesh>
+      {/* Geschossdecke innen hell (gebürsteter Beton), Kante außen dunkel wie eine echte Fassadenblende */}
+      <PbrBox args={[BREITE - 0.1, 0.06, TIEFE - 0.5]} position={[0, H - 0.03, -0.2]} ordner="brushed-concrete" tint="#f1f1ef" />
 
-      {[-1, 1].map((s) =>
-        seitenPfosten.map((z) => (
-          <mesh key={`${s}${z}`} position={[(s * (BREITE + 0.08)) / 2, glasY, z]} castShadow>
-            <boxGeometry args={[0.1, glasH, 0.05]} />
-            <meshStandardMaterial color={FARBE.anthrazit} metalness={0.5} roughness={0.4} />
-          </mesh>
-        )),
-      )}
+      {/* Seitenfassaden: Glas-Läufe zwischen massiven Eck- und Pfeilerfeldern */}
       {[-1, 1].map((s) => (
-        <mesh key={`riegel${s}`} position={[(s * (BREITE + 0.08)) / 2, PLATTE + 0.95, 0]}>
-          <boxGeometry args={[0.1, 0.05, TIEFE]} />
-          <meshStandardMaterial color={FARBE.anthrazit} metalness={0.5} roughness={0.4} />
-        </mesh>
+        <group key={`seite${s}`}>
+          {seite.voll.map(([z0, z1]) => (
+            <PbrBox
+              key={`v${z0}`}
+              args={[0.26, glasH, z1 - z0 - 0.05]}
+              position={[s * (SEITE_X + 0.03), glasY, (z0 + z1) / 2]}
+              ordner="brushed-concrete"
+              tint="#aab0b8"
+              castShadow
+              receiveShadow
+            />
+          ))}
+          {seite.glas.map(([z0, z1]) => (
+            <mesh key={`g${z0}`} position={[s * SEITE_X, glasY, (z0 + z1) / 2]}>
+              <boxGeometry args={[0.03, glasH, z1 - z0]} />
+              <Glas opacity={0.3} />
+            </mesh>
+          ))}
+          {seite.kanten.slice(1, -1).map((z) => (
+            <PbrBox key={`p${z}`} args={[0.1, glasH, 0.06]} position={[s * (SEITE_X + 0.04), glasY, z]} ordner="metal-plate" tint="#6b717a" castShadow />
+          ))}
+          <PbrBox args={[0.1, 0.05, TIEFE]} position={[s * (SEITE_X + 0.04), PLATTE + 0.95, 0]} ordner="metal-plate" tint="#6b717a" />
+        </group>
       ))}
-      <mesh position={[0, PLATTE + 0.95, TIEFE / 2 + 0.04]}>
-        <boxGeometry args={[BREITE, 0.05, 0.08]} />
-        <meshStandardMaterial color={FARBE.anthrazit} metalness={0.5} roughness={0.4} />
-      </mesh>
 
-      <mesh position={[0, H / 2 + PLATTE / 2, -TIEFE / 2 + 0.1]} receiveShadow>
-        <boxGeometry args={[BREITE, H - PLATTE, 0.2]} />
-        <meshStandardMaterial color="#e4e6ea" roughness={0.9} />
-      </mesh>
+      {/* Rückwand */}
+      <PbrBox args={[BREITE, H - PLATTE, 0.2]} position={[0, H / 2 + PLATTE / 2, -TIEFE / 2 + 0.1]} ordner="brushed-concrete" tint="#d6d9de" receiveShadow />
 
       {[-RAUM_B / 2, RAUM_B / 2].map((x) => (
         <mesh key={x} position={[x, H / 2 + PLATTE / 2, 0.6]}>
@@ -456,23 +615,28 @@ function Geschoss({
         </mesh>
       ))}
 
-      {[-1, 1].map((s) => (
-        <mesh key={s} position={[(s * BREITE) / 2, glasY, 0]}>
-          <boxGeometry args={[0.03, glasH, TIEFE]} />
-          <Glas opacity={0.3} />
+      {/* Frontfassade */}
+      {front.glas.map(([x0, x1]) => (
+        <mesh key={`fg${x0}`} position={[(x0 + x1) / 2, glasY, TIEFE / 2]}>
+          <boxGeometry args={[x1 - x0, glasH, 0.03]} />
+          <Glas opacity={imFokus ? 0.1 : 0.26} />
         </mesh>
       ))}
-
-      <mesh position={[0, glasY, TIEFE / 2]}>
-        <boxGeometry args={[BREITE, glasH, 0.03]} />
-        <Glas opacity={imFokus ? 0.1 : 0.26} />
-      </mesh>
-      {pfosten.map((x) => (
-        <mesh key={x} position={[x, glasY, TIEFE / 2 + 0.05]} castShadow>
-          <boxGeometry args={[0.05, glasH, 0.14]} />
-          <meshStandardMaterial color={FARBE.anthrazit} metalness={0.5} roughness={0.4} />
-        </mesh>
+      {front.voll.map(([x0, x1]) => (
+        <PbrBox
+          key={`fv${x0}`}
+          args={[x1 - x0 - 0.05, glasH, 0.3]}
+          position={[(x0 + x1) / 2, glasY, TIEFE / 2 + 0.03]}
+          ordner="brushed-concrete"
+          tint="#aab0b8"
+          castShadow
+          receiveShadow
+        />
       ))}
+      {front.kanten.map((x) => (
+        <PbrBox key={`fp${x}`} args={[0.05, glasH, 0.14]} position={[x, glasY, TIEFE / 2 + 0.05]} ordner="metal-plate" tint="#6b717a" castShadow />
+      ))}
+      <PbrBox args={[BREITE, 0.05, 0.08]} position={[0, PLATTE + 0.95, TIEFE / 2 + 0.04]} ordner="metal-plate" tint="#6b717a" />
 
       {raeume.map((r) => (
         <RaumModell
@@ -557,14 +721,8 @@ function Dach({ y, angehoben }: { y: number; angehoben: boolean }) {
   })
   return (
     <group ref={ref} position={[0, y, 0]}>
-      <mesh position={[0, PLATTE / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[BREITE + 0.6, PLATTE + 0.25, TIEFE + 0.6]} />
-        <meshStandardMaterial color={FARBE.anthrazit} roughness={0.55} metalness={0.35} />
-      </mesh>
-      <mesh position={[0, PLATTE + 0.26, 0]} receiveShadow>
-        <boxGeometry args={[BREITE + 0.2, 0.02, TIEFE + 0.2]} />
-        <meshStandardMaterial color="#9a9ea5" roughness={1} />
-      </mesh>
+      <PbrBox args={[BREITE + 0.6, PLATTE + 0.25, TIEFE + 0.6]} position={[0, PLATTE / 2, 0]} ordner="smooth-concrete" tint="#8f959e" castShadow receiveShadow />
+      <PbrBox args={[BREITE + 0.2, 0.02, TIEFE + 0.2]} position={[0, PLATTE + 0.26, 0]} ordner="brushed-concrete" tint="#8e939a" receiveShadow />
       {[
         [-6, 1.5, -2],
         [-2.2, 1.1, -2.6],
@@ -632,21 +790,16 @@ function Umgebung() {
           <meshStandardMaterial color="#fff6e6" emissive="#fff1d6" emissiveIntensity={0.6} toneMapped={false} />
         </mesh>
       </group>
-      {[-14, -8, 8, 14, -19, 19].map((x, i) => (
-        <group key={x} position={[x, 0, TIEFE / 2 + (i > 3 ? 2 : 8)]} scale={i > 3 ? 1.25 : 1}>
+      {BAUM_X.map((x, i) => (
+        <group key={x} position={[x, 0, TIEFE / 2 + (i > 3 ? 2 : 8)]} scale={i > 3 ? 1.25 : 1} rotation={[0, i * 1.3, 0]}>
           <mesh position={[0, 1.4, 0]} castShadow>
             <cylinderGeometry args={[0.1, 0.16, 2.8, 10]} />
             <meshStandardMaterial color="#5a4a3a" roughness={0.95} />
           </mesh>
-          {[
-            [0, 3.4, 0, 1.25],
-            [0.7, 3, 0.3, 0.9],
-            [-0.6, 3.1, -0.3, 0.95],
-            [0.1, 4.2, -0.2, 0.85],
-          ].map(([px, py, pz, r], k) => (
-            <mesh key={k} position={[px, py, pz]} castShadow>
-              <sphereGeometry args={[r, 18, 14]} />
-              <meshStandardMaterial color={k % 2 ? "#566f4a" : "#647f55"} roughness={0.95} />
+          {BAEUME[i].map((k, j) => (
+            <mesh key={j} position={k.pos} scale={[1, 0.88, 1]} castShadow>
+              <sphereGeometry args={[k.r, 18, 14]} />
+              <meshStandardMaterial color={k.farbe} roughness={0.95} />
             </mesh>
           ))}
         </group>
@@ -710,7 +863,7 @@ export default function Hauptsitz3D({
       </Environment>
 
       <Umgebung />
-      <Gehirn hoehe={hoehe + 1.2} />
+      <Gehirn hoehe={hoehe + 1.2} fokus={fokus} />
       {etagen.map((e) => (
         <Geschoss
           key={e.index}
@@ -738,6 +891,15 @@ export default function Hauptsitz3D({
         enablePan
       />
       <Kamera fokus={fokus} raeume={raeume} />
+
+      {/* Tone Mapping läuft hier im Composer (ACES Filmic), nicht mehr über den Renderer */}
+      <EffectComposer multisampling={0} enableNormalPass={false}>
+        <N8AO aoRadius={1.4} distanceFalloff={1.2} intensity={2.2} quality="medium" halfRes />
+        <Bloom intensity={0.45} luminanceThreshold={0.75} luminanceSmoothing={0.25} mipmapBlur />
+        <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
+        <Vignette offset={0.35} darkness={0.3} />
+        <SMAA />
+      </EffectComposer>
     </Canvas>
   )
 }
