@@ -5,6 +5,7 @@ import { Pill, Surface } from "@/components/admin/primitives"
 import {
   MESSE_KATEGORIEN,
   MESSE_REGIONEN,
+  terminLabel,
   naechsteTermine,
   type Empfehlung,
   type MesseKategorie,
@@ -70,7 +71,7 @@ export default async function MessenPage({
               <li key={m.name}>
                 <Surface padding="sm" className="flex h-full flex-col gap-2">
                   <span className="text-sm text-muted-foreground">
-                    {MONATE[m.monat - 1]} {m.jahr} · {m.ort}
+                    {terminLabel(m)} · {m.ort}
                   </span>
                   <span className="font-sans text-lg font-semibold">{m.name}</span>
                   <p className="text-sm leading-relaxed text-muted-foreground text-pretty">{m.nutzen}</p>
@@ -117,7 +118,7 @@ export default async function MessenPage({
                   {liste.map((m) => (
                     <tr key={m.name} className="align-top odd:bg-muted/50">
                       <td className="whitespace-nowrap px-3 py-3 tabular-nums">
-                        <span className="font-medium">{MONATE[m.monat - 1]} {m.jahr}</span>
+                        <span className="font-medium">{terminLabel(m)}</span>
                         <span className="block text-xs text-muted-foreground">
                           {m.rhythmus === 1 ? "jährlich" : `alle ${m.rhythmus} Jahre`}
                         </span>
