@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition, type ReactNode } from "react"
 
 import { AdminField, AdminInput, AdminTextarea } from "@/components/admin/primitives"
 import { baueEml, einzelmailHtml, type EingebettetesBild, type Einzelmail } from "@/lib/mailing/eml"
+import { ABSENDER } from "@/lib/mailing/vorlage"
 import type { KiEinzelmail } from "@/lib/mailing/ki"
 import { cidFuer, mailBildPfade, MAIL_SCHRIFTEN, schriftPfad } from "@/lib/mailing/vorlage"
 
@@ -33,6 +34,7 @@ const T = {
     zweit: "Zweiter Knopf",
     link: "Link",
     gruss: "Grußformel",
+    absender: "Name unter der Mail",
     telefon: "Telefon",
     mail: "E-Mail",
     eml: ".eml herunterladen",
@@ -67,6 +69,7 @@ const T = {
     zweit: "İkinci buton",
     link: "Link",
     gruss: "Kapanış",
+    absender: "İmza adı",
     telefon: "Telefon",
     mail: "E-posta",
     eml: ".eml indir",
@@ -251,7 +254,7 @@ export function EinzelmailStudio({
           <div className="border-line flex flex-col gap-1 border-b px-5 py-4">
             <p className="truncate text-base font-semibold">{m.subject || "—"}</p>
             <p className="text-muted-foreground truncate text-sm">
-              <span className="text-foreground">{t.von}:</span> Muhammed Emin Akyol{m.an ? ` → ${m.an}` : ""}
+              <span className="text-foreground">{t.von}:</span> {m.absender || ABSENDER}{m.an ? ` → ${m.an}` : ""}
             </p>
             <p className="text-muted-foreground truncate text-xs">{m.preheader}</p>
           </div>
@@ -340,6 +343,9 @@ export function EinzelmailStudio({
             <AdminField label={t.inhalt} htmlFor="e-body">
               <AdminTextarea id="e-body" rows={14} value={m.body} onChange={feld("body")} />
               <p className="text-meta text-muted-foreground mt-1.5 leading-relaxed">{t.inhaltHint}</p>
+            </AdminField>
+            <AdminField label={t.absender} htmlFor="e-absender">
+              <AdminInput id="e-absender" value={m.absender ?? ""} onChange={feld("absender")} maxLength={60} placeholder={ABSENDER} />
             </AdminField>
             <AdminField label={t.gruss} htmlFor="e-gruss">
               <AdminInput id="e-gruss" value={m.gruss} onChange={feld("gruss")} maxLength={60} />

@@ -120,7 +120,7 @@ function nachfassText(stufe: number, original: string): string {
     stufe === 1
       ? "ich wollte kurz nachfragen, ob meine Nachricht von letzter Woche angekommen ist. Wenn das Thema gerade passt, reichen 15 Minuten am Telefon – ich richte mich nach Ihrem Kalender."
       : "ich melde mich ein letztes Mal zu meiner Nachricht. Wenn es aktuell nicht passt, ist das völlig in Ordnung – eine kurze Rückmeldung hilft mir trotzdem sehr. Ansonsten melde ich mich nicht weiter."
-  return `${gruss}\n\n${kern}\n\nViele Grüße\nMuhammed Emin Akyol\ncreaDIG Solutions`
+  return `${gruss}\n\n${kern}\n\nViele Grüße\nEmin Akyol\ncreaDIG Solutions`
 }
 
 type Faellig = { id: string; titel: string; empfaenger: string; betreff: string | null; inhalt: string; stufe: number }

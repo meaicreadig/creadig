@@ -55,6 +55,7 @@ export default async function EinzelmailSeite({ searchParams }: { searchParams: 
     zweitText: "Kontaktformular",
     zweitUrl: `${basis}/kontakt`,
     gruss: "Mit freundlichen Grüßen",
+    absender: "Emin Akyol",
     telefon: "0176 41965356",
     kontaktMail: adresse(process.env.MAIL_REPLY_TO?.trim() || von),
   }
