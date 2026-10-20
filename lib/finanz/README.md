@@ -247,7 +247,15 @@ fehlenden Zweig als eigene, benannte Prüfung (z. B. Drill M6/K-Abschnitte).
 
 Migration (lesbare Kopie): `scripts/migrations/039-finanz-bescheide-anlagen.sql`.
 
-Bewusst offen: Kontoabruf (PSD2), Eingangsmail `belege@`, wiederkehrende Rechnungsentwürfe,
-Finanz-Agent in der Truppe, §19-Umstellungsassistent. Das alte `lib/rechnung.ts` mit
-`invoices`/`payments` ist ein ungenutztes Zweitmodell (nur `steuerlage` wird gelesen) und
-wird nicht mehr für Kundenzahlen herangezogen.
+### Automatisierung (alles vorbereiten, nie von allein senden)
+
+| Was | Wie |
+|---|---|
+| `abos.ts` + `/finanz/abos` | Tabelle `fin_abos`; 5 Tage vor dem Termin entsteht ein Rechnungs-ENTWURF, der Termin rückt bedingt vor (kein Doppellauf). Pausieren statt löschen. |
+| `agent.ts` (Truppe-Agent „finanz“, täglich) | erzeugt Abo-Entwürfe und legt je überfälliger Rechnung und Mahnstufe EINEN Vorschlag in die Freigabe-Liste (`mahnung:<id>:<stufe>`). Versand bleibt dein Klick in `/finanz/vorgang/<id>`. |
+| Heute-Seite | vier Kennzahlen auf einen Blick: investierbar, überfällig, planbarer Jahresumsatz, Entwürfe warten. |
+
+Bewusst offen: Kontoabruf (PSD2), Eingangsmail `belege@` (braucht Resend-Empfang + `BLOB_READ_WRITE_TOKEN`, lokal nicht testbar),
+Finanz-Dashboard-Mail im Wochenrhythmus. Der §19-Hinweis erscheint nur, wenn `ust_pflichtig` in den Grundlagen AUS ist — für ein
+USt-pflichtiges Unternehmen also nie. Das alte `lib/rechnung.ts` mit `invoices`/`payments` ist ein ungenutztes Zweitmodell (nur
+`steuerlage` wird gelesen) und wird nicht mehr für Kundenzahlen herangezogen.

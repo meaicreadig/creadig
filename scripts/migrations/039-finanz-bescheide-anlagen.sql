@@ -32,3 +32,19 @@ CREATE TABLE IF NOT EXISTS fin_anlagen_staende (
     wert_cent bigint NOT NULL CHECK (wert_cent >= 0),
     created_at timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (anlage_id, datum));
+
+-- Wiederkehrende Rechnungen
+CREATE TABLE IF NOT EXISTS fin_abos (
+    id text PRIMARY KEY,
+    titel text NOT NULL,
+    kunde jsonb NOT NULL,
+    positionen jsonb NOT NULL,
+    geschaeftsfeld text NOT NULL DEFAULT 'digitalprodukte',
+    intervall text NOT NULL CHECK (intervall IN ('monat','quartal','jahr')),
+    naechste date NOT NULL,
+    zahlungsziel_tage int NOT NULL DEFAULT 14,
+    aktiv boolean NOT NULL DEFAULT true,
+    letzter_entwurf_id text,
+    erstellt_at timestamptz NOT NULL DEFAULT now());
+
+CREATE INDEX IF NOT EXISTS fin_abos_faellig_idx ON fin_abos (naechste) WHERE aktiv;

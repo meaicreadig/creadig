@@ -9,6 +9,9 @@ import { finanzBasis } from "@/lib/finanz/basis"
 import { berechneLage } from "@/lib/finanz/lage"
 import { stufe } from "@/lib/finanz/rechnen"
 import { finanzDb } from "@/lib/finanz/store"
+import { ladeAbos } from "@/lib/finanz/abos"
+import { investierbar } from "@/lib/finanz/investment"
+import { ladeFinanzKurzlage } from "@/lib/finanz/kurzlage"
 import { after } from "next/server"
 import { Geschaeftsfelder } from "@/components/finanz/geschaeftsfelder"
 import { ladeFelder } from "@/lib/finanz/felder"
@@ -44,6 +47,13 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
   const jahre = [diesesJahr, String(Number(diesesJahr) - 1)]
   const gewaehlt = (await searchParams).jahr
   const jahr = gewaehlt && jahre.includes(gewaehlt) ? gewaehlt : diesesJahr
+  const [kurz, abos, entwuerfe] = await Promise.all([
+    ladeFinanzKurzlage(db, heute),
+    ladeAbos(db).catch(() => []),
+    db(`SELECT count(*) AS c FROM fin_dokumente WHERE art = 'rechnung' AND status = 'entwurf'`, []).then((r) => Number(r[0]?.c ?? 0)).catch(() => 0),
+  ])
+  const inv = investierbar(frei, verlauf)
+  const aboJahr = abos.filter((a) => a.aktiv).reduce((sum, a) => sum + a.positionen.reduce((x, p) => x + p.preisCent * p.menge, 0) * (a.intervall === "monat" ? 12 : a.intervall === "quartal" ? 4 : 1), 0)
   const [felder, abgleichsStand, ziele, diversifikation] = await Promise.all([
     ladeFelder(db, jahr),
     abgleichStand(db),
@@ -63,6 +73,19 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
         paragraph19={paragraph19}
         paragraph19Vorschau={paragraph19Vorschau}
       />
+
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Auf einen Blick">
+        <Kachel href={`${basis}/investment`} label="Investierbar" wert={eur(inv.investierbarCent)} fuss="nach Steuern und Reserve" />
+        <Kachel
+          href={`${basis}/rechnungen`}
+          label="Überfällige Rechnungen"
+          wert={String(kurz.ueberfaellig)}
+          fuss={kurz.ueberfaellig > 0 ? "Mahnvorschläge liegen in deiner Freigabe-Liste" : "alles im Zahlungsziel"}
+          warnung={kurz.ueberfaellig > 0}
+        />
+        <Kachel href={`${basis}/abos`} label="Planbarer Jahresumsatz" wert={eur(aboJahr)} fuss={`${abos.filter((a) => a.aktiv).length} wiederkehrende Rechnungen`} />
+        <Kachel href={`${basis}/rechnungen`} label="Entwürfe warten" wert={String(entwuerfe)} fuss="prüfen und mit einem Klick senden" />
+      </ul>
 
       <Geschaeftsfelder bild={felder} stand={abgleichsStand} fiberoAktiv={fiberoKonfiguriert()} basis={basis || "/"} jahre={jahre} />
 
@@ -104,5 +127,17 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
         </section>
       </div>
     </FinanzShell>
+  )
+}
+
+function Kachel({ href, label, wert, fuss, warnung }: { href: string; label: string; wert: string; fuss: string; warnung?: boolean }) {
+  return (
+    <li>
+      <Link href={href} className="bg-card hover:bg-card/80 flex h-full flex-col gap-1 rounded-[1.5rem] p-5">
+        <span className="text-muted-foreground text-xs">{label}</span>
+        <span className={`text-2xl font-semibold tabular-nums ${warnung ? "text-destructive" : "text-primary"}`}>{wert}</span>
+        <span className="text-muted-foreground text-xs">{fuss}</span>
+      </Link>
+    </li>
   )
 }
