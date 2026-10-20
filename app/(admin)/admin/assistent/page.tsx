@@ -46,7 +46,7 @@ import { AGENTEN, fuehreFaelligeAus, type AgentInfo, type AgentKey } from "@/lib
 import { getVertriebStore } from "@/lib/lead-store"
 
 import { agentStarten, antwortErhalten, freigabeEntscheiden, ratAntworten } from "./actions"
-import { ladeAnsprache, type Ansprache } from "@/lib/assistent/versand"
+import { ergaenzeFehlendeAdressen, ladeAnsprache, type Ansprache } from "@/lib/assistent/versand"
 
 const euro = (n: number) => `${Math.round(n).toLocaleString("de-DE")} €`
 
@@ -446,6 +446,12 @@ function MailKarte({ f }: { f: Freigabe }) {
               <Check className="size-4" aria-hidden="true" />
               Freigeben und senden
             </button>
+            <Link
+              href={`/admin/marketing/mail/einzel?freigabe=${encodeURIComponent(f.id)}`}
+              className="flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-2 text-sm text-primary hover:bg-primary/15"
+            >
+              Im Mail-Studio gestalten
+            </Link>
             <button
               formAction={freigabeEntscheiden}
               name="status"
@@ -637,6 +643,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
     ladeAnsprache().catch((): Ansprache => ({ gesendet: 0, beantwortet: 0, quote: null, nachfassOffen: 0 })),
   ])
   after(() => fuehreFaelligeAus().catch(() => undefined))
+  after(() => ergaenzeFehlendeAdressen().catch(() => undefined))
 
   const ratMitAntwort = raete.find((r) => r.antwort)
   const neuerLoeschauftrag = ratMitAntwort?.antwort

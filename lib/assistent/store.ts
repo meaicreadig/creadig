@@ -79,6 +79,8 @@ export type FreigabeExtra = {
   gesendetAt?: string
   mailId?: string
   antwortAt?: string
+  /** Automatische Suche der Kontaktadresse auf der Firmen-Webseite */
+  adressSuche?: "gefunden" | "keine"
   /** Nachfass-Kette: Stufe 1/2, Vorgänger-Mail, angelegte Nachfass-Freigabe */
   stufe?: number
   vorgaenger?: string

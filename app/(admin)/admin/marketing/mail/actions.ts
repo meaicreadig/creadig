@@ -9,6 +9,7 @@ import { pruefeZugang } from "@/lib/admin-widerruf"
 import { darfBetreten } from "@/lib/rollen"
 import { siteUrl } from "@/lib/termine/mail"
 import { einzelmailHtml, einzelmailText, type Einzelmail } from "@/lib/mailing/eml"
+import { ergaenzeExtra, setzeFreigabe, setzeMailKopf } from "@/lib/assistent/store"
 import { schreibeEinzelmail, schreibeKampagne, type KampagnenAnlass, type KiEinzelmail, type KiKampagne } from "@/lib/mailing/ki"
 import {
   aktiveEmpfaenger,
@@ -120,6 +121,19 @@ export async function einzelmailSenden(roh: Einzelmail): Promise<Ergebnis> {
   })
   if (!res.ok) return { fehler: `Versand fehlgeschlagen (${res.status}).` }
   return { ok: true, hinweis: `An ${m.an} gesendet${a.replyTo ? ` (Kopie an ${a.replyTo})` : ""}.` }
+}
+
+/** Aus dem Assistenten geöffnet: senden und die Freigabe als gesendet markieren (startet das Nachfassen). */
+export async function einzelmailFuerFreigabe(freigabeId: string, roh: Einzelmail): Promise<Ergebnis> {
+  const r = await einzelmailSenden(roh)
+  if ("ok" in r) {
+    const m = einzelBereinigt(roh)
+    await setzeMailKopf(freigabeId, m.an, m.subject).catch(() => undefined)
+    await ergaenzeExtra(freigabeId, { gesendetAt: new Date().toISOString(), fehler: undefined }).catch(() => undefined)
+    await setzeFreigabe(freigabeId, "freigegeben").catch(() => undefined)
+    revalidatePath("/admin/assistent")
+  }
+  return r
 }
 
 export async function neueKampagne(): Promise<void> {

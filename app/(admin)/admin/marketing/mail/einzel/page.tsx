@@ -6,7 +6,10 @@ import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import type { Einzelmail } from "@/lib/mailing/eml"
 import { siteUrl } from "@/lib/termine/mail"
 
-import { einzelmailSenden, kiEinzelmail } from "../actions"
+import { ladeFreigabe } from "@/lib/assistent/store"
+import { alsEinzelmail } from "@/lib/assistent/versand"
+
+import { einzelmailFuerFreigabe, einzelmailSenden, kiEinzelmail } from "../actions"
 
 export const dynamic = "force-dynamic"
 
@@ -26,14 +29,19 @@ function adresse(von: string): string {
   return von.match(/<([^>]+)>/)?.[1]?.trim() || (von.includes("@") ? von.trim() : "")
 }
 
-export default async function EinzelmailSeite() {
+export default async function EinzelmailSeite({ searchParams }: { searchParams: Promise<{ freigabe?: string }> }) {
   const { sprache } = await adminSprachKontext()
   const tr = sprache === "tr"
   const basis = siteUrl()
+  const { freigabe: freigabeId } = await searchParams
+  const freigabe = freigabeId ? await ladeFreigabe(freigabeId).catch(() => null) : null
+  const ausAssistent = freigabe?.art === "mail" && freigabe.status === "offen" ? freigabe : null
 
   const von = process.env.MAIL_FROM?.trim() || process.env.LEAD_FROM?.trim() || ""
 
-  const start: Einzelmail = {
+  const start: Einzelmail = ausAssistent
+    ? alsEinzelmail(ausAssistent.empfaenger ?? "", ausAssistent.betreff || ausAssistent.titel, ausAssistent.inhalt)
+    : {
     an: "info@vi-sec.de",
     subject: "Nach unserem Gespräch mit Herrn Baser – Ihre offene Stelle",
     preheader: "Herr Baser hat mich gebeten, mich bei Ihnen zu melden – kurz und persönlich.",
@@ -60,12 +68,25 @@ export default async function EinzelmailSeite() {
           : "An eine Person, im creaDIG-Design. Sag, was du willst – die KI schreibt und passt an. Live ansehen, als .eml laden oder direkt senden."
       }
       meta={
-        <Link href="/admin/marketing/mail" className="text-meta text-muted-foreground hover:text-foreground underline underline-offset-4">
-          {tr ? "← E-posta pazarlama" : "← E-Mail-Marketing"}
+        <Link
+          href={ausAssistent ? "/admin/assistent" : "/admin/marketing/mail"}
+          className="text-meta text-muted-foreground hover:text-foreground underline underline-offset-4"
+        >
+          {ausAssistent ? (tr ? "← Asistan" : "← Assistent") : tr ? "← E-posta pazarlama" : "← E-Mail-Marketing"}
         </Link>
       }
     >
-      <EinzelmailStudio sprache={tr ? "tr" : "de"} siteUrl={basis} von={von} start={start} aktionen={{ kiEinzelmail, einzelmailSenden }} />
+      <EinzelmailStudio
+        key={ausAssistent?.id ?? "frei"}
+        sprache={tr ? "tr" : "de"}
+        siteUrl={basis}
+        von={von}
+        start={start}
+        aktionen={{
+          kiEinzelmail,
+          einzelmailSenden: ausAssistent ? einzelmailFuerFreigabe.bind(null, ausAssistent.id) : einzelmailSenden,
+        }}
+      />
     </AdminShell>
   )
 }
