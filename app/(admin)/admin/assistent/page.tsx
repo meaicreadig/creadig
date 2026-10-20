@@ -241,7 +241,7 @@ function AgentKarte({ a, lauf }: { a: AgentInfo; lauf?: Lauf }) {
   )
 }
 
-function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: string | null }) {
+function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele }) {
   const offen = f.status === "offen"
   return (
     <li className="flex flex-col overflow-hidden rounded-3xl bg-card shadow-sm">
@@ -289,9 +289,30 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: string | null })
                 className="resize-y rounded-2xl bg-muted px-4 py-3 text-sm leading-relaxed text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary"
               />
               {f.extra.fehler ? <p className="text-sm text-destructive">LinkedIn: {f.extra.fehler}</p> : null}
+              {linkedin.firma || linkedin.inhaber ? (
+                <fieldset className="flex flex-wrap gap-2">
+                  <legend className="sr-only">Wo posten?</legend>
+                  {(
+                    [
+                      { kanal: "firma", label: "Firmenseite", name: linkedin.firma },
+                      { kanal: "inhaber", label: "Mein Profil", name: linkedin.inhaber },
+                    ] as const
+                  )
+                    .filter((z) => z.name)
+                    .map((z, i) => (
+                      <label
+                        key={z.kanal}
+                        className="flex cursor-pointer items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-sm text-foreground has-[:checked]:bg-primary has-[:checked]:text-primary-foreground"
+                      >
+                        <input type="radio" name="ziel" value={z.kanal} defaultChecked={i === 0} className="sr-only" />
+                        {z.label}
+                      </label>
+                    ))}
+                </fieldset>
+              ) : null}
               <button className="flex w-fit items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">
                 <Check className="size-4" aria-hidden="true" />
-                {linkedin ? "Freigeben & auf LinkedIn posten" : "Freigeben"}
+                {linkedin.firma || linkedin.inhaber ? "Freigeben & auf LinkedIn posten" : "Freigeben"}
               </button>
             </form>
             <form action={freigabeEntscheiden}>
@@ -302,7 +323,7 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: string | null })
                 Verwerfen
               </button>
             </form>
-            {!linkedin ? (
+            {!linkedin.firma && !linkedin.inhaber ? (
               <p className="text-xs text-muted-foreground">
                 LinkedIn noch nicht verbunden – nach dem Verbinden postet „Freigeben“ direkt mit Bild.
               </p>
@@ -324,28 +345,44 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: string | null })
   )
 }
 
-function LinkedinStatus({ name, meldung }: { name: string | null; meldung?: string }) {
+type LinkedinZiele = { inhaber: string | null; firma: string | null }
+
+function LinkedinStatus({ ziele, meldung }: { ziele: LinkedinZiele; meldung?: string }) {
   const text: Record<string, string> = {
-    verbunden: "LinkedIn verbunden.",
+    verbunden: "Profil verbunden.",
+    "firma-verbunden": "Firmenseite verbunden.",
     abgebrochen: "Verbindung abgebrochen.",
-    fehler: "LinkedIn hat die Verbindung abgelehnt. Prüfe in der LinkedIn-App die Redirect-URL und die Produkte „Sign In with OpenID Connect“ und „Share on LinkedIn“.",
+    fehler:
+      "LinkedIn hat abgelehnt. Prüfe in der jeweiligen LinkedIn-App die Redirect-URL und ob das Produkt freigeschaltet ist (Firmenseite: „Community Management API“ muss genehmigt sein).",
   }
+  const zeilen = [
+    { kanal: "firma", label: "Firmenseite", name: ziele.firma },
+    { kanal: "inhaber", label: "Profil", name: ziele.inhaber },
+  ] as const
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-card p-4 shadow-sm">
-      <p className="flex items-center gap-2 text-sm text-foreground">
-        <Newspaper className="size-4 text-primary" aria-hidden="true" />
-        {name ? `Postet als ${name}` : "LinkedIn nicht verbunden"}
-        {meldung && text[meldung] ? <span className="text-muted-foreground">· {text[meldung]}</span> : null}
-      </p>
-      {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth-Weiterleitung, darf nicht vorab geladen werden */}
-      <a href="/api/linkedin/verbinden" className="rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground">
-        {name ? "Neu verbinden" : "Mit LinkedIn verbinden"}
-      </a>
+    <div className="flex flex-col gap-3 rounded-3xl bg-card p-4 shadow-sm">
+      {zeilen.map((z) => (
+        <div key={z.kanal} className="flex flex-wrap items-center justify-between gap-3">
+          <p className="flex items-center gap-2 text-sm text-foreground">
+            <Newspaper className="size-4 text-primary" aria-hidden="true" />
+            <span className="font-medium">{z.label}:</span>
+            {z.name ? z.name : <span className="text-muted-foreground">nicht verbunden</span>}
+          </p>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth-Weiterleitung, darf nicht vorab geladen werden */}
+          <a
+            href={`/api/linkedin/verbinden?kanal=${z.kanal}`}
+            className="rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground"
+          >
+            {z.name ? "Neu verbinden" : "Verbinden"}
+          </a>
+        </div>
+      ))}
+      {meldung && text[meldung] ? <p className="text-sm text-muted-foreground">{text[meldung]}</p> : null}
     </div>
   )
 }
 
-function FreigabeKarte({ f, linkedin }: { f: Freigabe; linkedin: string | null }) {
+function FreigabeKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele }) {
   if (f.art === "linkedin") return <ArtikelKarte f={f} linkedin={linkedin} />
   const { label, Icon } = ART[f.art]
   const offen = f.status === "offen"
@@ -409,8 +446,14 @@ function FreigabeKarte({ f, linkedin }: { f: Freigabe; linkedin: string | null }
 
 export default async function AssistentPage({ searchParams }: { searchParams: Promise<{ linkedin?: string }> }) {
   const { linkedin: liMeldung } = await searchParams
-  const li = await ladeLinkedin().catch(() => null)
-  const liName = li ? li.name ?? "dein Profil" : null
+  const [liInhaber, liFirma] = await Promise.all([
+    ladeLinkedin("inhaber").catch(() => null),
+    ladeLinkedin("firma").catch(() => null),
+  ])
+  const liZiele: LinkedinZiele = {
+    inhaber: liInhaber ? liInhaber.name ?? "dein Profil" : null,
+    firma: liFirma ? liFirma.name ?? "Firmenseite" : null,
+  }
   const [verlauf, freigabenAlle, heute, laeufe, board, raete, rahmen, beitraege] = await Promise.all([
     ladeVerlauf(40),
     ladeFreigaben(),
@@ -451,11 +494,11 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
               </button>
             </form>
           </div>
-          <LinkedinStatus name={liName} meldung={liMeldung} />
+          <LinkedinStatus ziele={liZiele} meldung={liMeldung} />
           {beitraege.length > 0 ? (
             <ul className="grid gap-4 lg:grid-cols-2">
               {beitraege.map((f) => (
-                <FreigabeKarte key={f.id} f={f} linkedin={liName} />
+                <FreigabeKarte key={f.id} f={f} linkedin={liZiele} />
               ))}
             </ul>
           ) : (
@@ -491,7 +534,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
             {offen.length > 0 ? (
               <ul className="flex flex-col gap-3">
                 {offen.map((f) => (
-                    <FreigabeKarte key={f.id} f={f} linkedin={liName} />
+                    <FreigabeKarte key={f.id} f={f} linkedin={liZiele} />
                 ))}
               </ul>
             ) : (
@@ -532,7 +575,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
                 <summary className="cursor-pointer text-sm text-muted-foreground">Erledigt (letzte 3 Tage) · {erledigt.length}</summary>
                 <ul className="mt-3 flex flex-col gap-3">
                   {erledigt.map((f) => (
-                  <FreigabeKarte key={f.id} f={f} linkedin={liName} />
+                  <FreigabeKarte key={f.id} f={f} linkedin={liZiele} />
                   ))}
                 </ul>
               </details>
