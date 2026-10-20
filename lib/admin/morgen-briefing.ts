@@ -6,6 +6,7 @@ import { collectAttention, type AttentionItem } from "@/lib/attention"
 import { ladeCockpit, type CockpitDaten } from "@/lib/cockpit"
 import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 import { getVertriebStore } from "@/lib/lead-store"
+import { ladeFinanzKurzlage, type FinanzKurzlage } from "@/lib/finanz/kurzlage"
 import { neonAbfrage } from "@/lib/neon-abfrage"
 
 export type BriefingSprache = "de" | "tr"
@@ -67,7 +68,7 @@ function kandidaten(items: AttentionItem[]): AttentionItem[] {
   return [...items].sort((a, b) => (RANG_GEWICHT[a.rank] ?? 9) - (RANG_GEWICHT[b.rank] ?? 9)).slice(0, 25)
 }
 
-function lagebild(items: AttentionItem[], c: CockpitDaten): string {
+function lagebild(items: AttentionItem[], c: CockpitDaten, f: FinanzKurzlage | null): string {
   const n = (v: number | null) => (v === null ? "nicht gemessen" : String(v))
   const eur = (cent: number | null) => (cent === null ? "nicht gemessen" : `${Math.round(cent / 100)} €`)
   return [
@@ -75,6 +76,10 @@ function lagebild(items: AttentionItem[], c: CockpitDaten): string {
     `Anfragen letzte 7 Tage: ${n(c.anfragen7)} (Woche davor: ${n(c.anfragenVor7)})`,
     `Offene Chancen in der Pipeline: ${n(c.pipelineOffen)}, Wert ${c.pipelineWert === null ? "nicht gemessen" : `${Math.round(c.pipelineWert)} €`}`,
     `Offene Rechnungen: ${n(c.rechnungenOffen)}, Summe ${eur(c.rechnungenOffenCent)}`,
+    f
+      ? `Noch nicht erhaltene Einnahmen: ${f.offeneEinnahmen.anzahl} Posten, ${eur(f.offeneEinnahmen.bruttoCent)} brutto`
+      : "Noch nicht erhaltene Einnahmen: nicht gemessen",
+    f ? `Letzter Fibero-Abgleich: ${f.abgleichAt ? f.abgleichAt.slice(0, 10) : "noch nie gelaufen"}` : "Letzter Fibero-Abgleich: nicht gemessen",
     `Veröffentlichte Beiträge letzte 7 Tage: ${n(c.posts7)}`,
     `Nächste Termine: ${c.termine?.length ? c.termine.slice(0, 5).map((t) => `${t.start} ${t.name}`).join("; ") : "keine"}`,
     `Verschickte Terminlinks ohne Buchung: ${c.linksOffen?.length ?? 0}`,
@@ -137,12 +142,12 @@ function text(v: unknown, max: number): string | null {
   return typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null
 }
 
-async function kiBriefing(items: AttentionItem[], c: CockpitDaten, sprache: BriefingSprache): Promise<Briefing | null> {
+async function kiBriefing(items: AttentionItem[], c: CockpitDaten, f: FinanzKurzlage | null, sprache: BriefingSprache): Promise<Briefing | null> {
   try {
     const { text: roh } = await generateText({
       model: MODELL,
       system: SYSTEM(sprache),
-      prompt: `LAGEBILD:\n${lagebild(items, c)}`,
+      prompt: `LAGEBILD:\n${lagebild(items, c, f)}`,
       maxOutputTokens: 2000,
     })
     const json = JSON.parse(roh.slice(roh.indexOf("{"), roh.lastIndexOf("}") + 1)) as Record<string, unknown>
@@ -167,7 +172,9 @@ async function kiBriefing(items: AttentionItem[], c: CockpitDaten, sprache: Brie
 async function erstelle(sprache: BriefingSprache): Promise<Briefing> {
   const [board, cockpit] = await Promise.all([collectAttention(getVertriebStore()), ladeCockpit()])
   const items = kandidaten(board.items)
-  return (await kiBriefing(items, cockpit, sprache)) ?? regelBriefing(items, sprache)
+  const fdb = neonAbfrage()
+  const finanz = fdb ? await ladeFinanzKurzlage(fdb, heute()).catch(() => null) : null
+  return (await kiBriefing(items, cockpit, finanz, sprache)) ?? regelBriefing(items, sprache)
 }
 
 async function speichere(sprache: BriefingSprache, b: Briefing) {

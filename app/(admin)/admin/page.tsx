@@ -88,7 +88,7 @@ export default async function Uebersicht() {
     cookies().then((c) => verifySession(c.get(ADMIN_COOKIE)?.value)),
   ])
   const netzSprache = sprache === "tr" ? "tr" : "de"
-  const netz = await ladeNetz({ sprache: netzSprache, board, cockpit, truppe })
+  const netz = await ladeNetz({ sprache: netzSprache, board, cockpit, truppe, owner: session?.rolle === "owner" })
   const hauptsitz = bauHauptsitz(netz, netzSprache, session?.rolle === "owner")
   if (cockpit.linksOffen?.some((x) => !x.entwurf)) {
     after(() => bereiteNachfassVor().catch((e) => console.error("[nachfass]", e instanceof Error ? e.message : e)))

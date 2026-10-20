@@ -5,6 +5,8 @@ import type { CockpitDaten } from "@/lib/cockpit"
 import { assistentDb, letzteLaeufe } from "@/lib/assistent/store"
 import { ladeBetriebsmeldungen } from "@/lib/betrieb-alarm"
 import { naechsteTermine } from "@/lib/messen"
+import { ladeFinanzKurzlage } from "@/lib/finanz/kurzlage"
+import { neonAbfrage } from "@/lib/neon-abfrage"
 import { ladeVerkaufslage, MONATSZIEL_EUR } from "@/lib/verkaufen"
 import type { KnotenId, Sprache } from "@/lib/zentrale/netz-karte"
 
@@ -57,17 +59,21 @@ async function mailLage(): Promise<{ gesendet7: number; offen: number } | null> 
 }
 
 const STILL_STUNDEN = 36
+const heuteIso = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date())
 
 export async function ladeNetz({
   sprache,
   board,
   cockpit,
   truppe,
+  owner = false,
 }: {
   sprache: Sprache
   board: Board | null
   cockpit: CockpitDaten | null
   truppe: { gesamt: number; linkedin: number } | null
+  /** Nur der Inhaber sieht Finanz-Zahlen im Hauptsitz. */
+  owner?: boolean
 }): Promise<NetzLage> {
   const tr = sprache === "tr"
   const [lage, laeufe, meldungen, mail] = await Promise.all([
@@ -248,14 +254,37 @@ export async function ladeNetz({
     wege: [],
   }
 
-  const finanz: Signal = {
-    wert: "€",
-    zeile: tr ? "kurulun çerçevesi" : "Rahmen für den Rat",
-    zustand: "aktiv",
-    last: 0.45,
-    punkte: [tr ? "Ayrı uygulama, sadece sahip" : "Eigene App, nur Inhaber"],
-    wege: [],
-  }
+  /*
+   * Finanzen: Zahlen NUR für den Inhaber (Finanz ist eine eigene App, nur
+   * Inhaber). Alle anderen sehen den Rahmen — dieselbe Zurückhaltung wie vorher.
+   */
+  const finanzDb = owner ? neonAbfrage() : null
+  const finanzLage = finanzDb ? await ladeFinanzKurzlage(finanzDb, heuteIso()).catch(() => null) : null
+  const finanz: Signal = finanzLage
+    ? {
+        wert: euro(finanzLage.offeneEinnahmen.bruttoCent / 100, sprache),
+        zeile: tr ? "henüz tahsil edilmedi" : "noch nicht erhalten",
+        zustand: finanzLage.offeneEinnahmen.anzahl > 0 ? "aktiv" : "ruhig",
+        last: lastAus(finanzLage.offeneEinnahmen.anzahl + finanzLage.offeneRechnungen.anzahl),
+        punkte: [
+          tr ? `${finanzLage.offeneEinnahmen.anzahl} açık gelir kalemi` : `${finanzLage.offeneEinnahmen.anzahl} offene Einnahmen`,
+          tr
+            ? `${finanzLage.offeneRechnungen.anzahl} açık fatura, ${euro(finanzLage.offeneRechnungen.offenCent / 100, sprache)}`
+            : `${finanzLage.offeneRechnungen.anzahl} offene Rechnungen, ${euro(finanzLage.offeneRechnungen.offenCent / 100, sprache)}`,
+          finanzLage.abgleichAt
+            ? tr ? `Son Fibero karşılaştırması: ${finanzLage.abgleichAt.slice(0, 10)}` : `Letzter Fibero-Abgleich: ${finanzLage.abgleichAt.slice(0, 10)}`
+            : tr ? "Fibero karşılaştırması henüz çalışmadı" : "Fibero-Abgleich noch nie gelaufen",
+        ],
+        wege: [],
+      }
+    : {
+        wert: "€",
+        zeile: tr ? "kurulun çerçevesi" : "Rahmen für den Rat",
+        zustand: "aktiv",
+        last: 0.45,
+        punkte: [tr ? "Ayrı uygulama, sadece sahip" : "Eigene App, nur Inhaber"],
+        wege: [],
+      }
 
   /* ── Gehirn: alles, was im Blick ist ── */
   const operativ = items.filter((i) => i.rank !== "entscheidung" && i.rank !== "betriebsblocker").length
