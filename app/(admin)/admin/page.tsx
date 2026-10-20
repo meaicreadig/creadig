@@ -8,7 +8,7 @@ import { bereiteNachfassVor } from "@/lib/termine/nachfass"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { Pill, SectionHeader, Surface, UnavailableNote } from "@/components/admin/primitives"
-import { type AttentionItem, type AttentionRank, type Kennzahlen, collectAttention } from "@/lib/attention"
+import { type AttentionItem, type AttentionRank, collectAttention } from "@/lib/attention"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { datumAnzeige, GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 import { getVertriebStore, leadStoreConfigured } from "@/lib/lead-store"
@@ -16,6 +16,11 @@ import { SystemErledigt } from "@/components/admin/system-erledigt"
 import { CockpitBand } from "@/components/admin/cockpit-band"
 import { ladeCockpit } from "@/lib/cockpit"
 import { zaehleOffen } from "@/lib/assistent/store"
+import { cookies } from "next/headers"
+import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
+import { ZentraleSzene } from "@/components/admin/zentrale/zentrale-szene"
+import { ladeNetz } from "@/lib/zentrale/netz"
+import { FAEDEN, KNOTEN } from "@/lib/zentrale/netz-karte"
 
 /**
  * ÜBERSICHT — die Startseite des Admin (ADM-01, 17.09.2026).
@@ -71,41 +76,20 @@ const SCHWERE: Record<AttentionRank, "neutral" | "attention" | "critical"> = {
   entscheidung: "neutral",
 }
 
-type KennzahlSchluessel = Exclude<keyof Kennzahlen, "aufteilung">
-
-/*
- * ADM-06 · A25 — JEDE ZAHL FÜHRT ZU DEN ZEILEN, DIE SIE ZÄHLT.
- *
- * Bis 22.09.2026 führten „Überfällig“ und „Heute fällig“ auf `#heute-titel`:
- * eine Liste mit höchstens zwölf Einträgen je Art. Bei 30 überfälligen
- * Vorgängen erklärte sie die Zahl nicht — sie widersprach ihr. Beide Zahlen
- * zählen Chancen UND Anfragen; eine vollständige Liste gibt es je Art. Die
- * Kachel zeigt deshalb die Summe und darunter beide Wege, jeder mit seinem
- * Anteil — gefiltert mit derselben Bedingung, mit der `summary()` zählt.
- */
-const KENNZAHL_WEG: Record<KennzahlSchluessel, string | { chancen: string; anfragen: string }> = {
-  ueberfaellig: {
-    chancen: "/admin/vertrieb/pipeline?bucket=ueberfaellig",
-    anfragen: "/admin/vertrieb/anfragen?faellig=ueberfaellig",
-  },
-  heuteFaellig: {
-    chancen: "/admin/vertrieb/pipeline?bucket=faellig",
-    anfragen: "/admin/vertrieb/anfragen?faellig=heute",
-  },
-  neueAnfragen: "/admin/vertrieb/anfragen?status=neu",
-  ohneSchritt: "/admin/vertrieb/pipeline?bucket=ohne-schritt",
-}
-
 const ENTSCHEIDUNGEN_SICHTBAR = 5
 
 export default async function Uebersicht() {
   const { t, intl, sprache } = await adminSprachKontext()
   const hasStore = leadStoreConfigured()
-  const [board, cockpit, truppe] = await Promise.all([
+  const [board, cockpit, truppe, session] = await Promise.all([
     collectAttention(getVertriebStore()),
     ladeCockpit(),
     zaehleOffen().catch(() => ({ gesamt: 0, linkedin: 0 })),
+    cookies().then((c) => verifySession(c.get(ADMIN_COOKIE)?.value)),
   ])
+  const netzSprache = sprache === "tr" ? "tr" : "de"
+  const netz = await ladeNetz({ sprache: netzSprache, board, cockpit, truppe })
+  const szenenKnoten = KNOTEN.filter((n) => !n.nurOwner || session.rolle === "owner").map((n) => ({ ...n, signal: netz[n.id] }))
   if (cockpit.linksOffen?.some((x) => !x.entwurf)) {
     after(() => bereiteNachfassVor().catch((e) => console.error("[nachfass]", e instanceof Error ? e.message : e)))
     after(() =>
@@ -133,88 +117,18 @@ export default async function Uebersicht() {
 
   return (
     <AdminShell title={t.uebersicht.titel} meta={<span className="block">{t.uebersicht.stand(stand)}</span>}>
-      <Suspense fallback={<MorgenAssistentLaedt sprache={sprache === "tr" ? "tr" : "de"} />}>
-        <MorgenAssistent sprache={sprache === "tr" ? "tr" : "de"} />
-      </Suspense>
+      {/* ── 0 · Die Zentrale: jede Fläche als Knoten am Gehirn, live ── */}
+      <ZentraleSzene knoten={szenenKnoten} faeden={[...FAEDEN]} sprache={netzSprache} />
 
-      <section aria-label="Assistent" className="flex flex-col gap-2.5 sm:flex-row">
-        <Link
-          href="/admin/assistent#eingang-titel"
-          className="flex flex-1 items-center justify-between gap-4 rounded-3xl bg-card px-5 py-4 transition-colors hover:bg-primary/5"
-        >
-          <span className="flex flex-col gap-0.5">
-            <span className="text-sm text-muted-foreground">Truppe · zur Entscheidung</span>
-            <span className="font-sans text-2xl font-semibold text-primary">{truppe.gesamt - truppe.linkedin}</span>
-          </span>
-          <span className="text-sm text-primary">Assistent öffnen</span>
-        </Link>
-        <Link
-          href="/admin/assistent#redaktion"
-          className="flex flex-1 items-center justify-between gap-4 rounded-3xl bg-card px-5 py-4 transition-colors hover:bg-primary/5"
-        >
-          <span className="flex flex-col gap-0.5">
-            <span className="text-sm text-muted-foreground">LinkedIn-Beiträge · warten auf dich</span>
-            <span className="font-sans text-2xl font-semibold text-primary">{truppe.linkedin}</span>
-          </span>
-          <span className="text-sm text-primary">Zur Redaktion</span>
-        </Link>
-      </section>
+      <div className="mt-10">
+        <Suspense fallback={<MorgenAssistentLaedt sprache={netzSprache} />}>
+          <MorgenAssistent sprache={netzSprache} />
+        </Suspense>
+      </div>
 
-      <CockpitBand daten={cockpit} sprache={sprache === "tr" ? "tr" : "de"} intl={intl} />
+      <CockpitBand daten={cockpit} sprache={netzSprache} intl={intl} />
 
-      {/* ── 1 · Kennzahlen ── */}
       <section aria-label={t.uebersicht.kennzahlenLabel}>
-        <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
-          {(Object.keys(KENNZAHL_WEG) as KennzahlSchluessel[]).map((schluessel) => {
-            const weg = KENNZAHL_WEG[schluessel]
-            const zahl = k ? (
-              <span
-                className={`mt-1 block text-2xl font-semibold tabular-nums ${typeof weg === "string" ? "group-hover:underline group-hover:underline-offset-4" : ""} ${
-                  schluessel === "ueberfaellig" && k[schluessel] > 0 ? "text-destructive" : ""
-                }`}
-                data-kennzahl={schluessel}
-              >
-                {k[schluessel]}
-              </span>
-            ) : null
-            return (
-              <li key={schluessel}>
-                {k && typeof weg === "string" ? (
-                  <Link href={weg} className="group block h-full">
-                    <Surface padding="sm" className="h-full">
-                      <span className="type-small text-muted-foreground block">{t.uebersicht.kennzahl[schluessel]}</span>
-                      {zahl}
-                    </Surface>
-                  </Link>
-                ) : k && typeof weg !== "string" ? (
-                  <Surface padding="sm" className="h-full">
-                    <span className="type-small text-muted-foreground block">{t.uebersicht.kennzahl[schluessel]}</span>
-                    {zahl}
-                    {/* Zwei Wege statt einer Kachel-Verknüpfung: ein Link im Link wäre keiner. */}
-                    <span className="mt-1 flex flex-wrap gap-x-3 text-xs">
-                      {(["chancen", "anfragen"] as const).map((art) => (
-                        <Link
-                          key={art}
-                          href={weg[art]}
-                          className="text-gold-text underline underline-offset-4"
-                          data-teil={`${schluessel}-${art}`}
-                        >
-                          {t.uebersicht.teil[art](k.aufteilung[schluessel as "ueberfaellig" | "heuteFaellig"][art])}
-                        </Link>
-                      ))}
-                    </span>
-                  </Surface>
-                ) : (
-                  <Surface padding="sm" className="h-full">
-                    <span className="type-small text-muted-foreground block">{t.uebersicht.kennzahl[schluessel]}</span>
-                    <span className="mt-1 block text-2xl font-semibold" aria-hidden="true">—</span>
-                    <span className="text-muted-foreground block text-xs">{t.uebersicht.nichtGemessen}</span>
-                  </Surface>
-                )}
-              </li>
-            )
-          })}
-        </ul>
         {!hasStore ? (
           <div className="mt-4">
             <UnavailableNote title={t.uebersicht.vertriebNichtEingerichtetTitel}>{t.uebersicht.vertriebNichtEingerichtet}</UnavailableNote>
