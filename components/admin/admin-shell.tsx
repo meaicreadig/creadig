@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 import Link from "next/link"
-import { Settings } from "lucide-react"
+import { Settings, Wallet } from "lucide-react"
 import { UngespeichertWache } from "@/components/admin/ungespeichert-wache"
 import { Logo } from "@/components/brand/logo"
 import { AdminLogout } from "@/components/admin/admin-logout"
@@ -114,6 +114,22 @@ export async function AdminShell({
           </div>
 
           <AdminNav items={items} oeffnen={t.shell.menueOeffnen} schliessen={t.shell.menueSchliessen} />
+
+          {rolle === "owner" && (
+            <Link
+              href="/finanz"
+              prefetch={false}
+              className="bg-background hover:text-primary flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors"
+            >
+              <Wallet aria-hidden="true" className="text-primary size-4" />
+              <span className="flex flex-col">
+                <span>creaDIG Finanz</span>
+                <span className="text-muted-foreground text-xs font-normal">
+                  {sprache === "tr" ? "Para, vergi, likidite" : "Geld, Steuern, Liquidität"}
+                </span>
+              </span>
+            </Link>
+          )}
 
           <div className="bg-background mt-auto hidden flex-col gap-3 rounded-2xl p-3 lg:flex">
             <div className="flex items-center justify-between gap-3">

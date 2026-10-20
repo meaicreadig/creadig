@@ -1,10 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import NextLink from "next/link"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useRouter, usePathname } from "next/navigation"
 import { motion } from "framer-motion"
-import { Check, Menu, Sun } from "lucide-react"
+import { Check, LogIn, Menu, Sun } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { hasConsent } from "@/lib/consent"
 import { LOCALE_COOKIE, LOCALE_COOKIE_MAXALTER } from "@/lib/locale-markt"
@@ -235,6 +236,18 @@ export function SiteNav() {
             >
               <WhatsAppIcon className="size-5" />
             </a>
+          </Button>
+
+          <Button
+            asChild
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground hover:bg-transparent hover:text-foreground"
+          >
+            {/* Bewusst kein LocaleLink: /admin ist sprachfrei. */}
+            <NextLink href="/admin/login" prefetch={false} aria-label="Login" title="Login">
+              <LogIn className="size-5" aria-hidden="true" />
+            </NextLink>
           </Button>
 
           {/*

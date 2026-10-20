@@ -1,30 +1,39 @@
 import { cookies } from "next/headers"
-import { NextResponse, type NextRequest } from "next/server"
+import type { NextRequest } from "next/server"
 
-import { ADMIN_COOKIE } from "@/lib/admin-session"
-import { pruefeZugang } from "@/lib/admin-widerruf"
 import { verbindeMitCode } from "@/lib/assistent/linkedin"
 
+/*
+ * Kein Admin-Cookie-Check hier: Das Admin-Cookie ist SameSite=Strict und wird
+ * beim Rücksprung von linkedin.com (seitenübergreifend) NICHT mitgeschickt —
+ * genau daher kam "Nicht berechtigt". Die Berechtigung trägt stattdessen
+ * `li_state`: Nur ein angemeldeter Inhaber bekommt es in /api/linkedin/verbinden.
+ */
 export async function GET(req: NextRequest) {
   const jar = await cookies()
-  const z = await pruefeZugang(jar.get(ADMIN_COOKIE)?.value, { aendernd: true })
-  if (z.verdict !== "ok" || z.rolle !== "owner") return new Response("Nicht berechtigt", { status: 403 })
-
-  const ziel = new URL("/admin/assistent", req.nextUrl.origin)
   const code = req.nextUrl.searchParams.get("code")
   const state = req.nextUrl.searchParams.get("state")
-  if (!code || !state || state !== jar.get("li_state")?.value) {
-    ziel.searchParams.set("linkedin", "abgebrochen")
-  } else {
+  const erwartet = jar.get("li_state")?.value
+
+  let ergebnis = "abgebrochen"
+  if (code && state && erwartet && state === erwartet) {
     try {
       await verbindeMitCode(code, req.nextUrl.origin)
-      ziel.searchParams.set("linkedin", "verbunden")
+      ergebnis = "verbunden"
     } catch (e) {
       console.error("[linkedin]", e)
-      ziel.searchParams.set("linkedin", "fehler")
+      ergebnis = "fehler"
     }
   }
-  const res = NextResponse.redirect(ziel)
-  res.cookies.delete({ name: "li_state", path: "/api/linkedin" })
+
+  /*
+   * Weiter per Meta-Refresh statt 302: Eine von unserer eigenen Seite
+   * ausgelöste Navigation gilt als same-site, dann kommt das Strict-Cookie
+   * wieder mit und /admin/assistent leitet nicht auf den Login.
+   */
+  const ziel = `/admin/assistent?linkedin=${ergebnis}`
+  const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${ziel}"><title>LinkedIn</title></head><body style="font-family:system-ui;padding:2rem"><a href="${ziel}">Weiter zum Assistenten</a></body></html>`
+  const res = new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } })
+  res.headers.append("Set-Cookie", "li_state=; Path=/api/linkedin; Max-Age=0; HttpOnly; Secure; SameSite=Lax")
   return res
 }
