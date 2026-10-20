@@ -402,7 +402,11 @@ export function Gespraechsraum({
           <Eigenschaft icon={<CalendarClock className="size-4" />} label={t.naechsterKontakt}>
             {kontakt.nextTouch || kontakt.nextTouchAt ? (
               <>
-                {kontakt.nextTouch && <span className="text-pretty">{kontakt.nextTouch}</span>}
+                {kontakt.nextTouch && (
+                  <span className="line-clamp-2 text-pretty" title={kontakt.nextTouch}>
+                    {kontakt.nextTouch}
+                  </span>
+                )}
                 {kontakt.nextTouchAt && (
                   <span className="text-gold-text font-mono text-xs">{datumKurz(kontakt.nextTouchAt)}</span>
                 )}

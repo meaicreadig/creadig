@@ -254,18 +254,27 @@ export async function speichereGespraech(
 
   const minuten = Math.max(1, Math.round(input.dauerSek / 60))
 
+  // Wird ein ganzer Chat ins Feld "Nächster Schritt" eingefügt, ist das Inhalt, kein Schritt.
+  const folgeIstInhalt = istLangtext(input.folge)
+  const abschnitte = folgeIstInhalt
+    ? { ...input.abschnitte, notiz: [input.abschnitte.notiz, input.folge].filter(Boolean).join("\n\n") }
+    : input.abschnitte
+
   const detail =
-    ABSCHNITTE.filter((a) => input.abschnitte[a])
-      .map((a) => `${UEBERSCHRIFT[a]}\n${input.abschnitte[a]}`)
+    ABSCHNITTE.filter((a) => abschnitte[a])
+      .map((a) => `${UEBERSCHRIFT[a]}\n${abschnitte[a]}`)
       .join("\n\n") || null
 
   const kontakt = await holeKontakt(input.kontaktId)
   const aufbereitung = detail
-    ? await bereiteAuf(rohtext(detail, input.folge), input.sprache, {
+    ? await bereiteAuf(rohtext(detail, folgeIstInhalt ? null : input.folge), input.sprache, {
         kontakt: kontakt?.name ?? "",
         firma: kontakt?.organisation ?? null,
       })
     : null
+
+  const folge = folgeIstInhalt ? (aufbereitung?.naechsterSchritt ?? null) : input.folge
+  input = { ...input, abschnitte, folge }
 
   const kern =
     aufbereitung?.titel ??
@@ -334,8 +343,14 @@ export async function speichereGespraech(
   return { id, aufbereitung }
 }
 
-function rohtext(detail: string, folge: string | null): string {
-  return folge ? `${detail}\n\nVereinbarter nächster Schritt: ${folge}` : detail
+function istLangtext(t: string | null | undefined): t is string {
+  return typeof t === "string" && (t.length > 140 || t.trim().includes("\n"))
+}
+
+function rohtext(detail: string | null, folge: string | null): string {
+  if (istLangtext(folge)) return [detail, folge].filter(Boolean).join("\n\n")
+  const basis = detail ?? ""
+  return folge ? `${basis}\n\nVereinbarter nächster Schritt: ${folge}`.trim() : basis
 }
 
 /**
@@ -347,30 +362,49 @@ export async function ergaenzeAufbereitungen(sprache: KiSprache, kontaktId: stri
   if (!c) return 0
   await c.ready()
   const rows = (await c.sql.query(
-    `SELECT a.id, a.detail, a.data, c.name AS contact_name, o.name AS organisation
+    `SELECT a.id, a.subject_id, a.detail, a.data, c.name AS contact_name, c.next_touch, o.name AS organisation
        FROM activities a
        LEFT JOIN contacts c ON c.id = a.subject_id
        LEFT JOIN organisations o ON o.id = c.organisation_id
       WHERE a.subject_type = 'contact' AND a.kind = 'gespraech'
-        AND a.detail IS NOT NULL
+        AND (a.detail IS NOT NULL OR length(coalesce(a.data->>'folge','')) > 0)
         AND ($1::text IS NULL OR a.subject_id = $1)
         AND (a.data IS NULL OR a.data->'ki'->$2 IS NULL)
       ORDER BY a.created_at DESC
       LIMIT $3`,
     [kontaktId, sprache, limit],
-  )) as { id: string; detail: string; data: Record<string, unknown> | null; contact_name: string | null; organisation: string | null }[]
+  )) as {
+    id: string
+    subject_id: string
+    detail: string | null
+    data: Record<string, unknown> | null
+    contact_name: string | null
+    next_touch: string | null
+    organisation: string | null
+  }[]
 
   let n = 0
   for (const z of rows) {
     const folge = typeof z.data?.folge === "string" ? z.data.folge : null
-    const a = await bereiteAuf(rohtext(z.detail, folge), sprache, { kontakt: z.contact_name ?? "", firma: z.organisation })
+    const roh = rohtext(z.detail, folge)
+    if (roh.trim().length < 3) continue
+    const a = await bereiteAuf(roh, sprache, { kontakt: z.contact_name ?? "", firma: z.organisation })
     if (!a) continue
     await c.sql.query(
       `UPDATE activities
-          SET data = jsonb_set(coalesce(data,'{}'::jsonb) || jsonb_build_object('ki', coalesce(data->'ki','{}'::jsonb)), ARRAY['ki',$2::text], $3::jsonb, true)
+          SET data = jsonb_set(coalesce(data,'{}'::jsonb) || jsonb_build_object('ki', coalesce(data->'ki','{}'::jsonb)), ARRAY['ki',$2::text], $3::jsonb, true),
+              summary = CASE WHEN length(summary) > 140 OR position(E'\\n' in summary) > 0
+                             THEN 'Gespräch · ' || $4 ELSE summary END
         WHERE id = $1`,
-      [z.id, sprache, JSON.stringify(a)],
+      [z.id, sprache, JSON.stringify(a), a.titel],
     )
+    // Eingefügter Chat landete früher als "nächster Kontakt" – durch den echten Schritt ersetzen.
+    if (istLangtext(z.next_touch)) {
+      await c.sql.query(`UPDATE contacts SET next_touch = $2, updated_at = now() WHERE id = $1`, [
+        z.subject_id,
+        a.naechsterSchritt ?? a.titel,
+      ])
+    }
     n++
   }
   return n
