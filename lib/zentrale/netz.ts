@@ -264,9 +264,19 @@ export async function ladeNetz({
     ? {
         wert: euro(finanzLage.offeneEinnahmen.bruttoCent / 100, sprache),
         zeile: tr ? "henüz tahsil edilmedi" : "noch nicht erhalten",
-        zustand: finanzLage.offeneEinnahmen.anzahl > 0 ? "aktiv" : "ruhig",
+        /* Achtung, wenn Geld oder Frist drängt: überfällige Rechnung oder Finanzamt-Frist in ≤ 14 Tagen. */
+        zustand:
+          finanzLage.ueberfaellig > 0 || (finanzLage.naechsteFrist !== null && finanzLage.naechsteFrist.tage <= 14)
+            ? "achtung"
+            : finanzLage.offeneEinnahmen.anzahl > 0
+              ? "aktiv"
+              : "ruhig",
         last: lastAus(finanzLage.offeneEinnahmen.anzahl + finanzLage.offeneRechnungen.anzahl),
         punkte: [
+          ...(finanzLage.ueberfaellig > 0 ? [tr ? `${finanzLage.ueberfaellig} fatura vadesi geçmiş` : `${finanzLage.ueberfaellig} Rechnung(en) überfällig`] : []),
+          ...(finanzLage.naechsteFrist && finanzLage.naechsteFrist.tage <= 30
+            ? [tr ? `Sonraki vade: ${finanzLage.naechsteFrist.titel} (${finanzLage.naechsteFrist.tage} gün)` : `Nächste Frist: ${finanzLage.naechsteFrist.titel} (${finanzLage.naechsteFrist.tage} Tage)`]
+            : []),
           tr ? `${finanzLage.offeneEinnahmen.anzahl} açık gelir kalemi` : `${finanzLage.offeneEinnahmen.anzahl} offene Einnahmen`,
           tr
             ? `${finanzLage.offeneRechnungen.anzahl} açık fatura, ${euro(finanzLage.offeneRechnungen.offenCent / 100, sprache)}`
@@ -290,7 +300,7 @@ export async function ladeNetz({
   const operativ = items.filter((i) => i.rank !== "entscheidung" && i.rank !== "betriebsblocker").length
   const imBlick = operativ + (truppeOffen ?? 0) + linkedinOffen
   const stoerungen = [system, assistent].filter((s) => s.zustand === "stoerung").length
-  const achtung = [assistent, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen].filter(
+  const achtung = [assistent, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen, finanz].filter(
     (s) => s.zustand === "achtung",
   ).length
   const uebersicht: Signal = {

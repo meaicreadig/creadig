@@ -233,3 +233,21 @@ In diesem Durchlauf lokal bestätigt fehlend: `BLOB_READ_WRITE_TOKEN`,
 `AI_GATEWAY_API_KEY`, `RESEND_API_KEY`, `MAIL_FROM`, `LEAD_TO` — jede
 betroffene Phase wurde trotzdem fertig gebaut und per Drill geprüft, mit dem
 fehlenden Zweig als eigene, benannte Prüfung (z. B. Drill M6/K-Abschnitte).
+
+## Nachtrag: Liquidität, USt-VA, Bescheide, Investment, Kundenbezug
+
+| Modul | Zweck |
+|---|---|
+| `rechnen.ts` (`kuenftigeBewegungen`) | Liquidität mit geschätztem Steuerabfluss; Szenarien vorsichtig / erwartet / optimistisch (`?szenario=`); überfällige Forderungen nach 21 Tagen, Pipeline gewichtet. Kompass und Warnungen nutzen immer „vorsichtig“. |
+| `ustva.ts` + `/finanz/steuern/ustva` | USt-Voranmeldung (Kz 81/86/66/83), Ist-Versteuerung; Zahllast je Frist in die Liquidität; Übernahme in die Frist ist ein Owner-Klick. Keine ELSTER-Übermittlung — nur Ausfüllhilfe. |
+| `bescheide.ts` + `/finanz/bescheide` | Tabelle `fin_bescheide`; Vorauszahlung/Nachzahlung/Erstattung wirken auf Fristen. Nur Metadaten, kein Datei-Upload. |
+| `investment.ts` + `/finanz/investment` | Tabellen `fin_anlagen`, `fin_anlagen_staende`; investierbar = frei − 6 Monatsausgaben; Was-wäre-wenn; Werte manuell mit Stichtag, keine Live-Kurse, keine Anlageberatung. |
+| `kunden-bezug.ts` | Geld je Organisation (eingenommen, offen, überfällig, Zahlungsdauer) aus `fin_dokumente`/`fin_zahlungen` — speist Kundenkarte und Kundenlage; Beträge nur für den Inhaber. |
+| `kurzlage.ts` | zusätzlich nächste Frist und überfällige Rechnungen → Finanz-Signal der Zentrale springt auf „Achtung“. |
+
+Migration (lesbare Kopie): `scripts/migrations/039-finanz-bescheide-anlagen.sql`.
+
+Bewusst offen: Kontoabruf (PSD2), Eingangsmail `belege@`, wiederkehrende Rechnungsentwürfe,
+Finanz-Agent in der Truppe, §19-Umstellungsassistent. Das alte `lib/rechnung.ts` mit
+`invoices`/`payments` ist ein ungenutztes Zweitmodell (nur `steuerlage` wird gelesen) und
+wird nicht mehr für Kundenzahlen herangezogen.

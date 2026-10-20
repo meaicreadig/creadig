@@ -1377,6 +1377,14 @@ console.log("\nK · Kunden-Bezug — Geld je Organisation aus Finanz")
   p(gesundheitAus(2, 1, 1) === "rot" && gesundheitAus(2, 1, 0) === "gelb" && gesundheitAus(2, 0, 0) === "gruen", "K6 überfällige Rechnung macht rot, auch bei frischem Kontakt")
 }
 
+/* ══ Z · Kurzlage für die Zentrale ══ */
+console.log("\nZ · Kurzlage — Frist-Nähe und Überfälliges")
+{
+  const kl = await ladeFinanzKurzlage(db, "2026-10-20")
+  p(typeof kl.ueberfaellig === "number" && kl.ueberfaellig >= 1, "Z1 überfällige Rechnungen werden gezählt (Fixture aus K)", String(kl.ueberfaellig))
+  p(kl.naechsteFrist === null || (typeof kl.naechsteFrist.tage === "number" && kl.naechsteFrist.titel.length > 0), "Z2 nächste Frist hat Titel und Tage oder ist ehrlich leer")
+}
+
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
 process.exit(fehler === 0 ? 0 : 1)
