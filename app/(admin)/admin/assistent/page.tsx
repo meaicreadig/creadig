@@ -17,6 +17,7 @@ import {
   Play,
   Radar,
   StickyNote,
+  Trash2,
   Users,
   X,
 } from "lucide-react"
@@ -27,6 +28,7 @@ import { collectAttention } from "@/lib/attention"
 import {
   fragenHeute,
   ladeBeitraege,
+  ladeFreigabe,
   ladeFreigaben,
   ladeLinkedin,
   ladeRaete,
@@ -39,6 +41,7 @@ import {
   type Rat,
 } from "@/lib/assistent/store"
 import { firmenRahmen, type Rahmen } from "@/lib/assistent/rahmen"
+import { erkenneLoeschwunsch } from "@/lib/assistent/loeschen"
 import { AGENTEN, fuehreFaelligeAus, type AgentInfo, type AgentKey } from "@/lib/assistent/truppe"
 import { getVertriebStore } from "@/lib/lead-store"
 
@@ -174,6 +177,7 @@ const ART: Record<FreigabeArt, { label: string; Icon: typeof Mail }> = {
   linkedin: { label: "LinkedIn", Icon: Newspaper },
   kapital: { label: "Kapital", Icon: Coins },
   notiz: { label: "Notiz", Icon: StickyNote },
+  loeschen: { label: "Löschen", Icon: Trash2 },
 }
 
 const AGENT_ICON: Record<AgentKey, typeof Mail> = {
@@ -501,9 +505,61 @@ function AnspracheLeiste({ a }: { a: Ansprache }) {
   )
 }
 
+function LoeschKarte({ f }: { f: Freigabe }) {
+  const offen = f.status === "offen"
+  return (
+    <li className={offen ? "flex flex-col gap-3 rounded-3xl bg-card p-5 shadow-sm" : "flex flex-col gap-2 rounded-3xl bg-card/60 p-5"}>
+      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-1 text-destructive">
+          <Trash2 className="size-3.5" aria-hidden="true" />
+          Löschen
+        </span>
+        <span>{f.extra.warum ?? `von ${agentName(f.agent)}`} · {seit(f.zeit)}</span>
+        {!offen ? <span>· {f.status === "freigegeben" ? "gelöscht" : "behalten"}</span> : null}
+      </div>
+      <h3 className="text-balance font-medium leading-snug text-foreground">{f.titel}</h3>
+      {offen ? (
+        <>
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{f.inhalt}</p>
+          {f.extra.fehler ? <p className="text-sm text-destructive">{f.extra.fehler}</p> : null}
+          <details className="group">
+            <summary className="flex w-fit cursor-pointer list-none items-center gap-1.5 rounded-full bg-destructive/10 px-4 py-2 text-sm text-destructive group-open:hidden">
+              <Trash2 className="size-4" aria-hidden="true" />
+              Löschen …
+            </summary>
+            <div className="flex flex-col gap-3 rounded-2xl bg-destructive/10 p-4">
+              <p className="text-sm font-medium text-foreground">Wirklich endgültig löschen?</p>
+              <div className="flex flex-wrap gap-2">
+                <form action={freigabeEntscheiden}>
+                  <input type="hidden" name="id" value={f.id} />
+                  <input type="hidden" name="status" value="freigegeben" />
+                  <input type="hidden" name="bestaetigt" value="ja" />
+                  <button className="flex items-center gap-1.5 rounded-full bg-destructive px-4 py-2 text-sm text-destructive-foreground">
+                    <Check className="size-4" aria-hidden="true" />
+                    Ja, endgültig löschen
+                  </button>
+                </form>
+                <form action={freigabeEntscheiden}>
+                  <input type="hidden" name="id" value={f.id} />
+                  <input type="hidden" name="status" value="verworfen" />
+                  <button className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground">
+                    <X className="size-4" aria-hidden="true" />
+                    Nein, behalten
+                  </button>
+                </form>
+              </div>
+            </div>
+          </details>
+        </>
+      ) : null}
+    </li>
+  )
+}
+
 function FreigabeKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele }) {
   if (f.art === "linkedin") return <ArtikelKarte f={f} linkedin={linkedin} />
   if (f.art === "mail") return <MailKarte f={f} />
+  if (f.art === "loeschen") return <LoeschKarte f={f} />
   const { label, Icon } = ART[f.art]
   const offen = f.status === "offen"
   return (
@@ -581,6 +637,15 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
     ladeAnsprache().catch((): Ansprache => ({ gesendet: 0, beantwortet: 0, quote: null, nachfassOffen: 0 })),
   ])
   after(() => fuehreFaelligeAus().catch(() => undefined))
+
+  const ratMitAntwort = raete.find((r) => r.antwort)
+  const neuerLoeschauftrag = ratMitAntwort?.antwort
+    ? await erkenneLoeschwunsch(ratMitAntwort.antwort, ratMitAntwort.id).catch(() => null)
+    : null
+  if (neuerLoeschauftrag) {
+    const f = await ladeFreigabe(neuerLoeschauftrag).catch(() => null)
+    if (f) freigabenAlle.unshift(f)
+  }
 
   const freigaben = freigabenAlle.filter((f) => f.art !== "linkedin")
   const offen = freigaben.filter((f) => f.status === "offen")
