@@ -3,6 +3,7 @@ import "server-only"
 import { randomUUID } from "node:crypto"
 
 import type { Abfrage } from "@/lib/neon-abfrage"
+import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 
 /**
  * Der Kundenfaden: EINE Stelle, die Firmen und Kontakte erkennt oder anlegt
@@ -174,6 +175,7 @@ export async function notiereGesendeteMail(
       ],
     )
   }
+  await protokolliereFaden(q, "mailstudio", "kunden", m.betreff)
   if (!firmaId) return
   const offen = (await q(
     `UPDATE opportunities SET last_contact_at = now(), updated_at = now(),
@@ -190,6 +192,7 @@ export async function notiereGesendeteMail(
        VALUES ($1, $2, $3, $4, 'contacted', 'jaeger', 'Antwort abwarten, sonst Nachfassen', (now() + interval '5 days')::date, now(), now(), now())`,
       [`opp-${randomUUID()}`, firmaId, kontaktId, `Erstkontakt: ${m.betreff}`.slice(0, 160)],
     )
+    await protokolliereFaden(q, "assistent", "vertrieb", m.betreff)
   }
 }
 
@@ -350,6 +353,7 @@ export async function notiereAntwort(q: Abfrage, an: string, betreff: string | n
     quelleId,
     schritt: "Termin vereinbaren",
   })
+  if (staende.length) await protokolliereFaden(q, "mailstudio", "verkaufen", betreff ?? undefined)
   const summary = `Antwort erhalten${betreff ? ` · ${betreff}` : ""}`.slice(0, 200)
   const ziele: [string, string][] = [["contact", k[0].id]]
   if (k[0].organisation_id) ziele.push(["organisation", k[0].organisation_id])
@@ -400,6 +404,7 @@ export async function notiereTermin(
     schrittAm: t.startDatum,
     anlegen: `Bedarfsgespräch: ${firma[0]?.name ?? "Termin"}`,
   })
+  await protokolliereFaden(q, "termine", "verkaufen", t.referenz)
   await q(
     `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
      SELECT $1, 'organisation', $2, 'termin_gebucht', $3, 'system', 'termine', $4::jsonb, now()
@@ -426,9 +431,11 @@ export async function notiereGespraech(
     schrittAm: g.folge ? g.folgeAm : null,
     anlegen: `Bedarfsgespräch: ${firma[0]?.name ?? "Gespräch"}`,
   })
+  await protokolliereFaden(q, "gespraech", "verkaufen", g.folge ?? undefined)
   await q(
     `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
      VALUES ($1, 'organisation', $2, 'gespraech', $3, 'admin', 'HUMAN', $4::jsonb, now())`,
     [randomUUID(), firmaId, g.summary.slice(0, 200), JSON.stringify({ quelleId: g.gespraechId, kontaktId: g.kontaktId })],
   )
+  await protokolliereFaden(q, "gespraech", "kunden", g.summary)
 }

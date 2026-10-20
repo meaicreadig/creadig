@@ -25,6 +25,7 @@ import {
   type Nachricht,
 } from "@/lib/assistent/store"
 import { darfBetreten } from "@/lib/rollen"
+import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 
 async function pruefe() {
   const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
@@ -108,6 +109,7 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
       return
     }
     await ergaenzeExtra(fid, { gesendetAt: new Date().toISOString(), mailId: r.id, fehler: undefined })
+    await protokolliereFaden(await assistentDb().catch(() => null), "assistent", "mailstudio", betreff)
   }
 
   if (status === "freigegeben" && f.art === "loeschen") {
@@ -129,6 +131,7 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
     try {
       const postUrn = await veroeffentliche({ text, bildPfad: f.bildPfad, alt: f.extra.alt, kanal })
       await ergaenzeExtra(fid, { postUrn, fehler: undefined })
+      await protokolliereFaden(await assistentDb().catch(() => null), "marketing", "assistent", f.titel)
     } catch (e) {
       console.error("[linkedin] post", e)
       await ergaenzeExtra(fid, { fehler: e instanceof Error ? e.message.slice(0, 200) : "Veröffentlichung fehlgeschlagen" })
