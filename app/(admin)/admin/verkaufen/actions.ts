@@ -5,11 +5,14 @@ import { revalidatePath } from "next/cache"
 
 import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
-import { findeOderLegeFirma } from "@/lib/kundenfaden"
+import { redirect } from "next/navigation"
+
+import { legeFreigabeAn } from "@/lib/assistent/store"
+import { findeOderLegeFirma, nimmLetzteStufeZurueck, setzeStufeVonHand } from "@/lib/kundenfaden"
 import { neonAbfrage } from "@/lib/neon-abfrage"
 import { darfBetreten } from "@/lib/rollen"
 import { ladeVerkaufslage, OFFENE_STUFEN, type OffeneStufe } from "@/lib/verkaufen"
-import { erstelleEntwurf } from "@/lib/verkaufen-entwurf"
+import { erstelleEntwurf, ladeEntwuerfe } from "@/lib/verkaufen-entwurf"
 
 function text(v: FormDataEntryValue | null, max = 200): string | null {
   if (typeof v !== "string") return null
@@ -28,6 +31,58 @@ export async function entwurfErstellen(form: FormData): Promise<void> {
   if (!deal) throw new Error("Abschluss nicht gefunden")
   await erstelleEntwurf(deal)
   revalidatePath("/admin/verkaufen")
+}
+
+async function berechtigt(): Promise<boolean> {
+  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
+  return zugang.verdict === "ok" && !!zugang.rolle && darfBetreten(zugang.rolle, "/admin/verkaufen")
+}
+
+function neuLaden() {
+  revalidatePath("/admin/verkaufen")
+  revalidatePath("/admin/kunden")
+  revalidatePath("/admin")
+}
+
+export async function stufeSetzen(form: FormData): Promise<void> {
+  if (!(await berechtigt())) throw new Error("Nicht berechtigt")
+  const q = neonAbfrage()
+  const id = text(form.get("deal"), 80)
+  const nach = text(form.get("stufe"), 20)
+  if (!q || !id || !nach) return
+  await setzeStufeVonHand(q, id, nach)
+  neuLaden()
+}
+
+export async function stufeZuruecknehmen(form: FormData): Promise<void> {
+  if (!(await berechtigt())) throw new Error("Nicht berechtigt")
+  const q = neonAbfrage()
+  const id = text(form.get("deal"), 80)
+  if (!q || !id) return
+  await nimmLetzteStufeZurueck(q, id)
+  neuLaden()
+}
+
+/** KI-Entwurf ins Mail-Studio übernehmen: dort gestalten, senden → Faden + Nachfassen laufen automatisch. */
+export async function entwurfInsStudio(form: FormData): Promise<void> {
+  if (!(await berechtigt())) throw new Error("Nicht berechtigt")
+  const id = text(form.get("deal"), 80)
+  const lage = await ladeVerkaufslage()
+  const deal = lage.deals.find((d) => d.id === id)
+  if (!deal) throw new Error("Abschluss nicht gefunden")
+  const entwuerfe = await ladeEntwuerfe()
+  const e = entwuerfe[deal.id]
+  const freigabeId = await legeFreigabeAn({
+    art: "mail",
+    titel: `${deal.firma ?? deal.titel}: ${e?.betreff ?? "Nachricht"}`.slice(0, 160),
+    inhalt: e?.text ?? "",
+    empfaenger: deal.kontaktMail,
+    betreff: e?.betreff ?? null,
+    agent: "vertrieb",
+    quelle: `deal-studio:${deal.id}:${e?.erstellt ?? "leer"}`,
+  })
+  if (!freigabeId) throw new Error("Entwurf konnte nicht übernommen werden")
+  redirect(`/admin/marketing/mail/einzel?freigabe=${encodeURIComponent(freigabeId)}`)
 }
 
 export async function dealAnlegen(form: FormData): Promise<void> {

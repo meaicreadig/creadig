@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Check, Clock, CornerDownRight, Reply } from "lucide-react"
+import { Check, Clock, CornerDownRight, Reply, Undo2 } from "lucide-react"
 
 import { Pill } from "@/components/admin/primitives"
 import type { VersandZeile } from "@/lib/assistent/versand"
@@ -19,6 +19,7 @@ const T = {
     nachgefasst: "Nachgefasst",
     beendet: "Keine Antwort · Kette beendet",
     antwortKnopf: "Antwort erhalten",
+    rueckgaengig: "Rückgängig",
     freigeben: "Ansehen & senden",
     quelle: { studio: "Mail Studio", assistent: "Assistent", nachfassen: "Nachfassen" },
     stufe: (n: number) => `${n}. Nachfassen`,
@@ -35,6 +36,7 @@ const T = {
     nachgefasst: "Takip edildi",
     beendet: "Yanıt yok · zincir bitti",
     antwortKnopf: "Yanıt geldi",
+    rueckgaengig: "Geri al",
     freigeben: "Gör ve gönder",
     quelle: { studio: "Mail Studio", assistent: "Asistan", nachfassen: "Takip" },
     stufe: (n: number) => `${n}. takip`,
@@ -46,11 +48,13 @@ export function MailVersandTabelle({
   sprache,
   intl,
   antwortAktion,
+  rueckgaengigAktion,
 }: {
   zeilen: VersandZeile[]
   sprache: Sprache
   intl: string
   antwortAktion: (formData: FormData) => Promise<void>
+  rueckgaengigAktion: (formData: FormData) => Promise<void>
 }) {
   const t = T[sprache]
   const tag = new Intl.DateTimeFormat(intl, { day: "2-digit", month: "short", timeZone: "Europe/Berlin" })
@@ -106,6 +110,15 @@ export function MailVersandTabelle({
                         >
                           {t.freigeben}
                         </Link>
+                      )}
+                      {z.status.art === "beantwortet" && (
+                        <form action={rueckgaengigAktion}>
+                          <input type="hidden" name="id" value={z.id} />
+                          <button className="text-muted-foreground hover:bg-muted inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors">
+                            <Undo2 className="size-3.5" aria-hidden="true" />
+                            {t.rueckgaengig}
+                          </button>
+                        </form>
                       )}
                       {z.status.art !== "beantwortet" && (
                         <form action={antwortAktion}>

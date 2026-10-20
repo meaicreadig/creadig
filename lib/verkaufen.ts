@@ -1,5 +1,6 @@
 import { neonAbfrage } from "@/lib/neon-abfrage"
 import { geschaeftsTag } from "@/lib/geschaeftszeit"
+import { ladeStufenSchritte } from "@/lib/kundenfaden"
 
 /**
  * „Heute verkaufen“ — eine Seite, die jeden Morgen sagt, welcher Abschluss
@@ -37,7 +38,16 @@ export type Deal = {
   faelligAm: string | null
   tageStill: number | null
   warnungen: Warnung[]
+  firmaId: string | null
+  kontaktId: string | null
+  kontaktMail: string | null
+  /** Letzte echte Berührungen: Mails, Antworten, Gespräche, Termine */
+  verlauf: VerlaufEintrag[]
+  /** Warum steht der Deal auf dieser Stufe – rücknehmbar */
+  letzterSchritt: { von: string | null; nach: string; grund: string; am: string; vonHand: boolean } | null
 }
+
+export type VerlaufEintrag = { art: string; text: string; am: string }
 
 export type Faellig = { id: string; name: string; firma: string | null; was: string | null; am: string }
 
@@ -75,7 +85,7 @@ export async function ladeVerkaufslage(): Promise<Verkaufslage> {
     const [opps, kontakte, gewonnen, neu] = await Promise.all([
       q(
         `SELECT o.id, o.title, o.status, o.estimated_value, o.next_action, o.next_action_at, o.last_contact_at,
-                o.updated_at, org.name AS firma, c.name AS person
+                o.updated_at, org.name AS firma, c.name AS person, o.organisation_id, o.contact_id, c.email
            FROM opportunities o
            LEFT JOIN organisations org ON org.id = o.organisation_id
            LEFT JOIN contacts c ON c.id = o.contact_id
@@ -96,6 +106,34 @@ export async function ladeVerkaufslage(): Promise<Verkaufslage> {
       ),
       q(`SELECT count(*) AS anzahl FROM opportunities WHERE created_at >= now() - interval '7 days'`, []),
     ])
+
+    const subjekte = [
+      ...new Set(opps.flatMap((r) => [r.organisation_id, r.contact_id].filter(Boolean).map(String))),
+    ]
+    const akt = subjekte.length
+      ? await q(
+          `SELECT subject_id, kind, summary, created_at FROM activities
+            WHERE subject_id = ANY($1::text[]) AND kind <> 'deal.stufe'
+            ORDER BY created_at DESC LIMIT 400`,
+          [subjekte],
+        )
+      : []
+    const schritte = await ladeStufenSchritte(q, opps.map((r) => String(r.id)))
+    const verlaufFuer = (orgId: unknown, kontaktId: unknown): VerlaufEintrag[] => {
+      const ids = new Set([orgId, kontaktId].filter(Boolean).map(String))
+      const gesehen = new Set<string>()
+      const liste: VerlaufEintrag[] = []
+      for (const a of akt) {
+        if (!ids.has(String(a.subject_id))) continue
+        // Mails/Antworten stehen an Kontakt UND Firma – nur einmal zeigen.
+        const schluessel = `${a.kind}|${a.summary}|${String(a.created_at).slice(0, 16)}`
+        if (gesehen.has(schluessel)) continue
+        gesehen.add(schluessel)
+        liste.push({ art: String(a.kind), text: String(a.summary ?? ""), am: new Date(String(a.created_at)).toISOString() })
+        if (liste.length === 4) break
+      }
+      return liste
+    }
 
     const jetzt = Date.now()
     const deals: Deal[] = opps
@@ -123,6 +161,11 @@ export async function ladeVerkaufslage(): Promise<Verkaufslage> {
           faelligAm,
           tageStill,
           warnungen,
+          firmaId: r.organisation_id ? String(r.organisation_id) : null,
+          kontaktId: r.contact_id ? String(r.contact_id) : null,
+          kontaktMail: r.email ? String(r.email) : null,
+          verlauf: verlaufFuer(r.organisation_id, r.contact_id),
+          letzterSchritt: schritte[String(r.id)] ?? null,
         }
       })
       .sort((a, b) => b.warnungen.length - a.warnungen.length || b.gewichtet - a.gewichtet)

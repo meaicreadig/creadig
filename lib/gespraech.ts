@@ -288,6 +288,22 @@ export async function speichereGespraech(
     [input.kontaktId, input.folge, input.folgeAm],
   )
 
+  try {
+    const [{ notiereGespraech }, { neonAbfrage }] = await Promise.all([import("@/lib/kundenfaden"), import("@/lib/neon-abfrage")])
+    const nq = neonAbfrage()
+    if (nq) {
+      await notiereGespraech(nq, {
+        kontaktId: input.kontaktId,
+        gespraechId: id,
+        summary,
+        folge: input.folge,
+        folgeAm: input.folgeAm,
+      })
+    }
+  } catch (e) {
+    console.error("[kundenfaden] Gespräch nicht in den Faden geschrieben:", (e as Error).message)
+  }
+
   const { ereignis } = await import("@/lib/motor/ereignis")
   await ereignis("gespraech_notiert", {
     kontaktId: input.kontaktId,

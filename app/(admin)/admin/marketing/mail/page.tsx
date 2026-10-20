@@ -8,7 +8,7 @@ import { AdminField, AdminInput, AdminSelect, Pill, SectionHeader, Surface, Unav
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { empfaenger, freieKontakte, kampagnen, type Empfaenger, type FreierKontakt, type Kampagne } from "@/lib/mailing/store"
 
-import { antwortErhalten, empfaengerHinzufuegen, empfaengerUmschalten, kontakteUebernehmen, neueKampagne } from "./actions"
+import { antwortErhalten, antwortZuruecknehmen, empfaengerHinzufuegen, empfaengerUmschalten, kontakteUebernehmen, neueKampagne } from "./actions"
 
 export const dynamic = "force-dynamic"
 
@@ -160,7 +160,7 @@ export default async function MailMarketingSeite() {
 
         <section aria-labelledby="gesendet" className="flex flex-col gap-4">
           <SectionHeader id="gesendet" title={t.gesendetTitel} count={versandListe.length} />
-          <MailVersandTabelle zeilen={versandListe} sprache={sprache === "tr" ? "tr" : "de"} intl={intl} antwortAktion={antwortErhalten} />
+          <MailVersandTabelle zeilen={versandListe} sprache={sprache === "tr" ? "tr" : "de"} intl={intl} antwortAktion={antwortErhalten} rueckgaengigAktion={antwortZuruecknehmen} />
         </section>
 
         <section aria-labelledby="kampagnen" className="flex flex-col gap-4">

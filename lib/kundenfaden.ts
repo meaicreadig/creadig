@@ -193,29 +193,242 @@ export async function notiereGesendeteMail(
   }
 }
 
-/** Antwort erhalten: am Kontakt protokollieren und Chance auf "qualifiziert" heben. */
-export async function notiereAntwort(q: Abfrage, an: string, betreff: string | null): Promise<void> {
+/* ------------------------------------------------------------------------ */
+/* Stufen-Motor: Ereignisse schieben Chancen vor – nie zurück.               */
+/* ------------------------------------------------------------------------ */
+
+const STUFEN_REIHE = ["new", "contacted", "qualified", "discovery", "audit", "proposal", "negotiation"] as const
+type Stufe = (typeof STUFEN_REIHE)[number]
+const rang = (s: string) => STUFEN_REIHE.indexOf(s as Stufe)
+
+/** Vorheriger Stand einer Chance – reicht, um eine Änderung exakt zurückzunehmen. */
+export type ChancenStand = { id: string; status: string; nachStatus: string; next_action: string | null; next_action_at: string | null }
+
+export async function firmaVonKontakt(q: Abfrage, kontaktId: string | null): Promise<string | null> {
+  if (!kontaktId) return null
+  const r = (await q(`SELECT organisation_id FROM contacts WHERE id = $1`, [kontaktId])) as { organisation_id: string | null }[]
+  return r[0]?.organisation_id ?? null
+}
+
+/**
+ * Hebt alle offenen Chancen der Firma mindestens auf `ziel`, setzt optional den
+ * nächsten Schritt und protokolliert jede Stufenänderung als `deal.stufe`.
+ * Gibt es noch keine Chance und ist `anlegen` gesetzt, entsteht eine.
+ */
+export async function rueckeChanceVor(
+  q: Abfrage,
+  e: {
+    firmaId: string | null
+    kontaktId?: string | null
+    ziel: Stufe
+    grund: string
+    quelleId?: string
+    schritt?: string | null
+    schrittAm?: string | null
+    anlegen?: string | null
+  },
+): Promise<ChancenStand[]> {
+  if (!e.firmaId) return []
+  const offen = (await q(
+    `SELECT id, status, next_action, next_action_at::text AS next_action_at FROM opportunities
+     WHERE organisation_id = $1 AND status = ANY($2::text[])`,
+    [e.firmaId, STUFEN_REIHE as unknown as string[]],
+  )) as { id: string; status: string; next_action: string | null; next_action_at: string | null }[]
+
+  if (offen.length === 0) {
+    if (!e.anlegen) return []
+    const id = `opp-${randomUUID()}`
+    await q(
+      `INSERT INTO opportunities (id, organisation_id, contact_id, title, status, source, next_action, next_action_at,
+                                  last_contact_at, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, 'faden', $6, $7::date, now(), now(), now())`,
+      [id, e.firmaId, e.kontaktId ?? null, e.anlegen.slice(0, 160), e.ziel, e.schritt ?? null, e.schrittAm ?? null],
+    )
+    await protokolliereStufe(q, e.firmaId, id, null, e.ziel, e.grund, e.quelleId)
+    return [{ id, status: "neu-angelegt", nachStatus: e.ziel, next_action: null, next_action_at: null }]
+  }
+
+  const staende: ChancenStand[] = []
+  for (const o of offen) {
+    const nach = rang(o.status) < rang(e.ziel) ? e.ziel : o.status
+    await q(
+      `UPDATE opportunities SET status = $2, last_contact_at = now(), updated_at = now(),
+              contact_id = coalesce(contact_id, $3),
+              next_action = coalesce($4, next_action), next_action_at = CASE WHEN $4::text IS NULL THEN next_action_at ELSE $5::date END
+       WHERE id = $1`,
+      [o.id, nach, e.kontaktId ?? null, e.schritt ?? null, e.schrittAm ?? null],
+    )
+    if (nach !== o.status) await protokolliereStufe(q, e.firmaId, o.id, o.status, nach, e.grund, e.quelleId)
+    staende.push({ ...o, nachStatus: nach })
+  }
+  return staende
+}
+
+async function protokolliereStufe(
+  q: Abfrage,
+  firmaId: string,
+  oppId: string,
+  von: string | null,
+  nach: string,
+  grund: string,
+  quelleId?: string,
+) {
+  await q(
+    `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
+     VALUES ($1, 'organisation', $2, 'deal.stufe', $3, 'system', 'AUTOMATIC', $4::jsonb, now())`,
+    [randomUUID(), firmaId, `Stufe → ${nach} · ${grund}`.slice(0, 200), JSON.stringify({ oppId, von, nach, grund, quelleId: quelleId ?? null })],
+  )
+}
+
+const ALLE_STUFEN = [...(STUFEN_REIHE as unknown as string[]), "won", "lost"]
+
+/** Stufe von Hand setzen (auch zurück, gewonnen, verloren) – mit Protokoll, damit sie rücknehmbar bleibt. */
+export async function setzeStufeVonHand(q: Abfrage, oppId: string, nach: string): Promise<boolean> {
+  if (!ALLE_STUFEN.includes(nach)) return false
+  const r = (await q(`SELECT status, organisation_id FROM opportunities WHERE id = $1`, [oppId])) as {
+    status: string
+    organisation_id: string | null
+  }[]
+  const alt = r[0]
+  if (!alt || alt.status === nach || !alt.organisation_id) return false
+  await q(`UPDATE opportunities SET status = $2, updated_at = now() WHERE id = $1`, [oppId, nach])
+  await q(
+    `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
+     VALUES ($1, 'organisation', $2, 'deal.stufe', $3, 'emin', 'MANUAL', $4::jsonb, now())`,
+    [randomUUID(), alt.organisation_id, `Stufe → ${nach} · von Hand`, JSON.stringify({ oppId, von: alt.status, nach, grund: "von Hand" })],
+  )
+  return true
+}
+
+/** Letzten Stufenschritt (automatisch oder von Hand) zurücknehmen. */
+export async function nimmLetzteStufeZurueck(q: Abfrage, oppId: string): Promise<boolean> {
+  const r = (await q(
+    `SELECT id, data->>'von' AS von, data->>'nach' AS nach FROM activities
+      WHERE kind = 'deal.stufe' AND data->>'oppId' = $1 ORDER BY created_at DESC LIMIT 1`,
+    [oppId],
+  )) as { id: string; von: string | null; nach: string }[]
+  const letzte = r[0]
+  if (!letzte?.von) return false
+  await q(`UPDATE opportunities SET status = $2, updated_at = now() WHERE id = $1 AND status = $3`, [oppId, letzte.von, letzte.nach])
+  await q(`DELETE FROM activities WHERE id = $1`, [letzte.id])
+  return true
+}
+
+/** Letzte Stufenschritte je Chance (für die Anzeige "warum steht der Deal hier"). */
+export async function ladeStufenSchritte(
+  q: Abfrage,
+  oppIds: string[],
+): Promise<Record<string, { von: string | null; nach: string; grund: string; am: string; vonHand: boolean }>> {
+  if (oppIds.length === 0) return {}
+  const r = (await q(
+    `SELECT DISTINCT ON (data->>'oppId') data->>'oppId' AS opp, data->>'von' AS von, data->>'nach' AS nach,
+            data->>'grund' AS grund, origin, created_at
+       FROM activities WHERE kind = 'deal.stufe' AND data->>'oppId' = ANY($1::text[])
+      ORDER BY data->>'oppId', created_at DESC`,
+    [oppIds],
+  )) as { opp: string; von: string | null; nach: string; grund: string | null; origin: string; created_at: string }[]
+  return Object.fromEntries(
+    r.map((s) => [
+      s.opp,
+      { von: s.von, nach: s.nach, grund: s.grund ?? "", am: new Date(s.created_at).toISOString(), vonHand: s.origin === "MANUAL" },
+    ]),
+  )
+}
+
+/** Antwort erhalten: am Kontakt + Firma protokollieren und Chance auf "qualifiziert" heben. */
+export async function notiereAntwort(q: Abfrage, an: string, betreff: string | null, quelleId: string): Promise<void> {
   const k = (await q(`SELECT id, organisation_id FROM contacts WHERE email_normalised = $1 LIMIT 1`, [an.trim().toLowerCase()])) as {
     id: string
     organisation_id: string | null
   }[]
   if (!k[0]) return
-  await q(
-    `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
-     VALUES ($1, 'contact', $2, 'mail.antwort', $3, 'admin', 'HUMAN', '{}'::jsonb, now())`,
-    [randomUUID(), k[0].id, `Antwort erhalten${betreff ? ` · ${betreff}` : ""}`.slice(0, 200)],
-  )
-  if (k[0].organisation_id) {
+  const staende = await rueckeChanceVor(q, {
+    firmaId: k[0].organisation_id,
+    kontaktId: k[0].id,
+    ziel: "qualified",
+    grund: "Antwort erhalten",
+    quelleId,
+    schritt: "Termin vereinbaren",
+  })
+  const summary = `Antwort erhalten${betreff ? ` · ${betreff}` : ""}`.slice(0, 200)
+  const ziele: [string, string][] = [["contact", k[0].id]]
+  if (k[0].organisation_id) ziele.push(["organisation", k[0].organisation_id])
+  for (const [typ, ziel] of ziele) {
     await q(
       `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
-       VALUES ($1, 'organisation', $2, 'mail.antwort', $3, 'admin', 'HUMAN', '{}'::jsonb, now())`,
-      [randomUUID(), k[0].organisation_id, `Antwort erhalten${betreff ? ` · ${betreff}` : ""}`.slice(0, 200)],
-    )
-    await q(
-      `UPDATE opportunities SET status = CASE WHEN status IN ('new','contacted') THEN 'qualified' ELSE status END,
-              last_contact_at = now(), updated_at = now(), next_action = 'Termin vereinbaren'
-       WHERE organisation_id = $1 AND status IN ('new','contacted','qualified','discovery','audit','proposal','negotiation')`,
-      [k[0].organisation_id],
+       VALUES ($1, $2, $3, 'mail.antwort', $4, 'admin', 'HUMAN', $5::jsonb, now())`,
+      [randomUUID(), typ, ziel, summary, JSON.stringify({ quelleId, vorher: typ === "organisation" ? staende : [] })],
     )
   }
+}
+
+/** Versehentlich "Antwort erhalten" gedrückt: Verlauf und Chancen exakt zurücksetzen. */
+export async function nimmAntwortZurueck(q: Abfrage, quelleId: string): Promise<void> {
+  const eintraege = (await q(
+    `SELECT id, data FROM activities WHERE kind = 'mail.antwort' AND data->>'quelleId' = $1`,
+    [quelleId],
+  )) as { id: string; data: { vorher?: ChancenStand[] } | null }[]
+  for (const e of eintraege) {
+    for (const s of e.data?.vorher ?? []) {
+      if (s.status === "neu-angelegt") continue
+      // Nur zurücksetzen, wenn seitdem niemand die Chance weiterbewegt hat.
+      await q(
+        `UPDATE opportunities SET status = $2, next_action = $3, next_action_at = $4::date, updated_at = now()
+         WHERE id = $1 AND status = $5`,
+        [s.id, s.status, s.next_action, s.next_action_at, s.nachStatus],
+      )
+    }
+  }
+  await q(`DELETE FROM activities WHERE kind IN ('mail.antwort','deal.stufe') AND data->>'quelleId' = $1`, [quelleId])
+}
+
+/** Termin gebucht → mindestens Bedarfsgespräch; ohne Chance wird eine angelegt. */
+export async function notiereTermin(
+  q: Abfrage,
+  t: { kontaktId: string | null; firmaId?: string | null; terminId: string; startDatum: string; referenz: string },
+): Promise<void> {
+  const firmaId = t.firmaId ?? (await firmaVonKontakt(q, t.kontaktId))
+  if (!firmaId) return
+  const firma = (await q(`SELECT name FROM organisations WHERE id = $1`, [firmaId])) as { name: string }[]
+  await rueckeChanceVor(q, {
+    firmaId,
+    kontaktId: t.kontaktId,
+    ziel: "discovery",
+    grund: `Termin ${t.referenz} gebucht`,
+    quelleId: t.terminId,
+    schritt: `Termin ${t.referenz} vorbereiten`,
+    schrittAm: t.startDatum,
+    anlegen: `Bedarfsgespräch: ${firma[0]?.name ?? "Termin"}`,
+  })
+  await q(
+    `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
+     SELECT $1, 'organisation', $2, 'termin_gebucht', $3, 'system', 'termine', $4::jsonb, now()
+     WHERE NOT EXISTS (SELECT 1 FROM activities WHERE kind = 'termin_gebucht' AND subject_type = 'organisation' AND data->>'quelleId' = $5)`,
+    [randomUUID(), firmaId, `Termin gebucht · ${t.referenz}`, JSON.stringify({ quelleId: t.terminId, startDatum: t.startDatum }), t.terminId],
+  )
+}
+
+/** Gespräch notiert → mindestens Bedarfsgespräch, nächster Schritt aus der Folge-Notiz. */
+export async function notiereGespraech(
+  q: Abfrage,
+  g: { kontaktId: string; gespraechId: string; summary: string; folge: string | null; folgeAm: string | null },
+): Promise<void> {
+  const firmaId = await firmaVonKontakt(q, g.kontaktId)
+  if (!firmaId) return
+  const firma = (await q(`SELECT name FROM organisations WHERE id = $1`, [firmaId])) as { name: string }[]
+  await rueckeChanceVor(q, {
+    firmaId,
+    kontaktId: g.kontaktId,
+    ziel: "discovery",
+    grund: "Gespräch geführt",
+    quelleId: g.gespraechId,
+    schritt: g.folge,
+    schrittAm: g.folge ? g.folgeAm : null,
+    anlegen: `Bedarfsgespräch: ${firma[0]?.name ?? "Gespräch"}`,
+  })
+  await q(
+    `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
+     VALUES ($1, 'organisation', $2, 'gespraech', $3, 'admin', 'HUMAN', $4::jsonb, now())`,
+    [randomUUID(), firmaId, g.summary.slice(0, 200), JSON.stringify({ quelleId: g.gespraechId, kontaktId: g.kontaktId })],
+  )
 }

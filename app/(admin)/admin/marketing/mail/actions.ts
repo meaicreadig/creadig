@@ -10,7 +10,7 @@ import { darfBetreten } from "@/lib/rollen"
 import { siteUrl } from "@/lib/termine/mail"
 import { einzelmailHtml, einzelmailText, type Einzelmail } from "@/lib/mailing/eml"
 import { ergaenzeExtra, setzeFreigabe, setzeMailKopf } from "@/lib/assistent/store"
-import { markiereAntwort, protokolliereStudioMail } from "@/lib/assistent/versand"
+import { markiereAntwort, nimmAntwortZurueckFuer, protokolliereStudioMail } from "@/lib/assistent/versand"
 import { schreibeEinzelmail, schreibeKampagne, type KampagnenAnlass, type KiEinzelmail, type KiKampagne } from "@/lib/mailing/ki"
 import {
   aktiveEmpfaenger,
@@ -148,6 +148,16 @@ export async function antwortErhalten(formData: FormData): Promise<void> {
   if (id) await markiereAntwort(id)
   revalidatePath(PFAD)
   revalidatePath("/admin/assistent")
+  revalidatePath("/admin/verkaufen")
+}
+
+export async function antwortZuruecknehmen(formData: FormData): Promise<void> {
+  if (!(await darf())) return
+  const id = String(formData.get("id") ?? "").slice(0, 80)
+  if (id) await nimmAntwortZurueckFuer(id)
+  revalidatePath(PFAD)
+  revalidatePath("/admin/assistent")
+  revalidatePath("/admin/verkaufen")
 }
 
 /** Aus dem Assistenten geöffnet: senden und die Freigabe als gesendet markieren (startet das Nachfassen). */
