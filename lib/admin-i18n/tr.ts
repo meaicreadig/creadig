@@ -29,6 +29,7 @@ export const tr: AdminTexte = {
     veroeffentlichungen: { label: "Yayınlar", hint: "Ne çıktı, ne geri döndü" },
     uebersicht: { label: "Genel bakış", hint: "Bugün önemli olan" },
     verkaufen: { label: "Bugün sat", hint: "Anlaşmalar, hedef, sıradaki hamle" },
+    messen: { label: "Fuarlar", hint: "Fiber, dijital, 3D baskı, e-ticaret" },
     anfragen: { label: "Talepler", hint: "Gelen, değerlendirme, sonraki adım" },
     kunden: { label: "Müşteriler ve kişiler", hint: "Kuruluşlar, kişiler, geçmiş" },
     vertrieb: { label: "Satış", hint: "Fırsatlar, süreç, araştırma, kayıp" },
@@ -446,7 +447,7 @@ export const tr: AdminTexte = {
       `${inhalt} müşteri ve talep veritabanında tutulur. Bu ortam için henüz kurulmadı. Bu boş bir liste değil, eksik bir bağlantıdır — kurulum Sistem altında.`,
     nichtErreichbarTitel: (bereich) => `${bereich}: veritabanına şu an ulaşılamıyor`,
     nichtErreichbarText: (inhalt) =>
-      `${inhalt} müşteri ve talep veritabanında tutulur. Kurulu, ancak şu an yanıt vermedi. Bu boş bir liste değil, bir ar��zadır — hiçbir şey silinmedi.`,
+      `${inhalt} müşteri ve talep veritabanında tutulur. Kurulu, ancak şu an yanıt vermedi. Bu boş bir liste değil, bir ar���zadır — hiçbir şey silinmedi.`,
     erneutLaden: "Yeniden yükle",
     inhaltVertrieb: "Talepler, kişiler ve satış fırsatları",
     inhaltKunden: "Kuruluşlar, lokasyonlar ve irtibat ki��ileri",

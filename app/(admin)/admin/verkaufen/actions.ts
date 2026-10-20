@@ -7,12 +7,26 @@ import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
 import { neonAbfrage } from "@/lib/neon-abfrage"
 import { darfBetreten } from "@/lib/rollen"
-import { OFFENE_STUFEN, type OffeneStufe } from "@/lib/verkaufen"
+import { ladeVerkaufslage, OFFENE_STUFEN, type OffeneStufe } from "@/lib/verkaufen"
+import { erstelleEntwurf } from "@/lib/verkaufen-entwurf"
 
 function text(v: FormDataEntryValue | null, max = 200): string | null {
   if (typeof v !== "string") return null
   const t = v.trim().slice(0, max)
   return t.length === 0 ? null : t
+}
+
+export async function entwurfErstellen(form: FormData): Promise<void> {
+  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
+  if (zugang.verdict !== "ok" || !zugang.rolle || !darfBetreten(zugang.rolle, "/admin/verkaufen")) {
+    throw new Error("Nicht berechtigt")
+  }
+  const id = text(form.get("deal"), 80)
+  const lage = await ladeVerkaufslage()
+  const deal = lage.deals.find((d) => d.id === id)
+  if (!deal) throw new Error("Abschluss nicht gefunden")
+  await erstelleEntwurf(deal)
+  revalidatePath("/admin/verkaufen")
 }
 
 export async function dealAnlegen(form: FormData): Promise<void> {

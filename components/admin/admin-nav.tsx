@@ -12,7 +12,9 @@ import {
   Megaphone,
   Menu,
   MessagesSquare,
+  Presentation,
   Send,
+  Target,
   TrendingUp,
   X,
   type LucideIcon,
@@ -22,6 +24,8 @@ export type NavItem = { href: string; label: string; hint: string; gruppe: strin
 
 const ICONS: Record<string, LucideIcon> = {
   uebersicht: LayoutDashboard,
+  verkaufen: Target,
+  messen: Presentation,
   gespraech: MessagesSquare,
   termine: CalendarClock,
   anfragen: Inbox,

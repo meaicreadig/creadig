@@ -183,13 +183,16 @@ export async function termineFuerFeed(): Promise<Termin[]> {
   return rows.map(alsTermin)
 }
 
+import { appleBelegt } from "@/lib/termine/apple"
+
 async function belegteIntervalle(q: Abfrage): Promise<{ sperren: Intervall[]; termine: Intervall[] }> {
-  const [b, t] = await Promise.all([
+  const [b, t, apple] = await Promise.all([
     q(`SELECT starts_at, ends_at FROM availability_blocks WHERE deleted_at IS NULL AND ends_at > now()`, []),
     q(`SELECT starts_at, ends_at FROM appointments WHERE ends_at > now() AND status = ANY($1)`, [AKTIVE_STATUS as unknown as string[]]),
+    appleBelegt().catch(() => [] as Intervall[]),
   ])
   const iv = (r: Record<string, unknown>) => ({ start: new Date(iso(r.starts_at)).getTime(), end: new Date(iso(r.ends_at)).getTime() })
-  return { sperren: b.map(iv), termine: t.map(iv) }
+  return { sperren: [...b.map(iv), ...apple], termine: t.map(iv) }
 }
 
 /* ------------------------------------------------------------------------ */
