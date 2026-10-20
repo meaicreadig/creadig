@@ -1,6 +1,8 @@
 import "server-only"
 
+import type { Locale } from "@/lib/dictionary"
 import type { Termin } from "@/lib/termine/store"
+import { TERMIN_TEXTE, terminZeit } from "@/lib/termine/texte"
 
 /**
  * CreaDIGMailLayout — eine HTML-Hülle für alle Termin-Mails, plus ICS.
@@ -25,13 +27,21 @@ export function siteUrl(): string {
   return "https://creadig.de"
 }
 
+/** Buchungslink in der Sprache des Gastes: /termin/buchen/… bzw. /en|/tr|/ar/termin/buchen/… */
+export function buchungsUrl(token: string, locale: Locale = "de"): string {
+  return `${siteUrl()}${TERMIN_TEXTE[locale].pfad}/termin/buchen/${token}`
+}
+
 export function mailLayout(o: {
   vorschau: string
   titel: string
   absaetze: string[]
   knopf?: { text: string; href: string }
   details?: [string, string][]
+  /** Sprache des Empfängers; bestimmt lang/dir und die Fußzeile. Standard Deutsch. */
+  locale?: Locale
 }): string {
+  const x = TERMIN_TEXTE[o.locale ?? "de"]
   const absaetze = o.absaetze
     .map((p) => `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:${TEXT}">${esc(p).replace(/\n/g, "<br>")}</p>`)
     .join("")
@@ -46,7 +56,7 @@ export function mailLayout(o: {
   const knopf = o.knopf
     ? `<table role="presentation" style="margin:4px 0 24px"><tr><td style="background:${NACHT};border-radius:6px"><a href="${esc(o.knopf.href)}" style="display:inline-block;padding:13px 22px;font-size:15px;font-weight:600;color:#FFFFFF;text-decoration:none">${esc(o.knopf.text)}</a></td></tr></table>`
     : ""
-  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><title>${esc(o.titel)}</title></head>
+  return `<!doctype html><html lang="${o.locale ?? "de"}" dir="${x.dir}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light only"><title>${esc(o.titel)}</title></head>
 <body style="margin:0;padding:0;background:#F3F2EF;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif">
 <span style="display:none;max-height:0;overflow:hidden">${esc(o.vorschau)}</span>
 <table role="presentation" width="100%" style="background:#F3F2EF"><tr><td align="center" style="padding:24px 12px">
@@ -58,8 +68,8 @@ export function mailLayout(o: {
 ${absaetze}${details}${knopf}
 </td></tr>
 <tr><td style="padding:18px 28px;border-top:1px solid ${LINIE};font-size:12px;line-height:1.6;color:${GRAU}">
-creaDIG solutions UG (haftungsbeschränkt) · <a href="${siteUrl()}/impressum" style="color:${GRAU}">Impressum</a> · <a href="${siteUrl()}/datenschutz" style="color:${GRAU}">Datenschutz</a><br>
-Sie möchten keine weiteren Nachrichten? Eine kurze Antwort auf diese Mail genügt.
+creaDIG solutions UG (haftungsbeschränkt) · <a href="${siteUrl()}${x.pfad}/impressum" style="color:${GRAU}">${x.mail.footerImpressum}</a> · <a href="${siteUrl()}${x.pfad}/datenschutz" style="color:${GRAU}">${x.mail.footerDatenschutz}</a><br>
+${x.mail.footerAbmelden}
 </td></tr></table></td></tr></table></body></html>`
 }
 
@@ -147,11 +157,6 @@ export async function sendeMail(m: {
   return { ok: true }
 }
 
-export function terminZeitText(t: { startsAt: string; endsAt: string }, timezone = "Europe/Berlin"): string {
-  const s = new Date(t.startsAt)
-  const e = new Date(t.endsAt)
-  const tag = s.toLocaleDateString("de-DE", { timeZone: timezone, weekday: "long", day: "numeric", month: "long", year: "numeric" })
-  const von = s.toLocaleTimeString("de-DE", { timeZone: timezone, hour: "2-digit", minute: "2-digit" })
-  const bis = e.toLocaleTimeString("de-DE", { timeZone: timezone, hour: "2-digit", minute: "2-digit" })
-  return `${tag}, ${von}–${bis} Uhr`
+export function terminZeitText(t: { startsAt: string; endsAt: string }, timezone = "Europe/Berlin", locale: Locale = "de"): string {
+  return terminZeit(t, locale, timezone)
 }

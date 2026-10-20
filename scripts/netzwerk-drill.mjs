@@ -143,6 +143,53 @@ console.log("\nN5 · Betriebsalarm")
   p(alarm.TAEGLICHE_AGENTEN.length + alarm.WOECHENTLICHE_AGENTEN.length === truppe.AGENTEN.length, "N5 jeder Agent der Truppe wird überwacht")
 }
 
+/* ═══ N6 · Terminbuchung spricht die Sprache des Gastes ═══ */
+console.log("\nN6 · Termin-Kette mit Sprache")
+{
+  const fs = await import("node:fs")
+  await q(`CREATE TABLE IF NOT EXISTS contacts (id text PRIMARY KEY, name text, email text, organisation_id text, next_touch text, next_touch_at date, last_interaction_at timestamptz, updated_at timestamptz, excluded_reason text)`)
+  await q(`CREATE TABLE IF NOT EXISTS organisations (id text PRIMARY KEY, name text)`)
+  await q(`CREATE TABLE IF NOT EXISTS activities (id text PRIMARY KEY, subject_type text, subject_id text, kind text, summary text, data jsonb, actor text, created_at timestamptz DEFAULT now())`)
+  await q(`CREATE EXTENSION IF NOT EXISTS btree_gist`).catch(() => undefined)
+  for (const t of ["appointments", "booking_links", "availability_settings", "availability_blocks"]) await q(`DROP TABLE IF EXISTS ${t} CASCADE`)
+  await q(fs.readFileSync(new URL("./migrations/026-termine.sql", import.meta.url), "utf8"))
+  await q(fs.readFileSync(new URL("./migrations/038-termin-locale.sql", import.meta.url), "utf8"))
+  await q(`CREATE TABLE IF NOT EXISTS leads (id text PRIMARY KEY, contact_id text, locale text, created_at timestamptz DEFAULT now())`)
+  await q(`DELETE FROM leads`)
+  await q(`DELETE FROM contacts WHERE id LIKE 'c-%'`)
+  await q(`INSERT INTO contacts (id, name) VALUES ('c-tr','Drill TR'),('c-de','Drill DE'),('c-unbekannt','Drill ?')`)
+  await q(`INSERT INTO leads (id, contact_id, locale) VALUES ('l1','c-tr','tr'),('l2','c-de','de')`)
+  const ts = await import("../lib/termine/store.ts")
+  const mail = await import("../lib/termine/mail.ts")
+  const tx = await import("../lib/termine/texte.ts")
+
+  const tTr = await ts.legeBuchungslinkAn({ contactId: "c-tr", organisationId: null, meetingKind: "kennenlernen", topic: null, windowFrom: null, windowTo: null, gueltigTage: 5, von: "drill" })
+  const tDe = await ts.legeBuchungslinkAn({ contactId: "c-de", organisationId: null, meetingKind: "kennenlernen", topic: null, windowFrom: null, windowTo: null, gueltigTage: 5, von: "drill" })
+  const tEn = await ts.legeBuchungslinkAn({ contactId: null, organisationId: null, meetingKind: "video", topic: null, windowFrom: null, windowTo: null, gueltigTage: 5, von: "drill", locale: "en" })
+  const tNeu = await ts.legeBuchungslinkAn({ contactId: "c-unbekannt", organisationId: null, meetingKind: "video", topic: null, windowFrom: null, windowTo: null, gueltigTage: 5, von: "drill" })
+  p((await ts.linkSprache(tTr)) === "tr", "N6 Link erbt die Sprache der letzten Anfrage des Kontakts (tr)")
+  p((await ts.linkSprache(tDe)) === "de" && (await ts.linkSprache(tNeu)) === "de", "N6 deutscher / unbekannter Kontakt bleibt deutsch")
+  p((await ts.linkSprache(tEn)) === "en", "N6 ausdrückliche Sprache gewinnt (en)")
+  const pr = await ts.pruefeBuchungslink(tTr)
+  p(pr.ok && pr.link.locale === "tr", "N6 pruefeBuchungslink liefert die Sprache")
+  p(mail.buchungsUrl(tTr, "tr").includes("/tr/termin/buchen/") && !mail.buchungsUrl(tDe, "de").includes("/de/"), "N6 Link-URL trägt das Sprachpräfix (de ohne)")
+
+  const html = mail.mailLayout({ vorschau: "v", titel: "t", absaetze: ["a"], locale: "ar" })
+  p(html.includes('lang="ar" dir="rtl"') && html.includes("/ar/impressum"), "N6 Mail-Hülle: lang/dir und Fußzeile in der Gastsprache")
+  const z = tx.terminZeit({ startsAt: "2026-10-27T13:00:00Z", endsAt: "2026-10-27T13:30:00Z" }, "de")
+  const zt = tx.terminZeit({ startsAt: "2026-10-27T13:00:00Z", endsAt: "2026-10-27T13:30:00Z" }, "tr")
+  p(z.includes("Uhr") && z.includes("14:00") && !zt.includes("Uhr") && zt.includes("Ekim"), "N6 Zeitangabe lokalisiert", `${z} | ${zt}`)
+
+  /* Buchung → Termin trägt die Sprache. Folgeschritte (Ereignis/Faden) dürfen in der Wegwerf-DB ausfallen, der Termin nicht. */
+  const frei = await ts.slotsFuerLink(pr.link)
+  if (frei.length) {
+    const b = await ts.bucheTermin({ token: tTr, start: frei[0], name: "Drill Gast", email: "gast@example.test", note: null }).catch((e) => ({ ok: false, grund: String(e.message) }))
+    p(b.ok && b.termin.locale === "tr", "N6 gebuchter Termin trägt die Sprache des Links", b.ok ? "" : JSON.stringify(b))
+  } else {
+    p(false, "N6 keine freien Slots im Drill (Einstellungen fehlen?)")
+  }
+}
+
 await roh.end()
 console.log(fehler === 0 ? "\nAlle Pruefungen bestanden — die Systeme kennen sich.\n" : `\nABGEBROCHEN — ${fehler} Befund(e)\n`)
 process.exit(fehler ? 1 : 0)

@@ -8,13 +8,15 @@ import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
 import { darfBetreten } from "@/lib/rollen"
 import { plusTage, geschaeftsTag } from "@/lib/geschaeftszeit"
-import { mailLayout, sendeMail, siteUrl, terminZeitText } from "@/lib/termine/mail"
+import { buchungsUrl, mailLayout, sendeMail, terminZeitText } from "@/lib/termine/mail"
+import { TERMIN_TEXTE } from "@/lib/termine/texte"
 import {
   GESPRAECHSARTEN,
   einladungsKontakt,
   entferneSperre,
   holeEinstellungen,
   legeBuchungslinkAn,
+  linkSprache,
   legeSperreAn,
   protokolliere,
   sageTerminAb,
@@ -112,18 +114,14 @@ export async function terminAbsagen(form: FormData): Promise<void> {
   const grund = feld(form, "grund", 300)
   const termin = await sageTerminAb(id, grund, von)
   if (!termin) zurueck("Termin war schon abgesagt.")
-  const zeit = terminZeitText(termin)
-  const text = [
-    `Hallo ${termin.guestName},`,
-    `leider muss ich unseren Termin am ${zeit} absagen.${grund ? ` ${grund}` : ""}`,
-    "Ich melde mich mit einem neuen Vorschlag.",
-    "Viele Grüße\nMuhammed Emin Akyol · creaDIG",
-  ]
+  const T = TERMIN_TEXTE[termin.locale].mail
+  const zeit = terminZeitText(termin, "Europe/Berlin", termin.locale)
+  const text = T.absageText(termin.guestName, zeit, grund)
   await sendeMail({
     to: termin.guestEmail,
-    subject: `Termin abgesagt · ${termin.reference}`,
+    subject: T.absageSubject(termin.reference),
     text: text.join("\n\n"),
-    html: mailLayout({ vorschau: "Ihr Termin wurde abgesagt", titel: "Termin abgesagt", absaetze: text, details: [["Termin", zeit], ["Referenz", termin.reference]] }),
+    html: mailLayout({ vorschau: T.absageVorschau, titel: T.absageTitel, absaetze: text, details: [[T.labelTermin, zeit], [T.labelReferenz, termin.reference]], locale: termin.locale }),
   })
   revalidatePath(PFAD)
   zurueck("Termin abgesagt, Gast informiert.")
@@ -168,7 +166,8 @@ export async function terminmailSenden(form: FormData): Promise<void> {
     gueltigTage: zahl(form, "gueltig", 1, 30, 10),
     von,
   })
-  const link = `${siteUrl()}/termin/buchen/${token}`
+  const sprache = await linkSprache(token)
+  const link = buchungsUrl(token, sprache)
   const fertig = text.replace("{link}", link)
   const absaetze = fertig.split(/\n{2,}/)
 
@@ -176,7 +175,7 @@ export async function terminmailSenden(form: FormData): Promise<void> {
     to: empfaenger,
     subject: test ? `[TEST] ${betreff}` : betreff,
     text: fertig,
-    html: mailLayout({ vorschau: betreff, titel: betreff, absaetze: absaetze.map((p) => p.replace(link, "").trim()).filter(Boolean), knopf: { text: "Termin wählen", href: link } }),
+    html: mailLayout({ vorschau: betreff, titel: betreff, absaetze: absaetze.map((p) => p.replace(link, "").trim()).filter(Boolean), knopf: { text: TERMIN_TEXTE[sprache].mail.terminWaehlen, href: link }, locale: sprache }),
   })
   if (!versand.ok) zurueck(versand.grund === "nicht_eingerichtet" ? "Mailversand ist nicht eingerichtet." : `Versand fehlgeschlagen: ${versand.detail ?? ""}`, ziel)
 

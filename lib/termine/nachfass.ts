@@ -3,8 +3,9 @@ import "server-only"
 import { neonAbfrage } from "@/lib/neon-abfrage"
 import { geschaeftsTag, plusTage } from "@/lib/geschaeftszeit"
 import { schreibeTerminmail } from "@/lib/termine/ki-mail"
-import { mailLayout, sendeMail, siteUrl } from "@/lib/termine/mail"
-import { GESPRAECHSARTEN, neuesToken, protokolliere, setzeNaechstenSchritt, type Gespraechsart } from "@/lib/termine/store"
+import { buchungsUrl, mailLayout, sendeMail } from "@/lib/termine/mail"
+import { TERMIN_TEXTE } from "@/lib/termine/texte"
+import { GESPRAECHSARTEN, alsLocale, neuesToken, protokolliere, setzeNaechstenSchritt, type Gespraechsart } from "@/lib/termine/store"
 
 /**
  * Nachfass-Motor: Für jeden Terminlink, der seit 3 Tagen unbenutzt ist,
@@ -79,7 +80,7 @@ export async function sendeNachfass(id: string, von: string): Promise<NachfassEr
   if (!e) return { ok: false, meldung: "Entwurf nicht mehr offen." }
 
   const r = await q(
-    `SELECT c.name, c.email, c.excluded_reason, b.meeting_kind, b.used_at, b.revoked_at, b.expires_at > now() + interval '2 days' AS gueltig
+    `SELECT c.name, c.email, c.excluded_reason, b.meeting_kind, b.locale, b.used_at, b.revoked_at, b.expires_at > now() + interval '2 days' AS gueltig
        FROM contacts c JOIN booking_links b ON b.token = $2 WHERE c.id = $1`,
     [e.kontaktId, e.token],
   )
@@ -96,15 +97,16 @@ export async function sendeNachfass(id: string, von: string): Promise<NachfassEr
   if (k.revoked_at || !k.gueltig) {
     token = neuesToken()
     await q(
-      `INSERT INTO booking_links (token, contact_id, organisation_id, meeting_kind, duration_min, topic, window_from, window_to, expires_at, created_by)
-       SELECT $1, contact_id, organisation_id, meeting_kind, duration_min, topic, NULL, NULL, now() + interval '10 days', $3
+      `INSERT INTO booking_links (token, contact_id, organisation_id, meeting_kind, duration_min, topic, window_from, window_to, expires_at, created_by, locale)
+       SELECT $1, contact_id, organisation_id, meeting_kind, duration_min, topic, NULL, NULL, now() + interval '10 days', $3, locale
          FROM booking_links WHERE token = $2`,
       [token, e.token, von],
     )
     await q(`UPDATE booking_links SET revoked_at = now() WHERE token = $1 AND revoked_at IS NULL`, [e.token])
   }
 
-  const link = `${siteUrl()}/termin/buchen/${token}`
+  const sprache = alsLocale(k.locale)
+  const link = buchungsUrl(token, sprache)
   const fertig = e.text.replace("{link}", link)
   const versand = await sendeMail({
     to: String(k.email),
@@ -114,7 +116,8 @@ export async function sendeNachfass(id: string, von: string): Promise<NachfassEr
       vorschau: e.betreff,
       titel: e.betreff,
       absaetze: fertig.split(/\n{2,}/).map((p) => p.replace(link, "").trim()).filter(Boolean),
-      knopf: { text: "Termin wählen", href: link },
+      knopf: { text: TERMIN_TEXTE[sprache].mail.terminWaehlen, href: link },
+      locale: sprache,
     }),
   })
   if (!versand.ok) return { ok: false, meldung: versand.grund === "nicht_eingerichtet" ? "Mailversand ist nicht eingerichtet." : "Versand fehlgeschlagen." }
