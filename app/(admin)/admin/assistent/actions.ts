@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache"
 import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
 import { antworte } from "@/lib/assistent/agent"
+import { AGENT_KEYS, fuehreAgentAus, type AgentKey } from "@/lib/assistent/truppe"
 import {
   fragenHeute,
   ladeVerlauf,
@@ -43,6 +44,14 @@ export async function frage(eingabe: string): Promise<FrageErgebnis> {
     console.error("[assistent]", e)
     return { ok: false, fehler: "Der Assistent ist gerade nicht erreichbar. Bitte gleich nochmal versuchen." }
   }
+}
+
+export async function agentStarten(form: FormData): Promise<void> {
+  await pruefe()
+  const key = form.get("agent")
+  if (typeof key !== "string" || !AGENT_KEYS.includes(key as AgentKey)) return
+  await fuehreAgentAus(key as AgentKey)
+  revalidatePath("/admin/assistent")
 }
 
 export async function freigabeEntscheiden(form: FormData): Promise<void> {
