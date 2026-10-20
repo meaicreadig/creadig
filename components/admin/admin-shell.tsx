@@ -29,6 +29,7 @@ const NAV = [
   { key: "termine", href: "/admin/termine", gruppe: "cockpit" },
   { key: "vertrieb", href: "/admin/vertrieb", gruppe: "vertrieb" },
   { key: "kunden", href: "/admin/kunden", gruppe: "kunden" },
+  { key: "mailstudio", href: "/admin/marketing/mail", gruppe: "marketing" },
   { key: "marketing", href: "/admin/marketing", gruppe: "marketing" },
   { key: "messen", href: "/admin/messen", gruppe: "marketing" },
 ] as const

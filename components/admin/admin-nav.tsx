@@ -9,6 +9,7 @@ import {
   CalendarClock,
   Inbox,
   LayoutDashboard,
+  Mail,
   Megaphone,
   Menu,
   MessagesSquare,
@@ -35,6 +36,7 @@ const ICONS: Record<string, LucideIcon> = {
   kunden: Building2,
   nachweise: BadgeCheck,
   marketing: Megaphone,
+  mailstudio: Mail,
   veroeffentlichungen: Send,
 }
 

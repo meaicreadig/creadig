@@ -168,7 +168,7 @@ export default async function MarketingSeite() {
           href="/admin/marketing/mail"
           className="border-gold text-gold-text inline-flex h-10 items-center gap-1.5 rounded-md border px-4 text-sm font-medium transition-colors hover:bg-muted/40"
         >
-          {sprache === "tr" ? "E-posta pazarlama" : "E-Mail-Marketing"}
+          Mail Studio
           <ArrowUpRight className="size-4" aria-hidden="true" />
         </Link>
       </div>

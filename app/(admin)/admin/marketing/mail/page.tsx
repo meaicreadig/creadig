@@ -1,18 +1,27 @@
 import Link from "next/link"
+import { PenLine } from "lucide-react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
+import { MailVersandTabelle } from "@/components/admin/mail-versand-tabelle"
+import { ladeAnsprache, ladeVersandListe } from "@/lib/assistent/versand"
 import { AdminField, AdminInput, AdminSelect, Pill, SectionHeader, Surface, UnavailableNote } from "@/components/admin/primitives"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { empfaenger, freieKontakte, kampagnen, type Empfaenger, type FreierKontakt, type Kampagne } from "@/lib/mailing/store"
 
-import { empfaengerHinzufuegen, empfaengerUmschalten, kontakteUebernehmen, neueKampagne } from "./actions"
+import { antwortErhalten, empfaengerHinzufuegen, empfaengerUmschalten, kontakteUebernehmen, neueKampagne } from "./actions"
 
 export const dynamic = "force-dynamic"
 
 const T = {
   de: {
-    title: "E-Mail-Marketing",
-    lead: "Kampagnen schreiben, an den Verteiler senden und sehen, wer reagiert. Jede Adresse hat eine dokumentierte Rechtsgrundlage und kann sich mit einem Klick abmelden.",
+    title: "Mail Studio",
+    lead: "Jede gesendete Mail an einem Ort: an wen, was, wann – und ob eine Antwort kam. Ohne Antwort legt das System nach 5 und 9 Tagen automatisch eine Nachfass-Mail zur Freigabe an.",
+    neueMail: "Neue Mail",
+    gesendetTitel: "Gesendete Mails",
+    mailsGesendet: "Gesendet (60 Tage)",
+    antworten: "Antworten",
+    quote: "Antwortquote",
+    nachfassOffen: "Nachfassen wartet",
     aktiv: "Aktive Empfänger",
     versendet: "Versendete Kampagnen",
     oeffnung: "Öffnungsrate (ungefähr)",
@@ -45,8 +54,14 @@ const T = {
     dbText: "Die Tabellen für Mail-Marketing (Migration 027) fehlen oder die Verbindung ist gestört.",
   },
   tr: {
-    title: "E-posta pazarlama",
-    lead: "Kampanya yaz, listeye gönder, kimin tepki verdiğini gör. Her adresin belgelenmiş bir hukuki dayanağı var ve tek tıkla abonelikten çıkabilir.",
+    title: "Mail Studio",
+    lead: "Gönderilen her e-posta tek yerde: kime, ne, ne zaman – ve yanıt geldi mi. Yanıt gelmezse sistem 5 ve 9 gün sonra otomatik takip e-postasını onaya koyar.",
+    neueMail: "Yeni e-posta",
+    gesendetTitel: "Gönderilen e-postalar",
+    mailsGesendet: "Gönderilen (60 gün)",
+    antworten: "Yanıtlar",
+    quote: "Yanıt oranı",
+    nachfassOffen: "Bekleyen takip",
     aktiv: "Aktif alıcı",
     versendet: "Gönderilen kampanya",
     oeffnung: "Açılma oranı (yaklaşık)",
@@ -87,6 +102,10 @@ function prozent(teil: number, ganz: number): string {
 export default async function MailMarketingSeite() {
   const { sprache, intl } = await adminSprachKontext()
   const t = sprache === "tr" ? T.tr : T.de
+  const [versandListe, ansprache] = await Promise.all([
+    ladeVersandListe().catch(() => []),
+    ladeAnsprache().catch(() => ({ gesendet: 0, beantwortet: 0, quote: null, nachfassOffen: 0 })),
+  ])
   let daten: { k: Kampagne[]; e: Empfaenger[]; f: FreierKontakt[] } | null = null
   try {
     const [k, e, f] = await Promise.all([kampagnen(), empfaenger(), freieKontakte()])
@@ -109,23 +128,40 @@ export default async function MailMarketingSeite() {
   const aktive = daten.e.filter((e) => e.status === "aktiv").length
 
   const kennzahlen = [
-    { label: t.aktiv, wert: String(aktive) },
-    { label: t.versendet, wert: String(versendet.length) },
-    { label: t.oeffnung, wert: prozent(versendet.reduce((s, k) => s + k.geoeffnet, 0), summeGesendet) },
-    { label: t.klick, wert: prozent(versendet.reduce((s, k) => s + k.geklickt, 0), summeGesendet) },
+    { label: t.mailsGesendet, wert: String(ansprache.gesendet) },
+    { label: t.antworten, wert: String(ansprache.beantwortet) },
+    { label: t.quote, wert: ansprache.quote === null ? "—" : `${ansprache.quote} %` },
+    { label: t.nachfassOffen, wert: String(ansprache.nachfassOffen) },
   ]
 
   return (
-    <AdminShell title={t.title} lead={t.lead}>
+    <AdminShell
+      title={t.title}
+      lead={t.lead}
+      meta={
+        <Link
+          href="/admin/marketing/mail/einzel"
+          className="bg-primary text-primary-foreground inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium"
+        >
+          <PenLine className="size-4" aria-hidden="true" />
+          {t.neueMail}
+        </Link>
+      }
+    >
       <div className="flex flex-col gap-10">
         <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {kennzahlen.map((z) => (
             <Surface key={z.label} padding="sm">
               <dt className="text-meta text-muted-foreground">{z.label}</dt>
-              <dd className="font-display mt-1 text-2xl font-semibold tabular-nums">{z.wert}</dd>
+              <dd className="font-display text-primary mt-1 text-2xl font-semibold tabular-nums">{z.wert}</dd>
             </Surface>
           ))}
         </dl>
+
+        <section aria-labelledby="gesendet" className="flex flex-col gap-4">
+          <SectionHeader id="gesendet" title={t.gesendetTitel} count={versandListe.length} />
+          <MailVersandTabelle zeilen={versandListe} sprache={sprache === "tr" ? "tr" : "de"} intl={intl} antwortAktion={antwortErhalten} />
+        </section>
 
         <section aria-labelledby="kampagnen" className="flex flex-col gap-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
@@ -133,11 +169,14 @@ export default async function MailMarketingSeite() {
               <SectionHeader id="kampagnen" title={t.kampagnen} count={daten.k.length} />
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <Link href="/admin/marketing/mail/einzel" className="border-gold/60 text-gold-text rounded-md border px-4 py-2 text-sm font-medium">
-                {sprache === "tr" ? "Kişisel e-posta" : "Persönliche Mail"}
-              </Link>
+              {versendet.length > 0 && (
+                <span className="text-meta text-muted-foreground">
+                  {t.aktiv} {aktive} · {t.oeffnung} {prozent(versendet.reduce((s, k) => s + k.geoeffnet, 0), summeGesendet)} · {t.klick}{" "}
+                  {prozent(versendet.reduce((s, k) => s + k.geklickt, 0), summeGesendet)}
+                </span>
+              )}
               <form action={neueKampagne}>
-                <button className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-medium">{t.neu}</button>
+                <button className="border-primary/40 text-primary rounded-full border px-4 py-2 text-sm font-medium">{t.neu}</button>
               </form>
             </div>
           </div>
@@ -211,7 +250,7 @@ export default async function MailMarketingSeite() {
                             {c.name}
                             {c.firma ? <span className="text-muted-foreground"> · {c.firma}</span> : null}
                           </span>
-                          <span className="text-meta text-muted-foreground hidden truncate sm:block">{c.email}</span>
+                          <span className="text-meta text-muted-foreground hidden max-w-[45%] truncate sm:block">{c.email}</span>
                         </label>
                       ))}
                     </fieldset>

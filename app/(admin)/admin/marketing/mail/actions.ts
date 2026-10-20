@@ -10,6 +10,7 @@ import { darfBetreten } from "@/lib/rollen"
 import { siteUrl } from "@/lib/termine/mail"
 import { einzelmailHtml, einzelmailText, type Einzelmail } from "@/lib/mailing/eml"
 import { ergaenzeExtra, setzeFreigabe, setzeMailKopf } from "@/lib/assistent/store"
+import { markiereAntwort, protokolliereStudioMail } from "@/lib/assistent/versand"
 import { schreibeEinzelmail, schreibeKampagne, type KampagnenAnlass, type KiEinzelmail, type KiKampagne } from "@/lib/mailing/ki"
 import {
   aktiveEmpfaenger,
@@ -101,7 +102,7 @@ export async function kiEinzelmail(anweisung: string, entwurf: Einzelmail): Prom
   return schreibeEinzelmail(anweisung, bisher, m.an)
 }
 
-export async function einzelmailSenden(roh: Einzelmail): Promise<Ergebnis> {
+async function resendEinzelmail(roh: Einzelmail): Promise<{ ok: true; hinweis: string; mailId?: string } | { fehler: string }> {
   if (!(await darf())) return { fehler: "Kein Zugang." }
   const m = einzelBereinigt(roh)
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.an)) return { fehler: "Empfänger-Adresse fehlt oder ist ungültig." }
@@ -121,16 +122,42 @@ export async function einzelmailSenden(roh: Einzelmail): Promise<Ergebnis> {
     }),
   })
   if (!res.ok) return { fehler: `Versand fehlgeschlagen (${res.status}).` }
-  return { ok: true, hinweis: `An ${m.an} gesendet${a.replyTo ? ` (Kopie an ${a.replyTo})` : ""}.` }
+  const mailId = ((await res.json().catch(() => ({}))) as { id?: string }).id
+  return { ok: true, mailId, hinweis: `An ${m.an} gesendet${a.replyTo ? ` (Kopie an ${a.replyTo})` : ""}.` }
+}
+
+function studioInhalt(m: Einzelmail): string {
+  return [m.anrede, m.body].filter(Boolean).join("\n\n")
+}
+
+/** Frei im Mail Studio geschrieben: senden und ins Versandprotokoll (Antwort + Nachfassen). */
+export async function einzelmailSenden(roh: Einzelmail): Promise<Ergebnis> {
+  const r = await resendEinzelmail(roh)
+  if ("ok" in r) {
+    const m = einzelBereinigt(roh)
+    await protokolliereStudioMail({ an: m.an, betreff: m.subject, inhalt: studioInhalt(m), mailId: r.mailId }).catch(() => undefined)
+    revalidatePath(PFAD)
+  }
+  return r
+}
+
+/** Antwort eingegangen: Kette stoppen, kein weiteres Nachfassen. */
+export async function antwortErhalten(formData: FormData): Promise<void> {
+  if (!(await darf())) return
+  const id = String(formData.get("id") ?? "").slice(0, 80)
+  if (id) await markiereAntwort(id)
+  revalidatePath(PFAD)
+  revalidatePath("/admin/assistent")
 }
 
 /** Aus dem Assistenten geöffnet: senden und die Freigabe als gesendet markieren (startet das Nachfassen). */
 export async function einzelmailFuerFreigabe(freigabeId: string, roh: Einzelmail): Promise<Ergebnis> {
-  const r = await einzelmailSenden(roh)
+  const r = await resendEinzelmail(roh)
   if ("ok" in r) {
     const m = einzelBereinigt(roh)
     await setzeMailKopf(freigabeId, m.an, m.subject).catch(() => undefined)
-    await ergaenzeExtra(freigabeId, { gesendetAt: new Date().toISOString(), fehler: undefined }).catch(() => undefined)
+    await ergaenzeExtra(freigabeId, { gesendetAt: new Date().toISOString(), fehler: undefined, ...(r.mailId ? { mailId: r.mailId } : {}) }).catch(() => undefined)
+    revalidatePath(PFAD)
     await setzeFreigabe(freigabeId, "freigegeben").catch(() => undefined)
     revalidatePath("/admin/assistent")
   }
