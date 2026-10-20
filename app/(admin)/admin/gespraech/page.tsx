@@ -3,6 +3,7 @@ import { after } from "next/server"
 import { Plus, Search } from "lucide-react"
 
 import { AufbereitungBlock } from "@/components/admin/gespraech-aufbereitung"
+import { Disclosure } from "@/components/ui/disclosure"
 import type { KiSprache } from "@/lib/gespraech-ki"
 
 import { kontaktAnlegen } from "@/app/(admin)/admin/gespraech/actions"
@@ -251,7 +252,7 @@ export default async function GespraechSeite({
             />
           ) : (
             <div className="border-line grid overflow-hidden rounded-xl border xl:grid-cols-[minmax(0,1fr)_22rem]">
-              <div className="flex min-h-96 flex-col justify-center gap-3 p-8 sm:p-12">
+              <div className="flex min-h-96 flex-col gap-3 p-8 sm:p-12">
                 <p className="eyebrow text-gold-text">{t.zentrale}</p>
                 <h2 className="font-display text-3xl font-semibold tracking-tight text-balance">{t.waehlen}</h2>
                 <p className="text-muted-foreground max-w-lg leading-relaxed text-pretty">{t.waehlenText}</p>
@@ -260,10 +261,9 @@ export default async function GespraechSeite({
                 aria-label={t.zuletzt}
                 className="border-line bg-background/60 flex flex-col border-t xl:border-t-0 xl:border-l"
               >
-                <h2 className="border-line font-display border-b px-5 py-4 text-base font-semibold">{t.zuletzt}</h2>
-                <div className="px-5 py-5">
+                <Disclosure heading size="sm" label={t.zuletzt} className="border-t-0 px-5">
                   <Verlauf eintraege={verlauf} t={t} sprache={sprache} mitName />
-                </div>
+                </Disclosure>
               </aside>
             </div>
           )}

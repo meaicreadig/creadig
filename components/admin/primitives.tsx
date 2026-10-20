@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from "react"
+import type { ComponentProps, ComponentType, ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -227,6 +227,65 @@ export function AdminSelect({ className, children, ...props }: ComponentProps<"s
           <path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </span>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------------ */
+/* Auswahl-Button — eine Kante, mehrere Optionen                             */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Ein Dialekt für jede Stelle, die zwischen wenigen Optionen wählen lässt
+ * (Desktop/Mobil in der Mail-Vorschau, Messe-Status, …). Vorher stand dasselbe
+ * Muster handgeschrieben an mehreren Stellen, einmal als eine gemeinsame
+ * Kante mit Segmenten, einmal als mehrere freistehende Knöpfe nebeneinander —
+ * zwei Dialekte für dieselbe Frage. Jetzt gibt es nur noch den ersten: eine
+ * Kante, die Segmente teilen sich den Innenraum.
+ */
+export type SegmentedOption<T extends string> = {
+  value: T
+  label: ReactNode
+  icon?: ComponentType<{ className?: string; "aria-hidden"?: boolean }>
+  activeClassName?: string
+}
+
+export function SegmentedControl<T extends string>({
+  value,
+  onChange,
+  options,
+  ariaLabel,
+  disabled = false,
+}: {
+  value: T | null
+  /** `alreadyActive` ist wahr, wenn die Option vor dem Klick schon gewählt war — für abwählbare Gruppen. */
+  onChange: (value: T, alreadyActive: boolean) => void
+  options: readonly SegmentedOption<T>[]
+  ariaLabel: string
+  disabled?: boolean
+}) {
+  return (
+    <div role="group" aria-label={ariaLabel} className="border-line inline-flex flex-wrap gap-0.5 rounded-full border p-0.5">
+      {options.map((o) => {
+        const active = value === o.value
+        const Icon = o.icon
+        return (
+          <button
+            key={o.value}
+            type="button"
+            aria-pressed={active}
+            disabled={disabled}
+            onClick={() => onChange(o.value, active)}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60",
+              active ? o.activeClassName ?? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {Icon ? <Icon className="size-3.5" aria-hidden /> : null}
+            {o.label}
+          </button>
+        )
+      })}
     </div>
   )
 }

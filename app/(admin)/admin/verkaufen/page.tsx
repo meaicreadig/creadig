@@ -6,7 +6,7 @@ import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { datumAnzeige } from "@/lib/geschaeftszeit"
 import { ladeVerkaufslage, MONATSZIEL_EUR, OFFENE_STUFEN, WAHRSCHEINLICHKEIT, type OffeneStufe, type Warnung } from "@/lib/verkaufen"
 import { ladeEntwuerfe } from "@/lib/verkaufen-entwurf"
-import { Sparkles, Undo2 } from "lucide-react"
+import { ChevronDown, Sparkles, Undo2 } from "lucide-react"
 import { dealAnlegen, entwurfErstellen, entwurfInsStudio, stufeSetzen, stufeZuruecknehmen } from "./actions"
 
 function artLabel(art: string, arten: Record<string, string>): string {
@@ -274,18 +274,24 @@ export default async function VerkaufenPage() {
                       <form action={stufeSetzen} className="flex items-center gap-2">
                         <input type="hidden" name="deal" value={d.id} />
                         <label className="sr-only" htmlFor={`stufe-${d.id}`}>{t.stufe}</label>
-                        <select
-                          id={`stufe-${d.id}`}
-                          name="stufe"
-                          defaultValue={d.stufe}
-                          className="rounded-full bg-card px-3 py-1.5 text-sm"
-                        >
-                          {OFFENE_STUFEN.map((s) => (
-                            <option key={s} value={s}>{t.stufen[s]}</option>
-                          ))}
-                          <option value="won">{t.gewonnenStufe}</option>
-                          <option value="lost">{t.verlorenStufe}</option>
-                        </select>
+                        <div className="relative">
+                          <select
+                            id={`stufe-${d.id}`}
+                            name="stufe"
+                            defaultValue={d.stufe}
+                            className="appearance-none rounded-full bg-card py-1.5 pl-3 pr-7 text-sm"
+                          >
+                            {OFFENE_STUFEN.map((s) => (
+                              <option key={s} value={s}>{t.stufen[s]}</option>
+                            ))}
+                            <option value="won">{t.gewonnenStufe}</option>
+                            <option value="lost">{t.verlorenStufe}</option>
+                          </select>
+                          <ChevronDown
+                            aria-hidden
+                            className="text-muted-foreground pointer-events-none absolute right-2 top-1/2 size-3.5 -translate-y-1/2"
+                          />
+                        </div>
                         <button type="submit" className="rounded-full bg-card px-3 py-1.5 text-sm font-medium text-primary">
                           {t.setzen}
                         </button>

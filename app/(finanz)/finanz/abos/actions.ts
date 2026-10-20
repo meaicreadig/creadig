@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache"
 import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
 import { INTERVALLE, legeAboAn, setzeAboAktiv, type Intervall } from "@/lib/finanz/abos"
+import { kundenSchluessel } from "@/lib/finanz/abos-shared"
 import { ladeKunden } from "@/lib/finanz/auftraege/store"
 import { finanzDb, protokolliere } from "@/lib/finanz/store"
 
@@ -16,8 +17,6 @@ async function zugang() {
   if (!db) throw new Error("Kein Speicher verbunden")
   return db
 }
-
-export const kundenSchluessel = (k: { email: string; firma: string; name: string }) => (k.email.trim() || `${k.firma}|${k.name}`).toLowerCase().trim()
 
 export type AboAntwort = { ok: true } | { ok: false; fehler: string } | null
 

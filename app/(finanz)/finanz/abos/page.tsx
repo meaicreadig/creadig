@@ -1,9 +1,10 @@
 import Link from "next/link"
 
-import { aboUmschalten, kundenSchluessel } from "@/app/(finanz)/finanz/abos/actions"
+import { aboUmschalten } from "@/app/(finanz)/finanz/abos/actions"
 import { AboFormular } from "@/components/finanz/abo-formular"
 import { eur, tag } from "@/components/finanz/format"
 import { FinanzShell, OhneSpeicher } from "@/components/finanz/shell"
+import { kundenSchluessel } from "@/lib/finanz/abos-shared"
 import { INTERVALL_LABEL, VORLAUF_TAGE, ladeAbos } from "@/lib/finanz/abos"
 import { ladeKunden } from "@/lib/finanz/auftraege/store"
 import { heuteBerlin } from "@/lib/finanz/rechnen"

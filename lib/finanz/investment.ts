@@ -18,16 +18,9 @@ import type { Monat } from "@/lib/finanz/rechnen"
  * rät, wäre die falsche Art von Selbstsicherheit.
  */
 
-export const KLASSEN = {
-  tagesgeld: "Tagesgeld / Festgeld",
-  etf: "ETF / Fonds",
-  aktie: "Einzelaktien",
-  krypto: "Krypto",
-  immobilie: "Immobilie",
-  beteiligung: "Beteiligung / Unternehmen",
-  sonstig: "Sonstiges",
-} as const
-export type Klasse = keyof typeof KLASSEN
+export { KLASSEN } from "@/lib/finanz/investment-shared"
+export type { Klasse } from "@/lib/finanz/investment-shared"
+import { KLASSEN, type Klasse } from "@/lib/finanz/investment-shared"
 
 /** Wie viele Monatsausgaben als Reserve unangetastet bleiben, bevor etwas „investierbar“ heißt. Dieselbe 6 wie im Kompass. */
 export const PUFFER_MONATE = 6

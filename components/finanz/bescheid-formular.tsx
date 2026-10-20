@@ -4,7 +4,7 @@ import { useActionState } from "react"
 
 import { bescheidAnlegen, type BescheidAntwort } from "@/app/(finanz)/finanz/bescheide/actions"
 import { AdminField, AdminInput } from "@/components/admin/primitives"
-import { BESCHEID_ARTEN, STEUERARTEN } from "@/lib/finanz/bescheide"
+import { BESCHEID_ARTEN, STEUERARTEN } from "@/lib/finanz/bescheide-shared"
 
 const SELECT = "border-line bg-background w-full rounded-md border px-3 py-2.5 text-base"
 

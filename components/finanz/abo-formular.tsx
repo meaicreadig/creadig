@@ -4,7 +4,7 @@ import { useActionState } from "react"
 
 import { aboAnlegen, type AboAntwort } from "@/app/(finanz)/finanz/abos/actions"
 import { AdminField, AdminInput } from "@/components/admin/primitives"
-import { INTERVALL_LABEL } from "@/lib/finanz/abos"
+import { INTERVALL_LABEL } from "@/lib/finanz/abos-shared"
 
 const SELECT = "border-line bg-background w-full rounded-md border px-3 py-2.5 text-base"
 

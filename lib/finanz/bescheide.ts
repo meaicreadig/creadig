@@ -19,16 +19,9 @@ import { plusTage } from "@/lib/finanz/rechnen"
  * Dateiupload kommt mit dem Beleg-Archiv, nicht doppelt hierher.
  */
 
-export const BESCHEID_ARTEN = {
-  vorauszahlung: "Festsetzung Vorauszahlungen",
-  nachzahlung: "Nachzahlung",
-  erstattung: "Erstattung",
-  sonstig: "Sonstiger Bescheid (nur Ablage)",
-} as const
-export type BescheidArt = keyof typeof BESCHEID_ARTEN
-
-export const STEUERARTEN = { est: "Einkommensteuer", ust: "Umsatzsteuer", gewerbe: "Gewerbesteuer", sonstig: "Sonstige" } as const
-export type Steuerart = keyof typeof STEUERARTEN
+export { BESCHEID_ARTEN, STEUERARTEN } from "@/lib/finanz/bescheide-shared"
+export type { BescheidArt, Steuerart } from "@/lib/finanz/bescheide-shared"
+import { STEUERARTEN, type BescheidArt, type Steuerart } from "@/lib/finanz/bescheide-shared"
 
 export const BESCHEIDE_SCHEMA = [
   `CREATE TABLE IF NOT EXISTS fin_bescheide (

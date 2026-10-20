@@ -17,9 +17,9 @@ import { auftraegeSchema, legeEntwurfAn, merkeKunde, verlauf } from "@/lib/finan
  * alte ist) — zwei gleichzeitige Läufe erzeugen genau einen Entwurf.
  */
 
-export const INTERVALLE = { monat: 1, quartal: 3, jahr: 12 } as const
-export type Intervall = keyof typeof INTERVALLE
-export const INTERVALL_LABEL: Record<Intervall, string> = { monat: "monatlich", quartal: "vierteljährlich", jahr: "jährlich" }
+export { INTERVALLE, INTERVALL_LABEL, kundenSchluessel } from "@/lib/finanz/abos-shared"
+export type { Intervall } from "@/lib/finanz/abos-shared"
+import { INTERVALLE, INTERVALL_LABEL, type Intervall } from "@/lib/finanz/abos-shared"
 
 /** So viele Tage vor dem Termin liegt der Entwurf bereit. */
 export const VORLAUF_TAGE = 5

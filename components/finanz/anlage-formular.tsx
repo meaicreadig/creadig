@@ -4,7 +4,7 @@ import { useActionState } from "react"
 
 import { anlageAnlegen, type AnlageAntwort } from "@/app/(finanz)/finanz/investment/actions"
 import { AdminField, AdminInput } from "@/components/admin/primitives"
-import { KLASSEN } from "@/lib/finanz/investment"
+import { KLASSEN } from "@/lib/finanz/investment-shared"
 
 const SELECT = "border-line bg-background w-full rounded-md border px-3 py-2.5 text-base"
 

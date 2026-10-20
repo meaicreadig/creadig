@@ -82,7 +82,7 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-5 md:p-6" style={{ maxHeight: "60vh" }}>
         {verlauf.length === 0 ? (
           <div className="flex flex-col gap-3">
-            <p className="text-pretty leading-relaxed text-muted-foreground">
+            <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
               Erzähl mir, woran du gerade denkst – schreibend oder per Mikrofon. Ich bereite alles vor, du gibst frei.
             </p>
             <div className="flex flex-wrap gap-2">
@@ -104,8 +104,8 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
               <div
                 className={
                   m.rolle === "user"
-                    ? "max-w-[85%] whitespace-pre-wrap rounded-3xl rounded-br-lg bg-primary px-4 py-3 leading-relaxed text-primary-foreground"
-                    : "max-w-[85%] whitespace-pre-wrap rounded-3xl rounded-bl-lg bg-secondary px-4 py-3 leading-relaxed text-secondary-foreground"
+                    ? "max-w-[85%] whitespace-pre-wrap rounded-3xl rounded-br-lg bg-primary px-4 py-3 text-sm leading-relaxed text-primary-foreground"
+                    : "max-w-[85%] whitespace-pre-wrap rounded-3xl rounded-bl-lg bg-secondary px-4 py-3 text-sm leading-relaxed text-secondary-foreground"
                 }
               >
                 {m.text}
@@ -151,7 +151,7 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
               }
             }}
             placeholder="Laut denken, fragen, beauftragen …"
-            className="min-h-12 flex-1 resize-none bg-transparent px-3 py-2 leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
+            className="min-h-12 flex-1 resize-none bg-transparent px-3 py-2 text-sm leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
           />
           <button
             type="button"
