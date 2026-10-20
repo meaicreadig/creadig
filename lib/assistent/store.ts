@@ -24,6 +24,15 @@ const SCHEMA = [
   `ALTER TABLE assistent_freigaben ADD COLUMN IF NOT EXISTS quelle text`,
   `ALTER TABLE assistent_freigaben ADD COLUMN IF NOT EXISTS agent text`,
   `CREATE INDEX IF NOT EXISTS assistent_freigaben_quelle_idx ON assistent_freigaben (quelle)`,
+  `ALTER TABLE assistent_freigaben ADD COLUMN IF NOT EXISTS bild_pfad text`,
+  `ALTER TABLE assistent_freigaben ADD COLUMN IF NOT EXISTS extra jsonb NOT NULL DEFAULT '{}'::jsonb`,
+  `CREATE TABLE IF NOT EXISTS assistent_linkedin (
+    id text PRIMARY KEY,
+    access_token text NOT NULL,
+    person_urn text NOT NULL,
+    name text,
+    expires_at timestamptz NOT NULL,
+    updated_at timestamptz NOT NULL DEFAULT now())`,
   `CREATE TABLE IF NOT EXISTS assistent_laeufe (
     id text PRIMARY KEY,
     agent text NOT NULL,
@@ -54,7 +63,18 @@ export type Freigabe = {
   betreff: string | null
   status: "offen" | "freigegeben" | "verworfen"
   agent: string | null
+  bildPfad: string | null
+  extra: FreigabeExtra
   zeit: string
+}
+
+/** Zusatzwissen je Entwurf – z. B. warum die Redaktion dieses Thema gewählt hat. */
+export type FreigabeExtra = {
+  warum?: string
+  bezug?: string
+  alt?: string
+  postUrn?: string
+  fehler?: string
 }
 
 export type Lauf = { agent: string; ergebnis: string; anzahl: number; fehler: string | null; zeit: string }
@@ -120,13 +140,17 @@ export async function legeFreigabeAn(f: {
   /** Stabiler Schlüssel – dieselbe Quelle wird nie zweimal vorgeschlagen. */
   quelle?: string | null
   agent?: string | null
+  id?: string
+  bildPfad?: string | null
+  extra?: FreigabeExtra
 }): Promise<string | null> {
   const q = await assistentDb()
   if (!q) throw new Error("Datenbank nicht verfügbar")
   if (f.quelle && (await quelleBekannt(f.quelle))) return null
-  const id = neueId("frg")
+  const id = f.id ?? neueId("frg")
   await q(
-    `INSERT INTO assistent_freigaben (id, art, titel, inhalt, empfaenger, betreff, quelle, agent) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    `INSERT INTO assistent_freigaben (id, art, titel, inhalt, empfaenger, betreff, quelle, agent, bild_pfad, extra)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb)`,
     [
       id,
       f.art,
@@ -136,9 +160,80 @@ export async function legeFreigabeAn(f: {
       f.betreff?.slice(0, 200) ?? null,
       f.quelle ?? null,
       f.agent ?? null,
+      f.bildPfad ?? null,
+      JSON.stringify(f.extra ?? {}),
     ],
   )
   return id
+}
+
+export const neueFreigabeId = () => neueId("frg")
+
+type FreigabeZeile = Omit<Freigabe, "zeit" | "bildPfad"> & { bild_pfad: string | null; created_at: string | Date }
+const FREIGABE_SPALTEN = `id, art, titel, inhalt, empfaenger, betreff, status, agent, bild_pfad, extra, created_at`
+const alsFreigabe = ({ created_at, bild_pfad, ...r }: FreigabeZeile): Freigabe => ({
+  ...r,
+  extra: r.extra ?? {},
+  bildPfad: bild_pfad,
+  zeit: new Date(created_at).toISOString(),
+})
+
+export async function ladeFreigabe(id: string): Promise<Freigabe | null> {
+  const q = await assistentDb()
+  if (!q) return null
+  const rows = (await q(`SELECT ${FREIGABE_SPALTEN} FROM assistent_freigaben WHERE id = $1`, [id])) as FreigabeZeile[]
+  return rows[0] ? alsFreigabe(rows[0]) : null
+}
+
+export async function ergaenzeExtra(id: string, extra: FreigabeExtra): Promise<void> {
+  const q = await assistentDb()
+  if (!q) return
+  await q(`UPDATE assistent_freigaben SET extra = extra || $2::jsonb WHERE id = $1`, [id, JSON.stringify(extra)])
+}
+
+export async function aendereInhalt(id: string, titel: string, inhalt: string): Promise<void> {
+  const q = await assistentDb()
+  if (!q) throw new Error("Datenbank nicht verfügbar")
+  await q(`UPDATE assistent_freigaben SET titel = $2, inhalt = $3 WHERE id = $1 AND status = 'offen'`, [
+    id,
+    titel.slice(0, 160),
+    inhalt.slice(0, 6000),
+  ])
+}
+
+/** Titel der letzten Artikel – die Redaktion wiederholt sich nicht. */
+export async function letzteArtikel(limit = 10): Promise<{ titel: string; status: string }[]> {
+  const q = await assistentDb()
+  if (!q) return []
+  return (await q(
+    `SELECT titel, status FROM assistent_freigaben WHERE art = 'linkedin' ORDER BY created_at DESC LIMIT $1`,
+    [limit],
+  )) as { titel: string; status: string }[]
+}
+
+export type LinkedinVerbindung = { accessToken: string; personUrn: string; name: string | null; ablauf: string }
+
+export async function ladeLinkedin(): Promise<LinkedinVerbindung | null> {
+  const q = await assistentDb()
+  if (!q) return null
+  const rows = (await q(
+    `SELECT access_token, person_urn, name, expires_at FROM assistent_linkedin WHERE id = 'inhaber' AND expires_at > now()`,
+    [],
+  )) as { access_token: string; person_urn: string; name: string | null; expires_at: string | Date }[]
+  const r = rows[0]
+  return r ? { accessToken: r.access_token, personUrn: r.person_urn, name: r.name, ablauf: new Date(r.expires_at).toISOString() } : null
+}
+
+export async function speichereLinkedin(v: { accessToken: string; personUrn: string; name: string | null; gueltigSek: number }) {
+  const q = await assistentDb()
+  if (!q) throw new Error("Datenbank nicht verfügbar")
+  await q(
+    `INSERT INTO assistent_linkedin (id, access_token, person_urn, name, expires_at)
+     VALUES ('inhaber', $1, $2, $3, now() + make_interval(secs => $4))
+     ON CONFLICT (id) DO UPDATE SET access_token = EXCLUDED.access_token, person_urn = EXCLUDED.person_urn,
+       name = EXCLUDED.name, expires_at = EXCLUDED.expires_at, updated_at = now()`,
+    [v.accessToken, v.personUrn, v.name, v.gueltigSek],
+  )
 }
 
 export async function quelleBekannt(quelle: string): Promise<boolean> {
@@ -177,12 +272,12 @@ export async function ladeFreigaben(): Promise<Freigabe[]> {
   const q = await assistentDb()
   if (!q) return []
   const rows = (await q(
-    `SELECT id, art, titel, inhalt, empfaenger, betreff, status, agent, created_at FROM assistent_freigaben
+    `SELECT ${FREIGABE_SPALTEN} FROM assistent_freigaben
      WHERE status = 'offen' OR erledigt_at > now() - interval '3 days'
      ORDER BY (status = 'offen') DESC, created_at DESC LIMIT 50`,
     [],
-  )) as (Omit<Freigabe, "zeit"> & { created_at: string | Date })[]
-  return rows.map(({ created_at, ...r }) => ({ ...r, zeit: new Date(created_at).toISOString() }))
+  )) as FreigabeZeile[]
+  return rows.map(alsFreigabe)
 }
 
 export type RatStimme = { rolle: string; sagt: string }

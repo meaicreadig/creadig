@@ -1,6 +1,7 @@
 import "server-only"
 
-import { generateText } from "ai"
+import { generateImage, generateText } from "ai"
+import { put } from "@vercel/blob"
 
 import { collectAttention } from "@/lib/attention"
 import { MESSEN, messeKey, type Messe } from "@/lib/messen"
@@ -14,7 +15,9 @@ import {
   ladeFreigaben,
   ladeRaete,
   legeFreigabeAn,
+  letzteArtikel,
   letzteLaeufe,
+  neueFreigabeId,
   protokolliereLauf,
   quelleBekannt,
   speichereRat,
@@ -39,11 +42,12 @@ export const AGENTEN: AgentInfo[] = [
   { key: "vertrieb", name: "Vertrieb", aufgabe: "Findet stille oder überfällige Abschlüsse und schreibt die nächste Mail.", takt: "taeglich", ki: true },
   { key: "messen", name: "Messen", aufgabe: "Bereitet jede Messe vor, bei der du teilnimmst: Plan, Kontakte, Unterkunft.", takt: "taeglich", ki: false },
   { key: "kapital", name: "Kapital", aufgabe: "Recherchiert Förderungen, Kredite und Investoren mit Quelle und Frist.", takt: "woechentlich", ki: true },
-  { key: "redaktion", name: "Redaktion", aufgabe: "Schreibt einen LinkedIn-Artikel aus echter Arbeit – Wissen statt Werbung.", takt: "woechentlich", ki: true },
+  { key: "redaktion", name: "Redaktion", aufgabe: "Wählt das Thema nach den Beschlüssen der Geschäftsleitung, schreibt den Beitrag und erzeugt das Bild dazu.", takt: "woechentlich", ki: true },
 ]
 
 const MODELL = "openai/gpt-5.4-mini"
 const RECHERCHE = "perplexity/sonar"
+const BILDMODELL = "openai/gpt-image-1-mini"
 
 const berlinTag = (d: Date) => d.toLocaleDateString("sv-SE", { timeZone: "Europe/Berlin" })
 const kw = (d: Date) => {
@@ -166,34 +170,104 @@ Antworte NUR mit einem JSON-Array (max. 4 Einträge): [{"programm":"","geber":""
   return { ergebnis: `${neu} neue Kapitalchancen gefunden`, anzahl: neu }
 }
 
-const THEMEN = [
-  "Was Glasfaser-Montagefirmen an Papierkram verlieren – und wie man Aufmaß, Fotos und Abrechnung an einem Ort zusammenführt (aus der Arbeit an fibero).",
-  "Warum Stempelkarten aus Papier Stammgäste kosten – und was eine Karte im Apple/Google Wallet über Besuchsrhythmus verrät (aus der Arbeit an stammo).",
-  "Vom Werkzeug zum Motor: wie ein kleiner Betrieb Anfragen, Termine und Nachfassen automatisch laufen lässt (aus dem creaDIG Control Center).",
-  "Digitalisierung im Verein und Verband: was Mitgliederverwaltung wirklich braucht und was nur teuer ist.",
+/** Echter Stoff aus der eigenen Arbeit – die Redaktion erfindet keine Projekte. */
+const STOFF = [
+  "fibero: Software für Glasfaser-Montagefirmen (Aufmaß, Fotos, Hausanschlüsse, Abrechnung). Zielgruppe: Montage-, Tiefbau- und Spleißbetriebe.",
+  "stammo: digitale Stempelkarte im Apple/Google Wallet für Cafés, Imbisse, Bäckereien. Erkennt Besuchsrhythmus und meldet, wenn Stammgäste wegbleiben.",
+  "creaDIG Control Center: ein kleiner Betrieb lässt Anfragen, Termine, Nachfassen und Mailings automatisch laufen; KI-Agenten bereiten vor, der Mensch entscheidet.",
+  "creaDIG Web & System für Vereine, Verbände, Moscheegemeinden, Stiftungen: Webseite plus Anmeldung, Mitglieder, Termine aus einer Hand.",
+  "Erfahrung als Einzelunternehmer: wie man mit KI-Agenten statt Team arbeitet – was funktioniert, was nicht.",
 ]
+
+const BILDSTIL =
+  "Editorial photograph for a LinkedIn article, realistic, natural daylight, shallow depth of field, calm and confident mood, subtle cool blue accent light (#2F5BEA), clean composition with negative space, real people at work in Germany when people appear, no text, no letters, no logos, no watermarks, no UI screenshots."
+
+type Artikel = { thema: string; warum: string; bezug: string; titel: string; text: string; bildidee: string; alt: string }
+
+function jsonObjekt<T>(text: string): T | null {
+  const a = text.indexOf("{")
+  const b = text.lastIndexOf("}")
+  if (a < 0 || b <= a) return null
+  try {
+    return JSON.parse(text.slice(a, b + 1)) as T
+  } catch {
+    return null
+  }
+}
+
+async function erzeugeBild(id: string, idee: string): Promise<string | null> {
+  try {
+    const { image } = await generateImage({
+      model: BILDMODELL,
+      prompt: `${idee}. ${BILDSTIL}`,
+      size: "1536x1024",
+    })
+    const pfad = `assistent/linkedin/${id}.png`
+    await put(pfad, Buffer.from(image.uint8Array), {
+      access: "private",
+      contentType: "image/png",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+    })
+    return pfad
+  } catch (e) {
+    console.error("[redaktion] bild", e)
+    return null
+  }
+}
 
 async function redaktion(): Promise<Ergebnis> {
   const woche = kw(new Date())
   const quelle = `linkedin:${woche}`
   if (await quelleBekannt(quelle)) return { ergebnis: "Artikel dieser Woche liegt schon bereit", anzahl: 0 }
-  const nr = Number(woche.split("-")[1]) % THEMEN.length
+
+  const [raete, frueher, rahmen] = await Promise.all([ladeRaete(1).catch(() => []), letzteArtikel(10), firmenRahmen()])
+  const rat = raete[0]?.protokoll
+  const marketing = rat?.stimmen.find((s) => /marketing/i.test(s.rolle))?.sagt
+  const beschluesse = rat?.beschluesse.map((b) => b.was) ?? []
+
   const { text } = await generateText({
     model: MODELL,
-    prompt: `Du schreibst als Muhammed Emin Akyol, Gründer von creaDIG Solutions, einen LinkedIn-Artikel auf Deutsch.
-Thema: ${THEMEN[nr]}
-Regeln: Fachartikel, kein Werbetext. Starker erster Satz (Beobachtung aus der Praxis). 3 kurze Abschnitte mit konkretem Wissen, das der Leser sofort nutzen kann. Das eigene Produkt höchstens einmal beiläufig als Beispiel nennen. Ende mit einer offenen Frage an die Leser. 180–260 Wörter, keine Emojis, keine Hashtag-Wolke (max. 3 Hashtags am Ende).
-Erste Zeile = Titel, dann Leerzeile, dann Text.`,
+    prompt: `Du bist die Redaktion von creaDIG Solutions (Einzelunternehmen, Inhaber Muhammed Emin Akyol). Du schreibst als Muhammed Emin Akyol genau EINEN LinkedIn-Beitrag auf Deutsch.
+
+SCHRITT 1 – Thema wählen (wie ein Chefredakteur):
+- Richte dich nach der letzten Sitzung der Geschäftsleitung. Marketing sagte: ${marketing ?? "(noch keine Sitzung)"}
+- Beschlüsse: ${beschluesse.length ? beschluesse.join(" | ") : "(keine)"}
+- Lage: ${rahmen.text}
+- Echter Stoff (nur daraus schöpfen, nichts erfinden): ${STOFF.join(" || ")}
+- Schon geschrieben – NICHT wiederholen, anderer Blickwinkel: ${frueher.map((f) => f.titel).join(" | ") || "(noch nichts)"}
+- Wähle das Thema, das den Leser (Inhaber kleiner Betriebe, Glasfaser-Branche, Vereine) am meisten bewegt und Kunden anzieht, ohne zu werben.
+
+SCHRITT 2 – Beitrag:
+- Fachbeitrag mit Haltung, kein Werbetext. Erster Satz = scharfe Beobachtung aus der Praxis, die zum Weiterlesen zwingt.
+- 3 kurze Absätze mit konkretem Wissen, sofort nutzbar. Das eigene Produkt höchstens einmal beiläufig als Beispiel.
+- Ende mit einer echten Frage an die Leser. 180–260 Wörter, keine Emojis, max. 3 Hashtags am Ende.
+
+SCHRITT 3 – Bildidee: eine konkrete fotografische Szene (Englisch, ein Satz), die die Kernaussage zeigt – keine Schrift, keine Bildschirme.
+
+Antworte NUR mit JSON:
+{"thema":"…","warum":"1 Satz: warum gerade jetzt dieses Thema (Bezug auf Sitzung/Lage)","bezug":"welcher Stoff/Beschluss","titel":"…","text":"…","bildidee":"…","alt":"Bildbeschreibung Deutsch, 1 Satz"}`,
   })
-  const [titel, ...rest] = text.trim().split("\n")
-  const id = await legeFreigabeAn({
+
+  const a = jsonObjekt<Artikel>(text)
+  if (!a?.titel || !a.text) throw new Error("Redaktion lieferte keinen gültigen Beitrag")
+
+  const id = neueFreigabeId()
+  const bildPfad = a.bildidee ? await erzeugeBild(id, a.bildidee) : null
+  const angelegt = await legeFreigabeAn({
+    id,
     art: "linkedin",
-    titel: titel.replace(/^#+\s*/, "").slice(0, 150),
-    inhalt: rest.join("\n").trim(),
+    titel: a.titel.replace(/^#+\s*/, "").slice(0, 150),
+    inhalt: a.text.trim(),
     quelle,
     agent: "redaktion",
+    bildPfad,
+    extra: { warum: a.warum, bezug: a.bezug, alt: a.alt },
   })
-  return { ergebnis: id ? "Neuer Artikelentwurf bereit" : "Artikel liegt schon bereit", anzahl: id ? 1 : 0 }
+  return {
+    ergebnis: angelegt ? `Beitrag „${a.thema}“ ${bildPfad ? "mit Bild " : ""}bereit` : "Beitrag liegt schon bereit",
+    anzahl: angelegt ? 1 : 0,
+  }
 }
 
 type Ziel = { firma: string; ort: string; website: string; warum: string; betreff: string; mail: string }

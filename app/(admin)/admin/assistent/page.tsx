@@ -10,6 +10,7 @@ import {
   Coins,
   Crosshair,
   Handshake,
+
   Mail,
   Newspaper,
   PenLine,
@@ -26,6 +27,7 @@ import { collectAttention } from "@/lib/attention"
 import {
   fragenHeute,
   ladeFreigaben,
+  ladeLinkedin,
   ladeRaete,
   ladeVerlauf,
   letzteLaeufe,
@@ -238,7 +240,112 @@ function AgentKarte({ a, lauf }: { a: AgentInfo; lauf?: Lauf }) {
   )
 }
 
-function FreigabeKarte({ f }: { f: Freigabe }) {
+function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: string | null }) {
+  const offen = f.status === "offen"
+  return (
+    <li className="flex flex-col overflow-hidden rounded-3xl bg-card shadow-sm">
+      {f.bildPfad ? (
+        // eslint-disable-next-line @next/next/no-img-element -- privates Blob-Bild über geschützte Route
+        <img
+          src={`/api/assistent/bild/${encodeURIComponent(f.id)}`}
+          alt={f.extra.alt ?? ""}
+          className="aspect-[3/2] w-full object-cover"
+          loading="lazy"
+        />
+      ) : null}
+      <div className="flex flex-col gap-3 p-5">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-primary">
+            <Newspaper className="size-3.5" aria-hidden="true" />
+            LinkedIn-Beitrag
+          </span>
+          <span>von {agentName(f.agent)} · {seit(f.zeit)}</span>
+          {!offen ? <span>· {f.status === "freigegeben" ? (f.extra.postUrn ? "veröffentlicht" : "freigegeben") : "verworfen"}</span> : null}
+        </div>
+        {f.extra.warum ? (
+          <p className="rounded-2xl bg-secondary px-4 py-3 text-sm leading-relaxed text-secondary-foreground">
+            <span className="font-medium text-foreground">Warum jetzt: </span>
+            {f.extra.warum}
+          </p>
+        ) : null}
+        {offen ? (
+          <>
+            <form action={freigabeEntscheiden} className="flex flex-col gap-3">
+              <input type="hidden" name="id" value={f.id} />
+              <input type="hidden" name="status" value="freigegeben" />
+              <label className="sr-only" htmlFor={`titel-${f.id}`}>Titel</label>
+              <input
+                id={`titel-${f.id}`}
+                name="titel"
+                defaultValue={f.titel}
+                className="rounded-2xl bg-muted px-4 py-2.5 font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              />
+              <label className="sr-only" htmlFor={`text-${f.id}`}>Beitragstext</label>
+              <textarea
+                id={`text-${f.id}`}
+                name="inhalt"
+                defaultValue={f.inhalt}
+                rows={10}
+                className="resize-y rounded-2xl bg-muted px-4 py-3 text-sm leading-relaxed text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              />
+              {f.extra.fehler ? <p className="text-sm text-destructive">LinkedIn: {f.extra.fehler}</p> : null}
+              <button className="flex w-fit items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">
+                <Check className="size-4" aria-hidden="true" />
+                {linkedin ? "Freigeben & auf LinkedIn posten" : "Freigeben"}
+              </button>
+            </form>
+            <form action={freigabeEntscheiden}>
+              <input type="hidden" name="id" value={f.id} />
+              <input type="hidden" name="status" value="verworfen" />
+              <button className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground">
+                <X className="size-4" aria-hidden="true" />
+                Verwerfen
+              </button>
+            </form>
+            {!linkedin ? (
+              <p className="text-xs text-muted-foreground">
+                LinkedIn noch nicht verbunden – nach dem Verbinden postet „Freigeben“ direkt mit Bild.
+              </p>
+            ) : null}
+          </>
+        ) : (
+          <>
+            <h3 className="text-balance font-medium leading-snug text-foreground">{f.titel}</h3>
+            {f.status === "freigegeben" && !f.extra.postUrn ? (
+              <details>
+                <summary className="cursor-pointer text-sm text-primary">Text kopieren</summary>
+                <p className="mt-2 select-all whitespace-pre-wrap text-sm leading-relaxed text-foreground">{f.inhalt}</p>
+              </details>
+            ) : null}
+          </>
+        )}
+      </div>
+    </li>
+  )
+}
+
+function LinkedinStatus({ name, meldung }: { name: string | null; meldung?: string }) {
+  const text: Record<string, string> = {
+    verbunden: "LinkedIn verbunden.",
+    abgebrochen: "Verbindung abgebrochen.",
+    fehler: "LinkedIn hat die Verbindung abgelehnt. Prüfe in der LinkedIn-App die Redirect-URL und die Produkte „Sign In with OpenID Connect“ und „Share on LinkedIn“.",
+  }
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-card p-4 shadow-sm">
+      <p className="flex items-center gap-2 text-sm text-foreground">
+        <Newspaper className="size-4 text-primary" aria-hidden="true" />
+        {name ? `Postet als ${name}` : "LinkedIn nicht verbunden"}
+        {meldung && text[meldung] ? <span className="text-muted-foreground">· {text[meldung]}</span> : null}
+      </p>
+      <a href="/api/linkedin/verbinden" className="rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground">
+        {name ? "Neu verbinden" : "Mit LinkedIn verbinden"}
+      </a>
+    </div>
+  )
+}
+
+function FreigabeKarte({ f, linkedin }: { f: Freigabe; linkedin: string | null }) {
+  if (f.art === "linkedin") return <ArtikelKarte f={f} linkedin={linkedin} />
   const { label, Icon } = ART[f.art]
   const offen = f.status === "offen"
   return (
@@ -299,7 +406,10 @@ function FreigabeKarte({ f }: { f: Freigabe }) {
   )
 }
 
-export default async function AssistentPage() {
+export default async function AssistentPage({ searchParams }: { searchParams: Promise<{ linkedin?: string }> }) {
+  const { linkedin: liMeldung } = await searchParams
+  const li = await ladeLinkedin().catch(() => null)
+  const liName = li ? li.name ?? "dein Profil" : null
   const [verlauf, freigaben, heute, laeufe, board, raete, rahmen] = await Promise.all([
     ladeVerlauf(40),
     ladeFreigaben(),
@@ -342,11 +452,12 @@ export default async function AssistentPage() {
               </h2>
               <span className="text-sm text-primary">{offen.length + system.length} offen</span>
             </div>
+            <LinkedinStatus name={liName} meldung={liMeldung} />
 
             {offen.length > 0 ? (
               <ul className="flex flex-col gap-3">
                 {offen.map((f) => (
-                  <FreigabeKarte key={f.id} f={f} />
+                    <FreigabeKarte key={f.id} f={f} linkedin={liName} />
                 ))}
               </ul>
             ) : (
@@ -387,7 +498,7 @@ export default async function AssistentPage() {
                 <summary className="cursor-pointer text-sm text-muted-foreground">Erledigt (letzte 3 Tage) · {erledigt.length}</summary>
                 <ul className="mt-3 flex flex-col gap-3">
                   {erledigt.map((f) => (
-                    <FreigabeKarte key={f.id} f={f} />
+                  <FreigabeKarte key={f.id} f={f} linkedin={liName} />
                   ))}
                 </ul>
               </details>
