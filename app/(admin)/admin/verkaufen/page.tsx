@@ -6,8 +6,12 @@ import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { datumAnzeige } from "@/lib/geschaeftszeit"
 import { ladeVerkaufslage, MONATSZIEL_EUR, OFFENE_STUFEN, WAHRSCHEINLICHKEIT, type OffeneStufe, type Warnung } from "@/lib/verkaufen"
 import { ladeEntwuerfe } from "@/lib/verkaufen-entwurf"
-import { Sparkles } from "lucide-react"
-import { dealAnlegen, entwurfErstellen } from "./actions"
+import { Sparkles, Undo2 } from "lucide-react"
+import { dealAnlegen, entwurfErstellen, entwurfInsStudio, stufeSetzen, stufeZuruecknehmen } from "./actions"
+
+function artLabel(art: string, arten: Record<string, string>): string {
+  return arten[art] ?? arten[art.split(".")[0]] ?? art
+}
 
 export const dynamic = "force-dynamic"
 
@@ -39,6 +43,23 @@ const TEXTE = {
     notiz: "Notiz",
     speichern: "Anlegen",
     wahrscheinlich: "Wahrscheinlichkeit",
+    verlauf: "Zuletzt passiert",
+    keinVerlauf: "Noch keine Berührung erfasst.",
+    setzen: "Stufe setzen",
+    gewonnenStufe: "Gewonnen",
+    verlorenStufe: "Verloren",
+    vonHand: "Von Hand",
+    automatisch: "Automatisch",
+    zurueck: "Zurücknehmen",
+    studio: "Im Mail Studio senden",
+    arten: {
+      "mail.gesendet": "Mail gesendet",
+      "mail.antwort": "Antwort erhalten",
+      gespraech: "Gespräch",
+      termin: "Termin",
+      "termin.gebucht": "Termin gebucht",
+      note: "Notiz",
+    } as Record<string, string>,
     warn: {
       "ohne-schritt": "Kein Schritt",
       ueberfaellig: "Überfällig",
@@ -91,6 +112,23 @@ const TEXTE = {
     notiz: "Not",
     speichern: "Ekle",
     wahrscheinlich: "Olasılık",
+    verlauf: "Son olanlar",
+    keinVerlauf: "Henüz temas kaydı yok.",
+    setzen: "Aşamayı kaydet",
+    gewonnenStufe: "Kazanıldı",
+    verlorenStufe: "Kaybedildi",
+    vonHand: "Elle",
+    automatisch: "Otomatik",
+    zurueck: "Geri al",
+    studio: "Mail Studio'da gönder",
+    arten: {
+      "mail.gesendet": "Mail gönderildi",
+      "mail.antwort": "Yanıt geldi",
+      gespraech: "Görüşme",
+      termin: "Randevu",
+      "termin.gebucht": "Randevu alındı",
+      note: "Not",
+    } as Record<string, string>,
     warn: {
       "ohne-schritt": "Adım yok",
       ueberfaellig: "Gecikmiş",
@@ -211,6 +249,61 @@ export default async function VerkaufenPage() {
                       <p className="text-sm leading-relaxed text-muted-foreground">{t.zuege[d.stufe]}</p>
                     </div>
 
+                    <div className="flex flex-col gap-2">
+                      <span className="text-xs font-medium text-muted-foreground">{t.verlauf}</span>
+                      {d.verlauf.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">{t.keinVerlauf}</p>
+                      ) : (
+                        <ul className="flex flex-col gap-1.5">
+                          {d.verlauf.map((v, i) => (
+                            <li key={i} className="flex items-baseline justify-between gap-3 text-sm">
+                              <span className="min-w-0 truncate">
+                                <span className="font-medium">{artLabel(v.art, t.arten)}</span>
+                                {v.text ? <span className="text-muted-foreground"> · {v.text}</span> : null}
+                              </span>
+                              <time className="shrink-0 text-xs tabular-nums text-muted-foreground" dateTime={v.am}>
+                                {new Date(v.am).toLocaleDateString(intl, { day: "2-digit", month: "2-digit", timeZone: "Europe/Berlin" })}
+                              </time>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-muted p-3">
+                      <form action={stufeSetzen} className="flex items-center gap-2">
+                        <input type="hidden" name="deal" value={d.id} />
+                        <label className="sr-only" htmlFor={`stufe-${d.id}`}>{t.stufe}</label>
+                        <select
+                          id={`stufe-${d.id}`}
+                          name="stufe"
+                          defaultValue={d.stufe}
+                          className="rounded-full bg-card px-3 py-1.5 text-sm"
+                        >
+                          {OFFENE_STUFEN.map((s) => (
+                            <option key={s} value={s}>{t.stufen[s]}</option>
+                          ))}
+                          <option value="won">{t.gewonnenStufe}</option>
+                          <option value="lost">{t.verlorenStufe}</option>
+                        </select>
+                        <button type="submit" className="rounded-full bg-card px-3 py-1.5 text-sm font-medium text-primary">
+                          {t.setzen}
+                        </button>
+                      </form>
+                      {d.letzterSchritt?.von ? (
+                        <form action={stufeZuruecknehmen} className="ml-auto flex items-center gap-2">
+                          <input type="hidden" name="deal" value={d.id} />
+                          <span className="text-xs text-muted-foreground">
+                            {d.letzterSchritt.vonHand ? t.vonHand : t.automatisch}: {d.letzterSchritt.grund}
+                          </span>
+                          <button type="submit" className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-card">
+                            <Undo2 className="size-3.5" aria-hidden />
+                            {t.zurueck}
+                          </button>
+                        </form>
+                      ) : null}
+                    </div>
+
                     {entwuerfe[d.id] ? (
                       <details className="rounded-2xl bg-muted p-4">
                         <summary className="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary">
@@ -219,12 +312,12 @@ export default async function VerkaufenPage() {
                         </summary>
                         <p className="mt-3 whitespace-pre-line text-sm leading-relaxed">{entwuerfe[d.id].text}</p>
                         <div className="mt-3 flex flex-wrap gap-2">
-                          <a
-                            href={`mailto:?subject=${encodeURIComponent(entwuerfe[d.id].betreff)}&body=${encodeURIComponent(entwuerfe[d.id].text)}`}
-                            className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-                          >
-                            Prüfen & senden
-                          </a>
+                          <form action={entwurfInsStudio}>
+                            <input type="hidden" name="deal" value={d.id} />
+                            <button type="submit" className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+                              {t.studio}
+                            </button>
+                          </form>
                           <form action={entwurfErstellen}>
                             <input type="hidden" name="deal" value={d.id} />
                             <button type="submit" className="rounded-full bg-card px-4 py-2 text-sm">Neu entwerfen</button>

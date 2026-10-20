@@ -46,6 +46,7 @@ import { AGENTEN, fuehreFaelligeAus, type AgentInfo, type AgentKey } from "@/lib
 import { getVertriebStore } from "@/lib/lead-store"
 
 import { agentStarten, antwortErhalten, freigabeEntscheiden, ratAntworten } from "./actions"
+import { antwortZuruecknehmen } from "../marketing/mail/actions"
 import { ergaenzeFehlendeAdressen, ladeAnsprache, type Ansprache } from "@/lib/assistent/versand"
 
 const euro = (n: number) => `${Math.round(n).toLocaleString("de-DE")} €`
@@ -471,10 +472,16 @@ function MailKarte({ f }: { f: Freigabe }) {
             Gesendet an {f.empfaenger} · {seit(gesendet)}
           </span>
           {f.extra.antwortAt ? (
-            <span className="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-primary">
-              <Check className="size-3.5" aria-hidden="true" />
-              Antwort erhalten
-            </span>
+            <>
+              <span className="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-primary">
+                <Check className="size-3.5" aria-hidden="true" />
+                Antwort erhalten
+              </span>
+              <form action={antwortZuruecknehmen}>
+                <input type="hidden" name="id" value={f.id} />
+                <button className="rounded-full px-3 py-1 text-muted-foreground hover:bg-muted">Rückgängig</button>
+              </form>
+            </>
           ) : (
             <form action={antwortErhalten}>
               <input type="hidden" name="id" value={f.id} />

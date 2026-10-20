@@ -343,6 +343,19 @@ export async function bucheTermin(e: {
     appointmentId: termin.id,
     startsAt: termin.startsAt,
   })
+  try {
+    const { notiereTermin } = await import("@/lib/kundenfaden")
+    const orgRow = await q(`SELECT organisation_id FROM appointments WHERE id = $1`, [id])
+    await notiereTermin(q, {
+      kontaktId: termin.contactId,
+      firmaId: (orgRow[0]?.organisation_id as string | null) ?? null,
+      terminId: id,
+      startDatum: new Intl.DateTimeFormat("en-CA", { timeZone: einstellungen.timezone }).format(start),
+      referenz: termin.reference,
+    })
+  } catch (e) {
+    console.error("[kundenfaden] Termin nicht in den Faden geschrieben:", (e as Error).message)
+  }
   if (termin.contactId) {
     await q(
       `UPDATE contacts SET next_touch = $2, next_touch_at = ($3::timestamptz AT TIME ZONE $4)::date, updated_at = now() WHERE id = $1`,

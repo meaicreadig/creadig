@@ -79,6 +79,9 @@ export type FreigabeExtra = {
   gesendetAt?: string
   mailId?: string
   antwortAt?: string
+  /** Welche Mail den Antwort-Knopf ausgelöst hat und welche Nachfass-Mails dabei verworfen wurden (für Rückgängig). */
+  antwortQuelle?: string
+  antwortVerworfen?: string[]
   /** Automatische Suche der Kontaktadresse auf der Firmen-Webseite */
   adressSuche?: "gefunden" | "keine"
   /** Nachfass-Kette: Stufe 1/2, Vorgänger-Mail, angelegte Nachfass-Freigabe */

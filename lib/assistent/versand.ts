@@ -2,7 +2,7 @@ import "server-only"
 
 import { einzelmailHtml, einzelmailText, type Einzelmail } from "@/lib/mailing/eml"
 import { siteUrl } from "@/lib/termine/mail"
-import { notiereAntwort, notiereGesendeteMail } from "@/lib/kundenfaden"
+import { nimmAntwortZurueck, notiereAntwort, notiereGesendeteMail } from "@/lib/kundenfaden"
 import { neonAbfrage } from "@/lib/neon-abfrage"
 
 import { findeKontaktMail } from "./kontaktsuche"
@@ -188,25 +188,57 @@ export async function nachfassen(): Promise<number> {
 export async function markiereAntwort(id: string): Promise<void> {
   const q = await assistentDb()
   if (!q) return
-  const jetzt = JSON.stringify({ antwortAt: new Date().toISOString() })
-  const kette = `WITH RECURSIVE kette AS (
-       SELECT id, extra->>'vorgaenger' AS vor FROM assistent_freigaben WHERE id = $1
-       UNION ALL
-       SELECT f.id, f.extra->>'vorgaenger' FROM assistent_freigaben f JOIN kette k ON f.id = k.vor)`
-  await q(`${kette} UPDATE assistent_freigaben SET extra = extra || $2::jsonb WHERE id IN (SELECT id FROM kette)`, [id, jetzt])
-  await q(
-    `${kette} UPDATE assistent_freigaben SET status = 'verworfen', erledigt_at = now()
-     WHERE status = 'offen' AND extra->>'vorgaenger' IN (SELECT id FROM kette)`,
+  const verworfen = (await q(
+    `${KETTE} UPDATE assistent_freigaben SET status = 'verworfen', erledigt_at = now()
+     WHERE status = 'offen' AND extra->>'vorgaenger' IN (SELECT id FROM kette) RETURNING id`,
     [id],
-  )
+  )) as { id: string }[]
+  const jetzt = JSON.stringify({
+    antwortAt: new Date().toISOString(),
+    antwortQuelle: id,
+    antwortVerworfen: verworfen.map((v) => v.id),
+  })
+  await q(`${KETTE} UPDATE assistent_freigaben SET extra = extra || $2::jsonb WHERE id IN (SELECT id FROM kette)`, [id, jetzt])
   const f = (await q(`SELECT empfaenger, betreff FROM assistent_freigaben WHERE id = $1`, [id])) as {
     empfaenger: string | null
     betreff: string | null
   }[]
   const nq = neonAbfrage()
   if (nq && f[0]?.empfaenger) {
-    await notiereAntwort(nq, f[0].empfaenger, f[0].betreff).catch((e) =>
+    await notiereAntwort(nq, f[0].empfaenger, f[0].betreff, id).catch((e) =>
       console.error("[kundenfaden] Antwort nicht protokolliert:", (e as Error).message),
+    )
+  }
+}
+
+const KETTE = `WITH RECURSIVE kette AS (
+     SELECT id, extra->>'vorgaenger' AS vor FROM assistent_freigaben WHERE id = $1
+     UNION ALL
+     SELECT f.id, f.extra->>'vorgaenger' FROM assistent_freigaben f JOIN kette k ON f.id = k.vor)`
+
+/**
+ * "Antwort erhalten" zurücknehmen: Kette wieder offen, verworfene Nachfass-Mails
+ * kommen zurück, Kundenverlauf und Verkaufsstufe werden exakt zurückgesetzt.
+ */
+export async function nimmAntwortZurueckFuer(id: string): Promise<void> {
+  const q = await assistentDb()
+  if (!q) return
+  const r = (await q(`SELECT extra FROM assistent_freigaben WHERE id = $1`, [id])) as { extra: FreigabeExtra | null }[]
+  const quelle = r[0]?.extra?.antwortQuelle ?? id
+  const ursprung = (await q(`SELECT extra FROM assistent_freigaben WHERE id = $1`, [quelle])) as { extra: FreigabeExtra | null }[]
+  const zurueck = ursprung[0]?.extra?.antwortVerworfen ?? []
+  await q(
+    `UPDATE assistent_freigaben SET extra = extra - 'antwortAt' - 'antwortQuelle' - 'antwortVerworfen'
+     WHERE extra->>'antwortQuelle' = $1 OR id = $1`,
+    [quelle],
+  )
+  if (zurueck.length > 0) {
+    await q(`UPDATE assistent_freigaben SET status = 'offen', erledigt_at = NULL WHERE id = ANY($1::text[]) AND status = 'verworfen'`, [zurueck])
+  }
+  const nq = neonAbfrage()
+  if (nq) {
+    await nimmAntwortZurueck(nq, quelle).catch((e) =>
+      console.error("[kundenfaden] Antwort nicht zurückgenommen:", (e as Error).message),
     )
   }
 }
