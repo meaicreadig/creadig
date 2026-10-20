@@ -4,9 +4,11 @@ import dynamic from "next/dynamic"
 import Link from "next/link"
 import { useState } from "react"
 import { ArrowLeft, ArrowUpRight, X } from "lucide-react"
+import { agentFrisch, fadenLive, vorText, type LiveFaden } from "@/lib/zentrale/aktivitaet"
 import type { Etage, Raum } from "@/lib/zentrale/hauptsitz"
 import type { Sprache } from "@/lib/zentrale/netz-karte"
 import type { Fokus } from "./hauptsitz-3d"
+import { useJetzt } from "./use-jetzt"
 
 const Szene = dynamic(() => import("./hauptsitz-3d"), {
   ssr: false,
@@ -27,6 +29,10 @@ const T = {
     gebaeude: "Ganzes Gebäude",
     team: "KI-Mitarbeiter",
     keinTeam: "Noch niemand eingestellt.",
+    zuletzt: "zuletzt aktiv",
+    keinLauf: "noch kein Lauf erfasst",
+    fehlerLauf: "letzter Lauf mit Fehler",
+    gerade: "Gerade passiert",
     leer: "Nicht besetzt",
     teil: "Teilweise besetzt",
     aktiv: "Besetzt",
@@ -39,6 +45,10 @@ const T = {
     gebaeude: "Tüm bina",
     team: "Yapay zekâ çalışanları",
     keinTeam: "Henüz kimse işe alınmadı.",
+    zuletzt: "son aktif",
+    keinLauf: "henüz çalışma kaydı yok",
+    fehlerLauf: "son çalışma hatalı",
+    gerade: "Az önce olanlar",
     leer: "Kadro yok",
     teil: "Kısmen dolu",
     aktiv: "Dolu",
@@ -47,10 +57,12 @@ const T = {
   },
 }
 
-export function Hauptsitz({ etagen, raeume, sprache }: { etagen: Etage[]; raeume: Raum[]; sprache: Sprache }) {
+export function Hauptsitz({ etagen, raeume, faeden, sprache }: { etagen: Etage[]; raeume: Raum[]; faeden: LiveFaden[]; sprache: Sprache }) {
   const [fokus, setFokus] = useState<Fokus>({ etage: null, raum: null })
   const t = T[sprache]
+  const jetzt = useJetzt()
   const raum = raeume.find((r) => r.id === fokus.raum) ?? null
+  const gerade = raum && jetzt !== null ? faeden.filter((f) => (f.raumVon === raum.id || f.raumNach === raum.id) && fadenLive(f.zeit, jetzt)) : []
   const besetzung = raum ? { leer: t.leer, teilweise: t.teil, aktiv: t.aktiv }[raum.besetzung] : ""
 
   const waehleRaum = (id: string) => {
@@ -98,6 +110,8 @@ export function Hauptsitz({ etagen, raeume, sprache }: { etagen: Etage[]; raeume
           etagen={etagen}
           raeume={raeume}
           fokus={fokus}
+          faeden={faeden}
+          sprache={sprache}
           onRaum={waehleRaum}
           onEtage={(i) => setFokus({ etage: i, raum: null })}
           onLeer={() => setFokus((f) => (f.raum ? { etage: f.etage, raum: null } : f))}
@@ -163,18 +177,41 @@ export function Hauptsitz({ etagen, raeume, sprache }: { etagen: Etage[]; raeume
                   <span className="text-xs font-medium text-muted-foreground">{t.team}</span>
                   <span className="text-xs text-muted-foreground">{besetzung}</span>
                 </div>
-                {raum.agenten.length ? (
-                  <div className="flex flex-wrap gap-1.5">
-                    {raum.agenten.map((a) => (
-                      <span key={a} className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
-                        {a}
-                      </span>
-                    ))}
-                  </div>
+                {raum.agentenStand.length ? (
+                  <ul className="flex flex-col gap-1.5">
+                    {raum.agentenStand.map((a) => {
+                      const frisch = jetzt !== null && agentFrisch(a, jetzt)
+                      const stand = !a.zeit
+                        ? t.keinLauf
+                        : jetzt === null
+                          ? ""
+                          : `${a.fehler ? `${t.fehlerLauf} · ` : `${t.zuletzt} `}${vorText(a.zeit, jetzt, sprache)}`
+                      return (
+                        <li key={a.id} className="flex items-center justify-between gap-3 rounded-2xl bg-primary/10 px-3 py-2 text-xs">
+                          <span className="flex items-center gap-2 text-primary">
+                            <span aria-hidden className={`size-1.5 rounded-full ${frisch ? "bg-primary" : a.fehler ? "bg-amber-500" : "bg-muted-foreground/40"}`} />
+                            {a.name}
+                          </span>
+                          <span className="text-muted-foreground">{stand}</span>
+                        </li>
+                      )
+                    })}
+                  </ul>
                 ) : (
                   <p className="text-sm text-muted-foreground">{t.keinTeam}</p>
                 )}
               </div>
+
+              {jetzt !== null && gerade.length > 0 && (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">{t.gerade}</span>
+                  {gerade.map((f) => (
+                    <p key={`${f.von}>${f.nach}`} className="rounded-2xl bg-muted/40 px-3 py-2 text-xs text-foreground">
+                      {f.was} · {vorText(f.zeit, jetzt, sprache)}
+                    </p>
+                  ))}
+                </div>
+              )}
 
               {raum.wege.length > 0 && (
                 <div className="mt-auto flex flex-col gap-1.5">

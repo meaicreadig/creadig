@@ -12,6 +12,7 @@ import { erkenneLoeschwunsch, loescheFirmen } from "@/lib/assistent/loeschen"
 import { istMail, markiereAntwort, sendeFreigabeMail } from "@/lib/assistent/versand"
 import {
   aendereInhalt,
+  assistentDb,
   beantworteRat,
   ergaenzeExtra,
   ladeFreigabe,
