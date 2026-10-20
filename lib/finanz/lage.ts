@@ -18,6 +18,7 @@ import {
 } from "@/lib/finanz/rechnen"
 import { ladeAlles, sichereFristen, type finanzDb } from "@/lib/finanz/store"
 import { paragraph19Projektion, paragraph19Status } from "@/lib/finanz/paragraph19"
+import { berechneUstVa, zeitraumFuerFrist } from "@/lib/finanz/ustva"
 import { ladeFelder } from "@/lib/finanz/felder"
 import { offeneBeratungsZieleCent } from "@/lib/finanz/ziele"
 
@@ -37,10 +38,17 @@ export async function berechneLage(db: Db) {
   const topf = steuertopf(einstellungen, buchungen, fristen, heute)
   const frei = stand - topf.gesamtCent
   const pipeline = await ladePipelineChancen(db)
+  const ustJeFrist = new Map<string, number>()
+  if (einstellungen.ustPflichtig) {
+    for (const f of fristen) {
+      const z = zeitraumFuerFrist(f, einstellungen.ustRhythmus)
+      if (z && !f.erledigt) ustJeFrist.set(f.id, Math.max(0, berechneUstVa(buchungen, z).kz83Cent))
+    }
+  }
   const horizont = plusTage(heute, 91)
   const szenarien = {} as Record<Szenario, { bewegungen: ReturnType<typeof kuenftigeBewegungen>; wochen: ReturnType<typeof liquiditaet> }>
   for (const sz of SZENARIEN) {
-    const bw = kuenftigeBewegungen(buchungen, fristen, heute, horizont, { topf, szenario: sz, pipeline })
+    const bw = kuenftigeBewegungen(buchungen, fristen, heute, horizont, { topf, szenario: sz, pipeline, ustJeFrist })
     szenarien[sz] = { bewegungen: bw, wochen: liquiditaet(stand, bw, heute) }
   }
   /* Kompass und Hinweise rechnen immer mit dem VORSICHTIGEN Blick: Warnungen dürfen nicht von Hoffnung abhängen. */

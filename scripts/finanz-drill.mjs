@@ -1247,6 +1247,37 @@ console.log("\nY · Liquiditäts-Szenarien")
   p(tief(mit) < tief(ohne), "Y9 mit Steuerabfluss liegt der Tiefpunkt tiefer als im alten, zu schönen Band", `${tief(mit)} < ${tief(ohne)}`)
 }
 
+/* ══ X · USt-Voranmeldung ══ */
+console.log("\nX · USt-Voranmeldung — Kennzahlen aus dem Hauptbuch")
+{
+  const R = await import("../lib/finanz/rechnen.ts")
+  const U = await import("../lib/finanz/ustva.ts")
+  const mk = (o) => ({ id: o.id, art: "einnahme", status: "gebucht", datum: "2026-08-15", bruttoCent: 11900, ustSatz: 19, kategorie: "Projekt / Kunde", gegenpartei: null, notiz: null, wiederholung: "keine", storniert: false, ...o })
+  const z = U.zeitraumFuerFrist({ titel: "USt Q3", art: "ust", periodeEnde: "2026-09-30" }, "quartal")
+  p(z.von === "2026-07-01" && z.bis === "2026-09-30", "X1 Quartalsfrist → 01.07.–30.09.", `${z.von}..${z.bis}`)
+  const zm = U.zeitraumFuerFrist({ titel: "USt Sep", art: "ust", periodeEnde: "2026-09-30" }, "monatlich")
+  p(zm.von === "2026-09-01", "X2 Monatsfrist → nur der Monat")
+  const b = [
+    mk({ id: "a", bruttoCent: 119000 }),                                  // netto 1.000,00 / USt 190,00
+    mk({ id: "b", bruttoCent: 10700, ustSatz: 7 }),                       // netto 100,00 / USt 7,00
+    mk({ id: "c", bruttoCent: 5950, art: "ausgabe", kategorie: "Software & Hosting" }), // Vorsteuer 9,50
+    mk({ id: "d", bruttoCent: 2380, art: "ausgabe", archiviert: true }),  // abgegolten: kein Vorsteuerabzug
+    mk({ id: "e", bruttoCent: 50000, ustSatz: 0 }),                       // ohne USt
+    mk({ id: "f", bruttoCent: 99999, datum: "2026-10-02" }),              // anderer Zeitraum
+    mk({ id: "g", bruttoCent: 119000, storniert: true }),                 // storniert
+    mk({ id: "h", bruttoCent: 119000, status: "geplant" }),               // noch nicht geflossen
+    mk({ id: "i", bruttoCent: 140000000, ustSatz: 0, kategorie: "Darlehen" }), // kein Umsatz
+  ]
+  const va = U.berechneUstVa(b, z)
+  p(va.kz81Cent === 100000 && va.kz86Cent === 10000, "X3 Bemessungsgrundlagen 19 % / 7 % (volle Euro)", `${va.kz81Cent}/${va.kz86Cent}`)
+  p(va.ust19Cent === 19000 && va.ust7Cent === 700, "X4 Umsatzsteuer cent-genau", `${va.ust19Cent}/${va.ust7Cent}`)
+  p(va.kz66Cent === 950, "X5 Vorsteuer nur aus nicht archivierten Belegen", `${va.kz66Cent}`)
+  p(va.kz83Cent === 19000 + 700 - 950, "X6 Zahllast = USt − Vorsteuer", `${va.kz83Cent}`)
+  p(va.ohneUstCent === 50000, "X7 0 %-Einnahmen separat gemeldet, Darlehen zählt nicht")
+  const leer = U.berechneUstVa([mk({ id: "x", bruttoCent: 1190, art: "ausgabe" })], z)
+  p(leer.kz83Cent === -190 && leer.kz83Cent < 0, "X8 mehr Vorsteuer als USt → negative Zahllast (Erstattung)")
+}
+
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
 process.exit(fehler === 0 ? 0 : 1)

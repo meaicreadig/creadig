@@ -253,11 +253,14 @@ export type PipelineChance = { id: string; titel: string; wertCent: number; stat
  *   ESt  die Rücklage gleichmäßig auf die noch offenen Vorauszahlungen des Jahres
  * Fristen mit eigenem Betrag bleiben unberührt.
  */
-export function geschaetzteFristBetraege(fristen: Frist[], topf: Steuertopf, heute: string): Map<string, number> {
+export function geschaetzteFristBetraege(fristen: Frist[], topf: Steuertopf, heute: string, ustJeFrist?: Map<string, number>): Map<string, number> {
   const ergebnis = new Map<string, number>()
   const offen = fristen.filter((f) => !f.erledigt && f.betragCent === null)
   const ust = offen.filter((f) => f.art === "ust").sort((a, b) => a.faellig.localeCompare(b.faellig))
-  if (ust[0] && topf.ustOffenCent > 0) ergebnis.set(ust[0].id, topf.ustOffenCent)
+  if (ustJeFrist) {
+    /* Genauer Weg: Zahllast der Voranmeldung je Periode (lib/finanz/ustva.ts). */
+    for (const f of ust) if (ustJeFrist.has(f.id)) ergebnis.set(f.id, ustJeFrist.get(f.id) as number)
+  } else if (ust[0] && topf.ustOffenCent > 0) ergebnis.set(ust[0].id, topf.ustOffenCent)
   const jahr = heute.slice(0, 4)
   const est = offen.filter((f) => f.art === "est" && f.faellig.startsWith(jahr)).sort((a, b) => a.faellig.localeCompare(b.faellig))
   if (est.length && topf.estRuecklageCent > 0) {
@@ -270,6 +273,8 @@ export function geschaetzteFristBetraege(fristen: Frist[], topf: Steuertopf, heu
 export type BewegungsOptionen = {
   /** Mit Steuertopf werden Fristen ohne Betrag geschätzt (siehe geschaetzteFristBetraege). */
   topf?: Steuertopf
+  /** Zahllast je USt-Frist aus der Voranmeldung; ersetzt die Grobschätzung über den Steuertopf. */
+  ustJeFrist?: Map<string, number>
   szenario?: Szenario
   pipeline?: PipelineChance[]
 }
@@ -304,7 +309,7 @@ export function kuenftigeBewegungen(
       }
     }
   }
-  const schaetzung = optionen.topf ? geschaetzteFristBetraege(fristen, optionen.topf, heute) : new Map<string, number>()
+  const schaetzung = optionen.topf ? geschaetzteFristBetraege(fristen, optionen.topf, heute, optionen.ustJeFrist) : new Map<string, number>()
   for (const f of fristen) {
     if (f.erledigt || f.faellig > horizont) continue
     const betrag = f.betragCent ?? schaetzung.get(f.id) ?? null
