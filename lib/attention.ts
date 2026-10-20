@@ -229,6 +229,15 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
     })
   }
 
+  try {
+    const { ladeBetriebsmeldungen } = await import("@/lib/betrieb-alarm")
+    for (const m of await ladeBetriebsmeldungen()) {
+      items.push({ id: m.id, rank: "betriebsblocker", title: m.titel, detail: m.detail, href: "/admin/assistent", due: null })
+    }
+  } catch {
+    /* Überwachung darf die Übersicht nie blockieren. */
+  }
+
   let salesMeasured = false
   let kennzahlen: Kennzahlen | null = null
 
