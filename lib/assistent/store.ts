@@ -75,6 +75,14 @@ export type FreigabeExtra = {
   alt?: string
   postUrn?: string
   fehler?: string
+  /** Mailversand über Resend */
+  gesendetAt?: string
+  mailId?: string
+  antwortAt?: string
+  /** Nachfass-Kette: Stufe 1/2, Vorgänger-Mail, angelegte Nachfass-Freigabe */
+  stufe?: number
+  vorgaenger?: string
+  nachfassId?: string
 }
 
 export type Lauf = { agent: string; ergebnis: string; anzahl: number; fehler: string | null; zeit: string }
@@ -348,6 +356,16 @@ export async function beantworteRat(id: string, antwort: string): Promise<void> 
   const q = await assistentDb()
   if (!q) throw new Error("Datenbank nicht verfügbar")
   await q(`UPDATE assistent_rat SET antwort = $2, beantwortet_at = now() WHERE id = $1`, [id, antwort])
+}
+
+export async function setzeMailKopf(id: string, empfaenger: string, betreff: string): Promise<void> {
+  const q = await assistentDb()
+  if (!q) return
+  await q(`UPDATE assistent_freigaben SET empfaenger = $2, betreff = $3 WHERE id = $1 AND status = 'offen'`, [
+    id,
+    empfaenger.slice(0, 200),
+    betreff.slice(0, 200),
+  ])
 }
 
 export async function setzeFreigabe(id: string, status: "freigegeben" | "verworfen"): Promise<void> {

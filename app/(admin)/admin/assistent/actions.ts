@@ -8,6 +8,7 @@ import { pruefeZugang } from "@/lib/admin-widerruf"
 import { antworte } from "@/lib/assistent/agent"
 import { AGENT_KEYS, fuehreAgentAus, type AgentKey } from "@/lib/assistent/truppe"
 import { veroeffentliche } from "@/lib/assistent/linkedin"
+import { istMail, markiereAntwort, sendeFreigabeMail } from "@/lib/assistent/versand"
 import {
   aendereInhalt,
   beantworteRat,
@@ -17,6 +18,7 @@ import {
   fragenHeute,
   ladeVerlauf,
   setzeFreigabe,
+  setzeMailKopf,
   speichereNachricht,
   TAGESLIMIT,
   type Nachricht,
@@ -69,6 +71,14 @@ export async function ratAntworten(form: FormData): Promise<void> {
   revalidatePath("/admin/assistent")
 }
 
+export async function antwortErhalten(form: FormData): Promise<void> {
+  await pruefe()
+  const id = form.get("id")
+  if (typeof id !== "string") return
+  await markiereAntwort(id.slice(0, 80))
+  revalidatePath("/admin/assistent")
+}
+
 export async function freigabeEntscheiden(form: FormData): Promise<void> {
   await pruefe()
   const id = form.get("id")
@@ -82,6 +92,20 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
   const inhalt = form.get("inhalt")
   if (status === "freigegeben" && typeof titel === "string" && typeof inhalt === "string" && inhalt.trim()) {
     await aendereInhalt(fid, titel.trim() || f.titel, inhalt.trim())
+  }
+
+  if (status === "freigegeben" && f.art === "mail") {
+    const an = String(form.get("empfaenger") ?? f.empfaenger ?? "").trim()
+    const betreff = String(form.get("betreff") ?? f.betreff ?? "").trim() || f.titel
+    const text = typeof inhalt === "string" && inhalt.trim() ? inhalt.trim() : f.inhalt
+    if (istMail(an)) await setzeMailKopf(fid, an, betreff)
+    const r = await sendeFreigabeMail(f, an, betreff, text)
+    if (!r.ok) {
+      await ergaenzeExtra(fid, { fehler: r.grund })
+      revalidatePath("/admin/assistent")
+      return
+    }
+    await ergaenzeExtra(fid, { gesendetAt: new Date().toISOString(), mailId: r.id, fehler: undefined })
   }
 
   const kanal = form.get("ziel") === "firma" ? "firma" : "inhaber"

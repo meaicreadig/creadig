@@ -42,7 +42,8 @@ import { firmenRahmen, type Rahmen } from "@/lib/assistent/rahmen"
 import { AGENTEN, fuehreFaelligeAus, type AgentInfo, type AgentKey } from "@/lib/assistent/truppe"
 import { getVertriebStore } from "@/lib/lead-store"
 
-import { agentStarten, freigabeEntscheiden, ratAntworten } from "./actions"
+import { agentStarten, antwortErhalten, freigabeEntscheiden, ratAntworten } from "./actions"
+import { ladeAnsprache, type Ansprache } from "@/lib/assistent/versand"
 
 const euro = (n: number) => `${Math.round(n).toLocaleString("de-DE")} €`
 
@@ -352,6 +353,14 @@ function LinkedinStatus({ ziele, meldung }: { ziele: LinkedinZiele; meldung?: st
     verbunden: "Profil verbunden.",
     "firma-verbunden": "Firmenseite verbunden.",
     abgebrochen: "Verbindung abgebrochen.",
+    "firma-nicht-freigeschaltet":
+      "Firmenseite: LinkedIn hat die „Community Management API“ für diese App noch nicht freigeschaltet. In developer.linkedin.com → deine Firmen-App → Reiter „Products“ muss dort „Added“ stehen (nicht „Requested/Pending“). Danach einfach erneut verbinden.",
+    "inhaber-nicht-freigeschaltet":
+      "Profil: In der Profil-App fehlen die Produkte „Sign In with LinkedIn using OpenID Connect“ und „Share on LinkedIn“.",
+    "firma-redirect":
+      "Firmenseite: In der Firmen-App unter „Auth“ fehlt die Redirect-URL https://creadig.de/api/linkedin/callback.",
+    "inhaber-redirect":
+      "Profil: In der Profil-App unter „Auth“ fehlt die Redirect-URL https://creadig.de/api/linkedin/callback.",
     fehler:
       "LinkedIn hat abgelehnt. Prüfe in der jeweiligen LinkedIn-App die Redirect-URL und ob das Produkt freigeschaltet ist (Firmenseite: „Community Management API“ muss genehmigt sein).",
   }
@@ -382,8 +391,119 @@ function LinkedinStatus({ ziele, meldung }: { ziele: LinkedinZiele; meldung?: st
   )
 }
 
+const feld = "w-full rounded-2xl bg-muted px-4 py-2.5 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary"
+
+function MailKarte({ f }: { f: Freigabe }) {
+  const offen = f.status === "offen"
+  const notiz = f.inhalt.split(/\n-{3,}\n/)[1]?.trim()
+  const gesendet = f.extra.gesendetAt
+  return (
+    <li className={offen ? "flex flex-col gap-3 rounded-3xl bg-card p-5 shadow-sm" : "flex flex-col gap-2 rounded-3xl bg-card/60 p-5"}>
+      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-primary">
+          <Mail className="size-3.5" aria-hidden="true" />
+          {f.extra.stufe ? `${f.extra.stufe}. Nachfassen` : "Mail"}
+        </span>
+        <span>von {agentName(f.agent)} · {seit(f.zeit)}</span>
+        {f.status === "verworfen" ? <span>· verworfen</span> : null}
+      </div>
+      <h3 className="text-balance font-medium leading-snug text-foreground">{f.titel}</h3>
+      {f.extra.warum && offen ? <p className="text-sm text-muted-foreground">{f.extra.warum}</p> : null}
+      {offen ? (
+        <form action={freigabeEntscheiden} className="flex flex-col gap-3">
+          <input type="hidden" name="id" value={f.id} />
+          <input type="hidden" name="status" value="freigegeben" />
+          <input type="hidden" name="titel" value={f.titel} />
+          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            An
+            <input name="empfaenger" type="email" required defaultValue={f.empfaenger ?? ""} placeholder="name@firma.de" className={feld} />
+          </label>
+          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            Betreff
+            <input name="betreff" defaultValue={f.betreff ?? ""} className={feld} />
+          </label>
+          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            Text
+            <textarea
+              name="inhalt"
+              rows={8}
+              defaultValue={f.inhalt.split(/\n-{3,}\n/)[0].trim()}
+              className={`${feld} leading-relaxed`}
+            />
+          </label>
+          {notiz ? <p className="whitespace-pre-wrap rounded-2xl bg-primary/5 px-4 py-3 text-xs leading-relaxed text-muted-foreground">{notiz}</p> : null}
+          {f.extra.fehler ? (
+            <p role="alert" className="text-sm text-destructive">
+              {f.extra.fehler}
+            </p>
+          ) : null}
+          <div className="flex flex-wrap gap-2">
+            <button className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">
+              <Check className="size-4" aria-hidden="true" />
+              Freigeben und senden
+            </button>
+            <button
+              formAction={freigabeEntscheiden}
+              name="status"
+              value="verworfen"
+              formNoValidate
+              className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground"
+            >
+              <X className="size-4" aria-hidden="true" />
+              Verwerfen
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground">Antworten landen in deinem Postfach. Ohne Antwort schlägt der Vertrieb nach 5 und 9 Tagen ein Nachfassen vor.</p>
+        </form>
+      ) : gesendet ? (
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <span className="text-muted-foreground">
+            Gesendet an {f.empfaenger} · {seit(gesendet)}
+          </span>
+          {f.extra.antwortAt ? (
+            <span className="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-primary">
+              <Check className="size-3.5" aria-hidden="true" />
+              Antwort erhalten
+            </span>
+          ) : (
+            <form action={antwortErhalten}>
+              <input type="hidden" name="id" value={f.id} />
+              <button className="rounded-full bg-secondary px-3 py-1 text-secondary-foreground">Antwort erhalten</button>
+            </form>
+          )}
+        </div>
+      ) : f.status === "freigegeben" ? (
+        <a href={mailto(f)} className="flex w-fit items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">
+          <Mail className="size-4" aria-hidden="true" />
+          Im Mailprogramm öffnen
+        </a>
+      ) : null}
+    </li>
+  )
+}
+
+function AnspracheLeiste({ a }: { a: Ansprache }) {
+  const werte = [
+    { label: "Erstmails gesendet (60 Tage)", wert: String(a.gesendet) },
+    { label: "Antworten", wert: String(a.beantwortet) },
+    { label: "Antwortquote", wert: a.quote === null ? "–" : `${a.quote} %` },
+    { label: "Nachfassen offen", wert: String(a.nachfassOffen) },
+  ]
+  return (
+    <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {werte.map((w) => (
+        <div key={w.label} className="flex flex-col gap-1 rounded-3xl bg-card p-4 shadow-sm">
+          <dt className="text-xs text-muted-foreground">{w.label}</dt>
+          <dd className="font-display text-2xl font-semibold text-primary">{w.wert}</dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
+
 function FreigabeKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele }) {
   if (f.art === "linkedin") return <ArtikelKarte f={f} linkedin={linkedin} />
+  if (f.art === "mail") return <MailKarte f={f} />
   const { label, Icon } = ART[f.art]
   const offen = f.status === "offen"
   return (
@@ -429,11 +549,6 @@ function FreigabeKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele }
             </form>
           </div>
         </>
-      ) : f.status === "freigegeben" && f.art === "mail" ? (
-        <a href={mailto(f)} className="flex w-fit items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">
-          <Mail className="size-4" aria-hidden="true" />
-          Im Mailprogramm öffnen
-        </a>
       ) : f.status === "freigegeben" ? (
         <details>
           <summary className="cursor-pointer text-sm text-primary">Text kopieren</summary>
@@ -454,7 +569,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
     inhaber: liInhaber ? liInhaber.name ?? "dein Profil" : null,
     firma: liFirma ? liFirma.name ?? "Firmenseite" : null,
   }
-  const [verlauf, freigabenAlle, heute, laeufe, board, raete, rahmen, beitraege] = await Promise.all([
+  const [verlauf, freigabenAlle, heute, laeufe, board, raete, rahmen, beitraege, ansprache] = await Promise.all([
     ladeVerlauf(40),
     ladeFreigaben(),
     fragenHeute(),
@@ -463,6 +578,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
     ladeRaete(1).catch(() => []),
     firmenRahmen(),
     ladeBeitraege(6).catch(() => []),
+    ladeAnsprache().catch((): Ansprache => ({ gesendet: 0, beantwortet: 0, quote: null, nachfassOffen: 0 })),
   ])
   after(() => fuehreFaelligeAus().catch(() => undefined))
 
@@ -530,6 +646,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
               </h2>
               <span className="text-sm text-primary">{offen.length + system.length} offen</span>
             </div>
+            <AnspracheLeiste a={ansprache} />
 
             {offen.length > 0 ? (
               <ul className="flex flex-col gap-3">
