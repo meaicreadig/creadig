@@ -229,6 +229,7 @@ export const FLAECHEN: readonly Flaeche[] = [
   { pfad: "/admin/kunden", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   { pfad: "/admin/kunden/:id", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
 
+  { pfad: "/admin/verkaufen", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   { pfad: "/admin/vertrieb", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   { pfad: "/admin/vertrieb/anfragen", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   /* ADM-03 — Anfrage von Hand erfassen. Vor `:id`, damit „neu“ nicht als Kennung gelesen wird. */

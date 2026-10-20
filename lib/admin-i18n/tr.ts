@@ -28,6 +28,7 @@ export const tr: AdminTexte = {
     marketing: { label: "Pazarlama özeti", hint: "LinkedIn, kanallar, tepkiler tek bakışta" },
     veroeffentlichungen: { label: "Yayınlar", hint: "Ne çıktı, ne geri döndü" },
     uebersicht: { label: "Genel bakış", hint: "Bugün önemli olan" },
+    verkaufen: { label: "Bugün sat", hint: "Anlaşmalar, hedef, sıradaki hamle" },
     anfragen: { label: "Talepler", hint: "Gelen, değerlendirme, sonraki adım" },
     kunden: { label: "Müşteriler ve kişiler", hint: "Kuruluşlar, kişiler, geçmiş" },
     vertrieb: { label: "Satış", hint: "Fırsatlar, süreç, araştırma, kayıp" },
