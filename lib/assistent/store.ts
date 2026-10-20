@@ -1,6 +1,7 @@
 import "server-only"
 
 import { neonAbfrage, type Abfrage } from "@/lib/neon-abfrage"
+import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 
 /** Legt sich selbst an (additiv), weil die Produktions-DATABASE_URL "Sensitive" ist. */
 const SCHEMA = [
@@ -90,6 +91,9 @@ export type FreigabeExtra = {
   nachfassId?: string
   /** Löschauftrag: betroffene Firmen */
   orgIds?: string[]
+  /** Kampagnen-Versand (Mail Studio): eine Zeile je Empfänger, damit Antworten zuordenbar sind — nie Nachfass-Kette. */
+  kampagneId?: string
+  zustellungId?: string
 }
 
 export type Lauf = { agent: string; ergebnis: string; anzahl: number; fehler: string | null; zeit: string }
@@ -260,6 +264,29 @@ export async function speichereLinkedin(v: {
   )
 }
 
+/**
+ * Für welche Gegenstände (Vorgangs-Ids) steht bereits eine OFFENE Erinnerung der Automation
+ * (`automation_runs`, Wirkung „erinnern") auf der Liste des Inhabers? Die Truppe schlägt dafür
+ * nichts Zweites vor — beide Motoren bleiben, nur die Doppelmeldung entfällt.
+ * Fehlt die Tabelle, gilt: nichts offen (kein Ausfall der Truppe wegen der Automation).
+ */
+export async function offeneAutomationErinnerungen(gegenstaende: string[]): Promise<Set<string>> {
+  if (gegenstaende.length === 0) return new Set()
+  const q = await assistentDb()
+  if (!q) return new Set()
+  const rows = (await q(
+    `SELECT DISTINCT gegenstand FROM automation_runs
+      WHERE zustand = 'offen' AND wirkung = 'erinnern' AND gegenstand = ANY($1::text[])`,
+    [gegenstaende],
+  ).catch(() => [])) as { gegenstand: string }[]
+  return new Set(rows.map((r) => r.gegenstand))
+}
+
+export async function trenneLinkedin(kanal: LinkedinKanal) {
+  const q = await assistentDb()
+  if (q) await q(`DELETE FROM assistent_linkedin WHERE id = $1`, [kanal])
+}
+
 export async function quelleBekannt(quelle: string): Promise<boolean> {
   const q = await assistentDb()
   if (!q) return true
@@ -277,6 +304,7 @@ export async function protokolliereLauf(l: { agent: string; ergebnis: string; an
     l.anzahl,
     l.fehler?.slice(0, 300) ?? null,
   ])
+  await protokolliereFaden(q, "system", "assistent", `${l.agent}${l.fehler ? " (Fehler)" : ""}`)
 }
 
 /** Letzter Lauf je Agent. */

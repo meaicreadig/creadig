@@ -1,5 +1,5 @@
 import { neonAbfrage } from "@/lib/neon-abfrage"
-import { steuerlage, summe, type Position, type Steuerlage } from "@/lib/rechnung"
+import { ladeOffeneRechnungenSumme } from "@/lib/finanz/kurzlage"
 
 /**
  * Cockpit-Band der Admin-Startseite: nur Lese-Abfragen auf bestehende
@@ -57,6 +57,8 @@ export async function ladeCockpit(): Promise<CockpitDaten> {
       return null
     }
   }
+  /* Offene Rechnungen kommen aus fin_dokumente (lib/finanz/kurzlage.ts) — `invoices`/`payments` tragen keine Zeilen. */
+  const eins2 = async <T,>(lesen: () => Promise<T>): Promise<T | null> => lesen().catch(() => null)
   const zahl = (v: unknown) => Number(v ?? 0)
 
   const [anfragen, pipeline, rechnungen, posts, wochen, stufen, quellen, termine, linksOffen] = await Promise.all([
@@ -71,24 +73,7 @@ export async function ladeCockpit(): Promise<CockpitDaten> {
          FROM opportunities WHERE status NOT IN ('won','lost') AND excluded_reason IS NULL`,
       (r) => ({ wert: zahl(r[0]?.wert), offen: zahl(r[0]?.offen) }),
     ),
-    eins(
-      `SELECT i.positions, i.tax_snapshot,
-              coalesce((SELECT sum(p.amount_cent) FROM payments p WHERE p.invoice_id = i.id), 0) AS bezahlt
-         FROM invoices i WHERE i.state = 'gestellt'`,
-      (r) => {
-        let offenCent = 0
-        let anzahl = 0
-        for (const z of r) {
-          const lage = (z.tax_snapshot as Steuerlage | null) ?? steuerlage()
-          const rest = summe((z.positions ?? []) as Position[], lage).bruttoCent - zahl(z.bezahlt)
-          if (rest > 0) {
-            offenCent += rest
-            anzahl++
-          }
-        }
-        return { offenCent, anzahl }
-      },
-    ),
+    eins2(() => ladeOffeneRechnungenSumme(q)),
     eins(`SELECT count(*) AS n FROM publications WHERE veroeffentlicht_am >= current_date - 7`, (r) => zahl(r[0]?.n)),
     eins(
       `SELECT to_char(w, 'YYYY-MM-DD') AS start, count(l.id) AS anzahl

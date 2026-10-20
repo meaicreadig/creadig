@@ -19,7 +19,16 @@ const SCHEMA = [
 ]
 
 const MAIL_PAUSE_MIN = 60
-const TAEGLICHE_AGENTEN = ["lage", "vertrieb", "messen"] as const
+/*
+ * Alle sieben Agenten der Truppe (lib/assistent/truppe.ts, AGENTEN) — nicht nur die
+ * drei täglichen. Die Taktung hier muss zu `takt` dort passen (netzwerk-drill prüft das).
+ * Wöchentliche Agenten laufen ab 6,5 Tagen Abstand wieder; 192 Std. (8 Tage) lässt
+ * einen Tag Luft, bevor „still" gemeldet wird.
+ */
+export const TAEGLICHE_AGENTEN = ["lage", "vertrieb", "messen"] as const
+export const WOECHENTLICHE_AGENTEN = ["rat", "jaeger", "kapital", "redaktion"] as const
+const ALLE_UEBERWACHTEN = [...TAEGLICHE_AGENTEN, ...WOECHENTLICHE_AGENTEN] as readonly string[]
+const STILL_NACH_STUNDEN = { taeglich: 36, woechentlich: 192 } as const
 
 let bereit: Promise<boolean> | null = null
 
@@ -99,11 +108,12 @@ export async function ladeBetriebsmeldungen(): Promise<Betriebsmeldung[]> {
   const laeufe = await q(
     `SELECT DISTINCT ON (agent) agent, fehler, created_at FROM assistent_laeufe
       WHERE agent = ANY($1) ORDER BY agent, created_at DESC`,
-    [TAEGLICHE_AGENTEN as unknown as string[]],
+    [ALLE_UEBERWACHTEN as string[]],
   ).catch(() => null)
   if (laeufe) {
     const stand = new Map(laeufe.map((l) => [String(l.agent), l]))
-    for (const agent of TAEGLICHE_AGENTEN) {
+    for (const agent of ALLE_UEBERWACHTEN) {
+      const takt = (WOECHENTLICHE_AGENTEN as readonly string[]).includes(agent) ? "woechentlich" : "taeglich"
       const l = stand.get(agent)
       const alter = l ? (Date.now() - new Date(String(l.created_at)).getTime()) / 36e5 : Infinity
       if (l?.fehler) {
@@ -113,11 +123,11 @@ export async function ladeBetriebsmeldungen(): Promise<Betriebsmeldung[]> {
           detail: String(l.fehler).slice(0, 240),
           seit: new Date(String(l.created_at)).toISOString(),
         })
-      } else if (l && alter > 36) {
+      } else if (l && alter > STILL_NACH_STUNDEN[takt]) {
         meldungen.push({
           id: `agent:${agent}:still`,
           titel: `Agent „${agent}“ läuft seit ${Math.round(alter)} Std. nicht mehr`,
-          detail: "Täglicher Lauf (Cron 5 Uhr UTC) ist ausgeblieben. Cron-Protokoll in Vercel prüfen.",
+          detail: `${takt === "taeglich" ? "Täglicher" : "Wöchentlicher"} Lauf (Cron 5 Uhr UTC) ist ausgeblieben. Cron-Protokoll in Vercel prüfen.`,
           seit: new Date(String(l.created_at)).toISOString(),
         })
       }

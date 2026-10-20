@@ -43,6 +43,7 @@
  * regelmäßig — das ist ADM-06, nicht hier.
  */
 
+import { lesePruefung, lesePruefungen, schreibePruefung } from "@/lib/betrieb-pruefung"
 import { getLeadStore, getVertriebStore } from "@/lib/lead-store"
 import { verbindungEintrag, type VerbindungsId, type VerbindungsZustand } from "@/lib/verbindungen"
 
@@ -79,18 +80,20 @@ export type Pruefergebnis = {
  * DAS PROTOKOLL DIESER INSTANZ
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-const protokoll = new Map<VerbindungsId, Pruefergebnis>()
+/*
+ * Das Protokoll liegt im Prüfregister (`betrieb_pruefung`, Quelle
+ * `verbindung:<id>`), nicht mehr im Prozess: Eine Map ist nach jedem
+ * Kaltstart leer und auf der zweiten Instanz eine andere. Ohne Speicher
+ * bleibt die Anzeige ehrlich leer („noch nicht geprüft").
+ */
 
-export function letztePruefung(id: VerbindungsId): Pruefergebnis | null {
-  return protokoll.get(id) ?? null
+export async function letztePruefung(id: VerbindungsId): Promise<Pruefergebnis | null> {
+  return (await lesePruefung<Pruefergebnis>(`verbindung:${id}`))?.ergebnis ?? null
 }
 
-export function pruefprotokoll(): Pruefergebnis[] {
-  return [...protokoll.values()].sort((a, b) => b.at - a.at)
-}
-
-export function pruefprotokollZuruecksetzen(): void {
-  protokoll.clear()
+export async function pruefprotokoll(): Promise<Pruefergebnis[]> {
+  const alle = await lesePruefungen<Pruefergebnis>("verbindung:")
+  return alle.map((x) => x.ergebnis).sort((a, b) => b.at - a.at)
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -130,9 +133,7 @@ function ergebnis(
   dauerMs: number | null,
   akteur: string,
 ): Pruefergebnis {
-  const e: Pruefergebnis = { id, befund, zustand, reichweite, at: Date.now(), dauerMs, akteur }
-  protokoll.set(id, e)
-  return e
+  return { id, befund, zustand, reichweite, at: Date.now(), dauerMs, akteur }
 }
 
 /**
@@ -147,6 +148,12 @@ export async function verbindungPruefen(
   id: VerbindungsId,
   akteur = "owner",
 ): Promise<Pruefergebnis> {
+  const r = await messeVerbindung(id, akteur)
+  await schreibePruefung(`verbindung:${id}`, r)
+  return r
+}
+
+async function messeVerbindung(id: VerbindungsId, akteur: string): Promise<Pruefergebnis> {
   const start = Date.now()
 
   if (id === "website-anfrage") {

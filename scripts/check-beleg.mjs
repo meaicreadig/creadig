@@ -41,6 +41,7 @@ import {
   alleProdukteHabenBeleg,
 } from "@/lib/produkt-beleg"
 import { genannteClientWorks } from "@/lib/site-data"
+import { schreibePruefung } from "@/lib/betrieb-pruefung"
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const probleme = []
@@ -247,6 +248,24 @@ console.log(
     `${genannteClientWorks.length} von ${clientWorks.length} Kundenarbeiten freigegeben · ` +
     `${reviews.length} Bewertungen`,
 )
+
+/*
+ * DER LAUF WIRD FESTGEHALTEN, bevor das Gate entscheidet — auch ein roter Lauf
+ * muss sichtbar sein. /admin/beleg zeigt ihn an (lib/beleg-betrieb.ts, "Gate").
+ * Zwei Ablagen, damit auch ein Build ohne Datenbank eine Spur hinterlaesst:
+ * das Pruefregister (betrieb_pruefung, wenn DATABASE_URL gesetzt ist) und
+ * .next/beleg-gate.json.
+ */
+{
+  const lauf = { ok: probleme.length === 0, verstoesse: probleme.slice(0, 20), anzahlVerstoesse: probleme.length, produkte: produktBelege.length }
+  try {
+    const dir = path.join(ROOT, ".next")
+    if (fs.existsSync(dir)) fs.writeFileSync(path.join(dir, "beleg-gate.json"), JSON.stringify({ ...lauf, laufAt: new Date().toISOString() }))
+  } catch {
+    /* Ein Build-Artefakt, kein Muss. */
+  }
+  await schreibePruefung("beleg-gate", lauf).catch(() => false)
+}
 
 if (probleme.length > 0) {
   console.error("\nBeleg-Gate: ein Beleg deckt nicht, was er zeigt.\n")

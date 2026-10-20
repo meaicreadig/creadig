@@ -3,11 +3,22 @@ import "server-only"
 import { randomUUID } from "node:crypto"
 
 import type { Abfrage } from "@/lib/neon-abfrage"
+import { legeEntwurfAusGewinn } from "@/lib/finanz/auftraege/aus-vertrieb"
+import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 
 /**
  * Der Kundenfaden: EINE Stelle, die Firmen und Kontakte erkennt oder anlegt
  * und jede Berührung (Mail, Gespräch, Termin) in `activities` schreibt.
  * Alle Seiten (Kunden, Verkaufen, Gesprächsraum, Assistent) lesen daraus.
+ *
+ * WER SCHREIBT WAS (Netzwerk-Durchlauf, Phase 4b — bewusst NICHT zu einer
+ * Datei verschmolzen, `lib/vertrieb-store-neon.ts` hat dafür zu viele Aufrufstellen):
+ *  · Stufenwechsel einer Chance: `protokolliereStufe()` HIER schreibt `deal.stufe`
+ *    (+ eine `opportunity.*`-Zeile an der Chance). `moveOpportunity` im Vertriebs-Store
+ *    ruft dieselbe Funktion auf, schreibt seine `opportunity.*`-Zeile aber selbst.
+ *  · Angebot angenommen (`acceptOffer`), Projekt, Abnahme, Übergabe: nur der
+ *    Vertriebs-Store (`offer.*`, `project.*`) — das sind keine Stufenwechsel des Fadens.
+ *  · Mail/Gespräch/Termin-Berührungen: nur HIER.
  */
 
 const FREEMAIL = new Set([
@@ -174,6 +185,7 @@ export async function notiereGesendeteMail(
       ],
     )
   }
+  await protokolliereFaden(q, "mailstudio", "kunden", m.betreff)
   if (!firmaId) return
   const offen = (await q(
     `UPDATE opportunities SET last_contact_at = now(), updated_at = now(),
@@ -190,6 +202,7 @@ export async function notiereGesendeteMail(
        VALUES ($1, $2, $3, $4, 'contacted', 'jaeger', 'Antwort abwarten, sonst Nachfassen', (now() + interval '5 days')::date, now(), now(), now())`,
       [`opp-${randomUUID()}`, firmaId, kontaktId, `Erstkontakt: ${m.betreff}`.slice(0, 160)],
     )
+    await protokolliereFaden(q, "assistent", "vertrieb", m.betreff)
   }
 }
 
@@ -264,20 +277,55 @@ export async function rueckeChanceVor(
   return staende
 }
 
-async function protokolliereStufe(
+/**
+ * Die EINE Zeile, die „warum steht der Deal hier / rückgängig" trägt. Auch die
+ * Pipeline (`moveOpportunity` in lib/vertrieb-store-neon.ts) schreibt sie —
+ * früher stand dort nur `opportunity.<status>`, und eine Stufenänderung auf
+ * /admin/vertrieb/pipeline war auf /admin/verkaufen unsichtbar.
+ * `von` Hand = Herkunft MANUAL (so liest ladeStufenSchritte „vonHand").
+ */
+export async function protokolliereStufe(
   q: Abfrage,
-  firmaId: string,
+  firmaId: string | null,
   oppId: string,
   von: string | null,
   nach: string,
   grund: string,
   quelleId?: string,
+  wer: { actor: string; origin: "AUTOMATIC" | "MANUAL" } = { actor: "system", origin: "AUTOMATIC" },
+  /** false, wenn der Aufrufer die Chronik des Vorgangs selbst schreibt (moveOpportunity). */
+  chronikAmVorgang = true,
 ) {
   await q(
     `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
-     VALUES ($1, 'organisation', $2, 'deal.stufe', $3, 'system', 'AUTOMATIC', $4::jsonb, now())`,
-    [randomUUID(), firmaId, `Stufe → ${nach} · ${grund}`.slice(0, 200), JSON.stringify({ oppId, von, nach, grund, quelleId: quelleId ?? null })],
+     VALUES ($1, $2, $3, 'deal.stufe', $4, $5, $6, $7::jsonb, now())`,
+    [
+      randomUUID(),
+      firmaId ? "organisation" : "opportunity",
+      firmaId ?? oppId,
+      `Stufe → ${nach} · ${grund}`.slice(0, 200),
+      wer.actor,
+      wer.origin,
+      JSON.stringify({ oppId, von, nach, grund, quelleId: quelleId ?? null }),
+    ],
   )
+  /* Umgekehrt: eine Stufe, die hier gesetzt wird, steht auch in der Chronik des Vorgangs auf /admin/vertrieb/pipeline/:id. */
+  if (chronikAmVorgang && firmaId) {
+    await q(
+      `INSERT INTO activities (id, subject_type, subject_id, kind, summary, detail, actor, origin, data, created_at)
+       VALUES ($1, 'opportunity', $2, $3, $4, $5, $6, $7, $8::jsonb, now())`,
+      [
+        randomUUID(),
+        oppId,
+        nach === "won" || nach === "lost" ? `opportunity.${nach}` : "opportunity.status",
+        `Status → ${nach}`,
+        grund.slice(0, 200),
+        wer.actor,
+        wer.origin,
+        JSON.stringify({ von, nach }),
+      ],
+    )
+  }
 }
 
 const ALLE_STUFEN = [...(STUFEN_REIHE as unknown as string[]), "won", "lost"]
@@ -292,11 +340,22 @@ export async function setzeStufeVonHand(q: Abfrage, oppId: string, nach: string)
   const alt = r[0]
   if (!alt || alt.status === nach || !alt.organisation_id) return false
   await q(`UPDATE opportunities SET status = $2, updated_at = now() WHERE id = $1`, [oppId, nach])
-  await q(
-    `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
-     VALUES ($1, 'organisation', $2, 'deal.stufe', $3, 'emin', 'MANUAL', $4::jsonb, now())`,
-    [randomUUID(), alt.organisation_id, `Stufe → ${nach} · von Hand`, JSON.stringify({ oppId, von: alt.status, nach, grund: "von Hand" })],
-  )
+  await protokolliereStufe(q, alt.organisation_id, oppId, alt.status, nach, "von Hand", undefined, { actor: "emin", origin: "MANUAL" })
+  /* Gewonnen heißt hier dasselbe wie in der Pipeline: ein Angebots-ENTWURF in Finanz (nie Versand). */
+  if (nach === "won") {
+    try {
+      const entwurf = await legeEntwurfAusGewinn(q, oppId, null)
+      if (entwurf?.neu) {
+        await q(
+          `INSERT INTO activities (id, subject_type, subject_id, kind, summary, detail, actor, origin, created_at)
+           VALUES ($1, 'opportunity', $2, 'finanz.entwurf', 'Angebots-Entwurf in Finanz angelegt', $3, 'emin', 'MANUAL', now())`,
+          [randomUUID(), oppId, `Entwurf ${entwurf.id} — Versand bleibt dein Klick in Finanz.`],
+        )
+      }
+    } catch {
+      /* Das Ja gilt auch ohne Entwurf; die Pipeline-Seite zeigt den Hinweis nur, wenn die Chronikzeile existiert. */
+    }
+  }
   return true
 }
 
@@ -350,6 +409,7 @@ export async function notiereAntwort(q: Abfrage, an: string, betreff: string | n
     quelleId,
     schritt: "Termin vereinbaren",
   })
+  if (staende.length) await protokolliereFaden(q, "mailstudio", "verkaufen", betreff ?? undefined)
   const summary = `Antwort erhalten${betreff ? ` · ${betreff}` : ""}`.slice(0, 200)
   const ziele: [string, string][] = [["contact", k[0].id]]
   if (k[0].organisation_id) ziele.push(["organisation", k[0].organisation_id])
@@ -400,6 +460,7 @@ export async function notiereTermin(
     schrittAm: t.startDatum,
     anlegen: `Bedarfsgespräch: ${firma[0]?.name ?? "Termin"}`,
   })
+  await protokolliereFaden(q, "termine", "verkaufen", t.referenz)
   await q(
     `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
      SELECT $1, 'organisation', $2, 'termin_gebucht', $3, 'system', 'termine', $4::jsonb, now()
@@ -426,9 +487,11 @@ export async function notiereGespraech(
     schrittAm: g.folge ? g.folgeAm : null,
     anlegen: `Bedarfsgespräch: ${firma[0]?.name ?? "Gespräch"}`,
   })
+  await protokolliereFaden(q, "gespraech", "verkaufen", g.folge ?? undefined)
   await q(
     `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
      VALUES ($1, 'organisation', $2, 'gespraech', $3, 'admin', 'HUMAN', $4::jsonb, now())`,
     [randomUUID(), firmaId, g.summary.slice(0, 200), JSON.stringify({ quelleId: g.gespraechId, kontaktId: g.kontaktId })],
   )
+  await protokolliereFaden(q, "gespraech", "kunden", g.summary)
 }

@@ -11,6 +11,8 @@ import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { darfBetreten } from "@/lib/rollen"
 import { NetzFaden } from "@/components/admin/netz-faden"
+import { assistentDb } from "@/lib/assistent/store"
+import { letzteFaeden } from "@/lib/zentrale/faden-protokoll"
 import { KNOTEN, NAV_SCHLUESSEL, type NavSchluessel } from "@/lib/zentrale/netz-karte"
 
 /*
@@ -62,6 +64,9 @@ export async function AdminShell({
 }) {
   const { sprache, t } = await adminSprachKontext()
   const { rolle } = await verifySession((await cookies()).get(ADMIN_COOKIE)?.value)
+  const letzteFaedenStand = await assistentDb()
+    .then((q) => letzteFaeden(q))
+    .catch(() => ({}) as Record<string, string>)
   const items: NavItem[] = NAV.filter((n) => darfBetreten(rolle, n.href)).map((n) => ({
     href: n.href,
     icon: n.key,
@@ -159,7 +164,7 @@ export async function AdminShell({
             {meta && <div className="bg-card text-muted-foreground shrink-0 rounded-full px-4 py-2 text-sm shadow-sm">{meta}</div>}
           </header>
 
-          <NetzFaden sprache={sprache === "tr" ? "tr" : "de"} owner={rolle === "owner"} />
+          <NetzFaden sprache={sprache === "tr" ? "tr" : "de"} owner={rolle === "owner"} letzte={letzteFaedenStand} />
 
           <div className="mt-10">{children}</div>
 

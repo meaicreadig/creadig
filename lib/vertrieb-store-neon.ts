@@ -1,8 +1,17 @@
 import { randomUUID } from "node:crypto"
+
+/*
+ * Wer schreibt welche Chronikzeile — Gegenstück zum Kommentar in lib/kundenfaden.ts:
+ * dieser Store schreibt `offer.*`, `project.*` und die `opportunity.*`-Zeilen der
+ * Pipeline selbst; Stufenwechsel gehen zusätzlich über `protokolliereStufe()` aus
+ * dem Kundenfaden (`deal.stufe`), damit /admin/verkaufen sie sieht und zurücknehmen kann.
+ */
 import { sqlTuerkisch, tuerkischVergleich } from "@/lib/tuerkisch"
 import { istQuelle, istZustand } from "@/lib/veroeffentlichung-zustand"
 
 import { OFFERS } from "@/lib/offer-readiness"
+import { protokolliereStufe } from "@/lib/kundenfaden"
+import { legeEntwurfAusGewinn } from "@/lib/finanz/auftraege/aus-vertrieb"
 import { KATALOG, fehltFuer, type Angebot, type Annahme, type Befund, type Position } from "@/lib/angebot"
 import {
   UEBERGABE_STUECKE,
@@ -657,6 +666,21 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
     )
   }
 
+  /*
+   * Vertrieb → Finanz (Netzwerk-Durchlauf, Phase 2a): ein gewonnener Vorgang
+   * legt einen Angebots-ENTWURF in fin_dokumente an. Kein Versand — das ist
+   * ein Klick in Finanz. Scheitert die Brücke, bleibt das Ja gültig; der
+   * Fehler steht in der Chronik des Vorgangs statt im Nichts.
+   */
+  async function finanzEntwurf(opportunityId: string, angebot: Angebot | null): Promise<void> {
+    try {
+      const r = await legeEntwurfAusGewinn((t, p) => sql.query(t, p) as Promise<Record<string, unknown>[]>, opportunityId, angebot)
+      if (r?.neu) await note("opportunity", opportunityId, "finanz.entwurf", "Angebots-Entwurf in Finanz angelegt", `Entwurf ${r.id} — Versand bleibt dein Klick in Finanz.`)
+    } catch (e) {
+      await note("opportunity", opportunityId, "finanz.entwurf-fehler", "Finanz-Entwurf konnte nicht angelegt werden", e instanceof Error ? e.message.slice(0, 300) : "unbekannt").catch(() => undefined)
+    }
+  }
+
   return {
     /**
      * Die Übersicht — sieben Zahlen, jede eine Zählung über echte Zeilen.
@@ -1142,8 +1166,8 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
     async moveOpportunity(id, status: SalesStatus, lostReason, stand): Promise<Schreibergebnis> {
       await ready()
       const alt = (await sql.query(
-        `SELECT status FROM opportunities WHERE id = $1`, [id],
-      )) as { status: string }[]
+        `SELECT status, organisation_id FROM opportunities WHERE id = $1`, [id],
+      )) as { status: string; organisation_id: string | null }[]
       if (!alt.length) return "fehlt"
       const rows = (await sql.query(
         `UPDATE opportunities
@@ -1156,6 +1180,26 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         [id, status, lostReason, stand],
       )) as { id: string }[]
       if (!rows.length) return "konflikt"
+      if (status === "won" && alt[0].status !== "won") await finanzEntwurf(id, null)
+      /*
+       * Eine Stufenänderung der Pipeline schreibt ZUSÄTZLICH `deal.stufe`
+       * (lib/kundenfaden.ts) — das ist die Zeile, aus der /admin/verkaufen
+       * „Warum steht der Deal hier" und „Rückgängig" liest. Die
+       * `opportunity.*`-Zeile unten bleibt für die Chronik dieses Vorgangs.
+       */
+      if (alt[0].status !== status) {
+        await protokolliereStufe(
+          (t, p) => sql.query(t, p) as Promise<Record<string, unknown>[]>,
+          alt[0].organisation_id,
+          id,
+          alt[0].status,
+          status,
+          status === "lost" && lostReason ? `verloren: ${lostReason}` : "Pipeline",
+          undefined,
+          { actor: akteur.kennung, origin: akteur.herkunft === "HUMAN" ? "MANUAL" : "AUTOMATIC" },
+          false,
+        )
+      }
       const closing = TERMINAL_STATES.includes(status)
       await note(
         "opportunity",
@@ -1562,6 +1606,7 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
       await note("opportunity", angebot.opportunityId, "offer.accepted",
         `Angebot ${angebot.referenz} angenommen`,
         `${annahme.von} (${annahme.rolle}), ${annahme.form}, ${annahme.am}`)
+      await finanzEntwurf(angebot.opportunityId, angebot)
       return []
     },
 

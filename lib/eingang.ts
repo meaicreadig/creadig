@@ -7,8 +7,8 @@ import { assistentDb, legeFreigabeAn } from "@/lib/assistent/store"
 import { kundenText, markiereAntwort } from "@/lib/assistent/versand"
 export { eingangsAdresse } from "@/lib/assistent/versand"
 import { neonAbfrage, type Abfrage } from "@/lib/neon-abfrage"
-import { legeBuchungslinkAn } from "@/lib/termine/store"
-import { siteUrl } from "@/lib/termine/mail"
+import { legeBuchungslinkAn, linkSprache } from "@/lib/termine/store"
+import { buchungsUrl, siteUrl } from "@/lib/termine/mail"
 
 /**
  * Gelir Motoru – das Auge der Verkaufsmaschine.
@@ -245,7 +245,7 @@ export async function verarbeiteEingang(emailId: string): Promise<boolean> {
         gueltigTage: 21,
         von: "gelir-motoru",
       }).catch(() => null)
-      entwurf = entwurf.replace("{TERMINLINK}", token ? `${siteUrl()}/termin/buchen/${token}` : `${siteUrl()}/termin`)
+      entwurf = entwurf.replace("{TERMINLINK}", token ? buchungsUrl(token, await linkSprache(token)) : `${siteUrl()}/termin`)
     }
 
     let entwurfId: string | null = null

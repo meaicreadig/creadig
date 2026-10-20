@@ -14,6 +14,7 @@ import { firmenRahmen, INHABER } from "./rahmen"
 import { findeKontaktMail } from "./kontaktsuche"
 import { ergaenzeFehlendeAdressen, istMail, nachfassen } from "./versand"
 import { holeEingang } from "@/lib/eingang"
+import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 import {
   assistentDb,
   ladeFreigaben,
@@ -22,6 +23,7 @@ import {
   letzteArtikel,
   letzteLaeufe,
   neueFreigabeId,
+  offeneAutomationErinnerungen,
   protokolliereLauf,
   quelleBekannt,
   speichereRat,
@@ -73,9 +75,16 @@ async function vertrieb(): Promise<Ergebnis> {
   const { deals } = await ladeVerkaufslage()
   const woche = kw(new Date())
   const kandidaten = deals.filter((d) => d.warnungen.length > 0).slice(0, 4)
+  /* Steht für den Deal schon eine offene Erinnerung der Automation (lib/automation.ts), melden wir ihn nicht ein zweites Mal. */
+  const schonErinnert = await offeneAutomationErinnerungen(kandidaten.map((d) => d.id))
   let neu = 0
+  let uebersprungen = 0
   for (const deal of kandidaten) {
     if (neu >= 2) break
+    if (schonErinnert.has(deal.id)) {
+      uebersprungen++
+      continue
+    }
     const quelle = `deal:${deal.id}:${woche}`
     if (await quelleBekannt(quelle)) continue
     await erstelleEntwurf(deal)
@@ -92,7 +101,9 @@ async function vertrieb(): Promise<Ergebnis> {
     if (id) neu++
   }
   return {
-    ergebnis: kandidaten.length ? `${neu} Mailentwürfe für ${kandidaten.length} gefährdete Abschlüsse` : "Alle Abschlüsse im Takt",
+    ergebnis: kandidaten.length
+      ? `${neu} Mailentwürfe für ${kandidaten.length} gefährdete Abschlüsse${uebersprungen ? ` (${uebersprungen} bereits als Automation-Erinnerung offen)` : ""}`
+      : "Alle Abschlüsse im Takt",
     anzahl: neu,
   }
 }
@@ -135,6 +146,7 @@ async function messen(): Promise<Ergebnis> {
     })
     if (id) neu++
   }
+  if (neu > 0) await protokolliereFaden(await assistentDb().catch(() => null), "messen", "assistent", `${neu} Vorbereitungspläne`)
   return { ergebnis: teil.length ? `${neu} neue Vorbereitungspläne · ${teil.length} Messen zugesagt` : "Noch keine Messe zugesagt", anzahl: neu }
 }
 
@@ -369,6 +381,7 @@ async function rat(): Promise<Ergebnis> {
     letzteLaeufe(),
     ladeRaete(2),
   ])
+  await protokolliereFaden(await assistentDb().catch(() => null), "finanz", "assistent", "Rat liest Finanzrahmen")
   if (frueher[0]?.woche === woche) return { ergebnis: "Sitzung dieser Woche hat schon getagt", anzahl: 0 }
 
   const zugesagt = Object.entries(status).filter(([, s]) => s === "teilnehmen").map(([k]) => k)

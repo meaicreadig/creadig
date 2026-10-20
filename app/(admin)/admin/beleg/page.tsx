@@ -10,6 +10,7 @@ import {
   naechsteSchritte,
   uebersicht,
   wirksamsterSchritt,
+  ladeGateLauf,
 } from "@/lib/beleg-betrieb"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { fiberoKennzahlen, HISTORISCHER_BEFUND, MESSUNG_START } from "@/lib/fibero-messung"
@@ -113,6 +114,7 @@ export default async function BelegBetrieb() {
   const oeffentlich = alle.filter((p) => p.stand === "oeffentlich")
   const f = t.freigaben
   const { freigaben, organisationen, eingerichtet } = await ladeFreigaben()
+  const gate = await ladeGateLauf()
   const gueltige = freigaben?.filter((r) => !r.withdrawnAt) ?? []
 
   return (
@@ -150,6 +152,25 @@ export default async function BelegBetrieb() {
           </div>
         )}
       </section>
+
+      {/* ── LETZTER LAUF DES BELEG-GATES ───────────────────────────────── */}
+      <p
+        className={`type-small mt-6 max-w-3xl text-pretty ${gate && !gate.ok ? "text-destructive" : "text-muted-foreground"}`}
+        role="status"
+      >
+        {gate === null
+          ? b.gateKein
+          : gate.ok
+            ? b.gateGruen(new Date(gate.laufAt).toLocaleString(intl, { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" }))
+            : b.gateRot(new Date(gate.laufAt).toLocaleString(intl, { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" }), gate.anzahlVerstoesse)}
+      </p>
+      {gate && !gate.ok && (
+        <ul className="type-small text-destructive mt-2 max-w-3xl list-disc ps-5">
+          {gate.verstoesse.map((v) => (
+            <li key={v}>{v}</li>
+          ))}
+        </ul>
+      )}
 
       {/* ── ALLES OFFENE, IN REIHENFOLGE ───────────────────────────────── */}
       <section aria-labelledby="offen-titel" className="border-line mt-12 border-t pt-8">

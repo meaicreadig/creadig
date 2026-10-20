@@ -7,6 +7,7 @@ import { berechneLage } from "@/lib/finanz/lage"
 import { ladeBelege } from "@/lib/finanz/belege"
 import { ladeOffeneBankUmsaetze } from "@/lib/finanz/bank-abgleich"
 import { protokolliere } from "@/lib/finanz/store"
+import { ladeFinanzKurzlage, PAUSCHALEN_ERINNERUNG_AB_TAG } from "@/lib/finanz/kurzlage"
 import { sendeMail, siteUrl } from "@/lib/termine/mail"
 import { FIRMA, kampagnenHtml } from "@/lib/mailing/vorlage"
 import { morgenBriefing, type BriefingSchritt } from "@/lib/admin/morgen-briefing"
@@ -27,17 +28,20 @@ export type MorgenBericht = {
   paragraph19Hinweis: string | null
   belegeImKorb: number
   bankUmsaetzeOffen: number
+  /** Ab dem 25. des Monats, solange weder Verpflegungs- noch Homeoffice-Pauschale für den laufenden Monat erfasst ist. */
+  pauschalenFehlen: boolean
   /** Kompass()-Hinweise mit schwere="neutral" — Wachstum/Kapital, keine Störung, aber auch nicht nur bei Problemen interessant. */
   wachstumsHinweise: string[]
 }
 
 export async function erstelleMorgenBericht(db: Abfrage): Promise<MorgenBericht> {
   const heute = heuteBerlin()
-  const [lage, rechnungen, belege, bankUmsaetze] = await Promise.all([
+  const [lage, rechnungen, belege, bankUmsaetze, kurzlage] = await Promise.all([
     berechneLage(db),
     ladeDokumente(db, ["rechnung"]),
     ladeBelege(db, null),
     ladeOffeneBankUmsaetze(db),
+    ladeFinanzKurzlage(db, heute),
   ])
 
   const faelligeMahnungen = rechnungen
@@ -56,12 +60,12 @@ export async function erstelleMorgenBericht(db: Abfrage): Promise<MorgenBericht>
   const paragraph19Hinweis = lage.hinweise.find((h) => h.text.includes("§ 19"))?.text ?? null
   const wachstumsHinweise = lage.hinweise.filter((h) => h.schwere === "neutral").map((h) => h.text)
 
-  return { heute, faelligeMahnungen, fristen, paragraph19Hinweis, belegeImKorb: belege.korbAnzahl, bankUmsaetzeOffen: bankUmsaetze.length, wachstumsHinweise }
+  return { heute, faelligeMahnungen, fristen, paragraph19Hinweis, belegeImKorb: belege.korbAnzahl, bankUmsaetzeOffen: bankUmsaetze.length, pauschalenFehlen: Number(heute.slice(8, 10)) >= PAUSCHALEN_ERINNERUNG_AB_TAG && !kurzlage.pauschaleErfasst, wachstumsHinweise }
 }
 
 /** "Ruhig" meint: nichts Dringendes — Wachstumshinweise zählen bewusst nicht mit, die sind gerade an ruhigen Tagen am nützlichsten. */
 function istDringend(b: MorgenBericht): boolean {
-  return b.faelligeMahnungen.length > 0 || b.fristen.length > 0 || Boolean(b.paragraph19Hinweis) || b.belegeImKorb > 0 || b.bankUmsaetzeOffen > 0
+  return b.faelligeMahnungen.length > 0 || b.fristen.length > 0 || Boolean(b.paragraph19Hinweis) || b.belegeImKorb > 0 || b.bankUmsaetzeOffen > 0 || b.pauschalenFehlen
 }
 
 const STUFEN_TEXT = ["", "Zahlungserinnerung", "1. Mahnung", "2. Mahnung"]
@@ -110,6 +114,7 @@ function berichtMail(b: MorgenBericht, a: AssistentTeil): { subject: string; tex
   if (b.paragraph19Hinweis) finanz.push(`- [shield] § 19 Kleinunternehmer: ${zeile(b.paragraph19Hinweis)}`)
   if (b.belegeImKorb > 0) finanz.push(`- [layers] Belege im Eingangskorb: ${b.belegeImKorb} ${b.belegeImKorb === 1 ? "Beleg wartet" : "Belege warten"} auf ein Geschäftsfeld`)
   if (b.bankUmsaetzeOffen > 0) finanz.push(`- [layers] Bank-Import: ${b.bankUmsaetzeOffen} ${b.bankUmsaetzeOffen === 1 ? "Umsatz wartet" : "Umsätze warten"} auf Zuordnung`)
+  if (b.pauschalenFehlen) finanz.push(`- [clock] Pauschalen: Für ${datumKurz(b.heute).split(" ").slice(-1)[0]} sind noch keine Verpflegungs- oder Homeoffice-Tage erfasst — unter ${basis}/finanz/pauschalen eintragen.`)
   for (const w of b.wachstumsHinweise) finanz.push(`- [sparkles] Wachstum & Kapital: ${zeile(w)}`)
   bloecke.push(finanz.length ? finanz.join("\n") : "Bei den Finanzen ist heute nichts offen — keine Frist, keine Mahnung, kein offener Beleg.")
 

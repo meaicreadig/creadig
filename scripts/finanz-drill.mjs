@@ -1179,6 +1179,35 @@ await db(`UPDATE fin_ziele SET status = 'verworfen' WHERE id = 'ABNAHME-w-ziel-v
 const w_offen = await offeneBeratungsZieleCent(db, heuteBerlin())
 p(w_offen === 2000000, "W4 offeneBeratungsZieleCent() zählt nur aktive, NICHT-platzhalter Beratungs-Ziele mit Frist im laufenden Jahr", String(w_offen))
 
+/* ══ V · Netzwerk-Verbindungen — Finanz-Wahrheit ausserhalb von /finanz ══ */
+console.log("\nV · Finanz-Kurzlage und Abbuchungen")
+const { ladeFinanzKurzlage, ladeOffeneRechnungenSumme } = await import("../lib/finanz/kurzlage.ts")
+const { ladeAusgehendeBankUmsaetze, bucheAusgehendenUmsatz, ladeOffeneRechnungenFuerAbgleich: ladeOffeneRe } = await import("../lib/finanz/bank-abgleich.ts")
+const { ladeOffeneEinnahmen } = await import("../lib/finanz/felder.ts")
+
+const n_heute = heuteBerlin()
+const n_felder = await ladeFelder(db, n_heute.slice(0, 4))
+const n_offen = await ladeOffeneEinnahmen(db)
+p(n_offen.anzahl === n_felder.offen.anzahl && n_offen.bruttoCent === n_felder.offen.bruttoCent, "V1 ladeOffeneEinnahmen() liefert dieselbe Zahl wie die Finanz-Startseite (eine Quelle)")
+const n_summe = await ladeOffeneRechnungenSumme(db)
+const n_liste = (await ladeOffeneRe(db)).filter((r) => r.offenCent > 0)
+p(n_summe.anzahl === n_liste.length && n_summe.offenCent === n_liste.reduce((a, r) => a + r.offenCent, 0) && n_summe.anzahl >= 1,
+  "V2 offene Rechnungen fuer Cockpit/Hauptsitz = dieselbe Abfrage wie der Bank-Abgleich", `${n_summe.anzahl} Rechnungen`)
+const n_vorher = await ladeFinanzKurzlage(db, n_heute)
+p(n_vorher.pauschaleErfasst === false, "V3 ohne Verpflegungs-/Homeoffice-Eintrag im Monat: pauschaleErfasst = false (Fahrt-Pauschalen zaehlen nicht)")
+await db(`INSERT INTO fin_buchungen (id, art, status, datum, brutto_cent, ust_satz, kategorie, notiz, quelle, pauschal_menge)
+  VALUES ('ABNAHME-n-pausch','ausgabe','gebucht',$1,1400,0,'Verpflegungspauschale','ABNAHME','pauschale',1) ON CONFLICT (id) DO NOTHING`, [n_heute])
+p((await ladeFinanzKurzlage(db, n_heute)).pauschaleErfasst === true, "V4 mit einem Verpflegungs-Eintrag im Monat: pauschaleErfasst = true")
+
+await db(`INSERT INTO fin_bank_umsaetze (id, datum, betrag_cent, verwendungszweck, gegenpartei, quelle)
+  VALUES ('ABNAHME-n-abbuchung',$1,-2380,'ABNAHME Kontofuehrung','Testbank','csv') ON CONFLICT (id) DO NOTHING`, [n_heute])
+p((await ladeAusgehendeBankUmsaetze(db)).some((u) => u.id === "ABNAHME-n-abbuchung" && u.betragCent === 2380), "V5 offene Abbuchung erscheint in der Liste (positiver Betrag)")
+p(await bucheAusgehendenUmsatz(db, "ABNAHME-n-abbuchung", "Bank & Gebühren", 0, "sonstiges"), "V6 als Ausgabe buchen gelingt")
+p(!(await bucheAusgehendenUmsatz(db, "ABNAHME-n-abbuchung", "Bank & Gebühren", 0, "sonstiges")), "V7 zweites Buchen tut nichts (idempotent)")
+const n_bu = await db(`SELECT art, brutto_cent, kategorie, geschaeftsfeld FROM fin_buchungen WHERE quelle_ref = 'ABNAHME-n-abbuchung'`)
+p(n_bu.length === 1 && n_bu[0].art === "ausgabe" && Number(n_bu[0].brutto_cent) === 2380 && n_bu[0].geschaeftsfeld === "sonstiges", "V8 genau eine Ausgaben-Buchung mit Kategorie und Geschaeftsfeld")
+p(!(await ladeAusgehendeBankUmsaetze(db)).some((u) => u.id === "ABNAHME-n-abbuchung"), "V9 die Abbuchung ist aus dem Eingangskorb verschwunden")
+
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
 process.exit(fehler === 0 ? 0 : 1)

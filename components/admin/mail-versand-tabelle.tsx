@@ -21,8 +21,15 @@ const T = {
     antwortKnopf: "Antwort erhalten",
     rueckgaengig: "Rückgängig",
     freigeben: "Ansehen & senden",
-    quelle: { studio: "Mail Studio", assistent: "Assistent", nachfassen: "Nachfassen" },
+    quelle: { studio: "Mail Studio", assistent: "Assistent", nachfassen: "Nachfassen", kampagne: "Kampagne" },
     stufe: (n: number) => `${n}. Nachfassen`,
+    kampagneStand: "Kampagne · kein Nachfassen",
+    empfaenger: (n: number) => (n === 1 ? "1 Empfänger" : `${n} Empfänger`),
+    entwurf: "Entwurf",
+    versendet: (g: number, o: string, k: string) => `Versendet · ${g} Mails · Öffnung ${o} · Klick ${k}`,
+    antworten: (n: number) => (n === 1 ? "1 Antwort" : `${n} Antworten`),
+    oeffnen: "Öffnen",
+    ohneBetreff: "Ohne Betreff",
   },
   tr: {
     datum: "Gönderildi",
@@ -38,19 +45,44 @@ const T = {
     antwortKnopf: "Yanıt geldi",
     rueckgaengig: "Geri al",
     freigeben: "Gör ve gönder",
-    quelle: { studio: "Mail Studio", assistent: "Asistan", nachfassen: "Takip" },
+    quelle: { studio: "Mail Studio", assistent: "Asistan", nachfassen: "Takip", kampagne: "Kampanya" },
     stufe: (n: number) => `${n}. takip`,
+    kampagneStand: "Kampanya · takip yok",
+    empfaenger: (n: number) => `${n} alıcı`,
+    entwurf: "Taslak",
+    versendet: (g: number, o: string, k: string) => `Gönderildi · ${g} e-posta · açılma ${o} · tıklama ${k}`,
+    antworten: (n: number) => `${n} yanıt`,
+    oeffnen: "Aç",
+    ohneBetreff: "Konusuz",
   },
 }
 
+/** Eine Kampagne als EINE Zeile der Zeitleiste (der Versand je Empfänger steht in `assistent_freigaben`, nicht hier). */
+export type KampagnenZeile = {
+  id: string
+  subject: string
+  preheader: string
+  datum: string
+  status: "entwurf" | "versendet"
+  recipientsCount: number
+  gesendet: number
+  geoeffnet: number
+  geklickt: number
+  antworten: number
+}
+
+const prozent = (teil: number, ganz: number) => (ganz > 0 ? `${Math.round((teil / ganz) * 100)} %` : "—")
+
 export function MailVersandTabelle({
   zeilen,
+  kampagnen = [],
   sprache,
   intl,
   antwortAktion,
   rueckgaengigAktion,
 }: {
   zeilen: VersandZeile[]
+  kampagnen?: KampagnenZeile[]
   sprache: Sprache
   intl: string
   antwortAktion: (formData: FormData) => Promise<void>
@@ -61,7 +93,13 @@ export function MailVersandTabelle({
   const uhr = new Intl.DateTimeFormat(intl, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" })
   const kurz = new Intl.DateTimeFormat(intl, { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Berlin" })
 
-  if (zeilen.length === 0) {
+  /* EINE Zeitleiste: Einzelmails und Kampagnen, neueste zuerst. */
+  const eintraege = [
+    ...zeilen.map((z) => ({ zeit: z.gesendetAt, mail: z, kampagne: null as KampagnenZeile | null })),
+    ...kampagnen.map((k) => ({ zeit: k.datum, mail: null as VersandZeile | null, kampagne: k })),
+  ].sort((a, b) => new Date(b.zeit).getTime() - new Date(a.zeit).getTime())
+
+  if (eintraege.length === 0) {
     return <p className="bg-card text-muted-foreground rounded-3xl p-6 text-sm leading-relaxed">{t.leer}</p>
   }
 
@@ -78,8 +116,43 @@ export function MailVersandTabelle({
             </tr>
           </thead>
           <tbody>
-            {zeilen.map((z) => {
-              const d = new Date(z.gesendetAt)
+            {eintraege.map((eintrag) => {
+              const k = eintrag.kampagne
+              const d = new Date(eintrag.zeit)
+              if (k) {
+                return (
+                  <tr key={`k-${k.id}`} className="hover:bg-muted/40 align-top transition-colors">
+                    <td className="whitespace-nowrap px-5 py-4">
+                      <span className="block font-medium tabular-nums">{tag.format(d)}</span>
+                      <span className="text-meta text-muted-foreground tabular-nums">{uhr.format(d)}</span>
+                    </td>
+                    <td className="max-w-[14rem] px-3 py-4">
+                      <span className="block truncate font-medium">{t.empfaenger(k.status === "versendet" ? k.gesendet : k.recipientsCount)}</span>
+                    </td>
+                    <td className="px-3 py-4">
+                      <span className="line-clamp-1 font-medium">{k.subject || t.ohneBetreff}</span>
+                      {k.preheader ? <span className="text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{k.preheader}</span> : null}
+                      <span className="text-meta text-primary mt-1.5 block">{t.quelle.kampagne}</span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="flex flex-col items-end gap-2">
+                        {k.status === "versendet" ? (
+                          <>
+                            <span className="text-muted-foreground text-xs">{t.versendet(k.gesendet, prozent(k.geoeffnet, k.gesendet), prozent(k.geklickt, k.gesendet))}</span>
+                            {k.antworten > 0 && <Pill severity="attention">{t.antworten(k.antworten)}</Pill>}
+                          </>
+                        ) : (
+                          <Pill severity="attention">{t.entwurf}</Pill>
+                        )}
+                        <Link href={`/admin/marketing/mail/${k.id}`} className="text-primary hover:bg-primary/10 rounded-full px-3 py-1.5 text-xs font-medium transition-colors">
+                          {t.oeffnen}
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              }
+              const z = eintrag.mail as VersandZeile
               return (
                 <tr key={z.id} className="hover:bg-muted/40 align-top transition-colors">
                   <td className="whitespace-nowrap px-5 py-4">
@@ -159,5 +232,6 @@ function StatusPill({ z, t, kurz }: { z: VersandZeile; t: (typeof T)["de"]; kurz
     )
   if (s.art === "nachfass_offen") return <Pill severity="attention">{t.nachfassOffen}</Pill>
   if (s.art === "nachgefasst") return <Pill>{t.nachgefasst}</Pill>
+  if (s.art === "kampagne") return <Pill>{t.kampagneStand}</Pill>
   return <Pill severity="critical">{t.beendet}</Pill>
 }

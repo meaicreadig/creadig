@@ -7,8 +7,10 @@ import { morgenBriefing } from "@/lib/admin/morgen-briefing"
 import { ladeStatus, messenFuerKalender } from "@/lib/messen-radar"
 import { ladeVerkaufslage, MONATSZIEL_EUR } from "@/lib/verkaufen"
 
+import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
+
 import { firmenRahmen } from "./rahmen"
-import { FREIGABE_ARTEN, ladeFreigaben, ladeRaete, legeFreigabeAn, type Nachricht } from "./store"
+import { assistentDb, FREIGABE_ARTEN, ladeFreigaben, ladeRaete, legeFreigabeAn, type Nachricht } from "./store"
 
 const MODELL = "openai/gpt-5.4-mini"
 
@@ -38,7 +40,11 @@ export async function antworte(verlauf: Nachricht[]): Promise<string> {
     finanzrahmen: tool({
       description: "Frei verfügbares Geld, Reichweite und Ausgaben-Spielraum. Vor JEDEM Vorschlag, der Geld kostet, aufrufen.",
       inputSchema: z.object({}),
-      execute: async () => firmenRahmen(),
+      execute: async () => {
+        const rahmen = await firmenRahmen()
+        await protokolliereFaden(await assistentDb().catch(() => null), "finanz", "assistent", "Chat liest Finanzrahmen")
+        return rahmen
+      },
     }),
     geschaeftsleitung: tool({
       description: "Letzte Wochensitzung der KI-Geschäftsleitung: Beschlüsse, verworfene Ideen, Rückfrage und Emins Antwort.",

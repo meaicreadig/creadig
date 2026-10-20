@@ -9,8 +9,8 @@ import { pruefeZugang } from "@/lib/admin-widerruf"
 import { darfBetreten } from "@/lib/rollen"
 import { siteUrl } from "@/lib/termine/mail"
 import { einzelmailHtml, einzelmailText, type Einzelmail } from "@/lib/mailing/eml"
-import { ergaenzeExtra, setzeFreigabe, setzeMailKopf } from "@/lib/assistent/store"
-import { markiereAntwort, nimmAntwortZurueckFuer, protokolliereStudioMail } from "@/lib/assistent/versand"
+import { ergaenzeExtra, neueFreigabeId, setzeFreigabe, setzeMailKopf } from "@/lib/assistent/store"
+import { eingangsAdresse, markiereAntwort, nimmAntwortZurueckFuer, protokolliereKampagnenVersand, protokolliereStudioMail } from "@/lib/assistent/versand"
 import { schreibeEinzelmail, schreibeKampagne, type KampagnenAnlass, type KiEinzelmail, type KiKampagne } from "@/lib/mailing/ki"
 import {
   aktiveEmpfaenger,
@@ -238,7 +238,10 @@ export async function versenden(id: string, roh: KampagnenInhalt): Promise<Ergeb
   let fehler = 0
   for (let i = 0; i < offen.length; i += 50) {
     const stapel = offen.slice(i, i + 50)
-    const mails = stapel.map((z) => {
+    /* Je Empfänger eine Versand-Id: steckt in der Antwortadresse und wird nach dem Versand als Zeile protokolliert. */
+    const versandIds = stapel.map(() => neueFreigabeId())
+    const mails = stapel.map((z, n) => {
+      const antwortAn = eingangsAdresse(versandIds[n]) ?? a.replyTo
       const abmeldeUrl = `${basis}/mail/abmelden/${z.token}`
       const ctaHref = `${basis}/api/mail/k/${z.id}`
       const anrede = anredeFuer(z.name)
@@ -248,7 +251,7 @@ export async function versenden(id: string, roh: KampagnenInhalt): Promise<Ergeb
         subject: k.subject,
         html: kampagnenHtml(k, { siteUrl: basis, abmeldeUrl, ctaHref, pixelUrl: `${basis}/api/mail/o/${z.id}`, anrede }),
         text: kampagnenText(k, { abmeldeUrl, ctaHref, anrede }),
-        ...(a.replyTo ? { reply_to: a.replyTo } : {}),
+        ...(antwortAn ? { reply_to: antwortAn } : {}),
         headers: {
           "List-Unsubscribe": `<${basis}/api/mail/abmelden/${z.token}>`,
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
@@ -263,6 +266,18 @@ export async function versenden(id: string, roh: KampagnenInhalt): Promise<Ergeb
       })
       if (res.ok) {
         await zustellungErgebnis(stapel.map((z) => z.id), true)
+        const antwort = (await res.json().catch(() => null)) as { data?: { id?: string }[] } | null
+        await protokolliereKampagnenVersand(
+          stapel.map((z, n) => ({
+            id: versandIds[n],
+            zustellungId: z.id,
+            an: z.email,
+            betreff: k.subject,
+            inhalt: k.body,
+            kampagneId: id,
+            mailId: antwort?.data?.[n]?.id,
+          })),
+        )
         gesendet += stapel.length
       } else {
         await zustellungErgebnis(stapel.map((z) => z.id), false, `HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`)

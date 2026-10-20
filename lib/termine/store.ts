@@ -1,6 +1,8 @@
 import "server-only"
 
+import type { Locale } from "@/lib/dictionary"
 import { neonAbfrage, type Abfrage } from "@/lib/neon-abfrage"
+import { istTerminLocale } from "@/lib/termine/texte"
 import {
   STANDARD_EINSTELLUNGEN,
   freieSlots,
@@ -38,9 +40,11 @@ export type Termin = {
   contactId: string | null
   contactName: string | null
   calendarState: string
+  locale: Locale
 }
 export type Buchungslink = {
   token: string
+  locale: Locale
   contactId: string | null
   meetingKind: Gespraechsart
   durationMin: number
@@ -50,6 +54,10 @@ export type Buchungslink = {
   expiresAt: string
   usedAt: string | null
   revokedAt: string | null
+}
+
+export function alsLocale(v: unknown): Locale {
+  return istTerminLocale(v) ? v : "de"
 }
 
 function db(): Abfrage | null {
@@ -141,7 +149,7 @@ export async function entferneSperre(id: string): Promise<void> {
 /* ------------------------------------------------------------------------ */
 
 const TERMIN_SPALTEN = `a.id, a.reference, a.status, a.meeting_kind, a.topic, a.starts_at, a.ends_at, a.guest_name, a.guest_email,
-  a.guest_note, a.contact_id, c.name AS contact_name, a.calendar_state`
+  a.guest_note, a.contact_id, c.name AS contact_name, a.calendar_state, a.locale`
 
 function alsTermin(r: Record<string, unknown>): Termin {
   return {
@@ -158,6 +166,7 @@ function alsTermin(r: Record<string, unknown>): Termin {
     contactId: (r.contact_id as string | null) ?? null,
     contactName: (r.contact_name as string | null) ?? null,
     calendarState: String(r.calendar_state),
+    locale: alsLocale(r.locale),
   }
 }
 
@@ -208,16 +217,31 @@ export async function legeBuchungslinkAn(l: {
   windowTo: string | null
   gueltigTage: number
   von: string
+  /** Sprache des Gastes; ohne Angabe die der letzten Anfrage des Kontakts, sonst Deutsch. */
+  locale?: Locale
 }): Promise<string> {
   const q = db()
   if (!q) throw new Error("Speicher nicht verfügbar")
   const token = neuesToken()
+  let locale = l.locale
+  if (!locale && l.contactId) {
+    const r = await q(`SELECT locale FROM leads WHERE contact_id = $1 ORDER BY created_at DESC LIMIT 1`, [l.contactId]).catch(() => [])
+    locale = alsLocale(r[0]?.locale)
+  }
   await q(
-    `INSERT INTO booking_links (token, contact_id, organisation_id, meeting_kind, duration_min, topic, window_from, window_to, expires_at, created_by)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now() + make_interval(days => $9), $10)`,
-    [token, l.contactId, l.organisationId, l.meetingKind, GESPRAECHSARTEN[l.meetingKind].dauer, l.topic, l.windowFrom, l.windowTo, l.gueltigTage, l.von],
+    `INSERT INTO booking_links (token, contact_id, organisation_id, meeting_kind, duration_min, topic, window_from, window_to, expires_at, created_by, locale)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now() + make_interval(days => $9), $10, $11)`,
+    [token, l.contactId, l.organisationId, l.meetingKind, GESPRAECHSARTEN[l.meetingKind].dauer, l.topic, l.windowFrom, l.windowTo, l.gueltigTage, l.von, locale ?? "de"],
   )
   return token
+}
+
+/** Sprache eines bestehenden Buchungslinks (Deutsch, wenn unbekannt). */
+export async function linkSprache(token: string): Promise<Locale> {
+  const q = db()
+  if (!q) return "de"
+  const r = await q(`SELECT locale FROM booking_links WHERE token = $1`, [token]).catch(() => [])
+  return alsLocale(r[0]?.locale)
 }
 
 export type LinkPruefung = { ok: true; link: Buchungslink } | { ok: false; grund: "unbekannt" | "abgelaufen" | "benutzt" | "widerrufen" | "speicher" }
@@ -227,7 +251,7 @@ export async function pruefeBuchungslink(token: string): Promise<LinkPruefung> {
   const q = db()
   if (!q) return { ok: false, grund: "speicher" }
   const rows = await q(
-    `SELECT token, contact_id, meeting_kind, duration_min, topic, window_from, window_to, expires_at, used_at, revoked_at
+    `SELECT token, contact_id, meeting_kind, duration_min, topic, window_from, window_to, expires_at, used_at, revoked_at, locale
        FROM booking_links WHERE token = $1`,
     [token],
   )
@@ -235,6 +259,7 @@ export async function pruefeBuchungslink(token: string): Promise<LinkPruefung> {
   if (!r) return { ok: false, grund: "unbekannt" }
   const link: Buchungslink = {
     token: String(r.token),
+    locale: alsLocale(r.locale),
     contactId: (r.contact_id as string | null) ?? null,
     meetingKind: (String(r.meeting_kind) in GESPRAECHSARTEN ? String(r.meeting_kind) : "kennenlernen") as Gespraechsart,
     durationMin: Number(r.duration_min),
@@ -310,12 +335,12 @@ export async function bucheTermin(e: {
       `WITH link AS (
          UPDATE booking_links SET used_at = now()
           WHERE token = $1 AND used_at IS NULL AND revoked_at IS NULL AND expires_at > now()
-          RETURNING token, contact_id, organisation_id, meeting_kind, topic
+          RETURNING token, contact_id, organisation_id, meeting_kind, topic, locale
        )
        INSERT INTO appointments (id, reference, booking_token, manage_token, contact_id, organisation_id, meeting_kind, topic,
-         starts_at, ends_at, hold_range, timezone, status, guest_name, guest_email, guest_note, calendar_state)
+         starts_at, ends_at, hold_range, timezone, status, guest_name, guest_email, guest_note, calendar_state, locale)
        SELECT $2, $3, link.token, $4, link.contact_id, link.organisation_id, link.meeting_kind, link.topic,
-         $5::timestamptz, $6::timestamptz, tstzrange($5::timestamptz, $7::timestamptz, '[)'), $8, 'booked', $9, $10, $11, 'feed_only'
+         $5::timestamptz, $6::timestamptz, tstzrange($5::timestamptz, $7::timestamptz, '[)'), $8, 'booked', $9, $10, $11, 'feed_only', link.locale
          FROM link
        RETURNING id, contact_id`,
       [link.token, id, referenz(), manageToken, start.toISOString(), ende.toISOString(), halteEnde.toISOString(), einstellungen.timezone, e.name, e.email, e.note],

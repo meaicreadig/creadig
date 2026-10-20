@@ -36,6 +36,16 @@ const FELD = `COALESCE(b.geschaeftsfeld, fb.geschaeftsfeld, 'offen')`
 const JOIN = `FROM fin_buchungen b
   LEFT JOIN fin_belege fb ON fb.quelle = 'fibero' AND b.id = 'fibero-exp-' || fb.extern_id`
 
+/** Noch nicht erhaltene Einnahmen (auch unbezahlte fibero-Rechnungen) — eine Abfrage für Finanz-Startseite, Hauptsitz und Morgenbriefing. */
+export async function ladeOffeneEinnahmen(db: Abfrage): Promise<{ anzahl: number; bruttoCent: number }> {
+  const [r] = await db(
+    `SELECT count(*) AS c, coalesce(sum(b.brutto_cent),0) AS s FROM fin_buchungen b
+      WHERE b.storniert_at IS NULL AND b.art = 'einnahme' AND b.bezahlt = false`,
+    [],
+  )
+  return { anzahl: Number(r?.c ?? 0), bruttoCent: Number(r?.s ?? 0) }
+}
+
 export async function ladeFelder(db: Abfrage, jahr: string): Promise<FelderBild> {
   await belegeSchema(db)
   const p = [`${jahr}-01-01`, `${Number(jahr) + 1}-01-01`]
@@ -44,11 +54,7 @@ export async function ladeFelder(db: Abfrage, jahr: string): Promise<FelderBild>
 
   const [zeilen, offen, quellen, monate, afa, pruef] = await Promise.all([
     db(`SELECT ${FELD} AS feld, b.art, sum(${NETTO}) AS netto, count(*) AS c ${JOIN} WHERE ${basis} GROUP BY 1, 2`, p),
-    db(
-      `SELECT count(*) AS c, coalesce(sum(b.brutto_cent),0) AS s FROM fin_buchungen b
-        WHERE b.storniert_at IS NULL AND b.art = 'einnahme' AND b.bezahlt = false`,
-      [],
-    ),
+    ladeOffeneEinnahmen(db),
     db(`SELECT b.quelle, count(*) AS c FROM fin_buchungen b WHERE ${basis} GROUP BY 1 ORDER BY 2 DESC`, p),
     db(
       `SELECT to_char(b.datum,'YYYY-MM') AS m, ${FELD} AS feld,
@@ -113,7 +119,7 @@ export async function ladeFelder(db: Abfrage, jahr: string): Promise<FelderBild>
     jahr,
     felder,
     summe: felder.reduce((s, f) => ({ einCent: s.einCent + f.einCent, ausCent: s.ausCent + f.ausCent }), { einCent: 0, ausCent: 0 }),
-    offen: { anzahl: Number(offen[0]?.c ?? 0), bruttoCent: Number(offen[0]?.s ?? 0) },
+    offen,
     quellen: quellen.map((r) => ({ quelle: String(r.quelle), anzahl: Number(r.c) })),
     monate: [...proMonat.entries()].map(([schluessel, f]) => ({ schluessel, felder: f })),
     pruefung: {

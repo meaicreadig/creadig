@@ -73,8 +73,15 @@ function MesseZeile({ m, status }: { m: Zeile; status: MesseStatus | null }) {
         </span>
         <p className="text-sm leading-relaxed text-pretty">{m.nutzen}</p>
       </div>
-      <div className="shrink-0">
+      <div className="flex shrink-0 flex-col items-start gap-2">
         <MesseStatusWahl messeKey={key} status={status} name={m.name} />
+        {/* Verbindung zu Anfragen: dieselbe Erfassung wie überall, nur mit Messe vorbefüllt. */}
+        <Link
+          href={`/admin/vertrieb/anfragen/neu?${new URLSearchParams({ quelle: "messe", messe: `${m.name} · ${m.ort} · ${terminLabel(m)}` })}`}
+          className="text-xs text-primary underline underline-offset-4"
+        >
+          Kontakt von dieser Messe erfassen
+        </Link>
       </div>
     </li>
   )

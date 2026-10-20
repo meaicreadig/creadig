@@ -405,3 +405,28 @@ export function uebersicht(proben: readonly Probe[] = []) {
     fiberoGemessen: fiberoHatMessung,
   }
 }
+
+/* ── Der letzte Lauf des Beleg-Gates ────────────────────────────────────── */
+
+export type GateLauf = { laufAt: string; ok: boolean; verstoesse: string[]; anzahlVerstoesse: number }
+
+/**
+ * Was `scripts/check-beleg.mjs` beim letzten Lauf festgehalten hat — gelesen,
+ * nicht neu berechnet. Quelle 1: Prüfregister (`betrieb_pruefung`); Quelle 2:
+ * `.next/beleg-gate.json` des laufenden Builds. `null` heißt ehrlich: kein
+ * Lauf aufgezeichnet (z. B. Build ohne Datenbank).
+ */
+export async function ladeGateLauf(): Promise<GateLauf | null> {
+  const { lesePruefung } = await import("@/lib/betrieb-pruefung")
+  const roh = await lesePruefung<Omit<GateLauf, "laufAt">>("beleg-gate")
+  if (roh) return { laufAt: roh.laufAt, ...roh.ergebnis }
+  try {
+    const fs = await import("node:fs")
+    const path = await import("node:path")
+    const datei = path.join(process.cwd(), ".next", "beleg-gate.json")
+    if (fs.existsSync(datei)) return JSON.parse(fs.readFileSync(datei, "utf8")) as GateLauf
+  } catch {
+    /* kein lesbarer Lauf */
+  }
+  return null
+}
