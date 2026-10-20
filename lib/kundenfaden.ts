@@ -3,11 +3,21 @@ import "server-only"
 import { randomUUID } from "node:crypto"
 
 import type { Abfrage } from "@/lib/neon-abfrage"
+import { legeEntwurfAusGewinn } from "@/lib/finanz/auftraege/aus-vertrieb"
 
 /**
  * Der Kundenfaden: EINE Stelle, die Firmen und Kontakte erkennt oder anlegt
  * und jede Berührung (Mail, Gespräch, Termin) in `activities` schreibt.
  * Alle Seiten (Kunden, Verkaufen, Gesprächsraum, Assistent) lesen daraus.
+ *
+ * WER SCHREIBT WAS (Netzwerk-Durchlauf, Phase 4b — bewusst NICHT zu einer
+ * Datei verschmolzen, `lib/vertrieb-store-neon.ts` hat dafür zu viele Aufrufstellen):
+ *  · Stufenwechsel einer Chance: `protokolliereStufe()` HIER schreibt `deal.stufe`
+ *    (+ eine `opportunity.*`-Zeile an der Chance). `moveOpportunity` im Vertriebs-Store
+ *    ruft dieselbe Funktion auf, schreibt seine `opportunity.*`-Zeile aber selbst.
+ *  · Angebot angenommen (`acceptOffer`), Projekt, Abnahme, Übergabe: nur der
+ *    Vertriebs-Store (`offer.*`, `project.*`) — das sind keine Stufenwechsel des Fadens.
+ *  · Mail/Gespräch/Termin-Berührungen: nur HIER.
  */
 
 const FREEMAIL = new Set([
@@ -264,20 +274,55 @@ export async function rueckeChanceVor(
   return staende
 }
 
-async function protokolliereStufe(
+/**
+ * Die EINE Zeile, die „warum steht der Deal hier / rückgängig" trägt. Auch die
+ * Pipeline (`moveOpportunity` in lib/vertrieb-store-neon.ts) schreibt sie —
+ * früher stand dort nur `opportunity.<status>`, und eine Stufenänderung auf
+ * /admin/vertrieb/pipeline war auf /admin/verkaufen unsichtbar.
+ * `von` Hand = Herkunft MANUAL (so liest ladeStufenSchritte „vonHand").
+ */
+export async function protokolliereStufe(
   q: Abfrage,
-  firmaId: string,
+  firmaId: string | null,
   oppId: string,
   von: string | null,
   nach: string,
   grund: string,
   quelleId?: string,
+  wer: { actor: string; origin: "AUTOMATIC" | "MANUAL" } = { actor: "system", origin: "AUTOMATIC" },
+  /** false, wenn der Aufrufer die Chronik des Vorgangs selbst schreibt (moveOpportunity). */
+  chronikAmVorgang = true,
 ) {
   await q(
     `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
-     VALUES ($1, 'organisation', $2, 'deal.stufe', $3, 'system', 'AUTOMATIC', $4::jsonb, now())`,
-    [randomUUID(), firmaId, `Stufe → ${nach} · ${grund}`.slice(0, 200), JSON.stringify({ oppId, von, nach, grund, quelleId: quelleId ?? null })],
+     VALUES ($1, $2, $3, 'deal.stufe', $4, $5, $6, $7::jsonb, now())`,
+    [
+      randomUUID(),
+      firmaId ? "organisation" : "opportunity",
+      firmaId ?? oppId,
+      `Stufe → ${nach} · ${grund}`.slice(0, 200),
+      wer.actor,
+      wer.origin,
+      JSON.stringify({ oppId, von, nach, grund, quelleId: quelleId ?? null }),
+    ],
   )
+  /* Umgekehrt: eine Stufe, die hier gesetzt wird, steht auch in der Chronik des Vorgangs auf /admin/vertrieb/pipeline/:id. */
+  if (chronikAmVorgang && firmaId) {
+    await q(
+      `INSERT INTO activities (id, subject_type, subject_id, kind, summary, detail, actor, origin, data, created_at)
+       VALUES ($1, 'opportunity', $2, $3, $4, $5, $6, $7, $8::jsonb, now())`,
+      [
+        randomUUID(),
+        oppId,
+        nach === "won" || nach === "lost" ? `opportunity.${nach}` : "opportunity.status",
+        `Status → ${nach}`,
+        grund.slice(0, 200),
+        wer.actor,
+        wer.origin,
+        JSON.stringify({ von, nach }),
+      ],
+    )
+  }
 }
 
 const ALLE_STUFEN = [...(STUFEN_REIHE as unknown as string[]), "won", "lost"]
@@ -292,11 +337,22 @@ export async function setzeStufeVonHand(q: Abfrage, oppId: string, nach: string)
   const alt = r[0]
   if (!alt || alt.status === nach || !alt.organisation_id) return false
   await q(`UPDATE opportunities SET status = $2, updated_at = now() WHERE id = $1`, [oppId, nach])
-  await q(
-    `INSERT INTO activities (id, subject_type, subject_id, kind, summary, actor, origin, data, created_at)
-     VALUES ($1, 'organisation', $2, 'deal.stufe', $3, 'emin', 'MANUAL', $4::jsonb, now())`,
-    [randomUUID(), alt.organisation_id, `Stufe → ${nach} · von Hand`, JSON.stringify({ oppId, von: alt.status, nach, grund: "von Hand" })],
-  )
+  await protokolliereStufe(q, alt.organisation_id, oppId, alt.status, nach, "von Hand", undefined, { actor: "emin", origin: "MANUAL" })
+  /* Gewonnen heißt hier dasselbe wie in der Pipeline: ein Angebots-ENTWURF in Finanz (nie Versand). */
+  if (nach === "won") {
+    try {
+      const entwurf = await legeEntwurfAusGewinn(q, oppId, null)
+      if (entwurf?.neu) {
+        await q(
+          `INSERT INTO activities (id, subject_type, subject_id, kind, summary, detail, actor, origin, created_at)
+           VALUES ($1, 'opportunity', $2, 'finanz.entwurf', 'Angebots-Entwurf in Finanz angelegt', $3, 'emin', 'MANUAL', now())`,
+          [randomUUID(), oppId, `Entwurf ${entwurf.id} — Versand bleibt dein Klick in Finanz.`],
+        )
+      }
+    } catch {
+      /* Das Ja gilt auch ohne Entwurf; die Pipeline-Seite zeigt den Hinweis nur, wenn die Chronikzeile existiert. */
+    }
+  }
   return true
 }
 

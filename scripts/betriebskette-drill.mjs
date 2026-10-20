@@ -246,6 +246,24 @@ p(await chronik(kette.oppId, "project.handover") === 1, "B7 genau eine Chronikze
   )
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * B8 · EIN TRICHTER — die Pipeline und /admin/verkaufen lesen dieselbe Stufe
+ * ═══════════════════════════════════════════════════════════════════════════ */
+console.log("\nB8 · Stufenänderung der Pipeline ist auf /admin/verkaufen sichtbar und rückgängig")
+{
+  const { ladeStufenSchritte, nimmLetzteStufeZurueck } = await import("../lib/kundenfaden.ts")
+  const qq = (t, par) => q(t, par)
+  const { oppId } = await vorgangMitAngebot("B8 Trichter")
+  const opp = await store.getOpportunity(oppId)
+  const r = await store.moveOpportunity(oppId, "qualified", null, opp.updatedAt)
+  p(r === "ok", "B8 moveOpportunity gelingt", String(r))
+  const schritte = await ladeStufenSchritte(qq, [oppId])
+  p(schritte[oppId]?.nach === "qualified" && schritte[oppId]?.von === "new" && schritte[oppId]?.vonHand === true,
+    "B8 ladeStufenSchritte (verkaufen) sieht den Pipeline-Schritt, von Hand", JSON.stringify(schritte[oppId]))
+  p(await nimmLetzteStufeZurueck(qq, oppId), "B8 Rückgängig (verkaufen) nimmt ihn zurück")
+  p((await q(`SELECT status FROM opportunities WHERE id=$1`, [oppId]))[0].status === "new", "B8 der Vorgang steht wieder auf new")
+}
+
 await client.end()
 console.log(
   fehler === 0

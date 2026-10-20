@@ -1,8 +1,16 @@
 import { randomUUID } from "node:crypto"
+
+/*
+ * Wer schreibt welche Chronikzeile — Gegenstück zum Kommentar in lib/kundenfaden.ts:
+ * dieser Store schreibt `offer.*`, `project.*` und die `opportunity.*`-Zeilen der
+ * Pipeline selbst; Stufenwechsel gehen zusätzlich über `protokolliereStufe()` aus
+ * dem Kundenfaden (`deal.stufe`), damit /admin/verkaufen sie sieht und zurücknehmen kann.
+ */
 import { sqlTuerkisch, tuerkischVergleich } from "@/lib/tuerkisch"
 import { istQuelle, istZustand } from "@/lib/veroeffentlichung-zustand"
 
 import { OFFERS } from "@/lib/offer-readiness"
+import { protokolliereStufe } from "@/lib/kundenfaden"
 import { legeEntwurfAusGewinn } from "@/lib/finanz/auftraege/aus-vertrieb"
 import { KATALOG, fehltFuer, type Angebot, type Annahme, type Befund, type Position } from "@/lib/angebot"
 import {
@@ -1158,8 +1166,8 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
     async moveOpportunity(id, status: SalesStatus, lostReason, stand): Promise<Schreibergebnis> {
       await ready()
       const alt = (await sql.query(
-        `SELECT status FROM opportunities WHERE id = $1`, [id],
-      )) as { status: string }[]
+        `SELECT status, organisation_id FROM opportunities WHERE id = $1`, [id],
+      )) as { status: string; organisation_id: string | null }[]
       if (!alt.length) return "fehlt"
       const rows = (await sql.query(
         `UPDATE opportunities
@@ -1173,6 +1181,25 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
       )) as { id: string }[]
       if (!rows.length) return "konflikt"
       if (status === "won" && alt[0].status !== "won") await finanzEntwurf(id, null)
+      /*
+       * Eine Stufenänderung der Pipeline schreibt ZUSÄTZLICH `deal.stufe`
+       * (lib/kundenfaden.ts) — das ist die Zeile, aus der /admin/verkaufen
+       * „Warum steht der Deal hier" und „Rückgängig" liest. Die
+       * `opportunity.*`-Zeile unten bleibt für die Chronik dieses Vorgangs.
+       */
+      if (alt[0].status !== status) {
+        await protokolliereStufe(
+          (t, p) => sql.query(t, p) as Promise<Record<string, unknown>[]>,
+          alt[0].organisation_id,
+          id,
+          alt[0].status,
+          status,
+          status === "lost" && lostReason ? `verloren: ${lostReason}` : "Pipeline",
+          undefined,
+          { actor: akteur.kennung, origin: akteur.herkunft === "HUMAN" ? "MANUAL" : "AUTOMATIC" },
+          false,
+        )
+      }
       const closing = TERMINAL_STATES.includes(status)
       await note(
         "opportunity",
