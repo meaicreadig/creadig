@@ -30,7 +30,7 @@ export function BuchungsAuswahl({ token, slots, timezone, dauer, locale = "de" }
       m.set(k, [...(m.get(k) ?? []), s])
     }
     return [...m.entries()]
-  }, [slots, timezone])
+  }, [slots, timezone, T.intl])
   const uhr = (ms: number) => new Date(ms).toLocaleTimeString(T.intl, { timeZone: timezone, hour: "2-digit", minute: "2-digit" })
 
   if (fertig) {
