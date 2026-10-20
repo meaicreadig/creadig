@@ -19,7 +19,8 @@ const RAUM_B = 7
 const BREITE = RAUM_B * 3
 const TIEFE = 10
 const PLATTE = 0.35
-const ANHEBEN = 9
+/** Kein Auseinanderfahren der Geschosse beim Fokus – das Gebäude bleibt geschlossen. */
+const ANHEBEN = 0
 
 const FARBE = {
   beton: "#d9dce1",
