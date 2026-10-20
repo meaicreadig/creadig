@@ -23,6 +23,7 @@ import {
   sperren,
   termineVerfuegbar,
 } from "@/lib/termine/store"
+import { STANDARD_EINSTELLUNGEN } from "@/lib/termine/verfuegbarkeit"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Termine" }
@@ -64,11 +65,20 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
       </AdminShell>
     )
   }
+  let gestoert = false
+  function stoerung<T>(p: Promise<T>, fallback: T): Promise<T> {
+    return p.catch((e) => {
+      console.error("[termine]", e instanceof Error ? e.message : e)
+      gestoert = true
+      return fallback
+    })
+  }
+
   const [einstellungen, liste, gesperrt, kontakt, nachfass] = await Promise.all([
-    holeEinstellungen(),
-    kommendeTermine(),
-    sperren(),
-    sp.kontakt ? einladungsKontakt(sp.kontakt) : Promise.resolve(null),
+    stoerung(holeEinstellungen(), STANDARD_EINSTELLUNGEN),
+    stoerung(kommendeTermine(), []),
+    stoerung(sperren(), []),
+    sp.kontakt ? stoerung(einladungsKontakt(sp.kontakt), null) : Promise.resolve(null),
     sp.entwurf ? holeNachfassEntwurf(sp.entwurf).catch(() => null) : Promise.resolve(null),
   ])
   const secret = process.env.ADMIN_SESSION_SECRET?.trim()
@@ -82,6 +92,11 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
     <AdminShell title="Termine" lead="Verfügbarkeit, Sperren und gebuchte Gespräche — alles an einem Ort.">
       <div className="flex flex-col gap-8">
         <AppleKalender feedUrl={feedUrl} quelle={apple.quelle} termine={apple.termine} />
+        {gestoert && (
+          <p role="status" className="border-destructive/40 bg-destructive/10 text-foreground rounded-md border px-4 py-3 text-sm">
+            Teile dieser Seite waren beim Laden kurz nicht erreichbar — bitte neu laden. Nichts wurde dabei verändert.
+          </p>
+        )}
         {sp.meldung && (
           <p role="status" className="border-gold/40 bg-gold/10 text-foreground rounded-md border px-4 py-3 text-sm">
             {sp.meldung}

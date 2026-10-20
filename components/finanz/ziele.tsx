@@ -98,7 +98,9 @@ function ZielForm({ ziel }: { ziel?: Ziel }) {
 }
 
 export function ZieleListe({ ziele }: { ziele: Ziel[] }) {
-  const aktiv = ziele.filter((z) => z.status === "aktiv")
+  /* Ein Platzhalter ohne Umsatz sagt nichts — er wird nicht gezeigt, nur gezählt. */
+  const offeneSaeulen = ziele.filter((z) => z.status === "aktiv" && z.istPlatzhalter)
+  const aktiv = ziele.filter((z) => z.status === "aktiv" && !z.istPlatzhalter)
   const erledigt = ziele.filter((z) => z.status !== "aktiv")
   return (
     <div className="flex flex-col gap-5">
@@ -106,6 +108,12 @@ export function ZieleListe({ ziele }: { ziele: Ziel[] }) {
         <h2 id="z-neu" className="text-lg font-semibold">Neues Ziel</h2>
         <ZielForm />
       </section>
+
+      {offeneSaeulen.length > 0 && (
+        <p className="text-muted-foreground bg-card rounded-3xl p-5 text-sm leading-relaxed">
+          Für {offeneSaeulen.map((z) => LABEL[z.saeule] ?? z.saeule).join(", ")} gibt es noch keine Einnahmen in diesem Jahr. Sobald die erste Zahlung gebucht ist, rechnet das System ein Jahresziel hoch — oder lege oben selbst eines an.
+        </p>
+      )}
 
       <section aria-labelledby="z-aktiv" className="flex flex-col gap-3">
         <h2 id="z-aktiv" className="sr-only">Aktive Ziele</h2>
@@ -136,7 +144,7 @@ export function ZieleListe({ ziele }: { ziele: Ziel[] }) {
 
 /** Dashboard-Kachel (Phase 1) — aktive Ziele mit Fortschritt, sortiert nach Frist. */
 export function ZieleKachel({ ziele, basis }: { ziele: Ziel[]; basis: string }) {
-  const aktiv = ziele.filter((z) => z.status === "aktiv")
+  const aktiv = ziele.filter((z) => z.status === "aktiv" && !z.istPlatzhalter)
   return (
     <section aria-labelledby="ziele-kachel" className="bg-card flex flex-col gap-4 rounded-[2rem] p-7">
       <div className="flex items-baseline justify-between gap-3">

@@ -148,7 +148,7 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Finanzen", tr: "Finans" },
     aufgabe: { de: "Buchhaltung, Steuern, Liquidität", tr: "Muhasebe, vergi, nakit" },
     knoten: ["finanz"],
-    agenten: [],
+    agenten: ["finanz"],
     besetzung: "teilweise",
   },
   {

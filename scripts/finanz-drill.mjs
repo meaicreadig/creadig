@@ -1085,10 +1085,10 @@ p(s_nachGlasfaser[0]?.geschaeftsfeld === "glasfaser", "S8 'glasfaser' bleibt unv
 console.log("\nT · Ziele — Fortschritt aus dem Hauptbuch, nie eine zweite Zahl")
 
 const t_ziele0 = await ladeZiele(db)
-const t_platzhalter = t_ziele0.filter((z) => z.istPlatzhalter)
+const t_platzhalter = t_ziele0.filter((z) => z.istPlatzhalter || z.titel.startsWith("Jahresziel"))
 p(["digitalprodukte", "beratung", "content"].every((s) => t_platzhalter.some((z) => z.saeule === s)),
-  "T1 je ein Platzhalter-Ziel für die drei Säulen mit Umsatzziel existiert (additiv angelegt, siehe ZIELE_SCHEMA)")
-p(t_platzhalter.every((z) => z.zielbetragCent === 0 && z.status === "aktiv"), "T2 Platzhalter tragen Betrag 0 und bleiben aktiv — sie werden nie automatisch 'erreicht'")
+  "T1 je ein Ziel für die drei Säulen existiert: Platzhalter, oder — sobald Einnahmen da sind — das automatisch hochgerechnete Jahresziel")
+p(t_platzhalter.filter((z) => z.istPlatzhalter).every((z) => z.zielbetragCent === 0 && z.status === "aktiv"), "T2 Platzhalter tragen Betrag 0 und bleiben aktiv — sie werden nie automatisch 'erreicht'")
 p(istPlatzhalterZiel("Platzhalter – vom Owner zu ersetzen") && !istPlatzhalterZiel("ABNAHME Erster Beratungskunde"),
   "T3 das Namensmuster erkennt nur echte Platzhalter, keine echten Zieltitel")
 
@@ -1207,6 +1207,264 @@ p(!(await bucheAusgehendenUmsatz(db, "ABNAHME-n-abbuchung", "Bank & Gebühren", 
 const n_bu = await db(`SELECT art, brutto_cent, kategorie, geschaeftsfeld FROM fin_buchungen WHERE quelle_ref = 'ABNAHME-n-abbuchung'`)
 p(n_bu.length === 1 && n_bu[0].art === "ausgabe" && Number(n_bu[0].brutto_cent) === 2380 && n_bu[0].geschaeftsfeld === "sonstiges", "V8 genau eine Ausgaben-Buchung mit Kategorie und Geschaeftsfeld")
 p(!(await ladeAusgehendeBankUmsaetze(db)).some((u) => u.id === "ABNAHME-n-abbuchung"), "V9 die Abbuchung ist aus dem Eingangskorb verschwunden")
+
+/* ══ Y · Liquidität spricht die Wahrheit — Steuerabfluss, Überfälliges, Pipeline ══ */
+console.log("\nY · Liquiditäts-Szenarien")
+{
+  const R = await import("../lib/finanz/rechnen.ts")
+  const heute = "2026-10-20"
+  const b = (o) => ({ id: o.id, art: "einnahme", status: "geplant", datum: heute, bruttoCent: 100000, ustSatz: 0, kategorie: "Beratung", gegenpartei: o.id, notiz: null, wiederholung: "keine", storniert: false, ...o })
+  const topf = { ustOffenCent: 190000, estRuecklageCent: 900000, gewinnJahrCent: 3000000, gesamtCent: 1090000 }
+  const fristen = [
+    { id: "ust-1", titel: "USt Q3", art: "ust", faellig: "2026-10-10", periodeEnde: "2026-09-30", betragCent: null, erledigt: false },
+    { id: "ust-2", titel: "USt Q4", art: "ust", faellig: "2027-01-10", periodeEnde: "2026-12-31", betragCent: null, erledigt: false },
+    { id: "est-a", titel: "ESt Dez", art: "est", faellig: "2026-12-10", periodeEnde: null, betragCent: null, erledigt: false },
+    { id: "est-b", titel: "ESt mit Betrag", art: "est", faellig: "2026-11-10", periodeEnde: null, betragCent: 50000, erledigt: false },
+  ]
+  const geschaetzt = R.geschaetzteFristBetraege(fristen, topf, heute)
+  p(geschaetzt.get("ust-1") === 190000 && !geschaetzt.has("ust-2"), "Y1 gesamter USt-Saldo landet auf der frühesten offenen USt-Frist, nicht doppelt")
+  p(geschaetzt.get("est-a") === 900000 && !geschaetzt.has("est-b"), "Y2 ESt-Rücklage verteilt sich auf Fristen ohne Betrag; eine Frist mit eigenem Betrag bleibt unberührt", `${geschaetzt.get("est-a")}`)
+  const ohne = R.kuenftigeBewegungen([], fristen, heute, "2027-01-20")
+  const mit = R.kuenftigeBewegungen([], fristen, heute, "2027-01-20", { topf })
+  p(ohne.length === 1 && mit.length === 3 && mit.filter((x) => x.geschaetzt).length === 2, "Y3 ohne Topf bleibt das alte Verhalten, mit Topf stehen die Steuerabflüsse im Band (als geschätzt gekennzeichnet)")
+  p(mit.find((x) => x.titel === "USt Q3")?.datum === heute, "Y4 eine überfällige Steuerfrist belastet das Band ab heute, nicht in der Vergangenheit")
+
+  const ueberf = [b({ id: "alt", datum: "2026-09-01", bruttoCent: 250000 })]
+  const v = R.kuenftigeBewegungen(ueberf, [], heute, "2027-01-20", { szenario: "vorsichtig" })
+  const e = R.kuenftigeBewegungen(ueberf, [], heute, "2027-01-20", { szenario: "erwartet" })
+  p(v.length === 0, "Y5 vorsichtig: eine überfällige Forderung zählt nicht")
+  p(e.length === 1 && e[0].cent === 250000 && e[0].datum === R.plusTage(heute, R.UEBERFAELLIG_ANNAHME_TAGE) && e[0].geschaetzt === true, "Y6 erwartet: sie kommt mit Verzug, gekennzeichnet")
+
+  const pipeline = [
+    { id: "o1", titel: "Chance A", wertCent: 1000000, status: "negotiation", erwartetAm: null },
+    { id: "o2", titel: "Chance B", wertCent: 400000, status: "new", erwartetAm: null },
+    { id: "o3", titel: "Chance C", wertCent: 500000, status: "proposal", erwartetAm: "2026-12-01" },
+  ]
+  const o = R.kuenftigeBewegungen([], [], heute, "2027-01-20", { szenario: "optimistisch", pipeline })
+  p(o.length === 2 && o.find((x) => x.titel.startsWith("Chance A"))?.cent === 500000 && o.find((x) => x.titel.startsWith("Chance C"))?.cent === 150000, "Y7 nur Stufen mit Gewicht, Betrag × Gewicht, Chance ohne Wert/Stufe bleibt draußen")
+  p(R.kuenftigeBewegungen([], [], heute, "2027-01-20", { szenario: "erwartet", pipeline }).length === 0, "Y8 ohne Szenario 'optimistisch' kommt die Pipeline nie ins Band")
+  const tief = (bw) => Math.min(...R.liquiditaet(100000, bw, heute).map((w) => w.standCent))
+  p(tief(mit) < tief(ohne), "Y9 mit Steuerabfluss liegt der Tiefpunkt tiefer als im alten, zu schönen Band", `${tief(mit)} < ${tief(ohne)}`)
+}
+
+/* ══ X · USt-Voranmeldung ══ */
+console.log("\nX · USt-Voranmeldung — Kennzahlen aus dem Hauptbuch")
+{
+  const R = await import("../lib/finanz/rechnen.ts")
+  const U = await import("../lib/finanz/ustva.ts")
+  const mk = (o) => ({ id: o.id, art: "einnahme", status: "gebucht", datum: "2026-08-15", bruttoCent: 11900, ustSatz: 19, kategorie: "Projekt / Kunde", gegenpartei: null, notiz: null, wiederholung: "keine", storniert: false, ...o })
+  const z = U.zeitraumFuerFrist({ titel: "USt Q3", art: "ust", periodeEnde: "2026-09-30" }, "quartal")
+  p(z.von === "2026-07-01" && z.bis === "2026-09-30", "X1 Quartalsfrist → 01.07.–30.09.", `${z.von}..${z.bis}`)
+  const zm = U.zeitraumFuerFrist({ titel: "USt Sep", art: "ust", periodeEnde: "2026-09-30" }, "monatlich")
+  p(zm.von === "2026-09-01", "X2 Monatsfrist → nur der Monat")
+  const b = [
+    mk({ id: "a", bruttoCent: 119000 }),                                  // netto 1.000,00 / USt 190,00
+    mk({ id: "b", bruttoCent: 10700, ustSatz: 7 }),                       // netto 100,00 / USt 7,00
+    mk({ id: "c", bruttoCent: 5950, art: "ausgabe", kategorie: "Software & Hosting" }), // Vorsteuer 9,50
+    mk({ id: "d", bruttoCent: 2380, art: "ausgabe", archiviert: true }),  // abgegolten: kein Vorsteuerabzug
+    mk({ id: "e", bruttoCent: 50000, ustSatz: 0 }),                       // ohne USt
+    mk({ id: "f", bruttoCent: 99999, datum: "2026-10-02" }),              // anderer Zeitraum
+    mk({ id: "g", bruttoCent: 119000, storniert: true }),                 // storniert
+    mk({ id: "h", bruttoCent: 119000, status: "geplant" }),               // noch nicht geflossen
+    mk({ id: "i", bruttoCent: 140000000, ustSatz: 0, kategorie: "Darlehen" }), // kein Umsatz
+  ]
+  const va = U.berechneUstVa(b, z)
+  p(va.kz81Cent === 100000 && va.kz86Cent === 10000, "X3 Bemessungsgrundlagen 19 % / 7 % (volle Euro)", `${va.kz81Cent}/${va.kz86Cent}`)
+  p(va.ust19Cent === 19000 && va.ust7Cent === 700, "X4 Umsatzsteuer cent-genau", `${va.ust19Cent}/${va.ust7Cent}`)
+  p(va.kz66Cent === 950, "X5 Vorsteuer nur aus nicht archivierten Belegen", `${va.kz66Cent}`)
+  p(va.kz83Cent === 19000 + 700 - 950, "X6 Zahllast = USt − Vorsteuer", `${va.kz83Cent}`)
+  p(va.ohneUstCent === 50000, "X7 0 %-Einnahmen separat gemeldet, Darlehen zählt nicht")
+  const leer = U.berechneUstVa([mk({ id: "x", bruttoCent: 1190, art: "ausgabe" })], z)
+  p(leer.kz83Cent === -190 && leer.kz83Cent < 0, "X8 mehr Vorsteuer als USt → negative Zahllast (Erstattung)")
+}
+
+/* ══ B · Bescheide wirken auf Fristen ══ */
+console.log("\nB · Steuerbescheide")
+{
+  const B = await import("../lib/finanz/bescheide.ts")
+  await B.bescheideSchema(db)
+  await db(`DELETE FROM fin_fristen WHERE id LIKE 'ABNAHME-b-%'`)
+  await db(`INSERT INTO fin_fristen (id, titel, art, faellig) VALUES
+    ('ABNAHME-b-est1','ESt Dez','est','2099-12-10'),('ABNAHME-b-est2','ESt Mrz','est','2100-03-10'),('ABNAHME-b-alt','ESt alt','est','2000-03-10')`)
+  const v = await B.legeBescheidAn(db, { art: "vorauszahlung", steuerart: "est", jahr: 2099, datum: "2099-01-05", betragCent: 123400, gueltigAb: "2099-06-01", aktenzeichen: "ABNAHME", ablageort: null, notiz: null })
+  const rows = await db(`SELECT id, betrag_cent FROM fin_fristen WHERE id LIKE 'ABNAHME-b-est%' ORDER BY id`)
+  p(v.ok && rows.length === 2 && rows.every((r) => Number(r.betrag_cent) === 123400), "B1 Vorauszahlung setzt den Betrag der offenen ESt-Fristen ab 'gilt ab'")
+  p((await db(`SELECT betrag_cent FROM fin_fristen WHERE id='ABNAHME-b-alt'`))[0].betrag_cent === null, "B2 eine Frist vor 'gilt ab' bleibt unberührt")
+  const n = await B.legeBescheidAn(db, { art: "nachzahlung", steuerart: "est", jahr: 2098, datum: "2099-03-01", betragCent: 500000, gueltigAb: null, aktenzeichen: null, ablageort: null, notiz: null })
+  const f = n.ok ? (await db(`SELECT titel, betrag_cent, to_char(faellig,'YYYY-MM-DD') AS f, art FROM fin_fristen WHERE id IN (SELECT unnest(frist_ids) FROM fin_bescheide WHERE id=$1)`, [n.id]))[0] : null
+  p(f && Number(f.betrag_cent) === 500000 && f.f === "2099-03-31" && f.art === "sonstig", "B3 Nachzahlung → Frist mit Betrag, Bekanntgabe + 30 Tage (zählt nicht als ESt-Vorauszahlung)", JSON.stringify(f))
+  const e = await B.legeBescheidAn(db, { art: "erstattung", steuerart: "ust", jahr: 2098, datum: "2099-03-01", betragCent: 70000, gueltigAb: null, aktenzeichen: null, ablageort: null, notiz: null })
+  const fe = e.ok ? (await db(`SELECT betrag_cent FROM fin_fristen WHERE id IN (SELECT unnest(frist_ids) FROM fin_bescheide WHERE id=$1)`, [e.id]))[0] : null
+  p(fe && Number(fe.betrag_cent) === -70000, "B4 Erstattung → negativer Betrag = erwarteter Zufluss in der Liquidität")
+  p(!(await B.legeBescheidAn(db, { art: "nachzahlung", steuerart: "est", jahr: 2098, datum: "2099-03-01", betragCent: null, gueltigAb: null, aktenzeichen: null, ablageort: null, notiz: null })).ok, "B5 ohne Betrag wird keine Nachzahlung abgelegt")
+  p(!(await B.legeBescheidAn(db, { art: "vorauszahlung", steuerart: "est", jahr: 2099, datum: "2099-01-05", betragCent: 1000, gueltigAb: null, aktenzeichen: null, ablageort: null, notiz: null })).ok, "B6 Vorauszahlung ohne 'gilt ab' wird abgelehnt")
+  await B.storniereBescheid(db, n.id)
+  p((await db(`SELECT 1 FROM fin_fristen WHERE id IN (SELECT unnest(frist_ids) FROM fin_bescheide WHERE id=$1)`, [n.id])).length === 0, "B7 Storno entfernt die noch offene Nachzahlungsfrist, der Bescheid bleibt (storniert) sichtbar")
+  await db(`DELETE FROM fin_fristen WHERE id LIKE 'ABNAHME-b-%'`)
+  await db(`DELETE FROM fin_bescheide WHERE jahr IN (2098, 2099)`)
+}
+
+/* ══ I · Investment ══ */
+console.log("\nI · Investment — investierbar, Vermögen, Anlagen")
+{
+  const I = await import("../lib/finanz/investment.ts")
+  const monate = [
+    { schluessel: "2026-05", einCent: 0, ausCent: 100000 },
+    { schluessel: "2026-06", einCent: 0, ausCent: 300000 },
+    { schluessel: "2026-07", einCent: 0, ausCent: 0 },       // zählt nicht (keine Ausgaben)
+    { schluessel: "2026-10", einCent: 0, ausCent: 900000 },   // laufender Monat zählt nicht
+  ]
+  const inv = I.investierbar(5000000, monate)
+  p(inv.schnittAusgabeCent === 200000 && inv.reserveCent === 1200000 && inv.investierbarCent === 3800000, "I1 Reserve = 6 × Ø volle Monate mit Ausgaben; investierbar = frei − Reserve", JSON.stringify(inv))
+  p(I.investierbar(500000, monate).investierbarCent === 0, "I2 unter der Reserve ist nichts investierbar (nie negativ)")
+  p(I.investierbar(1000000, []).reichweite === null && I.investierbar(1000000, []).investierbarCent === 1000000, "I3 ohne Historie: keine Reichweite, keine erfundene Reserve")
+  const a = I.nachAnlage(inv, 4000000)
+  p(a.unterReserve && a.ueberInvestierbar && a.reichweite === 5, "I4 Was-wäre-wenn: über investierbar → unter Reserve, Reichweite 5,0 Monate", JSON.stringify(a))
+  p(!I.nachAnlage(inv, 3000000).unterReserve, "I5 innerhalb von investierbar bleibt die Reserve unangetastet")
+
+  const an = (o) => ({ id: o.id, name: o.id, klasse: "etf", einstandCent: 100000, seit: "2026-01-01", notiz: null, wertCent: 100000, stand: "2026-10-01", ...o })
+  const b = I.vermoegensbild([an({ id: "a", wertCent: 150000 }), an({ id: "b", klasse: "tagesgeld", wertCent: 50000, einstandCent: 50000 }), an({ id: "c", wertCent: null, stand: null }), an({ id: "d", stand: "2026-06-01" })], 1000000, "2026-10-20")
+  p(b.anlagenWertCent === 300000 && b.einstandCent === 250000 && b.ergebnisCent === 50000, "I6 nur bewertete Anlagen zählen", JSON.stringify([b.anlagenWertCent, b.einstandCent, b.ergebnisCent]))
+  p(Math.abs((b.renditeProzent ?? 0) - 20) < 1e-9, "I7 Rendite = Ergebnis ÷ Einstand")
+  p(b.konzentriert?.klasse === "etf" && b.veraltet.length === 1 && b.veraltet[0].id === "d", "I8 Konzentration ab 60 %, veralteter Stand erkannt")
+  p(b.gesamtCent === 1300000, "I9 Gesamtvermögen = freies Geld + Anlagen")
+  const fr = I.feldRendite([{ key: "a", label: "A", einCent: 300, ausCent: 100 }, { key: "b", label: "B", einCent: 100, ausCent: 0 }, { key: "privat", label: "P", einCent: 5, ausCent: 5 }])
+  p(fr.length === 2 && fr[0].key === "a" && fr[0].ruckfluss === 3 && fr[1].ruckfluss === null, "I10 Rückfluss je Euro; ohne Einsatz ehrlich leer; privat ausgeschlossen")
+
+  await db(`DELETE FROM fin_anlagen_staende WHERE anlage_id LIKE 'anlage-%'`).catch(() => null)
+  const neu = await I.legeAnlageAn(db, { name: "ABNAHME ETF", klasse: "etf", einstandCent: 100000, seit: "2026-09-01", wertCent: null, notiz: null }, "2026-10-20")
+  const l1 = (await I.ladeAnlagen(db)).find((x) => neu.ok && x.id === neu.id)
+  p(l1 && l1.wertCent === 100000 && l1.stand === "2026-09-01", "I11 ohne eigenen Wert gilt der Einstand als erster Stand (mit Stichtag des Kaufs)")
+  p(neu.ok && (await I.bewerteAnlage(db, neu.id, 120000, "2026-10-20")) && (await I.bewerteAnlage(db, neu.id, 125000, "2026-10-20")), "I12 Bewerten; derselbe Tag überschreibt")
+  const l2 = (await I.ladeAnlagen(db)).find((x) => neu.ok && x.id === neu.id)
+  p(l2 && l2.wertCent === 125000 && l2.stand === "2026-10-20", "I13 Anzeige nimmt den neuesten Stichtag")
+  p(!(await I.legeAnlageAn(db, { name: " ", klasse: "etf", einstandCent: 0, seit: "2026-09-01", wertCent: null, notiz: null }, "2026-10-20")).ok, "I14 ohne Namen keine Anlage")
+  if (neu.ok) {
+    await I.archiviereAnlage(db, neu.id)
+    p(!(await I.ladeAnlagen(db)).some((x) => x.id === neu.id), "I15 archiviert = aus der Liste, Stände bleiben erhalten")
+    p((await db(`SELECT count(*) AS c FROM fin_anlagen_staende WHERE anlage_id = $1`, [neu.id]))[0].c > 0, "I16 Historie wird nie gelöscht")
+  }
+}
+
+/* ══ K · Finanz → Kunde ══ */
+console.log("\nK · Kunden-Bezug — Geld je Organisation aus Finanz")
+{
+  const { ladeKundenGeld } = await import("../lib/finanz/kunden-bezug.ts")
+  await db(`CREATE TABLE IF NOT EXISTS organisations (id text PRIMARY KEY, name text)`)
+  await db(`CREATE TABLE IF NOT EXISTS contacts (id text PRIMARY KEY, organisation_id text, email text)`)
+  await db(`CREATE TABLE IF NOT EXISTS opportunities (id text PRIMARY KEY, organisation_id text)`)
+  await db(`INSERT INTO organisations VALUES ('k-org','ABNAHME Kunde GmbH'),('k-leer','ABNAHME Leer') ON CONFLICT DO NOTHING`)
+  await db(`INSERT INTO contacts VALUES ('k-c','k-org','abnahme-k@example.invalid') ON CONFLICT DO NOTHING`)
+  const kd = (o) => ({ name: "X", firma: "", strasse: "", plzOrt: "", land: "Deutschland", email: "", ustId: "", ...o })
+  const mk = async (kunde, brutto, status, faellig, datum) => {
+    const id = await legeEntwurfAn(db, "rechnung", { titel: "ABNAHME K", kunde })
+    await db(`UPDATE fin_dokumente SET status=$2, summen=$3::jsonb, faellig_am=$4::date, datum=$5::date, nummer=$6 WHERE id=$1`,
+      [id, status, JSON.stringify({ bruttoCent: brutto }), faellig, datum, `ABN-K-${id.slice(-6)}`])
+    return id
+  }
+  const a = await mk(kd({ email: "ABNAHME-K@example.invalid" }), 100000, "bezahlt", "2026-08-10", "2026-07-27")
+  await db(`INSERT INTO fin_zahlungen (id, dokument_id, datum, cent) VALUES ('k-z1',$1,'2026-08-06',100000)`, [a])
+  await mk(kd({ firma: "abnahme kunde gmbh" }), 50000, "versendet", "2026-09-01", "2026-08-18")
+  await mk(kd({ email: "abnahme-k@example.invalid" }), 30000, "versendet", "2026-12-01", "2026-10-15")
+  const m = await ladeKundenGeld(db, "2026-10-20", ["k-org", "k-leer"])
+  const g = m.get("k-org")
+  p(g && g.eingenommenCent === 100000, "K1 eingenommen = Summe echter Zahlungen aus fin_zahlungen", JSON.stringify(g))
+  p(g && g.offeneRechnungen === 2 && g.offenCent === 80000, "K2 offene Rechnungen über E-Mail UND Firmenname zugeordnet")
+  p(g && g.ueberfaelligAnzahl === 1 && g.ueberfaelligCent === 50000, "K3 überfällig = Fälligkeit vor heute")
+  p(g && g.zahlungsdauerTage === 10, "K4 Zahlungsdauer = Rechnungsdatum → letzte Zahlung", String(g?.zahlungsdauerTage))
+  p(!m.has("k-leer"), "K5 Organisation ohne Dokumente erscheint nicht (kein erfundener Wert)")
+  const { gesundheitAus } = await import("../lib/kundenkarte.ts")
+  p(gesundheitAus(2, 1, 1) === "rot" && gesundheitAus(2, 1, 0) === "gelb" && gesundheitAus(2, 0, 0) === "gruen", "K6 überfällige Rechnung macht rot, auch bei frischem Kontakt")
+}
+
+/* ══ Z · Kurzlage für die Zentrale ══ */
+console.log("\nZ · Kurzlage — Frist-Nähe und Überfälliges")
+{
+  const kl = await ladeFinanzKurzlage(db, "2026-10-20")
+  p(typeof kl.ueberfaellig === "number" && kl.ueberfaellig >= 1, "Z1 überfällige Rechnungen werden gezählt (Fixture aus K)", String(kl.ueberfaellig))
+  p(kl.naechsteFrist === null || (typeof kl.naechsteFrist.tage === "number" && kl.naechsteFrist.titel.length > 0), "Z2 nächste Frist hat Titel und Tage oder ist ehrlich leer")
+}
+
+/* ══ W · Wiederkehrende Rechnungen ══ */
+console.log("\nW · Abos — Entwurf statt Versand, genau einmal")
+{
+  const A = await import("../lib/finanz/abos.ts")
+  p(A.addMonate("2026-01-31", 1) === "2026-02-28" && A.addMonate("2028-01-31", 1) === "2028-02-29", "W1 Monatsende wird geklemmt (31.01. + 1 Monat)")
+  p(A.addMonate("2026-11-15", 3) === "2027-02-15" && A.addMonate("2026-12-01", 12) === "2027-12-01", "W2 Quartal und Jahr über den Jahreswechsel")
+  p(A.zeitraumText("2026-10-01", "monat") === "Oktober 2026" && A.zeitraumText("2026-10-01", "quartal") === "Oktober – Dezember 2026" && A.zeitraumText("2026-11-01", "quartal") === "November 2026 – Januar 2027", "W3 Leistungszeitraum im Klartext")
+  const kunde = { name: "ABNAHME Abo", firma: "ABNAHME Abo GmbH", strasse: "", plzOrt: "", land: "Deutschland", email: "abnahme-abo@example.invalid", ustId: "" }
+  p(!(await A.legeAboAn(db, { titel: "x", kunde, beschreibung: "", nettoCent: 0, ustSatz: 19, intervall: "monat", start: "2026-10-22", geschaeftsfeld: "digitalprodukte" })).ok, "W4 Betrag 0 wird abgelehnt")
+  const r = await A.legeAboAn(db, { titel: "ABNAHME Wartung", kunde, beschreibung: "", nettoCent: 20000, ustSatz: 19, intervall: "monat", start: "2026-10-22", geschaeftsfeld: "digitalprodukte" })
+  const vorher = Number((await db(`SELECT count(*) AS c FROM fin_dokumente`))[0].c)
+  const zuFrueh = await A.erzeugeFaelligeAboEntwuerfe(db, "2026-10-10")
+  p(zuFrueh.filter((e) => r.ok && e.aboId === r.id).length === 0, "W5 vor dem Vorlauf entsteht nichts")
+  const lauf = await Promise.all([A.erzeugeFaelligeAboEntwuerfe(db, "2026-10-20"), A.erzeugeFaelligeAboEntwuerfe(db, "2026-10-20")])
+  const meine = lauf.flat().filter((e) => r.ok && e.aboId === r.id)
+  p(meine.length === 1, "W6 zwei gleichzeitige Läufe erzeugen genau EINEN Entwurf", String(meine.length))
+  const d = meine[0] ? await ladeDokument(db, meine[0].id) : null
+  p(d && d.status === "entwurf" && d.nummer === null && d.leistungszeitraum === "Oktober 2026", "W7 Entwurf ohne Nummer, nicht versendet, mit Leistungszeitraum")
+  p(d && d.positionen[0].preisCent === 20000 && d.positionen[0].ustSatz === 19, "W8 Position wie im Abo (200 € netto, 19 %)")
+  const abo = (await A.ladeAbos(db)).find((x) => r.ok && x.id === r.id)
+  p(abo && abo.naechste === "2026-11-22" && abo.letzterEntwurfId === meine[0]?.id, "W9 Termin rückt um einen Monat vor")
+  p(Number((await db(`SELECT count(*) AS c FROM fin_dokumente`))[0].c) === vorher + 1, "W10 es entsteht kein weiteres Dokument")
+  if (r.ok) {
+    await A.setzeAboAktiv(db, r.id, false)
+    const nach = await A.erzeugeFaelligeAboEntwuerfe(db, "2026-12-31")
+    p(nach.filter((e) => e.aboId === r.id).length === 0, "W11 pausiertes Abo erzeugt nichts")
+    p((await A.ladeAbos(db)).some((x) => x.id === r.id), "W12 Pausieren löscht nicht — das Abo bleibt sichtbar")
+  }
+}
+
+/* ══ V · Automatisch zuordnen ══ */
+console.log("\nV · Auto-Zuordnung — Verlauf zuerst, KI nur mit Schwelle, nie Privat")
+{
+  const AU = await import("../lib/finanz/auto.ts")
+  const { leseKiZuordnung, dominantesFeld } = AU
+  p(dominantesFeld({ glasfaser: 4, sonstiges: 1 }) === "glasfaser", "V1 80 % Verlauf genügt")
+  p(dominantesFeld({ glasfaser: 3, sonstiges: 2 }) === null, "V2 gemischter Verlauf → offen lassen")
+  p(dominantesFeld({ privat: 5 }) === null, "V3 Privat wird nie automatisch vergeben")
+  const ki = leseKiZuordnung('Text [{"id":"a","feld":"content","konfidenz":0.9},{"id":"b","feld":"privat","konfidenz":0.99},{"id":"c","feld":"beratung","konfidenz":0.5},{"id":"x","feld":"content","konfidenz":0.99},{"id":"a","feld":"glasfaser","konfidenz":0.99}] Ende', ["a", "b", "c"])
+  p(ki.length === 1 && ki[0].id === "a" && ki[0].feld === "content", "V4 KI-Antwort: nur bekannte IDs, nicht privat, ab 80 %, jede ID einmal", JSON.stringify(ki))
+  p(leseKiZuordnung("kein json", ["a"]).length === 0, "V5 kaputte KI-Antwort ordnet nichts zu")
+
+  const beleg = async (id, h, feld) => db(`INSERT INTO fin_belege (id, quelle, extern_id, art, datum, haendler, brutto_cent, kategorie, geschaeftsfeld, zugeordnet_at) VALUES ($1,'hand',$1,'beleg','2026-09-01',$2,5000,'Büro',$3, CASE WHEN $3::text IS NULL THEN NULL ELSE now() END)`, [id, h, feld])
+  await beleg("v-alt1", "ABNAHME Baumarkt", "glasfaser")
+  await beleg("v-alt2", "ABNAHME Baumarkt", "glasfaser")
+  await beleg("v-neu1", "ABNAHME Baumarkt", null)
+  await beleg("v-neu2", "ABNAHME Unbekannt GmbH", null)
+  const r = await AU.ordneAllesAutomatischZu(db, false)
+  const b1 = (await db(`SELECT geschaeftsfeld, zuordnung_quelle FROM fin_belege WHERE id='v-neu1'`))[0]
+  p(b1.geschaeftsfeld === "glasfaser" && b1.zuordnung_quelle === "verlauf", "V6 bekannter Händler wird nach Verlauf zugeordnet, Herkunft steht dran", JSON.stringify(b1))
+  p((await db(`SELECT geschaeftsfeld FROM fin_belege WHERE id='v-neu2'`))[0].geschaeftsfeld === null, "V7 unbekannter Händler bleibt ohne KI offen")
+  p((await db(`SELECT count(*) AS c FROM fin_buchungen WHERE id = 'beleg-v-neu1'`))[0].c == 1, "V8 die Zuordnung erzeugt wie von Hand genau eine Ausgabe-Buchung")
+  const r2 = await AU.ordneAllesAutomatischZu(db, false)
+  p(r2.belegeVerlauf === 0, "V9 zweiter Lauf ändert nichts", JSON.stringify(r2))
+  p(r.belegeVerlauf >= 1, "V10 Lauf meldet die Zahl der Zuordnungen")
+}
+
+/* ══ Q · Ziele ersetzen Platzhalter selbst ══ */
+console.log("\nQ · Jahresziel-Vorschlag")
+{
+  const { jahreszielVorschlagCent } = await import("../lib/finanz/ziele.ts")
+  p(jahreszielVorschlagCent(0, 100) === 0, "Q1 ohne Umsatz kein Vorschlag")
+  p(jahreszielVorschlagCent(1_000_000, 73) === 6_500_000 || jahreszielVorschlagCent(1_000_000, 73) === 6_250_000, "Q2 Hochrechnung aufs Jahr +25 %, auf 500 € aufgerundet", String(jahreszielVorschlagCent(1_000_000, 73)))
+  p(jahreszielVorschlagCent(1_000_000, 365) >= 1_250_000, "Q3 am Jahresende mindestens bisheriger Umsatz +25 %")
+}
+
+/* ══ S · Leistungskatalog aus der Website ══ */
+console.log("\nS · Katalog = Website-Angebote (eine Preisquelle)")
+{
+  const { ladeLeistungen } = await import("../lib/finanz/auftraege/store.ts")
+  const { offers } = await import("../lib/offers.ts")
+  const l = await ladeLeistungen(db)
+  const pub = offers.filter((o) => o.published && o.amount !== null)
+  p(pub.every((o) => l.some((x) => x.id === `leistung-site-${o.key}` && x.preisCent === o.amount * 100)), "S1 jedes veröffentlichte Website-Angebot steht mit seinem Preis im Katalog")
+  p(!l.some((x) => x.id === "leistung-site-analyse"), "S2 ein Angebot ohne veröffentlichten Preis (Systemanalyse) wird nicht erfunden")
+  await db(`UPDATE fin_leistungen SET preis_cent = 12345 WHERE id = 'leistung-site-website'`)
+  const { uebernehmeWebsiteLeistungen } = await import("../lib/finanz/auftraege/website-leistungen.ts")
+  await uebernehmeWebsiteLeistungen(db)
+  p((await db(`SELECT preis_cent FROM fin_leistungen WHERE id='leistung-site-website'`))[0].preis_cent == 12345, "S3 ein vom Owner geänderter Preis wird nie überschrieben")
+}
 
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()

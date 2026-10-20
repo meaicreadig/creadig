@@ -218,19 +218,85 @@ export function steuertopf(
 
 const SCHRITT: Record<Exclude<Wiederholung, "keine">, number> = { monatlich: 1, quartal: 3, jaehrlich: 12 }
 
-export type Bewegung = { datum: string; cent: number; titel: string; quelle: "buchung" | "wiederholung" | "frist" }
+export type Bewegung = {
+  datum: string
+  cent: number
+  titel: string
+  quelle: "buchung" | "wiederholung" | "frist" | "ueberfaellig" | "pipeline"
+  /** Rechnerische Annahme statt gebuchter/geplanter Tatsache — die Oberfläche kennzeichnet sie. */
+  geschaetzt?: boolean
+}
+
+/**
+ * Drei Blickwinkel auf dieselben Daten. Jeder baut auf dem vorigen auf:
+ *   vorsichtig   gebuchte/geplante Bewegungen + Steuerzahlungen (geschätzt, wo kein Betrag steht)
+ *   erwartet     + überfällige Forderungen, die mit Verzug doch noch eingehen
+ *   optimistisch + gewichtete Verkaufschancen aus der Pipeline
+ */
+export type Szenario = "vorsichtig" | "erwartet" | "optimistisch"
+export const SZENARIEN: readonly Szenario[] = ["vorsichtig", "erwartet", "optimistisch"]
+
+/** Überfällige Forderung: Eingang nach so vielen Tagen ab heute angenommen. */
+export const UEBERFAELLIG_ANNAHME_TAGE = 21
+/** Ohne eigenen Termin: Abschluss einer Chance in so vielen Tagen angenommen. */
+export const PIPELINE_STANDARD_TAGE = 45
+/** Gewicht je Pipeline-Stufe. Bewusst niedrig — eine Chance ist kein Geld. */
+export const PIPELINE_GEWICHT: Record<string, number> = { audit: 0.15, discovery: 0.1, proposal: 0.3, negotiation: 0.5 }
+
+export type PipelineChance = { id: string; titel: string; wertCent: number; status: string; erwartetAm: string | null }
+
+/**
+ * Betrag für Fristen ohne Betrag (USt-Voranmeldung, ESt-Vorauszahlung), damit
+ * der Steuerabfluss im Liquiditätsband steht und nicht nur als Linie daneben.
+ *   USt  der gesamte offene USt-Saldo auf die früheste offene USt-Frist
+ *        (alles bis zur nächsten Zahlung Aufgelaufene wird dort fällig)
+ *   ESt  die Rücklage gleichmäßig auf die noch offenen Vorauszahlungen des Jahres
+ * Fristen mit eigenem Betrag bleiben unberührt.
+ */
+export function geschaetzteFristBetraege(fristen: Frist[], topf: Steuertopf, heute: string, ustJeFrist?: Map<string, number>): Map<string, number> {
+  const ergebnis = new Map<string, number>()
+  const offen = fristen.filter((f) => !f.erledigt && f.betragCent === null)
+  const ust = offen.filter((f) => f.art === "ust").sort((a, b) => a.faellig.localeCompare(b.faellig))
+  if (ustJeFrist) {
+    /* Genauer Weg: Zahllast der Voranmeldung je Periode (lib/finanz/ustva.ts). */
+    for (const f of ust) if (ustJeFrist.has(f.id)) ergebnis.set(f.id, ustJeFrist.get(f.id) as number)
+  } else if (ust[0] && topf.ustOffenCent > 0) ergebnis.set(ust[0].id, topf.ustOffenCent)
+  const jahr = heute.slice(0, 4)
+  const est = offen.filter((f) => f.art === "est" && f.faellig.startsWith(jahr)).sort((a, b) => a.faellig.localeCompare(b.faellig))
+  if (est.length && topf.estRuecklageCent > 0) {
+    const je = Math.floor(topf.estRuecklageCent / est.length)
+    est.forEach((f, i) => ergebnis.set(f.id, i === est.length - 1 ? topf.estRuecklageCent - je * (est.length - 1) : je))
+  }
+  return ergebnis
+}
+
+export type BewegungsOptionen = {
+  /** Mit Steuertopf werden Fristen ohne Betrag geschätzt (siehe geschaetzteFristBetraege). */
+  topf?: Steuertopf
+  /** Zahllast je USt-Frist aus der Voranmeldung; ersetzt die Grobschätzung über den Steuertopf. */
+  ustJeFrist?: Map<string, number>
+  szenario?: Szenario
+  pipeline?: PipelineChance[]
+}
 
 export function kuenftigeBewegungen(
   buchungen: Buchung[],
   fristen: Frist[],
   heute: string,
   horizont: string,
+  optionen: BewegungsOptionen = {},
 ): Bewegung[] {
+  const szenario = optionen.szenario ?? "vorsichtig"
   const liste: Bewegung[] = []
   for (const b of buchungen.filter(geldfluss)) {
     const titel = b.gegenpartei ?? b.kategorie
     if (b.datum > heute && b.datum <= horizont) {
       liste.push({ datum: b.datum, cent: vorzeichen(b) * b.bruttoCent, titel, quelle: "buchung" })
+    }
+    /* Überfällige, noch nicht eingegangene Forderung: im vorsichtigen Blick draußen, sonst mit Verzug erwartet. */
+    if (szenario !== "vorsichtig" && b.status === "geplant" && b.art === "einnahme" && b.datum <= heute && b.wiederholung === "keine") {
+      const wann = plusTage(heute, UEBERFAELLIG_ANNAHME_TAGE)
+      if (wann <= horizont) liste.push({ datum: wann, cent: b.bruttoCent, titel: `${titel} (überfällig)`, quelle: "ueberfaellig", geschaetzt: true })
     }
     if (b.wiederholung !== "keine") {
       const schritt = SCHRITT[b.wiederholung]
@@ -243,9 +309,21 @@ export function kuenftigeBewegungen(
       }
     }
   }
+  const schaetzung = optionen.topf ? geschaetzteFristBetraege(fristen, optionen.topf, heute, optionen.ustJeFrist) : new Map<string, number>()
   for (const f of fristen) {
-    if (f.erledigt || f.betragCent === null || f.faellig > horizont) continue
-    liste.push({ datum: f.faellig < heute ? heute : f.faellig, cent: -f.betragCent, titel: f.titel, quelle: "frist" })
+    if (f.erledigt || f.faellig > horizont) continue
+    const betrag = f.betragCent ?? schaetzung.get(f.id) ?? null
+    if (betrag === null) continue
+    liste.push({ datum: f.faellig < heute ? heute : f.faellig, cent: -betrag, titel: f.titel, quelle: "frist", geschaetzt: f.betragCent === null })
+  }
+  if (szenario === "optimistisch") {
+    for (const c of optionen.pipeline ?? []) {
+      const gewicht = PIPELINE_GEWICHT[c.status]
+      if (!gewicht || c.wertCent <= 0) continue
+      const wann = c.erwartetAm && c.erwartetAm > heute ? c.erwartetAm : plusTage(heute, PIPELINE_STANDARD_TAGE)
+      if (wann > horizont) continue
+      liste.push({ datum: wann, cent: Math.round(c.wertCent * gewicht), titel: `${c.titel} (${Math.round(gewicht * 100)} %)`, quelle: "pipeline", geschaetzt: true })
+    }
   }
   return liste.sort((a, b) => a.datum.localeCompare(b.datum))
 }

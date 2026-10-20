@@ -1,5 +1,6 @@
 import "server-only"
 
+import { mitSchemaMarker } from "@/lib/finanz/schema-marker"
 import { neonAbfrage, type Abfrage } from "@/lib/neon-abfrage"
 import type { Art, Buchung, Einstellungen, Frist, FristArt, Status, Wiederholung } from "@/lib/finanz/rechnen"
 
@@ -104,7 +105,7 @@ let schemaBereit: Promise<void> | null = null
 export async function finanzSchema(abfrage: Abfrage): Promise<void> {
   if (!schemaBereit) {
     schemaBereit = (async () => {
-      for (const sql of FINANZ_SCHEMA) await abfrage(sql, [])
+      await mitSchemaMarker(abfrage, "finanz", FINANZ_SCHEMA)
     })().catch((e) => {
       schemaBereit = null
       throw e

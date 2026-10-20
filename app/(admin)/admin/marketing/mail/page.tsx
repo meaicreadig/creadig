@@ -208,7 +208,7 @@ export default async function MailMarketingSeite() {
                   </AdminField>
                 </div>
                 <BasisFelder t={t} prefix="m" />
-                <button className="bg-primary text-primary-foreground self-start rounded-md px-4 py-2 text-sm font-medium">{t.eintragen}</button>
+                <button className="bg-primary text-primary-foreground self-start rounded-full px-4 py-2 text-sm font-medium">{t.eintragen}</button>
               </form>
             </Surface>
 
@@ -219,7 +219,7 @@ export default async function MailMarketingSeite() {
                   <p className="text-muted-foreground text-sm leading-relaxed">{t.keineFreien}</p>
                 ) : (
                   <>
-                    <fieldset className="border-line max-h-48 overflow-y-auto rounded-sm border">
+                    <fieldset className="border-line max-h-48 overflow-y-auto rounded-xl border">
                       <legend className="sr-only">{t.ausCrm}</legend>
                       {daten.f.map((c) => (
                         <label key={c.id} className="hover:bg-muted/40 flex cursor-pointer items-center gap-3 px-3 py-2 text-sm">
@@ -233,7 +233,7 @@ export default async function MailMarketingSeite() {
                       ))}
                     </fieldset>
                     <BasisFelder t={t} prefix="c" />
-                    <button className="bg-primary text-primary-foreground self-start rounded-md px-4 py-2 text-sm font-medium">{t.uebernehmen}</button>
+                    <button className="bg-primary text-primary-foreground self-start rounded-full px-4 py-2 text-sm font-medium">{t.uebernehmen}</button>
                   </>
                 )}
               </form>
@@ -243,7 +243,7 @@ export default async function MailMarketingSeite() {
           {daten.e.length === 0 ? (
             <p className="text-muted-foreground text-sm">{t.leer}</p>
           ) : (
-            <ul className="border-line divide-line flex flex-col divide-y rounded-md border">
+            <ul className="border-line divide-line flex flex-col divide-y rounded-xl border">
               {daten.e.map((e) => (
                 <li key={e.id} className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                   <span className="min-w-0">

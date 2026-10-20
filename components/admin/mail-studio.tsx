@@ -3,7 +3,7 @@
 import { Sparkles } from "lucide-react"
 import { useMemo, useState, useTransition } from "react"
 
-import { AdminField, AdminInput, AdminSelect, AdminTextarea, Surface } from "@/components/admin/primitives"
+import { AdminField, AdminInput, AdminSelect, AdminTextarea, SegmentedControl, Surface } from "@/components/admin/primitives"
 import type { KampagnenAnlass, KiKampagne } from "@/lib/mailing/ki"
 import { anredeFuer, kampagnenHtml, type KampagnenInhalt } from "@/lib/mailing/vorlage"
 
@@ -237,19 +237,15 @@ export function MailStudio({
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
             <p className="text-meta text-muted-foreground">{t.postfach}</p>
-            <div role="group" className="border-line flex rounded-full border p-0.5">
-              {(["desktop", "mobil"] as const).map((b) => (
-                <button
-                  key={b}
-                  type="button"
-                  aria-pressed={breite === b}
-                  onClick={() => setBreite(b)}
-                  className={`rounded-full px-3 py-1 text-xs ${breite === b ? "bg-muted text-foreground" : "text-muted-foreground"}`}
-                >
-                  {b === "desktop" ? t.desktop : t.mobil}
-                </button>
-              ))}
-            </div>
+            <SegmentedControl
+              ariaLabel={t.postfach}
+              value={breite}
+              onChange={(v) => setBreite(v)}
+              options={[
+                { value: "desktop", label: t.desktop, activeClassName: "bg-muted text-foreground" },
+                { value: "mobil", label: t.mobil, activeClassName: "bg-muted text-foreground" },
+              ]}
+            />
           </div>
           <Surface padding="sm" className="rounded-2xl">
             <p className="truncate text-sm font-semibold">creaDIG Solutions · {k.subject || "—"}</p>

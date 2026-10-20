@@ -46,6 +46,7 @@ import { AGENTEN, fuehreFaelligeAus, type AgentInfo, type AgentKey } from "@/lib
 import { getVertriebStore } from "@/lib/lead-store"
 import { eingangAktiv, holeEingang, ladeEingang } from "@/lib/eingang"
 import { EingangListe } from "@/components/admin/eingang-liste"
+import { Disclosure } from "@/components/ui/disclosure"
 
 import { agentStarten, antwortErhalten, freigabeEntscheiden, ratAntworten } from "./actions"
 import { antwortZuruecknehmen } from "../marketing/mail/actions"
@@ -53,7 +54,7 @@ import { ergaenzeFehlendeAdressen, ladeAnsprache, type Ansprache } from "@/lib/a
 
 const euro = (n: number) => `${Math.round(n).toLocaleString("de-DE")} €`
 
-function Sitzung({ rat, rahmen }: { rat: Rat | undefined; rahmen: Rahmen }) {
+function Sitzung({ rat, fruehere, rahmen }: { rat: Rat | undefined; fruehere: Rat[]; rahmen: Rahmen }) {
   return (
     <section aria-labelledby="rat-titel" className="flex flex-col gap-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -165,6 +166,29 @@ function Sitzung({ rat, rahmen }: { rat: Rat | undefined; rahmen: Rahmen }) {
           </div>
         </div>
       )}
+
+      {fruehere.length > 0 ? (
+        <Disclosure size="sm" label={`Frühere Sitzungen (${fruehere.length})`} className="rounded-3xl border-0 bg-card px-6">
+          <ul className="flex flex-col gap-4">
+            {fruehere.map((f) => (
+              <li key={f.id} className="flex flex-col gap-1.5 border-t border-line pt-4 first:border-t-0 first:pt-0">
+                <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                  Sitzung KW {f.woche.split("-")[1]} · {seit(f.zeit)}
+                </span>
+                <p className="text-pretty text-sm leading-relaxed text-foreground">{f.protokoll.frage}</p>
+                {f.antwort ? (
+                  <p className="rounded-2xl bg-muted p-3 text-sm leading-relaxed text-muted-foreground">
+                    <span className="font-medium text-foreground">Deine Antwort: </span>
+                    {f.antwort}
+                  </p>
+                ) : (
+                  <p className="text-sm leading-relaxed text-muted-foreground">Unbeantwortet geblieben.</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        </Disclosure>
+      ) : null}
     </section>
   )
 }
@@ -190,6 +214,7 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
   vertrieb: Handshake,
   messen: CalendarRange,
   kapital: Coins,
+  finanz: Coins,
   redaktion: PenLine,
 }
 
@@ -654,7 +679,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
     fragenHeute(),
     letzteLaeufe(),
     collectAttention(getVertriebStore()).catch(() => null),
-    ladeRaete(1).catch(() => []),
+    ladeRaete(6).catch(() => []),
     firmenRahmen(),
     ladeBeitraege(6).catch(() => []),
     ladeAnsprache().catch((): Ansprache => ({ gesendet: 0, beantwortet: 0, quote: null, nachfassOffen: 0 })),
@@ -664,7 +689,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
   after(() => holeEingang().catch(() => undefined))
   const eingang = await ladeEingang(12)
 
-  const ratMitAntwort = raete.find((r) => r.antwort)
+  const ratMitAntwort = raete[0]?.antwort ? raete[0] : undefined
   const neuerLoeschauftrag = ratMitAntwort?.antwort
     ? await erkenneLoeschwunsch(ratMitAntwort.antwort, ratMitAntwort.id).catch(() => null)
     : null
@@ -681,7 +706,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
   return (
     <AdminShell title="Assistent" meta={<span className="block">Deine Truppe arbeitet im Hintergrund – du entscheidest</span>}>
       <div className="flex flex-col gap-10">
-        <Sitzung rat={raete[0]} rahmen={rahmen} />
+        <Sitzung rat={raete[0]} fruehere={raete.slice(1)} rahmen={rahmen} />
 
         <EingangListe eintraege={eingang} aktiv={eingangAktiv()} />
 

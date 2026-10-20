@@ -1,14 +1,15 @@
 import { buchungAnlegen, buchungBestaetigen, buchungStornieren } from "@/app/(finanz)/finanz/actions"
 import { AdminField, AdminInput, AdminSelect, Pill, SectionHeader } from "@/components/admin/primitives"
 import { eur, tag } from "@/components/finanz/format"
+import { Karte } from "@/components/finanz/karte"
+import { MehrListe } from "@/components/finanz/mehr-liste"
 import { KATEGORIEN, type Buchung } from "@/lib/finanz/rechnen"
 
 const WIEDER = { keine: "", monatlich: "monatlich", quartal: "vierteljährlich", jaehrlich: "jährlich" } as const
 
 export function BuchungErfassen({ heute }: { heute: string }) {
   return (
-    <section aria-labelledby="erfassen" className="flex flex-col gap-4">
-      <SectionHeader id="erfassen" title="Buchung erfassen" />
+    <Karte titel="Buchung erfassen" untertitel="Einnahme oder Ausgabe von Hand eintragen">
       <form action={buchungAnlegen} className="bg-card rounded-[2rem] grid grid-cols-2 gap-4 p-5">
         <fieldset className="col-span-2 flex gap-2">
           <legend className="sr-only">Art</legend>
@@ -89,68 +90,83 @@ export function BuchungErfassen({ heute }: { heute: string }) {
           sofort abzugsfähig ist oder über die Nutzungsdauer abgeschrieben werden muss (GWG-Grenze), entscheidet der Steuerberater.
         </p>
       </form>
+    </Karte>
+  )
+}
+
+const MONAT = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
+const monatsName = (schluessel: string) => `${MONAT[Number(schluessel.slice(5, 7)) - 1]} ${schluessel.slice(0, 4)}`
+
+/** Buchungen als Monatskarten: oben Summen, auf Klick die Tabelle. Der laufende Monat ist offen, der Rest zu. */
+export function BuchungsListe({ buchungen, heute }: { buchungen: Buchung[]; heute: string }) {
+  const je = new Map<string, Buchung[]>()
+  for (const b of [...buchungen].sort((a, c) => c.datum.localeCompare(a.datum))) {
+    const k = b.datum.slice(0, 7)
+    je.set(k, [...(je.get(k) ?? []), b])
+  }
+  const aktuell = heute.slice(0, 7)
+  return (
+    <section aria-labelledby="buchungen" className="flex flex-col gap-4">
+      <SectionHeader id="buchungen" title="Buchungen" count={`${buchungen.filter((b) => !b.storniert).length} wirksam`} />
+      {je.size === 0 && (
+        <p className="bg-card type-small text-muted-foreground rounded-[1.75rem] p-5">
+          Noch keine Buchungen. Fang mit deinem Kontostand in den Einstellungen unten an, dann trag die festen Kosten ein.
+        </p>
+      )}
+      {[...je.entries()].map(([monat, liste]) => {
+        const wirksam = liste.filter((b) => !b.storniert)
+        const ein = wirksam.filter((b) => b.art === "einnahme").reduce((s, b) => s + b.bruttoCent, 0)
+        const aus = wirksam.filter((b) => b.art === "ausgabe").reduce((s, b) => s + b.bruttoCent, 0)
+        return (
+          <Karte
+            key={monat}
+            titel={monatsName(monat)}
+            untertitel={`${wirksam.length} Buchungen · +${eur(ein)} · −${eur(aus)}`}
+            zahl={`${ein - aus >= 0 ? "+" : "−"}${eur(Math.abs(ein - aus))}`}
+            fuss="Saldo brutto"
+            offen={monat === aktuell}
+          >
+            <MehrListe start={12} kinder={liste.map((b) => <BuchungsZeile key={b.id} b={b} heute={heute} />)} />
+          </Karte>
+        )
+      })}
     </section>
   )
 }
 
-export function BuchungsListe({ buchungen, heute }: { buchungen: Buchung[]; heute: string }) {
-  const liste = buchungen.slice(0, 40)
+function BuchungsZeile({ b, heute }: { b: Buchung; heute: string }) {
   return (
-    <section aria-labelledby="buchungen" className="flex flex-col gap-4">
-      <SectionHeader id="buchungen" title="Buchungen" count={`${buchungen.filter((b) => !b.storniert).length} wirksam`} />
-      <div className="bg-card rounded-[2rem] p-2">
-        {liste.length === 0 ? (
-          <p className="type-small text-muted-foreground p-4">
-            Noch keine Buchungen. Fang mit deinem Kontostand in den Einstellungen unten an, dann trag die festen Kosten ein.
-          </p>
-        ) : (
-          <ul className="flex flex-col">
-            {liste.map((b) => (
-              <li
-                key={b.id}
-                className={`border-line flex items-center gap-3 border-b px-3 py-3 last:border-0 ${b.storniert ? "opacity-50" : ""}`}
-              >
-                <span className="text-muted-foreground w-20 shrink-0 text-xs tabular-nums">{tag(b.datum)}</span>
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <span className={`truncate text-sm ${b.storniert ? "line-through" : ""}`}>{b.gegenpartei ?? b.kategorie}</span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    {b.kategorie}
-                    {b.wiederholung !== "keine" ? ` · ${WIEDER[b.wiederholung]}` : ""}
-                    {b.afaJahre ? ` · AfA ${b.afaJahre} Jahre` : ""}
-                    {b.notiz ? ` · ${b.notiz}` : ""}
-                  </span>
-                </div>
-                {b.status === "geplant" && !b.storniert && (
-                  <Pill severity={b.datum < heute ? "critical" : "attention"}>{b.datum < heute ? "überfällig" : "geplant"}</Pill>
-                )}
-                {b.storniert && <Pill>storniert</Pill>}
-                <span className={`w-28 shrink-0 text-end text-sm tabular-nums ${b.art === "einnahme" ? "text-gold-text" : ""}`}>
-                  {b.art === "einnahme" ? "+" : "−"}
-                  {eur(b.bruttoCent)}
-                </span>
-                {!b.storniert && (
-                  <div className="flex shrink-0 gap-1">
-                    {b.status === "geplant" && (
-                      <form action={buchungBestaetigen}>
-                        <input type="hidden" name="id" value={b.id} />
-                        <button type="submit" className="text-gold-text hover:bg-gold/10 rounded-full px-2 py-1 text-xs">
-                          bezahlt
-                        </button>
-                      </form>
-                    )}
-                    <form action={buchungStornieren}>
-                      <input type="hidden" name="id" value={b.id} />
-                      <button type="submit" className="text-muted-foreground hover:text-destructive rounded-full px-2 py-1 text-xs">
-                        stornieren
-                      </button>
-                    </form>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
+    <li className={`border-line flex items-center gap-3 border-b px-1 py-3 last:border-0 ${b.storniert ? "opacity-50" : ""}`}>
+      <span className="text-muted-foreground w-20 shrink-0 text-xs tabular-nums">{tag(b.datum)}</span>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <span className={`truncate text-sm ${b.storniert ? "line-through" : ""}`}>{b.gegenpartei ?? b.kategorie}</span>
+        <span className="text-muted-foreground truncate text-xs">
+          {b.kategorie}
+          {b.wiederholung !== "keine" ? ` · ${WIEDER[b.wiederholung]}` : ""}
+          {b.afaJahre ? ` · AfA ${b.afaJahre} Jahre` : ""}
+          {b.notiz ? ` · ${b.notiz}` : ""}
+        </span>
       </div>
-    </section>
+      {b.status === "geplant" && !b.storniert && <Pill severity={b.datum < heute ? "critical" : "attention"}>{b.datum < heute ? "überfällig" : "geplant"}</Pill>}
+      {b.storniert && <Pill>storniert</Pill>}
+      <span className={`w-28 shrink-0 text-end text-sm tabular-nums ${b.art === "einnahme" ? "text-gold-text" : ""}`}>
+        {b.art === "einnahme" ? "+" : "−"}
+        {eur(b.bruttoCent)}
+      </span>
+      {!b.storniert && (
+        <div className="flex shrink-0 gap-1">
+          {b.status === "geplant" && (
+            <form action={buchungBestaetigen}>
+              <input type="hidden" name="id" value={b.id} />
+              <button type="submit" className="text-gold-text hover:bg-gold/10 rounded-full px-2 py-1 text-xs">bezahlt</button>
+            </form>
+          )}
+          <form action={buchungStornieren}>
+            <input type="hidden" name="id" value={b.id} />
+            <button type="submit" className="text-muted-foreground hover:text-destructive rounded-full px-2 py-1 text-xs">stornieren</button>
+          </form>
+        </div>
+      )}
+    </li>
   )
 }

@@ -33,7 +33,16 @@ export function KundenKopf({
 
   const geld: { label: string; wert: string | null }[] = [
     { label: k.eingenommen, wert: kopf.eingenommenCent === null ? null : euro.format(kopf.eingenommenCent / 100) },
-    { label: k.offeneRechnungen, wert: kopf.offeneRechnungen === null ? null : String(kopf.offeneRechnungen) },
+    {
+      label: k.offeneRechnungen,
+      wert:
+        kopf.offeneRechnungen === null
+          ? null
+          : kopf.offenCent !== null && kopf.offeneRechnungen > 0
+            ? `${kopf.offeneRechnungen} · ${euro.format(kopf.offenCent / 100)}${kopf.ueberfaellig ? ` (${kopf.ueberfaellig} ${k.ueberfaelligKurz})` : ""}`
+            : String(kopf.offeneRechnungen),
+    },
+    ...(kopf.zahlungsdauerTage !== null ? [{ label: k.zahlungsdauer, wert: `${kopf.zahlungsdauerTage} ${k.tageKurz}` }] : []),
     { label: k.offeneAngebote, wert: kopf.offeneAngebote === null ? null : String(kopf.offeneAngebote) },
     { label: k.potenzial, wert: kopf.potenzialEuro === null ? null : euro.format(kopf.potenzialEuro) },
   ]

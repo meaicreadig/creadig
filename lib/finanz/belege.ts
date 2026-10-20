@@ -1,5 +1,6 @@
 import "server-only"
 
+import { mitSchemaMarker } from "@/lib/finanz/schema-marker"
 import { createHash, randomUUID } from "node:crypto"
 import { put } from "@vercel/blob"
 
@@ -88,13 +89,14 @@ export const BELEGE_SCHEMA = [
   `UPDATE fin_buchungen SET geschaeftsfeld = 'digitalprodukte'
      WHERE geschaeftsfeld IN ('it','software','ecommerce') AND (status <> 'gebucht' OR quelle = 'fibero')`,
   `UPDATE fin_belege SET geschaeftsfeld = 'digitalprodukte' WHERE geschaeftsfeld IN ('it','software','ecommerce')`,
+  `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS zuordnung_quelle text`,
 ]
 
 let bereit: Promise<void> | null = null
 export async function belegeSchema(db: Abfrage): Promise<void> {
   if (!bereit) {
     bereit = (async () => {
-      for (const s of BELEGE_SCHEMA) await db(s, [])
+      await mitSchemaMarker(db, "belege", BELEGE_SCHEMA)
     })().catch((e) => {
       bereit = null
       throw e
@@ -113,6 +115,8 @@ export type Beleg = {
   kategorie: string
   geschaeftsfeld: Geschaeftsfeld | null
   archiviert: boolean
+  /** Woher die Zuordnung kommt: 'verlauf' / 'ki' = automatisch, 'hand' = von Hand, null = (noch) keine. */
+  zuordnungQuelle: string | null
   hatDatei: boolean
   dateiName: string | null
   /** Nur gesetzt, wenn eine eingehende E-Rechnung (UBL/CII, auch aus ZUGFeRD-PDF) erkannt wurde. */
@@ -145,6 +149,7 @@ function zuBeleg(r: Record<string, unknown>): Beleg {
     kategorie: String(r.kategorie ?? ""),
     geschaeftsfeld: r.geschaeftsfeld && istGeschaeftsfeld(String(r.geschaeftsfeld)) ? (String(r.geschaeftsfeld) as Geschaeftsfeld) : null,
     archiviert: Boolean(r.archiviert),
+    zuordnungQuelle: r.zuordnung_quelle ? String(r.zuordnung_quelle) : null,
     hatDatei: r.datei_status === "kopiert",
     dateiName: pfad ? pfad.split("/").pop() ?? pfad : null,
     erechnung:
@@ -155,7 +160,7 @@ function zuBeleg(r: Record<string, unknown>): Beleg {
 }
 
 const SPALTEN = `id, art, to_char(datum,'YYYY-MM-DD') AS datum, haendler, brutto_cent, vorsteuer_cent, kategorie, erechnung_format, erechnung_nummer, erechnung_iban,
-  geschaeftsfeld, archiviert, datei_status, datei_quelle_pfad`
+  geschaeftsfeld, archiviert, datei_status, datei_quelle_pfad, zuordnung_quelle`
 
 /** Die Ist-Werte aus Finanz — gleiche Definition wie die Soll-Werte der Quelle. */
 export async function istKennzahlen(db: Abfrage, quelle: string): Promise<Kennzahlen> {
@@ -211,7 +216,7 @@ export async function ladeBelege(db: Abfrage, suche: string | null): Promise<Bel
          FROM fin_belege WHERE geschaeftsfeld IS NULL GROUP BY 1 HAVING count(*) > 1 ORDER BY 2 DESC LIMIT 12`,
       [],
     ),
-    db(`SELECT ${SPALTEN} FROM fin_belege WHERE geschaeftsfeld IS NOT NULL ${filter} ORDER BY zugeordnet_at DESC NULLS LAST LIMIT 40`, p),
+    db(`SELECT ${SPALTEN} FROM fin_belege WHERE geschaeftsfeld IS NOT NULL ${filter} ORDER BY zugeordnet_at DESC NULLS LAST LIMIT 400`, p),
     db(
       `SELECT geschaeftsfeld AS g, count(*) AS c, coalesce(sum(brutto_cent) FILTER (WHERE NOT archiviert),0) AS b
          FROM fin_belege WHERE geschaeftsfeld IS NOT NULL GROUP BY 1`,
@@ -259,7 +264,8 @@ export async function verbucheBeleg(db: Abfrage, belegId: string): Promise<boole
 export async function ordneZu(db: Abfrage, ids: string[], feld: Geschaeftsfeld | null): Promise<number> {
   if (ids.length === 0) return 0
   const r = await db(
-    `UPDATE fin_belege SET geschaeftsfeld = $1, zugeordnet_at = CASE WHEN $1::text IS NULL THEN NULL ELSE now() END
+    `UPDATE fin_belege SET geschaeftsfeld = $1, zugeordnet_at = CASE WHEN $1::text IS NULL THEN NULL ELSE now() END,
+        zuordnung_quelle = CASE WHEN $1::text IS NULL THEN NULL ELSE 'hand' END
       WHERE id = ANY($2::text[]) RETURNING id`,
     [feld, ids],
   )
@@ -271,7 +277,7 @@ export async function ordneZu(db: Abfrage, ids: string[], feld: Geschaeftsfeld |
 export async function ordneHaendlerZu(db: Abfrage, haendler: string, feld: Geschaeftsfeld): Promise<number> {
   const name = haendler === "(ohne Händler)" ? "" : haendler
   const r = await db(
-    `UPDATE fin_belege SET geschaeftsfeld = $1, zugeordnet_at = now()
+    `UPDATE fin_belege SET geschaeftsfeld = $1, zugeordnet_at = now(), zuordnung_quelle = 'hand'
       WHERE geschaeftsfeld IS NULL AND haendler = $2 RETURNING id`,
     [feld, name],
   )

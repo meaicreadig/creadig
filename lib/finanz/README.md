@@ -233,3 +233,29 @@ In diesem Durchlauf lokal bestätigt fehlend: `BLOB_READ_WRITE_TOKEN`,
 `AI_GATEWAY_API_KEY`, `RESEND_API_KEY`, `MAIL_FROM`, `LEAD_TO` — jede
 betroffene Phase wurde trotzdem fertig gebaut und per Drill geprüft, mit dem
 fehlenden Zweig als eigene, benannte Prüfung (z. B. Drill M6/K-Abschnitte).
+
+## Nachtrag: Liquidität, USt-VA, Bescheide, Investment, Kundenbezug
+
+| Modul | Zweck |
+|---|---|
+| `rechnen.ts` (`kuenftigeBewegungen`) | Liquidität mit geschätztem Steuerabfluss; Szenarien vorsichtig / erwartet / optimistisch (`?szenario=`); überfällige Forderungen nach 21 Tagen, Pipeline gewichtet. Kompass und Warnungen nutzen immer „vorsichtig“. |
+| `ustva.ts` + `/finanz/steuern/ustva` | USt-Voranmeldung (Kz 81/86/66/83), Ist-Versteuerung; Zahllast je Frist in die Liquidität; Übernahme in die Frist ist ein Owner-Klick. Keine ELSTER-Übermittlung — nur Ausfüllhilfe. |
+| `bescheide.ts` + `/finanz/bescheide` | Tabelle `fin_bescheide`; Vorauszahlung/Nachzahlung/Erstattung wirken auf Fristen. Nur Metadaten, kein Datei-Upload. |
+| `investment.ts` + `/finanz/investment` | Tabellen `fin_anlagen`, `fin_anlagen_staende`; investierbar = frei − 6 Monatsausgaben; Was-wäre-wenn; Werte manuell mit Stichtag, keine Live-Kurse, keine Anlageberatung. |
+| `kunden-bezug.ts` | Geld je Organisation (eingenommen, offen, überfällig, Zahlungsdauer) aus `fin_dokumente`/`fin_zahlungen` — speist Kundenkarte und Kundenlage; Beträge nur für den Inhaber. |
+| `kurzlage.ts` | zusätzlich nächste Frist und überfällige Rechnungen → Finanz-Signal der Zentrale springt auf „Achtung“. |
+
+Migration (lesbare Kopie): `scripts/migrations/039-finanz-bescheide-anlagen.sql`.
+
+### Automatisierung (alles vorbereiten, nie von allein senden)
+
+| Was | Wie |
+|---|---|
+| `abos.ts` + `/finanz/abos` | Tabelle `fin_abos`; 5 Tage vor dem Termin entsteht ein Rechnungs-ENTWURF, der Termin rückt bedingt vor (kein Doppellauf). Pausieren statt löschen. |
+| `agent.ts` (Truppe-Agent „finanz“, täglich) | erzeugt Abo-Entwürfe und legt je überfälliger Rechnung und Mahnstufe EINEN Vorschlag in die Freigabe-Liste (`mahnung:<id>:<stufe>`). Versand bleibt dein Klick in `/finanz/vorgang/<id>`. |
+| Heute-Seite | vier Kennzahlen auf einen Blick: investierbar, überfällig, planbarer Jahresumsatz, Entwürfe warten. |
+
+Bewusst offen: Kontoabruf (PSD2), Eingangsmail `belege@` (braucht Resend-Empfang + `BLOB_READ_WRITE_TOKEN`, lokal nicht testbar),
+Finanz-Dashboard-Mail im Wochenrhythmus. Der §19-Hinweis erscheint nur, wenn `ust_pflichtig` in den Grundlagen AUS ist — für ein
+USt-pflichtiges Unternehmen also nie. Das alte `lib/rechnung.ts` mit `invoices`/`payments` ist ein ungenutztes Zweitmodell (nur
+`steuerlage` wird gelesen) und wird nicht mehr für Kundenzahlen herangezogen.

@@ -1,18 +1,15 @@
 import Link from "next/link"
 import { after } from "next/server"
-import { Suspense } from "react"
-
-import { MorgenAssistent, MorgenAssistentLaedt } from "@/components/admin/morgen-assistent"
 
 import { bereiteNachfassVor } from "@/lib/termine/nachfass"
 
 import { AdminShell } from "@/components/admin/admin-shell"
+import { Disclosure } from "@/components/ui/disclosure"
 import { Pill, SectionHeader, Surface, UnavailableNote } from "@/components/admin/primitives"
 import { type AttentionItem, type AttentionRank, collectAttention } from "@/lib/attention"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { datumAnzeige, GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 import { getVertriebStore, leadStoreConfigured } from "@/lib/lead-store"
-import { SystemErledigt } from "@/components/admin/system-erledigt"
 import { CockpitBand } from "@/components/admin/cockpit-band"
 import { ladeCockpit } from "@/lib/cockpit"
 import { zaehleOffen } from "@/lib/assistent/store"
@@ -125,12 +122,8 @@ export default async function Uebersicht() {
       <Hauptsitz etagen={hauptsitz.etagen} raeume={hauptsitz.raeume} faeden={hauptsitz.faeden} sprache={netzSprache} />
 
       <div className="mt-10">
-        <Suspense fallback={<MorgenAssistentLaedt sprache={netzSprache} />}>
-          <MorgenAssistent sprache={netzSprache} />
-        </Suspense>
+        <CockpitBand daten={cockpit} sprache={netzSprache} intl={intl} />
       </div>
-
-      <CockpitBand daten={cockpit} sprache={netzSprache} intl={intl} />
 
       <section aria-label={t.uebersicht.kennzahlenLabel}>
         {!hasStore ? (
@@ -191,23 +184,20 @@ export default async function Uebersicht() {
             </section>
           ) : null}
 
-          {/* ── 3b · W6 · A4 — was das System selbst erledigt hat ── */}
-          <SystemErledigt />
-
-          {/* ── 4 · Entscheidungen ── */}
+          {/* ── 3b · Entscheidungen — zugeklappt, damit sie die Spalte nicht sprengen ── */}
           <section aria-labelledby="entscheidungen-titel">
-            <SectionHeader id="entscheidungen-titel" title={t.uebersicht.entscheidungenTitel} count={entscheidungen.length ? t.uebersicht.punkte(entscheidungen.length) : undefined} />
+            <SectionHeader id="entscheidungen-titel" title={t.uebersicht.entscheidungenTitel} />
             {entscheidungen.length === 0 ? (
               <p className="type-small text-muted-foreground mt-4">{t.uebersicht.entscheidungenLeer}</p>
             ) : (
-              <>
+              <Disclosure size="sm" label={t.uebersicht.punkte(entscheidungen.length)} className="border-t-0">
                 <Punktliste items={entscheidungen.slice(0, ENTSCHEIDUNGEN_SICHTBAR)} t={t} intl={intl} ohneRang />
                 {entscheidungen.length > ENTSCHEIDUNGEN_SICHTBAR ? (
                   <Link href="/admin/material#gruppe-entscheidungen" className="text-gold-text mt-3 inline-block text-sm underline underline-offset-4">
                     {t.uebersicht.alleEntscheidungen(entscheidungen.length)}
                   </Link>
                 ) : null}
-              </>
+              </Disclosure>
             )}
           </section>
         </aside>
