@@ -163,6 +163,7 @@ export async function nachfassen(): Promise<number> {
      FROM assistent_freigaben
      WHERE art = 'mail' AND status = 'freigegeben'
        AND extra ? 'gesendetAt' AND NOT extra ? 'antwortAt' AND NOT extra ? 'nachfassId'
+       AND NOT extra ? 'kampagneId'
        AND COALESCE((extra->>'stufe')::int, 0) < $1
        AND (extra->>'gesendetAt')::timestamptz < now() - make_interval(days =>
              CASE WHEN COALESCE((extra->>'stufe')::int, 0) = 0 THEN $2::int ELSE $3::int END)
@@ -273,12 +274,47 @@ export async function protokolliereStudioMail(m: { an: string; betreff: string; 
   return id
 }
 
+/**
+ * Kampagnen-Versand (Mail Studio): pro Empfänger eine gesendete Mail-Zeile im
+ * selben Protokoll wie alle anderen Mails — damit steht sie in der Versand-Liste
+ * und `findeUrsprung()` (lib/eingang.ts) kann eine Antwort auf `antwort+<id>@`
+ * zuordnen. Bewusst KEIN Nachfass (eine Kampagne ist keine Erstansprache) und
+ * KEINE Bewegung einer Verkaufschance (`inDenFaden` wird nicht aufgerufen).
+ * Die Id wird VOR dem Versand vergeben (`neueFreigabeId`), weil sie in der Antwortadresse steckt.
+ */
+export async function protokolliereKampagnenVersand(
+  zeilen: { id: string; zustellungId: string; an: string; betreff: string; inhalt: string; kampagneId: string; mailId?: string }[],
+): Promise<void> {
+  const q = await assistentDb()
+  if (!q) return
+  const gesendetAt = new Date().toISOString()
+  for (const z of zeilen) {
+    const id = await legeFreigabeAn({
+      id: z.id,
+      art: "mail",
+      titel: `Kampagne: ${z.betreff}`,
+      empfaenger: z.an,
+      betreff: z.betreff,
+      inhalt: z.inhalt,
+      quelle: `kampagne:${z.zustellungId}`,
+      agent: "kampagne",
+      extra: { gesendetAt, kampagneId: z.kampagneId, zustellungId: z.zustellungId, ...(z.mailId ? { mailId: z.mailId } : {}) },
+    }).catch((e) => {
+      console.error("[kampagne] Versand nicht protokolliert:", (e as Error).message)
+      return null
+    })
+    if (id) await q(`UPDATE assistent_freigaben SET status = 'freigegeben', erledigt_at = now() WHERE id = $1`, [id])
+  }
+}
+
 export type VersandStatus =
   | { art: "beantwortet"; am: string }
   | { art: "wartet"; nachfassAm: string }
   | { art: "nachfass_offen"; nachfassId: string }
   | { art: "nachgefasst" }
   | { art: "beendet" }
+  /** Kampagnen-Mail: kein Nachfassen vorgesehen — nur der Antwortstand zählt. */
+  | { art: "kampagne" }
 
 export type VersandZeile = {
   id: string
@@ -286,8 +322,9 @@ export type VersandZeile = {
   betreff: string
   kurz: string
   gesendetAt: string
-  quelle: "studio" | "assistent" | "nachfassen"
+  quelle: "studio" | "assistent" | "nachfassen" | "kampagne"
   stufe: number
+  kampagneId: string | null
   status: VersandStatus
 }
 
@@ -300,15 +337,19 @@ function kurzfassung(inhalt: string): string {
   return text.length > 150 ? `${text.slice(0, 147).trimEnd()} …` : text
 }
 
-/** Alle gesendeten Mails, neueste zuerst, mit dem Stand der Antwort-/Nachfass-Kette. */
-export async function ladeVersandListe(limit = 100): Promise<VersandZeile[]> {
+/**
+ * Alle gesendeten Mails, neueste zuerst, mit dem Stand der Antwort-/Nachfass-Kette.
+ * `kampagnen: "ohne"` lässt die Einzelzeilen des Kampagnen-Versands weg (die Zeitleiste
+ * zeigt eine Kampagne als EINE Zeile, nicht als eine je Empfänger).
+ */
+export async function ladeVersandListe(limit = 100, opts: { kampagnen?: "mit" | "ohne" } = {}): Promise<VersandZeile[]> {
   const q = await assistentDb()
   if (!q) return []
   const rows = (await q(
     `SELECT f.id, f.empfaenger, f.betreff, f.titel, f.inhalt, f.agent, f.extra, n.status AS nachfass_status
      FROM assistent_freigaben f
      LEFT JOIN assistent_freigaben n ON n.id = f.extra->>'nachfassId'
-     WHERE f.art = 'mail' AND f.extra ? 'gesendetAt'
+     WHERE f.art = 'mail' AND f.extra ? 'gesendetAt'${opts.kampagnen === "ohne" ? " AND NOT f.extra ? 'kampagneId'" : ""}
      ORDER BY (f.extra->>'gesendetAt')::timestamptz DESC
      LIMIT $1`,
     [limit],
@@ -330,6 +371,7 @@ export async function ladeVersandListe(limit = 100): Promise<VersandZeile[]> {
     if (e.antwortAt) status = { art: "beantwortet", am: e.antwortAt }
     else if (e.nachfassId && r.nachfass_status === "offen") status = { art: "nachfass_offen", nachfassId: e.nachfassId }
     else if (e.nachfassId) status = { art: "nachgefasst" }
+    else if (e.kampagneId) status = { art: "kampagne" }
     else if (stufe >= MAX_STUFE) status = { art: "beendet" }
     else {
       const tage = stufe === 0 ? NACHFASS_TAGE[0] : NACHFASS_TAGE[1] - NACHFASS_TAGE[0]
@@ -341,11 +383,24 @@ export async function ladeVersandListe(limit = 100): Promise<VersandZeile[]> {
       betreff: r.betreff || r.titel,
       kurz: kurzfassung(r.inhalt),
       gesendetAt,
-      quelle: e.vorgaenger ? "nachfassen" : r.agent === "studio" ? "studio" : "assistent",
+      quelle: e.vorgaenger ? "nachfassen" : r.agent === "kampagne" ? "kampagne" : r.agent === "studio" ? "studio" : "assistent",
       stufe,
+      kampagneId: e.kampagneId ?? null,
       status,
     }
   })
+}
+
+/** Antworten je Kampagne (Zeilen mit `antwortAt`) — für die gemeinsame Zeitleiste. */
+export async function ladeKampagnenAntworten(): Promise<Record<string, number>> {
+  const q = await assistentDb()
+  if (!q) return {}
+  const rows = (await q(
+    `SELECT extra->>'kampagneId' AS id, COUNT(*) FILTER (WHERE extra ? 'antwortAt')::int AS n
+       FROM assistent_freigaben WHERE art = 'mail' AND extra ? 'kampagneId' GROUP BY 1`,
+    [],
+  )) as { id: string; n: number }[]
+  return Object.fromEntries(rows.map((r) => [r.id, r.n]))
 }
 
 export type Ansprache = { gesendet: number; beantwortet: number; quote: number | null; nachfassOffen: number }
@@ -357,8 +412,8 @@ export async function ladeAnsprache(): Promise<Ansprache> {
   if (!q) return leer
   const [r] = (await q(
     `SELECT
-       COUNT(*) FILTER (WHERE extra ? 'gesendetAt' AND NOT extra ? 'vorgaenger' AND (extra->>'gesendetAt')::timestamptz > now() - interval '60 days')::int AS gesendet,
-       COUNT(*) FILTER (WHERE extra ? 'antwortAt' AND NOT extra ? 'vorgaenger' AND (extra->>'gesendetAt')::timestamptz > now() - interval '60 days')::int AS beantwortet,
+       COUNT(*) FILTER (WHERE extra ? 'gesendetAt' AND NOT extra ? 'vorgaenger' AND NOT extra ? 'kampagneId' AND (extra->>'gesendetAt')::timestamptz > now() - interval '60 days')::int AS gesendet,
+       COUNT(*) FILTER (WHERE extra ? 'antwortAt' AND NOT extra ? 'vorgaenger' AND NOT extra ? 'kampagneId' AND (extra->>'gesendetAt')::timestamptz > now() - interval '60 days')::int AS beantwortet,
        COUNT(*) FILTER (WHERE status = 'offen' AND extra ? 'vorgaenger')::int AS "nachfassOffen"
      FROM assistent_freigaben WHERE art = 'mail'`,
     [],

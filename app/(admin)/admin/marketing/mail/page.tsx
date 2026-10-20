@@ -2,8 +2,8 @@ import Link from "next/link"
 import { PenLine } from "lucide-react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
-import { MailVersandTabelle } from "@/components/admin/mail-versand-tabelle"
-import { ladeAnsprache, ladeVersandListe } from "@/lib/assistent/versand"
+import { MailVersandTabelle, type KampagnenZeile } from "@/components/admin/mail-versand-tabelle"
+import { ladeAnsprache, ladeKampagnenAntworten, ladeVersandListe } from "@/lib/assistent/versand"
 import { AdminField, AdminInput, AdminSelect, Pill, SectionHeader, Surface, UnavailableNote } from "@/components/admin/primitives"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { empfaenger, freieKontakte, kampagnen, type Empfaenger, type FreierKontakt, type Kampagne } from "@/lib/mailing/store"
@@ -17,7 +17,7 @@ const T = {
     title: "Mail Studio",
     lead: "Jede gesendete Mail an einem Ort: an wen, was, wann – und ob eine Antwort kam. Ohne Antwort legt das System nach 5 und 9 Tagen automatisch eine Nachfass-Mail zur Freigabe an.",
     neueMail: "Neue Mail",
-    gesendetTitel: "Gesendete Mails",
+    gesendetTitel: "Zeitleiste · Mails & Kampagnen",
     mailsGesendet: "Gesendet (60 Tage)",
     antworten: "Antworten",
     quote: "Antwortquote",
@@ -57,7 +57,7 @@ const T = {
     title: "Mail Studio",
     lead: "Gönderilen her e-posta tek yerde: kime, ne, ne zaman – ve yanıt geldi mi. Yanıt gelmezse sistem 5 ve 9 gün sonra otomatik takip e-postasını onaya koyar.",
     neueMail: "Yeni e-posta",
-    gesendetTitel: "Gönderilen e-postalar",
+    gesendetTitel: "Zaman çizelgesi · e-postalar ve kampanyalar",
     mailsGesendet: "Gönderilen (60 gün)",
     antworten: "Yanıtlar",
     quote: "Yanıt oranı",
@@ -102,9 +102,10 @@ function prozent(teil: number, ganz: number): string {
 export default async function MailMarketingSeite() {
   const { sprache, intl } = await adminSprachKontext()
   const t = sprache === "tr" ? T.tr : T.de
-  const [versandListe, ansprache] = await Promise.all([
-    ladeVersandListe().catch(() => []),
+  const [versandListe, ansprache, kampagnenAntworten] = await Promise.all([
+    ladeVersandListe(100, { kampagnen: "ohne" }).catch(() => []),
     ladeAnsprache().catch(() => ({ gesendet: 0, beantwortet: 0, quote: null, nachfassOffen: 0 })),
+    ladeKampagnenAntworten().catch(() => ({}) as Record<string, number>),
   ])
   let daten: { k: Kampagne[]; e: Empfaenger[]; f: FreierKontakt[] } | null = null
   try {
@@ -126,6 +127,19 @@ export default async function MailMarketingSeite() {
   const versendet = daten.k.filter((k) => k.status === "versendet")
   const summeGesendet = versendet.reduce((s, k) => s + k.gesendet, 0)
   const aktive = daten.e.filter((e) => e.status === "aktiv").length
+
+  const kampagnenZeilen: KampagnenZeile[] = daten.k.map((k) => ({
+    id: k.id,
+    subject: k.subject,
+    preheader: k.preheader,
+    datum: k.sentAt ?? k.updatedAt,
+    status: k.status,
+    recipientsCount: k.recipientsCount,
+    gesendet: k.gesendet,
+    geoeffnet: k.geoeffnet,
+    geklickt: k.geklickt,
+    antworten: kampagnenAntworten[k.id] ?? 0,
+  }))
 
   const kennzahlen = [
     { label: t.mailsGesendet, wert: String(ansprache.gesendet) },
@@ -159,14 +173,9 @@ export default async function MailMarketingSeite() {
         </dl>
 
         <section aria-labelledby="gesendet" className="flex flex-col gap-4">
-          <SectionHeader id="gesendet" title={t.gesendetTitel} count={versandListe.length} />
-          <MailVersandTabelle zeilen={versandListe} sprache={sprache === "tr" ? "tr" : "de"} intl={intl} antwortAktion={antwortErhalten} rueckgaengigAktion={antwortZuruecknehmen} />
-        </section>
-
-        <section aria-labelledby="kampagnen" className="flex flex-col gap-4">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <SectionHeader id="kampagnen" title={t.kampagnen} count={daten.k.length} />
+              <SectionHeader id="gesendet" title={t.gesendetTitel} count={versandListe.length + daten.k.length} />
             </div>
             <div className="flex flex-wrap items-center gap-3">
               {versendet.length > 0 && (
@@ -180,38 +189,7 @@ export default async function MailMarketingSeite() {
               </form>
             </div>
           </div>
-          {daten.k.length === 0 ? (
-            <p className="text-muted-foreground text-sm leading-relaxed">{t.keine}</p>
-          ) : (
-            <ul className="border-line divide-line flex flex-col divide-y rounded-md border">
-              {daten.k.map((k) => (
-                <li key={k.id}>
-                  <Link
-                    href={`/admin/marketing/mail/${k.id}`}
-                    className="hover:bg-muted/40 flex flex-col gap-2 px-4 py-3 transition-colors sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium">{k.subject || t.ohneBetreff}</span>
-                      <span className="text-meta text-muted-foreground block truncate">
-                        {datum.format(new Date(k.sentAt ?? k.updatedAt))}
-                        {k.preheader ? ` · ${k.preheader}` : ""}
-                      </span>
-                    </span>
-                    <span className="flex shrink-0 items-center gap-3">
-                      {k.status === "versendet" && (
-                        <span className="text-meta text-muted-foreground tabular-nums">
-                          {k.gesendet} → {prozent(k.geoeffnet, k.gesendet)} / {prozent(k.geklickt, k.gesendet)}
-                        </span>
-                      )}
-                      <Pill severity={k.status === "entwurf" ? "attention" : "neutral"}>
-                        {k.status === "entwurf" ? t.entwurf : t.gesendet}
-                      </Pill>
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
+          <MailVersandTabelle zeilen={versandListe} kampagnen={kampagnenZeilen} sprache={sprache === "tr" ? "tr" : "de"} intl={intl} antwortAktion={antwortErhalten} rueckgaengigAktion={antwortZuruecknehmen} />
         </section>
 
         <section aria-labelledby="verteiler" className="flex flex-col gap-4">

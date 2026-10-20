@@ -90,6 +90,9 @@ export type FreigabeExtra = {
   nachfassId?: string
   /** Löschauftrag: betroffene Firmen */
   orgIds?: string[]
+  /** Kampagnen-Versand (Mail Studio): eine Zeile je Empfänger, damit Antworten zuordenbar sind — nie Nachfass-Kette. */
+  kampagneId?: string
+  zustellungId?: string
 }
 
 export type Lauf = { agent: string; ergebnis: string; anzahl: number; fehler: string | null; zeit: string }

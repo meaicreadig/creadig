@@ -28,6 +28,7 @@
     "research-import": "node --import ./scripts/lib/alias-hook.mjs scripts/research-import.mjs",
     "proof-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/proof-drill.mjs",
     "rechnung-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/rechnung-drill.mjs",
+    "netzwerk-drill": "node --import ./scripts/lib/alias-hook.mjs --import ./scripts/lib/pg-abfrage-hook.mjs scripts/netzwerk-drill.mjs",
     "finanz-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/finanz-drill.mjs",
     "kette-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/kette-drill.mjs",
     "auftritt-drill": "node --import ./scripts/lib/alias-hook.mjs scripts/auftritt-drill.mjs",

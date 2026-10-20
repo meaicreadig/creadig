@@ -58,6 +58,13 @@ export async function linkedinStatus(): Promise<LinkedinStatus> {
 
 export async function verbindungTrennen(): Promise<void> {
   await trenneLinkedin("inhaber")
+  /* Auch den alten Token entfernen — sonst würde ihn die einmalige Übernahme beim nächsten Status wieder einsetzen. */
+  const q = neonAbfrage()
+  if (q) {
+    await q(`DELETE FROM linkedin_connection WHERE id = 1`, []).catch((error) => {
+      if (!tabelleFehlt(error, "linkedin_connection")) throw error
+    })
+  }
 }
 
 export type VeroeffentlichungsErgebnis = { ok: true; url: string | null } | { ok: false; grund: "nicht-verbunden" | "abgelehnt" }
