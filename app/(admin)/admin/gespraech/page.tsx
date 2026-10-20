@@ -117,13 +117,15 @@ export default async function GespraechSeite({
     )
   }
 
+  // Beim geöffneten Kontakt sofort aufbereiten, damit die KI-Notiz direkt sichtbar ist.
+  if (kontaktId) await ergaenzeAufbereitungen(sprache, kontaktId, 3).catch(() => 0)
   const [alle, kontakt, verlauf] = await Promise.all([
     sucheKontakte(q ?? null),
     kontaktId ? holeKontakt(kontaktId) : Promise.resolve(null),
     gespraeche(kontaktId ?? null, kontaktId ? 12 : 8),
   ])
-  if (verlauf.some((g) => g.detail && !g.ki[sprache])) {
-    after(() => ergaenzeAufbereitungen(sprache, kontaktId ?? null).catch(() => 0))
+  if (!kontaktId && verlauf.some((g) => !g.ki[sprache])) {
+    after(() => ergaenzeAufbereitungen(sprache, null).catch(() => 0))
   }
   const heute = new Date().toISOString().slice(0, 10)
   const sucht = Boolean(q?.trim())
