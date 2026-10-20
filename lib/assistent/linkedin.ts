@@ -17,8 +17,8 @@ const APPS: Record<LinkedinKanal, { id?: string; secret?: string; scope: string 
     scope: "openid profile w_member_social",
   },
   firma: {
-    id: process.env.LINKEDIN_ORG_CLIENT_ID,
-    secret: process.env.LINKEDIN_ORG_CLIENT_SECRET,
+    id: process.env.LINKEDIN_FIRMA_CLIENT_ID || process.env.LINKEDIN_ORG_CLIENT_ID,
+    secret: process.env.LINKEDIN_FIRMA_CLIENT_SECRET || process.env.LINKEDIN_ORG_CLIENT_SECRET,
     scope: "r_organization_social w_organization_social rw_organization_admin",
   },
 }
