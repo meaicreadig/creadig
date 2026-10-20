@@ -2,9 +2,10 @@ import { FinanzShell, OhneSpeicher } from "@/components/finanz/shell"
 import { LiquiditaetsBand } from "@/components/finanz/liquiditaet"
 import { BuchungErfassen, BuchungsListe } from "@/components/finanz/buchungen"
 import { BankImportKarte } from "@/components/finanz/bank-import"
+import { BankAusgabenKarte } from "@/components/finanz/bank-ausgaben"
 import { berechneLage } from "@/lib/finanz/lage"
 import { finanzDb } from "@/lib/finanz/store"
-import { ladeOffeneBankUmsaetze, ladeOffeneRechnungenFuerAbgleich } from "@/lib/finanz/bank-abgleich"
+import { ladeAusgehendeBankUmsaetze, ladeOffeneBankUmsaetze, ladeOffeneRechnungenFuerAbgleich } from "@/lib/finanz/bank-abgleich"
 import { finanzOwnerSeite } from "@/lib/finanz/zugang"
 
 export const dynamic = "force-dynamic"
@@ -15,10 +16,11 @@ export default async function FinanzGeldfluss() {
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="geldfluss" titel="Geldfluss"><OhneSpeicher /></FinanzShell>
 
-  const [{ heute, buchungen, topf, bewegungen, wochen }, offeneUmsaetze, offeneRechnungen] = await Promise.all([
+  const [{ heute, buchungen, topf, bewegungen, wochen }, offeneUmsaetze, offeneRechnungen, abbuchungen] = await Promise.all([
     berechneLage(db),
     ladeOffeneBankUmsaetze(db),
     ladeOffeneRechnungenFuerAbgleich(db),
+    ladeAusgehendeBankUmsaetze(db),
   ])
   return (
     <FinanzShell aktiv="geldfluss" titel="Geldfluss" unterzeile="Was kommt, was geht – und wie dein Konto in 13 Wochen aussieht.">
@@ -32,6 +34,7 @@ export default async function FinanzGeldfluss() {
         </div>
       </div>
       <BankImportKarte offeneUmsaetze={offeneUmsaetze} offeneRechnungen={offeneRechnungen} />
+      <BankAusgabenKarte abbuchungen={abbuchungen} />
     </FinanzShell>
   )
 }

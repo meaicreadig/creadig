@@ -10,7 +10,8 @@ import { finanzDb, protokolliere } from "@/lib/finanz/store"
 import { berechneLage } from "@/lib/finanz/lage"
 import { frageAssistent } from "@/lib/finanz/assistent"
 import { leseBankCsv, leseBankCsvSaldo, leseCamt053, leseCamt053Saldo } from "@/lib/finanz/bank-import"
-import { bestaetigeZuordnung, ignoriereUmsatz, importiereBankUmsaetze } from "@/lib/finanz/bank-abgleich"
+import { bestaetigeZuordnung, bucheAusgehendenUmsatz, ignoriereUmsatz, importiereBankUmsaetze } from "@/lib/finanz/bank-abgleich"
+import { istGeschaeftsfeld } from "@/lib/finanz/beleg-felder"
 
 const PFAD = "/finanz"
 
@@ -232,4 +233,17 @@ export async function bankUmsatzIgnorieren(form: FormData): Promise<void> {
   const db = await zugang()
   await ignoriereUmsatz(db, String(form.get("umsatzId") ?? ""))
   revalidatePath("/finanz/geldfluss")
+}
+
+/** Abbuchung als Ausgabe buchen — Kategorie und USt-Satz werden gegen die Listen geprüft, nicht blind übernommen. */
+export async function bankAusgabeBuchen(form: FormData): Promise<void> {
+  const db = await zugang()
+  const kategorie = String(form.get("kategorie") ?? "")
+  const ust = Number(form.get("ust"))
+  const feld = String(form.get("geschaeftsfeld") ?? "")
+  if (!KATEGORIEN.ausgabe.includes(kategorie) || ![0, 7, 19].includes(ust)) return
+  const ok = await bucheAusgehendenUmsatz(db, String(form.get("umsatzId") ?? ""), kategorie, ust, istGeschaeftsfeld(feld) ? feld : null)
+  if (ok) await protokolliere(db, "bank_ausgabe_gebucht", { kategorie, ust })
+  revalidatePath("/finanz/geldfluss", "layout")
+  revalidatePath("/finanz")
 }
