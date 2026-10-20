@@ -264,6 +264,24 @@ console.log("\nB8 · Stufenänderung der Pipeline ist auf /admin/verkaufen sicht
   p((await q(`SELECT status FROM opportunities WHERE id=$1`, [oppId]))[0].status === "new", "B8 der Vorgang steht wieder auf new")
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * B9 · SCHON IM ANGEBOTSSCHRITT liegt der Finanz-Entwurf bereit (nie versendet)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+console.log("\nB9 · Vorgang im Angebotsschritt → Angebots-Entwurf in Finanz, genau einmal")
+{
+  const { legeAngebotsEntwuerfeAusChancen } = await import("../lib/finanz/angebot-aus-chance.ts")
+  const { oppId } = await vorgangMitAngebot("B9 Angebotsschritt")
+  await q(`UPDATE opportunities SET status = 'proposal' WHERE id = $1`, [oppId])
+  const eins = await legeAngebotsEntwuerfeAusChancen((t, par) => q(t, par))
+  const zwei = await legeAngebotsEntwuerfeAusChancen((t, par) => q(t, par))
+  const meine = eins.filter((e) => e.opportunityId === oppId)
+  p(meine.length === 1, "B9 genau ein Entwurf für den Vorgang im Angebotsschritt", String(meine.length))
+  p(zwei.filter((e) => e.opportunityId === oppId).length === 0, "B9 zweiter Lauf legt nichts mehr an")
+  const dok = await q(`SELECT status, nummer, versendet_at FROM fin_dokumente WHERE opportunity_id = $1 AND art = 'angebot'`, [oppId])
+  p(dok.length === 1 && dok[0].status === "entwurf" && dok[0].nummer === null && dok[0].versendet_at === null, "B9 Entwurf ohne Nummer, nicht versendet")
+  p(await chronik(oppId, "finanz.entwurf") === 1, "B9 Chronikzeile am Vorgang")
+}
+
 await client.end()
 console.log(
   fehler === 0

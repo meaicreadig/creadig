@@ -4,12 +4,13 @@ import { useOptimistic, useState, useTransition } from "react"
 import { CalendarCheck, Loader2, RefreshCw, Star, X } from "lucide-react"
 
 import { messeStatusSetzen, radarJetzt } from "@/app/(admin)/admin/messen/actions"
+import { SegmentedControl, type SegmentedOption } from "@/components/admin/primitives"
 import type { MesseStatus } from "@/lib/messen-radar"
 
-const OPTIONEN: { wert: MesseStatus; text: string; Icon: typeof Star; aktiv: string }[] = [
-  { wert: "teilnehmen", text: "Ich nehme teil", Icon: CalendarCheck, aktiv: "bg-primary text-primary-foreground" },
-  { wert: "interessiert", text: "Interessiert", Icon: Star, aktiv: "bg-primary/15 text-primary" },
-  { wert: "nein", text: "Kein Interesse", Icon: X, aktiv: "bg-muted-foreground/15 text-foreground" },
+const OPTIONEN: readonly SegmentedOption<MesseStatus>[] = [
+  { value: "teilnehmen", label: "Ich nehme teil", icon: CalendarCheck, activeClassName: "bg-primary text-primary-foreground" },
+  { value: "interessiert", label: "Interessiert", icon: Star, activeClassName: "bg-primary/15 text-primary" },
+  { value: "nein", label: "Kein Interesse", icon: X, activeClassName: "bg-muted-foreground/15 text-foreground" },
 ]
 
 export function MesseStatusWahl({ messeKey, status, name }: { messeKey: string; status: MesseStatus | null; name: string }) {
@@ -17,32 +18,19 @@ export function MesseStatusWahl({ messeKey, status, name }: { messeKey: string; 
   const [aktuell, setAktuell] = useOptimistic(status)
 
   return (
-    <div role="group" aria-label={`Status für ${name}`} className="flex flex-wrap gap-1.5">
-      {OPTIONEN.map(({ wert, text, Icon, aktiv }) => {
-        const an = aktuell === wert
-        return (
-          <button
-            key={wert}
-            type="button"
-            aria-pressed={an}
-            disabled={pending}
-            onClick={() =>
-              start(async () => {
-                const neu = an ? null : wert
-                setAktuell(neu)
-                await messeStatusSetzen(messeKey, neu)
-              })
-            }
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-              an ? aktiv : "bg-muted text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Icon className="size-3.5" aria-hidden />
-            {text}
-          </button>
-        )
-      })}
-    </div>
+    <SegmentedControl
+      ariaLabel={`Status für ${name}`}
+      value={aktuell}
+      disabled={pending}
+      options={OPTIONEN}
+      onChange={(wert, warAktiv) =>
+        start(async () => {
+          const neu = warAktiv ? null : wert
+          setAktuell(neu)
+          await messeStatusSetzen(messeKey, neu)
+        })
+      }
+    />
   )
 }
 

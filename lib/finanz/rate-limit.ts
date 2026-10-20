@@ -1,5 +1,6 @@
 import "server-only"
 
+import { mitSchemaMarker } from "@/lib/finanz/schema-marker"
 import type { Abfrage } from "@/lib/neon-abfrage"
 
 /**
@@ -20,7 +21,7 @@ let bereit: Promise<void> | null = null
 async function rateLimitSchema(db: Abfrage): Promise<void> {
   if (!bereit) {
     bereit = (async () => {
-      for (const s of RATE_LIMIT_SCHEMA) await db(s, [])
+      await mitSchemaMarker(db, "ratelimit", RATE_LIMIT_SCHEMA)
     })().catch((e) => {
       bereit = null
       throw e

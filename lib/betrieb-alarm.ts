@@ -25,7 +25,7 @@ const MAIL_PAUSE_MIN = 60
  * Wöchentliche Agenten laufen ab 6,5 Tagen Abstand wieder; 192 Std. (8 Tage) lässt
  * einen Tag Luft, bevor „still" gemeldet wird.
  */
-export const TAEGLICHE_AGENTEN = ["lage", "vertrieb", "messen"] as const
+export const TAEGLICHE_AGENTEN = ["lage", "vertrieb", "messen", "finanz"] as const
 export const WOECHENTLICHE_AGENTEN = ["rat", "jaeger", "kapital", "redaktion"] as const
 const ALLE_UEBERWACHTEN = [...TAEGLICHE_AGENTEN, ...WOECHENTLICHE_AGENTEN] as readonly string[]
 const STILL_NACH_STUNDEN = { taeglich: 36, woechentlich: 192 } as const

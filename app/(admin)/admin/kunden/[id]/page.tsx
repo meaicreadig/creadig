@@ -1,4 +1,7 @@
+import { cookies } from "next/headers"
 import Link from "next/link"
+
+import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
 import { ChevronDown } from "lucide-react"
 import { notFound } from "next/navigation"
 
@@ -84,7 +87,8 @@ export default async function OrganisationDetail({ params }: { params: Promise<{
   }
 
   const kunde = organisation.lifecycle === "kunde"
-  const kopf = await ladeKundenkartenKopf(organisation.id)
+  const sitzung = await cookies().then((c) => verifySession(c.get(ADMIN_COOKIE)?.value))
+  const kopf = await ladeKundenkartenKopf(organisation.id, { geldSichtbar: sitzung?.rolle === "owner" })
 
   const offeneChancen = opportunities.filter((o) => o.status !== "won" && o.status !== "lost")
   const mitSchritt = offeneChancen

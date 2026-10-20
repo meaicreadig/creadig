@@ -42,6 +42,13 @@ export default async function FinanzSteuern({ searchParams }: { searchParams: Pr
         </span>
         <span className="text-primary text-sm font-medium">Öffnen</span>
       </Link>
+      <Link href={`${basis}/steuern/ustva`} className="bg-card flex items-center justify-between gap-4 rounded-[2rem] p-7">
+        <span className="flex flex-col gap-1">
+          <span className="font-semibold">USt-Voranmeldung</span>
+          <span className="text-muted-foreground text-sm">Kz 81 / 86 / 66 / 83 je Frist — Zahllast in die Frist übernehmen</span>
+        </span>
+        <span className="text-primary text-sm font-medium">Öffnen</span>
+      </Link>
       <FristenListe fristen={fristen} heute={heute} ustOffenCent={topf.ustOffenCent} />
       <FinanzEuer euer={euer} jahre={jahre} jahrAktuell={jahr} />
     </FinanzShell>

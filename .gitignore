@@ -60,3 +60,7 @@ screenshots/
 # --out . angibt.
 *.dump
 creadig-backups/
+
+# lokale Screenshots / macOS-Temp
+screenshots*/
+.!*

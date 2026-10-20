@@ -811,6 +811,9 @@ export const de = {
     } as Record<string, string>,
   },
   kundenkarte: {
+    zahlungsdauer: "Ø Zahlungsdauer",
+    tageKurz: "Tage",
+    ueberfaelligKurz: "überfällig",
     naechsterSchritt: "Nächster Schritt",
     keinSchritt: "Kein nächster Schritt festgelegt",
     schrittAnlegen: "Chance öffnen und Schritt setzen",

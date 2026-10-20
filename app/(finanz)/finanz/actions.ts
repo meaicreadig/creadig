@@ -11,6 +11,7 @@ import { berechneLage } from "@/lib/finanz/lage"
 import { frageAssistent } from "@/lib/finanz/assistent"
 import { leseBankCsv, leseBankCsvSaldo, leseCamt053, leseCamt053Saldo } from "@/lib/finanz/bank-import"
 import { bestaetigeZuordnung, bucheAusgehendenUmsatz, ignoriereUmsatz, importiereBankUmsaetze } from "@/lib/finanz/bank-abgleich"
+import { berechneUstVa, zeitraumFuerFrist } from "@/lib/finanz/ustva"
 import { istGeschaeftsfeld } from "@/lib/finanz/beleg-felder"
 
 const PFAD = "/finanz"
@@ -246,4 +247,19 @@ export async function bankAusgabeBuchen(form: FormData): Promise<void> {
   if (ok) await protokolliere(db, "bank_ausgabe_gebucht", { kategorie, ust })
   revalidatePath("/finanz/geldfluss", "layout")
   revalidatePath("/finanz")
+}
+
+/** Zahllast der Voranmeldung als Betrag der Frist eintragen (Frist bleibt offen). Rechnet neu aus dem Hauptbuch — nimmt keinen Betrag vom Browser. */
+export async function ustvaInFristUebernehmen(form: FormData) {
+  const db = await zugang()
+  const id = feld(form, "frist")
+  if (!id) return
+  const lage = await berechneLage(db)
+  const frist = lage.fristen.find((f) => f.id === id && !f.erledigt && f.art === "ust")
+  const zeitraum = frist ? zeitraumFuerFrist(frist, lage.einstellungen.ustRhythmus) : null
+  if (!frist || !zeitraum) return
+  const va = berechneUstVa(lage.buchungen, zeitraum)
+  await db(`UPDATE fin_fristen SET betrag_cent = $2 WHERE id = $1 AND erledigt_at IS NULL`, [id, va.kz83Cent])
+  await protokolliere(db, "ustva_in_frist", { id, kz83Cent: va.kz83Cent, von: zeitraum.von, bis: zeitraum.bis })
+  revalidatePath(PFAD, "layout")
 }

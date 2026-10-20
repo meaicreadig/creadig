@@ -1,11 +1,11 @@
 import Link from "next/link"
-import { CalendarClock, Car, Compass, FileCheck2, FileText, Package, Receipt, Settings, Target, Waves } from "lucide-react"
+import { Archive, CalendarClock, Repeat, Calculator, Car, Compass, FileCheck2, FileText, Package, Receipt, Settings, Target, TrendingUp, Waves } from "lucide-react"
 
 import { Logo } from "@/components/brand/logo"
 import { Abmelden } from "@/components/finanz/anmeldung"
 import { finanzBasis } from "@/lib/finanz/basis"
 
-export type FinanzBereich = "heute" | "angebote" | "rechnungen" | "leistungen" | "geldfluss" | "belege" | "ziele" | "steuern" | "pauschalen" | "grundlagen"
+export type FinanzBereich = "heute" | "angebote" | "rechnungen" | "leistungen" | "geldfluss" | "belege" | "ziele" | "steuern" | "ustva" | "bescheide" | "abos" | "pauschalen" | "investment" | "grundlagen"
 
 type Bereich = { key: FinanzBereich; pfad: string; label: string; Icon: typeof Compass }
 
@@ -16,6 +16,7 @@ const GRUPPEN: { titel: string; bereiche: Bereich[] }[] = [
     bereiche: [
       { key: "angebote", pfad: "/angebote", label: "Angebote", Icon: FileText },
       { key: "rechnungen", pfad: "/rechnungen", label: "Rechnungen", Icon: FileCheck2 },
+      { key: "abos", pfad: "/abos", label: "Wiederkehrend", Icon: Repeat },
       { key: "leistungen", pfad: "/leistungen", label: "Leistungen", Icon: Package },
     ],
   },
@@ -28,15 +29,21 @@ const GRUPPEN: { titel: string; bereiche: Bereich[] }[] = [
     ],
   },
   {
+    titel: "Vermögen",
+    bereiche: [{ key: "investment", pfad: "/investment", label: "Investment", Icon: TrendingUp }],
+  },
+  {
     titel: "Finanzamt",
     bereiche: [
       { key: "steuern", pfad: "/steuern", label: "Steuern", Icon: CalendarClock },
+      { key: "ustva", pfad: "/steuern/ustva", label: "USt-Voranmeldung", Icon: Calculator },
+      { key: "bescheide", pfad: "/bescheide", label: "Bescheide", Icon: Archive },
       { key: "pauschalen", pfad: "/pauschalen", label: "Pauschalen", Icon: Car },
     ],
   },
 ]
 
-const MOBIL_KEYS: FinanzBereich[] = ["heute", "angebote", "rechnungen", "geldfluss", "steuern"]
+const MOBIL_KEYS: FinanzBereich[] = ["heute", "rechnungen", "geldfluss", "investment", "steuern"]
 const MOBIL: Bereich[] = [
   ...GRUPPEN.flatMap((g) => g.bereiche).filter((b) => MOBIL_KEYS.includes(b.key)),
   { key: "grundlagen", pfad: "/grundlagen", label: "Grundlagen", Icon: Settings },
