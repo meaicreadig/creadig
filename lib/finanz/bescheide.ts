@@ -1,5 +1,6 @@
 import "server-only"
 
+import { mitSchemaMarker } from "@/lib/finanz/schema-marker"
 import type { Abfrage } from "@/lib/neon-abfrage"
 import { plusTage } from "@/lib/finanz/rechnen"
 
@@ -49,7 +50,7 @@ export const BESCHEIDE_SCHEMA = [
 let bereit: Promise<void> | null = null
 export async function bescheideSchema(db: Abfrage): Promise<void> {
   bereit ??= (async () => {
-    for (const q of BESCHEIDE_SCHEMA) await db(q, [])
+    await mitSchemaMarker(db, "bescheide", BESCHEIDE_SCHEMA)
   })().catch((e) => {
     bereit = null
     throw e

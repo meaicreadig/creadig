@@ -1,5 +1,6 @@
 import "server-only"
 
+import { mitSchemaMarker } from "@/lib/finanz/schema-marker"
 import { randomUUID } from "node:crypto"
 
 import type { Abfrage } from "@/lib/neon-abfrage"
@@ -60,7 +61,7 @@ let bereit: Promise<void> | null = null
 export async function zieleSchema(db: Abfrage): Promise<void> {
   if (!bereit) {
     bereit = (async () => {
-      for (const s of ZIELE_SCHEMA) await db(s, [])
+      await mitSchemaMarker(db, "ziele", ZIELE_SCHEMA)
     })().catch((e) => {
       bereit = null
       throw e

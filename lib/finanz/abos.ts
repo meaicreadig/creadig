@@ -1,5 +1,6 @@
 import "server-only"
 
+import { mitSchemaMarker } from "@/lib/finanz/schema-marker"
 import type { Abfrage } from "@/lib/neon-abfrage"
 import { addTage, type Kunde, type Position } from "@/lib/finanz/auftraege/rechnen"
 import { auftraegeSchema, legeEntwurfAn, merkeKunde, verlauf } from "@/lib/finanz/auftraege/store"
@@ -43,7 +44,7 @@ let bereit: Promise<void> | null = null
 export async function abosSchema(db: Abfrage): Promise<void> {
   bereit ??= (async () => {
     await auftraegeSchema(db)
-    for (const q of ABOS_SCHEMA) await db(q, [])
+    await mitSchemaMarker(db, "abos", ABOS_SCHEMA)
   })().catch((e) => {
     bereit = null
     throw e

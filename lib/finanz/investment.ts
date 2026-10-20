@@ -1,5 +1,6 @@
 import "server-only"
 
+import { mitSchemaMarker } from "@/lib/finanz/schema-marker"
 import type { Abfrage } from "@/lib/neon-abfrage"
 import type { Monat } from "@/lib/finanz/rechnen"
 
@@ -56,7 +57,7 @@ export const ANLAGEN_SCHEMA = [
 let bereit: Promise<void> | null = null
 export async function anlagenSchema(db: Abfrage): Promise<void> {
   bereit ??= (async () => {
-    for (const q of ANLAGEN_SCHEMA) await db(q, [])
+    await mitSchemaMarker(db, "anlagen", ANLAGEN_SCHEMA)
   })().catch((e) => {
     bereit = null
     throw e

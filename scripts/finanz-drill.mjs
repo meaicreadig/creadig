@@ -1415,6 +1415,33 @@ console.log("\nW · Abos — Entwurf statt Versand, genau einmal")
   }
 }
 
+/* ══ V · Automatisch zuordnen ══ */
+console.log("\nV · Auto-Zuordnung — Verlauf zuerst, KI nur mit Schwelle, nie Privat")
+{
+  const AU = await import("../lib/finanz/auto.ts")
+  const { leseKiZuordnung, dominantesFeld } = AU
+  p(dominantesFeld({ glasfaser: 4, sonstiges: 1 }) === "glasfaser", "V1 80 % Verlauf genügt")
+  p(dominantesFeld({ glasfaser: 3, sonstiges: 2 }) === null, "V2 gemischter Verlauf → offen lassen")
+  p(dominantesFeld({ privat: 5 }) === null, "V3 Privat wird nie automatisch vergeben")
+  const ki = leseKiZuordnung('Text [{"id":"a","feld":"content","konfidenz":0.9},{"id":"b","feld":"privat","konfidenz":0.99},{"id":"c","feld":"beratung","konfidenz":0.5},{"id":"x","feld":"content","konfidenz":0.99},{"id":"a","feld":"glasfaser","konfidenz":0.99}] Ende', ["a", "b", "c"])
+  p(ki.length === 1 && ki[0].id === "a" && ki[0].feld === "content", "V4 KI-Antwort: nur bekannte IDs, nicht privat, ab 80 %, jede ID einmal", JSON.stringify(ki))
+  p(leseKiZuordnung("kein json", ["a"]).length === 0, "V5 kaputte KI-Antwort ordnet nichts zu")
+
+  const beleg = async (id, h, feld) => db(`INSERT INTO fin_belege (id, quelle, extern_id, art, datum, haendler, brutto_cent, kategorie, geschaeftsfeld, zugeordnet_at) VALUES ($1,'hand',$1,'beleg','2026-09-01',$2,5000,'Büro',$3, CASE WHEN $3::text IS NULL THEN NULL ELSE now() END)`, [id, h, feld])
+  await beleg("v-alt1", "ABNAHME Baumarkt", "glasfaser")
+  await beleg("v-alt2", "ABNAHME Baumarkt", "glasfaser")
+  await beleg("v-neu1", "ABNAHME Baumarkt", null)
+  await beleg("v-neu2", "ABNAHME Unbekannt GmbH", null)
+  const r = await AU.ordneAllesAutomatischZu(db, false)
+  const b1 = (await db(`SELECT geschaeftsfeld, zuordnung_quelle FROM fin_belege WHERE id='v-neu1'`))[0]
+  p(b1.geschaeftsfeld === "glasfaser" && b1.zuordnung_quelle === "verlauf", "V6 bekannter Händler wird nach Verlauf zugeordnet, Herkunft steht dran", JSON.stringify(b1))
+  p((await db(`SELECT geschaeftsfeld FROM fin_belege WHERE id='v-neu2'`))[0].geschaeftsfeld === null, "V7 unbekannter Händler bleibt ohne KI offen")
+  p((await db(`SELECT count(*) AS c FROM fin_buchungen WHERE id = 'beleg-v-neu1'`))[0].c == 1, "V8 die Zuordnung erzeugt wie von Hand genau eine Ausgabe-Buchung")
+  const r2 = await AU.ordneAllesAutomatischZu(db, false)
+  p(r2.belegeVerlauf === 0, "V9 zweiter Lauf ändert nichts", JSON.stringify(r2))
+  p(r.belegeVerlauf >= 1, "V10 Lauf meldet die Zahl der Zuordnungen")
+}
+
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
 process.exit(fehler === 0 ? 0 : 1)

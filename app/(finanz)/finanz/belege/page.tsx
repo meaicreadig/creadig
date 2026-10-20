@@ -1,3 +1,6 @@
+import { after } from "next/server"
+
+import { ordneAllesAutomatischZu } from "@/lib/finanz/auto"
 import { Search } from "lucide-react"
 
 import { FinanzShell, OhneSpeicher } from "@/components/finanz/shell"
@@ -22,6 +25,8 @@ export default async function FinanzBelege({ searchParams }: { searchParams: Pro
   if (!db) return <FinanzShell aktiv="belege" titel="Belege"><OhneSpeicher /></FinanzShell>
   await belegeSchema(db)
 
+  await ordneAllesAutomatischZu(db, false).catch(() => null)
+  after(() => ordneAllesAutomatischZu(db).catch(() => null))
   const q = (await searchParams).q?.trim().slice(0, 80) || null
   const [daten, letzter, basis] = await Promise.all([ladeBelege(db, q), letzterAbgleich(db, "fibero"), finanzBasis()])
   const zugeordnet = daten.gesamt - daten.korbAnzahl

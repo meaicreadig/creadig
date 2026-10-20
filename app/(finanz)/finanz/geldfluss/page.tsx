@@ -1,3 +1,6 @@
+import { after } from "next/server"
+
+import { ordneAllesAutomatischZu } from "@/lib/finanz/auto"
 import { FinanzShell, OhneSpeicher } from "@/components/finanz/shell"
 import { LiquiditaetsBand } from "@/components/finanz/liquiditaet"
 import { BuchungErfassen, BuchungsListe } from "@/components/finanz/buchungen"
@@ -20,6 +23,8 @@ export default async function FinanzGeldfluss({ searchParams }: { searchParams: 
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="geldfluss" titel="Geldfluss"><OhneSpeicher /></FinanzShell>
 
+  await ordneAllesAutomatischZu(db, false).catch(() => null)
+  after(() => ordneAllesAutomatischZu(db).catch(() => null))
   const [{ heute, buchungen, topf, szenarien }, offeneUmsaetze, offeneRechnungen, abbuchungen, basis] = await Promise.all([
     berechneLage(db),
     ladeOffeneBankUmsaetze(db),

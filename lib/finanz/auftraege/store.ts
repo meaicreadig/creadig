@@ -1,5 +1,7 @@
 import "server-only"
 
+import { uebernehmeWebsiteLeistungen } from "@/lib/finanz/auftraege/website-leistungen"
+import { mitSchemaMarker } from "@/lib/finanz/schema-marker"
 import { createHash, randomBytes } from "node:crypto"
 
 import type { Abfrage } from "@/lib/neon-abfrage"
@@ -260,7 +262,7 @@ let bereit: Promise<void> | null = null
 export async function auftraegeSchema(db: Abfrage): Promise<void> {
   if (!bereit) {
     bereit = (async () => {
-      for (const sql of AUFTRAEGE_SCHEMA) await db(sql, [])
+      await mitSchemaMarker(db, "auftraege", AUFTRAEGE_SCHEMA)
     })().catch((e) => {
       bereit = null
       throw e
@@ -457,8 +459,14 @@ export async function verlauf(db: Abfrage, id: string, aktion: string, daten: Re
 
 export type Leistung = { id: string; titel: string; beschreibung: string; einheit: string; preisCent: number; ustSatz: number; geschaeftsfeld: string; aktiv: boolean }
 
+let websiteUebernommen = false
 export async function ladeLeistungen(db: Abfrage, nurAktiv = false): Promise<Leistung[]> {
   await auftraegeSchema(db)
+  /* Der Katalog füllt sich selbst aus den Website-Angeboten (lib/offers.ts) — einmal je Prozess, nie überschreibend. */
+  if (!websiteUebernommen) {
+    await uebernehmeWebsiteLeistungen(db)
+    websiteUebernommen = true
+  }
   const r = await db(`SELECT * FROM fin_leistungen ${nurAktiv ? "WHERE aktiv" : ""} ORDER BY aktiv DESC, titel`, [])
   return r.map((x) => ({
     id: String(x.id),

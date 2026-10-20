@@ -1,5 +1,6 @@
 import "server-only"
 
+import { mitSchemaMarker } from "@/lib/finanz/schema-marker"
 import type { Abfrage } from "@/lib/neon-abfrage"
 import { protokolliere } from "@/lib/finanz/store"
 import { ladeUmrechner } from "@/lib/finanz/kurse"
@@ -38,7 +39,7 @@ let schemaBereit: Promise<void> | null = null
 async function abgleichSchema(db: Abfrage) {
   if (!schemaBereit) {
     schemaBereit = (async () => {
-      for (const s of ABGLEICH_SCHEMA) await db(s, [])
+      await mitSchemaMarker(db, "abgleich", ABGLEICH_SCHEMA)
     })().catch((e) => {
       schemaBereit = null
       throw e
