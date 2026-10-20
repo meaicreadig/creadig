@@ -62,18 +62,18 @@ export default async function EinzelmailSeite({ searchParams }: { searchParams: 
 
   return (
     <AdminShell
-      title={tr ? "Kişisel e-posta" : "Persönliche Mail"}
+      title={tr ? "Mail Studio · Yeni e-posta" : "Mail Studio · Neue Mail"}
       lead={
         tr
-          ? "Tek bir kişiye, creaDIG tasarımında. Ne istediğini yaz, yapay zekâ yazsın ve düzenlesin; canlı gör, .eml olarak indir ya da direkt gönder."
-          : "An eine Person, im creaDIG-Design. Sag, was du willst – die KI schreibt und passt an. Live ansehen, als .eml laden oder direkt senden."
+          ? "creaDIG tasarımında. Ne istediğini yaz, yapay zekâ yazsın; canlı gör ve gönder. Gönderilen her e-posta listeye düşer ve otomatik takip edilir."
+          : "Im creaDIG-Design. Sag, was du willst – die KI schreibt. Live ansehen und senden. Jede gesendete Mail landet in der Liste und wird automatisch nachgefasst."
       }
       meta={
         <Link
           href={ausAssistent ? "/admin/assistent" : "/admin/marketing/mail"}
           className="text-meta text-muted-foreground hover:text-foreground underline underline-offset-4"
         >
-          {ausAssistent ? (tr ? "← Asistan" : "← Assistent") : tr ? "← E-posta pazarlama" : "← E-Mail-Marketing"}
+          {ausAssistent ? (tr ? "← Asistan" : "← Assistent") : "← Mail Studio"}
         </Link>
       }
     >

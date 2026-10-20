@@ -4,7 +4,7 @@ import { einzelmailHtml, einzelmailText, type Einzelmail } from "@/lib/mailing/e
 import { siteUrl } from "@/lib/termine/mail"
 
 import { findeKontaktMail } from "./kontaktsuche"
-import { assistentDb, ergaenzeExtra, legeFreigabeAn, setzeMailKopf, type Freigabe } from "./store"
+import { assistentDb, ergaenzeExtra, legeFreigabeAn, setzeMailKopf, type Freigabe, type FreigabeExtra } from "./store"
 
 /** Tage bis zum Nachfassen je Stufe (1. und 2. Erinnerung). */
 export const NACHFASS_TAGE = [5, 9] as const
@@ -180,6 +180,103 @@ export async function markiereAntwort(id: string): Promise<void> {
      WHERE status = 'offen' AND extra->>'vorgaenger' IN (SELECT id FROM kette)`,
     [id],
   )
+}
+
+/**
+ * Jede Mail aus dem Mail Studio landet als gesendete Mail-Freigabe im selben
+ * Protokoll wie die Assistenten-Mails – damit gelten Liste, Antwort-Knopf und
+ * automatisches Nachfassen für alle Mails gleich.
+ */
+export async function protokolliereStudioMail(m: { an: string; betreff: string; inhalt: string; mailId?: string }): Promise<string | null> {
+  const id = await legeFreigabeAn({
+    art: "mail",
+    titel: m.betreff,
+    empfaenger: m.an,
+    betreff: m.betreff,
+    inhalt: m.inhalt,
+    agent: "studio",
+    extra: { gesendetAt: new Date().toISOString(), ...(m.mailId ? { mailId: m.mailId } : {}) },
+  })
+  if (id) {
+    const q = await assistentDb()
+    await q?.(`UPDATE assistent_freigaben SET status = 'freigegeben', erledigt_at = now() WHERE id = $1`, [id])
+  }
+  return id
+}
+
+export type VersandStatus =
+  | { art: "beantwortet"; am: string }
+  | { art: "wartet"; nachfassAm: string }
+  | { art: "nachfass_offen"; nachfassId: string }
+  | { art: "nachgefasst" }
+  | { art: "beendet" }
+
+export type VersandZeile = {
+  id: string
+  an: string
+  betreff: string
+  kurz: string
+  gesendetAt: string
+  quelle: "studio" | "assistent" | "nachfassen"
+  stufe: number
+  status: VersandStatus
+}
+
+function kurzfassung(inhalt: string): string {
+  const text = kundenText(inhalt)
+    .replace(/^\s*(hallo|guten tag|sehr geehrte[^\n]*|liebe[^\n]*)[^\n]*\n/i, "")
+    .replace(/\*\*|__|^>\s?|^-\s?\[[a-z]+\]\s?|^[-*]\s/gim, "")
+    .replace(/\s+/g, " ")
+    .trim()
+  return text.length > 150 ? `${text.slice(0, 147).trimEnd()} …` : text
+}
+
+/** Alle gesendeten Mails, neueste zuerst, mit dem Stand der Antwort-/Nachfass-Kette. */
+export async function ladeVersandListe(limit = 100): Promise<VersandZeile[]> {
+  const q = await assistentDb()
+  if (!q) return []
+  const rows = (await q(
+    `SELECT f.id, f.empfaenger, f.betreff, f.titel, f.inhalt, f.agent, f.extra, n.status AS nachfass_status
+     FROM assistent_freigaben f
+     LEFT JOIN assistent_freigaben n ON n.id = f.extra->>'nachfassId'
+     WHERE f.art = 'mail' AND f.extra ? 'gesendetAt'
+     ORDER BY (f.extra->>'gesendetAt')::timestamptz DESC
+     LIMIT $1`,
+    [limit],
+  )) as {
+    id: string
+    empfaenger: string | null
+    betreff: string | null
+    titel: string
+    inhalt: string
+    agent: string | null
+    extra: FreigabeExtra | null
+    nachfass_status: string | null
+  }[]
+  return rows.map((r) => {
+    const e = r.extra ?? {}
+    const stufe = e.stufe ?? 0
+    const gesendetAt = e.gesendetAt as string
+    let status: VersandStatus
+    if (e.antwortAt) status = { art: "beantwortet", am: e.antwortAt }
+    else if (e.nachfassId && r.nachfass_status === "offen") status = { art: "nachfass_offen", nachfassId: e.nachfassId }
+    else if (e.nachfassId) status = { art: "nachgefasst" }
+    else if (stufe >= MAX_STUFE) status = { art: "beendet" }
+    else {
+      const tage = stufe === 0 ? NACHFASS_TAGE[0] : NACHFASS_TAGE[1] - NACHFASS_TAGE[0]
+      status = { art: "wartet", nachfassAm: new Date(new Date(gesendetAt).getTime() + tage * 86_400_000).toISOString() }
+    }
+    return {
+      id: r.id,
+      an: r.empfaenger ?? "",
+      betreff: r.betreff || r.titel,
+      kurz: kurzfassung(r.inhalt),
+      gesendetAt,
+      quelle: e.vorgaenger ? "nachfassen" : r.agent === "studio" ? "studio" : "assistent",
+      stufe,
+      status,
+    }
+  })
 }
 
 export type Ansprache = { gesendet: number; beantwortet: number; quote: number | null; nachfassOffen: number }

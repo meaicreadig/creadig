@@ -25,6 +25,7 @@ export const tr: AdminTexte = {
     ungespeichert: "Bu sayfada henüz kaydedilmemiş bir şey var. Yine de ayrılmak istiyor musunuz?",
   },
   nav: {
+    mailstudio: { label: "Mail Studio", hint: "Yaz, gönder, yanıtları takip et" },
     marketing: { label: "Pazarlama özeti", hint: "LinkedIn, kanallar, tepkiler tek bakışta" },
     veroeffentlichungen: { label: "Yayınlar", hint: "Ne çıktı, ne geri döndü" },
     uebersicht: { label: "Genel bakış", hint: "Bugün önemli olan" },
