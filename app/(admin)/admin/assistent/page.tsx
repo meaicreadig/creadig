@@ -245,7 +245,6 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: string | null })
   return (
     <li className="flex flex-col overflow-hidden rounded-3xl bg-card shadow-sm">
       {f.bildPfad ? (
-        // eslint-disable-next-line @next/next/no-img-element -- privates Blob-Bild über geschützte Route
         <img
           src={`/api/assistent/bild/${encodeURIComponent(f.id)}`}
           alt={f.extra.alt ?? ""}
@@ -337,6 +336,7 @@ function LinkedinStatus({ name, meldung }: { name: string | null; meldung?: stri
         {name ? `Postet als ${name}` : "LinkedIn nicht verbunden"}
         {meldung && text[meldung] ? <span className="text-muted-foreground">· {text[meldung]}</span> : null}
       </p>
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth-Weiterleitung, darf nicht vorab geladen werden */}
       <a href="/api/linkedin/verbinden" className="rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground">
         {name ? "Neu verbinden" : "Mit LinkedIn verbinden"}
       </a>
