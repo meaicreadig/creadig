@@ -19,6 +19,8 @@ import {
 import { gespraechSpeichern } from "@/app/(admin)/admin/gespraech/actions"
 import type { Abschnitt, GespraechKontakt, Interesse } from "@/lib/gespraech"
 import type { GespraechText } from "@/lib/gespraech-text"
+import type { Aufbereitung } from "@/lib/gespraech-ki"
+import { AufbereitungBlock } from "@/components/admin/gespraech-aufbereitung"
 
 type Entwurf = {
   abschnitte: Partial<Record<Abschnitt, string>>
@@ -101,14 +103,14 @@ function Eigenschaft({
   children: ReactNode
 }) {
   return (
-    <div className="flex min-h-10 items-center gap-3">
-      <dt className="text-muted-foreground flex w-40 shrink-0 items-center gap-2.5 text-sm">
+    <div className="border-line/60 flex min-h-11 flex-col gap-1 border-b py-2 last:border-b-0 sm:flex-row sm:items-center sm:gap-4">
+      <dt className="text-muted-foreground flex shrink-0 items-center gap-2.5 text-sm sm:w-44">
         <span aria-hidden="true" className="flex size-4 items-center justify-center">
           {icon}
         </span>
         {label}
       </dt>
-      <dd className="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-sm">{children}</dd>
+      <dd className="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-sm break-words">{children}</dd>
     </div>
   )
 }
@@ -130,6 +132,7 @@ export function Gespraechsraum({
   const [laeuft, setLaeuft] = useState(false)
   const [geladen, setGeladen] = useState(false)
   const [gespeichert, setGespeichert] = useState<Entwurf | null>(null)
+  const [aufbereitung, setAufbereitung] = useState<Aufbereitung | null>(null)
   const [fehler, setFehler] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
   const notizRef = useRef<HTMLTextAreaElement>(null)
@@ -196,6 +199,7 @@ export function Gespraechsraum({
       })
       if (r.ok) {
         setGespeichert(stand)
+        setAufbereitung(r.aufbereitung)
         setE(LEER)
         try {
           sessionStorage.removeItem(schluessel)
@@ -228,6 +232,11 @@ export function Gespraechsraum({
           .replace("{name}", kontakt.name)
           .replace("{min}", String(Math.max(1, Math.round(gespeichert.sek / 60))))}
       </p>
+      {aufbereitung && (
+        <div className="bg-surface rounded-3xl p-4">
+          <AufbereitungBlock a={aufbereitung} texte={t} />
+        </div>
+      )}
       {gespeichert.folge && gespeichert.folgeAm ? (
         <>
           <p className="text-muted-foreground text-sm leading-relaxed">
@@ -274,7 +283,10 @@ export function Gespraechsraum({
       <div className="flex flex-wrap items-center gap-4">
         <button
           type="button"
-          onClick={() => setGespeichert(null)}
+          onClick={() => {
+            setGespeichert(null)
+            setAufbereitung(null)
+          }}
           className="border-line-strong hover:border-gold rounded-md border px-4 py-2 text-sm transition-colors"
         >
           {t.neuesGespraech}
@@ -324,7 +336,7 @@ export function Gespraechsraum({
           </p>
         </div>
 
-        <dl className="grid gap-x-10 gap-y-1 lg:grid-cols-2">
+        <dl className="flex flex-col">
           <Eigenschaft icon={<Timer className="size-4" />} label={t.status}>
             <span
               role="timer"
@@ -389,12 +401,12 @@ export function Gespraechsraum({
 
           <Eigenschaft icon={<CalendarClock className="size-4" />} label={t.naechsterKontakt}>
             {kontakt.nextTouch || kontakt.nextTouchAt ? (
-              <span className="truncate">
-                {kontakt.nextTouch}
+              <>
+                {kontakt.nextTouch && <span className="text-pretty">{kontakt.nextTouch}</span>}
                 {kontakt.nextTouchAt && (
-                  <span className="text-gold-text ml-2 font-mono text-xs">{datumKurz(kontakt.nextTouchAt)}</span>
+                  <span className="text-gold-text font-mono text-xs">{datumKurz(kontakt.nextTouchAt)}</span>
                 )}
-              </span>
+              </>
             ) : (
               <span className="text-muted-foreground">{t.offen}</span>
             )}

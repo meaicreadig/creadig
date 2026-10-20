@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
 import { ADMIN_COOKIE } from "@/lib/admin-session"
+import { adminSprache } from "@/lib/admin-i18n/server"
+import type { Aufbereitung } from "@/lib/gespraech-ki"
 import { pruefeZugang } from "@/lib/admin-widerruf"
 import { darfBetreten } from "@/lib/rollen"
 import {
@@ -48,7 +50,9 @@ export async function kontaktAnlegen(form: FormData): Promise<void> {
   redirect(`/admin/gespraech?kontakt=${encodeURIComponent(id)}`)
 }
 
-export type SpeichernErgebnis = { ok: true; id: string } | { ok: false; fehler: string }
+export type SpeichernErgebnis =
+  | { ok: true; id: string; aufbereitung: Aufbereitung | null }
+  | { ok: false; fehler: string }
 
 export async function gespraechSpeichern(eingabe: {
   kontaktId: string
@@ -78,13 +82,15 @@ export async function gespraechSpeichern(eingabe: {
   }
   const dauerSek = Number.isFinite(eingabe.dauerSek) ? Math.min(Math.max(0, Math.round(eingabe.dauerSek)), 86400) : 0
 
+  const sprache = (await adminSprache()) === "tr" ? "tr" : "de"
   const ergebnis = await speichereGespraech(
-    { kontaktId: eingabe.kontaktId, dauerSek, abschnitte, interessen, folge, folgeAm, folgeUm },
+    { kontaktId: eingabe.kontaktId, dauerSek, abschnitte, interessen, folge, folgeAm, folgeUm, sprache },
     wer,
   )
   if (!ergebnis) return { ok: false, fehler: "speicher" }
 
   revalidatePath("/admin/gespraech")
   revalidatePath(`/admin/vertrieb/beziehungen/${eingabe.kontaktId}`)
-  return { ok: true, id: ergebnis.id }
+  revalidatePath("/admin/verkaufen")
+  return { ok: true, id: ergebnis.id, aufbereitung: ergebnis.aufbereitung }
 }

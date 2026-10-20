@@ -56,6 +56,12 @@ export type GespraechText = {
   googleKalender: string
   neuesGespraech: string
   zurAkte: string
+  kiEyebrow: string
+  kiPunkte: string
+  kiNaechster: string
+  original: string
+  inVertrieb: string
+  kiAusstehend: string
   terminmail: string
   min: string
   zentrale: string
@@ -155,6 +161,12 @@ const DE: GespraechText = {
   googleKalender: "Google Kalender",
   neuesGespraech: "Neues Gespräch",
   zurAkte: "Zur Kundenakte",
+  kiEyebrow: "KI-Zusammenfassung",
+  kiPunkte: "Kernpunkte",
+  kiNaechster: "Nächster Schritt",
+  original: "Originalnotiz anzeigen",
+  inVertrieb: "Im Vertrieb öffnen",
+  kiAusstehend: "Wird gerade von der KI aufbereitet – beim nächsten Laden sichtbar.",
   terminmail: "Terminmail senden",
   min: "Min",
   zentrale: "Zentrale",
@@ -259,6 +271,12 @@ const TR: GespraechText = {
   googleKalender: "Google Takvim",
   neuesGespraech: "Yeni görüşme",
   zurAkte: "Müşteri dosyasına git",
+  kiEyebrow: "Yapay zekâ özeti",
+  kiPunkte: "Ana maddeler",
+  kiNaechster: "Sonraki adım",
+  original: "Orijinal notu göster",
+  inVertrieb: "Satışta aç",
+  kiAusstehend: "Yapay zekâ tarafından hazırlanıyor – bir sonraki yüklemede görünür.",
   terminmail: "Randevu e-postası gönder",
   min: "dk",
   zentrale: "Merkez",
