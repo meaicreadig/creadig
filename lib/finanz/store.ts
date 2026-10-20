@@ -100,9 +100,8 @@ export const FINANZ_SCHEMA = [
 
 let schemaBereit: Promise<void> | null = null
 
-export async function finanzDb(): Promise<Abfrage | null> {
-  const abfrage = neonAbfrage()
-  if (!abfrage) return null
+/** Legt das Finanz-Schema an (einmal je Prozess). Für Aufrufer, die schon eine Abfrage haben — z. B. die Vertrieb→Finanz-Brücke. */
+export async function finanzSchema(abfrage: Abfrage): Promise<void> {
   if (!schemaBereit) {
     schemaBereit = (async () => {
       for (const sql of FINANZ_SCHEMA) await abfrage(sql, [])
@@ -112,6 +111,12 @@ export async function finanzDb(): Promise<Abfrage | null> {
     })
   }
   await schemaBereit
+}
+
+export async function finanzDb(): Promise<Abfrage | null> {
+  const abfrage = neonAbfrage()
+  if (!abfrage) return null
+  await finanzSchema(abfrage)
   return abfrage
 }
 

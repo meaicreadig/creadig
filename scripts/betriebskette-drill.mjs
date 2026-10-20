@@ -160,6 +160,15 @@ console.log("\nB2 · Eine Zusage ist eine Zusage")
   p(await chronik(oppId, "offer.accepted") === 1, "genau EINE Chronikzeile „angenommen“")
   const status = (await q(`SELECT status FROM opportunities WHERE id=$1`, [oppId]))[0].status
   p(status === "won", "der Vorgang steht auf gewonnen", status)
+  /* Vertrieb → Finanz: das Ja legt genau einen Angebots-ENTWURF an — kein Versand, keine Nummer. */
+  const dok = await q(`SELECT id, status, nummer, positionen FROM fin_dokumente WHERE opportunity_id=$1`, [oppId])
+  p(dok.length === 1, "B2 genau EIN Finanz-Entwurf zum gewonnenen Vorgang", String(dok.length))
+  p(dok[0]?.status === "entwurf" && dok[0]?.nummer === null, "B2 Entwurf ohne Nummer, nicht versendet")
+  p(dok[0]?.positionen?.[0]?.preisCent > 0, "B2 Position mit Betrag aus dem Angebot", String(dok[0]?.positionen?.[0]?.preisCent))
+  const org = (await q(`SELECT organisation_id FROM opportunities WHERE id=$1`, [oppId]))[0].organisation_id
+  p((await zahl(`SELECT count(*)::int n FROM fin_kunden WHERE organisation_id=$1`, [org])) === 1, "B2 fin_kunden trägt den Bezug zur Organisation")
+  p(await chronik(oppId, "finanz.entwurf") === 1, "B2 Chronikzeile „Entwurf in Finanz angelegt“")
+  p(await chronik(oppId, "finanz.entwurf-fehler") === 0, "B2 kein Brückenfehler")
 }
 {
   const { oppId, offerId } = await vorgangMitAngebot("B2 Parallel")
@@ -167,6 +176,7 @@ console.log("\nB2 · Eine Zusage ist eine Zusage")
   const antworten = await Promise.all(Array.from({ length: 10 }, () => store.acceptOffer(offerId, JA)))
   p(antworten.filter((a) => a.length === 0).length === 1, "zehn gleichzeitig: genau eine Zusage")
   p(await chronik(oppId, "offer.accepted") === 1, "und genau eine Chronikzeile", String(await chronik(oppId, "offer.accepted")))
+  p((await zahl(`SELECT count(*)::int n FROM fin_dokumente WHERE opportunity_id=$1`, [oppId])) === 1, "und genau EIN Finanz-Entwurf")
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

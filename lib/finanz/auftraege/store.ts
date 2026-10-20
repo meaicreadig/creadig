@@ -101,6 +101,11 @@ export const AUFTRAEGE_SCHEMA = [
   `CREATE INDEX IF NOT EXISTS fin_dokument_verlauf_idx ON fin_dokument_verlauf (dokument_id, created_at)`,
   `ALTER TABLE fin_buchungen ADD COLUMN IF NOT EXISTS geschaeftsfeld text`,
   `ALTER TABLE fin_buchungen ADD COLUMN IF NOT EXISTS quelle_ref text`,
+  /* Vertrieb-Brücke (scripts/migrations/037-vertrieb-finanz-bruecke.sql) — beide nullable, alte Zeilen bleiben gültig. */
+  `ALTER TABLE fin_kunden ADD COLUMN IF NOT EXISTS organisation_id text`,
+  `ALTER TABLE fin_kunden ADD COLUMN IF NOT EXISTS contact_id text`,
+  `ALTER TABLE fin_dokumente ADD COLUMN IF NOT EXISTS opportunity_id text`,
+  `CREATE INDEX IF NOT EXISTS fin_dokumente_opportunity_idx ON fin_dokumente (opportunity_id) WHERE opportunity_id IS NOT NULL`,
   `ALTER TABLE fin_einstellungen ADD COLUMN IF NOT EXISTS firma jsonb NOT NULL DEFAULT '{}'::jsonb`,
   /* Säulen-Durchlauf — 'it'/'software'/'ecommerce' → 'digitalprodukte', siehe lib/finanz/beleg-felder.ts. */
   `ALTER TABLE fin_leistungen ALTER COLUMN geschaeftsfeld SET DEFAULT 'digitalprodukte'`,
@@ -473,13 +478,18 @@ export async function ladeKunden(db: Abfrage): Promise<Kunde[]> {
   return r.map((x) => x.daten as Kunde)
 }
 
-async function merkeKunde(db: Abfrage, k: Kunde): Promise<void> {
+/** Optionaler Bezug eines Finanz-Kunden zu Vertrieb (organisations/contacts). Ohne Angabe bleibt ein vorhandener Bezug unverändert. */
+export type KundenBezug = { organisationId?: string | null; contactId?: string | null }
+
+export async function merkeKunde(db: Abfrage, k: Kunde, bezug: KundenBezug = {}): Promise<void> {
   const schluessel = (k.email.trim() || `${k.firma}|${k.name}`).toLowerCase().trim()
   if (!schluessel || schluessel === "|") return
   await db(
-    `INSERT INTO fin_kunden (id, daten, schluessel) VALUES ($1,$2::jsonb,$3)
-     ON CONFLICT (schluessel) DO UPDATE SET daten = EXCLUDED.daten, updated_at = now()`,
-    [crypto.randomUUID(), JSON.stringify(k), schluessel],
+    `INSERT INTO fin_kunden (id, daten, schluessel, organisation_id, contact_id) VALUES ($1,$2::jsonb,$3,$4,$5)
+     ON CONFLICT (schluessel) DO UPDATE SET daten = EXCLUDED.daten, updated_at = now(),
+       organisation_id = COALESCE(EXCLUDED.organisation_id, fin_kunden.organisation_id),
+       contact_id = COALESCE(EXCLUDED.contact_id, fin_kunden.contact_id)`,
+    [crypto.randomUUID(), JSON.stringify(k), schluessel, bezug.organisationId ?? null, bezug.contactId ?? null],
   )
 }
 
@@ -487,14 +497,14 @@ async function merkeKunde(db: Abfrage, k: Kunde): Promise<void> {
 /* Schreiben                                                                 */
 /* ------------------------------------------------------------------------ */
 
-export async function legeEntwurfAn(db: Abfrage, art: "angebot" | "rechnung", vorlage?: Partial<Entwurf> & { angebotId?: string; anzahlungProzent?: number }): Promise<string> {
+export async function legeEntwurfAn(db: Abfrage, art: "angebot" | "rechnung", vorlage?: Partial<Entwurf> & { angebotId?: string; anzahlungProzent?: number; opportunityId?: string }): Promise<string> {
   await auftraegeSchema(db)
   const id = crypto.randomUUID()
   const heute = heuteBerlin()
   await db(
     `INSERT INTO fin_dokumente (id, art, sprache, titel, kunde, datum, gueltig_bis, zahlungsziel_tage, leistungszeitraum, einleitung, schluss,
-       rabatt_prozent, geschaeftsfeld, positionen, angebot_id, anzahlung_prozent)
-     VALUES ($1,$2,$3,$4,$5::jsonb,$6,$7,$8,$9,$10,$11,$12,$13,$14::jsonb,$15,$16)`,
+       rabatt_prozent, geschaeftsfeld, positionen, angebot_id, anzahlung_prozent, opportunity_id)
+     VALUES ($1,$2,$3,$4,$5::jsonb,$6,$7,$8,$9,$10,$11,$12,$13,$14::jsonb,$15,$16,$17)`,
     [
       id,
       art,
@@ -512,9 +522,10 @@ export async function legeEntwurfAn(db: Abfrage, art: "angebot" | "rechnung", vo
       JSON.stringify(vorlage?.positionen ?? []),
       vorlage?.angebotId ?? null,
       vorlage?.anzahlungProzent ?? null,
+      vorlage?.opportunityId ?? null,
     ],
   )
-  await verlauf(db, id, "angelegt", { art, aus: vorlage?.angebotId ?? null })
+  await verlauf(db, id, "angelegt", { art, aus: vorlage?.angebotId ?? vorlage?.opportunityId ?? null })
   return id
 }
 
