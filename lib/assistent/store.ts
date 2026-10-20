@@ -280,6 +280,30 @@ export async function ladeFreigaben(): Promise<Freigabe[]> {
   return rows.map(alsFreigabe)
 }
 
+/** LinkedIn-Beiträge der Redaktion – unabhängig vom Status, damit nichts verschwindet. */
+export async function ladeBeitraege(limit = 6): Promise<Freigabe[]> {
+  const q = await assistentDb()
+  if (!q) return []
+  const rows = (await q(
+    `SELECT ${FREIGABE_SPALTEN} FROM assistent_freigaben WHERE art = 'linkedin'
+     ORDER BY (status = 'offen') DESC, created_at DESC LIMIT $1`,
+    [limit],
+  )) as FreigabeZeile[]
+  return rows.map(alsFreigabe)
+}
+
+/** Kurzlage für die Übersicht: offene Entscheidungen der Truppe. */
+export async function zaehleOffen(): Promise<{ gesamt: number; linkedin: number }> {
+  const q = await assistentDb()
+  if (!q) return { gesamt: 0, linkedin: 0 }
+  const rows = (await q(
+    `SELECT count(*)::int AS gesamt, count(*) FILTER (WHERE art = 'linkedin')::int AS linkedin
+     FROM assistent_freigaben WHERE status = 'offen'`,
+    [],
+  )) as { gesamt: number; linkedin: number }[]
+  return rows[0] ?? { gesamt: 0, linkedin: 0 }
+}
+
 export type RatStimme = { rolle: string; sagt: string }
 export type RatBeschluss = { was: string; warum: string; kostenEur: number; wer: "truppe" | "emin" }
 export type RatProtokoll = {

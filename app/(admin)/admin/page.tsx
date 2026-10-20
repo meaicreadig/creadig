@@ -15,6 +15,7 @@ import { getVertriebStore, leadStoreConfigured } from "@/lib/lead-store"
 import { SystemErledigt } from "@/components/admin/system-erledigt"
 import { CockpitBand } from "@/components/admin/cockpit-band"
 import { ladeCockpit } from "@/lib/cockpit"
+import { zaehleOffen } from "@/lib/assistent/store"
 
 /**
  * ÜBERSICHT — die Startseite des Admin (ADM-01, 17.09.2026).
@@ -100,7 +101,11 @@ const ENTSCHEIDUNGEN_SICHTBAR = 5
 export default async function Uebersicht() {
   const { t, intl, sprache } = await adminSprachKontext()
   const hasStore = leadStoreConfigured()
-  const [board, cockpit] = await Promise.all([collectAttention(getVertriebStore()), ladeCockpit()])
+  const [board, cockpit, truppe] = await Promise.all([
+    collectAttention(getVertriebStore()),
+    ladeCockpit(),
+    zaehleOffen().catch(() => ({ gesamt: 0, linkedin: 0 })),
+  ])
   if (cockpit.linksOffen?.some((x) => !x.entwurf)) {
     after(() => bereiteNachfassVor().catch((e) => console.error("[nachfass]", e instanceof Error ? e.message : e)))
     after(() =>
@@ -131,6 +136,29 @@ export default async function Uebersicht() {
       <Suspense fallback={<MorgenAssistentLaedt sprache={sprache === "tr" ? "tr" : "de"} />}>
         <MorgenAssistent sprache={sprache === "tr" ? "tr" : "de"} />
       </Suspense>
+
+      <section aria-label="Assistent" className="flex flex-col gap-2.5 sm:flex-row">
+        <Link
+          href="/admin/assistent#eingang-titel"
+          className="flex flex-1 items-center justify-between gap-4 rounded-3xl bg-card px-5 py-4 transition-colors hover:bg-primary/5"
+        >
+          <span className="flex flex-col gap-0.5">
+            <span className="text-sm text-muted-foreground">Truppe · zur Entscheidung</span>
+            <span className="font-sans text-2xl font-semibold text-primary">{truppe.gesamt - truppe.linkedin}</span>
+          </span>
+          <span className="text-sm text-primary">Assistent öffnen</span>
+        </Link>
+        <Link
+          href="/admin/assistent#redaktion"
+          className="flex flex-1 items-center justify-between gap-4 rounded-3xl bg-card px-5 py-4 transition-colors hover:bg-primary/5"
+        >
+          <span className="flex flex-col gap-0.5">
+            <span className="text-sm text-muted-foreground">LinkedIn-Beiträge · warten auf dich</span>
+            <span className="font-sans text-2xl font-semibold text-primary">{truppe.linkedin}</span>
+          </span>
+          <span className="text-sm text-primary">Zur Redaktion</span>
+        </Link>
+      </section>
 
       <CockpitBand daten={cockpit} sprache={sprache === "tr" ? "tr" : "de"} intl={intl} />
 

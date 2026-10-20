@@ -26,6 +26,7 @@ import { AssistentChat } from "@/components/admin/assistent-chat"
 import { collectAttention } from "@/lib/attention"
 import {
   fragenHeute,
+  ladeBeitraege,
   ladeFreigaben,
   ladeLinkedin,
   ladeRaete,
@@ -410,7 +411,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
   const { linkedin: liMeldung } = await searchParams
   const li = await ladeLinkedin().catch(() => null)
   const liName = li ? li.name ?? "dein Profil" : null
-  const [verlauf, freigaben, heute, laeufe, board, raete, rahmen] = await Promise.all([
+  const [verlauf, freigabenAlle, heute, laeufe, board, raete, rahmen, beitraege] = await Promise.all([
     ladeVerlauf(40),
     ladeFreigaben(),
     fragenHeute(),
@@ -418,9 +419,11 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
     collectAttention(getVertriebStore()).catch(() => null),
     ladeRaete(1).catch(() => []),
     firmenRahmen(),
+    ladeBeitraege(6).catch(() => []),
   ])
   after(() => fuehreFaelligeAus().catch(() => undefined))
 
+  const freigaben = freigabenAlle.filter((f) => f.art !== "linkedin")
   const offen = freigaben.filter((f) => f.status === "offen")
   const erledigt = freigaben.filter((f) => f.status !== "offen")
   const system = board?.items ?? []
@@ -429,6 +432,38 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
     <AdminShell title="Assistent" meta={<span className="block">Deine Truppe arbeitet im Hintergrund – du entscheidest</span>}>
       <div className="flex flex-col gap-10">
         <Sitzung rat={raete[0]} rahmen={rahmen} />
+
+        <section id="redaktion" aria-labelledby="redaktion-titel" className="flex scroll-mt-6 flex-col gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-col gap-1">
+              <h2 id="redaktion-titel" className="font-sans text-xl font-semibold text-foreground">
+                LinkedIn · Redaktion
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Thema aus der Geschäftsleitung, Text und Bild von der Redaktion – du gibst frei, dann wird gepostet.
+              </p>
+            </div>
+            <form action={agentStarten}>
+              <input type="hidden" name="agent" value="redaktion" />
+              <button className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+                <PenLine className="size-4" aria-hidden="true" />
+                Neuen Beitrag erstellen
+              </button>
+            </form>
+          </div>
+          <LinkedinStatus name={liName} meldung={liMeldung} />
+          {beitraege.length > 0 ? (
+            <ul className="grid gap-4 lg:grid-cols-2">
+              {beitraege.map((f) => (
+                <FreigabeKarte key={f.id} f={f} linkedin={liName} />
+              ))}
+            </ul>
+          ) : (
+            <p className="rounded-3xl bg-card p-5 text-sm leading-relaxed text-muted-foreground">
+              Noch kein Beitrag. „Neuen Beitrag erstellen“ startet die Redaktion sofort (Text + Bild, ca. 30–60 Sekunden).
+            </p>
+          )}
+        </section>
 
         <section aria-labelledby="truppe-titel" className="flex flex-col gap-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -452,7 +487,6 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
               </h2>
               <span className="text-sm text-primary">{offen.length + system.length} offen</span>
             </div>
-            <LinkedinStatus name={liName} meldung={liMeldung} />
 
             {offen.length > 0 ? (
               <ul className="flex flex-col gap-3">
