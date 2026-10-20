@@ -97,6 +97,12 @@ export async function raiseAlert(kind: string, message: string): Promise<void> {
   console.error(`[alarm] ${text}`)
 
   const hook = process.env.ALERT_WEBHOOK_URL
+  try {
+    const { speichereAlarm } = await import("@/lib/betrieb-alarm")
+    await speichereAlarm(safeKind, text, !hook)
+  } catch (error) {
+    console.error("[alarm] Speichern fehlgeschlagen:", String(error))
+  }
   if (!hook) return
   try {
     /*
