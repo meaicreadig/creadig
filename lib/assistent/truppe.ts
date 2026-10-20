@@ -11,8 +11,10 @@ import { ladeVerkaufslage, MONATSZIEL_EUR as MONATSZIEL } from "@/lib/verkaufen"
 import { erstelleEntwurf, ladeEntwuerfe } from "@/lib/verkaufen-entwurf"
 
 import { firmenRahmen, INHABER } from "./rahmen"
-import { nachfassen } from "./versand"
+import { findeKontaktMail } from "./kontaktsuche"
+import { ergaenzeFehlendeAdressen, istMail, nachfassen } from "./versand"
 import {
+  assistentDb,
   ladeFreigaben,
   ladeRaete,
   legeFreigabeAn,
@@ -271,7 +273,26 @@ Antworte NUR mit JSON:
   }
 }
 
-type Ziel = { firma: string; ort: string; website: string; warum: string; betreff: string; mail: string }
+type Ziel = { firma: string; ort: string; website: string; email?: string; warum: string; betreff: string; mail: string }
+
+const JAEGER_ANZAHL = 8
+
+async function bekannteJaegerFirmen(): Promise<string[]> {
+  const q = await assistentDb()
+  if (!q) return []
+  const rows = (await q(
+    `SELECT DISTINCT regexp_replace(titel, '^Neukunde [^:]+: ', '') AS firma FROM assistent_freigaben WHERE agent = 'jaeger' LIMIT 200`,
+    [],
+  ).catch(() => [])) as { firma: string }[]
+  return rows.map((r) => r.firma)
+}
+
+async function zaehleJaegerLaeufe(): Promise<number> {
+  const q = await assistentDb()
+  if (!q) return 0
+  const rows = (await q(`SELECT count(*)::int AS n FROM assistent_laeufe WHERE agent = 'jaeger'`, []).catch(() => [])) as { n: number }[]
+  return rows[0]?.n ?? 0
+}
 
 const JAGDREVIER = [
   {
@@ -296,24 +317,39 @@ const JAGDREVIER = [
 
 async function jaeger(): Promise<Ergebnis> {
   const woche = kw(new Date())
-  const revier = JAGDREVIER[Number(woche.split("-")[1]) % JAGDREVIER.length]
+  const lauf = (await zaehleJaegerLaeufe()) + Number(woche.split("-")[1])
+  const revier = JAGDREVIER[lauf % JAGDREVIER.length]
+  const bekannt = await bekannteJaegerFirmen()
   const { text } = await generateText({
     model: RECHERCHE,
     prompt: `${INHABER}
-Finde 3 echte, aktuell existierende Firmen als Neukunden für ${revier.produkt}.
+Finde ${JAEGER_ANZAHL} echte, aktuell existierende Firmen als Neukunden für ${revier.produkt}.
 Zielgruppe: ${revier.suche}.
 Nur Firmen mit eigener Webseite, die du in der Quelle gesehen hast. Keine Konzerne. Keine Erfindungen.
+Gib, wenn auf der Webseite sichtbar, die öffentliche Kontakt-E-Mail an (Impressum/Kontakt), sonst leer lassen – niemals raten.
+${bekannt.length ? `Diese Firmen kennen wir schon – NICHT erneut nennen: ${bekannt.slice(0, 80).join(", ")}.` : ""}
 Für jede Firma eine kurze Erstmail auf Deutsch (60–110 Wörter, per Sie, Absender Muhammed Emin Akyol): ein konkreter Bezug zur Firma, ein Nutzen aus "${revier.angebot}", eine kleine Frage am Ende (z. B. 15 Minuten Telefonat). Kein Werbeton.
-Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","warum":"1 Satz, warum gerade diese Firma","betreff":"","mail":""}]`,
+Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","email":"","warum":"1 Satz, warum gerade diese Firma","betreff":"","mail":""}]`,
   })
-  const ziele = jsonListe<Ziel>(text).filter((z) => z?.firma && z?.website?.startsWith("http") && z?.mail)
+  const ziele = jsonListe<Ziel>(text)
+    .filter((z) => z?.firma && z?.website?.startsWith("http") && z?.mail)
+    .slice(0, JAEGER_ANZAHL)
+  const adressen = await Promise.all(ziele.map((z) => findeKontaktMail(z.website).catch(() => null)))
   let neu = 0
-  for (const z of ziele.slice(0, 3)) {
+  for (const [i, z] of ziele.entries()) {
+    let host = ""
+    try {
+      host = new URL(z.website).hostname.replace(/^www\./, "").toLowerCase()
+    } catch {}
+    const genannt = istMail(z.email) && z.email.trim().toLowerCase().endsWith(`@${host}`) ? z.email.trim().toLowerCase() : null
+    const an = adressen[i] ?? genannt
     const id = await legeFreigabeAn({
       art: "mail",
       titel: `Neukunde ${revier.produkt}: ${z.firma} (${z.ort})`,
+      empfaenger: an,
       betreff: z.betreff,
-      inhalt: `${z.mail}\n\n---\nWarum diese Firma: ${z.warum}\nWebseite: ${z.website}\nE-Mail-Adresse bitte im Impressum prüfen und eintragen.`,
+      extra: { adressSuche: an ? "gefunden" : "keine" },
+      inhalt: `${z.mail}\n\n---\nWarum diese Firma: ${z.warum}\nWebseite: ${z.website}\n${an ? `Adresse von der Webseite: ${an}` : "Keine Adresse auf der Webseite gefunden – bitte im Impressum nachsehen."}`,
       quelle: `jaeger:${z.firma.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
       agent: "jaeger",
     })

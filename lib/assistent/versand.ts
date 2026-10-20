@@ -1,12 +1,42 @@
 import "server-only"
 
-import { assistentDb, ergaenzeExtra, legeFreigabeAn, type Freigabe } from "./store"
+import { einzelmailHtml, einzelmailText, type Einzelmail } from "@/lib/mailing/eml"
+import { siteUrl } from "@/lib/termine/mail"
+
+import { findeKontaktMail } from "./kontaktsuche"
+import { assistentDb, ergaenzeExtra, legeFreigabeAn, setzeMailKopf, type Freigabe } from "./store"
 
 /** Tage bis zum Nachfassen je Stufe (1. und 2. Erinnerung). */
 export const NACHFASS_TAGE = [5, 9] as const
 const MAX_STUFE = NACHFASS_TAGE.length
 
 const MAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+
+/** Offene Erstmails ohne Empfänger: Adresse auf der Firmen-Webseite suchen und eintragen. */
+export async function ergaenzeFehlendeAdressen(max = 6): Promise<number> {
+  const q = await assistentDb()
+  if (!q) return 0
+  const rows = (await q(
+    `SELECT id, inhalt, betreff, titel FROM assistent_freigaben
+     WHERE art = 'mail' AND status = 'offen' AND (empfaenger IS NULL OR empfaenger = '')
+       AND NOT extra ? 'adressSuche'
+     ORDER BY created_at DESC LIMIT $1`,
+    [max],
+  ).catch(() => [])) as { id: string; inhalt: string; betreff: string | null; titel: string }[]
+  let gefunden = 0
+  await Promise.all(
+    rows.map(async (r) => {
+      const web = r.inhalt.match(/Webseite:\s*(https?:\/\/\S+)/)?.[1]
+      const adresse = web ? await findeKontaktMail(web) : null
+      if (adresse) {
+        await setzeMailKopf(r.id, adresse, r.betreff || r.titel)
+        gefunden++
+      }
+      await ergaenzeExtra(r.id, { adressSuche: adresse ? "gefunden" : "keine" })
+    }),
+  )
+  return gefunden
+}
 
 export function istMail(s: string | null | undefined): s is string {
   return !!s && s.length <= 200 && MAIL_RE.test(s.trim())
@@ -17,17 +47,38 @@ export function kundenText(inhalt: string): string {
   return inhalt.split(/\n-{3,}\n/)[0].trim()
 }
 
-function escape(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+function kontaktAdresse(): string {
+  const roh = process.env.MAIL_REPLY_TO?.trim() || process.env.LEAD_TO?.trim() || process.env.MAIL_FROM?.trim() || ""
+  return roh.match(/<([^>]+)>/)?.[1]?.trim() || (roh.includes("@") ? roh : "")
 }
 
-/** Persönliche Mail: schlichtes HTML wie aus dem Postfach – keine Werbeoptik, besser für die Zustellung. */
-function alsHtml(text: string): string {
-  const absaetze = text
-    .split(/\n{2,}/)
-    .map((p) => `<p style="margin:0 0 14px">${escape(p).replace(/\n/g, "<br>")}</p>`)
-    .join("")
-  return `<div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;color:#1f2933">${absaetze}</div>`
+/** Wandelt den Agenten-Text in die creaDIG-Einzelmail (gleiches Design wie das Mail-Studio). */
+export function alsEinzelmail(an: string, betreff: string, inhalt: string): Einzelmail {
+  const basis = siteUrl()
+  const zeilen = kundenText(inhalt).split("\n")
+  const ersteZeile = zeilen[0]?.trim() ?? ""
+  const hatAnrede = /^(hallo|guten tag|sehr geehrte|liebe|moin|servus)/i.test(ersteZeile)
+  let rumpf = (hatAnrede ? zeilen.slice(1) : zeilen).join("\n").trim()
+  const gruss = rumpf.match(/\n\s*((?:viele|beste|freundliche|herzliche) grüße|mit freundlichen grüßen)[\s\S]*$/i)
+  if (gruss?.index != null) rumpf = rumpf.slice(0, gruss.index).trim()
+  const ersterSatz = rumpf.replace(/\s+/g, " ").match(/^.{20,160}?[.!?](\s|$)/)?.[0]?.trim() ?? ""
+  return {
+    an,
+    subject: betreff,
+    preheader: ersterSatz,
+    kennung: "",
+    headline: betreff,
+    anrede: hatAnrede ? ersteZeile : "Guten Tag,",
+    body: rumpf,
+    ctaHinweis: "Wählen Sie direkt einen passenden Termin – oder antworten Sie einfach auf diese Mail.",
+    ctaText: "Termin wählen",
+    ctaUrl: `${basis}/termin`,
+    zweitText: "Kontakt",
+    zweitUrl: `${basis}/kontakt`,
+    gruss: "Viele Grüße",
+    telefon: "0176 41965356",
+    kontaktMail: kontaktAdresse(),
+  }
 }
 
 export type VersandErgebnis = { ok: true; id: string } | { ok: false; grund: string }
@@ -40,6 +91,7 @@ export async function sendeFreigabeMail(f: Freigabe, an: string, betreff: string
   const text = kundenText(inhalt)
   if (!text) return { ok: false, grund: "Der Mailtext ist leer." }
   const antwortAn = process.env.MAIL_REPLY_TO?.trim() || process.env.LEAD_TO?.trim()
+  const mail = alsEinzelmail(an.trim(), betreff.slice(0, 200) || f.titel, inhalt)
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -48,9 +100,9 @@ export async function sendeFreigabeMail(f: Freigabe, an: string, betreff: string
         from,
         to: [an.trim()],
         ...(antwortAn ? { reply_to: antwortAn } : {}),
-        subject: betreff.slice(0, 200) || f.titel,
-        text,
-        html: alsHtml(text),
+        subject: mail.subject,
+        text: einzelmailText(mail),
+        html: einzelmailHtml(mail, siteUrl()),
       }),
     })
     const daten = (await res.json().catch(() => ({}))) as { id?: string; message?: string }
