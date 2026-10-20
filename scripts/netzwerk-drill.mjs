@@ -34,7 +34,8 @@ const li = await import("../lib/linkedin.ts")
 const roh = new pg.Client({ connectionString: process.env.NETZWERK_DRILL_URL })
 await roh.connect()
 const q = async (t, par) => (await roh.query(t, par ?? [])).rows
-await q(`DELETE FROM assistent_linkedin`).catch(() => undefined)
+/* Wegwerf-Datenbank: jeder Lauf beginnt leer (requireSafeTarget in pg-abfrage.mjs erlaubt nur lokale/Wegwerf-Ziele). */
+for (const t of ["assistent_linkedin", "assistent_freigaben", "linkedin_connection"]) await q(`DELETE FROM ${t}`).catch(() => undefined)
 
 /* ═══ N1 · LinkedIn ═══ */
 console.log("\nN1 · LinkedIn: eine Verbindung für Werkstatt und Agent")
