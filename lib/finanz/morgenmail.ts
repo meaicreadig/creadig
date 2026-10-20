@@ -7,7 +7,10 @@ import { berechneLage } from "@/lib/finanz/lage"
 import { ladeBelege } from "@/lib/finanz/belege"
 import { ladeOffeneBankUmsaetze } from "@/lib/finanz/bank-abgleich"
 import { protokolliere } from "@/lib/finanz/store"
-import { mailLayout, sendeMail, siteUrl } from "@/lib/termine/mail"
+import { sendeMail, siteUrl } from "@/lib/termine/mail"
+import { FIRMA, kampagnenHtml } from "@/lib/mailing/vorlage"
+import { morgenBriefing, type BriefingSchritt } from "@/lib/admin/morgen-briefing"
+import { zaehleOffen } from "@/lib/assistent/store"
 
 /**
  * Besitzer-Morgenmail (Phase 7) — fasst zusammen, was heute Aufmerksamkeit
@@ -63,40 +66,84 @@ function istDringend(b: MorgenBericht): boolean {
 
 const STUFEN_TEXT = ["", "Zahlungserinnerung", "1. Mahnung", "2. Mahnung"]
 
-function berichtMail(b: MorgenBericht): { subject: string; text: string; html: string } {
+const datumLang = (iso: string) =>
+  new Date(`${iso}T12:00:00Z`).toLocaleDateString("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long" })
+const datumKurz = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("de-DE", { timeZone: "Europe/Berlin", day: "numeric", month: "long" })
+const zeile = (s: string) => s.replace(/\s+/g, " ").trim()
+
+type AssistentTeil = { lage: string | null; schritte: BriefingSchritt[]; impuls: string | null; offen: number }
+
+async function ladeAssistentTeil(): Promise<AssistentTeil> {
+  const [briefing, offen] = await Promise.all([
+    morgenBriefing("de").catch(() => null),
+    zaehleOffen().catch(() => ({ gesamt: 0, linkedin: 0 })),
+  ])
+  return { lage: briefing?.lage ?? null, schritte: briefing?.schritte ?? [], impuls: briefing?.impuls ?? null, offen: offen.gesamt }
+}
+
+/** Morgenbriefing des Assistenten im creaDIG-Markendesign — Finanz ist nur ein Abschnitt davon. */
+function berichtMail(b: MorgenBericht, a: AssistentTeil): { subject: string; text: string; html: string } {
   const basis = siteUrl()
-  const absaetze: string[] = []
-  const details: [string, string][] = []
+  const bloecke: string[] = []
   const dringend = istDringend(b)
 
-  if (!dringend) {
-    absaetze.push("Heute ist nichts Dringendes offen — kein Mahnungsfall, keine Frist in den nächsten 14 Tagen, kein unbearbeiteter Eingang.")
-  } else {
-    if (b.faelligeMahnungen.length) {
-      details.push([
-        "Fällige Mahnungen",
-        b.faelligeMahnungen.map((m) => `${m.nummer} · ${m.kunde} · ${STUFEN_TEXT[m.stufe]} (${m.tageUeberfaellig} Tage überfällig)`).join("\n"),
-      ])
-    }
-    if (b.fristen.length) {
-      details.push(["Fristen (≤14 Tage)", b.fristen.map((f) => `${f.titel} · fällig ${f.faellig} (${f.tageBis >= 0 ? `in ${f.tageBis} Tagen` : `${-f.tageBis} Tage überfällig`})`).join("\n")])
-    }
-    if (b.paragraph19Hinweis) details.push(["§ 19 Kleinunternehmer", b.paragraph19Hinweis])
-    if (b.belegeImKorb > 0) details.push(["Belege im Eingangskorb", `${b.belegeImKorb} Beleg(e) noch ohne Geschäftsfeld`])
-    if (b.bankUmsaetzeOffen > 0) details.push(["Bank-Import", `${b.bankUmsaetzeOffen} Umsatz/Umsätze warten auf Zuordnung`])
-    absaetze.push("Kurzer Überblick über das, was heute Aufmerksamkeit braucht. Nichts davon wurde automatisch verschickt oder gebucht — jede Handlung bleibt ein Klick in Finanz.")
-  }
-  if (b.wachstumsHinweise.length) details.push(["Wachstum & Kapital", b.wachstumsHinweise.join("\n")])
+  bloecke.push(a.lage ? zeile(a.lage) : "Hier ist dein Überblick für heute — was wichtig ist, steht oben.")
 
-  const text = `${absaetze.join("\n\n")}\n\n${details.map(([k, v]) => `${k}:\n${v}`).join("\n\n")}\n\n${basis}/finanz`
-  const html = mailLayout({
-    vorschau: dringend ? "Kurzer Finanz-Überblick für heute." : "Heute ist nichts Dringendes offen.",
-    titel: `Finanz-Überblick · ${b.heute}`,
-    absaetze,
-    details,
-    knopf: { text: "In Finanz öffnen", href: `${basis}/finanz` },
+  if (a.schritte.length) {
+    bloecke.push("## Deine **3 Schritte** heute")
+    bloecke.push(a.schritte.slice(0, 3).map((s, i) => `- [${["zap", "user", "calendar"][i]}] ${zeile(s.titel)}: ${zeile(s.warum)}`).join("\n"))
+  }
+
+  if (a.offen > 0) {
+    bloecke.push(`> **${a.offen}** ${a.offen === 1 ? "Vorschlag wartet" : "Vorschläge warten"} auf deine Freigabe.`)
+  }
+
+  bloecke.push("## Finanzen")
+  const finanz: string[] = []
+  for (const m of b.faelligeMahnungen) {
+    finanz.push(`- [shield] ${STUFEN_TEXT[m.stufe]} fällig: ${m.nummer} · ${zeile(m.kunde)} · ${m.tageUeberfaellig} Tage überfällig`)
+  }
+  for (const f of b.fristen) {
+    const wann = f.tageBis >= 0 ? `fällig am ${datumKurz(f.faellig)}, in ${f.tageBis} Tagen` : `seit ${datumKurz(f.faellig)} fällig, **${-f.tageBis} Tage überfällig**`
+    finanz.push(`- [clock] ${zeile(f.titel)}: ${wann}`)
+  }
+  if (b.paragraph19Hinweis) finanz.push(`- [shield] § 19 Kleinunternehmer: ${zeile(b.paragraph19Hinweis)}`)
+  if (b.belegeImKorb > 0) finanz.push(`- [layers] Belege im Eingangskorb: ${b.belegeImKorb} ${b.belegeImKorb === 1 ? "Beleg wartet" : "Belege warten"} auf ein Geschäftsfeld`)
+  if (b.bankUmsaetzeOffen > 0) finanz.push(`- [layers] Bank-Import: ${b.bankUmsaetzeOffen} ${b.bankUmsaetzeOffen === 1 ? "Umsatz wartet" : "Umsätze warten"} auf Zuordnung`)
+  for (const w of b.wachstumsHinweise) finanz.push(`- [sparkles] Wachstum & Kapital: ${zeile(w)}`)
+  bloecke.push(finanz.length ? finanz.join("\n") : "Bei den Finanzen ist heute nichts offen — keine Frist, keine Mahnung, kein offener Beleg.")
+
+  if (a.impuls) bloecke.push(`## Impuls\n\n${zeile(a.impuls)}`)
+
+  bloecke.push("Ich habe nichts selbst verschickt oder gebucht. Jede Handlung bleibt ein Klick von dir.")
+
+  const datum = datumLang(b.heute)
+  const subject = a.offen > 0 || dringend ? `Dein Morgen · ${datumKurz(b.heute)} — ${a.schritte.length || "ein paar"} Schritte für heute` : `Dein Morgen · ${datumKurz(b.heute)} — alles ruhig`
+  const body = bloecke.join("\n\n")
+  const inhalt = {
+    subject,
+    preheader: a.schritte[0] ? zeile(a.schritte[0].titel) : "Dein Überblick für heute.",
+    headline: `Guten Morgen, Emin. Hier ist **dein Tag.**`,
+    body,
+    ctaText: "Zum Assistenten",
+    ctaUrl: `${basis}/admin/assistent`,
+  }
+  const html = kampagnenHtml(inhalt, {
+    siteUrl: basis,
+    kennung: `Morgenbriefing · ${datum}`,
+    ctaHinweis: a.offen > 0 ? "Gib die wartenden Vorschläge frei — der Rest läuft von allein." : "Schau kurz rein und leg los.",
+    zweitLink: { text: "Finanzen öffnen", url: `${basis}/finanz` },
+    gruss: "Einen starken Tag",
+    absender: "Dein Assistent",
+    rolle: `${FIRMA} · Zentrale`,
   })
-  return { subject: dringend ? `Finanz-Überblick · ${b.heute}` : `Finanz: alles ruhig · ${b.heute}`, text, html }
+  const text = [
+    `Guten Morgen, Emin. Hier ist dein Tag (${datum}).`,
+    body.replace(/^## /gm, "").replace(/^- \[[a-z]+\]\s*/gm, "• ").replace(/^> /gm, "").replace(/\*\*/g, ""),
+    `Zum Assistenten: ${basis}/admin/assistent\nFinanzen: ${basis}/finanz`,
+    `Dein Assistent · ${FIRMA}`,
+  ].join("\n\n")
+  return { subject, text, html }
 }
 
 /** Höchstens eine Morgenmail pro Tag — ein zweiter Cron-Lauf oder ein manueller Trigger am selben Tag verschickt nichts erneut. */
@@ -108,9 +155,9 @@ export async function sendeMorgenmailFallsFaellig(db: Abfrage): Promise<{ versen
   const to = process.env.LEAD_TO?.trim()
   if (!to) return { versendet: false, grund: "LEAD_TO fehlt — keine Empfängeradresse eingerichtet" }
 
-  const bericht = await erstelleMorgenBericht(db)
-  const mail = berichtMail(bericht)
-  const versand = await sendeMail({ to, subject: mail.subject, text: mail.text, html: mail.html })
+  const [bericht, assistent] = await Promise.all([erstelleMorgenBericht(db), ladeAssistentTeil()])
+  const mail = berichtMail(bericht, assistent)
+  const versand = await sendeMail({ to, subject: mail.subject, text: mail.text, html: mail.html, fromName: "creaDIG Assistent" })
   if (!versand.ok) return { versendet: false, grund: versand.grund === "nicht_eingerichtet" ? "RESEND_API_KEY/MAIL_FROM fehlt" : versand.detail }
 
   await protokolliere(db, "morgenmail_gesendet", { datum: heute, mahnungen: bericht.faelligeMahnungen.length, fristen: bericht.fristen.length, belegeImKorb: bericht.belegeImKorb, bankUmsaetzeOffen: bericht.bankUmsaetzeOffen, wachstumsHinweise: bericht.wachstumsHinweise.length })

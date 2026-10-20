@@ -120,10 +120,13 @@ export async function sendeMail(m: {
   text: string
   ics?: string
   replyTo?: string
+  /** Überschreibt nur den Anzeigenamen, die Absenderadresse bleibt die verifizierte. */
+  fromName?: string
 }): Promise<Versand> {
   const key = process.env.RESEND_API_KEY?.trim()
-  const from = process.env.MAIL_FROM?.trim() || process.env.LEAD_FROM?.trim()
-  if (!key || !from) return { ok: false, grund: "nicht_eingerichtet" }
+  const roh = process.env.MAIL_FROM?.trim() || process.env.LEAD_FROM?.trim()
+  if (!key || !roh) return { ok: false, grund: "nicht_eingerichtet" }
+  const from = m.fromName ? `${m.fromName.replace(/[<>"]/g, "")} <${roh.match(/<([^>]+)>/)?.[1] ?? roh}>` : roh
   const replyTo = m.replyTo ?? (process.env.MAIL_REPLY_TO?.trim() || process.env.LEAD_TO?.trim() || undefined)
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
