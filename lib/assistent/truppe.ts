@@ -11,6 +11,7 @@ import { ladeVerkaufslage, MONATSZIEL_EUR as MONATSZIEL } from "@/lib/verkaufen"
 import { erstelleEntwurf, ladeEntwuerfe } from "@/lib/verkaufen-entwurf"
 
 import { firmenRahmen, INHABER } from "./rahmen"
+import { nachfassen } from "./versand"
 import {
   ladeFreigaben,
   ladeRaete,
@@ -420,5 +421,6 @@ export async function fuehreFaelligeAus(): Promise<AgentKey[]> {
     return a.takt === "taeglich" ? berlinTag(zuletzt) !== berlinTag(jetzt) : jetzt.getTime() - zuletzt.getTime() > 6.5 * 86400000
   }).map((a) => a.key)
   for (const key of faellig) await fuehreAgentAus(key)
+  await nachfassen().catch((e) => console.error("[assistent] nachfassen", e instanceof Error ? e.message : e))
   return faellig
 }
