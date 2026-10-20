@@ -1278,6 +1278,32 @@ console.log("\nX · USt-Voranmeldung — Kennzahlen aus dem Hauptbuch")
   p(leer.kz83Cent === -190 && leer.kz83Cent < 0, "X8 mehr Vorsteuer als USt → negative Zahllast (Erstattung)")
 }
 
+/* ══ B · Bescheide wirken auf Fristen ══ */
+console.log("\nB · Steuerbescheide")
+{
+  const B = await import("../lib/finanz/bescheide.ts")
+  await B.bescheideSchema(db)
+  await db(`DELETE FROM fin_fristen WHERE id LIKE 'ABNAHME-b-%'`)
+  await db(`INSERT INTO fin_fristen (id, titel, art, faellig) VALUES
+    ('ABNAHME-b-est1','ESt Dez','est','2099-12-10'),('ABNAHME-b-est2','ESt Mrz','est','2100-03-10'),('ABNAHME-b-alt','ESt alt','est','2000-03-10')`)
+  const v = await B.legeBescheidAn(db, { art: "vorauszahlung", steuerart: "est", jahr: 2099, datum: "2099-01-05", betragCent: 123400, gueltigAb: "2099-06-01", aktenzeichen: "ABNAHME", ablageort: null, notiz: null })
+  const rows = await db(`SELECT id, betrag_cent FROM fin_fristen WHERE id LIKE 'ABNAHME-b-est%' ORDER BY id`)
+  p(v.ok && rows.length === 2 && rows.every((r) => Number(r.betrag_cent) === 123400), "B1 Vorauszahlung setzt den Betrag der offenen ESt-Fristen ab 'gilt ab'")
+  p((await db(`SELECT betrag_cent FROM fin_fristen WHERE id='ABNAHME-b-alt'`))[0].betrag_cent === null, "B2 eine Frist vor 'gilt ab' bleibt unberührt")
+  const n = await B.legeBescheidAn(db, { art: "nachzahlung", steuerart: "est", jahr: 2098, datum: "2099-03-01", betragCent: 500000, gueltigAb: null, aktenzeichen: null, ablageort: null, notiz: null })
+  const f = n.ok ? (await db(`SELECT titel, betrag_cent, to_char(faellig,'YYYY-MM-DD') AS f, art FROM fin_fristen WHERE id IN (SELECT unnest(frist_ids) FROM fin_bescheide WHERE id=$1)`, [n.id]))[0] : null
+  p(f && Number(f.betrag_cent) === 500000 && f.f === "2099-03-31" && f.art === "sonstig", "B3 Nachzahlung → Frist mit Betrag, Bekanntgabe + 30 Tage (zählt nicht als ESt-Vorauszahlung)", JSON.stringify(f))
+  const e = await B.legeBescheidAn(db, { art: "erstattung", steuerart: "ust", jahr: 2098, datum: "2099-03-01", betragCent: 70000, gueltigAb: null, aktenzeichen: null, ablageort: null, notiz: null })
+  const fe = e.ok ? (await db(`SELECT betrag_cent FROM fin_fristen WHERE id IN (SELECT unnest(frist_ids) FROM fin_bescheide WHERE id=$1)`, [e.id]))[0] : null
+  p(fe && Number(fe.betrag_cent) === -70000, "B4 Erstattung → negativer Betrag = erwarteter Zufluss in der Liquidität")
+  p(!(await B.legeBescheidAn(db, { art: "nachzahlung", steuerart: "est", jahr: 2098, datum: "2099-03-01", betragCent: null, gueltigAb: null, aktenzeichen: null, ablageort: null, notiz: null })).ok, "B5 ohne Betrag wird keine Nachzahlung abgelegt")
+  p(!(await B.legeBescheidAn(db, { art: "vorauszahlung", steuerart: "est", jahr: 2099, datum: "2099-01-05", betragCent: 1000, gueltigAb: null, aktenzeichen: null, ablageort: null, notiz: null })).ok, "B6 Vorauszahlung ohne 'gilt ab' wird abgelehnt")
+  await B.storniereBescheid(db, n.id)
+  p((await db(`SELECT 1 FROM fin_fristen WHERE id IN (SELECT unnest(frist_ids) FROM fin_bescheide WHERE id=$1)`, [n.id])).length === 0, "B7 Storno entfernt die noch offene Nachzahlungsfrist, der Bescheid bleibt (storniert) sichtbar")
+  await db(`DELETE FROM fin_fristen WHERE id LIKE 'ABNAHME-b-%'`)
+  await db(`DELETE FROM fin_bescheide WHERE jahr IN (2098, 2099)`)
+}
+
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
 process.exit(fehler === 0 ? 0 : 1)
