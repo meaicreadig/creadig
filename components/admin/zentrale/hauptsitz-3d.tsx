@@ -30,6 +30,77 @@ const FARBE = {
   blau: "#2f5bea",
   achtung: "#d9a13b",
   stoerung: "#d9483b",
+  anthrazit: "#3b4048",
+  glas: "#8fa7b8",
+}
+
+const KLEIDUNG = ["#2f3a4c", "#6b7686", "#e6e2da", "#44505f", "#8a6f5a"]
+
+function Glas({ opacity = 0.32 }: { opacity?: number }) {
+  return (
+    <meshPhysicalMaterial
+      color={FARBE.glas}
+      transparent
+      opacity={opacity}
+      roughness={0.04}
+      metalness={0.15}
+      clearcoat={1}
+      clearcoatRoughness={0.05}
+      envMapIntensity={1.4}
+      depthWrite={false}
+    />
+  )
+}
+
+function Person({ farbe }: { farbe: string }) {
+  return (
+    <group position={[0, 0, 0.6]}>
+      <mesh position={[0, 0.92, 0.04]} castShadow>
+        <capsuleGeometry args={[0.17, 0.36, 4, 12]} />
+        <meshStandardMaterial color={farbe} roughness={0.85} />
+      </mesh>
+      <mesh position={[0, 1.38, -0.02]} castShadow>
+        <sphereGeometry args={[0.11, 16, 12]} />
+        <meshStandardMaterial color="#c9a184" roughness={0.7} />
+      </mesh>
+      <mesh position={[0, 0.56, -0.2]} castShadow>
+        <boxGeometry args={[0.34, 0.13, 0.46]} />
+        <meshStandardMaterial color="#2c313a" roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 0.27, -0.42]}>
+        <boxGeometry args={[0.3, 0.5, 0.11]} />
+        <meshStandardMaterial color="#2c313a" roughness={0.9} />
+      </mesh>
+      {[-0.2, 0.2].map((ax) => (
+        <mesh key={ax} position={[ax, 0.88, -0.16]} rotation={[1.1, 0, 0]}>
+          <capsuleGeometry args={[0.05, 0.3, 4, 8]} />
+          <meshStandardMaterial color={farbe} roughness={0.85} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+function Pflanze() {
+  return (
+    <group>
+      <mesh position={[0, 0.22, 0]} castShadow>
+        <cylinderGeometry args={[0.24, 0.19, 0.44, 20]} />
+        <meshStandardMaterial color="#e9e7e2" roughness={0.6} />
+      </mesh>
+      {[
+        [0, 0.78, 0, 0.32],
+        [0.14, 1.05, 0.05, 0.24],
+        [-0.12, 0.98, -0.06, 0.26],
+        [0.03, 1.28, -0.02, 0.18],
+      ].map(([px, py, pz, r], i) => (
+        <mesh key={i} position={[px, py, pz]} castShadow>
+          <sphereGeometry args={[r, 14, 10]} />
+          <meshStandardMaterial color={i % 2 ? "#4c6b44" : "#5c7d51"} roughness={0.9} />
+        </mesh>
+      ))}
+    </group>
+  )
 }
 
 const ZUSTAND_FARBE: Record<Zustand, string> = {
@@ -106,7 +177,7 @@ function Gehirn({ hoehe }: { hoehe: number }) {
   )
 }
 
-function Arbeitsplatz({ x, z, an, besetzt }: { x: number; z: number; an: boolean; besetzt: boolean }) {
+function Arbeitsplatz({ x, z, an, besetzt, farbe }: { x: number; z: number; an: boolean; besetzt: boolean; farbe: string }) {
   const schirm = useRef<THREE.MeshStandardMaterial>(null)
   useFrame(({ clock }) => {
     // Puls nur bei echtem, frischem Lauf – sonst bleibt der Schirm ruhig.
@@ -156,6 +227,7 @@ function Arbeitsplatz({ x, z, an, besetzt }: { x: number; z: number; an: boolean
           <meshStandardMaterial color={FARBE.alu} metalness={0.7} roughness={0.3} />
         </mesh>
       </group>
+      {besetzt && <Person farbe={farbe} />}
     </group>
   )
 }
@@ -216,7 +288,7 @@ function RaumModell({
           const an = jetzt !== null && !!stand && agentFrisch(stand, jetzt)
           return (
             <group key={i}>
-              <Arbeitsplatz x={plaetze === 1 ? 0 : seite} z={-1.2 + reihe * 2.2} an={an} besetzt={!!stand} />
+              <Arbeitsplatz x={plaetze === 1 ? 0 : seite} z={-1.2 + reihe * 2.2} an={an} besetzt={!!stand} farbe={KLEIDUNG[(raum.etage * 3 + raum.spalte + i) % KLEIDUNG.length]} />
               {gewaehlt && stand && (
                 <Html position={[plaetze === 1 ? 0 : seite, 1.7, -1.2 + reihe * 2.2]} center distanceFactor={10} zIndexRange={[10, 0]}>
                   <span className="pointer-events-none whitespace-nowrap rounded-full bg-card/90 px-2.5 py-1 font-sans text-[11px] text-foreground shadow-sm backdrop-blur">
@@ -228,10 +300,9 @@ function RaumModell({
           )
         })}
         {!leer && (
-          <mesh position={[RAUM_B / 2 - 0.9, 0.55, 2.6]} castShadow>
-            <cylinderGeometry args={[0.22, 0.3, 1.1, 12]} />
-            <meshStandardMaterial color="#4f6b4a" roughness={0.9} />
-          </mesh>
+          <group position={[RAUM_B / 2 - 0.9, 0, 2.6]}>
+            <Pflanze />
+          </group>
         )}
       </group>
 
@@ -334,12 +405,44 @@ function Geschoss({
     for (let x = -BREITE / 2; x <= BREITE / 2 + 0.01; x += 1.5) xs.push(x)
     return xs
   }, [])
+  const seitenPfosten = useMemo(() => {
+    const zs: number[] = []
+    for (let z = -TIEFE / 2 + 1.25; z < TIEFE / 2; z += 1.25) zs.push(z)
+    return zs
+  }, [])
+  const glasH = H - PLATTE
+  const glasY = H / 2 + PLATTE / 2
 
   return (
     <group ref={gruppe} position={[0, basisY, 0]}>
-      <RoundedBox args={[BREITE + 0.6, PLATTE, TIEFE + 0.6]} radius={0.04} smoothness={2} position={[0, PLATTE / 2, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color={FARBE.beton} roughness={0.8} />
+      <RoundedBox args={[BREITE + 0.6, PLATTE, TIEFE + 0.6]} radius={0.03} smoothness={2} position={[0, PLATTE / 2, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color={FARBE.anthrazit} roughness={0.55} metalness={0.35} />
       </RoundedBox>
+
+      {/* Geschossdecke innen sichtbar hell, Kante außen anthrazit wie eine echte Fassadenblende */}
+      <mesh position={[0, H - 0.03, -0.2]}>
+        <boxGeometry args={[BREITE - 0.1, 0.06, TIEFE - 0.5]} />
+        <meshStandardMaterial color="#f1f1ef" roughness={0.95} />
+      </mesh>
+
+      {[-1, 1].map((s) =>
+        seitenPfosten.map((z) => (
+          <mesh key={`${s}${z}`} position={[(s * (BREITE + 0.08)) / 2, glasY, z]} castShadow>
+            <boxGeometry args={[0.1, glasH, 0.05]} />
+            <meshStandardMaterial color={FARBE.anthrazit} metalness={0.5} roughness={0.4} />
+          </mesh>
+        )),
+      )}
+      {[-1, 1].map((s) => (
+        <mesh key={`riegel${s}`} position={[(s * (BREITE + 0.08)) / 2, PLATTE + 0.95, 0]}>
+          <boxGeometry args={[0.1, 0.05, TIEFE]} />
+          <meshStandardMaterial color={FARBE.anthrazit} metalness={0.5} roughness={0.4} />
+        </mesh>
+      ))}
+      <mesh position={[0, PLATTE + 0.95, TIEFE / 2 + 0.04]}>
+        <boxGeometry args={[BREITE, 0.05, 0.08]} />
+        <meshStandardMaterial color={FARBE.anthrazit} metalness={0.5} roughness={0.4} />
+      </mesh>
 
       <mesh position={[0, H / 2 + PLATTE / 2, -TIEFE / 2 + 0.1]} receiveShadow>
         <boxGeometry args={[BREITE, H - PLATTE, 0.2]} />
@@ -354,20 +457,20 @@ function Geschoss({
       ))}
 
       {[-1, 1].map((s) => (
-        <mesh key={s} position={[(s * BREITE) / 2, H / 2 + PLATTE / 2, 0]}>
-          <boxGeometry args={[0.05, H - PLATTE, TIEFE]} />
-          <meshStandardMaterial color="#bcd3e0" transparent opacity={0.22} roughness={0.05} metalness={0.3} />
+        <mesh key={s} position={[(s * BREITE) / 2, glasY, 0]}>
+          <boxGeometry args={[0.03, glasH, TIEFE]} />
+          <Glas opacity={0.3} />
         </mesh>
       ))}
 
-      <mesh position={[0, H / 2 + PLATTE / 2, TIEFE / 2]}>
-        <boxGeometry args={[BREITE, H - PLATTE, 0.04]} />
-        <meshStandardMaterial color="#bcd3e0" transparent opacity={imFokus ? 0.08 : 0.2} roughness={0.04} metalness={0.3} />
+      <mesh position={[0, glasY, TIEFE / 2]}>
+        <boxGeometry args={[BREITE, glasH, 0.03]} />
+        <Glas opacity={imFokus ? 0.1 : 0.26} />
       </mesh>
       {pfosten.map((x) => (
-        <mesh key={x} position={[x, H / 2 + PLATTE / 2, TIEFE / 2 + 0.03]} castShadow>
-          <boxGeometry args={[0.06, H - PLATTE, 0.1]} />
-          <meshStandardMaterial color={FARBE.alu} metalness={0.7} roughness={0.35} />
+        <mesh key={x} position={[x, glasY, TIEFE / 2 + 0.05]} castShadow>
+          <boxGeometry args={[0.05, glasH, 0.14]} />
+          <meshStandardMaterial color={FARBE.anthrazit} metalness={0.5} roughness={0.4} />
         </mesh>
       ))}
 
@@ -455,21 +558,34 @@ function Dach({ y, angehoben }: { y: number; angehoben: boolean }) {
   return (
     <group ref={ref} position={[0, y, 0]}>
       <mesh position={[0, PLATTE / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[BREITE + 0.6, PLATTE, TIEFE + 0.6]} />
-        <meshStandardMaterial color={FARBE.beton} roughness={0.8} />
+        <boxGeometry args={[BREITE + 0.6, PLATTE + 0.25, TIEFE + 0.6]} />
+        <meshStandardMaterial color={FARBE.anthrazit} roughness={0.55} metalness={0.35} />
       </mesh>
-      <mesh position={[0, PLATTE + 0.45, TIEFE / 2 + 0.25]}>
-        <boxGeometry args={[BREITE + 0.6, 0.9, 0.1]} />
-        <meshStandardMaterial color="#bcd3e0" transparent opacity={0.3} metalness={0.3} roughness={0.05} />
+      <mesh position={[0, PLATTE + 0.26, 0]} receiveShadow>
+        <boxGeometry args={[BREITE + 0.2, 0.02, TIEFE + 0.2]} />
+        <meshStandardMaterial color="#9a9ea5" roughness={1} />
       </mesh>
       {[
-        [-6, 1.6, -2],
-        [-2.5, 1.2, -2.6],
-        [5.5, 1.4, -1.5],
+        [-6, 1.5, -2],
+        [-2.2, 1.1, -2.6],
+        [5.5, 1.3, -1.5],
       ].map(([x, s, z]) => (
-        <mesh key={x} position={[x, PLATTE + s / 2, z]} castShadow>
-          <boxGeometry args={[s * 1.6, s, s]} />
-          <meshStandardMaterial color="#c7cbd2" roughness={0.6} metalness={0.2} />
+        <group key={x} position={[x, PLATTE + 0.27, z]}>
+          <mesh position={[0, s / 2, 0]} castShadow>
+            <boxGeometry args={[s * 1.6, s, s]} />
+            <meshStandardMaterial color="#b4b8be" roughness={0.45} metalness={0.55} />
+          </mesh>
+          <mesh position={[0, s + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[s * 0.32, 24]} />
+            <meshStandardMaterial color="#2f343b" roughness={0.6} />
+          </mesh>
+        </group>
+      ))}
+      {/* Photovoltaik-Felder */}
+      {[-8, -5.6, 1, 3.4].map((x) => (
+        <mesh key={`pv${x}`} position={[x, PLATTE + 0.55, 2.4]} rotation={[-0.35, 0, 0]} castShadow>
+          <boxGeometry args={[2.1, 0.05, 1.3]} />
+          <meshStandardMaterial color="#1f2a3d" roughness={0.25} metalness={0.6} />
         </mesh>
       ))}
     </group>
@@ -479,24 +595,60 @@ function Dach({ y, angehoben }: { y: number; angehoben: boolean }) {
 function Umgebung() {
   return (
     <>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow>
         <planeGeometry args={[220, 220]} />
-        <meshStandardMaterial color="#e7e9ec" roughness={1} />
+        <meshStandardMaterial color="#a9b49c" roughness={1} />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 4]} receiveShadow>
-        <planeGeometry args={[BREITE + 14, TIEFE + 18]} />
-        <meshStandardMaterial color="#d6d8dc" roughness={0.9} />
+      {/* Vorplatz mit Plattenbelag */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 3]} receiveShadow>
+        <planeGeometry args={[BREITE + 12, TIEFE + 12]} />
+        <meshStandardMaterial color="#d7d5cf" roughness={0.9} />
       </mesh>
-      {[-12, -6, 6, 12].map((x) => (
-        <group key={x} position={[x, 0, TIEFE / 2 + 7]}>
-          <mesh position={[0, 1.2, 0]} castShadow>
-            <cylinderGeometry args={[0.08, 0.12, 2.4, 8]} />
-            <meshStandardMaterial color="#6b5a47" roughness={0.9} />
+      {/* Straße */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, TIEFE / 2 + 13]} receiveShadow>
+        <planeGeometry args={[220, 7]} />
+        <meshStandardMaterial color="#555a61" roughness={0.95} />
+      </mesh>
+      {Array.from({ length: 24 }).map((_, i) => (
+        <mesh key={`m${i}`} rotation={[-Math.PI / 2, 0, 0]} position={[-69 + i * 6, 0.01, TIEFE / 2 + 13]}>
+          <planeGeometry args={[2.4, 0.14]} />
+          <meshStandardMaterial color="#e8e8e4" roughness={0.8} />
+        </mesh>
+      ))}
+      {/* Eingang mit Vordach */}
+      <group position={[0, 0, TIEFE / 2]}>
+        <mesh position={[0, 3.05, 1.2]} castShadow>
+          <boxGeometry args={[6.4, 0.16, 2.6]} />
+          <meshStandardMaterial color={FARBE.anthrazit} roughness={0.5} metalness={0.4} />
+        </mesh>
+        {[-2.9, 2.9].map((x) => (
+          <mesh key={x} position={[x, 1.5, 2.3]} castShadow>
+            <cylinderGeometry args={[0.07, 0.07, 3, 12]} />
+            <meshStandardMaterial color={FARBE.anthrazit} metalness={0.6} roughness={0.35} />
           </mesh>
-          <mesh position={[0, 3, 0]} castShadow>
-            <sphereGeometry args={[1.3, 16, 12]} />
-            <meshStandardMaterial color="#6f8a63" roughness={0.95} />
+        ))}
+        <mesh position={[0, 2.95, 1.2]}>
+          <boxGeometry args={[5.6, 0.02, 2]} />
+          <meshStandardMaterial color="#fff6e6" emissive="#fff1d6" emissiveIntensity={0.6} toneMapped={false} />
+        </mesh>
+      </group>
+      {[-14, -8, 8, 14, -19, 19].map((x, i) => (
+        <group key={x} position={[x, 0, TIEFE / 2 + (i > 3 ? 2 : 8)]} scale={i > 3 ? 1.25 : 1}>
+          <mesh position={[0, 1.4, 0]} castShadow>
+            <cylinderGeometry args={[0.1, 0.16, 2.8, 10]} />
+            <meshStandardMaterial color="#5a4a3a" roughness={0.95} />
           </mesh>
+          {[
+            [0, 3.4, 0, 1.25],
+            [0.7, 3, 0.3, 0.9],
+            [-0.6, 3.1, -0.3, 0.95],
+            [0.1, 4.2, -0.2, 0.85],
+          ].map(([px, py, pz, r], k) => (
+            <mesh key={k} position={[px, py, pz]} castShadow>
+              <sphereGeometry args={[r, 18, 14]} />
+              <meshStandardMaterial color={k % 2 ? "#566f4a" : "#647f55"} roughness={0.95} />
+            </mesh>
+          ))}
         </group>
       ))}
     </>
