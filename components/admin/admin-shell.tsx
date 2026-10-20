@@ -10,6 +10,8 @@ import { cookies } from "next/headers"
 import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { darfBetreten } from "@/lib/rollen"
+import { NetzFaden } from "@/components/admin/netz-faden"
+import { KNOTEN, NAV_SCHLUESSEL, type NavSchluessel } from "@/lib/zentrale/netz-karte"
 
 /*
  * Die Ziel-Informationsarchitektur (docs/admin-os/program.md) — nur Bereiche,
@@ -21,18 +23,15 @@ import { darfBetreten } from "@/lib/rollen"
  * Fünf Bereiche statt neun loser Punkte (Gesamtplan, Etappe 1). Keine Route
  * wandert oder verschwindet — nur die Einordnung in der Leiste ändert sich.
  */
-const NAV = [
-  { key: "uebersicht", href: "/admin", gruppe: "cockpit" },
-  { key: "assistent", href: "/admin/assistent", gruppe: "cockpit" },
-  { key: "verkaufen", href: "/admin/verkaufen", gruppe: "cockpit" },
-  { key: "gespraech", href: "/admin/gespraech", gruppe: "cockpit" },
-  { key: "termine", href: "/admin/termine", gruppe: "cockpit" },
-  { key: "vertrieb", href: "/admin/vertrieb", gruppe: "vertrieb" },
-  { key: "kunden", href: "/admin/kunden", gruppe: "kunden" },
-  { key: "mailstudio", href: "/admin/marketing/mail", gruppe: "marketing" },
-  { key: "marketing", href: "/admin/marketing", gruppe: "marketing" },
-  { key: "messen", href: "/admin/messen", gruppe: "marketing" },
-] as const
+/*
+ * Schritt 4 (20.10.2026): Das Menü kommt aus der Netz-Karte. Keine Fläche
+ * erscheint in der Leiste, die nicht als Knoten am Gehirn hängt.
+ */
+const NAV = KNOTEN.flatMap((k) =>
+  k.nav && (NAV_SCHLUESSEL as readonly string[]).includes(k.id)
+    ? [{ key: k.id as NavSchluessel, href: k.href, gruppe: k.nav.gruppe }]
+    : [],
+)
 
 /*
  * Verbindungen, Automationen und Einrichtung sind Technik, die im Hintergrund
@@ -159,6 +158,8 @@ export async function AdminShell({
             </div>
             {meta && <div className="bg-card text-muted-foreground shrink-0 rounded-full px-4 py-2 text-sm shadow-sm">{meta}</div>}
           </header>
+
+          <NetzFaden sprache={sprache === "tr" ? "tr" : "de"} owner={rolle === "owner"} />
 
           <div className="mt-10">{children}</div>
 
