@@ -66,11 +66,12 @@ async function db(): Promise<Abfrage | null> {
 }
 
 export function eingangAktiv(): boolean {
-  return !!process.env.MAIL_EINGANG_DOMAIN?.trim() && !!process.env.RESEND_API_KEY?.trim()
+  return !!process.env.MAIL_EINGANG_DOMAIN?.trim() && !!resendKey()
 }
 
+// Reading received mails needs a full-access key; the sending key is restricted.
 function resendKey(): string | null {
-  return process.env.RESEND_API_KEY?.trim() || null
+  return process.env.RESEND_FULL_ACCESS_KEY?.trim() || process.env.RESEND_API_KEY?.trim() || null
 }
 
 type Empfangen = { id: string; from: string; to: string[]; subject: string | null; text: string | null; html: string | null; created_at: string }
