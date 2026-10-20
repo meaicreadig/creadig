@@ -113,6 +113,36 @@ console.log("\nN2 · Kampagnen-Versand ist zuordenbar, aber kein Nachfassen")
   p(unbeantwortet?.status.art === "kampagne", "N3 eine unbeantwortete Kampagnen-Mail steht nicht als „Kette beendet“, sondern als Kampagne", unbeantwortet?.status.art)
 }
 
+/* ═══ N4 · Automation ↔ Truppe ═══ */
+console.log("\nN4 · Zwei Motoren, eine Meldung")
+{
+  await q(`CREATE TABLE IF NOT EXISTS automation_runs (id text PRIMARY KEY, ausloeser text, ereignis text, gegenstand_art text, gegenstand text, schluessel text UNIQUE, wirkung text, zustand text DEFAULT 'offen')`)
+  await q(`DELETE FROM automation_runs`)
+  await q(`INSERT INTO automation_runs (id, ausloeser, ereignis, gegenstand_art, gegenstand, schluessel, wirkung, zustand) VALUES
+    ('r1','abnahme-erinnert-an-freigabe','project.accepted','opportunity','deal-A','k1','erinnern','offen'),
+    ('r2','abnahme-erinnert-an-freigabe','project.accepted','opportunity','deal-B','k2','erinnern','erledigt'),
+    ('r3','verlust-prueft-muster','opportunity.status','opportunity','deal-C','k3','pruefen','offen')`)
+  const erinnert = await store.offeneAutomationErinnerungen(["deal-A", "deal-B", "deal-C", "deal-D"])
+  p(erinnert.has("deal-A"), "N4 offene Erinnerung am Deal: der Vertriebsagent meldet ihn nicht doppelt")
+  p(!erinnert.has("deal-B"), "N4 eine erledigte Erinnerung unterdrückt nichts")
+  p(!erinnert.has("deal-C"), "N4 nur Erinnerungen zählen als gleichwertig (eine Prüfung ist keine)")
+  p(!erinnert.has("deal-D"), "N4 ein Deal ohne Automation-Eintrag bleibt Kandidat")
+  await q(`DROP TABLE automation_runs`)
+  p((await store.offeneAutomationErinnerungen(["deal-A"])).size === 0, "N4 fehlt die Tabelle, fällt die Truppe nicht aus (nichts offen)")
+}
+
+/* ═══ N5 · Betriebsalarm überwacht alle sieben Agenten ═══ */
+console.log("\nN5 · Betriebsalarm")
+{
+  const alarm = await import("../lib/betrieb-alarm.ts")
+  const truppe = await import("../lib/assistent/truppe.ts")
+  const taeglich = truppe.AGENTEN.filter((a) => a.takt === "taeglich").map((a) => a.key).sort()
+  const woechentlich = truppe.AGENTEN.filter((a) => a.takt === "woechentlich").map((a) => a.key).sort()
+  p(JSON.stringify([...alarm.TAEGLICHE_AGENTEN].sort()) === JSON.stringify(taeglich), "N5 tägliche Liste = AGENTEN mit takt=taeglich", taeglich.join(","))
+  p(JSON.stringify([...alarm.WOECHENTLICHE_AGENTEN].sort()) === JSON.stringify(woechentlich), "N5 wöchentliche Liste = AGENTEN mit takt=woechentlich", woechentlich.join(","))
+  p(alarm.TAEGLICHE_AGENTEN.length + alarm.WOECHENTLICHE_AGENTEN.length === truppe.AGENTEN.length, "N5 jeder Agent der Truppe wird überwacht")
+}
+
 await roh.end()
 console.log(fehler === 0 ? "\nAlle Pruefungen bestanden — die Systeme kennen sich.\n" : `\nABGEBROCHEN — ${fehler} Befund(e)\n`)
 process.exit(fehler ? 1 : 0)

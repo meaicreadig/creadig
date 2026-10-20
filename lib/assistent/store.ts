@@ -263,6 +263,24 @@ export async function speichereLinkedin(v: {
   )
 }
 
+/**
+ * Für welche Gegenstände (Vorgangs-Ids) steht bereits eine OFFENE Erinnerung der Automation
+ * (`automation_runs`, Wirkung „erinnern") auf der Liste des Inhabers? Die Truppe schlägt dafür
+ * nichts Zweites vor — beide Motoren bleiben, nur die Doppelmeldung entfällt.
+ * Fehlt die Tabelle, gilt: nichts offen (kein Ausfall der Truppe wegen der Automation).
+ */
+export async function offeneAutomationErinnerungen(gegenstaende: string[]): Promise<Set<string>> {
+  if (gegenstaende.length === 0) return new Set()
+  const q = await assistentDb()
+  if (!q) return new Set()
+  const rows = (await q(
+    `SELECT DISTINCT gegenstand FROM automation_runs
+      WHERE zustand = 'offen' AND wirkung = 'erinnern' AND gegenstand = ANY($1::text[])`,
+    [gegenstaende],
+  ).catch(() => [])) as { gegenstand: string }[]
+  return new Set(rows.map((r) => r.gegenstand))
+}
+
 export async function trenneLinkedin(kanal: LinkedinKanal) {
   const q = await assistentDb()
   if (q) await q(`DELETE FROM assistent_linkedin WHERE id = $1`, [kanal])

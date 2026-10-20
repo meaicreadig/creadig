@@ -22,6 +22,7 @@ import {
   letzteArtikel,
   letzteLaeufe,
   neueFreigabeId,
+  offeneAutomationErinnerungen,
   protokolliereLauf,
   quelleBekannt,
   speichereRat,
@@ -73,9 +74,16 @@ async function vertrieb(): Promise<Ergebnis> {
   const { deals } = await ladeVerkaufslage()
   const woche = kw(new Date())
   const kandidaten = deals.filter((d) => d.warnungen.length > 0).slice(0, 4)
+  /* Steht für den Deal schon eine offene Erinnerung der Automation (lib/automation.ts), melden wir ihn nicht ein zweites Mal. */
+  const schonErinnert = await offeneAutomationErinnerungen(kandidaten.map((d) => d.id))
   let neu = 0
+  let uebersprungen = 0
   for (const deal of kandidaten) {
     if (neu >= 2) break
+    if (schonErinnert.has(deal.id)) {
+      uebersprungen++
+      continue
+    }
     const quelle = `deal:${deal.id}:${woche}`
     if (await quelleBekannt(quelle)) continue
     await erstelleEntwurf(deal)
@@ -92,7 +100,9 @@ async function vertrieb(): Promise<Ergebnis> {
     if (id) neu++
   }
   return {
-    ergebnis: kandidaten.length ? `${neu} Mailentwürfe für ${kandidaten.length} gefährdete Abschlüsse` : "Alle Abschlüsse im Takt",
+    ergebnis: kandidaten.length
+      ? `${neu} Mailentwürfe für ${kandidaten.length} gefährdete Abschlüsse${uebersprungen ? ` (${uebersprungen} bereits als Automation-Erinnerung offen)` : ""}`
+      : "Alle Abschlüsse im Takt",
     anzahl: neu,
   }
 }
