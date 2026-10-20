@@ -8,6 +8,7 @@ import { pruefeZugang } from "@/lib/admin-widerruf"
 import { antworte } from "@/lib/assistent/agent"
 import { AGENT_KEYS, fuehreAgentAus, type AgentKey } from "@/lib/assistent/truppe"
 import { veroeffentliche } from "@/lib/assistent/linkedin"
+import { erkenneLoeschwunsch, loescheFirmen } from "@/lib/assistent/loeschen"
 import { istMail, markiereAntwort, sendeFreigabeMail } from "@/lib/assistent/versand"
 import {
   aendereInhalt,
@@ -68,6 +69,7 @@ export async function ratAntworten(form: FormData): Promise<void> {
   const antwort = form.get("antwort")
   if (typeof id !== "string" || typeof antwort !== "string" || !antwort.trim()) return
   await beantworteRat(id.slice(0, 80), antwort.trim().slice(0, 2000))
+  await erkenneLoeschwunsch(antwort, id.slice(0, 80)).catch((e) => console.error("[loeschen] erkennen", e))
   revalidatePath("/admin/assistent")
 }
 
@@ -106,6 +108,19 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
       return
     }
     await ergaenzeExtra(fid, { gesendetAt: new Date().toISOString(), mailId: r.id, fehler: undefined })
+  }
+
+  if (status === "freigegeben" && f.art === "loeschen") {
+    if (form.get("bestaetigt") !== "ja") return
+    const r = await loescheFirmen(f.extra.orgIds ?? [])
+    if (!r.ok) {
+      await ergaenzeExtra(fid, { fehler: r.grund })
+      revalidatePath("/admin/assistent")
+      return
+    }
+    await ergaenzeExtra(fid, { fehler: undefined })
+    revalidatePath("/admin/kunden")
+    revalidatePath("/admin/verkaufen")
   }
 
   const kanal = form.get("ziel") === "firma" ? "firma" : "inhaber"

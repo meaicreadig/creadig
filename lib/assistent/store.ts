@@ -50,7 +50,7 @@ const SCHEMA = [
     beantwortet_at timestamptz)`,
 ]
 
-export const FREIGABE_ARTEN = ["mail", "aufgabe", "termin", "linkedin", "kapital", "notiz"] as const
+export const FREIGABE_ARTEN = ["mail", "aufgabe", "termin", "linkedin", "kapital", "notiz", "loeschen"] as const
 export type FreigabeArt = (typeof FREIGABE_ARTEN)[number]
 
 export type Nachricht = { id: string; rolle: "user" | "assistant"; text: string; zeit: string }
@@ -83,6 +83,8 @@ export type FreigabeExtra = {
   stufe?: number
   vorgaenger?: string
   nachfassId?: string
+  /** Löschauftrag: betroffene Firmen */
+  orgIds?: string[]
 }
 
 export type Lauf = { agent: string; ergebnis: string; anzahl: number; fehler: string | null; zeit: string }
