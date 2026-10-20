@@ -2,6 +2,7 @@ import "server-only"
 
 import { randomUUID } from "node:crypto"
 
+import { legeFreigabeAn } from "@/lib/assistent/store"
 import { findeAblauf } from "@/lib/motor/ablaeufe"
 import { motorDb } from "@/lib/motor/db"
 import { ereignis } from "@/lib/motor/ereignis"
@@ -52,6 +53,13 @@ export async function takt(): Promise<TaktErgebnis> {
            VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (schluessel) DO NOTHING`,
           [`vs_${randomUUID()}`, `${id}:${schrittNr}`, id, ablauf.id, schritt.art, String(run.subjekt), run.kontakt_id ?? null],
         )
+        await inWarteschlange(q, {
+          schluessel: `${id}:${schrittNr}`,
+          ablaufName: ablauf.name.de,
+          schrittTitel: schritt.titel.de,
+          subjekt: String(run.subjekt),
+          kontaktId: (run.kontakt_id as string | null) ?? null,
+        })
       }
 
       const naechster = ablauf.schritte[schrittNr + 1]
@@ -79,6 +87,8 @@ export async function takt(): Promise<TaktErgebnis> {
     }
   }
 
+  await altlastenSpiegeln(q)
+
   await q(
     `INSERT INTO motor_takt (id, letzter_lauf, ergebnis) VALUES ('takt', now(), $1::jsonb)
      ON CONFLICT (id) DO UPDATE SET letzter_lauf = now(), ergebnis = EXCLUDED.ergebnis`,
@@ -86,6 +96,66 @@ export async function takt(): Promise<TaktErgebnis> {
   ).catch(() => {})
 
   return ergebnis
+}
+
+/**
+ * Eine Warteschlange: Motor-Vorschläge wurden früher von keiner Seite gelesen.
+ * Jetzt landet jeder Schritt als Aufgabe in assistent_freigaben – dort, wo Emin
+ * ohnehin entscheidet. Dublettensperre über quelle "motor:<run>:<schritt>".
+ */
+async function inWarteschlange(
+  q: Abfrage,
+  v: { schluessel: string; ablaufName: string; schrittTitel: string; subjekt: string; kontaktId: string | null },
+): Promise<void> {
+  try {
+    let wer = ""
+    if (v.kontaktId) {
+      const k = await q(`SELECT name, email FROM contacts WHERE id = $1 LIMIT 1`, [v.kontaktId]).catch(() => [])
+      if (k[0]) wer = String(k[0].name ?? k[0].email ?? "")
+    }
+    await legeFreigabeAn({
+      art: "aufgabe",
+      titel: wer ? `${v.schrittTitel} – ${wer}` : v.schrittTitel,
+      inhalt: [
+        `Ablauf: ${v.ablaufName}`,
+        `Schritt: ${v.schrittTitel}`,
+        wer ? `Kontakt: ${wer}` : `Bezug: ${v.subjekt}`,
+      ].join("\n"),
+      quelle: `motor:${v.schluessel}`,
+      agent: "motor",
+      extra: { bezug: v.subjekt, warum: `Automatischer Ablauf „${v.ablaufName}“` },
+    })
+  } catch (error) {
+    console.error("[motor] Warteschlange nicht erreichbar:", error instanceof Error ? error.message : error)
+  }
+}
+
+/** Ältere offene Motor-Vorschläge einmalig nachziehen (idempotent über quelle). */
+async function altlastenSpiegeln(q: Abfrage): Promise<void> {
+  try {
+    const offen = await q(
+      `SELECT schluessel, ablauf, art, subjekt, kontakt_id FROM motor_vorschlaege
+        WHERE status = 'offen' ORDER BY created_at DESC LIMIT 50`,
+      [],
+    )
+    for (const v of offen) {
+      const ablauf = findeAblauf(String(v.ablauf))
+      const schritt = ablauf?.schritte.find((s) => s.art === String(v.art))
+      await inWarteschlange(q, {
+        schluessel: String(v.schluessel),
+        ablaufName: ablauf?.name.de ?? String(v.ablauf),
+        schrittTitel: schritt?.titel.de ?? String(v.art),
+        subjekt: String(v.subjekt),
+        kontaktId: (v.kontakt_id as string | null) ?? null,
+      })
+      await q(`UPDATE motor_vorschlaege SET status = 'erledigt', erledigt_at = now() WHERE schluessel = $1`, [
+        String(v.schluessel),
+      ])
+    }
+  } catch (error) {
+    if (tabelleFehlt(error, "motor_vorschlaege")) return
+    console.error("[motor] Altlasten nicht gespiegelt:", error instanceof Error ? error.message : error)
+  }
 }
 
 /** Ereignisse, die nur durch Zeit entstehen — z. B. "Termin ist vorbei". */
