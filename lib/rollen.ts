@@ -230,6 +230,8 @@ export const FLAECHEN: readonly Flaeche[] = [
   { pfad: "/admin/kunden/:id", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
 
   { pfad: "/admin/verkaufen", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
+  /* Assistent sieht Abschlüsse, Lage und Messen — nur der Inhaber. */
+  { pfad: "/admin/assistent", klasse: "fremde-personen", fuer: ["owner"] },
   { pfad: "/admin/messen", klasse: "eigene-lage", fuer: ["owner", "vertrieb", "redaktion"] },
   { pfad: "/admin/vertrieb", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   { pfad: "/admin/vertrieb/anfragen", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },

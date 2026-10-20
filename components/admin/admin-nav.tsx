@@ -14,6 +14,7 @@ import {
   MessagesSquare,
   Presentation,
   Send,
+  Sparkles,
   Target,
   TrendingUp,
   X,
@@ -24,6 +25,7 @@ export type NavItem = { href: string; label: string; hint: string; gruppe: strin
 
 const ICONS: Record<string, LucideIcon> = {
   uebersicht: LayoutDashboard,
+  assistent: Sparkles,
   verkaufen: Target,
   messen: Presentation,
   gespraech: MessagesSquare,

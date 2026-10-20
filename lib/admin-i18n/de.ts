@@ -29,6 +29,7 @@ export const de = {
     marketing: { label: "Marketing-Übersicht", hint: "LinkedIn, Kanäle, Reaktionen auf einen Blick" },
     veroeffentlichungen: { label: "Veröffentlichungen", hint: "Was hinausging, und was zurückkam" },
     uebersicht: { label: "Übersicht", hint: "Was heute zählt" },
+    assistent: { label: "Assistent", hint: "Chat, Sprache, Freigaben" },
     verkaufen: { label: "Heute verkaufen", hint: "Abschlüsse, Ziel, nächster Zug" },
     messen: { label: "Messen", hint: "Glasfaser, Digital, 3D-Druck, E-Commerce" },
     gespraech: { label: "Gesprächsraum", hint: "Anrufen, mitschreiben, Folgetermin" },
@@ -1581,7 +1582,7 @@ export const de = {
     titel: "Etwas ist schiefgegangen",
     hinweisTitel: "Diese Ansicht konnte nicht geladen werden",
     hinweis:
-      "Der Fehler liegt auf unserer Seite. Häufigste Ursache: eine Datenquelle antwortet nicht. Das heißt nicht, dass Daten fehlen — nur, dass sie gerade nicht erreichbar sind.",
+      "Der Fehler liegt auf unserer Seite. Häufigste Ursache: eine Datenquelle antwortet nicht. Das heißt nicht, dass Daten fehlen ��� nur, dass sie gerade nicht erreichbar sind.",
     erneut: "Erneut versuchen",
     digest: "Kennung fürs Protokoll:",
   },
