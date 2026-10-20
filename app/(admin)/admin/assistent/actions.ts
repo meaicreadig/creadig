@@ -8,6 +8,7 @@ import { pruefeZugang } from "@/lib/admin-widerruf"
 import { antworte } from "@/lib/assistent/agent"
 import { AGENT_KEYS, fuehreAgentAus, type AgentKey } from "@/lib/assistent/truppe"
 import {
+  beantworteRat,
   fragenHeute,
   ladeVerlauf,
   setzeFreigabe,
@@ -51,6 +52,15 @@ export async function agentStarten(form: FormData): Promise<void> {
   const key = form.get("agent")
   if (typeof key !== "string" || !AGENT_KEYS.includes(key as AgentKey)) return
   await fuehreAgentAus(key as AgentKey)
+  revalidatePath("/admin/assistent")
+}
+
+export async function ratAntworten(form: FormData): Promise<void> {
+  await pruefe()
+  const id = form.get("id")
+  const antwort = form.get("antwort")
+  if (typeof id !== "string" || typeof antwort !== "string" || !antwort.trim()) return
+  await beantworteRat(id.slice(0, 80), antwort.trim().slice(0, 2000))
   revalidatePath("/admin/assistent")
 }
 
