@@ -958,6 +958,9 @@ export const de = {
       "Nicht was fehlt, sondern was als Nächstes beweisbar wird. Diese Ansicht erfindet nichts — sie liest die Freigaben, die Produktbelege, die Messreihe und die offenen Owner-Tatsachen und sortiert sie danach, wie nah sie an öffentlich sind.",
     meta: (oeffentlich: number, offen: number) => `${oeffentlich} öffentlich · ${offen} offen`,
     kundenfaelle: (n: number) => `${n} freigegebene Kundenfälle`,
+    gateGruen: (z: string) => `Beleg-Gate: letzter Lauf ${z} — grün.`,
+    gateRot: (z: string, n: number) => `Beleg-Gate: letzter Lauf ${z} — ROT, ${n} Verstoß/Verstöße:`,
+    gateKein: "Beleg-Gate: noch kein Lauf aufgezeichnet (läuft im Build; ohne Datenbank im Build bleibt hier nichts stehen).",
     naechsterTitel: "Die wirksamste nächste Handlung",
     leer: "Nichts offen. Jeder Beleg, den dieses Haus führen kann, ist öffentlich.",
     art: {

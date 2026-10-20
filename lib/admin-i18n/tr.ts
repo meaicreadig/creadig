@@ -949,6 +949,9 @@ export const tr: AdminTexte = {
       "Eksik olan değil, sırada neyin kanıtlanabilir olduğu. Bu görünüm hiçbir şey uydurmaz — onayları, ürün kanıtlarını, ölçüm serisini ve açık Owner gerçeklerini okuyup bunları kamuya ne kadar yakın olduklarına göre sıralar.",
     meta: (oeffentlich, offen) => `${oeffentlich} kamuda · ${offen} açık`,
     kundenfaelle: (n) => `${n} onaylanmış müşteri vakası`,
+    gateGruen: (z) => `Belge kapısı: son çalıştırma ${z} — yeşil.`,
+    gateRot: (z, n) => `Belge kapısı: son çalıştırma ${z} — KIRMIZI, ${n} ihlal:`,
+    gateKein: "Belge kapısı: henüz kayıtlı çalıştırma yok (build sırasında çalışır; build'de veritabanı yoksa burada kayıt kalmaz).",
     naechsterTitel: "En etkili sonraki hareket",
     leer: "Açık bir şey yok. Bu işletmenin sunabildiği her kanıt kamudadır.",
     art: {

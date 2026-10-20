@@ -242,7 +242,7 @@ export default async function Verbindungen() {
 
 type Texte = Awaited<ReturnType<typeof adminSprachKontext>>["t"]["verbindungen"]
 
-function Karte({
+async function Karte({
   eintrag,
   v,
   zeitformat,
@@ -253,7 +253,7 @@ function Karte({
   zeitformat: Intl.DateTimeFormat
   schreibsperre: boolean
 }) {
-  const gemessen = letztePruefung(eintrag.id)
+  const gemessen = await letztePruefung(eintrag.id)
   const titelId = `verbindung-${eintrag.id}`
 
   return (

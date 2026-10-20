@@ -190,6 +190,24 @@ console.log("\nN6 · Termin-Kette mit Sprache")
   }
 }
 
+/* ═══ N7 · Prüfregister (Beleg-Gate, Verbindungsprüfung) ═══ */
+console.log("\nN7 · Prüfregister")
+{
+  await q(`DROP TABLE IF EXISTS betrieb_pruefung`)
+  const reg = await import("../lib/betrieb-pruefung.ts")
+  const gate = await import("../lib/beleg-betrieb.ts")
+  const vp = await import("../lib/verbindungen-pruefung.ts")
+  await reg.schreibePruefung("beleg-gate", { ok: false, verstoesse: ["Beispiel-Verstoß"], anzahlVerstoesse: 1, produkte: 3 })
+  const g = await gate.ladeGateLauf()
+  p(g && g.ok === false && g.anzahlVerstoesse === 1 && g.verstoesse[0] === "Beispiel-Verstoß", "N7 roter Lauf wird mit Verstoß gelesen", JSON.stringify(g))
+  await reg.schreibePruefung("beleg-gate", { ok: true, verstoesse: [], anzahlVerstoesse: 0, produkte: 3 })
+  p((await gate.ladeGateLauf())?.ok === true, "N7 neuer Lauf ersetzt den alten")
+  const r = await vp.verbindungPruefen("email-ausgang", "drill")
+  const wieder = await vp.letztePruefung("email-ausgang")
+  p(wieder && wieder.befund === r.befund && wieder.at === r.at, "N7 Verbindungsprüfung überlebt den Prozess (aus der Tabelle gelesen)")
+  p((await vp.pruefprotokoll()).length >= 1, "N7 Protokoll listet die Prüfung")
+}
+
 await roh.end()
 console.log(fehler === 0 ? "\nAlle Pruefungen bestanden — die Systeme kennen sich.\n" : `\nABGEBROCHEN — ${fehler} Befund(e)\n`)
 process.exit(fehler ? 1 : 0)
