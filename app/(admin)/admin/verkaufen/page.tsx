@@ -5,7 +5,9 @@ import { AdminField, AdminInput, AdminSelect, AdminTextarea, Pill, SectionHeader
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { datumAnzeige } from "@/lib/geschaeftszeit"
 import { ladeVerkaufslage, MONATSZIEL_EUR, OFFENE_STUFEN, WAHRSCHEINLICHKEIT, type OffeneStufe, type Warnung } from "@/lib/verkaufen"
-import { dealAnlegen } from "./actions"
+import { ladeEntwuerfe } from "@/lib/verkaufen-entwurf"
+import { Sparkles } from "lucide-react"
+import { dealAnlegen, entwurfErstellen } from "./actions"
 
 export const dynamic = "force-dynamic"
 
@@ -124,7 +126,7 @@ export async function generateMetadata() {
 export default async function VerkaufenPage() {
   const { sprache, intl } = await adminSprachKontext()
   const t = TEXTE[sprache === "tr" ? "tr" : "de"]
-  const lage = await ladeVerkaufslage()
+  const [lage, entwuerfe] = await Promise.all([ladeVerkaufslage(), ladeEntwuerfe()])
   const euro = (n: number) => `${n.toLocaleString(intl)} €`
   const zielAnteil = Math.min(100, Math.round((lage.gewonnenMonat / MONATSZIEL_EUR) * 100))
 
@@ -209,12 +211,45 @@ export default async function VerkaufenPage() {
                       <p className="text-sm leading-relaxed text-muted-foreground">{t.zuege[d.stufe]}</p>
                     </div>
 
-                    <Link
-                      href={`/admin/vertrieb/pipeline/${d.id}`}
-                      className="mt-auto self-start rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-                    >
-                      {t.oeffnen}
-                    </Link>
+                    {entwuerfe[d.id] ? (
+                      <details className="rounded-2xl bg-muted p-4">
+                        <summary className="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary">
+                          <Sparkles className="size-4" aria-hidden />
+                          Mailentwurf: {entwuerfe[d.id].betreff}
+                        </summary>
+                        <p className="mt-3 whitespace-pre-line text-sm leading-relaxed">{entwuerfe[d.id].text}</p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <a
+                            href={`mailto:?subject=${encodeURIComponent(entwuerfe[d.id].betreff)}&body=${encodeURIComponent(entwuerfe[d.id].text)}`}
+                            className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                          >
+                            Prüfen & senden
+                          </a>
+                          <form action={entwurfErstellen}>
+                            <input type="hidden" name="deal" value={d.id} />
+                            <button type="submit" className="rounded-full bg-card px-4 py-2 text-sm">Neu entwerfen</button>
+                          </form>
+                        </div>
+                      </details>
+                    ) : null}
+
+                    <div className="mt-auto flex flex-wrap gap-2">
+                      <Link
+                        href={`/admin/vertrieb/pipeline/${d.id}`}
+                        className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                      >
+                        {t.oeffnen}
+                      </Link>
+                      {!entwuerfe[d.id] && (
+                        <form action={entwurfErstellen}>
+                          <input type="hidden" name="deal" value={d.id} />
+                          <button type="submit" className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm font-medium text-primary">
+                            <Sparkles className="size-4" aria-hidden />
+                            Mail entwerfen
+                          </button>
+                        </form>
+                      )}
+                    </div>
                   </Surface>
                 </li>
               ))}

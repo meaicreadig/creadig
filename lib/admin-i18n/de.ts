@@ -30,6 +30,7 @@ export const de = {
     veroeffentlichungen: { label: "Veröffentlichungen", hint: "Was hinausging, und was zurückkam" },
     uebersicht: { label: "Übersicht", hint: "Was heute zählt" },
     verkaufen: { label: "Heute verkaufen", hint: "Abschlüsse, Ziel, nächster Zug" },
+    messen: { label: "Messen", hint: "Glasfaser, Digital, 3D-Druck, E-Commerce" },
     gespraech: { label: "Gesprächsraum", hint: "Anrufen, mitschreiben, Folgetermin" },
     termine: { label: "Termine", hint: "Verfügbarkeit, Sperren, Buchungen" },
     anfragen: { label: "Anfragen", hint: "Eingang, Qualifizierung, nächster Schritt" },

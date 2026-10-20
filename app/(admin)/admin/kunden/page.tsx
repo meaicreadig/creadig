@@ -10,7 +10,11 @@ import {
 import {
   Unknown,
 } from "@/components/admin/primitives-i18n"
+import { Plus } from "lucide-react"
+
 import { KundenShell } from "@/components/admin/kunden-shell"
+import { KundeLoeschen } from "@/components/admin/kunde-loeschen"
+import { kundeAnlegen } from "./actions"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import type { AdminTexte } from "@/lib/admin-i18n"
 import { getVertriebStore } from "@/lib/lead-store"
@@ -33,7 +37,7 @@ const BUCKET_VALUES = ["", "kunde-ohne-chance", "mit-chance", "ohne-chance"] as 
 export default async function OrganisationenPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; historie?: string; bucket?: string }>
+  searchParams: Promise<{ q?: string; historie?: string; bucket?: string; meldung?: string }>
 }) {
   const { t, intl } = await adminSprachKontext()
   const store = getVertriebStore()
@@ -62,6 +66,33 @@ export default async function OrganisationenPage({
       meta={<span className="block">{t.kundenListe.gesamt(page.total)}</span>}
       available
     >
+      {params.meldung && (
+        <p role="status" className="mb-6 rounded-2xl bg-muted px-4 py-3 text-sm">{params.meldung}</p>
+      )}
+      <details className="mb-8 rounded-3xl bg-muted p-5">
+        <summary className="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary">
+          <Plus className="size-4" aria-hidden />
+          Neuen Kunden anlegen
+        </summary>
+        <form action={kundeAnlegen} className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <AdminField label="Firma / Verein" htmlFor="neu-name">
+            <AdminInput id="neu-name" name="name" required maxLength={160} />
+          </AdminField>
+          <AdminField label="Ort" htmlFor="neu-city">
+            <AdminInput id="neu-city" name="city" maxLength={120} />
+          </AdminField>
+          <AdminField label="Website" htmlFor="neu-website">
+            <AdminInput id="neu-website" name="website" inputMode="url" placeholder="beispiel.de" />
+          </AdminField>
+          <AdminField label="Notiz" htmlFor="neu-note">
+            <AdminInput id="neu-note" name="note" maxLength={1000} />
+          </AdminField>
+          <button type="submit" className="self-start rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground md:col-span-2">
+            Anlegen
+          </button>
+        </form>
+      </details>
+
       <form method="get" data-wache="aus" className="flex flex-wrap items-end gap-4">
         <AdminField label={t.kundenListe.suche} htmlFor="q" className="flex-1 basis-64">
           <AdminInput id="q" name="q" type="search" defaultValue={search} placeholder={t.kundenListe.suchePlatzhalter} />
@@ -123,13 +154,18 @@ function OrganisationTable({
           {rows.map((o) => (
             <tr key={o.id} className="border-line hover:bg-muted/40 border-b last:border-b-0">
               <Td>
-                <Link
-                  href={`/admin/kunden/${o.id}`}
-                  className="text-gold-text text-sm underline underline-offset-4"
-                >
-                  {o.name}
-                </Link>
-                {o.industry && <span className="text-muted-foreground block text-xs">{o.industry}</span>}
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <Link
+                      href={`/admin/kunden/${o.id}`}
+                      className="text-gold-text text-sm underline underline-offset-4"
+                    >
+                      {o.name}
+                    </Link>
+                    {o.industry && <span className="text-muted-foreground block text-xs">{o.industry}</span>}
+                  </div>
+                  <KundeLoeschen id={o.id} name={o.name} />
+                </div>
               </Td>
               <Td>
                 <span className="text-xs">

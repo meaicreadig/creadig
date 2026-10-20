@@ -1,3 +1,5 @@
+import { AppleKalender } from "@/components/admin/apple-kalender"
+import { appleQuelle, appleTermine } from "@/lib/termine/apple"
 import Link from "next/link"
 
 import {
@@ -73,10 +75,13 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
   const feedKey = secret ? await sign("termine-feed", secret) : null
   const feedUrl = feedKey ? `${siteUrl().replace(/^https?:/, "webcal:")}/api/termine/feed?key=${feedKey}` : null
   const tz = einstellungen.timezone
+  const [appleUrl, appleListe] = await Promise.all([appleQuelle().catch(() => null), appleTermine(7)])
+  const apple = { quelle: appleUrl, termine: appleListe }
 
   return (
     <AdminShell title="Termine" lead="Verfügbarkeit, Sperren und gebuchte Gespräche — alles an einem Ort.">
       <div className="flex flex-col gap-8">
+        <AppleKalender feedUrl={feedUrl} quelle={apple.quelle} termine={apple.termine} />
         {sp.meldung && (
           <p role="status" className="border-gold/40 bg-gold/10 text-foreground rounded-md border px-4 py-3 text-sm">
             {sp.meldung}
@@ -261,17 +266,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ m
           </section>
         </div>
 
-        {feedUrl && (
-          <Surface padding="sm">
-            <p className="text-sm font-medium">Apple Kalender</p>
-            <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
-              Auf dem iPhone oder Mac öffnen — gebuchte Termine erscheinen dann automatisch im Kalender.
-            </p>
-            <a href={feedUrl} className="text-gold-text mt-2 inline-block text-sm underline underline-offset-4">
-              Kalender abonnieren
-            </a>
-          </Surface>
-        )}
       </div>
     </AdminShell>
   )
