@@ -190,6 +190,7 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
   vertrieb: Handshake,
   messen: CalendarRange,
   kapital: Coins,
+  finanz: Coins,
   redaktion: PenLine,
 }
 

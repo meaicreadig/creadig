@@ -29,7 +29,7 @@ import {
   type RatProtokoll,
 } from "./store"
 
-export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "redaktion"] as const
+export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "redaktion", "finanz"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
 
 export type AgentInfo = {
@@ -46,6 +46,7 @@ export const AGENTEN: AgentInfo[] = [
   { key: "lage", name: "Lage", aufgabe: "Sammelt alles, was im System auf deine Entscheidung wartet.", takt: "taeglich", ki: false },
   { key: "vertrieb", name: "Vertrieb", aufgabe: "Findet stille oder überfällige Abschlüsse und schreibt die nächste Mail.", takt: "taeglich", ki: true },
   { key: "messen", name: "Messen", aufgabe: "Bereitet jede Messe vor, bei der du teilnimmst: Plan, Kontakte, Unterkunft.", takt: "taeglich", ki: false },
+  { key: "finanz", name: "Finanz", aufgabe: "Legt Folgerechnungen aus Abos als Entwurf an und schlägt Mahnungen vor. Versendet nie selbst.", takt: "taeglich", ki: false },
   { key: "kapital", name: "Kapital", aufgabe: "Recherchiert Förderungen, Kredite und Investoren mit Quelle und Frist.", takt: "woechentlich", ki: true },
   { key: "redaktion", name: "Redaktion", aufgabe: "Wählt das Thema nach den Beschlüssen der Geschäftsleitung, schreibt den Beitrag und erzeugt das Bild dazu.", takt: "woechentlich", ki: true },
 ]
@@ -112,6 +113,11 @@ function naechsterBeginn(m: Messe, heute: Date): Date {
   const j = heute.getFullYear()
   const d = new Date(j, m.monat - 1, 1)
   return d < heute ? new Date(j + 1, m.monat - 1, 1) : d
+}
+
+async function finanz(): Promise<Ergebnis> {
+  const { finanzAgentLauf } = await import("@/lib/finanz/agent")
+  return finanzAgentLauf()
 }
 
 async function messen(): Promise<Ergebnis> {
@@ -445,7 +451,7 @@ Antworte NUR mit JSON: {"lage":"2 Sätze","stimmen":[{"rolle":"CEO","sagt":""},{
   return { ergebnis: `Sitzung KW ${woche.split("-")[1]}: ${p.beschluesse.length} Beschlüsse`, anzahl: p.beschluesse.length }
 }
 
-const LAEUFER: Record<AgentKey, () => Promise<Ergebnis>> = { lage, vertrieb, messen, kapital, redaktion, jaeger, rat }
+const LAEUFER: Record<AgentKey, () => Promise<Ergebnis>> = { lage, vertrieb, messen, finanz, kapital, redaktion, jaeger, rat }
 
 export async function fuehreAgentAus(key: AgentKey): Promise<void> {
   try {

@@ -1,11 +1,11 @@
 import Link from "next/link"
-import { Archive, CalendarClock, Calculator, Car, Compass, FileCheck2, FileText, Package, Receipt, Settings, Target, TrendingUp, Waves } from "lucide-react"
+import { Archive, CalendarClock, Repeat, Calculator, Car, Compass, FileCheck2, FileText, Package, Receipt, Settings, Target, TrendingUp, Waves } from "lucide-react"
 
 import { Logo } from "@/components/brand/logo"
 import { Abmelden } from "@/components/finanz/anmeldung"
 import { finanzBasis } from "@/lib/finanz/basis"
 
-export type FinanzBereich = "heute" | "angebote" | "rechnungen" | "leistungen" | "geldfluss" | "belege" | "ziele" | "steuern" | "ustva" | "bescheide" | "pauschalen" | "investment" | "grundlagen"
+export type FinanzBereich = "heute" | "angebote" | "rechnungen" | "leistungen" | "geldfluss" | "belege" | "ziele" | "steuern" | "ustva" | "bescheide" | "abos" | "pauschalen" | "investment" | "grundlagen"
 
 type Bereich = { key: FinanzBereich; pfad: string; label: string; Icon: typeof Compass }
 
@@ -16,6 +16,7 @@ const GRUPPEN: { titel: string; bereiche: Bereich[] }[] = [
     bereiche: [
       { key: "angebote", pfad: "/angebote", label: "Angebote", Icon: FileText },
       { key: "rechnungen", pfad: "/rechnungen", label: "Rechnungen", Icon: FileCheck2 },
+      { key: "abos", pfad: "/abos", label: "Wiederkehrend", Icon: Repeat },
       { key: "leistungen", pfad: "/leistungen", label: "Leistungen", Icon: Package },
     ],
   },

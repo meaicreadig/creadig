@@ -1385,6 +1385,36 @@ console.log("\nZ · Kurzlage — Frist-Nähe und Überfälliges")
   p(kl.naechsteFrist === null || (typeof kl.naechsteFrist.tage === "number" && kl.naechsteFrist.titel.length > 0), "Z2 nächste Frist hat Titel und Tage oder ist ehrlich leer")
 }
 
+/* ══ W · Wiederkehrende Rechnungen ══ */
+console.log("\nW · Abos — Entwurf statt Versand, genau einmal")
+{
+  const A = await import("../lib/finanz/abos.ts")
+  p(A.addMonate("2026-01-31", 1) === "2026-02-28" && A.addMonate("2028-01-31", 1) === "2028-02-29", "W1 Monatsende wird geklemmt (31.01. + 1 Monat)")
+  p(A.addMonate("2026-11-15", 3) === "2027-02-15" && A.addMonate("2026-12-01", 12) === "2027-12-01", "W2 Quartal und Jahr über den Jahreswechsel")
+  p(A.zeitraumText("2026-10-01", "monat") === "Oktober 2026" && A.zeitraumText("2026-10-01", "quartal") === "Oktober – Dezember 2026" && A.zeitraumText("2026-11-01", "quartal") === "November 2026 – Januar 2027", "W3 Leistungszeitraum im Klartext")
+  const kunde = { name: "ABNAHME Abo", firma: "ABNAHME Abo GmbH", strasse: "", plzOrt: "", land: "Deutschland", email: "abnahme-abo@example.invalid", ustId: "" }
+  p(!(await A.legeAboAn(db, { titel: "x", kunde, beschreibung: "", nettoCent: 0, ustSatz: 19, intervall: "monat", start: "2026-10-22", geschaeftsfeld: "digitalprodukte" })).ok, "W4 Betrag 0 wird abgelehnt")
+  const r = await A.legeAboAn(db, { titel: "ABNAHME Wartung", kunde, beschreibung: "", nettoCent: 20000, ustSatz: 19, intervall: "monat", start: "2026-10-22", geschaeftsfeld: "digitalprodukte" })
+  const vorher = Number((await db(`SELECT count(*) AS c FROM fin_dokumente`))[0].c)
+  const zuFrueh = await A.erzeugeFaelligeAboEntwuerfe(db, "2026-10-10")
+  p(zuFrueh.filter((e) => r.ok && e.aboId === r.id).length === 0, "W5 vor dem Vorlauf entsteht nichts")
+  const lauf = await Promise.all([A.erzeugeFaelligeAboEntwuerfe(db, "2026-10-20"), A.erzeugeFaelligeAboEntwuerfe(db, "2026-10-20")])
+  const meine = lauf.flat().filter((e) => r.ok && e.aboId === r.id)
+  p(meine.length === 1, "W6 zwei gleichzeitige Läufe erzeugen genau EINEN Entwurf", String(meine.length))
+  const d = meine[0] ? await ladeDokument(db, meine[0].id) : null
+  p(d && d.status === "entwurf" && d.nummer === null && d.leistungszeitraum === "Oktober 2026", "W7 Entwurf ohne Nummer, nicht versendet, mit Leistungszeitraum")
+  p(d && d.positionen[0].preisCent === 20000 && d.positionen[0].ustSatz === 19, "W8 Position wie im Abo (200 € netto, 19 %)")
+  const abo = (await A.ladeAbos(db)).find((x) => r.ok && x.id === r.id)
+  p(abo && abo.naechste === "2026-11-22" && abo.letzterEntwurfId === meine[0]?.id, "W9 Termin rückt um einen Monat vor")
+  p(Number((await db(`SELECT count(*) AS c FROM fin_dokumente`))[0].c) === vorher + 1, "W10 es entsteht kein weiteres Dokument")
+  if (r.ok) {
+    await A.setzeAboAktiv(db, r.id, false)
+    const nach = await A.erzeugeFaelligeAboEntwuerfe(db, "2026-12-31")
+    p(nach.filter((e) => e.aboId === r.id).length === 0, "W11 pausiertes Abo erzeugt nichts")
+    p((await A.ladeAbos(db)).some((x) => x.id === r.id), "W12 Pausieren löscht nicht — das Abo bleibt sichtbar")
+  }
+}
+
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
 process.exit(fehler === 0 ? 0 : 1)
