@@ -138,7 +138,6 @@ export async function ladeKundenkartenKopf(organisationId: string, optionen: { g
     }
   }
   const zahl = (v: unknown) => Number(v ?? 0)
-  const chancen = `SELECT id FROM opportunities WHERE organisation_id = $1 AND excluded_reason IS NULL`
 
   const [geld, potenzial, kontakt] = await Promise.all([
     ladeKundenGeld(q, heuteIso(), [organisationId])
