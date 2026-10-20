@@ -16,6 +16,7 @@ import {
   setOpportunityOffer,
   setOpportunityResponsible,
   setOpportunityStatus,
+  setOrganisationLifecycle,
 } from "@/app/(admin)/admin/vertrieb/actions"
 import { ActivityLog } from "@/components/admin/activity-log"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
@@ -88,6 +89,10 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
 
     return <VertriebShell title={t.chance.titel} available={false}>{null}</VertriebShell>
   }
+
+  /* Phase 2c — Vorschlag „Als Kunde markieren": nur wenn gewonnen und die Organisation noch nicht Kunde ist. */
+  const organisation = opp.status === "won" && opp.organisationId ? await store.getOrganisation(opp.organisationId).catch(() => null) : null
+  const kundeVorschlag = organisation !== null && organisation.lifecycle !== "kunde"
 
   const closed = TERMINAL_STATES.includes(opp.status)
   /*
@@ -219,6 +224,16 @@ export default async function ChanceDetail({ params }: { params: Promise<{ id: s
                   <a href="#angebotsmappe-titel" className="text-gold-text underline underline-offset-4">{t.chance.zumAngebot}</a>
                   <a href="#lieferung-titel" className="text-gold-text underline underline-offset-4">{t.chance.zurLieferung}</a>
                 </p>
+                {activities.some((a) => a.kind === "finanz.entwurf") ? (
+                  <p className="type-small text-foreground/90 mt-3 text-pretty">{t.chance.finanzEntwurfHinweis}</p>
+                ) : null}
+                {kundeVorschlag && organisation ? (
+                  <form action={setOrganisationLifecycle.bind(null, organisation.id)} className="mt-3 flex flex-wrap items-center gap-3">
+                    <input type="hidden" name="lifecycle" value="kunde" />
+                    <p className="type-small text-muted-foreground max-w-md text-pretty">{t.chance.alsKundeHinweis}</p>
+                    <button type="submit" className="cta-quiet px-4 py-2 text-sm">{t.chance.alsKundeMarkieren}</button>
+                  </form>
+                ) : null}
                 <p className="text-muted-foreground mt-2 text-xs">{t.chance.keineAutomatik}</p>
               </Surface>
             ) : null}

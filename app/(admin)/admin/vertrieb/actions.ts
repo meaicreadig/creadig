@@ -571,6 +571,8 @@ export async function setOrganisationLifecycle(id: string, form: FormData): Prom
   if (typeof stage !== "string" || !(LIFECYCLE_STAGES as readonly string[]).includes(stage)) return
   await (await requireStore()).updateOrganisationLifecycle(id, stage as LifecycleStage)
   refresh(`/admin/kunden/${id}`, "/admin/kunden")
+  /* Der „Als Kunde markieren"-Vorschlag auf der Chance verschwindet sofort. */
+  revalidatePath("/admin/vertrieb/pipeline/[id]", "page")
 }
 
 /* ── Standorte ────────────────────────────────────────────────────────────── */
