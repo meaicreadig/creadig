@@ -1451,6 +1451,21 @@ console.log("\nQ · Jahresziel-Vorschlag")
   p(jahreszielVorschlagCent(1_000_000, 365) >= 1_250_000, "Q3 am Jahresende mindestens bisheriger Umsatz +25 %")
 }
 
+/* ══ S · Leistungskatalog aus der Website ══ */
+console.log("\nS · Katalog = Website-Angebote (eine Preisquelle)")
+{
+  const { ladeLeistungen } = await import("../lib/finanz/auftraege/store.ts")
+  const { offers } = await import("../lib/offers.ts")
+  const l = await ladeLeistungen(db)
+  const pub = offers.filter((o) => o.published && o.amount !== null)
+  p(pub.every((o) => l.some((x) => x.id === `leistung-site-${o.key}` && x.preisCent === o.amount * 100)), "S1 jedes veröffentlichte Website-Angebot steht mit seinem Preis im Katalog")
+  p(!l.some((x) => x.id === "leistung-site-analyse"), "S2 ein Angebot ohne veröffentlichten Preis (Systemanalyse) wird nicht erfunden")
+  await db(`UPDATE fin_leistungen SET preis_cent = 12345 WHERE id = 'leistung-site-website'`)
+  const { uebernehmeWebsiteLeistungen } = await import("../lib/finanz/auftraege/website-leistungen.ts")
+  await uebernehmeWebsiteLeistungen(db)
+  p((await db(`SELECT preis_cent FROM fin_leistungen WHERE id='leistung-site-website'`))[0].preis_cent == 12345, "S3 ein vom Owner geänderter Preis wird nie überschrieben")
+}
+
 console.log(`\n  ${fehler === 0 ? "Finanz rechnet, nummeriert und gleicht ab, wie es soll." : `${fehler} Pruefung(en) fehlgeschlagen.`}\n`)
 await close()
 process.exit(fehler === 0 ? 0 : 1)

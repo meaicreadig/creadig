@@ -1,6 +1,7 @@
 import "server-only"
 
 import { legeFreigabeAn } from "@/lib/assistent/store"
+import { legeAngebotsEntwuerfeAusChancen } from "@/lib/finanz/angebot-aus-chance"
 import { ordneAllesAutomatischZu } from "@/lib/finanz/auto"
 import { erzeugeFaelligeAboEntwuerfe } from "@/lib/finanz/abos"
 import { heuteBerlin } from "@/lib/finanz/auftraege/rechnen"
@@ -23,6 +24,7 @@ export async function finanzAgentLauf(): Promise<{ ergebnis: string; anzahl: num
   const entwuerfe = await erzeugeFaelligeAboEntwuerfe(db, heuteBerlin())
   for (const e of entwuerfe) await protokolliere(db, "abo_entwurf", { entwurf: e.id, abo: e.aboId, zeitraum: e.zeitraum })
 
+  const angebote = await legeAngebotsEntwuerfeAusChancen(db).catch(() => [])
   const auto = await ordneAllesAutomatischZu(db).catch(() => null)
   const bericht = await erstelleMorgenBericht(db)
   let mahnungen = 0
@@ -45,10 +47,11 @@ export async function finanzAgentLauf(): Promise<{ ergebnis: string; anzahl: num
 
   const teile = [
     entwuerfe.length ? `${entwuerfe.length} Folgerechnung(en) als Entwurf` : null,
+    angebote.length ? `${angebote.length} Angebots-Entwurf/-Entwürfe aus dem Vertrieb` : null,
     mahnungen ? `${mahnungen} Mahnvorschlag/-vorschläge` : null,
     auto && auto.belegeVerlauf + auto.belegeKi ? `${auto.belegeVerlauf + auto.belegeKi} Beleg(e) zugeordnet` : null,
     auto && auto.bankAusgaben ? `${auto.bankAusgaben} Abbuchung(en) gebucht` : null,
     auto && auto.bankEingaenge ? `${auto.bankEingaenge} Zahlungseingang/-eingänge zugeordnet` : null,
   ].filter(Boolean)
-  return { ergebnis: teile.length ? teile.join(" · ") : "Nichts zu tun", anzahl: entwuerfe.length + mahnungen + (auto ? auto.belegeVerlauf + auto.belegeKi + auto.bankAusgaben + auto.bankEingaenge : 0) }
+  return { ergebnis: teile.length ? teile.join(" · ") : "Nichts zu tun", anzahl: entwuerfe.length + angebote.length + mahnungen + (auto ? auto.belegeVerlauf + auto.belegeKi + auto.bankAusgaben + auto.bankEingaenge : 0) }
 }

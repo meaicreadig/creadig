@@ -1,6 +1,7 @@
 import { FinanzShell, OhneSpeicher } from "@/components/finanz/shell"
 import { AdminField, AdminInput, AdminSelect, AdminTextarea } from "@/components/admin/primitives"
 import { leistungSpeichern, leistungUmschalten } from "@/app/(finanz)/finanz/auftraege/actions"
+import { Karte } from "@/components/finanz/karte"
 import { finanzDb } from "@/lib/finanz/store"
 import { GESCHAEFTSFELDER } from "@/lib/finanz/belege"
 import { EINHEITEN, formatEuro, UST_SAETZE } from "@/lib/finanz/auftraege/rechnen"
@@ -19,37 +20,45 @@ export default async function Leistungen() {
   const liste = await ladeLeistungen(db)
 
   return (
-    <FinanzShell aktiv="leistungen" titel="Leistungen" unterzeile="Dein Katalog mit festen Preisen. Einmal pflegen – jedes Angebot und jede Rechnung greift darauf zu.">
-      <section aria-labelledby="l-neu" className="bg-card flex flex-col gap-5 rounded-[2rem] p-6">
-        <h2 id="l-neu" className="text-lg font-semibold">Neue Leistung</h2>
+    <FinanzShell aktiv="leistungen" titel="Leistungen" unterzeile="Dein Katalog – gefüllt aus den Angeboten deiner Website (gleiche Preisquelle). Einmal pflegen, jedes Angebot und jede Rechnung greift darauf zu.">
+      <Karte titel="Neue Leistung" untertitel="Einzelne Leistung zum Katalog hinzufügen">
         <LeistungsForm />
-      </section>
+      </Karte>
 
-      <section aria-labelledby="l-alle" className="flex flex-col gap-3">
-        <h2 id="l-alle" className="sr-only">Katalog</h2>
-        {liste.length === 0 && <p className="bg-card text-muted-foreground rounded-3xl p-6 text-sm">Noch keine Leistungen im Katalog.</p>}
-        {liste.map((l) => (
-          <details key={l.id} className={`bg-card rounded-[2rem] p-5 ${l.aktiv ? "" : "opacity-60"}`}>
-            <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-3">
-              <span className="font-medium">
-                {l.titel}
-                <span className="text-muted-foreground font-normal"> · {FELDER.find((f) => f.key === l.geschaeftsfeld)?.label}</span>
-                {!l.aktiv && <span className="text-muted-foreground font-normal"> · Intern — noch nicht verkaufsfähig</span>}
-              </span>
-              <span className="text-primary font-semibold tabular-nums">
-                {formatEuro(l.preisCent)} <span className="text-muted-foreground text-xs font-normal">/ {l.einheit} · {l.ustSatz} %</span>
-              </span>
-            </summary>
-            <div className="mt-5 flex flex-col gap-4">
-              <LeistungsForm l={l} />
-              <form action={leistungUmschalten}>
-                <input type="hidden" name="id" value={l.id} />
-                <button className="text-muted-foreground hover:text-primary text-sm">{l.aktiv ? "Deaktivieren (bleibt in alten Dokumenten)" : "Wieder aktivieren"}</button>
-              </form>
-            </div>
-          </details>
-        ))}
-      </section>
+      {liste.length === 0 && <p className="bg-card text-muted-foreground rounded-3xl p-6 text-sm">Noch keine Leistungen im Katalog.</p>}
+      {FELDER.map((f) => {
+        const mit = liste.filter((l) => l.geschaeftsfeld === f.key)
+        if (!mit.length) return null
+        const aktiv = mit.filter((l) => l.aktiv)
+        return (
+          <Karte key={f.key} titel={f.label} untertitel={`${aktiv.length} aktiv${mit.length > aktiv.length ? ` · ${mit.length - aktiv.length} intern` : ""}`} zahl={String(mit.length)} fuss="Leistungen" offen>
+            <ul className="flex flex-col gap-2">
+              {mit.map((l) => (
+                <li key={l.id}>
+                  <details className={`bg-background rounded-2xl p-4 ${l.aktiv ? "" : "opacity-60"}`}>
+                    <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-3">
+                      <span className="font-medium">
+                        {l.titel}
+                        {!l.aktiv && <span className="text-muted-foreground font-normal"> · Intern — noch nicht verkaufsfähig</span>}
+                      </span>
+                      <span className="text-primary font-semibold tabular-nums">
+                        {formatEuro(l.preisCent)} <span className="text-muted-foreground text-xs font-normal">/ {l.einheit} · {l.ustSatz} %</span>
+                      </span>
+                    </summary>
+                    <div className="mt-5 flex flex-col gap-4">
+                      <LeistungsForm l={l} />
+                      <form action={leistungUmschalten}>
+                        <input type="hidden" name="id" value={l.id} />
+                        <button className="text-muted-foreground hover:text-primary text-sm">{l.aktiv ? "Deaktivieren (bleibt in alten Dokumenten)" : "Wieder aktivieren"}</button>
+                      </form>
+                    </div>
+                  </details>
+                </li>
+              ))}
+            </ul>
+          </Karte>
+        )
+      })}
     </FinanzShell>
   )
 }

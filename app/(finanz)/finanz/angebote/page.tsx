@@ -1,5 +1,6 @@
 import { FinanzShell, OhneSpeicher } from "@/components/finanz/shell"
 import { AuftragsListe, aufgabenFuer } from "@/components/finanz/auftraege/liste"
+import { legeAngebotsEntwuerfeAusChancen } from "@/lib/finanz/angebot-aus-chance"
 import { finanzBasis } from "@/lib/finanz/basis"
 import { finanzDb } from "@/lib/finanz/store"
 import { formatEuro, heuteBerlin } from "@/lib/finanz/auftraege/rechnen"
@@ -14,6 +15,7 @@ export default async function Angebote() {
   const db = await finanzDb().catch(() => null)
   if (!db) return <FinanzShell aktiv="angebote" titel="Angebote"><OhneSpeicher /></FinanzShell>
 
+  await legeAngebotsEntwuerfeAusChancen(db).catch(() => null)
   const [docs, basis] = await Promise.all([ladeDokumente(db, ["angebot"]), finanzBasis()])
   const heute = heuteBerlin()
   const jahr = heute.slice(0, 4)

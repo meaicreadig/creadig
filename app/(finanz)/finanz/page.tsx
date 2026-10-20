@@ -52,6 +52,20 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
     ladeAbos(db).catch(() => []),
     db(`SELECT count(*) AS c FROM fin_dokumente WHERE art = 'rechnung' AND status = 'entwurf'`, []).then((r) => Number(r[0]?.c ?? 0)).catch(() => 0),
   ])
+  const zaehle = (sql: string) => db(sql, []).then((r) => Number(r[0]?.c ?? 0)).catch(() => 0)
+  const [korb, bankOffen, angebotEntwuerfe] = await Promise.all([
+    zaehle(`SELECT count(*) AS c FROM fin_belege WHERE geschaeftsfeld IS NULL AND art = 'beleg' AND NOT archiviert`),
+    zaehle(`SELECT count(*) AS c FROM fin_bank_umsaetze WHERE status = 'offen'`),
+    zaehle(`SELECT count(*) AS c FROM fin_dokumente WHERE art = 'angebot' AND status = 'entwurf'`),
+  ])
+  const wartet = [
+    { n: angebotEntwuerfe, text: "Angebots-Entwürfe prüfen und senden", href: `${basis}/angebote` },
+    { n: entwuerfe, text: "Rechnungs-Entwürfe prüfen und senden", href: `${basis}/rechnungen` },
+    { n: kurz.ueberfaellig, text: "überfällige Rechnungen mahnen", href: `${basis}/rechnungen` },
+    { n: bankOffen, text: "Bank-Umsätze ohne Zuordnung", href: `${basis}/geldfluss` },
+    { n: korb, text: "Belege ohne Geschäftsfeld", href: `${basis}/belege` },
+    { n: kurz.naechsteFrist && kurz.naechsteFrist.tage <= 14 ? 1 : 0, text: kurz.naechsteFrist ? `Frist: ${kurz.naechsteFrist.titel} (${kurz.naechsteFrist.tage} T)` : "", href: `${basis}/steuern` },
+  ].filter((x) => x.n > 0)
   const inv = investierbar(frei, verlauf)
   const aboJahr = abos.filter((a) => a.aktiv).reduce((sum, a) => sum + a.positionen.reduce((x, p) => x + p.preisCent * p.menge, 0) * (a.intervall === "monat" ? 12 : a.intervall === "quartal" ? 4 : 1), 0)
   const [felder, abgleichsStand, ziele, diversifikation] = await Promise.all([
@@ -73,6 +87,25 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
         paragraph19={paragraph19}
         paragraph19Vorschau={paragraph19Vorschau}
       />
+
+      <section aria-labelledby="wartet" className="bg-card flex flex-col gap-3 rounded-[2rem] p-6">
+        <h2 id="wartet" className="text-lg font-semibold">Wartet auf dich</h2>
+        {wartet.length === 0 ? (
+          <p className="text-muted-foreground text-sm">Nichts. Alles Vorbereitbare ist erledigt — das System arbeitet im Hintergrund weiter.</p>
+        ) : (
+          <ul className="flex flex-col">
+            {wartet.map((w) => (
+              <li key={w.text} className="border-line border-b last:border-0">
+                <Link href={w.href} className="hover:bg-background flex items-center justify-between gap-3 rounded-xl px-2 py-3 text-sm">
+                  <span>{w.n > 1 || !w.text.startsWith("Frist") ? <strong className="tabular-nums">{w.n}</strong> : null} {w.text}</span>
+                  <ArrowRight className="text-muted-foreground size-4" aria-hidden />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="text-muted-foreground text-xs">Zuordnen, Entwürfe, Mahnvorschläge und Abos laufen automatisch. Hier steht nur, was deine Entscheidung braucht.</p>
+      </section>
 
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Auf einen Blick">
         <Kachel href={`${basis}/investment`} label="Investierbar" wert={eur(inv.investierbarCent)} fuss="nach Steuern und Reserve" />
