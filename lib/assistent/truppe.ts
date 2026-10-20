@@ -13,6 +13,7 @@ import { erstelleEntwurf, ladeEntwuerfe } from "@/lib/verkaufen-entwurf"
 import { firmenRahmen, INHABER } from "./rahmen"
 import { findeKontaktMail } from "./kontaktsuche"
 import { ergaenzeFehlendeAdressen, istMail, nachfassen } from "./versand"
+import { holeEingang } from "@/lib/eingang"
 import {
   assistentDb,
   ladeFreigaben,
@@ -457,6 +458,7 @@ export async function fuehreFaelligeAus(): Promise<AgentKey[]> {
     return a.takt === "taeglich" ? berlinTag(zuletzt) !== berlinTag(jetzt) : jetzt.getTime() - zuletzt.getTime() > 6.5 * 86400000
   }).map((a) => a.key)
   for (const key of faellig) await fuehreAgentAus(key)
+  await holeEingang().catch((e) => console.error("[assistent] eingang", e instanceof Error ? e.message : e))
   await nachfassen().catch((e) => console.error("[assistent] nachfassen", e instanceof Error ? e.message : e))
   return faellig
 }
