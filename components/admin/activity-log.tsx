@@ -1,6 +1,7 @@
 import { SectionHeader } from "@/components/admin/primitives"
 import type { AdminTexte } from "@/lib/admin-i18n"
 import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
+import { leseAufbereitung } from "@/lib/gespraech-ki"
 import type { Activity } from "@/lib/vertrieb"
 
 /**
@@ -31,7 +32,15 @@ export function ActivityLog({ entries, t, intl }: { entries: Activity[]; t: Admi
       ) : (
         <ol className="mt-4 flex flex-col">
           {entries.map((entry) => {
-            const { satz, zusatz } = beschreibe(entry, t)
+            const ki = entry.kind === "gespraech" ? leseAufbereitung(entry.data, intl.startsWith("tr") ? "tr" : "de") : null
+            const { satz, zusatz } = ki
+              ? {
+                  satz: ki.titel,
+                  zusatz: [ki.zusammenfassung, ...ki.punkte.map((p) => `• ${p}`), ki.naechsterSchritt ? `→ ${ki.naechsterSchritt}` : ""]
+                    .filter(Boolean)
+                    .join("\n"),
+                }
+              : beschreibe(entry, t)
             return (
               <li key={entry.id} className="border-line flex flex-wrap gap-x-4 gap-y-1 border-b py-3 last:border-b-0" data-art={entry.kind} data-herkunft={entry.origin ?? "unbekannt"}>
                 <time dateTime={entry.createdAt} className="text-meta text-muted-foreground w-28 shrink-0 tabular-nums">
@@ -39,7 +48,7 @@ export function ActivityLog({ entries, t, intl }: { entries: Activity[]; t: Admi
                 </time>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm">{satz}</p>
-                  {zusatz ? <p className="type-small text-muted-foreground mt-0.5 text-pretty">{zusatz}</p> : null}
+                  {zusatz ? <p className="type-small text-muted-foreground mt-0.5 text-pretty whitespace-pre-line">{zusatz}</p> : null}
                   <p className="text-muted-foreground mt-0.5 text-xs">
                     {t.chronik.durch(werIst(entry.actor, t), entry.origin ? (t.begriffe.herkunft[entry.origin] ?? entry.origin) : t.begriffe.unbekannt)}
                   </p>

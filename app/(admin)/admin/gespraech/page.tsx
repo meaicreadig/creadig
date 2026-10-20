@@ -1,11 +1,16 @@
 import Link from "next/link"
+import { after } from "next/server"
 import { Plus, Search } from "lucide-react"
+
+import { AufbereitungBlock } from "@/components/admin/gespraech-aufbereitung"
+import type { KiSprache } from "@/lib/gespraech-ki"
 
 import { kontaktAnlegen } from "@/app/(admin)/admin/gespraech/actions"
 import { AdminShell } from "@/components/admin/admin-shell"
 import { Gespraechsraum } from "@/components/admin/gespraechsraum"
 import { adminSprache } from "@/lib/admin-i18n/server"
 import {
+  ergaenzeAufbereitungen,
   gespraeche,
   gespraechVerfuegbar,
   holeKontakt,
@@ -32,38 +37,65 @@ function initialen(name: string): string {
     .join("")
 }
 
-function Verlauf({ eintraege, t, mitName }: { eintraege: GespraechEintrag[]; t: GespraechText; mitName?: boolean }) {
+function Verlauf({
+  eintraege,
+  t,
+  sprache,
+  mitName,
+}: {
+  eintraege: GespraechEintrag[]
+  t: GespraechText
+  sprache: KiSprache
+  mitName?: boolean
+}) {
   if (eintraege.length === 0) return <p className="text-muted-foreground text-sm leading-relaxed">{t.keinVerlauf}</p>
   return (
-    <ol className="relative flex flex-col gap-5">
-      <span aria-hidden="true" className="bg-line absolute top-2 bottom-2 left-[5px] w-px" />
-      {eintraege.map((g) => (
-        <li key={g.id} className="relative pl-6">
-          <span aria-hidden="true" className="bg-gold ring-background absolute top-1.5 left-0 size-[11px] rounded-full ring-4" />
-          <details className="group">
-            <summary className="cursor-pointer list-none">
+    <ol className="flex flex-col gap-3">
+      {eintraege.map((g) => {
+        const a = g.ki[sprache]
+        return (
+          <li key={g.id} className="bg-surface flex flex-col gap-3 rounded-3xl p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-muted-foreground font-mono text-[11px] tabular-nums">
                 {new Date(g.createdAt).toLocaleString(t.locale, { dateStyle: "medium", timeStyle: "short" })}
                 {g.dauerSek ? ` · ${Math.max(1, Math.round(g.dauerSek / 60))} ${t.min}` : ""}
               </p>
               {mitName && g.contactName && (
-                <Link
-                  href={`/admin/gespraech?kontakt=${g.contactId}`}
-                  className="hover:text-gold-text mt-1 block text-sm font-medium"
-                >
+                <Link href={`/admin/gespraech?kontakt=${g.contactId}`} className="hover:text-gold-text text-xs font-medium">
                   {g.contactName}
                 </Link>
               )}
-              <p className="mt-1 text-sm leading-relaxed text-pretty">{g.summary.replace(/^Gespräch · \d+ Min · /, "")}</p>
-            </summary>
-            {g.detail && (
-              <p className="text-muted-foreground border-line mt-3 rounded-md border p-3 text-xs leading-relaxed whitespace-pre-line">
-                {g.detail}
-              </p>
+            </div>
+
+            {a ? (
+              <AufbereitungBlock a={a} texte={t} />
+            ) : (
+              <>
+                <p className="text-sm leading-relaxed text-pretty">{g.summary.replace(/^Gespräch · \d+ Min · /, "")}</p>
+                {g.detail && <p className="text-muted-foreground text-xs leading-relaxed">{t.kiAusstehend}</p>}
+              </>
             )}
-          </details>
-        </li>
-      ))}
+
+            {g.detail && (
+              <details className="group">
+                <summary className="text-muted-foreground hover:text-foreground cursor-pointer list-none text-xs underline-offset-4 hover:underline">
+                  {t.original}
+                </summary>
+                <p className="text-muted-foreground bg-background mt-2 max-h-64 overflow-y-auto rounded-2xl p-3 text-xs leading-relaxed whitespace-pre-line">
+                  {g.detail}
+                </p>
+              </details>
+            )}
+
+            <Link
+              href={`/admin/vertrieb/beziehungen/${g.contactId}#chronik-titel`}
+              className="text-gold-text self-start text-xs font-medium underline-offset-4 hover:underline"
+            >
+              {t.inVertrieb} →
+            </Link>
+          </li>
+        )
+      })}
     </ol>
   )
 }
@@ -73,7 +105,8 @@ export default async function GespraechSeite({
 }: {
   searchParams: Promise<{ q?: string; kontakt?: string }>
 }) {
-  const t = gespraechText(await adminSprache())
+  const sprache: KiSprache = (await adminSprache()) === "tr" ? "tr" : "de"
+  const t = gespraechText(sprache)
   const { q, kontakt: kontaktId } = await searchParams
 
   if (!gespraechVerfuegbar()) {
@@ -89,6 +122,9 @@ export default async function GespraechSeite({
     kontaktId ? holeKontakt(kontaktId) : Promise.resolve(null),
     gespraeche(kontaktId ?? null, kontaktId ? 12 : 8),
   ])
+  if (verlauf.some((g) => g.detail && !g.ki[sprache])) {
+    after(() => ergaenzeAufbereitungen(sprache, kontaktId ?? null).catch(() => 0))
+  }
   const heute = new Date().toISOString().slice(0, 10)
   const sucht = Boolean(q?.trim())
   const faelligeKontakte = sucht ? [] : alle.filter((k) => k.nextTouchAt && k.nextTouchAt <= heute)
@@ -209,7 +245,7 @@ export default async function GespraechSeite({
               key={kontakt.id}
               kontakt={kontakt}
               t={t}
-              verlauf={<Verlauf eintraege={verlauf} t={t} />}
+              verlauf={<Verlauf eintraege={verlauf} t={t} sprache={sprache} />}
             />
           ) : (
             <div className="border-line grid overflow-hidden rounded-xl border xl:grid-cols-[minmax(0,1fr)_22rem]">
@@ -224,7 +260,7 @@ export default async function GespraechSeite({
               >
                 <h2 className="border-line font-display border-b px-5 py-4 text-base font-semibold">{t.zuletzt}</h2>
                 <div className="px-5 py-5">
-                  <Verlauf eintraege={verlauf} t={t} mitName />
+                  <Verlauf eintraege={verlauf} t={t} sprache={sprache} mitName />
                 </div>
               </aside>
             </div>

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto"
 
+import { bereiteAuf, leseAufbereitung, type Aufbereitung, type KiSprache } from "@/lib/gespraech-ki"
 import { neonClient } from "@/lib/neon-client"
 
 /**
@@ -46,6 +47,7 @@ export type GespraechEintrag = {
   dauerSek: number | null
   interessen: Interesse[]
   createdAt: string
+  ki: Partial<Record<KiSprache, Aufbereitung>>
 }
 
 const OHNE_MAIL = "@ohne-mail.invalid"
@@ -159,6 +161,12 @@ function alsEintrag(z: EintragZeile): GespraechEintrag {
     dauerSek: typeof z.data?.dauerSek === "number" ? z.data.dauerSek : null,
     interessen,
     createdAt: iso(z.created_at) ?? "",
+    ki: Object.fromEntries(
+      (["de", "tr"] as const).flatMap((s) => {
+        const a = leseAufbereitung(z.data, s)
+        return a ? [[s, a]] : []
+      }),
+    ),
   }
 }
 
@@ -225,6 +233,7 @@ export type GespraechSpeichern = {
   folge: string | null
   folgeAm: string | null
   folgeUm: string | null
+  sprache: KiSprache
 }
 
 const UEBERSCHRIFT: Record<Abschnitt, string> = {
@@ -238,13 +247,28 @@ const UEBERSCHRIFT: Record<Abschnitt, string> = {
 export async function speichereGespraech(
   input: GespraechSpeichern,
   akteur: string,
-): Promise<{ id: string } | null> {
+): Promise<{ id: string; aufbereitung: Aufbereitung | null } | null> {
   const c = client()
   if (!c) return null
   await c.ready()
 
   const minuten = Math.max(1, Math.round(input.dauerSek / 60))
+
+  const detail =
+    ABSCHNITTE.filter((a) => input.abschnitte[a])
+      .map((a) => `${UEBERSCHRIFT[a]}\n${input.abschnitte[a]}`)
+      .join("\n\n") || null
+
+  const kontakt = await holeKontakt(input.kontaktId)
+  const aufbereitung = detail
+    ? await bereiteAuf(rohtext(detail, input.folge), input.sprache, {
+        kontakt: kontakt?.name ?? "",
+        firma: kontakt?.organisation ?? null,
+      })
+    : null
+
   const kern =
+    aufbereitung?.titel ??
     input.folge ??
     input.abschnitte.bedarf ??
     input.abschnitte.ausgangslage ??
@@ -252,11 +276,6 @@ export async function speichereGespraech(
     "ohne Notiz"
   const ersteZeile = kern.split("\n")[0].trim()
   const summary = `Gespräch · ${minuten} Min · ${ersteZeile.length > 110 ? `${ersteZeile.slice(0, 110)}…` : ersteZeile}`
-
-  const detail =
-    ABSCHNITTE.filter((a) => input.abschnitte[a])
-      .map((a) => `${UEBERSCHRIFT[a]}\n${input.abschnitte[a]}`)
-      .join("\n\n") || null
 
   const id = randomUUID()
   await c.sql.query(
@@ -275,6 +294,7 @@ export async function speichereGespraech(
         folge: input.folge,
         folgeAm: input.folgeAm,
         folgeUm: input.folgeUm,
+        ...(aufbereitung ? { ki: { [input.sprache]: aufbereitung } } : {}),
       }),
     ],
   )
@@ -311,5 +331,47 @@ export async function speichereGespraech(
     schluessel: `gespraech:${id}`,
   })
 
-  return { id }
+  return { id, aufbereitung }
+}
+
+function rohtext(detail: string, folge: string | null): string {
+  return folge ? `${detail}\n\nVereinbarter nächster Schritt: ${folge}` : detail
+}
+
+/**
+ * Ältere Gespräche (oder solche, deren Aufbereitung in der anderen Sprache
+ * fehlt) werden im Hintergrund nachgezogen. Begrenzt je Aufruf.
+ */
+export async function ergaenzeAufbereitungen(sprache: KiSprache, kontaktId: string | null, limit = 4): Promise<number> {
+  const c = client()
+  if (!c) return 0
+  await c.ready()
+  const rows = (await c.sql.query(
+    `SELECT a.id, a.detail, a.data, c.name AS contact_name, o.name AS organisation
+       FROM activities a
+       LEFT JOIN contacts c ON c.id = a.subject_id
+       LEFT JOIN organisations o ON o.id = c.organisation_id
+      WHERE a.subject_type = 'contact' AND a.kind = 'gespraech'
+        AND a.detail IS NOT NULL
+        AND ($1::text IS NULL OR a.subject_id = $1)
+        AND (a.data IS NULL OR a.data->'ki'->$2 IS NULL)
+      ORDER BY a.created_at DESC
+      LIMIT $3`,
+    [kontaktId, sprache, limit],
+  )) as { id: string; detail: string; data: Record<string, unknown> | null; contact_name: string | null; organisation: string | null }[]
+
+  let n = 0
+  for (const z of rows) {
+    const folge = typeof z.data?.folge === "string" ? z.data.folge : null
+    const a = await bereiteAuf(rohtext(z.detail, folge), sprache, { kontakt: z.contact_name ?? "", firma: z.organisation })
+    if (!a) continue
+    await c.sql.query(
+      `UPDATE activities
+          SET data = jsonb_set(coalesce(data,'{}'::jsonb) || jsonb_build_object('ki', coalesce(data->'ki','{}'::jsonb)), ARRAY['ki',$2::text], $3::jsonb, true)
+        WHERE id = $1`,
+      [z.id, sprache, JSON.stringify(a)],
+    )
+    n++
+  }
+  return n
 }
