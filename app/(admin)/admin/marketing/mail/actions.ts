@@ -83,6 +83,7 @@ function einzelBereinigt(m: Einzelmail): Einzelmail {
     zweitText: s(m.zweitText, 40).trim(),
     zweitUrl: s(m.zweitUrl, 500).trim(),
   gruss: s(m.gruss, 60).trim(),
+  absender: s(m.absender, 60).trim(),
   kennung: s(m.kennung, 60).trim(),
   ctaHinweis: s(m.ctaHinweis, 160).trim(),
   telefon: s(m.telefon, 40).trim(),

@@ -148,6 +148,8 @@ function kontakt(o: { telefon?: string; email?: string; web: string }, bild: Bil
   return `<table role="presentation" cellpadding="0" cellspacing="0">${reihen.join("")}</table>`
 }
 
+export const ABSENDER = "Emin Akyol"
+
 export function kampagnenHtml(
   k: KampagnenInhalt,
   o: {
@@ -158,6 +160,7 @@ export function kampagnenHtml(
     anrede?: string
     zweitLink?: { text: string; url: string }
     gruss?: string
+    absender?: string
     /** Wie Bildpfade (z. B. "/brand/…png") zu src werden: Vorschau relativ, .eml per cid:. */
     bildSrc?: Bild
     /** Wie Schriftdateien zu URLs werden: Standard = absolute Webseiten-URL, .eml = data:-URI. */
@@ -220,7 +223,7 @@ ${anrede}${bloecke(k.body, bild)}${knoepfe}
 <tr><td class="px" style="padding:30px 44px 40px">
 <p style="margin:0 0 22px;font-size:15px;line-height:1.6;color:${TEXT};font-family:${SCHRIFT}">${esc(o.gruss ?? "Viele Grüße")}</p>
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:22px"><tr><td>
-<p style="margin:0;font-size:19px;font-weight:800;color:${TINTE};letter-spacing:-0.2px;font-family:${TITEL}">Muhammed Emin Akyol</p>
+<p style="margin:0;font-size:19px;font-weight:800;color:${TINTE};letter-spacing:-0.2px;font-family:${TITEL}">${esc(o.absender || ABSENDER)}</p>
 <p style="margin:4px 0 0;font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:${GOLD};font-weight:700;font-family:${TITEL}">Gr&uuml;nder &middot; ${FIRMA}</p>
 </td></tr></table>
 ${kontakt({ telefon: o.telefon, email: o.email, web: o.siteUrl }, bild)}

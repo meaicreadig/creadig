@@ -4,7 +4,7 @@
  * den man nur noch absendet. Läuft im Browser und auf dem Server.
  */
 
-import { FIRMA, kampagnenHtml, textOhneIcons } from "@/lib/mailing/vorlage"
+import { ABSENDER, FIRMA, kampagnenHtml, textOhneIcons } from "@/lib/mailing/vorlage"
 
 export type EingebettetesBild = { cid: string; name: string; base64: string }
 
@@ -22,6 +22,7 @@ export function einzelmailHtml(
       schriftSrc,
       anrede: m.anrede || undefined,
       gruss: m.gruss || undefined,
+      absender: m.absender || undefined,
       zweitLink: { text: m.zweitText, url: m.zweitUrl },
       kennung: m.kennung,
       ctaHinweis: m.ctaHinweis,
@@ -47,6 +48,7 @@ export type Einzelmail = {
   zweitText: string
   zweitUrl: string
   gruss: string
+  absender?: string
 }
 
 function base64Utf8(s: string): string {
@@ -70,7 +72,7 @@ export function einzelmailText(m: Einzelmail): string {
     textOhneIcons(m.body).replace(/^## /gm, "").replace(/^- /gm, "• ").replace(/^> /gm, "").replace(/\*\*/g, ""),
     m.ctaText && m.ctaUrl ? `${m.ctaText}: ${m.ctaUrl}` : "",
     m.zweitText && m.zweitUrl ? `${m.zweitText}: ${m.zweitUrl}` : "",
-    `${m.gruss || "Viele Grüße"}\nMuhammed Emin Akyol\nGründer · ${FIRMA}`,
+    `${m.gruss || "Viele Grüße"}\n${m.absender || ABSENDER}\nGründer · ${FIRMA}`,
     ["—", m.telefon, m.kontaktMail, `${FIRMA} · Osnabrück · creadig.de`].filter(Boolean).join("\n"),
   ]
     .filter(Boolean)
