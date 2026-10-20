@@ -352,6 +352,14 @@ function LinkedinStatus({ ziele, meldung }: { ziele: LinkedinZiele; meldung?: st
     verbunden: "Profil verbunden.",
     "firma-verbunden": "Firmenseite verbunden.",
     abgebrochen: "Verbindung abgebrochen.",
+    "firma-nicht-freigeschaltet":
+      "Firmenseite: LinkedIn hat die „Community Management API“ für diese App noch nicht freigeschaltet. In developer.linkedin.com → deine Firmen-App → Reiter „Products“ muss dort „Added“ stehen (nicht „Requested/Pending“). Danach einfach erneut verbinden.",
+    "inhaber-nicht-freigeschaltet":
+      "Profil: In der Profil-App fehlen die Produkte „Sign In with LinkedIn using OpenID Connect“ und „Share on LinkedIn“.",
+    "firma-redirect":
+      "Firmenseite: In der Firmen-App unter „Auth“ fehlt die Redirect-URL https://creadig.de/api/linkedin/callback.",
+    "inhaber-redirect":
+      "Profil: In der Profil-App unter „Auth“ fehlt die Redirect-URL https://creadig.de/api/linkedin/callback.",
     fehler:
       "LinkedIn hat abgelehnt. Prüfe in der jeweiligen LinkedIn-App die Redirect-URL und ob das Produkt freigeschaltet ist (Firmenseite: „Community Management API“ muss genehmigt sein).",
   }
