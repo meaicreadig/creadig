@@ -44,6 +44,8 @@ import { firmenRahmen, type Rahmen } from "@/lib/assistent/rahmen"
 import { erkenneLoeschwunsch } from "@/lib/assistent/loeschen"
 import { AGENTEN, fuehreFaelligeAus, type AgentInfo, type AgentKey } from "@/lib/assistent/truppe"
 import { getVertriebStore } from "@/lib/lead-store"
+import { eingangAktiv, holeEingang, ladeEingang } from "@/lib/eingang"
+import { EingangListe } from "@/components/admin/eingang-liste"
 
 import { agentStarten, antwortErhalten, freigabeEntscheiden, ratAntworten } from "./actions"
 import { antwortZuruecknehmen } from "../marketing/mail/actions"
@@ -570,6 +572,14 @@ function LoeschKarte({ f }: { f: Freigabe }) {
 }
 
 function FreigabeKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele }) {
+  return (
+    <div id={`frg-${f.id}`} className="scroll-mt-6">
+      <FreigabeInhalt f={f} linkedin={linkedin} />
+    </div>
+  )
+}
+
+function FreigabeInhalt({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele }) {
   if (f.art === "linkedin") return <ArtikelKarte f={f} linkedin={linkedin} />
   if (f.art === "mail") return <MailKarte f={f} />
   if (f.art === "loeschen") return <LoeschKarte f={f} />
@@ -651,6 +661,8 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
   ])
   after(() => fuehreFaelligeAus().catch(() => undefined))
   after(() => ergaenzeFehlendeAdressen().catch(() => undefined))
+  after(() => holeEingang().catch(() => undefined))
+  const eingang = await ladeEingang(12)
 
   const ratMitAntwort = raete.find((r) => r.antwort)
   const neuerLoeschauftrag = ratMitAntwort?.antwort
@@ -670,6 +682,8 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
     <AdminShell title="Assistent" meta={<span className="block">Deine Truppe arbeitet im Hintergrund – du entscheidest</span>}>
       <div className="flex flex-col gap-10">
         <Sitzung rat={raete[0]} rahmen={rahmen} />
+
+        <EingangListe eintraege={eingang} aktiv={eingangAktiv()} />
 
         <section id="redaktion" aria-labelledby="redaktion-titel" className="flex scroll-mt-6 flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">

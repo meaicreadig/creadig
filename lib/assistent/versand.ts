@@ -40,6 +40,13 @@ export async function ergaenzeFehlendeAdressen(max = 6): Promise<number> {
   return gefunden
 }
 
+/** Antwortadresse je Mail – so erkennt der Eingang, auf welche Mail geantwortet wurde. */
+export function eingangsAdresse(freigabeId: string): string | null {
+  const domain = process.env.MAIL_EINGANG_DOMAIN?.trim().replace(/^@/, "")
+  if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(domain)) return null
+  return `antwort+${freigabeId}@${domain}`
+}
+
 export function istMail(s: string | null | undefined): s is string {
   return !!s && s.length <= 200 && MAIL_RE.test(s.trim())
 }
@@ -99,7 +106,7 @@ export async function sendeFreigabeMail(f: Freigabe, an: string, betreff: string
   if (!istMail(an)) return { ok: false, grund: "Bitte eine gültige E-Mail-Adresse eintragen." }
   const text = kundenText(inhalt)
   if (!text) return { ok: false, grund: "Der Mailtext ist leer." }
-  const antwortAn = process.env.MAIL_REPLY_TO?.trim() || process.env.LEAD_TO?.trim()
+  const antwortAn = eingangsAdresse(f.id) || process.env.MAIL_REPLY_TO?.trim() || process.env.LEAD_TO?.trim()
   const mail = alsEinzelmail(an.trim(), betreff.slice(0, 200) || f.titel, inhalt)
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -185,7 +192,7 @@ export async function nachfassen(): Promise<number> {
 }
 
 /** Antwort eingegangen: ganze Kette gilt als beantwortet, kein weiteres Nachfassen. */
-export async function markiereAntwort(id: string): Promise<void> {
+export async function markiereAntwort(id: string, opts: { faden?: boolean } = {}): Promise<void> {
   const q = await assistentDb()
   if (!q) return
   const verworfen = (await q(
@@ -204,7 +211,7 @@ export async function markiereAntwort(id: string): Promise<void> {
     betreff: string | null
   }[]
   const nq = neonAbfrage()
-  if (nq && f[0]?.empfaenger) {
+  if (nq && f[0]?.empfaenger && opts.faden !== false) {
     await notiereAntwort(nq, f[0].empfaenger, f[0].betreff, id).catch((e) =>
       console.error("[kundenfaden] Antwort nicht protokolliert:", (e as Error).message),
     )
