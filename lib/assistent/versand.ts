@@ -2,6 +2,8 @@ import "server-only"
 
 import { einzelmailHtml, einzelmailText, type Einzelmail } from "@/lib/mailing/eml"
 import { siteUrl } from "@/lib/termine/mail"
+import { notiereAntwort, notiereGesendeteMail } from "@/lib/kundenfaden"
+import { neonAbfrage } from "@/lib/neon-abfrage"
 
 import { findeKontaktMail } from "./kontaktsuche"
 import { assistentDb, ergaenzeExtra, legeFreigabeAn, setzeMailKopf, type Freigabe, type FreigabeExtra } from "./store"
@@ -81,6 +83,13 @@ export function alsEinzelmail(an: string, betreff: string, inhalt: string): Einz
   }
 }
 
+/** Jede gesendete Mail landet am Kontakt und bewegt die Verkaufschance – Fehler blockieren den Versand nie. */
+async function inDenFaden(m: Parameters<typeof notiereGesendeteMail>[1]): Promise<void> {
+  const q = neonAbfrage()
+  if (!q) return
+  await notiereGesendeteMail(q, m).catch((e) => console.error("[kundenfaden] Mail nicht protokolliert:", (e as Error).message))
+}
+
 export type VersandErgebnis = { ok: true; id: string } | { ok: false; grund: string }
 
 export async function sendeFreigabeMail(f: Freigabe, an: string, betreff: string, inhalt: string): Promise<VersandErgebnis> {
@@ -107,6 +116,16 @@ export async function sendeFreigabeMail(f: Freigabe, an: string, betreff: string
     })
     const daten = (await res.json().catch(() => ({}))) as { id?: string; message?: string }
     if (!res.ok || !daten.id) return { ok: false, grund: `Versand fehlgeschlagen${daten.message ? `: ${daten.message}` : ` (${res.status})`}`.slice(0, 200) }
+    await inDenFaden({
+      an: an.trim(),
+      betreff: mail.subject,
+      text,
+      quelleId: f.id,
+      agent: f.agent,
+      firma: f.inhalt.match(/Firma:\s*(.+)/)?.[1]?.trim() ?? null,
+      website: f.inhalt.match(/Webseite:\s*(https?:\/\/\S+)/)?.[1] ?? null,
+      stufe: Number(f.extra?.stufe ?? 0),
+    })
     return { ok: true, id: daten.id }
   } catch {
     return { ok: false, grund: "Mailserver nicht erreichbar – bitte später erneut." }
@@ -180,6 +199,16 @@ export async function markiereAntwort(id: string): Promise<void> {
      WHERE status = 'offen' AND extra->>'vorgaenger' IN (SELECT id FROM kette)`,
     [id],
   )
+  const f = (await q(`SELECT empfaenger, betreff FROM assistent_freigaben WHERE id = $1`, [id])) as {
+    empfaenger: string | null
+    betreff: string | null
+  }[]
+  const nq = neonAbfrage()
+  if (nq && f[0]?.empfaenger) {
+    await notiereAntwort(nq, f[0].empfaenger, f[0].betreff).catch((e) =>
+      console.error("[kundenfaden] Antwort nicht protokolliert:", (e as Error).message),
+    )
+  }
 }
 
 /**
@@ -200,6 +229,7 @@ export async function protokolliereStudioMail(m: { an: string; betreff: string; 
   if (id) {
     const q = await assistentDb()
     await q?.(`UPDATE assistent_freigaben SET status = 'freigegeben', erledigt_at = now() WHERE id = $1`, [id])
+    await inDenFaden({ an: m.an, betreff: m.betreff, text: kundenText(m.inhalt), quelleId: id, agent: "studio" })
   }
   return id
 }
