@@ -164,31 +164,43 @@ function Glas({ opacity = 0.32 }: { opacity?: number }) {
 
 function Person({ farbe, haar, an }: { farbe: string; haar: string; an: boolean }) {
   const arme = useRef<(THREE.Group | null)[]>([])
+  const koerper = useRef<THREE.Group>(null)
+  const kopf = useRef<THREE.Group>(null)
   const phase = useMemo(() => (farbe.charCodeAt(1) + farbe.charCodeAt(3)) % 7, [farbe])
   useFrame(({ clock }, dt) => {
     const t = clock.getElapsedTime()
+    // Grundleben (immer): Atmen und leichtes Umsehen – kein erfundenes „Arbeiten“, das bleibt an `an` gebunden.
+    if (koerper.current) koerper.current.scale.y = 1 + Math.sin(t * 1.5 + phase) * 0.012
+    if (kopf.current) {
+      kopf.current.rotation.y = Math.sin(t * 0.45 + phase * 1.7) * (an ? 0.12 : 0.28)
+      kopf.current.rotation.x = Math.sin(t * 0.8 + phase) * 0.04 + (an ? 0.08 : 0)
+    }
     arme.current.forEach((g, i) => {
       if (!g) return
       // Tippen: schnelle, kleine Schwingung, links/rechts versetzt – ohne Lauf bleiben die Arme in Grundhaltung.
-      const soll = an ? Math.sin(t * 11 + phase + i * Math.PI) * 0.09 + Math.sin(t * 4.3 + phase * 2 + i) * 0.03 : 0
+      const soll = an ? Math.sin(t * 11 + phase + i * Math.PI) * 0.09 + Math.sin(t * 4.3 + phase * 2 + i) * 0.03 : Math.sin(t * 0.9 + phase + i) * 0.015
       g.rotation.x = THREE.MathUtils.damp(g.rotation.x, soll, 12, dt)
     })
   })
   return (
     <group position={[0, 0, 0.6]}>
-      <mesh position={[0, 0.92, 0.04]} castShadow>
-        <capsuleGeometry args={[0.17, 0.36, 4, 12]} />
-        <meshStandardMaterial color={farbe} roughness={0.85} />
-      </mesh>
-      <mesh position={[0, 1.38, -0.02]} castShadow>
-        <sphereGeometry args={[0.11, 16, 12]} />
-        <meshStandardMaterial color="#c9a184" roughness={0.7} />
-      </mesh>
-      {/* Haare: Kappe über Oberkopf und Hinterkopf, Gesicht (−z) bleibt frei */}
-      <mesh position={[0, 1.395, 0.0]} rotation={[0.45, 0, 0]} castShadow>
-        <sphereGeometry args={[0.122, 16, 12, 0, Math.PI * 2, 0, 1.85]} />
-        <meshStandardMaterial color={haar} roughness={0.9} />
-      </mesh>
+      <group ref={koerper} position={[0, 0.6, 0]}>
+        <mesh position={[0, 0.32, 0.04]} castShadow>
+          <capsuleGeometry args={[0.17, 0.36, 4, 12]} />
+          <meshStandardMaterial color={farbe} roughness={0.85} />
+        </mesh>
+      </group>
+      <group ref={kopf} position={[0, 1.3, -0.02]}>
+        <mesh position={[0, 0.08, 0]} castShadow>
+          <sphereGeometry args={[0.11, 16, 12]} />
+          <meshStandardMaterial color="#c9a184" roughness={0.7} />
+        </mesh>
+        {/* Haare: Kappe über Oberkopf und Hinterkopf, Gesicht (−z) bleibt frei */}
+        <mesh position={[0, 0.095, 0.02]} rotation={[0.45, 0, 0]} castShadow>
+          <sphereGeometry args={[0.122, 16, 12, 0, Math.PI * 2, 0, 1.85]} />
+          <meshStandardMaterial color={haar} roughness={0.9} />
+        </mesh>
+      </group>
       <mesh position={[0, 0.56, -0.2]} castShadow>
         <boxGeometry args={[0.34, 0.13, 0.46]} />
         <meshStandardMaterial color="#2c313a" roughness={0.9} />
@@ -294,6 +306,51 @@ function Kamera({ fokus, raeume }: { fokus: Fokus; raeume: Raum[] }) {
  * Die Säule ist immer durchgehend: unteres Segment bleibt stehen, oberes Segment fährt mit den angehobenen
  * Geschossen (gleiches damp wie Geschoss/Dach), ein Schaftstück füllt die entstehende Lücke.
  */
+/** Touch: Drei-Finger-Wischen verschiebt die Ansicht (links/rechts/hoch/runter). Ein Finger dreht, zwei zoomen/schwenken. */
+function DreiFingerPan() {
+  const { camera, gl } = useThree()
+  const controls = useThree((s) => s.controls) as OrbitControlsImpl | null
+  useEffect(() => {
+    const el = gl.domElement
+    let letzter: { x: number; y: number } | null = null
+    const mitte = (e: TouchEvent) => ({
+      x: (e.touches[0].clientX + e.touches[1].clientX + e.touches[2].clientX) / 3,
+      y: (e.touches[0].clientY + e.touches[1].clientY + e.touches[2].clientY) / 3,
+    })
+    const start = (e: TouchEvent) => {
+      if (e.touches.length !== 3) return
+      letzter = mitte(e)
+      controls?.dispatchEvent({ type: "start" } as never)
+    }
+    const move = (e: TouchEvent) => {
+      if (e.touches.length !== 3 || !letzter || !controls) return
+      e.preventDefault()
+      const m = mitte(e)
+      const cam = camera as THREE.PerspectiveCamera
+      const k = (camera.position.distanceTo(controls.target) * 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2))) / el.clientHeight
+      const rechts = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0)
+      const hoch = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1)
+      const d = rechts.multiplyScalar(-(m.x - letzter.x) * k).add(hoch.multiplyScalar((m.y - letzter.y) * k))
+      camera.position.add(d)
+      controls.target.add(d)
+      controls.update()
+      letzter = m
+    }
+    const ende = () => (letzter = null)
+    el.addEventListener("touchstart", start, { passive: true })
+    el.addEventListener("touchmove", move, { passive: false })
+    el.addEventListener("touchend", ende)
+    el.addEventListener("touchcancel", ende)
+    return () => {
+      el.removeEventListener("touchstart", start)
+      el.removeEventListener("touchmove", move)
+      el.removeEventListener("touchend", ende)
+      el.removeEventListener("touchcancel", ende)
+    }
+  }, [camera, gl, controls])
+  return null
+}
+
 function Gehirn({ hoehe, fokus }: { hoehe: number; fokus: Fokus }) {
   const puls = useRef<THREE.Mesh>(null)
   const kern = useRef<THREE.MeshStandardMaterial>(null)
@@ -891,6 +948,7 @@ export default function Hauptsitz3D({
         enablePan
       />
       <Kamera fokus={fokus} raeume={raeume} />
+      <DreiFingerPan />
 
       {/* Tone Mapping läuft hier im Composer (ACES Filmic), nicht mehr über den Renderer */}
       <EffectComposer multisampling={0} enableNormalPass={false}>
