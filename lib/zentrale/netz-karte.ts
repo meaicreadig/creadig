@@ -15,6 +15,7 @@ type Text = Record<Sprache, string>
 export const NAV_SCHLUESSEL = [
   "uebersicht",
   "assistent",
+  "leistung",
   "bulletin",
   "verkaufen",
   "gespraech",
@@ -163,6 +164,18 @@ export const KNOTEN: readonly Knoten[] = [
     viertel: "marketing",
     pos: { x: 4.4, y: 6.2 },
     nav: { gruppe: "marketing" },
+  },
+  {
+    id: "leistung",
+    href: "/admin/leistung",
+    label: { de: "Leistung & Engpässe", tr: "Performans ve Tıkanıklık" },
+    aufgabe: {
+      de: "Wie viel jede Abteilung arbeitet, wie stabil, wie sie zusammenspielt – und wo es klemmt.",
+      tr: "Her departman ne kadar çalışıyor, ne kadar istikrarlı, nasıl uyumlu – ve nerede tıkanıyor.",
+    },
+    viertel: "kern",
+    pos: { x: -6.6, y: 0 },
+    nav: { gruppe: "cockpit" },
   },
   {
     id: "bulletin",

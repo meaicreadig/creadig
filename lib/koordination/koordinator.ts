@@ -343,6 +343,15 @@ export async function koordinatorRunde(): Promise<{ ergebnis: string; anzahl: nu
     .join("\n")
   const offeneKette = await ladeAuftraege(15)
   const zuletzt = offeneKette.map((a) => `- ${abteilungName(a.an)} [${a.status}]: ${a.titel}`).join("\n")
+  const { berechneLeistung, engpassBericht } = await import("@/lib/zentrale/leistung")
+  const leistung = await berechneLeistung().catch(() => null)
+  const engpaesse = leistung ? engpassBericht(leistung) : "(unbekannt)"
+  const schwach = leistung
+    ? leistung.abteilungen
+        .filter((x) => x.besetzt && x.note != null && x.note < 60)
+        .map((x) => `- ${x.name.de}: Note ${x.note}`)
+        .join("\n")
+    : ""
 
   const { text } = await generateText({
     model: MODELL,
@@ -353,8 +362,9 @@ Abteilungen:
 ${abteilungsListe()}
 
 Antworte NUR mit JSON: {"auftraege":[{"an":"abteilungs-id","titel":"…","inhalt":"was genau, warum jetzt, welches Ergebnis erwartet wird"}],"lage":"1 Satz Gesamtlage"}
-Höchstens 3 Aufträge, nur wenn sie echten Fortschritt bringen und nicht schon in der Liste stehen. Lieber 0 als Beschäftigungstherapie.`,
-    prompt: `Heute ${tag}. Ergebnisse der KI-Mitarbeiter:\n${lage || "(noch keine)"}\n\nLetzte interne Aufträge:\n${zuletzt || "(keine)"}`,
+Höchstens 3 Aufträge, nur wenn sie echten Fortschritt bringen und nicht schon in der Liste stehen. Lieber 0 als Beschäftigungstherapie.
+Engpässe haben Vorrang: Wenn eine Abteilung hängt oder schwach ist, ist dein erster Auftrag, das zu lösen (Arbeit umverteilen, vereinfachen, Vorarbeit liefern).`,
+    prompt: `Heute ${tag}. Ergebnisse der KI-Mitarbeiter:\n${lage || "(noch keine)"}\n\nLetzte interne Aufträge:\n${zuletzt || "(keine)"}\n\nEngpässe:\n${engpaesse}${schwach ? `\n\nSchwache Abteilungen (14 Tage):\n${schwach}` : ""}`,
   })
   const a = text.indexOf("{")
   const b = text.lastIndexOf("}")

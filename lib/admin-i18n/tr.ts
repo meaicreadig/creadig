@@ -30,6 +30,7 @@ export const tr: AdminTexte = {
     veroeffentlichungen: { label: "Yayınlar", hint: "Ne çıktı, ne geri döndü" },
     uebersicht: { label: "Genel bakış", hint: "Bugün önemli olan" },
     assistent: { label: "Asistan", hint: "Sohbet, ses, onaylar" },
+    leistung: { label: "Performans ve Tıkanıklık", hint: "Çalışma süresi, istikrar, uyum" },
     bulletin: { label: "Bülten", hint: "Yapay zekâ, medya, çip, robotik – yorumlu" },
     verkaufen: { label: "Bugün sat", hint: "Anlaşmalar, hedef, sıradaki hamle" },
     messen: { label: "Fuarlar", hint: "Fiber, dijital, 3D baskı, e-ticaret" },
@@ -296,7 +297,7 @@ export const tr: AdminTexte = {
     organisationLead: (name: string) => `Kuruluş: ${name}`,
     konflikt: "Kaydedilmedi: Bu satış fırsatı bu arada başka biri tarafından değiştirildi. Sayfa şimdi güncel durumu gösteriyor — lütfen değişikliği kontrol edip yeniden kaydedin.",
     gewonnenTitel: "Kazanıldı — işletmedeki sonraki adım",
-    gewonnenOhneAngebot: "Henüz kabul edilmiş bir teklif kaydedilmedi. Önce kabulü teklif belgesinde kaydedin, ardından projeyi başlatın.",
+    gewonnenOhneAngebot: "Henüz kabul edilmiş bir teklif kaydedilmedi. Önce kabulü teklif belgesinde kaydedin, ard��ndan projeyi başlatın.",
     gewonnenMitAngebot: "Teklif kabul edildi. Sonraki adım: projeyi „Teslimat ve kabul“ altında başlatın.",
     gewonnenMitProjekt: "Proje sürüyor. Materyal, kabul ve teslim „Teslimat ve kabul��� altında.",
     zumAngebot: "Teklif belgesine git",
@@ -1514,7 +1515,7 @@ export const tr: AdminTexte = {
       erreichbar: "Yanıt veriyor.",
       "nicht-erreichbar": "Kurulu, ama yanıt vermiyor.",
       "nicht-eingerichtet": "Kurulu değil — erişilecek bir şey yok.",
-      "schluessel-gesetzt": "Erişim tanımlı.",
+      "schluessel-gesetzt": "Erişim tan��mlı.",
       "nicht-pruefbar": "Kontrol edilemez.",
     },
     reichweite: {
@@ -1568,6 +1569,6 @@ export const tr: AdminTexte = {
     gespeichert: "Kaydedildi.",
     offenePunkte: (n) => `Bu haliyle dışarı çıkamaz — ${n} açık ${n === 1 ? "nokta" : "nokta"}:`,
     abschneidehinweis: (grenze, wie) =>
-      `Bu liste ${grenze} kayıt gösteriyor — üst sınır bu. Daha fazlası olup olmadığı burada görünmüyor. ${wie}`,
+      `Bu liste ${grenze} kayıt gösteriyor ��� üst sınır bu. Daha fazlası olup olmadığı burada görünmüyor. ${wie}`,
   },
 }
