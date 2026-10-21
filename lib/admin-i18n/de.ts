@@ -31,6 +31,7 @@ export const de = {
     veroeffentlichungen: { label: "Veröffentlichungen", hint: "Was hinausging, und was zurückkam" },
     uebersicht: { label: "Übersicht", hint: "Was heute zählt" },
     assistent: { label: "Assistent", hint: "Chat, Sprache, Freigaben" },
+    bulletin: { label: "Bulletin", hint: "KI, Medien, Chips, Robotik – eingeordnet" },
     verkaufen: { label: "Heute verkaufen", hint: "Abschlüsse, Ziel, nächster Zug" },
     messen: { label: "Messen", hint: "Glasfaser, Digital, 3D-Druck, E-Commerce" },
     gespraech: { label: "Gesprächsraum", hint: "Anrufen, mitschreiben, Folgetermin" },
@@ -730,7 +731,7 @@ export const de = {
     } as Record<string, string>,
     quellenHinweis: {
       website: "Der Betrieb sagt es über sich selbst. Für Standorte, Leistungen und Kontaktwege die beste Quelle.",
-      stellenanzeige: "Die ergiebigste Quelle für Betriebszustände — dort steht, welche Werkzeuge benutzt werden und welche Arbeit von Hand läuft. Portale untersagen meist den maschinellen Abruf: von Hand öffnen, Fundstelle festhalten.",
+      stellenanzeige: "Die ergiebigste Quelle für Betriebszustände �� dort steht, welche Werkzeuge benutzt werden und welche Arbeit von Hand läuft. Portale untersagen meist den maschinellen Abruf: von Hand öffnen, Fundstelle festhalten.",
       branchenverzeichnis: "Gut für die Existenz und die Branche, oft veraltet bei Adressen und Größe.",
       handelsregister: "Rechtsform und Sitz belegt. Sagt nichts über den Betriebszustand.",
       presse: "Gut für Veränderungen — neuer Standort, Übernahme, Umbau. Datum mitschreiben, veraltet schnell.",

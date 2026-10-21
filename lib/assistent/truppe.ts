@@ -15,6 +15,7 @@ import { findeKontaktMail } from "./kontaktsuche"
 import { pruefeWebseite, webcheckNotiz } from "./webcheck"
 import { ergaenzeFehlendeAdressen, istMail, nachfassen } from "./versand"
 import { holeEingang } from "@/lib/eingang"
+import { bulletinStoff, erstelleBulletin } from "@/lib/bulletin/agent"
 import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 import {
   assistentDb,
@@ -31,7 +32,7 @@ import {
   type RatProtokoll,
 } from "./store"
 
-export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "koordinator"] as const
+export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
 
 export type AgentInfo = {
@@ -53,6 +54,7 @@ export const AGENTEN: AgentInfo[] = [
   { key: "projekte", name: "Projektleitung", aufgabe: "Führt jeden gewonnenen Auftrag bis zur Übergabe: legt Projekte an, fordert Material an, schreibt Wochenberichte, warnt vor Fristen und fasst nach.", takt: "taeglich", ki: false },
   { key: "kapital", name: "Kapital", aufgabe: "Recherchiert Förderungen, Kredite und Investoren mit Quelle und Frist.", takt: "woechentlich", ki: true },
   { key: "golf", name: "Golf-Radar", aufgabe: "Sucht jede Woche Investoren, Family Offices, Programme und Events in VAE, Saudi-Arabien und Katar und schreibt die erste Nachricht auf Englisch und Arabisch.", takt: "woechentlich", ki: true },
+  { key: "bulletin", name: "Bulletin", aufgabe: "Recherchiert jeden Morgen, was in KI, Automatisierung, Medien, Chips und Robotik zählt, mit Quelle, ordnet es für creaDIG ein und liefert der Redaktion Artikelideen.", takt: "taeglich", ki: true },
   { key: "redaktion", name: "Redaktion", aufgabe: "Wählt das Thema nach den Beschlüssen der Geschäftsleitung, schreibt den Beitrag und erzeugt das Bild dazu.", takt: "woechentlich", ki: true },
 ]
 
@@ -252,7 +254,12 @@ async function redaktion(): Promise<Ergebnis> {
   const quelle = `linkedin:${woche}`
   if (await quelleBekannt(quelle)) return { ergebnis: "Artikel dieser Woche liegt schon bereit", anzahl: 0 }
 
-  const [raete, frueher, rahmen] = await Promise.all([ladeRaete(1).catch(() => []), letzteArtikel(10), firmenRahmen()])
+  const [raete, frueher, rahmen, branche] = await Promise.all([
+    ladeRaete(1).catch(() => []),
+    letzteArtikel(10),
+    firmenRahmen(),
+    bulletinStoff().catch(() => "—"),
+  ])
   const rat = raete[0]?.protokoll
   const marketing = rat?.stimmen.find((s) => /marketing/i.test(s.rolle))?.sagt
   const beschluesse = rat?.beschluesse.map((b) => b.was) ?? []
@@ -266,6 +273,7 @@ SCHRITT 1 – Thema wählen (wie ein Chefredakteur):
 - Beschlüsse: ${beschluesse.length ? beschluesse.join(" | ") : "(keine)"}
 - Lage: ${rahmen.text}
 - Echter Stoff (nur daraus schöpfen, nichts erfinden): ${STOFF.join(" || ")}
+- Was die Branche gerade bewegt (aus dem Bulletin, nur als aktueller Anlass mit eigener Haltung, Quelle nennen): ${branche}
 - Schon geschrieben – NICHT wiederholen, anderer Blickwinkel: ${frueher.map((f) => f.titel).join(" | ") || "(noch nichts)"}
 - Wähle das Thema, das den Leser (Inhaber kleiner Betriebe, Glasfaser-Branche, Vereine) am meisten bewegt und Kunden anzieht, ohne zu werben.
 
@@ -530,7 +538,7 @@ async function koordinator(): Promise<Ergebnis> {
   return koordinatorRunde()
 }
 
-const LAEUFER: Record<AgentKey, () => Promise<Ergebnis>> = { koordinator, lage, vertrieb, messen, finanz, projekte, kapital, golf, redaktion, jaeger, rat }
+const LAEUFER: Record<AgentKey, () => Promise<Ergebnis>> = { koordinator, lage, vertrieb, messen, finanz, projekte, kapital, golf, redaktion, jaeger, rat, bulletin: () => erstelleBulletin() }
 
 export async function fuehreAgentAus(key: AgentKey): Promise<void> {
   try {

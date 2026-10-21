@@ -30,6 +30,7 @@ export const tr: AdminTexte = {
     veroeffentlichungen: { label: "Yayınlar", hint: "Ne çıktı, ne geri döndü" },
     uebersicht: { label: "Genel bakış", hint: "Bugün önemli olan" },
     assistent: { label: "Asistan", hint: "Sohbet, ses, onaylar" },
+    bulletin: { label: "Bülten", hint: "Yapay zekâ, medya, çip, robotik – yorumlu" },
     verkaufen: { label: "Bugün sat", hint: "Anlaşmalar, hedef, sıradaki hamle" },
     messen: { label: "Fuarlar", hint: "Fiber, dijital, 3D baskı, e-ticaret" },
     anfragen: { label: "Talepler", hint: "Gelen, değerlendirme, sonraki adım" },
@@ -1102,7 +1103,7 @@ export const tr: AdminTexte = {
       },
       "eigenes-system": {
         label: "Sistem bizden — ya da inceleyip devraldık",
-        warum: "Tanımadığımız bir kodun arkasında duramayız.",
+        warum: "Tanımadı��ımız bir kodun arkasında duramayız.",
       },
       grenze: {
         label: "İşletme sınırı biliyor — ayda iki içerik değişikliği",
