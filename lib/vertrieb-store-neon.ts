@@ -1819,6 +1819,13 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
         case "pflege-faellig":
           where.push(`c.next_touch_at IS NOT NULL AND c.next_touch_at <= ${SQL_HEUTE}`)
           break
+        /* Für „Heute zu tun": Wer zu einer offenen Chance gehört (selbst oder
+           über seine Firma), wird über die Chance geführt — ein Vorgang, ein Punkt. */
+        case "pflege-faellig-ohne-chance":
+          where.push(`c.next_touch_at IS NOT NULL AND c.next_touch_at <= ${SQL_HEUTE}`)
+          where.push(`NOT EXISTS (SELECT 1 FROM opportunities o WHERE ${OPEN_CLAUSE}
+                        AND (o.contact_id = c.id OR (c.organisation_id IS NOT NULL AND o.organisation_id = c.organisation_id)))`)
+          break
       }
       if (query.search?.trim()) {
         /* ADM-07 · A24 — Suchwort und Spalte auf denselben Nenner (`lib/tuerkisch.ts`). */

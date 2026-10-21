@@ -246,7 +246,7 @@ export async function collectAttention(store: VertriebStore | null): Promise<Att
       const [summary, neue, pflege, faelligeAnfragen] = await Promise.all([
         store.summary(),
         store.listEnquiries({ handling: "neu", limit: 12 }),
-        store.listContacts({ bucket: "pflege-faellig", limit: 12 }),
+        store.listContacts({ bucket: "pflege-faellig-ohne-chance", limit: 12 }),
         /* ADM-03 · A07 — ein zugesagter Rückruf auf eine Anfrage ist genauso fällig wie einer auf eine Chance. */
         store.listEnquiries({ faellig: true, limit: 12 }),
       ])

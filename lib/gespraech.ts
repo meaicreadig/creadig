@@ -317,6 +317,23 @@ export async function speichereGespraech(
     [input.kontaktId, input.folge, input.folgeAm],
   )
 
+  /* Ein Gespräch legt den nächsten Termin für den ganzen Vorgang fest — nicht
+     nur für die Person. Offene Chancen derselben Person oder Firma rücken mit,
+     sonst fragt das System bei der Chance weiter, obwohl Ruhe vereinbart ist. */
+  if (input.folgeAm) {
+    await c.sql.query(
+      `UPDATE opportunities o
+          SET next_action_at = $2::date,
+              next_action = COALESCE(o.next_action, $3::text),
+              updated_at = now()
+        WHERE o.status NOT IN ('won','lost') AND o.excluded_reason IS NULL
+          AND (o.contact_id = $1
+               OR o.organisation_id = (SELECT organisation_id FROM contacts WHERE id = $1))
+          AND (o.next_action_at IS NULL OR o.next_action_at < $2::date)`,
+      [input.kontaktId, input.folgeAm, input.folge],
+    )
+  }
+
   try {
     const [{ notiereGespraech }, { neonAbfrage }] = await Promise.all([import("@/lib/kundenfaden"), import("@/lib/neon-abfrage")])
     const nq = neonAbfrage()
