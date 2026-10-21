@@ -97,7 +97,15 @@ export type FreigabeExtra = {
   /** Kampagnen-Versand (Mail Studio): eine Zeile je Empfänger, damit Antworten zuordenbar sind — nie Nachfass-Kette. */
   kampagneId?: string
   zustellungId?: string
+  /** Instagram-Beitrag aus derselben Redaktions-Freigabe */
+  instagramId?: string
+  instagramUrl?: string | null
+  /** Freigegebene Kapitalchance = Vorhaben mit Stufe und KI-Antragsskizze */
+  antrag?: { stufe: KapitalStufe; seit: string; skizze?: string }
 }
+
+export const KAPITAL_STUFEN = ["pruefen", "schreiben", "eingereicht", "bewilligt", "abgelehnt"] as const
+export type KapitalStufe = (typeof KAPITAL_STUFEN)[number]
 
 export type Lauf = { agent: string; ergebnis: string; anzahl: number; fehler: string | null; zeit: string }
 
@@ -330,6 +338,20 @@ export async function ladeFreigaben(): Promise<Freigabe[]> {
     `SELECT ${FREIGABE_SPALTEN} FROM assistent_freigaben
      WHERE status = 'offen' OR erledigt_at > now() - interval '3 days'
      ORDER BY (status = 'offen') DESC, created_at DESC LIMIT 50`,
+    [],
+  )) as FreigabeZeile[]
+  return rows.map(alsFreigabe)
+}
+
+/** Freigegebene Kapitalchancen – bleiben sichtbar, bis bewilligt oder abgelehnt (dann 30 Tage). */
+export async function ladeKapitalVorhaben(): Promise<Freigabe[]> {
+  const q = await assistentDb()
+  if (!q) return []
+  const rows = (await q(
+    `SELECT ${FREIGABE_SPALTEN} FROM assistent_freigaben
+     WHERE art = 'kapital' AND status = 'freigegeben'
+       AND (coalesce(extra->'antrag'->>'stufe', 'pruefen') NOT IN ('bewilligt','abgelehnt') OR erledigt_at > now() - interval '30 days')
+     ORDER BY created_at DESC LIMIT 20`,
     [],
   )) as FreigabeZeile[]
   return rows.map(alsFreigabe)

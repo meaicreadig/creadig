@@ -4,6 +4,7 @@ import { after } from "next/server"
 import {
   ArrowUpRight,
   CalendarClock,
+  Camera,
   CalendarRange,
   Check,
   ClipboardList,
@@ -49,7 +50,11 @@ import { EingangListe } from "@/components/admin/eingang-liste"
 import { ladeNeueBuchungen } from "@/lib/termine/store"
 import { Disclosure } from "@/components/ui/disclosure"
 
-import { agentStarten, antwortErhalten, freigabeEntscheiden, ratAntworten } from "./actions"
+import { agentStarten, antwortErhalten, freigabeEntscheiden, kapitalStufe, ratAntworten } from "./actions"
+import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
+import { instagramBereit, ladeInstagram } from "@/lib/assistent/instagram"
+import { STUFE_TEXT } from "@/lib/assistent/kapital-antrag"
+import { KAPITAL_STUFEN, ladeKapitalVorhaben } from "@/lib/assistent/store"
 import { antwortZuruecknehmen } from "../marketing/mail/actions"
 import { letzteAbendRueckmeldung, type AbendRueckmeldung } from "@/lib/assistent/abend"
 
@@ -134,10 +139,14 @@ function Sitzung({ rat, fruehere, rahmen }: { rat: Rat | undefined; fruehere: Ra
           </p>
           <form action={agentStarten}>
             <input type="hidden" name="agent" value="rat" />
-            <button className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90">
+            <AktionKnopf
+              laeuft="Sitzung tagt …"
+              fertig="Sitzung beendet – Beschlüsse stehen oben"
+              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+            >
               <Play className="size-4" aria-hidden="true" />
               Sitzung jetzt einberufen
-            </button>
+            </AktionKnopf>
           </form>
         </div>
       ) : (
@@ -228,9 +237,13 @@ function Sitzung({ rat, fruehere, rahmen }: { rat: Rat | undefined; fruehere: Ra
                     placeholder="Deine Antwort fließt in die nächste Sitzung ein …"
                     className="resize-none rounded-2xl bg-card p-4 text-sm leading-relaxed text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary"
                   />
-                  <button className="self-end rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90">
+                  <AktionKnopf
+                    laeuft="Wird gespeichert …"
+                    fertig="Antwort gespeichert – fließt in die nächste Sitzung"
+                    className="flex items-center gap-2 self-end rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+                  >
                     Antworten
-                  </button>
+                  </AktionKnopf>
                 </form>
               )}
             </article>
@@ -334,10 +347,14 @@ function AgentKarte({ a, lauf }: { a: AgentInfo; lauf?: Lauf }) {
           <span className="text-xs text-muted-foreground">{lauf ? seit(lauf.zeit) : "noch nie gelaufen"}</span>
           <form action={agentStarten}>
             <input type="hidden" name="agent" value={a.key} />
-            <button className="flex items-center gap-1 rounded-full bg-card px-3 py-1.5 text-xs text-primary shadow-sm">
+            <AktionKnopf
+              laeuft="Arbeitet …"
+              fertig={`${a.name} ist fertig – Ergebnis steht in der Karte`}
+              className="flex items-center gap-1 rounded-full bg-card px-3 py-1.5 text-xs text-primary shadow-sm"
+            >
               <Play className="size-3" aria-hidden="true" />
               Jetzt
-            </button>
+            </AktionKnopf>
           </form>
         </div>
       </div>
@@ -364,7 +381,21 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele })
             LinkedIn-Beitrag
           </span>
           <span>von {agentName(f.agent)} · {seit(f.zeit)}</span>
-          {!offen ? <span>· {f.status === "freigegeben" ? (f.extra.postUrn ? "veröffentlicht" : "freigegeben") : "verworfen"}</span> : null}
+          {!offen ? (
+            <span>
+              · {f.status === "freigegeben" ? (f.extra.postUrn || f.extra.instagramId ? "veröffentlicht" : "freigegeben") : "verworfen"}
+            </span>
+          ) : null}
+          {f.extra.postUrn?.startsWith("urn:li:") ? (
+            <a href={`https://www.linkedin.com/feed/update/${f.extra.postUrn}/`} target="_blank" rel="noreferrer" className="text-primary underline-offset-2 hover:underline">
+              LinkedIn ansehen
+            </a>
+          ) : null}
+          {f.extra.instagramUrl ? (
+            <a href={f.extra.instagramUrl} target="_blank" rel="noreferrer" className="text-primary underline-offset-2 hover:underline">
+              Instagram ansehen
+            </a>
+          ) : null}
         </div>
         {f.extra.warum ? (
           <p className="rounded-2xl bg-secondary px-4 py-3 text-sm leading-relaxed text-secondary-foreground">
@@ -392,10 +423,10 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele })
                 rows={10}
                 className="resize-y rounded-2xl bg-muted px-4 py-3 text-sm leading-relaxed text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary"
               />
-              {f.extra.fehler ? <p className="text-sm text-destructive">LinkedIn: {f.extra.fehler}</p> : null}
+              {f.extra.fehler ? <p role="alert" className="text-sm text-destructive">{f.extra.fehler}</p> : null}
               {linkedin.firma || linkedin.inhaber ? (
                 <fieldset className="flex flex-wrap gap-2">
-                  <legend className="sr-only">Wo posten?</legend>
+                  <legend className="sr-only">Wo auf LinkedIn posten?</legend>
                   {(
                     [
                       { kanal: "firma", label: "Firmenseite", name: linkedin.firma },
@@ -412,24 +443,46 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele })
                         {z.label}
                       </label>
                     ))}
+                  {linkedin.instagram ? (
+                    <label className="flex cursor-pointer items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-sm text-foreground has-[:checked]:bg-primary has-[:checked]:text-primary-foreground">
+                      <input type="radio" name="ziel" value="keins" className="sr-only" />
+                      Kein LinkedIn
+                    </label>
+                  ) : null}
                 </fieldset>
               ) : null}
-              <button className="flex w-fit items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">
+              {linkedin.instagram && f.bildPfad ? (
+                <label className="flex w-fit cursor-pointer items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-sm text-foreground has-[:checked]:bg-primary has-[:checked]:text-primary-foreground">
+                  <input type="checkbox" name="instagram" value="ja" defaultChecked className="sr-only" />
+                  <Camera className="size-4" aria-hidden="true" />
+                  Auch auf Instagram ({linkedin.instagram})
+                </label>
+              ) : null}
+              {!linkedin.firma && !linkedin.inhaber && linkedin.instagram ? <input type="hidden" name="ziel" value="keins" /> : null}
+              <AktionKnopf
+                laeuft="Wird veröffentlicht …"
+                fertig="Freigegeben – Beitrag ist raus"
+                className="flex w-fit items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
+              >
                 <Check className="size-4" aria-hidden="true" />
-                {linkedin.firma || linkedin.inhaber ? "Freigeben & auf LinkedIn posten" : "Freigeben"}
-              </button>
+                {linkedin.firma || linkedin.inhaber || linkedin.instagram ? "Freigeben & posten" : "Freigeben"}
+              </AktionKnopf>
             </form>
             <form action={freigabeEntscheiden}>
               <input type="hidden" name="id" value={f.id} />
               <input type="hidden" name="status" value="verworfen" />
-              <button className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground">
+              <AktionKnopf
+                laeuft="Wird verworfen …"
+                fertig="Verworfen"
+                className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground"
+              >
                 <X className="size-4" aria-hidden="true" />
                 Verwerfen
-              </button>
+              </AktionKnopf>
             </form>
-            {!linkedin.firma && !linkedin.inhaber ? (
+            {!linkedin.firma && !linkedin.inhaber && !linkedin.instagram ? (
               <p className="text-xs text-muted-foreground">
-                LinkedIn noch nicht verbunden – nach dem Verbinden postet „Freigeben“ direkt mit Bild.
+                Noch kein Kanal verbunden – nach dem Verbinden postet „Freigeben“ direkt mit Bild.
               </p>
             ) : null}
           </>
@@ -449,7 +502,138 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele })
   )
 }
 
-type LinkedinZiele = { inhaber: string | null; firma: string | null }
+type LinkedinZiele = { inhaber: string | null; firma: string | null; instagram: string | null }
+
+const IG_TEXT: Record<string, string> = {
+  verbunden: "Instagram verbunden – Redaktions-Beiträge können jetzt mit Bild auf Instagram gehen.",
+  abgebrochen: "Instagram-Verbindung abgebrochen.",
+  fehler: "Instagram hat abgelehnt. Prüfe in der Meta-App die Redirect-URL und ob dein Konto als Tester eingetragen ist.",
+  "app-fehlt": "Es fehlen noch INSTAGRAM_APP_ID und INSTAGRAM_APP_SECRET in den Vars (Anleitung im Chat).",
+}
+
+function InstagramStatus({ name, bereit, meldung }: { name: string | null; bereit: boolean; meldung?: string }) {
+  return (
+    <div className="flex flex-col gap-2 rounded-3xl bg-card p-4 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="flex items-center gap-2 text-sm text-foreground">
+          <Camera className="size-4 text-primary" aria-hidden="true" />
+          <span className="font-medium">Instagram:</span>
+          {name ? name : <span className="text-muted-foreground">{bereit ? "nicht verbunden" : "Meta-App fehlt noch"}</span>}
+        </p>
+        <Link href="/api/instagram/verbinden" prefetch={false} className="rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground">
+          {name ? "Neu verbinden" : "Verbinden"}
+        </Link>
+      </div>
+      {meldung && IG_TEXT[meldung] ? <p className="text-sm text-muted-foreground">{IG_TEXT[meldung]}</p> : null}
+    </div>
+  )
+}
+
+function KapitalVorhaben({ liste }: { liste: Freigabe[] }) {
+  return (
+    <section id="kapital" aria-labelledby="kapital-titel" className="flex scroll-mt-6 flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <h2 id="kapital-titel" className="font-sans text-xl font-semibold text-foreground">
+          Kapital · deine Vorhaben
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Hier landet jede freigegebene Förderchance. Der Assistent schreibt eine Antragsskizze, du rückst Schritt für Schritt vor.
+        </p>
+      </div>
+      <ul className="grid gap-4 lg:grid-cols-2">
+        {liste.map((f) => {
+          const stufe = f.extra.antrag?.stufe ?? "pruefen"
+          const index = KAPITAL_STUFEN.indexOf(stufe)
+          const naechste = stufe === "pruefen" ? "schreiben" : stufe === "schreiben" ? "eingereicht" : null
+          const quelle = f.inhalt.match(/https?:\/\/\S+/)?.[0]?.replace(/[).,]+$/, "")
+          return (
+            <li key={f.id} id={`frg-${f.id}`} className="flex scroll-mt-6 flex-col gap-4 rounded-3xl bg-card p-5 shadow-sm">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-muted-foreground">Freigegeben {seit(f.zeit)}</span>
+                <h3 className="text-balance font-medium leading-snug text-foreground">{f.titel}</h3>
+              </div>
+              <ol className="flex flex-wrap gap-2" aria-label="Fortschritt">
+                {KAPITAL_STUFEN.slice(0, 3).map((s, i) => (
+                  <li
+                    key={s}
+                    aria-current={s === stufe ? "step" : undefined}
+                    className={`rounded-full px-3 py-1 text-xs ${
+                      i < index || stufe === "bewilligt" ? "bg-primary/10 text-primary" : s === stufe ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {STUFE_TEXT[s].titel}
+                  </li>
+                ))}
+                {stufe === "bewilligt" || stufe === "abgelehnt" ? (
+                  <li className={`rounded-full px-3 py-1 text-xs ${stufe === "bewilligt" ? "bg-primary text-primary-foreground" : "bg-destructive/10 text-destructive"}`}>
+                    {STUFE_TEXT[stufe].titel}
+                  </li>
+                ) : null}
+              </ol>
+              <p className="text-sm leading-relaxed text-foreground">
+                <span className="font-medium">Jetzt: </span>
+                {STUFE_TEXT[stufe].tun}
+              </p>
+              {f.extra.antrag?.skizze ? (
+                <details>
+                  <summary className="cursor-pointer text-sm text-primary">Antragsskizze vom Assistenten</summary>
+                  <p className="mt-2 select-all whitespace-pre-wrap text-sm leading-relaxed text-foreground">{f.extra.antrag.skizze}</p>
+                </details>
+              ) : (
+                <p className="text-sm text-muted-foreground">Antragsskizze wird geschrieben – beim nächsten Öffnen da.</p>
+              )}
+              <div className="flex flex-wrap items-center gap-2">
+                {quelle ? (
+                  <a href={quelle} target="_blank" rel="noreferrer" className="flex items-center gap-1 rounded-full bg-primary/10 px-4 py-2 text-sm text-primary">
+                    Programm öffnen
+                    <ArrowUpRight className="size-4" aria-hidden="true" />
+                  </a>
+                ) : null}
+                {naechste ? (
+                  <form action={kapitalStufe}>
+                    <input type="hidden" name="id" value={f.id} />
+                    <input type="hidden" name="stufe" value={naechste} />
+                    <AktionKnopf
+                      laeuft="Wird gespeichert …"
+                      fertig={`Weiter: ${STUFE_TEXT[naechste].titel}`}
+                      className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
+                    >
+                      <Check className="size-4" aria-hidden="true" />
+                      {naechste === "schreiben" ? "Passt – Antrag schreiben" : "Eingereicht"}
+                    </AktionKnopf>
+                  </form>
+                ) : null}
+                {stufe === "eingereicht"
+                  ? (["bewilligt", "abgelehnt"] as const).map((s) => (
+                      <form key={s} action={kapitalStufe}>
+                        <input type="hidden" name="id" value={f.id} />
+                        <input type="hidden" name="stufe" value={s} />
+                        <AktionKnopf
+                          fertig={STUFE_TEXT[s].titel}
+                          className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm ${s === "bewilligt" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}
+                        >
+                          {STUFE_TEXT[s].titel}
+                        </AktionKnopf>
+                      </form>
+                    ))
+                  : null}
+                {stufe === "pruefen" ? (
+                  <form action={kapitalStufe}>
+                    <input type="hidden" name="id" value={f.id} />
+                    <input type="hidden" name="stufe" value="abgelehnt" />
+                    <AktionKnopf fertig="Als unpassend abgelegt" className="rounded-full px-3 py-2 text-sm text-muted-foreground hover:bg-muted">
+                      Passt doch nicht
+                    </AktionKnopf>
+                  </form>
+                ) : null}
+              </div>
+            </li>
+          )
+        })}
+      </ul>
+    </section>
+  )
+}
 
 function LinkedinStatus({ ziele, meldung }: { ziele: LinkedinZiele; meldung?: string }) {
   const text: Record<string, string> = {
@@ -552,26 +736,34 @@ function MailKarte({ f }: { f: Freigabe }) {
             </p>
           ) : null}
           <div className="flex flex-wrap gap-2">
-            <button className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">
+            <AktionKnopf
+              nichtWenn="verworfen"
+              laeuft="Wird gesendet …"
+              fertig="Mail ist raus – Nachfassen läuft automatisch"
+              className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
+            >
               <Check className="size-4" aria-hidden="true" />
               Freigeben und senden
-            </button>
+            </AktionKnopf>
             <Link
               href={`/admin/marketing/mail/einzel?freigabe=${encodeURIComponent(f.id)}`}
               className="flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-2 text-sm text-primary hover:bg-primary/15"
             >
               Im Mail-Studio gestalten
             </Link>
-            <button
+            <AktionKnopf
               formAction={freigabeEntscheiden}
               name="status"
               value="verworfen"
               formNoValidate
+              nurWenn="verworfen"
+              laeuft="Wird verworfen …"
+              fertig="Verworfen – nichts wurde gesendet"
               className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground"
             >
               <X className="size-4" aria-hidden="true" />
               Verwerfen
-            </button>
+            </AktionKnopf>
           </div>
           <p className="text-xs text-muted-foreground">Antworten landen in deinem Postfach. Ohne Antwort schlägt der Vertrieb nach 5 und 9 Tagen ein Nachfassen vor.</p>
         </form>
@@ -588,13 +780,17 @@ function MailKarte({ f }: { f: Freigabe }) {
               </span>
               <form action={antwortZuruecknehmen}>
                 <input type="hidden" name="id" value={f.id} />
-                <button className="rounded-full px-3 py-1 text-muted-foreground hover:bg-muted">Rückgängig</button>
+                <AktionKnopf laeuft="…" fertig="Rückgängig gemacht" className="flex items-center gap-1 rounded-full px-3 py-1 text-muted-foreground hover:bg-muted">
+                  Rückgängig
+                </AktionKnopf>
               </form>
             </>
           ) : (
             <form action={antwortErhalten}>
               <input type="hidden" name="id" value={f.id} />
-              <button className="rounded-full bg-secondary px-3 py-1 text-secondary-foreground">Antwort erhalten</button>
+              <AktionKnopf laeuft="…" fertig="Notiert – Nachfassen gestoppt" className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-secondary-foreground">
+                Antwort erhalten
+              </AktionKnopf>
             </form>
           )}
         </div>
@@ -656,18 +852,22 @@ function LoeschKarte({ f }: { f: Freigabe }) {
                   <input type="hidden" name="id" value={f.id} />
                   <input type="hidden" name="status" value="freigegeben" />
                   <input type="hidden" name="bestaetigt" value="ja" />
-                  <button className="flex items-center gap-1.5 rounded-full bg-destructive px-4 py-2 text-sm text-destructive-foreground">
+                  <AktionKnopf
+                    laeuft="Wird gelöscht …"
+                    fertig="Gelöscht"
+                    className="flex items-center gap-1.5 rounded-full bg-destructive px-4 py-2 text-sm text-destructive-foreground"
+                  >
                     <Check className="size-4" aria-hidden="true" />
                     Ja, endgültig löschen
-                  </button>
+                  </AktionKnopf>
                 </form>
                 <form action={freigabeEntscheiden}>
                   <input type="hidden" name="id" value={f.id} />
                   <input type="hidden" name="status" value="verworfen" />
-                  <button className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground">
+                  <AktionKnopf fertig="Behalten" className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground">
                     <X className="size-4" aria-hidden="true" />
                     Nein, behalten
-                  </button>
+                  </AktionKnopf>
                 </form>
               </div>
             </div>
@@ -720,21 +920,38 @@ function FreigabeInhalt({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele 
             <form action={freigabeEntscheiden}>
               <input type="hidden" name="id" value={f.id} />
               <input type="hidden" name="status" value="freigegeben" />
-              <button className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">
+              <AktionKnopf
+                laeuft="Wird übernommen …"
+                fertig={f.art === "kapital" ? "Freigegeben – liegt jetzt unter „Kapital · deine Vorhaben“" : "Freigegeben – steht unter „Erledigt“"}
+                className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
+              >
                 <Check className="size-4" aria-hidden="true" />
                 Freigeben
-              </button>
+              </AktionKnopf>
             </form>
             <form action={freigabeEntscheiden}>
               <input type="hidden" name="id" value={f.id} />
               <input type="hidden" name="status" value="verworfen" />
-              <button className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground">
+              <AktionKnopf
+                laeuft="Wird verworfen …"
+                fertig="Verworfen"
+                className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground"
+              >
                 <X className="size-4" aria-hidden="true" />
                 Verwerfen
-              </button>
+              </AktionKnopf>
             </form>
           </div>
+          <p className="text-xs text-muted-foreground">
+            {f.art === "kapital"
+              ? "Freigeben = Vorhaben anlegen. Der Assistent schreibt dir eine Antragsskizze und führt dich bis zur Einreichung."
+              : "Freigeben = du übernimmst es. Es wandert unter „Erledigt“."}
+          </p>
         </>
+      ) : f.status === "freigegeben" && f.art === "kapital" ? (
+        <a href={`#frg-${f.id}`} className="w-fit text-sm text-primary">
+          Liegt unter „Kapital · deine Vorhaben“
+        </a>
       ) : f.status === "freigegeben" ? (
         <details>
           <summary className="cursor-pointer text-sm text-primary">Text kopieren</summary>
@@ -745,15 +962,22 @@ function FreigabeInhalt({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele 
   )
 }
 
-export default async function AssistentPage({ searchParams }: { searchParams: Promise<{ linkedin?: string }> }) {
-  const { linkedin: liMeldung } = await searchParams
-  const [liInhaber, liFirma] = await Promise.all([
+export default async function AssistentPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ linkedin?: string; instagram?: string }>
+}) {
+  const { linkedin: liMeldung, instagram: igMeldung } = await searchParams
+  const [liInhaber, liFirma, ig, kapital] = await Promise.all([
     ladeLinkedin("inhaber").catch(() => null),
     ladeLinkedin("firma").catch(() => null),
+    ladeInstagram().catch(() => null),
+    ladeKapitalVorhaben().catch(() => []),
   ])
   const liZiele: LinkedinZiele = {
     inhaber: liInhaber ? liInhaber.name ?? "dein Profil" : null,
     firma: liFirma ? liFirma.name ?? "Firmenseite" : null,
+    instagram: ig ? ig.name ?? "Instagram" : null,
   }
   const [verlauf, freigabenAlle, heute, laeufe, board, raete, rahmen, beitraege, ansprache] = await Promise.all([
     ladeVerlauf(40),
@@ -798,25 +1022,34 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
 
         <EingangListe eintraege={eingang} aktiv={eingangAktiv()} buchungen={buchungen} />
 
+        {kapital.length > 0 ? <KapitalVorhaben liste={kapital} /> : null}
+
         <section id="redaktion" aria-labelledby="redaktion-titel" className="flex scroll-mt-6 flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-col gap-1">
               <h2 id="redaktion-titel" className="font-sans text-xl font-semibold text-foreground">
-                LinkedIn · Redaktion
+                Social Media · Redaktion
               </h2>
               <p className="text-sm text-muted-foreground">
-                Thema aus der Geschäftsleitung, Text und Bild von der Redaktion – du gibst frei, dann wird gepostet.
+                Thema aus der Geschäftsleitung, Text und Bild von der Redaktion – du gibst frei, dann geht es auf LinkedIn und Instagram.
               </p>
             </div>
             <form action={agentStarten}>
               <input type="hidden" name="agent" value="redaktion" />
-              <button className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+              <AktionKnopf
+                laeuft="Redaktion schreibt (30–60 Sek.) …"
+                fertig="Neuer Beitrag ist da – unten freigeben"
+                className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+              >
                 <PenLine className="size-4" aria-hidden="true" />
                 Neuen Beitrag erstellen
-              </button>
+              </AktionKnopf>
             </form>
           </div>
-          <LinkedinStatus ziele={liZiele} meldung={liMeldung} />
+          <div className="grid gap-3 lg:grid-cols-2">
+            <LinkedinStatus ziele={liZiele} meldung={liMeldung} />
+            <InstagramStatus name={liZiele.instagram} bereit={instagramBereit()} meldung={igMeldung} />
+          </div>
           {beitraege.length > 0 ? (
             <ul className="grid gap-4 lg:grid-cols-2">
               {beitraege.map((f) => (
@@ -913,6 +1146,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
           </section>
         </div>
       </div>
+      <AktionMeldung />
     </AdminShell>
   )
 }

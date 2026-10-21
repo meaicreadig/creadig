@@ -1,7 +1,11 @@
 "use server"
 
-import { cookies } from "next/headers"
+import { cookies, headers } from "next/headers"
 import { revalidatePath } from "next/cache"
+import { after } from "next/server"
+
+import { veroeffentlicheInstagram } from "@/lib/assistent/instagram"
+import { schreibeAntragsskizze } from "@/lib/assistent/kapital-antrag"
 
 import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
@@ -25,6 +29,8 @@ import {
   setzeMailKopf,
   speichereNachricht,
   TAGESLIMIT,
+  KAPITAL_STUFEN,
+  type KapitalStufe,
   type Nachricht,
 } from "@/lib/assistent/store"
 import { darfBetreten } from "@/lib/rollen"
@@ -155,18 +161,65 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
     revalidatePath("/admin/verkaufen")
   }
 
-  const kanal = form.get("ziel") === "firma" ? "firma" : "inhaber"
+  if (status === "freigegeben" && f.art === "kapital") {
+    await ergaenzeExtra(fid, { antrag: { stufe: "pruefen", seit: new Date().toISOString() } })
+    after(() => schreibeAntragsskizze(fid).catch((e) => console.error("[kapital] skizze", e)))
+  }
+
+  const zielWert = form.get("ziel")
+  const kanal = zielWert === "firma" ? "firma" : "inhaber"
+  const aufLinkedin = zielWert !== "keins"
+  const aufInstagram = form.get("instagram") === "ja"
   if (status === "freigegeben" && f.art === "linkedin") {
-    /* Ohne Verbindung wird NICHT als freigegeben markiert: Der Inhaber muss sehen, dass nichts gepostet wurde. */
-    if (!(await ladeLinkedin(kanal))) {
-      await ergaenzeExtra(fid, { fehler: `${kanal === "firma" ? "Firmenseite" : "LinkedIn"} ist nicht verbunden — nichts wurde gepostet. Bitte verbinden und erneut freigeben.` })
+    const text = typeof inhalt === "string" && inhalt.trim() ? inhalt.trim() : f.inhalt
+    const fehler: string[] = []
+    let erfolg = false
+
+    if (aufInstagram) {
+      try {
+        const h = await headers()
+        const origin = `https://${h.get("x-forwarded-host") ?? h.get("host")}`
+        const r = await veroeffentlicheInstagram({ freigabeId: fid, text, origin })
+        await ergaenzeExtra(fid, { instagramId: r.medienId, instagramUrl: r.link })
+        erfolg = true
+        const heute = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date())
+        await getVertriebStore({ kennung: rolle, herkunft: "HUMAN" })
+          ?.recordPublication({ was: `Instagram: ${text.split("\n")[0].slice(0, 180)}`, kanal: "andere", veroeffentlichtAm: heute, url: r.link })
+          .catch(() => null)
+      } catch (e) {
+        console.error("[instagram] post", e)
+        fehler.push(`Instagram: ${e instanceof Error ? e.message.slice(0, 200) : "fehlgeschlagen"}`)
+      }
+    }
+
+    if (!aufLinkedin) {
+      if (!erfolg) {
+        await ergaenzeExtra(fid, { fehler: fehler.join(" · ") || "Kein Kanal gewählt — nichts wurde gepostet." })
+        revalidatePath("/admin/assistent")
+        return
+      }
+      await ergaenzeExtra(fid, { fehler: undefined })
+      await setzeFreigabe(fid, status)
       revalidatePath("/admin/assistent")
       return
     }
-    const text = typeof inhalt === "string" && inhalt.trim() ? inhalt.trim() : f.inhalt
+
+    /* Ohne Verbindung wird NICHT als freigegeben markiert: Der Inhaber muss sehen, dass nichts gepostet wurde. */
+    if (!(await ladeLinkedin(kanal))) {
+      if (erfolg) {
+        await ergaenzeExtra(fid, { fehler: "LinkedIn nicht verbunden – nur auf Instagram gepostet." })
+        await setzeFreigabe(fid, status)
+        revalidatePath("/admin/assistent")
+        return
+      }
+      fehler.push(`${kanal === "firma" ? "Firmenseite" : "LinkedIn"} ist nicht verbunden — nichts wurde gepostet. Bitte verbinden und erneut freigeben.`)
+      await ergaenzeExtra(fid, { fehler: fehler.join(" · ") })
+      revalidatePath("/admin/assistent")
+      return
+    }
     try {
       const postUrn = await veroeffentliche({ text, bildPfad: f.bildPfad, alt: f.extra.alt, kanal })
-      await ergaenzeExtra(fid, { postUrn, fehler: undefined })
+      await ergaenzeExtra(fid, { postUrn, fehler: fehler.length ? fehler.join(" · ") : undefined })
       /* Jeder echte Post gehört ins Veröffentlichungsregister — wie bei der Werkstatt unter /admin/marketing. */
       const heute = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date())
       try {
@@ -183,11 +236,28 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
       await protokolliereFaden(await assistentDb().catch(() => null), "marketing", "assistent", f.titel)
     } catch (e) {
       console.error("[linkedin] post", e)
-      await ergaenzeExtra(fid, { fehler: e instanceof Error ? e.message.slice(0, 200) : "Veröffentlichung fehlgeschlagen" })
-      revalidatePath("/admin/assistent")
-      return
+      fehler.push(`LinkedIn: ${e instanceof Error ? e.message.slice(0, 200) : "Veröffentlichung fehlgeschlagen"}`)
+      await ergaenzeExtra(fid, { fehler: fehler.join(" · ") })
+      if (!erfolg) {
+        revalidatePath("/admin/assistent")
+        return
+      }
     }
   }
   await setzeFreigabe(fid, status)
+  revalidatePath("/admin/assistent")
+}
+
+export async function kapitalStufe(form: FormData): Promise<void> {
+  await pruefe()
+  const id = String(form.get("id") ?? "").slice(0, 80)
+  const stufe = form.get("stufe")
+  if (!KAPITAL_STUFEN.includes(stufe as KapitalStufe)) return
+  const f = await ladeFreigabe(id)
+  if (!f || f.art !== "kapital" || f.status !== "freigegeben") return
+  await ergaenzeExtra(id, {
+    antrag: { stufe: stufe as KapitalStufe, seit: new Date().toISOString(), skizze: f.extra.antrag?.skizze },
+  })
+  if (!f.extra.antrag?.skizze) after(() => schreibeAntragsskizze(id).catch(() => undefined))
   revalidatePath("/admin/assistent")
 }
