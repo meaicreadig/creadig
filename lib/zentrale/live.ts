@@ -14,7 +14,7 @@ export async function ladeLive(): Promise<LiveDaten> {
       .catch(() => ({}) as Record<string, string>),
   ])
   return {
-    laeufe: Object.fromEntries(Object.values(laeufe).map((l) => [l.agent, { zeit: l.zeit, fehler: Boolean(l.fehler) }])),
+    laeufe: Object.fromEntries(Object.values(laeufe).map((l) => [l.agent, { zeit: l.zeit, fehler: Boolean(l.fehler), ergebnis: l.ergebnis ?? "" }])),
     takte: Object.fromEntries(AGENTEN.map((a) => [a.key, a.takt])),
     faeden,
   }

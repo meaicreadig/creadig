@@ -85,6 +85,8 @@ export type FreigabeExtra = {
   antwortVerworfen?: string[]
   /** Automatische Suche der Kontaktadresse auf der Firmen-Webseite */
   adressSuche?: "gefunden" | "keine"
+  /** Produkt, das die Verkaufsmail mit Webseiten-Bild vorstellt. */
+  produkt?: "fibero" | "stammo" | "creadig"
   /** Nachfass-Kette: Stufe 1/2, Vorgänger-Mail, angelegte Nachfass-Freigabe */
   stufe?: number
   vorgaenger?: string

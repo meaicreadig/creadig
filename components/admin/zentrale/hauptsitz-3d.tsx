@@ -504,10 +504,26 @@ function RaumModell({
           return (
             <group key={i}>
               <Arbeitsplatz x={plaetze === 1 ? 0 : seite} z={-1.2 + reihe * 2.2} an={an} besetzt={!!stand} farbe={KLEIDUNG[(raum.etage * 3 + raum.spalte + i) % KLEIDUNG.length]} haar={HAAR[(raum.etage * 2 + raum.spalte * 3 + i * 2 + 1) % HAAR.length]} />
-              {gewaehlt && stand && (
-                <Html position={[plaetze === 1 ? 0 : seite, 1.7, -1.2 + reihe * 2.2]} center distanceFactor={10} zIndexRange={[10, 0]}>
-                  <span className="pointer-events-none whitespace-nowrap rounded-full bg-card/90 px-2.5 py-1 font-sans text-[11px] text-foreground shadow-sm backdrop-blur">
-                    {stand.name} · {stand.zeit && jetzt !== null ? `${sprache === "tr" ? "son aktif" : "zuletzt aktiv"} ${vorText(stand.zeit, jetzt, sprache)}` : sprache === "tr" ? "henüz çalışma yok" : "noch kein Lauf erfasst"}
+              {stand && (gewaehlt || an || stand.fehler) && (
+                <Html position={[plaetze === 1 ? 0 : seite, 1.75, -1.2 + reihe * 2.2]} center distanceFactor={gewaehlt ? 10 : 14} zIndexRange={[10, 0]}>
+                  <span className="pointer-events-none flex max-w-56 flex-col gap-0.5 rounded-2xl bg-card/95 px-3 py-1.5 font-sans text-foreground shadow-sm backdrop-blur">
+                    <span className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-semibold">
+                      <span
+                        aria-hidden="true"
+                        className={`size-1.5 rounded-full ${stand.fehler ? "bg-destructive" : an ? "animate-pulse bg-primary" : "bg-muted-foreground/50"}`}
+                      />
+                      {stand.name}
+                    </span>
+                    <span className="text-[10px] leading-snug text-muted-foreground">
+                      {stand.fehler
+                        ? sprache === "tr" ? "son çalışma hata verdi" : "letzter Lauf mit Fehler"
+                        : stand.ergebnis
+                          ? stand.ergebnis
+                          : stand.zeit && jetzt !== null
+                            ? `${sprache === "tr" ? "son aktif" : "zuletzt aktiv"} ${vorText(stand.zeit, jetzt, sprache)}`
+                            : sprache === "tr" ? "henüz çalışma yok" : "noch kein Lauf erfasst"}
+                      {stand.ergebnis && stand.zeit && jetzt !== null && !stand.fehler ? ` · ${vorText(stand.zeit, jetzt, sprache)}` : ""}
+                    </span>
                   </span>
                 </Html>
               )}

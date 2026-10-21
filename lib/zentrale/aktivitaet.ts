@@ -30,10 +30,12 @@ export type AgentStand = {
   zeit: string | null
   /** Der letzte Lauf endete mit Fehler. */
   fehler: boolean
+  /** Was der letzte Lauf tatsächlich erledigt hat (aus assistent_laeufe). */
+  ergebnis?: string
 }
 
 export type LiveDaten = {
-  laeufe: Record<string, { zeit: string; fehler: boolean }>
+  laeufe: Record<string, { zeit: string; fehler: boolean; ergebnis?: string }>
   takte: Record<string, Takt>
   /** „von>nach“ → ISO-Zeit des jüngsten echten Ereignisses. */
   faeden: Record<string, string>

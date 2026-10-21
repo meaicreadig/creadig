@@ -316,18 +316,21 @@ async function zaehleJaegerLaeufe(): Promise<number> {
 const JAGDREVIER = [
   {
     produkt: "fibero",
+    id: "fibero" as const,
     suche:
       "Glasfaser-Montagefirmen, FTTH-Tiefbau- und Spleißbetriebe (5–80 Mitarbeiter) in Niedersachsen, NRW, Bremen, Hamburg, Hessen, die als Subunternehmer für Netzbetreiber arbeiten",
     angebot: "fibero: Aufmaß, Fotos, Hausanschlüsse und Abrechnung an einem Ort statt Excel und WhatsApp",
   },
   {
     produkt: "creaDIG Web & System",
+    id: "creadig" as const,
     suche:
       "Vereine, Verbände, Moscheegemeinden, Stiftungen und mittelständische Betriebe in Niedersachsen/NRW mit sichtbar veralteter Webseite oder ohne Online-Anmeldung/Mitgliederverwaltung",
     angebot: "creaDIG: moderne Webseite plus System (Anmeldung, Mitglieder, Termine) aus einer Hand",
   },
   {
     produkt: "stammo",
+    id: "stammo" as const,
     suche:
       "inhabergeführte Cafés, Bäckereien, Imbisse und vegane Restaurants mit 2–6 Filialen in Deutschland, Österreich, Schweiz oder dem Elsass",
     angebot: "stammo: Stempelkarte im Apple/Google Wallet, die Stammgäste zurückholt",
@@ -347,7 +350,7 @@ Zielgruppe: ${revier.suche}.
 Nur Firmen mit eigener Webseite, die du in der Quelle gesehen hast. Keine Konzerne. Keine Erfindungen.
 Gib, wenn auf der Webseite sichtbar, die öffentliche Kontakt-E-Mail an (Impressum/Kontakt), sonst leer lassen – niemals raten.
 ${bekannt.length ? `Diese Firmen kennen wir schon – NICHT erneut nennen: ${bekannt.slice(0, 80).join(", ")}.` : ""}
-Für jede Firma eine kurze Erstmail auf Deutsch (60–110 Wörter, per Sie, Absender Muhammed Emin Akyol): ein konkreter Bezug zur Firma, ein Nutzen aus "${revier.angebot}", eine kleine Frage am Ende (z. B. 15 Minuten Telefonat). Kein Werbeton.
+Für jede Firma eine kurze Erstmail auf Deutsch (60–110 Wörter, per Sie, Absender Muhammed Emin Akyol): ein konkreter Bezug zur Firma, ein Nutzen aus "${revier.angebot}", eine kleine Frage am Ende (z. B. 15 Minuten Telefonat). Kein Werbeton. Unter der Mail erscheint automatisch eine Produktkarte mit Logo, Webseiten-Bild und Link – Funktionen also NICHT aufzählen und keinen Link in den Text schreiben.
 Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","email":"","warum":"1 Satz, warum gerade diese Firma","betreff":"","mail":""}]`,
   })
   const ziele = jsonListe<Ziel>(text)
@@ -367,7 +370,7 @@ Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","emai
       titel: `Neukunde ${revier.produkt}: ${z.firma} (${z.ort})`,
       empfaenger: an,
       betreff: z.betreff,
-      extra: { adressSuche: an ? "gefunden" : "keine" },
+      extra: { adressSuche: an ? "gefunden" : "keine", produkt: revier.id },
       inhalt: `${z.mail}\n\n---\nWarum diese Firma: ${z.warum}\nWebseite: ${z.website}\n${an ? `Adresse von der Webseite: ${an}` : "Keine Adresse auf der Webseite gefunden – bitte im Impressum nachsehen."}`,
       quelle: `jaeger:${z.firma.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
       agent: "jaeger",

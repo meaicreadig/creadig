@@ -83,6 +83,7 @@ export function bauHauptsitz(
           takt: live?.takte[g] ?? null,
           zeit: live?.laeufe[g]?.zeit ?? null,
           fehler: live?.laeufe[g]?.fehler ?? false,
+          ergebnis: live?.laeufe[g]?.ergebnis ?? "",
         })),
         wege: [...wege, ...signale.flatMap((s) => s.wege)].filter((w, i, all) => all.findIndex((x) => x.href === w.href) === i).slice(0, 5),
       })
