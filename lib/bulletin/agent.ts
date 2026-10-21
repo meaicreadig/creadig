@@ -2,9 +2,13 @@ import "server-only"
 
 import { generateText } from "ai"
 
+import { schreibeArtikel } from "@/lib/artikel/agent"
+
 import {
   RESSORTS,
   ausgabeExistiert,
+  beendeLauf,
+  starteLauf,
   istRessort,
   ladeAusgabe,
   speichereAusgabe,
@@ -45,7 +49,7 @@ async function recherchiere(tag: string): Promise<Fund[]> {
     model: RECHERCHE,
     prompt: `Du bist Nachrichten-Rechercheur. Stand: ${tag}. Finde die wichtigsten ECHTEN Meldungen der letzten 7 Tage (weltweit) zu diesen Ressorts: ${ressorts}.
 Beispiele, worauf es ankommt: neue KI-Modelle und Preise (OpenAI, Google, Anthropic, Meta, Mistral, xAI), KI-Agenten in Unternehmen, Automatisierung im Mittelstand, Änderungen bei Meta/Instagram/LinkedIn/Google-Suche/SEO, Chip-Produktion (TSMC, Nvidia, Intel Magdeburg, ASML, Exportkontrollen), humanoide Roboter und Industrierobotik, EU AI Act/DSGVO/Digitalpolitik, Tech-Investitionen in Deutschland, Türkei, VAE, Saudi-Arabien, Katar.
-Je Ressort 2 Meldungen, insgesamt 12–14. Nur überprüfbare Meldungen mit direkter Artikel-URL einer seriösen Quelle. Nichts erfinden, im Zweifel weglassen.
+Je Ressort 1–2 Meldungen, insgesamt 10–12. Nur überprüfbare Meldungen mit direkter Artikel-URL einer seriösen Quelle. Nichts erfinden, im Zweifel weglassen.
 Antworte NUR mit einem JSON-Array: [{"ressort":"ki|automation|medien|chips|robotik|recht|maerkte","titel":"","fakten":"2–3 Sätze nüchterne Fakten mit Zahlen","quelle":"Medienname","url":"https://…","datum":"YYYY-MM-DD"}]`,
   })
   return (json<Fund[]>(text, "[") ?? []).filter((f) => f?.titel && f?.url?.startsWith("http") && istRessort(f.ressort))
@@ -56,24 +60,38 @@ type Einordnung = {
   meldungen: { nr: number; titel: Zweisprachig; kurz: Zweisprachig; fuerUns: Zweisprachig; gewicht: number; artikel: Zweisprachig | null }[]
 }
 
-async function ordneEin(funde: Fund[]): Promise<Einordnung | null> {
-  const liste = funde.map((f, i) => `#${i} [${f.ressort}] ${f.titel} — ${f.fakten} (${f.quelle})`).join("\n")
+const zeileVon = (f: Fund, i: number) => `#${i} [${f.ressort}] ${f.titel} — ${f.fakten} (${f.quelle})`
+
+async function lageText(funde: Fund[]): Promise<Zweisprachig | null> {
   const { text } = await generateText({
     model: REDAKTION,
     prompt: `Du bist Chefredakteur eines internen Lage-Bulletins für den Inhaber von ${FIRMA}
-Unten stehen recherchierte Meldungen. Erfinde KEINE neuen Fakten, ordne nur ein.
-
-Aufgabe:
-1. "lage": 3–4 Sätze Leitartikel – was diese Woche in Tech/KI/Medien wirklich zählt und was der Inhaber daraus mitnehmen sollte. Klar, souverän, ohne Floskeln.
-2. Für JEDE Meldung (#nr behalten): "titel" (prägnant, max. 12 Wörter), "kurz" (2 Sätze Fakten), "fuerUns" (1–2 Sätze: konkrete Bedeutung für creaDIG – Chance, Risiko oder Handlung; ehrlich "kaum Bezug", wenn es keinen gibt), "gewicht" (3 = Schwerpunkt, höchstens 3 Meldungen; 2 = wichtig; 1 = Randnotiz), "artikel" (nur wenn creaDIG daraus einen eigenen, suchmaschinenstarken Fachartikel mit eigener Haltung schreiben kann: Arbeitstitel; sonst null).
-Alles jeweils auf Deutsch ("de") UND natürlichem Türkisch ("tr").
-
-Meldungen:
-${liste}
-
-Antworte NUR mit JSON: {"lage":{"de":"","tr":""},"meldungen":[{"nr":0,"titel":{"de":"","tr":""},"kurz":{"de":"","tr":""},"fuerUns":{"de":"","tr":""},"gewicht":2,"artikel":{"de":"","tr":""}}]}`,
+Schreibe aus diesen recherchierten Meldungen 3–4 Sätze Leitartikel: was diese Woche in Tech/KI/Medien wirklich zählt und was der Inhaber daraus mitnehmen sollte. Klar, souverän, ohne Floskeln, keine neuen Fakten.
+${funde.map(zeileVon).join("\n")}
+Antworte NUR mit JSON: {"de":"","tr":""} (tr = natürliches Türkisch).`,
   })
-  return json<Einordnung>(text, "{")
+  return zwei(json(text, "{"))
+}
+
+async function ordnePaket(funde: Fund[], start: number): Promise<Einordnung["meldungen"]> {
+  const { text } = await generateText({
+    model: REDAKTION,
+    prompt: `Du ordnest Meldungen für den Inhaber von ${FIRMA} ein. Erfinde KEINE neuen Fakten.
+Für JEDE Meldung (#nr behalten): "titel" (prägnant, max. 12 Wörter), "kurz" (2 Sätze Fakten), "fuerUns" (1–2 Sätze: konkrete Bedeutung für creaDIG – Chance, Risiko oder Handlung; ehrlich "kaum Bezug", wenn es keinen gibt), "gewicht" (3 = Schwerpunkt, höchstens 1 in dieser Liste; 2 = wichtig; 1 = Randnotiz), "artikel" (nur wenn creaDIG daraus einen eigenen, suchmaschinenstarken Fachartikel mit Haltung schreiben kann: Arbeitstitel; sonst null).
+Alles auf Deutsch ("de") UND natürlichem Türkisch ("tr").
+${funde.map((f, i) => zeileVon(f, start + i)).join("\n")}
+Antworte NUR mit JSON: {"meldungen":[{"nr":0,"titel":{"de":"","tr":""},"kurz":{"de":"","tr":""},"fuerUns":{"de":"","tr":""},"gewicht":2,"artikel":{"de":"","tr":""}}]}`,
+  })
+  return json<{ meldungen: Einordnung["meldungen"] }>(text, "{")?.meldungen ?? []
+}
+
+/** Parallel in kleinen Paketen – ein einziger großer Aufruf lief über das Zeitlimit. */
+async function ordneEin(funde: Fund[]): Promise<Einordnung | null> {
+  const pakete: Promise<Einordnung["meldungen"]>[] = []
+  for (let i = 0; i < funde.length; i += 4) pakete.push(ordnePaket(funde.slice(i, i + 4), i).catch(() => []))
+  const [lage, ...teile] = await Promise.all([lageText(funde).catch(() => null), ...pakete])
+  if (!lage) return null
+  return { lage, meldungen: teile.flat() }
 }
 
 /** Erstellt die Ausgabe des Tages. Ohne `erzwingen` nur einmal pro Tag. */
@@ -110,7 +128,27 @@ export async function erstelleBulletin(opt: { erzwingen?: boolean } = {}): Promi
 
   await speichereAusgabe({ id: tag, lage, meldungen })
   const schwer = meldungen.filter((m) => m.gewicht === 3).length
-  return { ergebnis: `Bulletin ${tag}: ${meldungen.length} Meldungen, ${schwer} Schwerpunkte`, anzahl: meldungen.length }
+
+  /* Die Redaktion wartet nicht auf einen Klick: die stärkste Artikelidee wird sofort als Entwurf geschrieben. */
+  let artikel = ""
+  const top = meldungen.find((m) => m.artikel && m.gewicht === 3) ?? meldungen.find((m) => m.artikel)
+  if (top) {
+    artikel = await schreibeArtikel(top, tag)
+      .then((r) => ` · ${r.ergebnis}`)
+      .catch(() => "")
+  }
+  return { ergebnis: `Bulletin ${tag}: ${meldungen.length} Meldungen, ${schwer} Schwerpunkte${artikel}`, anzahl: meldungen.length }
+}
+
+/** Startet die Ausgabe im Hintergrund und merkt sich den Lauf, damit die Seite den Fortschritt zeigt. */
+export async function bulletinImHintergrund(): Promise<void> {
+  await starteLauf()
+  try {
+    const r = await erstelleBulletin({ erzwingen: true })
+    await beendeLauf(r.ergebnis, r.anzahl > 0)
+  } catch {
+    await beendeLauf("Recherche gerade nicht erreichbar – bitte später erneut", false).catch(() => undefined)
+  }
 }
 
 /** Kurzer Anlass-Stoff für die Redaktion: die Schwerpunkte der letzten Ausgabe. */

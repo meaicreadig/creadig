@@ -1,17 +1,19 @@
 import Link from "next/link"
-import { ArrowUpRight, PenLine, RefreshCw } from "lucide-react"
+import { ArrowUpRight, Check, Loader2, PenLine, RefreshCw, X } from "lucide-react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
+import { AutoAktualisieren } from "@/components/admin/auto-aktualisieren"
 import { Surface } from "@/components/admin/primitives"
 import { adminSprache } from "@/lib/admin-i18n/server"
-import { RESSORTS, istRessort, ladeArchiv, ladeAusgabe, type Meldung } from "@/lib/bulletin/store"
+import { ladeArtikelListe, type Artikel } from "@/lib/artikel/store"
+import { RESSORTS, istRessort, ladeArchiv, ladeAusgabe, ladeLauf, type Meldung } from "@/lib/bulletin/store"
 
-import { artikelAnRedaktion, bulletinNeu } from "./actions"
+import { artikelSchreiben, artikelVeroeffentlichen, artikelVerwerfen, bulletinNeu } from "./actions"
 
 export const metadata = { title: "Bulletin" }
 export const dynamic = "force-dynamic"
-export const maxDuration = 120
+export const maxDuration = 300
 
 const T = {
   de: {
@@ -23,9 +25,20 @@ const T = {
     weitere: "Weitere Meldungen",
     fuerUns: "Für creaDIG",
     artikel: "Artikelidee",
-    anRedaktion: "An Redaktion geben",
+    anRedaktion: "Artikel schreiben",
     neu: "Neu recherchieren",
     laeuft: "Recherche läuft …",
+    lauf: "Recherche läuft seit",
+    laufHinweis: "Die Seite aktualisiert sich von selbst. Du kannst sie auch verlassen – die Arbeit läuft weiter.",
+    artikelTitel: "Artikel für creadig.de",
+    artikelLead: "Die Redaktion schreibt aus der stärksten Meldung jeden Morgen einen eigenen Fachartikel (DE + TR). Öffentlich wird er erst mit deiner Freigabe – danach liegt der LinkedIn-Beitrag zur Freigabe bereit.",
+    entwurf: "Entwurf",
+    live: "Live",
+    vorschau: "Ganzen Text lesen",
+    veroeffentlichen: "Veröffentlichen",
+    verwerfen: "Verwerfen",
+    ansehen: "Auf creadig.de ansehen",
+    keineArtikel: "Noch kein Entwurf. Der erste entsteht mit der nächsten Ausgabe – oder klicke bei einer Meldung auf „Artikel schreiben“.",
     archiv: "Ausgaben",
     meldungen: "Meldungen",
     leer: "Die erste Ausgabe entsteht beim nächsten Morgen-Takt. Du kannst sie auch jetzt erstellen.",
@@ -40,9 +53,20 @@ const T = {
     weitere: "Diğer haberler",
     fuerUns: "creaDIG için",
     artikel: "Makale fikri",
-    anRedaktion: "Editörlüğe ver",
+    anRedaktion: "Makale yaz",
     neu: "Yeniden araştır",
     laeuft: "Araştırılıyor …",
+    lauf: "Araştırma sürüyor, başlangıç",
+    laufHinweis: "Sayfa kendini yeniler. Sayfadan çıkabilirsin – çalışma arka planda devam eder.",
+    artikelTitel: "creadig.de için makaleler",
+    artikelLead: "Editörlük her sabah en güçlü haberden kendi uzmanlık makalesini yazar (DE + TR). Senin onayın olmadan yayına çıkmaz – sonra LinkedIn paylaşımı onaya hazır bekler.",
+    entwurf: "Taslak",
+    live: "Yayında",
+    vorschau: "Tüm metni oku",
+    veroeffentlichen: "Yayınla",
+    verwerfen: "At",
+    ansehen: "creadig.de'de gör",
+    keineArtikel: "Henüz taslak yok. İlki bir sonraki sayıyla çıkar – ya da bir haberde „Makale yaz“a tıkla.",
     archiv: "Sayılar",
     meldungen: "haber",
     leer: "İlk sayı bir sonraki sabah taktında çıkar. İstersen şimdi oluşturabilirsin.",
@@ -60,10 +84,13 @@ export default async function BulletinSeite(props: { searchParams: Promise<{ aus
   const sprache = await adminSprache()
   const t = T[sprache]
   const intl = sprache === "tr" ? "tr-TR" : "de-DE"
-  const [ausgabe, archiv] = await Promise.all([
+  const [ausgabe, archiv, lauf, artikel] = await Promise.all([
     ladeAusgabe(ausgabeId && /^\d{4}-\d{2}-\d{2}$/.test(ausgabeId) ? ausgabeId : null).catch(() => null),
     ladeArchiv().catch(() => []),
+    ladeLauf().catch(() => null),
+    ladeArtikelListe().catch(() => [] as Artikel[]),
   ])
+  const uhr = (iso: string) => new Date(iso).toLocaleTimeString(intl, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" })
   const filter = istRessort(ressort) ? ressort : null
   const sichtbar = (ausgabe?.meldungen ?? []).filter((m) => !filter || m.ressort === filter)
   const schwer = sichtbar.filter((m) => m.gewicht === 3)
@@ -77,6 +104,23 @@ export default async function BulletinSeite(props: { searchParams: Promise<{ aus
       <AktionMeldung />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_15rem]">
         <div className="flex min-w-0 flex-col gap-6">
+          {lauf?.laeuft && (
+            <Surface className="flex items-start gap-3">
+              <AutoAktualisieren />
+              <Loader2 className="mt-0.5 size-5 shrink-0 animate-spin text-primary" aria-hidden />
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-medium text-foreground">
+                  {t.lauf} {lauf.start ? uhr(lauf.start) : ""}
+                </p>
+                <p className="text-sm leading-relaxed text-muted-foreground">{t.laufHinweis}</p>
+              </div>
+            </Surface>
+          )}
+          {!lauf?.laeuft && lauf?.ergebnis && !lauf.ok && (
+            <Surface>
+              <p className="text-sm text-destructive">{lauf.ergebnis}</p>
+            </Surface>
+          )}
           {ausgabe ? (
             <>
               <Surface className="flex flex-col gap-4">
@@ -137,6 +181,20 @@ export default async function BulletinSeite(props: { searchParams: Promise<{ aus
               <p className="text-sm leading-relaxed text-muted-foreground">{t.leer}</p>
             </Surface>
           )}
+
+          <section id="artikel" aria-labelledby="artikel-titel" className="flex flex-col gap-3">
+            <h2 id="artikel-titel" className="font-sans text-lg font-semibold text-foreground">
+              {t.artikelTitel}
+            </h2>
+            <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">{t.artikelLead}</p>
+            {artikel.length === 0 ? (
+              <Surface>
+                <p className="text-sm leading-relaxed text-muted-foreground">{t.keineArtikel}</p>
+              </Surface>
+            ) : (
+              artikel.map((a) => <ArtikelKarte key={a.slug} a={a} t={t} sprache={sprache} />)
+            )}
+          </section>
         </div>
 
         <aside className="flex flex-col gap-4">
@@ -186,6 +244,73 @@ function RessortLink({ href, aktiv, children }: { href: string; aktiv: boolean; 
   )
 }
 
+function ArtikelKarte({ a, t, sprache }: { a: Artikel; t: (typeof T)["de"]; sprache: "de" | "tr" }) {
+  const live = a.zustand === "veroeffentlicht"
+  const pfad = `${sprache === "tr" ? "/tr" : ""}/insights/${a.slug}`
+  return (
+    <Surface className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <span
+          className={`rounded-full px-3 py-1 text-xs font-medium ${live ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}
+        >
+          {live ? t.live : t.entwurf}
+        </span>
+        <span className="font-mono text-xs text-muted-foreground">{a.topic[sprache]}</span>
+        {a.quelleName && <span className="font-mono text-xs text-muted-foreground">· {a.quelleName}</span>}
+      </div>
+      <h3 className="text-balance font-sans text-lg font-semibold leading-snug text-foreground">{a.titel[sprache]}</h3>
+      <p className="text-sm leading-relaxed text-muted-foreground">{a.teaser[sprache]}</p>
+      <details className="rounded-2xl bg-muted px-4 py-3">
+        <summary className="cursor-pointer text-sm font-medium text-primary">{t.vorschau}</summary>
+        <div className="flex flex-col gap-3 pt-3">
+          {a.body.map((b, i) =>
+            b.kind === "list" ? (
+              <ul key={i} className="flex list-disc flex-col gap-1 pl-5 text-sm leading-relaxed text-foreground">
+                {b.items[sprache].map((x, k) => (
+                  <li key={k}>{x}</li>
+                ))}
+              </ul>
+            ) : b.kind === "heading" ? (
+              <h4 key={i} className="pt-2 font-sans text-base font-semibold text-foreground">
+                {b.text[sprache]}
+              </h4>
+            ) : (
+              <p key={i} className={`text-sm leading-relaxed ${b.kind === "note" ? "text-muted-foreground" : "text-foreground"}`}>
+                {b.text[sprache]}
+              </p>
+            ),
+          )}
+        </div>
+      </details>
+      <div className="flex flex-wrap items-center gap-2">
+        {live ? (
+          <a href={pfad} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-primary">
+            {t.ansehen}
+            <ArrowUpRight className="size-4" aria-hidden />
+          </a>
+        ) : (
+          <>
+            <form action={artikelVeroeffentlichen}>
+              <input type="hidden" name="slug" value={a.slug} />
+              <AktionKnopf className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+                <Check className="size-4" aria-hidden />
+                {t.veroeffentlichen}
+              </AktionKnopf>
+            </form>
+            <form action={artikelVerwerfen}>
+              <input type="hidden" name="slug" value={a.slug} />
+              <AktionKnopf className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm text-foreground">
+                <X className="size-4" aria-hidden />
+                {t.verwerfen}
+              </AktionKnopf>
+            </form>
+          </>
+        )}
+      </div>
+    </Surface>
+  )
+}
+
 function MeldungKarte({
   m,
   t,
@@ -222,7 +347,7 @@ function MeldungKarte({
           <ArrowUpRight className="size-4" aria-hidden />
         </a>
         {m.artikel && (
-          <form action={artikelAnRedaktion} className="flex items-center gap-2">
+          <form action={artikelSchreiben} className="flex items-center gap-2">
             <input type="hidden" name="ausgabe" value={ausgabe} />
             <input type="hidden" name="nr" value={m.nr} />
             <AktionKnopf className="inline-flex items-center gap-2 rounded-full bg-card px-4 py-2 text-sm text-foreground ring-1 ring-border hover:bg-muted">

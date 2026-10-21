@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next"
+import { ARTIKEL_SPRACHEN, veroeffentlichteInsights } from "@/lib/artikel/store"
 import { publishedInsights, readableInsights } from "@/lib/insights"
 import { publishedSeoLandings } from "@/lib/seo-landings"
 import { publishedServicePages } from "@/lib/service-pages"
@@ -159,7 +160,29 @@ const entries: Entry[] = [
   })),
 ]
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const revalidate = 3600
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const redaktion = await veroeffentlichteInsights().catch(() => [])
+  const bekannt = new Set(readableInsights.map((e) => e.slug))
+  const artikelSprachen = locales.filter(isIndexed).filter((l) => (ARTIKEL_SPRACHEN as readonly string[]).includes(l))
+  const artikelEintraege: MetadataRoute.Sitemap = redaktion
+    .filter((e) => !bekannt.has(e.slug))
+    .flatMap((e) =>
+      artikelSprachen.map((locale) => ({
+        url: localeUrl(`/insights/${e.slug}`, locale),
+        lastModified: e.date,
+        changeFrequency: "yearly" as const,
+        priority: 0.6,
+        alternates: {
+          languages: Object.fromEntries(artikelSprachen.map((l) => [l, localeUrl(`/insights/${e.slug}`, l)])),
+        },
+      })),
+    )
+  return [...basis(), ...artikelEintraege]
+}
+
+function basis(): MetadataRoute.Sitemap {
   return entries.flatMap((entry) =>
     locales.filter(isIndexed).map((locale) => ({
       url: localeUrl(entry.path, locale),

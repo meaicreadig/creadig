@@ -2,7 +2,8 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { InsightPageBody } from "@/components/pages/insight-page-body"
 import { dictionary, type Locale } from "@/lib/dictionary"
-import { findInsight, readableInsights } from "@/lib/insights"
+import { findeInsight } from "@/lib/artikel/oeffentlich"
+import { readableInsights } from "@/lib/insights"
 import { pageMetadata } from "@/lib/page-metadata"
 import { breadcrumbList, jsonLdScript } from "@/lib/json-ld"
 import { SITE_URL, localeUrl } from "@/lib/routes"
@@ -30,7 +31,7 @@ export async function insightMetadata(
   params: Promise<{ slug: string }>,
 ): Promise<Metadata> {
   const { slug } = await params
-  const entry = findInsight(slug)
+  const entry = await findeInsight(slug, locale)
   if (!entry) return {}
 
   return pageMetadata({
@@ -50,7 +51,7 @@ export async function InsightRoute({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const entry = findInsight(slug)
+  const entry = await findeInsight(slug, locale)
   if (!entry) notFound()
 
   const t = dictionary[locale]
