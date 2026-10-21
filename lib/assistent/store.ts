@@ -49,7 +49,22 @@ const SCHEMA = [
     antwort text,
     created_at timestamptz NOT NULL DEFAULT now(),
     beantwortet_at timestamptz)`,
+  `DO $$ BEGIN
+     IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'assistent_freigaben_art_check'
+                    AND pg_get_constraintdef(oid) LIKE '%loeschen%') THEN
+       ALTER TABLE assistent_freigaben DROP CONSTRAINT IF EXISTS assistent_freigaben_art_check;
+       ALTER TABLE assistent_freigaben ADD CONSTRAINT assistent_freigaben_art_check
+         CHECK (art IN ('mail','aufgabe','termin','linkedin','kapital','notiz','loeschen'));
+     END IF;
+   END $$`,
 ]
+
+/**
+ * Interne Arbeit (Aufgaben, Notizen) läuft im Hintergrund über die Koordination und
+ * erscheint nie im Freigabe-Eingang. Sichtbar ist nur, was nach außen geht oder löscht.
+ */
+export const INTERNE_ARTEN = ["aufgabe", "notiz"] as const
+const NUR_SICHTBARE = `art NOT IN ('aufgabe','notiz')`
 
 export const FREIGABE_ARTEN = ["mail", "aufgabe", "termin", "linkedin", "kapital", "notiz", "loeschen"] as const
 export type FreigabeArt = (typeof FREIGABE_ARTEN)[number]
@@ -338,7 +353,7 @@ export async function ladeFreigaben(): Promise<Freigabe[]> {
   if (!q) return []
   const rows = (await q(
     `SELECT ${FREIGABE_SPALTEN} FROM assistent_freigaben
-     WHERE status = 'offen' OR erledigt_at > now() - interval '3 days'
+     WHERE ${NUR_SICHTBARE} AND (status = 'offen' OR erledigt_at > now() - interval '3 days')
      ORDER BY (status = 'offen') DESC, created_at DESC LIMIT 50`,
     [],
   )) as FreigabeZeile[]
@@ -377,7 +392,7 @@ export async function zaehleOffen(): Promise<{ gesamt: number; linkedin: number 
   if (!q) return { gesamt: 0, linkedin: 0 }
   const rows = (await q(
     `SELECT count(*)::int AS gesamt, count(*) FILTER (WHERE art = 'linkedin')::int AS linkedin
-     FROM assistent_freigaben WHERE status = 'offen'`,
+     FROM assistent_freigaben WHERE status = 'offen' AND ${NUR_SICHTBARE}`,
     [],
   )) as { gesamt: number; linkedin: number }[]
   return rows[0] ?? { gesamt: 0, linkedin: 0 }
