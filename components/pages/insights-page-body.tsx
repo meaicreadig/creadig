@@ -6,7 +6,7 @@ import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { Reveal } from "@/components/ui/reveal"
 import { ClosingCta } from "@/components/sections/closing-cta"
-import { filledInsightCategories, insightsInCategory, publishedInsights } from "@/lib/insights"
+import { insightCategoryKeys, publishedInsights, type Insight, type InsightCategoryKey } from "@/lib/insights"
 import { InsightFeature } from "@/components/insight/article-parts"
 
 /**
@@ -35,10 +35,11 @@ import { InsightFeature } from "@/components/insight/article-parts"
  * Die Struktur ist da, bevor der zweite Text existiert, und sie muss beim
  * dritten nicht nachgebaut werden.
  */
-export function InsightsPageBody() {
+export function InsightsPageBody({ entries = publishedInsights }: { entries?: Insight[] }) {
   const { t, locale } = useLocale()
   const copy = t.insightsPage
-  const entries = publishedInsights
+  const insightsInCategory = (key: InsightCategoryKey) => entries.filter((e) => e.category === key)
+  const filledInsightCategories = insightCategoryKeys.filter((key) => insightsInCategory(key).length > 0)
   /* Alles ausser dem Aufmacher. Ist die Liste danach leer, entfaellt der
      Faecher-Block ganz — sechs Ueberschriften ueber nichts waeren genau die
      leeren Regalbretter, die dieser Bereich seit PHASE A ablehnt. */

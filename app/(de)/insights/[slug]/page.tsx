@@ -5,7 +5,8 @@ import {
   insightStaticParams,
 } from "@/app/_routes/insight-detail"
 
-export const dynamicParams = false
+export const dynamicParams = true
+export const revalidate = 300
 export const generateStaticParams = insightStaticParams
 
 export function generateMetadata(props: {

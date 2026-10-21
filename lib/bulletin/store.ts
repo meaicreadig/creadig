@@ -105,6 +105,48 @@ export async function ladeArchiv(anzahl = 21): Promise<{ id: string; anzahl: num
   return rows.map((r) => ({ id: String(r.id), anzahl: Number(r.anzahl) }))
 }
 
+export type Lauf = { laeuft: boolean; start: string | null; ergebnis: string | null; ok: boolean }
+
+const LAUF_TABELLE = `CREATE TABLE IF NOT EXISTS bulletin_lauf (
+  id text PRIMARY KEY, start_at timestamptz, ende_at timestamptz, ergebnis text, ok boolean
+)`
+
+export async function starteLauf(): Promise<void> {
+  const d = await db()
+  if (!d) return
+  await d(LAUF_TABELLE, [])
+  await d(
+    `INSERT INTO bulletin_lauf (id, start_at, ende_at, ergebnis, ok) VALUES ('aktuell', now(), NULL, NULL, NULL)
+     ON CONFLICT (id) DO UPDATE SET start_at = now(), ende_at = NULL, ergebnis = NULL, ok = NULL`,
+    [],
+  )
+}
+
+export async function beendeLauf(ergebnis: string, ok: boolean): Promise<void> {
+  const d = await db()
+  if (!d) return
+  await d(`UPDATE bulletin_lauf SET ende_at = now(), ergebnis = $1, ok = $2 WHERE id = 'aktuell'`, [ergebnis, ok])
+}
+
+/** Ein Lauf ohne Ende, der älter als 6 Minuten ist, gilt als abgebrochen. */
+export async function ladeLauf(): Promise<Lauf> {
+  const d = await db()
+  const leer: Lauf = { laeuft: false, start: null, ergebnis: null, ok: true }
+  if (!d) return leer
+  await d(LAUF_TABELLE, [])
+  const r = (await d(
+    `SELECT start_at, ende_at, ergebnis, ok, (ende_at IS NULL AND start_at > now() - interval '6 minutes') AS laeuft FROM bulletin_lauf WHERE id = 'aktuell'`,
+    [],
+  ))[0]
+  if (!r) return leer
+  return {
+    laeuft: Boolean(r.laeuft),
+    start: r.start_at ? new Date(String(r.start_at)).toISOString() : null,
+    ergebnis: r.ergebnis ? String(r.ergebnis) : r.ende_at || r.laeuft ? null : "Letzte Recherche wurde abgebrochen – bitte erneut starten",
+    ok: r.ok !== false && !(!r.ende_at && !r.laeuft),
+  }
+}
+
 export async function ausgabeExistiert(id: string): Promise<boolean> {
   const d = await db()
   if (!d) return false
