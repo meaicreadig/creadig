@@ -12,6 +12,8 @@
  * "> " = hervorgehobene Aussage, **so** = fett (in der Überschrift: blau).
  */
 
+import { MAIL_PRODUKTE, type MailProdukt } from "@/lib/mailing/produkte"
+
 export type KampagnenInhalt = {
   subject: string
   preheader: string
@@ -63,11 +65,16 @@ const iconPfad = (name: string, art: "list" | "gold") => `/brand/mail/${name}-${
 
 /** Alle Bilder, die eine Mail verwenden kann – für das Einbetten in .eml-Dateien. */
 export function mailBildPfade(): string[] {
-  return [LOGO_PFAD, ...LISTEN_ICONS.map((n) => iconPfad(n, "list")), ...["phone", "mail", "globe"].map((n) => iconPfad(n, "gold"))]
+  return [
+    LOGO_PFAD,
+    ...LISTEN_ICONS.map((n) => iconPfad(n, "list")),
+    ...["phone", "mail", "globe"].map((n) => iconPfad(n, "gold")),
+    ...Object.values(MAIL_PRODUKTE).map((p) => p.bild),
+  ]
 }
 
 export function cidFuer(pfad: string): string {
-  return pfad === LOGO_PFAD ? LOGO_CID : `creadig-${pfad.split("/").pop()?.replace(/\.png$/, "")}`
+  return pfad === LOGO_PFAD ? LOGO_CID : `creadig-${pfad.split("/").pop()?.replace(/\.(png|jpe?g)$/, "")}`
 }
 
 function esc(s: string): string {
@@ -148,6 +155,26 @@ function kontakt(o: { telefon?: string; email?: string; web: string }, bild: Bil
   return `<table role="presentation" cellpadding="0" cellspacing="0">${reihen.join("")}</table>`
 }
 
+/** Produkt sichtbar vorstellen: echtes Bild der Webseite, Logo-Zeile, Nutzen, drei Punkte, Weg zur Seite. */
+function produktKarte(p: MailProdukt, bild: Bild): string {
+  const host = p.url.replace(/^https?:\/\//, "").replace(/\/$/, "")
+  const punkte = p.punkte
+    .map(
+      (x) =>
+        `<tr><td valign="top" width="22" style="width:22px;padding:0 0 8px;font-size:14px;line-height:1.6;color:${BLAU};font-weight:800;font-family:${TITEL}">&#10003;</td><td style="padding:0 0 8px;font-size:14px;line-height:1.6;color:${TEXT};font-family:${SCHRIFT}">${esc(x)}</td></tr>`,
+    )
+    .join("")
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:10px 0 30px"><tr><td bgcolor="${WEISS}" style="background:${WEISS};border:1px solid ${LINIE};border-radius:28px;box-shadow:0 12px 32px rgba(13,26,46,0.07);overflow:hidden">
+<a href="${esc(p.url)}" style="display:block;text-decoration:none"><img src="${esc(bild(p.bild))}" width="560" alt="${esc(p.bildAlt)}" style="display:block;border:0;width:100%;max-width:560px;height:auto;border-radius:28px 28px 0 0"></a>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td class="px" style="padding:24px 30px 26px">
+<p style="margin:0 0 4px;font-size:22px;line-height:1.2;color:${TINTE};font-weight:800;letter-spacing:-0.3px;font-family:${TITEL}">${esc(p.name)}</p>
+<p style="margin:0 0 14px;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:${GOLD};font-weight:800;font-family:${TITEL}">${esc(p.kennung)}</p>
+<p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:${TEXT};font-family:${SCHRIFT}">${esc(p.nutzen)}</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 18px">${punkte}</table>
+<table role="presentation" cellpadding="0" cellspacing="0"><tr>${knopf(`${host} ansehen`, p.url, "rand")}</tr></table>
+</td></tr></table></td></tr></table>`
+}
+
 export const ABSENDER = "Emin Akyol"
 
 export function kampagnenHtml(
@@ -171,6 +198,8 @@ export function kampagnenHtml(
     email?: string
     /** Zeile unter dem Absendernamen, Standard "Gründer · creaDIG Solutions". */
     rolle?: string
+    /** Stellt ein Produkt mit Webseiten-Bild vor (vor dem nächsten Schritt). */
+    produkt?: MailProdukt
   },
 ): string {
   const bild: Bild = o.bildSrc ?? ((p) => `${o.siteUrl}${p}`)
@@ -220,7 +249,7 @@ ${kennung}<h1 class="h1" style="margin:0;font-size:32px;line-height:1.2;color:${
 </td></tr></table>
 </td></tr>
 <tr><td class="px" style="padding:40px 44px 8px">
-${anrede}${bloecke(k.body, bild)}${knoepfe}
+${anrede}${bloecke(k.body, bild)}${o.produkt ? produktKarte(o.produkt, bild) : ""}${knoepfe}
 </td></tr>
 <tr><td class="px" style="padding:30px 44px 40px">
 <p style="margin:0 0 22px;font-size:15px;line-height:1.6;color:${TEXT};font-family:${SCHRIFT}">${esc(o.gruss ?? "Viele Grüße")}</p>

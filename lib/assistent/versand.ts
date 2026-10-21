@@ -1,6 +1,7 @@
 import "server-only"
 
 import { einzelmailHtml, einzelmailText, type Einzelmail } from "@/lib/mailing/eml"
+import { istProduktId, produktAusTitel, type ProduktId } from "@/lib/mailing/produkte"
 import { siteUrl } from "@/lib/termine/mail"
 import { nimmAntwortZurueck, notiereAntwort, notiereGesendeteMail } from "@/lib/kundenfaden"
 import { neonAbfrage } from "@/lib/neon-abfrage"
@@ -62,7 +63,7 @@ function kontaktAdresse(): string {
 }
 
 /** Wandelt den Agenten-Text in die creaDIG-Einzelmail (gleiches Design wie das Mail-Studio). */
-export function alsEinzelmail(an: string, betreff: string, inhalt: string): Einzelmail {
+export function alsEinzelmail(an: string, betreff: string, inhalt: string, produkt?: ProduktId | null): Einzelmail {
   const basis = siteUrl()
   const zeilen = kundenText(inhalt).split("\n")
   const ersteZeile = zeilen[0]?.trim() ?? ""
@@ -87,7 +88,13 @@ export function alsEinzelmail(an: string, betreff: string, inhalt: string): Einz
     gruss: "Viele Grüße",
     telefon: "0176 41965356",
     kontaktMail: kontaktAdresse(),
+    ...(produkt ? { produkt } : {}),
   }
+}
+
+/** Produkt einer Freigabe: gespeichert vom Jäger, sonst aus dem Titel erkannt (ältere Einträge). */
+export function freigabeProdukt(f: Pick<Freigabe, "titel" | "extra">): ProduktId | null {
+  return istProduktId(f.extra?.produkt) ? f.extra.produkt : produktAusTitel(f.titel)
 }
 
 /** Jede gesendete Mail landet am Kontakt und bewegt die Verkaufschance – Fehler blockieren den Versand nie. */
@@ -107,7 +114,7 @@ export async function sendeFreigabeMail(f: Freigabe, an: string, betreff: string
   const text = kundenText(inhalt)
   if (!text) return { ok: false, grund: "Der Mailtext ist leer." }
   const antwortAn = eingangsAdresse(f.id) || process.env.MAIL_REPLY_TO?.trim() || process.env.LEAD_TO?.trim()
-  const mail = alsEinzelmail(an.trim(), betreff.slice(0, 200) || f.titel, inhalt)
+  const mail = alsEinzelmail(an.trim(), betreff.slice(0, 200) || f.titel, inhalt, freigabeProdukt(f))
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",

@@ -4,6 +4,7 @@
  * den man nur noch absendet. Läuft im Browser und auf dem Server.
  */
 
+import { MAIL_PRODUKTE, type ProduktId } from "@/lib/mailing/produkte"
 import { ABSENDER, FIRMA, kampagnenHtml, textOhneIcons } from "@/lib/mailing/vorlage"
 
 export type EingebettetesBild = { cid: string; name: string; base64: string }
@@ -28,6 +29,7 @@ export function einzelmailHtml(
       ctaHinweis: m.ctaHinweis,
       telefon: m.telefon,
       email: m.kontaktMail,
+      produkt: m.produkt ? MAIL_PRODUKTE[m.produkt] : undefined,
     },
   )
 }
@@ -49,6 +51,8 @@ export type Einzelmail = {
   zweitUrl: string
   gruss: string
   absender?: string
+  /** Produkt, das die Mail mit Webseiten-Bild vorstellt. */
+  produkt?: ProduktId
 }
 
 function base64Utf8(s: string): string {
@@ -70,6 +74,9 @@ export function einzelmailText(m: Einzelmail): string {
   return [
     m.anrede,
     textOhneIcons(m.body).replace(/^## /gm, "").replace(/^- /gm, "• ").replace(/^> /gm, "").replace(/\*\*/g, ""),
+    m.produkt
+      ? `${MAIL_PRODUKTE[m.produkt].name} – ${MAIL_PRODUKTE[m.produkt].nutzen}\n${MAIL_PRODUKTE[m.produkt].punkte.map((p) => `✓ ${p}`).join("\n")}\n${MAIL_PRODUKTE[m.produkt].url}`
+      : "",
     m.ctaText && m.ctaUrl ? `${m.ctaText}: ${m.ctaUrl}` : "",
     m.zweitText && m.zweitUrl ? `${m.zweitText}: ${m.zweitUrl}` : "",
     `${m.gruss || "Viele Grüße"}\n${m.absender || ABSENDER}\nGründer · ${FIRMA}`,

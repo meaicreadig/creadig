@@ -7,7 +7,7 @@ import type { Einzelmail } from "@/lib/mailing/eml"
 import { siteUrl } from "@/lib/termine/mail"
 
 import { ladeFreigabe } from "@/lib/assistent/store"
-import { alsEinzelmail } from "@/lib/assistent/versand"
+import { alsEinzelmail, freigabeProdukt } from "@/lib/assistent/versand"
 
 import { einzelmailFuerFreigabe, einzelmailSenden, kiEinzelmail } from "../actions"
 
@@ -40,7 +40,12 @@ export default async function EinzelmailSeite({ searchParams }: { searchParams: 
   const von = process.env.MAIL_FROM?.trim() || process.env.LEAD_FROM?.trim() || ""
 
   const start: Einzelmail = ausAssistent
-    ? alsEinzelmail(ausAssistent.empfaenger ?? "", ausAssistent.betreff || ausAssistent.titel, ausAssistent.inhalt)
+    ? alsEinzelmail(
+        ausAssistent.empfaenger ?? "",
+        ausAssistent.betreff || ausAssistent.titel,
+        ausAssistent.inhalt,
+        freigabeProdukt(ausAssistent),
+      )
     : {
     an: "info@vi-sec.de",
     subject: "Nach unserem Gespräch mit Herrn Baser – Ihre offene Stelle",
