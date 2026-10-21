@@ -9,6 +9,7 @@ import { pruefeZugang } from "@/lib/admin-widerruf"
 import { darfBetreten } from "@/lib/rollen"
 import { siteUrl } from "@/lib/termine/mail"
 import { einzelmailHtml, einzelmailText, type Einzelmail } from "@/lib/mailing/eml"
+import { istProduktId } from "@/lib/mailing/produkte"
 import { ergaenzeExtra, neueFreigabeId, setzeFreigabe, setzeMailKopf } from "@/lib/assistent/store"
 import { eingangsAdresse, markiereAntwort, nimmAntwortZurueckFuer, protokolliereKampagnenVersand, protokolliereStudioMail } from "@/lib/assistent/versand"
 import { schreibeEinzelmail, schreibeKampagne, type KampagnenAnlass, type KiEinzelmail, type KiKampagne } from "@/lib/mailing/ki"
@@ -89,6 +90,7 @@ function einzelBereinigt(m: Einzelmail): Einzelmail {
   ctaHinweis: s(m.ctaHinweis, 160).trim(),
   telefon: s(m.telefon, 40).trim(),
   kontaktMail: s(m.kontaktMail, 200).trim(),
+  ...(istProduktId(m.produkt) ? { produkt: m.produkt } : {}),
   }
   }
 

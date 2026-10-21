@@ -7,7 +7,7 @@ import { nimmAntwortZurueck, notiereAntwort, notiereGesendeteMail } from "@/lib/
 import { neonAbfrage } from "@/lib/neon-abfrage"
 
 import { findeKontaktMail } from "./kontaktsuche"
-import { assistentDb, ergaenzeExtra, legeFreigabeAn, setzeMailKopf, type Freigabe, type FreigabeExtra } from "./store"
+import { assistentDb, ergaenzeExtra, legeFreigabeAn, setzeFreigabe, setzeMailKopf, type Freigabe, type FreigabeExtra } from "./store"
 
 /** Tage bis zum Nachfassen je Stufe (1. und 2. Erinnerung). */
 export const NACHFASS_TAGE = [5, 9] as const
@@ -30,7 +30,7 @@ export async function ergaenzeFehlendeAdressen(max = 6): Promise<number> {
   await Promise.all(
     rows.map(async (r) => {
       const web = r.inhalt.match(/Webseite:\s*(https?:\/\/\S+)/)?.[1]
-      const adresse = web ? await findeKontaktMail(web) : null
+      const adresse = web ? await findeKontaktMail(web).catch(() => null) : null
       if (adresse) {
         await setzeMailKopf(r.id, adresse, r.betreff || r.titel)
         gefunden++
@@ -38,6 +38,18 @@ export async function ergaenzeFehlendeAdressen(max = 6): Promise<number> {
       await ergaenzeExtra(r.id, { adressSuche: adresse ? "gefunden" : "keine" })
     }),
   )
+  /* Jäger-Mails ohne auffindbare Adresse sind keine Entscheidung für den Inhaber – automatisch aussortieren. */
+  const ohne = (await q(
+    `SELECT id FROM assistent_freigaben
+     WHERE art = 'mail' AND status = 'offen' AND agent = 'jaeger'
+       AND (empfaenger IS NULL OR empfaenger = '') AND extra->>'adressSuche' = 'keine'
+     LIMIT 50`,
+    [],
+  ).catch(() => [])) as { id: string }[]
+  for (const r of ohne) {
+    await ergaenzeExtra(r.id, { fehler: "Automatisch aussortiert: keine Kontaktadresse auf der Webseite." })
+    await setzeFreigabe(r.id, "verworfen")
+  }
   return gefunden
 }
 
