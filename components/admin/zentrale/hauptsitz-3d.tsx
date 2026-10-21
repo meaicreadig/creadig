@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { ContactShadows, Environment, Html, Lightformer, OrbitControls, QuadraticBezierLine, useTexture } from "@react-three/drei"
 import { Bloom, EffectComposer, N8AO, SMAA, ToneMapping, Vignette } from "@react-three/postprocessing"
@@ -34,7 +34,7 @@ const FARBE = {
   achtung: "#d9a13b",
   stoerung: "#d9483b",
   anthrazit: "#3b4048",
-  glas: "#8fa7b8",
+  glas: "#6fa6bd",
 }
 
 const KLEIDUNG = ["#2f3a4c", "#6b7686", "#e6e2da", "#44505f", "#8a6f5a"]
@@ -103,22 +103,6 @@ function PbrBox({ args, ordner, tint, roughness, metalness, ...mesh }: PbrBoxPro
   return <mesh {...mesh} geometry={weltBox(...args)} material={material} />
 }
 
-/** Segmentiert eine Fassadenreihe in Glas-Läufe und massive Paneele. */
-function fassadenSegmente(kanten: number[], massiv: Set<number>) {
-  const glas: [number, number][] = []
-  const voll: [number, number][] = []
-  let start: number | null = null
-  for (let i = 0; i < kanten.length - 1; i++) {
-    if (massiv.has(i)) {
-      if (start !== null) glas.push([kanten[start], kanten[i]])
-      start = null
-      voll.push([kanten[i], kanten[i + 1]])
-    } else if (start === null) start = i
-  }
-  if (start !== null) glas.push([kanten[start], kanten[kanten.length - 1]])
-  return { glas, voll }
-}
-
 /** Kleiner deterministischer Zufall (kein Math.random im Render). */
 function zufall(seed: number) {
   let s = seed >>> 0
@@ -129,6 +113,133 @@ function zufall(seed: number) {
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
+}
+
+/* Organisches Außenskelett (Vorbild: Glass Cube, Bad Driburg) – weiße Rahmenfläche mit weich gerundeten Glasöffnungen. */
+const RAHMEN_T = 0.32
+
+function rundesLoch(pfad: THREE.Path, ecken: THREE.Vector2[], radien: number[]) {
+  const n = ecken.length
+  ecken.forEach((p, i) => {
+    const vor = ecken[(i - 1 + n) % n]
+    const nach = ecken[(i + 1) % n]
+    const r = Math.min(radien[i], p.distanceTo(vor) * 0.45, p.distanceTo(nach) * 0.45)
+    const a = p.clone().add(vor.clone().sub(p).setLength(r))
+    const b = p.clone().add(nach.clone().sub(p).setLength(r))
+    if (i === 0) pfad.moveTo(a.x, a.y)
+    else pfad.lineTo(a.x, a.y)
+    pfad.quadraticCurveTo(p.x, p.y, b.x, b.y)
+  })
+  pfad.closePath()
+}
+
+function organischerRahmen(breite: number, etagen: number, spalten: number, seed: number) {
+  const r = zufall(seed)
+  const hoehe = etagen * H + PLATTE + 0.25
+  const form = new THREE.Shape()
+  form.moveTo(-breite / 2, 0)
+  form.lineTo(breite / 2, 0)
+  form.lineTo(breite / 2, hoehe)
+  form.lineTo(-breite / 2, hoehe)
+  form.closePath()
+  const innen = breite - 0.7
+  const feld = innen / spalten
+  // Knotenpunkte je Geschossgrenze leicht versetzt → schräge, fließende Stege statt starrem Raster.
+  const knoten = Array.from({ length: etagen + 1 }, () =>
+    Array.from({ length: spalten + 1 }, (_, i) => {
+      const basis = -innen / 2 + i * feld
+      return i === 0 || i === spalten ? basis : basis + (r() - 0.5) * feld * 0.5
+    }),
+  )
+  const steg = 0.18
+  for (let e = 0; e < etagen; e++) {
+    const y0 = e * H + PLATTE + 0.1
+    const y1 = (e + 1) * H - 0.05
+    for (let i = 0; i < spalten; i++) {
+      const ecken = [
+        new THREE.Vector2(knoten[e][i] + steg, y0),
+        new THREE.Vector2(knoten[e][i + 1] - steg, y0),
+        new THREE.Vector2(knoten[e + 1][i + 1] - steg, y1),
+        new THREE.Vector2(knoten[e + 1][i] + steg, y1),
+      ]
+      const loch = new THREE.Path()
+      rundesLoch(loch, ecken, ecken.map(() => 0.35 + r() * 1.15))
+      form.holes.push(loch)
+    }
+  }
+  return new THREE.ExtrudeGeometry(form, {
+    depth: RAHMEN_T,
+    bevelEnabled: true,
+    bevelThickness: 0.04,
+    bevelSize: 0.04,
+    bevelSegments: 3,
+    curveSegments: 12,
+  })
+}
+
+function Rahmen({ etagen }: { etagen: number }) {
+  const front = useMemo(() => organischerRahmen(BREITE + 1.2, etagen, 6, 101), [etagen])
+  const seite = useMemo(() => organischerRahmen(TIEFE + 0.6, etagen, 3, 202), [etagen])
+  const weiss = useMemo(
+    () => new THREE.MeshPhysicalMaterial({ color: "#f6f7f8", roughness: 0.3, clearcoat: 0.5, clearcoatRoughness: 0.2 }),
+    [],
+  )
+  return (
+    <group>
+      <mesh geometry={front} material={weiss} position={[0, 0, TIEFE / 2 + 0.3]} castShadow receiveShadow />
+      <mesh geometry={seite} material={weiss} position={[BREITE / 2 + 0.3, 0, 0]} rotation={[0, Math.PI / 2, 0]} castShadow receiveShadow />
+      <mesh geometry={seite} material={weiss} position={[-BREITE / 2 - 0.3, 0, 0]} rotation={[0, -Math.PI / 2, 0]} castShadow receiveShadow />
+    </group>
+  )
+}
+
+/** Weiße, fließende Wege im Rasen – als flaches Band entlang einer Kurve. */
+const PFADE: [number, number][][] = [
+  [[-4, TIEFE / 2 + 1], [-6, 12], [-12, 17], [-22, 19], [-42, 17]],
+  [[4, TIEFE / 2 + 1], [7, 11], [6, 18], [10, 27], [18, 42]],
+  [[BREITE / 2 + 1, 2], [16, 4], [22, 10], [31, 12], [50, 9]],
+  [[-BREITE / 2 - 1, -2], [-16, -5], [-24, -4], [-34, -10], [-52, -12]],
+  [[-12, 17], [-4, 23], [1, 31], [-1, 46]],
+  [[16, 4], [20, -6], [30, -14], [46, -18]],
+]
+
+function bandGeometrie(punkte: [number, number][], breite: number) {
+  const kurve = new THREE.CatmullRomCurve3(punkte.map(([x, z]) => new THREE.Vector3(x, 0, z)))
+  const n = 90
+  const pos: number[] = []
+  const nor: number[] = []
+  const idx: number[] = []
+  for (let i = 0; i <= n; i++) {
+    const t = i / n
+    const p = kurve.getPoint(t)
+    const tan = kurve.getTangent(t)
+    const quer = new THREE.Vector3(-tan.z, 0, tan.x).normalize()
+    const w = (breite * (0.75 + 0.5 * Math.sin(t * Math.PI))) / 2
+    pos.push(p.x + quer.x * w, 0, p.z + quer.z * w, p.x - quer.x * w, 0, p.z - quer.z * w)
+    nor.push(0, 1, 0, 0, 1, 0)
+    if (i < n) {
+      const a = i * 2
+      idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2)
+    }
+  }
+  const g = new THREE.BufferGeometry()
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3))
+  g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3))
+  g.setIndex(idx)
+  return g
+}
+
+function Wege() {
+  const baender = useMemo(() => PFADE.map((p, i) => bandGeometrie(p, i > 3 ? 1.6 : 2.4)), [])
+  return (
+    <>
+      {baender.map((g, i) => (
+        <mesh key={i} geometry={g} position={[0, 0.012, 0]} receiveShadow>
+          <meshStandardMaterial color="#f2f3f1" roughness={0.85} side={THREE.DoubleSide} />
+        </mesh>
+      ))}
+    </>
+  )
 }
 
 const BAUM_X = [-14, -8, 8, 14, -19, 19]
@@ -307,37 +418,69 @@ function Kamera({ fokus, raeume }: { fokus: Fokus; raeume: Raum[] }) {
  * Die Säule ist immer durchgehend: unteres Segment bleibt stehen, oberes Segment fährt mit den angehobenen
  * Geschossen (gleiches damp wie Geschoss/Dach), ein Schaftstück füllt die entstehende Lücke.
  */
-/** Touch: Drei-Finger-Wischen verschiebt die Ansicht (links/rechts/hoch/runter). Ein Finger dreht, zwei zoomen/schwenken. */
-function DreiFingerPan() {
+const MIN_ABSTAND = 8
+const MAX_ABSTAND = 95
+
+/**
+ * Touch-Gesten (eigene Umsetzung, OrbitControls macht nur noch 1 Finger = drehen):
+ * - 2 Finger: zuerst wird erkannt, ob gespreizt (Zoom) oder gemeinsam geschoben (Verschieben) wird; die Art bleibt bis zum Loslassen.
+ * - Zoom folgt dem Finger 1:1 (Abstandsverhältnis), kein Vorauseilen.
+ * - 3 Finger: immer verschieben (hoch/runter/links/rechts).
+ */
+function TouchGesten() {
   const { camera, gl } = useThree()
   const controls = useThree((s) => s.controls) as OrbitControlsImpl | null
   useEffect(() => {
     const el = gl.domElement
-    let letzter: { x: number; y: number } | null = null
-    const mitte = (e: TouchEvent) => ({
-      x: (e.touches[0].clientX + e.touches[1].clientX + e.touches[2].clientX) / 3,
-      y: (e.touches[0].clientY + e.touches[1].clientY + e.touches[2].clientY) / 3,
-    })
-    const start = (e: TouchEvent) => {
-      if (e.touches.length !== 3) return
-      letzter = mitte(e)
+    type Zustand = { n: number; dist: number; x: number; y: number; modus: "zoom" | "pan" | null; sx: number; sy: number; sdist: number }
+    let z: Zustand | null = null
+    const lese = (e: TouchEvent) => {
+      const t = Array.from(e.touches)
+      const x = t.reduce((s, p) => s + p.clientX, 0) / t.length
+      const y = t.reduce((s, p) => s + p.clientY, 0) / t.length
+      const dist = t.length >= 2 ? Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY) : 0
+      return { x, y, dist }
+    }
+    const beginne = (e: TouchEvent) => {
+      if (e.touches.length !== 2 && e.touches.length !== 3) {
+        z = null
+        return
+      }
+      const m = lese(e)
+      z = { n: e.touches.length, ...m, sx: m.x, sy: m.y, sdist: m.dist, modus: e.touches.length === 3 ? "pan" : null }
       controls?.dispatchEvent({ type: "start" } as never)
     }
     const move = (e: TouchEvent) => {
-      if (e.touches.length !== 3 || !letzter || !controls) return
+      if (!z || e.touches.length !== z.n || !controls) return
       e.preventDefault()
-      const m = mitte(e)
-      const cam = camera as THREE.PerspectiveCamera
-      const k = (camera.position.distanceTo(controls.target) * 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2))) / el.clientHeight
-      const rechts = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0)
-      const hoch = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1)
-      const d = rechts.multiplyScalar(-(m.x - letzter.x) * k).add(hoch.multiplyScalar((m.y - letzter.y) * k))
-      camera.position.add(d)
-      controls.target.add(d)
+      const m = lese(e)
+      if (!z.modus) {
+        const spreizen = Math.abs(m.dist - z.sdist)
+        const schieben = Math.hypot(m.x - z.sx, m.y - z.sy)
+        if (spreizen > 12 && spreizen > schieben) z.modus = "zoom"
+        else if (schieben > 12) z.modus = "pan"
+        else return
+      }
+      if (z.modus === "zoom" && m.dist > 0 && z.dist > 0) {
+        const versatz = camera.position.clone().sub(controls.target)
+        const neu = THREE.MathUtils.clamp(versatz.length() * (z.dist / m.dist), MIN_ABSTAND, MAX_ABSTAND)
+        camera.position.copy(controls.target).add(versatz.setLength(neu))
+      } else if (z.modus === "pan") {
+        const cam = camera as THREE.PerspectiveCamera
+        const k = (camera.position.distanceTo(controls.target) * 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2))) / el.clientHeight
+        const rechts = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0)
+        const hoch = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1)
+        const d = rechts.multiplyScalar(-(m.x - z.x) * k).add(hoch.multiplyScalar((m.y - z.y) * k))
+        camera.position.add(d)
+        controls.target.add(d)
+      }
+      z.x = m.x
+      z.y = m.y
+      z.dist = m.dist
       controls.update()
-      letzter = m
     }
-    const ende = () => (letzter = null)
+    const start = beginne
+    const ende = (e: TouchEvent) => beginne(e)
     el.addEventListener("touchstart", start, { passive: true })
     el.addEventListener("touchmove", move, { passive: false })
     el.addEventListener("touchend", ende)
@@ -458,8 +601,12 @@ function RaumModell({
   jetzt,
   innen,
   sprache,
+  personIndex,
+  onPerson,
 }: {
   raum: Raum
+  personIndex: number | null
+  onPerson: (key: string) => void
   gewaehlt: boolean
   zeigeLabel: boolean
   onWahl: (id: string) => void
@@ -501,11 +648,36 @@ function RaumModell({
           const seite = i % 2 === 0 ? -1.3 : 1.3
           const stand = raum.agentenStand[i]
           const an = jetzt !== null && !!stand && agentFrisch(stand, jetzt)
+          const px = plaetze === 1 ? 0 : seite
+          const pz = -1.2 + reihe * 2.2
+          const offen = personIndex === i
           return (
-            <group key={i}>
-              <Arbeitsplatz x={plaetze === 1 ? 0 : seite} z={-1.2 + reihe * 2.2} an={an} besetzt={!!stand} farbe={KLEIDUNG[(raum.etage * 3 + raum.spalte + i) % KLEIDUNG.length]} haar={HAAR[(raum.etage * 2 + raum.spalte * 3 + i * 2 + 1) % HAAR.length]} />
-              {stand && (gewaehlt || an || stand.fehler) && (
-                <Html position={[plaetze === 1 ? 0 : seite, 1.75, -1.2 + reihe * 2.2]} center distanceFactor={gewaehlt ? 10 : 14} zIndexRange={[10, 0]}>
+            <group
+              key={i}
+              onClick={(e) => {
+                if (!stand) return
+                e.stopPropagation()
+                onPerson(`${raum.id}:${i}`)
+              }}
+            >
+              <Arbeitsplatz x={px} z={pz} an={an} besetzt={!!stand} farbe={KLEIDUNG[(raum.etage * 3 + raum.spalte + i) % KLEIDUNG.length]} haar={HAAR[(raum.etage * 2 + raum.spalte * 3 + i * 2 + 1) % HAAR.length]} />
+              {stand && !offen && (gewaehlt || an || stand.fehler) && (
+                <Html position={[px, 1.5, pz]} center zIndexRange={[10, 0]}>
+                  <button
+                    type="button"
+                    aria-label={stand.name}
+                    onClick={() => onPerson(`${raum.id}:${i}`)}
+                    className="flex size-6 items-center justify-center rounded-full"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`size-2.5 rounded-full ring-2 ring-card ${stand.fehler ? "bg-destructive" : an ? "animate-pulse bg-primary" : "bg-muted-foreground/60"}`}
+                    />
+                  </button>
+                </Html>
+              )}
+              {stand && offen && (
+                <Html position={[px, 1.75, pz]} center distanceFactor={10} zIndexRange={[30, 0]}>
                   <span className="pointer-events-none flex max-w-56 flex-col gap-0.5 rounded-2xl bg-card/95 px-3 py-1.5 font-sans text-foreground shadow-sm backdrop-blur">
                     <span className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-semibold">
                       <span
@@ -610,7 +782,11 @@ function Geschoss({
   jetzt,
   innenRaeume,
   sprache,
+  person,
+  onPerson,
 }: {
+  person: string | null
+  onPerson: (key: string) => void
   etage: Etage
   raeume: Raum[]
   fokus: Fokus
@@ -631,56 +807,27 @@ function Geschoss({
     gruppe.current.position.y = THREE.MathUtils.damp(gruppe.current.position.y, soll, 4, dt)
   })
 
-  // Front: 14 Felder à 1,5 m. Massiv: Eckfelder (0, 13) und zwei Pfeiler auf den Raumgrenzen (4, 9).
-  // Seiten: 8 Felder à 1,25 m. Massiv: Eckfelder (0, 7) und ein Pfeiler (3).
-  const front = useMemo(() => {
-    const kanten = Array.from({ length: 15 }, (_, i) => -BREITE / 2 + i * 1.5)
-    return { kanten, ...fassadenSegmente(kanten, new Set([0, 4, 9, 13])) }
-  }, [])
-  const seite = useMemo(() => {
-    const kanten = Array.from({ length: 9 }, (_, i) => -TIEFE / 2 + i * 1.25)
-    return { kanten, ...fassadenSegmente(kanten, new Set([0, 3, 7])) }
-  }, [])
   const glasH = H - PLATTE
   const glasY = H / 2 + PLATTE / 2
   const SEITE_X = BREITE / 2
 
   return (
     <group ref={gruppe} position={[0, basisY, 0]}>
-      <PbrBox args={[BREITE + 0.6, PLATTE, TIEFE + 0.6]} position={[0, PLATTE / 2, 0]} ordner="smooth-concrete" tint="#8f959e" castShadow receiveShadow />
+      <PbrBox args={[BREITE + 0.6, PLATTE, TIEFE + 0.6]} position={[0, PLATTE / 2, 0]} ordner="smooth-concrete" tint="#f2f3f5" castShadow receiveShadow />
 
       {/* Geschossdecke innen hell (gebürsteter Beton), Kante außen dunkel wie eine echte Fassadenblende */}
       <PbrBox args={[BREITE - 0.1, 0.06, TIEFE - 0.5]} position={[0, H - 0.03, -0.2]} ordner="brushed-concrete" tint="#f1f1ef" />
 
-      {/* Seitenfassaden: Glas-Läufe zwischen massiven Eck- und Pfeilerfeldern */}
+      {/* Rahmenlose Glashaut – das organische Außenskelett (Rahmen) liegt davor */}
       {[-1, 1].map((s) => (
-        <group key={`seite${s}`}>
-          {seite.voll.map(([z0, z1]) => (
-            <PbrBox
-              key={`v${z0}`}
-              args={[0.26, glasH, z1 - z0 - 0.05]}
-              position={[s * (SEITE_X + 0.03), glasY, (z0 + z1) / 2]}
-              ordner="brushed-concrete"
-              tint="#aab0b8"
-              castShadow
-              receiveShadow
-            />
-          ))}
-          {seite.glas.map(([z0, z1]) => (
-            <mesh key={`g${z0}`} position={[s * SEITE_X, glasY, (z0 + z1) / 2]}>
-              <boxGeometry args={[0.03, glasH, z1 - z0]} />
-              <Glas opacity={0.3} />
-            </mesh>
-          ))}
-          {seite.kanten.slice(1, -1).map((z) => (
-            <PbrBox key={`p${z}`} args={[0.1, glasH, 0.06]} position={[s * (SEITE_X + 0.04), glasY, z]} ordner="metal-plate" tint="#6b717a" castShadow />
-          ))}
-          <PbrBox args={[0.1, 0.05, TIEFE]} position={[s * (SEITE_X + 0.04), PLATTE + 0.95, 0]} ordner="metal-plate" tint="#6b717a" />
-        </group>
+        <mesh key={`seite${s}`} position={[s * SEITE_X, glasY, 0]}>
+          <boxGeometry args={[0.03, glasH, TIEFE]} />
+          <Glas opacity={0.3} />
+        </mesh>
       ))}
 
       {/* Rückwand */}
-      <PbrBox args={[BREITE, H - PLATTE, 0.2]} position={[0, H / 2 + PLATTE / 2, -TIEFE / 2 + 0.1]} ordner="brushed-concrete" tint="#d6d9de" receiveShadow />
+      <PbrBox args={[BREITE, H - PLATTE, 0.2]} position={[0, H / 2 + PLATTE / 2, -TIEFE / 2 + 0.1]} ordner="brushed-concrete" tint="#f1f2f4" receiveShadow />
 
       {[-RAUM_B / 2, RAUM_B / 2].map((x) => (
         <mesh key={x} position={[x, H / 2 + PLATTE / 2, 0.6]}>
@@ -690,27 +837,10 @@ function Geschoss({
       ))}
 
       {/* Frontfassade */}
-      {front.glas.map(([x0, x1]) => (
-        <mesh key={`fg${x0}`} position={[(x0 + x1) / 2, glasY, TIEFE / 2]}>
-          <boxGeometry args={[x1 - x0, glasH, 0.03]} />
-          <Glas opacity={imFokus ? 0.1 : 0.26} />
-        </mesh>
-      ))}
-      {front.voll.map(([x0, x1]) => (
-        <PbrBox
-          key={`fv${x0}`}
-          args={[x1 - x0 - 0.05, glasH, 0.3]}
-          position={[(x0 + x1) / 2, glasY, TIEFE / 2 + 0.03]}
-          ordner="brushed-concrete"
-          tint="#aab0b8"
-          castShadow
-          receiveShadow
-        />
-      ))}
-      {front.kanten.map((x) => (
-        <PbrBox key={`fp${x}`} args={[0.05, glasH, 0.14]} position={[x, glasY, TIEFE / 2 + 0.05]} ordner="metal-plate" tint="#6b717a" castShadow />
-      ))}
-      <PbrBox args={[BREITE, 0.05, 0.08]} position={[0, PLATTE + 0.95, TIEFE / 2 + 0.04]} ordner="metal-plate" tint="#6b717a" />
+      <mesh position={[0, glasY, TIEFE / 2]}>
+        <boxGeometry args={[BREITE, glasH, 0.03]} />
+        <Glas opacity={imFokus ? 0.1 : 0.26} />
+      </mesh>
 
       {raeume.map((r) => (
         <RaumModell
@@ -722,6 +852,8 @@ function Geschoss({
           jetzt={jetzt}
           innen={innenRaeume.has(r.id)}
           sprache={sprache}
+          personIndex={person?.startsWith(`${r.id}:`) ? Number(person.slice(r.id.length + 1)) : null}
+          onPerson={onPerson}
         />
       ))}
 
@@ -795,8 +927,8 @@ function Dach({ y, angehoben }: { y: number; angehoben: boolean }) {
   })
   return (
     <group ref={ref} position={[0, y, 0]}>
-      <PbrBox args={[BREITE + 0.6, PLATTE + 0.25, TIEFE + 0.6]} position={[0, PLATTE / 2, 0]} ordner="smooth-concrete" tint="#8f959e" castShadow receiveShadow />
-      <PbrBox args={[BREITE + 0.2, 0.02, TIEFE + 0.2]} position={[0, PLATTE + 0.26, 0]} ordner="brushed-concrete" tint="#8e939a" receiveShadow />
+      <PbrBox args={[BREITE + 0.6, PLATTE + 0.25, TIEFE + 0.6]} position={[0, PLATTE / 2, 0]} ordner="smooth-concrete" tint="#f4f5f7" castShadow receiveShadow />
+      <PbrBox args={[BREITE + 0.2, 0.02, TIEFE + 0.2]} position={[0, PLATTE + 0.26, 0]} ordner="brushed-concrete" tint="#e6e8eb" receiveShadow />
       {[
         [-6, 1.5, -2],
         [-2.2, 1.1, -2.6],
@@ -829,41 +961,14 @@ function Umgebung() {
     <>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow>
         <planeGeometry args={[220, 220]} />
-        <meshStandardMaterial color="#a9b49c" roughness={1} />
+        <meshStandardMaterial color="#6f9a4f" roughness={1} />
       </mesh>
-      {/* Vorplatz mit Plattenbelag */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 3]} receiveShadow>
-        <planeGeometry args={[BREITE + 12, TIEFE + 12]} />
-        <meshStandardMaterial color="#d7d5cf" roughness={0.9} />
+      {/* Heller Sockelplatz direkt ums Gebäude */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.006, 0]} receiveShadow>
+        <planeGeometry args={[BREITE + 4, TIEFE + 4]} />
+        <meshStandardMaterial color="#f2f3f1" roughness={0.85} />
       </mesh>
-      {/* Straße */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, TIEFE / 2 + 13]} receiveShadow>
-        <planeGeometry args={[220, 7]} />
-        <meshStandardMaterial color="#555a61" roughness={0.95} />
-      </mesh>
-      {Array.from({ length: 24 }).map((_, i) => (
-        <mesh key={`m${i}`} rotation={[-Math.PI / 2, 0, 0]} position={[-69 + i * 6, 0.01, TIEFE / 2 + 13]}>
-          <planeGeometry args={[2.4, 0.14]} />
-          <meshStandardMaterial color="#e8e8e4" roughness={0.8} />
-        </mesh>
-      ))}
-      {/* Eingang mit Vordach */}
-      <group position={[0, 0, TIEFE / 2]}>
-        <mesh position={[0, 3.05, 1.2]} castShadow>
-          <boxGeometry args={[6.4, 0.16, 2.6]} />
-          <meshStandardMaterial color={FARBE.anthrazit} roughness={0.5} metalness={0.4} />
-        </mesh>
-        {[-2.9, 2.9].map((x) => (
-          <mesh key={x} position={[x, 1.5, 2.3]} castShadow>
-            <cylinderGeometry args={[0.07, 0.07, 3, 12]} />
-            <meshStandardMaterial color={FARBE.anthrazit} metalness={0.6} roughness={0.35} />
-          </mesh>
-        ))}
-        <mesh position={[0, 2.95, 1.2]}>
-          <boxGeometry args={[5.6, 0.02, 2]} />
-          <meshStandardMaterial color="#fff6e6" emissive="#fff1d6" emissiveIntensity={0.6} toneMapped={false} />
-        </mesh>
-      </group>
+      <Wege />
       {BAUM_X.map((x, i) => (
         <group key={x} position={[x, 0, TIEFE / 2 + (i > 3 ? 2 : 8)]} scale={i > 3 ? 1.25 : 1} rotation={[0, i * 1.3, 0]}>
           <mesh position={[0, 1.4, 0]} castShadow>
@@ -907,16 +1012,26 @@ export default function Hauptsitz3D({
     () => new Set(jetzt === null ? [] : faeden.filter((f) => f.raumVon === f.raumNach && fadenLive(f.zeit, jetzt)).map((f) => f.raumVon)),
     [faeden, jetzt],
   )
+  const [person, setPerson] = useState<string | null>(null)
+  const sichtbarePerson = person && fokus.raum && person.startsWith(`${fokus.raum}:`) ? person : null
+  const waehlePerson = (key: string) => {
+    const raumId = key.slice(0, key.lastIndexOf(":"))
+    setPerson((p) => (p === key ? null : key))
+    if (fokus.raum !== raumId) onRaum(raumId)
+  }
   return (
     <Canvas
       shadows
       dpr={[1, 2]}
       camera={{ position: [44, 30, 50], fov: 32, near: 0.5, far: 400 }}
-      onPointerMissed={onLeer}
+      onPointerMissed={() => {
+        setPerson(null)
+        onLeer()
+      }}
       gl={{ antialias: true }}
     >
-      <color attach="background" args={["#eef1f5"]} />
-      <fog attach="fog" args={["#eef1f5", 70, 160]} />
+      <color attach="background" args={["#dfe9f2"]} />
+      <fog attach="fog" args={["#dfe9f2", 80, 180]} />
       <hemisphereLight args={["#ffffff", "#c9ccd2", 0.55]} />
       <directionalLight
         position={[24, 40, 28]}
@@ -949,8 +1064,11 @@ export default function Hauptsitz3D({
           jetzt={jetzt}
           innenRaeume={innenRaeume}
           sprache={sprache}
+          person={sichtbarePerson}
+          onPerson={waehlePerson}
         />
       ))}
+      <Rahmen etagen={etagen.length} />
       <Verbindungen faeden={faeden} raeume={raeume} fokus={fokus} jetzt={jetzt} />
       <Dach y={hoehe} angehoben={fokus.etage !== null} />
       <ContactShadows position={[0, 0.01, 0]} opacity={0.35} scale={60} blur={2.4} far={20} />
@@ -959,13 +1077,15 @@ export default function Hauptsitz3D({
         makeDefault
         enableDamping
         dampingFactor={0.08}
-        minDistance={8}
-        maxDistance={95}
+        minDistance={MIN_ABSTAND}
+        maxDistance={MAX_ABSTAND}
         maxPolarAngle={Math.PI / 2.15}
+        zoomSpeed={0.6}
         enablePan
+        touches={{ ONE: THREE.TOUCH.ROTATE, TWO: null } as never}
       />
       <Kamera fokus={fokus} raeume={raeume} />
-      <DreiFingerPan />
+      <TouchGesten />
 
       {/* Tone Mapping läuft hier im Composer (ACES Filmic), nicht mehr über den Renderer */}
       <EffectComposer multisampling={0} enableNormalPass={false}>
