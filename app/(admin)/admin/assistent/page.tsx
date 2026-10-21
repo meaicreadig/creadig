@@ -21,6 +21,7 @@ import {
   Trash2,
   Users,
   X,
+  Kanban,
 } from "lucide-react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
@@ -300,6 +301,7 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
   kapital: Coins,
   finanz: Coins,
   redaktion: PenLine,
+  projekte: Kanban,
 }
 
 const agentName = (key: string | null) => AGENTEN.find((a) => a.key === key)?.name ?? "Assistent"
