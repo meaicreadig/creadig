@@ -31,7 +31,7 @@ import {
   type RatProtokoll,
 } from "./store"
 
-export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "redaktion", "finanz", "projekte"] as const
+export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
 
 export type AgentInfo = {
@@ -51,6 +51,7 @@ export const AGENTEN: AgentInfo[] = [
   { key: "finanz", name: "Finanz", aufgabe: "Legt Folgerechnungen aus Abos als Entwurf an und schlägt Mahnungen vor. Versendet nie selbst.", takt: "taeglich", ki: false },
   { key: "projekte", name: "Projektleitung", aufgabe: "Führt jeden gewonnenen Auftrag bis zur Übergabe: legt Projekte an, fordert Material an, schreibt Wochenberichte, warnt vor Fristen und fasst nach.", takt: "taeglich", ki: false },
   { key: "kapital", name: "Kapital", aufgabe: "Recherchiert Förderungen, Kredite und Investoren mit Quelle und Frist.", takt: "woechentlich", ki: true },
+  { key: "golf", name: "Golf-Radar", aufgabe: "Sucht jede Woche Investoren, Family Offices, Programme und Events in VAE, Saudi-Arabien und Katar und schreibt die erste Nachricht auf Englisch und Arabisch.", takt: "woechentlich", ki: true },
   { key: "redaktion", name: "Redaktion", aufgabe: "Wählt das Thema nach den Beschlüssen der Geschäftsleitung, schreibt den Beitrag und erzeugt das Bild dazu.", takt: "woechentlich", ki: true },
 ]
 
@@ -486,7 +487,44 @@ Antworte NUR mit JSON: {"lage":"2 Sätze","stimmen":[{"rolle":"CEO","sagt":""},{
   return { ergebnis: `Sitzung KW ${woche.split("-")[1]}: ${p.beschluesse.length} Beschlüsse`, anzahl: p.beschluesse.length }
 }
 
-const LAEUFER: Record<AgentKey, () => Promise<Ergebnis>> = { lage, vertrieb, messen, finanz, projekte, kapital, redaktion, jaeger, rat }
+type GolfChance = {
+  name: string
+  art: string
+  land: string
+  url: string
+  warum: string
+  naechsterSchritt: string
+  nachrichtEn: string
+  nachrichtAr: string
+}
+
+/** Golf-Radar: Kapital und Türöffner in VAE, Saudi-Arabien, Katar. Wöchentlich 3 Chancen, jede mit fertiger Erstnachricht. */
+async function golf(): Promise<Ergebnis> {
+  const { text } = await generateText({
+    model: RECHERCHE,
+    prompt: `Research (as of ${berlinTag(new Date())}) concrete, currently active opportunities in the UAE, Saudi Arabia and Qatar for this company:
+creaDIG Solutions (Germany), founder Muhammed Emin Akyol, speaks German, English, Turkish, Arabic. An AI-run technology house: vertical SaaS (fibero for fibre-optic installers, stammo wallet loyalty cards), its own AI operating system (15 departments run by AI agents), and Islamic digital services (Quran study with Arabic root reading, donation live-streaming, mosque/association management).
+Goal: strategic investor or partner for Gulf expansion, NOT small client work.
+Look for: accelerator/soft-landing programmes accepting foreign founders (Hub71, DIFC Innovation Hub, in5, Dubai Future District, Garage Riyadh, Misk, Monsha'at, QSTP, Qatar Development Bank), AI/tech investment funds and family offices with a stated tech or Islamic-economy thesis, awqaf/Islamic-economy digitalisation initiatives, and events with investor meetings (LEAP, GITEX, Web Summit Qatar) with open application or registration deadlines.
+Only real, verifiable entries with an official URL. Max 3.
+Reply ONLY with a JSON array: [{"name":"","art":"Accelerator|Fund|Family Office|Programme|Event|Institution","land":"","url":"","warum":"1 sentence in German why it fits creaDIG","naechsterSchritt":"1 concrete next step in German incl. deadline if known","nachrichtEn":"first outreach message in English, max 90 words, warm and confident, mention the AI-run company and the Germany–Türkiye–Gulf bridge, ask for a 20-minute call, sign as Muhammed Emin Akyol, creaDIG Solutions","nachrichtAr":"the same message in natural Modern Standard Arabic"}]. If unsure, leave it out.`,
+  })
+  const chancen = jsonListe<GolfChance>(text).filter((c) => c?.name && c?.url?.startsWith("http"))
+  let neu = 0
+  for (const c of chancen.slice(0, 3)) {
+    const id = await legeFreigabeAn({
+      art: "kapital",
+      titel: `Golf · ${c.name} (${c.land})`,
+      inhalt: `${c.art} · ${c.land}\n\n${c.warum}\n\nNächster Schritt: ${c.naechsterSchritt}\n\nQuelle: ${c.url}\n\n— Erstnachricht (EN) —\n${c.nachrichtEn}\n\n— Erstnachricht (AR) —\n${c.nachrichtAr}\n\nTipp: Mit der Nachricht einen persönlichen Investorenraum-Link mitschicken (/admin/investoren).`,
+      quelle: `golf:${c.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+      agent: "golf",
+    })
+    if (id) neu++
+  }
+  return { ergebnis: `${neu} neue Golf-Chancen mit Erstnachricht`, anzahl: neu }
+}
+
+const LAEUFER: Record<AgentKey, () => Promise<Ergebnis>> = { lage, vertrieb, messen, finanz, projekte, kapital, golf, redaktion, jaeger, rat }
 
 export async function fuehreAgentAus(key: AgentKey): Promise<void> {
   try {

@@ -49,8 +49,8 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Geschäftsentwicklung", tr: "İş Geliştirme" },
     aufgabe: { de: "Partner, Kapital, neue Märkte", tr: "Ortaklık, sermaye, yeni pazarlar" },
     knoten: [],
-    agenten: ["kapital"],
-    besetzung: "teilweise",
+    agenten: ["kapital", "golf"],
+    besetzung: "aktiv",
   },
   {
     id: "kommunikation",
