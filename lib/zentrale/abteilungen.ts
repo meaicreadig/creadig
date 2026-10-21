@@ -121,8 +121,8 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Projektmanagement", tr: "Proje Yönetimi" },
     aufgabe: { de: "Gewonnene Aufträge liefern", tr: "Kazanılan işi teslim etme" },
     knoten: [],
-    agenten: [],
-    besetzung: "leer",
+    agenten: ["projekte"],
+    besetzung: "aktiv",
   },
   {
     id: "einkauf",

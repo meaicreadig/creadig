@@ -19,6 +19,8 @@ const AGENT_NAMEN: Record<string, Record<Sprache, string>> = {
   kapital: { de: "Kapital", tr: "Sermaye" },
   redaktion: { de: "Redaktion", tr: "Editörlük" },
   motor: { de: "Motor", tr: "Motor" },
+  finanz: { de: "Finanz", tr: "Finans" },
+  projekte: { de: "Projektleitung", tr: "Proje lideri" },
 }
 
 const RANG: Record<Zustand, number> = { ruhig: 0, aktiv: 1, achtung: 2, stoerung: 3 }
@@ -72,6 +74,7 @@ export function bauHauptsitz(
         wert: haupt?.wert ?? "—",
         zeile:
           haupt?.zeile ??
+          a.agenten.map((g) => live?.laeufe[g]?.ergebnis).find(Boolean) ??
           (a.besetzung === "leer"
             ? sprache === "tr" ? "Kadro yok. Bu departman henüz kurulmadı." : "Nicht besetzt. Diese Abteilung ist noch nicht aufgebaut."
             : sprache === "tr" ? "Henüz ölçülen bir alan yok." : "Noch keine gemessene Fläche."),
