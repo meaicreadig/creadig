@@ -1,15 +1,16 @@
 import type { Metadata, Viewport } from "next"
-import { JetBrains_Mono, Manrope, M_PLUS_Rounded_1c, Readex_Pro } from "next/font/google"
+import { JetBrains_Mono, Manrope, M_PLUS_Rounded_1c } from "next/font/google"
+import localFont from "next/font/local"
 import "@/app/globals.css"
 
 /* Markenschriften (Owner-Entscheidung): Manrope + M PLUS Rounded 1c, Arabisch Readex Pro. */
 const manrope = Manrope({ subsets: ["latin", "latin-ext"], weight: ["400", "500", "600", "700"], variable: "--font-manrope", display: "swap" })
 const mplusRounded = M_PLUS_Rounded_1c({ subsets: ["latin", "latin-ext"], weight: ["400", "500", "700"], variable: "--font-mplus", display: "swap", preload: false })
 const jetbrains = JetBrains_Mono({ subsets: ["latin", "latin-ext"], weight: ["400", "500"], variable: "--font-jetbrains", display: "swap" })
-/* Exakt dieselben Optionen wie in components/site-shell.tsx, damit next/font dieselbe bereits geladene Schrift wiederverwendet. */
-const readex = Readex_Pro({
-  subsets: ["arabic"],
-  weight: ["300", "400", "500", "600", "700"],
+/* Readex Pro lokal (variable 300–700): ein zweiter Google-Abruf derselben Schrift ließ den Vercel-Build scheitern. */
+const readex = localFont({
+  src: "./fonts/readex-arabic.woff2",
+  weight: "300 700",
   variable: "--font-arabic",
   display: "swap",
   preload: false,
