@@ -51,6 +51,64 @@ import { Disclosure } from "@/components/ui/disclosure"
 
 import { agentStarten, antwortErhalten, freigabeEntscheiden, ratAntworten } from "./actions"
 import { antwortZuruecknehmen } from "../marketing/mail/actions"
+import { letzteAbendRueckmeldung, type AbendRueckmeldung } from "@/lib/assistent/abend"
+
+function AbendKarte({ r }: { r: AbendRueckmeldung }) {
+  const datum = new Date(`${r.tag}T12:00:00`).toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })
+  const z = r.zahlen
+  const kennzahlen = [
+    { wert: z.mailsGesendet, text: "Mails raus" },
+    { wert: z.antworten, text: "Antworten" },
+    { wert: z.termineGebucht, text: "Termine" },
+    { wert: z.freigabenErledigt, text: "Freigaben erledigt" },
+  ]
+  return (
+    <section aria-labelledby="abend-titel" className="bg-card flex flex-col gap-5 rounded-3xl p-6">
+      <div className="flex flex-col gap-1">
+        <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">Tages-Rückmeldung · {datum}</p>
+        <h2 id="abend-titel" className="text-foreground text-pretty text-lg font-semibold">
+          {r.bilanz}
+        </h2>
+      </div>
+      <dl className="flex flex-wrap gap-6">
+        {kennzahlen.map((k) => (
+          <div key={k.text} className="flex flex-col">
+            <dt className="text-muted-foreground order-2 text-xs">{k.text}</dt>
+            <dd className="text-primary order-1 text-2xl font-semibold tabular-nums">{k.wert}</dd>
+          </div>
+        ))}
+      </dl>
+      {(r.gut.length > 0 || r.offen.length > 0) && (
+        <div className="grid gap-4 md:grid-cols-2">
+          {r.gut.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <h3 className="text-foreground text-sm font-semibold">Vorangegangen</h3>
+              <ul className="text-muted-foreground flex flex-col gap-1 text-sm leading-relaxed">
+                {r.gut.map((g) => (
+                  <li key={g}>{g}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {r.offen.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <h3 className="text-foreground text-sm font-semibold">Liegen geblieben</h3>
+              <ul className="text-muted-foreground flex flex-col gap-1 text-sm leading-relaxed">
+                {r.offen.map((g) => (
+                  <li key={g}>{g}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+      <p className="bg-primary/10 text-foreground rounded-2xl px-4 py-3 text-sm">
+        <span className="font-semibold">Morgen zuerst: </span>
+        {r.morgenZuerst}
+      </p>
+    </section>
+  )
+}
 import { ergaenzeFehlendeAdressen, ladeAnsprache, type Ansprache } from "@/lib/assistent/versand"
 
 const euro = (n: number) => `${Math.round(n).toLocaleString("de-DE")} €`
@@ -712,7 +770,11 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
   after(() => fuehreFaelligeAus().catch(() => undefined))
   after(() => ergaenzeFehlendeAdressen().catch(() => undefined))
   after(() => holeEingang().catch(() => undefined))
-  const [eingang, buchungen] = await Promise.all([ladeEingang(12), ladeNeueBuchungen(14, 10)])
+  const [eingang, buchungen, abend] = await Promise.all([
+    ladeEingang(12),
+    ladeNeueBuchungen(14, 10),
+    letzteAbendRueckmeldung().catch(() => null),
+  ])
 
   const ratMitAntwort = raete[0]?.antwort ? raete[0] : undefined
   const neuerLoeschauftrag = ratMitAntwort?.antwort
@@ -731,6 +793,8 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
   return (
     <AdminShell title="Assistent" meta={<span className="block">Deine Truppe arbeitet im Hintergrund – du entscheidest</span>}>
       <div className="flex flex-col gap-10">
+        {abend && <AbendKarte r={abend} />}
+
         <Sitzung rat={raete[0]} fruehere={raete.slice(1)} rahmen={rahmen} />
 
         <EingangListe eintraege={eingang} aktiv={eingangAktiv()} buchungen={buchungen} />

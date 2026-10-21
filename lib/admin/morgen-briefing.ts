@@ -2,6 +2,7 @@ import "server-only"
 
 import { generateText } from "ai"
 
+import { abendVonGestern, type AbendRueckmeldung } from "@/lib/assistent/abend"
 import { collectAttention, type AttentionItem } from "@/lib/attention"
 import { ladeCockpit, type CockpitDaten } from "@/lib/cockpit"
 import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
@@ -68,11 +69,28 @@ function kandidaten(items: AttentionItem[]): AttentionItem[] {
   return [...items].sort((a, b) => (RANG_GEWICHT[a.rank] ?? 9) - (RANG_GEWICHT[b.rank] ?? 9)).slice(0, 25)
 }
 
-function lagebild(items: AttentionItem[], c: CockpitDaten, f: FinanzKurzlage | null): string {
+type AssistentLage = { freigabenOffen: number; aeltesteOffen: string | null; abend: AbendRueckmeldung | null }
+
+async function ladeAssistentLage(): Promise<AssistentLage> {
+  const abfrage = neonAbfrage()
+  const [rows, abend] = await Promise.all([
+    abfrage
+      ? abfrage(`SELECT count(*) AS c, min(created_at)::date AS d FROM assistent_freigaben WHERE status = 'offen'`, []).catch(() => [])
+      : Promise.resolve([]),
+    abendVonGestern().catch(() => null),
+  ])
+  return { freigabenOffen: Number(rows[0]?.c ?? 0), aeltesteOffen: rows[0]?.d ? String(rows[0].d).slice(0, 10) : null, abend }
+}
+
+function lagebild(items: AttentionItem[], c: CockpitDaten, f: FinanzKurzlage | null, a: AssistentLage): string {
   const n = (v: number | null) => (v === null ? "nicht gemessen" : String(v))
   const eur = (cent: number | null) => (cent === null ? "nicht gemessen" : `${Math.round(cent / 100)} €`)
   return [
     `Heute: ${heute()}`,
+    `Offene Freigaben im Assistenten (Mails/Aufgaben der KI-Truppe, warten auf Klick): ${a.freigabenOffen}${a.aeltesteOffen ? `, älteste seit ${a.aeltesteOffen}` : ""}`,
+    a.abend
+      ? `Rückmeldung gestern Abend: ${a.abend.bilanz} | Liegen geblieben: ${a.abend.offen.join("; ") || "nichts"} | Geplant für heute zuerst: ${a.abend.morgenZuerst}`
+      : "Rückmeldung gestern Abend: keine",
     `Anfragen letzte 7 Tage: ${n(c.anfragen7)} (Woche davor: ${n(c.anfragenVor7)})`,
     `Offene Chancen in der Pipeline: ${n(c.pipelineOffen)}, Wert ${c.pipelineWert === null ? "nicht gemessen" : `${Math.round(c.pipelineWert)} €`}`,
     `Offene Rechnungen: ${n(c.rechnungenOffen)}, Summe ${eur(c.rechnungenOffenCent)}`,
@@ -96,6 +114,7 @@ Deine Aufgabe: jeden Morgen genau die drei Schritte nennen, die ihn heute am wei
 Regeln:
 - Grundlage ist NUR das LAGEBILD. Erfinde keine Namen, Zahlen oder Termine.
 - Wenn ein Schritt sich auf einen OFFENEN PUNKT bezieht, gib dessen Index als "ref" an, sonst null.
+- Du arbeitest in einer Linie mit dem Assistenten und seiner KI-Truppe: Was gestern Abend für heute geplant wurde, kommt zuerst (außer etwas Dringenderes). Offene Freigaben sind fertige Arbeit, die nur einen Klick braucht – erwähne sie, wenn welche warten.
 - Reihenfolge: Geld und Fristen zuerst (überfällig, offene Rechnungen, neue Anfragen), dann Pipeline, dann Wachstum.
 - Ist wenig offen, schlage aktive Wachstumsschritte vor (Kontakte anschreiben, Beitrag veröffentlichen, Angebot für die Golfregion vorbereiten).
 - Sprache: ${sprache === "tr" ? "Türkisch" : "Deutsch"}, per du, klar, motivierend ohne Floskeln, keine Emojis.
@@ -142,12 +161,12 @@ function text(v: unknown, max: number): string | null {
   return typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null
 }
 
-async function kiBriefing(items: AttentionItem[], c: CockpitDaten, f: FinanzKurzlage | null, sprache: BriefingSprache): Promise<Briefing | null> {
+async function kiBriefing(items: AttentionItem[], c: CockpitDaten, f: FinanzKurzlage | null, a: AssistentLage, sprache: BriefingSprache): Promise<Briefing | null> {
   try {
     const { text: roh } = await generateText({
       model: MODELL,
       system: SYSTEM(sprache),
-      prompt: `LAGEBILD:\n${lagebild(items, c, f)}`,
+      prompt: `LAGEBILD:\n${lagebild(items, c, f, a)}`,
       maxOutputTokens: 2000,
     })
     const json = JSON.parse(roh.slice(roh.indexOf("{"), roh.lastIndexOf("}") + 1)) as Record<string, unknown>
@@ -173,8 +192,19 @@ async function erstelle(sprache: BriefingSprache): Promise<Briefing> {
   const [board, cockpit] = await Promise.all([collectAttention(getVertriebStore()), ladeCockpit()])
   const items = kandidaten(board.items)
   const fdb = neonAbfrage()
-  const finanz = fdb ? await ladeFinanzKurzlage(fdb, heute()).catch(() => null) : null
-  return (await kiBriefing(items, cockpit, finanz, sprache)) ?? regelBriefing(items, sprache)
+  const [finanz, assistent] = await Promise.all([
+    fdb ? ladeFinanzKurzlage(fdb, heute()).catch(() => null) : Promise.resolve(null),
+    ladeAssistentLage(),
+  ])
+  if (assistent.freigabenOffen > 0) {
+    items.unshift({
+      rank: "entscheidung",
+      title: sprache === "tr" ? `${assistent.freigabenOffen} onay bekliyor` : `${assistent.freigabenOffen} Freigaben warten im Assistenten`,
+      detail: sprache === "tr" ? "KI ekibinin hazırladığı mailler ve görevler" : "Mails und Aufgaben, die dein KI-Team vorbereitet hat",
+      href: "/admin/assistent",
+    } as AttentionItem)
+  }
+  return (await kiBriefing(items, cockpit, finanz, assistent, sprache)) ?? regelBriefing(items, sprache)
 }
 
 async function speichere(sprache: BriefingSprache, b: Briefing) {

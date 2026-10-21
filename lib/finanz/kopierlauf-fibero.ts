@@ -25,6 +25,17 @@ function zugang() {
 
 export const kopierlaufBereit = () => Boolean(zugang() && process.env.BLOB_READ_WRITE_TOKEN)
 
+/** Liest eine Belegdatei direkt aus dem fibero-Speicher (nur GET). */
+export async function ladeFiberoDatei(pfad: string): Promise<{ bytes: Buffer; typ: string } | null> {
+  const z = zugang()
+  if (!z || !pfad) return null
+  const sauber = ohnePrefix(pfad)
+  const res = await fetch(`${z.url}/storage/v1/object/${BUCKET}/${sauber.split("/").map(encodeURIComponent).join("/")}`, { headers: z.headers, cache: "no-store" })
+  if (!res.ok) return null
+  const typ = res.headers.get("content-type") ?? (sauber.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg")
+  return { bytes: Buffer.from(await res.arrayBuffer()), typ: typ.split(";")[0].trim() }
+}
+
 const cent = (v: unknown) => Math.round(Number(v ?? 0) * 100)
 const ohnePrefix = (p: string) => p.replace(/^\/+/, "").replace(/^belege\//, "")
 
