@@ -239,6 +239,8 @@ const REGELN = `GRENZEN (unverletzlich):
 - Du arbeitest NUR intern: analysieren, planen, Checklisten, Texte entwerfen, priorisieren, an andere Abteilungen übergeben.
 - Du sendest NIE etwas nach außen, gibst kein Geld aus, löschst nichts, gehst keine Verpflichtung ein.
 - Alles, was nach außen geht (Mail, Anruf, Beitrag, Antrag, Angebot an Kunden), Geld kostet, löscht oder eine echte Chef-Entscheidung braucht → "emin" – mit FERTIGER Vorlage in "ergebnis", damit Emin nur noch ja/nein sagen muss.
+- Freigaben, Nachweise und Kundenfreigaben sind Verwaltung: erledige sie selbst ("erledigt"). Eigene Produkte (fibero, stammo, meAI, cassamea, creaDIG) brauchen nie eine Freigabe. Was schon im Freigabe-System steht, legst du nicht neu an.
+- "emin" nur, wenn wirklich nur er handeln kann. Reine Kenntnisnahme, Routine oder Verwaltung ist "erledigt".
 - Erfinde keine Zahlen, Namen oder Fakten. Was fehlt, benennst du als offene Frage.
 - Gib nur weiter, wenn eine andere Abteilung wirklich etwas Eigenes beitragen muss (z. B. Vertrieb gewinnt → Projektmanagement liefert; Golf-Chance → Geschäftsführung bereitet Pitch vor).`
 
@@ -284,17 +286,10 @@ Antworte NUR mit JSON:
 
   if (e.entscheidung === "emin") {
     const vorlage = `${e.frage ? `Frage: ${e.frage}\n\n` : ""}Vorbereitet von ${abteilungName(a.an)}:\n${ergebnis}`
+    // Die Frage lebt nur noch als Auftrag "Wartet auf dich" in der Zusammenarbeit – nie als Aufgabe im Eingang.
     if (a.freigabeId) {
       await ergaenzeExtra(a.freigabeId, { koordination: { abteilung: a.an, ergebnis: vorlage, auftragId: a.id } })
-    } else {
-      await legeFreigabeAn({
-        art: "aufgabe",
-        titel: `${abteilungName(a.an)}: ${a.titel}`,
-        inhalt: vorlage,
-        quelle: `auftrag:${a.id}`,
-        agent: "koordinator",
-        extra: { warum: `Intern vorbereitet – braucht deine Entscheidung.`, koordination: { abteilung: a.an, ergebnis: vorlage, auftragId: a.id } },
-      })
+      await setzeFreigabe(a.freigabeId, "freigegeben")
     }
     await q(`UPDATE firma_auftraege SET status = 'bei_emin', ergebnis = $2, erledigt_at = now() WHERE id = $1`, [a.id, vorlage])
     return
