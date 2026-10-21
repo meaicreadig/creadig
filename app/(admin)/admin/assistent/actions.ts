@@ -17,6 +17,8 @@ import {
   ergaenzeExtra,
   ladeFreigabe,
   ladeLinkedin,
+  ladeRaete,
+  setzeRatErledigt,
   fragenHeute,
   ladeVerlauf,
   setzeFreigabe,
@@ -28,6 +30,21 @@ import {
 import { darfBetreten } from "@/lib/rollen"
 import { getVertriebStore } from "@/lib/lead-store"
 import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
+import { generateText } from "ai"
+
+async function werteAntwortAus(frage: string, antwort: string, loeschauftrag: boolean): Promise<string | null> {
+  const { text } = await generateText({
+    model: "openai/gpt-5.4-mini",
+    prompt: `Du bist der Chief of Staff von Emin (creaDIG Solutions). Die Geschäftsleitung hat gefragt:
+"${frage}"
+Emin hat geantwortet:
+"${antwort}"
+${loeschauftrag ? "Ein Löschauftrag wurde daraus bereits als Freigabe-Karte angelegt." : ""}
+Schreibe in 1–2 kurzen deutschen Sätzen, was die Truppe jetzt konkret daraus macht (Ergebnis-Sprache, kein Zitat der Antwort, keine Floskeln, kein Markdown).`,
+  })
+  const t = text.trim()
+  return t ? t.slice(0, 400) : null
+}
 
 async function pruefe() {
   const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
@@ -72,8 +89,18 @@ export async function ratAntworten(form: FormData): Promise<void> {
   const id = form.get("id")
   const antwort = form.get("antwort")
   if (typeof id !== "string" || typeof antwort !== "string" || !antwort.trim()) return
-  await beantworteRat(id.slice(0, 80), antwort.trim().slice(0, 2000))
-  await erkenneLoeschwunsch(antwort, id.slice(0, 80)).catch((e) => console.error("[loeschen] erkennen", e))
+  const ratId = id.slice(0, 80)
+  const text = antwort.trim().slice(0, 2000)
+  await beantworteRat(ratId, text)
+  const loesch = await erkenneLoeschwunsch(text, ratId).catch((e) => {
+    console.error("[loeschen] erkennen", e)
+    return null
+  })
+  const rat = (await ladeRaete(6)).find((r) => r.id === ratId)
+  if (rat) {
+    const erledigt = await werteAntwortAus(rat.protokoll.frage, text, Boolean(loesch)).catch(() => null)
+    await setzeRatErledigt(ratId, erledigt ?? "Antwort ist angekommen und fließt in die nächste Sitzung ein.")
+  }
   revalidatePath("/admin/assistent")
 }
 

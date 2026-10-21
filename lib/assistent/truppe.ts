@@ -12,6 +12,7 @@ import { erstelleEntwurf, ladeEntwuerfe } from "@/lib/verkaufen-entwurf"
 
 import { firmenRahmen, INHABER } from "./rahmen"
 import { findeKontaktMail } from "./kontaktsuche"
+import { pruefeWebseite, webcheckNotiz } from "./webcheck"
 import { ergaenzeFehlendeAdressen, istMail, nachfassen } from "./versand"
 import { holeEingang } from "@/lib/eingang"
 import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
@@ -356,9 +357,19 @@ Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","emai
   const ziele = jsonListe<Ziel>(text)
     .filter((z) => z?.firma && z?.website?.startsWith("http") && z?.mail)
     .slice(0, JAEGER_ANZAHL)
-  const adressen = await Promise.all(ziele.map((z) => findeKontaktMail(z.website).catch(() => null)))
+  const [adressen, checks] = await Promise.all([
+    Promise.all(ziele.map((z) => findeKontaktMail(z.website).catch(() => null))),
+    Promise.all(ziele.map((z) => pruefeWebseite(z.website).catch(() => null))),
+  ])
   let neu = 0
   for (const [i, z] of ziele.entries()) {
+    const check = checks[i]
+    const befund = check?.befunde[0]
+    const ps = befund
+      ? `\n\nP.S. Mir ist beim Blick auf Ihre Webseite aufgefallen: ${befund} Das lässt sich meist schnell beheben. Wenn Sie möchten, schicke ich Ihnen eine kurze Einschätzung, kostenlos.`
+      : revier.id !== "creadig"
+        ? `\n\nP.S. Neben ${revier.produkt} bauen wir auch Webseiten und digitale Abläufe für Betriebe wie Ihren, falls das irgendwann ein Thema wird.`
+        : ""
     let host = ""
     try {
       host = new URL(z.website).hostname.replace(/^www\./, "").toLowerCase()
@@ -370,8 +381,12 @@ Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","emai
       titel: `Neukunde ${revier.produkt}: ${z.firma} (${z.ort})`,
       empfaenger: an,
       betreff: z.betreff,
-      extra: { adressSuche: an ? "gefunden" : "keine", produkt: revier.id },
-      inhalt: `${z.mail}\n\n---\nWarum diese Firma: ${z.warum}\nWebseite: ${z.website}\n${an ? `Adresse von der Webseite: ${an}` : "Keine Adresse auf der Webseite gefunden – bitte im Impressum nachsehen."}`,
+      extra: {
+        adressSuche: an ? "gefunden" : "keine",
+        produkt: revier.id,
+        webcheck: check ? { befunde: check.befunde, https: check.https, mobil: check.mobil, ladezeitMs: check.ladezeitMs } : null,
+      },
+      inhalt: `${z.mail}${ps}\n\n---\nWarum diese Firma: ${z.warum}\nWebseite: ${z.website}\n${an ? `Adresse von der Webseite: ${an}` : "Keine Adresse auf der Webseite gefunden – bitte im Impressum nachsehen."}\n${check ? webcheckNotiz(check) : "Webseiten-Check: nicht gelaufen."}`,
       quelle: `jaeger:${z.firma.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
       agent: "jaeger",
     })

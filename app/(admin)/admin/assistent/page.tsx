@@ -46,6 +46,7 @@ import { AGENTEN, fuehreFaelligeAus, type AgentInfo, type AgentKey } from "@/lib
 import { getVertriebStore } from "@/lib/lead-store"
 import { eingangAktiv, holeEingang, ladeEingang } from "@/lib/eingang"
 import { EingangListe } from "@/components/admin/eingang-liste"
+import { ladeNeueBuchungen } from "@/lib/termine/store"
 import { Disclosure } from "@/components/ui/disclosure"
 
 import { agentStarten, antwortErhalten, freigabeEntscheiden, ratAntworten } from "./actions"
@@ -90,7 +91,12 @@ function Sitzung({ rat, fruehere, rahmen }: { rat: Rat | undefined; fruehere: Ra
               </span>
               <p className="text-pretty leading-relaxed text-foreground">{rat.protokoll.lage}</p>
             </div>
-            <ul className="grid gap-3 sm:grid-cols-2">
+            <details className="group flex flex-col gap-4">
+              <summary className="w-fit cursor-pointer list-none rounded-full bg-primary/10 px-4 py-2 text-sm text-primary hover:bg-primary/15">
+                <span className="group-open:hidden">Inhalt ansehen · {rat.protokoll.stimmen.map((s) => s.rolle).join(", ")}</span>
+                <span className="hidden group-open:inline">Inhalt zuklappen</span>
+              </summary>
+            <ul className="mt-4 grid gap-3 sm:grid-cols-2">
               {rat.protokoll.stimmen.map((s) => (
                 <li key={s.rolle} className="flex flex-col gap-1 rounded-2xl bg-muted/60 p-4">
                   <span className="text-xs font-semibold text-primary">{s.rolle}</span>
@@ -111,6 +117,7 @@ function Sitzung({ rat, fruehere, rahmen }: { rat: Rat | undefined; fruehere: Ra
                 </ul>
               </div>
             ) : null}
+            </details>
           </article>
 
           <div className="flex flex-col gap-4">
@@ -138,10 +145,16 @@ function Sitzung({ rat, fruehere, rahmen }: { rat: Rat | undefined; fruehere: Ra
               <h3 className="font-sans text-base font-semibold text-foreground">Rückfrage an dich</h3>
               <p className="text-pretty text-sm leading-relaxed text-foreground">{rat.protokoll.frage}</p>
               {rat.antwort ? (
-                <p className="rounded-2xl bg-card p-4 text-sm leading-relaxed text-muted-foreground">
-                  <span className="font-medium text-foreground">Deine Antwort: </span>
-                  {rat.antwort}
-                </p>
+                <div className="flex flex-col gap-2 rounded-2xl bg-card p-4">
+                  <p className="flex items-start gap-2 text-sm leading-relaxed text-foreground">
+                    <Check className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+                    {rat.protokoll.erledigt ?? "Antwort ist angekommen und fließt in die nächste Sitzung ein."}
+                  </p>
+                  <details>
+                    <summary className="cursor-pointer text-xs text-muted-foreground">Deine Antwort anzeigen</summary>
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{rat.antwort}</p>
+                  </details>
+                </div>
               ) : (
                 <form action={ratAntworten} className="flex flex-col gap-2">
                   <input type="hidden" name="id" value={rat.id} />
@@ -446,9 +459,19 @@ function MailKarte({ f }: { f: Freigabe }) {
           <input type="hidden" name="id" value={f.id} />
           <input type="hidden" name="status" value="freigegeben" />
           <input type="hidden" name="titel" value={f.titel} />
+          <p className="text-sm text-muted-foreground">
+            {f.empfaenger ? `An ${f.empfaenger}` : "Empfänger fehlt noch"}
+            {f.betreff ? ` · ${f.betreff}` : ""}
+          </p>
+          <details className="group">
+            <summary className="w-fit cursor-pointer list-none rounded-full bg-primary/10 px-4 py-2 text-sm text-primary hover:bg-primary/15">
+              <span className="group-open:hidden">Inhalt ansehen</span>
+              <span className="hidden group-open:inline">Inhalt zuklappen</span>
+            </summary>
+            <div className="mt-3 flex flex-col gap-3">
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
             An
-            <input name="empfaenger" type="email" required defaultValue={f.empfaenger ?? ""} placeholder="name@firma.de" className={feld} />
+            <input name="empfaenger" type="email" defaultValue={f.empfaenger ?? ""} placeholder="name@firma.de" className={feld} />
           </label>
           <label className="flex flex-col gap-1 text-xs text-muted-foreground">
             Betreff
@@ -464,6 +487,8 @@ function MailKarte({ f }: { f: Freigabe }) {
             />
           </label>
           {notiz ? <p className="whitespace-pre-wrap rounded-2xl bg-primary/5 px-4 py-3 text-xs leading-relaxed text-muted-foreground">{notiz}</p> : null}
+            </div>
+          </details>
           {f.extra.fehler ? (
             <p role="alert" className="text-sm text-destructive">
               {f.extra.fehler}
@@ -687,7 +712,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
   after(() => fuehreFaelligeAus().catch(() => undefined))
   after(() => ergaenzeFehlendeAdressen().catch(() => undefined))
   after(() => holeEingang().catch(() => undefined))
-  const eingang = await ladeEingang(12)
+  const [eingang, buchungen] = await Promise.all([ladeEingang(12), ladeNeueBuchungen(14, 10)])
 
   const ratMitAntwort = raete[0]?.antwort ? raete[0] : undefined
   const neuerLoeschauftrag = ratMitAntwort?.antwort
@@ -708,7 +733,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
       <div className="flex flex-col gap-10">
         <Sitzung rat={raete[0]} fruehere={raete.slice(1)} rahmen={rahmen} />
 
-        <EingangListe eintraege={eingang} aktiv={eingangAktiv()} />
+        <EingangListe eintraege={eingang} aktiv={eingangAktiv()} buchungen={buchungen} />
 
         <section id="redaktion" aria-labelledby="redaktion-titel" className="flex scroll-mt-6 flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -817,7 +842,7 @@ export default async function AssistentPage({ searchParams }: { searchParams: Pr
             ) : null}
           </section>
 
-          <section aria-labelledby="chat-titel" className="flex flex-col gap-4 lg:sticky lg:top-6 lg:self-start">
+          <section aria-labelledby="chat-titel" className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-6 lg:self-start">
             <h2 id="chat-titel" className="font-sans text-xl font-semibold text-foreground">
               Auftrag geben
             </h2>

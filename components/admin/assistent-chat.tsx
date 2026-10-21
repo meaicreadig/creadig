@@ -78,7 +78,7 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
   }
 
   return (
-    <section className="flex min-h-[32rem] flex-col rounded-3xl bg-card shadow-sm" aria-label="Chat mit dem Assistenten">
+    <section className="flex min-h-[32rem] w-full min-w-0 flex-col overflow-hidden rounded-3xl bg-card shadow-sm" aria-label="Chat mit dem Assistenten">
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-5 md:p-6" style={{ maxHeight: "60vh" }}>
         {verlauf.length === 0 ? (
           <div className="flex flex-col gap-3">
@@ -104,8 +104,8 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
               <div
                 className={
                   m.rolle === "user"
-                    ? "max-w-[85%] whitespace-pre-wrap rounded-3xl rounded-br-lg bg-primary px-4 py-3 text-sm leading-relaxed text-primary-foreground"
-                    : "max-w-[85%] whitespace-pre-wrap rounded-3xl rounded-bl-lg bg-secondary px-4 py-3 text-sm leading-relaxed text-secondary-foreground"
+                    ? "min-w-0 max-w-[85%] whitespace-pre-wrap break-words rounded-3xl rounded-br-lg bg-primary px-4 py-3 text-sm leading-relaxed text-primary-foreground [overflow-wrap:anywhere]"
+                    : "min-w-0 max-w-[85%] whitespace-pre-wrap break-words rounded-3xl rounded-bl-lg bg-secondary px-4 py-3 text-sm leading-relaxed text-secondary-foreground [overflow-wrap:anywhere]"
                 }
               >
                 {m.text}

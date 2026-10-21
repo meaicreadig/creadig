@@ -1,4 +1,5 @@
 import { ART_TEXT, type Eingang } from "@/lib/eingang"
+import type { NeueBuchung } from "@/lib/termine/store"
 
 const TON: Record<Eingang["art"], string> = {
   interessiert: "bg-primary text-primary-foreground",
@@ -13,17 +14,45 @@ const TON: Record<Eingang["art"], string> = {
 const zeit = (iso: string) =>
   new Date(iso).toLocaleString("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
 
-export function EingangListe({ eintraege, aktiv }: { eintraege: Eingang[]; aktiv: boolean }) {
+export function EingangListe({
+  eintraege,
+  aktiv,
+  buchungen = [],
+}: {
+  eintraege: Eingang[]
+  aktiv: boolean
+  buchungen?: NeueBuchung[]
+}) {
   return (
     <section id="eingang" aria-labelledby="eingang-titel" className="flex scroll-mt-6 flex-col gap-4">
       <div className="flex flex-col gap-1">
         <h2 id="eingang-titel" className="font-sans text-xl font-semibold text-foreground">
-          Antworten von Kunden
+          Nachrichten
         </h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Das System liest jede Antwort, stoppt das Nachfassen, bewegt die Verkaufschance und legt dir einen Antwortentwurf zur Freigabe hin.
+          Terminbuchungen und Kundenantworten an einem Ort. Bei jeder Buchung bekommst du zusätzlich eine Mail.
         </p>
       </div>
+
+      {buchungen.length > 0 ? (
+        <ul className="flex flex-col gap-3">
+          {buchungen.map((b) => (
+            <li key={b.id} className="flex flex-col gap-2 rounded-3xl bg-card px-5 py-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-primary px-3 py-0.5 text-xs font-medium text-primary-foreground">Termin gebucht</span>
+                <span className="text-sm font-medium text-foreground">{b.name}</span>
+                <span className="ml-auto font-mono text-xs text-muted-foreground">{zeit(b.createdAt)}</span>
+              </div>
+              <p className="text-sm leading-relaxed text-foreground">
+                {`Gespräch am ${zeit(b.startsAt)} Uhr · ${b.email}`}
+              </p>
+              <a href="/admin/termine" className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                Termin ansehen
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       {!aktiv ? (
         <p className="rounded-3xl bg-card px-5 py-4 text-sm leading-relaxed text-muted-foreground">

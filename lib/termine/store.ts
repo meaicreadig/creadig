@@ -305,6 +305,65 @@ function referenz(): string {
   return `T-${Array.from(a, (b) => z[b % z.length]).join("")}`
 }
 
+const html = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] as string)
+
+async function meldeBuchungAnInhaber(b: {
+  name: string
+  email: string
+  note: string | null
+  start: Date
+  timezone: string
+  referenz: string
+}): Promise<void> {
+  const an = process.env.LEAD_TO?.trim()
+  if (!an) return
+  const { sendeMail } = await import("@/lib/termine/mail")
+  const wann = new Intl.DateTimeFormat("de-DE", {
+    timeZone: b.timezone,
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(b.start)
+  const basis = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://creadig.de"
+  const text = `${b.name} (${b.email}) hat einen Termin gebucht: ${wann} Uhr.\nReferenz ${b.referenz}${b.note ? `\nNotiz: ${b.note}` : ""}\n\nTermine: ${basis}/admin/termine`
+  await sendeMail({
+    to: an,
+    subject: `Neuer Termin: ${b.name} · ${wann}`,
+    text,
+    replyTo: b.email,
+    html: `<div style="font-family:Manrope,Arial,sans-serif;font-size:15px;line-height:1.6;color:#0f172a">
+<p style="margin:0 0 8px;font-size:18px;font-weight:700">Neuer Termin gebucht</p>
+<p style="margin:0 0 4px"><strong>${html(b.name)}</strong> · ${html(b.email)}</p>
+<p style="margin:0 0 4px">${html(wann)} Uhr · ${html(b.referenz)}</p>
+${b.note ? `<p style="margin:12px 0 0;padding:12px 16px;border-radius:16px;background:#eef3ff">${html(b.note)}</p>` : ""}
+<p style="margin:20px 0 0"><a href="${basis}/admin/termine" style="display:inline-block;padding:10px 20px;border-radius:999px;background:#2f5bea;color:#fff;text-decoration:none">Termin ansehen</a></p>
+</div>`,
+  })
+}
+
+export type NeueBuchung = { id: string; name: string; email: string; startsAt: string; createdAt: string; referenz: string }
+
+export async function ladeNeueBuchungen(tage = 14, limit = 10): Promise<NeueBuchung[]> {
+  const q = db()
+  if (!q) return []
+  const rows = await q(
+    `SELECT id, guest_name, guest_email, starts_at, created_at, reference FROM appointments
+      WHERE status = 'booked' AND created_at > now() - ($1::int * interval '1 day')
+      ORDER BY created_at DESC LIMIT $2`,
+    [tage, limit],
+  ).catch(() => [])
+  return rows.map((r) => ({
+    id: String(r.id),
+    name: String(r.guest_name ?? ""),
+    email: String(r.guest_email ?? ""),
+    startsAt: new Date(r.starts_at as string).toISOString(),
+    createdAt: new Date(r.created_at as string).toISOString(),
+    referenz: String(r.reference ?? ""),
+  }))
+}
+
 export async function bucheTermin(e: {
   token: string
   start: number
@@ -364,6 +423,14 @@ export async function bucheTermin(e: {
     [id],
   )
   const termin = alsTermin(gelesen[0])
+  await meldeBuchungAnInhaber({
+    name: e.name,
+    email: e.email,
+    note: e.note,
+    start,
+    timezone: einstellungen.timezone,
+    referenz: termin.reference,
+  }).catch((err) => console.error("[termine] Inhaber-Benachrichtigung", err))
   await protokoll(q, termin.contactId, "termin_gebucht", `Termin gebucht · ${termin.reference}`, {
     appointmentId: termin.id,
     startsAt: termin.startsAt,
