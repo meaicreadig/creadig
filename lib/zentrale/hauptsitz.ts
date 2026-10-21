@@ -18,6 +18,7 @@ const AGENT_NAMEN: Record<string, Record<Sprache, string>> = {
   messen: { de: "Messen", tr: "Fuarlar" },
   kapital: { de: "Kapital", tr: "Sermaye" },
   golf: { de: "Golf-Radar", tr: "Körfez radarı" },
+  koordinator: { de: "Chief of Staff", tr: "Genel koordinatör" },
   redaktion: { de: "Redaktion", tr: "Editörlük" },
   motor: { de: "Motor", tr: "Motor" },
   finanz: { de: "Finanz", tr: "Finans" },

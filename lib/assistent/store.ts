@@ -102,6 +102,8 @@ export type FreigabeExtra = {
   instagramUrl?: string | null
   /** Freigegebene Kapitalchance = Vorhaben mit Stufe und KI-Antragsskizze */
   antrag?: { stufe: KapitalStufe; seit: string; skizze?: string }
+  /** Interne Vorarbeit der Koordination (Abteilung, Ergebnis, ob automatisch erledigt). */
+  koordination?: { abteilung: string; ergebnis: string; auftragId: string; automatisch?: boolean }
 }
 
 export const KAPITAL_STUFEN = ["pruefen", "schreiben", "eingereicht", "bewilligt", "abgelehnt"] as const
