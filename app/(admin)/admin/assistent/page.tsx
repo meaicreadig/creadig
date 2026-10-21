@@ -302,6 +302,7 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
   finanz: Coins,
   redaktion: PenLine,
   projekte: Kanban,
+  golf: Radar,
 }
 
 const agentName = (key: string | null) => AGENTEN.find((a) => a.key === key)?.name ?? "Assistent"
@@ -541,9 +542,9 @@ function KapitalVorhaben({ liste }: { liste: Freigabe[] }) {
         <p className="text-sm text-muted-foreground">
           Hier landet jede freigegebene Förderchance. Der Assistent schreibt eine Antragsskizze, du rückst Schritt für Schritt vor.
         </p>
-        <a href="/admin/investoren" className="self-start text-sm font-medium text-primary">
+        <Link href="/admin/investoren" className="self-start text-sm font-medium text-primary">
           Investorenraum · persönliche Links für Investoren
-        </a>
+        </Link>
       </div>
       <ul className="grid gap-4 lg:grid-cols-2">
         {liste.map((f) => {
