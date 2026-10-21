@@ -78,10 +78,41 @@ async function lage(): Promise<Ergebnis> {
   return { ergebnis: n ? `${n} Punkte im System warten auf dich` : "Nichts wartet auf dich", anzahl: n }
 }
 
+/* Offene Vertriebs-Mailkarten, die nicht mehr stimmen (Deal pausiert, abgeschlossen oder ohne Empfänger), schließt das System selbst. */
+async function raeumeVertriebsKartenAuf(
+  deals: Awaited<ReturnType<typeof ladeVerkaufslage>>["deals"],
+  pausiert: Set<string>,
+): Promise<void> {
+  const q = await assistentDb()
+  if (!q) return
+  const offen = new Set(deals.map((d) => d.id))
+  const rows = (await q(
+    `SELECT id, quelle, empfaenger FROM assistent_freigaben WHERE status = 'offen' AND agent = 'vertrieb' AND art = 'mail' AND quelle LIKE 'deal:%'`,
+    [],
+  )) as { id: string; quelle: string; empfaenger: string | null }[]
+  for (const r of rows) {
+    const dealId = r.quelle.split(":")[1]
+    const weg = pausiert.has(dealId) || !offen.has(dealId) || !r.empfaenger || !istMail(r.empfaenger)
+    if (!weg) continue
+    await q(
+      `UPDATE assistent_freigaben SET status = 'verworfen', erledigt_at = now(),
+         extra = coalesce(extra, '{}'::jsonb) || jsonb_build_object('automatisch', 'Vom System geschlossen: Pause, Abschluss oder kein Empfänger')
+       WHERE id = $1 AND status = 'offen'`,
+      [r.id],
+    )
+  }
+}
+
 async function vertrieb(): Promise<Ergebnis> {
   const { deals } = await ladeVerkaufslage()
   const woche = kw(new Date())
-  const kandidaten = deals.filter((d) => d.warnungen.length > 0).slice(0, 4)
+  const heute = berlinTag(new Date())
+  /* Abgesprochene Pause (nächster Schritt in der Zukunft) = Ruhe. Ohne Empfänger keine Mailkarte. */
+  const pausiert = new Set(deals.filter((d) => d.faelligAm && d.faelligAm > heute).map((d) => d.id))
+  await raeumeVertriebsKartenAuf(deals, pausiert)
+  const kandidaten = deals
+    .filter((d) => d.warnungen.length > 0 && !pausiert.has(d.id) && d.kontaktMail && istMail(d.kontaktMail))
+    .slice(0, 4)
   /* Steht für den Deal schon eine offene Erinnerung der Automation (lib/automation.ts), melden wir ihn nicht ein zweites Mal. */
   const schonErinnert = await offeneAutomationErinnerungen(kandidaten.map((d) => d.id))
   let neu = 0
@@ -100,6 +131,7 @@ async function vertrieb(): Promise<Ergebnis> {
     const id = await legeFreigabeAn({
       art: "mail",
       titel: `Nachfassen: ${deal.firma ?? deal.titel}`,
+      empfaenger: deal.kontaktMail,
       betreff: e.betreff,
       inhalt: e.text,
       quelle,

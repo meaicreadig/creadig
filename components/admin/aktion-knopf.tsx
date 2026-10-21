@@ -42,8 +42,14 @@ export function AktionKnopf({
   nichtWenn?: string
 }) {
   const { pending, data } = useFormStatus()
+  /* Welcher Knopf gedrückt wurde, merkt sich der Knopf selbst – der mitgeschickte Wert kommt nicht in jedem Browser an. */
+  const [geklickt, setGeklickt] = useState(false)
+  useEffect(() => {
+    if (!pending) setGeklickt(false)
+  }, [pending])
   const status = data ? data.getAll("status").map(String) : []
-  const meins = pending && (!nurWenn || status.includes(nurWenn)) && (!nichtWenn || !status.includes(nichtWenn))
+  const ueberWert = (!nurWenn || status.includes(nurWenn)) && (!nichtWenn || !status.includes(nichtWenn))
+  const meins = pending && (geklickt || (!nurWenn && !nichtWenn && ueberWert))
 
   const lief = useRef(false)
   const text = useRef(fertig)
@@ -74,6 +80,7 @@ export function AktionKnopf({
       value={value}
       formAction={formAction}
       formNoValidate={formNoValidate}
+      onClick={() => setGeklickt(true)}
       disabled={pending}
       aria-busy={meins || undefined}
       className={`${className} transition-transform duration-150 active:scale-95 disabled:cursor-wait ${pending && !meins ? "opacity-50" : ""}`}
