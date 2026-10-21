@@ -232,6 +232,8 @@ export const FLAECHEN: readonly Flaeche[] = [
   { pfad: "/admin/verkaufen", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   /* Assistent sieht Abschlüsse, Lage und Messen — nur der Inhaber. */
   { pfad: "/admin/assistent", klasse: "fremde-personen", fuer: ["owner"] },
+  /* Investorenraum — persönliche Links mit Finanzzahlen. Nur der Inhaber. */
+  { pfad: "/admin/investoren", klasse: "fremde-personen", fuer: ["owner"] },
   { pfad: "/admin/messen", klasse: "eigene-lage", fuer: ["owner", "vertrieb", "redaktion"] },
   { pfad: "/admin/vertrieb", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   { pfad: "/admin/vertrieb/anfragen", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
@@ -321,7 +323,7 @@ export function uebergabe(rolle: Rolle): Uebergabepunkt[] {
   return punkte
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
+/* ════════════��══════════════════════════════════════════════════════════════
  * 5 · WAS DIE LAGE HEUTE IST
  * ═══════════════════════════════════════════���════════════════════���══════════ */
 

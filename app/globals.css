@@ -1267,6 +1267,26 @@ html.admin-marke.dark {
   --primary-foreground: #0a1322;
 }
 
+/* Investorenraum · Auftritt, Live-Puls, wachsende Balken */
+@keyframes investor-auftritt {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes investor-puls {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(47 91 234 / 0.45); }
+  50% { box-shadow: 0 0 0 8px rgb(47 91 234 / 0); }
+}
+@keyframes investor-balken {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+.investor-auftritt { animation: investor-auftritt 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.investor-puls { animation: investor-puls 2.4s ease-in-out infinite; }
+.investor-balken { transform-origin: bottom; animation: investor-balken 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .investor-auftritt, .investor-puls, .investor-balken { animation: none; }
+}
+
 /* creaDIG Finanz · ein ruhiger Lichtzug über der Hauptzahl */
 @keyframes finanz-glanz {
   0% { transform: translateX(-60%) skewX(-12deg); }
