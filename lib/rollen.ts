@@ -234,6 +234,8 @@ export const FLAECHEN: readonly Flaeche[] = [
   { pfad: "/admin/assistent", klasse: "fremde-personen", fuer: ["owner"] },
   /* Investorenraum — persönliche Links mit Finanzzahlen. Nur der Inhaber. */
   { pfad: "/admin/investoren", klasse: "fremde-personen", fuer: ["owner"] },
+  /* Bulletin — öffentliche Nachrichten, eingeordnet. */
+  { pfad: "/admin/bulletin", klasse: "eigene-lage", fuer: ["owner", "vertrieb", "redaktion"] },
   { pfad: "/admin/messen", klasse: "eigene-lage", fuer: ["owner", "vertrieb", "redaktion"] },
   { pfad: "/admin/vertrieb", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   { pfad: "/admin/vertrieb/anfragen", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },

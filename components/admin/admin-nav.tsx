@@ -13,6 +13,7 @@ import {
   Megaphone,
   Menu,
   MessagesSquare,
+  Newspaper,
   Presentation,
   Send,
   Sparkles,
@@ -27,6 +28,7 @@ export type NavItem = { href: string; label: string; hint: string; gruppe: strin
 const ICONS: Record<string, LucideIcon> = {
   uebersicht: LayoutDashboard,
   assistent: Sparkles,
+  bulletin: Newspaper,
   verkaufen: Target,
   messen: Presentation,
   gespraech: MessagesSquare,

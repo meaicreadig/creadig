@@ -307,6 +307,7 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
   redaktion: PenLine,
   projekte: Kanban,
   golf: Radar,
+  bulletin: PenLine,
 }
 
 const agentName = (key: string | null) => AGENTEN.find((a) => a.key === key)?.name ?? "Assistent"

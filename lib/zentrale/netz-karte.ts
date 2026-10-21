@@ -15,6 +15,7 @@ type Text = Record<Sprache, string>
 export const NAV_SCHLUESSEL = [
   "uebersicht",
   "assistent",
+  "bulletin",
   "verkaufen",
   "gespraech",
   "termine",
@@ -164,6 +165,18 @@ export const KNOTEN: readonly Knoten[] = [
     nav: { gruppe: "marketing" },
   },
   {
+    id: "bulletin",
+    href: "/admin/bulletin",
+    label: { de: "Bulletin", tr: "Bülten" },
+    aufgabe: {
+      de: "Was die Welt in KI, Medien, Chips und Robotik bewegt – für creaDIG eingeordnet.",
+      tr: "Yapay zekâ, medya, çip ve robotikte dünyayı ne hareket ettiriyor – creaDIG için yorumlu.",
+    },
+    viertel: "kern",
+    pos: { x: -4.4, y: 6.2 },
+    nav: { gruppe: "cockpit" },
+  },
+  {
     id: "finanz",
     href: "/finanz",
     label: { de: "creaDIG Finanz", tr: "creaDIG Finans" },
@@ -203,6 +216,7 @@ export const FAEDEN: readonly Faden[] = [
   { von: "assistent", nach: "mailstudio", was: { de: "Freigegebene Mails", tr: "Onaylı e-postalar" } },
   { von: "assistent", nach: "vertrieb", was: { de: "Jäger: neue Firmen", tr: "Avcı: yeni firmalar" } },
   { von: "marketing", nach: "assistent", was: { de: "LinkedIn-Redaktion", tr: "LinkedIn editörlüğü" } },
+  { von: "bulletin", nach: "marketing", was: { de: "Themen für die Redaktion", tr: "Editörlük için konular" } },
   { von: "messen", nach: "assistent", was: { de: "Messe-Agent", tr: "Fuar ajanı" } },
   { von: "finanz", nach: "assistent", was: { de: "Finanzrahmen für den Rat", tr: "Kurul için finans çerçevesi" } },
   { von: "system", nach: "assistent", was: { de: "Agentenläufe und Störungen", tr: "Ajan çalışmaları ve arızalar" } },

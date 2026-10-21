@@ -1,0 +1,113 @@
+import "server-only"
+
+import { neonAbfrage, type Abfrage } from "@/lib/neon-abfrage"
+
+export type Zweisprachig = { de: string; tr: string }
+
+export const RESSORTS = [
+  { id: "ki", de: "KI & Modelle", tr: "Yapay zekâ & modeller" },
+  { id: "automation", de: "Automatisierung & Agenten", tr: "Otomasyon & ajanlar" },
+  { id: "medien", de: "Medien & Plattformen", tr: "Medya & platformlar" },
+  { id: "chips", de: "Chips & Hardware", tr: "Çip & donanım" },
+  { id: "robotik", de: "Robotik", tr: "Robotik" },
+  { id: "recht", de: "Recht & Politik", tr: "Hukuk & politika" },
+  { id: "maerkte", de: "Märkte DACH · Türkei · Golf", tr: "Pazarlar DACH · Türkiye · Körfez" },
+] as const
+export type RessortId = (typeof RESSORTS)[number]["id"]
+export const istRessort = (v: unknown): v is RessortId => RESSORTS.some((r) => r.id === v)
+
+export type Meldung = {
+  nr: number
+  ressort: RessortId
+  titel: Zweisprachig
+  kurz: Zweisprachig
+  /** Was die Nachricht für creaDIG bedeutet – der eigentliche Wert des Bulletins. */
+  fuerUns: Zweisprachig
+  /** 3 = Schwerpunkt, 2 = wichtig, 1 = Randnotiz. */
+  gewicht: 1 | 2 | 3
+  quelle: string
+  url: string
+  datum: string | null
+  /** Ein eigener Artikel, den creaDIG daraus schreiben könnte (Website, LinkedIn, Google). */
+  artikel: Zweisprachig | null
+}
+
+export type Ausgabe = {
+  id: string
+  erstelltAm: string
+  lage: Zweisprachig
+  meldungen: Meldung[]
+}
+
+let bereit: Promise<void> | null = null
+
+/* Legt sich selbst an: die Prod-DATABASE_URL ist "Sensitive" und von außen nicht migrierbar. */
+function schema(db: Abfrage): Promise<void> {
+  bereit ??= db(
+    `CREATE TABLE IF NOT EXISTS bulletin_ausgaben (
+      id text PRIMARY KEY,
+      erstellt_at timestamptz NOT NULL DEFAULT now(),
+      lage jsonb NOT NULL,
+      meldungen jsonb NOT NULL DEFAULT '[]'::jsonb
+    )`,
+    [],
+  )
+    .then(() => undefined)
+    .catch((e) => {
+      bereit = null
+      throw e
+    })
+  return bereit
+}
+
+async function db(): Promise<Abfrage | null> {
+  const abfrage = neonAbfrage()
+  if (!abfrage) return null
+  await schema(abfrage)
+  return abfrage
+}
+
+function zeile(r: Record<string, unknown>): Ausgabe {
+  return {
+    id: String(r.id),
+    erstelltAm: new Date(String(r.erstellt_at)).toISOString(),
+    lage: r.lage as Zweisprachig,
+    meldungen: (r.meldungen as Meldung[]) ?? [],
+  }
+}
+
+export async function speichereAusgabe(a: Omit<Ausgabe, "erstelltAm">): Promise<void> {
+  const d = await db()
+  if (!d) throw new Error("Keine Datenbank")
+  await d(
+    `INSERT INTO bulletin_ausgaben (id, lage, meldungen) VALUES ($1, $2::jsonb, $3::jsonb)
+     ON CONFLICT (id) DO UPDATE SET lage = EXCLUDED.lage, meldungen = EXCLUDED.meldungen, erstellt_at = now()`,
+    [a.id, JSON.stringify(a.lage), JSON.stringify(a.meldungen)],
+  )
+}
+
+export async function ladeAusgabe(id?: string | null): Promise<Ausgabe | null> {
+  const d = await db()
+  if (!d) return null
+  const rows = id
+    ? await d(`SELECT * FROM bulletin_ausgaben WHERE id = $1`, [id])
+    : await d(`SELECT * FROM bulletin_ausgaben ORDER BY id DESC LIMIT 1`, [])
+  return rows[0] ? zeile(rows[0]) : null
+}
+
+export async function ladeArchiv(anzahl = 21): Promise<{ id: string; anzahl: number }[]> {
+  const d = await db()
+  if (!d) return []
+  const rows = await d(
+    `SELECT id, jsonb_array_length(meldungen) AS anzahl FROM bulletin_ausgaben ORDER BY id DESC LIMIT $1`,
+    [anzahl],
+  )
+  return rows.map((r) => ({ id: String(r.id), anzahl: Number(r.anzahl) }))
+}
+
+export async function ausgabeExistiert(id: string): Promise<boolean> {
+  const d = await db()
+  if (!d) return false
+  const rows = await d(`SELECT 1 FROM bulletin_ausgaben WHERE id = $1`, [id])
+  return rows.length > 0
+}

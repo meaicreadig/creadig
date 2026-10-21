@@ -4,6 +4,7 @@ import type { collectAttention } from "@/lib/attention"
 import type { CockpitDaten } from "@/lib/cockpit"
 import { assistentDb, letzteLaeufe } from "@/lib/assistent/store"
 import { ladeBetriebsmeldungen } from "@/lib/betrieb-alarm"
+import { ladeAusgabe } from "@/lib/bulletin/store"
 import { naechsteTermine } from "@/lib/messen"
 import { ladeFinanzKurzlage } from "@/lib/finanz/kurzlage"
 import { neonAbfrage } from "@/lib/neon-abfrage"
@@ -244,6 +245,19 @@ export async function ladeNetz({
       }
     : leer(tr ? "sıradaki fuar" : "nächste Messe")
 
+  /* ── Bulletin ── */
+  const ausgabe = await ladeAusgabe().catch(() => null)
+  const bulletin: Signal = ausgabe
+    ? {
+        wert: String(ausgabe.meldungen.length),
+        zeile: tr ? "güncel haber" : "aktuelle Meldungen",
+        zustand: "aktiv",
+        last: Math.min(1, ausgabe.meldungen.length / 14),
+        punkte: ausgabe.meldungen.slice(0, 2).map((m) => m.titel[tr ? "tr" : "de"]),
+        wege: [{ label: tr ? "Bülteni oku" : "Bulletin lesen", href: "/admin/bulletin" }],
+      }
+    : leer(tr ? "ilk sayı" : "erste Ausgabe")
+
   /* ── Betrieb ── */
   const system: Signal = {
     wert: String(meldungen.length),
@@ -315,5 +329,5 @@ export async function ladeNetz({
     wege: [{ label: tr ? "Bugün yapılacaklar" : "Heute zu tun", href: "#heute-titel" }],
   }
 
-  return { uebersicht, assistent, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen, finanz, system }
+  return { uebersicht, assistent, bulletin, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen, finanz, system }
 }
