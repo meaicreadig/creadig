@@ -1,4 +1,5 @@
 import { headers } from "next/headers"
+import Link from "next/link"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
@@ -42,7 +43,7 @@ export default async function InvestorenSeite(props: { searchParams: Promise<{ n
           <Surface>
             <p className="text-sm text-muted-foreground">Golf-Radar</p>
             <p className="text-sm leading-relaxed text-foreground">Sucht wöchentlich 3 Chancen in VAE, Saudi-Arabien und Katar, mit fertiger Nachricht auf Englisch und Arabisch.</p>
-            <a href="/admin/assistent#kapital" className="text-sm font-medium text-primary">Zu den Chancen</a>
+            <Link href="/admin/assistent#kapital" className="text-sm font-medium text-primary">Zu den Chancen</Link>
           </Surface>
         </div>
 
