@@ -31,7 +31,7 @@ import {
   type RatProtokoll,
 } from "./store"
 
-export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte"] as const
+export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "koordinator"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
 
 export type AgentInfo = {
@@ -43,6 +43,7 @@ export type AgentInfo = {
 }
 
 export const AGENTEN: AgentInfo[] = [
+  { key: "koordinator", name: "Chief of Staff", aufgabe: "Ordnet jede neue interne Arbeit einer Abteilung zu, lässt Abteilungen untereinander übergeben und legt dir nur vor, was nach außen geht oder deine Entscheidung braucht – fertig vorbereitet.", takt: "taeglich", ki: true },
   { key: "rat", name: "Geschäftsleitung", aufgabe: "CEO, CFO, Vertrieb und Marketing tagen wöchentlich, prüfen gegen dein Budget und beschließen.", takt: "woechentlich", ki: true },
   { key: "jaeger", name: "Kunden-Jäger", aufgabe: "Findet jede Woche echte Firmen für fibero, creaDIG oder stammo und schreibt die Erstmail.", takt: "woechentlich", ki: true },
   { key: "lage", name: "Lage", aufgabe: "Sammelt alles, was im System auf deine Entscheidung wartet.", takt: "taeglich", ki: false },
@@ -524,7 +525,12 @@ Reply ONLY with a JSON array: [{"name":"","art":"Accelerator|Fund|Family Office|
   return { ergebnis: `${neu} neue Golf-Chancen mit Erstnachricht`, anzahl: neu }
 }
 
-const LAEUFER: Record<AgentKey, () => Promise<Ergebnis>> = { lage, vertrieb, messen, finanz, projekte, kapital, golf, redaktion, jaeger, rat }
+async function koordinator(): Promise<Ergebnis> {
+  const { koordinatorRunde } = await import("@/lib/koordination/koordinator")
+  return koordinatorRunde()
+}
+
+const LAEUFER: Record<AgentKey, () => Promise<Ergebnis>> = { koordinator, lage, vertrieb, messen, finanz, projekte, kapital, golf, redaktion, jaeger, rat }
 
 export async function fuehreAgentAus(key: AgentKey): Promise<void> {
   try {
@@ -546,8 +552,14 @@ export async function fuehreFaelligeAus(): Promise<AgentKey[]> {
     const zuletzt = new Date(l.zeit)
     return a.takt === "taeglich" ? berlinTag(zuletzt) !== berlinTag(jetzt) : jetzt.getTime() - zuletzt.getTime() > 6.5 * 86400000
   }).map((a) => a.key)
-  for (const key of faellig) await fuehreAgentAus(key)
+  // Chief of Staff zuletzt, damit er die heutigen Ergebnisse aller Abteilungen sieht.
+  const reihenfolge = [...faellig.filter((k) => k !== "koordinator"), ...faellig.filter((k) => k === "koordinator")]
+  for (const key of reihenfolge) await fuehreAgentAus(key)
+  if (!faellig.includes("koordinator")) {
+    const { arbeiteWarteschlangeAb } = await import("@/lib/koordination/koordinator")
+    await arbeiteWarteschlangeAb().catch((e) => console.error("[assistent] koordination", e instanceof Error ? e.message : e))
+  }
   await holeEingang().catch((e) => console.error("[assistent] eingang", e instanceof Error ? e.message : e))
   await nachfassen().catch((e) => console.error("[assistent] nachfassen", e instanceof Error ? e.message : e))
-  return faellig
+  return reihenfolge
 }

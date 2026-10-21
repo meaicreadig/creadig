@@ -22,6 +22,7 @@ import {
   Users,
   X,
   Kanban,
+  Network,
 } from "lucide-react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
@@ -44,6 +45,8 @@ import {
 } from "@/lib/assistent/store"
 import { firmenRahmen, type Rahmen } from "@/lib/assistent/rahmen"
 import { erkenneLoeschwunsch } from "@/lib/assistent/loeschen"
+import { Zusammenarbeit } from "@/components/admin/zusammenarbeit"
+import { auftragKennzahlen, ladeAuftraege } from "@/lib/koordination/koordinator"
 import { AGENTEN, fuehreFaelligeAus, type AgentInfo, type AgentKey } from "@/lib/assistent/truppe"
 import { getVertriebStore } from "@/lib/lead-store"
 import { eingangAktiv, holeEingang, ladeEingang } from "@/lib/eingang"
@@ -293,6 +296,7 @@ const ART: Record<FreigabeArt, { label: string; Icon: typeof Mail }> = {
 }
 
 const AGENT_ICON: Record<AgentKey, typeof Mail> = {
+  koordinator: Network,
   rat: Users,
   jaeger: Crosshair,
   lage: Radar,
@@ -405,6 +409,14 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele })
             <span className="font-medium text-foreground">Warum jetzt: </span>
             {f.extra.warum}
           </p>
+        ) : null}
+        {f.extra.koordination ? (
+          <div className="flex flex-col gap-1 rounded-2xl bg-secondary px-4 py-3 text-sm leading-relaxed text-secondary-foreground">
+            <span className="font-medium text-foreground">
+              {f.extra.koordination.automatisch ? "Intern erledigt" : "Intern vorbereitet"}
+            </span>
+            <span className="whitespace-pre-line">{f.extra.koordination.ergebnis}</span>
+          </div>
         ) : null}
         {offen ? (
           <>
@@ -996,6 +1008,10 @@ export default async function AssistentPage({
     ladeBeitraege(6).catch(() => []),
     ladeAnsprache().catch((): Ansprache => ({ gesendet: 0, beantwortet: 0, quote: null, nachfassOffen: 0 })),
   ])
+  const [auftraege, auftragZahlen] = await Promise.all([
+    ladeAuftraege(20).catch(() => []),
+    auftragKennzahlen().catch(() => ({ heute: 0, erledigt: 0, uebergaben: 0, beiEmin: 0, offen: 0 })),
+  ])
   after(() => fuehreFaelligeAus().catch(() => undefined))
   after(() => ergaenzeFehlendeAdressen().catch(() => undefined))
   after(() => holeEingang().catch(() => undefined))
@@ -1029,6 +1045,8 @@ export default async function AssistentPage({
         <EingangListe eintraege={eingang} aktiv={eingangAktiv()} buchungen={buchungen} />
 
         {kapital.length > 0 ? <KapitalVorhaben liste={kapital} /> : null}
+
+        <Zusammenarbeit auftraege={auftraege} zahlen={auftragZahlen} />
 
         <section id="redaktion" aria-labelledby="redaktion-titel" className="flex scroll-mt-6 flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
