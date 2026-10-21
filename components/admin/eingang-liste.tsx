@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { ART_TEXT, type Eingang } from "@/lib/eingang"
 import type { NeueBuchung } from "@/lib/termine/store"
 
@@ -46,9 +47,9 @@ export function EingangListe({
               <p className="text-sm leading-relaxed text-foreground">
                 {`Gespräch am ${zeit(b.startsAt)} Uhr · ${b.email}`}
               </p>
-              <a href="/admin/termine" className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              <Link href="/admin/termine" className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                 Termin ansehen
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
