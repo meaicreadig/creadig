@@ -71,6 +71,7 @@ export type Freigabe = {
 
 /** Zusatzwissen je Entwurf – z. B. warum die Redaktion dieses Thema gewählt hat. */
 export type FreigabeExtra = {
+  webcheck?: { befunde: string[]; https: boolean; mobil: boolean; ladezeitMs: number | null } | null
   warum?: string
   bezug?: string
   alt?: string
@@ -366,6 +367,8 @@ export type RatProtokoll = {
   beschluesse: RatBeschluss[]
   verworfen: string[]
   frage: string
+  /** KI-Auswertung deiner Antwort: was die Truppe daraus macht. */
+  erledigt?: string
 }
 export type Rat = { id: string; woche: string; protokoll: RatProtokoll; antwort: string | null; zeit: string }
 
@@ -393,6 +396,12 @@ export async function beantworteRat(id: string, antwort: string): Promise<void> 
   const q = await assistentDb()
   if (!q) throw new Error("Datenbank nicht verfügbar")
   await q(`UPDATE assistent_rat SET antwort = $2, beantwortet_at = now() WHERE id = $1`, [id, antwort])
+}
+
+export async function setzeRatErledigt(id: string, erledigt: string): Promise<void> {
+  const q = await assistentDb()
+  if (!q) return
+  await q(`UPDATE assistent_rat SET protokoll = jsonb_set(protokoll, '{erledigt}', to_jsonb($2::text)) WHERE id = $1`, [id, erledigt])
 }
 
 export async function setzeMailKopf(id: string, empfaenger: string, betreff: string): Promise<void> {

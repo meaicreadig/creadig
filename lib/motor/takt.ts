@@ -103,6 +103,23 @@ export async function takt(): Promise<TaktErgebnis> {
  * Jetzt landet jeder Schritt als Aufgabe in assistent_freigaben – dort, wo Emin
  * ohnehin entscheidet. Dublettensperre über quelle "motor:<run>:<schritt>".
  */
+const SCHRITT_ERKLAERUNG: Record<string, (wer: string) => string> = {
+  "Dankesmail mit Terminlink": (w) =>
+    `Du hast ein Gespräch mit ${w} notiert und dabei einen nächsten Schritt festgehalten. Jetzt ist der beste Moment für eine kurze Dankesmail: Danke für das Gespräch, die vereinbarte Folge in einem Satz und ein Link, über den ${w} selbst einen Folgetermin bucht. Öffne den Gesprächsraum und klicke dort auf „Terminmail senden“.`,
+  "Kurze Erinnerung": (w) =>
+    `${w} hat seit 3 Tagen keinen Termin gebucht. Eine kurze, freundliche Erinnerung mit dem Buchungslink hält das Gespräch warm.`,
+  "Passendes Kundenbeispiel": (w) =>
+    `Noch keine Reaktion von ${w}. Ein konkretes Beispiel aus einem ähnlichen Projekt schafft Vertrauen, kurz und mit Ergebnis.`,
+  "Freundlicher Abschluss": (w) =>
+    `Eine Woche ohne Antwort von ${w}. Schließe freundlich ab und lass die Tür offen. Das wirkt professionell und bringt oft doch noch eine Antwort.`,
+  "Erstantwort mit Terminlink": (w) =>
+    `${w} hat eine Anfrage gestellt. Antworte schnell mit einer persönlichen Zeile und dem Buchungslink, denn wer zuerst antwortet, gewinnt meistens.`,
+  "Nachfassen zur Anfrage": (w) => `${w} hat nach der Erstantwort keinen Termin gebucht. Frag kurz nach, ob die Anfrage noch aktuell ist.`,
+  "Zusammenfassung an den Kunden": (w) =>
+    `Der Termin mit ${w} ist vorbei. Schick eine kurze Zusammenfassung mit den besprochenen Punkten und dem nächsten Schritt.`,
+  "Angebot vorbereiten": (w) => `Zwei Tage nach dem Termin mit ${w}: Jetzt das Angebot vorbereiten, solange das Gespräch frisch ist.`,
+}
+
 async function inWarteschlange(
   q: Abfrage,
   v: { schluessel: string; ablaufName: string; schrittTitel: string; subjekt: string; kontaktId: string | null },
@@ -113,17 +130,24 @@ async function inWarteschlange(
       const k = await q(`SELECT name, email FROM contacts WHERE id = $1 LIMIT 1`, [v.kontaktId]).catch(() => [])
       if (k[0]) wer = String(k[0].name ?? k[0].email ?? "")
     }
+    const person = wer || "dem Kontakt"
+    const erklaerung = SCHRITT_ERKLAERUNG[v.schrittTitel]?.(person)
     await legeFreigabeAn({
       art: "aufgabe",
       titel: wer ? `${v.schrittTitel} – ${wer}` : v.schrittTitel,
       inhalt: [
-        `Ablauf: ${v.ablaufName}`,
-        `Schritt: ${v.schrittTitel}`,
+        erklaerung ?? `Nächster Schritt im Ablauf „${v.ablaufName}“ für ${person}.`,
+        "",
+        `Ablauf: ${v.ablaufName} · Schritt: ${v.schrittTitel}`,
         wer ? `Kontakt: ${wer}` : `Bezug: ${v.subjekt}`,
       ].join("\n"),
       quelle: `motor:${v.schluessel}`,
       agent: "motor",
-      extra: { bezug: v.subjekt, warum: `Automatischer Ablauf „${v.ablaufName}“` },
+      extra: {
+        bezug: v.subjekt,
+        warum: erklaerung ?? `Automatischer Ablauf „${v.ablaufName}“`,
+        ...(v.kontaktId ? { link: `/admin/gespraech?kontakt=${v.kontaktId}` } : {}),
+      },
     })
   } catch (error) {
     console.error("[motor] Warteschlange nicht erreichbar:", error instanceof Error ? error.message : error)
