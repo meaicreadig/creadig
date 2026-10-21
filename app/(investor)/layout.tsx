@@ -6,7 +6,14 @@ import "@/app/globals.css"
 const manrope = Manrope({ subsets: ["latin", "latin-ext"], weight: ["400", "500", "600", "700"], variable: "--font-manrope", display: "swap" })
 const mplusRounded = M_PLUS_Rounded_1c({ subsets: ["latin", "latin-ext"], weight: ["400", "500", "700"], variable: "--font-mplus", display: "swap", preload: false })
 const jetbrains = JetBrains_Mono({ subsets: ["latin", "latin-ext"], weight: ["400", "500"], variable: "--font-jetbrains", display: "swap" })
-const readex = Readex_Pro({ subsets: ["arabic"], weight: ["400", "500", "600", "700"], variable: "--font-arabic", display: "swap", preload: false })
+/* Exakt dieselben Optionen wie in components/site-shell.tsx, damit next/font dieselbe bereits geladene Schrift wiederverwendet. */
+const readex = Readex_Pro({
+  subsets: ["arabic"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-arabic",
+  display: "swap",
+  preload: false,
+})
 
 export const metadata: Metadata = {
   title: "creaDIG Solutions · Investor Room",
