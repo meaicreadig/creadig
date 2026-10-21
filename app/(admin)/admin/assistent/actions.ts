@@ -121,8 +121,10 @@ export async function antwortErhalten(form: FormData): Promise<void> {
 export async function freigabeEntscheiden(form: FormData): Promise<void> {
   const rolle = await pruefe()
   const id = form.get("id")
-  const status = form.get("status")
-  if (typeof id !== "string" || (status !== "freigegeben" && status !== "verworfen")) return
+  /* Karten tragen ein verstecktes status=freigegeben; der Verwerfen-Knopf schickt zusätzlich "verworfen" – das gewinnt immer. */
+  const werte = form.getAll("status").map(String)
+  const status = werte.includes("verworfen") ? "verworfen" : werte.includes("freigegeben") ? "freigegeben" : null
+  if (typeof id !== "string" || !status) return
   const fid = id.slice(0, 80)
   const f = await ladeFreigabe(fid)
   if (!f || f.status !== "offen") return

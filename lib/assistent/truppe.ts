@@ -346,20 +346,25 @@ async function jaeger(): Promise<Ergebnis> {
   const { text } = await generateText({
     model: RECHERCHE,
     prompt: `${INHABER}
-Finde ${JAEGER_ANZAHL} echte, aktuell existierende Firmen als Neukunden für ${revier.produkt}.
+Finde ${JAEGER_ANZAHL * 2} echte, aktuell existierende Firmen als Neukunden für ${revier.produkt}.
 Zielgruppe: ${revier.suche}.
 Nur Firmen mit eigener Webseite, die du in der Quelle gesehen hast. Keine Konzerne. Keine Erfindungen.
-Gib, wenn auf der Webseite sichtbar, die öffentliche Kontakt-E-Mail an (Impressum/Kontakt), sonst leer lassen – niemals raten.
+Bevorzuge Firmen, deren öffentliche Kontakt-E-Mail im Impressum/Kontakt steht, und gib sie an – niemals raten. Firmen ohne erkennbare E-Mail werden verworfen.
 ${bekannt.length ? `Diese Firmen kennen wir schon – NICHT erneut nennen: ${bekannt.slice(0, 80).join(", ")}.` : ""}
 Für jede Firma eine kurze Erstmail auf Deutsch (60–110 Wörter, per Sie, Absender Muhammed Emin Akyol): ein konkreter Bezug zur Firma, ein Nutzen aus "${revier.angebot}", eine kleine Frage am Ende (z. B. 15 Minuten Telefonat). Kein Werbeton. Unter der Mail erscheint automatisch eine Produktkarte mit Logo, Webseiten-Bild und Link – Funktionen also NICHT aufzählen und keinen Link in den Text schreiben.
 Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","email":"","warum":"1 Satz, warum gerade diese Firma","betreff":"","mail":""}]`,
   })
   const ziele = jsonListe<Ziel>(text)
     .filter((z) => z?.firma && z?.website?.startsWith("http") && z?.mail)
-    .slice(0, JAEGER_ANZAHL)
+    .slice(0, JAEGER_ANZAHL * 2)
+  const pruefeMitWiederholung = async (web: string) => {
+    const erst = await pruefeWebseite(web).catch(() => null)
+    if (erst?.erreichbar) return erst
+    return (await pruefeWebseite(web).catch(() => null)) ?? erst
+  }
   const [adressen, checks] = await Promise.all([
     Promise.all(ziele.map((z) => findeKontaktMail(z.website).catch(() => null))),
-    Promise.all(ziele.map((z) => pruefeWebseite(z.website).catch(() => null))),
+    Promise.all(ziele.map((z) => pruefeMitWiederholung(z.website))),
   ])
   let neu = 0
   for (const [i, z] of ziele.entries()) {
@@ -376,6 +381,9 @@ Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","emai
     } catch {}
     const genannt = istMail(z.email) && z.email.trim().toLowerCase().endsWith(`@${host}`) ? z.email.trim().toLowerCase() : null
     const an = adressen[i] ?? genannt
+    /* Ohne echte Adresse keine Karte – der Inhaber soll nur Mails sehen, die er wirklich senden kann. */
+    if (!an) continue
+    if (neu >= JAEGER_ANZAHL) break
     const id = await legeFreigabeAn({
       art: "mail",
       titel: `Neukunde ${revier.produkt}: ${z.firma} (${z.ort})`,
