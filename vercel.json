@@ -26,6 +26,10 @@
       "schedule": "30 5 * * *"
     },
     {
+      "path": "/api/assistent/abend",
+      "schedule": "0 18 * * *"
+    },
+    {
       "path": "/api/finanz/morgenmail",
       "schedule": "15 6 * * *"
     }

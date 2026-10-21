@@ -59,6 +59,8 @@ export const BELEGE_SCHEMA = [
   `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS erechnung_xml text`,
   `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS erechnung_nummer text`,
   `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS erechnung_iban text`,
+  `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS ki_gelesen_at timestamptz`,
+  `ALTER TABLE fin_belege ADD COLUMN IF NOT EXISTS ki_vorschlag jsonb`,
   `CREATE TABLE IF NOT EXISTS fin_kopierlaeufe (
     id text PRIMARY KEY,
     quelle text NOT NULL,
@@ -121,6 +123,8 @@ export type Beleg = {
   dateiName: string | null
   /** Nur gesetzt, wenn eine eingehende E-Rechnung (UBL/CII, auch aus ZUGFeRD-PDF) erkannt wurde. */
   erechnung: { format: "ubl" | "cii"; nummer: string | null; iban: string | null } | null
+  /** Unsicherer KI-Vorschlag (unter der Automatik-Schwelle oder „privat“) — wird nie selbst gebucht. */
+  kiVorschlag: { feld: Geschaeftsfeld; konfidenz: number; grund: string | null } | null
 }
 
 export type Kennzahlen = {
@@ -156,11 +160,16 @@ function zuBeleg(r: Record<string, unknown>): Beleg {
       r.erechnung_format === "ubl" || r.erechnung_format === "cii"
         ? { format: r.erechnung_format, nummer: r.erechnung_nummer ? String(r.erechnung_nummer) : null, iban: r.erechnung_iban ? String(r.erechnung_iban) : null }
         : null,
+    kiVorschlag: (() => {
+      const v = r.ki_vorschlag as { feld?: unknown; konfidenz?: unknown; grund?: unknown } | null
+      if (!v || !istGeschaeftsfeld(String(v.feld))) return null
+      return { feld: String(v.feld) as Geschaeftsfeld, konfidenz: Number(v.konfidenz) || 0, grund: typeof v.grund === "string" ? v.grund : null }
+    })(),
   }
 }
 
 const SPALTEN = `id, art, to_char(datum,'YYYY-MM-DD') AS datum, haendler, brutto_cent, vorsteuer_cent, kategorie, erechnung_format, erechnung_nummer, erechnung_iban,
-  geschaeftsfeld, archiviert, datei_status, datei_quelle_pfad, zuordnung_quelle`
+  geschaeftsfeld, archiviert, datei_status, datei_quelle_pfad, zuordnung_quelle, ki_vorschlag`
 
 /** Die Ist-Werte aus Finanz — gleiche Definition wie die Soll-Werte der Quelle. */
 export async function istKennzahlen(db: Abfrage, quelle: string): Promise<Kennzahlen> {

@@ -78,7 +78,21 @@ function BelegZeile({ b, basis, zugeordnet }: { b: Beleg; basis: string; zugeord
             </button>
           </form>
         ) : (
-          <FeldKnoepfe ids={[b.id]} />
+          <>
+            {b.kiVorschlag && (
+              <form action={zuordnen} className="flex flex-wrap items-center gap-2 md:justify-end">
+                <input type="hidden" name="id" value={b.id} />
+                <span className="text-muted-foreground text-xs">
+                  KI schlägt vor: <strong className="text-foreground">{FELD_LABEL[b.kiVorschlag.feld]}</strong> ({Math.round(b.kiVorschlag.konfidenz * 100)} %)
+                  {b.kiVorschlag.grund ? ` · ${b.kiVorschlag.grund}` : ""}
+                </span>
+                <button type="submit" name="feld" value={b.kiVorschlag.feld} className="bg-primary text-primary-foreground rounded-full px-3 py-1.5 text-xs font-semibold">
+                  Übernehmen
+                </button>
+              </form>
+            )}
+            <FeldKnoepfe ids={[b.id]} />
+          </>
         )}
       </div>
     </li>
