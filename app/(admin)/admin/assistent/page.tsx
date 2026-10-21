@@ -480,7 +480,6 @@ function LinkedinStatus({ ziele, meldung }: { ziele: LinkedinZiele; meldung?: st
             <span className="font-medium">{z.label}:</span>
             {z.name ? z.name : <span className="text-muted-foreground">nicht verbunden</span>}
           </p>
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- OAuth-Weiterleitung, darf nicht vorab geladen werden */}
           <a
             href={`/api/linkedin/verbinden?kanal=${z.kanal}`}
             className="rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground"
