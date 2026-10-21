@@ -118,6 +118,15 @@ export async function antwortErhalten(form: FormData): Promise<void> {
   revalidatePath("/admin/assistent")
 }
 
+/* Eigene Aktion: hängt nicht davon ab, ob der Browser den gedrückten Knopf mitschickt – sendet nie. */
+export async function freigabeVerwerfen(form: FormData): Promise<void> {
+  await pruefe()
+  const id = form.get("id")
+  if (typeof id !== "string") return
+  await setzeFreigabe(id.slice(0, 80), "verworfen")
+  revalidatePath("/admin/assistent")
+}
+
 export async function freigabeEntscheiden(form: FormData): Promise<void> {
   const rolle = await pruefe()
   const id = form.get("id")

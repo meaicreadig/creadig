@@ -54,7 +54,7 @@ import { EingangListe } from "@/components/admin/eingang-liste"
 import { ladeNeueBuchungen } from "@/lib/termine/store"
 import { Disclosure } from "@/components/ui/disclosure"
 
-import { agentStarten, antwortErhalten, freigabeEntscheiden, kapitalStufe, ratAntworten } from "./actions"
+import { agentStarten, antwortErhalten, freigabeEntscheiden, freigabeVerwerfen, kapitalStufe, ratAntworten } from "./actions"
 import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
 import { instagramBereit, ladeInstagram } from "@/lib/assistent/instagram"
 import { STUFE_TEXT } from "@/lib/assistent/kapital-antrag"
@@ -771,11 +771,8 @@ function MailKarte({ f }: { f: Freigabe }) {
               Im Mail-Studio gestalten
             </Link>
             <AktionKnopf
-              formAction={freigabeEntscheiden}
-              name="status"
-              value="verworfen"
+              formAction={freigabeVerwerfen}
               formNoValidate
-              nurWenn="verworfen"
               laeuft="Wird verworfen …"
               fertig="Verworfen – nichts wurde gesendet"
               className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground"
