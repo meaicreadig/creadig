@@ -171,6 +171,13 @@ export default async function MarketingSeite() {
           Mail Studio
           <ArrowUpRight className="size-4" aria-hidden="true" />
         </Link>
+        <Link
+          href="/admin/marketing/seo"
+          className="border-gold text-gold-text inline-flex h-10 items-center gap-1.5 rounded-md border px-4 text-sm font-medium transition-colors hover:bg-muted/40"
+        >
+          SEO &amp; Google
+          <ArrowUpRight className="size-4" aria-hidden="true" />
+        </Link>
       </div>
 
       <WochenPlan d={d} t={t} />

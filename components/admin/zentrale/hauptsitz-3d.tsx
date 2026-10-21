@@ -274,72 +274,266 @@ function Glas({ opacity = 0.32 }: { opacity?: number }) {
   )
 }
 
+const HAUT = "#c9a184"
+const HOSE = "#2c313a"
+const OBERARM = 0.26
+const UNTERARM = 0.25
+
+/**
+ * Hand mit Handfläche, vier Fingern und Daumen. Lokal zeigt −y in Unterarmrichtung,
+ * +z nach unten zur Tastatur – negative rotation.x krümmt einen Finger auf die Taste.
+ */
+function Hand({ finger, seite }: { finger: React.MutableRefObject<(THREE.Group | null)[]>; seite: number }) {
+  return (
+    <group>
+      <mesh position={[0, -0.045, 0]} castShadow>
+        <boxGeometry args={[0.075, 0.08, 0.026]} />
+        <meshStandardMaterial color={HAUT} roughness={0.7} />
+      </mesh>
+      {[-0.027, -0.009, 0.009, 0.027].map((fx, j) => (
+        <group
+          key={fx}
+          ref={(g) => {
+            finger.current[j] = g
+          }}
+          position={[fx, -0.085, 0]}
+        >
+          <mesh position={[0, -0.026, 0]} castShadow>
+            <capsuleGeometry args={[0.0085, j === 0 || j === 3 ? 0.032 : 0.04, 3, 6]} />
+            <meshStandardMaterial color={HAUT} roughness={0.7} />
+          </mesh>
+        </group>
+      ))}
+      {/* Daumen liegt innen, leicht abgespreizt */}
+      <mesh position={[-seite * 0.045, -0.05, 0.006]} rotation={[0, 0, -seite * 0.7]} castShadow>
+        <capsuleGeometry args={[0.01, 0.035, 3, 6]} />
+        <meshStandardMaterial color={HAUT} roughness={0.7} />
+      </mesh>
+    </group>
+  )
+}
+
+function Arm({ x, farbe, an, phase, seite }: { x: number; farbe: string; an: boolean; phase: number; seite: number }) {
+  const schulter = useRef<THREE.Group>(null)
+  const ellbogen = useRef<THREE.Group>(null)
+  const finger = useRef<(THREE.Group | null)[]>([])
+  useFrame(({ clock }, dt) => {
+    const t = clock.getElapsedTime()
+    // Arbeitet der Agent gerade (echter frischer Lauf), tippen die Finger einzeln – sonst ruhen sie auf den Tasten.
+    if (schulter.current) {
+      const soll = 0.5 + (an ? Math.sin(t * 1.7 + phase + seite) * 0.035 : Math.sin(t * 0.6 + phase) * 0.01)
+      schulter.current.rotation.x = THREE.MathUtils.damp(schulter.current.rotation.x, soll, 6, dt)
+    }
+    if (ellbogen.current) {
+      const soll = 1.25 + (an ? Math.sin(t * 3.1 + phase * 2 + seite) * 0.05 : 0)
+      ellbogen.current.rotation.x = THREE.MathUtils.damp(ellbogen.current.rotation.x, soll, 8, dt)
+    }
+    finger.current.forEach((g, j) => {
+      if (!g) return
+      const anschlag = an ? Math.max(0, Math.sin(t * 13 + phase + j * 1.9 + seite * 2.3)) ** 3 * 0.55 : 0
+      g.rotation.x = THREE.MathUtils.damp(g.rotation.x, -0.45 - anschlag, 22, dt)
+    })
+  })
+  return (
+    // Gierung nach innen, damit beide Hände über der Tastatur zusammenfinden
+    <group position={[x, 0.97, 0.02]} rotation={[0, seite * 0.27, 0]}>
+      <group ref={schulter} rotation={[0.5, 0, 0]}>
+        <mesh castShadow>
+          <sphereGeometry args={[0.055, 10, 8]} />
+          <meshStandardMaterial color={farbe} roughness={0.85} />
+        </mesh>
+        <mesh position={[0, -OBERARM / 2, 0]} castShadow>
+          <capsuleGeometry args={[0.048, OBERARM - 0.06, 4, 10]} />
+          <meshStandardMaterial color={farbe} roughness={0.85} />
+        </mesh>
+        <group ref={ellbogen} position={[0, -OBERARM, 0]} rotation={[1.25, 0, 0]}>
+          <mesh position={[0, -UNTERARM / 2, 0]} castShadow>
+            <capsuleGeometry args={[0.04, UNTERARM - 0.05, 4, 10]} />
+            <meshStandardMaterial color={farbe} roughness={0.85} />
+          </mesh>
+          <mesh position={[0, -UNTERARM + 0.01, 0]} castShadow>
+            <cylinderGeometry args={[0.03, 0.032, 0.03, 10]} />
+            <meshStandardMaterial color={HAUT} roughness={0.7} />
+          </mesh>
+          <group position={[0, -UNTERARM, 0]}>
+            <Hand finger={finger} seite={seite} />
+          </group>
+        </group>
+      </group>
+    </group>
+  )
+}
+
 function Person({ farbe, haar, an }: { farbe: string; haar: string; an: boolean }) {
-  const arme = useRef<(THREE.Group | null)[]>([])
   const koerper = useRef<THREE.Group>(null)
   const kopf = useRef<THREE.Group>(null)
   const phase = useMemo(() => (farbe.charCodeAt(1) + farbe.charCodeAt(3)) % 7, [farbe])
-  useFrame(({ clock }, dt) => {
+  useFrame(({ clock }) => {
     const t = clock.getElapsedTime()
     // Grundleben (immer): Atmen und leichtes Umsehen – kein erfundenes „Arbeiten“, das bleibt an `an` gebunden.
     if (koerper.current) koerper.current.scale.y = 1 + Math.sin(t * 1.5 + phase) * 0.012
     if (kopf.current) {
-      kopf.current.rotation.y = Math.sin(t * 0.45 + phase * 1.7) * (an ? 0.12 : 0.28)
-      kopf.current.rotation.x = Math.sin(t * 0.8 + phase) * 0.04 + (an ? 0.08 : 0)
+      // Beim Arbeiten Blick auf den Bildschirm, leichtes Lesen von Zeile zu Zeile
+      kopf.current.rotation.y = an ? Math.sin(t * 0.9 + phase) * 0.06 : Math.sin(t * 0.45 + phase * 1.7) * 0.28
+      kopf.current.rotation.x = an ? 0.06 + Math.sin(t * 0.35 + phase) * 0.03 : Math.sin(t * 0.8 + phase) * 0.04
     }
-    arme.current.forEach((g, i) => {
-      if (!g) return
-      // Tippen: schnelle, kleine Schwingung, links/rechts versetzt – ohne Lauf bleiben die Arme in Grundhaltung.
-      const soll = an ? Math.sin(t * 11 + phase + i * Math.PI) * 0.09 + Math.sin(t * 4.3 + phase * 2 + i) * 0.03 : Math.sin(t * 0.9 + phase + i) * 0.015
-      g.rotation.x = THREE.MathUtils.damp(g.rotation.x, soll, 12, dt)
-    })
   })
   return (
     <group position={[0, 0, 0.6]}>
       <group ref={koerper} position={[0, 0.6, 0]}>
-        <mesh position={[0, 0.32, 0.04]} castShadow>
-          <capsuleGeometry args={[0.17, 0.36, 4, 12]} />
+        {/* Rumpf: Brustkorb breiter, Taille schmaler */}
+        <mesh position={[0, 0.36, 0.04]} scale={[1, 1, 0.72]} castShadow>
+          <capsuleGeometry args={[0.17, 0.3, 6, 16]} />
           <meshStandardMaterial color={farbe} roughness={0.85} />
         </mesh>
-      </group>
-      <group ref={kopf} position={[0, 1.3, -0.02]}>
-        <mesh position={[0, 0.08, 0]} castShadow>
-          <sphereGeometry args={[0.11, 16, 12]} />
-          <meshStandardMaterial color="#c9a184" roughness={0.7} />
+        <mesh position={[0, 0.06, 0.03]} scale={[1, 1, 0.75]} castShadow>
+          <sphereGeometry args={[0.16, 14, 10]} />
+          <meshStandardMaterial color={HOSE} roughness={0.9} />
         </mesh>
+      </group>
+      <mesh position={[0, 1.18, 0]} castShadow>
+        <cylinderGeometry args={[0.045, 0.055, 0.1, 10]} />
+        <meshStandardMaterial color={HAUT} roughness={0.7} />
+      </mesh>
+      <group ref={kopf} position={[0, 1.3, -0.02]}>
+        <mesh position={[0, 0.08, 0]} scale={[0.92, 1.08, 1]} castShadow>
+          <sphereGeometry args={[0.11, 20, 16]} />
+          <meshStandardMaterial color={HAUT} roughness={0.7} />
+        </mesh>
+        <mesh position={[0, 0.06, -0.105]} rotation={[-0.3, 0, 0]}>
+          <coneGeometry args={[0.016, 0.04, 8]} />
+          <meshStandardMaterial color={HAUT} roughness={0.7} />
+        </mesh>
+        {[-0.1, 0.1].map((ox) => (
+          <mesh key={ox} position={[ox, 0.07, 0]} scale={[0.4, 1, 0.7]}>
+            <sphereGeometry args={[0.03, 8, 6]} />
+            <meshStandardMaterial color={HAUT} roughness={0.7} />
+          </mesh>
+        ))}
         {/* Haare: Kappe über Oberkopf und Hinterkopf, Gesicht (−z) bleibt frei */}
         <mesh position={[0, 0.095, 0.02]} rotation={[0.45, 0, 0]} castShadow>
-          <sphereGeometry args={[0.122, 16, 12, 0, Math.PI * 2, 0, 1.85]} />
+          <sphereGeometry args={[0.122, 20, 14, 0, Math.PI * 2, 0, 1.85]} />
           <meshStandardMaterial color={haar} roughness={0.9} />
         </mesh>
       </group>
-      <mesh position={[0, 0.56, -0.2]} castShadow>
-        <boxGeometry args={[0.34, 0.13, 0.46]} />
-        <meshStandardMaterial color="#2c313a" roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 0.27, -0.42]}>
-        <boxGeometry args={[0.3, 0.5, 0.11]} />
-        <meshStandardMaterial color="#2c313a" roughness={0.9} />
-      </mesh>
-      {[-0.2, 0.2].map((ax, i) => (
-        // Pivot an der Schulter, damit die Hand den Bogen über die Tastatur beschreibt
-        <group
-          key={ax}
-          ref={(g) => {
-            arme.current[i] = g
-          }}
-          position={[ax, 0.97, 0.02]}
-        >
-          <mesh position={[0, -0.09, -0.178]} rotation={[1.1, 0, 0]} castShadow>
-            <capsuleGeometry args={[0.05, 0.3, 4, 8]} />
-            <meshStandardMaterial color={farbe} roughness={0.85} />
+      {[-0.09, 0.09].map((lx) => (
+        <group key={lx} position={[lx, 0, 0]}>
+          <mesh position={[0, 0.58, -0.18]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <capsuleGeometry args={[0.072, 0.3, 4, 10]} />
+            <meshStandardMaterial color={HOSE} roughness={0.9} />
           </mesh>
-          <mesh position={[0, -0.18, -0.36]} castShadow>
-            <sphereGeometry args={[0.045, 10, 8]} />
-            <meshStandardMaterial color="#c9a184" roughness={0.7} />
+          <mesh position={[0, 0.32, -0.4]} castShadow>
+            <capsuleGeometry args={[0.058, 0.36, 4, 10]} />
+            <meshStandardMaterial color={HOSE} roughness={0.9} />
+          </mesh>
+          <mesh position={[0, 0.04, -0.46]} castShadow>
+            <boxGeometry args={[0.1, 0.07, 0.22]} />
+            <meshStandardMaterial color="#1c1f24" roughness={0.5} />
           </mesh>
         </group>
       ))}
+      <Arm x={-0.2} farbe={farbe} an={an} phase={phase} seite={-1} />
+      <Arm x={0.2} farbe={farbe} an={an} phase={phase + 0.8} seite={1} />
+    </group>
+  )
+}
+
+/** Zeilenumbruch für den Bildschirm-Canvas. */
+function umbrechen(ctx: CanvasRenderingContext2D, text: string, breite: number): string[] {
+  const zeilen: string[] = []
+  let zeile = ""
+  for (const wort of text.split(/\s+/)) {
+    const probe = zeile ? `${zeile} ${wort}` : wort
+    if (ctx.measureText(probe).width > breite && zeile) {
+      zeilen.push(zeile)
+      zeile = wort
+    } else zeile = probe
+  }
+  if (zeile) zeilen.push(zeile)
+  return zeilen
+}
+
+/**
+ * Echter Bildschirm: zeigt Agent und sein letztes echtes Ergebnis.
+ * Läuft der Agent gerade, wird der Text live getippt (mit Cursor), die Uhr oben ist die echte Uhrzeit.
+ */
+function Bildschirm({ an, titel, text }: { an: boolean; titel: string; text: string }) {
+  const { canvas, tex } = useMemo(() => {
+    const c = document.createElement("canvas")
+    c.width = 512
+    c.height = 296
+    const t = new THREE.CanvasTexture(c)
+    t.colorSpace = THREE.SRGBColorSpace
+    t.anisotropy = 4
+    return { canvas: c, tex: t }
+  }, [])
+  useEffect(() => () => tex.dispose(), [tex])
+  const zuletzt = useRef("")
+  const inhalt = text.trim() || "Bereit · wartet auf den nächsten Lauf"
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime()
+    const n = an ? Math.min(inhalt.length, Math.floor((t * 22) % (inhalt.length + 70))) : inhalt.length
+    const cursor = an && Math.floor(t * 2) % 2 === 0
+    const uhr = new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
+    const schluessel = `${n}|${cursor}|${uhr}|${an}|${titel}`
+    if (schluessel === zuletzt.current) return
+    zuletzt.current = schluessel
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+    ctx.fillStyle = "#f5f7fa"
+    ctx.fillRect(0, 0, 512, 296)
+    ctx.fillStyle = an ? "#2f5bea" : "#5b6270"
+    ctx.fillRect(0, 0, 512, 52)
+    ctx.fillStyle = "#ffffff"
+    ctx.font = "600 24px Manrope, system-ui, sans-serif"
+    ctx.fillText(titel, 22, 34)
+    ctx.font = "500 20px system-ui, sans-serif"
+    ctx.textAlign = "right"
+    ctx.fillText(uhr, 490, 34)
+    ctx.textAlign = "left"
+    ctx.fillStyle = an ? "#7ee2a8" : "#b8bec9"
+    ctx.beginPath()
+    ctx.arc(490 - ctx.measureText(uhr).width - 18, 27, 6, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = "#1f2633"
+    ctx.font = "400 22px system-ui, sans-serif"
+    const zeilen = umbrechen(ctx, inhalt.slice(0, n), 468).slice(0, 8)
+    zeilen.forEach((z, i) => ctx.fillText(z, 22, 92 + i * 28))
+    if (cursor) {
+      const letzte = zeilen[zeilen.length - 1] ?? ""
+      ctx.fillStyle = "#2f5bea"
+      ctx.fillRect(22 + ctx.measureText(letzte).width + 4, 72 + Math.max(0, zeilen.length - 1) * 28, 3, 24)
+    }
+    tex.needsUpdate = true
+  })
+
+  return (
+    <mesh position={[0, 1.06, -0.234]}>
+      <planeGeometry args={[0.66, 0.38]} />
+      <meshBasicMaterial map={tex} toneMapped={false} color={an ? "#ffffff" : "#9aa0aa"} />
+    </mesh>
+  )
+}
+
+function Tastatur() {
+  return (
+    <group position={[0, 0.765, 0.2]}>
+      <mesh castShadow receiveShadow>
+        <boxGeometry args={[0.46, 0.018, 0.15]} />
+        <meshStandardMaterial color="#d9dce2" roughness={0.5} metalness={0.2} />
+      </mesh>
+      {/* Tastenreihen */}
+      {[-0.045, -0.015, 0.015, 0.045].map((tz) => (
+        <mesh key={tz} position={[0, 0.011, tz]}>
+          <boxGeometry args={[0.42, 0.006, 0.022]} />
+          <meshStandardMaterial color="#f3f4f7" roughness={0.6} />
+        </mesh>
+      ))}
+      <mesh position={[0.36, 0, 0.02]} castShadow>
+        <boxGeometry args={[0.06, 0.02, 0.1]} />
+        <meshStandardMaterial color="#d9dce2" roughness={0.45} metalness={0.2} />
+      </mesh>
     </group>
   )
 }
@@ -538,12 +732,25 @@ function Gehirn({ hoehe, fokus }: { hoehe: number; fokus: Fokus }) {
   )
 }
 
-function Arbeitsplatz({ x, z, an, besetzt, farbe, haar }: { x: number; z: number; an: boolean; besetzt: boolean; farbe: string; haar: string }) {
-  const schirm = useRef<THREE.MeshStandardMaterial>(null)
-  useFrame(({ clock }) => {
-    // Puls nur bei echtem, frischem Lauf – sonst bleibt der Schirm ruhig.
-    if (schirm.current && an) schirm.current.emissiveIntensity = 0.9 + Math.sin(clock.getElapsedTime() * 2.4) * 0.35
-  })
+function Arbeitsplatz({
+  x,
+  z,
+  an,
+  besetzt,
+  farbe,
+  haar,
+  titel = "",
+  text = "",
+}: {
+  x: number
+  z: number
+  an: boolean
+  besetzt: boolean
+  farbe: string
+  haar: string
+  titel?: string
+  text?: string
+}) {
   return (
     <group position={[x, 0, z]}>
       <mesh position={[0, 0.74, 0]} castShadow receiveShadow>
@@ -560,16 +767,15 @@ function Arbeitsplatz({ x, z, an, besetzt, farbe, haar }: { x: number; z: number
         <boxGeometry args={[0.7, 0.42, 0.03]} />
         <meshStandardMaterial color={FARBE.dunkel} roughness={0.3} />
       </mesh>
-      <mesh position={[0, 1.06, -0.234]}>
-        <planeGeometry args={[0.66, 0.38]} />
-        <meshStandardMaterial
-          ref={schirm}
-          color={an ? "#dfe7ff" : besetzt ? "#4a5160" : "#1b1f26"}
-          emissive={an ? FARBE.blau : "#000000"}
-          emissiveIntensity={an ? 0.9 : 0}
-          toneMapped={!an}
-        />
-      </mesh>
+      {besetzt ? (
+        <Bildschirm an={an} titel={titel} text={text} />
+      ) : (
+        <mesh position={[0, 1.06, -0.234]}>
+          <planeGeometry args={[0.66, 0.38]} />
+          <meshStandardMaterial color="#1b1f26" roughness={0.3} />
+        </mesh>
+      )}
+      {besetzt && <Tastatur />}
       <mesh position={[0, 0.84, -0.25]}>
         <boxGeometry args={[0.05, 0.2, 0.05]} />
         <meshStandardMaterial color={FARBE.alu} metalness={0.6} roughness={0.35} />
@@ -660,7 +866,7 @@ function RaumModell({
                 onPerson(`${raum.id}:${i}`)
               }}
             >
-              <Arbeitsplatz x={px} z={pz} an={an} besetzt={!!stand} farbe={KLEIDUNG[(raum.etage * 3 + raum.spalte + i) % KLEIDUNG.length]} haar={HAAR[(raum.etage * 2 + raum.spalte * 3 + i * 2 + 1) % HAAR.length]} />
+              <Arbeitsplatz x={px} z={pz} an={an} besetzt={!!stand} farbe={KLEIDUNG[(raum.etage * 3 + raum.spalte + i) % KLEIDUNG.length]} haar={HAAR[(raum.etage * 2 + raum.spalte * 3 + i * 2 + 1) % HAAR.length]} titel={stand?.name ?? ""} text={stand?.ergebnis ?? ""} />
               {stand && !offen && (gewaehlt || an || stand.fehler) && (
                 <Html position={[px, 1.5, pz]} center zIndexRange={[10, 0]}>
                   <button
