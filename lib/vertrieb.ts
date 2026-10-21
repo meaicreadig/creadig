@@ -482,7 +482,7 @@ export type OpportunityQuery = {
 export type ContactQuery = {
   search?: string
   relationship?: RelationshipLevel
-  bucket?: "mit-chance" | "ohne-chance" | "warm-ohne-chance" | "pflege-faellig"
+  bucket?: "mit-chance" | "ohne-chance" | "warm-ohne-chance" | "pflege-faellig" | "pflege-faellig-ohne-chance"
   limit?: number
   offset?: number
   /** Standardmäßig `false` — Ausgeschlossene bleiben aus der Arbeitsfläche. */
