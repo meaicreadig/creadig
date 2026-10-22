@@ -72,6 +72,24 @@ export function localizedRange(from: number, to: number): L {
  */
 export const VAT_PERCENT = 19
 
+/**
+ * Kleinunternehmer nach § 19 UStG — vom Inhaber bestätigt (15.10.2026).
+ * EINE Quelle: `imprintDetails.smallBusiness`, die Rechnung und `{ust}` lesen
+ * von hier. Vorher sagte die Startseite „zzgl. 19 % USt." und das Impressum
+ * im selben Moment „keine Umsatzsteuer".
+ */
+export const KLEINUNTERNEHMER = true as boolean | null
+
+/** `{ust}` — der ganze Satz zur Umsatzsteuer, passend zum Steuerstatus. */
+export const ustSatz = (locale: Locale) => UST_SATZ[locale][KLEINUNTERNEHMER ? "klein" : "regel"]
+
+const UST_SATZ: Record<Locale, { klein: string; regel: string }> = {
+  de: { klein: "Keine Umsatzsteuer nach § 19 UStG (Kleinunternehmerregelung).", regel: `Alle Beträge netto, zzgl. ${VAT_PERCENT} % USt.` },
+  tr: { klein: "§ 19 UStG uyarınca (küçük işletme düzenlemesi) KDV alınmaz.", regel: `Tüm tutarlar net, artı %${VAT_PERCENT} KDV.` },
+  en: { klein: "No VAT is charged under § 19 UStG (small-business rule).", regel: `All amounts net, plus ${VAT_PERCENT} % VAT.` },
+  ar: { klein: "لا تُحتسب ضريبة القيمة المضافة وفق المادة 19 من قانون ضريبة المبيعات الألماني (نظام المنشآت الصغيرة).", regel: `كل المبالغ صافية، يُضاف إليها ${VAT_PERCENT} % ضريبة القيمة المضافة.` },
+}
+
 /*
  * ==========================================================================
  * DIE ANGEBOTE — in Kundensprache, ohne „Entry/Core"
@@ -222,12 +240,13 @@ export const publishedOffers = offers.filter((o) => o.published && o.amount !== 
  *   {condition:<key>}  die Bedingung (Pilot: Referenzfreigabe)
  *   {range:behebung}   die Erfahrungsspanne der Behebung
  *   {vat}              die Umsatzsteuer in Prozent, als Zahl
+ *   {ust}              der ganze Umsatzsteuer-Satz, je nach Steuerstatus
  *
  * Ein Platzhalter auf ein unveroeffentlichtes Angebot WIRFT. Das ist
  * Absicht: Lieber bricht der Build, als dass „Festpreis {price:analyse}"
  * oder ein leerer Satz ausgeliefert wird.
  */
-const TOKEN = /\{(price|condition|range|vat|sprachen)(?::([\w-]+))?\}/g
+const TOKEN = /\{(price|condition|range|vat|ust|sprachen)(?::([\w-]+))?\}/g
 
 /*
  * W2 — die Beratungssprachen als EINE Angabe. Englisch und Arabisch nannten
@@ -245,6 +264,7 @@ export function fillOfferTokens(text: string, locale: Locale): string {
   if (!text.includes("{")) return text
   return text.replace(TOKEN, (whole, kind: string, key: string | undefined) => {
     if (kind === "vat") return String(VAT_PERCENT)
+    if (kind === "ust") return ustSatz(locale)
     if (kind === "sprachen") return BERATUNGSSPRACHEN[locale][key === "oder" ? "oder" : "und"]
     if (kind === "range") {
       if (key !== "behebung") throw new Error(`Unbekannte Spanne im Text: ${whole}`)

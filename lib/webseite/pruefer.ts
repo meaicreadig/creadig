@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache"
 import { neonAbfrage, type Abfrage } from "@/lib/neon-abfrage"
 import { SITE_URL } from "@/lib/routes"
 
+import { PFLICHT, SOLL_KURZ, VERBOTEN, WIDERSPRUECHE } from "./soll"
+
 /**
  * Website-Prüfer (Abteilung IT & Sicherheit).
  * Täglich: Erreichbarkeit, Tempo, SEO, Sprachen, Sicherheit, tote Links, Aktualität.
@@ -147,8 +149,14 @@ export async function pruefeWebseite(o: { tief?: boolean } = {}): Promise<Pruefu
     neu({ code: "robots-sitemap", bereich: "technik", schwere: "hinweis", titel: "robots.txt nennt die Sitemap nicht", detail: "Eine Zeile „Sitemap: …/sitemap.xml“ hilft Suchmaschinen.", an: "entwicklung" })
 
   const sprachSeiten = SPRACHEN.map((s) => `${basis}${s.pfad || "/"}`)
-  const weitere = sitemapUrls.filter((u) => !sprachSeiten.includes(u) && !sprachSeiten.includes(`${u}/`)).slice(0, 20)
-  const seiten = await Promise.all([...sprachSeiten, ...weitere].map((u) => hole(u)))
+  /* Täglich ein anderes Fenster aus der Sitemap — in einer Woche ist jede Seite einmal dran. */
+  const rest = sitemapUrls.filter((u) => !sprachSeiten.includes(u) && !sprachSeiten.includes(`${u}/`))
+  const fenster = 30
+  const versatz = rest.length > fenster ? (Math.floor(Date.now() / 86400000) * fenster) % rest.length : 0
+  const weitere = [...rest, ...rest].slice(versatz, versatz + Math.min(fenster, rest.length))
+  /* Rechtstexte stehen nicht in der Sitemap, müssen aber jeden Tag stimmen. */
+  const recht = ["/impressum", "/datenschutz", "/tr/impressum", "/tr/datenschutz"].map((p) => `${basis}${p}`).filter((u) => !weitere.includes(u))
+  const seiten = await Promise.all([...sprachSeiten, ...weitere, ...recht].map((u) => hole(u)))
   const start = seiten[0]
 
   /* Sicherheit: echte Antwort-Header der Startseite. */
@@ -194,7 +202,11 @@ export async function pruefeWebseite(o: { tief?: boolean } = {}): Promise<Pruefu
     if (h1 !== 1) neu({ code: `h1:${pfad}`, bereich: "inhalt", schwere: "hinweis", titel: `${h1 === 0 ? "Keine" : h1} Hauptüberschrift(en): ${pfad}`, detail: "Genau eine H1 je Seite ist für Google und Screenreader am klarsten.", url: s.url, an: "entwicklung" })
     const ohneAlt = (s.html.match(/<img(?![^>]*\balt=)[^>]*>/gi) ?? []).length
     if (ohneAlt) neu({ code: `alt:${pfad}`, bereich: "design", schwere: "hinweis", titel: `${ohneAlt} Bild(er) ohne Beschreibung: ${pfad}`, detail: "Fehlender alt-Text schadet Barrierefreiheit (BFSG ab 2025) und SEO.", url: s.url, an: "entwicklung" })
-    if (!/<link[^>]+rel=["']canonical["']/i.test(s.html))
+    const kanon = s.html.match(/<link[^>]+rel=["']canonical["'][^>]*href=["']([^"']+)["']/i)?.[1] ?? s.html.match(/<link[^>]+href=["']([^"']+)["'][^>]*rel=["']canonical["']/i)?.[1]
+    const eigeneSprache = SPRACHEN.find((sp) => sp.pfad && (pfad === sp.pfad || pfad.startsWith(`${sp.pfad}/`)))?.pfad ?? ""
+    if (kanon && eigeneSprache && !kanon.replace(basis, "").startsWith(eigeneSprache))
+      neu({ code: `canonical-sprache:${pfad}`, bereich: "international", schwere: "wichtig", titel: `Kanonische Adresse zeigt auf eine andere Sprache: ${pfad}`, detail: `canonical = ${kanon}. Google hält die Seite dann für ein Duplikat und zeigt sie nicht.`, url: s.url, an: "entwicklung" })
+    if (!kanon)
       neu({ code: `canonical:${pfad}`, bereich: "technik", schwere: "hinweis", titel: `Keine kanonische Adresse: ${pfad}`, detail: "Hilft Google, doppelte Seiten zu vermeiden.", url: s.url, an: "entwicklung" })
   }
 
@@ -223,6 +235,25 @@ export async function pruefeWebseite(o: { tief?: boolean } = {}): Promise<Pruefu
       }
     }
   })
+
+  /* Soll-Abgleich: sagt die Seite noch, was creaDIG heute ist? (lib/webseite/soll.ts) */
+  const texte = seiten.filter((s) => s.status === 200).map((s) => ({ s, text: sichtbarerText(s.html) }))
+  for (const r of VERBOTEN) {
+    const treffer = texte.filter((t) => r.muster.test(t.text)).map((t) => t.s.url.replace(basis, "") || "/")
+    if (treffer.length)
+      neu({ code: `soll:${r.code}`, bereich: "inhalt", schwere: r.schwere, titel: `${r.titel} (${treffer.length} Seite${treffer.length > 1 ? "n" : ""})`, detail: `${r.detail} Seiten: ${treffer.slice(0, 8).join(", ")}`, url: `${basis}${treffer[0] === "/" ? "" : treffer[0]}`, an: r.an })
+  }
+  for (const w of WIDERSPRUECHE) {
+    const a = texte.find((t) => w.a.test(t.text))
+    const b = texte.find((t) => w.b.test(t.text))
+    if (a && b)
+      neu({ code: `soll:${w.code}`, bereich: "inhalt", schwere: "kritisch", titel: w.titel, detail: `${w.detail} Beispiel: ${a.s.url} gegen ${b.s.url}`, url: a.s.url, an: w.an })
+  }
+  for (const p of PFLICHT) {
+    const s = await hole(`${basis}${p.pfad}`)
+    if (s.status !== 200 || !p.muster.test(sichtbarerText(s.html)))
+      neu({ code: `soll:${p.code}`, bereich: "inhalt", schwere: "wichtig", titel: `Fehlt auf der Seite: ${p.titel}`, detail: `${p.pfad} antwortet ${s.status} oder enthält das Erwartete nicht.`, url: `${basis}${p.pfad}`, an: p.an })
+  }
 
   /* Tote interne Links (Startseiten aller Sprachen). */
   const links = new Set<string>()
@@ -253,7 +284,7 @@ export async function pruefeWebseite(o: { tief?: boolean } = {}): Promise<Pruefu
     .filter((d) => !Number.isNaN(d.getTime()))
     .sort((a, b) => b.getTime() - a.getTime())[0]
   const tageAlt = neuster ? Math.floor((Date.now() - neuster.getTime()) / 86400000) : null
-  if (tageAlt === null || tageAlt > 14)
+  if (tageAlt === null || tageAlt > 7)
     neu({ code: "frische", bereich: "inhalt", schwere: "wichtig", titel: tageAlt === null ? "Noch kein eigener Fachartikel online" : `Letzter Fachartikel vor ${tageAlt} Tagen`, detail: "Google und Besucher sehen eine stille Seite. Ziel: mindestens ein Artikel je Woche unter /insights.", an: "kommunikation" })
   const fehlendeArtikel = artikel
     .map((a) => a.slug)
@@ -277,7 +308,16 @@ export async function pruefeWebseite(o: { tief?: boolean } = {}): Promise<Pruefu
   }
 
   /* Selbst reparieren, was erlaubt ist; Rest zuordnen. */
+  /* Stille Seite: kein Auftrag an eine Abteilung (der endete nur in Plänen), sondern gleich ein Entwurf aus dem Redaktionsplan. */
+  let entwurf: string | null = null
+  if (befunde.some((b) => b.code === "frische")) {
+    const { schreibeNaechstenPlanArtikel } = await import("@/lib/artikel/plan")
+    entwurf = (await schreibeNaechstenPlanArtikel().catch((e) => ({ ergebnis: `Entwurf gescheitert: ${e instanceof Error ? e.message : e}` }))).ergebnis
+  }
+
   const fertig: Befund[] = befunde.map((b) => {
+    if (b.code === "frische" && entwurf)
+      return { ...b, erledigung: "emin", an: "geschaeftsfuehrung", detail: `${b.detail} ${entwurf} – Freigabe unter /admin/bulletin.` }
     if (b.code === "artikel-sitemap") {
       try {
         revalidatePath("/sitemap.xml")
@@ -311,7 +351,7 @@ export async function pruefeWebseite(o: { tief?: boolean } = {}): Promise<Pruefu
     befunde: fertig.sort((a, b) => rang(a.schwere) - rang(b.schwere)),
     seiten: seiten.length,
     psi,
-    anweisung: umsetzungsAnweisung(fertig.filter((b) => b.erledigung === "emin")),
+    anweisung: umsetzungsAnweisung(fertig.filter((b) => b.erledigung === "emin" && b.code !== "frische")),
   }
 }
 
@@ -373,7 +413,9 @@ async function designBlick(bild: string): Promise<Omit<Befund, "erledigung">[]> 
           content: [
             {
               type: "text",
-              text: `Das ist die Startseite von creadig.de auf dem Handy (creaDIG Solutions, System-Haus für digitale Betriebe, Kunden in DE, Türkei, Golf). Markenschriften Manrope + M PLUS Rounded 1c, Markenblau #2F5BEA – diese NICHT infrage stellen.
+              text: `Das ist die Startseite von creadig.de auf dem Handy. So soll creaDIG wirken:
+${SOLL_KURZ}
+Marke (Blau, Schrift) NICHT infrage stellen.
 Bewerte wie eine internationale Top-Agentur: Wirkt die Seite auf den ersten Blick hochwertig, klar und vertrauenswürdig? Ist sofort klar, was creaDIG verkauft und was der nächste Schritt ist? Lesbarkeit, Abstände, Kontrast, Bildsprache.
 Nenne höchstens 3 konkrete Schwächen, die man ändern sollte (keine Lobreden). Antworte NUR mit JSON: [{"titel":"kurz","detail":"was genau und wie besser","schwere":"wichtig|hinweis"}]`,
             },
@@ -437,7 +479,10 @@ export async function websiteRunde(o: { manuell?: boolean } = {}): Promise<{ erg
       von: "it",
       an: "geschaeftsfuehrung",
       titel: `Webseiten-Bericht: Note ${p.gesamt}/100, ${emin.length} Punkte brauchen Code`,
-      inhalt: `Diese Punkte darf der Prüfer nicht selbst ändern (Code/Server):\n${p.anweisung}`,
+      inhalt: [
+        ...emin.filter((b) => b.code === "frische").map((b) => `Redaktion: ${b.detail}`),
+        p.anweisung ? `Diese Punkte darf der Prüfer nicht selbst ändern (Code/Server):\n${p.anweisung}` : "",
+      ].filter(Boolean).join("\n\n"),
       quelle: `webseite:${woche}:bericht`,
     }).catch(() => null)
     if (id) auftraege++

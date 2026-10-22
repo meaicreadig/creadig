@@ -76,7 +76,7 @@ export const MESSEN: readonly Messe[] = [
   { name: "GITEX Global", ort: "Dubai", land: "AE", region: "welt", kategorie: "digital", monat: 10, rhythmus: 1, url: "https://www.gitex.com", nutzen: "Tech-Leitmesse Golfstaaten — Einstieg für die Golf-Vision.", empfehlung: "beobachten" },
 
   // 3D-Druck & Industrie
-  { name: "EXPO 3D İstanbul", ort: "Istanbul (İFM)", land: "TR", region: "tr", kategorie: "druck", monat: 9, rhythmus: 1, termin: { von: "2027-09-30", bis: "2027-10-02" }, url: "https://www.expo3d.com.tr", nutzen: "3D-Druck-Messe der T��rkei — Drucker, Material, Lieferanten und Kunden direkt vor Ort.", empfehlung: "besuchen" },
+  { name: "EXPO 3D İstanbul", ort: "Istanbul (İFM)", land: "TR", region: "tr", kategorie: "druck", monat: 9, rhythmus: 1, termin: { von: "2027-09-30", bis: "2027-10-02" }, url: "https://www.expo3d.com.tr", nutzen: "3D-Druck-Messe der Türkei — Drucker, Material, Lieferanten und Kunden direkt vor Ort.", empfehlung: "besuchen" },
   { name: "Formnext", ort: "Frankfurt am Main", land: "DE", region: "dach", kategorie: "druck", monat: 11, rhythmus: 1, url: "https://formnext.mesago.com", nutzen: "Weltleitmesse Additive Fertigung — Lieferanten, Kunden, Trends.", empfehlung: "besuchen" },
   { name: "Rapid.Tech 3D", ort: "Erfurt", land: "DE", region: "dach", kategorie: "druck", monat: 5, rhythmus: 1, url: "https://www.rapidtech-3d.de", nutzen: "Anwendertagung 3D-Druck — kleiner, gut für erste Kontakte.", empfehlung: "besuchen" },
   { name: "AMB", ort: "Stuttgart", land: "DE", region: "dach", kategorie: "druck", monat: 9, rhythmus: 2, referenzJahr: 2026, url: "https://www.messe-stuttgart.de/amb", nutzen: "Metallbearbeitung inkl. Additiv — Industrie-Mittelstand Süddeutschland.", empfehlung: "beobachten" },

@@ -683,7 +683,7 @@ function LinkedinStatus({ ziele, meldung }: { ziele: LinkedinZiele; meldung?: st
     "firma-redirect":
       "Firmenseite: In der Firmen-App unter „Auth“ fehlt die Redirect-URL https://creadig.de/api/linkedin/callback.",
     "inhaber-redirect":
-      "Profil: In der Profil-App unter ���Auth“ fehlt die Redirect-URL https://creadig.de/api/linkedin/callback.",
+      "Profil: In der Profil-App unter „Auth“ fehlt die Redirect-URL https://creadig.de/api/linkedin/callback.",
     fehler:
       "LinkedIn hat abgelehnt. Prüfe in der jeweiligen LinkedIn-App die Redirect-URL und ob das Produkt freigeschaltet ist (Firmenseite: „Community Management API“ muss genehmigt sein).",
   }

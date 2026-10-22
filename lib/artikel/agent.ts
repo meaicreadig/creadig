@@ -54,26 +54,47 @@ function blocke(roh: unknown): ArtikelBlock[] {
   return out
 }
 
+type Anlass = {
+  /** Was der Artikel behandelt — wörtlich in den Prompt. */
+  anlass: string
+  kategorie: InsightCategoryKey
+  quelleName: string | null
+  quelleUrl: string | null
+  /** Eindeutig je Anlass (Bulletin-Meldung oder Planthema) — verhindert Doppelentwürfe. */
+  ref: string
+}
+
 /**
  * Schreibt aus einer Bulletin-Meldung einen eigenen Fachartikel für creadig.de.
  * Ergebnis ist immer ein ENTWURF – öffentlich wird er erst, wenn Emin freigibt.
  */
 export async function schreibeArtikel(m: Meldung, ausgabeId: string): Promise<{ slug: string | null; ergebnis: string }> {
-  const ref = `${ausgabeId}:${m.nr}`
-  if (await bulletinRefBekannt(ref)) return { slug: null, ergebnis: "Artikel zu dieser Meldung liegt schon vor" }
-
-  const { text } = await generateText({
-    model: AUTOR,
-    prompt: `Du schreibst für creadig.de, die Webseite von creaDIG Solutions (System-Haus für digitale Betriebe, Inhaber Muhammed Emin Akyol; Web- und Systementwicklung, KI-Agenten und Automatisierung für Mittelstand, Handwerk und Gastronomie; eigene Produkte fibero und stammo).
-
-Anlass (echte Meldung, nicht verändern, nichts dazuerfinden):
+  const kategorie = KATEGORIE[m.ressort] ?? "ai"
+  return entwerfe({
+    anlass: `Anlass (echte Meldung, nicht verändern, nichts dazuerfinden):
 Titel: ${m.titel.de}
 Fakten: ${m.kurz.de}
 Bedeutung für uns: ${m.fuerUns.de}
 Quelle: ${m.quelle} (${m.url})
-Arbeitstitel: ${m.artikel?.de ?? m.titel.de}
+Arbeitstitel: ${m.artikel?.de ?? m.titel.de}`,
+    kategorie: insightCategoryKeys.includes(kategorie) ? kategorie : "ai",
+    quelleName: m.quelle,
+    quelleUrl: m.url,
+    ref: `${ausgabeId}:${m.nr}`,
+  })
+}
 
-Schreibe einen EIGENEN Fachartikel mit Haltung (keine Nacherzählung der Quelle, keine Kopie): Was bedeutet das konkret für Betriebe im deutschsprachigen Raum, was sollte ein Inhaber jetzt tun, wo liegen Grenzen. 700–1000 Wörter, klare Zwischenüberschriften, eine kurze Liste mit konkreten Schritten, ein Hinweis-Block ("note") mit der Quelle als Satz. Sachlich, selbstbewusst, ohne Werbefloskeln, ohne erfundene Zahlen oder Kundenbeispiele. Suchmaschinenstark: das Kernthema steht im Titel und im ersten Absatz.
+/** Gemeinsamer Kern: Anlass → zweisprachiger Entwurf in `web_artikel`. */
+export async function entwerfe(a: Anlass): Promise<{ slug: string | null; ergebnis: string }> {
+  if (await bulletinRefBekannt(a.ref)) return { slug: null, ergebnis: "Artikel zu diesem Anlass liegt schon vor" }
+
+  const { text } = await generateText({
+    model: AUTOR,
+    prompt: `Du schreibst für creadig.de, die Webseite von creaDIG Solutions (System-Haus für digitale Betriebe, Inhaber Muhammed Emin Akyol; Web- und Systementwicklung, Barrierefreiheit, KI-Agenten und Automatisierung für Mittelstand, Handwerk und Gastronomie; eigene Produkte wie fibero und stammo).
+
+${a.anlass}
+
+Schreibe einen EIGENEN Fachartikel mit Haltung (keine Nacherzählung, keine Kopie): Was bedeutet das konkret für Betriebe im deutschsprachigen Raum, was sollte ein Inhaber jetzt tun, wo liegen Grenzen. 700–1000 Wörter, klare Zwischenüberschriften, eine kurze Liste mit konkreten Schritten, ein Hinweis-Block ("note") mit der Quelle bzw. Rechtsgrundlage als Satz. Sachlich, selbstbewusst, ohne Werbefloskeln, ohne erfundene Zahlen, Fristen oder Kundenbeispiele — was du nicht sicher weißt, lässt du weg. Keine Rechtsberatung versprechen. Suchmaschinenstark: das Kernthema steht im Titel und im ersten Absatz.
 Alles auf Deutsch ("de") UND natürlichem Türkisch ("tr", keine Wort-für-Wort-Übersetzung).
 Zusätzlich "linkedin": ein LinkedIn-Beitrag auf Deutsch (600–900 Zeichen, erster Satz als Haken, ohne Hashtag-Wand, max. 3 Hashtags am Ende), der neugierig auf den Artikel macht.
 
@@ -94,19 +115,18 @@ Antworte NUR mit JSON:
   const body = blocke(j?.body)
   if (!j || !titel || !teaser || body.length < 4) return { slug: null, ergebnis: "Artikel konnte nicht sauber geschrieben werden" }
 
-  const kategorie = KATEGORIE[m.ressort] ?? "ai"
   const slug = await speichereEntwurf({
     slug: slugVon(String(j.slug || titel.de)) || `artikel-${Date.now()}`,
-    kategorie: insightCategoryKeys.includes(kategorie) ? kategorie : "ai",
+    kategorie: a.kategorie,
     topic: zwei(j.topic) ?? { de: "KI", tr: "Yapay zekâ" },
     titel,
     teaser,
     metaTitel: zwei(j.metaTitel) ?? titel,
     body,
     linkedin: typeof j.linkedin === "string" ? j.linkedin.trim() : "",
-    quelleName: m.quelle,
-    quelleUrl: m.url,
-    bulletinRef: ref,
+    quelleName: a.quelleName,
+    quelleUrl: a.quelleUrl,
+    bulletinRef: a.ref,
   })
   return { slug, ergebnis: `Artikel-Entwurf „${titel.de}“ bereit` }
 }

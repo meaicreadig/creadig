@@ -1,7 +1,7 @@
 import type { Locale } from "@/lib/dictionary"
 import type { Localized, Package } from "@/lib/site-data"
 import { genannteClientWorks, productWorks } from "@/lib/site-data"
-import { findOffer, formatPrice, localizedPrice, localizedRange, remediationRange, VAT_PERCENT } from "@/lib/offers"
+import { findOffer, formatPrice, localizedPrice, localizedRange, remediationRange, ustSatz } from "@/lib/offers"
 
 /**
  * Granulare Leistungsseiten (E-K4).
@@ -1040,10 +1040,10 @@ export const servicePages: ServicePage[] = [
         },
       ],
       note: {
-        de: `Alle Preise netto, zzgl. ${VAT_PERCENT} % USt. Die Prüfung ist der Einstieg und steht für sich: Sie verpflichtet zu keiner Behebung, und der Bericht bleibt bei Ihnen.`,
-        tr: `Tüm fiyatlar nettir, %${VAT_PERCENT} KDV hariç. Denetim giriş adımıdır ve tek başına durur: Hiçbir gidermeye mecbur bırakmaz, rapor sizde kalır.`,
-        en: `All prices excl. VAT, plus ${VAT_PERCENT}% VAT. The audit is the entry point and stands on its own: it commits you to no remediation, and the report stays with you.`,
-        ar: `كل الأسعار دون ضريبة، تُضاف إليها ${VAT_PERCENT}٪. والفحص هو نقطة الدخول وقائم بذاته: لا يُلزم بأي معالجة، والتقرير يبقى لديكم.`,
+        de: `${ustSatz("de")} Die Prüfung ist der Einstieg und steht für sich: Sie verpflichtet zu keiner Behebung, und der Bericht bleibt bei Ihnen.`,
+        tr: `${ustSatz("tr")} Denetim giriş adımıdır ve tek başına durur: Hiçbir gidermeye mecbur bırakmaz, rapor sizde kalır.`,
+        en: `${ustSatz("en")} The audit is the entry point and stands on its own: it commits you to no remediation, and the report stays with you.`,
+        ar: `${ustSatz("ar")} والفحص هو نقطة الدخول وقائم بذاته: لا يُلزم بأي معالجة، والتقرير يبقى لديكم.`,
       },
     },
     packageKeys: ["website"],

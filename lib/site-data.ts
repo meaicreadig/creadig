@@ -17,7 +17,7 @@ import {
   type Release,
 } from "@/lib/proof"
 import { publishedInsights } from "@/lib/insights"
-import { findOffer, offerAmount } from "@/lib/offers"
+import { KLEINUNTERNEHMER, findOffer, offerAmount } from "@/lib/offers"
 
 export type Region = "DE" | "CH" | "DE & CH"
 
@@ -1452,7 +1452,7 @@ export const caseStudies: CaseStudy[] = [
     context: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya", en: "Non-profit · aid · Germany", ar: "غير ربحي · إغاثة · ألمانيا" },
     card: {
       project: "Bir Damla Hayır",
-      category: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya", en: "Non-profit · aid · Germany", ar: "غير ربحي · إغاثة · أ��مانيا" },
+      category: { de: "Nonprofit · Hilfe · Deutschland", tr: "Sivil toplum · yardım · Almanya", en: "Non-profit · aid · Germany", ar: "غير ربحي · إغاثة · ألمانيا" },
       services: null,
     },
     chapters: { ...emptyChapters },
@@ -1924,7 +1924,7 @@ export const opsSteps = [
  *
  * `packages` trug den Preis als fertige Zeichenkette: `price: "€2.400"`.
  * Eine Zeichenkette kennt keine Sprache. Auf der englischen Seite stand
- * damit in der Kachel „€2.400" und in der FAQ „���2,400" — dieselbe Zahl,
+ * damit in der Kachel „€2.400" und in der FAQ „€2,400" — dieselbe Zahl,
  * zwei Schreibweisen, und die erste liest ein englischer Leser als ZWEI
  * EURO VIERZIG. Ein Preisfehler um den Faktor tausend, verursacht von
  * einem Punkt.
@@ -2339,7 +2339,7 @@ export const imprintDetails = {
    * Vom Inhaber bestätigt: Kleinunternehmer nach § 19 UStG (15.10.2026,
    * Finanz-Abschluss-Durchlauf).
    */
-  smallBusiness: true as boolean | null,
+  smallBusiness: KLEINUNTERNEHMER,
   /**
    * Klar markierter Platzhalter, solange der Steuerstatus nicht freigegeben
    * ist. Er ist NICHT als Angabe gemeint und wird auf der Seite auch nicht so

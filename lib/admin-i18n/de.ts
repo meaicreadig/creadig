@@ -521,7 +521,7 @@ export const de = {
     zielbildTitel: "Was das Zielbild angeht",
     nurMuster: "Nur Muster. Eine einzelne Absage dreht kein Zielbild.",
     keinDruck: "Keine offene Annahme steht durch diese Verluste unter Druck.",
-    keinDruckDetail: "Entweder ist noch keine Häufung ein Muster, oder die geh��uften Gründe sagen über das Zielbild nichts — „Zeitpunkt passt nicht“ ist kein Nein, und „Keine Rückmeldung“ sagt mehr über unser Nachfassen als über den Markt.",
+    keinDruckDetail: "Entweder ist noch keine Häufung ein Muster, oder die gehäuften Gründe sagen über das Zielbild nichts — „Zeitpunkt passt nicht“ ist kein Nein, und „Keine Rückmeldung“ sagt mehr über unser Nachfassen als über den Markt.",
     beruehrtVon: (liste: string) => `Berührt von: ${liste}`,
     entscheidet: "Was sie entscheidet: ",
     registerHinweis: "Das Register ändert ein Mensch, nicht dieser Zähler — mit einem Satz im Gegenbeleg.",
@@ -732,7 +732,7 @@ export const de = {
     } as Record<string, string>,
     quellenHinweis: {
       website: "Der Betrieb sagt es über sich selbst. Für Standorte, Leistungen und Kontaktwege die beste Quelle.",
-      stellenanzeige: "Die ergiebigste Quelle für Betriebszustände �� dort steht, welche Werkzeuge benutzt werden und welche Arbeit von Hand läuft. Portale untersagen meist den maschinellen Abruf: von Hand öffnen, Fundstelle festhalten.",
+      stellenanzeige: "Die ergiebigste Quelle für Betriebszustände — dort steht, welche Werkzeuge benutzt werden und welche Arbeit von Hand läuft. Portale untersagen meist den maschinellen Abruf: von Hand öffnen, Fundstelle festhalten.",
       branchenverzeichnis: "Gut für die Existenz und die Branche, oft veraltet bei Adressen und Größe.",
       handelsregister: "Rechtsform und Sitz belegt. Sagt nichts über den Betriebszustand.",
       presse: "Gut für Veränderungen — neuer Standort, Übernahme, Umbau. Datum mitschreiben, veraltet schnell.",
@@ -1594,7 +1594,7 @@ export const de = {
     titel: "Etwas ist schiefgegangen",
     hinweisTitel: "Diese Ansicht konnte nicht geladen werden",
     hinweis:
-      "Der Fehler liegt auf unserer Seite. Häufigste Ursache: eine Datenquelle antwortet nicht. Das heißt nicht, dass Daten fehlen ��� nur, dass sie gerade nicht erreichbar sind.",
+      "Der Fehler liegt auf unserer Seite. Häufigste Ursache: eine Datenquelle antwortet nicht. Das heißt nicht, dass Daten fehlen — nur, dass sie gerade nicht erreichbar sind.",
     erneut: "Erneut versuchen",
     digest: "Kennung fürs Protokoll:",
   },
