@@ -18,6 +18,8 @@ export type EreignisTyp =
   | "antwort_erhalten"
   | "auftrag_erteilt"
   | "kontakt_gesperrt"
+  /** Website-Artikel, LinkedIn, Instagram oder von Hand erfasst — siehe lib/inhalte.ts. */
+  | "inhalt_veroeffentlicht"
 
 export type Schritt = {
   nachStunden: number

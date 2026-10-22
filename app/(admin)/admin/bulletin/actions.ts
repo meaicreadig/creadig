@@ -13,6 +13,7 @@ import { legeFreigabeAn } from "@/lib/assistent/store"
 import { bulletinImHintergrund } from "@/lib/bulletin/agent"
 import { ladeAusgabe, ladeLauf } from "@/lib/bulletin/store"
 import { SITE_URL } from "@/lib/routes"
+import { getVertriebStore } from "@/lib/lead-store"
 
 const zurueck = (meldung: string, ausgabe?: string): never =>
   redirect(`/admin/bulletin?${ausgabe ? `ausgabe=${ausgabe}&` : ""}meldung=${encodeURIComponent(meldung)}`)
@@ -58,6 +59,10 @@ export async function artikelVeroeffentlichen(form: FormData): Promise<void> {
 
   /* Nach außen geht nur, was Emin freigibt: der LinkedIn-Beitrag wartet als Freigabe-Karte. */
   const url = `${SITE_URL}/insights/${slug}`
+  /* Ins Register — von dort erfährt das ganze Netz davon (lib/inhalte.ts). */
+  await getVertriebStore({ kennung: "owner", herkunft: "HUMAN" })
+    ?.recordPublication({ was: `Artikel: ${art!.titel.de}`, kanal: "website", veroeffentlichtAm: new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Berlin" }), url })
+    .catch(() => null)
   if (art!.linkedin) {
     await legeFreigabeAn({
       art: "linkedin",

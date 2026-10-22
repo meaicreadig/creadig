@@ -4,6 +4,7 @@ import { ABTEILUNGEN, abteilungVonAgent } from "@/lib/zentrale/abteilungen"
 import { assistentDb, ergaenzeExtra, legeFreigabeAn, letzteLaeufe, setzeFreigabe } from "@/lib/assistent/store"
 import type { Abfrage } from "@/lib/neon-abfrage"
 import { firmenText } from "@/lib/firmenwahrheit"
+import { inhalteText } from "@/lib/inhalte"
 
 /**
  * Interne Koordination der KI-Firma.
@@ -328,11 +329,12 @@ async function bearbeite(a: Auftrag): Promise<void> {
   const q = await db()
   if (!q) return
   const abt = ABTEILUNGEN.find((x) => x.id === a.an)
-  const davor = await verlauf(a.eltern)
+  const [davor, inhalte] = await Promise.all([verlauf(a.eltern), inhalteText()])
   const { text } = await generateText({
     model: MODELL,
     system: `Du bist die Abteilung "${abt?.name.de ?? a.an}" der KI-Firma creaDIG Solutions.
 ${firmenText("voll")}
+${inhalte}
 Aufgabe der Abteilung: ${abt?.aufgabe.de ?? "Unterstützung"}.
 Du arbeitest wie ein erfahrenes Team in einer professionellen Firma: konkret, knapp, auf Deutsch, umsetzbar.
 

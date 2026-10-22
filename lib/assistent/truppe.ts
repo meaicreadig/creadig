@@ -40,6 +40,7 @@ import {
   type RatProtokoll,
 } from "./store"
 import { firmenText, firmenTextEn } from "@/lib/firmenwahrheit"
+import { inhalteText } from "@/lib/inhalte"
 
 export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite", "qualitaet", "wissen", "forderungen", "sicherheit", "kundenservice", "forschung"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
@@ -300,7 +301,7 @@ async function erzeugeBild(id: string, idee: string): Promise<string | null> {
   }
 }
 
-type RedaktionsLage = { marketing?: string; beschluesse: string[]; lage: string; branche: string; frueher: string[]; woche: string; zielgruppe: string }
+type RedaktionsLage = { marketing?: string; beschluesse: string[]; lage: string; branche: string; frueher: string[]; inhalte: string; woche: string; zielgruppe: string }
 
 /** Wochenplan: jede fehlende Säule dieser Woche wird geschrieben, bebildert und mit Sendetermin zur Freigabe gelegt. */
 async function redaktion(): Promise<Ergebnis> {
@@ -314,11 +315,12 @@ async function redaktion(): Promise<Ergebnis> {
   }
   if (!fehlend.length) return { ergebnis: "Wochenplan steht – alle Beiträge liegen bereit", anzahl: 0 }
 
-  const [raete, frueher, rahmen, branche] = await Promise.all([
+  const [raete, frueher, rahmen, branche, inhalte] = await Promise.all([
     ladeRaete(1).catch(() => []),
     letzteArtikel(12),
     firmenRahmen(),
     bulletinStoff().catch(() => "—"),
+    inhalteText(),
   ])
   const rat = raete[0]?.protokoll
   const lage: RedaktionsLage = {
@@ -327,6 +329,7 @@ async function redaktion(): Promise<Ergebnis> {
     lage: rahmen.text,
     branche,
     frueher: frueher.map((f) => f.titel),
+    inhalte,
     woche,
     zielgruppe: zielgruppeDerWoche(Number(woche.split("-")[1])),
   }
@@ -355,7 +358,9 @@ Hintergrund (nur daraus schöpfen, nichts erfinden):
 - Lage: ${l.lage}
 - Produkte/Stoff: ${STOFF.join(" || ")}
 - Branche aktuell (Bulletin, mit Quelle): ${l.branche}
-- Schon veröffentlicht – NICHT wiederholen: ${l.frueher.join(" | ") || "(nichts)"}
+- Schon vorbereitet – NICHT wiederholen: ${l.frueher.join(" | ") || "(nichts)"}
+- Website-Artikel darfst du aufgreifen und im ersten Kommentar verlinken.
+${l.inhalte}
 
 AUFBAU (so funktioniert LinkedIn):
 1. Haken: die ersten zwei Zeilen (max. 200 Zeichen) entscheiden, ob jemand „mehr anzeigen“ klickt – eine überraschende Beobachtung oder klare These aus dem Alltag der Zielgruppe. Keine Frage als Einstieg, kein „Heute möchte ich…“.
