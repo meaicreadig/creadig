@@ -5,8 +5,10 @@ import { ArrowRight, Zap } from "lucide-react"
 import { AdminShell } from "@/components/admin/admin-shell"
 import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
 import { Surface } from "@/components/admin/primitives"
+import { TrendGrafik } from "@/components/admin/trend-grafik"
 import { adminSprache } from "@/lib/admin-i18n/server"
 import { letzteLaeufe } from "@/lib/assistent/store"
+import { ladeTrend } from "@/lib/trend"
 import { ABTEILUNGEN } from "@/lib/zentrale/abteilungen"
 import { berechneLeistung, MINUTEN_JE_ERGEBNIS, type AbteilungsLeistung } from "@/lib/zentrale/leistung"
 import { pulsFaellig, pulsRunde } from "@/lib/zentrale/puls"
@@ -104,7 +106,11 @@ export default async function LeistungSeite() {
   const sprache = await adminSprache()
   const t = T[sprache]
   const intl = sprache === "tr" ? "tr-TR" : "de-DE"
-  const [leistung, laeufe] = await Promise.all([berechneLeistung().catch(() => null), letzteLaeufe().catch(() => ({}))])
+  const [leistung, laeufe, trend] = await Promise.all([
+    berechneLeistung().catch(() => null),
+    letzteLaeufe().catch(() => ({})),
+    ladeTrend(14).catch(() => []),
+  ])
   const puls = (laeufe as Awaited<ReturnType<typeof letzteLaeufe>>)["puls"]
 
   after(async () => {
@@ -168,6 +174,8 @@ export default async function LeistungSeite() {
             </Surface>
           ))}
         </dl>
+
+        <TrendGrafik trend={trend} sprache={sprache} intl={intl} />
 
         <Surface className="flex flex-col gap-4">
           <div className="flex items-center justify-between gap-3">
