@@ -55,6 +55,7 @@ import {
 } from "@/lib/assistent/store"
 import { firmenRahmen, type Rahmen } from "@/lib/assistent/rahmen"
 import { erkenneLoeschwunsch } from "@/lib/assistent/loeschen"
+import { GrundWahl } from "@/components/admin/grund-wahl"
 import { Zusammenarbeit } from "@/components/admin/zusammenarbeit"
 import { auftragKennzahlen, ladeAuftraege } from "@/lib/koordination/koordinator"
 import { AGENTEN, type AgentInfo, type AgentKey } from "@/lib/assistent/truppe"
@@ -513,9 +514,10 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele })
                 {linkedin.firma || linkedin.inhaber || linkedin.instagram ? "Freigeben & posten" : "Freigeben"}
               </AktionKnopf>
             </form>
-            <form action={freigabeEntscheiden}>
+            <form action={freigabeEntscheiden} className="flex flex-wrap items-center gap-2">
               <input type="hidden" name="id" value={f.id} />
               <input type="hidden" name="status" value="verworfen" />
+              <GrundWahl />
               <AktionKnopf
                 laeuft="Wird verworfen …"
                 fertig="Verworfen"
@@ -803,6 +805,7 @@ function MailKarte({ f }: { f: Freigabe }) {
             >
               Im Mail-Studio gestalten
             </Link>
+            <GrundWahl />
             <AktionKnopf
               formAction={freigabeVerwerfen}
               formNoValidate
@@ -978,9 +981,10 @@ function FreigabeInhalt({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele 
                 Freigeben
               </AktionKnopf>
             </form>
-            <form action={freigabeEntscheiden}>
+            <form action={freigabeEntscheiden} className="flex flex-wrap items-center gap-2">
               <input type="hidden" name="id" value={f.id} />
               <input type="hidden" name="status" value="verworfen" />
+              <GrundWahl />
               <AktionKnopf
                 laeuft="Wird verworfen …"
                 fertig="Verworfen"

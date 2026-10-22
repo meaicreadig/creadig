@@ -762,7 +762,8 @@ const AGENT_ZEITLIMIT_MS = 200_000
 const GLEICHZEITIG = 4
 /**
  * Eine Funktion lebt 300 s. Ein neuer Block startet nur, wenn er samt Zeitlimit noch hineinpasst –
- * der Rest bleibt fällig und läuft im nächsten Takt (Folgerunden 05:25 und 05:50 UTC, danach der Puls).
+ * der Rest bleibt fällig und läuft im nächsten Takt (Folgerunden alle 12 Minuten bis 05:48 UTC,
+ * Chef-Runde 06:00 UTC, danach der Puls).
  */
 const TAKT_BUDGET_MS = 280_000
 
@@ -826,30 +827,65 @@ export function faelligeAgenten(laeufe: Record<string, Lauf>, jetzt = new Date()
   }).map((a) => a.key)
 }
 
+/**
+ * Reihenfolge innerhalb eines Takts — gemessen 22.10.2026: Vorher lief Bulletin
+ * allein vorweg; brauchte es länger als 80 s, startete in der Runde kein
+ * weiterer Agent mehr. Ergebnis: morgens liefen höchstens 4 von 20 Agenten,
+ * der Chief of Staff in 30 Tagen genau einmal (er kam nur dran, wenn alle
+ * anderen fertig waren UND Zeit übrig blieb).
+ *
+ * Jetzt:
+ * 1. Alle Agenten ohne KI gemeinsam (Datenbankarbeit, Sekunden) — zusammen
+ *    mit Bulletin, das nur Zeit kostet, aber niemanden blockiert.
+ * 2. KI-Agenten in Blöcken; Redaktion und Geschäftsleitung zuletzt, weil sie
+ *    Bulletin-Meldungen lesen.
+ * 3. Der Chief of Staff hat eine eigene Runde (`chef`, 06:00 UTC): Er läuft
+ *    dort IMMER, wenn er fällig ist — egal, ob andere noch warten. Er sieht
+ *    dann die Ergebnisse aller Morgenrunden, bevor um 06:15 die Morgenmail geht.
+ */
+const LIEST_BULLETIN: AgentKey[] = ["redaktion", "rat"]
+
+export function taktPlan(faellig: AgentKey[]): { schnell: AgentKey[]; ki: AgentKey[] } {
+  const ohneChef = faellig.filter((k) => k !== "koordinator")
+  const istKi = (k: AgentKey) => AGENTEN.find((a) => a.key === k)?.ki ?? true
+  const schnell = ohneChef.filter((k) => !istKi(k) || k === "bulletin")
+  const ki = ohneChef
+    .filter((k) => istKi(k) && k !== "bulletin")
+    .sort((a, b) => Number(LIEST_BULLETIN.includes(a)) - Number(LIEST_BULLETIN.includes(b)))
+  return { schnell, ki }
+}
+
 /** Startet jeden Agenten, dessen Takt fällig ist (täglich bzw. alle 7 Tage). */
-export async function fuehreFaelligeAus(): Promise<AgentKey[]> {
+export async function fuehreFaelligeAus(o: { chef?: boolean } = {}): Promise<AgentKey[]> {
   const start = Date.now()
   const passtNoch = () => Date.now() - start + AGENT_ZEITLIMIT_MS < TAKT_BUDGET_MS
   const faellig = faelligeAgenten(await letzteLaeufe())
   const gestartet: AgentKey[] = []
-  // Bulletin zuerst (Redaktion und Rat nutzen seine Meldungen), Chief of Staff zuletzt (sieht die Ergebnisse aller).
-  if (faellig.includes("bulletin")) {
-    await mitZeitlimit("bulletin")
-    gestartet.push("bulletin")
+
+  if (o.chef && faellig.includes("koordinator")) {
+    await mitZeitlimit("koordinator")
+    gestartet.push("koordinator")
   }
-  const mitte = faellig.filter((k) => k !== "koordinator" && k !== "bulletin")
+
+  const { schnell, ki } = taktPlan(faellig)
+  if (schnell.length && passtNoch()) {
+    await Promise.all(schnell.map(mitZeitlimit))
+    gestartet.push(...schnell)
+  }
   let i = 0
-  for (; i < mitte.length && passtNoch(); i += GLEICHZEITIG) {
-    const block = mitte.slice(i, i + GLEICHZEITIG)
+  for (; i < ki.length && passtNoch(); i += GLEICHZEITIG) {
+    const block = ki.slice(i, i + GLEICHZEITIG)
     await Promise.all(block.map(mitZeitlimit))
     gestartet.push(...block)
   }
-  const liegenGeblieben = mitte.length - Math.min(i, mitte.length)
+  const liegenGeblieben = faellig.filter((k) => k !== "koordinator" && !gestartet.includes(k)).length
   if (liegenGeblieben > 0) console.info(`[assistent] ${liegenGeblieben} Agenten bleiben für den nächsten Takt fällig`)
-  if (faellig.includes("koordinator") && liegenGeblieben === 0 && passtNoch()) {
+
+  /* Außerhalb der Chef-Runde: Chief of Staff nur, wenn alles durch ist und Zeit bleibt — sonst arbeitet die Warteschlange. */
+  if (!o.chef && faellig.includes("koordinator") && liegenGeblieben === 0 && passtNoch()) {
     await mitZeitlimit("koordinator")
     gestartet.push("koordinator")
-  } else await koordinationAbarbeiten()
+  } else if (!gestartet.includes("koordinator")) await koordinationAbarbeiten()
   await holeEingang().catch((e) => console.error("[assistent] eingang", e instanceof Error ? e.message : e))
   await ergaenzeFehlendeAdressen().catch((e) => console.error("[assistent] adressen", e instanceof Error ? e.message : e))
   await nachfassen().catch((e) => console.error("[assistent] nachfassen", e instanceof Error ? e.message : e))
