@@ -29,7 +29,7 @@ export const NAV_SCHLUESSEL = [
 export type NavSchluessel = (typeof NAV_SCHLUESSEL)[number]
 export type NavGruppe = "cockpit" | "vertrieb" | "kunden" | "marketing"
 
-export type KnotenId = NavSchluessel | "finanz" | "system"
+export type KnotenId = NavSchluessel | "finanz" | "system" | "webseite"
 
 export type Knoten = {
   id: KnotenId
@@ -211,6 +211,18 @@ export const KNOTEN: readonly Knoten[] = [
     },
     viertel: "technik",
     pos: { x: 3.6, y: -4.6 },
+  },
+  {
+    id: "webseite",
+    href: "/admin/webseite",
+    label: { de: "Webseite", tr: "Web sitesi" },
+    aufgabe: {
+      de: "creadig.de in 4 Sprachen: Inhalt, Technik, Sicherheit, Tempo, Design – täglich geprüft.",
+      tr: "creadig.de 4 dilde: içerik, teknik, güvenlik, hız, tasarım – her gün denetlenir.",
+    },
+    viertel: "technik",
+    pos: { x: 6.2, y: -2.4 },
+    nurOwner: true,
   },
 ]
 

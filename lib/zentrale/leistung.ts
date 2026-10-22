@@ -32,6 +32,7 @@ export const MINUTEN_JE_ERGEBNIS: Record<string, number> = {
   golf: 40,
   redaktion: 60,
   bulletin: 12,
+  webseite: 8,
   finanz: 15,
   projekte: 20,
   puls: 10,

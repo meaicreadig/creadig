@@ -37,7 +37,7 @@ import {
   type RatProtokoll,
 } from "./store"
 
-export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing"] as const
+export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
 
 export type AgentInfo = {
@@ -54,6 +54,7 @@ export const AGENTEN: AgentInfo[] = [
   { key: "jaeger", name: "Kunden-Jäger", aufgabe: "Findet jede Woche echte Firmen für fibero, creaDIG oder stammo, legt sie mit Briefentwurf an und übergibt die Zielliste ans Marketing – keine Kaltmails.", takt: "woechentlich", ki: true },
   { key: "recht", name: "Recht & Compliance", aufgabe: "Prüft jede Mail vor dem Versand (Einwilligung, Widerspruch, UWG § 7), stoppt unzulässige Kaltmails, sperrt Widersprüche und kontrolliert Impressum und Datenschutz.", takt: "taeglich", ki: false },
   { key: "marketing", name: "Marketingleitung", aufgabe: "Macht aus Zielliste, Beschlüssen und Absagen einen Wochenplan mit einer Zielgruppe und verteilt die Aufträge an Redaktion, Vertrieb und Recht.", takt: "woechentlich", ki: true },
+  { key: "webseite", name: "Website-Prüfer", aufgabe: "Prüft creadig.de täglich in allen 4 Sprachen auf Erreichbarkeit, Tempo, SEO, Sicherheit, tote Links und Aktualität, wöchentlich mit Google PageSpeed und Design-Blick. Behebt selbst, was er darf, und schickt den Rest an die zuständige Abteilung oder als fertigen Auftrag an die Geschäftsführung.", takt: "taeglich", ki: true },
   { key: "lage", name: "Lage", aufgabe: "Sammelt alles, was im System auf deine Entscheidung wartet.", takt: "taeglich", ki: false },
   { key: "vertrieb", name: "Vertrieb", aufgabe: "Findet stille oder überfällige Abschlüsse und schreibt die nächste Mail.", takt: "taeglich", ki: true },
   { key: "messen", name: "Messen", aufgabe: "Bereitet jede Messe vor, bei der du teilnimmst: Plan, Kontakte, Unterkunft.", takt: "taeglich", ki: false },
@@ -727,6 +728,7 @@ const LAEUFER: Record<AgentKey, (o: Start) => Promise<Ergebnis>> = {
   marketing,
   rat: (o) => rat(o),
   bulletin: (o) => erstelleBulletin({ erzwingen: o.manuell }),
+  webseite: async (o) => (await import("@/lib/webseite/pruefer")).websiteRunde(o),
 }
 
 export async function fuehreAgentAus(key: AgentKey, o: Start = {}): Promise<void> {
