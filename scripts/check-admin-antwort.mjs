@@ -59,49 +59,202 @@ pruefe("Ueberall abmelden nur fuer Owner", /alle && zugang\.rolle !== "owner"/.t
  * UND ihren Waechter in JEDER exportierten Funktion aufrufen. Eine neue
  * Datei faellt weiterhin auf; sie faellt nur nicht mehr auf, WEIL sie neu
  * ist, sondern weil niemand gesagt hat, wer sie bewacht.
+ *
+ * ADM-04b (22.10.2026) — Das Register stand bei 6 von 34 Dateien; das Gate
+ * war rot und sagte damit nichts mehr. Jetzt steht jede Datei darin, in
+ * einem von drei Registern (Admin-Flaeche, Finanz, oeffentlicher Token), und
+ * der Waechter muss nicht nur vorkommen, sondern als ERSTES `await` stehen.
  */
+const A = (...teile) => join("app", "(admin)", "admin", ...teile)
+const F = (...teile) => join("app", "(finanz)", "finanz", ...teile)
 const SCHREIBPUNKTE = new Map([
-  [join("app", "(admin)", "admin", "vertrieb", "actions.ts"), "requireStore()"],
-  [join("app", "(admin)", "admin", "verbindungen", "actions.ts"), "requireOwner()"],
-  [join("app", "(admin)", "admin", "beleg", "actions.ts"), "requireOwnerStore()"],
-  [join("app", "(admin)", "admin", "automationen", "actions.ts"), "requireOwnerStore()"],
-  [join("app", "(admin)", "admin", "veroeffentlichungen", "actions.ts"), "requireOwnerStore()"],
-  [join("app", "(admin)", "admin", "redaktion", "actions.ts"), "nurInhaber()"],
+  [A("vertrieb", "actions.ts"), "requireStore"],
+  [A("vertrieb", "kanal-actions.ts"), "berechtigt"],
+  [A("verbindungen", "actions.ts"), "requireOwner"],
+  [A("beleg", "actions.ts"), "requireOwnerStore"],
+  [A("automationen", "actions.ts"), "requireOwnerStore"],
+  [A("veroeffentlichungen", "actions.ts"), "requireOwnerStore"],
+  [A("redaktion", "actions.ts"), "nurInhaber"],
+  [A("bulletin", "actions.ts"), "nurInhaber"],
+  [A("investoren", "actions.ts"), "nurInhaber"],
+  [A("forschung", "actions.ts"), "nurInhaber"],
+  [A("leistung", "actions.ts"), "nurInhaber"],
+  [A("webseite", "actions.ts"), "nurInhaber"],
+  [A("assistent", "actions.ts"), "pruefe"],
+  [A("gespraech", "actions.ts"), "rolle"],
+  [A("termine", "actions.ts"), "rolle"],
+  [A("termine", "apple-actions.ts"), "berechtigt"],
+  [A("termine", "ki-actions.ts"), "berechtigt"],
+  [A("nachfass-actions.ts"), "rolle"],
+  [A("kunden", "actions.ts"), "zugang"],
+  [A("messen", "actions.ts"), "zugang"],
+  [A("marketing", "actions.ts"), "zugang"],
+  [A("marketing", "mail", "actions.ts"), "darf"],
+  [A("verkaufen", "actions.ts"), "berechtigt"],
 ])
 
-for (const [datei, waechter] of SCHREIBPUNKTE) {
-  const quelle = readFileSync(datei, "utf8")
-  const name = waechter.replace("()", "")
-  pruefe(
-    `${datei}: \`${name}\` prueft Sitzung + Rolle`,
-    new RegExp(`async function ${name}\\(\\)[\\s\\S]{0,400}pruefeZugang[\\s\\S]{0,300}darfBetreten`).test(quelle),
-  )
-  const exportiert = [...quelle.matchAll(/\nexport async function (\w+)\([^)]*\)[^{]*\{/g)]
-  const ohne = []
-  for (const m of exportiert) {
-    let i = m.index + m[0].length
-    let tiefe = 1
-    while (tiefe && i < quelle.length) {
-      const c = quelle[i++]
-      if (c === "{") tiefe++
-      else if (c === "}") tiefe--
-    }
-    if (!quelle.slice(m.index, i).includes(waechter)) ohne.push(m[1])
+/*
+ * Die Finanz-Anwendung (`/finanz`, finanz.creadig.de) hat keine eigene
+ * Sitzung: Sie traegt dieselbe Admin-Sitzung, und `finanzZugang()` in der
+ * Middleware laesst nur `owner` durch. Eine Server Action ist aber unter
+ * JEDER Adresse aufrufbar, die Middleware also keine Sicherung — deshalb
+ * prueft jede Finanz-Datei Sitzung, Widerruf und Inhaber selbst, bevor sie
+ * den Speicher holt. Eigenes Register, weil die Regel eine andere ist:
+ * nicht „darf diese Flaeche", sondern „ist der Inhaber".
+ */
+const FINANZPUNKTE = new Map([
+  [F("actions.ts"), "zugang"],
+  [F("abos", "actions.ts"), "zugang"],
+  [F("auftraege", "actions.ts"), "zugang"],
+  [F("belege", "actions.ts"), "zugang"],
+  [F("bescheide", "actions.ts"), "zugang"],
+  [F("investment", "actions.ts"), "zugang"],
+  [F("pauschalen", "actions.ts"), "zugang"],
+  [F("ziele", "actions.ts"), "zugang"],
+])
+
+/*
+ * Oeffentliche Schreibpunkte: Hier gibt es keine Sitzung, die Berechtigung
+ * IST der Link. Das Register sagt je Datei, welcher Aufruf den Token prueft,
+ * und haelt fest, dass er in jeder Action vor der ersten Wirkung steht — und
+ * dass die pruefende Funktion selbst den Token wirklich gegen den Speicher
+ * haelt, statt ihn nur weiterzureichen.
+ */
+const TOKENPUNKTE = new Map([
+  [
+    join("app", "(de)", "termin", "buchen", "[token]", "actions.ts"),
+    {
+      pruefung: "bucheTermin(",
+      wirkungen: ["sendeMail("],
+      quelle: join("lib", "termine", "store.ts"),
+      beweis: /export async function bucheTermin\([\s\S]{0,400}await pruefeBuchungslink\(e\.token\)\s*if \(!pruefung\.ok\) return/,
+    },
+  ],
+  [
+    join("app", "(finanz)", "dokument", "[token]", "actions.ts"),
+    {
+      pruefung: "ladeDokumentPerToken(",
+      wirkungen: ["pruefeRateLimit(", "beantworteAngebot(", "sendeDokumentMail(", "meldeInhaber("],
+      quelle: join("lib", "finanz", "auftraege", "store.ts"),
+      beweis: /export async function ladeDokumentPerToken\([^)]*\)[^{]*\{\s*if \(!\/\^\[A-Za-z0-9_-\]\{24,64\}\$\/\.test\(token\)\) return null[\s\S]{0,200}WHERE token = \$1/,
+    },
+  ],
+  [
+    join("app", "mail", "abmelden", "[token]", "page.tsx"),
+    {
+      pruefung: "abmeldenPerToken(",
+      wirkungen: ["revalidatePath("],
+      quelle: join("lib", "mailing", "store.ts"),
+      beweis: /export async function abmeldenPerToken\([^)]*\)[^{]*\{\s*if \(!\/\^\[\\w-\]\{10,60\}\$\/\.test\(token\)\) return false[\s\S]{0,200}WHERE token=\$1/,
+    },
+  ],
+])
+
+/* Den Rumpf einer Funktion ab ihrer oeffnenden Klammer lesen. */
+function rumpf(quelle, ab) {
+  let i = ab
+  let tiefe = 1
+  while (tiefe && i < quelle.length) {
+    const c = quelle[i++]
+    if (c === "{") tiefe++
+    else if (c === "}") tiefe--
   }
+  return quelle.slice(ab, i)
+}
+
+/*
+ * Die Actions einer Datei: in einer `use server`-Datei jede exportierte
+ * async-Funktion, sonst jede Funktion, die die Direktive selbst traegt.
+ *
+ * Der Rumpf beginnt an der Klammer am ZEILENENDE der Signatur — nicht an der
+ * ersten: `Promise<{ ok: boolean }>` traegt selbst eine, und wer dort zu
+ * zaehlen beginnt, prueft den Rueckgabetyp statt der Action. Und keine
+ * Action darf dem Muster entgehen: Was nicht gelesen wird, kann auch nicht
+ * durchfallen — deshalb muss die Zahl der Treffer die Zahl der Exporte sein.
+ */
+function aktionen(quelle) {
+  const oben = /^\s*["']use server["']/.test(quelle)
+  const muster = oben
+    ? /\nexport async function (\w+)\([^)]*\)[^\n]*\{\n/g
+    : /async function (\w+)\([^)]*\)[^\n{]*\{\s*["']use server["']/g
+  const treffer = [...quelle.matchAll(muster)].map((m) => ({ name: m[1], text: rumpf(quelle, m.index + m[0].length) }))
+  const erwartet = oben
+    ? (quelle.match(/\nexport async function /g) ?? []).length
+    : (quelle.match(/^\s+["']use server["']/gm) ?? []).length
+  return treffer.length === erwartet ? treffer : [...treffer, { name: "(Signatur nicht gelesen)", text: "" }]
+}
+
+/*
+ * Der Waechter muss nicht nur VORKOMMEN, er muss ZUERST kommen: Das erste
+ * `await` einer Action ist sein Aufruf. Vorher darf nur gerechnet werden
+ * (Formular lesen, Eingaben pruefen) — kein Speicher, kein Netz, keine Mail.
+ */
+function waechterZuerst(text, name) {
+  const i = text.search(/\bawait\b/)
+  return i >= 0 && new RegExp(`^await\\s+(?:\\(\\s*await\\s+)?${name}\\(`).test(text.slice(i))
+}
+
+function pruefeRegister(register, rolle, beweis) {
+  for (const [datei, name] of register) {
+    const quelle = readFileSync(datei, "utf8")
+    pruefe(`${datei}: \`${name}\` prueft Sitzung + ${rolle}`, beweis(name).test(quelle))
+    const alle = aktionen(quelle)
+    const ohne = alle.filter((a) => !waechterZuerst(a.text, name)).map((a) => a.name)
+    pruefe(
+      `${datei}: jede exportierte Action (${alle.length}) ruft zuerst ${name}()`,
+      ohne.length === 0 && alle.length > 0,
+      ohne.join(", "),
+    )
+  }
+}
+
+pruefeRegister(
+  SCHREIBPUNKTE,
+  "Rolle",
+  /* `rolle !== "owner"` ist strenger als jede Flaeche: Wer nur den Inhaber durchlaesst, braucht `darfBetreten` nicht. */
+  (name) =>
+    new RegExp(
+      `async function ${name}\\([^)]*\\)[^{]*\\{[\\s\\S]{0,400}pruefeZugang\\([\\s\\S]{0,300}(?:darfBetreten\\(|rolle !== "owner")`,
+    ),
+)
+
+pruefeRegister(
+  FINANZPUNKTE,
+  "Inhaber (Finanz)",
+  (name) =>
+    new RegExp(
+      `async function ${name}\\(\\)[^{]*\\{\\s*const z = await pruefeZugang\\(\\(await cookies\\(\\)\\)\\.get\\(ADMIN_COOKIE\\)\\?\\.value, \\{ aendernd: true \\}\\)\\s*` +
+        `if \\(z\\.verdict !== "ok" \\|\\| (?:!z\\.rolle \\|\\| )?z\\.rolle !== "owner"\\) throw new Error`,
+    ),
+)
+
+for (const [datei, { pruefung, wirkungen, quelle: speicher, beweis }] of TOKENPUNKTE) {
+  const quelle = readFileSync(datei, "utf8")
+  pruefe(`${datei}: \`${pruefung.slice(0, -1)}\` haelt den Token gegen den Speicher`, beweis.test(readFileSync(speicher, "utf8")))
+  const alle = aktionen(quelle)
+  const ohne = alle
+    .filter((a) => {
+      const p = a.text.indexOf(pruefung)
+      return p < 0 || wirkungen.some((w) => a.text.includes(w) && a.text.indexOf(w) < p)
+    })
+    .map((a) => a.name)
   pruefe(
-    `${datei}: jede exportierte Action (${exportiert.length}) ruft ${waechter}`,
-    ohne.length === 0 && exportiert.length > 0,
+    `${datei}: jede Action (${alle.length}) prueft den Token vor der ersten Wirkung`,
+    ohne.length === 0 && alle.length > 0,
     ohne.join(", "),
   )
 }
 
+const REGISTER = [SCHREIBPUNKTE, FINANZPUNKTE, TOKENPUNKTE]
+const bekannt = (f) => REGISTER.some((r) => r.has(f))
+const registriert = REGISTER.reduce((n, r) => n + r.size, 0)
 const serverDateien = ["app", "lib"]
   .flatMap((d) => readdirSync(d, { recursive: true }).map((f) => join(d, String(f))))
   .filter((f) => /\.(ts|tsx)$/.test(f) && /^\s*["']use server["']/m.test(readFileSync(f, "utf8")))
-const unbekannt = serverDateien.filter((f) => !SCHREIBPUNKTE.has(f))
+const unbekannt = serverDateien.filter((f) => !bekannt(f))
 pruefe(
-  `jede "use server"-Datei steht im Register (${serverDateien.length})`,
-  unbekannt.length === 0 && serverDateien.length === SCHREIBPUNKTE.size,
+  `jede "use server"-Datei steht in einem Register (${serverDateien.length}/${registriert})`,
+  unbekannt.length === 0 && serverDateien.length === registriert,
   unbekannt.length ? `unbekannt: ${unbekannt.join(", ")}` : "",
 )
 

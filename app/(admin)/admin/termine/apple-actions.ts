@@ -9,11 +9,15 @@ import { pruefeZugang } from "@/lib/admin-widerruf"
 import { darfBetreten } from "@/lib/rollen"
 import { normalisiereIcsUrl, speichereAppleQuelle } from "@/lib/termine/apple"
 
-export async function appleKalenderSpeichern(form: FormData): Promise<void> {
+async function berechtigt() {
   const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
   if (zugang.verdict !== "ok" || !zugang.rolle || !darfBetreten(zugang.rolle, "/admin/termine")) {
     redirect("/admin/termine?meldung=Keine%20Berechtigung")
   }
+}
+
+export async function appleKalenderSpeichern(form: FormData): Promise<void> {
+  await berechtigt()
   const roh = form.get("ics_url")
   const leer = typeof roh !== "string" || roh.trim() === ""
   const url = leer ? null : normalisiereIcsUrl(roh as string)

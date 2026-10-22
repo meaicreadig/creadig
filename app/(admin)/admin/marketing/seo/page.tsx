@@ -8,8 +8,10 @@ export const metadata = { title: "SEO & Google" }
 export const dynamic = "force-dynamic"
 
 const zahl = new Intl.NumberFormat("de-DE")
-const prozent = (v: number) => `${(v * 100).toLocaleString("de-DE", { maximumFractionDigits: 1 })} %`
-const platz = (v: number) => v.toLocaleString("de-DE", { maximumFractionDigits: 1 })
+const EINE_STELLE = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 1 })
+const GANZ = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 0 })
+const prozent = (v: number) => `${EINE_STELLE.format(v * 100)} %`
+const platz = (v: number) => EINE_STELLE.format(v)
 
 function Veraenderung({ jetzt, vorher, besserWennKleiner = false }: { jetzt: number; vorher: number; besserWennKleiner?: boolean }) {
   if (!vorher) return <span className="text-xs text-muted-foreground">kein Vergleich</span>
@@ -19,7 +21,7 @@ function Veraenderung({ jetzt, vorher, besserWennKleiner = false }: { jetzt: num
   return (
     <span className={`inline-flex items-center gap-0.5 text-xs font-medium ${gut ? "text-primary" : "text-destructive"}`}>
       <Icon className="size-3.5" aria-hidden="true" />
-      {Math.abs(diff * 100).toLocaleString("de-DE", { maximumFractionDigits: 0 })} % zu den 28 Tagen davor
+      {GANZ.format(Math.abs(diff * 100))} % zu den 28 Tagen davor
     </span>
   )
 }

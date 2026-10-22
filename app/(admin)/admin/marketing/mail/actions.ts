@@ -33,7 +33,7 @@ const PFAD = "/admin/marketing/mail"
 
 async function darf(aendernd = true): Promise<boolean> {
   const z = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd })
-  return z.verdict === "ok" && Boolean(z.rolle) && darfBetreten(z.rolle, "/admin/marketing")
+  return z.verdict === "ok" && Boolean(z.rolle) && darfBetreten(z.rolle, PFAD)
 }
 
 function bereinigt(k: KampagnenInhalt): KampagnenInhalt {
@@ -134,6 +134,7 @@ function studioInhalt(m: Einzelmail): string {
 
 /** Frei im Mail Studio geschrieben: senden und ins Versandprotokoll (Antwort + Nachfassen). */
 export async function einzelmailSenden(roh: Einzelmail): Promise<Ergebnis> {
+  if (!(await darf())) return { fehler: "Kein Zugang." }
   const r = await resendEinzelmail(roh)
   if ("ok" in r) {
     const m = einzelBereinigt(roh)
@@ -164,6 +165,7 @@ export async function antwortZuruecknehmen(formData: FormData): Promise<void> {
 
 /** Aus dem Assistenten geöffnet: senden und die Freigabe als gesendet markieren (startet das Nachfassen). */
 export async function einzelmailFuerFreigabe(freigabeId: string, roh: Einzelmail): Promise<Ergebnis> {
+  if (!(await darf())) return { fehler: "Kein Zugang." }
   const r = await resendEinzelmail(roh)
   if ("ok" in r) {
     const m = einzelBereinigt(roh)

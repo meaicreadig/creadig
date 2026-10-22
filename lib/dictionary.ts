@@ -686,9 +686,10 @@ const rawDictionary = {
        * Steht auf jeder Kundenwerk-Seite, solange keine schriftliche Freigabe
        * fuer eine ausfuehrliche Fallbeschreibung vorliegt. Bewusst als Grund
        * formuliert, nicht als „demnaechst" — es ist eine Haltung, kein Rueckstand.
+       * Kurz gehalten (22.10.2026, Content-Gate): Die Begruendung steht einmal
+       * auf /arbeiten; hier nur der Verweis, sonst wird sie auf acht Seiten Tapete.
        */
-      caseGatedNote:
-        "Eine ausführliche Fallbeschreibung mit Ausgangslage, Lösung und Ergebnis veröffentlichen wir nur mit schriftlicher Freigabe des Kunden. Liegt sie vor, steht sie hier.",
+      caseGatedNote: "Fallbeschreibung nur mit schriftlicher Freigabe des Kunden.",
       ctaTitle: "Ähnliche Ausgangslage in Ihrem Betrieb?",
       ctaBody: "Zwanzig Minuten, kostenlos und unverbindlich. Wir sehen uns den Betrieb an und sagen ehrlich, ob wir helfen können.",
       ctaPrimary: "Projekt starten",
@@ -829,7 +830,7 @@ const rawDictionary = {
       zugangLabel: "Zugang",
       zugang: {
         offen: "Ohne Konto benutzbar",
-        geschlossen: "Geschlossenes System — Konto nach Verifizierung",
+        geschlossen: "Öffentliche Seite — Nutzung nur mit Konto",
         /*
          * SELBSTPRUEFUNG G02 — DIESE ZEILE BEHAUPTETE ZU VIEL.
          *
@@ -3643,7 +3644,7 @@ const rawDictionary = {
       zugangLabel: "Erişim",
       zugang: {
         offen: "Hesapsız kullanılabilir",
-        geschlossen: "Kapalı sistem — doğrulamadan sonra hesap",
+        geschlossen: "Açık sayfa — kullanım yalnızca hesapla",
         intern: "Herkese açık adresi yok",
       },
       situCaption: "Uygulama sahada",
@@ -5449,7 +5450,7 @@ const rawDictionary = {
       zugangLabel: "Access",
       zugang: {
         offen: "Usable without an account",
-        geschlossen: "Closed system — account after verification",
+        geschlossen: "Public page — use with an account only",
         intern: "No public address",
       },
       situCaption: "The application in use",
@@ -7241,7 +7242,7 @@ const rawDictionary = {
       zugangLabel: "الوصول",
       zugang: {
         offen: "قابل للاستخدام دون حساب",
-        geschlossen: "نظام مغلق — حساب بعد التحقّق",
+        geschlossen: "صفحة عامة — الاستخدام بحساب فقط",
         intern: "لا يوجد عنوان عام",
       },
       situCaption: "التطبيق أثناء الاستخدام",

@@ -65,7 +65,8 @@ export type BelegQuelle =
  * Wie ein Fremder heute an das Produkt herankommt.
  *
  *   `geschlossen`  Es gibt eine oeffentliche Adresse, aber kein offenes
- *                  Produkt: Anmeldung, Konto nach Verifizierung.
+ *                  Produkt: Nutzung nur mit Konto (Registrierung oder
+ *                  Verifizierung) bzw. noch nicht verfuegbar.
  *   `intern`       Keine oeffentliche Adresse. Laeuft im eigenen Betrieb.
  *   `offen`        Ohne Konto benutzbar. Heute trifft das auf kein Produkt zu.
  *
@@ -141,50 +142,65 @@ export type ProduktBeleg = {
  * dieselbe, am richtigen Ort.
  * ---------------------------------------------------------------------------
  */
+/*
+ * Nachgeprueft 22.10.2026: Die alten JPG-Szenen (generiert) sind durch PNG-
+ * Screenshots der laufenden Produkte ersetzt (lib/media-provenance.ts,
+ * origin "real-ui"). Jede Aufnahme selbst angesehen: oeffentliche Startseite
+ * bzw. Anmeldung, keine Personendaten Dritter, keine Demodaten. Alle vier
+ * Adressen antworten (fibero, stammo, cassamea 200; meai.run 307 → Login).
+ * Keine ist ohne Konto benutzbar — daher „geschlossen", nicht „offen".
+ * meahv bleibt zurueckgehalten (OA-2), es hat keine oeffentliche Adresse.
+ */
 export const produktBelege: ProduktBeleg[] = [
   {
     slug: "fibero",
-    /* W4 — die Aufnahme war eine generierte Szene (lib/media-provenance.ts). */
-    situBild: null,
-    grundOhneBild: "szene-generiert",
-    /*
-     * fibero hat keine oeffentliche Adresse (`href` in `site-data` ist nicht
-     * gesetzt). Es laeuft im Glasfaser-Alltag — das ist der Beleg, und
-     * „intern" ist die ehrliche Zugangslage dazu, nicht ein Mangel.
-     */
-    zugang: "intern",
-    zugangHref: null,
-    quelle: "repository",
-    geprueft: "2026-09-10",
+    /* Startseite fibero.vercel.app — Registrierung noetig. */
+    situBild: "/works/fibero.png",
+    grundOhneBild: null,
+    zugang: "geschlossen",
+    zugangHref: "https://fibero.vercel.app",
+    quelle: "oeffentliche-produktseite",
+    geprueft: "2026-10-22",
+  },
+  {
+    slug: "stammo",
+    /* Startseite stammo.app — Test nur mit Konto. */
+    situBild: "/works/stammo.png",
+    grundOhneBild: null,
+    zugang: "geschlossen",
+    zugangHref: "https://stammo.app",
+    quelle: "oeffentliche-produktseite",
+    geprueft: "2026-10-22",
   },
   {
     slug: "meai",
-    /* W4 — die Aufnahme war eine generierte Szene (lib/media-provenance.ts). */
-    situBild: null,
-    grundOhneBild: "szene-generiert",
     /*
      * WEB-0009. `https://meai.run` antwortet mit 307 auf `/login?next=%2F`.
      * Dort steht ohne Anmeldung lesbar „Geschlossenes System · Zugang nur
-     * nach Verifizierung". Also: erreichbar, aber nicht offen.
+     * nach Verifizierung". Also: erreichbar, aber nicht offen. Die Aufnahme
+     * ist genau diese Anmeldeseite.
      *
      * Was hier bewusst NICHT steht: irgendeine Aussage ueber Sicherheit.
      * Dass auf derselben Seite „2-Faktor & Bot-Schutz folgen" steht, ist eine
      * Angabe des Produkts ueber sich selbst. creaDIG behauptet dazu hier
      * weder das Gegenteil noch etwas Beruhigendes — es behauptet nichts.
      */
+    situBild: "/works/meai.png",
+    grundOhneBild: null,
     zugang: "geschlossen",
     zugangHref: "https://meai.run",
     quelle: "oeffentliche-produktseite",
-    geprueft: "2026-09-10",
+    geprueft: "2026-10-22",
   },
   {
     slug: "cassamea",
-    situBild: null,
-    grundOhneBild: "demodaten-nicht-belegt",
-    zugang: "intern",
-    zugangHref: null,
-    quelle: "repository",
-    geprueft: "2026-09-10",
+    /* Startseite www.cassamea.com — „Bald verfügbar · 2026". */
+    situBild: "/works/cassamea.png",
+    grundOhneBild: null,
+    zugang: "geschlossen",
+    zugangHref: "https://www.cassamea.com",
+    quelle: "oeffentliche-produktseite",
+    geprueft: "2026-10-22",
   },
   {
     slug: "meahv",

@@ -294,9 +294,13 @@ function Kapitel({
       id={`ebene-${layerKey}`}
       data-index={index}
       aria-labelledby={`ebene-${layerKey}-title`}
+      /*
+       * Aktiv zeigt die Oberkante, nicht die Deckkraft: Vorher wurden inaktive
+       * Ebenen auf 45 % gedimmt — Text fiel damit auf 2,2:1 (axe, 22.10.2026).
+       */
       className={cn(
-        "border-line scroll-mt-32 border-t py-16 transition-opacity duration-[var(--dur-3)] lg:min-h-[85vh] lg:py-24",
-        aktiv ? "opacity-100" : "lg:opacity-45",
+        "scroll-mt-32 border-t py-16 transition-colors duration-[var(--dur-3)] lg:min-h-[85vh] lg:py-24",
+        aktiv ? "border-gold" : "border-line",
       )}
     >
       <div ref={innen}>

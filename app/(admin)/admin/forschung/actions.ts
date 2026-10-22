@@ -7,9 +7,14 @@ import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
 import { istProjekt, trageStundenEin } from "@/lib/agenten/forschung"
 
-export async function stundenEintragen(form: FormData): Promise<void> {
+/* F&E-Stunden sind Nachweis fuer die Forschungszulage — nur der Inhaber, auch wenn die Flaeche einmal weiter offen waere. */
+async function nurInhaber() {
   const z = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
   if (z.verdict !== "ok" || z.rolle !== "owner") redirect("/admin/forschung?meldung=Nur%20der%20Inhaber")
+}
+
+export async function stundenEintragen(form: FormData): Promise<void> {
+  await nurInhaber()
 
   const projekt = String(form.get("projekt") ?? "")
   const stunden = Number(String(form.get("stunden") ?? "").replace(",", "."))

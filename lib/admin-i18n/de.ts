@@ -44,6 +44,9 @@ export const de = {
     nachweise: { label: "Nachweise & Freigaben", hint: "Was als Nächstes beweisbar wird" },
     verbindungen: { label: "Verbindungen", hint: "Wege herein und hinaus, ehrlich benannt" },
     automationen: { label: "Automationen", hint: "Was ohne Zutun läuft — und was nie" },
+    webseite: { label: "Website-Prüfer", hint: "creadig.de täglich geprüft, Befunde verteilt" },
+    forschung: { label: "F&E-Nachweis", hint: "Stunden für die Forschungszulage" },
+    investoren: { label: "Investoren", hint: "Investor-Raum, Zugänge, Kennzahlen" },
     system: { label: "Einrichtung", hint: "Material, Zugänge, Diagnose" },
   },
   navGruppen: {
@@ -550,6 +553,7 @@ export const de = {
   },
   kundenListe: {
     titel: "Kunden",
+    neu: { titel: "Neuen Kunden anlegen", name: "Firma / Verein", ort: "Ort", website: "Website", beispiel: "beispiel.de", notiz: "Notiz", anlegen: "Anlegen" },
     lead: "Betriebe, Einrichtungen und Vereine — mit ihrer belegten Geschäftshistorie. Kundenhistorie heißt NICHT laufender Auftrag.",
     gesamt: (n: number) => `${n} gesamt`,
     suche: "Suche",

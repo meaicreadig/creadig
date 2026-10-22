@@ -36,11 +36,23 @@ const NAV = KNOTEN.flatMap((k) =>
 )
 
 /*
- * Verbindungen, Automationen und Einrichtung sind Technik, die im Hintergrund
- * läuft — sie stehen nicht im Menü, sondern hinter dem Zahnrad unten.
- * Gestörter Betrieb meldet sich von selbst auf der Übersicht.
+ * Technik und Hintergrund-Flächen — gemessen 22.10.2026: Website-Prüfer,
+ * Automationen, Verbindungen, Nachweise, F&E und Investoren waren nur über
+ * direkte Adressen erreichbar. Jetzt stehen sie in einer zugeklappten Gruppe
+ * „System“ am Ende der Leiste: auffindbar, ohne die Arbeitsbereiche zu
+ * verlängern. Gestörter Betrieb meldet sich weiterhin selbst auf der Übersicht.
  */
 const SYSTEM_HREF = "/admin/material"
+const SYSTEM_NAV = [
+  { key: "webseite", href: "/admin/webseite" },
+  { key: "veroeffentlichungen", href: "/admin/veroeffentlichungen" },
+  { key: "nachweise", href: "/admin/beleg" },
+  { key: "automationen", href: "/admin/automationen" },
+  { key: "verbindungen", href: "/admin/verbindungen" },
+  { key: "forschung", href: "/admin/forschung" },
+  { key: "investoren", href: "/admin/investoren" },
+  { key: "system", href: SYSTEM_HREF },
+] as const
 
 /**
  * ADM-01 — die Hülle jeder Admin-Seite.
@@ -74,6 +86,9 @@ export async function AdminShell({
     hint: t.nav[n.key].hint,
     gruppe: t.navGruppen[n.gruppe],
   }))
+  for (const s of SYSTEM_NAV) {
+    if (darfBetreten(rolle, s.href)) items.push({ href: s.href, icon: s.key, label: t.nav[s.key].label, hint: t.nav[s.key].hint, gruppe: t.navGruppen.system })
+  }
   const umschalter = (
     <SprachUmschalter
       aktuell={sprache}
@@ -118,7 +133,7 @@ export async function AdminShell({
             <div className="lg:hidden">{umschalter}</div>
           </div>
 
-          <AdminNav items={items} oeffnen={t.shell.menueOeffnen} schliessen={t.shell.menueSchliessen} />
+          <AdminNav items={items} oeffnen={t.shell.menueOeffnen} schliessen={t.shell.menueSchliessen} klappGruppe={t.navGruppen.system} />
 
           {rolle === "owner" && (
             <Link

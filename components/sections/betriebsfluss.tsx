@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react"
-import { AnimatePresence, motion } from "framer-motion"
-import { RotateCcw } from "lucide-react"
-import { useLocale } from "@/components/locale-provider"
-import { Reveal } from "@/components/ui/reveal"
-import { SectionEyebrow } from "@/components/ui/section-eyebrow"
-import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion"
-import { useSeenOnce } from "@/lib/use-seen-once"
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { RotateCcw } from "lucide-react";
+import { useLocale } from "@/components/locale-provider";
+import { Reveal } from "@/components/ui/reveal";
+import { SectionEyebrow } from "@/components/ui/section-eyebrow";
+import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion";
+import { useSeenOnce } from "@/lib/use-seen-once";
 
 /*
  * DAS SYSTEMBILD — eine Buehne statt zweier Zeilen.
@@ -20,9 +20,9 @@ import { useSeenOnce } from "@/lib/use-seen-once"
  * Es bleibt ein Modell, kein Kundenergebnis (`modelNote` steht am Bild).
  */
 
-const EASE = [0.22, 1, 0.36, 1] as const
+const EASE = [0.22, 1, 0.36, 1] as const;
 
-type Pt = readonly [number, number]
+type Pt = readonly [number, number];
 
 const CHAOS_WIDE: Pt[] = [
   [12, 22],
@@ -31,7 +31,7 @@ const CHAOS_WIDE: Pt[] = [
   [86, 38],
   [50, 32],
   [72, 66],
-]
+];
 const CHAOS_NARROW: Pt[] = [
   [14, 7],
   [50, 21],
@@ -39,53 +39,56 @@ const CHAOS_NARROW: Pt[] = [
   [54, 52],
   [16, 69],
   [48, 87],
-]
+];
 
 const TANGLES: readonly (readonly [number, number])[] = [
   [0, 4],
   [2, 5],
   [1, 3],
   [0, 2],
-]
+];
 
 function systemPoints(narrow: boolean, n: number): Pt[] {
   return Array.from({ length: n }, (_, i) => {
-    const t = i / (n - 1)
-    return narrow ? ([14, 7 + t * 80] as const) : ([8 + t * 84, 46] as const)
-  })
+    const t = i / (n - 1);
+    return narrow ? ([14, 7 + t * 80] as const) : ([8 + t * 84, 46] as const);
+  });
 }
 
 function clamp(v: number) {
-  return Math.min(98, Math.max(2, v))
+  return Math.min(98, Math.max(2, v));
 }
 
 function curve(a: Pt, b: Pt, ordered: boolean, sign: number) {
   if (ordered) {
-    const c1x = a[0] + (b[0] - a[0]) / 3
-    const c1y = a[1] + (b[1] - a[1]) / 3
-    const c2x = a[0] + ((b[0] - a[0]) * 2) / 3
-    const c2y = a[1] + ((b[1] - a[1]) * 2) / 3
-    return `M ${a[0]} ${a[1]} C ${c1x} ${c1y} ${c2x} ${c2y} ${b[0]} ${b[1]}`
+    const c1x = a[0] + (b[0] - a[0]) / 3;
+    const c1y = a[1] + (b[1] - a[1]) / 3;
+    const c2x = a[0] + ((b[0] - a[0]) * 2) / 3;
+    const c2y = a[1] + ((b[1] - a[1]) * 2) / 3;
+    return `M ${a[0]} ${a[1]} C ${c1x} ${c1y} ${c2x} ${c2y} ${b[0]} ${b[1]}`;
   }
-  const c1x = clamp(a[0] + (b[0] - a[0]) * 0.15 + sign * 22)
-  const c1y = clamp(a[1] - sign * 30)
-  const c2x = clamp(b[0] - (b[0] - a[0]) * 0.15 - sign * 18)
-  const c2y = clamp(b[1] + sign * 28)
-  return `M ${a[0]} ${a[1]} C ${c1x} ${c1y} ${c2x} ${c2y} ${b[0]} ${b[1]}`
+  const c1x = clamp(a[0] + (b[0] - a[0]) * 0.15 + sign * 22);
+  const c1y = clamp(a[1] - sign * 30);
+  const c2x = clamp(b[0] - (b[0] - a[0]) * 0.15 - sign * 18);
+  const c2y = clamp(b[1] + sign * 28);
+  return `M ${a[0]} ${a[1]} C ${c1x} ${c1y} ${c2x} ${c2y} ${b[0]} ${b[1]}`;
 }
 
 function curveMid(a: Pt, b: Pt, sign: number): Pt {
-  const c1x = clamp(a[0] + (b[0] - a[0]) * 0.15 + sign * 22)
-  const c1y = clamp(a[1] - sign * 30)
-  const c2x = clamp(b[0] - (b[0] - a[0]) * 0.15 - sign * 18)
-  const c2y = clamp(b[1] + sign * 28)
-  return [(a[0] + 3 * c1x + 3 * c2x + b[0]) / 8, (a[1] + 3 * c1y + 3 * c2y + b[1]) / 8]
+  const c1x = clamp(a[0] + (b[0] - a[0]) * 0.15 + sign * 22);
+  const c1y = clamp(a[1] - sign * 30);
+  const c2x = clamp(b[0] - (b[0] - a[0]) * 0.15 - sign * 18);
+  const c2y = clamp(b[1] + sign * 28);
+  return [
+    (a[0] + 3 * c1x + 3 * c2x + b[0]) / 8,
+    (a[1] + 3 * c1y + 3 * c2y + b[1]) / 8,
+  ];
 }
 
 function subscribeNarrow(cb: () => void) {
-  const mq = window.matchMedia("(max-width: 767px)")
-  mq.addEventListener("change", cb)
-  return () => mq.removeEventListener("change", cb)
+  const mq = window.matchMedia("(max-width: 767px)");
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
 }
 
 function useNarrow() {
@@ -93,36 +96,36 @@ function useNarrow() {
     subscribeNarrow,
     () => window.matchMedia("(max-width: 767px)").matches,
     () => false,
-  )
+  );
 }
 
 export function Betriebsfluss() {
-  const { t, locale } = useLocale()
-  const copy = t.home.betriebsfluss
-  const reduce = usePrefersReducedMotion()
-  const narrow = useNarrow()
-  const { ref, seen } = useSeenOnce<HTMLElement>(0.45)
-  const [ordered, setOrdered] = useState(false)
-  const [run, setRun] = useState(0)
+  const { t, locale } = useLocale();
+  const copy = t.home.betriebsfluss;
+  const reduce = usePrefersReducedMotion();
+  const narrow = useNarrow();
+  const { ref, seen } = useSeenOnce<HTMLElement>(0.45);
+  const [ordered, setOrdered] = useState(false);
+  const [run, setRun] = useState(0);
 
   useEffect(() => {
     if (reduce) {
-      setOrdered(true)
-      return
+      setOrdered(true);
+      return;
     }
-    if (!seen) return
-    setOrdered(false)
-    const id = window.setTimeout(() => setOrdered(true), 1900)
-    return () => window.clearTimeout(id)
-  }, [seen, reduce, run])
+    if (!seen) return;
+    setOrdered(false);
+    const id = window.setTimeout(() => setOrdered(true), 1900);
+    return () => window.clearTimeout(id);
+  }, [seen, reduce, run]);
 
-  const rtl = locale === "ar"
-  const flip = (p: Pt): Pt => (rtl && !narrow ? [100 - p[0], p[1]] : p)
-  const n = copy.stations.length
-  const chaos = (narrow ? CHAOS_NARROW : CHAOS_WIDE).map(flip)
-  const line = systemPoints(narrow, n).map(flip)
-  const pos = ordered ? line : chaos
-  const dur = reduce ? 0 : 1.4
+  const rtl = locale === "ar";
+  const flip = (p: Pt): Pt => (rtl && !narrow ? [100 - p[0], p[1]] : p);
+  const n = copy.stations.length;
+  const chaos = (narrow ? CHAOS_NARROW : CHAOS_WIDE).map(flip);
+  const line = systemPoints(narrow, n).map(flip);
+  const pos = ordered ? line : chaos;
+  const dur = reduce ? 0 : 1.4;
 
   return (
     <section
@@ -141,7 +144,9 @@ export function Betriebsfluss() {
             </h2>
           </Reveal>
           <Reveal delay={0.1} className="lg:col-span-5 lg:pb-2">
-            <p className="type-lead text-muted-foreground max-w-md text-pretty">{copy.lead}</p>
+            <p className="type-lead text-muted-foreground max-w-md text-pretty">
+              {copy.lead}
+            </p>
           </Reveal>
         </div>
 
@@ -153,7 +158,8 @@ export function Betriebsfluss() {
               backgroundImage:
                 "linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px)",
               backgroundSize: "40px 40px",
-              maskImage: "radial-gradient(ellipse at center, black 40%, transparent 85%)",
+              maskImage:
+                "radial-gradient(ellipse at center, black 40%, transparent 85%)",
             }}
           />
 
@@ -167,7 +173,7 @@ export function Betriebsfluss() {
                 { on: false, label: copy.todayLabel },
                 { on: true, label: copy.systemLabel },
               ].map((opt) => {
-                const active = ordered === opt.on
+                const active = ordered === opt.on;
                 return (
                   <button
                     key={opt.label}
@@ -175,7 +181,9 @@ export function Betriebsfluss() {
                     aria-pressed={active}
                     onClick={() => setOrdered(opt.on)}
                     className={`relative rounded-full px-5 py-2 text-sm font-medium transition-colors ${
-                      active ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                      active
+                        ? "text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {active && (
@@ -187,22 +195,37 @@ export function Betriebsfluss() {
                     )}
                     <span className="relative">{opt.label}</span>
                   </button>
-                )
+                );
               })}
             </div>
 
-            <dl className="flex items-end gap-8 md:gap-12">
-              <Metric value={ordered ? 0 : n - 1} label={copy.metricHandoffs} alarm={!ordered} />
-              <Metric value={ordered ? 1 : n} label={copy.metricTools} alarm={!ordered} />
+            {/* Der Knopf steht neben der Liste, nicht darin: in einem <dl> sind nur dt/dd-Gruppen erlaubt (axe, 22.10.2026). */}
+            <div className="flex items-end gap-8 md:gap-12">
+              <dl className="flex items-end gap-8 md:gap-12">
+                <Metric
+                  value={ordered ? 0 : n - 1}
+                  label={copy.metricHandoffs}
+                  alarm={!ordered}
+                />
+                <Metric
+                  value={ordered ? 1 : n}
+                  label={copy.metricTools}
+                  alarm={!ordered}
+                />
+              </dl>
               <button
                 type="button"
                 onClick={() => setRun((r) => r + 1)}
                 className="text-muted-foreground hover:text-foreground mb-1 hidden items-center gap-2 text-sm transition-colors sm:inline-flex"
               >
-                <RotateCcw className="size-4" strokeWidth={1.5} aria-hidden="true" />
+                <RotateCcw
+                  className="size-4"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
                 {copy.replay}
               </button>
-            </dl>
+            </div>
           </div>
 
           <div className="relative z-10 aspect-[3/4] w-full sm:aspect-[4/3] md:aspect-[21/9]">
@@ -241,7 +264,11 @@ export function Betriebsfluss() {
                     strokeDasharray: ordered ? "0 0" : "6 6",
                     opacity: ordered ? 1 : 0.8,
                   }}
-                  transition={{ duration: dur, ease: EASE, delay: ordered ? i * 0.04 : 0 }}
+                  transition={{
+                    duration: dur,
+                    ease: EASE,
+                    delay: ordered ? i * 0.04 : 0,
+                  }}
                 />
               ))}
             </svg>
@@ -249,7 +276,7 @@ export function Betriebsfluss() {
             <AnimatePresence>
               {!ordered &&
                 chaos.slice(0, -1).map((p, i) => {
-                  const m = curveMid(p, chaos[i + 1], i % 2 ? 1 : -1)
+                  const m = curveMid(p, chaos[i + 1], i % 2 ? 1 : -1);
                   return (
                     <motion.span
                       key={`break-${copy.stations[i]}`}
@@ -259,11 +286,14 @@ export function Betriebsfluss() {
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0, opacity: 0 }}
-                      transition={{ duration: reduce ? 0 : 0.35, delay: reduce ? 0 : 0.2 + i * 0.08 }}
+                      transition={{
+                        duration: reduce ? 0 : 0.35,
+                        delay: reduce ? 0 : 0.2 + i * 0.08,
+                      }}
                     >
                       {"×"}
                     </motion.span>
-                  )
+                  );
                 })}
             </AnimatePresence>
 
@@ -272,14 +302,27 @@ export function Betriebsfluss() {
                 key={`pulse-${narrow}-${rtl}`}
                 aria-hidden="true"
                 className="bg-gold absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full"
-                style={{ boxShadow: "0 0 0 6px color-mix(in oklab, var(--gold) 25%, transparent), 0 0 24px var(--gold)" }}
-                initial={{ left: `${line[0][0]}%`, top: `${line[0][1]}%`, opacity: 0 }}
+                style={{
+                  boxShadow:
+                    "0 0 0 6px color-mix(in oklab, var(--gold) 25%, transparent), 0 0 24px var(--gold)",
+                }}
+                initial={{
+                  left: `${line[0][0]}%`,
+                  top: `${line[0][1]}%`,
+                  opacity: 0,
+                }}
                 animate={{
                   left: [`${line[0][0]}%`, `${line[n - 1][0]}%`],
                   top: [`${line[0][1]}%`, `${line[n - 1][1]}%`],
                   opacity: [0, 1, 1, 0],
                 }}
-                transition={{ duration: 2.6, delay: 1.2, repeat: Number.POSITIVE_INFINITY, repeatDelay: 0.6, ease: "easeInOut" }}
+                transition={{
+                  duration: 2.6,
+                  delay: 1.2,
+                  repeat: Number.POSITIVE_INFINITY,
+                  repeatDelay: 0.6,
+                  ease: "easeInOut",
+                }}
               />
             )}
 
@@ -290,23 +333,38 @@ export function Betriebsfluss() {
                   className="absolute"
                   initial={false}
                   animate={{ left: `${pos[i][0]}%`, top: `${pos[i][1]}%` }}
-                  transition={{ duration: dur, ease: EASE, delay: ordered ? i * 0.05 : 0 }}
+                  transition={{
+                    duration: dur,
+                    ease: EASE,
+                    delay: ordered ? i * 0.05 : 0,
+                  }}
                 >
                   <motion.span
                     aria-hidden="true"
                     className="absolute block size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
                     animate={{
-                      backgroundColor: ordered ? "var(--gold)" : "var(--background)",
-                      borderColor: ordered ? "var(--gold)" : "var(--muted-foreground)",
+                      backgroundColor: ordered
+                        ? "var(--gold)"
+                        : "var(--background)",
+                      borderColor: ordered
+                        ? "var(--gold)"
+                        : "var(--muted-foreground)",
                     }}
                     transition={{ duration: reduce ? 0 : 0.5 }}
                   />
                   <motion.div
                     className={`absolute flex flex-col gap-1 ${
-                      narrow ? "top-0 ms-5 -translate-y-1/2" : "top-5 -translate-x-1/2 items-center text-center"
+                      narrow
+                        ? "top-0 ms-5 -translate-y-1/2"
+                        : "top-5 -translate-x-1/2 items-center text-center"
                     }`}
                     style={narrow && rtl ? { right: 0 } : undefined}
-                    animate={{ rotate: ordered || reduce ? 0 : (i % 2 ? 1 : -1) * (2 + (i % 3)) }}
+                    animate={{
+                      rotate:
+                        ordered || reduce
+                          ? 0
+                          : (i % 2 ? 1 : -1) * (2 + (i % 3)),
+                    }}
                     transition={{ duration: dur, ease: EASE }}
                   >
                     <span
@@ -353,22 +411,37 @@ export function Betriebsfluss() {
                 ordered ? "opacity-100" : "opacity-0"
               }`}
             >
-              <span aria-hidden="true" className="bg-gold size-[7px] rounded-full" />
+              <span
+                aria-hidden="true"
+                className="bg-gold size-[7px] rounded-full"
+              />
               {copy.ownership}
             </span>
           </div>
         </div>
 
-        <p className="text-meta text-muted-foreground mt-6 max-w-xl">{copy.modelNote}</p>
+        <p className="text-meta text-muted-foreground mt-6 max-w-xl">
+          {copy.modelNote}
+        </p>
       </div>
     </section>
-  )
+  );
 }
 
-function Metric({ value, label, alarm }: { value: number; label: string; alarm: boolean }) {
+function Metric({
+  value,
+  label,
+  alarm,
+}: {
+  value: number;
+  label: string;
+  alarm: boolean;
+}) {
   return (
     <div className="flex flex-col">
-      <dt className="text-muted-foreground order-2 text-xs md:text-sm">{label}</dt>
+      <dt className="text-muted-foreground order-2 text-xs md:text-sm">
+        {label}
+      </dt>
       <dd className="order-1 h-12 overflow-hidden md:h-14">
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.span
@@ -386,5 +459,5 @@ function Metric({ value, label, alarm }: { value: number; label: string; alarm: 
         </AnimatePresence>
       </dd>
     </div>
-  )
+  );
 }

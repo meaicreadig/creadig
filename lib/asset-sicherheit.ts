@@ -102,30 +102,35 @@ export type Asset = {
  * sie echte Daten zeigt, und was fehlt.
  */
 const ZUSATZ: Record<string, Pick<Asset, "echteDaten" | "geprueftVon" | "geprueftAm" | "fehlt">> = {
+  /*
+   * 22.10.2026: fibero, stammo, meai und cassamea zeigen jetzt PNG-Screenshots
+   * der oeffentlichen Start- bzw. Anmeldeseite (lib/produkt-beleg.ts). Darauf
+   * stehen keine Betriebs- oder Kundendaten. Die alte cassamea-Sperre (OA-1)
+   * galt dem JPG mit Personennamen; das ist nicht mehr eingebunden.
+   */
   fibero: {
     echteDaten: false,
-    geprueftVon: "Gate 02",
-    geprueftAm: "2026-09-10",
+    geprueftVon: "Beleg-Nachpruefung",
+    geprueftAm: "2026-10-22",
+    fehlt: null,
+  },
+  stammo: {
+    echteDaten: false,
+    geprueftVon: "Beleg-Nachpruefung",
+    geprueftAm: "2026-10-22",
     fehlt: null,
   },
   meai: {
     echteDaten: false,
-    geprueftVon: "Gate 02",
-    geprueftAm: "2026-09-10",
+    geprueftVon: "Beleg-Nachpruefung",
+    geprueftAm: "2026-10-22",
     fehlt: null,
   },
-  /*
-   * Die Dateien liegen unter `public/works/` und sind damit abrufbar — Gate
-   * 02 hat sie aus dem RENDER genommen, nicht aus dem Verzeichnis. Das ist
-   * der Owner-Punkt OA-1, und er steht hier als das, was er ist: ein offener
-   * Punkt, keine Loesung.
-   */
   cassamea: {
-    echteDaten: true,
-    geprueftVon: "Gate 02",
-    geprueftAm: "2026-09-10",
-    fehlt:
-      "Eine Aufnahme aus einer Demo-Instanz mit dem Musterbestand aus docs/ops/demo-data-standard.md — oder die Bestätigung, dass die sichtbaren Namen in der vorhandenen Aufnahme erfunden sind.",
+    echteDaten: false,
+    geprueftVon: "Beleg-Nachpruefung",
+    geprueftAm: "2026-10-22",
+    fehlt: null,
   },
   meahv: {
     echteDaten: true,
