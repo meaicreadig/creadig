@@ -258,6 +258,23 @@ export async function ladeNetz({
       }
     : leer(tr ? "ilk sayı" : "erste Ausgabe")
 
+  /* ── Redaktion: was auf Emin wartet (Website-Entwürfe + LinkedIn) ── */
+  const webEntwuerfe = await import("@/lib/artikel/store")
+    .then((m) => m.ladeArtikelListe("entwurf"))
+    .catch(() => [])
+  const redaktionWartet = webEntwuerfe.length + linkedinOffen
+  const redaktion: Signal = {
+    wert: String(redaktionWartet),
+    zeile: tr ? "taslak onay bekliyor" : "Entwürfe warten auf dich",
+    zustand: redaktionWartet ? "achtung" : "ruhig",
+    last: Math.min(1, 0.2 + redaktionWartet / 5),
+    punkte: [
+      ...webEntwuerfe.slice(0, 2).map((a) => a.titel[tr ? "tr" : "de"]),
+      ...(linkedinOffen ? [tr ? `${linkedinOffen} LinkedIn paylaşımı` : `${linkedinOffen} LinkedIn-Beiträge`] : []),
+    ],
+    wege: [{ label: tr ? "Redaksiyonu aç" : "Redaktion öffnen", href: "/admin/redaktion" }],
+  }
+
   /* ── Leistung ── */
   const puls = (await letzteLaeufe().catch(() => ({}) as Awaited<ReturnType<typeof letzteLaeufe>>))["puls"]
   const leistung: Signal = puls
@@ -356,7 +373,7 @@ export async function ladeNetz({
   const operativ = items.filter((i) => i.rank !== "entscheidung" && i.rank !== "betriebsblocker").length
   const imBlick = operativ + (truppeOffen ?? 0) + linkedinOffen
   const stoerungen = [system, assistent].filter((s) => s.zustand === "stoerung").length
-  const achtung = [assistent, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen, finanz].filter(
+  const achtung = [assistent, verkaufen, gespraech, termine, vertrieb, kunden, redaktion, mailstudio, marketing, messen, finanz].filter(
     (s) => s.zustand === "achtung",
   ).length
   const uebersicht: Signal = {
@@ -371,5 +388,5 @@ export async function ladeNetz({
     wege: [{ label: tr ? "Bugün yapılacaklar" : "Heute zu tun", href: "#heute-titel" }],
   }
 
-  return { uebersicht, assistent, leistung, bulletin, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen, finanz, system, webseite, forschung }
+  return { uebersicht, assistent, leistung, bulletin, redaktion, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen, finanz, system, webseite, forschung }
 }

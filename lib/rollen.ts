@@ -200,6 +200,8 @@ export const FLAECHEN: readonly Flaeche[] = [
 
   /* Marketing-Übersicht: liest dieselben Veröffentlichungen, also dieselbe Regel — nur `owner`. */
   { pfad: "/admin/marketing", klasse: "eigene-lage", fuer: ["owner"] },
+  /* Redaktion: Entwürfe vor der Freigabe, Register, Agentenläufe — dieselbe Regel, nur `owner`. */
+  { pfad: "/admin/redaktion", klasse: "eigene-lage", fuer: ["owner"] },
   /* Mail-Studio: Verteiler enthält fremde Adressen — ebenfalls nur `owner`. */
   /* SEO aus der Google Search Console — eigene Kennzahlen, keine Personen. */
   { pfad: "/admin/marketing/seo", klasse: "eigene-lage", fuer: ["owner"] },
