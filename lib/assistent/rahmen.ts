@@ -2,6 +2,7 @@ import "server-only"
 
 import { berechneLage } from "@/lib/finanz/lage"
 import { finanzDb } from "@/lib/finanz/store"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 export type Rahmen = {
   freiEur: number | null
@@ -47,4 +48,5 @@ export async function firmenRahmen(): Promise<Rahmen> {
   }
 }
 
-export const INHABER = `creaDIG Solutions ist ein Einzelunternehmen in Niedersachsen. Inhaber Muhammed Emin Akyol arbeitet allein, ohne Team und ohne Investor. Produkte: fibero (SaaS für Glasfaser-Montagefirmen, die große Wette – erst 10–20 zahlende Firmen, dann verkaufsfähig), stammo (digitale Wallet-Stempelkarte für Gastronomie/Handel, 39/69 € im Monat), Web- und Systemprojekte für Betriebe, Vereine und Verbände (bringt heute das Geld). Märkte: DACH, Türkei, später Golfstaaten. Engpass: Vertrieb und Zeit, nicht Technik.`
+/** Die Firma, wie jeder Agent sie kennen muss — Quelle: lib/firmenwahrheit.ts. */
+export const INHABER = firmenText("voll")

@@ -39,6 +39,7 @@ import {
   type Lauf,
   type RatProtokoll,
 } from "./store"
+import { firmenText, firmenTextEn } from "@/lib/firmenwahrheit"
 
 export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite", "qualitaet", "wissen", "forderungen", "sicherheit", "kundenservice", "forschung"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
@@ -233,8 +234,9 @@ async function kapital(): Promise<Ergebnis> {
   const { text } = await generateText({
     model: RECHERCHE,
     prompt: `Recherchiere aktuell (Stand ${berlinTag(new Date())}) offene Förderprogramme, Förderkredite, Wettbewerbe mit Preisgeld und Investoren-Programme für:
-creaDIG Solutions, Einzelunternehmen in Niedersachsen (Deutschland), Inhaber Muhammed Emin Akyol. Produkte: fibero (SaaS für Glasfaser-Montagefirmen), stammo (digitale Wallet-Treuekarte für Gastronomie/Einzelhandel), Web- und Systementwicklung für Betriebe. Ziel: Wachstum, Vertrieb, Internationalisierung (DACH, Türkei, Golfstaaten).
-Nur Programme, die JETZT Anträge annehmen und für ein Einzelunternehmen zulässig sind. Bevorzugt: NBank, KfW, BAFA, EU (EIC, Horizon), Bund-Digitalprogramme, Accelerator in DACH/Türkei/Golf.
+${firmenText("voll")}
+Ziel: Wachstum und Vertrieb in Deutschland, der Schweiz und Europa.
+Nur Programme, die JETZT Anträge annehmen und für ein Einzelunternehmen zulässig sind. Bevorzugt: NBank, KfW, EU (EIC, Horizon), Bund-Digitalprogramme, Accelerator in DACH/EU.
 Antworte NUR mit einem JSON-Array (max. 4 Einträge): [{"programm":"","geber":"","betrag":"Spanne oder Höhe laut Quelle","frist":"Datum oder laufend","url":"offizielle Seite","warum":"1 Satz, warum es zu creaDIG passt"}]. Keine Erfindungen – wenn unsicher, weglassen.`,
   })
   const chancen = jsonListe<Chance>(text).filter((c) => c?.programm && c?.url?.startsWith("http"))
@@ -339,7 +341,8 @@ async function redaktion(): Promise<Ergebnis> {
 async function schreibeBeitrag(s: Saeule, l: RedaktionsLage): Promise<boolean> {
   const { text } = await generateText({
     model: MODELL,
-    prompt: `Du bist die Redaktion von creaDIG Solutions (Einzelunternehmen, Inhaber Muhammed Emin Akyol). Du schreibst genau EINEN LinkedIn-Beitrag auf Deutsch.
+    prompt: `Du bist die Redaktion von creaDIG Solutions. Du schreibst genau EINEN LinkedIn-Beitrag auf Deutsch.
+${firmenText("voll")}
 
 SÄULE: ${s.name} – Ziel: ${s.ziel}
 KANAL: ${s.kanal === "firma" ? "Unternehmensseite creaDIG" : "persönliches Profil von Emin"} · Stimme: ${s.stimme}
@@ -645,7 +648,7 @@ async function golf(): Promise<Ergebnis> {
   const { text } = await generateText({
     model: RECHERCHE,
     prompt: `Research (as of ${berlinTag(new Date())}) concrete, currently active opportunities in the UAE, Saudi Arabia and Qatar for this company:
-creaDIG Solutions (Germany), founder Muhammed Emin Akyol, speaks German, English, Turkish, Arabic. An AI-run technology house: vertical SaaS (fibero for fibre-optic installers, stammo wallet loyalty cards), its own AI operating system (15 departments run by AI agents), and Islamic digital services (Quran study with Arabic root reading, donation live-streaming, mosque/association management).
+${firmenTextEn()} The founder speaks German, English, Turkish and Arabic. Also: its own AI operating system (15 departments run by AI agents), and Islamic digital services (Quran study with Arabic root reading, donation live-streaming, mosque/association management).
 Goal: strategic investor or partner for Gulf expansion, NOT small client work.
 Look for: accelerator/soft-landing programmes accepting foreign founders (Hub71, DIFC Innovation Hub, in5, Dubai Future District, Garage Riyadh, Misk, Monsha'at, QSTP, Qatar Development Bank), AI/tech investment funds and family offices with a stated tech or Islamic-economy thesis, awqaf/Islamic-economy digitalisation initiatives, and events with investor meetings (LEAP, GITEX, Web Summit Qatar) with open application or registration deadlines.
 Only real, verifiable entries with an official URL. Max 3.

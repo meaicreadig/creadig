@@ -12,6 +12,7 @@ import {
   type MesseKategorie,
   type MesseRegion,
 } from "@/lib/messen"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 export type MesseStatus = "teilnehmen" | "interessiert" | "nein"
 export const MESSE_STATUS: readonly MesseStatus[] = ["teilnehmen", "interessiert", "nein"]
@@ -20,7 +21,8 @@ export const MESSE_STATUS: readonly MesseStatus[] = ["teilnehmen", "interessiert
 const RECHERCHE_MODELL = "perplexity/sonar"
 
 const INTERESSEN = `
-Inhaber: creaDIG Solutions (Einzelunternehmen, Deutschland). Interessen nach Priorität:
+Inhaber: ${firmenText("kurz")}
+Interessen nach Priorität (Emins eigene Suchliste, bewusst breiter als die Zielmärkte):
 1. Digitale Produkte, Software, SaaS, KI — Messen für Mittelstand und Vereine.
 2. Digitale Gastronomie / Food-Tech / Hospitality-Tech (Kassen, Bestellung, Treue-Apps) — KEINE reinen Lebensmittelmessen.
 3. Golfstaaten (Saudi-Arabien, VAE, Katar, Kuwait): Koran, islamische Bildung und Medien, digitale islamische Produkte, Tech-Messen.

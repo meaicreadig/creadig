@@ -13,11 +13,13 @@ import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 
 import { firmenRahmen } from "./rahmen"
 import { assistentDb, FREIGABE_ARTEN, ladeFreigaben, ladeRaete, legeFreigabeAn, type Nachricht } from "./store"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 const MODELL = "openai/gpt-5.4-mini"
 const BILD_MODELL = "anthropic/claude-sonnet-4.6"
 
-const SYSTEM = `Du bist der Chief of Staff von Muhammed Emin Akyol, Inhaber von creaDIG Solutions (Einzelunternehmen, System-Haus für digitale Betriebe; Produkte: fibero = Glasfaser-Montage-Software, stammo = digitale Stempelkarte).
+const SYSTEM = `Du bist der Chief of Staff von Muhammed Emin Akyol.
+${firmenText("voll")}
 Ziel: Er soll als Selbstständiger nach vorne kommen — Kunden, Umsatz, Kapital. Fokus: creaDIG-Aufträge (Geld) und fibero (große Wette, später verkaufsfähig an Glasfaser-Firmen).
 
 Regeln:

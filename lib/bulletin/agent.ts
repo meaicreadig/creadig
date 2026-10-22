@@ -16,13 +16,15 @@ import {
   type RessortId,
   type Zweisprachig,
 } from "./store"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 const RECHERCHE = "perplexity/sonar"
 const REDAKTION = "openai/gpt-5.4-mini"
 
 const heute = () => new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Berlin" })
 
-const FIRMA = `creaDIG Solutions (Einzelunternehmen in Niedersachsen, Inhaber Muhammed Emin Akyol). Eine KI-geführte Technologie-Firma: vertikale SaaS (fibero für Glasfaser-Montagefirmen, stammo digitale Wallet-Treuekarte für Gastronomie/Handel), Web- und Systementwicklung für Betriebe, eigenes KI-Betriebssystem mit Agenten, islamische Digitalangebote. Märkte: Deutschland/EU (Kunden), Türkei (Lieferkraft), Golfstaaten (Kapital, Partner).`
+/** Quelle: lib/firmenwahrheit.ts */
+const FIRMA = firmenText("voll")
 
 type Fund = { ressort: string; titel: string; fakten: string; quelle: string; url: string; datum?: string }
 
@@ -155,7 +157,8 @@ async function verteileLage(tag: string, lage: string, meldungen: Meldung[]): Pr
   const ids = new Set(ABTEILUNGEN.map((a) => a.id))
   const { text } = await generateText({
     model: "openai/gpt-5.4-mini",
-    prompt: `Du bist der Chief of Staff von creaDIG Solutions (System-Haus; Produkte fibero = Glasfaser-Montage-Software, stammo = digitale Stempelkarte, eigenes KI-Betriebssystem).
+    prompt: `Du bist der Chief of Staff von creaDIG Solutions.
+${FIRMA}
 Aus der heutigen Marktlage leitest du bis zu 3 KONKRETE interne Aufträge ab, die creaDIG nach vorne bringen. Jeder Auftrag geht an genau eine Abteilung, die ihn selbst bearbeiten kann (Analyse, Entwurf, Konzept, Positionierung). Nichts, was Geld kostet oder nach außen geht.
 Abteilungen: ${ABTEILUNGEN.map((a) => `${a.id} (${a.name.de})`).join(", ")}
 

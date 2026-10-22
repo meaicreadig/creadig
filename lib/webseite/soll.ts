@@ -1,3 +1,5 @@
+import { firmenText } from "@/lib/firmenwahrheit"
+
 /**
  * Das Soll der Webseite — woran der Website-Prüfer den echten Text misst.
  *
@@ -7,14 +9,9 @@
  * Datei — und der Prüfer meldet am nächsten Morgen jede Seite, die nachzieht.
  */
 
-/** Kurzfassung für KI-Blicke (Design, Inhalt). */
-export const SOLL_KURZ = `creaDIG Solutions — System-Haus für digitale Betriebe, Inhaber Muhammed Emin Akyol, ICO Osnabrück.
-Märkte: 1. Deutschland, 2. Schweiz, 3. übriges Europa (Nische: Handwerk und türkischsprachige Betriebe in Europa).
-Marke: Kobaltblau #2F5BEA, Schrift Manrope. Ton: sachlich, hochwertig, keine Werbefloskeln, zeigen statt behaupten.
-Steuer: umsatzsteuerpflichtig, Preise netto zzgl. 19 % USt. (kein Kleinunternehmer).
-Angebote: Website-Paket, BFSG-Barrierefreiheit (Prüfung 1.500 €, Behebung 2.000–4.000 €, Betreuung 149 €/Monat), Systeme/KI-Agenten.
-Eigene Produkte: meAI, fibero, stammo (live, stammo.app), CASSAMEA, meahv.
-Verboten: Zertifizierungen/Partnerstatus ohne Nachweis (BAFA, go-digital, iuk, AVPQ, AGD), erfundene Zahlen, erfundene Kundenstimmen, Platzhalter.`
+/** Kurzfassung für KI-Blicke (Design, Inhalt) — Quelle: lib/firmenwahrheit.ts. */
+export const SOLL_KURZ = `${firmenText("voll")}
+Marke: Kobaltblau #2F5BEA, Schrift Manrope. Ton: sachlich, hochwertig, keine Werbefloskeln, zeigen statt behaupten.`
 
 export type SollRegel = {
   code: string

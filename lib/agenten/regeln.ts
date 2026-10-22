@@ -1,3 +1,5 @@
+import { VERBOTENE_AUSSAGEN, bekanntePreiseEur } from "@/lib/firmenwahrheit"
+
 /**
  * Reine Regeln der neuen Abteilungen (Qualität, Wissen, Sicherheit, Forschung).
  *
@@ -55,32 +57,11 @@ export function bewerte(z: AgentZahlen): Bewertung {
 
 export type Behauptung = { muster: RegExp; grund: string }
 
-/**
- * Jede Zeile ist eine früher tatsächlich aufgetauchte oder naheliegende
- * Falschaussage. Quelle der Wahrheit: Owner-Entscheidungen (keine
- * Zertifizierungen, Einzelunternehmen, Telekom & Co. nie als Kunden).
- */
-export const VERBOTENE_BEHAUPTUNGEN: Behauptung[] = [
-  { muster: /\bBAFA[- ]?(zertifiziert|gelistet|autorisiert|anerkannt|berater)/i, grund: "BAFA-Zertifizierung/-Listung existiert nicht" },
-  { muster: /\b(iuk|AVPQ|AGD)[- ]?(zertifiziert|mitglied|gepr[uü]ft|qualifiziert)/i, grund: "Zertifizierung/Mitgliedschaft (iuk/AVPQ/AGD) existiert nicht" },
-  { muster: /\b(zertifiziert|mitglied)\b[^.\n]{0,40}\b(BAFA|iuk|AVPQ|AGD)\b/i, grund: "Zertifizierung/Mitgliedschaft (BAFA/iuk/AVPQ/AGD) existiert nicht" },
-  { muster: /go[- ]?digital[^.\n]{0,40}(autorisiert|zugelassen|berater|f[oö]rderf[aä]hig über uns)/i, grund: "Keine go-digital-Autorisierung" },
-  { muster: /\b(gegr[uü]ndet|seit)\s+(im\s+jahr\s+)?2018\b|\b2018\s+gegr[uü]ndet\b/i, grund: "Falsches Jahr: Marke seit 2017, Einzelunternehmen seit 01.10.2025" },
-  {
-    muster: /\b(Telekom|Glasfaser\s*NordWest|1\s*&\s*1|Drillisch)\b[^.\n]{0,60}\b(Kunde|Kunden|Referenz|Partner|f[uü]r die wir|Auftraggeber)/i,
-    grund: "Telekom/Glasfaser NordWest/1&1/Drillisch dürfen nie als Kunde oder Partner genannt werden",
-  },
-  {
-    muster: /\b(Kunde|Kunden|Referenz|Partner|Auftraggeber)\b[^.\n]{0,60}\b(Telekom|Glasfaser\s*NordWest|1\s*&\s*1|Drillisch)\b/i,
-    grund: "Telekom/Glasfaser NordWest/1&1/Drillisch dürfen nie als Kunde oder Partner genannt werden",
-  },
-  { muster: /\b\d{1,3}\s?%\s+(mehr|h[oö]here[rn]?|weniger|schneller|g[uü]nstiger)\s+\w+/i, grund: "Prozent-Wirkungsversprechen ohne belegte Quelle" },
-  { muster: /\b(Team|Mannschaft)\s+(von|aus)\s+(\d{2,}|zwanzig|drei[sß]ig|vielen|über)\b/i, grund: "Größenbehauptung zum Team – creaDIG ist ein Einzelunternehmen" },
-  { muster: /\b(\d{2,})\s+(Mitarbeiter(innen)?|Angestellte|Experten)\b/i, grund: "Mitarbeiterzahl – creaDIG ist ein Einzelunternehmen" },
-]
+/** Quelle: `lib/firmenwahrheit.ts` — dort wird die Liste gepflegt, hier nur angewandt. */
+export const VERBOTENE_BEHAUPTUNGEN: Behauptung[] = VERBOTENE_AUSSAGEN
 
-/** Öffentliche Preise (docs/website-2/pricing-inventory.md, lib/site-data.ts, stammo.app) in Euro. */
-export const BEKANNTE_PREISE_EUR = [2400, 3900, 1500, 2000, 4000, 149, 39, 69] as const
+/** Öffentliche Preise in Euro — aus `lib/offers.ts` über die Firmenwahrheit. */
+export const BEKANNTE_PREISE_EUR: readonly number[] = bekanntePreiseEur()
 
 const PREIS = /(\d{1,3}(?:[.\u00a0\u202f]\d{3})*|\d+)(?:,\d{2})?\s?(?:€|EUR|Euro)(?![A-Za-z])|(?:€|EUR)\s?(\d{1,3}(?:[.\u00a0\u202f]\d{3})*|\d+)/gi
 
@@ -91,7 +72,7 @@ export function fremdePreise(text: string): number[] {
     const roh = (m[1] ?? m[2] ?? "").replace(/[.\u00a0\u202f]/g, "")
     const n = Number(roh)
     if (!Number.isFinite(n) || n <= 0) continue
-    if (!(BEKANNTE_PREISE_EUR as readonly number[]).includes(n)) funde.push(n)
+    if (!BEKANNTE_PREISE_EUR.includes(n)) funde.push(n)
   }
   return [...new Set(funde)]
 }

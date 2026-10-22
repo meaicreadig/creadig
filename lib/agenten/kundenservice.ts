@@ -7,6 +7,7 @@ import { sperrGrund } from "@/lib/recht/compliance"
 import { tabelleFehlt, type Abfrage } from "@/lib/neon-abfrage"
 
 import { istVerdaechtig } from "./regeln"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 /**
  * Abteilung Kundenservice.
@@ -42,7 +43,8 @@ async function bekannterKunde(q: Abfrage, mail: string): Promise<string | null> 
 async function entwurf(m: Mail, kunde: string | null): Promise<string> {
   const { text } = await generateText({
     model: MODELL,
-    prompt: `Du bist der Kundenservice von creaDIG Solutions (Einzelunternehmen von Muhammed Emin Akyol: Websites, Digitalisierung, Barrierefreiheit, Software fibero und stammo).
+    prompt: `Du bist der Kundenservice von creaDIG Solutions.
+${firmenText("voll")}
 ${kunde ? `Absender ist bekannt: ${kunde}.` : "Absender ist UNBEKANNT – bedanke dich und frage freundlich nach, worum es genau geht und in welchem Zusammenhang."}
 
 Schreibe einen Antwortentwurf: Deutsch (oder die Sprache des Absenders), Sie-Form, höchstens 120 Wörter, menschlich, konkret.

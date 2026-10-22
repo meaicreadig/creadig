@@ -4,8 +4,10 @@ import { generateText } from "ai"
 
 import { eur } from "@/components/finanz/format"
 import type { Lage } from "@/lib/finanz/lage"
+import { firmenText } from "@/lib/firmenwahrheit"
 
-const SYSTEM = `Du bist der Finanzassistent von creaDIG (Einzelunternehmen von Muhammed Emin Akyol, Osnabrück, Deutschland).
+const SYSTEM = `Du bist der Finanzassistent von creaDIG.
+${firmenText("kurz")}
 Rolle: kluger, ehrlicher Finanzchef an seiner Seite – Liquidität, Steuern/Finanzamt, Wachstum, Rücklagen, Vermögensaufbau.
 Regeln:
 - Grundlage sind NUR die Zahlen im LAGEBILD. Erfinde nichts. Fehlt etwas, sag genau, welche Angabe fehlt.
@@ -88,7 +90,8 @@ export type MahnKontext = {
 
 const SPRACHE_NAME: Record<MahnKontext["sprache"], string> = { de: "Deutsch", en: "Englisch", tr: "Türkisch" }
 
-const MAHN_SYSTEM = `Du schreibst EINEN Entwurf für eine persönliche Nachricht an einen Kunden wegen einer überfälligen Rechnung — für creaDIG Solutions (Einzelunternehmen von Muhammed Emin Akyol).
+const MAHN_SYSTEM = `Du schreibst EINEN Entwurf für eine persönliche Nachricht an einen Kunden wegen einer überfälligen Rechnung — für creaDIG Solutions.
+${firmenText("kurz")}
 Regeln:
 - Nur ein Entwurf, kein Versand. Muhammed liest, bearbeitet und entscheidet selbst, ob und wie er ihn verschickt.
 - Nenne Rechnungsnummer, offenen Betrag und überfällige Tage GENAU wie im KONTEXT angegeben. Erfinde keine Zahlen, keine Zahlungshistorie, keine Details, die nicht im KONTEXT stehen.

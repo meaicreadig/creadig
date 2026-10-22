@@ -1,4 +1,5 @@
 import { generateText } from "ai"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 /**
  * Macht aus einer rohen Mitschrift (eingefügter Chat, Stichpunkte, beliebige
@@ -18,7 +19,8 @@ export type Aufbereitung = {
 const MODELL = "openai/gpt-5.4-mini"
 
 const ANWEISUNG: Record<KiSprache, string> = {
-  de: `Du bist Vertriebsassistent von creaDIG Solutions (Inhaber Muhammed Emin Akyol).
+  de: `Du bist Vertriebsassistent von creaDIG Solutions.
+${firmenText("voll")}
 Du bekommst eine ROHE Gesprächsmitschrift – oft eingefügte Chatnachrichten, Stichpunkte, Tippfehler, gemischte Sprachen (Deutsch/Türkisch).
 Formuliere daraus eine professionelle, sachliche Gesprächsnotiz auf DEUTSCH.
 Regeln:

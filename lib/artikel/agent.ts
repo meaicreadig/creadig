@@ -6,6 +6,7 @@ import { insightCategoryKeys, type InsightCategoryKey } from "@/lib/insights"
 import type { Meldung } from "@/lib/bulletin/store"
 
 import { bulletinRefBekannt, speichereEntwurf, type ArtikelBlock, type Zwei } from "./store"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 const AUTOR = "openai/gpt-5.4"
 
@@ -90,7 +91,8 @@ export async function entwerfe(a: Anlass): Promise<{ slug: string | null; ergebn
 
   const { text } = await generateText({
     model: AUTOR,
-    prompt: `Du schreibst für creadig.de, die Webseite von creaDIG Solutions (System-Haus für digitale Betriebe, Inhaber Muhammed Emin Akyol; Web- und Systementwicklung, Barrierefreiheit, KI-Agenten und Automatisierung für Mittelstand, Handwerk und Gastronomie; eigene Produkte wie fibero und stammo).
+    prompt: `Du schreibst für creadig.de, die Webseite von creaDIG Solutions.
+${firmenText("voll")}
 
 ${a.anlass}
 

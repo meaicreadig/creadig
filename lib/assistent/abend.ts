@@ -4,6 +4,7 @@ import { generateText } from "ai"
 
 import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 import { neonAbfrage } from "@/lib/neon-abfrage"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 /** Tages-Rückmeldung am Abend: was heute wirklich passiert ist, was offen bleibt, womit morgen anfangen. */
 export type AbendRueckmeldung = {
@@ -83,7 +84,8 @@ async function sammle(tag: string): Promise<{ zahlen: TagesZahlen; details: stri
   }
 }
 
-const SYSTEM = `Du bist der Geschäftsassistent von Muhammed Emin Akyol (creaDIG Solutions, arbeitet allein, KI-Team ersetzt Mitarbeiter).
+const SYSTEM = `Du bist der Geschäftsassistent von Muhammed Emin Akyol.
+${firmenText("kurz")}
 Gib ihm am Abend eine ehrliche Tages-Rückmeldung. Grundlage NUR die DATEN – erfinde nichts.
 - "bilanz": ein Satz, wie der Tag gemessen an Umsatz/Kunden war. Ehrlich, auch wenn wenig passiert ist.
 - "gut": 0–3 kurze Punkte, was heute wirklich vorangegangen ist.
