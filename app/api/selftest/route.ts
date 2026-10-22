@@ -205,8 +205,11 @@ async function alert(checks: Check[]) {
 }
 
 export async function GET(request: Request) {
-  const secret = process.env.SELFTEST_SECRET
-  if (!secret) {
+  const secret = process.env.SELFTEST_SECRET?.trim() ?? ""
+  // Abgeschaltet nur, wenn es GAR keinen Ausweis gibt. Vorher blockte ein
+  // fehlendes SELFTEST_SECRET auch den CRON_SECRET-Weg — der 07:00-Cron lief
+  // dadurch täglich in 503.
+  if (!secret && !process.env.CRON_SECRET?.trim()) {
     return NextResponse.json(
       { ok: false, error: "selftest_disabled" },
       { status: 503, headers: { "Cache-Control": "no-store" } },
@@ -239,7 +242,7 @@ export async function GET(request: Request) {
 
   // Ohne Ausweis gibt es diese Route nicht — 404 statt 401, damit ein
   // Fremder nicht einmal erfaehrt, dass hier etwas zu erraten waere.
-  if (!alsCron && !equal(provided, secret)) {
+  if (!alsCron && !(secret && equal(provided, secret))) {
     return NextResponse.json({ ok: false }, { status: 404, headers: { "Cache-Control": "no-store" } })
   }
 
