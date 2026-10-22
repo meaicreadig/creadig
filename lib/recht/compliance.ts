@@ -78,6 +78,16 @@ export async function sperre(adresse: string, grund: string, quelle?: string | n
      WHERE status = 'offen' AND art = 'mail' AND (lower(empfaenger) = $1 OR lower(empfaenger) LIKE $2)`,
     [norm(adresse), art === "domain" ? `%@${domain}` : norm(adresse)],
   )
+  /* Ins Rückgrat melden: kein Motor-Ablauf schreibt dieser Person weiter. */
+  const kontakt = (await q(`SELECT id FROM contacts WHERE email_normalised = $1 LIMIT 1`, [norm(adresse)]).catch(() => [])) as { id: string }[]
+  const { ereignis } = await import("@/lib/motor/ereignis")
+  await ereignis("kontakt_gesperrt", {
+    kontaktId: kontakt[0]?.id ?? null,
+    subjekt: `mail:${norm(adresse)}`,
+    email: norm(adresse),
+    daten: { grund: grund.slice(0, 200) },
+    schluessel: `sperre:${wert}`,
+  })
   return wert
 }
 

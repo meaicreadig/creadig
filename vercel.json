@@ -14,6 +14,14 @@
       "schedule": "0 5 * * *"
     },
     {
+      "path": "/api/assistent/truppe?runde=2",
+      "schedule": "25 5 * * *"
+    },
+    {
+      "path": "/api/assistent/truppe?runde=3",
+      "schedule": "50 5 * * *"
+    },
+    {
       "path": "/api/assistent/puls?runde=mittag",
       "schedule": "0 10 * * *"
     },

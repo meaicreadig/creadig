@@ -187,6 +187,7 @@ export async function nachfassen(): Promise<number> {
      WHERE art = 'mail' AND status = 'freigegeben'
        AND extra ? 'gesendetAt' AND NOT extra ? 'antwortAt' AND NOT extra ? 'nachfassId'
        AND NOT extra ? 'kampagneId'
+       AND coalesce(agent, '') <> 'forderungen'
        AND COALESCE((extra->>'stufe')::int, 0) < $1
        AND (extra->>'gesendetAt')::timestamptz < now() - make_interval(days =>
              CASE WHEN COALESCE((extra->>'stufe')::int, 0) = 0 THEN $2::int ELSE $3::int END)
@@ -245,6 +246,21 @@ export async function markiereAntwort(id: string, opts: { faden?: boolean } = {}
     await notiereAntwort(nq, f[0].empfaenger, f[0].betreff, id).catch((e) =>
       console.error("[kundenfaden] Antwort nicht protokolliert:", (e as Error).message),
     )
+  }
+  /* Ins Rückgrat melden: stoppt Motor-Abläufe dieser Person (auch die ihrer Anfrage). */
+  const empfaenger = f[0]?.empfaenger?.trim().toLowerCase() ?? null
+  if (empfaenger) {
+    const kontakt = nq
+      ? ((await nq(`SELECT id FROM contacts WHERE email_normalised = $1 LIMIT 1`, [empfaenger]).catch(() => [])) as { id: string }[])
+      : []
+    const { ereignis } = await import("@/lib/motor/ereignis")
+    await ereignis("antwort_erhalten", {
+      kontaktId: kontakt[0]?.id ?? null,
+      subjekt: `mail:${empfaenger}`,
+      email: empfaenger,
+      daten: { freigabe: id },
+      schluessel: `antwort:${id}`,
+    })
   }
 }
 

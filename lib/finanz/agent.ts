@@ -1,6 +1,5 @@
 import "server-only"
 
-import { legeFreigabeAn } from "@/lib/assistent/store"
 import { legeAngebotsEntwuerfeAusChancen } from "@/lib/finanz/angebot-aus-chance"
 import { ordneAllesAutomatischZu } from "@/lib/finanz/auto"
 import { erzeugeFaelligeAboEntwuerfe } from "@/lib/finanz/abos"
@@ -8,13 +7,11 @@ import { heuteBerlin } from "@/lib/finanz/auftraege/rechnen"
 import { erstelleMorgenBericht } from "@/lib/finanz/morgenmail"
 import { finanzDb, protokolliere } from "@/lib/finanz/store"
 
-const STUFE = ["", "Zahlungserinnerung", "1. Mahnung", "2. Mahnung"]
-
 /**
  * Der tägliche Finanz-Lauf. Er BEREITET VOR und versendet nichts:
  *   · Folgerechnungen aus Abos → Entwurf (Prüfen/Festschreiben/Senden = dein Klick)
- *   · überfällige Rechnungen → ein Vorschlag in deiner Freigabe-Liste je Mahnstufe
- *     (derselbe Fall wird nie zweimal vorgeschlagen — Schlüssel `mahnung:<id>:<stufe>`)
+ *   · überfällige Rechnungen → übernimmt Tahsilat (lib/agenten/forderungen.ts) als
+ *     sendefertige Mahnung je Stufe (Schlüssel `forderung:<id>:<stufe>`)
  * Gelöscht oder verändert wird dabei nichts Bestehendes.
  */
 export async function finanzAgentLauf(): Promise<{ ergebnis: string; anzahl: number }> {
@@ -27,31 +24,14 @@ export async function finanzAgentLauf(): Promise<{ ergebnis: string; anzahl: num
   const angebote = await legeAngebotsEntwuerfeAusChancen(db).catch(() => [])
   const auto = await ordneAllesAutomatischZu(db).catch(() => null)
   const bericht = await erstelleMorgenBericht(db)
-  let mahnungen = 0
-  for (const m of bericht.faelligeMahnungen) {
-    const id = await legeFreigabeAn({
-      art: "aufgabe",
-      titel: `${STUFE[m.stufe] ?? "Mahnung"} prüfen: ${m.nummer} (${m.kunde})`,
-      inhalt: [
-        `Rechnung ${m.nummer} an ${m.kunde} ist ${m.tageUeberfaellig} Tage überfällig.`,
-        `Vorschlag: ${STUFE[m.stufe] ?? "Mahnung"} senden.`,
-        "",
-        `Öffnen und mit einem Klick versenden: /finanz/vorgang/${m.id}`,
-        "Es wurde nichts verschickt.",
-      ].join("\n"),
-      quelle: `mahnung:${m.id}:${m.stufe}`,
-      agent: "finanz",
-    })
-    if (id) mahnungen++
-  }
-
+  /* Mahnvorschläge legt seit 22.10.2026 Tahsilat (lib/agenten/forderungen.ts) als sendefertige Mail an – nicht zweimal. */
   const teile = [
     entwuerfe.length ? `${entwuerfe.length} Folgerechnung(en) als Entwurf` : null,
     angebote.length ? `${angebote.length} Angebots-Entwurf/-Entwürfe aus dem Vertrieb` : null,
-    mahnungen ? `${mahnungen} Mahnvorschlag/-vorschläge` : null,
+    bericht.faelligeMahnungen.length ? `${bericht.faelligeMahnungen.length} Mahnstufe(n) fällig → Tahsilat` : null,
     auto && auto.belegeVerlauf + auto.belegeKi ? `${auto.belegeVerlauf + auto.belegeKi} Beleg(e) zugeordnet` : null,
     auto && auto.bankAusgaben ? `${auto.bankAusgaben} Abbuchung(en) gebucht` : null,
     auto && auto.bankEingaenge ? `${auto.bankEingaenge} Zahlungseingang/-eingänge zugeordnet` : null,
   ].filter(Boolean)
-  return { ergebnis: teile.length ? teile.join(" · ") : "Nichts zu tun", anzahl: entwuerfe.length + angebote.length + mahnungen + (auto ? auto.belegeVerlauf + auto.belegeKi + auto.bankAusgaben + auto.bankEingaenge : 0) }
+  return { ergebnis: teile.length ? teile.join(" · ") : "Nichts zu tun", anzahl: entwuerfe.length + angebote.length + (auto ? auto.belegeVerlauf + auto.belegeKi + auto.bankAusgaben + auto.bankEingaenge : 0) }
 }

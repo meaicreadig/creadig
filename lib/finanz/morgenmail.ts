@@ -75,14 +75,39 @@ const datumLang = (iso: string) =>
 const datumKurz = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("de-DE", { timeZone: "Europe/Berlin", day: "numeric", month: "long" })
 const zeile = (s: string) => s.replace(/\s+/g, " ").trim()
 
-type AssistentTeil = { lage: string | null; schritte: BriefingSchritt[]; impuls: string | null; offen: number }
+type AssistentTeil = { lage: string | null; schritte: BriefingSchritt[]; impuls: string | null; offen: number; team: string[]; teamWoche: boolean }
 
-async function ladeAssistentTeil(): Promise<AssistentTeil> {
-  const [briefing, offen] = await Promise.all([
+/**
+ * Karne des KI-Teams aus der Qualitätssicherung (lib/agenten/qualitaet.ts): täglich die letzten
+ * 24 Stunden, montags die ganze Woche. Dynamisch geladen – truppe → finanz/agent → morgenmail wäre ein Kreis.
+ */
+async function ladeTeamKarne(woche: boolean): Promise<string[]> {
+  const [{ ladeNoten }, { AGENTEN }] = await Promise.all([import("@/lib/agenten/qualitaet"), import("@/lib/assistent/truppe")])
+  const name = (k: string) => AGENTEN.find((a) => a.key === k)?.name ?? k
+  const noten = (await ladeNoten(woche ? 7 : 1)).filter((n) => n.entwuerfe + n.laeufe + n.fehler > 0)
+  return noten.slice(0, woche ? 12 : 6).map((n) => {
+    const teile = [
+      n.freigegeben + n.verworfen > 0 ? `${n.freigegeben}/${n.freigegeben + n.verworfen} freigegeben (${Math.round((n.quote ?? 0) * 100)} %)` : `${n.entwuerfe} Entwürfe`,
+      n.bearbeitet ? `${n.bearbeitet} von dir geändert` : null,
+      `${n.laeufe} Läufe`,
+      n.fehler ? `**${n.fehler} Fehler**` : null,
+    ].filter(Boolean)
+    const icon = n.fehler || (n.quote !== null && n.quote < 0.4) ? "shield" : "zap"
+    return `- [${icon}] ${name(n.agent)}: ${teile.join(" · ")}`
+  })
+}
+
+async function ladeAssistentTeil(heute: string): Promise<AssistentTeil> {
+  const teamWoche = new Date(`${heute}T12:00:00Z`).getUTCDay() === 1
+  const [briefing, offen, team] = await Promise.all([
     morgenBriefing("de").catch(() => null),
     zaehleOffen().catch(() => ({ gesamt: 0, linkedin: 0 })),
+    ladeTeamKarne(teamWoche).catch((e) => {
+      console.error("[morgenmail] Team-Karne:", e instanceof Error ? e.message : e)
+      return []
+    }),
   ])
-  return { lage: briefing?.lage ?? null, schritte: briefing?.schritte ?? [], impuls: briefing?.impuls ?? null, offen: offen.gesamt }
+  return { lage: briefing?.lage ?? null, schritte: briefing?.schritte ?? [], impuls: briefing?.impuls ?? null, offen: offen.gesamt, team, teamWoche }
 }
 
 /** Morgenbriefing des Assistenten im creaDIG-Markendesign — Finanz ist nur ein Abschnitt davon. */
@@ -117,6 +142,11 @@ function berichtMail(b: MorgenBericht, a: AssistentTeil): { subject: string; tex
   if (b.pauschalenFehlen) finanz.push(`- [clock] Pauschalen: Für ${datumKurz(b.heute).split(" ").slice(-1)[0]} sind noch keine Verpflegungs- oder Homeoffice-Tage erfasst — unter ${basis}/finanz/pauschalen eintragen.`)
   for (const w of b.wachstumsHinweise) finanz.push(`- [sparkles] Wachstum & Kapital: ${zeile(w)}`)
   bloecke.push(finanz.length ? finanz.join("\n") : "Bei den Finanzen ist heute nichts offen — keine Frist, keine Mahnung, kein offener Beleg.")
+
+  if (a.team.length) {
+    bloecke.push(a.teamWoche ? "## KI-Team · **Wochenkarne**" : "## KI-Team · letzte 24 Stunden")
+    bloecke.push(a.team.join("\n"))
+  }
 
   if (a.impuls) bloecke.push(`## Impuls\n\n${zeile(a.impuls)}`)
 
@@ -160,7 +190,7 @@ export async function sendeMorgenmailFallsFaellig(db: Abfrage): Promise<{ versen
   const to = process.env.LEAD_TO?.trim()
   if (!to) return { versendet: false, grund: "LEAD_TO fehlt — keine Empfängeradresse eingerichtet" }
 
-  const [bericht, assistent] = await Promise.all([erstelleMorgenBericht(db), ladeAssistentTeil()])
+  const [bericht, assistent] = await Promise.all([erstelleMorgenBericht(db), ladeAssistentTeil(heute)])
   const mail = berichtMail(bericht, assistent)
   const versand = await sendeMail({ to, subject: mail.subject, text: mail.text, html: mail.html, fromName: "creaDIG Assistent" })
   if (!versand.ok) return { versendet: false, grund: versand.grund === "nicht_eingerichtet" ? "RESEND_API_KEY/MAIL_FROM fehlt" : versand.detail }

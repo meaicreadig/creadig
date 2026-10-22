@@ -1214,6 +1214,17 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
        * Zahl kommt aus der Datenbank, nicht aus einer Schaetzung: Wie oft
        * dieser Grund bisher vorkam, entscheidet, ob es ein Muster ist (G16).
        */
+      /* Ins Rückgrat melden: gewonnen = Auftrag erteilt → Projektleitung und Finanz arbeiten sofort weiter. */
+      if (status === "won") {
+        const k = (await sql.query(`SELECT contact_id FROM opportunities WHERE id = $1`, [id])) as { contact_id: string | null }[]
+        const { ereignis } = await import("@/lib/motor/ereignis")
+        await ereignis("auftrag_erteilt", {
+          kontaktId: k[0]?.contact_id ?? null,
+          subjekt: `opportunity:${id}`,
+          daten: { von: alt[0].status },
+          schluessel: `auftrag_erteilt:${id}`,
+        })
+      }
       if (status === "lost" && lostReason) {
         const gezaehlt = (await sql.query(
           `SELECT count(*)::int AS n FROM opportunities WHERE status = 'lost' AND lost_reason = $1::text`,
