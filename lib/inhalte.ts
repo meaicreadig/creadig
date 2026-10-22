@@ -16,7 +16,8 @@ import { neonAbfrage } from "@/lib/neon-abfrage"
  *   2. `meldeInhalt` schreibt das Ereignis `inhalt_veroeffentlicht` in den
  *      Strom (motor/ereignis) — sichtbar für Karne, Netz und Folgeagenten.
  *   3. `inhalteText()` gibt jedem Agenten-Prompt die letzten Inhalte mit.
- *   4. Ein neuer Website-Artikel weckt die LinkedIn-Redaktion.
+ *   4. Den LinkedIn-Beitrag zu einem neuen Artikel legt lib/artikel/veroeffentlichen.ts an
+ *      (genau einen) — nicht dieses Ereignis, sonst gäbe es zwei Karten.
  */
 
 export type Inhalt = { id: string; was: string; kanal: string; am: string; url: string | null }
@@ -30,20 +31,6 @@ export async function meldeInhalt(i: Inhalt): Promise<void> {
       { subjekt: `inhalt:${i.id}`, daten: { was: i.was, kanal: i.kanal, am: i.am, url: i.url }, schluessel: `inhalt:${i.id}` },
       { ohneTakt: true },
     )
-    /* Neuer Website-Artikel → die Redaktion schreibt den LinkedIn-Beitrag dazu (wartet auf Emins Freigabe).
-       Bewusst nur für die Website: ein LinkedIn-Post soll keinen weiteren LinkedIn-Post auslösen. */
-    if (i.kanal === "website") {
-      const lauf = async () => {
-        const { fuehreAgentAus } = await import("@/lib/assistent/truppe")
-        await fuehreAgentAus("redaktion")
-      }
-      try {
-        const { after } = await import("next/server")
-        after(() => lauf().catch((e) => console.error("[inhalte] redaktion", e instanceof Error ? e.message : e)))
-      } catch {
-        await lauf().catch((e) => console.error("[inhalte] redaktion", e instanceof Error ? e.message : e))
-      }
-    }
   } catch (e) {
     console.error("[inhalte] melden", e instanceof Error ? e.message : e)
   }

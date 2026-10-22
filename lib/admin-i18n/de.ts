@@ -26,6 +26,7 @@ export const de = {
     ungespeichert: "Auf dieser Seite steht etwas, das noch nicht gespeichert ist. Seite trotzdem verlassen?",
   },
   nav: {
+    redaktion: { label: "Redaktion", hint: "Website und LinkedIn: Entwürfe, Plan, Netz" },
     mailstudio: { label: "Mail Studio", hint: "Schreiben, senden, Antworten verfolgen" },
     marketing: { label: "Marketing-Übersicht", hint: "LinkedIn, Kanäle, Reaktionen auf einen Blick" },
     veroeffentlichungen: { label: "Veröffentlichungen", hint: "Was hinausging, und was zurückkam" },
