@@ -24,6 +24,7 @@ const AGENT_NAMEN: Record<string, Record<Sprache, string>> = {
   motor: { de: "Motor", tr: "Motor" },
   finanz: { de: "Finanz", tr: "Finans" },
   projekte: { de: "Projektleitung", tr: "Proje lideri" },
+  webseite: { de: "Website-Prüfer", tr: "Web sitesi denetçisi" },
 }
 
 const RANG: Record<Zustand, number> = { ruhig: 0, aktiv: 1, achtung: 2, stoerung: 3 }

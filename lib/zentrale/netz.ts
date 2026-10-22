@@ -281,6 +281,26 @@ export async function ladeNetz({
     wege: [],
   }
 
+  const pruefung = await import("@/lib/webseite/pruefer").then((m) => m.ladeLetztePruefung()).catch(() => null)
+  const kritischWeb = pruefung?.befunde.filter((b) => b.schwere === "kritisch").length ?? 0
+  const webseite: Signal = pruefung
+    ? {
+        wert: String(pruefung.gesamt),
+        zeile: tr ? "web sitesi notu /100" : "Webseiten-Note /100",
+        zustand: kritischWeb ? "stoerung" : pruefung.gesamt < 75 ? "achtung" : "ruhig",
+        last: Math.max(0.2, 1 - pruefung.gesamt / 100),
+        punkte: pruefung.befunde.filter((b) => b.erledigung !== "behoben").slice(0, 3).map((b) => b.titel),
+        wege: [{ label: tr ? "Raporu aç" : "Bericht öffnen", href: "/admin/webseite" }],
+      }
+    : {
+        wert: "–",
+        zeile: tr ? "ilk denetim bekliyor" : "erste Prüfung folgt",
+        zustand: "ruhig",
+        last: 0.2,
+        punkte: [],
+        wege: [{ label: tr ? "Şimdi denetle" : "Jetzt prüfen", href: "/admin/webseite" }],
+      }
+
   /*
    * Finanzen: Zahlen NUR für den Inhaber (Finanz ist eine eigene App, nur
    * Inhaber). Alle anderen sehen den Rahmen — dieselbe Zurückhaltung wie vorher.
@@ -342,5 +362,5 @@ export async function ladeNetz({
     wege: [{ label: tr ? "Bugün yapılacaklar" : "Heute zu tun", href: "#heute-titel" }],
   }
 
-  return { uebersicht, assistent, leistung, bulletin, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen, finanz, system }
+  return { uebersicht, assistent, leistung, bulletin, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen, finanz, system, webseite }
 }

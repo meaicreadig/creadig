@@ -25,6 +25,7 @@ import {
   X,
   Kanban,
   Network,
+  Globe,
 } from "lucide-react"
 import { saeuleVon, zeitpunktText } from "@/lib/assistent/linkedin-plan"
 
@@ -299,6 +300,7 @@ const ART: Record<FreigabeArt, { label: string; Icon: typeof Mail }> = {
 }
 
 const AGENT_ICON: Record<AgentKey, typeof Mail> = {
+  webseite: Globe,
   koordinator: Network,
   rat: Users,
   jaeger: Crosshair,

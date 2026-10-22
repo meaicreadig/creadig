@@ -110,9 +110,9 @@ export const ABTEILUNGEN: Abteilung[] = [
     id: "it",
     bereich: "technik",
     name: { de: "IT & Sicherheit", tr: "Bilgi Teknolojileri ve Güvenlik" },
-    aufgabe: { de: "Systemzustand, Verbindungen, Backups, Alarme", tr: "Sistem durumu, bağlantı, yedek, alarm" },
-    knoten: ["system"],
-    agenten: [],
+    aufgabe: { de: "Systemzustand, Webseite, Sicherheit, Alarme", tr: "Sistem durumu, web sitesi, güvenlik, alarm" },
+    knoten: ["system", "webseite"],
+    agenten: ["webseite"],
     besetzung: "aktiv",
   },
   {
