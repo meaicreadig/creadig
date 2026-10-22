@@ -20,6 +20,8 @@ import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 import { ABTEILUNGEN } from "@/lib/zentrale/abteilungen"
 import { findeOderLegeFirma } from "@/lib/kundenfaden"
 import { ladeSperrliste, rechtsRunde, sperrGrund } from "@/lib/recht/compliance"
+import { geplantFuer, linkMitUtm, SAEULEN, zielgruppeDerWoche, type Saeule } from "./linkedin-plan"
+import { veroeffentlicheGeplante } from "./redaktion-post"
 import {
   assistentDb,
   ladeFreigaben,
@@ -60,7 +62,7 @@ export const AGENTEN: AgentInfo[] = [
   { key: "kapital", name: "Kapital", aufgabe: "Recherchiert Förderungen, Kredite und Investoren mit Quelle und Frist.", takt: "woechentlich", ki: true },
   { key: "golf", name: "Golf-Radar", aufgabe: "Sucht jede Woche Investoren, Family Offices, Programme und Events in VAE, Saudi-Arabien und Katar und schreibt die erste Nachricht auf Englisch und Arabisch.", takt: "woechentlich", ki: true },
   { key: "bulletin", name: "Bulletin", aufgabe: "Recherchiert jeden Morgen, was in KI, Automatisierung, Medien, Chips und Robotik zählt, mit Quelle, ordnet es für creaDIG ein und liefert der Redaktion Artikelideen.", takt: "taeglich", ki: true },
-  { key: "redaktion", name: "Redaktion", aufgabe: "Wählt das Thema nach den Beschlüssen der Geschäftsleitung, schreibt den Beitrag und erzeugt das Bild dazu.", takt: "woechentlich", ki: true },
+  { key: "redaktion", name: "Redaktion", aufgabe: "Plant jede Woche 4 LinkedIn-Beiträge (Gründer-Stimme, Praxiswissen, Einblick & Beweis, Branche & Haltung) mit Text, Bild, Sendetermin und Link im ersten Kommentar.", takt: "taeglich", ki: true },
 ]
 
 const MODELL = "openai/gpt-5.4-mini"
@@ -286,64 +288,101 @@ async function erzeugeBild(id: string, idee: string): Promise<string | null> {
   }
 }
 
+type RedaktionsLage = { marketing?: string; beschluesse: string[]; lage: string; branche: string; frueher: string[]; woche: string; zielgruppe: string }
+
+/** Wochenplan: jede fehlende Säule dieser Woche wird geschrieben, bebildert und mit Sendetermin zur Freigabe gelegt. */
 async function redaktion(): Promise<Ergebnis> {
   const woche = kw(new Date())
-  const quelle = `linkedin:${woche}`
-  if (await quelleBekannt(quelle)) return { ergebnis: "Artikel dieser Woche liegt schon bereit", anzahl: 0 }
+  const fehlend: Saeule[] = []
+  for (const s of SAEULEN) {
+    if (await quelleBekannt(`linkedin:${woche}:${s.key}`)) continue
+    /* Der frühere Einzelbeitrag pro Woche zählt als Gründer-Stimme. */
+    if (s.key === "gruender" && (await quelleBekannt(`linkedin:${woche}`))) continue
+    fehlend.push(s)
+  }
+  if (!fehlend.length) return { ergebnis: "Wochenplan steht – alle Beiträge liegen bereit", anzahl: 0 }
 
   const [raete, frueher, rahmen, branche] = await Promise.all([
     ladeRaete(1).catch(() => []),
-    letzteArtikel(10),
+    letzteArtikel(12),
     firmenRahmen(),
     bulletinStoff().catch(() => "—"),
   ])
   const rat = raete[0]?.protokoll
-  const marketing = rat?.stimmen.find((s) => /marketing/i.test(s.rolle))?.sagt
-  const beschluesse = rat?.beschluesse.map((b) => b.was) ?? []
+  const lage: RedaktionsLage = {
+    marketing: rat?.stimmen.find((s) => /marketing/i.test(s.rolle))?.sagt,
+    beschluesse: rat?.beschluesse.map((b) => b.was) ?? [],
+    lage: rahmen.text,
+    branche,
+    frueher: frueher.map((f) => f.titel),
+    woche,
+    zielgruppe: zielgruppeDerWoche(Number(woche.split("-")[1])),
+  }
 
+  const ergebnisse = await Promise.allSettled(fehlend.map((s) => schreibeBeitrag(s, lage)))
+  const fertig = ergebnisse.filter((r) => r.status === "fulfilled" && r.value).length
+  const fehler = ergebnisse.find((r): r is PromiseRejectedResult => r.status === "rejected")
+  if (!fertig && fehler) throw fehler.reason
+  return { ergebnis: `${fertig} von ${fehlend.length} Beiträgen für KW ${woche.split("-")[1]} bereit (${lage.zielgruppe.split(" (")[0]})`, anzahl: fertig }
+}
+
+async function schreibeBeitrag(s: Saeule, l: RedaktionsLage): Promise<boolean> {
   const { text } = await generateText({
     model: MODELL,
-    prompt: `Du bist die Redaktion von creaDIG Solutions (Einzelunternehmen, Inhaber Muhammed Emin Akyol). Du schreibst als Muhammed Emin Akyol genau EINEN LinkedIn-Beitrag auf Deutsch.
+    prompt: `Du bist die Redaktion von creaDIG Solutions (Einzelunternehmen, Inhaber Muhammed Emin Akyol). Du schreibst genau EINEN LinkedIn-Beitrag auf Deutsch.
 
-SCHRITT 1 – Thema wählen (wie ein Chefredakteur):
-- Richte dich nach der letzten Sitzung der Geschäftsleitung. Marketing sagte: ${marketing ?? "(noch keine Sitzung)"}
-- Beschlüsse: ${beschluesse.length ? beschluesse.join(" | ") : "(keine)"}
-- Lage: ${rahmen.text}
-- Echter Stoff (nur daraus schöpfen, nichts erfinden): ${STOFF.join(" || ")}
-- Was die Branche gerade bewegt (aus dem Bulletin, nur als aktueller Anlass mit eigener Haltung, Quelle nennen): ${branche}
-- Schon geschrieben – NICHT wiederholen, anderer Blickwinkel: ${frueher.map((f) => f.titel).join(" | ") || "(noch nichts)"}
-- Wähle das Thema, das den Leser (Inhaber kleiner Betriebe, Glasfaser-Branche, Vereine) am meisten bewegt und Kunden anzieht, ohne zu werben.
+SÄULE: ${s.name} – Ziel: ${s.ziel}
+KANAL: ${s.kanal === "firma" ? "Unternehmensseite creaDIG" : "persönliches Profil von Emin"} · Stimme: ${s.stimme}
+AUFTRAG: ${s.anleitung}
+ZIELGRUPPE DIESER WOCHE: ${l.zielgruppe}
 
-SCHRITT 2 – Beitrag:
-- Fachbeitrag mit Haltung, kein Werbetext. Erster Satz = scharfe Beobachtung aus der Praxis, die zum Weiterlesen zwingt.
-- 3 kurze Absätze mit konkretem Wissen, sofort nutzbar. Das eigene Produkt höchstens einmal beiläufig als Beispiel.
-- Ende mit einer echten Frage an die Leser. 180–260 Wörter, keine Emojis, max. 3 Hashtags am Ende.
+Hintergrund (nur daraus schöpfen, nichts erfinden):
+- Geschäftsleitung, Marketing sagte: ${l.marketing ?? "(noch keine Sitzung)"}
+- Beschlüsse: ${l.beschluesse.join(" | ") || "(keine)"}
+- Lage: ${l.lage}
+- Produkte/Stoff: ${STOFF.join(" || ")}
+- Branche aktuell (Bulletin, mit Quelle): ${l.branche}
+- Schon veröffentlicht – NICHT wiederholen: ${l.frueher.join(" | ") || "(nichts)"}
 
-SCHRITT 3 – Bildidee: eine konkrete fotografische Szene (Englisch, ein Satz), die die Kernaussage zeigt – keine Schrift, keine Bildschirme.
+AUFBAU (so funktioniert LinkedIn):
+1. Haken: die ersten zwei Zeilen (max. 200 Zeichen) entscheiden, ob jemand „mehr anzeigen“ klickt – eine überraschende Beobachtung oder klare These aus dem Alltag der Zielgruppe. Keine Frage als Einstieg, kein „Heute möchte ich…“.
+2. Leerzeile, dann kurze Absätze (1–3 Sätze), viel Weißraum, gut auf dem Handy lesbar.
+3. Konkreter Nutzen: etwas, das man sofort anwenden kann.
+4. Schluss: eine echte, leicht zu beantwortende Frage an die Leser (erzeugt Kommentare = Reichweite).
+- 150–230 Wörter, keine Emojis, kein Link im Text, keine Kundennamen, keine erfundenen Zahlen, max. 3 Hashtags in der letzten Zeile.
+- Rechtlich sauber: keine Heilsversprechen, keine Garantien, keine Vergleiche mit namentlich genannten Wettbewerbern.
+
+BILD: eine konkrete fotografische Szene (Englisch, ein Satz), die die Kernaussage zeigt – passend zur Zielgruppe, keine Schrift, keine Bildschirme.
 
 Antworte NUR mit JSON:
-{"thema":"…","warum":"1 Satz: warum gerade jetzt dieses Thema (Bezug auf Sitzung/Lage)","bezug":"welcher Stoff/Beschluss","titel":"…","text":"…","bildidee":"…","alt":"Bildbeschreibung Deutsch, 1 Satz"}`,
+{"thema":"…","warum":"1 Satz: warum dieses Thema jetzt Kunden aus der Zielgruppe bringt","bezug":"welcher Stoff/Beschluss","titel":"…","text":"…","kommentar":"1 kurzer Satz für den ersten Kommentar, der neugierig auf den Link macht","bildidee":"…","alt":"Bildbeschreibung Deutsch, 1 Satz"}`,
   })
 
-  const a = jsonObjekt<Artikel>(text)
-  if (!a?.titel || !a.text) throw new Error("Redaktion lieferte keinen gültigen Beitrag")
+  const a = jsonObjekt<Artikel & { kommentar?: string }>(text)
+  if (!a?.titel || !a.text) throw new Error(`Redaktion (${s.name}) lieferte keinen gültigen Beitrag`)
 
   const id = neueFreigabeId()
   const bildPfad = a.bildidee ? await erzeugeBild(id, a.bildidee) : null
+  const geplant = geplantFuer(s)
   const angelegt = await legeFreigabeAn({
     id,
     art: "linkedin",
     titel: a.titel.replace(/^#+\s*/, "").slice(0, 150),
     inhalt: a.text.trim(),
-    quelle,
+    quelle: `linkedin:${l.woche}:${s.key}`,
     agent: "redaktion",
     bildPfad,
-    extra: { warum: a.warum, bezug: a.bezug, alt: a.alt },
+    extra: {
+      warum: a.warum,
+      bezug: a.bezug,
+      alt: a.alt,
+      saeule: s.key,
+      ziel: s.kanal,
+      geplant: geplant?.toISOString() ?? null,
+      kommentar: `${(a.kommentar || s.kommentar).trim()}\n${linkMitUtm(s, l.woche)}`,
+    },
   })
-  return {
-    ergebnis: angelegt ? `Beitrag „${a.thema}“ ${bildPfad ? "mit Bild " : ""}bereit` : "Beitrag liegt schon bereit",
-    anzahl: angelegt ? 1 : 0,
-  }
+  return Boolean(angelegt)
 }
 
 type Ziel = { firma: string; ort: string; website: string; email?: string; warum: string; betreff: string; mail: string }
@@ -730,6 +769,7 @@ export async function fuehreFaelligeAus(): Promise<AgentKey[]> {
   if (!faellig.includes("koordinator")) await koordinationAbarbeiten()
   await holeEingang().catch((e) => console.error("[assistent] eingang", e instanceof Error ? e.message : e))
   await nachfassen().catch((e) => console.error("[assistent] nachfassen", e instanceof Error ? e.message : e))
+  await veroeffentlicheGeplante().catch((e) => console.error("[redaktion] geplant", e instanceof Error ? e.message : e))
   return reihenfolge
 }
 

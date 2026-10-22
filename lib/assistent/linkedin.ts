@@ -143,6 +143,7 @@ export async function veroeffentliche(p: {
   bildPfad: string | null
   alt?: string
   kanal: LinkedinKanal
+  kommentar?: string
 }): Promise<string> {
   const v = await ladeLinkedin(p.kanal)
   if (!v) throw new Error(p.kanal === "firma" ? "Firmenseite ist nicht verbunden" : "LinkedIn ist nicht verbunden")
@@ -162,5 +163,21 @@ export async function veroeffentliche(p: {
     }),
   })
   if (!res.ok) throw new Error(`Post: ${res.status} ${(await res.text()).slice(0, 200)}`)
-  return res.headers.get("x-restli-id") ?? res.headers.get("x-linkedin-id") ?? "veröffentlicht"
+  const urn = res.headers.get("x-restli-id") ?? res.headers.get("x-linkedin-id") ?? "veröffentlicht"
+  if (p.kommentar && urn.startsWith("urn:li:")) {
+    await kommentiere(v.accessToken, v.personUrn, urn, p.kommentar).catch((e) =>
+      console.error("[linkedin] erster Kommentar", e instanceof Error ? e.message : e),
+    )
+  }
+  return urn
+}
+
+/** Der Link gehört in den ersten Kommentar – Beiträge mit Link im Text drosselt LinkedIn in der Reichweite. */
+async function kommentiere(token: string, actor: string, postUrn: string, text: string): Promise<void> {
+  const res = await fetch(`https://api.linkedin.com/rest/socialActions/${encodeURIComponent(postUrn)}/comments`, {
+    method: "POST",
+    headers: kopf(token),
+    body: JSON.stringify({ actor, object: postUrn, message: { text: maskiere(text).slice(0, 1200) } }),
+  })
+  if (!res.ok) throw new Error(`Kommentar: ${res.status} ${(await res.text()).slice(0, 200)}`)
 }

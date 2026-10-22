@@ -26,6 +26,7 @@ import {
   Kanban,
   Network,
 } from "lucide-react"
+import { saeuleVon, zeitpunktText } from "@/lib/assistent/linkedin-plan"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { AssistentChat } from "@/components/admin/assistent-chat"
@@ -392,10 +393,20 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele })
             <Newspaper className="size-3.5" aria-hidden="true" />
             LinkedIn-Beitrag
           </span>
+          {saeuleVon(f.extra.saeule) ? (
+            <span className="rounded-full bg-secondary px-2.5 py-1 text-secondary-foreground">
+              {saeuleVon(f.extra.saeule)?.name} · {f.extra.ziel === "inhaber" ? "Profil" : "Firmenseite"}
+            </span>
+          ) : null}
           <span>von {agentName(f.agent)} · {seit(f.zeit)}</span>
+          {f.extra.geplant && !f.extra.postUrn ? (
+            <span className="font-medium text-foreground">
+              · {f.extra.wartet ? "geht raus" : "geplant"} {zeitpunktText(f.extra.geplant)}
+            </span>
+          ) : null}
           {!offen ? (
             <span>
-              · {f.status === "freigegeben" ? (f.extra.postUrn || f.extra.instagramId ? "veröffentlicht" : "freigegeben") : "verworfen"}
+              · {f.status === "freigegeben" ? (f.extra.postUrn || f.extra.instagramId ? "veröffentlicht" : f.extra.wartet ? "freigegeben, wartet auf Sendezeit" : "freigegeben") : "verworfen"}
             </span>
           ) : null}
           {f.extra.postUrn?.startsWith("urn:li:") ? (
