@@ -129,6 +129,12 @@ export async function erstelleBulletin(opt: { erzwingen?: boolean } = {}): Promi
   await speichereAusgabe({ id: tag, lage, meldungen })
   const schwer = meldungen.filter((m) => m.gewicht === 3).length
 
+  /* Erkennen heißt handeln: aus der Lage werden sofort Aufträge an die zuständigen Abteilungen. */
+  const verteilt = await verteileLage(tag, lage.de, meldungen).catch((e) => {
+    console.error("[bulletin] verteilen", e instanceof Error ? e.message : e)
+    return 0
+  })
+
   /* Die Redaktion wartet nicht auf einen Klick: die stärkste Artikelidee wird sofort als Entwurf geschrieben. */
   let artikel = ""
   const top = meldungen.find((m) => m.artikel && m.gewicht === 3) ?? meldungen.find((m) => m.artikel)
@@ -137,7 +143,44 @@ export async function erstelleBulletin(opt: { erzwingen?: boolean } = {}): Promi
       .then((r) => ` · ${r.ergebnis}`)
       .catch(() => "")
   }
-  return { ergebnis: `Bulletin ${tag}: ${meldungen.length} Meldungen, ${schwer} Schwerpunkte${artikel}`, anzahl: meldungen.length }
+  return {
+    ergebnis: `Bulletin ${tag}: ${meldungen.length} Meldungen, ${schwer} Schwerpunkte${verteilt ? `, ${verteilt} Aufträge an Abteilungen` : ""}${artikel}`,
+    anzahl: meldungen.length,
+  }
+}
+
+async function verteileLage(tag: string, lage: string, meldungen: Meldung[]): Promise<number> {
+  const { ABTEILUNGEN } = await import("@/lib/zentrale/abteilungen")
+  const { legeAuftragAn } = await import("@/lib/koordination/koordinator")
+  const ids = new Set(ABTEILUNGEN.map((a) => a.id))
+  const { text } = await generateText({
+    model: "openai/gpt-5.4-mini",
+    prompt: `Du bist der Chief of Staff von creaDIG Solutions (System-Haus; Produkte fibero = Glasfaser-Montage-Software, stammo = digitale Stempelkarte, eigenes KI-Betriebssystem).
+Aus der heutigen Marktlage leitest du bis zu 3 KONKRETE interne Aufträge ab, die creaDIG nach vorne bringen. Jeder Auftrag geht an genau eine Abteilung, die ihn selbst bearbeiten kann (Analyse, Entwurf, Konzept, Positionierung). Nichts, was Geld kostet oder nach außen geht.
+Abteilungen: ${ABTEILUNGEN.map((a) => `${a.id} (${a.name.de})`).join(", ")}
+
+LAGE: ${lage}
+MELDUNGEN:
+${meldungen.slice(0, 6).map((m) => `- ${m.titel.de} – für uns: ${m.fuerUns.de}`).join("\n")}
+
+Antworte NUR mit JSON: {"auftraege":[{"an":"<id>","titel":"max 12 Wörter","inhalt":"was genau zu tun ist, 2-3 Sätze, mit Bezug zur Meldung"}]}`,
+    maxOutputTokens: 900,
+  })
+  const json = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1)
+  const p = JSON.parse(json || "{}") as { auftraege?: { an?: string; titel?: string; inhalt?: string }[] }
+  let n = 0
+  for (const [i, a] of (p.auftraege ?? []).slice(0, 3).entries()) {
+    if (!a.an || !ids.has(a.an) || !a.titel || !a.inhalt) continue
+    const id = await legeAuftragAn({
+      von: "unternehmenskommunikation",
+      an: a.an,
+      titel: a.titel.slice(0, 160),
+      inhalt: `${a.inhalt}\n\nAnlass: Bulletin vom ${tag}.`,
+      quelle: `bulletin:${tag}:${i}`,
+    }).catch(() => null)
+    if (id) n++
+  }
+  return n
 }
 
 /** Startet die Ausgabe im Hintergrund und merkt sich den Lauf, damit die Seite den Fortschritt zeigt. */

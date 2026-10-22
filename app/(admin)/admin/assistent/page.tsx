@@ -373,7 +373,7 @@ function AgentKarte({ a, lauf }: { a: AgentInfo; lauf?: Lauf }) {
 function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele }) {
   const offen = f.status === "offen"
   return (
-    <li className="flex flex-col overflow-hidden rounded-3xl bg-card shadow-sm">
+    <li className="flex min-w-0 flex-col overflow-hidden break-words rounded-3xl bg-card shadow-sm [overflow-wrap:anywhere]">
       {f.bildPfad ? (
         <img
           src={`/api/assistent/bild/${encodeURIComponent(f.id)}`}
@@ -666,7 +666,7 @@ function LinkedinStatus({ ziele, meldung }: { ziele: LinkedinZiele; meldung?: st
     "firma-redirect":
       "Firmenseite: In der Firmen-App unter „Auth“ fehlt die Redirect-URL https://creadig.de/api/linkedin/callback.",
     "inhaber-redirect":
-      "Profil: In der Profil-App unter „Auth“ fehlt die Redirect-URL https://creadig.de/api/linkedin/callback.",
+      "Profil: In der Profil-App unter ���Auth“ fehlt die Redirect-URL https://creadig.de/api/linkedin/callback.",
     fehler:
       "LinkedIn hat abgelehnt. Prüfe in der jeweiligen LinkedIn-App die Redirect-URL und ob das Produkt freigeschaltet ist (Firmenseite: „Community Management API“ muss genehmigt sein).",
   }
@@ -1100,8 +1100,8 @@ export default async function AssistentPage({
         </section>
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_26rem]">
-          <section aria-labelledby="eingang-titel" className="flex flex-col gap-4">
-            <div className="flex items-baseline justify-between gap-2">
+          <section aria-labelledby="eingang-titel" className="flex min-w-0 flex-col gap-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 id="eingang-titel" className="font-sans text-xl font-semibold text-foreground">
                 Zur Entscheidung
               </h2>

@@ -407,7 +407,7 @@ export async function zaehleOffen(): Promise<{ gesamt: number; linkedin: number 
 }
 
 export type RatStimme = { rolle: string; sagt: string }
-export type RatBeschluss = { was: string; warum: string; kostenEur: number; wer: "truppe" | "emin" }
+export type RatBeschluss = { was: string; warum: string; kostenEur: number; wer: "truppe" | "emin"; abteilung?: string }
 export type RatProtokoll = {
   lage: string
   stimmen: RatStimme[]

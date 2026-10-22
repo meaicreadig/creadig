@@ -1,7 +1,7 @@
 import "server-only"
 import { generateText } from "ai"
 import { ABTEILUNGEN, abteilungVonAgent } from "@/lib/zentrale/abteilungen"
-import { assistentDb, ergaenzeExtra, legeFreigabeAn, letzteLaeufe, setzeFreigabe } from "@/lib/assistent/store"
+import { assistentDb, ergaenzeExtra, letzteLaeufe, setzeFreigabe } from "@/lib/assistent/store"
 
 /**
  * Interne Koordination der KI-Firma.
@@ -68,7 +68,7 @@ async function db() {
 }
 
 const neueId = () => `auf-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
-const abteilungName = (id: string) =>
+export const abteilungName = (id: string) =>
   id === "emin" ? "Emin" : id === "koordination" ? "Koordination" : (ABTEILUNGEN.find((a) => a.id === id)?.name.de ?? id)
 
 type Zeile = {
@@ -128,6 +128,18 @@ export async function ladeAuftraege(limit = 30): Promise<Auftrag[]> {
     `SELECT id, von, an, titel, inhalt, status, ergebnis, eltern, tiefe, freigabe_id, created_at
      FROM firma_auftraege ORDER BY created_at DESC LIMIT $1`,
     [limit],
+  )) as Zeile[]
+  return rows.map(alsAuftrag)
+}
+
+/** Aufträge, die aus einer bestimmten Quelle entstanden sind (z. B. "bulletin:2026-10-22:"). */
+export async function ladeAuftraegeMitQuelle(praefix: string, limit = 12): Promise<Auftrag[]> {
+  const q = await db().catch(() => null)
+  if (!q) return []
+  const rows = (await q(
+    `SELECT id, von, an, titel, inhalt, status, ergebnis, eltern, tiefe, freigabe_id, created_at
+     FROM firma_auftraege WHERE quelle LIKE $1 ORDER BY created_at ASC LIMIT $2`,
+    [`${praefix.replace(/[%_]/g, "")}%`, limit],
   )) as Zeile[]
   return rows.map(alsAuftrag)
 }
@@ -387,4 +399,3 @@ Engpässe haben Vorrang: Wenn eine Abteilung hängt oder schwach ist, ist dein e
   }
 }
 
-export { abteilungName }

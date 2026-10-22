@@ -69,17 +69,39 @@ function kandidaten(items: AttentionItem[]): AttentionItem[] {
   return [...items].sort((a, b) => (RANG_GEWICHT[a.rank] ?? 9) - (RANG_GEWICHT[b.rank] ?? 9)).slice(0, 25)
 }
 
-type AssistentLage = { freigabenOffen: number; aeltesteOffen: string | null; abend: AbendRueckmeldung | null }
+type DealAbsprache = { firma: string; titel: string; status: string; naechsterSchritt: string; am: string | null; notiz: string }
+type AssistentLage = { freigabenOffen: number; aeltesteOffen: string | null; abend: AbendRueckmeldung | null; deals: DealAbsprache[] }
 
 async function ladeAssistentLage(): Promise<AssistentLage> {
   const abfrage = neonAbfrage()
-  const [rows, abend] = await Promise.all([
+  const [rows, abend, deals] = await Promise.all([
     abfrage
       ? abfrage(`SELECT count(*) AS c, min(created_at)::date AS d FROM assistent_freigaben WHERE status = 'offen'`, []).catch(() => [])
       : Promise.resolve([]),
     abendVonGestern().catch(() => null),
+    abfrage
+      ? abfrage(
+          `SELECT coalesce(g.name, '') AS firma, o.title, o.status, coalesce(o.next_action, '') AS next_action,
+                  o.next_action_at::date AS am, coalesce(o.note, '') AS note
+             FROM opportunities o LEFT JOIN organisations g ON g.id = o.organisation_id
+            WHERE o.status NOT IN ('won','lost','excluded') ORDER BY o.next_action_at NULLS LAST LIMIT 12`,
+          [],
+        ).catch(() => [])
+      : Promise.resolve([]),
   ])
-  return { freigabenOffen: Number(rows[0]?.c ?? 0), aeltesteOffen: rows[0]?.d ? String(rows[0].d).slice(0, 10) : null, abend }
+  return {
+    freigabenOffen: Number(rows[0]?.c ?? 0),
+    aeltesteOffen: rows[0]?.d ? String(rows[0].d).slice(0, 10) : null,
+    abend,
+    deals: deals.map((d) => ({
+      firma: String(d.firma),
+      titel: String(d.title ?? ""),
+      status: String(d.status ?? ""),
+      naechsterSchritt: String(d.next_action),
+      am: d.am ? String(d.am).slice(0, 10) : null,
+      notiz: String(d.note).slice(0, 400),
+    })),
+  }
 }
 
 function lagebild(items: AttentionItem[], c: CockpitDaten, f: FinanzKurzlage | null, a: AssistentLage): string {
@@ -102,6 +124,11 @@ function lagebild(items: AttentionItem[], c: CockpitDaten, f: FinanzKurzlage | n
     `Nächste Termine: ${c.termine?.length ? c.termine.slice(0, 5).map((t) => `${t.start} ${t.name}`).join("; ") : "keine"}`,
     `Verschickte Terminlinks ohne Buchung: ${c.linksOffen?.length ?? 0}`,
     "",
+    "CHANCEN MIT EMINS ABSPRACHEN (verbindlich – Firma | Chance | Stufe | vereinbarter nächster Schritt | am | Notiz):",
+    ...(a.deals.length
+      ? a.deals.map((d) => `${d.firma || "-"} | ${d.titel} | ${d.status} | ${d.naechsterSchritt || "-"} | ${d.am ?? "-"} | ${d.notiz || "-"}`)
+      : ["keine"]),
+    "",
     "OFFENE PUNKTE (Index | Art | Titel | Detail | fällig):",
     ...items.map((i, idx) => `${idx} | ${i.rank} | ${i.title} | ${i.detail ?? "-"} | ${i.due ?? "-"}`),
   ]
@@ -113,6 +140,7 @@ const SYSTEM = (sprache: BriefingSprache) => `Du bist der persönliche Geschäft
 Deine Aufgabe: jeden Morgen genau die drei Schritte nennen, die ihn heute am weitesten nach vorne bringen – Umsatz, Kunden, Sichtbarkeit.
 Regeln:
 - Grundlage ist NUR das LAGEBILD. Erfinde keine Namen, Zahlen oder Termine.
+- Bei Chancen gilt EMINS ABSPRACHE: Nenne genau den vereinbarten nächsten Schritt (z. B. "Nummer besorgen und anrufen"), mit dem echten Firmennamen. Schreibe NIE "abschließen", "Entscheidung erzwingen" o. Ä., wenn das nicht in der Absprache steht. Liegt das Datum der Absprache in der Zukunft, ist die Chance pausiert – nicht erwähnen. Steht in der Notiz "Kein eigenes Produkt", nenne es nicht Produkt.
 - Wenn ein Schritt sich auf einen OFFENEN PUNKT bezieht, gib dessen Index als "ref" an, sonst null.
 - Du arbeitest in einer Linie mit dem Assistenten und seiner KI-Truppe: Was gestern Abend für heute geplant wurde, kommt zuerst (außer etwas Dringenderes). Offene Freigaben sind fertige Arbeit, die nur einen Klick braucht – erwähne sie, wenn welche warten.
 - Reihenfolge: Geld und Fristen zuerst (überfällig, offene Rechnungen, neue Anfragen), dann Pipeline, dann Wachstum.

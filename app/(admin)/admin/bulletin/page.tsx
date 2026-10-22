@@ -132,9 +132,7 @@ export default async function BulletinSeite(props: { searchParams: Promise<{ aus
                     {ausgabe.meldungen.length} {t.meldungen}
                   </p>
                 </div>
-                <p className="text-pretty font-sans text-xl font-semibold leading-relaxed text-foreground md:text-2xl">
-                  {ausgabe.lage[sprache]}
-                </p>
+                <LageText text={ausgabe.lage[sprache]} />
               </Surface>
 
               <nav aria-label={t.alle} className="flex flex-wrap gap-2">
@@ -363,5 +361,28 @@ function MeldungKarte({
         </p>
       )}
     </Surface>
+  )
+}
+
+/** Lage in Lesestücke: Kernsatz vorn, Begründung ruhig, „Für creaDIG“ als eigener Hinweis. */
+function LageText({ text }: { text: string }) {
+  const saetze = text.split(/(?<=[.!?])\s+(?=[A-ZÄÖÜÇĞİŞ„"])/).map((s) => s.trim()).filter(Boolean)
+  const uns = saetze.findIndex((s) => /^(Für creaDIG|creaDIG için|Bizim için|Für uns)/i.test(s))
+  const kern = saetze[0] ?? text
+  const mitte = saetze.slice(1, uns > 0 ? uns : undefined)
+  const fuerUns = uns > 0 ? saetze.slice(uns) : []
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="text-balance font-sans text-lg font-semibold leading-snug text-foreground md:text-xl">{kern}</p>
+      {mitte.length > 0 && (
+        <p className="max-w-3xl text-pretty text-[15px] leading-relaxed text-muted-foreground">{mitte.join(" ")}</p>
+      )}
+      {fuerUns.length > 0 && (
+        <div className="flex flex-col gap-1 rounded-2xl bg-primary/5 px-5 py-4">
+          <p className="font-mono text-[11px] uppercase tracking-widest text-primary">creaDIG</p>
+          <p className="max-w-3xl text-pretty text-[15px] leading-relaxed text-foreground">{fuerUns.join(" ")}</p>
+        </div>
+      )}
+    </div>
   )
 }

@@ -13,10 +13,11 @@ import { erstelleEntwurf, ladeEntwuerfe } from "@/lib/verkaufen-entwurf"
 import { firmenRahmen, INHABER } from "./rahmen"
 import { findeKontaktMail } from "./kontaktsuche"
 import { pruefeWebseite, webcheckNotiz } from "./webcheck"
-import { ergaenzeFehlendeAdressen, istMail, nachfassen } from "./versand"
+import { istMail, nachfassen } from "./versand"
 import { holeEingang } from "@/lib/eingang"
 import { bulletinStoff, erstelleBulletin } from "@/lib/bulletin/agent"
 import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
+import { ABTEILUNGEN } from "@/lib/zentrale/abteilungen"
 import {
   assistentDb,
   ladeFreigaben,
@@ -451,8 +452,8 @@ Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","emai
   return { ergebnis: `${neu} neue Firmen für ${revier.produkt} gefunden`, anzahl: neu }
 }
 
-async function rat(): Promise<Ergebnis> {
-  const woche = kw(new Date())
+async function rat(opt: { manuell?: boolean } = {}): Promise<Ergebnis> {
+  const kwHeute = kw(new Date())
   const [rahmen, verkauf, status, offene, laeufe, frueher] = await Promise.all([
     firmenRahmen(),
     ladeVerkaufslage(),
@@ -462,7 +463,12 @@ async function rat(): Promise<Ergebnis> {
     ladeRaete(2),
   ])
   await protokolliereFaden(await assistentDb().catch(() => null), "finanz", "assistent", "Rat liest Finanzrahmen")
-  if (frueher[0]?.woche === woche) return { ergebnis: "Sitzung dieser Woche hat schon getagt", anzahl: 0 }
+  const schonGetagt = Boolean(frueher[0]?.woche.startsWith(kwHeute))
+  if (schonGetagt && !opt.manuell) return { ergebnis: "Sitzung dieser Woche hat schon getagt", anzahl: 0 }
+  /* Ruft Emin selbst eine Sitzung ein, obwohl diese Woche schon getagt wurde, ist es eine außerordentliche Sitzung mit eigenem Schlüssel. */
+  const ausserordentlich = schonGetagt
+  const woche = ausserordentlich ? `${kwHeute}-a${Date.now().toString(36)}` : kwHeute
+  const kwNr = kwHeute.split("-")[1] ?? kwHeute
 
   const zugesagt = Object.entries(status).filter(([, s]) => s === "teilnehmen").map(([k]) => k)
   const lagebild = {
@@ -482,7 +488,7 @@ async function rat(): Promise<Ergebnis> {
   const { text } = await generateText({
     model: MODELL,
     maxOutputTokens: 2500,
-    prompt: `Ihr seid die Geschäftsleitung von creaDIG Solutions und haltet die Wochensitzung KW ${woche}. Ihr behandelt die Firma als eure eigene und denkt wie Gründer, die aus wenig viel machen.
+    prompt: `Ihr seid die Geschäftsleitung von creaDIG Solutions und haltet ${ausserordentlich ? `eine AUSSERORDENTLICHE Sitzung in KW ${kwNr} (Emin hat sie einberufen – geht auf das ein, was sich seit der letzten Sitzung geändert hat)` : `die Wochensitzung KW ${kwNr}`}. Ihr behandelt die Firma als eure eigene und denkt wie Gründer, die aus wenig viel machen.
 ${INHABER}
 
 Teilnehmer: CEO (Richtung, Fokus, sagt Nein zu Ablenkung), CFO (prüft jede Idee gegen das Budget unten – blockiert alles, was nicht bezahlbar ist), Vertrieb (Abschlüsse, Neukunden), Marketing (LinkedIn-Artikel, Sichtbarkeit, organisch zuerst).
@@ -495,11 +501,12 @@ Regeln:
 - Was der CFO oder CEO ablehnt (z. B. Messestand, bezahlte Werbung, neues Produkt), kommt mit Grund in "verworfen".
 - Emin hat ca. 10 Stunden pro Woche für Vertrieb. Maximal 3 Beschlüsse. Jeder Beschluss konkret und in einer Woche erledigbar.
 - "wer": "truppe" = die KI-Agenten bereiten vor; "emin" = nur er kann es tun (Anruf, Termin, Unterschrift).
+- "abteilung": welche Abteilung den Beschluss umsetzt bzw. vorbereitet, eine ID aus: ${ABTEILUNGEN.map((a) => `${a.id} (${a.name.de})`).join(", ")}.
 - Wenn Emin letzte Woche geantwortet hat, berücksichtigt seine Antwort ausdrücklich.
 - "frage": genau eine Rückfrage an Emin, deren Antwort die nächste Sitzung besser macht.
 - Deutsch, klar, keine Floskeln.
 
-Antworte NUR mit JSON: {"lage":"2 Sätze","stimmen":[{"rolle":"CEO","sagt":""},{"rolle":"CFO","sagt":""},{"rolle":"Vertrieb","sagt":""},{"rolle":"Marketing","sagt":""}],"beschluesse":[{"was":"","warum":"","kostenEur":0,"wer":"emin"}],"verworfen":["Idee – Grund"],"frage":""}`,
+Antworte NUR mit JSON: {"lage":"2 Sätze","stimmen":[{"rolle":"CEO","sagt":""},{"rolle":"CFO","sagt":""},{"rolle":"Vertrieb","sagt":""},{"rolle":"Marketing","sagt":""}],"beschluesse":[{"was":"","warum":"","kostenEur":0,"wer":"emin","abteilung":"vertrieb"}],"verworfen":["Idee – Grund"],"frage":""}`,
   })
 
   const start = text.indexOf("{")
@@ -511,21 +518,51 @@ Antworte NUR mit JSON: {"lage":"2 Sätze","stimmen":[{"rolle":"CEO","sagt":""},{
     p = null
   }
   if (!p?.lage || !Array.isArray(p.stimmen) || !Array.isArray(p.beschluesse)) throw new Error("Sitzungsprotokoll unlesbar")
-  p.beschluesse = p.beschluesse.slice(0, 3).map((b) => ({ ...b, kostenEur: Math.max(0, Number(b.kostenEur) || 0), wer: b.wer === "truppe" ? "truppe" : "emin" }))
+  p.beschluesse = p.beschluesse.slice(0, 3).map((b) => ({
+    ...b,
+    kostenEur: Math.max(0, Number(b.kostenEur) || 0),
+    wer: b.wer === "truppe" ? "truppe" : "emin",
+    abteilung: ABTEILUNGEN.some((a) => a.id === b.abteilung) ? b.abteilung : "geschaeftsfuehrung",
+  }))
   p.verworfen = Array.isArray(p.verworfen) ? p.verworfen.slice(0, 4) : []
+  p.stimmen = p.stimmen.filter((s) => s?.rolle && s?.sagt)
+  p.frage = typeof p.frage === "string" ? p.frage : ""
   if (!(await speichereRat(woche, p))) return { ergebnis: "Sitzung dieser Woche hat schon getagt", anzahl: 0 }
 
+  const sitzung = ausserordentlich ? `außerordentlichen Sitzung KW ${kwNr}` : `Wochensitzung KW ${kwNr}`
+  const { legeAuftragAn } = await import("@/lib/koordination/koordinator")
+  let verteilt = 0
   for (const [i, b] of p.beschluesse.entries()) {
-    if (b.wer !== "emin") continue
-    await legeFreigabeAn({
-      art: "aufgabe",
-      titel: `Beschluss: ${b.was}`.slice(0, 160),
-      inhalt: `${b.warum}\n\nKosten: ${b.kostenEur ? `${b.kostenEur} €` : "keine"}\nAus der Wochensitzung KW ${woche}.`,
-      quelle: `rat:${woche}:${i}`,
-      agent: "rat",
-    })
+    if (b.wer === "emin") {
+      await legeFreigabeAn({
+        art: "aufgabe",
+        titel: `Beschluss: ${b.was}`.slice(0, 160),
+        inhalt: `${b.warum}\n\nKosten: ${b.kostenEur ? `${b.kostenEur} €` : "keine"}\nAus der ${sitzung}.`,
+        quelle: `rat:${woche}:${i}`,
+        agent: "rat",
+      })
+    }
+    /* Jeder Beschluss wird sofort Arbeit einer Abteilung – auch Emins: die Abteilung bereitet alles vor, damit er nur noch handeln muss. */
+    const id = await legeAuftragAn({
+      von: "geschaeftsfuehrung",
+      an: b.abteilung ?? "geschaeftsfuehrung",
+      titel: `${b.wer === "emin" ? "Für Emin vorbereiten" : "Umsetzen"}: ${b.was}`,
+      inhalt: `${b.warum}\n\nBudget: ${b.kostenEur ? `${b.kostenEur} €` : "kostenlos"}\nBeschlossen in der ${sitzung}.${b.wer === "emin" ? "\nEmin führt aus – liefere ihm eine fertige Vorlage (Text, Nummer, Ablauf)." : ""}`,
+      quelle: `rat-auftrag:${woche}:${i}`,
+    }).catch(() => null)
+    if (id) verteilt++
   }
-  return { ergebnis: `Sitzung KW ${woche.split("-")[1]}: ${p.beschluesse.length} Beschlüsse`, anzahl: p.beschluesse.length }
+  if (verteilt > 0) await koordinationAbarbeiten()
+
+  const { sendeRatMail } = await import("./rat-mail")
+  const mail = await sendeRatMail(p, { kw: kwNr, ausserordentlich, auftraege: verteilt }).catch((e) => {
+    console.error("[assistent] rat-mail", e instanceof Error ? e.message : e)
+    return false
+  })
+  return {
+    ergebnis: `${ausserordentlich ? "Außerordentliche Sitzung" : "Sitzung"} KW ${kwNr}: ${p.beschluesse.length} Beschlüsse, ${verteilt} an Abteilungen verteilt${mail ? ", Protokoll per Mail" : ""}`,
+    anzahl: p.beschluesse.length,
+  }
 }
 
 type GolfChance = {
@@ -570,12 +607,26 @@ async function koordinator(): Promise<Ergebnis> {
   return koordinatorRunde()
 }
 
-const LAEUFER: Record<AgentKey, () => Promise<Ergebnis>> = { koordinator, lage, vertrieb, messen, finanz, projekte, kapital, golf, redaktion, jaeger, rat, bulletin: () => erstelleBulletin() }
+type Start = { manuell?: boolean }
+const LAEUFER: Record<AgentKey, (o: Start) => Promise<Ergebnis>> = {
+  koordinator,
+  lage,
+  vertrieb,
+  messen,
+  finanz,
+  projekte,
+  kapital,
+  golf,
+  redaktion,
+  jaeger,
+  rat: (o) => rat(o),
+  bulletin: (o) => erstelleBulletin({ erzwingen: o.manuell }),
+}
 
-export async function fuehreAgentAus(key: AgentKey): Promise<void> {
+export async function fuehreAgentAus(key: AgentKey, o: Start = {}): Promise<void> {
   const start = Date.now()
   try {
-    const r = await LAEUFER[key]()
+    const r = await LAEUFER[key](o)
     await protokolliereLauf({ agent: key, ...r, dauerMs: Date.now() - start })
   } catch (e) {
     console.error("[assistent] agent", key, e instanceof Error ? e.message : e)
@@ -597,10 +648,17 @@ export async function fuehreFaelligeAus(): Promise<AgentKey[]> {
     const l = laeufe[a.key]
     if (!l) return true
     const zuletzt = new Date(l.zeit)
+    /* Ein gescheitertes Bulletin wartet nicht bis morgen: nach 90 Minuten neuer Versuch, damit morgens Meldungen da sind. */
+    if (a.key === "bulletin" && (l.fehler || l.anzahl === 0) && jetzt.getTime() - zuletzt.getTime() > 90 * 60000) return true
     return a.takt === "taeglich" ? berlinTag(zuletzt) !== berlinTag(jetzt) : jetzt.getTime() - zuletzt.getTime() > 6.5 * 86400000
   }).map((a) => a.key)
   // Chief of Staff zuletzt, damit er die heutigen Ergebnisse aller Abteilungen sieht.
-  const reihenfolge = [...faellig.filter((k) => k !== "koordinator"), ...faellig.filter((k) => k === "koordinator")]
+  // Bulletin zuerst (Redaktion und Rat nutzen seine Meldungen), Chief of Staff zuletzt.
+  const reihenfolge = [
+    ...faellig.filter((k) => k === "bulletin"),
+    ...faellig.filter((k) => k !== "koordinator" && k !== "bulletin"),
+    ...faellig.filter((k) => k === "koordinator"),
+  ]
   for (const key of reihenfolge) await fuehreAgentAus(key)
   if (!faellig.includes("koordinator")) await koordinationAbarbeiten()
   await holeEingang().catch((e) => console.error("[assistent] eingang", e instanceof Error ? e.message : e))
