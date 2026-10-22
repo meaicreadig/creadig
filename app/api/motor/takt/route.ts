@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server"
 
 import { takt } from "@/lib/motor/takt"
+import { cronErlaubt } from "@/lib/cron-auth"
 
 export const dynamic = "force-dynamic"
 export const maxDuration = 60
@@ -11,16 +12,17 @@ export const maxDuration = 60
  * ohnehin nur ab, was fällig ist, und kann nichts vorziehen.
  */
 export async function GET(request: NextRequest) {
-  const secret = process.env.CRON_SECRET?.trim()
-  const auth = request.headers.get("authorization")
-  const erlaubt = secret
-    ? auth === `Bearer ${secret}`
-    : (request.headers.get("user-agent") ?? "").startsWith("vercel-cron/")
-  if (!erlaubt) return NextResponse.json({ ok: false }, { status: 401 })
+  if (!cronErlaubt(request)) return NextResponse.json({ ok: false }, { status: 401 })
 
   try {
     const ergebnis = await takt()
-    return NextResponse.json({ ok: true, ...ergebnis })
+    /* Termin-Nachfass hängt nicht mehr an einem Seitenbesuch: unbenutzte Terminlinks bekommen hier täglich ihren Entwurf. */
+    const { bereiteNachfassVor } = await import("@/lib/termine/nachfass")
+    const nachfass = await bereiteNachfassVor().catch((e) => {
+      console.error("[nachfass]", e instanceof Error ? e.message : e)
+      return 0
+    })
+    return NextResponse.json({ ok: true, ...ergebnis, nachfass })
   } catch (error) {
     console.error("[motor] takt", error instanceof Error ? error.message : error)
     return NextResponse.json({ ok: false }, { status: 500 })

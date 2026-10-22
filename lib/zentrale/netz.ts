@@ -343,6 +343,15 @@ export async function ladeNetz({
         wege: [],
       }
 
+  const forschung: Signal = {
+    wert: "F&E",
+    zeile: tr ? "Forschungszulage kanıtı" : "Nachweis Forschungszulage",
+    zustand: "ruhig",
+    last: 0.2,
+    punkte: [tr ? "Haftalık Ar-Ge saatleri" : "Wöchentliche F&E-Stunden"],
+    wege: [{ label: tr ? "Saat gir" : "Stunden erfassen", href: "/admin/forschung" }],
+  }
+
   /* ── Gehirn: alles, was im Blick ist ── */
   const operativ = items.filter((i) => i.rank !== "entscheidung" && i.rank !== "betriebsblocker").length
   const imBlick = operativ + (truppeOffen ?? 0) + linkedinOffen
@@ -362,5 +371,5 @@ export async function ladeNetz({
     wege: [{ label: tr ? "Bugün yapılacaklar" : "Heute zu tun", href: "#heute-titel" }],
   }
 
-  return { uebersicht, assistent, leistung, bulletin, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen, finanz, system, webseite }
+  return { uebersicht, assistent, leistung, bulletin, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen, finanz, system, webseite, forschung }
 }

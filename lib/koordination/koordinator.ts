@@ -1,7 +1,8 @@
 import "server-only"
 import { generateText } from "ai"
 import { ABTEILUNGEN, abteilungVonAgent } from "@/lib/zentrale/abteilungen"
-import { assistentDb, ergaenzeExtra, letzteLaeufe, setzeFreigabe } from "@/lib/assistent/store"
+import { assistentDb, ergaenzeExtra, legeFreigabeAn, letzteLaeufe, setzeFreigabe } from "@/lib/assistent/store"
+import type { Abfrage } from "@/lib/neon-abfrage"
 
 /**
  * Interne Koordination der KI-Firma.
@@ -168,6 +169,7 @@ async function sammleEin(): Promise<number> {
   const rows = (await q(
     `SELECT f.id, f.titel, f.inhalt, f.agent FROM assistent_freigaben f
      WHERE f.status = 'offen' AND f.art IN ('aufgabe','notiz')
+       AND coalesce(f.extra->'koordination'->>'beiEmin', '') <> 'true'
        AND NOT EXISTS (SELECT 1 FROM firma_auftraege a WHERE a.quelle = 'frg:' || f.id)
      ORDER BY f.created_at ASC LIMIT 10`,
     [],
@@ -256,6 +258,71 @@ const REGELN = `GRENZEN (unverletzlich):
 - Erfinde keine Zahlen, Namen oder Fakten. Was fehlt, benennst du als offene Frage.
 - Gib nur weiter, wenn eine andere Abteilung wirklich etwas Eigenes beitragen muss (z. B. Vertrieb gewinnt → Projektmanagement liefert; Golf-Chance → Geschäftsführung bereitet Pitch vor).`
 
+/**
+ * Arbeit, die einen Kunden, Geld oder die Außenwirkung berührt, entscheidet nie die KI allein:
+ * Motor-Schritte (Kundenmails), Finanz- und Forderungsvorschläge (Angebot, Mahnung), Projekt-
+ * Nachfassen – und alles, dessen Titel nach Versand, Angebot, Rechnung oder Kundenkontakt klingt.
+ */
+const AUSSEN_AGENTEN = new Set(["motor", "finanz", "forderungen", "projekte", "golf", "kapital", "investor"])
+const AUSSEN_TITEL =
+  /\b(mail|e-mail|senden|schicken|versenden|angebot|rechnung|mahnung|zahlungserinnerung|anruf|anrufen|termin|dankesmail|kunde|kundin|nachfass|antwort an|antrag|bewerbung|pitch)\w*/i
+
+export function gehtNachAussen(a: { von: string; titel: string; freigabeId?: string | null }): boolean {
+  /* Reine Abteilungsaufträge (ohne Freigabe-Karte) bleiben intern – sonst landet jeder Wochenplan bei Emin. */
+  return AUSSEN_AGENTEN.has(a.von) || (Boolean(a.freigabeId) && AUSSEN_TITEL.test(a.titel))
+}
+
+/** Emin eine fertige Vorlage in den Freigabe-Eingang legen – an die bestehende Freigabe oder als neue Karte. */
+async function legeEminVor(q: Abfrage, a: Auftrag, vorlage: string): Promise<void> {
+  const koordination = { abteilung: a.an, ergebnis: vorlage, auftragId: a.id, beiEmin: true }
+  let freigabeId = a.freigabeId
+  if (freigabeId) {
+    await ergaenzeExtra(freigabeId, { koordination })
+  } else {
+    freigabeId = await legeFreigabeAn({
+      art: "aufgabe",
+      titel: a.titel,
+      inhalt: vorlage,
+      quelle: `auftrag:${a.id}`,
+      agent: a.von,
+      extra: { koordination },
+    })
+  }
+  await q(`UPDATE firma_auftraege SET status = 'bei_emin', ergebnis = $2, freigabe_id = coalesce($3, freigabe_id), erledigt_at = now() WHERE id = $1`, [
+    a.id,
+    vorlage,
+    freigabeId,
+  ])
+}
+
+/**
+ * Reparatur: Bis 22.10.2026 hat die Koordination Vorlagen für Emin und Kundenschritte als
+ * "freigegeben" geschlossen, ohne dass Emin sie je sah. Diese Karten kommen einmalig zurück
+ * in den Eingang (offen, sichtbar). Idempotent über extra.zurueckgeholt.
+ */
+async function holeVorlagenZurueck(q: Abfrage): Promise<number> {
+  const rows = (await q(
+    `SELECT f.id, f.titel, coalesce(f.agent, '') AS agent, f.extra->'koordination' AS k FROM assistent_freigaben f
+      WHERE f.status = 'freigegeben' AND f.art IN ('aufgabe','notiz')
+        AND f.extra ? 'koordination' AND NOT (f.extra ? 'zurueckgeholt')
+        AND f.erledigt_at > now() - interval '30 days'`,
+    [],
+  )) as { id: string; titel: string; agent: string; k: { automatisch?: boolean } }[]
+  let n = 0
+  for (const r of rows) {
+    const warVorlage = !r.k?.automatisch
+    if (!warVorlage && !gehtNachAussen({ von: r.agent, titel: r.titel, freigabeId: r.id })) continue
+    await q(
+      `UPDATE assistent_freigaben SET status = 'offen', erledigt_at = NULL,
+         extra = jsonb_set(extra || jsonb_build_object('zurueckgeholt', now()::text), '{koordination,beiEmin}', 'true'::jsonb)
+       WHERE id = $1 AND status = 'freigegeben'`,
+      [r.id],
+    )
+    n++
+  }
+  return n
+}
+
 async function bearbeite(a: Auftrag): Promise<void> {
   const q = await db()
   if (!q) return
@@ -296,14 +363,10 @@ Antworte NUR mit JSON:
     return
   }
 
-  if (e.entscheidung === "emin") {
+  /* Nach außen gerichtete Arbeit geht immer an Emin – auch wenn die KI sie für erledigt hält. */
+  if (e.entscheidung === "emin" || gehtNachAussen(a)) {
     const vorlage = `${e.frage ? `Frage: ${e.frage}\n\n` : ""}Vorbereitet von ${abteilungName(a.an)}:\n${ergebnis}`
-    // Die Frage lebt nur noch als Auftrag "Wartet auf dich" in der Zusammenarbeit – nie als Aufgabe im Eingang.
-    if (a.freigabeId) {
-      await ergaenzeExtra(a.freigabeId, { koordination: { abteilung: a.an, ergebnis: vorlage, auftragId: a.id } })
-      await setzeFreigabe(a.freigabeId, "freigegeben")
-    }
-    await q(`UPDATE firma_auftraege SET status = 'bei_emin', ergebnis = $2, erledigt_at = now() WHERE id = $1`, [a.id, vorlage])
+    await legeEminVor(q, a, vorlage)
     return
   }
 
@@ -319,6 +382,8 @@ Antworte NUR mit JSON:
 export async function arbeiteWarteschlangeAb(): Promise<{ eingesammelt: number; bearbeitet: number }> {
   const q = await db()
   if (!q) return { eingesammelt: 0, bearbeitet: 0 }
+  const zurueck = await holeVorlagenZurueck(q)
+  if (zurueck > 0) console.info(`[koordination] ${zurueck} Vorlagen wieder in den Eingang gelegt`)
   const eingesammelt = await sammleEin()
   // Kleine Sperre: dieselben Aufträge nicht parallel aus zwei Aufrufen bearbeiten.
   const rows = (await q(

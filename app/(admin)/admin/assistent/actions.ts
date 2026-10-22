@@ -13,6 +13,7 @@ import { AGENT_KEYS, fuehreAgentAus, type AgentKey } from "@/lib/assistent/trupp
 import { postBeitrag } from "@/lib/assistent/redaktion-post"
 import { erkenneLoeschwunsch, loescheFirmen } from "@/lib/assistent/loeschen"
 import { istMail, markiereAntwort, sendeFreigabeMail } from "@/lib/assistent/versand"
+import { sendeForderung } from "@/lib/agenten/forderungen"
 import {
   aendereInhalt,
   assistentDb,
@@ -147,6 +148,8 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
   const inhalt = form.get("inhalt")
   if (status === "freigegeben" && typeof titel === "string" && typeof inhalt === "string" && inhalt.trim()) {
     await aendereInhalt(fid, titel.trim() || f.titel, inhalt.trim())
+    /* Geändert vor der Freigabe = der Agent lag daneben. Zählt in seine Note (Qualitätssicherung). */
+    if (inhalt.trim() !== f.inhalt.trim() || (titel.trim() && titel.trim() !== f.titel.trim())) await ergaenzeExtra(fid, { bearbeitet: true })
   }
 
   if (status === "freigegeben" && f.art === "mail") {
@@ -160,7 +163,9 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
       await ergaenzeExtra(fid, { basisBestaetigt })
       f.extra = { ...(f.extra ?? {}), basisBestaetigt }
     }
-    const r = await sendeFreigabeMail(f, an, betreff, text)
+    /* Tahsilat-Karten senden über das Mahnwesen (Vorlage, offener Betrag, Mahnstufe im Beleg) – nie als Vertriebsmail. */
+    const forderung = f.agent === "forderungen" && f.extra.bezug?.startsWith("finanz:") ? f.extra.bezug.slice(7) : null
+    const r = forderung ? await sendeForderung(forderung) : await sendeFreigabeMail(f, an, betreff, text)
     if (!r.ok) {
       await ergaenzeExtra(fid, { fehler: r.grund })
       revalidatePath("/admin/assistent")

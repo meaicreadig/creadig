@@ -85,8 +85,8 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Kundenservice", tr: "Müşteri Hizmetleri" },
     aufgabe: { de: "Anfragen, Support, Verlängerung", tr: "Talep, destek, yenileme" },
     knoten: [],
-    agenten: [],
-    besetzung: "leer",
+    agenten: ["kundenservice"],
+    besetzung: "aktiv",
   },
   {
     id: "produktmanagement",
@@ -102,9 +102,9 @@ export const ABTEILUNGEN: Abteilung[] = [
     bereich: "technik",
     name: { de: "Entwicklung", tr: "Yazılım Geliştirme" },
     aufgabe: { de: "Releases, Fehler, Deployments", tr: "Sürüm, hata, yayına alma" },
-    knoten: [],
-    agenten: [],
-    besetzung: "leer",
+    knoten: ["forschung"],
+    agenten: ["forschung"],
+    besetzung: "teilweise",
   },
   {
     id: "it",
@@ -112,7 +112,7 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "IT & Sicherheit", tr: "Bilgi Teknolojileri ve Güvenlik" },
     aufgabe: { de: "Systemzustand, Webseite, Sicherheit, Alarme", tr: "Sistem durumu, web sitesi, güvenlik, alarm" },
     knoten: ["system", "webseite"],
-    agenten: ["webseite"],
+    agenten: ["webseite", "sicherheit"],
     besetzung: "aktiv",
   },
   {
@@ -139,8 +139,8 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Qualitätsmanagement", tr: "Kalite Yönetimi" },
     aufgabe: { de: "Prüfungen, Kundenfreigaben, Nachweise", tr: "Kontrol, müşteri onayı, kanıt" },
     knoten: [],
-    agenten: [],
-    besetzung: "teilweise",
+    agenten: ["qualitaet", "wissen"],
+    besetzung: "aktiv",
   },
   {
     id: "finanzen",
@@ -148,7 +148,7 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Finanzen", tr: "Finans" },
     aufgabe: { de: "Buchhaltung, Steuern, Liquidität", tr: "Muhasebe, vergi, nakit" },
     knoten: ["finanz"],
-    agenten: ["finanz"],
+    agenten: ["finanz", "forderungen"],
     besetzung: "teilweise",
   },
   {

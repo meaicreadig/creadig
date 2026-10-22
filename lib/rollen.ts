@@ -201,6 +201,8 @@ export const FLAECHEN: readonly Flaeche[] = [
   /* Marketing-Übersicht: liest dieselben Veröffentlichungen, also dieselbe Regel — nur `owner`. */
   { pfad: "/admin/marketing", klasse: "eigene-lage", fuer: ["owner"] },
   /* Mail-Studio: Verteiler enthält fremde Adressen — ebenfalls nur `owner`. */
+  /* SEO aus der Google Search Console — eigene Kennzahlen, keine Personen. */
+  { pfad: "/admin/marketing/seo", klasse: "eigene-lage", fuer: ["owner"] },
   { pfad: "/admin/marketing/mail", klasse: "fremde-personen", fuer: ["owner"] },
   { pfad: "/admin/marketing/mail/:id", klasse: "fremde-personen", fuer: ["owner"] },
 
@@ -238,6 +240,8 @@ export const FLAECHEN: readonly Flaeche[] = [
   { pfad: "/admin/bulletin", klasse: "eigene-lage", fuer: ["owner", "vertrieb", "redaktion"] },
   { pfad: "/admin/leistung", klasse: "eigene-lage", fuer: ["owner"] },
   { pfad: "/admin/webseite", klasse: "eigene-lage", fuer: ["owner"] },
+  /* F&E-Stunden — Nachweis für die Forschungszulage. Nur der Inhaber. */
+  { pfad: "/admin/forschung", klasse: "eigene-lage", fuer: ["owner"] },
   { pfad: "/admin/messen", klasse: "eigene-lage", fuer: ["owner", "vertrieb", "redaktion"] },
   { pfad: "/admin/vertrieb", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   { pfad: "/admin/vertrieb/anfragen", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },

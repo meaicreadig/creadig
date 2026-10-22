@@ -190,10 +190,14 @@ async function meldeInhaber(e: { von: string; art: string; zusammenfassung: stri
       from,
       to: [an],
       reply_to: e.von,
-      subject: `Antwort von ${e.von} · ${ART_TEXT[e.art as EingangArt] ?? e.art}`,
-      text: `${e.zusammenfassung}\n\nEntwurf liegt zur Freigabe bereit: ${siteUrl()}/admin/assistent#eingang\n\n— Originaltext —\n${e.text}`,
+      subject: `${e.art === "unzugeordnet" ? "Mail" : "Antwort"} von ${e.von} · ${ART_TEXT[e.art as EingangArt] ?? e.art}`,
+      text: `${e.zusammenfassung}\n\n${
+        e.art === "unzugeordnet"
+          ? "Gehört zu keiner unserer Mails – der Kundenservice legt einen Antwortentwurf an"
+          : "Entwurf liegt zur Freigabe bereit"
+      }: ${siteUrl()}/admin/assistent#eingang\n\n— Originaltext —\n${e.text}`,
     }),
-  }).catch(() => undefined)
+  }).catch((err) => console.error("[eingang] Inhaber-Mail:", err instanceof Error ? err.message : err))
 }
 
 export const ART_TEXT: Record<EingangArt | "unzugeordnet", string> = {
@@ -222,7 +226,22 @@ export async function verarbeiteEingang(emailId: string): Promise<boolean> {
     const kontakt = await kontaktZu(q, von)
 
     if (!ursprung) {
-      await q(`UPDATE mail_eingang SET von = $2, betreff = $3, text = $4 WHERE id = $1`, [emailId, von, m.subject, text])
+      /* Keine eigene Mail als Ursprung – trotzdem einordnen und Emin sofort Bescheid geben, nie still liegen lassen.
+         Den Antwortentwurf schreibt der Kundenservice (bekannte Absender) im nächsten Takt. */
+      const e = await ordneEin(null, von, m.subject, text, false)
+      await q(`UPDATE mail_eingang SET von = $2, betreff = $3, text = $4, art = $5, zusammenfassung = $6 WHERE id = $1`, [
+        emailId,
+        von,
+        m.subject,
+        text,
+        e.art,
+        e.zusammenfassung,
+      ])
+      if (e.art === "nein") {
+        const adresse = von?.match(/[^\s<>"]+@[^\s<>"]+/)?.[0]
+        if (adresse) await sperre(adresse, `Widerspruch per Mail („${m.subject ?? "ohne Betreff"}“)`, emailId)
+      }
+      if (e.art !== "abwesend") await meldeInhaber({ von, art: "unzugeordnet", zusammenfassung: e.zusammenfassung, text })
       return true
     }
 

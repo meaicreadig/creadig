@@ -26,6 +26,12 @@ import {
   Kanban,
   Network,
   Globe,
+  BadgeCheck,
+  BookCheck,
+  Receipt,
+  ShieldCheck,
+  Headset,
+  FlaskConical,
 } from "lucide-react"
 import { saeuleVon, zeitpunktText } from "@/lib/assistent/linkedin-plan"
 
@@ -51,7 +57,7 @@ import { firmenRahmen, type Rahmen } from "@/lib/assistent/rahmen"
 import { erkenneLoeschwunsch } from "@/lib/assistent/loeschen"
 import { Zusammenarbeit } from "@/components/admin/zusammenarbeit"
 import { auftragKennzahlen, ladeAuftraege } from "@/lib/koordination/koordinator"
-import { AGENTEN, fuehreFaelligeAus, type AgentInfo, type AgentKey } from "@/lib/assistent/truppe"
+import { AGENTEN, type AgentInfo, type AgentKey } from "@/lib/assistent/truppe"
 import { getVertriebStore } from "@/lib/lead-store"
 import { eingangAktiv, holeEingang, ladeEingang } from "@/lib/eingang"
 import { EingangListe } from "@/components/admin/eingang-liste"
@@ -315,6 +321,12 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
   bulletin: PenLine,
   marketing: Megaphone,
   recht: Scale,
+  qualitaet: BadgeCheck,
+  wissen: BookCheck,
+  forderungen: Receipt,
+  sicherheit: ShieldCheck,
+  kundenservice: Headset,
+  forschung: FlaskConical,
 }
 
 const agentName = (key: string | null) => AGENTEN.find((a) => a.key === key)?.name ?? "Assistent"
@@ -1031,9 +1043,10 @@ export default async function AssistentPage({
     ladeAuftraege(20).catch(() => []),
     auftragKennzahlen().catch(() => ({ heute: 0, erledigt: 0, uebergaben: 0, beiEmin: 0, offen: 0 })),
   ])
-  after(() => fuehreFaelligeAus().catch(() => undefined))
-  after(() => ergaenzeFehlendeAdressen().catch(() => undefined))
-  after(() => holeEingang().catch(() => undefined))
+  /* Die Truppe läuft nur im Morgen-Takt (Cron) und im Puls – nicht beim Seitenaufruf, sonst verschiebt
+     ein nächtlicher Besuch den Tageslauf und der Morgen bleibt leer. */
+  after(() => ergaenzeFehlendeAdressen().catch((e) => console.error("[assistent] adressen", e instanceof Error ? e.message : e)))
+  after(() => holeEingang().catch((e) => console.error("[assistent] eingang", e instanceof Error ? e.message : e)))
   const [eingang, buchungen, abend] = await Promise.all([
     ladeEingang(12),
     ladeNeueBuchungen(14, 10),

@@ -330,6 +330,19 @@ export async function protokolliereStufe(
 
 const ALLE_STUFEN = [...(STUFEN_REIHE as unknown as string[]), "won", "lost"]
 
+/** Stufenwechsel ins Rückgrat melden – gewonnen heißt für alle Abteilungen: Auftrag erteilt. */
+async function meldeStufe(q: Abfrage, oppId: string, von: string, nach: string, wer: string): Promise<void> {
+  if (nach !== "won") return
+  const k = (await q(`SELECT contact_id FROM opportunities WHERE id = $1`, [oppId])) as { contact_id: string | null }[]
+  const { ereignis } = await import("@/lib/motor/ereignis")
+  await ereignis("auftrag_erteilt", {
+    kontaktId: k[0]?.contact_id ?? null,
+    subjekt: `opportunity:${oppId}`,
+    daten: { von, wer },
+    schluessel: `auftrag_erteilt:${oppId}`,
+  })
+}
+
 /** Stufe von Hand setzen (auch zurück, gewonnen, verloren) – mit Protokoll, damit sie rücknehmbar bleibt. */
 export async function setzeStufeVonHand(q: Abfrage, oppId: string, nach: string): Promise<boolean> {
   if (!ALLE_STUFEN.includes(nach)) return false
@@ -341,6 +354,7 @@ export async function setzeStufeVonHand(q: Abfrage, oppId: string, nach: string)
   if (!alt || alt.status === nach || !alt.organisation_id) return false
   await q(`UPDATE opportunities SET status = $2, updated_at = now() WHERE id = $1`, [oppId, nach])
   await protokolliereStufe(q, alt.organisation_id, oppId, alt.status, nach, "von Hand", undefined, { actor: "emin", origin: "MANUAL" })
+  await meldeStufe(q, oppId, alt.status, nach, "emin")
   /* Gewonnen heißt hier dasselbe wie in der Pipeline: ein Angebots-ENTWURF in Finanz (nie Versand). */
   if (nach === "won") {
     try {
