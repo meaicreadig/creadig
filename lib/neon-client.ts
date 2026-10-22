@@ -1037,7 +1037,7 @@ async function once(sql: Sql, key: string, step: () => Promise<void>): Promise<v
  * NIEMALS ÜBERSCHREIBEN
  * Jedes Feld geht über `coalesce(vorhanden, neu)`: Was schon dasteht, bleibt
  * stehen. Trifft der Import auf eine Organisation, die bereits aus einer
- * Anfrage entstanden ist, erg��nzt er sie und übernimmt sie — er ersetzt sie
+ * Anfrage entstanden ist, ergänzt er sie und übernimmt sie — er ersetzt sie
  * nicht. Beim Namen ist das entscheidend: Zwei Zeilen für denselben Betrieb
  * wären genau die Dublette, die dieser Import verhindern soll.
  *

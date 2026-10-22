@@ -188,7 +188,7 @@ export function shellMetadata(locale: Locale): Metadata {
      * mehr aus; als Aussage darüber, was dieses Haus ist, stand es trotzdem
      * da, und es war falsch.
      *
-     * Was jetzt hier steht, ist entweder ein Name (creaDIG, die vier
+     * Was jetzt hier steht, ist entweder ein Name (creaDIG, die eigenen
      * Produkte) oder die Positionierung selbst. Kein Begriff, der eine
      * andere Kategorie behauptet.
      */
@@ -200,6 +200,7 @@ export function shellMetadata(locale: Locale): Metadata {
       "fibero",
       "CASSAMEA",
       "meahv",
+      "stammo",
       "KI-Systeme",
       "Osnabrück",
       "Schweiz",

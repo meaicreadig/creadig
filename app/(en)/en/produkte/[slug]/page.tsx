@@ -11,7 +11,7 @@ export const generateStaticParams = produktStaticParams
 export function generateMetadata(props: {
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
-  return produktMetadata("tr", props.params)
+  return produktMetadata("en", props.params)
 }
 
 export default function Page(props: { params: Promise<{ slug: string }> }) {

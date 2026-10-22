@@ -225,13 +225,20 @@ for (const b of produktBelege) {
   }
 }
 
-/* ── 7 · Kein Kundenbeleg ohne Freigabe (Nachpruefung zu lib/proof.ts) ──── */
-if (genannteClientWorks.length > 0) {
-  probleme.push(
-    `${genannteClientWorks.length} Kundenarbeit(en) waeren oeffentlich sichtbar. Das ist nicht ` +
-      `falsch — aber Gate 02 hat es nicht veranlasst. Pruefen: liegt fuer jede eine ` +
-      `hinterlegte Freigabe vor (npm run proof-drill)?`,
-  )
+/* ── 7 · Kein Kundenbeleg ohne Freigabe (Nachpruefung zu lib/proof.ts) ────
+ * Bis 22.10.2026 schlug hier JEDE sichtbare Kundenarbeit Alarm. Der Inhaber
+ * hat bestaetigt: fuer alle acht liegt die schriftliche Freigabe vor, und sie
+ * steht als `releases` in site-data. Geprueft wird jetzt, was zaehlt: Jede
+ * sichtbare Arbeit traegt eine vollstaendige, nicht zurueckgezogene Freigabe
+ * mit Person, Datum und Ablageort. */
+for (const w of genannteClientWorks) {
+  const gueltig = (w.releases ?? []).filter((r) => !r.withdrawnAt)
+  const luecke = gueltig.find((r) => !r.by?.name || !r.at || !r.reference?.trim())
+  if (!gueltig.length || luecke)
+    probleme.push(
+      `Kundenarbeit „${w.slug}" ist sichtbar, aber ihre Freigabe ist unvollstaendig ` +
+        `(Person, Datum oder Ablageort fehlt).`,
+    )
 }
 if (reviews.length > 0) {
   probleme.push(

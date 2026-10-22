@@ -236,7 +236,7 @@ const rawDictionary = {
         eyebrow: "Eigene Produkte",
         title: "Erst bauen. Dann reden.",
         note: "Zwei von vier. Die anderen beiden stehen auf der Produktseite.",
-        cta: "Alle vier Produkte",
+        cta: "Alle Produkte",
         /*
          * MP10-2.4 — der Verweis AM ENDE der Werkschau.
          *
@@ -245,7 +245,7 @@ const rawDictionary = {
          * Wer drei Arbeiten durchgescrollt hat, will genau das — und fand
          * am Ende nur eine Fussnote ueber Mockups und die naechste Sektion.
          */
-        ctaEnd: "Alle vier Produkte ansehen",
+        ctaEnd: "Alle Produkte ansehen",
       },
       /*
        * MP10-2.7 — die Ueberschrift ist in den Hero gezogen.
@@ -354,7 +354,7 @@ const rawDictionary = {
             cta: "Betrieb ansehen",
           },
         },
-        nettoNote: "Alle Beträge netto, zzgl. {vat} % USt.",
+        nettoNote: "{ust}",
         questionsLabel: "Zwei Fragen vorab",
         questionsCta: "Alle Fragen",
       },
@@ -483,7 +483,7 @@ const rawDictionary = {
         },
         products: {
           name: "Produkte ansehen",
-          what: "Vier eigene Systeme, die wir von Grund auf gebaut haben — eines im Tagesbetrieb, drei im Aufbau. Der schnellste Weg zu einem Urteil über uns.",
+          what: "Eigene Systeme, die wir von Grund auf gebaut haben — der Stand steht an jedem. Der schnellste Weg zu einem Urteil über uns.",
           cta: "Zu den Produkten",
         },
         works: {
@@ -517,7 +517,7 @@ const rawDictionary = {
       statement: "Was wir für Kunden entwickeln, betreiben wir für uns selbst. Diese Substanz unterscheidet ein System-Haus von einer Präsentation.",
       metaTitle: "Unternehmen — System-Haus aus Osnabrück, seit 2017",
       metaDescription:
-        "creaDIG: System-Haus im ICO InnovationsCentrum Osnabrück, gegründet 2017. Gründer, Arbeitsmodell, Schwerpunkte und Standort — ein Dach, fünf Ebenen, vier eigene Produkte.",
+        "creaDIG: System-Haus im ICO InnovationsCentrum Osnabrück, gegründet 2017. Gründer, Arbeitsmodell, Schwerpunkte und Standort — ein Dach, fünf Ebenen, eigene Produkte.",
       /*
        * Die drei Etappen des Hauses (KIZILELMA §7: „Das Dach zuerst — gross,
        * als Ursprung; die Produkte als sein Werk").
@@ -541,7 +541,7 @@ const rawDictionary = {
           {
             year: null,
             title: "Aus Aufträgen wurden Produkte",
-            body: "Was in Projekten immer wiederkehrte, haben wir gebaut statt jedes Mal neu zu lösen. Vier eigene Systeme: meAI, fibero, CASSAMEA, meahv — erfunden, gebaut und selbst betrieben.",
+            body: "Was in Projekten immer wiederkehrte, haben wir gebaut statt jedes Mal neu zu lösen. Eigene Systeme wie meAI, fibero, stammo, CASSAMEA und meahv — erfunden, gebaut und selbst betrieben.",
           },
           {
             year: "heute",
@@ -573,7 +573,7 @@ const rawDictionary = {
        */
       eyebrow: "Arbeiten",
       title: "Für andere gebaut.",
-      lead: "Vier eigene Produkte, die wir selbst erfunden und gebaut haben — dazu Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen, damit klar ist, was uns gehört.",
+      lead: "Eigene Produkte, die wir selbst erfunden und gebaut haben — dazu Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen, damit klar ist, was uns gehört.",
       /*
        * ZWEI FASSUNGEN, WEIL DIE SEITE ZWEI ZUSTAENDE HAT.
        *
@@ -592,10 +592,10 @@ const rawDictionary = {
       ohneKundenwerkCta: "Zu den eigenen Produkten",
       metaTitleOhneKundenwerk: "Arbeiten — Kundenwerk nur mit schriftlicher Freigabe",
       metaDescriptionOhneKundenwerk:
-        "creaDIG zeigt Kundenwerk erst nach schriftlicher Freigabe des Kunden. Heute liegt keine vor. Die vier eigenen Produkte stehen auf der Produktseite.",
+        "creaDIG zeigt Kundenwerk erst nach schriftlicher Freigabe des Kunden. Heute liegt keine vor. Die eigenen Produkte stehen auf der Produktseite.",
       metaTitle: "Arbeiten — eigene Produkte und Kundenwerk",
       metaDescription:
-        "Die Werkschau von creaDIG: vier eigene Produkte und Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen — eigene Systeme und Auftragsarbeit sind nicht dasselbe.",
+        "Die Werkschau von creaDIG: eigene Produkte und Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen — eigene Systeme und Auftragsarbeit sind nicht dasselbe.",
     },
     /*
      * DIE BELEGLAGE — die Rangfolge des Beweises, mit der leeren Stufe oben.
@@ -707,11 +707,11 @@ const rawDictionary = {
        * im ersten Satz, was die Seite wirklich ist: ein Beleg, kein Regal.
        */
       eyebrow: "Beweis, kein Katalog",
-      title: "Vier Produkte, die wir selbst gebaut haben.",
-      lead: "Die Seite belegt, was wir über uns sagen: Jedes dieser Systeme hat creaDIG von Grund auf gebaut. Eines läuft im eigenen Tagesbetrieb, die drei anderen sind im Aufbau — der Stand steht an jedem Produkt. Was wir für Sie bauen, steht unter Leistungen.",
+      title: "Produkte, die wir selbst gebaut haben.",
+      lead: "Die Seite belegt, was wir über uns sagen: Jedes dieser Systeme hat creaDIG von Grund auf gebaut. Ob live oder im Aufbau: Der Stand steht an jedem Produkt. Was wir für Sie bauen, steht unter Leistungen.",
       metaTitle: "Eigene Produkte — meAI, fibero, CASSAMEA, meahv",
       metaDescription:
-        "Die vier eigenen Produkte von creaDIG: meAI (KI-Business-Betriebssystem), fibero (Glasfaser-Operations), CASSAMEA (Gastro-Kasse, Schweiz) und meahv (Hausverwaltung).",
+        "Die eigenen Produkte von creaDIG: meAI (KI-Business-Betriebssystem), fibero (Glasfaser-Operations), stammo (digitale Stempelkarte im Wallet), CASSAMEA (Gastro-Kasse, Schweiz) und meahv (Hausverwaltung).",
       builtLabel: "Was wir gebaut haben",
       sectorLabel: "Sektor",
       statusLabel: "Stand",
@@ -1201,7 +1201,7 @@ const rawDictionary = {
     portfolio: {
       eyebrow: "Werkschau",
       title: "Gebaut. Und betrieben.",
-      lead: "Vier eigene Produkte, die wir selbst erfunden und gebaut haben — dazu Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen, damit klar ist, was uns gehört.",
+      lead: "Eigene Produkte, die wir selbst erfunden und gebaut haben — dazu Kundenwerk aus Deutschland und der Schweiz. Getrennt ausgewiesen, damit klar ist, was uns gehört.",
       built: "Was wir gebaut haben",
       products: "Eigene Produkte",
       productsNote: "Selbst erfunden, selbst gebaut, selbst betrieben.",
@@ -1294,7 +1294,7 @@ const rawDictionary = {
       items: [
         {
           q: "Was kostet ein Auftritt bei creaDIG?",
-          a: "Das Website-Paket kostet {price:website} netto, als Festpreis. Pro Gewerk gibt es einen Pilotplatz für {price:website-pilot} netto — im Tausch gegen die schriftliche Freigabe, Ihren Betrieb als Referenz zu zeigen. Die Website-Betreuung kostet {price:betreuung} netto im Monat. Alle Preise zzgl. {vat} % USt., Festpreis für den vereinbarten Umfang.",
+          a: "Das Website-Paket kostet {price:website} netto, als Festpreis. Pro Gewerk gibt es einen Pilotplatz für {price:website-pilot} netto — im Tausch gegen die schriftliche Freigabe, Ihren Betrieb als Referenz zu zeigen. Die Website-Betreuung kostet {price:betreuung} netto im Monat. {ust} Festpreis für den vereinbarten Umfang.",
         },
         {
           q: "Wie läuft ein Projekt ab?",
@@ -1447,8 +1447,8 @@ const rawDictionary = {
      */
     architecture: {
       eyebrow: "Das Haus",
-      title: "Ein Dach, fünf Ebenen, vier Produkte.",
-      lead: "Das ganze Unternehmen in einer Ansicht: oben das Dach, darunter die fünf Ebenen, quer darunter der Betrieb — und unten die vier eigenen Produkte, jedes an der Ebene, auf der es sitzt.",
+      title: "Ein Dach, fünf Ebenen, eigene Produkte.",
+      lead: "Das ganze Unternehmen in einer Ansicht: oben das Dach, darunter die fünf Ebenen, quer darunter der Betrieb — und unten die eigenen Produkte, jedes an der Ebene, auf der es sitzt.",
       kompaktTitle: "Ein Dach, fünf Ebenen.",
       kompaktLead: "Das ganze Haus in einer Ansicht: oben das Dach, darunter die fünf Ebenen, quer darunter der Betrieb. Sie können auf jeder Ebene einsteigen — und auf jeder aufhören.",
       roofLabel: "Das Dach",
@@ -1456,7 +1456,7 @@ const rawDictionary = {
       layersLabel: "Fünf Ebenen",
       operateLabel: "Quer darunter",
       operateNote: "Hosting · Monitoring · Updates · Security · Backups · Support · Weiterentwicklung",
-      productsLabel: "Vier eigene Produkte",
+      productsLabel: "Eigene Produkte",
       onLayer: "auf Ebene",
       caption:
         "Kein Organigramm und keine Marktübersicht — die Ordnung des eigenen Hauses. Jede Ebene bieten wir als Leistung an; jedes Produkt ist der Beleg, dass wir sie selbst gebaut haben.",
@@ -1628,7 +1628,7 @@ const rawDictionary = {
      */
     houseProducts: {
       eyebrow: "Unter dem Dach",
-      title: "Vier eigene Produkte.",
+      title: "Eigene Produkte.",
       lead: "Selbst erfunden, selbst gebaut, selbst betrieben — und deshalb der beste Beleg dafür, was wir für andere bauen können. Kein Katalog: Verkauft wird hier keins davon. Der Deep-Dive zum Flaggschiff meAI folgt direkt darunter.",
       statusLabel: "Stand",
       openLabel: "Öffnen",
@@ -1722,7 +1722,7 @@ const rawDictionary = {
       founderLabel: "Gründer & System Lead",
       founder: "Muhammed Emin Akyol",
       body1:
-        "creaDIG startete 2017 als Agentur. Aus Aufträgen wurden Produkte, aus Produkten ein System-Haus — heute laufen unter dem Dach vier eigene Systeme und die Betreuung der Betriebe, für die wir sie gebaut haben.",
+        "creaDIG startete 2017 als Agentur. Aus Aufträgen wurden Produkte, aus Produkten ein System-Haus — heute laufen unter dem Dach eigene Systeme und die Betreuung der Betriebe, für die wir sie gebaut haben.",
       body2:
         "Das Team wächst; die nächsten Stellen sind in Vorbereitung.",
       nicheLabel: "Schwerpunkte",
@@ -3256,7 +3256,7 @@ const rawDictionary = {
       lagen: {
         eyebrow: "Nereden girersiniz",
         title: "Üç durum, üç başlangıç.",
-        lead: "Hangisinin sizin olduğu, bugün nerede takıldığınızdan çıkar — işletmenizin büyüklüğünden de��il.",
+        lead: "Hangisinin sizin olduğu, bugün nerede takıldığınızdan çıkar — işletmenizin büyüklüğünden değil.",
         note: "Hiçbir durum diğerinin ön aşaması değil. Her birinde başlayabilir, her birinde durabilirsiniz.",
         cta: "İlgili katmana",
         routen: [
@@ -3290,8 +3290,8 @@ const rawDictionary = {
         eyebrow: "Kendi ürünlerimiz",
         title: "Önce kur. Sonra konuş.",
         note: "Dörtten ikisi. Diğer ikisi ürünler sayfasında.",
-        cta: "Dört ürünün tümü",
-        ctaEnd: "Dört ürünün tümünü gör",
+        cta: "Tüm ürünler",
+        ctaEnd: "Tüm ürünleri gör",
       },
       capabilities: {
         eyebrow: "Hizmetler",
@@ -3355,7 +3355,7 @@ const rawDictionary = {
             cta: "İşletmeyi görün",
           },
         },
-        nettoNote: "Tüm tutarlar net, artı %{vat} KDV.",
+        nettoNote: "{ust}",
         questionsLabel: "Önceden iki soru",
         questionsCta: "Tüm sorular",
       },
@@ -3444,7 +3444,7 @@ const rawDictionary = {
         },
         products: {
           name: "Ürünlere bakmak",
-          what: "Sıfırdan kurduğumuz dört kendi sistemimiz — biri günlük işletimde, üçü yapım aşamasında. Hakkımızda karar vermenin en hızlı yolu.",
+          what: "Sıfırdan kurduğumuz kendi sistemlerimiz — durumu her birinin yanında yazıyor. Hakkımızda karar vermenin en hızlı yolu.",
           cta: "Ürünlere git",
         },
         works: {
@@ -3470,7 +3470,7 @@ const rawDictionary = {
       statement: "Müşteriler için geliştirdiğimizi kendimiz için de işletiriz. Bir sistem evini bir sunumdan ayıran şey bu sağlamlıktır.",
       metaTitle: "Şirket — Osnabrück'ten sistem evi, 2017'den beri",
       metaDescription:
-        "creaDIG: Osnabrück ICO InnovationsCentrum'da sistem evi, 2017'de kuruldu. Kurucu, çalışma modeli, odak alanları ve merkez — tek çatı, beş katman, kendi dört ürünümüz.",
+        "creaDIG: Osnabrück ICO InnovationsCentrum'da sistem evi, 2017'de kuruldu. Kurucu, çalışma modeli, odak alanları ve merkez — tek çatı, beş katman, kendi ürünlerimiz.",
       chapters: {
         label: "Yol",
         title: "Bir ev, duyuruyla kurulmaz.",
@@ -3483,7 +3483,7 @@ const rawDictionary = {
           {
             year: null,
             title: "İşlerden ürünler doğdu",
-            body: "Projelerde sürekli tekrar edeni her seferinde yeniden çözmek yerine kurduk. Dört kendi sistemimiz: meAI, fibero, CASSAMEA, meahv — icat ettik, kurduk ve kendimiz işletiyoruz.",
+            body: "Projelerde sürekli tekrar edeni her seferinde yeniden çözmek yerine kurduk. meAI, fibero, stammo, CASSAMEA ve meahv gibi kendi sistemlerimiz — icat ettik, kurduk ve kendimiz işletiyoruz.",
           },
           {
             year: "bugün",
@@ -3496,16 +3496,16 @@ const rawDictionary = {
     arbeitenPage: {
       eyebrow: "İşler",
       title: "Başkaları için kuruldu.",
-      lead: "Kendi icat edip kurduğumuz dört ürün — ayrıca Almanya ve İsviçre'den müşteri işleri. Neyin bize ait olduğu açık olsun diye ayrı gösteriliyor.",
+      lead: "Kendi icat edip kurduğumuz ürünler — ayrıca Almanya ve İsviçre'den müşteri işleri. Neyin bize ait olduğu açık olsun diye ayrı gösteriliyor.",
       leadOhneKundenwerk:
         "Burada müşteri işleri yer alır — başkaları için kurduğumuz ve müşterinin yazılı olarak onayladığı işler. Bugün böyle bir onay yok, bu yüzden burada kimse yer almıyor. Kendi icat edip kurduklarımız ürünler sayfasında.",
       ohneKundenwerkCta: "Kendi ürünlerimize",
       metaTitleOhneKundenwerk: "İşler — müşteri işleri yalnızca yazılı onayla",
       metaDescriptionOhneKundenwerk:
-        "creaDIG müşteri işlerini ancak müşterinin yazılı onayından sonra gösterir. Bugün onay yok. Kendi dört ürünümüz ürünler sayfasında.",
+        "creaDIG müşteri işlerini ancak müşterinin yazılı onayından sonra gösterir. Bugün onay yok. Kendi ürünlerimiz ürünler sayfasında.",
       metaTitle: "İşler — kendi ürünlerimiz ve müşteri işleri",
       metaDescription:
-        "creaDIG seçkisi: dört kendi ürün ve Almanya ile İsviçre'den müşteri işleri. Ayrı gösterilir — kendi sistemlerimiz ile sipariş işleri aynı şey değildir.",
+        "creaDIG seçkisi: kendi ürünlerimiz ve Almanya ile İsviçre'den müşteri işleri. Ayrı gösterilir — kendi sistemlerimiz ile sipariş işleri aynı şey değildir.",
     },
     /* Die Beleglage. Dieselbe Rangfolge, dieselbe leere Stufe oben. */
     beleglage: {
@@ -3567,7 +3567,7 @@ const rawDictionary = {
       whatLabel: "Konu ne",
       backLabel: "Tüm işler",
       caseGatedNote:
-        "Başlangıç durumu, çözüm ve sonucu içeren ayr��ntılı bir vaka anlatımını yalnızca müşterinin yazılı onayıyla yayımlarız. Onay geldiğinde burada yer alır.",
+        "Başlangıç durumu, çözüm ve sonucu içeren ayrıntılı bir vaka anlatımını yalnızca müşterinin yazılı onayıyla yayımlarız. Onay geldiğinde burada yer alır.",
       ctaTitle: "İşletmenizde de benzer bir durum mu var?",
       ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmenize bakar ve yardımcı olup olamayacağımızı dürüstçe söyleriz.",
       ctaPrimary: "Projeye başla",
@@ -3575,11 +3575,11 @@ const rawDictionary = {
     },
     produktePage: {
       eyebrow: "Katalog değil, kanıt",
-      title: "Kendi kurduğumuz dört ürün.",
-      lead: "Bu sayfa kendimiz hakkında söylediğimizi kanıtlar: Bu sistemlerin her birini creaDIG sıfırdan kurdu. Biri kendi günlük işletiminde çalışıyor, diğer üçü yapım aşamasında — durum her ürünün yanında yazıyor. Sizin için ne kurduğumuz Hizmetler altında.",
+      title: "Kendi kurduğumuz ürünler.",
+      lead: "Bu sayfa kendimiz hakkında söylediğimizi kanıtlar: Bu sistemlerin her birini creaDIG sıfırdan kurdu. Canlı ya da yapım aşamasında: durum her ürünün yanında yazıyor. Sizin için ne kurduğumuz Hizmetler altında.",
       metaTitle: "Kendi ürünlerimiz — meAI, fibero, CASSAMEA, meahv",
       metaDescription:
-        "creaDIG'in dört kendi ürünü: meAI (yapay zekâ tabanlı iş işletim sistemi), fibero (fiber operasyonu), CASSAMEA (İsviçre için gastronomi kasası) ve meahv (bina yönetimi).",
+        "creaDIG'in kendi ürünleri: meAI (yapay zekâ tabanlı iş işletim sistemi), fibero (fiber operasyonu), stammo (Wallet'ta dijital damga kartı), CASSAMEA (İsviçre için gastronomi kasası) ve meahv (bina yönetimi).",
       builtLabel: "Ne inşa ettik",
       sectorLabel: "Sektör",
       statusLabel: "Durum",
@@ -3666,7 +3666,7 @@ const rawDictionary = {
         "Arayüzleri ancak gerçek uygulamayı örnek verilerle kaydedebildiğimizde paylaşırız. O zamana kadar burada ne kurulduğu yazar — başka bir şey iddia eden bir görsel değil.",
       screensLabel: "Gerçek arayüz",
       screensCaption: "Gerçek arayüz, örnek veriler.",
-      screensAlt: "örnek verilerle ger��ek arayüz",
+      screensAlt: "örnek verilerle gerçek arayüz",
       ctaTitle: "Bu sizin işletmenize uyar mı?",
       ctaBody: "Yirmi dakika, ücretsiz ve bağlayıcı değil. İşletmenize bakar ve yardımcı olup olamayacağımızı dürüstçe söyleriz.",
       ctaPrimary: "Projeye başla",
@@ -3784,7 +3784,7 @@ const rawDictionary = {
     portfolio: {
       eyebrow: "Seçki",
       title: "Kuruldu. Ve işletiliyor.",
-      lead: "Kendi icat edip kurduğumuz dört ürün — ayrıca Almanya ve İsviçre'den müşteri işleri. Neyin bize ait olduğu açık olsun diye ayrı gösteriliyor.",
+      lead: "Kendi icat edip kurduğumuz ürünler — ayrıca Almanya ve İsviçre'den müşteri işleri. Neyin bize ait olduğu açık olsun diye ayrı gösteriliyor.",
       built: "Ne inşa ettik",
       products: "Kendi ürünlerimiz",
       productsNote: "Kendimiz icat ettik, kendimiz kurduk, kendimiz işletiyoruz.",
@@ -3852,7 +3852,7 @@ const rawDictionary = {
       items: [
         {
           q: "creaDIG ile bir web sitesi ne kadar?",
-          a: "Web sitesi paketi sabit fiyatla {price:website} nettir. Her meslek dalında bir pilot yer vardır: {price:website-pilot} net — karşılığında işletmenizi referans olarak göstermemize yazılı izin verirsiniz. Web sitesi bakımı aylık {price:betreuung} nettir. Tüm fiyatlar %{vat} KDV hariçtir; kararlaştırılan kapsam için sabit fiyattır.",
+          a: "Web sitesi paketi sabit fiyatla {price:website} nettir. Her meslek dalında bir pilot yer vardır: {price:website-pilot} net — karşılığında işletmenizi referans olarak göstermemize yazılı izin verirsiniz. Web sitesi bakımı aylık {price:betreuung} nettir. {ust} Kararlaştırılan kapsam için sabit fiyattır.",
         },
         {
           q: "Proje nasıl ilerler?",
@@ -3927,8 +3927,8 @@ const rawDictionary = {
     },
     architecture: {
       eyebrow: "Ev",
-      title: "Tek çatı, beş katman, dört ürün.",
-      lead: "Tüm şirket tek bir görünümde: en üstte çatı, altında beş katman, onların altında yatay olarak işletme — ve en altta kendi dört ürünümüz, her biri oturduğu katmanda.",
+      title: "Tek çatı, beş katman, kendi ürünlerimiz.",
+      lead: "Tüm şirket tek bir görünümde: en üstte çatı, altında beş katman, onların altında yatay olarak işletme — ve en altta kendi ürünlerimiz, her biri oturduğu katmanda.",
       kompaktTitle: "Tek çatı, beş katman.",
       kompaktLead: "Tüm ev tek bir görünümde: en üstte çatı, altında beş katman, onların altında yatay olarak işletme. Her katmanda başlayabilir — ve her katmanda durabilirsiniz.",
       roofLabel: "Çatı",
@@ -3936,7 +3936,7 @@ const rawDictionary = {
       layersLabel: "Beş katman",
       operateLabel: "Altında yatay",
       operateNote: "Hosting · Monitoring · Güncellemeler · Güvenlik · Yedekler · Destek · Geliştirme",
-      productsLabel: "Kendi dört ürünümüz",
+      productsLabel: "Kendi ürünlerimiz",
       onLayer: "katman",
       caption:
         "Bir organizasyon şeması ya da pazar görünümü değil — kendi evimizin düzeni. Her katmanı hizmet olarak sunuyoruz; her ürün ise o katmanı kendimiz kurduğumuzun kanıtı.",
@@ -4056,7 +4056,7 @@ const rawDictionary = {
     },
     houseProducts: {
       eyebrow: "Çatının altında",
-      title: "Dört kendi ürünümüz.",
+      title: "Kendi ürünlerimiz.",
       lead: "Kendimiz icat ettik, kendimiz kurduk, kendimiz işletiyoruz — ve tam da bu yüzden başkaları için ne kurabileceğimizin en iyi kanıtı. Katalog değil: Burada hiçbiri satılmıyor. Amiral gemisi meAI'ın ayrıntılı bölümü hemen aşağıda.",
       statusLabel: "Durum",
       openLabel: "Aç",
@@ -4134,7 +4134,7 @@ const rawDictionary = {
       founderLabel: "Kurucu & sistem lideri",
       founder: "Muhammed Emin Akyol",
       body1:
-        "creaDIG 2017'de ajans olarak başladı. İşlerden ürünler, ürünlerden bir sistem evi doğdu — bugün bu çatı altında dört kendi sistemimiz ve onları kurduğumuz işletmelerin bakımı yürüyor.",
+        "creaDIG 2017'de ajans olarak başladı. İşlerden ürünler, ürünlerden bir sistem evi doğdu — bugün bu çatı altında kendi sistemlerimiz ve onları kurduğumuz işletmelerin bakımı yürüyor.",
       body2:
         "Ekip büyüyor; yeni pozisyonlar hazırlanıyor.",
       nicheLabel: "Odak alanları",
@@ -4174,7 +4174,7 @@ const rawDictionary = {
         },
         uebergabe: {
           name: "Size ait olan",
-          what: "Sistem ve içindeki tüm veriler ilk günden itibaren sizindir. Kod, i��erik, erişimler ve alan adı, bakım sona erse de sizde kalır.",
+          what: "Sistem ve içindeki tüm veriler ilk günden itibaren sizindir. Kod, içerik, erişimler ve alan adı, bakım sona erse de sizde kalır.",
           cta: "İşletme ve mülkiyet",
         },
         netzwerk: {
@@ -4447,7 +4447,7 @@ const rawDictionary = {
         },
         bilingual: {
           name: "İki dil, iki adres",
-          body: "Her dil sürümünün kendi URL'leri, kendi başlıkları, kendi yapılandır��lmış verileri vardır ve hreflang ile bağlıdır — tarayıcıda metin değiştiren bir düğme değil.",
+          body: "Her dil sürümünün kendi URL'leri, kendi başlıkları, kendi yapılandırılmış verileri vardır ve hreflang ile bağlıdır — tarayıcıda metin değiştiren bir düğme değil.",
         },
         images: {
           name: "AVIF ve WebP görseller",
@@ -4718,7 +4718,7 @@ const rawDictionary = {
           "Başka bir şey",
         ],
         rolesLabel: "Farklı görevleri olan birden fazla kişi mi çalışıyor?",
-        rolesOptions: ["Hayır, esasen tek kişi", "Evet, birka�� kişi", "Evet, birden fazla alan"],
+        rolesOptions: ["Hayır, esasen tek kişi", "Evet, birkaç kişi", "Evet, birden fazla alan"],
         sitesLabel: "Kaç yerde çalışılıyor?",
         sitesOptions: ["Tek yer", "İki ile üç", "Üçten fazla"],
         systemsLabel: "Taşınması gereken program veya veri var mı?",
@@ -4862,7 +4862,7 @@ const rawDictionary = {
       updated: "11 Eylül 2026",
     },
     legal: {
-      imprintTitle: "K��nye",
+      imprintTitle: "Künye",
       privacyTitle: "Gizlilik",
       imprintMetaDescription: "creaDIG'in sağlayıcı bilgileri ve iletişim.",
       privacyMetaDescription:
@@ -5103,8 +5103,8 @@ const rawDictionary = {
         eyebrow: "Our own products",
         title: "Build first. Talk after.",
         note: "Two of four. The other two are on the products page.",
-        cta: "All four products",
-        ctaEnd: "See all four products",
+        cta: "All products",
+        ctaEnd: "See all products",
       },
       capabilities: {
         eyebrow: "Services",
@@ -5168,7 +5168,7 @@ const rawDictionary = {
             cta: "See operation",
           },
         },
-        nettoNote: "All amounts net, plus {vat} % VAT.",
+        nettoNote: "{ust}",
         questionsLabel: "Two questions first",
         questionsCta: "All questions",
       },
@@ -5257,7 +5257,7 @@ const rawDictionary = {
         },
         products: {
           name: "See the products",
-          what: "Four systems of our own that we built and run ourselves. The fastest way to form a judgement about us.",
+          what: "Systems of our own that we built and run ourselves. The fastest way to form a judgement about us.",
           cta: "To the products",
         },
         works: {
@@ -5276,7 +5276,7 @@ const rawDictionary = {
       statement: "What we develop for clients, we operate for ourselves. That substance is what separates a systems house from a presentation.",
       metaTitle: "Company — a systems house from Osnabrück, since 2017",
       metaDescription:
-        "creaDIG: systems house at the ICO InnovationsCentrum Osnabrück, founded in 2017. Founder, way of working, focus areas and location — one house, five levels, four products of our own.",
+        "creaDIG: systems house at the ICO InnovationsCentrum Osnabrück, founded in 2017. Founder, way of working, focus areas and location — one house, five levels, products of our own.",
       chapters: {
         label: "The path",
         title: "A house is not built by announcing it.",
@@ -5289,7 +5289,7 @@ const rawDictionary = {
           {
             year: null,
             title: "Commissions became products",
-            body: "What kept recurring in projects, we built instead of solving it again every time. Four systems of our own: meAI, fibero, CASSAMEA, meahv — invented, built and operated by us.",
+            body: "What kept recurring in projects, we built instead of solving it again every time. Systems of our own such as meAI, fibero, stammo, CASSAMEA and meahv — invented, built and operated by us.",
           },
           {
             year: "today",
@@ -5302,16 +5302,16 @@ const rawDictionary = {
     arbeitenPage: {
       eyebrow: "Work",
       title: "Built for others.",
-      lead: "Four products of our own that we invented and built ourselves — alongside client work from Germany and Switzerland. Listed separately, so it is clear what belongs to us.",
+      lead: "Products of our own that we invented and built ourselves — alongside client work from Germany and Switzerland. Listed separately, so it is clear what belongs to us.",
       leadOhneKundenwerk:
         "This is where client work goes — work we built for others and that the client has released in writing. Today no such release exists, so nobody is listed here. What we invented and built ourselves is on the products page.",
       ohneKundenwerkCta: "To our own products",
       metaTitleOhneKundenwerk: "Work — client work only with a written release",
       metaDescriptionOhneKundenwerk:
-        "creaDIG shows client work only after the client has released it in writing. Today there is none. Our four own products are on the products page.",
+        "creaDIG shows client work only after the client has released it in writing. Today there is none. Our own products are on the products page.",
       metaTitle: "Work — our own products and client work",
       metaDescription:
-        "The creaDIG portfolio: four products of our own and client work from Germany and Switzerland. Listed separately — our own systems and commissioned work are not the same thing.",
+        "The creaDIG portfolio: products of our own and client work from Germany and Switzerland. Listed separately — our own systems and commissioned work are not the same thing.",
     },
     /* Die Beleglage. Same ranking, same empty rung at the top. */
     beleglage: {
@@ -5381,11 +5381,11 @@ const rawDictionary = {
     },
     produktePage: {
       eyebrow: "Proof, not a catalogue",
-      title: "Four products we built ourselves.",
-      lead: "This page backs up what we say about ourselves: creaDIG built every one of these systems from the ground up. One runs in our own daily operation, the other three are in build — the status is stated on each product. What we build for you is under Services.",
+      title: "Products we built ourselves.",
+      lead: "This page backs up what we say about ourselves: creaDIG built every one of these systems from the ground up. Live or in build: the status is stated on each product. What we build for you is under Services.",
       metaTitle: "Our own products — meAI, fibero, CASSAMEA, meahv",
       metaDescription:
-        "The four products creaDIG built for itself: meAI (AI business operating system), fibero (fibre-optic operations), CASSAMEA (hospitality POS, Switzerland) and meahv (property management).",
+        "The products creaDIG built for itself: meAI (AI business operating system), fibero (fibre-optic operations), stammo (digital stamp card in the wallet), CASSAMEA (hospitality POS, Switzerland) and meahv (property management).",
       builtLabel: "What we built",
       sectorLabel: "Sector",
       statusLabel: "Status",
@@ -5590,7 +5590,7 @@ const rawDictionary = {
     portfolio: {
       eyebrow: "Portfolio",
       title: "Built. And operated.",
-      lead: "Four products of our own that we invented and built ourselves — alongside client work from Germany and Switzerland. Listed separately, so it is clear what belongs to us.",
+      lead: "Products of our own that we invented and built ourselves — alongside client work from Germany and Switzerland. Listed separately, so it is clear what belongs to us.",
       built: "What we built",
       products: "Own products",
       productsNote: "Invented, built and operated by us.",
@@ -5658,7 +5658,7 @@ const rawDictionary = {
       items: [
         {
           q: "What does a creaDIG presence cost?",
-          a: "The website package costs {price:website} excl. VAT, as a fixed price. Each trade has one pilot place at {price:website-pilot} excl. VAT — in exchange for written permission to show your business as a reference. Website care costs {price:betreuung} excl. VAT per month. All prices plus {vat}% VAT, fixed price for the agreed scope.",
+          a: "The website package costs {price:website} excl. VAT, as a fixed price. Each trade has one pilot place at {price:website-pilot} excl. VAT — in exchange for written permission to show your business as a reference. Website care costs {price:betreuung} excl. VAT per month. {ust} Fixed price for the agreed scope.",
         },
         {
           q: "How does a project run?",
@@ -5733,8 +5733,8 @@ const rawDictionary = {
     },
     architecture: {
       eyebrow: "The house",
-      title: "One roof, five levels, four products.",
-      lead: "The whole company in one view: the roof on top, the five levels below it, operations running across underneath — and at the bottom the four products of our own, each on the level where it sits.",
+      title: "One roof, five levels, products of our own.",
+      lead: "The whole company in one view: the roof on top, the five levels below it, operations running across underneath — and at the bottom the products of our own, each on the level where it sits.",
       kompaktTitle: "One roof, five levels.",
       kompaktLead: "The whole house in one view: the roof on top, the five levels below, operations running across underneath. You can start at any level — and stop at any level.",
       roofLabel: "The roof",
@@ -5742,7 +5742,7 @@ const rawDictionary = {
       layersLabel: "Five levels",
       operateLabel: "Running across",
       operateNote: "Hosting · monitoring · updates · security · backups · support · further development",
-      productsLabel: "Four products of our own",
+      productsLabel: "Products of our own",
       onLayer: "on level",
       caption:
         "Not an org chart and not a market overview — the order of our own house. We offer every level as a service; every product is the evidence that we built it ourselves.",
@@ -5862,7 +5862,7 @@ const rawDictionary = {
     },
     houseProducts: {
       eyebrow: "Under this roof",
-      title: "Four products of our own.",
+      title: "Products of our own.",
       lead: "Invented, built and operated by us — and therefore the best evidence of what we can build for others. Not a catalogue: none of them is for sale here. The deep dive into our flagship meAI follows directly below.",
       statusLabel: "Status",
       openLabel: "Open",
@@ -5940,7 +5940,7 @@ const rawDictionary = {
       founderLabel: "Founder & system lead",
       founder: "Muhammed Emin Akyol",
       body1:
-        "creaDIG started in 2017 as an agency. Commissions became products, products became a systems house — today four systems of our own run under this roof, alongside support for the businesses we built them for.",
+        "creaDIG started in 2017 as an agency. Commissions became products, products became a systems house — today systems of our own run under this roof, alongside support for the businesses we built them for.",
       body2:
         "The team is growing; the next roles are being prepared.",
       nicheLabel: "Focus areas",
@@ -6868,7 +6868,7 @@ const rawDictionary = {
           {
             key: "grundlage",
             label: "الحالة أ",
-            title: "الأساس ا��رقمي",
+            title: "الأساس الرقمي",
             wenn: "لا يعثر عليك أحد، أو أنّ حضورك لم يعد يعبّر عمّا تجيده.",
             start: "العلامة والحضور والموقع.",
             href: "/leistungen#ebene-identity",
@@ -6895,8 +6895,8 @@ const rawDictionary = {
         eyebrow: "منتجاتنا",
         title: "نبني أولًا. ثم نتحدث.",
         note: "اثنان من أربعة. الاثنان الآخران في صفحة المنتجات.",
-        cta: "المنتجات الأربعة",
-        ctaEnd: "عرض المنتجات الأربعة",
+        cta: "كل المنتجات",
+        ctaEnd: "عرض كل المنتجات",
       },
       capabilities: {
         eyebrow: "الخدمات",
@@ -6960,7 +6960,7 @@ const rawDictionary = {
             cta: "عرض التشغيل",
           },
         },
-        nettoNote: "كل المبالغ صافية، يُضاف إليها {vat} % ضريبة القيمة المضافة.",
+        nettoNote: "{ust}",
         questionsLabel: "سؤالان مسبقًا",
         questionsCta: "كل الأسئلة",
       },
@@ -7049,7 +7049,7 @@ const rawDictionary = {
         },
         products: {
           name: "استعراض المنتجات",
-          what: "أربعة أنظمة خاصة بنا بنيناها من الأساس — واحد في التشغيل اليومي وثلاثة قيد البناء. أسرع طريق لتكوين حكم علينا.",
+          what: "أنظمة خاصة بنا بنيناها من الأساس — والحالة مذكورة عند كل منها. أسرع طريق لتكوين حكم علينا.",
           cta: "إلى المنتجات",
         },
         works: {
@@ -7068,7 +7068,7 @@ const rawDictionary = {
       statement: "ما نطوّره للعملاء نشغّله لأنفسنا. هذا الرصيد هو ما يفصل بيت الأنظمة عن العرض التقديمي.",
       metaTitle: "الشركة — بيت أنظمة من أوسنابروك، منذ 2017",
       metaDescription:
-        "creaDIG: بيت أنظمة في مركز ICO للابتكار بأوسنابروك، تأسس في 2017. المؤسس، وطريقة العمل، ومجالات التركيز، والمقر — مظلة واحدة، خمس طبقات، أربعة منتجات خاصة.",
+        "creaDIG: بيت أنظمة في مركز ICO للابتكار بأوسنابروك، تأسس في 2017. المؤسس، وطريقة العمل، ومجالات التركيز، والمقر — مظلة واحدة، خمس طبقات، منتجات خاصة.",
       chapters: {
         label: "الطريق",
         title: "البيت لا يُبنى بإعلان.",
@@ -7081,7 +7081,7 @@ const rawDictionary = {
           {
             year: null,
             title: "من المشاريع إلى المنتجات",
-            body: "ما تكرّر في المشاريع بنيناه مرةً واحدة بدل حلّه في كل مرة من جديد. أربعة أنظمة خاصة بنا: meAI وfibero وCASSAMEA وmeahv — ابتكرناها وبنيناها ونشغّلها.",
+            body: "ما تكرّر في المشاريع بنيناه مرةً واحدة بدل حلّه في كل مرة من جديد. أنظمة خاصة بنا مثل meAI وfibero وstammo وCASSAMEA وmeahv — ابتكرناها وبنيناها ونشغّلها.",
           },
           {
             year: "اليوم",
@@ -7094,16 +7094,16 @@ const rawDictionary = {
     arbeitenPage: {
       eyebrow: "الأعمال",
       title: "بُنيت للآخرين.",
-      lead: "أربعة منتجات خاصة بنا ابتكرناها وبنيناها بأنفسنا — إلى جانب أعمال لعملاء في ألمانيا وسويسرا. مفصولة بوضوح ليتبيّن ما هو ملكنا.",
+      lead: "منتجات خاصة بنا ابتكرناها وبنيناها بأنفسنا — إلى جانب أعمال لعملاء في ألمانيا وسويسرا. مفصولة بوضوح ليتبيّن ما هو ملكنا.",
       leadOhneKundenwerk:
         "هنا تُعرض أعمال العملاء — أعمال بنيناها لآخرين ووافق عليها العميل خطيًا. لا توجد اليوم موافقة كهذه، لذلك لا يظهر هنا أحد. أما ما ابتكرناه وبنيناه بأنفسنا فيوجد في صفحة المنتجات.",
       ohneKundenwerkCta: "إلى منتجاتنا",
       metaTitleOhneKundenwerk: "الأعمال — أعمال العملاء بموافقة خطية فقط",
       metaDescriptionOhneKundenwerk:
-        "تعرض creaDIG أعمال العملاء بعد مو��فقة العميل خطيًا فقط. لا توجد موافقة اليوم. منتجاتنا الأربعة موجودة في صفحة المنتجات.",
+        "تعرض creaDIG أعمال العملاء بعد موافقة العميل خطيًا فقط. لا توجد موافقة اليوم. منتجاتنا الخاصة موجودة في صفحة المنتجات.",
       metaTitle: "الأعمال — منتجاتنا الخاصة وأعمال العملاء",
       metaDescription:
-        "معرض أعمال creaDIG: أربعة منتجات خاصة وأعمال لعملاء في ألمانيا وسويسرا. مفصولة بوضوح — الأنظمة الخاصة والأعمال المكلَّف بها ليستا الشيء نفسه.",
+        "معرض أعمال creaDIG: منتجات خاصة وأعمال لعملاء في ألمانيا وسويسرا. مفصولة بوضوح — الأنظمة الخاصة والأعمال المكلَّف بها ليستا الشيء نفسه.",
     },
     /* Die Beleglage. Im Arabischen laeuft die Leiter von rechts. */
     beleglage: {
@@ -7173,11 +7173,11 @@ const rawDictionary = {
     },
     produktePage: {
       eyebrow: "دليل، لا كتالوج",
-      title: "أربعة منتجات بنيناها بأنفسنا.",
-      lead: "تُثبت هذه الصفحة ما نقوله عن أنفسنا: كل واحد من هذه الأنظمة بنته creaDIG من الأساس. واحد منها يعمل في تشغيلنا اليومي والثلاثة الأخرى قيد البناء — وا��حالة مذكورة عند كل منتج. أما ما نبنيه لكم فتجدونه تحت الخدمات.",
+      title: "منتجات بنيناها بأنفسنا.",
+      lead: "تُثبت هذه الصفحة ما نقوله عن أنفسنا: كل واحد من هذه الأنظمة بنته creaDIG من الأساس. سواء كان يعمل أو قيد البناء: الحالة مذكورة عند كل منتج. أما ما نبنيه لكم فتجدونه تحت الخدمات.",
       metaTitle: "منتجاتنا الخاصة — meAI وfibero وCASSAMEA وmeahv",
       metaDescription:
-        "منتجات creaDIG الأربعة: meAI (نظام تشغيل أعمال بالذكاء الاصطناعي)، وfibero (تشغيل شبكات الألياف)، وCASSAMEA (نقاط بيع للضيافة، سويسرا)، وmeahv (إدارة العقارات).",
+        "منتجات creaDIG الخاصة: meAI (نظام تشغيل أعمال بالذكاء الاصطناعي)، وfibero (تشغيل شبكات الألياف)، وstammo (بطاقة أختام رقمية في المحفظة)، وCASSAMEA (نقاط بيع للضيافة، سويسرا)، وmeahv (إدارة العقارات).",
       builtLabel: "ما الذي بنيناه",
       sectorLabel: "القطاع",
       statusLabel: "الحالة",
@@ -7382,7 +7382,7 @@ const rawDictionary = {
     portfolio: {
       eyebrow: "معرض الأعمال",
       title: "مبنيّة. ومشغَّلة.",
-      lead: "أربعة منتجات خاصة بنا ابتكرناها وبنيناها بأنفسنا — إلى جانب أعمال لعملاء في ألمانيا وسويسرا. مفصولة بوضوح ليتبيّن ما هو ملكنا.",
+      lead: "منتجات خاصة بنا ابتكرناها وبنيناها بأنفسنا — إلى جانب أعمال لعملاء في ألمانيا وسويسرا. مفصولة بوضوح ليتبيّن ما هو ملكنا.",
       built: "ما الذي بنيناه",
       products: "منتجات خاصة",
       productsNote: "ابتكرناها وبنيناها ونشغّلها بأنفسنا.",
@@ -7395,7 +7395,7 @@ const rawDictionary = {
       mockupNote: "بطاقات المنتجات: نماذج توضيحية، لا لقطات شاشة.",
       productPhotoNote:
         "صور المنتجات تُظهر الواجهة الحقيقية (ببيانات تجريبية) — لا نماذج.",
-      customerPhotoNote: "صور العمل��ء تُظهر الواجهة الحقيقية — لا نماذج.",
+      customerPhotoNote: "صور العملاء تُظهر الواجهة الحقيقية — لا نماذج.",
       imageNoteMixed:
         "واجهات حقيقية (منتجات وعملاء) ونماذج توضيحية — موسومة بشكل منفصل، لا مختلطة.",
       viewLabel: "العرض",
@@ -7450,7 +7450,7 @@ const rawDictionary = {
       items: [
         {
           q: "كم يكلّف الحضور الرقمي لدى creaDIG؟",
-          a: "باقة الموقع بسعر ثابت {price:website} دون ضريبة. ولكل حرفة مقعد تجريبي بـ {price:website-pilot} دون ضريبة — مقابل إذن مكتوب بعرض منشأتكم كمرجع. رعاية الموقع بـ {price:betreuung} دون ضريبة شهريًا. كل الأسعار تُضاف إليها ضريبة {vat}٪، بسعر ثابت للنطاق المتفق عليه.",
+          a: "باقة الموقع بسعر ثابت {price:website} دون ضريبة. ولكل حرفة مقعد تجريبي بـ {price:website-pilot} دون ضريبة — مقابل إذن مكتوب بعرض منشأتكم كمرجع. رعاية الموقع بـ {price:betreuung} دون ضريبة شهريًا. {ust} بسعر ثابت للنطاق المتفق عليه.",
         },
         {
           q: "كيف يسير المشروع؟",
@@ -7525,8 +7525,8 @@ const rawDictionary = {
     },
     architecture: {
       eyebrow: "البيت",
-      title: "مظلة واحدة، خمس طبقات، أربعة منتجات.",
-      lead: "الشركة كلها في عرضٍ واحد: المظلة في الأعلى، وتحتها الطبقات الخمس، ويمتدّ التشغيل عرضيًا تحتها — وفي الأسفل المنتجات الأربعة، كلٌّ عند الطبقة التي يجلس عليها.",
+      title: "مظلة واحدة، خمس طبقات، منتجات خاصة.",
+      lead: "الشركة كلها في عرضٍ واحد: المظلة في الأعلى، وتحتها الطبقات الخمس، ويمتدّ التشغيل عرضيًا تحتها — وفي الأسفل منتجاتنا الخاصة، كلٌّ عند الطبقة التي يجلس عليها.",
       kompaktTitle: "مظلة واحدة، خمس طبقات.",
       kompaktLead: "البيت كله في عرضٍ واحد: المظلة في الأعلى، وتحتها الطبقات الخمس، ويمتدّ التشغيل عرضيًا تحتها. يمكنكم البدء من أي طبقة — والتوقف عند أي طبقة.",
       roofLabel: "المظلة",
@@ -7534,7 +7534,7 @@ const rawDictionary = {
       layersLabel: "خمس طبقات",
       operateLabel: "ممتدّ عرضيًا",
       operateNote: "استضافة · مراقبة · تحديثات · أمان · نسخ احتياطي · دعم · تطوير مستمر",
-      productsLabel: "أربعة منتجات خاصة",
+      productsLabel: "منتجات خاصة",
       onLayer: "على طبقة",
       caption:
         "ليس هيكلًا تنظيميًا ولا مسحًا للسوق — بل ترتيب بيتنا نحن. كل طبقة نقدّمها كخدمة؛ وكل منتج دليلٌ على أننا بنيناها بأنفسنا.",
@@ -7603,7 +7603,7 @@ const rawDictionary = {
           what: "نقاط البيع والتخطيط والفوترة والإدارة — المنشأة داخل نظام واحد.",
           who: "الضيافة، والعمل الميداني، والإدارة، ومقدّمو الخدمات.",
           problem:
-            "المنشأة تسير على أوراق وجداول وثلاثة برامج ��ا ي��رف بعضها بعضًا. من أراد إجابة سؤالٍ واحد بحث في أربعة مواضع — وتكون الإجابة قد قدُمت قبل أن تكتمل.",
+            "المنشأة تسير على أوراق وجداول وثلاثة برامج لا يعرف بعضها بعضًا. من أراد إجابة سؤالٍ واحد بحث في أربعة مواضع — وتكون الإجابة قد قدُمت قبل أن تكتمل.",
           solution:
             "نُنظّم المنشأة في نظام واحد: الطلب والعميل والمستند والرقم في مكان واحد، مع واجهات لما يجب أن يبقى. ما يجب أن يكون مخصَّصًا نبنيه؛ وما هو متاح جاهزًا لا نشتريه مرتين.",
           result: "مصدر إجابة واحد بدل أربعة. ومن ينضمّ حديثًا يجد طريقه في النظام لا في ذاكرة زميل.",
@@ -7640,7 +7640,7 @@ const rawDictionary = {
           problem:
             "الأرقام موجودة، والقرار ليس كذلك. من أراد اتخاذه فتح خمسة تقارير وخرج يعرف أكثر — لا أفضل.",
           solution:
-            "نبني فوق ذلك نظامًا يقرأ بدل أن يعرض: يصنّف، ويرتّب الأولويات، ويُهيّئ الخيارات. وmeAI هو نسختنا منه — بنيناه ونشغّله، وجرّبناه في يومنا العملي قبل أ�� يصل إلى منشأة.",
+            "نبني فوق ذلك نظامًا يقرأ بدل أن يعرض: يصنّف، ويرتّب الأولويات، ويُهيّئ الخيارات. وmeAI هو نسختنا منه — بنيناه ونشغّله، وجرّبناه في يومنا العملي قبل أن يصل إلى منشأة.",
           result: "سؤال «ما الذي يأتي أولًا اليوم» صار له جواب — والسبب مكتوب بجانبه.",
           projects: [
             "التحليل",
@@ -7654,7 +7654,7 @@ const rawDictionary = {
     },
     houseProducts: {
       eyebrow: "تحت هذه المظلة",
-      title: "أربعة منتجات خاصة بنا.",
+      title: "منتجات خاصة بنا.",
       lead: "ابتكرناها وبنيناها ونشغّلها بأنفسنا — ولذلك هي أفضل دليل على ما نستطيع بناءه للآخرين. ليست كتالوجًا: لا يُباع منها شيء هنا. والتعمّق في منتجنا الرائد meAI يأتي مباشرةً بعدها.",
       statusLabel: "الحالة",
       openLabel: "فتح",
@@ -7732,7 +7732,7 @@ const rawDictionary = {
       founderLabel: "المؤسس وقائد الأنظمة",
       founder: "محمد أمين أكيول",
       body1:
-        "بدأت creaDIG في 2017 كوكالة. تحوّلت المشاريع إلى منتجات، والمنتجات إلى بيت أنظمة — واليوم تعمل تحت هذه المظلة أربعة أنظمة خاصة، ��لى جانب متابعة المنشآت التي بنيناها لها.",
+        "بدأت creaDIG في 2017 كوكالة. تحوّلت المشاريع إلى منتجات، والمنتجات إلى بيت أنظمة — واليوم تعمل تحت هذه المظلة أنظمة خاصة بنا، إلى جانب متابعة المنشآت التي بنيناها لها.",
       body2:
         "الفريق ينمو؛ والوظائف التالية قيد الإعداد.",
       nicheLabel: "مجالات التركيز",
@@ -7846,7 +7846,7 @@ const rawDictionary = {
     packages: {
       eyebrow: "عروض البداية",
       title: "التكلفة.",
-      lead: "أسعار ثابتة للموقع وللفحص، وطريق ثابت لكل ما هو أ��بر. كل رقم يسري على النطاق المذكور.",
+      lead: "أسعار ثابتة للموقع وللفحص، وطريق ثابت لكل ما هو أكبر. كل رقم يسري على النطاق المذكور.",
       entryNote:
         "هذه نقطة الدخول، لا البنية الأساسية. أما ما تبنيه creaDIG كبيت أنظمة فمذكور أعلاه في الطبقات الخمس ويُحسب بحسب النطاق — لا بالباقة.",
       forWhom: "لمن",
@@ -7951,7 +7951,7 @@ const rawDictionary = {
         },
         evolution: {
           name: "التطوير المستمر",
-          what: "ما يتبيّن خطؤه في التشغيل يُغيَّر — لا يُوثَّق ويُترك كما هو. ضم�� التغييرات الشهرية؛ وكل ما يُضاف جديدًا فهو مشروع قائم بذاته.",
+          what: "ما يتبيّن خطؤه في التشغيل يُغيَّر — لا يُوثَّق ويُترك كما هو. ضمن التغييرات الشهرية؛ وكل ما يُضاف جديدًا فهو مشروع قائم بذاته.",
         },
       },
       note: "لا نسبة إتاحة مئوية، ولا زمن استجابة بالساعات، ولا «24/7». المُلتزَم به هو ما هو مكتوب هنا — ونلتزم به في الإجازة أيضًا.",
@@ -7976,7 +7976,7 @@ const rawDictionary = {
         },
         data: {
           name: "البيانات وقواعد البيانات",
-          body: "أين تعيش البيانات، ولمن تعود، وكيف تبدو ح��ن تصير خاطئة. نموذج بيانات لا يعكس المنشأة يُلتفّ عليه في التشغيل — وعندها يعود أحدهم إلى صيانة جدول جانبي.",
+          body: "أين تعيش البيانات، ولمن تعود، وكيف تبدو حين تصير خاطئة. نموذج بيانات لا يعكس المنشأة يُلتفّ عليه في التشغيل — وعندها يعود أحدهم إلى صيانة جدول جانبي.",
           question: "أي سجلّ هو الحقيقة حين يتناقض موضعان؟",
         },
         hosting: {
@@ -8049,7 +8049,7 @@ const rawDictionary = {
         },
         images: {
           name: "الصور بصيغتَي AVIF وWebP",
-          body: "الصور تُحوَّل وقت البناء وتُسلَّم بالمقاس الذي ي��تاجه التخطيط فعلًا. ومن لا يدعم AVIF يحصل على WebP — تلقائيًا، لا بتفرّع في الشيفرة.",
+          body: "الصور تُحوَّل وقت البناء وتُسلَّم بالمقاس الذي يحتاجه التخطيط فعلًا. ومن لا يدعم AVIF يحصل على WebP — تلقائيًا، لا بتفرّع في الشيفرة.",
         },
         gates: {
           name: "ثلاثة فحوص في البناء",
@@ -8071,7 +8071,7 @@ const rawDictionary = {
       lead: "معظم المشاريع تنتهي عند الإطلاق. وبعده يبدأ الجزء الذي لا يبيعه أحد: التحديثات والأعطال والثغرات الأمنية والتغييرات الصغيرة التي فجأةً لا يستطيع أحد إجراءها. نحن نبقى.",
       metaTitle: "التشغيل المُدار — استضافة ومراقبة وتحديثات ونسخ احتياطي",
       metaDescription:
-        "creaDIG تشغّل ما بنته creaDIG: ��لاستضافة والمراقبة والتحديثات والأمان والنسخ الاحتياطي والدعم والتطوير المستمر. قابل للإنهاء شهريًا — النظام والبيانات ملككم.",
+        "creaDIG تشغّل ما بنته creaDIG: الاستضافة والمراقبة والتحديثات والأمان والنسخ الاحتياطي والدعم والتطوير المستمر. قابل للإنهاء شهريًا — النظام والبيانات ملككم.",
       whyLabel: "لماذا التشغيل بدل التسليم",
       why: [
         {
@@ -8152,7 +8152,7 @@ const rawDictionary = {
       handoffWhatsapp:
         "واتساب مفتوح برسالتكم الجاهزة. ولا تصلنا إلا حين تضغطون إرسال هناك.",
       handoffMail:
-        "برنامج البريد لديكم مفتوح بالرسالة الجاهزة. ��لا تصلنا إلا حين تضغطون إرسال هناك.",
+        "برنامج البريد لديكم مفتوح بالرسالة الجاهزة. ولا تصلنا إلا حين تضغطون إرسال هناك.",
       handoffRetry: "لم يحدث شيء؟ افتحوه من هنا مرة أخرى.",
       errBlocked:
         "حجب متصفحكم النافذة. يُرجى فتح واتساب عبر الرابط أدناه — أو الكتابة مباشرةً إلى",
@@ -8324,7 +8324,7 @@ const rawDictionary = {
         privacyNote:
           "بياناتكم تصل إلى creaDIG وتُستعمل حصرًا لمعالجة طلب الموعد هذا.",
         title: "المراجعة والإرسال",
-        lead: "نقرة واحدة ويصل طل�� موعدكم إلى بريدنا. وتصلكم فورًا رسالة استلام؛ أما الموعد نفسه فنؤكّده بشكل ملزِم في ردّنا. وإن كنتم تفضّلون واتساب فهو ممكن أيضًا.",
+        lead: "نقرة واحدة ويصل طلب موعدكم إلى بريدنا. وتصلكم فورًا رسالة استلام؛ أما الموعد نفسه فنؤكّده بشكل ملزِم في ردّنا. وإن كنتم تفضّلون واتساب فهو ممكن أيضًا.",
         send: "إرسال طلب الموعد",
         typeLabel: "نوع الحديث",
         dateLabel: "الأيام المفضّلة",
@@ -8419,7 +8419,7 @@ const rawDictionary = {
         "ألوان نصوص بتباين غير كافٍ (وصولًا إلى 2,4 : 1 في النصوص النائبة)",
         "غياب التركيز المرئي عن ثلاثة عناصر تحكم في الشريط العلوي",
         "غياب رابط التخطي إلى المحتوى",
-        "أيام التقويم في مساعد المواعيد دون اسم ذي دلا��ة",
+        "أيام التقويم في مساعد المواعيد دون اسم ذي دلالة",
         "تسميتان ألمانيتان بقيتا في النسخة التركية",
         "تغيير الخطوة في مساعد المواعيد لم يكن يُعلَن",
       ],
@@ -8519,14 +8519,14 @@ const rawDictionary = {
         },
         {
           title: "الموافقة والتخزين المحلي",
-          body: "نحفظ قراركم من لافتة الموافقة في التخزين المحلي لمتصفحكم (المفتاح «creadig_consent»). وبموافقتكم فقط نتذكّر إضافةً إلى ذلك المظهر (فاتح/داكن)؛ ودون مواف��ة يسري هذا الإعداد للجلسة الحالية فقط. أما اللغة فلا نحفظها إطلاقًا — فهي في عنوان الصفحة. ولا تُنقل بذلك أي بيانات لأطراف ثالثة. ويمكنكم تعديل اختياركم أو سحبه في أي وقت تحت «إعدادات ملفات تعريف الارتباط» — وعند السحب نزيل المدخلات المعنية فورًا.",
+          body: "نحفظ قراركم من لافتة الموافقة في التخزين المحلي لمتصفحكم (المفتاح «creadig_consent»). وبموافقتكم فقط نتذكّر إضافةً إلى ذلك المظهر (فاتح/داكن)؛ ودون موافقة يسري هذا الإعداد للجلسة الحالية فقط. أما اللغة فلا نحفظها إطلاقًا — فهي في عنوان الصفحة. ولا تُنقل بذلك أي بيانات لأطراف ثالثة. ويمكنكم تعديل اختياركم أو سحبه في أي وقت تحت «إعدادات ملفات تعريف الارتباط» — وعند السحب نزيل المدخلات المعنية فورًا.",
         },
         {
           title: "حقوقكم",
-          body: "لكم في أي وقت حق الوصول (المادة 15) والتصحيح (16) والمحو (17) وتقييد المعالجة (18) ونقل البيانات (20) والاعتراض (21). وتكفي رسالة إلى العنوان المذكور أدناه. وبصرف النظر عن ذلك لكم حق تقديم شكوى إلى سلطة إشراف على حماية البيانات (المادة 77) — والمختصة لمقرّنا هي مفوّضة حماية البيانات لولاية ساك��ونيا السفلى.",
+          body: "لكم في أي وقت حق الوصول (المادة 15) والتصحيح (16) والمحو (17) وتقييد المعالجة (18) ونقل البيانات (20) والاعتراض (21). وتكفي رسالة إلى العنوان المذكور أدناه. وبصرف النظر عن ذلك لكم حق تقديم شكوى إلى سلطة إشراف على حماية البيانات (المادة 77) — والمختصة لمقرّنا هي مفوّضة حماية البيانات لولاية ساكسونيا السفلى.",
         },
       ],
-      privacyNote: "ستخضع هذه الن��خة لمراجعة قانونية نهائية مع بيانات الشركة الكاملة.",
+      privacyNote: "ستخضع هذه النسخة لمراجعة قانونية نهائية مع بيانات الشركة الكاملة.",
     },
     consent: {
       title: "موافقتكم",

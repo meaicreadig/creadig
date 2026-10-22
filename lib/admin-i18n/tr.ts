@@ -172,7 +172,7 @@ export const tr: AdminTexte = {
       "in-recherche": "Araştırmada",
       "beleg-fehlt": "Kanıt eksik",
       eingeordnet: "Sınıflandırıldı",
-      "bereit-fuer-kontakt": "İletişime haz��r",
+      "bereit-fuer-kontakt": "İletişime hazır",
       zurueckgestellt: "Ertelendi",
       ausgeschlossen: "Hariç tutuldu",
     },
@@ -297,9 +297,9 @@ export const tr: AdminTexte = {
     organisationLead: (name: string) => `Kuruluş: ${name}`,
     konflikt: "Kaydedilmedi: Bu satış fırsatı bu arada başka biri tarafından değiştirildi. Sayfa şimdi güncel durumu gösteriyor — lütfen değişikliği kontrol edip yeniden kaydedin.",
     gewonnenTitel: "Kazanıldı — işletmedeki sonraki adım",
-    gewonnenOhneAngebot: "Henüz kabul edilmiş bir teklif kaydedilmedi. Önce kabulü teklif belgesinde kaydedin, ard��ndan projeyi başlatın.",
+    gewonnenOhneAngebot: "Henüz kabul edilmiş bir teklif kaydedilmedi. Önce kabulü teklif belgesinde kaydedin, ardından projeyi başlatın.",
     gewonnenMitAngebot: "Teklif kabul edildi. Sonraki adım: projeyi „Teslimat ve kabul“ altında başlatın.",
-    gewonnenMitProjekt: "Proje sürüyor. Materyal, kabul ve teslim „Teslimat ve kabul��� altında.",
+    gewonnenMitProjekt: "Proje sürüyor. Materyal, kabul ve teslim „Teslimat ve kabul“ altında.",
     zumAngebot: "Teklif belgesine git",
     zurLieferung: "Teslimat ve kabule git",
     keineAutomatik: "Hiçbir şey otomatik olmaz — her adım elle başlatılır.",
@@ -454,10 +454,10 @@ export const tr: AdminTexte = {
       `${inhalt} müşteri ve talep veritabanında tutulur. Bu ortam için henüz kurulmadı. Bu boş bir liste değil, eksik bir bağlantıdır — kurulum Sistem altında.`,
     nichtErreichbarTitel: (bereich) => `${bereich}: veritabanına şu an ulaşılamıyor`,
     nichtErreichbarText: (inhalt) =>
-      `${inhalt} müşteri ve talep veritabanında tutulur. Kurulu, ancak şu an yanıt vermedi. Bu boş bir liste değil, bir ar���zadır — hiçbir şey silinmedi.`,
+      `${inhalt} müşteri ve talep veritabanında tutulur. Kurulu, ancak şu an yanıt vermedi. Bu boş bir liste değil, bir arızadır — hiçbir şey silinmedi.`,
     erneutLaden: "Yeniden yükle",
     inhaltVertrieb: "Talepler, kişiler ve satış fırsatları",
-    inhaltKunden: "Kuruluşlar, lokasyonlar ve irtibat ki��ileri",
+    inhaltKunden: "Kuruluşlar, lokasyonlar ve irtibat kişileri",
   },
   pipeline: {
     titel: "Satış süreci",
@@ -629,7 +629,7 @@ export const tr: AdminTexte = {
     },
     tage: (n) => (n === 1 ? "1 gün" : `${n} gün`),
     mitPerson: "Kişi",
-    ohnePerson: "ki��isiz",
+    ohnePerson: "kişisiz",
     signal: (n) => (n === 1 ? "1 sinyal" : `${n} sinyal`),
     mehrfach: (n) => `${n} kez doğrulandı`,
     fuss: "Araştırma satış değildir. Burada satış fırsatı, kişi kaydı veya pazarlama izni oluşmaz — yalnızca bir görüşmenin değip değmeyeceğine dair gerekçeli bir yargı.",
@@ -1038,7 +1038,7 @@ export const tr: AdminTexte = {
         "„{referenz}“ referansı CD-YYAAGG-#### kalıbına uymuyor. Bu numara, alındı onayındaki numarayla aynı olmalı — yoksa müşterinin elinde iki numara olur.",
       "reife-offen": "{beleg} — {warum}",
       "abschnitt-leer": "Bu zorunlu bölüm boş. {regel}",
-      "keine-position": "Hi�� kalem yok. Rakamsız bir teklif, görüşme notudur.",
+      "keine-position": "Hiç kalem yok. Rakamsız bir teklif, görüşme notudur.",
       "katalog-ohne-zahl": "„{was}“ {quelle} kaynağına işaret ediyor, orada ise bir rakam yok.",
       "betrag-ohne-freigabe":
         "„{was}“ kendi tutarını taşıyor ama dayanaklı bir onayı yok. Her rakam ya katalogda durur ya da onaylıdır — kim, ne zaman ve nerede bilgisiyle.",
@@ -1058,7 +1058,7 @@ export const tr: AdminTexte = {
       "kein-ja":
         "Kabul edilmiş bir teklif yok. Evet'i olmayan bir proje bir niyet beyanıdır; kapsamı da en son birinin söylediği şey olurdu.",
       "kein-materialeingang":
-        "Materyal girişi yok. Kamuya verilen söz şudur: materyal girişinden itibaren dört hafta. Materyal olmadan hiçbir s��re işlemez ve verilecek tarih uydurma olur.",
+        "Materyal girişi yok. Kamuya verilen söz şudur: materyal girişinden itibaren dört hafta. Materyal olmadan hiçbir süre işlemez ve verilecek tarih uydurma olur.",
       "aenderung-unbeziffert":
         "„{was}“ onaylanmış ama rakamlandırılmamış. Bilinmeyen bir rakama verilen onay, onay değildir.",
       "keine-abnahme":
@@ -1088,7 +1088,7 @@ export const tr: AdminTexte = {
       },
       material: {
         label: "İşletme metin, görsel ve erişim sağlayabiliyor",
-        warum: "Dört hafta materyal girişinden itibaren işler. Bu taahhüt olmadan süre bir taahhüt de��ildir.",
+        warum: "Dört hafta materyal girişinden itibaren işler. Bu taahhüt olmadan süre bir taahhüt değildir.",
       },
       seite: {
         label: "Denetlenecek site belirlendi",
@@ -1096,7 +1096,7 @@ export const tr: AdminTexte = {
       },
       pruefung: {
         label: "Bir denetim raporu var",
-        warum: "Bulgular olmadan her rakam tahmindir. Gör��lmemiş bir işe kimse ciddi bir fiyat vermez.",
+        warum: "Bulgular olmadan her rakam tahmindir. Görülmemiş bir işe kimse ciddi bir fiyat vermez.",
       },
       zugang: {
         label: "Koda erişim netleşti",
@@ -1104,7 +1104,7 @@ export const tr: AdminTexte = {
       },
       "eigenes-system": {
         label: "Sistem bizden — ya da inceleyip devraldık",
-        warum: "Tanımadı��ımız bir kodun arkasında duramayız.",
+        warum: "Tanımadığımız bir kodun arkasında duramayız.",
       },
       grenze: {
         label: "İşletme sınırı biliyor — ayda iki içerik değişikliği",
@@ -1236,7 +1236,7 @@ export const tr: AdminTexte = {
     erfassenTitel: "Çıkanı kaydedin",
     erfassenHinweis: "Bir cümle yeter. İçeriğin kendisi yayımlandığı yerde durur; burada yalnızca var olduğu yazar.",
     was: "Ne",
-    wasPlatzhalter: "��rn. Build Note: Teklifleri neden otomatikleştirmiyoruz",
+    wasPlatzhalter: "Örn. Build Note: Teklifleri neden otomatikleştirmiyoruz",
     kanal: "Nerede",
     am: "Ne zaman",
     url: "Adres (isteğe bağlı)",
@@ -1395,7 +1395,7 @@ export const tr: AdminTexte = {
       umfaenge: "En az bir kapsam.",
       fundstelle: "Kaynak olmadan onay bulunamaz.",
     },
-    formTraegtNicht: "{form}, ��{umfang}“ kapsamını taşımaz — bu biçim yalnızca müşterinin kendi yayımladığını kapsar.",
+    formTraegtNicht: "{form}, „{umfang}“ kapsamını taşımaz — bu biçim yalnızca müşterinin kendi yayımladığını kapsar.",
     scope: {
       name: "Adı anmak",
       logo: "Logoyu göstermek",
@@ -1515,7 +1515,7 @@ export const tr: AdminTexte = {
       erreichbar: "Yanıt veriyor.",
       "nicht-erreichbar": "Kurulu, ama yanıt vermiyor.",
       "nicht-eingerichtet": "Kurulu değil — erişilecek bir şey yok.",
-      "schluessel-gesetzt": "Erişim tan��mlı.",
+      "schluessel-gesetzt": "Erişim tanımlı.",
       "nicht-pruefbar": "Kontrol edilemez.",
     },
     reichweite: {
@@ -1569,6 +1569,6 @@ export const tr: AdminTexte = {
     gespeichert: "Kaydedildi.",
     offenePunkte: (n) => `Bu haliyle dışarı çıkamaz — ${n} açık ${n === 1 ? "nokta" : "nokta"}:`,
     abschneidehinweis: (grenze, wie) =>
-      `Bu liste ${grenze} kayıt gösteriyor ��� üst sınır bu. Daha fazlası olup olmadığı burada görünmüyor. ${wie}`,
+      `Bu liste ${grenze} kayıt gösteriyor — üst sınır bu. Daha fazlası olup olmadığı burada görünmüyor. ${wie}`,
   },
 }
