@@ -29,7 +29,7 @@ export const NAV_SCHLUESSEL = [
 export type NavSchluessel = (typeof NAV_SCHLUESSEL)[number]
 export type NavGruppe = "cockpit" | "vertrieb" | "kunden" | "marketing"
 
-export type KnotenId = NavSchluessel | "finanz" | "system" | "webseite"
+export type KnotenId = NavSchluessel | "finanz" | "system" | "webseite" | "forschung"
 
 export type Knoten = {
   id: KnotenId
@@ -222,6 +222,18 @@ export const KNOTEN: readonly Knoten[] = [
     },
     viertel: "technik",
     pos: { x: 6.2, y: -2.4 },
+    nurOwner: true,
+  },
+  {
+    id: "forschung",
+    href: "/admin/forschung",
+    label: { de: "F&E-Stunden", tr: "Ar-Ge saatleri" },
+    aufgabe: {
+      de: "F&E-Stunden für FIBERO, meAI und Stammo erfassen – Nachweis und Schätzung für die Forschungszulage.",
+      tr: "FIBERO, meAI ve Stammo için Ar-Ge saatlerini kaydet – Forschungszulage için kanıt ve tahmin.",
+    },
+    viertel: "technik",
+    pos: { x: 6.0, y: -5.8 },
     nurOwner: true,
   },
 ]

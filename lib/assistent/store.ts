@@ -58,14 +58,21 @@ const SCHEMA = [
          CHECK (art IN ('mail','aufgabe','termin','linkedin','kapital','notiz','loeschen'));
      END IF;
    END $$`,
+  /* Sperre je Agent: Cron und Seitenaufruf starten denselben Agenten nie gleichzeitig. */
+  `CREATE TABLE IF NOT EXISTS assistent_sperren (
+    name text PRIMARY KEY,
+    bis timestamptz NOT NULL,
+    seit timestamptz NOT NULL DEFAULT now())`,
 ]
 
 /**
- * Interne Arbeit (Aufgaben, Notizen) läuft im Hintergrund über die Koordination und
- * erscheint nie im Freigabe-Eingang. Sichtbar ist nur, was nach außen geht oder löscht.
+ * Interne Arbeit (Aufgaben, Notizen) läuft im Hintergrund über die Koordination.
+ * Im Freigabe-Eingang erscheint sie nur, wenn die Koordination sie Emin vorlegt
+ * (extra.koordination.beiEmin) – dann mit fertiger Vorlage. Alles andere, was nach
+ * außen geht oder löscht, ist immer sichtbar.
  */
 export const INTERNE_ARTEN = ["aufgabe", "notiz"] as const
-const NUR_SICHTBARE = `art NOT IN ('aufgabe','notiz')`
+const NUR_SICHTBARE = `(art NOT IN ('aufgabe','notiz') OR coalesce(extra->'koordination'->>'beiEmin', '') = 'true')`
 
 export const FREIGABE_ARTEN = ["mail", "aufgabe", "termin", "linkedin", "kapital", "notiz", "loeschen"] as const
 export type FreigabeArt = (typeof FREIGABE_ARTEN)[number]
@@ -118,8 +125,14 @@ export type FreigabeExtra = {
   instagramUrl?: string | null
   /** Freigegebene Kapitalchance = Vorhaben mit Stufe und KI-Antragsskizze */
   antrag?: { stufe: KapitalStufe; seit: string; skizze?: string }
-  /** Interne Vorarbeit der Koordination (Abteilung, Ergebnis, ob automatisch erledigt). */
-  koordination?: { abteilung: string; ergebnis: string; auftragId: string; automatisch?: boolean }
+  /** Interne Vorarbeit der Koordination (Abteilung, Ergebnis, ob automatisch erledigt, ob Emin vorgelegt). */
+  koordination?: { abteilung: string; ergebnis: string; auftragId: string; automatisch?: boolean; beiEmin?: boolean }
+  /** Von der Koordination fälschlich geschlossen und Emin wieder vorgelegt (Zeitpunkt). */
+  zurueckgeholt?: string
+  /** Emin hat den Entwurf vor der Freigabe geändert – Messgröße für die Qualität des Agenten. */
+  bearbeitet?: boolean
+  /** Bilgi Bekçisi: Behauptung, die nicht zu den Firmenfakten passt. */
+  wissen?: string
   /** Recht & Compliance: Prüfergebnis, von Emin bestätigte Rechtsgrundlage (Zeitpunkt), Widerspruch. */
   recht?: string
   rechtOk?: boolean
@@ -210,9 +223,12 @@ export async function legeFreigabeAn(f: {
   if (!q) throw new Error("Datenbank nicht verfügbar")
   if (f.quelle && (await quelleBekannt(f.quelle))) return null
   const id = f.id ?? neueId("frg")
-  await q(
+  /* Prüfen und Einfügen in einer Anweisung: zwei gleichzeitige Läufe legen dieselbe Quelle nicht doppelt an. */
+  const rows = (await q(
     `INSERT INTO assistent_freigaben (id, art, titel, inhalt, empfaenger, betreff, quelle, agent, bild_pfad, extra)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb)`,
+     SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb
+      WHERE $7::text IS NULL OR NOT EXISTS (SELECT 1 FROM assistent_freigaben WHERE quelle = $7::text)
+     RETURNING id`,
     [
       id,
       f.art,
@@ -225,8 +241,32 @@ export async function legeFreigabeAn(f: {
       f.bildPfad ?? null,
       JSON.stringify(f.extra ?? {}),
     ],
-  )
-  return id
+  )) as { id: string }[]
+  return rows[0]?.id ?? null
+}
+
+/**
+ * Sperre nehmen (Lease). Liefert `null`, wenn ein anderer Lauf sie hält.
+ * `abgebrochen` = die vorige Sperre ist abgelaufen, ohne freigegeben zu werden –
+ * der vorige Lauf ist also mitten drin gestorben (z. B. Zeitlimit der Funktion).
+ */
+export async function nimmSperre(name: string, minuten: number): Promise<{ abgebrochen: boolean } | null> {
+  const q = await assistentDb()
+  if (!q) return { abgebrochen: false }
+  const rows = (await q(
+    `WITH alt AS (SELECT bis FROM assistent_sperren WHERE name = $1)
+     INSERT INTO assistent_sperren (name, bis, seit) VALUES ($1, now() + make_interval(mins => $2), now())
+     ON CONFLICT (name) DO UPDATE SET bis = EXCLUDED.bis, seit = now() WHERE assistent_sperren.bis < now()
+     RETURNING (SELECT bis FROM alt) AS alt_bis`,
+    [name, minuten],
+  )) as { alt_bis: string | Date | null }[]
+  if (!rows[0]) return null
+  return { abgebrochen: rows[0].alt_bis != null }
+}
+
+export async function gibSperre(name: string): Promise<void> {
+  const q = await assistentDb()
+  if (q) await q(`DELETE FROM assistent_sperren WHERE name = $1`, [name])
 }
 
 export const neueFreigabeId = () => neueId("frg")

@@ -13,7 +13,7 @@ import { erstelleEntwurf, ladeEntwuerfe } from "@/lib/verkaufen-entwurf"
 import { firmenRahmen, INHABER } from "./rahmen"
 import { findeKontaktMail } from "./kontaktsuche"
 import { pruefeWebseite, webcheckNotiz } from "./webcheck"
-import { istMail, nachfassen } from "./versand"
+import { ergaenzeFehlendeAdressen, istMail, nachfassen } from "./versand"
 import { holeEingang } from "@/lib/eingang"
 import { bulletinStoff, erstelleBulletin } from "@/lib/bulletin/agent"
 import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
@@ -24,20 +24,23 @@ import { geplantFuer, linkMitUtm, SAEULEN, zielgruppeDerWoche, type Saeule } fro
 import { veroeffentlicheGeplante } from "./redaktion-post"
 import {
   assistentDb,
+  gibSperre,
   ladeFreigaben,
   ladeRaete,
   legeFreigabeAn,
   letzteArtikel,
   letzteLaeufe,
   neueFreigabeId,
+  nimmSperre,
   offeneAutomationErinnerungen,
   protokolliereLauf,
   quelleBekannt,
   speichereRat,
+  type Lauf,
   type RatProtokoll,
 } from "./store"
 
-export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite"] as const
+export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite", "qualitaet", "wissen", "forderungen", "sicherheit", "kundenservice", "forschung"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
 
 export type AgentInfo = {
@@ -63,6 +66,12 @@ export const AGENTEN: AgentInfo[] = [
   { key: "kapital", name: "Kapital", aufgabe: "Recherchiert Förderungen, Kredite und Investoren mit Quelle und Frist.", takt: "woechentlich", ki: true },
   { key: "golf", name: "Golf-Radar", aufgabe: "Sucht jede Woche Investoren, Family Offices, Programme und Events in VAE, Saudi-Arabien und Katar und schreibt die erste Nachricht auf Englisch und Arabisch.", takt: "woechentlich", ki: true },
   { key: "bulletin", name: "Bulletin", aufgabe: "Recherchiert jeden Morgen, was in KI, Automatisierung, Medien, Chips und Robotik zählt, mit Quelle, ordnet es für creaDIG ein und liefert der Redaktion Artikelideen.", takt: "taeglich", ki: true },
+  { key: "qualitaet", name: "Qualitätssicherung", aufgabe: "Benotet jeden KI-Mitarbeiter täglich nach deinen Entscheidungen: Freigaben, Änderungen, Absagen, Fehler und Dauer. Wer unter der Grenze liegt, bekommt einen Auftrag mit seinen letzten Absagen.", takt: "taeglich", ki: false },
+  { key: "wissen", name: "Wissens-Wächter", aufgabe: "Prüft jeden offenen Entwurf auf erfundene Behauptungen (Zertifikate, Kundenzahlen) und unbekannte Preise und schickt ihn zur Korrektur zurück.", takt: "taeglich", ki: false },
+  { key: "forderungen", name: "Tahsilat", aufgabe: "Legt für überfällige Rechnungen die nächste Mahnstufe als sendefertige Mail in deine Freigabe (3/14/28 Tage) und eskaliert die 2. Mahnung an die Geschäftsführung. Versendet nie selbst.", takt: "taeglich", ki: false },
+  { key: "sicherheit", name: "IT-Sicherheit", aufgabe: "Prüft Pflicht-Einstellungen und durchsucht eingehende Mails nach Angriffen auf die KI (Prompt-Injection). Kritisches löst einen Alarm aus.", takt: "taeglich", ki: false },
+  { key: "kundenservice", name: "Kundenservice", aufgabe: "Schreibt für unbeantwortete Kundenmails ohne Zuordnung einen Antwortentwurf; unbekannte Absender bekommen eine höfliche Rückfrage. Versendet nie selbst.", takt: "taeglich", ki: true },
+  { key: "forschung", name: "F&E-Nachweis", aufgabe: "Fasst jede Woche die erfassten F&E-Stunden für die Forschungszulage zusammen und schätzt die Jahreserstattung.", takt: "woechentlich", ki: false },
   { key: "redaktion", name: "Redaktion", aufgabe: "Plant jede Woche 4 LinkedIn-Beiträge (Gründer-Stimme, Praxiswissen, Einblick & Beweis, Branche & Haltung) mit Text, Bild, Sendetermin und Link im ersten Kommentar.", takt: "taeglich", ki: true },
 ]
 
@@ -729,15 +738,48 @@ const LAEUFER: Record<AgentKey, (o: Start) => Promise<Ergebnis>> = {
   rat: (o) => rat(o),
   bulletin: (o) => erstelleBulletin({ erzwingen: o.manuell }),
   webseite: async (o) => (await import("@/lib/webseite/pruefer")).websiteRunde(o),
+  qualitaet: async () => (await import("@/lib/agenten/qualitaet")).qualitaetsRunde(),
+  wissen: async () => (await import("@/lib/agenten/wissen")).wissensRunde(),
+  forderungen: async () => (await import("@/lib/agenten/forderungen")).forderungsRunde(),
+  sicherheit: async () => (await import("@/lib/agenten/sicherheit")).sicherheitsRunde(),
+  kundenservice: async () => (await import("@/lib/agenten/kundenservice")).kundenserviceRunde(),
+  forschung: async () => (await import("@/lib/agenten/forschung")).forschungsRunde(),
 }
 
-export async function fuehreAgentAus(key: AgentKey, o: Start = {}): Promise<void> {
+/** Länger als jede Funktion leben darf (maxDuration 300 s) – danach gilt eine Sperre als verwaist. */
+const SPERRE_MINUTEN = 6
+/** Weiche Zeitgrenze je Agent im Morgen-Takt: ein hängender Agent hält die anderen nicht auf. */
+const AGENT_ZEITLIMIT_MS = 200_000
+/** So viele Agenten arbeiten gleichzeitig (schont Gateway-Limits). */
+const GLEICHZEITIG = 4
+/**
+ * Eine Funktion lebt 300 s. Ein neuer Block startet nur, wenn er samt Zeitlimit noch hineinpasst –
+ * der Rest bleibt fällig und läuft im nächsten Takt (Folgerunden 05:25 und 05:50 UTC, danach der Puls).
+ */
+const TAKT_BUDGET_MS = 280_000
+
+/** Ein scheiternder Agent ist ein Alarm (Mail an Emin, gedrosselt je Fenster) – nicht nur eine Logzeile. */
+async function meldeAgentFehler(key: AgentKey, grund: string): Promise<void> {
+  const name = AGENTEN.find((a) => a.key === key)?.name ?? key
+  const { raiseAlert } = await import("@/lib/alert")
+  await raiseAlert("agent-fehler", `${name}: ${grund.slice(0, 300)}`).catch((e) => console.error("[assistent] alarm", e))
+}
+
+export async function fuehreAgentAus(key: AgentKey, o: Start = {}): Promise<"gelaufen" | "laeuft_schon"> {
+  const sperre = await nimmSperre(`agent:${key}`, SPERRE_MINUTEN)
+  if (!sperre) return "laeuft_schon"
+  if (sperre.abgebrochen) {
+    /* Der vorige Lauf ist gestorben, ohne sich abzumelden – sichtbar machen, statt ihn als "gelaufen" zu zählen. */
+    await protokolliereLauf({ agent: key, ergebnis: "Voriger Lauf abgebrochen", anzahl: 0, fehler: "Abgebrochen (Zeitlimit oder Absturz)" })
+    await meldeAgentFehler(key, "voriger Lauf abgebrochen (Zeitlimit oder Absturz)")
+  }
   const start = Date.now()
   try {
     const r = await LAEUFER[key](o)
     await protokolliereLauf({ agent: key, ...r, dauerMs: Date.now() - start })
   } catch (e) {
     console.error("[assistent] agent", key, e instanceof Error ? e.message : e)
+    await meldeAgentFehler(key, e instanceof Error ? e.message : "Fehler")
     await protokolliereLauf({
       agent: key,
       ergebnis: "Lauf fehlgeschlagen",
@@ -745,34 +787,66 @@ export async function fuehreAgentAus(key: AgentKey, o: Start = {}): Promise<void
       fehler: e instanceof Error ? e.message : "Fehler",
       dauerMs: Date.now() - start,
     })
+  } finally {
+    await gibSperre(`agent:${key}`).catch((e) => console.error("[assistent] sperre", key, e instanceof Error ? e.message : e))
   }
+  return "gelaufen"
+}
+
+/** Agent mit weicher Zeitgrenze: läuft er zu lange, geht der Takt weiter; seine Sperre verfällt von selbst. */
+async function mitZeitlimit(key: AgentKey): Promise<void> {
+  let uhr: ReturnType<typeof setTimeout> | undefined
+  const grenze = new Promise<void>((fertig) => {
+    uhr = setTimeout(() => {
+      console.error("[assistent] agent", key, "überschreitet", AGENT_ZEITLIMIT_MS / 1000, "s – Takt läuft weiter")
+      fertig()
+    }, AGENT_ZEITLIMIT_MS)
+  })
+  await Promise.race([fuehreAgentAus(key).then(() => undefined), grenze])
+  clearTimeout(uhr)
+}
+
+/** Welche Agenten sind fällig? Gescheiterte Läufe zählen nicht als "heute erledigt". */
+export function faelligeAgenten(laeufe: Record<string, Lauf>, jetzt = new Date()): AgentKey[] {
+  return AGENTEN.filter((a) => {
+    const l = laeufe[a.key]
+    if (!l) return true
+    const her = jetzt.getTime() - new Date(l.zeit).getTime()
+    /* Ein gescheiterter oder leerer Lauf wartet nicht bis morgen bzw. nächste Woche: nach 90 Minuten neuer Versuch. */
+    if ((l.fehler || (a.key === "bulletin" && l.anzahl === 0)) && her > 90 * 60000) return true
+    return a.takt === "taeglich" ? berlinTag(new Date(l.zeit)) !== berlinTag(jetzt) : her > 6.5 * 86400000
+  }).map((a) => a.key)
 }
 
 /** Startet jeden Agenten, dessen Takt fällig ist (täglich bzw. alle 7 Tage). */
 export async function fuehreFaelligeAus(): Promise<AgentKey[]> {
-  const laeufe = await letzteLaeufe()
-  const jetzt = new Date()
-  const faellig = AGENTEN.filter((a) => {
-    const l = laeufe[a.key]
-    if (!l) return true
-    const zuletzt = new Date(l.zeit)
-    /* Ein gescheitertes Bulletin wartet nicht bis morgen: nach 90 Minuten neuer Versuch, damit morgens Meldungen da sind. */
-    if (a.key === "bulletin" && (l.fehler || l.anzahl === 0) && jetzt.getTime() - zuletzt.getTime() > 90 * 60000) return true
-    return a.takt === "taeglich" ? berlinTag(zuletzt) !== berlinTag(jetzt) : jetzt.getTime() - zuletzt.getTime() > 6.5 * 86400000
-  }).map((a) => a.key)
-  // Chief of Staff zuletzt, damit er die heutigen Ergebnisse aller Abteilungen sieht.
-  // Bulletin zuerst (Redaktion und Rat nutzen seine Meldungen), Chief of Staff zuletzt.
-  const reihenfolge = [
-    ...faellig.filter((k) => k === "bulletin"),
-    ...faellig.filter((k) => k !== "koordinator" && k !== "bulletin"),
-    ...faellig.filter((k) => k === "koordinator"),
-  ]
-  for (const key of reihenfolge) await fuehreAgentAus(key)
-  if (!faellig.includes("koordinator")) await koordinationAbarbeiten()
+  const start = Date.now()
+  const passtNoch = () => Date.now() - start + AGENT_ZEITLIMIT_MS < TAKT_BUDGET_MS
+  const faellig = faelligeAgenten(await letzteLaeufe())
+  const gestartet: AgentKey[] = []
+  // Bulletin zuerst (Redaktion und Rat nutzen seine Meldungen), Chief of Staff zuletzt (sieht die Ergebnisse aller).
+  if (faellig.includes("bulletin")) {
+    await mitZeitlimit("bulletin")
+    gestartet.push("bulletin")
+  }
+  const mitte = faellig.filter((k) => k !== "koordinator" && k !== "bulletin")
+  let i = 0
+  for (; i < mitte.length && passtNoch(); i += GLEICHZEITIG) {
+    const block = mitte.slice(i, i + GLEICHZEITIG)
+    await Promise.all(block.map(mitZeitlimit))
+    gestartet.push(...block)
+  }
+  const liegenGeblieben = mitte.length - Math.min(i, mitte.length)
+  if (liegenGeblieben > 0) console.info(`[assistent] ${liegenGeblieben} Agenten bleiben für den nächsten Takt fällig`)
+  if (faellig.includes("koordinator") && liegenGeblieben === 0 && passtNoch()) {
+    await mitZeitlimit("koordinator")
+    gestartet.push("koordinator")
+  } else await koordinationAbarbeiten()
   await holeEingang().catch((e) => console.error("[assistent] eingang", e instanceof Error ? e.message : e))
+  await ergaenzeFehlendeAdressen().catch((e) => console.error("[assistent] adressen", e instanceof Error ? e.message : e))
   await nachfassen().catch((e) => console.error("[assistent] nachfassen", e instanceof Error ? e.message : e))
   await veroeffentlicheGeplante().catch((e) => console.error("[redaktion] geplant", e instanceof Error ? e.message : e))
-  return reihenfolge
+  return gestartet
 }
 
 /** Interne Warteschlange abarbeiten und – wenn etwas getan wurde – als Arbeitszeit der Geschäftsführung protokollieren. */

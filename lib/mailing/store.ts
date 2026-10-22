@@ -263,7 +263,21 @@ export async function kampagneAbschliessen(id: string): Promise<void> {
 
 export async function geoeffnet(zustellung: string): Promise<void> {
   if (!/^z_[0-9a-f]{32}$/.test(zustellung)) return
-  await q()(`UPDATE mail_deliveries SET opened_at = coalesce(opened_at, now()) WHERE id=$1`, [zustellung])
+  const erst = await q()(`UPDATE mail_deliveries SET opened_at = now() WHERE id=$1 AND opened_at IS NULL RETURNING id`, [zustellung])
+  if (erst.length) await meldeZustellung("mail_geoeffnet", zustellung)
+}
+
+/** Erstes Öffnen/Klicken einer Kampagnenmail ins Rückgrat melden (Empfänger über die Zustellung). */
+async function meldeZustellung(typ: "mail_geoeffnet" | "mail_geklickt", zustellung: string): Promise<void> {
+  try {
+    const r = await q()(`SELECT lower(email) AS email FROM mail_deliveries WHERE id = $1`, [zustellung])
+    const email = r[0]?.email ? String(r[0].email) : null
+    if (!email) return
+    const { ereignis } = await import("@/lib/motor/ereignis")
+    await ereignis(typ, { subjekt: `mail:${email}`, email, daten: { zustellung }, schluessel: `${typ}:${zustellung}` })
+  } catch (e) {
+    console.error("[mailing] Ereignis", typ, e instanceof Error ? e.message : e)
+  }
 }
 
 export async function geklickt(zustellung: string): Promise<string | null> {
@@ -273,5 +287,6 @@ export async function geklickt(zustellung: string): Promise<string | null> {
      FROM mail_campaigns c WHERE d.id=$1 AND c.id = d.campaign_id RETURNING c.cta_url`,
     [zustellung],
   )
+  if (rows[0]) await meldeZustellung("mail_geklickt", zustellung)
   return rows[0] ? String(rows[0].cta_url) : null
 }

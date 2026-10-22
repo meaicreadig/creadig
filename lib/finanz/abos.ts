@@ -146,14 +146,22 @@ export async function erzeugeFaelligeAboEntwuerfe(db: Abfrage, heute: string): P
     const gewonnen = await db(`UPDATE fin_abos SET naechste = $3::date WHERE id = $1 AND naechste = $2::date AND aktiv RETURNING id`, [a.id, a.naechste, neu])
     if (!gewonnen.length) continue
     const zeitraum = zeitraumText(a.naechste, a.intervall)
-    const id = await legeEntwurfAn(db, "rechnung", {
-      titel: a.titel,
-      kunde: a.kunde,
-      positionen: a.positionen,
-      geschaeftsfeld: a.geschaeftsfeld,
-      zahlungszielTage: a.zahlungszielTage,
-      leistungszeitraum: zeitraum,
-    })
+    let id: string
+    try {
+      id = await legeEntwurfAn(db, "rechnung", {
+        titel: a.titel,
+        kunde: a.kunde,
+        positionen: a.positionen,
+        geschaeftsfeld: a.geschaeftsfeld,
+        zahlungszielTage: a.zahlungszielTage,
+        leistungszeitraum: zeitraum,
+      })
+    } catch (e) {
+      /* Entwurf gescheitert → Termin zurück, sonst wäre dieser Zeitraum für immer ohne Rechnung. */
+      await db(`UPDATE fin_abos SET naechste = $2::date WHERE id = $1 AND naechste = $3::date`, [a.id, a.naechste, neu])
+      console.error("[finanz] Abo-Entwurf fehlgeschlagen, Termin zurückgesetzt:", a.id, e instanceof Error ? e.message : e)
+      continue
+    }
     await db(`UPDATE fin_abos SET letzter_entwurf_id = $2 WHERE id = $1`, [a.id, id])
     await verlauf(db, id, "aus_abo", { aboId: a.id, zeitraum })
     erzeugt.push({ id, aboId: a.id, zeitraum })
