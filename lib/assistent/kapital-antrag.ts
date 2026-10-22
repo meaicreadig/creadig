@@ -3,6 +3,7 @@ import "server-only"
 import { generateText } from "ai"
 
 import { ergaenzeExtra, ladeFreigabe, type KapitalStufe } from "./store"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 export const STUFE_TEXT: Record<KapitalStufe, { titel: string; tun: string }> = {
   pruefen: { titel: "Bedingungen prüfen", tun: "Quelle öffnen, Zulässigkeit und Frist bestätigen." },
@@ -18,7 +19,8 @@ export async function schreibeAntragsskizze(id: string): Promise<void> {
   if (!f || f.art !== "kapital" || f.extra.antrag?.skizze) return
   const { text } = await generateText({
     model: "openai/gpt-5.4-mini",
-    prompt: `Du bereitest für creaDIG Solutions (Einzelunternehmen in Niedersachsen, Inhaber Muhammed Emin Akyol; Produkte fibero = Software für Glasfaser-Montagefirmen, stammo = digitale Wallet-Treuekarte, Web- und Systementwicklung) einen Förderantrag vor.
+    prompt: `Du bereitest für creaDIG Solutions einen Förderantrag vor.
+${firmenText("voll")}
 Programm:
 ${f.titel}
 ${f.inhalt}

@@ -4,6 +4,7 @@ import { generateText } from "ai"
 
 import { neonAbfrage, type Abfrage } from "@/lib/neon-abfrage"
 import type { Deal } from "@/lib/verkaufen"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 const MODELL = "openai/gpt-5.4-mini"
 
@@ -49,7 +50,7 @@ export async function erstelleEntwurf(deal: Deal): Promise<void> {
   const { text: roh } = await generateText({
     model: MODELL,
     system:
-      "Du schreibst Geschäftsmails für Muhammed Emin Akyol, Inhaber von creaDIG Solutions (System-Haus für digitale Betriebe: Software, Web, Automatisierung). " +
+      `Du schreibst Geschäftsmails für Muhammed Emin Akyol.\n${firmenText("voll")}\n` +
       "Deutsch, Sie-Form, warm und selbstbewusst, konkret, höchstens 140 Wörter, keine Floskeln, keine erfundenen Fakten, Zahlen oder Referenzen. " +
       "Antworte exakt im Format: erste Zeile 'Betreff: …', dann Leerzeile, dann der Mailtext mit Gruß 'Muhammed Emin Akyol · creaDIG Solutions'.",
     prompt: [

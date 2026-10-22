@@ -10,6 +10,7 @@ export { eingangsAdresse } from "@/lib/assistent/versand"
 import { neonAbfrage, type Abfrage } from "@/lib/neon-abfrage"
 import { legeBuchungslinkAn, linkSprache } from "@/lib/termine/store"
 import { buchungsUrl, siteUrl } from "@/lib/termine/mail"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 /**
  * Gelir Motoru – das Auge der Verkaufsmaschine.
@@ -134,7 +135,8 @@ async function ordneEin(u: Ursprung | null, von: string, betreff: string | null,
   try {
     const { text: roh } = await generateText({
       model: MODELL,
-      prompt: `Du bist der Vertrieb von creaDIG Solutions (Inhaber Emin Akyol, Software für Betriebe: fibero für Glasfaser-Montagefirmen, stammo digitale Treuekarte, Web & Systeme).
+      prompt: `Du bist der Vertrieb von creaDIG Solutions.
+${firmenText("voll")}
 Ein Interessent hat auf unsere Mail geantwortet. Ordne die Antwort ein und schreibe den Antwortentwurf.
 
 UNSERE MAIL (Betreff: ${u?.betreff ?? "unbekannt"}):

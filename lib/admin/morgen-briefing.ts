@@ -9,6 +9,7 @@ import { GESCHAEFTS_ZEITZONE } from "@/lib/geschaeftszeit"
 import { getVertriebStore } from "@/lib/lead-store"
 import { ladeFinanzKurzlage, type FinanzKurzlage } from "@/lib/finanz/kurzlage"
 import { neonAbfrage } from "@/lib/neon-abfrage"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 export type BriefingSprache = "de" | "tr"
 
@@ -136,7 +137,8 @@ function lagebild(items: AttentionItem[], c: CockpitDaten, f: FinanzKurzlage | n
     .slice(0, 9000)
 }
 
-const SYSTEM = (sprache: BriefingSprache) => `Du bist der persönliche Geschäftsassistent von Muhammed Emin Akyol, Inhaber von creaDIG Solutions (System-Haus für digitale Betriebe, Deutschland, Expansion in die Golfstaaten geplant).
+const SYSTEM = (sprache: BriefingSprache) => `Du bist der persönliche Geschäftsassistent von Muhammed Emin Akyol.
+${firmenText("voll")}
 Deine Aufgabe: jeden Morgen genau die drei Schritte nennen, die ihn heute am weitesten nach vorne bringen – Umsatz, Kunden, Sichtbarkeit.
 Regeln:
 - Grundlage ist NUR das LAGEBILD. Erfinde keine Namen, Zahlen oder Termine.
@@ -159,7 +161,7 @@ const REGEL_TEXT = {
       { titel: "Einen Beitrag veröffentlichen", warum: "Sichtbarkeit bringt Anfragen, auch wenn du nicht suchst.", href: "/admin/marketing" },
       { titel: "Pipeline durchsehen und nächste Schritte setzen", warum: "Jede Chance ohne nächsten Schritt kühlt ab.", href: "/admin/vertrieb/pipeline" },
     ],
-    impuls: "Bereite heute einen Satz vor, mit dem du creaDIG in den Golfstaaten vorstellst.",
+    impuls: "Bereite heute einen Satz vor, mit dem du creaDIG einem Handwerksbetrieb in zehn Sekunden erklärst.",
   },
   tr: {
     lage: (n: number) => (n ? `Seni bekleyen ${n} konu var – en önemlileri burada.` : "Her şey tamam. Yeni bir şey başlatma zamanı."),

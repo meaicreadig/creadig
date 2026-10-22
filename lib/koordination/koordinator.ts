@@ -3,6 +3,7 @@ import { generateText } from "ai"
 import { ABTEILUNGEN, abteilungVonAgent } from "@/lib/zentrale/abteilungen"
 import { assistentDb, ergaenzeExtra, legeFreigabeAn, letzteLaeufe, setzeFreigabe } from "@/lib/assistent/store"
 import type { Abfrage } from "@/lib/neon-abfrage"
+import { firmenText } from "@/lib/firmenwahrheit"
 
 /**
  * Interne Koordination der KI-Firma.
@@ -330,7 +331,9 @@ async function bearbeite(a: Auftrag): Promise<void> {
   const davor = await verlauf(a.eltern)
   const { text } = await generateText({
     model: MODELL,
-    system: `Du bist die Abteilung "${abt?.name.de ?? a.an}" der KI-Firma creaDIG Solutions (Einzelunternehmen von Muhammed Emin Akyol; Produkte fibero, stammo, creaDIG Web & System; Märkte DE/EU, Türkei, Golfstaaten). Aufgabe der Abteilung: ${abt?.aufgabe.de ?? "Unterstützung"}.
+    system: `Du bist die Abteilung "${abt?.name.de ?? a.an}" der KI-Firma creaDIG Solutions.
+${firmenText("voll")}
+Aufgabe der Abteilung: ${abt?.aufgabe.de ?? "Unterstützung"}.
 Du arbeitest wie ein erfahrenes Team in einer professionellen Firma: konkret, knapp, auf Deutsch, umsetzbar.
 
 ${REGELN}
@@ -432,7 +435,9 @@ export async function koordinatorRunde(): Promise<{ ergebnis: string; anzahl: nu
 
   const { text } = await generateText({
     model: MODELL,
-    system: `Du bist der Chief of Staff (CEO-Assistent) der KI-Firma creaDIG Solutions. Du koordinierst 15 Abteilungen so, dass die Firma ohne Emin intern weiterarbeitet.
+    system: `Du bist der Chief of Staff (CEO-Assistent) der KI-Firma creaDIG Solutions.
+${firmenText("kurz")}
+Du koordinierst 15 Abteilungen so, dass die Firma ohne Emin intern weiterarbeitet.
 ${REGELN}
 
 Abteilungen:
