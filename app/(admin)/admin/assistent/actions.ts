@@ -62,17 +62,24 @@ async function pruefe() {
 
 export type FrageErgebnis = { ok: true; antwort: Nachricht } | { ok: false; fehler: string }
 
-export async function frage(eingabe: string): Promise<FrageErgebnis> {
+export async function frage(eingabe: string, bildDaten?: string | null): Promise<FrageErgebnis> {
   await pruefe()
-  const text = eingabe.trim().slice(0, 4000)
+  let bild: { base64: string; mediaType: string } | undefined
+  if (bildDaten) {
+    const m = bildDaten.match(/^data:(image\/(?:png|jpeg|webp|gif));base64,([A-Za-z0-9+/=]+)$/)
+    if (!m) return { ok: false, fehler: "Bildformat nicht unterstützt (PNG, JPG, WebP)." }
+    if (m[2].length > 5_500_000) return { ok: false, fehler: "Bild zu groß – bitte kleiner als 4 MB." }
+    bild = { mediaType: m[1], base64: m[2] }
+  }
+  const text = (eingabe.trim() || (bild ? "Was steht auf dem Bild – und was machen wir damit?" : "")).slice(0, 4000)
   if (!text) return { ok: false, fehler: "Leere Nachricht" }
   if ((await fragenHeute()) >= TAGESLIMIT) {
     return { ok: false, fehler: `Tageslimit von ${TAGESLIMIT} Fragen erreicht – morgen geht es weiter.` }
   }
-  await speichereNachricht("user", text)
+  await speichereNachricht("user", bild ? `[Bild angehängt] ${text}` : text)
   try {
     const verlauf = await ladeVerlauf(16)
-    const antwort = await antworte(verlauf)
+    const antwort = await antworte(verlauf, bild)
     const gespeichert = await speichereNachricht("assistant", antwort)
     revalidatePath("/admin/assistent")
     return { ok: true, antwort: gespeichert }
@@ -149,6 +156,12 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
     const betreff = String(form.get("betreff") ?? f.betreff ?? "").trim() || f.titel
     const text = typeof inhalt === "string" && inhalt.trim() ? inhalt.trim() : f.inhalt
     if (istMail(an)) await setzeMailKopf(fid, an, betreff)
+    /* Emin bestätigt ausdrücklich eine Rechtsgrundlage (Einwilligung/Gespräch) – wird mit Zeitpunkt dokumentiert. */
+    if (form.get("basis") === "1") {
+      const basisBestaetigt = new Date().toISOString()
+      await ergaenzeExtra(fid, { basisBestaetigt })
+      f.extra = { ...(f.extra ?? {}), basisBestaetigt }
+    }
     const r = await sendeFreigabeMail(f, an, betreff, text)
     if (!r.ok) {
       await ergaenzeExtra(fid, { fehler: r.grund })

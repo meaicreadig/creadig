@@ -120,6 +120,13 @@ export type FreigabeExtra = {
   antrag?: { stufe: KapitalStufe; seit: string; skizze?: string }
   /** Interne Vorarbeit der Koordination (Abteilung, Ergebnis, ob automatisch erledigt). */
   koordination?: { abteilung: string; ergebnis: string; auftragId: string; automatisch?: boolean }
+  /** Recht & Compliance: Prüfergebnis, von Emin bestätigte Rechtsgrundlage (Zeitpunkt), Widerspruch. */
+  recht?: string
+  rechtOk?: boolean
+  basisBestaetigt?: string
+  antwortArt?: string
+  widerspruch?: boolean
+  automatisch?: string
 }
 
 export const KAPITAL_STUFEN = ["pruefen", "schreiben", "eingereicht", "bewilligt", "abgelehnt"] as const

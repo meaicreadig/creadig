@@ -3,6 +3,7 @@ import "server-only"
 import { einzelmailHtml, einzelmailText, type Einzelmail } from "@/lib/mailing/eml"
 import { istProduktId, produktAusTitel, type ProduktId } from "@/lib/mailing/produkte"
 import { siteUrl } from "@/lib/termine/mail"
+import { pruefeEmpfaenger } from "@/lib/recht/compliance"
 import { nimmAntwortZurueck, notiereAntwort, notiereGesendeteMail } from "@/lib/kundenfaden"
 import { neonAbfrage } from "@/lib/neon-abfrage"
 
@@ -125,6 +126,8 @@ export async function sendeFreigabeMail(f: Freigabe, an: string, betreff: string
   if (!istMail(an)) return { ok: false, grund: "Bitte eine gültige E-Mail-Adresse eintragen." }
   const text = kundenText(inhalt)
   if (!text) return { ok: false, grund: "Der Mailtext ist leer." }
+  const recht = await pruefeEmpfaenger(an, { bestaetigt: Boolean(f.extra?.basisBestaetigt) })
+  if (!recht.erlaubt) return { ok: false, grund: recht.grund }
   const antwortAn = eingangsAdresse(f.id) || process.env.MAIL_REPLY_TO?.trim() || process.env.LEAD_TO?.trim()
   const mail = alsEinzelmail(an.trim(), betreff.slice(0, 200) || f.titel, inhalt, freigabeProdukt(f))
   try {
@@ -168,7 +171,7 @@ function nachfassText(stufe: number, original: string): string {
   return `${gruss}\n\n${kern}\n\nViele Grüße\nEmin Akyol\ncreaDIG Solutions`
 }
 
-type Faellig = { id: string; titel: string; empfaenger: string; betreff: string | null; inhalt: string; stufe: number }
+type Faellig = { id: string; titel: string; empfaenger: string; betreff: string | null; inhalt: string; stufe: number; bestaetigt: boolean }
 
 /**
  * Legt für gesendete Mails ohne Antwort eine Nachfass-Mail zur Freigabe an.
@@ -178,7 +181,8 @@ export async function nachfassen(): Promise<number> {
   const q = await assistentDb()
   if (!q) return 0
   const rows = (await q(
-    `SELECT id, titel, empfaenger, betreff, inhalt, COALESCE((extra->>'stufe')::int, 0) AS stufe
+    `SELECT id, titel, empfaenger, betreff, inhalt, COALESCE((extra->>'stufe')::int, 0) AS stufe,
+            (extra ? 'basisBestaetigt') AS bestaetigt
      FROM assistent_freigaben
      WHERE art = 'mail' AND status = 'freigegeben'
        AND extra ? 'gesendetAt' AND NOT extra ? 'antwortAt' AND NOT extra ? 'nachfassId'
@@ -191,6 +195,12 @@ export async function nachfassen(): Promise<number> {
   )) as Faellig[]
   let neu = 0
   for (const r of rows) {
+    /* Recht & Compliance: Nachfassen nur mit Rechtsgrundlage – sonst endet die Kette still. */
+    const recht = await pruefeEmpfaenger(r.empfaenger, { bestaetigt: Boolean(r.bestaetigt) })
+    if (!recht.erlaubt) {
+      await ergaenzeExtra(r.id, { nachfassId: "gestoppt", recht: recht.grund })
+      continue
+    }
     const stufe = r.stufe + 1
     const betreff = r.betreff ? (r.betreff.startsWith("Re:") ? r.betreff : `Re: ${r.betreff}`) : `Re: ${r.titel}`
     const id = await legeFreigabeAn({
@@ -201,7 +211,7 @@ export async function nachfassen(): Promise<number> {
       inhalt: nachfassText(stufe, kundenText(r.inhalt)),
       quelle: `nachfass:${r.id}`,
       agent: "vertrieb",
-      extra: { stufe, vorgaenger: r.id, warum: `Keine Antwort seit ${stufe === 1 ? NACHFASS_TAGE[0] : NACHFASS_TAGE[1] - NACHFASS_TAGE[0]} Tagen.` },
+      extra: { stufe, vorgaenger: r.id, ...(r.bestaetigt ? { basisBestaetigt: new Date().toISOString() } : {}), warum: `Keine Antwort seit ${stufe === 1 ? NACHFASS_TAGE[0] : NACHFASS_TAGE[1] - NACHFASS_TAGE[0]} Tagen.` },
     })
     if (id) {
       await ergaenzeExtra(r.id, { nachfassId: id })

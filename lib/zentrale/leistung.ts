@@ -20,6 +20,8 @@ export const ZEITRAUM_TAGE = 14
 export const MINUTEN_JE_ERGEBNIS: Record<string, number> = {
   koordinator: 20,
   koordination: 20,
+  recht: 10,
+  marketing: 45,
   rat: 60,
   lage: 20,
   vertrieb: 15,
