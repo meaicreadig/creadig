@@ -1145,7 +1145,7 @@ export default async function AssistentPage({
               <h2 id="eingang-titel" className="font-sans text-xl font-semibold text-foreground">
                 Zur Entscheidung
               </h2>
-              <span className="text-sm text-primary">{offen.length + system.length} offen</span>
+              <span className="text-sm text-primary">{offen.length} offen</span>
             </div>
             <AnspracheLeiste a={ansprache} />
 
@@ -1161,15 +1161,31 @@ export default async function AssistentPage({
               </p>
             )}
 
+            {erledigt.length > 0 ? (
+              <details className="pt-2">
+                <summary className="cursor-pointer text-sm text-muted-foreground">Erledigt (letzte 3 Tage) · {erledigt.length}</summary>
+                <ul className="mt-3 flex flex-col gap-3">
+                  {erledigt.map((f) => (
+                  <FreigabeKarte key={f.id} f={f} linkedin={liZiele} />
+                  ))}
+                </ul>
+              </details>
+            ) : null}
+
+            {/*
+              22.10.2026 (Inhaber): Die Hausaufgaben aus dem Materialstand
+              (Impressum, AV-Verträge, Löschlauf …) sind keine Entscheidungen
+              der Agenten. Oben standen sie zwischen den Freigaben und
+              schoben sie nach unten. Jetzt: unten, zugeklappt, nicht im Zähler.
+            */}
             {system.length > 0 ? (
-              <div className="flex flex-col gap-3 pt-2">
-                <h3 className="text-sm font-medium text-muted-foreground">Aus dem System · {system.length}</h3>
+              <Klappe titel="Hausaufgaben aus dem System" zahl={system.length} unter="Impressum, Verträge, Betrieb — keine Freigaben">
                 <ul className="flex flex-col gap-2">
                   {system.slice(0, 12).map((i) => (
                     <li key={i.id}>
                       <Link
                         href={i.href}
-                        className="flex items-center justify-between gap-4 rounded-2xl bg-card px-5 py-4 transition-colors hover:bg-primary/5"
+                        className="flex items-center justify-between gap-4 rounded-2xl bg-background px-5 py-4 transition-colors hover:bg-primary/5"
                       >
                         <span className="flex min-w-0 flex-col gap-0.5">
                           <span className="truncate font-medium text-foreground">{i.title}</span>
@@ -1181,22 +1197,11 @@ export default async function AssistentPage({
                   ))}
                 </ul>
                 {system.length > 12 ? (
-                  <Link href="/admin" className="text-sm text-primary">
+                  <Link href="/admin" className="mt-3 inline-block text-sm text-primary">
                     Alle {system.length} in der Übersicht
                   </Link>
                 ) : null}
-              </div>
-            ) : null}
-
-            {erledigt.length > 0 ? (
-              <details className="pt-2">
-                <summary className="cursor-pointer text-sm text-muted-foreground">Erledigt (letzte 3 Tage) · {erledigt.length}</summary>
-                <ul className="mt-3 flex flex-col gap-3">
-                  {erledigt.map((f) => (
-                  <FreigabeKarte key={f.id} f={f} linkedin={liZiele} />
-                  ))}
-                </ul>
-              </details>
+              </Klappe>
             ) : null}
           </section>
 

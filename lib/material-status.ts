@@ -41,6 +41,7 @@ import {
   logoFreigabe,
   fallFreigabe,
 } from "@/lib/site-data"
+import { SITE_URL } from "@/lib/routes"
 import { CLIENT_LOGOS } from "@/lib/client-logos.generated"
 import { COMPANY_PHOTOS, COMPANY_PHOTO_SLOTS } from "@/lib/company-media.generated"
 import { productScreens } from "@/lib/product-media"
@@ -444,9 +445,18 @@ export function collect(): { open: Item[]; done: Item[] } {
    */
   push({
     label: "Steuerausweis auf den Preisen (§ 27 a / § 19 UStG)",
-    ok: Boolean(imprintDetails.vatId) || imprintDetails.smallBusiness === true,
+    /*
+     * 22.10.2026: Der Inhaber hat entschieden — regelbesteuert (19 %), kein
+     * Kleinunternehmer. Damit ist „zzgl. 19 % USt.“ auf den Preisen richtig,
+     * auch solange die USt-IdNr. noch fehlt (die steht als eigener Punkt im
+     * Impressum). Vorher hing der Punkt allein an `vatId` und blieb offen.
+     */
+    ok:
+      Boolean(imprintDetails.vatId) ||
+      imprintDetails.smallBusiness === true ||
+      (imprintDetails.smallBusiness === false && !imprintDetails.taxStatusPending),
     detail:
-      imprintDetails.vatId || imprintDetails.smallBusiness === true
+      imprintDetails.vatId || imprintDetails.smallBusiness !== null
         ? "Der Steuerstatus steht; die Preiszeile folgt ihm automatisch."
         : "Die Seite schreibt „zzgl. 19 % USt.“ auf jeden Preis, während das Impressum " +
           "den Umsatzsteuer-Status als offen führt. Trifft die Kleinunternehmerregelung " +
@@ -506,10 +516,11 @@ export function collect(): { open: Item[]; done: Item[] } {
   group = "betrieb"
   push({
     label: "Zustell-Selbsttest aktiviert (BF-8)",
-    ok: Boolean(process.env.SELFTEST_SECRET),
-    detail: process.env.SELFTEST_SECRET
-      ? "SELFTEST_SECRET gesetzt — /api/selftest antwortet"
-      : "SELFTEST_SECRET fehlt; die Route ist abgeschaltet und niemand merkt einen Ausfall",
+    /* Seit PR #130 reicht der Cron-Weg: Vercel ruft mit CRON_SECRET auf. */
+    ok: Boolean(process.env.SELFTEST_SECRET || process.env.CRON_SECRET),
+    detail: process.env.SELFTEST_SECRET || process.env.CRON_SECRET
+      ? "Cron um 07:00 ruft /api/selftest mit CRON_SECRET auf"
+      : "weder SELFTEST_SECRET noch CRON_SECRET gesetzt; die Route ist abgeschaltet und niemand merkt einen Ausfall",
     owner: "Owner: Geheimnis setzen und einen Cron darauf zeigen lassen",
   })
 
@@ -526,9 +537,14 @@ export function collect(): { open: Item[]; done: Item[] } {
 
   push({
     label: "Domain gesetzt",
-    ok: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
-    detail: process.env.NEXT_PUBLIC_SITE_URL
-      ? `NEXT_PUBLIC_SITE_URL = ${process.env.NEXT_PUBLIC_SITE_URL}`
+    /*
+     * Ohne Variable greift der Rueckfall https://creadig.de — und genau das
+     * ist die Produktionsadresse (22.10.2026 geprueft: 200, ausgeliefert von
+     * Vercel). Der Punkt ist offen nur, wenn die Adresse von creadig.de abweicht.
+     */
+    ok: Boolean(process.env.NEXT_PUBLIC_SITE_URL) || SITE_URL === "https://creadig.de",
+    detail: process.env.NEXT_PUBLIC_SITE_URL || SITE_URL === "https://creadig.de"
+      ? `Adresse = ${SITE_URL}`
       : "nicht gesetzt. Der Code fällt auf https://creadig.de zurück — " +
         "daran hängen die kanonischen Adressen, die Sitemap und jedes OG-Bild. " +
         "Stimmt die Adresse nicht, zeigen alle drei ins Leere, ohne dass etwas bricht.",
