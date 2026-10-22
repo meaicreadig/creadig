@@ -85,7 +85,7 @@ async function ladeTeamKarne(woche: boolean): Promise<string[]> {
   const [{ ladeNoten }, { AGENTEN }] = await Promise.all([import("@/lib/agenten/qualitaet"), import("@/lib/assistent/truppe")])
   const name = (k: string) => AGENTEN.find((a) => a.key === k)?.name ?? k
   const noten = (await ladeNoten(woche ? 7 : 1)).filter((n) => n.entwuerfe + n.laeufe + n.fehler > 0)
-  return noten.slice(0, woche ? 12 : 6).map((n) => {
+  const zeilen = noten.slice(0, woche ? 12 : 6).map((n) => {
     const teile = [
       n.freigegeben + n.verworfen > 0 ? `${n.freigegeben}/${n.freigegeben + n.verworfen} freigegeben (${Math.round((n.quote ?? 0) * 100)} %)` : `${n.entwuerfe} Entwürfe`,
       n.bearbeitet ? `${n.bearbeitet} von dir geändert` : null,
@@ -95,6 +95,24 @@ async function ladeTeamKarne(woche: boolean): Promise<string[]> {
     const icon = n.fehler || (n.quote !== null && n.quote < 0.4) ? "shield" : "zap"
     return `- [${icon}] ${name(n.agent)}: ${teile.join(" · ")}`
   })
+  return [...(await trendZeilen().catch(() => [])), ...zeilen]
+}
+
+/** Verlauf 14 Tage als Textkurve (lib/trend.ts) — eine Mail zeigt keine Grafik, aber eine Richtung. */
+async function trendZeilen(): Promise<string[]> {
+  const { ladeTrend, sparkline } = await import("@/lib/trend")
+  const tr = await ladeTrend(14)
+  if (!tr.some((d) => d.laeufe > 0)) return []
+  const heute = tr.at(-1)!
+  const vor7 = tr.at(-8)
+  const pz = (v: number | null) => (v === null ? "–" : `${Math.round(v * 100)} %`)
+  const fehler = tr.reduce((s, d) => s + d.fehler, 0)
+  const web = [...tr].reverse().find((d) => d.webNote !== null)?.webNote ?? null
+  return [
+    `- [layers] Läufe 14 Tage: ${sparkline(tr.map((d) => d.laeufe))} · gestern ${tr.at(-2)?.laeufe ?? 0} · ${fehler ? `**${fehler} Fehler**` : "keine Fehler"}`,
+    `- [zap] Freigabequote 7 Tage: ${pz(heute.quote7)}${vor7 && vor7.quote7 !== null ? ` (Vorwoche ${pz(vor7.quote7)})` : ""} ${sparkline(tr.map((d) => d.quote7), [0, 1])}`,
+    ...(web !== null ? [`- [sparkles] Website-Note: ${web}/100 ${sparkline(tr.map((d) => d.webNote), [0, 100])}`] : []),
+  ]
 }
 
 async function ladeAssistentTeil(heute: string): Promise<AssistentTeil> {
