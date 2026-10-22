@@ -124,12 +124,19 @@ export async function antwortErhalten(form: FormData): Promise<void> {
   revalidatePath("/admin/assistent")
 }
 
+/** Absagegrund mitschreiben (freiwillig) — die Qualitätssicherung gibt ihn dem Agenten als Lernstoff zurück. */
+async function merkeAbsageGrund(id: string, form: FormData): Promise<void> {
+  const grund = String(form.get("grund") ?? "").trim().slice(0, 80)
+  if (grund) await ergaenzeExtra(id, { grund }).catch((e) => console.error("[assistent] grund", e instanceof Error ? e.message : e))
+}
+
 /* Eigene Aktion: hängt nicht davon ab, ob der Browser den gedrückten Knopf mitschickt – sendet nie. */
 export async function freigabeVerwerfen(form: FormData): Promise<void> {
   await pruefe()
   const id = form.get("id")
   if (typeof id !== "string") return
   await setzeFreigabe(id.slice(0, 80), "verworfen")
+  await merkeAbsageGrund(id.slice(0, 80), form)
   revalidatePath("/admin/assistent")
 }
 
@@ -143,6 +150,7 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
   const fid = id.slice(0, 80)
   const f = await ladeFreigabe(fid)
   if (!f || f.status !== "offen") return
+  if (status === "verworfen") await merkeAbsageGrund(fid, form)
 
   const titel = form.get("titel")
   const inhalt = form.get("inhalt")

@@ -15,11 +15,23 @@
     },
     {
       "path": "/api/assistent/truppe?runde=2",
-      "schedule": "25 5 * * *"
+      "schedule": "12 5 * * *"
     },
     {
       "path": "/api/assistent/truppe?runde=3",
-      "schedule": "50 5 * * *"
+      "schedule": "24 5 * * *"
+    },
+    {
+      "path": "/api/assistent/truppe?runde=4",
+      "schedule": "36 5 * * *"
+    },
+    {
+      "path": "/api/assistent/truppe?runde=5",
+      "schedule": "48 5 * * *"
+    },
+    {
+      "path": "/api/assistent/truppe?runde=chef",
+      "schedule": "0 6 * * *"
     },
     {
       "path": "/api/assistent/puls?runde=mittag",

@@ -94,6 +94,8 @@ export type Freigabe = {
 
 /** Zusatzwissen je Entwurf – z. B. warum die Redaktion dieses Thema gewählt hat. */
 export type FreigabeExtra = {
+  /** Warum Emin verworfen hat (freiwillig, components/admin/grund-wahl.tsx) — Lernstoff für die Qualitätssicherung. */
+  grund?: string
   webcheck?: { befunde: string[]; https: boolean; mobil: boolean; ladezeitMs: number | null } | null
   warum?: string
   bezug?: string

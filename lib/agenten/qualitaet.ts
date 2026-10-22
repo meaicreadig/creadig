@@ -108,10 +108,10 @@ export async function sammleZahlen(q: Abfrage, tage = ZEITRAUM_TAGE): Promise<Ag
 
 async function letzteVerworfene(q: Abfrage, agent: string): Promise<string[]> {
   const rows = (await q(
-    `SELECT titel FROM assistent_freigaben WHERE agent = $1 AND status = 'verworfen' ORDER BY erledigt_at DESC NULLS LAST LIMIT 5`,
+    `SELECT titel, extra->>'grund' AS grund FROM assistent_freigaben WHERE agent = $1 AND status = 'verworfen' ORDER BY erledigt_at DESC NULLS LAST LIMIT 5`,
     [agent],
-  )) as { titel: string }[]
-  return rows.map((r) => r.titel)
+  )) as { titel: string; grund: string | null }[]
+  return rows.map((r) => (r.grund ? `${r.titel} — Grund: ${r.grund}` : r.titel))
 }
 
 function auftragsText(z: AgentZahlen, b: Bewertung, verworfen: string[]): string {
