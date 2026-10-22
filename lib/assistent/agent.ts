@@ -22,6 +22,7 @@ Regeln:
 - Hole dir Fakten über die Werkzeuge, bevor du über Zahlen, Abschlüsse oder Messen sprichst. Erfinde NIE Zahlen, Firmen, Fristen oder Fördersummen. Wenn du etwas nicht weißt, sag es und schlage vor, wie man es herausfindet.
 - Du handelst nie selbst. Alles, was nach außen geht (Mail, LinkedIn-Beitrag, Termin, Bewerbung), legst du mit "vorschlag_anlegen" in den Freigabe-Eingang. Er gibt frei.
 - Interne Arbeit (art "aufgabe" oder "notiz") läuft unsichtbar im Hintergrund: Geschäftsleitung und Abteilungen erledigen sie selbst. Sag ihm nie, er müsse sie freigeben oder abhaken. Produkt- und Firmenfreigaben sind Verwaltung, keine Aufgabe für ihn.
+- Absprachen zu Kunden/Chancen (Termin, nächster Schritt, Ort, Verband, wer entscheidet) speicherst du SOFORT mit "absprache_speichern". Bestätige danach kurz, was gespeichert ist. Er soll nichts zweimal sagen müssen.
 - LinkedIn: Artikel-Charakter, echter Mehrwert aus der Praxis, Produkt nur beiläufig. Keine Werbesprache.
 - Wenn er laut denkt ("ich gehe zur Messe X", "Kunde Y hat geschrieben"), zerlege es in konkrete nächste Schritte und lege die wichtigsten als Vorschläge an.
 - Schlage nichts vor, was er sich nicht leisten kann (Messestand, bezahlte Werbung, Personal), solange "finanzrahmen" das nicht hergibt. Biete stattdessen die kostenlose Variante an.
@@ -79,6 +80,42 @@ export async function antworte(verlauf: Nachricht[]): Promise<string> {
         betreff: z.string().max(200).optional().describe("Nur bei Mail"),
       }),
       execute: async (v) => ({ id: await legeFreigabeAn(v), angelegt: true }),
+    }),
+    absprache_speichern: tool({
+      description:
+        "Speichert, was Emin zu einer offenen Chance gesagt hat (nächster Schritt, Datum, Fakten wie Ort/Verband/Ansprechpartner) direkt an der Chance. IMMER aufrufen, sobald er etwas zu einem Kunden/Deal festlegt – Morgenbriefing, Vertrieb und Agenten lesen genau das.",
+      inputSchema: z.object({
+        suche: z.string().min(2).max(120).describe("Firmenname oder Stichwort der Chance"),
+        naechsterSchritt: z.string().min(3).max(300).optional(),
+        datum: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().describe("Datum des nächsten Schritts, JJJJ-MM-TT"),
+        fakten: z.string().min(3).max(600).optional().describe("Neue Fakten, werden an die Notiz angehängt"),
+      }),
+      execute: async (v) => {
+        const q = await assistentDb()
+        if (!q) return { gespeichert: false, grund: "keine Datenbank" }
+        const muster = `%${v.suche.replace(/[%_]/g, "")}%`
+        const treffer = await q(
+          `SELECT o.id, o.title, coalesce(g.name,'') AS firma FROM opportunities o
+             LEFT JOIN organisations g ON g.id = o.organisation_id
+            WHERE o.status NOT IN ('won','lost','excluded') AND (g.name ILIKE $1 OR o.title ILIKE $1)
+            ORDER BY o.updated_at DESC LIMIT 2`,
+          [muster],
+        )
+        if (treffer.length !== 1) return { gespeichert: false, grund: treffer.length ? "mehrdeutig – genauer fragen" : "keine passende offene Chance", treffer }
+        const id = String(treffer[0].id)
+        const stempel = new Intl.DateTimeFormat("de-DE", { dateStyle: "short", timeZone: "Europe/Berlin" }).format(new Date())
+        await q(
+          `UPDATE opportunities SET
+             next_action = coalesce($2, next_action),
+             next_action_at = coalesce($3::date, next_action_at),
+             note = CASE WHEN $4::text IS NULL THEN note ELSE concat_ws(E'\n', nullif(note,''), $4::text) END,
+             updated_at = now()
+           WHERE id = $1`,
+          [id, v.naechsterSchritt ?? null, v.datum ?? null, v.fakten ? `${stempel}: ${v.fakten}` : null],
+        )
+        await q(`DELETE FROM admin_briefing WHERE tag = (now() AT TIME ZONE 'Europe/Berlin')::date`, []).catch(() => null)
+        return { gespeichert: true, chance: treffer[0].title, firma: treffer[0].firma }
+      },
     }),
   }
 
