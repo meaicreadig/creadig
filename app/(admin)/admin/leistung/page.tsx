@@ -4,6 +4,7 @@ import { ArrowRight, Zap } from "lucide-react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
+import { Klappe } from "@/components/admin/klappe"
 import { Surface } from "@/components/admin/primitives"
 import { TrendGrafik } from "@/components/admin/trend-grafik"
 import { adminSprache } from "@/lib/admin-i18n/server"
@@ -177,11 +178,8 @@ export default async function LeistungSeite() {
 
         <TrendGrafik trend={trend} sprache={sprache} intl={intl} />
 
-        <Surface className="flex flex-col gap-4">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="font-sans text-lg font-semibold text-foreground">{t.engpaesse}</h2>
-            <span className="rounded-full bg-muted px-3 py-1 font-mono text-xs text-foreground">{leistung.engpaesse.length}</span>
-          </div>
+        {/* Offen nur, wenn etwas gestört ist — „noch nie gelaufen“ allein ist kein Alarm. */}
+        <Klappe titel={t.engpaesse} zahl={leistung.engpaesse.length} offen={leistung.engpaesse.some((e) => e.schwere === "stoerung")}>
           {leistung.engpaesse.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t.keineEngpaesse}</p>
           ) : (
@@ -208,12 +206,9 @@ export default async function LeistungSeite() {
               ))}
             </ul>
           )}
-        </Surface>
+        </Klappe>
 
-        <section className="flex flex-col gap-4" aria-labelledby="abt-titel">
-          <h2 id="abt-titel" className="font-sans text-lg font-semibold text-foreground">
-            {t.abteilungen}
-          </h2>
+        <Klappe titel={t.abteilungen} zahl={besetzt.length} kasten={false}>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {besetzt.map((a) => (
               <AbteilungKarte key={a.id} a={a} t={t} sprache={sprache} zeit={zeit} />
@@ -231,11 +226,10 @@ export default async function LeistungSeite() {
               </div>
             </Surface>
           )}
-        </section>
+        </Klappe>
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <Surface className="flex flex-col gap-4">
-            <h2 className="font-sans text-lg font-semibold text-foreground">{t.zusammenspiel}</h2>
+        <div className="grid items-start gap-4 lg:grid-cols-2">
+          <Klappe titel={t.zusammenspiel} zahl={leistung.fluesse.length || undefined}>
             {leistung.fluesse.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t.keinFluss}</p>
             ) : (
@@ -252,9 +246,8 @@ export default async function LeistungSeite() {
                 ))}
               </ul>
             )}
-          </Surface>
-          <Surface className="flex flex-col gap-3">
-            <h2 className="font-sans text-lg font-semibold text-foreground">{t.methode}</h2>
+          </Klappe>
+          <Klappe titel={t.methode}>
             <p className="text-sm leading-relaxed text-muted-foreground">{t.methodeText}</p>
             <p className="font-mono text-xs leading-relaxed text-muted-foreground">
               {Object.entries(MINUTEN_JE_ERGEBNIS)
@@ -262,7 +255,7 @@ export default async function LeistungSeite() {
                 .map(([k, v]) => `${k} ${v}`)
                 .join(" · ")}
             </p>
-          </Surface>
+          </Klappe>
         </div>
       </div>
     </AdminShell>

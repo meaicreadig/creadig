@@ -4,6 +4,8 @@ import { assistentDb } from "@/lib/assistent/store"
 import { AGENTEN } from "@/lib/assistent/truppe"
 import { ABTEILUNGEN, type Abteilung } from "@/lib/zentrale/abteilungen"
 
+const agentName = (key: string) => AGENTEN.find((a) => a.key === key)?.name ?? key
+
 /**
  * LEISTUNGSBILD DER KI-FIRMA — wie jede Abteilung arbeitet, wie stabil,
  * wie gut sie mit den anderen zusammenspielt und wo es klemmt.
@@ -226,8 +228,8 @@ export async function berechneLeistung(tage = ZEITRAUM_TAGE): Promise<FirmenLeis
             agent: key,
             seitStunden: Number.isFinite(still) ? still : tage * 24,
             text: l
-              ? { de: `${key} ist seit ${Math.round(still)} Std. still`, tr: `${key} ${Math.round(still)} saattir çalışmadı` }
-              : { de: `${key} ist noch nie gelaufen`, tr: `${key} henüz hiç çalışmadı` },
+              ? { de: `${agentName(key)} ist seit ${Math.round(still)} Std. still`, tr: `${agentName(key)} ${Math.round(still)} saattir çalışmadı` }
+              : { de: `${agentName(key)} ist noch nie gelaufen`, tr: `${agentName(key)} henüz hiç çalışmadı` },
           })
         }
       }

@@ -9,6 +9,7 @@ import { BEREICHE, ladeLetztePruefung, ladeVerlauf, type Befund, type Bereich, t
 
 import { webseiteJetztPruefen } from "./actions"
 
+export const metadata = { title: "Website-Prüfer" }
 export const dynamic = "force-dynamic"
 
 const BEREICH_TEXT: Record<Bereich, { de: string; tr: string }> = {

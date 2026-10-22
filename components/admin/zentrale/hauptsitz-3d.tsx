@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState, type MutableRefObject } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { ContactShadows, Environment, Html, Lightformer, OrbitControls, QuadraticBezierLine, useTexture } from "@react-three/drei"
 import { Bloom, EffectComposer, N8AO, SMAA, ToneMapping, Vignette } from "@react-three/postprocessing"
@@ -608,6 +608,43 @@ function Kamera({ fokus, raeume }: { fokus: Fokus; raeume: Raum[] }) {
   return null
 }
 
+export type Richtung = "hoch" | "runter" | "links" | "rechts" | "rein" | "raus"
+export type Steuer = (r: Richtung) => void
+
+/**
+ * Verschieben und Zoomen per Knopf oder Pfeiltaste — Rechtsklick-Ziehen kennt
+ * kaum jemand. Verschoben wird in der Bildebene der Kamera (Kamera und Blickziel
+ * gemeinsam), gezoomt entlang der Blickachse innerhalb der Abstandsgrenzen.
+ */
+function Steuerung({ steuer }: { steuer?: MutableRefObject<Steuer | null> }) {
+  const { camera } = useThree()
+  const controls = useThree((s) => s.controls) as OrbitControlsImpl | null
+  useEffect(() => {
+    if (!steuer || !controls) return
+    steuer.current = (r) => {
+      controls.dispatchEvent({ type: "start" } as never)
+      const abstand = camera.position.distanceTo(controls.target)
+      if (r === "rein" || r === "raus") {
+        const neu = THREE.MathUtils.clamp(abstand * (r === "rein" ? 0.8 : 1.25), MIN_ABSTAND, MAX_ABSTAND)
+        const achse = camera.position.clone().sub(controls.target).setLength(neu)
+        camera.position.copy(controls.target).add(achse)
+      } else {
+        const schritt = abstand * 0.12
+        const v = new THREE.Vector3()
+        if (r === "links" || r === "rechts") v.setFromMatrixColumn(camera.matrix, 0).multiplyScalar(r === "rechts" ? schritt : -schritt)
+        else v.set(0, r === "hoch" ? schritt : -schritt, 0)
+        camera.position.add(v)
+        controls.target.add(v)
+      }
+      controls.update()
+    }
+    return () => {
+      steuer.current = null
+    }
+  }, [steuer, controls, camera])
+  return null
+}
+
 /**
  * Die Säule ist immer durchgehend: unteres Segment bleibt stehen, oberes Segment fährt mit den angehobenen
  * Geschossen (gleiches damp wie Geschoss/Dach), ein Schaftstück füllt die entstehende Lücke.
@@ -1202,7 +1239,9 @@ export default function Hauptsitz3D({
   onLeer,
   faeden,
   sprache,
+  steuer,
 }: {
+  steuer?: MutableRefObject<Steuer | null>
   etagen: Etage[]
   raeume: Raum[]
   fokus: Fokus
@@ -1292,6 +1331,7 @@ export default function Hauptsitz3D({
       />
       <Kamera fokus={fokus} raeume={raeume} />
       <TouchGesten />
+      <Steuerung steuer={steuer} />
 
       {/* Tone Mapping läuft hier im Composer (ACES Filmic), nicht mehr über den Renderer */}
       <EffectComposer multisampling={0} enableNormalPass={false}>

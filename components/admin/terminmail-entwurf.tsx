@@ -47,7 +47,7 @@ export function TerminmailEntwurf({
             Mit KI entwerfen
           </span>
           <span className="text-muted-foreground text-xs leading-relaxed">
-            Die KI liest das Firmengehirn und die Gesprächsnotizen dieses Kontakts. Nichts wird ohne Ihren Klick gesendet.
+            Die KI liest das Firmengehirn und die Gesprächsnotizen dieses Kontakts. Nichts wird ohne deinen Klick gesendet.
           </span>
           <input
             value={hinweis}
