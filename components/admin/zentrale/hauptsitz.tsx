@@ -2,12 +2,12 @@
 
 import dynamic from "next/dynamic"
 import Link from "next/link"
-import { useState } from "react"
-import { ArrowLeft, ArrowUpRight, X } from "lucide-react"
+import { useRef, useState } from "react"
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, Minus, Plus, X } from "lucide-react"
 import { agentFrisch, fadenLive, vorText, type LiveFaden } from "@/lib/zentrale/aktivitaet"
 import type { Etage, Raum } from "@/lib/zentrale/hauptsitz"
 import type { Sprache } from "@/lib/zentrale/netz-karte"
-import type { Fokus } from "./hauptsitz-3d"
+import type { Fokus, Richtung, Steuer } from "./hauptsitz-3d"
 import { useJetzt } from "./use-jetzt"
 
 const Szene = dynamic(() => import("./hauptsitz-3d"), {
@@ -25,7 +25,7 @@ const PUNKT: Record<Raum["zustand"], string> = {
 const T = {
   de: {
     titel: "Hauptsitz",
-    unter: "5 Etagen, 15 Abteilungen. Ziehen zum Drehen, Scrollen zum Zoomen, Klick auf Etage oder Raum.",
+    unter: "5 Etagen, 15 Abteilungen. Ziehen zum Drehen, Scrollen zum Zoomen, Pfeiltasten oder Knöpfe unten rechts zum Verschieben, Klick auf Etage oder Raum.",
     gebaeude: "Ganzes Gebäude",
     team: "KI-Mitarbeiter",
     keinTeam: "Noch niemand eingestellt.",
@@ -41,7 +41,7 @@ const T = {
   },
   tr: {
     titel: "Genel Merkez",
-    unter: "5 kat, 15 departman. Döndürmek için sürükle, yakınlaştırmak için kaydır, kata veya odaya tıkla.",
+    unter: "5 kat, 15 departman. Döndürmek için sürükle, yakınlaştırmak için kaydır, kaydırmak için ok tuşları veya sağ alttaki düğmeler, kata veya odaya tıkla.",
     gebaeude: "Tüm bina",
     team: "Yapay zekâ çalışanları",
     keinTeam: "Henüz kimse işe alınmadı.",
@@ -59,6 +59,9 @@ const T = {
 
 export function Hauptsitz({ etagen, raeume, faeden, sprache }: { etagen: Etage[]; raeume: Raum[]; faeden: LiveFaden[]; sprache: Sprache }) {
   const [fokus, setFokus] = useState<Fokus>({ etage: null, raum: null })
+  const steuer = useRef<Steuer | null>(null)
+  const bewege = (r: Richtung) => steuer.current?.(r)
+  const TASTE: Record<string, Richtung> = { ArrowUp: "hoch", ArrowDown: "runter", ArrowLeft: "links", ArrowRight: "rechts", "+": "rein", "-": "raus" }
   const t = T[sprache]
   const jetzt = useJetzt()
   const raum = raeume.find((r) => r.id === fokus.raum) ?? null
@@ -105,8 +108,41 @@ export function Hauptsitz({ etagen, raeume, faeden, sprache }: { etagen: Etage[]
         </nav>
       </div>
 
-      <div className="relative h-[72vh] min-h-[520px] overflow-hidden rounded-3xl bg-card">
+      <div
+        tabIndex={0}
+        aria-label={t.titel}
+        onKeyDown={(e) => {
+          const r = TASTE[e.key]
+          if (!r) return
+          e.preventDefault()
+          bewege(r)
+        }}
+        className="relative h-[72vh] min-h-[520px] overflow-hidden rounded-3xl bg-card outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      >
+        <div className="absolute bottom-4 right-4 z-10 grid grid-cols-3 gap-1 rounded-2xl bg-card/90 p-1.5 shadow-sm backdrop-blur">
+          {(
+            [
+              ["rein", Plus, "Zoom +"],
+              ["hoch", ArrowUp, "↑"],
+              ["raus", Minus, "Zoom −"],
+              ["links", ArrowLeft, "←"],
+              ["runter", ArrowDown, "↓"],
+              ["rechts", ArrowRight, "→"],
+            ] as const
+          ).map(([r, Icon, label]) => (
+            <button
+              key={r}
+              type="button"
+              aria-label={label}
+              onClick={() => bewege(r)}
+              className="flex size-8 items-center justify-center rounded-full text-foreground/75 transition-colors hover:bg-background hover:text-foreground"
+            >
+              <Icon aria-hidden className="size-4" />
+            </button>
+          ))}
+        </div>
         <Szene
+          steuer={steuer}
           etagen={etagen}
           raeume={raeume}
           fokus={fokus}

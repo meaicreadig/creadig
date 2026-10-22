@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Archive, CalendarClock, Repeat, Calculator, Car, Compass, FileCheck2, FileText, Package, Receipt, Settings, Target, TrendingUp, Waves } from "lucide-react"
+import { Archive, ArrowLeft, CalendarClock, Repeat, Calculator, Car, Compass, FileCheck2, FileText, Package, Receipt, Settings, Target, TrendingUp, Waves } from "lucide-react"
 
 import { Logo } from "@/components/brand/logo"
 import { Abmelden } from "@/components/finanz/anmeldung"
@@ -98,7 +98,16 @@ export async function FinanzShell({
           ))}
         </nav>
 
-        <div className="bg-background mt-auto flex flex-col gap-3 rounded-2xl p-3">
+        {/* Rückweg ins Control Center — vorher führte nur ein Weg hinein (Admin → Finanz), keiner zurück. */}
+        <a
+          href={basis ? "/admin" : "https://creadig.de/admin"}
+          className="text-muted-foreground hover:text-primary mt-auto inline-flex items-center gap-2 px-4 text-sm font-medium transition-colors"
+        >
+          <ArrowLeft aria-hidden className="size-4" />
+          Control Center
+        </a>
+
+        <div className="bg-background flex flex-col gap-3 rounded-2xl p-3">
           <div className="flex items-center justify-between gap-3 px-1">
             <span className="text-muted-foreground text-xs font-medium">creaDIG Solutions</span>
             <Link

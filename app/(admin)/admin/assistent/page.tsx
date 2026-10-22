@@ -35,6 +35,7 @@ import {
 } from "lucide-react"
 import { saeuleVon, zeitpunktText } from "@/lib/assistent/linkedin-plan"
 
+import { Klappe } from "@/components/admin/klappe"
 import { AdminShell } from "@/components/admin/admin-shell"
 import { AssistentChat } from "@/components/admin/assistent-chat"
 import { collectAttention } from "@/lib/attention"
@@ -1080,16 +1081,23 @@ export default async function AssistentPage({
 
         <Zusammenarbeit auftraege={auftraege} zahlen={auftragZahlen} />
 
-        <section id="redaktion" aria-labelledby="redaktion-titel" className="flex scroll-mt-6 flex-col gap-4">
+        {/*
+          Hier wird gepostet, weil hier die LinkedIn-/Instagram-Verbindung sitzt.
+          Den Überblick (Website + LinkedIn + Plan) hat /admin/redaktion; deren
+          Knopf „Im Assistenten freigeben“ springt per #frg-… hierher, und Chrome
+          klappt den Abschnitt dabei von selbst auf.
+        */}
+        <Klappe
+          id="redaktion"
+          titel="Social Media · Redaktion"
+          zahl={`${beitraege.filter((f) => f.status === "offen").length} offen`}
+          unter="Thema aus der Geschäftsleitung, Text und Bild von der Redaktion – du gibst frei, dann geht es auf LinkedIn und Instagram."
+        >
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <h2 id="redaktion-titel" className="font-sans text-xl font-semibold text-foreground">
-                Social Media · Redaktion
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Thema aus der Geschäftsleitung, Text und Bild von der Redaktion – du gibst frei, dann geht es auf LinkedIn und Instagram.
-              </p>
-            </div>
+            <Link href="/admin/redaktion" className="inline-flex items-center gap-1 text-sm font-medium text-primary">
+              Gesamtüberblick in der Redaktion
+              <ArrowUpRight className="size-4" aria-hidden="true" />
+            </Link>
             <form action={agentStarten}>
               <input type="hidden" name="agent" value="redaktion" />
               <AktionKnopf
@@ -1117,21 +1125,15 @@ export default async function AssistentPage({
               Noch kein Beitrag. „Neuen Beitrag erstellen“ startet die Redaktion sofort (Text + Bild, ca. 30–60 Sekunden).
             </p>
           )}
-        </section>
+        </Klappe>
 
-        <section aria-labelledby="truppe-titel" className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 id="truppe-titel" className="font-sans text-xl font-semibold text-foreground">
-              Deine Truppe
-            </h2>
-            <p className="text-sm text-muted-foreground">Arbeitet jeden Morgen von selbst · KI nur, wo es sich lohnt</p>
-          </div>
+        <Klappe titel="Deine Truppe" zahl={AGENTEN.length} unter="Arbeitet jeden Morgen von selbst · KI nur, wo es sich lohnt">
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {AGENTEN.map((a) => (
               <AgentKarte key={a.key} a={a} lauf={laeufe[a.key]} />
             ))}
           </ul>
-        </section>
+        </Klappe>
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_26rem]">
           <section aria-labelledby="eingang-titel" className="flex min-w-0 flex-col gap-4">

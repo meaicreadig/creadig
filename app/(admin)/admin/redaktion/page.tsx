@@ -4,7 +4,8 @@ import { ArrowUpRight, Check, PenLine, Send, X } from "lucide-react"
 import { AdminShell } from "@/components/admin/admin-shell"
 import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
 import { AutoAktualisieren } from "@/components/admin/auto-aktualisieren"
-import { Pill, SectionHeader, Surface } from "@/components/admin/primitives"
+import { Klappe } from "@/components/admin/klappe"
+import { Pill, Surface } from "@/components/admin/primitives"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { ladeRedaktion, type PlanStand } from "@/lib/redaktion-lage"
 
@@ -141,6 +142,8 @@ export default async function RedaktionSeite(props: { searchParams: Promise<{ me
         </p>
       )}
 
+      {/* Abstand zwischen den Blöcken — vorher stießen die Karten ohne Lücke aneinander. */}
+      <div className="flex flex-col gap-8">
       <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {kacheln.map((k) => (
           <li key={k.label} className="flex flex-col gap-2 rounded-3xl bg-card p-5 shadow-sm">
@@ -152,8 +155,10 @@ export default async function RedaktionSeite(props: { searchParams: Promise<{ me
         ))}
       </ul>
 
-      <Surface className="flex flex-col gap-4">
-        <SectionHeader title={t.wochen} />
+      <Klappe titel={t.wochen}>
+        {maxWoche === 1 && d.wochen.every((w) => w.website + w.linkedin + w.andere === 0) && (
+          <p className="text-sm text-muted-foreground">{t.nichtsDraussen}</p>
+        )}
         <div
           className="flex h-32 items-end gap-2"
           role="img"
@@ -175,10 +180,9 @@ export default async function RedaktionSeite(props: { searchParams: Promise<{ me
           <Legende farbe="bg-primary/45" text={t.linkedin} />
           <Legende farbe="bg-muted-foreground/30" text={t.andere} />
         </div>
-      </Surface>
+      </Klappe>
 
-      <section aria-labelledby="wartet" className="flex flex-col gap-3">
-        <SectionHeader id="wartet" title={t.wartet} count={wartend || undefined} />
+      <Klappe id="wartet" titel={t.wartet} zahl={wartend || undefined} offen kasten={false}>
         {wartend === 0 && <p className="text-sm text-muted-foreground">{t.leer}</p>}
 
         {d.webEntwuerfe.map((a) => (
@@ -268,11 +272,10 @@ export default async function RedaktionSeite(props: { searchParams: Promise<{ me
             </Link>
           </Surface>
         )}
-      </section>
+      </Klappe>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Surface className="flex flex-col gap-4">
-          <SectionHeader title={t.plan} count={t.planStand(erledigt, d.plan.length)} />
+      <div className="grid items-start gap-4 lg:grid-cols-2">
+        <Klappe titel={t.plan} zahl={t.planStand(erledigt, d.plan.length)}>
           <ol className="flex flex-col gap-2">
             {d.plan.map((p, i) => (
               <li key={p.code} className="flex items-start justify-between gap-3 text-sm">
@@ -302,10 +305,9 @@ export default async function RedaktionSeite(props: { searchParams: Promise<{ me
               </AktionKnopf>
             </form>
           )}
-        </Surface>
+        </Klappe>
 
-        <Surface className="flex flex-col gap-4">
-          <SectionHeader title={t.draussen} count={d.inhalte.length || undefined} />
+        <Klappe titel={t.draussen} zahl={d.inhalte.length || undefined}>
           {d.inhalte.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t.nichtsDraussen}</p>
           ) : (
@@ -325,12 +327,10 @@ export default async function RedaktionSeite(props: { searchParams: Promise<{ me
               ))}
             </ul>
           )}
-        </Surface>
+        </Klappe>
       </div>
 
-      <Surface className="flex flex-col gap-4">
-        <SectionHeader title={t.netz} />
-        <p className="text-sm text-muted-foreground">{t.netzLead}</p>
+      <Klappe titel={t.netz} unter={t.netzLead}>
         <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {d.laeufe.map(({ agent, lauf }) => (
             <li key={agent} className="flex flex-col gap-1 rounded-2xl bg-muted px-4 py-3">
@@ -364,7 +364,8 @@ export default async function RedaktionSeite(props: { searchParams: Promise<{ me
             {t.linkedinJetzt}
           </AktionKnopf>
         </form>
-      </Surface>
+      </Klappe>
+      </div>
     </AdminShell>
   )
 }
