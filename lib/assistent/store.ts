@@ -42,6 +42,7 @@ const SCHEMA = [
     fehler text,
     created_at timestamptz NOT NULL DEFAULT now())`,
   `CREATE INDEX IF NOT EXISTS assistent_laeufe_agent_idx ON assistent_laeufe (agent, created_at DESC)`,
+  `ALTER TABLE assistent_laeufe ADD COLUMN IF NOT EXISTS dauer_ms int`,
   `CREATE TABLE IF NOT EXISTS assistent_rat (
     id text PRIMARY KEY,
     woche text NOT NULL UNIQUE,
@@ -322,15 +323,22 @@ export async function quelleBekannt(quelle: string): Promise<boolean> {
   return rows.length > 0
 }
 
-export async function protokolliereLauf(l: { agent: string; ergebnis: string; anzahl: number; fehler?: string | null }) {
+export async function protokolliereLauf(l: {
+  agent: string
+  ergebnis: string
+  anzahl: number
+  fehler?: string | null
+  dauerMs?: number | null
+}) {
   const q = await assistentDb()
   if (!q) return
-  await q(`INSERT INTO assistent_laeufe (id, agent, ergebnis, anzahl, fehler) VALUES ($1, $2, $3, $4, $5)`, [
+  await q(`INSERT INTO assistent_laeufe (id, agent, ergebnis, anzahl, fehler, dauer_ms) VALUES ($1, $2, $3, $4, $5, $6)`, [
     neueId("lauf"),
     l.agent,
     l.ergebnis.slice(0, 300),
     l.anzahl,
     l.fehler?.slice(0, 300) ?? null,
+    l.dauerMs != null ? Math.round(l.dauerMs) : null,
   ])
   await protokolliereFaden(q, "system", "assistent", `${l.agent}${l.fehler ? " (Fehler)" : ""}`)
 }

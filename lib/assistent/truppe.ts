@@ -573,12 +573,19 @@ async function koordinator(): Promise<Ergebnis> {
 const LAEUFER: Record<AgentKey, () => Promise<Ergebnis>> = { koordinator, lage, vertrieb, messen, finanz, projekte, kapital, golf, redaktion, jaeger, rat, bulletin: () => erstelleBulletin() }
 
 export async function fuehreAgentAus(key: AgentKey): Promise<void> {
+  const start = Date.now()
   try {
     const r = await LAEUFER[key]()
-    await protokolliereLauf({ agent: key, ...r })
+    await protokolliereLauf({ agent: key, ...r, dauerMs: Date.now() - start })
   } catch (e) {
     console.error("[assistent] agent", key, e instanceof Error ? e.message : e)
-    await protokolliereLauf({ agent: key, ergebnis: "Lauf fehlgeschlagen", anzahl: 0, fehler: e instanceof Error ? e.message : "Fehler" })
+    await protokolliereLauf({
+      agent: key,
+      ergebnis: "Lauf fehlgeschlagen",
+      anzahl: 0,
+      fehler: e instanceof Error ? e.message : "Fehler",
+      dauerMs: Date.now() - start,
+    })
   }
 }
 
@@ -595,11 +602,29 @@ export async function fuehreFaelligeAus(): Promise<AgentKey[]> {
   // Chief of Staff zuletzt, damit er die heutigen Ergebnisse aller Abteilungen sieht.
   const reihenfolge = [...faellig.filter((k) => k !== "koordinator"), ...faellig.filter((k) => k === "koordinator")]
   for (const key of reihenfolge) await fuehreAgentAus(key)
-  if (!faellig.includes("koordinator")) {
-    const { arbeiteWarteschlangeAb } = await import("@/lib/koordination/koordinator")
-    await arbeiteWarteschlangeAb().catch((e) => console.error("[assistent] koordination", e instanceof Error ? e.message : e))
-  }
+  if (!faellig.includes("koordinator")) await koordinationAbarbeiten()
   await holeEingang().catch((e) => console.error("[assistent] eingang", e instanceof Error ? e.message : e))
   await nachfassen().catch((e) => console.error("[assistent] nachfassen", e instanceof Error ? e.message : e))
   return reihenfolge
+}
+
+/** Interne Warteschlange abarbeiten und – wenn etwas getan wurde – als Arbeitszeit der Geschäftsführung protokollieren. */
+export async function koordinationAbarbeiten(): Promise<number> {
+  const start = Date.now()
+  try {
+    const { arbeiteWarteschlangeAb } = await import("@/lib/koordination/koordinator")
+    const w = await arbeiteWarteschlangeAb()
+    if (w.bearbeitet > 0) {
+      await protokolliereLauf({
+        agent: "koordination",
+        ergebnis: `${w.bearbeitet} interne Aufträge bearbeitet`,
+        anzahl: w.bearbeitet,
+        dauerMs: Date.now() - start,
+      })
+    }
+    return w.bearbeitet
+  } catch (e) {
+    console.error("[assistent] koordination", e instanceof Error ? e.message : e)
+    return 0
+  }
 }

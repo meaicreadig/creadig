@@ -236,6 +236,7 @@ export const FLAECHEN: readonly Flaeche[] = [
   { pfad: "/admin/investoren", klasse: "fremde-personen", fuer: ["owner"] },
   /* Bulletin — öffentliche Nachrichten, eingeordnet. */
   { pfad: "/admin/bulletin", klasse: "eigene-lage", fuer: ["owner", "vertrieb", "redaktion"] },
+  { pfad: "/admin/leistung", klasse: "eigene-lage", fuer: ["owner"] },
   { pfad: "/admin/messen", klasse: "eigene-lage", fuer: ["owner", "vertrieb", "redaktion"] },
   { pfad: "/admin/vertrieb", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },
   { pfad: "/admin/vertrieb/anfragen", klasse: "fremde-personen", fuer: ["owner", "vertrieb"] },

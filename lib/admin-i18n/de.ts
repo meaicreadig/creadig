@@ -31,6 +31,7 @@ export const de = {
     veroeffentlichungen: { label: "Veröffentlichungen", hint: "Was hinausging, und was zurückkam" },
     uebersicht: { label: "Übersicht", hint: "Was heute zählt" },
     assistent: { label: "Assistent", hint: "Chat, Sprache, Freigaben" },
+    leistung: { label: "Leistung & Engpässe", hint: "Arbeitszeit, Stabilität, Zusammenspiel" },
     bulletin: { label: "Bulletin", hint: "KI, Medien, Chips, Robotik – eingeordnet" },
     verkaufen: { label: "Heute verkaufen", hint: "Abschlüsse, Ziel, nächster Zug" },
     messen: { label: "Messen", hint: "Glasfaser, Digital, 3D-Druck, E-Commerce" },

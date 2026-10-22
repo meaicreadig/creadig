@@ -258,6 +258,19 @@ export async function ladeNetz({
       }
     : leer(tr ? "ilk sayı" : "erste Ausgabe")
 
+  /* ── Leistung ── */
+  const puls = (await letzteLaeufe().catch(() => ({}) as Awaited<ReturnType<typeof letzteLaeufe>>))["puls"]
+  const leistung: Signal = puls
+    ? {
+        wert: puls.fehler ? "!" : "✓",
+        zeile: tr ? "son nabız" : "letzter Puls",
+        zustand: puls.fehler ? "stoerung" : "aktiv",
+        last: 0.5,
+        punkte: [puls.ergebnis],
+        wege: [{ label: tr ? "Performansı aç" : "Leistung öffnen", href: "/admin/leistung" }],
+      }
+    : leer(tr ? "ilk nabız" : "erster Puls")
+
   /* ── Betrieb ── */
   const system: Signal = {
     wert: String(meldungen.length),
@@ -329,5 +342,5 @@ export async function ladeNetz({
     wege: [{ label: tr ? "Bugün yapılacaklar" : "Heute zu tun", href: "#heute-titel" }],
   }
 
-  return { uebersicht, assistent, bulletin, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen, finanz, system }
+  return { uebersicht, assistent, leistung, bulletin, verkaufen, gespraech, termine, vertrieb, kunden, mailstudio, marketing, messen, finanz, system }
 }
