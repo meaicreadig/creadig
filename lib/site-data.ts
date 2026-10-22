@@ -2336,8 +2336,10 @@ export const imprintDetails = {
    * Dann tritt der entsprechende Hinweis an die Stelle der USt-IdNr.
    * Entweder `vatId` ODER `smallBusiness` muss gesetzt sein — nicht beides.
    *
-   * Vom Inhaber bestätigt: Kleinunternehmer nach § 19 UStG (15.10.2026,
-   * Finanz-Abschluss-Durchlauf).
+   * 22.10.2026: Inhaber stellt klar — umsatzsteuerpflichtig (19 %), KEIN
+   * Kleinunternehmer. Der Eintrag vom 15.10. war falsch. Für das Impressum
+   * fehlt damit noch `vatId` (USt-IdNr.) — bis sie da ist, bleibt der
+   * Steuerstatus als offen markiert und Rechnungen bleiben gesperrt.
    */
   smallBusiness: KLEINUNTERNEHMER,
   /**
