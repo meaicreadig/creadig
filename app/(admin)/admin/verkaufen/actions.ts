@@ -20,22 +20,19 @@ function text(v: FormDataEntryValue | null, max = 200): string | null {
   return t.length === 0 ? null : t
 }
 
-export async function entwurfErstellen(form: FormData): Promise<void> {
+async function berechtigt(): Promise<boolean> {
   const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
-  if (zugang.verdict !== "ok" || !zugang.rolle || !darfBetreten(zugang.rolle, "/admin/verkaufen")) {
-    throw new Error("Nicht berechtigt")
-  }
+  return zugang.verdict === "ok" && !!zugang.rolle && darfBetreten(zugang.rolle, "/admin/verkaufen")
+}
+
+export async function entwurfErstellen(form: FormData): Promise<void> {
+  if (!(await berechtigt())) throw new Error("Nicht berechtigt")
   const id = text(form.get("deal"), 80)
   const lage = await ladeVerkaufslage()
   const deal = lage.deals.find((d) => d.id === id)
   if (!deal) throw new Error("Abschluss nicht gefunden")
   await erstelleEntwurf(deal)
   revalidatePath("/admin/verkaufen")
-}
-
-async function berechtigt(): Promise<boolean> {
-  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
-  return zugang.verdict === "ok" && !!zugang.rolle && darfBetreten(zugang.rolle, "/admin/verkaufen")
 }
 
 function neuLaden() {
@@ -86,10 +83,7 @@ export async function entwurfInsStudio(form: FormData): Promise<void> {
 }
 
 export async function dealAnlegen(form: FormData): Promise<void> {
-  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
-  if (zugang.verdict !== "ok" || !zugang.rolle || !darfBetreten(zugang.rolle, "/admin/verkaufen")) {
-    throw new Error("Nicht berechtigt")
-  }
+  if (!(await berechtigt())) throw new Error("Nicht berechtigt")
   const q = neonAbfrage()
   if (!q) throw new Error("Datenbank nicht verfügbar")
 

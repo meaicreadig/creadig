@@ -475,7 +475,7 @@ function Bildschirm({ an, titel, text }: { an: boolean; titel: string; text: str
     const t = clock.getElapsedTime()
     const n = an ? Math.min(inhalt.length, Math.floor((t * 22) % (inhalt.length + 70))) : inhalt.length
     const cursor = an && Math.floor(t * 2) % 2 === 0
-    const uhr = new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
+    const uhr = new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Berlin" })
     const schluessel = `${n}|${cursor}|${uhr}|${an}|${titel}`
     if (schluessel === zuletzt.current) return
     zuletzt.current = schluessel

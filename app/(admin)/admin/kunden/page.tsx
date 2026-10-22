@@ -72,23 +72,23 @@ export default async function OrganisationenPage({
       <details className="mb-8 rounded-3xl bg-muted p-5">
         <summary className="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary">
           <Plus className="size-4" aria-hidden />
-          Neuen Kunden anlegen
+          {t.kundenListe.neu.titel}
         </summary>
         <form action={kundeAnlegen} className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <AdminField label="Firma / Verein" htmlFor="neu-name">
+          <AdminField label={t.kundenListe.neu.name} htmlFor="neu-name">
             <AdminInput id="neu-name" name="name" required maxLength={160} />
           </AdminField>
-          <AdminField label="Ort" htmlFor="neu-city">
+          <AdminField label={t.kundenListe.neu.ort} htmlFor="neu-city">
             <AdminInput id="neu-city" name="city" maxLength={120} />
           </AdminField>
-          <AdminField label="Website" htmlFor="neu-website">
-            <AdminInput id="neu-website" name="website" inputMode="url" placeholder="beispiel.de" />
+          <AdminField label={t.kundenListe.neu.website} htmlFor="neu-website">
+            <AdminInput id="neu-website" name="website" inputMode="url" placeholder={t.kundenListe.neu.beispiel} />
           </AdminField>
-          <AdminField label="Notiz" htmlFor="neu-note">
+          <AdminField label={t.kundenListe.neu.notiz} htmlFor="neu-note">
             <AdminInput id="neu-note" name="note" maxLength={1000} />
           </AdminField>
           <button type="submit" className="self-start rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground md:col-span-2">
-            Anlegen
+            {t.kundenListe.neu.anlegen}
           </button>
         </form>
       </details>

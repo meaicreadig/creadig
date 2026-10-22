@@ -44,10 +44,24 @@ p(R.darfBetreten("vertrieb", "/admin/kunden/abc123"), "die Kundenakte schon")
 
 console.log("\nR4 · Jede Flaeche mit Personendaten ist eng vergeben")
 const eng = R.FLAECHEN.filter((f) => R.KLASSEN[f.klasse].eng)
-/* 12 → 13 seit `157e1fa` (/admin/beleg, Owner-only). Der Drill war seitdem rot,
-   ohne dass es auffiel — er stand in keiner Kette. Nachgezogen 17.09.2026 (ADM-02).
-   13 → 14: /admin/vertrieb/anfragen/neu (ADM-03, Owner + Vertrieb). */
-p(eng.length === 14, `${eng.length} Flaechen tragen Personendaten Dritter`)
+/* Frueher eine feste Zahl (zuletzt 14). Sie lief jedes Mal still auseinander,
+   wenn eine Flaeche dazukam — 22.10.2026 standen 21 im Register und der Drill
+   war seit Wochen rot. Jetzt die LISTE: Eine neue Flaeche mit Personendaten
+   Dritter muss hier bewusst eingetragen werden, sonst faellt der Drill. */
+const ENG_ERWARTET = [
+  "/admin/assistent", "/admin/beleg", "/admin/gespraech", "/admin/investoren",
+  "/admin/kunden", "/admin/kunden/:id", "/admin/marketing/mail", "/admin/marketing/mail/:id",
+  "/admin/termine", "/admin/verkaufen", "/admin/vertrieb", "/admin/vertrieb/anfragen",
+  "/admin/vertrieb/anfragen/:id", "/admin/vertrieb/anfragen/neu", "/admin/vertrieb/beziehungen",
+  "/admin/vertrieb/beziehungen/:id", "/admin/vertrieb/pipeline", "/admin/vertrieb/pipeline/:id",
+  "/admin/vertrieb/recherche", "/admin/vertrieb/recherche/:id", "/admin/vertrieb/verlust",
+]
+const engIst = eng.map((f) => f.pfad).sort()
+p(
+  JSON.stringify(engIst) === JSON.stringify([...ENG_ERWARTET].sort()),
+  `${eng.length} Flaechen tragen Personendaten Dritter — genau die eingetragenen`,
+  `neu: ${engIst.filter((x) => !ENG_ERWARTET.includes(x)).join(", ") || "–"} · weg: ${ENG_ERWARTET.filter((x) => !engIst.includes(x)).join(", ") || "–"}`,
+)
 p(eng.every((f) => !f.fuer.includes("redaktion")), "keine davon fuer die Redaktion")
 p(eng.every((f) => f.fuer.includes("owner")), "alle fuer den Owner")
 

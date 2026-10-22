@@ -1,11 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import {
-  Manrope,
-  M_PLUS_Rounded_1c,
-  JetBrains_Mono,
-  Readex_Pro,
-  Cairo,
-} from "next/font/google"
+import { manrope, mplusRounded, jetbrains, readex, cairo } from "@/app/schriften"
 import "@/app/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LocaleProvider } from "@/components/locale-provider"
@@ -45,120 +39,20 @@ import { ogImage } from "@/lib/page-metadata"
  * Adresse.
  */
 
-// Owner-Entscheidung 28.09.2026: Manrope loest Poppins als UEBERSCHRIFT ab.
-// Poppins las sich wie jede Vorlage und stand gegen die feine, einlinige
-// Wortmarke; Manrope ist ruhig-geometrisch und steht naeher am Logo.
-// Traegt nur `--font-display`; der Fliesstext bleibt M PLUS Rounded 1c.
-const manrope = Manrope({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-manrope",
-  display: "swap",
-})
-
-const mplusRounded = M_PLUS_Rounded_1c({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "700"],
-  variable: "--font-mplus",
-  display: "swap",
-  preload: false,
-})
-
 /*
- * Fliesstext-Schrift — Owner-Entscheidung 27.08.2026 (Master-Prompt 11).
+ * Schriften kommen aus `app/schriften` — seit 22.10.2026 im Projekt
+ * mitgeliefert statt beim Build von Google geholt (Begründung dort).
  *
- * Die Analyse hat den Kernwiderspruch benannt: Die Seite zeichnet Kanten
- * (2 px Radius, 251 Haarlinien), die Marke verspricht Verbindung und Naehe.
- * M PLUS Rounded 1c hat runde Strichenden — der Text sagt damit dasselbe wie
- * die kommende runde Geometrie, statt dagegen zu stehen.
- *
- * NUR der Fliesstext. Die Ueberschriften bleiben ausdruecklich Poppins
- * (`--font-display` in `globals.css`), damit dieser Schritt allein die
- * Schriftart tauscht und nichts an der Hierarchie verschiebt.
- *
- * `latin-ext` ist hier dieselbe Pflicht wie bei der Monospace: ohne den
- * Subset fehlen ş, ğ, ı, İ, ç — und Umlaute traegt er ohnehin. Der
- * japanische Subset der Familie wird NICHT geladen; next/font holt genau
- * die zwei angegebenen.
- *
- * ---------------------------------------------------------------------------
- * `preload: false` IST HIER PFLICHT, KEIN GESCHMACK.
- *
- * M PLUS Rounded 1c ist urspruenglich eine japanische Familie. Google
- * zerlegt sie in ~126 Unicode-Bereiche je Schnitt — bei drei Schnitten also
- * 378 `@font-face`-Regeln. Mit Vorladen haengte Next an die Startseite
- * **252 `<link rel="preload">` und 3,79 MB** Schriftdateien, gemessen am
- * gebauten Server. Zum Vergleich: die ganze Seite lag vorher darunter.
- *
- * Ohne Vorladen bleibt der Mechanismus intakt, der fuer solche Familien
- * gebaut wurde: `unicode-range`. Der Browser holt genau die Bereiche, in
- * denen die Zeichen der Seite liegen — Latein und Latein-Erweitert, zwei
- * bis drei Dateien. Die japanischen Bereiche liegen im Build und werden nie
- * angefragt.
- *
- * Der Preis ist ein kurzer Wechsel von der Ersatzschrift auf die echte
- * (`display: swap`). Den zahlen wir; 3,7 MB Vorladen zahlen wir nicht.
+ * Owner-Entscheidungen, die dabei gelten:
+ * - Überschriften Manrope (28.09.2026, löste Poppins ab), Fließtext
+ *   M PLUS Rounded 1c (27.08.2026), Kennziffern JetBrains Mono.
+ * - Türkisch braucht Latein-erweitert (ş ğ ı İ ç) — die Dateien tragen es.
+ * - Arabisch: Fließtext Readex Pro, Überschriften Cairo. Im arabischen Baum
+ *   stehen beide VOR den lateinischen Familien, sonst landet Arabisch auf
+ *   der Systemschrift des Geräts.
+ * - M PLUS ohne Vorladen: früher hingen 252 Preload-Links (3,8 MB) an der
+ *   Startseite. Die lokalen Dateien sind auf Latein zugeschnitten (je ~46 KB).
  */
-
-// Monospace nur für Eyebrows und Kennziffern.
-// `latin-ext` ist Pflicht, nicht Komfort: Ohne diesen Subset fehlen ş, ğ, ı,
-// İ und ç — und genau die stehen in den türkischen Labels. Der Browser fiele
-// dort auf eine System-Monospace zurück, mitten im Wort.
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500"],
-  variable: "--font-jetbrains",
-  display: "swap",
-})
-
-/*
- * ===========================================================================
- * ARABISCH — READEX PRO
- * ===========================================================================
- *
- * Bis hierher lud die Seite fuer Arabisch GAR KEINE Schrift.
- *
- * Poppins, M PLUS Rounded 1c und JetBrains Mono sind alle auf `latin`
- * beschnitten — kein einziges arabisches Zeichen ist darin. Jeder arabische
- * Buchstabe fiel also auf das durch, was das Geraet des Besuchers zufaellig
- * mitbringt: auf einem Mac Geeza Pro, auf Windows etwas anderes, auf Android
- * wieder etwas anderes. Das arabische Erscheinungsbild von creaDIG war damit
- * nicht gestaltet, sondern geliehen — und der Owner hat genau das gesehen:
- * hart, starr, hoher Strichkontrast, neben einer runden lateinischen Schrift.
- *
- * Gemessen wurde am Musterblatt mit echtem creaDIG-Text, nicht nach Namen
- * ausgewaehlt: System-Fallback, IBM Plex Sans Arabic, Readex Pro, Alexandria,
- * Tajawal und Noto Kufi Arabic nebeneinander, in denselben Graden.
- *
- * ZWEI ARABISCHE SCHNITTE — wie Latein Poppins/M PLUS:
- *
- *   Fliesstext → Readex Pro (`--font-arabic`). Owner: Normal-Schnitt gut.
- *
- *   Ueberschriften → Cairo (`--font-arabic-display`). Plex war korrekt,
- *   aber flach („nicht wow"). Cairo traegt in Hero-Groesse mehr Charakter
- *   ohne die mechanische Kufi-Kante. Gewicht 700, enger Durchschuss —
- *   die Plex-Runde hatte die Zeilen zu weit geoeffnet.
- *
- * Die lateinische Schrift bleibt unangetastet (Owner-Formentscheidung vom
- * 27.08.2026). Im arabischen Baum stehen beide Familien VORN vor Poppins/
- * M PLUS — sonst greift die next/font-Fallback-Familie und das Arabische
- * landet wieder auf der Systemschrift.
- */
-const readex = Readex_Pro({
-  subsets: ["arabic"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-arabic",
-  display: "swap",
-  preload: false,
-})
-
-const cairo = Cairo({
-  subsets: ["arabic"],
-  weight: ["500", "600", "700"],
-  variable: "--font-arabic-display",
-  display: "swap",
-  preload: false,
-})
 
 /**
  * Die Kopfdaten der jeweiligen Sprachwurzel.

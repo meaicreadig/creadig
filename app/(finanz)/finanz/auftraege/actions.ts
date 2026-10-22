@@ -126,9 +126,9 @@ export async function entwurfSpeichern(id: string, roh: Entwurf): Promise<Ergebn
 }
 
 export async function entwurfSenden(id: string, roh: Entwurf): Promise<Ergebnis> {
+  const db = await zugang()
   const gespeichert = await entwurfSpeichern(id, roh)
   if (!gespeichert.ok) return gespeichert
-  const db = await zugang()
   const fest = await schreibeFest(db, id)
   if (!fest.ok) return fest
   const mail = await sendeDokumentMail(fest.dok, "versand", await eRechnungAnhang(db, fest.dok))

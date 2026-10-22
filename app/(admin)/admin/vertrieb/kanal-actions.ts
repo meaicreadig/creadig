@@ -10,9 +10,13 @@ import { istKanal } from "@/lib/kanal"
 import { neonAbfrage } from "@/lib/neon-abfrage"
 import { darfBetreten } from "@/lib/rollen"
 
-export async function setzeKanal(id: string, form: FormData): Promise<void> {
+async function berechtigt(): Promise<boolean> {
   const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
-  if (zugang.verdict !== "ok" || !zugang.rolle || !darfBetreten(zugang.rolle, "/admin/vertrieb/anfragen")) return
+  return zugang.verdict === "ok" && !!zugang.rolle && darfBetreten(zugang.rolle, "/admin/vertrieb/anfragen")
+}
+
+export async function setzeKanal(id: string, form: FormData): Promise<void> {
+  if (!(await berechtigt())) return
 
   const roh = String(form.get("kanal") ?? "")
   const kanal = roh === "" ? null : istKanal(roh) ? roh : undefined

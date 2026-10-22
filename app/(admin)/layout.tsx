@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next"
 
 import { adminSprache } from "@/lib/admin-i18n/server"
-import { JetBrains_Mono, Manrope, M_PLUS_Rounded_1c } from "next/font/google"
+import { manrope, mplusRounded, jetbrains } from "@/app/schriften"
 import "@/app/globals.css"
 
 /**
@@ -27,27 +27,6 @@ import "@/app/globals.css"
  */
 
 /* Dieselben Markenschriften wie die Webseite (Owner-Entscheidung, nicht ändern ohne Freigabe). */
-const manrope = Manrope({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-manrope",
-  display: "swap",
-})
-
-const mplusRounded = M_PLUS_Rounded_1c({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "700"],
-  variable: "--font-mplus",
-  display: "swap",
-  preload: false,
-})
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500"],
-  variable: "--font-jetbrains",
-  display: "swap",
-})
 
 export const metadata: Metadata = {
   title: { default: "Control Center", template: "%s · Control Center" },

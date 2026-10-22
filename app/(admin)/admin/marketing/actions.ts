@@ -53,9 +53,16 @@ function zerlegen(roh: string): Record<Plattform, string> | null {
   return PLATTFORMEN.every((p) => texte[p]) ? texte : null
 }
 
+/** Sitzung, Widerruf und Rolle fuer die Marketing-Flaeche — gibt die Rolle zurueck oder null. */
+async function zugang() {
+  const z = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
+  if (z.verdict !== "ok" || !z.rolle || !darfBetreten(z.rolle, "/admin/marketing")) return null
+  return z.rolle
+}
+
 export async function sichtbarkeitUmschalten(formData: FormData): Promise<void> {
-  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
-  if (zugang.verdict !== "ok" || !zugang.rolle || !darfBetreten(zugang.rolle, "/admin/marketing")) return
+  const rolle = await zugang()
+  if (!rolle) return
   const key = String(formData.get("key") ?? "")
   if (!KATALOG.some((e) => e.key === key)) return
   const eingetragen = formData.get("eingetragen") === "1"
@@ -65,7 +72,7 @@ export async function sichtbarkeitUmschalten(formData: FormData): Promise<void> 
     await q(
       `INSERT INTO visibility_listings (key, eingetragen, actor, updated_at) VALUES ($1, $2, $3, now())
        ON CONFLICT (key) DO UPDATE SET eingetragen = EXCLUDED.eingetragen, actor = EXCLUDED.actor, updated_at = now()`,
-      [key, eingetragen, zugang.rolle],
+      [key, eingetragen, rolle],
     )
   } catch {
     return
@@ -76,8 +83,9 @@ export async function sichtbarkeitUmschalten(formData: FormData): Promise<void> 
 export type LinkedinErgebnis = { ok: true; url: string | null } | { fehler: string }
 
 export async function linkedinVeroeffentlichen(text: string): Promise<LinkedinErgebnis> {
-  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
-  if (zugang.verdict !== "ok" || zugang.rolle !== "owner") return { fehler: "Nur der Inhaber darf veröffentlichen." }
+  /* Veroeffentlichen bleibt Inhabersache, auch wenn die Marketing-Flaeche einmal weiteren Rollen offensteht. */
+  const rolle = await zugang()
+  if (rolle !== "owner") return { fehler: "Nur der Inhaber darf veröffentlichen." }
   const inhalt = text.trim()
   if (inhalt.length < 10 || inhalt.length > 3000) return { fehler: "Der Text muss zwischen 10 und 3000 Zeichen lang sein." }
 
@@ -93,7 +101,7 @@ export async function linkedinVeroeffentlichen(text: string): Promise<LinkedinEr
 
   const heute = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date())
   try {
-    await getVertriebStore({ kennung: zugang.rolle, herkunft: "HUMAN" })?.recordPublication({
+    await getVertriebStore({ kennung: rolle, herkunft: "HUMAN" })?.recordPublication({
       was: inhalt.split("\n")[0].slice(0, 200),
       kanal: "linkedin",
       veroeffentlichtAm: heute,
@@ -108,17 +116,13 @@ export async function linkedinVeroeffentlichen(text: string): Promise<LinkedinEr
 }
 
 export async function linkedinTrennen(): Promise<void> {
-  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
-  if (zugang.verdict !== "ok" || zugang.rolle !== "owner") return
+  if ((await zugang()) !== "owner") return
   await verbindungTrennen()
   revalidatePath("/admin/marketing")
 }
 
 export async function postEntwerfen(anlass: PostAnlass, stichpunkte: string): Promise<PostErgebnis> {
-  const zugang = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
-  if (zugang.verdict !== "ok" || !zugang.rolle || !darfBetreten(zugang.rolle, "/admin/marketing")) {
-    return { fehler: "Nicht berechtigt" }
-  }
+  if (!(await zugang())) return { fehler: "Nicht berechtigt" }
   const eingabe = stichpunkte.trim().slice(0, 2000)
   if (eingabe.length < 10 || !(anlass in ANLASS)) return { fehler: "Bitte ein paar Stichpunkte eingeben." }
 

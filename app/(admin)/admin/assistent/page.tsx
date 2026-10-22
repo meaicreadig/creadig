@@ -75,7 +75,7 @@ import { antwortZuruecknehmen } from "../marketing/mail/actions"
 import { letzteAbendRueckmeldung, type AbendRueckmeldung } from "@/lib/assistent/abend"
 
 function AbendKarte({ r }: { r: AbendRueckmeldung }) {
-  const datum = new Date(`${r.tag}T12:00:00`).toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })
+  const datum = new Date(`${r.tag}T12:00:00`).toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Berlin" })
   const z = r.zahlen
   const kennzahlen = [
     { wert: z.mailsGesendet, text: "Mails raus" },

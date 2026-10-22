@@ -19,6 +19,7 @@ import {
   type GespraechEintrag,
 } from "@/lib/gespraech"
 import { gespraechText, type GespraechText } from "@/lib/gespraech-text"
+import { geschaeftsTag } from "@/lib/geschaeftszeit"
 
 export const dynamic = "force-dynamic"
 
@@ -128,7 +129,7 @@ export default async function GespraechSeite({
   if (!kontaktId && verlauf.some((g) => !g.ki[sprache])) {
     after(() => ergaenzeAufbereitungen(sprache, null).catch(() => 0))
   }
-  const heute = new Date().toISOString().slice(0, 10)
+  const heute = geschaeftsTag()
   const sucht = Boolean(q?.trim())
   const faelligeKontakte = sucht ? [] : alle.filter((k) => k.nextTouchAt && k.nextTouchAt <= heute)
   const kontakte = sucht

@@ -6,6 +6,13 @@ import { useEffect, useState } from "react"
 import {
   BadgeCheck,
   Building2,
+  ChevronDown,
+  Cable,
+  FlaskConical,
+  Globe,
+  HandCoins,
+  Settings,
+  Workflow,
   CalendarClock,
   Inbox,
   LayoutDashboard,
@@ -44,6 +51,12 @@ const ICONS: Record<string, LucideIcon> = {
   marketing: Megaphone,
   mailstudio: Mail,
   veroeffentlichungen: Send,
+  webseite: Globe,
+  automationen: Workflow,
+  verbindungen: Cable,
+  forschung: FlaskConical,
+  investoren: HandCoins,
+  system: Settings,
 }
 
 /**
@@ -60,10 +73,13 @@ export function AdminNav({
   items,
   oeffnen,
   schliessen,
+  klappGruppe,
 }: {
   items: NavItem[]
   oeffnen: string
   schliessen: string
+  /** Diese Gruppe steht zugeklappt (Technik, selten gebraucht) — offen nur, wenn man gerade darin ist. */
+  klappGruppe?: string
 }) {
   const pathname = usePathname()
   const [offen, setOffen] = useState(false)
@@ -94,9 +110,8 @@ export function AdminNav({
         {offen ? schliessen : oeffnen}
       </button>
       <div id="admin-hauptnavigation" className={`${offen ? "mt-3 flex" : "hidden"} flex-col gap-5 lg:mt-0 lg:flex`}>
-        {gruppen.map(([gruppe, eintraege]) => (
-          <div key={gruppe}>
-            <p className="text-muted-foreground px-4 pb-2 text-xs font-medium">{gruppe}</p>
+        {gruppen.map(([gruppe, eintraege]) => {
+          const liste = (
             <ul className="flex flex-col gap-1">
               {eintraege.map((item) => {
                 const active = item.href === aktiv
@@ -129,8 +144,22 @@ export function AdminNav({
                 )
               })}
             </ul>
-          </div>
-        ))}
+          )
+          return gruppe === klappGruppe ? (
+            <details key={gruppe} open={eintraege.some((e) => e.href === aktiv)} className="group/klapp">
+              <summary className="text-muted-foreground hover:text-foreground flex cursor-pointer list-none items-center justify-between px-4 pb-2 text-xs font-medium [&::-webkit-details-marker]:hidden">
+                {gruppe}
+                <ChevronDown aria-hidden="true" className="size-3.5 transition-transform group-open/klapp:rotate-180" />
+              </summary>
+              {liste}
+            </details>
+          ) : (
+            <div key={gruppe}>
+              <p className="text-muted-foreground px-4 pb-2 text-xs font-medium">{gruppe}</p>
+              {liste}
+            </div>
+          )
+        })}
       </div>
     </div>
   )

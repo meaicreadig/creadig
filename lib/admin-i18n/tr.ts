@@ -43,6 +43,9 @@ export const tr: AdminTexte = {
     gespraech: { label: "Görüşme odası", hint: "Ara, not al, takip randevusu" },
     termine: { label: "Randevular", hint: "Müsaitlik, blokajlar, rezervasyonlar" },
     automationen: { label: "Otomasyonlar", hint: "Kendiliğinden çalışanlar — ve asla çalışmayacaklar" },
+    webseite: { label: "Web sitesi denetçisi", hint: "creadig.de her gün denetlenir, bulgular dağıtılır" },
+    forschung: { label: "Ar-Ge kaydı", hint: "Araştırma desteği için saatler" },
+    investoren: { label: "Yatırımcılar", hint: "Yatırımcı odası, erişimler, göstergeler" },
     system: { label: "Kurulum", hint: "Materyal, erişimler, tanılama" },
   },
   navGruppen: {
@@ -542,6 +545,7 @@ export const tr: AdminTexte = {
   },
   kundenListe: {
     titel: "Müşteriler",
+    neu: { titel: "Yeni müşteri ekle", name: "Firma / dernek", ort: "Yer", website: "Web sitesi", beispiel: "ornek.com.tr", notiz: "Not", anlegen: "Ekle" },
     lead: "İşletmeler, kurumlar ve dernekler — belgelenmiş iş geçmişleriyle. Müşteri geçmişi, devam eden iş demek DEĞİLDİR.",
     gesamt: (n) => `toplam ${n}`,
     suche: "Ara",

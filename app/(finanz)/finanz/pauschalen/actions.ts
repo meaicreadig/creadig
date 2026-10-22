@@ -12,11 +12,16 @@ import { finanzBasis } from "@/lib/finanz/basis"
 
 const heuteBerlin = () => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date())
 
-export async function pauschaleSpeichern(form: FormData): Promise<void> {
+async function zugang() {
   const z = await pruefeZugang((await cookies()).get(ADMIN_COOKIE)?.value, { aendernd: true })
   if (z.verdict !== "ok" || z.rolle !== "owner") throw new Error("Nicht berechtigt")
   const db = await finanzDb()
   if (!db) throw new Error("Kein Speicher verbunden")
+  return db
+}
+
+export async function pauschaleSpeichern(form: FormData): Promise<void> {
+  const db = await zugang()
 
   const art = form.get("art") === "homeoffice" ? "homeoffice" : ("verpflegung" as PauschalArt)
   const monat = String(form.get("monat") ?? "")

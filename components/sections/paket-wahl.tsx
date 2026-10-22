@@ -186,7 +186,9 @@ function Zaehler({ wert, reduce }: { wert: number; reduce: boolean }) {
   }, [wert, reduce])
 
   return (
-    <span className="type-stat tabular-nums" aria-label={formatPrice(wert, locale)}>
+    <span className="type-stat tabular-nums">
+      {/* aria-label ist auf einem rollenlosen <span> verboten (axe) — der Endwert steht deshalb als Text für Screenreader. */}
+      <span className="sr-only">{formatPrice(wert, locale)}</span>
       <span aria-hidden="true">{formatPrice(anzeige, locale)}</span>
     </span>
   )

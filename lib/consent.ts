@@ -12,9 +12,9 @@
  * (`consent.thirdCountry` in `dictionary.ts`), sichtbar ÜBER den Schaltern
  * und nicht in einem aufklappbaren Detail.
  *
- * Die Schriften bleiben unberührt: Manrope und JetBrains Mono lädt
- * `next/font` beim Build herunter, ausgeliefert werden sie vom eigenen
- * Server. Maps und Werbe-Tags gibt es weiterhin nicht.
+ * Die Schriften bleiben unberührt: Sie liegen im Projekt (`app/schriften`)
+ * und kommen vom eigenen Server — kein Abruf bei Google, weder beim Build
+ * noch beim Besuch. Maps und Werbe-Tags gibt es weiterhin nicht.
  *
  * Was tatsächlich gespeichert wird:
  *   essential  — immer aktiv, nicht abwählbar: diese Einwilligung selbst
