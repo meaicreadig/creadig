@@ -2444,6 +2444,8 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
            VALUES ($1,$2,$3,$4::date,$5,$6, now(), now())`,
           [id, input.was.trim(), input.kanal, input.veroeffentlichtAm, input.url?.trim() || null, akteur.kennung],
         )
+        const { meldeInhalt } = await import("@/lib/inhalte")
+        await meldeInhalt({ id, was: input.was.trim(), kanal: input.kanal, am: input.veroeffentlichtAm, url: input.url?.trim() || null })
         return { id }
       } catch {
         return null
@@ -2493,9 +2495,13 @@ export function createNeonVertrieb(connectionString: string, akteur: Akteur = AK
           `UPDATE publications
               SET zustand = 'veroeffentlicht', veroeffentlicht_am = $2::date, url = COALESCE($3, url), updated_at = now()
             WHERE id = $1::text AND zustand = 'freigegeben'
-          RETURNING id`,
+          RETURNING id, was, kanal, url`,
           [id, am, url?.trim() || null],
-        )) as unknown[]
+        )) as { id: string; was: string; kanal: string; url: string | null }[]
+        if (rows.length === 1) {
+          const { meldeInhalt } = await import("@/lib/inhalte")
+          await meldeInhalt({ id, was: rows[0].was, kanal: rows[0].kanal, am, url: rows[0].url })
+        }
         return rows.length === 1
       } catch {
         return false
