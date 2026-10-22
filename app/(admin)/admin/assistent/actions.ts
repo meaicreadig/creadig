@@ -4,14 +4,13 @@ import { cookies, headers } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { after } from "next/server"
 
-import { veroeffentlicheInstagram } from "@/lib/assistent/instagram"
 import { schreibeAntragsskizze } from "@/lib/assistent/kapital-antrag"
 
 import { ADMIN_COOKIE } from "@/lib/admin-session"
 import { pruefeZugang } from "@/lib/admin-widerruf"
 import { antworte } from "@/lib/assistent/agent"
 import { AGENT_KEYS, fuehreAgentAus, type AgentKey } from "@/lib/assistent/truppe"
-import { veroeffentliche } from "@/lib/assistent/linkedin"
+import { postBeitrag } from "@/lib/assistent/redaktion-post"
 import { erkenneLoeschwunsch, loescheFirmen } from "@/lib/assistent/loeschen"
 import { istMail, markiereAntwort, sendeFreigabeMail } from "@/lib/assistent/versand"
 import {
@@ -34,7 +33,6 @@ import {
   type Nachricht,
 } from "@/lib/assistent/store"
 import { darfBetreten } from "@/lib/rollen"
-import { getVertriebStore } from "@/lib/lead-store"
 import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 import { generateText } from "ai"
 
@@ -196,76 +194,32 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
   const aufInstagram = form.get("instagram") === "ja"
   if (status === "freigegeben" && f.art === "linkedin") {
     const text = typeof inhalt === "string" && inhalt.trim() ? inhalt.trim() : f.inhalt
-    const fehler: string[] = []
-    let erfolg = false
-
-    if (aufInstagram) {
-      try {
-        const h = await headers()
-        const origin = `https://${h.get("x-forwarded-host") ?? h.get("host")}`
-        const r = await veroeffentlicheInstagram({ freigabeId: fid, text, origin })
-        await ergaenzeExtra(fid, { instagramId: r.medienId, instagramUrl: r.link })
-        erfolg = true
-        const heute = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date())
-        await getVertriebStore({ kennung: rolle, herkunft: "HUMAN" })
-          ?.recordPublication({ was: `Instagram: ${text.split("\n")[0].slice(0, 180)}`, kanal: "andere", veroeffentlichtAm: heute, url: r.link })
-          .catch(() => null)
-      } catch (e) {
-        console.error("[instagram] post", e)
-        fehler.push(`Instagram: ${e instanceof Error ? e.message.slice(0, 200) : "fehlgeschlagen"}`)
-      }
-    }
-
-    if (!aufLinkedin) {
-      if (!erfolg) {
-        await ergaenzeExtra(fid, { fehler: fehler.join(" · ") || "Kein Kanal gewählt — nichts wurde gepostet." })
+    const ziel = aufLinkedin ? kanal : null
+    const geplant = f.extra.geplant ? new Date(f.extra.geplant) : null
+    /* Geplanter Beitrag: freigeben heißt "zum Sendetermin raus" – der Morgen-Takt postet. */
+    if (geplant && geplant.getTime() > Date.now() + 10 * 60000 && (ziel || aufInstagram)) {
+      if (ziel && !(await ladeLinkedin(ziel))) {
+        await ergaenzeExtra(fid, { fehler: `${ziel === "firma" ? "Firmenseite" : "LinkedIn"} ist nicht verbunden — bitte zuerst verbinden.` })
         revalidatePath("/admin/assistent")
         return
       }
-      await ergaenzeExtra(fid, { fehler: undefined })
-      await setzeFreigabe(fid, status)
-      revalidatePath("/admin/assistent")
-      return
-    }
-
-    /* Ohne Verbindung wird NICHT als freigegeben markiert: Der Inhaber muss sehen, dass nichts gepostet wurde. */
-    if (!(await ladeLinkedin(kanal))) {
-      if (erfolg) {
-        await ergaenzeExtra(fid, { fehler: "LinkedIn nicht verbunden – nur auf Instagram gepostet." })
-        await setzeFreigabe(fid, status)
+      await ergaenzeExtra(fid, { wartet: { kanal: ziel, instagram: aufInstagram, text }, fehler: undefined })
+    } else {
+      const h = await headers()
+      const r = await postBeitrag({
+        f,
+        text,
+        kanal: ziel,
+        instagram: aufInstagram,
+        kennung: rolle,
+        origin: `https://${h.get("x-forwarded-host") ?? h.get("host")}`,
+      })
+      await ergaenzeExtra(fid, { fehler: r.fehler ?? undefined })
+      if (!r.erfolg) {
         revalidatePath("/admin/assistent")
         return
       }
-      fehler.push(`${kanal === "firma" ? "Firmenseite" : "LinkedIn"} ist nicht verbunden — nichts wurde gepostet. Bitte verbinden und erneut freigeben.`)
-      await ergaenzeExtra(fid, { fehler: fehler.join(" · ") })
-      revalidatePath("/admin/assistent")
-      return
-    }
-    try {
-      const postUrn = await veroeffentliche({ text, bildPfad: f.bildPfad, alt: f.extra.alt, kanal })
-      await ergaenzeExtra(fid, { postUrn, fehler: fehler.length ? fehler.join(" · ") : undefined })
-      /* Jeder echte Post gehört ins Veröffentlichungsregister — wie bei der Werkstatt unter /admin/marketing. */
-      const heute = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date())
-      try {
-        await getVertriebStore({ kennung: rolle, herkunft: "HUMAN" })?.recordPublication({
-          was: text.split("\n")[0].slice(0, 200),
-          kanal: "linkedin",
-          veroeffentlichtAm: heute,
-          url: postUrn.startsWith("urn:li:") ? `https://www.linkedin.com/feed/update/${postUrn}/` : null,
-        })
-        revalidatePath("/admin/veroeffentlichungen")
-      } catch {
-        /* Der Beitrag ist live; ein fehlender Registereintrag darf das nicht als Fehler melden. */
-      }
-      await protokolliereFaden(await assistentDb().catch(() => null), "marketing", "assistent", f.titel)
-    } catch (e) {
-      console.error("[linkedin] post", e)
-      fehler.push(`LinkedIn: ${e instanceof Error ? e.message.slice(0, 200) : "Veröffentlichung fehlgeschlagen"}`)
-      await ergaenzeExtra(fid, { fehler: fehler.join(" · ") })
-      if (!erfolg) {
-        revalidatePath("/admin/assistent")
-        return
-      }
+      revalidatePath("/admin/veroeffentlichungen")
     }
   }
   await setzeFreigabe(fid, status)

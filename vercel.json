@@ -38,6 +38,10 @@
       "schedule": "0 18 * * *"
     },
     {
+      "path": "/api/linkedin/takt",
+      "schedule": "30 6 * * 1-5"
+    },
+    {
       "path": "/api/finanz/morgenmail",
       "schedule": "15 6 * * *"
     }

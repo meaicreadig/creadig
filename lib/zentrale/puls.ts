@@ -3,6 +3,7 @@ import "server-only"
 import { assistentDb, letzteLaeufe, protokolliereLauf } from "@/lib/assistent/store"
 import { AGENT_KEYS, fuehreAgentAus, koordinationAbarbeiten, type AgentKey } from "@/lib/assistent/truppe"
 import { berechneLeistung } from "@/lib/zentrale/leistung"
+import { veroeffentlicheGeplante } from "@/lib/assistent/redaktion-post"
 
 /**
  * DER PULS — läuft mehrmals am Tag zwischen den Morgen-Takten.
@@ -24,6 +25,7 @@ export async function pulsFaellig(): Promise<boolean> {
 export async function pulsRunde(): Promise<{ ergebnis: string; anzahl: number }> {
   const start = Date.now()
   const bearbeitet = await koordinationAbarbeiten()
+  await veroeffentlicheGeplante().catch(() => 0)
   const leistung = await berechneLeistung()
   if (!leistung) return { ergebnis: "keine Datenbank", anzahl: 0 }
 

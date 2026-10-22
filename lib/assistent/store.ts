@@ -127,6 +127,13 @@ export type FreigabeExtra = {
   antwortArt?: string
   widerspruch?: boolean
   automatisch?: string
+  /** Redaktionsplan LinkedIn: Säule, Kanal, geplanter Zeitpunkt, erster Kommentar mit UTM-Link. */
+  saeule?: string
+  ziel?: "firma" | "inhaber"
+  geplant?: string | null
+  kommentar?: string
+  /** Freigegeben, wartet auf den geplanten Zeitpunkt. */
+  wartet?: { kanal: "firma" | "inhaber" | null; instagram: boolean; text: string; versuche?: number } | null
 }
 
 export const KAPITAL_STUFEN = ["pruefen", "schreiben", "eingereicht", "bewilligt", "abgelehnt"] as const
