@@ -300,17 +300,10 @@ const nextConfig: NextConfig = {
        * den Build, wenn eine freigegebene Arbeit hier noch umgeleitet wird.
        * Eine Regel, die an zwei Stellen steht, braucht einen Waechter —
        * das war der Befund, mit dem Gate 13 angefangen hat.
+       *
+       * 22.10.2026: NV SWISS, maqam und Bir Damla Hayır sind freigegeben —
+       * die Umleitung ist entfernt, die Seiten sind wieder erreichbar.
        */
-      {
-        source: "/arbeiten/:slug(nv-swiss|maqam|bir-damla-hayir)",
-        destination: "/arbeiten",
-        permanent: false,
-      },
-      {
-        source: "/:locale(tr|en|ar)/arbeiten/:slug(nv-swiss|maqam|bir-damla-hayir)",
-        destination: "/:locale/arbeiten",
-        permanent: false,
-      },
 
       { source: "/admin/vertrieb/organisationen", destination: "/admin/kunden", permanent: false },
       { source: "/admin/vertrieb/organisationen/:id", destination: "/admin/kunden/:id", permanent: false },
