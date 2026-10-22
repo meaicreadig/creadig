@@ -5,6 +5,7 @@ import { generateText } from "ai"
 
 import { assistentDb, legeFreigabeAn } from "@/lib/assistent/store"
 import { kundenText, markiereAntwort } from "@/lib/assistent/versand"
+import { sperre } from "@/lib/recht/compliance"
 export { eingangsAdresse } from "@/lib/assistent/versand"
 import { neonAbfrage, type Abfrage } from "@/lib/neon-abfrage"
 import { legeBuchungslinkAn, linkSprache } from "@/lib/termine/store"
@@ -230,7 +231,11 @@ export async function verarbeiteEingang(emailId: string): Promise<boolean> {
     if (e.art !== "abwesend") {
       // stoppt die Nachfass-Kette; "nein" bewegt die Chance nicht nach vorn
       await markiereAntwort(ursprung.id, { faden: e.art !== "nein" })
-      if (e.art === "nein") await notiere(kontakt, "mail.absage", `Kein Interesse · ${ursprung.betreff ?? ""}`, { quelleId: ursprung.id, eingang: emailId })
+      if (e.art === "nein") {
+        await notiere(kontakt, "mail.absage", `Kein Interesse · ${ursprung.betreff ?? ""}`, { quelleId: ursprung.id, eingang: emailId })
+        const adresse = von?.match(/[^\s<>"]+@[^\s<>"]+/)?.[0]
+        if (adresse) await sperre(adresse, `Widerspruch per Antwort auf „${ursprung.betreff ?? "Mail"}“`, emailId).catch(() => null)
+      }
     }
 
     let entwurf = e.antwort.trim()

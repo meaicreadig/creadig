@@ -94,7 +94,7 @@ function liste(zeilen: string[], bild: Bild): string {
     .map((z, i) => {
       let roh = z.trim().slice(2)
       let icon: string = ICON_FOLGE[i % ICON_FOLGE.length]
-      const tag = roh.match(/^\[([a-z]+)\]\s*/)
+      const tag = roh.match(/^\[([a-z]+)\]\s*/) ?? roh.match(new RegExp(`^(${LISTEN_ICONS.join("|")})\\s+(?=[A-ZÄÖÜ])`))
       if (tag) {
         if ((LISTEN_ICONS as readonly string[]).includes(tag[1])) icon = tag[1]
         roh = roh.slice(tag[0].length)
@@ -265,7 +265,8 @@ ${FIRMA} &middot; Osnabr&uuml;ck &middot; <a href="${esc(o.siteUrl)}/impressum" 
 </td></tr></table>${pixel}</td></tr></table></body></html>`
 }
 
-const ohneIconTags = (s: string) => s.replace(/^- \[[a-z]+\]\s*/gm, "- ")
+const ICON_WORT = new RegExp(`^(\\s*[-•]\\s+)\\[?(?:${LISTEN_ICONS.join("|")})\\]?\\s+(?=\\S)`, "gim")
+const ohneIconTags = (s: string) => s.replace(/^- \[[a-z]+\]\s*/gm, "- ").replace(ICON_WORT, "$1")
 
 export function kampagnenText(k: KampagnenInhalt, o: { abmeldeUrl: string; ctaHref?: string; anrede?: string }): string {
   const teile = [

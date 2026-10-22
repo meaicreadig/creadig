@@ -18,6 +18,8 @@ import { holeEingang } from "@/lib/eingang"
 import { bulletinStoff, erstelleBulletin } from "@/lib/bulletin/agent"
 import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 import { ABTEILUNGEN } from "@/lib/zentrale/abteilungen"
+import { findeOderLegeFirma } from "@/lib/kundenfaden"
+import { ladeSperrliste, rechtsRunde, sperrGrund } from "@/lib/recht/compliance"
 import {
   assistentDb,
   ladeFreigaben,
@@ -33,7 +35,7 @@ import {
   type RatProtokoll,
 } from "./store"
 
-export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator"] as const
+export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
 
 export type AgentInfo = {
@@ -47,7 +49,9 @@ export type AgentInfo = {
 export const AGENTEN: AgentInfo[] = [
   { key: "koordinator", name: "Chief of Staff", aufgabe: "Ordnet jede neue interne Arbeit einer Abteilung zu, lässt Abteilungen untereinander übergeben und legt dir nur vor, was nach außen geht oder deine Entscheidung braucht – fertig vorbereitet.", takt: "taeglich", ki: true },
   { key: "rat", name: "Geschäftsleitung", aufgabe: "CEO, CFO, Vertrieb und Marketing tagen wöchentlich, prüfen gegen dein Budget und beschließen.", takt: "woechentlich", ki: true },
-  { key: "jaeger", name: "Kunden-Jäger", aufgabe: "Findet jede Woche echte Firmen für fibero, creaDIG oder stammo und schreibt die Erstmail.", takt: "woechentlich", ki: true },
+  { key: "jaeger", name: "Kunden-Jäger", aufgabe: "Findet jede Woche echte Firmen für fibero, creaDIG oder stammo, legt sie mit Briefentwurf an und übergibt die Zielliste ans Marketing – keine Kaltmails.", takt: "woechentlich", ki: true },
+  { key: "recht", name: "Recht & Compliance", aufgabe: "Prüft jede Mail vor dem Versand (Einwilligung, Widerspruch, UWG § 7), stoppt unzulässige Kaltmails, sperrt Widersprüche und kontrolliert Impressum und Datenschutz.", takt: "taeglich", ki: false },
+  { key: "marketing", name: "Marketingleitung", aufgabe: "Macht aus Zielliste, Beschlüssen und Absagen einen Wochenplan mit einer Zielgruppe und verteilt die Aufträge an Redaktion, Vertrieb und Recht.", takt: "woechentlich", ki: true },
   { key: "lage", name: "Lage", aufgabe: "Sammelt alles, was im System auf deine Entscheidung wartet.", takt: "taeglich", ki: false },
   { key: "vertrieb", name: "Vertrieb", aufgabe: "Findet stille oder überfällige Abschlüsse und schreibt die nächste Mail.", takt: "taeglich", ki: true },
   { key: "messen", name: "Messen", aufgabe: "Bereitet jede Messe vor, bei der du teilnimmst: Plan, Kontakte, Unterkunft.", takt: "taeglich", ki: false },
@@ -400,7 +404,7 @@ Zielgruppe: ${revier.suche}.
 Nur Firmen mit eigener Webseite, die du in der Quelle gesehen hast. Keine Konzerne. Keine Erfindungen.
 Bevorzuge Firmen, deren öffentliche Kontakt-E-Mail im Impressum/Kontakt steht, und gib sie an – niemals raten. Firmen ohne erkennbare E-Mail werden verworfen.
 ${bekannt.length ? `Diese Firmen kennen wir schon – NICHT erneut nennen: ${bekannt.slice(0, 80).join(", ")}.` : ""}
-Für jede Firma eine kurze Erstmail auf Deutsch (60–110 Wörter, per Sie, Absender Muhammed Emin Akyol): ein konkreter Bezug zur Firma, ein Nutzen aus "${revier.angebot}", eine kleine Frage am Ende (z. B. 15 Minuten Telefonat). Kein Werbeton. Unter der Mail erscheint automatisch eine Produktkarte mit Logo, Webseiten-Bild und Link – Funktionen also NICHT aufzählen und keinen Link in den Text schreiben.
+Für jede Firma einen kurzen persönlichen BRIEF auf Deutsch (Post, keine E-Mail – Werbung per E-Mail ohne Einwilligung ist unzulässig; 90–140 Wörter, per Sie, Absender Muhammed Emin Akyol): ein konkreter Bezug zur Firma, ein Nutzen aus "${revier.angebot}", am Ende die Einladung, sich bei Interesse selbst zu melden (creadig.de/termin). Kein Werbeton, keine Superlative, keine Aufzählungen.
 Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","email":"","warum":"1 Satz, warum gerade diese Firma","betreff":"","mail":""}]`,
   })
   const ziele = jsonListe<Ziel>(text)
@@ -415,6 +419,8 @@ Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","emai
     Promise.all(ziele.map((z) => findeKontaktMail(z.website).catch(() => null))),
     Promise.all(ziele.map((z) => pruefeMitWiederholung(z.website))),
   ])
+  const q = await assistentDb()
+  const liste: string[] = []
   let neu = 0
   for (const [i, z] of ziele.entries()) {
     const check = checks[i]
@@ -430,26 +436,35 @@ Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","emai
     } catch {}
     const genannt = istMail(z.email) && z.email.trim().toLowerCase().endsWith(`@${host}`) ? z.email.trim().toLowerCase() : null
     const an = adressen[i] ?? genannt
-    /* Ohne echte Adresse keine Karte – der Inhaber soll nur Mails sehen, die er wirklich senden kann. */
-    if (!an) continue
+    /* Recht & Compliance: keine Kaltmail mehr. Zielfirma landet mit Briefentwurf beim Kunden, Marketing übernimmt die Ansprache. */
+    if (!an || !q) continue
     if (neu >= JAEGER_ANZAHL) break
-    const id = await legeFreigabeAn({
-      art: "mail",
-      titel: `Neukunde ${revier.produkt}: ${z.firma} (${z.ort})`,
-      empfaenger: an,
-      betreff: z.betreff,
-      extra: {
-        adressSuche: an ? "gefunden" : "keine",
-        produkt: revier.id,
-        webcheck: check ? { befunde: check.befunde, https: check.https, mobil: check.mobil, ladezeitMs: check.ladezeitMs } : null,
-      },
-      inhalt: `${z.mail}${ps}\n\n---\nWarum diese Firma: ${z.warum}\nWebseite: ${z.website}\n${an ? `Adresse von der Webseite: ${an}` : "Keine Adresse auf der Webseite gefunden – bitte im Impressum nachsehen."}\n${check ? webcheckNotiz(check) : "Webseiten-Check: nicht gelaufen."}`,
-      quelle: `jaeger:${z.firma.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
-      agent: "jaeger",
+    if (await sperrGrund(an)) continue
+    const firma = await findeOderLegeFirma(q, {
+      name: z.firma,
+      website: z.website,
+      city: z.ort,
+      note: `Zielfirma (Kunden-Jäger, KW ${woche}) für ${revier.produkt}. ${z.warum}`,
     })
-    if (id) neu++
+    if (!firma.neu) continue
+    await q(`UPDATE organisations SET note = concat_ws(E'\n\n', nullif(note,''), $2::text), updated_at = now() WHERE id = $1`, [
+      firma.id,
+      `Kontakt laut Webseite: ${an}\nAnsprache: Brief per Post oder persönlich – Werbung per E-Mail ohne Einwilligung ist unzulässig (UWG § 7).\n${check ? webcheckNotiz(check) : ""}\n\nBriefentwurf – ${z.betreff}:\n${z.mail}${ps}`.slice(0, 4000),
+    ])
+    liste.push(`- ${z.firma} (${z.ort}) · ${z.website} · ${z.warum}`)
+    neu++
   }
-  return { ergebnis: `${neu} neue Firmen für ${revier.produkt} gefunden`, anzahl: neu }
+  if (liste.length) {
+    const { legeAuftragAn } = await import("@/lib/koordination/koordinator")
+    await legeAuftragAn({
+      von: "vertrieb",
+      an: "marketing",
+      titel: `Zielliste KW ${woche}: ${liste.length} Firmen für ${revier.produkt}`,
+      inhalt: `Zielgruppe: ${revier.suche}\nAngebot: ${revier.angebot}\n\n${liste.join("\n")}\n\nBriefentwürfe liegen an der Firma (Kunden). Kein Mailversand ohne Einwilligung.`,
+      quelle: `jaeger:${woche}:${revier.id}`,
+    })
+  }
+  return { ergebnis: `${neu} Zielfirmen für ${revier.produkt} recherchiert – Ansprache per Brief, keine Kaltmail`, anzahl: neu }
 }
 
 async function rat(opt: { manuell?: boolean } = {}): Promise<Ergebnis> {
@@ -602,6 +617,56 @@ Reply ONLY with a JSON array: [{"name":"","art":"Accelerator|Fund|Family Office|
   return { ergebnis: `${neu} neue Golf-Chancen mit Erstnachricht`, anzahl: neu }
 }
 
+async function recht(): Promise<Ergebnis> {
+  return rechtsRunde()
+}
+
+/** Marketingleitung: macht aus Zielliste, Beschlüssen und Absagen einen Wochenplan und verteilt ihn an die Abteilungen. */
+async function marketing(): Promise<Ergebnis> {
+  const woche = kw(new Date())
+  const { ladeAuftraegeMitQuelle, legeAuftragAn } = await import("@/lib/koordination/koordinator")
+  const [ziele, raete, sperren, stoff] = await Promise.all([
+    ladeAuftraegeMitQuelle("jaeger:", 3).catch(() => []),
+    ladeRaete(1).catch(() => []),
+    ladeSperrliste(10).catch(() => []),
+    bulletinStoff().catch(() => ""),
+  ])
+  const erlaubt = ABTEILUNGEN.filter((a) => a.id !== "marketing").map((a) => a.id)
+  const { text } = await generateText({
+    model: MODELL,
+    prompt: `${INHABER}
+Du bist die Marketingleitung von creaDIG Solutions. Regel von Recht & Compliance: KEINE Werbe-E-Mails ohne Einwilligung (UWG § 7). Neukunden kommen über erlaubte Wege: Fachartikel/LinkedIn/SEO (Einwilligung entsteht durch Anfrage), persönliche Briefe per Post, Veranstaltungen/Messen, Empfehlungen, Verbände als Partner.
+Zielliste des Kunden-Jägers:\n${ziele.map((z) => `${z.titel}\n${z.inhalt}`).join("\n\n").slice(0, 2500) || "keine"}
+Beschlüsse der Geschäftsleitung: ${JSON.stringify(raete[0]?.protokoll ?? null).slice(0, 1200)}
+Widersprüche (daraus lernen, Ton anpassen): ${sperren.map((s) => s.grund).join(" | ").slice(0, 600) || "keine"}
+Aktuelle Lage: ${String(stoff).slice(0, 800)}
+Erstelle den Wochenplan: genau EINE Zielgruppe, EINE Kernbotschaft (Nutzen, kein Werbeton) und 2–3 Aufträge an Abteilungen (ids: ${erlaubt.join(", ")}), z. B. Fachartikel an unternehmenskommunikation, Briefserie an vertrieb, Prüfung an recht.
+Antworte NUR mit JSON: {"zielgruppe":"","botschaft":"","auftraege":[{"an":"","titel":"","inhalt":"konkret, was bis wann entsteht"}]}`,
+    maxOutputTokens: 1200,
+  })
+  const roh = text.match(/\{[\s\S]*\}/)?.[0]
+  let plan: { zielgruppe?: string; botschaft?: string; auftraege?: { an: string; titel: string; inhalt: string }[] } = {}
+  try {
+    plan = roh ? JSON.parse(roh) : {}
+  } catch {}
+  let verteilt = 0
+  for (const [i, a] of (plan.auftraege ?? []).slice(0, 3).entries()) {
+    if (!a?.titel || !erlaubt.includes(a.an)) continue
+    const id = await legeAuftragAn({
+      von: "marketing",
+      an: a.an,
+      titel: a.titel,
+      inhalt: `Zielgruppe: ${plan.zielgruppe ?? "-"}\nBotschaft: ${plan.botschaft ?? "-"}\n\n${a.inhalt}`,
+      quelle: `marketing:${woche}:${i}`,
+    })
+    if (id) verteilt++
+  }
+  return {
+    ergebnis: plan.zielgruppe ? `Wochenplan: ${plan.zielgruppe} · ${verteilt} Aufträge verteilt` : "Kein Wochenplan erstellt",
+    anzahl: verteilt,
+  }
+}
+
 async function koordinator(): Promise<Ergebnis> {
   const { koordinatorRunde } = await import("@/lib/koordination/koordinator")
   return koordinatorRunde()
@@ -619,6 +684,8 @@ const LAEUFER: Record<AgentKey, (o: Start) => Promise<Ergebnis>> = {
   golf,
   redaktion,
   jaeger,
+  recht,
+  marketing,
   rat: (o) => rat(o),
   bulletin: (o) => erstelleBulletin({ erzwingen: o.manuell }),
 }

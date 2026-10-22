@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { after } from "next/server"
 import {
+  Megaphone,
+  Scale,
   ArrowUpRight,
   CalendarClock,
   Camera,
@@ -308,6 +310,8 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
   projekte: Kanban,
   golf: Radar,
   bulletin: PenLine,
+  marketing: Megaphone,
+  recht: Scale,
 }
 
 const agentName = (key: string | null) => AGENTEN.find((a) => a.key === key)?.name ?? "Assistent"
@@ -754,6 +758,10 @@ function MailKarte({ f }: { f: Freigabe }) {
               {f.extra.fehler}
             </p>
           ) : null}
+          <label className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">
+            <input type="checkbox" name="basis" value="1" defaultChecked={Boolean(f.extra.basisBestaetigt)} className="mt-0.5 accent-primary" />
+            <span>Ich habe mit dieser Person gesprochen oder sie hat zugestimmt (Rechtsgrundlage wird mit Datum gespeichert). Ohne Haken lässt Recht & Compliance nur Mails an Bestandskunden und Anfragende durch.</span>
+          </label>
           <div className="flex flex-wrap gap-2">
             <AktionKnopf
               nichtWenn="verworfen"

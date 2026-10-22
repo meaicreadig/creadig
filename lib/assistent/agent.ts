@@ -1,7 +1,9 @@
 import "server-only"
 
-import { generateText, stepCountIs, tool } from "ai"
+import { generateText, stepCountIs, tool, type ModelMessage } from "ai"
 import { z } from "zod"
+
+import { sperre } from "@/lib/recht/compliance"
 
 import { morgenBriefing } from "@/lib/admin/morgen-briefing"
 import { ladeStatus, messenFuerKalender } from "@/lib/messen-radar"
@@ -13,6 +15,7 @@ import { firmenRahmen } from "./rahmen"
 import { assistentDb, FREIGABE_ARTEN, ladeFreigaben, ladeRaete, legeFreigabeAn, type Nachricht } from "./store"
 
 const MODELL = "openai/gpt-5.4-mini"
+const BILD_MODELL = "anthropic/claude-sonnet-4.6"
 
 const SYSTEM = `Du bist der Chief of Staff von Muhammed Emin Akyol, Inhaber von creaDIG Solutions (Einzelunternehmen, System-Haus für digitale Betriebe; Produkte: fibero = Glasfaser-Montage-Software, stammo = digitale Stempelkarte).
 Ziel: Er soll als Selbstständiger nach vorne kommen — Kunden, Umsatz, Kapital. Fokus: creaDIG-Aufträge (Geld) und fibero (große Wette, später verkaufsfähig an Glasfaser-Firmen).
@@ -29,8 +32,22 @@ Regeln:
 - Er ist allein. Ihr (die Truppe) seid sein Team: denkt wie Mitinhaber, sagt auch Nein, wenn etwas vom Fokus ablenkt.
 - Ende jede Antwort mit genau einem klaren nächsten Schritt.`
 
-export async function antworte(verlauf: Nachricht[]): Promise<string> {
+export type ChatBild = { base64: string; mediaType: string }
+
+export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<string> {
   const tools = {
+    widerspruch_eintragen: tool({
+      description:
+        "Trägt eine E-Mail-Adresse oder Domain dauerhaft in die Sperrliste ein (Widerspruch, Absage, Spam-Drohung). Danach geht nie wieder eine Mail dorthin.",
+      inputSchema: z.object({
+        adresse: z.string().describe("E-Mail-Adresse oder Domain, z. B. info@firma.de oder firma.de"),
+        grund: z.string().describe("Kurz, z. B. 'Kein Interesse, droht mit rechtlichen Schritten'"),
+      }),
+      execute: async ({ adresse, grund }) => {
+        const id = await sperre(adresse, grund, "chat")
+        return id ? { gesperrt: adresse } : { fehler: "Adresse ungültig oder Datenbank nicht erreichbar" }
+      },
+    }),
     verkaufslage: tool({
       description: "Offene Abschlüsse (Pipeline), Monatsziel, Warnungen und fällige Rückrufe.",
       inputSchema: z.object({}),
@@ -121,10 +138,23 @@ export async function antworte(verlauf: Nachricht[]): Promise<string> {
 
   const heute = new Intl.DateTimeFormat("de-DE", { dateStyle: "full", timeZone: "Europe/Berlin" }).format(new Date())
 
+  const nachrichten: ModelMessage[] = verlauf.slice(-16).map((m) => ({ role: m.rolle, content: m.text }))
+  const letzte = nachrichten.at(-1)
+  if (bild && letzte?.role === "user") {
+    nachrichten[nachrichten.length - 1] = {
+      role: "user",
+      content: [
+        { type: "text", text: String(letzte.content) },
+        { type: "image", image: Buffer.from(bild.base64, "base64"), mediaType: bild.mediaType },
+      ],
+    }
+  }
+
   const { text } = await generateText({
-    model: MODELL,
-    system: `${SYSTEM}\n\nHeute ist ${heute}.`,
-    messages: verlauf.slice(-16).map((m) => ({ role: m.rolle, content: m.text })),
+    /* Bilder (Screenshots von Mails, Briefen, Belegen) liest Sonnet am zuverlässigsten – nur dann, sonst das günstige Modell. */
+    model: bild ? BILD_MODELL : MODELL,
+    system: `${SYSTEM}\n\nHeute ist ${heute}.${bild ? `\n\nEr hat ein Bild angehängt. Lies es genau. Ist es eine Kundenantwort oder Mail: 1) ordne sie mit "absprache_speichern" der Firma zu, 2) bei Absage/Widerspruch/Spam-Drohung sofort "widerspruch_eintragen" (dann wird diese Adresse nie wieder angeschrieben) und sag ehrlich, was rechtlich daraus folgt, 3) leite ab, was Marketing/Vertrieb daraus lernt.` : ""}`,
+    messages: nachrichten,
     tools,
     stopWhen: stepCountIs(6),
     maxOutputTokens: 2500,

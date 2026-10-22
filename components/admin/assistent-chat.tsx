@@ -1,7 +1,28 @@
 "use client"
 
 import { useEffect, useRef, useState, useTransition } from "react"
-import { ArrowUp, Loader2, Mic, Square } from "lucide-react"
+import { ArrowUp, ImagePlus, Loader2, Mic, Square, X } from "lucide-react"
+
+/** Verkleinert auf max. 1600 px (JPEG) – Text bleibt lesbar, Bildkosten bleiben klein. */
+async function verkleinere(datei: File): Promise<string> {
+  const url = URL.createObjectURL(datei)
+  try {
+    const img = await new Promise<HTMLImageElement>((ok, fehler) => {
+      const i = new Image()
+      i.onload = () => ok(i)
+      i.onerror = fehler
+      i.src = url
+    })
+    const faktor = Math.min(1, 1600 / Math.max(img.width, img.height))
+    const canvas = document.createElement("canvas")
+    canvas.width = Math.round(img.width * faktor)
+    canvas.height = Math.round(img.height * faktor)
+    canvas.getContext("2d")?.drawImage(img, 0, 0, canvas.width, canvas.height)
+    return canvas.toDataURL("image/jpeg", 0.85)
+  } finally {
+    URL.revokeObjectURL(url)
+  }
+}
 
 import { frage } from "@/app/(admin)/admin/assistent/actions"
 import type { Nachricht } from "@/lib/assistent/store"
@@ -32,6 +53,22 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
   const [sprache, setSprache] = useState<"de-DE" | "tr-TR">("de-DE")
   const erkennung = useRef<Erkennung | null>(null)
   const ende = useRef<HTMLDivElement>(null)
+  const dateiFeld = useRef<HTMLInputElement>(null)
+  const [bild, setBild] = useState<string | null>(null)
+
+  async function bildWaehlen(datei: File | undefined) {
+    if (!datei) return
+    if (!datei.type.startsWith("image/")) {
+      setFehler("Bitte ein Bild wählen (PNG, JPG, WebP).")
+      return
+    }
+    try {
+      setBild(await verkleinere(datei))
+      setFehler(null)
+    } catch {
+      setFehler("Bild konnte nicht gelesen werden.")
+    }
+  }
 
   useEffect(() => {
     ende.current?.scrollIntoView({ block: "end" })
@@ -39,12 +76,15 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
 
   function senden(text: string) {
     const t = text.trim()
-    if (!t || laeuft) return
+    const b = bild
+    if ((!t && !b) || laeuft) return
     setFehler(null)
     setEingabe("")
-    setVerlauf((v) => [...v, { id: `tmp-${Date.now()}`, rolle: "user", text: t, zeit: new Date().toISOString() }])
+    setBild(null)
+    const anzeige = b ? `[Bild angehängt] ${t}`.trim() : t
+    setVerlauf((v) => [...v, { id: `tmp-${Date.now()}`, rolle: "user", text: anzeige, zeit: new Date().toISOString() }])
     startTransition(async () => {
-      const r = await frage(t)
+      const r = await frage(t, b)
       if (r.ok) setVerlauf((v) => [...v, r.antwort])
       else setFehler(r.fehler)
     })
@@ -134,7 +174,52 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
             {fehler}
           </p>
         ) : null}
-        <div className="flex items-end gap-2 rounded-3xl bg-secondary p-2">
+        {bild ? (
+          <div className="flex items-center gap-3 rounded-2xl bg-secondary p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element -- lokale Vorschau aus data:-URL */}
+            <img src={bild} alt="Angehängtes Bild" className="size-14 rounded-xl object-cover" />
+            <p className="flex-1 text-xs leading-relaxed text-muted-foreground">
+              Bild angehängt – wird mit Claude Sonnet gelesen und ins System eingeordnet.
+            </p>
+            <button
+              type="button"
+              onClick={() => setBild(null)}
+              aria-label="Bild entfernen"
+              className="flex size-8 items-center justify-center rounded-full bg-card text-muted-foreground hover:text-foreground"
+            >
+              <X className="size-4" aria-hidden="true" />
+            </button>
+          </div>
+        ) : null}
+        <div
+          className="flex items-end gap-2 rounded-3xl bg-secondary p-2"
+          onPaste={(e) => {
+            const datei = Array.from(e.clipboardData.files).find((f) => f.type.startsWith("image/"))
+            if (datei) {
+              e.preventDefault()
+              void bildWaehlen(datei)
+            }
+          }}
+        >
+          <input
+            ref={dateiFeld}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="sr-only"
+            tabIndex={-1}
+            onChange={(e) => {
+              void bildWaehlen(e.target.files?.[0])
+              e.target.value = ""
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => dateiFeld.current?.click()}
+            aria-label="Bild anhängen"
+            className="flex size-10 items-center justify-center rounded-full bg-card text-foreground hover:bg-background"
+          >
+            <ImagePlus className="size-4" aria-hidden="true" />
+          </button>
           <label htmlFor="assistent-eingabe" className="sr-only">
             Nachricht an den Assistenten
           </label>
@@ -176,7 +261,7 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
           </button>
           <button
             type="submit"
-            disabled={laeuft || !eingabe.trim()}
+            disabled={laeuft || (!eingabe.trim() && !bild)}
             aria-label="Senden"
             className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"
           >
