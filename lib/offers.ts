@@ -73,12 +73,13 @@ export function localizedRange(from: number, to: number): L {
 export const VAT_PERCENT = 19
 
 /**
- * Kleinunternehmer nach § 19 UStG — vom Inhaber bestätigt (15.10.2026).
+ * Steuerstatus: REGELBESTEUERT, 19 % — vom Inhaber klargestellt 22.10.2026,
+ * deckt sich mit `fin_einstellungen.ust_pflichtig = true` (USt-Voranmeldung
+ * quartalsweise). Der Eintrag „Kleinunternehmer" vom 15.10. war falsch.
  * EINE Quelle: `imprintDetails.smallBusiness`, die Rechnung und `{ust}` lesen
- * von hier. Vorher sagte die Startseite „zzgl. 19 % USt." und das Impressum
- * im selben Moment „keine Umsatzsteuer".
+ * von hier — Startseite, Leistungen und Impressum sagen dasselbe.
  */
-export const KLEINUNTERNEHMER = true as boolean | null
+export const KLEINUNTERNEHMER = false as boolean | null
 
 /** `{ust}` — der ganze Satz zur Umsatzsteuer, passend zum Steuerstatus. */
 export const ustSatz = (locale: Locale) => UST_SATZ[locale][KLEINUNTERNEHMER ? "klein" : "regel"]
