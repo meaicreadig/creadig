@@ -7,7 +7,7 @@ import { Bloom, EffectComposer, N8AO, SMAA, ToneMapping, Vignette } from "@react
 import { ToneMappingMode } from "postprocessing"
 import * as THREE from "three"
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib"
-import type { Etage, Raum } from "@/lib/zentrale/hauptsitz"
+import type { Erscheinung, Etage, Raum } from "@/lib/zentrale/hauptsitz"
 import type { Zustand } from "@/lib/zentrale/netz"
 import { useJetzt } from "./use-jetzt"
 import { agentFrisch, fadenLive, vorText, type LiveFaden } from "@/lib/zentrale/aktivitaet"
@@ -41,6 +41,8 @@ const FARBE = {
 }
 
 const KLEIDUNG = ["#2f3a4c", "#6b7686", "#e6e2da", "#44505f", "#8a6f5a"]
+const KLEIDUNG_FRAU = ["#5d6f80", "#8a6b78", "#d9d2c6", "#55654f", "#7a5a48"]
+const KOPFTUCH = ["#7d5a66", "#3d4e63", "#c2ae95", "#5f7468", "#9a4a54"]
 const HAAR = ["#2a1d15", "#15110e", "#5b3a22", "#b98d4f", "#7a4a2a"]
 
 /* PBR-Materialien (Poly Haven, CC0) – Ordner unter /public/3d, Konvention siehe public/3d/README.md. */
@@ -295,11 +297,12 @@ const UNTERARM = 0.25
  * Hand mit Handfläche, vier Fingern und Daumen. Lokal zeigt −y in Unterarmrichtung,
  * +z nach unten zur Tastatur – negative rotation.x krümmt einen Finger auf die Taste.
  */
-function Hand({ finger, seite }: { finger: React.MutableRefObject<(THREE.Group | null)[]>; seite: number }) {
+function Hand({ finger, seite, haut }: { finger: React.MutableRefObject<(THREE.Group | null)[]>; seite: number; haut: string }) {
+  const HAUT = haut
   return (
     <group>
-      <mesh position={[0, -0.045, 0]} castShadow>
-        <boxGeometry args={[0.075, 0.08, 0.026]} />
+      <mesh position={[0, -0.045, 0]} scale={[1, 1, 0.38]} castShadow>
+        <sphereGeometry args={[0.042, 14, 10]} />
         <meshStandardMaterial color={HAUT} roughness={0.7} />
       </mesh>
       {[-0.027, -0.009, 0.009, 0.027].map((fx, j) => (
@@ -325,7 +328,8 @@ function Hand({ finger, seite }: { finger: React.MutableRefObject<(THREE.Group |
   )
 }
 
-function Arm({ x, farbe, an, phase, seite }: { x: number; farbe: string; an: boolean; phase: number; seite: number }) {
+function Arm({ x, farbe, an, phase, seite, haut, schmal }: { x: number; farbe: string; an: boolean; phase: number; seite: number; haut: string; schmal: number }) {
+  const HAUT = haut
   const schulter = useRef<THREE.Group>(null)
   const ellbogen = useRef<THREE.Group>(null)
   const finger = useRef<(THREE.Group | null)[]>([])
@@ -350,25 +354,30 @@ function Arm({ x, farbe, an, phase, seite }: { x: number; farbe: string; an: boo
     // Gierung nach innen, damit beide Hände über der Tastatur zusammenfinden
     <group position={[x, 0.97, 0.02]} rotation={[0, seite * 0.27, 0]}>
       <group ref={schulter} rotation={[0.5, 0, 0]}>
-        <mesh castShadow>
-          <sphereGeometry args={[0.055, 10, 8]} />
-          <meshStandardMaterial color={farbe} roughness={0.85} />
+        <mesh castShadow scale={schmal}>
+          <sphereGeometry args={[0.058, 16, 12]} />
+          <meshStandardMaterial color={farbe} roughness={0.88} />
         </mesh>
+        {/* Oberarm verjüngt sich zum Ellbogen – kein Rohr mehr */}
         <mesh position={[0, -OBERARM / 2, 0]} castShadow>
-          <capsuleGeometry args={[0.048, OBERARM - 0.06, 4, 10]} />
-          <meshStandardMaterial color={farbe} roughness={0.85} />
+          <cylinderGeometry args={[0.042 * schmal, 0.052 * schmal, OBERARM, 16]} />
+          <meshStandardMaterial color={farbe} roughness={0.88} />
         </mesh>
         <group ref={ellbogen} position={[0, -OBERARM, 0]} rotation={[1.25, 0, 0]}>
+          <mesh castShadow>
+            <sphereGeometry args={[0.042 * schmal, 14, 10]} />
+            <meshStandardMaterial color={farbe} roughness={0.88} />
+          </mesh>
           <mesh position={[0, -UNTERARM / 2, 0]} castShadow>
-            <capsuleGeometry args={[0.04, UNTERARM - 0.05, 4, 10]} />
-            <meshStandardMaterial color={farbe} roughness={0.85} />
+            <cylinderGeometry args={[0.03 * schmal, 0.041 * schmal, UNTERARM, 16]} />
+            <meshStandardMaterial color={farbe} roughness={0.88} />
           </mesh>
           <mesh position={[0, -UNTERARM + 0.01, 0]} castShadow>
-            <cylinderGeometry args={[0.03, 0.032, 0.03, 10]} />
+            <cylinderGeometry args={[0.024, 0.027, 0.04, 12]} />
             <meshStandardMaterial color={HAUT} roughness={0.7} />
           </mesh>
           <group position={[0, -UNTERARM, 0]}>
-            <Hand finger={finger} seite={seite} />
+            <Hand finger={finger} seite={seite} haut={haut} />
           </group>
         </group>
       </group>
@@ -376,7 +385,38 @@ function Arm({ x, farbe, an, phase, seite }: { x: number; farbe: string; an: boo
   )
 }
 
-function Person({ farbe, haar, an }: { farbe: string; haar: string; an: boolean }) {
+const HAUTTOENE = ["#ecc9ad", "#dcb08e", "#c69472", "#a8775a", "#86593f"]
+
+function rumpfProfil(punkte: [number, number][]) {
+  return new THREE.LatheGeometry(
+    punkte.map(([r, y]) => new THREE.Vector2(r, y)),
+    32,
+  )
+}
+const RUMPF_MANN = rumpfProfil([
+  [0.001, 0],
+  [0.14, 0.02],
+  [0.15, 0.14],
+  [0.155, 0.28],
+  [0.18, 0.44],
+  [0.2, 0.52],
+  [0.17, 0.57],
+  [0.07, 0.6],
+  [0.001, 0.6],
+])
+const RUMPF_FRAU = rumpfProfil([
+  [0.001, 0],
+  [0.155, 0.02],
+  [0.135, 0.18],
+  [0.125, 0.26],
+  [0.15, 0.4],
+  [0.165, 0.5],
+  [0.15, 0.56],
+  [0.06, 0.59],
+  [0.001, 0.59],
+])
+
+function Person({ farbe, haar, an, aussehen }: { farbe: string; haar: string; an: boolean; aussehen: Erscheinung }) {
   const koerper = useRef<THREE.Group>(null)
   const kopf = useRef<THREE.Group>(null)
   const phase = useMemo(() => (farbe.charCodeAt(1) + farbe.charCodeAt(3)) % 7, [farbe])
@@ -390,62 +430,115 @@ function Person({ farbe, haar, an }: { farbe: string; haar: string; an: boolean 
       kopf.current.rotation.x = an ? 0.06 + Math.sin(t * 0.35 + phase) * 0.03 : Math.sin(t * 0.8 + phase) * 0.04
     }
   })
+  const { frau, kopftuch } = aussehen
+  const HAUT = HAUTTOENE[aussehen.haut % HAUTTOENE.length]
+  const rumpf = frau ? RUMPF_FRAU : RUMPF_MANN
+  const schmal = frau ? 0.86 : 1
+  const schulterX = frau ? 0.175 : 0.2
   return (
     <group position={[0, 0, 0.6]}>
       <group ref={koerper} position={[0, 0.6, 0]}>
-        {/* Rumpf: Brustkorb breiter, Taille schmaler */}
-        <mesh position={[0, 0.36, 0.04]} scale={[1, 1, 0.72]} castShadow>
-          <capsuleGeometry args={[0.17, 0.3, 6, 16]} />
-          <meshStandardMaterial color={farbe} roughness={0.85} />
+        {/* Rumpf als gedrehtes Profil: Hüfte → Taille → Brust → Schulter, vorn-hinten flacher */}
+        <mesh geometry={rumpf} position={[0, 0.02, 0.04]} scale={[1, 1, 0.68]} castShadow>
+          <meshStandardMaterial color={farbe} roughness={0.88} />
         </mesh>
-        <mesh position={[0, 0.06, 0.03]} scale={[1, 1, 0.75]} castShadow>
-          <sphereGeometry args={[0.16, 14, 10]} />
-          <meshStandardMaterial color={HOSE} roughness={0.9} />
+        <mesh position={[0, 0.06, 0.03]} scale={[1, 0.7, 0.85]} castShadow>
+          <sphereGeometry args={[frau ? 0.165 : 0.155, 24, 16]} />
+          <meshStandardMaterial color={frau && kopftuch ? farbe : HOSE} roughness={0.9} />
         </mesh>
       </group>
-      <mesh position={[0, 1.18, 0]} castShadow>
-        <cylinderGeometry args={[0.045, 0.055, 0.1, 10]} />
-        <meshStandardMaterial color={HAUT} roughness={0.7} />
-      </mesh>
-      <group ref={kopf} position={[0, 1.3, -0.02]}>
-        <mesh position={[0, 0.08, 0]} scale={[0.92, 1.08, 1]} castShadow>
-          <sphereGeometry args={[0.11, 20, 16]} />
-          <meshStandardMaterial color={HAUT} roughness={0.7} />
+      {!kopftuch && (
+        <mesh position={[0, 1.17, 0.005]} castShadow>
+          <cylinderGeometry args={[0.04 * schmal, 0.05 * schmal, 0.11, 16]} />
+          <meshStandardMaterial color={HAUT} roughness={0.65} />
         </mesh>
-        <mesh position={[0, 0.06, -0.105]} rotation={[-0.3, 0, 0]}>
-          <coneGeometry args={[0.016, 0.04, 8]} />
-          <meshStandardMaterial color={HAUT} roughness={0.7} />
+      )}
+      <group ref={kopf} position={[0, 1.29, -0.01]}>
+        {/* Schädel + Kieferpartie, kleiner Kopf statt Spielfigur-Kugel */}
+        <mesh position={[0, 0.09, 0]} scale={[0.86, 1.06, 0.98]} castShadow>
+          <sphereGeometry args={[0.1, 32, 24]} />
+          <meshStandardMaterial color={HAUT} roughness={0.62} />
         </mesh>
-        {[-0.1, 0.1].map((ox) => (
-          <mesh key={ox} position={[ox, 0.07, 0]} scale={[0.4, 1, 0.7]}>
-            <sphereGeometry args={[0.03, 8, 6]} />
-            <meshStandardMaterial color={HAUT} roughness={0.7} />
-          </mesh>
+        <mesh position={[0, 0.02, -0.03]} scale={[0.78, 0.72, 0.86]} castShadow>
+          <sphereGeometry args={[0.085, 24, 16]} />
+          <meshStandardMaterial color={HAUT} roughness={0.62} />
+        </mesh>
+        <mesh position={[0, 0.07, -0.098]} rotation={[-0.25, 0, 0]} scale={[0.7, 1, 0.9]}>
+          <sphereGeometry args={[0.018, 12, 8]} />
+          <meshStandardMaterial color={HAUT} roughness={0.6} />
+        </mesh>
+        {[-0.032, 0.032].map((ox) => (
+          <group key={ox}>
+            <mesh position={[ox, 0.105, -0.084]}>
+              <sphereGeometry args={[0.009, 10, 8]} />
+              <meshStandardMaterial color="#1e1915" roughness={0.3} />
+            </mesh>
+            <mesh position={[ox, 0.128, -0.086]} rotation={[0, 0, ox > 0 ? -0.12 : 0.12]}>
+              <boxGeometry args={[0.03, 0.006, 0.006]} />
+              <meshStandardMaterial color={kopftuch ? "#2a1d15" : haar} roughness={0.9} />
+            </mesh>
+          </group>
         ))}
-        {/* Haare: Kappe über Oberkopf und Hinterkopf, Gesicht (−z) bleibt frei */}
-        <mesh position={[0, 0.095, 0.02]} rotation={[0.45, 0, 0]} castShadow>
-          <sphereGeometry args={[0.122, 20, 14, 0, Math.PI * 2, 0, 1.85]} />
-          <meshStandardMaterial color={haar} roughness={0.9} />
-        </mesh>
+        {kopftuch ? (
+          <>
+            {/* Kopftuch: umschließt Kopf und Hals, Gesicht bleibt offen */}
+            <mesh position={[0, 0.085, 0.008]} scale={[0.95, 1.1, 1]} castShadow>
+              <sphereGeometry args={[0.118, 32, 24, Math.PI * 1.5 + 0.78, Math.PI * 2 - 1.56]} />
+              <meshStandardMaterial color={haar} roughness={0.92} side={THREE.DoubleSide} />
+            </mesh>
+            <mesh position={[0, 0.16, -0.035]} rotation={[0.35, 0, 0]} scale={[0.95, 0.55, 1]}>
+              <sphereGeometry args={[0.105, 24, 12, 0, Math.PI * 2, 0, 1.1]} />
+              <meshStandardMaterial color={haar} roughness={0.92} side={THREE.DoubleSide} />
+            </mesh>
+            <mesh position={[0, -0.09, 0.01]} castShadow>
+              <cylinderGeometry args={[0.1, 0.2, 0.2, 28, 1, true]} />
+              <meshStandardMaterial color={haar} roughness={0.92} side={THREE.DoubleSide} />
+            </mesh>
+          </>
+        ) : (
+          <>
+            <mesh position={[0, 0.115, 0.018]} rotation={[0.5, 0, 0]} castShadow>
+              <sphereGeometry args={[0.106, 28, 18, 0, Math.PI * 2, 0, 1.75]} />
+              <meshStandardMaterial color={haar} roughness={0.85} />
+            </mesh>
+            {[-0.084, 0.084].map((ox) => (
+              <mesh key={ox} position={[ox, 0.085, 0.005]} scale={[0.35, 0.9, 0.6]}>
+                <sphereGeometry args={[0.026, 10, 8]} />
+                <meshStandardMaterial color={HAUT} roughness={0.65} />
+              </mesh>
+            ))}
+            {frau && (
+              /* Langes Haar fällt über den Rücken */
+              <mesh position={[0, -0.02, 0.07]} scale={[1, 1, 0.55]} castShadow>
+                <capsuleGeometry args={[0.085, 0.2, 8, 20]} />
+                <meshStandardMaterial color={haar} roughness={0.85} />
+              </mesh>
+            )}
+          </>
+        )}
       </group>
-      {[-0.09, 0.09].map((lx) => (
+      {[-0.085, 0.085].map((lx) => (
         <group key={lx} position={[lx, 0, 0]}>
           <mesh position={[0, 0.58, -0.18]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-            <capsuleGeometry args={[0.072, 0.3, 4, 10]} />
-            <meshStandardMaterial color={HOSE} roughness={0.9} />
+            <cylinderGeometry args={[0.058, 0.074, 0.4, 16]} />
+            <meshStandardMaterial color={frau && kopftuch ? farbe : HOSE} roughness={0.9} />
+          </mesh>
+          <mesh position={[0, 0.58, -0.38]} castShadow>
+            <sphereGeometry args={[0.058, 14, 10]} />
+            <meshStandardMaterial color={frau && kopftuch ? farbe : HOSE} roughness={0.9} />
           </mesh>
           <mesh position={[0, 0.32, -0.4]} castShadow>
-            <capsuleGeometry args={[0.058, 0.36, 4, 10]} />
-            <meshStandardMaterial color={HOSE} roughness={0.9} />
+            <cylinderGeometry args={[0.055, 0.042, 0.5, 16]} />
+            <meshStandardMaterial color={frau && kopftuch ? farbe : HOSE} roughness={0.9} />
           </mesh>
-          <mesh position={[0, 0.04, -0.46]} castShadow>
-            <boxGeometry args={[0.1, 0.07, 0.22]} />
-            <meshStandardMaterial color="#1c1f24" roughness={0.5} />
+          <mesh position={[0, 0.04, -0.45]} scale={[1, 0.6, 1]} castShadow>
+            <capsuleGeometry args={[0.045, 0.14, 6, 12]} />
+            <meshStandardMaterial color="#1c1f24" roughness={0.45} />
           </mesh>
         </group>
       ))}
-      <Arm x={-0.2} farbe={farbe} an={an} phase={phase} seite={-1} />
-      <Arm x={0.2} farbe={farbe} an={an} phase={phase + 0.8} seite={1} />
+      <Arm x={-schulterX} farbe={farbe} an={an} phase={phase} seite={-1} haut={HAUT} schmal={schmal} />
+      <Arm x={schulterX} farbe={farbe} an={an} phase={phase + 0.8} seite={1} haut={HAUT} schmal={schmal} />
     </group>
   )
 }
@@ -739,45 +832,60 @@ function TouchGesten() {
   return null
 }
 
-function Gehirn({ hoehe, fokus }: { hoehe: number; fokus: Fokus }) {
-  const puls = useRef<THREE.Mesh>(null)
-  const kern = useRef<THREE.MeshStandardMaterial>(null)
-  const oben = useRef<THREE.Group>(null)
-  const schaft = useRef<THREE.Mesh>(null)
-  const streifen = useRef<THREE.Mesh>(null)
-  const lift = useRef(0)
-  const angehoben = fokus.etage !== null
-  const yTop = fokus.etage === null ? hoehe : Math.min((fokus.etage + 1) * H, hoehe)
-  useFrame(({ clock }, dt) => {
-    const t = clock.getElapsedTime()
-    lift.current = THREE.MathUtils.damp(lift.current, angehoben ? ANHEBEN : 0, 4, dt)
-    const l = lift.current
-    if (oben.current) oben.current.position.y = l
-    if (schaft.current) schaft.current.visible = l > 0.02
-    const gesamt = hoehe + l
-    if (streifen.current) {
-      streifen.current.scale.y = gesamt
-      streifen.current.position.y = gesamt / 2
-    }
-    if (puls.current) puls.current.position.y = ((t * 3) % gesamt) + 0.2
-    if (kern.current) kern.current.emissiveIntensity = 0.55 + Math.sin(t * 1.6) * 0.15
+/**
+ * Erschließungskern hinten mit gläsernem Aufzug: Betonschacht bis exakt zur Dachplatte,
+ * davor ein Glasschacht, in dem die beleuchtete Kabine Geschoss für Geschoss hält.
+ */
+function Gehirn({ hoehe }: { hoehe: number }) {
+  const kabine = useRef<THREE.Group>(null)
+  const geschosse = Math.max(1, Math.round(hoehe / H))
+  useFrame(({ clock }) => {
+    if (!kabine.current) return
+    // 6 s je Abschnitt: 3,5 s Halt mit offener Tür, 2,5 s weich fahren – rauf und wieder runter.
+    const t = clock.getElapsedTime() / 6
+    const strecke = Math.max(1, geschosse - 1) * 2
+    const abschnitt = Math.floor(t) % strecke
+    const anteil = THREE.MathUtils.smoothstep((t % 1 - 0.58) / 0.42, 0, 1)
+    const von = abschnitt < strecke / 2 ? abschnitt : strecke - abschnitt
+    const nach = abschnitt < strecke / 2 ? von + 1 : von - 1
+    const stock = geschosse === 1 ? 0 : THREE.MathUtils.lerp(von, nach, anteil)
+    kabine.current.position.y = stock * H + PLATTE + 0.02
   })
+  const SCHACHT_B = 1.7
+  const SCHACHT_T = 1.1
   return (
-    <group position={[0, 0, -TIEFE / 2 + 1.3]}>
-      <PbrBox args={[2.2, yTop, 1.6]} position={[0, yTop / 2, 0]} ordner="brushed-concrete" tint="#9ea4ad" castShadow receiveShadow />
-      <group ref={oben}>
-        <PbrBox args={[2.2, hoehe - yTop, 1.6]} position={[0, yTop + (hoehe - yTop) / 2, 0]} ordner="brushed-concrete" tint="#9ea4ad" castShadow receiveShadow />
-        {/* Schaftstück: wandert mit dem oberen Segment und überbrückt die Lücke zum stehenden Teil */}
-        <PbrBox ref={schaft} args={[2.204, ANHEBEN, 1.604]} position={[0, yTop - ANHEBEN / 2, 0]} ordner="brushed-concrete" tint="#9ea4ad" castShadow />
+    <group position={[0, 0, -TIEFE / 2 + 1.1]}>
+      <PbrBox args={[2.6, hoehe, 1.2]} position={[0, hoehe / 2, 0]} ordner="brushed-concrete" tint="#b9bcc0" castShadow receiveShadow />
+      <group position={[0, 0, 0.6 + SCHACHT_T / 2]}>
+        <mesh position={[0, hoehe / 2, 0]}>
+          <boxGeometry args={[SCHACHT_B, hoehe, SCHACHT_T]} />
+          <meshStandardMaterial color="#cfe0ea" transparent opacity={0.16} roughness={0.05} metalness={0.3} depthWrite={false} />
+        </mesh>
+        {[-1, 1].flatMap((sx) => [-1, 1].map((sz) => (
+          <mesh key={`${sx}${sz}`} position={[(sx * SCHACHT_B) / 2, hoehe / 2, (sz * SCHACHT_T) / 2]}>
+            <boxGeometry args={[0.05, hoehe, 0.05]} />
+            <meshStandardMaterial color={FARBE.platte} metalness={0.6} roughness={0.35} />
+          </mesh>
+        )))}
+        <group ref={kabine} position={[0, PLATTE, 0]}>
+          <mesh position={[0, 0.02, 0]}>
+            <boxGeometry args={[SCHACHT_B - 0.14, 0.06, SCHACHT_T - 0.14]} />
+            <meshStandardMaterial color={FARBE.platte} metalness={0.6} roughness={0.35} />
+          </mesh>
+          <mesh position={[0, 2.3, 0]}>
+            <boxGeometry args={[SCHACHT_B - 0.14, 0.06, SCHACHT_T - 0.14]} />
+            <meshStandardMaterial color="#fff3df" emissive="#ffe2b8" emissiveIntensity={0.7} toneMapped={false} />
+          </mesh>
+          <mesh position={[0, 1.15, -SCHACHT_T / 2 + 0.1]}>
+            <planeGeometry args={[SCHACHT_B - 0.18, 2.25]} />
+            <meshStandardMaterial color="#d8cbb6" roughness={0.5} />
+          </mesh>
+          <mesh position={[0, 1.0, -SCHACHT_T / 2 + 0.12]}>
+            <planeGeometry args={[SCHACHT_B - 0.3, 0.04]} />
+            <meshStandardMaterial color={FARBE.alu} metalness={0.8} roughness={0.25} />
+          </mesh>
+        </group>
       </group>
-      <mesh ref={streifen} position={[0, hoehe / 2, 0.81]}>
-        <planeGeometry args={[0.18, 1]} />
-        <meshStandardMaterial ref={kern} color={FARBE.blau} emissive={FARBE.blau} emissiveIntensity={0.6} toneMapped={false} />
-      </mesh>
-      <mesh ref={puls} position={[0, 1, 0.83]}>
-        <planeGeometry args={[0.5, 0.9]} />
-        <meshBasicMaterial color="#9fb6ff" transparent opacity={0.85} toneMapped={false} />
-      </mesh>
     </group>
   )
 }
@@ -791,6 +899,7 @@ function Arbeitsplatz({
   haar,
   titel = "",
   text = "",
+  aussehen,
 }: {
   x: number
   z: number
@@ -800,9 +909,11 @@ function Arbeitsplatz({
   haar: string
   titel?: string
   text?: string
+  aussehen?: Erscheinung
 }) {
   return (
     <group position={[x, 0, z]}>
+      {besetzt && <Schreibtischlicht an={an} />}
       <mesh position={[0, 0.74, 0]} castShadow receiveShadow>
         <boxGeometry args={[1.6, 0.04, 0.8]} />
         <meshStandardMaterial color={FARBE.tisch} roughness={0.4} />
@@ -844,7 +955,59 @@ function Arbeitsplatz({
           <meshStandardMaterial color={FARBE.alu} metalness={0.7} roughness={0.3} />
         </mesh>
       </group>
-      {besetzt && <Person farbe={farbe} haar={haar} an={an} />}
+      {besetzt && aussehen && <Person farbe={farbe} haar={haar} an={an} aussehen={aussehen} />}
+    </group>
+  )
+}
+
+let lichtkegel: THREE.Texture | null = null
+/** Weicher, warmer Lichtfleck – gemalt statt echter Lichtquelle, damit 30 Plätze nichts kosten. */
+function lichtkegelTextur() {
+  if (lichtkegel || typeof document === "undefined") return lichtkegel
+  const c = document.createElement("canvas")
+  c.width = c.height = 128
+  const ctx = c.getContext("2d")!
+  const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64)
+  g.addColorStop(0, "rgba(255,226,180,1)")
+  g.addColorStop(0.45, "rgba(255,214,160,0.45)")
+  g.addColorStop(1, "rgba(255,210,150,0)")
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, 128, 128)
+  lichtkegel = new THREE.CanvasTexture(c)
+  lichtkegel.colorSpace = THREE.SRGBColorSpace
+  return lichtkegel
+}
+
+function Schreibtischlicht({ an }: { an: boolean }) {
+  const textur = useMemo(() => lichtkegelTextur(), [])
+  return (
+    <group position={[0.62, 0.76, -0.18]}>
+      <mesh position={[0, 0.01, 0]}>
+        <cylinderGeometry args={[0.06, 0.07, 0.02, 20]} />
+        <meshStandardMaterial color={FARBE.dunkel} roughness={0.4} metalness={0.5} />
+      </mesh>
+      <mesh position={[0, 0.2, 0]} rotation={[0, 0, 0.18]}>
+        <cylinderGeometry args={[0.008, 0.008, 0.4, 8]} />
+        <meshStandardMaterial color={FARBE.dunkel} roughness={0.4} metalness={0.5} />
+      </mesh>
+      <mesh position={[-0.12, 0.4, 0.02]} rotation={[0, 0, 1.4]}>
+        <cylinderGeometry args={[0.008, 0.008, 0.26, 8]} />
+        <meshStandardMaterial color={FARBE.dunkel} roughness={0.4} metalness={0.5} />
+      </mesh>
+      <mesh position={[-0.26, 0.37, 0.02]}>
+        <cylinderGeometry args={[0.025, 0.05, 0.07, 20, 1, true]} />
+        <meshStandardMaterial color={FARBE.dunkel} roughness={0.4} metalness={0.5} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[-0.26, 0.34, 0.02]} rotation={[Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.045, 20]} />
+        <meshBasicMaterial color="#ffe6bf" toneMapped={false} side={THREE.DoubleSide} />
+      </mesh>
+      {textur && (
+        <mesh position={[-0.42, 0.006, 0.12]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[1.3, 1.1]} />
+          <meshBasicMaterial map={textur} transparent opacity={an ? 0.55 : 0.35} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
+        </mesh>
+      )}
     </group>
   )
 }
@@ -916,9 +1079,23 @@ function RaumModell({
                 onPerson(`${raum.id}:${i}`)
               }}
             >
-              <Arbeitsplatz x={px} z={pz} an={an} besetzt={!!stand} farbe={KLEIDUNG[(raum.etage * 3 + raum.spalte + i) % KLEIDUNG.length]} haar={HAAR[(raum.etage * 2 + raum.spalte * 3 + i * 2 + 1) % HAAR.length]} titel={stand?.name ?? ""} text={stand?.ergebnis ?? ""} />
+              <Arbeitsplatz
+                x={px}
+                z={pz}
+                an={an}
+                besetzt={!!stand}
+                farbe={(stand?.aussehen.frau ? KLEIDUNG_FRAU : KLEIDUNG)[(raum.etage * 3 + raum.spalte + i) % KLEIDUNG.length]}
+                haar={
+                  stand?.aussehen.kopftuch
+                    ? KOPFTUCH[(raum.etage * 2 + raum.spalte + i) % KOPFTUCH.length]
+                    : HAAR[(raum.etage * 2 + raum.spalte * 3 + i * 2 + 1) % HAAR.length]
+                }
+                titel={stand ? `${stand.vorname} · ${stand.rolle}` : ""}
+                text={stand?.ergebnis ?? ""}
+                aussehen={stand?.aussehen}
+              />
               {stand && !offen && (gewaehlt || an || stand.fehler) && (
-                <Html position={[px, 1.5, pz]} center zIndexRange={[10, 0]}>
+                <Html position={[px, 1.68, pz + 0.6]} center zIndexRange={[10, 0]}>
                   <button
                     type="button"
                     aria-label={stand.name}
@@ -933,16 +1110,27 @@ function RaumModell({
                 </Html>
               )}
               {stand && offen && (
-                <Html position={[px, 1.75, pz]} center distanceFactor={10} zIndexRange={[30, 0]}>
-                  <span className="pointer-events-none flex max-w-56 flex-col gap-0.5 rounded-2xl bg-card/95 px-3 py-1.5 font-sans text-foreground shadow-sm backdrop-blur">
-                    <span className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-semibold">
+                /* Namensschild seitlich neben der Person (rechts vom Stuhl), nie vor dem Gesicht */
+                <Html position={[px + (px > 0 ? -0.55 : 0.55), 1.15, pz + 0.6]} distanceFactor={9} zIndexRange={[30, 0]}>
+                  <span
+                    className={`pointer-events-none flex w-44 -translate-y-1/2 items-start gap-2 rounded-2xl bg-card/95 p-2.5 font-sans text-foreground shadow-md backdrop-blur ${px > 0 ? "-translate-x-full" : ""}`}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-semibold text-primary"
+                    >
+                      {stand.vorname.charAt(0)}
+                    </span>
+                    <span className="flex min-w-0 flex-col gap-0.5">
+                    <span className="flex items-center gap-1.5 text-[12px] font-semibold leading-tight">
+                      {stand.vorname}
                       <span
                         aria-hidden="true"
                         className={`size-1.5 rounded-full ${stand.fehler ? "bg-destructive" : an ? "animate-pulse bg-primary" : "bg-muted-foreground/50"}`}
                       />
-                      {stand.name}
                     </span>
-                    <span className="text-[10px] leading-snug text-muted-foreground">
+                    <span className="text-[10px] font-medium leading-tight text-primary">{stand.rolle}</span>
+                    <span className="line-clamp-3 text-[10px] leading-snug text-muted-foreground">
                       {stand.fehler
                         ? sprache === "tr" ? "son çalışma hata verdi" : "letzter Lauf mit Fehler"
                         : stand.ergebnis
@@ -951,6 +1139,7 @@ function RaumModell({
                             ? `${sprache === "tr" ? "son aktif" : "zuletzt aktiv"} ${vorText(stand.zeit, jetzt, sprache)}`
                             : sprache === "tr" ? "henüz çalışma yok" : "noch kein Lauf erfasst"}
                       {stand.ergebnis && stand.zeit && jetzt !== null && !stand.fehler ? ` · ${vorText(stand.zeit, jetzt, sprache)}` : ""}
+                    </span>
                     </span>
                   </span>
                 </Html>
@@ -977,7 +1166,7 @@ function RaumModell({
         <meshStandardMaterial
           color="#ffffff"
           emissive="#ffe8c8"
-          emissiveIntensity={leer ? 0.05 : 1.3}
+          emissiveIntensity={leer ? 0.05 : 0.45}
           toneMapped={false}
         />
       </mesh>
@@ -1084,10 +1273,10 @@ function Geschoss({
         <meshStandardMaterial color={FARBE.holz} roughness={0.6} />
       </mesh>
       <mesh geometry={f.lichtfuge} rotation={UNTERSICHT} position={[0, H - 0.03, 0]}>
-        <meshStandardMaterial color={FARBE.licht} emissive={FARBE.licht} emissiveIntensity={1.4} toneMapped={false} />
+        <meshStandardMaterial color={FARBE.licht} emissive={FARBE.licht} emissiveIntensity={0.7} toneMapped={false} />
       </mesh>
-      {/* Warmes Raumlicht wie im Abend-Vorbild */}
-      <pointLight position={[0, H - 0.6, 0]} color={FARBE.licht} intensity={14} distance={BREITE * 0.9} decay={1.6} />
+      {/* Gedämpftes Grundlicht – das eigentliche Licht kommt von den Arbeitsplatzleuchten */}
+      <pointLight position={[0, H - 0.6, 0]} color={FARBE.licht} intensity={6} distance={BREITE * 0.8} decay={1.6} />
 
       {/* Durchgehende Glashaut rundum, schlanke Pfosten */}
       <mesh geometry={f.glas} rotation={LIEGEND} position={[0, PLATTE + 0.02, 0]}>
@@ -1193,26 +1382,10 @@ function Dach({ y, angehoben }: { y: number; angehoben: boolean }) {
       <mesh geometry={formen().dach} rotation={LIEGEND} castShadow receiveShadow>
         <meshStandardMaterial color={FARBE.platte} metalness={0.5} roughness={0.38} />
       </mesh>
-      <mesh geometry={formen().dachflaeche} rotation={LIEGEND} position={[0, PLATTE + 0.28, 0]} receiveShadow>
-        <meshStandardMaterial color="#a7a9a6" roughness={0.95} />
+      {/* Glatte, leere Dachfläche – nichts steht oben drauf */}
+      <mesh geometry={formen().dachflaeche} rotation={LIEGEND} position={[0, PLATTE + 0.005, 0]} receiveShadow>
+        <meshStandardMaterial color="#3a3f47" roughness={0.6} metalness={0.3} />
       </mesh>
-      {/* Gläserne Brüstung der Dachterrasse */}
-      <mesh geometry={formen().gelaender} rotation={LIEGEND} position={[0, PLATTE + 0.28, 0]}>
-        <Glas opacity={0.16} />
-      </mesh>
-      {/* Zurückgesetzte Technik, von unten kaum sichtbar */}
-      {[-5, 5].map((x) => (
-        <mesh key={x} position={[x, PLATTE + 0.28 + 0.55, -2.6]} castShadow>
-          <boxGeometry args={[2.4, 1.1, 1.6]} />
-          <meshStandardMaterial color="#8e939a" roughness={0.45} metalness={0.55} />
-        </mesh>
-      ))}
-      {[-9, -6.6, 6.6, 9].map((x) => (
-        <mesh key={`pv${x}`} position={[x, PLATTE + 0.6, 1.6]} rotation={[-0.3, 0, 0]} castShadow>
-          <boxGeometry args={[2.1, 0.05, 1.3]} />
-          <meshStandardMaterial color="#1f2a3d" roughness={0.25} metalness={0.6} />
-        </mesh>
-      ))}
     </group>
   )
 }
@@ -1316,7 +1489,7 @@ export default function Hauptsitz3D({
       </Environment>
 
       <Umgebung />
-      <Gehirn hoehe={hoehe + 1.2} fokus={fokus} />
+      <Gehirn hoehe={hoehe} />
       {etagen.map((e) => (
         <Geschoss
           key={e.index}
@@ -1354,7 +1527,7 @@ export default function Hauptsitz3D({
       {/* Tone Mapping läuft hier im Composer (ACES Filmic), nicht mehr über den Renderer */}
       <EffectComposer multisampling={0} enableNormalPass={false}>
         <N8AO aoRadius={1.4} distanceFalloff={1.2} intensity={2.2} quality="medium" halfRes />
-        <Bloom intensity={0.45} luminanceThreshold={0.75} luminanceSmoothing={0.25} mipmapBlur />
+        <Bloom intensity={0.2} luminanceThreshold={0.9} luminanceSmoothing={0.2} mipmapBlur />
         <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
         <Vignette offset={0.35} darkness={0.3} />
         <SMAA />
