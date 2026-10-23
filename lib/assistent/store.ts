@@ -472,6 +472,8 @@ export type RatProtokoll = {
   frage: string
   /** KI-Auswertung deiner Antwort: was die Truppe daraus macht. */
   erledigt?: string
+  /** Nummern (0-basiert) der Beschlüsse, die Emin abgehakt hat. Fehlt in Sitzungen vor dem 23.10.2026. */
+  erledigteBeschluesse?: number[]
 }
 export type Rat = { id: string; woche: string; protokoll: RatProtokoll; antwort: string | null; zeit: string }
 
@@ -505,6 +507,26 @@ export async function setzeRatErledigt(id: string, erledigt: string): Promise<vo
   const q = await assistentDb()
   if (!q) return
   await q(`UPDATE assistent_rat SET protokoll = jsonb_set(protokoll, '{erledigt}', to_jsonb($2::text)) WHERE id = $1`, [id, erledigt])
+}
+
+/*
+  23.10.2026: Beschlüsse ließen sich nicht abhaken. Eine Sitzung gilt eine
+  Woche, also standen erledigte Beschlüsse sieben Tage als offen da — der
+  Owner las das als „die Automatisierung tut nichts“.
+*/
+export async function setzeBeschlussErledigt(id: string, nr: number, erledigt: boolean): Promise<void> {
+  const q = await assistentDb()
+  if (!q) throw new Error("Datenbank nicht verfügbar")
+  const rows = (await q(`SELECT protokoll FROM assistent_rat WHERE id = $1`, [id])) as { protokoll: RatProtokoll }[]
+  const p = rows[0]?.protokoll
+  if (!p || !Number.isInteger(nr) || nr < 0 || nr >= p.beschluesse.length) return
+  const alt = new Set(p.erledigteBeschluesse ?? [])
+  if (erledigt) alt.add(nr)
+  else alt.delete(nr)
+  await q(`UPDATE assistent_rat SET protokoll = jsonb_set(protokoll, '{erledigteBeschluesse}', $2::jsonb) WHERE id = $1`, [
+    id,
+    JSON.stringify([...alt].sort((a, b) => a - b)),
+  ])
 }
 
 export async function setzeMailKopf(id: string, empfaenger: string, betreff: string): Promise<void> {

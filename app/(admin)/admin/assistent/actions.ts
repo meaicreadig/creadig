@@ -23,6 +23,7 @@ import {
   ladeLinkedin,
   ladeRaete,
   setzeRatErledigt,
+  setzeBeschlussErledigt,
   fragenHeute,
   ladeVerlauf,
   setzeFreigabe,
@@ -113,6 +114,15 @@ export async function ratAntworten(form: FormData): Promise<void> {
     const erledigt = await werteAntwortAus(rat.protokoll.frage, text, Boolean(loesch)).catch(() => null)
     await setzeRatErledigt(ratId, erledigt ?? "Antwort ist angekommen und fließt in die nächste Sitzung ein.")
   }
+  revalidatePath("/admin/assistent")
+}
+
+export async function beschlussAbhaken(form: FormData): Promise<void> {
+  await pruefe()
+  const id = form.get("id")
+  const nr = Number(form.get("nr"))
+  if (typeof id !== "string") return
+  await setzeBeschlussErledigt(id.slice(0, 80), nr, form.get("erledigt") === "1")
   revalidatePath("/admin/assistent")
 }
 

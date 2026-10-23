@@ -66,7 +66,7 @@ import { EingangListe } from "@/components/admin/eingang-liste"
 import { ladeNeueBuchungen } from "@/lib/termine/store"
 import { Disclosure } from "@/components/ui/disclosure"
 
-import { agentStarten, antwortErhalten, freigabeEntscheiden, freigabeVerwerfen, kapitalStufe, ratAntworten } from "./actions"
+import { agentStarten, antwortErhalten, beschlussAbhaken, freigabeEntscheiden, freigabeVerwerfen, kapitalStufe, ratAntworten } from "./actions"
 import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
 import { instagramBereit, ladeInstagram } from "@/lib/assistent/instagram"
 import { STUFE_TEXT } from "@/lib/assistent/kapital-antrag"
@@ -206,17 +206,29 @@ function Sitzung({ rat, fruehere, rahmen }: { rat: Rat | undefined; fruehere: Ra
           <div className="flex flex-col gap-4">
             <article className="flex flex-col gap-3 rounded-3xl bg-card p-6 shadow-sm">
               <h3 className="font-sans text-base font-semibold text-foreground">Beschlüsse</h3>
+              {/* Abgehakte Beschlüsse rutschen nach unten und werden leise – offen bleibt, was noch zu tun ist. */}
               <ol className="flex flex-col gap-3">
-                {rat.protokoll.beschluesse.map((b, i) => (
-                  <li key={b.was} className="flex gap-3">
+                {rat.protokoll.beschluesse
+                  .map((b, i) => ({ b, i, fertig: (rat.protokoll.erledigteBeschluesse ?? []).includes(i) }))
+                  .sort((x, y) => Number(x.fertig) - Number(y.fertig))
+                  .map(({ b, i, fertig }) => (
+                  <li key={b.was} className={`flex gap-3 ${fertig ? "opacity-60" : ""}`}>
                     <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                      {i + 1}
+                      {fertig ? <Check className="size-4" aria-label="erledigt" /> : i + 1}
                     </span>
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-medium leading-relaxed text-foreground">{b.was}</p>
-                      <p className="text-sm leading-relaxed text-muted-foreground">{b.warum}</p>
-                      <span className="text-xs text-muted-foreground">
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+                      <p className={`text-sm font-medium leading-relaxed text-foreground ${fertig ? "line-through" : ""}`}>{b.was}</p>
+                      {!fertig && <p className="text-sm leading-relaxed text-muted-foreground">{b.warum}</p>}
+                      <span className="flex flex-wrap items-center gap-x-3 text-xs text-muted-foreground">
                         {b.wer === "emin" ? "Du" : "Truppe bereitet vor"} · {b.kostenEur ? euro(b.kostenEur) : "kostenlos"}
+                        <form action={beschlussAbhaken}>
+                          <input type="hidden" name="id" value={rat.id} />
+                          <input type="hidden" name="nr" value={i} />
+                          <input type="hidden" name="erledigt" value={fertig ? "0" : "1"} />
+                          <button type="submit" className="text-primary underline-offset-2 hover:underline">
+                            {fertig ? "Wieder öffnen" : "Erledigt"}
+                          </button>
+                        </form>
                       </span>
                     </div>
                   </li>
@@ -224,21 +236,33 @@ function Sitzung({ rat, fruehere, rahmen }: { rat: Rat | undefined; fruehere: Ra
               </ol>
             </article>
 
-            <article className="flex flex-col gap-3 rounded-3xl bg-primary/5 p-6">
-              <h3 className="font-sans text-base font-semibold text-foreground">Rückfrage an dich</h3>
-              <p className="text-pretty text-sm leading-relaxed text-foreground">{rat.protokoll.frage}</p>
+            {/*
+              23.10.2026: Eine beantwortete Rückfrage stand bis zur nächsten Wochensitzung
+              genauso groß da wie eine offene – der Owner hielt sie für hängengeblieben.
+              Beantwortet ist sie jetzt eine Zeile; Frage, Ergebnis und Antwort zum Aufklappen.
+            */}
+            <article className={`flex flex-col gap-3 rounded-3xl p-6 ${rat.antwort ? "bg-card shadow-sm" : "bg-primary/5"}`}>
               {rat.antwort ? (
-                <div className="flex flex-col gap-2 rounded-2xl bg-card p-4">
-                  <p className="flex items-start gap-2 text-sm leading-relaxed text-foreground">
+                <details>
+                  <summary className="flex cursor-pointer list-none items-start gap-2 text-sm leading-relaxed text-foreground [&::-webkit-details-marker]:hidden">
                     <Check className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
-                    {rat.protokoll.erledigt ?? "Antwort ist angekommen und fließt in die nächste Sitzung ein."}
-                  </p>
-                  <details>
-                    <summary className="cursor-pointer text-xs text-muted-foreground">Deine Antwort anzeigen</summary>
-                    <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{rat.antwort}</p>
-                  </details>
-                </div>
+                    <span>
+                      <span className="font-semibold">Rückfrage erledigt.</span>{" "}
+                      <span className="text-muted-foreground">{rat.protokoll.erledigt ?? "Antwort ist angekommen und fließt in die nächste Sitzung ein."}</span>
+                    </span>
+                  </summary>
+                  <div className="mt-3 flex flex-col gap-2 border-t border-line pt-3 text-sm leading-relaxed">
+                    <p className="text-foreground">{rat.protokoll.frage}</p>
+                    <p className="whitespace-pre-wrap text-muted-foreground">
+                      <span className="font-medium text-foreground">Deine Antwort: </span>
+                      {rat.antwort}
+                    </p>
+                  </div>
+                </details>
               ) : (
+                <>
+                <h3 className="font-sans text-base font-semibold text-foreground">Rückfrage an dich</h3>
+                <p className="text-pretty text-sm leading-relaxed text-foreground">{rat.protokoll.frage}</p>
                 <form action={ratAntworten} className="flex flex-col gap-2">
                   <input type="hidden" name="id" value={rat.id} />
                   <label htmlFor="rat-antwort" className="sr-only">
@@ -261,6 +285,7 @@ function Sitzung({ rat, fruehere, rahmen }: { rat: Rat | undefined; fruehere: Ra
                     Antworten
                   </AktionKnopf>
                 </form>
+                </>
               )}
             </article>
           </div>
