@@ -57,10 +57,12 @@ type RevealProps = {
   className?: string
   delay?: number
   y?: number
+  /** Karten im Business-OS staffeln kürzer (0,3 s) als Sektionen der Website. */
+  duration?: number
   as?: "div" | "span" | "li" | "section"
 }
 
-export function Reveal({ children, className, delay = 0, y = 16, as = "div" }: RevealProps) {
+export function Reveal({ children, className, delay = 0, y = 16, duration = 0.5, as = "div" }: RevealProps) {
   const reduce = usePrefersReducedMotion()
   const MotionTag = motion[as]
 
@@ -75,7 +77,7 @@ export function Reveal({ children, className, delay = 0, y = 16, as = "div" }: R
       initial={{ y }}
       whileInView={{ y: 0 }}
       viewport={{ once: true, margin: "0px 0px -5% 0px" }}
-      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </MotionTag>

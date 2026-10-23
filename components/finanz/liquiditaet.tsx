@@ -47,9 +47,10 @@ export function LiquiditaetsBand({
                   <Link
                     key={k}
                     href={`${basis}/geldfluss?szenario=${k}`}
+                    scroll={false}
                     role="tab"
                     aria-selected={k === aktiv}
-                    className={`rounded-full px-4 py-2 text-sm font-medium ${k === aktiv ? "bg-primary text-primary-foreground" : "bg-background text-foreground/75"}`}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 ${k === aktiv ? "bg-primary text-primary-foreground" : "bg-background text-foreground/75"}`}
                   >
                     {SZ_LABEL[k]} <span className="tabular-nums opacity-75">· Tiefpunkt {eurRund(tief)}</span>
                   </Link>
@@ -75,7 +76,7 @@ export function LiquiditaetsBand({
             return (
               <div
                 key={w.bis}
-                className={`flex-1 rounded-t-sm ${negativ ? "bg-destructive" : unterTopf ? "bg-gold/50" : "bg-gold"}`}
+                className={`flex-1 rounded-t-sm motion-safe:transition-[height,background-color] motion-safe:duration-300 motion-safe:ease-out ${negativ ? "bg-destructive" : unterTopf ? "bg-gold/50" : "bg-gold"}`}
                 style={{ height: `${h}%` }}
                 title={`bis ${tag(w.bis)}: ${eur(w.standCent)} (+${eur(w.einCent)} / −${eur(w.ausCent)})`}
               />

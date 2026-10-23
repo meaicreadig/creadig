@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import type { ReactNode } from "react"
 
 import { FinanzShell, OhneSpeicher } from "@/components/finanz/shell"
 import { FinanzKompass } from "@/components/finanz/kompass"
@@ -20,6 +21,8 @@ import { finanzOwnerSeite } from "@/lib/finanz/zugang"
 import { ZieleKachel } from "@/components/finanz/ziele"
 import { ladeZiele } from "@/lib/finanz/ziele"
 import { Diversifikationskachel } from "@/components/finanz/diversifikation"
+import { Reveal } from "@/components/ui/reveal"
+import { Zaehler } from "@/components/ui/zaehler"
 import { ladeDiversifikation } from "@/lib/finanz/diversifikation"
 
 export const dynamic = "force-dynamic"
@@ -108,16 +111,17 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
       </section>
 
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Auf einen Blick">
-        <Kachel href={`${basis}/investment`} label="Investierbar" wert={eur(inv.investierbarCent)} fuss="nach Steuern und Reserve" />
+        <Kachel i={0} href={`${basis}/investment`} label="Investierbar" wert={<Zaehler wert={inv.investierbarCent / 100} waehrung nachkomma={2} />} fuss="nach Steuern und Reserve" />
         <Kachel
+          i={1}
           href={`${basis}/rechnungen`}
           label="Überfällige Rechnungen"
-          wert={String(kurz.ueberfaellig)}
+          wert={<Zaehler wert={kurz.ueberfaellig} />}
           fuss={kurz.ueberfaellig > 0 ? "Mahnvorschläge liegen in deiner Freigabe-Liste" : "alles im Zahlungsziel"}
           warnung={kurz.ueberfaellig > 0}
         />
-        <Kachel href={`${basis}/abos`} label="Planbarer Jahresumsatz" wert={eur(aboJahr)} fuss={`${abos.filter((a) => a.aktiv).length} wiederkehrende Rechnungen`} />
-        <Kachel href={`${basis}/rechnungen`} label="Entwürfe warten" wert={String(entwuerfe)} fuss="prüfen und mit einem Klick senden" />
+        <Kachel i={2} href={`${basis}/abos`} label="Planbarer Jahresumsatz" wert={<Zaehler wert={aboJahr / 100} waehrung nachkomma={2} />} fuss={`${abos.filter((a) => a.aktiv).length} wiederkehrende Rechnungen`} />
+        <Kachel i={3} href={`${basis}/rechnungen`} label="Entwürfe warten" wert={<Zaehler wert={entwuerfe} />} fuss="prüfen und mit einem Klick senden" />
       </ul>
 
       <Geschaeftsfelder bild={felder} stand={abgleichsStand} fiberoAktiv={fiberoKonfiguriert()} basis={basis || "/"} jahre={jahre} />
@@ -163,14 +167,18 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
   )
 }
 
-function Kachel({ href, label, wert, fuss, warnung }: { href: string; label: string; wert: string; fuss: string; warnung?: boolean }) {
+/* Gestaffelt (60 ms je Kachel) und mit leichtem Anheben beim Hover — Bewegung zeigt Reihenfolge, nicht Ladezustand. */
+function Kachel({ i, href, label, wert, fuss, warnung }: { i: number; href: string; label: string; wert: ReactNode; fuss: string; warnung?: boolean }) {
   return (
-    <li>
-      <Link href={href} className="bg-card hover:bg-card/80 flex h-full flex-col gap-1 rounded-[1.5rem] p-5">
+    <Reveal as="li" delay={i * 0.06} duration={0.3} y={10}>
+      <Link
+        href={href}
+        className="bg-card hover:bg-card/80 flex h-full flex-col gap-1 rounded-[1.5rem] p-5 transition-[transform,box-shadow,background-color] duration-200 hover:shadow-md motion-safe:hover:-translate-y-0.5"
+      >
         <span className="text-muted-foreground text-xs">{label}</span>
         <span className={`text-2xl font-semibold tabular-nums ${warnung ? "text-destructive" : "text-primary"}`}>{wert}</span>
         <span className="text-muted-foreground text-xs">{fuss}</span>
       </Link>
-    </li>
+    </Reveal>
   )
 }

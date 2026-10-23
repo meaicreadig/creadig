@@ -3,6 +3,8 @@ import Link from "next/link"
 import { type CockpitDaten, STUFEN } from "@/lib/cockpit"
 import { kanalName } from "@/lib/kanal"
 import { NachfassKarte } from "@/components/admin/nachfass-karte"
+import { Reveal } from "@/components/ui/reveal"
+import { Zaehler } from "@/components/ui/zaehler"
 
 type Sprache = "de" | "tr"
 
@@ -67,34 +69,34 @@ const TEXT = {
 
 export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; sprache: Sprache; intl: string }) {
   const t = TEXT[sprache] ?? TEXT.de
-  const euro = new Intl.NumberFormat(intl, { style: "currency", currency: "EUR", maximumFractionDigits: 0 })
+  const zahl = (n: number | null, euro = false) => (n === null ? null : <Zaehler wert={n} waehrung={euro} intl={intl} />)
   const delta = daten.anfragen7 !== null && daten.anfragenVor7 !== null ? daten.anfragen7 - daten.anfragenVor7 : null
 
   const kacheln = [
     {
       label: t.anfragen,
-      wert: daten.anfragen7,
+      wert: zahl(daten.anfragen7),
       unter: delta !== null ? t.vorwoche(delta) : null,
       ton: delta !== null && delta > 0 ? "text-gold-text" : "text-muted-foreground",
       href: "/admin/vertrieb/anfragen",
     },
     {
       label: t.pipeline,
-      wert: daten.pipelineWert !== null ? euro.format(daten.pipelineWert) : null,
+      wert: zahl(daten.pipelineWert, true),
       unter: daten.pipelineOffen !== null ? t.chancen(daten.pipelineOffen) : null,
       ton: "text-muted-foreground",
       href: "/admin/vertrieb/pipeline",
     },
     {
       label: t.rechnungen,
-      wert: daten.rechnungenOffenCent !== null ? euro.format(daten.rechnungenOffenCent / 100) : null,
+      wert: zahl(daten.rechnungenOffenCent !== null ? Math.round(daten.rechnungenOffenCent / 100) : null, true),
       unter: daten.rechnungenOffen !== null ? t.rechnungenAnzahl(daten.rechnungenOffen) : null,
       ton: "text-muted-foreground",
       href: "/admin/kunden",
     },
     {
       label: t.posts,
-      wert: daten.posts7,
+      wert: zahl(daten.posts7),
       unter: null,
       ton: "text-muted-foreground",
       href: "/admin/veroeffentlichungen",
@@ -114,7 +116,7 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
   return (
     <section aria-label={t.label} className="mb-12">
       <div className="mb-4 grid gap-4 lg:grid-cols-2">
-        <Panel titel={t.termine}>
+        <Panel i={0} titel={t.termine}>
           {daten.termine && daten.termine.length > 0 ? (
             <ul className="flex flex-col">
               {daten.termine.map((x) => (
@@ -134,7 +136,7 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
           )}
         </Panel>
 
-        <Panel titel={t.linksOffen}>
+        <Panel i={1} titel={t.linksOffen}>
           {daten.linksOffen && daten.linksOffen.length > 0 ? (
             <ul className="flex flex-col">
               {daten.linksOffen.map((x) => (
@@ -154,24 +156,27 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
           )}
         </Panel>
       </div>
-      <ul className="border-line bg-line grid grid-cols-2 gap-px overflow-hidden rounded-lg border lg:grid-cols-4">
-        {kacheln.map((k) => (
-          <li key={k.label} className="bg-surface">
-            <Link href={k.href} className="group hover:bg-background focus-visible:bg-background flex h-full flex-col gap-3 p-5 transition-colors">
-              <span className="text-muted-foreground font-mono text-[11px] tracking-[0.14em] uppercase">{k.label}</span>
-              <span className="font-display text-3xl font-semibold tabular-nums tracking-tight md:text-4xl">
-                {k.wert ?? <span className="text-muted-foreground">—</span>}
-              </span>
-              <span className={`text-xs ${k.wert === null ? "text-muted-foreground" : k.ton}`}>
-                {k.wert === null ? t.nichtGemessen : k.unter ?? "\u00a0"}
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {/* Die Reihe bewegt sich als Ganzes: einzeln versetzt, blitzte das Linienraster (gap-px) durch. */}
+      <Reveal delay={0.12} duration={0.3} y={10}>
+        <ul className="border-line bg-line grid grid-cols-2 gap-px overflow-hidden rounded-lg border lg:grid-cols-4">
+          {kacheln.map((k) => (
+            <li key={k.label} className="bg-surface">
+              <Link href={k.href} className="group hover:bg-background focus-visible:bg-background flex h-full flex-col gap-3 p-5 transition-colors">
+                <span className="text-muted-foreground font-mono text-[11px] tracking-[0.14em] uppercase">{k.label}</span>
+                <span className="font-display text-3xl font-semibold tabular-nums tracking-tight md:text-4xl">
+                  {k.wert ?? <span className="text-muted-foreground">—</span>}
+                </span>
+                <span className={`text-xs ${k.wert === null ? "text-muted-foreground" : k.ton}`}>
+                  {k.wert === null ? t.nichtGemessen : k.unter ?? "\u00a0"}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
-        <Panel titel={t.wochen}>
+        <Panel i={3} titel={t.wochen}>
           {daten.wochen && daten.wochen.some((w) => w.anzahl > 0) ? (
             <div className="flex h-28 items-end gap-2" role="img" aria-label={daten.wochen.map((w) => `${w.start}: ${w.anzahl}`).join(", ")}>
               {daten.wochen.map((w, i) => (
@@ -189,7 +194,7 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
           )}
         </Panel>
 
-        <Panel titel={t.stufen}>
+        <Panel i={4} titel={t.stufen}>
           {stufenSumme > 0 ? (
             <>
               <div className="flex h-3 w-full overflow-hidden rounded-full" aria-hidden="true">
@@ -215,7 +220,7 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
           )}
         </Panel>
 
-        <Panel titel={t.quellen}>
+        <Panel i={5} titel={t.quellen}>
           {daten.quellen && daten.quellen.length > 0 ? (
             <ul className="flex flex-col gap-2.5">
               {daten.quellen.map((q) => (
@@ -244,12 +249,13 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
   )
 }
 
-function Panel({ titel, children }: { titel: string; children: React.ReactNode }) {
+/* Gestaffelt in Lesereihenfolge: 60 ms je Panel, die Kachelreihe sitzt an Stelle 2. */
+function Panel({ i, titel, children }: { i: number; titel: string; children: React.ReactNode }) {
   return (
-    <div className="border-line bg-surface flex flex-col gap-4 rounded-lg border p-5">
+    <Reveal delay={i * 0.06} duration={0.3} y={10} className="border-line bg-surface flex flex-col gap-4 rounded-lg border p-5">
       <h2 className="text-muted-foreground font-mono text-[11px] tracking-[0.14em] uppercase">{titel}</h2>
       {children}
-    </div>
+    </Reveal>
   )
 }
 

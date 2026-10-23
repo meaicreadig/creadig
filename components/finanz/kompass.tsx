@@ -2,6 +2,7 @@ import { eur, eurRund, monatKurz } from "@/components/finanz/format"
 import type { Hinweis, Monat, Steuertopf } from "@/lib/finanz/rechnen"
 import type { Paragraph19Projektion, Paragraph19Status } from "@/lib/finanz/paragraph19"
 import { aufUstPflichtUmstellen } from "@/app/(finanz)/finanz/actions"
+import { Zaehler } from "@/components/ui/zaehler"
 
 const SCHWERE = {
   critical: { text: "Jetzt", punkt: "bg-destructive" },
@@ -84,7 +85,9 @@ export function FinanzKompass({
           <h2 id="kompass" className="text-muted-foreground text-sm font-medium">
             Frei verfügbar
           </h2>
-          <p className="text-primary font-sans text-5xl font-semibold tracking-tight tabular-nums md:text-7xl">{eurRund(frei)}</p>
+          <p className="text-primary font-sans text-5xl font-semibold tracking-tight tabular-nums md:text-7xl">
+            <Zaehler wert={Math.round(frei / 100)} waehrung />
+          </p>
           <p className="text-muted-foreground text-sm leading-relaxed">Kontostand minus Steuertopf – dieses Geld gehört wirklich dir.</p>
         </div>
 

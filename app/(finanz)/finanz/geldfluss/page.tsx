@@ -12,6 +12,7 @@ import { berechneLage } from "@/lib/finanz/lage"
 import { finanzDb } from "@/lib/finanz/store"
 import { ladeAusgehendeBankUmsaetze, ladeOffeneBankUmsaetze, ladeOffeneRechnungenFuerAbgleich } from "@/lib/finanz/bank-abgleich"
 import { finanzOwnerSeite } from "@/lib/finanz/zugang"
+import { Reveal } from "@/components/ui/reveal"
 
 export const dynamic = "force-dynamic"
 export const metadata = { title: "Geldfluss" }
@@ -34,11 +35,22 @@ export default async function FinanzGeldfluss({ searchParams }: { searchParams: 
   ])
   return (
     <FinanzShell aktiv="geldfluss" titel="Geldfluss" unterzeile="Was kommt, was geht – und wie dein Konto in 13 Wochen aussieht.">
-      <LiquiditaetsBand wochen={szenarien[aktiv].wochen} topfCent={topf.gesamtCent} bewegungen={szenarien[aktiv].bewegungen} szenarien={szenarien} aktiv={aktiv} basis={basis} />
-      <BankImportKarte offeneUmsaetze={offeneUmsaetze} offeneRechnungen={offeneRechnungen} />
-      <BankAusgabenKarte abbuchungen={abbuchungen} />
-      <BuchungErfassen heute={heute} />
-      <BuchungsListe buchungen={buchungen} heute={heute} />
+      {/* Karten in Lesereihenfolge, 60 ms Abstand. */}
+      <Reveal duration={0.3} y={10}>
+        <LiquiditaetsBand wochen={szenarien[aktiv].wochen} topfCent={topf.gesamtCent} bewegungen={szenarien[aktiv].bewegungen} szenarien={szenarien} aktiv={aktiv} basis={basis} />
+      </Reveal>
+      <Reveal delay={0.06} duration={0.3} y={10}>
+        <BankImportKarte offeneUmsaetze={offeneUmsaetze} offeneRechnungen={offeneRechnungen} />
+      </Reveal>
+      <Reveal delay={0.12} duration={0.3} y={10}>
+        <BankAusgabenKarte abbuchungen={abbuchungen} />
+      </Reveal>
+      <Reveal delay={0.18} duration={0.3} y={10}>
+        <BuchungErfassen heute={heute} />
+      </Reveal>
+      <Reveal delay={0.24} duration={0.3} y={10}>
+        <BuchungsListe buchungen={buchungen} heute={heute} />
+      </Reveal>
     </FinanzShell>
   )
 }

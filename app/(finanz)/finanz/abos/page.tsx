@@ -4,6 +4,8 @@ import { aboUmschalten } from "@/app/(finanz)/finanz/abos/actions"
 import { AboFormular } from "@/components/finanz/abo-formular"
 import { eur, tag } from "@/components/finanz/format"
 import { FinanzShell, OhneSpeicher } from "@/components/finanz/shell"
+import { Reveal } from "@/components/ui/reveal"
+import { Zaehler } from "@/components/ui/zaehler"
 import { kundenSchluessel } from "@/lib/finanz/abos-shared"
 import { INTERVALL_LABEL, VORLAUF_TAGE, ladeAbos } from "@/lib/finanz/abos"
 import { ladeKunden } from "@/lib/finanz/auftraege/store"
@@ -33,7 +35,7 @@ export default async function FinanzAbos() {
     >
       <section className="bg-card flex flex-col gap-2 rounded-[2rem] p-7">
         <h2 className="text-muted-foreground text-sm font-medium">Planbarer Jahresumsatz (netto, aktive Abos)</h2>
-        <span className="text-primary text-4xl font-semibold tabular-nums">{eur(jahresCent)}</span>
+        <Zaehler wert={jahresCent / 100} waehrung nachkomma={2} className="text-primary text-4xl font-semibold tabular-nums" />
       </section>
 
       <section className="bg-card flex flex-col gap-4 rounded-[2rem] p-7">
@@ -42,8 +44,9 @@ export default async function FinanzAbos() {
           <p className="text-muted-foreground text-sm">Noch kein Abo. Lege eines an — der Rest läuft von allein bis zum Entwurf.</p>
         ) : (
           <ul className="flex flex-col">
-            {abos.map((a) => (
-              <li key={a.id} className="border-line flex flex-wrap items-center gap-3 border-b py-3 last:border-0">
+            {/* Gestaffelt, ab der neunten Zeile ohne weitere Verzögerung – lange Listen sollen nicht nachlaufen. */}
+            {abos.map((a, i) => (
+              <Reveal as="li" key={a.id} delay={Math.min(i, 8) * 0.04} duration={0.3} y={8} className="border-line flex flex-wrap items-center gap-3 border-b py-3 last:border-0">
                 <div className="flex min-w-0 flex-1 flex-col">
                   <span className="font-medium">{a.titel} · {a.kunde.firma || a.kunde.name}</span>
                   <span className="text-muted-foreground text-xs">
@@ -57,7 +60,7 @@ export default async function FinanzAbos() {
                   <input type="hidden" name="aktiv" value={a.aktiv ? "0" : "1"} />
                   <button type="submit" className="text-muted-foreground text-xs underline">{a.aktiv ? "Pausieren" : "Fortsetzen"}</button>
                 </form>
-              </li>
+              </Reveal>
             ))}
           </ul>
         )}
