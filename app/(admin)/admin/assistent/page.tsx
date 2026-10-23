@@ -393,6 +393,9 @@ function AgentKarte({ a, lauf }: { a: AgentInfo; lauf?: Lauf }) {
 
 function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele }) {
   const offen = f.status === "offen"
+  /* Die Redaktion plant jeden Beitrag für ein Ziel. Ist die Firmenseite nicht
+     verbunden, darf der Knopf nicht still aufs Privatprofil ausweichen (23.10.). */
+  const geplantesZiel = f.extra.ziel === "inhaber" ? "inhaber" : "firma"
   return (
     <li className="flex min-w-0 flex-col overflow-hidden break-words rounded-3xl bg-card shadow-sm [overflow-wrap:anywhere]">
       {f.bildPfad ? (
@@ -471,6 +474,15 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele })
                 className="resize-y rounded-2xl bg-muted px-4 py-3 text-sm leading-relaxed text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary"
               />
               {f.extra.fehler ? <p role="alert" className="text-sm text-destructive">{f.extra.fehler}</p> : null}
+              {geplantesZiel === "firma" && !linkedin.firma ? (
+                <p role="alert" className="text-sm text-destructive">
+                  Geplant für die Firmenseite – die ist nicht verbunden.{" "}
+                  <Link href="/admin/verbindungen" className="underline underline-offset-2">
+                    Firmenseite verbinden
+                  </Link>{" "}
+                  oder bewusst „Mein Profil“ wählen.
+                </p>
+              ) : null}
               {linkedin.firma || linkedin.inhaber ? (
                 <fieldset className="flex flex-wrap gap-2">
                   <legend className="sr-only">Wo auf LinkedIn posten?</legend>
@@ -481,12 +493,12 @@ function ArtikelKarte({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele })
                     ] as const
                   )
                     .filter((z) => z.name)
-                    .map((z, i) => (
+                    .map((z) => (
                       <label
                         key={z.kanal}
                         className="flex cursor-pointer items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-sm text-foreground has-[:checked]:bg-primary has-[:checked]:text-primary-foreground"
                       >
-                        <input type="radio" name="ziel" value={z.kanal} defaultChecked={i === 0} className="sr-only" />
+                        <input type="radio" name="ziel" value={z.kanal} defaultChecked={z.kanal === geplantesZiel} required className="sr-only" />
                         {z.label}
                       </label>
                     ))}

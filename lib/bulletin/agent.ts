@@ -28,16 +28,32 @@ const FIRMA = firmenText("voll")
 
 type Fund = { ressort: string; titel: string; fakten: string; quelle: string; url: string; datum?: string }
 
+/*
+  Perplexity schreibt Quellenmarken wie „[1]“ in den Text. Trifft das erste
+  „[“ oder das letzte „]“ so eine Marke, scheitert JSON.parse und der Lauf
+  meldet „zu wenige Meldungen“ — vermutlich der Grund für die leeren Morgen
+  (23.10., Lauf nach 4,7 s fertig). Deshalb: erst ein ```json-Block, sonst
+  jeden Anfang probieren, auf den ein Objekt folgt.
+*/
 function json<T>(text: string, auf: "[" | "{"): T | null {
   const zu = auf === "[" ? "]" : "}"
-  const start = text.indexOf(auf)
-  const ende = text.lastIndexOf(zu)
-  if (start < 0 || ende <= start) return null
-  try {
-    return JSON.parse(text.slice(start, ende + 1)) as T
-  } catch {
-    return null
+  const block = text.match(/```(?:json)?\s*([\s\S]*?)```/)
+  const quellen = block ? [block[1], text] : [text]
+  for (const t of quellen) {
+    const ende = t.lastIndexOf(zu)
+    const anfaenge = [...t.matchAll(auf === "[" ? /\[\s*\{/g : /\{/g)].map((m) => m.index)
+    for (const start of anfaenge) {
+      if (start >= ende) break
+      for (let e = ende; e > start; e = t.lastIndexOf(zu, e - 1)) {
+        try {
+          return JSON.parse(t.slice(start, e + 1)) as T
+        } catch {
+          /* nächster Versuch */
+        }
+      }
+    }
   }
+  return null
 }
 
 const zwei = (v: unknown): Zweisprachig | null => {
@@ -102,6 +118,7 @@ export async function erstelleBulletin(opt: { erzwingen?: boolean } = {}): Promi
   if (!opt.erzwingen && (await ausgabeExistiert(tag))) return { ergebnis: "Heutige Ausgabe liegt schon vor", anzahl: 0 }
 
   const funde = await recherchiere(tag)
+  if (funde.length < 3) console.warn("[bulletin] nur", funde.length, "Funde")
   if (funde.length < 3) return { ergebnis: "Zu wenige belegte Meldungen gefunden – nächster Versuch beim nächsten Takt", anzahl: 0 }
 
   const e = await ordneEin(funde)

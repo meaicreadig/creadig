@@ -201,7 +201,8 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
     after(() => schreibeAntragsskizze(fid).catch((e) => console.error("[kapital] skizze", e)))
   }
 
-  const zielWert = form.get("ziel")
+  /* Ohne Auswahl gilt das geplante Ziel – nie stillschweigend das Privatprofil. */
+  const zielWert = form.get("ziel") ?? (f.art === "linkedin" ? (f.extra.ziel ?? "firma") : null)
   const kanal = zielWert === "firma" ? "firma" : "inhaber"
   const aufLinkedin = zielWert !== "keins"
   const aufInstagram = form.get("instagram") === "ja"

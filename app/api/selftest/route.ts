@@ -115,6 +115,21 @@ async function checkResend(apiKey: string, domain: string | null): Promise<Check
     return { name: "resend", ok: false, detail: `nicht erreichbar: ${String(error)}` }
   }
 
+  /*
+    Ein reiner Sende-Schlüssel bekommt auf /domains ebenfalls 401, aber mit
+    name "restricted_api_key". Der Schlüssel ist gültig — Morgenbriefing und
+    Alarm gehen damit raus. Fehlalarm vom 23.10. — das unterscheiden wir jetzt.
+  */
+  if (response.status === 401) {
+    const body = (await response.clone().json().catch(() => null)) as { name?: string } | null
+    if (body?.name === "restricted_api_key") {
+      return {
+        name: "resend",
+        ok: true,
+        detail: "Sende-Schlüssel gültig (ohne Leserecht auf Domains) — Verifizierung nicht prüfbar",
+      }
+    }
+  }
   /* 400 kommt bei einem formal kaputten Schluessel, 401 bei einem gueltig
      geformten, den Resend nicht kennt — fuer uns dasselbe Ergebnis. */
   if (response.status === 400 || response.status === 401) {
@@ -243,7 +258,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false }, { status: 404, headers: { "Cache-Control": "no-store" } })
   }
 
-  const apiKey = process.env.RESEND_API_KEY
+  const apiKey = process.env.RESEND_API_KEY?.trim()
   const from = process.env.LEAD_FROM
   const to = process.env.LEAD_TO || "info@creadig.de"
   const checks: Check[] = []
