@@ -170,7 +170,7 @@ export default async function FinanzHeute({ searchParams }: { searchParams: Prom
 /* Gestaffelt (60 ms je Kachel) und mit leichtem Anheben beim Hover — Bewegung zeigt Reihenfolge, nicht Ladezustand. */
 function Kachel({ i, href, label, wert, fuss, warnung }: { i: number; href: string; label: string; wert: ReactNode; fuss: string; warnung?: boolean }) {
   return (
-    <Reveal as="li" delay={i * 0.06} duration={0.3} y={10}>
+    <Reveal as="li" delay={i * 0.06} duration={0.35} y={20}>
       <Link
         href={href}
         className="bg-card hover:bg-card/80 flex h-full flex-col gap-1 rounded-[1.5rem] p-5 transition-[transform,box-shadow,background-color] duration-200 hover:shadow-md motion-safe:hover:-translate-y-0.5"

@@ -46,7 +46,7 @@ export default async function FinanzAbos() {
           <ul className="flex flex-col">
             {/* Gestaffelt, ab der neunten Zeile ohne weitere Verzögerung – lange Listen sollen nicht nachlaufen. */}
             {abos.map((a, i) => (
-              <Reveal as="li" key={a.id} delay={Math.min(i, 8) * 0.04} duration={0.3} y={8} className="border-line flex flex-wrap items-center gap-3 border-b py-3 last:border-0">
+              <Reveal as="li" key={a.id} delay={Math.min(i, 8) * 0.04} duration={0.35} y={16} className="border-line flex flex-wrap items-center gap-3 border-b py-3 last:border-0">
                 <div className="flex min-w-0 flex-1 flex-col">
                   <span className="font-medium">{a.titel} · {a.kunde.firma || a.kunde.name}</span>
                   <span className="text-muted-foreground text-xs">

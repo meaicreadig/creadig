@@ -11,9 +11,13 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react"
  * und Hydration rendern deshalb den Endwert; ein Hochzählen von 0 hieße,
  * erst die richtige Zahl zu zeigen, dann eine falsche, dann wieder die richtige.
  *
- * Gezählt wird, wenn die Zahl im Client neu entsteht (Navigation im System)
- * oder sich ändert (Jahr, Szenario, nach einer Aktion) — dort, wo Bewegung
- * zeigt, dass etwas passiert ist.
+ * Gezählt wird, wenn die Zahl im Client neu entsteht (Navigation im System),
+ * sich ändert (Jahr, Szenario, nach einer Aktion) oder beim Laden noch
+ * unterhalb des Blickfelds lag — dann zählt sie, sobald sie ins Bild kommt.
+ * Dort sah sie vorher niemand, also flackert nichts.
+ *
+ * 23.10.2026: Ohne den letzten Fall sah der Owner auf /admin keine Bewegung:
+ * Das Cockpit-Band liegt unter der Zentrale, und nach dem Login wird hart geladen.
  *
  * Reduzierte Bewegung: kein Zählen, der Wert springt. Die Vorliebe wird
  * direkt gelesen, nicht über `useReducedMotion` (siehe lib/use-prefers-reduced-motion.ts).
@@ -41,9 +45,28 @@ export function Zaehler({
   const imClient = useSyncExternalStore(nie, () => true, () => false)
   const [anzeige, setAnzeige] = useState(() => (imClient && !ruhig() ? 0 : wert))
   const letzter = useRef(anzeige)
+  const ref = useRef<HTMLSpanElement>(null)
+  const [sichtbar, setSichtbar] = useState(false)
 
   useEffect(() => {
-    if (letzter.current === wert) return
+    const el = ref.current
+    if (!el) return
+    /* Hart geladen, aber noch nicht im Bild: unsichtbar auf 0, beim Hinscrollen zählen. */
+    if (letzter.current !== 0 && !ruhig() && el.getBoundingClientRect().top > window.innerHeight) {
+      letzter.current = 0
+      setAnzeige(0)
+    }
+    const beobachter = new IntersectionObserver(([e]) => {
+      if (!e?.isIntersecting) return
+      setSichtbar(true)
+      beobachter.disconnect()
+    })
+    beobachter.observe(el)
+    return () => beobachter.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!sichtbar || letzter.current === wert) return
     if (ruhig()) {
       letzter.current = wert
       setAnzeige(wert)
@@ -58,7 +81,7 @@ export function Zaehler({
       },
     })
     return () => steuerung.stop()
-  }, [wert])
+  }, [wert, sichtbar])
 
   const format = new Intl.NumberFormat(intl, {
     ...(waehrung ? { style: "currency", currency: "EUR" } : {}),
@@ -66,7 +89,7 @@ export function Zaehler({
     maximumFractionDigits: nachkomma,
   })
   return (
-    <span className={className}>
+    <span ref={ref} className={className}>
       <span aria-hidden>{format.format(anzeige)}</span>
       <span className="sr-only">{format.format(wert)}</span>
     </span>

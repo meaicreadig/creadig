@@ -157,7 +157,7 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
         </Panel>
       </div>
       {/* Die Reihe bewegt sich als Ganzes: einzeln versetzt, blitzte das Linienraster (gap-px) durch. */}
-      <Reveal delay={0.12} duration={0.3} y={10}>
+      <Reveal delay={0.12} duration={0.35} y={20}>
         <ul className="border-line bg-line grid grid-cols-2 gap-px overflow-hidden rounded-lg border lg:grid-cols-4">
           {kacheln.map((k) => (
             <li key={k.label} className="bg-surface">
@@ -252,7 +252,7 @@ export function CockpitBand({ daten, sprache, intl }: { daten: CockpitDaten; spr
 /* Gestaffelt in Lesereihenfolge: 60 ms je Panel, die Kachelreihe sitzt an Stelle 2. */
 function Panel({ i, titel, children }: { i: number; titel: string; children: React.ReactNode }) {
   return (
-    <Reveal delay={i * 0.06} duration={0.3} y={10} className="border-line bg-surface flex flex-col gap-4 rounded-lg border p-5">
+    <Reveal delay={i * 0.06} duration={0.35} y={20} className="border-line bg-surface flex flex-col gap-4 rounded-lg border p-5">
       <h2 className="text-muted-foreground font-mono text-[11px] tracking-[0.14em] uppercase">{titel}</h2>
       {children}
     </Reveal>

@@ -36,19 +36,19 @@ export default async function FinanzGeldfluss({ searchParams }: { searchParams: 
   return (
     <FinanzShell aktiv="geldfluss" titel="Geldfluss" unterzeile="Was kommt, was geht – und wie dein Konto in 13 Wochen aussieht.">
       {/* Karten in Lesereihenfolge, 60 ms Abstand. */}
-      <Reveal duration={0.3} y={10}>
+      <Reveal duration={0.35} y={20}>
         <LiquiditaetsBand wochen={szenarien[aktiv].wochen} topfCent={topf.gesamtCent} bewegungen={szenarien[aktiv].bewegungen} szenarien={szenarien} aktiv={aktiv} basis={basis} />
       </Reveal>
-      <Reveal delay={0.06} duration={0.3} y={10}>
+      <Reveal delay={0.06} duration={0.35} y={20}>
         <BankImportKarte offeneUmsaetze={offeneUmsaetze} offeneRechnungen={offeneRechnungen} />
       </Reveal>
-      <Reveal delay={0.12} duration={0.3} y={10}>
+      <Reveal delay={0.12} duration={0.35} y={20}>
         <BankAusgabenKarte abbuchungen={abbuchungen} />
       </Reveal>
-      <Reveal delay={0.18} duration={0.3} y={10}>
+      <Reveal delay={0.18} duration={0.35} y={20}>
         <BuchungErfassen heute={heute} />
       </Reveal>
-      <Reveal delay={0.24} duration={0.3} y={10}>
+      <Reveal delay={0.24} duration={0.35} y={20}>
         <BuchungsListe buchungen={buchungen} heute={heute} />
       </Reveal>
     </FinanzShell>
