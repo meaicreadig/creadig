@@ -25,6 +25,57 @@ const AGENT_NAMEN: Record<string, Record<Sprache, string>> = {
   finanz: { de: "Finanz", tr: "Finans" },
   projekte: { de: "Projektleitung", tr: "Proje lideri" },
   webseite: { de: "Website-Prüfer", tr: "Web sitesi denetçisi" },
+  international: { de: "International", tr: "Uluslararası" },
+  marketing: { de: "Marketing", tr: "Pazarlama" },
+  kundenservice: { de: "Kundenservice", tr: "Müşteri hizmetleri" },
+  produkt: { de: "Produkt", tr: "Ürün" },
+  entwicklung: { de: "Entwicklung", tr: "Geliştirme" },
+  forschung: { de: "Forschung", tr: "Araştırma" },
+  sicherheit: { de: "Sicherheit", tr: "Güvenlik" },
+  einkauf: { de: "Einkauf", tr: "Satın alma" },
+  qualitaet: { de: "Qualität", tr: "Kalite" },
+  wissen: { de: "Wissen", tr: "Bilgi yönetimi" },
+  forderungen: { de: "Forderungen", tr: "Alacaklar" },
+  recht: { de: "Recht & Compliance", tr: "Hukuk & uyum" },
+  personal: { de: "Personal", tr: "İnsan kaynakları" },
+}
+
+export type Erscheinung = { frau: boolean; kopftuch: boolean; haut: number }
+export type Mitarbeiter = AgentStand & { vorname: string; rolle: string; aussehen: Erscheinung }
+
+/** Feste Besetzung: jeder Agent hat einen eigenen Menschen-Namen (deutsch oder türkisch) und ein festes Aussehen. */
+const PERSONAL: Record<string, { vorname: string } & Erscheinung> = {
+  koordinator: { vorname: "Elif", frau: true, kopftuch: true, haut: 1 },
+  rat: { vorname: "Johannes", frau: false, kopftuch: false, haut: 0 },
+  lage: { vorname: "Merve", frau: true, kopftuch: true, haut: 2 },
+  kapital: { vorname: "Konstantin", frau: false, kopftuch: false, haut: 0 },
+  international: { vorname: "Leyla", frau: true, kopftuch: false, haut: 2 },
+  golf: { vorname: "Yusuf", frau: false, kopftuch: false, haut: 3 },
+  bulletin: { vorname: "Sophie", frau: true, kopftuch: false, haut: 0 },
+  marketing: { vorname: "Zeynep", frau: true, kopftuch: true, haut: 1 },
+  redaktion: { vorname: "Lukas", frau: false, kopftuch: false, haut: 1 },
+  messen: { vorname: "Ayşe", frau: true, kopftuch: true, haut: 2 },
+  jaeger: { vorname: "Emre", frau: false, kopftuch: false, haut: 2 },
+  vertrieb: { vorname: "Julia", frau: true, kopftuch: false, haut: 0 },
+  motor: { vorname: "Felix", frau: false, kopftuch: false, haut: 0 },
+  kundenservice: { vorname: "Fatma", frau: true, kopftuch: true, haut: 3 },
+  produkt: { vorname: "Can", frau: false, kopftuch: false, haut: 2 },
+  entwicklung: { vorname: "Jonas", frau: false, kopftuch: false, haut: 1 },
+  forschung: { vorname: "Hatice", frau: true, kopftuch: true, haut: 1 },
+  webseite: { vorname: "Tobias", frau: false, kopftuch: false, haut: 0 },
+  sicherheit: { vorname: "Kerem", frau: false, kopftuch: false, haut: 3 },
+  projekte: { vorname: "Laura", frau: true, kopftuch: false, haut: 1 },
+  einkauf: { vorname: "Mustafa", frau: false, kopftuch: false, haut: 3 },
+  qualitaet: { vorname: "Anna", frau: true, kopftuch: false, haut: 0 },
+  wissen: { vorname: "Büşra", frau: true, kopftuch: true, haut: 2 },
+  finanz: { vorname: "Mehmet", frau: false, kopftuch: false, haut: 2 },
+  forderungen: { vorname: "Lena", frau: true, kopftuch: false, haut: 1 },
+  recht: { vorname: "Sarah", frau: true, kopftuch: false, haut: 0 },
+  personal: { vorname: "Selin", frau: true, kopftuch: false, haut: 2 },
+}
+
+function person(g: string) {
+  return PERSONAL[g] ?? { vorname: g.charAt(0).toUpperCase() + g.slice(1), frau: false, kopftuch: false, haut: 1 }
 }
 
 const RANG: Record<Zustand, number> = { ruhig: 0, aktiv: 1, achtung: 2, stoerung: 3 }
@@ -44,7 +95,7 @@ export type Raum = {
   punkte: string[]
   agenten: string[]
   /** Pro zugeordnetem Agenten der echte letzte Lauf (zeit null = nie einer erfasst). */
-  agentenStand: AgentStand[]
+  agentenStand: Mitarbeiter[]
   wege: { label: string; href: string }[]
 }
 
@@ -87,10 +138,13 @@ export function bauHauptsitz(
             ? sprache === "tr" ? "Kadro yok. Bu departman henüz kurulmadı." : "Nicht besetzt. Diese Abteilung ist noch nicht aufgebaut."
             : sprache === "tr" ? "Henüz ölçülen bir alan yok." : "Noch keine gemessene Fläche."),
         punkte: signale.flatMap((s) => s.punkte).slice(0, 4),
-        agenten: a.agenten.map((g) => AGENT_NAMEN[g]?.[sprache] ?? g),
+        agenten: a.agenten.map((g) => `${person(g).vorname} · ${AGENT_NAMEN[g]?.[sprache] ?? g}`),
         agentenStand: a.agenten.map((g) => ({
           id: g,
           name: AGENT_NAMEN[g]?.[sprache] ?? g,
+          vorname: person(g).vorname,
+          rolle: AGENT_NAMEN[g]?.[sprache] ?? g,
+          aussehen: { frau: person(g).frau, kopftuch: person(g).kopftuch, haut: person(g).haut },
           takt: live?.takte[g] ?? null,
           zeit: live?.laeufe[g]?.zeit ?? null,
           fehler: live?.laeufe[g]?.fehler ?? false,

@@ -226,7 +226,8 @@ export function Hauptsitz({ etagen, raeume, faeden, sprache }: { etagen: Etage[]
                         <li key={a.id} className="flex items-center justify-between gap-3 rounded-2xl bg-primary/10 px-3 py-2 text-xs">
                           <span className="flex items-center gap-2 text-primary">
                             <span aria-hidden className={`size-1.5 rounded-full ${frisch ? "bg-primary" : a.fehler ? "bg-amber-500" : "bg-muted-foreground/40"}`} />
-                            {a.name}
+                            <span className="font-medium">{a.vorname}</span>
+                            <span className="text-primary/70">{a.rolle}</span>
                           </span>
                           <span className="text-muted-foreground">{stand}</span>
                         </li>
