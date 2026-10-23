@@ -52,10 +52,10 @@ const SCHEMA = [
     beantwortet_at timestamptz)`,
   `DO $$ BEGIN
      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'assistent_freigaben_art_check'
-                    AND pg_get_constraintdef(oid) LIKE '%loeschen%') THEN
+                    AND pg_get_constraintdef(oid) LIKE '%brief%') THEN
        ALTER TABLE assistent_freigaben DROP CONSTRAINT IF EXISTS assistent_freigaben_art_check;
        ALTER TABLE assistent_freigaben ADD CONSTRAINT assistent_freigaben_art_check
-         CHECK (art IN ('mail','aufgabe','termin','linkedin','kapital','notiz','loeschen'));
+         CHECK (art IN ('mail','aufgabe','termin','linkedin','kapital','notiz','loeschen','brief'));
      END IF;
    END $$`,
   /* Sperre je Agent: Cron und Seitenaufruf starten denselben Agenten nie gleichzeitig. */
@@ -74,7 +74,7 @@ const SCHEMA = [
 export const INTERNE_ARTEN = ["aufgabe", "notiz"] as const
 const NUR_SICHTBARE = `(art NOT IN ('aufgabe','notiz') OR coalesce(extra->'koordination'->>'beiEmin', '') = 'true')`
 
-export const FREIGABE_ARTEN = ["mail", "aufgabe", "termin", "linkedin", "kapital", "notiz", "loeschen"] as const
+export const FREIGABE_ARTEN = ["mail", "aufgabe", "termin", "linkedin", "kapital", "notiz", "loeschen", "brief"] as const
 export type FreigabeArt = (typeof FREIGABE_ARTEN)[number]
 
 export type Nachricht = { id: string; rolle: "user" | "assistant"; text: string; zeit: string }
@@ -117,6 +117,12 @@ export type FreigabeExtra = {
   stufe?: number
   vorgaenger?: string
   nachfassId?: string
+  /** Brief per Post (LetterXpress): Anschrift aus dem Impressum, Auftrag und Preis nach dem Versand. */
+  anschrift?: { firma: string; zusatz?: string; strasse: string; plz: string; ort: string; land?: string }
+  briefId?: string
+  briefPreis?: number | null
+  briefTest?: boolean
+  orgId?: string
   /** Löschauftrag: betroffene Firmen */
   orgIds?: string[]
   /** Kampagnen-Versand (Mail Studio): eine Zeile je Empfänger, damit Antworten zuordenbar sind — nie Nachfass-Kette. */

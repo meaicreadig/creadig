@@ -383,7 +383,7 @@ Antworte NUR mit JSON:
   return Boolean(angelegt)
 }
 
-type Ziel = { firma: string; ort: string; website: string; email?: string; warum: string; betreff: string; mail: string }
+type Ziel = { firma: string; ort: string; website: string; email?: string; strasse?: string; plz?: string; land?: string; warum: string; betreff: string; mail: string }
 
 const JAEGER_ANZAHL = 8
 
@@ -428,6 +428,8 @@ const JAGDREVIER = [
   },
 ]
 
+const slugJaeger = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 60)
+
 async function jaeger(): Promise<Ergebnis> {
   const woche = kw(new Date())
   const lauf = (await zaehleJaegerLaeufe()) + Number(woche.split("-")[1])
@@ -439,10 +441,10 @@ async function jaeger(): Promise<Ergebnis> {
 Finde ${JAEGER_ANZAHL * 2} echte, aktuell existierende Firmen als Neukunden für ${revier.produkt}.
 Zielgruppe: ${revier.suche}.
 Nur Firmen mit eigener Webseite, die du in der Quelle gesehen hast. Keine Konzerne. Keine Erfindungen.
-Bevorzuge Firmen, deren öffentliche Kontakt-E-Mail im Impressum/Kontakt steht, und gib sie an – niemals raten. Firmen ohne erkennbare E-Mail werden verworfen.
+Pflicht: die Postanschrift aus dem Impressum (Straße mit Hausnummer, PLZ, Ort, Land) – genau so, wie sie dort steht, niemals raten. Firmen ohne Impressums-Anschrift weglassen. Die öffentliche Kontakt-E-Mail nur angeben, wenn sie im Impressum steht.
 ${bekannt.length ? `Diese Firmen kennen wir schon – NICHT erneut nennen: ${bekannt.slice(0, 80).join(", ")}.` : ""}
 Für jede Firma einen kurzen persönlichen BRIEF auf Deutsch (Post, keine E-Mail – Werbung per E-Mail ohne Einwilligung ist unzulässig; 90–140 Wörter, per Sie, Absender Muhammed Emin Akyol): ein konkreter Bezug zur Firma, ein Nutzen aus "${revier.angebot}", am Ende die Einladung, sich bei Interesse selbst zu melden (creadig.de/termin). Kein Werbeton, keine Superlative, keine Aufzählungen.
-Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","email":"","warum":"1 Satz, warum gerade diese Firma","betreff":"","mail":""}]`,
+Antworte NUR mit JSON-Array: [{"firma":"","strasse":"","plz":"","ort":"","land":"Deutschland","website":"https://...","email":"","warum":"1 Satz, warum gerade diese Firma","betreff":"","mail":"nur der Brieftext ab der Anrede, mit Gruß und Name"}]`,
   })
   const ziele = jsonListe<Ziel>(text)
     .filter((z) => z?.firma && z?.website?.startsWith("http") && z?.mail)
@@ -473,10 +475,18 @@ Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","emai
     } catch {}
     const genannt = istMail(z.email) && z.email.trim().toLowerCase().endsWith(`@${host}`) ? z.email.trim().toLowerCase() : null
     const an = adressen[i] ?? genannt
-    /* Recht & Compliance: keine Kaltmail mehr. Zielfirma landet mit Briefentwurf beim Kunden, Marketing übernimmt die Ansprache. */
-    if (!an || !q) continue
+    /*
+     * Erstansprache per Brief (Owner-Entscheid 24.10.2026): Pflicht ist die
+     * Impressums-Anschrift, nicht mehr die E-Mail. Bis hierher verwarf der
+     * Jäger jede Firma ohne auffindbare Mail – am 23.10. blieb so 1 von 16.
+     */
+    const anschrift =
+      z.strasse?.trim() && /^\d{4,5}$/.test(z.plz?.trim() ?? "") && z.ort?.trim()
+        ? { firma: z.firma.trim(), strasse: z.strasse.trim(), plz: z.plz!.trim(), ort: z.ort.trim(), land: z.land?.trim() || undefined }
+        : null
+    if (!anschrift || !q) continue
     if (neu >= JAEGER_ANZAHL) break
-    if (await sperrGrund(an)) continue
+    if (an && (await sperrGrund(an))) continue
     const firma = await findeOderLegeFirma(q, {
       name: z.firma,
       website: z.website,
@@ -486,8 +496,18 @@ Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","emai
     if (!firma.neu) continue
     await q(`UPDATE organisations SET note = concat_ws(E'\n\n', nullif(note,''), $2::text), updated_at = now() WHERE id = $1`, [
       firma.id,
-      `Kontakt laut Webseite: ${an}\nAnsprache: Brief per Post oder persönlich – Werbung per E-Mail ohne Einwilligung ist unzulässig (UWG § 7).\n${check ? webcheckNotiz(check) : ""}\n\nBriefentwurf – ${z.betreff}:\n${z.mail}${ps}`.slice(0, 4000),
+      `Anschrift laut Impressum: ${anschrift.strasse}, ${anschrift.plz} ${anschrift.ort}${an ? `\nKontakt laut Webseite: ${an}` : ""}\nAnsprache: Brief per Post – Werbung per E-Mail ohne Einwilligung ist unzulässig (UWG § 7).\n${check ? webcheckNotiz(check) : ""}`.slice(0, 4000),
     ])
+    await legeFreigabeAn({
+      art: "brief",
+      titel: `Brief an ${z.firma} (${z.ort})`,
+      inhalt: `${z.mail.trim()}${ps}`,
+      betreff: z.betreff,
+      empfaenger: an ?? null,
+      quelle: `brief:${host || slugJaeger(z.firma)}`,
+      agent: "jaeger",
+      extra: { warum: z.warum, anschrift, orgId: firma.id, produkt: revier.id === "fibero" || revier.id === "stammo" ? revier.id : "creadig" },
+    })
     liste.push(`- ${z.firma} (${z.ort}) · ${z.website} · ${z.warum}`)
     neu++
   }
@@ -497,11 +517,11 @@ Antworte NUR mit JSON-Array: [{"firma":"","ort":"","website":"https://...","emai
       von: "vertrieb",
       an: "marketing",
       titel: `Zielliste KW ${woche}: ${liste.length} Firmen für ${revier.produkt}`,
-      inhalt: `Zielgruppe: ${revier.suche}\nAngebot: ${revier.angebot}\n\n${liste.join("\n")}\n\nBriefentwürfe liegen an der Firma (Kunden). Kein Mailversand ohne Einwilligung.`,
+      inhalt: `Zielgruppe: ${revier.suche}\nAngebot: ${revier.angebot}\n\n${liste.join("\n")}\n\nDie Briefe liegen fertig bei Emin zur Freigabe (Post über LetterXpress). Kein Mailversand ohne Einwilligung.`,
       quelle: `jaeger:${woche}:${revier.id}`,
     })
   }
-  return { ergebnis: `${neu} Zielfirmen für ${revier.produkt} recherchiert – Ansprache per Brief, keine Kaltmail`, anzahl: neu }
+  return { ergebnis: `${neu} Zielfirmen für ${revier.produkt} recherchiert – ${neu} Briefe zur Freigabe`, anzahl: neu }
 }
 
 async function rat(opt: { manuell?: boolean } = {}): Promise<Ergebnis> {

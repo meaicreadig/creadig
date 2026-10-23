@@ -193,6 +193,44 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
     await protokolliereFaden(await assistentDb().catch(() => null), "assistent", "mailstudio", betreff)
   }
 
+  if (status === "freigegeben" && f.art === "brief") {
+    const vorher = f.extra.anschrift
+    const feld = (k: string, alt = "") => String(form.get(k) ?? alt).trim()
+    const anschrift = {
+      firma: feld("firma", vorher?.firma),
+      zusatz: feld("zusatz", vorher?.zusatz) || undefined,
+      strasse: feld("strasse", vorher?.strasse),
+      plz: feld("plz", vorher?.plz),
+      ort: feld("ort", vorher?.ort),
+      land: feld("land", vorher?.land) || undefined,
+    }
+    const betreff = String(form.get("betreff") ?? f.betreff ?? "").trim() || f.titel
+    const text = typeof inhalt === "string" && inhalt.trim() ? inhalt.trim() : f.inhalt
+    if (!anschrift.firma || !anschrift.strasse || !anschrift.plz || !anschrift.ort) {
+      await ergaenzeExtra(fid, { anschrift, fehler: "Anschrift unvollständig – Firma, Straße, PLZ und Ort sind Pflicht." })
+      revalidatePath("/admin/assistent")
+      return
+    }
+    const { erzeugeBriefPdf } = await import("@/lib/brief/pdf")
+    const { sendeBrief } = await import("@/lib/brief/letterxpress")
+    const pdf = await erzeugeBriefPdf({ an: anschrift, betreff, text })
+    const ausland = Boolean(anschrift.land && !/^(de|deutschland|germany)$/i.test(anschrift.land))
+    const r = await sendeBrief(pdf, { dateiname: `brief-${fid}.pdf`, ausland })
+    if (!r.ok) {
+      await ergaenzeExtra(fid, { anschrift, fehler: r.grund })
+      revalidatePath("/admin/assistent")
+      return
+    }
+    await ergaenzeExtra(fid, { anschrift, briefId: r.id, briefPreis: r.preisEur, briefTest: r.test, gesendetAt: new Date().toISOString(), fehler: undefined })
+    const db = await assistentDb().catch(() => null)
+    if (db && f.extra.orgId)
+      await db(`UPDATE organisations SET note = concat_ws(E'\n\n', nullif(note,''), $2::text), updated_at = now() WHERE id = $1`, [
+        f.extra.orgId,
+        `Brief per Post ${r.test ? "(Testmodus) " : ""}am ${new Date().toLocaleDateString("de-DE", { timeZone: "Europe/Berlin" })}: ${betreff}`,
+      ]).catch(() => null)
+    await protokolliereFaden(db, "assistent", "vertrieb", `Brief: ${betreff}`)
+  }
+
   if (status === "freigegeben" && f.art === "loeschen") {
     if (form.get("bestaetigt") !== "ja") return
     const r = await loescheFirmen(f.extra.orgIds ?? [])

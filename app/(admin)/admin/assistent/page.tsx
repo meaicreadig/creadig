@@ -37,6 +37,7 @@ import {
   Earth,
   ShoppingCart,
   UserCog,
+  Send,
 } from "lucide-react"
 import { saeuleVon, zeitpunktText } from "@/lib/assistent/linkedin-plan"
 
@@ -355,6 +356,7 @@ const ART: Record<FreigabeArt, { label: string; Icon: typeof Mail }> = {
   kapital: { label: "Kapital", Icon: Coins },
   notiz: { label: "Notiz", Icon: StickyNote },
   loeschen: { label: "Löschen", Icon: Trash2 },
+  brief: { label: "Brief", Icon: Send },
 }
 
 const AGENT_ICON: Record<AgentKey, typeof Mail> = {
@@ -799,6 +801,117 @@ function LinkedinStatus({ ziele, meldung }: { ziele: LinkedinZiele; meldung?: st
 
 const feld = "w-full rounded-2xl bg-muted px-4 py-2.5 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary"
 
+function BriefKarte({ f }: { f: Freigabe }) {
+  const offen = f.status === "offen"
+  const a = f.extra.anschrift
+  return (
+    <li className={offen ? "flex flex-col gap-3 rounded-3xl bg-card p-5 shadow-sm" : "flex flex-col gap-2 rounded-3xl bg-card/60 p-5"}>
+      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-primary">
+          <Send className="size-3.5" aria-hidden="true" />
+          Brief per Post
+        </span>
+        <span>von {agentName(f.agent)} · {seit(f.zeit)}</span>
+        {f.status === "verworfen" ? <span>· verworfen</span> : null}
+      </div>
+      <h3 className="text-balance font-medium leading-snug text-foreground">{f.titel}</h3>
+      {f.extra.warum && offen ? <p className="text-sm text-muted-foreground">{f.extra.warum}</p> : null}
+      {offen ? (
+        <form action={freigabeEntscheiden} className="flex flex-col gap-3">
+          <input type="hidden" name="id" value={f.id} />
+          <input type="hidden" name="status" value="freigegeben" />
+          <input type="hidden" name="titel" value={f.titel} />
+          <p className="text-sm text-muted-foreground">
+            {a ? `${a.firma} · ${a.strasse} · ${a.plz} ${a.ort}` : "Anschrift fehlt noch"}
+          </p>
+          <details className="group">
+            <summary className="w-fit cursor-pointer list-none rounded-full bg-primary/10 px-4 py-2 text-sm text-primary hover:bg-primary/15">
+              <span className="group-open:hidden">Brief ansehen und ändern</span>
+              <span className="hidden group-open:inline">Zuklappen</span>
+            </summary>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <label className="flex flex-col gap-1 text-xs text-muted-foreground sm:col-span-2">
+                Firma
+                <input name="firma" defaultValue={a?.firma ?? ""} required className={feld} />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-muted-foreground sm:col-span-2">
+                Zusatz
+                <input name="zusatz" defaultValue={a?.zusatz ?? ""} placeholder="z. Hd. der Geschäftsleitung" className={feld} />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-muted-foreground sm:col-span-2">
+                Straße
+                <input name="strasse" defaultValue={a?.strasse ?? ""} required className={feld} />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+                PLZ
+                <input name="plz" defaultValue={a?.plz ?? ""} required className={feld} />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+                Ort
+                <input name="ort" defaultValue={a?.ort ?? ""} required className={feld} />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-muted-foreground sm:col-span-2">
+                Land (leer = Deutschland)
+                <input name="land" defaultValue={a?.land ?? ""} className={feld} />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-muted-foreground sm:col-span-2">
+                Betreff
+                <input name="betreff" defaultValue={f.betreff ?? ""} className={feld} />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-muted-foreground sm:col-span-2">
+                Text
+                <textarea name="inhalt" rows={10} defaultValue={f.inhalt} className={`${feld} leading-relaxed`} />
+              </label>
+            </div>
+          </details>
+          {f.extra.fehler ? (
+            <p role="alert" className="text-sm text-destructive">
+              {f.extra.fehler}
+            </p>
+          ) : null}
+          <div className="flex flex-wrap gap-2">
+            <AktionKnopf
+              nichtWenn="verworfen"
+              laeuft="Geht in den Druck …"
+              fertig="Brief ist beim Druckdienst – Zustellung in 1–3 Werktagen"
+              className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground"
+            >
+              <Check className="size-4" aria-hidden="true" />
+              Freigeben und per Post senden
+            </AktionKnopf>
+            <a
+              href={`/api/assistent/brief/${encodeURIComponent(f.id)}`}
+              target="_blank"
+              rel="noopener"
+              className="flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-2 text-sm text-primary hover:bg-primary/15"
+            >
+              PDF ansehen
+            </a>
+            <GrundWahl />
+            <AktionKnopf
+              formAction={freigabeVerwerfen}
+              formNoValidate
+              laeuft="Wird verworfen …"
+              fertig="Verworfen – nichts wurde gesendet"
+              className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground"
+            >
+              <X className="size-4" aria-hidden="true" />
+              Verwerfen
+            </AktionKnopf>
+          </div>
+          <p className="text-xs text-muted-foreground">Gedruckt, kuvertiert und frankiert von LetterXpress (s/w, ca. 1 € je Brief). Geänderter Text gilt erst nach dem Speichern – die PDF-Vorschau zeigt den letzten gespeicherten Stand.</p>
+        </form>
+      ) : f.extra.gesendetAt ? (
+        <p className="text-sm text-muted-foreground">
+          Per Post an {a?.firma ?? "Empfänger"} · {seit(f.extra.gesendetAt)}
+          {f.extra.briefTest ? " · Testmodus (nicht gedruckt)" : ""}
+          {f.extra.briefPreis ? ` · ${f.extra.briefPreis.toFixed(2).replace(".", ",")} €` : ""}
+        </p>
+      ) : null}
+    </li>
+  )
+}
+
 function MailKarte({ f }: { f: Freigabe }) {
   const offen = f.status === "offen"
   const notiz = f.inhalt.split(/\n-{3,}\n/)[1]?.trim()
@@ -1012,6 +1125,7 @@ function FreigabeInhalt({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele 
   if (f.art === "linkedin") return <ArtikelKarte f={f} linkedin={linkedin} />
   if (f.art === "mail") return <MailKarte f={f} />
   if (f.art === "loeschen") return <LoeschKarte f={f} />
+  if (f.art === "brief") return <BriefKarte f={f} />
   const { label, Icon } = ART[f.art]
   const offen = f.status === "offen"
   return (
