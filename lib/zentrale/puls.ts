@@ -4,9 +4,12 @@ import { assistentDb, letzteLaeufe, protokolliereLauf } from "@/lib/assistent/st
 import { AGENT_KEYS, fuehreAgentAus, koordinationAbarbeiten, type AgentKey } from "@/lib/assistent/truppe"
 import { berechneLeistung } from "@/lib/zentrale/leistung"
 import { veroeffentlicheGeplante } from "@/lib/assistent/redaktion-post"
+import { initiativeRunde } from "@/lib/koordination/initiative"
 
 /**
  * DER PULS — läuft mehrmals am Tag zwischen den Morgen-Takten.
+ * 0. Initiative: einen neuen Auftrag mit wechselndem Schwerpunkt anstoßen
+ *    (lib/koordination/initiative.ts) — die Firma sucht sich selbst Arbeit.
  * 1. Interne Warteschlange abarbeiten (Abteilungen übergeben sich Arbeit).
  * 2. Engpässe erkennen und selbst heilen: gescheiterte oder stille Agenten
  *    neu starten (je Agent höchstens 2 Versuche pro Tag).
@@ -30,6 +33,10 @@ export async function pulsFaellig(): Promise<boolean> {
 
 export async function pulsRunde(): Promise<{ ergebnis: string; anzahl: number }> {
   const start = Date.now()
+  const initiative = await initiativeRunde().catch((e) => {
+    console.error("[puls] initiative", e instanceof Error ? e.message : e)
+    return { angelegt: false, grund: "Fehler" }
+  })
   const bearbeitet = await koordinationAbarbeiten()
   await veroeffentlicheGeplante().catch(() => 0)
   const leistung = await berechneLeistung()
@@ -73,7 +80,8 @@ export async function pulsRunde(): Promise<{ ergebnis: string; anzahl: number }>
   }
 
   const offen = leistung.engpaesse.length
-  const ergebnis = `${bearbeitet} intern bearbeitet · ${neustart.length} Agenten neu gestartet · ${eskaliert} eskaliert · ${offen} Engpässe offen`
-  await protokolliereLauf({ agent: "puls", ergebnis, anzahl: bearbeitet + neustart.length + eskaliert, dauerMs: Date.now() - start })
-  return { ergebnis, anzahl: bearbeitet + neustart.length + eskaliert }
+  const ergebnis = `${initiative.angelegt ? `Initiative: ${initiative.grund} · ` : ""}${bearbeitet} intern bearbeitet · ${neustart.length} Agenten neu gestartet · ${eskaliert} eskaliert · ${offen} Engpässe offen`
+  const anzahl = Number(initiative.angelegt) + bearbeitet + neustart.length + eskaliert
+  await protokolliereLauf({ agent: "puls", ergebnis, anzahl, dauerMs: Date.now() - start })
+  return { ergebnis, anzahl }
 }
