@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState, type MutableRefObject } from "react"
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type MutableRefObject } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { ContactShadows, Environment, Html, Lightformer, OrbitControls, QuadraticBezierLine, useTexture } from "@react-three/drei"
 import { Bloom, EffectComposer, N8AO, SMAA, ToneMapping, Vignette } from "@react-three/postprocessing"
@@ -16,7 +16,8 @@ import type { Sprache } from "@/lib/zentrale/netz-karte"
 /* Maße in Metern — echtes Bürogeschoss: 3,6 m Geschosshöhe, 7 m Raumbreite. */
 const H = 3.6
 const RAUM_B = 7
-const BREITE = RAUM_B * 3
+/** Platz für bis zu 4 Abteilungen je Geschoss; weniger Räume teilen sich die Breite. */
+const BREITE = RAUM_B * 4
 const TIEFE = 10
 const PLATTE = 0.35
 /** Kein Auseinanderfahren der Geschosse beim Fokus – das Gebäude bleibt geschlossen. */
@@ -34,7 +35,9 @@ const FARBE = {
   achtung: "#d9a13b",
   stoerung: "#d9483b",
   anthrazit: "#3b4048",
-  glas: "#6fa6bd",
+  glas: "#8fb3c4",
+  platte: "#3a4049",
+  licht: "#ffc98a",
 }
 
 const KLEIDUNG = ["#2f3a4c", "#6b7686", "#e6e2da", "#44505f", "#8a6f5a"]
@@ -115,82 +118,91 @@ function zufall(seed: number) {
   }
 }
 
-/* Organisches Außenskelett (Vorbild: Glass Cube, Bad Driburg) – weiße Rahmenfläche mit weich gerundeten Glasöffnungen. */
-const RAHMEN_T = 0.32
+/*
+ * Fassade nach echtem Vorbild: abgerundete, auskragende Geschossplatten (Anthrazit) mit warmer Holzunterseite
+ * und einer feinen Lichtfuge, dahinter eine durchgehende Glashaut mit schlanken Pfosten – rundum.
+ */
+const RUND = 2.6
+const UEBERSTAND = 1.1
+const GLAS_B = BREITE + 0.2
+const GLAS_T = TIEFE + 0.2
+/** Halbe Länge des geraden Fassadenstücks vorne – davor beginnt die Rundung. */
+const GERADE = GLAS_B / 2 - RUND
 
-function rundesLoch(pfad: THREE.Path, ecken: THREE.Vector2[], radien: number[]) {
-  const n = ecken.length
-  ecken.forEach((p, i) => {
-    const vor = ecken[(i - 1 + n) % n]
-    const nach = ecken[(i + 1) % n]
-    const r = Math.min(radien[i], p.distanceTo(vor) * 0.45, p.distanceTo(nach) * 0.45)
-    const a = p.clone().add(vor.clone().sub(p).setLength(r))
-    const b = p.clone().add(nach.clone().sub(p).setLength(r))
-    if (i === 0) pfad.moveTo(a.x, a.y)
-    else pfad.lineTo(a.x, a.y)
-    pfad.quadraticCurveTo(p.x, p.y, b.x, b.y)
-  })
-  pfad.closePath()
+function zeichne<P extends THREE.Path>(p: P, b: number, t: number, r: number): P {
+  const x = b / 2
+  const y = t / 2
+  p.moveTo(-x + r, -y)
+  p.lineTo(x - r, -y)
+  p.absarc(x - r, -y + r, r, -Math.PI / 2, 0, false)
+  p.lineTo(x, y - r)
+  p.absarc(x - r, y - r, r, 0, Math.PI / 2, false)
+  p.lineTo(-x + r, y)
+  p.absarc(-x + r, y - r, r, Math.PI / 2, Math.PI, false)
+  p.lineTo(-x, -y + r)
+  p.absarc(-x + r, -y + r, r, Math.PI, Math.PI * 1.5, false)
+  return p
 }
 
-function organischerRahmen(breite: number, etagen: number, spalten: number, seed: number) {
-  const r = zufall(seed)
-  const hoehe = etagen * H + PLATTE + 0.25
-  const form = new THREE.Shape()
-  form.moveTo(-breite / 2, 0)
-  form.lineTo(breite / 2, 0)
-  form.lineTo(breite / 2, hoehe)
-  form.lineTo(-breite / 2, hoehe)
-  form.closePath()
-  const innen = breite - 0.7
-  const feld = innen / spalten
-  // Knotenpunkte je Geschossgrenze leicht versetzt → schräge, fließende Stege statt starrem Raster.
-  const knoten = Array.from({ length: etagen + 1 }, () =>
-    Array.from({ length: spalten + 1 }, (_, i) => {
-      const basis = -innen / 2 + i * feld
-      return i === 0 || i === spalten ? basis : basis + (r() - 0.5) * feld * 0.5
-    }),
-  )
-  const steg = 0.18
-  for (let e = 0; e < etagen; e++) {
-    const y0 = e * H + PLATTE + 0.1
-    const y1 = (e + 1) * H - 0.05
-    for (let i = 0; i < spalten; i++) {
-      const ecken = [
-        new THREE.Vector2(knoten[e][i] + steg, y0),
-        new THREE.Vector2(knoten[e][i + 1] - steg, y0),
-        new THREE.Vector2(knoten[e + 1][i + 1] - steg, y1),
-        new THREE.Vector2(knoten[e + 1][i] + steg, y1),
-      ]
-      const loch = new THREE.Path()
-      rundesLoch(loch, ecken, ecken.map(() => 0.35 + r() * 1.15))
-      form.holes.push(loch)
-    }
+function ring(b: number, t: number, r: number, dicke: number) {
+  const s = zeichne(new THREE.Shape(), b, t, r)
+  s.holes.push(zeichne(new THREE.Path(), b - 2 * dicke, t - 2 * dicke, r - dicke))
+  return s
+}
+
+function baueFormen() {
+  const pb = GLAS_B + 2 * UEBERSTAND
+  const pt = GLAS_T + 2 * UEBERSTAND
+  const pr = RUND + UEBERSTAND
+  const kante = { bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 2, curveSegments: 40 }
+  const umfang = 2 * (GLAS_B + GLAS_T) - 8 * RUND + 2 * Math.PI * RUND
+  const pfosten = zeichne(new THREE.Shape(), GLAS_B + 0.02, GLAS_T + 0.02, RUND + 0.01)
+    .getSpacedPoints(Math.round(umfang / 1.75))
+    .slice(0, -1)
+    .map((p) => [p.x, p.y] as [number, number])
+  return {
+    platte: new THREE.ExtrudeGeometry(zeichne(new THREE.Shape(), pb, pt, pr), { depth: PLATTE, ...kante }),
+    dach: new THREE.ExtrudeGeometry(zeichne(new THREE.Shape(), pb, pt, pr), { depth: PLATTE + 0.25, ...kante }),
+    boden: new THREE.ShapeGeometry(zeichne(new THREE.Shape(), GLAS_B - 0.05, GLAS_T - 0.05, RUND - 0.02), 40),
+    dachflaeche: new THREE.ShapeGeometry(zeichne(new THREE.Shape(), pb - 0.3, pt - 0.3, pr - 0.15), 40),
+    decke: new THREE.ShapeGeometry(zeichne(new THREE.Shape(), pb - 0.1, pt - 0.1, pr - 0.05), 40),
+    lichtfuge: new THREE.ShapeGeometry(ring(pb - 0.3, pt - 0.3, pr - 0.15, 0.06), 40),
+    glas: new THREE.ExtrudeGeometry(ring(GLAS_B, GLAS_T, RUND, 0.035), { depth: H - PLATTE, bevelEnabled: false, curveSegments: 40 }),
+    gelaender: new THREE.ExtrudeGeometry(ring(pb - 0.5, pt - 0.5, pr - 0.25, 0.03), { depth: 1.05, bevelEnabled: false, curveSegments: 40 }),
+    pfosten,
   }
-  return new THREE.ExtrudeGeometry(form, {
-    depth: RAHMEN_T,
-    bevelEnabled: true,
-    bevelThickness: 0.04,
-    bevelSize: 0.04,
-    bevelSegments: 3,
-    curveSegments: 12,
-  })
 }
 
-function Rahmen({ etagen }: { etagen: number }) {
-  const front = useMemo(() => organischerRahmen(BREITE + 1.2, etagen, 6, 101), [etagen])
-  const seite = useMemo(() => organischerRahmen(TIEFE + 0.6, etagen, 3, 202), [etagen])
-  const weiss = useMemo(
-    () => new THREE.MeshPhysicalMaterial({ color: "#f6f7f8", roughness: 0.3, clearcoat: 0.5, clearcoatRoughness: 0.2 }),
-    [],
-  )
+let formenCache: ReturnType<typeof baueFormen> | null = null
+const formen = () => (formenCache ??= baueFormen())
+
+/** Liegende Formen: Extrusion zeigt nach oben, Grundriss liegt in x/z. */
+const LIEGEND: [number, number, number] = [-Math.PI / 2, 0, 0]
+/** Nach unten zeigende Fläche (Deckenuntersicht). */
+const UNTERSICHT: [number, number, number] = [Math.PI / 2, 0, 0]
+
+function Pfosten({ y, hoehe }: { y: number; hoehe: number }) {
+  const ref = useRef<THREE.InstancedMesh>(null)
+  const punkte = formen().pfosten
+  useLayoutEffect(() => {
+    if (!ref.current) return
+    const m = new THREE.Matrix4()
+    punkte.forEach(([x, z], i) => ref.current!.setMatrixAt(i, m.makeTranslation(x, y, -z)))
+    ref.current.instanceMatrix.needsUpdate = true
+  }, [punkte, y])
   return (
-    <group>
-      <mesh geometry={front} material={weiss} position={[0, 0, TIEFE / 2 + 0.3]} castShadow receiveShadow />
-      <mesh geometry={seite} material={weiss} position={[BREITE / 2 + 0.3, 0, 0]} rotation={[0, Math.PI / 2, 0]} castShadow receiveShadow />
-      <mesh geometry={seite} material={weiss} position={[-BREITE / 2 - 0.3, 0, 0]} rotation={[0, -Math.PI / 2, 0]} castShadow receiveShadow />
-    </group>
+    <instancedMesh ref={ref} args={[undefined as never, undefined as never, punkte.length]} castShadow>
+      <boxGeometry args={[0.035, hoehe, 0.035]} />
+      <meshStandardMaterial color="#6b727c" metalness={0.7} roughness={0.3} />
+    </instancedMesh>
   )
+}
+
+/** Teil einer Raumbreite, der auf dem geraden Fassadenstück liegt (für Statusleiste/Milchglas vorne). */
+function geradeAnteil(x: number, b: number) {
+  const lo = Math.max(x - b / 2 + 0.3, -GERADE)
+  const hi = Math.min(x + b / 2 - 0.3, GERADE)
+  return { dx: (lo + hi) / 2 - x, b: Math.max(hi - lo, 0.4) }
 }
 
 /** Weiße, fließende Wege im Rasen – als flaches Band entlang einer Kurve. */
@@ -569,7 +581,8 @@ const ZUSTAND_FARBE: Record<Zustand, string> = {
 
 export type Fokus = { etage: number | null; raum: string | null }
 
-const raumX = (spalte: number) => (spalte - 1) * RAUM_B
+const raumB = (r: Raum) => BREITE / Math.max(r.spalten, 1)
+const raumX = (r: Raum) => (r.spalte - (Math.max(r.spalten, 1) - 1) / 2) * raumB(r)
 
 function Kamera({ fokus, raeume }: { fokus: Fokus; raeume: Raum[] }) {
   const { camera } = useThree()
@@ -579,7 +592,7 @@ function Kamera({ fokus, raeume }: { fokus: Fokus; raeume: Raum[] }) {
     const raum = raeume.find((r) => r.id === fokus.raum)
     if (raum) {
       const y = raum.etage * H + 1.4
-      const x = raumX(raum.spalte)
+      const x = raumX(raum)
       return { pos: new THREE.Vector3(x + 4.5, y + 3.2, 12.5), blick: new THREE.Vector3(x, y, -0.5) }
     }
     if (fokus.etage !== null) {
@@ -858,7 +871,9 @@ function RaumModell({
   innen: boolean
   sprache: Sprache
 }) {
-  const x = raumX(raum.spalte)
+  const x = raumX(raum)
+  const B = raumB(raum)
+  const vorne = geradeAnteil(x, B)
   const leer = raum.besetzung === "leer"
   const plaetze = Math.max(raum.agenten.length, 1)
   const innenLicht = useRef<THREE.MeshStandardMaterial>(null)
@@ -883,8 +898,6 @@ function RaumModell({
       }}
       onPointerOut={() => (document.body.style.cursor = "")}
     >
-      <PbrBox args={[RAUM_B - 0.1, 0.01, TIEFE - 2.6]} position={[0, PLATTE / 2 + 0.005, 0.6]} ordner="smooth-concrete" tint={leer ? "#bdbab4" : FARBE.boden} receiveShadow />
-
       <group position={[0, PLATTE, 0]}>
         {Array.from({ length: plaetze }).map((_, i) => {
           const reihe = Math.floor(i / 2)
@@ -946,38 +959,38 @@ function RaumModell({
           )
         })}
         {!leer && (
-          <group position={[RAUM_B / 2 - 0.9, 0, 2.6]}>
+          <group position={[Math.min(B / 2 - 0.9, 2.6), 0, 2.2]}>
             <Pflanze />
           </group>
         )}
       </group>
 
       {innen && (
-        <mesh position={[0, PLATTE + 0.02, 0.6]}>
-          <boxGeometry args={[RAUM_B - 0.2, 0.02, TIEFE - 2.8]} />
+        <mesh position={[0, PLATTE + 0.05, 0.5]}>
+          <boxGeometry args={[B - 1.2, 0.02, TIEFE - 3]} />
           <meshStandardMaterial ref={innenLicht} color={FARBE.blau} emissive={FARBE.blau} emissiveIntensity={0.8} transparent opacity={0.18} toneMapped={false} />
         </mesh>
       )}
 
       <mesh position={[0, H - 0.08, 0.6]}>
-        <boxGeometry args={[RAUM_B * 0.55, 0.04, 1.2]} />
+        <boxGeometry args={[B * 0.55, 0.04, 1.2]} />
         <meshStandardMaterial
           color="#ffffff"
-          emissive="#fff6e6"
-          emissiveIntensity={leer ? 0.05 : 1.1}
+          emissive="#ffe8c8"
+          emissiveIntensity={leer ? 0.05 : 1.3}
           toneMapped={false}
         />
       </mesh>
 
       {leer && (
-        <mesh position={[0, H / 2 + PLATTE / 2, TIEFE / 2 - 0.12]}>
-          <planeGeometry args={[RAUM_B - 0.2, H - PLATTE]} />
+        <mesh position={[vorne.dx, H / 2 + PLATTE / 2, TIEFE / 2 - 0.08]}>
+          <planeGeometry args={[vorne.b, H - PLATTE]} />
           <meshStandardMaterial color="#e9edf2" transparent opacity={0.72} roughness={1} />
         </mesh>
       )}
 
-      <mesh position={[0, PLATTE + 0.03, TIEFE / 2 - 0.02]}>
-        <boxGeometry args={[RAUM_B - 0.6, 0.05, 0.04]} />
+      <mesh position={[vorne.dx, PLATTE + 0.06, TIEFE / 2 - 0.05]}>
+        <boxGeometry args={[vorne.b, 0.05, 0.04]} />
         <meshStandardMaterial
           ref={status}
           color={ZUSTAND_FARBE[raum.zustand]}
@@ -988,8 +1001,8 @@ function RaumModell({
       </mesh>
 
       {gewaehlt && (
-        <mesh position={[0, PLATTE + 0.02, 0.6]}>
-          <boxGeometry args={[RAUM_B - 0.2, 0.02, TIEFE - 2.8]} />
+        <mesh position={[0, PLATTE + 0.05, 0.5]}>
+          <boxGeometry args={[B - 1.2, 0.02, TIEFE - 3]} />
           <meshBasicMaterial color={FARBE.blau} transparent opacity={0.12} />
         </mesh>
       )}
@@ -1052,38 +1065,45 @@ function Geschoss({
 
   const glasH = H - PLATTE
   const glasY = H / 2 + PLATTE / 2
-  const SEITE_X = BREITE / 2
+  const f = formen()
+  const n = Math.max(raeume.length, 1)
+  const trenner = Array.from({ length: n - 1 }, (_, k) => -BREITE / 2 + ((k + 1) * BREITE) / n)
 
   return (
     <group ref={gruppe} position={[0, basisY, 0]}>
-      <PbrBox args={[BREITE + 0.6, PLATTE, TIEFE + 0.6]} position={[0, PLATTE / 2, 0]} ordner="smooth-concrete" tint="#f2f3f5" castShadow receiveShadow />
-
-      {/* Geschossdecke innen hell (gebürsteter Beton), Kante außen dunkel wie eine echte Fassadenblende */}
-      <PbrBox args={[BREITE - 0.1, 0.06, TIEFE - 0.5]} position={[0, H - 0.03, -0.2]} ordner="brushed-concrete" tint="#f1f1ef" />
-
-      {/* Rahmenlose Glashaut – das organische Außenskelett (Rahmen) liegt davor */}
-      {[-1, 1].map((s) => (
-        <mesh key={`seite${s}`} position={[s * SEITE_X, glasY, 0]}>
-          <boxGeometry args={[0.03, glasH, TIEFE]} />
-          <Glas opacity={0.3} />
-        </mesh>
-      ))}
-
-      {/* Rückwand */}
-      <PbrBox args={[BREITE, H - PLATTE, 0.2]} position={[0, H / 2 + PLATTE / 2, -TIEFE / 2 + 0.1]} ordner="brushed-concrete" tint="#f1f2f4" receiveShadow />
-
-      {[-RAUM_B / 2, RAUM_B / 2].map((x) => (
-        <mesh key={x} position={[x, H / 2 + PLATTE / 2, 0.6]}>
-          <boxGeometry args={[0.04, H - PLATTE, TIEFE - 2.6]} />
-          <meshStandardMaterial color="#cfe0ea" transparent opacity={0.28} roughness={0.05} metalness={0.2} />
-        </mesh>
-      ))}
-
-      {/* Frontfassade */}
-      <mesh position={[0, glasY, TIEFE / 2]}>
-        <boxGeometry args={[BREITE, glasH, 0.03]} />
-        <Glas opacity={imFokus ? 0.1 : 0.26} />
+      {/* Auskragende, abgerundete Geschossplatte */}
+      <mesh geometry={f.platte} rotation={LIEGEND} castShadow receiveShadow>
+        <meshStandardMaterial color={FARBE.platte} metalness={0.5} roughness={0.38} />
       </mesh>
+      <mesh geometry={f.boden} rotation={LIEGEND} position={[0, PLATTE + 0.025, 0]} receiveShadow>
+        <meshStandardMaterial color={FARBE.boden} roughness={0.72} />
+      </mesh>
+
+      {/* Holzuntersicht der nächsten Platte + feine warme Lichtfuge an der Kante */}
+      <mesh geometry={f.decke} rotation={UNTERSICHT} position={[0, H - 0.025, 0]}>
+        <meshStandardMaterial color={FARBE.holz} roughness={0.6} />
+      </mesh>
+      <mesh geometry={f.lichtfuge} rotation={UNTERSICHT} position={[0, H - 0.03, 0]}>
+        <meshStandardMaterial color={FARBE.licht} emissive={FARBE.licht} emissiveIntensity={1.4} toneMapped={false} />
+      </mesh>
+      {/* Warmes Raumlicht wie im Abend-Vorbild */}
+      <pointLight position={[0, H - 0.6, 0]} color={FARBE.licht} intensity={14} distance={BREITE * 0.9} decay={1.6} />
+
+      {/* Durchgehende Glashaut rundum, schlanke Pfosten */}
+      <mesh geometry={f.glas} rotation={LIEGEND} position={[0, PLATTE + 0.02, 0]}>
+        <Glas opacity={imFokus ? 0.08 : 0.2} />
+      </mesh>
+      <Pfosten y={glasY} hoehe={glasH} />
+
+      {/* Kernwand hinten – endet vor den Rundungen, damit nichts durchs Glas sticht */}
+      <PbrBox args={[BREITE - 2 * RUND - 0.4, H - PLATTE, 0.2]} position={[0, H / 2 + PLATTE / 2, -TIEFE / 2 + 0.2]} ordner="brushed-concrete" tint="#eceae6" receiveShadow />
+
+      {trenner.map((x) => (
+        <mesh key={x} position={[x, H / 2 + PLATTE / 2, 0.4]}>
+          <boxGeometry args={[0.04, H - PLATTE, TIEFE - 3]} />
+          <meshStandardMaterial color="#cfe0ea" transparent opacity={0.22} roughness={0.05} metalness={0.2} depthWrite={false} />
+        </mesh>
+      ))}
 
       {raeume.map((r) => (
         <RaumModell
@@ -1100,7 +1120,7 @@ function Geschoss({
         />
       ))}
 
-      <Html position={[-BREITE / 2 - 1.2, H / 2, TIEFE / 2]} center distanceFactor={22} zIndexRange={[20, 0]}>
+      <Html position={[-BREITE / 2 - UEBERSTAND - 1.6, H / 2, TIEFE / 2]} center distanceFactor={22} zIndexRange={[20, 0]}>
           <button
             type="button"
             tabIndex={fokus.etage === null ? 0 : -1}
@@ -1156,7 +1176,7 @@ function Verbindungen({ faeden, raeume, fokus, jetzt }: { faeden: LiveFaden[]; r
         if (!a || !b) return null
         // Angehobene Geschosse (über dem Fokus) bewegen sich – dort wäre die Linie falsch verankert.
         if (fokus.etage !== null && (a.etage > fokus.etage || b.etage > fokus.etage)) return null
-        const punkt = (r: Raum) => new THREE.Vector3(raumX(r.spalte), r.etage * H + H / 2 + PLATTE / 2, TIEFE / 2 + 0.3)
+        const punkt = (r: Raum) => new THREE.Vector3(raumX(r), r.etage * H + H / 2 + PLATTE / 2, TIEFE / 2 + 0.3)
         return <Verbindung key={`${f.von}>${f.nach}`} von={punkt(a)} nach={punkt(b)} />
       })}
     </>
@@ -1170,27 +1190,25 @@ function Dach({ y, angehoben }: { y: number; angehoben: boolean }) {
   })
   return (
     <group ref={ref} position={[0, y, 0]}>
-      <PbrBox args={[BREITE + 0.6, PLATTE + 0.25, TIEFE + 0.6]} position={[0, PLATTE / 2, 0]} ordner="smooth-concrete" tint="#f4f5f7" castShadow receiveShadow />
-      <PbrBox args={[BREITE + 0.2, 0.02, TIEFE + 0.2]} position={[0, PLATTE + 0.26, 0]} ordner="brushed-concrete" tint="#e6e8eb" receiveShadow />
-      {[
-        [-6, 1.5, -2],
-        [-2.2, 1.1, -2.6],
-        [5.5, 1.3, -1.5],
-      ].map(([x, s, z]) => (
-        <group key={x} position={[x, PLATTE + 0.27, z]}>
-          <mesh position={[0, s / 2, 0]} castShadow>
-            <boxGeometry args={[s * 1.6, s, s]} />
-            <meshStandardMaterial color="#b4b8be" roughness={0.45} metalness={0.55} />
-          </mesh>
-          <mesh position={[0, s + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <circleGeometry args={[s * 0.32, 24]} />
-            <meshStandardMaterial color="#2f343b" roughness={0.6} />
-          </mesh>
-        </group>
+      <mesh geometry={formen().dach} rotation={LIEGEND} castShadow receiveShadow>
+        <meshStandardMaterial color={FARBE.platte} metalness={0.5} roughness={0.38} />
+      </mesh>
+      <mesh geometry={formen().dachflaeche} rotation={LIEGEND} position={[0, PLATTE + 0.28, 0]} receiveShadow>
+        <meshStandardMaterial color="#a7a9a6" roughness={0.95} />
+      </mesh>
+      {/* Gläserne Brüstung der Dachterrasse */}
+      <mesh geometry={formen().gelaender} rotation={LIEGEND} position={[0, PLATTE + 0.28, 0]}>
+        <Glas opacity={0.16} />
+      </mesh>
+      {/* Zurückgesetzte Technik, von unten kaum sichtbar */}
+      {[-5, 5].map((x) => (
+        <mesh key={x} position={[x, PLATTE + 0.28 + 0.55, -2.6]} castShadow>
+          <boxGeometry args={[2.4, 1.1, 1.6]} />
+          <meshStandardMaterial color="#8e939a" roughness={0.45} metalness={0.55} />
+        </mesh>
       ))}
-      {/* Photovoltaik-Felder */}
-      {[-8, -5.6, 1, 3.4].map((x) => (
-        <mesh key={`pv${x}`} position={[x, PLATTE + 0.55, 2.4]} rotation={[-0.35, 0, 0]} castShadow>
+      {[-9, -6.6, 6.6, 9].map((x) => (
+        <mesh key={`pv${x}`} position={[x, PLATTE + 0.6, 1.6]} rotation={[-0.3, 0, 0]} castShadow>
           <boxGeometry args={[2.1, 0.05, 1.3]} />
           <meshStandardMaterial color="#1f2a3d" roughness={0.25} metalness={0.6} />
         </mesh>
@@ -1268,19 +1286,20 @@ export default function Hauptsitz3D({
     <Canvas
       shadows
       dpr={[1, 2]}
-      camera={{ position: [44, 30, 50], fov: 32, near: 0.5, far: 400 }}
+      camera={{ position: [50, 28, 58], fov: 32, near: 0.5, far: 400 }}
       onPointerMissed={() => {
         setPerson(null)
         onLeer()
       }}
       gl={{ antialias: true }}
     >
-      <color attach="background" args={["#dfe9f2"]} />
-      <fog attach="fog" args={["#dfe9f2", 80, 180]} />
-      <hemisphereLight args={["#ffffff", "#c9ccd2", 0.55]} />
+      <color attach="background" args={["#d3dce6"]} />
+      <fog attach="fog" args={["#d3dce6", 90, 200]} />
+      <hemisphereLight args={["#eef3f8", "#b9bcc2", 0.5]} />
       <directionalLight
         position={[24, 40, 28]}
-        intensity={1.6}
+        color="#fff4e6"
+        intensity={1.4}
         castShadow
         shadow-mapSize={[2048, 2048]}
         shadow-camera-left={-30}
@@ -1313,7 +1332,6 @@ export default function Hauptsitz3D({
           onPerson={waehlePerson}
         />
       ))}
-      <Rahmen etagen={etagen.length} />
       <Verbindungen faeden={faeden} raeume={raeume} fokus={fokus} jetzt={jetzt} />
       <Dach y={hoehe} angehoben={fokus.etage !== null} />
       <ContactShadows position={[0, 0.01, 0]} opacity={0.35} scale={60} blur={2.4} far={20} />
