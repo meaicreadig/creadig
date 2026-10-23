@@ -12,6 +12,12 @@ import { veroeffentlicheGeplante } from "@/lib/assistent/redaktion-post"
  *    neu starten (je Agent höchstens 2 Versuche pro Tag).
  * 3. Hängende Aufträge an die Geschäftsführung eskalieren.
  * Alles, was nicht selbst lösbar ist, bleibt als Engpass sichtbar.
+ *
+ * Takt (vercel.json): alle 2 Stunden rund um die Uhr, außer 06–08 Uhr Berlin,
+ * wo die Morgenrunden laufen. Bis 23.10.2026 lief er nur 12 und 16 Uhr — eine
+ * Übergabe zwischen zwei Abteilungen brauchte so einen halben Tag, eine Kette
+ * Tage, und nachts stand alles. Kosten entstehen je Auftrag, nicht je Puls:
+ * Eine leere Warteschlange kostet nichts.
  */
 
 const MAX_NEUSTARTS_PRO_PULS = 2

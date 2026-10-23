@@ -42,6 +42,42 @@
       "schedule": "0 14 * * *"
     },
     {
+      "path": "/api/assistent/puls?runde=vormittag",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/assistent/puls?runde=mittag2",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/assistent/puls?runde=abend",
+      "schedule": "0 16 * * *"
+    },
+    {
+      "path": "/api/assistent/puls?runde=abend2",
+      "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/assistent/puls?runde=nacht1",
+      "schedule": "0 20 * * *"
+    },
+    {
+      "path": "/api/assistent/puls?runde=nacht2",
+      "schedule": "0 22 * * *"
+    },
+    {
+      "path": "/api/assistent/puls?runde=nacht3",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/assistent/puls?runde=nacht4",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/assistent/puls?runde=frueh",
+      "schedule": "0 4 * * *"
+    },
+    {
       "path": "/api/selftest",
       "schedule": "0 7 * * *"
     },
