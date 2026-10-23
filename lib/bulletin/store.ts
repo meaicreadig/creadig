@@ -11,6 +11,10 @@ export const RESSORTS = [
   { id: "chips", de: "Chips & Hardware", tr: "Çip & donanım" },
   { id: "robotik", de: "Robotik", tr: "Robotik" },
   { id: "recht", de: "Recht & Politik", tr: "Hukuk & politika" },
+  /* 23.10.2026: Die PHP-Lücken (php.net, 21.10.) kamen per Hoster-Mail, nicht
+     übers Bulletin — Sicherheit war kein Ressort. Für Betriebe mit Website
+     ist das oft die wichtigste Nachricht der Woche. */
+  { id: "sicherheit", de: "IT-Sicherheit & Schwachstellen", tr: "BT güvenliği & açıklar" },
   { id: "maerkte", de: "Märkte DACH · Türkei · Golf", tr: "Pazarlar DACH · Türkiye · Körfez" },
 ] as const
 export type RessortId = (typeof RESSORTS)[number]["id"]

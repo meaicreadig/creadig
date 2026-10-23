@@ -66,9 +66,9 @@ async function recherchiere(tag: string): Promise<Fund[]> {
   const { text } = await generateText({
     model: RECHERCHE,
     prompt: `Du bist Nachrichten-Rechercheur. Stand: ${tag}. Finde die wichtigsten ECHTEN Meldungen der letzten 7 Tage (weltweit) zu diesen Ressorts: ${ressorts}.
-Beispiele, worauf es ankommt: neue KI-Modelle und Preise (OpenAI, Google, Anthropic, Meta, Mistral, xAI), KI-Agenten in Unternehmen, Automatisierung im Mittelstand, Änderungen bei Meta/Instagram/LinkedIn/Google-Suche/SEO, Chip-Produktion (TSMC, Nvidia, Intel Magdeburg, ASML, Exportkontrollen), humanoide Roboter und Industrierobotik, EU AI Act/DSGVO/Digitalpolitik, Tech-Investitionen in Deutschland, Türkei, VAE, Saudi-Arabien, Katar.
+Beispiele, worauf es ankommt: neue KI-Modelle und Preise (OpenAI, Google, Anthropic, Meta, Mistral, xAI), KI-Agenten in Unternehmen, Automatisierung im Mittelstand, Änderungen bei Meta/Instagram/LinkedIn/Google-Suche/SEO, Chip-Produktion (TSMC, Nvidia, Intel Magdeburg, ASML, Exportkontrollen), humanoide Roboter und Industrierobotik, EU AI Act/DSGVO/Digitalpolitik, kritische Sicherheitslücken in verbreiteter Web-Software (PHP, WordPress, Shop-Systeme, Browser, Router) und Angriffswellen auf kleine Betriebe, Tech-Investitionen in Deutschland, Türkei, VAE, Saudi-Arabien, Katar.
 Je Ressort 1–2 Meldungen, insgesamt 10–12. Nur überprüfbare Meldungen mit direkter Artikel-URL einer seriösen Quelle. Nichts erfinden, im Zweifel weglassen.
-Antworte NUR mit einem JSON-Array: [{"ressort":"ki|automation|medien|chips|robotik|recht|maerkte","titel":"","fakten":"2–3 Sätze nüchterne Fakten mit Zahlen","quelle":"Medienname","url":"https://…","datum":"YYYY-MM-DD"}]`,
+Antworte NUR mit einem JSON-Array: [{"ressort":"ki|automation|medien|chips|robotik|recht|sicherheit|maerkte","titel":"","fakten":"2–3 Sätze nüchterne Fakten mit Zahlen","quelle":"Medienname","url":"https://…","datum":"YYYY-MM-DD"}]`,
   })
   return (json<Fund[]>(text, "[") ?? []).filter((f) => f?.titel && f?.url?.startsWith("http") && istRessort(f.ressort))
 }
