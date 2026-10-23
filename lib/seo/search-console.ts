@@ -173,3 +173,10 @@ export async function ladeSeoBericht(): Promise<SeoBericht> {
     return { status: "fehler", meldung: e instanceof Error ? e.message : String(e), dienstkonto: k.client_email }
   }
 }
+
+/** Suchanfragen mit Impressionen auf Platz 4–20 — der Stoff, an dem die Redaktion schreibt. Ohne Verbindung leer. */
+export async function seoChancen(): Promise<string[]> {
+  if (!seoVerbunden()) return []
+  const b = await ladeSeoBericht()
+  return b.status === "ok" ? b.chancen.map((z) => z.keys[0]).filter(Boolean) : []
+}

@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { ArrowUpRight, ChevronRight } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
@@ -124,6 +125,23 @@ export function InsightPageBody({ entry }: { entry: Insight }) {
             </Reveal>
           </div>
         </header>
+
+        {entry.bild && (
+          <Reveal className="section-gutter mt-12">
+            <figure className="border-line overflow-hidden border">
+              <Image
+                src={entry.bild.src}
+                alt={entry.bild.alt[locale]}
+                width={1536}
+                height={1024}
+                priority
+                unoptimized
+                sizes="(min-width: 1280px) 1200px, 100vw"
+                className="aspect-[3/2] w-full object-cover"
+              />
+            </figure>
+          </Reveal>
+        )}
 
         <div className="section-gutter">
           {/* ---- Der Befund in Zahlen ---------------------------------- */}

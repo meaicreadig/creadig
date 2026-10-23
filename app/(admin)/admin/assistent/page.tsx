@@ -732,6 +732,8 @@ function LinkedinStatus({ ziele, meldung }: { ziele: LinkedinZiele; meldung?: st
       "Firmenseite: LinkedIn hat die „Community Management API“ für diese App noch nicht freigeschaltet. In developer.linkedin.com → deine Firmen-App → Reiter „Products“ muss dort „Added“ stehen (nicht „Requested/Pending“). Danach einfach erneut verbinden.",
     "inhaber-nicht-freigeschaltet":
       "Profil: In der Profil-App fehlen die Produkte „Sign In with LinkedIn using OpenID Connect“ und „Share on LinkedIn“.",
+    "firma-kein-admin":
+      "Firmenseite: Dein LinkedIn-Konto ist kein Administrator der creaDIG-Firmenseite. Auf der Firmenseite unter „Admin-Tools → Seitenadministratoren“ dich als Superadmin eintragen, dann erneut verbinden.",
     "firma-redirect":
       "Firmenseite: In der Firmen-App unter „Auth“ fehlt die Redirect-URL https://creadig.de/api/linkedin/callback.",
     "inhaber-redirect":

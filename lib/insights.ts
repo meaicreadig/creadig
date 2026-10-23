@@ -133,6 +133,12 @@ export type Insight = {
    * werden. Ohne `von` steht die Zahl fuer sich.
    */
   kennzahlen?: Kennzahl[]
+  /** Titelbild. Nur Redaktionsartikel aus der Datenbank haben eins (lib/assistent/bild.ts). */
+  bild?: { src: string; alt: Localized }
+  /** Meta-Description für Google (140–155 Zeichen); fehlt sie, gilt der Anreißer. */
+  metaDescription?: Localized
+  /** Fokus-Keyword — landet in den strukturierten Daten. */
+  keyword?: string
   /*
    * GATE 15 — HIER STAND `published: boolean`.
    *

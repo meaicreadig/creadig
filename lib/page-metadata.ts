@@ -80,6 +80,8 @@ export function pageMetadata({
   type = "website",
   /** Suchmaschinen von einer Seite fernhalten (Rechtstexte, Fehlerseiten). */
   noIndex = false,
+  /** Eigenes Vorschaubild (Artikel mit Titelbild), sonst das der Sprache. */
+  bild,
 }: {
   locale: Locale
   path: string
@@ -87,7 +89,9 @@ export function pageMetadata({
   description: string
   type?: "website" | "article"
   noIndex?: boolean
+  bild?: { url: string; alt: string }
 }): Metadata {
+  const images = bild ? [{ url: `${SITE_URL}${bild.url}`, width: 1536, height: 1024, alt: bild.alt }] : ogImage(locale)
   return {
     title,
     description,
@@ -106,7 +110,7 @@ export function pageMetadata({
       alternateLocale: locales.filter((l) => l !== locale && isIndexed(l)).map((l) => openGraphLocale[l]),
       siteName: "creaDIG",
       type,
-      images: ogImage(locale),
+      images,
     },
     /*
      * Ohne diesen Block zeigt X eine kleine quadratische Vorschau statt der
@@ -116,7 +120,7 @@ export function pageMetadata({
       card: "summary_large_image",
       title: `${title} · creaDIG`,
       description,
-      images: ogImage(locale),
+      images,
     },
     /* S1 — eine zurueckgestellte Sprache bleibt erreichbar, wird aber nicht indexiert. */
     ...(noIndex || !isIndexed(locale) ? { robots: { index: false, follow: true } } : {}),

@@ -5,7 +5,8 @@ import { generateText } from "ai"
 import { insightCategoryKeys, type InsightCategoryKey } from "@/lib/insights"
 import type { Meldung } from "@/lib/bulletin/store"
 
-import { bulletinRefBekannt, speichereEntwurf, type ArtikelBlock, type Zwei } from "./store"
+import { artikelOhneBild, bulletinRefBekannt, ladeArtikel, setzeBild, speichereEntwurf, type Artikel, type ArtikelBlock, type Zwei } from "./store"
+import { erzeugeBild } from "@/lib/assistent/bild"
 import { firmenText } from "@/lib/firmenwahrheit"
 
 const AUTOR = "openai/gpt-5.4"
@@ -63,6 +64,10 @@ type Anlass = {
   quelleUrl: string | null
   /** Eindeutig je Anlass (Bulletin-Meldung oder Planthema) — verhindert Doppelentwürfe. */
   ref: string
+  /** Fokus-Keyword; ohne wählt der Autor selbst, wonach ein Inhaber suchen würde. */
+  keyword?: string
+  /** Suchanfragen aus der Search Console, für die creadig.de schon erscheint. */
+  suchanfragen?: string[]
 }
 
 /**
@@ -97,11 +102,16 @@ ${firmenText("voll")}
 ${a.anlass}
 
 Schreibe einen EIGENEN Fachartikel mit Haltung (keine Nacherzählung, keine Kopie): Was bedeutet das konkret für Betriebe im deutschsprachigen Raum, was sollte ein Inhaber jetzt tun, wo liegen Grenzen. 700–1000 Wörter, klare Zwischenüberschriften, eine kurze Liste mit konkreten Schritten, ein Hinweis-Block ("note") mit der Quelle bzw. Rechtsgrundlage als Satz. Sachlich, selbstbewusst, ohne Werbefloskeln, ohne erfundene Zahlen, Fristen oder Kundenbeispiele — was du nicht sicher weißt, lässt du weg. Keine Rechtsberatung versprechen. Suchmaschinenstark: das Kernthema steht im Titel und im ersten Absatz.
+SEO (Google):
+- Fokus-Keyword: ${a.keyword ? `„${a.keyword}“` : "wähle selbst die Suchanfrage, die ein Inhaber dazu bei Google eintippen würde (2–4 Wörter)"}. Es steht natürlich formuliert im Titel, im metaTitel (vorn), im ersten Satz und in mindestens einer Zwischenüberschrift — nie gestopft.
+- Zwischenüberschriften als echte Fragen, die Leute googeln. Vor dem Hinweis-Block ein Abschnitt „Häufige Fragen“ (heading) mit 2–3 kurzen Frage-Überschriften (heading) und je einer direkten Antwort in 2–3 Sätzen (text).
+- metaBeschreibung: 140–155 Zeichen, mit Keyword, sagt was der Leser bekommt.
+${a.suchanfragen?.length ? `- Diese Suchanfragen zeigt Google schon für creadig.de — greife passende davon wörtlich auf, unpassende lässt du weg: ${a.suchanfragen.join(" | ")}` : ""}
 Alles auf Deutsch ("de") UND natürlichem Türkisch ("tr", keine Wort-für-Wort-Übersetzung).
 Zusätzlich "linkedin": ein LinkedIn-Beitrag auf Deutsch (600–900 Zeichen, erster Satz als Haken, ohne Hashtag-Wand, max. 3 Hashtags am Ende), der neugierig auf den Artikel macht.
 
 Antworte NUR mit JSON:
-{"slug":"kurzer-deutscher-url-slug","topic":{"de":"Themenwort","tr":""},"titel":{"de":"","tr":""},"teaser":{"de":"2 Sätze","tr":""},"metaTitel":{"de":"max 60 Zeichen","tr":""},"body":[{"kind":"text","text":{"de":"","tr":""}},{"kind":"heading","text":{"de":"","tr":""}},{"kind":"list","items":{"de":["",""],"tr":["",""]}},{"kind":"note","text":{"de":"","tr":""}}],"linkedin":""}`,
+{"slug":"kurzer-deutscher-url-slug-mit-keyword","keyword":"","metaBeschreibung":{"de":"","tr":""},"topic":{"de":"Themenwort","tr":""},"titel":{"de":"","tr":""},"teaser":{"de":"2 Sätze","tr":""},"metaTitel":{"de":"max 60 Zeichen","tr":""},"body":[{"kind":"text","text":{"de":"","tr":""}},{"kind":"heading","text":{"de":"","tr":""}},{"kind":"list","items":{"de":["",""],"tr":["",""]}},{"kind":"note","text":{"de":"","tr":""}}],"linkedin":""}`,
   })
 
   const s = text.indexOf("{")
@@ -126,9 +136,51 @@ Antworte NUR mit JSON:
     metaTitel: zwei(j.metaTitel) ?? titel,
     body,
     linkedin: typeof j.linkedin === "string" ? j.linkedin.trim() : "",
+    keyword: typeof j.keyword === "string" && j.keyword.trim() ? j.keyword.trim() : (a.keyword ?? null),
+    metaBeschreibung: zwei(j.metaBeschreibung),
     quelleName: a.quelleName,
     quelleUrl: a.quelleUrl,
     bulletinRef: a.ref,
   })
+  const art = await ladeArtikel(slug)
+  if (art) await ergaenzeBild(art).catch((e) => console.error("[artikel] bild", e instanceof Error ? e.message : e))
   return { slug, ergebnis: `Artikel-Entwurf „${titel.de}“ bereit` }
+}
+
+/**
+ * Titelbild zum Artikel: erst eine Szene, die die Kernaussage zeigt (nicht
+ * das Schlagwort — „KI" als leuchtendes Gehirn ist genau das Bild, das wir
+ * nicht wollen), dann das Bild in der creaDIG-Bildsprache.
+ */
+export async function ergaenzeBild(art: Artikel): Promise<boolean> {
+  if (art.bildPfad) return true
+  const absatz = art.body.find((b) => b.kind === "text")
+  const { text } = await generateText({
+    model: "openai/gpt-5.4-mini",
+    prompt: `Artikel: ${art.titel.de}
+Anreißer: ${art.teaser.de}
+${absatz && absatz.kind === "text" ? `Einstieg: ${absatz.text.de.slice(0, 600)}` : ""}
+
+Beschreibe EIN Titelfoto dazu: eine konkrete, ruhige Szene aus dem Alltag eines kleinen Betriebs in Deutschland (Handwerk, Gastronomie, Büro, Verein), die die Kernaussage zeigt — mit Gegenständen, Händen oder einem Ort, ohne Gesichter, ohne Schrift, ohne Bildschirminhalte, ohne Roboter oder leuchtende KI-Symbole.
+Antworte NUR mit JSON: {"idee":"one English sentence","alt":{"de":"1 Satz","tr":"1 cümle"}}`,
+  })
+  const j = (() => {
+    try {
+      return JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1)) as { idee?: string; alt?: unknown }
+    } catch {
+      return null
+    }
+  })()
+  if (!j?.idee) return false
+  const pfad = await erzeugeBild(`insights/${art.slug}.png`, j.idee)
+  if (!pfad) return false
+  await setzeBild(art.slug, pfad, zwei(j.alt) ?? art.titel)
+  return true
+}
+
+/** Holt für ältere Artikel das Titelbild nach — höchstens `n` pro Lauf, Bilder kosten. */
+export async function ergaenzeFehlendeBilder(n = 2): Promise<number> {
+  let k = 0
+  for (const a of await artikelOhneBild(n)) if (await ergaenzeBild(a).catch(() => false)) k++
+  return k
 }

@@ -1,7 +1,6 @@
 import "server-only"
 
-import { generateImage, generateText } from "ai"
-import { put } from "@vercel/blob"
+import { generateText } from "ai"
 
 import { collectAttention } from "@/lib/attention"
 import { MESSEN, messeKey, type Messe } from "@/lib/messen"
@@ -10,6 +9,7 @@ import { getVertriebStore } from "@/lib/lead-store"
 import { ladeVerkaufslage, MONATSZIEL_EUR as MONATSZIEL } from "@/lib/verkaufen"
 import { erstelleEntwurf, ladeEntwuerfe } from "@/lib/verkaufen-entwurf"
 
+import { erzeugeBild } from "./bild"
 import { firmenRahmen, INHABER } from "./rahmen"
 import { findeKontaktMail } from "./kontaktsuche"
 import { pruefeWebseite, webcheckNotiz } from "./webcheck"
@@ -79,7 +79,6 @@ export const AGENTEN: AgentInfo[] = [
 
 const MODELL = "openai/gpt-5.4-mini"
 const RECHERCHE = "perplexity/sonar"
-const BILDMODELL = "openai/gpt-image-1-mini"
 
 const berlinTag = (d: Date) => d.toLocaleDateString("sv-SE", { timeZone: "Europe/Berlin" })
 const kw = (d: Date) => {
@@ -264,9 +263,6 @@ const STOFF = [
   "Erfahrung als Einzelunternehmer: wie man mit KI-Agenten statt Team arbeitet – was funktioniert, was nicht.",
 ]
 
-const BILDSTIL =
-  "Editorial photograph for a LinkedIn article, realistic, natural daylight, shallow depth of field, calm and confident mood, subtle cool blue accent light (#2F5BEA), clean composition with negative space, real people at work in Germany when people appear, no text, no letters, no logos, no watermarks, no UI screenshots."
-
 type Artikel = { thema: string; warum: string; bezug: string; titel: string; text: string; bildidee: string; alt: string }
 
 function jsonObjekt<T>(text: string): T | null {
@@ -276,27 +272,6 @@ function jsonObjekt<T>(text: string): T | null {
   try {
     return JSON.parse(text.slice(a, b + 1)) as T
   } catch {
-    return null
-  }
-}
-
-async function erzeugeBild(id: string, idee: string): Promise<string | null> {
-  try {
-    const { image } = await generateImage({
-      model: BILDMODELL,
-      prompt: `${idee}. ${BILDSTIL}`,
-      size: "1536x1024",
-    })
-    const pfad = `assistent/linkedin/${id}.png`
-    await put(pfad, Buffer.from(image.uint8Array), {
-      access: "private",
-      contentType: "image/png",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-    })
-    return pfad
-  } catch (e) {
-    console.error("[redaktion] bild", e)
     return null
   }
 }
@@ -370,7 +345,7 @@ AUFBAU (so funktioniert LinkedIn):
 - 150–230 Wörter, keine Emojis, kein Link im Text, keine Kundennamen, keine erfundenen Zahlen, max. 3 Hashtags in der letzten Zeile.
 - Rechtlich sauber: keine Heilsversprechen, keine Garantien, keine Vergleiche mit namentlich genannten Wettbewerbern.
 
-BILD: eine konkrete fotografische Szene (Englisch, ein Satz), die die Kernaussage zeigt – passend zur Zielgruppe, keine Schrift, keine Bildschirme.
+BILD: eine konkrete fotografische Szene (Englisch, ein Satz) mit Gegenständen, Händen oder einem Ort aus dem Alltag der Zielgruppe, die die Kernaussage als Bild zeigt (z. B. „a worn paper loyalty card next to a cobalt blue coffee cup on a café counter“) – keine Gesichter, keine Schrift, keine Bildschirme, keine Roboter, nichts Futuristisches.
 
 Antworte NUR mit JSON:
 {"thema":"…","warum":"1 Satz: warum dieses Thema jetzt Kunden aus der Zielgruppe bringt","bezug":"welcher Stoff/Beschluss","titel":"…","text":"…","kommentar":"1 kurzer Satz für den ersten Kommentar, der neugierig auf den Link macht","bildidee":"…","alt":"Bildbeschreibung Deutsch, 1 Satz"}`,
@@ -380,7 +355,7 @@ Antworte NUR mit JSON:
   if (!a?.titel || !a.text) throw new Error(`Redaktion (${s.name}) lieferte keinen gültigen Beitrag`)
 
   const id = neueFreigabeId()
-  const bildPfad = a.bildidee ? await erzeugeBild(id, a.bildidee) : null
+  const bildPfad = a.bildidee ? await erzeugeBild(`assistent/linkedin/${id}.png`, a.bildidee) : null
   const geplant = geplantFuer(s)
   const angelegt = await legeFreigabeAn({
     id,

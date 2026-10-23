@@ -38,8 +38,9 @@ export async function insightMetadata(
     locale,
     path: `/insights/${entry.slug}`,
     title: entry.metaTitle[locale],
-    description: entry.teaser[locale],
+    description: (entry.metaDescription ?? entry.teaser)[locale],
     type: "article",
+    bild: entry.bild ? { url: entry.bild.src, alt: entry.bild.alt[locale] } : undefined,
   })
 }
 
@@ -78,6 +79,8 @@ export async function InsightRoute({
       author: { "@type": "Person", name: "Muhammed Emin Akyol" },
       publisher: { "@type": "Organization", name: "creaDIG", url: SITE_URL },
       mainEntityOfPage: localeUrl(`/insights/${entry.slug}`, locale),
+      ...(entry.bild ? { image: `${SITE_URL}${entry.bild.src}` } : {}),
+      ...(entry.keyword ? { keywords: entry.keyword } : {}),
     },
   ]
 

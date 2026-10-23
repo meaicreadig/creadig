@@ -307,6 +307,11 @@ export async function pruefeWebseite(o: { tief?: boolean } = {}): Promise<Pruefu
     }
   }
 
+  /* Ältere Artikel ohne Titelbild bekommen eins nach — zwei pro Lauf. */
+  await import("@/lib/artikel/agent")
+    .then((m) => m.ergaenzeFehlendeBilder(2))
+    .catch((e) => console.error("[pruefer] bilder", e instanceof Error ? e.message : e))
+
   /* Selbst reparieren, was erlaubt ist; Rest zuordnen. */
   /* Stille Seite: kein Auftrag an eine Abteilung (der endete nur in Plänen), sondern gleich ein Entwurf aus dem Redaktionsplan. */
   let entwurf: string | null = null

@@ -3,6 +3,7 @@ import "server-only"
 import { revalidatePath } from "next/cache"
 import { after } from "next/server"
 
+import { ergaenzeBild } from "@/lib/artikel/agent"
 import { ladeArtikel, setzeZustand } from "@/lib/artikel/store"
 import { legeFreigabeAn } from "@/lib/assistent/store"
 import { getVertriebStore } from "@/lib/lead-store"
@@ -18,8 +19,11 @@ import { SITE_URL } from "@/lib/routes"
  * die Redaktion. Nie beides: zwei Karten für denselben Artikel wären Lärm.
  */
 export async function veroeffentlicheArtikel(slug: string): Promise<{ ok: boolean; linkedin: boolean }> {
-  const art = await ladeArtikel(slug)
-  if (!art || art.zustand !== "entwurf") return { ok: false, linkedin: false }
+  const roh = await ladeArtikel(slug)
+  if (!roh || roh.zustand !== "entwurf") return { ok: false, linkedin: false }
+  /* Kein Artikel ohne Titelbild nach draußen — und der LinkedIn-Beitrag nimmt dasselbe mit. */
+  if (!roh.bildPfad) await ergaenzeBild(roh).catch((e) => console.error("[artikel] bild", e instanceof Error ? e.message : e))
+  const art = (await ladeArtikel(slug)) ?? roh
   await setzeZustand(slug, "veroeffentlicht")
   for (const p of ["/insights", "/tr/insights", `/insights/${slug}`, `/tr/insights/${slug}`, "/sitemap.xml"]) revalidatePath(p)
 
@@ -40,6 +44,7 @@ export async function veroeffentlicheArtikel(slug: string): Promise<{ ok: boolea
       inhalt: `${art.linkedin}\n\n${url}`,
       quelle: `artikel:${slug}`,
       agent: "redaktion",
+      bildPfad: art.bildPfad,
       extra: { warum: `Neuer Artikel auf creadig.de: ${art.titel.de}` },
     }).catch(() => null)
   } else {

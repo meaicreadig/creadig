@@ -16,14 +16,35 @@ export async function GET(req: NextRequest) {
   const erwartet = jar.get("li_state")?.value
 
   let ergebnis = "abgebrochen"
-  if (code && state && erwartet && state === erwartet) {
+  /*
+    23.10.2026: Lehnte LinkedIn ab (Produkt nicht freigeschaltet, Redirect-URL
+    fehlt), kam statt `code` ein `error` zurück — und hier stand nur
+    „abgebrochen“, ohne Logzeile. Die Seite kennt die genauen Hinweise
+    (`firma-nicht-freigeschaltet`, `firma-redirect`), bekam sie aber nie.
+    Die Firmenseite war deshalb nie verbunden, ohne dass jemand sah, warum.
+  */
+  const fehler = req.nextUrl.searchParams.get("error")
+  if (fehler) {
+    const kanal = state?.startsWith("firma.") ? "firma" : "inhaber"
+    const beschreibung = req.nextUrl.searchParams.get("error_description") ?? ""
+    console.error("[linkedin] abgelehnt", kanal, fehler, beschreibung.slice(0, 300))
+    ergebnis = /scope|unauthorized/i.test(`${fehler} ${beschreibung}`)
+      ? `${kanal}-nicht-freigeschaltet`
+      : /redirect/i.test(`${fehler} ${beschreibung}`)
+        ? `${kanal}-redirect`
+        : fehler === "user_cancelled_login" || fehler === "user_cancelled_authorize"
+          ? "abgebrochen"
+          : "fehler"
+  } else if (code && state && erwartet && state === erwartet) {
     const kanal = state.startsWith("firma.") ? "firma" : "inhaber"
     try {
       await verbindeMitCode(code, req.nextUrl.origin, kanal)
       ergebnis = kanal === "firma" ? "firma-verbunden" : "verbunden"
     } catch (e) {
       console.error("[linkedin]", e)
-      ergebnis = "fehler"
+      const m = e instanceof Error ? e.message : ""
+      /* 403 auf organizationAcls = Community Management API fehlt; kein Admin = falsches Konto. */
+      ergebnis = kanal === "firma" && /Firmenseiten: 403|ACCESS_DENIED/i.test(m) ? "firma-nicht-freigeschaltet" : kanal === "firma" && /Kein Admin-Zugang/.test(m) ? "firma-kein-admin" : "fehler"
     }
   }
 

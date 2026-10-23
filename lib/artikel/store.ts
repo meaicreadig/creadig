@@ -21,6 +21,12 @@ export type Artikel = {
   metaTitel: Zwei
   body: ArtikelBlock[]
   linkedin: string
+  /** Fokus-Keyword für Google; ältere Artikel haben keins. */
+  keyword: string | null
+  metaBeschreibung: Zwei | null
+  /** Titelbild im privaten Blob; öffentlich nur über /api/insights/bild/[slug]. */
+  bildPfad: string | null
+  bildAlt: Zwei | null
   quelleName: string | null
   quelleUrl: string | null
   bulletinRef: string | null
@@ -65,13 +71,17 @@ async function db(): Promise<Abfrage | null> {
 }
 
 function zeile(r: Record<string, unknown>): Artikel {
-  const d = r.daten as Pick<Artikel, "topic" | "titel" | "teaser" | "metaTitel" | "body" | "linkedin">
+  const d = r.daten as Pick<Artikel, "topic" | "titel" | "teaser" | "metaTitel" | "body" | "linkedin"> & Partial<Pick<Artikel, "bildPfad" | "bildAlt" | "keyword" | "metaBeschreibung">>
   return {
     slug: String(r.slug),
     kategorie: r.kategorie as InsightCategoryKey,
     datum: new Date(String(r.datum)).toISOString().slice(0, 10),
     zustand: r.zustand as ArtikelZustand,
     ...d,
+    bildPfad: d.bildPfad ?? null,
+    bildAlt: d.bildAlt ?? null,
+    keyword: d.keyword ?? null,
+    metaBeschreibung: d.metaBeschreibung ?? null,
     quelleName: (r.quelle_name as string) ?? null,
     quelleUrl: (r.quelle_url as string) ?? null,
     bulletinRef: (r.bulletin_ref as string) ?? null,
@@ -86,12 +96,12 @@ export async function bulletinRefBekannt(ref: string): Promise<boolean> {
   return (await q(`SELECT 1 FROM web_artikel WHERE bulletin_ref = $1`, [ref])).length > 0
 }
 
-export async function speichereEntwurf(a: Omit<Artikel, "zustand" | "erstelltAm" | "veroeffentlichtAm" | "datum">): Promise<string> {
+export async function speichereEntwurf(a: Omit<Artikel, "zustand" | "erstelltAm" | "veroeffentlichtAm" | "datum" | "bildPfad" | "bildAlt">): Promise<string> {
   const q = await db()
   if (!q) throw new Error("Keine Datenbank")
   let slug = a.slug
   for (let i = 2; (await q(`SELECT 1 FROM web_artikel WHERE slug = $1`, [slug])).length > 0; i++) slug = `${a.slug}-${i}`
-  const daten = { topic: a.topic, titel: a.titel, teaser: a.teaser, metaTitel: a.metaTitel, body: a.body, linkedin: a.linkedin }
+  const daten = { topic: a.topic, titel: a.titel, teaser: a.teaser, metaTitel: a.metaTitel, body: a.body, linkedin: a.linkedin, keyword: a.keyword, metaBeschreibung: a.metaBeschreibung }
   await q(
     `INSERT INTO web_artikel (slug, kategorie, daten, quelle_name, quelle_url, bulletin_ref) VALUES ($1, $2, $3::jsonb, $4, $5, $6)`,
     [slug, a.kategorie, JSON.stringify(daten), a.quelleName, a.quelleUrl, a.bulletinRef],
@@ -113,6 +123,23 @@ export async function ladeArtikel(slug: string): Promise<Artikel | null> {
   if (!q) return null
   const rows = await q(`SELECT * FROM web_artikel WHERE slug = $1`, [slug])
   return rows[0] ? zeile(rows[0]) : null
+}
+
+export async function setzeBild(slug: string, bildPfad: string, bildAlt: Zwei): Promise<void> {
+  const q = await db()
+  if (!q) throw new Error("Keine Datenbank")
+  await q(`UPDATE web_artikel SET daten = daten || $2::jsonb WHERE slug = $1`, [slug, JSON.stringify({ bildPfad, bildAlt })])
+}
+
+/** Veröffentlichte Artikel ohne Titelbild — die ältesten zuerst. */
+export async function artikelOhneBild(n: number): Promise<Artikel[]> {
+  const q = await db().catch(() => null)
+  if (!q) return []
+  const rows = await q(
+    `SELECT * FROM web_artikel WHERE zustand <> 'verworfen' AND coalesce(daten->>'bildPfad', '') = '' ORDER BY erstellt_at LIMIT $1`,
+    [n],
+  )
+  return rows.map(zeile)
 }
 
 export async function setzeZustand(slug: string, zustand: ArtikelZustand): Promise<void> {
@@ -145,6 +172,9 @@ export function alsInsight(a: Artikel): Insight {
     teaser: voll(a.teaser),
     metaTitle: voll(a.metaTitel),
     body,
+    ...(a.metaBeschreibung ? { metaDescription: voll(a.metaBeschreibung) } : {}),
+    ...(a.keyword ? { keyword: a.keyword } : {}),
+    ...(a.bildPfad ? { bild: { src: `/api/insights/bild/${a.slug}`, alt: voll(a.bildAlt ?? a.titel) } } : {}),
     zustand: "veroeffentlicht",
     belege: [],
     nachfrage: null,
