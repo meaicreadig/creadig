@@ -198,7 +198,7 @@ export function PostWerkstatt({ t, linkedin }: { t: Texte; linkedin: LinkedinSta
 
           <article role="tabpanel" className="border-border bg-background flex flex-col gap-3 rounded-lg border p-4" aria-live="polite">
             <header className="flex items-center gap-3">
-              <span className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-full font-serif text-sm font-semibold">
+              <span className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-full text-sm font-semibold">
                 {aktiv === "person" ? "EA" : "cD"}
               </span>
               <span className="flex flex-col">
