@@ -32,7 +32,17 @@ export type BelegVorschlag = {
 }
 
 /** true/false ohne zu verraten, ob es gerade funktioniert — nur, ob ueberhaupt ein Zugang konfiguriert sein koennte. */
-export const belegKiBereit = () => Boolean(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN)
+/*
+  23.10.2026: Hier stand nur `AI_GATEWAY_API_KEY || VERCEL_OIDC_TOKEN`. Beides
+  fehlt in einer laufenden Vercel-Funktion: Einen Gateway-Schlüssel gibt es
+  nicht, und den OIDC-Token reicht Vercel zur Laufzeit per Request-Header
+  durch, nicht als Umgebungsvariable (die gibt es nur im Build und lokal).
+  Das AI SDK holt ihn sich selbst — nur diese Prüfung sagte „nicht bereit“.
+  Ergebnis: Seit dem FIBERO-Import (14.10.) blieben 554 Belege unzugeordnet,
+  keiner wurde je ausgelesen, und der Finanz-Agent meldete täglich „Nichts zu tun“.
+*/
+export const belegKiBereit = () =>
+  Boolean(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL === "1" || process.env.VERCEL_OIDC_TOKEN)
 
 export async function leseBelegAus(bytes: Buffer, mimeType: string): Promise<BelegVorschlag | null> {
   if (!belegKiBereit()) return null

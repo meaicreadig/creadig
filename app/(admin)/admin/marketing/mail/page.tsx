@@ -11,6 +11,7 @@ import { empfaenger, freieKontakte, kampagnen, type Empfaenger, type FreierKonta
 import { antwortErhalten, antwortZuruecknehmen, empfaengerHinzufuegen, empfaengerUmschalten, kontakteUebernehmen, neueKampagne } from "./actions"
 
 export const dynamic = "force-dynamic"
+export const metadata = { title: "Mail Studio" }
 
 const T = {
   de: {

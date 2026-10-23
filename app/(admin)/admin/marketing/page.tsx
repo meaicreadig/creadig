@@ -10,6 +10,7 @@ import { ArrowUpRight, Check } from "lucide-react"
 import { sichtbarkeitUmschalten } from "./actions"
 
 export const dynamic = "force-dynamic"
+export const metadata = { title: "Marketing" }
 
 const TEXT = {
   de: {

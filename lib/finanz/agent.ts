@@ -22,7 +22,11 @@ export async function finanzAgentLauf(): Promise<{ ergebnis: string; anzahl: num
   for (const e of entwuerfe) await protokolliere(db, "abo_entwurf", { entwurf: e.id, abo: e.aboId, zeitraum: e.zeitraum })
 
   const angebote = await legeAngebotsEntwuerfeAusChancen(db).catch(() => [])
-  const auto = await ordneAllesAutomatischZu(db).catch(() => null)
+  /* Kein stummes Verschlucken: Ein Fehler hier ließ Belege wochenlang liegen, ohne dass es jemand sah. */
+  const auto = await ordneAllesAutomatischZu(db).catch((e) => {
+    console.error("[finanz-agent] automatisch zuordnen", e instanceof Error ? e.message : e)
+    return null
+  })
   const bericht = await erstelleMorgenBericht(db)
   /* Mahnvorschläge legt seit 22.10.2026 Tahsilat (lib/agenten/forderungen.ts) als sendefertige Mail an – nicht zweimal. */
   const teile = [
