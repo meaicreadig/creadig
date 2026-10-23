@@ -206,12 +206,15 @@ function Sitzung({ rat, fruehere, rahmen }: { rat: Rat | undefined; fruehere: Ra
           <div className="flex flex-col gap-4">
             <article className="flex flex-col gap-3 rounded-3xl bg-card p-6 shadow-sm">
               <h3 className="font-sans text-base font-semibold text-foreground">Beschlüsse</h3>
-              {/* Abgehakte Beschlüsse rutschen nach unten und werden leise – offen bleibt, was noch zu tun ist. */}
-              <ol className="flex flex-col gap-3">
-                {rat.protokoll.beschluesse
-                  .map((b, i) => ({ b, i, fertig: (rat.protokoll.erledigteBeschluesse ?? []).includes(i) }))
-                  .sort((x, y) => Number(x.fertig) - Number(y.fertig))
-                  .map(({ b, i, fertig }) => (
+              {(() => {
+                const alle = rat.protokoll.beschluesse.map((b, i) => ({
+                  b,
+                  i,
+                  fertig: (rat.protokoll.erledigteBeschluesse ?? []).includes(i),
+                }))
+                const offen = alle.filter((e) => !e.fertig)
+                const erledigt = alle.filter((e) => e.fertig)
+                const zeile = ({ b, i, fertig }: (typeof alle)[number]) => (
                   <li key={b.was} className={`flex gap-3 ${fertig ? "opacity-60" : ""}`}>
                     <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                       {fertig ? <Check className="size-4" aria-label="erledigt" /> : i + 1}
@@ -232,8 +235,25 @@ function Sitzung({ rat, fruehere, rahmen }: { rat: Rat | undefined; fruehere: Ra
                       </span>
                     </div>
                   </li>
-                ))}
-              </ol>
+                )
+                return (
+                  <>
+                    {offen.length > 0 ? (
+                      <ol className="flex flex-col gap-3">{offen.map(zeile)}</ol>
+                    ) : (
+                      <p className="text-sm leading-relaxed text-muted-foreground">Alle Beschlüsse erledigt.</p>
+                    )}
+                    {erledigt.length > 0 ? (
+                      <details className="group">
+                        <summary className="cursor-pointer list-none text-xs font-medium text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden">
+                          Erledigt ({erledigt.length}) ›
+                        </summary>
+                        <ol className="mt-3 flex flex-col gap-3 border-t border-line pt-3">{erledigt.map(zeile)}</ol>
+                      </details>
+                    ) : null}
+                  </>
+                )
+              })()}
             </article>
 
             {/*
@@ -241,7 +261,7 @@ function Sitzung({ rat, fruehere, rahmen }: { rat: Rat | undefined; fruehere: Ra
               genauso groß da wie eine offene – der Owner hielt sie für hängengeblieben.
               Beantwortet ist sie jetzt eine Zeile; Frage, Ergebnis und Antwort zum Aufklappen.
             */}
-            <article className={`flex flex-col gap-3 rounded-3xl p-6 ${rat.antwort ? "bg-card shadow-sm" : "bg-primary/5"}`}>
+            <article className={`flex flex-col gap-3 rounded-3xl ${rat.antwort ? "bg-muted/40 p-4" : "bg-primary/5 p-6"}`}>
               {rat.antwort ? (
                 <details>
                   <summary className="flex cursor-pointer list-none items-start gap-2 text-sm leading-relaxed text-foreground [&::-webkit-details-marker]:hidden">
