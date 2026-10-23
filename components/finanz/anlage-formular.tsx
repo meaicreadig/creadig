@@ -3,10 +3,10 @@
 import { useActionState } from "react"
 
 import { anlageAnlegen, type AnlageAntwort } from "@/app/(finanz)/finanz/investment/actions"
-import { AdminField, AdminInput } from "@/components/admin/primitives"
+import { AdminField, AdminInput, AdminSelect } from "@/components/admin/primitives"
 import { KLASSEN } from "@/lib/finanz/investment-shared"
 
-const SELECT = "border-line bg-background w-full rounded-md border px-3 py-2.5 text-base"
+const SELECT = "border-line bg-background w-full rounded-md border ps-3 pe-9 py-2.5 text-base"
 
 export function AnlageFormular({ heute }: { heute: string }) {
   const [antwort, aktion, laeuft] = useActionState<AnlageAntwort, FormData>(anlageAnlegen, null)
@@ -16,11 +16,11 @@ export function AnlageFormular({ heute }: { heute: string }) {
         <AdminInput id="a-name" name="name" required placeholder="z. B. Tagesgeld Bank X, MSCI World ETF" />
       </AdminField>
       <AdminField label="Klasse" htmlFor="a-klasse">
-        <select id="a-klasse" name="klasse" className={SELECT} defaultValue="etf">
+        <AdminSelect id="a-klasse" name="klasse" className={SELECT} defaultValue="etf">
           {Object.entries(KLASSEN).map(([k, v]) => (
             <option key={k} value={k}>{v}</option>
           ))}
-        </select>
+        </AdminSelect>
       </AdminField>
       <AdminField label="Angelegt am" htmlFor="a-seit">
         <AdminInput id="a-seit" name="seit" type="date" required defaultValue={heute} />

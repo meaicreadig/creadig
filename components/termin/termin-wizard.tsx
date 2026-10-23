@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { LocaleLink as Link } from "@/components/ui/locale-link"
 import { useSearchParams } from "next/navigation"
-import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Clock, Send } from "lucide-react"
+import { ArrowLeft, ArrowRight, Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Send } from "lucide-react"
 import { useLocale } from "@/components/locale-provider"
 import { WhatsAppIcon } from "@/components/ui/whatsapp-icon"
 import { contact } from "@/lib/site-data"
@@ -526,6 +526,7 @@ export function TerminWizard() {
 
   const inputClass =
     "w-full rounded-none border-0 border-b border-line-strong bg-transparent px-0 py-3 text-base text-foreground outline-none transition-colors duration-[var(--dur-1)] placeholder:text-muted-foreground focus:border-gold"
+  const selectClass = cn(inputClass, "appearance-none pe-6")
   const invalidClass = "border-destructive focus:border-destructive"
 
   function field(key: keyof FormState) {
@@ -1016,27 +1017,39 @@ export function TerminWizard() {
                   </label>
                   <label className="flex flex-col gap-2">
                     <span className="eyebrow text-muted-foreground">{t.termin.step3.size}</span>
-                    <select {...field("size")} className={inputClass}>
-                      <option value="">{t.termin.step3.choose}</option>
-                      {t.termin.step3.sizes.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select {...field("size")} data-admin-control="select" className={selectClass}>
+                        <option value="">{t.termin.step3.choose}</option>
+                        {t.termin.step3.sizes.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        aria-hidden
+                        className="text-muted-foreground pointer-events-none absolute end-0 top-1/2 size-4 -translate-y-1/2"
+                      />
+                    </div>
                   </label>
                 </>
               )}
               <label className="flex flex-col gap-2 sm:col-span-2">
                 <span className="eyebrow text-muted-foreground">{t.termin.step3.interest}</span>
-                <select {...field("interest")} className={inputClass}>
-                  <option value="">{t.termin.step3.choose}</option>
-                  {t.termin.step3.interests.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select {...field("interest")} data-admin-control="select" className={selectClass}>
+                    <option value="">{t.termin.step3.choose}</option>
+                    {t.termin.step3.interests.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    aria-hidden
+                    className="text-muted-foreground pointer-events-none absolute end-0 top-1/2 size-4 -translate-y-1/2"
+                  />
+                </div>
               </label>
 
               {/*
@@ -1095,14 +1108,20 @@ export function TerminWizard() {
                         className={cn("flex flex-col gap-2", question.wide && "sm:col-span-2")}
                       >
                         <span className="eyebrow text-muted-foreground">{question.label}</span>
-                        <select {...field(question.key)} className={inputClass}>
-                          <option value="">{t.termin.step3.choose}</option>
-                          {question.options.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="relative">
+                          <select {...field(question.key)} data-admin-control="select" className={selectClass}>
+                            <option value="">{t.termin.step3.choose}</option>
+                            {question.options.map((option) => (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown
+                            aria-hidden
+                            className="text-muted-foreground pointer-events-none absolute end-0 top-1/2 size-4 -translate-y-1/2"
+                          />
+                        </div>
                       </label>
                     ))}
                   </div>

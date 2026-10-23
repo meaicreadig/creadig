@@ -3,7 +3,7 @@ import Link from "next/link"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
-import { Pill, Surface } from "@/components/admin/primitives"
+import { AdminSelect, Pill, Surface } from "@/components/admin/primitives"
 import { istGueltig, ladeInvestorLinks } from "@/lib/investor/store"
 
 import { investorLinkAnlegen, investorLinkWiderrufen } from "./actions"
@@ -67,20 +67,20 @@ export default async function InvestorenSeite(props: { searchParams: Promise<{ n
             </label>
             <label className="flex flex-col gap-1 text-sm text-muted-foreground">
               Sprache
-              <select name="sprache" defaultValue="en" className={feld}>
+              <AdminSelect name="sprache" defaultValue="en" className={feld}>
                 <option value="en">Englisch</option>
                 <option value="ar">Arabisch</option>
                 <option value="de">Deutsch</option>
-              </select>
+              </AdminSelect>
             </label>
             <label className="flex flex-col gap-1 text-sm text-muted-foreground">
               Gültig für
-              <select name="tage" defaultValue="30" className={feld}>
+              <AdminSelect name="tage" defaultValue="30" className={feld}>
                 <option value="14">14 Tage</option>
                 <option value="30">30 Tage</option>
                 <option value="90">90 Tage</option>
                 <option value="180">180 Tage</option>
-              </select>
+              </AdminSelect>
             </label>
             <label className="flex items-center gap-3 text-sm text-foreground md:col-span-2">
               <input type="checkbox" name="zahlen" value="ja" defaultChecked className="size-4 accent-primary" />

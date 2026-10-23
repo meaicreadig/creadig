@@ -3,28 +3,28 @@
 import { useActionState } from "react"
 
 import { bescheidAnlegen, type BescheidAntwort } from "@/app/(finanz)/finanz/bescheide/actions"
-import { AdminField, AdminInput } from "@/components/admin/primitives"
+import { AdminField, AdminInput, AdminSelect } from "@/components/admin/primitives"
 import { BESCHEID_ARTEN, STEUERARTEN } from "@/lib/finanz/bescheide-shared"
 
-const SELECT = "border-line bg-background w-full rounded-md border px-3 py-2.5 text-base"
+const SELECT = "border-line bg-background w-full rounded-md border ps-3 pe-9 py-2.5 text-base"
 
 export function BescheidFormular({ heute }: { heute: string }) {
   const [antwort, aktion, laeuft] = useActionState<BescheidAntwort, FormData>(bescheidAnlegen, null)
   return (
     <form action={aktion} className="bg-card grid gap-4 rounded-[2rem] p-7 md:grid-cols-4 md:items-end">
       <AdminField label="Art" htmlFor="b-art">
-        <select id="b-art" name="art" className={SELECT} defaultValue="vorauszahlung">
+        <AdminSelect id="b-art" name="art" className={SELECT} defaultValue="vorauszahlung">
           {Object.entries(BESCHEID_ARTEN).map(([k, v]) => (
             <option key={k} value={k}>{v}</option>
           ))}
-        </select>
+        </AdminSelect>
       </AdminField>
       <AdminField label="Steuerart" htmlFor="b-steuerart">
-        <select id="b-steuerart" name="steuerart" className={SELECT} defaultValue="est">
+        <AdminSelect id="b-steuerart" name="steuerart" className={SELECT} defaultValue="est">
           {Object.entries(STEUERARTEN).map(([k, v]) => (
             <option key={k} value={k}>{v}</option>
           ))}
-        </select>
+        </AdminSelect>
       </AdminField>
       <AdminField label="Steuerjahr" htmlFor="b-jahr">
         <AdminInput id="b-jahr" name="jahr" type="number" required defaultValue={Number(heute.slice(0, 4))} />
