@@ -16,6 +16,7 @@ import {
   type RessortId,
   type Zweisprachig,
 } from "./store"
+import { sicherheitsFunde } from "./sicherheit"
 import { firmenText } from "@/lib/firmenwahrheit"
 
 const RECHERCHE = "perplexity/sonar"
@@ -26,7 +27,7 @@ const heute = () => new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/B
 /** Quelle: lib/firmenwahrheit.ts */
 const FIRMA = firmenText("voll")
 
-type Fund = { ressort: string; titel: string; fakten: string; quelle: string; url: string; datum?: string }
+type Fund = { ressort: string; titel: string; fakten: string; quelle: string; url: string; datum?: string; pflicht?: boolean }
 
 /*
   Perplexity schreibt Quellenmarken wie „[1]“ in den Text. Trifft das erste
@@ -126,7 +127,10 @@ export async function erstelleBulletin(opt: { erzwingen?: boolean } = {}): Promi
   const tag = heute()
   if (!opt.erzwingen && (await ausgabeExistiert(tag))) return { ergebnis: "Heutige Ausgabe liegt schon vor", anzahl: 0 }
 
-  const funde = await recherchiere(tag)
+  /* Feeds parallel zur Suche: kostet keine Zeit, und eine kritische Lücke hängt nicht mehr am Modell. */
+  const [gesucht, sicher] = await Promise.all([recherchiere(tag).catch(() => [] as Fund[]), sicherheitsFunde()])
+  const urls = new Set(sicher.map((f) => f.url))
+  const funde: Fund[] = [...sicher, ...gesucht.filter((f) => !urls.has(f.url))]
   if (funde.length < 3) console.warn("[bulletin] nur", funde.length, "Funde")
   if (funde.length < 3) return { ergebnis: "Zu wenige belegte Meldungen gefunden – nächster Versuch beim nächsten Takt", anzahl: 0 }
 
@@ -146,11 +150,28 @@ export async function erstelleBulletin(opt: { erzwingen?: boolean } = {}): Promi
       kurz: zwei(m.kurz) ?? { de: f.fakten, tr: f.fakten },
       fuerUns: zwei(m.fuerUns) ?? { de: "—", tr: "—" },
       fuerKunden: zwei(m.fuerKunden),
-      gewicht: m.gewicht === 3 ? 3 : m.gewicht === 1 ? 1 : 2,
+      gewicht: f.pflicht || m.gewicht === 3 ? 3 : m.gewicht === 1 ? 1 : 2,
       quelle: f.quelle || new URL(f.url).hostname,
       url: f.url,
       datum: /^\d{4}-\d{2}-\d{2}$/.test(f.datum ?? "") ? f.datum! : null,
       artikel: zwei(m.artikel),
+    })
+  }
+  /* Lässt die Einordnung eine Pflicht-Meldung fallen, kommt sie roh hinein – fehlen darf sie nicht. */
+  const drin = new Set(meldungen.map((m) => m.url))
+  for (const f of funde.filter((f) => f.pflicht && !drin.has(f.url))) {
+    meldungen.push({
+      nr: meldungen.length,
+      ressort: "sicherheit",
+      titel: { de: f.titel, tr: f.titel },
+      kurz: { de: f.fakten, tr: f.fakten },
+      fuerUns: { de: "Kundenseiten auf betroffene Versionen prüfen.", tr: "Müşteri sitelerinde etkilenen sürümleri kontrol et." },
+      fuerKunden: { de: "Prüfen und patchen, bevor es jemand ausnutzt.", tr: "Biri istismar etmeden kontrol edip yamala." },
+      gewicht: 3,
+      quelle: f.quelle,
+      url: f.url,
+      datum: f.datum ?? null,
+      artikel: null,
     })
   }
   meldungen.sort((a, b) => b.gewicht - a.gewicht)
