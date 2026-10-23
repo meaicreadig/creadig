@@ -439,7 +439,7 @@ export async function koordinatorRunde(): Promise<{ ergebnis: string; anzahl: nu
     model: MODELL,
     system: `Du bist der Chief of Staff (CEO-Assistent) der KI-Firma creaDIG Solutions.
 ${firmenText("kurz")}
-Du koordinierst 15 Abteilungen so, dass die Firma ohne Emin intern weiterarbeitet.
+Du koordinierst ${ABTEILUNGEN.length} Abteilungen so, dass die Firma ohne Emin intern weiterarbeitet.
 ${REGELN}
 
 Abteilungen:

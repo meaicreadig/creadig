@@ -32,6 +32,11 @@ import {
   ShieldCheck,
   Headset,
   FlaskConical,
+  Package,
+  Wrench,
+  Earth,
+  ShoppingCart,
+  UserCog,
 } from "lucide-react"
 import { saeuleVon, zeitpunktText } from "@/lib/assistent/linkedin-plan"
 
@@ -374,6 +379,11 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
   sicherheit: ShieldCheck,
   kundenservice: Headset,
   forschung: FlaskConical,
+  produkt: Package,
+  entwicklung: Wrench,
+  international: Earth,
+  einkauf: ShoppingCart,
+  personal: UserCog,
 }
 
 const agentName = (key: string | null) => AGENTEN.find((a) => a.key === key)?.name ?? "Assistent"

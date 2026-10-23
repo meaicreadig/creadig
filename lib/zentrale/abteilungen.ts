@@ -1,5 +1,5 @@
 /**
- * Organigramm der KI-Firma creaDIG: 5 Bereiche, 15 Abteilungen.
+ * Organigramm der KI-Firma creaDIG: 5 Bereiche, 16 Abteilungen.
  * Grundlage: Porters Wertkette (Primär- + Unterstützungsaktivitäten) und das
  * übliche C-Level-Organigramm (CEO/CCO/CTO/COO/CFO).
  *
@@ -49,7 +49,16 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Geschäftsentwicklung", tr: "İş Geliştirme" },
     aufgabe: { de: "Partner, Kapital, neue Märkte", tr: "Ortaklık, sermaye, yeni pazarlar" },
     knoten: [],
-    agenten: ["kapital", "golf"],
+    agenten: ["kapital"],
+    besetzung: "aktiv",
+  },
+  {
+    id: "international",
+    bereich: "leitung",
+    name: { de: "International Business", tr: "Uluslararası İş Geliştirme" },
+    aufgabe: { de: "Schweiz, Österreich, EU, Diaspora-Netzwerke, Golf-Radar", tr: "İsviçre, Avusturya, AB, diaspora ağları, Körfez radarı" },
+    knoten: [],
+    agenten: ["international", "golf"],
     besetzung: "aktiv",
   },
   {
@@ -94,17 +103,17 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Produktmanagement", tr: "Ürün Yönetimi" },
     aufgabe: { de: "stammo, fibero, cassamea – Fahrplan und MRR", tr: "stammo, fibero, cassamea – yol haritası ve MRR" },
     knoten: [],
-    agenten: [],
-    besetzung: "leer",
+    agenten: ["produkt"],
+    besetzung: "aktiv",
   },
   {
     id: "entwicklung",
     bereich: "technik",
     name: { de: "Entwicklung", tr: "Yazılım Geliştirme" },
-    aufgabe: { de: "Releases, Fehler, Deployments", tr: "Sürüm, hata, yayına alma" },
+    aufgabe: { de: "Tech-Radar, Releases, F&E, Aufträge für Claude Code", tr: "Teknoloji radarı, sürüm, Ar-Ge, Claude Code görevleri" },
     knoten: ["forschung"],
-    agenten: ["forschung"],
-    besetzung: "teilweise",
+    agenten: ["entwicklung", "forschung"],
+    besetzung: "aktiv",
   },
   {
     id: "it",
@@ -130,8 +139,8 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Einkauf", tr: "Satın Alma" },
     aufgabe: { de: "Lieferanten, Abos, KI-Kosten", tr: "Tedarikçi, abonelik, yapay zekâ maliyeti" },
     knoten: [],
-    agenten: [],
-    besetzung: "leer",
+    agenten: ["einkauf"],
+    besetzung: "aktiv",
   },
   {
     id: "qualitaet",
@@ -149,7 +158,7 @@ export const ABTEILUNGEN: Abteilung[] = [
     aufgabe: { de: "Buchhaltung, Steuern, Liquidität", tr: "Muhasebe, vergi, nakit" },
     knoten: ["finanz"],
     agenten: ["finanz", "forderungen"],
-    besetzung: "teilweise",
+    besetzung: "aktiv",
   },
   {
     id: "recht",
@@ -166,8 +175,8 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Personal (KI-Team)", tr: "İnsan Kaynakları (Yapay Zekâ Ekibi)" },
     aufgabe: { de: "KI-Mitarbeiter: Aufgaben, Leistung, Kosten", tr: "Yapay zekâ çalışanları: görev, performans, maliyet" },
     knoten: [],
-    agenten: [],
-    besetzung: "teilweise",
+    agenten: ["personal"],
+    besetzung: "aktiv",
   },
 ]
 

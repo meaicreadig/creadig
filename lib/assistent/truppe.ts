@@ -42,7 +42,7 @@ import {
 import { firmenText, firmenTextEn } from "@/lib/firmenwahrheit"
 import { inhalteText } from "@/lib/inhalte"
 
-export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite", "qualitaet", "wissen", "forderungen", "sicherheit", "kundenservice", "forschung"] as const
+export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite", "qualitaet", "wissen", "forderungen", "sicherheit", "kundenservice", "forschung", "produkt", "entwicklung", "international", "einkauf", "personal"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
 
 export type AgentInfo = {
@@ -74,6 +74,11 @@ export const AGENTEN: AgentInfo[] = [
   { key: "sicherheit", name: "IT-Sicherheit", aufgabe: "Prüft Pflicht-Einstellungen und durchsucht eingehende Mails nach Angriffen auf die KI (Prompt-Injection). Kritisches löst einen Alarm aus.", takt: "taeglich", ki: false },
   { key: "kundenservice", name: "Kundenservice", aufgabe: "Schreibt für unbeantwortete Kundenmails ohne Zuordnung einen Antwortentwurf; unbekannte Absender bekommen eine höfliche Rückfrage. Versendet nie selbst.", takt: "taeglich", ki: true },
   { key: "forschung", name: "F&E-Nachweis", aufgabe: "Fasst jede Woche die erfassten F&E-Stunden für die Forschungszulage zusammen und schätzt die Jahreserstattung.", takt: "woechentlich", ki: false },
+  { key: "produkt", name: "Produktmanagement", aufgabe: "Nimmt sich jeden Tag ein Produkt vor (fibero, stammo, meAI, CASSAMEA, meahv): MRR aus den Abos, Wettbewerb und Gesetze mit Quelle, Bulletin – und verteilt höchstens zwei Fahrplan-Schritte an Entwicklung, Marketing, Vertrieb oder International.", takt: "taeglich", ki: true },
+  { key: "entwicklung", name: "Entwicklung & Tech-Radar", aufgabe: "Bewertet jeden Morgen die Bulletin-Meldungen (montags auch Releases unseres Stacks): einsetzen, beobachten, ignorieren. Legt dir fertige Aufträge für Claude Code vor, markiert F&E-Vorhaben für die Forschungszulage und gibt Praxis-Themen an die Redaktion.", takt: "taeglich", ki: true },
+  { key: "international", name: "International Business", aufgabe: "Sucht jede Woche reihum in Schweiz, Österreich, Diaspora-Netzwerken und EU-Programmen echte Wege in den Markt (Programme, Kammern, Messen, Pflichten) mit Quelle und nächstem Schritt; Chancen mit Kundenkontakt gehen an den Vertrieb.", takt: "woechentlich", ki: true },
+  { key: "einkauf", name: "Einkauf", aufgabe: "Erkennt aus den Belegen laufende Verträge, meldet Preisanstiege über 10 % und neue Abos zur Prüfung. Kündigt nie selbst.", takt: "taeglich", ki: false },
+  { key: "personal", name: "Personal (KI-Team)", aufgabe: "Prüft jede Woche das KI-Team: unbesetzte Abteilungen, gescheiterte, stumme und nie gelaufene Mitarbeiter – als ein Auftrag an die Geschäftsführung.", takt: "woechentlich", ki: false },
   { key: "redaktion", name: "Redaktion", aufgabe: "Plant jede Woche 4 LinkedIn-Beiträge (Gründer-Stimme, Praxiswissen, Einblick & Beweis, Branche & Haltung) mit Text, Bild, Sendetermin und Link im ersten Kommentar.", takt: "taeglich", ki: true },
 ]
 
@@ -727,6 +732,11 @@ const LAEUFER: Record<AgentKey, (o: Start) => Promise<Ergebnis>> = {
   sicherheit: async () => (await import("@/lib/agenten/sicherheit")).sicherheitsRunde(),
   kundenservice: async () => (await import("@/lib/agenten/kundenservice")).kundenserviceRunde(),
   forschung: async () => (await import("@/lib/agenten/forschung")).forschungsRunde(),
+  produkt: async () => (await import("@/lib/agenten/produkt")).produktRunde(),
+  entwicklung: async () => (await import("@/lib/agenten/entwicklung")).entwicklungsRunde(),
+  international: async () => (await import("@/lib/agenten/international")).internationalRunde(),
+  einkauf: async () => (await import("@/lib/agenten/einkauf")).einkaufsRunde(),
+  personal: async () => (await import("@/lib/agenten/personal")).personalRunde(),
 }
 
 /** Länger als jede Funktion leben darf (maxDuration 300 s) – danach gilt eine Sperre als verwaist. */
@@ -818,7 +828,7 @@ export function faelligeAgenten(laeufe: Record<string, Lauf>, jetzt = new Date()
  *    dort IMMER, wenn er fällig ist — egal, ob andere noch warten. Er sieht
  *    dann die Ergebnisse aller Morgenrunden, bevor um 06:15 die Morgenmail geht.
  */
-const LIEST_BULLETIN: AgentKey[] = ["redaktion", "rat"]
+const LIEST_BULLETIN: AgentKey[] = ["redaktion", "rat", "entwicklung", "produkt"]
 
 export function taktPlan(faellig: AgentKey[]): { schnell: AgentKey[]; ki: AgentKey[] } {
   const ohneChef = faellig.filter((k) => k !== "koordinator")

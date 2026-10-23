@@ -62,6 +62,14 @@ const SCHWERPUNKTE: Schwerpunkt[] = [
       "Welche Förderprogramme, Zuschüsse und Wettbewerbe für junge Einzelunternehmen im Bereich Digitalisierung und KI in Deutschland haben eine Frist in den nächsten 90 Tagen?",
   },
   {
+    key: "international",
+    label: "Internationale Märkte",
+    an: "international",
+    auftrag: "Welcher Weg bringt creaDIG in den nächsten 90 Tagen in der Schweiz, in Österreich oder über die Diaspora-Netzwerke voran? Ein Weg, nächster Schritt, Frist. Keine Kaltakquise.",
+    recherche:
+      "Welche Programme, Kammern, Unternehmerverbände (auch türkischstämmige) und Messen mit offener Anmeldung in der Schweiz, in Österreich und im übrigen Europa helfen einem kleinen deutschen Digitalanbieter (Websites, Barrierefreiheit, KI-Automatisierung) beim Markteintritt?",
+  },
+  {
     key: "sichtbarkeit",
     label: "Sichtbarkeit",
     an: "kommunikation",
