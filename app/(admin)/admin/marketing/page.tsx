@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import { AdminShell } from "@/components/admin/admin-shell"
+import { SectionHeader } from "@/components/admin/primitives"
 import { PostWerkstatt } from "@/components/admin/post-werkstatt"
 import { linkedinStatus } from "@/lib/linkedin"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
@@ -15,6 +16,8 @@ export const metadata = { title: "Marketing" }
 const TEXT = {
   de: {
     titel: "Marketing",
+    auswertung: "Auswertung",
+    werkzeuge: "Werkzeuge",
     werkstatt: {
       titel: "Beitrags-Werkstatt · ein Gedanke, vier Kanäle",
       anlass: "Anlass",
@@ -73,6 +76,8 @@ const TEXT = {
   },
   tr: {
     titel: "Pazarlama",
+    auswertung: "Değerlendirme",
+    werkzeuge: "Araçlar",
     werkstatt: {
       titel: "Paylaşım atölyesi · bir fikir, dört kanal",
       anlass: "Konu",
@@ -181,6 +186,10 @@ export default async function MarketingSeite() {
         </Link>
       </div>
 
+      <div className="mt-8">
+        <SectionHeader title={t.auswertung} as="h2" />
+      </div>
+
       <WochenPlan d={d} t={t} />
 
       <ul className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -285,6 +294,10 @@ export default async function MarketingSeite() {
           <Leer text={d.letzte ? t.keineDaten : t.nichtGemessen} />
         )}
       </section>
+
+      <div className="border-border mt-12 border-t pt-8">
+        <SectionHeader title={t.werkzeuge} as="h2" />
+      </div>
 
       <div id="werkstatt" className="scroll-mt-6">
         <PostWerkstatt t={t.werkstatt} linkedin={await linkedinStatus()} />

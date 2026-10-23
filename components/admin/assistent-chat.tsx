@@ -235,7 +235,7 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
                 senden(eingabe)
               }
             }}
-            placeholder="Laut denken, fragen, beauftragen …"
+            placeholder="Laut denken, fragen …"
             className="min-h-12 flex-1 resize-none bg-transparent px-3 py-2 text-sm leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
           />
           <button

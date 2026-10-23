@@ -21,7 +21,7 @@ export function GrundWahl() {
       name="grund"
       defaultValue=""
       aria-label="Grund fürs Verwerfen (freiwillig)"
-      className="h-9 rounded-full border-border bg-card px-3 pe-7 text-sm text-muted-foreground"
+      className="rounded-full border-border bg-card px-3 py-1.5 pe-7 text-sm text-muted-foreground"
     >
       <option value="">Grund (freiwillig)</option>
       {ABSAGE_GRUENDE.map((g) => (
