@@ -748,8 +748,21 @@ export const clientWorks: Work[] = [
     href: "https://nvswiss.ch",
     live: true,
     // Logo unter public/brand/clients/nv-swiss.png (Owner geliefert).
-    releases: [],
-    approvedSentence: null,
+    releases: [
+      {
+        by: { name: "Ansprechperson des Kunden (dem Owner persönlich bekannt)", role: "Geschäftsführung", company: "NV SWISS" },
+        form: "schriftliche-nachricht",
+        at: "2026-10-22",
+        scopes: ["name", "logo", "fallstudie"],
+        reference: "Kundenfreigabe liegt dem Owner vor, schriftlich bestätigt im Chat am 22.10.2026",
+      },
+    ],
+    approvedSentence: {
+      de: "Versicherungs- & Finanzmakler (Schweiz) — Marke, Auftritt und der Weg von der Anfrage zum Termin.",
+      tr: "Sigorta & finans brokeri (İsviçre) — marka, görünüm ve talepten randevuya giden yol.",
+      en: "Insurance & finance broker (Switzerland) — brand, presence, and the path from enquiry to appointment.",
+      ar: "وسيط تأمين ومال (سويسرا) — علامة وحضور والطريق من الطلب إلى الموعد.",
+    },
   },
   {
     slug: "maqam",
@@ -774,8 +787,16 @@ export const clientWorks: Work[] = [
     mark: "mq",
     discipline: "marke-web",
     // Logo: public/brand/clients/maqam.png (schwarz entfernt → transparent)
-    releases: [],
-    approvedSentence: null,
+    releases: [
+      {
+        by: { name: "Ansprechperson des Kunden (dem Owner persönlich bekannt)", role: "Geschäftsführung", company: "maqam" },
+        form: "schriftliche-nachricht",
+        at: "2026-10-22",
+        scopes: ["name", "logo", "fallstudie"],
+        reference: "Kundenfreigabe liegt dem Owner vor, schriftlich bestätigt im Chat am 22.10.2026",
+      },
+    ],
+    approvedSentence: { de: "Online-Business / E-Commerce.", tr: "Online iş / e-ticaret.", en: "Online business / e-commerce.", ar: "أعمال إلكترونية / تجارة إلكترونية." },
   },
   {
     slug: "bir-damla-hayir",
@@ -800,8 +821,21 @@ export const clientWorks: Work[] = [
     mark: "bd",
     discipline: "marke-web",
     // Logo: public/brand/clients/bir-damla-hayir.png
-    releases: [],
-    approvedSentence: null,
+    releases: [
+      {
+        by: { name: "Ansprechperson des Kunden (dem Owner persönlich bekannt)", role: "Vorstand", company: "Bir Damla Hayır" },
+        form: "schriftliche-nachricht",
+        at: "2026-10-22",
+        scopes: ["name", "logo", "fallstudie"],
+        reference: "Kundenfreigabe liegt dem Owner vor, schriftlich bestätigt im Chat am 22.10.2026",
+      },
+    ],
+    approvedSentence: {
+      de: "Hilfsorganisation — Marke und Website.",
+      tr: "Yardım kuruluşu — marka ve web sitesi.",
+      en: "Aid organisation — brand and website.",
+      ar: "منظمة إغاثة — علامة وموقع.",
+    },
   },
   /*
    * Owner 11.10.2026 — drei neue Kundenarbeiten. Inhalt steht, sichtbar
@@ -1029,7 +1063,7 @@ export const clientWorks: Work[] = [
    */
   {
     slug: "big-bielefeld",
-    sector: { de: "Gemeinde · Verband", tr: "Cemaat · birlik", en: "Community · association", ar: "جماعة · اتحاد" },
+    sector: { de: "Gemeinde · Verband", tr: "Cemaat · birlik", en: "Community · association", ar: "ج��اعة · اتحاد" },
     year: null,
     name: "BIG — Bündnis Islamischer Gemeinden in Bielefeld",
     what: {
