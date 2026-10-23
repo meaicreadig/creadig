@@ -27,6 +27,12 @@ export type Meldung = {
   kurz: Zweisprachig
   /** Was die Nachricht für creaDIG bedeutet – der eigentliche Wert des Bulletins. */
   fuerUns: Zweisprachig
+  /**
+   * Was creaDIG daraus für Kunden tun kann (Prüfung, Hinweis, Leistung).
+   * Zweite Hälfte derselben Frage: Was nützt uns, was nützt dem Kunden?
+   * Fehlt in Ausgaben vor dem 23.10.2026.
+   */
+  fuerKunden?: Zweisprachig | null
   /** 3 = Schwerpunkt, 2 = wichtig, 1 = Randnotiz. */
   gewicht: 1 | 2 | 3
   quelle: string

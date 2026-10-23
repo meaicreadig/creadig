@@ -97,6 +97,22 @@ export async function sammleZahlen(q: Abfrage, tage = ZEITRAUM_TAGE): Promise<Ag
     z.fehler = zahl(r.fehler)
   }
 
+  /* Leere Läufe in Folge, vom neuesten rückwärts – für die Lieferpflicht (regeln.ts). */
+  const serien = (await q(
+    `SELECT agent, array_agg(anzahl ORDER BY created_at DESC) AS anzahlen,
+            (array_agg(ergebnis ORDER BY created_at DESC))[1] AS letztes
+       FROM assistent_laeufe
+      WHERE created_at > now() - make_interval(days => $1)
+      GROUP BY agent`,
+    [tage],
+  )) as { agent: string; anzahlen: (number | null)[]; letztes: string | null }[]
+  for (const r of serien) {
+    const z = hole(String(r.agent))
+    const ende = r.anzahlen.findIndex((a) => zahl(a) > 0)
+    z.leerInFolge = ende < 0 ? r.anzahlen.length : ende
+    z.letztesErgebnis = r.letztes
+  }
+
   /* Wer im Takt steht und im ganzen Zeitraum nie lief, ist still ausgefallen. Dynamisch geladen: truppe.ts ruft diese Datei selbst auf. */
   const { AGENTEN } = await import("@/lib/assistent/truppe")
   for (const a of AGENTEN) {
@@ -123,6 +139,9 @@ function auftragsText(z: AgentZahlen, b: Bewertung, verworfen: string[]): string
     verworfen.length ? `\nZuletzt verworfen:\n${verworfen.map((t) => `- ${t}`).join("\n")}` : "",
     "",
     "Auftrag: Finde das Muster hinter den Verwerfungen bzw. Fehlern (Zielgruppe, Ton, fehlende Daten, falscher Zeitpunkt) und schlage EINE konkrete Änderung an Auswahl, Vorlage oder Regel des Agenten vor. Keine Zahlen erfinden.",
+    z.leerInFolge && b.gruende.some((g) => g.startsWith("Liefert nicht"))
+      ? "Liefert der Agent gar nichts, zuerst die Ursache benennen: Datenquelle erreichbar? Antwort lesbar? Auftrag zu eng? Ein Fix am Code geht als Auftrag an die Entwicklung."
+      : "",
   ].join("\n")
 }
 

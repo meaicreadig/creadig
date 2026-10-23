@@ -27,6 +27,9 @@ pruefe(!bewerte({ ...basis, entwuerfe: 6, freigegeben: 6 }).auffaellig, "100 % F
 pruefe(bewerte({ ...basis, laeufe: 10, fehler: 4 }).auffaellig, "40 % Fehlerquote muss auffallen")
 pruefe(!bewerte({ ...basis, laeufe: 10, fehler: 3 }).auffaellig, "30 % Fehlerquote liegt auf der Schwelle, nicht darüber")
 pruefe(bewerte({ ...basis, laeufe: 0, erwartetOhneLauf: true }).auffaellig, "Agent im Takt ohne Lauf muss auffallen")
+pruefe(bewerte({ ...basis, agent: "bulletin", leerInFolge: 3 }).auffaellig, "Bulletin mit 3 leeren Läufen in Folge muss auffallen (23.10.)")
+pruefe(!bewerte({ ...basis, agent: "bulletin", leerInFolge: 1 }).auffaellig, "Ein leerer Bulletin-Lauf darf noch nicht auffallen")
+pruefe(!bewerte({ ...basis, agent: "finanz", leerInFolge: 9 }).auffaellig, "Finanz ohne Fälliges ist kein Ausfall")
 pruefe(bewerte({ ...basis, entwuerfe: 4, freigegeben: 1, verworfen: 3 }).quote === 0.25, "Quote muss 0,25 sein")
 
 /* 2 · Bilgi Bekçisi */

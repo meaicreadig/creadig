@@ -32,6 +32,29 @@ export type AgentZahlen = {
   fehler: number
   /** Agent steht im Takt, ist im Zeitraum aber nie gelaufen. */
   erwartetOhneLauf?: boolean
+  /** So viele letzte Läufe in Folge ohne Ergebnis (anzahl = 0). */
+  leerInFolge?: number
+  /** Ergebnistext des letzten Laufs – damit der Auftrag den Grund nennt. */
+  letztesErgebnis?: string | null
+}
+
+/**
+ * Lieferpflicht: Agenten, deren Auftrag ein Ergebnis IST. Bei ihnen ist ein
+ * leerer Lauf kein „nichts zu tun“, sondern ein Ausfall – nach so vielen
+ * leeren Läufen in Folge gilt der Agent als auffällig.
+ *
+ * Warum (23.10.2026): Das Bulletin lief drei Tage „fehlerfrei“ und lieferte
+ * jedes Mal null Meldungen. Die Note sah nur Fehler und Freigaben, nicht das
+ * fehlende Ergebnis — aufgefallen ist es dem Inhaber, nicht dem Denetçi.
+ * Agenten wie Finanz oder Tahsilat stehen bewusst NICHT hier: bei ihnen ist
+ * „nichts fällig“ ein gutes Ergebnis.
+ */
+export const LIEFERPFLICHT: Record<string, number> = {
+  bulletin: 2,
+  webseite: 2,
+  jaeger: 2,
+  kapital: 2,
+  golf: 2,
 }
 
 export type Bewertung = { auffaellig: boolean; quote: number | null; fehlerquote: number | null; gruende: string[] }
@@ -48,6 +71,12 @@ export function bewerte(z: AgentZahlen): Bewertung {
     gruende.push(`Fehlerquote ${Math.round(fehlerquote * 100)} % (${z.fehler} von ${z.laeufe} Läufen gescheitert)`)
   }
   if (z.erwartetOhneLauf) gruende.push("Im Takt, aber im Zeitraum kein einziger Lauf")
+  const pflicht = LIEFERPFLICHT[z.agent]
+  if (pflicht && (z.leerInFolge ?? 0) >= pflicht) {
+    gruende.push(
+      `Liefert nicht: die letzten ${z.leerInFolge} Läufe ohne Ergebnis${z.letztesErgebnis ? ` („${z.letztesErgebnis.slice(0, 120)}“)` : ""}`,
+    )
+  }
   return { auffaellig: gruende.length > 0, quote, fehlerquote, gruende }
 }
 

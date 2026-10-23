@@ -67,7 +67,7 @@ async function recherchiere(tag: string): Promise<Fund[]> {
     model: RECHERCHE,
     prompt: `Du bist Nachrichten-Rechercheur. Stand: ${tag}. Finde die wichtigsten ECHTEN Meldungen der letzten 7 Tage (weltweit) zu diesen Ressorts: ${ressorts}.
 Beispiele, worauf es ankommt: neue KI-Modelle und Preise (OpenAI, Google, Anthropic, Meta, Mistral, xAI), KI-Agenten in Unternehmen, Automatisierung im Mittelstand, Änderungen bei Meta/Instagram/LinkedIn/Google-Suche/SEO, Chip-Produktion (TSMC, Nvidia, Intel Magdeburg, ASML, Exportkontrollen), humanoide Roboter und Industrierobotik, EU AI Act/DSGVO/Digitalpolitik, kritische Sicherheitslücken in verbreiteter Web-Software (PHP, WordPress, Shop-Systeme, Browser, Router) und Angriffswellen auf kleine Betriebe, Tech-Investitionen in Deutschland, Türkei, VAE, Saudi-Arabien, Katar.
-Je Ressort 1–2 Meldungen, insgesamt 10–12. Nur überprüfbare Meldungen mit direkter Artikel-URL einer seriösen Quelle. Nichts erfinden, im Zweifel weglassen.
+Decke ALLE Technikfelder ab, nicht nur die Beispiele. Insgesamt 12–15 Meldungen. Vorrang hat, was kleine und mittlere Betriebe mit Website, Shop, Mails oder Software diese Woche direkt betrifft. Nur überprüfbare Meldungen mit direkter Artikel-URL einer seriösen Quelle. Nichts erfinden, im Zweifel weglassen.
 Antworte NUR mit einem JSON-Array: [{"ressort":"ki|automation|medien|chips|robotik|recht|sicherheit|maerkte","titel":"","fakten":"2–3 Sätze nüchterne Fakten mit Zahlen","quelle":"Medienname","url":"https://…","datum":"YYYY-MM-DD"}]`,
   })
   return (json<Fund[]>(text, "[") ?? []).filter((f) => f?.titel && f?.url?.startsWith("http") && istRessort(f.ressort))
@@ -75,7 +75,15 @@ Antworte NUR mit einem JSON-Array: [{"ressort":"ki|automation|medien|chips|robot
 
 type Einordnung = {
   lage: Zweisprachig
-  meldungen: { nr: number; titel: Zweisprachig; kurz: Zweisprachig; fuerUns: Zweisprachig; gewicht: number; artikel: Zweisprachig | null }[]
+  meldungen: {
+    nr: number
+    titel: Zweisprachig
+    kurz: Zweisprachig
+    fuerUns: Zweisprachig
+    fuerKunden: Zweisprachig | null
+    gewicht: number
+    artikel: Zweisprachig | null
+  }[]
 }
 
 const zeileVon = (f: Fund, i: number) => `#${i} [${f.ressort}] ${f.titel} — ${f.fakten} (${f.quelle})`
@@ -95,10 +103,11 @@ async function ordnePaket(funde: Fund[], start: number): Promise<Einordnung["mel
   const { text } = await generateText({
     model: REDAKTION,
     prompt: `Du ordnest Meldungen für den Inhaber von ${FIRMA} ein. Erfinde KEINE neuen Fakten.
-Für JEDE Meldung (#nr behalten): "titel" (prägnant, max. 12 Wörter), "kurz" (2 Sätze Fakten), "fuerUns" (1–2 Sätze: konkrete Bedeutung für creaDIG – Chance, Risiko oder Handlung; ehrlich "kaum Bezug", wenn es keinen gibt), "gewicht" (3 = Schwerpunkt, höchstens 1 in dieser Liste; 2 = wichtig; 1 = Randnotiz), "artikel" (nur wenn creaDIG daraus einen eigenen, suchmaschinenstarken Fachartikel mit Haltung schreiben kann: Arbeitstitel; sonst null).
+Jede Meldung siehst du mit zwei Fragen: Was nützt sie creaDIG? Was kann creaDIG daraus für seine Kunden tun?
+Für JEDE Meldung (#nr behalten): "titel" (prägnant, max. 12 Wörter), "kurz" (2 Sätze Fakten), "fuerUns" (1–2 Sätze: konkrete Chance oder Handlung für creaDIG – Angebot, Positionierung, Produkt; ehrlich "kaum Bezug", wenn es keinen gibt), "fuerKunden" (1–2 Sätze: was creaDIG für bestehende Kunden konkret tun kann – prüfen, absichern, umstellen, erklären – als Nutzen formuliert, nie als Angstmache; null, wenn es nichts gibt), "gewicht" (3 = öffnet eine KONKRETE Chance für creaDIG oder einen konkreten Kundennutzen, so viele wie es ehrlich gibt; 2 = wichtig zu wissen; 1 = Randnotiz), "artikel" (bei jedem gewicht 3 und wo creaDIG einen suchmaschinenstarken Fachartikel mit Haltung schreiben kann: Arbeitstitel; sonst null).
 Alles auf Deutsch ("de") UND natürlichem Türkisch ("tr").
 ${funde.map((f, i) => zeileVon(f, start + i)).join("\n")}
-Antworte NUR mit JSON: {"meldungen":[{"nr":0,"titel":{"de":"","tr":""},"kurz":{"de":"","tr":""},"fuerUns":{"de":"","tr":""},"gewicht":2,"artikel":{"de":"","tr":""}}]}`,
+Antworte NUR mit JSON: {"meldungen":[{"nr":0,"titel":{"de":"","tr":""},"kurz":{"de":"","tr":""},"fuerUns":{"de":"","tr":""},"fuerKunden":{"de":"","tr":""},"gewicht":2,"artikel":{"de":"","tr":""}}]}`,
   })
   return json<{ meldungen: Einordnung["meldungen"] }>(text, "{")?.meldungen ?? []
 }
@@ -136,6 +145,7 @@ export async function erstelleBulletin(opt: { erzwingen?: boolean } = {}): Promi
       titel,
       kurz: zwei(m.kurz) ?? { de: f.fakten, tr: f.fakten },
       fuerUns: zwei(m.fuerUns) ?? { de: "—", tr: "—" },
+      fuerKunden: zwei(m.fuerKunden),
       gewicht: m.gewicht === 3 ? 3 : m.gewicht === 1 ? 1 : 2,
       quelle: f.quelle || new URL(f.url).hostname,
       url: f.url,
@@ -154,14 +164,21 @@ export async function erstelleBulletin(opt: { erzwingen?: boolean } = {}): Promi
     return 0
   })
 
-  /* Die Redaktion wartet nicht auf einen Klick: die stärkste Artikelidee wird sofort als Entwurf geschrieben. */
-  let artikel = ""
-  const top = meldungen.find((m) => m.artikel && m.gewicht === 3) ?? meldungen.find((m) => m.artikel)
-  if (top) {
-    artikel = await schreibeArtikel(top, tag)
-      .then((r) => ` · ${r.ergebnis}`)
-      .catch(() => "")
-  }
+  /*
+    Die Redaktion wartet nicht auf einen Klick: jede Chance (gewicht 3) mit
+    Artikelidee wird sofort Entwurf – bis zu zwei, parallel wegen Zeitlimit.
+    Vorher nur die eine stärkste; die PHP-Lücke am 21.10. wäre so durchgefallen.
+  */
+  const chancen = meldungen.filter((m) => m.artikel && m.gewicht === 3).slice(0, 2)
+  const auswahl = chancen.length ? chancen : meldungen.filter((m) => m.artikel).slice(0, 1)
+  const geschrieben = await Promise.all(
+    auswahl.map((m) =>
+      schreibeArtikel(m, tag)
+        .then((r) => r.ergebnis)
+        .catch(() => null),
+    ),
+  )
+  const artikel = geschrieben.filter(Boolean).map((e) => ` · ${e}`).join("")
   return {
     ergebnis: `Bulletin ${tag}: ${meldungen.length} Meldungen, ${schwer} Schwerpunkte${verteilt ? `, ${verteilt} Aufträge an Abteilungen` : ""}${artikel}`,
     anzahl: meldungen.length,
@@ -176,12 +193,16 @@ async function verteileLage(tag: string, lage: string, meldungen: Meldung[]): Pr
     model: "openai/gpt-5.4-mini",
     prompt: `Du bist der Chief of Staff von creaDIG Solutions.
 ${FIRMA}
-Aus der heutigen Marktlage leitest du bis zu 3 KONKRETE interne Aufträge ab, die creaDIG nach vorne bringen. Jeder Auftrag geht an genau eine Abteilung, die ihn selbst bearbeiten kann (Analyse, Entwurf, Konzept, Positionierung). Nichts, was Geld kostet oder nach außen geht.
+Aus der heutigen Marktlage leitest du bis zu 4 KONKRETE Aufträge ab. Grundsatz: Was creaDIG nützt, setzen wir um; was Kunden nützt, setzen wir für sie um – als Leistung.
+Jeder Auftrag geht an genau eine Abteilung, die ihn selbst bearbeiten kann (Analyse, Entwurf, Konzept, Positionierung, Angebotsbaustein). Wo eine Meldung Kunden betrifft, ist ein Auftrag der Entwurf eines sachlichen Hinweises an BESTANDSKUNDEN (nur Entwurf zur Freigabe; keine Kaltakquise, keine Angstmache) oder ein Leistungsbaustein dafür. Nichts, was Geld kostet oder ungefragt nach außen geht.
 Abteilungen: ${ABTEILUNGEN.map((a) => `${a.id} (${a.name.de})`).join(", ")}
 
 LAGE: ${lage}
 MELDUNGEN:
-${meldungen.slice(0, 6).map((m) => `- ${m.titel.de} – für uns: ${m.fuerUns.de}`).join("\n")}
+${meldungen
+  .slice(0, 8)
+  .map((m) => `- ${m.titel.de} – für uns: ${m.fuerUns.de}${m.fuerKunden ? ` – für Kunden: ${m.fuerKunden.de}` : ""}`)
+  .join("\n")}
 
 Antworte NUR mit JSON: {"auftraege":[{"an":"<id>","titel":"max 12 Wörter","inhalt":"was genau zu tun ist, 2-3 Sätze, mit Bezug zur Meldung"}]}`,
     maxOutputTokens: 900,
@@ -189,7 +210,7 @@ Antworte NUR mit JSON: {"auftraege":[{"an":"<id>","titel":"max 12 Wörter","inha
   const json = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1)
   const p = JSON.parse(json || "{}") as { auftraege?: { an?: string; titel?: string; inhalt?: string }[] }
   let n = 0
-  for (const [i, a] of (p.auftraege ?? []).slice(0, 3).entries()) {
+  for (const [i, a] of (p.auftraege ?? []).slice(0, 4).entries()) {
     if (!a.an || !ids.has(a.an) || !a.titel || !a.inhalt) continue
     const id = await legeAuftragAn({
       von: "unternehmenskommunikation",

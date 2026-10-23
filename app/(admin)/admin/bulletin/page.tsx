@@ -18,12 +18,13 @@ export const maxDuration = 300
 const T = {
   de: {
     titel: "Bulletin",
-    lead: "Was diese Woche in KI, Automatisierung, Medien, Chips und Robotik zählt – recherchiert mit Quelle und eingeordnet für creaDIG. Erscheint jeden Morgen von selbst.",
+    lead: "Jeden Morgen von selbst: was in Technik, IT-Sicherheit, KI, Medien und Märkten passiert – mit Quelle. Oben, was uns oder unseren Kunden eine Chance öffnet; darunter alles Weitere kurz notiert.",
     lage: "Lage",
     alle: "Alle",
     schwerpunkte: "Schwerpunkte",
-    weitere: "Weitere Meldungen",
+    weitere: "Kurz notiert",
     fuerUns: "Für creaDIG",
+    fuerKunden: "Für unsere Kunden",
     artikel: "Artikelidee",
     anRedaktion: "Artikel schreiben",
     neu: "Neu recherchieren",
@@ -31,7 +32,7 @@ const T = {
     lauf: "Recherche läuft seit",
     laufHinweis: "Die Seite aktualisiert sich von selbst. Du kannst sie auch verlassen – die Arbeit läuft weiter.",
     artikelTitel: "Artikel für creadig.de",
-    artikelLead: "Die Redaktion schreibt aus der stärksten Meldung jeden Morgen einen eigenen Fachartikel (DE + TR). Öffentlich wird er erst mit deiner Freigabe – danach liegt der LinkedIn-Beitrag zur Freigabe bereit.",
+    artikelLead: "Die Redaktion schreibt aus jeder Chance des Tages (bis zu zwei) sofort einen eigenen Fachartikel (DE + TR). Öffentlich wird er erst mit deiner Freigabe – danach liegt der LinkedIn-Beitrag zur Freigabe bereit.",
     entwurf: "Entwurf",
     live: "Live",
     vorschau: "Ganzen Text lesen",
@@ -46,12 +47,13 @@ const T = {
   },
   tr: {
     titel: "Bülten",
-    lead: "Bu hafta yapay zekâ, otomasyon, medya, çip ve robotikte önemli olan – kaynağıyla araştırıldı, creaDIG için yorumlandı. Her sabah kendiliğinden çıkar.",
+    lead: "Her sabah kendiliğinden: teknoloji, BT güvenliği, yapay zekâ, medya ve pazarlarda olanlar – kaynağıyla. Üstte bize ya da müşterilerimize fırsat açanlar; altta diğerleri kısaca.",
     lage: "Durum",
     alle: "Tümü",
     schwerpunkte: "Öne çıkanlar",
-    weitere: "Diğer haberler",
+    weitere: "Kısaca",
     fuerUns: "creaDIG için",
+    fuerKunden: "Müşterilerimiz için",
     artikel: "Makale fikri",
     anRedaktion: "Makale yaz",
     neu: "Yeniden araştır",
@@ -59,7 +61,7 @@ const T = {
     lauf: "Araştırma sürüyor, başlangıç",
     laufHinweis: "Sayfa kendini yeniler. Sayfadan çıkabilirsin – çalışma arka planda devam eder.",
     artikelTitel: "creadig.de için makaleler",
-    artikelLead: "Editörlük her sabah en güçlü haberden kendi uzmanlık makalesini yazar (DE + TR). Senin onayın olmadan yayına çıkmaz – sonra LinkedIn paylaşımı onaya hazır bekler.",
+    artikelLead: "Editörlük günün her fırsatından (en fazla iki) hemen kendi uzmanlık makalesini yazar (DE + TR). Senin onayın olmadan yayına çıkmaz – sonra LinkedIn paylaşımı onaya hazır bekler.",
     entwurf: "Taslak",
     live: "Yayında",
     vorschau: "Tüm metni oku",
@@ -166,11 +168,14 @@ export default async function BulletinSeite(props: { searchParams: Promise<{ aus
                   <h2 id="weitere" className="font-sans text-lg font-semibold text-foreground">
                     {t.weitere}
                   </h2>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {rest.map((m) => (
-                      <MeldungKarte key={m.nr} m={m} t={t} sprache={sprache} ausgabe={ausgabe.id} />
-                    ))}
-                  </div>
+                  {/* Tabelle statt Karten: lesen in Sekunden, Chancen bleiben oben (23.10.). */}
+                  <Surface className="p-0">
+                    <ul className="divide-y divide-border">
+                      {rest.map((m) => (
+                        <KurzZeile key={m.nr} m={m} sprache={sprache} />
+                      ))}
+                    </ul>
+                  </Surface>
                 </section>
               )}
             </>
@@ -334,6 +339,12 @@ function MeldungKarte({
         <p className="text-xs font-medium text-primary">{t.fuerUns}</p>
         <p className="text-sm leading-relaxed text-foreground">{m.fuerUns[sprache]}</p>
       </div>
+      {m.fuerKunden && (
+        <div className="rounded-2xl bg-primary/5 px-4 py-3">
+          <p className="text-xs font-medium text-primary">{t.fuerKunden}</p>
+          <p className="text-sm leading-relaxed text-foreground">{m.fuerKunden[sprache]}</p>
+        </div>
+      )}
       <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-1">
         <a
           href={m.url}
@@ -361,6 +372,27 @@ function MeldungKarte({
         </p>
       )}
     </Surface>
+  )
+}
+
+function KurzZeile({ m, sprache }: { m: Meldung; sprache: "de" | "tr" }) {
+  const ressort = RESSORTS.find((r) => r.id === m.ressort)
+  return (
+    <li className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-baseline sm:gap-4">
+      <p className="shrink-0 font-mono text-[11px] uppercase tracking-widest text-primary sm:w-36">{ressort?.[sprache]}</p>
+      <div className="flex min-w-0 flex-col gap-1">
+        <a
+          href={m.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-baseline gap-1 text-sm font-medium text-foreground hover:text-primary"
+        >
+          {m.titel[sprache]}
+          <ArrowUpRight className="size-3.5 shrink-0" aria-hidden />
+        </a>
+        <p className="text-sm leading-relaxed text-muted-foreground">{m.fuerUns[sprache]}</p>
+      </div>
+    </li>
   )
 }
 
