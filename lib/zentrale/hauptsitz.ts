@@ -33,6 +33,8 @@ export type Raum = {
   id: string
   etage: number
   spalte: number
+  /** Anzahl Räume auf diesem Geschoss – die Breite wird gleichmäßig geteilt, nie über die Fassade hinaus. */
+  spalten: number
   name: string
   aufgabe: string
   besetzung: Besetzung
@@ -58,7 +60,8 @@ export function bauHauptsitz(
   const raeume: Raum[] = []
 
   ETAGEN_FOLGE.forEach((bereich, etage) => {
-    ABTEILUNGEN.filter((a) => a.bereich === bereich).forEach((a, spalte) => {
+    const imGeschoss = ABTEILUNGEN.filter((a) => a.bereich === bereich)
+    imGeschoss.forEach((a, spalte) => {
       const knoten = a.knoten.filter((k) => erlaubt.has(k as KnotenId)) as KnotenId[]
       const signale = knoten.map((k) => netz[k]).filter(Boolean)
       const zustand = signale.reduce<Zustand>((s, x) => (RANG[x.zustand] > RANG[s] ? x.zustand : s), "ruhig")
@@ -71,6 +74,7 @@ export function bauHauptsitz(
         id: a.id,
         etage,
         spalte,
+        spalten: imGeschoss.length,
         name: a.name[sprache],
         aufgabe: a.aufgabe[sprache],
         besetzung: a.besetzung,
