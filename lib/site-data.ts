@@ -730,7 +730,8 @@ export const clientWorks: Work[] = [
        * Was jetzt dasteht, nennt die Sache: Marke, Auftritt, und der Weg
        * dahinter. Kuerzer, und man kann es sich vorstellen.
        */
-      de: "Versicherungs- & Finanzmakler (Schweiz) — Marke, Auftritt und der Weg von der Anfrage zum Termin.",
+      /* 23.10.2026: zwei kurze Sätze — seit der Freigabe steht NV SWISS auf 6 Routen (Content-Gate). */
+      de: "Versicherungs- & Finanzmakler in der Schweiz. Marke, Auftritt und der Weg zum Termin.",
       tr: "Sigorta & finans brokeri (İsviçre) — marka, görünüm ve talepten randevuya giden yol.",
       en: "Insurance & finance broker (Switzerland) — brand, presence, and the path from enquiry to appointment.",
       ar: "وسيط تأمين ومال (سويسرا) — علامة وحضور والطريق من الطلب إلى الموعد.",
@@ -757,11 +758,13 @@ export const clientWorks: Work[] = [
         reference: "Kundenfreigabe liegt dem Owner vor, schriftlich bestätigt im Chat am 22.10.2026",
       },
     ],
+    /* Kurz wie bei den anderen Kunden: die lange Fassung steht schon im summary;
+       doppelt stand sie auf 6 Routen (Content-Gate, 23.10.2026). */
     approvedSentence: {
-      de: "Versicherungs- & Finanzmakler (Schweiz) — Marke, Auftritt und der Weg von der Anfrage zum Termin.",
-      tr: "Sigorta & finans brokeri (İsviçre) — marka, görünüm ve talepten randevuya giden yol.",
-      en: "Insurance & finance broker (Switzerland) — brand, presence, and the path from enquiry to appointment.",
-      ar: "وسيط تأمين ومال (سويسرا) — علامة وحضور والطريق من الطلب إلى الموعد.",
+      de: "Finanzmakler — Marke, Website und Terminweg.",
+      tr: "Finans brokeri — marka, web sitesi ve randevu yolu.",
+      en: "Finance broker — brand, website and booking path.",
+      ar: "وسيط مالي — علامة وموقع ومسار المواعيد.",
     },
   },
   {
@@ -1063,7 +1066,7 @@ export const clientWorks: Work[] = [
    */
   {
     slug: "big-bielefeld",
-    sector: { de: "Gemeinde · Verband", tr: "Cemaat · birlik", en: "Community · association", ar: "ج��اعة · اتحاد" },
+    sector: { de: "Gemeinde · Verband", tr: "Cemaat · birlik", en: "Community · association", ar: "جماعة · اتحاد" },
     year: null,
     name: "BIG — Bündnis Islamischer Gemeinden in Bielefeld",
     what: {
@@ -1440,6 +1443,14 @@ const emptyChapters: Record<CaseChapterKey, Localized | null> = {
  * belegt) Leistungen. `approved: false` — unsichtbar, bis Owner Freigabe +
  * Freigabesatz liefert. Keine KPI, keine erfundenen Kapitel.
  */
+/*
+ * 23.10.2026: Die Freigaben (Umfang name/logo/fallstudie) stehen EINMAL bei
+ * der Kundenarbeit; der Fall liest dieselben, statt sie zu kopieren. Owner im
+ * Chat: „NV SWISS, maqam ve Bir Damla'nın yazılı onayları var“.
+ * Ob ein Fall öffentlich erscheint, entscheidet weiter lib/freigabe-projektion.ts.
+ */
+const freigabenVon = (name: string) => clientWorks.find((w) => w.name === name)?.releases ?? []
+
 export const caseStudies: CaseStudy[] = [
   {
     slug: "nv-swiss",
@@ -1461,7 +1472,7 @@ export const caseStudies: CaseStudy[] = [
     /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
     image: null,
     mark: "NV",
-    releases: [],
+    releases: freigabenVon("NV SWISS"),
   },
   {
     slug: "maqam",
@@ -1478,7 +1489,7 @@ export const caseStudies: CaseStudy[] = [
     /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
     image: null,
     mark: "mq",
-    releases: [],
+    releases: freigabenVon("maqam"),
   },
   {
     slug: "bir-damla-hayir",
@@ -1495,7 +1506,7 @@ export const caseStudies: CaseStudy[] = [
     /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
     image: null,
     mark: "bd",
-    releases: [],
+    releases: freigabenVon("Bir Damla Hayır"),
   },
 ]
 

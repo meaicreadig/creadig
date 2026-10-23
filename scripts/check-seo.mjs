@@ -208,7 +208,8 @@ const LOCALES = [...INDEXED_LOCALES]
  */
 {
   const VERBOTEN = [
-    [/NV SWISS|nvswiss|maqam|Bir Damla|Glasfaser NordWest/i, "Kundenname ohne Freigabe"],
+    /* NV SWISS, maqam, Bir Damla seit 23.10.2026 freigegeben (releases in lib/site-data.ts, PR #132). */
+    [/Glasfaser NordWest/i, "Kundenname ohne Freigabe"],
     [/Telekom|AlCaTech/i, "Name aus dem laufenden fibero-Betrieb"],
     [/spart \d|saves \d|\d+\s*%\s*(weniger|schneller|effizienter)/i, "unbelegte Wirkung"],
     [/garantiert|guaranteed ROI|garantili/i, "Zusage"],

@@ -311,7 +311,12 @@ export function collect(): { open: Item[]; done: Item[] } {
        * Freigabe hinterlegt", waehrend derselbe Name draussen auf der Wand
        * lief. Jetzt lesen beide `logoFreigabe()`.
        */
-      ok: logoFreigabe(work).gedeckt && Boolean(work.approvedSentence),
+      /*
+       * Owner-Entscheidung 23.10.2026: „Onay varsa madde kapansın, cümle şart
+       * değil.“ Offen ist der Punkt nur, wenn die Freigabe fehlt; der Satz zu
+       * Aufgabe/Ergebnis ist Fallstudien-Inhalt, keine Freigabebedingung.
+       */
+      ok: logoFreigabe(work).gedeckt,
       detail: logoFreigabe(work).gedeckt
         ? work.approvedSentence
           ? "Freigabe und Satz liegen vor — Name und Logo erscheinen"

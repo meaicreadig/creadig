@@ -211,8 +211,12 @@ for (const s of seiten) {
  * Die Namen stehen in alten Arbeitsdokumenten im Repository. Von dort in
  * eine Seite zu rutschen ist ein Handgriff — und der Weg zurueck aus einem
  * Suchindex ist keiner.
+ *
+ * 23.10.2026: NV SWISS, maqam und Bir Damla Hayır sind freigegeben — Owner im
+ * Chat: „yazılı onayları var“; eingetragen als `releases` in lib/site-data.ts
+ * (PR #132). Ab dort prüft logoFreigabe(), nicht diese Liste.
  */
-const ALTE_NAMEN = ["NV SWISS", "NV-SWISS", "nvswiss", "maqam", "Bir Damla", "birdamla", "Glasfaser NordWest"]
+const ALTE_NAMEN = ["Glasfaser NordWest"]
 for (const s of seiten) {
   for (const name of ALTE_NAMEN) {
     if (s.text.toLowerCase().includes(name.toLowerCase())) {
