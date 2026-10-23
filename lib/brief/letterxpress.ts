@@ -9,6 +9,11 @@ import { createHash } from "node:crypto"
  * Env: LETTERXPRESS_USER, LETTERXPRESS_API_KEY; LETTERXPRESS_MODE=test lässt
  * Aufträge nur im Kundenkonto ablegen (nicht drucken) — zum Ausprobieren.
  * Ohne Zugang meldet der Versand das ehrlich, statt still zu scheitern.
+ *
+ * NIE OHNE EMIN (Owner, 24.10.2026: „ohne meine Freigabe darf nichts
+ * rausgehen"): Einziger Aufrufer ist der Freigabe-Knopf in
+ * app/(admin)/admin/assistent/actions.ts. Kein Agent, Cron oder Puls ruft
+ * diese Funktion; `freigabe` muss die Rolle tragen, die geklickt hat.
  */
 
 const BASIS = "https://api.letterxpress.de/v3"
@@ -24,7 +29,11 @@ const auth = () => ({
 
 export type BriefErgebnis = { ok: true; id: string; preisEur: number | null; test: boolean } | { ok: false; grund: string }
 
-export async function sendeBrief(pdf: Uint8Array, o: { dateiname: string; ausland?: boolean }): Promise<BriefErgebnis> {
+export async function sendeBrief(
+  pdf: Uint8Array,
+  o: { dateiname: string; ausland?: boolean; freigabe: { id: string; durch: string } },
+): Promise<BriefErgebnis> {
+  if (!o.freigabe?.id || !o.freigabe.durch) return { ok: false, grund: "Ohne Freigabe durch Emin geht kein Brief raus." }
   if (!briefBereit()) return { ok: false, grund: "Briefversand nicht eingerichtet (LETTERXPRESS_USER und LETTERXPRESS_API_KEY in Vercel fehlen)." }
   const base64 = Buffer.from(pdf).toString("base64")
   try {

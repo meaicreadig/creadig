@@ -1,7 +1,7 @@
 import "server-only"
 import { generateText } from "ai"
 import { ABTEILUNGEN, abteilungVonAgent } from "@/lib/zentrale/abteilungen"
-import { assistentDb, ergaenzeExtra, legeFreigabeAn, letzteLaeufe, setzeFreigabe } from "@/lib/assistent/store"
+import { assistentDb, ergaenzeExtra, ladeFreigabe, legeFreigabeAn, letzteLaeufe, setzeFreigabe } from "@/lib/assistent/store"
 import type { Abfrage } from "@/lib/neon-abfrage"
 import { firmenText } from "@/lib/firmenwahrheit"
 import { inhalteText } from "@/lib/inhalte"
@@ -376,7 +376,9 @@ Antworte NUR mit JSON:
   }
 
   // Intern erledigt: zugehörige interne Freigabe schließen, Ergebnis bleibt nachlesbar.
-  if (a.freigabeId) {
+  /* Nur interne Karten (Aufgabe/Notiz) schließt die Koordination – Mail, Brief, LinkedIn nie. */
+  const intern = a.freigabeId ? ["aufgabe", "notiz"].includes((await ladeFreigabe(a.freigabeId))?.art ?? "") : false
+  if (a.freigabeId && intern) {
     await ergaenzeExtra(a.freigabeId, { koordination: { abteilung: a.an, ergebnis, auftragId: a.id, automatisch: true } })
     await setzeFreigabe(a.freigabeId, "freigegeben")
   }

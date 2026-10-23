@@ -215,7 +215,7 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
     const { sendeBrief } = await import("@/lib/brief/letterxpress")
     const pdf = await erzeugeBriefPdf({ an: anschrift, betreff, text })
     const ausland = Boolean(anschrift.land && !/^(de|deutschland|germany)$/i.test(anschrift.land))
-    const r = await sendeBrief(pdf, { dateiname: `brief-${fid}.pdf`, ausland })
+    const r = await sendeBrief(pdf, { dateiname: `brief-${fid}.pdf`, ausland, freigabe: { id: fid, durch: rolle } })
     if (!r.ok) {
       await ergaenzeExtra(fid, { anschrift, fehler: r.grund })
       revalidatePath("/admin/assistent")
