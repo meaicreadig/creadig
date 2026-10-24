@@ -43,12 +43,13 @@ import { firmenText, firmenTextEn } from "@/lib/firmenwahrheit"
 import { inhalteText } from "@/lib/inhalte"
 
 /*
- * 24.10.2026: Golf → Kapital (Investoren, nur jede 4. Woche), Messen → Vertrieb,
+ * 24.10.2026: Messen → Vertrieb,
  * Wissens-Wächter → Qualität, Tahsilat → Finanz. Ihre Läufe laufen weiter als
  * Teil der jeweiligen Runde; Karten tragen weiter ihren alten Agenten-Namen.
+ * Golf-Radar bleibt eigener, wöchentlicher Agent (Emin: offene Tür, nicht drosseln).
  * Neu: Kundenbetreuung, Partner & Empfehlungen, Ergebnis-Controller, Angebotsautomat.
  */
-export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "kapital", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite", "qualitaet", "sicherheit", "kundenservice", "forschung", "produkt", "entwicklung", "international", "einkauf", "personal", "kundenbetreuung", "partner", "controller", "angebot"] as const
+export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite", "qualitaet", "sicherheit", "kundenservice", "forschung", "produkt", "entwicklung", "international", "einkauf", "personal", "kundenbetreuung", "partner", "controller", "angebot"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
 
 export type AgentInfo = {
@@ -70,7 +71,8 @@ export const AGENTEN: AgentInfo[] = [
   { key: "vertrieb", name: "Vertrieb", aufgabe: "Findet stille oder überfällige Abschlüsse und schreibt die nächste Mail. Bereitet außerdem jede Messe vor, bei der du teilnimmst (Plan, Kontakte, Unterkunft).", takt: "taeglich", ki: true },
   { key: "finanz", name: "Finanz", aufgabe: "Legt Folgerechnungen aus Abos als Entwurf an, legt für überfällige Rechnungen die nächste Mahnstufe als Entwurf vor (3/14/28 Tage) und eskaliert die 2. Mahnung. Versendet nie selbst.", takt: "taeglich", ki: false },
   { key: "projekte", name: "Projektleitung", aufgabe: "Führt jeden gewonnenen Auftrag bis zur Übergabe: legt Projekte an, fordert Material an, schreibt Wochenberichte, warnt vor Fristen und fasst nach.", takt: "taeglich", ki: false },
-  { key: "kapital", name: "Kapital", aufgabe: "Recherchiert Förderungen, Kredite und Investoren mit Quelle und Frist; jede 4. Woche zusätzlich Investoren und Programme am Golf (EN/AR).", takt: "woechentlich", ki: true },
+  { key: "kapital", name: "Kapital", aufgabe: "Recherchiert Förderungen, Kredite und Investoren mit Quelle und Frist.", takt: "woechentlich", ki: true },
+  { key: "golf", name: "Golf-Radar", aufgabe: "Sucht jede Woche Investoren, Family Offices, Programme, Aufträge und Events in VAE, Saudi-Arabien und Katar und schreibt die erste Nachricht auf Englisch und Arabisch – offene Tür für Leistung, Investition oder Partnerschaft, ohne Umzug.", takt: "woechentlich", ki: true },
   { key: "bulletin", name: "Bulletin", aufgabe: "Recherchiert jeden Morgen, was in KI, Automatisierung, Medien, Chips und Robotik zählt, mit Quelle, ordnet es für creaDIG ein und liefert der Redaktion Artikelideen.", takt: "taeglich", ki: true },
   { key: "qualitaet", name: "Qualitätssicherung", aufgabe: "Benotet jeden KI-Mitarbeiter täglich nach deinen Entscheidungen: Freigaben, Änderungen, Absagen, Fehler und Dauer. Wer unter der Grenze liegt, bekommt einen Auftrag mit seinen letzten Absagen. Prüft außerdem jeden offenen Entwurf auf erfundene Behauptungen (Zertifikate, Kundenzahlen) und unbekannte Preise.", takt: "taeglich", ki: false },
   { key: "sicherheit", name: "IT-Sicherheit", aufgabe: "Prüft Pflicht-Einstellungen und durchsucht eingehende Mails nach Angriffen auf die KI (Prompt-Injection). Kritisches löst einen Alarm aus.", takt: "taeglich", ki: false },
@@ -744,8 +746,8 @@ const LAEUFER: Record<AgentKey, (o: Start) => Promise<Ergebnis>> = {
   vertrieb: async () => verbinde(await vertrieb(), await messen()),
   finanz: async () => verbinde(await finanz(), await (await import("@/lib/agenten/forderungen")).forderungsRunde()),
   projekte,
-  /* Golf nur jede 4. Woche: Marktpriorität Deutschland → Schweiz → Europa (lib/firmenwahrheit.ts). */
-  kapital: async () => (Number(kw(new Date()).split("-")[1]) % 4 === 0 ? verbinde(await kapital(), await golf()) : kapital()),
+  kapital,
+  golf,
   redaktion,
   jaeger,
   recht,

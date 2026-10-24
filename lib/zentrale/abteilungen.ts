@@ -58,7 +58,7 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "International Business", tr: "Uluslararası İş Geliştirme" },
     aufgabe: { de: "Schweiz, Österreich, EU, Diaspora-Netzwerke, Golf-Radar", tr: "İsviçre, Avusturya, AB, diaspora ağları, Körfez radarı" },
     knoten: [],
-    agenten: ["international"],
+    agenten: ["international", "golf"],
     besetzung: "aktiv",
   },
   {

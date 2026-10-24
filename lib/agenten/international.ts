@@ -43,7 +43,7 @@ export async function internationalRunde(): Promise<{ ergebnis: string; anzahl: 
     model: MODELL,
     prompt: `Du leitest International Business bei creaDIG.
 ${firmenText("kurz")}
-Marktpriorität: ${MAERKTE.prioritaet.join(" → ")}. Nische: ${MAERKTE.nische}. ${MAERKTE.nicht}
+Marktpriorität: ${MAERKTE.prioritaet.join(" → ")}. Nische: ${MAERKTE.nische}. ${MAERKTE.nicht} ${MAERKTE.offen} ${MAERKTE.ziel}
 
 Schwerpunkt dieser Woche: ${f.markt}
 Recherche (${berlinTag()}):

@@ -37,7 +37,11 @@ export const FIRMA = {
 export const MAERKTE = {
   prioritaet: ["Deutschland", "Schweiz", "übriges Europa"],
   nische: "Handwerk sowie türkischsprachige Betriebe in Deutschland und Europa (Diaspora)",
-  nicht: "Kein Umzug und keine Expansion in die Golfstaaten geplant; Türkei ist kein eigener Zielmarkt.",
+  nicht: "Kein Umzug in die Golfstaaten; Türkei ist kein eigener Zielmarkt.",
+  /* Emin 24.10.2026: Ziel ist Einnahmen auf halalem, legalem Weg – über Kunden, Leistungen, Investitionen oder Partnerschaften.
+     Kein Markt außerhalb der Priorität wird deshalb gedrosselt: Wo eine Tür offen ist, ist creaDIG da. */
+  offen: "Golfstaaten (VAE, Saudi-Arabien, Katar) sind ein offener Chancenkanal: Investoren, Programme, Aufträge und Partnerschaften dort werden jede Woche aktiv verfolgt (Golf-Radar), ohne Umzug und ohne großes Risiko.",
+  ziel: "Hauptziel des Systems: Einnahmen – halal und legal – über Kunden, Leistungen, Investitionen oder Partnerschaften. Jede belegte Chance zählt, egal aus welchem Markt.",
 } as const
 
 export type Produkt = { name: string; was: string; stand: string }
@@ -114,13 +118,14 @@ function angeboteText(): string {
  */
 export function firmenText(umfang: "kurz" | "voll" = "voll"): string {
   if (umfang === "kurz")
-    return `${FIRMA.name} (${FIRMA.rechtsform}, Inhaber ${FIRMA.inhaber}, ${FIRMA.standort}): ${FIRMA.positionierung}. Eigene Produkte: ${PRODUKTE.map((p) => p.name).join(", ")}. Märkte: ${MAERKTE.prioritaet.join(" > ")}.`
+    return `${FIRMA.name} (${FIRMA.rechtsform}, Inhaber ${FIRMA.inhaber}, ${FIRMA.standort}): ${FIRMA.positionierung}. Eigene Produkte: ${PRODUKTE.map((p) => p.name).join(", ")}. Märkte: ${MAERKTE.prioritaet.join(" > ")}; Golfstaaten als offener Chancenkanal. Ziel: Einnahmen – halal und legal – aus jeder belegten Chance.`
   return [
     `FIRMA (Stand ${STAND}): ${FIRMA.name}, ${FIRMA.rechtsform} von ${FIRMA.inhaber}, ${FIRMA.standort}. ${FIRMA.gruendung}. ${FIRMA.arbeitsweise}`,
     `WAS WIR TUN: ${FIRMA.positionierung}. ${FIRMA.geld}`,
     `ANGEBOTE: ${angeboteText()}`,
     `EIGENE PRODUKTE: ${PRODUKTE.map((p) => `${p.name} (${p.was}; ${p.stand})`).join("; ")}.`,
-    `MÄRKTE: ${MAERKTE.prioritaet.join(" > ")}. Nische: ${MAERKTE.nische}. ${MAERKTE.nicht}`,
+    `MÄRKTE: ${MAERKTE.prioritaet.join(" > ")}. Nische: ${MAERKTE.nische}. ${MAERKTE.nicht} ${MAERKTE.offen}`,
+    `ZIEL: ${MAERKTE.ziel}`,
     `SPRACHEN: ${FIRMA.sprachen}. ENGPASS: ${FIRMA.engpass}.`,
     `REGELN: ${GRUNDREGELN.join(" ")}`,
     `VERBOTEN: ${VERBOTE_TEXT}`,

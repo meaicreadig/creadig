@@ -368,6 +368,7 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
   lage: Radar,
   vertrieb: Handshake,
   kapital: Coins,
+  golf: Radar,
   finanz: Coins,
   redaktion: PenLine,
   projekte: Kanban,
@@ -390,7 +391,7 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
 }
 
 /* Seit 24.10.2026 zusammengelegt – ihre Karten tragen den alten Namen weiter. */
-const FRUEHERE: Record<string, string> = { golf: "Golf-Radar (Kapital)", messen: "Messen (Vertrieb)", wissen: "Wissens-Wächter (Qualität)", forderungen: "Tahsilat (Finanz)" }
+const FRUEHERE: Record<string, string> = { messen: "Messen (Vertrieb)", wissen: "Wissens-Wächter (Qualität)", forderungen: "Tahsilat (Finanz)" }
 const agentName = (key: string | null) => AGENTEN.find((a) => a.key === key)?.name ?? (key && FRUEHERE[key]) ?? "Assistent"
 
 function seit(iso: string): string {
