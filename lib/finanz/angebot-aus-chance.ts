@@ -2,7 +2,6 @@ import "server-only"
 
 import { randomUUID } from "node:crypto"
 
-import { legeFreigabeAn } from "@/lib/assistent/store"
 import type { Abfrage } from "@/lib/neon-abfrage"
 import { legeEntwurfAusGewinn } from "@/lib/finanz/auftraege/aus-vertrieb"
 
@@ -10,7 +9,7 @@ import { legeEntwurfAusGewinn } from "@/lib/finanz/auftraege/aus-vertrieb"
  * Admin → Finanz, früher als beim Gewinn: Sobald ein Vorgang in „Angebot“ oder
  * „Verhandlung“ steht, liegt in Finanz der Angebots-ENTWURF bereit (Kunde,
  * Kontakt und geschätzter Wert kommen aus dem Vertrieb), und in der
- * Freigabe-Liste steht „prüfen und senden“.
+ * Freigabe-Liste steht (seit Katman 4) die fertige Karte „Angebot senden“.
  *
  * Es wird nichts verschickt: Senden bleibt dein Klick in /finanz/vorgang/<id>
  * (dort auch Preise und Texte anpassen). Idempotent über opportunity_id und den
@@ -36,13 +35,21 @@ export async function legeAngebotsEntwuerfeAusChancen(db: Abfrage): Promise<{ id
        VALUES ($1,'opportunity',$2,'finanz.entwurf','Angebots-Entwurf in Finanz angelegt',$3,'finanz-agent','AUTO',now())`,
       [randomUUID(), oppId, `Entwurf ${r.id} liegt bereit — Prüfen und Senden bleibt dein Klick in Finanz.`],
     ).catch(() => null)
-    await legeFreigabeAn({
-      art: "aufgabe",
-      titel: `Angebot prüfen und senden: ${String(c.title).slice(0, 90)}`,
-      inhalt: [`Für den Vorgang „${c.title}“ liegt ein Angebots-Entwurf bereit.`, "", `Öffnen, Preise prüfen, mit einem Klick senden: /finanz/vorgang/${r.id}`, "Es wurde nichts verschickt."].join("\n"),
-      quelle: `angebot-chance:${oppId}`,
-      agent: "finanz",
-    }).catch(() => null)
+    /* Katman 4: statt „prüfen und senden“-Aufgabe gleich füllen und die Ein-Klick-Karte „Angebot senden“ anlegen. */
+    try {
+      const [{ fuelleAngebot }, { legeAngebotsKarte }, { finanzDb }] = await Promise.all([
+        import("@/lib/agenten/angebot"),
+        import("@/lib/ausfuehrung/angebot-hat"),
+        import("@/lib/finanz/store"),
+      ])
+      const fdb = await finanzDb()
+      if (fdb) {
+        await fuelleAngebot(fdb, r.id, oppId)
+        await legeAngebotsKarte(fdb, r.id)
+      }
+    } catch (e) {
+      console.error("[angebot-aus-chance] karte", e instanceof Error ? e.message : e)
+    }
   }
   return neu
 }

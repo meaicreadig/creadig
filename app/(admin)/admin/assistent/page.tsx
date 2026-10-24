@@ -73,7 +73,11 @@ import { EingangListe } from "@/components/admin/eingang-liste"
 import { ladeNeueBuchungen } from "@/lib/termine/store"
 import { Disclosure } from "@/components/ui/disclosure"
 
-import { agentStarten, antwortErhalten, beschlussAbhaken, freigabeEntscheiden, freigabeVerwerfen, kapitalStufe, ratAntworten } from "./actions"
+import { agentStarten, antwortErhalten, beschlussAbhaken, freigabeEntscheiden, freigabeVerwerfen, kapitalStufe, lieferAufgabeSetzen, codePrStarten, ratAntworten } from "./actions"
+import { codeHatBereit } from "@/lib/ausfuehrung/code-hat"
+import { siteUrl } from "@/lib/termine/mail"
+import { heuteBerlin } from "@/lib/finanz/rechnen"
+import { kalenderSchluessel, ladeLieferAufgaben, type LieferAufgabe } from "@/lib/ausfuehrung/lieferung-hat"
 import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
 import { instagramBereit, ladeInstagram } from "@/lib/assistent/instagram"
 import { STUFE_TEXT } from "@/lib/assistent/kapital-antrag"
@@ -1296,11 +1300,13 @@ export default async function AssistentPage({
     ladeBeitraege(6).catch(() => []),
     ladeAnsprache().catch((): Ansprache => ({ gesendet: 0, beantwortet: 0, quote: null, nachfassOffen: 0 })),
   ])
-  const [auftraege, auftragZahlen, codeBacklog, kanaele] = await Promise.all([
+  const [auftraege, auftragZahlen, codeBacklog, kanaele, lieferung, kalenderKey] = await Promise.all([
     ladeAuftraege(20).catch(() => []),
     auftragKennzahlen().catch(() => ({ heute: 0, erledigt: 0, uebergaben: 0, beiEmin: 0, offen: 0 })),
     ladeCodeBacklog().catch(() => []),
     pruefeKanaele().catch((): Kanal[] => []),
+    ladeLieferAufgaben().catch((): LieferAufgabe[] => []),
+    kalenderSchluessel().catch(() => null),
   ])
   /* Die Truppe läuft nur im Morgen-Takt (Cron) und im Puls – nicht beim Seitenaufruf, sonst verschiebt
      ein nächtlicher Besuch den Tageslauf und der Morgen bleibt leer. */
@@ -1455,15 +1461,22 @@ export default async function AssistentPage({
               </Klappe>
             ) : null}
 
+            {lieferung.length > 0 ? <LieferungKlappe aufgaben={lieferung} kalenderKey={kalenderKey} /> : null}
+
             {codeBacklog.length > 0 ? (
-              <Klappe titel="Code-Backlog" zahl={codeBacklog.length} unter="Für Claude Code gesammelt — keine Freigaben">
+              <Klappe
+                titel="Code-Backlog"
+                zahl={codeBacklog.filter((f) => f.extra.pr?.status === "offen").length || codeBacklog.length}
+                unter={
+                  codeHatBereit()
+                    ? "Wird automatisch zum Pull Request (einer zur Zeit) — du prüfst die Vorschau und mergst"
+                    : "Für Claude Code gesammelt — für automatische PRs fehlt GITHUB_TOKEN in Vercel"
+                }
+              >
                 <ul className="flex flex-col gap-2">
                   {codeBacklog.map((f) => (
                     <li key={f.id}>
-                      <details className="rounded-2xl bg-background px-5 py-4">
-                        <summary className="cursor-pointer font-medium text-foreground">{f.titel}</summary>
-                        <p className="mt-2 select-all whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{f.inhalt}</p>
-                      </details>
+                      <CodeKarte f={f} bereit={codeHatBereit()} belegt={codeBacklog.some((x) => x.extra.pr?.status === "laeuft" || x.extra.pr?.status === "offen")} />
                     </li>
                   ))}
                 </ul>
@@ -1513,5 +1526,92 @@ export default async function AssistentPage({
       </div>
       <AktionMeldung />
     </AdminShell>
+  )
+}
+
+/** Katman 4: Lieferplan aller laufenden Projekte – abhaken, Kalender abonnieren. */
+function LieferungKlappe({ aufgaben, kalenderKey }: { aufgaben: LieferAufgabe[]; kalenderKey: string | null }) {
+  const heute = heuteBerlin()
+  const offen = aufgaben.filter((a) => a.status === "offen")
+  const faellig = offen.filter((a) => a.faellig && a.faellig <= heute).length
+  const datum = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", timeZone: "Europe/Berlin" })
+  return (
+    <Klappe
+      titel="Lieferung"
+      zahl={faellig || undefined}
+      offen={faellig > 0}
+      unter={`${offen.length} offene Aufgabe(n) in laufenden Projekten${faellig ? ` · ${faellig} fällig` : ""} — Termine ab Materialeingang`}
+    >
+      <ul className="flex flex-col gap-2">
+        {aufgaben.map((a) => (
+          <li key={a.id} className="flex items-center justify-between gap-3 rounded-2xl bg-background px-5 py-3">
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span className={`font-medium ${a.status === "erledigt" ? "text-muted-foreground line-through" : "text-foreground"}`}>{a.titel}</span>
+              <span className="text-sm text-muted-foreground">
+                {a.projekt} · {a.phase} · {a.zustaendig}
+                {a.faellig ? ` · bis ${datum(a.faellig)}` : " · Termin ab Materialeingang"}
+                {a.status === "offen" && a.faellig && a.faellig < heute ? " · überfällig" : ""}
+              </span>
+            </span>
+            <form action={lieferAufgabeSetzen}>
+              <input type="hidden" name="id" value={a.id} />
+              <input type="hidden" name="erledigt" value={a.status === "erledigt" ? "0" : "1"} />
+              <AktionKnopf className="shrink-0 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground">
+                {a.status === "erledigt" ? "Wieder öffnen" : "Erledigt"}
+              </AktionKnopf>
+            </form>
+          </li>
+        ))}
+      </ul>
+      {kalenderKey ? (
+        <p className="mt-3 text-sm text-muted-foreground">
+          Kalender abonnieren (Apple/Google):{" "}
+          <span className="select-all break-all text-foreground">{`${siteUrl().replace(/^https?:/, "webcal:")}/api/kalender/projekte?key=${kalenderKey}`}</span>
+        </p>
+      ) : null}
+    </Klappe>
+  )
+}
+
+const PR_TEXT = {
+  laeuft: "Claude Code arbeitet",
+  offen: "PR wartet auf deinen Merge",
+  gemerged: "Gemerged",
+  geschlossen: "PR geschlossen",
+  fehlgeschlagen: "Lauf ohne PR",
+} as const
+
+/** Katman 4: Code-Karte mit PR-Stand – Link zum PR, oder von Hand starten. */
+function CodeKarte({ f, bereit, belegt }: { f: Freigabe; bereit: boolean; belegt: boolean }) {
+  const pr = f.extra.pr
+  const startbar = bereit && !belegt && (!pr || pr.status === "fehlgeschlagen")
+  return (
+    <details className="rounded-2xl bg-background px-5 py-4">
+      <summary className="cursor-pointer">
+        <span className="font-medium text-foreground">{f.titel}</span>
+        {pr ? (
+          <span className={`ml-2 text-sm ${pr.status === "offen" ? "text-primary" : pr.status === "fehlgeschlagen" ? "text-amber-600" : "text-muted-foreground"}`}>
+            · {PR_TEXT[pr.status]}
+          </span>
+        ) : null}
+      </summary>
+      <p className="mt-2 select-all whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{f.inhalt}</p>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        {pr?.url ? (
+          <a href={pr.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm text-primary">
+            PR #{pr.nummer} öffnen <ArrowUpRight className="size-4" aria-hidden="true" />
+          </a>
+        ) : null}
+        {pr?.grund ? <span className="text-sm text-muted-foreground">{pr.grund}</span> : null}
+        {startbar ? (
+          <form action={codePrStarten}>
+            <input type="hidden" name="id" value={f.id} />
+            <AktionKnopf className="rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground">
+              {pr ? "Nochmal als PR bauen" : "Jetzt als PR bauen"}
+            </AktionKnopf>
+          </form>
+        ) : null}
+      </div>
+    </details>
   )
 }

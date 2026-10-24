@@ -22,6 +22,8 @@ import { berlinTag, json, MODELL, recherchiere, slug } from "./ki"
  *   Entscheidungskarte mehr, sondern gesammelt unter „Code-Backlog")
  * - technisch unsicher → als F&E-Vorhaben markiert (Forschungszulage)
  * - lehrreich für Kunden → Themenauftrag an Marketing/Redaktion
+ * - Katman 4: danach startet der Kod hattı aus dem Code-Backlog einen Bot-PR
+ *   (lib/ausfuehrung/code-hat.ts) – Emin merged nur noch
  */
 
 const STACK =
@@ -50,7 +52,10 @@ export async function entwicklungsRunde(): Promise<{ ergebnis: string; anzahl: n
   const releases = montag
     ? await recherchiere(`Neue Versionen, Sicherheitslücken und Abkündigungen der letzten 7 Tage für: ${STACK}`).catch(() => null)
     : null
-  if (!meldungen && !releases) return { ergebnis: "Kein Bulletin und keine Releases – nichts zu bewerten", anzahl: 0 }
+  if (!meldungen && !releases) {
+    const pr = await (await import("@/lib/ausfuehrung/code-hat")).codeHatTakt().catch(() => null)
+    return { ergebnis: `Kein Bulletin und keine Releases – nichts zu bewerten${pr ? ` · ${pr}` : ""}`, anzahl: 0 }
+  }
 
   const { text } = await generateText({
     model: MODELL,
@@ -101,8 +106,13 @@ Antworte NUR mit JSON: [{"titel":"","entscheidung":"einsetzen","warum":"","massn
     }
   }
   const beob = liste.filter((b) => b.entscheidung === "beobachten").length
+  /* Katman 4: Code-Backlog → Bot-PR (höchstens einer offen); Emin merged nur noch. */
+  const pr = await (await import("@/lib/ausfuehrung/code-hat")).codeHatTakt().catch((e) => {
+    console.error("[entwicklung] code-hat", e instanceof Error ? e.message : e)
+    return null
+  })
   return {
-    ergebnis: `${liste.length} Meldungen bewertet (${tag}): ${auftraege} Aufträge ins Code-Backlog, ${themen} Themen an die Redaktion, ${beob} beobachtet`,
+    ergebnis: `${liste.length} Meldungen bewertet (${tag}): ${auftraege} Aufträge ins Code-Backlog, ${themen} Themen an die Redaktion, ${beob} beobachtet${pr ? ` · ${pr}` : ""}`,
     anzahl: auftraege + themen,
   }
 }

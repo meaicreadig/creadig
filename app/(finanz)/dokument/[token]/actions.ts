@@ -4,6 +4,7 @@ import { headers } from "next/headers"
 import { revalidatePath } from "next/cache"
 
 import { finanzDb } from "@/lib/finanz/store"
+import { nachAngebotsAntwort } from "@/lib/ausfuehrung/lieferung-hat"
 import { beantworteAngebot, ladeDokument, ladeDokumentPerToken } from "@/lib/finanz/auftraege/store"
 import { meldeInhaber, sendeDokumentMail } from "@/lib/finanz/auftraege/mail"
 import type { Sprache } from "@/lib/finanz/auftraege/rechnen"
@@ -68,6 +69,8 @@ export async function kundeAntwortet(token: string, _prev: KundenErgebnis, form:
   const ua = (await headers()).get("user-agent") ?? ""
   const ok = await beantworteAngebot(db, d.id, { antwort, name, text, gewaehlt, quelle: "kunde", client: ua })
   if (!ok) return { ok: false, fehler: f.nichtMehr }
+  /* Katman 4: Chance gewonnen/verloren, Projekt-Grundlage, Lieferplan. */
+  await nachAngebotsAntwort(d.id)
 
   const neu = await ladeDokument(db, d.id)
   if (neu) {

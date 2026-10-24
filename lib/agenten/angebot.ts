@@ -16,15 +16,21 @@ import { json, MODELL } from "./ki"
  * Entwurf an — bis hierher mit genau einer Pauschal-Zeile (geschätzter Wert)
  * oder ganz leer. Emin musste das Angebot trotzdem selbst schreiben.
  *
- * Jetzt liest der Automat Titel, Notizen und Verlauf der Chance und füllt den
- * Entwurf: Positionen NUR aus dem Leistungskatalog (fin_leistungen, mit dessen
- * Preisen), Einleitung und Schluss. Was der Katalog nicht hat, kommt als
- * Position mit 0 € und „(Preis prüfen)" – nie ein erfundener Preis. Jeder
- * Entwurf wird genau einmal gefüllt (Verlauf „ki-positionen"); danach gehört er
- * Emin. Festschreiben und Senden bleiben sein Klick in /finanz/vorgang/<id>.
+ * Jetzt liest der Automat Titel, Notizen, Verlauf der Chance UND die
+ * Gesprächsnotizen der Person bzw. Firma und füllt den Entwurf: Positionen NUR
+ * aus dem Leistungskatalog (fin_leistungen, mit dessen Preisen), Einleitung und
+ * Schluss. Was der Katalog nicht hat, kommt als Position mit 0 € und „(Preis
+ * prüfen)" – nie ein erfundener Preis. Jeder Entwurf wird genau einmal gefüllt
+ * (Verlauf „ki-positionen"); danach gehört er Emin.
+ *
+ * Katman 4: Gefüllt heißt versandfertig – lib/ausfuehrung/angebot-hat.ts legt
+ * die Ein-Klick-Karte „Angebot senden" an. Gesendet wird nur auf Emins Klick.
  */
 
 const JE_LAUF = 3
+
+type Db = NonNullable<Awaited<ReturnType<typeof finanzDb>>>
+type Katalog = Awaited<ReturnType<typeof ladeLeistungen>>
 
 type Vorschlag = {
   titel: string
@@ -47,39 +53,53 @@ export async function angebotsRunde(): Promise<{ ergebnis: string; anzahl: numbe
   if (!entwuerfe.length) return { ergebnis: "Kein offener Angebots-Entwurf zu füllen", anzahl: 0 }
 
   const katalog = await ladeLeistungen(db, true)
+  const { legeAngebotsKarte } = await import("@/lib/ausfuehrung/angebot-hat")
+  let n = 0
+  for (const e of entwuerfe) {
+    if (!(await fuelleAngebot(db, e.id, e.opportunity_id, katalog))) continue
+    n++
+    await legeAngebotsKarte(db, e.id).catch((err) => console.error("[angebot] karte", err instanceof Error ? err.message : err))
+  }
+  return { ergebnis: n ? `${n} Angebote gefüllt und als Ein-Klick-Karte „Angebot senden“ vorgelegt` : "Entwürfe geprüft, keiner gefüllt", anzahl: n }
+}
+
+/** Einen Angebots-Entwurf genau einmal füllen. `false`, wenn nichts zu tun war oder die KI nichts Brauchbares lieferte. */
+export async function fuelleAngebot(db: Db, dokId: string, oppId: string, katalogIn?: Katalog): Promise<boolean> {
+  const dok = await ladeDokument(db, dokId)
+  if (!dok || dok.status !== "entwurf") return false
+  if ((await ladeVerlauf(db, dokId)).some((v) => v.aktion === "ki-positionen")) return false
+  const katalog = katalogIn ?? (await ladeLeistungen(db, true))
   const katalogText = katalog
     .map((l) => `- ${l.id}: ${l.titel} – ${(l.preisCent / 100).toLocaleString("de-DE")} € je ${l.einheit}${l.beschreibung ? ` (${l.beschreibung.slice(0, 160)})` : ""}`)
     .join("\n")
 
-  let n = 0
-  for (const e of entwuerfe) {
-    const dok = await ladeDokument(db, e.id)
-    if (!dok || dok.status !== "entwurf") continue
-    if ((await ladeVerlauf(db, e.id)).some((v) => v.aktion === "ki-positionen")) continue
+  const [chance] = (await db(
+    `SELECT o.title, o.note, o.estimated_value, o.offer_kind, o.contact_id, o.organisation_id, org.name AS firma
+       FROM opportunities o LEFT JOIN organisations org ON org.id = o.organisation_id WHERE o.id = $1`,
+    [oppId],
+  )) as { title: string; note: string | null; estimated_value: number | null; offer_kind: string | null; contact_id: string | null; organisation_id: string | null; firma: string | null }[]
+  if (!chance) return false
+  /* Verlauf der Chance + Gespräche mit der Person oder anderen Kontakten derselben Firma. */
+  const chronik = ((await db(
+    `SELECT kind, summary, coalesce(detail, '') AS detail, created_at::date::text AS am FROM activities
+      WHERE (subject_type = 'opportunity' AND subject_id = $1)
+         OR (kind LIKE 'gespraech%' AND subject_type = 'contact'
+             AND (subject_id = $2 OR subject_id IN (SELECT id FROM contacts WHERE organisation_id = $3)))
+      ORDER BY created_at DESC LIMIT 14`,
+    [oppId, chance.contact_id, chance.organisation_id],
+  ).catch(() => [])) as { kind: string; summary: string; detail: string; am: string }[])
+    .map((a) => `- ${a.am} ${a.summary}${a.detail ? `: ${a.detail.slice(0, a.kind.startsWith("gespraech") ? 1500 : 300)}` : ""}`)
+    .join("\n")
 
-    const [chance] = (await db(
-      `SELECT o.title, o.note, o.estimated_value, o.offer_kind, org.name AS firma
-         FROM opportunities o LEFT JOIN organisations org ON org.id = o.organisation_id WHERE o.id = $1`,
-      [e.opportunity_id],
-    )) as { title: string; note: string | null; estimated_value: number | null; offer_kind: string | null; firma: string | null }[]
-    if (!chance) continue
-    const chronik = ((await db(
-      `SELECT kind, summary, coalesce(detail, '') AS detail, created_at::date::text AS am FROM activities
-        WHERE subject_type = 'opportunity' AND subject_id = $1 ORDER BY created_at DESC LIMIT 12`,
-      [e.opportunity_id],
-    ).catch(() => [])) as { kind: string; summary: string; detail: string; am: string }[])
-      .map((a) => `- ${a.am} ${a.summary}${a.detail ? `: ${a.detail.slice(0, 300)}` : ""}`)
-      .join("\n")
-
-    const { text } = await generateText({
-      model: MODELL,
-      prompt: `Du schreibst für creaDIG Solutions ein Angebot (Entwurf, Emin prüft vor dem Versand).
+  const { text } = await generateText({
+    model: MODELL,
+    prompt: `Du schreibst für creaDIG Solutions ein Angebot (Entwurf, Emin prüft vor dem Versand).
 ${firmenText("kurz")}
 
 Chance: ${chance.title}${chance.firma ? ` · Kunde: ${chance.firma}` : ""}
 Geschätzter Wert laut Vertrieb: ${chance.estimated_value ? `${chance.estimated_value} €` : "unbekannt"}${chance.offer_kind ? ` · Angebotsart: ${chance.offer_kind}` : ""}
 Notizen: ${chance.note?.slice(0, 1500) ?? "—"}
-Verlauf:
+Verlauf und Gespräche:
 ${chronik || "—"}
 
 Leistungskatalog (ID: Titel – Preis):
@@ -91,37 +111,35 @@ Regeln:
 - Wiederkehrendes (Betreuung) als eigene Position. Sinnvolle Zusatzleistung höchstens einmal als "optional": true.
 - "einleitung": 2–3 Sätze per Sie mit Bezug auf das Gespräch. "schluss": 1–2 Sätze (nächster Schritt, Ansprechpartner Emin). Nichts erfinden.
 Antworte NUR mit JSON: {"titel":"","einleitung":"","schluss":"","positionen":[{"katalogId":"","titel":"","beschreibung":"","menge":1,"optional":false}]}`,
-    })
-    const v = json<Vorschlag>(text)
-    if (!v?.positionen?.length) continue
+  })
+  const v = json<Vorschlag>(text)
+  if (!v?.positionen?.length) return false
 
-    const ust = dok.positionen[0]?.ustSatz ?? 19
-    const positionen: Position[] = v.positionen.slice(0, 8).flatMap((p): Position[] => {
-      const k = p.katalogId ? katalog.find((l) => l.id === p.katalogId) : undefined
-      if (k)
-        return [{ titel: k.titel, beschreibung: p.beschreibung?.trim() || k.beschreibung, menge: Math.max(1, Number(p.menge) || 1), einheit: k.einheit, preisCent: k.preisCent, ustSatz: k.ustSatz, optional: Boolean(p.optional), gewaehlt: !p.optional }]
-      if (!p.titel?.trim()) return []
-      return [{ titel: `${p.titel.trim()} (Preis prüfen)`, beschreibung: p.beschreibung?.trim() ?? "", menge: Math.max(1, Number(p.menge) || 1), einheit: "Pauschal", preisCent: 0, ustSatz: ust, optional: Boolean(p.optional), gewaehlt: !p.optional }]
-    })
-    if (!positionen.length) continue
+  const ust = dok.positionen[0]?.ustSatz ?? 19
+  const positionen: Position[] = v.positionen.slice(0, 8).flatMap((p): Position[] => {
+    const k = p.katalogId ? katalog.find((l) => l.id === p.katalogId) : undefined
+    if (k)
+      return [{ titel: k.titel, beschreibung: p.beschreibung?.trim() || k.beschreibung, menge: Math.max(1, Number(p.menge) || 1), einheit: k.einheit, preisCent: k.preisCent, ustSatz: k.ustSatz, optional: Boolean(p.optional), gewaehlt: !p.optional }]
+    if (!p.titel?.trim()) return []
+    return [{ titel: `${p.titel.trim()} (Preis prüfen)`, beschreibung: p.beschreibung?.trim() ?? "", menge: Math.max(1, Number(p.menge) || 1), einheit: "Pauschal", preisCent: 0, ustSatz: ust, optional: Boolean(p.optional), gewaehlt: !p.optional }]
+  })
+  if (!positionen.length) return false
 
-    const ok = await speichereEntwurf(db, e.id, {
-      sprache: dok.sprache,
-      titel: v.titel?.trim() || dok.titel,
-      kunde: dok.kunde,
-      datum: dok.datum,
-      gueltigBis: dok.gueltigBis,
-      zahlungszielTage: dok.zahlungszielTage,
-      leistungszeitraum: dok.leistungszeitraum,
-      einleitung: v.einleitung?.trim() || dok.einleitung,
-      schluss: v.schluss?.trim() || dok.schluss,
-      rabattProzent: dok.rabattProzent,
-      geschaeftsfeld: dok.geschaeftsfeld,
-      positionen,
-    })
-    if (!ok) continue
-    await verlauf(db, e.id, "ki-positionen", { vorher: dok.positionen.length, nachher: positionen.length, offenePreise: positionen.filter((p) => p.preisCent === 0).length })
-    n++
-  }
-  return { ergebnis: n ? `${n} Angebots-Entwürfe mit Positionen und Text gefüllt – Prüfen und Senden bleibt dein Klick` : "Entwürfe geprüft, keiner gefüllt", anzahl: n }
+  const ok = await speichereEntwurf(db, dokId, {
+    sprache: dok.sprache,
+    titel: v.titel?.trim() || dok.titel,
+    kunde: dok.kunde,
+    datum: dok.datum,
+    gueltigBis: dok.gueltigBis,
+    zahlungszielTage: dok.zahlungszielTage,
+    leistungszeitraum: dok.leistungszeitraum,
+    einleitung: v.einleitung?.trim() || dok.einleitung,
+    schluss: v.schluss?.trim() || dok.schluss,
+    rabattProzent: dok.rabattProzent,
+    geschaeftsfeld: dok.geschaeftsfeld,
+    positionen,
+  })
+  if (!ok) return false
+  await verlauf(db, dokId, "ki-positionen", { vorher: dok.positionen.length, nachher: positionen.length, offenePreise: positionen.filter((p) => p.preisCent === 0).length })
+  return true
 }

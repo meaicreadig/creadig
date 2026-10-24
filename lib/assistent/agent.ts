@@ -29,6 +29,7 @@ Regeln:
 - Du handelst nie selbst. Alles, was nach außen geht (Mail, LinkedIn-Beitrag, Termin, Bewerbung), legst du mit "vorschlag_anlegen" in den Freigabe-Eingang. Er gibt frei.
 - Interne Arbeit (art "aufgabe" oder "notiz") erledigen Geschäftsleitung und Abteilungen selbst; er sieht sie unter "Heute intern erledigt". Nur was einen Kunden, Geld oder die Außenwirkung berührt, legt die Koordination ihm mit fertiger Vorlage vor – das muss er freigeben. Produkt- und Firmenfreigaben sind Verwaltung, keine Aufgabe für ihn.
 - Sagt er, Karten sollen weg oder seien erledigt, schließe sie sofort mit "karten_schliessen" (vorher "freigabe_eingang" für die IDs) und sag, wie viele es waren. Sag nie, das System lasse das nicht zu.
+- Nennt er einen Subunternehmer/Freelancer für Projekte, lege ihn mit "subunternehmer_anlegen" an.
 - Nennt er Bestandskunden (auch als Liste), lege jeden sofort mit "bestandskunde_anlegen" an und bestätige die Zahl.
 - Absprachen zu Kunden/Chancen (Termin, nächster Schritt, Ort, Verband, wer entscheidet) speicherst du SOFORT mit "absprache_speichern". Bestätige danach kurz, was gespeichert ist. Er soll nichts zweimal sagen müssen.
 - LinkedIn: Artikel-Charakter, echter Mehrwert aus der Praxis, Produkt nur beiläufig. Keine Werbesprache.
@@ -127,6 +128,22 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<s
         betreff: z.string().max(200).optional().describe("Nur bei Mail"),
       }),
       execute: async (v) => ({ id: await legeFreigabeAn(v), angelegt: true }),
+    }),
+    subunternehmer_anlegen: tool({
+      description:
+        "Legt einen Subunternehmer (Freelancer, Partneragentur) für die Projektlieferung an. Aufrufen, sobald Emin einen nennt. Der Lieferplan teilt ihm danach passende Aufgaben zu; der Auftrag an ihn geht nur als Mail-Freigabe raus.",
+      inputSchema: z.object({
+        name: z.string().min(2).max(120),
+        email: z.string().email().max(200).optional(),
+        kompetenzen: z.array(z.enum(["design", "entwicklung", "text", "barrierefreiheit", "konzept"])).min(1),
+        tagessatzEur: z.number().int().min(0).max(5000).optional(),
+        notiz: z.string().max(600).optional(),
+      }),
+      execute: async (v) => {
+        const { legeSubAn } = await import("@/lib/ausfuehrung/lieferung-hat")
+        const id = await legeSubAn(v)
+        return id ? { angelegt: true, id } : { angelegt: false, grund: "keine Datenbank" }
+      },
     }),
     bestandskunde_anlegen: tool({
       description:

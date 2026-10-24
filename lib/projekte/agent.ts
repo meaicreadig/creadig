@@ -1,6 +1,7 @@
 import "server-only"
 
 import { legeFreigabeAn } from "@/lib/assistent/store"
+import { ladeLieferAufgaben, legeLieferplanAn, nachAngebotsAntwort, planAktualisieren } from "@/lib/ausfuehrung/lieferung-hat"
 import { terminMitAenderungen, UEBERGABE_STUECKE, type Aenderung } from "@/lib/lieferung"
 import { neonAbfrage, tabelleFehlt } from "@/lib/neon-abfrage"
 
@@ -16,6 +17,10 @@ import { neonAbfrage, tabelleFehlt } from "@/lib/neon-abfrage"
  *     Eskalation bei überschrittener Frist
  *   · abgenommen → Übergabe-Aufgabe mit den fehlenden Stücken
  *   · übergeben → nach 14 Tagen Zufriedenheits-Mail (Übergang an Kundenservice)
+ * Katman 4: Online angenommene Finanz-Angebote werden vorher in `offers`
+ * gespiegelt (lib/ausfuehrung/lieferung-hat.ts), jedes Projekt bekommt einen
+ * Lieferplan (Aufgaben, Fristen, Subunternehmer), der Wochenbericht nennt die
+ * echten Aufgaben.
  * Mails sind immer Freigaben (dein Klick sendet). Jeder Fall hat einen festen
  * Schlüssel, wird also nie doppelt vorgeschlagen.
  */
@@ -78,6 +83,15 @@ function str(v: unknown): string | null {
 export async function projektAgentLauf(): Promise<{ ergebnis: string; anzahl: number }> {
   const q = neonAbfrage()
   if (!q) return { ergebnis: "Projekt-Speicher nicht verbunden", anzahl: 0 }
+
+  /* Nachholen: angenommene Finanz-Angebote ohne Spiegel (z. B. vor Katman 4 angenommen). */
+  const ohneSpiegel = (await q(
+    `SELECT d.id FROM fin_dokumente d
+      WHERE d.art = 'angebot' AND d.status = 'angenommen' AND d.opportunity_id IS NOT NULL
+        AND NOT EXISTS (SELECT 1 FROM offers WHERE id = 'offer-fin-' || d.id)`,
+    [],
+  ).catch(() => [])) as { id: string }[]
+  for (const d of ohneSpiegel) await nachAngebotsAntwort(d.id)
 
   let roh: Record<string, unknown>[]
   try {
@@ -164,6 +178,7 @@ export async function projektAgentLauf(): Promise<{ ergebnis: string; anzahl: nu
     }
 
     const pid = z.projekt_id!
+    await legeLieferplanAn(pid).catch((e) => console.error("[projekte] lieferplan", e instanceof Error ? e.message : e))
 
     if (z.state === "aufgesetzt") {
       zaehler.laufend++
@@ -227,6 +242,10 @@ export async function projektAgentLauf(): Promise<{ ergebnis: string; anzahl: nu
         })
       }
       if (z.email && termin && tageSeit(z.material_received) >= 5) {
+        const plan = await ladeLieferAufgaben(pid)
+        const fertig = plan.filter((a) => a.status === "erledigt")
+        const woche = plan.filter((a) => a.status === "offen" && a.faellig && tageSeit(a.faellig) >= -7)
+        const verzug = woche.filter((a) => tageSeit(a.faellig!) > 0)
         await vorschlag({
           art: "mail",
           titel: `Wochenbericht an ${name}`,
@@ -235,13 +254,14 @@ export async function projektAgentLauf(): Promise<{ ergebnis: string; anzahl: nu
           inhalt: [
             anrede(z),
             "",
-            `kurz zum Stand Ihres Projekts: Wir liegen im Plan, der Livegang ist für den ${datumDe(termin)} vorgesehen.`,
+            `kurz zum Stand Ihres Projekts: ${verzug.length ? "Wir arbeiten an einzelnen Punkten nach" : "Wir liegen im Plan"}, der Livegang ist für den ${datumDe(termin)} vorgesehen.`,
             "",
-            "Diese Woche: Umsetzung der vereinbarten Bereiche.",
+            ...(fertig.length ? ["Erledigt:", ...fertig.slice(-5).map((a) => `• ${a.titel}`), ""] : []),
+            woche.length ? ["Diese Woche:", ...woche.map((a) => `• ${a.titel}`)].join("\n") : "Diese Woche: Umsetzung der vereinbarten Bereiche.",
             "Von Ihnen brauchen wir: aktuell nichts — wir melden uns, sobald die Vorschau zur Prüfung bereitsteht.",
             "",
             "Wenn sich bei Ihnen etwas geändert hat, antworten Sie einfach auf diese Mail.",
-          ].join("\n") + GRUSS + `\n---\nVor dem Senden prüfen: stimmt "im Plan"? Noch ${rest ?? "?"} Tag(e) bis zur Frist.`,
+          ].join("\n") + GRUSS + `\n---\nVor dem Senden prüfen: stimmt der Stand? Noch ${rest ?? "?"} Tag(e) bis zur Frist · Lieferplan ${fertig.length}/${plan.length} erledigt${verzug.length ? ` · ${verzug.length} überfällig` : ""}.`,
           quelle: `projekt:${pid}:status:${kalenderwoche(tag)}`,
         })
       }
@@ -284,7 +304,10 @@ export async function projektAgentLauf(): Promise<{ ergebnis: string; anzahl: nu
     }
   }
 
+  const plan = await planAktualisieren().catch(() => ({ datiert: 0, subKarten: 0 }))
   const teile = [
+    plan.datiert ? `${plan.datiert} Aufgabe(n) terminiert` : null,
+    plan.subKarten ? `${plan.subKarten} Sub-Auftrag/Aufträge zur Freigabe` : null,
     zaehler.laufend ? `${zaehler.laufend} Projekt(e) in Arbeit` : null,
     zaehler.angelegt ? `${zaehler.angelegt} neu aufgesetzt` : null,
     zaehler.kritisch ? `${zaehler.kritisch} mit Frist-Druck` : null,

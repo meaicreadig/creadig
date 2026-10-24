@@ -357,6 +357,21 @@ export async function speichereGespraech(
     schluessel: `gespraech:${id}`,
   })
 
+  /* Katman 4: Wurde ein Angebot vereinbart, liegt es kurz danach als Ein-Klick-Karte bereit. */
+  const angebotLauf = async () => {
+    const { neonAbfrage } = await import("@/lib/neon-abfrage")
+    const nq = neonAbfrage()
+    if (!nq) return
+    const { angebotAusGespraech } = await import("@/lib/ausfuehrung/angebot-hat")
+    await angebotAusGespraech(nq, input.kontaktId, id)
+  }
+  try {
+    const { after } = await import("next/server")
+    after(() => angebotLauf().catch((e) => console.error("[angebot-hat]", e instanceof Error ? e.message : e)))
+  } catch {
+    await angebotLauf().catch((e) => console.error("[angebot-hat]", e instanceof Error ? e.message : e))
+  }
+
   return { id, aufbereitung }
 }
 

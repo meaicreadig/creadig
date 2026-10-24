@@ -5,6 +5,7 @@ import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 
 import { ADMIN_COOKIE } from "@/lib/admin-session"
+import { nachAngebotsAntwort } from "@/lib/ausfuehrung/lieferung-hat"
 import { pruefeZugang } from "@/lib/admin-widerruf"
 import { finanzBasis } from "@/lib/finanz/basis"
 import { finanzDb, protokolliere } from "@/lib/finanz/store"
@@ -159,6 +160,7 @@ export async function inhaberAntwort(form: FormData): Promise<void> {
   const id = s(form.get("id"), 64)
   const antwort = form.get("antwort") === "abgelehnt" ? "abgelehnt" : "angenommen"
   const ok = await beantworteAngebot(db, id, { antwort, name: s(form.get("name"), 120) || "mündlich", text: s(form.get("text"), 1000), quelle: "inhaber", gewaehlt: [] })
+  if (ok) await nachAngebotsAntwort(id)
   if (ok && antwort === "angenommen") {
     const d = await ladeDokument(db, id)
     if (d) await sendeDokumentMail(d, "bestaetigung")

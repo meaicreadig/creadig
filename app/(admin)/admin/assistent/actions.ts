@@ -183,6 +183,18 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
     }
     /* Tahsilat-Karten senden über das Mahnwesen (Vorlage, offener Betrag, Mahnstufe im Beleg) – nie als Vertriebsmail. */
     const forderung = f.agent === "forderungen" && f.extra.bezug?.startsWith("finanz:") ? f.extra.bezug.slice(7) : null
+    /* Katman 4: Karte „Angebot senden“ – festschreiben und als Angebots-Mail mit Kundenlink versenden. */
+    if (f.extra.dokumentId) {
+      const { sendeAngebotAusFreigabe } = await import("@/lib/ausfuehrung/angebot-hat")
+      const a = await sendeAngebotAusFreigabe(f.extra.dokumentId, istMail(an) ? an : null)
+      if (!a.ok) {
+        await ergaenzeExtra(fid, { fehler: a.grund })
+        revalidatePath("/admin/assistent")
+        return
+      }
+      await ergaenzeExtra(fid, { gesendetAt: new Date().toISOString(), mailId: a.nummer, fehler: undefined })
+      revalidatePath("/finanz", "layout")
+    } else {
     const r = forderung ? await sendeForderung(forderung) : await sendeFreigabeMail(f, an, betreff, text)
     if (!r.ok) {
       await ergaenzeExtra(fid, { fehler: r.grund })
@@ -190,6 +202,7 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
       return
     }
     await ergaenzeExtra(fid, { gesendetAt: new Date().toISOString(), mailId: r.id, fehler: undefined })
+    }
     await protokolliereFaden(await assistentDb().catch(() => null), "assistent", "mailstudio", betreff)
   }
 
@@ -314,5 +327,30 @@ export async function kapitalStufe(form: FormData): Promise<void> {
     antrag: { stufe: stufe as KapitalStufe, seit: new Date().toISOString(), skizze: f.extra.antrag?.skizze },
   })
   if (!f.extra.antrag?.skizze) after(() => schreibeAntragsskizze(id).catch(() => undefined))
+  revalidatePath("/admin/assistent")
+}
+
+/** Katman 4: Aufgabe im Lieferplan abhaken (oder wieder öffnen). */
+export async function lieferAufgabeSetzen(form: FormData): Promise<void> {
+  await pruefe()
+  const id = form.get("id")
+  if (typeof id !== "string" || !id.startsWith("pa-")) return
+  const { setzeAufgabeErledigt } = await import("@/lib/ausfuehrung/lieferung-hat")
+  await setzeAufgabeErledigt(id, form.get("erledigt") === "1")
+  revalidatePath("/admin/assistent")
+}
+
+/** Katman 4: Code-Karte von Hand an den PR-Workflow geben (auch erneut nach einem Fehlschlag). */
+export async function codePrStarten(form: FormData): Promise<void> {
+  await pruefe()
+  const id = form.get("id")
+  if (typeof id !== "string") return
+  const { starteCodeAuftrag } = await import("@/lib/ausfuehrung/code-hat")
+  const r = await starteCodeAuftrag(id, true)
+  if (!r.ok) {
+    const f = await ladeFreigabe(id)
+    if (f?.extra.pr) await ergaenzeExtra(id, { pr: { ...f.extra.pr, grund: r.grund } })
+    else console.warn("[code-hat] nicht gestartet", id, r.grund)
+  }
   revalidatePath("/admin/assistent")
 }

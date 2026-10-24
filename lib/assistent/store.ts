@@ -94,6 +94,8 @@ export type Freigabe = {
 
 /** Zusatzwissen je Entwurf – z. B. warum die Redaktion dieses Thema gewählt hat. */
 export type FreigabeExtra = {
+  /** Katman 4: Karte „Angebot senden“ – Freigabe schreibt dieses Finanz-Dokument fest und versendet es. */
+  dokumentId?: string
   /** Katman 3: Vorschläge des Ergebnis-Controllers – Agenten pausieren (Emin wählt, was gilt). */
   steuerung?: { agent: string; name: string; grund: string; uebernimmt: string | null }[]
   /** Warum Emin verworfen hat (freiwillig, components/admin/grund-wahl.tsx) — Lernstoff für die Qualitätssicherung. */
@@ -139,6 +141,8 @@ export type FreigabeExtra = {
   koordination?: { abteilung: string; ergebnis: string; auftragId: string; automatisch?: boolean; beiEmin?: boolean }
   /** Interne Karte, die nur per Code-Änderung lösbar ist → Code-Backlog für Claude Code statt Entscheidungs-Eingang */
   code?: boolean
+  /** Kod hattı (Katman 4): Bot-PR aus dieser Code-Karte (lib/ausfuehrung/code-hat.ts). */
+  pr?: { status: "laeuft" | "offen" | "gemerged" | "geschlossen" | "fehlgeschlagen"; gestartet: string; zweig?: string; url?: string; nummer?: number; grund?: string }
   /** Von der Koordination fälschlich geschlossen und Emin wieder vorgelegt (Zeitpunkt). */
   zurueckgeholt?: string
   /** Emin hat den Entwurf vor der Freigabe geändert – Messgröße für die Qualität des Agenten. */
@@ -440,7 +444,8 @@ export async function ladeCodeBacklog(): Promise<Freigabe[]> {
   if (!q) return []
   const rows = (await q(
     `SELECT ${FREIGABE_SPALTEN} FROM assistent_freigaben
-     WHERE art = 'aufgabe' AND coalesce(extra->>'code', '') = 'true' AND created_at > now() - interval '14 days'
+     WHERE art = 'aufgabe' AND coalesce(extra->>'code', '') = 'true'
+       AND (created_at > now() - interval '14 days' OR extra->'pr'->>'status' IN ('laeuft','offen'))
      ORDER BY created_at DESC LIMIT 20`,
     [],
   )) as FreigabeZeile[]
