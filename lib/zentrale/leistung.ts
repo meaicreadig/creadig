@@ -165,7 +165,10 @@ export async function berechneLeistung(tage = ZEITRAUM_TAGE): Promise<FirmenLeis
     ) as Promise<{ agent: string; fehler: string | null; ergebnis: string; created_at: string }[]>,
   ])
 
-  const takt = new Map(AGENTEN.map((a) => [a.key as string, a.takt]))
+  /* Pausierte Agenten (Katman 3) sind kein Engpass – Emin hat sie bewusst angehalten. */
+  const { pausierteAgenten } = await import("@/lib/ergebnis/steuerung")
+  const pausiert = await pausierteAgenten().catch(() => new Set<string>())
+  const takt = new Map(AGENTEN.filter((a) => !pausiert.has(a.key)).map((a) => [a.key as string, a.takt]))
   const letzteJe = new Map(letzte.map((l) => [l.agent, l]))
   const koordinationsId = "geschaeftsfuehrung"
   const abtId = (x: string) => (x === "koordination" || x === "emin" ? koordinationsId : x)

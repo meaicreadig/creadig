@@ -1,107 +1,107 @@
 import "server-only"
 
-import { assistentDb } from "@/lib/assistent/store"
+import { assistentDb, legeFreigabeAn, quelleBekannt } from "@/lib/assistent/store"
+import { ladeKarne, type AgentKarne, type Kette } from "@/lib/ergebnis/karne"
 import { legeAuftragAn } from "@/lib/koordination/koordinator"
-import { abteilungVonAgent } from "@/lib/zentrale/abteilungen"
 
 import { kw } from "./ki"
 
 /**
- * ERGEBNIS-CONTROLLER — misst jeden KI-Mitarbeiter an Wirkung, nicht an Läufen.
+ * ERGEBNIS-CONTROLLER — misst jeden KI-Mitarbeiter am Ergebnis, nicht an Läufen.
  *
- * 24.10.2026 neu. Die Karne zählte bis hierher, ob ein Agent lief und wie viel
- * er erzeugte. 28 Agenten liefen, und trotzdem kamen in 30 Tagen 0 Anfragen und
- * 1 Kunde ins System. Jetzt zählt pro Agent (30 Tage):
- * - Außenwirkung: von Emin freigegebene Mails, Briefe, Beiträge
- * - Verwurf-Quote: wie viel Emin verworfen hat
- * - Pässe: Aufträge, die andere Abteilungen aus seiner Arbeit erledigt haben
- * Dazu der Trichter der Firma: neue Firmen → Chancen → gewonnen (€).
+ * 24.10.2026, Katman 3 (Owner): „Büyük şirkette karne sonuçla ölçer.“ Die
+ * Kette je Agent und Abteilung steht in lib/ergebnis/karne.ts:
+ * Kontakt → Antwort → Anfrage → Termin → Angebot → Gewonnen (€).
  *
- * Wächter (Recht, Sicherheit, Lage, Qualität, Puls) wirken durch Verhindern und
- * werden nicht nach Außenwirkung bewertet. Wer sonst 30 Tage ohne Wirkung läuft,
- * steht mit Vorschlag (vereinfachen, zusammenlegen, abschalten) im Wochenbericht
- * an die Geschäftsführung. Abschalten entscheidet Emin – der Controller nie.
+ * Jede Woche:
+ * 1. Wirkungsbericht an die Geschäftsführung (intern, kein Klick für Emin).
+ * 2. „Schärfen“-Aufträge an die Abteilungen der Agenten, die Kontakte, aber
+ *    keine Ergebnisse haben – und an die Chancen-Radare nach 90 Tagen.
+ * 3. Wer sein Fenster (30 Tage, Radare 90) ohne jedes Ergebnis hinter sich
+ *    hat, landet auf EINER Steuerungs-Karte bei Emin: pausieren bzw.
+ *    zusammenlegen, angehakt per Klick. Der Controller selbst schaltet nie ab.
+ *    Bisher wurde niemand abgeschaltet, nur neu gestartet.
  */
 
-const WAECHTER = new Set(["recht", "sicherheit", "lage", "qualitaet", "puls", "koordination", "koordinator", "personal", "controller", "webseite", "forschung", "einkauf"])
-const NAMEN: Record<string, string> = { koordination: "Koordination", puls: "Puls" }
-
-type Zeile = { agent: string; laeufe: number; fehler: number; menge: number; aussen: number; verworfen: number; vorlagen: number; paesse: number }
+const zeile = (k: Kette) =>
+  `${k.kontakte} Kontakte → ${k.antworten} Antworten · ${k.leads} Anfragen → ${k.termine} Termine → ${k.angebote} Angebote → ${k.gewonnen} gewonnen (${k.eur.toLocaleString("de-DE")} €)`
 
 export async function controllerRunde(): Promise<{ ergebnis: string; anzahl: number }> {
-  const q = await assistentDb()
-  if (!q) return { ergebnis: "Keine Datenbank", anzahl: 0 }
+  const karne = await ladeKarne(30)
+  if (!karne) return { ergebnis: "Keine Datenbank", anzahl: 0 }
+  const woche = kw()
+  const { firma, abteilungen, agenten } = karne
+  const gruppe = (u: AgentKarne["urteil"]) => agenten.filter((a) => a.urteil === u)
+  const wirkt = gruppe("wirkt")
+  const schaerfen = gruppe("schaerfen")
+  const vorschlag = gruppe("vorschlag")
+  const wartet = gruppe("wartet")
+  const anlauf = gruppe("anlauf")
+  const agentZeile = (a: AgentKarne) =>
+    `- ${a.name}: ${a.klasse === "stab" ? `${a.paesse} Pässe` : zeile(a.kette)} — ${a.grund}${a.uebernimmt ? ` (übernimmt: ${a.uebernimmt})` : ""}`
 
-  const zeilen = (await q(
-    `WITH l AS (
-       SELECT agent, count(*)::int AS laeufe, count(fehler)::int AS fehler, coalesce(sum(anzahl), 0)::int AS menge
-         FROM assistent_laeufe WHERE created_at > now() - interval '30 days' GROUP BY agent),
-     f AS (
-       SELECT agent,
-              count(*) FILTER (WHERE status = 'freigegeben' AND art IN ('mail','brief','linkedin','termin','kapital'))::int AS aussen,
-              count(*) FILTER (WHERE status = 'verworfen')::int AS verworfen,
-              count(*) FILTER (WHERE art IN ('mail','brief','linkedin','termin','kapital'))::int AS vorlagen
-         FROM assistent_freigaben WHERE created_at > now() - interval '30 days' AND agent IS NOT NULL GROUP BY agent)
-     SELECT l.agent, l.laeufe, l.fehler, l.menge,
-            coalesce(f.aussen, 0) AS aussen, coalesce(f.verworfen, 0) AS verworfen, coalesce(f.vorlagen, 0) AS vorlagen, 0 AS paesse
-       FROM l LEFT JOIN f ON f.agent = l.agent`,
-    [],
-  )) as Zeile[]
-
-  /* Pässe: erledigte Aufträge, die von der Abteilung des Agenten ausgingen. */
-  const paesse = (await q(
-    `SELECT von, count(*)::int AS n FROM firma_auftraege
-      WHERE created_at > now() - interval '30 days' AND status IN ('erledigt','bei_emin') GROUP BY von`,
-    [],
-  ).catch(() => [])) as { von: string; n: number }[]
-  const passVon = new Map(paesse.map((p) => [p.von, p.n]))
-  for (const z of zeilen) {
-    const abt = abteilungVonAgent(z.agent)?.id
-    z.paesse = (passVon.get(z.agent) ?? 0) + (abt && abt !== z.agent ? (passVon.get(abt) ?? 0) : 0)
-  }
-
-  const [t] = (await q(
-    `SELECT (SELECT count(*) FROM organisations WHERE created_at > now() - interval '30 days')::int AS firmen,
-            (SELECT count(*) FROM opportunities WHERE created_at > now() - interval '30 days')::int AS chancen,
-            (SELECT count(*) FROM opportunities WHERE status = 'won' AND updated_at > now() - interval '30 days')::int AS gewonnen,
-            (SELECT coalesce(sum(estimated_value), 0) FROM opportunities WHERE status = 'won' AND updated_at > now() - interval '30 days')::int AS gewonnen_eur,
-            (SELECT count(*) FROM organisations WHERE lifecycle = 'kunde')::int AS kunden`,
-    [],
-  )) as { firmen: number; chancen: number; gewonnen: number; gewonnen_eur: number; kunden: number }[]
-
-  const name = (a: string) => NAMEN[a] ?? a
-  const bewertet = zeilen.filter((z) => !WAECHTER.has(z.agent))
-  const wirkt = bewertet.filter((z) => z.aussen > 0).sort((a, b) => b.aussen - a.aussen)
-  const intern = bewertet.filter((z) => z.aussen === 0 && z.paesse > 0)
-  const ohne = bewertet.filter((z) => z.aussen === 0 && z.paesse === 0 && z.laeufe >= 3)
-  const hoheVerwurf = bewertet.filter((z) => z.vorlagen >= 4 && z.verworfen / z.vorlagen >= 0.5)
-
-  const zeile = (z: Zeile) =>
-    `- ${name(z.agent)}: ${z.laeufe} Läufe, ${z.aussen} freigegeben nach außen, ${z.verworfen} verworfen, ${z.paesse} Pässe${z.fehler ? `, ${z.fehler} Fehler` : ""}`
   const bericht = [
-    `Trichter 30 Tage: ${t.firmen} neue Firmen → ${t.chancen} neue Chancen → ${t.gewonnen} gewonnen (${t.gewonnen_eur.toLocaleString("de-DE")} €). Bestandskunden im System: ${t.kunden}.`,
+    `FIRMA 30 TAGE: ${zeile(firma)} · bezahlt ${firma.bezahltEur.toLocaleString("de-DE")} €`,
     "",
-    `WIRKT NACH AUSSEN (${wirkt.length}):`,
-    ...(wirkt.length ? wirkt.map(zeile) : ["- niemand"]),
+    "ABTEILUNGEN (Beitrag):",
+    ...(abteilungen.length ? abteilungen.map((a) => `- ${a.name}: ${zeile(a.kette)}`) : ["- noch keine Ergebnisse"]),
     "",
-    `LIEFERT NUR INTERN (${intern.length}):`,
-    ...(intern.length ? intern.map(zeile) : ["- niemand"]),
-    "",
-    `OHNE WIRKUNG (${ohne.length}) – Vorschlag: Auftrag schärfen, mit anderem zusammenlegen oder abschalten:`,
-    ...(ohne.length ? ohne.map(zeile) : ["- niemand"]),
-    ...(hoheVerwurf.length ? ["", "EMIN VERWIRFT MEHR ALS DIE HÄLFTE – Vorlagen verbessern:", ...hoheVerwurf.map(zeile)] : []),
+    `WIRKT (${wirkt.length}):`,
+    ...(wirkt.length ? wirkt.map(agentZeile) : ["- niemand"]),
+    `SCHÄRFEN (${schaerfen.length}):`,
+    ...(schaerfen.length ? schaerfen.map(agentZeile) : ["- niemand"]),
+    `WARTET AUF EMIN (${wartet.length}):`,
+    ...(wartet.length ? wartet.map(agentZeile) : ["- niemand"]),
+    `VORSCHLAG PAUSIEREN/ZUSAMMENLEGEN (${vorschlag.length}) – liegt als Steuerungs-Karte bei Emin:`,
+    ...(vorschlag.length ? vorschlag.map(agentZeile) : ["- niemand"]),
+    `IM ANLAUF (${anlauf.length}): ${anlauf.map((a) => a.name).join(", ") || "–"}`,
   ].join("\n")
 
   await legeAuftragAn({
     von: "controller",
     an: "geschaeftsfuehrung",
-    titel: `Wirkungsbericht KW ${kw()}: ${wirkt.length} wirken, ${ohne.length} ohne Wirkung`,
-    inhalt: `${bericht}\n\nBitte: Für jeden Agenten ohne Wirkung eine Entscheidung (Auftrag schärfen / zusammenlegen / Abschalten vorschlagen) und für hohe Verwurf-Quoten einen konkreten Verbesserungsauftrag an die Abteilung. Abschalten nur als Vorschlag an Emin.`,
-    quelle: `controller:${kw()}`,
+    titel: `Ergebnis-Karne KW ${woche}: ${firma.gewonnen} gewonnen, ${wirkt.length} wirken, ${vorschlag.length} ohne Ergebnis`,
+    inhalt: `${bericht}\n\nBitte: Für jeden Agenten unter SCHÄRFEN einen konkreten Verbesserungsauftrag (Zielgruppe, Angebot, Text) an seine Abteilung. Pausieren entscheidet Emin über die Steuerungs-Karte.`,
+    quelle: `controller:${woche}`,
   })
 
+  /* Schärfen geht direkt an die zuständige Abteilung – intern, ohne Emin. */
+  let auftraege = 0
+  for (const a of schaerfen) {
+    if (!a.abteilung) continue
+    const id = await legeAuftragAn({
+      von: "controller",
+      an: a.abteilung,
+      titel: `Schärfen: ${a.name} – ${a.grund.slice(0, 80)}`,
+      inhalt: `Ergebnis-Karne (${a.fenster} Tage): ${zeile(a.kette)}.\n${a.grund}\n\nBitte bis nächste Woche: Zielgruppe, Angebot und Text so ändern, dass aus Kontakten Antworten und Termine werden. Keine Kaltmails, nichts nach außen ohne Emins Freigabe.`,
+      quelle: `schaerfen:${a.agent}:${woche}`,
+    }).catch(() => null)
+    if (id) auftraege++
+  }
+
+  /* Eine Steuerungs-Karte pro Woche, nur wenn es etwas zu entscheiden gibt. */
+  let karte = 0
+  const quelle = `steuerung:${woche}`
+  if (vorschlag.length && !(await quelleBekannt(quelle))) {
+    const q = await assistentDb()
+    /* Eine noch offene Karte der Vorwoche wird ersetzt, nicht gestapelt. */
+    await q?.(`UPDATE assistent_freigaben SET status = 'verworfen' WHERE art = 'steuerung' AND status = 'offen'`, []).catch(() => null)
+    const id = await legeFreigabeAn({
+      art: "steuerung",
+      titel: `${vorschlag.length} KI-Mitarbeiter ohne Ergebnis – pausieren?`,
+      inhalt: `Diese Agenten haben ihr ganzes Prüffenster ohne ein einziges Ergebnis (Antwort, Anfrage, Termin, Angebot, Auftrag) hinter sich. Pausieren spart Rechenzeit und Lärm; es ist umkehrbar. Chancen-Radare (Golf, Kapital, International) stehen hier nie – sie werden nur geschärft.\n\nFirma 30 Tage: ${zeile(firma)}`,
+      quelle,
+      agent: "controller",
+      extra: {
+        warum: `Ergebnis-Karne KW ${woche}`,
+        steuerung: vorschlag.map((a) => ({ agent: a.agent, name: a.name, grund: a.grund, uebernimmt: a.uebernimmt })),
+      },
+    })
+    if (id) karte = 1
+  }
+
   return {
-    ergebnis: `${t.chancen} Chancen, ${t.gewonnen} gewonnen (${t.gewonnen_eur.toLocaleString("de-DE")} €) · ${wirkt.length} Agenten wirken nach außen, ${intern.length} nur intern, ${ohne.length} ohne Wirkung`,
-    anzahl: 1,
+    ergebnis: `Firma 30 T.: ${firma.leads} Anfragen, ${firma.termine} Termine, ${firma.gewonnen} gewonnen (${firma.eur.toLocaleString("de-DE")} €) · ${wirkt.length} wirken, ${schaerfen.length} schärfen, ${vorschlag.length} Pausen-Vorschläge, ${anlauf.length} im Anlauf`,
+    anzahl: 1 + auftraege + karte,
   }
 }

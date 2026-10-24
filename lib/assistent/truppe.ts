@@ -85,7 +85,7 @@ export const AGENTEN: AgentInfo[] = [
   { key: "personal", name: "Personal (KI-Team)", aufgabe: "Prüft jede Woche das KI-Team: unbesetzte Abteilungen, gescheiterte, stumme und nie gelaufene Mitarbeiter – als ein Auftrag an die Geschäftsführung.", takt: "woechentlich", ki: false },
   { key: "kundenbetreuung", name: "Kundenbetreuung", aufgabe: "Betreut die Bestandskunden: Wer 90 Tage (ehemalige: 180) ohne Kontakt und ohne offene Chance ist, bekommt einen Check-in mit passendem Angebot aus dem Leistungskatalog – als fertige Mail (ohne Mail: Brief) zur Ein-Klick-Freigabe. Fehlen Website oder Kontakt, recherchiert sie das Impressum (mit Quelle, nie geraten).", takt: "taeglich", ki: true },
   { key: "partner", name: "Partner & Empfehlungen", aufgabe: "Sucht jede Woche Multiplikatoren eines Segments (Webagenturen für White-Label-BFSG, Steuerkanzleien, deutsch-türkische Verbände, IT-Systemhäuser) mit Impressums-Anschrift und legt höchstens 2 Partner-Briefe zur Freigabe an; bittet zufriedene Kunden einmal im Jahr um Empfehlung.", takt: "woechentlich", ki: true },
-  { key: "controller", name: "Ergebnis-Controller", aufgabe: "Misst jeden KI-Mitarbeiter wöchentlich an Wirkung statt Läufen: freigegebene Außenwirkung, Verwurf-Quote, Pässe, dazu der Trichter Firmen → Chancen → gewonnen (€). Wer ohne Wirkung läuft, kommt mit Vorschlag in den Wochenbericht.", takt: "woechentlich", ki: false },
+  { key: "controller", name: "Ergebnis-Controller", aufgabe: "Misst jeden KI-Mitarbeiter wöchentlich am Ergebnis: Kontakt → Antwort → Anfrage → Termin → Angebot → gewonnen (€), je Agent und Abteilung. Schickt Schärfen-Aufträge an die Abteilungen und legt Emin einmal pro Woche eine Steuerungs-Karte vor: wer sein Prüffenster ohne Ergebnis hinter sich hat, wird auf Klick pausiert.", takt: "woechentlich", ki: false },
   { key: "angebot", name: "Angebotsautomat", aufgabe: "Füllt jeden Angebots-Entwurf aus Gesprächsnotizen und Verlauf: Positionen nur aus dem Leistungskatalog mit dessen Preisen, Einleitung und Schluss; Unbekanntes mit „Preis prüfen“. Senden bleibt dein Klick.", takt: "taeglich", ki: true },
   { key: "redaktion", name: "Redaktion", aufgabe: "Plant jede Woche 4 LinkedIn-Beiträge (Gründer-Stimme, Praxiswissen, Einblick & Beweis, Branche & Haltung) mit Text, Bild, Sendetermin und Link im ersten Kommentar.", takt: "taeglich", ki: true },
 ]
@@ -875,7 +875,10 @@ export function taktPlan(faellig: AgentKey[]): { schnell: AgentKey[]; ki: AgentK
 export async function fuehreFaelligeAus(o: { chef?: boolean } = {}): Promise<AgentKey[]> {
   const start = Date.now()
   const passtNoch = () => Date.now() - start + AGENT_ZEITLIMIT_MS < TAKT_BUDGET_MS
-  const faellig = faelligeAgenten(await letzteLaeufe())
+  /* Katman 3: Von Emin pausierte Agenten laufen nicht (lib/ergebnis/steuerung.ts). */
+  const { pausierteAgenten } = await import("@/lib/ergebnis/steuerung")
+  const pausiert = await pausierteAgenten().catch(() => new Set<string>())
+  const faellig = faelligeAgenten(await letzteLaeufe()).filter((k) => !pausiert.has(k))
   const gestartet: AgentKey[] = []
 
   if (o.chef && faellig.includes("koordinator")) {

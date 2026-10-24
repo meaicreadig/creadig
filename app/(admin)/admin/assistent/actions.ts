@@ -244,6 +244,21 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
     revalidatePath("/admin/verkaufen")
   }
 
+  /* Katman 3: nur die angehakten Agenten pausieren; nichts angehakt = nichts tun, Karte bleibt offen. */
+  if (status === "freigegeben" && f.art === "steuerung") {
+    const gewaehlt = new Set(form.getAll("agent").map(String))
+    const liste = (f.extra.steuerung ?? []).filter((s) => gewaehlt.has(s.agent))
+    if (!liste.length) {
+      await ergaenzeExtra(fid, { fehler: "Kein Agent angehakt – zum Behalten aller bitte „Alle behalten“." })
+      revalidatePath("/admin/assistent")
+      return
+    }
+    const { pausiere } = await import("@/lib/ergebnis/steuerung")
+    for (const s of liste) await pausiere(s.agent, { grund: s.grund, uebernimmt: s.uebernimmt, durch: rolle })
+    await ergaenzeExtra(fid, { fehler: undefined, steuerung: liste })
+    revalidatePath("/admin/leistung")
+  }
+
   if (status === "freigegeben" && f.art === "kapital") {
     await ergaenzeExtra(fid, { antrag: { stufe: "pruefen", seit: new Date().toISOString() } })
     after(() => schreibeAntragsskizze(fid).catch((e) => console.error("[kapital] skizze", e)))

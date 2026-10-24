@@ -4,17 +4,20 @@ import { ArrowRight, Zap } from "lucide-react"
 
 import { AdminShell } from "@/components/admin/admin-shell"
 import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
+import { ErgebnisKarne } from "@/components/admin/ergebnis-karne"
 import { Klappe } from "@/components/admin/klappe"
 import { Surface } from "@/components/admin/primitives"
 import { TrendGrafik } from "@/components/admin/trend-grafik"
 import { adminSprache } from "@/lib/admin-i18n/server"
 import { letzteLaeufe } from "@/lib/assistent/store"
+import { ladeKarne } from "@/lib/ergebnis/karne"
+import { ladePausen } from "@/lib/ergebnis/steuerung"
 import { ladeTrend } from "@/lib/trend"
 import { ABTEILUNGEN } from "@/lib/zentrale/abteilungen"
 import { berechneLeistung, MINUTEN_JE_ERGEBNIS, type AbteilungsLeistung } from "@/lib/zentrale/leistung"
 import { pulsFaellig, pulsRunde } from "@/lib/zentrale/puls"
 
-import { pulsJetzt } from "./actions"
+import { agentAktivieren, pulsJetzt } from "./actions"
 
 export const metadata = { title: "Leistung & Engpässe" }
 export const dynamic = "force-dynamic"
@@ -23,7 +26,8 @@ export const maxDuration = 300
 const T = {
   de: {
     titel: "Leistung & Engpässe",
-    lead: "Wie deine KI-Firma arbeitet: Arbeitszeit je Abteilung, Stabilität, Zusammenspiel, Eigeninitiative – und wo es klemmt. Der Puls löst Engpässe mehrmals täglich selbst.",
+    betrieb: "Betrieb – läuft das System?",
+    lead: "Was deine KI-Firma bringt – und wie sie arbeitet: Arbeitszeit je Abteilung, Stabilität, Zusammenspiel, Eigeninitiative – und wo es klemmt. Der Puls löst Engpässe mehrmals täglich selbst.",
     note: "Firmen-Note",
     stunden: "Arbeit pro Tag",
     stundenHinweis: "Menschen-Äquivalent",
@@ -56,6 +60,7 @@ const T = {
   },
   tr: {
     titel: "Performans ve Tıkanıklık",
+    betrieb: "İşletme – sistem çalışıyor mu?",
     lead: "Yapay zekâ şirketin nasıl çalışıyor: departman başına çalışma süresi, istikrar, uyum, proaktiflik – ve nerede tıkanıyor. Nabız tıkanıklıkları günde birkaç kez kendisi çözer.",
     note: "Şirket notu",
     stunden: "Günlük çalışma",
@@ -107,10 +112,15 @@ export default async function LeistungSeite() {
   const sprache = await adminSprache()
   const t = T[sprache]
   const intl = sprache === "tr" ? "tr-TR" : "de-DE"
-  const [leistung, laeufe, trend] = await Promise.all([
+  const [leistung, laeufe, trend, karne, pausen] = await Promise.all([
     berechneLeistung().catch(() => null),
     letzteLaeufe().catch(() => ({})),
     ladeTrend(14).catch(() => []),
+    ladeKarne(30).catch((e) => {
+      console.error("[leistung] karne", e instanceof Error ? e.message : e)
+      return null
+    }),
+    ladePausen().catch(() => []),
   ])
   const puls = (laeufe as Awaited<ReturnType<typeof letzteLaeufe>>)["puls"]
 
@@ -164,6 +174,10 @@ export default async function LeistungSeite() {
           </form>
         </div>
 
+        {/* Katman 3: zuerst das Ergebnis, darunter der Betrieb. */}
+        {karne ? <ErgebnisKarne karne={karne} pausen={pausen} sprache={sprache} aktivieren={agentAktivieren} /> : null}
+
+        <h2 className="pt-2 font-sans text-lg font-semibold text-foreground">{t.betrieb}</h2>
         <dl className="grid grid-cols-2 gap-4 lg:grid-cols-5">
           {kennzahlen.map((k) => (
             <Surface key={k.label} className="flex flex-col gap-2">

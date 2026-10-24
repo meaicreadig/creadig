@@ -1,7 +1,7 @@
 import "server-only"
 
 import { assistentDb } from "@/lib/assistent/store"
-import { AGENTEN } from "@/lib/assistent/truppe"
+import { AGENTEN as ALLE_AGENTEN } from "@/lib/assistent/truppe"
 import { legeAuftragAn } from "@/lib/koordination/koordinator"
 import { ABTEILUNGEN } from "@/lib/zentrale/abteilungen"
 
@@ -28,6 +28,10 @@ export async function personalRunde(): Promise<{ ergebnis: string; anzahl: numbe
     [],
   )) as Stat[]
   const stat = new Map(rows.map((r) => [r.agent, r]))
+  /* Pausiert = bewusst angehalten (Katman 3), kein Personalproblem. */
+  const { pausierteAgenten } = await import("@/lib/ergebnis/steuerung")
+  const pausiert = await pausierteAgenten().catch(() => new Set<string>())
+  const AGENTEN = ALLE_AGENTEN.filter((a) => !pausiert.has(a.key))
 
   const leer = ABTEILUNGEN.filter((a) => a.agenten.length === 0).map((a) => a.name.de)
   const nieGelaufen = AGENTEN.filter((a) => !stat.has(a.key)).map((a) => a.name)

@@ -1,5 +1,6 @@
 import "server-only"
 
+import { markiereLinks } from "@/lib/ergebnis/links"
 import { getVertriebStore } from "@/lib/lead-store"
 import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 
@@ -47,12 +48,14 @@ export async function postBeitrag(p: {
       )
     } else {
       try {
+        /* Katman 3: Anfragen aus dem Beitrag sind über utm dem Agenten zuordenbar. */
+        const herkunft = { quelle: "linkedin", medium: "social", kampagne: p.f.agent ?? "redaktion", inhalt: p.f.id }
         const postUrn = await veroeffentliche({
-          text: p.text,
+          text: markiereLinks(p.text, herkunft),
           bildPfad: p.f.bildPfad,
           alt: p.f.extra.alt,
           kanal: p.kanal,
-          kommentar: p.f.extra.kommentar,
+          kommentar: p.f.extra.kommentar ? markiereLinks(p.f.extra.kommentar, herkunft) : p.f.extra.kommentar,
         })
         erfolg = true
         await ergaenzeExtra(p.f.id, { postUrn })

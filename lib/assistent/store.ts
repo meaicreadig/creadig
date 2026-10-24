@@ -52,10 +52,10 @@ const SCHEMA = [
     beantwortet_at timestamptz)`,
   `DO $$ BEGIN
      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'assistent_freigaben_art_check'
-                    AND pg_get_constraintdef(oid) LIKE '%brief%') THEN
+                    AND pg_get_constraintdef(oid) LIKE '%steuerung%') THEN
        ALTER TABLE assistent_freigaben DROP CONSTRAINT IF EXISTS assistent_freigaben_art_check;
        ALTER TABLE assistent_freigaben ADD CONSTRAINT assistent_freigaben_art_check
-         CHECK (art IN ('mail','aufgabe','termin','linkedin','kapital','notiz','loeschen','brief'));
+         CHECK (art IN ('mail','aufgabe','termin','linkedin','kapital','notiz','loeschen','brief','steuerung'));
      END IF;
    END $$`,
   /* Sperre je Agent: Cron und Seitenaufruf starten denselben Agenten nie gleichzeitig. */
@@ -74,7 +74,7 @@ const SCHEMA = [
 export const INTERNE_ARTEN = ["aufgabe", "notiz"] as const
 const NUR_SICHTBARE = `(art NOT IN ('aufgabe','notiz') OR coalesce(extra->'koordination'->>'beiEmin', '') = 'true')`
 
-export const FREIGABE_ARTEN = ["mail", "aufgabe", "termin", "linkedin", "kapital", "notiz", "loeschen", "brief"] as const
+export const FREIGABE_ARTEN = ["mail", "aufgabe", "termin", "linkedin", "kapital", "notiz", "loeschen", "brief", "steuerung"] as const
 export type FreigabeArt = (typeof FREIGABE_ARTEN)[number]
 
 export type Nachricht = { id: string; rolle: "user" | "assistant"; text: string; zeit: string }
@@ -94,6 +94,8 @@ export type Freigabe = {
 
 /** Zusatzwissen je Entwurf – z. B. warum die Redaktion dieses Thema gewählt hat. */
 export type FreigabeExtra = {
+  /** Katman 3: Vorschläge des Ergebnis-Controllers – Agenten pausieren (Emin wählt, was gilt). */
+  steuerung?: { agent: string; name: string; grund: string; uebernimmt: string | null }[]
   /** Warum Emin verworfen hat (freiwillig, components/admin/grund-wahl.tsx) — Lernstoff für die Qualitätssicherung. */
   grund?: string
   webcheck?: { befunde: string[]; https: boolean; mobil: boolean; ladezeitMs: number | null } | null

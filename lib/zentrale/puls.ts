@@ -47,6 +47,16 @@ export async function pulsFaellig(): Promise<boolean> {
   return !l || Date.now() - new Date(l.zeit).getTime() > PULS_ABSTAND_STUNDEN * 3600000
 }
 
+/** Katman 2: Fällt ein Kernkanal aus, erfährt Emin es sofort – nicht erst, wenn wochenlang keine Anfrage kommt. */
+const KERN_KANAELE = ["formular", "mail", "buchung", "linkedin-inhaber"]
+async function kanalWache(): Promise<void> {
+  const { pruefeKanaele } = await import("@/lib/kanaele/bereitschaft")
+  const { raiseAlert } = await import("@/lib/alert")
+  for (const k of await pruefeKanaele()) {
+    if (KERN_KANAELE.includes(k.id) && k.stand === "rot") await raiseAlert(`kanal-${k.id}`, `${k.name}: ${k.detail}${k.schritt ? ` → ${k.schritt}` : ""}`)
+  }
+}
+
 export async function pulsRunde(): Promise<{ ergebnis: string; anzahl: number }> {
   const start = Date.now()
   const initiative = await initiativeRunde().catch((e) => {
@@ -58,6 +68,7 @@ export async function pulsRunde(): Promise<{ ergebnis: string; anzahl: number }>
   const aufgeraeumt = await raeumeEingangAuf().catch(() => ({ geschlossen: 0, code: 0 }))
   const skizzen = await holeSkizzenNach().catch(() => 0)
   await veroeffentlicheGeplante().catch(() => 0)
+  await kanalWache().catch((e) => console.error("[puls] kanaele", e instanceof Error ? e.message : e))
   const leistung = await berechneLeistung()
   if (!leistung) return { ergebnis: "keine Datenbank", anzahl: 0 }
 
@@ -74,10 +85,12 @@ export async function pulsRunde(): Promise<{ ergebnis: string; anzahl: number }>
   }
 
   const neustart: AgentKey[] = []
+  const { pausierteAgenten } = await import("@/lib/ergebnis/steuerung")
+  const pausiert = await pausierteAgenten().catch(() => new Set<string>())
   for (const e of leistung.engpaesse) {
     if (neustart.length >= MAX_NEUSTARTS_PRO_PULS) break
     if ((e.art !== "fehler" && e.art !== "still") || !e.agent) continue
-    if (!(AGENT_KEYS as readonly string[]).includes(e.agent)) continue
+    if (!(AGENT_KEYS as readonly string[]).includes(e.agent) || pausiert.has(e.agent)) continue
     if ((heuteVersuche.get(e.agent) ?? 0) >= 2) continue
     neustart.push(e.agent as AgentKey)
   }

@@ -154,7 +154,19 @@ async function ladeTeamKarne(woche: boolean): Promise<string[]> {
     const icon = n.fehler || (n.quote !== null && n.quote < 0.4) ? "shield" : "zap"
     return `- [${icon}] ${name(n.agent)}: ${teile.join(" · ")}`
   })
-  return [...(await trendZeilen().catch(() => [])), ...zeilen]
+  return [...(woche ? await ergebnisZeile().catch(() => []) : []), ...(await trendZeilen().catch(() => [])), ...zeilen]
+}
+
+/** Katman 3: montags zuerst das Ergebnis der Firma (30 Tage), dann der Betrieb. */
+async function ergebnisZeile(): Promise<string[]> {
+  const { ladeKarne } = await import("@/lib/ergebnis/karne")
+  const k = await ladeKarne(30)
+  if (!k) return []
+  const f = k.firma
+  const vorschlag = k.agenten.filter((a) => a.urteil === "vorschlag").length
+  return [
+    `- [layers] **Ergebnis 30 Tage:** ${f.kontakte} Kontakte → ${f.antworten} Antworten · ${f.leads} Anfragen → ${f.termine} Termine → ${f.angebote} Angebote → **${f.gewonnen} gewonnen (${f.eur.toLocaleString("de-DE")} €)**${vorschlag ? ` · ${vorschlag} Agenten ohne Ergebnis (Steuerungs-Karte)` : ""}`,
+  ]
 }
 
 /** Verlauf 14 Tage als Textkurve (lib/trend.ts) — eine Mail zeigt keine Grafik, aber eine Richtung. */

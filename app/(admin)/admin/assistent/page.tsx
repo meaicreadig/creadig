@@ -78,6 +78,7 @@ import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
 import { instagramBereit, ladeInstagram } from "@/lib/assistent/instagram"
 import { STUFE_TEXT } from "@/lib/assistent/kapital-antrag"
 import { KAPITAL_STUFEN, ladeCodeBacklog, ladeKapitalVorhaben } from "@/lib/assistent/store"
+import { pruefeKanaele, type Kanal } from "@/lib/kanaele/bereitschaft"
 import { antwortZuruecknehmen } from "../marketing/mail/actions"
 import { letzteAbendRueckmeldung, type AbendRueckmeldung } from "@/lib/assistent/abend"
 
@@ -358,6 +359,7 @@ const ART: Record<FreigabeArt, { label: string; Icon: typeof Mail }> = {
   notiz: { label: "Notiz", Icon: StickyNote },
   loeschen: { label: "Löschen", Icon: Trash2 },
   brief: { label: "Brief", Icon: Send },
+  steuerung: { label: "Team-Steuerung", Icon: Gauge },
 }
 
 const AGENT_ICON: Record<AgentKey, typeof Mail> = {
@@ -1062,6 +1064,68 @@ function AnspracheLeiste({ a }: { a: Ansprache }) {
   )
 }
 
+/**
+ * Katman 3: Der Ergebnis-Controller schlägt vor, sonuçsuz Agenten zu pausieren.
+ * Emin hakt ab, was gilt – ein Klick pro Woche, umkehrbar auf /admin/leistung.
+ */
+function SteuerungKarte({ f }: { f: Freigabe }) {
+  const offen = f.status === "offen"
+  const liste = f.extra.steuerung ?? []
+  return (
+    <li className={offen ? "flex flex-col gap-3 rounded-3xl bg-card p-5 shadow-sm" : "flex flex-col gap-2 rounded-3xl bg-card/60 p-5"}>
+      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-primary">
+          <Gauge className="size-3.5" aria-hidden="true" />
+          Team-Steuerung
+        </span>
+        <span>{f.extra.warum ?? "Ergebnis-Controller"} · {seit(f.zeit)}</span>
+        {!offen ? <span>· {f.status === "freigegeben" ? "umgesetzt" : "alle behalten"}</span> : null}
+      </div>
+      <h3 className="text-balance font-medium leading-snug text-foreground">{f.titel}</h3>
+      {offen ? (
+        <form action={freigabeEntscheiden} className="flex flex-col gap-3">
+          <input type="hidden" name="id" value={f.id} />
+          <input type="hidden" name="status" value="freigegeben" />
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{f.inhalt}</p>
+          <ul className="flex flex-col gap-2">
+            {liste.map((s) => (
+              <li key={s.agent}>
+                <label className="flex cursor-pointer items-start gap-3 rounded-2xl bg-background px-4 py-3">
+                  <input type="checkbox" name="agent" value={s.agent} defaultChecked className="mt-1 size-4 accent-primary" />
+                  <span className="flex min-w-0 flex-col gap-0.5">
+                    <span className="font-medium text-foreground">{s.name}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {s.grund}
+                      {s.uebernimmt ? ` Aufgabe übernimmt: ${agentName(s.uebernimmt)}.` : ""}
+                    </span>
+                  </span>
+                </label>
+              </li>
+            ))}
+          </ul>
+          {f.extra.fehler ? <p className="text-sm text-destructive">{f.extra.fehler}</p> : null}
+          <div className="flex flex-wrap gap-2">
+            <AktionKnopf laeuft="Wird umgesetzt …" fertig="Pausiert" className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">
+              <Check className="size-4" aria-hidden="true" />
+              Angehakte pausieren
+            </AktionKnopf>
+            <AktionKnopf
+              formAction={freigabeVerwerfen}
+              formNoValidate
+              fertig="Behalten"
+              className="flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-sm text-secondary-foreground"
+            >
+              <X className="size-4" aria-hidden="true" />
+              Alle behalten
+            </AktionKnopf>
+          </div>
+          <p className="text-xs text-muted-foreground">Pausieren ist umkehrbar: /admin/leistung → Sonuç karnesi → „Wieder aktivieren“.</p>
+        </form>
+      ) : null}
+    </li>
+  )
+}
+
 function LoeschKarte({ f }: { f: Freigabe }) {
   const offen = f.status === "offen"
   return (
@@ -1130,6 +1194,7 @@ function FreigabeInhalt({ f, linkedin }: { f: Freigabe; linkedin: LinkedinZiele 
   if (f.art === "mail") return <MailKarte f={f} />
   if (f.art === "loeschen") return <LoeschKarte f={f} />
   if (f.art === "brief") return <BriefKarte f={f} />
+  if (f.art === "steuerung") return <SteuerungKarte f={f} />
   const { label, Icon } = ART[f.art]
   const offen = f.status === "offen"
   return (
@@ -1231,10 +1296,11 @@ export default async function AssistentPage({
     ladeBeitraege(6).catch(() => []),
     ladeAnsprache().catch((): Ansprache => ({ gesendet: 0, beantwortet: 0, quote: null, nachfassOffen: 0 })),
   ])
-  const [auftraege, auftragZahlen, codeBacklog] = await Promise.all([
+  const [auftraege, auftragZahlen, codeBacklog, kanaele] = await Promise.all([
     ladeAuftraege(20).catch(() => []),
     auftragKennzahlen().catch(() => ({ heute: 0, erledigt: 0, uebergaben: 0, beiEmin: 0, offen: 0 })),
     ladeCodeBacklog().catch(() => []),
+    pruefeKanaele().catch((): Kanal[] => []),
   ])
   /* Die Truppe läuft nur im Morgen-Takt (Cron) und im Puls – nicht beim Seitenaufruf, sonst verschiebt
      ein nächtlicher Besuch den Tageslauf und der Morgen bleibt leer. */
@@ -1364,6 +1430,31 @@ export default async function AssistentPage({
               24.10.2026: Was nur eine Code-Änderung löst, ist keine Entscheidung.
               Die Geschäftsführung legt es hier ab – Emin gibt es gesammelt an Claude Code.
             */}
+            {/* 24.10.2026 (Katman 2): jeder Weg nach außen auf einen Blick – mit dem einen Handgriff, falls etwas fehlt. */}
+            {kanaele.length > 0 ? (
+              <Klappe
+                titel="Kanäle nach außen"
+                zahl={kanaele.filter((k) => k.stand !== "gruen").length}
+                unter={`${kanaele.filter((k) => k.stand === "gruen").length} von ${kanaele.length} laufen — der Rest mit genauem Handgriff`}
+              >
+                <ul className="flex flex-col gap-2">
+                  {kanaele.map((k) => (
+                    <li key={k.id} className="flex items-start gap-3 rounded-2xl bg-background px-5 py-4">
+                      <span
+                        aria-label={k.stand === "gruen" ? "läuft" : k.stand === "gelb" ? "eingeschränkt" : "geht nicht"}
+                        className={`mt-1.5 size-2.5 shrink-0 rounded-full ${k.stand === "gruen" ? "bg-emerald-500" : k.stand === "gelb" ? "bg-amber-500" : "bg-red-500"}`}
+                      />
+                      <span className="flex min-w-0 flex-col gap-0.5">
+                        <span className="font-medium text-foreground">{k.name}</span>
+                        <span className="text-sm text-muted-foreground">{k.detail}</span>
+                        {k.schritt ? <span className="select-all text-sm text-foreground">→ {k.schritt}</span> : null}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </Klappe>
+            ) : null}
+
             {codeBacklog.length > 0 ? (
               <Klappe titel="Code-Backlog" zahl={codeBacklog.length} unter="Für Claude Code gesammelt — keine Freigaben">
                 <ul className="flex flex-col gap-2">
