@@ -31,6 +31,10 @@ export const FIRMA = {
   sprachen: "Deutsch, Türkisch, Englisch",
   geld: "Web- und Systemprojekte für Betriebe, Vereine und Verbände bringen heute das Geld; fibero ist die große Wette.",
   engpass: "Vertrieb und Zeit, nicht Technik",
+  /* Emin 24.10.2026: Kapazität ist offen und wächst mit dem KI-Team – Aufträge nie wegen Kapazität bremsen. */
+  kapazitaet: "offen – mit dem KI-Team skalierbar; kein Auftrag wird wegen Kapazität abgelehnt oder gebremst",
+  /* Emin 24.10.2026: Sein warmes Netzwerk sind die IGMG-Verbände und Gemeinden; KİB OS ist dort der Beweis. */
+  netzwerk: "IGMG-Regionalverbände und Ortsgemeinden in Deutschland und Europa (Emin persönlich bekannt, KİB OS als Beweis); Ansprache dort persönlich und warm, nie als Massenaktion",
 } as const
 
 /** Reihenfolge = Priorität. */
@@ -47,8 +51,8 @@ export const MAERKTE = {
 export type Produkt = { name: string; was: string; stand: string }
 
 export const PRODUKTE: Produkt[] = [
-  { name: "fibero", was: "SaaS für Glasfaser-Montagefirmen", stand: "fertig; Ziel: erst 10–20 zahlende Firmen" },
-  { name: "stammo", was: "digitale Stempelkarte im Apple/Google Wallet für Gastronomie und Handel", stand: "live unter stammo.app, 39/69 € im Monat" },
+  { name: "fibero", was: "SaaS für Glasfaser-Montagefirmen", stand: "fertig, noch kein zahlender Kunde; Ziel: erst 10–20 zahlende Firmen" },
+  { name: "stammo", was: "digitale Stempelkarte im Apple/Google Wallet für Gastronomie und Handel", stand: "live unter stammo.app, 39/69 € im Monat, noch kein zahlender Kunde (erster Interessent: Vegitat Zürich)" },
   { name: "meAI", was: "KI-Betriebssystem für Unternehmen", stand: "intern, nicht öffentlich verfügbar" },
   { name: "CASSAMEA", was: "Gastro-Kasse für die Schweiz", stand: "im Aufbau" },
   { name: "meahv", was: "Hausverwaltung", stand: "im Aufbau" },
@@ -149,7 +153,8 @@ export function firmenText(umfang: "kurz" | "voll" = "voll"): string {
     `ZIEL: ${MAERKTE.ziel}`,
     `REFERENZEN (belegt, nur diese nennen): ${REFERENZEN.map((r) => `${r.name} – ${r.was} (${r.art})`).join("; ")}.`,
     `VORHABEN: ${VORHABEN.join(" ")}`,
-    `SPRACHEN: ${FIRMA.sprachen}. ENGPASS: ${FIRMA.engpass}.`,
+    `SPRACHEN: ${FIRMA.sprachen}. ENGPASS: ${FIRMA.engpass}. KAPAZITÄT: ${FIRMA.kapazitaet}.`,
+    `WARMES NETZWERK: ${FIRMA.netzwerk}.`,
     `REGELN: ${GRUNDREGELN.join(" ")}`,
     `VERBOTEN: ${VERBOTE_TEXT}`,
   ].join("\n")

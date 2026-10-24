@@ -14,7 +14,8 @@ import { json, kw, MODELL, RECHERCHE_MODELL, slug } from "./ki"
  * 24.10.2026 neu. Zwei Wege:
  * 1. Empfehlungen: Jeder Kunde mit gewonnenem Auftrag wird einmal im Jahr um
  *    eine Empfehlung gebeten (fertige Mail, Versand erst nach Emins Klick).
- * 2. Multiplikatoren: Jede Woche ein Segment (Plan 23.08.2026: Agentur-
+ * 2. Multiplikatoren: Jede Woche ein Segment (IGMG-Verbände = Emins warmes
+ *    Netzwerk, 24.10.2026; Plan 23.08.2026: Agentur-
  *    Partnerschaften als White-Label für das BFSG-Audit, DE-TR-Community). Die
  *    Recherche holt die Impressums-Anschrift, der Brief liegt als Ein-Klick-
  *    Freigabe bei Emin (Post, B2B – keine Werbe-Mail ohne Einwilligung).
@@ -22,6 +23,12 @@ import { json, kw, MODELL, RECHERCHE_MODELL, slug } from "./ki"
  */
 
 const SEGMENTE = [
+  /* Emin 24.10.2026: sein warmes Netzwerk. KİB OS (IGMG Nord Ruhr) und CIMG Ostfrankreich sind der Beweis. */
+  {
+    id: "igmg",
+    suche: "IGMG-Regionalverbände (Islamische Gemeinschaft Millî Görüş) und ihre Schwesterverbände in Deutschland, Frankreich (CIMG), den Niederlanden, Belgien, Österreich und der Schweiz mit eigener Website und Geschäftsstelle – außer IGMG Regionalverband Nord Ruhr und CIMG Ostfrankreich (Straßburg), die kennen wir schon",
+    angebot: "KİB OS – das System, das der IGMG Regionalverband Nord Ruhr schon nutzt (Programme, Aufgaben, Aktivitäten, Karte aller Ortsgemeinden), plus Mitgliederverwaltung; persönlich vorgestellt von Muhammed Emin Akyol, der die Gemeinschaft kennt",
+  },
   {
     id: "agentur",
     suche: "kleine Webagenturen und Designbüros in Deutschland (2–15 Mitarbeitende), die Websites für KMU bauen, aber auf ihrer Seite keine eigene Barrierefreiheits-Prüfung (BFSG/WCAG) anbieten",
