@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, useTransition } from "react"
-import { ArrowUp, Check, Clock, ImagePlus, Loader2, Mic, Square, X } from "lucide-react"
+import { ArrowUp, Check, Clock, HelpCircle, ImagePlus, Loader2, Mic, Square, X } from "lucide-react"
 
 /** Verkleinert auf max. 1600 px (JPEG) – Text bleibt lesbar, Bildkosten bleiben klein. */
 async function verkleinere(datei: File): Promise<string> {
@@ -24,7 +24,8 @@ async function verkleinere(datei: File): Promise<string> {
   }
 }
 
-import { frage, nachrichtenSeit } from "@/app/(admin)/admin/assistent/actions"
+import { frage, frageBeantworten, frageSpaeter, nachrichtenSeit } from "@/app/(admin)/admin/assistent/actions"
+import type { EminFrage } from "@/lib/assistent/fragen"
 import type { Nachricht } from "@/lib/assistent/store"
 import { personVon, type Uebernahme } from "@/lib/zentrale/personen"
 
@@ -65,6 +66,85 @@ function Uebernahmen({ liste }: { liste: Uebernahme[] }) {
   )
 }
 
+/**
+ * Fragen an dich – die KI-Kollegen fragen, was nur Emin weiß (Wie lief das
+ * Gespräch? Wie geht es weiter?). Ein Klick oder ein Satz, dann macht Aylin weiter.
+ */
+function FragenAnDich({ fragen, beantworte, spaeter, gesperrt }: { fragen: EminFrage[]; beantworte: (f: EminFrage, a: string) => void; spaeter: (f: EminFrage) => void; gesperrt: boolean }) {
+  const [frei, setFrei] = useState<Record<string, string>>({})
+  if (!fragen.length) return null
+  return (
+    <div className="flex flex-col gap-2 border-b border-border bg-primary/5 p-4 md:p-5" aria-label="Fragen an dich">
+      <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
+        <HelpCircle className="size-4" aria-hidden="true" />
+        Fragen an dich · {fragen.length}
+      </p>
+      <ul className="flex flex-col gap-2">
+        {fragen.map((f) => {
+          const p = personVon(f.agent)
+          const text = frei[f.id] ?? ""
+          return (
+            <li key={f.id} className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-3 text-sm">
+              <span className="flex items-start gap-3">
+                <span aria-hidden="true" className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                  {p.name.slice(0, 2)}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="flex flex-wrap items-center gap-x-2">
+                    <span className="font-semibold text-foreground">{p.name}</span>
+                    <span className="text-xs text-muted-foreground">{p.rolle.de} · KI</span>
+                  </span>
+                  <span className="mt-0.5 block font-medium text-foreground [overflow-wrap:anywhere]">{f.frage}</span>
+                  {f.kontext ? <span className="mt-0.5 block text-xs text-muted-foreground [overflow-wrap:anywhere]">{f.kontext}</span> : null}
+                </span>
+              </span>
+              {f.optionen.length ? (
+                <span className="flex flex-wrap gap-2">
+                  {f.optionen.map((o) => (
+                    <button
+                      key={o}
+                      type="button"
+                      disabled={gesperrt}
+                      onClick={() => beantworte(f, o)}
+                      className="rounded-full bg-secondary px-3 py-1.5 text-left text-xs text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground disabled:opacity-40"
+                    >
+                      {o}
+                    </button>
+                  ))}
+                </span>
+              ) : null}
+              <form
+                className="flex items-center gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (text.trim()) beantworte(f, text)
+                }}
+              >
+                <label htmlFor={`antwort-${f.id}`} className="sr-only">
+                  Eigene Antwort an {p.name}
+                </label>
+                <input
+                  id={`antwort-${f.id}`}
+                  value={text}
+                  onChange={(e) => setFrei((v) => ({ ...v, [f.id]: e.target.value }))}
+                  placeholder="Oder kurz selbst antworten …"
+                  className="min-w-0 flex-1 rounded-full bg-secondary px-3 py-1.5 text-xs text-foreground outline-none placeholder:text-muted-foreground"
+                />
+                <button type="submit" disabled={gesperrt || !text.trim()} aria-label="Antwort senden" className="flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40">
+                  <ArrowUp className="size-3.5" aria-hidden="true" />
+                </button>
+                <button type="button" disabled={gesperrt} onClick={() => spaeter(f)} className="rounded-full px-2 py-1 text-xs text-muted-foreground hover:text-foreground disabled:opacity-40">
+                  Morgen
+                </button>
+              </form>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+
 type Erkennung = {
   lang: string
   interimResults: boolean
@@ -82,8 +162,9 @@ const VORSCHLAEGE = [
   "Welche Förderungen könnten für creaDIG passen?",
 ]
 
-export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: number }) {
+export function AssistentChat({ start, rest, fragen: startFragen = [] }: { start: Nachricht[]; rest: number; fragen?: EminFrage[] }) {
   const [verlauf, setVerlauf] = useState(start)
+  const [fragen, setFragen] = useState(startFragen)
   const [eingabe, setEingabe] = useState("")
   const [fehler, setFehler] = useState<string | null>(null)
   const [laeuft, startTransition] = useTransition()
@@ -141,6 +222,24 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
     })
   }
 
+  function beantworte(f: EminFrage, antwort: string) {
+    if (laeuft) return
+    setFehler(null)
+    setFragen((l) => l.filter((x) => x.id !== f.id))
+    const p = personVon(f.agent)
+    setVerlauf((v) => [...v, { id: `tmp-${Date.now()}`, rolle: "user", text: `Antwort an ${p.name} auf „${f.frage}“: ${antwort}`, zeit: new Date().toISOString() }])
+    startTransition(async () => {
+      const r = await frageBeantworten(f.id, antwort)
+      if (r.ok) setVerlauf((v) => [...v.filter((m) => !m.id.startsWith("tmp-")), ...r.nachrichten.filter((n) => !v.some((x) => x.id === n.id))])
+      else setFehler(r.fehler)
+    })
+  }
+
+  function spaeter(f: EminFrage) {
+    setFragen((l) => l.filter((x) => x.id !== f.id))
+    void frageSpaeter(f.id)
+  }
+
   function sprechen() {
     if (hoert) {
       erkennung.current?.stop()
@@ -170,6 +269,7 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
 
   return (
     <section className="flex min-h-[24rem] w-full min-w-0 md:min-h-[32rem] flex-col overflow-hidden rounded-3xl bg-card shadow-sm" aria-label="Chat mit dem Assistenten">
+      <FragenAnDich fragen={fragen} beantworte={beantworte} spaeter={spaeter} gesperrt={laeuft} />
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-5 md:p-6" style={{ maxHeight: "60vh" }}>
         {verlauf.length === 0 ? (
           <div className="flex flex-col gap-3">

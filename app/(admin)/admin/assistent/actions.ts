@@ -100,6 +100,44 @@ export async function nachrichtenSeit(zeit: string): Promise<Nachricht[]> {
   return (await ladeVerlauf(10)).filter((m) => Date.parse(m.zeit) > t)
 }
 
+export type FrageAntwort = { ok: true; nachrichten: Nachricht[] } | { ok: false; fehler: string }
+
+/**
+ * Emin beantwortet eine Frage eines KI-Mitarbeiters (Knopf oder Freitext). Die Antwort
+ * geht als seine Nachricht an Aylin, die mit ihren Werkzeugen weitermacht.
+ */
+export async function frageBeantworten(id: string, antwort: string): Promise<FrageAntwort> {
+  await pruefe()
+  const { ladeFrage, markiereBeantwortet } = await import("@/lib/assistent/fragen")
+  const { personVon } = await import("@/lib/zentrale/personen")
+  const f = await ladeFrage(String(id).slice(0, 80))
+  const a = String(antwort ?? "").trim().slice(0, 1500)
+  if (!f) return { ok: false, fehler: "Diese Frage ist schon beantwortet." }
+  if (!a) return { ok: false, fehler: "Leere Antwort" }
+  await markiereBeantwortet(f.id, a)
+  const p = personVon(f.agent)
+  const text = `Antwort an ${p.name} (${p.rolle.de}) auf „${f.frage}“: ${a}${f.bezug ? `\n[Bezug: ${f.bezug}${f.kontext ? ` · ${f.kontext}` : ""}]` : ""}`
+  const user = await speichereNachricht("user", text)
+  try {
+    const verlauf = await ladeVerlauf(16)
+    const { mitAgent } = await import("@/lib/lernen/kontext")
+    const r = await mitAgent("assistent", () => antworte(verlauf))
+    const gespeichert = await speichereNachricht("assistant", r.text, r.uebernahmen)
+    revalidatePath("/admin/assistent")
+    return { ok: true, nachrichten: [user, gespeichert] }
+  } catch (e) {
+    console.error("[assistent] frage", e)
+    return { ok: true, nachrichten: [user] }
+  }
+}
+
+export async function frageSpaeter(id: string): Promise<void> {
+  await pruefe()
+  const { verschiebeFrage } = await import("@/lib/assistent/fragen")
+  await verschiebeFrage(String(id).slice(0, 80), 1)
+  revalidatePath("/admin/assistent")
+}
+
 export async function agentStarten(form: FormData): Promise<void> {
   await pruefe()
   const key = form.get("agent")

@@ -201,6 +201,10 @@ export async function teftisRunde(): Promise<{ ergebnis: string; anzahl: number 
       geraeumt.map((k) => ({ agent: "teftis", was: `${k.titel} → ${k.grund}`, stand: "erledigt" as const })),
     ).catch(() => null)
 
+  /* Täglich: Wo ein Gespräch/Termin/Warten vorbei ist, fragt Leyla Emin „Wie ist es gelaufen?“ (Fragen an dich). */
+  const fragen = await import("@/lib/assistent/fragen")
+  await fragen.frageNachGespraechen(q).catch((e) => console.error("[teftis] fragen", e))
+
   const [letzter] = (await q(`SELECT punkte, created_at FROM teftis_berichte ORDER BY created_at DESC LIMIT 1`, [])) as { punkte: number; created_at: string }[]
   const voll = !letzter || Date.now() - new Date(letzter.created_at).getTime() > (ZYKLUS_TAGE - 0.3) * 864e5
 
@@ -216,6 +220,8 @@ export async function teftisRunde(): Promise<{ ergebnis: string; anzahl: number 
   }
 
   const { punkte, befunde } = await pruefeAlles(q)
+  /* Was nur Emin weiß (nächster Schritt einer Chance), fragt das System ihn direkt – statt nur einen Auftrag zu schreiben. */
+  await fragen.frageNachNaechstemSchritt(q).catch(() => 0)
   const trend = letzter ? punkte - letzter.punkte : null
   const sortiert = [...befunde].sort((a, b) => ABZUG[b.schwere] - ABZUG[a.schwere])
 

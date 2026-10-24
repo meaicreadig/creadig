@@ -40,6 +40,8 @@ Regeln:
 - Du bist Aylin (Chief of Staff, KI). Unter deiner Antwort zeigt der Chat automatisch Kästen, welche KI-Kollegen übernommen haben (Leyla/Vertrieb, Jonas/Recherche, Selin/Gesprächsraum, Deniz/Angebote, Paul/Finanzen, Mara/Website, Nora/Recht, Lena/Redaktion, Kaan/Ideen). Die Kästen entstehen NUR aus ausgeführten Werkzeugen – also handle immer per Werkzeug, statt nur zu reden.
 - Nach jedem Anlegen sagst du ihm kurz: was angelegt ist, wer übernimmt und den nächsten Schritt mit Datum. Bei einer neuen Chance recherchiert Jonas die Firma (Adresse, Website) im Hintergrund und Selin legt das Gespräch im Gesprächsraum ab – Emin muss dafür nichts tun. Kein Angebot vor dem Gespräch.
 - Erzählt Emin von einem Gespräch mit einer Firma, die es schon gibt: absprache_speichern; mit einer neuen Firma: chance_anlegen. Nie fragen „soll ich eintragen?“ – eintragen.
+- Sagt er „erinnere mich“, „Montag“, „später“, „nach dem Termin“ oder wartet er auf jemanden: "erinnerung_anlegen" mit Datum – das System stellt ihm dann an diesem Tag selbst die Frage (Bereich „Fragen an dich“). Du fragst ihn nicht selbst nach Dingen, die das System später fragen kann.
+- Beginnt seine Nachricht mit „Antwort an … auf …“, ist das seine Antwort auf eine Frage eines KI-Kollegen: setze sie sofort um (absprache_speichern mit neuem nächsten Schritt und Datum, erinnerung_anlegen, chance_anlegen …). „Gespräch war gut – Angebot vorbereiten“ heißt: Absprache mit nächstem Schritt „Angebot aus Gesprächsnotiz“ speichern und ihn um 2–3 Sätze Gesprächsnotiz bitten, falls keine da ist. „Kein Interesse mehr“ heißt: Chance als verloren vermerken (absprache_speichern mit Fakt).
 - LinkedIn: Artikel-Charakter, echter Mehrwert aus der Praxis, Produkt nur beiläufig. Keine Werbesprache.
 - Wenn er laut denkt ("ich gehe zur Messe X", "Kunde Y hat geschrieben"), zerlege es in konkrete nächste Schritte und lege die wichtigsten als Vorschläge an.
 - Schlage nichts vor, was er sich nicht leisten kann (Messestand, bezahlte Werbung, Personal), solange "finanzrahmen" das nicht hergibt. Biete stattdessen die kostenlose Variante an.
@@ -74,6 +76,9 @@ function uebernahmenAus(ergebnisse: { toolName: string; input: unknown; output: 
         break
       case "absprache_speichern":
         liste.push({ agent: "vertrieb", was: `Absprache an „${String(aus.firma || aus.chance)}“ gespeichert`, stand: "erledigt" })
+        break
+      case "erinnerung_anlegen":
+        liste.push({ agent: "koordinator", was: `Fragt dich am ${new Date(String(aus.ab)).toLocaleDateString("de-DE", { timeZone: "Europe/Berlin" })}: ${String(ein.frage ?? "")}`, stand: "wartet", bis: new Date(String(aus.ab)).toLocaleDateString("de-DE", { timeZone: "Europe/Berlin" }) })
         break
       case "bestandskunde_anlegen":
         liste.push({ agent: "kundenbetreuung", was: `${String(aus.firma)} als ${String(aus.als)} geführt – meldet sich zur Pflege`, stand: "erledigt" })
@@ -312,6 +317,41 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<{
         const r = await legeChanceAn(q, v)
         await protokolliereFaden(q, "assistent", "vertrieb", `Neue Chance: ${r.firma}`).catch(() => null)
         return r
+      },
+    }),
+    erinnerung_anlegen: tool({
+      description:
+        "Legt eine Frage an Emin ab, die ihm das System an einem bestimmten Tag stellt (Bereich „Fragen an dich“, mit Antwortknöpfen). Für „erinnere mich Montag“, „frag mich nach dem Termin“, „ich warte auf Antwort von X“.",
+      inputSchema: z.object({
+        datum: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).describe("Tag, an dem gefragt wird, JJJJ-MM-TT"),
+        frage: z.string().min(5).max(200).describe("Kurze Frage an Emin, z. B. „Murat Başer: Hast du ihn gesehen – wie geht es weiter?“"),
+        kontext: z.string().max(400).optional().describe("Ein Satz, worum es geht"),
+        optionen: z.array(z.string().min(2).max(60)).max(4).optional().describe("2–4 Antwortknöpfe"),
+        suche: z.string().max(120).optional().describe("Firma/Chance, falls es um eine Chance geht"),
+      }),
+      execute: async (v) => {
+        const q = await assistentDb()
+        let bezug: string | null = null
+        if (q && v.suche) {
+          const t = (await q(
+            `SELECT o.id FROM opportunities o LEFT JOIN organisations g ON g.id = o.organisation_id
+              WHERE o.status NOT IN ('won','lost') AND (g.name ILIKE $1 OR o.title ILIKE $1) ORDER BY o.updated_at DESC LIMIT 2`,
+            [`%${v.suche.replace(/[%_]/g, "")}%`],
+          )) as { id: string }[]
+          if (t.length === 1) bezug = `opportunity:${t[0].id}`
+        }
+        const ab = new Date(`${v.datum}T07:00:00+01:00`)
+        const { stelleFrage } = await import("@/lib/assistent/fragen")
+        const id = await stelleFrage({
+          agent: "koordinator",
+          frage: v.frage,
+          kontext: v.kontext ?? null,
+          optionen: v.optionen?.length ? v.optionen : ["Erledigt", "Noch nicht – in 3 Tagen erinnern", "Hat sich erledigt"],
+          bezug,
+          quelle: `erinnerung:${v.datum}:${v.frage.slice(0, 60)}`,
+          ab,
+        })
+        return id ? { angelegt: true, id, ab: ab.toISOString() } : { angelegt: false, grund: "Diese Erinnerung gibt es schon" }
       },
     }),
     absprache_speichern: tool({

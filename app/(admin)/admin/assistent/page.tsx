@@ -1290,6 +1290,7 @@ export default async function AssistentPage({
     ladeInstagram().catch(() => null),
     ladeKapitalVorhaben().catch(() => []),
   ])
+  const fragenAnDich = await (await import("@/lib/assistent/fragen")).offeneFragen().catch(() => [])
   const liZiele: LinkedinZiele = {
     inhaber: liInhaber ? liInhaber.name ?? "dein Profil" : null,
     firma: liFirma ? liFirma.name ?? "Firmenseite" : null,
@@ -1530,7 +1531,7 @@ export default async function AssistentPage({
             <h2 id="chat-titel" className="font-sans text-xl font-semibold text-foreground">
               Auftrag geben
             </h2>
-            <AssistentChat start={verlauf} rest={TAGESLIMIT - heute} />
+            <AssistentChat start={verlauf} rest={TAGESLIMIT - heute} fragen={fragenAnDich} />
           </section>
         </div>
       </div>
