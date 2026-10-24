@@ -1,3 +1,4 @@
+import { BRANCHEN } from "@/lib/branchen-weitere"
 import type { MetadataRoute } from "next"
 import { ARTIKEL_SPRACHEN, veroeffentlichteInsights } from "@/lib/artikel/store"
 import { publishedInsights, readableInsights } from "@/lib/insights"
@@ -133,6 +134,7 @@ const entries: Entry[] = [
    * schlimmer als eine kurze Sitemap.
    */
   { path: "/branchen/handwerk", changeFrequency: "monthly", priority: 0.7 },
+  ...BRANCHEN.map((b) => ({ path: `/branchen/${b.slug}`, changeFrequency: "monthly" as const, priority: 0.7 })),
 
   { path: "/kontakt", changeFrequency: "monthly", priority: 0.9 },
   { path: "/termin", changeFrequency: "monthly", priority: 0.8 },

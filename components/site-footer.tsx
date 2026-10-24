@@ -8,6 +8,7 @@ import { openConsentSettings } from "@/lib/consent"
 import { checkCopy } from "@/lib/betriebscheck"
 import { rechnerText } from "@/lib/rechner-text"
 import { handwerkCopy } from "@/lib/branchen"
+import { BRANCHEN } from "@/lib/branchen-weitere"
 import { ArrowUpRight } from "lucide-react"
 
 /**
@@ -246,6 +247,14 @@ export function SiteFooter() {
                   {handwerkCopy.eyebrow[locale]}
                 </Link>
               </li>
+              {/* Weitere Nischen (lib/branchen-weitere.ts): Experten-Seiten, nicht im Hauptmenü. */}
+              {BRANCHEN.map((b) => (
+                <li key={b.slug}>
+                  <Link href={`/branchen/${b.slug}`} className={linkKlasse}>
+                    {b.eyebrow[locale]}
+                  </Link>
+                </li>
+              ))}
               <li>
                 <Link href="/systeme" className={linkKlasse}>
                   {t.nav.systeme}

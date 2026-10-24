@@ -140,6 +140,16 @@ const TOKENPUNKTE = new Map([
     },
   ],
   [
+    /* Newsletter-Double-Opt-in (24.10.2026): erst der Knopf schreibt die Einwilligung. */
+    join("app", "mail", "bestaetigen", "[token]", "page.tsx"),
+    {
+      pruefung: "bestaetige(",
+      wirkungen: ["revalidatePath("],
+      quelle: join("lib", "mailing", "anmeldung.ts"),
+      beweis: /export async function bestaetige\([^)]*\)[^{]*\{\s*if \(!\/\^\[\\w-\]\{20,60\}\$\/\.test\(token\)\) return false[\s\S]{0,400}WHERE token = \$1/,
+    },
+  ],
+  [
     join("app", "mail", "abmelden", "[token]", "page.tsx"),
     {
       pruefung: "abmeldenPerToken(",
