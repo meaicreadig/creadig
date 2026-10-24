@@ -252,6 +252,20 @@ export async function fragenHeute(): Promise<number> {
 /** Agenten, deren Karten zu einer Chance Geld oder Druck bedeuten (Angebot, Rechnung, Nachfassen). */
 const GELD_AGENTEN = ["vertrieb", "angebot", "finanz", "forderungen", "projekte"]
 
+const PROAKTIV = ["jaeger", "vertrieb", "partner", "kundenbetreuung", "international", "golf", "redaktion", "marketing", "ideen", "kapital"]
+const TAGES_DECKEL = Number(process.env.KARTEN_TAGES_DECKEL) || 4
+const OFFEN_DECKEL = Number(process.env.KARTEN_OFFEN_DECKEL) || 10
+
+async function deckelErreicht(q: Abfrage): Promise<boolean> {
+  const [r] = (await q(
+    `SELECT count(*) FILTER (WHERE created_at >= date_trunc('day', now() AT TIME ZONE 'Europe/Berlin') AT TIME ZONE 'Europe/Berlin')::int AS heute,
+            count(*) FILTER (WHERE status = 'offen')::int AS offen
+       FROM assistent_freigaben WHERE agent = ANY($1::text[]) AND ${NUR_SICHTBARE}`,
+    [PROAKTIV],
+  ).catch(() => [{ heute: 0, offen: 0 }])) as { heute: number; offen: number }[]
+  return (r?.heute ?? 0) >= TAGES_DECKEL || (r?.offen ?? 0) >= OFFEN_DECKEL
+}
+
 export async function legeFreigabeAn(f: {
   art: FreigabeArt
   titel: string
@@ -277,6 +291,17 @@ export async function legeFreigabeAn(f: {
     const { wartetAufGespraech } = await import("@/lib/ausfuehrung/vorbehalt")
     if (await wartetAufGespraech(q, opp)) return null
   }
+  /*
+   * Karten-Tavan (24.10.2026): Von proaktiven Vorschlägen (Akquise, Redaktion,
+   * Ideen) legen die Agenten höchstens TAGES_DECKEL neue Karten pro Tag bei Emin
+   * ab, und keine mehr, solange OFFEN_DECKEL davon unbearbeitet liegen. Was
+   * nicht passt, schlagen sie beim nächsten Lauf erneut vor – die Quelle ist ja
+   * nicht verbraucht. Ausgenommen: Geld nach Annahme, Antworten auf Anfragen,
+   * alles, was Emin selbst im Chat angestoßen hat.
+   */
+  const sichtbar = !["aufgabe", "notiz"].includes(f.art) || f.extra?.fuerEmin === true
+  const pflicht = /^(bewertung|empfehlung-dank|provision|anzahlung|schlussrechnung):/.test(f.quelle ?? "")
+  if (sichtbar && !pflicht && f.agent && PROAKTIV.includes(f.agent) && !f.extra?.nachAnnahme && (await deckelErreicht(q))) return null
   const id = f.id ?? neueId("frg")
   /* Prüfen und Einfügen in einer Anweisung: zwei gleichzeitige Läufe legen dieselbe Quelle nicht doppelt an. */
   const rows = (await q(

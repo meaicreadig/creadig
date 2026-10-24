@@ -100,8 +100,25 @@ export async function controllerRunde(): Promise<{ ergebnis: string; anzahl: num
     if (id) karte = 1
   }
 
+  /* Kosten gegen Einnahmen: einmal pro Woche als Chat-Meldung von Paul (Finanzen). */
+  let kostenText = ""
+  const kq = await assistentDb()
+  if (kq) {
+    const { kostenBild, kostenZeile } = await import("@/lib/ergebnis/kosten")
+    const k = await kostenBild(kq, 30).catch(() => null)
+    if (k && !(await quelleBekannt(`kosten:${woche}`))) {
+      kostenText = kostenZeile(k)
+      const { speichereNachricht } = await import("@/lib/assistent/store")
+      await speichereNachricht("assistant", `Wochenblick Kosten gegen Einnahmen (KW ${woche}):`, [
+        { agent: "finanz", was: kostenText, stand: "erledigt" },
+        ...(k.modelle.length ? [{ agent: "controller", was: `Größte KI-Posten: ${k.modelle.map((m) => `${m.model} ${m.eur.toLocaleString("de-DE")} €`).join(", ")}`, stand: "erledigt" as const }] : []),
+      ]).catch(() => null)
+      await legeAuftragAn({ von: "controller", an: "geschaeftsfuehrung", titel: `Kosten KW ${woche}`, inhalt: kostenText, quelle: `kosten:${woche}` }).catch(() => null)
+    }
+  }
+
   return {
-    ergebnis: `Firma 30 T.: ${firma.leads} Anfragen, ${firma.termine} Termine, ${firma.gewonnen} gewonnen (${firma.eur.toLocaleString("de-DE")} €) · ${wirkt.length} wirken, ${schaerfen.length} schärfen, ${vorschlag.length} Pausen-Vorschläge, ${anlauf.length} im Anlauf`,
+    ergebnis: `${kostenText ? `${kostenText} · ` : ""}Firma 30 T.: ${firma.leads} Anfragen, ${firma.termine} Termine, ${firma.gewonnen} gewonnen (${firma.eur.toLocaleString("de-DE")} €) · ${wirkt.length} wirken, ${schaerfen.length} schärfen, ${vorschlag.length} Pausen-Vorschläge, ${anlauf.length} im Anlauf`,
     anzahl: 1 + auftraege + karte,
   }
 }

@@ -98,11 +98,14 @@ export const SYSTEM_KANAELE = [
   "BFSG-Sprache: Erst ehrlich prüfen, ob das Gesetz den Betrieb überhaupt betrifft (Kleinstunternehmen-Ausnahme bei Dienstleistungen). Die Rechtsfrage klärt eine Kanzlei, wir liefern die technische Prüfung. Nie „abmahnsicher“, nie „BFSG-konform garantiert“, keine Overlay-Plugins.",
   "Förder-Hinweis für Kunden: Betriebe mit Sitz in Bayern können den Digitalbonus Bayern prüfen (Antrag VOR Auftrag, mind. 4.000 € Ausgaben, Standard-Websites nicht förderfähig) – immer „kann förderfähig sein“, nie zusagen.",
   "Ideenwerkstatt (Kaan) liefert täglich bis zu 3 Verbesserungen; im Admin-Chat zeigen Übernahme-Kästen, welcher KI-Mitarbeiter was übernommen hat.",
+  "Karten-Deckel: Proaktive Vorschläge (Akquise, Redaktion, Ideen, Kapital) legen zusammen höchstens 4 neue Karten pro Tag bei Emin ab und keine, solange 10 offen liegen – darum nur die besten Vorschläge, Rest beim nächsten Lauf. Pflicht-Karten (Bewertung, Provision, Rechnungen) zählen nicht.",
+  "Kosten gegen Einnahmen: Der Controller meldet jede Woche im Chat die echten KI-Kosten (AI Gateway) und Fixkosten gegen bezahlte Rechnungen der letzten 30 Tage.",
 ] as const
 
 /** Grundregeln des Inhabers — gelten für jeden Agenten. */
 export const GRUNDREGELN = [
   "Alles legal; im Zweifel nicht.",
+  "Nie eine Handlung als erledigt melden, die nicht wirklich ausgeführt wurde (Werkzeug-Ergebnis, Datenbank-Eintrag, versendete Karte). Unbekanntes heißt „noch offen“ oder „wartet“, nie „erledigt“ oder „nichts gefunden“; immer sagen, wer übernimmt.",
   "Keine Haftung für Fremde übernehmen.",
   "Kein Angstverkauf (keine Drohkulisse mit Abmahnungen, Fristen oder Strafen).",
   "Keine Kaltakquise und keine Werbe-E-Mails ohne Einwilligung (UWG § 7).",
