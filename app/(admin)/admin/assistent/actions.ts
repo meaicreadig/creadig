@@ -131,6 +131,21 @@ export async function frageBeantworten(id: string, antwort: string): Promise<Fra
   }
 }
 
+/** Schwebendes Assistenten-Fenster: nur die Zahl offener Fragen (für den Punkt am Knopf). */
+export async function dockStand(): Promise<{ fragen: number }> {
+  await pruefe()
+  const { offeneFragen } = await import("@/lib/assistent/fragen")
+  return { fragen: (await offeneFragen(20).catch(() => [])).length }
+}
+
+/** Beim Öffnen des Fensters: Verlauf, Fragen, Rest des Tageslimits. */
+export async function dockLaden(): Promise<{ verlauf: Nachricht[]; fragen: import("@/lib/assistent/fragen").EminFrage[]; rest: number }> {
+  await pruefe()
+  const { offeneFragen } = await import("@/lib/assistent/fragen")
+  const [verlauf, fragen, heute] = await Promise.all([ladeVerlauf(30), offeneFragen().catch(() => []), fragenHeute()])
+  return { verlauf, fragen, rest: TAGESLIMIT - heute }
+}
+
 export async function frageSpaeter(id: string): Promise<void> {
   await pruefe()
   const { verschiebeFrage } = await import("@/lib/assistent/fragen")

@@ -162,9 +162,25 @@ const VORSCHLAEGE = [
   "Welche Förderungen könnten für creaDIG passen?",
 ]
 
-export function AssistentChat({ start, rest, fragen: startFragen = [] }: { start: Nachricht[]; rest: number; fragen?: EminFrage[] }) {
+export function AssistentChat({
+  start,
+  rest,
+  fragen: startFragen = [],
+  modus = "seite",
+  onFragenZahl,
+}: {
+  start: Nachricht[]
+  rest: number
+  fragen?: EminFrage[]
+  /** „dock“: schwebendes Fenster auf jeder Admin-Seite – zwei Reiter (Fragen / Team-Chat). */
+  modus?: "seite" | "dock"
+  onFragenZahl?: (n: number) => void
+}) {
   const [verlauf, setVerlauf] = useState(start)
   const [fragen, setFragen] = useState(startFragen)
+  const dock = modus === "dock"
+  const [reiter, setReiter] = useState<"fragen" | "chat">(dock && startFragen.length ? "fragen" : "chat")
+  useEffect(() => onFragenZahl?.(fragen.length), [fragen.length, onFragenZahl])
   const [eingabe, setEingabe] = useState("")
   const [fehler, setFehler] = useState<string | null>(null)
   const [laeuft, startTransition] = useTransition()
@@ -226,6 +242,7 @@ export function AssistentChat({ start, rest, fragen: startFragen = [] }: { start
     if (laeuft) return
     setFehler(null)
     setFragen((l) => l.filter((x) => x.id !== f.id))
+    if (dock) setReiter("chat")
     const p = personVon(f.agent)
     setVerlauf((v) => [...v, { id: `tmp-${Date.now()}`, rolle: "user", text: `Antwort an ${p.name} auf „${f.frage}“: ${antwort}`, zeit: new Date().toISOString() }])
     startTransition(async () => {
@@ -268,9 +285,46 @@ export function AssistentChat({ start, rest, fragen: startFragen = [] }: { start
   }
 
   return (
-    <section className="flex min-h-[24rem] w-full min-w-0 md:min-h-[32rem] flex-col overflow-hidden rounded-3xl bg-card shadow-sm" aria-label="Chat mit dem Assistenten">
-      <FragenAnDich fragen={fragen} beantworte={beantworte} spaeter={spaeter} gesperrt={laeuft} />
-      <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-5 md:p-6" style={{ maxHeight: "60vh" }}>
+    <section
+      className={dock ? "flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden bg-card" : "flex min-h-[24rem] w-full min-w-0 md:min-h-[32rem] flex-col overflow-hidden rounded-3xl bg-card shadow-sm"}
+      aria-label="Chat mit dem Assistenten"
+    >
+      {dock ? (
+        <div role="tablist" aria-label="Bereich wählen" className="flex shrink-0 gap-1 border-b border-border p-2">
+          {(
+            [
+              ["fragen", `Fragen an dich${fragen.length ? ` · ${fragen.length}` : ""}`],
+              ["chat", "Team-Chat"],
+            ] as const
+          ).map(([k, text]) => (
+            <button
+              key={k}
+              type="button"
+              role="tab"
+              aria-selected={reiter === k}
+              onClick={() => setReiter(k)}
+              className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${reiter === k ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}
+            >
+              {text}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <FragenAnDich fragen={fragen} beantworte={beantworte} spaeter={spaeter} gesperrt={laeuft} />
+      )}
+      {dock && reiter === "fragen" ? (
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {fragen.length ? (
+            <FragenAnDich fragen={fragen} beantworte={beantworte} spaeter={spaeter} gesperrt={laeuft} />
+          ) : (
+            <p className="p-6 text-sm leading-relaxed text-muted-foreground">
+              Gerade keine offenen Fragen. Sobald jemand aus dem Team etwas von dir wissen muss – wie ein Gespräch gelaufen ist, wie es mit einer Chance weitergeht –, steht es hier.
+            </p>
+          )}
+        </div>
+      ) : (
+      <>
+      <div className={dock ? "flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4" : "flex flex-1 flex-col gap-4 overflow-y-auto p-5 md:p-6"} style={dock ? undefined : { maxHeight: "60vh" }}>
         {verlauf.length === 0 ? (
           <div className="flex flex-col gap-3">
             <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
@@ -426,6 +480,8 @@ export function AssistentChat({ start, rest, fragen: startFragen = [] }: { start
           Fragen · nichts geht ohne deine Freigabe raus
         </p>
       </form>
+      </>
+      )}
     </section>
   )
 }

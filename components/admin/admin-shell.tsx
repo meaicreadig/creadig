@@ -11,6 +11,7 @@ import { ADMIN_COOKIE, verifySession } from "@/lib/admin-session"
 import { adminSprachKontext } from "@/lib/admin-i18n/server"
 import { darfBetreten } from "@/lib/rollen"
 import { NetzFaden } from "@/components/admin/netz-faden"
+import { AssistentDock } from "@/components/admin/assistent-dock"
 import { assistentDb } from "@/lib/assistent/store"
 import { letzteFaeden } from "@/lib/zentrale/faden-protokoll"
 import { KNOTEN, NAV_SCHLUESSEL, type NavSchluessel } from "@/lib/zentrale/netz-karte"
@@ -188,6 +189,8 @@ export async function AdminShell({
           </div>
         </main>
       </div>
+      {/* Das Team auf jeder Seite: Fragen an dich + Team-Chat (24.10.2026). */}
+      {darfBetreten(rolle, "/admin/assistent") && <AssistentDock />}
     </div>
   )
 }
