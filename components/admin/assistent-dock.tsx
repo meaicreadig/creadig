@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { usePathname } from "next/navigation"
 import { Loader2, MessageCircle, X } from "lucide-react"
 
 import { dockLaden, dockStand } from "@/app/(admin)/admin/assistent/actions"
@@ -13,19 +12,15 @@ import type { Nachricht } from "@/lib/assistent/store"
  * Das Team auf jeder Admin-Seite (24.10.2026). Emin: „Hangi sayfada olursam
  * olayım o chat'i görüyor olmam lazım.“ Unten rechts ein Knopf; ein Punkt mit
  * Zahl zeigt offene Fragen. Das Fenster hat zwei Reiter: „Fragen an dich“ und
- * „Team-Chat“ (derselbe Chat wie auf /admin/assistent). Auf der Assistenten-Seite
- * selbst bleibt der Knopf weg – dort steht der Chat schon.
+ * „Team-Chat“. Es ist der EINE Chat – auf /admin/assistent steht kein zweiter mehr.
  */
 export function AssistentDock() {
-  const pfad = usePathname()
   const [offen, setOffen] = useState(false)
   const [zahl, setZahl] = useState(0)
   const [daten, setDaten] = useState<{ verlauf: Nachricht[]; fragen: EminFrage[]; rest: number } | null>(null)
   const [laedt, setLaedt] = useState(false)
-  const aufSeite = pfad?.startsWith("/admin/assistent")
 
   useEffect(() => {
-    if (aufSeite) return
     let aus = false
     const hole = () => dockStand().then((s) => !aus && setZahl(s.fragen)).catch(() => null)
     void hole()
@@ -34,7 +29,7 @@ export function AssistentDock() {
       aus = true
       clearInterval(t)
     }
-  }, [aufSeite])
+  }, [])
 
   useEffect(() => {
     if (!offen) return
@@ -52,8 +47,6 @@ export function AssistentDock() {
       setLaedt(false)
     }
   }, [])
-
-  if (aufSeite) return null
 
   return (
     <>

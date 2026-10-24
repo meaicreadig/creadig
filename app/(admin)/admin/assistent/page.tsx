@@ -46,18 +46,14 @@ import { saeuleVon, zeitpunktText } from "@/lib/assistent/linkedin-plan"
 
 import { Klappe } from "@/components/admin/klappe"
 import { AdminShell } from "@/components/admin/admin-shell"
-import { AssistentChat } from "@/components/admin/assistent-chat"
 import { collectAttention } from "@/lib/attention"
 import {
-  fragenHeute,
   ladeBeitraege,
   ladeFreigabe,
   ladeFreigaben,
   ladeLinkedin,
   ladeRaete,
-  ladeVerlauf,
   letzteLaeufe,
-  TAGESLIMIT,
   type Freigabe,
   type FreigabeArt,
   type Lauf,
@@ -1290,16 +1286,13 @@ export default async function AssistentPage({
     ladeInstagram().catch(() => null),
     ladeKapitalVorhaben().catch(() => []),
   ])
-  const fragenAnDich = await (await import("@/lib/assistent/fragen")).offeneFragen().catch(() => [])
   const liZiele: LinkedinZiele = {
     inhaber: liInhaber ? liInhaber.name ?? "dein Profil" : null,
     firma: liFirma ? liFirma.name ?? "Firmenseite" : null,
     instagram: ig ? ig.name ?? "Instagram" : null,
   }
-  const [verlauf, freigabenAlle, heute, laeufe, board, raete, rahmen, beitraege, ansprache] = await Promise.all([
-    ladeVerlauf(40),
+  const [freigabenAlle, laeufe, board, raete, rahmen, beitraege, ansprache] = await Promise.all([
     ladeFreigaben(),
-    fragenHeute(),
     letzteLaeufe(),
     collectAttention(getVertriebStore()).catch(() => null),
     ladeRaete(6).catch(() => []),
@@ -1408,7 +1401,7 @@ export default async function AssistentPage({
           </ul>
         </Klappe>
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_26rem]">
+        <div className="grid gap-8">
           <section aria-labelledby="eingang-titel" className="flex min-w-0 flex-col gap-4">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 id="eingang-titel" className="font-sans text-xl font-semibold text-foreground">
@@ -1527,12 +1520,7 @@ export default async function AssistentPage({
             ) : null}
           </section>
 
-          <section aria-labelledby="chat-titel" className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-6 lg:self-start">
-            <h2 id="chat-titel" className="font-sans text-xl font-semibold text-foreground">
-              Auftrag geben
-            </h2>
-            <AssistentChat start={verlauf} rest={TAGESLIMIT - heute} fragen={fragenAnDich} />
-          </section>
+          {/* Der Chat lebt seit 24.10.2026 nur noch im Team-Fenster unten rechts (jede Admin-Seite) – ein Chat, ein Ort. */}
         </div>
       </div>
       <AktionMeldung />
