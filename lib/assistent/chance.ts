@@ -31,6 +31,9 @@ export type NeueChance = {
   bisherGetan?: string
   naechsterSchritt?: string
   datum?: string
+  /** Wer hat uns empfohlen? (Kunde, Steuerberater, Verband …) */
+  empfohlenVon?: string
+  provisionProzent?: number
 }
 
 const plusTage = (n: number) => new Date(Date.now() + n * 864e5).toLocaleDateString("sv-SE", { timeZone: "Europe/Berlin" })
@@ -93,6 +96,11 @@ export async function legeChanceAn(q: Abfrage, v: NeueChance) {
     quelle: `chance:${id}`,
   }).catch(() => null)
 
+  if (v.empfohlenVon?.trim()) {
+    const { trageEmpfehlungEin } = await import("@/lib/ausfuehrung/empfehlung")
+    await trageEmpfehlungEin(q, { oppId: id, firma: org.name, partner: v.empfohlenVon, provisionProzent: v.provisionProzent ?? null }).catch(() => null)
+  }
+
   await q(`DELETE FROM admin_briefing WHERE tag = (now() AT TIME ZONE 'Europe/Berlin')::date`, []).catch(() => null)
   const { ereignis } = await import("@/lib/motor/ereignis")
   await ereignis("gespraech_notiert", {
@@ -121,6 +129,7 @@ export async function legeChanceAn(q: Abfrage, v: NeueChance) {
     zustaendig: "Vertrieb",
     auftragAnVertrieb: Boolean(auftrag),
     vorbehalt: "Kein Angebot vor dem Gespräch",
+    empfohlenVon: v.empfohlenVon?.trim() || null,
   }
 }
 

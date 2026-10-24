@@ -169,13 +169,23 @@ export async function aktiveEmpfaenger(): Promise<Empfaenger[]> {
   return rows.map(zuEmpfaenger)
 }
 
+const QUELLE_OHNE_EINWILLIGUNG = /linked\s*in|xing|instagram|facebook|tiktok|vernetz|visitenkarte|messe|stand(gespr|besuch)|import|kaltakquise|recherche/i
+
 export async function empfaengerEintragen(e: {
   email: string
   name: string | null
   basis: Basis
   source: string
   contactId?: string | null
-}): Promise<"neu" | "vorhanden"> {
+}): Promise<"neu" | "vorhanden" | "gesperrt"> {
+  /*
+   * Mail-Sperre (24.10.2026, Automatik 4): Eine Vernetzung, eine Visitenkarte
+   * oder ein Messegespräch ist keine Einwilligung in Werbe-Mails (AG Düsseldorf
+   * 20.11.2025, 23 C 120/25: LinkedIn-Kontakt ≠ Einwilligung). Solche Quellen
+   * kommen nie mit „einwilligung“ in den Verteiler – nur über die bestätigte
+   * Website-Anmeldung (Quelle doi:…) oder eine ausdrücklich erteilte Zustimmung.
+   */
+  if (e.basis === "einwilligung" && !e.source.startsWith("doi:") && QUELLE_OHNE_EINWILLIGUNG.test(e.source)) return "gesperrt"
   const norm = e.email.trim().toLowerCase()
   const rows = await q()(
     `INSERT INTO mail_recipients (id, email, email_normalised, name, contact_id, basis, source, token)

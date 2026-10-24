@@ -97,6 +97,9 @@ export async function kundenbetreuungsRunde(): Promise<{ ergebnis: string; anzah
   if (!q) return { ergebnis: "Keine Datenbank", anzahl: 0 }
 
   const stamm = await ergaenzeStammdaten(q).catch(() => 0)
+  /* Nach jeder Abnahme: Bewertungsbitte als Karte für Emin (lib/ausfuehrung/bewertung.ts). */
+  const { bewertungsRunde } = await import("@/lib/ausfuehrung/bewertung")
+  const bewertungen = await bewertungsRunde(q).catch(() => 0)
 
   const kunden = (await q(
     `SELECT og.id, og.name, og.website, og.city, og.email AS orgmail, og.street AS strasse, og.postal_code AS plz, og.city AS ort, og.country AS land, og.lifecycle, og.note,
@@ -172,7 +175,7 @@ Antworte NUR mit JSON: {"betreff":"","text":"ab der Anrede, mit Gruß und Name"}
   }
 
   return {
-    ergebnis: `${kunden.length} Bestandskunden ohne offene Chance (${erreichbar.length} erreichbar) · ${stamm} Stammdaten recherchiert · ${n} Check-ins zur Freigabe`,
-    anzahl: n + stamm,
+    ergebnis: `${kunden.length} Bestandskunden ohne offene Chance (${erreichbar.length} erreichbar) · ${stamm} Stammdaten recherchiert · ${n} Check-ins zur Freigabe · ${bewertungen} Bewertungsbitten`,
+    anzahl: n + stamm + bewertungen,
   }
 }

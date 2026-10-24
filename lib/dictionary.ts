@@ -3120,6 +3120,10 @@ const rawDictionary = {
           title: "Ihre Rechte",
           body: "Sie haben jederzeit das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch (Art. 21). Eine Nachricht an die unten genannte Adresse genügt. Unabhängig davon steht Ihnen das Recht zu, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren (Art. 77 DSGVO) — für unseren Sitz ist die Landesbeauftragte für den Datenschutz Niedersachsen zuständig.",
         },
+        {
+          title: "Newsletter (nur mit Bestätigung)",
+          body: "Wenn Sie unseren Newsletter abonnieren, speichern wir Ihre E-Mail-Adresse, den Zeitpunkt der Anmeldung und der Bestätigung, den Einwilligungstext, dem Sie zugestimmt haben, sowie einen verschlüsselten Prüfwert Ihrer IP-Adresse (nicht die Adresse selbst) als Nachweis Ihrer Einwilligung (Double-Opt-in). Vor Ihrem Klick auf den Bestätigungslink geht keine Mail an Sie. Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO. Sie können sich jederzeit über den Link in jeder Mail abmelden; unbestätigte Anmeldungen löschen wir nach 30 Tagen. Der Versand läuft über Resend.",
+        },
       ],
       privacyNote: "Diese Fassung wird mit den vollständigen Firmendaten juristisch final geprüft.",
     },
@@ -4942,6 +4946,10 @@ const rawDictionary = {
           title: "Haklarınız",
           body: "Her zaman bilgi alma (GDPR Md. 15), düzeltme (Md. 16), silme (Md. 17), işlemenin kısıtlanması (Md. 18), veri taşınabilirliği (Md. 20) ve itiraz (Md. 21) hakkına sahipsiniz. Aşağıdaki adrese bir mesaj yeterlidir. Bundan bağımsız olarak, bir veri koruma denetim otoritesine şikâyette bulunma hakkınız da vardır (GDPR Md. 77) — merkezimiz için yetkili otorite Aşağı Saksonya Veri Koruma Görevlisi'dir (Landesbeauftragte für den Datenschutz Niedersachsen).",
         },
+        {
+          title: "Bülten (yalnızca onayla)",
+          body: "Bültenimize kaydolursanız, onayınızın kanıtı olarak e-posta adresinizi, kayıt ve onay zamanını, onayladığınız metni ve IP adresinizin anahtarlı bir özetini (adresin kendisini değil) saklarız. Onay bağlantısına tıklamadan hiçbir e-posta gönderilmez. Hukuki dayanak: GDPR md. 6 (1) (a). Her e-postadaki bağlantıyla istediğiniz zaman abonelikten çıkabilirsiniz; onaylanmamış kayıtlar 30 gün sonra silinir. Gönderim Resend üzerinden yapılır.",
+        },
       ],
       privacyNote: "Bu metin, şirket bilgileri tamamlandığında hukuken son kez kontrol edilecektir.",
     },
@@ -6737,6 +6745,10 @@ const rawDictionary = {
           title: "Your rights",
           body: "You have the right at any time to access (Art. 15 GDPR), rectification (Art. 16), erasure (Art. 17), restriction of processing (Art. 18), data portability (Art. 20) and objection (Art. 21). A message to the address below is enough. Independently of this, you have the right to lodge a complaint with a data protection supervisory authority (Art. 77 GDPR) — for our location that is the State Commissioner for Data Protection of Lower Saxony.",
         },
+        {
+          title: "Newsletter (confirmed opt-in only)",
+          body: "If you subscribe to our newsletter, we store your e-mail address, the time of sign-up and confirmation, the consent text you agreed to and a keyed hash of your IP address (not the address itself) as proof of consent. Nothing is sent before you click the confirmation link. Legal basis: Art. 6(1)(a) GDPR. You can unsubscribe at any time via the link in every e-mail; unconfirmed sign-ups are deleted after 30 days. Delivery via Resend.",
+        },
       ],
       privacyNote: "This version will undergo a final legal review together with the complete company details.",
     },
@@ -8529,6 +8541,10 @@ const rawDictionary = {
         {
           title: "حقوقكم",
           body: "لكم في أي وقت حق الوصول (المادة 15) والتصحيح (16) والمحو (17) وتقييد المعالجة (18) ونقل البيانات (20) والاعتراض (21). وتكفي رسالة إلى العنوان المذكور أدناه. وبصرف النظر عن ذلك لكم حق تقديم شكوى إلى سلطة إشراف على حماية البيانات (المادة 77) — والمختصة لمقرّنا هي مفوّضة حماية البيانات لولاية ساكسونيا السفلى.",
+        },
+        {
+          title: "النشرة البريدية (بتأكيد فقط)",
+          body: "إذا اشتركت في نشرتنا، نحفظ عنوان بريدك الإلكتروني ووقت الاشتراك ووقت التأكيد والنص الذي وافقت عليه، إضافةً إلى بصمة مُشفّرة لعنوان IP (وليس العنوان نفسه) كدليل على موافقتك. لا يُرسَل أي بريد قبل نقرك على رابط التأكيد. الأساس القانوني: المادة 6 (1) (أ) من اللائحة العامة لحماية البيانات. يمكنك إلغاء الاشتراك في أي وقت عبر الرابط الموجود في كل رسالة؛ وتُحذف بيانات الطلبات غير المؤكدة بعد 30 يوماً. الإرسال عبر Resend.",
         },
       ],
       privacyNote: "ستخضع هذه النسخة لمراجعة قانونية نهائية مع بيانات الشركة الكاملة.",

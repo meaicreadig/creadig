@@ -64,6 +64,7 @@ function uebernahmenAus(ergebnisse: { toolName: string; input: unknown; output: 
     if (!ok && r.toolName !== "karten_schliessen") continue
     switch (r.toolName) {
       case "chance_anlegen":
+        if (aus.empfohlenVon) liste.push({ agent: "partner", was: `Empfehlung von ${String(aus.empfohlenVon)} vermerkt – Dank-Karte für dich liegt bereit; Provision erst nach bezahlter Schlussrechnung`, stand: "erledigt" })
         liste.push(
           { agent: "vertrieb", was: `${String(aus.chance ?? "Chance")} · ${String(aus.naechsterSchritt ?? "")}`, stand: "laeuft", bis: aus.bis ? `bis ${new Date(String(aus.bis)).toLocaleDateString("de-DE")}` : undefined },
           { agent: "recherche", was: `Recherchiert ${String(aus.firma)}: Adresse, Website, Branche – trägt es in die Firma ein`, stand: "laeuft", bis: "ca. 5 Min." },
@@ -301,6 +302,8 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<{
         bisherGetan: z.string().max(300).optional().describe("z. B. 'WhatsApp mit Terminvorschlag geschickt'"),
         naechsterSchritt: z.string().max(300).optional(),
         datum: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().describe("Bis wann der nächste Schritt, JJJJ-MM-TT; ohne Angabe in 3 Tagen"),
+        empfohlenVon: z.string().max(160).optional().describe("Wer hat den Kontakt empfohlen (Kunde, Steuerberater, Verband, Partner)? Nur wenn Emin es sagt."),
+        provisionProzent: z.number().min(0).max(30).optional().describe("Vereinbarte Tippgeber-Provision in %, nur wenn Emin es nennt"),
       }),
       execute: async (v) => {
         const q = await assistentDb()

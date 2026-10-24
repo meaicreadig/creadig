@@ -6,6 +6,7 @@ import { useLocale } from "@/components/locale-provider"
 import { PageHeader } from "@/components/ui/page-header"
 import { Reveal } from "@/components/ui/reveal"
 import { ClosingCta } from "@/components/sections/closing-cta"
+import { NewsletterAnmeldung } from "@/components/sections/newsletter-anmeldung"
 import { insightCategoryKeys, publishedInsights, type Insight, type InsightCategoryKey } from "@/lib/insights"
 import { InsightFeature } from "@/components/insight/article-parts"
 
@@ -169,6 +170,8 @@ export function InsightsPageBody({ entries = publishedInsights }: { entries?: In
           )}
         </div>
       </section>
+
+      <NewsletterAnmeldung quelle="insights" />
 
       <ClosingCta variant="insights" />
     </main>

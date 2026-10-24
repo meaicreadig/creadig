@@ -163,8 +163,10 @@ Antworte NUR mit JSON-Array: [{"firma":"","strasse":"","plz":"","ort":"","land":
   }
 
   const empf = await empfehlungen()
+  const { provisionsRunde } = await import("@/lib/ausfuehrung/empfehlung")
+  const provisionen = await provisionsRunde(q).catch(() => 0)
   return {
-    ergebnis: `Segment ${seg.id}: ${briefe} Partner-Briefe ${briefBereit() ? "zur Freigabe" : "im Firmenprofil geparkt (Briefkanal fehlt)"} · ${empf} Empfehlungs-Mails zur Freigabe`,
-    anzahl: briefe + empf,
+    ergebnis: `Segment ${seg.id}: ${briefe} Partner-Briefe ${briefBereit() ? "zur Freigabe" : "im Firmenprofil geparkt (Briefkanal fehlt)"} · ${empf} Empfehlungs-Mails zur Freigabe · ${provisionen} Provisionen fällig`,
+    anzahl: briefe + empf + provisionen,
   }
 }
