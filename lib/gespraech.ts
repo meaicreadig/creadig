@@ -363,7 +363,9 @@ export async function speichereGespraech(
     const nq = neonAbfrage()
     if (!nq) return
     const { angebotAusGespraech } = await import("@/lib/ausfuehrung/angebot-hat")
-    await angebotAusGespraech(nq, input.kontaktId, id)
+    /* Katman 6: Angebot aus dem Gespräch mit den Regeln des Angebotsautomaten. */
+    const { mitAgent } = await import("@/lib/lernen/kontext")
+    await mitAgent("angebot", () => angebotAusGespraech(nq, input.kontaktId, id))
   }
   try {
     const { after } = await import("next/server")

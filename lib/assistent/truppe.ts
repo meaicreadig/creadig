@@ -19,6 +19,7 @@ import { bulletinStoff, erstelleBulletin } from "@/lib/bulletin/agent"
 import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 import { ABTEILUNGEN } from "@/lib/zentrale/abteilungen"
 import { findeOderLegeFirma } from "@/lib/kundenfaden"
+import { briefBereit } from "@/lib/brief/letterxpress"
 import { ladeSperrliste, rechtsRunde, sperrGrund } from "@/lib/recht/compliance"
 import { geplantFuer, linkMitUtm, SAEULEN, zielgruppeDerWoche, type Saeule } from "./linkedin-plan"
 import { veroeffentlicheGeplante } from "./redaktion-post"
@@ -506,7 +507,17 @@ Antworte NUR mit JSON-Array: [{"firma":"","strasse":"","plz":"","ort":"","land":
       firma.id,
       `Anschrift laut Impressum: ${anschrift.strasse}, ${anschrift.plz} ${anschrift.ort}${an ? `\nKontakt laut Webseite: ${an}` : ""}\nAnsprache: Brief per Post – Werbung per E-Mail ohne Einwilligung ist unzulässig (UWG § 7).\n${check ? webcheckNotiz(check) : ""}`.slice(0, 4000),
     ])
-    await legeFreigabeAn({
+    /* Katman 6: Ohne Briefkanal keine Karte, die beim Freigeben nur scheitert – der Brief wartet im Firmenprofil. */
+    if (!briefBereit()) {
+      await q(`UPDATE organisations SET note = concat_ws(E'\n\n', nullif(note,''), $2::text), updated_at = now() WHERE id = $1`, [
+        firma.id,
+        `Brief-Entwurf (wartet auf Briefkanal):\nBetreff: ${z.betreff}\n\n${z.mail.trim()}${ps}`.slice(0, 4000),
+      ])
+      liste.push(`- ${z.firma} (${z.ort}) · ${z.website} · ${z.warum}`)
+      neu++
+      continue
+    }
+    const kartenId = await legeFreigabeAn({
       art: "brief",
       titel: `Brief an ${z.firma} (${z.ort})`,
       inhalt: `${z.mail.trim()}${ps}`,
@@ -516,6 +527,8 @@ Antworte NUR mit JSON-Array: [{"firma":"","strasse":"","plz":"","ort":"","land":
       agent: "jaeger",
       extra: { warum: z.warum, anschrift, orgId: firma.id, produkt: revier.id === "fibero" || revier.id === "stammo" ? revier.id : "creadig" },
     })
+    /* Katman 6: Nur gezählt, was wirklich als Karte angelegt wurde (gesperrtes Ziel, Doppel → null). */
+    if (!kartenId) continue
     liste.push(`- ${z.firma} (${z.ort}) · ${z.website} · ${z.warum}`)
     neu++
   }
@@ -525,11 +538,14 @@ Antworte NUR mit JSON-Array: [{"firma":"","strasse":"","plz":"","ort":"","land":
       von: "vertrieb",
       an: "marketing",
       titel: `Zielliste KW ${woche}: ${liste.length} Firmen für ${revier.produkt}`,
-      inhalt: `Zielgruppe: ${revier.suche}\nAngebot: ${revier.angebot}\n\n${liste.join("\n")}\n\nDie Briefe liegen fertig bei Emin zur Freigabe (Post über LetterXpress). Kein Mailversand ohne Einwilligung.`,
+      inhalt: `Zielgruppe: ${revier.suche}\nAngebot: ${revier.angebot}\n\n${liste.join("\n")}\n\n${briefBereit() ? "Die Briefe liegen fertig bei Emin zur Freigabe (Post über LetterXpress)." : "Briefkanal noch nicht eingerichtet – die Brief-Entwürfe stehen im Firmenprofil."} Kein Mailversand ohne Einwilligung.`,
       quelle: `jaeger:${woche}:${revier.id}`,
     })
   }
-  return { ergebnis: `${neu} Zielfirmen für ${revier.produkt} recherchiert – ${neu} Briefe zur Freigabe`, anzahl: neu }
+  return {
+    ergebnis: `${neu} Zielfirmen für ${revier.produkt} recherchiert – ${neu} Briefe ${briefBereit() ? "zur Freigabe" : "im Firmenprofil geparkt (Briefkanal fehlt)"}`,
+    anzahl: neu,
+  }
 }
 
 async function rat(opt: { manuell?: boolean } = {}): Promise<Ergebnis> {
@@ -737,7 +753,8 @@ async function koordinator(): Promise<Ergebnis> {
   return koordinatorRunde()
 }
 
-type Start = { manuell?: boolean }
+/** `trotzPause`: Emin startet einen pausierten Agenten selbst (Knopf im Assistenten). */
+type Start = { manuell?: boolean; trotzPause?: boolean }
 /** Zusammengelegte Agenten: beide Ergebnisse in einer Zeile, Mengen addiert. */
 const verbinde = (...e: Ergebnis[]): Ergebnis => ({ ergebnis: e.map((x) => x.ergebnis).join(" · "), anzahl: e.reduce((n, x) => n + x.anzahl, 0) })
 const LAEUFER: Record<AgentKey, (o: Start) => Promise<Ergebnis>> = {
@@ -790,7 +807,15 @@ async function meldeAgentFehler(key: AgentKey, grund: string): Promise<void> {
   await raiseAlert("agent-fehler", `${name}: ${grund.slice(0, 300)}`).catch((e) => console.error("[assistent] alarm", e))
 }
 
-export async function fuehreAgentAus(key: AgentKey, o: Start = {}): Promise<"gelaufen" | "laeuft_schon"> {
+export async function fuehreAgentAus(key: AgentKey, o: Start = {}): Promise<"gelaufen" | "laeuft_schon" | "pausiert"> {
+  /*
+   * Katman 6: Pause gilt auf JEDEM Weg (Takt, Motor-Ereignis, Puls, Seitenaufruf, Artikel) –
+   * vorher prüften nur Takt und Puls, ein pausierter Agent lief über Ereignisse weiter.
+   */
+  if (!o.trotzPause && !o.manuell) {
+    const { pausierteAgenten } = await import("@/lib/ergebnis/steuerung")
+    if ((await pausierteAgenten().catch(() => new Set<string>())).has(key)) return "pausiert"
+  }
   const sperre = await nimmSperre(`agent:${key}`, SPERRE_MINUTEN)
   if (!sperre) return "laeuft_schon"
   if (sperre.abgebrochen) {

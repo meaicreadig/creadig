@@ -167,6 +167,12 @@ export async function qualitaetsRunde(): Promise<{ ergebnis: string; anzahl: num
     )
     if (!b.auffaellig) continue
     auffaellig++
+    /*
+     * Katman 6 – EINE Rückmeldung je Agent: Eine niedrige Freigabequote lernt das
+     * Firmengedächtnis aus Emins Absagen (lib/lernen), das Ergebnis misst der Controller.
+     * Ein Auftrag von hier nur noch, wenn der Agent technisch nicht liefert.
+     */
+    if (b.gruende.every((g) => g.startsWith("Freigabequote"))) continue
     const abt = abteilungVonAgent(z.agent)
     const id = await legeAuftragAn({
       von: "qualitaet",

@@ -37,7 +37,8 @@ async function holeSkizzenNach(): Promise<number> {
     [],
   )) as { id: string }[]
   const { schreibeAntragsskizze } = await import("@/lib/assistent/kapital-antrag")
-  for (const r of rows) await schreibeAntragsskizze(r.id)
+  const { mitAgent } = await import("@/lib/lernen/kontext")
+  for (const r of rows) await mitAgent("kapital", () => schreibeAntragsskizze(r.id))
   return rows.length
 }
 export const PULS_ABSTAND_STUNDEN = 2

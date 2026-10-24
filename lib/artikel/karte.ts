@@ -43,6 +43,7 @@ export async function legeArtikelKarte(slug: string): Promise<string | null> {
     agent: "redaktion",
     extra: {
       artikelSlug: a.slug,
+      fuerEmin: true,
       warum: vonLinkedin
         ? "Aus deinem LinkedIn-Beitrag ausgebaut – damit er auch über Google gefunden wird."
         : a.bulletinRef?.startsWith("plan:") || a.bulletinRef?.startsWith("gsc:")

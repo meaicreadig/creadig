@@ -215,6 +215,29 @@ export async function rechtsRunde(): Promise<{ ergebnis: string; anzahl: number 
     }
   }
 
+  /*
+   * 1b. Briefe (Katman 6): Postwerbung an Betriebe ist ohne Einwilligung zulässig, aber nicht an
+   * jemanden, der widersprochen hat. Vorher prüfte diese Runde nur `mail` – Jäger und Partner
+   * schreiben seit dem 24.10. Briefe, die an der Sperrliste vorbeiliefen.
+   */
+  const briefe = (await q(`SELECT id, quelle, empfaenger FROM assistent_freigaben WHERE status = 'offen' AND art = 'brief'`, []).catch(() => [])) as {
+    id: string
+    quelle: string | null
+    empfaenger: string | null
+  }[]
+  for (const b of briefe) {
+    const ziel = b.empfaenger?.includes("@") ? b.empfaenger : b.quelle?.startsWith("brief:") ? `x@${b.quelle.slice(6)}` : null
+    const grund = ziel && ziel.includes(".") ? await sperrGrund(ziel) : null
+    if (!grund) continue
+    await q(
+      `UPDATE assistent_freigaben SET status = 'verworfen', erledigt_at = now(),
+         extra = coalesce(extra,'{}'::jsonb) || jsonb_build_object('automatisch', $2::text, 'recht', $2::text)
+       WHERE id = $1 AND status = 'offen'`,
+      [b.id, `Gesperrt: ${grund}`.slice(0, 300)],
+    )
+    geschlossen++
+  }
+
   /* 2. Widersprüche aus dem Eingang, die noch nicht gesperrt sind, nachziehen. */
   let gesperrt = 0
   const absagen = (await q(`SELECT von, id FROM mail_eingang WHERE art = 'nein' ORDER BY created_at DESC LIMIT 50`, []).catch(() => [])) as {

@@ -7,6 +7,7 @@ import { firmenText } from "@/lib/firmenwahrheit"
 import { inhalteText } from "@/lib/inhalte"
 
 import { akteWerkzeuge, FESTE_FAKTEN } from "./akte"
+import { AUSSENWIRKUNG_AGENTEN } from "@/lib/agenten/kreise"
 
 /**
  * Interne Koordination der KI-Firma.
@@ -174,6 +175,7 @@ async function sammleEin(): Promise<number> {
     `SELECT f.id, f.titel, f.inhalt, f.agent FROM assistent_freigaben f
      WHERE f.status = 'offen' AND f.art IN ('aufgabe','notiz')
        AND coalesce(f.extra->'koordination'->>'beiEmin', '') <> 'true'
+       AND coalesce(f.extra->>'fuerEmin', '') <> 'true' AND NOT coalesce(f.extra, '{}'::jsonb) ? 'artikelSlug'
        AND NOT EXISTS (SELECT 1 FROM firma_auftraege a WHERE a.quelle = 'frg:' || f.id)
      ORDER BY f.created_at ASC LIMIT 10`,
     [],
@@ -270,7 +272,7 @@ const REGELN = `GRENZEN (unverletzlich):
  * Motor-Schritte (Kundenmails), Finanz- und Forderungsvorschläge (Angebot, Mahnung), Projekt-
  * Nachfassen – und alles, dessen Titel nach Versand, Angebot, Rechnung oder Kundenkontakt klingt.
  */
-const AUSSEN_AGENTEN = new Set(["motor", "finanz", "forderungen", "projekte", "golf", "kapital", "investor", "kundenbetreuung", "partner", "angebot"])
+const AUSSEN_AGENTEN = new Set<string>(AUSSENWIRKUNG_AGENTEN)
 const AUSSEN_TITEL =
   /\b(mail|e-mail|senden|schicken|versenden|angebot|rechnung|mahnung|zahlungserinnerung|anruf|anrufen|termin|dankesmail|kunde|kundin|nachfass|antwort an|antrag|bewerbung|pitch)\w*/i
 
@@ -451,6 +453,7 @@ export async function raeumeEingangAuf(minTage = 2): Promise<{ geschlossen: numb
     `SELECT id, titel, inhalt, coalesce(agent, '') AS agent, extra->'koordination'->>'ergebnis' AS vorlage FROM assistent_freigaben
       WHERE status = 'offen' AND art IN ('aufgabe','notiz')
         AND coalesce(extra->'koordination'->>'beiEmin', '') = 'true'
+        AND coalesce(extra->>'fuerEmin', '') <> 'true' AND NOT coalesce(extra, '{}'::jsonb) ? 'artikelSlug'
         AND created_at < now() - make_interval(days => $1)
       ORDER BY created_at ASC LIMIT 40`,
     [minTage],

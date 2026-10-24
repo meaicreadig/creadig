@@ -1,4 +1,5 @@
 import { neonAbfrage, type Abfrage } from "@/lib/neon-abfrage"
+import { AKQUISE_AGENTEN } from "@/lib/agenten/kreise"
 
 /**
  * FIRMENGEDÄCHTNIS — Katman 5 (24.10.2026).
@@ -76,8 +77,8 @@ export async function lernDb(): Promise<Abfrage | null> {
 
 const neueId = (p: string) => `${p}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 
-/** Agenten, die nach außen ansprechen – nur für sie gilt die harte Zielsperre. */
-export const AUSSEN_AGENTEN = ["jaeger", "vertrieb", "partner", "kundenbetreuung", "international", "golf"]
+/** Agenten, die nach außen ansprechen – nur für sie gilt die harte Zielsperre (Liste: lib/agenten/kreise.ts). */
+export const AUSSEN_AGENTEN: string[] = [...AKQUISE_AGENTEN]
 
 /** Gründe, die den Entwurf meinen, nicht das Ziel: Ziel bleibt offen, nur der Text war schlecht. */
 const NUR_TEXT = ["Ton passt nicht", "Inhalt falsch oder unbelegt"]
@@ -283,8 +284,20 @@ export async function ladeLektionen(): Promise<Lektion[]> {
 /** Höchstens so viele Regeln je Aufruf – Emins zuerst, dann die stärksten. */
 const MAX_JE_AUFRUF = 14
 
+/**
+ * Katman 6: Zusammengelegte Agenten laufen unter EINEM Schlüssel, ihre Karten tragen aber den
+ * Unter-Namen (Messen-Karten „messen“, Mahnungen „forderungen“). Ohne diese Zuordnung kamen
+ * Regeln aus Emins Entscheidungen zu diesen Karten nie in einen Prompt.
+ */
+const UNTER_AGENTEN: Record<string, string[]> = {
+  vertrieb: ["messen"],
+  finanz: ["forderungen"],
+  koordinator: ["koordination"],
+}
+
 export async function lektionenFuer(agent: string): Promise<Lektion[]> {
-  return (await ladeLektionen()).filter((l) => l.geltung === agent || l.geltung === "*").slice(0, MAX_JE_AUFRUF)
+  const namen = new Set([agent, ...(UNTER_AGENTEN[agent] ?? [])])
+  return (await ladeLektionen()).filter((l) => namen.has(l.geltung) || l.geltung === "*").slice(0, MAX_JE_AUFRUF)
 }
 
 export async function lektionenText(agent: string): Promise<string | null> {

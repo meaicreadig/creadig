@@ -4,7 +4,11 @@ import { assistentDb } from "@/lib/assistent/store"
 import { AGENTEN } from "@/lib/assistent/truppe"
 import { ABTEILUNGEN, abteilungVonAgent } from "@/lib/zentrale/abteilungen"
 
+import { briefBereit } from "@/lib/brief/letterxpress"
+
 import { pausierteAgenten } from "./steuerung"
+
+const BRIEF_AGENTEN = new Set(["jaeger", "partner"])
 
 /**
  * SONUÇ KARNESİ — die Ergebnis-Karne (Katman 3, 24.10.2026).
@@ -36,7 +40,7 @@ import { pausierteAgenten } from "./steuerung"
  */
 
 export type Klasse = "umsatz" | "chance" | "stab" | "schutz"
-export type Urteil = "wirkt" | "anlauf" | "wartet" | "schaerfen" | "vorschlag" | "pausiert" | "schutz"
+export type Urteil = "wirkt" | "anlauf" | "wartet" | "schaerfen" | "vorschlag" | "pausiert" | "schutz" | "kanal"
 
 export type Kette = { kontakte: number; antworten: number; leads: number; termine: number; angebote: number; chancen: number; gewonnen: number; eur: number }
 export type AgentKarne = {
@@ -226,6 +230,9 @@ export async function ladeKarne(tage = 30): Promise<Karne | null> {
     const ab = erst === null ? null : new Date(erst + fenster * TAG).toISOString()
 
     if (pausiert.has(a.key)) return { ...basis, urteil: "pausiert", grund: "Von Emin pausiert – läuft nicht.", urteilAb: null }
+    /* Katman 6: Ohne Briefkanal kann ein Brief-Agent nicht wirken – kein Urteil über ihn, sondern über den fehlenden Kanal. */
+    if (BRIEF_AGENTEN.has(a.key) && !briefBereit())
+      return { ...basis, urteil: "kanal", grund: "Briefkanal (LetterXpress) nicht eingerichtet – Zielfirmen werden gesammelt, Briefe warten im Firmenprofil.", urteilAb: null }
     if (klasse === "schutz") return { ...basis, urteil: "schutz", grund: "Wirkt durch Verhindern – wird an Stabilität gemessen, nicht am Umsatz.", urteilAb: null }
     const erzielt = klasse === "stab" ? paesseN : ergebnisse(k) + (k.eur > 0 ? 1 : 0)
     if (erzielt > 0) return { ...basis, urteil: "wirkt", grund: klasse === "stab" ? `${paesseN} Aufträge aus seiner Arbeit erledigt.` : "Hat messbare Ergebnisse erzeugt.", urteilAb: null }
@@ -280,5 +287,6 @@ export const URTEIL_TEXT: Record<Urteil, { de: string; tr: string }> = {
   schaerfen: { de: "schärfen", tr: "keskinleştir" },
   vorschlag: { de: "pausieren/zusammenlegen?", tr: "durdur/birleştir?" },
   pausiert: { de: "pausiert", tr: "durduruldu" },
+  kanal: { de: "Kanal fehlt", tr: "kanal eksik" },
   schutz: { de: "Schutzfunktion", tr: "koruma görevi" },
 }

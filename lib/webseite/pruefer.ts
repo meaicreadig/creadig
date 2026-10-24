@@ -562,7 +562,7 @@ export async function websiteRunde(o: { manuell?: boolean } = {}): Promise<{ erg
       ].join("\n"),
       quelle: `webseite-inhaber:${woche}`,
       agent: "webseite",
-      extra: { warum: "Rechtliche Pflichtangaben auf der Website – nur du kennst sie." },
+      extra: { warum: "Rechtliche Pflichtangaben auf der Website – nur du kennst sie.", fuerEmin: true },
     }).catch(() => null)
     if (id) auftraege++
   }

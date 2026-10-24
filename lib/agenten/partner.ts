@@ -1,5 +1,7 @@
 import "server-only"
 
+import { briefBereit } from "@/lib/brief/letterxpress"
+
 import { generateText } from "ai"
 
 import { assistentDb, legeFreigabeAn, quelleBekannt } from "@/lib/assistent/store"
@@ -134,6 +136,15 @@ Antworte NUR mit JSON-Array: [{"firma":"","strasse":"","plz":"","ort":"","land":
     try {
       host = new URL(f.website).hostname.replace(/^www\./, "").toLowerCase()
     } catch {}
+    /* Katman 6: Ohne Briefkanal keine Karte – der Brief wartet im Firmenprofil. */
+    if (!briefBereit()) {
+      await q(`UPDATE organisations SET note = concat_ws(E'\n\n', nullif(note,''), $2::text), updated_at = now() WHERE id = $1`, [
+        firma.id,
+        `Partner-Brief-Entwurf (wartet auf Briefkanal):\nBetreff: ${f.betreff}\n\n${f.brief.trim()}`.slice(0, 4000),
+      ])
+      briefe++
+      continue
+    }
     const id = await legeFreigabeAn({
       art: "brief",
       titel: `Partner-Brief an ${f.firma} (${f.ort})`,
@@ -153,7 +164,7 @@ Antworte NUR mit JSON-Array: [{"firma":"","strasse":"","plz":"","ort":"","land":
 
   const empf = await empfehlungen()
   return {
-    ergebnis: `Segment ${seg.id}: ${briefe} Partner-Briefe zur Freigabe · ${empf} Empfehlungs-Mails zur Freigabe`,
+    ergebnis: `Segment ${seg.id}: ${briefe} Partner-Briefe ${briefBereit() ? "zur Freigabe" : "im Firmenprofil geparkt (Briefkanal fehlt)"} · ${empf} Empfehlungs-Mails zur Freigabe`,
     anzahl: briefe + empf,
   }
 }

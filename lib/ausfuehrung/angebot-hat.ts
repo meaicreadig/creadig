@@ -8,7 +8,7 @@ import { MODELL, json } from "@/lib/agenten/ki"
 import { legeFreigabeAn, quelleBekannt } from "@/lib/assistent/store"
 import { dokumentUrl, sendeDokumentMail } from "@/lib/finanz/auftraege/mail"
 import { berechne } from "@/lib/finanz/auftraege/rechnen"
-import { ladeDokument, schreibeFest, speichereEntwurf, verlauf } from "@/lib/finanz/auftraege/store"
+import { ladeDokument, schreibeFest, speichereEntwurf, verlauf, vermerkeNachfass } from "@/lib/finanz/auftraege/store"
 import { legeEntwurfAusGewinn } from "@/lib/finanz/auftraege/aus-vertrieb"
 import { finanzDb } from "@/lib/finanz/store"
 import type { Abfrage } from "@/lib/neon-abfrage"
@@ -44,6 +44,11 @@ export async function legeAngebotsKarte(db: Db, dokId: string): Promise<string |
   if (await quelleBekannt(quelle)) return null
   const d = await ladeDokument(db, dokId)
   if (!d || d.art !== "angebot" || d.status !== "entwurf") return null
+  const opp0 = await chanceVon(db, d.id)
+  if (opp0) {
+    const { wartetAufGespraech } = await import("./vorbehalt")
+    if (await wartetAufGespraech(db, opp0)) return null
+  }
   const summen = berechne(d.positionen.filter((p) => !p.optional || p.gewaehlt), d.rabattProzent, d.steuerModus ?? "normal")
   const offen = d.positionen.filter((p) => p.preisCent === 0)
   const oppId = await chanceVon(db, d.id)
@@ -80,12 +85,25 @@ export async function legeAngebotsKarte(db: Db, dokId: string): Promise<string |
 export type AngebotVersand = { ok: true; nummer: string } | { ok: false; grund: string }
 
 /** Emins Klick an der Karte: festschreiben und senden. Nie ohne Freigabe aufgerufen. */
-export async function sendeAngebotAusFreigabe(dokId: string, empfaenger: string | null): Promise<AngebotVersand> {
+/**
+ * Karte mit `extra.dokumentId` freigegeben: Angebot ODER Rechnung festschreiben
+ * und versenden (Katman 6: auch Anzahlungs- und Schlussrechnung), bzw. bei
+ * `nachfrage` die Nachfrage-Mail zu einem schon versendeten Angebot.
+ */
+export async function sendeAngebotAusFreigabe(dokId: string, empfaenger: string | null, art: "versand" | "nachfrage" = "versand"): Promise<AngebotVersand> {
   const db = await finanzDb().catch(() => null)
   if (!db) return { ok: false, grund: "Finanzdatenbank nicht erreichbar." }
   const d = await ladeDokument(db, dokId)
-  if (!d || d.art !== "angebot") return { ok: false, grund: "Angebot nicht gefunden." }
-  if (d.status !== "entwurf") return { ok: false, grund: `Angebot ist schon ${d.status}.` }
+  if (!d || (d.art !== "angebot" && d.art !== "rechnung")) return { ok: false, grund: "Dokument nicht gefunden." }
+  const name = d.art === "angebot" ? "Angebot" : "Rechnung"
+  if (art === "nachfrage") {
+    if (d.art !== "angebot" || d.status !== "versendet") return { ok: false, grund: `Angebot ist ${d.status} – keine Nachfrage nötig.` }
+    const mail = await sendeDokumentMail(d, "nachfrage")
+    if (!mail.ok) return { ok: false, grund: `Nachfrage nicht gesendet: ${mail.grund}` }
+    await vermerkeNachfass(db, d.id, null)
+    return { ok: true, nummer: d.nummer ?? d.id }
+  }
+  if (d.status !== "entwurf") return { ok: false, grund: `${name} ist schon ${d.status}.` }
   const offen = d.positionen.filter((p) => p.preisCent === 0)
   if (offen.length) return { ok: false, grund: `${offen.length} Position(en) ohne Preis („${offen[0].titel}“) – bitte erst im Entwurf ergänzen: /finanz/vorgang/${d.id}` }
   /* Emin hat an der Karte eine Adresse eingetragen, die im Entwurf fehlte. */
@@ -98,7 +116,7 @@ export async function sendeAngebotAusFreigabe(dokId: string, empfaenger: string 
   const mail = await sendeDokumentMail(fest.dok, "versand")
   await verlauf(db, d.id, "versand-aus-freigabe", { mail: mail.ok })
   if (!mail.ok) return { ok: false, grund: `${fest.dok.nummer} festgeschrieben, Mail nicht gesendet: ${mail.grund} Kundenlink: ${fest.dok.token ? dokumentUrl(fest.dok.token) : "—"}` }
-  const oppId = await chanceVon(db, d.id)
+  const oppId = d.art === "angebot" ? await chanceVon(db, d.id) : null
   if (oppId) {
     await db(`UPDATE opportunities SET last_contact_at = now(), updated_at = now(), status = CASE WHEN status IN ('new','contacted','qualified','discovery','audit') THEN 'proposal' ELSE status END WHERE id = $1`, [
       oppId,

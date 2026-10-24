@@ -24,7 +24,15 @@ export type EreignisEingabe = {
  * Projekt an, Finanz bereitet den Entwurf vor.
  */
 export const REAKTIONEN: Partial<Record<EreignisTyp, string[]>> = {
-  auftrag_erteilt: ["projekte", "finanz"],
+  auftrag_erteilt: ["projekte", "finanz", "angebot"],
+  /*
+   * Katman 6: Agenten, die im Tagestakt meist „nichts zu tun“ meldeten, laufen jetzt auch
+   * dann, wenn es etwas gibt – Antwort im Postfach, Gespräch geführt, Termin vorbei.
+   * „angebot“ achtet selbst auf den Gesprächsvorbehalt; nach dem Termin fällt er weg.
+   */
+  antwort_erhalten: ["kundenservice"],
+  gespraech_notiert: ["angebot"],
+  termin_vorbei: ["angebot"],
 }
 
 /** Gleiche Person, anderes Subjekt: Abläufe der Anfrage (`lead:<id>`) gehören zum Kontakt bzw. zur Mailadresse. */
@@ -110,7 +118,9 @@ export async function ereignis(typ: EreignisTyp, e: EreignisEingabe, optionen: {
 
     if (sofort && !optionen.ohneTakt) {
       const { takt } = await import("@/lib/motor/takt")
-      await takt()
+      /* Katman 6: auch der Sofort-Weg schreibt mit dem Firmengedächtnis (wie /api/motor/takt). */
+      const { mitAgent } = await import("@/lib/lernen/kontext")
+      await mitAgent("motor", () => takt())
     }
   } catch (error) {
     console.error("[motor] ereignis", typ, error instanceof Error ? error.message : error)

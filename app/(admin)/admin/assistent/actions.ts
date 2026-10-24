@@ -96,7 +96,7 @@ export async function agentStarten(form: FormData): Promise<void> {
   await pruefe()
   const key = form.get("agent")
   if (typeof key !== "string" || !AGENT_KEYS.includes(key as AgentKey)) return
-  await fuehreAgentAus(key as AgentKey)
+  await fuehreAgentAus(key as AgentKey, { trotzPause: true })
   revalidatePath("/admin/assistent")
 }
 
@@ -149,6 +149,12 @@ async function merkeAbsageGrund(id: string, form: FormData): Promise<{ grund: st
 }
 
 /** Katman 5: jede Entscheidung ins Firmengedächtnis – ein Fehler dort hält keine Freigabe auf. */
+/** Katman 6: Antragsskizzen schreiben mit den Regeln des Kapital-Agenten. */
+async function mitKapital<T>(fn: () => Promise<T>): Promise<T> {
+  const { mitAgent } = await import("@/lib/lernen/kontext")
+  return mitAgent("kapital", fn)
+}
+
 async function lerne(f: Freigabe, e: Parameters<typeof notiereEntscheidung>[1]): Promise<void> {
   await notiereEntscheidung(f, e).catch((x) => console.error("[lernen] notieren", x instanceof Error ? x.message : x))
 }
@@ -179,15 +185,17 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
 
   const titel = form.get("titel")
   const inhalt = form.get("inhalt")
+  /* Katman 6: Freigabe zählt erst als Emins Entscheidung, wenn sie auch ausgeführt wurde (Mail raus, Brief raus …) – nicht schon vor einem gescheiterten Versand. */
+  let freigabeLernen: Parameters<typeof notiereEntscheidung>[1] | null = null
   if (status === "freigegeben" && typeof titel === "string" && typeof inhalt === "string" && inhalt.trim()) {
     await aendereInhalt(fid, titel.trim() || f.titel, inhalt.trim())
     /* Geändert vor der Freigabe = der Agent lag daneben. Zählt in seine Note (Qualitätssicherung). */
     const umgeschrieben = inhalt.trim() !== f.inhalt.trim() || Boolean(titel.trim() && titel.trim() !== f.titel.trim())
     if (umgeschrieben) await ergaenzeExtra(fid, { bearbeitet: true })
     /* Katman 5: Entwurf und Emins Fassung nebeneinander – daraus lernt der Agent Ton und Inhalt. */
-    await lerne(f, umgeschrieben ? { entscheidung: "bearbeitet", endfassung: inhalt.trim() } : { entscheidung: "freigegeben" })
+    freigabeLernen = umgeschrieben ? { entscheidung: "bearbeitet", endfassung: inhalt.trim() } : { entscheidung: "freigegeben" }
   } else if (status === "freigegeben") {
-    await lerne(f, { entscheidung: "freigegeben" })
+    freigabeLernen = { entscheidung: "freigegeben" }
   }
 
   /* 24.10.2026: Karte „Artikel veröffentlichen“ – Freigeben stellt ihn auf creadig.de, Verwerfen legt das Thema ab. */
@@ -222,7 +230,7 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
     /* Katman 4: Karte „Angebot senden“ – festschreiben und als Angebots-Mail mit Kundenlink versenden. */
     if (f.extra.dokumentId) {
       const { sendeAngebotAusFreigabe } = await import("@/lib/ausfuehrung/angebot-hat")
-      const a = await sendeAngebotAusFreigabe(f.extra.dokumentId, istMail(an) ? an : null)
+      const a = await sendeAngebotAusFreigabe(f.extra.dokumentId, istMail(an) ? an : null, f.extra.dokumentMail ?? "versand")
       if (!a.ok) {
         await ergaenzeExtra(fid, { fehler: a.grund })
         revalidatePath("/admin/assistent")
@@ -310,7 +318,7 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
 
   if (status === "freigegeben" && f.art === "kapital") {
     await ergaenzeExtra(fid, { antrag: { stufe: "pruefen", seit: new Date().toISOString() } })
-    after(() => schreibeAntragsskizze(fid).catch((e) => console.error("[kapital] skizze", e)))
+    after(() => mitKapital(() => schreibeAntragsskizze(fid)).catch((e) => console.error("[kapital] skizze", e)))
   }
 
   /* Ohne Auswahl gilt das geplante Ziel – nie stillschweigend das Privatprofil. */
@@ -348,6 +356,7 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
       revalidatePath("/admin/veroeffentlichungen")
     }
   }
+  if (freigabeLernen) await lerne(f, freigabeLernen)
   await setzeFreigabe(fid, status)
   revalidatePath("/admin/assistent")
 }
@@ -362,7 +371,7 @@ export async function kapitalStufe(form: FormData): Promise<void> {
   await ergaenzeExtra(id, {
     antrag: { stufe: stufe as KapitalStufe, seit: new Date().toISOString(), skizze: f.extra.antrag?.skizze },
   })
-  if (!f.extra.antrag?.skizze) after(() => schreibeAntragsskizze(id).catch(() => undefined))
+  if (!f.extra.antrag?.skizze) after(() => mitKapital(() => schreibeAntragsskizze(id)).catch(() => undefined))
   revalidatePath("/admin/assistent")
 }
 

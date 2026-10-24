@@ -25,7 +25,7 @@ export async function wissensRunde(): Promise<{ ergebnis: string; anzahl: number
   const rows = (await q(
     `SELECT id, titel, inhalt, betreff, agent, extra->>'wissen' AS wissen
        FROM assistent_freigaben
-      WHERE status = 'offen' AND art IN ('mail','linkedin','kapital')
+      WHERE status = 'offen' AND art IN ('mail','linkedin','kapital','brief','notiz')  /* Katman 6: Briefe und Artikel-Karten liefen am Wissenswächter vorbei */
       ORDER BY created_at DESC LIMIT 100`,
     [],
   )) as Offen[]

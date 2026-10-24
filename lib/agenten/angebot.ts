@@ -50,17 +50,28 @@ export async function angebotsRunde(): Promise<{ ergebnis: string; anzahl: numbe
       ORDER BY d.created_at DESC LIMIT $1`,
     [JE_LAUF],
   )) as { id: string; opportunity_id: string }[]
-  if (!entwuerfe.length) return { ergebnis: "Kein offener Angebots-Entwurf zu füllen", anzahl: 0 }
+  /* Katman 6: Geld-Hattı – Anzahlung, Schlussrechnung, Nachfrage. Läuft auch, wenn kein Entwurf zu füllen ist. */
+  const { geldRunde } = await import("@/lib/ausfuehrung/geld-hat")
+  const g = await geldRunde().catch((e) => {
+    console.error("[angebot] geld", e instanceof Error ? e.message : e)
+    return { anzahlung: 0, schluss: 0, nachfrage: 0 }
+  })
+  const geld = [g.anzahlung && `${g.anzahlung} Anzahlung`, g.schluss && `${g.schluss} Schlussrechnung`, g.nachfrage && `${g.nachfrage} Nachfrage`].filter(Boolean).join(", ")
+  const geldN = g.anzahlung + g.schluss + g.nachfrage
+  if (!entwuerfe.length) return { ergebnis: geld ? `Geld-Karten: ${geld}` : "Kein offener Angebots-Entwurf zu füllen", anzahl: geldN }
 
   const katalog = await ladeLeistungen(db, true)
   const { legeAngebotsKarte } = await import("@/lib/ausfuehrung/angebot-hat")
   let n = 0
+  const { wartetAufGespraech } = await import("@/lib/ausfuehrung/vorbehalt")
   for (const e of entwuerfe) {
+    if (await wartetAufGespraech(db, e.opportunity_id)) continue
     if (!(await fuelleAngebot(db, e.id, e.opportunity_id, katalog))) continue
     n++
     await legeAngebotsKarte(db, e.id).catch((err) => console.error("[angebot] karte", err instanceof Error ? err.message : err))
   }
-  return { ergebnis: n ? `${n} Angebote gefüllt und als Ein-Klick-Karte „Angebot senden“ vorgelegt` : "Entwürfe geprüft, keiner gefüllt", anzahl: n }
+  const basis = n ? `${n} Angebote gefüllt und als Ein-Klick-Karte „Angebot senden“ vorgelegt` : "Entwürfe geprüft, keiner gefüllt"
+  return { ergebnis: geld ? `${basis} · Geld-Karten: ${geld}` : basis, anzahl: n + geldN }
 }
 
 /** Einen Angebots-Entwurf genau einmal füllen. `false`, wenn nichts zu tun war oder die KI nichts Brauchbares lieferte. */

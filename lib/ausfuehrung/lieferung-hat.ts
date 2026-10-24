@@ -151,6 +151,9 @@ export async function nachAngebotsAntwort(dokId: string): Promise<void> {
         daten: { von: o.status, wer: "kunde", angebot: d.nummer },
         schluessel: `auftrag_erteilt:${o.id}`,
       })
+      /* Katman 6: Annahme → Anzahlungsrechnung als Karte bei Emin. */
+      const { anzahlungNachAnnahme } = await import("./geld-hat")
+      await anzahlungNachAnnahme(q, d.id)
       return
     }
 

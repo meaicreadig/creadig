@@ -68,7 +68,7 @@ export function mailLayout(o: {
 ${absaetze}${details}${knopf}
 </td></tr>
 <tr><td style="padding:18px 28px;border-top:1px solid ${LINIE};font-size:12px;line-height:1.6;color:${GRAU}">
-creaDIG solutions UG (haftungsbeschränkt) · <a href="${siteUrl()}${x.pfad}/impressum" style="color:${GRAU}">${x.mail.footerImpressum}</a> · <a href="${siteUrl()}${x.pfad}/datenschutz" style="color:${GRAU}">${x.mail.footerDatenschutz}</a><br>
+creaDIG Solutions · Inh. Muhammed Emin Akyol · <a href="${siteUrl()}${x.pfad}/impressum" style="color:${GRAU}">${x.mail.footerImpressum}</a> · <a href="${siteUrl()}${x.pfad}/datenschutz" style="color:${GRAU}">${x.mail.footerDatenschutz}</a><br>
 ${x.mail.footerAbmelden}
 </td></tr></table></td></tr></table></body></html>`
 }

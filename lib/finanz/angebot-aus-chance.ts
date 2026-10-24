@@ -25,8 +25,11 @@ export async function legeAngebotsEntwuerfeAusChancen(db: Abfrage): Promise<{ id
     [],
   ).catch(() => [])
   const neu: { id: string; opportunityId: string; titel: string }[] = []
+  const { wartetAufGespraech } = await import("@/lib/ausfuehrung/vorbehalt")
   for (const c of chancen) {
     const oppId = String(c.id)
+    /* Katman 6: Erst Emins Gespräch, dann das Angebot – kein Entwurf, solange es aussteht. */
+    if (await wartetAufGespraech(db, oppId)) continue
     const r = await legeEntwurfAusGewinn(db, oppId, null).catch(() => null)
     if (!r?.neu) continue
     neu.push({ id: r.id, opportunityId: oppId, titel: String(c.title) })

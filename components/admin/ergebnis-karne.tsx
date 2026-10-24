@@ -43,7 +43,7 @@ const T = {
   },
 } as const
 
-const REIHENFOLGE: Urteil[] = ["vorschlag", "schaerfen", "wartet", "wirkt", "anlauf", "pausiert", "schutz"]
+const REIHENFOLGE: Urteil[] = ["vorschlag", "schaerfen", "wartet", "kanal", "wirkt", "anlauf", "pausiert", "schutz"]
 const FARBE: Record<Urteil, string> = {
   wirkt: "bg-emerald-500",
   anlauf: "bg-muted-foreground/40",
@@ -52,6 +52,7 @@ const FARBE: Record<Urteil, string> = {
   vorschlag: "bg-red-500",
   pausiert: "bg-muted-foreground",
   schutz: "bg-primary/50",
+  kanal: "bg-amber-500",
 }
 
 const werte = (k: Kette) => [k.kontakte, k.antworten, k.leads, k.termine, k.angebote, k.gewonnen]

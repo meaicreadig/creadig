@@ -72,7 +72,14 @@ const SCHEMA = [
  * außen geht oder löscht, ist immer sichtbar.
  */
 export const INTERNE_ARTEN = ["aufgabe", "notiz"] as const
-const NUR_SICHTBARE = `(art NOT IN ('aufgabe','notiz') OR coalesce(extra->'koordination'->>'beiEmin', '') = 'true')`
+/**
+ * Katman 6: Interne Karten, die NUR Emin entscheiden kann (Artikel veröffentlichen, fehlende
+ * Pflichtangaben fürs Impressum), liefen bis hierher unsichtbar in die Koordination – Entwürfe
+ * lagen tagelang, ohne dass er sie je sah. `fuerEmin` (oder ein Artikel an der Karte) macht sie
+ * sichtbar und hält sie aus Koordination und Aufräumen heraus.
+ */
+export const FUER_EMIN = `(coalesce(extra->>'fuerEmin', '') = 'true' OR extra ? 'artikelSlug')`
+const NUR_SICHTBARE = `(art NOT IN ('aufgabe','notiz') OR coalesce(extra->'koordination'->>'beiEmin', '') = 'true' OR ${FUER_EMIN})`
 
 export const FREIGABE_ARTEN = ["mail", "aufgabe", "termin", "linkedin", "kapital", "notiz", "loeschen", "brief", "steuerung"] as const
 export type FreigabeArt = (typeof FREIGABE_ARTEN)[number]
@@ -98,6 +105,12 @@ export type Freigabe = {
 export type FreigabeExtra = {
   /** Katman 4: Karte „Angebot senden“ – Freigabe schreibt dieses Finanz-Dokument fest und versendet es. */
   dokumentId?: string
+  /** Katman 6: „nachfrage“ = Nachfrage-Mail zu einem versendeten Angebot statt Erstversand. */
+  dokumentMail?: "nachfrage"
+  /** Katman 6: interne Karte, die nur Emin entscheiden kann – sichtbar, nie von der Koordination geschlossen. */
+  fuerEmin?: boolean
+  /** Katman 6: Karte folgt aus einer Kundenannahme (Rechnung) – der Gesprächsvorbehalt gilt hier nicht. */
+  nachAnnahme?: boolean
   /** Karte „Artikel veröffentlichen“ (lib/artikel/karte.ts): Freigeben = auf creadig.de veröffentlichen. */
   artikelSlug?: string
   /** Katman 3: Vorschläge des Ergebnis-Controllers – Agenten pausieren (Emin wählt, was gilt). */
@@ -228,6 +241,9 @@ export async function fragenHeute(): Promise<number> {
   return rows[0]?.n ?? 0
 }
 
+/** Agenten, deren Karten zu einer Chance Geld oder Druck bedeuten (Angebot, Rechnung, Nachfassen). */
+const GELD_AGENTEN = ["vertrieb", "angebot", "finanz", "forderungen", "projekte"]
+
 export async function legeFreigabeAn(f: {
   art: FreigabeArt
   titel: string
@@ -247,6 +263,12 @@ export async function legeFreigabeAn(f: {
   /* Katman 5: Was Emin bei diesem Ziel schon verworfen hat, schlägt kein Akquise-Agent noch einmal vor. */
   const { zielGesperrt } = await import("@/lib/lernen/store")
   if (await zielGesperrt({ agent: f.agent, quelle: f.quelle, empfaenger: f.empfaenger, orgId: f.extra?.orgId }).catch(() => false)) return null
+  /* Katman 6: Wartet die Chance auf Emins Gespräch, entsteht kein Angebot, keine Rechnung, kein Nachfassen. */
+  const opp = f.extra?.bezug?.startsWith("opportunity:") ? f.extra.bezug.slice(12) : (f.quelle?.match(/opp-[a-z0-9-]+?(?=:\d{4}-|$)/i)?.[0] ?? null)
+  if (opp && f.agent && GELD_AGENTEN.includes(f.agent) && !f.extra?.nachAnnahme) {
+    const { wartetAufGespraech } = await import("@/lib/ausfuehrung/vorbehalt")
+    if (await wartetAufGespraech(q, opp)) return null
+  }
   const id = f.id ?? neueId("frg")
   /* Prüfen und Einfügen in einer Anweisung: zwei gleichzeitige Läufe legen dieselbe Quelle nicht doppelt an. */
   const rows = (await q(
