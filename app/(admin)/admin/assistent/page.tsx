@@ -40,6 +40,7 @@ import {
   Gauge,
   FileText,
   Lightbulb,
+  ClipboardCheck,
 } from "lucide-react"
 import { saeuleVon, zeitpunktText } from "@/lib/assistent/linkedin-plan"
 
@@ -398,6 +399,7 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
   controller: Gauge,
   angebot: FileText,
   ideen: Lightbulb,
+  teftis: ClipboardCheck,
 }
 
 /* Seit 24.10.2026 zusammengelegt – ihre Karten tragen den alten Namen weiter. */

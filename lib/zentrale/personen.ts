@@ -34,6 +34,7 @@ export const PERSONEN: Record<string, Person> = {
   gedaechtnis: { name: "Aylin", rolle: { de: "Firmengedächtnis", tr: "Şirket Hafızası" } },
   ideen: { name: "Kaan", rolle: { de: "Ideenwerkstatt", tr: "Fikir Atölyesi" } },
   controller: { name: "Kaan", rolle: { de: "Ergebnis-Controller", tr: "Sonuç Kontrolü" } },
+  teftis: { name: "Teoman", rolle: { de: "Teftiş (Revision)", tr: "Teftiş Kurulu" } },
 }
 
 export const personVon = (agent: string): Person => PERSONEN[agent] ?? { name: "Aylin", rolle: { de: "Chief of Staff", tr: "Genel Koordinatör" } }

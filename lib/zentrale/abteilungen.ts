@@ -40,7 +40,7 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Geschäftsführung", tr: "Yönetim" },
     aufgabe: { de: "Strategie, Beirat, Tagesbriefing", tr: "Strateji, yönetim kurulu, günlük brifing" },
     knoten: ["uebersicht", "assistent"],
-    agenten: ["koordinator", "rat", "lage", "ideen"],
+    agenten: ["koordinator", "rat", "lage", "ideen", "teftis"],
     besetzung: "aktiv",
   },
   {
