@@ -26,6 +26,8 @@ async function verkleinere(datei: File): Promise<string> {
 
 import { frage, frageBeantworten, frageSpaeter, nachrichtenSeit } from "@/app/(admin)/admin/assistent/actions"
 import type { EminFrage } from "@/lib/assistent/fragen"
+import type { DockKarte } from "@/app/(admin)/admin/assistent/actions"
+import { DockKarten } from "@/components/admin/dock-karten"
 import type { Nachricht } from "@/lib/assistent/store"
 import { personVon, type Uebernahme } from "@/lib/zentrale/personen"
 
@@ -168,6 +170,8 @@ export function AssistentChat({
   fragen: startFragen = [],
   modus = "seite",
   onFragenZahl,
+  pfad,
+  karten: startKarten = [],
 }: {
   start: Nachricht[]
   rest: number
@@ -175,12 +179,17 @@ export function AssistentChat({
   /** „dock“: schwebendes Fenster auf jeder Admin-Seite – zwei Reiter (Fragen / Team-Chat). */
   modus?: "seite" | "dock"
   onFragenZahl?: (n: number) => void
+  /** Aktuelle Admin-Seite – Aylin weiß dann, worauf sich „hier“ bezieht. */
+  pfad?: string | null
+  /** Nur im Fenster: offene Karten „Zur Entscheidung“. */
+  karten?: DockKarte[]
 }) {
   const [verlauf, setVerlauf] = useState(start)
   const [fragen, setFragen] = useState(startFragen)
   const dock = modus === "dock"
-  const [reiter, setReiter] = useState<"fragen" | "chat">(dock && startFragen.length ? "fragen" : "chat")
-  useEffect(() => onFragenZahl?.(fragen.length), [fragen.length, onFragenZahl])
+  const [karten, setKarten] = useState(startKarten)
+  const [reiter, setReiter] = useState<"fragen" | "karten" | "chat">(dock && startFragen.length ? "fragen" : dock && startKarten.length ? "karten" : "chat")
+  useEffect(() => onFragenZahl?.(fragen.length + (dock ? karten.length : 0)), [fragen.length, karten.length, dock, onFragenZahl])
   const [eingabe, setEingabe] = useState("")
   const [fehler, setFehler] = useState<string | null>(null)
   const [laeuft, startTransition] = useTransition()
@@ -232,7 +241,7 @@ export function AssistentChat({
     const anzeige = b ? `[Bild angehängt] ${t}`.trim() : t
     setVerlauf((v) => [...v, { id: `tmp-${Date.now()}`, rolle: "user", text: anzeige, zeit: new Date().toISOString() }])
     startTransition(async () => {
-      const r = await frage(t, b)
+      const r = await frage(t, b, pfad)
       if (r.ok) setVerlauf((v) => [...v, r.antwort])
       else setFehler(r.fehler)
     })
@@ -293,7 +302,8 @@ export function AssistentChat({
         <div role="tablist" aria-label="Bereich wählen" className="flex shrink-0 gap-1 border-b border-border p-2">
           {(
             [
-              ["fragen", `Fragen an dich${fragen.length ? ` · ${fragen.length}` : ""}`],
+              ["fragen", `Fragen${fragen.length ? ` · ${fragen.length}` : ""}`],
+              ["karten", `Entscheiden${karten.length ? ` · ${karten.length}` : ""}`],
               ["chat", "Team-Chat"],
             ] as const
           ).map(([k, text]) => (
@@ -303,7 +313,7 @@ export function AssistentChat({
               role="tab"
               aria-selected={reiter === k}
               onClick={() => setReiter(k)}
-              className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${reiter === k ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}
+              className={`flex-1 rounded-full px-2 py-2 text-xs font-medium transition-colors sm:text-sm ${reiter === k ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}
             >
               {text}
             </button>
@@ -312,7 +322,11 @@ export function AssistentChat({
       ) : (
         <FragenAnDich fragen={fragen} beantworte={beantworte} spaeter={spaeter} gesperrt={laeuft} />
       )}
-      {dock && reiter === "fragen" ? (
+      {dock && reiter === "karten" ? (
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <DockKarten karten={karten} onWeg={(id) => setKarten((l) => l.filter((k) => k.id !== id))} />
+        </div>
+      ) : dock && reiter === "fragen" ? (
         <div className="min-h-0 flex-1 overflow-y-auto">
           {fragen.length ? (
             <FragenAnDich fragen={fragen} beantworte={beantworte} spaeter={spaeter} gesperrt={laeuft} />

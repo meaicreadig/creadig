@@ -1,9 +1,10 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 import { Loader2, MessageCircle, X } from "lucide-react"
 
-import { dockLaden, dockStand } from "@/app/(admin)/admin/assistent/actions"
+import { dockLaden, dockStand, type DockKarte } from "@/app/(admin)/admin/assistent/actions"
 import { AssistentChat } from "@/components/admin/assistent-chat"
 import type { EminFrage } from "@/lib/assistent/fragen"
 import type { Nachricht } from "@/lib/assistent/store"
@@ -15,14 +16,15 @@ import type { Nachricht } from "@/lib/assistent/store"
  * „Team-Chat“. Es ist der EINE Chat – auf /admin/assistent steht kein zweiter mehr.
  */
 export function AssistentDock() {
+  const pfad = usePathname()
   const [offen, setOffen] = useState(false)
   const [zahl, setZahl] = useState(0)
-  const [daten, setDaten] = useState<{ verlauf: Nachricht[]; fragen: EminFrage[]; rest: number } | null>(null)
+  const [daten, setDaten] = useState<{ verlauf: Nachricht[]; fragen: EminFrage[]; karten: DockKarte[]; rest: number; seite: string | null } | null>(null)
   const [laedt, setLaedt] = useState(false)
 
   useEffect(() => {
     let aus = false
-    const hole = () => dockStand().then((s) => !aus && setZahl(s.fragen)).catch(() => null)
+    const hole = () => dockStand().then((s) => !aus && setZahl(s.fragen + s.karten)).catch(() => null)
     void hole()
     const t = setInterval(hole, 120_000)
     return () => {
@@ -42,11 +44,11 @@ export function AssistentDock() {
     setOffen(true)
     setLaedt(true)
     try {
-      setDaten(await dockLaden())
+      setDaten(await dockLaden(pfad))
     } finally {
       setLaedt(false)
     }
-  }, [])
+  }, [pfad])
 
   return (
     <>
@@ -59,7 +61,9 @@ export function AssistentDock() {
           <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-3">
             <span className="flex flex-col">
               <span className="text-sm font-semibold text-foreground">Dein Team</span>
-              <span className="text-xs text-muted-foreground">Aylin und die KI-Kollegen · antworten hier, auf jeder Seite</span>
+              <span className="text-xs text-muted-foreground [overflow-wrap:anywhere]">
+                {daten?.seite ? `Aylin sieht: ${daten.seite.length > 70 ? `${daten.seite.slice(0, 70)}…` : daten.seite}` : "Aylin und die KI-Kollegen · auf jeder Seite"}
+              </span>
             </span>
             <button type="button" onClick={() => setOffen(false)} aria-label="Fenster schließen" className="flex size-9 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground">
               <X className="size-4" aria-hidden="true" />
@@ -72,7 +76,7 @@ export function AssistentDock() {
                 Lädt …
               </p>
             ) : (
-              <AssistentChat start={daten.verlauf} rest={daten.rest} fragen={daten.fragen} modus="dock" onFragenZahl={setZahl} />
+              <AssistentChat start={daten.verlauf} rest={daten.rest} fragen={daten.fragen} karten={daten.karten} modus="dock" onFragenZahl={setZahl} pfad={pfad} />
             )}
           </div>
         </div>
@@ -82,7 +86,7 @@ export function AssistentDock() {
         type="button"
         onClick={() => (offen ? setOffen(false) : void oeffnen())}
         aria-expanded={offen}
-        aria-label={zahl ? `Dein Team – ${zahl} offene Fragen an dich` : "Dein Team – Chat öffnen"}
+        aria-label={zahl ? `Dein Team – ${zahl} warten auf dich (Fragen und Entscheidungen)` : "Dein Team – Chat öffnen"}
         className={`fixed right-4 bottom-4 z-50 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 focus-visible:ring-4 focus-visible:ring-primary/30 focus-visible:outline-none sm:right-6 sm:bottom-6 ${offen ? "max-sm:hidden" : ""}`}
       >
         {offen ? <X className="size-6" aria-hidden="true" /> : <MessageCircle className="size-6" aria-hidden="true" />}

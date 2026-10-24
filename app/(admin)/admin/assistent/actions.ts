@@ -64,7 +64,7 @@ async function pruefe() {
 
 export type FrageErgebnis = { ok: true; antwort: Nachricht } | { ok: false; fehler: string }
 
-export async function frage(eingabe: string, bildDaten?: string | null): Promise<FrageErgebnis> {
+export async function frage(eingabe: string, bildDaten?: string | null, pfad?: string | null): Promise<FrageErgebnis> {
   await pruefe()
   let bild: { base64: string; mediaType: string } | undefined
   if (bildDaten) {
@@ -82,7 +82,9 @@ export async function frage(eingabe: string, bildDaten?: string | null): Promise
   try {
     const verlauf = await ladeVerlauf(16)
     const { mitAgent } = await import("@/lib/lernen/kontext")
-    const antwort = await mitAgent("assistent", () => antworte(verlauf, bild))
+    const { seitenKontext } = await import("@/lib/assistent/seitenkontext")
+    const seite = await seitenKontext(await assistentDb().catch(() => null), pfad)
+    const antwort = await mitAgent("assistent", () => antworte(verlauf, bild, seite))
     const gespeichert = await speichereNachricht("assistant", antwort.text, antwort.uebernahmen)
     revalidatePath("/admin/assistent")
     return { ok: true, antwort: gespeichert }
@@ -131,19 +133,79 @@ export async function frageBeantworten(id: string, antwort: string): Promise<Fra
   }
 }
 
-/** Schwebendes Assistenten-Fenster: nur die Zahl offener Fragen (für den Punkt am Knopf). */
-export async function dockStand(): Promise<{ fragen: number }> {
-  await pruefe()
-  const { offeneFragen } = await import("@/lib/assistent/fragen")
-  return { fragen: (await offeneFragen(20).catch(() => [])).length }
+export type DockKarte = Pick<Freigabe, "id" | "art" | "titel" | "inhalt" | "empfaenger" | "betreff" | "agent" | "zeit"> & {
+  warum: string | null
+  fehler: string | null
+  anschrift: string | null
+  /** Zu komplex fürs Fenster (Pausieren, Löschen, Kapital) – dort nur „auf der Seite öffnen“. */
+  nurSeite: boolean
 }
 
-/** Beim Öffnen des Fensters: Verlauf, Fragen, Rest des Tageslimits. */
-export async function dockLaden(): Promise<{ verlauf: Nachricht[]; fragen: import("@/lib/assistent/fragen").EminFrage[]; rest: number }> {
+async function offeneKarten(): Promise<DockKarte[]> {
+  const { ladeFreigaben } = await import("@/lib/assistent/store")
+  return (await ladeFreigaben().catch(() => []))
+    .filter((f) => f.status === "offen")
+    .map((f) => ({
+      id: f.id,
+      art: f.art,
+      titel: f.titel,
+      inhalt: f.inhalt.slice(0, 4000),
+      empfaenger: f.empfaenger,
+      betreff: f.betreff,
+      agent: f.agent,
+      zeit: f.zeit,
+      warum: f.extra.warum ?? null,
+      fehler: f.extra.fehler ?? null,
+      anschrift: f.extra.anschrift ? [f.extra.anschrift.firma, f.extra.anschrift.strasse, `${f.extra.anschrift.plz} ${f.extra.anschrift.ort}`].filter(Boolean).join(", ") : null,
+      nurSeite: ["steuerung", "loeschen", "kapital"].includes(f.art),
+    }))
+}
+
+export type DockDaten = {
+  verlauf: Nachricht[]
+  fragen: import("@/lib/assistent/fragen").EminFrage[]
+  karten: DockKarte[]
+  rest: number
+  seite: string | null
+}
+
+/** Schwebendes Team-Fenster: Zahlen für den Punkt am Knopf. */
+export async function dockStand(): Promise<{ fragen: number; karten: number }> {
   await pruefe()
   const { offeneFragen } = await import("@/lib/assistent/fragen")
-  const [verlauf, fragen, heute] = await Promise.all([ladeVerlauf(30), offeneFragen().catch(() => []), fragenHeute()])
-  return { verlauf, fragen, rest: TAGESLIMIT - heute }
+  const [fragen, karten] = await Promise.all([offeneFragen(20).catch(() => []), offeneKarten()])
+  return { fragen: fragen.length, karten: karten.length }
+}
+
+/** Beim Öffnen des Fensters: Verlauf, Fragen, Karten, Rest des Tageslimits und was Aylin über die aktuelle Seite weiß. */
+export async function dockLaden(pfad?: string | null): Promise<DockDaten> {
+  await pruefe()
+  const { offeneFragen } = await import("@/lib/assistent/fragen")
+  const { seitenKontext } = await import("@/lib/assistent/seitenkontext")
+  const [verlauf, fragen, karten, heute, seite] = await Promise.all([
+    ladeVerlauf(30),
+    offeneFragen().catch(() => []),
+    offeneKarten(),
+    fragenHeute(),
+    seitenKontext(await assistentDb().catch(() => null), pfad).catch(() => null),
+  ])
+  return { verlauf, fragen, karten, rest: TAGESLIMIT - heute, seite }
+}
+
+/**
+ * Karte aus dem Team-Fenster entscheiden – derselbe Weg wie auf der Seite
+ * (Rechts-Check, Versand, Lernen), danach ehrlich zurückmelden, ob es geklappt hat.
+ */
+export async function dockEntscheiden(form: FormData): Promise<{ ok: boolean; fehler: string | null }> {
+  await pruefe()
+  const id = String(form.get("id") ?? "").slice(0, 80)
+  if (!id) return { ok: false, fehler: "Karte fehlt" }
+  if (form.getAll("status").map(String).includes("verworfen")) await freigabeVerwerfen(form)
+  else await freigabeEntscheiden(form)
+  const f = await ladeFreigabe(id)
+  if (!f) return { ok: false, fehler: "Karte nicht gefunden" }
+  if (f.status === "offen") return { ok: false, fehler: f.extra.fehler ?? "Noch offen – bitte auf der Seite prüfen." }
+  return { ok: true, fehler: null }
 }
 
 export async function frageSpaeter(id: string): Promise<void> {

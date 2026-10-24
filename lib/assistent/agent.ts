@@ -109,7 +109,7 @@ function uebernahmenAus(ergebnisse: { toolName: string; input: unknown; output: 
   return liste
 }
 
-export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<{ text: string; uebernahmen: Uebernahme[] }> {
+export async function antworte(verlauf: Nachricht[], bild?: ChatBild, seite?: string | null): Promise<{ text: string; uebernahmen: Uebernahme[] }> {
   const tools = {
     widerspruch_eintragen: tool({
       description:
@@ -410,7 +410,7 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<{
   const { text, steps } = await generateText({
     /* Bilder (Screenshots von Mails, Briefen, Belegen) liest Sonnet am zuverlässigsten – nur dann, sonst das günstige Modell. */
     model: bild ? BILD_MODELL : MODELL,
-    system: `${SYSTEM}\n\nHeute ist ${heute}.${bild ? `\n\nEr hat ein Bild angehängt. Lies es genau. Ist es eine Kundenantwort oder Mail: 1) ordne sie mit "absprache_speichern" der Firma zu, 2) bei Absage/Widerspruch/Spam-Drohung sofort "widerspruch_eintragen" (dann wird diese Adresse nie wieder angeschrieben) und sag ehrlich, was rechtlich daraus folgt, 3) leite ab, was Marketing/Vertrieb daraus lernt.` : ""}`,
+    system: `${SYSTEM}\n\nHeute ist ${heute}.${seite ? `\n\nEmin schreibt gerade von dieser Admin-Seite: ${seite} Bezieht er sich mit „hier“, „diese Firma“, „dazu“ oder ohne Namen auf etwas, ist DAS gemeint – nutze den Namen für die Werkzeuge (suche).` : ""}${bild ? `\n\nEr hat ein Bild angehängt. Lies es genau. Ist es eine Kundenantwort oder Mail: 1) ordne sie mit "absprache_speichern" der Firma zu, 2) bei Absage/Widerspruch/Spam-Drohung sofort "widerspruch_eintragen" (dann wird diese Adresse nie wieder angeschrieben) und sag ehrlich, was rechtlich daraus folgt, 3) leite ab, was Marketing/Vertrieb daraus lernt.` : ""}`,
     messages: nachrichten,
     tools,
     stopWhen: stepCountIs(6),
