@@ -7,7 +7,6 @@ import {
   ArrowUpRight,
   CalendarClock,
   Camera,
-  CalendarRange,
   Check,
   ClipboardList,
   Coins,
@@ -27,8 +26,6 @@ import {
   Network,
   Globe,
   BadgeCheck,
-  BookCheck,
-  Receipt,
   ShieldCheck,
   Headset,
   FlaskConical,
@@ -38,6 +35,10 @@ import {
   ShoppingCart,
   UserCog,
   Send,
+  HeartHandshake,
+  Share2,
+  Gauge,
+  FileText,
 } from "lucide-react"
 import { saeuleVon, zeitpunktText } from "@/lib/assistent/linkedin-plan"
 
@@ -366,18 +367,14 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
   jaeger: Crosshair,
   lage: Radar,
   vertrieb: Handshake,
-  messen: CalendarRange,
   kapital: Coins,
   finanz: Coins,
   redaktion: PenLine,
   projekte: Kanban,
-  golf: Radar,
   bulletin: PenLine,
   marketing: Megaphone,
   recht: Scale,
   qualitaet: BadgeCheck,
-  wissen: BookCheck,
-  forderungen: Receipt,
   sicherheit: ShieldCheck,
   kundenservice: Headset,
   forschung: FlaskConical,
@@ -386,9 +383,15 @@ const AGENT_ICON: Record<AgentKey, typeof Mail> = {
   international: Earth,
   einkauf: ShoppingCart,
   personal: UserCog,
+  kundenbetreuung: HeartHandshake,
+  partner: Share2,
+  controller: Gauge,
+  angebot: FileText,
 }
 
-const agentName = (key: string | null) => AGENTEN.find((a) => a.key === key)?.name ?? "Assistent"
+/* Seit 24.10.2026 zusammengelegt – ihre Karten tragen den alten Namen weiter. */
+const FRUEHERE: Record<string, string> = { golf: "Golf-Radar (Kapital)", messen: "Messen (Vertrieb)", wissen: "Wissens-Wächter (Qualität)", forderungen: "Tahsilat (Finanz)" }
+const agentName = (key: string | null) => AGENTEN.find((a) => a.key === key)?.name ?? (key && FRUEHERE[key]) ?? "Assistent"
 
 function seit(iso: string): string {
   const min = Math.round((Date.now() - new Date(iso).getTime()) / 60000)

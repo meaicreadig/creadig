@@ -42,7 +42,13 @@ import {
 import { firmenText, firmenTextEn } from "@/lib/firmenwahrheit"
 import { inhalteText } from "@/lib/inhalte"
 
-export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "messen", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite", "qualitaet", "wissen", "forderungen", "sicherheit", "kundenservice", "forschung", "produkt", "entwicklung", "international", "einkauf", "personal"] as const
+/*
+ * 24.10.2026: Golf → Kapital (Investoren, nur jede 4. Woche), Messen → Vertrieb,
+ * Wissens-Wächter → Qualität, Tahsilat → Finanz. Ihre Läufe laufen weiter als
+ * Teil der jeweiligen Runde; Karten tragen weiter ihren alten Agenten-Namen.
+ * Neu: Kundenbetreuung, Partner & Empfehlungen, Ergebnis-Controller, Angebotsautomat.
+ */
+export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "kapital", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite", "qualitaet", "sicherheit", "kundenservice", "forschung", "produkt", "entwicklung", "international", "einkauf", "personal", "kundenbetreuung", "partner", "controller", "angebot"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
 
 export type AgentInfo = {
@@ -61,16 +67,12 @@ export const AGENTEN: AgentInfo[] = [
   { key: "marketing", name: "Marketingleitung", aufgabe: "Macht aus Zielliste, Beschlüssen und Absagen einen Wochenplan mit einer Zielgruppe und verteilt die Aufträge an Redaktion, Vertrieb und Recht.", takt: "woechentlich", ki: true },
   { key: "webseite", name: "Website-Prüfer", aufgabe: "Prüft creadig.de täglich in allen 4 Sprachen auf Erreichbarkeit, Tempo, SEO, Sicherheit, tote Links und Aktualität, wöchentlich mit Google PageSpeed und Design-Blick. Behebt selbst, was er darf, und schickt den Rest an die zuständige Abteilung oder als fertigen Auftrag an die Geschäftsführung.", takt: "taeglich", ki: true },
   { key: "lage", name: "Lage", aufgabe: "Sammelt alles, was im System auf deine Entscheidung wartet.", takt: "taeglich", ki: false },
-  { key: "vertrieb", name: "Vertrieb", aufgabe: "Findet stille oder überfällige Abschlüsse und schreibt die nächste Mail.", takt: "taeglich", ki: true },
-  { key: "messen", name: "Messen", aufgabe: "Bereitet jede Messe vor, bei der du teilnimmst: Plan, Kontakte, Unterkunft.", takt: "taeglich", ki: false },
-  { key: "finanz", name: "Finanz", aufgabe: "Legt Folgerechnungen aus Abos als Entwurf an und schlägt Mahnungen vor. Versendet nie selbst.", takt: "taeglich", ki: false },
+  { key: "vertrieb", name: "Vertrieb", aufgabe: "Findet stille oder überfällige Abschlüsse und schreibt die nächste Mail. Bereitet außerdem jede Messe vor, bei der du teilnimmst (Plan, Kontakte, Unterkunft).", takt: "taeglich", ki: true },
+  { key: "finanz", name: "Finanz", aufgabe: "Legt Folgerechnungen aus Abos als Entwurf an, legt für überfällige Rechnungen die nächste Mahnstufe als Entwurf vor (3/14/28 Tage) und eskaliert die 2. Mahnung. Versendet nie selbst.", takt: "taeglich", ki: false },
   { key: "projekte", name: "Projektleitung", aufgabe: "Führt jeden gewonnenen Auftrag bis zur Übergabe: legt Projekte an, fordert Material an, schreibt Wochenberichte, warnt vor Fristen und fasst nach.", takt: "taeglich", ki: false },
-  { key: "kapital", name: "Kapital", aufgabe: "Recherchiert Förderungen, Kredite und Investoren mit Quelle und Frist.", takt: "woechentlich", ki: true },
-  { key: "golf", name: "Golf-Radar", aufgabe: "Sucht jede Woche Investoren, Family Offices, Programme und Events in VAE, Saudi-Arabien und Katar und schreibt die erste Nachricht auf Englisch und Arabisch.", takt: "woechentlich", ki: true },
+  { key: "kapital", name: "Kapital", aufgabe: "Recherchiert Förderungen, Kredite und Investoren mit Quelle und Frist; jede 4. Woche zusätzlich Investoren und Programme am Golf (EN/AR).", takt: "woechentlich", ki: true },
   { key: "bulletin", name: "Bulletin", aufgabe: "Recherchiert jeden Morgen, was in KI, Automatisierung, Medien, Chips und Robotik zählt, mit Quelle, ordnet es für creaDIG ein und liefert der Redaktion Artikelideen.", takt: "taeglich", ki: true },
-  { key: "qualitaet", name: "Qualitätssicherung", aufgabe: "Benotet jeden KI-Mitarbeiter täglich nach deinen Entscheidungen: Freigaben, Änderungen, Absagen, Fehler und Dauer. Wer unter der Grenze liegt, bekommt einen Auftrag mit seinen letzten Absagen.", takt: "taeglich", ki: false },
-  { key: "wissen", name: "Wissens-Wächter", aufgabe: "Prüft jeden offenen Entwurf auf erfundene Behauptungen (Zertifikate, Kundenzahlen) und unbekannte Preise und schickt ihn zur Korrektur zurück.", takt: "taeglich", ki: false },
-  { key: "forderungen", name: "Tahsilat", aufgabe: "Legt für überfällige Rechnungen die nächste Mahnstufe als sendefertige Mail in deine Freigabe (3/14/28 Tage) und eskaliert die 2. Mahnung an die Geschäftsführung. Versendet nie selbst.", takt: "taeglich", ki: false },
+  { key: "qualitaet", name: "Qualitätssicherung", aufgabe: "Benotet jeden KI-Mitarbeiter täglich nach deinen Entscheidungen: Freigaben, Änderungen, Absagen, Fehler und Dauer. Wer unter der Grenze liegt, bekommt einen Auftrag mit seinen letzten Absagen. Prüft außerdem jeden offenen Entwurf auf erfundene Behauptungen (Zertifikate, Kundenzahlen) und unbekannte Preise.", takt: "taeglich", ki: false },
   { key: "sicherheit", name: "IT-Sicherheit", aufgabe: "Prüft Pflicht-Einstellungen und durchsucht eingehende Mails nach Angriffen auf die KI (Prompt-Injection). Kritisches löst einen Alarm aus.", takt: "taeglich", ki: false },
   { key: "kundenservice", name: "Kundenservice", aufgabe: "Schreibt für unbeantwortete Kundenmails ohne Zuordnung einen Antwortentwurf; unbekannte Absender bekommen eine höfliche Rückfrage. Versendet nie selbst.", takt: "taeglich", ki: true },
   { key: "forschung", name: "F&E-Nachweis", aufgabe: "Fasst jede Woche die erfassten F&E-Stunden für die Forschungszulage zusammen und schätzt die Jahreserstattung.", takt: "woechentlich", ki: false },
@@ -79,6 +81,10 @@ export const AGENTEN: AgentInfo[] = [
   { key: "international", name: "International Business", aufgabe: "Sucht jede Woche reihum in Schweiz, Österreich, Diaspora-Netzwerken und EU-Programmen echte Wege in den Markt (Programme, Kammern, Messen, Pflichten) mit Quelle und nächstem Schritt; Chancen mit Kundenkontakt gehen an den Vertrieb.", takt: "woechentlich", ki: true },
   { key: "einkauf", name: "Einkauf", aufgabe: "Erkennt aus den Belegen laufende Verträge, meldet Preisanstiege über 10 % und neue Abos zur Prüfung. Kündigt nie selbst.", takt: "taeglich", ki: false },
   { key: "personal", name: "Personal (KI-Team)", aufgabe: "Prüft jede Woche das KI-Team: unbesetzte Abteilungen, gescheiterte, stumme und nie gelaufene Mitarbeiter – als ein Auftrag an die Geschäftsführung.", takt: "woechentlich", ki: false },
+  { key: "kundenbetreuung", name: "Kundenbetreuung", aufgabe: "Betreut die Bestandskunden: Wer 90 Tage (ehemalige: 180) ohne Kontakt und ohne offene Chance ist, bekommt einen Check-in mit passendem Angebot aus dem Leistungskatalog – als fertige Mail (ohne Mail: Brief) zur Ein-Klick-Freigabe. Fehlen Website oder Kontakt, recherchiert sie das Impressum (mit Quelle, nie geraten).", takt: "taeglich", ki: true },
+  { key: "partner", name: "Partner & Empfehlungen", aufgabe: "Sucht jede Woche Multiplikatoren eines Segments (Webagenturen für White-Label-BFSG, Steuerkanzleien, deutsch-türkische Verbände, IT-Systemhäuser) mit Impressums-Anschrift und legt höchstens 2 Partner-Briefe zur Freigabe an; bittet zufriedene Kunden einmal im Jahr um Empfehlung.", takt: "woechentlich", ki: true },
+  { key: "controller", name: "Ergebnis-Controller", aufgabe: "Misst jeden KI-Mitarbeiter wöchentlich an Wirkung statt Läufen: freigegebene Außenwirkung, Verwurf-Quote, Pässe, dazu der Trichter Firmen → Chancen → gewonnen (€). Wer ohne Wirkung läuft, kommt mit Vorschlag in den Wochenbericht.", takt: "woechentlich", ki: false },
+  { key: "angebot", name: "Angebotsautomat", aufgabe: "Füllt jeden Angebots-Entwurf aus Gesprächsnotizen und Verlauf: Positionen nur aus dem Leistungskatalog mit dessen Preisen, Einleitung und Schluss; Unbekanntes mit „Preis prüfen“. Senden bleibt dein Klick.", takt: "taeglich", ki: true },
   { key: "redaktion", name: "Redaktion", aufgabe: "Plant jede Woche 4 LinkedIn-Beiträge (Gründer-Stimme, Praxiswissen, Einblick & Beweis, Branche & Haltung) mit Text, Bild, Sendetermin und Link im ersten Kommentar.", takt: "taeglich", ki: true },
 ]
 
@@ -730,15 +736,16 @@ async function koordinator(): Promise<Ergebnis> {
 }
 
 type Start = { manuell?: boolean }
+/** Zusammengelegte Agenten: beide Ergebnisse in einer Zeile, Mengen addiert. */
+const verbinde = (...e: Ergebnis[]): Ergebnis => ({ ergebnis: e.map((x) => x.ergebnis).join(" · "), anzahl: e.reduce((n, x) => n + x.anzahl, 0) })
 const LAEUFER: Record<AgentKey, (o: Start) => Promise<Ergebnis>> = {
   koordinator,
   lage,
-  vertrieb,
-  messen,
-  finanz,
+  vertrieb: async () => verbinde(await vertrieb(), await messen()),
+  finanz: async () => verbinde(await finanz(), await (await import("@/lib/agenten/forderungen")).forderungsRunde()),
   projekte,
-  kapital,
-  golf,
+  /* Golf nur jede 4. Woche: Marktpriorität Deutschland → Schweiz → Europa (lib/firmenwahrheit.ts). */
+  kapital: async () => (Number(kw(new Date()).split("-")[1]) % 4 === 0 ? verbinde(await kapital(), await golf()) : kapital()),
   redaktion,
   jaeger,
   recht,
@@ -746,9 +753,7 @@ const LAEUFER: Record<AgentKey, (o: Start) => Promise<Ergebnis>> = {
   rat: (o) => rat(o),
   bulletin: (o) => erstelleBulletin({ erzwingen: o.manuell }),
   webseite: async (o) => (await import("@/lib/webseite/pruefer")).websiteRunde(o),
-  qualitaet: async () => (await import("@/lib/agenten/qualitaet")).qualitaetsRunde(),
-  wissen: async () => (await import("@/lib/agenten/wissen")).wissensRunde(),
-  forderungen: async () => (await import("@/lib/agenten/forderungen")).forderungsRunde(),
+  qualitaet: async () => verbinde(await (await import("@/lib/agenten/qualitaet")).qualitaetsRunde(), await (await import("@/lib/agenten/wissen")).wissensRunde()),
   sicherheit: async () => (await import("@/lib/agenten/sicherheit")).sicherheitsRunde(),
   kundenservice: async () => (await import("@/lib/agenten/kundenservice")).kundenserviceRunde(),
   forschung: async () => (await import("@/lib/agenten/forschung")).forschungsRunde(),
@@ -757,6 +762,10 @@ const LAEUFER: Record<AgentKey, (o: Start) => Promise<Ergebnis>> = {
   international: async () => (await import("@/lib/agenten/international")).internationalRunde(),
   einkauf: async () => (await import("@/lib/agenten/einkauf")).einkaufsRunde(),
   personal: async () => (await import("@/lib/agenten/personal")).personalRunde(),
+  kundenbetreuung: async () => (await import("@/lib/agenten/kundenbetreuung")).kundenbetreuungsRunde(),
+  partner: async () => (await import("@/lib/agenten/partner")).partnerRunde(),
+  controller: async () => (await import("@/lib/agenten/controller")).controllerRunde(),
+  angebot: async () => (await import("@/lib/agenten/angebot")).angebotsRunde(),
 }
 
 /** Länger als jede Funktion leben darf (maxDuration 300 s) – danach gilt eine Sperre als verwaist. */

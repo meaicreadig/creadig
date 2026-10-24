@@ -58,7 +58,7 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "International Business", tr: "Uluslararası İş Geliştirme" },
     aufgabe: { de: "Schweiz, Österreich, EU, Diaspora-Netzwerke, Golf-Radar", tr: "İsviçre, Avusturya, AB, diaspora ağları, Körfez radarı" },
     knoten: [],
-    agenten: ["international", "golf"],
+    agenten: ["international"],
     besetzung: "aktiv",
   },
   {
@@ -76,7 +76,7 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Marketing", tr: "Pazarlama" },
     aufgabe: { de: "Inhalte, SEO, Kampagnen, Messen, Analyse", tr: "İçerik, SEO, kampanya, fuar, analiz" },
     knoten: ["marketing", "mailstudio", "messen"],
-    agenten: ["marketing", "redaktion", "messen"],
+    agenten: ["marketing", "redaktion"],
     besetzung: "aktiv",
   },
   {
@@ -85,7 +85,7 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Vertrieb", tr: "Satış" },
     aufgabe: { de: "Kunden finden, Angebot, Nachfassen, Gespräch", tr: "Müşteri bulma, teklif, takip, görüşme" },
     knoten: ["verkaufen", "vertrieb", "gespraech", "termine", "kunden"],
-    agenten: ["jaeger", "vertrieb", "motor"],
+    agenten: ["jaeger", "vertrieb", "motor", "partner", "kundenbetreuung"],
     besetzung: "aktiv",
   },
   {
@@ -148,7 +148,7 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Qualitätsmanagement", tr: "Kalite Yönetimi" },
     aufgabe: { de: "Prüfungen, Kundenfreigaben, Nachweise", tr: "Kontrol, müşteri onayı, kanıt" },
     knoten: [],
-    agenten: ["qualitaet", "wissen"],
+    agenten: ["qualitaet", "controller"],
     besetzung: "aktiv",
   },
   {
@@ -157,7 +157,7 @@ export const ABTEILUNGEN: Abteilung[] = [
     name: { de: "Finanzen", tr: "Finans" },
     aufgabe: { de: "Buchhaltung, Steuern, Liquidität", tr: "Muhasebe, vergi, nakit" },
     knoten: ["finanz"],
-    agenten: ["finanz", "forderungen"],
+    agenten: ["finanz", "angebot"],
     besetzung: "aktiv",
   },
   {

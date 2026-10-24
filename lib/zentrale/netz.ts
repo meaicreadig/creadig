@@ -94,7 +94,7 @@ export async function ladeNetz({
   const laufListe = Object.values(laeufe)
   const agentFehler = laufListe.filter((l) => l.fehler).length
   const agentFrisch = laufListe.filter((l) => jetzt - new Date(l.zeit).getTime() < 24 * 3600_000).length
-  const agentStill = ["lage", "vertrieb", "messen"].filter((a) => {
+  const agentStill = ["lage", "vertrieb"].filter((a) => {
     const l = laeufe[a]
     return !l || jetzt - new Date(l.zeit).getTime() > STILL_STUNDEN * 3600_000
   })

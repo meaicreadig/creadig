@@ -14,6 +14,7 @@ import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 import { firmenRahmen } from "./rahmen"
 import { assistentDb, ergaenzeExtra, FREIGABE_ARTEN, ladeFreigabe, ladeFreigaben, ladeRaete, legeFreigabeAn, setzeFreigabe, type Nachricht } from "./store"
 import { firmenText } from "@/lib/firmenwahrheit"
+import { findeOderLegeFirma, findeOderLegeKontakt } from "@/lib/kundenfaden"
 
 const MODELL = "openai/gpt-5.4-mini"
 const BILD_MODELL = "anthropic/claude-sonnet-4.6"
@@ -28,6 +29,7 @@ Regeln:
 - Du handelst nie selbst. Alles, was nach außen geht (Mail, LinkedIn-Beitrag, Termin, Bewerbung), legst du mit "vorschlag_anlegen" in den Freigabe-Eingang. Er gibt frei.
 - Interne Arbeit (art "aufgabe" oder "notiz") erledigen Geschäftsleitung und Abteilungen selbst; er sieht sie unter "Heute intern erledigt". Nur was einen Kunden, Geld oder die Außenwirkung berührt, legt die Koordination ihm mit fertiger Vorlage vor – das muss er freigeben. Produkt- und Firmenfreigaben sind Verwaltung, keine Aufgabe für ihn.
 - Sagt er, Karten sollen weg oder seien erledigt, schließe sie sofort mit "karten_schliessen" (vorher "freigabe_eingang" für die IDs) und sag, wie viele es waren. Sag nie, das System lasse das nicht zu.
+- Nennt er Bestandskunden (auch als Liste), lege jeden sofort mit "bestandskunde_anlegen" an und bestätige die Zahl.
 - Absprachen zu Kunden/Chancen (Termin, nächster Schritt, Ort, Verband, wer entscheidet) speicherst du SOFORT mit "absprache_speichern". Bestätige danach kurz, was gespeichert ist. Er soll nichts zweimal sagen müssen.
 - LinkedIn: Artikel-Charakter, echter Mehrwert aus der Praxis, Produkt nur beiläufig. Keine Werbesprache.
 - Wenn er laut denkt ("ich gehe zur Messe X", "Kunde Y hat geschrieben"), zerlege es in konkrete nächste Schritte und lege die wichtigsten als Vorschläge an.
@@ -125,6 +127,48 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<s
         betreff: z.string().max(200).optional().describe("Nur bei Mail"),
       }),
       execute: async (v) => ({ id: await legeFreigabeAn(v), angelegt: true }),
+    }),
+    bestandskunde_anlegen: tool({
+      description:
+        "Legt einen Bestandskunden (oder ehemaligen Kunden) im System an bzw. markiert eine vorhandene Firma als Kunde – mit Leistung, Wert und Datum des letzten Projekts. Aufrufen, sobald Emin Kunden nennt oder eine Kundenliste schickt; je Kunde ein Aufruf. Daraus arbeiten Kundenbetreuung und Partner-Agent.",
+      inputSchema: z.object({
+        firma: z.string().min(2).max(160),
+        ehemalig: z.boolean().optional().describe("true = ehemaliger Kunde"),
+        website: z.string().max(200).optional(),
+        ort: z.string().max(120).optional(),
+        ansprechpartner: z.string().max(120).optional(),
+        email: z.string().email().max(200).optional(),
+        leistung: z.string().max(200).optional().describe("Was er gekauft hat, z. B. 'Website-Relaunch' oder 'fibero-Lizenz'"),
+        wertEur: z.number().int().min(0).max(10_000_000).optional(),
+        datum: z.string().regex(/^\d{4}-\d{2}(-\d{2})?$/).optional().describe("Letztes Projekt, JJJJ-MM oder JJJJ-MM-TT"),
+        notiz: z.string().max(600).optional(),
+      }),
+      execute: async (v) => {
+        const q = await assistentDb()
+        if (!q) return { gespeichert: false, grund: "keine Datenbank" }
+        const org = await findeOderLegeFirma(q, { name: v.firma.trim(), website: v.website ?? null, city: v.ort ?? null })
+        const stempel = new Intl.DateTimeFormat("de-DE", { dateStyle: "short", timeZone: "Europe/Berlin" }).format(new Date())
+        const notiz = [v.leistung ? `Kunde: ${v.leistung}${v.wertEur ? ` (${v.wertEur} €)` : ""}${v.datum ? `, ${v.datum}` : ""}` : "", v.notiz ?? ""].filter(Boolean).join(" · ")
+        await q(
+          `UPDATE organisations SET lifecycle = $2, updated_at = now(),
+             note = CASE WHEN $3::text = '' THEN note ELSE concat_ws(E'\n', nullif(note,''), $3::text) END
+           WHERE id = $1`,
+          [org.id, v.ehemalig ? "ehemaliger-kunde" : "kunde", notiz ? `${stempel} (Chat): ${notiz}` : ""],
+        )
+        let kontaktId: string | null = null
+        if (v.email) kontaktId = (await findeOderLegeKontakt(q, { email: v.email, name: v.ansprechpartner ?? null, firma: v.firma, website: v.website ?? null }).catch(() => null))?.kontaktId ?? null
+        if (v.leistung) {
+          /* Gewonnener Auftrag mit dem echten Datum – zählt so nicht als „diesen Monat gewonnen". */
+          const am = v.datum ? (v.datum.length === 7 ? `${v.datum}-15` : v.datum) : null
+          await q(
+            `INSERT INTO opportunities (id, organisation_id, contact_id, title, status, source, note, estimated_value, created_at, updated_at)
+             SELECT $1, $2, $3, $4, 'won', 'bestand', $5, $6, coalesce($7::date, now() - interval '1 year'), coalesce($7::date, now() - interval '1 year')
+              WHERE NOT EXISTS (SELECT 1 FROM opportunities WHERE organisation_id = $2 AND lower(title) = lower($4))`,
+            [`opp-${crypto.randomUUID().slice(0, 8)}`, org.id, kontaktId, v.leistung, `Bestandskunde, im Chat erfasst ${stempel}`, v.wertEur ?? null, am],
+          )
+        }
+        return { gespeichert: true, firma: org.name, neu: org.neu, als: v.ehemalig ? "ehemaliger Kunde" : "Kunde" }
+      },
     }),
     absprache_speichern: tool({
       description:

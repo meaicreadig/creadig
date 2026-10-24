@@ -270,7 +270,7 @@ const REGELN = `GRENZEN (unverletzlich):
  * Motor-Schritte (Kundenmails), Finanz- und Forderungsvorschläge (Angebot, Mahnung), Projekt-
  * Nachfassen – und alles, dessen Titel nach Versand, Angebot, Rechnung oder Kundenkontakt klingt.
  */
-const AUSSEN_AGENTEN = new Set(["motor", "finanz", "forderungen", "projekte", "golf", "kapital", "investor"])
+const AUSSEN_AGENTEN = new Set(["motor", "finanz", "forderungen", "projekte", "golf", "kapital", "investor", "kundenbetreuung", "partner", "angebot"])
 const AUSSEN_TITEL =
   /\b(mail|e-mail|senden|schicken|versenden|angebot|rechnung|mahnung|zahlungserinnerung|anruf|anrufen|termin|dankesmail|kunde|kundin|nachfass|antwort an|antrag|bewerbung|pitch)\w*/i
 
