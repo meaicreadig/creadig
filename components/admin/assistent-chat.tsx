@@ -245,7 +245,7 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
           </div>
         ) : null}
         <div
-          className="flex items-end gap-2 rounded-3xl bg-secondary p-2"
+          className="flex items-center gap-2 rounded-3xl bg-secondary p-2"
           onPaste={(e) => {
             const datei = Array.from(e.clipboardData.files).find((f) => f.type.startsWith("image/"))
             if (datei) {

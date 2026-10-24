@@ -82,6 +82,24 @@ export const VORHABEN = [
   "Bestandskunden ausbauen: Pflege-Verträge, Automatisierung, Empfehlungen (z. B. NV SWISS, Vegitat Zürich).",
 ] as const
 
+/**
+ * SYSTEM & KANÄLE — was gebaut und LIVE ist (Emin 24.10.2026: „Was du baust
+ * und live nimmst, muss das System wissen und danach arbeiten“). Jede neue
+ * Fähigkeit kommt hier hinein, im selben Commit wie der Code.
+ */
+export const SYSTEM_KANAELE = [
+  "Branchen-Seiten (Firma bleibt breit, jede Nische eine Experten-Seite; nicht im Hauptmenü, nur Footer/Suche): /branchen/handwerk, /branchen/elektrohandwerk, /branchen/gemeinden-vereine, /branchen/gastronomie, /branchen/online-handel – Artikel, Briefe und Mails an Betriebe dieser Branchen verlinken die passende Seite.",
+  "Newsletter mit Double-Opt-in: Anmeldung auf /insights; erst nach Bestätigung steht jemand mit Einwilligung im Verteiler. Wer per Mail Werbung bekommen soll, wird auf die Anmeldung hingewiesen – nie heimlich eingetragen.",
+  "Mail-Sperre: LinkedIn-, Messe-, Visitenkarten- oder Recherche-Kontakte sind KEINE Einwilligung (AG Düsseldorf 20.11.2025) – an sie nur Brief, persönliches Gespräch oder Antwort auf ihre Anfrage.",
+  "Bewertungen: Nach jeder Abnahme fragt Emin persönlich; erst nach „ja“ geht der Google-Bewertungslink (GOOGLE_BEWERTUNG_URL) raus. Jeden Kunden fragen, nie Gegenleistung, keine automatische Bewertungs-Mail (BGH VI ZR 225/17).",
+  "Empfehlungen: Wer eine Chance gebracht hat, wird an der Chance vermerkt (Dank sofort); Tippgeber-Provision nur offengelegt und erst nach bezahlter Schlussrechnung.",
+  "Schnellste legale Lead-Kanäle (Recherche 24.10.2026): 1. Steuerberater und IT-Systemhäuser als Empfehlungspartner, 2. deutsch-türkische Verbände (MÜSİAD, TD-IHK, ATİAD) als Mitglied und Redner, 3. Google-Unternehmensprofil + Fallseiten + Bewertungen, 4. BNI, 5. Malt/Freelancermap als Reserve. Bezahlte Agentur-Verzeichnisse und Fiverr nicht.",
+  "Positionierung: Wir verkaufen keine „Website“, sondern das System hinter dem Betrieb (Anfrage → Angebot → Termin → Auftrag → Rechnung, plus Nachwuchs und Bewertungen). KI ist Werkzeug, nicht Schlagzeile. Preis entsteht aus dem Bedarf; Pakete sind nur Einstiegsanker („ab …“).",
+  "BFSG-Sprache: Erst ehrlich prüfen, ob das Gesetz den Betrieb überhaupt betrifft (Kleinstunternehmen-Ausnahme bei Dienstleistungen). Die Rechtsfrage klärt eine Kanzlei, wir liefern die technische Prüfung. Nie „abmahnsicher“, nie „BFSG-konform garantiert“, keine Overlay-Plugins.",
+  "Förder-Hinweis für Kunden: Betriebe mit Sitz in Bayern können den Digitalbonus Bayern prüfen (Antrag VOR Auftrag, mind. 4.000 € Ausgaben, Standard-Websites nicht förderfähig) – immer „kann förderfähig sein“, nie zusagen.",
+  "Ideenwerkstatt (Kaan) liefert täglich bis zu 3 Verbesserungen; im Admin-Chat zeigen Übernahme-Kästen, welcher KI-Mitarbeiter was übernommen hat.",
+] as const
+
 /** Grundregeln des Inhabers — gelten für jeden Agenten. */
 export const GRUNDREGELN = [
   "Alles legal; im Zweifel nicht.",
@@ -158,6 +176,7 @@ export function firmenText(umfang: "kurz" | "voll" = "voll"): string {
     `VORHABEN: ${VORHABEN.join(" ")}`,
     `SPRACHEN: ${FIRMA.sprachen}. ENGPASS: ${FIRMA.engpass}. KAPAZITÄT: ${FIRMA.kapazitaet}.`,
     `WARMES NETZWERK: ${FIRMA.netzwerk}.`,
+    `SYSTEM & KANÄLE (live): ${SYSTEM_KANAELE.join(" ")}`,
     `REGELN: ${GRUNDREGELN.join(" ")}`,
     `VERBOTEN: ${VERBOTE_TEXT}`,
   ].join("\n")
