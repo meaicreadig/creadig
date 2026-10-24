@@ -10,12 +10,13 @@ import { siteUrl } from "@/lib/termine/mail"
  * Ein Widerspruch gilt für immer – die Adresse (bei Firmendomains die ganze Domain) wird gesperrt.
  */
 
-export type RechtsBasis = "einwilligung" | "bestandskunde" | "antwort" | "gespraech" | "bestaetigt" | "keine"
+export type RechtsBasis = "einwilligung" | "bestandskunde" | "anfrage" | "antwort" | "gespraech" | "bestaetigt" | "keine"
 export type Pruefung = { erlaubt: boolean; basis: RechtsBasis; grund: string }
 
 export const BASIS_TEXT: Record<RechtsBasis, string> = {
   einwilligung: "Einwilligung liegt vor",
   bestandskunde: "Bestandskunde",
+  anfrage: "Anfrage über das Website-Formular",
   antwort: "Empfänger hat selbst geschrieben",
   gespraech: "Laufendes Gespräch",
   bestaetigt: "Von Emin bestätigt",
@@ -128,6 +129,8 @@ export async function rechtsBasis(adresse: string, bestaetigt = false): Promise<
   const a = norm(adresse)
   if (await ersterTreffer(q, `SELECT 1 FROM mail_recipients WHERE email_normalised = $1 AND status = 'aktiv' AND basis = 'einwilligung' LIMIT 1`, [a])) return "einwilligung"
   if (await ersterTreffer(q, `SELECT 1 FROM mail_recipients WHERE email_normalised = $1 AND status = 'aktiv' AND basis = 'bestandskunde' LIMIT 1`, [a])) return "bestandskunde"
+  /* Wer über das Formular anfragt, will eine Antwort – das ist keine Werbung (24.10.2026: blockierte sonst jede Erstantwort). */
+  if (await ersterTreffer(q, `SELECT 1 FROM leads WHERE lower(email) = $1 AND created_at > now() - interval '2 years' LIMIT 1`, [a])) return "anfrage"
   if (
     await ersterTreffer(
       q,

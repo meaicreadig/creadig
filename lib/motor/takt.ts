@@ -2,9 +2,10 @@ import "server-only"
 
 import { randomUUID } from "node:crypto"
 
-import { legeFreigabeAn } from "@/lib/assistent/store"
+import { legeFreigabeAn, quelleBekannt } from "@/lib/assistent/store"
 import { siteUrl } from "@/lib/termine/mail"
 import { findeAblauf } from "@/lib/motor/ablaeufe"
+import { motorMail } from "@/lib/motor/mailkarte"
 import { motorDb } from "@/lib/motor/db"
 import { ereignis } from "@/lib/motor/ereignis"
 import { tabelleFehlt, type Abfrage } from "@/lib/neon-abfrage"
@@ -58,6 +59,7 @@ export async function takt(): Promise<TaktErgebnis> {
           schluessel: `${id}:${schrittNr}`,
           ablaufName: ablauf.name.de,
           schrittTitel: schritt.titel.de,
+          art: schritt.art,
           subjekt: String(run.subjekt),
           kontaktId: (run.kontakt_id as string | null) ?? null,
         })
@@ -123,7 +125,7 @@ const SCHRITT_ERKLAERUNG: Record<string, (wer: string) => string> = {
 
 async function inWarteschlange(
   q: Abfrage,
-  v: { schluessel: string; ablaufName: string; schrittTitel: string; subjekt: string; kontaktId: string | null },
+  v: { schluessel: string; ablaufName: string; schrittTitel: string; art: string; subjekt: string; kontaktId: string | null },
 ): Promise<void> {
   try {
     let wer = ""
@@ -139,7 +141,32 @@ async function inWarteschlange(
       [v.subjekt],
     ).catch(() => [])
     if (vorige.length) return
+    /* Karte gibt es schon → keinen zweiten Buchungslink erzeugen. */
+    if (await quelleBekannt(`motor:${v.schluessel}`)) return
     const erklaerung = SCHRITT_ERKLAERUNG[v.schrittTitel]?.(person)
+    /* Katman 2: Mail-Schritte liegen als fertige Mail mit persönlichem Buchungslink bereit – Emin klickt nur noch. */
+    const mail = await motorMail(q, { art: v.art, subjekt: v.subjekt, kontaktId: v.kontaktId }).catch((error) => {
+      console.error("[motor] Mailkarte nicht erstellt:", error instanceof Error ? error.message : error)
+      return null
+    })
+    if (mail) {
+      await legeFreigabeAn({
+        art: "mail",
+        titel: `${v.schrittTitel} – ${mail.name || wer || mail.an}`,
+        inhalt: mail.text,
+        betreff: mail.betreff,
+        empfaenger: mail.an,
+        quelle: `motor:${v.schluessel}`,
+        agent: "motor",
+        extra: {
+          bezug: v.subjekt,
+          warum: erklaerung ?? `Automatischer Ablauf „${v.ablaufName}“`,
+          ...(mail.orgId ? { orgId: mail.orgId } : {}),
+          ...(mail.kontaktId ? { link: `/admin/gespraech?kontakt=${mail.kontaktId}` } : {}),
+        },
+      })
+      return
+    }
     await legeFreigabeAn({
       art: "aufgabe",
       titel: wer ? `${v.schrittTitel} – ${wer}` : v.schrittTitel,
@@ -177,6 +204,7 @@ async function altlastenSpiegeln(q: Abfrage): Promise<void> {
         schluessel: String(v.schluessel),
         ablaufName: ablauf?.name.de ?? String(v.ablauf),
         schrittTitel: schritt?.titel.de ?? String(v.art),
+        art: String(v.art),
         subjekt: String(v.subjekt),
         kontaktId: (v.kontakt_id as string | null) ?? null,
       })
