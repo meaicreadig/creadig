@@ -82,7 +82,9 @@ function esc(s: string): string {
 }
 
 function inline(s: string, fett = TINTE): string {
-  return esc(s).replace(/\*\*(.+?)\*\*/g, `<strong style="color:${fett};font-weight:700">$1</strong>`)
+  return esc(s)
+    .replace(/\*\*(.+?)\*\*/g, `<strong style="color:${fett};font-weight:700">$1</strong>`)
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, `<a href="$2" style="color:${BLAU};font-weight:600;text-decoration:underline">$1</a>`)
 }
 
 const P = `margin:0 0 18px;font-size:15px;line-height:1.75;color:${TEXT};font-family:${SCHRIFT}`

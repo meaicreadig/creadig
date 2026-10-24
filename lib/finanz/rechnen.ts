@@ -544,7 +544,13 @@ export function kompass(input: {
       const bestes = aktiveFelder.reduce((max, f) => (f.einCent - f.ausCent > max.einCent - max.ausCent ? f : max))
       const marge = bestes.einCent - bestes.ausCent
       const anteil = marge / gesamtMarge
-      if (anteil >= 0.5)
+      /* Über 100 % heißt: andere Felder machen Verlust – „184 % deines Gewinns" verstand niemand (Owner, 24.10.2026). */
+      if (anteil > 1)
+        h.push({
+          schwere: "neutral",
+          text: `${bestes.label} bringt dieses Jahr ${eur(marge)} Überschuss – mehr als dein Gesamtgewinn (${eur(gesamtMarge)}), weil andere Felder Verlust machen. Dort hat zusätzliche Investition rechnerisch den größten Hebel.`,
+        })
+      else if (anteil >= 0.5)
         h.push({
           schwere: "neutral",
           text: `${bestes.label} trägt dieses Jahr ${Math.round(anteil * 100)} % deines Gewinns (${eur(marge)} von ${eur(gesamtMarge)}). Dort hat zusätzliche Investition rechnerisch den größten Hebel.`,

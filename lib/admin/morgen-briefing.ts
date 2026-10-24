@@ -71,13 +71,17 @@ function kandidaten(items: AttentionItem[]): AttentionItem[] {
 }
 
 type DealAbsprache = { firma: string; titel: string; status: string; naechsterSchritt: string; am: string | null; notiz: string }
-type AssistentLage = { freigabenOffen: number; aeltesteOffen: string | null; abend: AbendRueckmeldung | null; deals: DealAbsprache[] }
+type AssistentLage = { freigabenOffen: number; aeltesteOffen: string | null; freigabeTitel: string[]; abend: AbendRueckmeldung | null; deals: DealAbsprache[] }
 
 async function ladeAssistentLage(): Promise<AssistentLage> {
   const abfrage = neonAbfrage()
-  const [rows, abend, deals] = await Promise.all([
+  const [rows, abend, deals, titel] = await Promise.all([
     abfrage
-      ? abfrage(`SELECT count(*) AS c, min(created_at)::date AS d FROM assistent_freigaben WHERE status = 'offen'`, []).catch(() => [])
+      ? abfrage(
+          `SELECT count(*) AS c, min(created_at)::date AS d FROM assistent_freigaben
+            WHERE status = 'offen' AND (art NOT IN ('aufgabe','notiz') OR coalesce(extra->'koordination'->>'beiEmin', '') = 'true')`,
+          [],
+        ).catch(() => [])
       : Promise.resolve([]),
     abendVonGestern().catch(() => null),
     abfrage
@@ -89,8 +93,17 @@ async function ladeAssistentLage(): Promise<AssistentLage> {
           [],
         ).catch(() => [])
       : Promise.resolve([]),
+    abfrage
+      ? abfrage(
+          `SELECT titel, created_at::date AS d FROM assistent_freigaben
+            WHERE status = 'offen' AND (art NOT IN ('aufgabe','notiz') OR coalesce(extra->'koordination'->>'beiEmin', '') = 'true')
+            ORDER BY created_at LIMIT 8`,
+          [],
+        ).catch(() => [])
+      : Promise.resolve([]),
   ])
   return {
+    freigabeTitel: titel.map((t) => `${String(t.titel).slice(0, 110)} (seit ${String(t.d).slice(0, 10)})`),
     freigabenOffen: Number(rows[0]?.c ?? 0),
     aeltesteOffen: rows[0]?.d ? String(rows[0].d).slice(0, 10) : null,
     abend,
@@ -110,7 +123,7 @@ function lagebild(items: AttentionItem[], c: CockpitDaten, f: FinanzKurzlage | n
   const eur = (cent: number | null) => (cent === null ? "nicht gemessen" : `${Math.round(cent / 100)} €`)
   return [
     `Heute: ${heute()}`,
-    `Offene Freigaben im Assistenten (Mails/Aufgaben der KI-Truppe, warten auf Klick): ${a.freigabenOffen}${a.aeltesteOffen ? `, älteste seit ${a.aeltesteOffen}` : ""}`,
+    `Offene Freigaben im Assistenten (Mails/Aufgaben der KI-Truppe, warten auf Klick): ${a.freigabenOffen}${a.aeltesteOffen ? `, älteste seit ${a.aeltesteOffen}` : ""}${a.freigabeTitel.length ? `\nDie ältesten: ${a.freigabeTitel.join(" | ")}` : ""}`,
     a.abend
       ? `Rückmeldung gestern Abend: ${a.abend.bilanz} | Liegen geblieben: ${a.abend.offen.join("; ") || "nichts"} | Geplant für heute zuerst: ${a.abend.morgenZuerst}`
       : "Rückmeldung gestern Abend: keine",
@@ -145,8 +158,10 @@ Regeln:
 - Bei Chancen gilt EMINS ABSPRACHE: Nenne genau den vereinbarten nächsten Schritt (z. B. "Nummer besorgen und anrufen"), mit dem echten Firmennamen. Schreibe NIE "abschließen", "Entscheidung erzwingen" o. Ä., wenn das nicht in der Absprache steht. Liegt das Datum der Absprache in der Zukunft, ist die Chance pausiert – nicht erwähnen. Steht in der Notiz "Kein eigenes Produkt", nenne es nicht Produkt.
 - Wenn ein Schritt sich auf einen OFFENEN PUNKT bezieht, gib dessen Index als "ref" an, sonst null.
 - Du arbeitest in einer Linie mit dem Assistenten und seiner KI-Truppe: Was gestern Abend für heute geplant wurde, kommt zuerst (außer etwas Dringenderes). Offene Freigaben sind fertige Arbeit, die nur einen Klick braucht – erwähne sie, wenn welche warten.
+- Jeder Schritt nennt das KONKRETE Ding (Firma, Angebot, Thema aus dem Lagebild) – nie allgemein „Freigaben abarbeiten", „älteste Freigabe entscheiden" oder „Befunde abarbeiten". Die Liste aller Freigaben steht ohnehin darunter in der Mail; ein Schritt darf eine einzelne Freigabe beim Namen nennen, wenn sie Geld oder einen Kunden bringt.
+- Systemfristen ohne Betrag (z. B. ESt-Vorauszahlung ohne Bescheid) sind keine Gewissheit, sondern eine Prüffrage – nicht als „überfällig" dramatisieren.
 - Reihenfolge: Geld und Fristen zuerst (überfällig, offene Rechnungen, neue Anfragen), dann Pipeline, dann Wachstum.
-- Ist wenig offen, schlage aktive Wachstumsschritte vor (Kontakte anschreiben, Beitrag veröffentlichen, Angebot für die Golfregion vorbereiten).
+- Ist wenig offen, schlage aktive Wachstumsschritte vor (Kontakte anschreiben, Beitrag veröffentlichen, Weg in die Schweiz oder nach Österreich vorbereiten).
 - Sprache: ${sprache === "tr" ? "Türkisch" : "Deutsch"}, per du, klar, motivierend ohne Floskeln, keine Emojis.
 - "titel" max 9 Wörter, imperativ. "warum" ein Satz, max 22 Wörter.
 - "lage": ein Satz, wie es heute steht. "impuls": ein Satz, der ihn über das Tagesgeschäft hinaus voranbringt.

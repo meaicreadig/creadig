@@ -24,9 +24,11 @@ import { zaehleOffen } from "@/lib/assistent/store"
 export type MorgenBericht = {
   heute: string
   faelligeMahnungen: { id: string; nummer: string; kunde: string; stufe: number; tageUeberfaellig: number }[]
-  fristen: { titel: string; faellig: string; tageBis: number }[]
+  fristen: { id: string; titel: string; art: string; faellig: string; tageBis: number; betragCent: number | null }[]
   paragraph19Hinweis: string | null
   belegeImKorb: number
+  /** Von der Beleg-KI in den letzten 24 Stunden zugeordnet — zeigt, dass der Korb sich leert, ohne Emin. */
+  belegeGestern: number
   bankUmsaetzeOffen: number
   /** Ab dem 25. des Monats, solange weder Verpflegungs- noch Homeoffice-Pauschale für den laufenden Monat erfasst ist. */
   pauschalenFehlen: boolean
@@ -36,12 +38,13 @@ export type MorgenBericht = {
 
 export async function erstelleMorgenBericht(db: Abfrage): Promise<MorgenBericht> {
   const heute = heuteBerlin()
-  const [lage, rechnungen, belege, bankUmsaetze, kurzlage] = await Promise.all([
+  const [lage, rechnungen, belege, bankUmsaetze, kurzlage, gestern] = await Promise.all([
     berechneLage(db),
     ladeDokumente(db, ["rechnung"]),
     ladeBelege(db, null),
     ladeOffeneBankUmsaetze(db),
     ladeFinanzKurzlage(db, heute),
+    db(`SELECT count(*)::int AS n FROM fin_belege WHERE zugeordnet_at > now() - interval '24 hours'`, []).catch(() => [{ n: 0 }]),
   ])
 
   const faelligeMahnungen = rechnungen
@@ -55,12 +58,12 @@ export async function erstelleMorgenBericht(db: Abfrage): Promise<MorgenBericht>
 
   const fristen = lage.fristen
     .filter((f) => !f.erledigt && tageZwischen(heute, f.faellig) <= 14)
-    .map((f) => ({ titel: f.titel, faellig: f.faellig, tageBis: tageZwischen(heute, f.faellig) }))
+    .map((f) => ({ id: f.id, titel: f.titel, art: f.art, faellig: f.faellig, tageBis: tageZwischen(heute, f.faellig), betragCent: f.betragCent }))
 
   const paragraph19Hinweis = lage.hinweise.find((h) => h.text.includes("§ 19"))?.text ?? null
   const wachstumsHinweise = lage.hinweise.filter((h) => h.schwere === "neutral").map((h) => h.text)
 
-  return { heute, faelligeMahnungen, fristen, paragraph19Hinweis, belegeImKorb: belege.korbAnzahl, bankUmsaetzeOffen: bankUmsaetze.length, pauschalenFehlen: Number(heute.slice(8, 10)) >= PAUSCHALEN_ERINNERUNG_AB_TAG && !kurzlage.pauschaleErfasst, wachstumsHinweise }
+  return { heute, faelligeMahnungen, fristen, paragraph19Hinweis, belegeImKorb: belege.korbAnzahl, belegeGestern: Number((gestern[0] as { n?: number } | undefined)?.n ?? 0), bankUmsaetzeOffen: bankUmsaetze.length, pauschalenFehlen: Number(heute.slice(8, 10)) >= PAUSCHALEN_ERINNERUNG_AB_TAG && !kurzlage.pauschaleErfasst, wachstumsHinweise }
 }
 
 /** "Ruhig" meint: nichts Dringendes — Wachstumshinweise zählen bewusst nicht mit, die sind gerade an ruhigen Tagen am nützlichsten. */
@@ -75,7 +78,56 @@ const datumLang = (iso: string) =>
 const datumKurz = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("de-DE", { timeZone: "Europe/Berlin", day: "numeric", month: "long" })
 const zeile = (s: string) => s.replace(/\s+/g, " ").trim()
 
-type AssistentTeil = { lage: string | null; schritte: BriefingSchritt[]; impuls: string | null; offen: number; team: string[]; teamWoche: boolean }
+type Entscheidung = { id: string; titel: string; agent: string; art: string; tage: number }
+type AssistentTeil = {
+  lage: string | null
+  schritte: BriefingSchritt[]
+  impuls: string | null
+  offen: number
+  team: string[]
+  teamWoche: boolean
+  /** Was die Firma seit gestern früh selbst erarbeitet hat — Läufe mit Ergebnis, nicht Läufe an sich. */
+  nacht: string[]
+  /** Die ältesten offenen Freigaben, je mit Direktlink. */
+  entscheidungen: Entscheidung[]
+}
+
+const ANDERE: Record<string, string> = { puls: "Puls (alle 2 Std.)", initiative: "Initiative", motor: "Vertriebsmotor", it: "IT & Sicherheit", studio: "Mail-Studio", unternehmenskommunikation: "Kommunikation" }
+
+const STILL = new Set(["lage", "qualitaet", "wissen", "sicherheit", "recht", "koordination"])
+
+/** Ergebnisse der letzten 24 Stunden je Agent (nur der jüngste Lauf mit Ergebnis). */
+async function ladeNacht(): Promise<string[]> {
+  const [{ assistentDb }, { AGENTEN }] = await Promise.all([import("@/lib/assistent/store"), import("@/lib/assistent/truppe")])
+  const q = await assistentDb()
+  if (!q) return []
+  const rows = (await q(
+    `SELECT DISTINCT ON (agent) agent, ergebnis, anzahl FROM assistent_laeufe
+      WHERE created_at > now() - interval '24 hours' AND anzahl > 0 AND fehler IS NULL
+      ORDER BY agent, created_at DESC`,
+    [],
+  )) as { agent: string; ergebnis: string; anzahl: number }[]
+  const name = (k: string) => AGENTEN.find((a) => a.key === k)?.name ?? ANDERE[k] ?? k
+  return rows
+    .filter((r) => !STILL.has(r.agent))
+    .sort((a, b) => b.anzahl - a.anzahl)
+    .slice(0, 8)
+    .map((r) => `- [sparkles] **${name(r.agent)}:** ${zeile(r.ergebnis).slice(0, 170)}`)
+}
+
+async function ladeEntscheidungen(): Promise<Entscheidung[]> {
+  const [{ assistentDb }, { AGENTEN }] = await Promise.all([import("@/lib/assistent/store"), import("@/lib/assistent/truppe")])
+  const q = await assistentDb()
+  if (!q) return []
+  const rows = (await q(
+    `SELECT id, titel, coalesce(agent, '') AS agent, art, extract(day FROM now() - created_at)::int AS tage FROM assistent_freigaben
+      WHERE status = 'offen' AND (art NOT IN ('aufgabe','notiz') OR coalesce(extra->'koordination'->>'beiEmin', '') = 'true')
+      ORDER BY CASE art WHEN 'mail' THEN 0 WHEN 'brief' THEN 0 WHEN 'kapital' THEN 1 WHEN 'aufgabe' THEN 2 ELSE 3 END, created_at
+      LIMIT 6`,
+    [],
+  )) as Entscheidung[]
+  return rows.map((r) => ({ ...r, agent: AGENTEN.find((a) => a.key === r.agent)?.name ?? ANDERE[r.agent] ?? r.agent }))
+}
 
 /**
  * Karne des KI-Teams aus der Qualitätssicherung (lib/agenten/qualitaet.ts): täglich die letzten
@@ -84,7 +136,8 @@ type AssistentTeil = { lage: string | null; schritte: BriefingSchritt[]; impuls:
 async function ladeTeamKarne(woche: boolean): Promise<string[]> {
   const [{ ladeNoten }, { AGENTEN }] = await Promise.all([import("@/lib/agenten/qualitaet"), import("@/lib/assistent/truppe")])
   const name = (k: string) => AGENTEN.find((a) => a.key === k)?.name ?? k
-  const noten = (await ladeNoten(woche ? 7 : 1)).filter((n) => n.entwuerfe + n.laeufe + n.fehler > 0)
+  /* Nur wer etwas zu sagen hat: Zeilen wie „Messen: 0 Entwürfe · 1 Lauf" waren Lärm (Owner-Note 1/10, 24.10.2026). */
+  const noten = (await ladeNoten(woche ? 7 : 1)).filter((n) => n.freigegeben + n.verworfen + n.fehler + (n.bearbeitet ?? 0) > 0)
   const zeilen = noten.slice(0, woche ? 12 : 6).map((n) => {
     const teile = [
       n.freigegeben + n.verworfen > 0 ? `${n.freigegeben}/${n.freigegeben + n.verworfen} freigegeben (${Math.round((n.quote ?? 0) * 100)} %)` : `${n.entwuerfe} Entwürfe`,
@@ -117,15 +170,17 @@ async function trendZeilen(): Promise<string[]> {
 
 async function ladeAssistentTeil(heute: string): Promise<AssistentTeil> {
   const teamWoche = new Date(`${heute}T12:00:00Z`).getUTCDay() === 1
-  const [briefing, offen, team] = await Promise.all([
+  const [briefing, offen, team, nacht, entscheidungen] = await Promise.all([
     morgenBriefing("de").catch(() => null),
     zaehleOffen().catch(() => ({ gesamt: 0, linkedin: 0 })),
     ladeTeamKarne(teamWoche).catch((e) => {
       console.error("[morgenmail] Team-Karne:", e instanceof Error ? e.message : e)
       return []
     }),
+    ladeNacht().catch(() => []),
+    ladeEntscheidungen().catch(() => []),
   ])
-  return { lage: briefing?.lage ?? null, schritte: briefing?.schritte ?? [], impuls: briefing?.impuls ?? null, offen: offen.gesamt, team, teamWoche }
+  return { lage: briefing?.lage ?? null, schritte: briefing?.schritte ?? [], impuls: briefing?.impuls ?? null, offen: offen.gesamt, team, teamWoche, nacht, entscheidungen }
 }
 
 /** Morgenbriefing des Assistenten im creaDIG-Markendesign — Finanz ist nur ein Abschnitt davon. */
@@ -141,8 +196,19 @@ function berichtMail(b: MorgenBericht, a: AssistentTeil): { subject: string; tex
     bloecke.push(a.schritte.slice(0, 3).map((s, i) => `- [${["zap", "user", "calendar"][i]}] ${zeile(s.titel)}: ${zeile(s.warum)}`).join("\n"))
   }
 
+  if (a.nacht.length) {
+    bloecke.push("## Über Nacht **erarbeitet**")
+    bloecke.push(a.nacht.join("\n"))
+  }
+
   if (a.offen > 0) {
-    bloecke.push(`> **${a.offen}** ${a.offen === 1 ? "Vorschlag wartet" : "Vorschläge warten"} auf deine Freigabe.`)
+    bloecke.push(`## Deine **${a.offen} Entscheidungen**`)
+    const alter = (t: number) => (t <= 0 ? "neu" : t === 1 ? "seit gestern" : `seit ${t} Tagen`)
+    bloecke.push(
+      a.entscheidungen
+        .map((e) => `- [${e.art === "mail" || e.art === "brief" ? "user" : e.art === "kapital" ? "sparkles" : "zap"}] [${zeile(e.titel).slice(0, 90)}](${basis}/admin/assistent#frg-${encodeURIComponent(e.id)}) · ${e.agent || "Assistent"} · ${alter(e.tage)}`)
+        .join("\n") + (a.offen > a.entscheidungen.length ? `\n\nDazu ${a.offen - a.entscheidungen.length} weitere im Assistenten.` : ""),
+    )
   }
 
   bloecke.push("## Finanzen")
@@ -151,11 +217,32 @@ function berichtMail(b: MorgenBericht, a: AssistentTeil): { subject: string; tex
     finanz.push(`- [shield] ${STUFEN_TEXT[m.stufe]} fällig: ${m.nummer} · ${zeile(m.kunde)} · ${m.tageUeberfaellig} Tage überfällig`)
   }
   for (const f of b.fristen) {
-    const wann = f.tageBis >= 0 ? `fällig am ${datumKurz(f.faellig)}, in ${f.tageBis} Tagen` : `seit ${datumKurz(f.faellig)} fällig, **${-f.tageBis} Tage überfällig**`
-    finanz.push(`- [clock] ${zeile(f.titel)}: ${wann}`)
+    if (f.tageBis >= 0) {
+      finanz.push(`- [clock] ${zeile(f.titel)}: fällig am ${datumKurz(f.faellig)}, in ${f.tageBis} Tagen`)
+      continue
+    }
+    /*
+     * Vergangen heißt nicht überfällig: Diese Fristen legt das System selbst an. Ohne Betrag
+     * (kein Bescheid erfasst) und ohne Zahlung an die Finanzkasse im Bankimport war „44 Tage
+     * überfällig" eine Behauptung, keine Tatsache. Jetzt die ehrliche Frage mit Link zum Abhaken.
+     */
+    const frage =
+      f.art === "est" && f.betragCent === null
+        ? "kein Bescheid erfasst – gibt es überhaupt eine Vorauszahlung? Wenn nein oder bezahlt:"
+        : f.art === "ust"
+          ? "abgegeben?"
+          : f.betragCent === null
+            ? "erledigt?"
+            : `**${-f.tageBis} Tage überfällig** (${(f.betragCent / 100).toLocaleString("de-DE", { style: "currency", currency: "EUR" })}) –`
+    finanz.push(`- [clock] ${zeile(f.titel)} (${datumKurz(f.faellig)}): ${frage} [abhaken](${basis}/finanz/steuern)`)
   }
   if (b.paragraph19Hinweis) finanz.push(`- [shield] § 19 Kleinunternehmer: ${zeile(b.paragraph19Hinweis)}`)
-  if (b.belegeImKorb > 0) finanz.push(`- [layers] Belege im Eingangskorb: ${b.belegeImKorb} ${b.belegeImKorb === 1 ? "Beleg wartet" : "Belege warten"} auf ein Geschäftsfeld`)
+  if (b.belegeImKorb > 0)
+    finanz.push(
+      b.belegeGestern > 0
+        ? `- [layers] Belege: Die KI hat gestern ${b.belegeGestern} zugeordnet, ${b.belegeImKorb} sind noch im Korb – du musst nichts tun.`
+        : `- [layers] Belege im Eingangskorb: ${b.belegeImKorb} ${b.belegeImKorb === 1 ? "Beleg wartet" : "Belege warten"} auf ein Geschäftsfeld`,
+    )
   if (b.bankUmsaetzeOffen > 0) finanz.push(`- [layers] Bank-Import: ${b.bankUmsaetzeOffen} ${b.bankUmsaetzeOffen === 1 ? "Umsatz wartet" : "Umsätze warten"} auf Zuordnung`)
   if (b.pauschalenFehlen) finanz.push(`- [clock] Pauschalen: Für ${datumKurz(b.heute).split(" ").slice(-1)[0]} sind noch keine Verpflegungs- oder Homeoffice-Tage erfasst — unter ${basis}/finanz/pauschalen eintragen.`)
   for (const w of b.wachstumsHinweise) finanz.push(`- [sparkles] Wachstum & Kapital: ${zeile(w)}`)
@@ -192,11 +279,17 @@ function berichtMail(b: MorgenBericht, a: AssistentTeil): { subject: string; tex
   })
   const text = [
     `Guten Morgen, Emin. Hier ist dein Tag (${datum}).`,
-    body.replace(/^## /gm, "").replace(/^- \[[a-z]+\]\s*/gm, "• ").replace(/^> /gm, "").replace(/\*\*/g, ""),
+    body.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, "$1 ($2)").replace(/^## /gm, "").replace(/^- \[[a-z]+\]\s*/gm, "• ").replace(/^> /gm, "").replace(/\*\*/g, ""),
     `Zum Assistenten: ${basis}/admin/assistent\nFinanzen: ${basis}/finanz`,
     `Dein Assistent · ${FIRMA}`,
   ].join("\n\n")
   return { subject, text, html }
+}
+
+/** Dieselbe Mail ohne Versand — Vorschau und Prüfung. */
+export async function morgenmailVorschau(db: Abfrage): Promise<{ subject: string; text: string; html: string }> {
+  const [bericht, assistent] = await Promise.all([erstelleMorgenBericht(db), ladeAssistentTeil(heuteBerlin())])
+  return berichtMail(bericht, assistent)
 }
 
 /** Höchstens eine Morgenmail pro Tag — ein zweiter Cron-Lauf oder ein manueller Trigger am selben Tag verschickt nichts erneut. */
