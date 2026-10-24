@@ -18,7 +18,7 @@ import { KLEINUNTERNEHMER, formatPrice, offers, remediationRange, ustSatz } from
  * Bei jeder Änderung `STAND` setzen: Die Agenten sehen daran, dass sich etwas
  * geändert hat.
  */
-export const STAND = "2026-10-22"
+export const STAND = "2026-10-24"
 
 export const FIRMA = {
   name: "creaDIG Solutions",
@@ -53,6 +53,27 @@ export const PRODUKTE: Produkt[] = [
   { name: "CASSAMEA", was: "Gastro-Kasse für die Schweiz", stand: "im Aufbau" },
   { name: "meahv", was: "Hausverwaltung", stand: "im Aufbau" },
 ]
+
+/**
+ * Belegte Referenzen (öffentlich unter /arbeiten). 24.10.2026: KİB OS und ennur.org
+ * standen nur auf der Website – die Agenten kannten sie nicht und nannten sie nie.
+ */
+export const REFERENZEN: { name: string; was: string; art: string }[] = [
+  { name: "NV SWISS GmbH (Schweiz)", was: "Marke, Website und Digitalisierung aus einer Hand für einen Versicherungs- und Finanzmakler", art: "Kundenprojekt" },
+  { name: "KİB OS (kibos.app)", was: "System für den IGMG Regionalverband Nord Ruhr: Programme, Aufgaben, Aktivitäten und Karte aller Ortsgemeinden – Beweis für Verbands- und Mitgliedersysteme", art: "ehrenamtlich, live, Referenz freigegeben" },
+  { name: "ennur.org", was: "international wettbewerbsfähige Plattform, laufend weiterentwickelt", art: "ehrenamtlich, live" },
+  { name: "vegancatering.ch (Zürich)", was: "veganes Catering – vom Logo bis zur Systemarchitektur", art: "Kundenprojekt" },
+  { name: "maqam", was: "Online-Business / E-Commerce", art: "Kundenprojekt" },
+  { name: "Bir Damla Hayır", was: "Hilfsorganisation – Marke und Website", art: "Kundenprojekt" },
+]
+
+/** Laufende Vorhaben des Inhabers (Stand 24.10.2026) – Agenten arbeiten darauf zu. */
+export const VORHABEN = [
+  "Eigene Produkte (stammo, fibero) schnell verkaufen: monatliche Abos, Marketing und bezahlte Meta-Werbung – Budget und jede Kampagne nur nach Emins Freigabe.",
+  "Die eigene Leistung (Websites, Systeme, Automatisierung, Pflege) bekannt machen.",
+  "ennur.org: Messen, Investoren und Förderer gewinnen; Mittel fließen in eine gGmbH (gemeinnützig, mit eigener Einnahmequelle), langfristig eine Stiftung.",
+  "Bestandskunden ausbauen: Pflege-Verträge, Automatisierung, Empfehlungen (z. B. NV SWISS, Vegitat Zürich).",
+] as const
 
 /** Grundregeln des Inhabers — gelten für jeden Agenten. */
 export const GRUNDREGELN = [
@@ -118,7 +139,7 @@ function angeboteText(): string {
  */
 export function firmenText(umfang: "kurz" | "voll" = "voll"): string {
   if (umfang === "kurz")
-    return `${FIRMA.name} (${FIRMA.rechtsform}, Inhaber ${FIRMA.inhaber}, ${FIRMA.standort}): ${FIRMA.positionierung}. Eigene Produkte: ${PRODUKTE.map((p) => p.name).join(", ")}. Märkte: ${MAERKTE.prioritaet.join(" > ")}; Golfstaaten als offener Chancenkanal. Ziel: Einnahmen – halal und legal – aus jeder belegten Chance.`
+    return `${FIRMA.name} (${FIRMA.rechtsform}, Inhaber ${FIRMA.inhaber}, ${FIRMA.standort}): ${FIRMA.positionierung}. Eigene Produkte: ${PRODUKTE.map((p) => p.name).join(", ")}. Märkte: ${MAERKTE.prioritaet.join(" > ")}; Golfstaaten als offener Chancenkanal. Ziel: Einnahmen – halal und legal – aus jeder belegten Chance. Referenzen: ${REFERENZEN.map((r) => r.name).join(", ")}.`
   return [
     `FIRMA (Stand ${STAND}): ${FIRMA.name}, ${FIRMA.rechtsform} von ${FIRMA.inhaber}, ${FIRMA.standort}. ${FIRMA.gruendung}. ${FIRMA.arbeitsweise}`,
     `WAS WIR TUN: ${FIRMA.positionierung}. ${FIRMA.geld}`,
@@ -126,6 +147,8 @@ export function firmenText(umfang: "kurz" | "voll" = "voll"): string {
     `EIGENE PRODUKTE: ${PRODUKTE.map((p) => `${p.name} (${p.was}; ${p.stand})`).join("; ")}.`,
     `MÄRKTE: ${MAERKTE.prioritaet.join(" > ")}. Nische: ${MAERKTE.nische}. ${MAERKTE.nicht} ${MAERKTE.offen}`,
     `ZIEL: ${MAERKTE.ziel}`,
+    `REFERENZEN (belegt, nur diese nennen): ${REFERENZEN.map((r) => `${r.name} – ${r.was} (${r.art})`).join("; ")}.`,
+    `VORHABEN: ${VORHABEN.join(" ")}`,
     `SPRACHEN: ${FIRMA.sprachen}. ENGPASS: ${FIRMA.engpass}.`,
     `REGELN: ${GRUNDREGELN.join(" ")}`,
     `VERBOTEN: ${VERBOTE_TEXT}`,
