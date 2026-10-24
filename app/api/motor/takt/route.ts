@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
   if (!cronErlaubt(request)) return NextResponse.json({ ok: false }, { status: 401 })
 
   try {
-    const ergebnis = await takt()
+    const { mitAgent } = await import("@/lib/lernen/kontext")
+    const ergebnis = await mitAgent("motor", () => takt())
     /* Termin-Nachfass hängt nicht mehr an einem Seitenbesuch: unbenutzte Terminlinks bekommen hier täglich ihren Entwurf. */
     const { bereiteNachfassVor } = await import("@/lib/termine/nachfass")
     const nachfass = await bereiteNachfassVor().catch((e) => {

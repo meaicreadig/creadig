@@ -31,9 +31,11 @@ import {
   speichereNachricht,
   TAGESLIMIT,
   KAPITAL_STUFEN,
+  type Freigabe,
   type KapitalStufe,
   type Nachricht,
 } from "@/lib/assistent/store"
+import { notiereEntscheidung } from "@/lib/lernen/store"
 import { darfBetreten } from "@/lib/rollen"
 import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 import { generateText } from "ai"
@@ -79,7 +81,8 @@ export async function frage(eingabe: string, bildDaten?: string | null): Promise
   await speichereNachricht("user", bild ? `[Bild angehängt] ${text}` : text)
   try {
     const verlauf = await ladeVerlauf(16)
-    const antwort = await antworte(verlauf, bild)
+    const { mitAgent } = await import("@/lib/lernen/kontext")
+    const antwort = await mitAgent("assistent", () => antworte(verlauf, bild))
     const gespeichert = await speichereNachricht("assistant", antwort)
     revalidatePath("/admin/assistent")
     return { ok: true, antwort: gespeichert }
@@ -135,9 +138,19 @@ export async function antwortErhalten(form: FormData): Promise<void> {
 }
 
 /** Absagegrund mitschreiben (freiwillig) — die Qualitätssicherung gibt ihn dem Agenten als Lernstoff zurück. */
-async function merkeAbsageGrund(id: string, form: FormData): Promise<void> {
+async function merkeAbsageGrund(id: string, form: FormData): Promise<{ grund: string; grundText: string }> {
   const grund = String(form.get("grund") ?? "").trim().slice(0, 80)
-  if (grund) await ergaenzeExtra(id, { grund }).catch((e) => console.error("[assistent] grund", e instanceof Error ? e.message : e))
+  const grundText = String(form.get("grund_text") ?? "").replace(/\s+/g, " ").trim().slice(0, 600)
+  if (grund || grundText)
+    await ergaenzeExtra(id, { grund: grund || undefined, grundText: grundText || undefined }).catch((e) =>
+      console.error("[assistent] grund", e instanceof Error ? e.message : e),
+    )
+  return { grund, grundText }
+}
+
+/** Katman 5: jede Entscheidung ins Firmengedächtnis – ein Fehler dort hält keine Freigabe auf. */
+async function lerne(f: Freigabe, e: Parameters<typeof notiereEntscheidung>[1]): Promise<void> {
+  await notiereEntscheidung(f, e).catch((x) => console.error("[lernen] notieren", x instanceof Error ? x.message : x))
 }
 
 /* Eigene Aktion: hängt nicht davon ab, ob der Browser den gedrückten Knopf mitschickt – sendet nie. */
@@ -145,8 +158,10 @@ export async function freigabeVerwerfen(form: FormData): Promise<void> {
   await pruefe()
   const id = form.get("id")
   if (typeof id !== "string") return
+  const f = await ladeFreigabe(id.slice(0, 80))
   await setzeFreigabe(id.slice(0, 80), "verworfen")
-  await merkeAbsageGrund(id.slice(0, 80), form)
+  const g = await merkeAbsageGrund(id.slice(0, 80), form)
+  if (f?.status === "offen") await lerne(f, { entscheidung: "verworfen", ...g })
   revalidatePath("/admin/assistent")
 }
 
@@ -160,14 +175,19 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
   const fid = id.slice(0, 80)
   const f = await ladeFreigabe(fid)
   if (!f || f.status !== "offen") return
-  if (status === "verworfen") await merkeAbsageGrund(fid, form)
+  if (status === "verworfen") await lerne(f, { entscheidung: "verworfen", ...(await merkeAbsageGrund(fid, form)) })
 
   const titel = form.get("titel")
   const inhalt = form.get("inhalt")
   if (status === "freigegeben" && typeof titel === "string" && typeof inhalt === "string" && inhalt.trim()) {
     await aendereInhalt(fid, titel.trim() || f.titel, inhalt.trim())
     /* Geändert vor der Freigabe = der Agent lag daneben. Zählt in seine Note (Qualitätssicherung). */
-    if (inhalt.trim() !== f.inhalt.trim() || (titel.trim() && titel.trim() !== f.titel.trim())) await ergaenzeExtra(fid, { bearbeitet: true })
+    const umgeschrieben = inhalt.trim() !== f.inhalt.trim() || Boolean(titel.trim() && titel.trim() !== f.titel.trim())
+    if (umgeschrieben) await ergaenzeExtra(fid, { bearbeitet: true })
+    /* Katman 5: Entwurf und Emins Fassung nebeneinander – daraus lernt der Agent Ton und Inhalt. */
+    await lerne(f, umgeschrieben ? { entscheidung: "bearbeitet", endfassung: inhalt.trim() } : { entscheidung: "freigegeben" })
+  } else if (status === "freigegeben") {
+    await lerne(f, { entscheidung: "freigegeben" })
   }
 
   /* 24.10.2026: Karte „Artikel veröffentlichen“ – Freigeben stellt ihn auf creadig.de, Verwerfen legt das Thema ab. */
@@ -343,6 +363,28 @@ export async function kapitalStufe(form: FormData): Promise<void> {
     antrag: { stufe: stufe as KapitalStufe, seit: new Date().toISOString(), skizze: f.extra.antrag?.skizze },
   })
   if (!f.extra.antrag?.skizze) after(() => schreibeAntragsskizze(id).catch(() => undefined))
+  revalidatePath("/admin/assistent")
+}
+
+/** Katman 5: Regel im Firmengedächtnis streichen – kommt auch durch das Destillieren nicht zurück. */
+export async function lektionStreichen(form: FormData): Promise<void> {
+  await pruefe()
+  const id = form.get("id")
+  if (typeof id !== "string" || !id.startsWith("lek-")) return
+  const { streicheLektion } = await import("@/lib/lernen/store")
+  await streicheLektion(id.slice(0, 80))
+  revalidatePath("/admin/assistent")
+}
+
+/** Katman 5: eigene Regel festhalten – gilt ab dem nächsten Entwurf des Agenten (oder aller). */
+export async function lektionAnlegen(form: FormData): Promise<void> {
+  await pruefe()
+  const regel = String(form.get("regel") ?? "").trim()
+  const geltung = String(form.get("geltung") ?? "*").trim().slice(0, 40) || "*"
+  const art = String(form.get("art") ?? "gebot")
+  if (regel.length < 6 || (geltung !== "*" && !(AGENT_KEYS as readonly string[]).includes(geltung) && geltung !== "assistent" && geltung !== "motor")) return
+  const { legeLektionAn } = await import("@/lib/lernen/store")
+  await legeLektionAn({ geltung, regel, art: art === "verbot" || art === "stil" ? art : "gebot", quelle: "emin" })
   revalidatePath("/admin/assistent")
 }
 

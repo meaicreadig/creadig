@@ -14,6 +14,7 @@ import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 import { firmenRahmen } from "./rahmen"
 import { assistentDb, ergaenzeExtra, FREIGABE_ARTEN, ladeFreigabe, ladeFreigaben, ladeRaete, legeFreigabeAn, setzeFreigabe, type Nachricht } from "./store"
 import { firmenText } from "@/lib/firmenwahrheit"
+import { legeLektionAn, notiereEntscheidung } from "@/lib/lernen/store"
 import { findeOderLegeFirma, findeOderLegeKontakt } from "@/lib/kundenfaden"
 
 const MODELL = "openai/gpt-5.4-mini"
@@ -112,10 +113,25 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<s
           const intern = f.art === "aufgabe" || f.art === "notiz"
           await ergaenzeExtra(id, { koordination: { abteilung: "emin", ergebnis: `Emin im Chat: ${grund}`, auftragId: "chat", automatisch: true } })
           await setzeFreigabe(id, intern ? "freigegeben" : "verworfen")
+          /* Katman 5: auch im Chat geschlossene Karten zählen als Emins Entscheidung (Ziel gesperrt, keine Regel aus dem Sammelsatz). */
+          if (!intern) await notiereEntscheidung(f, { entscheidung: "verworfen", grund: grund.slice(0, 80) }).catch(() => null)
           if (intern) erledigt++
           else abgelegt++
         }
         return { erledigt, abgelegtOhneVersand: abgelegt }
+      },
+    }),
+    regel_merken: tool({
+      description:
+        "Schreibt eine Regel ins Firmengedächtnis, wenn Emin sagt, wie etwas künftig sein soll (\"nie wieder Verbände anschreiben\", \"LinkedIn-Posts kürzer\", \"merk dir …\"). Die Regel geht ab sofort in jeden Entwurf des genannten Agenten (oder aller mit '*'). Emins Worte möglichst wörtlich übernehmen.",
+      inputSchema: z.object({
+        agent: z.string().min(1).max(40).describe("Agent-Schlüssel (z. B. jaeger, vertrieb, redaktion, marketing) oder '*' für alle"),
+        regel: z.string().min(6).max(400),
+        art: z.enum(["verbot", "gebot", "stil"]),
+      }),
+      execute: async ({ agent, regel, art }) => {
+        await legeLektionAn({ geltung: agent.trim().toLowerCase(), regel, art, quelle: "emin" })
+        return { gemerkt: true, gilt: agent === "*" ? "alle Agenten" : agent, ab: "nächster Entwurf" }
       },
     }),
     vorschlag_anlegen: tool({

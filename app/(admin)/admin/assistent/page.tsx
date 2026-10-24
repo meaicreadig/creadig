@@ -73,7 +73,9 @@ import { EingangListe } from "@/components/admin/eingang-liste"
 import { ladeNeueBuchungen } from "@/lib/termine/store"
 import { Disclosure } from "@/components/ui/disclosure"
 
-import { agentStarten, antwortErhalten, beschlussAbhaken, freigabeEntscheiden, freigabeVerwerfen, kapitalStufe, lieferAufgabeSetzen, codePrStarten, ratAntworten } from "./actions"
+import { agentStarten, antwortErhalten, beschlussAbhaken, freigabeEntscheiden, freigabeVerwerfen, kapitalStufe, lieferAufgabeSetzen, codePrStarten, lektionAnlegen, lektionStreichen, ratAntworten } from "./actions"
+import { ladeLektionen, lernStand, type Lektion, type LernStand } from "@/lib/lernen/store"
+import { AdminSelect } from "@/components/admin/primitives"
 import { codeHatBereit } from "@/lib/ausfuehrung/code-hat"
 import { siteUrl } from "@/lib/termine/mail"
 import { heuteBerlin } from "@/lib/finanz/rechnen"
@@ -1300,13 +1302,15 @@ export default async function AssistentPage({
     ladeBeitraege(6).catch(() => []),
     ladeAnsprache().catch((): Ansprache => ({ gesendet: 0, beantwortet: 0, quote: null, nachfassOffen: 0 })),
   ])
-  const [auftraege, auftragZahlen, codeBacklog, kanaele, lieferung, kalenderKey] = await Promise.all([
+  const [auftraege, auftragZahlen, codeBacklog, kanaele, lieferung, kalenderKey, lektionen, lernen] = await Promise.all([
     ladeAuftraege(20).catch(() => []),
     auftragKennzahlen().catch(() => ({ heute: 0, erledigt: 0, uebergaben: 0, beiEmin: 0, offen: 0 })),
     ladeCodeBacklog().catch(() => []),
     pruefeKanaele().catch((): Kanal[] => []),
     ladeLieferAufgaben().catch((): LieferAufgabe[] => []),
     kalenderSchluessel().catch(() => null),
+    ladeLektionen().catch((): Lektion[] => []),
+    lernStand().catch((): LernStand | null => null),
   ])
   /* Die Truppe läuft nur im Morgen-Takt (Cron) und im Puls – nicht beim Seitenaufruf, sonst verschiebt
      ein nächtlicher Besuch den Tageslauf und der Morgen bleibt leer. */
@@ -1463,6 +1467,8 @@ export default async function AssistentPage({
 
             {lieferung.length > 0 ? <LieferungKlappe aufgaben={lieferung} kalenderKey={kalenderKey} /> : null}
 
+            <GedaechtnisKlappe lektionen={lektionen} stand={lernen} />
+
             {codeBacklog.length > 0 ? (
               <Klappe
                 titel="Code-Backlog"
@@ -1526,6 +1532,89 @@ export default async function AssistentPage({
       </div>
       <AktionMeldung />
     </AdminShell>
+  )
+}
+
+const QUELLE_TEXT = { emin: "von dir", abgeleitet: "aus deinen Entscheidungen", korrektur: "aus deinen Umschreibungen" } as const
+const ART_TEXT = { verbot: "Nie", gebot: "Immer", stil: "Stil" } as const
+
+/** Katman 5: Was die Agenten aus deinen Entscheidungen gelernt haben – lesen, streichen, selbst ergänzen. */
+function GedaechtnisKlappe({ lektionen, stand }: { lektionen: Lektion[]; stand: LernStand | null }) {
+  const name = (k: string) => (k === "*" ? "Alle Agenten" : k === "assistent" ? "Assistent (Chat)" : k === "motor" ? "Motor" : (AGENTEN.find((a) => a.key === k)?.name ?? k))
+  const gruppen = [...new Set(lektionen.map((l) => l.geltung))].sort((a, b) => (a === "*" ? -1 : b === "*" ? 1 : name(a).localeCompare(name(b), "de")))
+  return (
+    <Klappe
+      titel="Firmengedächtnis"
+      zahl={lektionen.length || undefined}
+      unter={`${lektionen.length} Regel(n) in jedem Entwurf${stand ? ` · ${stand.entscheidungen} Entscheidung(en) in 30 Tagen, ${stand.mitGrund} mit Grund` : ""} — ein Satz beim Verwerfen wird sofort Regel`}
+    >
+      {gruppen.length ? (
+        <div className="flex flex-col gap-4">
+          {gruppen.map((g) => (
+            <div key={g} className="flex flex-col gap-2">
+              <h3 className="text-sm font-medium text-muted-foreground">{name(g)}</h3>
+              <ul className="flex flex-col gap-2">
+                {lektionen
+                  .filter((l) => l.geltung === g)
+                  .map((l) => (
+                    <li key={l.id} className="flex items-start justify-between gap-3 rounded-2xl bg-background px-5 py-3">
+                      <span className="flex min-w-0 flex-col gap-0.5">
+                        <span className="text-foreground">
+                          <span className="font-medium">{ART_TEXT[l.art]}:</span> {l.regel}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {QUELLE_TEXT[l.quelle]}
+                          {l.belege.length ? ` · ${l.belege.length} Beleg(e)` : ""}
+                          {l.staerke > 1 ? ` · ${l.staerke}× bestätigt` : ""}
+                        </span>
+                      </span>
+                      <form action={lektionStreichen}>
+                        <input type="hidden" name="id" value={l.id} />
+                        <AktionKnopf laeuft="…" fertig="Gestrichen" className="shrink-0 rounded-full bg-secondary px-3 py-1.5 text-sm text-secondary-foreground">
+                          Streichen
+                        </AktionKnopf>
+                      </form>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          Noch keine Regeln. Sie entstehen aus deinen Entscheidungen (täglich mit der Qualitätssicherung) – sofort, wenn du beim Verwerfen einen Satz schreibst.
+        </p>
+      )}
+      <form action={lektionAnlegen} className="mt-4 flex flex-wrap items-center gap-2">
+        <AdminSelect name="geltung" defaultValue="*" aria-label="Für welchen Agenten" className="rounded-full border-border bg-card px-3 py-1.5 pe-7 text-sm">
+          <option value="*">Alle Agenten</option>
+          <option value="assistent">Assistent (Chat)</option>
+          {AGENTEN.map((a) => (
+            <option key={a.key} value={a.key}>
+              {a.name}
+            </option>
+          ))}
+        </AdminSelect>
+        <AdminSelect name="art" defaultValue="gebot" aria-label="Art der Regel" className="rounded-full border-border bg-card px-3 py-1.5 pe-7 text-sm">
+          <option value="gebot">Immer</option>
+          <option value="verbot">Nie</option>
+          <option value="stil">Stil</option>
+        </AdminSelect>
+        <input
+          type="text"
+          name="regel"
+          required
+          minLength={6}
+          maxLength={400}
+          placeholder="Neue Regel, z. B. „Keine Verbände anschreiben“"
+          aria-label="Neue Regel"
+          className="min-w-0 flex-1 basis-64 rounded-full border border-border bg-card px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground"
+        />
+        <AktionKnopf laeuft="Wird gemerkt …" fertig="Gemerkt" className="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground">
+          Merken
+        </AktionKnopf>
+      </form>
+    </Klappe>
   )
 }
 

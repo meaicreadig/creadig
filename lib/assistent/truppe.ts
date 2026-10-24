@@ -74,7 +74,7 @@ export const AGENTEN: AgentInfo[] = [
   { key: "kapital", name: "Kapital", aufgabe: "Recherchiert Förderungen, Kredite und Investoren mit Quelle und Frist.", takt: "woechentlich", ki: true },
   { key: "golf", name: "Golf-Radar", aufgabe: "Sucht jede Woche Investoren, Family Offices, Programme, Aufträge und Events in VAE, Saudi-Arabien und Katar und schreibt die erste Nachricht auf Englisch und Arabisch – offene Tür für Leistung, Investition oder Partnerschaft, ohne Umzug.", takt: "woechentlich", ki: true },
   { key: "bulletin", name: "Bulletin", aufgabe: "Recherchiert jeden Morgen, was in KI, Automatisierung, Medien, Chips und Robotik zählt, mit Quelle, ordnet es für creaDIG ein und liefert der Redaktion Artikelideen.", takt: "taeglich", ki: true },
-  { key: "qualitaet", name: "Qualitätssicherung", aufgabe: "Benotet jeden KI-Mitarbeiter täglich nach deinen Entscheidungen: Freigaben, Änderungen, Absagen, Fehler und Dauer. Wer unter der Grenze liegt, bekommt einen Auftrag mit seinen letzten Absagen. Prüft außerdem jeden offenen Entwurf auf erfundene Behauptungen (Zertifikate, Kundenzahlen) und unbekannte Preise.", takt: "taeglich", ki: false },
+  { key: "qualitaet", name: "Qualitätssicherung", aufgabe: "Benotet jeden KI-Mitarbeiter täglich nach deinen Entscheidungen: Freigaben, Änderungen, Absagen, Fehler und Dauer. Wer unter der Grenze liegt, bekommt einen Auftrag mit seinen letzten Absagen. Prüft außerdem jeden offenen Entwurf auf erfundene Behauptungen (Zertifikate, Kundenzahlen) und unbekannte Preise. Schreibt aus deinen Entscheidungen Regeln ins Firmengedächtnis, die jeder Agent bei jedem Entwurf mitbekommt.", takt: "taeglich", ki: false },
   { key: "sicherheit", name: "IT-Sicherheit", aufgabe: "Prüft Pflicht-Einstellungen und durchsucht eingehende Mails nach Angriffen auf die KI (Prompt-Injection). Kritisches löst einen Alarm aus.", takt: "taeglich", ki: false },
   { key: "kundenservice", name: "Kundenservice", aufgabe: "Schreibt für unbeantwortete Kundenmails ohne Zuordnung einen Antwortentwurf; unbekannte Absender bekommen eine höfliche Rückfrage. Versendet nie selbst.", takt: "taeglich", ki: true },
   { key: "forschung", name: "F&E-Nachweis", aufgabe: "Fasst jede Woche die erfassten F&E-Stunden für die Forschungszulage zusammen und schätzt die Jahreserstattung.", takt: "woechentlich", ki: false },
@@ -755,7 +755,7 @@ const LAEUFER: Record<AgentKey, (o: Start) => Promise<Ergebnis>> = {
   rat: (o) => rat(o),
   bulletin: (o) => erstelleBulletin({ erzwingen: o.manuell }),
   webseite: async (o) => (await import("@/lib/webseite/pruefer")).websiteRunde(o),
-  qualitaet: async () => verbinde(await (await import("@/lib/agenten/qualitaet")).qualitaetsRunde(), await (await import("@/lib/agenten/wissen")).wissensRunde()),
+  qualitaet: async () => verbinde(await (await import("@/lib/agenten/qualitaet")).qualitaetsRunde(), await (await import("@/lib/agenten/wissen")).wissensRunde(), await (await import("@/lib/lernen/destillieren")).lernRunde()),
   sicherheit: async () => (await import("@/lib/agenten/sicherheit")).sicherheitsRunde(),
   kundenservice: async () => (await import("@/lib/agenten/kundenservice")).kundenserviceRunde(),
   forschung: async () => (await import("@/lib/agenten/forschung")).forschungsRunde(),
@@ -800,7 +800,9 @@ export async function fuehreAgentAus(key: AgentKey, o: Start = {}): Promise<"gel
   }
   const start = Date.now()
   try {
-    const r = await LAEUFER[key](o)
+    /* Katman 5: jeder Modellaufruf dieses Laufs bekommt die Regeln aus Emins Entscheidungen (lib/lernen). */
+    const { mitAgent } = await import("@/lib/lernen/kontext")
+    const r = await mitAgent(key, () => LAEUFER[key](o))
     await protokolliereLauf({ agent: key, ...r, dauerMs: Date.now() - start })
   } catch (e) {
     console.error("[assistent] agent", key, e instanceof Error ? e.message : e)

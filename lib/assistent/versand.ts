@@ -227,7 +227,8 @@ export async function markiereAntwort(id: string, opts: { faden?: boolean } = {}
   const q = await assistentDb()
   if (!q) return
   const verworfen = (await q(
-    `${KETTE} UPDATE assistent_freigaben SET status = 'verworfen', erledigt_at = now()
+    `${KETTE} UPDATE assistent_freigaben SET status = 'verworfen', erledigt_at = now(),
+       extra = coalesce(extra, '{}'::jsonb) || '{"automatisch": "Kunde hat geantwortet – Nachfass entfällt"}'::jsonb
      WHERE status = 'offen' AND extra->>'vorgaenger' IN (SELECT id FROM kette) RETURNING id`,
     [id],
   )) as { id: string }[]
@@ -286,7 +287,7 @@ export async function nimmAntwortZurueckFuer(id: string): Promise<void> {
     [quelle],
   )
   if (zurueck.length > 0) {
-    await q(`UPDATE assistent_freigaben SET status = 'offen', erledigt_at = NULL WHERE id = ANY($1::text[]) AND status = 'verworfen'`, [zurueck])
+    await q(`UPDATE assistent_freigaben SET status = 'offen', erledigt_at = NULL, extra = extra - 'automatisch' WHERE id = ANY($1::text[]) AND status = 'verworfen'`, [zurueck])
   }
   const nq = neonAbfrage()
   if (nq) {

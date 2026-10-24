@@ -90,6 +90,8 @@ export type Freigabe = {
   bildPfad: string | null
   extra: FreigabeExtra
   zeit: string
+  /** Stabiler Schlüssel der Quelle (z. B. jaeger:<firma>) – das Firmengedächtnis sperrt darüber verworfene Ziele. */
+  quelle?: string | null
 }
 
 /** Zusatzwissen je Entwurf – z. B. warum die Redaktion dieses Thema gewählt hat. */
@@ -102,6 +104,8 @@ export type FreigabeExtra = {
   steuerung?: { agent: string; name: string; grund: string; uebernimmt: string | null }[]
   /** Warum Emin verworfen hat (freiwillig, components/admin/grund-wahl.tsx) — Lernstoff für die Qualitätssicherung. */
   grund?: string
+  /** Katman 5: Emins Begründung in eigenen Worten – wird sofort Regel im Firmengedächtnis. */
+  grundText?: string
   webcheck?: { befunde: string[]; https: boolean; mobil: boolean; ladezeitMs: number | null } | null
   warum?: string
   bezug?: string
@@ -240,6 +244,9 @@ export async function legeFreigabeAn(f: {
   const q = await assistentDb()
   if (!q) throw new Error("Datenbank nicht verfügbar")
   if (f.quelle && (await quelleBekannt(f.quelle))) return null
+  /* Katman 5: Was Emin bei diesem Ziel schon verworfen hat, schlägt kein Akquise-Agent noch einmal vor. */
+  const { zielGesperrt } = await import("@/lib/lernen/store")
+  if (await zielGesperrt({ agent: f.agent, quelle: f.quelle, empfaenger: f.empfaenger, orgId: f.extra?.orgId }).catch(() => false)) return null
   const id = f.id ?? neueId("frg")
   /* Prüfen und Einfügen in einer Anweisung: zwei gleichzeitige Läufe legen dieselbe Quelle nicht doppelt an. */
   const rows = (await q(
@@ -290,7 +297,7 @@ export async function gibSperre(name: string): Promise<void> {
 export const neueFreigabeId = () => neueId("frg")
 
 type FreigabeZeile = Omit<Freigabe, "zeit" | "bildPfad"> & { bild_pfad: string | null; created_at: string | Date }
-const FREIGABE_SPALTEN = `id, art, titel, inhalt, empfaenger, betreff, status, agent, bild_pfad, extra, created_at`
+const FREIGABE_SPALTEN = `id, art, titel, inhalt, empfaenger, betreff, status, agent, bild_pfad, extra, created_at, quelle`
 const alsFreigabe = ({ created_at, bild_pfad, ...r }: FreigabeZeile): Freigabe => ({
   ...r,
   extra: r.extra ?? {},
