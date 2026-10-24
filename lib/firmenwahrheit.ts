@@ -67,8 +67,11 @@ export const REFERENZEN: { name: string; was: string; art: string }[] = [
   { name: "KİB OS (kibos.app)", was: "System für den IGMG Regionalverband Nord Ruhr: Programme, Aufgaben, Aktivitäten und Karte aller Ortsgemeinden – Beweis für Verbands- und Mitgliedersysteme", art: "ehrenamtlich, live, Referenz freigegeben" },
   { name: "ennur.org", was: "international wettbewerbsfähige Plattform, laufend weiterentwickelt", art: "ehrenamtlich, live" },
   { name: "vegancatering.ch (Zürich)", was: "veganes Catering – vom Logo bis zur Systemarchitektur", art: "Kundenprojekt" },
-  { name: "maqam", was: "Online-Business / E-Commerce", art: "Kundenprojekt" },
+  { name: "meaqam (meaqam.com)", was: "eigener Online-Shop für Kleidung, von creaDIG gebaut und selbst betrieben – kein Verkaufsprodukt, sondern Beweis für E-Commerce aus eigener Hand", art: "Eigenbetrieb des Inhabers, live" },
   { name: "Bir Damla Hayır", was: "Hilfsorganisation – Marke und Website", art: "Kundenprojekt" },
+  /* 24.10.2026: standen freigegeben auf /arbeiten, fehlten aber hier – der Website-Prüfer gleicht jetzt beide Richtungen ab. */
+  { name: "A+N Automobile (Diepholz)", was: "Autohandel – Fassadenbanner, Gestaltung und Druck", art: "Kundenprojekt" },
+  { name: "Allrein-Ofra GmbH", was: "Hersteller von Reinigungsmitteln – Etiketten, Produkt-Mockups, Produktkataloge 2021 und 2022", art: "Kundenprojekt" },
 ]
 
 /** Laufende Vorhaben des Inhabers (Stand 24.10.2026) – Agenten arbeiten darauf zu. */

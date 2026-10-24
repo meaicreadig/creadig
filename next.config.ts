@@ -255,6 +255,9 @@ const nextConfig: NextConfig = {
       { source: "/termin.html", destination: "/termin", permanent: true },
       { source: "/index.html", destination: "/", permanent: true },
       { source: "/meai_intro.html", destination: "/produkte/meai", permanent: true },
+      /* Inhaber 24.10.2026: „maqam“ hieß in Wahrheit meaqam (Eigenbetrieb). Die alte Adresse kommt nicht zurück → 308. */
+      { source: "/arbeiten/maqam", destination: "/arbeiten/meaqam", permanent: true },
+      { source: "/:lang(tr|en|ar)/arbeiten/maqam", destination: "/:lang/arbeiten/meaqam", permanent: true },
 
       /*
        * Vertrieb 1.0 — die Anfragenliste ist in den Vertriebsbereich gezogen.

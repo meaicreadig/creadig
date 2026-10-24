@@ -141,7 +141,7 @@ export const ENTSCHEIDUNG_BLOCKIERT_GESCHAEFT = [
   "Impressum vollständig",
   "Steuerausweis auf den Preisen (§ 27 a / § 19 UStG)",
   "Freigabe NV SWISS (C-2)",
-  "Freigabe maqam (C-2)",
+  "Freigabe meaqam (C-2)",
   "Freigabe Bir Damla Hayır (C-2)",
 ] as const
 

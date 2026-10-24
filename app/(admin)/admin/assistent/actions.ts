@@ -170,6 +170,22 @@ export async function freigabeEntscheiden(form: FormData): Promise<void> {
     if (inhalt.trim() !== f.inhalt.trim() || (titel.trim() && titel.trim() !== f.titel.trim())) await ergaenzeExtra(fid, { bearbeitet: true })
   }
 
+  /* 24.10.2026: Karte „Artikel veröffentlichen“ – Freigeben stellt ihn auf creadig.de, Verwerfen legt das Thema ab. */
+  if (f.extra.artikelSlug) {
+    if (status === "freigegeben") {
+      const { veroeffentlicheArtikel } = await import("@/lib/artikel/veroeffentlichen")
+      const r = await veroeffentlicheArtikel(f.extra.artikelSlug)
+      if (!r.ok) {
+        await ergaenzeExtra(fid, { fehler: "Artikel ist kein Entwurf mehr oder nicht auffindbar." })
+        revalidatePath("/admin/assistent")
+        return
+      }
+    } else {
+      const { setzeZustand } = await import("@/lib/artikel/store")
+      await setzeZustand(f.extra.artikelSlug, "verworfen")
+    }
+  }
+
   if (status === "freigegeben" && f.art === "mail") {
     const an = String(form.get("empfaenger") ?? f.empfaenger ?? "").trim()
     const betreff = String(form.get("betreff") ?? f.betreff ?? "").trim() || f.titel

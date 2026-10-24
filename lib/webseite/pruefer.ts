@@ -255,6 +255,42 @@ export async function pruefeWebseite(o: { tief?: boolean } = {}): Promise<Pruefu
       neu({ code: `soll:${p.code}`, bereich: "inhalt", schwere: "wichtig", titel: `Fehlt auf der Seite: ${p.titel}`, detail: `${p.pfad} antwortet ${s.status} oder enthält das Erwartete nicht.`, url: `${basis}${p.pfad}`, an: p.an })
   }
 
+  /*
+   * 24.10.2026 · Abgleich mit der Firmenwahrheit, in beide Richtungen. Der Inhaber fand selbst,
+   * was der Prüfer hätte finden müssen: ein eigener Shop als „Kundenwerk“, ein live verkauftes
+   * Produkt fehlte in der Firmenbeschreibung. Ändert sich lib/firmenwahrheit.ts, meldet der
+   * Prüfer am nächsten Morgen jede Seite, die nicht nachzieht – und umgekehrt.
+   */
+  {
+    const { PRODUKTE, REFERENZEN } = await import("@/lib/firmenwahrheit")
+    const { genannteClientWorks } = await import("@/lib/site-data")
+    const [produkte, arbeiten] = await Promise.all([hole(`${basis}/produkte`), hole(`${basis}/arbeiten`)])
+    const enthaelt = (html: string, wort: string) => html.toLowerCase().includes(wort.toLowerCase())
+    const fehlendeProdukte = PRODUKTE.filter((p) => produkte.status === 200 && !enthaelt(sichtbarerText(produkte.html), p.name)).map((p) => p.name)
+    if (fehlendeProdukte.length)
+      neu({ code: "wahrheit:produkte", bereich: "inhalt", schwere: "wichtig", titel: `Eigenes Produkt fehlt auf /produkte: ${fehlendeProdukte.join(", ")}`, detail: "Laut Firmenwahrheit (lib/firmenwahrheit.ts) gehört es dazu.", url: `${basis}/produkte`, an: "entwicklung" })
+    const beschreibung = start.html.match(/Eigene Systeme:([^"]*)/)?.[1] ?? ""
+    const ohneLd = PRODUKTE.filter((p) => beschreibung && !enthaelt(beschreibung, p.name)).map((p) => p.name)
+    if (ohneLd.length)
+      neu({ code: "wahrheit:ld", bereich: "inhalt", schwere: "wichtig", titel: `Firmenbeschreibung für Google nennt nicht alle Produkte: ${ohneLd.join(", ")} fehlt`, detail: "Die strukturierten Daten der Startseite (ProfessionalService.description) zählen die eigenen Systeme auf – unvollständig.", url: basis, an: "entwicklung" })
+    if (arbeiten.status === 200) {
+      /* Name ohne Rechtsform, dazu eine Domain in Klammern (z. B. „KİB OS (kibos.app)“); Orte in Klammern zählen nicht. */
+      const kurz = (r: { name: string }) =>
+        [r.name.split(" (")[0].replace(/\s+(GmbH|e\.V\.)$/, ""), r.name.match(/\(([^)]*\.[a-z]{2,})\)/)?.[1] ?? ""].filter(Boolean)
+      const fehlen = REFERENZEN.filter((r) => !kurz(r).some((k) => enthaelt(arbeiten.html, k))).map((r) => r.name)
+      if (fehlen.length)
+        neu({ code: "wahrheit:referenzen", bereich: "inhalt", schwere: "wichtig", titel: `Belegte Referenz fehlt auf /arbeiten: ${fehlen.join(", ")}`, detail: "Steht in der Firmenwahrheit, aber nicht auf der Website.", url: `${basis}/arbeiten`, an: "entwicklung" })
+    }
+    const unbekannt = genannteClientWorks
+      .filter((w) => !REFERENZEN.some((r) => enthaelt(`${r.name} ${r.was}`, w.name.slice(0, 12))))
+      .map((w) => w.name)
+    if (unbekannt.length)
+      neu({ code: "wahrheit:unbekannt", bereich: "inhalt", schwere: "wichtig", titel: `Referenz auf der Website, die die Firmenwahrheit nicht kennt: ${unbekannt.join(", ")}`, detail: "Entweder fehlt sie in lib/firmenwahrheit.ts (dann kennen die Agenten sie nicht) oder sie gehört nicht auf die Seite.", url: `${basis}/arbeiten`, an: "entwicklung" })
+    const falschKunde = genannteClientWorks.filter((w) => !w.eigen && REFERENZEN.some((r) => enthaelt(r.name, w.name.slice(0, 12)) && /eigen/i.test(r.art))).map((w) => w.name)
+    if (falschKunde.length)
+      neu({ code: "wahrheit:eigen", bereich: "inhalt", schwere: "kritisch", titel: `Eigenbetrieb als Kundenwerk ausgewiesen: ${falschKunde.join(", ")}`, detail: "Laut Firmenwahrheit ein eigenes Projekt – „Kundenwerk“ wäre eine falsche Angabe (UWG).", url: `${basis}/arbeiten`, an: "entwicklung" })
+  }
+
   /* Tote interne Links (Startseiten aller Sprachen). */
   const links = new Set<string>()
   for (const s of seiten.slice(0, SPRACHEN.length))
@@ -277,9 +313,12 @@ export async function pruefeWebseite(o: { tief?: boolean } = {}): Promise<Pruefu
   const copyright = start.html.match(/(?:©|&copy;)\s*(?:\d{4}\s*[–-]\s*)?(\d{4})/)
   if (copyright && Number(copyright[1]) < jahr)
     neu({ code: "jahr", bereich: "inhalt", schwere: "hinweis", titel: "Veraltetes Jahr im Fußbereich", detail: `© ${copyright[1]} – wirkt, als würde die Seite nicht gepflegt.`, an: "entwicklung" })
+  /* Gepflegte Notizen zählen mit (lib/insights.ts) – sonst meldete der Prüfer „noch kein Artikel“, obwohl einer steht. */
+  const { alleInsights } = await import("@/lib/artikel/oeffentlich")
   const { veroeffentlichteInsights } = await import("@/lib/artikel/store")
+  const alle = await alleInsights("de").catch(() => [])
   const artikel = await veroeffentlichteInsights().catch(() => [])
-  const neuster = artikel
+  const neuster = alle
     .map((a) => new Date(a.date))
     .filter((d) => !Number.isNaN(d.getTime()))
     .sort((a, b) => b.getTime() - a.getTime())[0]
@@ -319,10 +358,15 @@ export async function pruefeWebseite(o: { tief?: boolean } = {}): Promise<Pruefu
     const { schreibeNaechstenPlanArtikel } = await import("@/lib/artikel/plan")
     entwurf = (await schreibeNaechstenPlanArtikel().catch((e) => ({ ergebnis: `Entwurf gescheitert: ${e instanceof Error ? e.message : e}` }))).ergebnis
   }
+  /* 24.10.2026: Emins LinkedIn-Beiträge werden Website-Artikel; liegengebliebene Entwürfe bekommen ihre Karte. */
+  const karte = await import("@/lib/artikel/karte")
+  const ausLinkedin = await karte.linkedinZuArtikel().catch((e) => `LinkedIn→Artikel gescheitert: ${e instanceof Error ? e.message : e}`)
+  if (ausLinkedin) entwurf = [entwurf, ausLinkedin].filter(Boolean).join(" · ")
+  await karte.artikelKartenNachholen().catch(() => 0)
 
   const fertig: Befund[] = befunde.map((b) => {
     if (b.code === "frische" && entwurf)
-      return { ...b, erledigung: "emin", an: "geschaeftsfuehrung", detail: `${b.detail} ${entwurf} – Freigabe unter /admin/bulletin.` }
+      return { ...b, erledigung: "emin", an: "geschaeftsfuehrung", detail: `${b.detail} ${entwurf} – Freigabe als Karte im Assistenten.` }
     if (b.code === "artikel-sitemap") {
       try {
         revalidatePath("/sitemap.xml")
@@ -464,32 +508,53 @@ export async function websiteRunde(o: { manuell?: boolean } = {}): Promise<{ erg
       [p.id, JSON.stringify(p.noten), p.gesamt, JSON.stringify(p.befunde), p.seiten, p.psi ? JSON.stringify(p.psi) : null, p.anweisung],
     )
 
-  /* Aufträge: inhaltliche Punkte an die Abteilungen, Code-Punkte gebündelt als Bericht an die Geschäftsführung.
-     Quelle je Befund + Woche → derselbe Mangel erzeugt nicht jeden Tag einen neuen Auftrag. */
-  const { legeAuftragAn } = await import("@/lib/koordination/koordinator")
+  /*
+   * Weitergabe (neu 24.10.2026). Vorher gingen Befunde als Auftrag an Abteilungen, die einen
+   * Textvorschlag schrieben und „erledigt“ meldeten – auf der Seite änderte sich nichts (Platzhalter
+   * im Impressum, USt-Widerspruch: wochenlang gefunden, nie behoben). Jetzt:
+   *   · alles, was eine Änderung an der Website braucht → EINE Code-Backlog-Karte je Woche
+   *     → Kod hattı (lib/ausfuehrung/code-hat.ts) baut daraus einen PR, Emin merged
+   *   · was nur der Inhaber weiß (Recht, USt-Nummer, Verträge) → Karte bei Emin
+   * Quelle je Woche → derselbe Mangel erzeugt nicht jeden Tag eine neue Karte.
+   */
+  const { legeFreigabeAn, setzeFreigabe } = await import("@/lib/assistent/store")
   const woche = p.id.slice(0, 8) + String(Math.ceil(Number(p.id.slice(8, 10)) / 7))
   let auftraege = 0
-  for (const b of p.befunde.filter((x) => x.erledigung === "abteilung" && x.schwere !== "hinweis")) {
-    const id = await legeAuftragAn({
-      von: "it",
-      an: b.an ?? "kommunikation",
-      titel: `Webseite: ${b.titel}`,
-      inhalt: `${b.detail}${b.url ? `\nSeite: ${b.url}` : ""}\nGefunden vom Website-Prüfer. Liefere einen fertigen Text/Vorschlag zur Umsetzung.`,
-      quelle: `webseite:${woche}:${b.code}`,
-    }).catch(() => null)
-    if (id) auftraege++
-  }
-  const emin = p.befunde.filter((b) => b.erledigung === "emin" && b.schwere !== "hinweis")
-  if (emin.length) {
-    const id = await legeAuftragAn({
-      von: "it",
-      an: "geschaeftsfuehrung",
-      titel: `Webseiten-Bericht: Note ${p.gesamt}/100, ${emin.length} Punkte brauchen Code`,
+  const offen = p.befunde.filter((b) => b.erledigung !== "behoben" && b.schwere !== "hinweis" && b.code !== "frische")
+  const inhaber = offen.filter((b) => b.an === "recht")
+  const code = offen.filter((b) => b.an !== "recht")
+  if (code.length) {
+    const id = await legeFreigabeAn({
+      art: "aufgabe",
+      titel: `Webseite: ${code.length} Befund(e) beheben (Note ${p.gesamt}/100)`,
       inhalt: [
-        ...emin.filter((b) => b.code === "frische").map((b) => `Redaktion: ${b.detail}`),
-        p.anweisung ? `Diese Punkte darf der Prüfer nicht selbst ändern (Code/Server):\n${p.anweisung}` : "",
-      ].filter(Boolean).join("\n\n"),
-      quelle: `webseite:${woche}:bericht`,
+        `Gefunden vom Website-Prüfer am ${p.id}. Quelle der Wahrheit: lib/firmenwahrheit.ts.`,
+        "",
+        "— Auftrag für Claude Code —",
+        umsetzungsAnweisung(code),
+        "Inhalte, die nur der Inhaber kennen kann (Steuernummern, Vertragsstände, Zahlen), nie erfinden – solche Stellen unverändert lassen und im PR nennen.",
+      ].join("\n"),
+      quelle: `webseite-code:${woche}`,
+      agent: "webseite",
+      extra: { code: true, warum: "Website-Befunde, die eine Änderung im Code brauchen – werden zum Pull Request." },
+    }).catch(() => null)
+    if (id) {
+      await setzeFreigabe(id, "freigegeben")
+      auftraege++
+    }
+  }
+  if (inhaber.length) {
+    const id = await legeFreigabeAn({
+      art: "aufgabe",
+      titel: `Webseite braucht deine Angabe (${inhaber.length})`,
+      inhalt: [
+        "Diese Punkte kann kein Agent lösen – es fehlt eine Angabe von dir. Antworte im Chat, der Rest läuft von selbst (Code-Backlog → PR):",
+        "",
+        ...inhaber.map((b) => `• ${b.titel}${b.url ? ` (${b.url})` : ""}\n  ${b.detail}`),
+      ].join("\n"),
+      quelle: `webseite-inhaber:${woche}`,
+      agent: "webseite",
+      extra: { warum: "Rechtliche Pflichtangaben auf der Website – nur du kennst sie." },
     }).catch(() => null)
     if (id) auftraege++
   }

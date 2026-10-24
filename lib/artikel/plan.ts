@@ -96,7 +96,9 @@ const ref = (t: PlanThema) => `plan:${t.code}`
  * ist kein Redaktionsbetrieb.
  */
 export async function schreibeNaechstenPlanArtikel(): Promise<{ slug: string | null; ergebnis: string }> {
-  if ((await ladeArtikelListe("entwurf")).length) return { slug: null, ergebnis: "Ein Entwurf wartet schon auf Freigabe" }
+  /* 24.10.2026: Nur eigene Themen sperren (Plan, Google, LinkedIn) – Bulletin-Entwürfe sperrten seit August jeden Plan-Artikel. */
+  const eigene = (await ladeArtikelListe("entwurf")).filter((a) => /^(plan|gsc|li):/.test(a.bulletinRef ?? ""))
+  if (eigene.length >= 2) return { slug: null, ergebnis: `${eigene.length} Entwürfe warten auf Freigabe im Assistenten` }
   /* Was Google uns schon zeigt, aber knapp unter den ersten Plätzen: daran schreibt der Artikel mit. */
   const chancen = await seoChancen().catch(() => [])
   /* Auch verworfene Themen gelten als erledigt — was Emin ablehnt, kommt nicht wieder. */

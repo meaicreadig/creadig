@@ -29,6 +29,7 @@ Regeln:
 - Du handelst nie selbst. Alles, was nach außen geht (Mail, LinkedIn-Beitrag, Termin, Bewerbung), legst du mit "vorschlag_anlegen" in den Freigabe-Eingang. Er gibt frei.
 - Interne Arbeit (art "aufgabe" oder "notiz") erledigen Geschäftsleitung und Abteilungen selbst; er sieht sie unter "Heute intern erledigt". Nur was einen Kunden, Geld oder die Außenwirkung berührt, legt die Koordination ihm mit fertiger Vorlage vor – das muss er freigeben. Produkt- und Firmenfreigaben sind Verwaltung, keine Aufgabe für ihn.
 - Sagt er, Karten sollen weg oder seien erledigt, schließe sie sofort mit "karten_schliessen" (vorher "freigabe_eingang" für die IDs) und sag, wie viele es waren. Sag nie, das System lasse das nicht zu.
+- Sagt er, auf der Website stehe etwas Falsches oder etwas fehle, lege es sofort mit "website_korrigieren" an (seine Angaben wörtlich).
 - Nennt er einen Subunternehmer/Freelancer für Projekte, lege ihn mit "subunternehmer_anlegen" an.
 - Nennt er Bestandskunden (auch als Liste), lege jeden sofort mit "bestandskunde_anlegen" an und bestätige die Zahl.
 - Absprachen zu Kunden/Chancen (Termin, nächster Schritt, Ort, Verband, wer entscheidet) speicherst du SOFORT mit "absprache_speichern". Bestätige danach kurz, was gespeichert ist. Er soll nichts zweimal sagen müssen.
@@ -128,6 +129,27 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<s
         betreff: z.string().max(200).optional().describe("Nur bei Mail"),
       }),
       execute: async (v) => ({ id: await legeFreigabeAn(v), angelegt: true }),
+    }),
+    website_korrigieren: tool({
+      description:
+        "Emin meldet, dass auf creadig.de etwas falsch, veraltet oder nicht vorhanden ist (falscher Name, eigenes Projekt als Kunde, fehlendes Produkt, fehlende Seite). Legt einen fertigen Code-Auftrag an; daraus baut die Kod-Hattı einen Pull Request, den Emin nur noch merged. Firmenfakten gehören in lib/firmenwahrheit.ts UND auf die betroffenen Seiten.",
+      inputSchema: z.object({
+        titel: z.string().min(5).max(120).describe("Kurz, z. B. 'meaqam ist Eigenbetrieb, kein Kundenwerk'"),
+        richtig: z.string().min(10).max(2000).describe("Was stimmt – Emins Angaben wörtlich und vollständig, nichts dazuerfinden"),
+        wo: z.string().max(400).optional().describe("Seiten oder Bereiche, falls genannt, z. B. /arbeiten, /produkte"),
+      }),
+      execute: async (v) => {
+        const id = await legeFreigabeAn({
+          art: "aufgabe",
+          titel: `Website korrigieren: ${v.titel}`,
+          inhalt: `Angabe des Inhabers (Chat, ${new Date().toLocaleDateString("de-DE", { timeZone: "Europe/Berlin" })}):\n${v.richtig}${v.wo ? `\nBetroffen: ${v.wo}` : ""}\n\n— Auftrag für Claude Code —\nKorrigiere creadig.de nach der Angabe des Inhabers oben. Zuerst lib/firmenwahrheit.ts (einzige Firmenquelle) anpassen, dann jede Seite und alle Sprachen (de/tr/en/ar), die davon betroffen sind (lib/site-data.ts, lib/dictionary.ts). Keine Angaben erfinden, die oben nicht stehen; fehlt etwas, im PR nennen.`,
+          quelle: `website-korrektur:${Date.now()}`,
+          agent: "webseite",
+          extra: { code: true, warum: "Korrektur des Inhabers – wird zum Pull Request." },
+        })
+        if (id) await setzeFreigabe(id, "freigegeben")
+        return id ? { angelegt: true, hinweis: "Liegt im Code-Backlog; mit GITHUB_TOKEN wird daraus automatisch ein PR." } : { angelegt: false }
+      },
     }),
     subunternehmer_anlegen: tool({
       description:

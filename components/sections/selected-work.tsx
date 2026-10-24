@@ -169,7 +169,7 @@ export function SelectedWork() {
                   }`}
                 >
                   <p className="eyebrow text-muted-foreground">
-                    {work.kind === "Produkt" ? t.portfolio.kindProduct : t.portfolio.kindClientWork} ·{" "}
+                    {work.kind === "Produkt" ? t.portfolio.kindProduct : work.eigen ? t.portfolio.kindOwn : t.portfolio.kindClientWork} ·{" "}
                     {work.sector[locale]}
                   </p>
                   <h3 className="type-h3 mt-5">{work.name}</h3>

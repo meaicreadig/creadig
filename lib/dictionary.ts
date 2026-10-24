@@ -66,7 +66,7 @@ const rawDictionary = {
       ogDescription:
         "System-Haus für digitale Betriebe aus Osnabrück, seit 2017. Ein eigenes System für Unternehmen jeder Branche – gebaut und betrieben von uns, Code und Daten bei Ihnen.",
       organizationDescription:
-        "System-Haus für digitale Betriebe: creaDIG baut Unternehmen ein durchgehendes digitales System vom ersten Kontakt bis zum laufenden Betrieb und betreibt es. Code und Daten gehören dem Kunden. Eigene Systeme: fibero, meAI, CASSAMEA, meahv.",
+        "System-Haus für digitale Betriebe: creaDIG baut Unternehmen ein durchgehendes digitales System vom ersten Kontakt bis zum laufenden Betrieb und betreibt es. Code und Daten gehören dem Kunden. Eigene Systeme: fibero, stammo, meAI, CASSAMEA, meahv.",
       /** Erster Eintrag jeder Brotkrume in den strukturierten Daten. */
       breadcrumbHome: "Startseite",
       /* T-1 — Alt-Text des Vorschaubildes. Er stand nur in
@@ -1218,6 +1218,7 @@ const rawDictionary = {
        */
       kindProduct: "Produkt",
       kindClientWork: "Kundenwerk",
+      kindOwn: "Eigenbetrieb",
       more: "Außerdem unter dem Dach",
       viewLive: "Live ansehen",
       // Nur Produktkarten ohne echtes Foto — Kunden-/Produktfotos tragen eigene Notes.
@@ -3040,7 +3041,7 @@ const rawDictionary = {
       phoneLabel: "Telefon",
       phonePending: "Deutsche Rufnummer folgt.",
       pending: "Noch zu bestätigen",
-      pendingNote: "Zwei Angaben stehen noch aus und sind oben als Platzhalter gekennzeichnet: der Umsatzsteuer-Status (Identifikationsnummer nach § 27 a UStG oder Hinweis auf die Kleinunternehmerregelung nach § 19 UStG) und die deutsche Rufnummer. Beide ergänzen wir, sobald der Inhaber sie freigegeben hat. Anbieter, Anschrift, Rechtsform, Verantwortlicher nach § 18 Abs. 2 MStV und die Kontaktwege oben gelten bereits verbindlich.",
+      pendingNote: "Eine Angabe steht noch aus und ist oben gekennzeichnet: die Umsatzsteuer-Identifikationsnummer nach § 27 a UStG. Wir ergänzen sie, sobald sie vorliegt. Anbieter, Anschrift, Rechtsform, Verantwortlicher nach § 18 Abs. 2 MStV und die Kontaktwege oben gelten bereits verbindlich.",
       responsible: "Verantwortlich für den Inhalt",
       contactLabel: "Kontakt",
       privacyIntro: "Diese Seite ist bewusst schlank gebaut: kein Tracking über Websites hinweg, keine Werbe-Cookies, keine Profilbildung. Was wir einsetzen, steht unten mit Namen — und die Reichweitenmessung lädt erst, wenn Sie sie erlaubt haben.",
@@ -3216,7 +3217,7 @@ const rawDictionary = {
       ogDescription:
         "Osnabrück'ten dijital işletmeler için sistem evi, 2017'den beri. Tesisat, elektrik ve servis işletmelerine kendi sistemleri — biz kurar ve işletiriz, kod ve veriler sizde kalır.",
       organizationDescription:
-        "Dijital işletmeler için sistem evi: creaDIG, şirketlere ilk temastan işleyen operasyona kadar uçtan uca bir dijital sistem kurar ve işletir. Kod ve veriler müşteriye aittir. Kendi sistemlerimiz: fibero, meAI, CASSAMEA, meahv.",
+        "Dijital işletmeler için sistem evi: creaDIG, şirketlere ilk temastan işleyen operasyona kadar uçtan uca bir dijital sistem kurar ve işletir. Kod ve veriler müşteriye aittir. Kendi sistemlerimiz: fibero, stammo, meAI, CASSAMEA, meahv.",
       breadcrumbHome: "Ana sayfa",
       ogImageAlt: "creaDIG — Şirketler için dijital sistemler",
     },
@@ -3793,6 +3794,7 @@ const rawDictionary = {
       clientWorkNote: "İş verenler için hizmet — kendi ürünümüz değil.",
       kindProduct: "Ürün",
       kindClientWork: "Müşteri işi",
+      kindOwn: "Kendi işletmemiz",
       more: "Çatı altında ayrıca",
       viewLive: "Canlı gör",
       mockupNote: "Ürün kartları: açıklayıcı maketler, ekran görüntüsü değil.",
@@ -4883,7 +4885,7 @@ const rawDictionary = {
       phoneLabel: "Telefon",
       phonePending: "Almanya telefon numarası eklenecek.",
       pending: "Onay bekleyen bilgiler",
-      pendingNote: "İki bilgi henüz eksik ve yukarıda yer tutucu olarak işaretlendi: KDV durumu (§ 27 a UStG uyarınca vergi kimlik numarası ya da § 19 UStG küçük işletme düzenlemesine ilişkin not) ve Almanya telefon numarası. İkisini de şirket sahibi onayladığı anda ekleyeceğiz. Yukarıdaki sağlayıcı, adres, şirket türü, § 18/2 MStV uyarınca sorumlu ve iletişim yolları şimdiden bağlayıcıdır.",
+      pendingNote: "Bir bilgi henüz eksik ve yukarıda işaretlendi: § 27 a UStG uyarınca KDV kimlik numarası. Elimize ulaşır ulaşmaz ekleyeceğiz. Yukarıdaki sağlayıcı, adres, şirket türü, § 18/2 MStV uyarınca sorumlu ve iletişim yolları şimdiden bağlayıcıdır.",
       responsible: "İçerikten sorumlu",
       contactLabel: "İletişim",
       privacyIntro: "Bu sayfa bilinçli olarak sade kuruldu: siteler arası izleme yok, reklam çerezi yok, profil oluşturma yok. Kullandıklarımız aşağıda adıyla yazılı — ve erişim ölçümü ancak siz izin verdikten sonra yüklenir.",
@@ -5029,7 +5031,7 @@ const rawDictionary = {
       ogDescription:
         "A systems house for digital operations from Osnabrück, since 2017. One system for companies in any industry – built and run by us, code and data stay with you.",
       organizationDescription:
-        "Systems house for digital operations: creaDIG builds companies one end-to-end digital system from first contact to running operations and runs it. Code and data belong to the client. Own systems: fibero, meAI, CASSAMEA, meahv.",
+        "Systems house for digital operations: creaDIG builds companies one end-to-end digital system from first contact to running operations and runs it. Code and data belong to the client. Own systems: fibero, stammo, meAI, CASSAMEA, meahv.",
       breadcrumbHome: "Home",
       ogImageAlt: "creaDIG — digital systems for companies",
     },
@@ -5599,6 +5601,7 @@ const rawDictionary = {
       clientWorkNote: "A service for clients — not a product of ours.",
       kindProduct: "Product",
       kindClientWork: "Client work",
+      kindOwn: "Own venture",
       more: "Also under this roof",
       viewLive: "View live",
       mockupNote: "Product cards: illustrative mock-ups, not screenshots.",
@@ -6677,7 +6680,7 @@ const rawDictionary = {
       phoneLabel: "Phone",
       phonePending: "A German phone number follows.",
       pending: "Still to be confirmed",
-      pendingNote: "Two details are still outstanding and are marked as placeholders above: the VAT status (identification number under § 27a UStG or a reference to the small business rule under § 19 UStG) and the German phone number. We will add both as soon as the owner has released them. Provider, address, legal form, the person responsible under § 18(2) MStV and the contact routes above already apply bindingly.",
+      pendingNote: "One detail is still outstanding and marked above: the VAT identification number under § 27a UStG. We will add it as soon as it is available. Provider, address, legal form, the person responsible under § 18(2) MStV and the contact routes above already apply bindingly.",
       responsible: "Responsible for the content",
       contactLabel: "Contact",
       privacyIntro: "This site is deliberately built lean: no cross-site tracking, no advertising cookies, no profiling. What we do use is named below — and the analytics only load once you have allowed them.",
@@ -6821,7 +6824,7 @@ const rawDictionary = {
       ogDescription:
         "بيت أنظمة للمنشآت الرقمية من أوسنابروك منذ 2017. نظام خاص لمنشآت التمديدات الصحية والكهرباء والخدمات — نبنيه ونشغّله، والشيفرة والبيانات تبقى لديكم.",
       organizationDescription:
-        "بيت أنظمة للمنشآت الرقمية: تبني creaDIG للشركات الفنية نظامًا رقميًا متكاملًا من الطلب حتى الفاتورة وتشغّله. الشيفرة والبيانات ملك للعميل. أنظمتنا الخاصة: fibero وmeAI وCASSAMEA وmeahv.",
+        "بيت أنظمة للمنشآت الرقمية: تبني creaDIG للشركات الفنية نظامًا رقميًا متكاملًا من الطلب حتى الفاتورة وتشغّله. الشيفرة والبيانات ملك للعميل. أنظمتنا الخاصة: fibero وstammo وmeAI وCASSAMEA وmeahv.",
       breadcrumbHome: "الصفحة الرئيسية",
       ogImageAlt: "creaDIG — أنظمة رقمية للشركات",
     },
@@ -7391,6 +7394,7 @@ const rawDictionary = {
       clientWorkNote: "خدمة لعملاء — لا منتجًا لنا.",
       kindProduct: "منتج",
       kindClientWork: "عمل لعميل",
+      kindOwn: "مشروعنا الخاص",
       more: "كذلك تحت هذه المظلة",
       viewLive: "عرض حيّ",
       mockupNote: "بطاقات المنتجات: نماذج توضيحية، لا لقطات شاشة.",
@@ -8469,7 +8473,7 @@ const rawDictionary = {
       phoneLabel: "الهاتف",
       phonePending: "رقم هاتف ألماني يتبع.",
       pending: "بانتظار التأكيد",
-      pendingNote: "بيانان ما يزالان معلّقَين ومُعلَّمان أعلاه كعناصر نائبة: حالة ضريبة القيمة المضافة (رقم التعريف وفق المادة 27أ أو الإشارة إلى قاعدة المنشآت الصغيرة وفق المادة 19) ورقم الهاتف الألماني. سنضيفهما حالما يعتمدهما المالك. أما مقدّم الخدمة والعنوان والشكل القانوني والمسؤول وفق المادة 18(2) MStV ووسائل التواصل أعلاه فسارية بالفعل.",
+      pendingNote: "بيان واحد ما يزال معلّقًا ومُعلَّمًا أعلاه: رقم التعريف الضريبي وفق المادة 27أ UStG. سنضيفه حالما يتوفّر. أما مقدّم الخدمة والعنوان والشكل القانوني والمسؤول وفق المادة 18(2) MStV ووسائل التواصل أعلاه فسارية بالفعل.",
       responsible: "المسؤول عن المحتوى",
       contactLabel: "التواصل",
       privacyIntro: "هذا الموقع مبنيّ خفيفًا عن قصد: لا تتبّع عبر المواقع، ولا ملفات تعريف ارتباط إعلانية، ولا تكوين ملفات شخصية. وما نستعمله مذكور أدناه بالاسم — وقياس الوصول لا يُحمَّل إلا بعد إذنكم.",

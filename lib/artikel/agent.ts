@@ -68,6 +68,8 @@ type Anlass = {
   keyword?: string
   /** Suchanfragen aus der Search Console, für die creadig.de schon erscheint. */
   suchanfragen?: string[]
+  /** Anlass war selbst ein LinkedIn-Beitrag – kein zweiter Begleitpost. */
+  ohneLinkedin?: boolean
 }
 
 /**
@@ -136,7 +138,7 @@ Antworte NUR mit JSON:
     teaser,
     metaTitel: zwei(j.metaTitel) ?? titel,
     body,
-    linkedin: typeof j.linkedin === "string" ? j.linkedin.trim() : "",
+    linkedin: !a.ohneLinkedin && typeof j.linkedin === "string" ? j.linkedin.trim() : "",
     keyword: typeof j.keyword === "string" && j.keyword.trim() ? j.keyword.trim() : (a.keyword ?? null),
     metaBeschreibung: zwei(j.metaBeschreibung),
     quelleName: a.quelleName,
@@ -145,7 +147,9 @@ Antworte NUR mit JSON:
   })
   const art = await ladeArtikel(slug)
   if (art) await ergaenzeBild(art).catch((e) => console.error("[artikel] bild", e instanceof Error ? e.message : e))
-  return { slug, ergebnis: `Artikel-Entwurf „${titel.de}“ bereit` }
+  /* 24.10.2026: Entwurf wird Karte im Assistenten – sonst liegt er ungesehen unter /admin/redaktion. */
+  await (await import("./karte")).legeArtikelKarte(slug).catch((e) => console.error("[artikel] karte", e instanceof Error ? e.message : e))
+  return { slug, ergebnis: `Artikel-Entwurf „${titel.de}“ als Karte im Assistenten vorgelegt` }
 }
 
 /**

@@ -41,7 +41,7 @@ export function ArbeitPageBody({
           <div className="pt-7 sm:pr-8">
             <p className="eyebrow text-gold-text">{copy.kindLabel}</p>
             <p className="type-body text-foreground/85 mt-3">
-              {work.kind === "Produkt" ? t.portfolio.kindProduct : t.portfolio.kindClientWork}
+              {work.kind === "Produkt" ? t.portfolio.kindProduct : work.eigen ? t.portfolio.kindOwn : t.portfolio.kindClientWork}
             </p>
           </div>
           <div className="border-line pt-7 sm:border-l sm:pl-8">

@@ -13,6 +13,6 @@
 export const CLIENT_LOGOS: Readonly<Record<string, string>> = {
   "allrein-ofra": "/brand/clients/allrein-ofra.svg",
   "bir-damla-hayir": "/brand/clients/bir-damla-hayir.png",
-  "maqam": "/brand/clients/maqam.png",
+  "meaqam": "/brand/clients/meaqam.png",
   "nv-swiss": "/brand/clients/nv-swiss.png",
 }

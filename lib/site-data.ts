@@ -3,7 +3,7 @@ import type { Locale } from "@/lib/dictionary"
 //
 // CEO-Entscheidung (gesperrt):
 //   Eigene Produkte = meAI · fibero · CASSAMEA · meahv  — mehr nicht.
-//   Echte Kunden = NV SWISS · maqam · Bir Damla Hayır (Owner 29.08.2026).
+//   Echte Kunden = NV SWISS · Bir Damla Hayır (Owner 29.08.2026); meaqam ist Eigenbetrieb (24.10.2026).
 //   NÛR ist ein EIGENES Produkt, kein Kundenwerk.
 //   Rumi's Maison ist nicht bestaetigt und erscheint nirgends.
 //   PLANEX gehört nicht zu creaDIG und kommt nirgends vor.
@@ -159,6 +159,11 @@ export type Work = {
   built: Localized | null
   outcome: Localized
   kind: "Produkt" | "Kundenwerk"
+  /**
+   * Eigenbetrieb des Inhabers (z. B. meaqam): wie ein Kundenwerk gezeigt,
+   * aber nie als „Kundenwerk“ beschriftet — es gibt keinen Kunden.
+   */
+  eigen?: boolean
   /** `null`, solange der Owner die Region nicht bestaetigt hat. */
   region: Region | null
   /**
@@ -767,39 +772,58 @@ export const clientWorks: Work[] = [
       ar: "وسيط مالي — علامة وموقع ومسار المواعيد.",
     },
   },
+  /*
+   * Inhaber 24.10.2026: „maqam“ war falsch — meaqam (meaqam.com) ist KEIN
+   * Kundenauftrag, sondern Emins eigener Online-Shop (Kleidung), gebaut und
+   * betrieben von creaDIG. Kein Verkaufsprodukt, sondern der Beweis, dass das
+   * Haus E-Commerce nicht nur baut, sondern selbst führt. Als Kundenwerk mit
+   * Kundenfreigabe geführt zu werden, wäre eine falsche Angabe gewesen.
+   */
   {
-    slug: "maqam",
-    sector: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret", en: "Online business · e-commerce", ar: "أعمال إلكترونية · تجارة إلكترونية" },
+    slug: "meaqam",
+    sector: { de: "E-Commerce · Mode", tr: "E-ticaret · moda", en: "E-commerce · fashion", ar: "تجارة إلكترونية · أزياء" },
     year: null,
-    name: "maqam",
-    // Sichtschuld G14: „MAQAM-Q-Farbe originalgetreu". Das Q traegt die Marke;
-    // als weisse Silhouette ist es ein anderes Zeichen. Es bleibt farbig —
-    // `auftritt-drill` misst nach, dass es auf dem dunklen Grund trotzdem steht.
+    name: "meaqam",
+    eigen: true,
+    // Sichtschuld G14: Das Q traegt die Marke; es bleibt farbig.
     dunkel: "original",
-    what: { de: "Online-Business / E-Commerce.", tr: "Online iş / e-ticaret.", en: "Online business / e-commerce.", ar: "أعمال إلكترونية / تجارة إلكترونية." },
-    // Umfang, Region, Link — Owner 29.08.2026: Logo + Kundenbild geliefert.
-    // Leistungen (Case-Card) fehlen noch — nichts erfinden.
-    built: null,
-    outcome: { de: "Kundenwerk", tr: "Müşteri işi", en: "Client work", ar: "عمل لعميل" },
+    what: {
+      de: "Eigener Online-Shop für Kleidung — von uns gebaut und selbst betrieben.",
+      tr: "Kendi giyim online mağazamız — kendimiz kurduk, kendimiz işletiyoruz.",
+      en: "Our own online clothing shop — built and run by us.",
+      ar: "متجرنا الإلكتروني الخاص للملابس — بنيناه ونديره بأنفسنا.",
+    },
+    built: {
+      de: "Shop, Produktdaten, Versand, Rückgabe, Rechtstexte.",
+      tr: "Mağaza, ürün verileri, kargo, iade, yasal metinler.",
+      en: "Shop, product data, shipping, returns, legal pages.",
+      ar: "المتجر، بيانات المنتجات، الشحن، الإرجاع، النصوص القانونية.",
+    },
+    outcome: { de: "Eigenbetrieb · live", tr: "Kendi işletmemiz · canlı", en: "Own venture · live", ar: "مشروعنا الخاص · حيّ" },
     kind: "Kundenwerk",
-    region: null,
-    // Owner 29.08.2026: Kundenbild (Boutique-Laptop, echte maqam-Oberfläche).
-    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
+    region: "DE",
     image: null,
     imageProof: null,
     mark: "mq",
-    discipline: "marke-web",
-    // Logo: public/brand/clients/maqam.png (schwarz entfernt → transparent)
+    discipline: "system",
+    href: "https://meaqam.com",
+    live: true,
+    // Logo: public/brand/clients/meaqam.png (von meaqam.com, 24.10.2026)
     releases: [
       {
-        by: { name: "Ansprechperson des Kunden (dem Owner persönlich bekannt)", role: "Geschäftsführung", company: "maqam" },
+        by: { name: "Muhammed Emin Akyol", role: "Inhaber", company: "meaqam" },
         form: "schriftliche-nachricht",
-        at: "2026-10-22",
+        at: "2026-10-24",
         scopes: ["name", "logo", "fallstudie"],
-        reference: "Kundenfreigabe liegt dem Owner vor, schriftlich bestätigt im Chat am 22.10.2026",
+        reference: "Eigenes Unternehmen des Inhabers; Angabe im Chat am 24.10.2026",
       },
     ],
-    approvedSentence: { de: "Online-Business / E-Commerce.", tr: "Online iş / e-ticaret.", en: "Online business / e-commerce.", ar: "أعمال إلكترونية / تجارة إلكترونية." },
+    approvedSentence: {
+      de: "Eigener Shop — gebaut und betrieben von creaDIG.",
+      tr: "Kendi mağazamız — creaDIG tarafından kuruldu ve işletiliyor.",
+      en: "Our own shop — built and run by creaDIG.",
+      ar: "متجرنا الخاص — بنته وتديره creaDIG.",
+    },
   },
   {
     slug: "bir-damla-hayir",
@@ -1475,21 +1499,25 @@ export const caseStudies: CaseStudy[] = [
     releases: freigabenVon("NV SWISS"),
   },
   {
-    slug: "maqam",
-    client: "maqam",
-    context: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret", en: "Online business · e-commerce", ar: "أعمال إلكترونية · تجارة إلكترونية" },
+    slug: "meaqam",
+    client: "meaqam",
+    context: { de: "E-Commerce · Mode · Eigenbetrieb", tr: "E-ticaret · moda · kendi işletmemiz", en: "E-commerce · fashion · own venture", ar: "تجارة إلكترونية · أزياء · مشروعنا الخاص" },
     card: {
-      project: "maqam",
-      category: { de: "Online-Business · E-Commerce", tr: "Online iş · e-ticaret", en: "Online business · e-commerce", ar: "أعمال إلكترونية · تجارة إلكترونية" },
-      services: null,
+      project: "meaqam",
+      category: { de: "E-Commerce · Mode · Eigenbetrieb", tr: "E-ticaret · moda · kendi işletmemiz", en: "E-commerce · fashion · own venture", ar: "تجارة إلكترونية · أزياء · مشروعنا الخاص" },
+      services: {
+        de: "Shop, Produktdaten, Versand, Rückgabe, Rechtstexte.",
+        tr: "Mağaza, ürün verileri, kargo, iade, yasal metinler.",
+        en: "Shop, product data, shipping, returns, legal pages.",
+        ar: "المتجر، بيانات المنتجات، الشحن، الإرجاع، النصوص القانونية.",
+      },
     },
     chapters: { ...emptyChapters },
     metrics: [],
     voice: null,
-    /* W4 — generierte Szene, kein Beleg (lib/media-provenance.ts). */
     image: null,
     mark: "mq",
-    releases: freigabenVon("maqam"),
+    releases: freigabenVon("meaqam"),
   },
   {
     slug: "bir-damla-hayir",
@@ -2410,7 +2438,8 @@ export const imprintDetails = {
    * Nummer. Es wird KEIN `tel:`-Link daraus — ein Anruf-Link, der ins Leere
    * fuehrt, waere schlimmer als keiner.
    */
-  phonePending: true,
+  /* 24.10.2026: Keine deutsche Nummer nötig – § 5 DDG verlangt einen schnellen Kontaktweg, E-Mail + Telefon (CH) stehen. Der „folgt“-Platzhalter ist weg. */
+  phonePending: false,
 } as const
 
 /**

@@ -26,7 +26,7 @@ export type SollRegel = {
 /** Was auf keiner öffentlichen Seite stehen darf. */
 export const VERBOTEN: SollRegel[] = [
   { code: "zeichen", titel: "Kaputte Zeichen im Text", detail: "Ein Ersatzzeichen (U+FFFD) steht im sichtbaren Text — ein Buchstabe ist beim Speichern verloren gegangen.", muster: /\uFFFD/, schwere: "wichtig", an: "entwicklung" },
-  { code: "platzhalter", titel: "Platzhalter öffentlich sichtbar", detail: "Ein Platzhalter oder „folgt“-Vermerk steht auf der Live-Seite.", muster: /(Platzhalter|Placeholder|Yer tutucu)\s*[—–-]|noch nicht freigegeben|not yet released|lorem ipsum|\bTODO\b/i, schwere: "kritisch", an: "entwicklung" },
+  { code: "platzhalter", titel: "Platzhalter öffentlich sichtbar", detail: "Ein Platzhalter oder „folgt“-Vermerk steht auf der Live-Seite.", muster: /(Platzhalter|Placeholder|Yer tutucu)\s*[—–-]|noch nicht freigegeben|not yet released|lorem ipsum|\bTODO\b/i, schwere: "kritisch", an: "recht" },
   { code: "inhaber-offen", titel: "Offene Inhaber-Bestätigung öffentlich sichtbar", detail: "Ein Vermerk wie „Bestätigung durch den Inhaber offen“ steht im Live-Text.", muster: /Bestätigung durch den Inhaber offen|Inhaber-Bestätigung offen/i, schwere: "kritisch", an: "recht" },
   { code: "zertifikat", titel: "Nicht belegte Zertifizierung genannt", detail: "BAFA, go-digital, iuk, AVPQ und AGD sind nicht nachgewiesen und dürfen weder als Status noch als Angebot auftauchen.", muster: /\b(BAFA|AVPQ|AGD)\b|go-digital|zertifizierte?r? (Partner|Berater)|autorisierte?s? Beratungsunternehmen/i, schwere: "kritisch", an: "recht" },
 ]

@@ -103,10 +103,12 @@ async function run() {
    * jetzt das Gegenteil: Die Seite ist erreichbar und leitet NICHT mehr um —
    * eine vergessene Regel wuerde sonst eine freigegebene Referenz verstecken.
    */
-  for (const slug of ["nv-swiss", "maqam", "bir-damla-hayir"]) {
+  for (const slug of ["nv-swiss", "meaqam", "bir-damla-hayir"]) {
     await expectStatus(`/arbeiten/${slug}`, 200)
   }
-  await expectStatus("/tr/arbeiten/maqam", 200)
+  await expectStatus("/tr/arbeiten/meaqam", 200)
+  /* 24.10.2026: alte Adresse maqam → meaqam (Eigenbetrieb, nicht Kunde). */
+  await expectStatus("/arbeiten/maqam", 308)
 
   // Vorschaubild (T-1).
   const og = await expectStatus("/og/de.png", 200)

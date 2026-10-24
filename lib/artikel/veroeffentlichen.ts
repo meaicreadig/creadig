@@ -37,7 +37,9 @@ export async function veroeffentlicheArtikel(slug: string): Promise<{ ok: boolea
     })
     .catch(() => null)
 
-  if (art.linkedin) {
+  if (art.bulletinRef?.startsWith("li:")) {
+    /* Aus einem LinkedIn-Beitrag entstanden – der Beitrag ist schon draußen, kein zweiter. */
+  } else if (art.linkedin) {
     await legeFreigabeAn({
       art: "linkedin",
       titel: art.titel.de,

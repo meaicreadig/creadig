@@ -96,6 +96,8 @@ export type Freigabe = {
 export type FreigabeExtra = {
   /** Katman 4: Karte „Angebot senden“ – Freigabe schreibt dieses Finanz-Dokument fest und versendet es. */
   dokumentId?: string
+  /** Karte „Artikel veröffentlichen“ (lib/artikel/karte.ts): Freigeben = auf creadig.de veröffentlichen. */
+  artikelSlug?: string
   /** Katman 3: Vorschläge des Ergebnis-Controllers – Agenten pausieren (Emin wählt, was gilt). */
   steuerung?: { agent: string; name: string; grund: string; uebernimmt: string | null }[]
   /** Warum Emin verworfen hat (freiwillig, components/admin/grund-wahl.tsx) — Lernstoff für die Qualitätssicherung. */

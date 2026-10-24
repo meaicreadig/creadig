@@ -42,7 +42,7 @@ export const mediaProvenance: MediaProvenance[] = [
   { src: "/works/cassamea.jpg", origin: "illustration", herkunft: SZENE, alt: null, replaceWith: "product-screen" },
   { src: "/works/meahv.jpg", origin: "illustration", herkunft: SZENE, alt: null, replaceWith: "product-screen" },
   { src: "/works/nv-swiss.jpg", origin: "illustration", herkunft: `${SZENE} Die Person ist nicht der Kunde.`, alt: null, replaceWith: "customer-site" },
-  { src: "/works/maqam.jpg", origin: "illustration", herkunft: SZENE, alt: null, replaceWith: "customer-site" },
+  { src: "/works/maqam.jpg", origin: "illustration", herkunft: SZENE, alt: null, replaceWith: "customer-site" }, // meaqam (Eigenbetrieb), Bild ungenutzt
   { src: "/works/bir-damla-hayir.jpg", origin: "illustration", herkunft: SZENE, alt: null, replaceWith: "customer-site" },
   { src: "/works/rumis-maison.png", origin: "illustration", herkunft: "Nicht bestätigtes Projekt; erscheint nirgends.", alt: null, replaceWith: null },
   { src: "/works/fibero.png", origin: "real-ui", herkunft: "Echter Screenshot der laufenden fibero-App (Anmeldung), unverändert.", alt: null, replaceWith: null },

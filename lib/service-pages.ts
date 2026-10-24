@@ -305,7 +305,7 @@ export const servicePages: ServicePage[] = [
     packageKeys: ["website"],
     // Echtes Kundenwerk auf der Webdesign-Seite: NV SWISS ist Marke, Website
     // und Digitalisierung aus einer Hand — genau das, was diese Seite anbietet.
-    workSlugs: ["nv-swiss", "maqam"],
+    workSlugs: ["nv-swiss", "meaqam"],
     published: true,
   },
   {
