@@ -16,6 +16,7 @@ import { assistentDb, ergaenzeExtra, FREIGABE_ARTEN, ladeFreigabe, ladeFreigaben
 import { firmenText } from "@/lib/firmenwahrheit"
 import { legeLektionAn, notiereEntscheidung } from "@/lib/lernen/store"
 import { findeOderLegeFirma, findeOderLegeKontakt } from "@/lib/kundenfaden"
+import type { Uebernahme } from "@/lib/zentrale/personen"
 
 const MODELL = "openai/gpt-5.4-mini"
 const BILD_MODELL = "anthropic/claude-sonnet-4.6"
@@ -36,7 +37,9 @@ Regeln:
 - Absprachen zu Kunden/Chancen (Termin, nächster Schritt, Ort, Verband, wer entscheidet) speicherst du SOFORT mit "absprache_speichern". Bestätige danach kurz, was gespeichert ist. Er soll nichts zweimal sagen müssen.
 - Erzählt er von einem NEUEN Interessenten (Gespräch am Stand, Anruf, WhatsApp, Empfehlung) oder findet "absprache_speichern" keine passende Chance: SOFORT "chance_anlegen" aufrufen – in derselben Antwort, ohne Rückfrage. Fehlende Angaben (Telefon, Mail) leer lassen, nicht erfragen.
 - Kündige NIE eine Handlung an ("ich lege an", "ich trage ein", "ich gebe weiter"), die du nicht im selben Zug mit einem Werkzeug ausgeführt hast. Entweder du hast es getan, oder du sagst ehrlich, was fehlt.
-- Nach jedem Anlegen sagst du ihm in drei Zeilen: was angelegt ist, WER es jetzt übernimmt (Abteilung aus dem Werkzeug-Ergebnis) und den nächsten Schritt mit Datum. Kein Angebot vor dem Gespräch.
+- Du bist Aylin (Chief of Staff, KI). Unter deiner Antwort zeigt der Chat automatisch Kästen, welche KI-Kollegen übernommen haben (Leyla/Vertrieb, Jonas/Recherche, Selin/Gesprächsraum, Deniz/Angebote, Paul/Finanzen, Mara/Website, Nora/Recht, Lena/Redaktion, Kaan/Ideen). Die Kästen entstehen NUR aus ausgeführten Werkzeugen – also handle immer per Werkzeug, statt nur zu reden.
+- Nach jedem Anlegen sagst du ihm kurz: was angelegt ist, wer übernimmt und den nächsten Schritt mit Datum. Bei einer neuen Chance recherchiert Jonas die Firma (Adresse, Website) im Hintergrund und Selin legt das Gespräch im Gesprächsraum ab – Emin muss dafür nichts tun. Kein Angebot vor dem Gespräch.
+- Erzählt Emin von einem Gespräch mit einer Firma, die es schon gibt: absprache_speichern; mit einer neuen Firma: chance_anlegen. Nie fragen „soll ich eintragen?“ – eintragen.
 - LinkedIn: Artikel-Charakter, echter Mehrwert aus der Praxis, Produkt nur beiläufig. Keine Werbesprache.
 - Wenn er laut denkt ("ich gehe zur Messe X", "Kunde Y hat geschrieben"), zerlege es in konkrete nächste Schritte und lege die wichtigsten als Vorschläge an.
 - Schlage nichts vor, was er sich nicht leisten kann (Messestand, bezahlte Werbung, Personal), solange "finanzrahmen" das nicht hergibt. Biete stattdessen die kostenlose Variante an.
@@ -45,7 +48,62 @@ Regeln:
 
 export type ChatBild = { base64: string; mediaType: string }
 
-export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<string> {
+/**
+ * Wer hat aus dieser Antwort was übernommen? (24.10.2026)
+ *
+ * Abgeleitet aus den TATSÄCHLICH ausgeführten Werkzeugen – nie aus dem Text.
+ * Kündigt das Modell etwas an, ohne ein Werkzeug aufzurufen, erscheint auch
+ * keine Übernahme: Der Chat zeigt nur, was wirklich passiert ist.
+ */
+function uebernahmenAus(ergebnisse: { toolName: string; input: unknown; output: unknown }[]): Uebernahme[] {
+  const liste: Uebernahme[] = []
+  for (const r of ergebnisse) {
+    const ein = (r.input ?? {}) as Record<string, string | undefined>
+    const aus = (r.output ?? {}) as Record<string, unknown>
+    const ok = aus.angelegt === true || aus.gespeichert === true || Boolean(aus.id) || aus.gemerkt === true || Boolean(aus.gesperrt) || aus.ok === true
+    if (!ok && r.toolName !== "karten_schliessen") continue
+    switch (r.toolName) {
+      case "chance_anlegen":
+        liste.push(
+          { agent: "vertrieb", was: `${String(aus.chance ?? "Chance")} · ${String(aus.naechsterSchritt ?? "")}`, stand: "laeuft", bis: aus.bis ? `bis ${new Date(String(aus.bis)).toLocaleDateString("de-DE")}` : undefined },
+          { agent: "recherche", was: `Recherchiert ${String(aus.firma)}: Adresse, Website, Branche – trägt es in die Firma ein`, stand: "laeuft", bis: "ca. 5 Min." },
+          { agent: "gespraech", was: "Legt das Gespräch im Gesprächsraum ab", stand: "laeuft", bis: "ca. 5 Min." },
+          { agent: "angebot", was: "Wartet bewusst: kein Angebot vor deinem Gespräch", stand: "wartet" },
+        )
+        break
+      case "absprache_speichern":
+        liste.push({ agent: "vertrieb", was: `Absprache an „${String(aus.firma || aus.chance)}“ gespeichert`, stand: "erledigt" })
+        break
+      case "bestandskunde_anlegen":
+        liste.push({ agent: "kundenbetreuung", was: `${String(aus.firma)} als ${String(aus.als)} geführt – meldet sich zur Pflege`, stand: "erledigt" })
+        break
+      case "subunternehmer_anlegen":
+        liste.push({ agent: "projekte", was: `Subunternehmer ${ein.name ?? ""} im Team`, stand: "erledigt" })
+        break
+      case "website_korrigieren":
+        liste.push({ agent: "webseite", was: "Korrektur aufgenommen – wird als Code-Änderung umgesetzt", stand: "laeuft", bis: "nächster Prüflauf" })
+        break
+      case "widerspruch_eintragen":
+        liste.push({ agent: "recht", was: `${ein.adresse ?? "Adresse"} gesperrt – wird nie wieder angeschrieben`, stand: "erledigt" })
+        break
+      case "regel_merken":
+        liste.push({ agent: "gedaechtnis", was: "Regel gemerkt – gilt ab dem nächsten Entwurf", stand: "erledigt" })
+        break
+      case "karten_schliessen":
+        liste.push({ agent: "assistent", was: `Karten geschlossen (${Number(aus.erledigt ?? 0) + Number(aus.abgelegtOhneVersand ?? 0)})`, stand: "erledigt" })
+        break
+      case "vorschlag_anlegen": {
+        const art = ein.art ?? ""
+        const agent = art === "linkedin" ? "redaktion" : art === "kapital" ? "kapital" : art === "mail" || art === "termin" || art === "brief" ? "vertrieb" : "assistent"
+        liste.push({ agent, was: `Vorschlag „${ein.titel ?? ""}“ liegt zur Freigabe bereit`, stand: "wartet", bis: "deine Freigabe" })
+        break
+      }
+    }
+  }
+  return liste
+}
+
+export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<{ text: string; uebernahmen: Uebernahme[] }> {
   const tools = {
     widerspruch_eintragen: tool({
       description:
@@ -306,7 +364,7 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<s
     }
   }
 
-  const { text } = await generateText({
+  const { text, steps } = await generateText({
     /* Bilder (Screenshots von Mails, Briefen, Belegen) liest Sonnet am zuverlässigsten – nur dann, sonst das günstige Modell. */
     model: bild ? BILD_MODELL : MODELL,
     system: `${SYSTEM}\n\nHeute ist ${heute}.${bild ? `\n\nEr hat ein Bild angehängt. Lies es genau. Ist es eine Kundenantwort oder Mail: 1) ordne sie mit "absprache_speichern" der Firma zu, 2) bei Absage/Widerspruch/Spam-Drohung sofort "widerspruch_eintragen" (dann wird diese Adresse nie wieder angeschrieben) und sag ehrlich, was rechtlich daraus folgt, 3) leite ab, was Marketing/Vertrieb daraus lernt.` : ""}`,
@@ -315,5 +373,6 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<s
     stopWhen: stepCountIs(6),
     maxOutputTokens: 2500,
   })
-  return text.trim() || "Ich habe die Vorschläge im Freigabe-Eingang abgelegt."
+  const uebernahmen = uebernahmenAus(steps.flatMap((st) => st.toolResults.map((t) => ({ toolName: t.toolName, input: t.input, output: t.output }))))
+  return { text: text.trim() || (uebernahmen.length ? "Erledigt – siehe unten, wer übernommen hat." : "Ich habe nichts angelegt."), uebernahmen }
 }

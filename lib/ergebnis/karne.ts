@@ -82,6 +82,7 @@ const KLASSE: Record<string, Klasse> = {
   produkt: "stab",
   entwicklung: "stab",
   einkauf: "stab",
+  ideen: "stab",
 }
 export const klasseVon = (agent: string): Klasse => KLASSE[agent] ?? "schutz"
 const FENSTER: Record<Klasse, number> = { umsatz: 30, chance: 90, stab: 30, schutz: 30 }

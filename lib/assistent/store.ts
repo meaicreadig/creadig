@@ -2,6 +2,7 @@ import "server-only"
 
 import { neonAbfrage, type Abfrage } from "@/lib/neon-abfrage"
 import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
+import type { Uebernahme } from "@/lib/zentrale/personen"
 
 /** Legt sich selbst an (additiv), weil die Produktions-DATABASE_URL "Sensitive" ist. */
 const SCHEMA = [
@@ -11,6 +12,8 @@ const SCHEMA = [
     text text NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now())`,
   `CREATE INDEX IF NOT EXISTS assistent_nachrichten_zeit_idx ON assistent_nachrichten (created_at DESC)`,
+  /* 24.10.2026: wer im Chat was übernommen hat (lib/zentrale/personen.ts). */
+  `ALTER TABLE assistent_nachrichten ADD COLUMN IF NOT EXISTS uebernahmen jsonb`,
   `CREATE TABLE IF NOT EXISTS assistent_freigaben (
     id text PRIMARY KEY,
     art text NOT NULL CHECK (art IN ('mail','aufgabe','termin','linkedin','kapital','notiz')),
@@ -84,7 +87,7 @@ const NUR_SICHTBARE = `(art NOT IN ('aufgabe','notiz') OR coalesce(extra->'koord
 export const FREIGABE_ARTEN = ["mail", "aufgabe", "termin", "linkedin", "kapital", "notiz", "loeschen", "brief", "steuerung"] as const
 export type FreigabeArt = (typeof FREIGABE_ARTEN)[number]
 
-export type Nachricht = { id: string; rolle: "user" | "assistant"; text: string; zeit: string }
+export type Nachricht = { id: string; rolle: "user" | "assistant"; text: string; zeit: string; uebernahmen?: Uebernahme[] }
 export type Freigabe = {
   id: string
   art: FreigabeArt
@@ -215,19 +218,24 @@ export async function ladeVerlauf(limit = 40): Promise<Nachricht[]> {
   const q = await assistentDb()
   if (!q) return []
   const rows = (await q(
-    `SELECT id, rolle, text, created_at FROM assistent_nachrichten ORDER BY created_at DESC LIMIT $1`,
+    `SELECT id, rolle, text, created_at, uebernahmen FROM assistent_nachrichten ORDER BY created_at DESC LIMIT $1`,
     [limit],
-  )) as { id: string; rolle: "user" | "assistant"; text: string; created_at: string | Date }[]
-  return rows
-    .reverse()
-    .map((r) => ({ id: r.id, rolle: r.rolle, text: r.text, zeit: new Date(r.created_at).toISOString() }))
+  )) as { id: string; rolle: "user" | "assistant"; text: string; created_at: string | Date; uebernahmen: Uebernahme[] | null }[]
+  return rows.reverse().map((r) => ({
+    id: r.id,
+    rolle: r.rolle,
+    text: r.text,
+    zeit: new Date(r.created_at).toISOString(),
+    ...(r.uebernahmen?.length ? { uebernahmen: r.uebernahmen } : {}),
+  }))
 }
 
-export async function speichereNachricht(rolle: "user" | "assistant", text: string): Promise<Nachricht> {
+export async function speichereNachricht(rolle: "user" | "assistant", text: string, uebernahmen?: Uebernahme[]): Promise<Nachricht> {
   const q = await assistentDb()
   const id = neueId("msg")
-  if (q) await q(`INSERT INTO assistent_nachrichten (id, rolle, text) VALUES ($1, $2, $3)`, [id, rolle, text])
-  return { id, rolle, text, zeit: new Date().toISOString() }
+  const liste = uebernahmen?.length ? uebernahmen : null
+  if (q) await q(`INSERT INTO assistent_nachrichten (id, rolle, text, uebernahmen) VALUES ($1, $2, $3, $4::jsonb)`, [id, rolle, text, liste ? JSON.stringify(liste) : null])
+  return { id, rolle, text, zeit: new Date().toISOString(), ...(liste ? { uebernahmen: liste } : {}) }
 }
 
 export async function fragenHeute(): Promise<number> {

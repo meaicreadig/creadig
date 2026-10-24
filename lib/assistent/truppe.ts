@@ -50,7 +50,7 @@ import { inhalteText } from "@/lib/inhalte"
  * Golf-Radar bleibt eigener, wöchentlicher Agent (Emin: offene Tür, nicht drosseln).
  * Neu: Kundenbetreuung, Partner & Empfehlungen, Ergebnis-Controller, Angebotsautomat.
  */
-export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite", "qualitaet", "sicherheit", "kundenservice", "forschung", "produkt", "entwicklung", "international", "einkauf", "personal", "kundenbetreuung", "partner", "controller", "angebot"] as const
+export const AGENT_KEYS = ["rat", "lage", "vertrieb", "jaeger", "kapital", "golf", "redaktion", "finanz", "projekte", "bulletin", "koordinator", "recht", "marketing", "webseite", "qualitaet", "sicherheit", "kundenservice", "forschung", "produkt", "entwicklung", "international", "einkauf", "personal", "kundenbetreuung", "partner", "controller", "angebot", "ideen"] as const
 export type AgentKey = (typeof AGENT_KEYS)[number]
 
 export type AgentInfo = {
@@ -89,6 +89,7 @@ export const AGENTEN: AgentInfo[] = [
   { key: "controller", name: "Ergebnis-Controller", aufgabe: "Misst jeden KI-Mitarbeiter wöchentlich am Ergebnis: Kontakt → Antwort → Anfrage → Termin → Angebot → gewonnen (€), je Agent und Abteilung. Schickt Schärfen-Aufträge an die Abteilungen und legt Emin einmal pro Woche eine Steuerungs-Karte vor: wer sein Prüffenster ohne Ergebnis hinter sich hat, wird auf Klick pausiert.", takt: "woechentlich", ki: false },
   { key: "angebot", name: "Angebotsautomat", aufgabe: "Füllt jeden Angebots-Entwurf aus Gesprächsnotizen und Verlauf: Positionen nur aus dem Leistungskatalog mit dessen Preisen, Einleitung und Schluss; Unbekanntes mit „Preis prüfen“. Senden bleibt dein Klick.", takt: "taeglich", ki: true },
   { key: "redaktion", name: "Redaktion", aufgabe: "Plant jede Woche 4 LinkedIn-Beiträge (Gründer-Stimme, Praxiswissen, Einblick & Beweis, Branche & Haltung) mit Text, Bild, Sendetermin und Link im ersten Kommentar.", takt: "taeglich", ki: true },
+  { key: "ideen", name: "Ideenwerkstatt", aufgabe: "Liest täglich deine Klagen im Chat, die Ergebnis-Karne, Website-Befunde und liegengebliebene Chancen und macht daraus bis zu drei konkrete Verbesserungen – jede sofort mit Zuständigem; im Chat siehst du, wer übernimmt.", takt: "taeglich", ki: true },
 ]
 
 const MODELL = "openai/gpt-5.4-mini"
@@ -785,6 +786,7 @@ const LAEUFER: Record<AgentKey, (o: Start) => Promise<Ergebnis>> = {
   partner: async () => (await import("@/lib/agenten/partner")).partnerRunde(),
   controller: async () => (await import("@/lib/agenten/controller")).controllerRunde(),
   angebot: async () => (await import("@/lib/agenten/angebot")).angebotsRunde(),
+  ideen: async () => (await import("@/lib/agenten/ideen")).ideenRunde(),
 }
 
 /** Länger als jede Funktion leben darf (maxDuration 300 s) – danach gilt eine Sperre als verwaist. */

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, useTransition } from "react"
-import { ArrowUp, ImagePlus, Loader2, Mic, Square, X } from "lucide-react"
+import { ArrowUp, Check, Clock, ImagePlus, Loader2, Mic, Square, X } from "lucide-react"
 
 /** Verkleinert auf max. 1600 px (JPEG) – Text bleibt lesbar, Bildkosten bleiben klein. */
 async function verkleinere(datei: File): Promise<string> {
@@ -24,8 +24,46 @@ async function verkleinere(datei: File): Promise<string> {
   }
 }
 
-import { frage } from "@/app/(admin)/admin/assistent/actions"
+import { frage, nachrichtenSeit } from "@/app/(admin)/admin/assistent/actions"
 import type { Nachricht } from "@/lib/assistent/store"
+import { personVon, type Uebernahme } from "@/lib/zentrale/personen"
+
+const STAND = {
+  erledigt: { text: "erledigt", klasse: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" },
+  laeuft: { text: "arbeitet daran", klasse: "bg-primary/15 text-primary" },
+  wartet: { text: "wartet", klasse: "bg-amber-500/15 text-amber-700 dark:text-amber-300" },
+} as const
+
+/** Wer hat übernommen – ein Kasten je KI-Mitarbeiter (Name, Abteilung, was, Stand). */
+function Uebernahmen({ liste }: { liste: Uebernahme[] }) {
+  return (
+    <ul className="mt-2 flex w-full max-w-[85%] flex-col gap-2" aria-label="Übernommen von">
+      {liste.map((u, i) => {
+        const p = personVon(u.agent)
+        const st = STAND[u.stand]
+        return (
+          <li key={`${u.agent}-${i}`} className="flex items-start gap-3 rounded-2xl border border-border bg-card px-3 py-2.5 text-sm">
+            <span aria-hidden="true" className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+              {p.name.slice(0, 2)}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span className="font-semibold text-foreground">{p.name}</span>
+                <span className="text-xs text-muted-foreground">{p.rolle.de} · KI</span>
+                <span className={`ml-auto inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${st.klasse}`}>
+                  {u.stand === "erledigt" ? <Check className="size-3" aria-hidden="true" /> : <Clock className="size-3" aria-hidden="true" />}
+                  {st.text}
+                  {u.bis ? ` · ${u.bis}` : ""}
+                </span>
+              </span>
+              <span className="mt-0.5 block break-words text-muted-foreground [overflow-wrap:anywhere]">{u.was}</span>
+            </span>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
 
 type Erkennung = {
   lang: string
@@ -73,6 +111,19 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
   useEffect(() => {
     ende.current?.scrollIntoView({ block: "end" })
   }, [verlauf, laeuft])
+
+  /* Arbeitet noch jemand („arbeitet daran“)? Dann alle 20 s nachsehen, bis zu 8 Minuten – die Nacharbeit meldet sich selbst im Chat. */
+  const offen = verlauf.some((m) => m.uebernahmen?.some((u) => u.stand === "laeuft") && Date.now() - Date.parse(m.zeit) < 8 * 60_000)
+  useEffect(() => {
+    if (!offen) return
+    const t = setInterval(async () => {
+      const letzte = verlauf.filter((m) => !m.id.startsWith("tmp-")).at(-1)?.zeit
+      if (!letzte) return
+      const neu = await nachrichtenSeit(letzte).catch(() => [])
+      if (neu.length) setVerlauf((v) => [...v, ...neu.filter((n) => !v.some((x) => x.id === n.id))])
+    }, 20_000)
+    return () => clearInterval(t)
+  }, [offen, verlauf])
 
   function senden(text: string) {
     const t = text.trim()
@@ -140,7 +191,8 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
           </div>
         ) : (
           verlauf.map((m) => (
-            <div key={m.id} className={m.rolle === "user" ? "flex justify-end" : "flex justify-start"}>
+            <div key={m.id} className={m.rolle === "user" ? "flex justify-end" : "flex flex-col items-start"}>
+              {m.rolle === "assistant" ? <span className="mb-1 px-1 text-xs text-muted-foreground">Aylin · Chief of Staff · KI</span> : null}
               <div
                 className={
                   m.rolle === "user"
@@ -150,6 +202,7 @@ export function AssistentChat({ start, rest }: { start: Nachricht[]; rest: numbe
               >
                 {m.text}
               </div>
+              {m.rolle === "assistant" && m.uebernahmen?.length ? <Uebernahmen liste={m.uebernahmen} /> : null}
             </div>
           ))
         )}

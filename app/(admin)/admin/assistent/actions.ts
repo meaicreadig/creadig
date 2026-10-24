@@ -83,13 +83,21 @@ export async function frage(eingabe: string, bildDaten?: string | null): Promise
     const verlauf = await ladeVerlauf(16)
     const { mitAgent } = await import("@/lib/lernen/kontext")
     const antwort = await mitAgent("assistent", () => antworte(verlauf, bild))
-    const gespeichert = await speichereNachricht("assistant", antwort)
+    const gespeichert = await speichereNachricht("assistant", antwort.text, antwort.uebernahmen)
     revalidatePath("/admin/assistent")
     return { ok: true, antwort: gespeichert }
   } catch (e) {
     console.error("[assistent]", e)
     return { ok: false, fehler: "Der Assistent ist gerade nicht erreichbar. Bitte gleich nochmal versuchen." }
   }
+}
+
+/** Nachrichten nach `zeit` – der Chat holt so die Meldungen der Nacharbeit (Recherche, Gesprächsraum) nach. */
+export async function nachrichtenSeit(zeit: string): Promise<Nachricht[]> {
+  await pruefe()
+  const t = Date.parse(zeit)
+  if (!Number.isFinite(t)) return []
+  return (await ladeVerlauf(10)).filter((m) => Date.parse(m.zeit) > t)
 }
 
 export async function agentStarten(form: FormData): Promise<void> {

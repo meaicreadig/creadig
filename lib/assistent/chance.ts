@@ -2,6 +2,7 @@ import "server-only"
 
 import { findeOderLegeFirma, findeOderLegeKontakt, protokolliereStufe } from "@/lib/kundenfaden"
 import type { Abfrage } from "@/lib/neon-abfrage"
+import type { Uebernahme } from "@/lib/zentrale/personen"
 
 /**
  * Neue Chance aus dem Chat (24.10.2026).
@@ -101,6 +102,15 @@ export async function legeChanceAn(q: Abfrage, v: NeueChance) {
     schluessel: `gespraech_notiert:${id}:${stempel}`,
   }).catch(() => null)
 
+  /* Selbst weiterarbeiten, ohne dass Emin etwas tun muss: Recherche + Gesprächsraum, Ergebnis kommt als Chat-Nachricht. */
+  const nacharbeit = () => chanceNacharbeit(q, { oppId: id!, orgId: org.id, firma: org.name, v, naechster, datum }).catch((e) => console.error("[chance] nacharbeit", e instanceof Error ? e.message : e))
+  try {
+    const { after } = await import("next/server")
+    after(nacharbeit)
+  } catch {
+    await nacharbeit()
+  }
+
   return {
     angelegt: true,
     firma: org.name,
@@ -112,4 +122,121 @@ export async function legeChanceAn(q: Abfrage, v: NeueChance) {
     auftragAnVertrieb: Boolean(auftrag),
     vorbehalt: "Kein Angebot vor dem Gespräch",
   }
+}
+
+type Fund = { website?: string | null; strasse?: string | null; plz?: string | null; ort?: string | null; telefon?: string | null; branche?: string | null }
+
+/**
+ * Jonas (Recherche) und Selin (Gesprächsraum) arbeiten nach – im Hintergrund,
+ * Ergebnis als Chat-Nachricht mit Übernahme-Kästen. Nur belegte Angaben (mit
+ * Quelle); was die Recherche nicht findet, bleibt leer.
+ */
+export async function chanceNacharbeit(
+  q: Abfrage,
+  a: { oppId: string; orgId: string; firma: string; v: NeueChance; naechster: string; datum: string },
+): Promise<void> {
+  const ergebnisse: Uebernahme[] = []
+
+  /* 1 · Recherche */
+  const r = await recherchiereFirma(q, a.orgId, a.firma, a.v.ort, a.v.website)
+  ergebnisse.push(r)
+
+  /* 2 · Gesprächsraum: das Standgespräch als Gespräch am Kontakt */
+  try {
+    const { legeKontaktAn, speichereGespraech } = await import("@/lib/gespraech")
+    const kontaktId = await legeKontaktAn({ name: a.v.ansprechpartner || a.firma, phone: a.v.telefon ?? null, email: a.v.email ?? null, firma: a.firma })
+    if (kontaktId) {
+      await q(`UPDATE opportunities SET contact_id = coalesce(contact_id, $2) WHERE id = $1`, [a.oppId, kontaktId]).catch(() => null)
+      await speichereGespraech(
+        {
+          kontaktId,
+          dauerSek: 600,
+          abschnitte: { ausgangslage: a.v.wieKennengelernt, bedarf: a.v.bedarf, ...(a.v.bisherGetan ? { notiz: a.v.bisherGetan } : {}) },
+          interessen: [],
+          folge: a.naechster,
+          folgeAm: a.datum,
+          folgeUm: null,
+          sprache: "de",
+        },
+        "chat",
+      )
+      ergebnisse.push({ agent: "gespraech", was: `Gespräch mit ${a.v.ansprechpartner || a.firma} im Gesprächsraum abgelegt`, stand: "erledigt" })
+    }
+  } catch (e) {
+    console.error("[chance] gespraech", e instanceof Error ? e.message : e)
+    ergebnisse.push({ agent: "gespraech", was: "Gespräch konnte nicht abgelegt werden – bitte einmal im Gesprächsraum nachtragen", stand: "wartet" })
+  }
+
+  const { speichereNachricht } = await import("./store")
+  await speichereNachricht("assistant", `Nacharbeit zu **${a.firma}** ist fertig.`, ergebnisse)
+  const { revalidatePath } = await import("next/cache")
+  try {
+    revalidatePath("/admin/assistent")
+  } catch {}
+}
+
+const RECHERCHE_MARKE = "Recherche (KI,"
+
+/**
+ * Jonas recherchiert eine Firma: nur belegte Angaben (mit Quelle) gehen in die
+ * Firma. Scheitert der Dienst, steht das ehrlich da („wartet“) – nie „nichts
+ * gefunden“ – und der tägliche Nachlauf (recherchiereOffene) versucht es neu.
+ */
+export async function recherchiereFirma(q: Abfrage, orgId: string, firma: string, ort?: string | null, website?: string | null): Promise<Uebernahme> {
+  const { mitAgent } = await import("@/lib/lernen/kontext")
+  const { recherchiere, json, MODELL } = await import("@/lib/agenten/ki")
+  const { generateText } = await import("ai")
+  let fund: Fund | null = null
+  let quellen = ""
+  try {
+    const roh = await mitAgent("vertrieb", () =>
+      recherchiere(`Betrieb „${firma}“${ort ? ` in ${ort}` : ""}${website ? ` (${website})` : ""}: offizielle Website, Anschrift (Straße, PLZ, Ort), Telefon, was der Betrieb macht (Branche, Sortiment).`),
+    )
+    if (roh) {
+      quellen = roh
+      const { text } = await generateText({
+        model: MODELL,
+        prompt: `Ziehe aus diesen Rechercheergebnissen NUR belegte Angaben zu „${firma}“ heraus. Unsicheres = null.\n${roh}\n\nAntworte nur mit JSON: {"website": string|null, "strasse": string|null, "plz": string|null, "ort": string|null, "telefon": string|null, "branche": string|null}`,
+      })
+      fund = json<Fund>(text)
+    }
+  } catch (e) {
+    console.error("[chance] recherche", e instanceof Error ? e.message : e)
+    return { agent: "recherche", was: `Recherche zu ${firma} gerade nicht erreichbar – versucht es beim nächsten Tageslauf neu`, stand: "wartet", bis: "morgen" }
+  }
+  const stempel = `${RECHERCHE_MARKE} ${new Date().toLocaleDateString("de-DE")})`
+  if (fund && Object.values(fund).some(Boolean)) {
+    const anschrift = [fund.strasse, [fund.plz, fund.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")
+    const zeilen = [
+      fund.branche ? `Branche: ${fund.branche}` : null,
+      anschrift ? `Anschrift: ${anschrift}` : null,
+      fund.telefon ? `Telefon: ${fund.telefon}` : null,
+      fund.website ? `Website: ${fund.website}` : null,
+    ].filter(Boolean) as string[]
+    const url = fund.website && !/^https?:\/\//i.test(fund.website) ? `https://${fund.website}` : fund.website ?? null
+    await q(
+      `UPDATE organisations SET website = coalesce(website, $2), city = coalesce(city, $3), updated_at = now(),
+         note = concat_ws(E'\n\n', nullif(note,''), $4::text) WHERE id = $1`,
+      [orgId, url, fund.ort ?? null, `${stempel}:\n${zeilen.join("\n")}\nQuellen:\n${quellen.slice(0, 1500)}`],
+    ).catch(() => null)
+    return { agent: "recherche", was: `${firma}: ${zeilen.join(" · ")}`, stand: "erledigt" }
+  }
+  await q(`UPDATE organisations SET note = concat_ws(E'\n\n', nullif(note,''), $2::text) WHERE id = $1`, [orgId, `${stempel}: nichts Belegtes gefunden.`]).catch(() => null)
+  return { agent: "recherche", was: `Zu ${firma} nichts Belegtes im Netz – Website/Adresse bitte im Gespräch erfragen`, stand: "erledigt" }
+}
+
+/** Täglich (Ideenwerkstatt): neue persönliche Chancen, deren Firma noch nie recherchiert wurde. */
+export async function recherchiereOffene(q: Abfrage): Promise<Uebernahme[]> {
+  const offen = (await q(
+    `SELECT DISTINCT g.id, g.name, g.city, g.website FROM opportunities o JOIN organisations g ON g.id = o.organisation_id
+      WHERE o.source = 'persoenlich' AND o.created_at > now() - interval '30 days' AND o.status NOT IN ('won','lost')
+        AND coalesce(g.note, '') NOT LIKE '%' || $1 || '%' LIMIT 5`,
+    [RECHERCHE_MARKE],
+  ).catch(() => [])) as { id: string; name: string; city: string | null; website: string | null }[]
+  const liste: Uebernahme[] = []
+  for (const o of offen) {
+    const r = await recherchiereFirma(q, o.id, o.name, o.city, o.website)
+    if (r.stand === "erledigt") liste.push(r)
+  }
+  return liste
 }
