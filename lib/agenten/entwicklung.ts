@@ -2,7 +2,7 @@ import "server-only"
 
 import { generateText } from "ai"
 
-import { legeFreigabeAn } from "@/lib/assistent/store"
+import { legeFreigabeAn, setzeFreigabe } from "@/lib/assistent/store"
 import { ladeAusgabe } from "@/lib/bulletin/store"
 import { firmenText } from "@/lib/firmenwahrheit"
 import { legeAuftragAn } from "@/lib/koordination/koordinator"
@@ -17,8 +17,9 @@ import { berlinTag, json, MODELL, recherchiere, slug } from "./ki"
  * und montags zusätzlich die Releases unseres Stacks. Für jede Meldung, die
  * uns technisch betrifft, entscheidet sie: einsetzen, beobachten, ignorieren.
  *
- * - einsetzen → fertiger Entwicklungsauftrag bei Emin (Code ändert nur er,
- *   deshalb mit einem Prompt, den er direkt an Claude Code geben kann)
+ * - einsetzen → fertiger Entwicklungsauftrag im Code-Backlog (Code ändert nur
+ *   Emin mit Claude Code, deshalb mit fertigem Prompt; seit 24.10.2026 keine
+ *   Entscheidungskarte mehr, sondern gesammelt unter „Code-Backlog")
  * - technisch unsicher → als F&E-Vorhaben markiert (Forschungszulage)
  * - lehrreich für Kunden → Themenauftrag an Marketing/Redaktion
  */
@@ -81,9 +82,12 @@ Antworte NUR mit JSON: [{"titel":"","entscheidung":"einsetzen","warum":"","massn
         inhalt: `${b.warum}\n\nMaßnahme: ${b.massnahme ?? "—"}${b.fe ? `\n\nF&E-Vorhaben (Forschungszulage): ${b.unsicherheit ?? "technische Unsicherheit"} – Stunden unter /admin/forschung erfassen.` : ""}\n\n— Auftrag für Claude Code —\n${b.prompt}`,
         quelle: `entwicklung:${s}`,
         agent: "entwicklung",
-        extra: { warum: b.warum },
+        extra: { warum: b.warum, code: true },
       })
-      if (id) auftraege++
+      if (id) {
+        await setzeFreigabe(id, "freigegeben")
+        auftraege++
+      }
     }
     if (b.artikel) {
       const id = await legeAuftragAn({
@@ -98,7 +102,7 @@ Antworte NUR mit JSON: [{"titel":"","entscheidung":"einsetzen","warum":"","massn
   }
   const beob = liste.filter((b) => b.entscheidung === "beobachten").length
   return {
-    ergebnis: `${liste.length} Meldungen bewertet (${tag}): ${auftraege} Entwicklungsaufträge an Emin, ${themen} Themen an die Redaktion, ${beob} beobachtet`,
+    ergebnis: `${liste.length} Meldungen bewertet (${tag}): ${auftraege} Aufträge ins Code-Backlog, ${themen} Themen an die Redaktion, ${beob} beobachtet`,
     anzahl: auftraege + themen,
   }
 }

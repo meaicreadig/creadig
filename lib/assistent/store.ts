@@ -135,6 +135,8 @@ export type FreigabeExtra = {
   antrag?: { stufe: KapitalStufe; seit: string; skizze?: string }
   /** Interne Vorarbeit der Koordination (Abteilung, Ergebnis, ob automatisch erledigt, ob Emin vorgelegt). */
   koordination?: { abteilung: string; ergebnis: string; auftragId: string; automatisch?: boolean; beiEmin?: boolean }
+  /** Interne Karte, die nur per Code-Änderung lösbar ist → Code-Backlog für Claude Code statt Entscheidungs-Eingang */
+  code?: boolean
   /** Von der Koordination fälschlich geschlossen und Emin wieder vorgelegt (Zeitpunkt). */
   zurueckgeholt?: string
   /** Emin hat den Entwurf vor der Freigabe geändert – Messgröße für die Qualität des Agenten. */
@@ -425,6 +427,19 @@ export async function ladeFreigaben(): Promise<Freigabe[]> {
     `SELECT ${FREIGABE_SPALTEN} FROM assistent_freigaben
      WHERE ${NUR_SICHTBARE} AND (status = 'offen' OR erledigt_at > now() - interval '3 days')
      ORDER BY (status = 'offen') DESC, created_at DESC LIMIT 50`,
+    [],
+  )) as FreigabeZeile[]
+  return rows.map(alsFreigabe)
+}
+
+/** Code-Backlog: interne Karten, die nur eine Code-Änderung löst (14 Tage). */
+export async function ladeCodeBacklog(): Promise<Freigabe[]> {
+  const q = await assistentDb()
+  if (!q) return []
+  const rows = (await q(
+    `SELECT ${FREIGABE_SPALTEN} FROM assistent_freigaben
+     WHERE art = 'aufgabe' AND coalesce(extra->>'code', '') = 'true' AND created_at > now() - interval '14 days'
+     ORDER BY created_at DESC LIMIT 20`,
     [],
   )) as FreigabeZeile[]
   return rows.map(alsFreigabe)

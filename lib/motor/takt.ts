@@ -3,6 +3,7 @@ import "server-only"
 import { randomUUID } from "node:crypto"
 
 import { legeFreigabeAn } from "@/lib/assistent/store"
+import { siteUrl } from "@/lib/termine/mail"
 import { findeAblauf } from "@/lib/motor/ablaeufe"
 import { motorDb } from "@/lib/motor/db"
 import { ereignis } from "@/lib/motor/ereignis"
@@ -107,7 +108,7 @@ const SCHRITT_ERKLAERUNG: Record<string, (wer: string) => string> = {
   "Dankesmail mit Terminlink": (w) =>
     `Du hast ein Gespräch mit ${w} notiert und dabei einen nächsten Schritt festgehalten. Jetzt ist der beste Moment für eine kurze Dankesmail: Danke für das Gespräch, die vereinbarte Folge in einem Satz und ein Link, über den ${w} selbst einen Folgetermin bucht. Öffne den Gesprächsraum und klicke dort auf „Terminmail senden“.`,
   "Kurze Erinnerung": (w) =>
-    `${w} hat seit 3 Tagen keinen Termin gebucht. Eine kurze, freundliche Erinnerung mit dem Buchungslink hält das Gespräch warm.`,
+    `${w} hat seit 3 Tagen keinen Termin gebucht. Eine kurze, freundliche Erinnerung mit dem Buchungslink hält das Gespräch warm. Den persönlichen Link erzeugt der Gesprächsraum („Terminmail senden“), allgemein gilt ${siteUrl()}/termin.`,
   "Passendes Kundenbeispiel": (w) =>
     `Noch keine Reaktion von ${w}. Ein konkretes Beispiel aus einem ähnlichen Projekt schafft Vertrauen, kurz und mit Ergebnis.`,
   "Freundlicher Abschluss": (w) =>
@@ -131,6 +132,13 @@ async function inWarteschlange(
       if (k[0]) wer = String(k[0].name ?? k[0].email ?? "")
     }
     const person = wer || "dem Kontakt"
+    /* Liegt der vorige Schritt zum selben Kontakt noch offen, ist der nächste zu früh:
+       eine „Erinnerung" an eine nie gesendete Dankesmail wäre falsch (24.10.2026, Murat Başer). */
+    const vorige = await q(
+      `SELECT 1 FROM assistent_freigaben WHERE status = 'offen' AND agent = 'motor' AND extra->>'bezug' = $1 LIMIT 1`,
+      [v.subjekt],
+    ).catch(() => [])
+    if (vorige.length) return
     const erklaerung = SCHRITT_ERKLAERUNG[v.schrittTitel]?.(person)
     await legeFreigabeAn({
       art: "aufgabe",

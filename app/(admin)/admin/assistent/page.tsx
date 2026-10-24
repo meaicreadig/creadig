@@ -76,7 +76,7 @@ import { agentStarten, antwortErhalten, beschlussAbhaken, freigabeEntscheiden, f
 import { AktionKnopf, AktionMeldung } from "@/components/admin/aktion-knopf"
 import { instagramBereit, ladeInstagram } from "@/lib/assistent/instagram"
 import { STUFE_TEXT } from "@/lib/assistent/kapital-antrag"
-import { KAPITAL_STUFEN, ladeKapitalVorhaben } from "@/lib/assistent/store"
+import { KAPITAL_STUFEN, ladeCodeBacklog, ladeKapitalVorhaben } from "@/lib/assistent/store"
 import { antwortZuruecknehmen } from "../marketing/mail/actions"
 import { letzteAbendRueckmeldung, type AbendRueckmeldung } from "@/lib/assistent/abend"
 
@@ -1227,9 +1227,10 @@ export default async function AssistentPage({
     ladeBeitraege(6).catch(() => []),
     ladeAnsprache().catch((): Ansprache => ({ gesendet: 0, beantwortet: 0, quote: null, nachfassOffen: 0 })),
   ])
-  const [auftraege, auftragZahlen] = await Promise.all([
+  const [auftraege, auftragZahlen, codeBacklog] = await Promise.all([
     ladeAuftraege(20).catch(() => []),
     auftragKennzahlen().catch(() => ({ heute: 0, erledigt: 0, uebergaben: 0, beiEmin: 0, offen: 0 })),
+    ladeCodeBacklog().catch(() => []),
   ])
   /* Die Truppe läuft nur im Morgen-Takt (Cron) und im Puls – nicht beim Seitenaufruf, sonst verschiebt
      ein nächtlicher Besuch den Tageslauf und der Morgen bleibt leer. */
@@ -1353,6 +1354,25 @@ export default async function AssistentPage({
                   ))}
                 </ul>
               </details>
+            ) : null}
+
+            {/*
+              24.10.2026: Was nur eine Code-Änderung löst, ist keine Entscheidung.
+              Die Geschäftsführung legt es hier ab – Emin gibt es gesammelt an Claude Code.
+            */}
+            {codeBacklog.length > 0 ? (
+              <Klappe titel="Code-Backlog" zahl={codeBacklog.length} unter="Für Claude Code gesammelt — keine Freigaben">
+                <ul className="flex flex-col gap-2">
+                  {codeBacklog.map((f) => (
+                    <li key={f.id}>
+                      <details className="rounded-2xl bg-background px-5 py-4">
+                        <summary className="cursor-pointer font-medium text-foreground">{f.titel}</summary>
+                        <p className="mt-2 select-all whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{f.inhalt}</p>
+                      </details>
+                    </li>
+                  ))}
+                </ul>
+              </Klappe>
             ) : null}
 
             {/*

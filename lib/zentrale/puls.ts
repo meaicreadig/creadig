@@ -24,6 +24,22 @@ import { initiativeRunde } from "@/lib/koordination/initiative"
  */
 
 const MAX_NEUSTARTS_PRO_PULS = 2
+
+/** Freigegebene Förderchancen ohne Antragsskizze (Schreiben nach Freigabe war ausgefallen) – je Puls höchstens 2. */
+async function holeSkizzenNach(): Promise<number> {
+  const q = await assistentDb()
+  if (!q) return 0
+  const rows = (await q(
+    `SELECT id FROM assistent_freigaben WHERE art = 'kapital' AND status = 'freigegeben'
+       AND coalesce(extra->'antrag'->>'skizze', '') = ''
+       AND coalesce(extra->'antrag'->>'stufe', 'pruefen') NOT IN ('bewilligt','abgelehnt','eingereicht')
+     ORDER BY erledigt_at DESC LIMIT 2`,
+    [],
+  )) as { id: string }[]
+  const { schreibeAntragsskizze } = await import("@/lib/assistent/kapital-antrag")
+  for (const r of rows) await schreibeAntragsskizze(r.id)
+  return rows.length
+}
 export const PULS_ABSTAND_STUNDEN = 2
 
 export async function pulsFaellig(): Promise<boolean> {
@@ -38,6 +54,9 @@ export async function pulsRunde(): Promise<{ ergebnis: string; anzahl: number }>
     return { angelegt: false, grund: "Fehler" }
   })
   const bearbeitet = await koordinationAbarbeiten()
+  const { raeumeEingangAuf } = await import("@/lib/koordination/koordinator")
+  const aufgeraeumt = await raeumeEingangAuf().catch(() => ({ geschlossen: 0, code: 0 }))
+  const skizzen = await holeSkizzenNach().catch(() => 0)
   await veroeffentlicheGeplante().catch(() => 0)
   const leistung = await berechneLeistung()
   if (!leistung) return { ergebnis: "keine Datenbank", anzahl: 0 }
@@ -80,8 +99,8 @@ export async function pulsRunde(): Promise<{ ergebnis: string; anzahl: number }>
   }
 
   const offen = leistung.engpaesse.length
-  const ergebnis = `${initiative.angelegt ? `Initiative: ${initiative.grund} · ` : ""}${bearbeitet} intern bearbeitet · ${neustart.length} Agenten neu gestartet · ${eskaliert} eskaliert · ${offen} Engpässe offen`
-  const anzahl = Number(initiative.angelegt) + bearbeitet + neustart.length + eskaliert
+  const ergebnis = `${initiative.angelegt ? `Initiative: ${initiative.grund} · ` : ""}${bearbeitet} intern bearbeitet · ${aufgeraeumt.geschlossen ? `${aufgeraeumt.geschlossen} interne Karten von der Geschäftsführung geschlossen · ` : ""}${skizzen ? `${skizzen} Antragsskizzen nachgeholt · ` : ""}${neustart.length} Agenten neu gestartet · ${eskaliert} eskaliert · ${offen} Engpässe offen`
+  const anzahl = Number(initiative.angelegt) + bearbeitet + aufgeraeumt.geschlossen + skizzen + neustart.length + eskaliert
   await protokolliereLauf({ agent: "puls", ergebnis, anzahl, dauerMs: Date.now() - start })
   return { ergebnis, anzahl }
 }

@@ -12,7 +12,7 @@ import { ladeVerkaufslage, MONATSZIEL_EUR } from "@/lib/verkaufen"
 import { protokolliereFaden } from "@/lib/zentrale/faden-protokoll"
 
 import { firmenRahmen } from "./rahmen"
-import { assistentDb, FREIGABE_ARTEN, ladeFreigaben, ladeRaete, legeFreigabeAn, type Nachricht } from "./store"
+import { assistentDb, ergaenzeExtra, FREIGABE_ARTEN, ladeFreigabe, ladeFreigaben, ladeRaete, legeFreigabeAn, setzeFreigabe, type Nachricht } from "./store"
 import { firmenText } from "@/lib/firmenwahrheit"
 
 const MODELL = "openai/gpt-5.4-mini"
@@ -27,6 +27,7 @@ Regeln:
 - Hole dir Fakten über die Werkzeuge, bevor du über Zahlen, Abschlüsse oder Messen sprichst. Erfinde NIE Zahlen, Firmen, Fristen oder Fördersummen. Wenn du etwas nicht weißt, sag es und schlage vor, wie man es herausfindet.
 - Du handelst nie selbst. Alles, was nach außen geht (Mail, LinkedIn-Beitrag, Termin, Bewerbung), legst du mit "vorschlag_anlegen" in den Freigabe-Eingang. Er gibt frei.
 - Interne Arbeit (art "aufgabe" oder "notiz") erledigen Geschäftsleitung und Abteilungen selbst; er sieht sie unter "Heute intern erledigt". Nur was einen Kunden, Geld oder die Außenwirkung berührt, legt die Koordination ihm mit fertiger Vorlage vor – das muss er freigeben. Produkt- und Firmenfreigaben sind Verwaltung, keine Aufgabe für ihn.
+- Sagt er, Karten sollen weg oder seien erledigt, schließe sie sofort mit "karten_schliessen" (vorher "freigabe_eingang" für die IDs) und sag, wie viele es waren. Sag nie, das System lasse das nicht zu.
 - Absprachen zu Kunden/Chancen (Termin, nächster Schritt, Ort, Verband, wer entscheidet) speicherst du SOFORT mit "absprache_speichern". Bestätige danach kurz, was gespeichert ist. Er soll nichts zweimal sagen müssen.
 - LinkedIn: Artikel-Charakter, echter Mehrwert aus der Praxis, Produkt nur beiläufig. Keine Werbesprache.
 - Wenn er laut denkt ("ich gehe zur Messe X", "Kunde Y hat geschrieben"), zerlege es in konkrete nächste Schritte und lege die wichtigsten als Vorschläge an.
@@ -86,7 +87,32 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<s
       description: "Was bereits im Freigabe-Eingang liegt (um Doppelungen zu vermeiden).",
       inputSchema: z.object({}),
       execute: async () =>
-        (await ladeFreigaben()).filter((f) => f.status === "offen").map((f) => ({ art: f.art, titel: f.titel })),
+        (await ladeFreigaben()).filter((f) => f.status === "offen").map((f) => ({ id: f.id, art: f.art, agent: f.agent, titel: f.titel })),
+    }),
+    karten_schliessen: tool({
+      description:
+        "Schließt Karten im Freigabe-Eingang, wenn Emin das sagt (\"erledigt\", \"weg damit\", \"alle bisherigen schließen\"). Interne Karten (aufgabe/notiz) gelten danach als erledigt; Mail, Brief, LinkedIn, Termin, Kapital und Löschen werden NICHT ausgeführt, sondern nur abgelegt (verworfen). Nur auf ausdrücklichen Wunsch von Emin aufrufen.",
+      inputSchema: z.object({
+        ids: z.array(z.string().min(4).max(40)).max(60).optional().describe("IDs aus freigabe_eingang"),
+        alleInternen: z.boolean().optional().describe("true = alle offenen internen Karten (aufgabe/notiz) schließen"),
+        grund: z.string().min(3).max(300),
+      }),
+      execute: async ({ ids, alleInternen, grund }) => {
+        const offen = (await ladeFreigaben()).filter((f) => f.status === "offen")
+        const ziel = new Set([...(ids ?? []), ...(alleInternen ? offen.filter((f) => f.art === "aufgabe" || f.art === "notiz").map((f) => f.id) : [])])
+        let erledigt = 0
+        let abgelegt = 0
+        for (const id of ziel) {
+          const f = await ladeFreigabe(id)
+          if (!f || f.status !== "offen") continue
+          const intern = f.art === "aufgabe" || f.art === "notiz"
+          await ergaenzeExtra(id, { koordination: { abteilung: "emin", ergebnis: `Emin im Chat: ${grund}`, auftragId: "chat", automatisch: true } })
+          await setzeFreigabe(id, intern ? "freigegeben" : "verworfen")
+          if (intern) erledigt++
+          else abgelegt++
+        }
+        return { erledigt, abgelegtOhneVersand: abgelegt }
+      },
     }),
     vorschlag_anlegen: tool({
       description:

@@ -1,10 +1,12 @@
 import "server-only"
-import { generateText } from "ai"
+import { generateText, stepCountIs } from "ai"
 import { ABTEILUNGEN, abteilungVonAgent } from "@/lib/zentrale/abteilungen"
 import { assistentDb, ergaenzeExtra, ladeFreigabe, legeFreigabeAn, letzteLaeufe, setzeFreigabe } from "@/lib/assistent/store"
 import type { Abfrage } from "@/lib/neon-abfrage"
 import { firmenText } from "@/lib/firmenwahrheit"
 import { inhalteText } from "@/lib/inhalte"
+
+import { akteWerkzeuge, FESTE_FAKTEN } from "./akte"
 
 /**
  * Interne Koordination der KI-Firma.
@@ -252,13 +254,16 @@ async function verlauf(eltern: string | null): Promise<string> {
 }
 
 const REGELN = `GRENZEN (unverletzlich):
-- Du arbeitest NUR intern: analysieren, planen, Checklisten, Texte entwerfen, priorisieren, an andere Abteilungen übergeben.
+- Du arbeitest NUR intern: nachsehen, analysieren, planen, Texte und Vorlagen fertig ausarbeiten, priorisieren, an andere Abteilungen übergeben.
 - Du sendest NIE etwas nach außen, gibst kein Geld aus, löschst nichts, gehst keine Verpflichtung ein.
-- Alles, was nach außen geht (Mail, Anruf, Beitrag, Antrag, Angebot an Kunden), Geld kostet, löscht oder eine echte Chef-Entscheidung braucht → "emin" – mit FERTIGER Vorlage in "ergebnis", damit Emin nur noch ja/nein sagen muss.
-- Freigaben, Nachweise und Kundenfreigaben sind Verwaltung: erledige sie selbst ("erledigt"). Eigene Produkte (fibero, stammo, meAI, cassamea, creaDIG) brauchen nie eine Freigabe. Was schon im Freigabe-System steht, legst du nicht neu an.
-- "emin" nur, wenn wirklich nur er handeln kann. Reine Kenntnisnahme, Routine oder Verwaltung ist "erledigt".
-- Erfinde keine Zahlen, Namen oder Fakten. Was fehlt, benennst du als offene Frage.
-- Gib nur weiter, wenn eine andere Abteilung wirklich etwas Eigenes beitragen muss (z. B. Vertrieb gewinnt → Projektmanagement liefert; Golf-Chance → Geschäftsführung bereitet Pitch vor).`
+- Alles, was nach außen geht (Mail, Brief, Anruf, Beitrag, Antrag, Anmeldung, Angebot an Kunden), Geld kostet, löscht oder einen Vertrag berührt → "emin" – mit FERTIGER Vorlage in "ergebnis", damit Emin nur noch ja/nein sagt.
+- Alles andere entscheidet die Firma selbst. Emin will keine internen Rückfragen sehen (Entscheid 21.10.2026). Interne Fragen entscheidet die Geschäftsführung.
+- Fragen wie „Soll ich … vorbereiten/erstellen/auswerten?" sind verboten: Die Antwort ist immer ja – liefere es direkt im "ergebnis".
+- Frage nie nach Daten, die im System stehen: Sieh zuerst mit den Werkzeugen nach (Webseiten-Befunde, Belege, Pipeline, Bulletin, KI-Mitarbeiter, offene Karten, frühere Arbeit). Nenne im Ergebnis die konkreten Fakten (Befundtitel, Beträge, Daten), nicht „Befund 1".
+- Doppelte oder überholte interne Karten schließt du selbst mit "interne_karte_schliessen".
+- Eigene Produkte (fibero, stammo, meAI, cassamea, creaDIG) brauchen nie eine Freigabe. Was schon im Freigabe-System steht, legst du nicht neu an.
+- Erfinde keine Zahlen, Namen oder Fakten. Was nach dem Nachsehen wirklich fehlt, benennst du in einem Satz und arbeitest mit dem Rest weiter.
+- Gib nur weiter, wenn eine andere Abteilung wirklich etwas Eigenes beitragen muss (z. B. Vertrieb gewinnt → Projektmanagement liefert).`
 
 /**
  * Arbeit, die einen Kunden, Geld oder die Außenwirkung berührt, entscheidet nie die KI allein:
@@ -268,6 +273,11 @@ const REGELN = `GRENZEN (unverletzlich):
 const AUSSEN_AGENTEN = new Set(["motor", "finanz", "forderungen", "projekte", "golf", "kapital", "investor"])
 const AUSSEN_TITEL =
   /\b(mail|e-mail|senden|schicken|versenden|angebot|rechnung|mahnung|zahlungserinnerung|anruf|anrufen|termin|dankesmail|kunde|kundin|nachfass|antwort an|antrag|bewerbung|pitch)\w*/i
+
+/** Rückfragen an Emin, die wirklich nur er beantworten kann: Außenwirkung, Geld, Verträge. */
+const AUSSEN_FRAGE =
+  /\b(mail|senden|schick|versend|brief|anruf|anrufen|telefon|angebot|rechnung|mahnung|kunde|kundin|antrag|bewerb|einreich|anmeld|registrier|teilnahme|teilnehm|unterschreib|vertrag|kündig|bestell|kauf|bezahl|zahlung|kosten|budget|veröffentlich|posten|linkedin|beitrag|pitch|investor)\w*/i
+const NUR_VORBEREITEN = /^\s*(soll|darf|möchtest|willst)\s+(ich|wir|du)\b[^?]*(vorbereit|erstell|entwerf|ausarbeit|auswert|zusammenfass|formulier|anleg|gliedern|aufbereit|prüf)/i
 
 export function gehtNachAussen(a: { von: string; titel: string; freigabeId?: string | null }): boolean {
   /* Reine Abteilungsaufträge (ohne Freigabe-Karte) bleiben intern – sonst landet jeder Wochenplan bei Emin. */
@@ -325,32 +335,66 @@ async function holeVorlagenZurueck(q: Abfrage): Promise<number> {
   return n
 }
 
-async function bearbeite(a: Auftrag): Promise<void> {
-  const q = await db()
-  if (!q) return
-  const abt = ABTEILUNGEN.find((x) => x.id === a.an)
-  const [davor, inhalte] = await Promise.all([verlauf(a.eltern), inhalteText()])
-  const { text } = await generateText({
-    model: MODELL,
-    system: `Du bist die Abteilung "${abt?.name.de ?? a.an}" der KI-Firma creaDIG Solutions.
+function systemFuer(abtId: string): Promise<string> {
+  const abt = ABTEILUNGEN.find((x) => x.id === abtId)
+  return inhalteText().then(
+    (inhalte) => `Du bist die Abteilung "${abt?.name.de ?? abtId}" der KI-Firma creaDIG Solutions.
 ${firmenText("voll")}
 ${inhalte}
+${FESTE_FAKTEN()}
 Aufgabe der Abteilung: ${abt?.aufgabe.de ?? "Unterstützung"}.
-Du arbeitest wie ein erfahrenes Team in einer professionellen Firma: konkret, knapp, auf Deutsch, umsetzbar.
+Du arbeitest wie ein erfahrenes Team in einer professionellen Firma: erst nachsehen, dann konkret, knapp, auf Deutsch, umsetzbar.
 
 ${REGELN}
 
 Abteilungen für Übergaben:
 ${abteilungsListe()}
 
-Antworte NUR mit JSON:
-{"entscheidung":"erledigt"|"weitergeben"|"emin","ergebnis":"dein konkretes Arbeitsergebnis (max. 1200 Zeichen, Stichpunkte erlaubt)","an":"abteilungs-id (nur bei weitergeben)","uebergabe":"was die nächste Abteilung tun soll (nur bei weitergeben)","frage":"die eine Frage an Emin (nur bei emin)"}`,
-    prompt: `${davor ? `Bisherige Arbeit in dieser Kette:\n${davor}\n\n` : ""}Neuer Auftrag von ${abteilungName(a.von)}:\n${a.titel}\n\n${a.inhalt}${a.tiefe >= MAX_TIEFE - 1 ? "\n\nHinweis: Kette ist lang – nicht weitergeben, abschließen oder an Emin." : ""}`,
+Antworte am Ende NUR mit JSON:
+{"entscheidung":"erledigt"|"weitergeben"|"emin","ergebnis":"dein konkretes Arbeitsergebnis (max. 1500 Zeichen, Stichpunkte erlaubt)","an":"abteilungs-id (nur bei weitergeben)","uebergabe":"was die nächste Abteilung tun soll (nur bei weitergeben)","frage":"die eine Ja/Nein-Frage an Emin (nur bei emin)"}`,
+  )
+}
+
+async function frageAbteilung(abtId: string, prompt: string): Promise<Entscheidung | null> {
+  const { text } = await generateText({
+    model: MODELL,
+    system: await systemFuer(abtId),
+    prompt,
+    tools: akteWerkzeuge(abtId),
+    stopWhen: stepCountIs(8),
+    maxOutputTokens: 2500,
   })
-  const e = parse(text)
+  return parse(text)
+}
+
+async function bearbeite(a: Auftrag): Promise<void> {
+  const q = await db()
+  if (!q) return
+  const davor = await verlauf(a.eltern)
+  const auftrag = `${davor ? `Bisherige Arbeit in dieser Kette:\n${davor}\n\n` : ""}Neuer Auftrag von ${abteilungName(a.von)}:\n${a.titel}\n\n${a.inhalt}${a.tiefe >= MAX_TIEFE - 1 ? "\n\nHinweis: Kette ist lang – nicht weitergeben, abschließen oder an Emin." : ""}`
+  let e = await frageAbteilung(a.an, auftrag)
   if (!e) {
     await q(`UPDATE firma_auftraege SET versuche = versuche + 1 WHERE id = $1`, [a.id])
     return
+  }
+
+  const aussen = gehtNachAussen(a)
+  /* „Soll ich das vorbereiten?" ist keine Frage an den Chef – einmal nachfassen, dann liefern. */
+  if (e.entscheidung === "emin" && !aussen && NUR_VORBEREITEN.test(e.frage ?? "")) {
+    e =
+      (await frageAbteilung(
+        a.an,
+        `${auftrag}\n\nDeine Rückfrage war: „${e.frage}“. Antwort der Geschäftsführung: Ja. Liefere es jetzt vollständig im "ergebnis" und schließe mit "erledigt" ab (oder "emin" nur, wenn danach etwas nach außen geht).`,
+      )) ?? e
+  }
+  /* Interne Fragen gehen an die Geschäftsführung, nicht an Emin (Entscheid 21.10.2026). */
+  const echteChefFrage = aussen || AUSSEN_FRAGE.test(`${e.frage ?? ""} ${a.titel}`)
+  if (e.entscheidung === "emin" && !echteChefFrage) {
+    if (a.an !== "geschaeftsfuehrung" && a.tiefe < MAX_TIEFE - 1) {
+      e = { entscheidung: "weitergeben", an: "geschaeftsfuehrung", uebergabe: `Entscheide anstelle von Emin: ${e.frage ?? a.titel}`, ergebnis: e.ergebnis }
+    } else {
+      e = { ...e, entscheidung: "erledigt", ergebnis: `${e.ergebnis}${e.frage ? `\n\nOffen (intern entschieden: nach bestem Wissen weiter): ${e.frage}` : ""}` }
+    }
   }
   const ergebnis = e.ergebnis.slice(0, 2000)
 
@@ -369,7 +413,7 @@ Antworte NUR mit JSON:
   }
 
   /* Nach außen gerichtete Arbeit geht immer an Emin – auch wenn die KI sie für erledigt hält. */
-  if (e.entscheidung === "emin" || gehtNachAussen(a)) {
+  if (e.entscheidung === "emin" || aussen) {
     const vorlage = `${e.frage ? `Frage: ${e.frage}\n\n` : ""}Vorbereitet von ${abteilungName(a.an)}:\n${ergebnis}`
     await legeEminVor(q, a, vorlage)
     return
@@ -379,10 +423,59 @@ Antworte NUR mit JSON:
   /* Nur interne Karten (Aufgabe/Notiz) schließt die Koordination – Mail, Brief, LinkedIn nie. */
   const intern = a.freigabeId ? ["aufgabe", "notiz"].includes((await ladeFreigabe(a.freigabeId))?.art ?? "") : false
   if (a.freigabeId && intern) {
-    await ergaenzeExtra(a.freigabeId, { koordination: { abteilung: a.an, ergebnis, auftragId: a.id, automatisch: true } })
+    const f = await ladeFreigabe(a.freigabeId)
+    await ergaenzeExtra(a.freigabeId, {
+      ...(f && istCodeArbeit(f.agent ?? "", f.inhalt) ? { code: true } : {}),
+      koordination: { abteilung: a.an, ergebnis, auftragId: a.id, automatisch: true },
+    })
     await setzeFreigabe(a.freigabeId, "freigegeben")
   }
   await q(`UPDATE firma_auftraege SET status = 'erledigt', ergebnis = $2, erledigt_at = now() WHERE id = $1`, [a.id, ergebnis])
+}
+
+/** Karten, die nur eine Code-Änderung löst: Entwicklung/IT/Sicherheit oder ein Claude-Code-Auftrag. */
+const CODE_AGENTEN = new Set(["entwicklung", "it", "sicherheit", "webseite"])
+const istCodeArbeit = (agent: string, inhalt: string) => CODE_AGENTEN.has(agent) || /claude code|coding-agent|im code|code[- ]änderung/i.test(inhalt)
+
+/**
+ * Aufräumen (Entscheid Emin 21.10.2026: „Freigabesystem soll im Hintergrund laufen"):
+ * Interne Karten, die bei Emin liegen, aber weder Kunde noch Geld noch Außenwirkung
+ * berühren, schließt die Geschäftsführung nach 2 Tagen selbst. Code-Arbeit wandert ins
+ * Code-Backlog (extra.code), statt als Entscheidung im Eingang zu stehen.
+ * Mail, Brief, LinkedIn, Kapital, Löschen und alles Außen-Gerichtete bleiben unberührt.
+ */
+export async function raeumeEingangAuf(minTage = 2): Promise<{ geschlossen: number; code: number }> {
+  const q = await db()
+  if (!q) return { geschlossen: 0, code: 0 }
+  const rows = (await q(
+    `SELECT id, titel, inhalt, coalesce(agent, '') AS agent, extra->'koordination'->>'ergebnis' AS vorlage FROM assistent_freigaben
+      WHERE status = 'offen' AND art IN ('aufgabe','notiz')
+        AND coalesce(extra->'koordination'->>'beiEmin', '') = 'true'
+        AND created_at < now() - make_interval(days => $1)
+      ORDER BY created_at ASC LIMIT 40`,
+    [minTage],
+  )) as { id: string; titel: string; inhalt: string; agent: string; vorlage: string | null }[]
+  let geschlossen = 0
+  let code = 0
+  for (const r of rows) {
+    if (gehtNachAussen({ von: r.agent, titel: r.titel, freigabeId: r.id })) continue
+    const frage = (r.vorlage ?? "").match(/^Frage: (.*)$/m)?.[1] ?? ""
+    if (AUSSEN_FRAGE.test(`${r.titel} ${frage}`)) continue
+    const istCode = istCodeArbeit(r.agent, r.inhalt)
+    await ergaenzeExtra(r.id, {
+      ...(istCode ? { code: true } : {}),
+      koordination: {
+        abteilung: "geschaeftsfuehrung",
+        ergebnis: `${r.vorlage ? `${r.vorlage.slice(0, 1500)}\n\n` : ""}Geschäftsführung: intern entschieden – ${istCode ? "liegt im Code-Backlog" : "kein Kunde, kein Geld, keine Außenwirkung"}.`,
+        auftragId: "aufraeumen",
+        automatisch: true,
+      },
+    })
+    await setzeFreigabe(r.id, "freigegeben")
+    geschlossen++
+    if (istCode) code++
+  }
+  return { geschlossen, code }
 }
 
 /** Arbeitet die interne Warteschlange ab. Läuft bei jedem Takt (Cron + Seitenaufruf). */

@@ -94,9 +94,7 @@ Arbeitstitel: ${m.artikel?.de ?? m.titel.de}`,
 export async function entwerfe(a: Anlass): Promise<{ slug: string | null; ergebnis: string }> {
   if (await bulletinRefBekannt(a.ref)) return { slug: null, ergebnis: "Artikel zu diesem Anlass liegt schon vor" }
 
-  const { text } = await generateText({
-    model: AUTOR,
-    prompt: `Du schreibst für creadig.de, die Webseite von creaDIG Solutions.
+  const prompt = `Du schreibst für creadig.de, die Webseite von creaDIG Solutions.
 ${firmenText("voll")}
 
 ${a.anlass}
@@ -111,16 +109,19 @@ Alles auf Deutsch ("de") UND natürlichem Türkisch ("tr", keine Wort-für-Wort-
 Zusätzlich "linkedin": ein LinkedIn-Beitrag auf Deutsch (600–900 Zeichen, erster Satz als Haken, ohne Hashtag-Wand, max. 3 Hashtags am Ende), der neugierig auf den Artikel macht.
 
 Antworte NUR mit JSON:
-{"slug":"kurzer-deutscher-url-slug-mit-keyword","keyword":"","metaBeschreibung":{"de":"","tr":""},"topic":{"de":"Themenwort","tr":""},"titel":{"de":"","tr":""},"teaser":{"de":"2 Sätze","tr":""},"metaTitel":{"de":"max 60 Zeichen","tr":""},"body":[{"kind":"text","text":{"de":"","tr":""}},{"kind":"heading","text":{"de":"","tr":""}},{"kind":"list","items":{"de":["",""],"tr":["",""]}},{"kind":"note","text":{"de":"","tr":""}}],"linkedin":""}`,
-  })
-
-  const s = text.indexOf("{")
-  const e = text.lastIndexOf("}")
+{"slug":"kurzer-deutscher-url-slug-mit-keyword","keyword":"","metaBeschreibung":{"de":"","tr":""},"topic":{"de":"Themenwort","tr":""},"titel":{"de":"","tr":""},"teaser":{"de":"2 Sätze","tr":""},"metaTitel":{"de":"max 60 Zeichen","tr":""},"body":[{"kind":"text","text":{"de":"","tr":""}},{"kind":"heading","text":{"de":"","tr":""}},{"kind":"list","items":{"de":["",""],"tr":["",""]}},{"kind":"note","text":{"de":"","tr":""}}],"linkedin":""}`
+  /* 24.10.2026: Der zweisprachige JSON-Artikel brach ohne Token-Budget ab („nicht sauber geschrieben").
+     Jetzt mit großem Budget und einem zweiten Versuch. */
   let j: Record<string, unknown> | null = null
-  try {
-    j = s >= 0 && e > s ? (JSON.parse(text.slice(s, e + 1)) as Record<string, unknown>) : null
-  } catch {
-    j = null
+  for (let versuch = 0; versuch < 2 && !(j && blocke(j.body).length >= 4); versuch++) {
+    const { text } = await generateText({ model: AUTOR, prompt, maxOutputTokens: 16000 })
+    const s = text.indexOf("{")
+    const e = text.lastIndexOf("}")
+    try {
+      j = s >= 0 && e > s ? (JSON.parse(text.slice(s, e + 1)) as Record<string, unknown>) : null
+    } catch {
+      j = null
+    }
   }
   const titel = zwei(j?.titel)
   const teaser = zwei(j?.teaser)

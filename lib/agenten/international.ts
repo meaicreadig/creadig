@@ -2,7 +2,6 @@ import "server-only"
 
 import { generateText } from "ai"
 
-import { legeFreigabeAn } from "@/lib/assistent/store"
 import { firmenText, MAERKTE } from "@/lib/firmenwahrheit"
 import { legeAuftragAn } from "@/lib/koordination/koordinator"
 
@@ -18,7 +17,11 @@ import { berlinTag, json, kw, MODELL, recherchiere, slug } from "./ki"
  * Kammern und Verbände der türkischstämmigen Wirtschaft, Messen mit offener
  * Anmeldung, Pflichten (Recht, Steuern, Sprache) vor dem ersten Kunden.
  * Keine Kaltakquise: Vorschläge sind Bewerbungen, Anmeldungen, Partner, die
- * selbst um Mitglieder werben — alles als Vorlage bei Emin.
+ * selbst um Mitglieder werben.
+ *
+ * 24.10.2026: Jede Chance lag als eigene Karte bei Emin (vier in einer Nacht).
+ * Jetzt geht sie als Auftrag an die Geschäftsführung, die sie vorbereitet und
+ * nur eine echte Anmeldung/Bewerbung mit fertiger Vorlage zu Emin bringt.
  */
 
 const FOKUS = [
@@ -53,13 +56,12 @@ Antworte NUR mit JSON: [{"name":"","art":"Programm|Kammer|Verband|Messe|Pflicht|
 
   let n = 0
   for (const c of chancen.slice(0, 3)) {
-    const id = await legeFreigabeAn({
-      art: "aufgabe",
+    const id = await legeAuftragAn({
+      von: "international",
+      an: "geschaeftsfuehrung",
       titel: `International · ${c.name} (${c.land})`,
-      inhalt: `${c.art} · ${c.land}${c.frist ? ` · Frist: ${c.frist}` : ""}\n\n${c.warum}\n\nNächster Schritt: ${c.naechsterSchritt}\n\nQuelle: ${c.url}`,
+      inhalt: `${c.art} · ${c.land}${c.frist ? ` · Frist: ${c.frist}` : ""}\n\n${c.warum}\n\nVorgeschlagener Schritt: ${c.naechsterSchritt}\n\nQuelle: ${c.url}\n\nBitte entscheiden: lohnt es in den nächsten 90 Tagen? Wenn ja, alles vorbereiten (Unterlagen, Text, Kosten) und nur die Anmeldung/Bewerbung selbst mit fertiger Vorlage an Emin. Wenn nein, mit Begründung schließen.`,
       quelle: `international:${slug(c.name)}`,
-      agent: "international",
-      extra: { warum: c.warum },
     })
     if (!id) continue
     n++
