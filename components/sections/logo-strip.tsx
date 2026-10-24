@@ -1,7 +1,7 @@
 "use client"
 
 import { useLocale } from "@/components/locale-provider"
-import { clientLogos, ownProducts, type LogoDunkel, type Region } from "@/lib/site-data"
+import { clientLogos, eigenLogos, ownProducts, type LogoDunkel, type Region } from "@/lib/site-data"
 import { MarkenZeichen } from "@/components/brand/marken-zeichen"
 import { cn } from "@/lib/utils"
 
@@ -131,7 +131,7 @@ export function LogoStrip() {
   const { t } = useLocale()
 
   const pool: Row[] = [
-    ...ownProducts.map(({ name, mark, region, color, logoPath, dunkel }) => ({
+    ...[...ownProducts, ...eigenLogos].map(({ name, mark, region, color, logoPath, dunkel }) => ({
       name,
       mark,
       region,

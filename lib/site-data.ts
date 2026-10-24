@@ -1252,18 +1252,22 @@ export const genannteClientWorks: Work[] = clientWorks.filter((w) => namensFreig
  * Luecke, sondern der ehrliche Zustand — dieselbe Regel, die `brands` schon
  * immer befolgt hat.
  */
-export const clientLogos: BrandLogo[] = clientWorks
-  .filter((work) => logoFreigabe(work).gedeckt)
-  .map((work) => ({
-    name: work.name,
-    logoPath: CLIENT_LOGOS[work.slug] ?? null,
-    mark: work.mark,
-    region: work.region,
-    // Kein Markenfarben-Raten: bis ein Logo vorliegt, traegt die Kachel die
-    // Hausfarbe. Eine erfundene Markenfarbe waere eine erfundene Angabe.
-    color: "#2f5bea",
-    dunkel: work.dunkel,
-  }))
+const alsLogo = (work: Work): BrandLogo => ({
+  name: work.name,
+  logoPath: CLIENT_LOGOS[work.slug] ?? null,
+  mark: work.mark,
+  region: work.region,
+  // Kein Markenfarben-Raten: bis ein Logo vorliegt, traegt die Kachel die
+  // Hausfarbe. Eine erfundene Markenfarbe waere eine erfundene Angabe.
+  color: "#2f5bea",
+  dunkel: work.dunkel,
+})
+
+/** Echte Kunden. Eigenbetriebe (meaqam) stehen nie unter „Kunden“ – es gibt keinen Auftraggeber (24.10.2026). */
+export const clientLogos: BrandLogo[] = clientWorks.filter((work) => !work.eigen && logoFreigabe(work).gedeckt).map(alsLogo)
+
+/** Eigenbetriebe – laufen in der Reihe „Eigene Produkte“ mit, als Beleg aus dem eigenen Betrieb. */
+export const eigenLogos: BrandLogo[] = clientWorks.filter((work) => work.eigen).map(alsLogo)
 
 /**
  * Referenzregister (B2) — dieselben Projekte, dichte Listenansicht.

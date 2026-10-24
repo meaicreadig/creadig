@@ -289,6 +289,14 @@ export async function pruefeWebseite(o: { tief?: boolean } = {}): Promise<Pruefu
     const falschKunde = genannteClientWorks.filter((w) => !w.eigen && REFERENZEN.some((r) => enthaelt(r.name, w.name.slice(0, 12)) && /eigen/i.test(r.art))).map((w) => w.name)
     if (falschKunde.length)
       neu({ code: "wahrheit:eigen", bereich: "inhalt", schwere: "kritisch", titel: `Eigenbetrieb als Kundenwerk ausgewiesen: ${falschKunde.join(", ")}`, detail: "Laut Firmenwahrheit ein eigenes Projekt – „Kundenwerk“ wäre eine falsche Angabe (UWG).", url: `${basis}/arbeiten`, an: "entwicklung" })
+    /* Auch im LIVE-Text: Die Logo-Wand auf /unternehmen zählte meaqam unter „Kunden:“, obwohl die Daten stimmten. */
+    for (const r of REFERENZEN.filter((r) => /eigen/i.test(r.art))) {
+      const name = r.name.split(" (")[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+      const muster = new RegExp(`(Kunden|Kundenwerk|Müşteriler|Clients)\\s*:?[^.!?]{0,600}\\b${name}\\b`, "i")
+      const treffer = texte.filter((t) => muster.test(t.text)).map((t) => t.s.url.replace(basis, "") || "/")
+      if (treffer.length)
+        neu({ code: `wahrheit:eigen-live:${name.toLowerCase()}`, bereich: "inhalt", schwere: "kritisch", titel: `Eigenbetrieb ${r.name.split(" (")[0]} steht unter „Kunden“ (${treffer.length} Seite${treffer.length > 1 ? "n" : ""})`, detail: `Laut Firmenwahrheit ein eigener Betrieb, kein Auftraggeber. Seiten: ${treffer.slice(0, 8).join(", ")}`, url: `${basis}${treffer[0] === "/" ? "" : treffer[0]}`, an: "entwicklung" })
+    }
   }
 
   /* Tote interne Links (Startseiten aller Sprachen). */

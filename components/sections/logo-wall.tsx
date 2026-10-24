@@ -2,7 +2,7 @@
 
 import { Reveal } from "@/components/ui/reveal"
 import { useLocale } from "@/components/locale-provider"
-import { brands, clientLogos, ownProducts, type LogoDunkel, type Region } from "@/lib/site-data"
+import { brands, clientLogos, eigenLogos, ownProducts, type LogoDunkel, type Region } from "@/lib/site-data"
 import { MarkenZeichen } from "@/components/brand/marken-zeichen"
 import { SectionEyebrow } from "@/components/ui/section-eyebrow"
 
@@ -110,7 +110,7 @@ function MarqueeRow({ items, direction }: { items: Row[]; direction: "left" | "r
 export function LogoWall() {
   const { t } = useLocale()
 
-  const productRow: Row[] = ownProducts.map(({ name, mark, region, color, logoPath, dunkel }) => ({
+  const productRow: Row[] = [...ownProducts, ...eigenLogos].map(({ name, mark, region, color, logoPath, dunkel }) => ({
     name,
     mark,
     region,
