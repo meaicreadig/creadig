@@ -60,8 +60,9 @@ export function ogAlt(locale: Locale) {
 const NAVY = "#0a1322"
 const INK = "#eef2f8"
 const MUTED = "#93a1b8"
-const GOLD = "#E4C378"
-const GOLD_DEEP = "#BE904E"
+// Aktuelle CI-Akzentfarbe (app/globals.css --primary) — nicht mehr das alte Gold.
+const ACCENT = "#2f5bea"
+const ACCENT_DEEP = "#1e40af"
 
 // Die aufgehellte Variante — das Bild steht auf dunklem Grund.
 const LOGO = readFileSync(
@@ -111,7 +112,7 @@ export async function renderOgImage(locale: Locale) {
             left: 0,
             right: 0,
             height: 5,
-            background: `linear-gradient(90deg, ${GOLD_DEEP} 0%, ${GOLD} 50%, ${GOLD_DEEP} 100%)`,
+            background: `linear-gradient(90deg, ${ACCENT_DEEP} 0%, ${ACCENT} 50%, ${ACCENT_DEEP} 100%)`,
           }}
         />
 
@@ -140,7 +141,7 @@ export async function renderOgImage(locale: Locale) {
               }}
             >
               <span>{t.headline}</span>
-              <span style={{ color: GOLD }}>{t.headlineAccent}</span>
+              <span style={{ color: ACCENT }}>{t.headlineAccent}</span>
             </div>
             <div style={{ display: "flex", fontSize: 26, fontWeight: 500, lineHeight: 1.5, color: MUTED, maxWidth: 640 }}>
               {t.lead}
@@ -158,8 +159,8 @@ export async function renderOgImage(locale: Locale) {
             }}
           >
             <span>{t.disciplines}</span>
-            <span style={{ color: GOLD_DEEP }}>·</span>
-            <span style={{ color: GOLD }}>{t.origin}</span>
+            <span style={{ color: ACCENT_DEEP }}>·</span>
+            <span style={{ color: ACCENT }}>{t.origin}</span>
           </div>
         </div>
 
@@ -185,15 +186,15 @@ export async function renderOgImage(locale: Locale) {
                 height: 52,
                 padding: "0 20px",
                 borderRadius: 6,
-                border: `1px solid ${i === 0 ? GOLD : "#22324f"}`,
-                background: i === 0 ? "rgba(228,195,120,0.14)" : "#0f1b30",
-                color: i === 0 ? GOLD : INK,
+                border: `1px solid ${i === 0 ? ACCENT : "#22324f"}`,
+                background: i === 0 ? "rgba(47,91,234,0.14)" : "#0f1b30",
+                color: i === 0 ? ACCENT : INK,
                 fontSize: 20,
                 fontWeight: 500,
               }}
             >
               <span>{level}</span>
-              <span style={{ fontSize: 15, color: i === 0 ? GOLD : "#5d6c86", letterSpacing: 2 }}>{`0${5 - i}`}</span>
+              <span style={{ fontSize: 15, color: i === 0 ? ACCENT : "#5d6c86", letterSpacing: 2 }}>{`0${5 - i}`}</span>
             </div>
           ))}
         </div>
