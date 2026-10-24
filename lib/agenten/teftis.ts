@@ -190,6 +190,17 @@ export async function teftisRunde(): Promise<{ ergebnis: string; anzahl: number 
   for (const s of SCHEMA) await q(s, [])
   const tag = berlinTag()
 
+  /* Jeden Tag zuerst: Geld-Karten wartender Chancen schließen (Gespräch/Antwort steht noch aus). */
+  const { raeumeWartendeKarten } = await import("@/lib/ausfuehrung/vorbehalt")
+  const { WARTE_AGENTEN } = await import("@/lib/assistent/store")
+  const geraeumt = await raeumeWartendeKarten(q, WARTE_AGENTEN).catch(() => [])
+  if (geraeumt.length)
+    await speichereNachricht(
+      "assistant",
+      `Teoman (Teftiş): ${geraeumt.length} Karte${geraeumt.length > 1 ? "n" : ""} zurückgenommen – die Chance wartet noch auf dein Gespräch bzw. eine Antwort.`,
+      geraeumt.map((k) => ({ agent: "teftis", was: `${k.titel} → ${k.grund}`, stand: "erledigt" as const })),
+    ).catch(() => null)
+
   const [letzter] = (await q(`SELECT punkte, created_at FROM teftis_berichte ORDER BY created_at DESC LIMIT 1`, [])) as { punkte: number; created_at: string }[]
   const voll = !letzter || Date.now() - new Date(letzter.created_at).getTime() > (ZYKLUS_TAGE - 0.3) * 864e5
 

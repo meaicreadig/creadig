@@ -250,7 +250,9 @@ export async function fragenHeute(): Promise<number> {
 }
 
 /** Agenten, deren Karten zu einer Chance Geld oder Druck bedeuten (Angebot, Rechnung, Nachfassen). */
-const GELD_AGENTEN = ["vertrieb", "angebot", "finanz", "forderungen", "projekte"]
+export const GELD_AGENTEN = ["vertrieb", "angebot", "finanz", "forderungen", "projekte"]
+/** Geld-Agenten plus Nachfassen (Motor) und Geschäftsleitungs-Beschlüsse: warten mit, solange die Chance auf Gespräch oder Antwort wartet. */
+export const WARTE_AGENTEN = [...GELD_AGENTEN, "motor", "rat"]
 
 const PROAKTIV = ["jaeger", "vertrieb", "partner", "kundenbetreuung", "international", "golf", "redaktion", "marketing", "ideen", "kapital"]
 const TAGES_DECKEL = Number(process.env.KARTEN_TAGES_DECKEL) || 4
@@ -286,10 +288,10 @@ export async function legeFreigabeAn(f: {
   const { zielGesperrt } = await import("@/lib/lernen/store")
   if (await zielGesperrt({ agent: f.agent, quelle: f.quelle, empfaenger: f.empfaenger, orgId: f.extra?.orgId }).catch(() => false)) return null
   /* Katman 6: Wartet die Chance auf Emins Gespräch, entsteht kein Angebot, keine Rechnung, kein Nachfassen. */
-  const opp = f.extra?.bezug?.startsWith("opportunity:") ? f.extra.bezug.slice(12) : (f.quelle?.match(/opp-[a-z0-9-]+?(?=:\d{4}-|$)/i)?.[0] ?? null)
-  if (opp && f.agent && GELD_AGENTEN.includes(f.agent) && !f.extra?.nachAnnahme) {
-    const { wartetAufGespraech } = await import("@/lib/ausfuehrung/vorbehalt")
-    if (await wartetAufGespraech(q, opp)) return null
+  /* 24.10.2026: auch über Kontakt/Firma (Motor-Dankesmail an Cabir Gölbaşı lief ohne Opp-Bezug durch). */
+  if (f.agent && WARTE_AGENTEN.includes(f.agent) && !f.extra?.nachAnnahme) {
+    const { karteWartet } = await import("@/lib/ausfuehrung/vorbehalt")
+    if (await karteWartet(q, { bezug: f.extra?.bezug, quelle: f.quelle, orgId: f.extra?.orgId })) return null
   }
   /*
    * Karten-Tavan (24.10.2026): Von proaktiven Vorschlägen (Akquise, Redaktion,
