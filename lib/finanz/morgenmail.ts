@@ -12,6 +12,7 @@ import { sendeMail, siteUrl } from "@/lib/termine/mail"
 import { FIRMA, kampagnenHtml } from "@/lib/mailing/vorlage"
 import { morgenBriefing, type BriefingSchritt } from "@/lib/admin/morgen-briefing"
 import { zaehleOffen } from "@/lib/assistent/store"
+import { finanzamtWartet, ruhtBeimAmt } from "@/lib/finanz/finanzamt"
 
 /**
  * Besitzer-Morgenmail (Phase 7) — fasst zusammen, was heute Aufmerksamkeit
@@ -32,19 +33,22 @@ export type MorgenBericht = {
   bankUmsaetzeOffen: number
   /** Ab dem 25. des Monats, solange weder Verpflegungs- noch Homeoffice-Pauschale für den laufenden Monat erfasst ist. */
   pauschalenFehlen: boolean
+  /** Finanzamt-Erfassung steht aus: ESt/USt-Fristen ohne Bescheid ruhen. */
+  amtWartet: { seit: string | null; ruhend: number } | null
   /** Kompass()-Hinweise mit schwere="neutral" — Wachstum/Kapital, keine Störung, aber auch nicht nur bei Problemen interessant. */
   wachstumsHinweise: string[]
 }
 
 export async function erstelleMorgenBericht(db: Abfrage): Promise<MorgenBericht> {
   const heute = heuteBerlin()
-  const [lage, rechnungen, belege, bankUmsaetze, kurzlage, gestern] = await Promise.all([
+  const [lage, rechnungen, belege, bankUmsaetze, kurzlage, gestern, amt] = await Promise.all([
     berechneLage(db),
     ladeDokumente(db, ["rechnung"]),
     ladeBelege(db, null),
     ladeOffeneBankUmsaetze(db),
     ladeFinanzKurzlage(db, heute),
     db(`SELECT count(*)::int AS n FROM fin_belege WHERE zugeordnet_at > now() - interval '24 hours'`, []).catch(() => [{ n: 0 }]),
+    finanzamtWartet(db),
   ])
 
   const faelligeMahnungen = rechnungen
@@ -56,14 +60,16 @@ export async function erstelleMorgenBericht(db: Abfrage): Promise<MorgenBericht>
     })
     .filter((x): x is { id: string; nummer: string; kunde: string; stufe: number; tageUeberfaellig: number } => x !== null)
 
-  const fristen = lage.fristen
-    .filter((f) => !f.erledigt && tageZwischen(heute, f.faellig) <= 14)
+  const offen = lage.fristen.filter((f) => !f.erledigt && tageZwischen(heute, f.faellig) <= 14)
+  const ruhend = amt.wartet ? offen.filter(ruhtBeimAmt).length : 0
+  const fristen = offen
+    .filter((f) => !(amt.wartet && ruhtBeimAmt(f)))
     .map((f) => ({ id: f.id, titel: f.titel, art: f.art, faellig: f.faellig, tageBis: tageZwischen(heute, f.faellig), betragCent: f.betragCent }))
 
   const paragraph19Hinweis = lage.hinweise.find((h) => h.text.includes("§ 19"))?.text ?? null
   const wachstumsHinweise = lage.hinweise.filter((h) => h.schwere === "neutral").map((h) => h.text)
 
-  return { heute, faelligeMahnungen, fristen, paragraph19Hinweis, belegeImKorb: belege.korbAnzahl, belegeGestern: Number((gestern[0] as { n?: number } | undefined)?.n ?? 0), bankUmsaetzeOffen: bankUmsaetze.length, pauschalenFehlen: Number(heute.slice(8, 10)) >= PAUSCHALEN_ERINNERUNG_AB_TAG && !kurzlage.pauschaleErfasst, wachstumsHinweise }
+  return { heute, faelligeMahnungen, fristen, paragraph19Hinweis, amtWartet: amt.wartet ? { seit: amt.seit, ruhend } : null, belegeImKorb: belege.korbAnzahl, belegeGestern: Number((gestern[0] as { n?: number } | undefined)?.n ?? 0), bankUmsaetzeOffen: bankUmsaetze.length, pauschalenFehlen: Number(heute.slice(8, 10)) >= PAUSCHALEN_ERINNERUNG_AB_TAG && !kurzlage.pauschaleErfasst, wachstumsHinweise }
 }
 
 /** "Ruhig" meint: nichts Dringendes — Wachstumshinweise zählen bewusst nicht mit, die sind gerade an ruhigen Tagen am nützlichsten. */
@@ -236,6 +242,10 @@ function berichtMail(b: MorgenBericht, a: AssistentTeil): { subject: string; tex
             : `**${-f.tageBis} Tage überfällig** (${(f.betragCent / 100).toLocaleString("de-DE", { style: "currency", currency: "EUR" })}) –`
     finanz.push(`- [clock] ${zeile(f.titel)} (${datumKurz(f.faellig)}): ${frage} [abhaken](${basis}/finanz/steuern)`)
   }
+  if (b.amtWartet)
+    finanz.push(
+      `- [clock] Finanzamt: Die Entscheidung steht noch aus${b.amtWartet.seit ? ` (vermerkt am ${datumKurz(b.amtWartet.seit)})` : ""} – ${b.amtWartet.ruhend ? `${b.amtWartet.ruhend} Steuerfristen ruhen` : "Steuerfristen ruhen"} bis dahin. Kommt Post vom Amt: [hier eintragen](${basis}/finanz/steuern).`,
+    )
   if (b.paragraph19Hinweis) finanz.push(`- [shield] § 19 Kleinunternehmer: ${zeile(b.paragraph19Hinweis)}`)
   if (b.belegeImKorb > 0)
     finanz.push(

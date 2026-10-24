@@ -49,7 +49,15 @@ export async function ladeFinanzKurzlage(db: Abfrage, heute: string): Promise<Fi
           AND to_char(datum,'YYYY-MM') = $1`,
       [heute.slice(0, 7)],
     ),
-    db(`SELECT titel, (faellig - $1::date) AS tage FROM fin_fristen WHERE erledigt_at IS NULL ORDER BY faellig LIMIT 1`, [heute]),
+    /* Wartet das Finanzamt noch (lib/finanz/finanzamt.ts), ruhen ESt/USt-Fristen ohne Bescheid. */
+    db(
+      `SELECT titel, (faellig - $1::date) AS tage FROM fin_fristen
+        WHERE erledigt_at IS NULL
+          AND NOT (art IN ('est','ust') AND betrag_cent IS NULL AND coalesce(
+            (SELECT daten->>'wartet' FROM fin_protokoll WHERE aktion = 'finanzamt_status' ORDER BY created_at DESC LIMIT 1), 'false') = 'true')
+        ORDER BY faellig LIMIT 1`,
+      [heute],
+    ),
     db(
       `SELECT count(*) AS c FROM fin_dokumente fd
         WHERE fd.art = 'rechnung' AND fd.status IN ('versendet','teilbezahlt') AND fd.faellig_am < $1::date

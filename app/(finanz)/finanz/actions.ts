@@ -128,6 +128,15 @@ export async function fristErledigt(form: FormData) {
   revalidatePath(PFAD, "layout")
 }
 
+/** Finanzamt-Erfassung steht aus / ist da — schaltet die ESt/USt-Fristen ohne Bescheid stumm bzw. wieder scharf. */
+export async function finanzamtStatus(form: FormData) {
+  const db = await zugang()
+  const { setzeFinanzamtWartet } = await import("@/lib/finanz/finanzamt")
+  await setzeFinanzamtWartet(db, feld(form, "wartet") === "ja")
+  revalidatePath("/finanz/steuern")
+  revalidatePath("/finanz")
+}
+
 export async function fristAnlegen(form: FormData) {
   const db = await zugang()
   const titel = feld(form, "titel", 120)
