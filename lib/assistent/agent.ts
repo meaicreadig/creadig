@@ -34,6 +34,9 @@ Regeln:
 - Nennt er einen Subunternehmer/Freelancer für Projekte, lege ihn mit "subunternehmer_anlegen" an.
 - Nennt er Bestandskunden (auch als Liste), lege jeden sofort mit "bestandskunde_anlegen" an und bestätige die Zahl.
 - Absprachen zu Kunden/Chancen (Termin, nächster Schritt, Ort, Verband, wer entscheidet) speicherst du SOFORT mit "absprache_speichern". Bestätige danach kurz, was gespeichert ist. Er soll nichts zweimal sagen müssen.
+- Erzählt er von einem NEUEN Interessenten (Gespräch am Stand, Anruf, WhatsApp, Empfehlung) oder findet "absprache_speichern" keine passende Chance: SOFORT "chance_anlegen" aufrufen – in derselben Antwort, ohne Rückfrage. Fehlende Angaben (Telefon, Mail) leer lassen, nicht erfragen.
+- Kündige NIE eine Handlung an ("ich lege an", "ich trage ein", "ich gebe weiter"), die du nicht im selben Zug mit einem Werkzeug ausgeführt hast. Entweder du hast es getan, oder du sagst ehrlich, was fehlt.
+- Nach jedem Anlegen sagst du ihm in drei Zeilen: was angelegt ist, WER es jetzt übernimmt (Abteilung aus dem Werkzeug-Ergebnis) und den nächsten Schritt mit Datum. Kein Angebot vor dem Gespräch.
 - LinkedIn: Artikel-Charakter, echter Mehrwert aus der Praxis, Produkt nur beiläufig. Keine Werbesprache.
 - Wenn er laut denkt ("ich gehe zur Messe X", "Kunde Y hat geschrieben"), zerlege es in konkrete nächste Schritte und lege die wichtigsten als Vorschläge an.
 - Schlage nichts vor, was er sich nicht leisten kann (Messestand, bezahlte Werbung, Personal), solange "finanzrahmen" das nicht hergibt. Biete stattdessen die kostenlose Variante an.
@@ -225,6 +228,31 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<s
         return { gespeichert: true, firma: org.name, neu: org.neu, als: v.ehemalig ? "ehemaliger Kunde" : "Kunde" }
       },
     }),
+    chance_anlegen: tool({
+      description:
+        "Legt einen NEUEN Interessenten als Chance an (Firma, Ansprechpartner, Bedarf, wie kennengelernt, nächster Schritt) und übergibt ihn an den Vertrieb: Chronik, Gesprächsvorbehalt (kein Angebot vor dem Termin), Auftrag 'Termin nachhalten', Motor-Ereignis. Gibt es bei der Firma schon eine offene Chance, wird sie ergänzt. Aufrufen, sobald Emin von einem neuen Kontakt/Lead erzählt.",
+      inputSchema: z.object({
+        firma: z.string().min(2).max(160),
+        ort: z.string().max(120).optional(),
+        website: z.string().max(200).optional(),
+        ansprechpartner: z.string().max(120).optional(),
+        telefon: z.string().max(60).optional(),
+        email: z.string().email().max(200).optional(),
+        bedarf: z.string().min(3).max(400).describe("Was der Interessent will, in seinen Worten"),
+        wieKennengelernt: z.string().min(3).max(400).describe("z. B. 'Standgespräch 10 Min. am 24.10.'"),
+        bisherGetan: z.string().max(300).optional().describe("z. B. 'WhatsApp mit Terminvorschlag geschickt'"),
+        naechsterSchritt: z.string().max(300).optional(),
+        datum: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().describe("Bis wann der nächste Schritt, JJJJ-MM-TT; ohne Angabe in 3 Tagen"),
+      }),
+      execute: async (v) => {
+        const q = await assistentDb()
+        if (!q) return { angelegt: false, grund: "keine Datenbank" }
+        const { legeChanceAn } = await import("./chance")
+        const r = await legeChanceAn(q, v)
+        await protokolliereFaden(q, "assistent", "vertrieb", `Neue Chance: ${r.firma}`).catch(() => null)
+        return r
+      },
+    }),
     absprache_speichern: tool({
       description:
         "Speichert, was Emin zu einer offenen Chance gesagt hat (nächster Schritt, Datum, Fakten wie Ort/Verband/Ansprechpartner) direkt an der Chance. IMMER aufrufen, sobald er etwas zu einem Kunden/Deal festlegt – Morgenbriefing, Vertrieb und Agenten lesen genau das.",
@@ -245,7 +273,8 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<s
             ORDER BY o.updated_at DESC LIMIT 2`,
           [muster],
         )
-        if (treffer.length !== 1) return { gespeichert: false, grund: treffer.length ? "mehrdeutig – genauer fragen" : "keine passende offene Chance", treffer }
+        if (treffer.length !== 1)
+          return { gespeichert: false, grund: treffer.length ? "mehrdeutig – genauer fragen" : "keine passende offene Chance – jetzt chance_anlegen aufrufen", treffer }
         const id = String(treffer[0].id)
         const stempel = new Intl.DateTimeFormat("de-DE", { dateStyle: "short", timeZone: "Europe/Berlin" }).format(new Date())
         await q(
