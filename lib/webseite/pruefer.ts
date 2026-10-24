@@ -424,7 +424,8 @@ Marke (Blau, Schrift) NICHT infrage stellen.
 Bewerte wie eine internationale Top-Agentur: Wirkt die Seite auf den ersten Blick hochwertig, klar und vertrauenswürdig? Ist sofort klar, was creaDIG verkauft und was der nächste Schritt ist? Lesbarkeit, Abstände, Kontrast, Bildsprache.
 Nenne höchstens 3 konkrete Schwächen, die man ändern sollte (keine Lobreden). Antworte NUR mit JSON: [{"titel":"kurz","detail":"was genau und wie besser","schwere":"wichtig|hinweis"}]`,
             },
-            { type: "image", image: bild },
+            /* PageSpeed liefert eine data:-URL (meist JPEG/WebP) – als Datei-Teil mit echtem Typ. */
+            { type: "file", data: Buffer.from(bild.replace(/^data:[^,]+,/, ""), "base64"), mediaType: bild.match(/^data:([^;,]+)/)?.[1] ?? "image/jpeg" },
           ],
         },
       ],

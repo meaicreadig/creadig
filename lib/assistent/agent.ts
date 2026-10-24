@@ -217,7 +217,7 @@ export async function antworte(verlauf: Nachricht[], bild?: ChatBild): Promise<s
       role: "user",
       content: [
         { type: "text", text: String(letzte.content) },
-        { type: "image", image: Buffer.from(bild.base64, "base64"), mediaType: bild.mediaType },
+        { type: "file", data: Buffer.from(bild.base64, "base64"), mediaType: bild.mediaType },
       ],
     }
   }

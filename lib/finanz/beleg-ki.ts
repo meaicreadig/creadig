@@ -47,7 +47,6 @@ export const belegKiBereit = () =>
 export async function leseBelegAus(bytes: Buffer, mimeType: string): Promise<BelegVorschlag | null> {
   if (!belegKiBereit()) return null
   try {
-    const istPdf = mimeType === "application/pdf"
     const { text } = await generateText({
       model: "openai/gpt-5.4-mini",
       system: SYSTEM,
@@ -56,7 +55,7 @@ export async function leseBelegAus(bytes: Buffer, mimeType: string): Promise<Bel
           role: "user",
           content: [
             { type: "text", text: "Lies diesen Beleg aus und antworte nur mit dem JSON-Objekt." },
-            istPdf ? { type: "file", data: bytes, mediaType: mimeType } : { type: "image", image: bytes },
+            { type: "file", data: bytes, mediaType: mimeType },
           ],
         },
       ],
